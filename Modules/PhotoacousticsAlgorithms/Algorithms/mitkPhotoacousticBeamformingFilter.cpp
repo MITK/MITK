@@ -237,6 +237,7 @@ void mitk::BeamformingFilter::GenerateData()
     }
     m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
     m_oclFilter->SetOutputDim(oclOutputDim);
+    m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.RecordTime, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic);
     m_oclFilter->Update();
 
     auto out = m_oclFilter->GetOutput();
@@ -387,16 +388,11 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
   float l_i = 0;
   float s_i = 0;
 
-  float l = 0;
-  float x = 0;
-  float root = 0;
-
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
   float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   float apod_mult = 1;
 
-  float mult = 0;
   short usedLines = (maxLine - minLine);
 
   //exact delay

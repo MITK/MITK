@@ -73,6 +73,15 @@ public:
     m_PAImage = PA;
   }
 
+  void SetBeamformingParameters(float SpeedOfSound, float RecordTime, float Pitch, float Angle, bool PAImage)
+  {
+    m_SpeedOfSound = SpeedOfSound;
+    m_RecordTime = RecordTime;
+    m_Pitch = Pitch;
+    m_Angle = Angle;
+    m_PAImage = PAImage;
+  }
+
 protected:
 
   /** Constructor */
@@ -107,10 +116,13 @@ private:
   unsigned short m_InputS;
   unsigned short m_InputL;
   float* m_Apodisation;
-  float lol = 5;
   unsigned short m_ApodArraySize;
   BeamformingAlgorithm m_Algorithm;
-  bool m_PAImage;
+  unsigned short m_PAImage;
+  float m_SpeedOfSound;
+  float m_RecordTime;
+  float m_Pitch;
+  float m_Angle;
 };
 }
 #endif

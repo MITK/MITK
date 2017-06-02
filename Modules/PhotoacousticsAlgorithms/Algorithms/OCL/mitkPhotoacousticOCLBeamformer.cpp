@@ -84,10 +84,16 @@ void mitk::PhotoacousticOCLBeamformer::Execute()
   CHECK_OCL_ERR(clErr);
 
   // set kernel arguments
-  clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &cl_input);
+  clErr = clSetKernelArg( this->m_PixelCalculation, 2, sizeof(cl_mem), &cl_input);
   clErr |= clSetKernelArg( this->m_PixelCalculation, 3, sizeof(cl_ushort), &(this->m_ApodArraySize) );
   clErr |= clSetKernelArg( this->m_PixelCalculation, 4, sizeof(cl_ushort), &(this->m_OutputDim[1]) );
   clErr |= clSetKernelArg( this->m_PixelCalculation, 5, sizeof(cl_ushort), &(this->m_OutputDim[0]) );
+  clErr |= clSetKernelArg( this->m_PixelCalculation, 6, sizeof(cl_float), &(this->m_SpeedOfSound) );
+  clErr |= clSetKernelArg( this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_RecordTime) );
+  clErr |= clSetKernelArg( this->m_PixelCalculation, 8, sizeof(cl_float), &(this->m_Pitch) );
+  clErr |= clSetKernelArg( this->m_PixelCalculation, 9, sizeof(cl_float), &(this->m_Angle) );
+  clErr |= clSetKernelArg( this->m_PixelCalculation, 10, sizeof(cl_ushort), &(this->m_PAImage));
+
   CHECK_OCL_ERR( clErr );
 
   // execute the filter on a 3D NDRange

@@ -345,6 +345,7 @@ namespace mitk {
   const std::string TAG_ROI_MEAN = "6000|1302";
   const std::string TAG_ROI_STDDEV = "6000|1303";
   const std::string TAG_PIXEL_DAT = "7fe0|0010";
+  const std::string TAG_EX_INFO = "0051|100E";
 
   static const std::vector<std::string> dicomTagsList = {
     "0008|0008", // TAG_IMAGE_TYPE
@@ -689,6 +690,7 @@ namespace mitk {
     "6000|1302", // TAG_ROI_MEAN
     "6000|1303", // TAG_ROI_STDDEV
     "7fe0|0010", // TAG_PIXEL_DATA
+    "0051|100E", // TAG_EX_INFO
   };
   
   static const std::map<std::string, std::string> tagToPropertyMap = {

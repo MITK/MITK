@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkStdMultiWidget.h"
 
+#include <boost/format.hpp>
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -1634,6 +1636,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       }
       cornerimgtext[i] = _infoStringStream[i].str();
       setCornerAnnotation(2, i, cornerimgtext[i].c_str());
+      setViewDirectionAnnontation(image, p[i], i);
     }
 
     unsigned long newImageMTime = image->GetMTime();
@@ -1690,10 +1693,18 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         infoStringStream[0].clear();
       }
 
-      if (m_displayMetaInfo) {
+      if (m_displayMetaInfo && !magneticFieldStrength.empty()) {
         infoStringStream[1]
-          << "FS: " << magneticFieldStrength
-          << '\n' << "TR: " << dicomTR << " TE: " << dicomTE;
+          << "FS: " << magneticFieldStrength;
+      }
+      if (m_displayMetaInfo && (!dicomTR.empty() || !dicomTE.empty())) {
+        infoStringStream[1] << '\n';
+        if (!dicomTR.empty()) {
+          infoStringStream[1] << "TR: " << dicomTR;
+        }
+        if (!dicomTE.empty()) {
+          infoStringStream[1] << " TE: " << dicomTE;
+        }
       }
       if (m_displayMetaInfo && (studyDate != "" && studyTime != "")) {
         sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
@@ -2113,5 +2124,72 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
   case 3: return this->m_PlaneNode3;
     break;
   default: return NULL;
+  }
+}
+
+int valFromIntProp(mitk::Image* image, std::string propName, int slice, int defaultVal)
+{
+  propName = boost::str(boost::format(propName) % slice);
+  mitk::IntProperty* prop = nullptr;
+  if (image) {
+    prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(propName.c_str())));
+  }
+  return prop ? prop->GetValue() : defaultVal;
+}
+
+bool valFromBoolProp(mitk::Image* image, std::string propName, int slice, bool defaultVal)
+{
+  propName = boost::str(boost::format(propName) % slice);
+  mitk::BoolProperty* boolProp = nullptr;
+  if (image) {
+    boolProp = dynamic_cast<mitk::BoolProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(propName.c_str())));
+  }
+  return boolProp ? boolProp->GetValue() : defaultVal;
+}
+
+void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int slice, int i)
+{
+  auto mainAxis = valFromIntProp(image, "autoplan.mainAxisIndex_%d", slice, -1);
+  auto secondAxis = valFromIntProp(image, "autoplan.secondaryAxisIndex_%d", slice, -1);
+
+  auto mainSign = valFromBoolProp(image, "autoplan.mainAxisSign_%d", slice, true);
+  auto secondSign = valFromBoolProp(image, "autoplan.secondaryAxisSign_%d", slice, true);
+
+  switch (mainAxis) {
+  case 0:
+    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, mainSign ? "I" : "S");
+    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, mainSign ? "S" : "I");
+    break;
+  case 1:
+    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, mainSign ? "S" : "I");
+    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, mainSign ? "I" : "S");
+    break;
+  case 2:
+    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, mainSign ? "A" : "P");
+    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, mainSign ? "P" : "A");
+    break;
+  default:
+    setCornerAnnotation(vtkCornerAnnotation::UpperEdge, i, " ");
+    setCornerAnnotation(vtkCornerAnnotation::LowerEdge, i, " ");
+    break;
+  }
+
+  switch (secondAxis) {
+  case 0:
+    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, secondSign ? "L" : "R");
+    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, secondSign ? "R" : "L");
+    break;
+  case 1:
+    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, secondSign ? "P" : "A");
+    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, secondSign ? "A" : "P");
+    break;
+  case 2:
+    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, secondSign ? "L" : "R");
+    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, secondSign ? "R" : "L");
+    break;
+  default:
+    setCornerAnnotation(vtkCornerAnnotation::RightEdge, i, " ");
+    setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, " ");
+    break;
   }
 }

@@ -360,6 +360,7 @@ public:
    */
   std::pair<mitk::Color, mitk::Color> GetGradientColors(unsigned int widgetNumber);
 protected:
+  void setViewDirectionAnnontation(mitk::Image* image, int slice, int index);
 
   QHBoxLayout* QmitkStdMultiWidgetLayout;
 

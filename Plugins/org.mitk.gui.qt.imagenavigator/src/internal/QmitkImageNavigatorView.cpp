@@ -44,8 +44,8 @@ static mitk::DataNode::Pointer GetTopLayerNode(const mitk::DataStorage::SetOfObj
         // find node with largest layer, that is the node shown on top in the render window
         for (unsigned int x = 0; x < nodes->size(); x++)
         {
-            if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
-                 nodes->at(x)->GetData()->GetGeometry()->IsInside(position) )
+            auto data = nodes->at(x)->GetData();
+            if (data && data->GetGeometry() && data->GetGeometry()->IsInside(position))
             {
                 int layer = 0;
                 if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;

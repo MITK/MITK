@@ -15,6 +15,7 @@
 #include <boost/locale/encoding.hpp>
 #include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/locale.hpp>
 
 // boost log
 #include <boost/log/expressions.hpp>
@@ -156,6 +157,7 @@ namespace Logger
   }
 
   Log::Log()
+    : sourceAttribute(std::string())
   {
     dataBackend =
       boost::make_shared< boost::log::sinks::text_ostream_backend >();
@@ -182,6 +184,13 @@ namespace Logger
     return INSTANCE;
   }
 
+  Log& Log::get(const std::string& src)
+  {
+    auto& impl = get();
+    impl.setSource(src);
+    return impl;
+  }
+
   void Log::reinitLogger() const
   {
     boost::log::core::get()->flush();
@@ -201,12 +210,14 @@ namespace Logger
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
         ));
       sink->set_formatter(
-        boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\" host=\"%4%\" user=\"%5%\">%3%</record>")
+        boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\" severity=\"%6%\" host=\"%4%\" user=\"%5%\ source=\"%7%\">%3%</record>")
         % boost::log::expressions::attr< unsigned int >("RecordID")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
+        % boost::log::trivial::severity
+        % boost::log::expressions::attr<std::string>("Source")
         );
 
       auto write_header = [](boost::log::sinks::text_file_backend::stream_type& file) {
@@ -237,11 +248,17 @@ namespace Logger
 
       boost::shared_ptr< ostream_sink > sink2(new ostream_sink(backend));
       sink2->set_formatter(
-        boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"message\": \"%1%\"}")
-        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
+        boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"message\": \"%1%\"}")
+        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::message]
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
+        % boost::log::trivial::severity
+        % boost::log::expressions::attr<std::string>("Source")
       );
+
+      std::locale loc = boost::locale::generator()("en_US.UTF-8");
+      sink2->imbue(loc);
+
       boost::log::core::get()->add_sink(sink2);
     }
 
@@ -250,11 +267,13 @@ namespace Logger
 
       boost::shared_ptr< ostream_sink > sink3(new ostream_sink(dataBackend));
       sink3->set_formatter(
-        boost::log::expressions::format("%1% [%3% %4%] > %2%")
+        boost::log::expressions::format("%1% [%3% %4%] %5% (%6%) > %2%")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
+        % boost::log::trivial::severity
+        % boost::log::expressions::attr<std::string>("Source")
         );
 
       boost::log::core::get()->add_sink(sink3);
@@ -266,6 +285,11 @@ namespace Logger
         boost::log::keywords::format = (
           boost::log::expressions::stream
           << '[' << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT) << "] "
+          << '(' << boost::log::expressions::attr<std::string>("Source") << ')'
+          << boost::log::expressions::if_(boost::log::trivial::severity != boost::log::trivial::info)
+          [
+            boost::log::expressions::stream << boost::log::trivial::severity
+          ] << ": "
           << boost::log::expressions::smessage
           )
         );
@@ -277,7 +301,14 @@ namespace Logger
     boost::log::core::get()->add_global_attribute("UserName", boost::log::attributes::constant<std::string>(getName(NameType::USER)));
     boost::log::core::get()->add_global_attribute("ComputerName", boost::log::attributes::constant<std::string>(getName(NameType::HOST)));
 
+    boost::log::core::get()->add_global_attribute("Source", sourceAttribute);
+
     boost::log::add_common_attributes();
+  }
+
+  void Log::setSource(const std::string& src)
+  {
+    sourceAttribute.set(src);
   }
 
   // reutrns true in case of date time parse success

@@ -22,22 +22,24 @@
 // boost log::sinks
 #include <boost/log/sinks/text_ostream_backend.hpp>
 
+// boost log::attributes
+#include <boost/log/attributes/mutable_constant.hpp>
+
 #include <MitkLoggingExports.h>
 
 // TODO add call BOOST_CURRENT_FUNCTION after investigate it behavior on Apple system
 #ifdef __APPLE__
   #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info)
-  #define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::error) << "Error: "
+  #define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::error)
   #define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::trace)
-  #define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning) << "Warning: "
-  #define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal) << "Fatal Error: "
+  #define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning)
+  #define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal)
 #else
-  #define AUTOPLAN_LOG_CALLER_NAME << '(' << Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION) <<") "
-  #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info) AUTOPLAN_LOG_CALLER_NAME
-  #define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::error) AUTOPLAN_LOG_CALLER_NAME << "Error: "
-  #define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::trace) AUTOPLAN_LOG_CALLER_NAME
-  #define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning) AUTOPLAN_LOG_CALLER_NAME << "Warning: "
-  #define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal) AUTOPLAN_LOG_CALLER_NAME << "Fatal Error: "
+  #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get(Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION)).lg, boost::log::trivial::info)
+  #define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get(Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION)).lg, boost::log::trivial::error)
+  #define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get(Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION)).lg, boost::log::trivial::trace)
+  #define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get(Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION)).lg, boost::log::trivial::warning)
+  #define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get(Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION)).lg, boost::log::trivial::fatal)
 #endif // __APPLE__
 
 struct ThrowAwayPattern {};
@@ -51,9 +53,9 @@ ThrowAwayPattern & operator<<(ThrowAwayPattern&__, T)
 
 #ifdef DEBUG_INFO
   #ifdef __APPLE__
-    #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug) << "Debug: "
+    #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug)
   #else
-    #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug) AUTOPLAN_LOG_CALLER_NAME << "Debug: "
+    #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get(Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION)).lg, boost::log::trivial::debug)
   #endif // __APPLE__
 #else
   #define AUTOPLAN_DEBUG _
@@ -92,6 +94,7 @@ namespace Logger
 
       boost::shared_ptr< std::stringstream > dataStream;
       boost::shared_ptr< boost::log::sinks::text_ostream_backend > dataBackend;
+      boost::log::attributes::mutable_constant<std::string> sourceAttribute;
 
     public:
       boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
@@ -99,8 +102,11 @@ namespace Logger
       boost::shared_ptr< boost::log::sinks::text_ostream_backend > getDataBackend() const;
 
       static Log& get();
+      static Log& get(const std::string& src);
 
       void reinitLogger() const;
+
+      void setSource(const std::string& src);
 
       static std::string getLastDateTime(std::string str);
       void resetData() const;

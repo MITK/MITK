@@ -129,22 +129,22 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadWorkspace( const std::string& work
 
   // test if index.xml exists
   // parse index.xml with TinyXML
-  TiXmlDocument document( workDir + Poco::Path::separator() + "index.xml" );
+  std::string defaultLocale_WorkingDirectory = Poco::Path::transcode(workDir);
+  TiXmlDocument document(defaultLocale_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml" );
   if (!document.LoadFile())
   {
-    MITK_ERROR << "Could not open/read/parse " << workDir << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << defaultLocale_WorkingDirectory << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return storage;
   }
 
   SceneReader::Pointer reader = SceneReader::New();
-  if ( !reader->LoadScene( document, workDir, storage ) )
+  if ( !reader->LoadScene( document, defaultLocale_WorkingDirectory, storage ) )
   {
     MITK_ERROR << "There were errors while loading scene file in " << workDir << ". Your data may be corrupted";
   }
 
   // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
   return storage;
-
 }
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename,
@@ -230,7 +230,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   // delete temp directory
   try
   {
-    Poco::File deleteDir( m_WorkingDirectory );
+    Poco::File deleteDir(m_WorkingDirectory);
     deleteDir.remove(true); // recursive
   }
   catch(...)
@@ -366,7 +366,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
               auto lastDateTime = Logger::Log::getLastDateTime(log);
               logData = Logger::Log::get().getDataFromDate(lastDateTime);
             }
-            else {
+            else
+            {
               logData = Logger::Log::get().getData();
             }
             break;
@@ -497,14 +498,15 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     {
       try
       {
-        Poco::File deleteFile( filename.c_str() );
+        // create zip at filename
+        std::string defaultLocaleFilename = Poco::Path::transcode(filename);
+
+        Poco::File deleteFile(filename.c_str());
         if (deleteFile.exists())
         {
           deleteFile.remove(true);
         }
 
-        // create zip at filename
-        std::string defaultLocaleFilename = Poco::Path::transcode( filename );
         if (compress)
         {
           std::ofstream file( defaultLocaleFilename.c_str(), std::ios::binary | std::ios::out);
@@ -516,19 +518,19 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           else
           {
             Poco::Zip::Compress zipper( file, true );
-            Poco::Path tmpdir( m_WorkingDirectory );
-            zipper.addRecursive( tmpdir );
+            Poco::Path tmpdir(m_WorkingDirectory);
+            zipper.addRecursive(tmpdir);
             zipper.close();
           }
         }
         else
         {
-          Poco::File tmpdir( m_WorkingDirectory );
-          tmpdir.copyTo(defaultLocaleFilename);
+          Poco::File tmpdir(m_WorkingDirectory);
+          tmpdir.copyTo(filename);
         }
         try
         {
-          Poco::File deleteDir( m_WorkingDirectory );
+          Poco::File deleteDir(m_WorkingDirectory);
           deleteDir.remove(true); // recursive
         }
         catch(...)

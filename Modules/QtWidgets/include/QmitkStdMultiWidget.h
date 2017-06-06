@@ -148,11 +148,17 @@ public:
 
   void setDisplayMetaInfo(bool metainfo);
 
+  void setDisplayPatientInfo(bool patientinfo);
+
+  void setDisplayPositionInfo(bool positioninfo);
+
   void setSelectionMode(bool selection);
 
 protected:
 
   bool m_displayMetaInfo;
+  bool m_displayPatientInfo;
+  bool m_displayPositionInfo;
 
   void UpdateAllWidgets();
   void HideAllWidgetToolbars();

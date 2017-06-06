@@ -77,6 +77,8 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   m_drawTextInStatusBar(true),
   imageMTime(0),
   m_displayMetaInfo(false),
+  m_displayPatientInfo(true),
+  m_displayPositionInfo(true),
   m_Name(name)
 {
   /******************************************************
@@ -1585,6 +1587,16 @@ void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
   m_displayMetaInfo = metainfo;
 }
 
+void QmitkStdMultiWidget::setDisplayPatientInfo(bool patientinfo)
+{
+  m_displayPatientInfo = patientinfo;
+}
+
+void QmitkStdMultiWidget::setDisplayPositionInfo(bool positioninfo)
+{
+  m_displayPositionInfo = positioninfo;
+}
+
 void QmitkStdMultiWidget::setSelectionMode(bool selection)
 {
   m_MouseModeSwitcher->SetSelectionMode(selection);
@@ -1631,12 +1643,16 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     imageProperties->GetStringProperty("dicom.series.SeriesNumber", seriesNumber);
 
     for(int i = 0; i < 3; i++) {
-      _infoStringStream[i] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
-      if (timeSteps > 1) {
-        _infoStringStream[i]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
-      }
-      if (seriesNumber != "") {
-        _infoStringStream[i] << "\nSe: " << seriesNumber;
+      if (m_displayPositionInfo) {
+        _infoStringStream[i] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
+        if (timeSteps > 1) {
+          _infoStringStream[i]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
+        }
+        if (seriesNumber != "") {
+          _infoStringStream[i] << "\nSe: " << seriesNumber;
+        }
+      } else {
+        _infoStringStream[i].clear();
       }
       cornerimgtext[i] = _infoStringStream[i].str();
       setCornerAnnotation(2, i, cornerimgtext[i].c_str());
@@ -1680,12 +1696,19 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       char ss[3]; ss[2] = 0;
 
       if (m_displayMetaInfo) {
-        infoStringStream[0]
-          << patient.c_str()
-          << "\n" << patientId.c_str();
+        if (m_displayPatientInfo) {
+          infoStringStream[0]
+            << patient.c_str()
+            << "\n" << patientId.c_str();
+        } else {
+          infoStringStream[0] << "***\n***";
+        }
         if (birthday != "") {
           sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
           infoStringStream[0] << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str();
+        }
+        else {
+          infoStringStream[0] << '\n';
         }
         infoStringStream[0]
           << "\n" << institution.c_str()
@@ -1697,25 +1720,27 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         infoStringStream[0].clear();
       }
 
-      if (m_displayMetaInfo && !magneticFieldStrength.empty()) {
-        infoStringStream[1]
-          << "FS: " << magneticFieldStrength;
-      }
-      if (m_displayMetaInfo && (!dicomTR.empty() || !dicomTE.empty())) {
-        infoStringStream[1] << '\n';
-        if (!dicomTR.empty()) {
-          infoStringStream[1] << "TR: " << dicomTR;
+      if (m_displayMetaInfo) {
+        if (!magneticFieldStrength.empty()) {
+          infoStringStream[1]
+            << "FS: " << magneticFieldStrength;
         }
-        if (!dicomTE.empty()) {
-          infoStringStream[1] << " TE: " << dicomTE;
+        if (!dicomTR.empty() || !dicomTE.empty()) {
+          infoStringStream[1] << '\n';
+          if (!dicomTR.empty()) {
+            infoStringStream[1] << "TR: " << dicomTR;
+          }
+          if (!dicomTE.empty()) {
+            infoStringStream[1] << " TE: " << dicomTE;
+          }
         }
-      }
-      if (m_displayMetaInfo && (studyDate != "" && studyTime != "")) {
-        sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
-        sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
-        infoStringStream[1]
-          << "\n" << dd << "." << mm << "." << yy 
-          << " " << hh << ":" << mi << ":" << ss;
+        if (!studyDate.empty() && !studyTime.empty()) {
+          sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
+          sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
+          infoStringStream[1]
+            << "\n" << dd << "." << mm << "." << yy 
+            << " " << hh << ":" << mi << ":" << ss;
+        }
       } else {
         infoStringStream[1].clear();
       }

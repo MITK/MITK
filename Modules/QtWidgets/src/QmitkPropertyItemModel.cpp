@@ -123,7 +123,7 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex &index, int role) const
     }
     else if (index.column() == 1 && property != nullptr)
     {
-      if (mitk::ColorProperty *colorProperty = dynamic_cast<mitk::ColorProperty *>(property))
+      if (auto colorProperty = dynamic_cast<mitk::ColorProperty *>(property))
         return MitkToQt(colorProperty->GetValue());
       else if (dynamic_cast<mitk::BoolProperty *>(property) == nullptr)
         return QString::fromStdString(property->GetValueAsString());
@@ -133,7 +133,7 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex &index, int role) const
   {
     if (role == Qt::CheckStateRole)
     {
-      if (mitk::BoolProperty *boolProperty = dynamic_cast<mitk::BoolProperty *>(property))
+      if (auto boolProperty = dynamic_cast<mitk::BoolProperty *>(property))
         return boolProperty->GetValue() ? Qt::Checked : Qt::Unchecked;
     }
     else if (role == Qt::EditRole)
@@ -142,19 +142,19 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex &index, int role) const
       {
         return QString::fromStdString(property->GetValueAsString());
       }
-      else if (mitk::IntProperty *intProperty = dynamic_cast<mitk::IntProperty *>(property))
+      else if (auto intProperty = dynamic_cast<mitk::IntProperty *>(property))
       {
         return intProperty->GetValue();
       }
-      else if (mitk::FloatProperty *floatProperty = dynamic_cast<mitk::FloatProperty *>(property))
+      else if (auto floatProperty = dynamic_cast<mitk::FloatProperty *>(property))
       {
         return floatProperty->GetValue();
       }
-      else if (mitk::DoubleProperty *doubleProperty = dynamic_cast<mitk::DoubleProperty *>(property))
+      else if (auto doubleProperty = dynamic_cast<mitk::DoubleProperty *>(property))
       {
         return doubleProperty->GetValue();
       }
-      else if (mitk::EnumerationProperty *enumProperty = dynamic_cast<mitk::EnumerationProperty *>(property))
+      else if (auto enumProperty = dynamic_cast<mitk::EnumerationProperty *>(property))
       {
         QStringList values;
 
@@ -163,7 +163,7 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex &index, int role) const
 
         return values;
       }
-      else if (mitk::ColorProperty *colorProperty = dynamic_cast<mitk::ColorProperty *>(property))
+      else if (auto colorProperty = dynamic_cast<mitk::ColorProperty *>(property))
       {
         return MitkToQt(colorProperty->GetValue());
       }
@@ -182,10 +182,8 @@ QModelIndex QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *prope
   if (property == nullptr)
     return QModelIndex();
 
-  typedef mitk::PropertyList::PropertyMap PropertyMap;
-  const PropertyMap *propertyMap = m_PropertyList->GetMap();
-
-  PropertyMap::const_iterator it = std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
+  auto propertyMap = m_PropertyList->GetMap();
+  auto it = std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
 
   if (it == propertyMap->end())
     return QModelIndex();
@@ -205,7 +203,7 @@ QModelIndex QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *prope
     QModelIndexList items =
       this->match(index(0, 0), Qt::DisplayRole, names.last(), -1, Qt::MatchRecursive | Qt::MatchExactly);
 
-    foreach (QModelIndex item, items)
+    for (auto item : items)
     {
       QModelIndex candidate = item;
 
@@ -308,6 +306,11 @@ void QmitkPropertyItemModel::OnPropertyDeleted(const itk::Object * /*property*/,
     this->reset();*/
 }
 
+void QmitkPropertyItemModel::OnPropertyListModified(const itk::Object *propertyList)
+{
+  this->SetNewPropertyList(dynamic_cast<mitk::PropertyList *>(const_cast<itk::Object *>(propertyList)));
+}
+
 void QmitkPropertyItemModel::OnPropertyListDeleted(const itk::Object *)
 {
   this->CreateRootItem();
@@ -403,9 +406,13 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
 
   if (m_PropertyList.IsNotNull())
   {
-    mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> delegate(
+    mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> onPropertyListDeleted(
       this, &QmitkPropertyItemModel::OnPropertyListDeleted);
-    m_PropertyList.ObjectDelete.RemoveListener(delegate);
+    m_PropertyList.ObjectDelete.RemoveListener(onPropertyListDeleted);
+
+    mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> onPropertyListModified(
+      this, &QmitkPropertyItemModel::OnPropertyListModified);
+    m_PropertyList.ObjectModified.RemoveListener(onPropertyListModified);
 
     const PropertyMap *propertyMap = m_PropertyList->GetMap();
 
@@ -430,11 +437,15 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
 
   if (m_PropertyList.IsNotNull())
   {
-    mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> delegate(
-      this, &QmitkPropertyItemModel::OnPropertyListDeleted);
-    m_PropertyList.ObjectDelete.AddListener(delegate);
+    mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> onPropertyListModified(
+      this, &QmitkPropertyItemModel::OnPropertyListModified);
+    m_PropertyList.ObjectModified.AddListener(onPropertyListModified);
 
-    mitk::MessageDelegate2<QmitkPropertyItemModel, const itk::Object *, const itk::EventObject &> propertyDelegate(
+    mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> onPropertyListDeleted(
+      this, &QmitkPropertyItemModel::OnPropertyListDeleted);
+    m_PropertyList.ObjectDelete.AddListener(onPropertyListDeleted);
+
+    mitk::MessageDelegate2<QmitkPropertyItemModel, const itk::Object *, const itk::EventObject &> onPropertyModified(
       this, &QmitkPropertyItemModel::OnPropertyModified);
 
     itk::MemberCommand<QmitkPropertyItemModel>::Pointer modifiedCommand =

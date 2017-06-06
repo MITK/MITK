@@ -1616,8 +1616,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   itk::Index<3> p;
   mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   unsigned int timestep = baseRenderer->GetTimeStep();
+  auto timeSteps = image.IsNotNull() ? image->GetTimeSteps() : 0;
 
-  if(image.IsNotNull() && (image->GetTimeSteps() > timestep ))
+  if(image.IsNotNull() && (timeSteps > timestep ))
   {
     image->GetGeometry()->WorldToIndex(crosshairPos, p);
     stream.precision(2);
@@ -1631,6 +1632,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
     for(int i = 0; i < 3; i++) {
       _infoStringStream[i] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
+      if (timeSteps > 1) {
+        _infoStringStream[i]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
+      }
       if (seriesNumber != "") {
         _infoStringStream[i] << "\nSe: " << seriesNumber;
       }

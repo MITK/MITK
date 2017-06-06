@@ -1616,7 +1616,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   itk::Index<3> p;
   mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   unsigned int timestep = baseRenderer->GetTimeStep();
-  auto timeSteps = image->GetTimeSteps();
+  auto timeSteps = image.IsNotNull() ? image->GetTimeSteps() : 0;
 
   if(image.IsNotNull() && (timeSteps > timestep ))
   {

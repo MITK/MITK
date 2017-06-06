@@ -74,7 +74,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
     {
       std::string tagvalue = std::string();
 
-      if (tagsValueList != nullptr)
+      if (tagsValueList != nullptr && tagsValueList->GetValue().ValueExists(j))
       {
         tagvalue = tagsValueList->GetValue().GetTableValue(j);
       }

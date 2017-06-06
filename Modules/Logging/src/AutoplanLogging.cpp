@@ -256,9 +256,6 @@ namespace Logger
         % boost::log::expressions::attr<std::string>("Source")
       );
 
-      std::locale loc = boost::locale::generator()("en_US.UTF-8");
-      sink2->imbue(loc);
-
       boost::log::core::get()->add_sink(sink2);
     }
 

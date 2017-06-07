@@ -27,7 +27,7 @@ QmitkFileChooser::QmitkFileChooser(QWidget* parent, Qt::WindowFlags f )
 : QWidget( parent, f )
 , m_SelectDir( false )
 , m_FileMustExist( true )
-, m_SelectFile(new QPushButton("Select File"))
+, m_SelectFile(new QPushButton(tr("Select File")))
 , m_File( new QLineEdit )
 {
   m_File->setReadOnly( true );
@@ -98,15 +98,15 @@ void QmitkFileChooser::OnSelectFileClicked(bool)
   QString filename;
   if( m_SelectDir )
     filename = QFileDialog::getExistingDirectory( QApplication::activeWindow()
-      , "Open directory", m_File->text() );
+      , tr("Open directory"), m_File->text() );
   else
   {
     if (m_FileMustExist)
       filename = QFileDialog::getOpenFileName( QApplication::activeWindow()
-        , "Open file", m_File->text(), m_FilePattern );
+        , tr("Open file"), m_File->text(), m_FilePattern );
     else
       filename = QFileDialog::getSaveFileName( QApplication::activeWindow()
-        , "Open file", m_File->text(), m_FilePattern );
+        , tr("Open file"), m_File->text(), m_FilePattern );
   }
 
   if(!filename.isEmpty())

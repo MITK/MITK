@@ -652,8 +652,9 @@ void QmitkDataStorageTreeModel::RemoveNodeInternal( const mitk::DataNode* node )
 
     TreeItem* parentTreeItem = treeItem->GetParent();
     QModelIndex parentIndex = this->IndexFromTreeItem(parentTreeItem);
-    if (!parentIndex.isValid())
+    if (!parentIndex.isValid() && parentTreeItem != m_Root) {
       return;
+    }
 
     // emit beginRemoveRows event (QModelIndex is empty because we dont have a tree model)
     this->beginRemoveRows(parentIndex, treeItem->GetIndex(), treeItem->GetIndex());

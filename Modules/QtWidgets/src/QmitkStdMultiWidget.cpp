@@ -1585,16 +1585,19 @@ void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* tex
 void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
 {
   m_displayMetaInfo = metainfo;
+  imageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPatientInfo(bool patientinfo)
 {
   m_displayPatientInfo = patientinfo;
+  imageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPositionInfo(bool positioninfo)
 {
   m_displayPositionInfo = positioninfo;
+  imageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setSelectionMode(bool selection)
@@ -2156,33 +2159,63 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
   }
 }
 
-int valFromIntProp(mitk::Image* image, std::string propName, int slice, int defaultVal)
+int valFromIntProp(mitk::Image* image, int axisIndex, int slice, int defaultVal)
 {
-  propName = boost::str(boost::format(propName) % slice);
   mitk::IntProperty* prop = nullptr;
   if (image) {
+    static const char* axisNameInd[] = { "autoplan.mainAxisIndex_%d", "autoplan.secondaryAxisIndex_%d", "autoplan.tertiaryAxisIndex_%d" };
+    auto propName = boost::str(boost::format(axisNameInd[axisIndex]) % slice);
     prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(propName.c_str())));
+    if (!prop) {
+      static const char* axisName[] = { "autoplan.mainAxisIndex", "autoplan.secondaryAxisIndex", "autoplan.tertiaryAxisIndex" };
+      prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(axisName[axisIndex])));
+    }
   }
   return prop ? prop->GetValue() : defaultVal;
 }
 
-bool valFromBoolProp(mitk::Image* image, std::string propName, int slice, bool defaultVal)
+bool valFromBoolProp(mitk::Image* image, int axisIndex, int slice, bool defaultVal)
 {
-  propName = boost::str(boost::format(propName) % slice);
-  mitk::BoolProperty* boolProp = nullptr;
+  mitk::BoolProperty* prop = nullptr;
   if (image) {
-    boolProp = dynamic_cast<mitk::BoolProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(propName.c_str())));
+    static const char* axisNameInd[] = { "autoplan.mainAxisSign_%d", "autoplan.secondaryAxisSign_%d", "autoplan.tertiaryAxisSign_%d" };
+    auto propName = boost::str(boost::format(axisNameInd[axisIndex]) % slice);
+    prop = dynamic_cast<mitk::BoolProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(propName.c_str())));
+    if (!prop) {
+      static const char* axisName[] = { "autoplan.mainAxisSign", "autoplan.secondaryAxisSign", "autoplan.tertiaryAxisSign" };
+      prop = dynamic_cast<mitk::BoolProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(axisName[axisIndex])));
+    }
   }
-  return boolProp ? boolProp->GetValue() : defaultVal;
+  return prop ? prop->GetValue() : defaultVal;
 }
 
 void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int slice, int i)
 {
-  auto mainAxis = valFromIntProp(image, "autoplan.mainAxisIndex_%d", slice, -1);
-  auto secondAxis = valFromIntProp(image, "autoplan.secondaryAxisIndex_%d", slice, -1);
+  auto mainAxis = valFromIntProp(image, 0, slice, -1);
+  auto secondAxis = valFromIntProp(image, 1, slice, -1);
+  auto tertiaryAxis = valFromIntProp(image, 2, slice, -1);
 
-  auto mainSign = valFromBoolProp(image, "autoplan.mainAxisSign_%d", slice, true);
-  auto secondSign = valFromBoolProp(image, "autoplan.secondaryAxisSign_%d", slice, true);
+  auto mainSign = valFromBoolProp(image, 0, slice, true);
+  auto secondSign = valFromBoolProp(image, 1, slice, true);
+  auto tertiarySign = valFromBoolProp(image, 2, slice, true);
+
+  if (!m_displayMetaInfo) {
+    mainAxis = secondAxis = -1;
+  }
+  else {
+    switch (i) {
+    case 0:
+      std::swap(mainAxis, tertiaryAxis);
+      std::swap(mainSign, tertiarySign);
+      secondAxis = mainAxis;
+      secondSign = mainSign;
+      break;
+    case 1:
+      std::swap(mainAxis, tertiaryAxis);
+      std::swap(mainSign, tertiarySign);
+      break;
+    }
+  }
 
   switch (mainAxis) {
   case 0:

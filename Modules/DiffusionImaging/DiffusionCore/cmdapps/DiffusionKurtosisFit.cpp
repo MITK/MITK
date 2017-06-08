@@ -50,7 +50,7 @@ typedef mitk::DiffusionPropertyHelper DPH;
 #include <itkVectorIndexSelectionCastImageFilter.h>
 #include <itkComposeImageFilter.h>
 #include <itkDiscreteGaussianImageFilter.h>
-
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 
 DPH::ImageType::Pointer GetBlurredVectorImage( DPH::ImageType::Pointer vectorImage, double sigma)
@@ -202,7 +202,8 @@ int main( int argc, char* argv[] )
   std::string out_prefix = us::any_cast<std::string>(parsedArgs["output"]);
   std::string maskPath = "";
 
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inFileName);
+  mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
+  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inFileName, &functor);
 
   bool omitBZero = false;
   double lower = -1000;

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkFiberBundle.h>
 #include "mitkCommandLineParser.h"
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 using namespace mitk;
 using namespace std;
@@ -49,7 +50,8 @@ int main(int argc, char* argv[])
 
     try
     {
-        std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(inName);
+        mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
+        std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(inName, &functor);
 
         if ( baseData.size()>0 && dynamic_cast<Image*>(baseData[0].GetPointer()) )
         {

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <itksys/SystemTools.hxx>
 #include <mitkCoreObjectFactory.h>
-
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkFiberBundle.h>
 #include <mitkTrackingHandlerRandomForest.h>
 
@@ -125,9 +125,10 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "loading diffusion-weighted images";
     std::vector< mitk::Image::Pointer > rawData;
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
     for (auto imgFile : imageFiles)
     {
-        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(imgFile).GetPointer());
+        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(imgFile, &functor).GetPointer());
         rawData.push_back(dwi);
     }
 

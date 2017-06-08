@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkProperties.h>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 using namespace std;
 
@@ -83,11 +84,8 @@ int main(int argc, char* argv[])
 
   try
   {
-
-    if( boost::algorithm::ends_with(inFileName, ".dwi"))
-    {
-
-      DiffusionImageType::Pointer dwi = mitk::IOUtil::LoadImage(inFileName);
+      mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
+      DiffusionImageType::Pointer dwi = mitk::IOUtil::LoadImage(inFileName, &functor);
 
       mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
       mitk::CastToItkImage(dwi, itkVectorImagePointer);
@@ -121,11 +119,6 @@ int main(int argc, char* argv[])
 //      name << outFileName << "_NLM_" << search << "-" << compare << "-" << variance << ".dwi";
 
       mitk::IOUtil::Save(output, outFileName.c_str());
-    }
-    else
-    {
-      std::cout << "Only supported for .dwi!";
-    }
   }
   catch (itk::ExceptionObject e)
   {

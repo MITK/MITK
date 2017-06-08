@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToDWIImageFilter.h>
 #include <boost/lexical_cast.hpp>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
+#include <itksys/SystemTools.hxx>
 
 using namespace mitk;
 
@@ -73,6 +74,7 @@ int main(int argc, char* argv[])
   parameters.LoadParameters(paramName);
 
   // Test if /path/dir is an existing directory:
+  string file_extension = "";
   if( itksys::SystemTools::FileIsDirectory( outName ) )
   {
     while( *(--(outName.cend())) == '/')
@@ -99,12 +101,13 @@ int main(int argc, char* argv[])
     }
     else
     {
-      parameters.m_Misc.m_OutputPath = mitk::IOUtil::GetTempPath() + '/';
+      parameters.m_Misc.m_OutputPath = itksys::SystemTools::GetCurrentWorkingDirectory() + '/';
     }
 
-    if( ! itksys::SystemTools::GetFilenameName( outName ).empty() )
+    file_extension = itksys::SystemTools::GetFilenameExtension(outName);
+    if( ! itksys::SystemTools::GetFilenameWithoutExtension( outName ).empty() )
     {
-      parameters.m_Misc.m_OutputPrefix = itksys::SystemTools::GetFilenameName( outName );
+      parameters.m_Misc.m_OutputPrefix = itksys::SystemTools::GetFilenameWithoutExtension( outName );
     }
     else
     {
@@ -171,7 +174,12 @@ int main(int argc, char* argv[])
   mitk::DiffusionPropertyHelper propertyHelper( image );
   propertyHelper.InitializeImage();
 
-  mitk::IOUtil::Save(image, outName+".dwi");
+  if (file_extension=="")
+    mitk::IOUtil::Save(image, "application/vnd.mitk.nii.gz", outName+".nii.gz");
+  else if (file_extension==".nii" || file_extension==".nii.gz")
+    mitk::IOUtil::Save(image, "application/vnd.mitk.nii.gz", outName+file_extension);
+  else
+    mitk::IOUtil::Save(image, outName+file_extension);
 
   if (verbose)
   {

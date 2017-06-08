@@ -1,0 +1,41 @@
+From aab2e58b394194d5ac043826fa212bf37602ba76 Mon Sep 17 00:00:00 2001
+From: BlackCatter <iblackcatw@gmail.com>
+Date: Thu, 8 Jun 2017 17:04:29 +0400
+Subject: Fix for msvc std11
+
+---
+ config/include/dcmtk/config/osconfig.h.in | 2 +-
+ ofstd/include/dcmtk/ofstd/oflimits.h      | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/config/include/dcmtk/config/osconfig.h.in b/config/include/dcmtk/config/osconfig.h.in
+index e5fd004ca..48b5e35a0 100644
+--- a/config/include/dcmtk/config/osconfig.h.in
++++ b/config/include/dcmtk/config/osconfig.h.in
+@@ -1107,7 +1107,7 @@ typedef unsigned short ushort;
+ /* Define to int if undefined. */
+ #undef socklen_t
+ 
+-#if defined(DCMTK_USE_CXX11_STL) && defined(__cplusplus) && __cplusplus < 201103L
++#if defined(DCMTK_USE_CXX11_STL) && defined(__cplusplus) && !(__cplusplus >= 201103L || defined(_MSC_VER) && _MSC_VER >= 1800)
+ #error\
+  DCMTK was configured to use the C++11 STL, but your compiler is not configured\
+  for building with C++11 features.
+diff --git a/ofstd/include/dcmtk/ofstd/oflimits.h b/ofstd/include/dcmtk/ofstd/oflimits.h
+index 0f9a7ac5e..493066c48 100644
+--- a/ofstd/include/dcmtk/ofstd/oflimits.h
++++ b/ofstd/include/dcmtk/ofstd/oflimits.h
+@@ -33,8 +33,8 @@
+  *  @brief Provides an interface to query properties of all fundamental numeric types.
+  */
+ 
+-// use native classes if C++11 is supported
+-#if __cplusplus >= 201103L
++// use native classes if C++11 is supported or partially supported in MSC (starts from vs2013)
++#if __cplusplus >= 201103L || defined(_MSC_VER) && _MSC_VER >= 1800
+ 
+ #include <limits>
+ using OFfloat_round_style = std::float_round_style;
+-- 
+2.11.1.windows.1
+

@@ -1,0 +1,25 @@
+From 7ff97c23a9a018b7665777a17a6f3d3a7b7524fa Mon Sep 17 00:00:00 2001
+From: BlackCatter <iblackcatw@gmail.com>
+Date: Thu, 8 Jun 2017 16:30:54 +0400
+Subject: Fix for US spacing tag
+
+---
+ Source/MediaStorageAndFileFormat/gdcmImageHelper.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/MediaStorageAndFileFormat/gdcmImageHelper.cxx b/Source/MediaStorageAndFileFormat/gdcmImageHelper.cxx
+index 85940f7c4..7fd26e874 100644
+--- a/Source/MediaStorageAndFileFormat/gdcmImageHelper.cxx
++++ b/Source/MediaStorageAndFileFormat/gdcmImageHelper.cxx
+@@ -1098,7 +1098,7 @@ Tag ImageHelper::GetSpacingTagFromMediaStorage(MediaStorage const &ms)
+   case MediaStorage::UltrasoundMultiFrameImageStorageRetired:
+     // (0028,0034) IS [4\3]                                    #   4, 2 PixelAspectRatio
+     t = Tag(0xffff,0xffff); // FIXME
+-    t = Tag(0x0028,0x0034); // FIXME
++    t = Tag(0x0028,0x0030); // FIXME
+     break;
+   default:
+     gdcmDebugMacro( "Do not handle: " << ms );
+-- 
+2.11.1.windows.1
+

@@ -25,7 +25,7 @@ if(MITK_USE_Caffe2)
 
     ExternalProject_Add(${proj}
        GIT_REPOSITORY https://github.com/caffe2/caffe2.git
-       GIT_TAG ${revision_tag}
+       #GIT_TAG ${revision_tag}
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}

@@ -281,10 +281,12 @@ void DiffusionImageNiftiReaderService::InternalRead()
         // some parsing depending on the extension
         bool useFSLstyle( true );
         std::string bvecsExtension("");
-        std::string bvalsExtension("");
+        std::string bvalsExtension("");      
 
-        std::string base = itksys::SystemTools::GetFilenamePath( this->GetInputLocation() ) + "/"
-            + this->GetMimeType()->GetFilenameWithoutExtension( this->GetInputLocation() );
+        std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetInputLocation());
+        std::string base = this->GetMimeType()->GetFilenameWithoutExtension(this->GetInputLocation());
+        if (!base_path.empty())
+            std::string base = base_path + "/" + base;
 
         // check for possible file names
         {

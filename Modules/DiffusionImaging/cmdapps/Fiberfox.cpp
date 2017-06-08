@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkTractsToDWIImageFilter.h>
 #include <boost/lexical_cast.hpp>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 using namespace mitk;
 
@@ -129,7 +130,8 @@ int main(int argc, char* argv[])
     parameters.SaveParameters(outName+".ffp");
   }
 
-  mitk::BaseData::Pointer inputData = mitk::IOUtil::Load(input)[0];
+  mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images", "Fiberbundles"}, {});
+  mitk::BaseData::Pointer inputData = mitk::IOUtil::Load(input, &functor)[0];
 
   itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
 

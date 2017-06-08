@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 using namespace std;
 
@@ -80,7 +81,8 @@ int main(int argc, char* argv[])
   {
     std::cout << "Loading " << inName;
 
-    mitk::Image::Pointer dwi = mitk::IOUtil::LoadImage(inName);
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
+    mitk::Image::Pointer dwi = mitk::IOUtil::LoadImage(inName, &functor);
 
     if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dwi ) )
     {

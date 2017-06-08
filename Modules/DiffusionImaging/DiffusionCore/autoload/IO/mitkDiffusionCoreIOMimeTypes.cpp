@@ -45,7 +45,7 @@ std::vector<CustomMimeType*> DiffusionCoreIOMimeTypes::Get()
 DiffusionCoreIOMimeTypes::DiffusionImageNrrdMimeType::DiffusionImageNrrdMimeType()
   : CustomMimeType(DWI_NRRD_MIMETYPE_NAME())
 {
-  std::string category = "Diffusion Weighted Image";
+  std::string category = "Diffusion Weighted Images";
   this->SetCategory(category);
   this->SetComment("Diffusion Weighted Images");
 
@@ -123,7 +123,7 @@ DiffusionCoreIOMimeTypes::DiffusionImageNrrdMimeType DiffusionCoreIOMimeTypes::D
 DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::DiffusionImageNiftiMimeType()
   : CustomMimeType(DWI_NIFTI_MIMETYPE_NAME())
 {
-  std::string category = "Diffusion Weighted Image";
+  std::string category = "Diffusion Weighted Images";
   this->SetCategory(category);
   this->SetComment("Diffusion Weighted Images");
   this->AddExtension("nii.gz");
@@ -132,6 +132,7 @@ DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::DiffusionImageNiftiMimeTy
 
 bool DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::AppliesTo(const std::string &path) const
 {
+    MITK_INFO << "path1: " <<  path;
   bool canRead(CustomMimeType::AppliesTo(path));
 
   // fix for bug 18572
@@ -151,8 +152,10 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::AppliesTo(const std:
   // accompanied by bvecs and bvals files defining the diffusion information
   if (ext == ".nii" || ext == ".nii.gz")
   {
-    std::string base = itksys::SystemTools::GetFilenamePath(path) + "/"
-      + this->GetFilenameWithoutExtension(path);
+    std::string base_path = itksys::SystemTools::GetFilenamePath(path);
+    std::string base = this->GetFilenameWithoutExtension(path);
+    if (!base_path.empty())
+        std::string base = base_path + "/" + base;
 
     if (itksys::SystemTools::FileExists(std::string(base + ".bvec").c_str())
       && itksys::SystemTools::FileExists(std::string(base + ".bval").c_str())
@@ -214,10 +217,12 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageFslMimeType::AppliesTo(const std::s
 
   // Nifti files should only be considered for this mime type if they are
   // accompanied by bvecs and bvals files defining the diffusion information
-  if (ext == ".nii" || ext == ".nii.gz")
+  if (ext == ".fsl" || ext == ".fslgz")
   {
-    std::string base = itksys::SystemTools::GetFilenamePath(path) + "/"
-      + this->GetFilenameWithoutExtension(path);
+      std::string base_path = itksys::SystemTools::GetFilenamePath(path);
+      std::string base = this->GetFilenameWithoutExtension(path);
+      if (!base_path.empty())
+          std::string base = base_path + "/" + base;
 
     if (itksys::SystemTools::FileExists(std::string(base + ".bvec").c_str())
       && itksys::SystemTools::FileExists(std::string(base + ".bval").c_str())

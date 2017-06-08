@@ -19,10 +19,13 @@ __kernel void ckDASQuad(
   __global float* dDest, // output buffer
   __global float* apodArray,
   unsigned short apodArraySize,
-  unsigned short inputS,
-  unsigned short inputL,
-  unsigned short boundL,
-  unsigned short boundU  // parameters
+  unsigned short outputS,
+  unsigned short outputL,
+  float SpeedOfSound,
+  float RecordTime,
+  float Pitch,
+  float Angle,
+  unsigned short PAImage  // parameters
 )
 {
   // get thread identifier
@@ -31,18 +34,44 @@ __kernel void ckDASQuad(
   unsigned int globalPosZ = get_global_id(2);
   
   // get image width and weight
-  const unsigned int uiWidth = get_image_width( dSource );
-  const unsigned int uiHeight = get_image_height( dSource );
-  const unsigned int uiDepth = get_image_depth( dSource );
+  const unsigned int inputL = get_image_width( dSource );
+  const unsigned int inputS = get_image_height( dSource ) / (PAImage + 1);
+  const unsigned int Slices = get_image_depth( dSource );
 
   // create an image sampler
   const sampler_t defaultSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST ;
 
   // terminate non-valid threads
-  if ( globalPosX < uiWidth && globalPosY < uiHeight && globalPosZ < uiDepth )
-  {
-    // store the result
-    dDest[ globalPosZ * uiWidth * uiHeight + globalPosY * uiWidth + globalPosX ] = globalPosX;
-  }
+  if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
+  {	
+    float l_i = (float)globalPosX / outputL * inputL;
+    float s_i = (float)globalPosY / outputS * inputS;
 
+    float tan_phi = tan(Angle / 360 * 2 * M_PI);
+    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch;
+
+    float part = part_multiplicator * s_i;
+    if (part < 1)
+      part = 1;
+
+    short maxLine = min((l_i + part) + 1, (float)inputL);
+    short minLine = max((l_i - part), 0.0f);
+    short usedLines = (maxLine - minLine);
+	float apod_mult = apodArraySize / (maxLine - minLine);
+	
+	short AddSample = 0;
+	float output = 0;
+	float delayMultiplicator = pow(inputS / (RecordTime*SpeedOfSound) * Pitch, 2) / s_i / 2;
+
+    for (short l_s = minLine; l_s < maxLine; ++l_s)
+    {
+      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
+      if (AddSample < inputS && AddSample >= 0) 
+        output += apodArray[(short)((l_s - minLine)*apod_mult)] * read_imagef( dSource, defaultSampler, (int4)(l_s, AddSample, globalPosZ, 0 )).x;
+      else
+        --usedLines;
+    }
+	
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / usedLines;
+  }
 }

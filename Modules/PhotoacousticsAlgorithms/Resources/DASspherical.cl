@@ -44,17 +44,11 @@ __kernel void ckDASSphe(
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {
-    short AddSample = 0;
-	
-    float delayMultiplicator = 0;
-    float l_i = 0;
-    float s_i = 0;
+    float l_i = (float)globalPosX / outputL * inputL;
+    float s_i = (float)globalPosY / outputS * inputS;
 
     float tan_phi = tan(Angle / 360 * 2 * M_PI);
     float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch;
-    
-    l_i = (float)globalPosX / outputL * inputL;
-    s_i = (float)globalPosY / outputS * inputS;
 
     float part = part_multiplicator * s_i;
     if (part < 1)
@@ -65,6 +59,7 @@ __kernel void ckDASSphe(
     short usedLines = (maxLine - minLine);
 	float apod_mult = apodArraySize / (maxLine - minLine);
 	
+	short AddSample = 0;
 	float output = 0;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
@@ -76,7 +71,6 @@ __kernel void ckDASSphe(
       );
       if (AddSample < inputS && AddSample >= 0) 
         output += apodArray[(short)((l_s - minLine)*apod_mult)] * read_imagef( dSource, defaultSampler, (int4)(l_s, AddSample, globalPosZ, 0 )).x;
-		
       else
         --usedLines;
     }

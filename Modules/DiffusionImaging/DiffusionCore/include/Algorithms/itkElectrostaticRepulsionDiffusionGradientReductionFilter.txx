@@ -100,7 +100,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
     unsigned int randSeed = time(NULL);
 
     if(m_InputBValueMap.empty() || m_NumGradientDirections.size()!=m_InputBValueMap.size())
-        return;
+        mitkThrow() << "Vector of the number of desired gradient directions contains more elements than the specified target b-value map.";
 
     BValueMap manipulatedMap = m_InputBValueMap;
 

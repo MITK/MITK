@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>370</width>
+    <width>371</width>
     <height>747</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="m_MainWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -710,6 +710,13 @@ p, li { white-space: pre-wrap; }
         <widget class="QRadioButton" name="m_xmlFormat">
          <property name="text">
           <string>XML format</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_SkipInvalidData">
+         <property name="text">
+          <string>Skip invalid data</string>
          </property>
         </widget>
        </item>

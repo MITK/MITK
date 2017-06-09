@@ -143,6 +143,7 @@ private:
 
   bool m_AlreadyInSearch = false;
 
+  std::string replaceSpecialChars(const std::string& input) const;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

@@ -815,7 +815,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
   crosshairModesMenu->clear();
 
   QAction* resetViewAction = new QAction(crosshairModesMenu);
-  resetViewAction->setText("Reset view");
+  resetViewAction->setText(tr("Reset view"));
   crosshairModesMenu->addAction( resetViewAction );
   connect( resetViewAction, SIGNAL(triggered()), this, SIGNAL(ResetView()));
 
@@ -837,7 +837,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
 
     QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
-    showHideCrosshairVisibilityAction->setText("Show crosshair");
+    showHideCrosshairVisibilityAction->setText(tr("Show crosshair"));
     showHideCrosshairVisibilityAction->setCheckable(true);
     showHideCrosshairVisibilityAction->setChecked(currentState);
     crosshairModesMenu->addAction( showHideCrosshairVisibilityAction );
@@ -848,7 +848,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
   {
     QAction* rotationGroupSeparator = new QAction(crosshairModesMenu);
     rotationGroupSeparator->setSeparator(true);
-    rotationGroupSeparator->setText("Rotation mode");
+    rotationGroupSeparator->setText(tr("Rotation mode"));
     crosshairModesMenu->addAction( rotationGroupSeparator );
 
     QActionGroup* rotationModeActionGroup = new QActionGroup(crosshairModesMenu);
@@ -856,7 +856,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     QAction* noCrosshairRotation = new QAction(crosshairModesMenu);
     noCrosshairRotation->setActionGroup(rotationModeActionGroup);
-    noCrosshairRotation->setText("No crosshair rotation");
+    noCrosshairRotation->setText(tr("No crosshair rotation"));
     noCrosshairRotation->setCheckable(true);
     noCrosshairRotation->setChecked(currentCrosshairRotationMode==0);
     noCrosshairRotation->setData( 0 );
@@ -864,7 +864,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     QAction* singleCrosshairRotation = new QAction(crosshairModesMenu);
     singleCrosshairRotation->setActionGroup(rotationModeActionGroup);
-    singleCrosshairRotation->setText("Crosshair rotation");
+    singleCrosshairRotation->setText(tr("Crosshair rotation"));
     singleCrosshairRotation->setCheckable(true);
     singleCrosshairRotation->setChecked(currentCrosshairRotationMode==1);
     singleCrosshairRotation->setData( 1  );
@@ -872,7 +872,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     QAction* coupledCrosshairRotation = new QAction(crosshairModesMenu);
     coupledCrosshairRotation->setActionGroup(rotationModeActionGroup);
-    coupledCrosshairRotation->setText("Coupled crosshair rotation");
+    coupledCrosshairRotation->setText(tr("Coupled crosshair rotation"));
     coupledCrosshairRotation->setCheckable(true);
     coupledCrosshairRotation->setChecked(currentCrosshairRotationMode==2);
     coupledCrosshairRotation->setData( 2 );
@@ -880,7 +880,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     QAction* swivelMode = new QAction(crosshairModesMenu);
     swivelMode->setActionGroup(rotationModeActionGroup);
-    swivelMode->setText("Swivel mode");
+    swivelMode->setText(tr("Swivel mode"));
     swivelMode->setCheckable(true);
     swivelMode->setChecked(currentCrosshairRotationMode==3);
     swivelMode->setData( 3 );
@@ -896,7 +896,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
     autoRotationGroupSeparator->setSeparator(true);
     crosshairModesMenu->addAction( autoRotationGroupSeparator );
 
-    QAction* autoRotationAction = crosshairModesMenu->addAction( "Auto Rotation" );
+    QAction* autoRotationAction = crosshairModesMenu->addAction(tr("Auto Rotation"));
     autoRotationAction->setCheckable(true);
     autoRotationAction->setChecked( m_AutoRotationTimer.isActive() );
     connect( autoRotationAction, SIGNAL(triggered()), this, SLOT(OnAutoRotationActionTriggered()) );

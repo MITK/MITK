@@ -100,7 +100,9 @@ struct SelListenerRigidRegistration : ISelectionListener
           {
             mitk::DataNode::Pointer node = nodeObj->GetDataNode();
             // only look at interesting types
-            if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
+            QString nodeClass = node->GetData()->GetNameOfClass();
+            if ( nodeClass.compare("Image") == 0
+              || nodeClass.compare("LabelSetImage") == 0 )
             {
               if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
               {

@@ -18,6 +18,10 @@ if(MITK_TRACKING_DEVICES_HARDWARE_TESTS_ENABLED)
     mitkAddCustomModuleTest(mitkClaronTrackingDeviceHardwareTest  mitkClaronTrackingDeviceHardwareTest ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_11 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_12 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_13)
   endif(MITK_CLARON_MICRONTRACKER_CONNECTED)
 
+  if(MITK_POLHEMUS_CONNECTED)
+    mitkAddCustomModuleTest(mitkPolhemusTrackingDeviceHardwareTest  mitkPolhemusTrackingDeviceHardwareTest)
+  endif(MITK_POLHEMUS_CONNECTED)
+
 endif(MITK_TRACKING_DEVICES_HARDWARE_TESTS_ENABLED)
 
 option(MITK_IGT_READER_WRITER_TESTS_ENABLED "Enable additional reader/writer tests of the IGT module." OFF)

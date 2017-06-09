@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkIGTConfig.h"
 #include "mitkIGTActivator.h"
 
 //All Tracking devices, which should be available by default
@@ -23,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMicronTrackerTypeInformation.h"
 #include "mitkNPOptitrackTrackingTypeInformation.h"
 #include "mitkOpenIGTLinkTypeInformation.h"
+#ifdef MITK_USE_POLHEMUS_TRACKER
+#include "mitkPolhemusTrackerTypeInformation.h"
+#endif
 
 namespace mitk
 {
@@ -43,7 +47,10 @@ namespace mitk
     m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NPOptitrackTrackingTypeInformation());
     m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
     m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::OpenIGTLinkTypeInformation());
-    m_DeviceTypeCollection.RegisterAsMicroservice();
+#ifdef MITK_USE_POLHEMUS_TRACKER
+    m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::PolhemusTrackerTypeInformation());
+#endif
+	m_DeviceTypeCollection.RegisterAsMicroservice();
   }
 
   void IGTActivator::Unload(us::ModuleContext*)

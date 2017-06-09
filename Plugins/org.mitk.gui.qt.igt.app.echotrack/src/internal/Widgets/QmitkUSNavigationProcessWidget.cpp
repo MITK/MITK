@@ -42,7 +42,7 @@ QmitkUSNavigationProcessWidget::QmitkUSNavigationProcessWidget(QWidget* parent) 
   ui->setupUi(this);
 
   // remove the default page
-  ui->stepsToolBox->removeItem(0);
+  ui->stepsToolBox->setCurrentIndex(1);// ->removeItem(0);
 
   //set shortcuts
   QShortcut *nextShortcut = new QShortcut(QKeySequence("F10"), parent);
@@ -190,7 +190,7 @@ void QmitkUSNavigationProcessWidget::SetNavigationSteps(NavigationStepVector nav
 
   for ( int n = ui->stepsToolBox->count()-1; n >= 0; --n )
   {
-    ui->stepsToolBox->removeItem(n);
+    //ui->stepsToolBox->removeItem(n);
   }
 
   connect( ui->stepsToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnTabChanged(int)) );
@@ -216,7 +216,7 @@ void QmitkUSNavigationProcessWidget::ResetNavigationProcess()
   for ( int n = 0; n <= m_CurrentMaxStep; ++n )
   {
     m_NavigationSteps.at(n)->StopStep();
-    if ( n > 0 ) { ui->stepsToolBox->setItemEnabled(n, false); }
+    //if ( n > 0 ) { ui->stepsToolBox->setItemEnabled(n, false); }
   }
   ui->stepsToolBox->blockSignals(false);
 
@@ -370,7 +370,7 @@ void QmitkUSNavigationProcessWidget::OnStepReady(int index)
     this->UpdatePrevNextButtons();
     for (int n = 0; n <= m_CurrentMaxStep; ++n)
     {
-      ui->stepsToolBox->setItemEnabled(n, true);
+      //ui->stepsToolBox->setItemEnabled(n, true);
     }
   }
 
@@ -386,7 +386,7 @@ void QmitkUSNavigationProcessWidget::OnStepNoLongerReady(int index)
     this->UpdateFilterPipeline();
     for (int n = m_CurrentMaxStep+1; n < ui->stepsToolBox->count(); ++n)
     {
-      ui->stepsToolBox->setItemEnabled(n, false);
+      //ui->stepsToolBox->setItemEnabled(n, false);
       m_NavigationSteps.at(n)->StopStep();
     }
   }
@@ -474,8 +474,8 @@ void QmitkUSNavigationProcessWidget::InitializeNavigationStepWidgets()
     m_ReadySignalMapper->setMapping(curNavigationStep, n);
     m_NoLongerReadySignalMapper->setMapping(curNavigationStep, n);
 
-    ui->stepsToolBox->insertItem(n, curNavigationStep, QString("Step ") + QString::number(n+1) + ": " + curNavigationStep->GetTitle());
-    if ( n > 0 ) { ui->stepsToolBox->setItemEnabled(n, false); }
+    ui->stepsToolBox->insertWidget(n, curNavigationStep);
+    //if ( n > 0 ) { ui->stepsToolBox->get(n, false); }
   }
 
   ui->restartStepButton->setEnabled(m_NavigationSteps.at(0)->GetIsRestartable());

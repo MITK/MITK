@@ -150,7 +150,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
    void EnableTrackingControls();
    void DisableTrackingControls();
    void EnableDisableTimerButtons(int enable);
-
+   void OnToggleAdvancedSimpleMode();
    void OnToggleDifferentUpdateRates();
 
    //slots for worker thread
@@ -197,6 +197,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
    QTimer* m_TrackingRenderTimer;
    QTimer* m_TrackingLoggingTimer;
    QTimer* m_TimeoutTimer;
+
+   bool m_SimpleModeEnabled; ///>Stores if simple UI mode is enabled
 
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.
     *  Basically handles the microservice stuff: unregisteres the old storage, then

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qmessagebox.h>
 #include <QDialog>
 #include <mitkIOUtil.h>
+#include <QmitkIGTCommonHelper.h>
 
 //poco headers
 #include <Poco/Path.h>
@@ -192,7 +193,8 @@ void QmitkNavigationToolCreationWidget::OnCancel()
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("STL (*.stl)")).toLatin1().data();
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
   try
   {
     mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
@@ -205,7 +207,9 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 {
-  m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*"));
+  QString fileName = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
+  m_Controls->m_CalibrationFileName->setText(fileName);
 }
 
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)

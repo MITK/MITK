@@ -914,8 +914,8 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     if (!data)
       return;
 
-
-    QString fileName (QString::fromStdString(node->GetName()));
+    //We have to replace special characters due to XNAT inability to get along with them (" " is replaced by "%20", what leads to nasty behaviour!)
+    QString fileName(QString::fromStdString(replaceSpecialChars(node->GetName())));
 
     ctkXnatFile* xnatFile = new ctkXnatFile(resource);
 
@@ -1107,6 +1107,12 @@ void QmitkXnatTreeBrowserView::CleanUp()
   m_Controls.searchField->setEnabled(false);
   m_Controls.searchField->setText("");
   m_Controls.searchModeBox->setEnabled(false);
+}
+
+std::string QmitkXnatTreeBrowserView::replaceSpecialChars(const std::string& input) const
+{
+  QString convertedString = QString(QUrl::toPercentEncoding(QString::fromStdString(input)));
+  return  convertedString.toStdString();
 }
 
 void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)

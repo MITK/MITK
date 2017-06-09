@@ -3002,9 +3002,6 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
           activePartID = ViewFactory::ExtractPrimaryId(activePartID);
         }
       }
-      QString activePerspectiveID;
-      childMem->GetString(WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE,
-          activePerspectiveID);
 
       // Restore perspectives.
       QList<IMemento::Pointer> perspMems(childMem->GetChildren(
@@ -3030,11 +3027,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
         {
           activePerspective = persp;
         }
-        else if ((activePerspective == 0) && desc->GetId()
-            == activePerspectiveID)
-        {
-          activePerspective = persp;
-        }
+
         perspList.Add(persp);
         window->FirePerspectiveOpened(WorkbenchPage::Pointer(this), desc);
         //                }
@@ -3253,11 +3246,6 @@ bool WorkbenchPage::SaveState(IMemento::Pointer memento)
 
   // Create persp block.
   childMem = memento->CreateChild(WorkbenchConstants::TAG_PERSPECTIVES);
-  if (this->GetPerspective())
-  {
-    childMem->PutString(WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE,
-        this->GetPerspective()->GetId());
-  }
   if (this->GetActivePart() != 0)
   {
     if (this->GetActivePart().Cast<IViewPart> ())

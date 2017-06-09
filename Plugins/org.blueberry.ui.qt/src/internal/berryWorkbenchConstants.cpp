@@ -172,9 +172,6 @@ const QString WorkbenchConstants::TAG_PERSPECTIVES = "perspectives";
 
 const QString WorkbenchConstants::TAG_PERSPECTIVE = "perspective";
 
-const QString WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE =
-    "activePerspective";
-
 const QString WorkbenchConstants::TAG_ACTIVE_PART = "activePart";
 
 const QString WorkbenchConstants::TAG_ACTION_SET = "actionSet";

@@ -117,7 +117,7 @@ typedef itk::VectorImage< short, 3 > ItkDwiType;
 #include <mitkITKImageImport.h>
 #include "mitkPreferenceListReaderOptionsFunctor.h"
 
-mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image)
+mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, double BValue, unsigned int numOfGradientsToKeep)
 {
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
@@ -136,17 +136,16 @@ mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image)
 
   std::vector<unsigned int> newNumGradientDirections;
 
-  //TODO: Round bvalues
-
-  double BValue = 0;
-  shellSlectionMap[BValue] = originalShellMap[BValue];
+  //Keeps 1 b0 gradient
+  double B0Value = 0;
+  shellSlectionMap[B0Value] = originalShellMap[B0Value];
   unsigned int num = 1;
   newNumGradientDirections.push_back(num);
 
-  BValue = 1000;
+  //BValue = 1000;
   shellSlectionMap[BValue] = originalShellMap[BValue];
-  num = 32;
-  newNumGradientDirections.push_back(num);
+  //numOfGradientsToKeep = 32;
+  newNumGradientDirections.push_back(numOfGradientsToKeep);
 
 
   if (newNumGradientDirections.empty()) {
@@ -206,15 +205,17 @@ int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
+    //todo: doku that only one bvalue possible
+
     parser.setTitle("Resample Gradients");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("Resample gradients of input DWI image.");
+    parser.setDescription("Resample gradients of input DWI image. You can select one b-value shell and the number of gradients within this shell you want to have. It will also keep one b0 image.");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle", us::Any(), false);
     parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output fiber bundle", us::Any(), false);
-    parser.addArgument("bValue", "b", mitkCommandLineParser::Int, "b-value:", "integer", 1000, false);
+    parser.addArgument("bValue", "b", mitkCommandLineParser::Float, "b-value:", "float", 1000, false);
     parser.addArgument("nrOfGradients", "n", mitkCommandLineParser::Int, "Nr of gradients:", "integer", 32, false);
 
 
@@ -225,23 +226,16 @@ int main(int argc, char* argv[])
 
     std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);    
     std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
-    int bValue = us::any_cast<int>(parsedArgs["bValue"]);
-    int nrOfGradients = us::any_cast<int>(parsedArgs["nrOfGradients"]);
+    double bValue = us::any_cast<float>(parsedArgs["bValue"]);
+    unsigned int nrOfGradients = us::any_cast<int>(parsedArgs["nrOfGradients"]);
 
     try
     {
-        mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({ "Diffusion Weighted Images" }, {"ITK FixedNiftiImageIO"});
-
-        mitk::IOUtil::LoadInfo info(inFileName);
-        functor(info);
-        MITK_INFO << info.m_ReaderSelector.GetSelected().GetDescription();
-
-        //mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(inFileName)->GetData());
+        mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({ "Diffusion Weighted Images" }, {});
         mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(inFileName, &functor).GetPointer());
-
-        mitk::Image::Pointer newImage = DoReduceGradientDirections(mitkImage);
-
-        mitk::IOUtil::SaveImage(newImage, outFileName);
+        mitk::Image::Pointer newImage = DoReduceGradientDirections(mitkImage, bValue, nrOfGradients);
+        //mitk::IOUtil::SaveImage(newImage, outFileName); //save as dwi image
+        mitk::IOUtil::Save(newImage, "application/vnd.mitk.nii.gz", outFileName);  //save as nifti image
 
     }
     catch (itk::ExceptionObject e)

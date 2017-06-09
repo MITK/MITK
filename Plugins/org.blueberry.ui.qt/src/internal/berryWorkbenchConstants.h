@@ -170,8 +170,6 @@ struct BERRY_UI_QT WorkbenchConstants
 
   static const QString TAG_PERSPECTIVE; // = "perspective";
 
-  static const QString TAG_ACTIVE_PERSPECTIVE; // = "activePerspective";
-
   static const QString TAG_ACTIVE_PART; // = "activePart";
 
   static const QString TAG_ACTION_SET; // = "actionSet";

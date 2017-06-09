@@ -135,7 +135,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
 
   //MITK_INFO << "Server received r = " << r;
 
-  MITK_INFO << "Received r = " << r;
+  //MITK_INFO << "Received r = " << r;
 
   if (r == 0) //connection error
   {

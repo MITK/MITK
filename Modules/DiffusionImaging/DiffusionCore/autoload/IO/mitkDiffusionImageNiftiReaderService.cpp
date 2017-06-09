@@ -286,7 +286,7 @@ void DiffusionImageNiftiReaderService::InternalRead()
         std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetInputLocation());
         std::string base = this->GetMimeType()->GetFilenameWithoutExtension(this->GetInputLocation());
         if (!base_path.empty())
-            std::string base = base_path + "/" + base;
+            base = base_path + "/" + base;
 
         // check for possible file names
         {

@@ -67,18 +67,6 @@ int main(int argc, char* argv[])
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    bool binary = false;
-    if (parsedArgs.count("binary"))
-        binary = us::any_cast<int>(parsedArgs["binary"]);
-
-    bool endpoints = false;
-    if (parsedArgs.count("endpoints"))
-        endpoints = us::any_cast<int>(parsedArgs["endpoints"]);
-
-    std::string reference_image = "";
-    if (parsedArgs.count("reference_image"))
-        reference_image = us::any_cast<std::string>(parsedArgs["reference_image"]);
-
     std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
     std::string weightsFileName = us::any_cast<std::string>(parsedArgs["weights"]);
     std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);

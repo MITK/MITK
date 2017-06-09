@@ -155,7 +155,7 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::AppliesTo(const std:
     std::string base_path = itksys::SystemTools::GetFilenamePath(path);
     std::string base = this->GetFilenameWithoutExtension(path);
     if (!base_path.empty())
-        std::string base = base_path + "/" + base;
+        base = base_path + "/" + base;
 
     if (itksys::SystemTools::FileExists(std::string(base + ".bvec").c_str())
       && itksys::SystemTools::FileExists(std::string(base + ".bval").c_str())
@@ -222,7 +222,7 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageFslMimeType::AppliesTo(const std::s
       std::string base_path = itksys::SystemTools::GetFilenamePath(path);
       std::string base = this->GetFilenameWithoutExtension(path);
       if (!base_path.empty())
-          std::string base = base_path + "/" + base;
+          base = base_path + "/" + base;
 
     if (itksys::SystemTools::FileExists(std::string(base + ".bvec").c_str())
       && itksys::SystemTools::FileExists(std::string(base + ".bval").c_str())

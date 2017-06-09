@@ -28,6 +28,7 @@ if(BUILD_DiffusionCmdApps OR MITK_BUILD_ALL_APPS)
     RfTraining^^MitkFiberTracking
     TractDensity^^MitkFiberTracking
     Sift2WeightCopy^^MitkFiberTracking
+    ResampleGradients^^MitkFiberTracking
     )
 
     foreach(diffusioncmdapp ${diffusioncmdapps})

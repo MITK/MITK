@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkSegmentationView_h
-#define QmitkSegmentationView_h
+#ifndef QMITKSEGMENTATIONVIEW_H
+#define QMITKSEGMENTATIONVIEW_H
 
 #include <QmitkAbstractView.h>
 #include <mitkILifecycleAwarePart.h>
@@ -56,7 +56,6 @@ public:
 
   virtual void Activated() override;
   virtual void Deactivated() override;
-  bool IsActivated() const;
   virtual void Visible() override;
   virtual void Hidden() override;
 
@@ -82,35 +81,37 @@ public:
 
   protected slots:
 
-    void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
-    void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
 
-    // reaction to the button "New segmentation"
-    void CreateNewSegmentation();
+  // reaction to the button "New segmentation"
+  void CreateNewSegmentation();
 
-    void OnManualTool2DSelected(int id);
+  void OnManualTool2DSelected(int id);
 
-    void OnWorkingNodeVisibilityChanged();
+  void OnVisiblePropertyChanged();
 
-    // called if a node's binary property has changed
-    void OnBinaryPropertyChanged();
+  void OnBinaryPropertyChanged();
 
-    void OnShowMarkerNodes(bool);
+  void OnShowMarkerNodes(bool);
 
-    void OnTabWidgetChanged(int);
+  void OnTabWidgetChanged(int);
 
 protected:
 
   // a type for handling lists of DataNodes
   typedef std::vector<mitk::DataNode*> NodeList;
 
-  // actively query the current selection of data manager
-  //void PullCurrentDataManagerSelection();
+  // GUI setup
+  virtual void CreateQtPartControl(QWidget* parent) override;
 
   // reactions to selection events from data manager (and potential other senders)
   //void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
-  mitk::DataNode::Pointer FindFirstRegularImage( std::vector<mitk::DataNode*> nodes );
-  mitk::DataNode::Pointer FindFirstSegmentation( std::vector<mitk::DataNode*> nodes );
+  mitk::DataNode::Pointer FindFirstRegularImage(std::vector<mitk::DataNode*> nodes);
+  mitk::DataNode::Pointer FindFirstSegmentation(std::vector<mitk::DataNode*> nodes);
+
+  // initially set the tool manager selection from the combo boxes
+  void InitToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
 
   // propagate BlueBerry selection to ToolManager for manual segmentation
   void SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
@@ -124,19 +125,16 @@ protected:
   // decorates a DataNode according to the user preference settings
   void ApplyDisplayOptions(mitk::DataNode* node);
 
-  // GUI setup
-  void CreateQtPartControl(QWidget* parent) override;
+  void ResetMouseCursor();
 
-  void ResetMouseCursor( );
-
-  void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY );
+  void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY);
 
   void SetToolSelectionBoxesEnabled(bool);
 
   bool m_MouseCursorSet;
 
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
-  void OnContourMarkerSelected (const mitk::DataNode* node);
+  void OnContourMarkerSelected(const mitk::DataNode* node);
 
   void NodeRemoved(const mitk::DataNode* node) override;
 
@@ -173,8 +171,6 @@ protected:
   mitk::NodePredicateOr::Pointer m_IsASegmentationImagePredicate;
   mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;
 
-  bool m_Activated;
-
 };
 
-#endif /*QMITKsegmentationVIEW_H_*/
+#endif // QMITKSEGMENTATIONVIEW_H

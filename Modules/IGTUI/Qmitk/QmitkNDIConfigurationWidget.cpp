@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTException.h>
 #include <mitkIOUtil.h>
 
+#include <QmitkIGTCommonHelper.h>
 #include "QmitkCustomVariants.h"
 
 //#include <QtConcurrentMap>
@@ -236,12 +237,15 @@ void QmitkNDIConfigurationWidget::OnAddPassiveTool()
   if (m_Tracker.IsNull())
     this->CreateTracker();
 
-  QStringList filenames = QFileDialog::getOpenFileNames(this, "Select NDI SROM file", QDir::currentPath(),"NDI SROM files (*.rom)");
+  QStringList filenames = QFileDialog::getOpenFileNames(this, "Select NDI SROM file", QmitkIGTCommonHelper::GetLastFileLoadPath(),"NDI SROM files (*.rom)");
   if (filenames.isEmpty())
   {
     this->m_Tracker = NULL;
     return;
   }
+
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(filenames.at(0));
+
   foreach(QString fileName, filenames)
   {
     //QString toolName = QInputDialog::getText(this, "Enter a name for the tool", "Name of the tool: ", QLineEdit::Normal, QFileInfo(filename).baseName(), &ok);
@@ -491,7 +495,8 @@ void QmitkNDIConfigurationWidget::OnTableItemClicked(const QModelIndex & topLeft
   {
   case QmitkNDIToolDelegate::RepCol:
 
-    filename = QFileDialog::getOpenFileName(this, "Select Surface File", QDir::currentPath(),"STL files (*.stl)");
+    filename = QFileDialog::getOpenFileName(this, "Select Surface File", QmitkIGTCommonHelper::GetLastFileLoadPath(),"STL files (*.stl)");
+    QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(filename);
 
     filenameItem = new QTableWidgetItem(filename);
     m_Controls->m_ToolTable->setItem( topLeft.row(), topLeft.column(), filenameItem );
@@ -746,11 +751,13 @@ void QmitkNDIConfigurationWidget::OnLoadTool()
   if(m_Tracker.IsNull() || m_Tracker->GetToolCount() <= 0)
     return;
 
-  QString filename = QFileDialog::getOpenFileName(NULL, "Load NDI-Tools", QDir::currentPath(),"NDI Tracking Tool file(*.ntf)");
+  QString filename = QFileDialog::getOpenFileName(NULL, "Load NDI-Tools", QmitkIGTCommonHelper::GetLastFileLoadPath(),"NDI Tracking Tool file(*.ntf)");
   int currId = m_Controls->m_ToolSelectionComboBox->currentIndex();
 
   if(filename.isEmpty())
     return;
+
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(filename);
 
   mitk::DataNode::Pointer toolNode;
   mitk::NavigationToolReader::Pointer toolReader = mitk::NavigationToolReader::New();

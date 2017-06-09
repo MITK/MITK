@@ -40,15 +40,27 @@ void QmitkDataNodeSelectionProvider::SetSelection(const berry::ISelection::Const
   mitk::DataNodeSelection::ConstPointer dataNodeSelection = selection.Cast<const mitk::DataNodeSelection>();
   if (dataNodeSelection)
   {
+    mitk::DataNodeSelection::ConstPointer currentSelection = this->GetDataNodeSelection();
+    for (auto selectedNode: currentSelection->GetSelectedDataNodes())
+    {
+      if (selectedNode.IsNotNull())
+      {
+        selectedNode->SetSelected(false);
+      }
+    }
+
     const QAbstractItemModel* model = qSelectionModel->model();
 
     QItemSelection newSelection;
-    const std::list<mitk::DataNode::Pointer> selectedNodes = dataNodeSelection->GetSelectedDataNodes();
-    for (auto i = selectedNodes.begin();
-         i != selectedNodes.end(); ++i)
+    for (auto selectedNode: dataNodeSelection->GetSelectedDataNodes())
     {
+      if (selectedNode.IsNotNull())
+      {
+        selectedNode->SetSelected(true);
+      }
+
       QModelIndexList matched = model->match(model->index(0, 0), QmitkDataNodeRawPointerRole,
-                                             QVariant::fromValue<mitk::DataNode*>(i->GetPointer()), 1, Qt::MatchRecursive);
+                                             QVariant::fromValue<mitk::DataNode*>(selectedNode.GetPointer()), 1, Qt::MatchRecursive);
       if (!matched.empty())
       {
         newSelection.select(matched.front(), matched.front());

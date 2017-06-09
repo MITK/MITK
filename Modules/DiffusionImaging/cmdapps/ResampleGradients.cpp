@@ -205,8 +205,6 @@ int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
-    //todo: doku that only one bvalue possible
-
     parser.setTitle("Resample Gradients");
     parser.setCategory("Fiber Tracking and Processing Methods");
     parser.setDescription("Resample gradients of input DWI image. You can select one b-value shell and the number of gradients within this shell you want to have. It will also keep one b0 image.");

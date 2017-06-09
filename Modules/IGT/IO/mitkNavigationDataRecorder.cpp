@@ -24,6 +24,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_Recording = false;
   m_StandardizedTimeInitialized = false;
   m_RecordCountLimit = -1;
+  m_RecordOnlyValidData = false;
 }
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()
@@ -39,6 +40,8 @@ void mitk::NavigationDataRecorder::GenerateData()
   //This vector will hold the NavigationDatas that are copied from the inputs
   std::vector< mitk::NavigationData::Pointer > clonedDatas;
 
+  bool atLeastOneInputIsInvalid = false;
+
   // For each input
   for (unsigned int index=0; index < inputs.size(); index++)
   {
@@ -47,6 +50,11 @@ void mitk::NavigationDataRecorder::GenerateData()
 
     // if we are not recording, that's all there is to do
     if (! m_Recording) continue;
+
+    if (atLeastOneInputIsInvalid || !this->GetInput(index)->IsDataValid())
+    {
+       atLeastOneInputIsInvalid = true;
+    }
 
     // Clone a Navigation Data
     mitk::NavigationData::Pointer clone = mitk::NavigationData::New();
@@ -63,8 +71,9 @@ void mitk::NavigationDataRecorder::GenerateData()
   // if limitation is set and has been reached, stop recording
   if ((m_RecordCountLimit > 0) && (m_NavigationDataSet->Size() >= m_RecordCountLimit)) m_Recording = false;
   // We can skip the rest of the method, if recording is deactivated
-  if  (!m_Recording) return;
-
+  if (!m_Recording) return;
+  // We can skip the rest of the method, if we read only valid data
+  if (m_RecordOnlyValidData && atLeastOneInputIsInvalid) return;
 
   // Add data to set
   m_NavigationDataSet->AddNavigationDatas(clonedDatas);

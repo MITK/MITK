@@ -939,6 +939,7 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {
     //initialize logging filter
     m_loggingFilter = mitk::NavigationDataRecorder::New();
+    m_loggingFilter->SetRecordOnlyValidData(m_Controls->m_SkipInvalidData->isChecked());
 
     m_loggingFilter->ConnectTo(m_ToolVisualizationFilter);
 
@@ -1065,6 +1066,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableLoggingButtons()
   m_Controls->m_LoggedFramesLimit->setEnabled(false);
   m_Controls->m_csvFormat->setEnabled(false);
   m_Controls->m_xmlFormat->setEnabled(false);
+  m_Controls->m_SkipInvalidData->setEnabled(false);
   m_Controls->m_StopLogging->setEnabled(true);
 }
 
@@ -1077,6 +1079,7 @@ void QmitkMITKIGTTrackingToolboxView::EnableLoggingButtons()
   m_Controls->m_LoggedFramesLimit->setEnabled(true);
   m_Controls->m_csvFormat->setEnabled(true);
   m_Controls->m_xmlFormat->setEnabled(true);
+  m_Controls->m_SkipInvalidData->setEnabled(true);
   m_Controls->m_StopLogging->setEnabled(false);
 }
 

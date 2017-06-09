@@ -108,6 +108,12 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
 
 	void OnAddAblationZone(int size);
 
+  void OnEnableNavigationLayout();
+
+  void OnResetStandardLayout();
+
+  void OnChangeLayoutClicked();
+
 	void OnChangeAblationZone(int id, int newSize);
 
 public:

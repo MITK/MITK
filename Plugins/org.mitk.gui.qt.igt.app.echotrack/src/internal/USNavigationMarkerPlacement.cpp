@@ -207,6 +207,7 @@ void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
 	connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
 	connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
+  connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
 
 	connect(ui->navigationProcessWidget,
 		SIGNAL(SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>)),
@@ -280,9 +281,31 @@ void USNavigationMarkerPlacement::OnTimeout()
 	}
 }
 
+void USNavigationMarkerPlacement::OnEnableNavigationLayout()
+{
+  MITK_INFO << "Navigation Layout";
+  // try to get the standard multi widget if it couldn't be got before
+  mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
+
+  QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor *>(renderWindow);
+
+  // if there is a standard multi widget now, disable the level window and
+  // change the layout to 2D up and 3d down
+  if (multiWidgetEditor)
+  {
+    m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
+    if (m_StdMultiWidget)
+    {
+      m_StdMultiWidget->DisableStandardLevelWindow();
+      m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown();
+      this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane")->SetVisibility(false);
+      this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->SetVisibility(false);
+    }
+  }
+}
+
 void USNavigationMarkerPlacement::OnResetStandardLayout()
 {
-  MITK_INFO << "Resetting Layout";
   //reset render windows
   mitk::DataNode::Pointer widget1 = this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane");
   if (widget1.IsNotNull()) { widget1->SetVisibility(true); }

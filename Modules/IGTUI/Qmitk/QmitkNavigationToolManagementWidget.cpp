@@ -95,8 +95,9 @@ void QmitkNavigationToolManagementWidget::OnSaveTool()
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), QmitkIGTCommonHelper::GetLastFileSavePath(), "*.IGTTool").toLatin1().data();
     QmitkIGTCommonHelper::SetLastFileSavePathByFileName(QString::fromStdString(filename));
-    filename.append(".IGTTool");
     if (filename == "") return;
+    std::string fileExt = Poco::Path(filename).getExtension();
+    if (fileExt == "") { filename.append(".IGTTool"); }
     if (!myWriter->DoWrite(filename,m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())))
       MessageBox("Error: "+ myWriter->GetErrorMessage());
 }

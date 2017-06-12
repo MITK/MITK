@@ -283,7 +283,9 @@ if(MITK_USE_Qt5)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  mitkFunctionAddExternalProject(NAME Caffe2      OFF ADVANCED DOC "Experimental. Only available on Linux systems.")
+  mitkFunctionAddExternalProject(NAME Gflags  OFF ADVANCED DOC "Experimental. Only available on Linux systems. Needed for Caffe.")
+  mitkFunctionAddExternalProject(NAME Caffe   OFF ADVANCED DEPENDS HDF5 OpenCV Gflags DOC "Experimental. Only available on Linux systems.")
+  mitkFunctionAddExternalProject(NAME Caffe2  OFF ADVANCED DOC "Experimental. Only available on Linux systems.")
 endif()
 
 # -----------------------------------------

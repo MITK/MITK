@@ -1,4 +1,7 @@
-if(MITK_USE_Caffe2)
+message(WARNING ${MITK_USE_Caffe})
+message(WARNING ${MITK_USE_Caffe2})
+
+if(MITK_USE_Caffe2 AND MITK_USE_Caffe)
 
   set(_module_deps MitkFiberTracking )
 
@@ -6,7 +9,7 @@ if(MITK_USE_Caffe2)
     SUBPROJECTS MITK-DTI
     INCLUDE_DIRS include/
     DEPENDS ${_module_deps}
-    PACKAGE_DEPENDS PUBLIC OpenCV Caffe2
+    PACKAGE_DEPENDS PUBLIC OpenCV Caffe Caffe2
   )
 
   if(MODULE_IS_ENABLED)

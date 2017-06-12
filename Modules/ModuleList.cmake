@@ -17,14 +17,16 @@ set(mitk_modules
   DICOMReaderServices
   DICOMTesting
   SceneSerializationBase
+  SceneSerialization
+  Persistence
   PlanarFigure
   ImageDenoising
   ImageExtraction
   LegacyAdaptors
-  SceneSerialization
   Gizmo
   GraphAlgorithms
   Multilabel
+  SemanticRelations
   ImageStatistics
   ContourModel
   SurfaceInterpolation
@@ -59,7 +61,6 @@ set(mitk_modules
   Remeshing
   Python
   QtPython
-  Persistence
   OpenIGTLinkUI
   IGTUI
   VtkShaders

@@ -13,6 +13,7 @@ if(BUILD_DeepDiffusionCmdApps OR MITK_BUILD_ALL_APPS)
   # they are added after a "^^" and separated by "_"
   set( deepdiffusioncmdapps
   CaffeTest^^
+  CaffeSegmentationTest^^
   Caffe2Test^^
   )
 

@@ -20,6 +20,8 @@ endif()
 set(_package_excludes
   ${_apple_package_excludes}
   ${_python_excludes}
+  Gflags
+  Caffe
   Caffe2
   OpenCL
   SYSTEM_Boost

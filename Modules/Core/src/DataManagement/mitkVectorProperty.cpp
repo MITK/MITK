@@ -88,5 +88,7 @@ namespace mitk
   // Explicit instantiation for defined types.
   MITK_DEFINE_VECTOR_PROPERTY(double)
   MITK_DEFINE_VECTOR_PROPERTY(int)
+  MITK_DEFINE_VECTOR_PROPERTY(unsigned int)
+  MITK_DEFINE_VECTOR_PROPERTY(std::string)
 
 } // namespace mitk

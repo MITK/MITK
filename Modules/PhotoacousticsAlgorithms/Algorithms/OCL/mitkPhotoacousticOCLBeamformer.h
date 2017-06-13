@@ -73,13 +73,14 @@ public:
     m_PAImage = PA;
   }
 
-  void SetBeamformingParameters(float SpeedOfSound, float RecordTime, float Pitch, float Angle, bool PAImage)
+  void SetBeamformingParameters(float SpeedOfSound, float RecordTime, float Pitch, float Angle, bool PAImage, unsigned short transducerElements)
   {
     m_SpeedOfSound = SpeedOfSound;
     m_RecordTime = RecordTime;
     m_Pitch = Pitch;
     m_Angle = Angle;
     m_PAImage = PAImage;
+    m_TransducerElements = transducerElements;
   }
 
 protected:
@@ -113,8 +114,6 @@ private:
   cl_kernel m_PixelCalculation;
 
   unsigned int m_OutputDim[3];
-  unsigned short m_InputS;
-  unsigned short m_InputL;
   float* m_Apodisation;
   unsigned short m_ApodArraySize;
   BeamformingAlgorithm m_Algorithm;
@@ -123,6 +122,77 @@ private:
   float m_RecordTime;
   float m_Pitch;
   float m_Angle;
+  unsigned short m_TransducerElements;
+};
+
+class PhotoacousticPixelSum : public OclImageToImageFilter, public itk::Object
+{
+
+public:
+  mitkClassMacroItkParent(PhotoacousticPixelSum, itk::Object);
+  itkNewMacro(Self);
+
+  /**
+  * @brief SetInput Set the input image. Only 3D images are supported for now.
+  * @param image a 3D image.
+  * @throw mitk::Exception if the dimesion is not 3.
+  */
+  void SetInput(Image::Pointer image);
+
+  void* GetRawOutput();
+
+  /** Update the filter */
+  void Update();
+
+  void SetOutputDim(unsigned int outputDim[3])
+  {
+    m_OutputDim[0] = outputDim[0];
+    m_OutputDim[1] = outputDim[1];
+    m_OutputDim[2] = outputDim[2];
+  }
+
+  void SetImagesToAdd(unsigned short number)
+  {
+    m_Images = number;
+  }
+
+  void SetData(void* data)
+  {
+    m_Data = (float*)data;
+  }
+
+protected:
+
+  /** Constructor */
+  PhotoacousticPixelSum();
+
+  /** Destructor */
+  virtual ~PhotoacousticPixelSum();
+
+  /** Initialize the filter */
+  bool Initialize();
+
+  void Execute();
+
+  mitk::PixelType GetOutputType()
+  {
+    return mitk::MakeScalarPixelType<float>();
+  }
+
+  int GetBytesPerElem()
+  {
+    return sizeof(double);
+  }
+
+  virtual us::Module* GetModule();
+
+private:
+  /** The OpenCL kernel for the filter */
+  cl_kernel m_PixelCalculation;
+
+  unsigned int m_OutputDim[3];
+  float* m_Data;
+  unsigned short m_Images;
 };
 }
 #endif

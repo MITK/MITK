@@ -25,7 +25,8 @@ __kernel void ckDASSphe(
   float RecordTime,
   float Pitch,
   float Angle,
-  unsigned short PAImage  // parameters
+  unsigned short PAImage,
+  unsigned short TransducerElements  // parameters
 )
 {
   // get thread identifier
@@ -48,7 +49,7 @@ __kernel void ckDASSphe(
     float s_i = (float)globalPosY / outputS * inputS;
 
     float tan_phi = tan(Angle / 360 * 2 * M_PI);
-    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch;
+    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch * inputL / TransducerElements;
 
     float part = part_multiplicator * s_i;
     if (part < 1)
@@ -67,7 +68,7 @@ __kernel void ckDASSphe(
       AddSample = sqrt(
         pow(s_i, 2)
         +
-        pow((inputS / (RecordTime*SpeedOfSound) * ((l_s - l_i)*Pitch*outputL) / inputL), 2)
+        pow((inputS / (RecordTime*SpeedOfSound) * ((l_s - l_i)*Pitch*TransducerElements) / inputL), 2)
       );
       if (AddSample < inputS && AddSample >= 0) 
         output += apodArray[(short)((l_s - minLine)*apod_mult)] * read_imagef( dSource, defaultSampler, (int4)(l_s, AddSample, globalPosZ, 0 )).x;

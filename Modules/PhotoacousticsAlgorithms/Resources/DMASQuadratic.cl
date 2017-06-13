@@ -25,7 +25,8 @@ __kernel void ckDMASQuad(
   float RecordTime,
   float Pitch,
   float Angle,
-  unsigned short PAImage  // parameters
+  unsigned short PAImage,
+  unsigned short TransducerElements  // parameters
 )
 {
   // get thread identifier
@@ -48,7 +49,7 @@ __kernel void ckDMASQuad(
     float s_i = (float)globalPosY / outputS * inputS;
 
     float tan_phi = tan(Angle / 360 * 2 * M_PI);
-    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch;
+    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements;
 
     float part = part_multiplicator * s_i;
     if (part < 1)
@@ -59,7 +60,7 @@ __kernel void ckDMASQuad(
     short usedLines = (maxLine - minLine);
 	float apod_mult = apodArraySize / (maxLine - minLine);
 	
-    float delayMultiplicator = pow((inputS / (RecordTime*SpeedOfSound) * Pitch), 2) / s_i / 2;
+    float delayMultiplicator = pow((inputS / (RecordTime*SpeedOfSound) * Pitch * TransducerElements / inputL), 2) / s_i / 2;
 	
 	float mult = 0;
 	float output = 0;
@@ -68,19 +69,19 @@ __kernel void ckDMASQuad(
 	
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
-      //AddSample1 = delayMultiplicator * pow((l_s1 - l_i), 2) + s_i;
+      AddSample1 = delayMultiplicator * pow((l_s1 - l_i), 2) + s_i;
       if (AddSample1 < inputS && AddSample1 >= 0)
       {
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
-          //AddSample2 = delayMultiplicator * pow((l_s2 - l_i), 2) + s_i;
+          AddSample2 = delayMultiplicator * pow((l_s2 - l_i), 2) + s_i;
           if (AddSample2 < inputS && AddSample2 >= 0)
           {
             mult = read_imagef( dSource, defaultSampler, (int4)(l_s2, AddSample2, globalPosZ, 0 )).x
 			* apodArray[(short)((l_s2 - minLine)*apod_mult)]
 			* read_imagef( dSource, defaultSampler, (int4)(l_s1, AddSample1, globalPosZ, 0 )).x 
 			* apodArray[(short)((l_s1 - minLine)*apod_mult)];
-            output += sqrt(mult*(mult>0)) * ((mult > 0) - (mult < 0));
+            output += sqrt(mult * ((float)(mult>0)-(float)(mult<0))) * ((mult > 0) - (mult < 0));
           }
         }
       }

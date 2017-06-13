@@ -220,6 +220,7 @@ void mitk::BeamformingFilter::GenerateData()
 
   try
   {
+    MITK_INFO << "afas" << input->GetPixelType().GetTypeAsString();
     m_oclFilter->SetInput(input);
     if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
     {
@@ -237,7 +238,7 @@ void mitk::BeamformingFilter::GenerateData()
     }
     m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
     m_oclFilter->SetOutputDim(oclOutputDim);
-    m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.RecordTime, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic);
+    m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.RecordTime, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
     m_oclFilter->Update();
 
     auto out = m_oclFilter->GetOutput();

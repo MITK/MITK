@@ -25,7 +25,8 @@ __kernel void ckDASQuad(
   float RecordTime,
   float Pitch,
   float Angle,
-  unsigned short PAImage  // parameters
+  unsigned short PAImage,
+  unsigned short TransducerElements  // parameters
 )
 {
   // get thread identifier
@@ -48,7 +49,7 @@ __kernel void ckDASQuad(
     float s_i = (float)globalPosY / outputS * inputS;
 
     float tan_phi = tan(Angle / 360 * 2 * M_PI);
-    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch;
+    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements;
 
     float part = part_multiplicator * s_i;
     if (part < 1)
@@ -61,7 +62,7 @@ __kernel void ckDASQuad(
 	
 	short AddSample = 0;
 	float output = 0;
-	float delayMultiplicator = pow(inputS / (RecordTime*SpeedOfSound) * Pitch, 2) / s_i / 2;
+	float delayMultiplicator = pow(inputS / (RecordTime*SpeedOfSound) * Pitch * TransducerElements / inputL, 2) / s_i / 2;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {

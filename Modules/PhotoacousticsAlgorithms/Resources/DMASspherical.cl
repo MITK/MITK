@@ -25,9 +25,10 @@ __kernel void ckDMASSphe(
   float RecordTime,
   float Pitch,
   float Angle,
-  unsigned short PAImage  // parameters
+  unsigned short PAImage,
+  unsigned short TransducerElements  // parameters
 )
-{/*
+{
   // get thread identifier
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
@@ -48,7 +49,7 @@ __kernel void ckDMASSphe(
     float s_i = (float)globalPosY / outputS * inputS;
 
     float tan_phi = tan(Angle / 360 * 2 * M_PI);
-    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch;
+    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements;
 
     float part = part_multiplicator * s_i;
     if (part < 1)
@@ -69,7 +70,7 @@ __kernel void ckDMASSphe(
 	  AddSample1 = sqrt(
         pow(s_i, 2)
         +
-        pow((inputS / (RecordTime*SpeedOfSound) * ((l_s1 - l_i)*Pitch)), 2));
+        pow((inputS / (RecordTime*SpeedOfSound) * ((l_s1 - l_i)*Pitch*TransducerElements)/inputL), 2));
       if (AddSample1 < inputS && AddSample1 >= 0)
       {
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
@@ -77,14 +78,14 @@ __kernel void ckDMASSphe(
 	      AddSample2 = sqrt(
             pow(s_i, 2)
             +
-            pow((inputS / (RecordTime*SpeedOfSound) * ((l_s2 - l_i)*Pitch)), 2));
+            pow((inputS / (RecordTime*SpeedOfSound) * ((l_s2 - l_i)*Pitch*TransducerElements)/inputL), 2));
           if (AddSample2 < inputS && AddSample2 >= 0)
           {
             mult = read_imagef( dSource, defaultSampler, (int4)(l_s2, AddSample2, globalPosZ, 0 )).x 
 			* apodArray[(short)((l_s2 - minLine)*apod_mult)] 
 			* read_imagef( dSource, defaultSampler, (int4)(l_s1, AddSample1, globalPosZ, 0 )).x 
 			* apodArray[(short)((l_s1 - minLine)*apod_mult)];
-            output += sqrt(mult*(mult>0)) * ((mult > 0) - (mult < 0));
+            output += sqrt(mult * ((float)(mult>0)-(float)(mult<0))) * ((mult > 0) - (mult < 0));
           }
         }
       }
@@ -93,5 +94,5 @@ __kernel void ckDMASSphe(
     }
 	
     dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = 10 * output / (pow((float)usedLines, 2.0f) - (usedLines - 1));
-  }*/
+  }
 }

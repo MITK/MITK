@@ -435,9 +435,14 @@ void QmitkPreprocessingView::DoCropImage()
     ItkDwiType::Pointer itkOutImage = cropper->GetOutput();
     ItkDwiType::DirectionType dir = itkOutImage->GetDirection();
     itk::Point<double,3> origin = itkOutImage->GetOrigin();
-    origin[0] += lower[0]*itkOutImage->GetSpacing()[0]*dir[0][0]/std::fabs(dir[0][0]);
-    origin[1] += lower[1]*itkOutImage->GetSpacing()[1]*dir[1][1]/std::fabs(dir[1][1]);
-    origin[2] += lower[2]*itkOutImage->GetSpacing()[2]*dir[2][2]/std::fabs(dir[2][2]);
+
+    itk::Point<double,3> t; t[0] = lower[0]*itkOutImage->GetSpacing()[0]; t[1] = lower[1]*itkOutImage->GetSpacing()[1]; t[2] = lower[2]*itkOutImage->GetSpacing()[2];
+    t= dir*t;
+
+    origin[0] += t[0];
+    origin[1] += t[1];
+    origin[2] += t[2];
+
     itkOutImage->SetOrigin(origin);
 
     mitk::Image::Pointer newimage = mitk::GrabItkImageMemory( itkOutImage );
@@ -511,9 +516,13 @@ void QmitkPreprocessingView::TemplatedCropImage( itk::Image<TPixel, VImageDimens
   typename ImageType::Pointer itkOutImage = cropper->GetOutput();
   typename ImageType::DirectionType dir = itkOutImage->GetDirection();
   itk::Point<double,3> origin = itkOutImage->GetOrigin();
-  origin[0] += lower[0]*itkOutImage->GetSpacing()[0]*dir[0][0]/std::fabs(dir[0][0]);
-  origin[1] += lower[1]*itkOutImage->GetSpacing()[1]*dir[1][1]/std::fabs(dir[1][1]);
-  origin[2] += lower[2]*itkOutImage->GetSpacing()[2]*dir[2][2]/std::fabs(dir[2][2]);
+
+  itk::Point<double,3> t; t[0] = lower[0]*itkOutImage->GetSpacing()[0]; t[1] = lower[1]*itkOutImage->GetSpacing()[1]; t[2] = lower[2]*itkOutImage->GetSpacing()[2];
+  t= dir*t;
+
+  origin[0] += t[0];
+  origin[1] += t[1];
+  origin[2] += t[2];
 
   itkOutImage->SetOrigin(origin);
   mitk::Image::Pointer image = mitk::Image::New();
@@ -1841,23 +1850,24 @@ void QmitkPreprocessingView::DoFlipGradientDirections()
   if ( image == nullptr ) { return; }
 
   mitk::Image::Pointer newDwi = image->Clone();
+
   GradientDirectionContainerType::Pointer gradientContainer =
     static_cast<mitk::GradientDirectionsProperty*>
-      ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+      ( newDwi->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
         ->GetGradientDirectionsContainer();
 
-  GradientDirectionContainerType::Pointer new_gradientContainer = GradientDirectionContainerType::New();
   for (unsigned int j=0; j<gradientContainer->Size(); j++)
   {
-      GradientDirectionType g = gradientContainer->at(j);
-      if (m_Controls->m_FlipGradBoxX->isChecked()) { g[0] *= -1; }
-      if (m_Controls->m_FlipGradBoxY->isChecked()) { g[1] *= -1; }
-      if (m_Controls->m_FlipGradBoxZ->isChecked()) { g[2] *= -1; }
-      new_gradientContainer->push_back(g);
+      if (m_Controls->m_FlipGradBoxX->isChecked()) { gradientContainer->at(j)[0] *= -1; }
+      if (m_Controls->m_FlipGradBoxY->isChecked()) { gradientContainer->at(j)[1] *= -1; }
+      if (m_Controls->m_FlipGradBoxZ->isChecked()) { gradientContainer->at(j)[2] *= -1; }
   }
 
-  newDwi->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                       mitk::GradientDirectionsProperty::New( new_gradientContainer ) );
+  newDwi->GetPropertyList()->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(),
+                       mitk::GradientDirectionsProperty::New( gradientContainer ) );
+
+  mitk::DiffusionPropertyHelper propertyHelper( newDwi );
+  propertyHelper.InitializeImage();
 
   mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
   imageNode->SetData( newDwi );
@@ -1878,7 +1888,7 @@ void QmitkPreprocessingView::DoHalfSphereGradientDirections()
   mitk::Image::Pointer newDwi = image->Clone();
   GradientDirectionContainerType::Pointer gradientContainer =
     static_cast<mitk::GradientDirectionsProperty*>
-      ( newDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+      ( newDwi->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
         ->GetGradientDirectionsContainer();
 
   for (unsigned int j=0; j<gradientContainer->Size(); j++)
@@ -1886,7 +1896,7 @@ void QmitkPreprocessingView::DoHalfSphereGradientDirections()
     if (gradientContainer->at(j)[0]<0) { gradientContainer->at(j) = -gradientContainer->at(j); }
   }
 
-  newDwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
+  newDwi->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(),
                        mitk::GradientDirectionsProperty::New( gradientContainer ) );
 
   mitk::DiffusionPropertyHelper propertyHelper( newDwi );

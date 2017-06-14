@@ -1,6 +1,3 @@
-message(WARNING ${MITK_USE_Caffe})
-message(WARNING ${MITK_USE_Caffe2})
-
 if(MITK_USE_Caffe2 AND MITK_USE_Caffe)
 
   set(_module_deps MitkFiberTracking )

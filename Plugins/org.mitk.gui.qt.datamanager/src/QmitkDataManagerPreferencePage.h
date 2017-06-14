@@ -57,7 +57,6 @@ public:
 protected:
   QWidget* m_MainControl;
   QCheckBox* m_EnableSingleEditing;
-  QCheckBox* m_PlaceNewNodesOnTop;
   QCheckBox* m_ShowHelperObjects;
   QCheckBox* m_ShowNodesContainingNoData;
   QCheckBox* m_GlobalReinitOnNodeDelete;

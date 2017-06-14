@@ -143,8 +143,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage());
   m_NodeTreeModel->setParent( parent );
-  m_NodeTreeModel->SetPlaceNewNodesOnTop(
-      prefs->GetBool("Place new nodes on top", true) );
   m_NodeTreeModel->SetAllowHierarchyChange(
     prefs->GetBool("Allow changing of parent node", false));
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
@@ -491,9 +489,6 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
 
 void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
-    m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
-
   bool hideHelperObjects = !prefs->GetBool("Show helper objects", false);
   if (m_FilterModel->HasFilterPredicate(m_HelperObjectFilterPredicate) != hideHelperObjects)
   {

@@ -346,6 +346,7 @@ namespace mitk {
   const std::string TAG_ROI_STDDEV = "6000|1303";
   const std::string TAG_PIXEL_DAT = "7fe0|0010";
   const std::string TAG_EX_INFO = "0051|100E";
+  const std::string TAG_SLICE_THICKNESS = "0018|0050";
 
   static const std::vector<std::string> dicomTagsList = {
     "0008|0008", // TAG_IMAGE_TYPE
@@ -691,6 +692,7 @@ namespace mitk {
     "6000|1303", // TAG_ROI_STDDEV
     "7fe0|0010", // TAG_PIXEL_DATA
     "0051|100E", // TAG_EX_INFO
+    "0018|0050", // TAG_SLICE_THICKNESS
   };
   
   static const std::map<std::string, std::string> tagToPropertyMap = {
@@ -760,6 +762,10 @@ namespace mitk {
     std::make_pair("0018|0080", "dicom.TR"),
     std::make_pair("0018|0081", "dicom.TE"),
     std::make_pair("0018|0087", "dicom.MagneticFieldStrength"),
-    std::make_pair("0051|100E", "dicom.ExInfo")
+    std::make_pair("0051|100E", "dicom.ExInfo"),
+    std::make_pair("0018|0050", "dicom.SliceThickness"),
+    std::make_pair("0018|1151", "dicom.XrayTubeCurrent"),
+    std::make_pair("0018|0060", "dicom.Kvp"),
+    std::make_pair("0020|0032", "dicom.ImagePosition")
   };
 }

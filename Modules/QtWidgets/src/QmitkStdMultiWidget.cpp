@@ -1576,7 +1576,7 @@ void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* tex
     text = " ";
   }
   cornerText[i]->SetText(corner, text);
-  cornerText[i]->SetMaximumFontSize(13);
+  cornerText[i]->SetMaximumFontSize(15);
   textProp[i]->SetColor(1.0, 1.0, 7.0);
   textProp[i]->SetFontFamilyToArial();
   cornerText[i]->SetTextProperty(textProp[i]);
@@ -1667,8 +1667,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       imageMTime = newImageMTime;
       std::string patient, patientId,
         birthday, sex, institution, studyDate, studyTime,
-        acquisitionNumber, seriesDescription, studyDescription, exInfo,
-        magneticFieldStrength, dicomTR, dicomTE;
+        studiId, seriesDescription, studyDescription, exInfo,
+        magneticFieldStrength, dicomTR, dicomTE, bodyPart, protocolName,
+        sliceThickness, xrayTubeCurrent, kvp, imagePosition;
 
       imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
       imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
@@ -1681,13 +1682,24 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         imageProperties->GetStringProperty("dicom.study.StudyDate", studyDate);
         imageProperties->GetStringProperty("dicom.study.StudyTime", studyTime);
       }
-      imageProperties->GetStringProperty("dicom.acquisition.Number", acquisitionNumber);
+      imageProperties->GetStringProperty("dicom.study.StudyID", studiId);
       imageProperties->GetStringProperty("dicom.study.StudyDescription", studyDescription);
       imageProperties->GetStringProperty("dicom.series.SeriesDescription", seriesDescription);
       imageProperties->GetStringProperty("dicom.ExInfo", exInfo);
       imageProperties->GetStringProperty("dicom.MagneticFieldStrength", magneticFieldStrength);
       imageProperties->GetStringProperty("dicom.TR", dicomTR);
       imageProperties->GetStringProperty("dicom.TE", dicomTE);
+      imageProperties->GetStringProperty("dicom.series.BodyPartExamined", bodyPart);
+      imageProperties->GetStringProperty("dicom.series.ProtocolName", protocolName);
+      imageProperties->GetStringProperty("dicom.SliceThickness", sliceThickness);
+      imageProperties->GetStringProperty("dicom.XrayTubeCurrent", xrayTubeCurrent);
+      imageProperties->GetStringProperty("dicom.Kvp", kvp);
+      imageProperties->GetStringProperty("dicom.ImagePosition", imagePosition);
+
+      auto it = imagePosition.rfind('\\');
+      if (std::string::npos != it) {
+        imagePosition.erase(0, it + 1);
+      }
 
       std::stringstream infoStringStream[2];
 
@@ -1715,10 +1727,12 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         }
         infoStringStream[0]
           << "\n" << institution.c_str()
-          << "\n" << acquisitionNumber
+          << "\n" << studiId
           << "\n" << studyDescription
           << "\n" << seriesDescription
-          << "\n" << exInfo;
+          << "\n" << exInfo
+          << "\n" << bodyPart
+          << "\n" << protocolName;
       } else {
         infoStringStream[0].clear();
       }
@@ -1727,6 +1741,15 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         if (!magneticFieldStrength.empty()) {
           infoStringStream[1]
             << "FS: " << magneticFieldStrength;
+        }
+        if (!xrayTubeCurrent.empty() || !kvp.empty()) {
+          infoStringStream[1] << '\n';
+        }
+        if (!xrayTubeCurrent.empty()) {
+          infoStringStream[1] << xrayTubeCurrent << "mA";
+        }
+        if (!kvp.empty()) {
+          infoStringStream[1] << ' ' << kvp << " kV";
         }
         if (!dicomTR.empty() || !dicomTE.empty()) {
           infoStringStream[1] << '\n';

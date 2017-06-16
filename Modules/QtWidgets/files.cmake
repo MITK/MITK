@@ -37,6 +37,7 @@ QmitkDataStorageComboBoxWithSelectNone.cpp
 QmitkPropertyItem.cpp
 QmitkPropertyItemDelegate.cpp
 QmitkPropertyItemModel.cpp
+QmitkSynchronizeSelectedData.cpp
 )
 
 set(MOC_H_FILES

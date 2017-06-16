@@ -134,6 +134,11 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(std::make_pair("dicom.TE", DICOMTag(0x0018, 0x0081)));
     result.insert(std::make_pair("dicom.MagneticFieldStrength", DICOMTag(0x0018, 0x0087)));
     result.insert(std::make_pair("dicom.ExInfo", DICOMTag(0x0051, 0x100E)));
+    result.insert(std::make_pair("dicom.SliceThickness", DICOMTag(0x0018, 0x0050)));
+    result.insert(std::make_pair("dicom.XrayTubeCurrent", DICOMTag(0x0018, 0x1151)));
+    result.insert(std::make_pair("dicom.Kvp", DICOMTag(0x0018, 0x0060)));
+    result.insert(std::make_pair("dicom.ProtocolName", DICOMTag(0x0018, 0x1030)));
+    result.insert(std::make_pair("dicom.ImagePosition", DICOMTag(0x0020, 0x0032)));
 
     // Patient module
     /*dicom.patient.PatientsName*/ result.insert(MakeEntry(DICOMTag(0x0010, 0x0010)));
@@ -224,6 +229,11 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0018, 0x1310))); //dicom.Acquisition Matrix
     result.insert(MakeEntry(DICOMTag(0x0018, 0x0087))); //dicom.Magnetic Field Strength
     result.insert(MakeEntry(DICOMTag(0x0051, 0x100E))); //dicom.ExInfo
+    result.insert(MakeEntry(DICOMTag(0x0018, 0x0050))); //dicom.SliceThickness
+    result.insert(MakeEntry(DICOMTag(0x0018, 0x1151))); //dicom.XrayTubeCurrent
+    result.insert(MakeEntry(DICOMTag(0x0018, 0x0060))); //dicom.Kvp
+    result.insert(MakeEntry(DICOMTag(0x0018, 0x1030))); //dicom.ProtocolName
+    result.insert(MakeEntry(DICOMTag(0x0020, 0x0032))); //dicom.ImagePosition
 
     //SOP
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0018))); //SOP Instance UID

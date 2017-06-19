@@ -13,6 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#include <boost/bind.hpp>
 
 #include "QmitkDataStorageComboBox.h"
 
@@ -45,6 +46,8 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStor
 
 QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
 {
+  UnsubscribeToChangeData();
+
   // if there was an old storage, remove listeners
   if(m_DataStorage.IsNotNull())
   {
@@ -57,6 +60,29 @@ QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
   //we have lots of observers to nodes and their name properties, this get's ugly if nodes live longer than the box
   while(m_Nodes.size() > 0)
     RemoveNode(0);
+}
+
+void QmitkDataStorageComboBox::OnChangeData(const mitk::DataNode* node)
+{
+  const int index = Find(node);
+  if (index == -1)
+  {
+    AddNode(node);
+    return;
+  }
+  
+  SetSelectedNode(const_cast<mitk::DataNode*>(node));
+}
+
+void QmitkDataStorageComboBox::SubscribeToChangeData(SynchronizeEventType type)
+{
+  SlotType::slot_type slot = boost::bind(&QmitkDataStorageComboBox::OnChangeData, this, _1);
+  m_CurrentDataChange = QmitkSynchronizeSelectedData::addObserver(type, slot);
+}
+
+void QmitkDataStorageComboBox::UnsubscribeToChangeData()
+{
+  m_CurrentDataChange.disconnect();
 }
 
 //#PUBLIC GETTER

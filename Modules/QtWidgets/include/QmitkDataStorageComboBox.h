@@ -17,7 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDataStorageComboBox_h
 #define QmitkDataStorageComboBox_h
 
-#include <MitkQtWidgetsExports.h>
+// Toolkit Includes
+#include <map>
+
+#include <boost/signals2.hpp>
+
+#include <QComboBox>
 
 // Own Includes
 #include "mitkDataStorage.h"
@@ -25,9 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkWeakPointer.h"
 #include "mitkNodePredicateBase.h"
 
-// Toolkit Includes
-#include <QComboBox>
-#include <map>
+#include <MitkQtWidgetsExports.h>
+
+#include "QmitkSynchronizeSelectedData.h"
 
 // Forward Declartions
 
@@ -68,6 +73,9 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.
     ///
     virtual int Find( const mitk::DataNode* _DataNode ) const;
+    
+    void SubscribeToChangeData(SynchronizeEventType type);
+    void UnsubscribeToChangeData();
 
   //#PUBLIC GETTER
   public:
@@ -235,7 +243,12 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief If set to "true" new Nodes will be automatically selected.
     bool m_AutoSelectNewNodes;
+    
+  private:
+    
+    boost::signals2::connection m_CurrentDataChange;
 
+    void OnChangeData(const mitk::DataNode* node);
 };
 
 #endif // QmitkDataStorageComboBox_h

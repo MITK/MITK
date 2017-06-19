@@ -78,6 +78,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION ("updateStatusbar", UpdateStatusbar)
   CONNECT_FUNCTION("startRotation", StartRotation);
   CONNECT_FUNCTION("endRotation", EndRotation);
+  CONNECT_FUNCTION("rotationModeChanged", EndRotation);
   CONNECT_FUNCTION("rotate", Rotate);
   CONNECT_FUNCTION("rotateBack", RotateBack);
 

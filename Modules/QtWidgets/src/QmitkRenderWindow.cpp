@@ -304,6 +304,9 @@ void QmitkRenderWindow::OnChangeLayoutDesign(int layoutDesignIndex)
 
 void QmitkRenderWindow::OnWidgetPlaneModeChanged(int mode)
 {
+  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "RotationModeChanged");
+  this->HandleEvent(internalEvent.GetPointer());
+
   if (m_MenuWidget)
     m_MenuWidget->NotifyNewWidgetPlanesMode(mode);
 }

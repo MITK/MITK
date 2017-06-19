@@ -43,7 +43,7 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
   QListView::setSelectionBehavior( QAbstractItemView::SelectRows );
   QListView::setSelectionMode( QAbstractItemView::SingleSelection );
   QListView::setModel( m_PointListModel );
-  QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse wheel to change the timestep.\n\nTimeStep:\t%1").arg(0);
+  QString tooltip = tr("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse wheel to change the timestep.\n\nTimeStep:\t%1").arg(0);
   QListView::setToolTip(tooltip);
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -263,7 +263,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
   }
 
 
-  QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse wheel to change the timestep.\n\nTimeStep:\t%1").arg(currentTS);
+  QString tooltip = tr("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse wheel to change the timestep.\n\nTimeStep:\t%1").arg(currentTS);
   this->setToolTip(tooltip);
 
   fadeTimeStepIn();
@@ -323,19 +323,19 @@ void QmitkPointListView::ctxMenu(const QPoint &pos)
   QAction *showFading = new QAction(this);
   showFading->setCheckable(false);  //TODO: reset when fading is working
   showFading->setEnabled(false);    //TODO: reset when fading is working
-  showFading->setText("Fade TimeStep");
+  showFading->setText(tr("Fade TimeStep"));
   connect(showFading, SIGNAL(triggered(bool)), this, SLOT(SetFading(bool)));
   menu->addAction(showFading);
 
   //add Clear action
   QAction *clearList = new QAction(this);
-  clearList->setText("Clear List");
+  clearList->setText(tr("Clear List"));
   connect(clearList, SIGNAL(triggered()), this, SLOT(ClearPointList()));
   menu->addAction(clearList);
 
   //add Clear TimeStep action
   QAction *clearTS = new QAction(this);
-  clearTS->setText("Clear current time step");
+  clearTS->setText(tr("Clear current time step"));
   connect(clearTS, SIGNAL(triggered()), this, SLOT(ClearPointListTS()));
   menu->addAction(clearTS);
 

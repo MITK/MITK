@@ -88,13 +88,13 @@ void QmitkPointListWidget::SetupUi()
   m_ToggleAddPoint = new QPushButton();
   m_ToggleAddPoint->setMaximumSize(25,25);
   m_ToggleAddPoint->setCheckable(true);
-  m_ToggleAddPoint->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
+  m_ToggleAddPoint->setToolTip(tr("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)"));
   QIcon iconAdd(":/QtWidgetsExt/btnSetPoints.xpm");
   m_ToggleAddPoint->setIcon(iconAdd);
 
   m_AddPoint = new QPushButton();
   m_AddPoint->setMaximumSize(25,25);
-  m_AddPoint->setToolTip("Manually add point");
+  m_AddPoint->setToolTip(tr("Manually add point"));
   QIcon iconAddManually(":/QtWidgetsExt/btnSetPointsManually.xpm");
   m_AddPoint->setIcon(iconAddManually);
 
@@ -102,31 +102,31 @@ void QmitkPointListWidget::SetupUi()
   m_RemovePointBtn->setMaximumSize(25, 25);
   const QIcon iconDel(":/QtWidgetsExt/btnClear.xpm");
   m_RemovePointBtn->setIcon(iconDel);
-  m_RemovePointBtn->setToolTip("Erase one point from list   (Hotkey: DEL)");
+  m_RemovePointBtn->setToolTip(tr("Erase one point from list   (Hotkey: DEL)"));
 
   m_MovePointUpBtn = new QPushButton();
   m_MovePointUpBtn->setMaximumSize(25, 25);
   const QIcon iconUp(":/QtWidgetsExt/btnUp.xpm");
   m_MovePointUpBtn->setIcon(iconUp);
-  m_MovePointUpBtn->setToolTip("Swap selected point upwards   (Hotkey: F2)");
+  m_MovePointUpBtn->setToolTip(tr("Swap selected point upwards   (Hotkey: F2)"));
 
   m_MovePointDownBtn = new QPushButton();
   m_MovePointDownBtn->setMaximumSize(25, 25);
   const QIcon iconDown(":/QtWidgetsExt/btnDown.xpm");
   m_MovePointDownBtn->setIcon(iconDown);
-  m_MovePointDownBtn->setToolTip("Swap selected point downwards   (Hotkey: F3)");
+  m_MovePointDownBtn->setToolTip(tr("Swap selected point downwards   (Hotkey: F3)"));
 
   m_SavePointsBtn = new QPushButton();
   m_SavePointsBtn->setMaximumSize(25, 25);
   QIcon iconSave(":/QtWidgetsExt/btnSave.xpm");
   m_SavePointsBtn->setIcon(iconSave);
-  m_SavePointsBtn->setToolTip("Save points to file");
+  m_SavePointsBtn->setToolTip(tr("Save points to file"));
 
   m_LoadPointsBtn = new QPushButton();
   m_LoadPointsBtn->setMaximumSize(25, 25);
   QIcon iconLoad(":/QtWidgetsExt/btnLoad.xpm");
   m_LoadPointsBtn->setIcon(iconLoad);
-  m_LoadPointsBtn->setToolTip("Load list of points from file (REPLACES current content)");
+  m_LoadPointsBtn->setToolTip(tr("Load list of points from file (REPLACES current content)"));
 
 
   int i;
@@ -222,16 +222,16 @@ void QmitkPointListWidget::OnBtnSavePoints()
   }
   catch(...)
   {
-    QMessageBox::warning( this, "Save point set",
-                          QString("File writer reported problems writing %1\n\n"
-                                  "PLEASE CHECK output file!").arg(aFilename) );
+    QMessageBox::warning( this, tr("Save point set"),
+                          tr("File writer reported problems writing %1\n\n"
+                             "PLEASE CHECK output file!").arg(aFilename) );
   }
 }
 
 void QmitkPointListWidget::OnBtnLoadPoints()
 {
   // get the name of the file to load
-  QString filename = QFileDialog::getOpenFileName( NULL, "Open MITK Pointset", "", "MITK Point Sets (*.mps)");
+  QString filename = QFileDialog::getOpenFileName( NULL, tr("Open MITK Pointset"), "", tr("MITK Point Sets (*.mps)"));
   if ( filename.isEmpty() ) return;
 
   // attempt to load file
@@ -240,7 +240,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
     mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(filename.toStdString());
     if ( pointSet.IsNull() )
     {
-      QMessageBox::warning( this, "Load point set", QString("File reader could not read %1").arg(filename) );
+      QMessageBox::warning( this, tr("Load point set"), tr("File reader could not read %1").arg(filename) );
       return;
     }
 
@@ -250,7 +250,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
   }
   catch(...)
   {
-    QMessageBox::warning( this, "Load point set", QString("File reader collapsed while reading %1").arg(filename) );
+    QMessageBox::warning( this, tr("Load point set"), tr("File reader collapsed while reading %1").arg(filename) );
   }
   emit PointListChanged();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

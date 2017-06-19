@@ -133,7 +133,7 @@ void QmitkUploadToXNATAction::Run( const QList<mitk::DataNode::Pointer> &selecte
   if (returnValue == QDialog::Accepted)
   {
     // Save node
-    QString fileName (QString::fromStdString(selectedNode->GetName()));
+    QString fileName (QString::fromStdString(ReplaceSpecialChars(selectedNode->GetName())));
 
     if (dynamic_cast<mitk::Image*>(selectedNode->GetData()))
     {
@@ -196,4 +196,10 @@ void QmitkUploadToXNATAction::SetSmoothed(bool /*smoothed*/)
 void QmitkUploadToXNATAction::SetDecimated(bool /*smoothed*/)
 {
   //not needed
+}
+
+std::string QmitkUploadToXNATAction::ReplaceSpecialChars(const std::string& input) const
+{
+  QString convertedString = QString(QUrl::toPercentEncoding(QString::fromStdString(input)));
+  return  convertedString.toStdString();
 }

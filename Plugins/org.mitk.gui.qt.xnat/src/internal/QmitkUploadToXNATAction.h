@@ -42,7 +42,7 @@ public:
   void SetFunctionality(berry::QtViewPart* functionality) override;
 
 private:
-
+  std::string ReplaceSpecialChars(const std::string& input) const;
   typedef QList<mitk::DataNode::Pointer> NodeList;
 
 };

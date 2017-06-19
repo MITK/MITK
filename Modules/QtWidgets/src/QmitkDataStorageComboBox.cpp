@@ -29,8 +29,6 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoS
 , m_AutoSelectNewNodes(_AutoSelectNewNodes)
 {
   this->Init();
-  
-  QmitkSynchronizeSelectedData::getInstance();
 }
 
 QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate,

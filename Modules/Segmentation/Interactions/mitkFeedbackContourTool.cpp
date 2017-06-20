@@ -40,6 +40,7 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
   m_FeedbackContourNode->SetProperty("contour.project-onto-plane", BoolProperty::New(false));
   m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(1.0));
+  m_FeedbackContourNode->SetProperty("draw-in-3d", BoolProperty::New(false));
 
   SetFeedbackContourColorDefault();
 }

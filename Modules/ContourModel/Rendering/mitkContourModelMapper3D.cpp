@@ -79,11 +79,24 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
 void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
 {
-  bool visible = true;
-  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  const DataNode *node = this->GetDataNode();
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
+  mitk::BoolProperty::Pointer p;
+  node->GetProperty(p, "draw-in-3d", renderer);
+  bool drawIn3d = false;
+  if (p.IsNotNull()) {
+    drawIn3d = p->GetValue();
+  }
 
-  mitk::ContourModel* data  = static_cast< mitk::ContourModel*>( GetDataNode()->GetData() );
+  if (!drawIn3d) {
+    //clear the rendered polydata
+    localStorage->m_Mapper->SetInputData(vtkSmartPointer<vtkPolyData>::New());
+    return;
+  }
+
+  mitk::ContourModel* data  = static_cast< mitk::ContourModel*>(node->GetData() );
+
   if ( data == NULL )
   {
     return;
@@ -92,7 +105,6 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
 
-  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
@@ -105,7 +117,6 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
     return;
   }
 
-  const DataNode *node = this->GetDataNode();
   data->UpdateOutputInformation();
 
   //check if something important has changed and we need to rerender

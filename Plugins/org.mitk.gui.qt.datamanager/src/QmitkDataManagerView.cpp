@@ -136,9 +136,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       = (prefService->GetSystemPreferences()->Node(VIEW_ID))
         .Cast<berry::IBerryPreferences>();
   assert( prefs );
-  prefs->OnChanged.AddListener( berry::MessageDelegate1<QmitkDataManagerView
-    , const berry::IBerryPreferences*>( this
-      , &QmitkDataManagerView::OnPreferencesChanged ) );
 
   //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage());
@@ -151,6 +148,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)),
    mitk::NodePredicateProperty::New("hidden object", mitk::BoolProperty::New(true)));
   m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(0);
+
+  if (m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() != prefs->GetBool("__PlaceNewNodesOnTop__", false)) {
+    m_NodeTreeModel->SetPlaceNewNodesOnTop(!m_NodeTreeModel->GetPlaceNewNodesOnTopFlag());
+  }
 
   m_FilterModel = new QmitkDataStorageFilterProxyModel();
   m_FilterModel->setSourceModel(m_NodeTreeModel);
@@ -440,6 +441,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   layout->setContentsMargins(0,0,0,0);
 
   m_Parent->setLayout(layout);
+
+  prefs->OnChanged.AddListener(
+    berry::MessageDelegate1<QmitkDataManagerView, const berry::IBerryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
 }
 
 void QmitkDataManagerView::SetFocus()
@@ -489,6 +493,10 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
 
 void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  if (m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() != prefs->GetBool("__PlaceNewNodesOnTop__", false)) {
+    m_NodeTreeModel->SetPlaceNewNodesOnTop(!m_NodeTreeModel->GetPlaceNewNodesOnTopFlag());
+  }
+
   bool hideHelperObjects = !prefs->GetBool("Show helper objects", false);
   if (m_FilterModel->HasFilterPredicate(m_HelperObjectFilterPredicate) != hideHelperObjects)
   {

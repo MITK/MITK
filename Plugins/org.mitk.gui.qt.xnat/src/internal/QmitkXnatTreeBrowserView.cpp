@@ -233,7 +233,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   }
   catch (std::invalid_argument)
   {
-    session = 0;
+    session = nullptr;
   }
 
   connect(m_Controls.treeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
@@ -524,7 +524,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
             {
               this->InternalDICOMDownload(obj, downloadPath);
             }
-            catch(ctkRuntimeException exc)
+            catch(const ctkRuntimeException& exc)
             {
               QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
               return;
@@ -583,7 +583,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
             {
               this->InternalDICOMDownload(parent, downloadPath);
             }
-            catch(ctkRuntimeException exc)
+            catch(const ctkRuntimeException& exc)
             {
               QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
               return;
@@ -660,7 +660,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       {
         this->InternalOpenFiles(fileList, xnatURL);
       }
-      catch(ctkRuntimeException exc)
+      catch(const ctkRuntimeException& exc)
       {
         QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         return;
@@ -794,7 +794,7 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
     {
       return parent->addResourceFolder(folderName);
     }
-    catch(ctkRuntimeException exc)
+    catch(const ctkRuntimeException& exc)
     {
       QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return nullptr;
@@ -850,7 +850,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
     {
       this->InternalFileUpload(file);
     }
-    catch(ctkRuntimeException exc)
+    catch(const ctkRuntimeException& exc)
     {
       QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return;
@@ -960,7 +960,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     {
       this->InternalFileUpload(xnatFile);
     }
-    catch(ctkRuntimeException exc)
+    catch(const ctkRuntimeException& exc)
     {
       QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return;
@@ -1246,7 +1246,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       {
         subject->save();
       }
-      catch(ctkRuntimeException exc)
+      catch(const ctkRuntimeException& exc)
       {
         //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
         !QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
@@ -1285,7 +1285,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       {
         experiment->save();
       }
-      catch(ctkRuntimeException exc)
+      catch(const ctkRuntimeException& exc)
       {
         QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         subject->remove(experiment);

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUploadToXNATAction.h"
 
 //needed for qApp
-#include <qcoreapplication.h>
+#include <QCoreApplication>
 
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 #include <QmitkSelectXnatUploadDestinationDialog.h>
@@ -180,22 +180,18 @@ void QmitkUploadToXNATAction::Run( const QList<mitk::DataNode::Pointer> &selecte
 
 void QmitkUploadToXNATAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)
 {
-  //not needed
 }
 
 void QmitkUploadToXNATAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
 {
-  //not needed
 }
 
 void QmitkUploadToXNATAction::SetSmoothed(bool /*smoothed*/)
 {
-  //not needed
 }
 
 void QmitkUploadToXNATAction::SetDecimated(bool /*smoothed*/)
 {
-  //not needed
 }
 
 std::string QmitkUploadToXNATAction::ReplaceSpecialChars(const std::string& input) const

@@ -53,16 +53,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QClipboard>
 #include <QDateTime>
 #include <QDialog>
-#include <QDialogButtonBox>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QLayoutItem>
 #include <QMenu>
 #include <QMessageBox>
 #include <QTimer>
-#include <QFileInfo>
 #include <QFileInfoList>
 
 #include <QmitkPreferencesDialog.h>

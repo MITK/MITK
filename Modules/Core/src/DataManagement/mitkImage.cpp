@@ -168,36 +168,9 @@ void  mitk::Image::SetMetaDataDictionary(ReaderType::DictionaryArrayType metaDat
       }
       
       // Slice specific tags
-      if (tagKey == TAG_IMAGE_ORIENTATION || tagKey == TAG_IMAGE_POSITION || tagKey == TAG_PIXEL_SPACING) {
+      if (tagKey == TAG_IMAGE_POSITION || tagKey == TAG_PIXEL_SPACING) {
         mitk::PlaneGeometry* planegeometry = slicedGeometry->GetPlaneGeometry(i);
         if (planegeometry != nullptr) {
-          if (tagKey == TAG_IMAGE_ORIENTATION) {
-            std::vector<std::string> orientation;
-            boost::algorithm::split_regex(orientation, dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get(tagKey))->GetMetaDataObjectValue(), boost::regex("\\\\"));
-            std::vector<std::string> spacing;
-            boost::algorithm::split_regex(spacing, dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get(TAG_PIXEL_SPACING))->GetMetaDataObjectValue(), boost::regex("\\\\"));
-
-            mitk::Matrix3D imageMatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix();
-            mitk::Vector3D spacingVector;
-
-            imageMatrix[0][0] = std::stof(orientation[0]);
-            imageMatrix[0][1] = std::stof(orientation[1]);
-            imageMatrix[0][2] = std::stof(orientation[2]);
-            imageMatrix[1][0] = std::stof(orientation[3]);
-            imageMatrix[1][1] = std::stof(orientation[4]);
-            imageMatrix[1][2] = std::stof(orientation[5]);
-
-            spacingVector[0] = std::stof(spacing[0]);
-            spacingVector[1] = std::stof(spacing[1]);
-            spacingVector[2] = spacing.size() == 3 ? std::stof(spacing[2]) : 1.;
-
-            imageMatrix[0][0] *= spacingVector[0];
-            imageMatrix[1][1] *= spacingVector[1];
-
-            planegeometry->GetIndexToWorldTransform()->SetMatrix(imageMatrix);
-            
-            continue;
-          }
           if (tagKey == TAG_IMAGE_POSITION) {
             std::vector<std::string> imagePosition;
             boost::algorithm::split_regex(imagePosition, dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get(tagKey))->GetMetaDataObjectValue(), boost::regex("\\\\"));

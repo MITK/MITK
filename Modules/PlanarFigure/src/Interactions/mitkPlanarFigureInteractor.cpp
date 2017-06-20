@@ -739,6 +739,9 @@ bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D( const Intera
   }
   */
 
+  if (planarFigureGeometry == nullptr)
+    return false;
+
   // Project point onto plane of this PlanarFigure
   planarFigureGeometry->Map( worldPoint3D, point2D );
   return true;

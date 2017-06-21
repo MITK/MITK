@@ -57,6 +57,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRGBAPixel.h>
 #include <mitkRenderingModeProperty.h>
 
+#include "mitkDicomTagsList.h"
+#include "mitkStringProperty.h"
+
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
 }
@@ -693,44 +696,59 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   }
 
   bool isBinaryImage(false);
-  if ( ! node->GetBoolProperty("binary", isBinaryImage) && image->GetPixelType().GetNumberOfComponents()==1 )
+  if (!node->GetBoolProperty("binary", isBinaryImage) && image->GetPixelType().GetNumberOfComponents() == 1)
   {
-
-    // ok, property is not set, use heuristic to determine if this
-    // is a binary image
-    mitk::Image::Pointer centralSliceImage;
-    ScalarType minValue = 0.0;
-    ScalarType maxValue = 0.0;
-    ScalarType min2ndValue = 0.0;
-    ScalarType max2ndValue = 0.0;
-    mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
-
-    sliceSelector->SetInput(image);
-    sliceSelector->SetSliceNr(image->GetDimension(2)/2);
-    sliceSelector->SetTimeNr(image->GetDimension(3)/2);
-    sliceSelector->SetChannelNr(image->GetDimension(4)/2);
-    sliceSelector->Update();
-    centralSliceImage = sliceSelector->GetOutput();
-    if ( centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized() )
-    {
-      min2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMin();
-      max2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMax();
-      minValue = centralSliceImage->GetStatistics()->GetScalarValueMin();
-      maxValue = centralSliceImage->GetStatistics()->GetScalarValueMax();
+    // Check if this is Secondary Capture Image. 
+    // Make sure that it's not a binary image and that it will not be included in bounding box
+    std::string sopClassUid = "";
+    if (image) {
+      auto sopClassProp = dynamic_cast<mitk::StringProperty*>(image->GetProperty("dicom.series.SopClassUid").GetPointer());
+      if (sopClassProp) {
+        sopClassUid = sopClassProp->GetValue();
+      }
     }
 
-    bool skipCheck = false;
-    node->GetBoolProperty("skip check is binary", skipCheck);
-    if (!skipCheck) {
-      if ((maxValue == min2ndValue && minValue == max2ndValue) || minValue == maxValue)
+    if (sopClassUid.find("1.2.840.10008.5.1.4.1.1.7") != std::string::npos) {
+      isBinaryImage = false;
+      node->SetBoolProperty("includeInBoundingBox", false);
+    } else {
+
+      // ok, property is not set, use heuristic to determine if this
+      // is a binary image
+      mitk::Image::Pointer centralSliceImage;
+      ScalarType minValue = 0.0;
+      ScalarType maxValue = 0.0;
+      ScalarType min2ndValue = 0.0;
+      ScalarType max2ndValue = 0.0;
+      mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
+
+      sliceSelector->SetInput(image);
+      sliceSelector->SetSliceNr(image->GetDimension(2) / 2);
+      sliceSelector->SetTimeNr(image->GetDimension(3) / 2);
+      sliceSelector->SetChannelNr(image->GetDimension(4) / 2);
+      sliceSelector->Update();
+      centralSliceImage = sliceSelector->GetOutput();
+      if (centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized())
       {
-        // centralSlice is strange, lets look at all data
-        min2ndValue = image->GetStatistics()->GetScalarValue2ndMin();
-        max2ndValue = image->GetStatistics()->GetScalarValue2ndMax();
-        minValue = image->GetStatistics()->GetScalarValueMin();
-        maxValue = image->GetStatistics()->GetScalarValueMax();
+        min2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMin();
+        max2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMax();
+        minValue = centralSliceImage->GetStatistics()->GetScalarValueMin();
+        maxValue = centralSliceImage->GetStatistics()->GetScalarValueMax();
       }
-      isBinaryImage = ( maxValue == min2ndValue && minValue == max2ndValue );
+
+      bool skipCheck = false;
+      node->GetBoolProperty("skip check is binary", skipCheck);
+      if (!skipCheck) {
+        if ((maxValue == min2ndValue && minValue == max2ndValue) || minValue == maxValue)
+        {
+          // centralSlice is strange, lets look at all data
+          min2ndValue = image->GetStatistics()->GetScalarValue2ndMin();
+          max2ndValue = image->GetStatistics()->GetScalarValue2ndMax();
+          minValue = image->GetStatistics()->GetScalarValueMin();
+          maxValue = image->GetStatistics()->GetScalarValueMax();
+        }
+        isBinaryImage = (maxValue == min2ndValue && minValue == max2ndValue);
+      }
     }
   }
 

@@ -735,18 +735,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
       continue;
     }
     
-    std::string sopClassUIDString(tagMap[tagSOPClassUID]);
-    if (sopClassUIDString == "1.2.840.10008.5.1.4.1.1.7") {
-      continue;
-    }
-
-    /* sort out multi-frame
-    if ( scanner.GetValue( fileIter->first , tagNumberOfFrames ) )
-    {
-      MITK_INFO << "Ignoring " << fileIter->first << " because we cannot handle multi-frame images.";
-      continue;
-    }
-    */
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
     // doing the same thing with find would make the code less readable. Since we forget the Scanner results

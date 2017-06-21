@@ -742,6 +742,7 @@ namespace mitk {
     std::make_pair("0018|5100", "dicom.series.PatientPosition"),
     std::make_pair("0028|0108", "dicom.series.SmallestPixelValueInSeries"),
     std::make_pair("0028|0109", "dicom.series.LargestPixelValueInSeries"),
+    std::make_pair("0008|0016", "dicom.series.SopClassUid"),
     
     // VOI LUT module
     std::make_pair("0028|1050", "dicom.voilut.WindowCenter"),

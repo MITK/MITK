@@ -233,32 +233,24 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
       planeorientation == PlaneGeometry::Sagittal ? 0 :
       planeorientation == PlaneGeometry::Frontal  ? 1 : 2;
 
-  // Inspired by:
-  // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3
+  int axes[3];
+  geometry3D->GetAxesByOrientation(axes);
+  int axis = axes[worldAxis];
+ 
+  ScalarType viewSpacing = geometry3D->GetSpacing()[axis];
+  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(axis));
 
+#ifndef NDEBUG
   mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
   matrix.GetVnlMatrix().normalize_columns();
   mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
 
-  int dominantAxis = itk::Function::Max3(
-      inverseMatrix[0][worldAxis],
-      inverseMatrix[1][worldAxis],
-      inverseMatrix[2][worldAxis]);
-
-  ScalarType viewSpacing = geometry3D->GetSpacing()[dominantAxis];
-
-  /// Although the double value returned by GetExtent() holds a round number,
-  /// you need to add 0.5 to safely convert it to unsigned it. I have seen a
-  /// case when the result was less by one without this.
-  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis) + 0.5);
-
-#ifndef NDEBUG
-  int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);
+  int upDirection = itk::Function::Sign(inverseMatrix[axis][worldAxis]);
 
   /// The normal vector of an imaginary plane that points from the world origin (bottom left back
   /// corner or the world, with the lowest physical coordinates) towards the inside of the volume,
   /// along the renderer axis. Length is the slice thickness.
-  Vector3D worldPlaneNormal = inverseMatrix.get_row(dominantAxis) * (upDirection * viewSpacing);
+  Vector3D worldPlaneNormal = inverseMatrix.get_row(axis) * (upDirection * viewSpacing);
 
   /// The normal of the standard plane geometry just created.
   Vector3D standardPlaneNormal = planeGeometry->GetNormal();

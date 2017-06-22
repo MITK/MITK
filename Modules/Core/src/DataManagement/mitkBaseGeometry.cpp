@@ -822,6 +822,145 @@ const mitk::GeometryTransformHolder *mitk::BaseGeometry::GetGeometryTransformHol
   return m_GeometryTransform;
 }
 
+void mitk::BaseGeometry::GetAxesByOrientation(int axes[]) const
+{
+  mitk::AffineTransform3D::ConstPointer affineTransform = this->GetIndexToWorldTransform();
+  mitk::AffineTransform3D::MatrixType matrix = affineTransform->GetMatrix();
+  matrix.GetVnlMatrix().normalize_columns();
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+
+  bool axesAssigned[3] = {false, false, false};
+
+  for (int orientation = 0; orientation < 3; ++orientation)
+  {
+    double absX = std::abs(inverseMatrix[0][orientation]);
+    double absY = std::abs(inverseMatrix[1][orientation]);
+    double absZ = std::abs(inverseMatrix[2][orientation]);
+
+    /// First we check if there is a single maximum value. If there is, we found the axis
+    /// that corresponds to the given orientation. If there is no single maximum value,
+    /// we choose one from the the two or three axes that have the maximum value, but we
+    /// need to make sure that we do not map the same axis to different orientations.
+    /// Equal values are valid if the volume is rotated by exactly 45 degrees around one
+    /// or two axes.
+
+    if (absX > absY)
+    {
+      if (absX > absZ)
+      {
+        /// x is the greatest
+        assert(!axesAssigned[0]);
+        axes[orientation] = 0;
+        axesAssigned[0] = true;
+      }
+      else if (absZ > absX)
+      {
+        /// z is the greatest
+        assert(!axesAssigned[2]);
+        axes[orientation] = 2;
+        axesAssigned[2] = true;
+      }
+      else
+      {
+        /// x and z are equal and greater than y
+        if (axesAssigned[0])
+        {
+          assert(!axesAssigned[2]);
+          axes[orientation] = 2;
+          axesAssigned[2] = true;
+        }
+        else
+        {
+          axes[orientation] = 0;
+          axesAssigned[0] = true;
+        }
+      }
+    }
+    else if (absY > absX)
+    {
+      if (absY > absZ)
+      {
+        /// y is the greatest
+        assert(!axesAssigned[1]);
+        axes[orientation] = 1;
+        axesAssigned[1] = true;
+      }
+      else if (absZ > absY)
+      {
+        /// z is the greatest
+        assert(!axesAssigned[2]);
+        axes[orientation] = 2;
+        axesAssigned[2] = true;
+      }
+      else
+      {
+        /// y and z are equal and greater than x
+        if (axesAssigned[1])
+        {
+          assert(!axesAssigned[2]);
+          axes[orientation] = 2;
+          axesAssigned[2] = true;
+        }
+        else
+        {
+          axes[orientation] = 1;
+          axesAssigned[1] = true;
+        }
+      }
+    }
+    else
+    {
+      if (absZ > absX)
+      {
+        /// z is the greatest
+        assert(!axesAssigned[2]);
+        axes[orientation] = 2;
+        axesAssigned[2] = true;
+      }
+      else if (absX > absZ)
+      {
+        /// x and y are equal and greater than z
+        if (axesAssigned[0])
+        {
+          assert(!axesAssigned[1]);
+          axes[orientation] = 1;
+          axesAssigned[1] = true;
+        }
+        else
+        {
+          axes[orientation] = 0;
+          axesAssigned[0] = true;
+        }
+      }
+      else
+      {
+        /// x and y and z are equal
+        if (axesAssigned[0])
+        {
+          if (axesAssigned[1])
+          {
+            assert(!axesAssigned[2]);
+            axes[orientation] = 2;
+            axesAssigned[2] = true;
+          }
+          else
+          {
+            axes[orientation] = 1;
+            axesAssigned[1] = true;
+          }
+        }
+        else
+        {
+          axes[orientation] = 0;
+          axesAssigned[0] = true;
+        }
+      }
+    }
+  }
+
+  assert(axesAssigned[0] && axesAssigned[1] && axesAssigned[2]);
+}
+
 bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
                  const mitk::BaseGeometry::BoundingBoxType *rightHandSide,
                  ScalarType eps,

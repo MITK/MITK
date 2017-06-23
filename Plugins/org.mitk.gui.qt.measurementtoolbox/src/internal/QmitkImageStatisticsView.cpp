@@ -34,6 +34,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILinkedRenderWindowPart.h>
 #include <QmitkRenderWindow.h>
 
+#include <mitkImageCast.h>
+
+#include "itkImageRegionConstIteratorWithIndex.h"
+
 #include <limits>
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
@@ -716,6 +720,37 @@ void QmitkImageStatisticsView::UpdateStatistics()
           QString(" (t=") +
           QString::number(maskTimeStep) +
           QString(")"));
+    }
+
+    // check if the segmentation mask is empty
+    typedef itk::Image<unsigned char, 3> ItkImageType;
+    typedef itk::ImageRegionConstIteratorWithIndex< ItkImageType > IteratorType;
+
+    ItkImageType::Pointer itkImage;
+
+    mitk::CastToItkImage( m_SelectedImageMask, itkImage );
+
+    bool empty = true;
+    IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
+    while ( !it.IsAtEnd() )
+    {
+      ItkImageType::ValueType val = it.Get();
+      if ( val != 0 )
+      {
+        empty = false;
+        break;
+      }
+      ++it;
+    }
+
+    if ( empty )
+    {
+      std::stringstream message;
+      message << "<font color='red'>Empty segmentation mask selected...</font>";
+      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->show();
+
+      return;
     }
 
     //// initialize thread and trigger it

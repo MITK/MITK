@@ -537,6 +537,16 @@ namespace mitk
 
         const GeometryTransformHolder *GetGeometryTransformHolder() const;
 
+    //##Documentation
+    //## @brief Determines which axes correspond to each orientation.
+    //##
+    //## The result is stored in the output argument that must be an array of three int values.
+    //## The elements of the array will be the axis indices that correspond to the sagittal,
+    //## coronal and axial orientations, in this order.
+    //##
+    //## @param axes Output argument that will store the axis indices for each orientation.
+    void GetAxesByOrientation(int axes[]) const;
+
   protected:
     // ********************************** Constructor **********************************
     BaseGeometry();

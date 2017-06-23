@@ -76,6 +76,7 @@ private:
 
     std::vector< mitk::DataNode::Pointer > m_InputImageNodes; ///< input images
     std::vector< mitk::Image::Pointer > m_InputImages; ///< input image datanode
+	bool		m_FirstTensorProbRun;
 };
 
 

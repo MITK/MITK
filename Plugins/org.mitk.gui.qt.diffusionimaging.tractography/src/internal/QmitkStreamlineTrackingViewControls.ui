@@ -331,19 +331,6 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="0">
-       <widget class="QCheckBox" name="m_NormalizeODFsBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Min-max normalize ODFs</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="8" column="0">
        <widget class="QCheckBox" name="m_InterpolationBox">
         <property name="toolTip">
@@ -364,6 +351,32 @@
         </property>
         <property name="text">
          <string>Enable gray matter seeding</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QCheckBox" name="m_NormalizeODFsBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Min-max normalize ODFs</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0">
+       <widget class="QCheckBox" name="m_OutputProbMap">
+        <property name="toolTip">
+         <string>Output probability map instead of tractogram.</string>
+        </property>
+        <property name="text">
+         <string>Output probability map</string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -470,7 +483,7 @@
          <string>Input DTI</string>
         </property>
         <property name="text">
-         <string>Tensor/Peak Image:</string>
+         <string>Tensor/Peak/ODF Image:</string>
         </property>
        </widget>
       </item>

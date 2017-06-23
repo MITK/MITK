@@ -82,8 +82,11 @@ public:
     void SetSamplingDistance(float v)   ///< Maximum distance of sampling points in voxels, default is 0.25 * voxel
     { m_SamplingDistanceVox = v; }
 
+	itkGetMacro( OutputProbabilityMap, ItkDoubleImgType::Pointer)    ///< Output probability map
     itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers
-    itkSetMacro( SeedImage, ItkUcharImgType::Pointer)   ///< Seeds are only placed inside of this mask.
+	itkGetMacro( UseOutputProbabilityMap, bool)
+
+	itkSetMacro( SeedImage, ItkUcharImgType::Pointer)   ///< Seeds are only placed inside of this mask.
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
     itkSetMacro( TissueImage, ItkUcharImgType::Pointer) ///<
     itkSetMacro( SeedsPerVoxel, int)                    ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
@@ -105,6 +108,7 @@ public:
     itkSetMacro( MaxNumTracts, unsigned int )           ///< Tracking is stopped if the maximum number of tracts is exceeded
     itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
     itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
+	itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
 
     void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<
     {
@@ -123,7 +127,8 @@ protected:
     ~StreamlineTrackingFilter() {}
 
     void InitGrayMatterEndings();
-    void CheckFiberForGmEnding(FiberType* fib);
+	void CheckFiberForGmEnding(FiberType* fib);
+	void FiberToProbmap(FiberType* fib);
 
     void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
     float FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front);       ///< Start streamline in one direction.
@@ -169,12 +174,14 @@ protected:
     ItkUcharImgType::Pointer            m_SeedImage;
     ItkUcharImgType::Pointer            m_MaskImage;
     ItkUcharImgType::Pointer            m_TissueImage;
+	ItkDoubleImgType::Pointer			m_OutputProbabilityMap;
 
     bool                                m_Verbose;
     bool                                m_AposterioriCurvCheck;
     bool                                m_AvoidStop;
     bool                                m_DemoMode;
     bool                                m_Random;
+	bool								m_UseOutputProbabilityMap;
     void BuildFibers(bool check);
     int CheckCurvature(FiberType* fib, bool front);
 

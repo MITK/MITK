@@ -47,10 +47,6 @@ mitk::PickingTool::PickingTool() : m_WorkingData(nullptr)
   m_PointSetNode->GetPropertyList()->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PointSet = mitk::PointSet::New();
   m_PointSetNode->SetData(m_PointSet);
-  m_SeedPointInteractor = mitk::SinglePointDataInteractor::New();
-  m_SeedPointInteractor->LoadStateMachine("PointSet.xml");
-  m_SeedPointInteractor->SetEventConfig("PointSetConfig.xml");
-  m_SeedPointInteractor->SetDataNode(m_PointSetNode);
 
   // Watch for point added or modified
   itk::SimpleMemberCommand<PickingTool>::Pointer pointAddedCommand = itk::SimpleMemberCommand<PickingTool>::New();
@@ -99,6 +95,11 @@ void mitk::PickingTool::Activated()
   // add to datastorage and enable interaction
   if (!dataStorage->Exists(m_PointSetNode))
     dataStorage->Add(m_PointSetNode, m_WorkingData);
+
+  m_SeedPointInteractor = mitk::SinglePointDataInteractor::New();
+  m_SeedPointInteractor->LoadStateMachine("PointSet.xml");
+  m_SeedPointInteractor->SetEventConfig("PointSetConfig.xml");
+  m_SeedPointInteractor->SetDataNode(m_PointSetNode);
 
   // now add result to data tree
   dataStorage->Add(m_ResultNode, m_WorkingData);

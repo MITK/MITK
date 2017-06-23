@@ -68,6 +68,7 @@ StreamlineTrackingFilter
     , m_MaxNumTracts(-1)
     , m_Random(true)
     , m_Verbose(true)
+	, m_UseOutputProbabilityMap(true)
 {
     this->SetNumberOfRequiredInputs(0);
 }
@@ -120,6 +121,17 @@ void StreamlineTrackingFilter::BeforeTracking()
         PolyDataType poly = PolyDataType::New();
         m_PolyDataContainer.push_back(poly);
     }
+
+	if (m_UseOutputProbabilityMap)
+	{
+		m_OutputProbabilityMap = ItkDoubleImgType::New();
+		m_OutputProbabilityMap->SetSpacing(imageSpacing);
+		m_OutputProbabilityMap->SetOrigin(m_TrackingHandler->GetOrigin());
+		m_OutputProbabilityMap->SetDirection(m_TrackingHandler->GetDirection());
+		m_OutputProbabilityMap->SetRegions(m_TrackingHandler->GetLargestPossibleRegion());
+		m_OutputProbabilityMap->Allocate();
+		m_OutputProbabilityMap->FillBuffer(0);
+	}
 
     if (m_StoppingRegions.IsNull())
     {
@@ -546,7 +558,7 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
         }
 
 #pragma omp critical
-        if (m_DemoMode) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
+		if (m_DemoMode && !m_UseOutputProbabilityMap) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
         {
             m_BuildFibersReady++;
             m_Tractogram.push_back(*fib);
@@ -797,7 +809,10 @@ void StreamlineTrackingFilter::GenerateData()
             {
                 if (!stop)
                 {
-                    m_Tractogram.push_back(fib);
+					if (!m_UseOutputProbabilityMap)
+						m_Tractogram.push_back(fib);
+					else
+						FiberToProbmap(&fib);
                     current_tracts++;
                 }
                 if (m_MaxNumTracts > 0 && current_tracts>=static_cast<unsigned int>(m_MaxNumTracts))
@@ -890,6 +905,24 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
         fib->clear();
 }
 
+void StreamlineTrackingFilter::FiberToProbmap(FiberType* fib)
+{
+	ItkDoubleImgType::IndexType last_idx; last_idx.Fill(0);
+	for (FiberType::iterator it = fib->begin(); it != fib->end(); ++it)
+	{
+		ItkDoubleImgType::IndexType idx;
+		itk::Point<float> p = (*it);
+		m_OutputProbabilityMap->TransformPhysicalPointToIndex(p, idx);
+
+		if (idx != last_idx)
+		{
+#pragma omp critical
+			if (m_OutputProbabilityMap->GetLargestPossibleRegion().IsInside(idx))
+				m_OutputProbabilityMap->SetPixel(idx, m_OutputProbabilityMap->GetPixel(idx)+1);
+			last_idx = idx;
+		}
+	}
+}
 
 void StreamlineTrackingFilter::BuildFibers(bool check)
 {
@@ -926,9 +959,12 @@ void StreamlineTrackingFilter::BuildFibers(bool check)
 void StreamlineTrackingFilter::AfterTracking()
 {
     std::cout << "                                                                                                     \r";
-    MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
-    MITK_INFO << "Generating polydata ";
-    BuildFibers(false);
+	if (!m_UseOutputProbabilityMap)
+	{
+		MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
+		MITK_INFO << "Generating polydata ";
+		BuildFibers(false);
+	}
     MITK_INFO << "done";
 
     m_EndTime = std::chrono::system_clock::now();

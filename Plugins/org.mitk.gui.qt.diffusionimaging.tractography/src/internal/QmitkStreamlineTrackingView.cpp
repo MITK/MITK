@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 // MITK
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkImageToItk.h>
 #include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
@@ -99,6 +101,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
         connect( m_Controls->m_TissueImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()) );
         connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()) );
+
+		m_FirstTensorProbRun = true;
     }
 
     UpdateGui();
@@ -225,7 +229,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
                 return;
             }
 
-            QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. Please keep the state of the ODF normalization box (see advanced parameters) in mind. TEND parameters are ignored.");
+			if (m_FirstTensorProbRun)
+			{
+				QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. Please keep the state of the ODF normalization box (see advanced parameters) in mind. TEND parameters are ignored.");
+				m_FirstTensorProbRun = false;
+			}
 
             TensorImageType::Pointer itkImg = TensorImageType::New();
             mitk::CastToItkImage(m_InputImages.at(0), itkImg);
@@ -373,34 +381,61 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
     tracker->SetTrackingHandler(trackingHandler);
     tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
-    tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
+	tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
+	tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());
     tracker->Update();
 
     delete trackingHandler;
 
-    vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
-    if ( fiberBundle->GetNumberOfLines()==0 )
-    {
-        QMessageBox warnBox;
-        warnBox.setWindowTitle("Warning");
-        warnBox.setText("No fiberbundle was generated!");
-        warnBox.setDetailedText("No fibers were generated using the parameters: \n\n" + m_Controls->m_FaThresholdLabel->text() + "\n" + m_Controls->m_AngularThresholdLabel->text() + "\n" + m_Controls->m_fLabel->text() + "\n" + m_Controls->m_gLabel->text() + "\n" + m_Controls->m_StepsizeLabel->text() + "\n" + m_Controls->m_MinTractLengthLabel->text() + "\n" + m_Controls->m_SeedsPerVoxelLabel->text() + "\n\nPlease check your parametersettings.");
-        warnBox.setIcon(QMessageBox::Warning);
-        warnBox.exec();
-        return;
-    }
-    mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
-    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
-    if (m_Controls->m_ResampleFibersBox->isChecked())
-        fib->Compress(m_Controls->m_FiberErrorBox->value());
-    fib->ColorFibersByOrientation();
+	if (!tracker->GetUseOutputProbabilityMap())
+	{
+		vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
+		if (fiberBundle->GetNumberOfLines() == 0)
+		{
+			QMessageBox warnBox;
+			warnBox.setWindowTitle("Warning");
+			warnBox.setText("No fiberbundle was generated!");
+			warnBox.setDetailedText("No fibers were generated using the parameters: \n\n" + m_Controls->m_FaThresholdLabel->text() + "\n" + m_Controls->m_AngularThresholdLabel->text() + "\n" + m_Controls->m_fLabel->text() + "\n" + m_Controls->m_gLabel->text() + "\n" + m_Controls->m_StepsizeLabel->text() + "\n" + m_Controls->m_MinTractLengthLabel->text() + "\n" + m_Controls->m_SeedsPerVoxelLabel->text() + "\n\nPlease check your parametersettings.");
+			warnBox.setIcon(QMessageBox::Warning);
+			warnBox.exec();
+			return;
+		}
+		mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
+		fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
+		if (m_Controls->m_ResampleFibersBox->isChecked())
+			fib->Compress(m_Controls->m_FiberErrorBox->value());
+		fib->ColorFibersByOrientation();
 
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(fib);
-    QString name("FiberBundle_");
-    name += m_InputImageNodes.at(0)->GetName().c_str();
-    name += "_Streamline";
-    node->SetName(name.toStdString());
-    node->SetVisibility(true);
-    GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+		mitk::DataNode::Pointer node = mitk::DataNode::New();
+		node->SetData(fib);
+		QString name("FiberBundle_");
+		name += m_InputImageNodes.at(0)->GetName().c_str();
+		name += "_Streamline";
+		node->SetName(name.toStdString());
+		node->SetVisibility(true);
+		GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+	}
+	else
+	{
+		TrackerType::ItkDoubleImgType::Pointer outImg = tracker->GetOutputProbabilityMap();
+		mitk::Image::Pointer img = mitk::Image::New();
+		img->InitializeByItk(outImg.GetPointer());
+		img->SetVolume(outImg->GetBufferPointer());
+
+		mitk::DataNode::Pointer node = mitk::DataNode::New();
+		node->SetData(img);
+		QString name("ProbabilityMap_");
+		name += m_InputImageNodes.at(0)->GetName().c_str();
+		node->SetName(name.toStdString());
+		node->SetVisibility(true);
+
+		mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+		lut->SetType(mitk::LookupTable::JET_TRANSPARENT);
+		mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+		lut_prop->SetLookupTable(lut);
+		node->SetProperty("LookupTable", lut_prop);
+		node->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+
+		GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+	}
 }

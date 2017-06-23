@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkCoreObjectFactory.h>
 #include <omp.h>
+#include <itksys/SystemTools.hxx>
 
 #include <mitkFiberBundle.h>
 #include <itkStreamlineTrackingFilter.h>
@@ -61,7 +62,7 @@ int main(int argc, char* argv[])
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'Tensor' algorithm)", us::Any(), false);
     parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, DetODF, ProbODF, DetRF, ProbRF)", us::Any(), false);
-    parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle", us::Any(), false);
+    parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle/probability map", us::Any(), false);
 
     parser.addArgument("stop_mask", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
     parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
@@ -80,6 +81,7 @@ int main(int argc, char* argv[])
     parser.addArgument("sampling_distance", "", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", 0.25);
     parser.addArgument("use_stop_votes", "", mitkCommandLineParser::Bool, "Use stop votes:", "use stop votes");
     parser.addArgument("use_only_forward_samples", "", mitkCommandLineParser::Bool, "Use only forward samples:", "use only forward samples");
+	parser.addArgument("output_prob_map", "", mitkCommandLineParser::Bool, "Output probability map:", "output probability map instead of tractogram");
 
     parser.addArgument("no_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate:", "don't interpolate image values");
     parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1");
@@ -135,7 +137,11 @@ int main(int argc, char* argv[])
 
     bool use_only_forward_samples = false;
     if (parsedArgs.count("use_only_forward_samples"))
-        use_only_forward_samples = us::any_cast<bool>(parsedArgs["use_only_forward_samples"]);
+		use_only_forward_samples = us::any_cast<bool>(parsedArgs["use_only_forward_samples"]);
+
+	bool output_prob_map = false;
+	if (parsedArgs.count("output_prob_map"))
+		output_prob_map = us::any_cast<bool>(parsedArgs["output_prob_map"]);
 
     bool flip_x = false;
     if (parsedArgs.count("flip_x"))
@@ -389,14 +395,35 @@ int main(int argc, char* argv[])
     tracker->SetControlGmEndings(control_gm_endings);
     tracker->SetMaxNumTracts(max_tracts);
     tracker->SetTrackingHandler(handler);
+	tracker->SetUseOutputProbabilityMap(output_prob_map);
     tracker->Update();
-    vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
-    mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
 
-    if (compress>0)
-        outFib->Compress(compress);
+	std::string ext = itksys::SystemTools::GetFilenameExtension(outFile);
 
-    mitk::IOUtil::Save(outFib, outFile);
+	if (!output_prob_map)
+	{
+		vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
+		mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
+		if (compress > 0)
+			outFib->Compress(compress);
+
+		if (ext != ".fib" && ext != ".trk" && ext != ".tck")
+			outFile += ".fib";
+
+		mitk::IOUtil::Save(outFib, outFile);
+	}
+	else
+	{
+		TrackerType::ItkDoubleImgType::Pointer outImg = tracker->GetOutputProbabilityMap();
+		mitk::Image::Pointer img = mitk::Image::New();
+		img->InitializeByItk(outImg.GetPointer());
+		img->SetVolume(outImg->GetBufferPointer());
+
+		if (ext != ".nii" && ext != ".nii.gz" && ext != ".nrrd")
+			outFile += ".nii.gz";
+
+		mitk::IOUtil::SaveBaseData(img, outFile);
+	}
 
     delete handler;
 

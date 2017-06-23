@@ -723,34 +723,37 @@ void QmitkImageStatisticsView::UpdateStatistics()
     }
 
     // check if the segmentation mask is empty
-    typedef itk::Image<unsigned char, 3> ItkImageType;
-    typedef itk::ImageRegionConstIteratorWithIndex< ItkImageType > IteratorType;
-
-    ItkImageType::Pointer itkImage;
-
-    mitk::CastToItkImage( m_SelectedImageMask, itkImage );
-
-    bool empty = true;
-    IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
-    while ( !it.IsAtEnd() )
+    if (m_SelectedImageMask != NULL)
     {
-      ItkImageType::ValueType val = it.Get();
-      if ( val != 0 )
+      typedef itk::Image<unsigned char, 3> ItkImageType;
+      typedef itk::ImageRegionConstIteratorWithIndex< ItkImageType > IteratorType;
+
+      ItkImageType::Pointer itkImage;
+
+      mitk::CastToItkImage( m_SelectedImageMask, itkImage );
+
+      bool empty = true;
+      IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
+      while ( !it.IsAtEnd() )
       {
-        empty = false;
-        break;
+        ItkImageType::ValueType val = it.Get();
+        if ( val != 0 )
+        {
+          empty = false;
+          break;
+        }
+        ++it;
       }
-      ++it;
-    }
 
-    if ( empty )
-    {
-      std::stringstream message;
-      message << "<font color='red'>Empty segmentation mask selected...</font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
-      m_Controls->m_ErrorMessageLabel->show();
+      if ( empty )
+      {
+        std::stringstream message;
+        message << "<font color='red'>Empty segmentation mask selected...</font>";
+        m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+        m_Controls->m_ErrorMessageLabel->show();
 
-      return;
+        return;
+      }
     }
 
     //// initialize thread and trigger it

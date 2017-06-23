@@ -46,7 +46,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace {
 
-
 //! Workaround until IOUtil::LoadSurface will guarantee to load mitk::Surface
 //! even in presence of reader services that load STL as another type of
 //! BaseData (T19825).
@@ -119,7 +118,6 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 {
   mitk::Surface::Pointer output = this->GetOutput();  //the surface wich represents the tracking volume
 
-  std::string filepath = ""; // Full path to file (wil be resolved later)
   std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String, e.g. "cube"
 
   MITK_INFO << "volume: " << filename;
@@ -155,7 +153,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
   //      However this function is not guaranteed to find a reader that loads
   //      named resource as a Surface (given the presence of alternative readers
   //      that produce another data type but has a higher ranking than the core
-  //      surface reader) - see bug Txxxxx.
+  //      surface reader) - see bug T22608.
   mitk::Surface::Pointer fileoutput = LoadCoreSurface(moduleResource);
 
   if (fileoutput == nullptr)

@@ -148,7 +148,11 @@ public:
 
   void setDisplayMetaInfo(bool metainfo);
 
+  void setDisplayMetaInfoEx(bool metainfo);
+
   void setDisplayPatientInfo(bool patientinfo);
+
+  void setDisplayPatientInfoEx(bool patientinfo);
 
   void setDisplayPositionInfo(bool positioninfo);
 
@@ -157,7 +161,9 @@ public:
 protected:
 
   bool m_displayMetaInfo;
+  bool m_displayMetaInfoEx;
   bool m_displayPatientInfo;
+  bool m_displayPatientInfoEx;
   bool m_displayPositionInfo;
 
   void UpdateAllWidgets();

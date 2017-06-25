@@ -77,7 +77,9 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   m_drawTextInStatusBar(true),
   imageMTime(0),
   m_displayMetaInfo(false),
+  m_displayMetaInfoEx(false),
   m_displayPatientInfo(true),
+  m_displayPatientInfoEx(true),
   m_displayPositionInfo(true),
   m_Name(name)
 {
@@ -1588,9 +1590,21 @@ void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
   imageMTime = -1;
 }
 
+void QmitkStdMultiWidget::setDisplayMetaInfoEx(bool metainfo)
+{
+  m_displayMetaInfoEx = metainfo;
+  imageMTime = -1;
+}
+
 void QmitkStdMultiWidget::setDisplayPatientInfo(bool patientinfo)
 {
   m_displayPatientInfo = patientinfo;
+  imageMTime = -1;
+}
+
+void QmitkStdMultiWidget::setDisplayPatientInfoEx(bool patientinfo)
+{
+  m_displayPatientInfoEx = patientinfo;
   imageMTime = -1;
 }
 
@@ -1669,7 +1683,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         birthday, sex, institution, studyDate, studyTime,
         studiId, seriesDescription, studyDescription, exInfo,
         magneticFieldStrength, dicomTR, dicomTE, bodyPart, protocolName,
-        sliceThickness, xrayTubeCurrent, kvp, imagePosition;
+        sliceThickness, xrayTubeCurrent, kvp, imagePosition, windowCenter, windowWidth;
 
       imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
       imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
@@ -1695,6 +1709,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       imageProperties->GetStringProperty("dicom.XrayTubeCurrent", xrayTubeCurrent);
       imageProperties->GetStringProperty("dicom.Kvp", kvp);
       imageProperties->GetStringProperty("dicom.ImagePosition", imagePosition);
+      imageProperties->GetStringProperty("dicom.voilut.WindowCenter", windowCenter);
+      imageProperties->GetStringProperty("dicom.voilut.WindowWidth", windowWidth);
 
       auto it = imagePosition.rfind('\\');
       if (std::string::npos != it) {
@@ -1727,37 +1743,68 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         }
         infoStringStream[0]
           << "\n" << institution.c_str()
-          << "\n" << studiId
-          << "\n" << studyDescription
-          << "\n" << seriesDescription
-          << "\n" << exInfo
-          << "\n" << bodyPart
-          << "\n" << protocolName;
+          << "\n" << studiId;
+        if (m_displayPatientInfoEx) {
+          infoStringStream[0]
+            << "\n" << studyDescription
+            << "\n" << seriesDescription
+            << "\n" << exInfo
+            << "\n" << bodyPart
+            << "\n" << protocolName;
+        }
       } else {
         infoStringStream[0].clear();
       }
 
       if (m_displayMetaInfo) {
-        if (!magneticFieldStrength.empty()) {
-          infoStringStream[1]
-            << "FS: " << magneticFieldStrength;
-        }
-        if (!xrayTubeCurrent.empty() || !kvp.empty()) {
-          infoStringStream[1] << '\n';
-        }
-        if (!xrayTubeCurrent.empty()) {
-          infoStringStream[1] << xrayTubeCurrent << "mA";
-        }
-        if (!kvp.empty()) {
-          infoStringStream[1] << ' ' << kvp << " kV";
-        }
-        if (!dicomTR.empty() || !dicomTE.empty()) {
-          infoStringStream[1] << '\n';
-          if (!dicomTR.empty()) {
-            infoStringStream[1] << "TR: " << dicomTR;
+        if (m_displayMetaInfoEx) {
+          if (!magneticFieldStrength.empty()) {
+            infoStringStream[1]
+              << "FS: " << magneticFieldStrength;
           }
-          if (!dicomTE.empty()) {
-            infoStringStream[1] << " TE: " << dicomTE;
+          if (!xrayTubeCurrent.empty() || !kvp.empty()) {
+            infoStringStream[1] << '\n';
+          }
+          if (!xrayTubeCurrent.empty()) {
+            infoStringStream[1] << xrayTubeCurrent << "mA";
+          }
+          if (!kvp.empty()) {
+            infoStringStream[1] << ' ' << kvp << " kV";
+          }
+          if (!dicomTR.empty() || !dicomTE.empty()) {
+            infoStringStream[1] << '\n';
+            if (!dicomTR.empty()) {
+              infoStringStream[1] << "TR: " << dicomTR;
+            }
+            if (!dicomTE.empty()) {
+              infoStringStream[1] << " TE: " << dicomTE;
+            }
+          }
+          if (!windowCenter.empty() && !windowWidth.empty()) {
+            infoStringStream[1] << '\n';
+            auto pos = windowCenter.find('\\');
+            if (std::string::npos != pos) {
+              windowCenter.resize(pos);
+            }
+            pos = windowWidth.find('\\');
+            if (std::string::npos != pos) {
+              windowWidth.resize(pos);
+            }
+            if (!windowCenter.empty()) {
+              infoStringStream[1] << "WL: " << windowCenter;
+            }
+            if (!windowWidth.empty()) {
+              infoStringStream[1] << " WW: " << windowWidth;
+            }
+          }
+          if (!sliceThickness.empty() || !imagePosition.empty()) {
+            infoStringStream[1] << '\n';
+          }
+          if (!sliceThickness.empty()) {
+            infoStringStream[1] << "T: " << sliceThickness << "mm";
+          }
+          if (!imagePosition.empty()) {
+            infoStringStream[1] << " L: " << imagePosition << "mm";
           }
         }
         if (!studyDate.empty() && !studyTime.empty()) {

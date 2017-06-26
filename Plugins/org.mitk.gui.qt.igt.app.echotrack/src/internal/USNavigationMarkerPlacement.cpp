@@ -239,7 +239,7 @@ void USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const std::s
 }
 
 
-mitk::Point3D USNavigationMarkerPlacement::SetToolAxisMarkerPlacement()
+void USNavigationMarkerPlacement::SetToolAxisMarkerPlacement()
 {
   m_NavigationDataSource = m_CombinedModality->GetNavigationDataSource();
   m_ToolAxis.SetElement(0, 0);
@@ -248,7 +248,6 @@ mitk::Point3D USNavigationMarkerPlacement::SetToolAxisMarkerPlacement()
   if (m_NavigationDataSource.IsNull())
   {
     MITK_WARN << "Cannot retrieve tool axis as tracking source is null.";
-    return m_ToolAxis;
   }
   else
   {
@@ -261,13 +260,11 @@ mitk::Point3D USNavigationMarkerPlacement::SetToolAxisMarkerPlacement()
     if (m_CurrentStorage.IsNull())
     {
       MITK_WARN << "Found an invalid storage object!";
-      return m_ToolAxis;
     }
     if (m_CurrentStorage->GetToolCount() != m_NavigationDataSource->GetNumberOfOutputs()) //there is something wrong with the storage
     {
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
       m_CurrentStorage = NULL;
-      return m_ToolAxis;
     }
 
     //getting the first tool in the tool storage, assuming this is the needle

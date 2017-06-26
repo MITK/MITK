@@ -130,7 +130,7 @@ public:
   /**
   * \returns the point defining the needle axis in the tool storage
   */
-  mitk::Point3D SetToolAxisMarkerPlacement();
+  void SetToolAxisMarkerPlacement();
   mitk::Point3D m_ToolAxis;
 
 protected:

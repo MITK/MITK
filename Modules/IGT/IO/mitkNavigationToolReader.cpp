@@ -185,6 +185,11 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
     MITK_WARN << "Tooltip definition incomplete: position and orientation have to be set! Skipping tooltip definition.";
   }
 
+  //Tool Axis
+  std::string ToolAxisString;
+  node->GetStringProperty("ToolAxis", ToolAxisString);
+  returnValue->SetToolAxis(ConvertStringToPoint(ToolAxisString));
+
   return returnValue;
 }
 

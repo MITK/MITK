@@ -590,6 +590,8 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         if (interpolation) {
           m_FeedbackNode->SetData(interpolation);
           m_LastSNC = slicer;
+        } else if (m_LastSNC == slicer) {
+          m_FeedbackNode->SetData(nullptr);
         }
       }
     }

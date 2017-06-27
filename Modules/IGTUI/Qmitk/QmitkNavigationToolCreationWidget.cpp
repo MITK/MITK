@@ -181,6 +181,13 @@ m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->cu
   m_CreatedTool->SetToolCalibrationLandmarks(toolCalLandmarks);
   m_CreatedTool->SetToolRegistrationLandmarks(toolRegLandmarks);
 
+  //Tool Axis
+  mitk::Point3D toolAxis;
+  toolAxis.SetElement(0, (m_Controls->m_ToolAxisX->value()));
+  toolAxis.SetElement(1, (m_Controls->m_ToolAxisY->value()));
+  toolAxis.SetElement(2, (m_Controls->m_ToolAxisZ->value()));
+  m_CreatedTool->SetToolAxis(toolAxis);
+
   emit NavigationToolFinished();
 }
 

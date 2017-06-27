@@ -57,6 +57,7 @@ class QmitkUSNavigationStepPunctuationIntervention : public QmitkUSAbstractNavig
 
 public:
   explicit QmitkUSNavigationStepPunctuationIntervention(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepPunctuationIntervention(mitk::Point3D toolAxis, QWidget *parent = 0);
   ~QmitkUSNavigationStepPunctuationIntervention();
 
   virtual bool OnStartStep();
@@ -102,6 +103,7 @@ protected:
    * \brief Creates a Pointset that projects the needle's path
    */
   itk::SmartPointer<mitk::NeedleProjectionFilter> m_NeedleProjectionFilter;
+  mitk::Point3D m_ToolAxis;
 
   std::map<mitk::DataNode::Pointer,mitk::Color> m_OldColors; //stores the original color of the critical structrue nodes
 

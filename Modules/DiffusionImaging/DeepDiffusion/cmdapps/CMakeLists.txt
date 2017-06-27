@@ -14,6 +14,7 @@ if(BUILD_DeepDiffusionCmdApps OR MITK_BUILD_ALL_APPS)
   set( deepdiffusioncmdapps
   CaffeTest^^
   CaffeSegmentationTest^^
+  BrainTissueSegmentation^^MitkImageStatistics
   Caffe2Test^^
   )
 

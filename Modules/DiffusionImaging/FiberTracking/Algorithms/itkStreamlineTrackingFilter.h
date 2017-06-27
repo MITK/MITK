@@ -109,6 +109,7 @@ public:
     itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
     itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
 	itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
+	itkSetMacro( SeedPoints, std::vector< itk::Point<float> >)	///< Use manually defined points in physical space as seed points instead of seed image
 
     void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<
     {
@@ -130,10 +131,12 @@ protected:
 	void CheckFiberForGmEnding(FiberType* fib);
 	void FiberToProbmap(FiberType* fib);
 
+	void GetSeedPointsFromSeedImage();
     void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
     float FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front);       ///< Start streamline in one direction.
     bool IsValidPosition(itk::Point<float, 3>& pos);   ///< Are we outside of the mask image?
-    vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
+	bool IsInGm(itk::Point<float, 3> &pos);
+	vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
     float GetRandDouble(float min=-1, float max=1);
     std::vector< vnl_vector_fixed<float,3> > CreateDirections(int NPoints);
@@ -182,6 +185,8 @@ protected:
     bool                                m_DemoMode;
     bool                                m_Random;
 	bool								m_UseOutputProbabilityMap;
+	std::vector< itk::Point<float> >	m_SeedPoints;
+
     void BuildFibers(bool check);
     int CheckCurvature(FiberType* fib, bool front);
 

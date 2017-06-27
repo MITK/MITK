@@ -197,6 +197,9 @@ void StreamlineTrackingFilter::BeforeTracking()
             MITK_WARN << "StreamlineTracking - Tissue image set but no gray matter seeding or fiber endpoint-control enabled" << std::endl;
     }
 
+	if (m_SeedPoints.empty())
+		GetSeedPointsFromSeedImage();
+
     m_BuildFibersReady = 0;
     m_BuildFibersFinished = false;
     m_Tractogram.clear();
@@ -335,6 +338,20 @@ bool StreamlineTrackingFilter
         return false;
 
     return true;
+}
+
+bool StreamlineTrackingFilter
+::IsInGm(itk::Point<float, 3> &pos)
+{
+	if (m_TissueImage.IsNull())
+		return true;
+
+	ItkUcharImgType::IndexType idx;
+	m_TissueImage->TransformPhysicalPointToIndex(pos, idx);
+	if (m_TissueImage->GetLargestPossibleRegion().IsInside(idx) && m_TissueImage->GetPixel(idx) == m_GmLabel)
+		return true;
+
+	return false;
 }
 
 
@@ -655,71 +672,67 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
         return vectors.size();
 }
 
+void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
+{
+	MITK_INFO << "Calculating seed points.";
+	m_SeedPoints.clear();
+
+	if (!m_ControlGmEndings)
+	{
+		typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
+		MaskIteratorType    sit(m_SeedImage, m_SeedImage->GetLargestPossibleRegion());
+		sit.GoToBegin();
+
+		while (!sit.IsAtEnd())
+		{
+			if (sit.Value()>0)
+			{
+				ItkUcharImgType::IndexType index = sit.GetIndex();
+				itk::ContinuousIndex<float, 3> start;
+				start[0] = index[0];
+				start[1] = index[1];
+				start[2] = index[2];
+				itk::Point<float> worldPos;
+				m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
+
+				if (IsValidPosition(worldPos) && (!m_SeedOnlyGm || IsInGm(worldPos)))
+				{
+					m_SeedPoints.push_back(worldPos);
+					for (int s = 1; s < m_SeedsPerVoxel; s++)
+					{
+						start[0] = index[0] + GetRandDouble(-0.5, 0.5);
+						start[1] = index[1] + GetRandDouble(-0.5, 0.5);
+						start[2] = index[2] + GetRandDouble(-0.5, 0.5);
+
+						itk::Point<float> worldPos;
+						m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
+						m_SeedPoints.push_back(worldPos);
+					}
+				}
+			}
+			++sit;
+		}
+	}
+	else
+	{
+		for (auto s : m_GmStubs)
+			m_SeedPoints.push_back(s[1]);
+	}
+}
 
 void StreamlineTrackingFilter::GenerateData()
 {
     this->BeforeTracking();
-
-    std::vector< itk::Point<float> > seedpoints;
-
-    if (!m_ControlGmEndings)
-    {
-        typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
-        MaskIteratorType    sit(m_SeedImage, m_SeedImage->GetLargestPossibleRegion() );
-        MaskIteratorType    mit(m_MaskImage, m_MaskImage->GetLargestPossibleRegion() );
-        sit.GoToBegin();
-        mit.GoToBegin();
-
-        while( !sit.IsAtEnd() )
-        {
-            if (sit.Value()==0 || mit.Value()==0 || (m_SeedOnlyGm && m_TissueImage->GetPixel(sit.GetIndex())!=m_GmLabel))
-            {
-                ++sit;
-                ++mit;
-                continue;
-            }
-
-            for (int s=0; s<m_SeedsPerVoxel; s++)
-            {
-                ItkUcharImgType::IndexType index = sit.GetIndex();
-                itk::ContinuousIndex<float, 3> start;
-
-                if (m_SeedsPerVoxel>1)
-                {
-                    start[0] = index[0]+GetRandDouble(-0.5, 0.5);
-                    start[1] = index[1]+GetRandDouble(-0.5, 0.5);
-                    start[2] = index[2]+GetRandDouble(-0.5, 0.5);
-                }
-                else
-                {
-                    start[0] = index[0];
-                    start[1] = index[1];
-                    start[2] = index[2];
-                }
-
-                itk::Point<float> worldPos;
-                m_SeedImage->TransformContinuousIndexToPhysicalPoint( start, worldPos );
-                seedpoints.push_back(worldPos);
-            }
-            ++sit;
-            ++mit;
-        }
-    }
-    else
-    {
-        for (auto s : m_GmStubs)
-            seedpoints.push_back(s[1]);
-    }
-
+	
     if (m_Random)
     {
         std::srand(std::time(0));
-        std::random_shuffle ( seedpoints.begin(), seedpoints.end() );
+		std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
     }
 
     bool stop = false;
     unsigned int current_tracts = 0;
-    int num_seeds = seedpoints.size();
+	int num_seeds = m_SeedPoints.size();
     itk::Index<3> zeroIndex; zeroIndex.Fill(0);
     int progress = 0;
     int i = 0;
@@ -748,7 +761,7 @@ void StreamlineTrackingFilter::GenerateData()
             cout.flush();
         }
 
-        itk::Point<float> worldPos = seedpoints.at(temp_i);
+		itk::Point<float> worldPos = m_SeedPoints.at(temp_i);
         FiberType fib;
         float tractLength = 0;
         unsigned int counter = 0;
@@ -974,6 +987,8 @@ void StreamlineTrackingFilter::AfterTracking()
     mm %= 60;
     ss %= 60;
     MITK_INFO << "Tracking took " << hh.count() << "h, " << mm.count() << "m and " << ss.count() << "s";
+
+	m_SeedPoints.clear();
 }
 
 }

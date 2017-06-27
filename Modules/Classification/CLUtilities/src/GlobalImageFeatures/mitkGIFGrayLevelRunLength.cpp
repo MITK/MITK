@@ -121,10 +121,13 @@ void
     double minRange = minMaxComputer->GetMinimum() - 0.5;
     double maxRange = minMaxComputer->GetMaximum() + 0.5;
 
+
     if (params.UseMinimumIntensity)
       minRange = params.MinimumIntensity;
     if (params.UseMaximumIntensity)
       maxRange = params.MaximumIntensity;
+
+    MITK_INFO << minRange << " " << maxRange;
 
     filter->SetPixelValueMinMax(minRange, maxRange);
     filter->SetNumberOfBinsPerAxis(rangeOfPixels);
@@ -204,37 +207,37 @@ void
     case TextureFilterType::LongRunLowGreyLevelEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunLowGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunLowGreyLevelEmphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunLowGreyLevelEmphasis Comb.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunLowGreyLevelEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LongRunHighGreyLevelEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunHighGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunHighGreyLevelEmphasis Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunHighGreyLevelEmphasis Comb.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunHighGreyLevelEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunPercentage :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunPercentage Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunPercentage Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunPercentage Comb.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunPercentage Comb.", featureCombined->ElementAt(i)/newOffset->size()));
       break;
     case TextureFilterType::NumberOfRuns :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") NumberOfRuns Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. (" + strRange + ") NumberOfRuns Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") NumberOfRuns Comb.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") NumberOfRuns Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelVariance :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelVariance Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelVariance Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelVariance Comb.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelVariance Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunLengthVariance :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthVariance Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthVariance Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthVariance Comb.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthVariance Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunEntropy :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunEntropy Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunEntropy Std.", featureStd->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunEntropy Comb.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunEntropy Comb.", featureCombined->ElementAt(i)));
       break;
     default:
       break;
@@ -269,8 +272,7 @@ mitk::GIFGrayLevelRunLength::FeatureListType mitk::GIFGrayLevelRunLength::Calcul
   MITK_INFO << params.m_UseCtRange;
   MITK_INFO << params.m_Direction;
   MITK_INFO << params.Bins;
-  MITK_INFO<<params.m_Range;
-
+  MITK_INFO << params.m_Range;
 
   AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList,params);
 
@@ -319,13 +321,10 @@ mitk::GIFGrayLevelRunLength::CalculateFeaturesUsingParameters(const Image::Point
   if (parsedArgs.count(GetLongName()))
   {
     std::vector<double> bins;
+    bins.push_back(GetBins());
     if (parsedArgs.count(name + "::bins"))
     {
       bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';');
-    }
-    else
-    {
-      bins.push_back(1);
     }
 
     for (std::size_t i = 0; i < bins.size(); ++i)

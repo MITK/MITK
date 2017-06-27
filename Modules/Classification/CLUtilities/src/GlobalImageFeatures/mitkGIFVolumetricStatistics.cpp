@@ -349,16 +349,16 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
 
   std::sort(eigen_val.begin(), eigen_val.end());
   std::sort(eigen_valUC.begin(), eigen_valUC.end());
-  double major = eigen_val[2];
-  double minor = eigen_val[1];
-  double least = eigen_val[0];
-  double elongation = major == 0 ? 0 : minor/major;
-  double flatness = major == 0 ? 0 : least / major;
-  double majorUC = eigen_valUC[2];
-  double minorUC = eigen_valUC[1];
-  double leastUC = eigen_valUC[0];
-  double elongationUC = majorUC == 0 ? 0 : minorUC / majorUC;
-  double flatnessUC = majorUC == 0 ? 0 : leastUC / majorUC;
+  double major = 4*sqrt(eigen_val[2]);
+  double minor = 4*sqrt(eigen_val[1]);
+  double least = 4*sqrt(eigen_val[0]);
+  double elongation = major == 0 ? 0 : sqrt(minor/major);
+  double flatness = major == 0 ? 0 : sqrt(least / major);
+  double majorUC = 4*sqrt(eigen_valUC[2]);
+  double minorUC = 4*sqrt(eigen_valUC[1]);
+  double leastUC = 4*sqrt(eigen_valUC[0]);
+  double elongationUC = majorUC == 0 ? 0 : sqrt(minorUC / majorUC);
+  double flatnessUC = majorUC == 0 ? 0 : sqrt(leastUC / majorUC);
 
 
   featureList.push_back(std::make_pair("Volumetric Features Volume (mesh based)",meshVolume));

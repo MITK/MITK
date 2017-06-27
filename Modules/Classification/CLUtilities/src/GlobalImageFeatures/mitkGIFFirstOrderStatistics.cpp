@@ -72,7 +72,6 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   // --------------- Uniformity, Entropy --------------------
   double count = labelStatisticsImageFilter->GetCount(1);
   //double std_dev = labelStatisticsImageFilter->GetSigma(1);
-  double uncorrected_std_dev = std::sqrt((count - 1) / count * labelStatisticsImageFilter->GetVariance(1));
   double mean = labelStatisticsImageFilter->GetMean(1);
   auto histogram = labelStatisticsImageFilter->GetHistogram(1);
   bool histogramIsCalculated = histogram;
@@ -118,6 +117,9 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
     p95th = histogram->Quantile(0, 0.95);
   }
   double Log2=log(2);
+  double mode_bin;
+  double mode_value = 0;
+  double variance = 0;
   if (histogramIsCalculated)
   {
     for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
@@ -125,17 +127,24 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
       index[0] = i;
       double prob = histogram->GetFrequency(index);
 
-      if (prob < 0.1)
+
+      if (prob < 0.00000001)
         continue;
-      if (histogramIsCalculated)
+
+      voxelValue = histogram->GetBinMin(0, i) + binWidth * 0.5;
+
+      if (prob > mode_value)
       {
-        voxelValue = histogram->GetBinMin(0, i) + binWidth * 0.5;
+        mode_value = prob;
+        mode_bin = voxelValue;
       }
+
       sum_prob += prob;
       squared_sum += prob * voxelValue*voxelValue;
 
       prob /= count;
       mean_absolut_deviation += prob* std::abs(voxelValue - mean);
+      variance += prob * (voxelValue - mean) * (voxelValue - mean);
 
       kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
       skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
@@ -149,9 +158,10 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   }
   entropy = -entropy;
 
+  double uncorrected_std_dev = std::sqrt(variance);
   double rms = std::sqrt(squared_sum / count);
-  kurtosis = kurtosis / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev*uncorrected_std_dev);
-  skewness = skewness / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev);
+  kurtosis = kurtosis / (variance * variance);
+  skewness = skewness / (variance * uncorrected_std_dev);
   //mean_absolut_deviation = mean_absolut_deviation;
   double coveredGrayValueRange = range / imageRange;
 
@@ -169,9 +179,12 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair("FirstOrder Minimum",labelStatisticsImageFilter->GetMinimum(1)));
   featureList.push_back(std::make_pair("FirstOrder Maximum",labelStatisticsImageFilter->GetMaximum(1)));
   featureList.push_back(std::make_pair("FirstOrder Mean",labelStatisticsImageFilter->GetMean(1)));
-  featureList.push_back(std::make_pair("FirstOrder Variance",labelStatisticsImageFilter->GetVariance(1)));
+  featureList.push_back(std::make_pair("FirstOrder Unbiased Variance", labelStatisticsImageFilter->GetVariance(1))); //Siehe Definition von Unbiased Variance estimation. (Wird nicht durch n sondern durch n-1 normalisiert)
+  featureList.push_back(std::make_pair("FirstOrder Biased Variance", variance));
   featureList.push_back(std::make_pair("FirstOrder Sum",labelStatisticsImageFilter->GetSum(1)));
-  featureList.push_back(std::make_pair("FirstOrder Median",labelStatisticsImageFilter->GetMedian(1)));
+  featureList.push_back(std::make_pair("FirstOrder Median", labelStatisticsImageFilter->GetMedian(1)));
+  featureList.push_back(std::make_pair("FirstOrder Mode", mode_bin));
+  featureList.push_back(std::make_pair("FirstOrder Mode Probability", mode_value));
   featureList.push_back(std::make_pair("FirstOrder Standard deviation",labelStatisticsImageFilter->GetSigma(1)));
   featureList.push_back(std::make_pair("FirstOrder No. of Voxel",labelStatisticsImageFilter->GetCount(1)));
 

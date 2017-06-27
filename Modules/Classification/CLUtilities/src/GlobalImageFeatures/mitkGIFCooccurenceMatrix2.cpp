@@ -137,7 +137,7 @@ void CalculateFeatures(
   double sigmai = 0;;
   for (int i = 0; i < holder.m_NumberOfBins; ++i)
   {
-    double iInt = holder.IndexToMeanIntensity(i);
+    double iInt = i + 1;// holder.IndexToMeanIntensity(i);
     results.RowAverage += iInt * piVector(i);
     if (piVector(i) > 0)
     {
@@ -146,7 +146,7 @@ void CalculateFeatures(
   }
   for (int i = 0; i < holder.m_NumberOfBins; ++i)
   {
-    double iInt = holder.IndexToMeanIntensity(i);
+    double iInt = i + 1; // holder.IndexToMeanIntensity(i);
     results.RowVariance += (iInt - results.RowAverage)*(iInt - results.RowAverage) * piVector(i);
   }
   results.RowMaximum = piVector.maxCoeff();
@@ -164,8 +164,10 @@ void CalculateFeatures(
   {
     for (int j = 0; j < holder.m_NumberOfBins; ++j)
     {
-      double iInt = holder.IndexToMeanIntensity(i);
-      double jInt = holder.IndexToMeanIntensity(j);
+      //double iInt = holder.IndexToMeanIntensity(i);
+      //double jInt = holder.IndexToMeanIntensity(j);
+      double iInt = i + 1;// holder.IndexToMeanIntensity(i);
+      double jInt = j + 1;// holder.IndexToMeanIntensity(j);
       double pij = pijMatrix(i, j);
 
       int deltaK = (i - j)>0?(i-j) : (j-i);
@@ -215,8 +217,9 @@ void CalculateFeatures(
   {
     for (int j = 0; j < holder.m_NumberOfBins; ++j)
     {
-      double iInt = holder.IndexToMeanIntensity(i);
+      //double iInt = holder.IndexToMeanIntensity(i);
       //double jInt = holder.IndexToMeanIntensity(j);
+      double iInt = i + 1;
       double pij = pijMatrix(i, j);
 
       results.JointVariance += (iInt - results.JointAverage)* (iInt - results.JointAverage)*pij;

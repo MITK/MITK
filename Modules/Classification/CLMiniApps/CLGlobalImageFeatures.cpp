@@ -216,6 +216,8 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
     masnNoNaN2D->SetRegions(region);
     masnNoNaN2D->Allocate();
 
+    unsigned long voxelsInMask = 0;
+
     for (int a = 0; a < imageSize[idxA]; ++a)
     {
       for (int b = 0; b < imageSize[idxB]; ++b)
@@ -228,6 +230,7 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
         image2D->SetPixel(index2D, itkFloat->GetPixel(index3D));
         mask2D->SetPixel(index2D, itkMask->GetPixel(index3D));
         masnNoNaN2D->SetPixel(index2D, itkMaskNoNaN->GetPixel(index3D));
+        voxelsInMask += (itkMask->GetPixel(index3D) > 0) ? 1 : 0;
 
       }
     }
@@ -248,9 +251,12 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
     tmpMaskNoNaNImage->InitializeByItk(masnNoNaN2D.GetPointer());
     mitk::GrabItkImageMemory(masnNoNaN2D, tmpMaskNoNaNImage);
 
-    imageVector.push_back(tmpFloatImage);
-    maskVector.push_back(tmpMaskImage);
-    maskNoNaNVector.push_back(tmpMaskNoNaNImage);
+    if (voxelsInMask > 0)
+    {
+      imageVector.push_back(tmpFloatImage);
+      maskVector.push_back(tmpMaskImage);
+      maskNoNaNVector.push_back(tmpMaskNoNaNImage);
+    }
   }
 }
 
@@ -511,6 +517,7 @@ int main(int argc, char* argv[])
     if (param.defineGlobalNumberOfBins)
     {
       cFeature->SetBins(param.globalNumberOfBins);
+      MITK_INFO << param.globalNumberOfBins;
     }
     cFeature->SetParameter(parsedArgs);
     cFeature->SetDirection(direction);

@@ -15,6 +15,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         RandomForestTraining^^MitkCLVigraRandomForest
         NativeHeadCTSegmentation^^MitkCLVigraRandomForest
         ManualSegmentationEvaluation^^MitkCLVigraRandomForest
+        CLScreenshot^^MitkCore_MitkQtWidgetsExt_MitkCLUtilities
         CLGlobalImageFeatures^^MitkCore_MitkCLUtilities_MitkQtWidgetsExt
         CLMRNormalization^^MitkCore_MitkCLUtilities_MitkCLMRUtilities
         CLStaple^^MitkCore_MitkCLUtilities

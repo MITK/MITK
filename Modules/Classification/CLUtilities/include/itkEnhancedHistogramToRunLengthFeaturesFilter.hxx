@@ -169,11 +169,11 @@ namespace itk {
         IndexType index = hit.GetIndex();
         //      inputHistogram->GetIndex( hit.GetInstanceIdentifier() );
 
-        double i2 = static_cast<double>( ( index[0] + 1 ) * ( index[0] + 1 ) );
-        double j2 = static_cast<double>( ( index[1] + 1 ) * ( index[1] + 1 ) );
-
         double i = index[0] + 1;
         double j = index[1] + 1;
+        double i2 = i*i;
+        double j2 = j*j;
+        MITK_INFO << i << " " << j;
 
         double p_ij = frequency / m_TotalNumberOfRuns;
 

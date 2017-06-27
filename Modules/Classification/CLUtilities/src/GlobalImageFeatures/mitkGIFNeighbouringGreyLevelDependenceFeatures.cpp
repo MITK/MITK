@@ -165,7 +165,7 @@ void LocalCalculateFeatures(
     double sj = 0;
     for (int j = 0; j < holder.m_NumberOfDependences; ++j)
     {
-      double iInt = holder.IndexToMeanIntensity(i);
+      double iInt = i + 1;// holder.IndexToMeanIntensity(i);
       double sij = sijMatrix(i, j);
       double k = j+1;
       double pij = sij / Ns;
@@ -217,7 +217,7 @@ void LocalCalculateFeatures(
   {
     for (int j = 0; j < holder.m_NumberOfDependences; ++j)
     {
-      double iInt = holder.IndexToMeanIntensity(i);
+      double iInt = i + 1;// holder.IndexToMeanIntensity(i);
       double sij = sijMatrix(i, j);
       double k = j + 1;
       double pij = sij / Ns;
@@ -279,6 +279,10 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   mitk::CastToItkImage(mask, maskImage);
 
   std::vector<mitk::NGLDMMatrixFeatures> resultVector;
+  int numberofDependency = 37;
+  if (VImageDimension == 2)
+    numberofDependency = 37;
+
   mitk::NGLDMMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins,37);
   mitk::NGLDMMatrixFeatures overallFeature;
   CalculateNGLDMMatrix<TPixel, VImageDimension>(itkImage, maskImage, config.alpha, config.range, config.direction, holderOverall);

@@ -42,7 +42,7 @@ public:
 
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
 
     void SetGfaThreshold(float gfaThreshold){ m_GfaThreshold = gfaThreshold; }
@@ -66,7 +66,7 @@ public:
 
 protected:
 
-    vnl_vector< float > GetSecondOrderProbabilities(itk::Point<float, 3>& itkP, vnl_vector< float >& angles, vnl_vector< float >& probs);
+    vnl_vector< float > GetSecondOrderProbabilities(const itk::Point<float, 3>& itkP, vnl_vector< float >& angles, vnl_vector< float >& probs);
 
     float   m_GfaThreshold;
     ItkFloatImgType::Pointer        m_GfaImage;     ///< GFA image used to determine streamline termination.

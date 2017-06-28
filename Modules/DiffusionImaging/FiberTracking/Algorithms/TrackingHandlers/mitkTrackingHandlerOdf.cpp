@@ -117,7 +117,7 @@ void TrackingHandlerOdf::InitForTracking()
     }
 }
 
-vnl_vector< float > TrackingHandlerOdf::GetSecondOrderProbabilities(itk::Point<float, 3>& itkP, vnl_vector< float >& angles, vnl_vector< float >& probs)
+vnl_vector< float > TrackingHandlerOdf::GetSecondOrderProbabilities(const itk::Point<float, 3>& itkP, vnl_vector< float >& angles, vnl_vector< float >& probs)
 {
     vnl_vector< float > out_probs;
     out_probs.set_size(m_OdfHemisphereIndices.size());
@@ -183,7 +183,7 @@ void TrackingHandlerOdf::SetSecondOrder(bool SecondOrder)
     m_SecondOrder = SecondOrder;
 }
 
-vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
+vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
 
     vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);

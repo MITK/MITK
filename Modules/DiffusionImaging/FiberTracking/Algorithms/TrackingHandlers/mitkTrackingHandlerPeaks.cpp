@@ -233,7 +233,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3
   return dir;
 }
 
-vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
+vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
     // CHECK: wann wird wo normalisiert
   vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);

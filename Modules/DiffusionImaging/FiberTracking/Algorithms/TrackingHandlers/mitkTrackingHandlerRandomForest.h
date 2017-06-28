@@ -88,7 +88,7 @@ public:
     std::shared_ptr< vigra::RandomForest<int> > GetForest(){ return m_Forest; }
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
     bool IsForestValid();   ///< true is forest is not null, has more than 0 trees and the correct number of features (NumberOfSignalFeatures + 3)
 

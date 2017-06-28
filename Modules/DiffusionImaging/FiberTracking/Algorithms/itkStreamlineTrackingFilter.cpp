@@ -68,7 +68,7 @@ StreamlineTrackingFilter
     , m_MaxNumTracts(-1)
     , m_Random(true)
     , m_Verbose(true)
-	, m_UseOutputProbabilityMap(true)
+    , m_UseOutputProbabilityMap(false)
 {
     this->SetNumberOfRequiredInputs(0);
 }
@@ -726,13 +726,13 @@ void StreamlineTrackingFilter::GenerateData()
 	
     if (m_Random)
     {
-        std::srand(std::time(0));
-		std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
+      std::srand(std::time(0));
+      std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
     }
 
     bool stop = false;
     unsigned int current_tracts = 0;
-	int num_seeds = m_SeedPoints.size();
+    int num_seeds = m_SeedPoints.size();
     itk::Index<3> zeroIndex; zeroIndex.Fill(0);
     int progress = 0;
     int i = 0;
@@ -761,7 +761,7 @@ void StreamlineTrackingFilter::GenerateData()
             cout.flush();
         }
 
-		itk::Point<float> worldPos = m_SeedPoints.at(temp_i);
+        itk::Point<float> worldPos = m_SeedPoints.at(temp_i);
         FiberType fib;
         float tractLength = 0;
         unsigned int counter = 0;
@@ -822,10 +822,10 @@ void StreamlineTrackingFilter::GenerateData()
             {
                 if (!stop)
                 {
-					if (!m_UseOutputProbabilityMap)
-						m_Tractogram.push_back(fib);
-					else
-						FiberToProbmap(&fib);
+                    if (!m_UseOutputProbabilityMap)
+                      m_Tractogram.push_back(fib);
+                    else
+                      FiberToProbmap(&fib);
                     current_tracts++;
                 }
                 if (m_MaxNumTracts > 0 && current_tracts>=static_cast<unsigned int>(m_MaxNumTracts))
@@ -920,21 +920,19 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
 
 void StreamlineTrackingFilter::FiberToProbmap(FiberType* fib)
 {
-	ItkDoubleImgType::IndexType last_idx; last_idx.Fill(0);
-	for (FiberType::iterator it = fib->begin(); it != fib->end(); ++it)
+  ItkDoubleImgType::IndexType last_idx; last_idx.Fill(0);
+  for (auto p : *fib)
 	{
-		ItkDoubleImgType::IndexType idx;
-		itk::Point<float> p = (*it);
+    ItkDoubleImgType::IndexType idx;
 		m_OutputProbabilityMap->TransformPhysicalPointToIndex(p, idx);
 
-		if (idx != last_idx)
-		{
-#pragma omp critical
-			if (m_OutputProbabilityMap->GetLargestPossibleRegion().IsInside(idx))
+    if (idx != last_idx)
+    {
+      if (m_OutputProbabilityMap->GetLargestPossibleRegion().IsInside(idx))
 				m_OutputProbabilityMap->SetPixel(idx, m_OutputProbabilityMap->GetPixel(idx)+1);
 			last_idx = idx;
 		}
-	}
+  }
 }
 
 void StreamlineTrackingFilter::BuildFibers(bool check)
@@ -971,22 +969,23 @@ void StreamlineTrackingFilter::BuildFibers(bool check)
 
 void StreamlineTrackingFilter::AfterTracking()
 {
-    std::cout << "                                                                                                     \r";
+  if (m_Verbose)
+      std::cout << "                                                                                                     \r";
 	if (!m_UseOutputProbabilityMap)
 	{
 		MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
 		MITK_INFO << "Generating polydata ";
 		BuildFibers(false);
 	}
-    MITK_INFO << "done";
+  MITK_INFO << "done";
 
-    m_EndTime = std::chrono::system_clock::now();
-    std::chrono::hours   hh = std::chrono::duration_cast<std::chrono::hours>(m_EndTime - m_StartTime);
-    std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>(m_EndTime - m_StartTime);
-    std::chrono::seconds ss = std::chrono::duration_cast<std::chrono::seconds>(m_EndTime - m_StartTime);
-    mm %= 60;
-    ss %= 60;
-    MITK_INFO << "Tracking took " << hh.count() << "h, " << mm.count() << "m and " << ss.count() << "s";
+  m_EndTime = std::chrono::system_clock::now();
+  std::chrono::hours   hh = std::chrono::duration_cast<std::chrono::hours>(m_EndTime - m_StartTime);
+  std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>(m_EndTime - m_StartTime);
+  std::chrono::seconds ss = std::chrono::duration_cast<std::chrono::seconds>(m_EndTime - m_StartTime);
+  mm %= 60;
+  ss %= 60;
+  MITK_INFO << "Tracking took " << hh.count() << "h, " << mm.count() << "m and " << ss.count() << "s";
 
 	m_SeedPoints.clear();
 }

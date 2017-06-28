@@ -41,7 +41,6 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
     MITK_INFO << "Reference fiber file: " << referenceFileName;
 
     float minFA = 0.05;
-    float minCurv = -1;
     float stepSize = -1;
     float tendf = 1;
     float tendg = 0;

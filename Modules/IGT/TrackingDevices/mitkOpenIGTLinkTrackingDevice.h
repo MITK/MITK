@@ -109,6 +109,15 @@ namespace mitk
     */
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
 
+    /** @return Returns true if this device can autodetects its tools. */
+    virtual bool AutoDetectToolsAvailable();
+
+    /** Autodetects tools from the current OpenIGTLink connection and returns them as a navigation tool storage.
+    *  @return Returns the detected tools. Returns an empty storage if no tools are present
+    *          or if OpenIGTLink Connection is not possible
+    */
+    virtual mitk::NavigationToolStorage::Pointer AutoDetectTools();
+
     bool IsDeviceInstalled();
 
     itkSetMacro(UpdateRate, int);               ///< Sets the update rate of the device in fps. Default value is 60 fps.
@@ -129,6 +138,10 @@ namespace mitk
     /** Updates the tools from the open IGT link connection. Is called every time a message received event is invoked.*/
     void UpdateTools();
     unsigned long m_MessageReceivedObserverTag;
+
+    /** Receives one message from the OpenIGTLink connection. Starts the tracking stream if required.
+     */
+    mitk::IGTLMessage::Pointer ReceiveMessage(int waitingTime);
 
     /**
     * \return Returns all tools of the tracking device.
@@ -154,13 +167,18 @@ namespace mitk
 
     mitk::OpenIGTLinkTrackingDevice::TrackingMessageType GetMessageTypeFromString(const char* messageTypeString);
 
-    bool DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
+    /** Discovers tools from the input (type TDATA) */
+    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
 
-    bool DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
+    /** Discovers tools from the input (type QTDATA) */
+    mitk::NavigationToolStorage::Pointer DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
 
-    bool DiscoverToolsFromTransform();
+    /** Discovers tools from the input (type TRANSFORM) and waits for the given number of messages */
+    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTransform(int NumberOfMessagesToWait = 50);
 
     void AddNewToolForName(std::string name, int i);
+
+    mitk::NavigationTool::Pointer ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier);
   };
 }//mitk
 #endif /* MITKOpenIGTLinkTRACKINGDEVICE_H_HEADER_INCLUDED_ */

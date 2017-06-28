@@ -485,6 +485,10 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextCommand()
 {
   return m_MessageQueue->PullCommandMessage();
 }
+void mitk::IGTLDevice::EnableInfiniteBufferingMode(bool enable)
+{
+  m_MessageQueue->EnableInfiniteBuffering(enable);
+}
 
 void mitk::IGTLDevice::EnableInfiniteBufferingMode(
   mitk::IGTLMessageQueue::Pointer queue,

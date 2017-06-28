@@ -249,6 +249,8 @@ namespace mitk {
     void EnableInfiniteBufferingMode(mitk::IGTLMessageQueue::Pointer queue,
       bool enable = true);
 
+    void EnableInfiniteBufferingMode(bool enable = true);
+
     /**
     * \brief Returns the number of connections of this device
     */

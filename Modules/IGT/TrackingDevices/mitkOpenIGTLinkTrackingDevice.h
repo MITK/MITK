@@ -139,6 +139,10 @@ namespace mitk
     void UpdateTools();
     unsigned long m_MessageReceivedObserverTag;
 
+    /** Receives one message from the OpenIGTLink connection. Starts the tracking stream if required.
+     */
+    mitk::IGTLMessage::Pointer ReceiveMessage(int waitingTime);
+
     /**
     * \return Returns all tools of the tracking device.
     */

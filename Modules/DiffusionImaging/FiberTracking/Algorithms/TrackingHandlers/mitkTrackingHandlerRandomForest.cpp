@@ -226,7 +226,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrac
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
+vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::ProposeDirection(const itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
 
   vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);

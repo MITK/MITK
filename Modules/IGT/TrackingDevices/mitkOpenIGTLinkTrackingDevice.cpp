@@ -81,7 +81,7 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
     return mitk::NavigationToolStorage::New();
   }
 
-  mitk::IGTLMessage::Pointer receivedMessage = ReceiveMessage(1000);
+  mitk::IGTLMessage::Pointer receivedMessage = ReceiveMessage(10000);
 
   //code for transform messages
 
@@ -362,6 +362,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
   MITK_INFO << "Start discovering tools by TRANSFORM messages";
   std::map<std::string, int> toolNameMap;
   bool condition = false;
+  int j = 0;
   while (!condition)
   {
     //TODO: Fix this.. :/
@@ -387,14 +388,20 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
       MITK_WARN << "INCREMENTED TOOL COUNT IN TOOLCHAIN: " << msg->GetDeviceName() << " - " << toolNameMap[msg->GetDeviceName()];
     }
 
+    j++;
+    if (j > 100) { condition = true; }
+    else { condition = false; }
+    /*
     for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
     {
-      if (it->second < 5)
+      //if (it->second < 5)
+      if (i>100)
       {
         condition = false;
         break;
       }
     }
+    */
   }
 
   int i = 0;

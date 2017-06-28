@@ -114,9 +114,8 @@ void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
   rotationVec[1] = m_Controls->m_rotVecY->value(); //Y
   rotationVec[2] = m_Controls->m_rotVecZ->value(); //Z
 
-
   std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> allOrientationErrors;
-  for (int i = 0; i < (OrientationVector.size() - 1); i++)
+  for (std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError>::size_type i = 0; i < OrientationVector.size() - 1; ++i)
   {
     double AngleBetweenTwoQuaternions = mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(OrientationVector.at(i), OrientationVector.at(i+1), rotationVec);
     double AngularError = fabs(AngleBetweenTwoQuaternions - 11.25);
@@ -212,33 +211,25 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcRef()
   }
 
   //start loop and iterate through all files of list
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     //create navigation data player
     mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
-    myPlayer->SetFileName(m_FilenameVector.at(i));
+    myPlayer->SetFileName(m_FilenameVector[i]);
 
     //check if the stream is valid and skip file if not
-    /*
-    if (!myPlayer->GetStreamValid())
-    {
-    MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-    continue;
-    }
-    */
 
     //create evaluation filter
     mitk::NavigationDataEvaluationFilter::Pointer myEvaluationFilter = mitk::NavigationDataEvaluationFilter::New();
 
     //connect pipeline
-    for (int j = 0; j < myPlayer->GetNumberOfOutputs(); j++) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
+    for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j)
+      myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j));
 
-    //update pipline until number of samlples is reached
-    for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++)
-    {
+    //update pipline until number of samples is reached
+    for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j)
       myEvaluationFilter->Update();
-    }
 
     //store mean position as reference
     switch (i)

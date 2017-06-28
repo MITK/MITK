@@ -54,7 +54,7 @@ void mitk::PersistenceActivator::Load(us::ModuleContext *context)
   }
 }
 
-void mitk::PersistenceActivator::Unload(us::ModuleContext *context)
+void mitk::PersistenceActivator::Unload(us::ModuleContext *)
 {
   if (m_PersistenceService.IsNull())
     return;

@@ -15,11 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTubeGraphDeleteLabelGroupDialog.h"
 
-#include <qabstractitemview.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qlistwidget.h>
+#include <QAbstractItemView>
+#include <QPushButton>
+#include <QLayout>
+#include <QLabel>
+#include <QListWidget>
 
 
 
@@ -80,12 +80,12 @@ void QmitkTubeGraphDeleteLabelGroupDialog::OnDeleteLabelGroupClicked()
   this->accept();
 }
 
-const QStringList QmitkTubeGraphDeleteLabelGroupDialog::GetSelectedLabelGroups()
+QStringList QmitkTubeGraphDeleteLabelGroupDialog::GetSelectedLabelGroups()
 {
   return m_LabelGroupList;
 }
 
-void QmitkTubeGraphDeleteLabelGroupDialog::SetLabelGroups(QStringList labelGroups)
+void QmitkTubeGraphDeleteLabelGroupDialog::SetLabelGroups(const QStringList &labelGroups)
 {
   for (QStringList::iterator iterator = labelGroups.begin(); iterator != labelGroups.end(); iterator++)
   labelGroupListWidget->addItem(*iterator);

@@ -59,8 +59,8 @@ void OpenIGTLinkPlugin::UpdatePipeline()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void OpenIGTLinkPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-  const QList<mitk::DataNode::Pointer>& nodes)
+void OpenIGTLinkPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+  const QList<mitk::DataNode::Pointer> &)
 {
   // iterate all selected objects, adjust warning visibility
 }

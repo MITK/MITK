@@ -379,7 +379,7 @@ void UltrasoundSupport::RemoveControlWidgets()
 
 void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
-  if (m_Device.IsNull() || event.getType() != us::ServiceEvent::MODIFIED)
+  if (m_Device.IsNull() || event.getType() != static_cast<ctkServiceEvent::Type>(us::ServiceEvent::MODIFIED))
   {
     return;
   }
@@ -431,10 +431,8 @@ UltrasoundSupport::~UltrasoundSupport()
     StopTimers();
 
     // Get all active devicesand deactivate them to prevent freeze
-    std::vector<mitk::USDevice*> devices = this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>();
-    for (int i = 0; i < devices.size(); i++)
+    for (auto device : this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>())
     {
-      mitk::USDevice::Pointer device = devices[i];
       if (device.IsNotNull() && device->GetIsActive())
       {
         device->Deactivate();

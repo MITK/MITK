@@ -246,7 +246,7 @@ bool HelpPage::acceptNavigationRequest(const QUrl& url, NavigationType, bool)
   return true;
 }
 
-HelpWebView::HelpWebView(IEditorSite::Pointer editorSite, QWidget *parent, qreal zoom)
+HelpWebView::HelpWebView(IEditorSite::Pointer, QWidget *parent, qreal zoom)
   : QWebEngineView(parent),
     m_LoadFinished(false),
     m_HelpEngine(HelpPluginActivator::getInstance()->getQHelpEngine()),

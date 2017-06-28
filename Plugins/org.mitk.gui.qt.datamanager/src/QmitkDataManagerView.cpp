@@ -204,9 +204,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   auto surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
-  auto labelSetImageDataNodeDescriptor =
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("LabelSetImage");
-
   auto pointSetNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PointSet");
 

@@ -277,7 +277,7 @@ void QmitkOverlayManagerView::OnPropertyNameChanged(const itk::EventObject &)
 }
 
 void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
-                                                 const QList<mitk::DataNode::Pointer> &nodes)
+                                                 const QList<mitk::DataNode::Pointer> &)
 {
 }
 

@@ -109,6 +109,15 @@ namespace mitk
     */
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
 
+    /** @return Returns true if this device can autodetects its tools. */
+    virtual bool AutoDetectToolsAvailable();
+
+    /** Autodetects tools from the current OpenIGTLink connection and returns them as a navigation tool storage.
+    *  @return Returns the detected tools. Returns an empty storage if no tools are present
+    *          or if OpenIGTLink Connection is not possible
+    */
+    virtual mitk::NavigationToolStorage::Pointer AutoDetectTools();
+
     bool IsDeviceInstalled();
 
     itkSetMacro(UpdateRate, int);               ///< Sets the update rate of the device in fps. Default value is 60 fps.

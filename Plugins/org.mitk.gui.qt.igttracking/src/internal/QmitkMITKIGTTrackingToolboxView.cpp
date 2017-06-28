@@ -218,7 +218,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     m_TrackingVolumeNode->SetColor(red);
 
     //initialize buttons
-    m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
+    m_Controls->m_AutoDetectTools->setVisible(false); //only visible if supported by tracking device
     m_Controls->m_StartStopTrackingButton->setEnabled(false);
     m_Controls->m_StartTrackingSimpleMode->setEnabled(false);
     m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);

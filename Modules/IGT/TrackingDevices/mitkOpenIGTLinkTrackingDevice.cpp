@@ -53,6 +53,16 @@ int mitk::OpenIGTLinkTrackingDevice::GetPortNumber()
   return m_OpenIGTLinkClient->GetPortNumber();
 }
 
+bool mitk::OpenIGTLinkTrackingDevice::AutoDetectToolsAvailable()
+{
+  return true;
+}
+
+mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetectTools()
+{
+  return mitk::NavigationToolStorage::New();
+}
+
 std::string mitk::OpenIGTLinkTrackingDevice::GetHostname()
 {
   return m_OpenIGTLinkClient->GetHostname();

@@ -171,7 +171,8 @@ namespace mitk
 
     bool DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
 
-    bool DiscoverToolsFromTransform();
+    /** Discovers tools from the input and waits for the given number of messages */
+    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTransform(int NumberOfMessagesToWait = 100);
 
     void AddNewToolForName(std::string name, int i);
   };

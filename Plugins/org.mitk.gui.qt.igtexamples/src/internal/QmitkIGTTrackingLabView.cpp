@@ -121,7 +121,7 @@ void QmitkIGTTrackingLabView::OnSetupNavigation()
 
   if(ds == nullptr)
   {
-    MITK_WARN << "IGTSurfaceTracker: Error", "can not access DataStorage. Navigation not possible";
+    MITK_WARN << "IGTSurfaceTracker: Error. Cannot access DataStorage. Navigation not possible";
     return;
   }
 
@@ -200,8 +200,6 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
   //Check for initialization
   if (!CheckRegistrationInitialization()) return;
 
-  /* retrieve fiducials from data storage */
-  mitk::DataStorage* ds = this->GetDataStorage();
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
 
@@ -567,12 +565,12 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  this->CreateBundleWidgets( parent );
+  this->CreateBundleWidgets();
   this->CreateConnections();
 }
 
 
-void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
+void QmitkIGTTrackingLabView::CreateBundleWidgets()
 {
   //initialize registration widget
   m_Controls.m_RegistrationWidget->HideStaticRegistrationRadioButton(true);

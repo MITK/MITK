@@ -87,8 +87,7 @@ QmitkPythonTextEditor::QmitkPythonTextEditor(QWidget *parent)
   d->m_Content = new QTextEdit(this);
   d->m_Content->setObjectName(QString::fromUtf8("Content"));
 
-  QmitkPythonScriptEditorHighlighter* highlighter =
-      new QmitkPythonScriptEditorHighlighter( d->m_Content->document() );
+  new QmitkPythonScriptEditorHighlighter(d->m_Content->document());
 
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget( d->m_Toolbar, 0, 0, 1, 1 );

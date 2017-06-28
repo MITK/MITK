@@ -129,8 +129,6 @@ public:
   template <unsigned int VMovingDim, unsigned int VTargetDim>
   bool MapPoint(const ::itk::Point<mitk::ScalarType,VMovingDim>& inPoint, ::itk::Point<mitk::ScalarType,VTargetDim>& outPoint) const
   {
-    typedef ::itk::Point<mitk::ScalarType,VMovingDim> MITKMovingPointType;
-    typedef ::itk::Point<mitk::ScalarType,VTargetDim> MITKTargetPointType;
     typedef typename ::map::core::continuous::Elements<VMovingDim>::PointType MAPMovingPointType;
     typedef typename ::map::core::continuous::Elements<VTargetDim>::PointType MAPTargetPointType;
 
@@ -177,8 +175,6 @@ public:
   template <unsigned int VMovingDim, unsigned int VTargetDim>
   bool MapPointInverse(const ::itk::Point<mitk::ScalarType,VTargetDim> & inPoint, ::itk::Point<mitk::ScalarType,VMovingDim> & outPoint) const
 {
-  typedef ::itk::Point<mitk::ScalarType,VMovingDim> MITKMovingPointType;
-  typedef ::itk::Point<mitk::ScalarType,VTargetDim> MITKTargetPointType;
   typedef typename ::map::core::continuous::Elements<VMovingDim>::PointType MAPMovingPointType;
   typedef typename ::map::core::continuous::Elements<VTargetDim>::PointType MAPTargetPointType;
 

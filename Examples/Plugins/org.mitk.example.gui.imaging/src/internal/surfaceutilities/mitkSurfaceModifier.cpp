@@ -57,7 +57,7 @@ mitk::Point3D mitk::SurfaceModifier::PerturbePointAlongAxis(mitk::Point3D point,
 }
 
 mitk::Point3D mitk::SurfaceModifier::PerturbePoint(
-  mitk::Point3D point, double varianceX, double varianceY, double varianceZ, double maxNoiseVectorLenght)
+  mitk::Point3D point, double varianceX, double varianceY, double varianceZ)
 {
   if (m_myRandomGenerator.IsNull())
     m_myRandomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();

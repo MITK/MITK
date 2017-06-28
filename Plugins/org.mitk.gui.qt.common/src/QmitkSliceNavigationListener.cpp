@@ -44,7 +44,7 @@ void QmitkSliceNavigationListener::OnSliceChangedDelayed()
 };
 
 void
-QmitkSliceNavigationListener::OnSliceChangedInternal(const itk::EventObject& e)
+QmitkSliceNavigationListener::OnSliceChangedInternal(const itk::EventObject&)
 {
   // Taken from QmitkStdMultiWidget::HandleCrosshairPositionEvent().
   // Since there are always 3 events arriving (one for each render window) every time the slice

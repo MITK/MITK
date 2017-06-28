@@ -262,10 +262,10 @@ void QmitkXnatConnectionPreferencePage::TestConnection()
 
   try
   {
-    auto session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+    mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
-  catch (std::invalid_argument)
+  catch (const std::invalid_argument &)
   {
     if (!UserInformationEmpty())
     {
@@ -273,7 +273,7 @@ void QmitkXnatConnectionPreferencePage::TestConnection()
 
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CreateXnatSession();
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-            mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
     }
   }
 

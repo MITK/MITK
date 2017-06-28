@@ -64,7 +64,7 @@ using namespace berry;
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView()
   : QmitkAbstractView(),
     m_Controls(nullptr),
-    m_NodeUsedForOdfVisualization(nullptr),
+    m_CurrentSelection(0),
     m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
     m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
     m_IconGlyOFF_T(new QIcon(":/QmitkDiffusionImaging/glyphsoff_T.png")),
@@ -73,14 +73,12 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
     m_IconGlyON_C(new QIcon(":/QmitkDiffusionImaging/glyphson_C.png")),
     m_IconGlyOFF_S(new QIcon(":/QmitkDiffusionImaging/glyphsoff_S.png")),
     m_IconGlyON_S(new QIcon(":/QmitkDiffusionImaging/glyphson_S.png")),
-    m_CurrentSelection(0),
     m_CurrentPickingNode(0),
-    m_GlyIsOn_S(false),
-    m_GlyIsOn_C(false),
     m_GlyIsOn_T(false),
+    m_GlyIsOn_C(false),
+    m_GlyIsOn_S(false),
     m_FiberBundleObserverTag(0),
-    m_FiberBundleObserveOpacityTag(0),
-    m_Color(nullptr)
+    m_FiberBundleObserveOpacityTag(0)
 {
   currentThickSlicesMode = 1;
   m_MyMenu = nullptr;
@@ -104,30 +102,22 @@ void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction
   switch( currentThickSlicesMode )
   {
     case 0: // toInt() returns 0 'otherwise'.
-    {
       return; // dummy code/todo: implement stuff.
-      break;
-    }
+
     case 1:
-    {
       this->m_Controls->m_TSMenu->setText("MIP");
       break;
-    }
+
     case 2:
-    {
       this->m_Controls->m_TSMenu->setText("SUM");
       break;
-    }
+
     case 3:
-    {
       this->m_Controls->m_TSMenu->setText("WEIGH");
       break;
-    }
+
     default:
-    {
       return; // dummy code/todo: implement stuff.
-      break;
-    }
   }
 
   if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))

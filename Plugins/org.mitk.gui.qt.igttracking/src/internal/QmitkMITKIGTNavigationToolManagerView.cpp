@@ -37,8 +37,8 @@ QmitkMITKIGTNavigationToolManagerView::QmitkMITKIGTNavigationToolManagerView()
 
 QmitkMITKIGTNavigationToolManagerView::~QmitkMITKIGTNavigationToolManagerView()
 {
-  for (int i = 0; i < m_AllStoragesHandledByThisWidget.size(); i++)
-    m_AllStoragesHandledByThisWidget.at(i)->UnRegisterMicroservice();
+  for (auto storage : m_AllStoragesHandledByThisWidget)
+    storage->UnRegisterMicroservice();
 }
 
 void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl(QWidget *parent)

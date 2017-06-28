@@ -52,6 +52,7 @@ namespace mitk
       */
     void SetInterPointDistance(int d);
 
+    using Superclass::SetInput;
     /** @brief Sets the input surface. This parameter must be set before calculation is started. */
     void SetInput(mitk::Surface::Pointer input);
 
@@ -82,7 +83,7 @@ namespace mitk
 
     TargetPointCalculationMethod m_Method;
 
-    mitk::Image::Pointer CreateBinaryImage(mitk::Surface::Pointer input);
+    mitk::Image::Pointer CreateBinaryImage();
 
     mitk::PointSet::Pointer CreateTargetPoints(mitk::Image::Pointer binaryImage);
 

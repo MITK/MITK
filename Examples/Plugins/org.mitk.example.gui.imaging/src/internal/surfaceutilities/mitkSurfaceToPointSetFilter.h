@@ -35,7 +35,8 @@ namespace mitk
     mitkClassMacro(SurfaceToPointSetFilter, mitk::PointSetSource);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      void SetInput(mitk::Surface::Pointer m_InputSurface);
+    using Superclass::SetInput;
+    void SetInput(mitk::Surface::Pointer m_InputSurface);
 
     std::string GetErrorMessage();
 

@@ -113,7 +113,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
   igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message);
   //TODO: Fix this to dynamically get this from GUI
   ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(m_UpdateRate);
-  m_OpenIGTLinkClient->SendMessage(sttMsg);
+  m_OpenIGTLinkClient->SendMessage(mitk::IGTLMessage::New(sttMsg, message));
 
   mitk::IGTLMessage::Pointer receivedMessage;
 

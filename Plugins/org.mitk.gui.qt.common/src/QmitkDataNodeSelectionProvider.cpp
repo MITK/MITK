@@ -66,7 +66,10 @@ void QmitkDataNodeSelectionProvider::SetSelection(const berry::ISelection::Const
         newSelection.select(matched.front(), matched.front());
       }
     }
+
+    bool wasBlocked = qSelectionModel->blockSignals(true);
     qSelectionModel->select(newSelection, flags);
+    qSelectionModel->blockSignals(wasBlocked);
   }
   else
   {

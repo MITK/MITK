@@ -82,7 +82,29 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
     return mitk::NavigationToolStorage::New();
   }
 
-  returnValue = DiscoverToolsFromTransform();
+  //get a message to find out type
+  mitk::IGTLMessage::Pointer receivedMessage = ReceiveMessage(100);
+
+  const char* msgType = receivedMessage->GetIGTLMessageType();
+
+  mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
+
+  switch (type)
+  {
+  case TDATA:
+    returnValue = DiscoverToolsFromTData(dynamic_cast<igtl::TrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
+    break;
+  case QTDATA:
+    returnValue = DiscoverToolsFromQTData(dynamic_cast<igtl::QuaternionTrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
+    break;
+  case TRANSFORM:
+    returnValue = DiscoverToolsFromTransform();
+    break;
+  default:
+    MITK_INFO << "Server does not send tracking data. Received data is not of a compatible type. Received type: " << msgType;
+  }
+
+
 
   //close connection
   try

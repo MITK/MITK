@@ -117,6 +117,17 @@ QmitkDataManagerView::QmitkDataManagerView()
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
+  //# Preferences
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+
+  berry::IBerryPreferences::Pointer prefs
+    = (prefService->GetSystemPreferences()->Node(VIEW_ID))
+    .Cast<berry::IBerryPreferences>();
+  assert(prefs);
+
+  prefs->OnChanged.RemoveListener(
+    berry::MessageDelegate1<QmitkDataManagerView, const berry::IBerryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
+
   //Remove all registered actions from each descriptor
   for (std::vector< std::pair< QmitkNodeDescriptor*, QAction* > >::iterator it = m_DescriptorActionList.begin();it != m_DescriptorActionList.end(); it++)
   {

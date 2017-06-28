@@ -535,9 +535,18 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     //create convertion filter
     m_IGTLConversionFilter = mitk::NavigationDataToIGTLMessageFilter::New();
     m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
+    QString dataModeSelection = this->m_Controls->m_OpenIGTLinkDataFormat->currentText();
+    if (dataModeSelection == "TDATA")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);}
+    else if (dataModeSelection == "TRANSFORM")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);}
+    else if (dataModeSelection == "QTDATA")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTDataMsg);}
+    else if (dataModeSelection == "POSITION")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);}
     m_IGTLConversionFilter->ConnectTo(m_ToolVisualizationFilter);
-    m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
     m_IGTLConversionFilter->RegisterAsMicroservice();
+
 
     //create server and message provider
     m_IGTLServer = mitk::IGTLServer::New(false);
@@ -1071,6 +1080,8 @@ void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
   m_Controls->m_OptionsLogUpdateRateLabel->setEnabled(false);
   m_Controls->m_DisableAllTimers->setEnabled(false);
   m_Controls->m_OtherOptionsGroupBox->setEnabled(false);
+  m_Controls->m_EnableOpenIGTLinkMicroService->setEnabled(false);
+  m_Controls->m_OpenIGTLinkDataFormat->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
@@ -1079,6 +1090,8 @@ void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
   m_Controls->m_UseDifferentUpdateRates->setEnabled(true);
   m_Controls->m_DisableAllTimers->setEnabled(true);
   m_Controls->m_OtherOptionsGroupBox->setEnabled(true);
+  m_Controls->m_EnableOpenIGTLinkMicroService->setEnabled(true);
+  m_Controls->m_OpenIGTLinkDataFormat->setEnabled(true);
   OnToggleDifferentUpdateRates();
 }
 

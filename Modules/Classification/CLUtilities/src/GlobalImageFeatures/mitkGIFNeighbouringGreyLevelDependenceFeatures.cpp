@@ -283,7 +283,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   if (VImageDimension == 2)
     numberofDependency = 37;
 
-  mitk::NGLDMMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins,37);
+  mitk::NGLDMMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins, numberofDependency);
   mitk::NGLDMMatrixFeatures overallFeature;
   CalculateNGLDMMatrix<TPixel, VImageDimension>(itkImage, maskImage, config.alpha, config.range, config.direction, holderOverall);
   LocalCalculateFeatures(holderOverall, overallFeature);

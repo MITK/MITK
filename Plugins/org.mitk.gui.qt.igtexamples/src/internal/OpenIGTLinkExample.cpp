@@ -158,7 +158,7 @@ void OpenIGTLinkExample::Start()
     m_Timer.stop();
     igtl::StopTrackingDataMessage::Pointer stopStreaming =
       igtl::StopTrackingDataMessage::New();
-    this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
+    this->m_IGTLClient->SendMessage(mitk::IGTLMessage::New((igtl::MessageBase::Pointer) stopStreaming, ""));
     this->m_Controls.butStart->setText("Start Pipeline");
     //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
   }

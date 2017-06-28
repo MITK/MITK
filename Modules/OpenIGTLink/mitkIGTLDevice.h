@@ -114,6 +114,7 @@ namespace mitk {
      */
     void RunCommunication(void (IGTLDevice::*ComFunction)(void), itk::FastMutexLock* mutex);
 
+
     /**
      * \brief Adds the given message to the sending queue
      *
@@ -122,15 +123,7 @@ namespace mitk {
      * is not send directly. This method just adds it to the send queue.
      * \param msg The message to be added to the sending queue
      */
-    void SendMessage(igtl::MessageBase::Pointer msg);
-
-    /**
-     * \brief Adds the given message to the sending queue
-     *
-     * Convenience function to work with mitk::IGTLMessage directly.
-     * \param msg The message to be added to the sending queue
-     */
-    void SendMessage(const IGTLMessage* msg);
+    void SendMessage(mitk::IGTLMessage::Pointer msg);
 
     /**
      * \brief Returns current object state (Setup, Ready or Running)
@@ -256,6 +249,9 @@ namespace mitk {
     */
     virtual unsigned int GetNumberOfConnections() = 0;
 
+    itkGetMacro(LogMessages, bool);
+    itkSetMacro(LogMessages, bool);
+
   protected:
     /**
      * \brief Sends a message.
@@ -271,7 +267,7 @@ namespace mitk {
      * \retval IGTL_STATUS_UNKONWN_ERROR the message was not sent because an
      * unknown error occurred
      */
-    unsigned int SendMessagePrivate(igtl::MessageBase::Pointer msg,
+    unsigned int SendMessagePrivate(mitk::IGTLMessage::Pointer msg,
       igtl::Socket::Pointer socket);
 
     /**
@@ -357,6 +353,8 @@ namespace mitk {
 
     /** A message factory that provides the New() method for all msg types */
     mitk::IGTLMessageFactory::Pointer m_MessageFactory;
+
+    bool m_LogMessages;
 
   private:
 

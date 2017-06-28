@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include "igtlMessageBase.h"
 
-void mitk::IGTLMessageQueue::PushSendMessage(igtl::MessageBase::Pointer message)
+void mitk::IGTLMessageQueue::PushSendMessage(mitk::IGTLMessage::Pointer message)
 {
   this->m_Mutex->Lock();
   if (this->m_BufferingType == IGTLMessageQueue::Infinit)
@@ -114,9 +114,9 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
   this->m_Mutex->Unlock();
 }
 
-igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullSendMessage()
+mitk::IGTLMessage::Pointer mitk::IGTLMessageQueue::PullSendMessage()
 {
-  igtl::MessageBase::Pointer ret = nullptr;
+  mitk::IGTLMessage::Pointer ret = nullptr;
   this->m_Mutex->Lock();
   if (this->m_SendQueue.size() > 0)
   {

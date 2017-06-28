@@ -62,7 +62,7 @@ namespace mitk {
     *
     * Note: so far it broadcasts the message to all registered clients
     */
-    void Send(const IGTLMessage* msg);
+    void Send(mitk::IGTLMessage::Pointer msg);
 
     /**
     * \brief Starts the streaming of the given message source with the given fps.
@@ -203,6 +203,8 @@ namespace mitk {
     bool                                      m_IsStreaming;
 
     unsigned long m_LostConnectionObserverTag;
+
+    bool m_LogMessages;
   };
 
   /**

@@ -105,6 +105,8 @@ namespace mitk {
       */
       void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
+      std::string ToString() const;
+
       /** Compose with another IGTLMessage
        *
        * This method composes self with another IGTLMessage of the

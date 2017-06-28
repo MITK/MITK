@@ -96,16 +96,16 @@ void mitk::IGTLClient::Receive()
 
 void mitk::IGTLClient::Send()
 {
-  igtl::MessageBase::Pointer curMessage;
+  mitk::IGTLMessage::Pointer mitkMessage;
 
   //get the latest message from the queue
-  curMessage = this->m_MessageQueue->PullSendMessage();
+  mitkMessage = this->m_MessageQueue->PullSendMessage();
 
   // there is no message => return
-  if (curMessage.IsNull())
+  if (mitkMessage.IsNull())
     return;
 
-  if (!this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket))
+  if (!this->SendMessagePrivate(mitkMessage, this->m_Socket))
   {
     MITK_WARN("IGTLDevice") << "Could not send the message.";
   }

@@ -167,14 +167,18 @@ namespace mitk
 
     mitk::OpenIGTLinkTrackingDevice::TrackingMessageType GetMessageTypeFromString(const char* messageTypeString);
 
-    bool DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
+    /** Discovers tools from the input (type TDATA) */
+    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
 
-    bool DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
+    /** Discovers tools from the input (type QTDATA) */
+    mitk::NavigationToolStorage::Pointer DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
 
-    /** Discovers tools from the input and waits for the given number of messages */
-    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTransform(int NumberOfMessagesToWait = 100);
+    /** Discovers tools from the input (type TRANSFORM) and waits for the given number of messages */
+    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTransform(int NumberOfMessagesToWait = 50);
 
     void AddNewToolForName(std::string name, int i);
+
+    mitk::NavigationTool::Pointer ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier);
   };
 }//mitk
 #endif /* MITKOpenIGTLinkTRACKINGDEVICE_H_HEADER_INCLUDED_ */

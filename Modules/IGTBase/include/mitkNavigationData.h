@@ -59,7 +59,7 @@ namespace mitk {
       */
       typedef itk::Matrix<mitk::ScalarType,6,6> CovarianceMatrixType;
       /**
-      * \brief type that holds the time at which the data was recorded
+      * \brief type that holds the time at which the data was recorded in milliseconds
       */
       typedef double TimeStampType;
 
@@ -88,11 +88,11 @@ namespace mitk {
       */
       itkSetMacro(DataValid, bool);
       /**
-      * \brief sets the IGT timestamp of the NavigationData object
+      * \brief sets the IGT timestamp of the NavigationData object in milliseconds
       */
       itkSetMacro(IGTTimeStamp, TimeStampType);
       /**
-      * \brief gets the IGT timestamp of the NavigationData object
+      * \brief gets the IGT timestamp of the NavigationData object in milliseconds
       */
       itkGetConstMacro(IGTTimeStamp, TimeStampType);
       /**

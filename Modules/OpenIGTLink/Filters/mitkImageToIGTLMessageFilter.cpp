@@ -196,6 +196,11 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
       break;
     }
 
+    //copy timestamp of mitk image
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    timestamp->SetTime(img->GetMTime() / 1000, (int)(img->GetMTime()) % 1000);
+    imgMsg->SetTimeStamp(timestamp);
+
     imgMsg->Pack();
 
     output->SetMessage(imgMsg.GetPointer());

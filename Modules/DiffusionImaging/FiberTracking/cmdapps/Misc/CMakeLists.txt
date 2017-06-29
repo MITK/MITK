@@ -1,6 +1,6 @@
-option(BUILD_DiffusionCoreCmdApps "Build commandline tools for diffusion" OFF)
+option(BUILD_DiffusionMiscCmdApps "Build miscellaneous commandline tools for diffusion" OFF)
 
-if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_DiffusionMiscCmdApps OR MITK_BUILD_ALL_APPS)
 
   # needed include directories
   include_directories(
@@ -11,19 +11,14 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     # list of diffusion cmdapps
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
-    set( diffusioncorecmdapps
-    DwiDenoising^^
-    ImageResampler^^
-    ExportShImage^^
-    CopyGeometry^^
-    Registration^^
-    DiffusionDICOMLoader^^
-    ResampleGradients^^
+    set( diffusionMisccmdapps
+    PeakExtraction^^MitkFiberTracking
+    FileFormatConverter^^MitkFiberTracking
     )
 
-    foreach(diffusioncorecmdapp ${diffusioncorecmdapps})
+    foreach(diffusionMisccmdapp ${diffusionMisccmdapps})
       # extract cmd app name and dependencies
-      string(REPLACE "^^" "\\;" cmdapp_info ${diffusioncorecmdapp})
+      string(REPLACE "^^" "\\;" cmdapp_info ${diffusionMisccmdapp})
       set(cmdapp_info_list ${cmdapp_info})
       list(GET cmdapp_info_list 0 appname)
       list(GET cmdapp_info_list 1 raw_dependencies)
@@ -39,7 +34,3 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     
 endif()
 
-mitkFunctionCreateCommandLineApp(
-  NAME Dicom2Nrrd
-  DEPENDS MitkCore ${dependencies_list}
-)

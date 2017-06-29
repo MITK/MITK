@@ -324,7 +324,7 @@ int main( int argc, char* argv[] )
 
   parser.setTitle("Image Resampler");
   parser.setCategory("Preprocessing Tools");
-  parser.setContributor("MBI");
+  parser.setContributor("MIC");
   parser.setDescription("Resample an image to eigther a specific spacing or to a reference image.");
 
   // Add command line argument names

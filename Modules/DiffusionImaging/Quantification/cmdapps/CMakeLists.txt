@@ -1,6 +1,6 @@
-option(BUILD_DiffusionCoreCmdApps "Build commandline tools for diffusion" OFF)
+option(BUILD_DiffusionQuantificationCmdApps "Build commandline tools for diffusion quantification (IVIM, ADC, ...)" OFF)
 
-if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_DiffusionQuantificationCmdApps OR MITK_BUILD_ALL_APPS)
 
   # needed include directories
   include_directories(
@@ -11,19 +11,18 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     # list of diffusion cmdapps
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
-    set( diffusioncorecmdapps
-    DwiDenoising^^
-    ImageResampler^^
-    ExportShImage^^
-    CopyGeometry^^
-    Registration^^
-    DiffusionDICOMLoader^^
-    ResampleGradients^^
+    set( diffusionQuantificationcmdapps
+    DiffusionIndices^^
+    QballReconstruction^^
+    TensorReconstruction^^
+    TensorDerivedMapsExtraction^^
+    DiffusionKurtosisFit^^
+    MultishellMethods^^
     )
 
-    foreach(diffusioncorecmdapp ${diffusioncorecmdapps})
+    foreach(diffusionQuantificationcmdapp ${diffusionQuantificationcmdapps})
       # extract cmd app name and dependencies
-      string(REPLACE "^^" "\\;" cmdapp_info ${diffusioncorecmdapp})
+      string(REPLACE "^^" "\\;" cmdapp_info ${diffusionQuantificationcmdapp})
       set(cmdapp_info_list ${cmdapp_info})
       list(GET cmdapp_info_list 0 appname)
       list(GET cmdapp_info_list 1 raw_dependencies)
@@ -38,8 +37,3 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     endforeach()
     
 endif()
-
-mitkFunctionCreateCommandLineApp(
-  NAME Dicom2Nrrd
-  DEPENDS MitkCore ${dependencies_list}
-)

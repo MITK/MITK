@@ -1,6 +1,6 @@
-option(BUILD_DiffusionCoreCmdApps "Build commandline tools for diffusion" OFF)
+option(BUILD_DiffusionFiberfoxCmdApps "Build commandline tools for diffusion data simulation (Fiberfox)" OFF)
 
-if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_DiffusionFiberfoxCmdApps OR MITK_BUILD_ALL_APPS)
 
   # needed include directories
   include_directories(
@@ -11,19 +11,13 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     # list of diffusion cmdapps
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
-    set( diffusioncorecmdapps
-    DwiDenoising^^
-    ImageResampler^^
-    ExportShImage^^
-    CopyGeometry^^
-    Registration^^
-    DiffusionDICOMLoader^^
-    ResampleGradients^^
+    set( diffusionFiberfoxcmdapps
+    Fiberfox^^MitkFiberTracking
     )
 
-    foreach(diffusioncorecmdapp ${diffusioncorecmdapps})
+    foreach(diffusionFiberfoxcmdapp ${diffusiontractographycmdapps})
       # extract cmd app name and dependencies
-      string(REPLACE "^^" "\\;" cmdapp_info ${diffusioncorecmdapp})
+      string(REPLACE "^^" "\\;" cmdapp_info ${diffusionFiberfoxcmdapp})
       set(cmdapp_info_list ${cmdapp_info})
       list(GET cmdapp_info_list 0 appname)
       list(GET cmdapp_info_list 1 raw_dependencies)
@@ -36,10 +30,9 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
         PACKAGE_DEPENDS ITK
       )
     endforeach()
-    
-endif()
 
-mitkFunctionCreateCommandLineApp(
-  NAME Dicom2Nrrd
-  DEPENDS MitkCore ${dependencies_list}
-)
+  if(EXECUTABLE_IS_ENABLED)
+    MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})
+  endif()
+
+  endif()

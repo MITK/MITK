@@ -4,7 +4,6 @@ set( diffusion_module_dirs
       Connectomics
       Quantification
       DiffusionIO
-      cmdapps
       DeepDiffusion
 )
 

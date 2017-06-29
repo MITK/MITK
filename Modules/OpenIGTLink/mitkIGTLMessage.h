@@ -45,7 +45,7 @@ namespace mitk {
       mitkNewMacro2Param(Self, igtl::MessageBase::Pointer,std::string);
 
       /**
-      * \brief type that holds the time at which the data was recorded
+      * \brief type that holds the time at which the data was recorded in milliseconds
       */
       typedef double TimeStampType;
 

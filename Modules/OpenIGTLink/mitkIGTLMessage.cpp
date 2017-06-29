@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageCommon.h"
 
 mitk::IGTLMessage::IGTLMessage() : itk::DataObject(),
-  m_DataValid(false), m_IGTTimeStamp(0.0), m_Name()
+  m_DataValid(false), m_IGTTimeStamp(0), m_Name()
 {
   m_Message = igtl::MessageBase::New();
 }
@@ -79,8 +79,9 @@ void mitk::IGTLMessage::SetMessage(igtl::MessageBase::Pointer msg)
   m_Message = msg;
   unsigned int ts = 0;
   unsigned int frac = 0;
-  m_Message->GetTimeStamp(&ts, &frac);
-  this->SetIGTTimeStamp((double)ts + (double)frac/1000.0);
+  m_Message->GetTimeStamp(&ts, &frac); //ts = seconds / frac = nanoseconds
+  double timestamp = ts * 1000.0 + frac;
+  this->SetIGTTimeStamp(timestamp);
   this->SetDataValid(true);
 }
 

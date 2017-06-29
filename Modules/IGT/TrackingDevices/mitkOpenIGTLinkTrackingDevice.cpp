@@ -87,6 +87,14 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
 
   const char* msgType = receivedMessage->GetIGTLMessageType();
 
+  if (std::string(msgType).empty())
+  {
+    MITK_INFO << "Did not receive a message. Do you have to start the stream manually at the server?";
+    MITK_INFO << "Waiting for 10 seconds ...";
+    receivedMessage = ReceiveMessage(10000);
+    msgType = receivedMessage->GetIGTLMessageType();
+  }
+
   mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
 
   switch (type)
@@ -101,7 +109,7 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
     returnValue = DiscoverToolsFromTransform();
     break;
   default:
-    MITK_INFO << "Server does not send tracking data. Received data is not of a compatible type. Received type: " << msgType;
+    MITK_INFO << "Server does not send tracking data or received data is not of a compatible type. (Received type: " << msgType << ")";
   }
 
 
@@ -222,13 +230,15 @@ mitk::IGTLMessage::Pointer mitk::OpenIGTLinkTrackingDevice::ReceiveMessage(int w
   mitk::IGTLMessage::Pointer receivedMessage;
   //send a message to the server: start tracking stream
   mitk::IGTLMessageFactory::Pointer msgFactory = m_OpenIGTLinkClient->GetMessageFactory();
-  std::string message = "STT_TDATA";
-  igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message);
-  //TODO: Fix this to dynamically get this from GUI
-  ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(m_UpdateRate);
-  m_OpenIGTLinkClient->SendMessage(mitk::IGTLMessage::New(sttMsg));
+  std::string message[2] = {"STT_QTDATA","STT_TDATA"};
 
-
+  for (int i = 0; i < 2; i++)
+  {
+    igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message[i]);
+    //TODO: Fix this to dynamically get this from GUI
+    ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(m_UpdateRate);
+    m_OpenIGTLinkClient->SendMessage(mitk::IGTLMessage::New(sttMsg));
+  }
 
   std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
   std::chrono::milliseconds d = std::chrono::milliseconds(waitingTime);

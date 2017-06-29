@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 BYTE  MotionBuf[0x1FA400];
 
-mitk::PolhemusInterface::PolhemusInterface()
+mitk::PolhemusInterface::PolhemusInterface() : m_continousTracking(false)
 {
 	m_pdiDev = new CPDIdev();
 
@@ -38,6 +38,7 @@ bool mitk::PolhemusInterface::InitializeDevice()
   m_pdiDev->ResetTracker();
   m_pdiDev->ResetSAlignment(-1);
   m_pdiDev->Trace(TRUE, 7);
+  m_continousTracking = false;
   return true;
 }
 
@@ -151,8 +152,11 @@ unsigned int mitk::PolhemusInterface::GetNumberOfTools()
 
 std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetSingleFrame()
 {
-  if (m_continousTracking) return std::vector<mitk::PolhemusInterface::trackingData>();
-
+  if (m_continousTracking)
+  {
+    MITK_WARN << "Cannot get tool count when continously tracking";
+    return std::vector<mitk::PolhemusInterface::trackingData>();
+  }
   PBYTE pBuf;
   DWORD dwSize;
 

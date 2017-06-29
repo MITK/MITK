@@ -79,6 +79,7 @@ void mitk::IGTLMessage::SetMessage(igtl::MessageBase::Pointer msg)
   unsigned int ts = 0;
   unsigned int frac = 0;
   m_Message->GetTimeStamp(&ts, &frac); //ts = seconds / frac = nanoseconds
+  this->SetName(m_Message->GetDeviceName());
   double timestamp = ts * 1000.0 + frac;
   this->SetIGTTimeStamp(timestamp);
   this->SetDataValid(true);

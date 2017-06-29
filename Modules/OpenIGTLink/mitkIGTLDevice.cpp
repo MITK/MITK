@@ -280,9 +280,6 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(mitk::IGTLMessage::Pointer msg
 
   igtl::MessageBase* sendMessage = msg->GetMessage();
 
-  // add the name of this device to the message
-  sendMessage->SetDeviceName(this->GetName().c_str());
-
   // Pack (serialize) and send
   sendMessage->Pack();
 

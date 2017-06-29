@@ -60,13 +60,6 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
   default:
     break;
   }
-  igtl::MessageBase::Pointer curMessage = this->GetOutput()->GetMessage();
-  if (dynamic_cast<igtl::TrackingDataMessage*>(curMessage.GetPointer()) != nullptr)
-  {
-    igtl::TrackingDataMessage* tdMsg =
-      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
-  }
-
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::SetInput(const NavigationData* nd)

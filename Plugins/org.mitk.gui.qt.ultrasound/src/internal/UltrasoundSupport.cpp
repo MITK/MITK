@@ -433,7 +433,7 @@ UltrasoundSupport::~UltrasoundSupport()
     // Get all active devicesand deactivate them to prevent freeze
     for (auto device : this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>())
     {
-      if (device.IsNotNull() && device->GetIsActive())
+      if (device != nullptr && device->GetIsActive())
       {
         device->Deactivate();
         device->Disconnect();

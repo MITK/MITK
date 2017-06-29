@@ -1436,10 +1436,19 @@ endif()
 #------------------------------------------------------------------------------
 # Copy file font.
 #------------------------------------------------------------------------------
-file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/Debug/Fonts)
-file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/Release/Fonts)
-file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/RelWithDebInfo/Fonts)
-file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/MinSizeRel/Fonts)
+foreach (BUILDTYPE Debug Release RelWithDebInfo MinSizeRel)
+  if (IS_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}")
+    file(COPY "${MITK_SOURCE_DIR}/Fonts/DejaVuSans.ttf" DESTINATION "${PROJECT_BINARY_DIR}/bin/
+
+${BUILDTYPE}/Fonts")
+  else()
+    file(REMOVE "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}")
+    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}")
+    file(COPY "${MITK_SOURCE_DIR}/Fonts/DejaVuSans.ttf" DESTINATION "${PROJECT_BINARY_DIR}/bin/
+
+${BUILDTYPE}/Fonts")
+  endif()
+endforeach()
 
 #-----------------------------------------------------------------------------
 # Print configuration summary

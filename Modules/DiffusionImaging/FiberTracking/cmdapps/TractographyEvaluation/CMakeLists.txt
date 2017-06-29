@@ -17,7 +17,7 @@ if(BUILD_DiffusionTractographyEvaluationCmdApps OR MITK_BUILD_ALL_APPS)
     # LocalDirectionalFiberPlausibility^^MitkFiberTracking # HAS TO USE NEW PEAK IMAGE FORMAT
     )
 
-    foreach(diffusionTractographyEvaluationcmdapp ${diffusiontractographycmdapps})
+    foreach(diffusionTractographyEvaluationcmdapp ${diffusionTractographyEvaluationcmdapps})
       # extract cmd app name and dependencies
       string(REPLACE "^^" "\\;" cmdapp_info ${diffusionTractographyEvaluationcmdapp})
       set(cmdapp_info_list ${cmdapp_info})

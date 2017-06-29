@@ -20,7 +20,7 @@ if(BUILD_DiffusionFiberProcessingCmdApps OR MITK_BUILD_ALL_APPS)
     FiberJoin^^MitkFiberTracking
     )
 
-    foreach(diffusionFiberProcessingcmdapp ${diffusiontractographycmdapps})
+    foreach(diffusionFiberProcessingcmdapp ${diffusionFiberProcessingcmdapps})
       # extract cmd app name and dependencies
       string(REPLACE "^^" "\\;" cmdapp_info ${diffusionFiberProcessingcmdapp})
       set(cmdapp_info_list ${cmdapp_info})

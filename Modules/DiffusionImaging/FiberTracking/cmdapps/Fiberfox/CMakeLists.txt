@@ -15,7 +15,7 @@ if(BUILD_DiffusionFiberfoxCmdApps OR MITK_BUILD_ALL_APPS)
     Fiberfox^^MitkFiberTracking
     )
 
-    foreach(diffusionFiberfoxcmdapp ${diffusiontractographycmdapps})
+    foreach(diffusionFiberfoxcmdapp ${diffusionFiberfoxcmdapps})
       # extract cmd app name and dependencies
       string(REPLACE "^^" "\\;" cmdapp_info ${diffusionFiberfoxcmdapp})
       set(cmdapp_info_list ${cmdapp_info})

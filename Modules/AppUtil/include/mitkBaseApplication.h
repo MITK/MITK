@@ -57,15 +57,15 @@ public:
   {
     while (m_working)
     {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-      if (m_progress >= 1.f)
+      boost::this_thread::sleep(boost::posix_time::milliseconds(5));
+      if (m_progress >= .9f)
       {
-        m_progress = 0.f;
-        m_invert ^= m_invert;
+        m_progress = .1f;
+        m_invert = !m_invert;
       }
       else
       {
-        m_progress += .05f;
+        m_progress += .01f;
       }
       m_drawProgress(m_progress, m_invert);
     }

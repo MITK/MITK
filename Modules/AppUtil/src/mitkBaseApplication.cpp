@@ -817,6 +817,7 @@ static const int PROGRESS_X_PX = 200;
 static const int PROGRESS_Y_PX = 650;
 static const int PROGRESS_WIDTH_PX = 870;
 static const int PROGRESS_HEIGHT_PX = 30;
+static const int PROGRESS_ELEMENT_WIDTH = 150;
 
 void BaseApplication::initializeSplashScreen(QCoreApplication * application)
 {
@@ -839,15 +840,20 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
       {
         QPainter splashPainter;
         splashPainter.begin(&pixmap);
+        auto progressAbsolute = progress * PROGRESS_WIDTH_PX;
         if (invert)
         {
+          auto progressStart = PROGRESS_X_PX + PROGRESS_WIDTH_PX - progressAbsolute - PROGRESS_ELEMENT_WIDTH;
+          if (progressStart < PROGRESS_X_PX) progressStart = PROGRESS_X_PX;
           splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::gray );
-          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, progress * PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::darkCyan);
+          splashPainter.fillRect( progressStart, PROGRESS_Y_PX, PROGRESS_ELEMENT_WIDTH, PROGRESS_HEIGHT_PX, Qt::darkCyan );
         }
         else
         {
-          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::darkCyan );
-          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, progress * PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::gray );
+          auto progressStart = PROGRESS_X_PX + progressAbsolute;
+          if (progressStart > PROGRESS_X_PX + PROGRESS_WIDTH_PX - PROGRESS_ELEMENT_WIDTH) progressStart = PROGRESS_X_PX + PROGRESS_WIDTH_PX - PROGRESS_ELEMENT_WIDTH;
+          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::gray );
+          splashPainter.fillRect( progressStart, PROGRESS_Y_PX, PROGRESS_ELEMENT_WIDTH, PROGRESS_HEIGHT_PX, Qt::darkCyan);
         }
         d->m_Splashscreen->setPixmap(d->m_Splashscreen->pixmap());
         splashPainter.end();
@@ -855,7 +861,8 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
         application->processEvents();
       };
       d->m_Splashscreen->show();
-      m_drawProgress(.05f, false);
+      ///Init
+      m_drawProgress(.1f, false);
       ///Closing callback for splashscreen
       d->m_SplashscreenClosingCallback =
           new SplashCloserCallback(d->m_Splashscreen, m_drawProgress);

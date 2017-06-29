@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     mitkCommandLineParser parser;
 
     parser.setTitle("Tractometer Metrics");
-    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setCategory("Fiber Tracking Evaluation");
     parser.setDescription("Calculates the Tractometer evaluation metrics for tractograms (http://www.tractometer.org/)");
     parser.setContributor("MIC");
 

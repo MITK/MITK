@@ -61,11 +61,6 @@ int main(int argc, char* argv[])
   parser.addArgument("startDensity", "d", mitkCommandLineParser::Float, "Start Density", "Largest density for the range",1.0);
   parser.addArgument("thresholdStepSize", "t", mitkCommandLineParser::Int, "Step size threshold", "Distance of two adjacent thresholds",3);
 
-  parser.setCategory("Connectomics");
-  parser.setTitle("Network Statistics");
-  parser.setDescription("");
-  parser.setContributor("MIC");
-
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;

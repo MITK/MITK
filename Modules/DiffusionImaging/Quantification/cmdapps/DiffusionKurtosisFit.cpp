@@ -172,7 +172,7 @@ int main( int argc, char* argv[] )
   mitkCommandLineParser parser;
 
   parser.setTitle("Diffusion Kurtosis Fit");
-  parser.setCategory("Signal Reconstruction");
+  parser.setCategory("Diffusion Related Measures");
   parser.setContributor("MIC");
   parser.setDescription("Fitting Kurtosis");
   parser.setArgumentPrefix("--","-");

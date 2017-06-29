@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose", "output optional and intermediate calculation results");
     parser.addArgument("ignore", "i", mitkCommandLineParser::Bool, "Ignore", "don't increase error for missing or too many directions");
 
-    parser.setCategory("Preprocessing Tools");
+    parser.setCategory("Fiber Tracking Evaluation");
     parser.setTitle("Peaks Angular Error");
     parser.setDescription("Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)");
     parser.setContributor("MIC");

@@ -24,6 +24,12 @@ if(MITK_USE_Caffe)
     find_path(Boost_INCLUDE_DIR boost)
     find_library(Boost_LIBRARY boost_system)    
     get_filename_component(Boost_LIBRARY_DIR ${Boost_LIBRARY} DIRECTORY)
+    
+    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+      find_library(GFLAGS_LIBRARY gflagsd PATHS ${ep_prefix}/lib NO_DEFAULT_PATH) 
+    else()
+      find_library(GFLAGS_LIBRARY gflags PATHS ${ep_prefix}/lib NO_DEFAULT_PATH) 
+    endif()
         
     #set(revision_tag 63cad96)
     ExternalProject_Add(${proj}
@@ -39,6 +45,7 @@ if(MITK_USE_Caffe)
          -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
          -DBoost_LIBRARY_DIR_RELEASE:PATH=${Boost_LIBRARY_DIR}
          -DBoost_LIBRARY_DIR_DEBUG:PATH=${Boost_LIBRARY_DIR}
+         -DGFLAGS_LIBRARY:FILEPATH=${GFLAGS_LIBRARY}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
        CMAKE_CACHE_DEFAULT_ARGS

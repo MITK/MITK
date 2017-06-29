@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     parser.addArgument("outputCoeffs", "shc", mitkCommandLineParser::Bool, "Output coefficients", "output file containing the SH coefficients");
     parser.addArgument("mrtrix", "mb", mitkCommandLineParser::Bool, "MRtrix", "use MRtrix compatible spherical harmonics definition");
 
-    parser.setCategory("Preprocessing Tools");
+    parser.setCategory("Signal Modelling");
     parser.setTitle("Qball Reconstruction");
     parser.setDescription("");
     parser.setContributor("MIC");

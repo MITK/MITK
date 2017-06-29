@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setTitle("Caffe2Test");
-  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setCategory("MITK Diffusion Deep Learning");
   parser.setContributor("MIC");
   parser.setDescription("Minimal example for Caffe2 prediction in MITK");
   parser.setArgumentPrefix("--", "-");

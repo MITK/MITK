@@ -44,11 +44,6 @@ int main(int argc, char* argv[])
   parser.addArgument("radius", "r", mitkCommandLineParser::Int, "Radius", "Search radius in mm", 15, true);
   parser.addArgument("noCenterOfMass", "com", mitkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
 
-  parser.setCategory("Connectomics");
-  parser.setTitle("Network Creation");
-  parser.setDescription("");
-  parser.setContributor("MIC");
-
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;

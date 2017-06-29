@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setTitle("Fiberfox");
-  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setCategory("Diffusion Simulation Tools");
   parser.setContributor("MIC");
   parser.setDescription("Command line interface to Fiberfox."
                         " Simulate a diffusion-weighted image from a tractogram using the specified parameter file.");

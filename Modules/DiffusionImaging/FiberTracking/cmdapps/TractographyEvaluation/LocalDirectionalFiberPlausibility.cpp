@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     mitkCommandLineParser parser;
 
     parser.setTitle("Local Directional Fiber Plausibility");
-    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setCategory("Fiber Tracking Evaluation");
     parser.setDescription("Calculate angular error of a tractogram with respect to the input reference directions.");
     parser.setContributor("MIC");
 

@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     mitkCommandLineParser parser;
 
     parser.setTitle("Format Converter");
-    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setCategory("Preprocessing Tools");
     parser.setDescription("Load image and save as specified file type.");
     parser.setContributor("MIC");
 

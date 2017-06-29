@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
     parser.addArgument("b0Threshold", "t", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
 
-    parser.setCategory("Preprocessing Tools");
+    parser.setCategory("Signal Modelling");
     parser.setTitle("Tensor Reconstruction");
     parser.setDescription("");
     parser.setContributor("MIC");

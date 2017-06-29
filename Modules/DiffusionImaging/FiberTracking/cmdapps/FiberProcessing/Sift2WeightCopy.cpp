@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle", us::Any(), false);
     parser.addArgument("weights", "w", mitkCommandLineParser::String, "Weights:", "input weights file (.txt)", us::Any(), false);
-    parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output fiber bundle", us::Any(), false);
+    parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output fiber bundle (.fib)", us::Any(), false);
 
 
     std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

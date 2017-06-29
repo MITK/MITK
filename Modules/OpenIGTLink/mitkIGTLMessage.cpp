@@ -37,11 +37,10 @@ mitk::IGTLMessage::~IGTLMessage()
 {
 }
 
-mitk::IGTLMessage::IGTLMessage(igtl::MessageBase::Pointer message,
-                               std::string name)
+mitk::IGTLMessage::IGTLMessage(igtl::MessageBase::Pointer message)
 {
   this->SetMessage(message);
-  this->SetName(name);
+  this->SetName(message->GetDeviceName());
 }
 
 void mitk::IGTLMessage::Graft( const DataObject *data )

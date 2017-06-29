@@ -233,7 +233,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         else
         {
           if(m_LogMessages)
-            MITK_INFO << "Received Message: " << mitk::IGTLMessage::New(curMessage, "")->ToString();
+            MITK_INFO << "Received Message: " << mitk::IGTLMessage::New(curMessage)->ToString();
           this->m_MessageQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -437,7 +437,7 @@ bool mitk::IGTLDevice::SendRTSMessage(const char* type)
   //necessary to send one back
   if (rtsMsg.IsNotNull())
   {
-    this->SendMessage(mitk::IGTLMessage::New(rtsMsg, returnType));
+    this->SendMessage(mitk::IGTLMessage::New(rtsMsg));
     return true;
   }
   else

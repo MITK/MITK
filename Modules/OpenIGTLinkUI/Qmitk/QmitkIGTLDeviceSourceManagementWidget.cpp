@@ -222,7 +222,7 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
 
   igtl::StringMessage::Pointer msg = igtl::StringMessage::New();
   msg->SetString(toBeSend);
-  this->m_IGTLDevice->SendMessage(mitk::IGTLMessage::New((igtl::MessageBase::Pointer)msg, toBeSend));
+  this->m_IGTLDevice->SendMessage(mitk::IGTLMessage::New((igtl::MessageBase::Pointer)msg));
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived()

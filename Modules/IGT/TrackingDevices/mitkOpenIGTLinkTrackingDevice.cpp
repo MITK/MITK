@@ -226,7 +226,7 @@ mitk::IGTLMessage::Pointer mitk::OpenIGTLinkTrackingDevice::ReceiveMessage(int w
   igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message);
   //TODO: Fix this to dynamically get this from GUI
   ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(m_UpdateRate);
-  m_OpenIGTLinkClient->SendMessage(mitk::IGTLMessage::New(sttMsg, message));
+  m_OpenIGTLinkClient->SendMessage(mitk::IGTLMessage::New(sttMsg));
 
 
 

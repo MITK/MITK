@@ -52,7 +52,6 @@ namespace mitk
       */
     void SetInterPointDistance(int d);
 
-    using Superclass::SetInput;
     /** @brief Sets the input surface. This parameter must be set before calculation is started. */
     void SetInput(mitk::Surface::Pointer input);
 

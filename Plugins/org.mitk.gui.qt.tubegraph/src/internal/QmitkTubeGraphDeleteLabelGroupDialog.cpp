@@ -87,6 +87,6 @@ QStringList QmitkTubeGraphDeleteLabelGroupDialog::GetSelectedLabelGroups()
 
 void QmitkTubeGraphDeleteLabelGroupDialog::SetLabelGroups(const QStringList &labelGroups)
 {
-  for (QStringList::iterator iterator = labelGroups.begin(); iterator != labelGroups.end(); iterator++)
-  labelGroupListWidget->addItem(*iterator);
+  for (const auto &labelGroup : labelGroups)
+    labelGroupListWidget->addItem(labelGroup);
 }

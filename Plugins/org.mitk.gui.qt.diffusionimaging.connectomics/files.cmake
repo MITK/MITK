@@ -10,6 +10,8 @@ set(INTERNAL_CPP_FILES
   QmitkNetworkHistogramCanvas.cpp
   QmitkRandomParcellationView.cpp
   
+  Perspectives/QmitkConnectomicsPerspective.cpp
+  
   mitkPluginActivator.cpp
 )
 
@@ -24,6 +26,8 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
+  
+  src/internal/Perspectives/QmitkConnectomicsPerspective.h
   
   src/internal/QmitkConnectomicsDataView.h
   src/internal/QmitkConnectomicsNetworkOperationsView.h
@@ -42,6 +46,7 @@ set(CACHED_RESOURCE_FILES
   resources/QmitkConnectomicsNetworkOperationsViewIcon_48.png
   resources/QmitkConnectomicsStatisticsViewIcon_48.png
   resources/QmitkRandomParcellationIcon.png
+  resources/parcellation.png
 )
 
 set(QRC_FILES

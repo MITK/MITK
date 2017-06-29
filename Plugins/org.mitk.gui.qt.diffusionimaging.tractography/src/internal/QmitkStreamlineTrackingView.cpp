@@ -53,7 +53,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTensorImageToQBallImageFilter.h>
 #include <omp.h>
 
-
 const std::string QmitkStreamlineTrackingView::VIEW_ID = "org.mitk.views.streamlinetracking";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
@@ -119,6 +118,9 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 
   if ( m_Controls->m_InteractiveBox->isChecked() )
   {
+    QApplication::setOverrideCursor(Qt::PointingHandCursor);
+    QApplication::processEvents();
+
     m_InteractiveNode = mitk::DataNode::New();
 
     QString name("InteractiveFib");
@@ -159,6 +161,9 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
   }
   else
   {
+    QApplication::restoreOverrideCursor();
+    QApplication::processEvents();
+
     m_InteractiveNode = nullptr;
     m_InteractivePointSetNode = nullptr;
 

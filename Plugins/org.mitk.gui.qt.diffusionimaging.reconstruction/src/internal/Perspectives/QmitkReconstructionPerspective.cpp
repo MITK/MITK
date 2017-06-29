@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkStreamlineTractographyPerspective.h"
+#include "QmitkReconstructionPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkStreamlineTractographyPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkReconstructionPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
     /////////////////////////////////////////////////////
     // all di-app perspectives should have the following:
@@ -44,6 +44,9 @@ void QmitkStreamlineTractographyPerspective::CreateInitialLayout(berry::IPageLay
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
-    left->AddView("org.mitk.views.streamlinetracking");
-    left->AddView("org.mitk.views.segmentation");
+    left->AddView("org.mitk.views.tensorreconstruction");
+    left->AddView("org.mitk.views.qballreconstruction");
+    left->AddView("org.mitk.views.diffusionquantification");
+    left->AddView("org.mitk.views.diffusionpreprocessing");
+    left->AddView("org.mitk.views.odfdetails");
 }

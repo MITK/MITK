@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
+    <width>380</width>
     <height>1563</height>
    </rect>
   </property>
@@ -247,7 +247,7 @@
       <item>
        <widget class="QTabWidget" name="m_ModelTabSelectionWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="m_IVIMTab">
          <property name="sizePolicy">

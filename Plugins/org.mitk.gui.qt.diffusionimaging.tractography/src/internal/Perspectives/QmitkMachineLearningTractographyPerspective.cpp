@@ -44,7 +44,7 @@ void QmitkMachineLearningTractographyPerspective::CreateInitialLayout(berry::IPa
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
-    left->AddView("org.mitk.views.diffusionpreprocessing");
-    left->AddView("org.mitk.views.segmentation");
     left->AddView("org.mitk.views.mlbtview");
+    left->AddView("org.mitk.views.segmentation");
+    left->AddView("org.mitk.views.diffusionpreprocessing");
 }

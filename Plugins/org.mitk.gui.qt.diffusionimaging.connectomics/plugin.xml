@@ -38,4 +38,16 @@
 	
   </extension>
   
+  
+    <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.connectomics"
+    name="Connectomics"
+    class="QmitkConnectomicsPerspective"
+    icon="resources/parcellation.png">
+    <keywordReference id="org.mitk.perspectives.connectomics.Keyword"/>
+    </perspective>
+  
+  </extension>  
+  
 </plugin>

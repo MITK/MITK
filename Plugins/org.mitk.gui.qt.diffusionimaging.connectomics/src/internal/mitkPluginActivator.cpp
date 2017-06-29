@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkConnectomicsNetworkOperationsView.h"
 #include "src/internal/QmitkConnectomicsStatisticsView.h"
 #include "src/internal/QmitkRandomParcellationView.h"
+#include "src/internal/Perspectives/QmitkConnectomicsPerspective.h"
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 
@@ -30,6 +31,8 @@ ctkPluginContext* mitk::PluginActivator::GetContext()
 
 void mitk::PluginActivator::start(ctkPluginContext* context)
 {
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsPerspective, context)
+  
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsDataView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsNetworkOperationsView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsStatisticsView, context)

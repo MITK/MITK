@@ -35,9 +35,6 @@
     
   </extension>
   
-  
-  
-
   <extension point="org.blueberry.ui.keywords">
 
   <keyword label="processing" id="org.mitk.views.fiberprocessing.Keyword"/>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>358</width>
-    <height>779</height>
+    <height>878</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -408,6 +408,9 @@
         <property name="toolTip">
          <string>Shorter fibers are discarded.</string>
         </property>
+        <property name="statusTip">
+         <string>Minimum fiber length (in mm)</string>
+        </property>
         <property name="decimals">
          <number>1</number>
         </property>
@@ -618,7 +621,7 @@
          <string>Requires tissue image.</string>
         </property>
         <property name="text">
-         <string>Enable gray matter seeding</string>
+         <string>Enable Gray Matter Seeding</string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -631,7 +634,7 @@
          <string/>
         </property>
         <property name="text">
-         <string>Min-max normalize ODFs</string>
+         <string>Min-max Normalize ODFs</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -644,7 +647,7 @@
          <string>Output probability map instead of tractogram.</string>
         </property>
         <property name="text">
-         <string>Output probability map</string>
+         <string>Output Probability Map</string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -679,7 +682,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Interactive Tracking</string>
+      <string>Interactive Tractography</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="1" column="0">
@@ -697,8 +700,11 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="toolTip">
+         <string>Dynamically pick seed location by click into image.</string>
+        </property>
         <property name="text">
-         <string>Enable interactive tracking</string>
+         <string>Enable Interactive Tractography</string>
         </property>
        </widget>
       </item>
@@ -731,7 +737,7 @@
       <item row="1" column="1">
        <widget class="QDoubleSpinBox" name="m_SeedRadiusBox">
         <property name="toolTip">
-         <string>Seedpoints are normally distributed within a sphere centered at the selected position with the specified radius.</string>
+         <string>Seedpoints are normally distributed within a sphere centered at the selected position with the specified radius (in mm).</string>
         </property>
         <property name="decimals">
          <number>2</number>

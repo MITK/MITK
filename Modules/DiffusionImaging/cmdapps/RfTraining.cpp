@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     MITK_INFO << "RfTraining";
     mitkCommandLineParser parser;
 
-    parser.setTitle("Training for Machine Learning Based Streamline Tractography");
+    parser.setTitle("Trains Random Forests for Machine Learning Based Tractography");
     parser.setCategory("Fiber Tracking and Processing Methods");
     parser.setDescription("Train random forest classifier for machine learning based streamline tractography");
     parser.setContributor("MBI");

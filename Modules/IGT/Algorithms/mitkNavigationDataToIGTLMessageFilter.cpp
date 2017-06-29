@@ -183,7 +183,8 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
     igtl::PositionMessage::Pointer posMsg = igtl::PositionMessage::New();
     posMsg->SetPosition(pos[0], pos[1], pos[2]);
     posMsg->SetQuaternion(ori[0], ori[1], ori[2], ori[3]);
-    posMsg->SetTimeStamp(ConvertToIGTLTimeStamp(input->GetIGTTimeStamp()));
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(input->GetIGTTimeStamp());
+    posMsg->SetTimeStamp(timestamp);
     posMsg->SetDeviceName(input->GetName());
     posMsg->Pack();
 
@@ -217,7 +218,8 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
     igtl::TransformMessage::Pointer transMsg = igtl::TransformMessage::New();
     transMsg->SetMatrix(igtlTransform);
     transMsg->SetPosition(position[0], position[1], position[2]);
-    transMsg->SetTimeStamp(ConvertToIGTLTimeStamp(input->GetIGTTimeStamp()));
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(input->GetIGTTimeStamp());
+    transMsg->SetTimeStamp(timestamp);
     transMsg->SetDeviceName(input->GetName());
     transMsg->Pack();
 
@@ -328,7 +330,8 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
     tdMsg->AddTrackingDataElement(tde);
 
     //copy the time stamp
-    tdMsg->SetTimeStamp(ConvertToIGTLTimeStamp(nd->GetIGTTimeStamp()));
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(nd->GetIGTTimeStamp());
+    tdMsg->SetTimeStamp(timestamp);
   }
   tdMsg->Pack();
   //add the igtl message to the mitk::IGTLMessage

@@ -1437,17 +1437,11 @@ endif()
 # Copy file font.
 #------------------------------------------------------------------------------
 foreach (BUILDTYPE Debug Release RelWithDebInfo MinSizeRel)
-  if (IS_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}")
-    file(COPY "${MITK_SOURCE_DIR}/Fonts/DejaVuSans.ttf" DESTINATION "${PROJECT_BINARY_DIR}/bin/
-
-${BUILDTYPE}/Fonts")
-  else()
+  if (NOT IS_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}")
     file(REMOVE "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}")
     file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}")
-    file(COPY "${MITK_SOURCE_DIR}/Fonts/DejaVuSans.ttf" DESTINATION "${PROJECT_BINARY_DIR}/bin/
-
-${BUILDTYPE}/Fonts")
   endif()
+  file(COPY "${MITK_SOURCE_DIR}/Fonts/DejaVuSans.ttf" DESTINATION "${PROJECT_BINARY_DIR}/bin/${BUILDTYPE}/Fonts")
 endforeach()
 
 #-----------------------------------------------------------------------------

@@ -332,18 +332,14 @@ void QmitkMLBTView::StartTracking()
     tracker->SetStepSize(m_Controls->m_TrackingStepSizeBox->value());
     tracker->SetMinTractLength(m_Controls->m_MinLengthBox->value());
     tracker->SetMaxTractLength(m_Controls->m_MaxLengthBox->value());
-    tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
+    tracker->SetAposterioriCurvCheck(false);
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
-    tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
     tracker->SetTrackingHandler(m_ForestHandler);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
-    tracker->SetDeflectionMod(m_Controls->m_DeflectionModBox->value());
-    tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());
-    tracker->SetUseStopVotes(m_Controls->m_UseStopVotes->isChecked());
+    tracker->SetUseStopVotes(m_Controls->m_OnlyForwardSamples->isChecked());
     tracker->SetOnlyForwardSamples(m_Controls->m_OnlyForwardSamples->isChecked());
     tracker->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
     tracker->SetSeedOnlyGm(m_Controls->m_SeedGm->isChecked());
-    tracker->SetAngularThreshold(45);
     tracker->Update();
 }
 
@@ -375,6 +371,10 @@ void QmitkMLBTView::StartTrainingThread()
     QFuture<void> future = QtConcurrent::run( this, &QmitkMLBTView::StartTraining );
     m_TrainingWatcher.setFuture(future);
     m_Controls->m_StartTrainingButton->setEnabled(false);
+    m_Controls->m_StartTrainingButton->setText("Training in progress ...");
+    m_Controls->m_StartTrainingButton->setToolTip("Training in progress. This can take up to a couple of hours.");
+    m_Controls->m_StartTrainingButton->setCursor(Qt::WaitCursor);
+    QApplication::processEvents();
     m_Controls->m_SaveForestButton->setEnabled(false);
     m_Controls->m_LoadForestButton->setEnabled(false);
 }
@@ -384,7 +384,12 @@ void QmitkMLBTView::OnTrainingThreadStop()
     m_Controls->m_StartTrainingButton->setEnabled(true);
     m_Controls->m_SaveForestButton->setEnabled(true);
     m_Controls->m_LoadForestButton->setEnabled(true);
+    m_Controls->m_StartTrainingButton->setCursor(Qt::ArrowCursor);
+    m_Controls->m_StartTrainingButton->setText("Start Training");
+    m_Controls->m_StartTrainingButton->setToolTip("Start Training. This can take up to a couple of hours.");
+    m_LastLoadedForestName = "new_forest";
     UpdateGui();
+    QApplication::processEvents();
 }
 
 void QmitkMLBTView::StartTraining()
@@ -430,8 +435,6 @@ void QmitkMLBTView::StartTraining()
     m_ForestHandler->SetSampleFraction(m_Controls->m_SampleFractionBox->value());
     m_ForestHandler->SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
     m_ForestHandler->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
-    m_ForestHandler->SetBidirectionalFiberSampling(m_Controls->m_BidirectionalSampling->isChecked());
-    m_ForestHandler->SetZeroDirWmFeatures(m_Controls->m_ZeroDirBox->isChecked());
     m_ForestHandler->StartTraining();
 }
 

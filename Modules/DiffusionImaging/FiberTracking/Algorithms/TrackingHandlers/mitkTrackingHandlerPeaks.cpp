@@ -70,6 +70,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
   float mag = oldDir.magnitude();
   if (mag<mitk::eps)
   {
+    bool found = false;
     // try m_NumDirs times to get a non-zero random direction
     for (int j=0; j<m_NumDirs; j++)
     {
@@ -81,20 +82,24 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
         oldDir[0] = out_dir[0];
         oldDir[1] = out_dir[1];
         oldDir[2] = out_dir[2];
+        found = true;
         break;
       }
     }
 
-    // if you didn't find a non-zero random direction, take first non-zero direction you find
-    for (int i=0; i<m_NumDirs; i++)
+    if (!found)
     {
-      out_dir = GetDirection(idx3, i);
-      if (out_dir.magnitude()>mitk::eps)
+      // if you didn't find a non-zero random direction, take first non-zero direction you find
+      for (int i=0; i<m_NumDirs; i++)
       {
-        oldDir[0] = out_dir[0];
-        oldDir[1] = out_dir[1];
-        oldDir[2] = out_dir[2];
-        break;
+        out_dir = GetDirection(idx3, i);
+        if (out_dir.magnitude()>mitk::eps)
+        {
+          oldDir[0] = out_dir[0];
+          oldDir[1] = out_dir[1];
+          oldDir[2] = out_dir[2];
+          break;
+        }
       }
     }
   }
@@ -228,14 +233,14 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3
     }
   }
   else
-      dir = GetMatchingDirection(idx3, oldDir);
+    dir = GetMatchingDirection(idx3, oldDir);
 
   return dir;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
-    // CHECK: wann wird wo normalisiert
+  // CHECK: wann wird wo normalisiert
   vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);
 
   itk::Index<3> index;
@@ -255,7 +260,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
     output_direction.normalize();
     float a = 1;
     if (old_mag>0.5)
-        a = dot_product(output_direction, oldDir);
+      a = dot_product(output_direction, oldDir);
     if (a>m_AngularThreshold)
       output_direction *= mag;
     else

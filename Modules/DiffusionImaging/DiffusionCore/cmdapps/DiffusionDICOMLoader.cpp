@@ -203,7 +203,7 @@ int main(int argc, char* argv[])
   parser.setTitle("Diffusion Dicom Loader");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("Loads Diffusion Dicom files.");
-  parser.setContributor("MBI");
+  parser.setContributor("MIC");
 
   parser.addArgument("inputdir", "i", mitkCommandLineParser::InputDirectory, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output File Name", "output file", us::Any(), false);

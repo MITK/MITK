@@ -84,4 +84,16 @@
   
   </extension>  
   
+  
+  <extension point="org.blueberry.ui.perspectives">
+  
+    <perspective id="org.mitk.perspectives.reconstruction1"
+    name="ODF Reconstruction/Signal Modelling"
+    class="QmitkReconstructionPerspective"
+    icon="resources/qball.png">
+    <keywordReference id="org.mitk.perspectives.reconstruction1.Keyword"/>
+    </perspective>
+    
+  </extension>  
+  
 </plugin>

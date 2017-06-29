@@ -236,7 +236,7 @@ int main( int argc, char* argv[] )
   parser.setTitle("Folder Registration");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("For detail description see http://docs.mitk.org/nightly/DiffusionMiniApps.html");
-  parser.setContributor("MBI");
+  parser.setContributor("MIC");
 
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help", "Show this help text");

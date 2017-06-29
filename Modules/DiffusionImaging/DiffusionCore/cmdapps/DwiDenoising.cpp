@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 
   parser.setTitle("DWI Denoising");
   parser.setCategory("Preprocessing Tools");
-  parser.setContributor("MBI");
+  parser.setContributor("MIC");
   parser.setDescription("Denoising for diffusion weighted images using a non-local means algorithm.");
 
   parser.setArgumentPrefix("--", "-");

@@ -44,7 +44,7 @@ void QmitkGibbsTractographyPerspective::CreateInitialLayout(berry::IPageLayout::
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
-    left->AddView("org.mitk.views.tensorreconstruction");
-    left->AddView("org.mitk.views.qballreconstruction");
     left->AddView("org.mitk.views.gibbstracking");
+    left->AddView("org.mitk.views.qballreconstruction");
+    left->AddView("org.mitk.views.tensorreconstruction");
 }

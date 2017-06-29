@@ -44,7 +44,6 @@ void QmitkStreamlineTractographyPerspective::CreateInitialLayout(berry::IPageLay
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
-    left->AddView("org.mitk.views.tensorreconstruction");
-    left->AddView("org.mitk.views.segmentation");
     left->AddView("org.mitk.views.streamlinetracking");
+    left->AddView("org.mitk.views.segmentation");
 }

@@ -5,7 +5,9 @@
 
 Available sections:
   - \ref StrTrackUserManualInputData
+  - \ref StrTrackUserManualInteractive
   - \ref StrTrackUserManualParameters
+  - \ref StrTrackUserManualAdvancedParameters
   - \ref StrTrackUserManualReferences
 
 \section StrTrackUserManualInputData Input Data
@@ -24,6 +26,10 @@ Optional Input:
 \li Tissue label image needed for gray matter seeding (WM=3, GM=1). Use e.g. MRtrix 5ttgen to generate such a label image.
 \li FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
 
+\section StrTrackUserManualInteractive Interactive Tractography
+
+Interactive tractography enables the dynamic placement of spherical seed regions simply by clicking into the image. Parameters are the number of seed points and the radius of the spherical seed region. The seed points are randomly distributed inside the sphere around the selected position. By clicking and holding the left mouse button while moving the mouse around the image, the fiber connections originating from the selected region can be explored dynamically.
+
 \section StrTrackUserManualParameters Parameters
 
 \li Mode: Toggle between deterministic and probabilistic tractography. Peak tracking only supports deterministic mode. The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF.
@@ -31,7 +37,7 @@ Optional Input:
 \li Max. num. fibers: Tractography is stopped after the desired number of fibers is reached, even before all seed points are processed.
 \li Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated.
 
-\section StrTrackUserManualParameters Advanced Parameters
+\section StrTrackUserManualAdvancedParameters Advanced Parameters
 \li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
 \li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 \li Min. Tract Length: Shorter fibers are discarded.
@@ -40,8 +46,9 @@ Optional Input:
 \li Neighborhood Samples: Number of neighborhood samples that are used to determine the next fiber progression direction [4].
 \li Compress Fibers: Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
 \li Enable Trilinear Interpolation: By default the image values are interpolated. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
-\li Min-max normalize ODFs
-
+\li Min-max normalize ODFs: ODFs are min-max normalized before tractography. This results in sharper ODFs.
+\li Output Probability Map: No streamline are generated. Instead, the tractography outputs a probability map that indicates the probability of a fiber to reach a voxel from the selected seed region. For this measure to be sensible, the number of seeds per voxel needs to be rather large. This option does not work during interactive tractography.
+\li Enable Gray Matter Seeding: Seeds are onyl placed inside of the gray matter. Needs tissue label image.
 
 \section StrTrackUserManualReferences References
 

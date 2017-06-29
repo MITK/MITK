@@ -15,7 +15,7 @@
   </extension>
      
 
-  <extension point="org.blueberry.ui.keywords">
+  <extension point="org.blueberry.ui.perspectives">
 
     <perspective id="org.mitk.perspectives.ivim"
     name="Intra-Voxel Incoherent Motion (IVIM)"

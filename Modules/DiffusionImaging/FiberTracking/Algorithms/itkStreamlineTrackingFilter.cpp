@@ -212,7 +212,6 @@ void StreamlineTrackingFilter::BeforeTracking()
 
   if (m_DemoMode)
     omp_set_num_threads(1);
-  omp_set_num_threads(1);
 
   if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::MODE::DETERMINISTIC)
     std::cout << "StreamlineTracking - Mode: deterministic" << std::endl;

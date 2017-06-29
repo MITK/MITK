@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     parser.setTitle("Copy Geometry");
     parser.setCategory("Preprocessing Tools");
     parser.setDescription("Copies transformation matrix of one image to another");
-    parser.setContributor("MBI");
+    parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);

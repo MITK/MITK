@@ -16,13 +16,9 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     ImageResampler^^
     ExportShImage^^
     CopyGeometry^^
-    DiffusionIndices^^
-    QballReconstruction^^
     Registration^^
-    TensorReconstruction^^
-    TensorDerivedMapsExtraction^^
     DiffusionDICOMLoader^^
-    DiffusionKurtosisFit^^
+    ResampleGradients^^
     )
 
     foreach(diffusioncorecmdapp ${diffusioncorecmdapps})
@@ -40,5 +36,10 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
         PACKAGE_DEPENDS ITK
       )
     endforeach()
+    
+endif()
 
-  endif()
+mitkFunctionCreateCommandLineApp(
+  NAME Dicom2Nrrd
+  DEPENDS MitkCore ${dependencies_list}
+)

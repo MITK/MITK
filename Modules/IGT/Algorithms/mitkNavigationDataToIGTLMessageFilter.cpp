@@ -29,7 +29,6 @@ mitk::NavigationDataToIGTLMessageFilter::NavigationDataToIGTLMessageFilter()
   mitk::IGTLMessage::Pointer output = mitk::IGTLMessage::New();
   this->SetNumberOfRequiredOutputs(1);
   this->SetNthOutput(0, output.GetPointer());
-
   this->SetNumberOfRequiredInputs(1);
 
   //  m_OperationMode = Mode3D;
@@ -165,7 +164,7 @@ void ConvertAffineTransformationIntoIGTLMatrix(mitk::AffineTransform3D* trans,
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -195,7 +194,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -340,7 +339,6 @@ void mitk::NavigationDataToIGTLMessageFilter::SetOperationMode(OperationMode mod
 {
   m_OperationMode = mode;
   this->Modified();
-  this->CreateOutputsForAllInputs();
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::ConnectTo(

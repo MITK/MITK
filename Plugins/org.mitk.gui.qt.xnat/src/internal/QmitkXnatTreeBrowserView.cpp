@@ -1249,7 +1249,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       catch(const ctkRuntimeException& exc)
       {
         //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-        !QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
+        QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         project->remove(subject);
         delete subject;
         return;

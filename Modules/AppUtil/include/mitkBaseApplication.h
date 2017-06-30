@@ -27,14 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Util/Application.h>
 
 #include <QHash>
+#include <QVariant>
 #include <QString>
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QTranslator>
 #include <QRunnable>
 #include <QSplashScreen>
-
-class QCoreApplication;
+#include <QCoreApplication>
 
 class ctkPluginContext;
 class ctkPluginFramework;
@@ -44,46 +44,51 @@ namespace mitk {
 class SplashCloserCallback : public QRunnable
 {
 public:
-  SplashCloserCallback(QSplashScreen* splashscreen, std::function<void(float, bool)> drawProgress)
-    : m_working(true)
-    , m_invert(false)
+  SplashCloserCallback(QSplashScreen* splashscreen, std::function<void(float, bool)> drawProgress, QCoreApplication* app)
+    : m_App(app)
+    , m_Working(true)
+    , m_Invert(false)
+    , m_Splashscreen(splashscreen)
+    , m_DrawProgress(drawProgress)
   {
-    this->m_Splashscreen = splashscreen;
-    this->m_drawProgress = drawProgress;
-    m_workThread = boost::thread(boost::bind(&SplashCloserCallback::update, this));
+    m_App->setProperty("loading", QVariant(true));
+    m_WorkThread = boost::thread(boost::bind(&SplashCloserCallback::update, this));
   }
 
   void update()
   {
-    while (m_working)
+    while(m_Working)
     {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(5));
-      if (m_progress >= .9f)
+      if (m_Progress >= .9f)
       {
-        m_progress = .1f;
-        m_invert = !m_invert;
+        m_Progress = .1f;
+        m_Invert = !m_Invert;
       }
       else
       {
-        m_progress += .01f;
+        m_Progress += .01f;
       }
-      m_drawProgress(m_progress, m_invert);
+      m_DrawProgress(m_Progress, m_Invert);
+      boost::this_thread::sleep(boost::posix_time::milliseconds(5));
+      m_Working = m_App->property("loading").toBool();
     }
+    m_Splashscreen->close();
   }
 
   void run()
   {
-    m_working = false;
-    this->m_Splashscreen->close();
+    ///logics moved to update and qApp property checks
+    //m_Splashscreen->close();
   }
 
 private:
-  bool m_working;
-  bool m_invert;
-  float m_progress = 0.f;
-  boost::thread m_workThread;
+  QCoreApplication* m_App;
+  bool m_Working;
+  bool m_Invert;
+  float m_Progress = 0.f;
+  boost::thread m_WorkThread;
   QSplashScreen* m_Splashscreen;
-  std::function<void(float, bool)> m_drawProgress;
+  std::function<void(float, bool)> m_DrawProgress;
 };
 
 /**

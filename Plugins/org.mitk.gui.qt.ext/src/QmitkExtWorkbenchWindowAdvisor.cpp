@@ -884,6 +884,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     auto   memoryIndicator = new QmitkMemoryUsageIndicatorView();
     qStatusBar->addPermanentWidget(memoryIndicator, 0);
   }
+
+  ///Close splash screen
+  qApp->setProperty("loading", QVariant(false));
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()

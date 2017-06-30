@@ -60,7 +60,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   {
     mitkThrow() << "Cannot map point set. Passed point set pointer is nullptr.";
   }
-  if (input->GetTimeSteps()<=timeStep && timeStep>=0)
+  if (static_cast<int>(input->GetTimeSteps())<=timeStep && timeStep>=0)
   {
     mitkThrow() << "Cannot set point set. Selected time step is larger then mitk point set. MITK time step count: "<<input->GetTimeSteps()<<"; selected time step: "<<timeStep;
   }

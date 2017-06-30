@@ -64,9 +64,6 @@ public:
 
 private:
 
-    // purposely not implemented
-    IsoDoseLevelVectorProperty& operator=(const IsoDoseLevelVectorProperty&);
-
     itk::LightObject::Pointer InternalClone() const override;
 
     virtual bool IsEqual(const BaseProperty& property) const override;

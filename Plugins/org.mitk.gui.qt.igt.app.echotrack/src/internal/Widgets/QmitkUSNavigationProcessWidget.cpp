@@ -506,7 +506,7 @@ void QmitkUSNavigationProcessWidget::UpdateFilterPipeline()
 
   mitk::NavigationDataSource::Pointer navigationDataSource = m_CombinedModality->GetNavigationDataSource();
 
-  for (unsigned int n = 0; n <= m_CurrentMaxStep && n < m_NavigationSteps.size(); ++n)
+  for (unsigned int n = 0; n <= static_cast<unsigned int>(m_CurrentMaxStep) && n < m_NavigationSteps.size(); ++n)
   {
     QmitkUSAbstractNavigationStep::FilterVector filter = m_NavigationSteps.at(n)->GetFilter();
     if ( ! filter.empty() ) { filterList.insert(filterList.end(), filter.begin(), filter.end()); }

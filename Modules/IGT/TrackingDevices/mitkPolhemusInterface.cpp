@@ -161,7 +161,10 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetS
   DWORD dwSize;
 
   //read one frame
-  if (!m_pdiDev->ReadSinglePnoBuf(pBuf, dwSize)) { MITK_WARN << m_pdiDev->GetLastResultStr(); }
+  if (!m_pdiDev->ReadSinglePnoBuf(pBuf, dwSize)) {
+    MITK_WARN << m_pdiDev->GetLastResultStr();
+    return std::vector<mitk::PolhemusInterface::trackingData>();
+  }
 
   return ParsePolhemusRawData(pBuf, dwSize);
 }

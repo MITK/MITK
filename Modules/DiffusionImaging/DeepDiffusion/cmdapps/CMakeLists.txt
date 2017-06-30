@@ -14,6 +14,7 @@ if(BUILD_DeepDiffusionCmdApps OR MITK_BUILD_ALL_APPS)
   set( deepdiffusioncmdapps
   CaffeTest^^
   CaffeSegmentationTest^^
+  BrainMaskSegmentation^^MitkImageStatistics
   Caffe2Test^^
   )
 
@@ -28,7 +29,7 @@ if(BUILD_DeepDiffusionCmdApps OR MITK_BUILD_ALL_APPS)
 
     mitkFunctionCreateCommandLineApp(
       NAME ${appname}
-      DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
+      DEPENDS MitkCore MitkDiffusionCore MitkDeepDiffusion ${dependencies_list}
       PACKAGE_DEPENDS ITK Eigen Caffe Caffe2 OpenCV
     )
   endforeach()

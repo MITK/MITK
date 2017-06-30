@@ -101,7 +101,7 @@ namespace mitk {
       * \brief Returns the tool with the given tool name
       *
       * Note: subclasses can and should implement optimized versions of this method
-      * \return the given tool or NULL if no tool with that name exists
+      * \return the given tool or nullptr if no tool with that name exists
       */
       virtual mitk::TrackingTool* GetToolByName(std::string name) const;
 

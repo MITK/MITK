@@ -78,7 +78,7 @@ public:
 
     for(unsigned int r = 0; r < 50; r++)
     {
-      for(unsigned int c = 0; c < factorOfDividingThePicture; c++)
+      for(int c = 0; c < factorOfDividingThePicture; c++)
       {
         for(unsigned int l = 0; l < 100; l++)
         {

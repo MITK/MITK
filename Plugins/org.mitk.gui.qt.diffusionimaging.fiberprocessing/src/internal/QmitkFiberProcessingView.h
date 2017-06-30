@@ -85,7 +85,7 @@ protected slots:
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
   void OnMaskExtractionChanged();
 
-  virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
+  virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = nullptr, mitk::BaseProperty *property = nullptr );
 
 protected:
 
@@ -172,7 +172,7 @@ protected:
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   mitk::DataNode::Pointer               m_MaskImageNode;
 
-  void AddCompositeToDatastorage(mitk::DataNode::Pointer pfc, std::vector<mitk::DataNode::Pointer> children, mitk::DataNode::Pointer parentNode=NULL);
+  void AddCompositeToDatastorage(mitk::DataNode::Pointer pfc, std::vector<mitk::DataNode::Pointer> children, mitk::DataNode::Pointer parentNode=nullptr);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void WritePfToImage(mitk::DataNode::Pointer node, mitk::Image* image);
   mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute);

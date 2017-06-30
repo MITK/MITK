@@ -74,20 +74,20 @@ namespace mitk {
      * The stream is then set to m_Stream.
      *
      * @throw mitk::IGTIOException Throws an exception if file does not exist
-     * @throw mitk::IGTException Throws an exception if the stream is NULL
+     * @throw mitk::IGTException Throws an exception if the stream is nullptr
      */
     //void CreateStreamFromFilename();
 
     /**
      * \brief Returns the file version out of the XML document.
-     * @throw mitk::IGTException Throws an mitk::IGTException an exception if stream is NULL or not good.
+     * @throw mitk::IGTException Throws an mitk::IGTException an exception if stream is nullptr or not good.
      * @throw mitk::IGTIOException Throws an mitk::IGTIOException if the stream has an incompatible XML format.
      */
     unsigned int GetFileVersion(std::istream* stream);
 
     /**
      * \brief Returns the number of tracked tools out of the XML document.
-     * @throw Throws an exception if stream is NULL.
+     * @throw Throws an exception if stream is nullptr.
      * @throw Throws an exception if the input stream has an XML incompatible format.
      */
     unsigned int GetNumberOfNavigationDatas(std::istream* stream);

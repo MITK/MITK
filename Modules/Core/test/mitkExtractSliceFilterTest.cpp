@@ -104,7 +104,7 @@ public:
     slicer->SetWorldGeometry(TestPlane);
     slicer->Update();
 
-    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != NULL, "Extractor returned a slice");
+    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != nullptr, "Extractor returned a slice");
 
     mitk::Image::Pointer reslicedImage = slicer->GetOutput();
 

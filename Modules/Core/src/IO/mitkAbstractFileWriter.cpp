@@ -60,7 +60,7 @@ namespace mitk
 
   std::string AbstractFileWriter::LocalFile::GetFileName()
   {
-    if (d->m_Stream == NULL)
+    if (d->m_Stream == nullptr)
     {
       return d->m_Location;
     }
@@ -73,7 +73,7 @@ namespace mitk
   }
 
   AbstractFileWriter::OutputStream::OutputStream(IFileWriter *writer, std::ios_base::openmode mode)
-    : std::ostream(NULL), m_Stream(NULL)
+    : std::ostream(nullptr), m_Stream(nullptr)
   {
     std::ostream *stream = writer->GetOutputStream();
     if (stream)
@@ -91,13 +91,13 @@ namespace mitk
   class AbstractFileWriter::Impl : public FileReaderWriterBase
   {
   public:
-    Impl() : FileReaderWriterBase(), m_BaseData(NULL), m_Stream(NULL), m_PrototypeFactory(NULL) {}
+    Impl() : FileReaderWriterBase(), m_BaseData(nullptr), m_Stream(nullptr), m_PrototypeFactory(nullptr) {}
     Impl(const Impl &other)
       : FileReaderWriterBase(other),
         m_BaseDataType(other.m_BaseDataType),
-        m_BaseData(NULL),
-        m_Stream(NULL),
-        m_PrototypeFactory(NULL)
+        m_BaseData(nullptr),
+        m_Stream(nullptr),
+        m_PrototypeFactory(nullptr)
     {
     }
 
@@ -115,7 +115,7 @@ namespace mitk
   void AbstractFileWriter::SetOutputLocation(const std::string &location)
   {
     d->m_Location = location;
-    d->m_Stream = NULL;
+    d->m_Stream = nullptr;
   }
 
   std::string AbstractFileWriter::GetOutputLocation() const { return d->m_Location; }
@@ -156,7 +156,7 @@ namespace mitk
 
   IFileWriter::ConfidenceLevel AbstractFileWriter::GetConfidenceLevel() const
   {
-    if (d->m_BaseData == NULL)
+    if (d->m_BaseData == nullptr)
       return Unsupported;
 
     std::vector<std::string> classHierarchy = d->m_BaseData->GetClassHierarchy();
@@ -175,7 +175,7 @@ namespace mitk
     if (d->m_PrototypeFactory)
       return us::ServiceRegistration<IFileWriter>();
 
-    if (context == NULL)
+    if (context == nullptr)
     {
       context = us::GetModuleContext();
     }
@@ -277,7 +277,7 @@ namespace mitk
   std::string AbstractFileWriter::GetBaseDataType() const { return d->m_BaseDataType; }
   void AbstractFileWriter::ValidateOutputLocation() const
   {
-    if (this->GetOutputStream() == NULL)
+    if (this->GetOutputStream() == nullptr)
     {
       // check if a file name is set and if we can write to it
       const std::string fileName = this->GetOutputLocation();

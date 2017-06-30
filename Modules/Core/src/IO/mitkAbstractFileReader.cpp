@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   AbstractFileReader::InputStream::InputStream(IFileReader *reader, std::ios_base::openmode mode)
-    : std::istream(NULL), m_Stream(NULL)
+    : std::istream(nullptr), m_Stream(nullptr)
   {
     std::istream *stream = reader->GetInputStream();
     if (stream)
@@ -51,8 +51,8 @@ namespace mitk
   class AbstractFileReader::Impl : public FileReaderWriterBase
   {
   public:
-    Impl() : FileReaderWriterBase(), m_Stream(NULL), m_PrototypeFactory(NULL) {}
-    Impl(const Impl &other) : FileReaderWriterBase(other), m_Stream(NULL), m_PrototypeFactory(NULL) {}
+    Impl() : FileReaderWriterBase(), m_Stream(nullptr), m_PrototypeFactory(nullptr) {}
+    Impl(const Impl &other) : FileReaderWriterBase(other), m_Stream(nullptr), m_PrototypeFactory(nullptr) {}
     std::string m_Location;
     std::string m_TmpFile;
     std::istream *m_Stream;
@@ -141,7 +141,7 @@ namespace mitk
     if (d->m_PrototypeFactory)
       return us::ServiceRegistration<IFileReader>();
 
-    if (context == NULL)
+    if (context == nullptr)
     {
       context = us::GetModuleContext();
     }
@@ -247,7 +247,7 @@ namespace mitk
   void AbstractFileReader::SetInput(const std::string &location)
   {
     d->m_Location = location;
-    d->m_Stream = NULL;
+    d->m_Stream = nullptr;
   }
 
   void AbstractFileReader::SetInput(const std::string &location, std::istream *is)

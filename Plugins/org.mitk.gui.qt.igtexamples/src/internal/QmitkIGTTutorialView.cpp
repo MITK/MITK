@@ -33,7 +33,7 @@ const std::string QmitkIGTTutorialView::VIEW_ID = "org.mitk.views.igttutorial";
 
 QmitkIGTTutorialView::QmitkIGTTutorialView()
 : QmitkAbstractView(),
-m_Controls(NULL), m_Source(NULL), m_Visualizer(NULL), m_Timer(NULL)
+m_Controls(nullptr), m_Source(nullptr), m_Visualizer(nullptr), m_Timer(nullptr)
 {
 }
 
@@ -90,7 +90,7 @@ void QmitkIGTTutorialView::OnStartIGT()
       //Here we want to use the NDI Polaris tracking device. Therefore we instantiate a object of the class
       //NDITrackingDevice and make some settings which are necessary for a proper connection to the device.
       MITK_INFO << "NDI tracking";
-      QMessageBox::warning ( NULL, "Warning", "You have to set the parameters for the NDITracking device inside the code (QmitkIGTTutorialView::OnStartIGT()) before you can use it.");
+      QMessageBox::warning ( nullptr, "Warning", "You have to set the parameters for the NDITracking device inside the code (QmitkIGTTutorialView::OnStartIGT()) before you can use it.");
       mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();  //instantiate
       tracker->SetPortNumber(mitk::SerialCommunication::COM4); //set the comport
       tracker->SetBaudRate(mitk::SerialCommunication::BaudRate115200); //set the baud rate
@@ -194,7 +194,7 @@ void QmitkIGTTutorialView::OnStartIGT()
     //Now every call of m_Visualizer->Update() will show us the cone at the position and orientation
     //given from the tracking device.
     //We use a QTimer object to call this Update() method in a fixed interval.
-    if (m_Timer == NULL)
+    if (m_Timer == nullptr)
     {
       m_Timer = new QTimer(this);  //create a new timer
     }
@@ -237,21 +237,21 @@ void QmitkIGTTutorialView::OnTimer()
 void QmitkIGTTutorialView::OnStopIGT()
 {
   //This method is called when the Stop button is pressed. Here we disconnect the pipeline.
-  if (m_Timer == NULL)
+  if (m_Timer == nullptr)
   {
     MITK_INFO << "No Timer was set yet!";
     return;
   }
   //To disconnect the pipeline in a save way we first stop the timer than we disconnect the tracking device.
-  //After that we destroy all filters with changing them to NULL.
+  //After that we destroy all filters with changing them to nullptr.
   m_Timer->stop();
   disconnect(m_Timer, SIGNAL(timeout()), this, SLOT(OnTimer()));
-  m_Timer = NULL;
+  m_Timer = nullptr;
   m_Source->StopTracking();
   m_Source->Disconnect();
-  m_Source = NULL;
-  m_Visualizer = NULL;
-  m_Source = NULL;
+  m_Source = nullptr;
+  m_Visualizer = nullptr;
+  m_Source = nullptr;
   this->GetDataStorage()->Remove(this->GetDataStorage()->GetNamedNode("My tracked object"));
 
   //enable the tracking device selection

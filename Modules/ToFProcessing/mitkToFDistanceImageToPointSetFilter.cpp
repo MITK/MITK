@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFProcessingCommon.h"
 
 mitk::ToFDistanceImageToPointSetFilter::ToFDistanceImageToPointSetFilter()
-: m_Subset(NULL), m_CameraIntrinsics(), m_InterPixelDistance()
+: m_Subset(0), m_CameraIntrinsics(), m_InterPixelDistance()
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -43,9 +43,9 @@ void mitk::ToFDistanceImageToPointSetFilter::SetInput(const mitk::Image* distanc
 
 void mitk::ToFDistanceImageToPointSetFilter::SetInput( unsigned int idx,const mitk::Image* distanceImage )
 {
-  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   }
   else
   {
@@ -74,17 +74,19 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<itk::Index<3>
 
   unsigned int xDim = UINT_MAX;
   unsigned int yDim = UINT_MAX;
+
   if(input.IsNotNull() && input->IsInitialized())
   {
-    unsigned int xDim = input->GetDimension(0);
-    unsigned int yDim = input->GetDimension(1);
+    xDim = input->GetDimension(0);
+    yDim = input->GetDimension(1);
   }
 
   bool pointSetValid = true;
   for (unsigned int i=0; i<subset.size(); i++)
   {
     itk::Index<3> currentIndex = subset.at(i);
-    if (currentIndex[0]<0||currentIndex[0]>xDim||currentIndex[1]<0||currentIndex[1]>yDim)
+    if (currentIndex[0] < 0 || currentIndex[0] > static_cast<itk::IndexValueType>(xDim) ||
+        currentIndex[1] < 0 || currentIndex[1] > static_cast<itk::IndexValueType>(yDim))
     {
       pointSetValid = false;
     }
@@ -191,7 +193,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 
 void mitk::ToFDistanceImageToPointSetFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
     if (this->GetOutput(idx) == nullptr)
     {

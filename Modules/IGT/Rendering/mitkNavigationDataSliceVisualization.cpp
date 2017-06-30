@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 mitk::NavigationDataSliceVisualization::NavigationDataSliceVisualization() : mitk::NavigationDataToNavigationDataFilter(),
-  m_Renderer(NULL),
+  m_Renderer(nullptr),
   m_ViewDirection(Axial)
 {
   m_TipOffset[0] = 0.0f;

@@ -63,15 +63,6 @@ public:
 
 protected slots:
 
-  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
-  void OnReferenceSelectionChanged(const mitk::DataNode *node);
-
-  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
-  void OnSegmentationSelectionChanged(const mitk::DataNode *node);
-
-  /// \brief reaction to ...
-  void OnInterpolationSelectionChanged(int);
-
   /// \brief reaction to the selection of any 2D segmentation tool
   void OnManualTool2DSelected(int id);
 
@@ -110,11 +101,31 @@ protected slots:
   // reaction to the button "Lock exterior"
   void OnLockExteriorToggled(bool);
 
+  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
+  void OnReferenceSelectionChanged(const mitk::DataNode* node);
+
+  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
+  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
+
+  /// \brief reaction to ...
+  void OnInterpolationSelectionChanged(int);
+
 protected:
-  // invoked when the preferences were changed
-  void OnPreferencesChanged(const berry::IBerryPreferences *prefs) override;
+
+  // reimplemented from QmitkAbstractView
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+
+  // reimplemented from QmitkAbstractView
+  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+
+  // reimplemented from QmitkAbstractView
+  void NodeAdded(const mitk::DataNode* node) override;
+
+  // reimplemented from QmitkAbstractView
+  void NodeRemoved(const mitk::DataNode* node) override;
 
   void OnEstablishLabelSetConnection();
+
   void OnLooseLabelSetConnection();
 
   void SetFocus();
@@ -133,12 +144,6 @@ protected:
 
   /// \brief Checks if two images have the same size and geometry
   bool CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const;
-
-  /// \brief Reimplemented from QmitkAbstractView
-  virtual void NodeAdded(const mitk::DataNode *node);
-
-  /// \brief Reimplemented from QmitkAbstractView
-  virtual void NodeRemoved(const mitk::DataNode *node);
 
   QString GetLastFileOpenPath();
 
@@ -161,6 +166,7 @@ protected:
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 
   bool m_MouseCursorSet;
+  bool m_AutoSelectionEnabled;
 
   mitk::SegmentationInteractor::Pointer m_Interactor;
 

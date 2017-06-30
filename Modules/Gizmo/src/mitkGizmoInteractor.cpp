@@ -80,7 +80,7 @@ void mitk::GizmoInteractor::SetManipulatedObjectNode(DataNode *node)
 bool mitk::GizmoInteractor::HasPickedHandle(const InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return false;
   }
@@ -217,7 +217,7 @@ void mitk::GizmoInteractor::DecideInteraction(StateMachineAction *, InteractionE
 void mitk::GizmoInteractor::MoveAlongAxis(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }
@@ -237,7 +237,7 @@ void mitk::GizmoInteractor::MoveAlongAxis(StateMachineAction *, InteractionEvent
 void mitk::GizmoInteractor::RotateAroundAxis(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }
@@ -257,7 +257,7 @@ void mitk::GizmoInteractor::RotateAroundAxis(StateMachineAction *, InteractionEv
 void mitk::GizmoInteractor::MoveFreely(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }
@@ -279,7 +279,7 @@ void mitk::GizmoInteractor::MoveFreely(StateMachineAction *, InteractionEvent *i
 void mitk::GizmoInteractor::ScaleEqually(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }

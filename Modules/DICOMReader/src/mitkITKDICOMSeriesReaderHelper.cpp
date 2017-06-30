@@ -422,7 +422,7 @@ mitk::TimeGeometry::Pointer
 
   double check = 0.0;
   const auto boundListSize = boundsList.size();
-  for ( auto pos = 0; pos < boundListSize; ++pos )
+  for ( std::size_t pos = 0; pos < boundListSize; ++pos )
   {
     check += boundsList[pos][0];
     check += boundsList[pos][1];
@@ -441,7 +441,7 @@ mitk::TimeGeometry::Pointer
     newTimeGeometry->ClearAllGeometries();
     newTimeGeometry->ReserveSpaceForGeometries( boundListSize );
 
-    for ( auto pos = 0; pos < boundListSize; ++pos )
+    for ( std::size_t pos = 0; pos < boundListSize; ++pos )
     {
       TimeBounds bounds = boundsList[pos];
       if ( pos + 1 < boundListSize )

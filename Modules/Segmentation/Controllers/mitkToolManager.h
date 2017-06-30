@@ -74,7 +74,7 @@ namespace mitk
     assumption that something actually changed.
         - mitk::ToolSelectedEvent is sent when a (truly) different tool was activated. In reaction to this event you can
     ask for the active Tool using
-          GetActiveTool or GetActiveToolID (where NULL or -1 indicate that NO tool is active at the moment).
+          GetActiveTool or GetActiveToolID (where nullptr or -1 indicate that NO tool is active at the moment).
 
     Design descisions:
 
@@ -147,7 +147,7 @@ namespace mitk
     int GetActiveToolID();
 
     /**
-      \return NULL for "No tool is active"
+      \return nullptr for "No tool is active"
     */
     Tool *GetActiveTool();
 

@@ -44,7 +44,7 @@ namespace mitk
    *
    * This class can be used to conveniently access common
    * MITK Core service objects. Some getter methods where implementations
-   * exist in the core library are guaranteed to return a non-NULL service object.
+   * exist in the core library are guaranteed to return a non-nullptr service object.
    *
    * To ensure that CoreServices::Unget() is called after the caller
    * has finished using a service object, you should use the CoreServicePointer
@@ -63,49 +63,49 @@ namespace mitk
     /**
      * @brief Get an IShaderRepository instance.
      * @param context The module context of the module getting the service.
-     * @return A IShaderRepository instance which can be NULL.
+     * @return A IShaderRepository instance which can be nullptr.
      */
     static IShaderRepository *GetShaderRepository();
 
     /**
      * @brief Get an IPropertyAliases instance.
      * @param context The module context of the module getting the service.
-     * @return A non-NULL IPropertyAliases instance.
+     * @return A non-nullptr IPropertyAliases instance.
      */
     static IPropertyAliases *GetPropertyAliases(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * @brief Get an IPropertyDescriptions instance.
      * @param context The module context of the module getting the service.
-     * @return A non-NULL IPropertyDescriptions instance.
+     * @return A non-nullptr IPropertyDescriptions instance.
      */
     static IPropertyDescriptions *GetPropertyDescriptions(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * @brief Get an IPropertyExtensions instance.
      * @param context The module context of the module getting the service.
-     * @return A non-NULL IPropertyExtensions instance.
+     * @return A non-nullptr IPropertyExtensions instance.
      */
     static IPropertyExtensions *GetPropertyExtensions(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * @brief Get an IPropertyFilters instance.
      * @param context The module context of the module getting the service.
-     * @return A non-NULL IPropertyFilters instance.
+     * @return A non-nullptr IPropertyFilters instance.
      */
     static IPropertyFilters *GetPropertyFilters(us::ModuleContext *context = us::GetModuleContext());
 
     /**
     * @brief Get an IPropertyPersistence instance.
     * @param context The module context of the module getting the service.
-    * @return A non-NULL IPropertyPersistence instance.
+    * @return A non-nullptr IPropertyPersistence instance.
     */
     static IPropertyPersistence *GetPropertyPersistence(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * @brief Get an IMimeTypeProvider instance.
      * @param context The module context of the module getting the service.
-     * @return A non-NULL IMimeTypeProvider instance.
+     * @return A non-nullptr IMimeTypeProvider instance.
      */
     static IMimeTypeProvider *GetMimeTypeProvider(us::ModuleContext *context = us::GetModuleContext());
 

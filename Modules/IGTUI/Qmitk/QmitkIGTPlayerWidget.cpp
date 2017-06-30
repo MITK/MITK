@@ -87,7 +87,7 @@ bool QmitkIGTPlayerWidget::CheckInputFileValid()
   // check if file exists
   if(!file.exists())
   {
-    QMessageBox::warning(NULL, "IGTPlayer: Error", "No valid input file was loaded. Please load input file first!");
+    QMessageBox::warning(nullptr, "IGTPlayer: Error", "No valid input file was loaded. Please load input file first!");
     return false;
   }
 
@@ -163,9 +163,9 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         catch(mitk::IGTException)
         {
           std::string errormessage = "Error during start playing. Invalid or wrong file?";
-          QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+          QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
           m_Controls->playPushButton->setChecked(false);
-          m_RealTimePlayer = NULL;
+          m_RealTimePlayer = nullptr;
           return;
         }
 
@@ -180,9 +180,9 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
           catch(mitk::IGTException)
           {
             std::string errormessage = "Error during start playing. Invalid or wrong file?";
-            QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+            QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
             m_Controls->playPushButton->setChecked(false);
-            m_RealTimePlayer = NULL;
+            m_RealTimePlayer = nullptr;
             return;
           }
         }
@@ -196,9 +196,9 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
           catch(mitk::IGTException)
           {
             std::string errormessage = "Error during start playing. Invalid or wrong file type?";
-            QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+            QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
             m_Controls->playPushButton->setChecked(false);
-            m_RealTimePlayer = NULL;
+            m_RealTimePlayer = nullptr;
             return;
           }
 
@@ -451,7 +451,7 @@ void QmitkIGTPlayerWidget::OnOpenFileButtonPressed()
   // if something went wrong or user pressed cancel in the save dialog
   if ( filename.isEmpty()  || ! file.exists() )
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please enter valid path. Using previous path again."));
+    QMessageBox::warning(nullptr, "Warning", QString("Please enter valid path. Using previous path again."));
     return;
   }
 
@@ -486,7 +486,7 @@ void QmitkIGTPlayerWidget::OnGoToBegin()
   if(this->GetCurrentPlaybackMode() == RealTimeMode && m_RealTimePlayer.IsNotNull())
   {
     m_RealTimePlayer->StopPlaying();
-    m_RealTimePlayer = NULL;  // set player to NULL so it can be initialized again if playback is called afterwards
+    m_RealTimePlayer = nullptr;  // set player to nullptr so it can be initialized again if playback is called afterwards
   }
 
   m_StartTime = -1;  // set starttime back
@@ -555,9 +555,9 @@ void QmitkIGTPlayerWidget::OnSliderReleased()
 {
   int currentSliderValue = m_Controls->samplePositionHorizontalSlider->value(); // current slider value selected through user movement
 
-  if(currentSliderValue > m_CurrentSequentialPointNumber) // at the moment only forward scrolling is possible
+  if(currentSliderValue > static_cast<int>(m_CurrentSequentialPointNumber)) // at the moment only forward scrolling is possible
   {
-    unsigned int snapshotNumber = currentSliderValue;
+    auto snapshotNumber = static_cast<unsigned int>(currentSliderValue);
     m_SequentialPlayer->GoToSnapshot(snapshotNumber); // move player to selected snapshot
     m_CurrentSequentialPointNumber = currentSliderValue;
     m_Controls->sampleLCDNumber->display(currentSliderValue); // update lcdnumber in widget

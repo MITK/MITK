@@ -44,8 +44,8 @@ QmitkIGTLStreamingManagementWidget::QmitkIGTLStreamingManagementWidget(
   QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f), m_IsClient(false)
 {
-  m_Controls = NULL;
-  this->m_IGTLDevice = NULL;
+  m_Controls = nullptr;
+  this->m_IGTLDevice = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -212,7 +212,7 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
 
   //check if the device is a server or a client
   if (dynamic_cast<mitk::IGTLClient*>(
-    this->m_IGTLDevice.GetPointer()) == NULL)
+    this->m_IGTLDevice.GetPointer()) == nullptr)
   {
     m_IsClient = false;
   }

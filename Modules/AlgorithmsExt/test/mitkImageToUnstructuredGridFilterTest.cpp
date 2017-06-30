@@ -58,7 +58,7 @@ public:
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
     testFilter->SetInput(m_BallImage);
     testFilter->Update();
-    CPPUNIT_ASSERT_MESSAGE("Testing UnstructuredGrid generation!", testFilter->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing UnstructuredGrid generation!", testFilter->GetOutput() != nullptr);
   }
 
   void testThreshold()

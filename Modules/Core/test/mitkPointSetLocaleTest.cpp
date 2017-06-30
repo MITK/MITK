@@ -27,7 +27,7 @@ bool ChangeLocale(const std::string &locale)
 {
   try
   {
-    MITK_TEST_OUTPUT(<< "\n** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'");
+    MITK_TEST_OUTPUT(<< "\n** Changing locale from " << setlocale(LC_ALL, nullptr) << " to '" << locale << "'");
     setlocale(LC_ALL, locale.c_str());
 
     std::locale l(locale.c_str());

@@ -18,20 +18,20 @@
 #define __QVTKFramebufferObjectRenderer_h
 
 #include <QQuickFramebufferObject>
-#include <vtkFrameBufferObject2.h>
 
-#include "QVTKInternalOpenglRenderWindow.h"
 #include "QVTKQuickItem.h"
 
 #include <MitkOpenViewCoreExports.h>
 
+class vtkInternalOpenGLRenderWindow;
+
+//! Part of Qml rendering prototype, see QmlMitkRenderWindowItem.
 class MITKOPENVIEWCORE_EXPORT QVTKFramebufferObjectRenderer : public QQuickFramebufferObject::Renderer
 {
 public:
   bool m_neverRendered;
   bool m_readyToRender;
   vtkInternalOpenGLRenderWindow *m_vtkRenderWindow;
-  vtkFrameBufferObject2* m_vtkFBO;
 
   QVTKQuickItem *m_vtkQuickItem;
 

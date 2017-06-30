@@ -49,7 +49,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   if (!file.good())
   {
     m_ErrorMessage = "Cannot open '" + filename + "' for reading";
-    return NULL;
+    return nullptr;
   }
 
   std::string tempDirectory = m_ToolfilePath + GetFileWithoutPath(filename);
@@ -63,7 +63,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   if (loadedStorage->GetAll()->size() == 0 || loadedStorage.IsNull())
   {
     m_ErrorMessage = "Invalid file: cannot parse tool data.";
-    return NULL;
+    return nullptr;
   }
 
   //convert the DataStorage back to a NavigationTool-Object

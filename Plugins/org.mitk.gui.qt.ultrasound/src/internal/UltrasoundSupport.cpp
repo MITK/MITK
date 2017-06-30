@@ -148,12 +148,12 @@ void UltrasoundSupport::UpdateImage()
     }
     // if the geometry changed: reinitialize the ultrasound image
     if ((m_OldGeometry.IsNotNull()) &&
-      (curOutput->GetGeometry() != NULL) &&
+      (curOutput->GetGeometry() != nullptr) &&
       (!mitk::Equal(m_OldGeometry.GetPointer(), curOutput->GetGeometry(), 0.0001, false))
       )
     {
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-      if ((renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
+      if ((renderWindow != nullptr) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
       {
         renderWindow->GetRenderingManager()->InitializeViews(
           curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -379,7 +379,7 @@ void UltrasoundSupport::RemoveControlWidgets()
 
 void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
-  if (m_Device.IsNull() || event.getType() != us::ServiceEvent::MODIFIED)
+  if (m_Device.IsNull() || event.getType() != static_cast<ctkServiceEvent::Type>(us::ServiceEvent::MODIFIED))
   {
     return;
   }
@@ -431,11 +431,9 @@ UltrasoundSupport::~UltrasoundSupport()
     StopTimers();
 
     // Get all active devicesand deactivate them to prevent freeze
-    std::vector<mitk::USDevice*> devices = this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>();
-    for (int i = 0; i < devices.size(); i++)
+    for (auto device : this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>())
     {
-      mitk::USDevice::Pointer device = devices[i];
-      if (device.IsNotNull() && device->GetIsActive())
+      if (device != nullptr && device->GetIsActive())
       {
         device->Deactivate();
         device->Disconnect();

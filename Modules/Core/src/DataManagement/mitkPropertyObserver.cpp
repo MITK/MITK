@@ -31,7 +31,7 @@ namespace mitk
   PropertyView::PropertyView(const mitk::BaseProperty *property) : m_Property(property)
   {
     if (!property)
-      throw std::invalid_argument("NULL pointer makes no sense in PropertyView()"); // no NULL property allowed
+      throw std::invalid_argument("nullptr pointer makes no sense in PropertyView()"); // no nullptr property allowed
 
     {
       itk::ReceptorMemberCommand<PropertyView>::Pointer command = itk::ReceptorMemberCommand<PropertyView>::New();
@@ -84,7 +84,7 @@ namespace mitk
   PropertyEditor::PropertyEditor(mitk::BaseProperty *property) : m_Property(property)
   {
     if (!property)
-      throw std::invalid_argument("NULL pointer makes no sense in PropertyEditor()"); // no NULL property allowed
+      throw std::invalid_argument("nullptr pointer makes no sense in PropertyEditor()"); // no nullptr property allowed
 
     {
       itk::ReceptorMemberCommand<PropertyEditor>::Pointer command = itk::ReceptorMemberCommand<PropertyEditor>::New();

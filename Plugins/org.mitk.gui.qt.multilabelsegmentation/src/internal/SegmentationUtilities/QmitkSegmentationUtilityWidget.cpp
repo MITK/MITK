@@ -34,5 +34,5 @@ mitk::SliceNavigationController* QmitkSegmentationUtilityWidget::GetTimeNavigati
 void QmitkSegmentationUtilityWidget::SetTimeNavigationController(mitk::SliceNavigationController* timeNavigationController)
 {
   m_TimeNavigationController = timeNavigationController;
-  this->setEnabled(timeNavigationController != NULL);
+  this->setEnabled(timeNavigationController != nullptr);
 }

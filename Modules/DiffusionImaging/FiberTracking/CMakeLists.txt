@@ -46,5 +46,10 @@ MITK_CREATE_MODULE(
 )
 
 if(MODULE_IS_ENABLED)
+  add_subdirectory(cmdapps/Fiberfox)
+  add_subdirectory(cmdapps/FiberProcessing)
+  add_subdirectory(cmdapps/Tractography)
+  add_subdirectory(cmdapps/TractographyEvaluation)
+  add_subdirectory(cmdapps/Misc)
   add_subdirectory(Testing)
 endif()

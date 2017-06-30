@@ -82,20 +82,20 @@ const std::string QmitkGibbsTrackingView::VIEW_ID = "org.mitk.views.gibbstrackin
 QmitkGibbsTrackingView::QmitkGibbsTrackingView()
     : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_FiberBundle(NULL)
-    , m_MaskImage(NULL)
-    , m_TensorImage(NULL)
-    , m_QBallImage(NULL)
-    , m_ItkQBallImage(NULL)
-    , m_ItkTensorImage(NULL)
-    , m_ImageNode(NULL)
-    , m_MaskImageNode(NULL)
-    , m_FiberBundleNode(NULL)
+    , m_FiberBundle(nullptr)
+    , m_MaskImage(nullptr)
+    , m_TensorImage(nullptr)
+    , m_QBallImage(nullptr)
+    , m_ItkQBallImage(nullptr)
+    , m_ItkTensorImage(nullptr)
+    , m_ImageNode(nullptr)
+    , m_MaskImageNode(nullptr)
+    , m_FiberBundleNode(nullptr)
     , m_ThreadIsRunning(false)
     , m_ElapsedTime(0)
-    , m_GlobalTracker(NULL)
+    , m_GlobalTracker(nullptr)
     , m_TrackingWorker(this)
-    , m_TrackingNode(NULL)
+    , m_TrackingNode(nullptr)
 {
     m_TrackingWorker.moveToThread(&m_TrackingThread);
     connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -130,7 +130,7 @@ void QmitkGibbsTrackingView::StopGibbsTracking()
     m_GlobalTracker->SetAbortTracking(true);
     m_Controls->m_TrackingStop->setEnabled(false);
     m_Controls->m_TrackingStop->setText("Stopping Tractography ...");
-    m_TrackingNode = NULL;
+    m_TrackingNode = nullptr;
 }
 
 // update gui elements and generate fiber bundle after tracking is finished
@@ -143,8 +143,8 @@ void QmitkGibbsTrackingView::AfterThread()
 
     if( !m_GlobalTracker->GetIsInValidState() )
     {
-        QMessageBox::critical( NULL, "Gibbs Tracking", "An internal error occured. Tracking aborted.\n Please check the log for details." );
-        m_FiberBundleNode = NULL;
+        QMessageBox::critical( nullptr, "Gibbs Tracking", "An internal error occured. Tracking aborted.\n Please check the log for details." );
+        m_FiberBundleNode = nullptr;
         return;
     }
     UpdateTrackingStatus();
@@ -285,8 +285,8 @@ void QmitkGibbsTrackingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
     if (m_ThreadIsRunning)
         return;
 
-    m_ImageNode = NULL;
-    m_MaskImageNode = NULL;
+    m_ImageNode = nullptr;
+    m_MaskImageNode = nullptr;
 
     // iterate all selected objects
     for (mitk::DataNode::Pointer node: nodes)
@@ -405,7 +405,7 @@ void QmitkGibbsTrackingView::SetMask()
     QList<mitk::DataNode::Pointer> nodes = GetDataManagerSelection();
     if (nodes.empty())
     {
-        m_MaskImageNode = NULL;
+        m_MaskImageNode = nullptr;
         m_Controls->m_MaskImageLabel->setText("-");
         return;
     }
@@ -429,11 +429,11 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
         MITK_WARN("QmitkGibbsTrackingView")<<"Thread already running!";
         return;
     }
-    m_GlobalTracker = NULL;
+    m_GlobalTracker = nullptr;
 
     if (m_ImageNode.IsNull())
     {
-        QMessageBox::information( NULL, "Warning", "Please load and select a qball image before starting image processing.");
+        QMessageBox::information( nullptr, "Warning", "Please load and select a qball image before starting image processing.");
         return;
     }
 
@@ -447,9 +447,9 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
 
     // cast qbi to itk
     m_TrackingNode = m_ImageNode;
-    m_ItkTensorImage = NULL;
-    m_ItkQBallImage = NULL;
-    m_MaskImage = NULL;
+    m_ItkTensorImage = nullptr;
+    m_ItkQBallImage = nullptr;
+    m_MaskImage = nullptr;
 
     if (m_QBallImage.IsNotNull())
     {
@@ -511,11 +511,11 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
         try
         {
           mitk::IOUtil::Save(m_FiberBundle.GetPointer(),m_OutputFileName.toStdString());
-          QMessageBox::information(NULL, "Fiber bundle saved to", m_OutputFileName);
+          QMessageBox::information(nullptr, "Fiber bundle saved to", m_OutputFileName);
         }
         catch (itk::ExceptionObject &ex)
         {
-            QMessageBox::information(NULL, "Fiber bundle could not be saved", QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
+            QMessageBox::information(nullptr, "Fiber bundle could not be saved", QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
         }
     }
     if(m_ImageNode.IsNull())

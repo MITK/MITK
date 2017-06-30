@@ -78,7 +78,7 @@ protected slots:
   void CleanTreeModel(ctkXnatSession* session);
 
   /// \brief Searches the tree model
-  void search(const QString &toSearch);
+  void Search(const QString &toSearch);
 
   void OnContextMenuRequested(const QPoint & pos);
   void OnContextMenuDownloadAndOpenFile();
@@ -94,12 +94,12 @@ protected slots:
 
   void OnProgress(QUuid, double);
 
-  void itemSelected(const QModelIndex& index);
+  void ItemSelected(const QModelIndex& index);
 
   void OnUploadFromDataStorage();
 
-  void sessionTimedOutMsg();
-  void sessionTimesOutSoonMsg();
+  void SessionTimedOutMsg();
+  void SessionTimesOutSoonMsg();
 
   void ToggleConnection();
 
@@ -143,6 +143,7 @@ private:
 
   bool m_AlreadyInSearch = false;
 
+  std::string ReplaceSpecialChars(const std::string& input) const;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

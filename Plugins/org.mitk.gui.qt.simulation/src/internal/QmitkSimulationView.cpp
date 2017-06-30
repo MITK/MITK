@@ -31,14 +31,14 @@ static T* GetService()
 {
   ctkPluginContext* context = mitk::org_mitk_gui_qt_simulation_Activator::GetContext();
 
-  if (context == NULL)
-    return NULL;
+  if (context == nullptr)
+    return nullptr;
 
   ctkServiceReference serviceReference = context->getServiceReference<T>();
 
   return serviceReference
     ? context->getService<T>(serviceReference)
-    : NULL;
+    : nullptr;
 }
 
 static mitk::SimulationInteractor::Pointer CreateSimulationInteractor()
@@ -72,7 +72,7 @@ private:
 QmitkSimulationView::QmitkSimulationView()
   : m_SimulationService(GetService<mitk::ISimulationService>()),
     m_Interactor(CreateSimulationInteractor()),
-    m_VtkModelContextMenu(NULL),
+    m_VtkModelContextMenu(nullptr),
     m_Timer(this)
 {
   this->GetDataStorage()->RemoveNodeEvent.AddListener(
@@ -158,30 +158,30 @@ void QmitkSimulationView::OnBaseContextMenuRequested(const QPoint& point)
 
   QTreeWidgetItem* item = m_Ui.sceneTreeWidget->itemAt(point);
 
-  if (item == NULL)
+  if (item == nullptr)
     return;
 
   QmitkSceneTreeWidget::Base* base = m_Ui.sceneTreeWidget->GetBaseFromItem(item);
 
-  if (base == NULL)
+  if (base == nullptr)
     return;
 
   mitk::VtkModel* vtkModel = dynamic_cast<mitk::VtkModel*>(base);
 
-  if (vtkModel == NULL)
+  if (vtkModel == nullptr)
     return;
 
   m_VtkModelContextMenu->actions().first()->setChecked(vtkModel->GetMode() == mitk::VtkModel::Surface);
 
   QAction* action = m_VtkModelContextMenu->exec(m_Ui.sceneTreeWidget->mapToGlobal(point));
 
-  if (action == NULL)
+  if (action == nullptr)
     return;
 
   if (action->text() == "Render to Surface")
   {
     mitk::DataStorage::Pointer dataStorage = this->GetDataStorage();
-    SetOfObjects::ConstPointer objects = dataStorage->GetSubset(NULL);
+    SetOfObjects::ConstPointer objects = dataStorage->GetSubset(nullptr);
 
     if (action->isChecked())
     {
@@ -226,7 +226,7 @@ void QmitkSimulationView::OnNodeRemovedFromDataStorage(const mitk::DataNode* nod
       m_Timer.stop();
 
     if (m_SimulationService->GetActiveSimulation() == simulation)
-      m_SimulationService->SetActiveSimulation(NULL);
+      m_SimulationService->SetActiveSimulation(nullptr);
   }
 }
 
@@ -243,7 +243,7 @@ void QmitkSimulationView::OnResetButtonClicked()
 
 void QmitkSimulationView::OnSelectedSimulationChanged(const mitk::DataNode* node)
 {
-  if (node != NULL)
+  if (node != nullptr)
   {
     m_Selection = m_Ui.simulationComboBox->GetSelectedNode();
     mitk::Simulation* simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
@@ -254,7 +254,7 @@ void QmitkSimulationView::OnSelectedSimulationChanged(const mitk::DataNode* node
   }
   else
   {
-    m_Selection = NULL;
+    m_Selection = nullptr;
 
     this->SetSimulationControlsEnabled(false);
     m_Ui.animateButton->setChecked(false);
@@ -272,7 +272,7 @@ void QmitkSimulationView::OnSelectedBaseChanged()
 
   m_Ui.baseTreeWidget->OnSelectedBaseChanged(!selectedBaseItems.isEmpty()
     ? m_Ui.sceneTreeWidget->GetBaseFromItem(selectedBaseItems[0])
-    : NULL);
+    : nullptr);
 }
 
 void QmitkSimulationView::OnStep(bool renderWindowUpdate)
@@ -326,7 +326,7 @@ void QmitkSimulationView::ResetSceneTreeWidget()
 
   mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
 
-  m_Ui.sceneTreeWidget->addChild(NULL, simulation->GetRootNode().get());
+  m_Ui.sceneTreeWidget->addChild(nullptr, simulation->GetRootNode().get());
   m_Ui.sceneTreeWidget->expandItem(m_Ui.sceneTreeWidget->topLevelItem(0));
 }
 

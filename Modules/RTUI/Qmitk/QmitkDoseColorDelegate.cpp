@@ -72,7 +72,7 @@ bool QmitkDoseColorDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
   }
 
   QColor oldcolor = index.data(Qt::EditRole).value<QColor>();
-  QColor newColor = QColorDialog::getColor(oldcolor, NULL);
+  QColor newColor = QColorDialog::getColor(oldcolor, nullptr);
 
   if (newColor.isValid())
   {

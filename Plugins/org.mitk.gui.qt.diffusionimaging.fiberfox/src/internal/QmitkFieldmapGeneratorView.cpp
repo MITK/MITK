@@ -203,21 +203,21 @@ void QmitkFieldmapGeneratorView::RenderWindowPartActivated(mitk::IRenderWindowPa
         mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
         command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
-        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 
     {
         mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
         command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
-        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 
     {
         mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
         command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
-        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 }
 
@@ -246,7 +246,7 @@ void QmitkFieldmapGeneratorView::OnSelectionChanged(berry::IWorkbenchPart::Point
         m_Controls->m_SelectedImageBox->GetSelectedNode()->RemoveObserver( m_PropertyObserverTag );
 
     m_Controls->m_InputData->setTitle("Please Select Reference Image");
-    m_SelectedSource = NULL;
+    m_SelectedSource = nullptr;
 
     // iterate selection
     for (mitk::DataNode::Pointer node: nodes)

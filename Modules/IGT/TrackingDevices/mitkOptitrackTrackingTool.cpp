@@ -64,7 +64,7 @@ bool mitk::OptitrackTrackingTool::SetToolByFileName(std::string nameFile)
 
   // Open the file
   FILE* calib_file = fopen(this->m_fileConfiguration.c_str(),"r");
-  if (calib_file == NULL)
+  if (calib_file == nullptr)
   {
     MITK_INFO << "Error using opening file";
     mitkThrowException(mitk::IGTException) << "Cannot open configuration file";

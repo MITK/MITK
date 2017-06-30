@@ -91,7 +91,7 @@ namespace mitk
     \param capturedImageSequence the actually captured image sequence number
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL) override;
+                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=nullptr) override;
    /*!
     \brief Set file name where the data is recorded
     \param inputFileName name of input file which should be played

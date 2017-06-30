@@ -114,7 +114,7 @@ namespace mitk
     /**
     * \brief Return the tool pointer of the tool number toolNumber
     * \param toolNumber The number of the tool which should be given back.
-    * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
+    * \return Returns the tool which the number "toolNumber". Returns nullptr, if there is
     * no tool with this number.
     */
     TrackingTool* GetTool(unsigned int toolNumber) const override;
@@ -122,7 +122,7 @@ namespace mitk
     /**
     * \brief Return the tool pointer of the tool number toolNumber
     * \param toolNumber The number of the tool which should be given back.
-    * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
+    * \return Returns the tool which the number "toolNumber". Returns nullptr, if there is
     * no tool with this number.
     * @throw mitk::IGTException Throws an exception if there is the required tool does not exist.
     */
@@ -160,7 +160,7 @@ namespace mitk
 
     /**
     * \brief Start the Tracking Thread for the tools
-    * @throw mitk::IGTException Throws an exception if variable trackingDevice is NULL
+    * @throw mitk::IGTException Throws an exception if variable trackingDevice is nullptr
     */
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
 

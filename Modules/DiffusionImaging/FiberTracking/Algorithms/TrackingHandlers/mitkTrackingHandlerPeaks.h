@@ -39,10 +39,11 @@ public:
 
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
     void SetPeakThreshold(float thr){ m_PeakThreshold = thr; }
     void SetPeakImage( PeakImgType::Pointer image ){ m_PeakImage = image; }
+    void SetApplyDirectionMatrix( bool applyDirectionMatrix ){ m_ApplyDirectionMatrix = applyDirectionMatrix; }
 
     itk::Vector<double, 3> GetSpacing(){ return spacing3; }
     itk::Point<float,3> GetOrigin(){ return origin3; }
@@ -70,8 +71,11 @@ protected:
     itk::Point<float, 3> origin3;
     itk::Matrix<double, 3, 3> direction3;
     itk::ImageRegion<3> imageRegion3;
+    vnl_matrix_fixed<float,3,3> m_FloatImageRotation;
 
     ItkUcharImgType::Pointer m_DummyImage;
+
+    bool    m_ApplyDirectionMatrix;
 };
 
 }

@@ -186,13 +186,13 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
   mitk::DataNode *node = m_RegionGrow3DTool->GetPointSetNode();
 
-  if (node != NULL)
+  if (node != nullptr)
   {
     mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet *>(node->GetData());
 
     if (pointSet.IsNull())
     {
-      QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingToolGUI", "PointSetNode does not contain a pointset");
+      QMessageBox::critical(nullptr, "QmitkAdaptiveRegionGrowingToolGUI", "PointSetNode does not contain a pointset");
       return;
     }
 
@@ -247,7 +247,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
             mitkPixelTypeMultiplex4(mitk::FastSinglePixelAccess,
                                     image->GetChannelDescriptor().GetPixelType(),
                                     image,
-                                    NULL,
+                                    nullptr,
                                     currentIndex,
                                     pixelValues[pos]);
 
@@ -330,7 +330,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 {
   if (m_InputImageNode.IsNull())
   {
-    QMessageBox::information(NULL, "Adaptive Region Growing functionality", "Please specify the image in Datamanager!");
+    QMessageBox::information(nullptr, "Adaptive Region Growing functionality", "Please specify the image in Datamanager!");
     return;
   }
 
@@ -338,7 +338,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 
   if (node.IsNull())
   {
-    QMessageBox::information(NULL, "Adaptive Region Growing functionality", "Please insert a seed point inside the "
+    QMessageBox::information(nullptr, "Adaptive Region Growing functionality", "Please insert a seed point inside the "
                                                                             "image.\n\nFirst press the \"Define Seed "
                                                                             "Point\" button,\nthen click left mouse "
                                                                             "button inside the image.");
@@ -351,7 +351,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
   {
     m_Controls.m_pbRunSegmentation->setEnabled(true);
     QMessageBox::information(
-      NULL, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
+      nullptr, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
     return;
   }
 
@@ -362,7 +362,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
   {
     m_Controls.m_pbRunSegmentation->setEnabled(true);
     QMessageBox::information(
-      NULL, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
+      nullptr, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
     return;
   }
 
@@ -393,7 +393,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     {
       QApplication::restoreOverrideCursor(); // reset cursor
       QMessageBox::information(
-        NULL, "Adaptive Region Growing functionality", "Only images of dimension 3 or 4 can be processed!");
+        nullptr, "Adaptive Region Growing functionality", "Only images of dimension 3 or 4 can be processed!");
       return;
     }
   }
@@ -418,7 +418,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   if (!imageGeometry->IsInside(seedPoint))
   {
     QApplication::restoreOverrideCursor(); // reset cursor to be able to click ok with the regular mouse cursor
-    QMessageBox::information(NULL,
+    QMessageBox::information(nullptr,
                              "Segmentation functionality",
                              "The seed point is outside of the image! Please choose a position inside the image!");
     return;
@@ -431,7 +431,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   {
     QApplication::restoreOverrideCursor(); // reset cursor to be able to click ok with the regular mouse cursor
     QMessageBox::information(
-      NULL,
+      nullptr,
       "Segmentation functionality",
       "The seed point is outside the defined thresholds! Please set a new seed point or adjust the thresholds.");
     MITK_INFO << "Mean: " << m_SeedPointValueMean;
@@ -464,7 +464,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   }
   catch (...)
   {
-    QMessageBox::critical(NULL, "Adaptive RG Segmentation Functionality", "An error occurred during region growing!");
+    QMessageBox::critical(nullptr, "Adaptive RG Segmentation Functionality", "An error occurred during region growing!");
     return;
   }
 
@@ -572,7 +572,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
   mitk::DataNode::Pointer newNode = m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE);
 
   mitk::LevelWindow tempLevelWindow;
-  newNode->GetLevelWindow(tempLevelWindow, NULL, "levelwindow");
+  newNode->GetLevelWindow(tempLevelWindow, nullptr, "levelwindow");
 
   mitk::ScalarType *level = new mitk::ScalarType(0.0);
   mitk::ScalarType *window = new mitk::ScalarType(1.0);
@@ -603,7 +603,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
   }
 
   tempLevelWindow.SetLevelWindow(*level, *window);
-  newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
+  newNode->SetLevelWindow(tempLevelWindow, nullptr, "levelwindow");
   // update the widgets
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -639,7 +639,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ChangeLevelWindow(double newValue)
 
     mitk::LevelWindow tempLevelWindow;
 
-    newNode->GetLevelWindow(tempLevelWindow, NULL, "levelwindow"); // get the levelWindow associated with the preview
+    newNode->GetLevelWindow(tempLevelWindow, nullptr, "levelwindow"); // get the levelWindow associated with the preview
 
     mitk::ScalarType level; // = this->m_UPPERTHRESHOLD - newValue + 0.5;
     mitk::ScalarType *window = new mitk::ScalarType(1);
@@ -656,7 +656,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ChangeLevelWindow(double newValue)
       tempLevelWindow.SetLevelWindow(level, *window);
     }
 
-    newNode->SetLevelWindow(tempLevelWindow, NULL, "levelwindow");
+    newNode->SetLevelWindow(tempLevelWindow, nullptr, "levelwindow");
 
     if (m_UseVolumeRendering)
       this->UpdateVolumeRenderingThreshold((int)(level - 0.5)); // lower threshold for labeled image
@@ -693,14 +693,14 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
   // get image node
   if (m_InputImageNode.IsNull())
   {
-    QMessageBox::critical(NULL, "Adaptive region growing functionality", "Please specify the image in Datamanager!");
+    QMessageBox::critical(nullptr, "Adaptive region growing functionality", "Please specify the image in Datamanager!");
     return;
   }
   // get image data
   mitk::Image::Pointer orgImage = dynamic_cast<mitk::Image *>(m_InputImageNode->GetData());
   if (orgImage.IsNull())
   {
-    QMessageBox::critical(NULL, "Adaptive region growing functionality", "No Image found!");
+    QMessageBox::critical(nullptr, "Adaptive region growing functionality", "No Image found!");
     return;
   }
   // get labeled segmentation
@@ -708,7 +708,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
     (mitk::Image *)m_DataStorage->GetNamedObject<mitk::Image>(m_NAMEFORLABLEDSEGMENTATIONIMAGE);
   if (labeledSeg.IsNull())
   {
-    QMessageBox::critical(NULL, "Adaptive region growing functionality", "No Segmentation Preview found!");
+    QMessageBox::critical(nullptr, "Adaptive region growing functionality", "No Segmentation Preview found!");
     return;
   }
 
@@ -801,7 +801,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     while (!itOutput.IsAtEnd() && !itInput.IsAtEnd())
     {
       // Use threshold slider to determine if pixel is set to 1
-      if (itInput.Value() != 0 && itInput.Value() >= currentTreshold)
+      if (itInput.Value() != 0 && itInput.Value() >= static_cast<typename itk::ImageRegionIterator<InputImageType>::PixelType>(currentTreshold))
       {
         itOutput.Set(1);
       }
@@ -825,7 +825,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)
     return;
 
   // Check if seed point is already set, if not leave RunSegmentation disabled
-  // if even m_DataStorage is NULL leave node NULL
+  // if even m_DataStorage is nullptr leave node nullptr
   mitk::DataNode::Pointer node = m_RegionGrow3DTool->GetPointSetNode();
   if (node.IsNull())
   {
@@ -837,8 +837,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)
   }
 
   // Check if a segmentation exists, if not leave segmentation dependent disabled.
-  // if even m_DataStorage is NULL leave node NULL
-  node = m_DataStorage ? m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE) : NULL;
+  // if even m_DataStorage is nullptr leave node nullptr
+  node = m_DataStorage ? m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE) : nullptr;
   if (node.IsNull())
   {
     this->m_Controls.m_PreviewSlider->setEnabled(false);

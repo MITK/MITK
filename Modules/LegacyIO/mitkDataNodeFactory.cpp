@@ -446,9 +446,9 @@ mitk::ColorProperty::Pointer mitk::DataNodeFactory::DefaultColorForOrgan(const s
     std::string hexGreen = std::string("0x") + hexColor.substr(4, 2);
     std::string hexBlue = std::string("0x") + hexColor.substr(6, 2);
 
-    long int red = strtol(hexRed.c_str(), NULL, 16);
-    long int green = strtol(hexGreen.c_str(), NULL, 16);
-    long int blue = strtol(hexBlue.c_str(), NULL, 16);
+    long int red = strtol(hexRed.c_str(), nullptr, 16);
+    long int green = strtol(hexGreen.c_str(), nullptr, 16);
+    long int blue = strtol(hexBlue.c_str(), nullptr, 16);
 
     return ColorProperty::New((float)red / 255.0, (float)green / 255.0, (float)blue / 255.0);
   }

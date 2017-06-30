@@ -11,7 +11,14 @@ set(MITK_BUILD_APP_Workbench OFF CACHE BOOL "Build the MITK Workbench" FORCE)
 set(MITK_BUILD_APP_Diffusion ON CACHE BOOL "Build MITK Diffusion" FORCE)
 
 # Activate Diffusion Mini Apps
-set(BUILD_DiffusionMiniApps ON CACHE BOOL "Build MITK Diffusion MiniApps" FORCE)
+set(BUILD_DiffusionCoreCmdApps ON CACHE BOOL "Build commandline tools for diffusion" FORCE)
+set(BUILD_DiffusionFiberProcessingCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber processing" FORCE)
+set(BUILD_DiffusionFiberfoxCmdApps ON CACHE BOOL "Build commandline tools for diffusion data simulation (Fiberfox)" FORCE)
+set(BUILD_DiffusionMiscCmdApps ON CACHE BOOL "Build miscellaneous commandline tools for diffusion" FORCE)
+set(BUILD_DiffusionQuantificationCmdApps ON CACHE BOOL "Build commandline tools for diffusion quantification (IVIM, ADC, ...)" FORCE)
+set(BUILD_DiffusionTractographyCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber tractography" FORCE)
+set(BUILD_DiffusionTractographyEvaluationCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber tractography evaluation" FORCE)
+set(BUILD_DiffusionConnectomicsCmdApps ON CACHE BOOL "Build commandline tools for diffusion connectomics" FORCE)
 
 # Build neither all plugins nor examples
 set(MITK_BUILD_ALL_PLUGINS OFF CACHE BOOL "Build all MITK plugins" FORCE)
@@ -40,7 +47,6 @@ set(_plugins
   org.mitk.gui.common
   org.mitk.planarfigure
   org.mitk.core.ext
-  org.mitk.diffusionimaging
   org.mitk.gui.qt.application
   org.mitk.gui.qt.ext
   org.mitk.gui.qt.diffusionimagingapp
@@ -52,6 +58,18 @@ set(_plugins
   org.mitk.gui.qt.segmentation
   org.mitk.gui.qt.volumevisualization
   org.mitk.gui.qt.diffusionimaging
+  org.mitk.gui.qt.diffusionimaging.connectomics
+  org.mitk.gui.qt.diffusionimaging.denoising
+  org.mitk.gui.qt.diffusionimaging.fiberfox
+  org.mitk.gui.qt.diffusionimaging.fiberprocessing
+  org.mitk.gui.qt.diffusionimaging.ivim
+  org.mitk.gui.qt.diffusionimaging.odfpeaks
+  org.mitk.gui.qt.diffusionimaging.partialvolume
+  org.mitk.gui.qt.diffusionimaging.preprocessing
+  org.mitk.gui.qt.diffusionimaging.reconstruction
+  org.mitk.gui.qt.diffusionimaging.registration
+  org.mitk.gui.qt.diffusionimaging.tbss
+  org.mitk.gui.qt.diffusionimaging.tractography
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing

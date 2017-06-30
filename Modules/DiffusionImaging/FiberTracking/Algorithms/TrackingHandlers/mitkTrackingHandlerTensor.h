@@ -41,7 +41,7 @@ public:
 
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
     void SetF(float f){ m_F = f; }
     void SetG(float g){ m_G = g; }
@@ -55,7 +55,7 @@ public:
         if (m==MODE::DETERMINISTIC)
             m_Mode = m;
         else
-            mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
+            mitkThrow() << "Tensor tracker is only implemented for deterministic mode.";
     }
 
 

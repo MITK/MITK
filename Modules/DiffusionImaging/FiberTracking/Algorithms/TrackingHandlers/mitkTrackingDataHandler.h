@@ -52,7 +52,7 @@ public:
     typedef itk::Image<double, 3>         ItkDoubleImgType;
     typedef vnl_vector_fixed< float, 3 >  TrackingDirectionType;
 
-    virtual TrackingDirectionType ProposeDirection(itk::Point<float, 3>& pos, std::deque< TrackingDirectionType >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
+    virtual TrackingDirectionType ProposeDirection(const itk::Point<float, 3>& pos, std::deque< TrackingDirectionType >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
 
     virtual void InitForTracking() = 0;
     virtual itk::Vector<double, 3> GetSpacing() = 0;
@@ -60,6 +60,7 @@ public:
     virtual itk::Matrix<double, 3, 3> GetDirection() = 0;
     virtual itk::ImageRegion<3> GetLargestPossibleRegion() = 0;
     virtual void SetMode(MODE m) = 0;
+    MODE GetMode(){ return m_Mode; }
 
     void SetAngularThreshold( float a ){ m_AngularThreshold = a; }
     void SetInterpolate( bool interpolate ){ m_Interpolate = interpolate; }
@@ -69,12 +70,13 @@ public:
 
 protected:
 
-    float   m_AngularThreshold;
-    bool    m_Interpolate;
-    bool    m_FlipX;
-    bool    m_FlipY;
-    bool    m_FlipZ;
-    MODE    m_Mode;
+    float           m_AngularThreshold;
+    bool            m_Interpolate;
+    bool            m_FlipX;
+    bool            m_FlipY;
+    bool            m_FlipZ;
+    MODE            m_Mode;
+    BoostRngType    m_Rng;
 
     template< class TPixelType >
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<float, 8>& interpWeights){
@@ -200,9 +202,9 @@ protected:
       frac_z = 1-frac_z;
 
       // int coordinates inside image?
-      if (idx[0] >= 0 && idx[0] < image->GetLargestPossibleRegion().GetSize(0)-1 &&
-          idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
-          idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
+      if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(0) - 1) &&
+          idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(1) - 1) &&
+          idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(2) - 1))
       {
         // trilinear interpolation
         vnl_vector_fixed<float, 8> interpWeights;
@@ -286,9 +288,9 @@ protected:
       frac_z = 1-frac_z;
 
       // int coordinates inside image?
-      if (idx[0] >= 0 && idx[0] < image->GetLargestPossibleRegion().GetSize(0)-1 &&
-          idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
-          idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
+      if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(0) - 1) &&
+          idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(1) - 1) &&
+          idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(2) - 1))
       {
         // trilinear interpolation
         vnl_vector_fixed<float, 8> interpWeights;

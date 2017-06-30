@@ -59,7 +59,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
 
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
     setlocale(LC_ALL, locale.c_str());
 
     std::string filename = this->GetInputLocation();
@@ -77,16 +77,21 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
         {
             reader->Update();
 
-            if ( reader->GetOutput() != NULL )
+            if ( reader->GetOutput() != nullptr )
             {
                 vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
                 FiberBundle::Pointer fiberBundle = FiberBundle::New(fiberPolyData);
 
                 vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fiberPolyData->GetCellData()->GetArray("FIBER_WEIGHTS"));
-                if (weights!=NULL)
+                if (weights!=nullptr)
                 {
 //                    float weight=0;
-//                    for (int i=0; i<weights->GetSize(); i++)
+                    for (int i=0; i<weights->GetSize(); i++)
+                        if (weights->GetValue(i)<0.0)
+                        {
+                            MITK_ERROR << "Fiber weight<0 detected! Setting value to 0.";
+                            weights->SetValue(i,0);
+                        }
 //                        if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
 //                        {
 //                            MITK_INFO << "Weight: " << weights->GetValue(i);
@@ -96,7 +101,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
                 }
 
                 vtkSmartPointer<vtkUnsignedCharArray> fiberColors = vtkUnsignedCharArray::SafeDownCast(fiberPolyData->GetPointData()->GetArray("FIBER_COLORS"));
-                if (fiberColors!=NULL)
+                if (fiberColors!=nullptr)
                     fiberBundle->SetFiberColors(fiberColors);
 
                 result.push_back(fiberBundle.GetPointer());
@@ -121,14 +126,14 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
         {
             reader->Update();
 
-            if ( reader->GetOutput() != NULL )
+            if ( reader->GetOutput() != nullptr )
             {
                 vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
                 FiberBundle::Pointer fiberBundle = FiberBundle::New(fiberPolyData);
 
                 vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fiberPolyData->GetCellData()->GetArray("FIBER_WEIGHTS"));
 
-                if (weights!=NULL)
+                if (weights!=nullptr)
                 {
 //                                float weight=0;
 //                                for (int i=0; i<weights->GetSize(); i++)
@@ -141,7 +146,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
                 }
 
                 vtkSmartPointer<vtkUnsignedCharArray> fiberColors = vtkUnsignedCharArray::SafeDownCast(fiberPolyData->GetPointData()->GetArray("FIBER_COLORS"));
-                if (fiberColors!=NULL)
+                if (fiberColors!=nullptr)
                     fiberBundle->SetFiberColors(fiberColors);
 
                 result.push_back(fiberBundle.GetPointer());

@@ -57,17 +57,17 @@ void mitk::SurfaceDeformationDataInteractor3D::DataNodeChanged()
   {
     m_Surface = dynamic_cast<Surface *>(this->GetDataNode()->GetData());
 
-    if (m_Surface == NULL)
+    if (m_Surface == nullptr)
       MITK_ERROR << "SurfaceDeformationDataInteractor3D::DataNodeChanged(): DataNode has to contain a surface.";
   }
   else
-    m_Surface = NULL;
+    m_Surface = nullptr;
 }
 
 bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return false;
 
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
@@ -85,7 +85,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const Interaction
 void mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
@@ -102,7 +102,7 @@ void mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction *
 void mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
@@ -119,7 +119,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction
 void mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
@@ -142,7 +142,7 @@ void mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineActio
 void mitk::SurfaceDeformationDataInteractor3D::DeformObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
@@ -175,7 +175,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DeformObject(StateMachineAction *
   Vector3D v1 = pickedPoint.GetVectorFromOrigin();
 
   vtkDataArray *normal = polyData->GetPointData()->GetVectors("planeNormal");
-  if (normal != NULL)
+  if (normal != nullptr)
   {
     m_ObjectNormal[0] = normal->GetComponent(0, 0);
     m_ObjectNormal[1] = normal->GetComponent(0, 1);
@@ -222,7 +222,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DeformObject(StateMachineAction *
 void mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   const MouseWheelEvent *wheelEvent = dynamic_cast<const MouseWheelEvent *>(interactionEvent);
-  if (wheelEvent == NULL)
+  if (wheelEvent == nullptr)
     return;
 
   m_GaussSigma += (double)(wheelEvent->GetWheelDelta()) / 20;
@@ -247,16 +247,16 @@ void mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction *,
 void mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(
   vtkPolyData *polyData, int timeStep, const Point3D &pickedPoint, int mode, double scalar)
 {
-  if (polyData == NULL)
+  if (polyData == nullptr)
     return;
 
   vtkPoints *points = polyData->GetPoints();
   vtkPointData *pointData = polyData->GetPointData();
-  if (pointData == NULL)
+  if (pointData == nullptr)
     return;
 
   vtkDataArray *scalars = pointData->GetScalars();
-  if (scalars == NULL)
+  if (scalars == nullptr)
     return;
 
   if (mode == COLORIZATION_GAUSS)
@@ -269,7 +269,7 @@ void mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(
     Vector3D v1 = localPickedPoint.GetVectorFromOrigin();
 
     vtkDataArray *normal = polyData->GetPointData()->GetVectors("planeNormal");
-    if (normal != NULL)
+    if (normal != nullptr)
     {
       m_ObjectNormal[0] = normal->GetComponent(0, 0);
       m_ObjectNormal[1] = normal->GetComponent(0, 1);

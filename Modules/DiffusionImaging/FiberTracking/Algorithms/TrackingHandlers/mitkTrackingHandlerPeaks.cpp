@@ -21,6 +21,7 @@ namespace mitk
 
 TrackingHandlerPeaks::TrackingHandlerPeaks()
   : m_PeakThreshold(0.1)
+  , m_ApplyDirectionMatrix(false)
 {
 
 }
@@ -43,7 +44,10 @@ void TrackingHandlerPeaks::InitForTracking()
   origin3[0] = origin4[0]; origin3[1] = origin4[1]; origin3[2] = origin4[2];
   for (int r=0; r<3; r++)
     for (int c=0; c<3; c++)
+    {
       direction3[r][c] = direction4[r][c];
+      m_FloatImageRotation[r][c] = direction4[r][c];
+    }
   imageRegion3.SetSize(0, imageRegion4.GetSize()[0]);
   imageRegion3.SetSize(1, imageRegion4.GetSize()[1]);
   imageRegion3.SetSize(2, imageRegion4.GetSize()[2]);
@@ -66,6 +70,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
   float mag = oldDir.magnitude();
   if (mag<mitk::eps)
   {
+    bool found = false;
     // try m_NumDirs times to get a non-zero random direction
     for (int j=0; j<m_NumDirs; j++)
     {
@@ -77,20 +82,24 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
         oldDir[0] = out_dir[0];
         oldDir[1] = out_dir[1];
         oldDir[2] = out_dir[2];
+        found = true;
         break;
       }
     }
 
-    // if you didn't find a non-zero random direction, take first non-zero direction you find
-    for (int i=0; i<m_NumDirs; i++)
+    if (!found)
     {
-      out_dir = GetDirection(idx3, i);
-      if (out_dir.magnitude()>mitk::eps)
+      // if you didn't find a non-zero random direction, take first non-zero direction you find
+      for (int i=0; i<m_NumDirs; i++)
       {
-        oldDir[0] = out_dir[0];
-        oldDir[1] = out_dir[1];
-        oldDir[2] = out_dir[2];
-        break;
+        out_dir = GetDirection(idx3, i);
+        if (out_dir.magnitude()>mitk::eps)
+        {
+          oldDir[0] = out_dir[0];
+          oldDir[1] = out_dir[1];
+          oldDir[2] = out_dir[2];
+          break;
+        }
       }
     }
   }
@@ -142,6 +151,8 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3,
     dir[1] *= -1;
   if (m_FlipZ)
     dir[2] *= -1;
+  if (m_ApplyDirectionMatrix)
+    dir = m_FloatImageRotation*dir;
 
   return dir;
 }
@@ -182,9 +193,9 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3
     frac_z = 1-frac_z;
 
     // int coordinates inside image?
-    if (idx3[0] >= 0 && idx3[0] < m_DummyImage->GetLargestPossibleRegion().GetSize(0)-1 &&
-        idx3[1] >= 0 && idx3[1] < m_DummyImage->GetLargestPossibleRegion().GetSize(1)-1 &&
-        idx3[2] >= 0 && idx3[2] < m_DummyImage->GetLargestPossibleRegion().GetSize(2)-1)
+    if (idx3[0] >= 0 && idx3[0] < static_cast<itk::IndexValueType>(m_DummyImage->GetLargestPossibleRegion().GetSize(0) - 1) &&
+        idx3[1] >= 0 && idx3[1] < static_cast<itk::IndexValueType>(m_DummyImage->GetLargestPossibleRegion().GetSize(1) - 1) &&
+        idx3[2] >= 0 && idx3[2] < static_cast<itk::IndexValueType>(m_DummyImage->GetLargestPossibleRegion().GetSize(2) - 1))
     {
       // trilinear interpolation
       vnl_vector_fixed<float, 8> interpWeights;
@@ -222,14 +233,14 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3
     }
   }
   else
-      dir = GetMatchingDirection(idx3, oldDir);
+    dir = GetMatchingDirection(idx3, oldDir);
 
   return dir;
 }
 
-vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
+vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
-    // CHECK: wann wird wo normalisiert
+  // CHECK: wann wird wo normalisiert
   vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);
 
   itk::Index<3> index;
@@ -249,7 +260,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<floa
     output_direction.normalize();
     float a = 1;
     if (old_mag>0.5)
-        a = dot_product(output_direction, oldDir);
+      a = dot_product(output_direction, oldDir);
     if (a>m_AngularThreshold)
       output_direction *= mag;
     else

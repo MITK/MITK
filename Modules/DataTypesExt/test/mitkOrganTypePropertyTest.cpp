@@ -75,9 +75,9 @@ int mitkOrganTypePropertyTest(int /*argc*/, char * /*argv*/ [])
   std::cout << "Object destruction" << std::endl;
 
   // freeing
-  prop1 = NULL;
+  prop1 = nullptr;
   std::cout << "  (II) Freeing works for first property." << std::endl;
-  prop2 = NULL;
+  prop2 = nullptr;
 
   std::cout << "  (II) Freeing works for both properties." << std::endl;
 

@@ -68,7 +68,7 @@ class MITKIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     QmitkNavigationToolCreationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkNavigationToolCreationWidget();
 
-    /** @return Returns the created tool. Returns NULL if no tool was created yet. */
+    /** @return Returns the created tool. Returns nullptr if no tool was created yet. */
     mitk::NavigationTool::Pointer GetCreatedTool();
 
 

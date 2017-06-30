@@ -69,7 +69,7 @@ mitk::DICOMTagPath DcmPathToTagPath(DcmPath * dcmpath)
 
   while (it != endOfList)
   {
-    if (((*it) == NULL) || ((*it)->m_obj == NULL))
+    if (((*it) == nullptr) || ((*it)->m_obj == nullptr))
     {
       mitkThrow() << "Error in DcmPathToTagPath(). Invalid search result";
     }

@@ -60,7 +60,7 @@ namespace mitk
       {
         //todo error handling
         errorMessage->append("Can't add tool, is the toolfile valid?");
-        return NULL;
+        return nullptr;
       }
       thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolTipOrientation());
     }

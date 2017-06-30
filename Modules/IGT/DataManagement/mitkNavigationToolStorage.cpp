@@ -27,7 +27,7 @@ const std::string  mitk::NavigationToolStorage::US_PROPKEY_STORAGE_NAME = US_INT
 
 mitk::NavigationToolStorage::NavigationToolStorage()
   : m_ToolCollection(std::vector<mitk::NavigationTool::Pointer>()),
-    m_DataStorage(NULL),
+    m_DataStorage(nullptr),
     m_storageLocked(false)
   {
   this->SetName("ToolStorage (no name given)");
@@ -152,13 +152,13 @@ mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(int number)
 mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(std::string identifier)
   {
   for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetIdentifier())==identifier) return GetTool(i);
-  return NULL;
+  return nullptr;
   }
 
 mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetToolByName(std::string name)
   {
   for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetToolName())==name) return GetTool(i);
-  return NULL;
+  return nullptr;
   }
 
 int mitk::NavigationToolStorage::GetToolCount()

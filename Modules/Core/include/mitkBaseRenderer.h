@@ -165,14 +165,14 @@ namespace mitk
     //##
     //## Depending of the type of the passed BaseGeometry more or less information can be extracted:
     //## \li if it is a PlaneGeometry (which is a sub-class of BaseGeometry), m_CurrentWorldPlaneGeometry is
-    //## also set to point to it. m_WorldTimeGeometry is set to NULL.
+    //## also set to point to it. m_WorldTimeGeometry is set to nullptr.
     //## \li if it is a TimeGeometry, m_WorldTimeGeometry is also set to point to it.
     //## If m_WorldTimeGeometry contains instances of SlicedGeometry3D, m_CurrentWorldPlaneGeometry is set to
     //## one of geometries stored in the SlicedGeometry3D according to the value of m_Slice;  otherwise
     //## a PlaneGeometry describing the top of the bounding-box of the BaseGeometry is set as the
     //## m_CurrentWorldPlaneGeometry.
     //## \li otherwise a PlaneGeometry describing the top of the bounding-box of the BaseGeometry
-    //## is set as the m_CurrentWorldPlaneGeometry. m_WorldTimeGeometry is set to NULL.
+    //## is set as the m_CurrentWorldPlaneGeometry. m_WorldTimeGeometry is set to nullptr.
     //## @todo add calculation of PlaneGeometry describing the top of the bounding-box of the BaseGeometry
     //## when the passed BaseGeometry is not sliced.
     //## \sa m_WorldGeometry

@@ -49,7 +49,7 @@ void mitk::DisplayInteractor::Notify(InteractionEvent *interactionEvent, bool is
   // the event is passed to the state machine interface to be handled
   if (!isHandled || m_AlwaysReact)
   {
-    this->HandleEvent(interactionEvent, NULL);
+    this->HandleEvent(interactionEvent, nullptr);
   }
 }
 
@@ -101,7 +101,7 @@ mitk::DisplayInteractor::~DisplayInteractor()
 bool mitk::DisplayInteractor::CheckPositionEvent(const InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return false;
   }
@@ -142,8 +142,9 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     return false;
 
   Point3D cursorPosition = posEvent->GetPositionInWorld();
-  const PlaneGeometry *geometryToBeRotated = NULL; // this one is under the mouse cursor
-  const PlaneGeometry *anyOtherGeometry = NULL;    // this is also visible (for calculation of intersection ONLY)
+  const auto spacing = ourViewportGeometry->GetSpacing();
+  const PlaneGeometry *geometryToBeRotated = nullptr; // this one is under the mouse cursor
+  const PlaneGeometry *anyOtherGeometry = nullptr;    // this is also visible (for calculation of intersection ONLY)
   Line3D intersectionLineWithGeometryToBeRotated;
 
   bool hitMultipleLines(false);
@@ -162,7 +163,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
       continue;
 
     const PlaneGeometry *otherRenderersRenderPlane = snc->GetCurrentPlaneGeometry();
-    if (otherRenderersRenderPlane == NULL)
+    if (otherRenderersRenderPlane == nullptr)
       continue; // ignore, we don't see a plane
 
     // check if there is an intersection
@@ -173,7 +174,8 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     }
 
     // check distance from intersection line
-    double distanceFromIntersectionLine = intersectionLine.Distance(cursorPosition);
+    const double distanceFromIntersectionLine =
+      intersectionLine.Distance(cursorPosition) / spacing[snc->GetDefaultViewDirection()];
 
     // far away line, only remember for linked rotation if necessary
     if (distanceFromIntersectionLine > threshholdDistancePixels)
@@ -188,7 +190,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     }
     else // close to cursor
     {
-      if (geometryToBeRotated == NULL) // first one close to the cursor
+      if (geometryToBeRotated == nullptr) // first one close to the cursor
       {
         geometryToBeRotated = otherRenderersRenderPlane;
         intersectionLineWithGeometryToBeRotated = intersectionLine;
@@ -261,9 +263,9 @@ bool mitk::DisplayInteractor::CheckSwivelPossible(const mitk::InteractionEvent *
 
   m_SNCsToBeRotated.clear();
 
-  const PlaneGeometry *clickedGeometry(NULL);
-  const PlaneGeometry *otherGeometry1(NULL);
-  const PlaneGeometry *otherGeometry2(NULL);
+  const PlaneGeometry *clickedGeometry(nullptr);
+  const PlaneGeometry *otherGeometry1(nullptr);
+  const PlaneGeometry *otherGeometry2(nullptr);
 
   auto renWindows = interactionEvent->GetSender()->GetRenderingManager()->GetAllRegisteredRenderWindows();
 
@@ -289,7 +291,7 @@ bool mitk::DisplayInteractor::CheckSwivelPossible(const mitk::InteractionEvent *
     }
     else
     {
-      if (otherGeometry1 == NULL)
+      if (otherGeometry1 == nullptr)
       {
         otherGeometry1 = planeGeometry;
       }
@@ -307,7 +309,7 @@ bool mitk::DisplayInteractor::CheckSwivelPossible(const mitk::InteractionEvent *
 
   mitk::Line3D line;
   mitk::Point3D point;
-  if ((clickedGeometry != NULL) && (otherGeometry1 != NULL) && (otherGeometry2 != NULL) &&
+  if ((clickedGeometry != nullptr) && (otherGeometry1 != nullptr) && (otherGeometry2 != nullptr) &&
       clickedGeometry->IntersectionLine(otherGeometry1, line) && otherGeometry2->IntersectionPoint(line, point))
   {
     m_CenterOfRotation = point;
@@ -537,7 +539,7 @@ void mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction *, Interactio
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   // search for active image
   mitk::DataStorage::Pointer storage = sender->GetDataStorage();
-  mitk::DataNode::Pointer node = NULL;
+  mitk::DataNode::Pointer node = nullptr;
   mitk::DataStorage::SetOfObjects::ConstPointer allImageNodes =
     storage->GetSubset(mitk::NodePredicateDataType::New("Image"));
   for (unsigned int i = 0; i < allImageNodes->size(); i++)
@@ -740,7 +742,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     if (isBinary)
     {
       mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes =
-        posEvent->GetSender()->GetDataStorage()->GetSources(node, NULL, true);
+        posEvent->GetSender()->GetDataStorage()->GetSources(node, nullptr, true);
       if (!sourcenodes->empty())
       {
         topSourceNode = this->GetTopLayerNode(sourcenodes, worldposition, posEvent->GetSender());

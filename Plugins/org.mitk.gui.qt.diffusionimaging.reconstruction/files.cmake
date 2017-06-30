@@ -8,6 +8,8 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   
+  Perspectives/QmitkReconstructionPerspective.cpp
+  
   QmitkQBallReconstructionView.cpp
   QmitkDiffusionQuantificationView.cpp
   QmitkTensorReconstructionView.cpp
@@ -23,6 +25,8 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
+  
+  src/internal/Perspectives/QmitkReconstructionPerspective.h
   
   src/internal/QmitkQBallReconstructionView.h
   src/internal/QmitkDiffusionQuantificationView.h

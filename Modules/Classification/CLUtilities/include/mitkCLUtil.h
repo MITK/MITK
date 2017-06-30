@@ -306,7 +306,7 @@ public:
   template <class TImageType1, class TImageType2>
   static void itkSampleLabel(TImageType1* image, TImageType2* output, double acceptrate, unsigned int label)
   {
-    std::srand (time(NULL));
+    std::srand (time(nullptr));
 
     itk::ImageRegionConstIterator< TImageType1 > inputIter(image, image->GetLargestPossibleRegion());
     itk::ImageRegionIterator< TImageType2 > outputIter(output, output->GetLargestPossibleRegion());
@@ -325,7 +325,7 @@ public:
   template <class TImageType>
   static void itkSampleLabel(TImageType* image, mitk::Image::Pointer & output, unsigned int n_samples_drawn)
   {
-    std::srand (time(NULL));
+    std::srand (time(nullptr));
 
     typename TImageType::Pointer itk_out = TImageType::New();
     itk_out->SetRegions(image->GetLargestPossibleRegion());

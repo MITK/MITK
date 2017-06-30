@@ -215,9 +215,9 @@ public slots:
 
   void DisableColoredRectangles();
 
-  void SetWidgetPlaneVisibility(const char *widgetName, bool visible, mitk::BaseRenderer *renderer = NULL);
+  void SetWidgetPlaneVisibility(const char *widgetName, bool visible, mitk::BaseRenderer *renderer = nullptr);
 
-  void SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer = NULL);
+  void SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer = nullptr);
 
   void SetWidgetPlanesLocked(bool locked);
 

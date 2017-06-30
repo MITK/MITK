@@ -740,7 +740,7 @@ void mitk::BaseGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent << " IndexToWorldTransform: ";
   if (this->IsIndexToWorldTransformNull())
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   else
   {
     // from itk::MatrixOffsetTransformBase
@@ -783,7 +783,7 @@ void mitk::BaseGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
 
   os << indent << " BoundingBox: ";
   if (this->IsBoundingBoxNull())
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   else
   {
     os << indent << "( ";
@@ -830,7 +830,7 @@ bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const "
-                  "mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with NULL "
+                  "mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with nullptr "
                   "pointer input.";
     return false;
   }
@@ -872,7 +872,7 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType "
-                  "eps, bool verbose) does not with NULL pointer input.";
+                  "eps, bool verbose) does not with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);
@@ -981,7 +981,7 @@ bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType "
-                  "*rightHandSide, ScalarType eps, bool verbose ) does not with NULL pointer input.";
+                  "*rightHandSide, ScalarType eps, bool verbose ) does not with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);

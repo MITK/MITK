@@ -27,7 +27,7 @@ namespace itk{
   TractsToFiberEndingsImageFilter< OutputImageType >::TractsToFiberEndingsImageFilter()
     : m_InvertImage(false)
     , m_UpsamplingFactor(1)
-    , m_InputImage(NULL)
+    , m_InputImage(nullptr)
     , m_UseImageGeometry(false)
     , m_BinaryOutput(false)
   {
@@ -117,22 +117,20 @@ namespace itk{
         minSpacing = newSpacing[2];
 
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
-    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-    vLines->InitTraversal();
 
     int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
         ++disp;
-      vtkIdType   numPoints(0);
-      vtkIdType*  points(NULL);
-      vLines->GetNextCell ( numPoints, points );
+      vtkCell* cell = fiberPolyData->GetCell(i);
+      int numPoints = cell->GetNumberOfPoints();
+      vtkPoints* points = cell->GetPoints();
 
       // fill output image
       if (numPoints>0)
       {
-        itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[0]));
+        itk::Point<float, 3> vertex = GetItkPoint(points->GetPoint(0));
         itk::Index<3> index;
         outImage->TransformPhysicalPointToIndex(vertex, index);
         if (upsampledRegion.IsInside(index))
@@ -144,7 +142,7 @@ namespace itk{
 
       if (numPoints>=2)
       {
-        itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[numPoints-1]));
+        itk::Point<float, 3> vertex = GetItkPoint(points->GetPoint(numPoints-1));
         itk::Index<3> index;
         outImage->TransformPhysicalPointToIndex(vertex, index);
         if (upsampledRegion.IsInside(index))

@@ -127,8 +127,6 @@ set(H_FILES
   include/Algorithms/itkMergeDiffusionImagesFilter.h
   include/Algorithms/itkDwiPhantomGenerationFilter.h
   include/Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
-  include/Algorithms/itkMrtrixPeakImageConverter.h
-  include/Algorithms/itkFslPeakImageConverter.h
   include/Algorithms/itkShCoefficientImageImporter.h
   include/Algorithms/itkShCoefficientImageExporter.h
   include/Algorithms/itkOdfMaximaExtractionFilter.h

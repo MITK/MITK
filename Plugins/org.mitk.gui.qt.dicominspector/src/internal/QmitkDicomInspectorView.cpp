@@ -42,11 +42,11 @@ QmitkDicomInspectorView::ObserverInfo::ObserverInfo(mitk::SliceNavigationControl
 }
 
 QmitkDicomInspectorView::QmitkDicomInspectorView() :
-m_renderWindowPart(NULL),
+m_renderWindowPart(nullptr),
 m_PendingSliceChangedEvent(false),
 m_currentSelectedTimeStep(0),
 m_currentSelectedZSlice(0),
-m_currentSelectedNode(NULL),
+m_currentSelectedNode(nullptr),
 m_internalUpdateFlag(false)
 {
   m_currentSelectedPosition.Fill(0.0);
@@ -78,7 +78,7 @@ bool QmitkDicomInspectorView::InitObservers()
         itk::ReceptorMemberCommand<QmitkDicomInspectorView>::New();
       cmdSliceEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnSliceChanged);
       int tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0),
+        mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0),
         cmdSliceEvent);
 
       m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
@@ -88,7 +88,7 @@ bool QmitkDicomInspectorView::InitObservers()
         itk::ReceptorMemberCommand<QmitkDicomInspectorView>::New();
       cmdTimeEvent->SetCallbackFunction(this, &QmitkDicomInspectorView::OnSliceChanged);
       tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0),
+        mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0),
         cmdTimeEvent);
 
       m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
@@ -134,7 +134,7 @@ void QmitkDicomInspectorView::RemoveAllObservers(mitk::IRenderWindowPart* delete
   {
     ObserverMapType::const_iterator delPos = pos++;
 
-    if (deletedPart == NULL || deletedPart == delPos->second.renderWindowPart)
+    if (deletedPart == nullptr || deletedPart == delPos->second.renderWindowPart)
     {
       delPos->second.controller->RemoveObserver(delPos->second.observerTag);
       m_ObserverMap.erase(delPos);
@@ -159,7 +159,7 @@ void QmitkDicomInspectorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
 
     if (!InitObservers())
     {
-      QMessageBox::information(NULL, "Error", "Unable to set up the event observers. The " \
+      QMessageBox::information(nullptr, "Error", "Unable to set up the event observers. The " \
         "plot will not be triggered on changing the crosshair, " \
         "position or time step.");
     }
@@ -169,7 +169,7 @@ void QmitkDicomInspectorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
 void QmitkDicomInspectorView::RenderWindowPartDeactivated(
   mitk::IRenderWindowPart* renderWindowPart)
 {
-  m_renderWindowPart = NULL;
+  m_renderWindowPart = nullptr;
   this->RemoveAllObservers(renderWindowPart);
 }
 
@@ -226,7 +226,7 @@ void QmitkDicomInspectorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
 
 void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
 {
-  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(NULL);
+  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
   unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
   if (m_currentSelectedPosition != currentSelectedPosition
@@ -296,7 +296,7 @@ void QmitkDicomInspectorView::OnSliceChangedDelayed()
 
 void QmitkDicomInspectorView::RenderTable()
 {
-  assert(m_renderWindowPart != NULL);
+  assert(m_renderWindowPart != nullptr);
 
   // configure fit information
   unsigned int rowIndex = 0;

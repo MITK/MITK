@@ -66,15 +66,15 @@ namespace mitk
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
      * ProgressEvent on BaseRenderer. */
-    virtual bool IsLODEnabled(BaseRenderer *renderer = NULL) const override;
-    bool IsMIPEnabled(BaseRenderer *renderer = NULL);
-    bool IsGPUEnabled(BaseRenderer *renderer = NULL);
-    bool IsRAYEnabled(BaseRenderer *renderer = NULL);
+    virtual bool IsLODEnabled(BaseRenderer *renderer = nullptr) const override;
+    bool IsMIPEnabled(BaseRenderer *renderer = nullptr);
+    bool IsGPUEnabled(BaseRenderer *renderer = nullptr);
+    bool IsRAYEnabled(BaseRenderer *renderer = nullptr);
 
     virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer) override;
 
@@ -111,7 +111,7 @@ namespace mitk
     void CreateDefaultTransferFunctions();
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
 
-    vtkSmartPointer<vtkVolume> m_VolumeNULL;
+    vtkSmartPointer<vtkVolume> m_Volumenullptr;
 
     bool m_commonInitialized;
     vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;

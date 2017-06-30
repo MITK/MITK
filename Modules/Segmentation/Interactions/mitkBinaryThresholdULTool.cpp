@@ -67,7 +67,7 @@ mitk::BinaryThresholdULTool::~BinaryThresholdULTool()
 
 const char **mitk::BinaryThresholdULTool::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 us::ModuleResource mitk::BinaryThresholdULTool::GetIconResource() const
@@ -106,8 +106,8 @@ void mitk::BinaryThresholdULTool::Deactivated()
 {
   m_ToolManager->RoiDataChanged -=
     mitk::MessageDelegate<mitk::BinaryThresholdULTool>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
-  m_NodeForThresholding = NULL;
-  m_OriginalImageNode = NULL;
+  m_NodeForThresholding = nullptr;
+  m_OriginalImageNode = nullptr;
   try
   {
     if (DataStorage *storage = m_ToolManager->GetDataStorage())
@@ -120,7 +120,7 @@ void mitk::BinaryThresholdULTool::Deactivated()
   {
     // don't care
   }
-  m_ThresholdFeedbackNode->SetData(NULL);
+  m_ThresholdFeedbackNode->SetData(nullptr);
 
   Superclass::Deactivated();
 }

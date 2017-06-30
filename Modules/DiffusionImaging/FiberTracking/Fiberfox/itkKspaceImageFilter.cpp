@@ -430,9 +430,9 @@ namespace itk {
     frac_z = 1-frac_z;
 
     // int coordinates inside image?
-    if (idx[0] >= 0 && idx[0] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(0)-1 &&
-        idx[1] >= 0 && idx[1] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(1)-1 &&
-        idx[2] >= 0 && idx[2] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(2)-1)
+    if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(0) - 1) &&
+        idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(1) - 1) &&
+        idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(2) - 1))
     {
       vnl_vector_fixed<double, 8> interpWeights;
       interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);

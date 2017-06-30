@@ -89,7 +89,7 @@ public:
   //# PUBLIC SETTER
 public:
   ///
-  /// Sets the Property List to show. Resets the whole model. If _PropertyList is NULL the model is empty.
+  /// Sets the Property List to show. Resets the whole model. If _PropertyList is nullptr the model is empty.
   ///
   void SetPropertyList(mitk::PropertyList *_PropertyList);
 

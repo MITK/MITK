@@ -250,7 +250,7 @@ mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit fo
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
-mitkFunctionAddExternalProject(NAME HDF5        OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
 
 # -----------------------------------------
 # The following external projects must be
@@ -264,7 +264,7 @@ mitkFunctionAddExternalProject(NAME OpenCV    OFF)
 mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 
 # These are "hard" dependencies and always set to ON
-mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
+mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE DEPENDS HDF5)
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 
@@ -280,6 +280,12 @@ mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "U
 
 if(MITK_USE_Qt5)
   mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS Qt5)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  mitkFunctionAddExternalProject(NAME Gflags  OFF ADVANCED DOC "Experimental. Only available on Linux systems. Needed for Caffe.")
+  mitkFunctionAddExternalProject(NAME Caffe   OFF ADVANCED DEPENDS HDF5 OpenCV Gflags DOC "Experimental. Only available on Linux systems.")
+  mitkFunctionAddExternalProject(NAME Caffe2  OFF ADVANCED DOC "Experimental. Only available on Linux systems.")
 endif()
 
 # -----------------------------------------

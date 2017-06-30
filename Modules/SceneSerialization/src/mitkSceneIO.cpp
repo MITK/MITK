@@ -263,7 +263,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
       {
         DataNode *node = iter->GetPointer();
         if (!node)
-          continue; // unlikely event that we get a NULL pointer as an object for saving. just ignore
+          continue; // unlikely event that we get a nullptr pointer as an object for saving. just ignore
 
         // generate UIDs for all source objects
         DataStorage::SetOfObjects::ConstPointer sourceObjects = storage->GetSources(node);
@@ -373,7 +373,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         }
         else
         {
-          MITK_WARN << "Ignoring NULL node during scene serialization.";
+          MITK_WARN << "Ignoring nullptr node during scene serialization.";
         }
 
         ProgressBar::GetInstance()->Progress();

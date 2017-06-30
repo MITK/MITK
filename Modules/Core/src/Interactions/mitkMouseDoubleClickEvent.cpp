@@ -72,5 +72,5 @@ bool mitk::MouseDoubleClickEvent::IsEqual(const mitk::InteractionEvent &interact
 
 bool mitk::MouseDoubleClickEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<MouseDoubleClickEvent *>(baseClass.GetPointer()) != NULL);
+  return (dynamic_cast<MouseDoubleClickEvent *>(baseClass.GetPointer()) != nullptr);
 }

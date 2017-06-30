@@ -258,7 +258,7 @@ void QmitkUSNavigationProcessWidget::UpdateNavigationProgress()
 
 void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
 {
-  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetIsFreezed()) {return;} //no moving through steps when the modality is NULL or frozen
+  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetIsFreezed()) {return;} //no moving through steps when the modality is nullptr or frozen
 
   int currentIndex = ui->stepsToolBox->currentIndex();
   if (currentIndex >= m_CurrentMaxStep)
@@ -274,7 +274,7 @@ void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
 
 void QmitkUSNavigationProcessWidget::OnPreviousButtonClicked()
 {
-  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetIsFreezed()) {return;} //no moving through steps when the modality is NULL or frozen
+  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetIsFreezed()) {return;} //no moving through steps when the modality is nullptr or frozen
 
   int currentIndex = ui->stepsToolBox->currentIndex();
   if (currentIndex <= 0)
@@ -506,7 +506,7 @@ void QmitkUSNavigationProcessWidget::UpdateFilterPipeline()
 
   mitk::NavigationDataSource::Pointer navigationDataSource = m_CombinedModality->GetNavigationDataSource();
 
-  for (unsigned int n = 0; n <= m_CurrentMaxStep && n < m_NavigationSteps.size(); ++n)
+  for (unsigned int n = 0; n <= static_cast<unsigned int>(m_CurrentMaxStep) && n < m_NavigationSteps.size(); ++n)
   {
     QmitkUSAbstractNavigationStep::FilterVector filter = m_NavigationSteps.at(n)->GetFilter();
     if ( ! filter.empty() ) { filterList.insert(filterList.end(), filter.begin(), filter.end()); }

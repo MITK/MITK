@@ -81,7 +81,7 @@ namespace mitk
     LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
 
     /** \brief Set the default properties for general image rendering. */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
   protected:
     ContourModelMapper2D();

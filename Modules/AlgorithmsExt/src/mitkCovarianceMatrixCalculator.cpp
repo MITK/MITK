@@ -118,7 +118,7 @@ void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
   // of the surface:
   // normals = d->m_PolyData->GetPointData()->GetNormals();
   //// compute surface normals if the surface has no normals
-  // if ( normals == NULL )
+  // if ( normals == nullptr )
   //{
   d->m_PolyDataNormals->SetInputData(d->m_PolyData);
   d->m_PolyDataNormals->Update();

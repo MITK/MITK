@@ -109,7 +109,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
 
   m_Latest_Message = msg;
 
-  MITK_INFO << infolog.str();
+  //MITK_INFO << infolog.str();
 
   this->m_Mutex->Unlock();
 }

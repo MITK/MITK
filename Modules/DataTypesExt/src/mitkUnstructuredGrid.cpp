@@ -29,7 +29,7 @@ void mitk::UnstructuredGrid::SetVtkUnstructuredGrid(vtkUnstructuredGrid *grid, u
 
   m_GridSeries[t] = grid;
 
-  // call m_VtkPolyData->Register(NULL) to tell the reference counting that we
+  // call m_VtkPolyData->Register(nullptr) to tell the reference counting that we
   // want to keep a reference on the object
   if (m_GridSeries[t] != nullptr)
     m_GridSeries[t]->Register(grid);

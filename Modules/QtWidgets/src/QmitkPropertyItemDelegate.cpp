@@ -40,7 +40,7 @@ mitk::IPropertyExtensions *GetPropertyService()
   us::ServiceReference<mitk::IPropertyExtensions> serviceRef =
     context->GetServiceReference<mitk::IPropertyExtensions>();
 
-  return serviceRef ? context->GetService<mitk::IPropertyExtensions>(serviceRef) : NULL;
+  return serviceRef ? context->GetService<mitk::IPropertyExtensions>(serviceRef) : nullptr;
 }
 
 QmitkColorWidget::QmitkColorWidget(QWidget *parent)
@@ -107,7 +107,7 @@ QmitkComboBoxListView::~QmitkComboBoxListView()
 
 void QmitkComboBoxListView::paintEvent(QPaintEvent *event)
 {
-  if (m_ComboBox != NULL)
+  if (m_ComboBox != nullptr)
   {
     QStyleOptionComboBox option;
 
@@ -148,7 +148,7 @@ QStyleOptionViewItem QmitkComboBoxListView::viewOptions() const
   QStyleOptionViewItem option = QListView::viewOptions();
   option.showDecorationSelected = true;
 
-  if (m_ComboBox != NULL)
+  if (m_ComboBox != nullptr)
     option.font = m_ComboBox->font();
 
   return option;
@@ -190,7 +190,7 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
       mitk::IPropertyExtensions *extensions = GetPropertyService();
       std::string name = this->GetPropertyName(index);
 
-      if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
+      if (extensions != nullptr && !name.empty() && extensions->HasExtension(name))
       {
         mitk::IntPropertyExtension::Pointer extension =
           dynamic_cast<mitk::IntPropertyExtension *>(extensions->GetExtension(name).GetPointer());
@@ -215,7 +215,7 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
       mitk::IPropertyExtensions *extensions = GetPropertyService();
       std::string name = this->GetPropertyName(index);
 
-      if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
+      if (extensions != nullptr && !name.empty() && extensions->HasExtension(name))
       {
         mitk::FloatPropertyExtension::Pointer extension =
           dynamic_cast<mitk::FloatPropertyExtension *>(extensions->GetExtension(name).GetPointer());

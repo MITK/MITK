@@ -151,7 +151,7 @@ namespace berry {
         //TODO
         //ExpressionPlugin.getDefault().getLog().log(e.getStatus());
         BERRY_ERROR << e.what();
-        IPropertyTester::Pointer nullTester(new NULL_PROPERTY_TESTER_());
+        IPropertyTester::Pointer nullTester(new nullptr_PROPERTY_TESTER_());
         result.push_back(nullTester);
       }
     }

@@ -37,7 +37,7 @@ namespace mitk
     virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
     template <typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing(itk::Image<TPixel, VImageDimension> *itkImage, TPixel *dummy = NULL);
+    void ItkImageProcessing(itk::Image<TPixel, VImageDimension> *itkImage, TPixel *dummy = nullptr);
 
   private:
     unsigned int m_Volume;

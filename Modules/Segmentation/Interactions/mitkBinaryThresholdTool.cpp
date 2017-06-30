@@ -68,7 +68,7 @@ mitk::BinaryThresholdTool::~BinaryThresholdTool()
 
 const char **mitk::BinaryThresholdTool::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 us::ModuleResource mitk::BinaryThresholdTool::GetIconResource() const
@@ -107,8 +107,8 @@ void mitk::BinaryThresholdTool::Deactivated()
 {
   m_ToolManager->RoiDataChanged -=
     mitk::MessageDelegate<mitk::BinaryThresholdTool>(this, &mitk::BinaryThresholdTool::OnRoiDataChanged);
-  m_NodeForThresholding = NULL;
-  m_OriginalImageNode = NULL;
+  m_NodeForThresholding = nullptr;
+  m_OriginalImageNode = nullptr;
   try
   {
     if (DataStorage *storage = m_ToolManager->GetDataStorage())
@@ -121,7 +121,7 @@ void mitk::BinaryThresholdTool::Deactivated()
   {
     // don't care
   }
-  m_ThresholdFeedbackNode->SetData(NULL);
+  m_ThresholdFeedbackNode->SetData(nullptr);
 
   Superclass::Deactivated();
 }

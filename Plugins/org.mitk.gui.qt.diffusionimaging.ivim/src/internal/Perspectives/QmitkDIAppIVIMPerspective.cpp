@@ -46,5 +46,6 @@ void QmitkDIAppIVIMPerspective::CreateInitialLayout(berry::IPageLayout::Pointer 
 
     left->AddView("org.mitk.views.segmentation");
     lo = layout->GetViewLayout("org.mitk.views.segmentation");
-
+    left->AddView("org.mitk.views.diffusionquantification");
+    left->AddView("org.mitk.views.diffusionpreprocessing");
 }

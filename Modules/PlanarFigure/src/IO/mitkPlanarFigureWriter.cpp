@@ -73,7 +73,7 @@ void mitk::PlanarFigureWriter::GenerateData()
       continue;
 
     // PlanarFigure::VertexContainerType* vertices = pf->GetControlPoints();
-    // if (vertices == NULL)
+    // if (vertices == nullptr)
     //  continue;
 
     // Serialize property list of PlanarFigure

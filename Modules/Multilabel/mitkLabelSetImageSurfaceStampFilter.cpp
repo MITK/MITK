@@ -43,7 +43,7 @@ void mitk::LabelSetImageSurfaceStampFilter::GenerateData()
 
   if (m_Surface.IsNull())
   {
-    MITK_ERROR << "Input surface is NULL.";
+    MITK_ERROR << "Input surface is nullptr.";
     return;
   }
 

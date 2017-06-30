@@ -67,12 +67,9 @@ Image< unsigned char, 3 > >
     typedef typename Superclass::InputImageType           CoefficientImageType;
     typedef typename CoefficientImageType::RegionType     CoefficientImageRegionType;
     typedef typename CoefficientImageType::PixelType      CoefficientPixelType;
-
     typedef typename Superclass::OutputImageType          OutputImageType;
     typedef typename Superclass::OutputImageRegionType    OutputImageRegionType;
-
     typedef typename Superclass::InputImageRegionType     InputImageRegionType;
-
     typedef Image< float, 4 >                             PeakImageType;
 
     typedef OrientationDistributionFunction<PixelType, NrOdfDirections>   OdfType;
@@ -91,6 +88,7 @@ Image< unsigned char, 3 > >
     itkSetMacro( FlipX, bool)                               ///< flip peaks in x direction
     itkSetMacro( FlipY, bool)                               ///< flip peaks in y direction
     itkSetMacro( FlipZ, bool)                               ///< flip peaks in z direction
+    itkSetMacro( ApplyDirectionMatrix, bool)
 
     // output
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer )
@@ -140,6 +138,7 @@ Image< unsigned char, 3 > >
     bool                                        m_FlipX;
     bool                                        m_FlipY;
     bool                                        m_FlipZ;
+    bool                                        m_ApplyDirectionMatrix;
 };
 
 }

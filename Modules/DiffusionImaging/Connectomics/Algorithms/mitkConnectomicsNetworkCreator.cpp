@@ -99,21 +99,19 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   idCounter = 0;
 
   vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
-  vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-  vLines->InitTraversal();
 
   int numFibers = m_FiberBundle->GetNumFibers();
   for( int fiberID( 0 ); fiberID < numFibers; fiberID++ )
   {
-    vtkIdType   numPointsInCell(0);
-    vtkIdType*  pointsInCell(nullptr);
-    vLines->GetNextCell ( numPointsInCell, pointsInCell );
+    vtkCell* cell = fiberPolyData->GetCell(fiberID);
+    int numPoints = cell->GetNumberOfPoints();
+    vtkPoints* points = cell->GetPoints();
 
     TractType::Pointer singleTract = TractType::New();
-    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
+    for( int pointInCellID( 0 ); pointInCellID < numPoints ; pointInCellID++)
     {
       // push back point
-      PointType point = GetItkPoint( fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] ) );
+      PointType point = GetItkPoint( points->GetPoint( pointInCellID ) );
       singleTract->InsertElement( singleTract->Size(), point );
     }
 

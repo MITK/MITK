@@ -203,7 +203,7 @@ berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Poi
   // sanity checks
   if (page.IsNull())
   {
-    throw std::invalid_argument("page argument must not be NULL");
+    throw std::invalid_argument("page argument must not be nullptr");
   }
 
   // open the editor on the input
@@ -218,7 +218,7 @@ berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Poi
   // sanity checks
   if (page.IsNull())
   {
-    throw std::invalid_argument("page argument must not be NULL");
+    throw std::invalid_argument("page argument must not be nullptr");
   }
 
   // open the editor on the data storage
@@ -348,7 +348,7 @@ bool WorkbenchUtil::SetDepartmentLogoPreference(const QString &logoResource, ctk
   {
     // Get the preferences service
     ctkServiceReference prefServiceRef = context->getServiceReference<berry::IPreferencesService>();
-    berry::IPreferencesService* prefService = NULL;
+    berry::IPreferencesService* prefService = nullptr;
     if (prefServiceRef)
     {
       prefService = context->getService<berry::IPreferencesService>(prefServiceRef);

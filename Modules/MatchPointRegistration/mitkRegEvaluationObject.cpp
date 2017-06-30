@@ -127,7 +127,7 @@ namespace mitk
     Superclass::PrintSelf(os,indent);
     if (m_Registration.IsNull())
     {
-      os<< "Error. Eval object points to invalid registration (NULL).";
+      os<< "Error. Eval object points to invalid registration (nullptr).";
     }
     else
     {
@@ -137,7 +137,7 @@ namespace mitk
 
     if (m_TargetImage.IsNull())
     {
-      os<< "Error. Eval object points to invalid target image (NULL).";
+      os<< "Error. Eval object points to invalid target image (nullptr).";
     }
     else
     {
@@ -147,7 +147,7 @@ namespace mitk
 
     if (m_MovingImage.IsNull())
     {
-      os<< "Error. Eval object points to invalid moving image (NULL).";
+      os<< "Error. Eval object points to invalid moving image (nullptr).";
     }
     else
     {

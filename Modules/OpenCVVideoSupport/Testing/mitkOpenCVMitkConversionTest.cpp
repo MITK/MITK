@@ -127,7 +127,7 @@ int mitkOpenCVMitkConversionTest(int argc, char* argv[])
   MITK_TEST_CONDITION( color3 == convertedColor3, "Testing if initially created color values " << static_cast<int>( color3[0] ) << ", " << static_cast<int>( color3[1] ) << ", " << static_cast<int>( color3[2] ) << " matches the color values " << static_cast<int>( convertedColor3[0] ) << ", " << static_cast<int>( convertedColor3[1] ) << ", " << static_cast<int>( convertedColor3[2] ) << " at the same position " << pos3.x << ", " << pos3.y << " in the back converted OpenCV image" )
 
   // the second part of this test checks the conversion of mitk::Images to Ipl images and cv::Mat and back.
-  for(unsigned int i = 1; i < argc; ++i )
+  for (int i = 1; i < argc; ++i)
   {
     ReadImageDataAndConvertForthAndBack(argv[i]);
   }
@@ -180,7 +180,7 @@ void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
   mitk::Image::Pointer mitkTestImage = mitk::IOUtil::LoadImage(imageFileName);
 
   // some format checking
-  mitk::Image::Pointer resultImg = NULL;
+  mitk::Image::Pointer resultImg = nullptr;
   if( mitkTestImage->GetDimension() <= 3 )
   {
     if( mitkTestImage->GetDimension() > 2 && mitkTestImage->GetDimension(2) == 1 )
@@ -271,7 +271,7 @@ void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string i
   toOCvConverter->SetImage(inputForIpl);
   IplImage* iplTestImage = toOCvConverter->GetOpenCVImage();
 
-  MITK_TEST_CONDITION_REQUIRED( iplTestImage != NULL, "Conversion to OpenCv IplImage successful!");
+  MITK_TEST_CONDITION_REQUIRED( iplTestImage != nullptr, "Conversion to OpenCv IplImage successful!");
 
   mitk::OpenCVToMitkImageFilter::Pointer toMitkConverter = mitk::OpenCVToMitkImageFilter::New();
   toMitkConverter->SetOpenCVImage(iplTestImage);

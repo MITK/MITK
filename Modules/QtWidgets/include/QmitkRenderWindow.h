@@ -44,8 +44,8 @@ public:
   QmitkRenderWindow(
     QWidget *parent = 0,
     QString name = "unnamed renderwindow",
-    mitk::VtkPropRenderer *renderer = NULL,
-    mitk::RenderingManager *renderingManager = NULL,
+    mitk::VtkPropRenderer *renderer = nullptr,
+    mitk::RenderingManager *renderingManager = nullptr,
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
   virtual ~QmitkRenderWindow();
 
@@ -84,7 +84,7 @@ public:
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
   // Get it from the QVTKWidget parent
   virtual vtkRenderWindow *GetVtkRenderWindow() override { return GetRenderWindow(); }
-  virtual vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return NULL; }
+  virtual vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return nullptr; }
   void FullScreenMode(bool state);
 
 protected:

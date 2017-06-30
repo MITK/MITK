@@ -32,13 +32,13 @@ const std::string QmitkIGTConnectionWidget::VIEW_ID = "org.mitk.views.igtconnect
 QmitkIGTConnectionWidget::QmitkIGTConnectionWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
-  m_TrackingDevice = NULL;
-  m_TrackingDeviceSource = NULL;
-  m_NavigationToolStorage = NULL;
-  m_DataStorage = NULL;
+  m_TrackingDevice = nullptr;
+  m_TrackingDeviceSource = nullptr;
+  m_NavigationToolStorage = nullptr;
+  m_DataStorage = nullptr;
   m_ErrorMessage = "";
 }
 
@@ -74,7 +74,7 @@ void QmitkIGTConnectionWidget::OnConnect()
     m_TrackingDevice = m_Controls->trackingDeviceConfigurationWidget->GetTrackingDevice();
     if (m_TrackingDevice.IsNotNull())
     {
-      QString fileName = QFileDialog::getOpenFileName(NULL,tr("Open Navigation tool storage"), "/", tr("Toolfile (*.tfl)"));
+      QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Open Navigation tool storage"), "/", tr("Toolfile (*.tfl)"));
       if (LoadToolfile(fileName))
       {
         // Create TrackingDeviceSource and add tools
@@ -94,13 +94,13 @@ void QmitkIGTConnectionWidget::OnConnect()
       else
       {
         QString error(m_ErrorMessage.c_str());
-        QMessageBox::warning(NULL,"Warning",error);
+        QMessageBox::warning(nullptr,"Warning",error);
         // reset button to unchecked
         m_Controls->connectButton->setChecked(false);
         // remove tool nodes from DataStorage
         this->RemoveToolNodes();
         // reset NavigationToolStorage
-        m_NavigationToolStorage = NULL;
+        m_NavigationToolStorage = nullptr;
       }
     }
     else
@@ -121,9 +121,9 @@ void QmitkIGTConnectionWidget::OnConnect()
     // remove tool nodes from DataStorage
     this->RemoveToolNodes();
     // reset members
-    m_NavigationToolStorage = NULL;
-    m_TrackingDevice = NULL;
-    m_TrackingDeviceSource = NULL;
+    m_NavigationToolStorage = nullptr;
+    m_TrackingDevice = nullptr;
+    m_TrackingDeviceSource = nullptr;
     // change button text
     m_Controls->connectButton->setText("Connect");
     // enable configuration widget

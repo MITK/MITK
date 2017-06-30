@@ -96,7 +96,7 @@ const std::string QmitkFiberfoxView::VIEW_ID = "org.mitk.views.fiberfoxview";
 QmitkFiberfoxView::QmitkFiberfoxView()
   : QmitkAbstractView()
   , m_Controls( 0 )
-  , m_SelectedImageNode( NULL )
+  , m_SelectedImageNode( nullptr )
   , m_Worker(this)
   , m_ThreadIsRunning(false)
 {
@@ -208,10 +208,10 @@ void QmitkFiberfoxView::AfterThread()
       GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
     }
   }
-  m_TractsToDwiFilter = NULL;
+  m_TractsToDwiFilter = nullptr;
 
   if (parameters.m_Misc.m_AfterSimulationMessage.size()>0)
-    QMessageBox::information( NULL, "Warning", parameters.m_Misc.m_AfterSimulationMessage.c_str());
+    QMessageBox::information( nullptr, "Warning", parameters.m_Misc.m_AfterSimulationMessage.c_str());
 
   mitk::BaseData::Pointer basedata = parameters.m_Misc.m_ResultNode->GetData();
   if (basedata.IsNotNull())
@@ -247,7 +247,7 @@ void QmitkFiberfoxView::AfterThread()
       m_Controls->m_SimulationStatusText->append("Unknown exception during DWI writing!");
     }
   }
-  parameters.m_SignalGen.m_FrequencyMap = NULL;
+  parameters.m_SignalGen.m_FrequencyMap = nullptr;
 }
 
 void QmitkFiberfoxView::UpdateSimulationStatus()
@@ -761,7 +761,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
   {
     parameters.m_SignalGen.m_SignalScale = itk::NumericTraits<short>::max()*0.75/voxelVolume;
     m_Controls->m_SignalScaleBox->setValue(parameters.m_SignalGen.m_SignalScale);
-    QMessageBox::information( NULL, "Warning",
+    QMessageBox::information( nullptr, "Warning",
                               "Maximum signal exceeding data type limits. Automatically adjusted to "
                               + QString::number(parameters.m_SignalGen.m_SignalScale)
                               + " to obtain a maximum  signal of 75% of the data type maximum."
@@ -1178,12 +1178,12 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
   bool ok = true;
   bool first = true;
   bool dosampling = false;
-  mitk::Image::Pointer diffImg = NULL;
-  itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = NULL;
+  mitk::Image::Pointer diffImg = nullptr;
+  itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = nullptr;
   const int shOrder = 2;
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
-  QballFilterType::CoefficientImageType::Pointer itkFeatureImage = NULL;
-  ItkDoubleImgType::Pointer adcImage = NULL;
+  QballFilterType::CoefficientImageType::Pointer itkFeatureImage = nullptr;
+  ItkDoubleImgType::Pointer adcImage = nullptr;
 
   for (unsigned int i=0; i<ffParamaters.m_FiberModelList.size()+ffParamaters.m_NonFiberModelList.size(); i++)
   {
@@ -1201,7 +1201,7 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
     {
       if (first==true)
       {
-        if ( QMessageBox::question(NULL, "Prototype signal sampling",
+        if ( QMessageBox::question(nullptr, "Prototype signal sampling",
                                    "Do you want to sample prototype signals from the selected diffusion-weighted imag and save them?",
                                    QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes )
           dosampling = true;
@@ -1211,7 +1211,7 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
                             || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(
                               dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData()) ) ) )
         {
-          QMessageBox::information(NULL, "Parameter file not saved", "No diffusion-weighted image selected to sample signal from.");
+          QMessageBox::information(nullptr, "Parameter file not saved", "No diffusion-weighted image selected to sample signal from.");
           return;
         }
         else if (dosampling)
@@ -1303,7 +1303,7 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
         ok = model->SampleKernels(diffImg, ffParamaters.m_SignalGen.m_MaskImage, tensorImage, itkFeatureImage, adcImage);
         if (!ok)
         {
-          QMessageBox::information( NULL, "Parameter file not saved", "No valid prototype signals could be sampled.");
+          QMessageBox::information( nullptr, "Parameter file not saved", "No valid prototype signals could be sampled.");
           return;
         }
       }
@@ -1341,7 +1341,7 @@ void QmitkFiberfoxView::LoadParameters()
     QString missing("Parameter file might be corrupted. The following parameters could not be read: ");
     missing += QString(parameters.m_MissingTags.c_str());
     missing += "\nDefault values have been assigned to the missing parameters.";
-    QMessageBox::information( NULL, "Warning!", missing);
+    QMessageBox::information( nullptr, "Warning!", missing);
   }
 
   m_Controls->m_RealTimeFibers->setChecked(parameters.m_Misc.m_CheckRealTimeFibersBox);
@@ -1389,7 +1389,7 @@ void QmitkFiberfoxView::LoadParameters()
   m_Controls->m_CoilSensBox->setCurrentIndex(parameters.m_SignalGen.m_CoilSensitivityProfile);
   m_Controls->m_AcquisitionTypeBox->setCurrentIndex(parameters.m_SignalGen.m_AcquisitionType);
 
-  if (parameters.m_NoiseModel!=NULL)
+  if (parameters.m_NoiseModel!=nullptr)
   {
     m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
     if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel.get()))
@@ -1440,7 +1440,7 @@ void QmitkFiberfoxView::LoadParameters()
 
   for (unsigned int i=0; i<parameters.m_FiberModelList.size()+parameters.m_NonFiberModelList.size(); i++)
   {
-    mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
+    mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
     if (i<parameters.m_FiberModelList.size())
       signalModel = parameters.m_FiberModelList.at(i);
     else
@@ -2274,14 +2274,14 @@ void QmitkFiberfoxView::GenerateImage()
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
     UpdateGui();
-    QMessageBox::information(NULL, "Template image generated", "You have selected no fiber bundle or diffusion-weighted image, which can be used to simulate a new diffusion-weighted image. A template image with the specified geometry has been generated that can be used to draw artificial fibers (see tab 'Fiber Definition').");
+    QMessageBox::information(nullptr, "Template image generated", "You have selected no fiber bundle or diffusion-weighted image, which can be used to simulate a new diffusion-weighted image. A template image with the specified geometry has been generated that can be used to draw artificial fibers (see tab 'Fiber Definition').");
   }
   else if (m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull())
     SimulateImageFromFibers(m_Controls->m_FiberBundleComboBox->GetSelectedNode());
   else if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( m_Controls->m_TemplateComboBox->GetSelectedNode()) )
     SimulateForExistingDwi(m_Controls->m_TemplateComboBox->GetSelectedNode());
   else
-    QMessageBox::information(NULL, "No image generated", "You have selected no fiber bundle or diffusion-weighted image, which can be used to simulate a new diffusion-weighted image.");
+    QMessageBox::information(nullptr, "No image generated", "You have selected no fiber bundle or diffusion-weighted image, which can be used to simulate a new diffusion-weighted image.");
 }
 
 void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
@@ -2346,15 +2346,15 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
     bool first = true;
     bool ok = true;
     mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
-    itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = NULL;
+    itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = nullptr;
     const int shOrder = 2;
     typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
-    QballFilterType::CoefficientImageType::Pointer itkFeatureImage = NULL;
-    ItkDoubleImgType::Pointer adcImage = NULL;
+    QballFilterType::CoefficientImageType::Pointer itkFeatureImage = nullptr;
+    ItkDoubleImgType::Pointer adcImage = nullptr;
 
     for (unsigned int i=0; i<parameters.m_FiberModelList.size()+parameters.m_NonFiberModelList.size(); i++)
     {
-      mitk::RawShModel<>* model = NULL;
+      mitk::RawShModel<>* model = nullptr;
       if (i<parameters.m_FiberModelList.size())
         model = dynamic_cast<  mitk::RawShModel<>* >(parameters.m_FiberModelList.at(i));
       else
@@ -2411,7 +2411,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
     if (!ok)
     {
-      QMessageBox::information( NULL, "Simulation cancelled", "No valid prototype signals could be sampled.");
+      QMessageBox::information( nullptr, "Simulation cancelled", "No valid prototype signals could be sampled.");
       return;
     }
   }
@@ -2419,7 +2419,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
             || m_Controls->m_Compartment3Box->currentIndex()==3
             || m_Controls->m_Compartment4Box->currentIndex()==4 )
   {
-    QMessageBox::information( NULL, "Simulation cancelled",
+    QMessageBox::information( nullptr, "Simulation cancelled",
                               "Prototype signal but no diffusion-weighted image selected to sample signal from.");
     return;
   }
@@ -2574,7 +2574,7 @@ void QmitkFiberfoxView::ApplyTransform()
 void QmitkFiberfoxView::CopyBundles()
 {
   if ( m_SelectedBundles.size()<1 ){
-    QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
+    QMessageBox::information( nullptr, "Warning", "Select at least one fiber bundle!");
     MITK_WARN("QmitkFiberFoxView") << "Select at least one fiber bundle!";
     return;
   }
@@ -2634,7 +2634,7 @@ void QmitkFiberfoxView::CopyBundles()
 void QmitkFiberfoxView::JoinBundles()
 {
   if ( m_SelectedBundles.size()<2 ){
-    QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
+    QMessageBox::information( nullptr, "Warning", "Select at least two fiber bundles!");
     MITK_WARN("QmitkFiberFoxView") << "Select at least two fiber bundles!";
     return;
   }
@@ -2725,9 +2725,9 @@ void QmitkFiberfoxView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const
   m_SelectedBundles2.clear();
   m_SelectedImages.clear();
   m_SelectedFiducials.clear();
-  m_SelectedFiducial = NULL;
+  m_SelectedFiducial = nullptr;
   m_SelectedBundles.clear();
-  m_SelectedImageNode = NULL;
+  m_SelectedImageNode = nullptr;
 
   // iterate all selected objects, adjust warning visibility
   for( int i=0; i<nodes.size(); i++)
@@ -2890,7 +2890,7 @@ void QmitkFiberfoxView::SetOutputPath()
 {
   // SELECT FOLDER DIALOG
 
-  string outputPath = QFileDialog::getExistingDirectory(NULL, "Save images to...", QString(outputPath.c_str())).toStdString();
+  string outputPath = QFileDialog::getExistingDirectory(nullptr, "Save images to...", QString(outputPath.c_str())).toStdString();
 
   if (outputPath.empty())
     m_Controls->m_SavePathEdit->setText("-");

@@ -31,7 +31,7 @@ QmitkUSNewVideoDeviceWidget::QmitkUSNewVideoDeviceWidget(QWidget* parent,
   Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -231,7 +231,7 @@ void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection()
 
 void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL, "Open Video File");
+  QString fileName = QFileDialog::getOpenFileName(nullptr, "Open Video File");
   if (fileName.isNull())
   {
     return;

@@ -32,11 +32,11 @@ mitk::SimulationVtkMapper3D::LocalStorage::~LocalStorage()
 
 void mitk::SimulationVtkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool overwrite)
 {
-  if (node != NULL)
+  if (node != nullptr)
   {
     Simulation* simulation = dynamic_cast<Simulation*>(node->GetData());
 
-    if (simulation != NULL)
+    if (simulation != nullptr)
     {
       sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
       sofa::component::visualmodel::VisualStyle::SPtr visualStyle;
@@ -134,17 +134,17 @@ void mitk::SimulationVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer
 {
   DataNode* dataNode = this->GetDataNode();
 
-  if (dataNode == NULL)
+  if (dataNode == nullptr)
     return;
 
   Simulation* simulation = dynamic_cast<Simulation*>(dataNode->GetData());
 
-  if (simulation == NULL)
+  if (simulation == nullptr)
     return;
 
   LocalStorage* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
-  if (localStorage->m_Mapper == NULL)
+  if (localStorage->m_Mapper == nullptr)
   {
     localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper3D>::New();
     localStorage->m_Mapper->SetSimulation(simulation);

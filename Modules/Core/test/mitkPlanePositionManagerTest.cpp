@@ -104,7 +104,7 @@ int testAddPlanePosition()
 {
   MITK_TEST_OUTPUT(<< "Starting Test: ######### A d d P l a n e P o s i t i o n #########");
 
-  MITK_TEST_CONDITION(m_Service != NULL, "Testing getting of PlanePositionManagerService");
+  MITK_TEST_CONDITION(m_Service != nullptr, "Testing getting of PlanePositionManagerService");
 
   unsigned int currentID(m_Service->AddNewPlanePosition(m_Geometries.at(0), 0));
 

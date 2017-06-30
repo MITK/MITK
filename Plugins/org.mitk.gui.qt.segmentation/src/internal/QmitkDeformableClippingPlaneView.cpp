@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurfaceDeformationDataInteractor3D.h"
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkVtkRepresentationProperty.h"
+#include "mitkVtkResliceInterpolationProperty.h"
 #include "usModuleRegistry.h"
 
 #include "vtkFloatArray.h"
@@ -469,6 +470,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   clippedNode->SetName("Clipped Image");
   clippedNode->SetColor(1.0,1.0,1.0);  // color property will not be used, labeled image lookuptable will be used instead
   clippedNode->SetProperty ("use color", mitk::BoolProperty::New(false));
+  clippedNode->SetProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST));
   clippedNode->SetOpacity(0.4);
   this->GetDataStorage()->Add(clippedNode);
 

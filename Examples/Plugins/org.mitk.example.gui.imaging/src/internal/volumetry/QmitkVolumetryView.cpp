@@ -239,9 +239,9 @@ void QmitkVolumetryView::OnSaveCsvButtonClicked()
     }
     else
     {
-      // QMessageBox::critical(NULL,"Save Error!",QString("Saving of CSV failed! Couldn't open output file \"") +
+      // QMessageBox::critical(nullptr,"Save Error!",QString("Saving of CSV failed! Couldn't open output file \"") +
       // saveFile + QString("\""),QMessageBox:Ok,QMessageBox::NoButton);
-      // QMessageBox::critical(NULL,"Save Error!","Saving of CSV failed! Couldn't open output file \"" + saveFile.name()
+      // QMessageBox::critical(nullptr,"Save Error!","Saving of CSV failed! Couldn't open output file \"" + saveFile.name()
       // +"\"",QMessageBox::Ok,QMessageBox::NoButton);
     }
   }

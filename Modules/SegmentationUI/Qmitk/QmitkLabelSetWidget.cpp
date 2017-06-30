@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <berryIPreferencesService.h>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
-  : QWidget(parent), m_ToolManager(NULL), m_DataStorage(NULL), m_Completer(NULL)
+  : QWidget(parent), m_ToolManager(nullptr), m_DataStorage(nullptr), m_Completer(nullptr)
 {
   m_Controls.setupUi(this);
 
@@ -767,8 +767,6 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
 
   const mitk::Color &color = label->GetColor();
 
-  QTableWidget *tableWidget = m_Controls.m_LabelSetTableWidget;
-
   QString styleSheet = "background-color:rgb(";
   styleSheet.append(QString::number(color[0] * 255));
   styleSheet.append(",");
@@ -777,7 +775,7 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
   styleSheet.append(QString::number(color[2] * 255));
   styleSheet.append(")");
 
-  // Update text Label tableWdget->item(row,0)
+  QTableWidget *tableWidget = m_Controls.m_LabelSetTableWidget;
   int colWidth = (tableWidget->columnWidth(NAME_COL) < 180) ? 180 : tableWidget->columnWidth(NAME_COL) - 2;
   QString text = fontMetrics().elidedText(label->GetName().c_str(), Qt::ElideMiddle, colWidth);
   item->setText(text);
@@ -792,7 +790,9 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
   pbVisible->setChecked(!label->GetVisible());
 
   if (item->row() == 0)
+  {
     tableWidget->hideRow(item->row()); // hide exterior label
+  }
 }
 
 void QmitkLabelSetWidget::ResetAllTableWidgetItems()

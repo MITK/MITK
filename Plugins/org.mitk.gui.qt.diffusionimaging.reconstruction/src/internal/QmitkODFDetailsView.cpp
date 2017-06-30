@@ -41,7 +41,7 @@ QmitkODFDetailsView::QmitkODFDetailsView()
   : QmitkAbstractView()
   , m_Controls( 0 )
   , m_OdfNormalization(0)
-  , m_ImageNode(NULL)
+  , m_ImageNode(nullptr)
 {
   m_VtkActor = vtkActor::New();
   m_VtkMapper = vtkPolyDataMapper::New();
@@ -77,21 +77,21 @@ void QmitkODFDetailsView::Visible()
       mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
       itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
       command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
-      m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+      m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 
     {
       mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
       itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
       command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
-      m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+      m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 
     {
       mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
       itk::ReceptorMemberCommand<QmitkODFDetailsView>::Pointer command = itk::ReceptorMemberCommand<QmitkODFDetailsView>::New();
       command->SetCallbackFunction( this, &QmitkODFDetailsView::OnSliceChanged );
-      m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+      m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
   }
 }
@@ -137,7 +137,7 @@ void QmitkODFDetailsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*pa
   m_Controls->m_InputData->setTitle("Please Select Input Data");
   m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
 
-  m_ImageNode = NULL;
+  m_ImageNode = nullptr;
 
   // iterate selection
   for (mitk::DataNode::Pointer node: nodes)

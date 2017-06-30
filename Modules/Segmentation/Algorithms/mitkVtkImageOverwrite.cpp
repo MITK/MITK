@@ -125,7 +125,7 @@ mitkVtkImageOverwrite::~mitkVtkImageOverwrite()
 #define VTK_RESLICE_WRAP 1       // wrap to opposite side of image
 #define VTK_RESLICE_MIRROR 2     // mirror off of the boundary
 #define VTK_RESLICE_BORDER 3     // use a half-voxel border
-#define VTK_RESLICE_NULL 4       // do nothing to *outPtr if out-of-bounds
+#define VTK_RESLICE_nullptr 4       // do nothing to *outPtr if out-of-bounds
 
 //----------------------------------------------------------------------------
 // rounding functions for each type, where 'F' is a floating-point type

@@ -38,7 +38,7 @@ const std::string QmitkNavigationToolManagementWidget::VIEW_ID = "org.mitk.views
 QmitkNavigationToolManagementWidget::QmitkNavigationToolManagementWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
 }
@@ -68,7 +68,7 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
     return;
   }
   mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Add Navigation Tool"), "/", "*.IGTTool").toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Add Navigation Tool"), "/", "*.IGTTool").toLatin1().data();
   if (filename == "") return;
   mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
   if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
@@ -87,10 +87,10 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
 void QmitkNavigationToolManagementWidget::OnSaveTool()
 {
   //if no item is selected, show error message:
-  if (m_Controls->m_ToolList->currentItem() == NULL) { MessageBox("Error: Please select tool first!"); return; }
+  if (m_Controls->m_ToolList->currentItem() == nullptr) { MessageBox("Error: Please select tool first!"); return; }
 
   mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-  std::string filename = QFileDialog::getSaveFileName(NULL, tr("Save Navigation Tool"), "/", "*.IGTTool").toLatin1().data();
+  std::string filename = QFileDialog::getSaveFileName(nullptr, tr("Save Navigation Tool"), "/", "*.IGTTool").toLatin1().data();
   filename.append(".IGTTool");
   if (filename == "") return;
   if (!myWriter->DoWrite(filename, m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())))
@@ -135,7 +135,7 @@ void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorag
   }
   else
   {
-    m_NavigationToolStorage = NULL;
+    m_NavigationToolStorage = nullptr;
     DisableStorageControls();
   }
   UpdateToolTable();
@@ -211,7 +211,7 @@ void QmitkNavigationToolManagementWidget::OnDeleteTool()
     MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
     return;
   }
-  else if (m_Controls->m_ToolList->currentItem() == NULL) //if no item is selected, show error message:
+  else if (m_Controls->m_ToolList->currentItem() == nullptr) //if no item is selected, show error message:
   {
     MessageBox("Error: Please select tool first!");
     return;
@@ -230,7 +230,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     MessageBox("Storage is locked, cannot modify it. Maybe the tracking device which uses this storage is connected. If you want to modify the storage please disconnect the device first.");
     return;
   }
-  else if (m_Controls->m_ToolList->currentItem() == NULL) //if no item is selected, show error message:
+  else if (m_Controls->m_ToolList->currentItem() == nullptr) //if no item is selected, show error message:
   {
     MessageBox("Error: Please select tool first!");
     return;
@@ -245,7 +245,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
 
 void QmitkNavigationToolManagementWidget::OnCreateStorage()
 {
-  QString storageName = QInputDialog::getText(NULL, "Storage Name", "Name of the new tool storage:");
+  QString storageName = QInputDialog::getText(nullptr, "Storage Name", "Name of the new tool storage:");
   if (storageName.isNull()) return;
   m_NavigationToolStorage = mitk::NavigationToolStorage::New(this->m_DataStorage);
   m_NavigationToolStorage->SetName(storageName.toStdString());
@@ -257,7 +257,7 @@ void QmitkNavigationToolManagementWidget::OnCreateStorage()
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
 {
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
+  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Open Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
   if (filename == "") return;
 
   try
@@ -283,7 +283,7 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
 {
   //read in filename
-  QString filename = QFileDialog::getSaveFileName(NULL, tr("Save Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)"));
+  QString filename = QFileDialog::getSaveFileName(nullptr, tr("Save Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)"));
   if (filename.isEmpty()) return; //canceled by the user
 
   // add file extension if it wasn't added by the file dialog

@@ -69,7 +69,7 @@ void QmitkMappingJob::OnMapAlgorithmEvent(::itk::Object *, const itk::EventObjec
 
 QmitkMappingJob::QmitkMappingJob()
 {
-  m_spRefGeometry = NULL;
+  m_spRefGeometry = nullptr;
 
   m_spCommand = ::itk::MemberCommand<QmitkMappingJob>::New();
   m_spCommand->SetCallbackFunction(this, &QmitkMappingJob::OnMapAlgorithmEvent);
@@ -81,13 +81,13 @@ void QmitkMappingJob::run()
 {
   const mitk::Image *inputImage = this->GetInputDataAsImage();
   const mitk::PointSet *inputSet = this->GetInputDataAsPointSet();
-  m_spMappedData = NULL;
+  m_spMappedData = nullptr;
 
   if (m_doGeometryRefinement)
   {
     try
     {
-      mitk::Image::Pointer spResultImage = NULL;
+      mitk::Image::Pointer spResultImage = nullptr;
 
       if (inputImage)
       {
@@ -118,7 +118,7 @@ void QmitkMappingJob::run()
   {
     try
     {
-      mitk::BaseData::Pointer spResultData = NULL;
+      mitk::BaseData::Pointer spResultData = nullptr;
 
       if (inputImage)
       {

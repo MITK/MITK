@@ -132,8 +132,7 @@ This ensures that the automatically determined fiber volumes and the map-defined
 \li If a scaling factor is applied to the selcted fiber bundle, the corresponding fiducials are not scaled accordingly.
 \li In some cases the automatic update of the selected fiber bundle is not triggered even if "Real Time Fibers" is checked, e.g. if a fiducial is deleted. If this happens on can always force an update by pressing the "Generate Fibers" button.
 
-If any other issues or feature requests arises during the use of Fiberfox, please don't hesitate to send us an e-mail or directly report the issue in our bugtracker: http://bugs.mitk.org/
-
+If any other issues or feature requests arises during the use of Fiberfox, please don't hesitate to send us an e-mail or directly report the issue in our bugtracker: https://phabricator.mitk.org/maniphest/
 \section QmitkFiberfoxViewUserManualReferences References
 
 [1] Neher, P.F., Laun, F.B., Stieltjes, B., Maier-Hein, K.H., 2014. Fiberfox: facilitating the creation of realistic white matter software phantoms. Magn Reson Med 72, 1460–1470. doi:10.1002/mrm.25045
@@ -143,5 +142,9 @@ If any other issues or feature requests arises during the use of Fiberfox, pleas
 [3] Neher, P.F., Stieltjes, B., Laun, F.B., Meinzer, H.-P., Fritzsche, K.H., 2013. Fiberfox: A novel tool to generate software phantoms of complex fiber geometries, in: Proceedings of International Society of Magnetic Resonance in Medicine.
 
 [4] Hering, J., Neher, P.F., Meinzer, H.-P., Maier-Hein, K.H., 2014. Construction of ground-truth data for head motion correction in diffusion MRI, in: Proceedings of International Society of Magnetic Resonance in Medicine.
+
+[5] Maier-Hein, Klaus, Neher, Peter, Houde, Jean-Christophe, Caruyer, Emmanuel, Daducci, Alessandro, Dyrby, Tim, … Descoteaux, Maxime. (2015). Tractography Challenge ISMRM 2015 Data [Data set]. Zenodo. http://doi.org/10.5281/zenodo.572345
+
+[6] Maier-Hein, Klaus, Neher, Peter, Houde, Jean-Christophe, Caruyer, Emmanuel, Daducci, Alessandro, Dyrby, Tim, … Descoteaux, Maxime. (2017). Tractography Challenge ISMRM 2015 High-resolution Data [Data set]. Zenodo. http://doi.org/10.5281/zenodo.579933
 
 */

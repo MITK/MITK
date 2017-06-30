@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //class FLmitkRenderWindow : public mitk::RenderWindow, public Fl_Gl_Window {
 //  public:
-//  FLmitkRenderWindow(int x,int y,int width,int height,const char* label = "fltk gl win") : mitk::RenderWindow(label,NULL ), Fl_Gl_Window(x,y,width,height), m_InitNeeded(true),m_ResizeNeeded(true) { std::cout << "c'tor FLmitkRenderWindow" << std::endl;}
+//  FLmitkRenderWindow(int x,int y,int width,int height,const char* label = "fltk gl win") : mitk::RenderWindow(label,nullptr ), Fl_Gl_Window(x,y,width,height), m_InitNeeded(true),m_ResizeNeeded(true) { std::cout << "c'tor FLmitkRenderWindow" << std::endl;}
 //
 //  virtual void MakeCurrent() { make_current(); }
 //

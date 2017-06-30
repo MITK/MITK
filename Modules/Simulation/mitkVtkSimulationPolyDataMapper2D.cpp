@@ -60,17 +60,17 @@ void mitk::vtkSimulationPolyDataMapper2D::Render(vtkRenderer* renderer, vtkActor
 
   BaseRenderer* mitkRenderer = BaseRenderer::GetInstance(renderer->GetRenderWindow());
 
-  if (mitkRenderer == NULL)
+  if (mitkRenderer == nullptr)
     return;
 
   SliceNavigationController* sliceNavigationController = mitkRenderer->GetSliceNavigationController();
 
-  if (sliceNavigationController == NULL)
+  if (sliceNavigationController == nullptr)
     return;
 
   const PlaneGeometry* planeGeometry = sliceNavigationController->GetCurrentPlaneGeometry();
 
-  if (planeGeometry == NULL)
+  if (planeGeometry == nullptr)
     return;
 
   renderer->GetRenderWindow()->MakeCurrent();

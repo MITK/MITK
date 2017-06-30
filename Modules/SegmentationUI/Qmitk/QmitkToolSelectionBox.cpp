@@ -41,10 +41,10 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
     m_LayoutColumns(2),
     m_ShowNames(true),
     m_GenerateAccelerators(false),
-    m_ToolGUIWidget(NULL),
-    m_LastToolGUI(NULL),
-    m_ToolButtonGroup(NULL),
-    m_ButtonLayout(NULL),
+    m_ToolGUIWidget(nullptr),
+    m_LastToolGUI(nullptr),
+    m_ToolButtonGroup(nullptr),
+    m_ButtonLayout(nullptr),
     m_EnabledMode(EnabledWithReferenceAndWorkingDataVisible)
 {
   QFont currentFont = QWidget::font();
@@ -62,7 +62,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
   RecreateButtons();
 
   QWidget::setContentsMargins(0, 0, 0, 0);
-  if (layout() != NULL)
+  if (layout() != nullptr)
   {
     layout()->setContentsMargins(0, 0, 0, 0);
   }
@@ -107,7 +107,7 @@ mitk::ToolManager *QmitkToolSelectionBox::GetToolManager()
 }
 
 void QmitkToolSelectionBox::SetToolManager(
-  mitk::ToolManager &newManager) // no NULL pointer allowed here, a manager is required
+  mitk::ToolManager &newManager) // no nullptr pointer allowed here, a manager is required
 {
   // say bye to the old manager
   m_ToolManager->ActiveToolChanged -=
@@ -204,11 +204,11 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
       m_ToolGUIWidget->layout()->removeWidget(m_LastToolGUI);
     }
 
-    // m_LastToolGUI->reparent(NULL, QPoint(0,0));
+    // m_LastToolGUI->reparent(nullptr, QPoint(0,0));
     // TODO: reparent <-> setParent, Daniel fragen
     m_LastToolGUI->setParent(0);
     delete m_LastToolGUI; // will hopefully notify parent and layouts
-    m_LastToolGUI = NULL;
+    m_LastToolGUI = nullptr;
 
     QLayout *layout = m_ToolGUIWidget->layout();
     if (layout)
@@ -217,7 +217,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     }
   }
 
-  QToolButton *toolButton(NULL);
+  QToolButton *toolButton(nullptr);
   // mitk::Tool* tool = m_ToolManager->GetActiveTool();
 
   if (m_ButtonIDForToolID.find(id) != m_ButtonIDForToolID.end()) // if this tool is in our box
@@ -463,7 +463,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   // Q3GroupBox::setColumnLayout ( m_LayoutColumns, Qt::Horizontal );
   // mmueller using gridlayout instead of Q3GroupBox
   // this->setLayout(0);
-  if (m_ButtonLayout == NULL)
+  if (m_ButtonLayout == nullptr)
     m_ButtonLayout = new QGridLayout;
   /*else
     delete m_ButtonLayout;*/
@@ -596,7 +596,7 @@ void QmitkToolSelectionBox::RecreateButtons()
 
     mitk::DataNode *dataNode = m_ToolManager->GetReferenceData(0);
 
-    if (dataNode != NULL && !tool->CanHandle(dataNode->GetData()))
+    if (dataNode != nullptr && !tool->CanHandle(dataNode->GetData()))
       button->setEnabled(false);
 
     m_ButtonIDForToolID[currentToolID] = currentButtonID;

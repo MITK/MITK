@@ -41,7 +41,7 @@ std::string GetPrefix(mitk::BooleanOperation::Type type)
   }
 }
 
-void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = NULL)
+void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = nullptr)
 {
   mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
 
@@ -116,7 +116,7 @@ void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Type type)
 {
   mitk::SliceNavigationController* timeNavigationController = this->GetTimeNavigationController();
-  assert(timeNavigationController != NULL);
+  assert(timeNavigationController != nullptr);
 
   mitk::Image::Pointer segmentation0 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(0)->GetData());
   mitk::Image::Pointer segmentation1 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(1)->GetData());

@@ -135,7 +135,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
 
   //MITK_INFO << "Server received r = " << r;
 
-  MITK_INFO << "Received r = " << r;
+  //MITK_INFO << "Received r = " << r;
 
   if (r == 0) //connection error
   {
@@ -432,7 +432,7 @@ bool mitk::IGTLDevice::SendRTSMessage(const char* type)
   //create a return message
   igtl::MessageBase::Pointer rtsMsg =
     this->m_MessageFactory->CreateInstance(returnType);
-  //if retMsg is NULL there is no return message defined and thus it is not
+  //if retMsg is nullptr there is no return message defined and thus it is not
   //necessary to send one back
   if (rtsMsg.IsNotNull())
   {

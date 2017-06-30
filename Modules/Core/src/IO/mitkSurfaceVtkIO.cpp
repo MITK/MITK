@@ -41,7 +41,7 @@ namespace mitk
     vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 
     // surfaces do not have to exist in all timesteps; therefor, only write valid surfaces
-    if (input->GetVtkPolyData(t) == NULL)
+    if (input->GetVtkPolyData(t) == nullptr)
       return vtkSmartPointer<vtkPolyData>();
 
     std::string baseName = this->GetOutputLocation();

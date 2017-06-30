@@ -97,7 +97,7 @@ void QmitkCESTStatisticsView::CreateQtPartControl( QWidget *parent )
 void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
-  if (nodes.size() == NULL)
+  if (nodes.empty())
   {
     std::stringstream message;
     message << "<font color='red'>Please select an image.</font>";
@@ -445,7 +445,7 @@ void QmitkCESTStatisticsView::OnNormalizeImagePushButtonClicked()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "CEST View", "Please load and select an image before starting image processing.");
+    QMessageBox::information(nullptr, "CEST View", "Please load and select an image before starting image processing.");
     return;
   }
 
@@ -464,7 +464,7 @@ void QmitkCESTStatisticsView::OnNormalizeImagePushButtonClicked()
       bool hasOffsets = image->GetPropertyList()->GetStringProperty( mitk::CustomTagParser::m_OffsetsPropertyName.c_str() ,offsets);
       if (!hasOffsets)
       {
-        QMessageBox::information(NULL, "CEST View", "Selected image was missing CEST offset information.");
+        QMessageBox::information(nullptr, "CEST View", "Selected image was missing CEST offset information.");
         return;
       }
       if (image->GetDimension() == 4)
@@ -544,7 +544,7 @@ void QmitkCESTStatisticsView::OnThreeDimToFourDimPushButtonClicked()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "CEST View", "Please load and select an image before starting image processing.");
+    QMessageBox::information( nullptr, "CEST View", "Please load and select an image before starting image processing.");
     return;
   }
 
@@ -677,7 +677,7 @@ void QmitkCESTStatisticsView::FillStatisticsTableView(
       QString("%1").arg(s[t]->GetN())));
 
     const mitk::BaseGeometry *geometry = image->GetGeometry();
-    if (geometry != NULL)
+    if (geometry != nullptr)
     {
       const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
       double volume = spacing[0] * spacing[1] * spacing[2] * (double)s[t]->GetN();

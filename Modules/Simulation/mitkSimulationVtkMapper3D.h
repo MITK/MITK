@@ -42,7 +42,7 @@ namespace mitk
     };
 
   public:
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false);
 
     mitkClassMacro(SimulationVtkMapper3D, VtkMapper);
     itkFactorylessNewMacro(Self)

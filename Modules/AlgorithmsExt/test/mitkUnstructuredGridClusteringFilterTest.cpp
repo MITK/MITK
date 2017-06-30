@@ -74,7 +74,7 @@ public:
     clusterFilter->SetMinPts(4);
     clusterFilter->Seteps(1.2);
     clusterFilter->Update();
-    CPPUNIT_ASSERT_MESSAGE("Testing output generation!", clusterFilter->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing output generation!", clusterFilter->GetOutput() != nullptr);
   }
 
   void testReturnedCluster()

@@ -266,7 +266,7 @@ struct QbrSelListener : ISelectionListener
 
 QmitkQBallReconstructionView::QmitkQBallReconstructionView()
   : QmitkAbstractView(),
-    m_Controls(NULL)
+    m_Controls(nullptr)
 {
 }
 
@@ -543,11 +543,11 @@ void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)
       }
 #else
       std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-      QMessageBox::warning(NULL,"ERROR","Boost 1.35 minimum required");
+      QMessageBox::warning(nullptr,"ERROR","Boost 1.35 minimum required");
 #endif
 #else
       std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-      QMessageBox::warning(NULL,"ERROR","Boost 1.35 minimum required");
+      QMessageBox::warning(nullptr,"ERROR","Boost 1.35 minimum required");
 #endif
     }
   }
@@ -828,17 +828,6 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   }
 
   filter->Update();
-
-  if(m_Controls->m_OutputCoeffsImage->isChecked())
-  {
-    mitk::Image::Pointer coeffsImage = mitk::Image::New();
-    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
-    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
-    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
-    coeffsNode->SetData( coeffsImage );
-    coeffsNode->SetProperty( "name", mitk::StringProperty::New(dataNodePointer->GetName()+"_SH-Coefficients") );
-    GetDataStorage()->Add(coeffsNode, dataNodePointer);
-  }
 
   // ODFs TO DATATREE
   mitk::QBallImage::Pointer image = mitk::QBallImage::New();

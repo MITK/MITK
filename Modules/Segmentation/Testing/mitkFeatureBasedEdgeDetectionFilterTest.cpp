@@ -64,7 +64,7 @@ public:
     testFilter->SetSegmentationMask(m_Segmentation);
     testFilter->Update();
 
-    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput()->GetVtkUnstructuredGrid() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput()->GetVtkUnstructuredGrid() != nullptr);
   }
 };
 

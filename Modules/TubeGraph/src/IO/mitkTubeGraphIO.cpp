@@ -293,7 +293,7 @@ namespace mitk
           if (labelName)
             label = newProperty->GetLabelByName(labelGroup, labelName);
 
-          if (tube != TubeGraph::ErrorId && labelGroup != NULL && label != NULL)
+          if (tube != TubeGraph::ErrorId && labelGroup != nullptr && label != nullptr)
           {
             TubeGraphProperty::TubeToLabelGroupType tubeToLabelGroup(tube, labelGroupName);
             tubeToLabelsMap.insert(

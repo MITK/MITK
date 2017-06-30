@@ -413,7 +413,7 @@ namespace itk
         {
         typename HistogramType::IndexType index;
         index.SetSize(1);
-        for ( unsigned int bin = 0; bin < m_NumBins; bin++ )
+        for ( int bin = 0; bin < m_NumBins; ++bin )
           {
           index[0] = bin;
           m_Histogram->IncreaseFrequency( bin, m_HistogramPerThread[i]->GetFrequency(bin) );

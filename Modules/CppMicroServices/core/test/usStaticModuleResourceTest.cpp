@@ -75,7 +75,7 @@ void testResourcesWithStaticImport(Module* module)
   US_TEST_CONDITION_REQUIRED(!resource.IsValid(), "Check in-valid static.txt resource")
 
   Module* importedByBModule = ModuleRegistry::GetModule("TestModuleImportedByB");
-  US_TEST_CONDITION_REQUIRED(importedByBModule != NULL, "Check valid static module")
+  US_TEST_CONDITION_REQUIRED(importedByBModule != nullptr, "Check valid static module")
   resource = importedByBModule->GetResource("static.txt");
   US_TEST_CONDITION_REQUIRED(resource.IsValid(), "Check valid static.txt resource")
   line = GetResourceContent(resource);
@@ -129,7 +129,7 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 #endif
 
   Module* module = ModuleRegistry::GetModule("TestModuleB");
-  US_TEST_CONDITION_REQUIRED(module != NULL, "Test for existing module TestModuleB")
+  US_TEST_CONDITION_REQUIRED(module != nullptr, "Test for existing module TestModuleB")
   US_TEST_CONDITION(module->GetName() == "TestModuleB", "Test module name")
 
   testResourceOperators(module);

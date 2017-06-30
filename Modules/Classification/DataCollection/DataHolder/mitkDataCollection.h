@@ -165,7 +165,7 @@ namespace mitk
     /**
     * @brief GetMitkImage - casts data to  mitk::Image and returns it
     *
-    * \note returns NULL is object  is no mitk::Image or itk::Image
+    * \note returns nullptr is object  is no mitk::Image or itk::Image
     *
     * @param index
     * @return
@@ -175,7 +175,7 @@ namespace mitk
     /**
     * @brief GetMitkImage - casts data to  mitk::Image and returns it
     *
-    * \note returns NULL is object  is no mitk::Image or itk::Image
+    * \note returns nullptr is object  is no mitk::Image or itk::Image
     *
     * @param name
     * @return

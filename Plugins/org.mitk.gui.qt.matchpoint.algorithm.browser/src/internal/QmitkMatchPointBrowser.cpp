@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMatchPointBrowser::VIEW_ID = "org.mitk.views.matchpoint.algorithm.browser";
 
 QmitkMatchPointBrowser::QmitkMatchPointBrowser()
-    : m_Parent(NULL), m_LoadedDLLHandle(NULL), m_LoadedAlgorithm(NULL)
+    : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr)
 {
 }
 
@@ -102,7 +102,7 @@ void QmitkMatchPointBrowser::OnSearchFolderButtonPushed()
 void QmitkMatchPointBrowser::OnAlgoListSelectionChanged(const QModelIndex& index)
 {
     QVariant vIndex = index.data(Qt::UserRole).toInt();
-    map::deployment::DLLInfo::ConstPointer currentItemInfo = NULL;
+    map::deployment::DLLInfo::ConstPointer currentItemInfo = nullptr;
 
     if (vIndex.isValid())
     {
@@ -208,7 +208,7 @@ void QmitkMatchPointBrowser::RetrieveAndStorePreferenceValues()
     {
         char* deployedAlgorithmLoadPath = getenv("MAP_MDRA_LOAD_PATH");
 
-        if (deployedAlgorithmLoadPath != NULL)
+        if (deployedAlgorithmLoadPath != nullptr)
         {
             // The load path may in fact be a semi-colon or colon separated list of directories, not just one.
             QString paths(deployedAlgorithmLoadPath);

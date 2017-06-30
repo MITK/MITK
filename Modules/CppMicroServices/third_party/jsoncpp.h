@@ -1202,7 +1202,7 @@ public: // overridden from ValueArrayAllocator
       virtual void destructArray( ValueInternalArray *array ) = 0;
       /** \brief Reallocate array page index.
        * Reallocates an array of pointer on each page.
-       * \param indexes [input] pointer on the current index. May be \c NULL.
+       * \param indexes [input] pointer on the current index. May be \c nullptr.
        *                [output] pointer on the new index of at least
        *                         \a minNewIndexCount pages.
        * \param indexCount [input] current number of pages in the index.

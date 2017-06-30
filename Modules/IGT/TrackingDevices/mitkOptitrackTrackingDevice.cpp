@@ -377,26 +377,26 @@ ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* 
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
 
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
 
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
 
   OptitrackTrackingDevice *trackingDevice = static_cast<OptitrackTrackingDevice*>(pInfo->UserData);
 
-  if (trackingDevice != NULL)
+  if (trackingDevice != nullptr)
   {
     // Call the TrackTools function in this thread
     trackingDevice->TrackTools();
   }
   else
   {
-    mitkThrowException(mitk::IGTException) << "In ThreadStartTracking(): trackingDevice is NULL";
+    mitkThrowException(mitk::IGTException) << "In ThreadStartTracking(): trackingDevice is nullptr";
   }
 
   trackingDevice->m_ThreadID = -1; // reset thread ID because we end the thread here
@@ -711,7 +711,7 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
 ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
-  return NULL;
+  return 0;
 }
 
 //=======================================================

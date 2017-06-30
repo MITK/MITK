@@ -47,8 +47,8 @@ using namespace berry;
 QmitkStochasticFiberTrackingView::QmitkStochasticFiberTrackingView()
     : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_SeedRoi( NULL )
-    , m_DiffusionImage( NULL )
+    , m_SeedRoi( nullptr )
+    , m_DiffusionImage( nullptr )
 {
 }
 
@@ -95,9 +95,9 @@ void QmitkStochasticFiberTrackingView::OnMaxCacheSizeChanged(int value)
 
 void QmitkStochasticFiberTrackingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
-    m_DiffusionImageNode = NULL;
-    m_DiffusionImage = NULL;
-    m_SeedRoi = NULL;
+    m_DiffusionImageNode = nullptr;
+    m_DiffusionImage = nullptr;
+    m_SeedRoi = nullptr;
     m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_RoiImageLabel->setText("<font color='red'>mandatory</font>");
 

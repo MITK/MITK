@@ -30,9 +30,9 @@ namespace itk{
 template< class OutputImageType >
 TractDensityImageFilter< OutputImageType >::TractDensityImageFilter()
     : m_InvertImage(false)
-    , m_FiberBundle(NULL)
+    , m_FiberBundle(nullptr)
     , m_UpsamplingFactor(1)
-    , m_InputImage(NULL)
+    , m_InputImage(nullptr)
     , m_BinaryOutput(false)
     , m_UseImageGeometry(false)
     , m_OutputAbsoluteValues(false)
@@ -132,9 +132,9 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     else
         minSpacing = newSpacing[2];
 
-    MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
     if (m_DoFiberResampling)
     {
+      MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
       if (m_WorkOnFiberCopy)
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
       m_FiberBundle->ResampleLinear(minSpacing/10);
@@ -143,22 +143,22 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     MITK_INFO << "TractDensityImageFilter: starting image generation";
 
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
-    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-    vLines->InitTraversal();
+
     int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
         ++disp;
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
+        vtkCell* cell = fiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
         float weight = m_FiberBundle->GetFiberWeight(i);
 
         // fill output image
         for( int j=0; j<numPoints; j++)
         {
-            itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[j]));
+            itk::Point<float, 3> vertex = GetItkPoint(points->GetPoint(j));
             itk::Index<3> index;
             itk::ContinuousIndex<float, 3> contIndex;
             outImage->TransformPhysicalPointToIndex(vertex, index);

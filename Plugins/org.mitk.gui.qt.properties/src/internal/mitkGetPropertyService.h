@@ -29,7 +29,7 @@ namespace mitk
 
     return serviceRef
       ? context->getService<T>(serviceRef)
-      : NULL;
+      : nullptr;
   }
 }
 

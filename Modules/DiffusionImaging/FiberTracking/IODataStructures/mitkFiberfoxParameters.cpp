@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
-  : m_NoiseModel(NULL)
+  : m_NoiseModel(nullptr)
 {
 
 }
@@ -32,7 +32,7 @@ mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::~FiberfoxParameters()
 {
-  //    if (m_NoiseModel!=NULL)
+  //    if (m_NoiseModel!=nullptr)
   //        delete m_NoiseModel;
 }
 
@@ -194,7 +194,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     filename += ".ffp";
 
   const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
+  const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
   if ( locale.compare(currLocale)!=0 )
   {
@@ -303,7 +303,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
   parameters.put("fiberfox.fibers.constantradius", m_Misc.m_CheckConstantRadiusBox);
   parameters.put("fiberfox.fibers.includeFiducials", m_Misc.m_CheckIncludeFiducialsBox);
 
-  if (m_NoiseModel!=NULL)
+  if (m_NoiseModel!=nullptr)
   {
     parameters.put("fiberfox.image.artifacts.noisevariance", m_NoiseModel->GetNoiseVariance());
     if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
@@ -314,7 +314,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
 
   for (int i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
   {
-    mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
+    mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
     if (i<m_FiberModelList.size())
     {
       signalModel = m_FiberModelList.at(i);
@@ -390,7 +390,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
     }
 
-    if (signalModel!=NULL)
+    if (signalModel!=nullptr)
     {
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".ID", signalModel->m_CompartmentId);
 
@@ -469,7 +469,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
   if(filename.empty()) { return; }
 
   const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
+  const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
   if ( locale.compare(currLocale)!=0 )
   {
@@ -642,12 +642,10 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_MotionVolumes.push_back( true );
           }
           // set all true except those given.
-          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter  )
+          for (auto number : numbers)
           {
-            if ( -(*iter) < m_SignalGen.GetNumVolumes() && -(*iter) >= 0 )
-            {
-              m_SignalGen.m_MotionVolumes.at( -(*iter) ) = false;
-            }
+            if (-number < static_cast<int>(m_SignalGen.GetNumVolumes()) && -number >= 0 )
+              m_SignalGen.m_MotionVolumes.at(-number) = false;
           }
           MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of negative numbers.";
         }
@@ -660,12 +658,10 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_MotionVolumes.push_back( false );
           }
           // set all false except those given.
-          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter )
+          for (auto number : numbers)
           {
-            if ( *iter < m_SignalGen.GetNumVolumes() && *iter >= 0 )
-            {
-              m_SignalGen.m_MotionVolumes.at( *iter ) = true;
-            }
+            if (number < static_cast<int>(m_SignalGen.GetNumVolumes()) && number >= 0)
+              m_SignalGen.m_MotionVolumes.at(number) = true;
           }
           MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of positive numbers.";
         }
@@ -713,7 +709,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
       BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("compartments") )
       {
-        mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
+        mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
 
         std::string model = ReadVal<std::string>(v2,"model","",true);
         if (model=="stick")
@@ -811,7 +807,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           signalModel = model;
         }
 
-        if (signalModel!=NULL)
+        if (signalModel!=nullptr)
         {
           signalModel->SetGradientList(gradients);
           try

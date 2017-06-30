@@ -108,27 +108,26 @@ public:
 
     // get/set data
     vtkSmartPointer<vtkFloatArray> GetFiberWeights() const { return m_FiberWeights; }
-    float GetFiberWeight(unsigned int fiber);
+    float GetFiberWeight(unsigned int fiber) const;
     void SetFiberWeights(float newWeight);
     void SetFiberWeight(unsigned int fiber, float weight);
     void SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights);
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData() const;
-    itkGetMacro( NumFibers, int)
+    itkGetConstMacro( NumFibers, int)
     //itkGetMacro( FiberSampling, int)
-    int GetNumFibers() const {return m_NumFibers;}
-    itkGetMacro( MinFiberLength, float )
-    itkGetMacro( MaxFiberLength, float )
-    itkGetMacro( MeanFiberLength, float )
-    itkGetMacro( MedianFiberLength, float )
-    itkGetMacro( LengthStDev, float )
-    itkGetMacro( UpdateTime2D, itk::TimeStamp )
-    itkGetMacro( UpdateTime3D, itk::TimeStamp )
+    itkGetConstMacro( MinFiberLength, float )
+    itkGetConstMacro( MaxFiberLength, float )
+    itkGetConstMacro( MeanFiberLength, float )
+    itkGetConstMacro( MedianFiberLength, float )
+    itkGetConstMacro( LengthStDev, float )
+    itkGetConstMacro( UpdateTime2D, itk::TimeStamp )
+    itkGetConstMacro( UpdateTime3D, itk::TimeStamp )
     void RequestUpdate2D(){ m_UpdateTime2D.Modified(); }
     void RequestUpdate3D(){ m_UpdateTime3D.Modified(); }
     void RequestUpdate(){ m_UpdateTime2D.Modified(); m_UpdateTime3D.Modified(); }
 
-    unsigned long GetNumberOfPoints();
+    unsigned long GetNumberOfPoints() const;
 
     // copy fiber bundle
     mitk::FiberBundle::Pointer GetDeepCopy();

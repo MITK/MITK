@@ -115,7 +115,7 @@ public:
   {
     const std::string fullFileName = AppendExtension(filename, extension.c_str());
 
-    mitk::Image::Pointer singleSliceImage = NULL;
+    mitk::Image::Pointer singleSliceImage = nullptr;
     if (image->GetDimension() == 3)
     {
       mitk::ExtractSliceFilter::Pointer extractFilter = mitk::ExtractSliceFilter::New();
@@ -292,7 +292,7 @@ public:
     // load image
     CPPUNIT_ASSERT_MESSAGE("Checking whether source image exists", itksys::SystemTools::FileExists(sourcefile.c_str()));
 
-    mitk::Image::Pointer image = NULL;
+    mitk::Image::Pointer image = nullptr;
 
     try
     {
@@ -303,7 +303,7 @@ public:
       CPPUNIT_FAIL("Exception during file loading:");
     }
 
-    CPPUNIT_ASSERT_MESSAGE("loaded image not NULL", image.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("loaded image not nullptr", image.IsNotNull());
 
     // write ITK .mhd image (2D and 3D only)
     if (image->GetDimension() <= 3)

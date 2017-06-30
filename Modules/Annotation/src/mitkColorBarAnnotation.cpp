@@ -32,7 +32,7 @@ mitk::ColorBarAnnotation::ColorBarAnnotation()
 
   SetAnnotationTextScaling(false);
 
-  SetLookupTable(NULL);
+  SetLookupTable(nullptr);
 }
 
 mitk::ColorBarAnnotation::~ColorBarAnnotation()

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 #include <vnl/vnl_quaternion.h>
-#include <vnl/vnl_quaternion.txx>
+#include <vnl/vnl_quaternion.hxx>
 
 #include <fstream>
 #include <array>
@@ -41,7 +41,7 @@ static mitk::SlicedGeometry3D::Pointer createSlicedGeometry(const mitk::Point3D 
   slicedGeometry->SetOrigin(origin);
   slicedGeometry->SetSpacing(spacing);
 
-  for (unsigned int i = 0; i < numberOfSlices; ++i)
+  for (int i = 0; i < numberOfSlices; ++i)
   {
     auto planeGeometry = createPlaneGeometry();
     slicedGeometry->SetPlaneGeometry(planeGeometry, i);

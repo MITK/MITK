@@ -34,17 +34,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILinkedRenderWindowPart.h>
 #include <QmitkRenderWindow.h>
 
+#include <mitkImageCast.h>
+
+#include "itkImageRegionConstIteratorWithIndex.h"
+
 #include <limits>
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 const int QmitkImageStatisticsView::STAT_TABLE_BASE_HEIGHT = 180;
 
 QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const char* /*name*/)
-: m_Controls( NULL ),
-  m_TimeStepperAdapter( NULL ),
-  m_SelectedImage( NULL ),
-  m_SelectedImageMask( NULL ),
-  m_SelectedPlanarFigure( NULL ),
+: m_Controls( nullptr ),
+  m_TimeStepperAdapter( nullptr ),
+  m_SelectedImage( nullptr ),
+  m_SelectedImageMask( nullptr ),
+  m_SelectedPlanarFigure( nullptr ),
   m_ImageObserverTag( -1 ),
   m_ImageMaskObserverTag( -1 ),
   m_PlanarFigureObserverTag( -1 ),
@@ -59,11 +63,11 @@ QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const ch
 
 QmitkImageStatisticsView::~QmitkImageStatisticsView()
 {
-  if ( m_SelectedImage != NULL )
+  if ( m_SelectedImage != nullptr )
     m_SelectedImage->RemoveObserver( m_ImageObserverTag );
-  if ( m_SelectedImageMask != NULL )
+  if ( m_SelectedImageMask != nullptr )
     m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
-  if ( m_SelectedPlanarFigure != NULL )
+  if ( m_SelectedPlanarFigure != nullptr )
     m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
 
   while(this->m_CalculationThread->isRunning()) // wait until thread has finished
@@ -75,7 +79,7 @@ QmitkImageStatisticsView::~QmitkImageStatisticsView()
 
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
-  if (m_Controls == NULL)
+  if (m_Controls == nullptr)
   {
     m_Controls = new Ui::QmitkImageStatisticsViewControls;
     m_Controls->setupUi(parent);
@@ -110,7 +114,7 @@ void QmitkImageStatisticsView::OnDefaultBinSizeBoxChanged()
 
   m_Controls->m_BinSizeFrame->setVisible(!m_Controls->m_UseDefaultBinSizeBox->isChecked());
 
-if (m_CalculationThread != NULL){
+if (m_CalculationThread != nullptr){
   m_Controls->m_HistogramBinSizeSpinbox->setValue(m_CalculationThread->GetHistogramBinSize());
   m_CalculationThread->SetUseDefaultNBins(m_Controls->m_UseDefaultBinSizeBox->isChecked());
 }
@@ -152,12 +156,12 @@ void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::
 
 void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 {
-  if (this->m_SelectedDataNodes.isEmpty() || this->m_SelectedImage == NULL)
+  if (this->m_SelectedDataNodes.isEmpty() || this->m_SelectedImage == nullptr)
     return;
 
   const mitk::SliceNavigationController::GeometryTimeEvent* timeEvent =
       dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent*>(&e);
-  assert(timeEvent != NULL);
+  assert(timeEvent != nullptr);
   unsigned int timestep = timeEvent->GetPos();
 
   if (this->m_SelectedImage->GetTimeSteps() > 1)
@@ -167,7 +171,7 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
       for (int y = 0; y < this->m_Controls->m_StatisticsTable->rowCount(); y++)
       {
         QTableWidgetItem* item = this->m_Controls->m_StatisticsTable->item(y, x);
-        if (item == NULL)
+        if (item == nullptr)
           break;
 
         if (x == timestep)
@@ -236,9 +240,9 @@ void QmitkImageStatisticsView::JumpToCoordinates(int row ,int col)
   }
 
   mitk::Point3D world;
-  if (row==4 && !m_WorldMinList.empty())
+  if (row==5 && !m_WorldMinList.empty())
     world = m_WorldMinList[col];
-  else if (row==3 && !m_WorldMaxList.empty())
+  else if (row==4 && !m_WorldMaxList.empty())
     world = m_WorldMaxList[col];
   else
     return;
@@ -262,7 +266,7 @@ void QmitkImageStatisticsView::OnIgnoreZerosCheckboxClicked()
 
 void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
 {
-  if ( m_CurrentStatisticsValid && !( m_SelectedPlanarFigure != NULL))
+  if ( m_CurrentStatisticsValid && !( m_SelectedPlanarFigure != nullptr))
   {
     const unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
@@ -292,7 +296,7 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
         clipboard, QClipboard::Clipboard );
   }
   // If a (non-closed) PlanarFigure is selected, display a line profile widget
-  else if ( m_CurrentStatisticsValid && (m_SelectedPlanarFigure != NULL ))
+  else if ( m_CurrentStatisticsValid && (m_SelectedPlanarFigure != nullptr ))
   {
     /*auto intensity = m_Controls->m_JSHistogram->GetFrequency();
     auto pixel = m_Controls->m_JSHistogram->GetMeasurement();
@@ -321,7 +325,7 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
 {
   QLocale tempLocal;
   QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
-  if ( m_CurrentStatisticsValid && !( m_SelectedPlanarFigure != NULL))
+  if ( m_CurrentStatisticsValid && !( m_SelectedPlanarFigure != nullptr))
    {
     const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics =
       this->m_CalculationThread->GetStatisticsData();
@@ -512,20 +516,20 @@ void QmitkImageStatisticsView::ReinitData()
     itksys::SystemTools::Delay(100);
   }
 
-  if(this->m_SelectedImage != NULL)
+  if(this->m_SelectedImage != nullptr)
   {
     this->m_SelectedImage->RemoveObserver( this->m_ImageObserverTag);
-    this->m_SelectedImage = NULL;
+    this->m_SelectedImage = nullptr;
   }
-  if(this->m_SelectedImageMask != NULL)
+  if(this->m_SelectedImageMask != nullptr)
   {
     this->m_SelectedImageMask->RemoveObserver( this->m_ImageMaskObserverTag);
-    this->m_SelectedImageMask = NULL;
+    this->m_SelectedImageMask = nullptr;
   }
-  if(this->m_SelectedPlanarFigure != NULL)
+  if(this->m_SelectedPlanarFigure != nullptr)
   {
     this->m_SelectedPlanarFigure->RemoveObserver( this->m_PlanarFigureObserverTag);
-    this->m_SelectedPlanarFigure = NULL;
+    this->m_SelectedPlanarFigure = nullptr;
   }
   this->m_SelectedDataNodes.clear();
   this->m_StatisticsUpdatePending = false;
@@ -549,7 +553,7 @@ void QmitkImageStatisticsView::OnThreadedStatisticsCalculationEnds()
 void QmitkImageStatisticsView::UpdateStatistics()
 {
   mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
-  if ( renderPart == NULL )
+  if ( renderPart == nullptr )
   {
     this->m_StatisticsUpdatePending =  false;
     return;
@@ -581,7 +585,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       this->m_SelectedDataNodes.at(i)->GetPropertyValue("binary", isMask);
       isMask |= isLabelSet->CheckNode(this->m_SelectedDataNodes.at(i));
 
-      if( this->m_SelectedImageMask == NULL && isMask)
+      if( this->m_SelectedImageMask == nullptr && isMask)
       {
         this->m_SelectedImageMask = dynamic_cast<mitk::Image*>(this->m_SelectedDataNodes.at(i)->GetData());
         this->m_ImageMaskObserverTag = this->m_SelectedImageMask->AddObserver(itk::ModifiedEvent(), changeListener);
@@ -592,7 +596,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       }
       else if( !isMask )
       {
-        if(this->m_SelectedImage == NULL)
+        if(this->m_SelectedImage == nullptr)
         {
           this->m_SelectedImage = static_cast<mitk::Image*>(this->m_SelectedDataNodes.at(i)->GetData());
           this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
@@ -602,7 +606,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     }
     else if (planarFig.IsNotNull())
     {
-      if(this->m_SelectedPlanarFigure == NULL)
+      if(this->m_SelectedPlanarFigure == nullptr)
       {
         this->m_SelectedPlanarFigure = planarFig;
         this->m_PlanarFigureObserverTag  =
@@ -634,7 +638,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     featureImageName = "None";
   }
 
-  if (m_SelectedPlanarFigure != NULL && m_SelectedImage == NULL)
+  if (m_SelectedPlanarFigure != nullptr && m_SelectedImage == nullptr)
   {
     mitk::DataStorage::SetOfObjects::ConstPointer parentSet = this->GetDataStorage()->GetSources(planarFigureNode);
     for (int i=0; i<parentSet->Size(); i++)
@@ -648,7 +652,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
         if( !isMask )
         {
-          if(this->m_SelectedImage == NULL)
+          if(this->m_SelectedImage == nullptr)
           {
             this->m_SelectedImage = static_cast<mitk::Image*>(node->GetData());
             this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
@@ -660,7 +664,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
   unsigned int timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
 
-  if ( m_SelectedImage != NULL && m_SelectedImage->IsInitialized())
+  if ( m_SelectedImage != nullptr && m_SelectedImage->IsInitialized())
   {
     // Check if a the selected image is a multi-channel image. If yes, statistics
     // cannot be calculated currently.
@@ -703,7 +707,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     // Add the used mask time step to the mask label so the user knows which mask time step was used
     // if the image time step is bigger than the total number of mask time steps (see
     // ImageStatisticsCalculator::ExtractImageAndMask)
-    if (m_SelectedImageMask != NULL)
+    if (m_SelectedImageMask != nullptr)
     {
       unsigned int maskTimeStep = timeStep;
 
@@ -716,6 +720,40 @@ void QmitkImageStatisticsView::UpdateStatistics()
           QString(" (t=") +
           QString::number(maskTimeStep) +
           QString(")"));
+    }
+
+    // check if the segmentation mask is empty
+    if (m_SelectedImageMask != NULL)
+    {
+      typedef itk::Image<unsigned char, 3> ItkImageType;
+      typedef itk::ImageRegionConstIteratorWithIndex< ItkImageType > IteratorType;
+
+      ItkImageType::Pointer itkImage;
+
+      mitk::CastToItkImage( m_SelectedImageMask, itkImage );
+
+      bool empty = true;
+      IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
+      while ( !it.IsAtEnd() )
+      {
+        ItkImageType::ValueType val = it.Get();
+        if ( val != 0 )
+        {
+          empty = false;
+          break;
+        }
+        ++it;
+      }
+
+      if ( empty )
+      {
+        std::stringstream message;
+        message << "<font color='red'>Empty segmentation mask selected...</font>";
+        m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+        m_Controls->m_ErrorMessageLabel->show();
+
+        return;
+      }
     }
 
     //// initialize thread and trigger it
@@ -786,7 +824,7 @@ void QmitkImageStatisticsView::NodeRemoved(const mitk::DataNode *node)
 
   if (node->GetData() == m_SelectedImage)
   {
-    m_SelectedImage = NULL;
+    m_SelectedImage = nullptr;
   }
 }
 
@@ -865,11 +903,11 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     m_CurrentStatisticsValid = false;
 
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
-    if ( m_SelectedPlanarFigure != NULL )
+    if ( m_SelectedPlanarFigure != nullptr )
     {
       // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
       bool outOfBounds = false;
-      if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == NULL)
+      if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == nullptr)
       {
         outOfBounds = true;
         std::stringstream message;
@@ -879,7 +917,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 
       // check whether PlanarFigure is initialized
       const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
-      if ( !(planarFigurePlaneGeometry == NULL || outOfBounds))
+      if ( !(planarFigurePlaneGeometry == nullptr || outOfBounds))
       {
         unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
         m_Controls->m_JSHistogram->SetImage(this->m_CalculationThread->GetStatisticsImage());
@@ -1016,7 +1054,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
         QString("%1").arg(s[t]->GetN()) ) );
 
     const mitk::BaseGeometry *geometry = image->GetGeometry();
-    if ( geometry != NULL )
+    if ( geometry != nullptr )
     {
       const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
       double volume = spacing[0] * spacing[1] * spacing[2] * (double) s[t]->GetN();
@@ -1319,7 +1357,7 @@ void QmitkImageStatisticsView::Visible()
     // is always triggered by all views.
     m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->
         GetSliceNavigationController()->
-        AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), cmdTimeEvent);
+        AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0), cmdTimeEvent);
   }
 
   if (m_DataNodeSelectionChanged)
@@ -1343,7 +1381,7 @@ void QmitkImageStatisticsView::Hidden()
   // The slice navigation controller observer is removed here instead of in the destructor.
   // If it was called in the destructor, the application would freeze because the view's
   // destructor gets called after the render windows have been destructed.
-  if ( m_TimeObserverTag != NULL )
+  if ( m_TimeObserverTag != 0 )
   {
     mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
 
@@ -1352,7 +1390,7 @@ void QmitkImageStatisticsView::Hidden()
       renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->
           RemoveObserver( m_TimeObserverTag );
     }
-    m_TimeObserverTag = NULL;
+    m_TimeObserverTag = 0;
   }
 }
 

@@ -196,7 +196,7 @@ void mitk::VtkShaderRepository::Shader::LoadXmlShader(std::istream &stream)
   parser->SetMaterial(material);
   parser->Parse(content.c_str());
   parser->Delete();
-  if (material == NULL)
+  if (material == nullptr)
     return;
 
   // Vertexshader uniforms

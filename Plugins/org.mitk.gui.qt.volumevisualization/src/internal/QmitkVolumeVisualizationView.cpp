@@ -58,7 +58,7 @@ enum RenderMode
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkAbstractView(),
-  m_Controls(NULL)
+  m_Controls(nullptr)
 {
 }
 

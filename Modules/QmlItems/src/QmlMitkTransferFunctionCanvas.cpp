@@ -37,18 +37,18 @@ m_LineEditAvailable(false)
 }
 
 
-std::pair<int,int> QmlMitkTransferFunctionCanvas::FunctionToCanvas(
-                                                                   std::pair<double,double> functionPoint)
+std::pair<int, int> QmlMitkTransferFunctionCanvas::FunctionToCanvas(std::pair<double, double> functionPoint)
 {
-    return std::make_pair((int) ((functionPoint.first - m_Lower) / (m_Upper
-                                                                    - m_Lower) * boundingRect().width()) + boundingRect().x(), (int) (boundingRect().height() * (1 - functionPoint.second)) + boundingRect().y());
+    return std::make_pair(
+      static_cast<int>(((functionPoint.first - m_Lower) / (m_Upper - m_Lower) * boundingRect().width()) + boundingRect().x()),
+      static_cast<int>((boundingRect().height() * (1 - functionPoint.second)) + boundingRect().y()));
 }
 
-std::pair<double,double> QmlMitkTransferFunctionCanvas::CanvasToFunction(
-                                                                         std::pair<int,int> canvasPoint)
+std::pair<double, double> QmlMitkTransferFunctionCanvas::CanvasToFunction(std::pair<int, int> canvasPoint)
 {
-    return std::make_pair((canvasPoint.first - boundingRect().x()) * (m_Upper - m_Lower) / boundingRect().width()
-                          + m_Lower, 1.0 - (double) (canvasPoint.second - boundingRect().y()) / boundingRect().height());
+    return std::make_pair(
+      (canvasPoint.first - boundingRect().x()) * (m_Upper - m_Lower) / boundingRect().width() + m_Lower,
+      1.0 - static_cast<double>((canvasPoint.second - boundingRect().y()) / boundingRect().height()));
 }
 
 void QmlMitkTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent* mouseEvent)

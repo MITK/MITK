@@ -66,7 +66,7 @@ static void AddPropertyFilters()
 {
   mitk::IPropertyFilters* filters = mitk::org_mitk_simulation_Activator::GetService<mitk::IPropertyFilters>();
 
-  if (filters == NULL)
+  if (filters == nullptr)
     return;
 
   mitk::PropertyFilter filter;
@@ -80,7 +80,7 @@ static void AddPropertyFilters()
   filters->AddFilter(filter, "Simulation");
 }
 
-ctkPluginContext* mitk::org_mitk_simulation_Activator::Context = NULL;
+ctkPluginContext* mitk::org_mitk_simulation_Activator::Context = nullptr;
 
 void mitk::org_mitk_simulation_Activator::start(ctkPluginContext* context)
 {
@@ -93,7 +93,7 @@ void mitk::org_mitk_simulation_Activator::start(ctkPluginContext* context)
 
   QmitkNodeDescriptorManager* nodeDescriptorManager = QmitkNodeDescriptorManager::GetInstance();
 
-  if (nodeDescriptorManager != NULL)
+  if (nodeDescriptorManager != nullptr)
   {
     mitk::NodePredicateDataType::Pointer simulationPredicate = mitk::NodePredicateDataType::New("Simulation");
     nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("Simulation", ":/Simulation/SOFAIcon.png", simulationPredicate, nodeDescriptorManager));
@@ -102,5 +102,5 @@ void mitk::org_mitk_simulation_Activator::start(ctkPluginContext* context)
 
 void mitk::org_mitk_simulation_Activator::stop(ctkPluginContext*)
 {
-  Context = NULL;
+  Context = nullptr;
 }

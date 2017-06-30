@@ -83,11 +83,11 @@ public:
 
   void tearDown() override
   {
-    m_MovingSurface = NULL;
-    m_FixedSurface = NULL;
+    m_MovingSurface = nullptr;
+    m_FixedSurface = nullptr;
 
-    m_TargetsMovingSurface = NULL;
-    m_TargetsFixedSurface = NULL;
+    m_TargetsMovingSurface = nullptr;
+    m_TargetsFixedSurface = nullptr;
 
     m_SigmasMovingSurface.clear();
     m_SigmasFixedSurface.clear();

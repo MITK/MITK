@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _QMITKDIFFUSIONQUANTIFICATIONVIEW_H_INCLUDED
 
 #include <QmitkAbstractView.h>
-
 #include <string>
+#include <itkVectorImage.h>
 
 #include "ui_QmitkDiffusionQuantificationViewControls.h"
 /*!
@@ -45,6 +45,8 @@ class QmitkDiffusionQuantificationView : public QmitkAbstractView
   QmitkDiffusionQuantificationView(const QmitkDiffusionQuantificationView& other);
   virtual ~QmitkDiffusionQuantificationView();
 
+  typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
+
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
@@ -68,6 +70,9 @@ protected slots:
   void ClusterAnisotropy();
   void MD();
 
+  void ADC_DWI();
+  void MD_DWI();
+
   void QBIQuantify(int method);
   void QBIQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
     int method) ;
@@ -78,6 +83,8 @@ protected slots:
 
 protected:
 
+  void DoAdcCalculation(bool fit);
+
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
@@ -85,6 +92,7 @@ protected:
 
   mitk::DataStorage::SetOfObjects::Pointer m_QBallImages;
   mitk::DataStorage::SetOfObjects::Pointer m_TensorImages;
+  mitk::DataStorage::SetOfObjects::Pointer m_DwImages;
 
   static const float m_ScaleDAIValues;
 };

@@ -29,7 +29,7 @@ mitk::SimulationVtkMapper2D::LocalStorage::~LocalStorage()
 
 void mitk::SimulationVtkMapper2D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool overwrite)
 {
-  if (node != NULL)
+  if (node != nullptr)
   {
     node->AddProperty("Simulation.Visual.2D Rendering", BoolProperty::New(false), renderer, overwrite);
     Superclass::SetDefaultProperties(node, renderer, overwrite);
@@ -52,12 +52,12 @@ void mitk::SimulationVtkMapper2D::GenerateDataForRenderer(BaseRenderer* renderer
 {
   DataNode* dataNode = this->GetDataNode();
 
-  if (dataNode == NULL)
+  if (dataNode == nullptr)
     return;
 
   Simulation* simulation = dynamic_cast<Simulation*>(dataNode->GetData());
 
-  if (simulation == NULL)
+  if (simulation == nullptr)
     return;
 
   LocalStorage* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
@@ -67,17 +67,17 @@ void mitk::SimulationVtkMapper2D::GenerateDataForRenderer(BaseRenderer* renderer
 
   if (!enabled)
   {
-    localStorage->m_Actor->SetMapper(NULL);
+    localStorage->m_Actor->SetMapper(nullptr);
     return;
   }
 
-  if (localStorage->m_Mapper == NULL)
+  if (localStorage->m_Mapper == nullptr)
   {
     localStorage->m_Mapper = vtkSmartPointer<vtkSimulationPolyDataMapper2D>::New();
     localStorage->m_Mapper->SetSimulation(simulation);
   }
 
-  if (localStorage->m_Actor->GetMapper() == NULL)
+  if (localStorage->m_Actor->GetMapper() == nullptr)
     localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
 }
 

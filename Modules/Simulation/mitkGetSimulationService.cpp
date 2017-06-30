@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ISimulationService* mitk::GetSimulationService(us::ModuleContext* moduleContext)
 {
-  if (moduleContext == NULL)
-    return NULL;
+  if (moduleContext == nullptr)
+    return nullptr;
 
   us::ServiceReference<mitk::ISimulationService> serviceReference = moduleContext->GetServiceReference<mitk::ISimulationService>();
   return moduleContext->GetService<mitk::ISimulationService>(serviceReference);

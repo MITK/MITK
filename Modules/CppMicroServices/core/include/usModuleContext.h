@@ -119,7 +119,7 @@ public:
    * Get the module that with the specified module name.
    *
    * @param name The name of the module to get.
-   * @return The requested \c Module or \c NULL.
+   * @return The requested \c Module or \c nullptr.
    */
   Module* GetModule(const std::string& name);
 
@@ -224,7 +224,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service object is NULL.
+   *         \c service object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -258,7 +258,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service object is NULL.
+   *         \c service object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -287,7 +287,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service object is NULL.
+   *         \c service object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -320,7 +320,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service factory object is NULL.
+   *         \c service factory object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -352,7 +352,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service factory object is NULL.
+   *         \c service factory object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
@@ -381,7 +381,7 @@ public:
    *         unregister the service.
    * @throws std::logic_error If this ModuleContext is no longer valid.
    * @throws ServiceException If the service type \c S is invalid or the
-   *         \c service factory object is NULL.
+   *         \c service factory object is nullptr.
    *
    * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
    */

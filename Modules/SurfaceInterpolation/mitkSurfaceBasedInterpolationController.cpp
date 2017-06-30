@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 mitk::SurfaceBasedInterpolationController::SurfaceBasedInterpolationController()
-  : m_MinSpacing(1.0), m_MaxSpacing(1.0), m_WorkingImage(NULL), m_ActiveLabel(0)
+  : m_MinSpacing(1.0), m_MaxSpacing(1.0), m_WorkingImage(nullptr), m_ActiveLabel(0)
 {
   this->Initialize();
 }
@@ -62,7 +62,7 @@ void mitk::SurfaceBasedInterpolationController::Initialize()
 
   m_Contours = Surface::New();
 
-  m_InterpolationResult = NULL;
+  m_InterpolationResult = nullptr;
 }
 
 mitk::SurfaceBasedInterpolationController *mitk::SurfaceBasedInterpolationController::GetInstance()
@@ -132,7 +132,7 @@ void mitk::SurfaceBasedInterpolationController::Interpolate()
   if (m_MapOfContourLists[m_ActiveLabel].size() < 2)
   {
     // If no interpolation is possible reset the interpolation result
-    m_InterpolationResult = NULL;
+    m_InterpolationResult = nullptr;
     return;
   }
 
@@ -183,7 +183,7 @@ void mitk::SurfaceBasedInterpolationController::Interpolate()
   if (distanceImage.IsNull())
   {
     // If no interpolation is possible reset the interpolation result
-    m_InterpolationResult = NULL;
+    m_InterpolationResult = nullptr;
     return;
   }
 
@@ -264,7 +264,7 @@ void mitk::SurfaceBasedInterpolationController::SetActiveLabel(int activeLabel)
   {
     ContourPositionPairList newList;
     m_MapOfContourLists.insert(std::pair<unsigned int, ContourPositionPairList>(m_ActiveLabel, newList));
-    m_InterpolationResult = NULL;
+    m_InterpolationResult = nullptr;
   }
 
   this->Modified();
@@ -278,7 +278,7 @@ void mitk::SurfaceBasedInterpolationController::RemoveSegmentationFromContourLis
     m_MapOfContourLists.erase(segmentation);
     if (m_SelectedSegmentation == segmentation)
     {
-      SetSegmentationImage(NULL);
+      SetSegmentationImage(nullptr);
       m_SelectedSegmentation = 0;
     }
   }
@@ -295,7 +295,7 @@ void mitk::SurfaceBasedInterpolationController::OnSegmentationDeleted(const itk:
     RemoveSegmentationFromContourList(tempImage);
     if (tempImage == m_SelectedSegmentation)
     {
-      SetSegmentationImage(NULL);
+      SetSegmentationImage(nullptr);
       m_SelectedSegmentation = 0;
     }
   }

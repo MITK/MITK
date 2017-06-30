@@ -49,7 +49,7 @@ public:
 
     void setUp() override
     {
-        ref = NULL;
+        ref = nullptr;
         tfh = new mitk::TrackingHandlerRandomForest<6,100>();
 
         std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/ReferenceTracts.fib"));
@@ -70,7 +70,7 @@ public:
     void tearDown() override
     {
         delete tfh;
-        ref = NULL;
+        ref = nullptr;
     }
 
     void Track1()

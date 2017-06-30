@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const QString mitk::PythonService::m_TmpDataFileName("temp_mitk_data_file");
 #ifdef USE_MITK_BUILTIN_PYTHON
-static char* pHome = NULL;
+static char* pHome = nullptr;
 #endif
 
 mitk::PythonService::PythonService()
@@ -120,10 +120,10 @@ mitk::PythonService::PythonService()
 #ifdef USE_MITK_BUILTIN_PYTHON
       PyObject* dict = PyDict_New();
       // Import builtin modules
-      if (PyDict_GetItemString(dict, "__builtins__") == NULL)
+      if (PyDict_GetItemString(dict, "__builtins__") == nullptr)
       {
         PyObject* builtinMod = PyImport_ImportModule("__builtin__");
-        if (builtinMod == NULL ||
+        if (builtinMod == nullptr ||
             PyDict_SetItemString(dict, "__builtins__", builtinMod) != 0)
         {
           Py_DECREF(dict);
@@ -288,7 +288,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   const mitk::Point3D origin = image->GetGeometry()->GetOrigin();
   mitk::PixelType pixelType = image->GetPixelType();
   itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
-  PyObject* npyArray = NULL;
+  PyObject* npyArray = nullptr;
   mitk::ImageReadAccessor racc(image);
   void* array = (void*) racc.GetData();
 
@@ -563,7 +563,7 @@ mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrCom
 
 mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std::string &stdvarName)
 {
-  double*ds = NULL;
+  double*ds = nullptr;
   // access python module
   PyObject *pyMod = PyImport_AddModule((char*)"__main__");
   // global dictionarry
@@ -688,7 +688,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
   // global dictionary
   PyObject *pyDict = PyModule_GetDict(pyMod);
   mitk::PixelType pixelType = image->GetPixelType();
-  PyObject* npyArray = NULL;
+  PyObject* npyArray = nullptr;
   mitk::ImageReadAccessor racc(image);
   void* array = (void*) racc.GetData();
 
@@ -852,7 +852,7 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
   // global dictionarry
   PyObject *pyDict = PyModule_GetDict(pyMod);
   // python memory address
-  PyObject *pyAddr = NULL;
+  PyObject *pyAddr = nullptr;
   // cpp address
   size_t addr = 0;
   mitk::Surface::Pointer surface = mitk::Surface::New();

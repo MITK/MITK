@@ -78,7 +78,7 @@ mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool(const char* toolNam
   mitk::OpenIGTLinkTrackingTool::Pointer t;// = mitk::OpenIGTLinkTrackingTool::New();
   //TODO: Implement
   if (this->InternalAddTool(t) == false)
-    return NULL;
+    return nullptr;
   return t.GetPointer();
 }
 
@@ -284,7 +284,7 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
 
   mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput();
   const char* name = currentNavData->GetName();
-  MITK_WARN << name;
+  //MITK_WARN << name;
 
   for (int i = 0; i < m_AllTools.size(); i++)
   {
@@ -369,7 +369,7 @@ unsigned int mitk::OpenIGTLinkTrackingDevice::GetToolCount() const
 mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   if (toolNumber >= this->GetToolCount())
-    return NULL;
+    return nullptr;
   else
     return this->m_AllTools[toolNumber];
 }

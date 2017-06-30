@@ -151,7 +151,7 @@ namespace mitk
         ImageSizeInBytes = this->m_ToFImageSizeInBytes;
     }
     Image::Pointer imageTemplate = Image::New();
-    int dimension ;
+    unsigned int dimension;
     unsigned int* dimensions;
     if(m_ToFImageType == ToFImageType2DPlusT)
     {

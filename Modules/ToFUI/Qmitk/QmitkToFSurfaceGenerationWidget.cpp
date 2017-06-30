@@ -28,10 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFSurfaceGenerationWidget::VIEW_ID = "org.mitk.views.qmitktofsurfacegenerationwidget";
 
 QmitkToFSurfaceGenerationWidget::QmitkToFSurfaceGenerationWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
-, m_Controls(NULL),
-  m_ToFDistanceImageToSurfaceFilter(NULL),
-  m_ToFImageGrabber(NULL),
-  m_CameraIntrinsics(NULL),
+, m_Controls(nullptr),
+  m_ToFDistanceImageToSurfaceFilter(nullptr),
+  m_ToFImageGrabber(nullptr),
+  m_CameraIntrinsics(nullptr),
   m_Active(false)
 {
   CreateQtPartControl(this);

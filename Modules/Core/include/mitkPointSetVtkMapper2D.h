@@ -112,7 +112,7 @@ namespace mitk
   *   - \b "contourcolor" : (ColorProperty (1.0f, 0.0f, 0.0f))  // default color for the contour is red
   *   - \b "color": (ColorProperty (1.0f, 1.0f, 0.0f))          // default color of the (unselected) pointset is yellow
   *   - \b "opacity": (FloatProperty 1.0)                       // opacity of point set, contours
-  *   - \b "label": (StringProperty NULL)     // a label can be defined for each point, which is rendered in proximity
+  *   - \b "label": (StringProperty nullptr)     // a label can be defined for each point, which is rendered in proximity
   * to
   * the point
   *
@@ -131,7 +131,7 @@ namespace mitk
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     /** \brief set the default properties for this mapper */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage

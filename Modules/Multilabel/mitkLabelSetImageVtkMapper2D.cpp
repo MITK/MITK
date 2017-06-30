@@ -85,7 +85,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   // check if there is a valid worldGeometry
   const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  if ((worldGeometry == NULL) || (!worldGeometry->IsValid()) || (!worldGeometry->HasReferenceGeometry()))
+  if ((worldGeometry == nullptr) || (!worldGeometry->IsValid()) || (!worldGeometry->HasReferenceGeometry()))
     return;
 
   image->Update();
@@ -134,12 +134,12 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   // and the geometry of the image that is to be rendered.
   if (!RenderingGeometryIntersectsImage(worldGeometry, image->GetSlicedGeometry()))
   {
-    // set image to NULL, to clear the texture in 3D, because
+    // set image to nullptr, to clear the texture in 3D, because
     // the latest image is used there if the plane is out of the geometry
     // see bug-13275
     for (int lidx = 0; lidx < numberOfLayers; ++lidx)
     {
-      localStorage->m_ReslicedImageVector[lidx] = NULL;
+      localStorage->m_ReslicedImageVector[lidx] = nullptr;
       localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
       localStorage->m_OutlineActor->SetVisibility(false);
       localStorage->m_OutlineShadowActor->SetVisibility(false);
@@ -149,7 +149,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   for (int lidx = 0; lidx < numberOfLayers; ++lidx)
   {
-    mitk::Image *layerImage = NULL;
+    mitk::Image *layerImage = nullptr;
 
     // set main input for ExtractSliceFilter
     if (lidx == activeLayer)
@@ -285,9 +285,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 bool mitk::LabelSetImageVtkMapper2D::RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry,
                                                                       SlicedGeometry3D *imageGeometry)
 {
-  // if either one of the two geometries is NULL we return true
+  // if either one of the two geometries is nullptr we return true
   // for safety reasons
-  if (renderingGeometry == NULL || imageGeometry == NULL)
+  if (renderingGeometry == nullptr || imageGeometry == nullptr)
     return true;
 
   // get the distance for the first cornerpoint
@@ -507,7 +507,7 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   mitk::LabelSetImage *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
 
-  if (image == NULL || image->IsInitialized() == false)
+  if (image == nullptr || image->IsInitialized() == false)
     return;
 
   // Calculate time step of the image data for the specified renderer (integer value)
@@ -515,7 +515,7 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = image->GetTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
     return;

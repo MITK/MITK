@@ -46,7 +46,7 @@ namespace mitk
       m_LODAbortMechanismEnabled(false),
       m_ClippingPlaneEnabled(false),
       m_TimeNavigationController(SliceNavigationController::New()),
-      m_DataStorage(NULL),
+      m_DataStorage(nullptr),
       m_ConstrainedPanningZooming(true),
       m_FocusedRenderWindow(nullptr)
   {
@@ -63,7 +63,7 @@ namespace mitk
     RenderWindowVector::iterator it;
     for (it = m_AllRenderWindows.begin(); it != m_AllRenderWindows.end(); ++it)
     {
-      (*it)->UnRegister(NULL);
+      (*it)->UnRegister(nullptr);
 
       RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
 
@@ -93,8 +93,8 @@ namespace mitk
   RenderingManager::Pointer RenderingManager::New()
   {
     const RenderingManagerFactory *factory = GetFactory();
-    if (factory == NULL)
-      return NULL;
+    if (factory == nullptr)
+      return nullptr;
     return factory->CreateRenderingManager();
   }
 
@@ -179,7 +179,7 @@ namespace mitk
       if (rw_it != m_AllRenderWindows.cend())
       {
         // Decrease reference count for proper destruction
-        (*rw_it)->UnRegister(NULL);
+        (*rw_it)->UnRegister(nullptr);
         m_AllRenderWindows.erase(rw_it);
       }
     }
@@ -315,8 +315,8 @@ namespace mitk
     bool boundingBoxInitialized = false;
 
     TimeGeometry::ConstPointer timeGeometry = dataGeometry;
-    TimeGeometry::Pointer modifiedGeometry = NULL;
-    if (dataGeometry != NULL)
+    TimeGeometry::Pointer modifiedGeometry = nullptr;
+    if (dataGeometry != nullptr)
     {
       modifiedGeometry = dataGeometry->Clone();
     }
@@ -434,7 +434,7 @@ namespace mitk
     int warningLevel = vtkObject::GetGlobalWarningDisplay();
     vtkObject::GlobalWarningDisplayOff();
 
-    if ((geometry != NULL) &&
+    if ((geometry != nullptr) &&
         (const_cast<mitk::BoundingBox *>(geometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps))
     {
       boundingBoxInitialized = true;
@@ -624,7 +624,7 @@ namespace mitk
 
   int RenderingManager::GetNextLOD(BaseRenderer *renderer)
   {
-    if (renderer != NULL)
+    if (renderer != nullptr)
     {
       return m_NextLODMap[renderer];
     }
@@ -711,7 +711,7 @@ namespace mitk
 
   void RenderingManager::SetDataStorage(DataStorage *storage)
   {
-    if (storage != NULL)
+    if (storage != nullptr)
     {
       m_DataStorage = storage;
 

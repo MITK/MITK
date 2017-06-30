@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     mitk::Point3D point;
     point[0] = i * 20;
     point[1] = i * 30;
-    point[2] = -i * 50;
+    point[2] = i * -50;
     pointset->InsertPoint(i, point);
     textAnnotation3D->SetText("A Point");
 
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
   renderWindow.resize(256, 256);
 
   // cleanup: Remove References to DataStorage. This will delete the object
-  ds = NULL;
+  ds = nullptr;
 }
 /**
 \example Step1.cpp

@@ -68,7 +68,7 @@ namespace mitk
      * @result Pointer to the resulting mapped image.h*/
     MITKMATCHPOINTREGISTRATION_EXPORT ResultImageType::Pointer map(const InputImageType* input, const RegistrationType* registration,
       bool throwOnOutOfInputAreaError = false, const double& paddingValue = 0,
-      const ResultImageGeometryType* resultGeometry = NULL,
+      const ResultImageGeometryType* resultGeometry = nullptr,
       bool throwOnMappingError = true, const double& errorValue = 0, mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
     /**Helper that maps a given input image.
@@ -89,7 +89,7 @@ namespace mitk
      * @result Pointer to the resulting mapped image.h*/
     MITKMATCHPOINTREGISTRATION_EXPORT ResultImageType::Pointer map(const InputImageType* input, const MITKRegistrationType* registration,
       bool throwOnOutOfInputAreaError = false, const double& paddingValue = 0,
-      const ResultImageGeometryType* resultGeometry = NULL,
+      const ResultImageGeometryType* resultGeometry = nullptr,
       bool throwOnMappingError = true, const double& errorValue = 0, mitk::ImageMappingInterpolator::Type interpolatorType = mitk::ImageMappingInterpolator::Linear);
 
     /**Method clones the input image and applies the registration by applying it to the Geometry3D of the image.

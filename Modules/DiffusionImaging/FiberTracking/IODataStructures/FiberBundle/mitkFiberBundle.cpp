@@ -120,7 +120,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::AddBundle(mitk::FiberBundle* fib)
 {
     if (fib==nullptr)
     {
-        MITK_WARN << "trying to call AddBundle with NULL argument";
+        MITK_WARN << "trying to call AddBundle with nullptr argument";
         return nullptr;
     }
     MITK_INFO << "Adding fibers";
@@ -731,7 +731,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                         itk::Index<3> idx;
                         mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                        if ( mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)>0 )
+                        if ( mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx) != 0 )
                         {
                             inside++;
                             if (fraction==0)
@@ -767,7 +767,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                         itk::Index<3> idx;
                         mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                        if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
+                        if ( mask->GetPixel(idx) != 0 && mask->GetLargestPossibleRegion().IsInside(idx) )
                         {
                             inside++;
                             includeFiber = false;
@@ -806,7 +806,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                 {
                     if (bothEnds)
                     {
-                        if ( !mask->GetPixel(idxStart)>0 && !mask->GetPixel(idxEnd)>0 )
+                        if ( mask->GetPixel(idxStart) == 0 && mask->GetPixel(idxEnd) == 0 )
                         {
                             for (int j=0; j<numPointsOriginal; j++)
                             {
@@ -816,7 +816,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                             }
                         }
                     }
-                    else if ( !mask->GetPixel(idxStart)>0 || !mask->GetPixel(idxEnd)>0 )
+                    else if ( mask->GetPixel(idxStart) == 0 || mask->GetPixel(idxEnd) == 0 )
                     {
                         for (int j=0; j<numPointsOriginal; j++)
                         {
@@ -830,7 +830,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                 {
                     if (bothEnds)
                     {
-                        if ( mask->GetPixel(idxStart)>0 && mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
+                        if ( mask->GetPixel(idxStart) != 0 && mask->GetPixel(idxEnd) != 0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
                         {
                             for (int j=0; j<numPointsOriginal; j++)
                             {
@@ -840,7 +840,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                             }
                         }
                     }
-                    else if ( (mask->GetPixel(idxStart)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart)) || (mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxEnd)) )
+                    else if ( (mask->GetPixel(idxStart) != 0 && mask->GetLargestPossibleRegion().IsInside(idxStart)) || (mask->GetPixel(idxEnd) != 0 && mask->GetLargestPossibleRegion().IsInside(idxEnd)) )
                     {
                         for (int j=0; j<numPointsOriginal; j++)
                         {
@@ -905,13 +905,13 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
                 itk::Index<3> idx;
                 mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) && !invert )
+                if ( mask->GetPixel(idx) != 0 && mask->GetLargestPossibleRegion().IsInside(idx) && !invert )
                 {
                     vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                     container->GetPointIds()->InsertNextId(id);
                     newNumPoints++;
                 }
-                else if ( (mask->GetPixel(idx)<=0 || !mask->GetLargestPossibleRegion().IsInside(idx)) && invert )
+                else if ( (mask->GetPixel(idx) == 0 || !mask->GetLargestPossibleRegion().IsInside(idx)) && invert )
                 {
                     vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                     container->GetPointIds()->InsertNextId(id);
@@ -1012,7 +1012,7 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
                 result.push_back(i);
 
             std::vector<long>::iterator it;
-            for (long i=0; i<children->Size(); ++i)
+            for (unsigned int i=0; i<children->Size(); ++i)
             {
                 std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
 
@@ -1219,7 +1219,7 @@ void mitk::FiberBundle::UpdateFiberGeometry()
     m_UpdateTime2D.Modified();
 }
 
-float mitk::FiberBundle::GetFiberWeight(unsigned int fiber)
+float mitk::FiberBundle::GetFiberWeight(unsigned int fiber) const
 {
     return m_FiberWeights->GetValue(fiber);
 }
@@ -1897,7 +1897,7 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance)
     ResampleSpline(pointDistance, 0, 0, 0 );
 }
 
-unsigned long mitk::FiberBundle::GetNumberOfPoints()
+unsigned long mitk::FiberBundle::GetNumberOfPoints() const
 {
     unsigned long points = 0;
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
@@ -2116,7 +2116,7 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
                     else if (v2>0)
                         newV = p + d * v2;
                     else
-                        MITK_INFO << "ERROR";
+                        MITK_INFO << "ERROR1 - linear resampling";
                     
                     j--;
                 }
@@ -2128,7 +2128,7 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
                 }
                 lastV = newV;
             }
-            else if (j==vertices.size()-1)
+            else if (j==vertices.size()-1 && new_dist>0.0001)
             {
 #pragma omp critical
                 {
@@ -2160,7 +2160,7 @@ bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
 {
     if (fib==nullptr)
     {
-        MITK_INFO << "Reference bundle is NULL!";
+        MITK_INFO << "Reference bundle is nullptr!";
         return false;
     }
 

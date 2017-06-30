@@ -59,7 +59,7 @@ PCAExample::~PCAExample()
 {
   //clean up
   mitk::DataNode::Pointer ptSetNode = m_Controls.m_pointSetWidget->GetPointSetNode();
-  m_Controls.m_pointSetWidget->SetPointSetNode(NULL);
+  m_Controls.m_pointSetWidget->SetPointSetNode(nullptr);
   this->GetDataStorage()->Remove(ptSetNode);
   this->GetDataStorage()->Remove(m_Axis1Node);
   this->GetDataStorage()->Remove(m_Axis2Node);
@@ -104,10 +104,14 @@ for (int i=0; i<size; i++)
 }
 
 //Step 2: Remove average for each row (Mittelwertbefreiung)
-mitk::Vector3D mean;
+mitk::Vector3D mean; 
 for (int i = 0; i < size; i++) { mean += mitk::Vector3D(dataMatrix.get_column(i)); }
 mean /= size;
-for (int i = 0; i<size; i++) { dataMatrix.get_column(i) -= mean; }
+for (int i = 0; i<size; i++) 
+	{ 
+	mitk::Vector3D removedAverageI = mitk::Vector3D(dataMatrix.get_column(i)) - mean;
+	dataMatrix.set_column(i, removedAverageI);
+    }
 
 //Step 3: Compute covariance matrix
 vnl_matrix<double> covMatrix = (1.0 / (size - 1.0)) * dataMatrix * dataMatrix.transpose();

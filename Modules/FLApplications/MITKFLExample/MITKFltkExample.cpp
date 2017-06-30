@@ -33,11 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSample.h"
 
 int main(int argc, char **argv) {
-  const char* fileName = NULL;
+  const char* fileName = nullptr;
   if (argc == 2 && argv[1]) {
     fileName = argv[1];
   } else {
-    fileName = fl_file_chooser("Open file","*.dcm;*.png;*.jog;*.tiff;*.dcm;*.DCM;*.seq;*.pic;*.pic.gz;*.seq.gz;*.pic;*.pic.gz;*.png;*.stl",NULL);
+    fileName = fl_file_chooser("Open file","*.dcm;*.png;*.jog;*.tiff;*.dcm;*.DCM;*.seq;*.pic;*.pic.gz;*.seq.gz;*.pic;*.pic.gz;*.png;*.stl",nullptr);
   }
   if (!fileName) { exit(0);}
 

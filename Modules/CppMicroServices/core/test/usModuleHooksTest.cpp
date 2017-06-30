@@ -111,12 +111,12 @@ void TestFindHook()
   long moduleAId = moduleA->GetModuleId();
   US_TEST_CONDITION_REQUIRED(moduleAId > 0, "Test for valid module id")
 
-  US_TEST_CONDITION_REQUIRED(GetModuleContext()->GetModule(moduleAId) != NULL, "Test for non-filtered GetModule(long) result")
+  US_TEST_CONDITION_REQUIRED(GetModuleContext()->GetModule(moduleAId) != nullptr, "Test for non-filtered GetModule(long) result")
 
   TestModuleFindHook findHook;
   ServiceRegistration<ModuleFindHook> findHookReg = GetModuleContext()->RegisterService<ModuleFindHook>(&findHook);
 
-  US_TEST_CONDITION_REQUIRED(GetModuleContext()->GetModule(moduleAId) == NULL, "Test for filtered GetModule(long) result")
+  US_TEST_CONDITION_REQUIRED(GetModuleContext()->GetModule(moduleAId) == nullptr, "Test for filtered GetModule(long) result")
 
   std::vector<Module*> modules = GetModuleContext()->GetModules();
   for (std::vector<Module*>::iterator i = modules.begin();

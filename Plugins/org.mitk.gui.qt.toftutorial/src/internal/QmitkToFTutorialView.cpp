@@ -166,12 +166,12 @@ void QmitkToFTutorialView::OnStep2()
     }
     else
     {
-      QMessageBox::warning(NULL,"ToF Tutorial","Node 'Distance Image' contains no image");
+      QMessageBox::warning(nullptr,"ToF Tutorial","Node 'Distance Image' contains no image");
     }
   }
   else
   {
-    QMessageBox::warning(NULL,"ToF Tutorial","Perform Step 1 first to acquire a distance image");
+    QMessageBox::warning(nullptr,"ToF Tutorial","Perform Step 1 first to acquire a distance image");
   }
 }
 

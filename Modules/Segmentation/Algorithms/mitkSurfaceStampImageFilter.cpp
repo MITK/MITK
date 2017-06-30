@@ -54,7 +54,7 @@ void mitk::SurfaceStampImageFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 
-  if (inputImage.IsNull() || (inputImage->IsInitialized() == false) || (inputImage->GetTimeGeometry() == NULL))
+  if (inputImage.IsNull() || (inputImage->IsInitialized() == false) || (inputImage->GetTimeGeometry() == nullptr))
     return;
 
   if (m_MakeOutputBinary)
@@ -147,7 +147,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   vtkPoints *points = polydata->GetPoints();
 
   MeshType::PointType point;
-  for (int i = 0; i < numberOfPoints; i++)
+  for (unsigned int i = 0; i < numberOfPoints; i++)
   {
     double *aux = points->GetPoint(i);
     point[0] = aux[0];

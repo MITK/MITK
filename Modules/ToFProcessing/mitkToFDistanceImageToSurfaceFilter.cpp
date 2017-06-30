@@ -67,8 +67,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::SetInput(  mitk::Image* distanceImag
 
 void mitk::ToFDistanceImageToSurfaceFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
 {
-  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   else
     this->ProcessObject::SetNthInput(idx, distanceImage);   // Process object is not const-correct so the const_cast is required here
 
@@ -304,7 +304,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
 void mitk::ToFDistanceImageToSurfaceFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
     if (this->GetOutput(idx) == nullptr)
     {

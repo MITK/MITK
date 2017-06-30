@@ -83,7 +83,7 @@ public:
     mitk::PersistenceService::LoadModule();
 
     PERSISTENCE_GET_SERVICE_MACRO
-    CPPUNIT_ASSERT_MESSAGE("Testing availability of the PersistenceService.", persistenceService != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing availability of the PersistenceService.", persistenceService != nullptr);
 
     // Initialize testable parameter values
     std::string defaultPersistenceFile = persistenceService->GetDefaultPersistenceFile();

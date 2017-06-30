@@ -368,7 +368,7 @@ namespace mitk
       MITK_INFO << "Plane: " << i;
       MITK_INFO << "Clipping: Start\n";
 
-      // const PlaneGeometry *clippingGeometryOfCurrentTimeStep = NULL;
+      // const PlaneGeometry *clippingGeometryOfCurrentTimeStep = nullptr;
 
       int t;
       for (t = tstart; t < tmax; ++t)

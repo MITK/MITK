@@ -39,7 +39,7 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
 
     if (timestepSurface.IsNull())
     {
-      itkWarningMacro(<< "stlReader returned NULL while reading " << fileName
+      itkWarningMacro(<< "stlReader returned nullptr while reading " << fileName
                       << ". Trying to continue with empty vtkPolyData...");
       result->SetVtkPolyData(vtkPolyData::New(), i);
       return;

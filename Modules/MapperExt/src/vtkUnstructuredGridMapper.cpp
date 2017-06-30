@@ -196,7 +196,7 @@ unsigned long vtkUnstructuredGridMapper::GetMTime()
   unsigned long mTime = this->vtkMapper::GetMTime();
   unsigned long time;
 
-  if (this->LookupTable != NULL)
+  if (this->LookupTable != nullptr)
   {
     time = this->LookupTable->GetMTime();
     mTime = (time > mTime ? time : mTime);

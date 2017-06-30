@@ -102,7 +102,7 @@ public:
       distanceArray = (float*)distAcc.GetData();
 
       //write (or add) the three slices to the file
-      m_ToFNrrdImageWriter->Add(distanceArray, NULL, NULL);
+      m_ToFNrrdImageWriter->Add(distanceArray, nullptr, nullptr);
     }
     m_ToFNrrdImageWriter->Close(); //close file
 
@@ -133,7 +133,7 @@ public:
       amplitudeArray = (float*)amplAcc.GetData();
 
       //write (or add) the three slices to the file
-      m_ToFNrrdImageWriter->Add(distanceArray, amplitudeArray, NULL);
+      m_ToFNrrdImageWriter->Add(distanceArray, amplitudeArray, nullptr);
     }
     m_ToFNrrdImageWriter->Close(); //close file
 
@@ -167,7 +167,7 @@ public:
       intensityArray = (float*)intensityAcc.GetData();
 
       //write (or add) the three slices to the file
-      m_ToFNrrdImageWriter->Add(distanceArray, NULL, intensityArray);
+      m_ToFNrrdImageWriter->Add(distanceArray, nullptr, intensityArray);
     }
     m_ToFNrrdImageWriter->Close(); //close file
 

@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDir>
 #include <QDesktopServices>
 #include <QStringList>
-#include <QCoreApplication>
 #include <QOpenGLContext>
 #include <QDebug>
 
@@ -865,7 +864,7 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
       m_drawProgress(.1f, false);
       ///Closing callback for splashscreen
       d->m_SplashscreenClosingCallback =
-          new SplashCloserCallback(d->m_Splashscreen, m_drawProgress);
+          new SplashCloserCallback(d->m_Splashscreen, m_drawProgress, application);
     }
   }
 }

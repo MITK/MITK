@@ -4,7 +4,7 @@ if(MITK_USE_Caffe2 AND MITK_USE_Caffe)
 
   MITK_CREATE_MODULE(
     SUBPROJECTS MITK-DTI
-    INCLUDE_DIRS include/
+    INCLUDE_DIRS include/ src/
     DEPENDS ${_module_deps}
     PACKAGE_DEPENDS PUBLIC OpenCV Caffe Caffe2
   )

@@ -47,7 +47,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
 {
   if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   }
   else
   {
@@ -148,7 +148,7 @@ void mitk::ToFCompositeFilter::GenerateData()
 
 void mitk::ToFCompositeFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
     if (this->GetOutput(idx) == nullptr)
     {

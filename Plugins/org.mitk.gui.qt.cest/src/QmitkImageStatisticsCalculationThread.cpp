@@ -168,14 +168,14 @@ void QmitkImageStatisticsCalculationThread::run()
       calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
-  catch( const itk::ExceptionObject& e)
+  catch (const mitk::Exception& e)
   {
-    MITK_ERROR << "ITK Exception:" << e.what();
+    MITK_ERROR << "MITK Exception: " << e.what();
     statisticCalculationSuccessful = false;
   }
-  catch( const mitk::Exception& e )
+  catch (const itk::ExceptionObject& e)
   {
-    MITK_ERROR<< "MITK Exception: " << e.what();
+    MITK_ERROR << "ITK Exception:" << e.what();
     statisticCalculationSuccessful = false;
   }
   catch ( const std::runtime_error &e )

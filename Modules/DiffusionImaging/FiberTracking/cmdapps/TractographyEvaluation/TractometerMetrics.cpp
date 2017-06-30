@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
                                 itk::Index<3> idx;
                                 bundle->TransformPhysicalPointToIndex(itkP, idx);
 
-                                if ( !bundle->GetPixel(idx)>0 && bundle->GetLargestPossibleRegion().IsInside(idx) )
+                                if ( bundle->GetPixel(idx) == 0 && bundle->GetLargestPossibleRegion().IsInside(idx) )
                                 {
                                     outside=true;
                                 }
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
                         invalidConnections++;
                         int x = labelImage->GetPixel(idxStart)-1;
                         int y = labelImage->GetPixel(idxEnd)-1;
-                        if (x>=0 && y>0 && x<matrix.cols() && y<matrix.rows() && (matrix[x][y]==0 || matrix[y][x]==0) )
+                        if (x>=0 && y>0 && x<static_cast<int>(matrix.cols()) && y<static_cast<int>(matrix.rows()) && (matrix[x][y]==0 || matrix[y][x]==0) )
                         {
                             invalidBundles++;
                             matrix[x][y]=1;

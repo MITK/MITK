@@ -731,7 +731,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                         itk::Index<3> idx;
                         mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                        if ( mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)>0 )
+                        if ( mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx) != 0 )
                         {
                             inside++;
                             if (fraction==0)
@@ -767,7 +767,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                         itk::Index<3> idx;
                         mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                        if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
+                        if ( mask->GetPixel(idx) != 0 && mask->GetLargestPossibleRegion().IsInside(idx) )
                         {
                             inside++;
                             includeFiber = false;
@@ -806,7 +806,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                 {
                     if (bothEnds)
                     {
-                        if ( !mask->GetPixel(idxStart)>0 && !mask->GetPixel(idxEnd)>0 )
+                        if ( mask->GetPixel(idxStart) == 0 && mask->GetPixel(idxEnd) == 0 )
                         {
                             for (int j=0; j<numPointsOriginal; j++)
                             {
@@ -816,7 +816,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                             }
                         }
                     }
-                    else if ( !mask->GetPixel(idxStart)>0 || !mask->GetPixel(idxEnd)>0 )
+                    else if ( mask->GetPixel(idxStart) == 0 || mask->GetPixel(idxEnd) == 0 )
                     {
                         for (int j=0; j<numPointsOriginal; j++)
                         {
@@ -830,7 +830,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                 {
                     if (bothEnds)
                     {
-                        if ( mask->GetPixel(idxStart)>0 && mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
+                        if ( mask->GetPixel(idxStart) != 0 && mask->GetPixel(idxEnd) != 0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
                         {
                             for (int j=0; j<numPointsOriginal; j++)
                             {
@@ -840,7 +840,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                             }
                         }
                     }
-                    else if ( (mask->GetPixel(idxStart)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart)) || (mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxEnd)) )
+                    else if ( (mask->GetPixel(idxStart) != 0 && mask->GetLargestPossibleRegion().IsInside(idxStart)) || (mask->GetPixel(idxEnd) != 0 && mask->GetLargestPossibleRegion().IsInside(idxEnd)) )
                     {
                         for (int j=0; j<numPointsOriginal; j++)
                         {
@@ -905,13 +905,13 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
                 itk::Index<3> idx;
                 mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) && !invert )
+                if ( mask->GetPixel(idx) != 0 && mask->GetLargestPossibleRegion().IsInside(idx) && !invert )
                 {
                     vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                     container->GetPointIds()->InsertNextId(id);
                     newNumPoints++;
                 }
-                else if ( (mask->GetPixel(idx)<=0 || !mask->GetLargestPossibleRegion().IsInside(idx)) && invert )
+                else if ( (mask->GetPixel(idx) == 0 || !mask->GetLargestPossibleRegion().IsInside(idx)) && invert )
                 {
                     vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                     container->GetPointIds()->InsertNextId(id);

@@ -431,7 +431,7 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
 {
   SMW_INFO << "changing layout to 2D images up... " << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -449,12 +449,12 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
   m_SubSplit1->setSizes({ 1000, 1000, 1000 });
   m_LayoutSplit->setSizes({ 400, 1000 });
 
-  UpdateViewsAfterLayoutChange(LAYOUT_2D_IMAGES_UP);
+  UpdateViewsAfterChangeLayout(LAYOUT_2D_IMAGES_UP);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
 {
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -472,7 +472,7 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
   m_SubSplit1->setSizes({ 1000, 1000, 1000 });
   m_LayoutSplit->setSizes({ 400, 1000 });
 
-  UpdateViewsAfterLayoutChange(LAYOUT_2D_IMAGES_LEFT);
+  UpdateViewsAfterChangeLayout(LAYOUT_2D_IMAGES_LEFT);
 }
 
 void QmitkStdMultiWidget::SetDecorationProperties(std::string text, mitk::Color color, int widgetNumber)
@@ -537,7 +537,7 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
 {
   SMW_INFO << "changing layout to default... " << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -558,19 +558,19 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
   m_SubSplit2->setSizes(splitterSize);
   m_LayoutSplit->setSizes(splitterSize);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_DEFAULT);
+  UpdateViewsAfterChangeLayout(LAYOUT_DEFAULT);
 }
 
 void QmitkStdMultiWidget::changeLayoutToBig3D()
 {
   SMW_INFO << "changing layout to big 3D ..." << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_MainSplit->addWidget(mitkWidget4Container);
   m_MainSplit->addWidget(levelWindowWidget);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_BIG_3D);
+  UpdateViewsAfterChangeLayout(LAYOUT_BIG_3D);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget4->GetVtkRenderWindow());
 }
 
@@ -578,12 +578,12 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
 {
   SMW_INFO << "changing layout to big Widget1 ..." << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_MainSplit->addWidget(mitkWidget1Container);
   m_MainSplit->addWidget(levelWindowWidget);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_WIDGET1);
+  UpdateViewsAfterChangeLayout(LAYOUT_WIDGET1);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget1->GetVtkRenderWindow());
 }
 
@@ -591,12 +591,12 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
 {
   SMW_INFO << "changing layout to big Widget2 ..." << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_MainSplit->addWidget(mitkWidget2Container);
   m_MainSplit->addWidget(levelWindowWidget);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_WIDGET2);
+  UpdateViewsAfterChangeLayout(LAYOUT_WIDGET2);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget2->GetVtkRenderWindow());
 }
 
@@ -604,12 +604,12 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 {
   SMW_INFO << "changing layout to big Widget3 ..." << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_MainSplit->addWidget(mitkWidget3Container);
   m_MainSplit->addWidget(levelWindowWidget);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_WIDGET3);
+  UpdateViewsAfterChangeLayout(LAYOUT_WIDGET3);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget3->GetVtkRenderWindow());
 }
 
@@ -617,7 +617,7 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 {
   SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -628,14 +628,14 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 
   m_LayoutSplit->setSizes({ 1000, 1000 });
 
-  UpdateViewsAfterLayoutChange(LAYOUT_COLUMN_WIDGET_3_AND_4);
+  UpdateViewsAfterChangeLayout(LAYOUT_ROW_WIDGET_3_AND_4);
 }
 
 void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
 {
   SMW_INFO << "changing layout to Widget3 and 4 in one Column..." << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -646,7 +646,7 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
 
   m_LayoutSplit->setSizes({ 1000, 1000 });
 
-  UpdateViewsAfterLayoutChange(LAYOUT_ROW_WIDGET_3_AND_4);
+  UpdateViewsAfterChangeLayout(LAYOUT_COLUMN_WIDGET_3_AND_4);
 }
 
 void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
@@ -662,7 +662,7 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
 {
   SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -678,14 +678,14 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
   m_SubSplit1->setSizes({ 1000, 1000 });
   m_LayoutSplit->setSizes({ 500, 1000 });
 
-  UpdateViewsAfterLayoutChange(LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4);
+  UpdateViewsAfterChangeLayout(LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
 {
   SMW_INFO << "changing layout to 2 x 2D and 3D Widget" << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -702,14 +702,14 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
   m_LayoutSplit->setSizes(splitterSize);
   m_SubSplit1->setSizes(splitterSize);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_2X_2D_AND_3D_WIDGET);
+  UpdateViewsAfterChangeLayout(LAYOUT_2X_2D_AND_3D_WIDGET);
 }
 
 void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
 {
   SMW_INFO << "changing layout to 2D and 3D left, 2D right Widget" << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -726,14 +726,14 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
   m_SubSplit1->setSizes(splitterSize);
   m_LayoutSplit->setSizes(splitterSize);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
+  UpdateViewsAfterChangeLayout(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
 {
   SMW_INFO << "changing layout to 2D up and 3D down" << std::endl;
 
-  CleanViewsBeforeLayoutChange();
+  CleanViewsToChangeLayout();
 
   m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
@@ -752,10 +752,10 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   splitterSize.push_back(700);
   m_LayoutSplit->setSizes(splitterSize);
 
-  UpdateViewsAfterLayoutChange(LAYOUT_2D_UP_AND_3D_DOWN);
+  UpdateViewsAfterChangeLayout(LAYOUT_2D_UP_AND_3D_DOWN);
 }
 
-void QmitkStdMultiWidget::CleanViewsBeforeLayoutChange()
+void QmitkStdMultiWidget::CleanViewsToChangeLayout()
 {
   // Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -769,7 +769,7 @@ void QmitkStdMultiWidget::CleanViewsBeforeLayoutChange()
   delete m_LayoutSplit; m_LayoutSplit = nullptr;
 }
 
-void QmitkStdMultiWidget::UpdateViewsAfterLayoutChange(const int newLayout)
+void QmitkStdMultiWidget::UpdateViewsAfterChangeLayout(const int newLayout)
 {
   m_Layout = newLayout;
 
@@ -779,7 +779,7 @@ void QmitkStdMultiWidget::UpdateViewsAfterLayoutChange(const int newLayout)
   mitkWidget3->LayoutDesignListChanged(newLayout);
   mitkWidget4->LayoutDesignListChanged(newLayout);
 
-  // update Alle Widgets
+  // update All Widgets
   this->UpdateAllWidgets();
 
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(

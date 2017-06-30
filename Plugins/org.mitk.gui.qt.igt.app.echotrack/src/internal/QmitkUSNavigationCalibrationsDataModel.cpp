@@ -125,7 +125,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
      std::vector<double>(1,0) : m_ControlInterfaceBMode->GetScanningDepthValues();
 
    // make sure that row and column index fit data borders
-   if (static_cast<unsigned int>(index.row()) >= this->rowCount()
+   if (index.row() >= this->rowCount()
       || index.column() >= this->columnCount())
   {
     return QVariant(QVariant::Invalid);
@@ -222,29 +222,29 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
   return QVariant(QVariant::Invalid);
  }
 
- /** \brief Set model data for the selected cell. */
- bool QmitkUSNavigationCalibrationsDataModel::setData ( const QModelIndex & index, const QVariant & value, int role )
- {
-   if ( m_CombinedModality.IsNull() || index.column() != 2 || value != false ) { return false; }
-   else
-   {
-     if ( m_ControlInterfaceBMode.IsNull() )
-     {
-       m_CombinedModality->RemoveCalibration();
-     }
-     else
-     {
-       m_CombinedModality->RemoveCalibration(QString::number(m_ControlInterfaceBMode->GetScanningDepthValues().at(index.row())).toStdString());
-     }
+/** \brief Set model data for the selected cell. */
+bool QmitkUSNavigationCalibrationsDataModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+{
+  if ( m_CombinedModality.IsNull() || index.column() != 2 || value != false )
+    return false;
 
-     emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 1));
-   }
- }
+  if ( m_ControlInterfaceBMode.IsNull() )
+  {
+    m_CombinedModality->RemoveCalibration();
+  }
+  else
+  {
+    m_CombinedModality->RemoveCalibration(QString::number(m_ControlInterfaceBMode->GetScanningDepthValues().at(index.row())).toStdString());
+  }
 
- /** \brief Remove given rows from the model.
- *  \param removeFromDataStorage zone nodes are removed from the data storage too, if this is set to true
- */
- bool QmitkUSNavigationCalibrationsDataModel::removeRows ( int row, int count, const QModelIndex& parent, bool removeFromDataStorage )
- {
-   return false;
- }
+  emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 1));
+  return true;
+}
+
+/** \brief Remove given rows from the model.
+*  \param removeFromDataStorage zone nodes are removed from the data storage too, if this is set to true
+*/
+bool QmitkUSNavigationCalibrationsDataModel::removeRows ( int row, int count, const QModelIndex& parent, bool removeFromDataStorage )
+{
+  return false;
+}

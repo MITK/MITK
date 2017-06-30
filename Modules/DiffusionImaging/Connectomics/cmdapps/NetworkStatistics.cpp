@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
       // 2 - Threshold based
 
       // iterate over possible targets
-      for( unsigned int step( 0 ); step < granularity; step++ )
+      for( int step = 0; step < granularity; ++step )
       {
         double targetValue( 0.0 );
         bool newStep( true );

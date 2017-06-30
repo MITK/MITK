@@ -600,7 +600,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrai
 
     m_Tractograms.at(t)->ResampleLinear(m_WmSampleDistance);
 
-    unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers();
+    int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers();
     if (m_BidirectionalFiberSampling)
       wmSamples *= 2;
     if (m_ZeroDirWmFeatures)
@@ -625,14 +625,14 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrai
 
         itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randgen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
         randgen->SetSeed();
-        unsigned int c = 0;
+        int c = 0;
         while (c<m_MaxNumWmSamples)
         {
           int idx = randgen->GetIntegerVariate(m_MaxNumWmSamples-1);
           if (m_SampleUsage[t][idx]==false)
           {
             m_SampleUsage[t][idx]=true;
-            c++;
+            ++c;
           }
         }
       }
@@ -725,7 +725,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
           {
             int c=0;
             vnl_vector_fixed<float,3> probe;
-            if (i<num_zero_dirs)
+            if (static_cast<int>(i)<num_zero_dirs)
               probe.fill(0.0);
             else
             {
@@ -775,7 +775,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
       vtkPoints* points = cell->GetPoints();
       float fiber_weight = fib->GetFiberWeight(i);
 
-      for (int n = 0; n<=m_NumPreviousDirections; n++)
+      for (int n = 0; n <= static_cast<int>(m_NumPreviousDirections); ++n)
       {
         if (!m_ZeroDirWmFeatures)
           n = m_NumPreviousDirections;
@@ -808,7 +808,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
             }
 
             // nonzero directions
-            for (unsigned int k=0; k<num_nonzero_dirs; k++)
+            for (int k=0; k<num_nonzero_dirs; k++)
             {
               double* p = nullptr;
               int n_idx = num_nonzero_dirs-k;

@@ -45,7 +45,7 @@ void mitk::ToFDistanceImageToPointSetFilter::SetInput( unsigned int idx,const mi
 {
   if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   }
   else
   {
@@ -193,7 +193,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 
 void mitk::ToFDistanceImageToPointSetFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
     if (this->GetOutput(idx) == nullptr)
     {

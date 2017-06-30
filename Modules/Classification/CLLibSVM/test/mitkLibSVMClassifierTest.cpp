@@ -74,7 +74,8 @@ public:
     unsigned int c = p->GetMatrix().cols();
     unsigned int percentRange = (unsigned int)(maxrowrange*range);
 
-    if(isXMatrix == true){
+    if(isXMatrix == true)
+    {
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> trainMatrixX(percentRange,c);
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> testMatrixXPredict(maxrowrange-percentRange,c);
 
@@ -92,7 +93,8 @@ public:
 
       return std::make_pair(trainMatrixX,testMatrixXPredict);
     }
-    else if(isXMatrix == false){
+    else
+    {
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> trainLabelMatrixY(percentRange,c);
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> testMatrixYPredict(maxrowrange-percentRange,c);
 

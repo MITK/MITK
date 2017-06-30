@@ -312,7 +312,7 @@ namespace mitk
             // try to access the pixel values directly (no copying or casting). Only works if mask pixels are of pixelType unsigned short
             maskImage = ImageToItkImage< MaskPixelType, VImageDimension >(m_InternalMask);
         }
-        catch (itk::ExceptionObject & e)
+        catch (const itk::ExceptionObject &)
 
         {
             // if the pixel type of the mask is not short, then we have to make a copy of m_InternalMask (and cast the values)

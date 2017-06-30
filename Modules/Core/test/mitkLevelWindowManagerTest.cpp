@@ -71,7 +71,7 @@ public:
     {
       manager->SetLevelWindowProperty(levelWindowProperty);
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       success = true;
     }
@@ -441,11 +441,11 @@ public:
         falseran = ranGen->GetIntegerVariate(7);
       }
       BoolVecType falseNodes;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin1 : lvlWin1);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin1 : lvlWin1);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin2 : lvlWin2);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin2 : lvlWin2);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin3 : lvlWin3);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin3 : lvlWin3);
       int falseLevelWindow = 0;
       for (int i = 0; i < 3; ++i)
       {
@@ -586,11 +586,11 @@ public:
         falseran = ranGen->GetIntegerVariate(7);
       }
       BoolVecType falseNodes;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin1 : lvlWin1);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin1 : lvlWin1);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin2 : lvlWin2);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin2 : lvlWin2);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin3 : lvlWin3);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin3 : lvlWin3);
       int falseLevelWindow = 0;
       for (int i = 0; i < 3; ++i)
       {

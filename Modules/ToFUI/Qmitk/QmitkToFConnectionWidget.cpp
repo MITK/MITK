@@ -34,11 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFConnectionWidget::VIEW_ID = "org.mitk.views.qmitktofconnectionwidget2";
 
 //Constructor of QmitkToFConnectionWidget
-QmitkToFConnectionWidget::QmitkToFConnectionWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
+QmitkToFConnectionWidget::QmitkToFConnectionWidget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 , m_Controls(NULL)
 , m_IntegrationTime(0)
 , m_ModulationFrequency(0)
 , m_SelectedCameraName("")
+, m_Connected(false)
 {
   this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
   //Calling CreateQtPartControl
@@ -134,7 +135,7 @@ void QmitkToFConnectionWidget::HideAllParameterWidgets()
 void QmitkToFConnectionWidget::OnConnectCamera()
 {
   //After connecting a device
-  if (m_Controls->m_ConnectCameraButton->text()=="Connect")
+  if (!isConnected())
   {
     //Getting the device- and the slectedCamera-variables using the ServiceListWidget as we did it in the CameraSelect-Method
     mitk::ToFCameraDevice* device = m_Controls->m_DeviceList->GetSelectedService<mitk::ToFCameraDevice>();
@@ -294,6 +295,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
       //Reset the ConnectCameraButton to disconnected
       m_Controls->m_ConnectCameraButton->setText("Disconnect");
+      setConnected(true);
 
       //if a connection could be established
       try
@@ -339,6 +341,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
           m_Controls->m_ConnectCameraButton->setChecked(false);
           m_Controls->m_ConnectCameraButton->setEnabled(true);
           m_Controls->m_ConnectCameraButton->setText("Connect");
+          setConnected(false);
           m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
           this->OnSelectCamera();
           return;
@@ -350,6 +353,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         m_Controls->m_ConnectCameraButton->setChecked(false);
         m_Controls->m_ConnectCameraButton->setEnabled(true);
         m_Controls->m_ConnectCameraButton->setText("Connect");
+        setConnected(false);
         m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
         this->OnSelectCamera();
         return;
@@ -379,11 +383,12 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       m_Controls->m_ConnectCameraButton->setChecked(false);
     }
   }
-  else if (m_Controls->m_ConnectCameraButton->text()=="Disconnect")
+  else if (isConnected())
   {
     this->m_ToFImageGrabber->StopCamera();
     this->m_ToFImageGrabber->DisconnectCamera();
     m_Controls->m_ConnectCameraButton->setText("Connect");
+    setConnected(false);
     m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
     this->OnSelectCamera();
 

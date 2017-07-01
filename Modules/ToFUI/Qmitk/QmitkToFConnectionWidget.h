@@ -37,6 +37,7 @@ class MITKTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 {
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
+  //Q_PROPERTY(bool connected READ isConnected WRITE setConnected)
 
   public:
 
@@ -116,6 +117,12 @@ class MITKTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
   private:
 
     void HideAllParameterWidgets();
+    bool m_Connected;
+
+    void setConnected(bool connected) { m_Connected = connected; }
+    bool isConnected() const { return m_Connected; }
+
+
 };
 
 #endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED

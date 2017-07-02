@@ -988,14 +988,8 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
     EnableLoggingButtons();
 
     //write the results to a file
-    if (m_Controls->m_csvFormat->isChecked())
-    {
-      mitk::IOUtil::SaveBaseData(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
-    }
-    else if (m_Controls->m_xmlFormat->isChecked())
-    {
-      mitk::IOUtil::SaveBaseData(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
-    }
+    if (m_Controls->m_csvFormat->isChecked() || m_Controls->m_xmlFormat->isChecked())
+      mitk::IOUtil::Save(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
   }
 }
 

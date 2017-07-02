@@ -13,7 +13,9 @@
  See LICENSE.txt or http://www.mitk.org for details.
 
  ===================================================================*/
-#pragma warning (disable : 4996)
+#ifdef _MSC_VER
+#  pragma warning (disable : 4996)
+#endif
 
 #include "mitkCollectionWriter.h"
 
@@ -132,13 +134,13 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
           if (isSelected == false)
             continue;
         }
-        Image* image = dynamic_cast<Image*> (itemCollections->GetData(s).GetPointer());
+
         QString fileName = dir.path() + dir.separator() + subPath + dir.separator() +  QString::fromStdString(dataCollection->IndexToName(i)) + "_" + QString::fromStdString(subCollections->IndexToName(d)) + "_" + QString::fromStdString(itemCollections->IndexToName(s));
         try
         {
           fileName += ".nrrd";
           Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
-          IOUtil::SaveImage(image,fileName.toStdString());
+          IOUtil::Save(image, fileName.toStdString());
         }
         catch( const std::exception& e)
         {
@@ -233,7 +235,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
           if (isSelected == false)
             continue;
         }
-        Image* image = dynamic_cast<Image*> (itemCollections->GetData(s).GetPointer());
+
         QString fileName;
         bool fullName = false;
         if (itemCollections->GetDataFilePath(s) != "")
@@ -250,7 +252,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
           if (!fullName)
             fileName += ".nrrd";
           Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
-          IOUtil::SaveImage(image,fileName.toStdString());
+          IOUtil::Save(image,fileName.toStdString());
         }
         catch( const std::exception& e)
         {

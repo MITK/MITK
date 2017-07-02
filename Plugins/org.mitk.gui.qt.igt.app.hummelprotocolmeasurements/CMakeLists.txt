@@ -1,4 +1,4 @@
-project(org_mitk_gui_qt_igtapphummelprotocolmeasurements)
+project(org_mitk_gui_qt_igt_app_hummelprotocolmeasurements)
 
 mitk_create_plugin(
   EXPORT_DIRECTIVE IGTTRACKINGSEMIAUTOMATICMEASUREMENT_EXPORT

@@ -28,7 +28,7 @@ namespace mitk
     this->m_context = context;
   }
 
-  void PluginActivator::stop(ctkPluginContext* context)
+  void PluginActivator::stop(ctkPluginContext*)
   {
     this->m_context = nullptr;
   }

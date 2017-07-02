@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   est.Update();
 
   mitk::Image::Pointer w= col->GetMitkImage("weight");
-  mitk::IOUtil::SaveImage(w,argv[1]);
+  mitk::IOUtil::Save(w,argv[1]);
 
   return 0;
 }

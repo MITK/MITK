@@ -29,9 +29,9 @@ class vtkInternalOpenGLRenderWindow;
 class MITKOPENVIEWCORE_EXPORT QVTKFramebufferObjectRenderer : public QQuickFramebufferObject::Renderer
 {
 public:
+  vtkInternalOpenGLRenderWindow *m_vtkRenderWindow;
   bool m_neverRendered;
   bool m_readyToRender;
-  vtkInternalOpenGLRenderWindow *m_vtkRenderWindow;
 
   QVTKQuickItem *m_vtkQuickItem;
 

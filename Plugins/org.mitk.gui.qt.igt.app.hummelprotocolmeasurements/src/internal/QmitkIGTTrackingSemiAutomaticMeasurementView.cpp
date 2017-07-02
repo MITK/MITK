@@ -66,7 +66,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateResults()
   mitk::LoggingBackend::Register();
 
   double RMSmean = 0;
-  for (int i = 0; i < m_RMSValues.size(); i++)
+  for (std::size_t i = 0; i < m_RMSValues.size(); ++i)
   {
     MITK_INFO << "RMS at " << this->m_FilenameVector.at(i) << ": " << m_RMSValues.at(i);
     RMSmean += m_RMSValues.at(i);
@@ -172,7 +172,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnSetReference()
   m_ReferenceStartPositions = std::vector<mitk::Point3D>();
   m_ReferenceTrackingDeviceSource->Update();
   QString Label = "Positions At Start: ";
-  for (int i = 0; i < m_ReferenceTrackingDeviceSource->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < m_ReferenceTrackingDeviceSource->GetNumberOfOutputs(); ++i)
   {
     mitk::Point3D position = m_ReferenceTrackingDeviceSource->GetOutput(i)->GetPosition();
     Label = Label + "Tool" + QString::number(i) + ":[" + QString::number(position[0]) + ":" + QString::number(position[1]) + ":" + QString::number(position[1]) + "] ";
@@ -249,7 +249,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnStartTracking()
     return;
   }
   //connect the tool visualization widget
-  for (int i = 0; i < m_MeasurementTrackingDeviceSource->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < m_MeasurementTrackingDeviceSource->GetNumberOfOutputs(); ++i)
   {
     m_Controls->m_ToolStatusWidget->AddNavigationData(m_MeasurementTrackingDeviceSource->GetOutput(i));
     m_EvaluationFilter->SetInput(i, m_MeasurementTrackingDeviceSource->GetOutput(i));
@@ -325,10 +325,6 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnMeasurementLoadFile()
   QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open Measurement Filename List"), "/", tr("All Files (*.*)"));
   if (filename.isNull()) return;
 
-  //save old locale
-  char * oldLocale;
-  oldLocale = setlocale(LC_ALL, 0);
-
   //define own locale
   std::locale C("C");
   setlocale(LC_ALL, "C");
@@ -377,7 +373,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::UpdateTimer()
     m_ReferenceTrackingDeviceSource->Update();
     QString Label = "Current Positions: ";
     bool distanceThresholdExceeded = false;
-    for (int i = 0; i < m_ReferenceTrackingDeviceSource->GetNumberOfOutputs(); i++)
+    for (unsigned int i = 0; i < m_ReferenceTrackingDeviceSource->GetNumberOfOutputs(); ++i)
     {
       mitk::Point3D position = m_ReferenceTrackingDeviceSource->GetOutput(i)->GetPosition();
       Label = Label + "Tool" + QString::number(i) + ":[" + QString::number(position[0]) + ":" + QString::number(position[1]) + ":" + QString::number(position[1]) + "] ";
@@ -484,12 +480,12 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::StartNextMeasurement()
   StartLoggingAdditionalCSVFile(m_FilenameVector.at(m_NextFile));
 
   //connect filter
-  for (int i = 0; i < m_MeasurementToolVisualizationFilter->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < m_MeasurementToolVisualizationFilter->GetNumberOfOutputs(); ++i)
   {
     m_MeasurementLoggingFilterXML->AddNavigationData(m_MeasurementToolVisualizationFilter->GetOutput(i));
     m_MeasurementLoggingFilterCSV->AddNavigationData(m_MeasurementToolVisualizationFilter->GetOutput(i));
   }
-  if (m_Controls->m_UseReferenceTrackingSystem->isChecked()) for (int i = 0; i < m_ReferenceTrackingDeviceSource->GetNumberOfOutputs(); i++)
+  if (m_Controls->m_UseReferenceTrackingSystem->isChecked()) for (unsigned int i = 0; i < m_ReferenceTrackingDeviceSource->GetNumberOfOutputs(); ++i)
   {
     m_ReferenceLoggingFilterXML->AddNavigationData(m_ReferenceTrackingDeviceSource->GetOutput(i));
     m_ReferenceLoggingFilterCSV->AddNavigationData(m_ReferenceTrackingDeviceSource->GetOutput(i));
@@ -509,7 +505,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::StartNextMeasurement()
 
   //update label next measurement
   std::stringstream label;
-  if ((m_NextFile + 1) >= m_FilenameVector.size()) label << "Next Measurement: <none>";
+  if ((m_NextFile + 1) >= static_cast<int>(m_FilenameVector.size())) label << "Next Measurement: <none>";
   else label << "Next Measurement: " << m_FilenameVector.at(m_NextFile + 1);
   m_Controls->m_NextMeasurement->setText(label.str().c_str());
 
@@ -574,7 +570,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::FinishMeasurement()
   MITK_INFO << "RMS: " << rms;
   MITK_INFO << "Position Mean: " << positionMean;
   m_MeanPoints->SetPoint(id, positionMean);
-  if (m_RMSValues.size() <= id) m_RMSValues.push_back(rms);
+  if (static_cast<int>(m_RMSValues.size()) <= id) m_RMSValues.push_back(rms);
   else m_RMSValues[id] = rms;
 
   m_EvaluationFilter->ResetStatistic();
@@ -612,20 +608,15 @@ void  QmitkIGTTrackingSemiAutomaticMeasurementView::StopLoggingAdditionalCSVFile
   m_logFileCSV.close();
 }
 
-bool QmitkIGTTrackingSemiAutomaticMeasurementView::eventFilter(QObject *obj, QEvent *ev)
+bool QmitkIGTTrackingSemiAutomaticMeasurementView::eventFilter(QObject *, QEvent *ev)
 {
   if (ev->type() == QEvent::KeyPress)
   {
     QKeyEvent *k = (QKeyEvent *)ev;
-    bool up = false;
-    bool down = false;
-    if (k->key() == 16777238) up = true; //page up
-    else if (k->key() == 16777239) down = true; //page down
+    bool down = k->key() == 16777239;
 
     if (down && m_tracking && !m_logging)
-    {
       StartNextMeasurement();
-    }
   }
 
   return false;

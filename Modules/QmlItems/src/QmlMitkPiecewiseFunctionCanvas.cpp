@@ -68,41 +68,8 @@ void QmlMitkPiecewiseFunctionCanvas::paint(QPainter* painter)
         painter->drawText(QPoint(10,20),m_Title);
     }
 
-    {
-
-        QString qs_min = QString::number( m_Min, 'g', 4 );
-        QString qs_max = QString::number( m_Max, 'g', 4 );
-
-        QRect qr_min = painter->fontMetrics().boundingRect( qs_min );
-        QRect qr_max = painter->fontMetrics().boundingRect( qs_max );
-
-        int y,x;
-
-        y=this->boundingRect().height()-qr_min.height()+5;
-        //y = this->boundingRect().height()+5;
-        x=10;
-
-        // Fill the tf presets in the generator widget
-        /*
-        painter->setPen(Qt::black);
-        painter->drawText(QPoint(x+1,y+1),qs_min);
-        painter->setPen(Qt::white);
-        painter->drawText(QPoint(x  ,y  ),qs_min);
-
-        y=this->boundingRect().height()-qr_max.height()+5;
-        x=this->boundingRect().width()-qr_max.width()-6;
-
-        painter->setPen(Qt::black);
-        painter->drawText(QPoint(x,y+1),qs_max);
-        painter->setPen(Qt::white);
-        painter->drawText(QPoint(x,y  ),qs_max);
-         */
-    }
-
     painter->setPen(Qt::gray);
 
-    QRectF contentsRect = this->boundingRect();
-    //painter->drawRect(0, 0, contentsRect.width()+1, contentsRect.height()+1);
     if (m_PiecewiseFunction && this->isEnabled())
     {
         double* dp = m_PiecewiseFunction->GetDataPointer();

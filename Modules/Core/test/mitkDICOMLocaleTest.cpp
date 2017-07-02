@@ -74,9 +74,8 @@ private:
 private:
   std::string m_FileName;
   std::string m_Locale;
-  bool m_SkipImageTest;
-
   char *m_OldLocale;
+  bool m_SkipImageTest;
 
   void SetTestParameter()
   {

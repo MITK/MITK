@@ -40,7 +40,6 @@ static void ItkThresholdFilter(const itk::Image<TPixel, VDimensions> *image,
                                const double th[])
 {
   typedef itk::Image<TPixel, VDimensions> InputImageType;
-  typedef itk::Image<TPixel, VDimensions> OutputImageType;
   typedef itk::ThresholdImageFilter<InputImageType> ThresholdFilterType;
 
   typename ThresholdFilterType::Pointer thresholder = ThresholdFilterType::New();

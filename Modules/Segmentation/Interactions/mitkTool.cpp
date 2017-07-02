@@ -34,8 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char *type)
-  : m_PredicateImages(NodePredicateDataType::New("Image")) // for reference images
-    ,
+  : m_EventConfig("DisplayConfigMITK.xml"),
+    m_ToolManager(nullptr),
+    m_PredicateImages(NodePredicateDataType::New("Image")), // for reference images
     m_PredicateDim3(NodePredicateDimension::New(3, 1)),
     m_PredicateDim4(NodePredicateDimension::New(4, 1)),
     m_PredicateDimension(mitk::NodePredicateOr::New(m_PredicateDim3, m_PredicateDim4)),
@@ -52,8 +53,7 @@ mitk::Tool::Tool(const char *type)
     m_IsSegmentationPredicate(
       NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper)),
     m_InteractorType(type),
-    m_DisplayInteractorConfigs(),
-    m_EventConfig("DisplayConfigMITK.xml")
+    m_DisplayInteractorConfigs()
 {
 }
 

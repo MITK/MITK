@@ -381,7 +381,7 @@ void mitk::FastMarchingTool::OnAddPoint(StateMachineAction *, InteractionEvent *
   m_ReadyMessage.Send();
 }
 
-void mitk::FastMarchingTool::OnDelete(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::FastMarchingTool::OnDelete(StateMachineAction *, InteractionEvent *)
 {
   // delete last seed point
   if (!(this->m_SeedContainer->empty()))

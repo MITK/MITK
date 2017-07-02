@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTriangleMeshToBinaryImageFilter.h>
 
 mitk::SurfaceStampImageFilter::SurfaceStampImageFilter()
-  : m_MakeOutputBinary(false), m_OverwriteBackground(false), m_ForegroundValue(1.0), m_BackgroundValue(0.0)
+  : m_MakeOutputBinary(false), m_OverwriteBackground(false), m_BackgroundValue(0.0), m_ForegroundValue(1.0)
 {
 }
 
@@ -166,7 +166,6 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   // Read the number of polygons
   CellIdentifierType numberOfPolygons = 0;
   numberOfPolygons = polydata->GetNumberOfPolys();
-  vtkCellArray *polys = polydata->GetPolys();
 
   PointIdentifierType numberOfCellPoints = 3;
   CellIdentifierType i = 0;

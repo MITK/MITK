@@ -53,9 +53,9 @@ private:
       case (mitk::SliceNavigationController::Sagittal):
         dim = 0;
         break;
-      case (mitk::SliceNavigationController::Original):
+      default: // mitk::SliceNavigationController::Original
         dim = -1;
-        break; // This is just to get rid of a warning
+        break;
     }
 
     /* Fill segmentation

@@ -186,7 +186,9 @@ stop2:
   /* ============= check ============*/
   areSame = true;
 
-  int x, y, z;
+  int x = 0;
+  int y = 0;
+  int z = 0;
 
   for (x = 0; x < ObliquePlaneTestVolumeSize; ++x)
   {
@@ -204,8 +206,6 @@ stop2:
     }
   }
 stop3:
-  // MITK_INFO << "index: [" << x << ", " << y << ", " << z << "]";
-  // MITK_INFO << indx;
   MITK_TEST_CONDITION(x == idX && y == z, "overwrited the right index [oblique]");
 }
 

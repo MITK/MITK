@@ -90,7 +90,7 @@ namespace mitk
     virtual void SetRequestedRegionToLargestPossibleRegion() override {}
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
     virtual bool VerifyRequestedRegion() override { return true; }
-    virtual void SetRequestedRegion(const itk::DataObject *data) override {}
+    virtual void SetRequestedRegion(const itk::DataObject *) override {}
     /** Add a new vertex to the graph */
     VertexDescriptorType AddVertex(const VertexType &vertexData);
 
@@ -155,7 +155,6 @@ namespace mitk
 
   protected:
     UndirectedGraph();
-    UndirectedGraph(const UndirectedGraph<VertexType, EdgeType> &graph);
     virtual ~UndirectedGraph();
 
     GraphType m_Graph;

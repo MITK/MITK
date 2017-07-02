@@ -198,7 +198,7 @@ private:                                                                        
       if (m_PersistenceService)                                                                                        \
         m_PersistenceService->RemovePropertyListReplacedObserver(this);                                                \
     }                                                                                                                  \
-    void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList)                            \
+    void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *)                            \
     {                                                                                                                  \
       if (m_##THE_CLASS_NAME && m_##THE_CLASS_NAME->GetId() == id)                                                     \
         m_##THE_CLASS_NAME->FromPropertyList();                                                                        \

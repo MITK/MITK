@@ -78,7 +78,7 @@ void QmitkSurfaceToImageWidget::EnableButtons(bool enable)
   m_Controls.m_leBackgroundValue->setEnabled(enable && !m_Controls.m_chkMakeOutputBinary->isChecked());
 }
 
-void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
+void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
 {
   mitk::DataNode::Pointer imageNode = m_Controls.m_DataSelectionWidget->GetSelection(0);
   mitk::DataNode::Pointer surfaceNode = m_Controls.m_DataSelectionWidget->GetSelection(1);

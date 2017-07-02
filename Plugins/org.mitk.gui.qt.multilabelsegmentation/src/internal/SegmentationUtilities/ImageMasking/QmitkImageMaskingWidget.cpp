@@ -97,7 +97,7 @@ void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk:
   }
 }
 
-void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::DataNode* selection)
+void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::DataNode*)
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(index);
@@ -111,26 +111,6 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
       this->EnableButtons(false);
       return;
     }
-    /*
-    else if( node.IsNotNull() && selection )
-    {
-      mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(0)->GetData() );
-      mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(1)->GetData() );
-
-      if( referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
-      {
-        dataSelectionWidget->SetHelpText("Different image sizes cannot be masked");
-        this->EnableButtons(false);
-        return;
-      }
-    }
-
-    else
-    {
-      dataSelectionWidget->SetHelpText(HelpText);
-      return;
-    }
-    */
   }
 
   dataSelectionWidget->SetHelpText("");

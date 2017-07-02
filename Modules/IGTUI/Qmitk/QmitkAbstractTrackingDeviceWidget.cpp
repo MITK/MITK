@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkAbstractTrackingDeviceWidget::QmitkAbstractTrackingDeviceWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
-  , isInitialized(false)
   , m_TestConnectionWorker(nullptr)
   , m_TestConnectionWorkerThread(nullptr)
   , m_ErrorMessage("")
+  , isInitialized(false)
 {
 }
 

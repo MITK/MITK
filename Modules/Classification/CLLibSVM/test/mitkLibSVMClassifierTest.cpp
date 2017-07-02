@@ -207,16 +207,12 @@ public:
     colunmvector and the result of the SVM */
     unsigned int maxrows = classes.rows();
 
-    bool isYPredictVector = false;
     int count = 0;
 
     for (unsigned int i = 0; i < maxrows; i++)
     {
       if(classes(i, 0) == m_TestYPredict(i, 0))
-      {
-        isYPredictVector = true;
         ++count;
-      }
     }
 
     MITK_INFO << 100*count/(double)(maxrows) << "%";
@@ -298,16 +294,12 @@ public:
     of the SVM */
     unsigned int maxrows = classes.rows();
 
-    bool isYPredictVector = false;
     int count = 0;
 
     for (unsigned int i = 0; i < maxrows; i++)
     {
       if (classes(i, 0) == m_TestYPredict(i, 0))
-      {
-        isYPredictVector = true;
         ++count;
-      }
     }
 
     MITK_INFO << 100*count/(double)(maxrows) << "%";

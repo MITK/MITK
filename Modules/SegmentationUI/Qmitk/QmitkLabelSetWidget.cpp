@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <berryIPreferencesService.h>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
-  : QWidget(parent), m_ToolManager(nullptr), m_DataStorage(nullptr), m_Completer(nullptr)
+  : QWidget(parent), m_DataStorage(nullptr), m_Completer(nullptr), m_ToolManager(nullptr)
 {
   m_Controls.setupUi(this);
 
@@ -487,7 +487,7 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
 
 void QmitkLabelSetWidget::OnLockedButtonClicked()
 {
-  int row;
+  int row = -1;
   for(int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); ++i)
   {
     if (sender() == m_Controls.m_LabelSetTableWidget->cellWidget(i, LOCKED_COL))
@@ -504,7 +504,7 @@ void QmitkLabelSetWidget::OnLockedButtonClicked()
 
 void QmitkLabelSetWidget::OnVisibleButtonClicked()
 {
-  int row;
+  int row = -1;
   for(int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); ++i)
   {
     if (sender() == m_Controls.m_LabelSetTableWidget->cellWidget(i, VISIBLE_COL))
@@ -525,7 +525,7 @@ void QmitkLabelSetWidget::OnVisibleButtonClicked()
 
 void QmitkLabelSetWidget::OnColorButtonClicked()
 {
-  int row;
+  int row = -1;
   for(int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); ++i)
   {
     if (sender() == m_Controls.m_LabelSetTableWidget->cellWidget(i, COLOR_COL))

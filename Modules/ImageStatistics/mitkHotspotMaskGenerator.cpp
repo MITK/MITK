@@ -493,7 +493,6 @@ namespace mitk
     {
         typedef itk::Image< TPixel, VImageDimension > InputImageType;
         typedef itk::Image< TPixel, VImageDimension > ConvolutionImageType;
-        typedef itk::Image< float, VImageDimension > KernelImageType;
         typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
         typename ConvolutionImageType::Pointer convolutionImage = this->GenerateConvolutionImage(inputImage);

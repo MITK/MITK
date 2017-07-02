@@ -40,8 +40,8 @@ QmitkSurfaceBasedInterpolatorWidget::QmitkSurfaceBasedInterpolatorWidget(QWidget
   : QWidget(parent),
     m_SurfaceBasedInterpolatorController(mitk::SurfaceBasedInterpolationController::GetInstance()),
     m_ToolManager(nullptr),
-    m_DataStorage(nullptr),
-    m_Activated(false)
+    m_Activated(false),
+    m_DataStorage(nullptr)
 {
   m_Controls.setupUi(this);
 

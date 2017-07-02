@@ -32,6 +32,7 @@ namespace mitk {
     CESTDICOMReaderService(const std::string& description);
 
     /** Uses the BaseDICOMReaderService Read function and add extra steps for CEST meta data */
+    using AbstractFileReader::Read;
     virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   protected:

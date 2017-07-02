@@ -47,7 +47,7 @@ mitk::TubeGraphVtkMapper3D::~TubeGraphVtkMapper3D()
 
 const mitk::TubeGraph *mitk::TubeGraphVtkMapper3D::GetInput()
 {
-  return dynamic_cast<const TubeGraph *>(GetData());
+  return dynamic_cast<const TubeGraph *>(GetDataNode()->GetData());
 }
 
 vtkProp *mitk::TubeGraphVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
@@ -453,7 +453,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
     EdgeDescriptorType edgeDesc = graph->GetEdgeDescriptor(*edge);
 
     // get source and target vertex descriptor
-    std::pair<TubeGraphVertex, TubeGraphVertex> soureTargetPair = graph->GetVerticesOfAnEdge(edgeDesc);
+    auto soureTargetPair = graph->GetVerticesOfAnEdge(edgeDesc);
     TubeGraphVertex source = soureTargetPair.first;
     TubeGraphVertex target = soureTargetPair.second;
 
@@ -531,8 +531,8 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
       {
         double lastDistance = 0, distance = 0;
         // Get the first element behind the radius of the sphere; now backwards through the element list
-        unsigned int index = (*edge).GetNumberOfElements() - 1;
-        for (; index >= 0; index--)
+        int index = (*edge).GetNumberOfElements();
+        for ( ; index >= 0; --index)
         {
           mitk::Vector3D diffVec = (*edge).GetTubeElement(index)->GetCoordinates() - centerVertex;
           distance = std::sqrt(pow(diffVec[0], 2) + pow(diffVec[1], 2) + pow(diffVec[2], 2));
@@ -547,7 +547,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
 
           interpolationValue = (radius - lastDistance) / (distance - lastDistance);
 
-          if (index == (*edge).GetNumberOfElements() - 1)
+          if (index == static_cast<int>((*edge).GetNumberOfElements() - 1))
           {
             if (dynamic_cast<mitk::CircularProfileTubeElement *>(
                   (*edge).GetTubeElement((*edge).GetNumberOfElements() - 1)))
@@ -565,11 +565,10 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
               outsideSphereDiameter =
                 (dynamic_cast<mitk::CircularProfileTubeElement *>((*edge).GetTubeElement(index)))->GetDiameter();
           }
-          // interpolate the diameter for clipping
+        // interpolate the diameter for clipping
           cylinderDiameter =
             (1 - interpolationValue) * withinSphereDiameter + interpolationValue * outsideSphereDiameter;
         }
-
         // Get the reference point, so the direction of the tube can be calculated
         edgeDirectionPoint = (*edge).GetTubeElement((*edge).GetNumberOfElements() - 1)->GetCoordinates();
       }

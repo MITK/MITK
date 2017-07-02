@@ -411,7 +411,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   typedef typename InputImageType::IndexType IndexType;
   typedef itk::ConnectedAdaptiveThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
   typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
-  typedef itk::MinimumMaximumImageCalculator<InputImageType> MinMaxValueFilterType;
   typedef itk::BinaryThresholdImageFilter<InputImageType, InputImageType> ThresholdFilterType;
   typedef itk::MaskImageFilter<InputImageType, InputImageType, InputImageType> MaskImageFilterType;
 
@@ -879,7 +878,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int thValue)
+void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int)
 {
   typedef short PixelType;
   typedef itk::Image<PixelType, 3> InputImageType;

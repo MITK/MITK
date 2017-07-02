@@ -377,7 +377,6 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
   TimeBoundsList result;
 
   OFDateTime baseLine;
-  bool baseLineSet = false;
 
   // extract the timebounds
   DateTimeBounds baselineDateTimeBounds;
@@ -385,7 +384,6 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
   StringContainerList::const_iterator pos = filenamesOfTimeSteps.cbegin();
   ExtractDateTimeBoundsAndTriggerOfTimeStep(*pos, baselineDateTimeBounds, triggerBounds);
   baseLine = baselineDateTimeBounds[0];
-  baseLineSet = true;
 
   // timebounds for baseline is 0
   TimeBounds bounds( 0.0 );

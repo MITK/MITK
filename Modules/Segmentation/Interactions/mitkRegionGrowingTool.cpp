@@ -620,15 +620,13 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
     {
       // Get working data to pass to following method so we don't overwrite locked labels in a LabelSetImage
       mitk::DataNode *workingNode(m_ToolManager->GetWorkingData(0));
-      mitk::LabelSetImage *labelImage;
-      if (workingNode)
-      {
-        labelImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-      }
+      mitk::LabelSetImage *labelImage = workingNode != nullptr
+        ? dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())
+        : nullptr;
 
       MITK_DEBUG << "Filling Segmentation";
 
-      if (labelImage)
+      if (labelImage != nullptr)
       {
         // m_PaintingPixelValue only decides whether to paint or not
         // For LabelSetImages we want to paint with the active label value

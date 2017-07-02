@@ -14,14 +14,14 @@ QmitkSelectXnatUploadDestinationDialog::QmitkSelectXnatUploadDestinationDialog(c
                                                                                const QStringList &availableResources,
                                                                                QWidget *parent)
   : QDialog(parent),
-    ui(new Ui::QmitkSelectXnatUploadDestinationDialog),
+    m_TreeModel(new QmitkXnatTreeModel),
     m_Url(""),
     m_ResourceName(""),
-    m_CreateNewFolder(false)
+    m_CreateNewFolder(false),
+    ui(new Ui::QmitkSelectXnatUploadDestinationDialog)
 {
   ui->setupUi(this);
 
-  m_TreeModel = new QmitkXnatTreeModel();
   m_TreeModel->addDataModel(session->dataModel());
   ui->treeView->setModel(m_TreeModel);
 

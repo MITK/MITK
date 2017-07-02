@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
-  : QWidget(parent), m_Controls(nullptr), m_ProgressDialog(nullptr)
+  : QWidget(parent), m_ProgressDialog(nullptr), m_Controls(nullptr)
 {
   Initialize();
   CreateQtPartControl(this);

@@ -40,18 +40,18 @@ public:
   void initializeJavaScriptChart();
   void callJavaScriptFuntion(QString command);
 
-  QmitkC3Data* GetC3Data() { return &m_c3Data; };
+  QmitkC3Data* GetC3Data() { return &m_c3Data; }
 
-  mitk::Image::Pointer GetImage() { return m_Image; }; const
-  void SetImage(const mitk::Image::Pointer image) { m_Image = image; };
+  mitk::Image::Pointer GetImage() const { return m_Image; }
+  void SetImage(const mitk::Image::Pointer image) { m_Image = image; }
 
-  mitk::PlanarFigure::ConstPointer GetPlanarFigure() { return m_PlanarFigure; }; const
-  void SetPlanarFigure(const mitk::PlanarFigure::ConstPointer planarFigure) { m_PlanarFigure = planarFigure; };
+  mitk::PlanarFigure::ConstPointer GetPlanarFigure() const { return m_PlanarFigure; }
+  void SetPlanarFigure(const mitk::PlanarFigure::ConstPointer planarFigure) { m_PlanarFigure = planarFigure; }
 
 private:
-  QWidget* m_Parent;
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
+  QWidget* m_Parent;
 
   QmitkC3Data m_c3Data;
 
@@ -138,7 +138,7 @@ QmitkC3jsWidget::~QmitkC3jsWidget()
   delete m_Impl;
 }
 
-void QmitkC3jsWidget::OnLoadFinished(bool isLoadSuccessfull)
+void QmitkC3jsWidget::OnLoadFinished(bool)
 {
   emit PageSuccessfullyLoaded();
 }

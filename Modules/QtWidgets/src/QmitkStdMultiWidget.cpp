@@ -1416,7 +1416,7 @@ void QmitkStdMultiWidget::wheelEvent(QWheelEvent *e)
   emit WheelMoved(e);
 }
 
-void QmitkStdMultiWidget::mousePressEvent(QMouseEvent *e)
+void QmitkStdMultiWidget::mousePressEvent(QMouseEvent *)
 {
 }
 

@@ -74,7 +74,6 @@ public:
     image->SetRegions(region);
     image->Allocate();
     image->FillBuffer(bufferValue);
-              int i = 0;
 
     for(unsigned int r = 0; r < 50; r++)
     {

@@ -30,10 +30,10 @@ namespace itk
       m_SumOfCubes(1),
       m_SumOfQuadruples(1),
       m_Count(1),
-      m_ThreadMin(1),
-      m_ThreadMax(1),
       m_PositivePixelCount(1),
       m_ThreadSumOfPositivePixels(1),
+      m_ThreadMin(1),
+      m_ThreadMax(1),
       m_UseHistogram(false),
       m_HistogramCalculated(false)
   {

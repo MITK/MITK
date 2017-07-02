@@ -161,9 +161,9 @@ private:
 
   mitk::ColorSequenceRainbow m_ColorSequenceRainbow;
 
-  QCompleter *m_Completer;
-
   mitk::DataStorage *m_DataStorage;
+
+  QCompleter *m_Completer;
 
   mitk::ToolManager *m_ToolManager;
 

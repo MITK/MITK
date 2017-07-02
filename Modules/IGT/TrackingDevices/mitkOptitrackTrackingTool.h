@@ -97,12 +97,14 @@ namespace mitk
     * \brief Set the position to a given one
     * @throw mitk::IGTException Throws an exception if
     */
+    using Superclass::SetPosition;
     void SetPosition(mitk::Point3D position, ScalarType eps=0.0);
 
     /**
     * \brief Set the orientation to a given one using a quaternion nomenclature
     * @throw mitk::IGTException Throws an exception if
     */
+    using Superclass::SetOrientation;
     void SetOrientation(mitk::Quaternion orientation, ScalarType eps=0.0);
 
     /**

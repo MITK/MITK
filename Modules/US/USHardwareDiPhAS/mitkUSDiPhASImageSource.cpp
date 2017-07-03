@@ -722,7 +722,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       if (m_SavingSettings.saveRaw)
       {
         OrderImagesInterleaved(PAImageRaw, USImageRaw, m_RawRecordedImages, true);
-        //mitk::IOUtil::Save(USImageRaw, pathUSRaw);
+        mitk::IOUtil::Save(USImageRaw, pathUSRaw);
         mitk::IOUtil::Save(PAImageRaw, pathPARaw);
       }
 

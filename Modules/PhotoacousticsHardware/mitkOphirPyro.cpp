@@ -287,10 +287,33 @@ bool mitk::OphirPyro::OpenConnection()
 {
   if (!m_Connected)
   {
-    char* m_SerialNumber = ophirAPI.ScanUSB();
+    char* m_SerialNumber;
+    try {
+      MITK_INFO << "Scanning for Ophir connection";
+      m_SerialNumber = ophirAPI.ScanUSB();
+    }
+    catch (...)
+    {
+      MITK_INFO << "Scanning failed, trying again in 2 seconds...";
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+      MITK_INFO << "Scanning for Ophir connection";
+      m_SerialNumber = ophirAPI.ScanUSB();
+    }
+
     if (m_SerialNumber != 0)
     {
-      m_DeviceHandle = ophirAPI.OpenDevice(m_SerialNumber);
+      try {
+        MITK_INFO << "Opening Ophir connection";
+        m_DeviceHandle = ophirAPI.OpenDevice(m_SerialNumber);
+      }
+      catch (...)
+      {
+        MITK_INFO << "Ophir connection failed, trying again in 2 seconds...";
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        MITK_INFO << "Opening Ophir connection";
+        m_DeviceHandle = ophirAPI.OpenDevice(m_SerialNumber);
+      }
+      
       if (m_DeviceHandle != 0)
       {
         m_Connected = true;

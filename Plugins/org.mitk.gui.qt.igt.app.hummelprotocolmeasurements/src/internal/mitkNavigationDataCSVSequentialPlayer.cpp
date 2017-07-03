@@ -273,8 +273,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
       return returnValue;
     }
 
-    time = myLineList.at(2).toDouble();
-
     if (myLineList.at(3).toStdString() == "1") valid = true;
 
     position[0] = myLineList.at(2).toDouble();
@@ -287,7 +285,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     orientation[3] = myLineList.at(8).toDouble(); //qr
   }
 
-  //returnValue->SetTimeStamp(time); //DOES NOT WORK ANY MORE... CANNOT SET TIME TO itk::timestamp CLASS
   returnValue->SetDataValid(valid);
   returnValue->SetPosition(position);
   returnValue->SetOrientation(orientation);

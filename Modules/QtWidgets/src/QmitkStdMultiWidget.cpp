@@ -760,6 +760,7 @@ void QmitkStdMultiWidget::CleanViewsToChangeLayout()
   // Hide all Menu Widgets
   this->HideAllWidgetToolbars();
 
+  levelWindowWidget->setParent(nullptr);
   mitkWidget1Container->setParent(nullptr);
   mitkWidget2Container->setParent(nullptr);
   mitkWidget3Container->setParent(nullptr);

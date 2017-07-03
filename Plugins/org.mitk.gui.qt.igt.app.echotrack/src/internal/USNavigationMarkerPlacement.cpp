@@ -63,23 +63,24 @@ const char *USNavigationMarkerPlacement::DATANAME_TARGETS_PATHS = "Target Paths"
 const char *USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS = "Reached Targets";
 
 USNavigationMarkerPlacement::USNavigationMarkerPlacement()
-  : m_UpdateTimer(new QTimer(this)),
+  : m_Parent(nullptr),
+    m_UpdateTimer(new QTimer(this)),
     m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
     m_StdMultiWidget(0),
     m_ReinitAlreadyDone(false),
     m_IsExperimentRunning(false),
     m_NavigationStepTimer(mitk::USNavigationStepTimer::New()),
     m_ExperimentLogging(mitk::USNavigationExperimentLogging::New()),
-    m_AblationZonesDisplacementFilter(mitk::NodeDisplacementFilter::New()),
     m_IconRunning(QPixmap(":/USNavigation/record.png")),
     m_IconNotRunning(QPixmap(":/USNavigation/record-gray.png")),
     m_USImageLoggingFilter(mitk::USImageLoggingFilter::New()),
     m_NavigationDataRecorder(mitk::NavigationDataRecorder::New()),
+    m_AblationZonesDisplacementFilter(mitk::NodeDisplacementFilter::New()),
+    m_NeedleIndex(0),
+    m_MarkerIndex(1),
     m_SceneNumber(1),
     m_WarnOverlay(mitk::TextAnnotation2D::New()),
     m_ListenerDeviceChanged(this, &USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged),
-    m_NeedleIndex(0),
-    m_MarkerIndex(1),
     ui(new Ui::USNavigationMarkerPlacement)
 {
   connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
@@ -116,7 +117,7 @@ USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 
 void USNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
 {
-  if ((m_AblationZonesVector.size() < id) || (id < 0))
+  if ((static_cast<int>(m_AblationZonesVector.size()) < id) || (id < 0))
   {
     return;
   }
@@ -285,7 +286,7 @@ void USNavigationMarkerPlacement::OnImageAndNavigationDataLoggingTimeout()
     // get last messages for logging filer and store them
     std::vector<std::string> messages = m_LoggingBackend.GetNavigationMessages();
     std::string composedMessage = "";
-    for (int i = 0; i < messages.size(); i++)
+    for (std::size_t i = 0; i < messages.size(); i++)
     {
       composedMessage += messages.at(i);
     }
@@ -399,10 +400,10 @@ void USNavigationMarkerPlacement::OnFinishExperiment()
   m_NavigationDataRecorder->StopRecording();
 
   // Write data to csv and xml file
-  mitk::IOUtil::SaveBaseData(
+  mitk::IOUtil::Save(
     m_NavigationDataRecorder->GetNavigationDataSet(),
     (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.xml").toStdString().c_str()));
-  mitk::IOUtil::SaveBaseData(
+  mitk::IOUtil::Save(
     m_NavigationDataRecorder->GetNavigationDataSet(),
     (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.csv").toStdString().c_str()));
 
@@ -597,7 +598,7 @@ void USNavigationMarkerPlacement::OnActiveNavigationStepChanged(int index)
 {
   // update navigation step timer each time the active navigation step changes
   m_NavigationStepTimer->SetActiveIndex(index, m_NavigationSteps.at(index)->GetTitle().toStdString());
-  if (m_NavigationStepNames.size() <= index)
+  if (static_cast<int>(m_NavigationStepNames.size()) <= index)
   {
     MITK_INFO("USNavigationLogging") << "Someting went wrong: unknown navigation step!";
   }

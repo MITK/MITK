@@ -708,7 +708,7 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
 //=======================================================
 // ThreadStartTracking
 //=======================================================
-ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void*)
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return 0;
@@ -717,7 +717,7 @@ ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* 
 //=======================================================
 // GetOptitrackTool
 //=======================================================
-mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( unsigned int toolNumber) const
+mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool(unsigned int) const
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return nullptr;
@@ -743,7 +743,7 @@ void mitk::OptitrackTrackingDevice::TrackTools()
 //=======================================================
 // SetCameraParams
 //=======================================================
-bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold , int intensity, int videoType )
+bool mitk::OptitrackTrackingDevice::SetCameraParams(int, int, int, int)
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
@@ -752,7 +752,7 @@ bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold 
 //=======================================================
 // GetTool
 //=======================================================
-mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int toolNumber) const
+mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int) const
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return nullptr;
@@ -761,7 +761,7 @@ mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int toolNumb
 //=======================================================
 // AddToolByFileName
 //=======================================================
-bool mitk::OptitrackTrackingDevice::AddToolByDefinitionFile(std::string fileName)
+bool mitk::OptitrackTrackingDevice::AddToolByDefinitionFile(std::string)
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;

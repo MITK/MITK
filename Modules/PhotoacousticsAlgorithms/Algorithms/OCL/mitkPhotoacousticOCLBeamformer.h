@@ -17,8 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 
-#include "..\\..\\..\\OpenCL\\mitkOclImageToImageFilter.h"
+#include "mitkOclImageToImageFilter.h"
 #include <itkObject.h>
+
 namespace mitk
 {
 class OclImageToImageFilter;
@@ -123,76 +124,6 @@ private:
   float m_Pitch;
   float m_Angle;
   unsigned short m_TransducerElements;
-};
-
-class PhotoacousticPixelSum : public OclImageToImageFilter, public itk::Object
-{
-
-public:
-  mitkClassMacroItkParent(PhotoacousticPixelSum, itk::Object);
-  itkNewMacro(Self);
-
-  /**
-  * @brief SetInput Set the input image. Only 3D images are supported for now.
-  * @param image a 3D image.
-  * @throw mitk::Exception if the dimesion is not 3.
-  */
-  void SetInput(Image::Pointer image);
-
-  void* GetRawOutput();
-
-  /** Update the filter */
-  void Update();
-
-  void SetOutputDim(unsigned int outputDim[3])
-  {
-    m_OutputDim[0] = outputDim[0];
-    m_OutputDim[1] = outputDim[1];
-    m_OutputDim[2] = outputDim[2];
-  }
-
-  void SetImagesToAdd(unsigned short number)
-  {
-    m_Images = number;
-  }
-
-  void SetData(void* data)
-  {
-    m_Data = (float*)data;
-  }
-
-protected:
-
-  /** Constructor */
-  PhotoacousticPixelSum();
-
-  /** Destructor */
-  virtual ~PhotoacousticPixelSum();
-
-  /** Initialize the filter */
-  bool Initialize();
-
-  void Execute();
-
-  mitk::PixelType GetOutputType()
-  {
-    return mitk::MakeScalarPixelType<float>();
-  }
-
-  int GetBytesPerElem()
-  {
-    return sizeof(double);
-  }
-
-  virtual us::Module* GetModule();
-
-private:
-  /** The OpenCL kernel for the filter */
-  cl_kernel m_PixelCalculation;
-
-  unsigned int m_OutputDim[3];
-  float* m_Data;
-  unsigned short m_Images;
 };
 }
 #endif

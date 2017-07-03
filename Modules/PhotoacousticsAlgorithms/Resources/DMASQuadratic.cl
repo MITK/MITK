@@ -19,8 +19,6 @@ __kernel void ckDMASQuad(
   __global float* dDest, // output buffer
   __global float* apodArray,
   unsigned short apodArraySize,
-  unsigned short outputS,
-  unsigned short outputL,
   float SpeedOfSound,
   float RecordTime,
   float Pitch,
@@ -33,6 +31,9 @@ __kernel void ckDMASQuad(
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
   unsigned int globalPosZ = get_global_id(2);
+  
+  unsigned short outputS = get_global_size(1);
+  unsigned short outputL = get_global_size(0);
   
   // get image width and weight
   const unsigned int inputL = get_image_width( dSource );
@@ -48,10 +49,7 @@ __kernel void ckDMASQuad(
     float l_i = (float)globalPosX / outputL * inputL;
     float s_i = (float)globalPosY / outputS * inputS;
 
-    float tan_phi = tan(Angle / 360 * 2 * M_PI);
-    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements;
-
-    float part = part_multiplicator * s_i;
+    float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
       part = 1;
 
@@ -92,35 +90,3 @@ __kernel void ckDMASQuad(
     dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = 10 * output / (pow((float)usedLines, 2.0f) - (usedLines - 1));
   }
 }
-
-
-/*
-    //calculate the AddSamples beforehand to save some time
-    for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
-    {
-      AddSample[l_s] = delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i;
-    }
-	
-	float mult = 0;
-	float output = 0;
-
-    for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
-    {
-      if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
-      {
-        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
-        {
-          if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
-          {
-            mult = read_imagef( dSource, defaultSampler, (int4)(l_s2, AddSample[l_s2], globalPosZ, 0 )).x 
-			* apodArray[(short)((l_s2 - minLine)*apod_mult)] 
-			* read_imagef( dSource, defaultSampler, (int4)(l_s1, AddSample[l_s1], globalPosZ, 0 )).x 
-			* apodArray[(short)((l_s1 - minLine)*apod_mult)];
-            output += sqrt(mult*(mult>0)) * ((mult > 0) - (mult < 0));
-          }
-        }
-      }
-      else
-        --usedLines;
-    }
-*/

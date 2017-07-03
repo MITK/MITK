@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include <functional>
+#include "mitkOclImageToImageFilter.h"
 
 #include "mitkPhotoacousticBeamformingFilter.h"
 
@@ -44,6 +45,66 @@ namespace mitk {
       PhotoacousticImage();
       virtual ~PhotoacousticImage();
     };
+
+    /*
+    class CropFilter : public OclImageToImageFilter, public itk::Object
+    {
+
+    public:
+      mitkClassMacroItkParent(CropFilter, itk::Object);
+      itkNewMacro(Self);
+
+      void SetInput(Image::Pointer image);
+
+      mitk::Image::Pointer GetOutput();
+
+      void Update();
+
+      void SetCropping(int above, int below, int right, int left, int minSlice, int maxSlice)
+      {
+        m_Above = above;
+        m_Below = below;
+        m_Right = right;
+        m_Left = left;
+        m_MinSlice = minSlice;
+        m_MaxSlice = maxSlice;
+      }
+
+
+    protected:
+      CropFilter();
+
+      virtual ~CropFilter();
+
+      bool Initialize();
+
+      void Execute();
+
+      mitk::PixelType GetOutputType()
+      {
+        return mitk::MakeScalarPixelType<float>();
+      }
+
+      int GetBytesPerElem()
+      {
+        return sizeof(double);
+      }
+
+      virtual us::Module* GetModule();
+
+    private:
+      cl_kernel m_PixelCalculation;
+
+      int m_Above; 
+      int m_Below;
+      int m_Right;
+      int m_Left;
+      int m_MinSlice;
+      int m_MaxSlice;
+
+      unsigned int m_OutputDim[3];
+    };
+    */
 } // namespace mitk
 
 #endif /* mitkPhotoacousticImage_H_HEADER_INCLUDED */

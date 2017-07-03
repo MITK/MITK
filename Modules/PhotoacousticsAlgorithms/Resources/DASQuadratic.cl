@@ -19,8 +19,6 @@ __kernel void ckDASQuad(
   __global float* dDest, // output buffer
   __global float* apodArray,
   unsigned short apodArraySize,
-  unsigned short outputS,
-  unsigned short outputL,
   float SpeedOfSound,
   float RecordTime,
   float Pitch,
@@ -33,6 +31,9 @@ __kernel void ckDASQuad(
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
   unsigned int globalPosZ = get_global_id(2);
+  
+  unsigned short outputS = get_global_size(1);
+  unsigned short outputL = get_global_size(0);
   
   // get image width and weight
   const unsigned int inputL = get_image_width( dSource );
@@ -47,11 +48,8 @@ __kernel void ckDASQuad(
   {	
     float l_i = (float)globalPosX / outputL * inputL;
     float s_i = (float)globalPosY / outputS * inputS;
-
-    float tan_phi = tan(Angle / 360 * 2 * M_PI);
-    float part_multiplicator = tan_phi * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements;
-
-    float part = part_multiplicator * s_i;
+	
+    float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
       part = 1;
 

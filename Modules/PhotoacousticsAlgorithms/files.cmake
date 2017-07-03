@@ -11,5 +11,5 @@ set(RESOURCE_FILES
   DMASQuadratic.cl
   DASspherical.cl
   DMASspherical.cl
-  PixelSum.cl
+  CropFilter.cl
 )

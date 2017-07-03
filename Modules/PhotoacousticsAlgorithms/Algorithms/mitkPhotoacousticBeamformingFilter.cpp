@@ -220,7 +220,6 @@ void mitk::BeamformingFilter::GenerateData()
 
   try
   {
-    MITK_INFO << "afas" << input->GetPixelType().GetTypeAsString();
     m_oclFilter->SetInput(input);
     if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
     {

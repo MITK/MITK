@@ -263,3 +263,128 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
   Beamformer->UpdateLargestPossibleRegion();
   return Beamformer->GetOutput();
 }
+
+/*
+mitk::CropFilter::CropFilter()
+  : m_PixelCalculation(NULL)
+{
+  this->AddSourceFile("CropFilter.cl");
+
+  this->m_FilterID = "CropFilter";
+}
+
+mitk::CropFilter::~CropFilter()
+{
+  if (this->m_PixelCalculation)
+  {
+    clReleaseKernel(m_PixelCalculation);
+  }
+}
+
+void mitk::CropFilter::Update()
+{
+  //Check if context & program available
+  if (!this->Initialize())
+  {
+    us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+    OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+
+    // clean-up also the resources
+    resources->InvalidateStorage();
+    mitkThrow() << "Filter is not initialized. Cannot update.";
+  }
+  else {
+    // Execute
+    this->Execute();
+  }
+}
+
+void mitk::CropFilter::Execute()
+{
+  cl_int clErr = 0;
+
+  try
+  {
+    this->InitExec(this->m_PixelCalculation);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_ERROR << "Catched exception while initializing filter: " << e.what();
+    return;
+  }
+
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+  cl_context gpuContext = resources->GetContext();
+
+  unsigned int size = m_OutputDim[0] * m_OutputDim[1] * m_OutputDim[2] * m_Images;
+
+  cl_mem cl_input = clCreateBuffer(gpuContext, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(float) * size, m_Data, &clErr);
+  CHECK_OCL_ERR(clErr);
+
+  // set kernel arguments
+  clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &cl_input);
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_ushort), &(this->m_Images));
+
+  CHECK_OCL_ERR(clErr);
+
+  // execute the filter on a 3D NDRange
+  this->ExecuteKernel(m_PixelCalculation, 3);
+
+  // signalize the GPU-side data changed
+  m_Output->Modified(GPU_DATA);
+}
+
+us::Module *mitk::CropFilter::GetModule()
+{
+  return us::GetModuleContext()->GetModule();
+}
+
+bool mitk::CropFilter::Initialize()
+{
+  bool buildErr = true;
+  cl_int clErr = 0;
+
+  if (OclFilter::Initialize())
+  {
+    this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckCrop", &clErr);
+    buildErr |= CHECK_OCL_ERR(clErr);
+  }
+  return (OclFilter::IsInitialized() && buildErr);
+}
+
+void mitk::CropFilter::SetInput(mitk::Image::Pointer image)
+{
+  if (image->GetDimension() != 3)
+  {
+    mitkThrowException(mitk::Exception) << "Input for " << this->GetNameOfClass() <<
+      " is not 3D. The filter only supports 3D. Please change your input.";
+  }
+  OclImageToImageFilter::SetInput(image);
+}
+
+mitk::Image::Pointer mitk::CropFilter::GetOutput()
+{
+  if (m_Output->IsModified(GPU_DATA))
+  {
+    void* pData = m_Output->TransferDataToCPU(m_CommandQue);
+
+    const unsigned int dimension = 3;
+    unsigned int* dimensions = m_OutputDim;
+
+    const mitk::SlicedGeometry3D::Pointer p_slg = m_Input->GetMITKImage()->GetSlicedGeometry();
+
+    MITK_DEBUG << "Creating new MITK Image.";
+
+    m_Output->GetMITKImage()->Initialize(this->GetOutputType(), dimension, dimensions);
+    m_Output->GetMITKImage()->SetSpacing(p_slg->GetSpacing());
+    m_Output->GetMITKImage()->SetGeometry(m_Input->GetMITKImage()->GetGeometry());
+    m_Output->GetMITKImage()->SetImportVolume(pData, 0, 0, mitk::Image::ReferenceMemory);
+  }
+
+  MITK_DEBUG << "Image Initialized.";
+
+  return m_Output->GetMITKImage();
+}
+
+*/

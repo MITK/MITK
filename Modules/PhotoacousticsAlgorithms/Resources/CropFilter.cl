@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-__kernel void ckSum(
+__kernel void ckCrop(
   __read_only image3d_t dSource, // input image
   __global float* dDest, // output buffer
   __global float* input,

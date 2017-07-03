@@ -66,7 +66,7 @@ bool mitk::HummelProtocolEvaluation::Evaluate15cmDistances(mitk::PointSet::Point
     }
 
   //compute all errors
-  for (int i = 0; i < distances.size(); i++)
+  for (std::size_t i = 0; i < distances.size(); ++i)
   {
     HummelProtocolDistanceError currentError;
     currentError.distanceError = fabs(distances.at(i) - (double)150.0);
@@ -126,7 +126,7 @@ bool mitk::HummelProtocolEvaluation::Evaluate30cmDistances(mitk::PointSet::Point
     }
 
   //compute all errors
-  for (int i = 0; i < distances.size(); i++)
+  for (std::size_t i = 0; i < distances.size(); ++i)
   {
     HummelProtocolDistanceError currentError;
     currentError.distanceError = fabs(distances.at(i) - (double)300.0);
@@ -149,8 +149,6 @@ bool mitk::HummelProtocolEvaluation::Evaluate30cmDistances(mitk::PointSet::Point
 bool mitk::HummelProtocolEvaluation::EvaluateAccumulatedDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)
 {
   if (m != mitk::HummelProtocolEvaluation::standard) { MITK_WARN << "Accumulated distances are only evaluated for standard volumes, aborting!"; return false; }
-  //convert measurements to matrix
-  std::array<std::array<mitk::Point3D, 10> ,9>  matrix = ParseMatrixStandardVolume(p);
 
   MITK_INFO << "########### accumulated distance errors #############";
 
@@ -333,7 +331,7 @@ case standard:
 }
 
 //compute all errors
-for (int i = 0; i < distances.size(); i++)
+for (std::size_t i = 0; i < distances.size(); ++i)
 {
 HummelProtocolDistanceError currentError;
 currentError.distanceError = fabs(distances.at(i) - (double)50.0);
@@ -408,7 +406,7 @@ std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> mitk::H
     acc(each.distanceError);
   }
 
-  returnValue.push_back({ values.size(), "N" });
+  returnValue.push_back({ static_cast<double>(values.size()), "N" });
   returnValue.push_back({ boost::accumulators::mean(acc), "Mean" });
   //double quantile25th = boost::accumulators::quantile(acc, boost::accumulators::quantile_probability = 0.25);
   //returnValue.push_back({ boost::accumulators::median(acc), "Median" });

@@ -428,7 +428,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::UpdateTimer()
 
 void QmitkIGTTrackingSemiAutomaticMeasurementView::StartNextMeasurement()
 {
-  if (this->m_NextFile >= m_FilenameVector.size())
+  if (this->m_NextFile >= static_cast<int>(m_FilenameVector.size()))
   {
     MessageBox("Last Measurement reached!");
     return;

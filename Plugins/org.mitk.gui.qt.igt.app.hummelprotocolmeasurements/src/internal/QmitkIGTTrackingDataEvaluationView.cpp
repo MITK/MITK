@@ -251,21 +251,12 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcRef()
 void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcOrientandWriteToFile()
 {
   //start loop and iterate through all files of list
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     //create navigation data player
     mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
-
-    //check if the stream is valid and skip file if not
-    /*
-    if (!myPlayer->GetStreamValid())
-    {
-    MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-    continue;
-    }
-    */
 
     //open file header
     QString outputname = QString(m_FilenameVector.at(i).c_str()) + "_orientationFile.csv";
@@ -315,17 +306,6 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcOrientandW
           ) current_orientation.fill(0);
         else
         {
-          /* Drehen um eine Achse um das "Umschlagen" zu vermeiden
-          itk::Matrix<float,3,3> rot180degreeAroundY;
-          rot180degreeAroundY.Fill(0);
-          rot180degreeAroundY[0][0] = -1;
-          rot180degreeAroundY[1][1] = 1;
-          rot180degreeAroundY[2][2] = -1;
-          point1 = rot180degreeAroundY * point1;
-          point2 = rot180degreeAroundY * point2;
-          point3 = rot180degreeAroundY * point3;
-          */
-
           vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
           vtkSmartPointer<vtkPoints> sourcePoints = vtkSmartPointer<vtkPoints>::New();
           double sourcepoint1[3] = { point1[0], point1[1], point1[2] };
@@ -403,42 +383,12 @@ void QmitkIGTTrackingDataEvaluationView::OnAddToCurrentList()
   QStringList files = QFileDialog::getOpenFileNames(nullptr, "Select one or more files to open", "/", "CSV (*.csv)");
   if (files.isEmpty()) return;
 
-  for (int i = 0; i < files.size(); i++){
+  for (int i = 0; i < files.size(); i++)
+  {
     std::string tmp = files.at(i).toStdString().c_str();
     m_FilenameVector.push_back(tmp);
   }
-  /*
-  //save old locale
-  char * oldLocale;
-  oldLocale = setlocale( LC_ALL, 0 );
 
-  //define own locale
-  std::locale C("C");
-  setlocale( LC_ALL, "C" );
-  */ //TODO: check if this is needed here, and load old locale if yes
-
-  /*
-  //read file
-  std::ifstream file;
-  file.open(filename.toStdString().c_str(), std::ios::in);
-  if (file.good())
-  {
-  //read out file
-  file.seekg(0L, std::ios::beg);  // move to begin of file
-  while (!file.eof())
-  {
-  std::string buffer;
-  std::getline(file, buffer);    // read out file line by line
-  if (buffer.size() > 0)
-  {
-  std::string thisFilename = "";
-  if (m_Controls->m_AddPath->isChecked()) thisFilename = m_Controls->m_ListPath->text().toStdString();
-  thisFilename.append(buffer);
-  m_FilenameVector.push_back(thisFilename);
-  }
-  }
-  }
-  */
   //fill list at GUI
   m_Controls->m_FileList->clear();
   for (unsigned int i = 0; i < m_FilenameVector.size(); i++) { new QListWidgetItem(tr(m_FilenameVector.at(i).c_str()), m_Controls->m_FileList); }
@@ -513,28 +463,18 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
   WriteHeader();
 
   //start loop and iterate through all files of list
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     //create navigation data player
     mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
-    //check if the stream is valid and skip file if not
-    /*
-    if (!myPlayer->GetStreamValid())
-    {
-    MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-
-    continue;
-    }
-    */
-
     //create evaluation filter
     mitk::NavigationDataEvaluationFilter::Pointer myEvaluationFilter = mitk::NavigationDataEvaluationFilter::New();
 
     //connect pipeline
-    for (int j = 0; j < myPlayer->GetNumberOfOutputs(); j++) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
+    for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++i) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
 
     if (myPlayer->GetNumberOfSnapshots() < m_Controls->m_NumberOfSamples->value())
     {
@@ -544,12 +484,7 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
 
     //update pipline until number of samples is reached
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++)
-    {
       myEvaluationFilter->Update();
-      //Debug output:
-      //std::cout.precision(5);
-      //std::cout << "Euler " << j << ";" << myPlayer->GetOutput()->GetOrientation().rotation_euler_angles()[0] << ";" << myPlayer->GetOutput()->GetOrientation().rotation_euler_angles()[1] << ";" << myPlayer->GetOutput()->GetOrientation().rotation_euler_angles()[2] << "\n";
-    }
 
     //store all jitter values in separate vector for statistics
     jitterValues.push_back({ myEvaluationFilter->GetPositionErrorRMS(0), "RMS" });
@@ -583,7 +518,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSetsOfSinglePositions()
   m_scalingfactor = m_Controls->m_ScalingFactor->value();
 
   //start loop and iterate through all files of list
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     //create point set for this file
     mitk::PointSet::Pointer thisPointSet = mitk::PointSet::New();
@@ -592,16 +527,6 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSetsOfSinglePositions()
     mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
-
-    //check if the stream is valid and skip file if not
-    /*
-    if (!myPlayer->GetStreamValid())
-    {
-    MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-
-    continue;
-    }
-    */
 
     //update pipline until number of samlples is reached and store every single point
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++)
@@ -630,31 +555,21 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSet()
   mitk::PointSet::Pointer generatedPointSet = mitk::PointSet::New();
 
   //start loop and iterate through all files of list
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     //create navigation data player
     mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
-    //check if the stream is valid and skip file if not
-    /*
-      if (!myPlayer->GetStreamValid())
-      {
-      MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-
-      continue;
-      }
-      */
-
     //create evaluation filter
     mitk::NavigationDataEvaluationFilter::Pointer myEvaluationFilter = mitk::NavigationDataEvaluationFilter::New();
 
     //connect pipeline
-    for (int j = 0; j < myPlayer->GetNumberOfOutputs(); j++) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
+    for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
 
     //update pipline until number of samlples is reached
-    for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++) { myEvaluationFilter->Update(); }
+    for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j) { myEvaluationFilter->Update(); }
 
     //add mean position to point set
     mitk::Point3D meanPos = myEvaluationFilter->GetPositionMean(0);
@@ -682,84 +597,64 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateRotationLines()
   m_scalingfactor = m_Controls->m_ScalingFactor->value();
 
   //start loop and iterate through all files of list
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     //create navigation data player
     mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
-    //check if the stream is valid and skip file if not
-    /*
-      if (!myPlayer->GetStreamValid())
-      {
-      MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-      }
-      else
-      */
+    //create evaluation filter
+    mitk::NavigationDataEvaluationFilter::Pointer myEvaluationFilter = mitk::NavigationDataEvaluationFilter::New();
+
+    //connect pipeline
+    for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
+
+    //update pipline until number of samlples is reached
+    for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j)
+      myEvaluationFilter->Update();
+
+    //create line from mean pos to a second point which lies along the sensor (1,0,0 in tool coordinates for aurora)
+    mitk::Point3D meanPos = myEvaluationFilter->GetPositionMean(0);
+    if (m_scalingfactor != 1)
     {
-      //create evaluation filter
-      mitk::NavigationDataEvaluationFilter::Pointer myEvaluationFilter = mitk::NavigationDataEvaluationFilter::New();
-
-      //connect pipeline
-      for (int j = 0; j < myPlayer->GetNumberOfOutputs(); j++) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
-
-      //update pipline until number of samlples is reached
-      for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++)
-      {
-        myEvaluationFilter->Update();
-        /*
-            if (!myPlayer->GetStreamValid())
-            {
-            MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-            continue;
-            }
-            */
-      }
-      //if (!myPlayer->IsAtEnd()) continue;
-
-      //create line from mean pos to a second point which lies along the sensor (1,0,0 in tool coordinates for aurora)
-      mitk::Point3D meanPos = myEvaluationFilter->GetPositionMean(0);
-      if (m_scalingfactor != 1)
-      {
-        meanPos[0] *= m_scalingfactor;
-        meanPos[1] *= m_scalingfactor;
-        meanPos[2] *= m_scalingfactor;
-      }
-      mitk::Point3D secondPoint;
-      mitk::Point3D thirdPoint;
-      mitk::Point3D fourthPoint;
-
-      mitk::FillVector3D(secondPoint, 2, 0, 0); //X
-      vnl_vector<mitk::ScalarType> secondPointTransformed = myEvaluationFilter->GetQuaternionMean(0).rotation_matrix_transpose().transpose() * secondPoint.Get_vnl_vector() + meanPos.Get_vnl_vector();
-      mitk::Point3D secondPointTransformedMITK;
-      mitk::FillVector3D(secondPointTransformedMITK, secondPointTransformed[0], secondPointTransformed[1], secondPointTransformed[2]);
-
-      mitk::FillVector3D(thirdPoint, 0, 4, 0); //Y
-      vnl_vector<mitk::ScalarType> thirdPointTransformed = myEvaluationFilter->GetQuaternionMean(0).rotation_matrix_transpose().transpose() * thirdPoint.Get_vnl_vector() + meanPos.Get_vnl_vector();
-      mitk::Point3D thirdPointTransformedMITK;
-      mitk::FillVector3D(thirdPointTransformedMITK, thirdPointTransformed[0], thirdPointTransformed[1], thirdPointTransformed[2]);
-
-      mitk::FillVector3D(fourthPoint, 0, 0, 6); //Z
-      vnl_vector<mitk::ScalarType> fourthPointTransformed = myEvaluationFilter->GetQuaternionMean(0).rotation_matrix_transpose().transpose() * fourthPoint.Get_vnl_vector() + meanPos.Get_vnl_vector();
-      mitk::Point3D fourthPointTransformedMITK;
-      mitk::FillVector3D(fourthPointTransformedMITK, fourthPointTransformed[0], fourthPointTransformed[1], fourthPointTransformed[2]);
-
-      mitk::PointSet::Pointer rotationLine = mitk::PointSet::New();
-      rotationLine->InsertPoint(0, secondPointTransformedMITK);
-      rotationLine->InsertPoint(1, meanPos);
-      rotationLine->InsertPoint(2, thirdPointTransformedMITK);
-      rotationLine->InsertPoint(3, meanPos);
-      rotationLine->InsertPoint(4, fourthPointTransformedMITK);
-
-      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      QString nodeName = this->m_Controls->m_prefix->text() + "RotationLineNumber" + QString::number(i);
-      newNode->SetName(nodeName.toStdString());
-      newNode->SetData(rotationLine);
-      newNode->SetBoolProperty("show contour", true);
-      newNode->SetFloatProperty("pointsize", 0.5);
-      this->GetDataStorage()->Add(newNode);
+      meanPos[0] *= m_scalingfactor;
+      meanPos[1] *= m_scalingfactor;
+      meanPos[2] *= m_scalingfactor;
     }
+    mitk::Point3D secondPoint;
+    mitk::Point3D thirdPoint;
+    mitk::Point3D fourthPoint;
+
+    mitk::FillVector3D(secondPoint, 2, 0, 0); //X
+    vnl_vector<mitk::ScalarType> secondPointTransformed = myEvaluationFilter->GetQuaternionMean(0).rotation_matrix_transpose().transpose() * secondPoint.GetVnlVector() + meanPos.GetVnlVector();
+    mitk::Point3D secondPointTransformedMITK;
+    mitk::FillVector3D(secondPointTransformedMITK, secondPointTransformed[0], secondPointTransformed[1], secondPointTransformed[2]);
+
+    mitk::FillVector3D(thirdPoint, 0, 4, 0); //Y
+    vnl_vector<mitk::ScalarType> thirdPointTransformed = myEvaluationFilter->GetQuaternionMean(0).rotation_matrix_transpose().transpose() * thirdPoint.GetVnlVector() + meanPos.GetVnlVector();
+    mitk::Point3D thirdPointTransformedMITK;
+    mitk::FillVector3D(thirdPointTransformedMITK, thirdPointTransformed[0], thirdPointTransformed[1], thirdPointTransformed[2]);
+
+    mitk::FillVector3D(fourthPoint, 0, 0, 6); //Z
+    vnl_vector<mitk::ScalarType> fourthPointTransformed = myEvaluationFilter->GetQuaternionMean(0).rotation_matrix_transpose().transpose() * fourthPoint.GetVnlVector() + meanPos.GetVnlVector();
+    mitk::Point3D fourthPointTransformedMITK;
+    mitk::FillVector3D(fourthPointTransformedMITK, fourthPointTransformed[0], fourthPointTransformed[1], fourthPointTransformed[2]);
+
+    mitk::PointSet::Pointer rotationLine = mitk::PointSet::New();
+    rotationLine->InsertPoint(0, secondPointTransformedMITK);
+    rotationLine->InsertPoint(1, meanPos);
+    rotationLine->InsertPoint(2, thirdPointTransformedMITK);
+    rotationLine->InsertPoint(3, meanPos);
+    rotationLine->InsertPoint(4, fourthPointTransformedMITK);
+
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    QString nodeName = this->m_Controls->m_prefix->text() + "RotationLineNumber" + QString::number(i);
+    newNode->SetName(nodeName.toStdString());
+    newNode->SetData(rotationLine);
+    newNode->SetBoolProperty("show contour", true);
+    newNode->SetFloatProperty("pointsize", 0.5);
+    this->GetDataStorage()->Add(newNode);
   }
 }
 
@@ -809,9 +704,9 @@ void QmitkIGTTrackingDataEvaluationView::OnConvertCSVtoXMLFile()
       MessageBox("Error: lists do not have the same number of files!");
       return;
     }
-    for (int i = 0; i < m_CSVtoXMLInputFilenameVector.size(); i++)
+    for (std::size_t i = 0; i < m_CSVtoXMLInputFilenameVector.size(); ++i)
     {
-      int lines = ConvertOneFile(m_CSVtoXMLInputFilenameVector.at(i), m_CSVtoXMLOutputFilenameVector.at(i));
+      ConvertOneFile(m_CSVtoXMLInputFilenameVector.at(i), m_CSVtoXMLOutputFilenameVector.at(i));
     }
     QString result = "Converted " + QString::number(m_CSVtoXMLInputFilenameVector.size()) + " files from file list!";
     MessageBox(result.toStdString());
@@ -827,7 +722,7 @@ int QmitkIGTTrackingDataEvaluationView::ConvertOneFile(std::string inputFilename
   if (m_Controls->m_ConvertCSV->isChecked()) myRecorder->SetOutputFormat(mitk::NavigationDataRecorderDeprecated::csv);
   myRecorder->AddNavigationData(input);
   myRecorder->StartRecording();
-  for (int i = 0; i < myNavigationDatas.size(); i++)
+  for (std::size_t i = 0; i < myNavigationDatas.size(); ++i)
   {
     input->Graft(myNavigationDatas.at(i));
     myRecorder->Update();
@@ -1036,7 +931,7 @@ std::vector<mitk::NavigationDataEvaluationFilter::Pointer> QmitkIGTTrackingDataE
   std::vector<mitk::NavigationDataEvaluationFilter::Pointer> EvaluationDataCollection;
 
   //start loop and iterate through all files of list: store the evaluation data
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     //create navigation data player
     mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
@@ -1046,20 +941,13 @@ std::vector<mitk::NavigationDataEvaluationFilter::Pointer> QmitkIGTTrackingDataE
     //create evaluation filter
     mitk::NavigationDataEvaluationFilter::Pointer myEvaluationFilter = mitk::NavigationDataEvaluationFilter::New();
 
-    //check if the stream is valid and skip file if not
-    /*
-    if (!myPlayer->GetStreamValid())
-    {
-    MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-    }
-    else
-    */
-    {
-      //connect pipeline
-      for (int j = 0; j < myPlayer->GetNumberOfOutputs(); j++) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
-      //update pipline until number of samlples is reached
-      for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++) { myEvaluationFilter->Update(); }
-    }
+    //connect pipeline
+    for (unsigned int j = 0; j < myPlayer->GetNumberOfOutputs(); ++j)
+      myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j));
+
+    //update pipline until number of samlples is reached
+    for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); ++j)
+      myEvaluationFilter->Update();
 
     myEvaluationFilter->SetInput(nullptr);
     myPlayer = nullptr;
@@ -1088,10 +976,10 @@ void QmitkIGTTrackingDataEvaluationView::CalculateDifferenceAngles()
   QString pos1 = "invalid";
   QString pos2 = "invalid";
   //now iterate through all evaluation data and calculate the angles
-  for (int i = 0; i < m_FilenameVector.size(); i++)
+  for (std::size_t i = 0; i < m_FilenameVector.size(); ++i)
   {
     pos1 = QString::fromStdString(itksys::SystemTools::GetFilenameWithoutLastExtension(m_FilenameVector.at(i)));
-    for (int j = 0; j < m_FilenameVector.size(); j++)
+    for (std::size_t j = 0; j < m_FilenameVector.size(); ++j)
     {
       pos2 = QString::fromStdString(itksys::SystemTools::GetFilenameWithoutLastExtension(m_FilenameVector.at(j)));
 
@@ -1134,9 +1022,7 @@ void QmitkIGTTrackingDataEvaluationView::WriteDifferenceAnglesHeader()
 
 void QmitkIGTTrackingDataEvaluationView::WriteDifferenceAnglesDataSet(std::string pos1, std::string pos2, int idx1, int idx2, double angle)
 {
-  //double PI = 3.1415926535897932384626433832795;
-  //double angle_degree = angle * 180 / PI;
-  m_CurrentAngleDifferencesWriteFile << "Angle between " << pos1 << " and " << pos2 << ";" << idx1 << ";" << idx2 << ";" << angle << "\n";//<< ";" << angle_degree << "\n";
+  m_CurrentAngleDifferencesWriteFile << "Angle between " << pos1 << " and " << pos2 << ";" << idx1 << ";" << idx2 << ";" << angle << "\n";
   MITK_INFO << "Angle: " << angle;
 }
 
@@ -1144,7 +1030,7 @@ std::vector<mitk::NavigationData::Pointer> QmitkIGTTrackingDataEvaluationView::G
 {
   std::vector<mitk::NavigationData::Pointer> returnValue = std::vector<mitk::NavigationData::Pointer>();
   std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(filename);
-  for (int i = 1; i < fileContentLineByLine.size(); i++) //skip header so start at 1
+  for (std::size_t i = 1; i < fileContentLineByLine.size(); ++i) //skip header so start at 1
   {
     returnValue.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));
   }
@@ -1198,8 +1084,6 @@ mitk::NavigationData::Pointer QmitkIGTTrackingDataEvaluationView::GetNavigationD
   mitk::Point3D position;
   mitk::Quaternion orientation;
 
-  double time = myLineList.at(1).toDouble();
-
   bool valid = false;
   if (myLineList.at(2).toStdString() == "1") valid = true;
 
@@ -1212,7 +1096,6 @@ mitk::NavigationData::Pointer QmitkIGTTrackingDataEvaluationView::GetNavigationD
   orientation[2] = myLineList.at(8).toDouble();
   orientation[3] = myLineList.at(9).toDouble();
 
-  //returnValue->SetTimeStamp(time);
   returnValue->SetDataValid(valid);
   returnValue->SetPosition(position);
   returnValue->SetOrientation(orientation);

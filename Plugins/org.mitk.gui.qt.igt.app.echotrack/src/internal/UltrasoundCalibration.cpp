@@ -308,15 +308,17 @@ void UltrasoundCalibration::OnAddCurrentTipPositionForVerification()
   MITK_INFO << "Current Error: " << currentError << " mm";
   m_allErrors.push_back(currentError);
 
-  m_currentPoint++;
-  if (m_currentPoint < m_allReferencePoints.size()) { m_Controls.m_CurrentPointLabel->setText("Point " + QString::number(m_currentPoint) + " of " + QString::number(m_allReferencePoints.size())); }
+  if (++m_currentPoint < static_cast<int>(m_allReferencePoints.size()))
+  {
+    m_Controls.m_CurrentPointLabel->setText("Point " + QString::number(m_currentPoint) + " of " + QString::number(m_allReferencePoints.size()));
+  }
   else
   {
     m_currentPoint = -1;
     double meanError = 0;
-    for (int i = 0; i < m_allErrors.size(); i++)
+    for (std::size_t i = 0; i < m_allErrors.size(); ++i)
     {
-      meanError += m_allErrors.at(i);
+      meanError += m_allErrors[i];
     }
     meanError /= m_allErrors.size();
 
@@ -513,7 +515,6 @@ void UltrasoundCalibration::OnStartStreaming()
   m_TrackingMessageProvider->StartStreamingOfSource(m_TrackingToIGTLMessageFilter, 5);
   m_Controls.m_StartStreaming->setEnabled(false);
   m_Controls.m_ConnectionStatus->setText("");
-  unsigned int interval = this->m_USMessageProvider->GetStreamingTime();
   m_StreamingTimer->start((1.0 / 5.0 * 1000.0));
 }
 
@@ -1032,7 +1033,7 @@ double UltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials,
 {
   if (imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
   double FRE = 0;
-  for (unsigned int i = 0; i < imageFiducials->GetSize(); i++)
+  for (int i = 0; i < imageFiducials->GetSize(); ++i)
   {
     itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
     if (transform != nullptr)

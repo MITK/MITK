@@ -38,6 +38,8 @@
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 
+#include <boost/phoenix/bind.hpp>
+
 struct ThrowAwayPattern _ = {};
 
 namespace
@@ -45,17 +47,56 @@ namespace
   const char TIME_STAMP_FORMAT[] = "%Y-%m-%d %H:%M:%S";
 
 #ifdef _WIN32
-  std::string convertToUtf8(const std::wstring& wstr)
+  std::wstring strToWstr(const std::string& str, UINT codePage)
   {
-    const auto size = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
-    if (!size) {
-      return std::string();
+    std::wstring wstr;
+    if (auto n = MultiByteToWideChar(codePage, 0, str.c_str(), str.size() + 1, /*dst*/NULL, 0)) {
+      wstr.resize(n - 1);
+      if (!MultiByteToWideChar(codePage, 0, str.c_str(), str.size() + 1, /*dst*/&wstr[0], n)) {
+        wstr.clear();
+      }
     }
-    std::string str(size, '\0');
-    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), &str[0], size, NULL, NULL);
+    return wstr;
+  }
+  std::string wstrToStr(const std::wstring& wstr, UINT codePage)
+  {
+    std::string str;
+    if (auto n = WideCharToMultiByte(codePage, 0, wstr.c_str(), wstr.size() + 1, /*dst*/NULL, 0, /*defchr*/0, NULL)) {
+      str.resize(n - 1);
+      if (!WideCharToMultiByte(codePage, 0, wstr.c_str(), wstr.size() + 1, /*dst*/&str[0], n, /*defchr*/0, NULL)) {
+        str.clear();
+      }
+    }
     return str;
   }
+  std::string strToStr(const std::string &str, UINT codePageSrc, UINT codePageDst)
+  {
+    return wstrToStr(strToWstr(str, codePageSrc), codePageDst);
+  }
+
+  std::string convertToUtf8(const std::wstring& wstr)
+  {
+    return wstrToStr(wstr, CP_UTF8);
+  }
 #endif
+
+  std::string MessageToUTF8(const boost::log::value_ref<std::string>& message)
+  {
+#ifdef _WIN32
+    return message ? strToStr(*message, CP_ACP, CP_UTF8) : std::string();
+#else
+    return message ? *message : std::string();
+#endif
+  }
+
+  std::string MessageToOEM(const boost::log::value_ref<std::string>& message)
+  {
+#ifdef _WIN32
+    return message ? strToStr(*message, CP_ACP, CP_OEMCP) : std::string();
+#else
+    return message ? *message : std::string();
+#endif
+  }
 
   enum class NameType { USER, HOST };
 
@@ -249,7 +290,7 @@ namespace Logger
       boost::shared_ptr< ostream_sink > sink2(new ostream_sink(backend));
       sink2->set_formatter(
         boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"message\": \"%1%\"}")
-        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::message]
+        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageToUTF8, boost::log::expressions::attr<std::string>("Message"))]
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
         % boost::log::trivial::severity
@@ -285,9 +326,9 @@ namespace Logger
           << '(' << boost::log::expressions::attr<std::string>("Source") << ')'
           << boost::log::expressions::if_(boost::log::trivial::severity != boost::log::trivial::info)
           [
-            boost::log::expressions::stream << boost::log::trivial::severity
+            boost::log::expressions::stream << ' ' << boost::log::trivial::severity
           ] << ": "
-          << boost::log::expressions::smessage
+          << boost::phoenix::bind(&MessageToOEM, boost::log::expressions::attr<std::string>("Message"))
           )
         );
     }

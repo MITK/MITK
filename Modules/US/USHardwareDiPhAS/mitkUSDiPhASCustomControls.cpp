@@ -74,6 +74,7 @@ void mitk::USDiPhASCustomControls::OnSetScatteringCoefficient(float coeff)
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
   imageSource->ModifyScatteringCoefficient(coeff);
 }
+
 void mitk::USDiPhASCustomControls::OnSetCompensateScattering(bool compensate)
 {
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
@@ -202,6 +203,7 @@ void mitk::USDiPhASCustomControls::OnSetReconstructedLines(int lines)
 void mitk::USDiPhASCustomControls::OnSetSpeedOfSound(int mps)
 {
   m_device->GetScanMode().averageSpeedOfSound = mps;
+  m_device->SetInterleaved(m_device->IsInterleaved()); //update transmit parameters
   m_device->UpdateScanmode();
 }
 

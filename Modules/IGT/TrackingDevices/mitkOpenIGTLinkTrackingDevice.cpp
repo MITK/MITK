@@ -40,7 +40,7 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDev
 
   m_OpenIGTLinkClient = mitk::IGTLClient::New(true);
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
-  m_OpenIGTLinkClient->EnableInfiniteBufferingMode(false);
+  m_OpenIGTLinkClient->EnableNoBufferingMode(false);
 
   m_IGTLDeviceSource = mitk::IGTLTransformDeviceSource::New();
   m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
@@ -97,6 +97,8 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
 
   mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
 
+  returnValue = DiscoverToolsAndConvertToNavigationTools(type);
+  /*
   switch (type)
   {
   case TDATA:
@@ -111,8 +113,7 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
   default:
     MITK_INFO << "Server does not send tracking data or received data is not of a compatible type. (Received type: " << msgType << ")";
   }
-
-
+  */
 
   //close connection
   try
@@ -126,6 +127,56 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
     return mitk::NavigationToolStorage::New();
   }
 
+
+  return returnValue;
+}
+
+mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverToolsAndConvertToNavigationTools(mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type, int NumberOfMessagesToWait)
+{
+  MITK_INFO << "Start discovering tools by " << type << " messages";
+  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
+  std::map<std::string, int> toolNameMap;
+
+  for (int j = 0; j<NumberOfMessagesToWait; j++)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    m_IGTLDeviceSource->Update();
+    igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+    if (msg == nullptr || msg.IsNull())
+    {
+      MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
+      continue;
+    }
+
+    int count = toolNameMap[msg->GetDeviceName()];
+    if (count == 0)
+    {
+      //MITK_WARN << "ADDED NEW TOOL TO TOOLCHAIN: " << msg->GetDeviceName() << " - 1";
+      toolNameMap[msg->GetDeviceName()] = 1;
+    }
+    else
+    {
+      toolNameMap[msg->GetDeviceName()]++;
+      //MITK_WARN << "INCREMENTED TOOL COUNT IN TOOLCHAIN: " << msg->GetDeviceName() << " - " << toolNameMap[msg->GetDeviceName()];
+    }
+  }
+
+  int i = 0;
+  for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
+  {
+    MITK_INFO << "Found tool: " << it->first;
+
+    std::stringstream name;
+    name << it->first;
+
+    std::stringstream identifier;
+    identifier << "AutoDetectedTool-" << i;
+    i++;
+
+    mitk::NavigationTool::Pointer newTool = ConstructDefaultOpenIGTLinkTool(name.str(), identifier.str());
+
+    returnValue->AddTool(newTool);
+  }
 
   return returnValue;
 }
@@ -472,6 +523,7 @@ bool mitk::OpenIGTLinkTrackingDevice::StartTracking()
   messageReceivedCommand->SetCallbackFunction(this, &mitk::OpenIGTLinkTrackingDevice::UpdateTools);
   m_MessageReceivedObserverTag = m_OpenIGTLinkClient->AddObserver(mitk::MessageReceivedEvent(), messageReceivedCommand);
 
+  m_OpenIGTLinkClient->EnableNoBufferingMode(true);
   this->SetState(Tracking);
   return true;
 }
@@ -496,6 +548,7 @@ bool mitk::OpenIGTLinkTrackingDevice::StopTracking()
     MITK_WARN << "Open IGT Link device retruned an error while stopping communication: " << e.what();
     return false;
   }
+  m_OpenIGTLinkClient->EnableNoBufferingMode(false);
   this->SetState(Ready);
   return true;
 }

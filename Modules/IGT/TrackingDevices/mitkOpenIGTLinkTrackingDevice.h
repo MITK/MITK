@@ -167,6 +167,10 @@ namespace mitk
 
     mitk::OpenIGTLinkTrackingDevice::TrackingMessageType GetMessageTypeFromString(const char* messageTypeString);
 
+    /** Discovers tools from the OpenIGTLink connection and converts them to MITK navigation tool objects.
+        @return Returns a navigation tool storage holding all found tools. Returns an empty storage if no tools were found or if there was an error.*/
+    mitk::NavigationToolStorage::Pointer DiscoverToolsAndConvertToNavigationTools(mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type, int NumberOfMessagesToWait = 50);
+
     /** Discovers tools from the input (type TDATA) */
     mitk::NavigationToolStorage::Pointer DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
 

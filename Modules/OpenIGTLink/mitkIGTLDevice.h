@@ -239,10 +239,10 @@ namespace mitk {
     /**
     * \brief Sets the buffering mode of the given queue
     */
-    void EnableInfiniteBufferingMode(mitk::IGTLMessageQueue::Pointer queue,
+    void EnableNoBufferingMode(mitk::IGTLMessageQueue::Pointer queue,
       bool enable = true);
 
-    void EnableInfiniteBufferingMode(bool enable = true);
+    void EnableNoBufferingMode(bool enable = true);
 
     /**
     * \brief Returns the number of connections of this device

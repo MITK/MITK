@@ -58,6 +58,7 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.Logfilter, SIGNAL(clicked()), this, SLOT(UseLogfilter()));
   connect(m_Controls.ResamplingValue, SIGNAL(valueChanged(double)), this, SLOT(SetResampling()));
   connect(m_Controls.buttonApplyBeamforming, SIGNAL(clicked()), this, SLOT(StartBeamformingThread()));
+  connect(m_Controls.buttonApplyCropFilter, SIGNAL(clicked()), this, SLOT(StartCropThread()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
   connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
   connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
@@ -273,6 +274,94 @@ void PAImageProcessing::HandleBmodeResults(mitk::Image::Pointer image)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void PAImageProcessing::StartCropThread()
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (nodes.empty()) return;
+
+  mitk::DataStorage::Pointer storage = this->GetDataStorage();
+
+  mitk::DataNode::Pointer node = nodes.front();
+
+  if (!node)
+  {
+    // Nothing selected. Inform the user and return
+    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image cropping.");
+    return;
+  }
+
+  mitk::BaseData* data = node->GetData();
+  if (data)
+  {
+    // test if this data item is an image or not (could also be a surface or something totally different)
+    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
+    if (image)
+    {
+      UpdateBFSettings(image);
+      std::stringstream message;
+      std::string name;
+      message << "Performing image cropping for image ";
+      if (node->GetName(name))
+      {
+        // a property called "name" was found for this DataNode
+        message << "'" << name << "'";
+        m_OldNodeName = name;
+      }
+      else
+        m_OldNodeName = " ";
+
+      message << ".";
+      MITK_INFO << message.str();
+
+      m_Controls.buttonApplyCropFilter->setText("working...");
+      DisableControls();
+
+      CropThread *thread = new CropThread();
+      connect(thread, &CropThread::result, this, &PAImageProcessing::HandleCropResults);
+      connect(thread, &CropThread::finished, thread, &QObject::deleteLater);
+
+      thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value());
+      thread->setInputImage(image);
+
+      MITK_INFO << "Started new thread for Image Cropping";
+      thread->start();
+    }
+  }
+}
+
+void PAImageProcessing::HandleCropResults(mitk::Image::Pointer image)
+{
+  auto newNode = mitk::DataNode::New();
+  newNode->SetData(image);
+
+  // name the new Data node
+  std::stringstream newNodeName;
+  newNodeName << m_OldNodeName << " ";
+  newNodeName << "Cropped";
+
+  newNode->SetName(newNodeName.str());
+
+  // update level window for the current dynamic range
+  mitk::LevelWindow levelWindow;
+  newNode->GetLevelWindow(levelWindow);
+  auto data = newNode->GetData();
+  levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
+  newNode->SetLevelWindow(levelWindow);
+
+  // add new node to data storage
+  this->GetDataStorage()->Add(newNode);
+
+  // disable progress bar
+  m_Controls.progressBar->setVisible(false);
+  m_Controls.buttonApplyCropFilter->setText("Apply Crop Filter");
+  EnableControls();
+
+  // update rendering
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void PAImageProcessing::UpdateBounds()
 {
   if (!m_Controls.Partial->isChecked())
@@ -368,12 +457,16 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
     {
       m_Controls.labelWarning->setVisible( false );
       m_Controls.buttonApplyBModeFilter->setEnabled( true );
+      m_Controls.labelWarning2->setVisible(false);
+      m_Controls.buttonApplyCropFilter->setEnabled(true);
       UpdateFrequency();
       return;
     }
   }
   m_Controls.labelWarning->setVisible( true );
   m_Controls.buttonApplyBModeFilter->setEnabled( false );
+  m_Controls.labelWarning2->setVisible(true);
+  m_Controls.buttonApplyCropFilter->setEnabled(false);
 }
 
 void PAImageProcessing::UseResampling()
@@ -439,6 +532,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.BPLowPass = 1000000 * (1 / (BFconfig.RecordTime / BFconfig.SamplesPerLine) * BFconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000 - m_Controls.BPlow->value()); // [Hz]
   BFconfig.ButterworthOrder = m_Controls.BPFalloff->value();
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
+  BFconfig.UseGPU = m_Controls.UseGPU->isChecked();
 
   UpdateRecordTime(image);
   UpdateBounds();
@@ -521,6 +615,7 @@ void PAImageProcessing::EnableControls()
   m_Controls.ImageType->setEnabled(true);
   m_Controls.Apodization->setEnabled(true);
   m_Controls.UseBP->setEnabled(true);
+  m_Controls.UseGPU->setEnabled(true);
   UseBandpass();
   m_Controls.UseImageSpacing->setEnabled(true);
   UseImageSpacing();
@@ -545,6 +640,7 @@ void PAImageProcessing::DisableControls()
   m_Controls.ImageType->setEnabled(false);
   m_Controls.Apodization->setEnabled(false);
   m_Controls.UseBP->setEnabled(false);
+  m_Controls.UseGPU->setEnabled(false);
   m_Controls.BPhigh->setEnabled(false);
   m_Controls.BPlow->setEnabled(false);
   m_Controls.BPFalloff->setEnabled(false);
@@ -634,6 +730,27 @@ void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing)
 }
 
 void BmodeThread::setInputImage(mitk::Image::Pointer image)
+{
+  m_InputImage = image;
+}
+
+void CropThread::run()
+{
+  mitk::Image::Pointer resultImage;
+  mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
+
+  resultImage = filterbank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, 0, m_InputImage->GetDimension(2) - 1);
+
+  emit result(resultImage);
+}
+
+void CropThread::setConfig(unsigned int CutAbove, unsigned int CutBelow)
+{
+  m_CutAbove = CutAbove;
+  m_CutBelow = CutBelow;
+}
+
+void CropThread::setInputImage(mitk::Image::Pointer image)
 {
   m_InputImage = image;
 }

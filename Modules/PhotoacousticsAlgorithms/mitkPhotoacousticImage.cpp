@@ -161,13 +161,15 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice)
 {
   float* inputData = new float[inputImage->GetDimension(0)*inputImage->GetDimension(1)*inputImage->GetDimension(2)];
+  //void* inputData;
   float* outputData = new float[(inputImage->GetDimension(0) - left - right)*(inputImage->GetDimension(1) - above - below)*(maxSlice - minSlice + 1)];
 
   unsigned int inputDim[3] = { inputImage->GetDimension(0), inputImage->GetDimension(1), inputImage->GetDimension(2) };
   unsigned int outputDim[3] = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - above - below, maxSlice - minSlice + 1 };
 
   ImageReadAccessor acc(inputImage);
-
+  //inputData = const_cast<void*>(acc.GetData());
+  
   // convert the data to float by default
   // as of now only those float, short, float are used at all... though it's easy to add other ones
   if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
@@ -206,7 +208,55 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   {
     MITK_INFO << "Could not determine pixel type";
   }
-
+  
+  /*
+  if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
+  {
+    // copy the data into the cropped image
+    for (int sl = 0; sl < outputDim[2]; ++sl)
+    {
+      for (int l = 0; l < outputDim[0]; ++l)
+      {
+        for (int s = 0; s < outputDim[1]; ++s)
+        {
+          outputData[l + s*(unsigned short)outputDim[0] + sl*outputDim[0] * outputDim[1]] = (float)((float*)inputData)[(l + left) + (s + above)*(unsigned short)inputDim[0] + (sl + minSlice)*inputDim[0] * inputDim[1]];
+        }
+      }
+    }
+  }
+  else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (short)" || inputImage->GetPixelType().GetTypeAsString() == " (short)")
+  {
+    // copy the data into the cropped image
+    for (int sl = 0; sl < outputDim[2]; ++sl)
+    {
+      for (int l = 0; l < outputDim[0]; ++l)
+      {
+        for (int s = 0; s < outputDim[1]; ++s)
+        {
+          outputData[l + s*(unsigned short)outputDim[0] + sl*outputDim[0] * outputDim[1]] = (float)((short*)inputData)[(l + left) + (s + above)*(unsigned short)inputDim[0] + (sl + minSlice)*inputDim[0] * inputDim[1]];
+        }
+      }
+    }
+  }
+  else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (double)" || inputImage->GetPixelType().GetTypeAsString() == " (double)")
+  {
+    // copy the data into the cropped image
+    for (int sl = 0; sl < outputDim[2]; ++sl)
+    {
+      for (int l = 0; l < outputDim[0]; ++l)
+      {
+        for (int s = 0; s < outputDim[1]; ++s)
+        {
+          outputData[l + s*(unsigned short)outputDim[0] + sl*outputDim[0] * outputDim[1]] = (float)((double*)inputData)[(l + left) + (s + above)*(unsigned short)inputDim[0] + (sl + minSlice)*inputDim[0] * inputDim[1]];
+        }
+      }
+    }
+  }
+  else
+  {
+    MITK_INFO << "Could not determine pixel type";
+  }
+  */
   // copy the data into the cropped image
   for (int sl = 0; sl < outputDim[2]; ++sl)
   {
@@ -222,11 +272,9 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   mitk::Image::Pointer output = mitk::Image::New();
   output->Initialize(mitk::MakeScalarPixelType<float>(), 3, outputDim);
   output->SetSpacing(inputImage->GetGeometry()->GetSpacing());
-  for (int slice = 0; slice < outputDim[2]; ++slice)
-  {
-    output->SetSlice(&outputData[slice*outputDim[0] * outputDim[1]], slice);
-  }
+  output->SetImportVolume(outputData, 0, 0, mitk::Image::ReferenceMemory);
 
+  delete[] inputData;
   return output;
 }
 

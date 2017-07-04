@@ -45,6 +45,8 @@ namespace mitk {
       bool partial = false;
       unsigned int bounds[2] = { 0,0 };
 
+      bool UseGPU = true;
+
       enum DelayCalc {QuadApprox, Spherical};
       DelayCalc DelayCalculationMethod = QuadApprox;
 

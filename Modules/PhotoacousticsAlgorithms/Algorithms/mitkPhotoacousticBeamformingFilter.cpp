@@ -110,6 +110,11 @@ void mitk::BeamformingFilter::GenerateData()
   float outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
   unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
 
+  unsigned short chunkSize = 40;
+  unsigned int oclOutputDimChunk[3] = { output->GetDimension(0), output->GetDimension(1), chunkSize < input->GetDimension(2) ? chunkSize : input->GetDimension(2) };
+  unsigned int oclInputDimChunk[3] = { input->GetDimension(0), input->GetDimension(1), chunkSize < input->GetDimension(2) ? chunkSize : input->GetDimension(2) };
+  
+
   const int apodArraySize = m_Conf.TransducerElements * 4; // set the resolution of the apodization array
   float* ApodWindow;
   // calculate the appropiate apodization window
@@ -130,141 +135,152 @@ void mitk::BeamformingFilter::GenerateData()
   // the interval at which we update the gui progress bar
 
   auto begin = std::chrono::high_resolution_clock::now(); // debbuging the performance...
-  /*
-  for (int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
+  if (!m_Conf.UseGPU)
   {
-    mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
-
-    m_OutputData = new float[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
-    m_InputDataPuffer = new float[input->GetDimension(0)*input->GetDimension(1)];
-
-    // first, we convert any data to float, which we use by default
-    if (input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)")
+    for (int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
     {
-      m_InputData = (float*)inputReadAccessor.GetData();
-    }
-    else
-    {
-      MITK_INFO << "Pixel type is not float, abort";
-      return;
-    }
+      mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
 
-    // fill the image with zeros
-    for (int l = 0; l < outputDim[0]; ++l)
-    {
-      for (int s = 0; s < outputDim[1]; ++s)
+      m_OutputData = new float[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
+      m_InputDataPuffer = new float[input->GetDimension(0)*input->GetDimension(1)];
+
+      // first, we convert any data to float, which we use by default
+      if (input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)")
       {
-        m_OutputData[l*(short)outputDim[1] + s] = 0;
+        m_InputData = (float*)inputReadAccessor.GetData();
       }
-    }
-
-    std::thread *threads = new std::thread[(short)outputDim[0]];
-
-    // every line will be beamformed in a seperate thread
-    if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
-    {
-      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+      else
       {
-        for (short line = 0; line < outputDim[0]; ++line)
+        MITK_INFO << "Pixel type is not float, abort";
+        return;
+      }
+
+      // fill the image with zeros
+      for (int l = 0; l < outputDim[0]; ++l)
+      {
+        for (int s = 0; s < outputDim[1]; ++s)
         {
-          threads[line] = std::thread(&BeamformingFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+          m_OutputData[l*(short)outputDim[1] + s] = 0;
         }
       }
-      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+
+      std::thread *threads = new std::thread[(short)outputDim[0]];
+
+      // every line will be beamformed in a seperate thread
+      if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
       {
-        for (short line = 0; line < outputDim[0]; ++line)
+        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
         {
-          threads[line] = std::thread(&BeamformingFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+          for (short line = 0; line < outputDim[0]; ++line)
+          {
+            threads[line] = std::thread(&BeamformingFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+          }
+        }
+        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+        {
+          for (short line = 0; line < outputDim[0]; ++line)
+          {
+            threads[line] = std::thread(&BeamformingFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+          }
         }
       }
-    }
-    else if(m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
-    {
-      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+      else if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
       {
-        for (short line = 0; line < outputDim[0]; ++line)
+        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
         {
-          threads[line] = std::thread(&BeamformingFilter::DMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+          for (short line = 0; line < outputDim[0]; ++line)
+          {
+            threads[line] = std::thread(&BeamformingFilter::DMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+          }
+        }
+        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+        {
+          for (short line = 0; line < outputDim[0]; ++line)
+          {
+            threads[line] = std::thread(&BeamformingFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+          }
         }
       }
-      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+      // wait for all lines to finish
+      for (short line = 0; line < outputDim[0]; ++line)
       {
-        for (short line = 0; line < outputDim[0]; ++line)
-        {
-          threads[line] = std::thread(&BeamformingFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
-        }
+        threads[line].join();
       }
+
+      output->SetSlice(m_OutputData, i);
+
+      if (i % progInterval == 0)
+        m_ProgressHandle((int)((i + 1) / (float)output->GetDimension(2) * 100), "performing reconstruction");
+
+      delete[] m_OutputData;
+      delete[] m_InputDataPuffer;
+      m_OutputData = nullptr;
+      m_InputData = nullptr;
     }
-    // wait for all lines to finish
-    for (short line = 0; line < outputDim[0]; ++line)
-    {
-      threads[line].join();
-    }
-
-    output->SetSlice(m_OutputData, i);
-
-    if (i % progInterval == 0)
-      m_ProgressHandle((int)((i + 1) / (float)output->GetDimension(2) * 100), "performing reconstruction");
-
-    delete[] m_OutputData;
-    delete[] m_InputDataPuffer;
-    m_OutputData = nullptr;
-    m_InputData = nullptr;
   }
-  */
-  
-  mitk::PhotoacousticOCLBeamformer::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformer::New();
-  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
-  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-  resources->GetContext();
-
-  try
+  else
   {
-    m_oclFilter->SetInput(input);
-    if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
-    {
-      if(m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASQuad, true);
-      else if(m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASSphe, true);
-    }
-    else if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
-    {
-      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASQuad, true);
-      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASSphe, true);
-    }
-    m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
-    m_oclFilter->SetOutputDim(oclOutputDim);
-    m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.RecordTime, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
-    m_oclFilter->Update();
+    mitk::PhotoacousticOCLBeamformer::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformer::New();
+    us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+    OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+    resources->GetContext();
 
-    auto out = m_oclFilter->GetOutput();
-    for (int i = 0; i < output->GetDimension(2); ++i)
+    try
     {
-      mitk::ImageReadAccessor copy(out, out->GetSliceData(i));
-      output->SetSlice(copy.GetData(), i);
+      if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
+      {
+        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASQuad, true);
+        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASSphe, true);
+      }
+      else if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
+      {
+        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASQuad, true);
+        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASSphe, true);
+      }
+      m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
+      m_oclFilter->SetOutputDim(oclOutputDimChunk);
+      m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.RecordTime, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
+
+      for (int i = 0; i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
+      {
+        mitk::Image::Pointer chunk = mitk::Image::New();
+        chunk->Initialize(input->GetPixelType(), 3, oclInputDimChunk);
+        chunk->SetSpacing(input->GetGeometry()->GetSpacing());
+
+        mitk::ImageReadAccessor ChunkMove(input);
+        chunk->SetImportVolume((void*)&(((float*)const_cast<void*>(ChunkMove.GetData()))[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)]), 0, 0, mitk::Image::ReferenceMemory);
+        
+        m_oclFilter->SetInput(chunk);
+        m_oclFilter->Update();
+
+        auto out = m_oclFilter->GetOutput();
+        for (int s = i * chunkSize; s < oclOutputDim[2]; ++s)
+        {
+          mitk::ImageReadAccessor copy(out, out->GetSliceData(s - i * chunkSize));
+          output->SetImportSlice(const_cast<void*>(copy.GetData()), s, 0, 0, mitk::Image::ReferenceMemory);
+        }
+      }
     }
- }
- catch (mitk::Exception &e)
- {
-   std::string errorMessage = "Caught unexpected exception ";
-   errorMessage.append(e.what());
-   MITK_ERROR << errorMessage;
- }
-   
-    // apply a bandpass filter, if requested
+    catch (mitk::Exception &e)
+    {
+      std::string errorMessage = "Caught unexpected exception ";
+      errorMessage.append(e.what());
+      MITK_ERROR << errorMessage;
+    }
+  }
+
+  // apply a bandpass filter, if requested
   if (m_Conf.UseBP)
   {
     m_ProgressHandle(100, "applying bandpass");
     mitk::Image::Pointer BP = BandpassFilter(output);
 
-    for (int i = 0; i < output->GetDimension(2); ++i)
-    {
-      mitk::ImageReadAccessor copy(BP, BP->GetSliceData(i));
-      output->SetSlice(copy.GetData(), i);
-    }
+    mitk::ImageReadAccessor copy(BP);
+    output->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ReferenceMemory);
   }
 
   m_TimeOfHeaderInitialization.Modified();

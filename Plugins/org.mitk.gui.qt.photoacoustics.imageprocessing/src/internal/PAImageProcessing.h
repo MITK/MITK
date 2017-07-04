@@ -62,6 +62,9 @@ class PAImageProcessing : public QmitkAbstractView
     void HandleBmodeResults(mitk::Image::Pointer image);
     void StartBmodeThread();
 
+    void HandleCropResults(mitk::Image::Pointer image);
+    void StartCropThread();
+
     void UpdateProgress(int progress, std::string progressInfo);
 
   protected:
@@ -124,6 +127,25 @@ class BmodeThread : public QThread
 
     bool m_UseLogfilter;
     double m_ResampleSpacing;
+};
+
+class CropThread : public QThread
+{
+  Q_OBJECT
+    void run() Q_DECL_OVERRIDE;
+
+signals:
+  void result(mitk::Image::Pointer);
+
+public:
+  void setConfig(unsigned int CutAbove, unsigned int CutBelow);
+  void setInputImage(mitk::Image::Pointer image);
+
+protected:
+  mitk::Image::Pointer m_InputImage;
+
+  unsigned int m_CutAbove;
+  unsigned int m_CutBelow;
 };
 
 #endif // PAImageProcessing_h

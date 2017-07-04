@@ -483,16 +483,16 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextCommand()
 {
   return m_MessageQueue->PullCommandMessage();
 }
-void mitk::IGTLDevice::EnableInfiniteBufferingMode(bool enable)
+void mitk::IGTLDevice::EnableNoBufferingMode(bool enable)
 {
-  m_MessageQueue->EnableInfiniteBuffering(enable);
+  m_MessageQueue->EnableNoBufferingMode(enable);
 }
 
-void mitk::IGTLDevice::EnableInfiniteBufferingMode(
+void mitk::IGTLDevice::EnableNoBufferingMode(
   mitk::IGTLMessageQueue::Pointer queue,
   bool enable)
 {
-  queue->EnableInfiniteBuffering(enable);
+  queue->EnableNoBufferingMode(enable);
 }
 
 ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartSending(void* pInfoStruct)

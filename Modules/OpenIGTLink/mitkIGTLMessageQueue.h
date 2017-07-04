@@ -105,10 +105,8 @@ namespace mitk {
     std::string GetLatestMsgDeviceType();
 
     /**
-    * \brief Sets infinite buffering on/off.
-    * Initiale value is enabled.
-    */
-    void EnableInfiniteBuffering(bool enable);
+     */
+    void EnableNoBufferingMode(bool enable);
 
   protected:
     IGTLMessageQueue();

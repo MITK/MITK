@@ -17,7 +17,7 @@ set(Boost_DEPENDS ${proj})
 
 if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
-  set(_boost_version 1_60)
+  set(_boost_version 1_64)
   set(_boost_install_include_dir include/boost)
   if(WIN32)
     set(_boost_install_include_dir include/boost-${_boost_version}/boost)
@@ -138,7 +138,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
   ExternalProject_Add(${proj}-download
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
-      URL_MD5 7ce7f5a4e396484da8da6b60d4ed7661
+      URL_MD5 ace404a1c6be8b74544a77b85f828d40
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""

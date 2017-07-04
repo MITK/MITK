@@ -98,22 +98,6 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
   mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
 
   returnValue = DiscoverToolsAndConvertToNavigationTools(type);
-  /*
-  switch (type)
-  {
-  case TDATA:
-    returnValue = DiscoverToolsFromTData(dynamic_cast<igtl::TrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
-    break;
-  case QTDATA:
-    returnValue = DiscoverToolsFromQTData(dynamic_cast<igtl::QuaternionTrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
-    break;
-  case TRANSFORM:
-    returnValue = DiscoverToolsFromTransform();
-    break;
-  default:
-    MITK_INFO << "Server does not send tracking data or received data is not of a compatible type. (Received type: " << msgType << ")";
-  }
-  */
 
   //close connection
   try
@@ -151,13 +135,11 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverTo
     int count = toolNameMap[msg->GetDeviceName()];
     if (count == 0)
     {
-      //MITK_WARN << "ADDED NEW TOOL TO TOOLCHAIN: " << msg->GetDeviceName() << " - 1";
       toolNameMap[msg->GetDeviceName()] = 1;
     }
     else
     {
       toolNameMap[msg->GetDeviceName()]++;
-      //MITK_WARN << "INCREMENTED TOOL COUNT IN TOOLCHAIN: " << msg->GetDeviceName() << " - " << toolNameMap[msg->GetDeviceName()];
     }
   }
 

@@ -171,15 +171,6 @@ namespace mitk
         @return Returns a navigation tool storage holding all found tools. Returns an empty storage if no tools were found or if there was an error.*/
     mitk::NavigationToolStorage::Pointer DiscoverToolsAndConvertToNavigationTools(mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type, int NumberOfMessagesToWait = 50);
 
-    /** Discovers tools from the input (type TDATA) */
-    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
-
-    /** Discovers tools from the input (type QTDATA) */
-    mitk::NavigationToolStorage::Pointer DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
-
-    /** Discovers tools from the input (type TRANSFORM) and waits for the given number of messages */
-    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTransform(int NumberOfMessagesToWait = 50);
-
     void AddNewToolForName(std::string name, int i);
 
     mitk::NavigationTool::Pointer ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier);

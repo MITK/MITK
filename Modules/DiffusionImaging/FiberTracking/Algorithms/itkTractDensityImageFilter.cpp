@@ -169,7 +169,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
                 if (m_BinaryOutput)
                     outImage->SetPixel(index, 1);
                 else
-                    outImage->SetPixel(index, outImage->GetPixel(index)+0.01*weight);
+                    outImage->SetPixel(index, outImage->GetPixel(index)+weight);
                 continue;
             }
 

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <itkImageFileWriter.h>
 #include "itkPointShell.h"
+#include <itkRescaleIntensityImageFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -975,6 +976,15 @@ void StreamlineTrackingFilter::AfterTracking()
     MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);
+  }
+  else
+  {
+    itk::RescaleIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer filter = itk::RescaleIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+    filter->SetInput(m_OutputProbabilityMap);
+    filter->SetOutputMaximum(1.0);
+    filter->SetOutputMinimum(0.0);
+    filter->Update();
+    m_OutputProbabilityMap = filter->GetOutput();
   }
   MITK_INFO << "done";
 

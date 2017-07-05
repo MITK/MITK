@@ -34,7 +34,8 @@ namespace mitk
     this->m_Instance = this;
     this->m_Context = context;
 
-    BERRY_REGISTER_EXTENSION_CLASS(QmitkGeneralPreferencePage, context)
+    /// Autoplan overrides MITK General prefs tab
+    //BERRY_REGISTER_EXTENSION_CLASS(QmitkGeneralPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorsPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkShowPreferencePageHandler, context)
 

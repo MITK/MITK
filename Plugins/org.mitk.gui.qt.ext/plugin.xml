@@ -8,10 +8,6 @@
     <page id="org.mitk.ConfigPreferencePage" name="Mitk Configuration"
           class="QmitkConfigPreferencePage" >
     </page>
-    <page id="org.mitk.AppInstancesPreferencePage" name="Application Instances"
-          class="QmitkAppInstancesPreferencePage" category="org.mitk.GeneralPreferencePage">
-      <keywordreference id="org.mitk.AppInstancesPreferencePageKeywords"/>
-    </page>
     <page id="org.mitk.ExternalProgramsPreferencePage" name="External Programs"
           class="QmitkExternalProgramsPreferencePage" >
     </page>
@@ -20,16 +16,13 @@
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="WiiMote"/>
-    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>
-    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances"/>
-    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene"/>
+    <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>>
   </extension>
 
   <extension point="org.blueberry.ui.views">
     <view
       id="org.mitk.views.modules"
       name="Modules"
-      category="org.mitk.views.general"
       class="QmitkModuleView"
       icon="resources/ModuleView.png" />
   </extension>

@@ -17,7 +17,7 @@ set(BUILD_DiffusionFiberProcessingCmdApps ON CACHE BOOL "Build commandline tools
 set(BUILD_DiffusionFiberfoxCmdApps ON CACHE BOOL "Build commandline tools for diffusion data simulation (Fiberfox)" FORCE)
 set(BUILD_DiffusionMiscCmdApps OFF CACHE BOOL "Build miscellaneous commandline tools for diffusion" FORCE)
 set(BUILD_DiffusionQuantificationCmdApps OFF CACHE BOOL "Build commandline tools for diffusion quantification (IVIM, ADC, ...)" FORCE)
-set(BUILD_DiffusionTractographyCmdApps OFF CACHE BOOL "Build commandline tools for diffusion fiber tractography" FORCE)
+set(BUILD_DiffusionTractographyCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber tractography" FORCE)
 set(BUILD_DiffusionTractographyEvaluationCmdApps OFF CACHE BOOL "Build commandline tools for diffusion fiber tractography evaluation" FORCE)
 set(BUILD_DiffusionConnectomicsCmdApps OFF CACHE BOOL "Build commandline tools for diffusion connectomics" FORCE)
 

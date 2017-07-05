@@ -256,7 +256,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   vnl_vector< float > angles = m_OdfFloatDirs*last_dir;
   vnl_vector< float > probs; probs.set_size(m_OdfHemisphereIndices.size());
   float probs_sum = 0;
-
+  float max_prob = 0;
   for (unsigned int i=0; i<m_OdfHemisphereIndices.size(); i++)
   {
     float odf_val = odf_values[m_OdfHemisphereIndices[i]];
@@ -264,15 +264,14 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     float abs_angle = fabs(angle);
 
     odf_val *= abs_angle; // weight probabilities according to deviation from last direction
-//    if (abs_angle<m_AngularThreshold)
-//      odf_val = 0;
 
-    if (m_Mode==MODE::DETERMINISTIC)
+    if (m_Mode==MODE::DETERMINISTIC && odf_val>max_prob)
     {
+      max_prob = odf_val;
       vnl_vector_fixed<float,3> d = m_OdfFloatDirs.get_row(i);
       if (angle<0)                          // make sure we don't walk backwards
         d *= -1;
-      output_direction += odf_val*d;
+      output_direction = odf_val*d;
     }
     else if (m_Mode==MODE::PROBABILISTIC)
     {

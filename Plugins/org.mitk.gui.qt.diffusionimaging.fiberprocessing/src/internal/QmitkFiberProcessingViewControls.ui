@@ -17,15 +17,15 @@
    <item row="1" column="0">
     <widget class="QToolBox" name="toolBoxx">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>354</width>
-        <height>347</height>
+        <width>355</width>
+        <height>363</height>
        </rect>
       </property>
       <attribute name="label">
@@ -298,7 +298,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                <iconset resource="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc">
                  <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
                </property>
                <property name="iconSize">
@@ -481,8 +481,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>354</width>
-        <height>342</height>
+        <width>355</width>
+        <height>380</height>
        </rect>
       </property>
       <attribute name="label">
@@ -809,7 +809,7 @@
                 <double>1.000000000000000</double>
                </property>
                <property name="value">
-                <double>5.000000000000000</double>
+                <double>10.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -869,8 +869,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>368</width>
-        <height>309</height>
+        <width>280</width>
+        <height>349</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1225,8 +1225,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>368</width>
-        <height>152</height>
+        <width>360</width>
+        <height>104</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1415,6 +1415,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc"/>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>
  </resources>
  <connections/>

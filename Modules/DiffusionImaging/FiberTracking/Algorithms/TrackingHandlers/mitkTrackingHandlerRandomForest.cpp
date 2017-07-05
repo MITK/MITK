@@ -220,9 +220,13 @@ template< int ShOrder, int NumberOfSignalFeatures >
 void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 {
   MITK_INFO << "Initializing random forest tracker.";
-  InputDataValidForTracking();
-  m_DwiFeatureImages.clear();
-  InitDwiImageFeatures<>(m_InputDwis.at(0));
+  if (m_NeedsDataInit)
+  {
+    InputDataValidForTracking();
+    m_DwiFeatureImages.clear();
+    InitDwiImageFeatures<>(m_InputDwis.at(0));
+    m_NeedsDataInit = false;
+  }
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >

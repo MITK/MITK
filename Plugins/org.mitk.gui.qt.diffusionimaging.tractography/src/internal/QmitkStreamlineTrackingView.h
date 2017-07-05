@@ -66,7 +66,7 @@ protected slots:
   void DoFiberTracking();   ///< start fiber tracking
   void UpdateGui();
   void ToggleInteractive();
-
+  void DeleteTrackingHandler();
 
 protected:
 
@@ -91,6 +91,7 @@ private:
   bool		m_FirstTensorProbRun;
 
   void OnSliceChanged(const itk::EventObject& e);
+  mitk::TrackingDataHandler*      m_TrackingHandler;
 };
 
 

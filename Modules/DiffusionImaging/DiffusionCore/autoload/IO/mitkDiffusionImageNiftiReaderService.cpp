@@ -286,7 +286,10 @@ void DiffusionImageNiftiReaderService::InternalRead()
         std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetInputLocation());
         std::string base = this->GetMimeType()->GetFilenameWithoutExtension(this->GetInputLocation());
         if (!base_path.empty())
+        {
             base = base_path + "/" + base;
+            base_path += "/";
+        }
 
         // check for possible file names
         {
@@ -320,6 +323,16 @@ void DiffusionImageNiftiReaderService::InternalRead()
         {
           fname = std::string( base + bvecsExtension);
         }
+
+        // for hcp data
+        if ( !itksys::SystemTools::FileExists( fname.c_str() ) )
+        {
+            if ( itksys::SystemTools::FileExists( std::string( base_path + "bvec").c_str() ) )
+                fname = std::string( base_path + "bvec");
+            else  if ( itksys::SystemTools::FileExists( std::string( base_path + "bvecs").c_str() ) )
+                fname = std::string( base_path + "bvecs");
+        }
+
         std::ifstream myfile (fname.c_str());
         if (myfile.is_open())
         {
@@ -360,6 +373,16 @@ void DiffusionImageNiftiReaderService::InternalRead()
         {
           fname2 = std::string( base + bvalsExtension);
         }
+
+        // for hcp data
+        if ( !itksys::SystemTools::FileExists( fname2.c_str() ) )
+        {
+            if ( itksys::SystemTools::FileExists( std::string( base_path + "bval").c_str() ) )
+                fname2 = std::string( base_path + "bval");
+            else  if ( itksys::SystemTools::FileExists( std::string( base_path + "bvals").c_str() ) )
+                fname2 = std::string( base_path + "bvals");
+        }
+
         std::ifstream myfile2 (fname2.c_str());
         if (myfile2.is_open())
         {

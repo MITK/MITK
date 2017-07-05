@@ -59,13 +59,11 @@ mitk::FiberBundle::FiberBundle( vtkPolyData* fiberPolyData )
 
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != nullptr)
-    {
         m_FiberPolyData = fiberPolyData;
-        this->ColorFibersByOrientation();
-    }
 
     this->UpdateFiberGeometry();
     this->GenerateFiberIds();
+    this->ColorFibersByOrientation();
 }
 
 mitk::FiberBundle::~FiberBundle()
@@ -310,16 +308,14 @@ void mitk::FiberBundle::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, b
     if (fiberPD == nullptr)
         this->m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     else
-    {
         m_FiberPolyData->DeepCopy(fiberPD);
-        ColorFibersByOrientation();
-    }
 
     m_NumFibers = m_FiberPolyData->GetNumberOfLines();
 
     if (updateGeometry)
         UpdateFiberGeometry();
     GenerateFiberIds();
+    ColorFibersByOrientation();
 }
 
 /*
@@ -2117,10 +2113,10 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
                         newV = p + d * v2;
                     else
                         MITK_INFO << "ERROR1 - linear resampling";
-                    
+
                     j--;
                 }
-                
+
 #pragma omp critical
                 {
                     vtkIdType id = vtkNewPoints->InsertNextPoint(newV.data_block());

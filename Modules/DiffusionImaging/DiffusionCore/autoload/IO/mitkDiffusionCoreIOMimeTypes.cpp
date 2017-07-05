@@ -132,7 +132,6 @@ DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::DiffusionImageNiftiMimeTy
 
 bool DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::AppliesTo(const std::string &path) const
 {
-    MITK_INFO << "path1: " <<  path;
   bool canRead(CustomMimeType::AppliesTo(path));
 
   // fix for bug 18572
@@ -154,8 +153,12 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::AppliesTo(const std:
   {
     std::string base_path = itksys::SystemTools::GetFilenamePath(path);
     std::string base = this->GetFilenameWithoutExtension(path);
+    std::string filename = base;
     if (!base_path.empty())
+    {
         base = base_path + "/" + base;
+        base_path += "/";
+    }
 
     if (itksys::SystemTools::FileExists(std::string(base + ".bvec").c_str())
       && itksys::SystemTools::FileExists(std::string(base + ".bval").c_str())
@@ -171,8 +174,19 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType::AppliesTo(const std:
       return canRead;
     }
 
-    canRead = false;
-  }
+    // hack for HCP data
+    if ( filename=="data" && itksys::SystemTools::FileExists(std::string(base_path + "bvec").c_str()) && itksys::SystemTools::FileExists(std::string(base_path + "bval").c_str()) )
+    {
+        return canRead;
+    }
+
+    if ( filename=="data" && itksys::SystemTools::FileExists(std::string(base_path + "bvecs").c_str()) && itksys::SystemTools::FileExists(std::string(base_path + "bvals").c_str()) )
+    {
+        return canRead;
+    }
+
+        canRead = false;
+    }
 
   return canRead;
 }

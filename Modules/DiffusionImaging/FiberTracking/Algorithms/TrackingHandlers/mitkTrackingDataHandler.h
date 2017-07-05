@@ -77,6 +77,12 @@ protected:
     bool            m_FlipZ;
     MODE            m_Mode;
     BoostRngType    m_Rng;
+    bool            m_NeedsDataInit;
+
+    void DataModified()
+    {
+      m_NeedsDataInit = true;
+    }
 
     template< class TPixelType >
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<float, 8>& interpWeights){

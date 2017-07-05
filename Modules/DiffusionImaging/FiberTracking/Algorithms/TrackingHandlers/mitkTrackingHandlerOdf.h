@@ -46,8 +46,8 @@ public:
 
 
     void SetGfaThreshold(float gfaThreshold){ m_GfaThreshold = gfaThreshold; }
-    void SetOdfImage( ItkOdfImageType::Pointer img ){ m_OdfImage = img; }
-    void SetGfaImage( ItkFloatImgType::Pointer img ){ m_GfaImage = img; }
+    void SetOdfImage( ItkOdfImageType::Pointer img ){ m_OdfImage = img; DataModified(); }
+    void SetGfaImage( ItkFloatImgType::Pointer img ){ m_GfaImage = img; DataModified(); }
     void SetMode( MODE m ){ m_Mode = m; }
 
 
@@ -57,7 +57,7 @@ public:
     ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_OdfImage->GetLargestPossibleRegion(); }
 
     int OdfPower() const;
-    void SetOdfPower(int OdfPower);
+    void SetNumProbSamples(int NumProbSamples);
 
     void SetSecondOrder(bool SecondOrder);
 
@@ -74,10 +74,9 @@ protected:
     ItkOdfImageType::Pointer        m_WorkingOdfImage;     ///< Modified odf image.
     std::vector< int >              m_OdfHemisphereIndices;
     vnl_matrix< float >             m_OdfFloatDirs;
-    int                             m_OdfPower;
     bool                            m_SecondOrder;
     bool                            m_MinMaxNormalize;
-
+    int                             m_NumProbSamples;
     std::vector< int >              m_OdfReducedIndices;
 };
 

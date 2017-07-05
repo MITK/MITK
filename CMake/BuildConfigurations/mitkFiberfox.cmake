@@ -8,6 +8,7 @@ set(MITK_USE_HDF5 ON CACHE BOOL "MITK Use HDF5 Library" FORCE)
 set(MITK_BUILD_ALL_APPS OFF CACHE BOOL "Build all MITK applications" FORCE)
 set(MITK_BUILD_APP_CoreApp OFF CACHE BOOL "Build the MITK CoreApp" FORCE)
 set(MITK_BUILD_APP_Workbench OFF CACHE BOOL "Build the MITK Workbench" FORCE)
+set(MITK_BUILD_APP_Diffusion OFF CACHE BOOL "Build MITK Diffusion" FORCE)
 set(MITK_BUILD_APP_Fiberfox ON CACHE BOOL "Build MITK Fiberfox" FORCE)
 
 # Activate Diffusion Mini Apps

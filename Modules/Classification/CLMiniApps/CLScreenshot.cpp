@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 #include <mitkSplitParameterToVector.h>
+#include <mitkProperties.h>
 
 #include <QApplication>
 #include <mitkStandaloneDataStorage.h>
@@ -36,16 +37,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 static
 void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string path)
 {
+  std::vector<mitk::ColorProperty::Pointer> colorList;
+  colorList.push_back(mitk::ColorProperty::New(0.9569, 0.16471, 0.25490));  // Red
+  colorList.push_back(mitk::ColorProperty::New(1, 0.839, 0));               // Yellow
+  colorList.push_back(mitk::ColorProperty::New(0, 0.6, 0.2));               // Green
+  colorList.push_back(mitk::ColorProperty::New(0, 0.2784, 0.7255));         // BLue
+  colorList.push_back(mitk::ColorProperty::New(1,0.3608,0));                // Orange
+  colorList.push_back(mitk::ColorProperty::New(0.839215,0.141176,0.80784)); // Violett
+  colorList.push_back(mitk::ColorProperty::New(0.1372,0.81568,0.7647));     // Turkis
+  colorList.push_back(mitk::ColorProperty::New(0.61176,0.9568,0.16078));    // Bright Green
+  colorList.push_back(mitk::ColorProperty::New(1,0.4274,0.16862));          // Dark Orange
+  colorList.push_back(mitk::ColorProperty::New(0.88633,0.14901,0.64705));   // Pink
+
   // Create a Standalone Datastorage for the single purpose of saving screenshots..
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   QmitkRenderWindow renderWindow;
   renderWindow.GetRenderer()->SetDataStorage(ds);
 
+  int numberOfSegmentations = 0;
+  bool isSegmentation;
   for (auto name : listOfOutputs)
   {
     mitk::Image::Pointer tmpImage = mitk::IOUtil::LoadImage(name);
     auto nodeI = mitk::DataNode::New();
     nodeI->SetData(tmpImage);
+    nodeI->GetPropertyValue("binary",isSegmentation);
+    if (isSegmentation)
+    {
+      nodeI->SetProperty("color", colorList[numberOfSegmentations % colorList.size()]);
+      nodeI->SetProperty("binaryimage.hoveringannotationcolor", colorList[numberOfSegmentations % colorList.size()]);
+      nodeI->SetProperty("binaryimage.hoveringcolor", colorList[numberOfSegmentations % colorList.size()]);
+      nodeI->SetProperty("binaryimage.selectedannotationcolor", colorList[numberOfSegmentations % colorList.size()]);
+      nodeI->SetProperty("binaryimage.selectedcolor", colorList[numberOfSegmentations % colorList.size()]);
+      numberOfSegmentations++;
+    }
     ds->Add(nodeI);
   }
 

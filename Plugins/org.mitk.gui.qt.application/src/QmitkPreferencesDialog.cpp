@@ -40,6 +40,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace std;
 
+namespace {
+  const QHash<QString, QString> translationsMap = QHash<QString, QString>(
+    { {"General",               QObject::tr("General")}
+    , {"Editors",               QObject::tr("Editors")}
+    , {"Standard Milti Widget", QObject::tr("Standard Milti Widget")}
+    , {"Data Manager",          QObject::tr("Data Manager")}
+    , {"Hotkeys",               QObject::tr("Hotkeys")}
+    , {"Input Devices",         QObject::tr("Input Devices")}
+    , {"Language",              QObject::tr("Language")}
+    , {"Logging",               QObject::tr("Logging")}
+    , {"Mitk Configuration",    QObject::tr("Mitk Configuration")}
+    , {"External Programs",     QObject::tr("External Programs")}
+    , {"Properties",            QObject::tr("Properties")}
+    , {"Segmentation",          QObject::tr("Segmentation")}
+    , {"Segmentation Manager",  QObject::tr("Segmentation Manager")}
+    , {"Series Tags",           QObject::tr("Series Tags")} });
+}
+
 class QmitkPreferencesDialogPrivate : public Ui::QmitkPreferencesDialog
 {
 public:
@@ -90,6 +108,9 @@ public:
     {
       QString id = (*prefPagesIt)->GetAttribute("id");
       QString name = (*prefPagesIt)->GetAttribute("name");
+      if (translationsMap.contains(name)) {
+        name = translationsMap[name];
+      }
       QString className = (*prefPagesIt)->GetAttribute("class");
       if(!id.isEmpty() && !name.isEmpty() && !className.isEmpty())
       {
@@ -163,10 +184,10 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
 
   QObject::connect(d->m_PreferencesTree, SIGNAL(itemSelectionChanged()), this, SLOT(OnPreferencesTreeItemSelectionChanged()));
 
-  QPushButton* importButton = d->buttonBox->addButton("Import...", QDialogButtonBox::ActionRole);
+  QPushButton* importButton = d->buttonBox->addButton(tr("Import..."), QDialogButtonBox::ActionRole);
   QObject::connect(importButton, SIGNAL(clicked()), this, SLOT(OnImportButtonClicked()));
 
-  QPushButton* exportButton = d->buttonBox->addButton("Export...", QDialogButtonBox::ActionRole);
+  QPushButton* exportButton = d->buttonBox->addButton(tr("Export..."), QDialogButtonBox::ActionRole);
   QObject::connect(exportButton, SIGNAL(clicked()), this, SLOT(OnExportButtonClicked()));
 
   QObject::connect(this, SIGNAL(accepted()), this, SLOT(OnDialogAccepted()));

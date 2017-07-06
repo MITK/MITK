@@ -79,9 +79,9 @@ void TrackingHandlerTensor::InitForTracking()
 #else
 #pragma omp parallel for collapse(3)
 #endif
-    for (unsigned int x=0; x<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[0]; x++)
-      for (unsigned int y=0; y<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[1]; y++)
-        for (unsigned int z=0; z<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[2]; z++)
+    for (int x=0; x<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[0]; x++)
+      for (int y=0; y<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[1]; y++)
+        for (int z=0; z<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[2]; z++)
         {
           ItkTensorImageType::IndexType index;
           index[0] = x; index[1] = y; index[2] = z;

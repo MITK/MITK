@@ -53,13 +53,14 @@ mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestP
     m_NumberOfIterations(0),
     m_MovingSurface(nullptr),
     m_FixedSurface(nullptr),
-    m_WeightedPointTransform(mitk::WeightedPointTransform::New())
+    m_WeightedPointTransform(mitk::WeightedPointTransform::New()),
+    m_StopRegistration(false)
 {
 }
 
 mitk::AnisotropicIterativeClosestPointRegistration::~AnisotropicIterativeClosestPointRegistration()
 {
-}
+}                                                                          
 
 void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences ( vtkPoints* X,
                                                                                   vtkPoints* Z,
@@ -209,6 +210,21 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
 
   do {
+
+    //checking flag to stop registration now
+    if (m_StopRegistration) {
+
+      mitk::ProgressBar::GetInstance()->Progress(steps);
+
+      // free memory
+      Y->Delete();
+      Z->Delete();
+      X->Delete();
+      X_sorted->Delete();
+      Z_sorted->Delete();
+
+      return;
+    }
 
     // reset innerloop
     double currSearchRadius = m_SearchRadius;

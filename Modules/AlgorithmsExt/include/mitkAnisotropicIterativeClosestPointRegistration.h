@@ -182,6 +182,9 @@ protected:
   /** The computed 3x3 rotation matrix.*/
   Rotation    m_Rotation;
 
+  /** Flag meaning that the algorithm should stop immediately*/
+  bool m_StopRegistration;
+
   /**
     * Method that computes the correspondences between the moving point set X
     * and the fixed point set Y. The distances between the points
@@ -272,6 +275,11 @@ public:
     * Set fixed surface that includes the point set (Y).
     */
   itkSetMacro(FixedSurface,itk::SmartPointer<Surface>)
+
+  /**
+  *Set flag meaning that the algorithm should stop immediately
+  */
+  itkSetMacro(StopRegistration, bool)
 
   /**
     * Returns the 3x1 translation vector computed by the algorithm.

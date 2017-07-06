@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include "mitkHummelProtocolEvaluation.h"
 
+#include <boost/serialization/array_wrapper.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
 #include <boost/accumulators/statistics/stats.hpp>

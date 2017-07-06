@@ -182,9 +182,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for(unsigned int x=0;x<size[0];x++)
-    for(unsigned int y=0;y<size[1];y++)
-      for(unsigned int z=0;z<size[2];z++)
+  for(int x=0;x<size[0];x++)
+    for(int y=0;y<size[1];y++)
+      for(int z=0;z<size[2];z++)
       {
         double mean_b=0.0;
         itk::Index<3> ix = {{x,y,z}};
@@ -218,9 +218,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (unsigned int x=0;x<size[0];x++)
-    for (unsigned int y=0;y<size[1];y++)
-      for (unsigned int z=0;z<size[2];z++)
+  for (int x=0;x<size[0];x++)
+    for (int y=0;y<size[1];y++)
+      for (int z=0;z<size[2];z++)
       {
         vnl_vector<double> org_vec(nof);
         itk::Index<3> ix = {{x,y,z}};
@@ -510,9 +510,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (unsigned int x=0;x<size[0];x++)
-    for (unsigned int y=0;y<size[1];y++)
-      for (unsigned int z=0;z<size[2];z++)
+  for (int x=0;x<size[0];x++)
+    for (int y=0;y<size[1];y++)
+      for (int z=0;z<size[2];z++)
       {
         double pixel=0;
 
@@ -561,9 +561,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (unsigned int z=0;z<size[2];z++)
-    for (unsigned int x=0;x<size[0];x++)
-      for (unsigned int y=0;y<size[1];y++)
+  for (int z=0;z<size[2];z++)
+    for (int x=0;x<size[0];x++)
+      for (int y=0;y<size[1];y++)
       {
         vnl_vector<double> org_data(nof);
         vnl_vector<double> atten(nof-numberb0);
@@ -736,9 +736,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (unsigned int x=0;x<size[0];x++)
-    for (unsigned int y=0;y<size[1];y++)
-      for (unsigned int z=0;z<size[2];z++)
+  for (int x=0;x<size[0];x++)
+    for (int y=0;y<size[1];y++)
+      for (int z=0;z<size[2];z++)
       {
         itk::Index<3> ix;
 
@@ -842,9 +842,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for(unsigned int x=0;x<size[0];x++)
-    for(unsigned int y=0;y<size[1];y++)
-      for(unsigned int z=0;z<size[2];z++)
+  for(int x=0;x<size[0];x++)
+    for(int y=0;y<size[1];y++)
+      for(int z=0;z<size[2];z++)
       {
         ix[0] = x; ix[1] = y; ix[2] = z;
         temp_mask_value=mask->GetPixel(ix);

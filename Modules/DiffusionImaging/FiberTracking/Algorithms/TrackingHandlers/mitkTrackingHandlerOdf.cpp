@@ -217,31 +217,65 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     return last_dir;
 
   ItkOdfImageType::PixelType odf_values = GetImageValue<float, QBALL_ODFSIZE>(pos, m_OdfImage, m_Interpolate);
+  vnl_vector< float > probs; probs.set_size(m_OdfHemisphereIndices.size());
 
-  float max = 0;
-  int max_idx_v = -1;
+  float max_odf_val = 0;
+  float odf_sum = 0;
   int max_idx_d = -1;
   int c = 0;
   for (int i : m_OdfHemisphereIndices)
   {
     if (odf_values[i]<0)
       odf_values[i] = 0;
-    if (odf_values[i]>=max)
+    if (odf_values[i]>max_odf_val)
     {
-      max = odf_values[i];
-      max_idx_v = i;
+      max_odf_val = odf_values[i];
       max_idx_d = c;
     }
+
+    odf_sum += odf_values[i];
+    probs[c] = odf_values[i];
     c++;
   }
 
-  if (max_idx_v>=0 && (olddirs.empty() || last_dir.magnitude()<=0.5) )    // no previous direction, so return principal diffusion direction
+  if (max_idx_d>=0 && (olddirs.empty() || last_dir.magnitude()<=0.5))    // no previous direction, so return principal diffusion direction
   {
-    output_direction = m_OdfFloatDirs.get_row(max_idx_d);
-    float odf_val = odf_values[max_idx_v];
-    return output_direction * odf_val;
+    if (m_Mode==MODE::DETERMINISTIC)
+    {
+      output_direction = m_OdfFloatDirs.get_row(max_idx_d);
+      return output_direction * max_odf_val;
+    }
+    else if (m_Mode==MODE::PROBABILISTIC)
+    {
+      probs /= odf_sum;
+      boost::random::discrete_distribution<int, float> dist(probs.begin(), probs.end());
+      int sampled_idx = 0;
+      int max_sample_idx = -1;
+      float max_prob = 0;
+      int trials = 0;
+
+      for (int i=0; i<m_NumProbSamples; i++)
+      {
+        trials++;
+  #pragma omp critical
+        {
+          boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
+          sampled_idx = sampler();
+        }
+        if (probs[sampled_idx]>max_prob && probs[sampled_idx]>1.2/QBALL_ODFSIZE)
+        {
+          max_prob = probs[sampled_idx];
+          max_sample_idx = sampled_idx;
+        }
+        else if (probs[sampled_idx]<=1.2/QBALL_ODFSIZE && trials<50)
+          i--;
+      }
+      if (max_sample_idx>=0)
+        output_direction = m_OdfFloatDirs.get_row(max_sample_idx);
+      return output_direction;
+    }
   }
-  else if (max_idx_v<0)
+  else if (max_idx_d<0)
   {
     return output_direction;
   }
@@ -254,12 +288,11 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     last_dir[2] *= -1;
 
   vnl_vector< float > angles = m_OdfFloatDirs*last_dir;
-  vnl_vector< float > probs; probs.set_size(m_OdfHemisphereIndices.size());
   float probs_sum = 0;
   float max_prob = 0;
   for (unsigned int i=0; i<m_OdfHemisphereIndices.size(); i++)
   {
-    float odf_val = odf_values[m_OdfHemisphereIndices[i]];
+    float odf_val = probs[i];
     float angle = angles[i];
     float abs_angle = fabs(angle);
 
@@ -289,27 +322,33 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     boost::random::discrete_distribution<int, float> dist(probs.begin(), probs.end());
 
     int sampled_idx = 0;
-    int max_sample_idx = 0;
+    int max_sample_idx = -1;
     float max_prob = 0;
+    int trials = 0;
 
     for (int i=0; i<m_NumProbSamples; i++)
     {
+      trials++;
 #pragma omp critical
       {
         boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
         sampled_idx = sampler();
       }
-      if (probs[sampled_idx]>max_prob)
+      if (probs[sampled_idx]>max_prob && probs[sampled_idx]>1.2/QBALL_ODFSIZE)
       {
         max_prob = probs[sampled_idx];
         max_sample_idx = sampled_idx;
       }
+      else if (probs[sampled_idx]<=1.2/QBALL_ODFSIZE && trials<50)
+        i--;
     }
-
-    output_direction = m_OdfFloatDirs.get_row(max_sample_idx);
-    if (angles[max_sample_idx]<0)                          // make sure we don't walk backwards
-      output_direction *= -1;
-    output_direction *= probs[max_sample_idx];
+    if (max_sample_idx>=0)
+    {
+      output_direction = m_OdfFloatDirs.get_row(max_sample_idx);
+      if (angles[max_sample_idx]<0)                          // make sure we don't walk backwards
+        output_direction *= -1;
+      output_direction *= max_prob;
+    }
   }
 
   float mag = output_direction.magnitude();

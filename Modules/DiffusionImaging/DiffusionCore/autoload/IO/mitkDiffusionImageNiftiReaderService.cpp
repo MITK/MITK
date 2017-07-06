@@ -281,7 +281,7 @@ void DiffusionImageNiftiReaderService::InternalRead()
         // some parsing depending on the extension
         bool useFSLstyle( true );
         std::string bvecsExtension("");
-        std::string bvalsExtension("");      
+        std::string bvalsExtension("");
 
         std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetInputLocation());
         std::string base = this->GetMimeType()->GetFilenameWithoutExtension(this->GetInputLocation());
@@ -408,19 +408,16 @@ void DiffusionImageNiftiReaderService::InternalRead()
         }
 
 
+        // Take the largest entry in bvals as the reference b-value
         BValue = -1;
         unsigned int numb = bval_entries.size();
         for(unsigned int i=0; i<numb; i++)
-        {
-
-          // Take the first entry in bvals as the reference b-value
-          if(BValue == -1 && bval_entries.at(i) != 0)
-          {
+          if (bval_entries.at(i)>BValue)
             BValue = bval_entries.at(i);
-          }
 
+        for(unsigned int i=0; i<numb; i++)
+        {
           float b_val = bval_entries.at(i);
-
 
           vnl_vector_fixed< double, 3 > vec;
           vec[0] = bvec_entries.at(i);

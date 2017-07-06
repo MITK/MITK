@@ -49,8 +49,8 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::TensorImage::Pointer tensorImage = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
             typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
             TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetBValue( b_value );
+            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->Update();
             mitk::TensorImage::Pointer testImage = mitk::TensorImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
@@ -63,8 +63,8 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
             typedef itk::DiffusionQballReconstructionImageFilter<short, short, float, QBALL_ODFSIZE> QballReconstructionImageFilterType;
             QballReconstructionImageFilterType::Pointer filter = QballReconstructionImageFilterType::New();
-            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetBValue( b_value );
+            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetNormalizationMethod(QballReconstructionImageFilterType::QBR_STANDARD);
             filter->Update();
             mitk::QBallImage::Pointer testImage = mitk::QBallImage::New();
@@ -78,8 +78,8 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetBValue( b_value );
+            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             filter->Update();
@@ -94,8 +94,8 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetBValue( b_value );
+            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
             filter->Update();
@@ -110,8 +110,8 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetBValue( b_value );
+            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_ADC_ONLY);
             filter->Update();
@@ -126,8 +126,8 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetBValue( b_value );
+            filter->SetGradientImage( gradients, itkVectorImagePointer );
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_RAW_SIGNAL);
             filter->Update();

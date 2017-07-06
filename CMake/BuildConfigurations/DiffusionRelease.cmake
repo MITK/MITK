@@ -24,6 +24,7 @@ set(BUILD_DiffusionConnectomicsCmdApps OFF CACHE BOOL "Build commandline tools f
 # Build neither all plugins nor examples
 set(MITK_BUILD_ALL_PLUGINS OFF CACHE BOOL "Build all MITK plugins" FORCE)
 set(MITK_BUILD_EXAMPLES OFF CACHE BOOL "Build the MITK examples" FORCE)
+set(BUILD_TESTING OFF CACHE BOOL "Build the MITK tests" FORCE)
 
 # Activate in-application help generation
 set(MITK_DOXYGEN_GENERATE_QCH_FILES ON CACHE BOOL "Use doxygen to generate Qt compressed help files for MITK docs" FORCE)

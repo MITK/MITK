@@ -765,8 +765,9 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
     ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
   mitk::CastToItkImage(vols, itkVectorImagePointer);
 
-  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
   filter->SetBValue( static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 
@@ -953,9 +954,9 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   mitk::Image* dwi = dynamic_cast<mitk::Image*>(dataNodePointer->GetData());
   BValueMapType currSelectionMap = m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap();
 
-  if(currSelectionMap.size() != 4 && currSelectionMap.find(0) != currSelectionMap.end())
+  if(currSelectionMap.size() != 4)// || currSelectionMap.find(0) != currSelectionMap.end())
   {
-    QMessageBox::information(0, "Reconstruction not possible:" ,QString("Only three shells in a equidistant configuration is supported. (ImageName: " + QString(nodename.c_str()) + ")"));
+    QMessageBox::information(0, "Reconstruction not possible:" ,QString("Only three equidistant shells are supported. (ImageName: " + QString(nodename.c_str()) + ")"));
     return;
   }
 

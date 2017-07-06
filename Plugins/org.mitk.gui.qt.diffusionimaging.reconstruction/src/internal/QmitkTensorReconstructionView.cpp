@@ -593,8 +593,8 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
             mitk::CastToItkImage(vols, itkVectorImagePointer);
 
             ReconstructionFilter::Pointer reconFilter = ReconstructionFilter::New();
-            reconFilter->SetGradientImage( gradientContainerCopy, itkVectorImagePointer);
             reconFilter->SetBValue( static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+            reconFilter->SetGradientImage( gradientContainerCopy, itkVectorImagePointer);
             reconFilter->SetB0Threshold(b0Threshold);
             reconFilter->Update();
 
@@ -694,8 +694,8 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
             mitk::CastToItkImage(vols, itkVectorImagePointer);
 
-            tensorReconstructionFilter->SetGradientImage( gradientContainerCopy, itkVectorImagePointer );
             tensorReconstructionFilter->SetBValue(  static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+            tensorReconstructionFilter->SetGradientImage( gradientContainerCopy, itkVectorImagePointer );
             tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreshold->value() );
             tensorReconstructionFilter->Update();
             clock.Stop();

@@ -1222,25 +1222,26 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
           TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
           ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
           mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+          filter->SetBValue( static_cast<mitk::FloatProperty*>
+                             ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str() ).GetPointer() )
+                             ->GetValue() );
           filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>
                                     ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
                                     ->GetGradientDirectionsContainer(),
                                     itkVectorImagePointer );
-          filter->SetBValue( static_cast<mitk::FloatProperty*>
-                             ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str() ).GetPointer() )
-                             ->GetValue() );
 
           filter->Update();
           tensorImage = filter->GetOutput();
 
           QballFilterType::Pointer qballfilter = QballFilterType::New();
+
+          qballfilter->SetBValue( static_cast<mitk::FloatProperty*>
+                                  ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
+                                  ->GetValue() );
           qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>
                                          ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
                                          ->GetGradientDirectionsContainer(),
                                          itkVectorImagePointer );
-          qballfilter->SetBValue( static_cast<mitk::FloatProperty*>
-                                  ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                                  ->GetValue() );
           qballfilter->SetLambda(0.006);
           qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
           qballfilter->Update();
@@ -1264,24 +1265,24 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
       TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
       ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
       mitk::CastToItkImage(diffImg, itkVectorImagePointer);
-      filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>
-                                ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-                                ->GetGradientDirectionsContainer(), itkVectorImagePointer );
       filter->SetBValue( static_cast<mitk::FloatProperty*>
                          (diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
                          ->GetValue() );
+      filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>
+                                ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+                                ->GetGradientDirectionsContainer(), itkVectorImagePointer );
 
       filter->Update();
       tensorImage = filter->GetOutput();
 
       QballFilterType::Pointer qballfilter = QballFilterType::New();
+      qballfilter->SetBValue( static_cast<mitk::FloatProperty*>
+                              (diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
+                              ->GetValue() );
       qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>
                                      ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
                                      ->GetGradientDirectionsContainer(),
                                      itkVectorImagePointer );
-      qballfilter->SetBValue( static_cast<mitk::FloatProperty*>
-                              (diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                              ->GetValue() );
       qballfilter->SetLambda(0.006);
       qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
       qballfilter->Update();
@@ -2369,13 +2370,13 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
           typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
           TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+          filter->SetBValue( static_cast<mitk::FloatProperty*>
+                             (diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
+                             ->GetValue() );
           filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>
                                     ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
                                     ->GetGradientDirectionsContainer(),
                                     itkVectorImagePointer );
-          filter->SetBValue( static_cast<mitk::FloatProperty*>
-                             (diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                             ->GetValue() );
           filter->Update();
           tensorImage = filter->GetOutput();
 

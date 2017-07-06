@@ -74,6 +74,11 @@ void TrackingHandlerTensor::InitForTracking()
     TensorType::EigenValuesArrayType eigenvalues;
     TensorType::EigenVectorsMatrixType eigenvectors;
 
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
     for (unsigned int x=0; x<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[0]; x++)
       for (unsigned int y=0; y<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[1]; y++)
         for (unsigned int z=0; z<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[2]; z++)
@@ -92,13 +97,20 @@ void TrackingHandlerTensor::InitForTracking()
               dir.normalize();
             else
               dir.fill(0.0);
-            m_PdImage.at(i)->SetPixel(index, dir);
-            if (!useUserFaImage)
-              m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)+tensor.GetFractionalAnisotropy());
-            m_EmaxImage.at(i)->SetPixel(index, 2/eigenvalues[2]);
+
+#pragma omp critical
+            {
+              m_PdImage.at(i)->SetPixel(index, dir);
+              if (!useUserFaImage)
+                m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)+tensor.GetFractionalAnisotropy());
+              m_EmaxImage.at(i)->SetPixel(index, 2/eigenvalues[2]);
+            }
           }
           if (!useUserFaImage)
+          {
+#pragma omp critical
             m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)/m_NumberOfInputs);
+          }
         }
 
     m_NeedsDataInit = false;

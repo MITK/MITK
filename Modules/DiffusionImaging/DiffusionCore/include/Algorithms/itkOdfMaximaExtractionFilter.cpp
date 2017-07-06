@@ -63,8 +63,8 @@ bool OdfMaximaExtractionFilter<TOdfPixelType>::ReconstructQballImage()
     cout << "Starting qball reconstruction\n";
     try {
         QballReconstructionFilterType::Pointer filter = QballReconstructionFilterType::New();
-        filter->SetGradientImage( m_DiffusionGradients, m_DiffusionImage );
         filter->SetBValue(m_Bvalue);
+        filter->SetGradientImage( m_DiffusionGradients, m_DiffusionImage );
         filter->SetLambda(0.006);
         filter->SetNormalizationMethod(QballReconstructionFilterType::QBAR_SOLID_ANGLE);
         filter->Update();

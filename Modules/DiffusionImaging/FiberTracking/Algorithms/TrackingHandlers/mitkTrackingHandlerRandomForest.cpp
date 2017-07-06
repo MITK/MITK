@@ -160,8 +160,8 @@ typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingHandlerR
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
   typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
   filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(mitk_dwi));
+  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
   filter->SetLambda(0.006);
   filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
   filter->Update();
@@ -178,8 +178,8 @@ typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingHandler
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
   typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
   filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(mitk_dwi));
+  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
   filter->SetLambda(0.006);
   filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
   filter->Update();

@@ -23,10 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/Path.h"
 #include <mitkRenderingModeProperty.h>
 
-#include <future>
-
-#include <QCoreApplication>
-
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
 
 namespace
@@ -34,17 +30,16 @@ namespace
 
 typedef std::pair<mitk::DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
 
-bool NodeSortByLayerIsLessThan( const NodesAndParentsPair& left, const NodesAndParentsPair& right )
+bool NodeSortByLayerIsLessThan(const NodesAndParentsPair& left, const NodesAndParentsPair& right)
 {
-  if ( left.first.IsNotNull() && right.first.IsNotNull() )
+  if (left.first.IsNotNull() && right.first.IsNotNull())
   {
     int leftLayer;
     int rightLayer;
-    if ( left.first->GetIntProperty("layer", leftLayer) && right.first->GetIntProperty("layer", rightLayer) )
+    if (left.first->GetIntProperty("layer", leftLayer) && right.first->GetIntProperty("layer", rightLayer))
     {
       return leftLayer < rightLayer;
-    }
-    else
+    } else
     {
       // fall back to name sort
       return left.first->GetName() < right.first->GetName();
@@ -59,7 +54,7 @@ bool NodeSortByLayerIsLessThan( const NodesAndParentsPair& left, const NodesAndP
 
 }
 
-bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage )
+bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage)
 {
   assert(storage);
   bool error(false);
@@ -68,157 +63,109 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
 
   //Get number of elements to initialze progress bar
   //   1. if there is a <data type="..." file="..."> element,
-    //        - construct a name for the appropriate serializer
-    //        - try to instantiate this serializer via itk object factory
-    //        - if serializer could be created, use it to read the file into a BaseData object
-    //        - if successful, call the new node's SetData(..)
+  //        - construct a name for the appropriate serializer
+  //        - try to instantiate this serializer via itk object factory
+  //        - if serializer could be created, use it to read the file into a BaseData object
+  //        - if successful, call the new node's SetData(..)
 
-    // create a node for the tag "data" and test if node was created
+  // create a node for the tag "data" and test if node was created
   typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
   DataNodeVector DataNodes;
   unsigned int listSize = 0;
-  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
+  for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
   {
     ++listSize;
   }
 
   ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
 
-  std::vector<std::future<mitk::DataNode::Pointer>> loadedThreads;
   for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
   {
-    auto dataElement = element->FirstChildElement("data");
-    loadedThreads.push_back(std::async(std::launch::async, [this, dataElement, &workingDirectory, &error]{
-        bool localError =false;
-        auto result = LoadBaseDataFromDataTag(dataElement, workingDirectory, localError);
-        if (localError) {
-          error = true;
-        }
-        return result;
-      }));
-  }
-  for (auto& task: loadedThreads)
-  {
-    while (task.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
-      qApp->processEvents();
-    }
-
-    DataNodes.push_back(task.get());
-
+    DataNodes.push_back(LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error));
     ProgressBar::GetInstance()->Progress();
   }
 
-  struct DecorateResult
-  {
-    IDToNodeMappingType::mapped_type m_NodeForID;
-    NodeToIDMappingType::mapped_type m_IDForNode;
-    NodesAndParentsPair m_OrderedNodePairs;
-  };
-  std::vector<std::future<DecorateResult>> decorateThreads;
   // iterate all nodes
   // first level nodes should be <node> elements
   DataNodeVector::iterator nit = DataNodes.begin();
-  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
+  for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit)
   {
-    decorateThreads.push_back(std::async(std::launch::async, [this, element, nit, &workingDirectory, &error]() -> DecorateResult {
-        bool localError = false;
-        DecorateResult result;
-        mitk::DataNode::Pointer node = *nit;
-        // in case dataXmlElement is valid test whether it containts the "properties" child tag
-        // and process further if and only if yes
-        TiXmlElement *dataXmlElement = element->FirstChildElement("data");
-        if( dataXmlElement && dataXmlElement->FirstChildElement("properties") )
-        {
-          TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
-          if ( node->GetData() )
-          {
-            DecorateBaseDataWithProperties( node->GetData(), baseDataElement, workingDirectory);
-          }
-          else
-          {
-            MITK_WARN << "BaseData properties stored in scene file, but BaseData could not be read" << std::endl;
-          }
-        }
-
-        //   2. check child nodes
-        const char* uida = element->Attribute("UID");
-        std::string uid("");
-
-        if (uida)
-        {
-          uid = uida;
-          result.m_NodeForID = node.GetPointer();
-          result.m_IDForNode = uid;
-        }
-        else
-        {
-          MITK_ERROR << "No UID found for current node. Node will have no parents.";
-          localError = true;
-        }
-
-        //   3. if there are <properties> nodes,
-        //        - instantiate the appropriate PropertyListDeSerializer
-        //        - use them to construct PropertyList objects
-        //        - add these properties to the node (if necessary, use renderwindow name)
-        bool success = DecorateNodeWithProperties(node, element, workingDirectory);
-        if (!success)
-        {
-          MITK_ERROR << "Could not load properties for node.";
-          localError = true;
-        }
-
-        // remember node for later adding to DataStorage
-        result.m_OrderedNodePairs.first = node;
-
-        //   4. if there are <source> elements, remember parent objects
-        for( TiXmlElement* source = element->FirstChildElement("source"); source != NULL; source = source->NextSiblingElement("source") )
-        {
-          const char* sourceUID = source->Attribute("UID");
-          if (sourceUID)
-          {
-            result.m_OrderedNodePairs.second.push_back( std::string(sourceUID) );
-          }
-        }
-        if (localError) {
-          error = true;
-        }
-        return std::move(result);
-      }));
-  }
-
-  for (auto& task : decorateThreads)
-  {
-    while (task.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
-      qApp->processEvents();
+    mitk::DataNode::Pointer node = *nit;
+    // in case dataXmlElement is valid test whether it containts the "properties" child tag
+    // and process further if and only if yes
+    TiXmlElement *dataXmlElement = element->FirstChildElement("data");
+    if (dataXmlElement && dataXmlElement->FirstChildElement("properties"))
+    {
+      TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
+      if (node->GetData())
+      {
+        DecorateBaseDataWithProperties(node->GetData(), baseDataElement, workingDirectory);
+      } else
+      {
+        MITK_WARN << "BaseData properties stored in scene file, but BaseData could not be read" << std::endl;
+      }
     }
 
-    auto result = task.get();
-    m_NodeForID[result.m_IDForNode] = result.m_NodeForID;
-    m_IDForNode[result.m_NodeForID] = result.m_IDForNode;
-    m_OrderedNodePairs.push_back(result.m_OrderedNodePairs);
+    //   2. check child nodes
+    const char* uida = element->Attribute("UID");
+    std::string uid("");
+
+    if (uida)
+    {
+      uid = uida;
+      m_NodeForID[uid] = node.GetPointer();
+      m_IDForNode[node.GetPointer()] = uid;
+    } else
+    {
+      MITK_ERROR << "No UID found for current node. Node will have no parents.";
+      error = true;
+    }
+
+    //   3. if there are <properties> nodes,
+    //        - instantiate the appropriate PropertyListDeSerializer
+    //        - use them to construct PropertyList objects
+    //        - add these properties to the node (if necessary, use renderwindow name)
+    bool success = DecorateNodeWithProperties(node, element, workingDirectory);
+    if (!success)
+    {
+      MITK_ERROR << "Could not load properties for node.";
+      error = true;
+    }
+
+    // remember node for later adding to DataStorage
+    m_OrderedNodePairs.push_back(std::make_pair(node, std::list<std::string>()));
+
+    //   4. if there are <source> elements, remember parent objects
+    for (TiXmlElement* source = element->FirstChildElement("source"); source != NULL; source = source->NextSiblingElement("source"))
+    {
+      const char* sourceUID = source->Attribute("UID");
+      if (sourceUID)
+      {
+        m_OrderedNodePairs.back().second.push_back(std::string(sourceUID));
+      }
+    }
 
     ProgressBar::GetInstance()->Progress();
   } // end for all <node>
 
-  // sort our nodes by their "layer" property
-  // (to be inserted in that order)
-  m_OrderedNodePairs.sort( &NodeSortByLayerIsLessThan );
+    // sort our nodes by their "layer" property
+    // (to be inserted in that order)
+  m_OrderedNodePairs.sort(&NodeSortByLayerIsLessThan);
 
   // remove all unknown parent UIDs
   for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
-       nodesIter != m_OrderedNodePairs.end();
-       ++nodesIter)
+    nodesIter != m_OrderedNodePairs.end();
+    ++nodesIter)
   {
     for (std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
-         parentsIter != nodesIter->second.end();)
+      parentsIter != nodesIter->second.end();)
     {
-      if (m_NodeForID.find( *parentsIter ) == m_NodeForID.end())
+      if (m_NodeForID.find(*parentsIter) == m_NodeForID.end())
       {
-        parentsIter = nodesIter->second.erase( parentsIter );
+        parentsIter = nodesIter->second.erase(parentsIter);
         MITK_WARN << "Found a DataNode with unknown parents. Will add it to DataStorage without any parent objects.";
         error = true;
-      }
-      else
+      } else
       {
         ++parentsIter;
       }
@@ -228,24 +175,24 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   // repeat the following loop ...
   //   ... for all created nodes
   unsigned int lastMapSize(0);
-  while ( lastMapSize != m_OrderedNodePairs.size()) // this is to prevent infinite loops; each iteration must at least add one node to DataStorage
+  while (lastMapSize != m_OrderedNodePairs.size()) // this is to prevent infinite loops; each iteration must at least add one node to DataStorage
   {
     lastMapSize = m_OrderedNodePairs.size();
 
     // iterate (layer) ordered nodes backwards
     // we insert the highest layers first
     for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
-         nodesIter != m_OrderedNodePairs.end();
-         ++nodesIter)
+      nodesIter != m_OrderedNodePairs.end();
+      ++nodesIter)
     {
       bool addThisNode(true);
 
       // if any parent node is not yet in DataStorage, skip node for now and check later
       for (std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
-           parentsIter != nodesIter->second.end();
-           ++parentsIter)
+        parentsIter != nodesIter->second.end();
+        ++parentsIter)
       {
-        if ( !storage->Exists( m_NodeForID[ *parentsIter ] ) )
+        if (!storage->Exists(m_NodeForID[*parentsIter]))
         {
           addThisNode = false;
           break;
@@ -255,20 +202,18 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       if (addThisNode)
       {
         DataStorage::SetOfObjects::Pointer parents = DataStorage::SetOfObjects::New();
-        for ( std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
-              parentsIter != nodesIter->second.end();
-              ++parentsIter )
+        for (std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
+          parentsIter != nodesIter->second.end();
+          ++parentsIter)
         {
-           parents->push_back(m_NodeForID[*parentsIter]);
+          parents->push_back(m_NodeForID[*parentsIter]);
         }
 
         // if all parents are found in datastorage (or are unknown), add node to DataStorage
         storage->Add(nodesIter->first, parents);
 
-        qApp->processEvents();
-
         // remove this node from m_OrderedNodePairs
-        m_OrderedNodePairs.erase( nodesIter );
+        m_OrderedNodePairs.erase(nodesIter);
 
         // break this for loop because iterators are probably invalid
         break;
@@ -278,10 +223,10 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
 
   // All nodes that are still in m_OrderedNodePairs at this point are not part of a proper directed graph structure. We'll add such nodes without any parent information.
   for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
-       nodesIter != m_OrderedNodePairs.end();
-       ++nodesIter)
+    nodesIter != m_OrderedNodePairs.end();
+    ++nodesIter)
   {
-    storage->Add( nodesIter->first );
+    storage->Add(nodesIter->first);
     MITK_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage without parents.";
     error = true;
   }
@@ -289,7 +234,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   return !error;
 }
 
-mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlElement* dataElement, const std::string& workingDirectory, bool& error )
+mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElement* dataElement, const std::string& workingDirectory, bool& error)
 {
   DataNode::Pointer node;
 
@@ -299,19 +244,18 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
     if (strlen(filename) == 0) {
       MITK_ERROR << "Error during attempt to read .mtk file. Empty filename found.'";
       error = true;
-    } else if ( filename )
+    } else if (filename)
     {
       try
       {
-        std::vector<BaseData::Pointer> baseData = IOUtil::Load( workingDirectory + Poco::Path::separator() + filename );
+        std::vector<BaseData::Pointer> baseData = IOUtil::Load(workingDirectory + Poco::Path::separator() + filename);
         if (baseData.size() > 1)
         {
           MITK_WARN << "Discarding multiple base data results from " << filename << " except the first one.";
         }
         node = DataNode::New();
         node->SetData(baseData.front());
-      }
-      catch (std::exception& e)
+      } catch (std::exception& e)
       {
         MITK_ERROR << "Error during attempt to read '" << filename << "'. Exception says: " << e.what();
         error = true;
@@ -344,36 +288,36 @@ void mitk::SceneReaderV1::ClearNodePropertyListWithExceptions(DataNode& node, Pr
   if (dynamic_cast<Image*>(data))
   {
     /*
-      Older scene files (before changes of bug 17547) could contain
-      a RenderingMode property with value "LevelWindow_Color".
-      Since bug 17547 this value has been removed and replaced by
-      the default value LookupTable_LevelWindow_Color.
+    Older scene files (before changes of bug 17547) could contain
+    a RenderingMode property with value "LevelWindow_Color".
+    Since bug 17547 this value has been removed and replaced by
+    the default value LookupTable_LevelWindow_Color.
 
-      This new default value does only result in "black-to-white"
-      CT images (or others) if there is a corresponding lookup
-      table. Such a lookup table is provided as a default value
-      by the Image mapper. Since that value was never present in
-      older scene files, we do well in not removing the new
-      default value here. Otherwise the mapper would fall back
-      to another default which is all the colors of the rainbow :-(
+    This new default value does only result in "black-to-white"
+    CT images (or others) if there is a corresponding lookup
+    table. Such a lookup table is provided as a default value
+    by the Image mapper. Since that value was never present in
+    older scene files, we do well in not removing the new
+    default value here. Otherwise the mapper would fall back
+    to another default which is all the colors of the rainbow :-(
     */
     BaseProperty::Pointer lutProperty = propertyList.GetProperty("LookupTable");
     propertiesToKeep->SetProperty("LookupTable", lutProperty);
 
     /*
-      Older scene files (before changes of T14807) may contain
-      multi-component images without the "Image.Displayed Component"
-      property.
+    Older scene files (before changes of T14807) may contain
+    multi-component images without the "Image.Displayed Component"
+    property.
 
-      As the treatment as multi-component image and the corresponding
-      visualization options hinges on that property we should not delete
-      it, if it was added by the mapper.
-      Old diffusion images might contain the "DisplayChannel" property
-      which stores the same information, however ignoring it is an acceptable
-      loss of precision as usually which channel is selected is not terribly
-      important.
+    As the treatment as multi-component image and the corresponding
+    visualization options hinges on that property we should not delete
+    it, if it was added by the mapper.
+    Old diffusion images might contain the "DisplayChannel" property
+    which stores the same information, however ignoring it is an acceptable
+    loss of precision as usually which channel is selected is not terribly
+    important.
 
-      This is a fix for the issue reported in T19919.
+    This is a fix for the issue reported in T19919.
     */
     BaseProperty::Pointer compProperty = propertyList.GetProperty("Image.Displayed Component");
     if (compProperty.IsNotNull())
@@ -393,13 +337,13 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
   assert(nodeElement);
   bool error(false);
 
-  for( TiXmlElement* properties = nodeElement->FirstChildElement("properties"); properties != NULL; properties = properties->NextSiblingElement("properties") )
+  for (TiXmlElement* properties = nodeElement->FirstChildElement("properties"); properties != NULL; properties = properties->NextSiblingElement("properties"))
   {
-    const char* propertiesfilea( properties->Attribute("file") );
-    std::string propertiesfile( propertiesfilea ? propertiesfilea : "" );
+    const char* propertiesfilea(properties->Attribute("file"));
+    std::string propertiesfile(propertiesfilea ? propertiesfilea : "");
 
-    const char* renderwindowa( properties->Attribute("renderwindow") );
-    std::string renderwindow( renderwindowa ? renderwindowa : "" );
+    const char* renderwindowa(properties->Attribute("renderwindow"));
+    std::string renderwindow(renderwindowa ? renderwindowa : "");
 
     PropertyList::Pointer propertyList = node->GetPropertyList(renderwindow); // DataNode implementation always returns a propertylist
     ClearNodePropertyListWithExceptions(*node, *propertyList);
@@ -414,9 +358,8 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
 
     if (readProperties.IsNotNull())
     {
-      propertyList->ConcatenatePropertyList( readProperties, true ); // true = replace
-    }
-    else
+      propertyList->ConcatenatePropertyList(readProperties, true); // true = replace
+    } else
     {
       MITK_ERROR << "Property list reader did not return a property list. This is an implementation error. Please tell your developer.";
       error = true;
@@ -433,9 +376,9 @@ bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
   bool error(false);
 
   // get the file name stored in the <properties ...> tag
-  const char* baseDataPropertyFile( baseDataNodeElem->Attribute("file") );
+  const char* baseDataPropertyFile(baseDataNodeElem->Attribute("file"));
   // check if the filename was found
-  if(baseDataPropertyFile)
+  if (baseDataPropertyFile)
   {
     //PropertyList::Pointer dataPropList = data->GetPropertyList();
 
@@ -450,17 +393,15 @@ bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
     PropertyList::Pointer inProperties = propertyDeserializer->GetOutput();
 
     // store the read-in properties to the given node or throw error otherwise
-    if( inProperties.IsNotNull() )
+    if (inProperties.IsNotNull())
     {
-      data->SetPropertyList( inProperties );
-    }
-    else
+      data->SetPropertyList(inProperties);
+    } else
     {
       MITK_ERROR << "The property deserializer did not return a (valid) property list.";
       error = true;
     }
-  }
-  else
+  } else
   {
     MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false TiXmlElement. \n \t ->Given element does not contain a 'file' attribute. \n";
     error = true;

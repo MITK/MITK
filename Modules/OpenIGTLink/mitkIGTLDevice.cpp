@@ -174,7 +174,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       //      std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
       //                << headerMsg->GetDeviceName() << std::endl;
 
-      //      headerMsg->Print(std::cout);
+      // headerMsg->Print(std::cout);
 
       //check the type of the received message
       //if it is a GET_, STP_ or RTS_ command push it into the command queue
@@ -241,7 +241,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       }
       else
       {
-        MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
+        MITK_WARN("IGTLDevice") << "Received a valid header but could not "
           << "read the whole message.";
         return IGTL_STATUS_UNKNOWN_ERROR;
       }
@@ -249,7 +249,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
     else
     {
       //CRC check failed
-      MITK_ERROR << "CRC Check failed";
+      MITK_WARN << "CRC Check failed";
       return IGTL_STATUS_CHECKSUM_ERROR;
     }
   }
@@ -257,7 +257,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   {
     //Message size information and actual data size don't match.
     //this state is not suppossed to be reached, return unknown error
-    MITK_ERROR << "IGTL status unknown";
+    MITK_WARN << "IGTL status unknown";
     return IGTL_STATUS_UNKNOWN_ERROR;
   }
 }
@@ -287,9 +287,7 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(mitk::IGTLMessage::Pointer msg
 
   if (sendSuccess)
   {
-    if(m_LogMessages)
-      MITK_INFO << "Send IGTL message: " << msg->ToString();
-
+    if (m_LogMessages) { MITK_INFO << "Send IGTL message: " << msg->ToString(); }
     this->InvokeEvent(MessageSentEvent());
     return IGTL_STATUS_OK;
   }

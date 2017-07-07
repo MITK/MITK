@@ -1152,13 +1152,14 @@ void QmitkMITKIGTTrackingToolboxView::StoreUISettings()
   QSettings settings;
 
   settings.beginGroup(QString::fromStdString(VIEW_ID));
-  MITK_INFO << "Store UI settings";
+  MITK_DEBUG << "Store UI settings";
   // set the values of some widgets and attrbutes to the QSettings
   settings.setValue("ShowTrackingVolume", QVariant(m_Controls->m_ShowTrackingVolume->isChecked()));
   settings.setValue("toolStorageFilename", QVariant(m_ToolStorageFilename));
   settings.setValue("VolumeSelectionBox", QVariant(m_Controls->m_VolumeSelectionBox->currentIndex()));
   settings.setValue("SimpleModeEnabled", QVariant(m_SimpleModeEnabled));
-
+  settings.setValue("OpenIGTLinkDataFormat", QVariant(m_Controls->m_OpenIGTLinkDataFormat->currentIndex()));
+  settings.setValue("EnableOpenIGTLinkMicroService", QVariant(m_Controls->m_EnableOpenIGTLinkMicroService->isChecked()));
   settings.endGroup();
 }
 //! [StoreUISettings]
@@ -1166,15 +1167,16 @@ void QmitkMITKIGTTrackingToolboxView::StoreUISettings()
 //! [LoadUISettings]
 void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
 {
-  // persistence service does not directly work in plugins for now
-  // -> using QSettings
+  // persistence service does not directly work in plugins for now -> using QSettings
   QSettings settings;
 
   settings.beginGroup(QString::fromStdString(VIEW_ID));
 
   // set some widgets and attributes by the values from the QSettings
   m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", true).toBool());
+  m_Controls->m_EnableOpenIGTLinkMicroService->setChecked(settings.value("EnableOpenIGTLinkMicroService", true).toBool());
   m_Controls->m_VolumeSelectionBox->setCurrentIndex(settings.value("VolumeSelectionBox", 0).toInt());
+  m_Controls->m_OpenIGTLinkDataFormat->setCurrentIndex(settings.value("OpenIGTLinkDataFormat", 0).toInt());
   m_ToolStorageFilename = settings.value("toolStorageFilename", QVariant("")).toString();
   if (settings.value("SimpleModeEnabled", false).toBool()) { this->OnToggleAdvancedSimpleMode(); }
   settings.endGroup();

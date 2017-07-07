@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlQuaternionTrackingDataMessage.h>
 #include <igtlTrackingDataMessage.h>
 #include <igtlTransformMessage.h>
-#include "mitkIGTLTransformDeviceSource.h"
+#include "mitkIGTLTrackingDataDeviceSource.h"
 
 namespace mitk
 {
@@ -41,11 +41,11 @@ namespace mitk
   {
   public:
     mitkClassMacro(OpenIGTLinkTrackingDevice, TrackingDevice);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      /** Sets the port number for the Open IGT Link connection. Default value is -1 (invalid). */
-      void SetPortNumber(int portNumber);
+    /** Sets the port number for the Open IGT Link connection. Default value is -1 (invalid). */
+    void SetPortNumber(int portNumber);
 
     /** Sets the hostname for the Open IGT Link connection. Default value is 127.0.0.1 (localhost). */
     void SetHostname(std::string hostname);
@@ -152,7 +152,7 @@ namespace mitk
     mitk::IGTLClient::Pointer m_OpenIGTLinkClient;
 
     //OpenIGTLink pipeline
-    mitk::IGTLTransformDeviceSource::Pointer m_IGTLDeviceSource;
+    mitk::IGTLTrackingDataDeviceSource::Pointer m_IGTLDeviceSource;
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
     std::vector<OpenIGTLinkTrackingTool::Pointer> m_AllTools; ///< vector holding all tools
@@ -170,15 +170,6 @@ namespace mitk
     /** Discovers tools from the OpenIGTLink connection and converts them to MITK navigation tool objects.
         @return Returns a navigation tool storage holding all found tools. Returns an empty storage if no tools were found or if there was an error.*/
     mitk::NavigationToolStorage::Pointer DiscoverToolsAndConvertToNavigationTools(mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type, int NumberOfMessagesToWait = 50);
-
-    /** Discovers tools from the input (type TDATA) */
-    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
-
-    /** Discovers tools from the input (type QTDATA) */
-    mitk::NavigationToolStorage::Pointer DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
-
-    /** Discovers tools from the input (type TRANSFORM) and waits for the given number of messages */
-    mitk::NavigationToolStorage::Pointer DiscoverToolsFromTransform(int NumberOfMessagesToWait = 50);
 
     void AddNewToolForName(std::string name, int i);
 

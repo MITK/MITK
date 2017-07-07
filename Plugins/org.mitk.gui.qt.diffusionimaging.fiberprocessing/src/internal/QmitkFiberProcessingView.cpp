@@ -187,6 +187,11 @@ void QmitkFiberProcessingView::Modify()
         DoCurvatureColorCoding();
         break;
     }
+    case 7:
+    {
+        DoWeightColorCoding();
+        break;
+    }
     }
 }
 
@@ -1386,6 +1391,20 @@ void QmitkFiberProcessingView::DoCurvatureColorCoding()
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->ColorFibersByCurvature();
+    }
+
+    if (auto renderWindowPart = this->GetRenderWindowPart())
+    {
+        renderWindowPart->RequestUpdate();
+    }
+}
+
+void QmitkFiberProcessingView::DoWeightColorCoding()
+{
+    for (auto node : m_SelectedFB)
+    {
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+        fib->ColorFibersByFiberWeights();
     }
 
     if (auto renderWindowPart = this->GetRenderWindowPart())

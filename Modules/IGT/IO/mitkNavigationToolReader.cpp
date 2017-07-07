@@ -84,6 +84,9 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(node->GetName());
   newNode->SetData(node->GetData());
+  bool visible = true;
+  node->GetVisibility(visible, NULL);
+  newNode->SetVisibility(visible);
   returnValue->SetDataNode(newNode);
 
   //Identifier

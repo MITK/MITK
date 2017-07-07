@@ -116,7 +116,14 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Surface
-    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=nullptr) thisTool->SetData(Tool->GetDataNode()->GetData());
+    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData() != NULL)
+    {
+      thisTool->SetData(Tool->GetDataNode()->GetData());
+  //Visibility
+      bool visible = true;
+      Tool->GetDataNode()->GetVisibility(visible, NULL);
+      thisTool->SetVisibility(visible);
+    }
 
   //Tool Landmarks
     thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolRegistrationLandmarks())));

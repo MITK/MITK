@@ -59,7 +59,7 @@ namespace mitk {
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_EXPORT_PLUGIN2(org_mbi_gui_qt_usnavigation, mitk::org_mbi_gui_qt_usnavigation_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_igt_app_echotrack, mitk::org_mbi_gui_qt_usnavigation_Activator)
 #endif
 
 // necessary for us::GetModuleContext() in USNavigationCombinedModalityPersistence

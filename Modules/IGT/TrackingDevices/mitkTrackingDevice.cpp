@@ -54,6 +54,16 @@ return true;
 //this method in the subclass.
 }
 
+bool mitk::TrackingDevice::AutoDetectToolsAvailable()
+{
+  return false;
+}
+
+mitk::NavigationToolStorage::Pointer mitk::TrackingDevice::AutoDetectTools()
+{
+  return mitk::NavigationToolStorage::New();
+}
+
 
 mitk::TrackingDevice::TrackingDeviceState mitk::TrackingDevice::GetState() const
 {

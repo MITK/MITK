@@ -197,6 +197,10 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
     if (!ok)
       return;
 
+	if (name == "")
+	{
+		name = "Bounding Shape";
+	}
     m_Controls.buttonCropping->setEnabled(true);
     m_Controls.buttonMasking->setEnabled(true);
     m_Controls.boundingShapeSelector->setEnabled(true);

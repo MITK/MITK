@@ -295,7 +295,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
     //set the time stamp
     nd->SetIGTTimeStamp(input->GetIGTTimeStamp());
     //set the name
-    nd->SetName(td->GetName());
+    nd->SetName(input->GetName());
     output->Graft(nd);
   }
 }

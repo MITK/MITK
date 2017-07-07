@@ -76,7 +76,14 @@ void mitk::NavigationData::Graft( const DataObject *data )
 
 bool mitk::NavigationData::IsDataValid() const
 {
-  return m_DataValid;
+  if (m_Position[0] == 0.0 && m_Position[1] == 0.0 && m_Position[2] == 0.0)
+  {
+    return false;
+  }
+  else
+  {
+    return m_DataValid;
+  }
 }
 
 

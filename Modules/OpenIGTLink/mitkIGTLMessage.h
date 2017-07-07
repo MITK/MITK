@@ -42,10 +42,10 @@ namespace mitk {
       mitkClassMacroItkParent(IGTLMessage, itk::DataObject);
       itkFactorylessNewMacro(Self);
       itkCloneMacro(Self);
-      mitkNewMacro2Param(Self, igtl::MessageBase::Pointer,std::string);
+      mitkNewMacro1Param(Self, igtl::MessageBase::Pointer);
 
       /**
-      * \brief type that holds the time at which the data was recorded
+      * \brief type that holds the time at which the data was recorded in milliseconds
       */
       typedef double TimeStampType;
 
@@ -105,6 +105,8 @@ namespace mitk {
       */
       void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
+      std::string ToString() const;
+
       /** Compose with another IGTLMessage
        *
        * This method composes self with another IGTLMessage of the
@@ -136,7 +138,7 @@ namespace mitk {
       /**
        * Creates a IGTLMessage object from an igtl::MessageBase and a given name.
        */
-      IGTLMessage(igtl::MessageBase::Pointer message, std::string name = "");
+      IGTLMessage(igtl::MessageBase::Pointer message);
 
       virtual ~IGTLMessage();
 

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationToolStorageDeserializer.h"
 #include "mitkTrackingDeviceSourceConfigurator.h"
+#include "QmitkIGTCommonHelper.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -74,7 +75,8 @@ void QmitkIGTConnectionWidget::OnConnect()
     m_TrackingDevice = m_Controls->trackingDeviceConfigurationWidget->GetTrackingDevice();
     if (m_TrackingDevice.IsNotNull())
     {
-      QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Open Navigation tool storage"), "/", tr("Toolfile (*.tfl)"));
+      QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Open Navigation tool storage"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("Toolfile (*.tfl)"));
+      QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
       if (LoadToolfile(fileName))
       {
         // Create TrackingDeviceSource and add tools

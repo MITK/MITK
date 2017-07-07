@@ -216,7 +216,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     m_TrackingVolumeNode->SetColor(red);
 
     //initialize buttons
-    m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
+    m_Controls->m_AutoDetectTools->setVisible(false); //only visible if supported by tracking device
     m_Controls->m_StartStopTrackingButton->setEnabled(false);
     m_Controls->m_StartTrackingSimpleMode->setEnabled(false);
     m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
@@ -528,9 +528,18 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     //create convertion filter
     m_IGTLConversionFilter = mitk::NavigationDataToIGTLMessageFilter::New();
     m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
+    QString dataModeSelection = this->m_Controls->m_OpenIGTLinkDataFormat->currentText();
+    if (dataModeSelection == "TDATA")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);}
+    else if (dataModeSelection == "TRANSFORM")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);}
+    else if (dataModeSelection == "QTDATA")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTDataMsg);}
+    else if (dataModeSelection == "POSITION")
+      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);}
     m_IGTLConversionFilter->ConnectTo(m_ToolVisualizationFilter);
-    m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
     m_IGTLConversionFilter->RegisterAsMicroservice();
+
 
     //create server and message provider
     m_IGTLServer = mitk::IGTLServer::New(false);
@@ -760,30 +769,6 @@ void QmitkMITKIGTTrackingToolboxView::UpdateRenderTrackingTimer()
   //refresh view and status widget
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   m_Controls->m_TrackingToolsStatusWidget->Refresh();
-
-  //code to better isolate bug 17713, could be removed when bug 17713 is fixed
-  static int i = 0;
-  static mitk::Point3D lastPositionTool1 = m_ToolVisualizationFilter->GetOutput(0)->GetPosition();
-  static itk::TimeStamp lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
-  i++;
-  //every 20 frames: check if tracking is frozen
-  if (i > 20)
-  {
-    i = 0;
-    if (m_ToolVisualizationFilter->GetOutput(0)->IsDataValid())
-    {
-        if (mitk::Equal(lastPositionTool1, m_ToolVisualizationFilter->GetOutput(0)->GetPosition(), 0.000000001, false)
-          && m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != "Da Vinci")
-      {
-        MITK_WARN << "Seems as tracking (of at least tool 1) is frozen which means that bug 17713 occurred. Restart tracking might help.";
-        //display further information to find the bug
-        MITK_WARN << "Timestamp of current navigation data: " << m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
-        MITK_WARN << "Timestamp of last navigation data (which holds the same values): " << lastTimeStamp;
-      }
-      lastPositionTool1 = m_ToolVisualizationFilter->GetOutput(0)->GetPosition();
-      lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
-    }
-  }
 }
 
 void QmitkMITKIGTTrackingToolboxView::UpdateLoggingTrackingTimer()
@@ -932,6 +917,7 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {
     //initialize logging filter
     m_loggingFilter = mitk::NavigationDataRecorder::New();
+    m_loggingFilter->SetRecordOnlyValidData(m_Controls->m_SkipInvalidData->isChecked());
 
     m_loggingFilter->ConnectTo(m_ToolVisualizationFilter);
 
@@ -1052,6 +1038,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableLoggingButtons()
   m_Controls->m_LoggedFramesLimit->setEnabled(false);
   m_Controls->m_csvFormat->setEnabled(false);
   m_Controls->m_xmlFormat->setEnabled(false);
+  m_Controls->m_SkipInvalidData->setEnabled(false);
   m_Controls->m_StopLogging->setEnabled(true);
 }
 
@@ -1064,6 +1051,7 @@ void QmitkMITKIGTTrackingToolboxView::EnableLoggingButtons()
   m_Controls->m_LoggedFramesLimit->setEnabled(true);
   m_Controls->m_csvFormat->setEnabled(true);
   m_Controls->m_xmlFormat->setEnabled(true);
+  m_Controls->m_SkipInvalidData->setEnabled(true);
   m_Controls->m_StopLogging->setEnabled(false);
 }
 
@@ -1079,6 +1067,8 @@ void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
   m_Controls->m_OptionsLogUpdateRateLabel->setEnabled(false);
   m_Controls->m_DisableAllTimers->setEnabled(false);
   m_Controls->m_OtherOptionsGroupBox->setEnabled(false);
+  m_Controls->m_EnableOpenIGTLinkMicroService->setEnabled(false);
+  m_Controls->m_OpenIGTLinkDataFormat->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
@@ -1087,6 +1077,8 @@ void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
   m_Controls->m_UseDifferentUpdateRates->setEnabled(true);
   m_Controls->m_DisableAllTimers->setEnabled(true);
   m_Controls->m_OtherOptionsGroupBox->setEnabled(true);
+  m_Controls->m_EnableOpenIGTLinkMicroService->setEnabled(true);
+  m_Controls->m_OpenIGTLinkDataFormat->setEnabled(true);
   OnToggleDifferentUpdateRates();
 }
 

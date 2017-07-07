@@ -385,7 +385,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferIncomingMessages(int state)
 {
   if (this->m_IGTLDevice.IsNotNull())
   {
-    this->m_IGTLDevice->EnableInfiniteBufferingMode(
+    this->m_IGTLDevice->EnableNoBufferingMode(
       this->m_IGTLDevice->GetMessageQueue(), (bool)state);
   }
 }
@@ -394,7 +394,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferOutgoingMessages(int state)
 {
   if (this->m_IGTLDevice.IsNotNull())
   {
-    this->m_IGTLDevice->EnableInfiniteBufferingMode(
+    this->m_IGTLDevice->EnableNoBufferingMode(
       this->m_IGTLDevice->GetMessageQueue(), (bool)state);
   }
 }

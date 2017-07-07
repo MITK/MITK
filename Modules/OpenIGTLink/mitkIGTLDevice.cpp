@@ -232,6 +232,8 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         }
         else
         {
+          if(m_LogMessages)
+            MITK_INFO << "Received Message: " << mitk::IGTLMessage::New(curMessage)->ToString();
           this->m_MessageQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -260,18 +262,12 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   }
 }
 
-void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
+void mitk::IGTLDevice::SendMessage(mitk::IGTLMessage::Pointer msg)
 {
-  this->SendMessage(msg->GetMessage());
-}
-
-void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
-{
-  //add the message to the queue
   m_MessageQueue->PushSendMessage(msg);
 }
 
-unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg,
+unsigned int mitk::IGTLDevice::SendMessagePrivate(mitk::IGTLMessage::Pointer msg,
   igtl::Socket::Pointer socket)
 {
   //check the input message
@@ -282,16 +278,18 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
     return false;
   }
 
-  // add the name of this device to the message
-  msg->SetDeviceName(this->GetName().c_str());
+  igtl::MessageBase* sendMessage = msg->GetMessage();
 
   // Pack (serialize) and send
-  msg->Pack();
+  sendMessage->Pack();
 
-  int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
+  int sendSuccess = socket->Send(sendMessage->GetPackPointer(), sendMessage->GetPackSize());
 
   if (sendSuccess)
   {
+    if(m_LogMessages)
+      MITK_INFO << "Send IGTL message: " << msg->ToString();
+
     this->InvokeEvent(MessageSentEvent());
     return IGTL_STATUS_OK;
   }
@@ -436,7 +434,7 @@ bool mitk::IGTLDevice::SendRTSMessage(const char* type)
   //necessary to send one back
   if (rtsMsg.IsNotNull())
   {
-    this->SendMessage(rtsMsg);
+    this->SendMessage(mitk::IGTLMessage::New(rtsMsg));
     return true;
   }
   else
@@ -485,12 +483,16 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextCommand()
 {
   return m_MessageQueue->PullCommandMessage();
 }
+void mitk::IGTLDevice::EnableNoBufferingMode(bool enable)
+{
+  m_MessageQueue->EnableNoBufferingMode(enable);
+}
 
-void mitk::IGTLDevice::EnableInfiniteBufferingMode(
+void mitk::IGTLDevice::EnableNoBufferingMode(
   mitk::IGTLMessageQueue::Pointer queue,
   bool enable)
 {
-  queue->EnableInfiniteBuffering(enable);
+  queue->EnableNoBufferingMode(enable);
 }
 
 ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartSending(void* pInfoStruct)

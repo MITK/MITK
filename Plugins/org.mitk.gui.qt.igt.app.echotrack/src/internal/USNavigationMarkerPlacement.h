@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMessage.h>
 #include <mitkTextAnnotation2D.h>
 #include <mitkUSCombinedModality.h>
+#include <mitkNavigationToolStorage.h>
 
 namespace itk
 {
@@ -108,6 +109,12 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
 
 	void OnAddAblationZone(int size);
 
+  void OnEnableNavigationLayout();
+
+  void OnResetStandardLayout();
+
+  void OnChangeLayoutClicked();
+
 	void OnChangeAblationZone(int id, int newSize);
 
 public:
@@ -126,6 +133,11 @@ public:
 	static const std::string VIEW_ID;
 
 	void OnCombinedModalityPropertyChanged(const std::string &, const std::string &);
+  /**
+  * \returns the point defining the needle axis in the tool storage
+  */
+  void SetToolAxisMarkerPlacement();
+  mitk::Point3D m_ToolAxis;
 
 protected:
 	/**
@@ -180,6 +192,10 @@ protected:
 	int m_SceneNumber;
 
 	itk::SmartPointer<mitk::TextAnnotation2D> m_WarnOverlay;
+
+  //To get tool storage
+  mitk::NavigationDataSource::Pointer m_NavigationDataSource;
+  mitk::NavigationToolStorage::Pointer m_CurrentStorage;
 
 private:
 	mitk::MessageDelegate2<USNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;

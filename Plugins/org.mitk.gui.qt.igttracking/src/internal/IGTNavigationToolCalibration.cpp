@@ -65,7 +65,7 @@ void IGTNavigationToolCalibration::OnToolCalibrationMethodChanged(int index)
   //if pivot calibration (3) or manual(0) is chosen only calibration pointer is needed
   if (index == 0 || index == 3) {
 
-    if (!CheckInitialization(FALSE)) {
+    if (!CheckInitialization(false)) {
       return;
     }
   }

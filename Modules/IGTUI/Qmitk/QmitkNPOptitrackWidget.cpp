@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOptitrackTrackingDevice.h"
 #include "mitkNPOptitrackTrackingTypeInformation.h"
+#include "QmitkIGTCommonHelper.h"
 
 #include <QFileDialog>
 #include <QScrollBar>
@@ -96,10 +97,11 @@ bool QmitkNPOptitrackWidget::IsDeviceInstalled()
 
 void QmitkNPOptitrackWidget::SetOptitrackCalibrationFileClicked()
 {
-  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Open Calibration File"), "/", "*.*").toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*").toLatin1().data();
   if (filename == "") { return; }
   else
   {
+    QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
     m_OptitrackCalibrationFile = filename;
     Poco::Path myPath = Poco::Path(m_OptitrackCalibrationFile.c_str());
     m_Controls->m_OptitrackCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));

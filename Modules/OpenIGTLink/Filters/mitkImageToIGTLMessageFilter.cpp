@@ -40,8 +40,6 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     int dims = img->GetDimension();
     int chn = img->GetNumberOfChannels();
 
-    MITK_INFO << "Sending image. Dimensions: " << dims << " Channels: " << chn << "\n";
-
     if (dims < 1)
     {
       MITK_ERROR << "Can not handle dimensionless images";
@@ -197,6 +195,11 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
         (double*)out, num_scalars);
       break;
     }
+
+    //copy timestamp of mitk image
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    timestamp->SetTime(img->GetMTime() / 1000, (int)(img->GetMTime()) % 1000);
+    imgMsg->SetTimeStamp(timestamp);
 
     imgMsg->Pack();
 

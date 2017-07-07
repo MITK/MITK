@@ -29,7 +29,6 @@ mitk::NavigationDataToIGTLMessageFilter::NavigationDataToIGTLMessageFilter()
   mitk::IGTLMessage::Pointer output = mitk::IGTLMessage::New();
   this->SetNumberOfRequiredOutputs(1);
   this->SetNthOutput(0, output.GetPointer());
-
   this->SetNumberOfRequiredInputs(1);
 
   //  m_OperationMode = Mode3D;
@@ -61,13 +60,6 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
   default:
     break;
   }
-  igtl::MessageBase::Pointer curMessage = this->GetOutput()->GetMessage();
-  if (dynamic_cast<igtl::TrackingDataMessage*>(curMessage.GetPointer()) != nullptr)
-  {
-    igtl::TrackingDataMessage* tdMsg =
-      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
-  }
-
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::SetInput(const NavigationData* nd)
@@ -165,7 +157,7 @@ void ConvertAffineTransformationIntoIGTLMatrix(mitk::AffineTransform3D* trans,
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -183,8 +175,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
     igtl::PositionMessage::Pointer posMsg = igtl::PositionMessage::New();
     posMsg->SetPosition(pos[0], pos[1], pos[2]);
     posMsg->SetQuaternion(ori[0], ori[1], ori[2], ori[3]);
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(input->GetTimeStamp().GetMTime() / 1000, input->GetTimeStamp().GetMTime() % 1000);
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(input->GetIGTTimeStamp());
     posMsg->SetTimeStamp(timestamp);
     posMsg->SetDeviceName(input->GetName());
     posMsg->Pack();
@@ -197,7 +188,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -219,8 +210,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
     igtl::TransformMessage::Pointer transMsg = igtl::TransformMessage::New();
     transMsg->SetMatrix(igtlTransform);
     transMsg->SetPosition(position[0], position[1], position[2]);
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(input->GetTimeStamp().GetMTime() / 1000, input->GetTimeStamp().GetMTime() % 1000);
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(input->GetIGTTimeStamp());
     transMsg->SetTimeStamp(timestamp);
     transMsg->SetDeviceName(input->GetName());
     transMsg->Pack();
@@ -228,6 +218,12 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
     //add the igtl message to the mitk::IGTLMessage
     output->SetMessage(transMsg.GetPointer());
   }
+}
+igtl::TimeStamp::Pointer mitk::NavigationDataToIGTLMessageFilter::ConvertToIGTLTimeStamp(double IGTTimeStamp)
+{
+  igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+  timestamp->SetTime(IGTTimeStamp / 1000, (int)(IGTTimeStamp) % 1000);
+  return timestamp;
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
@@ -261,11 +257,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
     //insert this element into the tracking data message
     qtdMsg->AddQuaternionTrackingDataElement(tde);
 
-    //copy the time stamp
-    //todo find a better way to do that
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(nd->GetTimeStamp().GetMTime() / 1000, nd->GetTimeStamp().GetMTime() % 1000);
-    MITK_INFO << timestamp;
+    MITK_INFO << ConvertToIGTLTimeStamp(nd->GetIGTTimeStamp());
   }
   qtdMsg->Pack();
 
@@ -330,11 +322,8 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
     tdMsg->AddTrackingDataElement(tde);
 
     //copy the time stamp
-    //todo find a better way to do that
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(nd->GetTimeStamp().GetMTime() / 1000, nd->GetTimeStamp().GetMTime() % 1000);
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(nd->GetIGTTimeStamp());
     tdMsg->SetTimeStamp(timestamp);
-
   }
   tdMsg->Pack();
   //add the igtl message to the mitk::IGTLMessage
@@ -346,7 +335,6 @@ void mitk::NavigationDataToIGTLMessageFilter::SetOperationMode(OperationMode mod
 {
   m_OperationMode = mode;
   this->Modified();
-  this->CreateOutputsForAllInputs();
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::ConnectTo(

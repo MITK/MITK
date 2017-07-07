@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>370</width>
-    <height>747</height>
+    <height>723</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -572,6 +572,56 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Open IGT Link</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <widget class="QCheckBox" name="m_EnableOpenIGTLinkMicroService">
+            <property name="text">
+             <string>Enable Open IGT Link MicroService</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Select Open IGT Link Data Format:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="m_OpenIGTLinkDataFormat">
+            <item>
+             <property name="text">
+              <string>TRANSFORM</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>QTDATA</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>TDATA</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>POSITION</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="m_OtherOptionsGroupBox">
          <property name="title">
           <string>Other Options</string>
@@ -581,16 +631,6 @@ p, li { white-space: pre-wrap; }
            <widget class="QCheckBox" name="m_ShowToolQuaternions">
             <property name="text">
              <string>Show Tool Quaternions</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="m_EnableOpenIGTLinkMicroService">
-            <property name="text">
-             <string>Enable Open IGT Link MicroService</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -710,6 +750,13 @@ p, li { white-space: pre-wrap; }
         <widget class="QRadioButton" name="m_xmlFormat">
          <property name="text">
           <string>XML format</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_SkipInvalidData">
+         <property name="text">
+          <string>Skip invalid data</string>
          </property>
         </widget>
        </item>

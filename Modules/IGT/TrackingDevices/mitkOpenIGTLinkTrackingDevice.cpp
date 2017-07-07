@@ -42,7 +42,7 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDev
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
   m_OpenIGTLinkClient->EnableNoBufferingMode(false);
 
-  m_IGTLDeviceSource = mitk::IGTLTransformDeviceSource::New();
+  m_IGTLDeviceSource = mitk::IGTLTrackingDataDeviceSource::New();
   m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
 }
 
@@ -83,6 +83,7 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
   }
 
   //get a message to find out type
+  m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::UNKNOWN);
   mitk::IGTLMessage::Pointer receivedMessage = ReceiveMessage(100);
 
   const char* msgType = receivedMessage->GetIGTLMessageType();
@@ -94,26 +95,24 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
     receivedMessage = ReceiveMessage(10000);
     msgType = receivedMessage->GetIGTLMessageType();
   }
-
+  MITK_INFO << "################# got message type: " << msgType;
   mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
-
-  returnValue = DiscoverToolsAndConvertToNavigationTools(type);
-  /*
   switch (type)
   {
+  case UNKNOWN:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::UNKNOWN);
+    break;
   case TDATA:
-    returnValue = DiscoverToolsFromTData(dynamic_cast<igtl::TrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::TDATA);
     break;
   case QTDATA:
-    returnValue = DiscoverToolsFromQTData(dynamic_cast<igtl::QuaternionTrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::QTDATA);
     break;
   case TRANSFORM:
-    returnValue = DiscoverToolsFromTransform();
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::TRANSFORM);
     break;
-  default:
-    MITK_INFO << "Server does not send tracking data or received data is not of a compatible type. (Received type: " << msgType << ")";
   }
-  */
+  returnValue = DiscoverToolsAndConvertToNavigationTools(type);
 
   //close connection
   try
@@ -141,23 +140,37 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverTo
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     m_IGTLDeviceSource->Update();
-    igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
-    if (msg == nullptr || msg.IsNull())
+    switch (type)
     {
-      MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
-      continue;
-    }
-
-    int count = toolNameMap[msg->GetDeviceName()];
-    if (count == 0)
-    {
-      //MITK_WARN << "ADDED NEW TOOL TO TOOLCHAIN: " << msg->GetDeviceName() << " - 1";
-      toolNameMap[msg->GetDeviceName()] = 1;
-    }
-    else
-    {
-      toolNameMap[msg->GetDeviceName()]++;
-      //MITK_WARN << "INCREMENTED TOOL COUNT IN TOOLCHAIN: " << msg->GetDeviceName() << " - " << toolNameMap[msg->GetDeviceName()];
+    case TRANSFORM:
+      {
+      igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+      if (msg == nullptr || msg.IsNull()) { MITK_INFO << "Received message is invalid / null. Skipping.."; continue; }
+      int count = toolNameMap[msg->GetDeviceName()];
+      if (count == 0) { toolNameMap[msg->GetDeviceName()] = 1; }
+      else { toolNameMap[msg->GetDeviceName()]++; }
+      }
+      break;
+    case TDATA:
+      {
+      igtl::TrackingDataMessage::Pointer msg = dynamic_cast<igtl::TrackingDataMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+      if (msg == nullptr || msg.IsNull()) { MITK_INFO << "Received message is invalid / null. Skipping.."; continue; }
+      for (int k = 0; k < msg->GetNumberOfTrackingDataElements(); k++)
+        {
+        igtl::TrackingDataElement::Pointer tde;
+        msg->GetTrackingDataElement(k, tde);
+        if (tde.IsNotNull())
+          {
+          int count = toolNameMap[tde->GetName()];
+          if (count == 0) { toolNameMap[tde->GetName()] = 1; }
+          else { toolNameMap[tde->GetName()]++; }
+          }
+        }
+      }
+      break;
+    default:
+      MITK_WARN << "Only TRANSFORM and TDATA is currently supported, skipping!";
+      break;
     }
   }
 
@@ -254,22 +267,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
 
   mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
 
-  mitk::NavigationToolStorage::Pointer foundTools;
-  switch (type)
-  {
-  case TDATA:
-    foundTools = DiscoverToolsFromTData(dynamic_cast<igtl::TrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
-    break;
-  case QTDATA:
-    foundTools = DiscoverToolsFromQTData(dynamic_cast<igtl::QuaternionTrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
-    break;
-  case TRANSFORM:
-    foundTools = DiscoverToolsFromTransform();
-    break;
-  default:
-    MITK_INFO << "Server does not send tracking data. Received data is not of a compatible type. Received type: " << msgType;
-    return false;
-  }
+  mitk::NavigationToolStorage::Pointer foundTools = this->DiscoverToolsAndConvertToNavigationTools(type);
   if (foundTools.IsNull() || (foundTools->GetToolCount() == 0)) { return false; }
   for (int i = 0; i < foundTools->GetToolCount(); i++) { AddNewToolForName(foundTools->GetTool(i)->GetToolName(), i); }
   MITK_INFO << "Found tools: " << foundTools->GetToolCount();
@@ -305,69 +303,6 @@ mitk::IGTLMessage::Pointer mitk::OpenIGTLinkTrackingDevice::ReceiveMessage(int w
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
   return receivedMessage;
-
-}
-
-mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer tdMsg)
-{
-  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
-  MITK_INFO << "Start discovering tools by TDATA messages";
-  if (tdMsg == nullptr)
-  {
-    MITK_WARN << "Message was not a TrackingDataMessage, aborting!";
-    return returnValue;
-  }
-
-  int numberOfTools = tdMsg->GetNumberOfTrackingDataElements();
-  MITK_INFO << "Found " << numberOfTools << " tools";
-  for (int i = 0; i < numberOfTools; i++)
-  {
-    igtl::TrackingDataElement::Pointer currentTrackingData;
-    tdMsg->GetTrackingDataElement(i, currentTrackingData);
-    std::string name = currentTrackingData->GetName();
-
-    std::stringstream identifier;
-    identifier << "AutoDetectedTool-" << i;
-    i++;
-
-    mitk::NavigationTool::Pointer newTool = ConstructDefaultOpenIGTLinkTool(name, identifier.str());
-
-    returnValue->AddTool(newTool);
-  }
-
-  m_IGTLDeviceSource->StopCommunication();
-  SetState(Ready);
-  return returnValue;
-}
-
-mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg)
-{
-  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
-  MITK_INFO << "Start discovering tools by QTDATA messages";
-  if (msg == nullptr)
-  {
-    MITK_WARN << "Message was not a QuaternionTrackingDataMessage, aborting!";
-    return returnValue;
-  }
-  int numberOfTools = msg->GetNumberOfQuaternionTrackingDataElements();
-  MITK_INFO << "Found " << numberOfTools << " tools";
-  for (int i = 0; i < numberOfTools; i++)
-  {
-    igtl::QuaternionTrackingDataElement::Pointer currentTrackingData;
-    msg->GetQuaternionTrackingDataElement(i, currentTrackingData);
-    std::string name = currentTrackingData->GetName();
-
-    std::stringstream identifier;
-    identifier << "AutoDetectedTool-" << i;
-    i++;
-
-    mitk::NavigationTool::Pointer newTool = ConstructDefaultOpenIGTLinkTool(name, identifier.str());
-
-    returnValue->AddTool(newTool);
-  }
-  m_IGTLDeviceSource->StopCommunication();
-  SetState(Ready);
-  return returnValue;
 }
 
 void mitk::OpenIGTLinkTrackingDevice::AddNewToolForName(std::string name, int i)
@@ -382,56 +317,6 @@ void mitk::OpenIGTLinkTrackingDevice::AddNewToolForName(std::string name, int i)
   MITK_INFO << "Added tool " << name << " to tracking device.";
   newTool->SetToolName(name);
   InternalAddTool(newTool);
-}
-
-mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform(int NumberOfMessagesToWait)
-{
-  MITK_INFO << "Start discovering tools by TRANSFORM messages";
-  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
-  std::map<std::string, int> toolNameMap;
-
-  for (int j=0; j<NumberOfMessagesToWait; j++)
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    m_IGTLDeviceSource->Update();
-    igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
-    if (msg == nullptr || msg.IsNull())
-    {
-      MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
-      continue;
-    }
-
-    int count = toolNameMap[msg->GetDeviceName()];
-    if (count == 0)
-    {
-      //MITK_WARN << "ADDED NEW TOOL TO TOOLCHAIN: " << msg->GetDeviceName() << " - 1";
-      toolNameMap[msg->GetDeviceName()] = 1;
-    }
-    else
-    {
-      toolNameMap[msg->GetDeviceName()]++;
-      //MITK_WARN << "INCREMENTED TOOL COUNT IN TOOLCHAIN: " << msg->GetDeviceName() << " - " << toolNameMap[msg->GetDeviceName()];
-    }
-  }
-
-  int i = 0;
-  for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
-  {
-    MITK_INFO << "Found tool: " << it->first;
-
-    std::stringstream name;
-    name << it->first;
-
-    std::stringstream identifier;
-    identifier << "AutoDetectedTool-" << i;
-    i++;
-
-    mitk::NavigationTool::Pointer newTool = ConstructDefaultOpenIGTLinkTool(name.str(), identifier.str());
-
-    returnValue->AddTool(newTool);
-  }
-
-  return returnValue;
 }
 
 mitk::NavigationTool::Pointer mitk::OpenIGTLinkTrackingDevice::ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier)
@@ -472,18 +357,19 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
 
   m_IGTLMsgToNavDataFilter->Update();
 
-  mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput();
-  const char* name = currentNavData->GetName();
-  //MITK_WARN << name;
-
-  for (int i = 0; i < m_AllTools.size(); i++)
+  for (int j = 0; j < m_IGTLMsgToNavDataFilter->GetNumberOfIndexedOutputs(); j++)
   {
-    if (strcmp(m_AllTools.at(i)->GetToolName(), name) == 0)
+    mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput(j);
+    const char* name = currentNavData->GetName();
+    for (int i = 0; i < m_AllTools.size(); i++)
     {
-      m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
-      m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
-      m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
-      m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
+      if (strcmp(m_AllTools.at(i)->GetToolName(), name) == 0)
+      {
+        m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
+        m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
+        m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
+        m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
+      }
     }
   }
 }

@@ -93,21 +93,19 @@ bool mitk::IGTLMessage::IsDataValid() const
 
 void mitk::IGTLMessage::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
-  this->Superclass::PrintSelf(os, indent);
   os << indent << "name: "           << this->GetName() << std::endl;
-  os << indent << "data valid: "     << this->IsDataValid() << std::endl;
-  os << indent << "TimeStamp: "      << this->GetIGTTimeStamp() << std::endl;
+  os << indent << "type: "           << this->GetIGTLMessageType() << std::endl;
+  os << indent << "valid: "     << this->IsDataValid() << std::endl;
+  os << indent << "timestamp: "      << this->GetIGTTimeStamp() << std::endl;
   os << indent << "OpenIGTLinkMessage: " << std::endl;
   m_Message->Print(os);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 std::string mitk::IGTLMessage::ToString() const
 {
   std::stringstream output;
-  output << "name: " << this->GetName() << std::endl <<
-      "MessageType: "     << this->GetIGTLMessageType() << std::endl <<
-      "TimeStamp: "      << this->GetIGTTimeStamp() << std::endl <<
-      "OpenIGTLinkMessage: " << std::endl;
+  this->Print(output);
   return output.str();
 }
 

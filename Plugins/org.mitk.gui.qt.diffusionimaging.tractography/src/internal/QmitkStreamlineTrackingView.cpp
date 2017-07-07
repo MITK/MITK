@@ -544,7 +544,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       QMessageBox warnBox;
       warnBox.setWindowTitle("Warning");
       warnBox.setText("No fiberbundle was generated!");
-      warnBox.setDetailedText("No fibers were generated using the parameters: \n\n" + m_Controls->m_FaThresholdLabel->text() + "\n" + m_Controls->m_AngularThresholdLabel->text() + "\n" + m_Controls->m_fLabel->text() + "\n" + m_Controls->m_gLabel->text() + "\n" + m_Controls->m_StepsizeLabel->text() + "\n" + m_Controls->m_MinTractLengthLabel->text() + "\n" + m_Controls->m_SeedsPerVoxelLabel->text() + "\n\nPlease check your parametersettings.");
+      warnBox.setDetailedText("No fibers were generated using the chosen parameters. Typical reasons are:\n\n- Cutoff too high. Some feature very low FA/GFA/peak size. Try to lower this parameter.\n- Angular threshold too strict. Try to increase this parameter. Especially probabilistic tractography with a low number of samples per step tends to produce very curvy tracts that are then rejected.\n- Number of samples in probabilistic tractography is too low. See angular threshold bullet.\n- A small step sizes also means many steps to go wrong. See angular threshold bullet.");
       warnBox.setIcon(QMessageBox::Warning);
       warnBox.exec();
       return;

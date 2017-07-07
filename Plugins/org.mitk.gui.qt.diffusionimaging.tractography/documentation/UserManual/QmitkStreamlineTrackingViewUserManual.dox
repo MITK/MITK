@@ -41,12 +41,12 @@ Interactive tractography enables the dynamic placement of spherical seed regions
 \li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
 \li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 \li Min. Tract Length: Shorter fibers are discarded.
+\li Num. Samples per Step: Only relevant for probabilistic tractography. At each streamline position, the ODF is sampled n times and the direction with the highest probability is used. Increasing this number approximates the result to the deterministic tractography.
 \li f and g values to balance between FACT [1] and TEND [2,3] tracking (only for tensor based tractography). For further information please refer to [2,3]
 \li Flip directions: Internally flips progression directions. This might be necessary depending on the input data.
 \li Neighborhood Samples: Number of neighborhood samples that are used to determine the next fiber progression direction [4].
 \li Compress Fibers: Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
 \li Enable Trilinear Interpolation: By default the image values are interpolated. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
-\li Min-max normalize ODFs: ODFs are min-max normalized before tractography. This results in sharper ODFs.
 \li Output Probability Map: No streamline are generated. Instead, the tractography outputs a probability map that indicates the probability of a fiber to reach a voxel from the selected seed region. For this measure to be sensible, the number of seeds per voxel needs to be rather large. This option does not work during interactive tractography.
 \li Enable Gray Matter Seeding: Seeds are onyl placed inside of the gray matter. Needs tissue label image.
 

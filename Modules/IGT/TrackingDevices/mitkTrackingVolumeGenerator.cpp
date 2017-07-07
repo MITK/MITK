@@ -95,12 +95,19 @@ void mitk::TrackingVolumeGenerator::GenerateData()
   std::vector<mitk::BaseData::Pointer> data = mitk::IOUtil::Load(moduleResource);
 
    if(data.empty())
-     MITK_ERROR << "Exception while reading file:";
+     MITK_ERROR << "Exception while reading file: " << moduleResource.GetResourcePath();
 
    mitk::Surface::Pointer fileoutput = dynamic_cast<mitk::Surface*>(data[0].GetPointer());
 
-   output->SetVtkPolyData(fileoutput->GetVtkPolyData());
-
+   if (fileoutput == nullptr)
+   {
+       MITK_ERROR << "Exception while casting data loaded from file: " << moduleResource.GetResourcePath();
+       output->SetVtkPolyData(vtkSmartPointer<vtkPolyData>(vtkPolyData::New()));
+   } 
+   else
+   {
+       output->SetVtkPolyData(fileoutput->GetVtkPolyData());
+   }
 }
 
 void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)

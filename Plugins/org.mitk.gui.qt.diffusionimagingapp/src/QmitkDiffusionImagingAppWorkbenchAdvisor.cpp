@@ -56,8 +56,7 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
 
   QList<QString> viewExcludeList;
   viewExcludeList.push_back( "org.mitk.views.controlvisualizationpropertiesview" );
-  viewExcludeList.push_back( "org.mitk.views.imagenavigator" );
-//  viewExcludeList.push_back( std::string("org.mitk.views.datamanager") );
+//  viewExcludeList.push_back( "org.mitk.views.imagenavigator" );
   viewExcludeList.push_back( "org.mitk.views.modules" );
   viewExcludeList.push_back( "org.blueberry.ui.internal.introview" );
 
@@ -70,9 +69,9 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   advisor->SetPerspectiveExcludeList(perspExcludeList);
   advisor->SetViewExcludeList(viewExcludeList);
   advisor->ShowViewToolbar(false);
-  advisor->ShowPerspectiveToolbar(false);
-  advisor->ShowVersionInfo(false);
-  advisor->ShowMitkVersionInfo(false);
+  advisor->ShowPerspectiveToolbar(true);
+  advisor->ShowVersionInfo(true);
+  advisor->ShowMitkVersionInfo(true);
   advisor->ShowMemoryIndicator(false);
   advisor->SetProductName("MITK Diffusion");
   advisor->SetWindowIcon(":/org.mitk.gui.qt.diffusionimagingapp/app-icon.png");

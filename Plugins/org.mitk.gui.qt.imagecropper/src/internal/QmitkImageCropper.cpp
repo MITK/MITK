@@ -110,10 +110,9 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnDataSelectionChanged(const mitk::DataNode*)));
   connect(m_Controls.buttonCreateNewBoundingBox, SIGNAL(clicked()), this, SLOT(DoCreateNewBoundingObject()));
   connect(m_Controls.buttonAdvancedSettings, SIGNAL(clicked()), this, SLOT(OnAdvancedSettingsButtonToggled()));
-  connect(m_Controls.spinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
+  connect(m_Controls.spinBoxOutsidePixelValue, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 
-  m_Controls.spinBox->setValue(-1000);
-  m_Controls.spinBox->setEnabled(false);
+  m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
   m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
   m_Controls.buttonCropping->setEnabled(false);
   m_Controls.boundingShapeSelector->setEnabled(false);
@@ -318,13 +317,13 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
           //static_cast<int>image->GetStatistics()->GetScalarValueMinNoRecompute();
           int maxPixelValue = static_cast<int>(image->GetScalarValueMaxNoRecompute());
           //static_cast<int>image->GetStatistics()->GetScalarValueMaxNoRecompute();
-          m_Controls.spinBox->setEnabled(true);
-          m_Controls.spinBox->setMaximum(maxPixelValue);
-          m_Controls.spinBox->setMinimum(minPixelValue);
-          m_Controls.spinBox->setValue(minPixelValue);
+          m_Controls.spinBoxOutsidePixelValue->setEnabled(true);
+          m_Controls.spinBoxOutsidePixelValue->setMaximum(maxPixelValue);
+          m_Controls.spinBoxOutsidePixelValue->setMinimum(minPixelValue);
+          m_Controls.spinBoxOutsidePixelValue->setValue(minPixelValue);
         }
         else
-          m_Controls.spinBox->setEnabled(false);
+          m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
 
         unsigned int dim = image->GetDimension();
         if (dim < 2 || dim > 4)

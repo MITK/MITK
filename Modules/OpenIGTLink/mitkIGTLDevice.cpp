@@ -174,7 +174,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       //      std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
       //                << headerMsg->GetDeviceName() << std::endl;
 
-      //      headerMsg->Print(std::cout);
+      // headerMsg->Print(std::cout);
 
       //check the type of the received message
       //if it is a GET_, STP_ or RTS_ command push it into the command queue
@@ -287,9 +287,7 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(mitk::IGTLMessage::Pointer msg
 
   if (sendSuccess)
   {
-    if(m_LogMessages)
-      MITK_INFO << "Send IGTL message: " << msg->ToString();
-
+    if (m_LogMessages) { MITK_INFO << "Send IGTL message: " << msg->ToString(); }
     this->InvokeEvent(MessageSentEvent());
     return IGTL_STATUS_OK;
   }

@@ -302,6 +302,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
   tdMsg->SetTimeStamp(timestamp);
   //tdMsg->SetDeviceName("MITK OpenIGTLink Connection");
   tdMsg->Pack();
+  tdMsg->SetDeviceName("MITK OpenIGTLink Source");
   output->SetMessage(tdMsg.GetPointer());
 }
 

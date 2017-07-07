@@ -108,27 +108,35 @@ void mitk::BeamformingFilter::GenerateData()
   float inputDim[2] = { input->GetDimension(0), input->GetDimension(1) / ((int)m_Conf.Photoacoustic + 1) };
   // if the photoacoustic option is used, we halve the image, as only the upper part of it contains any information
   float outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
+
+  unsigned short chunkSize = 40; // TODO: make this slightly less random
+
   unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
 
-  unsigned short chunkSize = 40;
-  unsigned int oclOutputDimChunk[3] = { output->GetDimension(0), output->GetDimension(1), chunkSize < input->GetDimension(2) ? chunkSize : input->GetDimension(2) };
-  unsigned int oclInputDimChunk[3] = { input->GetDimension(0), input->GetDimension(1), chunkSize < input->GetDimension(2) ? chunkSize : input->GetDimension(2) };
-  
+  unsigned int oclOutputDimChunk[3] = { output->GetDimension(0), output->GetDimension(1), chunkSize};
+  unsigned int oclInputDimChunk[3] = { input->GetDimension(0), input->GetDimension(1), chunkSize};
+
+  unsigned int oclOutputDimLastChunk[3] = { output->GetDimension(0), output->GetDimension(1), input->GetDimension(2) % chunkSize };
+  unsigned int oclInputDimLastChunk[3] = { input->GetDimension(0), input->GetDimension(1), input->GetDimension(2) % chunkSize };
 
   const int apodArraySize = m_Conf.TransducerElements * 4; // set the resolution of the apodization array
   float* ApodWindow;
+
   // calculate the appropiate apodization window
-  if (m_Conf.Apod == beamformingSettings::Apodization::Hann)
+  switch (m_Conf.Apod)
   {
+  case beamformingSettings::Apodization::Hann:
     ApodWindow = VonHannFunction(apodArraySize);
-  }
-  else if (m_Conf.Apod == beamformingSettings::Apodization::Hamm)
-  {
+    break;
+  case beamformingSettings::Apodization::Hamm:
     ApodWindow = HammFunction(apodArraySize);
-  }
-  else
-  {
+    break;
+  case beamformingSettings::Apodization::Box:
     ApodWindow = BoxFunction(apodArraySize);
+    break;
+  default:
+    ApodWindow = BoxFunction(apodArraySize);
+    break;
   }
 
   int progInterval = output->GetDimension(2) / 20 > 1 ? output->GetDimension(2) / 20 : 1;
@@ -221,9 +229,6 @@ void mitk::BeamformingFilter::GenerateData()
   else
   {
     mitk::PhotoacousticOCLBeamformer::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformer::New();
-    us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
-    OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-    resources->GetContext();
 
     try
     {
@@ -244,25 +249,48 @@ void mitk::BeamformingFilter::GenerateData()
       m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
       m_oclFilter->SetOutputDim(oclOutputDimChunk);
       m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.RecordTime, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
-
-      for (int i = 0; i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
+      
+      if (chunkSize < oclOutputDim[2])
       {
-        mitk::Image::Pointer chunk = mitk::Image::New();
-        chunk->Initialize(input->GetPixelType(), 3, oclInputDimChunk);
-        chunk->SetSpacing(input->GetGeometry()->GetSpacing());
+        for (int i = 0; i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
+        {
+          m_ProgressHandle(100 * ((i * chunkSize) / oclOutputDim[2]), "beamforming");
+          mitk::Image::Pointer chunk = mitk::Image::New();
+          if ((oclOutputDim[2]) - (i * chunkSize) >= chunkSize)
+            chunk->Initialize(input->GetPixelType(), 3, oclInputDimChunk);
+          else
+          {
+            chunk->Initialize(input->GetPixelType(), 3, oclInputDimLastChunk);
+            m_oclFilter->SetOutputDim(oclOutputDimLastChunk);
+          }
 
-        mitk::ImageReadAccessor ChunkMove(input);
-        chunk->SetImportVolume((void*)&(((float*)const_cast<void*>(ChunkMove.GetData()))[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)]), 0, 0, mitk::Image::ReferenceMemory);
-        
-        m_oclFilter->SetInput(chunk);
+          chunk->SetSpacing(input->GetGeometry()->GetSpacing());
+
+          mitk::ImageReadAccessor ChunkMove(input);
+          chunk->SetImportVolume((void*)&(((float*)const_cast<void*>(ChunkMove.GetData()))[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)]), 0, 0, mitk::Image::ReferenceMemory);
+
+          m_oclFilter->SetInput(chunk);
+          m_oclFilter->Update();
+
+          auto out = m_oclFilter->GetOutput();
+          for (int s = i * chunkSize; s < oclOutputDim[2]; ++s)
+          {
+            mitk::ImageReadAccessor copy(out, out->GetSliceData(s - i * chunkSize));
+            output->SetImportSlice(const_cast<void*>(copy.GetData()), s, 0, 0, mitk::Image::ReferenceMemory);
+          }
+        }
+      }
+      else
+      {
+        m_ProgressHandle(50, "beamforming");
+
+        m_oclFilter->SetOutputDim(oclOutputDim);
+        m_oclFilter->SetInput(input);
         m_oclFilter->Update();
 
         auto out = m_oclFilter->GetOutput();
-        for (int s = i * chunkSize; s < oclOutputDim[2]; ++s)
-        {
-          mitk::ImageReadAccessor copy(out, out->GetSliceData(s - i * chunkSize));
-          output->SetImportSlice(const_cast<void*>(copy.GetData()), s, 0, 0, mitk::Image::ReferenceMemory);
-        }
+        mitk::ImageReadAccessor copy(out);
+        output->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ReferenceMemory);
       }
     }
     catch (mitk::Exception &e)
@@ -280,7 +308,7 @@ void mitk::BeamformingFilter::GenerateData()
     mitk::Image::Pointer BP = BandpassFilter(output);
 
     mitk::ImageReadAccessor copy(BP);
-    output->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ReferenceMemory);
+    output->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ManageMemory);
   }
 
   m_TimeOfHeaderInitialization.Modified();

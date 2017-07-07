@@ -312,18 +312,25 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
 
         if (image->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
         {
-          // Might be changed with the upcoming new image statistics plugin
-          int minPixelValue = static_cast<int>(image->GetScalarValueMinNoRecompute());
-          //static_cast<int>image->GetStatistics()->GetScalarValueMinNoRecompute();
-          int maxPixelValue = static_cast<int>(image->GetScalarValueMaxNoRecompute());
-          //static_cast<int>image->GetStatistics()->GetScalarValueMaxNoRecompute();
-          m_Controls.spinBoxOutsidePixelValue->setEnabled(true);
-          m_Controls.spinBoxOutsidePixelValue->setMaximum(maxPixelValue);
-          m_Controls.spinBoxOutsidePixelValue->setMinimum(minPixelValue);
-          m_Controls.spinBoxOutsidePixelValue->setValue(minPixelValue);
+            // Might be changed with the upcoming new image statistics plugin
+            //(recomputation might be very expensive for large images ;) )
+            auto minPixelValue = image->GetScalarValueMin();
+            auto maxPixelValue = image->GetScalarValueMax();
+
+            if (minPixelValue < std::numeric_limits<int>::min()) {
+                minPixelValue = std::numeric_limits<int>::min();
+            }
+            if (maxPixelValue > std::numeric_limits<int>::max()) {
+                maxPixelValue = std::numeric_limits<int>::max();
+            }
+
+            m_Controls.spinBoxOutsidePixelValue->setEnabled(true);
+            m_Controls.spinBoxOutsidePixelValue->setMaximum(static_cast<int>(maxPixelValue));
+            m_Controls.spinBoxOutsidePixelValue->setMinimum(static_cast<int>(minPixelValue));
+            m_Controls.spinBoxOutsidePixelValue->setValue(static_cast<int>(minPixelValue));
         }
         else
-          m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
+            m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
 
         unsigned int dim = image->GetDimension();
         if (dim < 2 || dim > 4)

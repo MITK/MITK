@@ -7,6 +7,7 @@ if(MITK_USE_Caffe2 AND MITK_USE_Caffe)
     INCLUDE_DIRS include/ src/
     DEPENDS ${_module_deps}
     PACKAGE_DEPENDS PUBLIC OpenCV Caffe Caffe2
+    WARNINGS_AS_ERRORS
   )
 
   if(MODULE_IS_ENABLED)

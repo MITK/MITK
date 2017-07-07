@@ -21,6 +21,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkToFHardware
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
   AUTOLOAD_WITH MitkToFHardware
+  WARNINGS_AS_ERRORS
 )
   Message("MESASR4000 Module generated")
   add_subdirectory(Testing)

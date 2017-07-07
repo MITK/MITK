@@ -6,6 +6,7 @@ if(MITK_USE_OpenCL)
     PACKAGE_DEPENDS
       PUBLIC OpenCL
       PRIVATE ITK|ITKThresholding
+    WARNINGS_AS_ERRORS
   )
 
   add_subdirectory(Testing)

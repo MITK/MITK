@@ -20,7 +20,6 @@ set(mitk_modules
   PlanarFigure
   ImageDenoising
   ImageExtraction
-  LegacyAdaptors
   SceneSerialization
   Gizmo
   GraphAlgorithms

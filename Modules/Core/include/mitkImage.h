@@ -247,6 +247,8 @@ namespace mitk
                                  int n = 0,
                                  ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
+    virtual bool SetImportVolume(const void *const_data, int t = 0, int n = 0);
+
     //##Documentation
     //## @brief Set @a data in channel @a n. It is in
     //## the responsibility of the caller to ensure that the data vector @a data

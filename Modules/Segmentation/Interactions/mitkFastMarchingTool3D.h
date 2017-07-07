@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataNode.h"
-#include "mitkLegacyAdaptors.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetDataInteractor.h"
 #include "mitkToolCommand.h"

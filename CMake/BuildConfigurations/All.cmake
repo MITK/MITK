@@ -31,6 +31,7 @@ set(_package_excludes
   SOFA_PLUGINS_DIR
   SUPERBUILD
   BiophotonicsHardware_SpectroCam
+  POLHEMUS_TRACKER
 
   KWSTYLE
   MICROBIRD_TRACKER

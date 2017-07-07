@@ -140,21 +140,37 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverTo
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     m_IGTLDeviceSource->Update();
-    igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
-    if (msg == nullptr || msg.IsNull())
+    switch (type)
     {
-      MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
-      continue;
-    }
-
-    int count = toolNameMap[msg->GetDeviceName()];
-    if (count == 0)
-    {
-      toolNameMap[msg->GetDeviceName()] = 1;
-    }
-    else
-    {
-      toolNameMap[msg->GetDeviceName()]++;
+    case TRANSFORM:
+      {
+      igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+      if (msg == nullptr || msg.IsNull()) { MITK_INFO << "Received message is invalid / null. Skipping.."; continue; }
+      int count = toolNameMap[msg->GetDeviceName()];
+      if (count == 0) { toolNameMap[msg->GetDeviceName()] = 1; }
+      else { toolNameMap[msg->GetDeviceName()]++; }
+      }
+      break;
+    case TDATA:
+      {
+      igtl::TrackingDataMessage::Pointer msg = dynamic_cast<igtl::TrackingDataMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+      if (msg == nullptr || msg.IsNull()) { MITK_INFO << "Received message is invalid / null. Skipping.."; continue; }
+      for (int k = 0; k < msg->GetNumberOfTrackingDataElements(); k++)
+        {
+        igtl::TrackingDataElement::Pointer tde;
+        msg->GetTrackingDataElement(k, tde);
+        if (tde.IsNotNull())
+          {
+          int count = toolNameMap[tde->GetName()];
+          if (count == 0) { toolNameMap[tde->GetName()] = 1; }
+          else { toolNameMap[tde->GetName()]++; }
+          }
+        }
+      }
+      break;
+    default:
+      MITK_WARN << "Only TRANSFORM and TDATA is currently supported, skipping!";
+      break;
     }
   }
 

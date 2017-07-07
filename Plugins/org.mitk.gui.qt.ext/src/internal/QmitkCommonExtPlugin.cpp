@@ -53,8 +53,8 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConfigPreferencePage, context)
   ///Autoplan doesn't support those preferences
-  //BERRY_REGISTER_EXTENSION_CLASS(QmitkAboutHandler, context)
   //BERRY_REGISTER_EXTENSION_CLASS(QmitkAppInstancesPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAboutHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExternalProgramsPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkInputDevicesPrefPage, context)
 

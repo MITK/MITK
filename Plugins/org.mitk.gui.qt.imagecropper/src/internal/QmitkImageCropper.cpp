@@ -240,6 +240,17 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   //mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+void QmitkImageCropper::setDefaultGUI()
+{
+	m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+	m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
+	m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+	m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
+	m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
+	m_Controls.buttonCropping->setEnabled(false);
+	m_Controls.buttonMasking->setEnabled(false);
+	m_Controls.labelWarningRotation->setVisible(false);
+}
 
 void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
   const QList<mitk::DataNode::Pointer>& nodes)
@@ -247,14 +258,7 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
   bool rotationEnabled = false;
   if (nodes.empty())
   {
-    m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-    m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
-    m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-    m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
-    m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
-    m_Controls.buttonCropping->setEnabled(false);
-    m_Controls.buttonMasking->setEnabled(false);
-    m_Controls.labelWarningRotation->setVisible(false);
+	  setDefaultGUI();
     return;
   }
   m_ParentWidget->setEnabled(true);
@@ -272,6 +276,15 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
       if (image != nullptr)
       {
+		  if (image->GetDimension() < 3) {
+			  QMessageBox::warning(nullptr,
+				  tr("Invalid image selected"),
+				  tr("ImageCropper only works with 3 or more dimensions."),
+				  QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+			  setDefaultGUI();
+			  return;
+		  }
+
         vtkSmartPointer<vtkMatrix4x4> imageMat = image->GetGeometry()->GetVtkMatrix();
         // check whether the image geometry is rotated, if so, no pixel aligned cropping or masking can be performed
         if ((imageMat->GetElement(1, 0) == 0.0) && (imageMat->GetElement(0, 1) == 0.0) &&

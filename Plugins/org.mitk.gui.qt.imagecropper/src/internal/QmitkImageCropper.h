@@ -127,9 +127,12 @@ protected:
   */
   mitk::Geometry3D::Pointer InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry);
 
+ 
+
   void CreateBoundingShapeInteractor(bool rotationEnabled);
 
 private:
+
   /*!
   * The parent QWidget
   */
@@ -154,6 +157,11 @@ private:
   mitk::BoundingShapeInteractor::Pointer m_BoundingShapeInteractor;
 
   void ProcessImage(bool crop);
+
+  /*!
+  * @brief Resets GUI to default  
+  */
+  void setDefaultGUI();
 
   // cropping parameter
   mitk::ScalarType m_CropOutsideValue;

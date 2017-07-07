@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTLClient.h>
 #include <mitkIGTLDeviceSource.h>
 #include <mitkIGTL2DImageDeviceSource.h>
-#include <mitkIGTLTransformDeviceSource.h>
+#include <mitkIGTLTrackingDataDeviceSource.h>
 #include <mitkIGTLMessageToUSImageFilter.h>
 
 namespace mitk
@@ -61,7 +61,7 @@ namespace mitk
     int m_Port;
     mitk::IGTLDevice::Pointer m_Device;
     mitk::IGTL2DImageDeviceSource::Pointer m_DeviceSource;
-    mitk::IGTLTransformDeviceSource::Pointer m_TransformDeviceSource;
+    mitk::IGTLTrackingDataDeviceSource::Pointer m_TransformDeviceSource;
     mitk::IGTLMessageToUSImageFilter::Pointer m_Filter;
   };
 }  // namespace mitk

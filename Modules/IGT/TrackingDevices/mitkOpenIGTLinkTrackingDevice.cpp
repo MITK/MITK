@@ -42,7 +42,7 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDev
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
   m_OpenIGTLinkClient->EnableNoBufferingMode(false);
 
-  m_IGTLDeviceSource = mitk::IGTLTransformDeviceSource::New();
+  m_IGTLDeviceSource = mitk::IGTLTrackingDataDeviceSource::New();
   m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
 }
 
@@ -83,6 +83,7 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
   }
 
   //get a message to find out type
+  m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::UNKNOWN);
   mitk::IGTLMessage::Pointer receivedMessage = ReceiveMessage(100);
 
   const char* msgType = receivedMessage->GetIGTLMessageType();
@@ -94,9 +95,23 @@ mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetect
     receivedMessage = ReceiveMessage(10000);
     msgType = receivedMessage->GetIGTLMessageType();
   }
-
+  MITK_INFO << "################# got message type: " << msgType;
   mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
-
+  switch (type)
+  {
+  case UNKNOWN:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::UNKNOWN);
+    break;
+  case TDATA:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::TDATA);
+    break;
+  case QTDATA:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::QTDATA);
+    break;
+  case TRANSFORM:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::TRANSFORM);
+    break;
+  }
   returnValue = DiscoverToolsAndConvertToNavigationTools(type);
 
   //close connection

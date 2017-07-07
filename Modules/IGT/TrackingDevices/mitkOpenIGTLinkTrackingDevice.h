@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlQuaternionTrackingDataMessage.h>
 #include <igtlTrackingDataMessage.h>
 #include <igtlTransformMessage.h>
-#include "mitkIGTLTransformDeviceSource.h"
+#include "mitkIGTLTrackingDataDeviceSource.h"
 
 namespace mitk
 {
@@ -41,11 +41,11 @@ namespace mitk
   {
   public:
     mitkClassMacro(OpenIGTLinkTrackingDevice, TrackingDevice);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      /** Sets the port number for the Open IGT Link connection. Default value is -1 (invalid). */
-      void SetPortNumber(int portNumber);
+    /** Sets the port number for the Open IGT Link connection. Default value is -1 (invalid). */
+    void SetPortNumber(int portNumber);
 
     /** Sets the hostname for the Open IGT Link connection. Default value is 127.0.0.1 (localhost). */
     void SetHostname(std::string hostname);
@@ -152,7 +152,7 @@ namespace mitk
     mitk::IGTLClient::Pointer m_OpenIGTLinkClient;
 
     //OpenIGTLink pipeline
-    mitk::IGTLTransformDeviceSource::Pointer m_IGTLDeviceSource;
+    mitk::IGTLTrackingDataDeviceSource::Pointer m_IGTLDeviceSource;
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
     std::vector<OpenIGTLinkTrackingTool::Pointer> m_AllTools; ///< vector holding all tools

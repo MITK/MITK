@@ -113,6 +113,7 @@ public:
   void SetSeedPoints(std::vector< itk::Point<float> > seedPoints) ///< Use manually defined points in physical space as seed points instead of seed image
   {
     m_SeedPoints = seedPoints;
+    this->Modified();
   }
 
   void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<

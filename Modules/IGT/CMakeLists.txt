@@ -23,7 +23,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
   PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml OpenIGTLink
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
-  #WARNINGS_AS_ERRORS disabled for release 2014-03 because of bug 17463
+  WARNINGS_AS_ERRORS
 )
 
 if(MitkIGT_IS_ENABLED)

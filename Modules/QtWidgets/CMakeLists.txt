@@ -4,6 +4,7 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKIOImageBase VTK|vtkGUISupportQt+vtkGUISupportQtOpenGL Qt5|Widgets+OpenGL+Core
   SUBPROJECTS MITK-CoreUI
+  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(test)

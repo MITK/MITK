@@ -3,6 +3,7 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
     PUBLIC tinyxml
     PRIVATE ITK|ITKIOImageBase+ITKIOGDCM DCMTK Poco
+  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(autoload/IO)

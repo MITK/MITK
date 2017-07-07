@@ -590,6 +590,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
 
   if(className == "QmitkCreatePolygonModelAction")
   {
+
     if(smoothed == "false")
     {
       contextMenuAction->SetSmoothed(false);

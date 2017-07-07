@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageCommon.h"
 
 mitk::IGTLMessage::IGTLMessage() : itk::DataObject(),
-m_DataValid(false), m_IGTTimeStamp(0.0), m_Name()
+  m_DataValid(false), m_IGTTimeStamp(0), m_Name()
 {
   m_Message = igtl::MessageBase::New();
 }
@@ -37,11 +37,10 @@ mitk::IGTLMessage::~IGTLMessage()
 {
 }
 
-mitk::IGTLMessage::IGTLMessage(igtl::MessageBase::Pointer message,
-                               std::string name)
+mitk::IGTLMessage::IGTLMessage(igtl::MessageBase::Pointer message)
 {
   this->SetMessage(message);
-  this->SetName(name);
+  this->SetName(message->GetDeviceName());
 }
 
 void mitk::IGTLMessage::Graft( const DataObject *data )
@@ -55,16 +54,16 @@ void mitk::IGTLMessage::Graft( const DataObject *data )
   catch( ... )
   {
     itkExceptionMacro( << "mitk::IGTLMessage::Graft cannot cast "
-      << typeid(data).name() << " to "
-      << typeid(const Self *).name() );
+                       << typeid(data).name() << " to "
+                       << typeid(const Self *).name() );
     return;
   }
   if (!msg)
   {
     // pointer could not be cast back down
     itkExceptionMacro( << "mitk::IGTLMessage::Graft cannot cast "
-      << typeid(data).name() << " to "
-      << typeid(const Self *).name() );
+                       << typeid(data).name() << " to "
+                       << typeid(const Self *).name() );
     return;
   }
   // Now copy anything that is needed
@@ -79,8 +78,10 @@ void mitk::IGTLMessage::SetMessage(igtl::MessageBase::Pointer msg)
   m_Message = msg;
   unsigned int ts = 0;
   unsigned int frac = 0;
-  m_Message->GetTimeStamp(&ts, &frac);
-  this->SetIGTTimeStamp((double)ts + (double)frac/1000.0);
+  m_Message->GetTimeStamp(&ts, &frac); //ts = seconds / frac = nanoseconds
+  this->SetName(m_Message->GetDeviceName());
+  double timestamp = ts * 1000.0 + frac;
+  this->SetIGTTimeStamp(timestamp);
   this->SetDataValid(true);
 }
 
@@ -100,6 +101,16 @@ void mitk::IGTLMessage::PrintSelf(std::ostream& os, itk::Indent indent) const
   m_Message->Print(os);
 }
 
+std::string mitk::IGTLMessage::ToString() const
+{
+  std::stringstream output;
+  output << "name: " << this->GetName() << std::endl <<
+      "MessageType: "     << this->GetIGTLMessageType() << std::endl <<
+      "TimeStamp: "      << this->GetIGTTimeStamp() << std::endl <<
+      "OpenIGTLinkMessage: " << std::endl;
+  return output.str();
+}
+
 
 void mitk::IGTLMessage::CopyInformation( const DataObject* data )
 {
@@ -114,15 +125,15 @@ void mitk::IGTLMessage::CopyInformation( const DataObject* data )
   {
     // data could not be cast back down
     itkExceptionMacro(<< "mitk::IGTLMessage::CopyInformation() cannot cast "
-      << typeid(data).name() << " to "
-      << typeid(Self*).name() );
+                      << typeid(data).name() << " to "
+                      << typeid(Self*).name() );
   }
   if ( !nd )
   {
     // pointer could not be cast back down
     itkExceptionMacro(<< "mitk::IGTLMessage::CopyInformation() cannot cast "
-      << typeid(data).name() << " to "
-      << typeid(Self*).name() );
+                      << typeid(data).name() << " to "
+                      << typeid(Self*).name() );
   }
   /* copy all meta data */
 }
@@ -139,7 +150,7 @@ bool mitk::Equal(const mitk::IGTLMessage& leftHandSide,
     {
       MITK_INFO << "[( IGTLMessage )] Name differs.";
       MITK_INFO << "leftHandSide is " << leftHandSide.GetName()
-       << "rightHandSide is " << rightHandSide.GetName();
+                << "rightHandSide is " << rightHandSide.GetName();
     }
     returnValue = false;
   }
@@ -150,7 +161,7 @@ bool mitk::Equal(const mitk::IGTLMessage& leftHandSide,
     {
       MITK_INFO << "[( IGTLMessage )] IGTTimeStamp differs.";
       MITK_INFO << "leftHandSide is " << leftHandSide.GetIGTTimeStamp()
-       << "rightHandSide is " << rightHandSide.GetIGTTimeStamp();
+                << "rightHandSide is " << rightHandSide.GetIGTTimeStamp();
     }
     returnValue = false;
   }

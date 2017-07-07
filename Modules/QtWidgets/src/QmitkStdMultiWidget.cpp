@@ -1213,9 +1213,14 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
   this->UpdateAllWidgets();
 }
 
-void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
+void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown(unsigned int id2Dwindow)
 {
   SMW_INFO << "changing layout to 2D up and 3D down" << std::endl;
+  if (id2Dwindow < 1 || id2Dwindow > 3)
+  {
+    MITK_WARN << "Only 2D render window IDs 1,2 or 3 are valid. Got ID " << id2Dwindow << ". " << "Using default ID 2 instead.";
+    id2Dwindow = 2;
+  }
 
   // Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -1244,7 +1249,18 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   m_SubSplit2 = new QSplitter(m_LayoutSplit);
 
   // insert Widget Container into splitter top
-  m_SubSplit1->addWidget(mitkWidget1Container);
+  switch (id2Dwindow)
+  {
+  case 1:
+    m_SubSplit1->addWidget(mitkWidget1Container);
+    break;
+  case 2:
+    m_SubSplit1->addWidget(mitkWidget2Container);
+    break;
+  case 3:
+    m_SubSplit1->addWidget(mitkWidget3Container);
+    break;
+  }
 
   // set SplitterSize for splitter top
   QList<int> splitterSize;
@@ -1260,10 +1276,29 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   m_MainSplit->show();
 
   // show/hide Widgets
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  mitkWidget2->hide();
-  mitkWidget3->hide();
+  switch (id2Dwindow)
+  {
+  case 1:
+    if (mitkWidget1->isHidden())
+      mitkWidget1->show();
+    mitkWidget2->hide();
+    mitkWidget3->hide();
+    break;
+  case 2:
+    if (mitkWidget2->isHidden())
+      mitkWidget2->show();
+    mitkWidget1->hide();
+    mitkWidget3->hide();
+    break;
+  case 3:
+    if (mitkWidget3->isHidden())
+      mitkWidget3->show();
+    mitkWidget1->hide();
+    mitkWidget2->hide();
+    break;
+  }
+
+  //always show 3D widget
   if (mitkWidget4->isHidden())
     mitkWidget4->show();
 

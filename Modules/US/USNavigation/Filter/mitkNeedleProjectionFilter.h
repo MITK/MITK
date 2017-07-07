@@ -55,6 +55,7 @@ namespace mitk {
     itkGetMacro(TargetPlane, mitk::AffineTransform3D::Pointer);
     itkSetMacro(TargetPlane, mitk::AffineTransform3D::Pointer);
     itkGetMacro(Projection,  mitk::PointSet::Pointer);
+    void SetToolAxisForFilter(mitk::Point3D point);
 
   protected:
     NeedleProjectionFilter();

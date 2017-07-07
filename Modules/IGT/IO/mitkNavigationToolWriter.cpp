@@ -116,7 +116,14 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Surface
-    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=nullptr) thisTool->SetData(Tool->GetDataNode()->GetData());
+    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData() != NULL)
+    {
+      thisTool->SetData(Tool->GetDataNode()->GetData());
+  //Visibility
+      bool visible = true;
+      Tool->GetDataNode()->GetVisibility(visible, NULL);
+      thisTool->SetVisibility(visible);
+    }
 
   //Tool Landmarks
     thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolRegistrationLandmarks())));
@@ -128,6 +135,9 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
       thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())));
       thisTool->AddProperty("ToolTipOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolTipOrientation())));
     }
+
+    //Tool Axis
+    thisTool->AddProperty("ToolAxis", mitk::StringProperty::New(ConvertPointToString(Tool->GetToolAxis())));
 
   //Material is not needed, to avoid errors in scene serialization we have to do this:
     thisTool->ReplaceProperty("material",nullptr);

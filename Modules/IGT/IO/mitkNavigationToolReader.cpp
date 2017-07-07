@@ -84,6 +84,9 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(node->GetName());
   newNode->SetData(node->GetData());
+  bool visible = true;
+  node->GetVisibility(visible, NULL);
+  newNode->SetVisibility(visible);
   returnValue->SetDataNode(newNode);
 
   //Identifier
@@ -184,6 +187,11 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   {
     MITK_WARN << "Tooltip definition incomplete: position and orientation have to be set! Skipping tooltip definition.";
   }
+
+  //Tool Axis
+  std::string ToolAxisString;
+  node->GetStringProperty("ToolAxis", ToolAxisString);
+  returnValue->SetToolAxis(ConvertStringToPoint(ToolAxisString));
 
   return returnValue;
 }

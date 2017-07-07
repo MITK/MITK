@@ -98,7 +98,7 @@ void mitk::IGTLMessageProvider::GenerateData()
 
   for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
   {
-    const IGTLMessage* msg = this->GetInput(index);
+    mitk::IGTLMessage::Pointer msg = const_cast<mitk::IGTLMessage*>(this->GetInput(index));
     if (msg == nullptr)
     {
        continue;
@@ -109,13 +109,7 @@ void mitk::IGTLMessageProvider::GenerateData()
       continue;
     }
 
-    igtl::MessageBase::Pointer igtlMsg = msg->GetMessage();
-
-    if ( igtlMsg.IsNotNull() )
-    {
-      //send the message
-      this->m_IGTLDevice->SendMessage(igtlMsg);
-    }
+    this->m_IGTLDevice->SendMessage(msg);
   }
 }
 
@@ -210,10 +204,9 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
       mitk::IGTLMessage::Pointer sourceOutput = source->GetOutput();
       if (sourceOutput.IsNotNull() && sourceOutput->IsDataValid())
       {
-        igtl::MessageBase::Pointer sourceMsg = sourceOutput->GetMessage();
         if ( source.IsNotNull() )
         {
-          this->GetIGTLDevice()->SendMessage(sourceMsg);
+          this->GetIGTLDevice()->SendMessage(sourceOutput);
         }
       }
     }
@@ -358,10 +351,13 @@ mitk::IGTLMessageSource::Pointer mitk::IGTLMessageProvider::GetFittingSource(con
   return nullptr;
 }
 
-void mitk::IGTLMessageProvider::Send(const mitk::IGTLMessage* msg)
+void mitk::IGTLMessageProvider::Send(mitk::IGTLMessage::Pointer msg)
 {
   if (msg != nullptr)
+  {
+    MITK_INFO << "Sending OpenIGTLink Message: " << msg->ToString();
     this->m_IGTLDevice->SendMessage(msg);
+  }
 }
 
 void

@@ -175,7 +175,11 @@ public slots:
 
   void changeLayoutToLeft2Dand3DRight2D();
 
-  void changeLayoutTo2DUpAnd3DDown();
+  /** Changes the layout to one 2D window up and a 3D window down.
+   *  The 2D window can be defined by its id (1-3). If MITK default
+   *  settings were not changed, 1 is axial, 2 is sagittal and 3 is coronal.
+   */
+  void changeLayoutTo2DUpAnd3DDown(unsigned int id2Dwindow = 2);
 
   void Fit();
 

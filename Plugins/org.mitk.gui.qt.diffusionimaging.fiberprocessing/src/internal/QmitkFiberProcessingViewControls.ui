@@ -17,15 +17,15 @@
    <item row="1" column="0">
     <widget class="QToolBox" name="toolBoxx">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>355</width>
-        <height>363</height>
+        <width>354</width>
+        <height>347</height>
        </rect>
       </property>
       <attribute name="label">
@@ -481,8 +481,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>355</width>
-        <height>380</height>
+        <width>354</width>
+        <height>342</height>
        </rect>
       </property>
       <attribute name="label">
@@ -869,8 +869,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>280</width>
-        <height>349</height>
+        <width>368</width>
+        <height>309</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1065,12 +1065,17 @@
          </item>
          <item>
           <property name="text">
-           <string>Weight Bundle</string>
+           <string>Weight bundle</string>
           </property>
          </item>
          <item>
           <property name="text">
            <string>Color fibers by curvature</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Color fibers by fiber weights</string>
           </property>
          </item>
         </widget>
@@ -1225,8 +1230,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>360</width>
-        <height>104</height>
+        <width>368</width>
+        <height>152</height>
        </rect>
       </property>
       <attribute name="label">

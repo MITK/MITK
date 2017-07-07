@@ -19,7 +19,7 @@ set(BUILD_DiffusionMiscCmdApps OFF CACHE BOOL "Build miscellaneous commandline t
 set(BUILD_DiffusionQuantificationCmdApps OFF CACHE BOOL "Build commandline tools for diffusion quantification (IVIM, ADC, ...)" FORCE)
 set(BUILD_DiffusionTractographyCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber tractography" FORCE)
 set(BUILD_DiffusionTractographyEvaluationCmdApps OFF CACHE BOOL "Build commandline tools for diffusion fiber tractography evaluation" FORCE)
-set(BUILD_DiffusionConnectomicsCmdApps OFF CACHE BOOL "Build commandline tools for diffusion connectomics" FORCE)
+set(BUILD_DiffusionConnectomicsCmdApps ON CACHE BOOL "Build commandline tools for diffusion connectomics" FORCE)
 
 # Build neither all plugins nor examples
 set(MITK_BUILD_ALL_PLUGINS OFF CACHE BOOL "Build all MITK plugins" FORCE)
@@ -67,6 +67,7 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging.preprocessing
   org.mitk.gui.qt.diffusionimaging.reconstruction
   org.mitk.gui.qt.diffusionimaging.tractography
+  org.mitk.gui.qt.diffusionimaging.connectomics
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing

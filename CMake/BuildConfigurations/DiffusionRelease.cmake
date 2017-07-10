@@ -30,8 +30,10 @@ set(BUILD_TESTING OFF CACHE BOOL "Build the MITK tests" FORCE)
 set(MITK_DOXYGEN_GENERATE_QCH_FILES ON CACHE BOOL "Use doxygen to generate Qt compressed help files for MITK docs" FORCE)
 set(BLUEBERRY_USE_QT_HELP ON CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
 
-# Disable console window
+# Enable console window
 set(MITK_SHOW_CONSOLE_WINDOW ON CACHE BOOL "Use this to enable or disable the console window when starting MITK GUI Applications" FORCE)
+
+set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
 
 # Activate required plugins
 # should be identical to the list in /Applications/Diffusion/CMakeLists.txt

@@ -52,9 +52,8 @@ class PAImageProcessing : public QmitkAbstractView
     void UseLogfilter();
     void SetResampling();
     void UseImageSpacing();
-    void UpdateFrequency();
+    void UpdateImageInfo();
     void UpdateRecordTime(mitk::Image::Pointer image);
-    void UseBandpass();
 
     void HandleBeamformingResults(mitk::Image::Pointer image);
     void StartBeamformingThread();
@@ -161,7 +160,7 @@ signals:
   void result(mitk::Image::Pointer);
 
 public:
-  void setConfig(float BPHighPass, float BPLowPass, unsigned int butterworthOrder, float recordTime);
+  void setConfig(float BPHighPass, float BPLowPass, float TukeyAlpha, float recordTime);
   void setInputImage(mitk::Image::Pointer image);
 
 protected:
@@ -169,7 +168,7 @@ protected:
 
   float m_BPHighPass;
   float m_BPLowPass;
-  unsigned int m_ButterworthOrder;
+  float m_TukeyAlpha;
   float m_RecordTime;
 };
 

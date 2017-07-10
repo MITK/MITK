@@ -43,7 +43,7 @@ namespace mitk {
       float RecordTime = 0.00006; // [s]
       unsigned int TransducerElements = 128;
       bool partial = false;
-      unsigned int bounds[2] = { 0,0 };
+      unsigned int CropBounds[2] = { 0,0 };
 
       bool UseGPU = true;
 

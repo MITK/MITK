@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "mitkPhotoacousticImage.h"
 #include "itkBModeImageFilter.h"
 #include "itkPhotoacousticBModeImageFilter.h"
@@ -22,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPhotoacousticBeamformingFilter.h"
 #include <chrono>
 #include <mitkAutoCropImageFilter.h>
+
 
 
 // itk dependencies
@@ -243,11 +246,11 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
   progressHandle(0, "cropping image");
   if (!config.partial)
   {
-    config.bounds[0] = 0;
-    config.bounds[1] = inputImage->GetDimension(2) - 1;
+    config.CropBounds[0] = 0;
+    config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
 
-  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.bounds[0], config.bounds[1]);
+  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
 
   // resample the image in horizontal direction
   if (inputImage->GetDimension(0) != config.ReconstructionLines)
@@ -282,7 +285,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
   return processedImage;
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, unsigned int butterworthOrder)
+mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha)
 {
   // do a fourier transform, multiply with an appropriate window for the filter, and transform back
   typedef float PixelType;
@@ -308,30 +311,12 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
   }
 
   float singleVoxel = 1 / (recordTime / data->GetDimension(1)) / 2 / 1000;
-  float BoundHighPass = std::min(BPHighPass / singleVoxel, (float)data->GetDimension(1) / 2);
-  float BoundLowPass = std::min(BPLowPass / singleVoxel, (float)data->GetDimension(1) / 2 - BoundHighPass);
+  float cutoffPixelHighPass = std::min(BPHighPass / singleVoxel, (float)data->GetDimension(1) / 2);
+  float cutoffPixelLowPass = std::min(BPLowPass / singleVoxel, (float)data->GetDimension(1) / 2 - cutoffPixelHighPass);
 
-  int center1 = ((-BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundLowPass;
-  int center2 = ((-BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundHighPass + data->GetDimension(1) / 2;
+  MITK_INFO << "LowPass " << cutoffPixelLowPass << "HighPass " << cutoffPixelHighPass;
 
-  int width1 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
-  int width2 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
-
-  /*MITK_INFO << "BHP " << BoundHighPass << " BLP " << BoundLowPass << "BPLP" << m_Conf.BPLowPass;
-  MITK_INFO << "center1 " << center1 << " width1 " << width1;
-  MITK_INFO << "center2 " << center2 << " width2 " << width2;*/ //DEBUG
-
-  RealImageType::Pointer fftMultiplicator1 = BPFunction(data, width1, center1, butterworthOrder);
-  RealImageType::Pointer fftMultiplicator2 = BPFunction(data, width2, center2, butterworthOrder);
-
-  typedef itk::AddImageFilter<RealImageType, RealImageType> AddImageFilterType;
-  AddImageFilterType::Pointer addImageFilter = AddImageFilterType::New();
-  addImageFilter->SetInput1(fftMultiplicator1);
-  addImageFilter->SetInput2(fftMultiplicator2);
-
-  typedef itk::FFTShiftImageFilter< RealImageType, RealImageType > FFTShiftFilterType;
-  FFTShiftFilterType::Pointer fftShiftFilter = FFTShiftFilterType::New();
-  fftShiftFilter->SetInput(addImageFilter->GetOutput());
+  RealImageType::Pointer fftMultiplicator = BPFunction(data, cutoffPixelHighPass, cutoffPixelLowPass, alpha);
 
   typedef itk::MultiplyImageFilter< ComplexImageType,
     RealImageType,
@@ -339,11 +324,12 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
     MultiplyFilterType;
   MultiplyFilterType::Pointer multiplyFilter = MultiplyFilterType::New();
   multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
-  multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
+  multiplyFilter->SetInput2(fftMultiplicator);
 
   /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
-  toReal->SetInput(multiplyFilter->GetOutput());
-  return GrabItkImageMemory(addImageFilter->GetOutput());*/  //DEBUG
+  toReal->SetInput(forwardFFTFilter->GetOutput());
+  //return GrabItkImageMemory(toReal->GetOutput());
+  return GrabItkImageMemory(fftMultiplicator);  */ //DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();
@@ -353,42 +339,73 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
   return GrabItkImageMemory(inverseFFTFilter->GetOutput());
 }
 
-itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image::Pointer reference, int width, int center, unsigned int butterworthOrder)
+itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image::Pointer reference, int cutoffFrequencyPixelHighPass, int cutoffFrequencyPixelLowPass, float alpha)
 {
   float* imageData = new float[reference->GetDimension(0)*reference->GetDimension(1)];
+  
+  // tukey window
+  float width = reference->GetDimension(1) / 2 - (float)cutoffFrequencyPixelHighPass - (float)cutoffFrequencyPixelLowPass;
+  float center = (float)cutoffFrequencyPixelHighPass / 2 + width / 2;
 
-  for (int sample = 0; sample < reference->GetDimension(1); ++sample)
-  {
-    imageData[reference->GetDimension(0)*sample] = 0;
-  }
 
-  /* // tukey window
-  float alpha = m_Conf.BPFalloff;
-
-  for (int n = 0; n < width; ++n)
-  {
-  if (n <= (alpha*(width - 1)) / 2)
-  {
-  imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
-  }
-  else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
-  {
-  imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
-  }
-  else
-  {
-  imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = 1;
-  }
-  }*/
-
-  // Butterworth-Filter
-  float d = center - width / 2;
-  float l = center + width / 2;
+  MITK_INFO << width << "width  " << center << "center  " << alpha;
 
   for (int n = 0; n < reference->GetDimension(1); ++n)
   {
-    imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(((float)center - (float)n) / ((float)width / 2), 2 * butterworthOrder));
+      imageData[reference->GetDimension(0)*n] = 0;
   }
+
+  for (int n = 0; n < width; ++n)
+  {
+    if (n <= (alpha*(width - 1)) / 2)
+    {
+      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+    }
+    else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
+    {
+      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+    }
+    else
+    {
+      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = 1;
+    }
+  }
+
+  // Butterworth-Filter
+  /*
+  // first, write the HighPass
+  if (cutoffFrequencyPixelHighPass != reference->GetDimension(1) / 2)
+  {
+    for (int n = 0; n < reference->GetDimension(1) / 2; ++n)
+    {
+      imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(
+        (float)n / (float)(reference->GetDimension(1) / 2 - cutoffFrequencyPixelHighPass)
+        , 2 * butterworthOrder));
+    }
+  }
+  else
+  {
+    for (int n = 0; n < reference->GetDimension(1) / 2; ++n)
+    {
+      imageData[reference->GetDimension(0)*n] = 1;
+    }
+  }
+
+  // now, the LowPass
+  for (int n = 0; n < reference->GetDimension(1) / 2; ++n)
+  {
+    imageData[reference->GetDimension(0)*n] *= 1 / (1 + pow(
+      (float)(reference->GetDimension(1) / 2 - 1 - n) / (float)(reference->GetDimension(1) / 2 - cutoffFrequencyPixelLowPass)
+      , 2 * butterworthOrder));
+  }
+  */
+
+  // mirror the first half of the image
+  for (int n = reference->GetDimension(1) / 2; n < reference->GetDimension(1); ++n)
+  {
+    imageData[reference->GetDimension(0)*n] = imageData[(reference->GetDimension(1) - (n + 1)) * reference->GetDimension(0)];
+  }
+  
 
   // copy and paste to all lines
   for (int line = 1; line < reference->GetDimension(0); ++line)

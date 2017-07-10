@@ -61,10 +61,10 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonApplyCropFilter, SIGNAL(clicked()), this, SLOT(StartCropThread()));
   connect(m_Controls.buttonApplyBandpass, SIGNAL(clicked()), this, SLOT(StartBandpassThread()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
-  connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
-  connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
-  connect(m_Controls.Samples, SIGNAL(valueChanged(int)), this, SLOT(UpdateFrequency()));
-  connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UpdateFrequency()));
+  connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateRecordTime()));
+  connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateRecordTime()));
+  connect(m_Controls.Samples, SIGNAL(valueChanged(int)), this, SLOT(UpdateRecordTime()));
+  connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UpdateRecordTime()));
   connect(m_Controls.UseBP, SIGNAL(clicked()), this, SLOT(UseBandpass()));
   connect(m_Controls.boundLow, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
   connect(m_Controls.boundHigh, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
@@ -78,9 +78,9 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.UseImageSpacing->setToolTip("Image spacing of y-Axis must be in us, x-Axis in mm.");
   m_Controls.UseImageSpacing->setToolTipDuration(5000);
   m_Controls.ProgressInfo->setVisible(false);
+  m_Controls.UseBP->hide();
 
   UseImageSpacing();
-  UseBandpass();
 }
 
 void PAImageProcessing::StartBeamformingThread()
@@ -407,10 +407,51 @@ void PAImageProcessing::StartBandpassThread()
       connect(thread, &BandpassThread::result, this, &PAImageProcessing::HandleBandpassResults);
       connect(thread, &BandpassThread::finished, thread, &QObject::deleteLater);
 
-      thread->setConfig(BFconfig.BPHighPass, BFconfig.BPLowPass , BFconfig.ButterworthOrder, image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.SpeedOfSound->value());
+      float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.BPSpeedOfSound->value();
+
+      // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
+      float maxFrequency = 1 / (recordTime / image->GetDimension(1)) * image->GetDimension(1) / 2 / 2 / 1000;
+      float BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
+      float BPLowPass = maxFrequency - 1000000 * m_Controls.BPlow->value(); // [Hz]
+
+      if (BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("LowPass too low, disabled it.");
+        Msgbox.exec();
+
+        BPLowPass = 0;
+      }
+      if (BPLowPass < 0 && m_Controls.UseBP->isChecked())
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("LowPass too high, disabled it.");
+        Msgbox.exec();
+
+        BPLowPass = 0;
+      }
+      if (BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("HighPass too high, disabled it.");
+        Msgbox.exec();
+
+        BPHighPass = 0;
+      }
+      if (BPHighPass > maxFrequency - BFconfig.BPLowPass)
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("HighPass higher than LowPass, disabled both.");
+        Msgbox.exec();
+
+        BPHighPass = 0;
+        BPLowPass = 0;
+      }
+
+      thread->setConfig(BPHighPass, BPLowPass, m_Controls.BPFalloff->value(), recordTime);
       thread->setInputImage(image);
 
-      MITK_INFO << "Started new thread for Image Cropping";
+      MITK_INFO << "Started new thread for Bandpass filter";
       thread->start();
     }
   }
@@ -468,13 +509,13 @@ void PAImageProcessing::UpdateBounds()
     MITK_INFO << "high bound < low bound -> setting both to beamform only first slice";
     m_Controls.boundLow->setValue(0); 
     m_Controls.boundHigh->setValue(0);
-    BFconfig.bounds[0] = 0; 
-    BFconfig.bounds[1] = 0;
+    BFconfig.CropBounds[0] = 0;
+    BFconfig.CropBounds[1] = 0;
   }
   else
   {
-    BFconfig.bounds[0] = m_Controls.boundLow->value();
-    BFconfig.bounds[1] = m_Controls.boundHigh->value();
+    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
+    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
   }
 }
 
@@ -488,11 +529,8 @@ void PAImageProcessing::UpdateProgress(int progress, std::string progressInfo)
   qApp->processEvents();
 }
 
-void PAImageProcessing::UpdateFrequency()
+void PAImageProcessing::UpdateImageInfo()
 {
-  BFconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
-  BFconfig.SamplesPerLine = m_Controls.Samples->value();
-
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 
@@ -501,8 +539,6 @@ void PAImageProcessing::UpdateFrequency()
   if (!node)
   {
     // Nothing selected
-    if (!m_Controls.UseImageSpacing->isChecked())
-      UpdateRecordTime(mitk::Image::New());
     return;
   }
 
@@ -511,25 +547,34 @@ void PAImageProcessing::UpdateFrequency()
   {
     // test if this data item is an image or not (could also be a surface or something totally different)
     mitk::Image* image = dynamic_cast<mitk::Image*>(data);
-    if(m_Controls.UseImageSpacing->isChecked())
-    {
-      m_Controls.ElementCount->setValue(image->GetDimension(0));
-      m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
-      m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
-    }
+
     if (image)
+    {
+      // beamforming configs
+      if (m_Controls.UseImageSpacing->isChecked())
+      {
+        m_Controls.ElementCount->setValue(image->GetDimension(0));
+        m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
+        m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
+      }
       UpdateRecordTime(image);
+
+      // bandpass configs
+      float speedOfSound = m_Controls.BPSpeedOfSound->value(); // [m/s]
+      float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / speedOfSound;
+
+      std::stringstream frequency;
+      float maxFrequency = 1 / (recordTime / image->GetDimension(1)) * image->GetDimension(1) / 2 / 2 / 1000;
+      frequency << maxFrequency / 1000000; //[MHz]
+      frequency << "MHz";
+
+      frequency << " is the maximal allowed frequency for the selected image.";
+      m_Controls.BPhigh->setToolTip(frequency.str().c_str());
+      m_Controls.BPlow->setToolTip(frequency.str().c_str());
+      m_Controls.BPhigh->setToolTipDuration(5000);
+      m_Controls.BPlow->setToolTipDuration(5000);
+    }
   }
-
-  std::stringstream frequency;
-  frequency << 1 / (BFconfig.RecordTime / BFconfig.SamplesPerLine) * BFconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000; //[MHz]
-  frequency << "MHz";
-
-  frequency << " is the maximal allowed frequency for the selected image.";
-  m_Controls.BPhigh->setToolTip(frequency.str().c_str());
-  m_Controls.BPlow->setToolTip(frequency.str().c_str());
-  m_Controls.BPhigh->setToolTipDuration(5000);
-  m_Controls.BPlow->setToolTipDuration(5000);
 }
 
 void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -546,7 +591,7 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
       m_Controls.buttonApplyCropFilter->setEnabled(true);
       m_Controls.labelWarning3->setVisible(false);
       m_Controls.buttonApplyBandpass->setEnabled(true);
-      UpdateFrequency();
+      UpdateImageInfo();
       return;
     }
   }
@@ -617,52 +662,12 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.ReconstructionLines = m_Controls.Lines->value();
   BFconfig.TransducerElements = m_Controls.ElementCount->value();
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
-  BFconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
-  BFconfig.BPLowPass = 1000000 * (1 / (BFconfig.RecordTime / BFconfig.SamplesPerLine) * BFconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000 - m_Controls.BPlow->value()); // [Hz]
   BFconfig.ButterworthOrder = m_Controls.BPFalloff->value();
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
   BFconfig.UseGPU = m_Controls.UseGPU->isChecked();
 
   UpdateRecordTime(image);
   UpdateBounds();
-
-  // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
-
-  double maxFrequency = 1 / (BFconfig.RecordTime / BFconfig.SamplesPerLine) * BFconfig.SamplesPerLine / 2 / 2 / 1000; // [Hz]
-
-  if (BFconfig.BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
-  {
-    QMessageBox Msgbox;
-    Msgbox.setText("LowPass too low, disabled it.");
-    Msgbox.exec();
-
-    BFconfig.BPLowPass = 0;
-  }
-  if (BFconfig.BPLowPass < 0 && m_Controls.UseBP->isChecked())
-  {
-    QMessageBox Msgbox;
-    Msgbox.setText("LowPass too high, disabled it.");
-    Msgbox.exec();
-    
-    BFconfig.BPLowPass = 0;
-  }
-  if (BFconfig.BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
-  {
-    QMessageBox Msgbox;
-    Msgbox.setText("HighPass too high, disabled it.");
-    Msgbox.exec();
-
-    BFconfig.BPHighPass = 0;
-  }
-  if (BFconfig.BPHighPass > maxFrequency - BFconfig.BPLowPass)
-  {
-    QMessageBox Msgbox;
-    Msgbox.setText("HighPass higher than LowPass, disabled both.");
-    Msgbox.exec();
-
-    BFconfig.BPHighPass = 0;
-    BFconfig.BPLowPass = 0;
-  }
 }
 
 void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
@@ -715,7 +720,6 @@ void PAImageProcessing::EnableControls()
   m_Controls.BPhigh->setEnabled(true);
   m_Controls.BPlow->setEnabled(true);
   m_Controls.BPFalloff->setEnabled(true);
-  UseBandpass();
   m_Controls.UseImageSpacing->setEnabled(true);
   UseImageSpacing();
   m_Controls.Pitch->setEnabled(true);
@@ -771,12 +775,6 @@ void PAImageProcessing::UseImageSpacing()
   {
     m_Controls.ScanDepth->setEnabled(true);
   }
-  UpdateFrequency();
-}
-
-void PAImageProcessing::UseBandpass()
-{
-  UpdateFrequency();
 }
 
 void BeamformingThread::run()
@@ -854,18 +852,16 @@ void BandpassThread::run()
   mitk::Image::Pointer resultImage;
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
-  resultImage = filterbank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_ButterworthOrder);
-
-  MITK_INFO << m_RecordTime << " " << m_BPHighPass << " " << m_BPLowPass << " " << m_ButterworthOrder;
+  resultImage = filterbank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_TukeyAlpha);
 
   emit result(resultImage);
 }
 
-void BandpassThread::setConfig(float BPHighPass, float BPLowPass, unsigned int butterworthOrder, float recordTime)
+void BandpassThread::setConfig(float BPHighPass, float BPLowPass, float TukeyAlpha, float recordTime)
 {
   m_BPHighPass = BPHighPass;
   m_BPLowPass = BPLowPass;
-  m_ButterworthOrder = butterworthOrder;
+  m_TukeyAlpha = TukeyAlpha;
   m_RecordTime = recordTime;
 }
 

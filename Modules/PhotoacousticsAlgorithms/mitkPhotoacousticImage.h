@@ -40,12 +40,12 @@ namespace mitk {
       mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[2]);
       mitk::Image::Pointer ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
       mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice);
-      mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, unsigned int butterworthOrder);
+      mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha);
     protected:
       PhotoacousticImage();
       virtual ~PhotoacousticImage();
 
-      itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center, unsigned int butterworthOrder);
+      itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int cutoffFrequencyPixelHighPass, int cutoffFrequencyPixelLowPass, float alpha);
     };
 
     /*

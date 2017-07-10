@@ -239,7 +239,7 @@
             </sizepolicy>
            </property>
            <property name="decimals">
-            <number>2</number>
+            <number>3</number>
            </property>
            <property name="minimum">
             <double>0.010000000000000</double>
@@ -275,30 +275,17 @@
             </sizepolicy>
            </property>
            <property name="decimals">
-            <number>2</number>
+            <number>3</number>
            </property>
            <property name="maximum">
-            <double>20.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QSpinBox" name="BPFalloff">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>20</number>
-           </property>
-           <property name="value">
-            <number>7</number>
+            <double>200.000000000000000</double>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
           <widget class="QLabel" name="label_13">
            <property name="text">
-            <string>Butterworth Filter Order</string>
+            <string>Thukey window alpha</string>
            </property>
           </widget>
          </item>
@@ -325,6 +312,22 @@
           <widget class="QLabel" name="label_11">
            <property name="text">
             <string>Speed of Sound [m/s]</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QDoubleSpinBox" name="BPFalloff">
+           <property name="decimals">
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.200000000000000</double>
            </property>
           </widget>
          </item>
@@ -613,16 +616,6 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
-        <widget class="QCheckBox" name="UseBP">
-         <property name="text">
-          <string>Auto use Bandpass</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QComboBox" name="BFAlgorithm">
          <property name="sizePolicy">
@@ -821,6 +814,16 @@
         <widget class="QLabel" name="ProgressInfo">
          <property name="text">
           <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="1">
+        <widget class="QCheckBox" name="UseBP">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>Auto Use Bandpass</string>
          </property>
         </widget>
        </item>

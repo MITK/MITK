@@ -63,7 +63,7 @@ protected:
     vnl_vector_fixed<float,3> GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir);
     vnl_vector_fixed<float,3> GetDirection(itk::Index<3> idx3, int dirIdx);
 
-    PeakImgType::Pointer m_PeakImage;
+    PeakImgType::ConstPointer m_PeakImage;
     float m_PeakThreshold;
     int m_NumDirs;
 

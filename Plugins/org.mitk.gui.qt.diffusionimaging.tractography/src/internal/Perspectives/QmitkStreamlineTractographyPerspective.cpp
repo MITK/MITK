@@ -46,4 +46,5 @@ void QmitkStreamlineTractographyPerspective::CreateInitialLayout(berry::IPageLay
 
     left->AddView("org.mitk.views.streamlinetracking");
     left->AddView("org.mitk.views.segmentation");
+    left->AddView("org.mitk.views.odfmaximaextraction");
 }

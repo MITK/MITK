@@ -496,8 +496,6 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestVal
 template< int ShOrder, int NumberOfSignalFeatures >
 void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTraining()
 {
-  typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
-
   MITK_INFO << "Spherical signal interpolation and sampling ...";
   for (unsigned int i=0; i<m_InputDwis.size(); i++)
   {

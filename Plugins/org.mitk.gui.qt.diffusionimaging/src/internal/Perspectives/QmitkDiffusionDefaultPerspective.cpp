@@ -25,7 +25,7 @@ void QmitkDiffusionDefaultPerspective::CreateInitialLayout(berry::IPageLayout::P
 
     QString editorArea = layout->GetEditorArea();
 
-    layout->AddStandaloneView("org.mitk.views.viewnavigatorview", false, berry::IPageLayout::LEFT, 0.25f, editorArea);
+    layout->AddStandaloneViewPlaceholder("org.mitk.views.viewnavigatorview", berry::IPageLayout::LEFT, 0.3f, editorArea, false);
 
     layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
@@ -39,5 +39,7 @@ void QmitkDiffusionDefaultPerspective::CreateInitialLayout(berry::IPageLayout::P
     /////////////////////////////////////////////
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
+
+    left->AddView("org.mitk.views.diffusiondicomimport");
 
 }

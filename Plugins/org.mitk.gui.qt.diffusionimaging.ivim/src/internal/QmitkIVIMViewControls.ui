@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
+    <width>423</width>
     <height>1563</height>
    </rect>
   </property>
@@ -1006,7 +1006,7 @@
                   <string>Signa for gaussian smoothing applied prior to map computation</string>
                  </property>
                  <property name="minimum">
-                  <double>1.000000000000000</double>
+                  <double>0.000000000000000</double>
                  </property>
                  <property name="maximum">
                   <double>5.000000000000000</double>

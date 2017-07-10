@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_streamlinetracking Streamline Tractography
 
-
+This view enables streamline tractography on various input data. The corresponding command line application is named "MitkStreamlineTractography".
 
 Available sections:
   - \ref StrTrackUserManualInputData

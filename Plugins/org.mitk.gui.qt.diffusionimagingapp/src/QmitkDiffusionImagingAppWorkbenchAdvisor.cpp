@@ -45,20 +45,10 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   QList<QString> perspExcludeList;
   perspExcludeList.push_back( "org.blueberry.uitest.util.EmptyPerspective" );
   perspExcludeList.push_back( "org.blueberry.uitest.util.EmptyPerspective2" );
-//  perspExcludeList.push_back( std::string("org.mitk.coreapp.defaultperspective") );
-  //perspExcludeList.push_back( std::string("org.mitk.extapp.defaultperspective") );
-  perspExcludeList.push_back( "org.mitk.perspectives.publicdiffusionimaging" );
-  perspExcludeList.push_back("org.mitk.perspectives.diffusionimaginginternal" );
-  // Exclude the help perspective from org.blueberry.ui.qt.help from
-  // the normal perspective list.
-  // The perspective gets a dedicated menu entry in the help menu
   perspExcludeList.push_back("org.blueberry.perspectives.help");
 
   QList<QString> viewExcludeList;
   viewExcludeList.push_back( "org.mitk.views.controlvisualizationpropertiesview" );
-//  viewExcludeList.push_back( "org.mitk.views.imagenavigator" );
-  viewExcludeList.push_back( "org.mitk.views.modules" );
-  viewExcludeList.push_back( "org.blueberry.ui.internal.introview" );
 
   configurer->SetInitialSize(QPoint(1000,770));
 

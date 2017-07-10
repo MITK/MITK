@@ -29,7 +29,7 @@
     </view>
 
     <view id="org.mitk.views.mlbtview"
-    name="Machine Learning Based Streamline Tractography"
+    name="ML-Based Streamline Tractography"
     category="Fiber Tractography"
     class="QmitkMLBTView"
     icon="resources/ml_tractography.png">
@@ -93,7 +93,6 @@
     icon="resources/fiberTracking1.png">
     <keywordReference id="org.mitk.perspectives.tractography2.Keyword"/>
     </perspective>
-
 
     <perspective id="org.mitk.perspectives.tractography4"
     name="Machine-learning Tractography"

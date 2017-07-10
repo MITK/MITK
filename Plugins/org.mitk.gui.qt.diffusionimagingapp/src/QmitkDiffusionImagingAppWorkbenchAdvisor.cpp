@@ -49,8 +49,6 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
 
   QList<QString> viewExcludeList;
   viewExcludeList.push_back( "org.mitk.views.controlvisualizationpropertiesview" );
-//  viewExcludeList.push_back( "org.mitk.views.modules" );
-//  viewExcludeList.push_back( "org.blueberry.ui.internal.introview" );
 
   configurer->SetInitialSize(QPoint(1000,770));
 

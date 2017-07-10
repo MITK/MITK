@@ -41,7 +41,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_7">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Mask Image:</string>
@@ -81,7 +81,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="toolTip">
-         <string>Binary seed ROI. If not specified, the whole image area is seeded.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Seed Image:</string>
@@ -90,6 +90,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="m_TensorImageLabel">
+        <property name="toolTip">
+         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
+        </property>
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -101,7 +104,7 @@
       <item row="1" column="1">
        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
         <property name="toolTip">
-         <string>Seed points are only placed inside the mask image.</string>
+         <string>Seed points are only placed inside the mask image. If no seed mask is selected, the whole image is seeded.</string>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
@@ -116,7 +119,7 @@
       <item row="4" column="0">
        <widget class="QLabel" name="label_9">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Stop Image:</string>
@@ -126,7 +129,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="toolTip">
-         <string>Input DTI</string>
+         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
         </property>
         <property name="text">
          <string>Tensor/Peak/ODF Image:</string>
@@ -136,7 +139,7 @@
       <item row="6" column="0">
        <widget class="QLabel" name="mFaImageLabel">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>FA/GFA Image:</string>
@@ -161,7 +164,7 @@
       <item row="5" column="0">
        <widget class="QLabel" name="label_10">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Tissue Image:</string>

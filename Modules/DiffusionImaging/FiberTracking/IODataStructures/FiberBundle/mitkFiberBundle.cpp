@@ -441,7 +441,7 @@ void mitk::FiberBundle::ColorFibersByOrientation()
   m_UpdateTime2D.Modified();
 }
 
-void mitk::FiberBundle::ColorFibersByCurvature(bool minMaxNorm)
+void mitk::FiberBundle::ColorFibersByCurvature(bool opacity, bool normalize)
 {
   double window = 5;
 
@@ -549,15 +549,19 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool minMaxNorm)
     {
       double color[3];
       double dev = values.at(count);
-      if (minMaxNorm)
+      if (normalize)
         dev = (dev-min)/(max-min);
-      //            double dev = values.at(count)*values.at(count);
+      else if (dev>1)
+        dev = 1;
       lookupTable->GetColor(dev, color);
 
       rgba[0] = (unsigned char) (255.0 * color[0]);
       rgba[1] = (unsigned char) (255.0 * color[1]);
       rgba[2] = (unsigned char) (255.0 * color[2]);
-      rgba[3] = (unsigned char) (255.0);
+      if (opacity)
+        rgba[3] = (unsigned char) (255.0 * dev);
+      else
+        rgba[3] = (unsigned char) (255.0);
       m_FiberColors->InsertTupleValue(cell->GetPointId(j), rgba);
       count++;
     }
@@ -586,15 +590,15 @@ void mitk::FiberBundle::ResetFiberOpacity()
   m_UpdateTime2D.Modified();
 }
 
-void mitk::FiberBundle::ColorFibersByScalarMap(mitk::Image::Pointer FAimage, bool opacity)
+void mitk::FiberBundle::ColorFibersByScalarMap(mitk::Image::Pointer FAimage, bool opacity, bool normalize)
 {
-  mitkPixelTypeMultiplex2( ColorFibersByScalarMap, FAimage->GetPixelType(), FAimage, opacity );
+  mitkPixelTypeMultiplex3( ColorFibersByScalarMap, FAimage->GetPixelType(), FAimage, opacity, normalize );
   m_UpdateTime3D.Modified();
   m_UpdateTime2D.Modified();
 }
 
 template <typename TPixel>
-void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Image::Pointer image, bool opacity)
+void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Image::Pointer image, bool opacity, bool normalize)
 {
   m_FiberColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
   m_FiberColors->Allocate(m_FiberPolyData->GetNumberOfPoints() * 4);
@@ -613,6 +617,8 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
   mitkLookup->SetVtkLookupTable(lookupTable);
   mitkLookup->SetType(mitk::LookupTable::JET);
 
+  double min = 9999999;
+  double max = -9999999;
   for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
   {
     Point3D px;
@@ -620,6 +626,24 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
     px[1] = pointSet->GetPoint(i)[1];
     px[2] = pointSet->GetPoint(i)[2];
     double pixelValue = readimage.GetPixelByWorldCoordinates(px);
+    if (pixelValue>max)
+      max = pixelValue;
+    if (pixelValue<min)
+      min = pixelValue;
+  }
+
+  for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
+  {
+    Point3D px;
+    px[0] = pointSet->GetPoint(i)[0];
+    px[1] = pointSet->GetPoint(i)[1];
+    px[2] = pointSet->GetPoint(i)[2];
+    double pixelValue = readimage.GetPixelByWorldCoordinates(px);
+
+    if (normalize)
+      pixelValue = (pixelValue-min)/(max-min);
+    else if (pixelValue>1)
+      pixelValue = 1;
 
     double color[3];
     lookupTable->GetColor(1-pixelValue, color);
@@ -638,7 +662,7 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
 }
 
 
-void mitk::FiberBundle::ColorFibersByFiberWeights()
+void mitk::FiberBundle::ColorFibersByFiberWeights(bool opacity, bool normalize)
 {
   m_FiberColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
   m_FiberColors->Allocate(m_FiberPolyData->GetNumberOfPoints() * 4);
@@ -679,13 +703,21 @@ void mitk::FiberBundle::ColorFibersByFiberWeights()
 
     for (int j=0; j<numPoints; j++)
     {
+      float v = weight;
+      if (normalize)
+        v = (v-min)/(max-min);
+      else if (v>1)
+        v = 1;
       double color[3];
-      lookupTable->GetColor(1-(weight-min)/(max-min), color);
+      lookupTable->GetColor(1-v, color);
 
       rgba[0] = (unsigned char) (255.0 * color[0]);
       rgba[1] = (unsigned char) (255.0 * color[1]);
       rgba[2] = (unsigned char) (255.0 * color[2]);
-      rgba[3] = (unsigned char) (255.0);
+      if (opacity)
+        rgba[3] = (unsigned char) (255.0 * v);
+      else
+        rgba[3] = (unsigned char) (255.0);
 
       m_FiberColors->InsertTupleValue(counter, rgba);
       counter++;

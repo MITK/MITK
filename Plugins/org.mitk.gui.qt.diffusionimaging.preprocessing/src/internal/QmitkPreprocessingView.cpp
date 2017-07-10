@@ -164,7 +164,6 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ProjectSignalButton), SIGNAL(clicked()), this, SLOT(DoProjectSignal()) );
     connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
     connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
-    connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
     connect( (QObject*)(m_Controls->m_NormalizeImageValuesButton), SIGNAL(clicked()), this, SLOT(DoDwiNormalization()) );
     connect( (QObject*)(m_Controls->m_ModifyDirection), SIGNAL(clicked()), this, SLOT(DoApplyDirectionMatrix()) );
     connect( (QObject*)(m_Controls->m_ModifySpacingButton), SIGNAL(clicked()), this, SLOT(DoApplySpacing()) );
@@ -1494,56 +1493,6 @@ void QmitkPreprocessingView::DoADCAverage()
   CallMultishellToSingleShellFilter(functor,image,name + "_ADC", node);
 }
 
-void QmitkPreprocessingView::DoAdcCalculation()
-{
-  mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull()) { return; }
-
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  if ( image == nullptr ) { return; }
-
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
-  if ( ! isDiffusionImage ) { return; }
-
-  typedef itk::AdcImageFilter< DiffusionPixelType, double > FilterType;
-
-  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-  mitk::CastToItkImage(image, itkVectorImagePointer);
-  FilterType::Pointer filter = FilterType::New();
-  filter->SetInput( itkVectorImagePointer );
-
-  filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-      ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-        ->GetGradientDirectionsContainer() );
-
-  filter->SetB_value( static_cast<mitk::FloatProperty*>
-      (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-        ->GetValue() );
-
-  filter->SetFitSignal(m_Controls->m_FitAdcBox->isChecked());
-  filter->Update();
-
-  mitk::Image::Pointer newImage = mitk::Image::New();
-  newImage->InitializeByItk( filter->GetOutput() );
-  newImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-  imageNode->SetData( newImage );
-  QString name = node->GetName().c_str();
-
-  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-  lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
-  mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
-  lut_prop->SetLookupTable( lut );
-
-  imageNode->SetProperty("LookupTable", lut_prop );
-  if (m_Controls->m_FitAdcBox->isChecked())
-    imageNode->SetName((name+"_ADC").toStdString().c_str());
-  else
-    imageNode->SetName((name+"_MD").toStdString().c_str());
-
-  GetDataStorage()->Add(imageNode, node);
-}
-
 void QmitkPreprocessingView::CleanBValueTableWidget()
 {
   m_Controls->m_B_ValueMap_TableWidget->clear();
@@ -1675,7 +1624,6 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
   m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
   m_Controls->m_ProjectSignalButton->setEnabled(foundDwiVolume);
   m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
-  m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
   m_Controls->m_targetBValueSpinBox->setEnabled(foundDwiVolume);
   m_Controls->m_NormalizeImageValuesButton->setEnabled(foundDwiVolume);
   m_Controls->m_DirectionMatrixTable->setEnabled(foundSingleImageVolume);

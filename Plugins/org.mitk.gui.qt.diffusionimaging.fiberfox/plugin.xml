@@ -3,7 +3,7 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-  
+
     <view id="org.mitk.views.fiberfoxview"
     name="Fiberfox"
     category="Simulated data"
@@ -20,24 +20,24 @@
     icon="resources/fieldmap.png">
     <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
     </view>
-	
+
   </extension>
-  
-  
+
+
   <extension point="org.blueberry.ui.perspectives">
-  
+
     <perspective id="org.mitk.perspectives.syntheticdata"
-    name="Synthetic Data"
+    name="Fiberfox MRI Simulations"
     class="QmitkDIAppSyntheticDataGenerationPerspective"
     icon="resources/syntheticdata.png">
     <keywordReference id="org.mitk.perspectives.syntheticdata.Keyword"/>
     </perspective>
-  
+
   </extension>
-  
+
 
   <extension point="org.blueberry.ui.keywords">
-  
+
   <keyword label="diffusion" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="signal" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="simulation" id="org.mitk.views.fiberfoxview.Keyword"/>
@@ -62,7 +62,7 @@
   <keyword label="fieldmap" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="generator" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="fourier" id="org.mitk.views.fiberfoxview.Keyword"/>
-  
-  </extension>  
-  
+
+  </extension>
+
 </plugin>

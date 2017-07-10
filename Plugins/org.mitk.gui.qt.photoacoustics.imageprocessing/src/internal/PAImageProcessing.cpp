@@ -59,6 +59,7 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.ResamplingValue, SIGNAL(valueChanged(double)), this, SLOT(SetResampling()));
   connect(m_Controls.buttonApplyBeamforming, SIGNAL(clicked()), this, SLOT(StartBeamformingThread()));
   connect(m_Controls.buttonApplyCropFilter, SIGNAL(clicked()), this, SLOT(StartCropThread()));
+  connect(m_Controls.buttonApplyBandpass, SIGNAL(clicked()), this, SLOT(StartBandpassThread()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
   connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
   connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
@@ -351,9 +352,93 @@ void PAImageProcessing::HandleCropResults(mitk::Image::Pointer image)
   // add new node to data storage
   this->GetDataStorage()->Add(newNode);
 
-  // disable progress bar
-  m_Controls.progressBar->setVisible(false);
   m_Controls.buttonApplyCropFilter->setText("Apply Crop Filter");
+  EnableControls();
+
+  // update rendering
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void PAImageProcessing::StartBandpassThread()
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (nodes.empty()) return;
+
+  mitk::DataStorage::Pointer storage = this->GetDataStorage();
+
+  mitk::DataNode::Pointer node = nodes.front();
+
+  if (!node)
+  {
+    // Nothing selected. Inform the user and return
+    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image cropping.");
+    return;
+  }
+
+  mitk::BaseData* data = node->GetData();
+  if (data)
+  {
+    // test if this data item is an image or not (could also be a surface or something totally different)
+    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
+    if (image)
+    {
+      UpdateBFSettings(image);
+      std::stringstream message;
+      std::string name;
+      message << "Performing Bandpass filter on image ";
+      if (node->GetName(name))
+      {
+        // a property called "name" was found for this DataNode
+        message << "'" << name << "'";
+        m_OldNodeName = name;
+      }
+      else
+        m_OldNodeName = " ";
+
+      message << ".";
+      MITK_INFO << message.str();
+
+      m_Controls.buttonApplyBandpass->setText("working...");
+      DisableControls();
+
+      BandpassThread *thread = new BandpassThread();
+      connect(thread, &BandpassThread::result, this, &PAImageProcessing::HandleBandpassResults);
+      connect(thread, &BandpassThread::finished, thread, &QObject::deleteLater);
+
+      thread->setConfig(BFconfig.BPHighPass, BFconfig.BPLowPass , BFconfig.ButterworthOrder, image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.SpeedOfSound->value());
+      thread->setInputImage(image);
+
+      MITK_INFO << "Started new thread for Image Cropping";
+      thread->start();
+    }
+  }
+}
+
+void PAImageProcessing::HandleBandpassResults(mitk::Image::Pointer image)
+{
+  auto newNode = mitk::DataNode::New();
+  newNode->SetData(image);
+
+  // name the new Data node
+  std::stringstream newNodeName;
+  newNodeName << m_OldNodeName << " ";
+  newNodeName << "Bandpassed";
+
+  newNode->SetName(newNodeName.str());
+
+  // update level window for the current dynamic range
+  mitk::LevelWindow levelWindow;
+  newNode->GetLevelWindow(levelWindow);
+  auto data = newNode->GetData();
+  levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
+  newNode->SetLevelWindow(levelWindow);
+
+  // add new node to data storage
+  this->GetDataStorage()->Add(newNode);
+
+  m_Controls.buttonApplyBandpass->setText("Apply Bandpass");
   EnableControls();
 
   // update rendering
@@ -459,6 +544,8 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
       m_Controls.buttonApplyBModeFilter->setEnabled( true );
       m_Controls.labelWarning2->setVisible(false);
       m_Controls.buttonApplyCropFilter->setEnabled(true);
+      m_Controls.labelWarning3->setVisible(false);
+      m_Controls.buttonApplyBandpass->setEnabled(true);
       UpdateFrequency();
       return;
     }
@@ -467,6 +554,8 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
   m_Controls.buttonApplyBModeFilter->setEnabled( false );
   m_Controls.labelWarning2->setVisible(true);
   m_Controls.buttonApplyCropFilter->setEnabled(false);
+  m_Controls.labelWarning3->setVisible(true);
+  m_Controls.buttonApplyBandpass->setEnabled(false);
 }
 
 void PAImageProcessing::UseResampling()
@@ -609,13 +698,23 @@ void PAImageProcessing::EnableControls()
   UseResampling();
   m_Controls.Logfilter->setEnabled(true);
   m_Controls.buttonApplyBModeFilter->setEnabled(true);
+
+  m_Controls.CutoffAbove->setEnabled(true);
+  m_Controls.CutoffBelow->setEnabled(true);
   m_Controls.Cutoff->setEnabled(true);
+  m_Controls.buttonApplyCropFilter->setEnabled(true);
+
+  m_Controls.buttonApplyBandpass->setEnabled(true);
+
   m_Controls.BFAlgorithm->setEnabled(true);
   m_Controls.DelayCalculation->setEnabled(true);
   m_Controls.ImageType->setEnabled(true);
   m_Controls.Apodization->setEnabled(true);
   m_Controls.UseBP->setEnabled(true);
   m_Controls.UseGPU->setEnabled(true);
+  m_Controls.BPhigh->setEnabled(true);
+  m_Controls.BPlow->setEnabled(true);
+  m_Controls.BPFalloff->setEnabled(true);
   UseBandpass();
   m_Controls.UseImageSpacing->setEnabled(true);
   UseImageSpacing();
@@ -634,7 +733,14 @@ void PAImageProcessing::DisableControls()
   m_Controls.ResamplingValue->setEnabled(false);
   m_Controls.Logfilter->setEnabled(false);
   m_Controls.buttonApplyBModeFilter->setEnabled(false);
+
+  m_Controls.CutoffAbove->setEnabled(false);
+  m_Controls.CutoffBelow->setEnabled(false);
   m_Controls.Cutoff->setEnabled(false);
+  m_Controls.buttonApplyCropFilter->setEnabled(false);
+
+  m_Controls.buttonApplyBandpass->setEnabled(false);
+
   m_Controls.BFAlgorithm->setEnabled(false);
   m_Controls.DelayCalculation->setEnabled(false);
   m_Controls.ImageType->setEnabled(false);
@@ -670,18 +776,6 @@ void PAImageProcessing::UseImageSpacing()
 
 void PAImageProcessing::UseBandpass()
 {
-  if (m_Controls.UseBP->isChecked())
-  {
-    m_Controls.BPhigh->setEnabled(true);
-    m_Controls.BPlow->setEnabled(true);
-    m_Controls.BPFalloff->setEnabled(true);
-  }
-  else
-  {
-    m_Controls.BPhigh->setDisabled(true);
-    m_Controls.BPlow->setDisabled(true);
-    m_Controls.BPFalloff->setDisabled(true);
-  }
   UpdateFrequency();
 }
 
@@ -751,6 +845,31 @@ void CropThread::setConfig(unsigned int CutAbove, unsigned int CutBelow)
 }
 
 void CropThread::setInputImage(mitk::Image::Pointer image)
+{
+  m_InputImage = image;
+}
+
+void BandpassThread::run()
+{
+  mitk::Image::Pointer resultImage;
+  mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
+
+  resultImage = filterbank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_ButterworthOrder);
+
+  MITK_INFO << m_RecordTime << " " << m_BPHighPass << " " << m_BPLowPass << " " << m_ButterworthOrder;
+
+  emit result(resultImage);
+}
+
+void BandpassThread::setConfig(float BPHighPass, float BPLowPass, unsigned int butterworthOrder, float recordTime)
+{
+  m_BPHighPass = BPHighPass;
+  m_BPLowPass = BPLowPass;
+  m_ButterworthOrder = butterworthOrder;
+  m_RecordTime = recordTime;
+}
+
+void BandpassThread::setInputImage(mitk::Image::Pointer image)
 {
   m_InputImage = image;
 }

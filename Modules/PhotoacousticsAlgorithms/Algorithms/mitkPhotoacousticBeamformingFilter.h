@@ -96,9 +96,6 @@ namespace mitk {
     void DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
     void DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
 
-    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
-    itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
-
     float* m_OutputData;
     float* m_InputData;
     float* m_InputDataPuffer;

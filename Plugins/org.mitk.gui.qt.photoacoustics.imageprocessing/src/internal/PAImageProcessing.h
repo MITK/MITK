@@ -65,6 +65,9 @@ class PAImageProcessing : public QmitkAbstractView
     void HandleCropResults(mitk::Image::Pointer image);
     void StartCropThread();
 
+    void HandleBandpassResults(mitk::Image::Pointer image);
+    void StartBandpassThread();
+
     void UpdateProgress(int progress, std::string progressInfo);
 
   protected:
@@ -146,6 +149,28 @@ protected:
 
   unsigned int m_CutAbove;
   unsigned int m_CutBelow;
+};
+
+
+class BandpassThread : public QThread
+{
+  Q_OBJECT
+    void run() Q_DECL_OVERRIDE;
+
+signals:
+  void result(mitk::Image::Pointer);
+
+public:
+  void setConfig(float BPHighPass, float BPLowPass, unsigned int butterworthOrder, float recordTime);
+  void setInputImage(mitk::Image::Pointer image);
+
+protected:
+  mitk::Image::Pointer m_InputImage;
+
+  float m_BPHighPass;
+  float m_BPLowPass;
+  unsigned int m_ButterworthOrder;
+  float m_RecordTime;
 };
 
 #endif // PAImageProcessing_h

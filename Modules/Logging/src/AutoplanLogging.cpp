@@ -40,50 +40,18 @@
 
 #include <boost/phoenix/bind.hpp>
 
+#include "StringUtilities.h"
+
 struct ThrowAwayPattern _ = {};
 
 namespace
 {
   const char TIME_STAMP_FORMAT[] = "%Y-%m-%d %H:%M:%S";
 
-#ifdef _WIN32
-  std::wstring strToWstr(const std::string& str, UINT codePage)
-  {
-    std::wstring wstr;
-    if (auto n = MultiByteToWideChar(codePage, 0, str.c_str(), str.size() + 1, /*dst*/NULL, 0)) {
-      wstr.resize(n - 1);
-      if (!MultiByteToWideChar(codePage, 0, str.c_str(), str.size() + 1, /*dst*/&wstr[0], n)) {
-        wstr.clear();
-      }
-    }
-    return wstr;
-  }
-  std::string wstrToStr(const std::wstring& wstr, UINT codePage)
-  {
-    std::string str;
-    if (auto n = WideCharToMultiByte(codePage, 0, wstr.c_str(), wstr.size() + 1, /*dst*/NULL, 0, /*defchr*/0, NULL)) {
-      str.resize(n - 1);
-      if (!WideCharToMultiByte(codePage, 0, wstr.c_str(), wstr.size() + 1, /*dst*/&str[0], n, /*defchr*/0, NULL)) {
-        str.clear();
-      }
-    }
-    return str;
-  }
-  std::string strToStr(const std::string &str, UINT codePageSrc, UINT codePageDst)
-  {
-    return wstrToStr(strToWstr(str, codePageSrc), codePageDst);
-  }
-
-  std::string convertToUtf8(const std::wstring& wstr)
-  {
-    return wstrToStr(wstr, CP_UTF8);
-  }
-#endif
-
   std::string MessageToUTF8(const boost::log::value_ref<std::string>& message)
   {
 #ifdef _WIN32
-    return message ? strToStr(*message, CP_ACP, CP_UTF8) : std::string();
+    return message ? Utilities::convertLocalToUTF8(*message) : std::string();
 #else
     return message ? *message : std::string();
 #endif
@@ -92,7 +60,7 @@ namespace
   std::string MessageToOEM(const boost::log::value_ref<std::string>& message)
   {
 #ifdef _WIN32
-    return message ? strToStr(*message, CP_ACP, CP_OEMCP) : std::string();
+    return message ? Utilities::convertLocalToOEM(*message) : std::string();
 #else
     return message ? *message : std::string();
 #endif
@@ -136,7 +104,7 @@ namespace
 #endif
     if (name){
 #ifdef _WIN32
-      return convertToUtf8(name);
+      return Utilities::convertToUtf8(name);
 #else
       return name;
 #endif

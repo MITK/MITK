@@ -59,7 +59,6 @@ set(mitk_modules
   Persistence
   OpenIGTLinkUI
   IGTUI
-  VtkShaders
   DicomRT
   RTUI
   IOExt

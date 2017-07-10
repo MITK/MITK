@@ -56,7 +56,7 @@ public:
 
   // Description:
   // Get the mtime also considering the lookup table.
-  unsigned long GetMTime() override;
+  vtkMTimeType GetMTime() override;
 
   // Description:
   // Set the Input of this mapper.

@@ -32,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTubeFilter.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkSliceNavigationController.h>
-#include <mitkIShaderRepository.h>
-#include <mitkShaderProperty.h>
 #include <mitkCoreServices.h>
 
 mitk::FiberBundleMapper2D::FiberBundleMapper2D()
@@ -175,14 +173,7 @@ vtkProp* mitk::FiberBundleMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
     Superclass::SetDefaultProperties(node, renderer, overwrite);
-    node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
-
-    // Shaders
-    IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-    if (shaderRepo)
-    {
-        shaderRepo->AddDefaultProperties(node, renderer, overwrite);
-    }
+//    node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
 
     //add other parameters to propertylist
     node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(1.0f), renderer, overwrite );

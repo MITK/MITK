@@ -9,11 +9,15 @@
   <keyword label="image" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="data" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="load" id="org.mitk.views.diffusiondicomimport.Keyword"/>
-  
+
   <keyword label="default" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
   <keyword label="diffusion" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
   <keyword label="data" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
   <keyword label="standard" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
+  <keyword label="DICOM" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
+  <keyword label="image" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
+  <keyword label="data" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
+  <keyword label="load" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
 
   </extension>
 
@@ -40,11 +44,11 @@
 
 
   <extension point="org.blueberry.ui.perspectives">
-    
+
     <perspective id="org.mitk.perspectives.diffusiondefault"
-    name="Diffusion"
+    name="Diffusion DICOM Import"
     class="QmitkDiffusionDefaultPerspective"
-    icon="resources/dwi.png">
+    icon="resources/dwiimport.png">
     <keywordReference id="org.mitk.perspectives.diffusiondefault.Keyword"/>
     </perspective>
 

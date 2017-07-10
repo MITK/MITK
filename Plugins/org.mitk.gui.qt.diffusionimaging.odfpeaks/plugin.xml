@@ -11,9 +11,8 @@
     icon="resources/qball_peaks.png">
     <keywordReference id="org.mitk.views.odfmaximaextraction.Keyword"/>
     </view>
-    
+
   </extension>
-     
 
   <extension point="org.blueberry.ui.keywords">
 
@@ -27,7 +26,7 @@
   <keyword label="direction" id="org.mitk.views.odfmaximaextraction.Keyword"/>
   <keyword label="fODF" id="org.mitk.views.odfmaximaextraction.Keyword"/>
   <keyword label="dODF" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  
-  </extension>  
-  
+
+  </extension>
+
 </plugin>

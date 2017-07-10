@@ -859,6 +859,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_ColorFibersFrame->setVisible(false);
     m_Controls->m_MirrorFibersFrame->setVisible(false);
     m_Controls->m_MaskExtractionFrame->setVisible(false);
+    m_Controls->m_ColorMapBox->setVisible(false);
 
     bool pfSelected = !m_SelectedPF.empty();
     bool fibSelected = !m_SelectedFB.empty();
@@ -913,6 +914,7 @@ void QmitkFiberProcessingView::UpdateGui()
         break;
     case 3:
         m_Controls->m_ColorFibersFrame->setVisible(true);
+        m_Controls->m_ColorMapBox->setVisible(true);
         break;
     case 4:
         m_Controls->m_MirrorFibersFrame->setVisible(true);
@@ -921,6 +923,13 @@ void QmitkFiberProcessingView::UpdateGui()
         break;
     case 5:
         m_Controls->m_BundleWeightFrame->setVisible(true);
+      break;
+    case 6:
+        m_Controls->m_ColorFibersFrame->setVisible(true);
+        break;
+    case 7:
+        m_Controls->m_ColorFibersFrame->setVisible(true);
+        break;
     }
 
     // are fiber bundles selected?
@@ -1375,7 +1384,7 @@ void QmitkFiberProcessingView::DoImageColorCoding()
     for (auto node : m_SelectedFB)
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-        fib->ColorFibersByScalarMap(dynamic_cast<mitk::Image*>(m_Controls->m_ColorMapBox->GetSelectedNode()->GetData()), m_Controls->m_FiberOpacityBox->isChecked());
+        fib->ColorFibersByScalarMap(dynamic_cast<mitk::Image*>(m_Controls->m_ColorMapBox->GetSelectedNode()->GetData()), m_Controls->m_FiberOpacityBox->isChecked(), m_Controls->m_NormalizeColorValues->isChecked());
     }
 
     if (auto renderWindowPart = this->GetRenderWindowPart())
@@ -1390,7 +1399,7 @@ void QmitkFiberProcessingView::DoCurvatureColorCoding()
     for (auto node : m_SelectedFB)
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-        fib->ColorFibersByCurvature();
+        fib->ColorFibersByCurvature(m_Controls->m_FiberOpacityBox->isChecked(), m_Controls->m_NormalizeColorValues->isChecked());
     }
 
     if (auto renderWindowPart = this->GetRenderWindowPart())
@@ -1404,7 +1413,7 @@ void QmitkFiberProcessingView::DoWeightColorCoding()
     for (auto node : m_SelectedFB)
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-        fib->ColorFibersByFiberWeights();
+        fib->ColorFibersByFiberWeights(m_Controls->m_FiberOpacityBox->isChecked(), m_Controls->m_NormalizeColorValues->isChecked());
     }
 
     if (auto renderWindowPart = this->GetRenderWindowPart())

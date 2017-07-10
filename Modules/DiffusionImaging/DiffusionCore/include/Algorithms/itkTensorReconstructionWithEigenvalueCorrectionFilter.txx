@@ -522,21 +522,18 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
         // but only if previously marked as bad one-negative eigen value
         if(pixel > 1)
         {
-          itk::DiffusionTensor3D<double>::EigenValuesArrayType eigenvalues;
-          itk::DiffusionTensor3D<double>::EigenVectorsMatrixType eigenvectors;
-          itk::DiffusionTensor3D<double> ten = tensorImg->GetPixel(ix);
-          ten.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+#pragma omp critical
+          {
+            itk::DiffusionTensor3D<double>::EigenValuesArrayType eigenvalues;
+            itk::DiffusionTensor3D<double>::EigenVectorsMatrixType eigenvectors;
+            itk::DiffusionTensor3D<double> ten = tensorImg->GetPixel(ix);
+            ten.ComputeEigenAnalysis(eigenvalues, eigenvectors);
 
-          //comparison to 0.01 instead of 0 was proposed by O.Pasternak
-          if( eigenvalues[0]>0.01 && eigenvalues[1]>0.01 && eigenvalues[2]>0.01)
-          {
-#pragma omp critical
-            mask->SetPixel(ix,1);
-          }
-          else
-          {
-#pragma omp critical
-            badvoxels++;
+            //comparison to 0.01 instead of 0 was proposed by O.Pasternak
+            if( eigenvalues[0]>0.01 && eigenvalues[1]>0.01 && eigenvalues[2]>0.01)
+              mask->SetPixel(ix,1);
+            else
+              badvoxels++;
           }
         }
       }

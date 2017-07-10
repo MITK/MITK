@@ -3,6 +3,8 @@
 
 This view provides the user interface for the global Gibbs tractography algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
 
+The corresponding comman line application is named "MitkGlobalTractography".
+
 \tableofcontents
 
 \section QmitkGibbsTrackingUserManualInputData Input Data
@@ -22,8 +24,6 @@ Optional Input:
 \li Minimum fiber length constraint (in mm). Shorter fibers are discarded after the tracking.
 
 The automatic selection of parameters for the particle length/width and weight are determined directly from the input image using information about the image spacing and GFA.
-
-\imageMacro{gibbstrackingviewadvanced.png,"Advanced Tracking Parameters",10.08}
 
 \section QmitkGibbsTrackingUserManualTrackingSurveillance Surveilance of the tracking process
 

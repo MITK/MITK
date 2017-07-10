@@ -23,7 +23,7 @@ TrackingHandlerPeaks::TrackingHandlerPeaks()
   : m_PeakThreshold(0.1)
   , m_ApplyDirectionMatrix(false)
 {
-
+  std::srand(0);
 }
 
 TrackingHandlerPeaks::~TrackingHandlerPeaks()

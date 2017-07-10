@@ -29,7 +29,7 @@
     </view>
 
     <view id="org.mitk.views.mlbtview"
-    name="Machine Learning Based Streamline Tractography"
+    name="ML-Based Streamline Tractography"
     category="Fiber Tractography"
     class="QmitkMLBTView"
     icon="resources/ml_tractography.png">

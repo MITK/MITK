@@ -12,8 +12,8 @@ if(BUILD_DiffusionTractographyCmdApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( diffusiontractographycmdapps
-    StreamlineTracking^^MitkFiberTracking
-    GibbsTracking^^MitkFiberTracking
+    StreamlineTractography^^MitkFiberTracking
+    GlobalTractography^^MitkFiberTracking
     RfTraining^^MitkFiberTracking
     )
 

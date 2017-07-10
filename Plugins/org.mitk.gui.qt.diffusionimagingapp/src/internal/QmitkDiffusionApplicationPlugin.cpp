@@ -51,9 +51,9 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
 
   this->context = context;
 
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppIntroPart, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkWelcomePerspective, context)
 
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();

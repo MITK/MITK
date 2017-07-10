@@ -87,9 +87,15 @@ void TrackingHandlerTensor::InitForTracking()
           index[0] = x; index[1] = y; index[2] = z;
           for (int i=0; i<m_NumberOfInputs; i++)
           {
-            ItkTensorImageType::PixelType tensor = m_TensorImages.at(i)->GetPixel(index);
+
+            ItkTensorImageType::PixelType tensor;
+#pragma omp critical
+            {
+              tensor = m_TensorImages.at(i)->GetPixel(index);
+              tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+            }
+
             vnl_vector_fixed<float,3> dir;
-            tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
             dir[0] = eigenvectors(2, 0);
             dir[1] = eigenvectors(2, 1);
             dir[2] = eigenvectors(2, 2);

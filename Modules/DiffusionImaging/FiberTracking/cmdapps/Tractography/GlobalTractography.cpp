@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
             int nrCoeffs = mitkImage->GetLargestPossibleRegion().GetSize()[3];
             int c=3, d=2-2*nrCoeffs;
             double D = c*c-4*d;
-            int shOrder;
+            int shOrder = 0;
             if (D>0)
             {
                 shOrder = (-c+sqrt(D))/2.0;
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
         mitk::FiberBundle::Pointer mitkFiberBundle = mitk::FiberBundle::New(gibbsTracker->GetFiberBundle());
         mitkFiberBundle->SetReferenceGeometry(mitkImage->GetGeometry());
 
-        mitk::IOUtil::SaveBaseData(mitkFiberBundle.GetPointer(), outFileName );
+        mitk::IOUtil::Save(mitkFiberBundle, outFileName );
     }
     catch (itk::ExceptionObject e)
     {

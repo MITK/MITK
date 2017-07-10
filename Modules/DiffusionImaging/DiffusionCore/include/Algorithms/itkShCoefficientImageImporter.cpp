@@ -80,7 +80,6 @@ void ShCoefficientImageImporter< PixelType, ShOrder >
     Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder > nullVec2; nullVec2.Fill(0.0);
     m_CoefficientImage->FillBuffer(nullVec2);
 
-    typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     int x = imageRegion4.GetSize(0);
     int y = imageRegion4.GetSize(1);
     int z = imageRegion4.GetSize(2);

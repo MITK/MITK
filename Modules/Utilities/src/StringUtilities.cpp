@@ -1,7 +1,5 @@
 #include "StringUtilities.h"
 
-#include <codecvt>
-
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -58,14 +56,12 @@ namespace Utilities
 #endif
   }
 
+#ifdef _WIN32
   std::string convertToUtf8(const std::wstring& wstr)
   {
-#ifdef _WIN32
     return wstrToStr(wstr, CP_UTF8);
-#else
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(wstr);
-#endif
   }
+#endif
 
   bool isValidUtf8(const char* str)
   {

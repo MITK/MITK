@@ -431,7 +431,7 @@ protected:
   * to layout, so save mitkWidget#Container from destruction by removing
   * their parent and delete all QSplitters except m_MainSplit.
   */
-  void CleanViewsToChangeLayout();
+  void CleanViewsToChangeLayout(const Qt::Orientation);
 
   /**
   * @brief UpdateViewsAfterChangeLayout Internal helper method to call after

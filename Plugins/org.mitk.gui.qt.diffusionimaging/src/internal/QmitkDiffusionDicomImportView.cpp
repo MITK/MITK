@@ -60,15 +60,10 @@ const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusion
 
 
 QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject* /*parent*/, const char* /*name*/)
-  : QmitkAbstractView(), m_Controls(nullptr),
-    m_OutputFolderName(""), m_OutputFolderNameSet(false)
+  : m_Controls(nullptr)
+  , m_OutputFolderName("")
+  , m_OutputFolderNameSet(false)
 {
-}
-
-QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(const QmitkDiffusionDicomImport& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
 }
 
 QmitkDiffusionDicomImport::~QmitkDiffusionDicomImport()
@@ -497,7 +492,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
       gdcmReader->LoadImages();
 
-      for( int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
+      for( unsigned int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
       {
         mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(o).GetMitkImage();
 

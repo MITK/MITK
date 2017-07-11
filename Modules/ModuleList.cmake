@@ -2,6 +2,7 @@
 # ordered according to their dependencies.
 
 set(mitk_modules
+  Utilities
   Logging
   Config
   Core

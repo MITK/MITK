@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStringProperty.h"
 
+#include "StringUtilities.h"
+
 namespace mitk
 {
 
@@ -37,7 +39,12 @@ class StringPropertySerializer : public BasePropertySerializer
       if (const StringProperty* prop = dynamic_cast<const StringProperty*>(m_Property.GetPointer()))
       {
         auto  element = new TiXmlElement("string");
-        element->SetAttribute("value", prop->GetValue());
+        auto str = prop->GetValue();
+        if (Utilities::isValidUtf8(str)) {
+          element->SetAttribute("value", str);
+        } else {
+          element->SetAttribute("value", Utilities::convertLocalToUTF8(str));
+        }
         return element;
       }
       else return nullptr;

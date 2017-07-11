@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkVersionMacros.h>
 #include <vtkVolumeProperty.h>
+#include <vtkSmartVolumeMapper.h>
+#include <vtkImageData.h>
 
 namespace mitk
 {
@@ -44,7 +46,7 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
@@ -57,7 +59,14 @@ namespace mitk
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
+    void createMapper(vtkImageData*);
+    void createVolume();
+    void createVolumeProperty();
+    vtkImageData* GetInputImage();
+
     vtkSmartPointer<vtkVolume> m_Volume = nullptr;
+    vtkSmartPointer<vtkSmartVolumeMapper> m_Mapper = nullptr;
+    vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty = nullptr;
   };
 
 } // namespace mitk

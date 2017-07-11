@@ -18,13 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::VtkSmartVolumeMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  mitk::Image *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
-  vtkImageData *inputData = input->GetVtkImageData(this->GetTimestep());
+
 }
 
 vtkProp* mitk::VtkSmartVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-  return nullptr;
+  if (!m_Volume)
+  {
+    createVolume();
+  }
+
+  return m_Volume;
 }
 
 void mitk::VtkSmartVolumeMapper3D::ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer)
@@ -42,12 +46,52 @@ void mitk::VtkSmartVolumeMapper3D::MitkRenderVolumetricGeometry(mitk::BaseRender
 
 }
 
+vtkImageData* mitk::VtkSmartVolumeMapper3D::GetInputImage()
+{
+  mitk::Image *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
+  return input->GetVtkImageData(this->GetTimestep());
+}
+
+void mitk::VtkSmartVolumeMapper3D::createMapper(vtkImageData* imageData)
+{
+  vtkSmartPointer<vtkSmartVolumeMapper> m_Mapper =
+    vtkSmartPointer<vtkSmartVolumeMapper>::New();
+  m_Mapper->SetBlendModeToComposite(); // composite first
+  m_Mapper->SetInputData(imageData);
+}
+
+void mitk::VtkSmartVolumeMapper3D::createVolume()
+{
+  if (!m_Mapper)
+  {
+    createMapper(GetInputImage());
+  }
+  if (!m_VolumeProperty)
+  {
+    createVolumeProperty();
+  }
+
+  m_Volume = vtkSmartPointer<vtkVolume>::New();
+  m_Volume->VisibilityOff();
+  m_Volume->SetMapper(m_Mapper);
+  m_Volume->SetProperty(m_VolumeProperty);
+}
+
+void mitk::VtkSmartVolumeMapper3D::createVolumeProperty()
+{
+  m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
+  m_VolumeProperty->ShadeOff();
+  m_VolumeProperty->SetInterpolationType(VTK_LINEAR_INTERPOLATION);
+}
+
 mitk::VtkSmartVolumeMapper3D::VtkSmartVolumeMapper3D()
 {
-
+ 
 }
 
 mitk::VtkSmartVolumeMapper3D::~VtkSmartVolumeMapper3D()
 {
 
 }
+
+

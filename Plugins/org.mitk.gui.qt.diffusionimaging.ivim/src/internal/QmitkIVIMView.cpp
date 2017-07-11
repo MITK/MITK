@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h"
 #include "itkRegularizedIVIMReconstructionFilter.h"
 #include "mitkImageCast.h"
+#include <mitkImageStatisticsHolder.h>
 
 const std::string QmitkIVIMView::VIEW_ID = "org.mitk.views.ivim";
 
@@ -363,8 +364,8 @@ void QmitkIVIMView::AutoThreshold()
     histogramGenerator->SetInput( img );
     histogramGenerator->SetMarginalScale( 10 ); // Defines y-margin width of histogram
     histogramGenerator->SetNumberOfBins( 100 ); // CT range [-1024, +2048] --> bin size 4 values
-    histogramGenerator->SetHistogramMin(  dimg->GetScalarValueMin() );
-    histogramGenerator->SetHistogramMax(  dimg->GetScalarValueMax() * .5 );
+    histogramGenerator->SetHistogramMin(  dimg->GetStatistics()->GetScalarValueMin() );
+    histogramGenerator->SetHistogramMax(  dimg->GetStatistics()->GetScalarValueMax() * .5 );
     histogramGenerator->Compute();
 
     HistogramType::ConstIterator iter = histogramGenerator->GetOutput()->Begin();
@@ -392,7 +393,7 @@ void QmitkIVIMView::FittIVIMStart()
     QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
     mitk::Image* img = 0;
-    for ( unsigned int i=0; i<nodes.size(); i++ )
+    for ( int i=0; i<nodes.size(); i++ )
     {
         img = dynamic_cast<mitk::Image*>(nodes.at(i)->GetData());
 

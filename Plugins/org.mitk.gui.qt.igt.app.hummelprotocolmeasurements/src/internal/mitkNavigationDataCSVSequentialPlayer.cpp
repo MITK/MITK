@@ -36,14 +36,13 @@ mitk::NavigationDataCSVSequentialPlayer::~NavigationDataCSVSequentialPlayer()
 
 bool mitk::NavigationDataCSVSequentialPlayer::IsAtEnd()
 {
-  if (m_CurrentPos >= m_NavigationDatas.size()) return true;
-  else return false;
+  return m_CurrentPos >= static_cast<int>(m_NavigationDatas.size());
 }
 
 void mitk::NavigationDataCSVSequentialPlayer::
 SetFileName(const std::string& fileName)
 {
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
   FillOutputEmpty(0);
 
   MITK_INFO << "Reading file: " << fileName;
@@ -79,7 +78,7 @@ void mitk::NavigationDataCSVSequentialPlayer::GenerateData()
   {
     mitk::NavigationData* output = this->GetOutput(index);
 
-    if (m_CurrentPos > m_NavigationDatas.size())
+    if (m_CurrentPos > static_cast<int>(m_NavigationDatas.size()))
     {
       FillOutputEmpty(index);
       return;
@@ -100,16 +99,11 @@ std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataCSVSequentialPlay
 {
   std::vector<mitk::NavigationData::Pointer> returnValue = std::vector<mitk::NavigationData::Pointer>();
   std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(filename);
-  int i;
-  if (m_HeaderRow) //file has a header row, so it has to be skipped when reading the NavigationDatas
-  {
-      i = 1;
-  }
-  else
-  {
-      i = 0; //file has no header row, so no need to skip the first row
-  }
-  for (i; (i < fileContentLineByLine.size()); i++)
+  std::size_t i = m_HeaderRow
+    ? 1  //file has a header row, so it has to be skipped when reading the NavigationDatas
+    : 0; //file has no header row, so no need to skip the first row
+
+  for ( ; i < fileContentLineByLine.size(); ++i)
   {
     returnValue.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));
   }
@@ -138,24 +132,14 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
     file.seekg(0L, std::ios::beg);  // move to begin of file
 
     int count = 0;
-    //int count2 = 0;
     while (!file.eof())
     {
       std::string buffer;
       std::getline(file, buffer);    // read out file line by line
 
       readData.push_back(buffer);
-      /*
-      //for Polhemus tracker: just take every 24th sample
-      if (count == 0) if (buffer.size() > 0)
-      {
-        //MITK_INFO << "read(" << count2 << "): " << buffer.substr(0,30);
-        //count2++;
-        readData.push_back(buffer);
-      }
-      */
 
-      count++; if (count == m_SampleCount) count = 0;
+      ++count; if (count == m_SampleCount) count = 0;
     }
   }
 
@@ -178,11 +162,10 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   mitk::Point3D position;
   mitk::Quaternion orientation;
   bool valid = false;
-  double time;
 
   //this is for custom csv files. You have adapt the column numbers to correctly
   //interpret your csv file.
-  if (m_Filetype = mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV)
+  if (m_Filetype == mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV)
   {
     if (myLineList.size() < m_MinNumberOfColumns)
     {
@@ -205,24 +188,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     orientation[1] = myLineList.at(7).toDouble(); //qy
     orientation[2] = myLineList.at(8).toDouble(); //qz
     orientation[3] = myLineList.at(9).toDouble(); //qr
-
-
-    //Variant for the polhemus measurements in August 2016
-    //(.csv files from the polhemus software)
-
-    //Important: due to the documentation, Polhemus uses
-    //a left handed coordinate system while MITK uses a
-    //right handed. A conversion is not included in this
-    //read in method yet, because this is not required
-    //for this special rotation evaliation (no matter
-    //if it turns 11.25 degree to left or right). For
-    //other usage this might be important to adapt!
-
-    /*
-    position[0] = myLineList.at(m_XPos).toDouble();
-    position[1] = myLineList.at(m_YPos).toDouble();
-    position[2] = myLineList.at(m_ZPos).toDouble();
-    */
 
     if(!m_RightHanded) //MITK uses a right handed coordinate system, so the position needs to be converted
     {
@@ -277,66 +242,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
         orientation = eulerQuat;
     }
 
-
-    //Doesn't work... don't know how to interpret the
-    //Polhemus quaternions. They are seem to different
-    //different to other quaternions (NDI, Claron, etc.)
-    //http://www.mathepedia.de/Quaternionen.aspx
-
-    /*
-    double qr = myLineList.at(7).toDouble();
-    double qx = myLineList.at(8).toDouble();
-    double qy = myLineList.at(9).toDouble();
-    double qz = myLineList.at(10).toDouble();
-
-    vnl_quaternion<double> newQuat(qx, qy, qz, qr);
-
-    orientation = newQuat;
-    orientation.normalize();*/
-
-    /*
-    orientation[3] = qr;  //qr
-    orientation[0] = qx;  //qx
-    orientation[1] = qy;  //qy
-    orientation[2] = qz;  //qz
-
-    orientation.normalize();
-    */
-
-
-    /*
-//    //Using Euler angles instead does work
-//    //azimuth: rotation about Z axis of reference frame
-//    double azimuthAngle = (myLineList.at(11).toDouble() / 180 * M_PI);
-//    //elevation: rotation about Y' axis (transformed Y axis of sonsor frame)
-//    double elevationAngle = (myLineList.at(12).toDouble() / 180 * M_PI);
-//    //roll: rotation about X axis of sensor frame
-//    double rollAngle = (myLineList.at(13).toDouble() / 180 * M_PI);
-//    vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
-//    orientation = eulerQuat;
-    */
-
-    /*
-    //code block for conversion from axis-angular representation
-    double rotationAngle =  myLineList.at(7).toDouble();
-    double rotationAxis[3];
-    rotationAxis[0] = myLineList.at(8).toDouble();
-    rotationAxis[1] = myLineList.at(9).toDouble();
-    rotationAxis[2] = myLineList.at(10).toDouble();
-
-    double betragRotationAxis = sqrt(pow(rotationAxis[0], 2) + pow(rotationAxis[1], 2) + pow(rotationAxis[2], 2));
-    rotationAngle /= betragRotationAxis;
-    rotationAxis[0] /= betragRotationAxis;
-    rotationAxis[1] /= betragRotationAxis;
-    rotationAxis[2] /= betragRotationAxis;
-
-
-    double qr = cos(rotationAngle/2);
-    double qx = rotationAxis[0] * sin(rotationAngle/2);
-    double qy = rotationAxis[1] * sin(rotationAngle/2);
-    double qz = rotationAxis[1] * sin(rotationAngle/2);
-    */
-
     if(!m_RightHanded) //MITK uses a right handed coordinate system, so the orientation needs to be converted
     {
       //code block for conversion from left-handed to right-handed
@@ -359,7 +264,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   //this is for MITK csv files that have been recorded with the MITK
   //navigation data recorder. You can also use the navigation data player
   //class from the MITK-IGT module instead.
-  else if (m_Filetype = mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV)
+  else if (m_Filetype == mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV)
   {
     if (myLineList.size() < 8)
     {
@@ -367,8 +272,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
       returnValue = GetEmptyNavigationData();
       return returnValue;
     }
-
-    time = myLineList.at(2).toDouble();
 
     if (myLineList.at(3).toStdString() == "1") valid = true;
 
@@ -382,7 +285,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     orientation[3] = myLineList.at(8).toDouble(); //qr
   }
 
-  //returnValue->SetTimeStamp(time); //DOES NOT WORK ANY MORE... CANNOT SET TIME TO itk::timestamp CLASS
   returnValue->SetDataValid(valid);
   returnValue->SetPosition(position);
   returnValue->SetOrientation(orientation);

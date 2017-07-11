@@ -8,8 +8,6 @@ Available sections:
   - \ref QmitkStochasticTrackingUserManualParameters
   - \ref QmitkStochasticTrackingUserManualReferences
 
-\imageMacro{stochastictrackingview.png,"Stochastic Tracking View",10.12}
-
 \section QmitkStochasticTrackingUserManualInputData Input Data
 
 Mandatory Input:

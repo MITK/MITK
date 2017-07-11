@@ -6,7 +6,6 @@ set(INTERNAL_CPP_FILES
   QmitkDiffusionDicomImportView.cpp
   QmitkControlVisualizationPropertiesView.cpp
 
-  Perspectives/QmitkDiffusionImagingAppPerspective.cpp
   Perspectives/QmitkDiffusionDefaultPerspective.cpp
 )
 
@@ -19,8 +18,7 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkDiffusionDicomImportView.h
   src/internal/QmitkControlVisualizationPropertiesView.h
-  
-  src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h
+
   src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h
 )
 

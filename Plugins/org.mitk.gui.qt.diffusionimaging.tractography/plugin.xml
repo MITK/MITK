@@ -3,7 +3,7 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-  
+
     <view id="org.mitk.views.gibbstracking"
     name="Global Gibbs Tractography"
     category="Fiber Tractography"
@@ -24,22 +24,22 @@
     name="Streamline Tractography"
     category="Fiber Tractography"
     class="QmitkStreamlineTrackingView"
-    icon="resources/StreamlineTracking.png">
+    icon="resources/fiberTracking1.png">
     <keywordReference id="org.mitk.views.streamlinetracking.Keyword"/>
     </view>
 
     <view id="org.mitk.views.mlbtview"
-    name="Machine Learning Based Streamline Tractography"
+    name="ML-Based Streamline Tractography"
     category="Fiber Tractography"
     class="QmitkMLBTView"
-    icon="resources/fiberTracking1.png">
+    icon="resources/ml_tractography.png">
     <keywordReference id="org.mitk.views.mlbtview.Keyword"/>
     </view>
-	
+
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-  
+
   <keyword label="tractography" id="org.mitk.views.gibbstracking.Keyword"/>
   <keyword label="tracking" id="org.mitk.views.gibbstracking.Keyword"/>
   <keyword label="fiber" id="org.mitk.views.gibbstracking.Keyword"/>
@@ -72,12 +72,12 @@
   <keyword label="tensor" id="org.mitk.views.mlbtview.Keyword"/>
   <keyword label="dwi" id="org.mitk.views.mlbtview.Keyword"/>
   <keyword label="diffusion" id="org.mitk.views.mlbtview.Keyword"/>
-  
-  </extension>  
-  
+
+  </extension>
+
 
   <extension point="org.blueberry.ui.perspectives">
-  
+
     <perspective id="org.mitk.perspectives.tractography1"
     name="Global Gibbs Tractography"
     category="Fiber Tractography"
@@ -90,19 +90,18 @@
     name="Streamline Tractography"
     category="Fiber Tractography"
     class="QmitkStreamlineTractographyPerspective"
-    icon="resources/tractography.png">
+    icon="resources/fiberTracking1.png">
     <keywordReference id="org.mitk.perspectives.tractography2.Keyword"/>
     </perspective>
-
 
     <perspective id="org.mitk.perspectives.tractography4"
     name="Machine-learning Tractography"
     category="Fiber Tractography"
     class="QmitkMachineLearningTractographyPerspective"
-    icon="resources/tractography.png">
+    icon="resources/ml_tractography.png">
     <keywordReference id="org.mitk.perspectives.tractography4.Keyword"/>
     </perspective>
-    
-  </extension>  
-  
+
+  </extension>
+
 </plugin>

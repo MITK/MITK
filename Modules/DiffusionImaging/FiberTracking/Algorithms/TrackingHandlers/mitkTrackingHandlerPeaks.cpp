@@ -23,7 +23,7 @@ TrackingHandlerPeaks::TrackingHandlerPeaks()
   : m_PeakThreshold(0.1)
   , m_ApplyDirectionMatrix(false)
 {
-
+  std::srand(0);
 }
 
 TrackingHandlerPeaks::~TrackingHandlerPeaks()
@@ -34,33 +34,36 @@ void TrackingHandlerPeaks::InitForTracking()
 {
   MITK_INFO << "Initializing peak tracker.";
 
-  itk::Vector<double, 4> spacing4 = m_PeakImage->GetSpacing();
-  itk::Point<float, 4> origin4 = m_PeakImage->GetOrigin();
-  itk::Matrix<double, 4, 4> direction4 = m_PeakImage->GetDirection();
-  itk::ImageRegion<4> imageRegion4 = m_PeakImage->GetLargestPossibleRegion();
+  if (m_NeedsDataInit)
+  {
+    itk::Vector<double, 4> spacing4 = m_PeakImage->GetSpacing();
+    itk::Point<float, 4> origin4 = m_PeakImage->GetOrigin();
+    itk::Matrix<double, 4, 4> direction4 = m_PeakImage->GetDirection();
+    itk::ImageRegion<4> imageRegion4 = m_PeakImage->GetLargestPossibleRegion();
 
+    spacing3[0] = spacing4[0]; spacing3[1] = spacing4[1]; spacing3[2] = spacing4[2];
+    origin3[0] = origin4[0]; origin3[1] = origin4[1]; origin3[2] = origin4[2];
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+      {
+        direction3[r][c] = direction4[r][c];
+        m_FloatImageRotation[r][c] = direction4[r][c];
+      }
+    imageRegion3.SetSize(0, imageRegion4.GetSize()[0]);
+    imageRegion3.SetSize(1, imageRegion4.GetSize()[1]);
+    imageRegion3.SetSize(2, imageRegion4.GetSize()[2]);
 
-  spacing3[0] = spacing4[0]; spacing3[1] = spacing4[1]; spacing3[2] = spacing4[2];
-  origin3[0] = origin4[0]; origin3[1] = origin4[1]; origin3[2] = origin4[2];
-  for (int r=0; r<3; r++)
-    for (int c=0; c<3; c++)
-    {
-      direction3[r][c] = direction4[r][c];
-      m_FloatImageRotation[r][c] = direction4[r][c];
-    }
-  imageRegion3.SetSize(0, imageRegion4.GetSize()[0]);
-  imageRegion3.SetSize(1, imageRegion4.GetSize()[1]);
-  imageRegion3.SetSize(2, imageRegion4.GetSize()[2]);
+    m_DummyImage = ItkUcharImgType::New();
+    m_DummyImage->SetSpacing( spacing3 );
+    m_DummyImage->SetOrigin( origin3 );
+    m_DummyImage->SetDirection( direction3 );
+    m_DummyImage->SetRegions( imageRegion3 );
+    m_DummyImage->Allocate();
+    m_DummyImage->FillBuffer(0.0);
 
-  m_DummyImage = ItkUcharImgType::New();
-  m_DummyImage->SetSpacing( spacing3 );
-  m_DummyImage->SetOrigin( origin3 );
-  m_DummyImage->SetDirection( direction3 );
-  m_DummyImage->SetRegions( imageRegion3 );
-  m_DummyImage->Allocate();
-  m_DummyImage->FillBuffer(0.0);
-
-  m_NumDirs = imageRegion4.GetSize(3)/3;
+    m_NumDirs = imageRegion4.GetSize(3)/3;
+    m_NeedsDataInit = false;
+  }
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir)
@@ -261,7 +264,7 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
     float a = 1;
     if (old_mag>0.5)
       a = dot_product(output_direction, oldDir);
-    if (a>m_AngularThreshold)
+    if (a>=m_AngularThreshold)
       output_direction *= mag;
     else
       output_direction.fill(0);

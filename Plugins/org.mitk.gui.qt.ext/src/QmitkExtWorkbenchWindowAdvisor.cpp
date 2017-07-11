@@ -660,7 +660,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
 
-    QMenu* viewMenu;
+    QMenu* viewMenu = nullptr;
     if (showViewMenuItem)
     {
       viewMenu = windowMenu->addMenu("Show &View");

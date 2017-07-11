@@ -698,18 +698,34 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
   UpdateViewsAfterChangeLayout(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
 }
 
-void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
+void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown(unsigned int id2Dwindow)
 {
   SMW_INFO << "changing layout to 2D up and 3D down" << std::endl;
+  if (id2Dwindow < 1 || id2Dwindow > 3)
+  {
+    MITK_WARN << "Only 2D render window IDs 1,2 or 3 are valid. Got ID " << id2Dwindow << ". " << "Using default ID 2 instead.";
+    id2Dwindow = 2;
+  }
 
   CleanViewsToChangeLayout(Qt::Vertical);
 
-  m_SubSplit1 = new QSplitter;
-  m_SubSplit2 = new QSplitter;
-  m_LayoutSplit->addWidget(m_SubSplit1);
-  m_LayoutSplit->addWidget(m_SubSplit2);
+  m_SubSplit1 = new QSplitter(m_LayoutSplit);
+  m_SubSplit2 = new QSplitter(m_LayoutSplit);
 
-  m_SubSplit1->addWidget(mitkWidget1Container);
+  // insert Widget Container into splitter top
+  switch (id2Dwindow)
+  {
+  case 1:
+    m_SubSplit1->addWidget(mitkWidget1Container);
+    break;
+  case 2:
+    m_SubSplit1->addWidget(mitkWidget2Container);
+    break;
+  case 3:
+    m_SubSplit1->addWidget(mitkWidget3Container);
+    break;
+  }
+
   m_SubSplit2->addWidget(mitkWidget4Container);
   m_LayoutSplit->setSizes({ 700, 700 });
 
@@ -886,7 +902,7 @@ void QmitkStdMultiWidget::wheelEvent(QWheelEvent *e)
   emit WheelMoved(e);
 }
 
-void QmitkStdMultiWidget::mousePressEvent(QMouseEvent *e)
+void QmitkStdMultiWidget::mousePressEvent(QMouseEvent *)
 {
 }
 

@@ -106,8 +106,8 @@ int main(int argc, char* argv[])
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -129,8 +129,8 @@ int main(int argc, char* argv[])
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -152,8 +152,8 @@ int main(int argc, char* argv[])
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -175,8 +175,8 @@ int main(int argc, char* argv[])
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -198,8 +198,8 @@ int main(int argc, char* argv[])
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             if (normalization==0)
@@ -221,8 +221,8 @@ int main(int argc, char* argv[])
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
             FilterType::Pointer filter = FilterType::New();
-            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+            filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);

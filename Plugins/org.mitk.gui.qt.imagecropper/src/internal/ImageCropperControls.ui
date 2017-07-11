@@ -1080,7 +1080,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox">
+          <widget class="QSpinBox" name="spinBoxOutsidePixelValue">
            <property name="enabled">
             <bool>false</bool>
            </property>

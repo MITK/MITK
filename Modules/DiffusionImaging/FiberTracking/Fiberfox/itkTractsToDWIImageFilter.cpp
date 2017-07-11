@@ -761,11 +761,11 @@ namespace itk
     double volumeAccuracy = 10;
     m_FiberBundleWorkingCopy->ResampleLinear(minSpacing/volumeAccuracy);
     m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
-    
+
     auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<float, 3> >::New();
     caster->SetInput(m_TransformedMaskImage);
     caster->Update();
-      
+
     auto density_calculator = itk::TractDensityImageFilter< itk::Image<float, 3> >::New();
     density_calculator->SetFiberBundle(m_FiberBundleWorkingCopy);
     density_calculator->SetInputImage(caster->GetOutput());
@@ -776,30 +776,30 @@ namespace itk
     density_calculator->SetWorkOnFiberCopy(false);
     density_calculator->Update();
     float max_density = density_calculator->GetMaxDensity();
-    
-    if (m_mmRadius>0) 
-    { 
-      m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy; 
+
+    if (m_mmRadius>0)
+    {
+      m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
       stringstream stream;
-      stream << fixed << setprecision(2) << max_density * 100 * m_SegmentVolume;
+      stream << fixed << setprecision(2) << max_density * m_SegmentVolume;
       string s = stream.str();
       PrintToLog("\nMax. fiber volume: " + s + "mm².", false, true, true);
     }
     else
     {
       stringstream stream;
-      stream << fixed << setprecision(2) << max_density * 100 * m_SegmentVolume;
+      stream << fixed << setprecision(2) << max_density * m_SegmentVolume;
       string s = stream.str();
       PrintToLog("\nMax. fiber volume: " + s + "mm² (before rescaling to voxel volume).", false, true, true);
     }
     float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
-    float new_seg_vol = voxel_volume/(max_density * 100.0);
+    float new_seg_vol = voxel_volume/max_density;
     float new_fib_radius = 1000*std::sqrt(new_seg_vol*volumeAccuracy/(minSpacing*M_PI));
     stringstream stream;
     stream << fixed << setprecision(2) << new_fib_radius;
     string s = stream.str();
     PrintToLog("\nA full fiber voxel corresponds to a fiber radius of ~" + s + "µm, given the current fiber configuration.", false, true, true);
-    
+
     // a second fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
     m_FiberBundleTransformed = m_FiberBundleWorkingCopy;
   }
@@ -946,7 +946,7 @@ namespace itk
       PrintToLog("\n", false, false);
       PrintToLog("Generating " + boost::lexical_cast<std::string>(numFiberCompartments+numNonFiberCompartments)
                  + "-compartment diffusion-weighted signal.");
-           
+
       std::vector< int > bVals = m_Parameters.m_SignalGen.GetBvalues();
       PrintToLog("b-values: ", false, false, true);
       for (auto v : bVals)
@@ -1060,7 +1060,7 @@ namespace itk
         double fact = 1;    // density correction factor in mm³
         if (m_Parameters.m_SignalGen.m_AxonRadius<0.0001 || maxVolume>m_VoxelVolume)    // the fullest voxel is always completely full
           fact = m_VoxelVolume/maxVolume;
-        
+
         while(!it3.IsAtEnd())
         {
           if (it3.Get()>0)
@@ -1225,12 +1225,12 @@ namespace itk
         m_Parameters.m_NoiseModel->AddNoise(signal);
 
       for (unsigned int i=0; i<signal.Size(); i++)
-      {          
+      {
         if (signal[i]>0)
           signal[i] = floor(signal[i]+0.5);
         else
           signal[i] = ceil(signal[i]-0.5);
-          
+
         if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]>window)
           window = signal[i];
         if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]<min)
@@ -1523,7 +1523,7 @@ namespace itk
           other = 0;
           interAxonalVolume = extraAxonalVolume;
         }
-        
+
         double compartmentSum = intraAxonalVolume;
 
         // adjust non-fiber and intra-axonal signal
@@ -1590,7 +1590,7 @@ namespace itk
           if (g==0)
             m_VolumeFractions.at(i+numFiberCompartments)->SetPixel(index, weight/m_VoxelVolume);
         }
-        
+
         if (compartmentSum/m_VoxelVolume>1.05)
           MITK_ERROR << "Compartments do not sum to 1 in voxel " << index << " (" << compartmentSum/m_VoxelVolume << ")";
       }

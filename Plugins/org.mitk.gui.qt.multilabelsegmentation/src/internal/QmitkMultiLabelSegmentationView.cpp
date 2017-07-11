@@ -59,8 +59,8 @@ const std::string QmitkMultiLabelSegmentationView::VIEW_ID = "org.mitk.views.mul
 QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView()
   : m_Parent(nullptr),
     m_IRenderWindowPart(nullptr),
-    m_ReferenceNode(nullptr),
     m_ToolManager(nullptr),
+    m_ReferenceNode(nullptr),
     m_WorkingNode(nullptr),
     m_AutoSelectionEnabled(false),
     m_MouseCursorSet(false)
@@ -465,11 +465,10 @@ void QmitkMultiLabelSegmentationView::OnAddLayer()
 
   if (answerButton != QMessageBox::Yes) return;
 
-  int newLabelSetId = -1;
   try
   {
     WaitCursorOn();
-    newLabelSetId = workingImage->AddLayer();
+    workingImage->AddLayer();
     WaitCursorOff();
   }
   catch ( mitk::Exception& e )
@@ -657,18 +656,12 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
   m_ToolManager->ActivateTool(-1);
 
   if (m_WorkingNode.IsNotNull())
-  {
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
-    assert(workingImage);
     OnLooseLabelSetConnection();
-  }
 
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
   m_ToolManager->SetWorkingData(m_WorkingNode);
   if (m_WorkingNode.IsNotNull())
   {
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
-    assert(workingImage);
     OnEstablishLabelSetConnection();
 
     if (m_AutoSelectionEnabled)
@@ -755,7 +748,7 @@ void QmitkMultiLabelSegmentationView::OnInterpolationSelectionChanged(int index)
 /************************************************************************/
 /* protected                                                            */
 /************************************************************************/
-void QmitkMultiLabelSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+void QmitkMultiLabelSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer> &nodes)
 {
   if (m_AutoSelectionEnabled)
   {

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <itkImageFileWriter.h>
 #include "itkPointShell.h"
+#include <itkRescaleIntensityImageFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -573,15 +574,17 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
         return tractLength;
     }
 
-#pragma omp critical
     if (m_DemoMode && !m_UseOutputProbabilityMap) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
     {
-      m_BuildFibersReady++;
-      m_Tractogram.push_back(*fib);
-      BuildFibers(true);
-      m_Stop = true;
+#pragma omp critical
+      {
+        m_BuildFibersReady++;
+        m_Tractogram.push_back(*fib);
+        BuildFibers(true);
+        m_Stop = true;
 
-      while (m_Stop){
+        while (m_Stop){
+        }
       }
     }
 
@@ -742,9 +745,14 @@ void StreamlineTrackingFilter::GenerateData()
 #pragma omp parallel
   while (i<num_seeds && !stop)
   {
-    int temp_i = i;
+
+
+    int temp_i = 0;
 #pragma omp critical
-    i++;
+    {
+      temp_i = i;
+      i++;
+    }
 
     if (temp_i>=num_seeds || stop)
       continue;
@@ -837,6 +845,7 @@ void StreamlineTrackingFilter::GenerateData()
           stop = true;
         }
       }
+
     }
   }
 
@@ -975,6 +984,15 @@ void StreamlineTrackingFilter::AfterTracking()
     MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);
+  }
+  else
+  {
+    itk::RescaleIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer filter = itk::RescaleIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+    filter->SetInput(m_OutputProbabilityMap);
+    filter->SetOutputMaximum(1.0);
+    filter->SetOutputMinimum(0.0);
+    filter->Update();
+    m_OutputProbabilityMap = filter->GetOutput();
   }
   MITK_INFO << "done";
 

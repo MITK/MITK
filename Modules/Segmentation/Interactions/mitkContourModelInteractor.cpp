@@ -81,7 +81,7 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
   return true;
 }
 
-void mitk::ContourModelInteractor::OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::ContourModelInteractor::OnDeletePoint(StateMachineAction *, InteractionEvent *)
 {
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
   contour->RemoveVertex(contour->GetSelectedVertex());

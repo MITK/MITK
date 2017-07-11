@@ -13,7 +13,9 @@
  See LICENSE.txt or http://www.mitk.org for details.
 
  ===================================================================*/
-#pragma warning (disable : 4996)
+#ifdef _MSC_VER
+#  pragma warning (disable : 4996)
+#endif
 
 #include "mitkDiffusionCollectionWriter.h"
 

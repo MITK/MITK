@@ -173,8 +173,8 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
     // if desired rescale to the 0-255 range
     while( !it_connect.IsAtEnd() )
     {
-      it_connect.Set( ( unsigned short ) rescaleFactor *
-        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ]
+      it_connect.Set( ( unsigned short ) (rescaleFactor *
+        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ])
       );
       ++it_connect;
       counter++;

@@ -336,7 +336,6 @@ public:
   static void TestImageForLevelWindowOnRandomPropertyChange(std::string testImageFile)
   {
     typedef std::vector<bool> BoolVecType;
-    typedef BoolVecType::iterator IteratorType;
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandomGeneratorType;
 
     // initialize the data storage
@@ -468,7 +467,6 @@ public:
   static void TestImageForLevelWindowOnRandomVisibilityChange(std::string testImageFile)
   {
     typedef std::vector<bool> BoolVecType;
-    typedef BoolVecType::iterator IteratorType;
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandomGeneratorType;
 
     // initialize the data storage
@@ -570,11 +568,6 @@ public:
         {
           hasLevelWindow += pow(2, 2 - i);
         }
-      }
-
-      if (hasLevelWindow != mustHaveLvlWindow)
-      {
-        int n = 5;
       }
 
       validCount += hasLevelWindow == mustHaveLvlWindow ? 1 : 0;

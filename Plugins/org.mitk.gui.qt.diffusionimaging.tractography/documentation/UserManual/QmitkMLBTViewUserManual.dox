@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_mlbtview Machine Learning Based Streamline Tractography
 
-This view provides the user interface for machine-learning based streamline fiber tractography on diffusion-weighted images. It is dived in two parts: (1) training of the random-forest classifier used for tractography and (2) the actual tractography.
+This view provides the user interface for machine-learning based streamline fiber tractography on diffusion-weighted images. It is dived in two parts: (1) training of the random-forest classifier used for tractography and (2) the actual tractography. The corresponding command line applications are named "MitkRfTraining", to train the random forest classifier, and "MitkStreamlineTractography", which provides functionality for all streamline tractography methods including the random forest based tractography.
 
 Available sections:
   - \ref MlbstUserManualTraining

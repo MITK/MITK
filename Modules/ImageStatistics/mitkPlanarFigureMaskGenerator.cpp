@@ -71,7 +71,6 @@ template < typename TPixel, unsigned int VImageDimension >
 void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
   const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
 {
-  typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
 
   typename MaskImage2DType::Pointer maskImage = MaskImage2DType::New();

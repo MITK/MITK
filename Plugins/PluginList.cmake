@@ -8,7 +8,7 @@ set(MITK_PLUGINS
   org.blueberry.core.commands:OFF
   org.blueberry.core.jobs:OFF
   org.blueberry.ui.qt:OFF
-  org.blueberry.ui.qt.help:OFF
+  org.blueberry.ui.qt.help:ON
   org.blueberry.ui.qt.log:ON
   org.blueberry.ui.qt.objectinspector:OFF
 

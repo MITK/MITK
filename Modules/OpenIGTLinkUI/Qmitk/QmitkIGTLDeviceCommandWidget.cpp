@@ -241,7 +241,7 @@ void QmitkIGTLDeviceCommandWidget::OnSendCommand()
         SetResolution(this->m_Controls->fpsSpinBox->value());
   }
 
-  m_IGTLDevice->SendMessage(m_CurrentCommand.GetPointer());
+  m_IGTLDevice->SendMessage(mitk::IGTLMessage::New(m_CurrentCommand));
 }
 
 void QmitkIGTLDeviceCommandWidget::OnCommandChanged(

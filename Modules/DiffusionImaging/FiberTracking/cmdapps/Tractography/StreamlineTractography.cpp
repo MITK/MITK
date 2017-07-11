@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
+#include <itkTensorImageToQBallImageFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -60,8 +61,8 @@ int main(int argc, char* argv[])
 
   // parameters fo all methods
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'Tensor' algorithm)", us::Any(), false);
-  parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, DetODF, ProbODF, DetRF, ProbRF)", us::Any(), false);
+  parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'DetTensor' algorithm)", us::Any(), false);
+  parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF)", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle/probability map", us::Any(), false);
 
   parser.addArgument("stop_mask", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
@@ -82,6 +83,7 @@ int main(int argc, char* argv[])
   parser.addArgument("use_stop_votes", "", mitkCommandLineParser::Bool, "Use stop votes:", "use stop votes");
   parser.addArgument("use_only_forward_samples", "", mitkCommandLineParser::Bool, "Use only forward samples:", "use only forward samples");
   parser.addArgument("output_prob_map", "", mitkCommandLineParser::Bool, "Output probability map:", "output probability map instead of tractogram");
+  parser.addArgument("prob_samples", "", mitkCommandLineParser::Int, "Num. Samples per Step:", "Only relevant for probabilistic tensor and ODF tractography. At each integration step the ODF/tensor is sampled n times and the most probable direction is used. The higher the number, the closer the behaviour will be to the deterministic ODF tractography.", 10);
 
   parser.addArgument("no_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate:", "don't interpolate image values");
   parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1");
@@ -111,9 +113,6 @@ int main(int argc, char* argv[])
   mitkCommandLineParser::StringContainerType input_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["input"]);
   string outFile = us::any_cast<string>(parsedArgs["out"]);
   string algorithm = us::any_cast<string>(parsedArgs["algorithm"]);
-
-  //    mitk::LoggingBackend::SetLogFile( (outFile + ".log").c_str() );
-  //    MITK_INFO << "LOG";
 
   bool interpolate = true;
   if (parsedArgs.count("no_interpolation"))
@@ -221,6 +220,11 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("max_tracts"))
     max_tracts = us::any_cast<int>(parsedArgs["max_tracts"]);
 
+  unsigned int prob_samples = 10;
+  if (parsedArgs.count("prob_samples"))
+    prob_samples = us::any_cast<int>(parsedArgs["prob_samples"]);
+  if (prob_samples<=0)
+    prob_samples = 1;
 
   // LOAD DATASETS
 
@@ -234,7 +238,7 @@ int main(int argc, char* argv[])
   std::vector< mitk::Image::Pointer > input_images;
   for (unsigned int i=0; i<input_files.size(); i++)
   {
-    mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(input_files.at(i))->GetData());
+    mitk::Image::Pointer mitkImage = mitk::IOUtil::LoadImage(input_files.at(i));
     input_images.push_back(mitkImage);
   }
 
@@ -288,7 +292,30 @@ int main(int argc, char* argv[])
   }
 
   //    //////////////////////////////////////////////////////////////////
-  //    omp_set_num_threads(1);
+//      omp_set_num_threads(1);
+
+  if (algorithm == "ProbTensor")
+  {
+    typedef mitk::ImageToItk< mitk::TrackingHandlerTensor::ItkTensorImageType > CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput(input_images.at(0));
+    caster->Update();
+    mitk::TrackingHandlerTensor::ItkTensorImageType::Pointer itkTensorImg = caster->GetOutput();
+
+    typedef itk::TensorImageToQBallImageFilter< float, float > FilterType;
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( itkTensorImg );
+    filter->Update();
+
+    mitk::Image::Pointer image = mitk::Image::New();
+    FilterType::OutputImageType::Pointer outimg = filter->GetOutput();
+    image->InitializeByItk( outimg.GetPointer() );
+    image->SetVolume( outimg->GetBufferPointer() );
+
+    input_images.clear();
+    input_images.push_back(image);
+    algorithm = "ProbODF";
+  }
 
   typedef itk::StreamlineTrackingFilter TrackerType;
   TrackerType::Pointer tracker = TrackerType::New();
@@ -328,7 +355,7 @@ int main(int argc, char* argv[])
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetApplyDirectionMatrix(apply_image_rotation);
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakThreshold(cutoff);
   }
-  else if (algorithm == "Tensor")
+  else if (algorithm == "DetTensor")
   {
     handler = new mitk::TrackingHandlerTensor();
 
@@ -346,7 +373,7 @@ int main(int argc, char* argv[])
     dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetF(tend_f);
     dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetG(tend_g);
 
-    if (addImages.size()>0)
+    if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaImage(addImages.at(0).at(0));
   }
   else if (algorithm == "DetODF" || algorithm == "ProbODF")
@@ -365,12 +392,20 @@ int main(int argc, char* argv[])
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaThreshold(cutoff);
     if (algorithm == "ProbODF")
+    {
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMode(mitk::TrackingHandlerOdf::MODE::PROBABILISTIC);
+      dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetNumProbSamples(prob_samples);
+    }
 
-    if (addImages.size()>0)
+    if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addImages.at(0).at(0));
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMinMaxNormalize(normalize_odfs);
+  }
+  else
+  {
+    MITK_INFO << "Unknown tractography algorithm (" + algorithm+"). Known types are Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF.";
+    return EXIT_FAILURE;
   }
   handler->SetInterpolate(interpolate);
   handler->SetFlipX(flip_x);
@@ -422,7 +457,7 @@ int main(int argc, char* argv[])
     if (ext != ".nii" && ext != ".nii.gz" && ext != ".nrrd")
       outFile += ".nii.gz";
 
-    mitk::IOUtil::SaveBaseData(img, outFile);
+    mitk::IOUtil::Save(img, outFile);
   }
 
   delete handler;

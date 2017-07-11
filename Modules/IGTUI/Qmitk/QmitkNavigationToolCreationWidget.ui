@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
+    <width>255</width>
     <height>309</height>
    </rect>
   </property>
@@ -52,7 +52,7 @@
         <x>0</x>
         <y>0</y>
         <width>236</width>
-        <height>115</height>
+        <height>90</height>
        </rect>
       </property>
       <attribute name="label">
@@ -140,8 +140,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>303</width>
-        <height>98</height>
+        <width>310</width>
+        <height>113</height>
        </rect>
       </property>
       <attribute name="label">
@@ -250,8 +250,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>236</width>
-        <height>115</height>
+        <width>157</width>
+        <height>84</height>
        </rect>
       </property>
       <attribute name="label">
@@ -292,8 +292,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>276</width>
-        <height>133</height>
+        <width>286</width>
+        <height>183</height>
        </rect>
       </property>
       <attribute name="label">
@@ -447,6 +447,66 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Tool Axis:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_ToolAxisX">
+           <property name="correctionMode">
+            <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+           </property>
+           <property name="minimum">
+            <number>-9999</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_ToolAxisY">
+           <property name="minimum">
+            <number>-9999</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_ToolAxisZ">
+           <property name="minimum">
+            <number>-9999</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

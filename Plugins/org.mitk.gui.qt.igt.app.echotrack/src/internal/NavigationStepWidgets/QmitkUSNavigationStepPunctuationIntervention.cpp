@@ -38,21 +38,41 @@ QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIn
   connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
   connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
   connect(ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
+  ui->m_AblationZonesBox->setVisible(false);
+}
+
+QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIntervention(mitk::Point3D toolAxis, QWidget *parent) :
+QmitkUSAbstractNavigationStep(parent),
+m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
+ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
+m_SphereSource(vtkSmartPointer<vtkSphereSource>::New()),
+m_OBBTree(vtkSmartPointer<vtkOBBTree>::New()),
+m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
+{
+  m_ToolAxis.SetElement(0, (toolAxis.GetElement(0)));
+  m_ToolAxis.SetElement(1, (toolAxis.GetElement(1)));
+  m_ToolAxis.SetElement(2, (toolAxis.GetElement(2)));
+  m_NeedleProjectionFilter->SetToolAxisForFilter(m_ToolAxis);
+  ui->setupUi(this);
+  connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
+  connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
+  connect(ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
+  ui->m_AblationZonesBox->setVisible(false);
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnEnableAblationZoneMarkingClicked()
 {
   if(ui->m_EnableAblationMarking->isChecked())
-    ui->m_AblationZonesBox->setEnabled(true);
+    ui->m_AblationZonesBox->setVisible(true);
   else
-    ui->m_AblationZonesBox->setEnabled(false);
+    ui->m_AblationZonesBox->setVisible(false);
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnAblationZoneSizeSliderChanged(int size)
 {
 int id = ui->m_AblationZonesList->currentRow();
 if (id!=-1) {emit AblationZoneChanged(id,size);}
-}
+}//
 
 void QmitkUSNavigationStepPunctuationIntervention::OnAddAblationZoneClicked()
 {

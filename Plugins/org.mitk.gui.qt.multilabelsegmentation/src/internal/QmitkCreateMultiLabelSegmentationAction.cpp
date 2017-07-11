@@ -105,17 +105,17 @@ void QmitkCreateMultiLabelSegmentationAction::SetDataStorage(mitk::DataStorage* 
   m_DataStorage = dataStorage;
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
+void QmitkCreateMultiLabelSegmentationAction::SetFunctionality(berry::QtViewPart*)
 {
   //not needed
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetSmoothed(bool smoothed)
+void QmitkCreateMultiLabelSegmentationAction::SetSmoothed(bool)
 {
   //not needed
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetDecimated(bool decimated)
+void QmitkCreateMultiLabelSegmentationAction::SetDecimated(bool)
 {
   //not needed
 }

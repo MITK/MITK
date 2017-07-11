@@ -20,13 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   template <class TVertex, class TEdge>
-  UndirectedGraph<TVertex, TEdge>::UndirectedGraph() : m_Graph(NULL)
-  {
-  }
-
-  template <class TVertex, class TEdge>
-  UndirectedGraph<TVertex, TEdge>::UndirectedGraph(const UndirectedGraph<TVertex, TEdge> &graph)
-    : m_Graph(graph.m_Graph)
+  UndirectedGraph<TVertex, TEdge>::UndirectedGraph()
   {
   }
 

@@ -54,20 +54,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/Directory.hxx>
 
 #include <QMessageBox>
+#include <QTreeView>
 
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
 
 
 QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject* /*parent*/, const char* /*name*/)
-  : QmitkAbstractView(), m_Controls(nullptr),
-    m_OutputFolderName(""), m_OutputFolderNameSet(false)
+  : m_Controls(nullptr)
+  , m_OutputFolderName("")
+  , m_OutputFolderNameSet(false)
 {
-}
-
-QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(const QmitkDiffusionDicomImport& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
 }
 
 QmitkDiffusionDicomImport::~QmitkDiffusionDicomImport()
@@ -196,14 +192,24 @@ void QmitkDiffusionDicomImport::DicomLoadDeleteFolderNames()
 void QmitkDiffusionDicomImport::DicomLoadAddFolderNames()
 {
   // SELECT FOLDER DIALOG
-  QFileDialog* w = new QFileDialog( m_Parent, QString("Select folders containing DWI data") );
-  w->setFileMode( QFileDialog::Directory );
+  QFileDialog w( m_Parent, QString("Select folders containing DWI data") );
+  w.setFileMode( QFileDialog::DirectoryOnly );
+  w.setOption(QFileDialog::DontUseNativeDialog,true);
+
+  QListView *l = w.findChild<QListView*>("listView");
+  if (l) {
+    l->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
+  QTreeView *t = w.findChild<QTreeView*>();
+  if (t) {
+    t->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
 
   // RETRIEVE SELECTION
-  if ( w->exec() != QDialog::Accepted )
+  if ( w.exec() != QDialog::Accepted )
     return;
 
-  m_Controls->listWidget->addItems(w->selectedFiles());
+  m_Controls->listWidget->addItems(w.selectedFiles());
 }
 
 bool SortBySeriesUID(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
@@ -453,18 +459,18 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
       mitk::DICOMSortCriterion::ConstPointer sorting =
-        mitk::SortByImagePositionPatient::New(  // Image Position (Patient)
-          //mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
-             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
-                mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
-                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
-                      mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
-                    ).GetPointer()
-                  ).GetPointer()
-                ).GetPointer()
-             ).GetPointer()
-        // ).GetPointer()
-        ).GetPointer();
+          mitk::SortByImagePositionPatient::New(  // Image Position (Patient)
+                                                  //mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
+                                                  mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
+                                                                             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
+                                                                                                        mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
+                                                                                                                                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
+                                                                                                                                                              ).GetPointer()
+                                                                                                                                   ).GetPointer()
+                                                                                                        ).GetPointer()
+                                                                             ).GetPointer()
+                                                  // ).GetPointer()
+                                                  ).GetPointer();
       tagSorter->SetSortCriterion( sorting );
 
       // mosaic
@@ -486,7 +492,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
       gdcmReader->LoadImages();
 
-      for( int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
+      for( unsigned int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
       {
         mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(o).GetMitkImage();
 

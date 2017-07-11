@@ -14,7 +14,7 @@ find_program(DCMTK_STORESCP
 mark_as_advanced(DCMTK_STORESCP)
 
 if(NOT EXISTS ${DCMTK_STORESCP})
-  message(WARNING "Couldn't find program storescp without the program query retrieve of the dicom plugin won't work!")
+  message(WARNING "Couldn't find program storescp: Query/retrieve of the DICOM plugin won't work!")
 else(NOT EXISTS ${DCMTK_STORESCP})
 
   configure_file( org_mitk_gui_qt_dicom_config.h.in org_mitk_gui_qt_dicom_config.h @ONLY)

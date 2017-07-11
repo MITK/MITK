@@ -110,10 +110,9 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnDataSelectionChanged(const mitk::DataNode*)));
   connect(m_Controls.buttonCreateNewBoundingBox, SIGNAL(clicked()), this, SLOT(DoCreateNewBoundingObject()));
   connect(m_Controls.buttonAdvancedSettings, SIGNAL(clicked()), this, SLOT(OnAdvancedSettingsButtonToggled()));
-  connect(m_Controls.spinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
+  connect(m_Controls.spinBoxOutsidePixelValue, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 
-  m_Controls.spinBox->setValue(-1000);
-  m_Controls.spinBox->setEnabled(false);
+  m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
   m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
   m_Controls.buttonCropping->setEnabled(false);
   m_Controls.boundingShapeSelector->setEnabled(false);
@@ -197,6 +196,10 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
     if (!ok)
       return;
 
+	if (name == "")
+	{
+		name = "Bounding Shape";
+	}
     m_Controls.buttonCropping->setEnabled(true);
     m_Controls.buttonMasking->setEnabled(true);
     m_Controls.boundingShapeSelector->setEnabled(true);
@@ -236,6 +239,17 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   //mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+void QmitkImageCropper::setDefaultGUI()
+{
+	m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+	m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
+	m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+	m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
+	m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
+	m_Controls.buttonCropping->setEnabled(false);
+	m_Controls.buttonMasking->setEnabled(false);
+	m_Controls.labelWarningRotation->setVisible(false);
+}
 
 void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
   const QList<mitk::DataNode::Pointer>& nodes)
@@ -243,14 +257,7 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
   bool rotationEnabled = false;
   if (nodes.empty())
   {
-    m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-    m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
-    m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-    m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
-    m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
-    m_Controls.buttonCropping->setEnabled(false);
-    m_Controls.buttonMasking->setEnabled(false);
-    m_Controls.labelWarningRotation->setVisible(false);
+	  setDefaultGUI();
     return;
   }
   m_ParentWidget->setEnabled(true);
@@ -268,6 +275,15 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
       if (image != nullptr)
       {
+		  if (image->GetDimension() < 3) {
+			  QMessageBox::warning(nullptr,
+				  tr("Invalid image selected"),
+				  tr("ImageCropper only works with 3 or more dimensions."),
+				  QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+			  setDefaultGUI();
+			  return;
+		  }
+
         vtkSmartPointer<vtkMatrix4x4> imageMat = image->GetGeometry()->GetVtkMatrix();
         // check whether the image geometry is rotated, if so, no pixel aligned cropping or masking can be performed
         if ((imageMat->GetElement(1, 0) == 0.0) && (imageMat->GetElement(0, 1) == 0.0) &&
@@ -296,18 +312,25 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
 
         if (image->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
         {
-          // Might be changed with the upcoming new image statistics plugin
-          int minPixelValue = static_cast<int>(image->GetScalarValueMinNoRecompute());
-          //static_cast<int>image->GetStatistics()->GetScalarValueMinNoRecompute();
-          int maxPixelValue = static_cast<int>(image->GetScalarValueMaxNoRecompute());
-          //static_cast<int>image->GetStatistics()->GetScalarValueMaxNoRecompute();
-          m_Controls.spinBox->setEnabled(true);
-          m_Controls.spinBox->setMaximum(maxPixelValue);
-          m_Controls.spinBox->setMinimum(minPixelValue);
-          m_Controls.spinBox->setValue(minPixelValue);
+            // Might be changed with the upcoming new image statistics plugin
+            //(recomputation might be very expensive for large images ;) )
+            auto minPixelValue = image->GetScalarValueMin();
+            auto maxPixelValue = image->GetScalarValueMax();
+
+            if (minPixelValue < std::numeric_limits<int>::min()) {
+                minPixelValue = std::numeric_limits<int>::min();
+            }
+            if (maxPixelValue > std::numeric_limits<int>::max()) {
+                maxPixelValue = std::numeric_limits<int>::max();
+            }
+
+            m_Controls.spinBoxOutsidePixelValue->setEnabled(true);
+            m_Controls.spinBoxOutsidePixelValue->setMaximum(static_cast<int>(maxPixelValue));
+            m_Controls.spinBoxOutsidePixelValue->setMinimum(static_cast<int>(minPixelValue));
+            m_Controls.spinBoxOutsidePixelValue->setValue(static_cast<int>(minPixelValue));
         }
         else
-          m_Controls.spinBox->setEnabled(false);
+            m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
 
         unsigned int dim = image->GetDimension();
         if (dim < 2 || dim > 4)

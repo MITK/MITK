@@ -99,7 +99,6 @@ protected slots:
   void DoHalfSphereGradientDirections();
   void UpdateDwiBValueMapRounder(int i);
   void DoLengthCorrection();
-  void DoAdcCalculation();
   void DoDwiNormalization();
   void DoProjectSignal();
   void DoExtractBrainMask();

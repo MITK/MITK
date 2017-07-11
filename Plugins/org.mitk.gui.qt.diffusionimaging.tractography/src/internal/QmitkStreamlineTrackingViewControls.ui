@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>878</height>
+    <width>406</width>
+    <height>950</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -41,7 +41,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_7">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Mask Image:</string>
@@ -81,7 +81,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="toolTip">
-         <string>Binary seed ROI. If not specified, the whole image area is seeded.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Seed Image:</string>
@@ -90,6 +90,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="m_TensorImageLabel">
+        <property name="toolTip">
+         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
+        </property>
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -101,7 +104,7 @@
       <item row="1" column="1">
        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
         <property name="toolTip">
-         <string>Seed points are only placed inside the mask image.</string>
+         <string>Seed points are only placed inside the mask image. If no seed mask is selected, the whole image is seeded.</string>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
@@ -116,7 +119,7 @@
       <item row="4" column="0">
        <widget class="QLabel" name="label_9">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Stop Image:</string>
@@ -126,7 +129,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="toolTip">
-         <string>Input DTI</string>
+         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
         </property>
         <property name="text">
          <string>Tensor/Peak/ODF Image:</string>
@@ -136,7 +139,7 @@
       <item row="6" column="0">
        <widget class="QLabel" name="mFaImageLabel">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>FA/GFA Image:</string>
@@ -161,7 +164,7 @@
       <item row="5" column="0">
        <widget class="QLabel" name="label_10">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Tissue Image:</string>
@@ -425,7 +428,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="m_fLabel">
         <property name="toolTip">
          <string>f parameter of tensor tractography. f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
@@ -435,7 +438,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QDoubleSpinBox" name="m_fBox">
         <property name="toolTip">
          <string>f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
@@ -454,7 +457,7 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="m_gLabel">
         <property name="toolTip">
          <string/>
@@ -464,7 +467,7 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QDoubleSpinBox" name="m_gBox">
         <property name="toolTip">
          <string>f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
@@ -483,7 +486,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="6" column="0">
        <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
         <property name="toolTip">
          <string/>
@@ -493,7 +496,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
+      <item row="6" column="1">
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -547,7 +550,7 @@
         </layout>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
         <property name="toolTip">
          <string/>
@@ -557,7 +560,7 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="7" column="1">
        <widget class="QSpinBox" name="m_NumSamplesBox">
         <property name="toolTip">
          <string>Number of neighborhood samples that are used to determine the next fiber progression direction.</string>
@@ -567,7 +570,7 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
+      <item row="8" column="0">
        <widget class="QCheckBox" name="m_ResampleFibersBox">
         <property name="toolTip">
          <string>Resample fibers using the specified error constraint.</string>
@@ -580,7 +583,7 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="1">
+      <item row="8" column="1">
        <widget class="QDoubleSpinBox" name="m_FiberErrorBox">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
@@ -602,7 +605,7 @@
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
+      <item row="9" column="0">
        <widget class="QCheckBox" name="m_InterpolationBox">
         <property name="toolTip">
          <string>If false, nearest neighbor interpolation is used.</string>
@@ -615,7 +618,7 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0">
+      <item row="10" column="0">
        <widget class="QCheckBox" name="m_SeedGmBox">
         <property name="toolTip">
          <string>Requires tissue image.</string>
@@ -629,19 +632,6 @@
        </widget>
       </item>
       <item row="11" column="0">
-       <widget class="QCheckBox" name="m_NormalizeODFsBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Min-max Normalize ODFs</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="10" column="0">
        <widget class="QCheckBox" name="m_OutputProbMap">
         <property name="toolTip">
          <string>Output probability map instead of tractogram.</string>
@@ -651,6 +641,32 @@
         </property>
         <property name="checked">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_numProbSamplesLabel">
+        <property name="toolTip">
+         <string>f parameter of tensor tractography. f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
+        </property>
+        <property name="text">
+         <string>Num. Samples per Step:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="m_numProbSamplesBox">
+        <property name="toolTip">
+         <string>At each integration step the ODF is sampled n times and the most probable direction is used. The higher the number, the closer the behaviour will be to the deterministic ODF tractography.</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999999</number>
+        </property>
+        <property name="value">
+         <number>10</number>
         </property>
        </widget>
       </item>

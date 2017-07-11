@@ -87,7 +87,7 @@ const mitk::ValueToIndexMapper* mitk::CollectionStatistic::GetTestValueToIndexMa
 int mitk::CollectionStatistic::IsInSameVirtualClass(unsigned char gold, unsigned char test)
 {
   int resultClass = -1;
-  for (int i = 0; i < m_ConnectionGold.size(); ++i)
+  for (std::size_t i = 0; i < m_ConnectionGold.size(); ++i)
   {
     if (m_ConnectionGold[i] == gold && m_ConnectionTest[i] == test)
     {
@@ -112,7 +112,6 @@ bool mitk::CollectionStatistic::Update()
     return false;
   }
 
-  typedef itk::Image<unsigned char, 3> ImageType;
   DataCollectionImageIterator<unsigned char, 3> goldIter(m_Collection, m_GroundTruthName);
   DataCollectionImageIterator<unsigned char, 3> testIter(m_Collection, m_TestName);
   DataCollectionImageIterator<unsigned char, 3> maskIter(m_Collection, m_MaskName);
@@ -129,7 +128,7 @@ bool mitk::CollectionStatistic::Update()
       StatisticData statData;
       m_ImageStatistic.push_back(statData);
       DataVector data;
-      for (int i = 0; i < m_ClassCount; ++i)
+      for (std::size_t i = 0; i < m_ClassCount; ++i)
       {
         StatisticData stat;
         data.push_back(stat);
@@ -151,7 +150,7 @@ bool mitk::CollectionStatistic::Update()
     if (goldClass == testClass) // True Positive
     {
       m_ImageStatistic[imageIndex].m_TruePositive += 1;
-      for (int i = 0; i < m_ClassCount; ++i)
+      for (std::size_t i = 0; i < m_ClassCount; ++i)
       {
         if (goldClass == i) // For the detected class it is a true positive
         {
@@ -165,7 +164,7 @@ bool mitk::CollectionStatistic::Update()
     {
       m_ImageStatistic[imageIndex].m_FalseNegative += 1;
       m_ImageStatistic[imageIndex].m_FalsePositive += 1;
-      for (int i = 0; i < m_ClassCount; ++i)
+      for (std::size_t i = 0; i < m_ClassCount; ++i)
       {
         if (goldClass == i) // For the class in Goldstandard it is a false negative
         {
@@ -196,7 +195,7 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
   if (withHeader)
   {
     sout << "Label;ImageName;";
-    for (int i = 0; i < m_ClassCount; ++i)
+    for (std::size_t i = 0; i < m_ClassCount; ++i)
     {
       sout << "DICE-Class-"<< i << ";";
       sout << "Jaccard-Class-"<< i << ";";
@@ -233,7 +232,7 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
 
   MITK_INFO << "m_ImageClassStatistic.size(): " << m_ImageClassStatistic.size();
 
-  for (int i = 0; i < m_ImageClassStatistic.size(); ++i)
+  for (std::size_t i = 0; i < m_ImageClassStatistic.size(); ++i)
   {
     sout << label << ";"<< m_ImageNames[i]<<";";
     StatisticData meanStat;
@@ -247,7 +246,7 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
     out << "| Class  |    DICE     |   Jaccard   | Sensitivity | Specificity |     TP      |     TN      |     FP      |      FN      |" << std::endl;
     out << "|--------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|--------------|" << std::endl;
 
-    for (int j =0; j < m_ImageClassStatistic[i].size(); ++j)
+    for (std::size_t j =0; j < m_ImageClassStatistic[i].size(); ++j)
     {
       StatisticData& stat = m_ImageClassStatistic[i][j];
       stat.m_DICE  = std::max(0.0,(2.0 * stat.m_TruePositive) / (2.0 * stat.m_TruePositive + stat.m_FalseNegative + stat.m_FalsePositive));

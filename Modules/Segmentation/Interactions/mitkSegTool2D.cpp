@@ -620,7 +620,7 @@ void InternalWritePreviewOnWorkingImage(itk::Image<TPixel, VImageDimension> *tar
 }
 
 void mitk::SegTool2D::WritePreviewOnWorkingImage(
-  Image *targetSlice, Image *sourceSlice, mitk::Image *workingImage, int paintingPixelValue, int timestep)
+  Image *targetSlice, Image *sourceSlice, mitk::Image *workingImage, int paintingPixelValue, int)
 {
   if ((!targetSlice) || (!sourceSlice))
     return;

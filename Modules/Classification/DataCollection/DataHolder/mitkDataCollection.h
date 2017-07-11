@@ -13,7 +13,9 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#pragma warning (disable : 4996)
+#ifdef _MSC_VER
+#  pragma warning (disable : 4996)
+#endif
 
 #ifndef mitkDataCollection_H_
 #define mitkDataCollection_H_

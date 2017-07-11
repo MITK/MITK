@@ -39,16 +39,16 @@ struct PersistenceTestClass
 struct TestPropertyListReplacedObserver : public mitk::PropertyListReplacedObserver
 {
   TestPropertyListReplacedObserver() : counter(0) {}
-  virtual void BeforePropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList) override
+  virtual void BeforePropertyListReplaced(const std::string &id, mitk::PropertyList *) override
   {
     if (id == m_Id)
-      counter++;
+      ++counter;
   }
 
-  virtual void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList) override
+  virtual void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *) override
   {
     if (id == m_Id)
-      counter++;
+      ++counter;
   }
 
   int counter;
@@ -176,7 +176,7 @@ public:
   /**
  * Helper Method that compares the returned class to its base values
  */
-  void testParams(const PersistenceTestClass &testClass, const std::string &testClassName)
+  void testParams(const PersistenceTestClass &testClass, const std::string &)
   {
     CPPUNIT_ASSERT_MESSAGE("Parameter of TestClass not equal to reference value: testClass.id",
                            testClass.id == testClassId);

@@ -177,15 +177,15 @@ protected:
   ItkUcharImgType::Pointer            m_SeedImage;
   ItkUcharImgType::Pointer            m_MaskImage;
   ItkUcharImgType::Pointer            m_TissueImage;
-  ItkDoubleImgType::Pointer			m_OutputProbabilityMap;
+  ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
 
   bool                                m_Verbose;
   bool                                m_AposterioriCurvCheck;
   bool                                m_AvoidStop;
   bool                                m_DemoMode;
   bool                                m_Random;
-  bool								m_UseOutputProbabilityMap;
-  std::vector< itk::Point<float> >	m_SeedPoints;
+  bool                                m_UseOutputProbabilityMap;
+  std::vector< itk::Point<float> >    m_SeedPoints;
 
   void BuildFibers(bool check);
   int CheckCurvature(FiberType* fib, bool front);

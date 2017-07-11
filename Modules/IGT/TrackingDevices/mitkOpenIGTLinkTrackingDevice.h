@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlQuaternionTrackingDataMessage.h>
 #include <igtlTrackingDataMessage.h>
 #include <igtlTransformMessage.h>
-#include "mitkIGTLTransformDeviceSource.h"
+#include "mitkIGTLTrackingDataDeviceSource.h"
 
 namespace mitk
 {
@@ -41,11 +41,11 @@ namespace mitk
   {
   public:
     mitkClassMacro(OpenIGTLinkTrackingDevice, TrackingDevice);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      /** Sets the port number for the Open IGT Link connection. Default value is -1 (invalid). */
-      void SetPortNumber(int portNumber);
+    /** Sets the port number for the Open IGT Link connection. Default value is -1 (invalid). */
+    void SetPortNumber(int portNumber);
 
     /** Sets the hostname for the Open IGT Link connection. Default value is 127.0.0.1 (localhost). */
     void SetHostname(std::string hostname);
@@ -109,6 +109,15 @@ namespace mitk
     */
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
 
+    /** @return Returns true if this device can autodetects its tools. */
+    virtual bool AutoDetectToolsAvailable();
+
+    /** Autodetects tools from the current OpenIGTLink connection and returns them as a navigation tool storage.
+    *  @return Returns the detected tools. Returns an empty storage if no tools are present
+    *          or if OpenIGTLink Connection is not possible
+    */
+    virtual mitk::NavigationToolStorage::Pointer AutoDetectTools();
+
     bool IsDeviceInstalled();
 
     itkSetMacro(UpdateRate, int);               ///< Sets the update rate of the device in fps. Default value is 60 fps.
@@ -130,6 +139,10 @@ namespace mitk
     void UpdateTools();
     unsigned long m_MessageReceivedObserverTag;
 
+    /** Receives one message from the OpenIGTLink connection. Starts the tracking stream if required.
+     */
+    mitk::IGTLMessage::Pointer ReceiveMessage(int waitingTime);
+
     /**
     * \return Returns all tools of the tracking device.
     */
@@ -139,7 +152,7 @@ namespace mitk
     mitk::IGTLClient::Pointer m_OpenIGTLinkClient;
 
     //OpenIGTLink pipeline
-    mitk::IGTLTransformDeviceSource::Pointer m_IGTLDeviceSource;
+    mitk::IGTLTrackingDataDeviceSource::Pointer m_IGTLDeviceSource;
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
     std::vector<OpenIGTLinkTrackingTool::Pointer> m_AllTools; ///< vector holding all tools
@@ -154,13 +167,13 @@ namespace mitk
 
     mitk::OpenIGTLinkTrackingDevice::TrackingMessageType GetMessageTypeFromString(const char* messageTypeString);
 
-    bool DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
-
-    bool DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
-
-    bool DiscoverToolsFromTransform();
+    /** Discovers tools from the OpenIGTLink connection and converts them to MITK navigation tool objects.
+        @return Returns a navigation tool storage holding all found tools. Returns an empty storage if no tools were found or if there was an error.*/
+    mitk::NavigationToolStorage::Pointer DiscoverToolsAndConvertToNavigationTools(mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type, int NumberOfMessagesToWait = 50);
 
     void AddNewToolForName(std::string name, int i);
+
+    mitk::NavigationTool::Pointer ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier);
   };
 }//mitk
 #endif /* MITKOpenIGTLinkTRACKINGDEVICE_H_HEADER_INCLUDED_ */

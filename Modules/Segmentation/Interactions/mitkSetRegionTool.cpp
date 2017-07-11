@@ -115,14 +115,6 @@ void mitk::SetRegionTool::OnMousePressed(StateMachineAction *, InteractionEvent 
   if (!workingNode)
     return;
 
-  Image *image = dynamic_cast<Image *>(workingNode->GetData());
-  LabelSetImage *labelImage = dynamic_cast<LabelSetImage *>(image);
-  int activeColor = 1;
-  if (labelImage != 0)
-  {
-    activeColor = labelImage->GetActiveLabel()->GetValue();
-  }
-
   mitk::ImageToContourModelFilter::Pointer contourextractor = mitk::ImageToContourModelFilter::New();
   contourextractor->SetInput(resultImage);
   contourextractor->Update();

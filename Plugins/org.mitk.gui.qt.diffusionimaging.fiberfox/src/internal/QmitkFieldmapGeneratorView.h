@@ -23,59 +23,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFieldmapGeneratorViewControls.h"
 #include <mitkPointSet.h>
 #include <itkImage.h>
+#include "mitkILifecycleAwarePart.h"
 
 /*!
   \brief Generate float image with artificial frequency maps used by Fiberfox. Simulates additional frequencies at (possibly multiple) positions based on 3D gaussians with the specified variance and amplitude and/or as a linear gradient in the image.
 * See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
 */
 
-class QmitkFieldmapGeneratorView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
+class QmitkFieldmapGeneratorView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
-    // this is needed for all Qt objects that should have a Qt meta-object
-    // (everything that derives from QObject and wants to have signal/slots)
-    Q_OBJECT
+  // this is needed for all Qt objects that should have a Qt meta-object
+  // (everything that derives from QObject and wants to have signal/slots)
+  Q_OBJECT
 
 public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    QmitkFieldmapGeneratorView();
-    virtual ~QmitkFieldmapGeneratorView();
+  QmitkFieldmapGeneratorView();
+  virtual ~QmitkFieldmapGeneratorView();
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-    ///
-    /// Sets the focus to an internal widget.
-    ///
-    virtual void SetFocus() override;
+  virtual void SetFocus() override;
 
-    virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-    virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
-    void OnSliceChanged(const itk::EventObject& e);
+  void OnSliceChanged(const itk::EventObject& e);
 
 protected slots:
 
-    void GenerateFieldmap();
-    void PlaceFieldSource();
-    void OnVarianceChanged(double value);
-    void OnHeightChanged(double value);
+  void GenerateFieldmap();
+  void PlaceFieldSource();
+  void OnVarianceChanged(double value);
+  void OnHeightChanged(double value);
 
 protected:
 
-    /// \brief called by QmitkAbstractView when DataManager's selection has changed
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
-    Ui::QmitkFieldmapGeneratorViewControls* m_Controls;
+  Ui::QmitkFieldmapGeneratorViewControls* m_Controls;
 
-    /** observer flags */
-    int m_SliceObserverTag1;
-    int m_SliceObserverTag2;
-    int m_SliceObserverTag3;
-    int m_PropertyObserverTag;
+  /** observer flags */
+  int m_SliceObserverTag1;
+  int m_SliceObserverTag2;
+  int m_SliceObserverTag3;
+  int m_PropertyObserverTag;
 
-    mitk::Point3D               m_WorldPoint;
-    mitk::DataNode::Pointer     m_SelectedSource;
+  mitk::Point3D               m_WorldPoint;
+  mitk::DataNode::Pointer     m_SelectedSource;
 };
 
 

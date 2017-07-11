@@ -74,13 +74,6 @@ static mitk::Vector3D createVector(mitk::ScalarType x, mitk::ScalarType y, mitk:
   return createArray<mitk::Vector3D>(x, y, z);
 }
 
-static mitk::VnlVector createVnlVector(mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
-{
-  mitk::VnlVector vector(3);
-  mitk::FillVector3D(vector, x, y, z);
-  return vector;
-}
-
 void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
 {
   MITK_TEST_OUTPUT(<< "====== mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test() ======");
@@ -155,7 +148,6 @@ int mitkSlicedGeometry3DTest(int, char *[])
 
   auto right = createVector(widthInMM, 0.0, 0.0);
   auto bottom = createVector(0.0, heightInMM, 0.0);
-  auto normal = createVector(0.0, 0.0, thicknessInMM);
   auto spacing = createVector(1.0, 1.0, thicknessInMM);
 
   auto planeGeometry = mitk::PlaneGeometry::New();

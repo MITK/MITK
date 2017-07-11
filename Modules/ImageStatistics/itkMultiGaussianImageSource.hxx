@@ -786,7 +786,6 @@ namespace itk
     itkDebugMacro(<< "Generating a  image of scalars ");
     double valueReal;
     IndexType index;
-    typedef typename TOutputImage::PixelType scalarType;
     typename TOutputImage::Pointer image = this->GetOutput(0);
     image = this->GetOutput(0);
     image->SetBufferedRegion( image->GetRequestedRegion() );

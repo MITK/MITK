@@ -82,6 +82,12 @@ namespace mitk {
     itkGetConstMacro(ToolTipOrientation,mitk::Quaternion);
     itkSetMacro(ToolTipOrientation,mitk::Quaternion);
 
+    //Tool Axis definition:
+    //default tool axis is along x axis, the tool axis must be normalized
+    itkGetConstMacro(ToolAxis, mitk::Point3D);
+    itkSetMacro(ToolAxis, mitk::Point3D);
+
+
     /** @return Returns the tooltip as transform object. */
     mitk::AffineTransform3D::Pointer GetToolTipTransform();
 
@@ -190,6 +196,9 @@ namespace mitk {
     mitk::Point3D m_ToolTipPosition;
     /** @brief Holds the orientation of the tool tip. */
     mitk::Quaternion m_ToolTipOrientation;
+
+    /** @brief Holds the axis of the tool. */
+    mitk::Point3D m_ToolAxis;
     //#################################################
 
   };

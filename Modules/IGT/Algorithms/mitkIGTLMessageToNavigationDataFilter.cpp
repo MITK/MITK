@@ -237,10 +237,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
     //check if the current index, all outputs that have no corresponding input
     //tracking element stay invalidated, the others are validated according to
     //the tracking element
-    if (input->IsDataValid() == false || i >= numTrackingDataElements)
-    {
-      continue;
-    }
+    if (input->IsDataValid() == false) { continue; }
     output->SetDataValid(true);
 
     //get the tracking data element which holds all the data

@@ -43,7 +43,6 @@ public:
   \brief default constructor
   */
   QmitkDiffusionDicomImport(QObject *parent=0, const char *name=0);
-  QmitkDiffusionDicomImport(const QmitkDiffusionDicomImport& other);
 
   /*!
   \brief default destructor

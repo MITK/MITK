@@ -166,7 +166,7 @@ void mitk::SliceBasedInterpolationController::SetChangedSlice(const Image *slice
     return;
 
   // check if the number of labels has changed
-  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  auto numberOfLabels = m_WorkingImage->GetNumberOfLabels();
   if (m_LabelCountInSlice[0][0][0].size() != numberOfLabels)
     return;
 

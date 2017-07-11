@@ -15,19 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVolumeMapperVtkSmart3D.h"
+#include <vtkObjectFactory.h>
+#include <vtkRenderingOpenGL2ObjectFactory.h>
+#include <vtkRenderingVolumeOpenGL2ObjectFactory.h>
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
 
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+  createMapper(GetInputImage());
+  createVolume();
+  createVolumeProperty();
+  m_SmartVolumeMapper->Update();
+  m_Volume->Update();
+  MITK_INFO << "rendering ...";
 }
 
 vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-  if (!m_Volume->GetMapper())
-  {
-    createVolume();
-  }
-
   return m_Volume;
 }
 
@@ -37,11 +42,6 @@ void mitk::VolumeMapperVtkSmart3D::ApplyProperties(vtkActor *actor, mitk::BaseRe
 }
 
 void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)
-{
-
-}
-
-void mitk::VolumeMapperVtkSmart3D::MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer)
 {
 
 }
@@ -59,16 +59,8 @@ void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
 }
 
 void mitk::VolumeMapperVtkSmart3D::createVolume()
-{
-  if (!m_SmartVolumeMapper->GetInput())
-  {
-    createMapper(GetInputImage());
-  }
-
-  if (1)
-    createVolumeProperty();
-
-  m_Volume->VisibilityOff();
+{    
+  m_Volume->VisibilityOn();
   m_Volume->SetMapper(m_SmartVolumeMapper);
   m_Volume->SetProperty(m_VolumeProperty);
 }
@@ -77,10 +69,27 @@ void mitk::VolumeMapperVtkSmart3D::createVolumeProperty()
 {
   m_VolumeProperty->ShadeOff();
   m_VolumeProperty->SetInterpolationType(VTK_LINEAR_INTERPOLATION);
+
+  vtkSmartPointer<vtkPiecewiseFunction> compositeOpacity =
+    vtkSmartPointer<vtkPiecewiseFunction>::New();
+  compositeOpacity->AddPoint(-1000.0, 0.0);
+  compositeOpacity->AddPoint(400.0, 1.0);
+  m_VolumeProperty->SetScalarOpacity(compositeOpacity); // composite first.
+
+  vtkSmartPointer<vtkColorTransferFunction> color =
+    vtkSmartPointer<vtkColorTransferFunction>::New();
+  color->AddRGBPoint(0.0, 1.0, 1.0, 1.0);
+  color->AddRGBPoint(255.0, 1.0, 1.0, 1.0);
+  m_VolumeProperty->SetColor(color);
 }
 
 mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
 {
+  vtkObjectFactory::RegisterFactory(vtkRenderingOpenGL2ObjectFactory::New());
+  vtkObjectFactory::RegisterFactory(vtkRenderingVolumeOpenGL2ObjectFactory::New());
+
+  m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+  m_SmartVolumeMapper->SetBlendModeToComposite();
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
   m_Volume = vtkSmartPointer<vtkVolume>::New();
 }

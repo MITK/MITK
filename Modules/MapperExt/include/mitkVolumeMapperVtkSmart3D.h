@@ -50,9 +50,7 @@ namespace mitk
 
     virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
-
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer) override;
-
+    
   protected:
     VolumeMapperVtkSmart3D();
     virtual ~VolumeMapperVtkSmart3D();

@@ -1184,43 +1184,6 @@ DicomSeriesReader::GdcmSortFunction(
         {
           return temporalIndex1 < temporalIndex2;
         } 
-        else 
-        {
-          // try to sort by Acquisition Time
-          static const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
-          double acquisition_time1 = 0.0;
-          double acquisition_time2 = 0.0;
-
-          if (ds1.second.find(tagAcquisitionTime) != ds1.second.end() && ds2.second.find(tagAcquisitionTime) != ds2.second.end())
-          {
-            acquisition_time1 = std::stod(ds1.second.at(tagAcquisitionTime)); // Acquisition time
-            acquisition_time2 = std::stod(ds2.second.at(tagAcquisitionTime));
-          }
-          if (acquisition_time1 != acquisition_time2)
-          {
-            return acquisition_time1 < acquisition_time2;
-          } 
-          else // we gave up on image position, acquisition number and acquisition time now
-          {
-            // let's try trigger time
-            static const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
-            double trigger_time1 = 0.0;
-            double trigger_time2 = 0.0;
-
-            if (ds1.second.find(tagTriggerTime) != ds1.second.end() && ds2.second.find(tagTriggerTime) != ds2.second.end())
-            {
-              trigger_time1 = std::stod(ds1.second.at(tagTriggerTime)); // Trigger time
-              trigger_time2 = std::stod(ds2.second.at(tagTriggerTime));
-            }
-
-            if (trigger_time1 != trigger_time2)
-            {
-              return trigger_time1 < trigger_time2;
-            }
-              // ELSE!
-              // for this and many previous ifs we fall through if nothing lets us sort
-          }   // .
-        }
       }
     }
   }

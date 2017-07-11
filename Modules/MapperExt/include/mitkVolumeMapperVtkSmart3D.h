@@ -39,10 +39,10 @@ namespace mitk
   //## @brief Vtk-based mapper for VolumeData
   //##
   //## @ingroup Mapper
-  class MITKMAPPEREXT_EXPORT VtkSmartVolumeMapper3D : public VtkMapper
+  class MITKMAPPEREXT_EXPORT VolumeMapperVtkSmart3D : public VtkMapper
   {
   public:
-    mitkClassMacro(VtkSmartVolumeMapper3D, VtkMapper);
+    mitkClassMacro(VolumeMapperVtkSmart3D, VtkMapper);
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
@@ -54,8 +54,8 @@ namespace mitk
     virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer) override;
 
   protected:
-    VtkSmartVolumeMapper3D();
-    virtual ~VtkSmartVolumeMapper3D();
+    VolumeMapperVtkSmart3D();
+    virtual ~VolumeMapperVtkSmart3D();
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
@@ -64,9 +64,9 @@ namespace mitk
     void createVolumeProperty();
     vtkImageData* GetInputImage();
 
-    vtkSmartPointer<vtkVolume> m_Volume = nullptr;
-    vtkSmartPointer<vtkSmartVolumeMapper> m_Mapper = nullptr;
-    vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty = nullptr;
+    vtkSmartPointer<vtkVolume> m_Volume;
+    vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
+    vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
   };
 
 } // namespace mitk

@@ -404,7 +404,7 @@ void QmitkIVIMView::FittIVIMStart()
 
     if (!img)
     {
-        QMessageBox::information( nullptr, "Template", "No valid diffusion image was found.");
+        QMessageBox::information( nullptr, "Template", "No valid diffusion-weighted image selected.");
         return;
     }
 
@@ -455,10 +455,10 @@ void QmitkIVIMView::FittIVIMStart()
       kimage->InitializeByItk( filter->GetOutput(1) );
       kimage->SetVolume( filter->GetOutput(1)->GetBufferPointer());
 
-      QString basename(nodes.front()->GetName().c_str());
-      QString new_dname = basename; new_dname = new_dname.append("KurtFit_DMap");
-
-      QString new_kname = basename; new_kname = new_kname.append("KurtFit_KMap");
+      QString new_dname = "Kurtosis_DMap";
+      new_dname.append("_Method-"+m_Controls->m_KurtosisFitScale->currentText());
+      QString new_kname = "Kurtosis_KMap";
+      new_kname.append("_Method-"+m_Controls->m_KurtosisFitScale->currentText());
 
       if( this->m_Controls->m_CheckKurtD->isChecked() )
       {
@@ -466,7 +466,7 @@ void QmitkIVIMView::FittIVIMStart()
         dnode->SetData( dimage );
         dnode->SetName(new_dname.toLatin1());
         dnode->SetProperty("LookupTable", kurt_lut_prop );
-        GetDataStorage()->Add(dnode);
+        GetDataStorage()->Add(dnode, nodes.front());
       }
 
       if( this->m_Controls->m_CheckKurtK->isChecked() )
@@ -475,7 +475,7 @@ void QmitkIVIMView::FittIVIMStart()
         knode->SetData( kimage );
         knode->SetName(new_kname.toLatin1());
         knode->SetProperty("LookupTable", kurt_lut_prop );
-        GetDataStorage()->Add(knode);
+        GetDataStorage()->Add(knode, nodes.front());
       }
 
     }
@@ -802,11 +802,11 @@ void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& no
         mitk::Image::Pointer dstarimage = mitk::Image::New();
         dstarimage->InitializeByItk(m_DStarMap.GetPointer());
         dstarimage->SetVolume(m_DStarMap->GetBufferPointer());
-        QString newname2 = basename; newname2 = newname2.append("_DStarMap_%1").arg(m_Controls->m_MethodCombo->currentText());
+        QString newname2 = ""; newname2 = newname2.append("IVIM_DStarMap_Method-%1").arg(m_Controls->m_MethodCombo->currentText());
         mitk::DataNode::Pointer node2=mitk::DataNode::New();
         node2->SetData( dstarimage );
         node2->SetName(newname2.toLatin1());
-        GetDataStorage()->Add(node2);
+        GetDataStorage()->Add(node2, nodes.front());
     }
 
     if(m_Controls->m_CheckD->isChecked())
@@ -814,11 +814,11 @@ void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& no
         mitk::Image::Pointer dimage = mitk::Image::New();
         dimage->InitializeByItk(m_DMap.GetPointer());
         dimage->SetVolume(m_DMap->GetBufferPointer());
-        QString newname1 = basename; newname1 = newname1.append("_DMap_%1").arg(m_Controls->m_MethodCombo->currentText());
+        QString newname1 = ""; newname1 = newname1.append("IVIM_DMap_Method-%1").arg(m_Controls->m_MethodCombo->currentText());
         mitk::DataNode::Pointer node1=mitk::DataNode::New();
         node1->SetData( dimage );
         node1->SetName(newname1.toLatin1());
-        GetDataStorage()->Add(node1);
+        GetDataStorage()->Add(node1, nodes.front());
     }
 
     if(m_Controls->m_Checkf->isChecked())
@@ -826,11 +826,11 @@ void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& no
         mitk::Image::Pointer image = mitk::Image::New();
         image->InitializeByItk(m_fMap.GetPointer());
         image->SetVolume(m_fMap->GetBufferPointer());
-        QString newname0 = basename; newname0 = newname0.append("_fMap_%1").arg(m_Controls->m_MethodCombo->currentText());
+        QString newname0 = ""; newname0 = newname0.append("IVIM_fMap_Method-%1").arg(m_Controls->m_MethodCombo->currentText());
         mitk::DataNode::Pointer node=mitk::DataNode::New();
         node->SetData( image );
         node->SetName(newname0.toLatin1());
-        GetDataStorage()->Add(node);
+        GetDataStorage()->Add(node, nodes.front());
     }
 
     this->GetRenderWindowPart()->RequestUpdate();

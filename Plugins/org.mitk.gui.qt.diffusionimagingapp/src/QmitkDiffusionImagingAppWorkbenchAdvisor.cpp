@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QApplication>
 #include <QPoint>
+#include <QRect>
+#include <QDesktopWidget>
 
 const QString QmitkDiffusionImagingAppWorkbenchAdvisor::WELCOME_PERSPECTIVE_ID = "org.mitk.diffusionimagingapp.perspectives.welcome";
 
@@ -40,7 +42,7 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer
 
 berry::WorkbenchWindowAdvisor*
 QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
-        berry::IWorkbenchWindowConfigurer::Pointer configurer)
+    berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
   QList<QString> perspExcludeList;
   perspExcludeList.push_back( "org.blueberry.uitest.util.EmptyPerspective" );
@@ -50,7 +52,8 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   QList<QString> viewExcludeList;
   viewExcludeList.push_back( "org.mitk.views.controlvisualizationpropertiesview" );
 
-  configurer->SetInitialSize(QPoint(1000,770));
+  QRect rec = QApplication::desktop()->screenGeometry();
+  configurer->SetInitialSize(QPoint(rec.width(),rec.height()));
 
   QmitkExtWorkbenchWindowAdvisor* advisor = new QmitkExtWorkbenchWindowAdvisor(this, configurer);
   advisor->ShowViewMenuItem(true);

@@ -41,5 +41,6 @@ void QmitkDiffusionDefaultPerspective::CreateInitialLayout(berry::IPageLayout::P
     /////////////////////////////////////////////
 
     left->AddView("org.mitk.views.diffusiondicomimport");
+    left->AddView("org.mitk.views.diffusionpreprocessing");
 
 }

@@ -74,7 +74,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
  }
 
  /** \brief Return number of rows of the model. */
- int QmitkUSNavigationCalibrationsDataModel::rowCount ( const QModelIndex & parent ) const
+ int QmitkUSNavigationCalibrationsDataModel::rowCount ( const QModelIndex & ) const
  {
    if ( m_ControlInterfaceBMode.IsNull() )
    {
@@ -87,7 +87,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
  }
 
  /** \brief Return number of columns (3) of the model. */
- int QmitkUSNavigationCalibrationsDataModel::columnCount ( const QModelIndex & parent ) const
+ int QmitkUSNavigationCalibrationsDataModel::columnCount ( const QModelIndex & ) const
  {
    return 3;
  }
@@ -111,7 +111,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
  }
 
  /** \brief Return selectable and enabled for column 1 (size); selectable, enabled and editable for every other column. */
- Qt::ItemFlags QmitkUSNavigationCalibrationsDataModel::flags ( const QModelIndex & index ) const
+ Qt::ItemFlags QmitkUSNavigationCalibrationsDataModel::flags ( const QModelIndex & ) const
  {
    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
  }
@@ -223,7 +223,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
  }
 
 /** \brief Set model data for the selected cell. */
-bool QmitkUSNavigationCalibrationsDataModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+bool QmitkUSNavigationCalibrationsDataModel::setData ( const QModelIndex & index, const QVariant & value, int )
 {
   if ( m_CombinedModality.IsNull() || index.column() != 2 || value != false )
     return false;
@@ -244,7 +244,7 @@ bool QmitkUSNavigationCalibrationsDataModel::setData ( const QModelIndex & index
 /** \brief Remove given rows from the model.
 *  \param removeFromDataStorage zone nodes are removed from the data storage too, if this is set to true
 */
-bool QmitkUSNavigationCalibrationsDataModel::removeRows ( int row, int count, const QModelIndex& parent, bool removeFromDataStorage )
+bool QmitkUSNavigationCalibrationsDataModel::removeRows ( int, int, const QModelIndex&, bool )
 {
   return false;
 }

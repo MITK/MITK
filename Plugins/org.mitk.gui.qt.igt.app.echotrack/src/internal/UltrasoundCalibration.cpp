@@ -734,7 +734,7 @@ void UltrasoundCalibration::OnCalibration()
 
   mitk::SlicedGeometry3D::Pointer sliced3d = dynamic_cast<mitk::SlicedGeometry3D*> (m_Node->GetData()->GetGeometry());
 
-  mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetGeometry2D(0));
+  mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetPlaneGeometry(0));
 
   plane->SetIndexToWorldTransform(m_Transformation);
 
@@ -881,7 +881,7 @@ void UltrasoundCalibration::OnReset()
   if (m_Node.IsNotNull() && (m_Node->GetData() != nullptr) && (m_Node->GetData()->GetGeometry() != nullptr))
   {
     mitk::SlicedGeometry3D::Pointer sliced3d = dynamic_cast<mitk::SlicedGeometry3D*> (m_Node->GetData()->GetGeometry());
-    mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetGeometry2D(0));
+    mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetPlaneGeometry(0));
     plane->SetIndexToWorldTransform(m_Transformation);
   }
 
@@ -1051,7 +1051,7 @@ double UltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials,
 
 void UltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform)
 {
-  for (unsigned int i = 0; i < pointSet->GetSize(); i++)
+  for (int i = 0; i < pointSet->GetSize(); ++i)
   {
     itk::Point<double> current_point_transformed = itk::Point<double>();
     current_point_transformed = transform->TransformPoint(pointSet->GetPoint(i)[0], pointSet->GetPoint(i)[1], pointSet->GetPoint(i)[2]);

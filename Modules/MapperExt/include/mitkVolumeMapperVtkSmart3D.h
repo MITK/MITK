@@ -67,6 +67,7 @@ namespace mitk
     vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
     
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
+    void UpdateRenderMode(mitk::BaseRenderer *renderer);
   };
 
 } // namespace mitk

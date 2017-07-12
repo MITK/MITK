@@ -37,9 +37,9 @@ void mitk::MovieGeneratorOpenCV::SetFileName( const char *fileName )
   m_sFile = fileName;
 }
 
-void mitk::MovieGeneratorOpenCV::SetFrameRate(int rate)
+void mitk::MovieGeneratorOpenCV::SetFrameRate(unsigned int rate)
 {
-  m_dwRate = rate;
+  m_dwRate = static_cast<int>(rate);
 }
 
 void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool RemoveColouredFrame)

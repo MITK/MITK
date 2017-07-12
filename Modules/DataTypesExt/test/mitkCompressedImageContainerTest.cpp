@@ -132,7 +132,7 @@ int mitkCompressedImageContainerTest(int argc, char *argv[])
   try
   {
     std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
-    image = mitk::IOUtil::LoadImage(argv[1]);
+    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
   }
   catch (const mitk::Exception &)
   {

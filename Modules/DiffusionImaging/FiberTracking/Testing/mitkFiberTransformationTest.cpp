@@ -30,8 +30,8 @@ int mitkFiberTransformationTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(argc==3,"check for input data")
 
             try{
-        mitk::FiberBundle::Pointer groundTruthFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
-        mitk::FiberBundle::Pointer transformedFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
+        mitk::FiberBundle::Pointer groundTruthFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
+        mitk::FiberBundle::Pointer transformedFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[2])[0].GetPointer());
 
         groundTruthFibs->RotateAroundAxis(90, 45, 10);
         groundTruthFibs->TranslateFibers(2, 3, 5);

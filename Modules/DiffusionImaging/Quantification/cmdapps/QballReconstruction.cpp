@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
         coeffout += "_shcoeffs.nrrd";
 
         outfilename += ".qbi";
-        mitk::IOUtil::SaveBaseData(image, outfilename);
+        mitk::IOUtil::Save(image, outfilename);
 
         if (outCoeffs)
             mitk::IOUtil::SaveImage(coeffsImage, coeffout);

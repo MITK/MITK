@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
         mitk::Image::Pointer ref_img;
         MITK_INFO << reference_image;
         if (!reference_image.empty())
-            ref_img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(reference_image).GetPointer());
+            ref_img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(reference_image)[0].GetPointer());
 
         if (endpoints)
         {
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
             img->InitializeByItk(outImg.GetPointer());
             img->SetVolume(outImg->GetBufferPointer());
 
-            mitk::IOUtil::SaveBaseData(img, outFileName );
+            mitk::IOUtil::Save(img, outFileName );
         }
         else if (binary)
         {
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
             img->InitializeByItk(outImg.GetPointer());
             img->SetVolume(outImg->GetBufferPointer());
 
-            mitk::IOUtil::SaveBaseData(img, outFileName );
+            mitk::IOUtil::Save(img, outFileName );
         }
         else
         {
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
             img->InitializeByItk(outImg.GetPointer());
             img->SetVolume(outImg->GetBufferPointer());
 
-            mitk::IOUtil::SaveBaseData(img, outFileName );
+            mitk::IOUtil::Save(img, outFileName );
         }
 
     }

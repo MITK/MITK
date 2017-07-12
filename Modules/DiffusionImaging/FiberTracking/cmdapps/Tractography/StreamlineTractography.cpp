@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
   std::vector< mitk::Image::Pointer > input_images;
   for (unsigned int i=0; i<input_files.size(); i++)
   {
-    mitk::Image::Pointer mitkImage = mitk::IOUtil::LoadImage(input_files.at(i));
+    mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(input_files.at(i))[0].GetPointer());
     input_images.push_back(mitkImage);
   }
 
@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
   if (!maskFile.empty())
   {
     MITK_INFO << "loading mask image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(maskFile).GetPointer());
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFile)[0].GetPointer());
     mask = ItkUcharImgType::New();
     mitk::CastToItkImage(img, mask);
   }
@@ -251,7 +251,7 @@ int main(int argc, char* argv[])
   if (!seedFile.empty())
   {
     MITK_INFO << "loading seed image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(seedFile).GetPointer());
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(seedFile)[0].GetPointer());
     seed = ItkUcharImgType::New();
     mitk::CastToItkImage(img, seed);
   }
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
   if (!stopFile.empty())
   {
     MITK_INFO << "loading stop image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(stopFile).GetPointer());
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(stopFile)[0].GetPointer());
     stop = ItkUcharImgType::New();
     mitk::CastToItkImage(img, stop);
   }
@@ -270,7 +270,7 @@ int main(int argc, char* argv[])
   if (!tissueFile.empty())
   {
     MITK_INFO << "loading tissue image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(tissueFile).GetPointer());
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(tissueFile)[0].GetPointer());
     tissue = ItkUcharImgType::New();
     mitk::CastToItkImage(img, tissue);
   }
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
   addImages.push_back(std::vector< ItkFloatImgType::Pointer >());
   for (auto file : addFiles)
   {
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(file).GetPointer());
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(file)[0].GetPointer());
     ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
     mitk::CastToItkImage(img, itkimg);
     addImages.at(0).push_back(itkimg);

@@ -159,13 +159,7 @@ int main(int argc, char* argv[])
   else
     caffe::Caffe::set_mode(caffe::Caffe::GPU);
 
-  mitk::Image::Pointer input_input_image = mitk::IOUtil::LoadImage(input_image_file);
-
-//  mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
-//  statisticsCalculator->SetInputImage(t1_input_image);
-//  statisticsCalculator->SetNBinsForHistogramStatistics(1000);
-//  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer statistics = statisticsCalculator->GetStatistics();
-//  float percentile = statistics->GetHistogram()->Quantile(0, 0.95);
+  mitk::Image::Pointer input_input_image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(input_image_file)[0].GetPointer());
 
   typedef itk::Image< float, 3 >    FloatImgType;
   FloatImgType::Pointer float_img = FloatImgType::New();

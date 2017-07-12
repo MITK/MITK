@@ -130,7 +130,7 @@ public:
 
       m_ToFImageGrabber->ConnectCamera();
       m_ToFImageGrabber->StartCamera();
-      mitk::Image::Pointer expectedResultImage = mitk::IOUtil::LoadImage(m_KinectDepthImagePath);
+      mitk::Image::Pointer expectedResultImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_KinectDepthImagePath)[0].GetPointer());
 
       m_ToFImageGrabber->Update();
 

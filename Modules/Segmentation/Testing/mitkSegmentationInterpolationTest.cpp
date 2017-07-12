@@ -156,7 +156,7 @@ private:
 public:
   void setUp() override
   {
-    m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    m_ReferenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd"))[0].GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
 
     m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();

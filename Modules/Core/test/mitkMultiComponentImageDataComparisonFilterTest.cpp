@@ -50,7 +50,7 @@ int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char *argv[])
   MITK_TEST_CONDITION_REQUIRED(testObject->GetResult() == false, "CompareResult still false");
 
   // now load an image with several components and present it to the filter
-  mitk::Image::Pointer testImg = mitk::IOUtil::LoadImage(argv[1]);
+  mitk::Image::Pointer testImg = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
   mitk::Image::Pointer testImg2 = testImg->Clone();
 
   testObject->SetValidImage(testImg);

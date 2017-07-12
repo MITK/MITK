@@ -634,7 +634,7 @@ QTemporaryFile* QmitkCmdLineModuleRunner::SaveTemporaryImage(const ctkCmdLineMod
       if (tempFile->open())
       {
         tempFile->close();
-        if (mitk::IOUtil::SaveBaseData( image, tempFile->fileName().toStdString() ))
+        if (mitk::IOUtil::Save( image, tempFile->fileName().toStdString() ))
         {
           returnedFile = tempFile;
           break;

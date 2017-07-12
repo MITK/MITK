@@ -80,9 +80,9 @@ int main(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
         // load fiber bundle
-        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
 
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(labelImageFile)->GetData());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(labelImageFile)[0].GetPointer());
         typedef mitk::ImageToItk< ItkShortImgType > CasterType;
         CasterType::Pointer caster = CasterType::New();
         caster->SetInput(img);
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
             detected.push_back(false);
 
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK.nrrd")->GetData());
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK.nrrd")[0].GetPointer());
                 typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
             }
 
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK_COVERAGE.nrrd")->GetData());
+            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK_COVERAGE.nrrd")[0].GetPointer());
                 typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -294,7 +294,7 @@ int main(int argc, char* argv[])
             string ncfilename = outRoot;
             ncfilename.append("_NC.fib");
 
-            mitk::IOUtil::SaveBaseData(noConnFib.GetPointer(), ncfilename );
+            mitk::IOUtil::Save(noConnFib.GetPointer(), ncfilename );
 
             vtkSmartPointer<vtkPolyData> invalidPolyData = vtkSmartPointer<vtkPolyData>::New();
             invalidPolyData->SetPoints(invalidPoints);
@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
             string icfilename = outRoot;
             icfilename.append("_IC.fib");
 
-            mitk::IOUtil::SaveBaseData(invalidFib.GetPointer(), icfilename );
+            mitk::IOUtil::Save(invalidFib.GetPointer(), icfilename );
 
             vtkSmartPointer<vtkPolyData> validPolyData = vtkSmartPointer<vtkPolyData>::New();
             validPolyData->SetPoints(validPoints);
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
             string vcfilename = outRoot;
             vcfilename.append("_VC.fib");
 
-            mitk::IOUtil::SaveBaseData(validFib.GetPointer(), vcfilename );
+            mitk::IOUtil::Save(validFib.GetPointer(), vcfilename );
 
             {
                 typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;

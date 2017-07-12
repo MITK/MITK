@@ -37,7 +37,7 @@ static void Setup()
 {
   try
   {
-    m_Image = mitk::IOUtil::LoadImage(m_Filename);
+    m_Image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_Filename)[0].GetPointer());
   }
   catch (const itk::ExceptionObject &e)
   {

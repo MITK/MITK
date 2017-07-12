@@ -38,7 +38,7 @@ public:
 
   void TestDoseImage()
   {
-      mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"));
+      mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"))[0].GetPointer());
 
       auto doseReader = mitk::RTDoseReader();
       doseReader.SetInput(GetTestDataFilePath("RT/Dose/RD.dcm"));

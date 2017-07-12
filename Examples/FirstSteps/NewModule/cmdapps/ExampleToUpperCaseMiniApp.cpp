@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
       MITK_INFO << "Trying to write to file.";
     }
 
-    mitk::IOUtil::SaveBaseData(outExample.GetPointer(), outFileName);
+    mitk::IOUtil::Save(outExample.GetPointer(), outFileName);
 
     return EXIT_SUCCESS;
   }

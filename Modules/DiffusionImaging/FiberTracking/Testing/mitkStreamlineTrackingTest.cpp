@@ -52,16 +52,16 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
     {
         MITK_INFO << "Loading tensor image ...";
         typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-        mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(dtiFileName)->GetData());
+        mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::Load(dtiFileName)[0].GetPointer());
         ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
         mitk::CastToItkImage(mitkTensorImage, itk_dti);
 
         MITK_INFO << "Loading seed image ...";
         typedef itk::Image< unsigned char, 3 >    ItkUCharImageType;
-        mitk::Image::Pointer mitkSeedImage = mitk::IOUtil::LoadImage(maskFileName);
+        mitk::Image::Pointer mitkSeedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFileName)[0].GetPointer());
 
         MITK_INFO << "Loading mask image ...";
-        mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(maskFileName);
+        mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFileName)[0].GetPointer());
 
         omp_set_num_threads(1);
 
@@ -104,13 +104,13 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer fib1 = mitk::FiberBundle::New(fiberBundle);
 
-        mitk::FiberBundle::Pointer fib2 = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(referenceFileName)->GetData());
+        mitk::FiberBundle::Pointer fib2 = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(referenceFileName)[0].GetPointer());
         MITK_TEST_CONDITION_REQUIRED(fib2.IsNotNull(), "Check if reference tractogram is not null.");
         bool ok = fib1->Equals(fib2);
         if (!ok)
         {
             MITK_WARN << "TEST FAILED. TRACTOGRAMS ARE NOT EQUAL!";
-            mitk::IOUtil::SaveBaseData(fib1, mitk::IOUtil::GetTempPath()+"testBundle.fib");
+            mitk::IOUtil::Save(fib1, mitk::IOUtil::GetTempPath()+"testBundle.fib");
             MITK_INFO << "OUTPUT: " << mitk::IOUtil::GetTempPath();
         }
         MITK_TEST_CONDITION_REQUIRED(ok, "Check if tractograms are equal.");

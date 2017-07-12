@@ -106,7 +106,7 @@ public:
     }
     m_ToFNrrdImageWriter->Close(); //close file
 
-    mitk::Image::Pointer writtenImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
+    mitk::Image::Pointer writtenImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_DistanceImageName )[0].GetPointer());
     MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenImage, "Written image should be equal to the test data.");
 
     //clean up tmp written image
@@ -137,8 +137,8 @@ public:
     }
     m_ToFNrrdImageWriter->Close(); //close file
 
-    mitk::Image::Pointer writtenDepthImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
-    mitk::Image::Pointer writtenAmplitudeImage = mitk::IOUtil::LoadImage( m_AmplitudeImageName );
+    mitk::Image::Pointer writtenDepthImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_DistanceImageName )[0].GetPointer());
+    mitk::Image::Pointer writtenAmplitudeImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_AmplitudeImageName )[0].GetPointer());
 
     MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenDepthImage, "Written depth image should be equal to the test data.");
     MITK_ASSERT_EQUAL( m_GroundTruthAmplitudeImage, writtenAmplitudeImage, "Written amplitude image should be equal to the test data.");
@@ -171,8 +171,8 @@ public:
     }
     m_ToFNrrdImageWriter->Close(); //close file
 
-    mitk::Image::Pointer writtenDepthImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
-    mitk::Image::Pointer writtenIntensityImage = mitk::IOUtil::LoadImage( m_IntensityImageName );
+    mitk::Image::Pointer writtenDepthImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_DistanceImageName )[0].GetPointer());
+    mitk::Image::Pointer writtenIntensityImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_IntensityImageName )[0].GetPointer());
 
     MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenDepthImage, "Written depth image should be equal to the test data.");
     MITK_ASSERT_EQUAL( m_GroundTruthIntensityImage, writtenIntensityImage, "Written amplitude image should be equal to the test data.");
@@ -211,9 +211,9 @@ public:
     }
     m_ToFNrrdImageWriter->Close(); //close file
 
-    mitk::Image::Pointer writtenDepthImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
-    mitk::Image::Pointer writtenIntensityImage = mitk::IOUtil::LoadImage( m_IntensityImageName );
-    mitk::Image::Pointer writtenAmplitudeImage = mitk::IOUtil::LoadImage( m_AmplitudeImageName );
+    mitk::Image::Pointer writtenDepthImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_DistanceImageName )[0].GetPointer());
+    mitk::Image::Pointer writtenIntensityImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_IntensityImageName )[0].GetPointer());
+    mitk::Image::Pointer writtenAmplitudeImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_AmplitudeImageName )[0].GetPointer());
 
     MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenDepthImage, "Written depth image should be equal to the test data.");
     MITK_ASSERT_EQUAL( m_GroundTruthAmplitudeImage, writtenAmplitudeImage, "Written amplitude image should be equal to the test data.");

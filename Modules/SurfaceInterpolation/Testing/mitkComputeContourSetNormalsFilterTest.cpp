@@ -76,7 +76,7 @@ public:
   void TestComputeNormalsWithHole()
   {
     mitk::Image::Pointer segmentationImage =
-      mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"));
+      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"))[0].GetPointer());
 
     mitk::Surface::Pointer contour =
       mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/ComputeNormals/ContourWithHoles.vtk"));

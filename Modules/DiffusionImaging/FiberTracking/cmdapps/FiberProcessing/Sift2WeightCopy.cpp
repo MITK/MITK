@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
           fib->SetFiberWeight(i, weights[i]);
         }
 
-        mitk::IOUtil::SaveBaseData(fib.GetPointer(), outFileName );
+        mitk::IOUtil::Save(fib.GetPointer(), outFileName );
     }
     catch (itk::ExceptionObject e)
     {

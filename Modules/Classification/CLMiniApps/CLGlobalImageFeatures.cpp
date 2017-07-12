@@ -84,8 +84,8 @@ int main(int argc, char* argv[])
 
   bool useCooc = parsedArgs.count("cooccurence");
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+  mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["mask"].ToString())[0].GetPointer());
 
   bool fixDifferentSpaces = parsedArgs.count("same-space");
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetOrigin(), image->GetGeometry(0)->GetOrigin()))

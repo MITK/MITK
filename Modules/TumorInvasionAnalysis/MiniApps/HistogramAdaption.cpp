@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   }
 
   std::string outFile = us::any_cast<string>(parsedArgs["output"]);
-  mitk::Image::Pointer inputFile = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["input"]));
+  mitk::Image::Pointer inputFile = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["input"]))[0].GetPointer());
   float cutOff = us::any_cast<float>(parsedArgs["cutOff"]);
   float slope = us::any_cast<float>(parsedArgs["slope"]);
 

@@ -676,7 +676,7 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
 
 void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
 {
-  MITK_INFO << "Calculating seed points.";
+  MITK_INFO << "StreamlineTracking - Calculating seed points.";
   m_SeedPoints.clear();
 
   if (!m_ControlGmEndings)

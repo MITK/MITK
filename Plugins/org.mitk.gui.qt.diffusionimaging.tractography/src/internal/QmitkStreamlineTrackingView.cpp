@@ -275,8 +275,9 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->m_gLabel->setVisible(false);
   m_Controls->m_FaImageBox->setVisible(false);
   m_Controls->mFaImageLabel->setVisible(false);
-  m_Controls->m_numProbSamplesBox->setVisible(false);
-  m_Controls->m_numProbSamplesLabel->setVisible(false);
+  m_Controls->m_OdfCutoffBox->setVisible(false);
+  m_Controls->m_OdfCutoffLabel->setVisible(false);
+  m_Controls->m_SharpenOdfsBox->setVisible(false);
 
   if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
     m_Controls->m_SeedGmBox->setVisible(true);
@@ -293,12 +294,6 @@ void QmitkStreamlineTrackingView::UpdateGui()
     m_Controls->commandLinkButton->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
     m_Controls->m_InteractiveBox->setEnabled(true);
 
-    if (m_Controls->m_ModeBox->currentIndex()==1)
-    {
-      m_Controls->m_numProbSamplesBox->setVisible(true);
-      m_Controls->m_numProbSamplesLabel->setVisible(true);
-    }
-
     if ( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
       m_Controls->m_fBox->setVisible(true);
@@ -307,15 +302,22 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->m_gLabel->setVisible(true);
       m_Controls->mFaImageLabel->setVisible(true);
       m_Controls->m_FaImageBox->setVisible(true);
+
+//      if (m_Controls->m_ModeBox->currentIndex()==1)
+//      {
+//        m_Controls->m_OdfCutoffBox->setVisible(true);
+//        m_Controls->m_OdfCutoffLabel->setVisible(true);
+//        m_Controls->m_SharpenOdfsBox->setVisible(true);
+//      }
     }
     else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
       m_Controls->mFaImageLabel->setVisible(true);
       m_Controls->m_FaImageBox->setVisible(true);
-    }
-    else
-    {
 
+      m_Controls->m_OdfCutoffBox->setVisible(true);
+      m_Controls->m_OdfCutoffLabel->setVisible(true);
+      m_Controls->m_SharpenOdfsBox->setVisible(true);
     }
   }
   else
@@ -347,7 +349,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
       if (m_FirstTensorProbRun)
       {
-        QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. TEND parameters are ignored.");
+        QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. ODFs are sharpened (min-max normalized and raised to the power of 4). TEND parameters are ignored.");
         m_FirstTensorProbRun = false;
       }
 
@@ -374,7 +376,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       }
 
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
-      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetNumProbSamples(m_Controls->m_numProbSamplesBox->value());
+      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(0);
+      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetSharpenOdfs(true);
     }
     else
     {
@@ -422,7 +425,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     }
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
-    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetNumProbSamples(m_Controls->m_numProbSamplesBox->value());
+    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(m_Controls->m_OdfCutoffBox->value());
+    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetSharpenOdfs(m_Controls->m_SharpenOdfsBox->isChecked());
   }
   else
   {
@@ -544,7 +548,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       QMessageBox warnBox;
       warnBox.setWindowTitle("Warning");
       warnBox.setText("No fiberbundle was generated!");
-      warnBox.setDetailedText("No fibers were generated using the chosen parameters. Typical reasons are:\n\n- Cutoff too high. Some feature very low FA/GFA/peak size. Try to lower this parameter.\n- Angular threshold too strict. Try to increase this parameter. Especially probabilistic tractography with a low number of samples per step tends to produce very curvy tracts that are then rejected.\n- Number of samples in probabilistic tractography is too low. See angular threshold bullet.\n- A small step sizes also means many steps to go wrong. See angular threshold bullet.");
+      warnBox.setDetailedText("No fibers were generated using the chosen parameters. Typical reasons are:\n\n- Cutoff too high. Some images feature very low FA/GFA/peak size. Try to lower this parameter.\n- Angular threshold too strict. Try to increase this parameter.\n- A small step sizes also means many steps to go wrong. Especially in the case of probabilistic tractography. Try to adjust the angular threshold.");
       warnBox.setIcon(QMessageBox::Warning);
       warnBox.exec();
       return;

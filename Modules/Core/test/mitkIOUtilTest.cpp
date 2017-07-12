@@ -215,7 +215,7 @@ public:
 
   void TestLoadAndSaveSurface()
   {
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(m_SurfacePath);
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(m_SurfacePath)[0].GetPointer());
     CPPUNIT_ASSERT(surface.IsNotNull());
 
     std::ofstream tmpStream;

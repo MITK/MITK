@@ -57,7 +57,7 @@ public:
 
     m_Image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd"))[0].GetPointer());
     m_Image2D = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Png2D-bw.png"))[0].GetPointer());
-    m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("binary.stl"));
+    m_Surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("binary.stl"))[0].GetPointer());
 
     //QmitkPythonSnippets::LoadStringMap(QmitkPythonSnippets::DEFAULT_SNIPPET_FILE,m_Snippets);
   }

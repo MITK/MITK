@@ -79,7 +79,7 @@ public:
     mitk::Surface::Pointer contour = m_ContourExtractor->GetOutput();
 
     mitk::Surface::Pointer referenceContour =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"))[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE(
       "Extracted contour has wrong number of points!",
@@ -102,7 +102,7 @@ public:
     mitk::Surface::Pointer contour = m_ContourExtractor->GetOutput(0);
 
     mitk::Surface::Pointer referenceContour =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/TwoContours.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/TwoContours.vtk"))[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE(
       "Extracted contour1 has wrong number of points!",

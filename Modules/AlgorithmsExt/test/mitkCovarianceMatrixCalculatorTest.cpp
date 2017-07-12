@@ -42,7 +42,7 @@ private:
 public:
   void setUp() override
   {
-    m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("RenderingTestData/Stanford_bunny.stl"));
+    m_Surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("RenderingTestData/Stanford_bunny.stl"))[0].GetPointer());
 
     // saved results
     CovarianceMatrix m1, m2, m3;

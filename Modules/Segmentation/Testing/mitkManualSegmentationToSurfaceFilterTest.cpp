@@ -50,7 +50,7 @@ public:
     {
       m_Filter->SetInput(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath(parameter.at(0)))[0].GetPointer()));
       // For the tests which have reference data
-      m_ReferenceSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath(parameter.at(1)));
+      m_ReferenceSurface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath(parameter.at(1)))[0].GetPointer());
     }
     else
     {

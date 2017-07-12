@@ -194,7 +194,7 @@ bool mitk::NavigationToolStorage::AssignToolNumber(std::string identifier1, int 
     return false;
     }
 
-  if ((number2 >= m_ToolCollection.size()) || (number2 < 0))
+  if ((number2 >= static_cast<int>(m_ToolCollection.size())) || (number2 < 0))
     {
     MITK_WARN << "Invalid number, cannot assign new number";
     return false;
@@ -204,7 +204,7 @@ bool mitk::NavigationToolStorage::AssignToolNumber(std::string identifier1, int 
 
   int number1 = -1;
 
-  for(int i = 0; i<m_ToolCollection.size(); i++)
+  for(int i = 0; i<static_cast<int>(m_ToolCollection.size()); i++)
     {
     if (m_ToolCollection.at(i)->GetIdentifier() == identifier1) {number1=i;}
     }

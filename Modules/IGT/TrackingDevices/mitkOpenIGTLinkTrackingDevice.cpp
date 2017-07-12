@@ -73,7 +73,7 @@ bool mitk::OpenIGTLinkTrackingDevice::IsDeviceInstalled()
   return true;
 }
 
-mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool(const char* toolName, const char* fileName)
+mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool(const char*, const char*)
 {
   mitk::OpenIGTLinkTrackingTool::Pointer t;// = mitk::OpenIGTLinkTrackingTool::New();
   //TODO: Implement
@@ -286,7 +286,7 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
   const char* name = currentNavData->GetName();
   //MITK_WARN << name;
 
-  for (int i = 0; i < m_AllTools.size(); i++)
+  for (std::size_t i = 0; i < m_AllTools.size(); i++)
   {
     if (strcmp(m_AllTools.at(i)->GetToolName(), name) == 0)
     {

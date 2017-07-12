@@ -56,6 +56,11 @@ namespace {
     , {"Segmentation",          QObject::tr("Segmentation")}
     , {"Segmentation Manager",  QObject::tr("Segmentation Manager")}
     , {"Series Tags",           QObject::tr("Series Tags")} });
+  const QList<QString> mandatorySettings = QList<QString>(
+    { "org.mitk.gui.qt.application.EnvironmentPreferencePage"
+    , "org.mitk.gui.qt.application.LanguagePreferencePage"
+    , "org.mitk.gui.qt.application.SeriesTagsPreferencePage"
+    , "org.mitk.gui.qt.application.PacsPreferencePage" });
 }
 
 class QmitkPreferencesDialogPrivate : public Ui::QmitkPreferencesDialog
@@ -420,6 +425,14 @@ void QmitkPreferencesDialog::UpdateTree()
     return;
   }
 
+  bool advancedMode = false;
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  berry::IPreferences::Pointer prefsNode;
+  if (prefService) {
+    prefsNode = prefService->GetSystemPreferences()->Node("/General");
+    advancedMode = prefsNode->GetBool("advanced mode", false);
+  }
+
   std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator endRoot = d->m_PrefPages.end();
   
   std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator sortIter = d->m_PrefPages.begin();
@@ -458,6 +471,12 @@ void QmitkPreferencesDialog::UpdateTree()
   
   for (unsigned int i = 0; i < d->m_PrefPages.size(); ++i)
   {
+    // skip non-mandatory settings if advancedMode is not set
+    if (!advancedMode && !mandatorySettings.contains(d->m_PrefPages[i].id))
+    {
+      continue;
+    }
+
     d->m_PrefPages[i].treeWidgetItem = new QTreeWidgetItem();
     d->m_PrefPages[i].treeWidgetItem->setText(0, d->m_PrefPages[i].name);
     

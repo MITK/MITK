@@ -291,7 +291,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
                                      const QString &dir,
                                      const QString &filter,
                                      QString *selectedFilter,
-                                     QFileDialog::Options options
+                                     QFileDialog::Options
                                      )
 {
   QString selectedFileName = "";

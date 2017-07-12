@@ -125,7 +125,7 @@ void QmitkToFMESAParameterWidget::OnChangeANFCheckBox(bool checked)
   this->m_ToFImageGrabber->SetBoolProperty("SetANF", checked);
 }
 
-void QmitkToFMESAParameterWidget::OnChangeIntegrationTimeSpinBox(int value)
+void QmitkToFMESAParameterWidget::OnChangeIntegrationTimeSpinBox(int)
 {
   if (this->m_ToFImageGrabber != nullptr)
   {

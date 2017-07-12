@@ -97,7 +97,7 @@ void QmitkToFPMDParameterWidget::ActivateAllParameters()
     m_Controls->m_ModulationFrequencySpinBox->setValue(this->m_ToFImageGrabber->GetModulationFrequency());
 }
 
-void QmitkToFPMDParameterWidget::OnChangeIntegrationTimeSpinBox(int value)
+void QmitkToFPMDParameterWidget::OnChangeIntegrationTimeSpinBox(int)
 {
   if (this->m_ToFImageGrabber != nullptr)
   {
@@ -121,7 +121,7 @@ void QmitkToFPMDParameterWidget::OnChangeIntegrationTimeSpinBox(int value)
   }
 }
 
-void QmitkToFPMDParameterWidget::OnChangeModulationFrequencySpinBox(int value)
+void QmitkToFPMDParameterWidget::OnChangeModulationFrequencySpinBox(int)
 {
   if (this->m_ToFImageGrabber != nullptr)
   {

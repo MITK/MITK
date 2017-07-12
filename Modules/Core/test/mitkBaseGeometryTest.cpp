@@ -75,7 +75,7 @@ protected:
   //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
   //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example:
   // SlicedGeometry3D class
-  virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override{};
+  virtual void PreSetSpacing(const mitk::Vector3D &/*aSpacing*/) override{};
 };
 
 class mitkBaseGeometryTestSuite : public mitk::TestFixture

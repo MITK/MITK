@@ -63,7 +63,7 @@ public:
     std::string path = mitk::IOUtil::GetTempPath() + "ExampleDataOutput.txt";
     mitk::IOUtil::Save(m_Data, path);
     mitk::ExampleDataStructure::Pointer loadedData =
-      dynamic_cast<mitk::ExampleDataStructure *>(mitk::IOUtil::LoadBaseData(path).GetPointer());
+      dynamic_cast<mitk::ExampleDataStructure *>(mitk::IOUtil::Load(path)[0].GetPointer());
 
     itksys::SystemTools::RemoveFile(path);
 

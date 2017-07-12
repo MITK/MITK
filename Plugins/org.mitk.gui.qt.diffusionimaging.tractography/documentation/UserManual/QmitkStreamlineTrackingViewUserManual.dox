@@ -35,13 +35,14 @@ Interactive tractography enables the dynamic placement of spherical seed regions
 \li Mode: Toggle between deterministic and probabilistic tractography. Peak tracking only supports deterministic mode. The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF.
 \li Seeds per voxel: If set to 1, the seed is defined as the voxel center. If > 1 the seeds are distributet randomly inside the voxel.
 \li Max. num. fibers: Tractography is stopped after the desired number of fibers is reached, even before all seed points are processed.
-\li Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated.
+\li Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated. Typical values are 0.2 for FA/GFA and 0.1 for CSD peaks.
+\li ODF Cutoff: Additional threshold on the ODF magnitude. This is useful in case of CSD fODF tractography. For MRtrix CSD fODF images, a typical value is 0.1.
+\li Sharpen ODFs: If you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). This is not necessary (and not recommended) for CSD fODFs, since they are naturally much sharper.
 
 \section StrTrackUserManualAdvancedParameters Advanced Parameters
 \li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
 \li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 \li Min. Tract Length: Shorter fibers are discarded.
-\li Num. Samples per Step: Only relevant for probabilistic tractography. At each streamline position, the ODF is sampled n times and the direction with the highest probability is used. Increasing this number approximates the result to the deterministic tractography.
 \li f and g values to balance between FACT [1] and TEND [2,3] tracking (only for tensor based tractography). For further information please refer to [2,3]
 \li Flip directions: Internally flips progression directions. This might be necessary depending on the input data.
 \li Neighborhood Samples: Number of neighborhood samples that are used to determine the next fiber progression direction [4].

@@ -64,6 +64,8 @@ void TrackingHandlerPeaks::InitForTracking()
     m_NumDirs = imageRegion4.GetSize(3)/3;
     m_NeedsDataInit = false;
   }
+
+  std::cout << "TrackingHandlerPeaks - Peak threshold: " << m_PeakThreshold << std::endl;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir)

@@ -129,6 +129,10 @@ void TrackingHandlerTensor::InitForTracking()
     m_F /= temp;
     m_G /= temp;
   }
+
+  std::cout << "TrackingHandlerTensor - FA threshold: " << m_FaThreshold << std::endl;
+  std::cout << "TrackingHandlerTensor - f: " << m_F << std::endl;
+  std::cout << "TrackingHandlerTensor - g: " << m_G << std::endl;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num)

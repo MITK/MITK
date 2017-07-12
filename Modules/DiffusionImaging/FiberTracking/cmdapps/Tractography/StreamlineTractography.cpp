@@ -70,7 +70,9 @@ int main(int argc, char* argv[])
   parser.addArgument("seed_mask", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
   parser.addArgument("tissue_image", "", mitkCommandLineParser::String, "Tissue type image:", "image with tissue type labels (WM=3, GM=1)", us::Any());
 
+  parser.addArgument("sharpen_odfs", "", mitkCommandLineParser::Bool, "SHarpen ODFs:", "if you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). this is not necessary for CSD fODFs, since they are narurally much sharper.");
   parser.addArgument("cutoff", "", mitkCommandLineParser::Float, "Cutoff:", "set the FA, GFA or Peak amplitude cutoff for terminating tracks", 0.1);
+  parser.addArgument("odf_cutoff", "", mitkCommandLineParser::Float, "ODF Cutoff:", "additional threshold on the ODF magnitude. this is useful in case of CSD fODF tractography.", 0.1);
   parser.addArgument("step_size", "", mitkCommandLineParser::Float, "Step size:", "step size (in voxels)", 0.5);
   parser.addArgument("angular_threshold", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold between two successive steps, (default: 90° * step_size)");
   parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
@@ -83,7 +85,6 @@ int main(int argc, char* argv[])
   parser.addArgument("use_stop_votes", "", mitkCommandLineParser::Bool, "Use stop votes:", "use stop votes");
   parser.addArgument("use_only_forward_samples", "", mitkCommandLineParser::Bool, "Use only forward samples:", "use only forward samples");
   parser.addArgument("output_prob_map", "", mitkCommandLineParser::Bool, "Output probability map:", "output probability map instead of tractogram");
-  parser.addArgument("prob_samples", "", mitkCommandLineParser::Int, "Num. Samples per Step:", "Only relevant for probabilistic tensor and ODF tractography. At each integration step the ODF/tensor is sampled n times and the most probable direction is used. The higher the number, the closer the behaviour will be to the deterministic ODF tractography.", 10);
 
   parser.addArgument("no_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate:", "don't interpolate image values");
   parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1");
@@ -93,9 +94,6 @@ int main(int argc, char* argv[])
 
   parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "Compress output fibers using the given error threshold (in mm)");
   parser.addArgument("additional_images", "", mitkCommandLineParser::StringList, "Additional images:", "specify a list of float images that hold additional information (FA, GFA, additional Features)", us::Any());
-
-  // parameters for ODF based tractography
-  parser.addArgument("no_odf_normalization", "", mitkCommandLineParser::Bool, "Don't min-max normalize ODFs:", "No min-max normalization of ODFs");
 
   // parameters for random forest based tractography
   parser.addArgument("forest", "", mitkCommandLineParser::String, "Forest:", "input random forest (HDF5 file)", us::Any());
@@ -113,6 +111,10 @@ int main(int argc, char* argv[])
   mitkCommandLineParser::StringContainerType input_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["input"]);
   string outFile = us::any_cast<string>(parsedArgs["out"]);
   string algorithm = us::any_cast<string>(parsedArgs["algorithm"]);
+
+  bool sharpen_odfs = false;
+  if (parsedArgs.count("sharpen_odfs"))
+    sharpen_odfs = us::any_cast<bool>(parsedArgs["sharpen_odfs"]);
 
   bool interpolate = true;
   if (parsedArgs.count("no_interpolation"))
@@ -184,6 +186,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("cutoff"))
     cutoff = us::any_cast<float>(parsedArgs["cutoff"]);
 
+  float odf_cutoff = 0.1;
+  if (parsedArgs.count("odf_cutoff"))
+    odf_cutoff = us::any_cast<float>(parsedArgs["odf_cutoff"]);
+
   float stepsize = -1;
   if (parsedArgs.count("step_size"))
     stepsize = us::any_cast<float>(parsedArgs["step_size"]);
@@ -212,19 +218,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("angular_threshold"))
     angular_threshold = us::any_cast<float>(parsedArgs["angular_threshold"]);
 
-  bool normalize_odfs = true;
-  if (parsedArgs.count("no_odf_normalization"))
-    normalize_odfs = !us::any_cast<bool>(parsedArgs["no_odf_normalization"]);
-
   unsigned int max_tracts = -1;
   if (parsedArgs.count("max_tracts"))
     max_tracts = us::any_cast<int>(parsedArgs["max_tracts"]);
-
-  unsigned int prob_samples = 10;
-  if (parsedArgs.count("prob_samples"))
-    prob_samples = us::any_cast<int>(parsedArgs["prob_samples"]);
-  if (prob_samples<=0)
-    prob_samples = 1;
 
   // LOAD DATASETS
 
@@ -315,6 +311,9 @@ int main(int argc, char* argv[])
     input_images.clear();
     input_images.push_back(image);
     algorithm = "ProbODF";
+
+    sharpen_odfs = true;
+    odf_cutoff = 0;
   }
 
   typedef itk::StreamlineTrackingFilter TrackerType;
@@ -391,16 +390,14 @@ int main(int argc, char* argv[])
     }
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaThreshold(cutoff);
+    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfThreshold(odf_cutoff);
+    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetSharpenOdfs(sharpen_odfs);
+
     if (algorithm == "ProbODF")
-    {
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMode(mitk::TrackingHandlerOdf::MODE::PROBABILISTIC);
-      dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetNumProbSamples(prob_samples);
-    }
 
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addImages.at(0).at(0));
-
-    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMinMaxNormalize(normalize_odfs);
   }
   else
   {

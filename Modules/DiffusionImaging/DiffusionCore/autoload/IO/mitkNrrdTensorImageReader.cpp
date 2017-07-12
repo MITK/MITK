@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKImageImport.h"
 #include "mitkImageDataItem.h"
 #include <mitkLocaleSwitch.h>
+#include <mitkIOUtil.h>
 
 namespace mitk
 {
@@ -63,7 +64,7 @@ namespace mitk
 
         try
         {
-          std::string fname3 = "temp_dti.nii";
+          std::string fname3 = mitk::IOUtil::GetTempPath()+"/temp_dti.nii";
           itksys::SystemTools::CopyAFile(location.c_str(), fname3.c_str());
 
           typedef itk::VectorImage<float,3> ImageType;

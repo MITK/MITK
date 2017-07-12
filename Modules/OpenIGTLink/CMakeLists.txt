@@ -3,7 +3,7 @@ mitk_create_module(
   DEPENDS MitkCore
   PACKAGE_DEPENDS PUBLIC OpenIGTLink
   INCLUDE_DIRS Filters DeviceSources
-  #WARNINGS_AS_ERRORS
+  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(Testing)

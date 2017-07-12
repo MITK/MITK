@@ -106,7 +106,7 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
 }
 
-void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
+void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool)
 {
   int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(type));
 

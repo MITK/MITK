@@ -320,6 +320,16 @@ namespace mitk
     static void SetDefaultDataNodeProperties(mitk::DataNode *node, const std::string &filePath = std::string());
   };
 
+  BaseData::Pointer IOUtil::Impl::LoadBaseDataFromFile(const std::string &path,
+                                                       const ReaderOptionsFunctorBase *optionsCallback)
+  {
+    std::vector<BaseData::Pointer> baseDataList = Load(path, optionsCallback);
+
+    // The Load(path) call above should throw an exception if nothing could be loaded
+    assert(!baseDataList.empty());
+    return baseDataList.front();
+  }
+
 #ifdef US_PLATFORM_WINDOWS
   std::string IOUtil::GetProgramPath()
   {
@@ -559,40 +569,6 @@ namespace mitk
       result.insert(result.end(), iter->m_Output.begin(), iter->m_Output.end());
     }
     return result;
-  }
-
-  int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
-  {
-    return static_cast<int>(Load(fileNames, ds)->Size());
-  }
-
-  DataStorage::Pointer IOUtil::LoadFiles(const std::vector<std::string> &fileNames)
-  {
-    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-    Load(fileNames, *ds);
-    return ds.GetPointer();
-  }
-
-  BaseData::Pointer IOUtil::LoadBaseData(const std::string &path) { return Impl::LoadBaseDataFromFile(path); }
-  BaseData::Pointer IOUtil::Impl::LoadBaseDataFromFile(const std::string &path,
-                                                       const ReaderOptionsFunctorBase *optionsCallback)
-  {
-    std::vector<BaseData::Pointer> baseDataList = Load(path, optionsCallback);
-
-    // The Load(path) call above should throw an exception if nothing could be loaded
-    assert(!baseDataList.empty());
-    return baseDataList.front();
-  }
-
-  DataNode::Pointer IOUtil::LoadDataNode(const std::string &path)
-  {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
-
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(baseData);
-    Impl::SetDefaultDataNodeProperties(node, path);
-
-    return node;
   }
 
   Image::Pointer IOUtil::LoadImage(const std::string &path,
@@ -869,30 +845,6 @@ namespace mitk
     {
       mitkThrow() << errMsg;
     }
-  }
-
-  bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string &path)
-  {
-    Save(image, path);
-    return true;
-  }
-
-  bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string &path)
-  {
-    Save(surface, path);
-    return true;
-  }
-
-  bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string &path)
-  {
-    Save(pointset, path);
-    return true;
-  }
-
-  bool IOUtil::SaveBaseData(mitk::BaseData *data, const std::string &path)
-  {
-    Save(data, path);
-    return true;
   }
 
   std::string IOUtil::Save(const BaseData *data,

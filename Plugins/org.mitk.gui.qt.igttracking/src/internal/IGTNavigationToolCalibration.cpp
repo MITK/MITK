@@ -162,7 +162,6 @@ void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
       QString("; y: ") + (QString::number(m_ResultOffsetVector[1], 103, 3)) +
       QString("; z: ") + (QString::number(m_ResultOffsetVector[2], 103, 3)));
 
-
     ToolTipTransform->SetPosition(m_ResultOffsetVector);
   }
 
@@ -273,7 +272,7 @@ void IGTNavigationToolCalibration::ClearOldPivot()
 void IGTNavigationToolCalibration::OnAddPivotPose()
 {
   ClearOldPivot();
-  //When the collect Poses Button is Clicked 
+  //When the collect Poses Button is Clicked
   m_OnAddPivotPoseClicked = true;
   m_NumberOfNavigationData = m_Controls.m_PosesToCollect->value();
 
@@ -281,7 +280,7 @@ void IGTNavigationToolCalibration::OnAddPivotPose()
 
 void IGTNavigationToolCalibration::AddPivotPose()
 {
-  //Save the poses to be used in computation 
+  //Save the poses to be used in computation
   if (PivotCount < m_NumberOfNavigationData)
   {
     mitk::NavigationData::Pointer currentPose = mitk::NavigationData::New();

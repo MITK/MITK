@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
 #include "mitkLabelSetImage.h"
-#include "mitkLegacyAdaptors.h"
 
 #include <mitkITKImageImport.h>
 #include <mitkImagePixelReadAccessor.h>

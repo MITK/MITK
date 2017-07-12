@@ -187,8 +187,6 @@ public:
   **/
   void TestNullSave()
   {
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(nullptr, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(mitk::Image::New().GetPointer(), ""), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(nullptr, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(mitk::Image::New().GetPointer(), ""), mitk::Exception);
   }

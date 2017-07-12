@@ -143,11 +143,20 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   {
     focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
     focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
+    focalLengthInMm = 0.0;
   }
   else if( m_ReconstructionMode == WithInterPixelDistance)
   {
     //convert focallength from pixel to mm
+    focalLengthInPixelUnits[0] = 0.0;
+    focalLengthInPixelUnits[1] = 0.0;
     focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  }
+  else
+  {
+    focalLengthInPixelUnits[0] = 0.0;
+    focalLengthInPixelUnits[1] = 0.0;
+    focalLengthInMm = 0.0;
   }
 
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;

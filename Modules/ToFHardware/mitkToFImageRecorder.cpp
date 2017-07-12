@@ -178,7 +178,6 @@ ITK_THREAD_RETURN_TYPE ToFImageRecorder::RecordData(void* pInfoStruct)
     double t1 = 0;
     double t2 = 0;
     t1 = realTimeClock->GetCurrentStamp();
-    bool overflow = false;
     bool printStatus = false;
     int requiredImageSequence = 0;
     int numOfFramesRecorded = 0;

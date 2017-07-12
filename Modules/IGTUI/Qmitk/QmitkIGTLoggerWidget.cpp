@@ -166,7 +166,7 @@ void QmitkIGTLoggerWidget::StopRecording()
   try
   {
     // write NavigationDataSet on StopRecording
-    mitk::IOUtil::SaveBaseData(m_Recorder->GetNavigationDataSet(), m_CmpFilename.toStdString());
+    mitk::IOUtil::Save(m_Recorder->GetNavigationDataSet(), m_CmpFilename.toStdString());
   }
   catch(const std::exception &e)
   {

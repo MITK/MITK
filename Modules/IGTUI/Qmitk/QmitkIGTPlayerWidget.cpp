@@ -158,7 +158,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         mitk::NavigationDataSet::Pointer navigationDataSet;
         try
         {
-          navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(m_CmpFilename.toStdString()).GetPointer());
+          navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(m_CmpFilename.toStdString())[0].GetPointer());
         }
         catch(mitk::IGTException)
         {
@@ -375,13 +375,6 @@ const mitk::PointSet::Pointer QmitkIGTPlayerWidget::GetNavigationDatasPointSet()
 
   if( (isRealTimeMode && m_RealTimePlayer.IsNotNull()) || (isSequentialMode && m_SequentialPlayer.IsNotNull()))
   {
-    int numberOfOutputs = 0;
-
-    if(isRealTimeMode)
-      numberOfOutputs = m_RealTimePlayer->GetNumberOfOutputs();
-    else if(isSequentialMode)
-      numberOfOutputs = m_SequentialPlayer->GetNumberOfOutputs();
-
     for(unsigned int i=0; i < m_RealTimePlayer->GetNumberOfOutputs(); ++i)
     {
       mitk::NavigationData::PositionType position;
@@ -404,7 +397,7 @@ const mitk::PointSet::Pointer QmitkIGTPlayerWidget::GetNavigationDatasPointSet()
 
 const mitk::PointSet::PointType QmitkIGTPlayerWidget::GetNavigationDataPoint(unsigned int index)
 {
-  if( index > this->GetNumberOfTools() || index < 0 )
+  if( index > this->GetNumberOfTools() )
     throw std::out_of_range("Tool Index out of range!");
 
   PlaybackMode currentMode = this->GetCurrentPlaybackMode();
@@ -463,7 +456,7 @@ void QmitkIGTPlayerWidget::OnOpenFileButtonPressed()
 
   emit SignalInputFileChanged();
 
-  mitk::NavigationDataSet::Pointer navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(m_CmpFilename.toStdString()).GetPointer());
+  mitk::NavigationDataSet::Pointer navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(m_CmpFilename.toStdString())[0].GetPointer());
   m_RealTimePlayer->SetNavigationDataSet(navigationDataSet);
   m_SequentialPlayer->SetNavigationDataSet(navigationDataSet);
 

@@ -247,7 +247,7 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::OnPerformActionClicked(bool toggle
   {
     bool invalidND = false;
 
-    for(int i=0; i < this->GetSelectedTrackingSourcesIDs()->size(); ++i)
+    for(std::size_t i=0; i < this->GetSelectedTrackingSourcesIDs()->size(); ++i)
     {
       if(!(m_NavigationDatas->at(this->GetSelectedTrackingSourcesIDs()->at(i))->IsDataValid()))
         invalidND = true;

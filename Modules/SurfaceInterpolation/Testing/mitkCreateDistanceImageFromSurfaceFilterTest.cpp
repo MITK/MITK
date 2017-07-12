@@ -54,7 +54,7 @@ public:
       s << "SurfaceInterpolation/InterpolateLiver/LiverContourWithNormals_";
       s << i;
       s << ".vtk";
-      mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath(s.str()));
+      mitk::Surface::Pointer contour = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath(s.str()))[0].GetPointer());
       contourList.push_back(contour);
     }
 
@@ -98,7 +98,7 @@ public:
       s << "SurfaceInterpolation/InterpolateWithHoles/ContourWithHoles_";
       s << i;
       s << ".vtk";
-      mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath(s.str()));
+      mitk::Surface::Pointer contour = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath(s.str()))[0].GetPointer());
       contourList.push_back(contour);
     }
 

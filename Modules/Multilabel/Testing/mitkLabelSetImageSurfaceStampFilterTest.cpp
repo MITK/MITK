@@ -53,7 +53,7 @@ public:
     mitk::Label::PixelType value2 = 2;
     label2->SetValue(value2);
 
-    m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("BallBinary30x30x30Reference.vtp"));
+    m_Surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("BallBinary30x30x30Reference.vtp"))[0].GetPointer());
   }
 
   void tearDown() override

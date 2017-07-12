@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace {
 
-//! Workaround until IOUtil::LoadSurface will guarantee to load mitk::Surface
+//! Workaround until IOUtil::Load will guarantee to load mitk::Surface
 //! even in presence of reader services that load STL as another type of
 //! BaseData (T19825).
 mitk::Surface::Pointer LoadCoreSurface(const us::ModuleResource& usResource)
@@ -149,7 +149,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
   us::Module* module = us::GetModuleContext()->GetModule();
   us::ModuleResource moduleResource = module->GetResource(filename);
 
-  // TODO one would want to call mitk::IOUtils::LoadSurface(moduleResource) here.
+  // TODO one would want to call mitk::IOUtils::Load(moduleResource) here.
   //      However this function is not guaranteed to find a reader that loads
   //      named resource as a Surface (given the presence of alternative readers
   //      that produce another data type but has a higher ranking than the core

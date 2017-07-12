@@ -43,10 +43,18 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         mitk::FiberBundle::Pointer testFibs = dynamic_cast<mitk::FiberBundle*>( mitk::IOUtil::Load(argv[2]).front().GetPointer() );
 
         // test planar figure based extraction
-        mitk::DataNode::Pointer pf1 = mitk::IOUtil::LoadDataNode(argv[3]);
-        mitk::DataNode::Pointer pf2 = mitk::IOUtil::LoadDataNode(argv[4]);
-        mitk::DataNode::Pointer pf3 = mitk::IOUtil::LoadDataNode(argv[5]);
-
+        auto data = mitk::IOUtil::Load(argv[3])[0];
+        auto pf1 = mitk::DataNode::New();
+        pf1->SetData(data);
+        
+        data = mitk::IOUtil::Load(argv[4])[0];
+        auto pf2 = mitk::DataNode::New();
+        pf2->SetData(data);
+        
+        data = mitk::IOUtil::Load(argv[5])[0];
+        auto pf3 = mitk::DataNode::New();
+        pf3->SetData(data);
+        
         mitk::StandaloneDataStorage::Pointer storage = mitk::StandaloneDataStorage::New();
 
         mitk::PlanarFigureComposite::Pointer pfc2 = mitk::PlanarFigureComposite::New();
@@ -92,21 +100,8 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         itkUCharImageType::Pointer itkRoiImage = itkUCharImageType::New();
         mitk::CastToItkImage(mitkRoiImage, itkRoiImage);
 
-        //        mitk::FiberBundle::Pointer inside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, false);
-        //        mitk::IOUtil::Save(inside, mitk::IOUtil::GetTempPath()+"inside.fib");
-        //        mitk::FiberBundle::Pointer outside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, true);
-        //        mitk::IOUtil::Save(outside, mitk::IOUtil::GetTempPath()+"outside.fib");
-
         mitk::FiberBundle::Pointer passing = groundTruthFibs->ExtractFiberSubset(itkRoiImage, true);
-//        mitk::IOUtil::Save(passing, mitk::IOUtil::GetTempPath()+"fiberBundleX_passing-mask.fib");
         mitk::FiberBundle::Pointer ending = groundTruthFibs->ExtractFiberSubset(itkRoiImage, false);
-        //        mitk::IOUtil::Save(ending, mitk::IOUtil::GetTempPath()+"fiberBundleX_ending-in-mask.fib");
-
-        //        testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
-        //        MITK_TEST_CONDITION_REQUIRED(inside->Equals(testFibs),"check inside mask extraction")
-
-        //        testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[8])->GetData());
-        //        MITK_TEST_CONDITION_REQUIRED(outside->Equals(testFibs),"check outside mask extraction")
 
         testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[9]).front().GetPointer());
         MITK_TEST_CONDITION_REQUIRED(passing->Equals(testFibs),"check passing mask extraction");

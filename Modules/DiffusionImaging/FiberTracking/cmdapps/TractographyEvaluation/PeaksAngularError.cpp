@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         {
             try
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(testImages.at(i))->GetData());
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(testImages.at(i))[0].GetPointer());
                 typedef mitk::ImageToItk< ItkDirectionImage3DType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
         {
             try
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(referenceImages.at(i))->GetData());
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImages.at(i))[0].GetPointer());
                 typedef mitk::ImageToItk< ItkDirectionImage3DType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImage)->GetData());
+            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImage)[0].GetPointer());
             mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
         }
 

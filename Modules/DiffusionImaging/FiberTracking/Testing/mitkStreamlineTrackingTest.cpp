@@ -52,7 +52,7 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
     {
         MITK_INFO << "Loading tensor image ...";
         typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-        mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(dtiFileName)->GetData());
+        mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::Load(dtiFileName)[0].GetPointer());
         ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
         mitk::CastToItkImage(mitkTensorImage, itk_dti);
 
@@ -104,7 +104,7 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer fib1 = mitk::FiberBundle::New(fiberBundle);
 
-        mitk::FiberBundle::Pointer fib2 = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(referenceFileName)->GetData());
+        mitk::FiberBundle::Pointer fib2 = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(referenceFileName)[0].GetPointer());
         MITK_TEST_CONDITION_REQUIRED(fib2.IsNotNull(), "Check if reference tractogram is not null.");
         bool ok = fib1->Equals(fib2);
         if (!ok)

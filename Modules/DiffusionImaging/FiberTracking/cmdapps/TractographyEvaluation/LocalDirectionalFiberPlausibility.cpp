@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
         typedef itk::EvaluateDirectionImagesFilter< float >                     EvaluationFilterType;
 
         // load fiber bundle
-        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadData(fibFile)[0].GetPointer());
 
         // load reference directions
         ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
         {
             try
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(referenceImages.at(i))->GetData());
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImages.at(i))[0].GetPointer());
                 typedef mitk::ImageToItk< ItkDirectionImage3DType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
         {
             for (unsigned int i=0; i<maskImages.size(); i++)
             {
-                mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImages.at(i))->GetData());
+                mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImages.at(i))[0].GetPointer());
                 mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
 
                 // evaluate directions

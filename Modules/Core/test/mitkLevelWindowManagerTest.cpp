@@ -181,7 +181,6 @@ public:
     node1->SetData(image1);
     ds->Add(node1);
 
-    // mitk::DataNode::Pointer node1 = mitk::IOUtil::LoadDataNode( testImageFile );
     mitk::DataNode::Pointer node2 = mitk::IOUtil::Load(testImageFile, *ds)->GetElement(0);
     mitk::DataNode::Pointer node3 = mitk::IOUtil::Load(testImageFile, *ds)->GetElement(0);
     std::vector<mitk::DataNode::Pointer> nodeVec;

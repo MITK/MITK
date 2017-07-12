@@ -213,7 +213,7 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
   try
   {
-    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
+    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(fileName.toStdString())[0].GetPointer());
   }
   catch ( const mitk::Exception &e )
   {

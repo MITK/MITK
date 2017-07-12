@@ -37,7 +37,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
 
     try
     {
-        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
+        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
 
         itk::VectorImage<short,3>::Pointer itkVectorImagePointer = itk::VectorImage<short,3>::New();
         mitk::CastToItkImage(dwi, itkVectorImagePointer);
@@ -46,7 +46,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
         mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradients = mitk::DiffusionPropertyHelper::GetGradientContainer(dwi);
         {
             MITK_INFO << "Tensor reconstruction " << argv[2];
-            mitk::TensorImage::Pointer tensorImage = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
+            mitk::TensorImage::Pointer tensorImage = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::Load(argv[2])[0].GetPointer());
             typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
             TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
             filter->SetGradientImage( gradients, itkVectorImagePointer );
@@ -60,7 +60,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
 
         {
             MITK_INFO << "Numerical Q-ball reconstruction " << argv[3];
-            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
+            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::Load(argv[3])[0].GetPointer());
             typedef itk::DiffusionQballReconstructionImageFilter<short, short, float, QBALL_ODFSIZE> QballReconstructionImageFilterType;
             QballReconstructionImageFilterType::Pointer filter = QballReconstructionImageFilterType::New();
             filter->SetGradientImage( gradients, itkVectorImagePointer );
@@ -75,7 +75,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
 
         {
             MITK_INFO << "Standard Q-ball reconstruction " << argv[4];
-            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
+            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::Load(argv[4])[0].GetPointer());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( gradients, itkVectorImagePointer );
@@ -91,7 +91,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
 
         {
             MITK_INFO << "CSA Q-ball reconstruction " << argv[5];
-            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
+            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::Load(argv[5])[0].GetPointer());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( gradients, itkVectorImagePointer );
@@ -107,7 +107,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
 
         {
             MITK_INFO << "ADC profile reconstruction " << argv[6];
-            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
+            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::Load(argv[6])[0].GetPointer());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( gradients, itkVectorImagePointer );
@@ -123,7 +123,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
 
         {
             MITK_INFO << "Raw signal modeling " << argv[7];
-            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
+            mitk::QBallImage::Pointer qballImage = dynamic_cast<mitk::QBallImage*>(mitk::IOUtil::Load(argv[7])[0].GetPointer());
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( gradients, itkVectorImagePointer );

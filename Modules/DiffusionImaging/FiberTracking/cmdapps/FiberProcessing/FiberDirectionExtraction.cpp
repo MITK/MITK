@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
             string outfilename = outRoot;
             outfilename.append("_VECTOR_FIELD.fib");
 
-            mitk::IOUtil::SaveBaseData(directions.GetPointer(), outfilename );
+            mitk::IOUtil::Save(directions.GetPointer(), outfilename );
 
             // write num direction image
             {

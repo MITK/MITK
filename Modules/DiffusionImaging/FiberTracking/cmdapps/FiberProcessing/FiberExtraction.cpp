@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         }
 
         if (result.IsNotNull())
-            mitk::IOUtil::SaveBaseData(result, outFib);
+            mitk::IOUtil::Save(result, outFib);
         else
             std::cout << "No valid fiber bundle extracted.";
     }

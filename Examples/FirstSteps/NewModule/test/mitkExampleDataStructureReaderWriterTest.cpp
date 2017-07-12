@@ -61,7 +61,7 @@ public:
   void ReadWrite_ExampleData_SavedAndLoadedDataEqualToExample()
   {
     std::string path = mitk::IOUtil::GetTempPath() + "ExampleDataOutput.txt";
-    mitk::IOUtil::SaveBaseData(m_Data, path);
+    mitk::IOUtil::Save(m_Data, path);
     mitk::ExampleDataStructure::Pointer loadedData =
       dynamic_cast<mitk::ExampleDataStructure *>(mitk::IOUtil::LoadBaseData(path).GetPointer());
 

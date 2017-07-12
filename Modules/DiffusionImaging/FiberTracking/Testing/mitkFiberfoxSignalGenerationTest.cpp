@@ -202,7 +202,7 @@ public:
                 if (!cond)
                 {
                     MITK_INFO << "Saving test image to " << mitk::IOUtil::GetTempPath();
-                    mitk::IOUtil::SaveBaseData(testImage, mitk::IOUtil::GetTempPath()+out);
+                    mitk::IOUtil::Save(testImage, mitk::IOUtil::GetTempPath()+out);
                 }
                 CPPUNIT_ASSERT_MESSAGE("Simulated images should be equal", cond);
             }

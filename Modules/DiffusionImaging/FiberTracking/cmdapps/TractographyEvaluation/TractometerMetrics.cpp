@@ -294,7 +294,7 @@ int main(int argc, char* argv[])
             string ncfilename = outRoot;
             ncfilename.append("_NC.fib");
 
-            mitk::IOUtil::SaveBaseData(noConnFib.GetPointer(), ncfilename );
+            mitk::IOUtil::Save(noConnFib.GetPointer(), ncfilename );
 
             vtkSmartPointer<vtkPolyData> invalidPolyData = vtkSmartPointer<vtkPolyData>::New();
             invalidPolyData->SetPoints(invalidPoints);
@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
             string icfilename = outRoot;
             icfilename.append("_IC.fib");
 
-            mitk::IOUtil::SaveBaseData(invalidFib.GetPointer(), icfilename );
+            mitk::IOUtil::Save(invalidFib.GetPointer(), icfilename );
 
             vtkSmartPointer<vtkPolyData> validPolyData = vtkSmartPointer<vtkPolyData>::New();
             validPolyData->SetPoints(validPoints);
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
             string vcfilename = outRoot;
             vcfilename.append("_VC.fib");
 
-            mitk::IOUtil::SaveBaseData(validFib.GetPointer(), vcfilename );
+            mitk::IOUtil::Save(validFib.GetPointer(), vcfilename );
 
             {
                 typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;

@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
     std::cout << "searching writer";
 
-    mitk::IOUtil::SaveBaseData(network.GetPointer(), outputFilename );
+    mitk::IOUtil::Save(network.GetPointer(), outputFilename );
 
     return EXIT_SUCCESS;
   }

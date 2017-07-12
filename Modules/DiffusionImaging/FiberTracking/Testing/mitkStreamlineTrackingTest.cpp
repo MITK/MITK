@@ -110,7 +110,7 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         if (!ok)
         {
             MITK_WARN << "TEST FAILED. TRACTOGRAMS ARE NOT EQUAL!";
-            mitk::IOUtil::SaveBaseData(fib1, mitk::IOUtil::GetTempPath()+"testBundle.fib");
+            mitk::IOUtil::Save(fib1, mitk::IOUtil::GetTempPath()+"testBundle.fib");
             MITK_INFO << "OUTPUT: " << mitk::IOUtil::GetTempPath();
         }
         MITK_TEST_CONDITION_REQUIRED(ok, "Check if tractograms are equal.");

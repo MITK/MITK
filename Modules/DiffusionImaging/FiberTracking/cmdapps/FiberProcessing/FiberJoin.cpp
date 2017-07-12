@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
           }
           catch(...){ std::cout << "could not load: " << inFibs.at(i); }
       }
-      mitk::IOUtil::SaveBaseData(result, outFib);
+      mitk::IOUtil::Save(result, outFib);
   }
   catch (itk::ExceptionObject e)
   {

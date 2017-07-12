@@ -116,10 +116,10 @@ public:
     manager->SetDataStorage(ds);
 
     // add multiple objects to the data storage => multiple observers should be created
-    mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image1 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(testImageFile)[0].GetPointer());
     mitk::DataNode::Pointer node1 = mitk::DataNode::New();
     node1->SetData(image1);
-    mitk::Image::Pointer image2 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image2 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(testImageFile)[0].GetPointer());
     mitk::DataNode::Pointer node2 = mitk::DataNode::New();
     node2->SetData(image2);
     ds->Add(node1);
@@ -130,7 +130,7 @@ public:
       static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(),
       "Test if number of nodes is similar to number of observers");
 
-    mitk::Image::Pointer image3 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image3 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(testImageFile)[0].GetPointer());
     mitk::DataNode::Pointer node3 = mitk::DataNode::New();
     node3->SetData(image3);
     ds->Add(node3);
@@ -176,7 +176,7 @@ public:
     manager->SetDataStorage(ds);
 
     // add multiple objects to the data storage => multiple observers should be created
-    mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image1 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(testImageFile)[0].GetPointer());
     mitk::DataNode::Pointer node1 = mitk::DataNode::New();
     node1->SetData(image1);
     ds->Add(node1);

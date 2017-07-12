@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   std::string resultFile = us::any_cast<string>(parsedArgs["output"]);
   std::string seedFile = us::any_cast<string>(parsedArgs["input"]);
 
-  mitk::Image::Pointer seedImage = mitk::IOUtil::LoadImage(seedFile);
+  mitk::Image::Pointer seedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(seedFile)[0].GetPointer());
 
   BinaryType::Pointer itkSeed = BinaryType::New();
 

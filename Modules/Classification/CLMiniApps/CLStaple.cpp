@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   {
     MITK_INFO << argv[i];
     MaskImageType::Pointer itkImg = MaskImageType::New();
-    mitk::Image::Pointer img = mitk::IOUtil::LoadImage(argv[i]);
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[i])[0].GetPointer());
     mitk::CastToItkImage(img,itkImg);
     filter->SetInput(i-2, itkImg);
   }

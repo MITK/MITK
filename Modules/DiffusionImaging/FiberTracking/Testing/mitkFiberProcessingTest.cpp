@@ -64,7 +64,7 @@ public:
         original = nullptr;
         original = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/original.fib")).front().GetPointer());
 
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/FiberProcessing/MASK.nrrd")).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/MASK.nrrd"))[0].GetPointer());
         mask = ItkUcharImgType::New();
         mitk::CastToItkImage(img, mask);
     }

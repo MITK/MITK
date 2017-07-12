@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
   }
   bool useCooc = parsedArgs.count("cooccurence");
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
   std::string filename=parsedArgs["output"].ToString();
 
   ////////////////////////////////////////////////////////////////

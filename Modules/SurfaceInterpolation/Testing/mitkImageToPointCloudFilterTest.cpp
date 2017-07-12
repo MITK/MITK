@@ -38,7 +38,7 @@ public:
    * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
    * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp() { m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd")); }
+  void setUp() { m_BallImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("BallBinary30x30x30.nrrd"))[0].GetPointer()); }
   void testImageToPointCloudFilterInitialization()
   {
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();

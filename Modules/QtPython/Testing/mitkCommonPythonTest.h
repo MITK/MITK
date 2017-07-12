@@ -55,8 +55,8 @@ public:
     us::ServiceReference<mitk::IPythonService> serviceRef = context->GetServiceReference<mitk::IPythonService>();
     m_PythonService = dynamic_cast<mitk::IPythonService*>( context->GetService(serviceRef) );
 
-    m_Image = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
-    m_Image2D = mitk::IOUtil::LoadImage(GetTestDataFilePath("Png2D-bw.png"));
+    m_Image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd"))[0].GetPointer());
+    m_Image2D = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Png2D-bw.png"))[0].GetPointer());
     m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("binary.stl"));
 
     //QmitkPythonSnippets::LoadStringMap(QmitkPythonSnippets::DEFAULT_SNIPPET_FILE,m_Snippets);

@@ -32,7 +32,7 @@ int mitkImageSliceSelectorTest(int argc, char *argv[])
   mitk::Image::Pointer image;
   try
   {
-    image = mitk::IOUtil::LoadImage(argv[1]);
+    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(argv[1])[0].GetPointer());
   }
   catch (const mitk::Exception &)
   {

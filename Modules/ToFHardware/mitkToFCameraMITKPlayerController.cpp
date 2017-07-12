@@ -120,7 +120,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
 
       if (!this->m_DistanceImageFileName.empty())
       {
-        m_DistanceImage = mitk::IOUtil::LoadImage(this->m_DistanceImageFileName);
+        m_DistanceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(this->m_DistanceImageFileName)[0].GetPointer());
       }
       else
       {
@@ -128,7 +128,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
       }
       if (!this->m_AmplitudeImageFileName.empty())
       {
-        m_AmplitudeImage = mitk::IOUtil::LoadImage(this->m_AmplitudeImageFileName);
+        m_AmplitudeImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(this->m_AmplitudeImageFileName)[0].GetPointer());
       }
       else
       {
@@ -136,7 +136,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
       }
       if (!this->m_IntensityImageFileName.empty())
       {
-        m_IntensityImage = mitk::IOUtil::LoadImage(this->m_IntensityImageFileName);
+        m_IntensityImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(this->m_IntensityImageFileName)[0].GetPointer());
       }
       else
       {
@@ -144,7 +144,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
       }
       if (!this->m_RGBImageFileName.empty())
       {
-        m_RGBImage = mitk::IOUtil::LoadImage(this->m_RGBImageFileName);
+        m_RGBImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(this->m_RGBImageFileName)[0].GetPointer());
       }
       else
       {

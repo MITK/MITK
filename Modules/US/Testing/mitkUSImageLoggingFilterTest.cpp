@@ -61,7 +61,7 @@ public:
     m_RandomRestImage1 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomRestImage2 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomSingleSliceImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 0.2, 0.3, 0.4);
-    m_RealTestImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    m_RealTestImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd"))[0].GetPointer());
   }
 
   void tearDown() override

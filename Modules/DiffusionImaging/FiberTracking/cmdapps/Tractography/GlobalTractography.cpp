@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
         GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
 
         // load input image
-        mitk::Image::Pointer mitkImage = mitk::IOUtil::LoadImage(inFileName);
+        mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inFileName)[0].GetPointer());
 
         // try to cast to qball image
         if( boost::algorithm::ends_with(inFileName, ".qbi") )
@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
         if (parsedArgs.count("mask"))
         {
             typedef itk::Image<float,3> MaskImgType;
-            mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["mask"]));
+            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["mask"]))[0].GetPointer());
             MaskImgType::Pointer itk_mask = MaskImgType::New();
             mitk::CastToItkImage(mitkMaskImage, itk_mask);
             gibbsTracker->SetMaskImage(itk_mask);

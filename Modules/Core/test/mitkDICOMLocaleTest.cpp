@@ -122,7 +122,7 @@ public:
     if (m_SkipImageTest)
       return;
 
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(m_FileName);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_FileName)[0].GetPointer());
     CPPUNIT_ASSERT(image.IsNotNull());
 
     // note importance of minor differences in spacings:

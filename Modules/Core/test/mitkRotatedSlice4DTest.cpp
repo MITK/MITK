@@ -33,7 +33,7 @@ int mitkRotatedSlice4DTest(int, char *argv[])
   std::string filename = argv[1];
 
   // load 4D image
-  mitk::Image::Pointer image4D = mitk::IOUtil::LoadImage(filename);
+  mitk::Image::Pointer image4D = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
   // check inputs
   if (image4D.IsNull())
   {

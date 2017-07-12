@@ -80,7 +80,7 @@ public:
     std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestAddPoints.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+    mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pic3D)[0].GetPointer());
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -113,7 +113,7 @@ public:
       GetTestDataFilePath("InteractionTestData/Interactions/PointSetDataInteractor_PointsAdd2d3d.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+    mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pic3D)[0].GetPointer());
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -172,7 +172,7 @@ public:
     std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestMoveRemovePoints.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+    mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pic3D)[0].GetPointer());
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 

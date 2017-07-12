@@ -58,10 +58,10 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
 
         MITK_INFO << "Loading seed image ...";
         typedef itk::Image< unsigned char, 3 >    ItkUCharImageType;
-        mitk::Image::Pointer mitkSeedImage = mitk::IOUtil::LoadImage(maskFileName);
+        mitk::Image::Pointer mitkSeedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFileName)[0].GetPointer());
 
         MITK_INFO << "Loading mask image ...";
-        mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(maskFileName);
+        mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFileName)[0].GetPointer());
 
         omp_set_num_threads(1);
 

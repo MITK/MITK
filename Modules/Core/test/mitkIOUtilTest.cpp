@@ -190,7 +190,7 @@ public:
 
   void TestLoadAndSavePointSet()
   {
-    mitk::PointSet::Pointer pointset = mitk::IOUtil::LoadPointSet(m_PointSetPath);
+    mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(m_PointSetPath)[0].GetPointer());
     CPPUNIT_ASSERT(pointset.IsNotNull());
 
     std::ofstream tmpStream;

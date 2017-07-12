@@ -783,7 +783,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetScore()
 void QmitkUSNavigationStepMarkerIntervention::UpdateTargetProgressDisplay()
 {
   QString description;
-  if (m_CurrentTargetIndex >= m_NumberOfTargets)
+  if (m_CurrentTargetIndex >= static_cast<int>(m_NumberOfTargets))
   {
     description = "All Targets Reached";
     if (m_TargetProgressBar)
@@ -885,7 +885,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetViolationStatus()
 void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
 {
   // clear quality display if there aren't all targets reached
-  if (m_ReachedTargetsNodes.size() != m_NumberOfTargets)
+  if (m_ReachedTargetsNodes.size() != static_cast<int>(m_NumberOfTargets))
   {
     ui->placementQualityGroupBox->setEnabled(false);
     ui->angleDifferenceValue->setText("");
@@ -932,7 +932,7 @@ void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
     "USNavigation::AngleDifferences",
     mitk::GenericProperty<mitk::VnlVector>::New(m_PlacementQualityCalculator->GetAngleDifferences()));
 
-  if (m_PlannedTargetsNodes.size() == m_NumberOfTargets)
+  if (m_PlannedTargetsNodes.size() == static_cast<int>(m_NumberOfTargets))
   {
     mitk::VnlVector reachedPlannedDifferences;
     double reachedPlannedDifferencesSum = 0;

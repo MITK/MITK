@@ -370,8 +370,8 @@ public:
 
     mitk::Image::Pointer image = mitk::ImportItkImage(itkImage);
 
-    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
-    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png"));
+    mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
+    mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png"));
   }
 
   /**
@@ -417,9 +417,9 @@ public:
     }
     mitk::Image::Pointer image = mitk::ImportItkImage(itkImage);
 
-    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
+    mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
 
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png")),
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png")),
                          mitk::Exception);
   }
 };

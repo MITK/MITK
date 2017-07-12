@@ -36,12 +36,12 @@ mitk::ToFDistanceImageToPointSetFilter::~ToFDistanceImageToPointSetFilter()
 {
 }
 
-void mitk::ToFDistanceImageToPointSetFilter::SetInput(const mitk::Image* distanceImage )
+void mitk::ToFDistanceImageToPointSetFilter::SetInput(const Image *distanceImage )
 {
   this->SetInput(0,distanceImage);
 }
 
-void mitk::ToFDistanceImageToPointSetFilter::SetInput( unsigned int idx,const mitk::Image* distanceImage )
+void mitk::ToFDistanceImageToPointSetFilter::SetInput( unsigned int idx,const Image* distanceImage )
 {
   if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
@@ -125,9 +125,14 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
   {
     focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
     focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
+    focalLengthInMm = 0.0;
   }
   else
+  {
+    focalLengthInPixelUnits[0] = 0.0;
+    focalLengthInPixelUnits[1] = 0.0;
     focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  }
 
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
   principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
@@ -175,11 +180,11 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 
         mitk::ToFProcessingCommon::ToFScalarType distance = (double)imageAcces.GetPixelByIndex(pixel);
 
-      mitk::Point3D currentPoint;
-      if (m_ReconstructionMode)
-        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthInPixelUnits,principalPoint);
-      else
-        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
+        mitk::Point3D currentPoint;
+        if (m_ReconstructionMode)
+          currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthInPixelUnits,principalPoint);
+        else
+          currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
 
         if (distance>mitk::eps)
         {
@@ -200,7 +205,7 @@ void mitk::ToFDistanceImageToPointSetFilter::CreateOutputsForAllInputs()
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
     }
-    this->Modified();
+  this->Modified();
 }
 
 void mitk::ToFDistanceImageToPointSetFilter::GenerateOutputInformation()

@@ -48,7 +48,7 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
 
   try
   {
-    mitk::IOUtil::SaveBaseData(corrfilter->GetOutput(), argv[2]);
+    mitk::IOUtil::Save(corrfilter->GetOutput(), argv[2]);
   }
   catch( const itk::ExceptionObject& e)
   {

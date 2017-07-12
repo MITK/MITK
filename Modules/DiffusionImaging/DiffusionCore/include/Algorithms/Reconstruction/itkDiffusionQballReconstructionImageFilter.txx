@@ -662,6 +662,7 @@ namespace itk {
 
     // simple matrix multiplication, manual cause of stack overflow using operator
     for (unsigned i = 0; i < m_NumberOfEquatorSamplingPoints*NOdfDirections; ++i)
+    {
       for (unsigned j = 0; j < m_NumberOfGradientDirections; ++j)
       {
         double accum = (*G)(i,0) * (*H_plus)(0,j);
@@ -669,44 +670,44 @@ namespace itk {
           accum += (*G)(i,k) * (*H_plus)(k,j);
         (*GH_plus)(i,j) = accum;
       }
+    }
 
-      typename vnl_matrix<double>::iterator it3;
-      for( it3 = (*GH_plus).begin(); it3 != (*GH_plus).end(); it3++)
-      {
-        if(*it3<0.0)
-          *it3 = 0;
-      }
+    typename vnl_matrix<double>::iterator it3;
+    for( it3 = (*GH_plus).begin(); it3 != (*GH_plus).end(); it3++)
+    {
+      if(*it3<0.0)
+        *it3 = 0;
+    }
 
-      // this is an addition to the original tuch algorithm
-      for(unsigned int i=0; i<NOdfDirections*m_NumberOfEquatorSamplingPoints; i++)
-      {
-        vnl_vector< double > r = GH_plus->get_row(i);
-        r /= r.sum();
-        GH_plus->set_row(i,r);
-      }
+    // this is an addition to the original tuch algorithm
+    for(unsigned int i=0; i<NOdfDirections*m_NumberOfEquatorSamplingPoints; i++)
+    {
+      vnl_vector< double > r = GH_plus->get_row(i);
+      r /= r.sum();
+      GH_plus->set_row(i,r);
+    }
 
-      m_ReconstructionMatrix
-        = new vnl_matrix<TOdfPixelType>(NOdfDirections,m_NumberOfGradientDirections,0.0);
-      for(int i=0; i<NOdfDirections; i++)
+    m_ReconstructionMatrix
+      = new vnl_matrix<TOdfPixelType>(NOdfDirections,m_NumberOfGradientDirections,0.0);
+    for(int i=0; i<NOdfDirections; i++)
+    {
+      for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
       {
-        for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
+        for(unsigned int k=0; k<m_NumberOfEquatorSamplingPoints; k++)
         {
-          for(unsigned int k=0; k<m_NumberOfEquatorSamplingPoints; k++)
-          {
-            (*m_ReconstructionMatrix)(i,j) += (TOdfPixelType)(*GH_plus)(m_NumberOfEquatorSamplingPoints*i+k,j);
-          }
+          (*m_ReconstructionMatrix)(i,j) += (TOdfPixelType)(*GH_plus)(m_NumberOfEquatorSamplingPoints*i+k,j);
         }
       }
+    }
 
-      // this is also an addition to the original tuch algorithm
-      for(int i=0; i<NOdfDirections; i++)
-      {
-        vnl_vector< TOdfPixelType > r = m_ReconstructionMatrix->get_row(i);
-        r /= r.sum();
-        m_ReconstructionMatrix->set_row(i,r);
-      }
-      std::cout << "Reconstruction Matrix computed." << std::endl;
-
+    // this is also an addition to the original tuch algorithm
+    for(int i=0; i<NOdfDirections; i++)
+    {
+      vnl_vector< TOdfPixelType > r = m_ReconstructionMatrix->get_row(i);
+      r /= r.sum();
+      m_ReconstructionMatrix->set_row(i,r);
+    }
+    std::cout << "Reconstruction Matrix computed." << std::endl;
   }
 
   template< class TReferenceImagePixelType,

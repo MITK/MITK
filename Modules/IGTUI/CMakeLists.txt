@@ -2,6 +2,7 @@ MITK_CREATE_MODULE(
   SUBPROJECTS MITK-IGT
   INCLUDE_DIRS Qmitk
   DEPENDS MitkIGT MitkQtWidgetsExt MitkPersistence
+  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(autoload/ConfigurationWidgetRegistry)

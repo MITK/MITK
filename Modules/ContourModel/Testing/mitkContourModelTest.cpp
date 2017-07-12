@@ -337,7 +337,7 @@ static void TestSetVertices()
 
   contour->SetVertexAt(0, newCoordinates);
 
-  MITK_TEST_EQUAL(contour->GetVertexAt(0)->Coordinates, newCoordinates, "set coordinates");
+  MITK_TEST_CONDITION(mitk::Equal(contour->GetVertexAt(0)->Coordinates, newCoordinates), "set coordinates");
 
   mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
 
@@ -359,8 +359,8 @@ static void TestSetVertices()
 
   contour->SetVertexAt(1, contour2->GetVertexAt(1));
 
-  MITK_TEST_EQUAL(
-    contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates, "Use setter and getter combination");
+  MITK_TEST_CONDITION(
+    mitk::Equal(contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates), "Use setter and getter combination");
 }
 
 static void TestContourModelAPI()

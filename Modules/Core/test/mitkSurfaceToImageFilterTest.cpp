@@ -155,8 +155,10 @@ public:
     additionalInputImage->GetGeometry(1)->SetOrigin(secondStep->GetGeometry()->GetOrigin());
     additionalInputImage->GetGeometry(1)->SetIndexToWorldTransform(
       secondStep->GetGeometry()->GetIndexToWorldTransform());
-    additionalInputImage->SetImportVolume(secondStep->GetData(), 0);
-    additionalInputImage->SetImportVolume(secondStep->GetData(), 1);
+
+    mitk::ImageReadAccessor readAccess(secondStep);
+    additionalInputImage->SetImportVolume(readAccess.GetData(), 0);
+    additionalInputImage->SetImportVolume(readAccess.GetData(), 1);
 
     // Arrange the filter
     surfaceToImageFilter->MakeOutputBinaryOn();

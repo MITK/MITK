@@ -106,7 +106,7 @@ int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
 
     if( imageOutput )
     {
-      mitk::IOUtil::SaveImage( registrationMethod->GetResampledMovingImage(), image_out_filename.c_str() );
+      mitk::IOUtil::Save( registrationMethod->GetResampledMovingImage(), image_out_filename.c_str() );
     }
 
 

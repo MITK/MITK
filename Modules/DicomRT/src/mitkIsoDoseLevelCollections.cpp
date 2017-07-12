@@ -47,6 +47,7 @@ bool lesserIsoDoseLevel(const IsoDoseLevel* first, const IsoDoseLevel* second)
 }
 
 mitk::IsoDoseLevelSet::IsoDoseLevelSet(const IsoDoseLevelSet & other)
+  : itk::Object()
 {
   if (&other != this)
   {

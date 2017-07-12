@@ -26,6 +26,7 @@ m_DoseValue (0.0),
 }
 
 mitk::IsoDoseLevel::IsoDoseLevel( const IsoDoseLevel & other )
+  : itk::Object()
 {
   if (&other != this)
   {

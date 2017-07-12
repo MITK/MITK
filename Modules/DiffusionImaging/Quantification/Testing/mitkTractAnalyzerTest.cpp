@@ -42,7 +42,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   mitk::CastToMitkImage(itkImage, mitkImage);
 
   // load point set
-  mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(argv[2]);
+  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(argv[2])[0].GetPointer());
 
   mitk::TractAnalyzer analyzer;
 

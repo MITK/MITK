@@ -57,7 +57,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing reading a raw file.", readFile.IsNotNull());
 
     // compare with the reference image
-    mitk::Image::Pointer compareImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(m_ImagePathNrrdRef)[0].GetPointer());
+    mitk::Image::Pointer compareImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_ImagePathNrrdRef)[0].GetPointer());
     MITK_ASSERT_EQUAL(
       compareImage, readFile, "Testing if image is equal to the same image as reference file loaded with mitk");
   }

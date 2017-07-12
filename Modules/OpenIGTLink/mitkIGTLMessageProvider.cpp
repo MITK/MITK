@@ -180,7 +180,7 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
   bool isGetMsg = !reqType.find("GET_");
   bool isSTTMsg = !reqType.find("STT_");
   bool isSTPMsg = !reqType.find("STP_");
-  bool isRTSMsg = !reqType.find("RTS_");
+
   //get the type from the request type (remove STT_, STP_, GET_, RTS_)
   std::string type = RemoveRequestPrefixes(requestType);
   //check all microservices if there is a fitting source for the requested type
@@ -377,10 +377,26 @@ mitk::IGTLMessageProvider::ConnectTo( mitk::IGTLMessageSource* UpstreamFilter )
 void
 mitk::IGTLMessageProvider::DisconnectFrom( mitk::IGTLMessageSource* UpstreamFilter )
 {
-  for (DataObjectPointerArraySizeType i = 0;
-       i < UpstreamFilter->GetNumberOfOutputs(); i++)
+  if (UpstreamFilter == nullptr)
+    return;
+
+  for (DataObjectPointerArraySizeType i = 0; i < UpstreamFilter->GetNumberOfOutputs(); ++i)
   {
-    this->RemoveInput(UpstreamFilter->GetOutput(i));
+    auto input = UpstreamFilter->GetOutput(i);
+
+    if (input == nullptr)
+      continue;
+
+    auto nb = this->GetNumberOfIndexedInputs();
+
+    for (DataObjectPointerArraySizeType i = 0; i < nb; ++i)
+    {
+      if (this->GetInput(i) == input)
+      {
+        this->RemoveInput(i);
+        break;
+      }
+    }
   }
 }
 

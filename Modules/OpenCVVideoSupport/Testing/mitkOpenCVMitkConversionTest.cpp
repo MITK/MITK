@@ -209,7 +209,7 @@ void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
   ConvertCVMatForthAndBack(resultImg, imageFileName);
 }
 
-void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string imageFileName)
+void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string)
 {
   // now we convert it to OpenCV IplImage
   mitk::ImageToOpenCVImageFilter::Pointer toOCvConverter = mitk::ImageToOpenCVImageFilter::New();
@@ -257,7 +257,7 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
   MITK_TEST_NOT_EQUAL(toMitkConverter->GetOutput(), inputForCVMat, "Converted image must not be the same as before.");
 }
 
-void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string imageFileName)
+void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string)
 {
   // now we convert it to OpenCV IplImage
   mitk::ImageToOpenCVImageFilter::Pointer toOCvConverter = mitk::ImageToOpenCVImageFilter::New();

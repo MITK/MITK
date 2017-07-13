@@ -44,7 +44,6 @@ void TrackingHandlerOdf::InitForTracking()
   if (m_NeedsDataInit)
   {
     m_OdfHemisphereIndices.clear();
-    m_OdfReducedIndices.clear();
     itk::OrientationDistributionFunction< float, QBALL_ODFSIZE > odf;
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 

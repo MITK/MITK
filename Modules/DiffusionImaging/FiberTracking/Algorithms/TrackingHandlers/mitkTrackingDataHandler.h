@@ -67,6 +67,20 @@ public:
     void SetFlipX( bool f ){ m_FlipX = f; }
     void SetFlipY( bool f ){ m_FlipY = f; }
     void SetFlipZ( bool f ){ m_FlipZ = f; }
+    void SetRandom( bool random )
+    {
+      m_Random = random;
+      if (!random)
+      {
+        m_Rng.seed(0);
+        std::srand(0);
+      }
+      else
+      {
+        m_Rng.seed();
+        std::srand(std::time(0));
+      }
+    }
 
 protected:
 
@@ -78,6 +92,7 @@ protected:
     MODE            m_Mode;
     BoostRngType    m_Rng;
     bool            m_NeedsDataInit;
+    bool            m_Random;
 
     void DataModified()
     {

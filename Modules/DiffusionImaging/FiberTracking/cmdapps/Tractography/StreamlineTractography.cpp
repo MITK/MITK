@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
   parser.addArgument("odf_cutoff", "", mitkCommandLineParser::Float, "ODF Cutoff:", "additional threshold on the ODF magnitude. this is useful in case of CSD fODF tractography.", 0.1);
   parser.addArgument("step_size", "", mitkCommandLineParser::Float, "Step size:", "step size (in voxels)", 0.5);
   parser.addArgument("angular_threshold", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold between two successive steps, (default: 90° * step_size)");
+  parser.addArgument("min_tract_length", "", mitkCommandLineParser::Float, "Min. tract length:", "minimum fiber length (in mm)", 20);
   parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
   parser.addArgument("seed_gm", "", mitkCommandLineParser::Bool, "Seed only GM:", "Seed only in gray matter (requires tissue type image --tissue_image)");
   parser.addArgument("control_gm_endings", "", mitkCommandLineParser::Bool, "Control GM endings:", "Seed perpendicular to gray matter and enforce endings inside of the gray matter (requires tissue type image --tissue_image)");
@@ -161,6 +162,10 @@ int main(int argc, char* argv[])
   float compress = -1;
   if (parsedArgs.count("compress"))
     compress = us::any_cast<float>(parsedArgs["compress"]);
+
+  float min_tract_length = 20;
+  if (parsedArgs.count("min_tract_length"))
+    min_tract_length = us::any_cast<float>(parsedArgs["min_tract_length"]);
 
   string forestFile;
   if (parsedArgs.count("forest"))
@@ -379,15 +384,12 @@ int main(int argc, char* argv[])
   {
     handler = new mitk::TrackingHandlerOdf();
 
-    for (auto input_image : input_images)
-    {
-      typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
-      CasterType::Pointer caster = CasterType::New();
-      caster->SetInput(input_image);
-      caster->Update();
-      mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = caster->GetOutput();
-      dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
-    }
+    typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput(input_images.at(0));
+    caster->Update();
+    mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = caster->GetOutput();
+    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaThreshold(cutoff);
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfThreshold(odf_cutoff);
@@ -428,6 +430,7 @@ int main(int argc, char* argv[])
   tracker->SetMaxNumTracts(max_tracts);
   tracker->SetTrackingHandler(handler);
   tracker->SetUseOutputProbabilityMap(output_prob_map);
+  tracker->SetMinTractLength(min_tract_length);
   tracker->Update();
 
   std::string ext = itksys::SystemTools::GetFilenameExtension(outFile);

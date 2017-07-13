@@ -6,7 +6,7 @@ mitkAddCustomModuleTest(mitkFiberBundleReaderWriterTest mitkFiberBundleReaderWri
 # Temporarily disabled. Since method relies on random numbers, the behaviour is not consistent across different systems. Solution?
 #mitkAddCustomModuleTest(mitkGibbsTrackingTest mitkGibbsTrackingTest ${MITK_DATA_DIR}/DiffusionImaging/qBallImage.qbi ${MITK_DATA_DIR}/DiffusionImaging/diffusionImageMask.nrrd ${MITK_DATA_DIR}/DiffusionImaging/gibbsTrackingParameters.gtp ${MITK_DATA_DIR}/DiffusionImaging/gibbsTractogram.fib)
 
-mitkAddCustomModuleTest(mitkStreamlineTrackingTest mitkStreamlineTrackingTest ${MITK_DATA_DIR}/DiffusionImaging/tensorImage.dti ${MITK_DATA_DIR}/DiffusionImaging/diffusionImageMask.nrrd ${MITK_DATA_DIR}/DiffusionImaging/streamlineTractogramInterpolated.fib)
+
 # mitkLocalFiberPlausibilityTest needs to use new direction image
 # mitkAddCustomModuleTest(mitkLocalFiberPlausibilityTest mitkLocalFiberPlausibilityTest ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX.fib ${MITK_DATA_DIR}/DiffusionImaging/LDFP_GT_DIRECTION_0.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_GT_DIRECTION_1.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_ERROR_IMAGE.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_NUM_DIRECTIONS.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_VECTOR_FIELD.fib ${MITK_DATA_DIR}/DiffusionImaging/LDFP_ERROR_IMAGE_IGNORE.nrrd)
 mitkAddCustomModuleTest(mitkFiberTransformationTest mitkFiberTransformationTest ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_transformed.fib)
@@ -15,6 +15,7 @@ mitkAddCustomModuleTest(mitkFiberGenerationTest mitkFiberGenerationTest ${MITK_D
 
 mitkAddCustomModuleTest(mitkFiberfoxSignalGenerationTest mitkFiberfoxSignalGenerationTest)
 mitkAddCustomModuleTest(mitkMachineLearningTrackingTest mitkMachineLearningTrackingTest)
+mitkAddCustomModuleTest(mitkStreamlineTractographyTest mitkStreamlineTractographyTest)
 mitkAddCustomModuleTest(mitkFiberProcessingTest mitkFiberProcessingTest)
 
 ENDIF()

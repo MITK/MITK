@@ -224,7 +224,7 @@ static void CopyResources(FileListType fileList, std::string outputPath)
     std::string savePathAndFileName = outputPath +fileStem + "." + fileType;
     MITK_INFO << "Copy resource " << savePathAndFileName;
     mitk::Image::Pointer resImage = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(derivedResourceFilename)[0].GetPointer()), fileType);
-    mitk::IOUtil::SaveImage(resImage, savePathAndFileName);
+    mitk::IOUtil::Save(resImage, savePathAndFileName);
   }
 }
 
@@ -357,7 +357,7 @@ int main( int argc, char* argv[] )
   // Copy reference image to destination
   std::string savePathAndFileName = GetSavePath(outputPath, referenceFileName);
 
-  mitk::IOUtil::SaveImage(refImage, savePathAndFileName);
+  mitk::IOUtil::Save(refImage, savePathAndFileName);
 
   // Copy all derived resources also to output folder, adding _reg suffix
   referenceFileList = CreateDerivedFileList(referenceFileName, movingImgPattern,derPatterns);
@@ -454,7 +454,7 @@ int main( int argc, char* argv[] )
       mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference,isBinary);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
-      mitk::IOUtil::SaveImage(derivedMovingResource, savePathAndFileName);
+      mitk::IOUtil::Save(derivedMovingResource, savePathAndFileName);
     }
   }
 

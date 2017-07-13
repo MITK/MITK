@@ -149,23 +149,31 @@ protected:
   vtkSmartPointer<vtkCellArray>       m_Cells;
   BundleType                          m_Tractogram;
   BundleType                          m_GmStubs;
+  
+  ItkUcharImgType::Pointer            m_StoppingRegions;
+  ItkUcharImgType::Pointer            m_SeedImage;
+  ItkUcharImgType::Pointer            m_MaskImage;
+  ItkUcharImgType::Pointer            m_TissueImage;
+  ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
 
   float                               m_AngularThresholdDeg;
   float                               m_StepSizeVox;
   float                               m_SamplingDistanceVox;
-
   float                               m_AngularThreshold;
   float                               m_StepSize;
   int                                 m_MaxLength;
   float                               m_MinTractLength;
   float                               m_MaxTractLength;
   int                                 m_SeedsPerVoxel;
+  
+  bool                                m_AvoidStop;
   bool                                m_RandomSampling;
   float                               m_SamplingDistance;
   float                               m_DeflectionMod;
   bool                                m_OnlyForwardSamples;
   bool                                m_UseStopVotes;
   unsigned int                        m_NumberOfSamples;
+  
   unsigned int                        m_NumPreviousDirections;
   int                                 m_WmLabel;
   int                                 m_GmLabel;
@@ -173,15 +181,8 @@ protected:
   bool                                m_ControlGmEndings;
   int                                 m_MaxNumTracts;
 
-  ItkUcharImgType::Pointer            m_StoppingRegions;
-  ItkUcharImgType::Pointer            m_SeedImage;
-  ItkUcharImgType::Pointer            m_MaskImage;
-  ItkUcharImgType::Pointer            m_TissueImage;
-  ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
-
   bool                                m_Verbose;
   bool                                m_AposterioriCurvCheck;
-  bool                                m_AvoidStop;
   bool                                m_DemoMode;
   bool                                m_Random;
   bool                                m_UseOutputProbabilityMap;

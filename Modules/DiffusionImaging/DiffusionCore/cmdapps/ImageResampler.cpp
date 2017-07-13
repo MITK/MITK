@@ -427,7 +427,7 @@ int main( int argc, char* argv[] )
     resultImage = TransformToReference(refImage,inputImage,useLinearInterpol,useNN);
 
 
-  mitk::IOUtil::SaveImage(resultImage, outputFile);
+  mitk::IOUtil::Save(resultImage, outputFile);
 
   return EXIT_SUCCESS;
 }

@@ -62,7 +62,7 @@ void
   }
 
   mitk::Image::Pointer img = mitk::ImportItkImage(itkMask1);
-  mitk::IOUtil::SaveImage(img, output);
+  mitk::IOUtil::Save(img, output);
 }
 
 int main(int argc, char* argv[])

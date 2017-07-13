@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
   saveAs = parsedArgs["output"].ToString();
   MITK_INFO << "Save as: " << saveAs;
   saveAs = saveAs + ".nrrd";
-  mitk::IOUtil::SaveImage(resultImage,saveAs);
+  mitk::IOUtil::Save(resultImage,saveAs);
 
   return 0;
 }

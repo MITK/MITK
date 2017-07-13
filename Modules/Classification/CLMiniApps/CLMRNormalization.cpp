@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
     break;
   }
 
-  mitk::IOUtil::SaveImage(output, parsedArgs["output"].ToString());
+  mitk::IOUtil::Save(output, parsedArgs["output"].ToString());
 
   return 0;
 }

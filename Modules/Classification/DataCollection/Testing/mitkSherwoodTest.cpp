@@ -129,8 +129,8 @@ public:
     mitk::CastToMitkImage(labelImage, mLabelImage);
     mitk::CastToMitkImage(propImage, mPropImage);
 
-    mitk::IOUtil::SaveImage(mLabelImage, labelPath);
-    mitk::IOUtil::SaveImage(mPropImage, probPath);
+    mitk::IOUtil::Save(mLabelImage, labelPath);
+    mitk::IOUtil::Save(mPropImage, probPath);
   }
 
 

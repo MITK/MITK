@@ -29,7 +29,7 @@ class MatchPointActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(us::ModuleContext* context)
+  void Load(us::ModuleContext* )
   {
     m_MAPRegistrationWrapperIO = new MAPRegistrationWrapperIO();
   }

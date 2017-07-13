@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
   view2.SetData(rs->Begin(), mitk::SliceNavigationController::Axial);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
-  ds->Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
+  ds->Add(view2.GetRenderer()->GetCurrentWorldPlaneGeometryNode());
 
   //*************************************************************************
   // Part IVc: 2D view for slicing sagitally
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
   view3.SetData(rs->Begin(), mitk::SliceNavigationController::Sagittal);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
-  ds->Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
+  ds->Add(view3.GetRenderer()->GetCurrentWorldPlaneGeometryNode());
 
   // *******************************************************
   // ******************* END OF NEW PART *******************

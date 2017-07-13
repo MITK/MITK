@@ -634,12 +634,13 @@ QTemporaryFile* QmitkCmdLineModuleRunner::SaveTemporaryImage(const ctkCmdLineMod
       if (tempFile->open())
       {
         tempFile->close();
-        if (mitk::IOUtil::Save( image, tempFile->fileName().toStdString() ))
+        try
         {
+          mitk::IOUtil::Save( image, tempFile->fileName().toStdString() );
           returnedFile = tempFile;
           break;
         }
-        else
+        catch(const mitk::Exception &)
         {
           intermediateError = QObject::tr("Tried %1, failed to save image:\n%2\n").arg(extension).arg(tempFile->fileName());
         }

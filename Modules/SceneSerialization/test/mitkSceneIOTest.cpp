@@ -51,7 +51,7 @@ public:
 
   static mitk::Surface::Pointer LoadSurface(const std::string &filename)
   {
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(filename))[0].GetPointer());
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(filename)[0].GetPointer());
     if (surface.IsNull())
     {
       MITK_TEST_FAILED_MSG(<< "Test surface '" << filename << "' was not loaded as an mitk::Surface");

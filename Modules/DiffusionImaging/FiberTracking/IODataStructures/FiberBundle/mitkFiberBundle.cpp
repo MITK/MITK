@@ -227,7 +227,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
   int progress = 0;
   std::vector< int > ids;
 #pragma omp parallel for
-  for (int i=0; i<points1.size(); i++)
+  for (int i=0; i<(int)points1.size(); i++)
   {
 #pragma omp critical
     {
@@ -237,14 +237,14 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     }
 
     bool match = false;
-    for (int j=0; j<points2.size(); j++)
+    for (unsigned int j=0; j<points2.size(); j++)
     {
       auto v1 = points1.at(i);
       auto v2 = points2.at(j);
 
       unsigned int matches = 0;
       unsigned int reverse_matches = 0;
-      for (int c=0; c<v1.size(); c++)
+      for (unsigned int c=0; c<v1.size(); c++)
       {
         if (v1[c].SquaredEuclideanDistanceTo(v2[c])<mitk::eps)
           matches++;
@@ -2047,7 +2047,7 @@ void mitk::FiberBundle::Compress(float error)
       double minError = error;
       int removeIndex = -1;
 
-      for (int j=0; j<vertices.size(); j++)
+      for (unsigned int j=0; j<vertices.size(); j++)
       {
         if (removedPoints[j]==0)
         {

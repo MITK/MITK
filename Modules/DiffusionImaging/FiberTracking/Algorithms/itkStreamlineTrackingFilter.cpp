@@ -37,15 +37,26 @@ StreamlineTrackingFilter
 ::StreamlineTrackingFilter()
   : m_PauseTracking(false)
   , m_AbortTracking(false)
+  , m_BuildFibersFinished(false)
+  , m_BuildFibersReady(0)
   , m_FiberPolyData(nullptr)
   , m_Points(nullptr)
   , m_Cells(nullptr)
+  , m_StoppingRegions(nullptr)
+  , m_SeedImage(nullptr)
+  , m_MaskImage(nullptr)
+  , m_TissueImage(nullptr)
+  , m_OutputProbabilityMap(nullptr)
+  , m_AngularThresholdDeg(-1)
+  , m_StepSizeVox(-1)
+  , m_SamplingDistanceVox(-1)
   , m_AngularThreshold(-1)
   , m_StepSize(0)
   , m_MaxLength(10000)
   , m_MinTractLength(20.0)
   , m_MaxTractLength(400.0)
   , m_SeedsPerVoxel(1)
+  , m_AvoidStop(true)
   , m_RandomSampling(false)
   , m_SamplingDistance(-1)
   , m_DeflectionMod(1.0)
@@ -53,22 +64,15 @@ StreamlineTrackingFilter
   , m_UseStopVotes(true)
   , m_NumberOfSamples(30)
   , m_NumPreviousDirections(1)
-  , m_StoppingRegions(nullptr)
-  , m_SeedImage(nullptr)
-  , m_MaskImage(nullptr)
-  , m_AposterioriCurvCheck(false)
-  , m_AvoidStop(true)
-  , m_DemoMode(false)
-  , m_SeedOnlyGm(false)
-  , m_ControlGmEndings(false)
   , m_WmLabel(3) // mrtrix 5ttseg labels
   , m_GmLabel(1) // mrtrix 5ttseg labels
-  , m_StepSizeVox(-1)
-  , m_SamplingDistanceVox(-1)
-  , m_AngularThresholdDeg(-1)
+  , m_SeedOnlyGm(false)
+  , m_ControlGmEndings(false)
   , m_MaxNumTracts(-1)
-  , m_Random(true)
   , m_Verbose(true)
+  , m_AposterioriCurvCheck(false)
+  , m_DemoMode(false)
+  , m_Random(true)
   , m_UseOutputProbabilityMap(false)
 {
   this->SetNumberOfRequiredInputs(0);
@@ -429,7 +433,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
   int alternatives = 1;
   int stop_votes = 0;
   int possible_stop_votes = 0;
-  for (int i=0; i<probeVecs.size(); i++)
+  for (unsigned int i=0; i<probeVecs.size(); i++)
   {
     vnl_vector_fixed<float,3> d;
     bool is_stop_voter = false;
@@ -617,7 +621,7 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
   if (front)
   {
     int c=0;
-    while(dist<m_Distance && c<fib->size()-1)
+    while(dist<m_Distance && c<(int)fib->size()-1)
     {
       itk::Point<float> p1 = fib->at(c);
       itk::Point<float> p2 = fib->at(c+1);
@@ -649,14 +653,14 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
       dist += v.magnitude();
       v.normalize();
       vectors.push_back(v);
-      if (c==fib->size()-1)
+      if (c==(int)fib->size()-1)
         meanV += v;
       c--;
     }
   }
   meanV.normalize();
 
-  for (int c=0; c<vectors.size(); c++)
+  for (unsigned int c=0; c<vectors.size(); c++)
   {
     float angle = dot_product(meanV, vectors.at(c));
     if (angle>1.0)
@@ -952,7 +956,7 @@ void StreamlineTrackingFilter::BuildFibers(bool check)
   vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
-  for (int i=0; i<m_Tractogram.size(); i++)
+  for (unsigned int i=0; i<m_Tractogram.size(); i++)
   {
     vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
     FiberType fib = m_Tractogram.at(i);

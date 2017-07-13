@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         t_geom->SetIndexToWorldTransform(s_geom->GetIndexToWorldTransform());
         target->SetGeometry(t_geom);
       }
-        mitk::IOUtil::SaveImage(target, outImage);
+        mitk::IOUtil::Save(target, outImage);
     }
     catch (itk::ExceptionObject e)
     {

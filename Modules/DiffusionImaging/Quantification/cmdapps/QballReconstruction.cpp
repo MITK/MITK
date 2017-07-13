@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
         mitk::IOUtil::Save(image, outfilename);
 
         if (outCoeffs)
-            mitk::IOUtil::SaveImage(coeffsImage, coeffout);
+            mitk::IOUtil::Save(coeffsImage, coeffout);
     }
     catch ( itk::ExceptionObject &err)
     {

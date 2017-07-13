@@ -145,20 +145,29 @@ public:
     additionalInputImage->SetOrigin(m_Surface->GetGeometry()->GetOrigin());
     additionalInputImage->GetGeometry()->SetIndexToWorldTransform(m_Surface->GetGeometry()->GetIndexToWorldTransform());
     mitk::Image::Pointer secondStep = additionalInputImage->Clone();
+
     unsigned int size = sizeof(unsigned char);
     for (unsigned int i = 0; i < secondStep->GetDimension(); ++i)
+    {
       size *= secondStep->GetDimension(i);
-    mitk::ImageWriteAccessor accessor(secondStep);
-    memset(accessor.GetData(), 1, size);
+    }
+
+    {
+      mitk::ImageWriteAccessor accessor(secondStep);
+      memset(accessor.GetData(), 1, size);
+    }
+
     additionalInputImage->GetTimeGeometry()->Expand(2);
     additionalInputImage->GetGeometry(1)->SetSpacing(secondStep->GetGeometry()->GetSpacing());
     additionalInputImage->GetGeometry(1)->SetOrigin(secondStep->GetGeometry()->GetOrigin());
     additionalInputImage->GetGeometry(1)->SetIndexToWorldTransform(
       secondStep->GetGeometry()->GetIndexToWorldTransform());
 
-    mitk::ImageReadAccessor readAccess(secondStep);
-    additionalInputImage->SetImportVolume(readAccess.GetData(), 0);
-    additionalInputImage->SetImportVolume(readAccess.GetData(), 1);
+    {
+      mitk::ImageReadAccessor readAccess(secondStep);
+      additionalInputImage->SetImportVolume(readAccess.GetData(), 0);
+      additionalInputImage->SetImportVolume(readAccess.GetData(), 1);
+    }
 
     // Arrange the filter
     surfaceToImageFilter->MakeOutputBinaryOn();

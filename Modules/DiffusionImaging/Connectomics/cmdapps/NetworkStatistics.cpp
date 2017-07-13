@@ -221,7 +221,6 @@ int main(int argc, char* argv[])
       for( int step = 0; step < granularity; ++step )
       {
         double targetValue( 0.0 );
-        bool newStep( true );
 
         switch ( method )
         {
@@ -340,7 +339,7 @@ int main(int argc, char* argv[])
         // Create LabelToIndex translation
         std::map< std::string, int > labelToIdMap;
         std::vector< mitk::ConnectomicsNetwork::NetworkNode > nodeVector = thresholdedNetwork->GetVectorOfAllNodes();
-        for(int loop(0); loop < nodeVector.size(); loop++)
+        for(std::size_t loop(0); loop < nodeVector.size(); loop++)
         {
           labelToIdMap.insert( std::pair< std::string, int>(nodeVector.at(loop).label, nodeVector.at(loop).id) );
         }
@@ -415,7 +414,7 @@ int main(int argc, char* argv[])
             double sumBC( 0 );
             double count( 0 );
 
-            for( int loop(0); loop < regionLabelsVector.size(); loop++ )
+            for( std::size_t loop(0); loop < regionLabelsVector.size(); loop++ )
             {
               if( thresholdedNetwork->CheckForLabel(regionLabelsVector.at( loop )) )
               {
@@ -453,11 +452,11 @@ int main(int argc, char* argv[])
               std::vector<std::string> loopLabelsVector = loopRegionsIterator->second;
               std::string loopName = loopRegionsIterator->first;
 
-              for (int loop(0); loop < regionLabelsVector.size(); loop++)
+              for (std::size_t loop(0); loop < regionLabelsVector.size(); loop++)
               {
                 if (thresholdedNetwork->CheckForLabel(regionLabelsVector.at(loop)))
                 {
-                  for (int innerLoop(0); innerLoop < loopLabelsVector.size(); innerLoop++)
+                  for (std::size_t innerLoop(0); innerLoop < loopLabelsVector.size(); innerLoop++)
                   {
                     if (thresholdedNetwork->CheckForLabel(loopLabelsVector.at(loop)))
                     {

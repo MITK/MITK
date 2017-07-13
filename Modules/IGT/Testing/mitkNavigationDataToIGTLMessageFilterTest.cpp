@@ -36,12 +36,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataToIGTLMessageFilter::Pointer m_NavigationDataToIGTLMessageFilter;
 
-static void Setup()
+/*static void Setup()
 {
   m_NavigationDataToIGTLMessageFilter = mitk::NavigationDataToIGTLMessageFilter::New();
-}
+}*/
 
-static void SetInputs()
+/*static void SetInputs()
 {
   //Build up test data
   mitk::NavigationData::Pointer nd0 = mitk::NavigationData::New();
@@ -105,7 +105,7 @@ static void SetInputs()
   m_NavigationDataToIGTLMessageFilter->SetInput(1, nd1);
   m_NavigationDataToIGTLMessageFilter->SetInput(2, nd2);
   m_NavigationDataToIGTLMessageFilter->SetInput(3, nd3);
-}
+}*/
 
 
 

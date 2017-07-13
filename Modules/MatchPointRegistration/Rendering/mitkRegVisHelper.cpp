@@ -113,7 +113,6 @@ namespace mitk
     long xExtend = itk::Math::Ceil<long,mitk::ScalarType>(gridDesc->GetExtent(0));
     long yExtend = itk::Math::Ceil<long,mitk::ScalarType>(gridDesc->GetExtent(1));
     long zExtend = itk::Math::Ceil<long,mitk::ScalarType>(gridDesc->GetExtent(2));
-    long zOffset = xExtend*yExtend;
 
     mitk::Geometry3D::BoundsArrayType bounds = gridDesc->GetBounds();
 

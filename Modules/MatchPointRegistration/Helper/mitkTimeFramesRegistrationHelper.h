@@ -108,8 +108,13 @@ namespace mitk
     Image::Pointer GetRegisteredImage();
 
   protected:
-    TimeFramesRegistrationHelper() : m_Progress(0), m_AllowUndefPixels(true), m_PaddingValue(0),
-      m_AllowUnregPixels(true), m_ErrorValue(0), m_InterpolatorType(mitk::ImageMappingInterpolator::Linear)
+    TimeFramesRegistrationHelper() :
+      m_AllowUndefPixels(true),
+      m_PaddingValue(0),
+      m_AllowUnregPixels(true),
+      m_ErrorValue(0),
+      m_InterpolatorType(mitk::ImageMappingInterpolator::Linear),
+      m_Progress(0)
     {
       m_4DImage = nullptr;
       m_TargetMask = nullptr;

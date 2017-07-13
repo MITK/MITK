@@ -278,20 +278,10 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
   image->InitializeByItk(_pResizeFilter->GetOutput());
   mitk::GrabItkImageMemory( _pResizeFilter->GetOutput(), image);
   return image;
-
 }
 
-/// Save images according to file type
-static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
+static mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing)
 {
-  std::cout << "----Save to " << fileName;
-
-  mitk::IOUtil::Save(image, fileName);
-}
-
-mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing, bool useLinInt = true)
-{
-
   itk::Vector<double, 3> spacingVector;
   spacingVector[0] = spacing[0];
   spacingVector[1] = spacing[1];

@@ -42,7 +42,7 @@ QmitkPythonVariableStackTableModel::~QmitkPythonVariableStackTableModel()
   m_PythonService->RemovePythonCommandObserver( this );
 }
 
-bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent )
+bool QmitkPythonVariableStackTableModel::dropMimeData(const QMimeData * data, Qt::DropAction action, int, int, const QModelIndex &)
 {
     // Early exit, returning true, but not actually doing anything (ignoring data).
     if (action == Qt::IgnoreAction)

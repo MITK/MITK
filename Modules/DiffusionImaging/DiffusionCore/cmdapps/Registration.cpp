@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRegistrationWrapper.h>
 #include <mitkImage.h>
 #include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageTimeSelector.h>
 #include <itkImageFileWriter.h>
@@ -106,7 +107,7 @@ static std::string GetSavePath(std::string outputFolder, std::string fileName)
 }
 
 
-static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing, bool useLinInt = false)
+static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing)
 {
   InputImageType::Pointer itkImage = InputImageType::New();
   CastToItkImage(input,itkImage);
@@ -205,14 +206,6 @@ static FileListType CreateDerivedFileList(std::string baseFN, std::string baseSu
   return files;
 }
 
-/// Save images according to file type
-static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
-{
-  MITK_INFO << "----Save to " << fileName;
-
-  mitk::IOUtil::Save(image, fileName);
-}
-
 /// Copy derived resources from first time step. Append _reg tag, but leave data untouched.
 static void CopyResources(FileListType fileList, std::string outputPath)
 {
@@ -259,15 +252,12 @@ int main( int argc, char* argv[] )
   bool silent = false;
   bool isBinary = false;
   bool alignOrigin = false;
-  bool useLinearInterpol = true;
+
   {
     if (parsedArgs.size() == 0)
     {
       return EXIT_FAILURE;
     }
-
-    if (parsedArgs.count("sinc-int"))
-      useLinearInterpol = false;
 
     if (parsedArgs.count("silent"))
       silent = true;
@@ -316,7 +306,7 @@ int main( int argc, char* argv[] )
 
 
   std::vector<std::string> spacings;
-  float spacing[3];
+  float spacing[] = { 0.0f, 0.0f, 0.0f };
   bool doResampling = false;
   if (parsedArgs.count("resample") || parsedArgs.count("d") )
   {
@@ -422,11 +412,12 @@ int main( int argc, char* argv[] )
       if (fileType == ".dwi")
         fileType = "dwi";
 
-      if (movingImage->GetData() == nullptr)
-        MITK_INFO <<"POST DATA is null";
+      {
+        mitk::ImageReadAccessor readAccess(movingImage);
 
-
-
+        if (readAccess.GetData() == nullptr)
+          MITK_INFO <<"POST DATA is null";
+      }
 
       mitk::IOUtil::Save(movingImage, savePathAndFileName);
     }

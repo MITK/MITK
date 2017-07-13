@@ -1,7 +1,9 @@
-#pragma warning(disable : 4996)
-
 #ifndef __ConnectednessFilter_hxx
 #define __ConnectednessFilter_hxx
+
+#ifdef _MSC_VER
+#  pragma warning(disable : 4996)
+#endif
 
 #include "itkConnectednessFilter.h"
 #include "itkImageRegionConstIterator.h"

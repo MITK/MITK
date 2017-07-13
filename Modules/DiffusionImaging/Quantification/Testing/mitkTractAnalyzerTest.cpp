@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "mitkTractAnalyzer".
  */
-int mitkTractAnalyzerTest(int argc , char* argv[])
+int mitkTractAnalyzerTest(int, char* argv[])
 {
 
   MITK_TEST_BEGIN("TractAnalyzer");

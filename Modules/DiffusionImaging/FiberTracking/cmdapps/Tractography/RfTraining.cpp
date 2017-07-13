@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "loading additional feature images";
     std::vector< std::vector< ItkFloatImgType::Pointer > > addFeatImages;
-    for (int i=0; i<rawData.size(); i++)
+    for (std::size_t i=0; i<rawData.size(); ++i)
         addFeatImages.push_back(std::vector< ItkFloatImgType::Pointer >());
 
     int c = 0;

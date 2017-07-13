@@ -30,7 +30,7 @@ namespace itk
 
       virtual void GenerateData();
 
-      DataObject::Pointer MakeOutput(unsigned int /*idx*/);
+      virtual itk::ProcessObject::DataObjectPointer MakeOutput(itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/) override;
 
       void CreateOutputImage(InputImagePointer input, OutputImagePointer output);
 

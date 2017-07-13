@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "itkSkeletonizationFilter".
  */
-int mitkTbssSkeletonizationTest(int argc , char* argv[])
+int mitkTbssSkeletonizationTest(int, char* argv[])
 {
 
   MITK_TEST_BEGIN("TbssSkeletonizationTest");

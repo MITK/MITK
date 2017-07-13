@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "mitkNrrdTbssImageReader".
  */
-int mitkTbssRoiNrrdImageReaderTest(int argc , char* argv[])
+int mitkTbssRoiNrrdImageReaderTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("NrrdTbssRoiImageReaderTest");
 

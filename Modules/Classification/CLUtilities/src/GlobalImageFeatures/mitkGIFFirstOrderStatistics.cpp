@@ -44,10 +44,10 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 
   double voxelVolume = 1;
   for (int i = 0; i < std::min<int>(3, VImageDimension), ++i)
-    voxelVolume *= itkImage->GetSpacing[i];
+    voxelVolume *= itkImage->GetSpacing()[i];
   double voxelSpace = 1;
   for (int i = 0; i < VImageDimension, ++i)
-    voxelSpace *= itkImage->GetSpacing[i];
+    voxelSpace *= itkImage->GetSpacing()[i];
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);

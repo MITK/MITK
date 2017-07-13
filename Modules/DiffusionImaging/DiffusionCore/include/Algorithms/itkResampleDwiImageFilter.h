@@ -119,7 +119,7 @@ public:
 
     virtual void PropagateRequestedRegion(){}
 
-    virtual void PropagateRequestedRegion(itk::DataObject *output){}
+    virtual void PropagateRequestedRegion(itk::DataObject *){}
 
     virtual void VerifyInputInformation(){}
 

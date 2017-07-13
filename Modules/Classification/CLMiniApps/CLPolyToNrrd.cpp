@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
   std::string saveAs = parsedArgs["output"].ToString();
   MITK_INFO << "Save as: " << saveAs;
   saveAs = saveAs + ".vtk";
-  mitk::IOUtil::SaveSurface(surf.GetPointer(),saveAs);
+  mitk::IOUtil::Save(surf.GetPointer(),saveAs);
 
   saveAs = parsedArgs["output"].ToString();
   MITK_INFO << "Save as: " << saveAs;

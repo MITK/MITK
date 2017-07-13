@@ -60,7 +60,7 @@ CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
     return newMapper;
 };
 
-void mitk::RegEvaluationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
+void mitk::RegEvaluationObjectFactory::SetDefaultProperties(mitk::DataNode*)
 {
 
 }

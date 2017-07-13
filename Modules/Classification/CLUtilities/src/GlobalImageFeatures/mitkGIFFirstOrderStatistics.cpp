@@ -42,6 +42,13 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
 
+  double voxelVolume = 1;
+  for (int i = 0; i < min(3, VImageDimension), ++i)
+    voxelVolume *= itkImage->GetSpacing[i];
+  double voxelSpace = 1;
+  for (int i = 0; i < VImageDimension, ++i)
+    voxelSpace *= itkImage->GetSpacing[i];
+
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
   minMaxComputer->Compute();
@@ -208,6 +215,9 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair("FirstOrder 90th Percentile", p90th));
   featureList.push_back(std::make_pair("FirstOrder 95th Percentile", p95th));
   featureList.push_back(std::make_pair("FirstOrder Interquartile Range",(p75th - p25th)));
+  featureList.push_back(std::make_pair("FirstOrder Image Dimension", VImageDimension));
+  featureList.push_back(std::make_pair("FirstOrder Voxel Space", voxelSpace));
+  featureList.push_back(std::make_pair("FirstOrder Voxel Volume", voxelVolume));
 
   //Calculate the robust mean absolute deviation
   //First, set all frequencies to 0 that are <10th or >90th percentile

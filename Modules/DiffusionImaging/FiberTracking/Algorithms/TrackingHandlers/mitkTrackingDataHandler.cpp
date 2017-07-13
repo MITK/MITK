@@ -25,6 +25,7 @@ namespace mitk
         , m_FlipY(false)
         , m_FlipZ(false)
         , m_Mode(MODE::DETERMINISTIC)
+        , m_RngItk(ItkRngType::New())
         , m_NeedsDataInit(true)
         , m_Random(true)
     {

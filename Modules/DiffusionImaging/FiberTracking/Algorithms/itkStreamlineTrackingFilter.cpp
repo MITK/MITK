@@ -81,10 +81,6 @@ StreamlineTrackingFilter
 
 void StreamlineTrackingFilter::BeforeTracking()
 {
-  if (m_Random)
-    std::srand(std::time(0));
-  else
-    std::srand(0);
   m_TrackingHandler->SetRandom(m_Random);
   m_TrackingHandler->InitForTracking();
   m_FiberPolyData = PolyDataType::New();
@@ -363,13 +359,6 @@ bool StreamlineTrackingFilter
   return false;
 }
 
-
-float StreamlineTrackingFilter::GetRandDouble(float min, float max)
-{
-  return (float)(rand()%((int)(10000*(max-min))) + 10000*min)/10000;
-}
-
-
 std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirections(int NPoints)
 {
   std::vector< vnl_vector_fixed<float,3> > pointshell;
@@ -442,13 +431,13 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
   {
     vnl_vector_fixed<float,3> d;
     bool is_stop_voter = false;
-    if (m_RandomSampling)
+    if (m_Random && m_RandomSampling)
     {
-      d[0] = GetRandDouble();
-      d[1] = GetRandDouble();
-      d[2] = GetRandDouble();
+      d[0] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+      d[1] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+      d[2] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
       d.normalize();
-      d *= GetRandDouble(0,m_SamplingDistance);
+      d *= m_TrackingHandler->GetRandDouble(0,m_SamplingDistance);
     }
     else
     {
@@ -711,9 +700,9 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
           m_SeedPoints.push_back(worldPos);
           for (int s = 1; s < m_SeedsPerVoxel; s++)
           {
-            start[0] = index[0] + GetRandDouble(-0.5, 0.5);
-            start[1] = index[1] + GetRandDouble(-0.5, 0.5);
-            start[2] = index[2] + GetRandDouble(-0.5, 0.5);
+            start[0] = index[0] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+            start[1] = index[1] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+            start[2] = index[2] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
 
             itk::Point<float> worldPos;
             m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
@@ -734,7 +723,8 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
 void StreamlineTrackingFilter::GenerateData()
 {
   this->BeforeTracking();
-  std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
+  if (m_Random)
+    std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
 
   bool stop = false;
   unsigned int current_tracts = 0;

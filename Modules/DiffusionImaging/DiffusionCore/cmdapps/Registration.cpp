@@ -160,18 +160,11 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
   _pResizeFilter->SetOutputSpacing(outputSpacing);
   _pResizeFilter->SetSize(outputSize);
 
-
-  typedef itk::LinearInterpolateImageFunction< InputImageType > LinearInterpolatorType;
-  LinearInterpolatorType::Pointer lin_interpolator = LinearInterpolatorType::New();
-
   typedef itk::Function::WelchWindowFunction<4> WelchWindowFunction;
   typedef itk::WindowedSincInterpolateImageFunction< InputImageType, 4,WelchWindowFunction> WindowedSincInterpolatorType;
   WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
-  if (useLinInt)
-    _pResizeFilter->SetInterpolator(lin_interpolator);
-  else
-    _pResizeFilter->SetInterpolator(sinc_interpolator);
+  _pResizeFilter->SetInterpolator(sinc_interpolator);
 
   // Specify the input.
   _pResizeFilter->SetInput(itkImage);

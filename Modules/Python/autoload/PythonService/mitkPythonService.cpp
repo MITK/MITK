@@ -26,16 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
-#ifdef __GNUC__
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wall"
-#endif
-
 #include <numpy/arrayobject.h>
-
-#ifdef __GNUC__
-#  pragma GCC diagnostic pop
-#endif
 
 #include <mitkExceptionMacro.h>
 

@@ -74,7 +74,7 @@ void SetInputFileNames( std::string input_directory )
 }
 
 
-mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, std::string output_file )
+static mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, const std::string &)
 {
   mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
   //mitk::ClassicDICOMSeriesReader::Pointer gdcmReader = mitk::ClassicDICOMSeriesReader::New();

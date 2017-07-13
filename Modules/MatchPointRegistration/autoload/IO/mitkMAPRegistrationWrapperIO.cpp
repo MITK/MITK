@@ -130,7 +130,7 @@ namespace mitk
   class DimHelper<1,j, TFunctor >
   {
   public:
-    static bool Execute(const mitk::MAPRegistrationWrapper* obj, const map::core::String& data)
+    static bool Execute(const mitk::MAPRegistrationWrapper*, const map::core::String&)
     {
       //just unwind. We are done.
       return false;

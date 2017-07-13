@@ -198,15 +198,15 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
   mitk::MAPRegistrationWrapper::ConstPointer reg = this->GetRegistration();
 
   //check if there is a valid worldGeometry
-  const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
   if( ( worldGeometry == nullptr ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
   {
     return;
   }
 
   if(targetInput->GetMTime()>localStorage->m_LastUpdateTime
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime()))
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()))
   { //target input has been modified -> reslice target input
     targetInput->Update();
 
@@ -383,7 +383,7 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
       }
     case 3 :
       {
-        const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+        const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
 
         Point3D currentPos3D;
         datanode->GetPropertyValue<Point3D>(mitk::nodeProp_RegEvalCurrentPosition, currentPos3D);
@@ -587,8 +587,6 @@ void mitk::RegEvaluationMapper2D::PrepareBlend( mitk::DataNode* datanode, LocalS
 
 void mitk::RegEvaluationMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter)
 {
-  LocalStorage *localStorage = this->GetLocalStorage( renderer );
-
   LevelWindow levelWindow;
   dataNode->GetLevelWindow(levelWindow, renderer, "levelwindow");
   levelFilter->GetLookupTable()->SetRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
@@ -680,8 +678,8 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
     || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime())
     || (localStorage->m_LastUpdateTime < this->GetTargetNode()->GetMTime()) //was the target node modified?
@@ -765,7 +763,7 @@ void mitk::RegEvaluationMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   }
 }
 
-bool mitk::RegEvaluationMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
+bool mitk::RegEvaluationMapper2D::RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry )
 {
   // if either one of the two geometries is nullptr we return true
   // for safety reasons

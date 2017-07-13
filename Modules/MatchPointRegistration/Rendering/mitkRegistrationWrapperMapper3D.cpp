@@ -42,12 +42,12 @@ mitk::MITKRegistrationWrapperMapper3D::~MITKRegistrationWrapperMapper3D()
 
 }
 
-bool mitk::MITKRegistrationWrapperMapper3D::RendererGeometryIsOutdated(mitk::BaseRenderer *renderer, const itk::TimeStamp& time) const
+bool mitk::MITKRegistrationWrapperMapper3D::RendererGeometryIsOutdated(mitk::BaseRenderer*, const itk::TimeStamp&) const
 {
   return false;
 }
 
-bool mitk::MITKRegistrationWrapperMapper3D::GetGeometryDescription(mitk::BaseRenderer *renderer, mitk::BaseGeometry::ConstPointer& gridDesc, unsigned int& gridFrequ) const
+bool mitk::MITKRegistrationWrapperMapper3D::GetGeometryDescription(mitk::BaseRenderer*, mitk::BaseGeometry::ConstPointer& gridDesc, unsigned int& gridFrequ) const
 {
   mitk::Geometry3D::Pointer newDesc;
   mitk::GetGridGeometryFromNode(this->GetDataNode(),newDesc,gridFrequ);

@@ -190,7 +190,7 @@ void mitk::VtkModel::DrawOpenGLGroup(int group, bool)
   }
 }
 
-void mitk::VtkModel::DrawSurfaceGroup(int group, bool)
+void mitk::VtkModel::DrawSurfaceGroup(int, bool)
 {
   m_PolyData->SetPoints(m_Points);
   m_PolyData->SetPolys(m_Polys);

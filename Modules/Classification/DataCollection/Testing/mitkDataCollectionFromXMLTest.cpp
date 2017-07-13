@@ -95,7 +95,7 @@ mitk::CollectionWriter::FolderToXml("/home/cweber/SSD-Data/Features/Frychel_Jadw
 
 
   // Try saving image to disk to ensure it is a valid object
-  mitk::IOUtil::SaveImage(image, "/tmp/dump.nrrd");
+  mitk::IOUtil::Save(image, "/tmp/dump.nrrd");
 
 
   std::vector<std::string> colIds;

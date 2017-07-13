@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
   cutter->SetBoundingObject(boundingObject);
   cutter->SetInput(imageToCrop);
   cutter->Update();
-  mitk::IOUtil::SaveImage(cutter->GetOutput(), outputName);
+  mitk::IOUtil::Save(cutter->GetOutput(), outputName);
 
   return EXIT_SUCCESS;
 }

@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
       for (int i = 0; i < outs.size(); ++i)
       {
         std::string name = filename + "-lh" + us::any_value_to_string<int>(i)+".nii.gz";
-        mitk::IOUtil::SaveImage(outs[i], name);
+        mitk::IOUtil::Save(outs[i], name);
       }
     }
   }
@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer output;
       AccessByItk_2(image, GaussianFilter, ranges[i], output);
       std::string name = filename + "-gaussian-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer output;
       AccessByItk_2(image, DifferenceOfGaussFilter, ranges[i], output);
       std::string name = filename + "-dog-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -293,7 +293,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer output;
       AccessByItk_2(image, LaplacianOfGaussianFilter, ranges[i], output);
       std::string name = filename + "-log-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -314,11 +314,11 @@ int main(int argc, char* argv[])
       outs.push_back(mitk::Image::New());
       AccessByItk_2(image, HessianOfGaussianFilter, ranges[i], outs);
       std::string name = filename + "-hog0-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[0], name);
+      mitk::IOUtil::Save(outs[0], name);
       name = filename + "-hog1-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[1], name);
+      mitk::IOUtil::Save(outs[1], name);
       name = filename + "-hog2-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[2], name);
+      mitk::IOUtil::Save(outs[2], name);
     }
   }
 

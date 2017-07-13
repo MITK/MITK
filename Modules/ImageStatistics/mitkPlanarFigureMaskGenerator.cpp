@@ -328,7 +328,7 @@ void PlanarFigureMaskGenerator::CalculateMask()
 
     // extract image slice which corresponds to the planarFigure and store it in m_InternalImageSlice
     mitk::Image::Pointer inputImageSlice = extract2DImageSlice(axis, slice);
-    //mitk::IOUtil::SaveImage(inputImageSlice, "/home/fabian/inputSliceImage.nrrd");
+    //mitk::IOUtil::Save(inputImageSlice, "/home/fabian/inputSliceImage.nrrd");
     // Compute mask from PlanarFigure
     AccessFixedDimensionByItk_1(inputImageSlice,
                                 InternalCalculateMaskFromPlanarFigure,
@@ -337,15 +337,15 @@ void PlanarFigureMaskGenerator::CalculateMask()
     //convert itk mask to mitk::Image::Pointer and return it
     mitk::Image::Pointer planarFigureMaskImage;
     planarFigureMaskImage = mitk::GrabItkImageMemory(m_InternalITKImageMask2D);
-    //mitk::IOUtil::SaveImage(planarFigureMaskImage, "/home/fabian/planarFigureMaskImage.nrrd");
+    //mitk::IOUtil::Save(planarFigureMaskImage, "/home/fabian/planarFigureMaskImage.nrrd");
 
     //Convert2Dto3DImageFilter::Pointer sliceTo3DImageConverter = Convert2Dto3DImageFilter::New();
     //sliceTo3DImageConverter->SetInput(planarFigureMaskImage);
     //sliceTo3DImageConverter->Update();
-    //mitk::IOUtil::SaveImage(sliceTo3DImageConverter->GetOutput(), "/home/fabian/3DsliceImage.nrrd");
+    //mitk::IOUtil::Save(sliceTo3DImageConverter->GetOutput(), "/home/fabian/3DsliceImage.nrrd");
 
     m_ReferenceImage = inputImageSlice;
-    //mitk::IOUtil::SaveImage(m_ReferenceImage, "/home/fabian/referenceImage.nrrd");
+    //mitk::IOUtil::Save(m_ReferenceImage, "/home/fabian/referenceImage.nrrd");
     m_InternalMask = planarFigureMaskImage;
 }
 

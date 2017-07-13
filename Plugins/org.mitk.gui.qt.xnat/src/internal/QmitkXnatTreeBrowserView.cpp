@@ -991,7 +991,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 
     //        fileInfo.setFile(origFile);
     //        if (!fileInfo.exists())
-    //          mitk::IOUtil::SaveSurface(surface, dir.path().toStdString());
+    //          mitk::IOUtil::Save(surface, dir.path().toStdString());
     //      }
     //    this->uploadFileToXnat(xnatFile, dir.path());
   }

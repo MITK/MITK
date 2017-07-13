@@ -95,7 +95,7 @@ namespace mitk
   class DimHelperSub<i,1,TFunctor >
   {
   public:
-    static bool Execute(const mitk::MAPRegistrationWrapper* obj, const map::core::String& data)
+    static bool Execute(const mitk::MAPRegistrationWrapper*, const map::core::String&)
     {
       //just unwind. Go to the next "row" with DimHelper
       return false;
@@ -144,7 +144,7 @@ namespace mitk
   class CanWrite
   {
   public:
-    static bool Execute(const mitk::MAPRegistrationWrapper* obj, const map::core::String& data = "")
+    static bool Execute(const mitk::MAPRegistrationWrapper* obj, const map::core::String& = "")
     {
       bool result = false;
 

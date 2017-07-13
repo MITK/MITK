@@ -45,7 +45,8 @@ public:
     TrackingDataHandler();
     virtual ~TrackingDataHandler(){}
 
-    typedef boost::mt19937 BoostRngType;
+    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator ItkRngType;
+    typedef boost::mt19937                BoostRngType;
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
     typedef itk::Image<short, 3>          ItkShortImgType;
     typedef itk::Image<float, 3>          ItkFloatImgType;
@@ -74,25 +75,33 @@ public:
       {
         m_Rng.seed(0);
         std::srand(0);
+        m_RngItk->SetSeed(0);
       }
       else
       {
         m_Rng.seed();
+        m_RngItk->SetSeed();
         std::srand(std::time(0));
       }
     }
 
+    double GetRandDouble(const double & a, const double & b)
+    {
+      return m_RngItk->GetUniformVariate(a, b);
+    }
+
 protected:
 
-    float           m_AngularThreshold;
-    bool            m_Interpolate;
-    bool            m_FlipX;
-    bool            m_FlipY;
-    bool            m_FlipZ;
-    MODE            m_Mode;
-    BoostRngType    m_Rng;
-    bool            m_NeedsDataInit;
-    bool            m_Random;
+    float               m_AngularThreshold;
+    bool                m_Interpolate;
+    bool                m_FlipX;
+    bool                m_FlipY;
+    bool                m_FlipZ;
+    MODE                m_Mode;
+    BoostRngType        m_Rng;
+    ItkRngType::Pointer m_RngItk;
+    bool                m_NeedsDataInit;
+    bool                m_Random;
 
     void DataModified()
     {

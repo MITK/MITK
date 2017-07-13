@@ -312,7 +312,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
       parameters.put("fiberfox.image.artifacts.noisetype", "chisquare");
   }
 
-  for (int i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
+  for (std::size_t i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
   {
     mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
     if (i<m_FiberModelList.size())

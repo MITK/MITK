@@ -32,8 +32,8 @@ TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::TrackingHandlerR
   , m_NumberOfSamples(0)
   , m_GmSamplesPerVoxel(-1)
   , m_NumPreviousDirections(1)
-  , m_ZeroDirWmFeatures(true)
   , m_BidirectionalFiberSampling(false)
+  , m_ZeroDirWmFeatures(true)
   , m_MaxNumWmSamples(-1)
 {
   vnl_vector_fixed<float,3> ref; ref.fill(0); ref[0]=1;
@@ -481,13 +481,13 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestVal
     MITK_ERROR << "Forest could not be read!";
   else
   {
-    if (m_Forest->tree_count()<=0)
+    if (m_Forest->tree_count() <= 0)
       MITK_ERROR << "Forest contains no trees!";
-    if ( m_Forest->feature_count()!=(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
+    if ( m_Forest->feature_count() != static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
       MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->feature_count() << ", expected " << (NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features);
   }
 
-  if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
+  if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count() == static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
     return true;
 
   return false;

@@ -108,14 +108,6 @@ namespace itk{
       outImageBufferPointer[i] = 0;
 
     // resample fiber bundle
-    float minSpacing = 1;
-    if(newSpacing[0]<newSpacing[1] && newSpacing[0]<newSpacing[2])
-        minSpacing = newSpacing[0];
-    else if (newSpacing[1] < newSpacing[2])
-        minSpacing = newSpacing[1];
-    else
-        minSpacing = newSpacing[2];
-
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
 
     int numFibers = m_FiberBundle->GetNumFibers();
@@ -134,10 +126,16 @@ namespace itk{
         itk::Index<3> index;
         outImage->TransformPhysicalPointToIndex(vertex, index);
         if (upsampledRegion.IsInside(index))
+        {
           if (m_BinaryOutput)
-              outImage->SetPixel(index, 1);
+          {
+            outImage->SetPixel(index, 1);
+          }
           else
-              outImage->SetPixel(index, outImage->GetPixel(index)+1);
+          {
+            outImage->SetPixel(index, outImage->GetPixel(index)+1);
+          }
+        }
       }
 
       if (numPoints>=2)
@@ -146,10 +144,16 @@ namespace itk{
         itk::Index<3> index;
         outImage->TransformPhysicalPointToIndex(vertex, index);
         if (upsampledRegion.IsInside(index))
+        {
           if (m_BinaryOutput)
+          {
               outImage->SetPixel(index, 1);
+          }
           else
+          {
               outImage->SetPixel(index, outImage->GetPixel(index)+1);
+          }
+        }
       }
     }
 

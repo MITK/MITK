@@ -160,7 +160,7 @@ namespace itk {
 
   template< class TPixelType >
   void KspaceImageFilter< TPixelType >
-  ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType threadID)
+  ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType)
   {
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
     randGen->SetSeed();

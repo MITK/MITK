@@ -53,7 +53,7 @@ public:
   itkGetMacro( OutputAbsoluteValues, bool)                      ///< output absolute values of the number of fibers per voxel
   itkSetMacro( UseImageGeometry, bool)                          ///< use input image geometry to initialize output image
   itkGetMacro( UseImageGeometry, bool)                          ///< use input image geometry to initialize output image
-  itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)        ///< input fiber bundle
+  itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)         ///< input fiber bundle
   itkSetMacro( InputImage, typename OutputImageType::Pointer)   ///< use input image geometry to initialize output image
   itkSetMacro( UseTrilinearInterpolation, bool )
   itkSetMacro( DoFiberResampling, bool )

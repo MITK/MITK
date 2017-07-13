@@ -15,7 +15,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkKinectController.h"
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wall"
+#endif
+
 #include <XnCppWrapper.h>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
 namespace mitk
 {

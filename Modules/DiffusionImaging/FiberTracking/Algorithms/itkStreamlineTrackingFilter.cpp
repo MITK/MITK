@@ -81,6 +81,11 @@ StreamlineTrackingFilter
 
 void StreamlineTrackingFilter::BeforeTracking()
 {
+  if (m_Random)
+    std::srand(std::time(0));
+  else
+    std::srand(0);
+  m_TrackingHandler->SetRandom(m_Random);
   m_TrackingHandler->InitForTracking();
   m_FiberPolyData = PolyDataType::New();
   m_Points = vtkSmartPointer< vtkPoints >::New();
@@ -729,12 +734,7 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
 void StreamlineTrackingFilter::GenerateData()
 {
   this->BeforeTracking();
-
-  if (m_Random)
-  {
-    std::srand(std::time(0));
-    std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
-  }
+  std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
 
   bool stop = false;
   unsigned int current_tracts = 0;

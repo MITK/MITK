@@ -47,6 +47,7 @@ public:
     void SetG(float g){ m_G = g; }
     void SetFaThreshold(float FaThreshold){ m_FaThreshold = FaThreshold; }
     void AddTensorImage( ItkTensorImageType::Pointer img ){ m_TensorImages.push_back(img); DataModified(); }
+    void SetTensorImage( ItkTensorImageType::Pointer img ){ m_TensorImages.clear(); m_TensorImages.push_back(img); DataModified(); }
     void ClearTensorImages(){ m_TensorImages.clear(); DataModified(); }
     void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; DataModified(); }
     void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }

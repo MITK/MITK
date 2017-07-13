@@ -26,6 +26,7 @@ namespace mitk
         , m_FlipZ(false)
         , m_Mode(MODE::DETERMINISTIC)
         , m_NeedsDataInit(true)
+        , m_Random(true)
     {
 
     }

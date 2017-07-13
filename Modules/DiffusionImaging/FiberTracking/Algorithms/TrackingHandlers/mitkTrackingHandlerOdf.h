@@ -51,7 +51,6 @@ public:
     void SetGfaImage( ItkFloatImgType::Pointer img ){ m_GfaImage = img; DataModified(); }
     void SetMode( MODE m ){ m_Mode = m; }
 
-
     ItkUcharImgType::SpacingType GetSpacing(){ return m_OdfImage->GetSpacing(); }
     itk::Point<float,3> GetOrigin(){ return m_OdfImage->GetOrigin(); }
     ItkUcharImgType::DirectionType GetDirection(){ return m_OdfImage->GetDirection(); }
@@ -73,7 +72,6 @@ protected:
     std::vector< int >              m_OdfHemisphereIndices;
     vnl_matrix< float >             m_OdfFloatDirs;
     int                             m_NumProbSamples;
-    std::vector< int >              m_OdfReducedIndices;
 };
 
 }

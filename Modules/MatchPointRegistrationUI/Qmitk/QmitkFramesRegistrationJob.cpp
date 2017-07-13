@@ -153,7 +153,7 @@ void QmitkFramesRegistrationJob::OnMapAlgorithmEvent(::itk::Object *, const itk:
 }
 
 QmitkFramesRegistrationJob::QmitkFramesRegistrationJob(map::algorithm::RegistrationAlgorithmBase *pAlgorithm)
-  : m_spLoadedAlgorithm(pAlgorithm), m_TargetDataUID("Missing target UID")
+  : m_TargetDataUID("Missing target UID"), m_spLoadedAlgorithm(pAlgorithm)
 {
   m_MappedName = "Unnamed RegJob";
 

@@ -67,8 +67,6 @@ int mitkUSImageVideoSourceTest(int, char* argv[])
 
 #ifdef WIN32 // Video file compression is currently only supported under windows.
   mitkUSImageVideoSourceTestClass::TestOpenVideoFile(argv[1]);
-#else
-  argv;
 #endif
 
   // This test is commented out since no videodevcie ist steadily connected to the dart clients.

@@ -25,11 +25,11 @@ namespace itk{
 
   template< class OutputImageType >
   TractsToFiberEndingsImageFilter< OutputImageType >::TractsToFiberEndingsImageFilter()
-    : m_InvertImage(false)
-    , m_UpsamplingFactor(1)
-    , m_InputImage(nullptr)
+    : m_UpsamplingFactor(1)
+    , m_InvertImage(false)
     , m_UseImageGeometry(false)
     , m_BinaryOutput(false)
+    , m_InputImage(nullptr)
   {
 
   }

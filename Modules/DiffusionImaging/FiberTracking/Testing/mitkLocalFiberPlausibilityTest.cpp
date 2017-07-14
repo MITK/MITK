@@ -138,9 +138,9 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         mitk::Image::Pointer gtAngularErrorImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(LDFP_ERROR_IMAGE)[0].GetPointer());
         mitk::Image::Pointer gtNumTestDirImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(LDFP_NUM_DIRECTIONS)[0].GetPointer());
 
-        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImageIgnore, mitkAngularErrorImageIgnore, 0.5, true), "Check if error images are equal (ignored missing directions).");
-        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.01, true), "Check if error images are equal.");
-        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtNumTestDirImage, mitkNumDirImage, 0.1, true), "Check if num direction images are equal.");
+        MITK_ASSERT_EQUAL(gtAngularErrorImageIgnore, mitkAngularErrorImageIgnore, "Check if error images are equal (ignored missing directions).");
+        MITK_ASSERT_EQUAL(gtAngularErrorImage, mitkAngularErrorImage, "Check if error images are equal.");
+        MITK_ASSERT_EQUAL(gtNumTestDirImage, mitkNumDirImage, "Check if num direction images are equal.");
     }
     catch (itk::ExceptionObject e)
     {

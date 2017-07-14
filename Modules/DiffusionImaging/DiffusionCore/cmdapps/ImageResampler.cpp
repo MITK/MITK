@@ -357,7 +357,7 @@ int main( int argc, char* argv[] )
   std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
 
   std::vector<std::string> spacings;
-  float spacing = { 0.0f, 0.0f, 0.0f };
+  float spacing[] = { 0.0f, 0.0f, 0.0f };
   if (parsedArgs.count("spacing"))
   {
 

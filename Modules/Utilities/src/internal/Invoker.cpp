@@ -1,8 +1,13 @@
 #include "Invoker.h"
 
+Q_DECLARE_METATYPE(Utilities::ExecuteProc);
+
 namespace Utilities
 {
-  Q_DECLARE_METATYPE(ExecuteProc);
+  Invoker::Invoker()
+  {
+    qRegisterMetaType<Utilities::ExecuteProc>("Utilities::ExecuteProc");
+  }
 
   void Invoker::ExecInMainThread(const ExecuteProc& proc, Qt::ConnectionType connType)
   {

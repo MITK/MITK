@@ -11,6 +11,8 @@ namespace Utilities
     Q_OBJECT
 
   public:
+    Invoker();
+
     void ExecInMainThread(const ExecuteProc& proc, Qt::ConnectionType connType);
 
   private:

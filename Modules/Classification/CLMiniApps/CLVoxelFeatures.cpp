@@ -155,7 +155,7 @@ void
   typename HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
   hessianFilter->SetInput(itkImage);
   hessianFilter->SetSigma(std::sqrt(variance));
-  for (int i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     typename DetFilterType::Pointer detFilter = DetFilterType::New();
     detFilter->SetInput(hessianFilter->GetOutput());

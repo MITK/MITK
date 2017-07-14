@@ -9,7 +9,9 @@ MITK_CREATE_MODULE(
   INCLUDE_DIRS
     PUBLIC ${MITK_BINARY_DIR}
     PRIVATE src/Algorithms src/Controllers src/DataManagement src/Interactions src/IO src/Rendering ${OPENGL_INCLUDE_DIR}
-  DEPENDS PUBLIC mbilog CppMicroServices
+  DEPENDS
+    PUBLIC mbilog CppMicroServices
+    PRIVATE MitkUtilities
   PACKAGE_DEPENDS
     PRIVATE tinyxml OpenGL
     # Remove public GDCM and ITKIOGDCM+... dependencies after mitkDicomSeriesReader was removed

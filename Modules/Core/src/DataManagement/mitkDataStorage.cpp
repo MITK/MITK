@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataStorage.h"
 
+#include "ThreadUtilities.h"
+
 #include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkNodePredicateBase.h"
@@ -499,4 +501,32 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyK
 void mitk::DataStorage::BlockNodeModifiedEvents( bool block )
 {
   m_BlockNodeModifiedEvents = block;
+}
+
+
+void mitk::DataStorage::DataStorageEvent::Execute(MessageBaseType::AbstractDelegate* listener, const mitk::DataNode* node) const
+{
+  switch (listener->GetRunType()){
+  case mitk::MessageAbstractDelegateBase::THREAD_FREE:
+    listener->Execute(node);
+    break;
+  case mitk::MessageAbstractDelegateBase::MAIN_ASYNC:
+    {
+      auto func = listener->Clone();
+      mitk::DataNode::ConstPointer ptr = node;
+      Utilities::execInMainThreadAsync([func, ptr] {
+        func->Execute(ptr);
+        delete func;
+      });
+    }
+    break;
+  case mitk::MessageAbstractDelegateBase::MAIN_SYNC:
+    Utilities::execInMainThreadSync([listener, node] {
+      listener->Execute(node);
+    });
+    break;
+  default:
+    assert(0);
+    listener->Execute(node);
+  }
 }

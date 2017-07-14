@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFiberBundleMapper2D.h"
 #include <mitkBaseRenderer.h>
 #include <vtkActor.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPlane.h>
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
@@ -130,27 +130,68 @@ void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rende
 // vtkActors and Mappers are feeded here
 void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-    mitk::FiberBundle* fiberBundle = this->GetInput();
+  mitk::FiberBundle* fiberBundle = this->GetInput();
 
-    //the handler of local storage gets feeded in this method with requested data for related renderwindow
-    FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  //the handler of local storage gets feeded in this method with requested data for related renderwindow
+  FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
-    mitk::DataNode* node = this->GetDataNode();
-    if ( node == nullptr )
-        return;
+  mitk::DataNode* node = this->GetDataNode();
+  if (node == nullptr)
+    return;
 
-    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
-    if (fiberPolyData == nullptr)
-        return;
+  vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
+  if (fiberPolyData == nullptr)
+    return;
 
-    fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
-    localStorage->m_FiberMapper->ScalarVisibilityOn();
-    localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
-    localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
-    localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
-    localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
+  fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
+  localStorage->m_FiberMapper->ScalarVisibilityOn();
+  localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
+  localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
+  localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
+  localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
 
-    localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+  localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+  localStorage->m_FiberMapper->SetVertexShaderCode(
+    "varying vec3 positionWorld;\n"
+    "varying vec3 color;\n"
+
+    "void main(void)\n"
+    "{\n"
+    "  color = gl_Color.rgb;\n"
+    "  positionWorld = vec3(gl_Vertex);\n"
+    "  gl_Position = ftransform();\n"
+    "}\n"
+    );
+  localStorage->m_FiberMapper->SetFragmentShaderCode(
+    "//VTK::System::Dec\n"  // always start with this line
+    "//VTK::Output::Dec\n"  // always have this line in your FS
+    "uniform vec4 slicingPlane;\n"
+    "uniform float fiberThickness;\n"
+    "uniform int fiberFadingON;\n"
+    "uniform float fiberOpacity;\n"
+
+    "varying vec3 positionWorld;\n"
+    "varying vec3 color;\n"
+
+    "void main(void)\n"
+    "{"
+    "  float r1 = dot(positionWorld, slicingPlane.xyz) - slicingPlane.w;\n"
+    
+    "  if (abs(r1) >= fiberThickness)\n"
+    "    discard;\n"
+    
+    "  if (fiberFadingON != 0)\n"
+    "  {\n"
+    "    float x = (r1 + fiberThickness) / (fiberThickness*2.0);\n"
+    "    x = 1.0 - x;\n"
+    "    gl_FragColor = vec4(color*x, fiberOpacity);\n"
+    "  }\n"
+    "  else{\n"
+    "    gl_FragColor = vec4(color, fiberOpacity);\n"
+    "  }\n"
+    "}\n"
+    );
+
     localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
     localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
@@ -185,5 +226,5 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
 mitk::FiberBundleMapper2D::FBXLocalStorage::FBXLocalStorage()
 {
     m_PointActor = vtkSmartPointer<vtkActor>::New();
-    m_FiberMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    m_FiberMapper = vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER>::New();
 }

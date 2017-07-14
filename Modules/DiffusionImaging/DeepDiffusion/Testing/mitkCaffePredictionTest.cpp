@@ -99,9 +99,9 @@ public:
     cv::Mat out_img = cv::Mat(input_layer->height(), input_layer->width(), CV_32FC1, output_layer->mutable_cpu_data()) * 100;
     out_img.convertTo(out_img, CV_8UC1);
 
-    cv::imwrite(MITK_DATA_DIR + 'DiffusionImaging/DeepDiffusion/Caffe_Prediction_Test/input.png', input_img);
-    cv::imwrite(MITK_DATA_DIR + 'DiffusionImaging/DeepDiffusion/Caffe_Prediction_Test/output.png', out_img);
-    cv::imwrite(MITK_DATA_DIR + 'DiffusionImaging/DeepDiffusion/Caffe_Prediction_Test/ground_truth.png', ground_truth);
+//    cv::imwrite(MITK_DATA_DIR + "DiffusionImaging/DeepDiffusion/Caffe_Prediction_Test/input.png", input_img);
+//    cv::imwrite(MITK_DATA_DIR + "DiffusionImaging/DeepDiffusion/Caffe_Prediction_Test/output.png", out_img);
+//    cv::imwrite(MITK_DATA_DIR + "DiffusionImaging/DeepDiffusion/Caffe_Prediction_Test/ground_truth.png", ground_truth);
   }
 
 };

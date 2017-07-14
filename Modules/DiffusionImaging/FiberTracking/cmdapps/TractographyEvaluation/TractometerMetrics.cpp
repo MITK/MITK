@@ -285,7 +285,6 @@ int main(int argc, char* argv[])
 
         if (verbose)
         {
-            mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
             vtkSmartPointer<vtkPolyData> noConnPolyData = vtkSmartPointer<vtkPolyData>::New();
             noConnPolyData->SetPoints(noConnPoints);
             noConnPolyData->SetLines(noConnCells);

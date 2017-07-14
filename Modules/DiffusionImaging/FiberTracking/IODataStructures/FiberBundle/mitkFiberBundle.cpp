@@ -423,7 +423,7 @@ void mitk::FiberBundle::ColorFibersByOrientation()
           rgba[2] = (unsigned char) (255.0 * std::fabs(diff2[2]));
           rgba[3] = (unsigned char) (255.0);
         }
-        m_FiberColors->InsertTupleValue(idList[i], rgba);
+        m_FiberColors->InsertTypedTuple(idList[i], rgba);
       }
     }
     else if (pointsPerFiber == 1)
@@ -558,7 +558,7 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool minMaxNorm)
       rgba[1] = (unsigned char) (255.0 * color[1]);
       rgba[2] = (unsigned char) (255.0 * color[2]);
       rgba[3] = (unsigned char) (255.0);
-      m_FiberColors->InsertTupleValue(cell->GetPointId(j), rgba);
+      m_FiberColors->InsertTypedTuple(cell->GetPointId(j), rgba);
       count++;
     }
   }
@@ -631,7 +631,7 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
       rgba[3] = (unsigned char) (255.0 * pixelValue);
     else
       rgba[3] = (unsigned char) (255.0);
-    m_FiberColors->InsertTupleValue(i, rgba);
+    m_FiberColors->InsertTypedTuple(i, rgba);
   }
   m_UpdateTime3D.Modified();
   m_UpdateTime2D.Modified();
@@ -687,7 +687,7 @@ void mitk::FiberBundle::ColorFibersByFiberWeights()
       rgba[2] = (unsigned char) (255.0 * color[2]);
       rgba[3] = (unsigned char) (255.0);
 
-      m_FiberColors->InsertTupleValue(counter, rgba);
+      m_FiberColors->InsertTypedTuple(counter, rgba);
       counter++;
     }
   }
@@ -710,7 +710,7 @@ void mitk::FiberBundle::SetFiberColors(float r, float g, float b, float alpha)
     rgba[1] = (unsigned char) g;
     rgba[2] = (unsigned char) b;
     rgba[3] = (unsigned char) alpha;
-    m_FiberColors->InsertTupleValue(i, rgba);
+    m_FiberColors->InsertTypedTuple(i, rgba);
   }
   m_UpdateTime3D.Modified();
   m_UpdateTime2D.Modified();
@@ -1309,14 +1309,14 @@ void mitk::FiberBundle::SetFiberColors(vtkSmartPointer<vtkUnsignedCharArray> fib
   for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
   {
     unsigned char source[4] = {0,0,0,0};
-    fiberColors->GetTupleValue(i, source);
+    fiberColors->GetTypedTuple(i, source);
 
     unsigned char target[4] = {0,0,0,0};
     target[0] = source[0];
     target[1] = source[1];
     target[2] = source[2];
     target[3] = source[3];
-    m_FiberColors->InsertTupleValue(i, target);
+    m_FiberColors->InsertTypedTuple(i, target);
   }
   m_UpdateTime3D.Modified();
   m_UpdateTime2D.Modified();

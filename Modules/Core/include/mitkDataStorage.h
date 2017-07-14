@@ -202,7 +202,7 @@ namespace mitk {
     class DataStorageEvent : public Message1<const mitk::DataNode*>
     {
     protected:
-      virtual void Execute(MessageBaseType::AbstractDelegate* listener, const mitk::DataNode* node) const override;
+      virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, const mitk::DataNode* node) const override;
     };
 
     //##Documentation

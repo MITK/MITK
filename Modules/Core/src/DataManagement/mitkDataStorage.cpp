@@ -503,7 +503,7 @@ void mitk::DataStorage::BlockNodeModifiedEvents( bool block )
   m_BlockNodeModifiedEvents = block;
 }
 
-void mitk::DataStorage::DataStorageEvent::Execute(MessageBaseType::AbstractDelegate* listener, const mitk::DataNode* node) const
+void mitk::DataStorage::DataStorageEvent::Execute(typename MessageBaseType::AbstractDelegateType* listener, const mitk::DataNode* node) const
 {
   switch (listener->GetRunType()){
   case mitk::ERunType::THREAD_FREE:

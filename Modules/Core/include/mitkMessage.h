@@ -388,7 +388,7 @@ template<typename AbstractDelegate>
 class MessageBase
 {
 public:
-  typedef AbstractDelegate AbstractDelegate;
+  typedef AbstractDelegate AbstractDelegateType;
 
   virtual ~MessageBase()
   {
@@ -702,7 +702,7 @@ public:
   }
 
 protected:
-  virtual void Execute(typename MessageBaseType::AbstractDelegate* listener) const
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener) const
   {
     listener->Execute();
   }
@@ -728,7 +728,7 @@ public:
   }
 
 protected:
-  virtual void Execute(typename MessageBaseType::AbstractDelegate* listener, T t) const
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t) const
   {
     listener->Execute(t);
   }
@@ -754,7 +754,7 @@ public:
   }
 
 protected:
-  virtual void Execute(typename MessageBaseType::AbstractDelegate* listener, T t, U u) const
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t, U u) const
   {
     listener->Execute(t, u);
   }
@@ -780,7 +780,7 @@ public:
   }
 
 protected:
-  virtual void Execute(typename MessageBaseType::AbstractDelegate* listener, T t, U u, V v) const
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t, U u, V v) const
   {
     listener->Execute(t, u, v);
   }
@@ -806,7 +806,7 @@ public:
   }
 
 protected:
-  virtual void Execute(typename MessageBaseType::AbstractDelegate* listener, T t, U u, V v, W w) const
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t, U u, V v, W w) const
   {
     listener->Execute(t, u, v, w);
   }

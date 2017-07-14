@@ -478,7 +478,7 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestVal
     additional_features = m_AdditionalFeatureImages.at(0).size();
 
   if (!m_Forest)
-    MITK_ERROR << "Forest could not be read!";
+    MITK_INFO << "No forest available!";
   else
   {
     if (m_Forest->tree_count() <= 0)

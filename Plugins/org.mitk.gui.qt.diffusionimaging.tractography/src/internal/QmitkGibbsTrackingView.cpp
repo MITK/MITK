@@ -101,7 +101,6 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
     connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
     connect(&m_TrackingThread, SIGNAL(started()), &m_TrackingWorker, SLOT(run()));
     connect(&m_TrackingThread, SIGNAL(finished()), this, SLOT(AfterThread()));
-    connect(&m_TrackingThread, SIGNAL(terminated()), this, SLOT(AfterThread()));
     m_TrackingTimer = new QTimer(this);
 }
 

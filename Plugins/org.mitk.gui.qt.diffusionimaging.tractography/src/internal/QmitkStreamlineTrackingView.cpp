@@ -171,12 +171,15 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
     m_InteractiveNode = nullptr;
     m_InteractivePointSetNode = nullptr;
 
-    mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag1);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag2);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag3);
+    if (renderWindow)
+    {
+      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
+      slicer->RemoveObserver(m_SliceObserverTag1);
+      slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
+      slicer->RemoveObserver(m_SliceObserverTag2);
+      slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
+      slicer->RemoveObserver(m_SliceObserverTag3);
+    }
   }
 }
 
@@ -303,12 +306,12 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->mFaImageLabel->setVisible(true);
       m_Controls->m_FaImageBox->setVisible(true);
 
-//      if (m_Controls->m_ModeBox->currentIndex()==1)
-//      {
-//        m_Controls->m_OdfCutoffBox->setVisible(true);
-//        m_Controls->m_OdfCutoffLabel->setVisible(true);
-//        m_Controls->m_SharpenOdfsBox->setVisible(true);
-//      }
+      //      if (m_Controls->m_ModeBox->currentIndex()==1)
+      //      {
+      //        m_Controls->m_OdfCutoffBox->setVisible(true);
+      //        m_Controls->m_OdfCutoffLabel->setVisible(true);
+      //        m_Controls->m_SharpenOdfsBox->setVisible(true);
+      //      }
     }
     else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
     {

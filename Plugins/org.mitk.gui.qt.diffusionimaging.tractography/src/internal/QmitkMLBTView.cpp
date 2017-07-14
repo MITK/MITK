@@ -172,7 +172,7 @@ void QmitkMLBTView::ChangeTimerInterval(int value)
     m_TrackingTimer->setInterval(value);
 }
 
-void QmitkMLBTView::ToggleDemoMode(int state)
+void QmitkMLBTView::ToggleDemoMode(int )
 {
     if (tracker.IsNotNull())
     {

@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDATASTORAGE_H_HEADER_INCLUDED_
 #define MITKDATASTORAGE_H_HEADER_INCLUDED_
 
+#include <functional>
+
 #include "itkObject.h"
 #include <MitkCoreExports.h>
 #include "mitkMessage.h"
@@ -197,7 +199,12 @@ namespace mitk {
     mutable itk::SimpleFastMutexLock m_MutexOne;
 
     /* Public Events */
-    typedef Message1<const mitk::DataNode*> DataStorageEvent;
+    class DataStorageEvent : public Message1<const mitk::DataNode*>
+    {
+    protected:
+      virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, const mitk::DataNode* node) const override;
+    };
+
     //##Documentation
     //## @brief AddEvent is emitted whenever a new node has been added to the DataStorage.
     //##

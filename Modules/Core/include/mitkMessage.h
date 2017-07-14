@@ -66,74 +66,103 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-template<typename A = void>
-class MessageAbstractDelegate
+enum class ERunType
+{
+  THREAD_FREE,
+  MAIN_ASYNC,
+  MAIN_SYNC
+};
+
+class MessageAbstractDelegateBase
 {
 public:
+  ERunType GetRunType() const
+  {
+    return m_runType;
+  }
 
-  virtual ~MessageAbstractDelegate()
+  virtual ~MessageAbstractDelegateBase()
   {
   }
 
+protected:
+  MessageAbstractDelegateBase(ERunType runType)
+    : m_runType(runType)
+  {
+  }
+
+private:
+  const ERunType m_runType;
+};
+
+template<typename A = void>
+class MessageAbstractDelegate : public MessageAbstractDelegateBase
+{
+public:
   virtual A Execute() const = 0;
   virtual bool operator==(const MessageAbstractDelegate* cmd) const = 0;
   virtual MessageAbstractDelegate* Clone() const = 0;
+
+  MessageAbstractDelegate(ERunType runType = ERunType::MAIN_SYNC)
+    : MessageAbstractDelegateBase(runType)
+  {
+  }
 };
 
 template <typename T, typename A = void>
-class MessageAbstractDelegate1
+class MessageAbstractDelegate1 : public MessageAbstractDelegateBase
 {
 public:
-
-  virtual ~MessageAbstractDelegate1()
-  {
-  }
-
   virtual A Execute(T t) const = 0;
   virtual bool operator==(const MessageAbstractDelegate1* cmd) const = 0;
   virtual MessageAbstractDelegate1* Clone() const = 0;
+
+  MessageAbstractDelegate1(ERunType runType = ERunType::MAIN_SYNC)
+    : MessageAbstractDelegateBase(runType)
+  {
+  }
 };
 
 template <typename T, typename U, typename A = void>
-class MessageAbstractDelegate2
+class MessageAbstractDelegate2 : public MessageAbstractDelegateBase
 {
 public:
-
-  virtual ~MessageAbstractDelegate2()
-  {
-  }
-
   virtual A Execute(T t, U u) const = 0;
   virtual bool operator==(const MessageAbstractDelegate2* cmd) const = 0;
   virtual MessageAbstractDelegate2* Clone() const = 0;
+
+  MessageAbstractDelegate2(ERunType runType = ERunType::MAIN_SYNC)
+    : MessageAbstractDelegateBase(runType)
+  {
+  }
 };
 
 template <typename T, typename U, typename V, typename A = void>
-class MessageAbstractDelegate3
+class MessageAbstractDelegate3 : public MessageAbstractDelegateBase
 {
 public:
-
-  virtual ~MessageAbstractDelegate3()
-  {
-  }
-
   virtual A Execute(T t, U u, V v) const = 0;
   virtual bool operator==(const MessageAbstractDelegate3* cmd) const = 0;
   virtual MessageAbstractDelegate3* Clone() const = 0;
+
+  MessageAbstractDelegate3(ERunType runType = ERunType::MAIN_SYNC)
+    : MessageAbstractDelegateBase(runType)
+  {
+  }
 };
 
 template <typename T, typename U, typename V, typename W, typename A = void>
-class MessageAbstractDelegate4
+class MessageAbstractDelegate4 : public MessageAbstractDelegateBase
 {
 public:
-
-  virtual ~MessageAbstractDelegate4()
-  {
-  }
-
   virtual A Execute(T t, U u, V v, W w) const = 0;
   virtual bool operator==(const MessageAbstractDelegate4* cmd) const = 0;
   virtual MessageAbstractDelegate4* Clone() const = 0;
+
+  MessageAbstractDelegate4(ERunType runType = ERunType::MAIN_SYNC)
+    : MessageAbstractDelegateBase(runType)
+  {
+  }
 };
 
 /**
@@ -197,9 +226,11 @@ class MessageDelegate
 {
 public:
   typedef MessageDelegateBase<R, A(R::*)()> MessageDelegateBaseType;
+  typedef MessageAbstractDelegate<A> MessageAbstractDelegateType;
 
-  MessageDelegate(R* object, A(R::*memberFunctionPointer)())
+  MessageDelegate(R* object, A(R::*memberFunctionPointer)(), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
+    , MessageAbstractDelegateType(runType)
   {
   }
 
@@ -228,9 +259,11 @@ class MessageDelegate1
 {
 public:
   typedef MessageDelegateBase<R, A(R::*)(T)> MessageDelegateBaseType;
+  typedef MessageAbstractDelegate1<T, A> MessageAbstractDelegateType;
 
-  MessageDelegate1(R* object, A(R::*memberFunctionPointer)(T))
+  MessageDelegate1(R* object, A(R::*memberFunctionPointer)(T), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
+    , MessageAbstractDelegateType(runType)
   {
   }
 
@@ -259,9 +292,11 @@ class MessageDelegate2
 {
 public:
   typedef MessageDelegateBase<R, A(R::*)(T, U)> MessageDelegateBaseType;
+  typedef MessageAbstractDelegate2<T, U, A> MessageAbstractDelegateType;
 
-  MessageDelegate2(R* object, A(R::*memberFunctionPointer)(T, U))
+  MessageDelegate2(R* object, A(R::*memberFunctionPointer)(T, U), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
+    , MessageAbstractDelegateType(runType)
   {
   }
 
@@ -290,9 +325,11 @@ class MessageDelegate3
 {
 public:
   typedef MessageDelegateBase<R, A(R::*)(T, U, V)> MessageDelegateBaseType;
+  typedef MessageAbstractDelegate3<T, U, V, A> MessageAbstractDelegateType;
 
-  MessageDelegate3(R* object, A(R::*memberFunctionPointer)(T, U, V))
+  MessageDelegate3(R* object, A(R::*memberFunctionPointer)(T, U, V), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
+    , MessageAbstractDelegateType(runType)
   {
   }
 
@@ -321,9 +358,11 @@ class MessageDelegate4
 {
 public:
   typedef MessageDelegateBase<R, A(R::*)(T, U, V, W)> MessageDelegateBaseType;
+  typedef MessageAbstractDelegate4<T, U, V, W, A> MessageAbstractDelegateType;
 
-  MessageDelegate4(R* object, A(R::*memberFunctionPointer)(T, U, V, W))
+  MessageDelegate4(R* object, A(R::*memberFunctionPointer)(T, U, V, W), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
+    , MessageAbstractDelegateType(runType)
   {
   }
 
@@ -349,6 +388,7 @@ template<typename AbstractDelegate>
 class MessageBase
 {
 public:
+  typedef AbstractDelegate AbstractDelegateType;
 
   virtual ~MessageBase()
   {
@@ -649,16 +689,22 @@ class Message : public MessageBase< MessageAbstractDelegate<A> >
 public:
   typedef MessageBase<MessageAbstractDelegate<A>> MessageBaseType;
 
-  void Send()
+  void Send() const
   {
     for (auto listener = MessageBaseType::GetListener(); listener; listener = MessageBaseType::GetListener(listener)) {
-      listener->Execute();
+      Execute(listener);
     }
   }
 
-  void operator()()
+  void operator()() const
   {
     this->Send();
+  }
+
+protected:
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener) const
+  {
+    listener->Execute();
   }
 };
 
@@ -669,16 +715,22 @@ class Message1 : public MessageBase< MessageAbstractDelegate1<T, A> >
 public:
   typedef MessageBase<MessageAbstractDelegate1<T, A>> MessageBaseType;
 
-  void Send(T t)
+  void Send(T t) const
   {
     for (auto listener = MessageBaseType::GetListener(); listener; listener = MessageBaseType::GetListener(listener)) {
-      listener->Execute(t);
+      Execute(listener, t);
     }
   }
 
-  void operator()(T t)
+  void operator()(T t) const
   {
     this->Send(t);
+  }
+
+protected:
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t) const
+  {
+    listener->Execute(t);
   }
 };
 
@@ -689,16 +741,22 @@ class Message2 : public MessageBase< MessageAbstractDelegate2<T, U, A> >
 public:
   typedef MessageBase<MessageAbstractDelegate2<T, U, A>> MessageBaseType;
 
-  void Send(T t, U u)
+  void Send(T t, U u) const
   {
     for (auto listener = MessageBaseType::GetListener(); listener; listener = MessageBaseType::GetListener(listener)) {
-      listener->Execute(t, u);
+      Execute(listener, t, u);
     }
   }
 
-  void operator()(T t, U u)
+  void operator()(T t, U u) const
   {
     this->Send(t, u);
+  }
+
+protected:
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t, U u) const
+  {
+    listener->Execute(t, u);
   }
 };
 
@@ -709,16 +767,22 @@ class Message3 : public MessageBase< MessageAbstractDelegate3<T, U, V, A> >
 public:
   typedef MessageBase<MessageAbstractDelegate3<T, U, V, A>> MessageBaseType;
 
-  void Send(T t, U u, V v)
+  void Send(T t, U u, V v) const
   {
     for (auto listener = MessageBaseType::GetListener(); listener; listener = MessageBaseType::GetListener(listener)) {
-      listener->Execute(t, u, v);
+      Execute(listener, t, u, v);
     }
   }
 
-  void operator()(T t, U u, V v)
+  void operator()(T t, U u, V v) const
   {
     this->Send(t, u, v);
+  }
+
+protected:
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t, U u, V v) const
+  {
+    listener->Execute(t, u, v);
   }
 };
 
@@ -729,16 +793,22 @@ class Message4 : public MessageBase< MessageAbstractDelegate4<T, U, V, W> >
 public:
   typedef MessageBase<MessageAbstractDelegate4<T, U, V, W, A>> MessageBaseType;
 
-  void Send(T t, U u, V v, W w)
+  void Send(T t, U u, V v, W w) const
   {
     for (auto listener = MessageBaseType::GetListener(); listener; listener = MessageBaseType::GetListener(listener)) {
-      listener->Execute(t, u, v, w);
+      Execute(listener, t, u, v, w);
     }
   }
 
-  void operator()(T t, U u, V v, W w)
+  void operator()(T t, U u, V v, W w) const
   {
     this->Send(t, u, v, w);
+  }
+
+protected:
+  virtual void Execute(typename MessageBaseType::AbstractDelegateType* listener, T t, U u, V v, W w) const
+  {
+    listener->Execute(t, u, v, w);
   }
 };
 

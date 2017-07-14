@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static bool CompareImages(mitk::Image::Pointer mitkImage, cv::Mat openCVImage)
 {
   float equal = true;
-  if (static_cast<int>(mitkImage->GetDimension(0) != openCVImage.cols) || static_cast<int>(mitkImage->GetDimension(1)) != openCVImage.rows)
+  if (static_cast<int>(mitkImage->GetDimension(0)) != openCVImage.cols || static_cast<int>(mitkImage->GetDimension(1)) != openCVImage.rows)
   {
     equal = false;
   }

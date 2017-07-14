@@ -684,11 +684,6 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
 
   if ("US Image" == m_Controls.ImageType->currentText())
   {
-    if (m_Controls.UseImageSpacing->isChecked())
-    {
-      BFconfig.RecordTime = BFconfig.RecordTime / 2; // [s]
-    }
-
     BFconfig.Photoacoustic = false;
   }
   else if ("PA Image" == m_Controls.ImageType->currentText())
@@ -853,7 +848,7 @@ void BandpassThread::run()
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
   resultImage = filterbank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_TukeyAlpha);
-
+  MITK_INFO << "lol";
   emit result(resultImage);
 }
 

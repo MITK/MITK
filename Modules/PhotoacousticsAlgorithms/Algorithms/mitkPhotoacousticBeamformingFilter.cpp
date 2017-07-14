@@ -100,7 +100,7 @@ void mitk::BeamformingFilter::GenerateData()
   // if the photoacoustic option is used, we halve the image, as only the upper part of it contains any information
   float outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
 
-  unsigned short chunkSize = 40; // TODO: make this slightly less random
+  unsigned short chunkSize = 5; // TODO: make this slightly less random
 
   unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
 
@@ -243,11 +243,22 @@ void mitk::BeamformingFilter::GenerateData()
       
       if (chunkSize < oclOutputDim[2])
       {
-        for (int i = 0; i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
+        bool skip = false;
+        for (int i = 0; !skip && i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
         {
-          m_ProgressHandle(100 * ((i * chunkSize) / oclOutputDim[2]), "beamforming");
+          m_ProgressHandle(100 * ((float)(i * chunkSize) / (float)oclOutputDim[2]), "beamforming");
           mitk::Image::Pointer chunk = mitk::Image::New();
-          if ((oclOutputDim[2]) - (i * chunkSize) >= chunkSize)
+          if ((oclOutputDim[2]) - (i * chunkSize) == 1 + chunkSize)
+          {
+            // A 3d image of 3rd dimension == 1 can not be processed by openCL, make sure that this case never arises
+            oclInputDimLastChunk[2] = input->GetDimension(2) % chunkSize + chunkSize;
+            oclOutputDimLastChunk[2] = input->GetDimension(2) % chunkSize + chunkSize;
+            
+            chunk->Initialize(input->GetPixelType(), 3, oclInputDimLastChunk);
+            m_oclFilter->SetOutputDim(oclOutputDimLastChunk);
+            skip = true; //skip the last chunk
+          }
+          else if ((oclOutputDim[2]) - (i * chunkSize) >= chunkSize)
             chunk->Initialize(input->GetPixelType(), 3, oclInputDimChunk);
           else
           {
@@ -262,9 +273,9 @@ void mitk::BeamformingFilter::GenerateData()
 
           m_oclFilter->SetInput(chunk);
           m_oclFilter->Update();
-
           auto out = m_oclFilter->GetOutput();
-          for (int s = i * chunkSize; s < oclOutputDim[2]; ++s)
+
+          for (int s = i * chunkSize; s < oclOutputDim[2]; ++s)  // TODO: make the bounds here smaller...
           {
             mitk::ImageReadAccessor copy(out, out->GetSliceData(s - i * chunkSize));
             output->SetImportSlice(const_cast<void*>(copy.GetData()), s, 0, 0, mitk::Image::ReferenceMemory);

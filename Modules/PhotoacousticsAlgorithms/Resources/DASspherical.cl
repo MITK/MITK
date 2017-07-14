@@ -47,7 +47,7 @@ __kernel void ckDASSphe(
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {
     float l_i = (float)globalPosX / outputL * inputL;
-    float s_i = (float)globalPosY / outputS * inputS;
+    float s_i = (float)globalPosY / outputS * inputS / (2 - PAImage);
 
     float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
@@ -67,7 +67,7 @@ __kernel void ckDASSphe(
         pow(s_i, 2)
         +
         pow((inputS / (RecordTime*SpeedOfSound) * ((l_s - l_i)*Pitch*TransducerElements) / inputL), 2)
-      );
+      ) + (1-PAImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output += apodArray[(short)((l_s - minLine)*apod_mult)] * read_imagef( dSource, defaultSampler, (int4)(l_s, AddSample, globalPosZ, 0 )).x;
       else

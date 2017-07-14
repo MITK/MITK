@@ -47,7 +47,7 @@ __kernel void ckDASQuad(
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {	
     float l_i = (float)globalPosX / outputL * inputL;
-    float s_i = (float)globalPosY / outputS * inputS;
+    float s_i = (float)globalPosY / outputS * inputS / (2 - PAImage);
 	
     float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
@@ -64,7 +64,7 @@ __kernel void ckDASQuad(
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
+      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-PAImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output += apodArray[(short)((l_s - minLine)*apod_mult)] * read_imagef( dSource, defaultSampler, (int4)(l_s, AddSample, globalPosZ, 0 )).x;
       else

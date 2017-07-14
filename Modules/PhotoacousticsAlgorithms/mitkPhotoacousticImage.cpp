@@ -234,7 +234,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   mitk::Image::Pointer output = mitk::Image::New();
   output->Initialize(mitk::MakeScalarPixelType<float>(), 3, outputDim);
   output->SetSpacing(inputImage->GetGeometry()->GetSpacing());
-  output->SetImportVolume(outputData, 0, 0, mitk::Image::ManageMemory);
+  output->SetImportVolume(outputData, 0, 0, mitk::Image::ReferenceMemory);
 
   return output;
 }
@@ -242,7 +242,10 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
   // crop the image
-  config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  // set the Maximum Size of the image to 4096
+  unsigned short lowerCutoff = (4096 + cutoff) < inputImage->GetDimension(1) ? inputImage->GetDimension(1) - 4096 : 0;
+
+  config.RecordTime = config.RecordTime - (cutoff + lowerCutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "cropping image");
   if (!config.partial)
   {
@@ -250,7 +253,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
 
-  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
+  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, lowerCutoff, 0, 0, config.CropBounds[0], config.CropBounds[1]);
 
   // resample the image in horizontal direction
   if (inputImage->GetDimension(0) != config.ReconstructionLines)
@@ -272,21 +275,17 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
 
   processedImage = Beamformer->GetOutput();
 
-  // apply a bandpass filter, if requested
-  if (config.UseBP)
-  {
-    progressHandle(100, "applying bandpass");
-    mitk::Image::Pointer BP = BandpassFilter(processedImage, config.RecordTime, config.BPHighPass, config.BPLowPass, config.ButterworthOrder);
-
-    mitk::ImageReadAccessor copy(BP);
-    processedImage->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ReferenceMemory);
-  }
-
   return processedImage;
 }
 
 mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha)
 {
+  if (data->GetDimension(1) % 2 != 0)
+  {
+    int CropBounds[2] = { 0, data->GetDimension(2) - 1 };
+    data = ApplyCropping(data, 1, 0, 0, 0, CropBounds[0], CropBounds[1]);
+    //for the itk filter to work we make sure the 2nd dimension is a multiple of 2
+  }
   // do a fourier transform, multiply with an appropriate window for the filter, and transform back
   typedef float PixelType;
   typedef itk::Image< PixelType, 3 > RealImageType;
@@ -314,8 +313,6 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
   float cutoffPixelHighPass = std::min(BPHighPass / singleVoxel, (float)data->GetDimension(1) / 2);
   float cutoffPixelLowPass = std::min(BPLowPass / singleVoxel, (float)data->GetDimension(1) / 2 - cutoffPixelHighPass);
 
-  MITK_INFO << "LowPass " << cutoffPixelLowPass << "HighPass " << cutoffPixelHighPass;
-
   RealImageType::Pointer fftMultiplicator = BPFunction(data, cutoffPixelHighPass, cutoffPixelLowPass, alpha);
 
   typedef itk::MultiplyImageFilter< ComplexImageType,
@@ -328,8 +325,8 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
 
   /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
   toReal->SetInput(forwardFFTFilter->GetOutput());
-  //return GrabItkImageMemory(toReal->GetOutput());
-  return GrabItkImageMemory(fftMultiplicator);  */ //DEBUG
+  return GrabItkImageMemory(toReal->GetOutput());
+  return GrabItkImageMemory(fftMultiplicator);   *///DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();

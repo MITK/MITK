@@ -47,7 +47,7 @@ __kernel void ckDMASSphe(
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {
     float l_i = (float)globalPosX / outputL * inputL;
-    float s_i = (float)globalPosY / outputS * inputS;
+    float s_i = (float)globalPosY / outputS * inputS / (2 - PAImage);
 
     float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
@@ -68,7 +68,8 @@ __kernel void ckDMASSphe(
 	  AddSample1 = sqrt(
         pow(s_i, 2)
         +
-        pow((inputS / (RecordTime*SpeedOfSound) * ((l_s1 - l_i)*Pitch*TransducerElements)/inputL), 2));
+        pow((inputS / (RecordTime*SpeedOfSound) * ((l_s1 - l_i)*Pitch*TransducerElements)/inputL), 2)
+		) + (1-PAImage)*s_i;
       if (AddSample1 < inputS && AddSample1 >= 0)
       {
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
@@ -76,7 +77,8 @@ __kernel void ckDMASSphe(
 	      AddSample2 = sqrt(
             pow(s_i, 2)
             +
-            pow((inputS / (RecordTime*SpeedOfSound) * ((l_s2 - l_i)*Pitch*TransducerElements)/inputL), 2));
+            pow((inputS / (RecordTime*SpeedOfSound) * ((l_s2 - l_i)*Pitch*TransducerElements)/inputL), 2)
+			) + (1-PAImage)*s_i;
           if (AddSample2 < inputS && AddSample2 >= 0)
           {
             mult = read_imagef( dSource, defaultSampler, (int4)(l_s2, AddSample2, globalPosZ, 0 )).x 

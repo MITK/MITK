@@ -41,7 +41,6 @@ IF(MITK_USE_PMD)
     DEPENDS MitkToFHardware
     ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
     AUTOLOAD_WITH MitkToFHardware
-    WARNINGS_AS_ERRORS
   )
   Message("PMD Module generated")
   add_subdirectory(Testing)

@@ -3,7 +3,6 @@ MITK_CREATE_MODULE(
   DEPENDS MitkCore MitkSceneSerializationBase MitkLegacyGL MitkAnnotation MitkMultilabel
   PACKAGE_DEPENDS ITK|ITKReview
   # AUTOLOAD_WITH MitkCore TODO: Create IO Submodule and autoload that one instead.
-  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(Testing)

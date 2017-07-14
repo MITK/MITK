@@ -6,7 +6,6 @@ MITK_CREATE_MODULE(
   DEPENDS MitkOpenCVVideoSupport MitkIGTBase MitkCameraCalibration MitkIpPic
   PACKAGE_DEPENDS ITK|ITKIONRRD
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-  WARNINGS_AS_ERRORS
 )
 
 # set(tofHardware_srcs )

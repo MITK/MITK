@@ -3,6 +3,5 @@ MITK_CREATE_MODULE(
     PUBLIC include/
     PRIVATE src/
   PACKAGE_DEPENDS Qt5|Core+Quick VTK|vtkGUISupportQt OpenGL
-  WARNINGS_AS_ERRORS
   )
 

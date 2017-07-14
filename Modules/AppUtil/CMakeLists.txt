@@ -4,5 +4,4 @@ mitk_create_module(
   DEPENDS
     PUBLIC qtsingleapplication
     PRIVATE MitkCore
-  WARNINGS_AS_ERRORS
 )

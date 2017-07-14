@@ -3,7 +3,6 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
     PUBLIC tinyxml
     PRIVATE ITK|ITKIOImageBase+ITKIOGDCM DCMTK
-  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(test)

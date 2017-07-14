@@ -8,7 +8,6 @@ MITK_CREATE_MODULE( PythonService
     PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
     PRIVATE VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
     AUTOLOAD_WITH MitkPython
-  WARNINGS_AS_ERRORS
 )
 
 if(TARGET ${MODULE_TARGET})

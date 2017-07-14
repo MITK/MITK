@@ -31,7 +31,6 @@ MITK_CREATE_MODULE(
   DEPENDS MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
   PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml OpenIGTLink
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
-  WARNINGS_AS_ERRORS
 )
 
 if(MitkIGT_IS_ENABLED)

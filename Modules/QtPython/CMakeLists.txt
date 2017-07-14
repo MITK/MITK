@@ -8,7 +8,6 @@ if(MITK_USE_Python)
     DEPENDS MitkCore MitkQtWidgets MitkPython
     PACKAGE_DEPENDS
     PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
-    WARNINGS_AS_ERRORS
     )
 
   # temporarily disabled, bug-19153

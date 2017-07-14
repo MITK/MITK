@@ -28,7 +28,6 @@ if(GDCM_DIR)
 # now create a new module only for testing purposes
 MITK_CREATE_MODULE(
   DEPENDS MitkCore # Mitk.so
-  WARNINGS_AS_ERRORS
 )
 
 if(TARGET ${MODULE_NAME})

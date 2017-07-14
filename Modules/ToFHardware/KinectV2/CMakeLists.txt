@@ -14,7 +14,6 @@ MITK_CREATE_MODULE(
   DEPENDS MitkToFHardware MitkOpenCVVideoSupport
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
   AUTOLOAD_WITH MitkToFHardware
-  WARNINGS_AS_ERRORS
 )
 Message("Kinect V2 Module generated")
 add_subdirectory(Testing)

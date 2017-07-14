@@ -11,7 +11,6 @@ MITK_CREATE_MODULE(
 #  INCLUDE_DIRS .
   DEPENDS MitkCore
   PACKAGE_DEPENDS ${package_deps} GLEW Qt5|Widgets
-  WARNINGS_AS_ERRORS
 )
 
 endif(APPLE)

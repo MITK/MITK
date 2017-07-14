@@ -4,7 +4,6 @@ MITK_CREATE_MODULE(DataCollection #<-- module name
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS MitkCore # MitkLegacyIO #<-- modules on which your module depends on
   PACKAGE_DEPENDS Qt5|Core Eigen
-#  WARNINGS_AS_ERRORS
 )
 
 if(BUILD_TESTING)

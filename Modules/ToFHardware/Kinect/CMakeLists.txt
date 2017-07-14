@@ -19,7 +19,6 @@ IF(MITK_USE_TOF_KINECT)
     DEPENDS MitkToFHardware
     ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
     AUTOLOAD_WITH MitkToFHardware
-    WARNINGS_AS_ERRORS
   )
   Message("Kinect Module generated")
   add_subdirectory(Testing)

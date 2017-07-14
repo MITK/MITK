@@ -378,7 +378,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     //QStringList perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
 
     std::vector< QStandardItem* > categoryItems;
-    QStandardItem *perspectiveRootItem = new QStandardItem("Workflows");
+    QStandardItem *perspectiveRootItem = new QStandardItem("Perspectives");
     perspectiveRootItem->setEditable(false);
     perspectiveRootItem->setFont(QFont("", 12, QFont::Normal));
     treeRootItem->appendRow(perspectiveRootItem);
@@ -455,6 +455,9 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     QStringList viewExcludeList;
     // internal view used for the intro screen, will crash when opened directly, see T22352
     viewExcludeList.append(QString("org.blueberry.ui.internal.introview"));
+    viewExcludeList.append(QString("org.mitk.views.controlvisualizationpropertiesview"));
+    viewExcludeList.append(QString("org.mitk.views.modules"));
+    viewExcludeList.append(QString("org.mitk.views.viewnavigatorview"));
 
     QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Views");
     viewRootItem->setFont(QFont("", 12, QFont::Normal));

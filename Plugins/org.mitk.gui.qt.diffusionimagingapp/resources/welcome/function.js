@@ -5,7 +5,6 @@
 // enter the name of your module here
 var moduleNames = new Array("Dicom Import",
                             "Preprocessing and Reconstruction",
-//                            "Quantification",
                             "Tractography",
                             "Connectomics",
                             "Fiberfox",
@@ -18,16 +17,16 @@ var moduleNames = new Array("Dicom Import",
 
 // add the MITK-link to your module
 var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-//                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-//                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.reconstruction1?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.tractography2?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.connectomics?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.syntheticdata?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.ivim?clear=false",
+                            "",
+                            "",
+                            "",
+//                            "",
+//                            "",
                             "http://www.mitk.org");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
@@ -188,7 +187,7 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
 
   this.createPicLink = function(){
     picLink = document.createElement("a");
-//    picLink.href = this.modLink;
+    picLink.href = this.modLink;
     picLink.id = "link" + this.modName;
 
     return picLink;
@@ -251,7 +250,7 @@ function showPopUpWindow(){
   // append text-elements to their container
   contHeadline.appendChild(headline);
   contDescription.appendChild(description);
-  //contModLink.appendChild(moduleLink);
+//  contModLink.appendChild(moduleLink);
 }
 
 function getPos(id,prefix){

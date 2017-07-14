@@ -66,16 +66,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+enum class ERunType
+{
+  THREAD_FREE,
+  MAIN_ASYNC,
+  MAIN_SYNC
+};
+
 class MessageAbstractDelegateBase
 {
 public:
-  enum ERunType
-  {
-    THREAD_FREE,
-    MAIN_ASYNC,
-    MAIN_SYNC
-  };
-
   ERunType GetRunType() const
   {
     return m_runType;
@@ -103,7 +103,7 @@ public:
   virtual bool operator==(const MessageAbstractDelegate* cmd) const = 0;
   virtual MessageAbstractDelegate* Clone() const = 0;
 
-  MessageAbstractDelegate(ERunType runType = MAIN_SYNC)
+  MessageAbstractDelegate(ERunType runType = ERunType::MAIN_SYNC)
     : MessageAbstractDelegateBase(runType)
   {
   }
@@ -117,7 +117,7 @@ public:
   virtual bool operator==(const MessageAbstractDelegate1* cmd) const = 0;
   virtual MessageAbstractDelegate1* Clone() const = 0;
 
-  MessageAbstractDelegate1(ERunType runType = MAIN_SYNC)
+  MessageAbstractDelegate1(ERunType runType = ERunType::MAIN_SYNC)
     : MessageAbstractDelegateBase(runType)
   {
   }
@@ -131,7 +131,7 @@ public:
   virtual bool operator==(const MessageAbstractDelegate2* cmd) const = 0;
   virtual MessageAbstractDelegate2* Clone() const = 0;
 
-  MessageAbstractDelegate2(ERunType runType = MAIN_SYNC)
+  MessageAbstractDelegate2(ERunType runType = ERunType::MAIN_SYNC)
     : MessageAbstractDelegateBase(runType)
   {
   }
@@ -145,7 +145,7 @@ public:
   virtual bool operator==(const MessageAbstractDelegate3* cmd) const = 0;
   virtual MessageAbstractDelegate3* Clone() const = 0;
 
-  MessageAbstractDelegate3(ERunType runType = MAIN_SYNC)
+  MessageAbstractDelegate3(ERunType runType = ERunType::MAIN_SYNC)
     : MessageAbstractDelegateBase(runType)
   {
   }
@@ -159,7 +159,7 @@ public:
   virtual bool operator==(const MessageAbstractDelegate4* cmd) const = 0;
   virtual MessageAbstractDelegate4* Clone() const = 0;
 
-  MessageAbstractDelegate4(ERunType runType = MAIN_SYNC)
+  MessageAbstractDelegate4(ERunType runType = ERunType::MAIN_SYNC)
     : MessageAbstractDelegateBase(runType)
   {
   }
@@ -228,7 +228,7 @@ public:
   typedef MessageDelegateBase<R, A(R::*)()> MessageDelegateBaseType;
   typedef MessageAbstractDelegate<A> MessageAbstractDelegateType;
 
-  MessageDelegate(R* object, A(R::*memberFunctionPointer)(), ERunType runType = MAIN_SYNC)
+  MessageDelegate(R* object, A(R::*memberFunctionPointer)(), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
     , MessageAbstractDelegateType(runType)
   {
@@ -261,7 +261,7 @@ public:
   typedef MessageDelegateBase<R, A(R::*)(T)> MessageDelegateBaseType;
   typedef MessageAbstractDelegate1<T, A> MessageAbstractDelegateType;
 
-  MessageDelegate1(R* object, A(R::*memberFunctionPointer)(T), ERunType runType = MAIN_SYNC)
+  MessageDelegate1(R* object, A(R::*memberFunctionPointer)(T), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
     , MessageAbstractDelegateType(runType)
   {
@@ -294,7 +294,7 @@ public:
   typedef MessageDelegateBase<R, A(R::*)(T, U)> MessageDelegateBaseType;
   typedef MessageAbstractDelegate2<T, U, A> MessageAbstractDelegateType;
 
-  MessageDelegate2(R* object, A(R::*memberFunctionPointer)(T, U), ERunType runType = MAIN_SYNC)
+  MessageDelegate2(R* object, A(R::*memberFunctionPointer)(T, U), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
     , MessageAbstractDelegateType(runType)
   {
@@ -327,7 +327,7 @@ public:
   typedef MessageDelegateBase<R, A(R::*)(T, U, V)> MessageDelegateBaseType;
   typedef MessageAbstractDelegate3<T, U, V, A> MessageAbstractDelegateType;
 
-  MessageDelegate3(R* object, A(R::*memberFunctionPointer)(T, U, V), ERunType runType = MAIN_SYNC)
+  MessageDelegate3(R* object, A(R::*memberFunctionPointer)(T, U, V), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
     , MessageAbstractDelegateType(runType)
   {
@@ -360,7 +360,7 @@ public:
   typedef MessageDelegateBase<R, A(R::*)(T, U, V, W)> MessageDelegateBaseType;
   typedef MessageAbstractDelegate4<T, U, V, W, A> MessageAbstractDelegateType;
 
-  MessageDelegate4(R* object, A(R::*memberFunctionPointer)(T, U, V, W), ERunType runType = MAIN_SYNC)
+  MessageDelegate4(R* object, A(R::*memberFunctionPointer)(T, U, V, W), ERunType runType = ERunType::MAIN_SYNC)
     : MessageDelegateBaseType(object, memberFunctionPointer)
     , MessageAbstractDelegateType(runType)
   {

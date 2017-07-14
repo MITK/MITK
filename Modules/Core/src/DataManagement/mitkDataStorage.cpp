@@ -503,14 +503,13 @@ void mitk::DataStorage::BlockNodeModifiedEvents( bool block )
   m_BlockNodeModifiedEvents = block;
 }
 
-
 void mitk::DataStorage::DataStorageEvent::Execute(MessageBaseType::AbstractDelegate* listener, const mitk::DataNode* node) const
 {
   switch (listener->GetRunType()){
-  case mitk::MessageAbstractDelegateBase::THREAD_FREE:
+  case mitk::ERunType::THREAD_FREE:
     listener->Execute(node);
     break;
-  case mitk::MessageAbstractDelegateBase::MAIN_ASYNC:
+  case mitk::ERunType::MAIN_ASYNC:
     {
       auto func = listener->Clone();
       mitk::DataNode::ConstPointer ptr = node;
@@ -520,7 +519,7 @@ void mitk::DataStorage::DataStorageEvent::Execute(MessageBaseType::AbstractDeleg
       });
     }
     break;
-  case mitk::MessageAbstractDelegateBase::MAIN_SYNC:
+  case mitk::ERunType::MAIN_SYNC:
     Utilities::execInMainThreadSync([listener, node] {
       listener->Execute(node);
     });

@@ -15,47 +15,25 @@ set(DIFFUSIONIMAGINGAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${D
 # should be identical to the list in /CMake/mitkBuildConfigurationmitkDiffusion.cmake
 # remember to set plugins which should be automatically toggled in target_libraries.cmake
 set(_plugins
-  org.commontk.configadmin
-  org.commontk.eventadmin
-  org.blueberry.core.runtime
-  org.blueberry.core.expressions
-  org.blueberry.core.commands
-  org.blueberry.ui.qt
-  org.blueberry.ui.qt.log
-  org.blueberry.ui.qt.help
-  org.mitk.core.services
-  org.mitk.gui.common
   org.mitk.planarfigure
-  org.mitk.core.ext
-  org.mitk.gui.qt.application
-  org.mitk.gui.qt.ext
   org.mitk.gui.qt.diffusionimagingapp
-  org.mitk.gui.qt.common
-  org.mitk.gui.qt.stdmultiwidgeteditor
-  org.mitk.gui.qt.common.legacy
-  org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.measurementtoolbox
   org.mitk.gui.qt.segmentation
   org.mitk.gui.qt.volumevisualization
   org.mitk.gui.qt.diffusionimaging
-  org.mitk.gui.qt.diffusionimaging.connectomics
-  org.mitk.gui.qt.diffusionimaging.denoising
   org.mitk.gui.qt.diffusionimaging.fiberfox
   org.mitk.gui.qt.diffusionimaging.fiberprocessing
   org.mitk.gui.qt.diffusionimaging.ivim
   org.mitk.gui.qt.diffusionimaging.odfpeaks
-  org.mitk.gui.qt.diffusionimaging.partialvolume
   org.mitk.gui.qt.diffusionimaging.preprocessing
   org.mitk.gui.qt.diffusionimaging.reconstruction
-  org.mitk.gui.qt.diffusionimaging.registration
-  org.mitk.gui.qt.diffusionimaging.tbss
   org.mitk.gui.qt.diffusionimaging.tractography
+  org.mitk.gui.qt.diffusionimaging.connectomics
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing
   org.mitk.gui.qt.properties
   org.mitk.gui.qt.viewnavigator
-  org.mitk.gui.qt.cmdlinemodules
 )
 
 # Plug-ins listed below will not be

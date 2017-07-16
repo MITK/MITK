@@ -29,10 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-#ifdef _MSC_VER
-# pragma warning(disable: 4172)
-#endif
-
   /**
   * \brief Connectomics Network Class
   *

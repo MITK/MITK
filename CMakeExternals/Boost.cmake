@@ -133,7 +133,9 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   if(MITK_USE_Boost_LIBRARIES)
     set(_boost_build_cmd BUILD_COMMAND ${_build_cmd} install ${_macos_change_install_name_cmd} ${_windows_move_libs_cmd})
   else()
-    set(_boost_build_cmd BUILD_COMMAND ${_build_cmd} install)
+    set(_boost_build_cmd BUILD_COMMAND
+      ${CMAKE_COMMAND} -E echo "copying Boost headers..."
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
   endif()
 
   ExternalProject_Add(${proj}-download

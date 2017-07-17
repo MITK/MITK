@@ -182,26 +182,20 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
   int i = 0;
   if (gridRepProp)
   {
-    const mitk::EnumerationProperty::EnumStringsContainerType& repStrings = gridRepProp->GetEnumStrings();
-
-    for (auto it = repStrings.begin();
-      it != repStrings.end(); ++it, ++i)
-    {
-      m_MapRepEnumToIndex.insert(it->second, i);
-      this->addItem(QString::fromStdString(it->first), it->second);
-    }
+    gridRepProp->EnumerateStringsContainer([this, &i](const std::string& id, mitk::EnumerationProperty::IdType value) {
+      m_MapRepEnumToIndex.insert(value, i);
+      this->addItem(QString::fromStdString(id), value);
+      ++i;
+    });
     m_FirstVolumeRepId = i;
   }
   if (gridVolProp)
   {
-    const mitk::EnumerationProperty::EnumStringsContainerType& volStrings = gridVolProp->GetEnumStrings();
-
-    for (auto it = volStrings.begin();
-      it != volStrings.end(); ++it, ++i)
-    {
-      m_MapVolEnumToIndex.insert(it->second, i);
-      this->addItem(QString("Volume (") + QString::fromStdString(it->first) + ")", it->second);
-    }
+    gridVolProp->EnumerateStringsContainer([this, &i](const std::string& id, mitk::EnumerationProperty::IdType value) {
+      m_MapVolEnumToIndex.insert(value, i);
+      this->addItem(QString("Volume (") + QString::fromStdString(id) + ")", value);
+      ++i;
+    });
   }
 
   if (gridRepProp)

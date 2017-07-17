@@ -1047,6 +1047,7 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames, co
   */
 
   std::vector<std::pair<std::string, std::map<gdcm::Tag, const char*>>> unsortedFilenamesWithTags;
+  unsortedFilenamesWithTags.reserve(unsortedFilenames.size());
   for (const auto& filename : unsortedFilenames) {
     unsortedFilenamesWithTags.push_back({ filename, tags.at(filename.c_str()) });
   }
@@ -1054,6 +1055,7 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames, co
   std::sort(unsortedFilenamesWithTags.begin(), unsortedFilenamesWithTags.end(), DicomSeriesReader::GdcmSortFunction);
 
   std::vector<std::string> retval;
+  retval.reserve(unsortedFilenamesWithTags.size());
   for (const auto& filenameWithTag : unsortedFilenamesWithTags) {
     retval.push_back(filenameWithTag.first);
   }

@@ -138,10 +138,8 @@ void mitk::_ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageS
   auto& scalarMin = statisticsHolder->m_ScalarMin[t];
   auto& scalarMax = statisticsHolder->m_ScalarMax[t];
 
-  scalar2ndMin=
-      scalarMin = itk::NumericTraits<ScalarType>::max();
-  scalar2ndMax=
-      scalarMax = itk::NumericTraits<ScalarType>::NonpositiveMin();
+  scalar2ndMin= scalarMin = itk::NumericTraits<ScalarType>::max();
+  scalar2ndMax = scalarMax = itk::NumericTraits<ScalarType>::NonpositiveMin();
 
   while( !it.IsAtEnd() )
   {
@@ -159,8 +157,8 @@ void mitk::_ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageS
       // update min
       if ( value < scalarMin )
       {
-        scalar2ndMin =
-            scalarMin;    scalarMin = value;
+        scalar2ndMin = scalarMin;
+        scalarMin = value;
         countOfMinValuedVoxels = 1;
       }
       else if ( value == scalarMin )
@@ -175,8 +173,8 @@ void mitk::_ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageS
       // update max
       if ( value > scalarMax )
       {
-        scalar2ndMax =
-            scalarMax;    scalarMax = value;
+        scalar2ndMax = scalarMax;
+        scalarMax = value;
         countOfMaxValuedVoxels = 1;
       }
       else if ( value == scalarMax )
@@ -292,10 +290,8 @@ void mitk::_ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::
   auto& scalarMin = statisticsHolder->m_ScalarMin[t];
   auto& scalarMax = statisticsHolder->m_ScalarMax[t];
 
-  scalar2ndMin=
-      scalarMin = itk::NumericTraits<ScalarType>::max();
-  scalar2ndMax=
-      scalarMax = itk::NumericTraits<ScalarType>::NonpositiveMin();
+  scalar2ndMin = scalarMin = itk::NumericTraits<ScalarType>::max();
+  scalar2ndMax = scalarMax = itk::NumericTraits<ScalarType>::NonpositiveMin();
 
   while( !it.IsAtEnd() )
   {
@@ -313,8 +309,8 @@ void mitk::_ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::
       // update min
       if ( value < scalarMin )
       {
-        scalar2ndMin =
-            scalarMin;    scalarMin = value;
+        scalar2ndMin = scalarMin;
+        scalarMin = value;
         countOfMinValuedVoxels = 1;
       }
       else if ( value == scalarMin )
@@ -329,8 +325,8 @@ void mitk::_ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::
       // update max
       if ( value > scalarMax )
       {
-        scalar2ndMax =
-            scalarMax;    scalarMax = value;
+        scalar2ndMax = scalarMax;
+        scalarMax = value;
         countOfMaxValuedVoxels = 1;
       }
       else if ( value == scalarMax )
@@ -388,10 +384,8 @@ void mitk::_SimpleComputeExtremaInItkVectorImage(const ItkImageType* itkImage, m
   auto& scalarMin = statisticsHolder->m_ScalarMin[t];
   auto& scalarMax = statisticsHolder->m_ScalarMax[t];
 
-  scalar2ndMin =
-    scalarMin = itk::NumericTraits<ScalarType>::max();
-  scalar2ndMax =
-    scalarMax = itk::NumericTraits<ScalarType>::NonpositiveMin();
+  scalar2ndMin = scalarMin = itk::NumericTraits<ScalarType>::max();
+  scalar2ndMax = scalarMax = itk::NumericTraits<ScalarType>::NonpositiveMin();
 
   while (!it.IsAtEnd()) {
     double value = it.Get()[component];

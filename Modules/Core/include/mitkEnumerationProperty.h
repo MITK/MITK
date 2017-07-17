@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseProperty.h"
 #include <map>
 #include <string>
+#include <functional>
 
 namespace mitk
 {
@@ -64,22 +65,9 @@ public:
    */
   typedef unsigned int IdType;
 
-  /**
-   * Type used to store a mapping from enumeration id to enumeration string/
-   * description
-   */
-  typedef std::map<IdType, std::string> EnumIdsContainerType;
+  typedef std::function<void(IdType, const std::string&)> IdsContainerIterator;
 
-  /**
-   * Type used to store a mapping from enumeration string/description to
-   * enumeration id
-   */
-  typedef std::map<std::string, IdType> EnumStringsContainerType;
-
-  /**
-   * Type used for iterators over all defined enumeration values.
-   */
-  typedef EnumIdsContainerType::const_iterator EnumConstIterator;
+  typedef std::function<void(const std::string&, IdType)> StringsContainerIterator;
 
   /**
    * Adds an enumeration value into the enumeration. The name and id provided
@@ -132,21 +120,11 @@ public:
    * @returns the number of enumeration values associated with this Enumeration
    * Property
    */
-  virtual EnumIdsContainerType::size_type Size() const;
+  virtual size_t Size() const;
 
-  /**
-   * Provides access to the set of known enumeration values. The string representation
-   * may be accessed via iterator->second, the id may be access via iterator->first
-   * @returns an iterator over all enumeration values.
-   */
-  virtual EnumConstIterator Begin() const;
+  virtual void EnumerateIdsContainer(const IdsContainerIterator& enumerator) const;
 
-  /**
-   * Specifies the end of the range of the known enumeration values.
-   * @returns an iterator pointing past the last known element of the possible
-   * enumeration values.
-   */
-  virtual EnumConstIterator End() const;
+  virtual void EnumerateStringsContainer(const StringsContainerIterator& enumerator) const;
 
   /**
    * Returns the string representation for the given id.
@@ -180,12 +158,6 @@ public:
    */
   virtual bool IsValidEnumerationValue( const std::string& val ) const;
 
-  const EnumIdsContainerType& GetEnumIds() const;
-  const EnumStringsContainerType& GetEnumStrings() const;
-
-  EnumIdsContainerType& GetEnumIds();
-  EnumStringsContainerType& GetEnumStrings();
-
   using BaseProperty::operator=;
 
 protected:
@@ -202,18 +174,10 @@ protected:
 
   itk::LightObject::Pointer InternalClone() const override;
 
-
 private:
-
   // purposely not implemented
   EnumerationProperty& operator=(const EnumerationProperty&);
   IdType m_CurrentValue;
-
-  typedef std::map<std::string, EnumIdsContainerType> IdMapForClassNameContainerType;
-  typedef std::map<std::string, EnumStringsContainerType> StringMapForClassNameContainerType;
-
-  static IdMapForClassNameContainerType s_IdMapForClassName;
-  static StringMapForClassNameContainerType s_StringMapForClassName;
 };
 
 #ifdef _MSC_VER

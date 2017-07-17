@@ -786,23 +786,19 @@ void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
 
   // clear menu
   m_SurfaceRepresentation->menu()->clear();
-  QAction* tmp;
 
   // create menu entries
-  for(mitk::EnumerationProperty::EnumConstIterator it=representationProp->Begin(); it!=representationProp->End()
-    ; it++)
-  {
-    tmp = m_SurfaceRepresentation->menu()->addAction(QString::fromStdString(it->second));
+  representationProp->EnumerateIdsContainer([this, representationProp](mitk::EnumerationProperty::IdType id, const std::string& value) {
+    QAction* tmp = m_SurfaceRepresentation->menu()->addAction(QString::fromStdString(value));
     tmp->setCheckable(true);
 
-    if(it->second == representationProp->GetValueAsString())
-    {
+    if (value == representationProp->GetValueAsString()) {
       tmp->setChecked(true);
     }
 
-    QObject::connect( tmp, SIGNAL( triggered(bool) )
-      , this, SLOT( SurfaceRepresentationActionToggled(bool) ) );
-  }
+    QObject::connect(tmp, SIGNAL(triggered(bool))
+      , this, SLOT(SurfaceRepresentationActionToggled(bool)));
+  });
 }
 
 void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ )

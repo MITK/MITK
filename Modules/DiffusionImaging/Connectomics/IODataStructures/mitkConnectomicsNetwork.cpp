@@ -17,8 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetwork.h"
 #include <mitkConnectomicsStatisticsCalculator.h>
+
 #include <boost/graph/clustering_coefficient.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4172)
+#endif
+
 #include <boost/graph/betweenness_centrality.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 /* Constructor and Destructor */
 mitk::ConnectomicsNetwork::ConnectomicsNetwork()

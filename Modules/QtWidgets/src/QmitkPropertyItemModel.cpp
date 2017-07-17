@@ -165,10 +165,9 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex& index, int role) const
       else if (mitk::EnumerationProperty* enumProperty = dynamic_cast<mitk::EnumerationProperty*>(property))
       {
         QStringList values;
-
-        for (mitk::EnumerationProperty::EnumConstIterator it = enumProperty->Begin(); it != enumProperty->End(); it++)
-          values << QString::fromStdString(it->second);
-
+        enumProperty->EnumerateIdsContainer([&values](mitk::EnumerationProperty::IdType id, const std::string& value) {
+          values << QString::fromStdString(value);
+        });
         return values;
       }
       else if (mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>(property))

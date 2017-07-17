@@ -97,14 +97,11 @@ void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* prop
 
   QHash<int,int> enumIdToItemIndex;
 
-  const mitk::EnumerationProperty::EnumStringsContainerType& strings = property->GetEnumStrings();
   int index = 0;
-  for (auto it = strings.begin();
-       it != strings.end(); ++it, ++index)
-  {
-    enumIdToItemIndex.insert(it->second, index);
-    this->addItem(QString::fromStdString(it->first), it->second);
-  }
+  property->EnumerateStringsContainer([this, &index, &enumIdToItemIndex](const std::string& id, mitk::EnumerationProperty::IdType value) {
+    enumIdToItemIndex.insert(value, index);
+    this->addItem(QString::fromStdString(id), value);
+  });
 
   propView = new _EnumPropEditorImpl(property, this, enumIdToItemIndex);
   propView->PropertyChanged();

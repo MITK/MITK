@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/Path.h"
 #include <mitkRenderingModeProperty.h>
 
+#include <future>
+
+#include <QCoreApplication>
+
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
 
 namespace
@@ -79,71 +83,118 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
 
   ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
 
+  std::vector<std::future<mitk::DataNode::Pointer>> loadedThreads;
   for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
   {
-    DataNodes.push_back(LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error));
+    auto dataElement = element->FirstChildElement("data");
+    loadedThreads.push_back(std::async(std::launch::async, [this, dataElement, &workingDirectory, &error]{
+        bool localError =false;
+        auto result = LoadBaseDataFromDataTag(dataElement, workingDirectory, localError);
+        if (localError) {
+          error = true;
+        }
+        return result;
+      }));
+  }
+  for (auto& task: loadedThreads)
+  {
+    while (task.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
+      qApp->processEvents();
+    }
+
+    DataNodes.push_back(task.get());
+
     ProgressBar::GetInstance()->Progress();
   }
 
+  struct DecorateResult
+  {
+    IDToNodeMappingType::mapped_type m_NodeForID;
+    NodeToIDMappingType::mapped_type m_IDForNode;
+    NodesAndParentsPair m_OrderedNodePairs;
+  };
+  std::vector<std::future<DecorateResult>> decorateThreads;
   // iterate all nodes
   // first level nodes should be <node> elements
   DataNodeVector::iterator nit = DataNodes.begin();
-  for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit)
+  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
   {
-    mitk::DataNode::Pointer node = *nit;
-    // in case dataXmlElement is valid test whether it containts the "properties" child tag
-    // and process further if and only if yes
-    TiXmlElement *dataXmlElement = element->FirstChildElement("data");
-    if (dataXmlElement && dataXmlElement->FirstChildElement("properties"))
-    {
-      TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
-      if (node->GetData())
-      {
-        DecorateBaseDataWithProperties(node->GetData(), baseDataElement, workingDirectory);
-      } else
-      {
-        MITK_WARN << "BaseData properties stored in scene file, but BaseData could not be read" << std::endl;
-      }
+    decorateThreads.push_back(std::async(std::launch::async, [this, element, nit, &workingDirectory, &error]() -> DecorateResult {
+        bool localError = false;
+        DecorateResult result;
+        mitk::DataNode::Pointer node = *nit;
+        // in case dataXmlElement is valid test whether it containts the "properties" child tag
+        // and process further if and only if yes
+        TiXmlElement *dataXmlElement = element->FirstChildElement("data");
+        if( dataXmlElement && dataXmlElement->FirstChildElement("properties") )
+        {
+          TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
+          if ( node->GetData() )
+          {
+            DecorateBaseDataWithProperties( node->GetData(), baseDataElement, workingDirectory);
+          }
+          else
+          {
+            MITK_WARN << "BaseData properties stored in scene file, but BaseData could not be read" << std::endl;
+          }
+        }
+
+        //   2. check child nodes
+        const char* uida = element->Attribute("UID");
+        std::string uid("");
+
+        if (uida)
+        {
+          uid = uida;
+          result.m_NodeForID = node.GetPointer();
+          result.m_IDForNode = uid;
+        }
+        else
+        {
+          MITK_ERROR << "No UID found for current node. Node will have no parents.";
+          localError = true;
+        }
+
+        //   3. if there are <properties> nodes,
+        //        - instantiate the appropriate PropertyListDeSerializer
+        //        - use them to construct PropertyList objects
+        //        - add these properties to the node (if necessary, use renderwindow name)
+        bool success = DecorateNodeWithProperties(node, element, workingDirectory);
+        if (!success)
+        {
+          MITK_ERROR << "Could not load properties for node.";
+          localError = true;
+        }
+
+        // remember node for later adding to DataStorage
+        result.m_OrderedNodePairs.first = node;
+
+        //   4. if there are <source> elements, remember parent objects
+        for( TiXmlElement* source = element->FirstChildElement("source"); source != NULL; source = source->NextSiblingElement("source") )
+        {
+          const char* sourceUID = source->Attribute("UID");
+          if (sourceUID)
+          {
+            result.m_OrderedNodePairs.second.push_back( std::string(sourceUID) );
+          }
+        }
+        if (localError) {
+          error = true;
+        }
+        return std::move(result);
+      }));
+  }
+
+  for (auto& task : decorateThreads)
+  {
+    while (task.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
+      qApp->processEvents();
     }
 
-    //   2. check child nodes
-    const char* uida = element->Attribute("UID");
-    std::string uid("");
-
-    if (uida)
-    {
-      uid = uida;
-      m_NodeForID[uid] = node.GetPointer();
-      m_IDForNode[node.GetPointer()] = uid;
-    } else
-    {
-      MITK_ERROR << "No UID found for current node. Node will have no parents.";
-      error = true;
-    }
-
-    //   3. if there are <properties> nodes,
-    //        - instantiate the appropriate PropertyListDeSerializer
-    //        - use them to construct PropertyList objects
-    //        - add these properties to the node (if necessary, use renderwindow name)
-    bool success = DecorateNodeWithProperties(node, element, workingDirectory);
-    if (!success)
-    {
-      MITK_ERROR << "Could not load properties for node.";
-      error = true;
-    }
-
-    // remember node for later adding to DataStorage
-    m_OrderedNodePairs.push_back(std::make_pair(node, std::list<std::string>()));
-
-    //   4. if there are <source> elements, remember parent objects
-    for (TiXmlElement* source = element->FirstChildElement("source"); source != NULL; source = source->NextSiblingElement("source"))
-    {
-      const char* sourceUID = source->Attribute("UID");
-      if (sourceUID)
-      {
-        m_OrderedNodePairs.back().second.push_back(std::string(sourceUID));
-      }
-    }
+    auto result = task.get();
+    m_NodeForID[result.m_IDForNode] = result.m_NodeForID;
+    m_IDForNode[result.m_NodeForID] = result.m_IDForNode;
+    m_OrderedNodePairs.push_back(result.m_OrderedNodePairs);
 
     ProgressBar::GetInstance()->Progress();
   } // end for all <node>

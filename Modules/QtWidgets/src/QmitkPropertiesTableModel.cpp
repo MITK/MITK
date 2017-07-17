@@ -163,11 +163,9 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
       else if(role == Qt::EditRole)
       {
         QStringList values;
-        for(auto it=enumerationProp->Begin(); it!=enumerationProp->End()
-          ; it++)
-        {
-          values << QString::fromStdString(it->second);
-        }
+        enumerationProp->EnumerateIdsContainer([&values](mitk::EnumerationProperty::IdType id, const std::string& value) {
+          values << QString::fromStdString(value);
+        });
         data.setValue<QStringList>(values);
       }
     }

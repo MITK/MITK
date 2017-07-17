@@ -17,8 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOMimeTypes.h"
 
 #include "mitkCustomMimeType.h"
+#include "mitkLogMacros.h"
 
 #include "itkGDCMImageIO.h"
+#include "itkMetaDataObject.h"
 
 namespace mitk
 {
@@ -38,11 +40,30 @@ namespace mitk
 
   bool IOMimeTypes::DicomMimeType::AppliesTo(const std::string &path) const
   {
-    if (CustomMimeType::AppliesTo(path))
-      return true;
+    if (!CustomMimeType::AppliesTo(path))
+      return false;
     // Ask the GDCM ImageIO class directly
     itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
-    return gdcmIO->CanReadFile(path.c_str());
+    gdcmIO->SetFileName(path);
+    try {
+      gdcmIO->ReadImageInformation();
+    }
+    catch (const itk::ExceptionObject & err) {
+      MITK_ERROR << "ExceptionObject caught in IOMimeTypes::DicomMimeType::AppliesTo! " << err.GetDescription();
+      return false;
+    }
+
+    //DICOMRT modalities have specific reader, don't read with normal DICOM readers
+    std::string modality;
+    itk::MetaDataDictionary& dict = gdcmIO->GetMetaDataDictionary();
+    itk::ExposeMetaData<std::string>(dict, "0008|0060", modality);
+    MITK_INFO << "DICOM Modality is " << modality;
+    if (modality == "RTSTRUCT" || modality == "RTDOSE" || modality == "RTPLAN") {
+      return false;
+    }
+    else {
+      return gdcmIO->CanReadFile(path.c_str());
+    }
   }
 
   IOMimeTypes::DicomMimeType *IOMimeTypes::DicomMimeType::Clone() const { return new DicomMimeType(*this); }

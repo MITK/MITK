@@ -36,9 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStringProperty.h>
 #include <mitkDicomSeriesReader.h>
 
-#include <mitkRTDoseReader.h>
-#include <mitkRTPlanReader.h>
-#include <mitkRTStructureSetReader.h>
+#include <mitkRTDoseReaderService.h>
+#include <mitkRTPlanReaderService.h>
+#include <mitkRTStructureSetReaderService.h>
 #include <mitkRTConstants.h>
 #include <mitkIsoDoseLevelCollections.h>
 #include <mitkIsoDoseLevelSetProperty.h>
@@ -83,7 +83,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
-          auto doseReader = mitk::RTDoseReader();
+          auto doseReader = mitk::RTDoseReaderService();
           doseReader.SetInput(listOfFilesForSeries.front().toStdString());
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader.Read();
           if (!readerOutput.empty()){
@@ -248,7 +248,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
-          auto structReader = mitk::RTStructureSetReader();
+          auto structReader = mitk::RTStructureSetReaderService();
           structReader.SetInput(listOfFilesForSeries.front().toStdString());
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader.Read();
 
@@ -272,7 +272,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
                   structNode->SetProperty("contour.color", aStruct->GetProperty("contour.color"));
                   structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
                   structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
-                          mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
                   structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
                       mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
                   structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
@@ -287,7 +287,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
       {
-          auto planReader = mitk::RTPlanReader();
+          auto planReader = mitk::RTPlanReaderService();
           planReader.SetInput(listOfFilesForSeries.front().toStdString());
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader.Read();
           if (!readerOutput.empty()){

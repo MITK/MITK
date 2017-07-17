@@ -131,12 +131,11 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   )
 
   if(MITK_USE_Boost_LIBRARIES)
-    set(_boost_build_cmd BUILD_COMMAND ${_build_cmd})
-    set(_install_cmd ${_build_cmd} install ${_macos_change_install_name_cmd} ${_windows_move_libs_cmd})
+    set(_boost_build_cmd BUILD_COMMAND ${_build_cmd} install ${_macos_change_install_name_cmd} ${_windows_move_libs_cmd})
   else()
-    set(_boost_build_cmd BUILD_COMMAND ${CMAKE_COMMAND} -E echo "no binary libraries")
-    set(_install_cmd ${CMAKE_COMMAND} -E echo "copying Boost header..."
-           COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
+    set(_boost_build_cmd BUILD_COMMAND
+      ${CMAKE_COMMAND} -E echo "copying Boost headers..."
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
   endif()
 
   ExternalProject_Add(${proj}-download
@@ -157,7 +156,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
       --with-libraries=${_boost_libs}
       "--prefix=<INSTALL_DIR>"
     ${_boost_build_cmd}
-    INSTALL_COMMAND ${_install_cmd}
+    INSTALL_COMMAND "" # done in BUILD_COMMAND
     DEPENDS ${proj}-download ${proj_DEPENDENCIES}
     )
 

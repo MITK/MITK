@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkUSAbstractNavigationStep.h"
 #include <mitkPointSet.h>
+#include <mitkNavigationTool.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
 #include <vtkLine.h>
@@ -56,8 +57,10 @@ class QmitkUSNavigationStepPunctuationIntervention : public QmitkUSAbstractNavig
   Q_OBJECT
 
 public:
+
+  /** Sets the navigation tool of the needle for the meta data (tool axis etc.)*/
+  void SetNeedleMetaData(mitk::NavigationTool::Pointer needleNavigationTool);
   explicit QmitkUSNavigationStepPunctuationIntervention(QWidget *parent = 0);
-  explicit QmitkUSNavigationStepPunctuationIntervention(mitk::Point3D toolAxis, QWidget *parent = 0);
   ~QmitkUSNavigationStepPunctuationIntervention();
 
   virtual bool OnStartStep();
@@ -99,11 +102,11 @@ protected:
 
   mitk::DataStorage::SetOfObjects::ConstPointer m_ZoneNodes;
 
-    /**
-   * \brief Creates a Pointset that projects the needle's path
-   */
+  /** \brief Creates a Pointset that projects the needle's path */
   itk::SmartPointer<mitk::NeedleProjectionFilter> m_NeedleProjectionFilter;
-  mitk::Point3D m_ToolAxis;
+
+  /** holds the navigation tool of the needle for the meta data (tool axis etc.)*/
+  mitk::NavigationTool::Pointer m_NeedleNavigationTool;
 
   std::map<mitk::DataNode::Pointer,mitk::Color> m_OldColors; //stores the original color of the critical structrue nodes
 

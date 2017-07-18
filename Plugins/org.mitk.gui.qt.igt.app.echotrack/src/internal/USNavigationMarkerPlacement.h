@@ -47,6 +47,7 @@ namespace Ui
 }
 
 class QmitkUSAbstractNavigationStep;
+class QmitkUSNavigationStepPunctuationIntervention;
 class QmitkStdMultiWidget;
 class QTimer;
 class QSignalMapper;
@@ -133,11 +134,6 @@ public:
 	static const std::string VIEW_ID;
 
 	void OnCombinedModalityPropertyChanged(const std::string &, const std::string &);
-  /**
-  * \returns the point defining the needle axis in the tool storage
-  */
-  void SetToolAxisMarkerPlacement();
-  mitk::Point3D m_ToolAxis;
 
 protected:
 	/**
@@ -155,10 +151,13 @@ protected:
 	*/
 	void Convert2DImagesTo3D(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
+  void UpdateToolStorage();
+
 	void CreateOverlays();
 
 	QWidget *m_Parent;
 	QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
+  QmitkUSNavigationStepPunctuationIntervention* m_StepPuncture;
 	QTimer *m_UpdateTimer;
 	QTimer *m_ImageAndNavigationDataLoggingTimer;
 	QmitkStdMultiWidget *m_StdMultiWidget;

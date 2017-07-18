@@ -238,46 +238,6 @@ void USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const std::s
 	}
 }
 
-
-void USNavigationMarkerPlacement::SetToolAxisMarkerPlacement()
-{
-  m_NavigationDataSource = m_CombinedModality->GetNavigationDataSource();
-  m_ToolAxis.SetElement(0, 0);
-  m_ToolAxis.SetElement(1, 0);
-  m_ToolAxis.SetElement(2, 1);
-  if (m_NavigationDataSource.IsNull())
-  {
-    MITK_WARN << "Cannot retrieve tool axis as tracking source is null.";
-  }
-  else
-  {
-    us::ModuleContext* context = us::GetModuleContext();
-    std::string id = m_NavigationDataSource->US_PROPKEY_ID;
-    std::string filter = "(" + mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + ")";
-    // Get Storage
-    std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>();
-    m_CurrentStorage = context->GetService(refs.front());
-    if (m_CurrentStorage.IsNull())
-    {
-      MITK_WARN << "Found an invalid storage object!";
-    }
-    if (m_CurrentStorage->GetToolCount() != m_NavigationDataSource->GetNumberOfOutputs()) //there is something wrong with the storage
-    {
-      MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
-      m_CurrentStorage = NULL;
-    }
-
-    //getting the first tool in the tool storage, assuming this is the needle
-    mitk::NavigationTool::Pointer needle;
-    needle = m_CurrentStorage->GetTool(0);
-
-    m_ToolAxis.SetElement(0, (needle->GetToolAxis().GetElement(0)));
-    m_ToolAxis.SetElement(1, (needle->GetToolAxis().GetElement(1)));
-    m_ToolAxis.SetElement(2, (needle->GetToolAxis().GetElement(2)));
-  }
-}
-
-
 void USNavigationMarkerPlacement::SetFocus()
 {
 	this->ReinitOnImage();
@@ -535,24 +495,6 @@ void USNavigationMarkerPlacement::OnCombinedModalityChanged(
 	m_NavigationDataRecorder->ConnectTo(navigationDataSource);
 	m_NavigationDataRecorder->ResetRecording();
 
-  //upate stored tool axis for current tool
-  this->SetToolAxisMarkerPlacement();
-  //store new tool axis
-  if (m_CurrentApplicationName == "Puncture")
-  {
-    //QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
-    //  new QmitkUSNavigationStepPunctuationIntervention(m_ToolAxis, m_Parent);
-   // m_NavigationSteps.pop_back();
-    //m_NavigationSteps.push_back(stepIntervention);
-
-  }
-
-  // TODO check for correct connection
-  //  for (unsigned int n = 0; n < navigationDataSource->GetNumberOfIndexedOutputs(); ++n)
-  //  {
-  //    m_NavigationDataRecorder->AddNavigationData(navigationDataSource->GetOutput(n));
-  //  }
-
   // update ultrasound image logging filter for using the new combined modality
   mitk::USDevice::Pointer ultrasoundImageSource = combinedModality->GetUltrasoundDevice();
   for (unsigned int n = 0; n < ultrasoundImageSource->GetNumberOfIndexedOutputs(); ++n)
@@ -598,6 +540,7 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
         new QmitkUSNavigationStepZoneMarking(m_Parent);
       QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
         new QmitkUSNavigationStepPunctuationIntervention(m_Parent);
+      m_StepPuncture = stepIntervention;
 
 			connect(stepIntervention, SIGNAL(AddAblationZoneClicked(int)), this, SLOT(OnAddAblationZone(int)));
 			connect(stepIntervention, SIGNAL(AblationZoneChanged(int, int)), this, SLOT(OnChangeAblationZone(int, int)));
@@ -706,6 +649,29 @@ void USNavigationMarkerPlacement::OnActiveNavigationStepChanged(int index)
 			<< this->m_NavigationStepNames.at(index).toStdString()
 			<< "; duration until now: " << m_NavigationStepTimer->GetTotalDuration();
 	}
+
+
+  MITK_INFO << "Next Step: " << m_NavigationSteps.at(index)->GetTitle().toStdString();
+
+  if (m_NavigationSteps.at(index)->GetTitle().toStdString() == "Computer-assisted Intervention")
+  {
+    MITK_INFO << "Initializing Navigation Step Puncture";
+    //QmitkUSNavigationStepPunctuationIntervention* navigationStepPunctuationIntervention = static_cast<QmitkUSNavigationStepPunctuationIntervention*>(m_NavigationSteps.at(index));
+    if (m_StepPuncture != nullptr)
+    {
+      if (m_CurrentStorage.IsNull()) { this->UpdateToolStorage(); }
+      if (m_CurrentStorage.IsNull() || (m_CurrentStorage->GetTool(m_NeedleIndex).IsNull()))
+      {
+        MITK_WARN << "Found null pointer when setting the tool axis, aborting";
+      }
+      else
+      {
+        m_StepPuncture->SetNeedleMetaData(m_CurrentStorage->GetTool(m_NeedleIndex));
+        MITK_INFO << "Needle axis vector: " << m_CurrentStorage->GetTool(m_NeedleIndex)->GetToolAxis();
+      }
+    }
+  }
+
 }
 
 void USNavigationMarkerPlacement::OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode> resultsNode)
@@ -809,4 +775,26 @@ void USNavigationMarkerPlacement::CreateOverlays()
 	m_WarnOverlay->SetPosition2D(overlayPosition);
 	m_WarnOverlay->SetFontSize(22);
 	m_WarnOverlay->SetColor(1, 0, 0); // overlay should be red
+}
+
+void USNavigationMarkerPlacement::UpdateToolStorage()
+{
+  if (m_NavigationDataSource.IsNull()) { m_NavigationDataSource = m_CombinedModality->GetNavigationDataSource(); }
+  if (m_NavigationDataSource.IsNull()) { MITK_WARN << "Found an invalid navigation data source object!"; }
+  us::ModuleContext* context = us::GetModuleContext();
+  std::string id = m_NavigationDataSource->US_PROPKEY_ID;
+  std::string filter = "(" + mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + ")";
+  // Get Storage
+  std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>();
+  m_CurrentStorage = context->GetService(refs.front());
+
+  if (m_CurrentStorage.IsNull())
+  {
+    MITK_WARN << "Found an invalid storage object!";
+  }
+  else if (m_CurrentStorage->GetToolCount() != m_NavigationDataSource->GetNumberOfOutputs()) //there is something wrong with the storage
+  {
+    MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
+    m_CurrentStorage = NULL;
+  }
 }

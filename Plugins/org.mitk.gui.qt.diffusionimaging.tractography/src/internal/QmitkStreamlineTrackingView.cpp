@@ -107,6 +107,33 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
 
     connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(DeleteTrackingHandler()) );
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(DeleteTrackingHandler()) );
+    connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+
+    connect( m_Controls->m_StopImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_MaskImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+
+    connect( m_Controls->m_SeedsPerVoxelBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_NumFibersBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_ScalarThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_OdfCutoffBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_StepSizeBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
+
+    connect( m_Controls->m_AngularThresholdBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_MinTractLengthBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_fBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_gBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_NumSamplesBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+
+    connect( m_Controls->m_NumSeedsBox, SIGNAL(valueChanged(int)), this, SLOT(InteractiveSeedChanged()) );
+    connect( m_Controls->m_SeedRadiusBox, SIGNAL(valueChanged(double)), this, SLOT(InteractiveSeedChanged()) );
+
+    connect( m_Controls->m_SharpenOdfsBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_InterpolationBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_SeedGmBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_FlipXBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_FlipYBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_FlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
 
     m_FirstTensorProbRun = true;
   }
@@ -114,11 +141,60 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
   UpdateGui();
 }
 
+void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
+{
+  if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()))
+    return;
+
+  std::srand(std::time(0));
+  m_SeedPoints.clear();
+
+  itk::Point<float> world_pos = this->GetRenderWindowPart()->GetSelectedPosition();
+
+  m_SeedPoints.push_back(world_pos);
+  float radius = m_Controls->m_SeedRadiusBox->value();
+  int num = m_Controls->m_NumSeedsBox->value();
+
+  mitk::PointSet::Pointer pointset = mitk::PointSet::New();
+  pointset->InsertPoint(0, world_pos);
+  m_InteractivePointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(radius*2));
+  m_InteractivePointSetNode->SetProperty("point 2D size", mitk::FloatProperty::New(radius*2));
+  m_InteractivePointSetNode->SetData(pointset);
+
+  for (int i=1; i<num; i++)
+  {
+    itk::Vector<float> p;
+    p[0] = rand()%1000-500;
+    p[1] = rand()%1000-500;
+    p[2] = rand()%1000-500;
+    p.Normalize();
+    p *= radius;
+    m_SeedPoints.push_back(world_pos+p);
+  }
+
+  DoFiberTracking();
+}
+
+void QmitkStreamlineTrackingView::OnParameterChanged()
+{
+  if (m_Controls->m_InteractiveBox->isChecked() && m_Controls->m_ParamUpdateBox->isChecked())
+    DoFiberTracking();
+}
+
 void QmitkStreamlineTrackingView::ToggleInteractive()
 {
   UpdateGui();
 
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+  m_Controls->m_SeedsPerVoxelBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+  m_Controls->m_SeedsPerVoxelLabel->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+  m_Controls->m_SeedGmBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+  m_Controls->m_OutputProbMap->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+  m_Controls->m_SeedImageBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+  m_Controls->label_6->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+  m_Controls->m_TissueImageBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+  m_Controls->label_10->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
 
   if ( m_Controls->m_InteractiveBox->isChecked() )
   {
@@ -185,33 +261,7 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 
 void QmitkStreamlineTrackingView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
-  std::srand(std::time(0));
-  m_SeedPoints.clear();
-
-  itk::Point<float> world_pos = this->GetRenderWindowPart()->GetSelectedPosition();
-
-  m_SeedPoints.push_back(world_pos);
-  float radius = m_Controls->m_SeedRadiusBox->value();
-  int num = m_Controls->m_NumSeedsBox->value();
-
-  mitk::PointSet::Pointer pointset = mitk::PointSet::New();
-  pointset->InsertPoint(0, world_pos);
-  m_InteractivePointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(radius*2));
-  m_InteractivePointSetNode->SetProperty("point 2D size", mitk::FloatProperty::New(radius*2));
-  m_InteractivePointSetNode->SetData(pointset);
-
-  for (int i=1; i<num; i++)
-  {
-    itk::Vector<float> p;
-    p[0] = rand()%1000-500;
-    p[1] = rand()%1000-500;
-    p[2] = rand()%1000-500;
-    p.Normalize();
-    p *= radius;
-    m_SeedPoints.push_back(world_pos+p);
-  }
-
-  DoFiberTracking();
+  InteractiveSeedChanged(true);
 }
 
 void QmitkStreamlineTrackingView::SetFocus()
@@ -227,7 +277,7 @@ void QmitkStreamlineTrackingView::DeleteTrackingHandler()
   }
 }
 
-void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes )
+void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes )
 {
   m_InputImageNodes.clear();
   m_InputImages.clear();
@@ -266,26 +316,27 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
   }
 
   UpdateGui();
+  OnParameterChanged();
 }
 
 void QmitkStreamlineTrackingView::UpdateGui()
 {
   m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
 
-  m_Controls->m_fBox->setVisible(false);
-  m_Controls->m_fLabel->setVisible(false);
-  m_Controls->m_gBox->setVisible(false);
-  m_Controls->m_gLabel->setVisible(false);
-  m_Controls->m_FaImageBox->setVisible(false);
-  m_Controls->mFaImageLabel->setVisible(false);
-  m_Controls->m_OdfCutoffBox->setVisible(false);
-  m_Controls->m_OdfCutoffLabel->setVisible(false);
-  m_Controls->m_SharpenOdfsBox->setVisible(false);
+  m_Controls->m_fBox->setEnabled(false);
+  m_Controls->m_fLabel->setEnabled(false);
+  m_Controls->m_gBox->setEnabled(false);
+  m_Controls->m_gLabel->setEnabled(false);
+  m_Controls->m_FaImageBox->setEnabled(false);
+  m_Controls->mFaImageLabel->setEnabled(false);
+  m_Controls->m_OdfCutoffBox->setEnabled(false);
+  m_Controls->m_OdfCutoffLabel->setEnabled(false);
+  m_Controls->m_SharpenOdfsBox->setEnabled(false);
 
   if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
-    m_Controls->m_SeedGmBox->setVisible(true);
+    m_Controls->m_SeedGmBox->setEnabled(true);
   else
-    m_Controls->m_SeedGmBox->setVisible(false);
+    m_Controls->m_SeedGmBox->setEnabled(false);
 
   if(!m_InputImageNodes.empty())
   {
@@ -295,39 +346,30 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.at(0)->GetName().c_str());
     m_Controls->m_InputData->setTitle("Input Data");
     m_Controls->commandLinkButton->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
-    m_Controls->m_InteractiveBox->setEnabled(true);
 
     if ( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
-      m_Controls->m_fBox->setVisible(true);
-      m_Controls->m_fLabel->setVisible(true);
-      m_Controls->m_gBox->setVisible(true);
-      m_Controls->m_gLabel->setVisible(true);
-      m_Controls->mFaImageLabel->setVisible(true);
-      m_Controls->m_FaImageBox->setVisible(true);
-
-      //      if (m_Controls->m_ModeBox->currentIndex()==1)
-      //      {
-      //        m_Controls->m_OdfCutoffBox->setVisible(true);
-      //        m_Controls->m_OdfCutoffLabel->setVisible(true);
-      //        m_Controls->m_SharpenOdfsBox->setVisible(true);
-      //      }
+      m_Controls->m_fBox->setEnabled(true);
+      m_Controls->m_fLabel->setEnabled(true);
+      m_Controls->m_gBox->setEnabled(true);
+      m_Controls->m_gLabel->setEnabled(true);
+      m_Controls->mFaImageLabel->setEnabled(true);
+      m_Controls->m_FaImageBox->setEnabled(true);
     }
     else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
-      m_Controls->mFaImageLabel->setVisible(true);
-      m_Controls->m_FaImageBox->setVisible(true);
+      m_Controls->mFaImageLabel->setEnabled(true);
+      m_Controls->m_FaImageBox->setEnabled(true);
 
-      m_Controls->m_OdfCutoffBox->setVisible(true);
-      m_Controls->m_OdfCutoffLabel->setVisible(true);
-      m_Controls->m_SharpenOdfsBox->setVisible(true);
+      m_Controls->m_OdfCutoffBox->setEnabled(true);
+      m_Controls->m_OdfCutoffLabel->setEnabled(true);
+      m_Controls->m_SharpenOdfsBox->setEnabled(true);
     }
   }
   else
   {
     m_Controls->m_InputData->setTitle("Please Select Input Data");
     m_Controls->commandLinkButton->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
-    m_Controls->m_InteractiveBox->setEnabled(false);
   }
 
 }
@@ -542,6 +584,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       fib->Compress(m_Controls->m_FiberErrorBox->value());
 
     m_InteractiveNode->SetData(fib);
+
+    if (auto renderWindowPart = this->GetRenderWindowPart())
+    {
+        renderWindowPart->RequestUpdate();
+    }
   }
   else if (!tracker->GetUseOutputProbabilityMap())
   {

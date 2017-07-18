@@ -67,6 +67,8 @@ protected slots:
   void UpdateGui();
   void ToggleInteractive();
   void DeleteTrackingHandler();
+  void OnParameterChanged();
+  void InteractiveSeedChanged(bool posChanged=false);
 
 protected:
 

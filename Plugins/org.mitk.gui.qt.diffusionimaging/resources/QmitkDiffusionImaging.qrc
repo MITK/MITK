@@ -24,6 +24,7 @@
         <file>qball.png</file>
         <file>tensor.png</file>
         <file>tractogram.png</file>
+        <file>ml_tractogram.png</file>
         <file>ConnectomicsNetwork.png</file>
     </qresource>
 </RCC>

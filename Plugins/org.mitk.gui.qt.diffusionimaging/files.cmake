@@ -36,6 +36,7 @@ set(CACHED_RESOURCE_FILES
   resources/qball.png
   resources/tensor.png
   resources/tractogram.png
+  resources/ml_tractogram.png
   resources/refresh.xpm
  )
 

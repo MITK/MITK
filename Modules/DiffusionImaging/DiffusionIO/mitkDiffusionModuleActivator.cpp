@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleTrackVisReader.h>
 #include <mitkConnectomicsNetworkReader.h>
 #include <mitkPlanarFigureCompositeReader.h>
+#include <mitkTractographyForestReader.h>
 
 #include <mitkFiberBundleVtkWriter.h>
 #include <mitkFiberBundleTrackVisWriter.h>
@@ -61,6 +62,7 @@ namespace mitk
       m_FiberBundleTckReader = new FiberBundleTckReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
       m_PlanarFigureCompositeReader = new PlanarFigureCompositeReader();
+      m_TractographyForestReader = new TractographyForestReader();
 
       m_FiberBundleVtkWriter = new FiberBundleVtkWriter();
       m_FiberBundleTrackVisWriter = new FiberBundleTrackVisWriter();
@@ -82,6 +84,7 @@ namespace mitk
       delete m_FiberBundleTrackVisReader;
       delete m_ConnectomicsNetworkReader;
       delete m_PlanarFigureCompositeReader;
+      delete m_TractographyForestReader;
 
       delete m_FiberBundleVtkWriter;
       delete m_FiberBundleTrackVisWriter;
@@ -98,6 +101,7 @@ namespace mitk
     FiberBundleTrackVisReader * m_FiberBundleTrackVisReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
     PlanarFigureCompositeReader* m_PlanarFigureCompositeReader;
+    TractographyForestReader* m_TractographyForestReader;
 
     FiberBundleVtkWriter * m_FiberBundleVtkWriter;
     FiberBundleTrackVisWriter * m_FiberBundleTrackVisWriter;

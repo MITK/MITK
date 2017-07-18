@@ -299,6 +299,7 @@ void QmitkUSNavigationProcessWidget::OnRestartStepButtonClicked()
 
 void QmitkUSNavigationProcessWidget::OnTabChanged(int index)
 {
+  emit SignalActiveNavigationStepChangeRequested(index);
   if ( index < 0 || index >= static_cast<int>(m_NavigationSteps.size()) )
   {
     return;

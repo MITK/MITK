@@ -103,6 +103,9 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
 	*/
 	void OnActiveNavigationStepChanged(int);
 
+  /** Initializes the next navigation step */
+  void OnNextNavigationStepInitialization(int);
+
 	/**
 	* \brief The data node is given to the experiment logging and scene is saved to the file system.
 	*/
@@ -157,7 +160,6 @@ protected:
 
 	QWidget *m_Parent;
 	QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
-  QmitkUSNavigationStepPunctuationIntervention* m_StepPuncture;
 	QTimer *m_UpdateTimer;
 	QTimer *m_ImageAndNavigationDataLoggingTimer;
 	QmitkStdMultiWidget *m_StdMultiWidget;

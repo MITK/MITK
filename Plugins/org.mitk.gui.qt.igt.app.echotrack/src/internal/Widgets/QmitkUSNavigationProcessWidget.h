@@ -65,7 +65,12 @@ signals:
   void SignalSettingsChanged(itk::SmartPointer<mitk::DataNode>);
 
   /**
-   * \brief Signals a change of the currently active navigation step.
+  * \brief Signals if a change of the currently active navigation step is requested. Gives the index of the new step.
+  */
+  void SignalActiveNavigationStepChangeRequested(int);
+
+  /**
+   * \brief Signals a change of the currently active navigation step after the step was changed.
    */
   void SignalActiveNavigationStepChanged(int);
 

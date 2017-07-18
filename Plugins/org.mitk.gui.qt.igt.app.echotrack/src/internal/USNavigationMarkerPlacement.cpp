@@ -205,6 +205,11 @@ void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 		this,
 		SLOT(OnActiveNavigationStepChanged(int)));
 
+  connect(ui->navigationProcessWidget,
+    SIGNAL(SignalActiveNavigationStepChangeRequested(int)),
+    this,
+    SLOT(OnNextNavigationStepInitialization(int)));
+
 	connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
 	connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
   connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
@@ -540,7 +545,6 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
         new QmitkUSNavigationStepZoneMarking(m_Parent);
       QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
         new QmitkUSNavigationStepPunctuationIntervention(m_Parent);
-      m_StepPuncture = stepIntervention;
 
 			connect(stepIntervention, SIGNAL(AddAblationZoneClicked(int)), this, SLOT(OnAddAblationZone(int)));
 			connect(stepIntervention, SIGNAL(AblationZoneChanged(int, int)), this, SLOT(OnChangeAblationZone(int, int)));
@@ -650,27 +654,31 @@ void USNavigationMarkerPlacement::OnActiveNavigationStepChanged(int index)
 			<< "; duration until now: " << m_NavigationStepTimer->GetTotalDuration();
 	}
 
+ }
 
-  MITK_INFO << "Next Step: " << m_NavigationSteps.at(index)->GetTitle().toStdString();
-
-  if (m_NavigationSteps.at(index)->GetTitle().toStdString() == "Computer-assisted Intervention")
+  void USNavigationMarkerPlacement::OnNextNavigationStepInitialization(int index)
   {
-    MITK_INFO << "Initializing Navigation Step Puncture";
-    //QmitkUSNavigationStepPunctuationIntervention* navigationStepPunctuationIntervention = static_cast<QmitkUSNavigationStepPunctuationIntervention*>(m_NavigationSteps.at(index));
-    if (m_StepPuncture != nullptr)
+
+    MITK_INFO << "Next Step: " << m_NavigationSteps.at(index)->GetTitle().toStdString();
+
+    if (m_NavigationSteps.at(index)->GetTitle().toStdString() == "Computer-assisted Intervention")
     {
-      if (m_CurrentStorage.IsNull()) { this->UpdateToolStorage(); }
-      if (m_CurrentStorage.IsNull() || (m_CurrentStorage->GetTool(m_NeedleIndex).IsNull()))
+      MITK_INFO << "Initializing Navigation Step Puncture";
+      QmitkUSNavigationStepPunctuationIntervention* navigationStepPunctuationIntervention = static_cast<QmitkUSNavigationStepPunctuationIntervention*>(m_NavigationSteps.at(index));
+      if (navigationStepPunctuationIntervention != nullptr)
       {
-        MITK_WARN << "Found null pointer when setting the tool axis, aborting";
-      }
-      else
-      {
-        m_StepPuncture->SetNeedleMetaData(m_CurrentStorage->GetTool(m_NeedleIndex));
-        MITK_INFO << "Needle axis vector: " << m_CurrentStorage->GetTool(m_NeedleIndex)->GetToolAxis();
+        if (m_CurrentStorage.IsNull()) { this->UpdateToolStorage(); }
+        if (m_CurrentStorage.IsNull() || (m_CurrentStorage->GetTool(m_NeedleIndex).IsNull()))
+        {
+          MITK_WARN << "Found null pointer when setting the tool axis, aborting";
+        }
+        else
+        {
+          navigationStepPunctuationIntervention->SetNeedleMetaData(m_CurrentStorage->GetTool(m_NeedleIndex));
+          MITK_INFO << "Needle axis vector: " << m_CurrentStorage->GetTool(m_NeedleIndex)->GetToolAxis();
+        }
       }
     }
-  }
 
 }
 

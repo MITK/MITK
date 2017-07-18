@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDiffusionPropertyHelper.h>
 #include <itkAdcImageFilter.h>
+#include <itkBallAndSticksImageFilter.h>
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
 
@@ -100,6 +101,7 @@ void QmitkDiffusionQuantificationView::CreateConnections()
         connect( (QObject*)(m_Controls->m_MdDwiButton), SIGNAL(clicked()), this, SLOT(MD_DWI()) );
         connect( (QObject*)(m_Controls->m_AdcDwiButton), SIGNAL(clicked()), this, SLOT(ADC_DWI()) );
         connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
+        connect( (QObject*)(m_Controls->m_BallSTickButton), SIGNAL(clicked()), this, SLOT(DoBallStickCalculation()) );
     }
 }
 
@@ -166,6 +168,7 @@ void QmitkDiffusionQuantificationView::OnSelectionChanged(berry::IWorkbenchPart:
     m_Controls->m_ClusteringAnisotropy->setEnabled(foundTensorVolume);
     m_Controls->m_AdcDwiButton->setEnabled(foundDwVolume);
     m_Controls->m_MdDwiButton->setEnabled(foundDwVolume);
+    m_Controls->m_BallSTickButton->setEnabled(foundDwVolume);
 }
 
 void QmitkDiffusionQuantificationView::ADC_DWI()
@@ -176,6 +179,60 @@ void QmitkDiffusionQuantificationView::ADC_DWI()
 void QmitkDiffusionQuantificationView::MD_DWI()
 {
     DoAdcCalculation(false);
+}
+
+void QmitkDiffusionQuantificationView::DoBallStickCalculation()
+{
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_DwImages->end() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_DwImages->begin() );
+
+    while ( itemiter != itemiterend ) // for all items
+    {
+        mitk::DataNode* node = *itemiter;
+        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+
+        typedef itk::BallAndSticksImageFilter< short, double > FilterType;
+
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(image, itkVectorImagePointer);
+        FilterType::Pointer filter = FilterType::New();
+        filter->SetInput( itkVectorImagePointer );
+
+        filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
+          ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+            ->GetGradientDirectionsContainer() );
+
+        filter->SetB_value( static_cast<mitk::FloatProperty*>
+          (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
+            ->GetValue() );
+
+        filter->Update();
+
+        mitk::Image::Pointer newImage = mitk::Image::New();
+        newImage->InitializeByItk( filter->GetOutput() );
+        newImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( newImage );
+        QString name = node->GetName().c_str();
+
+        imageNode->SetName((name+"_ISO").toStdString().c_str());
+        GetDataStorage()->Add(imageNode, node);
+
+        {
+          FilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
+          mitk::Image::Pointer newImage = mitk::Image::New();
+          CastToMitkImage(itkImg, newImage);
+
+          mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+          imageNode->SetData( newImage );
+          QString name = node->GetName().c_str();
+
+          imageNode->SetName((name+"_Sticks").toStdString().c_str());
+          GetDataStorage()->Add(imageNode, node);
+        }
+
+        ++itemiter;
+    }
 }
 
 void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)

@@ -40,6 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace std;
 
+QmitkPreferencesDialog* QmitkPreferencesDialog::activeDialog = nullptr;
+
 namespace {
   const QHash<QString, QString> translationsMap = QHash<QString, QString>(
     { {"General",               QObject::tr("General")}
@@ -201,10 +203,20 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   d->buttonBox->button(QDialogButtonBox::Cancel)->setDefault(true);
 
   this->UpdateTree();
+
+  activeDialog = this;
 }
 
 QmitkPreferencesDialog::~QmitkPreferencesDialog()
 {
+}
+
+void QmitkPreferencesDialog::UpdateActiveTree(bool advancedMode)
+{
+  if (activeDialog)
+  {
+    activeDialog->UpdateExistingTree(advancedMode);
+  }
 }
 
 void QmitkPreferencesDialog::SetSelectedPage(const QString& id)
@@ -492,6 +504,94 @@ void QmitkPreferencesDialog::UpdateTree()
         { 
           d->m_PrefPages[j].treeWidgetItem->addChild(d->m_PrefPages[i].treeWidgetItem);
           
+          break;
+        }
+      }
+    }
+  }
+}
+
+void QmitkPreferencesDialog::UpdateExistingTree(bool advancedMode)
+{
+  std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator endRoot = d->m_PrefPages.end();
+  std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator sortIter = d->m_PrefPages.begin();
+  for (; sortIter != d->m_PrefPages.end(); ++sortIter)
+  {
+    if (sortIter->category.isEmpty())
+    {
+      endRoot = sortIter;
+    }
+  }
+
+  if (endRoot != d->m_PrefPages.end())
+  {
+    std::sort(d->m_PrefPages.begin(), endRoot + 1);
+  }
+
+  std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator iter = d->m_PrefPages.begin();
+  for (; iter != d->m_PrefPages.end(); ++iter)
+  {
+    if (iter->id == "org.mitk.gui.qt.application.EnvironmentPreferencePage")
+    {
+      std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator iter2 = d->m_PrefPages.begin();
+      std::iter_swap(iter, iter2);
+    }
+    else if (iter->id == "org.mitk.gui.qt.application.PacsPreferencePage")
+    {
+      std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator iter2 = d->m_PrefPages.begin() + 2;
+      std::iter_swap(iter, iter2);
+    }
+    else if (iter->id == "org.mitk.GeneralPreferencePage")
+    {
+      std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator iter2 = d->m_PrefPages.begin() + 1;
+      std::iter_swap(iter, iter2);
+    }
+  }
+
+  for (unsigned int i = 0; i < d->m_PrefPages.size(); ++i)
+  {
+    // skip mandatory settings
+    if (mandatorySettings.contains(d->m_PrefPages[i].id))
+    {
+      continue;
+    }
+
+    d->m_PrefPages[i].treeWidgetItem = new QTreeWidgetItem();
+    d->m_PrefPages[i].treeWidgetItem->setText(0, d->m_PrefPages[i].name);
+
+    if (d->m_PrefPages[i].category.isEmpty())
+    {
+      if (!advancedMode)
+      {
+        auto existing = d->m_PreferencesTree->findItems(d->m_PrefPages[i].name, Qt::MatchExactly|Qt::MatchRecursive, 0);
+        foreach(QTreeWidgetItem* item, existing)
+        {
+          delete item;
+        }
+      }
+      else
+      {
+        d->m_PreferencesTree->addTopLevelItem(d->m_PrefPages[i].treeWidgetItem);
+      }
+    }
+    else
+    {
+      for (unsigned int j = 0; j < d->m_PrefPages.size(); ++j)
+      {
+        if (d->m_PrefPages[i].category == d->m_PrefPages[j].id)
+        {
+          if (!advancedMode)
+          {
+            auto existing = d->m_PreferencesTree->findItems(d->m_PrefPages[i].name, Qt::MatchExactly|Qt::MatchRecursive, 0);
+            foreach(QTreeWidgetItem* item, existing)
+            {
+              delete item;
+            }
+          }
+          else
+          {
+            d->m_PrefPages[j].treeWidgetItem->addChild(d->m_PrefPages[i].treeWidgetItem);
+          }
           break;
         }
       }

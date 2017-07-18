@@ -40,6 +40,8 @@ public:
 
     void SetSelectedPage(const QString& id);
 
+    static void UpdateActiveTree(bool advancedMode);
+
 protected slots:
 
   void OnImportButtonClicked();
@@ -55,6 +57,7 @@ protected:
 
   //bool eventFilter(QObject *obj, QEvent *event);
   void UpdateTree();
+  void UpdateExistingTree(bool advancedMode);
 
   ///
   /// Saves all preferencepages.
@@ -63,6 +66,7 @@ protected:
 
   QScopedPointer<QmitkPreferencesDialogPrivate> d;
 
+  static QmitkPreferencesDialog* activeDialog;
 };
 
 #endif /* BERRYQMITKPREFERENCESDIALOG_H_ */

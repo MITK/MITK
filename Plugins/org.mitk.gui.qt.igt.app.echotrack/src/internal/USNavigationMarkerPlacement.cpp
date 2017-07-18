@@ -538,10 +538,14 @@ void USNavigationMarkerPlacement::OnCombinedModalityChanged(
   //upate stored tool axis for current tool
   this->SetToolAxisMarkerPlacement();
   //store new tool axis
-  QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
-    new QmitkUSNavigationStepPunctuationIntervention(m_ToolAxis, m_Parent);
-  m_NavigationSteps.pop_back();
-  m_NavigationSteps.push_back(stepIntervention);
+  if (m_CurrentApplicationName == "Puncture")
+  {
+    //QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
+    //  new QmitkUSNavigationStepPunctuationIntervention(m_ToolAxis, m_Parent);
+   // m_NavigationSteps.pop_back();
+    //m_NavigationSteps.push_back(stepIntervention);
+
+  }
 
   // TODO check for correct connection
   //  for (unsigned int n = 0; n < navigationDataSource->GetNumberOfIndexedOutputs(); ++n)

@@ -30,32 +30,52 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   m_SelectedInput(-1)
 {
   // Tool Coordinates:x axis is chosen as default axis when no axis is specified
-  for (int i = 0; i < 2; i++)
-  {
+  
+  MITK_INFO << "Constructor called";
+
     mitk::Point3D point;
-    point.SetElement(0, i * 400);
-    point.SetElement(1, 0);
-    point.SetElement(2, 0);
-    m_OriginalPoints->InsertPoint(i, point);
-  }
+    point.SetElement(0, 1 * 400);
+    point.SetElement(1, 0 * 400);
+    point.SetElement(2, 0 * 400);
+    m_OriginalPoints->InsertPoint(point);
+
+    mitk::Point3D point1;
+    point1.SetElement(0, 0 * 400);
+    point1.SetElement(1, 0 * 400);
+    point1.SetElement(2, 0 * 400);
+    m_OriginalPoints->InsertPoint(point1);
+    
+    mitk::Point3D point2;
+    point2.SetElement(0, -1 * 400);
+    point2.SetElement(1, 0 * 400);
+    point2.SetElement(2, 0 * 400);
+    m_OriginalPoints->InsertPoint(point2);
+
+  MITK_INFO << "orginal point 0 set constructor" << m_OriginalPoints->GetPoint(0);
+  MITK_INFO << "orginal point 1 set constructor" << m_OriginalPoints->GetPoint(1);
 }
 
 void mitk::NeedleProjectionFilter::SetToolAxisForFilter(mitk::Point3D point)
 {
-  // Tool Coordinates: First point - Tip of Needle, Second Point - 40 cm distance from needle
-  mitk::Point3D originPoint;
-  originPoint.SetElement(0, 0);
-  originPoint.SetElement(1, 0);
-  originPoint.SetElement(2, 0);
-  m_OriginalPoints->SetPoint(0, originPoint);
+  
+  m_startPoint.SetElement(0, point.GetElement(0) * 400);
+  m_startPoint.SetElement(1, point.GetElement(1) * 400);
+  m_startPoint.SetElement(2, point.GetElement(2) * 400);
+  m_OriginalPoints->SetPoint(0, m_startPoint);
+  MITK_INFO << "orginal point 0 set mutator" << m_OriginalPoints->GetPoint(0);
 
-  mitk::Point3D endPoint;
-  endPoint.SetElement(0, point.GetElement(0) * 400);
-  endPoint.SetElement(1, point.GetElement(1) * 400);
-  endPoint.SetElement(2, point.GetElement(2) * 400);
-  MITK_INFO << "Tool axis in project filter:";
-  MITK_INFO << endPoint;
-  m_OriginalPoints->SetPoint(1, endPoint);
+  // Tool Coordinates: First point - Tip of Needle, Second Point - 40 cm distance from needle
+  //mitk::Point3D originPoint;
+ // originPoint.SetElement(0, 0);
+  //originPoint.SetElement(1, 0);
+  //originPoint.SetElement(2, 0);
+  //m_OriginalPoints->SetPoint(1, originPoint);
+
+  m_endPoint.SetElement(0, point.GetElement(0) * -400);
+  m_endPoint.SetElement(1, point.GetElement(1) * -400);
+  m_endPoint.SetElement(2, point.GetElement(2) * -400);
+  m_OriginalPoints->SetPoint(1, m_endPoint);
+  MITK_INFO << "orginal point 1 set mutator" << m_OriginalPoints->GetPoint(1);
 }
 
 mitk::NeedleProjectionFilter::~NeedleProjectionFilter()
@@ -93,6 +113,9 @@ void mitk::NeedleProjectionFilter::GenerateData()
   // Update Projection (We do not clone, since we want to keep properties alive)
   m_Projection->SetPoint(0, m_OriginalPoints->GetPoint(0));
   m_Projection->SetPoint(1, m_OriginalPoints->GetPoint(1));
+  m_Projection->SetPoint(2, m_OriginalPoints->GetPoint(2));
+  //m_Projection->SetPoint(2, m_OriginalPoints->GetPoint(2));
+
   // 3a) If no target Plane has been set, then leave it at that
   if (this->m_TargetPlane.IsNull())
     return;
@@ -105,8 +128,8 @@ void mitk::NeedleProjectionFilter::GenerateData()
   double t;
   double x[3];
   // Points that define the needle vector
-  double p1[3] = {m_OriginalPoints->GetPoint(0)[0], m_OriginalPoints->GetPoint(0)[1], m_OriginalPoints->GetPoint(0)[2]};
-  double p2[3] = {m_OriginalPoints->GetPoint(1)[0], m_OriginalPoints->GetPoint(1)[1], m_OriginalPoints->GetPoint(1)[2]};
+  double p1[3] = {m_OriginalPoints->GetPoint(1)[0], m_OriginalPoints->GetPoint(1)[1], m_OriginalPoints->GetPoint(1)[2]};
+  double p2[3] = {m_OriginalPoints->GetPoint(2)[0], m_OriginalPoints->GetPoint(2)[1], m_OriginalPoints->GetPoint(2)[2]};
   // Center of image plane and it's normal
   double center[3] = {plane->GetCenter()[0], plane->GetCenter()[1], plane->GetCenter()[2]};
   double normal[3] = {plane->GetNormal()[0], plane->GetNormal()[1], plane->GetNormal()[2]};
@@ -124,7 +147,8 @@ void mitk::NeedleProjectionFilter::GenerateData()
     intersection[2] = x[2];
 
     // Replace distant point with image intersection
-    m_Projection->SetPoint(1, intersection);
+    m_Projection->SetPoint(2, intersection);
+
   }
 }
 

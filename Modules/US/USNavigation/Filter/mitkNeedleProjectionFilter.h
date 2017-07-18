@@ -68,6 +68,9 @@ namespace mitk {
     mitk::PointSet::Pointer          m_Projection;
     mitk::PointSet::Pointer          m_OriginalPoints;
 
+    mitk::Point3D                    m_startPoint;
+    mitk::Point3D                    m_endPoint;
+
     int                              m_SelectedInput;
 
 

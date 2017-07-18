@@ -15,10 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkLogoAnnotation.h"
+#include "mitkEqual.h"
 #include "vtkUnicodeString.h"
 #include <vtkImageData.h>
 #include <vtkImageData.h>
-#include <vtkImageMapper.h>
 #include <vtkImageMapper.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -26,11 +26,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 #include <vtkTextRenderer.h>
 #include <vtkTextRendererStringToImage.h>
+#include <vtkCommand.h>
 
 #include <mbilogo.h>
-#include <mitkVtkLogoRepresentation.h>
+#include <vtkImageProperty.h>
+#include <vtkActor2D.h>
 #include <vtkImageImport.h>
 #include <vtkProperty2D.h>
+#include <vtkImageResize.h>
+
+class vtkWindowModifiedCallback : public vtkCommand
+{
+public:
+  static vtkWindowModifiedCallback *New()
+  {
+    return new vtkWindowModifiedCallback;
+  }
+  
+  mitk::LogoAnnotation::LocalStorage* ls;
+
+  virtual void Execute(vtkObject *caller, unsigned long, void* calldata)
+  {
+    vtkRenderWindow* window = static_cast<vtkRenderWindow*>(caller);
+
+    int dims[3];
+    ls->m_LogoImage->GetDimensions(dims);    
+    int *size = window->GetSize();
+    double currentFactor = double(dims[0]) / double(size[0]);
+
+    double desiredFactor = 0.20;
+    double scaleFactor = desiredFactor / currentFactor;
+
+    double magnificationFactor[3];
+    ls->m_ImageResize->GetMagnificationFactors(magnificationFactor);
+
+    if (!mitk::Equal(scaleFactor, magnificationFactor[0])){
+      //float size = GetRelativeSize();            
+      ls->m_ImageResize->SetMagnificationFactors(scaleFactor, scaleFactor, scaleFactor);
+      ls->m_ImageResize->Update();
+    }
+
+    ls->m_ImageActor->GetProperty()->SetColor(0., 0., 1.);
+    ls->m_ImageActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+    ls->m_ImageActor->GetPosition2Coordinate()->SetCoordinateSystemToNormalizedViewport();
+    ls->m_ImageActor->SetPosition(0.75, 0.05);
+  }
+
+  vtkWindowModifiedCallback() { this->ls = 0; }
+};
+
 
 mitk::LogoAnnotation::LogoAnnotation()
 {
@@ -61,7 +105,11 @@ mitk::LogoAnnotation::LocalStorage::~LocalStorage()
 
 mitk::LogoAnnotation::LocalStorage::LocalStorage()
 {
-  m_LogoRep = vtkSmartPointer<mitkVtkLogoRepresentation>::New();
+  m_ImageActor = vtkSmartPointer<vtkActor2D>::New();
+  m_ImageMapper = vtkSmartPointer<vtkImageMapper>::New();
+  m_ImageActor->SetMapper(m_ImageMapper);
+
+  m_ImageResize = vtkSmartPointer<vtkImageResize>::New();
 }
 
 void mitk::LogoAnnotation::UpdateVtkAnnotation(mitk::BaseRenderer *renderer)
@@ -71,7 +119,7 @@ void mitk::LogoAnnotation::UpdateVtkAnnotation(mitk::BaseRenderer *renderer)
   {
     if (GetLogoImagePath().empty())
     {
-      ls->m_LogoRep->SetVisibility(0);
+      ls->m_ImageActor->SetVisibility(0);
       return;
     }
     vtkImageReader2 *imageReader = m_readerFactory->CreateImageReader2(GetLogoImagePath().c_str());
@@ -86,23 +134,16 @@ void mitk::LogoAnnotation::UpdateVtkAnnotation(mitk::BaseRenderer *renderer)
     {
       ls->m_LogoImage = CreateMbiLogo();
     }
-
-    ls->m_LogoRep->SetImage(ls->m_LogoImage);
-    ls->m_LogoRep->SetDragable(false);
-    ls->m_LogoRep->SetMoving(false);
-    ls->m_LogoRep->SetPickable(false);
-    ls->m_LogoRep->SetShowBorder(true);
-    ls->m_LogoRep->SetRenderer(renderer->GetVtkRenderer());
-    float size = GetRelativeSize();
-    ls->m_LogoRep->SetPosition2(size, size);
-    int corner = GetCornerPosition();
-    ls->m_LogoRep->SetCornerPosition(corner);
-    mitk::Point2D offset = GetOffsetVector();
-    ls->m_LogoRep->SetPosition(offset[0], offset[1]);
-    float opacity = 1.0;
-    GetOpacity(opacity);
-    ls->m_LogoRep->GetImageProperty()->SetOpacity(opacity);
-    ls->m_LogoRep->BuildRepresentation();
+    ls->m_ImageMapper->SetInputConnection(ls->m_ImageResize->GetOutputPort());
+    ls->m_ImageMapper->SetColorWindow(255);
+    ls->m_ImageMapper->SetColorLevel(127.5);
+    ls->m_ImageResize->SetInputData(ls->m_LogoImage);
+    ls->m_ImageResize->SetResizeMethodToMagnificationFactors();
+    ls->m_ImageResize->SetMagnificationFactors(1., 1., 1.);
+    vtkSmartPointer<vtkWindowModifiedCallback> wCallback = vtkSmartPointer<vtkWindowModifiedCallback>::New();
+    wCallback->ls = ls;
+    renderer->GetRenderWindow()->AddObserver(vtkCommand::ModifiedEvent, wCallback);
+    
     ls->UpdateGenerateDataTime();
   }
 }
@@ -200,5 +241,6 @@ float mitk::LogoAnnotation::GetRelativeSize() const
 vtkProp *mitk::LogoAnnotation::GetVtkProp(BaseRenderer *renderer) const
 {
   LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
-  return ls->m_LogoRep;
+  
+  return ls->m_ImageActor;
 }

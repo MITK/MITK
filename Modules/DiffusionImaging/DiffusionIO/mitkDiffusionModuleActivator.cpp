@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsNetworkCSVWriter.h>
 #include <mitkConnectomicsNetworkMatrixWriter.h>
 #include <mitkPlanarFigureCompositeWriter.h>
+#include <mitkTractographyForestWriter.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPropertyDescriptions.h>
@@ -70,6 +71,7 @@ namespace mitk
       m_ConnectomicsNetworkCSVWriter = new ConnectomicsNetworkCSVWriter();
       m_ConnectomicsNetworkMatrixWriter = new ConnectomicsNetworkMatrixWriter();
       m_PlanarFigureCompositeWriter = new PlanarFigureCompositeWriter();
+      m_TractographyForestWriter = new TractographyForestWriter();
     }
 
     void Unload(us::ModuleContext*) override
@@ -92,6 +94,7 @@ namespace mitk
       delete m_ConnectomicsNetworkCSVWriter;
       delete m_ConnectomicsNetworkMatrixWriter;
       delete m_PlanarFigureCompositeWriter;
+      delete m_TractographyForestWriter;
     }
 
   private:
@@ -109,6 +112,7 @@ namespace mitk
     ConnectomicsNetworkCSVWriter * m_ConnectomicsNetworkCSVWriter;
     ConnectomicsNetworkMatrixWriter * m_ConnectomicsNetworkMatrixWriter;
     PlanarFigureCompositeWriter* m_PlanarFigureCompositeWriter;
+    TractographyForestWriter* m_TractographyForestWriter;
 
     std::vector<mitk::CustomMimeType*> m_MimeTypes;
 

@@ -22,11 +22,12 @@ set(CPP_FILES
   mitkFiberBundleTrackVisReader.cpp
   mitkFiberBundleTrackVisWriter.cpp
   mitkFiberBundleVtkReader.cpp
-  mitkTractographyForestReader.cpp
   mitkFiberBundleVtkWriter.cpp
   mitkFiberBundleSerializer.cpp
   mitkFiberBundleMapper2D.cpp
   mitkFiberBundleMapper3D.cpp
+  mitkTractographyForestReader.cpp
+  mitkTractographyForestWriter.cpp
 
   mitkPlanarFigureCompositeWriter.cpp
   mitkPlanarFigureCompositeReader.cpp

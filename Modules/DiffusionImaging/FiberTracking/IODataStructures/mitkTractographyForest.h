@@ -33,32 +33,35 @@ class MITKFIBERTRACKING_EXPORT TractographyForest : public BaseData
 {
 public:
 
-    virtual void UpdateOutputInformation() override;
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual bool VerifyRequestedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject*) override;
+  virtual void UpdateOutputInformation() override;
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+  virtual bool VerifyRequestedRegion() override;
+  virtual void SetRequestedRegion(const itk::DataObject*) override;
 
-    mitkClassMacro( TractographyForest, BaseData )
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    mitkNewMacro1Param(Self, std::shared_ptr< vigra::RandomForest<int> >) // custom constructor
+  mitkClassMacro( TractographyForest, BaseData )
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
+  mitkNewMacro1Param(Self, std::shared_ptr< vigra::RandomForest<int> >) // custom constructor
 
-    int GetNumFeatures();
-    int GetNumTrees();
-    int GetNumClasses();
-    int GetMaxTreeDepth();
-    int IndexToClassLabel(int idx);
-    bool HasForest();
+  int GetNumFeatures();
+  int GetNumTrees();
+  int GetNumClasses();
+  int GetMaxTreeDepth();
+  int IndexToClassLabel(int idx);
+  bool HasForest();
+  void PredictProbabilities(vigra::MultiArray<2, float>& features, vigra::MultiArray<2, float>& probabilities);
+  std::shared_ptr< const vigra::RandomForest<int> > GetForest() const
+  { return m_Forest; }
 
 protected:
 
-    TractographyForest( std::shared_ptr< vigra::RandomForest<int> > forest = nullptr );
-    virtual ~TractographyForest();
+  TractographyForest( std::shared_ptr< vigra::RandomForest<int> > forest = nullptr );
+  virtual ~TractographyForest();
 
 private:
 
-    std::shared_ptr< vigra::RandomForest<int> > m_Forest;   ///< random forest classifier
+  std::shared_ptr< vigra::RandomForest<int> > m_Forest;   ///< random forest classifier
 
 };
 

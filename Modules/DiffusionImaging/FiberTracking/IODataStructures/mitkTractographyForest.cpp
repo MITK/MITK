@@ -34,6 +34,10 @@ TractographyForest::~TractographyForest()
 
 }
 
+void TractographyForest::PredictProbabilities(vigra::MultiArray<2, float>& features, vigra::MultiArray<2, float>& probabilities)
+{
+  m_Forest->predictProbabilities(features, probabilities);
+}
 
 int TractographyForest::GetNumFeatures()
 {

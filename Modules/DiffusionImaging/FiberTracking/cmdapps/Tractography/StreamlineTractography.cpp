@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
 #include <itkTensorImageToQBallImageFilter.h>
+#include <mitkTractographyForest.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -327,17 +328,21 @@ int main(int argc, char* argv[])
   mitk::TrackingDataHandler* handler;
   if (algorithm == "DetRF" || algorithm == "ProbRF")
   {
+    mitk::TractographyForest::Pointer forest = dynamic_cast<mitk::TractographyForest*>(mitk::IOUtil::Load(forestFile)[0].GetPointer());
+    if (forest.IsNull())
+      mitkThrow() << "Forest file " << forestFile << " could not be read.";
+
     if (use_sh_features)
     {
       handler = new mitk::TrackingHandlerRandomForest<6,28>();
-      dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->LoadForest(forestFile);
+      dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->SetForest(forest);
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->AddDwi(input_images.at(0));
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->SetAdditionalFeatureImages(addImages);
     }
     else
     {
       handler = new mitk::TrackingHandlerRandomForest<6,100>();
-      dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->LoadForest(forestFile);
+      dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetForest(forest);
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input_images.at(0));
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addImages);
     }

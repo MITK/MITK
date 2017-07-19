@@ -251,7 +251,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     return last_dir;
 
   // store feature pixel values in a vigra data type
-  vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->feature_count()) );
+  vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->GetNumFeatures()) );
   typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0), m_Interpolate);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
@@ -305,8 +305,8 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   }
 
   // perform classification
-  vigra::MultiArray<2, float> probs(vigra::Shape2(1, m_Forest->class_count()));
-  m_Forest->predictProbabilities(featureData, probs);
+  vigra::MultiArray<2, float> probs(vigra::Shape2(1, m_Forest->GetNumClasses()));
+  m_Forest->PredictProbabilities(featureData, probs);
 
   vnl_vector< float > angles = m_OdfFloatDirs*last_dir;
   vnl_vector< float > probs2; probs2.set_size(m_DirectionContainer.size()); probs2.fill(0.0); // used for probabilistic direction sampling
@@ -315,13 +315,12 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   float pNonFib = 0;     // probability that we left the white matter
   float w = 0;           // weight of the predicted direction
 
-  for (int i=0; i<m_Forest->class_count(); i++)   // for each class (number of possible directions + out-of-wm class)
+  for (int i=0; i<m_Forest->GetNumClasses(); i++)   // for each class (number of possible directions + out-of-wm class)
   {
     if (probs(0,i)>0)   // if probability of respective class is 0, do nothing
     {
       // get label of class (does not correspond to the loop variable i)
-      unsigned int classLabel = 0;
-      m_Forest->ext_param_.to_classlabel(i, classLabel);
+      unsigned int classLabel = m_Forest->IndexToClassLabel(i);
 
       if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
       {
@@ -448,8 +447,9 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::StartTraini
   for (int i = 1; i < m_NumTrees; ++i)
     trees.at(0)->trees_.push_back(trees.at(i)->trees_[0]);
 
-  m_Forest = trees.at(0);
-  m_Forest->options_.tree_count_ = m_NumTrees;
+  std::shared_ptr< vigra::RandomForest<int> > forest = trees.at(0);
+  forest->options_.tree_count_ = m_NumTrees;
+  m_Forest = mitk::TractographyForest::New(forest);
   MITK_INFO << "Training finsihed";
 
   m_EndTime = std::chrono::system_clock::now();
@@ -481,13 +481,13 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestVal
     MITK_INFO << "No forest available!";
   else
   {
-    if (m_Forest->tree_count() <= 0)
+    if (m_Forest->GetNumTrees() <= 0)
       MITK_ERROR << "Forest contains no trees!";
-    if ( m_Forest->feature_count() != static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
-      MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->feature_count() << ", expected " << (NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features);
+    if ( m_Forest->GetNumFeatures() != static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
+      MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->GetNumFeatures() << ", expected " << (NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features);
   }
 
-  if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count() == static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
+  if(m_Forest && m_Forest->GetNumTrees()>0 && m_Forest->GetNumFeatures() == static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
     return true;
 
   return false;
@@ -923,26 +923,6 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
   MITK_INFO << "done";
 }
 
-template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::SaveForest(std::string forestFile)
-{
-  MITK_INFO << "Saving forest to " << forestFile;
-  if (IsForestValid())
-  {
-    vigra::rf_export_HDF5( *m_Forest, forestFile, "" );
-    MITK_INFO << "Forest saved successfully.";
-  }
-  else
-    MITK_INFO << "Forest invalid! Could not be saved.";
-}
-
-template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::LoadForest(std::string forestFile)
-{
-  MITK_INFO << "Loading forest from " << forestFile;
-  m_Forest = std::make_shared< vigra::RandomForest<int> >();
-  vigra::rf_import_HDF5( *m_Forest, forestFile);
-}
 }
 
 #endif

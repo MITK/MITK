@@ -34,40 +34,40 @@ TractographyForest::~TractographyForest()
 
 }
 
-void TractographyForest::PredictProbabilities(vigra::MultiArray<2, float>& features, vigra::MultiArray<2, float>& probabilities)
+void TractographyForest::PredictProbabilities(vigra::MultiArray<2, float>& features, vigra::MultiArray<2, float>& probabilities) const
 {
   m_Forest->predictProbabilities(features, probabilities);
 }
 
-int TractographyForest::GetNumFeatures()
+int TractographyForest::GetNumFeatures() const
 {
   if (!HasForest())
     mitkThrow() << "Forest is NULL";
   return m_Forest->feature_count();
 }
 
-int TractographyForest::GetNumTrees()
+int TractographyForest::GetNumTrees() const
 {
   if (!HasForest())
     mitkThrow() << "Forest is NULL";
   return m_Forest->tree_count();
 }
 
-int TractographyForest::GetNumClasses()
+int TractographyForest::GetNumClasses() const
 {
   if (!HasForest())
     mitkThrow() << "Forest is NULL";
   return m_Forest->class_count();
 }
 
-int TractographyForest::GetMaxTreeDepth()
+int TractographyForest::GetMaxTreeDepth() const
 {
   if (!HasForest())
     mitkThrow() << "Forest is NULL";
   return m_Forest->ext_param_.max_tree_depth;
 }
 
-int TractographyForest::IndexToClassLabel(int idx)
+int TractographyForest::IndexToClassLabel(int idx) const
 {
   if (!HasForest())
     mitkThrow() << "Forest is NULL";
@@ -76,11 +76,20 @@ int TractographyForest::IndexToClassLabel(int idx)
   return classLabel;
 }
 
-bool TractographyForest::HasForest()
+bool TractographyForest::HasForest() const
 {
   return m_Forest!=nullptr;
 }
 
+void TractographyForest::PrintSelf(std::ostream &os, itk::Indent indent) const
+{
+//  Superclass::PrintSelf(os, indent);
+  os << indent << this->GetNameOfClass() << ":\n";
+  os << indent << "Number of features: " << GetNumFeatures() << std::endl;
+  os << indent << "Number of classes: " << GetNumClasses() << std::endl;
+  os << indent << "Number of trees: " << GetNumTrees() << std::endl;
+  os << indent << "Maximum tree depth: " << GetMaxTreeDepth() << std::endl;
+}
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void TractographyForest::UpdateOutputInformation()

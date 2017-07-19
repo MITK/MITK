@@ -30,9 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 #include <random>
 #include <mitkPointSet.h>
 #include <mitkPointSetShapeProperty.h>
+#include <mitkTractographyForest.h>
 
 
 /*!
@@ -69,6 +71,8 @@ protected slots:
   void DeleteTrackingHandler();
   void OnParameterChanged();
   void InteractiveSeedChanged(bool posChanged=false);
+  void ForestSwitched();
+  void OutputStyleSwitched();
 
 protected:
 
@@ -84,13 +88,14 @@ private:
   int m_SliceObserverTag1;
   int m_SliceObserverTag2;
   int m_SliceObserverTag3;
-  std::vector< itk::Point<float> > m_SeedPoints;
-  mitk::DataNode::Pointer m_InteractiveNode;
-  mitk::DataNode::Pointer m_InteractivePointSetNode;
+  std::vector< itk::Point<float> >        m_SeedPoints;
+  mitk::DataNode::Pointer                 m_InteractiveNode;
+  mitk::DataNode::Pointer                 m_InteractivePointSetNode;
 
-  std::vector< mitk::DataNode::Pointer > m_InputImageNodes; ///< input images
-  std::vector< mitk::Image::Pointer > m_InputImages; ///< input image datanode
-  bool		m_FirstTensorProbRun;
+  std::vector< mitk::DataNode::Pointer >  m_InputImageNodes; ///< input image nodes
+  std::vector< mitk::Image::Pointer >     m_InputImages; ///< input images
+  std::vector< mitk::Image::Pointer >     m_AdditionalInputImages;
+  bool                                    m_FirstTensorProbRun;
 
   void OnSliceChanged(const itk::EventObject& e);
   mitk::TrackingDataHandler*      m_TrackingHandler;

@@ -44,13 +44,13 @@ public:
   itkCloneMacro(Self)
   mitkNewMacro1Param(Self, std::shared_ptr< vigra::RandomForest<int> >) // custom constructor
 
-  int GetNumFeatures();
-  int GetNumTrees();
-  int GetNumClasses();
-  int GetMaxTreeDepth();
-  int IndexToClassLabel(int idx);
-  bool HasForest();
-  void PredictProbabilities(vigra::MultiArray<2, float>& features, vigra::MultiArray<2, float>& probabilities);
+  int GetNumFeatures() const;
+  int GetNumTrees() const;
+  int GetNumClasses() const;
+  int GetMaxTreeDepth() const;
+  int IndexToClassLabel(int idx) const;
+  bool HasForest() const;
+  void PredictProbabilities(vigra::MultiArray<2, float>& features, vigra::MultiArray<2, float>& probabilities) const;
   std::shared_ptr< const vigra::RandomForest<int> > GetForest() const
   { return m_Forest; }
 
@@ -58,6 +58,8 @@ protected:
 
   TractographyForest( std::shared_ptr< vigra::RandomForest<int> > forest = nullptr );
   virtual ~TractographyForest();
+
+  virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
 private:
 

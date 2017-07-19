@@ -81,7 +81,7 @@ public:
   void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
   void SetNumTrees(int num){ m_NumTrees = num; }
   void SetMaxTreeDepth(int depth){ m_MaxTreeDepth = depth; }
-  void SetStepSize(float step){ m_WmSampleDistance = step; }
+  void SetFiberSamplingStep(float step){ m_WmSampleDistance = step; }
   void SetGrayMatterSamplesPerVoxel(int samples){ m_GmSamplesPerVoxel = samples; }
   void SetSampleFraction(float fraction){ m_SampleFraction = fraction; }
   void SetBidirectionalFiberSampling(bool val) { m_BidirectionalFiberSampling = val; }

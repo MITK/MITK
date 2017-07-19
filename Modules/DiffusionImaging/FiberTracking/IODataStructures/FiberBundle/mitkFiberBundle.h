@@ -149,6 +149,8 @@ protected:
     // calculate geometry from fiber extent
     void UpdateFiberGeometry();
 
+    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+
 private:
 
     // actual fiber container

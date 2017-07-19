@@ -423,7 +423,7 @@ void QmitkMLBTView::StartTraining()
     m_ForestHandler->SetMaxTreeDepth(m_Controls->m_MaxDepthBox->value());
     m_ForestHandler->SetGrayMatterSamplesPerVoxel(m_Controls->m_GmSamplingBox->value());
     m_ForestHandler->SetSampleFraction(m_Controls->m_SampleFractionBox->value());
-    m_ForestHandler->SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
+    m_ForestHandler->SetFiberSamplingStep(m_Controls->m_TrainingStepSizeBox->value());
     m_ForestHandler->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
     m_ForestHandler->StartTraining();
 }

@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
         forestHandler.SetMaxTreeDepth(max_tree_depth);
         forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(sampling_distance);
+        forestHandler.SetFiberSamplingStep(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
         forest = forestHandler.GetForest();
@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
         forestHandler.SetMaxTreeDepth(max_tree_depth);
         forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(sampling_distance);
+        forestHandler.SetFiberSamplingStep(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
         forest = forestHandler.GetForest();

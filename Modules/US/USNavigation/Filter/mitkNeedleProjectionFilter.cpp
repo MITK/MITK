@@ -22,60 +22,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 // VTK
 #include <vtkPlane.h>
 
-
-
 mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   : m_Projection(mitk::PointSet::New()),
   m_OriginalPoints(mitk::PointSet::New()),
   m_SelectedInput(-1)
 {
   // Tool Coordinates:x axis is chosen as default axis when no axis is specified
-  
-  MITK_INFO << "Constructor called";
 
-    mitk::Point3D point;
-    point.SetElement(0, 1 * 400);
-    point.SetElement(1, 0 * 400);
-    point.SetElement(2, 0 * 400);
-    m_OriginalPoints->InsertPoint(point);
+  MITK_DEBUG << "Constructor called";
 
-    mitk::Point3D point1;
-    point1.SetElement(0, 0 * 400);
-    point1.SetElement(1, 0 * 400);
-    point1.SetElement(2, 0 * 400);
-    m_OriginalPoints->InsertPoint(point1);
-    
-    mitk::Point3D point2;
-    point2.SetElement(0, -1 * 400);
-    point2.SetElement(1, 0 * 400);
-    point2.SetElement(2, 0 * 400);
-    m_OriginalPoints->InsertPoint(point2);
+  mitk::Point3D point;
+  point.SetElement(0, 1 * 400);
+  point.SetElement(1, 0 * 400);
+  point.SetElement(2, 0 * 400);
+  m_OriginalPoints->InsertPoint(point);
 
-  MITK_INFO << "orginal point 0 set constructor" << m_OriginalPoints->GetPoint(0);
-  MITK_INFO << "orginal point 1 set constructor" << m_OriginalPoints->GetPoint(1);
+  mitk::Point3D point1;
+  point1.SetElement(0, 0 * 400);
+  point1.SetElement(1, 0 * 400);
+  point1.SetElement(2, 0 * 400);
+  m_OriginalPoints->InsertPoint(point1);
+
+  mitk::Point3D point2;
+  point2.SetElement(0, -1 * 400);
+  point2.SetElement(1, 0 * 400);
+  point2.SetElement(2, 0 * 400);
+  m_OriginalPoints->InsertPoint(point2);
+
+  MITK_DEBUG << "orginal point 0 set constructor" << m_OriginalPoints->GetPoint(0);
+  MITK_DEBUG << "orginal point 1 set constructor" << m_OriginalPoints->GetPoint(1);
 }
 
 void mitk::NeedleProjectionFilter::SetToolAxisForFilter(mitk::Point3D point)
 {
-  
   m_startPoint.SetElement(0, point.GetElement(0) * 400);
   m_startPoint.SetElement(1, point.GetElement(1) * 400);
   m_startPoint.SetElement(2, point.GetElement(2) * 400);
   m_OriginalPoints->SetPoint(0, m_startPoint);
-  MITK_INFO << "orginal point 0 set mutator" << m_OriginalPoints->GetPoint(0);
-
-  // Tool Coordinates: First point - Tip of Needle, Second Point - 40 cm distance from needle
-  //mitk::Point3D originPoint;
- // originPoint.SetElement(0, 0);
-  //originPoint.SetElement(1, 0);
-  //originPoint.SetElement(2, 0);
-  //m_OriginalPoints->SetPoint(1, originPoint);
 
   m_endPoint.SetElement(0, point.GetElement(0) * -400);
   m_endPoint.SetElement(1, point.GetElement(1) * -400);
   m_endPoint.SetElement(2, point.GetElement(2) * -400);
   m_OriginalPoints->SetPoint(1, m_endPoint);
-  MITK_INFO << "orginal point 1 set mutator" << m_OriginalPoints->GetPoint(1);
+
+  MITK_DEBUG << "orginal point 1 set mutator" << m_OriginalPoints->GetPoint(1);
+  MITK_DEBUG << "orginal point 0 set mutator" << m_OriginalPoints->GetPoint(0);
 }
 
 mitk::NeedleProjectionFilter::~NeedleProjectionFilter()

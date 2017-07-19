@@ -73,6 +73,7 @@ namespace mitk {
     mitk::PointSet::Pointer          m_Projection;
     mitk::PointSet::Pointer          m_OriginalPoints;
     bool                             m_ShowToolAxis;
+    mitk::Point3D                    m_ToolAxis;
 
     int                              m_SelectedInput;
 

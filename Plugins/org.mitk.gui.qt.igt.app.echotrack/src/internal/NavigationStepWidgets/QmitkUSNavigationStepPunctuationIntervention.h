@@ -88,6 +88,7 @@ protected slots:
   void OnAddAblationZoneClicked();
   void OnEnableAblationZoneMarkingClicked();
   void OnAblationZoneSizeSliderChanged(int size);
+  void OnShowToolAxisEnabled(int enabled);
 
 protected:
   virtual void OnSetCombinedModality();

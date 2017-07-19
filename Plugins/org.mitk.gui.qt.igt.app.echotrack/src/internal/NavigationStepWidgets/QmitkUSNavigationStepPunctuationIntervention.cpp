@@ -37,6 +37,7 @@ QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIn
 {
   ui->setupUi(this);
   connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
+  connect(ui->m_ShowToolAxisN, SIGNAL(stateChanged(int)), this, SLOT(OnShowToolAxisEnabled(int)));
   connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
   connect(ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
   ui->m_AblationZonesBox->setVisible(false);
@@ -137,6 +138,12 @@ bool QmitkUSNavigationStepPunctuationIntervention::OnActivateStep()
   m_NeedleProjectionFilter->SelectInput(0);
 
   return true;
+}
+
+void QmitkUSNavigationStepPunctuationIntervention::OnShowToolAxisEnabled(int enabled)
+{
+  if (enabled == 0) { m_NeedleProjectionFilter->ShowToolAxis(false); }
+  else { m_NeedleProjectionFilter->ShowToolAxis(true); }
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnUpdate()

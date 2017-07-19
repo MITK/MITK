@@ -34,6 +34,7 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
 
   mitk::Point3D toolAxis;
   mitk::FillVector3D(toolAxis, 1, 0, 0);
+  m_ToolAxis = toolAxis;
   InitializeOriginalPoints(toolAxis, m_ShowToolAxis);
 
   MITK_DEBUG << "orginal point 0 set constructor" << m_OriginalPoints->GetPoint(0);
@@ -67,9 +68,16 @@ void mitk::NeedleProjectionFilter::InitializeOriginalPoints(mitk::Point3D toolAx
 
 }
 
+void mitk::NeedleProjectionFilter::ShowToolAxis(bool enabled)
+{
+  m_ShowToolAxis = enabled;
+  InitializeOriginalPoints(m_ToolAxis,m_ShowToolAxis);
+}
+
 void mitk::NeedleProjectionFilter::SetToolAxisForFilter(mitk::Point3D point)
 {
-  InitializeOriginalPoints(point, m_ShowToolAxis);
+  m_ToolAxis = point;
+  InitializeOriginalPoints(m_ToolAxis, m_ShowToolAxis);
 
   MITK_DEBUG << "orginal point 1 set mutator" << m_OriginalPoints->GetPoint(1);
   MITK_DEBUG << "orginal point 0 set mutator" << m_OriginalPoints->GetPoint(0);

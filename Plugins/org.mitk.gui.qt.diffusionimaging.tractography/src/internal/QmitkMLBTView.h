@@ -55,7 +55,6 @@ public:
 
   QmitkMLBTView();
   virtual ~QmitkMLBTView();
-
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   ///
@@ -63,49 +62,27 @@ public:
   ///
   virtual void SetFocus() override;
 
-  protected slots:
+protected slots:
 
-  void StartTrackingThread();
-  void OnTrackingThreadStop();
   void StartTrainingThread();
   void OnTrainingThreadStop();
-  void BuildFibers();
-  void ChangeTimerInterval(int value);
-  void ToggleDemoMode(int state);
-  void PauseTracking();
-  void AbortTracking();
   void AddTrainingWidget();
   void RemoveTrainingWidget();
-  void ForestSwitched();
-  void DwiSwitched();
 
 protected:
 
-  void StartTracking();
   void StartTraining();
-  void UpdateGui();
 
-  Ui::QmitkMLBTViewControls* m_Controls;
-
-  mitk::TrackingHandlerRandomForest<6,100>* m_ForestHandler;
-
-  QFutureWatcher<void>        m_TrainingWatcher;
-  QFutureWatcher<void>        m_TrackingWatcher;
-  bool                        m_TrackingThreadIsRunning;
-  TrackerType::Pointer        m_Tracker;
-  std::shared_ptr<QTimer>     m_TrackingTimer;
-  mitk::DataNode::Pointer     m_TractogramNode;
-  mitk::DataNode::Pointer     m_SamplingPointsNode;
-  mitk::DataNode::Pointer     m_AlternativePointsNode;
-  mitk::DataNode::Pointer     m_StopVotePointsNode;
-
+  Ui::QmitkMLBTViewControls*    m_Controls;
+  mitk::TrackingDataHandler*    m_ForestHandler;
+  QFutureWatcher<void>          m_TrainingWatcher;
   std::vector< std::shared_ptr<QmitkMlbstTrainingDataWidget> > m_TrainingWidgets;
 
 private:
 
   bool IsTrainingInputValid(void) const;
 
- };
+};
 
 
 

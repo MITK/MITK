@@ -1,12 +1,8 @@
 /**
 \page org_mitk_views_mlbtview Machine Learning Based Streamline Tractography
 
-This view provides the user interface for machine-learning based streamline fiber tractography on diffusion-weighted images. It is dived in two parts: (1) training of the random-forest classifier used for tractography and (2) the actual tractography. The corresponding command line applications are named "MitkRfTraining", to train the random forest classifier, and "MitkStreamlineTractography", which provides functionality for all streamline tractography methods including the random forest based tractography.
-
-Available sections:
-  - \ref MlbstUserManualTraining
-  - \ref MlbstUserManualTractography
-  - \ref MlbstUserManualReferences
+This view provides a user interface to train random-forest classifiers used for machine learning based tractography tractography [1]. The corresponding command line application is named "MitkRfTraining".
+Tractography with the trained classifier can be performed using the "Streamline Tractography View".
 
 \section MlbstUserManualTraining Training
 
@@ -18,33 +14,9 @@ Parameters:
 \li Non-WM Sampling Points: Number of randomly placed sampling points in each non-white-matter voxel. These sampling points are needed to train the classifier for non-fiber tissue.
 \li Fiber Sampling: The fibers are resampled equidistantly. This influences the number of white-matter sampling ponts. Defaul is 0.5*min. voxel size.
 
-\section MlbstUserManualTractography Tractography
-
-Parameters and options:
-
-\li Input DWI: Input diffusion-weighted image for tractography. Minimum number of gradient directions is 28, since 6th order spherical harmonics are used to spherically interpolate the raw signal.
-\li Seeds per Voxel: Number of seed points per voxel. If set to 1, the seed is defined as the voxel center. If > 1 the seeds are distributet randomly inside the voxel.
-\li Step Size: The algorithm proceeds along the streamline with a fixed stepsize (in voxels). Default is 0.5*minSpacing.
-\li Sampling Distance: Maximum distance of the sampling points from the current streamline position (in voxel).
-\li Num. Samples: Number of samples used to probe the local neighborhood.
-\li Min. Length: Shorter fibers are discarded.
-\li Max. Length: Longer fibers are discarded.
-\li Enable Gray Matter Seeding: Seeds are onyl placed inside of the gray matter. Needs tissue label image.
-\li Only Frontal Samples: Only use neighborhood samples in front of the current streamline position.
-\li Mask Image: Binary mask used to constrain the generated streamlines. Streamlines can not leave the mask area.
-\li Seed Image: Binary mask used to define the seed voxels. If no seed mask is specified, the whole image volume is seeded.
-\li Stop Image: Binary mask used to define stopping regions. Streamlines that enter the mask area are stopped immediately.
-\li Tissue Image: Tissue label image needed for gray matter seeding (WM=3, GM=1). Use e.g. MRtrix 5ttgen to generate such a label image.
-
-\li Demo Mode: Directly visualizes the streamline progression and the sampling points. Only use this for demonstration purposes, since it is very slow.
-
 
 \section MlbstUserManualReferences References
 
-[1] Neher, P.F., Côte, M-A., Houde, J-C., Descoteaux, M., Maier-Hein, K.H., 2017. Fiber tractography using machine learning, doi: https://doi.org/10.1101/104190.
-
-[2] Neher, P.F., Götz, M., Norajitra, T., Weber, C., Maier-Hein, K.H., 2015. A machine learning based approach to fiber tractography, in: Proceedings of International Society of Magnetic Resonance in Medicine.
-
-[3] Neher, P.F., Götz, M., Norajitra, T., Weber, C., Maier-Hein, K.H., 2015. A machine learning based approach to fiber tractography using classifier voting, in: Proceedings of Medical Image Computing and Computer-Assisted Intervention. Presented at the Medical Image Computing and Computer-Assisted Intervention.
+[1] Neher, Peter F., Marc-Alexandre Côté, Jean-Christophe Houde, Maxime Descoteaux, and Klaus H. Maier-Hein. “Fiber Tractography Using Machine Learning.” NeuroImage. Accessed July 17, 2017. doi:10.1016/j.neuroimage.2017.07.028.
 
 */

@@ -44,6 +44,7 @@ public:
   }
   
   mitk::LogoAnnotation::LocalStorage* ls;
+  double relativeSize = 0.;
 
   virtual void Execute(vtkObject *caller, unsigned long, void* calldata)
   {
@@ -54,22 +55,20 @@ public:
     int *size = window->GetSize();
     double currentFactor = double(dims[0]) / double(size[0]);
 
-    double desiredFactor = 0.20;
+    double desiredFactor = relativeSize;
     double scaleFactor = desiredFactor / currentFactor;
 
     double magnificationFactor[3];
     ls->m_ImageResize->GetMagnificationFactors(magnificationFactor);
 
-    if (!mitk::Equal(scaleFactor, magnificationFactor[0])){
-      //float size = GetRelativeSize();            
+    if (!mitk::Equal(scaleFactor, magnificationFactor[0])){      
       ls->m_ImageResize->SetMagnificationFactors(scaleFactor, scaleFactor, scaleFactor);
       ls->m_ImageResize->Update();
     }
 
-    ls->m_ImageActor->GetProperty()->SetColor(0., 0., 1.);
-    ls->m_ImageActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+    /*ls->m_ImageActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
     ls->m_ImageActor->GetPosition2Coordinate()->SetCoordinateSystemToNormalizedViewport();
-    ls->m_ImageActor->SetPosition(0.75, 0.05);
+    ls->m_ImageActor->SetPosition(0.75, 0.05);*/
   }
 
   vtkWindowModifiedCallback() { this->ls = 0; }
@@ -142,9 +141,18 @@ void mitk::LogoAnnotation::UpdateVtkAnnotation(mitk::BaseRenderer *renderer)
     ls->m_ImageResize->SetMagnificationFactors(1., 1., 1.);
     vtkSmartPointer<vtkWindowModifiedCallback> wCallback = vtkSmartPointer<vtkWindowModifiedCallback>::New();
     wCallback->ls = ls;
+    wCallback->relativeSize = GetRelativeSize();
+
     renderer->GetRenderWindow()->AddObserver(vtkCommand::ModifiedEvent, wCallback);
     
+    float opacity;
+    this->GetOpacity(opacity);
+    ls->m_ImageActor->GetProperty()->SetOpacity(opacity);
+
+    ls->m_ImageActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    ls->m_ImageActor->GetPosition2Coordinate()->SetCoordinateSystemToDisplay();
     ls->UpdateGenerateDataTime();
+
   }
 }
 
@@ -195,6 +203,31 @@ std::string mitk::LogoAnnotation::GetLogoImagePath() const
   std::string path;
   GetPropertyList()->GetStringProperty("Annotation.LogoImagePath", path);
   return path;
+}
+
+mitk::Annotation::Bounds mitk::LogoAnnotation::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const
+{
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
+  mitk::Annotation::Bounds bounds;
+  bounds.Position = ls->m_ImageActor->GetPosition();
+
+  int size[3];
+  ls->m_ImageResize->GetOutput()->GetDimensions(size);
+  bounds.Size[0] = size[0];
+  bounds.Size[1] = size[1];
+
+  return bounds;
+}
+
+void mitk::LogoAnnotation::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, const mitk::Annotation::Bounds &bounds)
+{
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
+
+  mitk::Point2D posT;
+  posT[0] = bounds.Position[0];
+  posT[1] = bounds.Position[1];
+
+  ls->m_ImageActor->SetDisplayPosition(posT[0], posT[1]);
 }
 
 void mitk::LogoAnnotation::SetOffsetVector(const Point2D &OffsetVector)

@@ -61,6 +61,9 @@ namespace mitk
 
     void SetLogoImagePath(std::string text);
     std::string GetLogoImagePath() const;
+    
+    virtual Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
+    virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
 
     /** \brief The relative offset to the corner position */
     void SetOffsetVector(const Point2D &OffsetVector);

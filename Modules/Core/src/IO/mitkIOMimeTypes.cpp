@@ -40,16 +40,13 @@ namespace mitk
 
   bool IOMimeTypes::DicomMimeType::AppliesTo(const std::string &path) const
   {
-    if (!CustomMimeType::AppliesTo(path))
-      return false;
     // Ask the GDCM ImageIO class directly
     itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
     gdcmIO->SetFileName(path);
     try {
       gdcmIO->ReadImageInformation();
     }
-    catch (const itk::ExceptionObject & err) {
-      MITK_ERROR << "ExceptionObject caught in IOMimeTypes::DicomMimeType::AppliesTo! " << err.GetDescription();
+    catch (const itk::ExceptionObject & /*err*/) {
       return false;
     }
 

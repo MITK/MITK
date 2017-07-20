@@ -71,7 +71,8 @@ public:
 
     CPPUNIT_ASSERT(equal);
     //only 6 structure sets have content
-    CPPUNIT_ASSERT_EQUAL(comparedStructs, (unsigned int)6);
+    unsigned int structsExpected = 6;
+    CPPUNIT_ASSERT_EQUAL(comparedStructs, structsExpected);
 
   }
 

@@ -220,8 +220,9 @@ bool mitk::EnumerationProperty::Assign( const BaseProperty& property )
     auto& ids = s_IdMapForClassName.GetEnum(*this);
     auto& otherIds = s_IdMapForClassName.GetEnum(other);
     if (&ids != &otherIds) {
-      const UniqueLock lock(ids.first);
-      const SharedLock otherLock(otherIds.first);
+      UniqueLock lock(ids.first, boost::defer_lock);
+      SharedLock otherLock(otherIds.first, boost::defer_lock);
+      boost::lock(lock, otherLock);
       ids.second = otherIds.second;
     }
   }
@@ -229,8 +230,9 @@ bool mitk::EnumerationProperty::Assign( const BaseProperty& property )
     auto& strings = s_StringMapForClassName.GetEnum(*this);
     auto& otherStrings = s_StringMapForClassName.GetEnum(other);
     if (&strings != &otherStrings) {
-      const UniqueLock lock(strings.first);
-      const SharedLock otherLock(otherStrings.first);
+      UniqueLock lock(strings.first, boost::defer_lock);
+      SharedLock otherLock(otherStrings.first, boost::defer_lock);
+      boost::lock(lock, otherLock);
       strings.second = otherStrings.second;
     }
   }

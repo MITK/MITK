@@ -42,17 +42,20 @@ Volume Visualization imposes following restrictions on images:
 Select an image in datamanager and click on the checkbox left of "Volumerendering".
 Please be patient, while the image is prepared for rendering, which can take up to a half minute.
 
-\subsection QVV_LODGPU The LOD & GPU checkboxes
+\subsection QVV_LODGPU Dropdown menus for the rendering and blend modes
 
-Volume Rendering requires a lot of computing resources including processor, memory and graphics card.
+Two dropdown menus allow selection of rendering mode (Default, RayCast, GPU) and the blend mode (Composite, Max, Min, Avg, Add).
 
-To run volume rendering on smaller platforms,
-enable the LOD checkbox (level-of-detail rendering).
-Level-of-detail first renders a lower quality preview to increase interactivity.
-If the user stops to interact a normal quality rendering is issued.
-
-The GPU checkbox tries to use computing resources on the graphics card to accelerate volume rendering.
+Any Volume Rendering mode requires a lot of computing resources including processor, memory and often also graphics card.
+The Default selection usually finds the best rendering mode for the available hardware.
+Alternatively, it is possible to manually specify the selections RayCast and GPU.
+The RayCast selection is based on CPU computation and therefore typically slow, but allows to render without hardware acceleration.
+The GPU selection uses computing resources on the graphics card to accelerate volume rendering.
 It requires a powerful graphics card and OpenGL hardware support for shaders, but achieves much higher frame rates than software-rendering.
+
+Blend modes define how the volume voxels intersected by the rendering rays are pooled. The composite mode specifies standard volume rendering, 
+for which each voxel contributes equally with opacity and color. Other blend modes simply visualize the voxel of maximum / 
+minimum intensity and average / add the intentities along the rendering ray.
 
 \section QVV_PresetPage Applying premade presets
 

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkFiberBundle.h>
 #include <mitkTrackingHandlerRandomForest.h>
+#include <mitkTractographyForest.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -187,6 +188,7 @@ int main(int argc, char* argv[])
         c++;
     }
 
+    mitk::TractographyForest::Pointer forest = nullptr;
     if (shfeatures)
     {
         mitk::TrackingHandlerRandomForest<6,28> forestHandler;
@@ -200,10 +202,10 @@ int main(int argc, char* argv[])
         forestHandler.SetMaxTreeDepth(max_tree_depth);
         forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(sampling_distance);
+        forestHandler.SetFiberSamplingStep(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
-        forestHandler.SaveForest(forestFile);
+        forest = forestHandler.GetForest();
     }
     else
     {
@@ -218,11 +220,13 @@ int main(int argc, char* argv[])
         forestHandler.SetMaxTreeDepth(max_tree_depth);
         forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(sampling_distance);
+        forestHandler.SetFiberSamplingStep(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
-        forestHandler.SaveForest(forestFile);
+        forest = forestHandler.GetForest();
     }
+
+    mitk::IOUtil::Save(forest, forestFile);
 
     return EXIT_SUCCESS;
 }

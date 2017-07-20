@@ -2292,6 +2292,20 @@ bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
   return true;
 }
 
+void mitk::FiberBundle::PrintSelf(std::ostream &os, itk::Indent indent) const
+{
+  os << indent << this->GetNameOfClass() << ":\n";
+  os << indent << "Number of fibers: " << this->GetNumFibers() << std::endl;
+  os << indent << "Min. fiber length: " << this->GetMinFiberLength() << std::endl;
+  os << indent << "Max. fiber length: " << this->GetMaxFiberLength() << std::endl;
+  os << indent << "Mean fiber length: " << this->GetMeanFiberLength() << std::endl;
+  os << indent << "Median fiber length: " << this->GetMedianFiberLength() << std::endl;
+  os << indent << "STDEV fiber length: " << this->GetLengthStDev() << std::endl;
+  os << indent << "Number of points: " << this->GetNumberOfPoints() << std::endl;
+  os << indent << "" << this->GetNumberOfPoints() << std::endl;
+  Superclass::PrintSelf(os, indent);
+}
+
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */
 void mitk::FiberBundle::UpdateOutputInformation()
 {

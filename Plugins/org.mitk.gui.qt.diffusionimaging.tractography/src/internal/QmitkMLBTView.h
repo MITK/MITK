@@ -69,8 +69,6 @@ public:
   void OnTrackingThreadStop();
   void StartTrainingThread();
   void OnTrainingThreadStop();
-  void SaveForest();
-  void LoadForest();
   void BuildFibers();
   void ChangeTimerInterval(int value);
   void ToggleDemoMode(int state);
@@ -78,6 +76,8 @@ public:
   void AbortTracking();
   void AddTrainingWidget();
   void RemoveTrainingWidget();
+  void ForestSwitched();
+  void DwiSwitched();
 
 protected:
 
@@ -89,23 +89,21 @@ protected:
 
   mitk::TrackingHandlerRandomForest<6,100>* m_ForestHandler;
 
-  QFutureWatcher<void> m_TrainingWatcher;
-  QFutureWatcher<void> m_TrackingWatcher;
-  bool m_TrackingThreadIsRunning;
-  TrackerType::Pointer tracker;
-  std::shared_ptr<QTimer>   m_TrackingTimer;
-  mitk::DataNode::Pointer m_TractogramNode;
-  mitk::DataNode::Pointer m_SamplingPointsNode;
-  mitk::DataNode::Pointer m_AlternativePointsNode;
-  mitk::DataNode::Pointer m_StopVotePointsNode;
+  QFutureWatcher<void>        m_TrainingWatcher;
+  QFutureWatcher<void>        m_TrackingWatcher;
+  bool                        m_TrackingThreadIsRunning;
+  TrackerType::Pointer        m_Tracker;
+  std::shared_ptr<QTimer>     m_TrackingTimer;
+  mitk::DataNode::Pointer     m_TractogramNode;
+  mitk::DataNode::Pointer     m_SamplingPointsNode;
+  mitk::DataNode::Pointer     m_AlternativePointsNode;
+  mitk::DataNode::Pointer     m_StopVotePointsNode;
 
   std::vector< std::shared_ptr<QmitkMlbstTrainingDataWidget> > m_TrainingWidgets;
 
 private:
 
   bool IsTrainingInputValid(void) const;
-
-  std::string m_LastLoadedForestName;
 
  };
 

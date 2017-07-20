@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <omp.h>
+#include <mitkTractographyForest.h>
 
 #include "mitkTestFixture.h"
 
@@ -63,7 +64,9 @@ public:
         seed = ItkUcharImgType::New();
         mitk::CastToItkImage(img, seed);
 
-        tfh->LoadForest(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"));
+        mitk::TractographyForest::Pointer forest = dynamic_cast<mitk::TractographyForest*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"))[0].GetPointer());
+
+        tfh->SetForest(forest);
         tfh->AddDwi(dwi);
     }
 

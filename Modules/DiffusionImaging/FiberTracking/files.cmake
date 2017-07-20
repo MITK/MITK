@@ -6,6 +6,7 @@ set(CPP_FILES
   IODataStructures/FiberBundle/mitkFiberBundle.cpp
   IODataStructures/FiberBundle/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
+  IODataStructures/mitkTractographyForest.cpp
 
   # Interactions
 
@@ -29,6 +30,7 @@ set(H_FILES
   IODataStructures/FiberBundle/mitkFiberBundle.h
   IODataStructures/FiberBundle/mitkTrackvis.h
   IODataStructures/mitkFiberfoxParameters.h
+  IODataStructures/mitkTractographyForest.h
 
   # Algorithms
   Algorithms/itkTractDensityImageFilter.h

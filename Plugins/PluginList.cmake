@@ -18,7 +18,6 @@ set(MITK_PLUGINS
   #org.mitk.gui.qt.moviemaker:OFF
   #org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   #org.mitk.gui.qt.python:OFF
-  #org.mitk.gui.qt.remeshing:OFF
   #org.mitk.gui.qt.simulation:OFF
   #org.mitk.gui.qt.tubegraph:OFF
   #org.mitk.gui.qt.ugvisualization:OFF
@@ -71,6 +70,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
+  org.mitk.gui.qt.remeshing:ON
 )
 
 IF(MITK_USE_TOF_KINECTV2)

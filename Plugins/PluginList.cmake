@@ -70,7 +70,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
-  org.mitk.gui.qt.remeshing:ON
+  #org.mitk.gui.qt.remeshing:ON
 )
 
 IF(MITK_USE_TOF_KINECTV2)

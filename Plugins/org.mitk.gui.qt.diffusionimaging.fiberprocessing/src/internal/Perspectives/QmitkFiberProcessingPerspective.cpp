@@ -17,16 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFiberProcessingPerspective.h"
 #include "berryIViewLayout.h"
 
-QmitkFiberProcessingPerspective::QmitkFiberProcessingPerspective()
-{
-}
-
-QmitkFiberProcessingPerspective::QmitkFiberProcessingPerspective(const QmitkFiberProcessingPerspective& other)
-{
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-}
-
 void QmitkFiberProcessingPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
     /////////////////////////////////////////////////////

@@ -118,7 +118,7 @@ void QmitkTensorReconstructionView::CreateConnections()
     }
 }
 
-void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
+void QmitkTensorReconstructionView::ResidualClicked(int slice, itk::SizeValueType volume)
 {
     // Use image coord to reset crosshair
 
@@ -154,7 +154,7 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
 
         GradientDirectionContainerType::Pointer dirs = static_cast<mitk::GradientDirectionsProperty*>( diffImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
 
-        for(unsigned int i=0; i<dirs->Size() && i<=volume; i++)
+        for(itk::SizeValueType i=0; i<dirs->Size() && i<=volume; i++)
         {
             GradientDirectionType grad = dirs->ElementAt(i);
 

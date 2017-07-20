@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVectorImageMapper2D.h>
 #include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkImageStatisticsHolder.h>
 
 // Includes for image casting between ITK and MITK
 #include <mitkImageCast.h>
@@ -927,8 +928,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   case INVERSION:
     {
       InversionFilterType::Pointer invFilter = InversionFilterType::New();
-      mitk::ScalarType min = newImage->GetScalarValueMin();
-      mitk::ScalarType max = newImage->GetScalarValueMax();
+      mitk::ScalarType min = newImage->GetStatistics()->GetScalarValueMin();
+      mitk::ScalarType max = newImage->GetStatistics()->GetScalarValueMax();
       invFilter->SetMaximum( max + min );
       invFilter->SetInput(itkImage);
       invFilter->UpdateLargestPossibleRegion();

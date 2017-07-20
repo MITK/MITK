@@ -1589,7 +1589,7 @@ void QmitkPreprocessingView::TemplatedUpdateGui( itk::VectorImage<TPixel, VImage
   }
 }
 
-void QmitkPreprocessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkPreprocessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes)
 {
   (void) nodes;
   this->OnImageSelectionChanged();

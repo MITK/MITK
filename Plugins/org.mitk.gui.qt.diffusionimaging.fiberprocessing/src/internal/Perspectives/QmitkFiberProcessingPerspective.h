@@ -27,8 +27,8 @@ class QmitkFiberProcessingPerspective : public QObject, public berry::IPerspecti
 
 public:
 
-  QmitkFiberProcessingPerspective();
-  QmitkFiberProcessingPerspective(const QmitkFiberProcessingPerspective& other);
+  QmitkFiberProcessingPerspective() {}
+  ~QmitkFiberProcessingPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };

@@ -533,12 +533,12 @@ void QmitkFiberProcessingView::InternalReorientImagePlane( const itk::Image< TPi
     // Direction
     typename ResamplerType::DirectionType direction;
     typename mitk::AffineTransform3D::MatrixType matrix = planegeo->GetIndexToWorldTransform()->GetMatrix();
-    for(int c=0; c<matrix.ColumnDimensions; c++)
+    for(unsigned int c=0; c<matrix.ColumnDimensions; c++)
     {
         double sum = 0;
-        for(int r=0; r<matrix.RowDimensions; r++)
+        for(unsigned int r=0; r<matrix.RowDimensions; r++)
             sum += matrix(r,c)*matrix(r,c);
-        for(int r=0; r<matrix.RowDimensions; r++)
+        for(unsigned int r=0; r<matrix.RowDimensions; r++)
             direction(r,c) = matrix(r,c)/sqrt(sum);
     }
     resampler->SetOutputDirection( direction );
@@ -994,14 +994,14 @@ void QmitkFiberProcessingView::UpdateGui()
     }
 }
 
-void QmitkFiberProcessingView::NodeRemoved(const mitk::DataNode* node)
+void QmitkFiberProcessingView::NodeRemoved(const mitk::DataNode* )
 {
     berry::IWorkbenchPart::Pointer nullPart;
     QList<mitk::DataNode::Pointer> nodes;
     OnSelectionChanged(nullPart, nodes);
 }
 
-void QmitkFiberProcessingView::NodeAdded(const mitk::DataNode* node)
+void QmitkFiberProcessingView::NodeAdded(const mitk::DataNode* )
 {
     berry::IWorkbenchPart::Pointer nullPart;
     QList<mitk::DataNode::Pointer> nodes;

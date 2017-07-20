@@ -42,7 +42,6 @@ class QmitkDiffusionQuantificationView : public QmitkAbstractView
   static const std::string VIEW_ID;
 
   QmitkDiffusionQuantificationView();
-  QmitkDiffusionQuantificationView(const QmitkDiffusionQuantificationView& other);
   virtual ~QmitkDiffusionQuantificationView();
 
   typedef itk::VectorImage< short, 3 >                                    ItkDwiType;

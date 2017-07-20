@@ -73,10 +73,10 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
     m_IconGlyON_C(new QIcon(":/QmitkDiffusionImaging/glyphson_C.png")),
     m_IconGlyOFF_S(new QIcon(":/QmitkDiffusionImaging/glyphsoff_S.png")),
     m_IconGlyON_S(new QIcon(":/QmitkDiffusionImaging/glyphson_S.png")),
-    m_CurrentPickingNode(0),
     m_GlyIsOn_T(false),
     m_GlyIsOn_C(false),
     m_GlyIsOn_S(false),
+    m_CurrentPickingNode(0),
     m_FiberBundleObserverTag(0),
     m_FiberBundleObserveOpacityTag(0)
 {
@@ -643,7 +643,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-        ( renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()->GetCurrentWorldGeometry2D() );
+        ( renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -661,7 +661,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-        ( renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetCurrentWorldGeometry2D() );
+        ( renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -679,7 +679,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-        ( renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer()->GetCurrentWorldGeometry2D() );
+        ( renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -949,19 +949,19 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
 
       mitk::Geometry2D::ConstPointer worldGeometry1 =
-          axialRenderWindow->GetRenderer()->GetCurrentWorldGeometry2D();
+          axialRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane1 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry1.GetPointer() );
       mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
 
       mitk::Geometry2D::ConstPointer worldGeometry2 =
-          sagittalRenderWindow->GetRenderer()->GetCurrentWorldGeometry2D();
+          sagittalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane2 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry2.GetPointer() );
       mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
 
       mitk::Geometry2D::ConstPointer worldGeometry3 =
-          coronalRenderWindow->GetRenderer()->GetCurrentWorldGeometry2D();
+          coronalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane3 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry3.GetPointer() );
       mitk::VnlVector normal3 = _Plane3->GetNormalVnl();

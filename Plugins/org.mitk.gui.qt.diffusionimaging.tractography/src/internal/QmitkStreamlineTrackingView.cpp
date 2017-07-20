@@ -227,7 +227,7 @@ void QmitkStreamlineTrackingView::DeleteTrackingHandler()
   }
 }
 
-void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes )
+void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes )
 {
   m_InputImageNodes.clear();
   m_InputImages.clear();

@@ -60,8 +60,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*/)
   : QmitkAbstractView(),
     m_Controls(nullptr),
-    m_SelectedNode(0),
-    m_BackgroundColor(QColor(0,0,0))
+    m_BackgroundColor(QColor(0,0,0)),
+    m_SelectedNode(0)
 {
   parentWidget = parent;
 }

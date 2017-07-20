@@ -81,7 +81,7 @@ void RemoveDwiChannelFilter< TInPixelType>::BeforeThreadedGenerateData()
 }
 
 template< class TInPixelType >
-void RemoveDwiChannelFilter< TInPixelType>::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType id )
+void RemoveDwiChannelFilter< TInPixelType>::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 

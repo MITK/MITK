@@ -56,12 +56,6 @@ QmitkDiffusionQuantificationView::QmitkDiffusionQuantificationView()
     m_DwImages = mitk::DataStorage::SetOfObjects::New();
 }
 
-QmitkDiffusionQuantificationView::QmitkDiffusionQuantificationView(const QmitkDiffusionQuantificationView& other)
-{
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-}
-
 QmitkDiffusionQuantificationView::~QmitkDiffusionQuantificationView()
 {
 

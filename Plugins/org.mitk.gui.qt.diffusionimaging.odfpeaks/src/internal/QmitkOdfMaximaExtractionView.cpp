@@ -454,7 +454,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image* img)
   }
 }
 
-void QmitkOdfMaximaExtractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkOdfMaximaExtractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes)
 {
   (void) nodes;
   this->OnImageSelectionChanged();

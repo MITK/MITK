@@ -162,7 +162,7 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
   const mitk::SliceNavigationController::GeometryTimeEvent* timeEvent =
       dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent*>(&e);
   assert(timeEvent != nullptr);
-  unsigned int timestep = timeEvent->GetPos();
+  int timestep = timeEvent->GetPos();
 
   if (this->m_SelectedImage->GetTimeSteps() > 1)
   {
@@ -641,7 +641,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
   if (m_SelectedPlanarFigure != nullptr && m_SelectedImage == nullptr)
   {
     mitk::DataStorage::SetOfObjects::ConstPointer parentSet = this->GetDataStorage()->GetSources(planarFigureNode);
-    for (int i=0; i<parentSet->Size(); i++)
+    for (unsigned int i=0; i<parentSet->Size(); i++)
     {
       mitk::DataNode::Pointer node = parentSet->ElementAt(i);
       if( imagePredicate->CheckNode(node) )
@@ -1014,7 +1014,6 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     }
 
     typedef mitk::ImageStatisticsCalculator::StatisticsContainer::RealType RealType;
-    RealType maxVal = std::numeric_limits<RealType>::max();
 
     this->m_Controls->m_StatisticsTable->setItem( 0, t, new QTableWidgetItem(
         QString("%1").arg(s[t]->GetMean(), 0, 'f', decimals) ) );
@@ -1030,7 +1029,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
 
     QString max; max.append(QString("%1").arg(s[t]->GetMax(), 0, 'f', decimals));
     max += " (";
-    for (int i=0; i<s[t]->GetMaxIndex().size(); i++)
+    for (unsigned int i=0; i<s[t]->GetMaxIndex().size(); i++)
     {
       max += QString::number(s[t]->GetMaxIndex()[i]);
       if (i<s[t]->GetMaxIndex().size()-1)
@@ -1041,7 +1040,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
 
     QString min; min.append(QString("%1").arg(s[t]->GetMin(), 0, 'f', decimals));
     min += " (";
-    for (int i=0; i<s[t]->GetMinIndex().size(); i++)
+    for (unsigned int i=0; i<s[t]->GetMinIndex().size(); i++)
     {
       min += QString::number(s[t]->GetMinIndex()[i]);
       if (i<s[t]->GetMinIndex().size()-1)
@@ -1301,7 +1300,7 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
 
   m_PlanarFigureStatistics = this->CalculateStatisticsForPlanarFigure(image);
 
-  for (int i = 0; i< m_PlanarFigureStatistics.size(); i++)
+  for (unsigned int i = 0; i< m_PlanarFigureStatistics.size(); i++)
   {
     this->m_Controls->m_StatisticsTable->setItem( i, 0, new QTableWidgetItem(m_PlanarFigureStatistics[i] ));
   }
@@ -1323,7 +1322,7 @@ void QmitkImageStatisticsView::InvalidateStatisticsTableView()
   this->m_Controls->m_StatisticsTable->horizontalHeader()->setVisible(false);
   this->m_Controls->m_StatisticsTable->setColumnCount(1);
 
-  for ( unsigned int i = 0; i < this->m_Controls->m_StatisticsTable->rowCount(); ++i )
+  for ( int i = 0; i < this->m_Controls->m_StatisticsTable->rowCount(); ++i )
   {
     {
       this->m_Controls->m_StatisticsTable->setItem( i, 0, new QTableWidgetItem( "NA" ) );

@@ -82,6 +82,7 @@ const std::string QmitkGibbsTrackingView::VIEW_ID = "org.mitk.views.gibbstrackin
 QmitkGibbsTrackingView::QmitkGibbsTrackingView()
     : QmitkAbstractView()
     , m_Controls( 0 )
+    , m_TrackingNode(nullptr)
     , m_FiberBundle(nullptr)
     , m_MaskImage(nullptr)
     , m_TensorImage(nullptr)
@@ -95,7 +96,6 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
     , m_ElapsedTime(0)
     , m_GlobalTracker(nullptr)
     , m_TrackingWorker(this)
-    , m_TrackingNode(nullptr)
 {
     m_TrackingWorker.moveToThread(&m_TrackingThread);
     connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));

@@ -272,7 +272,7 @@ void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
 
 template< class TTensorPixelType>
 void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
-::PrintSelf(std::ostream& os, Indent indent) const
+::PrintSelf(std::ostream& , Indent ) const
 {
 }
 

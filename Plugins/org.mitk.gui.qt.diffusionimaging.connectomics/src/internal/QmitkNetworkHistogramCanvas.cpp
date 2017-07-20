@@ -25,8 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qwt_legend.h>
 #include <qwt_plot_marker.h>
 
-QmitkNetworkHistogramCanvas::QmitkNetworkHistogramCanvas(QWidget * parent,
-    Qt::WindowFlags f)
+QmitkNetworkHistogramCanvas::QmitkNetworkHistogramCanvas(QWidget * parent, Qt::WindowFlags )
     : QmitkPlotWidget(parent)
 {
   setEnabled(false);

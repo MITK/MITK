@@ -417,17 +417,17 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-void QmitkFiberfoxView::OnMaskSelected(int value)
+void QmitkFiberfoxView::OnMaskSelected(int )
 {
   UpdateGui();
 }
 
-void QmitkFiberfoxView::OnTemplateSelected(int value)
+void QmitkFiberfoxView::OnTemplateSelected(int )
 {
   UpdateGui();
 }
 
-void QmitkFiberfoxView::OnFibSelected(int value)
+void QmitkFiberfoxView::OnFibSelected(int )
 {
   UpdateGui();
 }
@@ -675,12 +675,12 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     {
       stringstream stream( parameters.m_Misc.m_MotionVolumesBox );
       std::vector<int> numbers;
-      int nummer = std::numeric_limits<int>::max();
-      while( stream >> nummer )
+      int number = std::numeric_limits<int>::max();
+      while( stream >> number )
       {
-        if( nummer < std::numeric_limits<int>::max() )
+        if( number < std::numeric_limits<int>::max() )
         {
-          numbers.push_back( nummer );
+          numbers.push_back( number );
         }
       }
 
@@ -695,7 +695,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         // set all true except those given.
         for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter  )
         {
-          if ( -(*iter) < parameters.m_SignalGen.GetNumVolumes() && -(*iter) >= 0 )
+          if ( -(*iter) < (int)parameters.m_SignalGen.GetNumVolumes() && -(*iter) >= 0 )
           {
             parameters.m_SignalGen.m_MotionVolumes.at( -(*iter) ) = false;
           }
@@ -714,7 +714,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         // set all false except those given.
         for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter )
         {
-          if ( *iter < parameters.m_SignalGen.GetNumVolumes() && *iter >= 0 )
+          if ( *iter < (int)parameters.m_SignalGen.GetNumVolumes() && *iter >= 0 )
           {
             parameters.m_SignalGen.m_MotionVolumes.at( *iter ) = true;
           }
@@ -732,7 +732,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     {
       MITK_WARN << "QmitkFiberfoxView.cpp: Unrecognised parameters.m_Misc.m_MotionVolumesBox: " << parameters.m_Misc.m_MotionVolumesBox;
       parameters.m_Misc.m_MotionVolumesBox = "random"; // set default.
-      for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+      for (unsigned int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
       {
         parameters.m_SignalGen.m_MotionVolumes.push_back(rand()%2);
       }

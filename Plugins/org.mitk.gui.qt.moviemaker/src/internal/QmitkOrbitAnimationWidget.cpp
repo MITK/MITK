@@ -47,7 +47,7 @@ void QmitkOrbitAnimationWidget::SetAnimationItem(QmitkAnimationItem* orbitAnimat
 }
 
 
-void QmitkOrbitAnimationWidget::OnOrbitChanged(int orbit)
+void QmitkOrbitAnimationWidget::OnOrbitChanged(int )
 {
   if (m_AnimationItem == nullptr)
     return;

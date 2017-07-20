@@ -50,7 +50,6 @@ QmitkFreeSurferParcellationHandler::~QmitkFreeSurferParcellationHandler()
 void QmitkFreeSurferParcellationHandler::Notify(InteractionEvent *interactionEvent, bool isHandled)
 {
   Q_UNUSED( isHandled )
-  typedef itk::VectorContainer<unsigned int, mitk::DataNode::Pointer> SetOfObjects;
   BaseRenderer* sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
   TNodePredicateDataType<Image>::Pointer isImageData = TNodePredicateDataType<Image>::New();

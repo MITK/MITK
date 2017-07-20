@@ -14,9 +14,11 @@ Available sections:
 
 Input:
 
+Select the data you want to track on in the datamanager. Supported file types are:
 \li One or multiple DTI images selected in the datamanager.
-\li One ODF image (e.g. obtained using MITK Q-ball reconstruction or MRtrix CSD).
-\li One peak image in MRtrix format (4D float image).
+\li One ODF image, e.g. obtained using MITK Q-ball reconstruction or MRtrix CSD (tractography similar to [6]).
+\li One peak image (4D float image).
+\li One raw diffusion-weighted image for machine learning based tractography [1].
 
 Optional Input:
 
@@ -25,11 +27,11 @@ Optional Input:
 \li Binary mask used to define stopping regions. Streamlines that enter the mask area are stopped immediately.
 \li Tissue label image needed for gray matter seeding (WM=3, GM=1). Use e.g. MRtrix 5ttgen to generate such a label image.
 \li FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
+\li Tractography Forest: Needed for machine learning based tractography [1].
 
 \section StrTrackUserManualInteractive Interactive Tractography
 
-Interactive tractography enables the dynamic placement of spherical seed regions simply by clicking into the image. Parameters are the number of seed points and the radius of the spherical seed region. The seed points are randomly distributed inside the sphere around the selected position. By clicking and holding the left mouse button while moving the mouse around the image, the fiber connections originating from the selected region can be explored dynamically.
-
+Interactive tractography enables the dynamic placement of spherical seed regions simply by clicking into the image (similar to [5]). Parameters are the number of seed points and the radius of the spherical seed region. The seed points are randomly distributed inside the sphere around the selected position. By clicking and holding the left mouse button while moving the mouse around the image, the fiber connections originating from the selected region can be explored dynamically.
 When "Update on Parameter Change" is checked, each parameter change causes an instant retracking with the new parameters. This enables an intuitive exploration of the effcts that the individual parameters have on the resulting tractogram.
 
 \section StrTrackUserManualParameters Parameters
@@ -45,17 +47,28 @@ When "Update on Parameter Change" is checked, each parameter change causes an in
 \li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
 \li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 \li Min. Tract Length: Shorter fibers are discarded.
-\li f and g values to balance between FACT [1] and TEND [2,3] tracking (only for tensor based tractography). For further information please refer to [2,3]
+\li f and g values to balance between FACT [2] and TEND [3,4] tracking (only for tensor based tractography). For further information please refer to [2,3]
 \li Flip directions: Internally flips progression directions. This might be necessary depending on the input data.
-\li Neighborhood Samples: Number of neighborhood samples that are used to determine the next fiber progression direction [4].
-\li Compress Fibers: Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
 \li Enable Trilinear Interpolation: By default the image values are interpolated. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
-\li Output Probability Map: No streamline are generated. Instead, the tractography outputs a probability map that indicates the probability of a fiber to reach a voxel from the selected seed region. For this measure to be sensible, the number of seeds per voxel needs to be rather large. This option does not work during interactive tractography.
 \li Enable Gray Matter Seeding: Seeds are onyl placed inside of the gray matter. Needs tissue label image.
+
+\section StrTrackUserManualAdvancedParameters Neighbourhood Sampling (for details see [1])
+\li Neighborhood Samples: Number of neighborhood samples that are used to determine the next fiber progression direction.
+\li Sampling Distance: Distance of the sampling positions from the current streamline position (in voxels).
+\li Use Only Frontal Samples: Only neighborhood samples in front of the current streamline position are considered.
+\li Use Stop-Votes: If checked, the majority of sampling points has to place a stop-vote for the streamline to terminate. If not checked, all sampling positions have to vote for a streamline termination.
+
+\section StrTrackUserManualAdvancedParameters Output and Postprocessing
+\li Compress Fibers: Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
+\li Output Probability Map: No streamline are generated. Instead, the tractography outputs a probability map that indicates the probability of a fiber to reach a voxel from the selected seed region. For this measure to be sensible, the number of seeds per voxel needs to be rather large.
 
 \section StrTrackUserManualReferences References
 
-[1] Mori et al. Annals Neurology 1999\n
-[2] Weinstein et al. Proceedings of IEEE Visualization 1999\n
-[3] Lazar et al. Human Brain Mapping 2003\n
+[1] Neher, Peter F., Marc-Alexandre Côté, Jean-Christophe Houde, Maxime Descoteaux, and Klaus H. Maier-Hein. “Fiber Tractography Using Machine Learning.” NeuroImage. Accessed July 19, 2017. doi:10.1016/j.neuroimage.2017.07.028.\n
+[2] Mori, Susumu, Walter E. Kaufmann, Godfrey D. Pearlson, Barbara J. Crain, Bram Stieltjes, Meiyappan Solaiyappan, and Peter C. M. Van Zijl. “In Vivo Visualization of Human Neural Pathways by Magnetic Resonance Imaging.” Annals of Neurology 47 (2000): 412–414.\n
+[3] Weinstein, David, Gordon Kindlmann, and Eric Lundberg. “Tensorlines: Advection-Diffusion Based Propagation through Diffusion Tensor Fields.” In Proceedings of the Conference on Visualization’99: Celebrating Ten Years, 249–253, n.d.\n
+[4] Lazar, Mariana, David M. Weinstein, Jay S. Tsuruda, Khader M. Hasan, Konstantinos Arfanakis, M. Elizabeth Meyerand, Benham Badie, et al. “White Matter Tractography Using Diffusion Tensor Deflection.” Human Brain Mapping 18, no. 4 (2003): 306–321.\n
+[5] Chamberland, M., K. Whittingstall, D. Fortin, D. Mathieu, and M. Descoteaux. “Real-Time Multi-Peak Tractography for Instantaneous Connectivity Display.” Front Neuroinform 8 (2014): 59. doi:10.3389/fninf.2014.00059.\n
+[6] Tournier, J-Donald, Fernando Calamante, and Alan Connelly. “MRtrix: Diffusion Tractography in Crossing Fiber Regions.” International Journal of Imaging Systems and Technology 22, no. 1 (March 2012): 53–66. doi:10.1002/ima.22005.
+
 */

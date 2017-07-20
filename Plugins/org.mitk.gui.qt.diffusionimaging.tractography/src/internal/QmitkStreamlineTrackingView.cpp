@@ -514,7 +514,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   {
     if ( m_Controls->m_ForestBox->GetSelectedNode().IsNull() )
     {
-      QMessageBox::information(nullptr, "Information", "Not random forest for machine-learning based tractography selected.");
+      QMessageBox::information(nullptr, "Information", "Not random forest for machine learning based tractography selected.");
       return;
     }
 

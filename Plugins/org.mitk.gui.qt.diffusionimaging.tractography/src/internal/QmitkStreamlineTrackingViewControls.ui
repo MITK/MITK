@@ -199,7 +199,7 @@
       <item row="7" column="1">
        <widget class="QmitkDataStorageComboBox" name="m_ForestBox">
         <property name="toolTip">
-         <string>Random forest for machine-learning based tractography.</string>
+         <string>Random forest for machine learning based tractography.</string>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
@@ -1011,9 +1011,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>m_InterpolationBox</zorder>
-     <zorder>frame_5</zorder>
-     <zorder>m_OutputProbMap</zorder>
     </widget>
    </item>
   </layout>

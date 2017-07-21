@@ -235,7 +235,7 @@ void QmitkDataManagerLightView::ToggleVisibility()
 {
     bool changedAnything = false;
     bool isVisible = false;
-    for(size_t i=0; i<d->m_DataNodes.size(); ++i)
+    for(int i=0; i<d->m_DataNodes.size(); ++i)
     {
         isVisible = false;
         d->m_DataNodes.at(i)->GetVisibility(isVisible, 0 );

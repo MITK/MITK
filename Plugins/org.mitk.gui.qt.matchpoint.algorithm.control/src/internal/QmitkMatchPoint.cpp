@@ -113,7 +113,7 @@ const map::deployment::DLLInfo* QmitkMatchPoint::GetSelectedAlgorithmDLL() const
   return m_SelectedAlgorithmInfo;
 }
 
-void QmitkMatchPoint::OnMaskCheckBoxToggeled(bool checked)
+void QmitkMatchPoint::OnMaskCheckBoxToggeled(bool)
 {
   if (!m_Working)
   {
@@ -694,8 +694,8 @@ void QmitkMatchPoint::ConfigureProgressInfos()
   m_Controls.m_progBarLevel->reset();
 }
 
-void QmitkMatchPoint::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPoint::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+    const QList<mitk::DataNode::Pointer>&)
 {
   if (!m_Working)
   {

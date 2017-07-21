@@ -106,7 +106,7 @@ void QmitkMatchPointBrowser::OnAlgoListSelectionChanged(const QModelIndex& index
 
     if (vIndex.isValid())
     {
-        int algListIndex = vIndex.toInt();
+        std::size_t algListIndex = vIndex.toInt();
 
         if (algListIndex < m_DLLInfoList.size())
         {

@@ -78,12 +78,12 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(berry::IWorkbenchP
   bool foundStartRoi = false;
   bool foundEndRoi = false;
 
-  mitk::TbssRoiImage* roiImage;
-  mitk::TbssImage* image;
-  mitk::Image* img;
-  mitk::FiberBundle* fib;
-  mitk::DataNode* start;
-  mitk::DataNode* end;
+  mitk::TbssRoiImage* roiImage = nullptr;
+  mitk::TbssImage* image = nullptr;
+  mitk::Image* img = nullptr;
+  mitk::FiberBundle* fib = nullptr;
+  mitk::DataNode* start = nullptr;
+  mitk::DataNode* end = nullptr;
 
   m_CurrentStartRoi = nullptr;
   m_CurrentEndRoi = nullptr;

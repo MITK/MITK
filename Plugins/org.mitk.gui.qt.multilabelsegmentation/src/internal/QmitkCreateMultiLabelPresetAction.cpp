@@ -76,12 +76,12 @@ void QmitkCreateMultiLabelPresetAction::SetFunctionality(berry::QtViewPart* /*fu
   //not needed
 }
 
-void QmitkCreateMultiLabelPresetAction::SetSmoothed(bool smoothed)
+void QmitkCreateMultiLabelPresetAction::SetSmoothed(bool)
 {
   //not needed
 }
 
-void QmitkCreateMultiLabelPresetAction::SetDecimated(bool decimated)
+void QmitkCreateMultiLabelPresetAction::SetDecimated(bool)
 {
   //not needed
 }

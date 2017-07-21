@@ -112,12 +112,8 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonAdvancedSettings, SIGNAL(clicked()), this, SLOT(OnAdvancedSettingsButtonToggled()));
   connect(m_Controls.spinBoxOutsidePixelValue, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 
-  m_Controls.spinBoxOutsidePixelValue->setEnabled(false);
-  m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
-  m_Controls.buttonCropping->setEnabled(false);
-  m_Controls.boundingShapeSelector->setEnabled(false);
+  setDefaultGUI();
   m_Controls.labelWarningRotation->setVisible(false);
-  m_Controls.buttonAdvancedSettings->setEnabled(false);
 
   m_Advanced = false;
   this->OnAdvancedSettingsButtonToggled();
@@ -133,7 +129,7 @@ void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode*)
   if (m_CroppingObjectNode.IsNotNull() && dynamic_cast<mitk::GeometryData*>(this->m_CroppingObjectNode->GetData()))
   {
     m_Controls.buttonAdvancedSettings->setEnabled(true);
-    m_Controls.labelWarningBB->setText(QString::fromStdString(""));
+    m_Controls.labelWarningBB->setVisible(false);
     m_CroppingObject = dynamic_cast<mitk::GeometryData*>(m_CroppingObjectNode->GetData());
     m_Advanced = true;
 
@@ -142,7 +138,7 @@ void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode*)
   }
   else
   {
-    m_Controls.buttonAdvancedSettings->setEnabled(false);
+    setDefaultGUI();
     m_CroppingObject = nullptr;
     m_BoundingShapeInteractor->EnableInteraction(false);
     m_BoundingShapeInteractor->SetDataNode(nullptr);
@@ -203,6 +199,7 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
     m_Controls.buttonCropping->setEnabled(true);
     m_Controls.buttonMasking->setEnabled(true);
     m_Controls.boundingShapeSelector->setEnabled(true);
+    m_Controls.groupImageSettings->setEnabled(true);
 
     // get current timestep to support 3d+t images
     auto renderWindowPart = this->GetRenderWindowPart(OPEN);
@@ -241,14 +238,22 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
 }
 void QmitkImageCropper::setDefaultGUI()
 {
-  m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-  m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
-  m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-  m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
-  m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
-  m_Controls.buttonCropping->setEnabled(false);
-  m_Controls.buttonMasking->setEnabled(false);
+	m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+	m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
+  m_Controls.labelWarningImage->setVisible(true);
+	m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+	m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
+  m_Controls.labelWarningBB->setVisible(true);
+	m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
   m_Controls.labelWarningRotation->setVisible(false);
+	m_Controls.buttonCropping->setEnabled(false);
+	m_Controls.buttonMasking->setEnabled(false);
+	m_Controls.labelWarningRotation->setVisible(false);
+  m_Controls.boundingShapeSelector->setEnabled(false);
+  m_Controls.buttonAdvancedSettings->setEnabled(false);
+  m_Controls.groupImageSettings->setEnabled(false);
+  m_Controls.checkOverwriteImage->setChecked(false);
+  m_Controls.checkBoxCropTimeStepOnly->setChecked(false);
 }
 
 void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
@@ -354,18 +359,12 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
           m_Controls.buttonCropping->setEnabled(false);
           m_Controls.buttonMasking->setEnabled(false);
           m_Controls.boundingShapeSelector->setEnabled(false);
-          m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-          m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
+          m_Controls.labelWarningBB->setVisible(true);
         }
         return;
       }
       //  iterate all selected objects, adjust warning visibility
-      m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-      m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
-      m_Controls.buttonCropping->setEnabled(false);
-      m_Controls.buttonMasking->setEnabled(false);
-      m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
-      m_Controls.boundingShapeSelector->setEnabled(false);
+      setDefaultGUI();
       m_ParentWidget->setEnabled(true);
       m_Controls.labelWarningRotation->setVisible(false);
     }

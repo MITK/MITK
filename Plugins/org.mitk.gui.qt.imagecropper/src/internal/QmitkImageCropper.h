@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QProgressDialog>
 #include "QVTKWidget.h"
 #include "QmitkRegisterClasses.h"
+#include <QList>
 
 #include "itkCommand.h"
 #include <itkImage.h>
@@ -158,10 +159,14 @@ private:
 
   void ProcessImage(bool crop);
 
+  QList<QString> m_BoundingObjectNames;
+
   /*!
   * @brief Resets GUI to default  
   */
   void setDefaultGUI();
+
+  QString getAdaptedBoundingObjectName(const QString& name) const;
 
   // cropping parameter
   mitk::ScalarType m_CropOutsideValue;

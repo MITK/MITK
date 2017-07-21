@@ -182,13 +182,35 @@ mitk::Geometry3D::Pointer QmitkImageCropper::InitializeWithImageGeometry(mitk::B
   return boundingGeometry;
 }
 
+QString QmitkImageCropper::getAdaptedBoundingObjectName(const QString& name) const
+{
+  bool nameNotTaken = false;
+  unsigned int counter = 2;
+  QString newName;
+  while (!nameNotTaken)
+  {
+    newName = name + "_" + QString::number(counter);
+    if (!m_BoundingObjectNames.contains(newName))
+    {
+      nameNotTaken = true;
+    }
+    ++counter;
+  }
+  return newName;
+}
+
 void QmitkImageCropper::DoCreateNewBoundingObject()
 {
   if (m_ImageNode.IsNotNull())
   {
     bool ok = false;
+    QString defaultName = "BoundingShape";
+    if (m_BoundingObjectNames.contains(defaultName))
+    {
+      defaultName = getAdaptedBoundingObjectName(defaultName);
+    }
     QString name = QInputDialog::getText(QApplication::activeWindow()
-      , "Add cropping shape...", "Enter name for the new cropping shape", QLineEdit::Normal, "BoundingShape", &ok);
+      , "Add cropping shape...", "Enter name for the new cropping shape", QLineEdit::Normal, defaultName, &ok);
     if (!ok)
       return;
 
@@ -196,6 +218,13 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   {
     name = "Bounding Shape";
   }
+  if (m_BoundingObjectNames.contains(name))
+  {
+    name = getAdaptedBoundingObjectName(name);
+    QMessageBox::information(nullptr, "Information", "Bounding object name already exists. It was changed to: " + name);
+  }
+    m_BoundingObjectNames.append(name);
+
     m_Controls.buttonCropping->setEnabled(true);
     m_Controls.buttonMasking->setEnabled(true);
     m_Controls.boundingShapeSelector->setEnabled(true);
@@ -248,7 +277,6 @@ void QmitkImageCropper::setDefaultGUI()
   m_Controls.labelWarningRotation->setVisible(false);
 	m_Controls.buttonCropping->setEnabled(false);
 	m_Controls.buttonMasking->setEnabled(false);
-	m_Controls.labelWarningRotation->setVisible(false);
   m_Controls.boundingShapeSelector->setEnabled(false);
   m_Controls.buttonAdvancedSettings->setEnabled(false);
   m_Controls.groupImageSettings->setEnabled(false);

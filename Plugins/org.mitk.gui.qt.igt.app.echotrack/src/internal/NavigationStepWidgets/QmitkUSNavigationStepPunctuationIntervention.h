@@ -97,6 +97,9 @@ protected:
   /** Checks if the given line intersects the given sphere. */
   bool CheckSphereLineIntersection(mitk::Point3D& sphereOrigin, float& sphereRadius, mitk::Point3D& lineStart, mitk::Point3D& lineEnd);
 
+private:
+  Ui::QmitkUSNavigationStepPunctuationIntervention *m_Ui;
+
   mitk::DataStorage::SetOfObjects::ConstPointer m_ZoneNodes;
 
     /**
@@ -111,9 +114,6 @@ protected:
   vtkSmartPointer<vtkSphereSource> m_SphereSource;
   vtkSmartPointer<vtkOBBTree> m_OBBTree;
   vtkSmartPointer<vtkPoints> m_IntersectPoints;
-
-private:
-  Ui::QmitkUSNavigationStepPunctuationIntervention *ui;
 };
 
 #endif // QMITKUSNAVIGATIONSTEPPUNCTUATIONINTERVENTION_H

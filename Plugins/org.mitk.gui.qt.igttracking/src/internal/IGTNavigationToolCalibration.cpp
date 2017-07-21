@@ -171,7 +171,7 @@ void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
     //2: Compute mean orientation
     mitk::Quaternion meanOrientation;
     std::vector <mitk::Quaternion> allOrientations = std::vector <mitk::Quaternion>();
-    for (int i = 0; i < m_LoggedNavigationDataDifferences.size(); i++) { allOrientations.push_back(m_LoggedNavigationDataDifferences.at(i)->GetOrientation()); }
+    for (std::size_t i = 0; i < m_LoggedNavigationDataDifferences.size(); i++) { allOrientations.push_back(m_LoggedNavigationDataDifferences.at(i)->GetOrientation()); }
     meanOrientation = mitk::QuaternionAveraging::CalcAverage(allOrientations);
     this->m_Controls.m_ResultOfCalibrationOrientation->setText(
       QString("qx: ") + QString(QString::number(meanOrientation.x(), 103, 3)) +
@@ -299,7 +299,7 @@ void IGTNavigationToolCalibration::OnComputePivot()
 {
 
   mitk::PivotCalibration::Pointer myPivotCalibration = mitk::PivotCalibration::New();
-  for (int i = 0; i < this->m_PivotPoses.size(); i++)
+  for (std::size_t i = 0; i < this->m_PivotPoses.size(); i++)
   {
     myPivotCalibration->AddNavigationData(m_PivotPoses.at(i));
   }

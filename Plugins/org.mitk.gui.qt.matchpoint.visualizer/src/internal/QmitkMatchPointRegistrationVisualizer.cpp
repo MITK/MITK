@@ -611,8 +611,8 @@ void QmitkMatchPointRegistrationVisualizer::CheckAndSetDefaultFOVRef()
 }
 
 void QmitkMatchPointRegistrationVisualizer::OnSelectionChanged(
-    berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& nodes)
+    berry::IWorkbenchPart::Pointer,
+    const QList<mitk::DataNode::Pointer>&)
 {
     this->CheckInputs();
     this->LoadStateFromNode();
@@ -655,7 +655,7 @@ void QmitkMatchPointRegistrationVisualizer::ActualizeRegInfo(mitk::MAPRegistrati
 
 }
 
-void QmitkMatchPointRegistrationVisualizer::OnDirectionChanged(int index)
+void QmitkMatchPointRegistrationVisualizer::OnDirectionChanged(int)
 {
     this->CheckAndSetDefaultFOVRef();
     this->ConfigureVisualizationControls();

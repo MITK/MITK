@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Colortables/HotIron.h>
 #include <Colortables/PETColor.h>
 #include <Colortables/PET20.h>
+#include <Colortables/ASISTaLUT.h>
 
 const char* const mitk::LookupTable::typenameList[] =
 {
@@ -39,6 +40,7 @@ const char* const mitk::LookupTable::typenameList[] =
   "Multilabel",
   "PET Color",
   "PET 20",
+  "ASIST-Japan a-LUT",
   "END_OF_ARRAY" // Do not add typenames after this entry (see QmitkDataManagerView::ColormapMenuAboutToShow())
 };
 
@@ -110,6 +112,9 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
     break;
   case (mitk::LookupTable::LEGACY_RAINBOW_COLOR):
     this->BuildLegacyRainbowColorLookupTable();
+    break;
+  case (mitk::LookupTable::ASIST_JAPAN_A_LUT):
+    this->BuildASISTaLUTLookupTable();
     break;
   default:
     MITK_ERROR << "non-existing colormap";
@@ -573,6 +578,22 @@ void mitk::LookupTable::BuildLegacyRainbowColorLookupTable()
   lut->SetHueRange(0.6667, 0.0);
   lut->SetTableRange(0.0, 20.0);
   lut->Build();
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
+void mitk::LookupTable::BuildASISTaLUTLookupTable()
+{
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+
+  lut->SetNumberOfTableValues(256);
+  lut->SetTableRange((m_Level - m_Window / 2.0), (m_Level + m_Window / 2.0));
+  lut->Build();
+
+  for (int i = 0; i < 256; i++) {
+    lut->SetTableValue(i, (double)ASIST_ALUT[i][0] / 255.0, (double)ASIST_ALUT[i][1] / 255.0, (double)ASIST_ALUT[i][2] / 255.0, 1.0);
+  }
 
   m_LookupTable = lut;
   this->Modified();

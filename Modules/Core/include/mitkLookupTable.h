@@ -212,7 +212,8 @@ public:
     LEGACY_RAINBOW_COLOR,
     MULTILABEL,
     PET_COLOR,
-    PET_20
+    PET_20,
+    ASIST_JAPAN_A_LUT
   };
 
   static const char* const typenameList[];
@@ -250,6 +251,7 @@ protected:
   virtual void BuildPETColorLookupTable();
   virtual void BuildPET20LookupTable();
   virtual void BuildMultiLabelLookupTable();
+  virtual void BuildASISTaLUTLookupTable();
 
   vtkSmartPointer<vtkLookupTable> m_LookupTable;
 

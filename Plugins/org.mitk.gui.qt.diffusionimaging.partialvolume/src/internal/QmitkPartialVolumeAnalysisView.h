@@ -220,7 +220,6 @@ protected:
   mitk::Image::Pointer m_RDImage;
   mitk::Image::Pointer m_ADImage;
   mitk::Image::Pointer m_MDImage;
-//  mitk::Image::Pointer m_DirectionImage;
   mitk::Image::Pointer m_DirectionComp1Image;
   mitk::Image::Pointer m_DirectionComp2Image;
   mitk::Image::Pointer m_AngularErrorImage;
@@ -247,14 +246,12 @@ protected:
   bool m_NumberBinsSliding;
   bool m_UpsamplingChangedSliding;
 
-  bool m_Visible;
-
   mitk::DataNode::Pointer m_ClusteringResult;
 
   int m_EllipseCounter;
   int m_RectangleCounter;
   int m_PolygonCounter;
-  unsigned int m_InitializedObserverTag;
+  long m_InitializedObserverTag;
   bool m_CurrentFigureNodeInitialized;
 
   int m_QuantifyClass;
@@ -262,12 +259,12 @@ protected:
   ClusteringType::HelperStructPerformRGBClusteringRetval* m_CurrentRGBClusteringResults;
   ClusteringType::HelperStructPerformClusteringRetval *m_CurrentPerformClusteringResults;
 
-//  mitk::DataNode::Pointer m_newnode;
-//  mitk::DataNode::Pointer m_newnode2;
   QIcon* m_IconTexOFF;
   QIcon* m_IconTexON;
   bool m_TexIsOn;
+
+  bool m_Visible;
 };
 
 
-#endif // !defined(QmitkPartialVolumeAnalysis_H__INCLUDED)
+#endif

@@ -111,37 +111,21 @@ inline bool my_isnan(float x)
 
 QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject * /*parent*/, const char * /*name*/)
     : QmitkAbstractView(),
-      m_Controls( nullptr ),
-      m_TimeStepperAdapter( nullptr ),
-      m_MeasurementInfoRenderer(0),
-      m_MeasurementInfoAnnotation(0),
-      m_SelectedImageNodes(  ),
-      m_SelectedImage( nullptr ),
-      m_SelectedMaskNode( nullptr ),
-      m_SelectedImageMask( nullptr ),
-      m_SelectedPlanarFigureNodes(0),
-      m_SelectedPlanarFigure( nullptr ),
+      m_Controls(nullptr),
+      m_TimeStepperAdapter(nullptr),
+      m_MeasurementInfoRenderer(nullptr),
+      m_MeasurementInfoAnnotation(nullptr),
       m_IsTensorImage(false),
-      m_FAImage(0),
-      m_RDImage(0),
-      m_ADImage(0),
-      m_MDImage(0),
-      m_CAImage(0),
-      //  m_DirectionImage(0),
-      m_DirectionComp1Image(0),
-      m_DirectionComp2Image(0),
-      m_AngularErrorImage(0),
       m_SelectedRenderWindow(nullptr),
       m_LastRenderWindow(nullptr),
-      m_ImageObserverTag( -1 ),
-      m_ImageMaskObserverTag( -1 ),
-      m_PlanarFigureObserverTag( -1 ),
-      m_CurrentStatisticsValid( false ),
-      m_StatisticsUpdatePending( false ),
+      m_ImageObserverTag(-1),
+      m_ImageMaskObserverTag(-1),
+      m_PlanarFigureObserverTag(-1),
+      m_CurrentStatisticsValid(false),
+      m_StatisticsUpdatePending(false),
       m_GaussianSigmaChangedSliding(false),
       m_NumberBinsSliding(false),
       m_UpsamplingChangedSliding(false),
-      m_ClusteringResult(nullptr),
       m_EllipseCounter(0),
       m_RectangleCounter(0),
       m_PolygonCounter(0),
@@ -414,7 +398,7 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
 
     itk::ImageRegionIterator<SegImageType>
             itimage(caster->GetOutput(), caster->GetOutput()->GetLargestPossibleRegion());
-    itimage = itimage.Begin();
+    itimage.GoToBegin();
 
     double max = -9999999999.0;
     double min =  9999999999.0;
@@ -455,7 +439,7 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
     mitk::FillVector3D(right,  2*factor*axes[2][0], 2*factor*axes[2][1], 2*factor*axes[2][2]);
 
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-    planegeometry->InitializeStandardPlane(right.Get_vnl_vector(), bottom.Get_vnl_vector());
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
     planegeometry->SetOrigin(origin);
 
     double len1 = sqrt(axes[1][0]*axes[1][0] + axes[1][1]*axes[1][1] + axes[1][2]*axes[1][2]);
@@ -558,13 +542,13 @@ void QmitkPartialVolumeAnalysisView::AddFigureToDataStorage(mitk::PlanarFigure* 
     this->GetDataStorage()->Add(newNode, m_SelectedImageNodes->GetNode() );
 
     QList<mitk::DataNode::Pointer> selectedNodes = this->GetDataManagerSelection();
-    for(unsigned int i = 0; i < selectedNodes.size(); i++)
+    for(int i = 0; i < selectedNodes.size(); ++i)
     {
         selectedNodes[i]->SetSelected(false);
     }
 
     std::vector<mitk::DataNode *> selectedPFNodes = m_SelectedPlanarFigureNodes->GetNodes();
-    for(unsigned int i = 0; i < selectedPFNodes.size(); i++)
+    for(std::size_t i = 0; i < selectedPFNodes.size(); ++i)
     {
         selectedPFNodes[i]->SetSelected(false);
     }
@@ -633,7 +617,7 @@ void QmitkPartialVolumeAnalysisView::FindRenderWindow(mitk::DataNode* node)
 }
 
 
-void QmitkPartialVolumeAnalysisView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+void QmitkPartialVolumeAnalysisView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer> &nodes)
 {
     m_Controls->m_InputData->setTitle("Please Select Input Data");
 
@@ -1776,7 +1760,7 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     DirImageType::Pointer dirImage = dirFilter->GetPeakImage();
 
     itk::ImageRegionIterator<DirImageType> itd(dirImage, dirImage->GetLargestPossibleRegion());
-    itd = itd.Begin();
+    itd.GoToBegin();
     while( !itd.IsAtEnd() )
     {
         DirImageType::PixelType direction = itd.Get();
@@ -1803,8 +1787,8 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     itk::ImageRegionIterator<CompImageType> it1(comp1, comp1->GetLargestPossibleRegion());
     itk::ImageRegionIterator<CompImageType> it2(comp2, comp2->GetLargestPossibleRegion());
 
-    it1 = it1.Begin();
-    it2 = it2.Begin();
+    it1.GoToBegin();
+    it2.GoToBegin();
 
     while( !it2.IsAtEnd() )
     {
@@ -1890,7 +1874,7 @@ void QmitkPartialVolumeAnalysisView::Deactivated()
 
 }
 
-void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer reference)
+void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer)
 {
     this->SetMeasurementInfoToRenderWindow("");
 
@@ -2002,22 +1986,22 @@ void QmitkPartialVolumeAnalysisView::AllRadio(bool checked)
     RequestStatisticsUpdate();
 }
 
-void QmitkPartialVolumeAnalysisView::NumberBinsChangedSlider(int v )
+void QmitkPartialVolumeAnalysisView::NumberBinsChangedSlider(int)
 {
     m_Controls->m_NumberBins->setText(QString("%1").arg(m_Controls->m_NumberBinsSlider->value()*5.0));
 }
 
-void QmitkPartialVolumeAnalysisView::UpsamplingChangedSlider( int v)
+void QmitkPartialVolumeAnalysisView::UpsamplingChangedSlider(int)
 {
     m_Controls->m_Upsampling->setText(QString("%1").arg(m_Controls->m_UpsamplingSlider->value()/10.0));
 }
 
-void QmitkPartialVolumeAnalysisView::GaussianSigmaChangedSlider(int v )
+void QmitkPartialVolumeAnalysisView::GaussianSigmaChangedSlider(int)
 {
     m_Controls->m_GaussianSigma->setText(QString("%1").arg(m_Controls->m_GaussianSigmaSlider->value()/100.0));
 }
 
-void QmitkPartialVolumeAnalysisView::SimilarAnglesChangedSlider(int v )
+void QmitkPartialVolumeAnalysisView::SimilarAnglesChangedSlider(int)
 {
     m_Controls->m_SimilarAngles->setText(QString("%1°").arg(90-m_Controls->m_SimilarAnglesSlider->value()));
     ShowClusteringResults();

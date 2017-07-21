@@ -219,16 +219,22 @@ bool mitk::EnumerationProperty::Assign( const BaseProperty& property )
   {
     auto& ids = s_IdMapForClassName.GetEnum(*this);
     auto& otherIds = s_IdMapForClassName.GetEnum(other);
-    const UniqueLock lock(ids.first);
-    const UniqueLock otherLock(otherIds.first);
-    ids.second = otherIds.second;
+    if (&ids != &otherIds) {
+      UniqueLock lock(ids.first, boost::defer_lock);
+      SharedLock otherLock(otherIds.first, boost::defer_lock);
+      boost::lock(lock, otherLock);
+      ids.second = otherIds.second;
+    }
   }
   {
     auto& strings = s_StringMapForClassName.GetEnum(*this);
     auto& otherStrings = s_StringMapForClassName.GetEnum(other);
-    const UniqueLock lock(strings.first);
-    const UniqueLock otherLock(otherStrings.first);
-    strings.second = otherStrings.second;
+    if (&strings != &otherStrings) {
+      UniqueLock lock(strings.first, boost::defer_lock);
+      SharedLock otherLock(otherStrings.first, boost::defer_lock);
+      boost::lock(lock, otherLock);
+      strings.second = otherStrings.second;
+    }
   }
   this->m_CurrentValue = other.m_CurrentValue;
   return true;

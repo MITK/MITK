@@ -457,12 +457,18 @@ void QmitkImageCropper::ProcessImage(bool mask)
   {
     QString imageName;
     if (mask)
-      imageName = QString::fromStdString(node->GetName() + "_masked");
+    {
+      imageName = QString::fromStdString(node->GetName() + "_" + m_CroppingObjectNode->GetName() + "_masked");
+    }
     else
-      imageName = QString::fromStdString(node->GetName() + "_cropped");
+    {
+      imageName = QString::fromStdString(node->GetName() + "_" + m_CroppingObjectNode->GetName() + "_cropped");
+    }
 
     if (m_Controls.checkBoxCropTimeStepOnly->isChecked())
-      imageName = imageName + "_T" + QString::number(timeStep);
+    {
+     imageName = imageName + "_T" + QString::number(timeStep);
+    }
 
     // image and bounding shape ok, set as input
     auto croppedImageNode = mitk::DataNode::New();

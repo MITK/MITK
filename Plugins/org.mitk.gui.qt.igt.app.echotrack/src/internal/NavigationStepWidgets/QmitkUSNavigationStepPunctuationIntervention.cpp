@@ -28,57 +28,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIntervention(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
+  m_Ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
   m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
-  ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
   m_SphereSource(vtkSmartPointer<vtkSphereSource>::New()),
   m_OBBTree(vtkSmartPointer<vtkOBBTree>::New()),
   m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
 {
-  ui->setupUi(this);
-  connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
-  connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
-  connect(ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
-  ui->m_AblationZonesBox->setVisible(false);
+  m_Ui->setupUi(this);
+  connect(m_Ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
+  connect(m_Ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
+  connect(m_Ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
+  m_Ui->m_AblationZonesBox->setVisible(false);
 }
 
 QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIntervention(mitk::Point3D toolAxis, QWidget *parent) :
 QmitkUSAbstractNavigationStep(parent),
-m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
-ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
-m_SphereSource(vtkSmartPointer<vtkSphereSource>::New()),
-m_OBBTree(vtkSmartPointer<vtkOBBTree>::New()),
-m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
+  m_Ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
+  m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
+  m_SphereSource(vtkSmartPointer<vtkSphereSource>::New()),
+  m_OBBTree(vtkSmartPointer<vtkOBBTree>::New()),
+  m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
 {
   m_ToolAxis.SetElement(0, (toolAxis.GetElement(0)));
   m_ToolAxis.SetElement(1, (toolAxis.GetElement(1)));
   m_ToolAxis.SetElement(2, (toolAxis.GetElement(2)));
   m_NeedleProjectionFilter->SetToolAxisForFilter(m_ToolAxis);
-  ui->setupUi(this);
-  connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
-  connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
-  connect(ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
-  ui->m_AblationZonesBox->setVisible(false);
+  m_Ui->setupUi(this);
+  connect(m_Ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
+  connect(m_Ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
+  connect(m_Ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
+  m_Ui->m_AblationZonesBox->setVisible(false);
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnEnableAblationZoneMarkingClicked()
 {
-  if(ui->m_EnableAblationMarking->isChecked())
-    ui->m_AblationZonesBox->setVisible(true);
+  if(m_Ui->m_EnableAblationMarking->isChecked())
+    m_Ui->m_AblationZonesBox->setVisible(true);
   else
-    ui->m_AblationZonesBox->setVisible(false);
+    m_Ui->m_AblationZonesBox->setVisible(false);
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnAblationZoneSizeSliderChanged(int size)
 {
-int id = ui->m_AblationZonesList->currentRow();
+int id = m_Ui->m_AblationZonesList->currentRow();
 if (id!=-1) {emit AblationZoneChanged(id,size);}
 }//
 
 void QmitkUSNavigationStepPunctuationIntervention::OnAddAblationZoneClicked()
 {
-  QListWidgetItem* newItem = new QListWidgetItem("Ablation Zone (initial size: " + QString::number(ui->m_AblationZoneSizeSlider->value()) + " mm)", ui->m_AblationZonesList);
+  QListWidgetItem* newItem = new QListWidgetItem("Ablation Zone (initial size: " + QString::number(m_Ui->m_AblationZoneSizeSlider->value()) + " mm)", m_Ui->m_AblationZonesList);
   newItem->setSelected(true);
-  emit AddAblationZoneClicked(ui->m_AblationZoneSizeSlider->value());
+  emit AddAblationZoneClicked(m_Ui->m_AblationZoneSizeSlider->value());
 }
 
 QmitkUSNavigationStepPunctuationIntervention::~QmitkUSNavigationStepPunctuationIntervention()
@@ -92,7 +92,7 @@ QmitkUSNavigationStepPunctuationIntervention::~QmitkUSNavigationStepPunctuationI
     if ( node.IsNotNull() ) { dataStorage->Remove(node); }
   }
 
-  delete ui;
+  delete m_Ui;
 }
 
 bool QmitkUSNavigationStepPunctuationIntervention::OnStartStep()
@@ -137,7 +137,7 @@ bool QmitkUSNavigationStepPunctuationIntervention::OnActivateStep()
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = m_ZoneNodes->Begin();
        it != m_ZoneNodes->End(); ++it)
   {
-    ui->riskStructuresRangeWidget->AddZone(it->Value());
+    m_Ui->riskStructuresRangeWidget->AddZone(it->Value());
     float rgb[3];
     it->Value()->GetColor(rgb);
     mitk::Color color;
@@ -172,7 +172,7 @@ void QmitkUSNavigationStepPunctuationIntervention::OnUpdate()
   mitk::Point3D point1 = m_NeedleProjectionFilter->GetProjection()->GetPoint(0);
   mitk::Point3D point2 = m_NeedleProjectionFilter->GetProjection()->GetPoint(1);
   double distance = point1.EuclideanDistanceTo(point2);
-  ui->m_DistanceToUSPlane->setText(QString::number(distance) + " mm");
+  m_Ui->m_DistanceToUSPlane->setText(QString::number(distance) + " mm");
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode)
@@ -211,7 +211,7 @@ void QmitkUSNavigationStepPunctuationIntervention::OnSetCombinedModality()
 
 void QmitkUSNavigationStepPunctuationIntervention::ClearZones()
 {
-  ui->riskStructuresRangeWidget->ClearZones();
+  m_Ui->riskStructuresRangeWidget->ClearZones();
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::UpdateBodyMarkerStatus(mitk::NavigationData::Pointer bodyMarker)
@@ -228,24 +228,24 @@ void QmitkUSNavigationStepPunctuationIntervention::UpdateBodyMarkerStatus(mitk::
   // update body marker status label
   if (valid)
   {
-    ui->bodyMarkerTrackingStatusLabel->setStyleSheet(
+    m_Ui->bodyMarkerTrackingStatusLabel->setStyleSheet(
       "background-color: #8bff8b; margin-right: 1em; margin-left: 1em; border: 1px solid grey");
-    ui->bodyMarkerTrackingStatusLabel->setText("Body marker is inside the tracking volume.");
+    m_Ui->bodyMarkerTrackingStatusLabel->setText("Body marker is inside the tracking volume.");
   }
   else
   {
-    ui->bodyMarkerTrackingStatusLabel->setStyleSheet(
+    m_Ui->bodyMarkerTrackingStatusLabel->setStyleSheet(
           "background-color: #ff7878; margin-right: 1em; margin-left: 1em; border: 1px solid grey");
-    ui->bodyMarkerTrackingStatusLabel->setText("Body marker is not inside the tracking volume.");
+    m_Ui->bodyMarkerTrackingStatusLabel->setText("Body marker is not inside the tracking volume.");
   }
 
-  ui->riskStructuresRangeGroupBox->setEnabled(valid);
+  m_Ui->riskStructuresRangeGroupBox->setEnabled(valid);
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::UpdateCriticalStructures(mitk::NavigationData::Pointer needle, mitk::PointSet::Pointer path)
 {
   // update the distances for the risk structures widget
-  ui->riskStructuresRangeWidget->UpdateDistancesToNeedlePosition(needle);
+  m_Ui->riskStructuresRangeWidget->UpdateDistancesToNeedlePosition(needle);
 
   //iterate through all zones
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = m_ZoneNodes->Begin();

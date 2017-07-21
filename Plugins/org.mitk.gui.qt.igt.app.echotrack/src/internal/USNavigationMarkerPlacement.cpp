@@ -66,7 +66,7 @@ USNavigationMarkerPlacement::USNavigationMarkerPlacement()
     : m_Parent(nullptr),
     m_UpdateTimer(new QTimer(this)),
     m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
-    m_StdMultiWidget(0),
+    m_StdMultiWidget(nullptr),
     m_ReinitAlreadyDone(false),
     m_IsExperimentRunning(false),
     m_NavigationStepTimer(mitk::USNavigationStepTimer::New()),
@@ -78,9 +78,9 @@ USNavigationMarkerPlacement::USNavigationMarkerPlacement()
     m_NavigationDataRecorder(mitk::NavigationDataRecorder::New()),
     m_SceneNumber(1),
     m_WarnOverlay(mitk::TextAnnotation2D::New()),
-    m_ListenerDeviceChanged(this, &USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged),
     m_NeedleIndex(0),
     m_MarkerIndex(1),
+    m_ListenerDeviceChanged(this, &USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged),
     ui(new Ui::USNavigationMarkerPlacement)
 {
     connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
@@ -262,7 +262,7 @@ void USNavigationMarkerPlacement::SetToolAxisMarkerPlacement()
     {
       MITK_WARN << "Found an invalid storage object!";
     }
-    if (m_CurrentStorage->GetToolCount() != m_NavigationDataSource->GetNumberOfOutputs()) //there is something wrong with the storage
+    if (m_CurrentStorage->GetToolCount() != static_cast<int>(m_NavigationDataSource->GetNumberOfOutputs())) //there is something wrong with the storage
     {
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
       m_CurrentStorage = NULL;

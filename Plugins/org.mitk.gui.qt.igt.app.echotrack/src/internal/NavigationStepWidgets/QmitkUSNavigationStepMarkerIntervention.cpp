@@ -75,10 +75,10 @@ QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention
     m_TargetOcclusionFilter(mitk::USNavigationTargetOcclusionFilter::New()),
     m_TargetIntersectionFilter(mitk::USNavigationTargetIntersectionFilter::New()),
     m_PlacementQualityCalculator(mitk::USTargetPlacementQualityCalculator::New()),
-    m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
     m_TargetStructureWarnOverlay(mitk::TextAnnotation2D::New()),
     m_ReferenceSensorIndex(1),
     m_NeedleSensorIndex(0),
+    m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
     ui(new Ui::QmitkUSNavigationStepMarkerIntervention)
 {
   m_ActiveTargetColor[0] = 1;

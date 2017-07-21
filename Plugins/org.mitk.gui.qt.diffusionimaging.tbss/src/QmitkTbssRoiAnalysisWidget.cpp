@@ -457,7 +457,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
     mitk::ScalarType locationBetween = 0;
 
     for(mitk::ScalarType position = 0;
-        position <= totalLength+0.001 && resampledTract.size() <= (number+1);
+        position <= totalLength+0.001 && static_cast<int>(resampledTract.size()) <= (number+1);
         position+=stepSize)
     {
 
@@ -811,7 +811,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
 
 
 template <typename T>
-void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, TractContainerType tracts, mitk::Image *img, bool avg)
+void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType, TractContainerType tracts, mitk::Image *img, bool avg)
 {
 
   m_PlottingFiberBundle = true;

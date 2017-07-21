@@ -70,7 +70,7 @@ void InteractionEventRecorder::Play()
   mitk::XML2EventParser::EventContainerType events = parser.GetInteractions();
 
   MITK_INFO << "parsed events";
-  for (int i=0; i < events.size(); ++i)
+  for (std::size_t i=0; i < events.size(); ++i)
   {
     //this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer()->GetDispatcher()->ProcessEvent(events.at(i));
     events.at(i)->GetSender()->GetDispatcher()->ProcessEvent(events.at(i));

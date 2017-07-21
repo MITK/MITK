@@ -163,7 +163,7 @@ bool mitk::SurfaceModifier::AddOutlierToSurface(
 }
 
 bool mitk::SurfaceModifier::PerturbeSurface(
-  mitk::Surface::Pointer surface, double varianceX, double varianceY, double varianceZ, double maxNoiseVectorLength)
+  mitk::Surface::Pointer surface, double varianceX, double varianceY, double varianceZ, double)
 {
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->ShallowCopy(surface->GetVtkPolyData()->GetPoints());

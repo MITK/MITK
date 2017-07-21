@@ -115,7 +115,7 @@ const map::deployment::DLLInfo* QmitkMatchPointFrameCorrection::GetSelectedAlgor
   return m_SelectedAlgorithmInfo;
 }
 
-void QmitkMatchPointFrameCorrection::OnMaskCheckBoxToggeled(bool checked)
+void QmitkMatchPointFrameCorrection::OnMaskCheckBoxToggeled(bool)
 {
   if (!m_Working)
   {
@@ -254,8 +254,6 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
     QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
     mitk::Image* targetImage = nullptr;
-    mitk::PointSet* targetPointSet = nullptr;
-
     mitk::Image* targetMaskImage = nullptr;
 
     typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
@@ -545,7 +543,7 @@ void QmitkMatchPointFrameCorrection::ConfigureFrameList()
 
 void QmitkMatchPointFrameCorrection::OnFramesSelectAllPushed()
 {
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
     item->setCheckState(Qt::Checked);
@@ -554,7 +552,7 @@ void QmitkMatchPointFrameCorrection::OnFramesSelectAllPushed()
 
 void QmitkMatchPointFrameCorrection::OnFramesDeSelectAllPushed()
 {
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
     item->setCheckState(Qt::Unchecked);
@@ -563,7 +561,7 @@ void QmitkMatchPointFrameCorrection::OnFramesDeSelectAllPushed()
 
 void QmitkMatchPointFrameCorrection::OnFramesInvertPushed()
 {
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
 
@@ -583,7 +581,7 @@ QmitkMatchPointFrameCorrection::GenerateIgnoreList() const
 {
   mitk::TimeFramesRegistrationHelper::IgnoreListType result;
 
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
 
@@ -596,8 +594,8 @@ QmitkMatchPointFrameCorrection::GenerateIgnoreList() const
   return result;
 }
 
-void QmitkMatchPointFrameCorrection::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPointFrameCorrection::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+    const QList<mitk::DataNode::Pointer>&)
 {
   if (!m_Working)
   {

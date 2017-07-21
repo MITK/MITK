@@ -110,7 +110,7 @@ public:
     // if (this->m_Controls->m_ServiceList->currentRow()==-1) return nullptr;
     std::vector<us::ServiceReferenceU> refs = GetAllServiceReferences();
     std::vector<T *> result;
-    for (int i = 0; i < refs.size(); i++)
+    for (std::size_t i = 0; i < refs.size(); i++)
     {
       result.push_back(m_Context->GetService(us::ServiceReference<T>(refs[i])));
     }

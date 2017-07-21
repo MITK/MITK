@@ -208,7 +208,7 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
 void RTDoseVisualizer::OnRemoveFreeValueClicked()
 {
   int index = this->m_Controls.listFreeValues->currentRow();
-  if (index > m_freeIsoValuesCount || index < 0)
+  if (index > static_cast<int>(m_freeIsoValuesCount) || index < 0)
     return;
 
   mitk::IsoDoseLevelVectorProperty::Pointer propfreeIsoVec;
@@ -448,8 +448,8 @@ void RTDoseVisualizer::UpdateColorWashTransferFunction()
   }
 }
 
-void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                          const QList<mitk::DataNode::Pointer>& nodes )
+void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer,
+                                          const QList<mitk::DataNode::Pointer>&)
 {
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
 
@@ -699,21 +699,19 @@ void RTDoseVisualizer::ActualizeDisplayStyleForAllDoseDataNodes()
   /** @TODO Klären ob diese präsentations info global oder auch per node gespeichert wird*/
 }
 
-void RTDoseVisualizer::OnHandleCTKEventReferenceDoseChanged(const ctkEvent& event)
+void RTDoseVisualizer::OnHandleCTKEventReferenceDoseChanged(const ctkEvent&)
 {
   mitk::DoseValueAbs referenceDose = 0.0;
-  bool globalSync = mitk::GetReferenceDoseValue(referenceDose);
-
   this->m_Controls.spinReferenceDose->setValue(referenceDose);
 }
 
-void RTDoseVisualizer::OnHandleCTKEventGlobalVisChanged(const ctkEvent& event)
+void RTDoseVisualizer::OnHandleCTKEventGlobalVisChanged(const ctkEvent&)
 {
   this->m_Controls.checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
   this->m_Controls.checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
 }
 
-void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent& event)
+void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent&)
 {
   std::string currentPresetName  = mitk::GetSelectedPresetName();
 

@@ -149,7 +149,7 @@ void UltrasoundSupport::UpdateImage()
     // if the geometry changed: reinitialize the ultrasound image
     if ((m_OldGeometry.IsNotNull()) &&
       (curOutput->GetGeometry() != nullptr) &&
-      (!mitk::Equal(m_OldGeometry.GetPointer(), curOutput->GetGeometry(), 0.0001, false))
+      (!mitk::Equal(*m_OldGeometry, *curOutput->GetGeometry(), 0.0001, false))
       )
     {
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();

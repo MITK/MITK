@@ -32,7 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 void QmitkStatusBar::DisplayText(const char* t)
 {
-  m_StatusBar->showMessage(t);
+  if (m_StatusBar != nullptr)
+    m_StatusBar->showMessage(t);
   // TODO bug #1357
   //qApp->processEvents(); // produces crashes!
 }
@@ -42,7 +43,8 @@ void QmitkStatusBar::DisplayText(const char* t)
  */
 void QmitkStatusBar::DisplayText(const char* t, int ms)
 {
-  m_StatusBar->showMessage(t, ms);
+  if (m_StatusBar != nullptr)
+    m_StatusBar->showMessage(t, ms);
   // TODO bug #1357
   //qApp->processEvents(); // produces crashes!
 }
@@ -74,7 +76,6 @@ void QmitkStatusBar::SetSizeGripEnabled(bool enable)
     m_StatusBar->setSizeGripEnabled(enable);
 }
 
-
 QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 :StatusBarImplementation()
 {
@@ -85,9 +86,14 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
     m_GreyValueLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Fixed);
     m_StatusBar->addPermanentWidget(m_GreyValueLabel);
     mitk::StatusBar::SetImplementation(this);
+    QObject::connect(m_StatusBar, &QObject::destroyed, [=]() {
+      m_StatusBar = nullptr;
+    });
 }
 
 QmitkStatusBar::~QmitkStatusBar()
 {
+  if (m_StatusBar != nullptr)
+    QObject::disconnect(m_StatusBar, &QObject::destroyed, 0, 0);
 }
 

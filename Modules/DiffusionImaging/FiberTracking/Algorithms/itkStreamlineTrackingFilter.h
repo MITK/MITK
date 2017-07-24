@@ -109,6 +109,7 @@ public:
   itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
   itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
+  itkSetMacro( StopTracking, bool)                    ///< Set flag to stop tractography
 
   void SetSeedPoints(std::vector< itk::Point<float> > seedPoints)	///< Use manually defined points in physical space as seed points instead of seed image
   {
@@ -124,6 +125,8 @@ public:
   virtual void Update() override{
     this->GenerateData();
   }
+
+  std::string GetStatusText();
 
 protected:
 
@@ -191,6 +194,9 @@ protected:
   bool                                m_Random;
   bool                                m_UseOutputProbabilityMap;
   std::vector< itk::Point<float> >    m_SeedPoints;
+  unsigned int                        m_CurrentTracts;
+  unsigned int                        m_Progress;
+  bool                                m_StopTracking;
 
   void BuildFibers(bool check);
   int CheckCurvature(FiberType* fib, bool front);

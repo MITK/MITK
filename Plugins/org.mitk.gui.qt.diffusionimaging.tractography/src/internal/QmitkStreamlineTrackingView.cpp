@@ -57,16 +57,38 @@ const std::string QmitkStreamlineTrackingView::VIEW_ID = "org.mitk.views.streaml
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
 
-QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
-  : m_Controls(nullptr)
-  , m_TrackingHandler(nullptr)
+QmitkStreamlineTrackingWorker::QmitkStreamlineTrackingWorker(QmitkStreamlineTrackingView* view)
+    : m_View(view)
 {
+}
+
+void QmitkStreamlineTrackingWorker::run()
+{
+    m_View->m_Tracker->Update();
+    m_View->m_TrackingThread.quit();
+}
+
+QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
+  : m_TrackingWorker(this)
+  , m_Controls(nullptr)
+  , m_TrackingHandler(nullptr)
+  , m_ThreadIsRunning(false)
+{
+  m_TrackingWorker.moveToThread(&m_TrackingThread);
+  connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
+  connect(&m_TrackingThread, SIGNAL(started()), &m_TrackingWorker, SLOT(run()));
+  connect(&m_TrackingThread, SIGNAL(finished()), this, SLOT(AfterThread()));
+  m_TrackingTimer = new QTimer(this);
 }
 
 // Destructor
 QmitkStreamlineTrackingView::~QmitkStreamlineTrackingView()
 {
+  if (m_Tracker.IsNull())
+    return;
 
+  m_Tracker->SetStopTracking(true);
+  m_TrackingThread.wait();
 }
 
 void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
@@ -103,6 +125,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TissueImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
     m_Controls->m_TissueImageBox->SetZeroEntryText("--");
 
+    connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
+    connect( m_Controls->commandLinkButton_2, SIGNAL(clicked()), this, SLOT(StopTractography()) );
     connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
     connect( m_Controls->m_InteractiveBox, SIGNAL(stateChanged(int)), this, SLOT(ToggleInteractive()) );
     connect( m_Controls->m_TissueImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()) );
@@ -140,11 +164,131 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FrontalSamplesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
 
-
-
     m_FirstTensorProbRun = true;
+    StartStopTrackingGui(false);
   }
 
+  UpdateGui();
+}
+
+void QmitkStreamlineTrackingView::StopTractography()
+{
+  if (m_Tracker.IsNull())
+    return;
+
+  m_Tracker->SetStopTracking(true);
+}
+
+void QmitkStreamlineTrackingView::TimerUpdate()
+{
+  if (m_Tracker.IsNull())
+    return;
+
+  QString status_text(m_Tracker->GetStatusText().c_str());
+  m_Controls->m_StatusTextBox->setText(status_text);
+}
+
+void QmitkStreamlineTrackingView::BeforeThread()
+{
+  m_TrackingTimer->start(1000);
+}
+
+void QmitkStreamlineTrackingView::AfterThread()
+{
+  m_TrackingTimer->stop();
+  if (!m_Tracker->GetUseOutputProbabilityMap())
+  {
+    vtkSmartPointer<vtkPolyData> fiberBundle = m_Tracker->GetFiberPolyData();
+
+    if (!m_Controls->m_InteractiveBox->isChecked() && fiberBundle->GetNumberOfLines() == 0)
+    {
+      QMessageBox warnBox;
+      warnBox.setWindowTitle("Warning");
+      warnBox.setText("No fiberbundle was generated!");
+      warnBox.setDetailedText("No fibers were generated using the chosen parameters. Typical reasons are:\n\n- Cutoff too high. Some images feature very low FA/GFA/peak size. Try to lower this parameter.\n- Angular threshold too strict. Try to increase this parameter.\n- A small step sizes also means many steps to go wrong. Especially in the case of probabilistic tractography. Try to adjust the angular threshold.");
+      warnBox.setIcon(QMessageBox::Warning);
+      warnBox.exec();
+      return;
+    }
+
+    mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
+    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
+    if (m_Controls->m_ResampleFibersBox->isChecked())
+      fib->Compress(m_Controls->m_FiberErrorBox->value());
+    fib->ColorFibersByOrientation();
+
+    if (m_Controls->m_InteractiveBox->isChecked())
+    {
+      if (m_InteractiveNode.IsNull())
+      {
+        m_InteractiveNode = mitk::DataNode::New();
+        QString name("Interactive");
+        m_InteractiveNode->SetName(name.toStdString());
+        GetDataStorage()->Add(m_InteractiveNode);
+      }
+      m_InteractiveNode->SetData(fib);
+
+      if (auto renderWindowPart = this->GetRenderWindowPart())
+          renderWindowPart->RequestUpdate();
+    }
+    else
+    {
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData(fib);
+      QString name("FiberBundle_");
+      name += m_InputImageNodes.at(0)->GetName().c_str();
+      name += "_Streamline";
+      node->SetName(name.toStdString());
+      GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+    }
+  }
+  else
+  {
+    TrackerType::ItkDoubleImgType::Pointer outImg = m_Tracker->GetOutputProbabilityMap();
+    mitk::Image::Pointer img = mitk::Image::New();
+    img->InitializeByItk(outImg.GetPointer());
+    img->SetVolume(outImg->GetBufferPointer());
+
+    if (m_Controls->m_InteractiveBox->isChecked())
+    {
+      if (m_InteractiveNode.IsNull())
+      {
+        m_InteractiveNode = mitk::DataNode::New();
+        QString name("Interactive");
+        m_InteractiveNode->SetName(name.toStdString());
+        GetDataStorage()->Add(m_InteractiveNode);
+      }
+      m_InteractiveNode->SetData(img);
+
+      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+      lut->SetType(mitk::LookupTable::JET_TRANSPARENT);
+      mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+      lut_prop->SetLookupTable(lut);
+      m_InteractiveNode->SetProperty("LookupTable", lut_prop);
+      m_InteractiveNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+
+      if (auto renderWindowPart = this->GetRenderWindowPart())
+          renderWindowPart->RequestUpdate();
+    }
+    else
+    {
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData(img);
+      QString name("ProbabilityMap_");
+      name += m_InputImageNodes.at(0)->GetName().c_str();
+      node->SetName(name.toStdString());
+
+      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+      lut->SetType(mitk::LookupTable::JET_TRANSPARENT);
+      mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+      lut_prop->SetLookupTable(lut);
+      node->SetProperty("LookupTable", lut_prop);
+      node->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+
+      GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+    }
+  }
+  StartStopTrackingGui(false);
   UpdateGui();
 }
 
@@ -356,6 +500,7 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->m_SharpenOdfsBox->setEnabled(false);
   m_Controls->m_ForestBox->setEnabled(false);
   m_Controls->m_ForestLabel->setEnabled(false);
+  m_Controls->commandLinkButton->setEnabled(false);
 
   if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
     m_Controls->m_SeedGmBox->setEnabled(true);
@@ -369,7 +514,7 @@ void QmitkStreamlineTrackingView::UpdateGui()
     else
       m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.at(0)->GetName().c_str());
     m_Controls->m_InputData->setTitle("Input Data");
-    m_Controls->commandLinkButton->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
+    m_Controls->commandLinkButton->setEnabled(!m_Controls->m_InteractiveBox->isChecked() && !m_ThreadIsRunning);
 
     m_Controls->m_ScalarThresholdBox->setEnabled(true);
     m_Controls->m_FaThresholdLabel->setEnabled(true);
@@ -401,20 +546,34 @@ void QmitkStreamlineTrackingView::UpdateGui()
     }
   }
   else
-  {
     m_Controls->m_InputData->setTitle("Please Select Input Data");
-    m_Controls->commandLinkButton->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
-  }
 
+}
+
+void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
+{
+  m_ThreadIsRunning = start;
+
+  if (!m_Controls->m_InteractiveBox->isChecked())
+  {
+    m_Controls->commandLinkButton_2->setVisible(start);
+    m_Controls->commandLinkButton->setVisible(!start);
+    m_Controls->m_InteractiveBox->setEnabled(!start);
+    m_Controls->m_StatusTextBox->setVisible(start);
+  }
 }
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
+  if (m_ThreadIsRunning)
+    return;
   if (m_InputImages.empty())
     return;
+  if (m_Controls->m_InteractiveBox->isChecked() && m_SeedPoints.empty())
+    return;
+  StartStopTrackingGui(true);
 
-  typedef itk::StreamlineTrackingFilter TrackerType;
-  TrackerType::Pointer tracker = TrackerType::New();
+  m_Tracker = TrackerType::New();
 
   if( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
   {
@@ -426,6 +585,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       if (m_InputImages.size()>1)
       {
         QMessageBox::information(nullptr, "Information", "Probabilistic tensor tractography is only implemented for single-tensor mode!");
+        StartStopTrackingGui(false);
         return;
       }
 
@@ -515,6 +675,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     if ( m_Controls->m_ForestBox->GetSelectedNode().IsNull() )
     {
       QMessageBox::information(nullptr, "Information", "Not random forest for machine learning based tractography selected.");
+      StartStopTrackingGui(false);
       return;
     }
 
@@ -557,6 +718,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       if (!forest_valid)
       {
         QMessageBox::information(nullptr, "Information", "Random forest is invalid. The forest signatue does not match the parameters of TrackingHandlerRandomForest.");
+        StartStopTrackingGui(false);
         return;
       }
     }
@@ -566,6 +728,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     if (m_Controls->m_ModeBox->currentIndex()==1)
     {
       QMessageBox::information(nullptr, "Information", "Probabilstic tractography is not implemented for peak images.");
+      StartStopTrackingGui(false);
       return;
     }
     try {
@@ -585,6 +748,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     }
     catch(...)
     {
+      StartStopTrackingGui(false);
       return;
     }
   }
@@ -607,141 +771,49 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   if (m_Controls->m_InteractiveBox->isChecked())
   {
-    tracker->SetSeedPoints(m_SeedPoints);
+    m_Tracker->SetSeedPoints(m_SeedPoints);
   }
   else if (m_Controls->m_SeedImageBox->GetSelectedNode().IsNotNull())
   {
     ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_SeedImageBox->GetSelectedNode()->GetData()), mask);
-    tracker->SetSeedImage(mask);
+    m_Tracker->SetSeedImage(mask);
   }
 
   if (m_Controls->m_MaskImageBox->GetSelectedNode().IsNotNull())
   {
     ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_MaskImageBox->GetSelectedNode()->GetData()), mask);
-    tracker->SetMaskImage(mask);
+    m_Tracker->SetMaskImage(mask);
   }
 
   if (m_Controls->m_StopImageBox->GetSelectedNode().IsNotNull())
   {
     ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_StopImageBox->GetSelectedNode()->GetData()), mask);
-    tracker->SetStoppingRegions(mask);
+    m_Tracker->SetStoppingRegions(mask);
   }
 
   if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
   {
     ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TissueImageBox->GetSelectedNode()->GetData()), mask);
-    tracker->SetTissueImage(mask);
-    tracker->SetSeedOnlyGm(m_Controls->m_SeedGmBox->isChecked());
+    m_Tracker->SetTissueImage(mask);
+    m_Tracker->SetSeedOnlyGm(m_Controls->m_SeedGmBox->isChecked());
   }
 
-  tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelBox->value());
-  tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
-  tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
-  tracker->SetUseStopVotes(m_Controls->m_StopVotesBox->isChecked());
-  tracker->SetOnlyForwardSamples(m_Controls->m_FrontalSamplesBox->isChecked());
-  tracker->SetAposterioriCurvCheck(false);
-  tracker->SetMaxNumTracts(m_Controls->m_NumFibersBox->value());
-  tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
-  tracker->SetTrackingHandler(m_TrackingHandler);
-  tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
-  tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
-  tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());
-  tracker->Update();
+  m_Tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelBox->value());
+  m_Tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
+  m_Tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
+  m_Tracker->SetUseStopVotes(m_Controls->m_StopVotesBox->isChecked());
+  m_Tracker->SetOnlyForwardSamples(m_Controls->m_FrontalSamplesBox->isChecked());
+  m_Tracker->SetAposterioriCurvCheck(false);
+  m_Tracker->SetMaxNumTracts(m_Controls->m_NumFibersBox->value());
+  m_Tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
+  m_Tracker->SetTrackingHandler(m_TrackingHandler);
+  m_Tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
+  m_Tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
+  m_Tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());
 
-  if (!tracker->GetUseOutputProbabilityMap())
-  {
-    vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
-
-    if (!m_Controls->m_InteractiveBox->isChecked() && fiberBundle->GetNumberOfLines() == 0)
-    {
-      QMessageBox warnBox;
-      warnBox.setWindowTitle("Warning");
-      warnBox.setText("No fiberbundle was generated!");
-      warnBox.setDetailedText("No fibers were generated using the chosen parameters. Typical reasons are:\n\n- Cutoff too high. Some images feature very low FA/GFA/peak size. Try to lower this parameter.\n- Angular threshold too strict. Try to increase this parameter.\n- A small step sizes also means many steps to go wrong. Especially in the case of probabilistic tractography. Try to adjust the angular threshold.");
-      warnBox.setIcon(QMessageBox::Warning);
-      warnBox.exec();
-      return;
-    }
-
-    mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
-    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
-    if (m_Controls->m_ResampleFibersBox->isChecked())
-      fib->Compress(m_Controls->m_FiberErrorBox->value());
-    fib->ColorFibersByOrientation();
-
-    if (m_Controls->m_InteractiveBox->isChecked())
-    {
-      if (m_InteractiveNode.IsNull())
-      {
-        m_InteractiveNode = mitk::DataNode::New();
-        QString name("Interactive");
-        m_InteractiveNode->SetName(name.toStdString());
-        GetDataStorage()->Add(m_InteractiveNode);
-      }
-      m_InteractiveNode->SetData(fib);
-
-      if (auto renderWindowPart = this->GetRenderWindowPart())
-          renderWindowPart->RequestUpdate();
-    }
-    else
-    {
-      mitk::DataNode::Pointer node = mitk::DataNode::New();
-      node->SetData(fib);
-      QString name("FiberBundle_");
-      name += m_InputImageNodes.at(0)->GetName().c_str();
-      name += "_Streamline";
-      node->SetName(name.toStdString());
-      GetDataStorage()->Add(node, m_InputImageNodes.at(0));
-    }
-  }
-  else
-  {
-    TrackerType::ItkDoubleImgType::Pointer outImg = tracker->GetOutputProbabilityMap();
-    mitk::Image::Pointer img = mitk::Image::New();
-    img->InitializeByItk(outImg.GetPointer());
-    img->SetVolume(outImg->GetBufferPointer());
-
-    if (m_Controls->m_InteractiveBox->isChecked())
-    {
-      if (m_InteractiveNode.IsNull())
-      {
-        m_InteractiveNode = mitk::DataNode::New();
-        QString name("Interactive");
-        m_InteractiveNode->SetName(name.toStdString());
-        GetDataStorage()->Add(m_InteractiveNode);
-      }
-      m_InteractiveNode->SetData(img);
-
-      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-      lut->SetType(mitk::LookupTable::JET_TRANSPARENT);
-      mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
-      lut_prop->SetLookupTable(lut);
-      m_InteractiveNode->SetProperty("LookupTable", lut_prop);
-      m_InteractiveNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
-
-      if (auto renderWindowPart = this->GetRenderWindowPart())
-          renderWindowPart->RequestUpdate();
-    }
-    else
-    {
-      mitk::DataNode::Pointer node = mitk::DataNode::New();
-      node->SetData(img);
-      QString name("ProbabilityMap_");
-      name += m_InputImageNodes.at(0)->GetName().c_str();
-      node->SetName(name.toStdString());
-
-      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-      lut->SetType(mitk::LookupTable::JET_TRANSPARENT);
-      mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
-      lut_prop->SetLookupTable(lut);
-      node->SetProperty("LookupTable", lut_prop);
-      node->SetProperty("opacity", mitk::FloatProperty::New(0.5));
-
-      GetDataStorage()->Add(node, m_InputImageNodes.at(0));
-    }
-  }
+  m_TrackingThread.start(QThread::LowestPriority);
 }

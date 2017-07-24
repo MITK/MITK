@@ -82,7 +82,9 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
       // try m_NumDirs times to get a non-zero random direction
       for (int j=0; j<m_NumDirs; j++)
       {
-        int i = m_RngItk->GetIntegerVariate(m_NumDirs-1);
+        int i = 0;
+#pragma omp critical
+        i = m_RngItk->GetIntegerVariate(m_NumDirs-1);
         out_dir = GetDirection(idx3, i);
 
         if (out_dir.magnitude()>mitk::eps)

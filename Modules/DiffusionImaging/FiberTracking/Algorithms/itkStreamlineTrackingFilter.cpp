@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include "itkPointShell.h"
 #include <itkRescaleIntensityImageFilter.h>
+#include <boost/lexical_cast.hpp>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -74,13 +75,29 @@ StreamlineTrackingFilter
   , m_DemoMode(false)
   , m_Random(true)
   , m_UseOutputProbabilityMap(false)
+  , m_CurrentTracts(0)
+  , m_Progress(0)
+  , m_StopTracking(false)
 {
   this->SetNumberOfRequiredInputs(0);
 }
 
+std::string StreamlineTrackingFilter::GetStatusText()
+{
+  std::string status = "Seedpoints processed: " + boost::lexical_cast<std::string>(m_Progress) + "/" + boost::lexical_cast<std::string>(m_SeedPoints.size());
+  if (m_SeedPoints.size()>0)
+    status += " (" + boost::lexical_cast<std::string>(100*m_Progress/m_SeedPoints.size()) + "%)";
+  if (m_MaxNumTracts>0)
+    status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts) + "/" + boost::lexical_cast<std::string>(m_MaxNumTracts);
+  else
+    status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts);
+
+  return status;
+}
 
 void StreamlineTrackingFilter::BeforeTracking()
 {
+  m_StopTracking = false;
   m_TrackingHandler->SetRandom(m_Random);
   m_TrackingHandler->InitForTracking();
   m_FiberPolyData = PolyDataType::New();
@@ -726,18 +743,17 @@ void StreamlineTrackingFilter::GenerateData()
   if (m_Random)
     std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
 
-  bool stop = false;
-  unsigned int current_tracts = 0;
+  m_CurrentTracts = 0;
   int num_seeds = m_SeedPoints.size();
   itk::Index<3> zeroIndex; zeroIndex.Fill(0);
-  int progress = 0;
+  m_Progress = 0;
   int i = 0;
   int print_interval = num_seeds/100;
   if (print_interval<100)
     m_Verbose=false;
 
 #pragma omp parallel
-  while (i<num_seeds && !stop)
+  while (i<num_seeds && !m_StopTracking)
   {
 
 
@@ -748,17 +764,17 @@ void StreamlineTrackingFilter::GenerateData()
       i++;
     }
 
-    if (temp_i>=num_seeds || stop)
+    if (temp_i>=num_seeds || m_StopTracking)
       continue;
     else if (m_Verbose && i%print_interval==0)
 #pragma omp critical
     {
-      progress += print_interval;
+      m_Progress += print_interval;
       std::cout << "                                                                                                     \r";
       if (m_MaxNumTracts>0)
-        std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << "/" << m_MaxNumTracts << '\r';
+        std::cout << "Tried: " << m_Progress << "/" << num_seeds << " | Accepted: " << m_CurrentTracts << "/" << m_MaxNumTracts << '\r';
       else
-        std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << '\r';
+        std::cout << "Tried: " << m_Progress << "/" << num_seeds << " | Accepted: " << m_CurrentTracts << '\r';
       cout.flush();
     }
 
@@ -821,22 +837,22 @@ void StreamlineTrackingFilter::GenerateData()
 #pragma omp critical
       if (tractLength>=m_MinTractLength && counter>=2)
       {
-        if (!stop)
+        if (!m_StopTracking)
         {
           if (!m_UseOutputProbabilityMap)
             m_Tractogram.push_back(fib);
           else
             FiberToProbmap(&fib);
-          current_tracts++;
+          m_CurrentTracts++;
         }
-        if (m_MaxNumTracts > 0 && current_tracts>=static_cast<unsigned int>(m_MaxNumTracts))
+        if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
         {
-          if (!stop)
+          if (!m_StopTracking)
           {
             std::cout << "                                                                                                     \r";
-            MITK_INFO << "Reconstructed maximum number of tracts (" << current_tracts << "). Stopping tractography.";
+            MITK_INFO << "Reconstructed maximum number of tracts (" << m_CurrentTracts << "). Stopping tractography.";
           }
-          stop = true;
+          m_StopTracking = true;
         }
       }
 

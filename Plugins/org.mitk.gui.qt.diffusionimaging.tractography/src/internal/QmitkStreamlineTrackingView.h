@@ -35,7 +35,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkTractographyForest.h>
+#include <QThread>
+#include <QTimer>
 
+class QmitkStreamlineTrackingView;
+
+class QmitkStreamlineTrackingWorker : public QObject
+{
+  Q_OBJECT
+
+public:
+
+  QmitkStreamlineTrackingWorker(QmitkStreamlineTrackingView* view);
+
+public slots:
+
+  void run();
+
+private:
+
+  QmitkStreamlineTrackingView* m_View;
+};
 
 /*!
 \brief View for tensor based deterministic streamline fiber tracking.
@@ -50,8 +70,9 @@ public:
 
   static const std::string VIEW_ID;
 
-  typedef itk::Image< unsigned char, 3 > ItkUCharImageType;
-  typedef itk::Image< float, 3 > ItkFloatImageType;
+  typedef itk::Image< unsigned char, 3 >  ItkUCharImageType;
+  typedef itk::Image< float, 3 >          ItkFloatImageType;
+  typedef itk::StreamlineTrackingFilter   TrackerType;
 
   QmitkStreamlineTrackingView();
   virtual ~QmitkStreamlineTrackingView();
@@ -63,6 +84,10 @@ public:
   ///
   virtual void SetFocus() override;
 
+  TrackerType::Pointer              m_Tracker;
+  QmitkStreamlineTrackingWorker     m_TrackingWorker;
+  QThread                           m_TrackingThread;
+
 protected slots:
 
   void DoFiberTracking();   ///< start fiber tracking
@@ -73,6 +98,10 @@ protected slots:
   void InteractiveSeedChanged(bool posChanged=false);
   void ForestSwitched();
   void OutputStyleSwitched();
+  void AfterThread();                       ///< update gui etc. after tracking has finished
+  void BeforeThread();                      ///< start timer etc.
+  void TimerUpdate();
+  void StopTractography();
 
 protected:
 
@@ -84,6 +113,9 @@ protected:
 protected slots:
 
 private:
+
+  void StartStopTrackingGui(bool start);
+  void OnSliceChanged(const itk::EventObject& e);
 
   int m_SliceObserverTag1;
   int m_SliceObserverTag2;
@@ -97,8 +129,9 @@ private:
   std::vector< mitk::Image::Pointer >     m_AdditionalInputImages;
   bool                                    m_FirstTensorProbRun;
 
-  void OnSliceChanged(const itk::EventObject& e);
-  mitk::TrackingDataHandler*      m_TrackingHandler;
+  mitk::TrackingDataHandler*              m_TrackingHandler;
+  bool                                    m_ThreadIsRunning;
+  QTimer*                                 m_TrackingTimer;
 };
 
 

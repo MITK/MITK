@@ -86,6 +86,7 @@ set(H_FILES
   include/Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   include/Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
   include/Algorithms/Reconstruction/itkDiffusionKurtosisReconstructionImageFilter.h
+  include/Algorithms/Reconstruction/itkBallAndSticksImageFilter.h
 
   # MultishellProcessing
   include/Algorithms/Reconstruction/MultishellProcessing/itkRadialMultishellToSingleshellImageFilter.h

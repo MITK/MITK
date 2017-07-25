@@ -98,6 +98,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_BallSTickButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Ball-STick</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

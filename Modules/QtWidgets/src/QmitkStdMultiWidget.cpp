@@ -298,9 +298,9 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Original );
 
-  SetDecorationProperties("Axial", GetDecorationColor(0), 0);
-  SetDecorationProperties("Sagittal", GetDecorationColor(1), 1);
-  SetDecorationProperties("Coronal", GetDecorationColor(2), 2);
+  SetDecorationProperties(Utilities::convertToLocalEncoding(tr("Axial")), GetDecorationColor(0), 0);
+  SetDecorationProperties(Utilities::convertToLocalEncoding(tr("Sagittal")), GetDecorationColor(1), 1);
+  SetDecorationProperties(Utilities::convertToLocalEncoding(tr("Coronal")), GetDecorationColor(2), 2);
   SetDecorationProperties("3D", GetDecorationColor(3), 3);
 
   for(int i = 0; i < 4; i++) {

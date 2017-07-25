@@ -80,13 +80,18 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
 {
   mitk::NavigationTool::Pointer returnValue = mitk::NavigationTool::New();
 
-  //DateTreeNode with Name and Surface
+  //DateTreeNode with Name, Surface and Color.
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(node->GetName());
   newNode->SetData(node->GetData());
   bool visible = true;
   node->GetVisibility(visible, NULL);
   newNode->SetVisibility(visible);
+
+  float rgb[3];
+  node->GetColor(rgb);
+  newNode->SetColor(rgb);
+
   returnValue->SetDataNode(newNode);
 
   //Identifier

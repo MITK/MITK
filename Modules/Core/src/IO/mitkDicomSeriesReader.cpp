@@ -66,11 +66,11 @@ std::string DicomSeriesReader::PixelSpacingInterpretationToString( const PixelSp
 }
 
 DataNode::Pointer
-DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
+DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, void *source, Image::Pointer preLoadedImageBlock)
 {
   DataNode::Pointer node = DataNode::New();
 
-  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, correctTilt, callback, preLoadedImageBlock))
+  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, correctTilt, callback, source, preLoadedImageBlock))
   {
     if( filenames.empty() )
     {
@@ -92,6 +92,7 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames,
     bool check_4d,
     bool correctTilt,
     UpdateCallBackMethod callback,
+    void *source,
     itk::SmartPointer<Image> preLoadedImageBlock)
 {
   if( filenames.empty() )
@@ -113,7 +114,7 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames,
       if (io->GetPixelType() == itk::ImageIOBase::SCALAR ||
           io->GetPixelType() == itk::ImageIOBase::RGB)
       {
-        LoadDicom(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
+        LoadDicom(filenames, node, sort, check_4d, correctTilt, callback, source, preLoadedImageBlock);
       }
 
       if (node.GetData())
@@ -1354,7 +1355,7 @@ void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBl
   image->GetGeometry()->SetSpacing( imageSpacing );
 }
 
-void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool, bool load4D, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool, bool load4D, bool correctTilt, UpdateCallBackMethod callback, void *source, Image::Pointer preLoadedImageBlock)
 {
   mitk::LocaleSwitch localeSwitch("C");
   std::locale previousCppLocale(std::cin.getloc());
@@ -1375,7 +1376,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   try
   {
     Image::Pointer image = preLoadedImageBlock.IsNull() ? Image::New() : preLoadedImageBlock;
-    CallbackCommand *command = callback ? new CallbackCommand(callback) : nullptr;
+    CallbackCommand *command = callback ? new CallbackCommand(callback, source) : nullptr;
     bool initialize_node = false;
 
     /* special case for Philips 3D+t ultrasound images */

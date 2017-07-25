@@ -78,7 +78,7 @@ mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles( const StringCon
   {
     StringContainer files = seriesIter->second.GetFilenames();
 
-    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, nullptr, preLoadedVolume ); // true, true, true ist just a copy of the default values
+    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, nullptr, nullptr, preLoadedVolume ); // true, true, true ist just a copy of the default values
 
     if (node.IsNotNull())
     {

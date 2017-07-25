@@ -326,7 +326,7 @@ public:
   /**
     \brief Interface for the progress callback.
   */
-  typedef void (*UpdateCallBackMethod)(float);
+  typedef void (*UpdateCallBackMethod)(float, void*);
 
   /**
     \brief Describes how well the reader is tested for a certain file type.
@@ -531,6 +531,7 @@ public:
                                            bool load4D = true,
                                            bool correctGantryTilt = true,
                                            UpdateCallBackMethod callback = nullptr,
+                                           void *source = nullptr,
                                            itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
   /**
@@ -545,6 +546,7 @@ public:
                               bool load4D = true,
                               bool correctGantryTilt = true,
                               UpdateCallBackMethod callback = nullptr,
+                              void *source = nullptr,
                               itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
   /**
@@ -873,23 +875,26 @@ protected:
   class CallbackCommand : public itk::Command
   {
   public:
-    CallbackCommand(UpdateCallBackMethod callback)
+    CallbackCommand(UpdateCallBackMethod callback, void* source)
       : m_Callback(callback)
+      , m_Source(source)
     {
     }
 
     void Execute(const itk::Object *caller, const itk::EventObject&) override
     {
-      (*this->m_Callback)(static_cast<const itk::ProcessObject*>(caller)->GetProgress());
+      (*this->m_Callback)(static_cast<const itk::ProcessObject*>(caller)->GetProgress(), m_Source);
     }
 
     void Execute(itk::Object *caller, const itk::EventObject&) override
     {
-      (*this->m_Callback)(static_cast<itk::ProcessObject*>(caller)->GetProgress());
+      (*this->m_Callback)(static_cast<itk::ProcessObject*>(caller)->GetProgress(), m_Source);
     }
 
+  private:
     // TODO ism need another mechanism for callback
     UpdateCallBackMethod m_Callback;
+    void* m_Source;
   };
 
   static void FixSpacingInformation( Image* image, const ImageBlockDescriptor& imageBlockDescriptor );
@@ -899,7 +904,7 @@ protected:
   */
   static
   void
-  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, itk::SmartPointer<Image> preLoadedImageBlock);
+  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, void *source, itk::SmartPointer<Image> preLoadedImageBlock);
 
   /**
     \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.

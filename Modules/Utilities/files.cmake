@@ -3,6 +3,7 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 set(CPP_FILES
   StringUtilities.cpp
   ThreadUtilities.cpp
+  ThreadPoolUtilities.cpp
   internal/Invoker.cpp
 )
 

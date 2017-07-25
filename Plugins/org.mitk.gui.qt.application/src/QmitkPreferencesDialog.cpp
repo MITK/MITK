@@ -509,6 +509,12 @@ void QmitkPreferencesDialog::UpdateTree()
       }
     }
   }
+  if (d->m_PreferencesTree->topLevelItemCount() > 0)
+  {
+    d->m_PreferencesTree->setCurrentItem(
+          d->m_PreferencesTree->topLevelItem(0),
+          0, QItemSelectionModel::Select);
+  }
 }
 
 void QmitkPreferencesDialog::UpdateExistingTree(bool advancedMode)

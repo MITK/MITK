@@ -4,6 +4,7 @@ set(CPP_FILES
   StringUtilities.cpp
   ThreadUtilities.cpp
   internal/Invoker.cpp
+  PathUtilities.cpp
 )
 
 set(MOC_H_FILES

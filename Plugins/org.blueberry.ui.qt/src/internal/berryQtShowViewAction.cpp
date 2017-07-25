@@ -48,6 +48,7 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "Incremental segmentation view", QAction::tr("Incremental segmentation view") },
   { "LiverResectionView", QAction::tr("LiverResectionView") },
   { "DiffusionADC", QAction::tr("DiffusionADC") },
+  { "Perfusion", QAction::tr("Perfusion") },
   { "LiverSegmentation", QAction::tr("LiverSegmentation") },
   { "Lung Trauma", QAction::tr("Lung Trauma") },
   { "Measurement", QAction::tr("Measurement") },

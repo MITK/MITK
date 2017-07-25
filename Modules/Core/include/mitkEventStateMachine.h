@@ -152,6 +152,14 @@ namespace mitk
       m_IsActive = enable;
     }
 
+    /**
+    * @brief tells whether the state machine is enabled
+    **/
+    bool isActive()
+    {
+      return m_IsActive;
+    }
+
   protected:
     EventStateMachine();
     virtual ~EventStateMachine();

@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QList>
 #include <QMouseEvent>
 #include <QTimer>
+#include <QStringList>
+#include <QDir>
 
 #include <mitkProperties.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
@@ -50,6 +52,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMitkRectangleProp.h>
 #include "mitkPixelTypeMultiplex.h"
 #include "mitkImagePixelReadAccessor.h"
+
+#include <PathUtilities.h>
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& name)
   : QWidget(parent, f),
@@ -294,9 +298,9 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Original );
 
-  SetDecorationProperties("Axial", GetDecorationColor(0), 0);
-  SetDecorationProperties("Sagittal", GetDecorationColor(1), 1);
-  SetDecorationProperties("Coronal", GetDecorationColor(2), 2);
+  SetDecorationProperties(Utilities::convertToLocalEncoding(tr("Axial")), GetDecorationColor(0), 0);
+  SetDecorationProperties(Utilities::convertToLocalEncoding(tr("Sagittal")), GetDecorationColor(1), 1);
+  SetDecorationProperties(Utilities::convertToLocalEncoding(tr("Coronal")), GetDecorationColor(2), 2);
   SetDecorationProperties("3D", GetDecorationColor(3), 3);
 
   for(int i = 0; i < 4; i++) {
@@ -639,24 +643,34 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
   this->UpdateAllWidgets();
 }
 
-void QmitkStdMultiWidget::SetDecorationProperties( std::string text,
-                                               mitk::Color color, int widgetNumber)
+void QmitkStdMultiWidget::SetDecorationProperties( std::string text, mitk::Color color, int widgetNumber)
 {
   if( widgetNumber > 3)
   {
     MITK_ERROR << "Unknown render window for annotation.";
     return;
   }
+
   vtkRenderer* renderer = this->GetRenderWindow(widgetNumber)->GetRenderer()->GetVtkRenderer();
-  if(!renderer) return;
+  if(!renderer)
+  {
+    return;
+  }
+
+  std::string fontPath = Utilities::preferredPath(Utilities::absPath(std::string("Fonts\\DejaVuSans.ttf")));
+
   vtkSmartPointer<vtkCornerAnnotation> annotation = m_CornerAnnotations[widgetNumber];
   annotation->SetText(0, text.c_str());
   annotation->SetMaximumFontSize(12);
+  annotation->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+  annotation->GetTextProperty()->SetFontFile(fontPath.c_str());
   annotation->GetTextProperty()->SetColor( color[0],color[1],color[2] );
+
   if(!renderer->HasViewProp(annotation))
   {
     renderer->AddViewProp(annotation);
   }
+
   vtkSmartPointer<vtkMitkRectangleProp> frame = m_RectangleProps[widgetNumber];
   frame->SetColor(color[0],color[1],color[2]);
   if(!renderer->HasViewProp(frame))
@@ -1572,15 +1586,19 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
 
 void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* text)
 {
+  std::string fontPath = Utilities::preferredPath(Utilities::absPath(std::string("Fonts\\DejaVuSans.ttf")));
+
   // empty or NULL string breaks renderer
   // and white square appears
   if ((text == NULL) || (text[0] == 0)) {
     text = " ";
   }
+
   cornerText[i]->SetText(corner, text);
   cornerText[i]->SetMaximumFontSize(15);
+  textProp[i]->SetFontFamily(VTK_FONT_FILE);
+  textProp[i]->SetFontFile(fontPath.c_str());
   textProp[i]->SetColor(1.0, 1.0, 7.0);
-  textProp[i]->SetFontFamilyToArial();
   cornerText[i]->SetTextProperty(textProp[i]);
 }
 

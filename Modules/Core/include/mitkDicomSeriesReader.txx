@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <limits>
 #include <map>
+#include <mutex>
 
 #include <boost/filesystem.hpp>
 
@@ -44,6 +45,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDicomSeriesReader.h>
 #include <mitkLookupTables.h>
 #include <mitkLookupTableProperty.h>
+
+namespace
+{
+  std::recursive_mutex s_readerGuard;
+
+  template <typename TReader>
+  void ReaderUpdate(TReader&& reader)
+  {
+    const std::unique_lock<std::recursive_mutex> lock(s_readerGuard);
+    reader->Update();
+  }
+}
 
 namespace mitk
 {
@@ -115,7 +128,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
   {
     reader->SetFileNames(imageBlocks.front());
 
-    reader->Update();
+    ReaderUpdate(reader);
 
     typename ImageType::Pointer readVolume = reader->GetOutput();
     // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
@@ -162,7 +175,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
     for (auto df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
     {
       reader->SetFileNames(*df_it);
-      reader->Update();
+      ReaderUpdate(reader);
       typename ImageType::Pointer readVolume = reader->GetOutput();
 
       if (correctTilt)
@@ -254,7 +267,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   if (preLoadedImageBlock.IsNull())
   {
     reader->SetFileNames(filenames);
-    reader->Update();
+    ReaderUpdate(reader);
 
     typename ImageType::Pointer readVolume = reader->GetOutput();
 
@@ -273,7 +286,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
     StringContainer fakeList;
     fakeList.push_back( filenames.front() );
     reader->SetFileNames( fakeList ); // we always need to load at least one file to get the MetaDataDictionary
-    reader->Update();
+    ReaderUpdate(reader);
   }
 
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "

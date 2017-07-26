@@ -280,23 +280,19 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
 
 mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha)
 {
-  MITK_INFO << "here";
   bool powerOfTwo = false;
   int finalPower = 0;
   for (int i = 1; pow(2, i) <= data->GetDimension(1); ++i)
   {
-    MITK_INFO << "here";
     finalPower = i;
     if (pow(2, i) == data->GetDimension(1))
     {
       powerOfTwo = true;
     }
   }
-  MITK_INFO << "here";
   if (!powerOfTwo)
   {
     unsigned int dim[2] = { data->GetDimension(0), pow(2,finalPower+1)};
-    MITK_INFO << "there";
     data = ApplyResampling(data, dim);
   }
 

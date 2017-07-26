@@ -38,6 +38,7 @@ __kernel void ckDASQuad(
   // get image width and weight
   const unsigned int inputL = get_image_width( dSource );
   const unsigned int inputS = get_image_height( dSource ) / (PAImage + 1);
+  const unsigned int inputSBack = get_image_height( dSource ) / 2;
   const unsigned int Slices = get_image_depth( dSource );
 
   // create an image sampler
@@ -49,7 +50,7 @@ __kernel void ckDASQuad(
     float l_i = (float)globalPosX / outputL * inputL;
     float s_i = (float)globalPosY / outputS * inputS / (2 - PAImage);
 	
-    float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputS * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
+    float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputSBack * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
       part = 1;
 
@@ -60,7 +61,7 @@ __kernel void ckDASQuad(
 	
 	short AddSample = 0;
 	float output = 0;
-	float delayMultiplicator = pow(inputS / (RecordTime*SpeedOfSound) * Pitch * TransducerElements / inputL, 2) / s_i / 2;
+	float delayMultiplicator = pow(inputSBack / (RecordTime*SpeedOfSound) * Pitch * TransducerElements / inputL, 2) / s_i / 2;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {

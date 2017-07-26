@@ -17,7 +17,8 @@ namespace Utilities
 {
   bool isGuiThread()
   {
-    return QThread::currentThread() == QCoreApplication::instance()->thread();
+    auto core = QCoreApplication::instance();
+    return core ? QThread::currentThread() == core->thread() : false;
   }
 
   void execInMainThreadAsync(const ExecuteProc& proc)

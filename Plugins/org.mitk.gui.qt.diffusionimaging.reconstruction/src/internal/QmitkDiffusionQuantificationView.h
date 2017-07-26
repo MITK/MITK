@@ -81,6 +81,7 @@ protected slots:
     int method) ;
 
   void DoBallStickCalculation();
+  void DoMultiTensorCalculation();
 
 protected:
 

@@ -74,8 +74,8 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   viewExcludeList.push_back( "org.mitk.views.controlvisualizationpropertiesview" );
   viewExcludeList.push_back( "org.mitk.views.modules" );
 
-  QRect rec = QApplication::desktop()->screenGeometry();
-  configurer->SetInitialSize(QPoint(rec.width(),rec.height()));
+  //QRect rec = QApplication::desktop()->screenGeometry();
+  //configurer->SetInitialSize(QPoint(rec.width(),rec.height()));
 
   QmitkDiffusionImagingAppWorkbenchWindowAdvisor* advisor = new QmitkDiffusionImagingAppWorkbenchWindowAdvisor(this, configurer);
   advisor->ShowViewMenuItem(true);

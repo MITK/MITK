@@ -45,8 +45,8 @@ namespace itk {
 template< class TTensorPixelType>
 DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>::DiffusionTensorPrincipalDirectionImageFilter()
     : m_NormalizeVectors(true)
-    , m_MaxEigenvalue(0.0)
     , m_UsePolarCoordinates(false)
+    , m_FaThreshold(0.2)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -144,9 +144,6 @@ void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
         peakIndex[3] = 2;
         dir[2] = m_PeakImage->GetPixel(peakIndex);
 
-        if (!m_NormalizeVectors && m_MaxEigenvalue>0 && !m_UsePolarCoordinates)
-            dir /= m_MaxEigenvalue;
-
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
         itk::ContinuousIndex<double, 3> center;
         center[0] = index[0];
@@ -220,37 +217,42 @@ void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
             vec[0] = eigenvectors(2,0);
             vec[1] = eigenvectors(2,1);
             vec[2] = eigenvectors(2,2);
+            vec.normalize();
 
-            if (!m_NormalizeVectors)
-                vec *= eigenvalues[2];
+            vnl_vector_fixed<float,3> out; out.fill(0);
 
-            if (eigenvalues[2]>m_MaxEigenvalue)
-                m_MaxEigenvalue = eigenvalues[2];
-
-            vnl_vector_fixed<float,3> out;
-            if (m_UsePolarCoordinates)
+            float fa = tensor.GetFractionalAnisotropy();
+            if (fa<m_FaThreshold)
+              vec.fill(0.0);
+            else
             {
-              if(vec[0] || vec[1] || vec[2])
-              {
-                out[0] = sqrt( vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] );
-                out[1] = atan2( vec[1], vec[0] );
-                out[2] = 0.5*M_PI - atan( vec[2] / sqrt( vec[0] * vec[0] + vec[1] * vec[1] ) );
+              if (!m_NormalizeVectors)
+                vec *= fa;
 
-                if(out[1]>M_PI)
+              if (m_UsePolarCoordinates)
+              {
+                if(vec[0] || vec[1] || vec[2])
                 {
-                  out[1] = out[1] - M_PI;
+                  out[0] = sqrt( vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] );
+                  out[1] = atan2( vec[1], vec[0] );
+                  out[2] = 0.5*M_PI - atan( vec[2] / sqrt( vec[0] * vec[0] + vec[1] * vec[1] ) );
+
+                  if(out[1]>M_PI)
+                  {
+                    out[1] = out[1] - M_PI;
+                  }
+                }
+                else
+                {
+                  out[0] = 0;
+                  out[1] = 0;
+                  out[2] = 0;
                 }
               }
               else
               {
-                out[0] = 0;
-                out[1] = 0;
-                out[2] = 0;
+                out = vec;
               }
-            }
-            else
-            {
-              out = vec;
             }
 
             peakIndex[3] = 0;

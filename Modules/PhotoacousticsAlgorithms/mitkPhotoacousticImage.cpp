@@ -280,12 +280,28 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
 
 mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha)
 {
-  if (data->GetDimension(1) % 2 != 0)
+  MITK_INFO << "here";
+  bool powerOfTwo = false;
+  int finalPower = 0;
+  for (int i = 1; pow(2, i) <= data->GetDimension(1); ++i)
   {
-    int CropBounds[2] = { 0, data->GetDimension(2) - 1 };
-    data = ApplyCropping(data, 1, 0, 0, 0, CropBounds[0], CropBounds[1]);
-    //for the itk filter to work we make sure the 2nd dimension is a multiple of 2
+    MITK_INFO << "here";
+    finalPower = i;
+    if (pow(2, i) == data->GetDimension(1))
+    {
+      powerOfTwo = true;
+    }
   }
+  MITK_INFO << "here";
+  if (!powerOfTwo)
+  {
+    unsigned int dim[2] = { data->GetDimension(0), pow(2,finalPower+1)};
+    MITK_INFO << "there";
+    data = ApplyResampling(data, dim);
+  }
+
+  MITK_INFO << data->GetDimension(0);
+
   // do a fourier transform, multiply with an appropriate window for the filter, and transform back
   typedef float PixelType;
   typedef itk::Image< PixelType, 3 > RealImageType;

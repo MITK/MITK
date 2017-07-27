@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 
+#include <mutex>
+#include <condition_variable>
+
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
 
@@ -1606,6 +1609,85 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   return imageBlocks;
 }
 
+namespace
+{
+enum class DICOMType
+{
+  NONE,
+  SCALAR,
+  RGB,
+  SCALAR_4D,
+  RGB_4D
+};
+
+class LoadSync
+{
+public:
+  LoadSync();
+
+  void Lock(const DICOMType type);
+  void Unlock(const DICOMType type);
+
+private:
+  typedef std::unique_lock<std::recursive_mutex> ScopedLock;
+
+  DICOMType m_type;
+  size_t m_count;
+  std::recursive_mutex m_mutex;
+  std::condition_variable_any m_event;
+};
+
+LoadSync::LoadSync()
+  : m_type(DICOMType::NONE)
+  , m_count(0)
+{
+}
+
+void LoadSync::Lock(const DICOMType type)
+{
+  ScopedLock lock(m_mutex);
+  while (DICOMType::NONE != m_type && type != m_type) {
+    m_event.wait(lock);
+  }
+  m_type = type;
+  ++m_count;
+}
+
+void LoadSync::Unlock(const DICOMType type)
+{
+  ScopedLock lock(m_mutex);
+  if (!--m_count) {
+    m_type = DICOMType::NONE;
+  }
+  m_event.notify_all();
+}
+
+class LoadSyncGuard
+{
+public:
+  explicit LoadSyncGuard(const DICOMType type);
+  ~LoadSyncGuard();
+
+private:
+  const DICOMType m_type;
+
+  static LoadSync s_guard;
+};
+
+LoadSync LoadSyncGuard::s_guard;
+
+LoadSyncGuard::LoadSyncGuard(const DICOMType type)
+  : m_type(type)
+{
+  s_guard.Lock(m_type);
+}
+
+LoadSyncGuard::~LoadSyncGuard()
+{
+  s_guard.Unlock(m_type);
+}
+}
+
 Image::Pointer
 DicomSeriesReader
 ::MultiplexLoadDICOMByITK(const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock)
@@ -1617,10 +1699,12 @@ DicomSeriesReader
 
   if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
   {
+    const LoadSyncGuard guard(DICOMType::SCALAR);
     return MultiplexLoadDICOMByITKScalar(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
   }
   else if (io->GetPixelType() == itk::ImageIOBase::RGB)
   {
+    const LoadSyncGuard guard(DICOMType::RGB);
     return MultiplexLoadDICOMByITKRGBPixel(filenames, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
   }
   else
@@ -1640,10 +1724,12 @@ DicomSeriesReader
 
   if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
   {
+    const LoadSyncGuard guard(DICOMType::SCALAR_4D);
     return MultiplexLoadDICOMByITK4DScalar(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
   }
   else if (io->GetPixelType() == itk::ImageIOBase::RGB)
   {
+    const LoadSyncGuard guard(DICOMType::RGB_4D);
     return MultiplexLoadDICOMByITK4DRGBPixel(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
   }
   else

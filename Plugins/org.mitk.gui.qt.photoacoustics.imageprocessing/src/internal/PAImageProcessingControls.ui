@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>370</width>
-    <height>875</height>
+    <width>323</width>
+    <height>1074</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,18 +23,11 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="BmodeFilter">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;B-mode Filter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QLabel" name="FilterSettings">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;B-mode Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -91,14 +84,14 @@
            </item>
           </layout>
          </item>
-         <item>
-          <widget class="QCheckBox" name="Logfilter">
-           <property name="text">
-            <string>Add Logfilter</string>
-           </property>
-          </widget>
-         </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="Logfilter">
+         <property name="text">
+          <string>Add Logfilter</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="labelWarning">
@@ -136,18 +129,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="CropLabel">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Crop Filter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QLabel" name="CropSettings">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Crop Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -156,28 +142,28 @@
          <item>
           <widget class="QSpinBox" name="CutoffAbove">
            <property name="maximum">
-            <number>1000000000</number>
+            <number>99999</number>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_20">
            <property name="text">
-            <string>Cutoff Above</string>
+            <string>Cut Top</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QSpinBox" name="CutoffBelow">
            <property name="maximum">
-            <number>1000000000</number>
+            <number>99999</number>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_21">
            <property name="text">
-            <string>Cutoff Below</string>
+            <string>Cut Bottom</string>
            </property>
           </widget>
          </item>
@@ -207,18 +193,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_19">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Bandpass Filter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
         <widget class="QLabel" name="label_22">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Bandpass Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -255,14 +234,14 @@
          <item row="0" column="1">
           <widget class="QLabel" name="BPHighLabel">
            <property name="text">
-            <string>High Pass Frequency [MHz]</string>
+            <string>[MHz] f High Pass</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
           <widget class="QLabel" name="BPLowLabel">
            <property name="text">
-            <string>Low Pass Frequency [MHz]</string>
+            <string>[MHz] f Low Pass</string>
            </property>
           </widget>
          </item>
@@ -311,7 +290,7 @@
          <item row="3" column="1">
           <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>Speed of Sound [m/s]</string>
+            <string>[m/s] Speed of Sound</string>
            </property>
           </widget>
          </item>
@@ -359,7 +338,7 @@
      <item>
       <widget class="QLabel" name="Beamforming">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Beamforming&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Beamforming Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -371,17 +350,17 @@
        <property name="verticalSpacing">
         <number>2</number>
        </property>
-       <item row="5" column="1">
+       <item row="4" column="1">
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Delay Calculation Method</string>
+          <string>Delay Calculation</string>
          </property>
         </widget>
        </item>
        <item row="18" column="1">
         <widget class="QCheckBox" name="UseImageSpacing">
          <property name="text">
-          <string>Auto get Depth, Transducer Config</string>
+          <string>Auto Get Depth</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -402,7 +381,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="3" column="1">
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>Beamforming Method</string>
@@ -412,7 +391,7 @@
        <item row="19" column="1">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Scan Depth [mm]</string>
+          <string>[mm] Scan Depth</string>
          </property>
         </widget>
        </item>
@@ -444,7 +423,7 @@
        <item row="22" column="1">
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Transducer Element Count</string>
+          <string>Transducer Elements</string>
          </property>
         </widget>
        </item>
@@ -470,7 +449,7 @@
        <item row="21" column="1">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Transducer Pitch [mm]</string>
+          <string>[mm] Transducer Pitch</string>
          </property>
         </widget>
        </item>
@@ -554,58 +533,6 @@
          </property>
         </widget>
        </item>
-       <item row="26" column="0">
-        <widget class="QDoubleSpinBox" name="Angle">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="decimals">
-          <number>1</number>
-         </property>
-         <property name="minimum">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>27.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="26" column="1">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Element Angle [°]</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QSpinBox" name="Cutoff">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximum">
-          <number>500</number>
-         </property>
-         <property name="singleStep">
-          <number>10</number>
-         </property>
-         <property name="value">
-          <number>50</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_12">
-         <property name="text">
-          <string>Cutoff Upper Voxels</string>
-         </property>
-        </widget>
-       </item>
        <item row="27" column="0">
         <widget class="QProgressBar" name="progressBar">
          <property name="enabled">
@@ -616,7 +543,33 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="0" column="0">
+        <widget class="QSpinBox" name="Cutoff">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximum">
+          <number>900</number>
+         </property>
+         <property name="singleStep">
+          <number>10</number>
+         </property>
+         <property name="value">
+          <number>50</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Cutoff Upper Voxels</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
         <widget class="QComboBox" name="BFAlgorithm">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -636,7 +589,7 @@
          </item>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="4" column="0">
         <widget class="QComboBox" name="DelayCalculation">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -656,8 +609,14 @@
          </item>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="5" column="0">
         <widget class="QComboBox" name="ImageType">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <item>
           <property name="text">
            <string>PA Image</string>
@@ -670,22 +629,21 @@
          </item>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="5" column="1">
         <widget class="QLabel" name="label_10">
          <property name="text">
           <string>Image Type</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_15">
-         <property name="text">
-          <string>Parameter</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
+       <item row="6" column="0">
         <widget class="QComboBox" name="Apodization">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <item>
           <property name="text">
            <string>Von Hann</string>
@@ -703,7 +661,7 @@
          </item>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="6" column="1">
         <widget class="QLabel" name="label_16">
          <property name="text">
           <string>Apodization</string>
@@ -738,11 +696,11 @@
        <item row="23" column="1">
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Speed of Sound [m/s]</string>
+          <string>[m/s] Speed of Sound</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QSpinBox" name="boundLow">
@@ -750,7 +708,7 @@
             <bool>false</bool>
            </property>
            <property name="maximum">
-            <number>999999999</number>
+            <number>99999</number>
            </property>
           </widget>
          </item>
@@ -760,13 +718,13 @@
             <string>minimal beamformed slice</string>
            </property>
            <property name="text">
-            <string>minSlice</string>
+            <string>min</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="3" column="1">
+       <item row="2" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QSpinBox" name="boundHigh">
@@ -774,7 +732,7 @@
             <bool>false</bool>
            </property>
            <property name="maximum">
-            <number>999999999</number>
+            <number>99999</number>
            </property>
            <property name="value">
             <number>10</number>
@@ -787,33 +745,33 @@
             <string>Maximal beamformed slice</string>
            </property>
            <property name="text">
-            <string>maxSlice</string>
+            <string>max</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="Partial">
+       <item row="28" column="0">
+        <widget class="QLabel" name="ProgressInfo">
          <property name="text">
-          <string>Beamform Image partially</string>
+          <string/>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="Partial">
+         <property name="text">
+          <string>select slices</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
         <widget class="QCheckBox" name="UseGPU">
          <property name="text">
           <string>Compute On GPU</string>
          </property>
          <property name="checked">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="28" column="0">
-        <widget class="QLabel" name="ProgressInfo">
-         <property name="text">
-          <string/>
          </property>
         </widget>
        </item>
@@ -824,6 +782,35 @@
          </property>
          <property name="text">
           <string>Auto Use Bandpass</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QDoubleSpinBox" name="Angle">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="decimals">
+          <number>1</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>180.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>27.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>[°] Element Angle</string>
          </property>
         </widget>
        </item>

@@ -135,6 +135,7 @@ void PAImageProcessing::StartBeamformingThread()
       connect(thread, &BeamformingThread::finished, thread, &QObject::deleteLater);
 
       thread->setConfig(BFconfig);
+      thread->setCutoff(m_Controls.Cutoff->value());
       thread->setInputImage(image);
 
       MITK_INFO << "Started new thread for Beamforming";

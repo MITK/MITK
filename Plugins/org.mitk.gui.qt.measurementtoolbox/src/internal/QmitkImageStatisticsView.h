@@ -53,9 +53,9 @@ private:
   typedef QList<mitk::DataNode*> SelectedDataNodeVectorType;
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
 
-  QMap<QVariant, QVariant> ConvertHistogramToMap(itk::Statistics::Histogram<double>::Pointer histogram) const;
-  QList<QVariant> ConvertIntensityProfileToList(mitk::IntensityProfile::Pointer intensityProfile) const;
-  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer statistics, mitk::Image::ConstPointer image) const;
+  std::map<double, double> ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const;
+  std::vector<double> ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const;
+  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image) const;
 
   QString GetFormattedIndex(const vnl_vector<int>& vector) const;
   QString GetFormattedString(double value, unsigned int decimals) const;
@@ -120,9 +120,9 @@ protected:
   void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics,
     const mitk::Image *image);
 
-  std::vector<QString> AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);
+  std::vector<QString> AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image);
 
-  void FillLinearProfileStatisticsTableView(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);
+  void FillLinearProfileStatisticsTableView(mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image);
 
   /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();

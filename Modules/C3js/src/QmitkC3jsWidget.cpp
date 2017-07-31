@@ -114,13 +114,13 @@ void QmitkC3jsWidget::Impl::callJavaScriptFuntion(QString command)
 
 void QmitkC3jsWidget::Impl::ClearJavaScriptChart()
 {
-  m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+    m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
 }
 
 void QmitkC3jsWidget::Impl::initializeJavaScriptChart()
 {
   m_WebChannel->registerObject(QStringLiteral("initValues"), &m_c3Data);
-  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/QmitkC3jsWidget.html")));
+  m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/QmitkC3jsWidget.html")));
 }
 
 QmitkC3jsWidget::QmitkC3jsWidget(const QString& id, QObject* object, QWidget* parent)

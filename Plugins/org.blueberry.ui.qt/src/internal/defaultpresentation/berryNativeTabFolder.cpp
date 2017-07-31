@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQCTabBar.h"
 
 #include <internal/berryQtControlWidget.h>
-#include <internal/berryWorkbenchPlugin.h>
+#include <berryWorkbenchPlugin.h>
 
 #include <berryIQtStyleManager.h>
 #include <berryShell.h>

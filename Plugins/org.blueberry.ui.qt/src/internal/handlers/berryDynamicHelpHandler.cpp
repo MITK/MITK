@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryDynamicHelpHandler.h"
 
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 #include <service/event/ctkEventAdmin.h>
 #include <ctkPluginException.h>

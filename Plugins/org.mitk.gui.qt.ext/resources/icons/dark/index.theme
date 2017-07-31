@@ -1,0 +1,46 @@
+[Icon Theme]
+Name=dark
+Comment=Icon theme to go with a dark GUI
+Directories=scalable/actions scalable/status scalable/places
+
+[scalable/actions]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Actions
+
+[scalable/categories]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Categories
+
+[scalable/devices]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Devices
+
+[scalable/mimetypes]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=MimeTypes
+
+[scalable/status]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Status
+
+[scalable/places]
+Size=48
+Type=Scalable
+MinSize=1
+MaxSize=256
+Context=Places

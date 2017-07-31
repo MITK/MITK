@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/berryPreferenceConstants.h"
 #include "internal/berryQtShowPerspectiveDialog.h"
 #include "internal/berryWorkbench.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 #include <QMessageBox>
 

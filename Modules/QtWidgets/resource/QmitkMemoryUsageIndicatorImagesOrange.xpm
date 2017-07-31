@@ -1,5 +1,5 @@
 /* XPM */
-static char * QmitkMemoryUsageIndicatorImagesOrange_xpm[] = {
+static const char * QmitkMemoryUsageIndicatorImagesOrange_xpm[] = {
 "100 100 10 1",
 " 	c None",
 ".	c #EDA11A",

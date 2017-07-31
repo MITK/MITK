@@ -1,5 +1,5 @@
 /* XPM */
-static char * QmitkMemoryUsageIndicatorImagesYellow_xpm[] = {
+static const char * QmitkMemoryUsageIndicatorImagesYellow_xpm[] = {
 "100 100 2 1",
 " 	c None",
 ".	c #F7E022",

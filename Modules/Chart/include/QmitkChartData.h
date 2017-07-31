@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkC3Data_h
 #define QmitkC3Data_h
 
-#include <QmitkC3jsWidget.h>
+#include <QmitkChartWidget.h>
 #include <QVariant>
 
 /** \brief This class holds the relevant properties for the chart generation with C3 such as labels and diagram type.
 * It is derived from QObject, because we need Q_PROPERTIES to send Data via QWebChannel to JavaScript.
 * \sa The actual data for the chart generation is in QmitkC3xyData!
 */
-class QmitkC3Data : public QObject
+class QmitkChartData : public QObject
 {
   Q_OBJECT
 
@@ -36,9 +36,9 @@ class QmitkC3Data : public QObject
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
 
 public:
-  QmitkC3Data();
+  QmitkChartData();
 
-  void SetAppearance(QVariant diagramTypeName, bool showSubChart = true, bool usePercentageInPieChart = false);
+  void SetAppearance(const QVariant& diagramTypeName, bool showSubChart = true, bool usePercentageInPieChart = false);
 
   Q_INVOKABLE QList<QVariant> GetDataLabels() const { return m_dataLabels; };
   Q_INVOKABLE void SetDataLabels(const QList<QVariant>& dataLabels) { m_dataLabels = dataLabels; emit SignalDataLabelsChanged(dataLabels); };
@@ -67,7 +67,6 @@ signals:
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
 
 private:
-
   QList<QVariant> m_dataLabels;
   QVariant m_xAxisLabel;
   QVariant m_yAxisLabel;

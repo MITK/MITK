@@ -33,7 +33,7 @@ set(mitk_modules
   OpenViewCore
   QtWidgets
   QtWidgetsExt
-  C3js
+  Chart
   QmlItems
   SegmentationUI
   DiffusionImaging

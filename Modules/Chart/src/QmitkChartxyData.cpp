@@ -14,17 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkC3xyData.h>
+#include <QmitkChartxyData.h>
 
-QmitkC3xyData::QmitkC3xyData()
-{
-}
-
-QmitkC3xyData::QmitkC3xyData(QMap<QVariant, QVariant> data) {
+QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data) {
   SetData(data);
 }
 
-QmitkC3xyData::QmitkC3xyData(QList<QVariant> data) {
+QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data) {
   QMap<QVariant, QVariant> augmentedData;
   unsigned int count = 0;
   //just augment the 1D data
@@ -36,7 +32,7 @@ QmitkC3xyData::QmitkC3xyData(QList<QVariant> data) {
 }
 
 
-void QmitkC3xyData::SetData(QMap<QVariant, QVariant> data)
+void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data)
 {
 	for (const auto& entry : data.toStdMap())
 	{
@@ -45,7 +41,7 @@ void QmitkC3xyData::SetData(QMap<QVariant, QVariant> data)
 	}
 }
 
-void QmitkC3xyData::ClearData()
+void QmitkChartxyData::ClearData()
 {
   this->m_YData.clear();
   this->m_XData.clear();

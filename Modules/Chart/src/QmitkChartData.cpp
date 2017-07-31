@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkC3Data.h>
+#include <QmitkChartData.h>
 
-QmitkC3Data::QmitkC3Data() : m_DiagramTypeName(QVariant("line")),
+QmitkChartData::QmitkChartData() : m_DiagramTypeName(QVariant("line")),
 m_ShowSubchart(true)
 {
 }
 
-void QmitkC3Data::SetAppearance(QVariant diagramTypeName, bool showSubChart, bool usePercentageInPieChart)
+void QmitkChartData::SetAppearance(const QVariant& diagramTypeName, bool showSubChart, bool usePercentageInPieChart)
 {
   m_DiagramTypeName = diagramTypeName;
   m_ShowSubchart = showSubChart;

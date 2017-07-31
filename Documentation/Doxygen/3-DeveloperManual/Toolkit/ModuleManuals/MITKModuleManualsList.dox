@@ -14,6 +14,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage mitkPython_Overview
   \li \subpage USModulePage
   \li \subpage OverlaysModulePage
+  \li \subpage ChartModule
 
 \section MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
 

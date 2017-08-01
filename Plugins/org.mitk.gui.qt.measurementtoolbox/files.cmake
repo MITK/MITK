@@ -28,9 +28,6 @@ set(CACHED_RESOURCE_FILES
   resources/arrow.png
   resources/circle.png
   resources/four-point-angle.png
-  resources/ImageStatistic_24.png
-  resources/ImageStatistic_48.png
-  resources/ImageStatistic_64.png
   resources/lena.xpm
   resources/line.png
   resources/measurement.png
@@ -39,6 +36,7 @@ set(CACHED_RESOURCE_FILES
   resources/rectangle.png
   resources/stats.png
   resources/text.png
+  resources/bar-chart.svg
   plugin.xml
 )
 

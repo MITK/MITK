@@ -167,7 +167,7 @@ else()
       install(FILES "${_qmake_path}/../plugins/iconengines/libqsvgicon.so"
               DESTINATION "bin/plugins/iconengines")
       install(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so"
-              DESTINATION "bin/plugins/iconengines")
+              DESTINATION "bin/plugins/xcbglintegrations")
 
       if(MITK_USE_Qt5_WebEngine)
         MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")

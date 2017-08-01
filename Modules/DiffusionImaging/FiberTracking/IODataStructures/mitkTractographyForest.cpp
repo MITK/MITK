@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include "mitkTractographyForest.h"
 #include <mitkExceptionMacro.h>
+#include <mitkGeometry3D.h>
 
 using namespace std;
 
@@ -27,6 +28,8 @@ namespace mitk
 TractographyForest::TractographyForest( std::shared_ptr< vigra::RandomForest<int> > forest )
 {
   m_Forest = forest;
+  mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+  SetGeometry(geometry);
 }
 
 TractographyForest::~TractographyForest()

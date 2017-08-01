@@ -14,26 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkPlanarFigureCompositeSerializer_h_included
-#define mitkPlanarFigureCompositeSerializer_h_included
+#ifndef mitkTractographyForestSerializer_h_included
+#define mitkTractographyForestSerializer_h_included
 
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
 {
 /**
-  \brief Serializes mitk::PlanarFigureComposite for mitk::SceneIO
+  \brief Serializes mitk::TractographyForest for mitk::SceneIO
 */
-class PlanarFigureCompositeSerializer : public BaseDataSerializer
+class TractographyForestSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( PlanarFigureCompositeSerializer, BaseDataSerializer );
+    mitkClassMacro( TractographyForestSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     virtual std::string Serialize() override;
   protected:
-    PlanarFigureCompositeSerializer();
-    virtual ~PlanarFigureCompositeSerializer();
+    TractographyForestSerializer();
+    virtual ~TractographyForestSerializer();
 };
 } // namespace
 #endif

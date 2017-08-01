@@ -324,10 +324,14 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
       if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
       {
+        float angle = angles[classLabel];
+        float abs_angle = fabs(angle);
+
         if (m_Mode==MODE::PROBABILISTIC)
         {
-          if (!check_last_dir || fabs(angles[classLabel])>=m_AngularThreshold)
-            probs2[classLabel] = probs(0,i);
+          probs2[classLabel] = probs(0,i);
+          if (check_last_dir)
+            probs2[classLabel] *= abs_angle;
           probs_sum += probs2[classLabel];
         }
         else if (m_Mode==MODE::DETERMINISTIC)
@@ -364,14 +368,19 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
   if (m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
   {
-    probs2 /= probs_sum;
     boost::random::discrete_distribution<int, float> dist(probs2.begin(), probs2.end());
-
     int sampled_idx = 0;
-#pragma omp critical
+
+    for (int i=0; i<50; i++)  // we allow 50 trials to exceed m_AngularThreshold
     {
+  #pragma omp critical
+      {
         boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
         sampled_idx = sampler();
+      }
+
+      if ( probs2[sampled_idx]>0.1 && (!check_last_dir || (check_last_dir && fabs(angles[sampled_idx])>=m_AngularThreshold)) )
+        break;
     }
 
     output_direction = m_DirectionContainer.at(sampled_idx);

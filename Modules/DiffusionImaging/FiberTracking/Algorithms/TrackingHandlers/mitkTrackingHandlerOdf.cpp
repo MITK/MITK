@@ -232,7 +232,6 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   // do probabilistic sampling
   if (m_Mode==MODE::PROBABILISTIC && probs_sum>0.0001)
   {
-//    probs /= probs_sum;
     int max_sample_idx = SampleOdf(probs, angles);
     if (max_sample_idx>=0)
     {

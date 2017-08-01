@@ -339,16 +339,11 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
           vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
           if (check_last_dir)   // do we have a previous streamline direction or did we just start?
           {
-            // TODO: check if hard curvature threshold is necessary.
-            // alternatively try square of dot product as weight.
-            // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
-
-            float dot = angles[classLabel];    // claculate angle between the candidate direction vector and the previous streamline direction
-            if (fabs(dot)>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
+            if (abs_angle>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
             {
-              if (dot<0)                          // make sure we don't walk backwards
+              if (angle<0)                          // make sure we don't walk backwards
                 d *= -1;
-              float w_i = probs(0,i)*fabs(dot);
+              float w_i = probs(0,i)*abs_angle;
               output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
               w += w_i;           // increase output weight of the final direction
             }

@@ -17,6 +17,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
+  resources/pai.svg
   resources/photoacousticsIcon.png
   plugin.xml
 )

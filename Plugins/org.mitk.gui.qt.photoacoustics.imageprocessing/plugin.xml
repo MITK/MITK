@@ -5,7 +5,7 @@
     <view id="org.mitk.views.paimageprocessing"
           name="PA Image Processing"
           class="PAImageProcessing"
-          icon="resources/photoacousticsIcon.png" />
+          icon="resources/pai.svg" />
   </extension>
 
 </plugin>

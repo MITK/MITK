@@ -71,8 +71,11 @@ void QmitkStreamlineTrackingWorker::run()
 QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
   : m_TrackingWorker(this)
   , m_Controls(nullptr)
+  , m_FirstTensorProbRun(true)
+  , m_FirstInteractiveRun(true)
   , m_TrackingHandler(nullptr)
   , m_ThreadIsRunning(false)
+  , m_DeleteTrackingHandler(false)
 {
   m_TrackingWorker.moveToThread(&m_TrackingThread);
   connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -164,7 +167,6 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FrontalSamplesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
 
-    m_FirstTensorProbRun = true;
     StartStopTrackingGui(false);
   }
 
@@ -208,12 +210,20 @@ void QmitkStreamlineTrackingView::AfterThread()
       warnBox.setDetailedText("No fibers were generated using the chosen parameters. Typical reasons are:\n\n- Cutoff too high. Some images feature very low FA/GFA/peak size. Try to lower this parameter.\n- Angular threshold too strict. Try to increase this parameter.\n- A small step sizes also means many steps to go wrong. Especially in the case of probabilistic tractography. Try to adjust the angular threshold.");
       warnBox.setIcon(QMessageBox::Warning);
       warnBox.exec();
+
+      if (m_InteractivePointSetNode.IsNotNull())
+        m_InteractivePointSetNode->SetProperty("color", mitk::ColorProperty::New(1,1,1));
+      StartStopTrackingGui(false);
+      if (m_DeleteTrackingHandler)
+        DeleteTrackingHandler();
+      UpdateGui();
+
       return;
     }
 
     mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
     fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
-    if (m_Controls->m_ResampleFibersBox->isChecked())
+    if (m_Controls->m_ResampleFibersBox->isChecked() && fiberBundle->GetNumberOfLines()>0)
       fib->Compress(m_Controls->m_FiberErrorBox->value());
     fib->ColorFibersByOrientation();
 
@@ -288,12 +298,18 @@ void QmitkStreamlineTrackingView::AfterThread()
       GetDataStorage()->Add(node, m_InputImageNodes.at(0));
     }
   }
+  if (m_InteractivePointSetNode.IsNotNull())
+    m_InteractivePointSetNode->SetProperty("color", mitk::ColorProperty::New(1,1,1));
   StartStopTrackingGui(false);
+  if (m_DeleteTrackingHandler)
+    DeleteTrackingHandler();
   UpdateGui();
 }
 
 void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 {
+  if (m_ThreadIsRunning)
+    return;
   if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()))
     return;
 
@@ -322,7 +338,7 @@ void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
     p *= radius;
     m_SeedPoints.push_back(world_pos+p);
   }
-
+  m_InteractivePointSetNode->SetProperty("color", mitk::ColorProperty::New(1,0,0));
   DoFiberTracking();
 }
 
@@ -336,8 +352,6 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 {
   UpdateGui();
 
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-
   m_Controls->m_SeedsPerVoxelBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
   m_Controls->m_SeedsPerVoxelLabel->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
   m_Controls->m_SeedGmBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
@@ -348,6 +362,12 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 
   if ( m_Controls->m_InteractiveBox->isChecked() )
   {
+    if (m_FirstInteractiveRun)
+    {
+      QMessageBox::information(nullptr, "Information", "Place and move a spherical seed region anywhere in the image by left-clicking and dragging. If the seed region is colored red, tracking is in progress. If the seed region is colored white, tracking is finished.\nPlacing the seed region for the first time in a newly selected dataset might cause a short delay, since the tracker needs to be initialized.");
+      m_FirstInteractiveRun = false;
+    }
+
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     QApplication::processEvents();
 
@@ -359,29 +379,9 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
     m_InteractivePointSetNode->SetProperty("Pointset.2D.shape", shape_prop);
     GetDataStorage()->Add(m_InteractivePointSetNode);
 
-    if (renderWindow)
-    {
-      {
-        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkStreamlineTrackingView>::Pointer command = itk::ReceptorMemberCommand<QmitkStreamlineTrackingView>::New();
-        command->SetCallbackFunction( this, &QmitkStreamlineTrackingView::OnSliceChanged );
-        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-      }
 
-      {
-        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkStreamlineTrackingView>::Pointer command = itk::ReceptorMemberCommand<QmitkStreamlineTrackingView>::New();
-        command->SetCallbackFunction( this, &QmitkStreamlineTrackingView::OnSliceChanged );
-        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-      }
-
-      {
-        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkStreamlineTrackingView>::Pointer command = itk::ReceptorMemberCommand<QmitkStreamlineTrackingView>::New();
-        command->SetCallbackFunction( this, &QmitkStreamlineTrackingView::OnSliceChanged );
-        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-      }
-    }
+    m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+    connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
   }
   else
   {
@@ -391,19 +391,12 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
     m_InteractiveNode = nullptr;
     m_InteractivePointSetNode = nullptr;
 
-    if (renderWindow)
-    {
-      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-      slicer->RemoveObserver(m_SliceObserverTag1);
-      slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-      slicer->RemoveObserver(m_SliceObserverTag2);
-      slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-      slicer->RemoveObserver(m_SliceObserverTag3);
-    }
+    m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+    disconnect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
   }
 }
 
-void QmitkStreamlineTrackingView::OnSliceChanged(const itk::EventObject& /*e*/)
+void QmitkStreamlineTrackingView::OnSliceChanged()
 {
   InteractiveSeedChanged(true);
 }
@@ -414,10 +407,15 @@ void QmitkStreamlineTrackingView::SetFocus()
 
 void QmitkStreamlineTrackingView::DeleteTrackingHandler()
 {
-  if (m_TrackingHandler != nullptr)
+  if (!m_ThreadIsRunning && m_TrackingHandler != nullptr)
   {
     delete m_TrackingHandler;
     m_TrackingHandler = nullptr;
+    m_DeleteTrackingHandler = false;
+  }
+  else if (m_ThreadIsRunning)
+  {
+    m_DeleteTrackingHandler = true;
   }
 }
 
@@ -435,10 +433,11 @@ void QmitkStreamlineTrackingView::OutputStyleSwitched()
 
 void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes )
 {
+  std::vector< mitk::DataNode::Pointer > last_nodes = m_InputImageNodes;
   m_InputImageNodes.clear();
   m_InputImages.clear();
   m_AdditionalInputImages.clear();
-  DeleteTrackingHandler();
+  bool retrack = false;
 
   for( auto node : nodes )
   {
@@ -449,16 +448,19 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
       {
         m_InputImageNodes.push_back(node);
         m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
+        retrack = true;
       }
       else if ( dynamic_cast<mitk::QBallImage*>(node->GetData()) )
       {
         m_InputImageNodes.push_back(node);
         m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
+        retrack = true;
       }
       else if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) )
       {
         m_InputImageNodes.push_back(node);
         m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
+        retrack = true;
       }
       else
       {
@@ -471,6 +473,7 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
           {
             m_InputImageNodes.push_back(node);
             m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
+            retrack = true;
           }
           else if (dim==3)
           {
@@ -481,8 +484,24 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
     }
   }
 
+  // sometimes the OnSelectionChanged event is sent twice and actually no selection has changed for the first event. We need to catch that.
+  if (last_nodes.size() == m_InputImageNodes.size())
+  {
+    bool same_nodes = true;
+    for (unsigned int i=0; i<m_InputImageNodes.size(); i++)
+      if (last_nodes.at(i)!=m_InputImageNodes.at(i))
+      {
+        same_nodes = false;
+        break;
+      }
+    if (same_nodes)
+      return;
+  }
+
+  DeleteTrackingHandler();
   UpdateGui();
-  OnParameterChanged();
+  if (retrack)
+    OnParameterChanged();
 }
 
 void QmitkStreamlineTrackingView::UpdateGui()
@@ -802,6 +821,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     m_Tracker->SetSeedOnlyGm(m_Controls->m_SeedGmBox->isChecked());
   }
 
+  m_Tracker->SetVerbose(!m_Controls->m_InteractiveBox->isChecked());
   m_Tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelBox->value());
   m_Tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
   m_Tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());

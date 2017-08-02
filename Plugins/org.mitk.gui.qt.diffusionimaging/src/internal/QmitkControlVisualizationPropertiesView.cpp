@@ -250,6 +250,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     m_Controls->m_ScalingFrame->setVisible(false);
     m_Controls->m_NormalizationFrame->setVisible(false);
+    m_Controls->m_Crosshair->setVisible(false);
   }
 }
 

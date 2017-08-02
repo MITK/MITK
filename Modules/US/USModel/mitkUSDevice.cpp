@@ -587,15 +587,23 @@ void mitk::USDevice::GenerateData()
 
   if (!output->IsInitialized() ||
     output->GetDimension(0) != m_Image->GetDimension(0) ||
-    output->GetDimension(1) != m_Image->GetDimension(1))
+    output->GetDimension(1) != m_Image->GetDimension(1) ||
+    output->GetDimension(2) != m_Image->GetDimension(2) ||
+    output->GetPixelType()  != m_Image->GetPixelType())
   {
     output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(),
       m_Image->GetDimensions());
   }
 
-  mitk::ImageReadAccessor inputReadAccessor(m_Image,
-    m_Image->GetSliceData(0, 0, 0));
-  output->SetSlice(inputReadAccessor.GetData());
+  // copy contents of the given image into the member variable, slice after slice
+  for (int sliceNumber = 0; sliceNumber < m_Image->GetDimension(2); ++sliceNumber)
+  {
+    if (m_Image->IsSliceSet(sliceNumber)) {
+      mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
+      output->SetSlice(inputReadAccessor.GetData(), sliceNumber);
+    }
+ }
+
   output->SetGeometry(m_Image->GetGeometry());
   m_ImageMutex->Unlock();
 };
@@ -634,7 +642,6 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
         device->m_FreezeBarrier->Wait(mutex);
       }
     }
-
     device->GrabImage();
   }
   return ITK_THREAD_RETURN_VALUE;

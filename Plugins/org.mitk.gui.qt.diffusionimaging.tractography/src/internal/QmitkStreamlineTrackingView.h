@@ -37,6 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTractographyForest.h>
 #include <QThread>
 #include <QTimer>
+#include <QmitkStdMultiWidget.h>
+#include <QmitkSliceNavigationListener.h>
 
 class QmitkStreamlineTrackingView;
 
@@ -102,6 +104,7 @@ protected slots:
   void BeforeThread();                      ///< start timer etc.
   void TimerUpdate();
   void StopTractography();
+  void OnSliceChanged();
 
 protected:
 
@@ -115,11 +118,7 @@ protected slots:
 private:
 
   void StartStopTrackingGui(bool start);
-  void OnSliceChanged(const itk::EventObject& e);
 
-  int m_SliceObserverTag1;
-  int m_SliceObserverTag2;
-  int m_SliceObserverTag3;
   std::vector< itk::Point<float> >        m_SeedPoints;
   mitk::DataNode::Pointer                 m_InteractiveNode;
   mitk::DataNode::Pointer                 m_InteractivePointSetNode;
@@ -128,10 +127,14 @@ private:
   std::vector< mitk::Image::Pointer >     m_InputImages; ///< input images
   std::vector< mitk::Image::Pointer >     m_AdditionalInputImages;
   bool                                    m_FirstTensorProbRun;
+  bool                                    m_FirstInteractiveRun;
 
   mitk::TrackingDataHandler*              m_TrackingHandler;
   bool                                    m_ThreadIsRunning;
   QTimer*                                 m_TrackingTimer;
+  bool                                    m_DeleteTrackingHandler;
+  QmitkSliceNavigationListener            m_SliceChangeListener;
+
 };
 
 

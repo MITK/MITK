@@ -14,6 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4244)
+#endif
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -236,3 +240,7 @@ bool QmitkMLBTView::IsTrainingInputValid(void) const
 
   return true;
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif

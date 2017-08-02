@@ -178,13 +178,14 @@ void mitk::USDiPhASDevice::UpdateTransmitEvents()
     m_ScanMode.TransmitEvents[ev].BurstCountPerChannel = new int[numChannels];
     m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel = new bool[numChannels];
     m_ScanMode.TransmitEvents[ev].ChannelMultiplexerSetups = nullptr;
+    float tiltStrength = ((m_ScanMode.transmitEventsCount - 1) / 2 - ev) * 10e-9f;
 
     for (int i = 0; i < numChannels; ++i)
     {
       m_ScanMode.TransmitEvents[ev].BurstHalfwaveClockCountPerChannel[i] = m_BurstHalfwaveClockCount; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 7.5 MHz 
-      m_ScanMode.TransmitEvents[ev].BurstCountPerChannel[i] = 1; // Burst with 1 cycle
+      m_ScanMode.TransmitEvents[ev].BurstCountPerChannel[i] = 3; // Burst with 1 cycle
       m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel[i] = true;
-      m_ScanMode.TransmitEvents[ev].transmitEventDelays[i] = 0;
+      m_ScanMode.TransmitEvents[ev].transmitEventDelays[i] = 2e-6f + (i - numChannels / 2) * tiltStrength;
     }
   }
 
@@ -193,6 +194,8 @@ void mitk::USDiPhASDevice::UpdateTransmitEvents()
   m_ScanMode.transmitSequences[0].startEvent = 0;
   m_ScanMode.transmitSequences[0].endEvent = m_ScanMode.transmitEventsCount;
 }
+
+
 
 void mitk::USDiPhASDevice::InitializeScanMode()
 {

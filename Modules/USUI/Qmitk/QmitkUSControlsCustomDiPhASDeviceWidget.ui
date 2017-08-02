@@ -129,6 +129,9 @@
        <property name="maximum">
         <number>42</number>
        </property>
+       <property name="value">
+        <number>10</number>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -138,6 +141,9 @@
       <widget class="QSlider" name="TimeGainCompensationMaxSlider">
        <property name="maximum">
         <number>42</number>
+       </property>
+       <property name="value">
+        <number>20</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -200,7 +206,7 @@
         <double>200.000000000000000</double>
        </property>
        <property name="value">
-        <double>45.000000000000000</double>
+        <double>50.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -347,8 +353,11 @@
        <property name="maximum">
         <number>1000000</number>
        </property>
+       <property name="singleStep">
+        <number>5</number>
+       </property>
        <property name="value">
-        <number>1540</number>
+        <number>1480</number>
        </property>
       </widget>
      </item>
@@ -453,6 +462,12 @@
        <property name="minimum">
         <number>1</number>
        </property>
+       <property name="maximum">
+        <number>11</number>
+       </property>
+       <property name="singleStep">
+        <number>2</number>
+       </property>
        <property name="value">
         <number>1</number>
        </property>
@@ -483,7 +498,7 @@
         <double>10000.000000000000000</double>
        </property>
        <property name="value">
-        <double>1.000000000000000</double>
+        <double>4.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -524,13 +539,13 @@
         <bool>false</bool>
        </property>
        <property name="minimum">
-        <number>5</number>
+        <number>6</number>
        </property>
        <property name="maximum">
         <number>75</number>
        </property>
        <property name="value">
-        <number>75</number>
+        <number>70</number>
        </property>
       </widget>
      </item>

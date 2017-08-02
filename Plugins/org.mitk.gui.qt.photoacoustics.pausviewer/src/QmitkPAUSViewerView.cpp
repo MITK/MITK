@@ -46,7 +46,7 @@ void QmitkPAUSViewerView::SetFocus()
 }
 
 void QmitkPAUSViewerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-  const QList<mitk::DataNode::Pointer>& nodes)
+  const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
 }
 

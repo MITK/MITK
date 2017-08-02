@@ -35,7 +35,7 @@ bool mitk::USDiPhASDeviceCustomControls::GetIsActive()
   return m_IsActive;
 }
 
-void mitk::USDiPhASDeviceCustomControls::passGUIOut(std::function<void(QString)> callback) {}
+void mitk::USDiPhASDeviceCustomControls::passGUIOut(std::function<void(QString)> /*callback*/) {}
 
 void mitk::USDiPhASDeviceCustomControls::SetSilentUpdate(bool silent)
 {
@@ -176,31 +176,31 @@ void mitk::USDiPhASDeviceCustomControls::SetHighCut(double MHz)
 
 //OnSetDummies
 
-void mitk::USDiPhASDeviceCustomControls::OnSetCompensateEnergy(bool compensate) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetUseBModeFilter(bool isSet) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetRecord(bool record) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetVerticalSpacing(float mm) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetScatteringCoefficient(float coeff) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetCompensateScattering(bool compensate) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetSavingSettings(SavingSettings settings) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetCompensateEnergy(bool /*compensate*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetUseBModeFilter(bool /*isSet*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetRecord(bool /*record*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetVerticalSpacing(float /*mm*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetScatteringCoefficient(float /*coeff*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetCompensateScattering(bool /*compensate*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetSavingSettings(SavingSettings /*settings*/) {}
 //Transmit
-void mitk::USDiPhASDeviceCustomControls::OnSetTransmitPhaseLength(double ms) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetExcitationFrequency(double MHz) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetTransmitEvents(int events) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetVoltage(int voltage) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetMode(bool interleaved) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetTransmitPhaseLength(double /*ms*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetExcitationFrequency(double /*MHz*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetTransmitEvents(int /*events*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetVoltage(int /*voltage*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetMode(bool /*interleaved*/) {}
 //Receive
-void mitk::USDiPhASDeviceCustomControls::OnSetScanDepth(double mm) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetAveragingCount(int count) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetTGCMin(int min) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetTGCMax(int max) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetDataType(DataType type) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetScanDepth(double /*mm*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetAveragingCount(int /*count*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetTGCMin(int /*min*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetTGCMax(int /*max*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetDataType(DataType /*type*/) {}
 //Beamforming
-void mitk::USDiPhASDeviceCustomControls::OnSetPitch(double mm) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetReconstructedSamples(int samples) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetReconstructedLines(int lines) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetSpeedOfSound(int mps) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetPitch(double /*mm*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetReconstructedSamples(int /*samples*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetReconstructedLines(int /*lines*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetSpeedOfSound(int /*mps*/) {}
 //Bandpass
-void mitk::USDiPhASDeviceCustomControls::OnSetBandpassEnabled(bool bandpass) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetLowCut(double MHz) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetHighCut(double MHz) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetBandpassEnabled(bool /*bandpass*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetLowCut(double /*MHz*/) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetHighCut(double /*MHz*/) {}

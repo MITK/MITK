@@ -166,7 +166,7 @@ void UltrasoundSupport::UpdateLevelWindows()
 
   if (m_Node.size() > 1)
   {
-    for (int index = 0; index < m_AmountOfOutputs; ++index)
+    for (unsigned int index = 0; index < m_AmountOfOutputs; ++index)
     {
       m_Node.at(index)->GetLevelWindow(levelWindow);
       if (!m_curOutput.at(index)->IsEmpty())
@@ -266,7 +266,7 @@ void UltrasoundSupport::UpdateImage()
       return;
     // if there is no image to be displayed, skip the rest of this method
 
-    for (int index = 0; index < m_AmountOfOutputs; ++index)
+    for (unsigned int index = 0; index < m_AmountOfOutputs; ++index)
     {
       if (m_curOutput.at(index)->GetDimension(0) != m_Image->GetDimension(0) ||
         m_curOutput.at(index)->GetDimension(1) != m_Image->GetDimension(1) ||
@@ -307,10 +307,10 @@ void UltrasoundSupport::UpdateImage()
     }
 
     // if the geometry changed: reinitialize the ultrasound image. we use the m_curOutput.at(0) to readjust the geometry
-    if ((m_OldGeometry.IsNotNull()) &&
-      (m_curOutput.at(0)->GetGeometry() != NULL) &&
-      (!mitk::Equal(m_OldGeometry.GetPointer(), m_curOutput.at(0)->GetGeometry(), 0.0001, false))
-      || m_ForceRequestUpdateAll)
+    if ((((m_OldGeometry.IsNotNull()) &&
+          (m_curOutput.at(0)->GetGeometry() != nullptr)) &&
+         (m_OldGeometry.GetPointer() != m_curOutput.at(0)->GetGeometry()))
+        || m_ForceRequestUpdateAll)
     {
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
       if ((renderWindow != NULL) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))

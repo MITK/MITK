@@ -64,8 +64,7 @@ protected:
 
   virtual void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&) override;
 
   Ui::QmitkPAUSViewerViewControls* m_Controls;
   QmitkPAUSViewerView** m_UltrasoundReference;

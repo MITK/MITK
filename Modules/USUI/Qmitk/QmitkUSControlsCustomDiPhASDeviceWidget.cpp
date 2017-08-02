@@ -33,7 +33,7 @@ QmitkUSControlsCustomDiPhASDeviceWidget::~QmitkUSControlsCustomDiPhASDeviceWidge
 
   if (m_ControlInterface.IsNotNull())
   {
-    m_ControlInterface->passGUIOut([](QString str)->void {} );
+    m_ControlInterface->passGUIOut([](QString /*str*/)->void {} );
   }
   delete ui;
 }

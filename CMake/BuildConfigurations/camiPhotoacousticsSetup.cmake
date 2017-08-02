@@ -1,11 +1,5 @@
 message(STATUS "Configuring MITK Photoacoustics Setup Build")
 
-set(MITK_CONFIG_PACKAGES
-  ACVD
-  QT
-  BLUEBERRY
-)
-
 # Enable open cv and open igt link, which is a necessary configuration
 set(MITK_USE_OpenCV ON CACHE BOOL "MITK Use OpenCV Library" FORCE)
 set(MITK_USE_OpenIGTLink ON CACHE BOOL "MITK Use OpenIGTLink Library" FORCE)

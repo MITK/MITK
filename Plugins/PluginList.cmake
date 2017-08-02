@@ -56,6 +56,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
+  org.mitk.gui.qt.lasercontrol:OFF
   org.mitk.gui.qt.openigtlink:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
@@ -94,5 +95,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.visualizer:OFF
   org.mitk.gui.qt.matchpoint.evaluator:OFF
   org.mitk.gui.qt.matchpoint.manipulator:OFF
+  org.mitk.gui.qt.photoacoustics.pausviewer:OFF
   org.mitk.gui.qt.cest:OFF
 )

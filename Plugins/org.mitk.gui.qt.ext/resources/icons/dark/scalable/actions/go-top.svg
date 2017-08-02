@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.2.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg11300" inkscape:export-filename="/home/jimmac/Desktop/wi-fi.png" inkscape:export-xdpi="90.000000" inkscape:export-ydpi="90.000000" inkscape:output_extension="org.inkscape.output.svg.inkscape" inkscape:version="0.46" sodipodi:docbase="/home/tigert/cvs/freedesktop.org/tango-icon-theme/scalable/actions" sodipodi:docname="go-bottom.svg" sodipodi:version="0.32" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 48 48"
+	 style="enable-background:new 0 0 48 48;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#ADB1B6;}
+</style>
+<defs>
+	
+	
+		<inkscape:perspective  id="perspective27" inkscape:persp3d-origin="24 : 16 : 1" inkscape:vp_x="0 : 24 : 1" inkscape:vp_y="0 : 1000 : 0" inkscape:vp_z="48 : 24 : 1" sodipodi:type="inkscape:persp3d">
+		</inkscape:perspective>
+</defs>
+<sodipodi:namedview  bordercolor="#666666" borderopacity="0.25490196" fill="#4e9a06" id="base" inkscape:current-layer="layer1" inkscape:cx="19.624097" inkscape:cy="22.011268" inkscape:document-units="px" inkscape:grid-bbox="true" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:showpageshadow="false" inkscape:window-height="688" inkscape:window-width="872" inkscape:window-x="293" inkscape:window-y="48" inkscape:zoom="2.8284271" pagecolor="#ffffff" showgrid="false" stroke="#4e9a06">
+	</sodipodi:namedview>
+<g>
+	<path class="st0" d="M7,28.7c0-0.7,0.3-1.4,0.8-1.9L21.6,13c0.6-0.5,1.2-0.8,1.9-0.8c0.7,0,1.4,0.3,1.9,0.8l13.8,13.8
+		c0.5,0.5,0.8,1.1,0.8,1.9c0,0.7-0.3,1.4-0.8,1.9l-1.6,1.6c-0.6,0.5-1.2,0.8-1.9,0.8c-0.7,0-1.4-0.3-1.9-0.8L27.6,26v14.9
+		c0,0.7-0.3,1.4-0.8,1.9c-0.5,0.5-1.2,0.8-1.9,0.8h-2.7c-0.7,0-1.4-0.3-1.9-0.8c-0.5-0.5-0.8-1.2-0.8-1.9V26l-6.2,6.2
+		c-0.5,0.5-1.2,0.8-1.9,0.8c-0.7,0-1.4-0.3-1.9-0.8l-1.6-1.6C7.3,30.1,7,29.4,7,28.7z"/>
+	<path class="st0" d="M38,5.8H9c-1.4,0-2.5,1.1-2.5,2.5v2.6c0,1.4,1.1,2.5,2.5,2.5h29c1.4,0,2.5-1.1,2.5-2.5V8.3
+		C40.5,6.9,39.4,5.8,38,5.8z"/>
+</g>
+</svg>

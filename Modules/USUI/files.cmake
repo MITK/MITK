@@ -8,6 +8,7 @@ set(CPP_FILES
   Qmitk/QmitkUSControlsDopplerWidget.cpp
   Qmitk/QmitkUSControlsProbesWidget.cpp
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.cpp
+  Qmitk/QmitkUSControlsCustomDiPhASDeviceWidget.cpp
   Qmitk/QmitkUSAbstractCustomWidget.cpp
   Qmitk/QmitkComboBoxStepThrough.cpp
 )
@@ -18,8 +19,8 @@ set(UI_FILES
   Qmitk/QmitkUSControlsDopplerWidget.ui
   Qmitk/QmitkUSControlsProbesWidget.ui
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.ui
+  Qmitk/QmitkUSControlsCustomDiPhASDeviceWidget.ui
 )
-
 set(MOC_H_FILES
   Qmitk/QmitkUSDeviceManagerWidget.h
   Qmitk/QmitkUSNewVideoDeviceWidget.h
@@ -27,6 +28,7 @@ set(MOC_H_FILES
   Qmitk/QmitkUSControlsDopplerWidget.h
   Qmitk/QmitkUSControlsProbesWidget.h
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.h
+  Qmitk/QmitkUSControlsCustomDiPhASDeviceWidget.h
   Qmitk/QmitkUSAbstractCustomWidget.h
   Qmitk/QmitkComboBoxStepThrough.h
 )

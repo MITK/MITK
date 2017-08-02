@@ -132,7 +132,9 @@ protected:
   unsigned int                          m_ImageDimensions[3];
   mitk::Vector3D                        m_ImageSpacing;
 
-  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool useLogFilter = false, float resampleSpacing = 0.15);
+  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer image, bool useLogFilter = false);
+  mitk::Image::Pointer ResampleOutputVertical(mitk::Image::Pointer image, float verticalSpacing = 0.1);
+
   mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
   mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3]);
   mitk::Image::Pointer MultiplyImage(mitk::Image::Pointer inputImage, double value);

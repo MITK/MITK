@@ -765,6 +765,10 @@ void QmitkControlVisualizationPropertiesView::Set3DClippingPlane(bool disable, m
       float distance = tmp1 + tmp2 + tmp3; //attention, correct normalvector
 
       planeNormal *= distance;
+      if (distance<0)
+        m_SelectedNode->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", true );
+      else
+        m_SelectedNode->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", false );
     }
 
     node->SetProperty( "Fiber3DClippingPlane", mitk::Vector3DProperty::New( planeNormal ) );

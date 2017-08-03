@@ -208,13 +208,19 @@ void mitk::FiberBundleMapper3D::UpdateShaderParameter(mitk::BaseRenderer * rende
 {
   mitk::Vector3D plane_vec;
   this->GetDataNode()->GetPropertyValue("Fiber3DClippingPlane",plane_vec);
+  float distance = plane_vec.GetNorm();
+  plane_vec.Normalize();
 
   bool flip;
   this->GetDataNode()->GetBoolProperty("Fiber3DClippingPlaneFlip",flip);
 
-  float distance = plane_vec.GetNorm();
-  plane_vec.Normalize();
+  if (flip)
+  {
+    plane_vec *= -1;
+    distance *= -1;
+  }
 
+  this->GetDataNode()->GetBoolProperty("Fiber3DClippingPlaneSecondFlip",flip);
   if (flip)
   {
     plane_vec *= -1;
@@ -241,6 +247,7 @@ void mitk::FiberBundleMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "Fiber3DClippingPlane", mitk::Vector3DProperty::New( plane_vec ), renderer, overwrite );
   node->AddProperty( "Fiber3DClippingPlaneId", mitk::IntProperty::New( 0 ), renderer, overwrite );
   node->AddProperty( "Fiber3DClippingPlaneFlip", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "Fiber3DClippingPlaneSecondFlip", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   // Shaders
   IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();

@@ -7,22 +7,22 @@
 \section ChartModule_brief Description
 The MITK chart module is able to show different types of charts in a widget with customizable labels. Four types of charts are supported: line, bar, spline and pie.
 
-\imageMacro{barChartTemperature.png,"Example bar chart",6}
-\imageMacro{lineChartTemperature.png,"Example line chart",6}
-\imageMacro{splineChartTemperature.png,"Example spline chart",6}
-\imageMacro{pieChartExample.png,"Example pie chart",6}
+\imageMacro{images\barChartTemperature.png,"Example bar chart",6}
+\imageMacro{images\lineChartTemperature.png,"Example line chart",6}
+\imageMacro{images\splineChartTemperature.png,"Example spline chart",6}
+\imageMacro{images\pieChartExample.png,"Example pie chart",6}
 
 \subsection Chart_Technical Technical background 
 
-The module uses the java script library C3js (http://www.c3js.org) to display the chart in a <a href="http://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content). For examples about available C3js charts, please visit http://c3js.org/examples.html.
+The module uses the java script library C3js (http://www.c3js.org) to display the chart in a <a href="http://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content). For examples, please visit http://c3js.org/examples.html.
 
 \subsection Chart_GUI GUI
 
-\note Be sure that CMakeList file of the plugin resolves the dependency to the Chart module: <code>MODULE_DEPENDS MitkChart</code>.
+\note Be sure that the dependency to the Chart Module is resolved in the CMakeLists.txt of the plugin: <code>MODULE_DEPENDS MitkChart</code>.
 
 Open the ui file of the plugin. Then add a widget (we always use the name <code>chartWidget</code> in the following) at the desired position. Change the class of the widget to a user-defined widget (right click &rarr; user defined classes, see http://doc.qt.io/qt-5/designer-using-custom-widgets.html). Set "QWidget" as base class. Set "QmitkChartWidget" as class name and "QmitkChartWidget.h" as include file.
 
-\imageMacro{userDefinedWidget.png,"User defined widget",10}
+\imageMacro{images\userDefinedWidget.png,"User defined widget",10}
 
 \subsection Chart_data Data
 
@@ -36,15 +36,15 @@ Thus, the x-values are given as their intervals are different (10 years, 5 years
 
 Data is added by calling <code>chartWidget->AddData1D(temperatureHD)</code> or <code>chartWidget->AddData2D(peopleHeidelberg)</code>.
 
-\note All data can be cleared by calling <code>chartWidget->Clear()</code>. However, this is visible only if <code>chartWidget->Show()</code> is called.
+\note All data can be cleared by calling <code>chartWidget->Clear()</code>.
 
-\imageMacro{2DDataExample.png,"2D data example: Heidelberg has fewer entries and their x-range (years) is smaller than Freiburg",8}
+\imageMacro{images\2DDataExample.png,"2D data example: Heidelberg has fewer entries and their x-range (years) is smaller than Freiburg",8}
 
 \subsection Chart_type Chart type
 
 The default chart type is bar. To use a different type, you have to change it. See \ref ChartModule_brief for the available chart types.
 
-Call <code>chartWidget->SetChartType(QmitkChartWidget::ChartType::line)</code> for changing the chart type. Note that it is not directly displayed. A convenience function if you want to change the chart type and display the result directly is to use <code>chartWidget->SetChartTypeAndReload(QmitkChartWidget::ChartType::line)</code>.
+Call e.g. <code>chartWidget->SetChartType(QmitkChartWidget::ChartType::line)</code> for changing the chart type. Note that it is not directly displayed. A convenience function if you want to change the chart type and display the result directly is to use <code>chartWidget->SetChartTypeAndReload(QmitkChartWidget::ChartType::line)</code>.
 
 bar chart, line chart and spline chart are somewhat similar. Pie charts are handled differently. The input data sum is regarded as 100%. The values of all data entries are summed. Example: 
 \code{.cpp}

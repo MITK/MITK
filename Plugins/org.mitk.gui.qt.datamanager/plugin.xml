@@ -9,7 +9,7 @@
       id="org.mitk.views.datamanager"
       name="Data Manager"
       category="Data handling"
-      icon="resources/DataManager_48.png"
+      icon="resources/data-manager.svg"
       class="QmitkDataManagerView" />
   </extension>
 

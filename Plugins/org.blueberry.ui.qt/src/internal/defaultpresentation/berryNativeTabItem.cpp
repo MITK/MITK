@@ -94,13 +94,12 @@ QWidget* NativeTabItem::GetCloseButton()
 {
   if (!closeButton)
   {
-    QIcon iconCloseTab( ":/org.blueberry.ui.qt/tab_close_icon.png" );
-    iconCloseTab.addFile(":/org.blueberry.ui.qt/tab_close_icon-active.png", QSize(), QIcon::Active);
+    QIcon iconCloseTab( ":/org.blueberry.ui.qt/tab_close_grey.svg" );
+    iconCloseTab.addFile(":/org.blueberry.ui.qt/tab_close_grey_active.svg", QSize(), QIcon::Active);
     closeButton = new QToolButton(parent->GetControl());
     closeButton->setObjectName("TabCloseButton");
     closeButton->setContentsMargins(0, 0, 0, 0);
     closeButton->setFixedSize(12,12);
-    //closeButton->setFlat(true);
     closeButton->setIcon(iconCloseTab);
     closeButton->setAutoRaise(true);
   }

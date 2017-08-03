@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryQtWorkbenchAdvisor.h"
 #include "internal/berryQtGlobalEventFilter.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 #include "berryQtPreferences.h"
 
 #include <berryPlatform.h>
@@ -44,6 +44,7 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
   IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node(QtPreferences::QT_STYLES_NODE);
   QString styleName = prefs->Get(QtPreferences::QT_STYLE_NAME, "");
   QString fontName = prefs->Get(QtPreferences::QT_FONT_NAME, "");
+  QString fontSize = prefs->Get(QtPreferences::QT_FONT_SIZE, "");
 
   ctkServiceReference serviceRef = WorkbenchPlugin::GetDefault()->GetPluginContext()->getServiceReference<IQtStyleManager>();
   if (serviceRef)
@@ -51,6 +52,8 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
     IQtStyleManager* styleManager = WorkbenchPlugin::GetDefault()->GetPluginContext()->getService<IQtStyleManager>(serviceRef);
     styleManager->SetStyle(styleName);
     styleManager->SetFont(fontName);
+    styleManager->SetFontSize(fontSize.toInt());
+    styleManager->UpdateWorkbenchFont();
   }
 
   QObject* eventFilter = new QtGlobalEventFilter(qApp);

@@ -94,6 +94,8 @@ struct BERRY_UI_QT IQtStyleManager
 
   virtual void GetFonts(QStringList& fontNames) const = 0;
   virtual void SetFont(const QString& fontName) = 0;
+  virtual void SetFontSize(const int fontSize) = 0;
+  virtual void UpdateWorkbenchFont() = 0;
 
   virtual Style GetDefaultStyle() const = 0;
   virtual void SetDefaultStyle() = 0;

@@ -8,8 +8,8 @@
     <file>cursor_top.xpm</file>
     <file>dialog-error.svg</file>
     <file>icon_missing.png</file>
-    <file>tab_close_icon.png</file>
-    <file>tab_close_icon-active.png</file>
+    <file>tab_close_grey.svg</file>
+    <file>tab_close_grey_active.svg</file>
 
     <file>defaultstyle.qss</file>
     <file>defaultstyle-activetab.qss</file>
@@ -25,9 +25,8 @@
     <file>dark/transparent.png</file>
     <file>dark/right_arrow_disabled.png</file>
     <file>dark/sizegrip.png</file>
-    <file>dark/close.png</file>
-    <file>dark/close-hover.png</file>
-    <file>dark/close-pressed.png</file>
+    <file>dark/tab_close_grey.svg</file>
+    <file>dark/tab_close_grey_active.svg</file>
     <file>dark/down_arrow.png</file>
     <file>dark/Vmovetoolbar.png</file>
     <file>dark/left_arrow.png</file>
@@ -60,7 +59,9 @@
     <file>darkstyle-activetab.qss</file>
 
     <file>fonts/FiraSans/FiraSans.ttf</file>
+    <file>fonts/LightFiraSans/LightFiraSans.ttf</file>
     <file>fonts/Roboto/Roboto.ttf</file>
+    <file>fonts/OpenSans/OpenSans-Regular.ttf</file>
     <file>fonts/xkcd/xkcd.ttf</file>
   </qresource>
 </RCC>

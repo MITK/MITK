@@ -1,5 +1,5 @@
 body {
-    background-color: darkgrey !important;
+    background-color: #323231 !important;
 }
 
 /*-- Bar --*/
@@ -15,7 +15,7 @@ body {
 /*-- Line --*/
 .c3-line {
   stroke-width: 1px;
-  stroke: white;
+  stroke: #ADB1B6;
   /*stroke-dasharray: 5,5; /*to make it dashed*/
 }
 
@@ -25,12 +25,12 @@ body {
   stroke: red !important;
   fill: red !important; /*-- The !important tag prevents the color from being overwritten at rendering--*/}
 
-path.domain { stroke: white !important; }
+path.domain { stroke: #ADB1B6 !important; }
 .c3 .c3-axis-x path, .c3 .c3-axis-x line {
-    stroke: white !important;
+    stroke: #ADB1B6 !important;
 }
 .c3 .c3-axis-y path, .c3 .c3-axis-y line {
-    stroke: white !important;
+    stroke: #ADB1B6 !important;
 }
-.tick text { stroke: white !important; }
-.c3-legend-item text { stroke: white !important; }
+.tick text { stroke: #ADB1B6 !important; }
+.c3-legend-item text { stroke: #323231 !important; }

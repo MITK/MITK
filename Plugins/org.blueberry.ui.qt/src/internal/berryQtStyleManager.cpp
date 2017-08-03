@@ -89,9 +89,21 @@ void QtStyleManager::AddDefaultStyle()
 void QtStyleManager::AddDefaultFonts()
 {
   m_customFontNames.append(QString("<<system>>"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttf"), QString("Fira Sans"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf"), QString("Roboto"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf"), QString("xkcd"));
+
+  m_customFontNames.append(QString("Fira Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttf");
+
+  m_customFontNames.append(QString("Light Fira Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/LightFiraSans/LightFiraSans.ttf");
+
+  m_customFontNames.append(QString("Roboto"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf");
+
+  m_customFontNames.push_back(QString("Open Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Regular.ttf");
+
+  m_customFontNames.push_back(QString("xkcd"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf");
 }
 
 void QtStyleManager::ClearStyles()
@@ -148,13 +160,6 @@ void QtStyleManager::AddStyle(const QString& styleFileName,
   styles.insert(newStyle->fileName, newStyle);
 }
 
-void QtStyleManager::AddFont(const QString& fontFilePath,
-    const QString& fontName)
-{
-  QFontDatabase::addApplicationFont(fontFilePath);
-  m_customFontNames.push_back(fontName);
-}
-
 void QtStyleManager::GetFonts(QStringList& fontNames) const
 {
   fontNames = m_customFontNames;
@@ -162,7 +167,7 @@ void QtStyleManager::GetFonts(QStringList& fontNames) const
 
 QString QtStyleManager::GetFont() const
 {
-  return currentFont;
+  return m_currentFont;
 }
 
 void QtStyleManager::AddStyles(const QString& path)
@@ -337,16 +342,27 @@ void QtStyleManager::SetStyle(const QString& fileName, bool update)
 
 void QtStyleManager::SetFont(const QString& fontName)
 {
-  if( fontName == QString( "<<system>>" ) ||  fontName == QString( "" ))
+  m_currentFont = fontName;
+}
+
+void QtStyleManager::SetFontSize(const int fontSize)
+{
+  m_currentFontSize = fontSize;
+}
+
+void QtStyleManager::UpdateWorkbenchFont()
+{
+  if( m_currentFont == QString( "<<system>>" ) ||  m_currentFont == QString( "" ))
   {
     qApp->setFont(QFontDatabase::systemFont(QFontDatabase::GeneralFont));
   }
   else
   {
-    QFont font(fontName, 11);
+    QFont font;
+    font.setFamily(m_currentFont);
+    font.setPointSize(m_currentFontSize);
     qApp->setFont(font);
   }
-  currentFont = fontName;
   qApp->setStyleSheet(currentStyle->stylesheet);
   PlatformUI::GetWorkbench()->UpdateTheme();
 }
@@ -362,6 +378,8 @@ void QtStyleManager::SetIconTheme(const QString& themeName)
     SetIconTheme(themeName, true);
   }
 }
+
+
 
 void QtStyleManager::SetIconTheme(const QString& themeName, bool /*update*/)
 {

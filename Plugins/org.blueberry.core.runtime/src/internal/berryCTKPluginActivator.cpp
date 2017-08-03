@@ -137,7 +137,18 @@ QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
 
 #include <ctkBackTrace.h>
 #include <windows.h>
+
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4091)
+#endif
+
 #include <dbghelp.h>
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+
 QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
 {
   if (symbol == nullptr) return QString();

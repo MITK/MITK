@@ -1,4 +1,4 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkCore MitkPlanarFigure MitkImageStatistics
+  DEPENDS MitkCore
   PACKAGE_DEPENDS PRIVATE Qt5|WebEngineWidgets
 )

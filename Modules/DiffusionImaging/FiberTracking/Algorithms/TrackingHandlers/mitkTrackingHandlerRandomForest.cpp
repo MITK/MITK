@@ -324,10 +324,14 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
       if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
       {
+        float angle = angles[classLabel];
+        float abs_angle = fabs(angle);
+
         if (m_Mode==MODE::PROBABILISTIC)
         {
-          if (!check_last_dir || fabs(angles[classLabel])>=m_AngularThreshold)
-            probs2[classLabel] = probs(0,i);
+          probs2[classLabel] = probs(0,i);
+          if (check_last_dir)
+            probs2[classLabel] *= abs_angle;
           probs_sum += probs2[classLabel];
         }
         else if (m_Mode==MODE::DETERMINISTIC)
@@ -335,16 +339,11 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
           vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
           if (check_last_dir)   // do we have a previous streamline direction or did we just start?
           {
-            // TODO: check if hard curvature threshold is necessary.
-            // alternatively try square of dot product as weight.
-            // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
-
-            float dot = angles[classLabel];    // claculate angle between the candidate direction vector and the previous streamline direction
-            if (fabs(dot)>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
+            if (abs_angle>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
             {
-              if (dot<0)                          // make sure we don't walk backwards
+              if (angle<0)                          // make sure we don't walk backwards
                 d *= -1;
-              float w_i = probs(0,i)*fabs(dot);
+              float w_i = probs(0,i)*abs_angle;
               output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
               w += w_i;           // increase output weight of the final direction
             }
@@ -364,14 +363,19 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
   if (m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
   {
-    probs2 /= probs_sum;
     boost::random::discrete_distribution<int, float> dist(probs2.begin(), probs2.end());
-
     int sampled_idx = 0;
-#pragma omp critical
+
+    for (int i=0; i<50; i++)  // we allow 50 trials to exceed m_AngularThreshold
     {
+  #pragma omp critical
+      {
         boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
         sampled_idx = sampler();
+      }
+
+      if ( probs2[sampled_idx]>0.1 && (!check_last_dir || (check_last_dir && fabs(angles[sampled_idx])>=m_AngularThreshold)) )
+        break;
     }
 
     output_direction = m_DirectionContainer.at(sampled_idx);

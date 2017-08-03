@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILifecycleAwarePart.h>
 #include <mitkPlanarLine.h>
 
+#include <berryIPreferences.h>
+
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
 are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
@@ -100,6 +102,8 @@ public:
       void OnBarRadioButtonSelected();
 
       void OnLineRadioButtonSelected();
+
+      void OnPageSuccessfullyLoaded();
 
 signals:
       /** \brief Method to set the data to the member and start the threaded statistics update */
@@ -191,5 +195,7 @@ protected:
 
   std::vector<mitk::Point3D>     m_WorldMinList;
   std::vector<mitk::Point3D>     m_WorldMaxList;
+
+  berry::IPreferences::Pointer m_StylePref;
 };
 #endif // QmitkImageStatisticsView_H__INCLUDED

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryAbstractUICTKPlugin.h"
 
 #include "internal/berryBundleUtility.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 #include "berryPlatformUI.h"
 #include "berryIPreferencesService.h"

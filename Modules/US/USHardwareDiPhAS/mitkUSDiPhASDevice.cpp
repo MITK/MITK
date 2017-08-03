@@ -178,12 +178,12 @@ void mitk::USDiPhASDevice::UpdateTransmitEvents()
     m_ScanMode.TransmitEvents[ev].BurstCountPerChannel = new int[numChannels];
     m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel = new bool[numChannels];
     m_ScanMode.TransmitEvents[ev].ChannelMultiplexerSetups = nullptr;
-    float tiltStrength = ((m_ScanMode.transmitEventsCount - 1) / 2 - ev) * 10e-9f;
+    float tiltStrength = ((m_ScanMode.transmitEventsCount - 1) / 2 - ev) * 20e-9f;
 
     for (int i = 0; i < numChannels; ++i)
     {
       m_ScanMode.TransmitEvents[ev].BurstHalfwaveClockCountPerChannel[i] = m_BurstHalfwaveClockCount; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 7.5 MHz 
-      m_ScanMode.TransmitEvents[ev].BurstCountPerChannel[i] = 3; // Burst with 1 cycle
+      m_ScanMode.TransmitEvents[ev].BurstCountPerChannel[i] = 1; // Burst with 1 cycle
       m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel[i] = true;
       m_ScanMode.TransmitEvents[ev].transmitEventDelays[i] = 2e-6f + (i - numChannels / 2) * tiltStrength;
     }
@@ -211,7 +211,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.transducerType = 1;
 
   // configure the receive paramters:
-  m_ScanMode.receivePhaseLengthSeconds = 65e-6f; // 5 cm imaging depth
+  m_ScanMode.receivePhaseLengthSeconds = 185e-6f; // about 15 cm imaging depth
   m_ScanMode.tgcdB = new unsigned char[8];
   for (int tgc = 0; tgc < 8; ++tgc)
     m_ScanMode.tgcdB[tgc] = tgc * 2 + 10;

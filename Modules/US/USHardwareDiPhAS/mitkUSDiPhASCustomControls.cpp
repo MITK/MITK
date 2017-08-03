@@ -123,8 +123,9 @@ void mitk::USDiPhASCustomControls::OnSetMode(bool interleaved)
 void mitk::USDiPhASCustomControls::OnSetScanDepth(double mm)
 {
   auto& scanMode = m_device->GetScanMode();
-  float time = 2 * (0.001 * mm) / scanMode.averageSpeedOfSound;
-  m_device->GetScanMode().receivePhaseLengthSeconds = time;
+  float time = 2 * (0.001 * (mm)) / scanMode.averageSpeedOfSound;
+  float timeInMicroSeconds = floor(time *1e6); // this is necessary because sub-microsecond accuracy causes undefined behaviour
+  m_device->GetScanMode().receivePhaseLengthSeconds = timeInMicroSeconds*1e-6;
   m_device->UpdateScanmode();
 }
 

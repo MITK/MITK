@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkControlVisualizationPropertiesViewControls.h"
 
 #include "mitkEnumerationProperty.h"
+#include <mitkILifecycleAwarePart.h>
 
 /*!
  * \ingroup org_mitk_gui_qt_diffusionquantification_internal
@@ -36,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * Document your class here.
  */
-class QmitkControlVisualizationPropertiesView : public QmitkAbstractView//, public berry::ISizeProvider
+class QmitkControlVisualizationPropertiesView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 
   friend struct CvpSelListener;
@@ -56,10 +57,6 @@ class QmitkControlVisualizationPropertiesView : public QmitkAbstractView//, publ
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  ///
-  /// Sets the focus to an internal widget.
-  ///
-  virtual void SetFocus() override;
 
 protected slots:
 
@@ -85,6 +82,7 @@ protected slots:
   void TubeRadiusChanged();
 
   void SetInteractor();
+  void Toggle3DClipping(bool enabled=true);
 
   void Welcome();
 
@@ -99,6 +97,12 @@ protected slots:
 
 protected:
 
+  virtual void SetFocus() override;
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
+
   virtual void NodeRemoved(const mitk::DataNode* node) override;
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
@@ -110,6 +114,12 @@ protected:
   bool IsPlaneRotated();
 
   void SliceRotation(const itk::EventObject&);
+
+  void OnAxialChanged(const itk::EventObject& e);
+  void OnCoronalChanged(const itk::EventObject& e);
+  void OnSagittalChanged(const itk::EventObject& e);
+
+  void Set3DClippingPlane(bool disable, mitk::DataNode *node, std::string plane);
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
 
@@ -144,6 +154,10 @@ protected:
   unsigned long m_FiberBundleObserveOpacityTag;
   mitk::ColorProperty::Pointer m_Color;
   mitk::FloatProperty::Pointer m_Opacity;
+
+  int m_SliceObserverTag1;
+  int m_SliceObserverTag2;
+  int m_SliceObserverTag3;
 };
 
 

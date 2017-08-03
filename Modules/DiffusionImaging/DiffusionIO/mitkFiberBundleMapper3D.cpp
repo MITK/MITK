@@ -233,6 +233,20 @@ void mitk::FiberBundleMapper3D::UpdateShaderParameter(mitk::BaseRenderer * rende
   node->SetFloatProperty("shader_3d.mitkShaderFiberClipping3D.slicingPlane.y",plane_vec[1],renderer);
   node->SetFloatProperty("shader_3d.mitkShaderFiberClipping3D.slicingPlane.z",plane_vec[2],renderer);
 
+  float v = 1;
+  node->GetFloatProperty("light.ambient", v);
+  node->SetFloatProperty("shader_3d.mitkShaderFiberClipping3D.ambient", v, renderer);
+  node->GetFloatProperty("light.diffuse", v);
+  node->SetFloatProperty("shader_3d.mitkShaderFiberClipping3D.diffuse", v, renderer);
+  node->GetFloatProperty("light.specular", v);
+  node->SetFloatProperty("shader_3d.mitkShaderFiberClipping3D.specular", v, renderer);
+  node->GetFloatProperty("light.intensity", v);
+  node->SetFloatProperty("shader_3d.mitkShaderFiberClipping3D.intensity", v, renderer);
+
+  bool enable_light = false;
+  node->GetBoolProperty("light.enable_light", enable_light);
+  node->SetIntProperty("shader_3d.mitkShaderFiberClipping3D.enable_light", enable_light, renderer);
+
   float fiberOpacity;
   this->GetDataNode()->GetOpacity(fiberOpacity, nullptr);
   node->SetFloatProperty("shader_3d.mitkShaderFiberClipping3D.fiberOpacity",fiberOpacity);
@@ -266,8 +280,9 @@ void mitk::FiberBundleMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "shape.tubesides",mitk::IntProperty::New( 15 ), renderer, overwrite);
   node->AddProperty( "shape.ribbonwidth", mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
 
-  node->AddProperty( "light.enable", mitk::BoolProperty::New( true ), renderer, overwrite);
-  node->AddProperty( "light.ambient", mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
+  node->AddProperty( "light.intensity", mitk::FloatProperty::New( 0.6 ), renderer, overwrite);
+  node->AddProperty( "light.enable_light", mitk::BoolProperty::New( false ), renderer, overwrite);
+  node->AddProperty( "light.ambient", mitk::FloatProperty::New( 0.05 ), renderer, overwrite);
   node->AddProperty( "light.diffuse", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
   node->AddProperty( "light.specular", mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
   node->AddProperty( "light.specularpower", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);

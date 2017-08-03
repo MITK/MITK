@@ -395,8 +395,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
 
       // handle fiber bundle property observers
       if (m_Color.IsNotNull()) { m_Color->RemoveObserver(m_FiberBundleObserverTag); }
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command
-          = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
       command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor );
       m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", nullptr));
       if (m_Color.IsNotNull())
@@ -766,9 +765,9 @@ void QmitkControlVisualizationPropertiesView::Set3DClippingPlane(bool disable, m
 
       planeNormal *= distance;
       if (distance<0)
-        m_SelectedNode->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", true );
+        node->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", true );
       else
-        m_SelectedNode->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", false );
+        node->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", false );
     }
 
     node->SetProperty( "Fiber3DClippingPlane", mitk::Vector3DProperty::New( planeNormal ) );
@@ -1248,6 +1247,10 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
     float newRadius = m_Controls->m_TubeWidth->value();
+    if (newRadius>0)
+      m_SelectedNode->SetBoolProperty( "light.enable_light", true);
+    else
+      m_SelectedNode->SetBoolProperty( "light.enable_light", false);
     m_SelectedNode->SetFloatProperty("shape.tuberadius", newRadius);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

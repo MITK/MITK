@@ -536,7 +536,10 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       delete[] noOffset;
     }
 
-    itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine, 0 } }; //22/532*2048 = 84
+    itk::Index<3> pixel = { {
+        (itk::Index<3>::IndexValueType)(image->GetDimension(0) / 2),
+        (itk::Index<3>::IndexValueType)(22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine), 
+        0 } }; //22/532*2048 = 84
     if (!m_Pyro->IsSyncDelaySet() &&(image->GetPixelValueByIndex(pixel) < -30)) // #MagicNumber
     {
       MITK_INFO << "Setting SyncDelay now";
@@ -754,7 +757,11 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       }
 
       // read the pixelvalues of the enveloped images at this position
-      itk::Index<3> pixel = { { m_RecordedImages.at(1)->GetDimension(0) / 2, 22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine, 0 } }; //22/532*2048 = 84
+
+      itk::Index<3> pixel = { {
+          (itk::Index<3>::IndexValueType)(m_RecordedImages.at(1)->GetDimension(0) / 2),
+          (itk::Index<3>::IndexValueType)(22.0 / 532.0*m_Device->GetScanMode().reconstructionSamplesPerLine), 
+          0 } }; //22/532*2048 = 84
       GetPixelValues(pixel, m_PixelValues); // write the Pixelvalues to m_PixelValues
 
       // save the timestamps!
@@ -835,8 +842,8 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
     height = m_Device->GetScanMode().imageHeight;
   }
 
-  unsigned int dimLaser[] = { width, height, recordedList.size() / events};
-  unsigned int dimSound[] = { width, height, recordedList.size() / events * (events-1)};
+  unsigned int dimLaser[] = { (unsigned int)width, (unsigned int)height, (unsigned int)(recordedList.size() / events)};
+  unsigned int dimSound[] = { (unsigned int)width, (unsigned int)height, (unsigned int)(recordedList.size() / events * (events-1))};
 
   PAImage->Initialize(recordedList.back()->GetPixelType(), 3, dimLaser);
   PAImage->SetGeometry(recordedList.back()->GetGeometry());
@@ -865,16 +872,16 @@ void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer USImage, st
 
   if (m_DataType == DataType::Beamformed_Short)
   {
-    width = m_Device->GetScanMode().reconstructionLines;
-    height = m_Device->GetScanMode().reconstructionSamplesPerLine;
+    width = (unsigned int)m_Device->GetScanMode().reconstructionLines;
+    height = (unsigned int)m_Device->GetScanMode().reconstructionSamplesPerLine;
   }
   else if (m_DataType == DataType::Image_uChar)
   {
-    width = m_Device->GetScanMode().imageWidth;
-    height = m_Device->GetScanMode().imageHeight;
+    width = (unsigned int)m_Device->GetScanMode().imageWidth;
+    height = (unsigned int)m_Device->GetScanMode().imageHeight;
   }
 
-  unsigned int dimSound[] = { width, height, recordedList.size()};
+  unsigned int dimSound[] = { (unsigned int)width, (unsigned int)height, (unsigned int)recordedList.size()};
 
   USImage->Initialize(recordedList.back()->GetPixelType(), 3, dimSound);
   USImage->SetGeometry(recordedList.back()->GetGeometry());

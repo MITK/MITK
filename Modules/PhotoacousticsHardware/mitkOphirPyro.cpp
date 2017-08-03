@@ -132,7 +132,7 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
       if (noPackages > 0)
       {
         m_PulseEnergy.insert(m_PulseEnergy.end(), newEnergy.begin(), newEnergy.end());
-        for (int i=0; i<noPackages; i++)
+        for (unsigned int i=0; i<noPackages; i++)
           m_TimeStamps.push_back(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
         m_PulseTime.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());

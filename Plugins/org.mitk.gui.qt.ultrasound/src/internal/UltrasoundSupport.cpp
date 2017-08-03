@@ -306,12 +306,18 @@ void UltrasoundSupport::UpdateImage()
       }
     }
 
+    float eps = 0.000001f;
     // if the geometry changed: reinitialize the ultrasound image. we use the m_curOutput.at(0) to readjust the geometry
-    if ((((m_OldGeometry.IsNotNull()) &&
+    if (((m_OldGeometry.IsNotNull()) &&
           (m_curOutput.at(0)->GetGeometry() != nullptr)) &&
-         (m_OldGeometry.GetPointer() != m_curOutput.at(0)->GetGeometry()))
-        || m_ForceRequestUpdateAll)
+      (
+        (abs(m_OldGeometry->GetSpacing()[0] - m_curOutput.at(0)->GetGeometry()->GetSpacing()[0]) > eps )||
+        (abs(m_OldGeometry->GetSpacing()[1] - m_curOutput.at(0)->GetGeometry()->GetSpacing()[1]) > eps )||
+        (abs(m_OldGeometry->GetCenter()[0] - m_curOutput.at(0)->GetGeometry()->GetCenter()[0]) > eps) ||
+        (abs(m_OldGeometry->GetCenter()[1] - m_curOutput.at(0)->GetGeometry()->GetCenter()[1]) > eps) ||
+        m_ForceRequestUpdateAll))
     {
+      MITK_INFO << "now";
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
       if ((renderWindow != NULL) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
       {

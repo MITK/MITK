@@ -373,7 +373,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
 
     if (dynamic_cast<mitk::FiberBundle*>(nodeData))
     {
-      int Fiber3DClippingPlaneId;
+      int Fiber3DClippingPlaneId = -1;
       m_SelectedNode->GetPropertyValue("Fiber3DClippingPlaneId",Fiber3DClippingPlaneId);
       switch(Fiber3DClippingPlaneId)
       {

@@ -41,6 +41,7 @@ namespace mitk {
       unsigned int SamplesPerLine = 2048;
       unsigned int ReconstructionLines = 128;
       float RecordTime = 0.00006; // [s]
+      float TimeSpacing = 0.0000000000001; // [s]
       unsigned int TransducerElements = 128;
       bool partial = false;
       unsigned int CropBounds[2] = { 0,0 };

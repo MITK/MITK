@@ -683,11 +683,13 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
   if (m_Controls.UseImageSpacing->isChecked())
   {
     BFconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
+    BFconfig.TimeSpacing = image->GetGeometry()->GetSpacing()[1] / 1000000;
     MITK_INFO << "Calculated Scan Depth of " << BFconfig.RecordTime * BFconfig.SpeedOfSound * 100 << "cm";
   }
   else
   {
-    BFconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / BFconfig.SpeedOfSound; // [s]
+    BFconfig.RecordTime = 2 * m_Controls.ScanDepth->value() / 1000 / BFconfig.SpeedOfSound; // [s]
+    BFconfig.TimeSpacing = BFconfig.RecordTime / image->GetDimension(1);
   }
 
   if ("US Image" == m_Controls.ImageType->currentText())

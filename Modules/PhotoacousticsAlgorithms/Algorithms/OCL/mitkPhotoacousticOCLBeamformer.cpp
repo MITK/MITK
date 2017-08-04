@@ -87,7 +87,7 @@ void mitk::PhotoacousticOCLBeamformer::Execute()
   clErr = clSetKernelArg( this->m_PixelCalculation, 2, sizeof(cl_mem), &cl_input);
   clErr |= clSetKernelArg( this->m_PixelCalculation, 3, sizeof(cl_ushort), &(this->m_ApodArraySize) );
   clErr |= clSetKernelArg( this->m_PixelCalculation, 4, sizeof(cl_float), &(this->m_SpeedOfSound) );
-  clErr |= clSetKernelArg( this->m_PixelCalculation, 5, sizeof(cl_float), &(this->m_RecordTime) );
+  clErr |= clSetKernelArg( this->m_PixelCalculation, 5, sizeof(cl_float), &(this->m_TimeSpacing) );
   clErr |= clSetKernelArg( this->m_PixelCalculation, 6, sizeof(cl_float), &(this->m_Pitch) );
   clErr |= clSetKernelArg( this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_Angle) );
   clErr |= clSetKernelArg( this->m_PixelCalculation, 8, sizeof(cl_ushort), &(this->m_PAImage));

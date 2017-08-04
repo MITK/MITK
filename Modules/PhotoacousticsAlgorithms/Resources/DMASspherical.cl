@@ -20,7 +20,7 @@ __kernel void ckDMASSphe(
   __global float* apodArray,
   unsigned short apodArraySize,
   float SpeedOfSound,
-  float RecordTime,
+  float TimeSpacing,
   float Pitch,
   float Angle,
   unsigned short PAImage,
@@ -37,8 +37,7 @@ __kernel void ckDMASSphe(
   
   // get image width and weight
   const unsigned int inputL = get_image_width( dSource );
-  const unsigned int inputS = get_image_height( dSource ) / (PAImage + 1);
-  const unsigned int inputSBack = get_image_height( dSource ) / 2;
+  const unsigned int inputS = get_image_height( dSource );
   const unsigned int Slices = get_image_depth( dSource );
 
   // create an image sampler
@@ -48,9 +47,9 @@ __kernel void ckDMASSphe(
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {
     float l_i = (float)globalPosX / outputL * inputL;
-    float s_i = (float)globalPosY / outputS * inputS / (2 - PAImage);
+    float s_i = (float)globalPosY / outputS * inputS / 2;
 
-    float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputSBack * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
+    float part = (tan(Angle / 360 * 2 * M_PI) * TimeSpacing * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
       part = 1;
 
@@ -69,7 +68,7 @@ __kernel void ckDMASSphe(
 	  AddSample1 = sqrt(
         pow(s_i, 2)
         +
-        pow((inputSBack / (RecordTime*SpeedOfSound) * ((l_s1 - l_i)*Pitch*TransducerElements)/inputL), 2)
+        pow((1 / (TimeSpacing*SpeedOfSound) * ((l_s1 - l_i)*Pitch*TransducerElements)/inputL), 2)
 		) + (1-PAImage)*s_i;
       if (AddSample1 < inputS && AddSample1 >= 0)
       {
@@ -78,7 +77,7 @@ __kernel void ckDMASSphe(
 	      AddSample2 = sqrt(
             pow(s_i, 2)
             +
-            pow((inputSBack / (RecordTime*SpeedOfSound) * ((l_s2 - l_i)*Pitch*TransducerElements)/inputL), 2)
+            pow((1 / (TimeSpacing*SpeedOfSound) * ((l_s2 - l_i)*Pitch*TransducerElements)/inputL), 2)
 			) + (1-PAImage)*s_i;
           if (AddSample2 < inputS && AddSample2 >= 0)
           {

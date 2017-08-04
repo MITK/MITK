@@ -252,8 +252,8 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
 {
   typedef itk::Image< unsigned short, 2 >       MaskImage2DType;
   typedef itk::LineIterator< MaskImage2DType >  LineIteratorType;
-  typedef MaskImage2DType::PointType            PointType2D;
-  typedef std::vector< PointType2D >            PointsVecType;
+  typedef MaskImage2DType::IndexType            IndexType2D;
+  typedef std::vector< IndexType2D >            IndexVecType;
 
   typename MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
   maskImage->SetOrigin(image->GetOrigin());
@@ -297,7 +297,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
   {
     // store the polyline contour as vtkPoints object
     bool outOfBounds = false;
-    PointsVecType points;
+    IndexVecType pointIndices;
     typename PlanarFigure::PolyLineType::const_iterator it;
     for ( it = planarFigurePolyline.begin();
       it != planarFigurePolyline.end();
@@ -314,10 +314,11 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
 
       imageGeometry3D->WorldToIndex( point3D, point3D );
 
-      PointType2D point;
-      point[0] = point3D[i0];
-      point[1] = point3D[i1];
-      points.push_back( point );
+      IndexType2D index2D;
+      index2D[0] = point3D[i0];
+      index2D[1] = point3D[i1];
+
+      pointIndices.push_back( index2D );
     }
 
     if ( outOfBounds )
@@ -325,15 +326,10 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
       throw std::runtime_error( "Figure at least partially outside of image bounds!" );
     }
 
-    for ( PointsVecType::const_iterator it = points.begin(); it != points.end()-1; ++it )
+    for ( IndexVecType::const_iterator it = pointIndices.begin(); it != pointIndices.end()-1; ++it )
     {
-      MaskImage2DType::IndexType ind1, ind2;
-
-      PointType2D point1 = *it;
-      maskImage->TransformPhysicalPointToIndex( point1, ind1 );
-
-      PointType2D point2 = *(it+1);
-      maskImage->TransformPhysicalPointToIndex( point2, ind2 );
+      IndexType2D ind1 = *it;
+      IndexType2D ind2 = *(it+1);
 
       LineIteratorType lineIt( maskImage, ind1, ind2 );
       while ( !lineIt.IsAtEnd() )

@@ -67,7 +67,6 @@ template < typename TPixel, unsigned int VImageDimension >
 void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
   const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
 {
-  typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
 
   typename MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
@@ -251,10 +250,10 @@ template < typename TPixel, unsigned int VImageDimension >
 void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
   const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
 {
-  typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, 2 >       MaskImage2DType;
   typedef itk::LineIterator< MaskImage2DType >  LineIteratorType;
-  typedef std::vector< Point3D >                Points3DVecType;
+  typedef MaskImage2DType::PointType            PointType2D;
+  typedef std::vector< PointType2D >            PointsVecType;
 
   typename MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
   maskImage->SetOrigin(image->GetOrigin());
@@ -298,7 +297,7 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
   {
     // store the polyline contour as vtkPoints object
     bool outOfBounds = false;
-    Points3DVecType points;
+    PointsVecType points;
     typename PlanarFigure::PolyLineType::const_iterator it;
     for ( it = planarFigurePolyline.begin();
       it != planarFigurePolyline.end();
@@ -315,7 +314,10 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
 
       imageGeometry3D->WorldToIndex( point3D, point3D );
 
-      points.push_back( point3D );
+      PointType2D point;
+      point[0] = point3D[i0];
+      point[1] = point3D[i1];
+      points.push_back( point );
     }
 
     if ( outOfBounds )
@@ -323,24 +325,14 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
       throw std::runtime_error( "Figure at least partially outside of image bounds!" );
     }
 
-    for ( Points3DVecType::const_iterator it = points.begin(); it != points.end()-1; ++it )
+    for ( PointsVecType::const_iterator it = points.begin(); it != points.end()-1; ++it )
     {
-      typedef MaskImage2DType::PointType ItkPointType2D;
-
       MaskImage2DType::IndexType ind1, ind2;
 
-      const Point3D pt1 = *it;
-      ItkPointType2D point1;
-      point1[0] = pt1[0];
-      point1[1] = pt1[1];
-
+      PointType2D point1 = *it;
       maskImage->TransformPhysicalPointToIndex( point1, ind1 );
 
-      const Point3D pt2 = *(it+1);
-      ItkPointType2D point2;
-      point2[0] = pt2[0];
-      point2[1] = pt2[1];
-
+      PointType2D point2 = *(it+1);
       maskImage->TransformPhysicalPointToIndex( point2, ind2 );
 
       LineIteratorType lineIt( maskImage, ind1, ind2 );

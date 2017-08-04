@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
-#include "mitkIShaderRepository.h"
 #include "mitkLocalStorageHandler.h"
 #include "mitkMapper.h"
 #include "mitkVtkPropRenderer.h"
@@ -123,7 +122,7 @@ namespace mitk
     /**
     * \brief SHADERTODO
     */
-    void ApplyShaderProperties(mitk::BaseRenderer *renderer);
+    void ApplyShaderProperties(mitk::BaseRenderer *);
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.
@@ -142,16 +141,10 @@ namespace mitk
     class VtkMapperLocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      mitk::IShaderRepository::ShaderProgram::Pointer m_ShaderProgram;
       itk::TimeStamp m_ModifiedTimeStamp;
 
       VtkMapperLocalStorage()
       {
-        IShaderRepository *shaderRepo = CoreServices::GetShaderRepository();
-        if (shaderRepo)
-        {
-          m_ShaderProgram = shaderRepo->CreateShaderProgram();
-        }
       }
 
       ~VtkMapperLocalStorage() {}

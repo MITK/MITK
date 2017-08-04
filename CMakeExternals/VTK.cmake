@@ -79,8 +79,9 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-7.0.0.tar.gz)
-  set(VTK_URL_MD5 5fe35312db5fb2341139b8e4955c367d)
+  #set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-7.0.0.tar.gz)
+  set(VTK_URL http://www.vtk.org/files/release/7.1/VTK-7.1.0.tar.gz)
+  set(VTK_URL_MD5 a7e814c1db503d896af72458c2d0228f)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
@@ -98,7 +99,7 @@ if(NOT DEFINED VTK_DIR)
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         -DVTK_USE_CXX11_FEATURES:BOOL=ON
-        -DVTK_RENDERING_BACKEND:STRING=OpenGL
+        -DVTK_RENDERING_BACKEND:STRING=OpenGL2
         ${additional_cmake_args}
     CMAKE_CACHE_ARGS
       ${ep_common_cache_args}

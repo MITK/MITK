@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include "mitkVtkMapper.h"
-#include "vtkMitkVolumeTextureMapper3D.h"
 
 // VTK
 #include <vtkFixedPointVolumeRayCastMapper.h>
@@ -33,12 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkVersionMacros.h>
 #include <vtkVolumeProperty.h>
 
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
-
 #include "vtkMitkGPUVolumeRayCastMapper.h"
-
-#endif
 
 namespace mitk
 {
@@ -92,17 +86,12 @@ namespace mitk
     void GenerateDataCPU(mitk::BaseRenderer *renderer);
 
     bool InitGPU(mitk::BaseRenderer *renderer);
-    void DeinitGPU(mitk::BaseRenderer *renderer);
-    void GenerateDataGPU(mitk::BaseRenderer *renderer);
-
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
+    void DeinitGPU(mitk::BaseRenderer *);
+    void GenerateDataGPU(mitk::BaseRenderer *);
 
     bool InitRAY(mitk::BaseRenderer *renderer);
     void DeinitRAY(mitk::BaseRenderer *renderer);
     void GenerateDataRAY(mitk::BaseRenderer *renderer);
-
-#endif
 
     void InitVtkMapper(mitk::BaseRenderer *renderer);
 
@@ -136,19 +125,13 @@ namespace mitk
       bool m_gpuSupported;
       bool m_gpuInitialized;
       vtkSmartPointer<vtkVolume> m_VolumeGPU;
-      vtkSmartPointer<vtkMitkVolumeTextureMapper3D> m_MapperGPU;
       vtkSmartPointer<vtkVolumeProperty> m_VolumePropertyGPU;
-
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
 
       bool m_raySupported;
       bool m_rayInitialized;
       vtkSmartPointer<vtkVolume> m_VolumeRAY;
       vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_MapperRAY;
       vtkSmartPointer<vtkVolumeProperty> m_VolumePropertyRAY;
-
-#endif
 
       LocalStorage()
       {
@@ -159,11 +142,8 @@ namespace mitk
         m_gpuInitialized = false;
         m_gpuSupported = true; // assume initially gpu slicing is supported
 
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
         m_rayInitialized = false;
         m_raySupported = true; // assume initially gpu raycasting is supported
-#endif
       }
 
       ~LocalStorage()
@@ -171,14 +151,8 @@ namespace mitk
         if (m_cpuInitialized && m_MapperCPU && m_VtkRenderWindow)
           m_MapperCPU->ReleaseGraphicsResources(m_VtkRenderWindow);
 
-        if (m_gpuInitialized && m_MapperGPU && m_VtkRenderWindow)
-          m_MapperGPU->ReleaseGraphicsResources(m_VtkRenderWindow);
-
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
         if (m_rayInitialized && m_MapperRAY && m_VtkRenderWindow)
           m_MapperRAY->ReleaseGraphicsResources(m_VtkRenderWindow);
-#endif
       }
     };
 

@@ -71,7 +71,12 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.boundHigh, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
   connect(m_Controls.Partial, SIGNAL(clicked()), this, SLOT(UpdateBounds()));
   connect(m_Controls.BatchProcessing, SIGNAL(clicked()), this, SLOT(BatchProcessing()));
+  connect(m_Controls.StepBeamforming, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
+  connect(m_Controls.StepCropping, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
+  connect(m_Controls.StepBandpass, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
+  connect(m_Controls.StepBMode, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
 
+  UpdateSaveBoxes();
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
   m_Controls.progressBar->setMinimum(0);
@@ -114,6 +119,29 @@ std::vector<std::string> splitpath(
   return result;
 }
 
+void PAImageProcessing::UpdateSaveBoxes()
+{
+  if (m_Controls.StepBeamforming->isChecked())
+    m_Controls.SaveBeamforming->setEnabled(true);
+  else
+    m_Controls.SaveBeamforming->setEnabled(false);
+
+  if (m_Controls.StepCropping->isChecked())
+    m_Controls.SaveCropping->setEnabled(true);
+  else
+    m_Controls.SaveCropping->setEnabled(false);
+
+  if (m_Controls.StepBandpass->isChecked())
+    m_Controls.SaveBandpass->setEnabled(true);
+  else
+    m_Controls.SaveBandpass->setEnabled(false);
+
+  if (m_Controls.StepBMode->isChecked())
+    m_Controls.SaveBMode->setEnabled(true);
+  else
+    m_Controls.SaveBMode->setEnabled(false);
+}
+
 void PAImageProcessing::BatchProcessing()
 {
   QFileDialog LoadDialog(nullptr, "Select Files to be processed");
@@ -136,6 +164,9 @@ void PAImageProcessing::BatchProcessing()
 
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
+  bool doSteps[] = { m_Controls.StepBeamforming->isChecked(), m_Controls.StepCropping->isChecked() , m_Controls.StepBandpass->isChecked(), m_Controls.StepBMode->isChecked() };
+  bool saveSteps[] = { m_Controls.SaveBeamforming->isChecked(), m_Controls.SaveCropping->isChecked() , m_Controls.SaveBandpass->isChecked(), m_Controls.SaveBMode->isChecked() };
+
   for (int fileNumber = 0; fileNumber < fileNames.size(); ++fileNumber)
   {
     m_Controls.progressBar->setValue(0);
@@ -150,76 +181,105 @@ void PAImageProcessing::BatchProcessing()
 
     UpdateBFSettings(image);
     // Beamforming
-    std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
-      this->UpdateProgress(progress, progressInfo);
-    };
-    m_Controls.progressBar->setValue(100);
+    if (doSteps[0])
+    {
+      std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
+        this->UpdateProgress(progress, progressInfo);
+      };
+      m_Controls.progressBar->setValue(100);
 
-    image = filterbank->ApplyBeamforming(image, BFconfig, m_Controls.Cutoff->value(), progressHandle);
+      image = filterbank->ApplyBeamforming(image, BFconfig, m_Controls.Cutoff->value(), progressHandle);
+
+      if (saveSteps[0])
+      {
+        std::string saveFileName = saveDir.toStdString() + "/" + imageName + " beamformed" + ".nrrd";
+        mitk::IOUtil::Save(image, saveFileName);
+      }
+    }
+
+    
 
     // Cropping
+    if (doSteps[1])
+    {
+      m_Controls.ProgressInfo->setText("cropping image");
 
-    m_Controls.ProgressInfo->setText("cropping image");
-    image = filterbank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, image->GetDimension(2) - 1);
-    
+      image = filterbank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, image->GetDimension(2) - 1);
+
+      if (saveSteps[1])
+      {
+        std::string saveFileName = saveDir.toStdString() + "/" + imageName + " cropped" + ".nrrd";
+        mitk::IOUtil::Save(image, saveFileName);
+      }
+    }
+
     // Bandpass
-
-    m_Controls.ProgressInfo->setText("applying bandpass");
-    float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.BPSpeedOfSound->value();
-    // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
-    float maxFrequency = 1 / (recordTime / image->GetDimension(1)) * image->GetDimension(1) / 2 / 2 / 1000;
-    float BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
-    float BPLowPass = maxFrequency - 1000000 * m_Controls.BPlow->value(); // [Hz]
-
-    if (BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
+    if (doSteps[2])
     {
-      QMessageBox Msgbox;
-      Msgbox.setText("LowPass too low, disabled it.");
-      Msgbox.exec();
+      m_Controls.ProgressInfo->setText("applying bandpass");
+      float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.BPSpeedOfSound->value();
+      // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
+      float maxFrequency = 1 / (recordTime / image->GetDimension(1)) * image->GetDimension(1) / 2 / 2 / 1000;
+      float BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
+      float BPLowPass = maxFrequency - 1000000 * m_Controls.BPlow->value(); // [Hz]
 
-      BPLowPass = 0;
+      if (BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("LowPass too low, disabled it.");
+        Msgbox.exec();
+
+        BPLowPass = 0;
+      }
+      if (BPLowPass < 0 && m_Controls.UseBP->isChecked())
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("LowPass too high, disabled it.");
+        Msgbox.exec();
+
+        BPLowPass = 0;
+      }
+      if (BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("HighPass too high, disabled it.");
+        Msgbox.exec();
+
+        BPHighPass = 0;
+      }
+      if (BPHighPass > maxFrequency - BFconfig.BPLowPass)
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("HighPass higher than LowPass, disabled both.");
+        Msgbox.exec();
+
+        BPHighPass = 0;
+        BPLowPass = 0;
+      }
+
+      image = filterbank->BandpassFilter(image, recordTime, BPHighPass, BPLowPass, m_Controls.BPFalloff->value());
+
+      if (saveSteps[2])
+      {
+        std::string saveFileName = saveDir.toStdString() + "/" + imageName + " bandpassed" + ".nrrd";
+        mitk::IOUtil::Save(image, saveFileName);
+      }
     }
-    if (BPLowPass < 0 && m_Controls.UseBP->isChecked())
+    // Bmode    
+    if (doSteps[3])
     {
-      QMessageBox Msgbox;
-      Msgbox.setText("LowPass too high, disabled it.");
-      Msgbox.exec();
+      m_Controls.ProgressInfo->setText("applying bmode filter");
 
-      BPLowPass = 0;
+      if (m_Controls.BModeMethod->currentText() == "Simple Abs Filter")
+        image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, m_UseLogfilter, m_ResampleSpacing);
+      else if (m_Controls.BModeMethod->currentText() == "Shape Detection")
+        image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, m_UseLogfilter, m_ResampleSpacing);
+      if (saveSteps[3])
+      {
+        std::string saveFileName = saveDir.toStdString() + "/" + imageName + " bmode" + ".nrrd";
+        mitk::IOUtil::Save(image, saveFileName);
+      }
     }
-    if (BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
-    {
-      QMessageBox Msgbox;
-      Msgbox.setText("HighPass too high, disabled it.");
-      Msgbox.exec();
-
-      BPHighPass = 0;
-    }
-    if (BPHighPass > maxFrequency - BFconfig.BPLowPass)
-    {
-      QMessageBox Msgbox;
-      Msgbox.setText("HighPass higher than LowPass, disabled both.");
-      Msgbox.exec();
-
-      BPHighPass = 0;
-      BPLowPass = 0;
-    }
-
-    image = filterbank->BandpassFilter(image, recordTime, BPHighPass, BPLowPass, m_Controls.BPFalloff->value());
-
-    // Bmode
-    m_Controls.ProgressInfo->setText("applying bmode filter");
-
-    if (m_Controls.BModeMethod->currentText() == "Simple Abs Filter")
-      image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, m_UseLogfilter, m_ResampleSpacing);
-    else if (m_Controls.BModeMethod->currentText() == "Shape Detection")
-      image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, m_UseLogfilter, m_ResampleSpacing);
-
-    // Save
-    m_Controls.ProgressInfo->setText("saving");
-
-    std::string saveFileName = saveDir.toStdString() + "/" + imageName + " processed"+ ".nrrd";
-    mitk::IOUtil::Save(image, saveFileName);
     m_Controls.progressBar->setVisible(false);
   }
 

@@ -14,11 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-__kernel void ckCrop(
+__kernel void ckBmodeAbsLog(
   __read_only image3d_t dSource, // input image
-  __global float* dDest, // output buffer
-  __global float* input,
-  unsigned short num_images // parameters
+  __global float* dDest // output buffer
 )
 {
   // get thread identifier
@@ -37,11 +35,6 @@ __kernel void ckCrop(
   // terminate non-valid threads
   if ( globalPosX < inputL && globalPosY < inputS && globalPosZ < Slices )
   {
-    float output = 0;
-    for (unsigned short im = 0; im < num_images; ++im)
-    {
-      output += input[ im * Slices * inputL * inputS + globalPosZ * inputL * inputS + globalPosY * inputL + globalPosX];
-    }
-    dDest[ globalPosZ * inputL * inputS + globalPosY * inputL + globalPosX ] = output;
+    dDest[ globalPosZ * inputL * inputS + globalPosY * inputL + globalPosX ] = log(fabs((float)read_imagef( dSource, defaultSampler, (int4)(globalPosX, globalPosY, globalPosZ, 0 )).x));
   }
 }

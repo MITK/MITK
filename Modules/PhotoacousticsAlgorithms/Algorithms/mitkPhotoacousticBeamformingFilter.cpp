@@ -353,6 +353,7 @@ float* mitk::BeamformingFilter::BoxFunction(int samples)
 void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
   float& inputS = inputDim[1];
+  float inputSBack = inputS / (2 - m_Conf.Photoacoustic);
   float& inputL = inputDim[0];
 
   float& outputS = outputDim[1];
@@ -371,7 +372,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputSBack * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   float mult = 0;
@@ -384,7 +385,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
   {
     s_i = sample / outputS * inputS;
 
-    part = part_multiplicator*s_i;
+    part = part_multiplicator*s_i / (2 - m_Conf.Photoacoustic);
 
     if (part < 1)
       part = 1;
@@ -395,11 +396,11 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
 
     apod_mult = apodArraySize / (maxLine - minLine);
 
-    delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
+    delayMultiplicator = pow((inputSBack / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
+      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1 - m_Conf.Photoacoustic)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
@@ -412,6 +413,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
 void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
   float& inputS = inputDim[1];
+  float inputSBack = inputS / (2 - m_Conf.Photoacoustic);
   float& inputL = inputDim[0];
 
   float& outputS = outputDim[1];
@@ -426,7 +428,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputSBack * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   short usedLines = (maxLine - minLine);
@@ -437,7 +439,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS;
+    s_i = (float)sample / outputS * inputS / (2 - m_Conf.Photoacoustic);
 
     part = part_multiplicator*s_i;
 
@@ -455,8 +457,8 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
       AddSample = (int)sqrt(
         pow(s_i, 2)
         +
-        pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-      );
+        pow((inputSBack / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
+      ) + (1 - m_Conf.Photoacoustic)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
@@ -469,6 +471,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
 void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
   float& inputS = inputDim[1];
+  float inputSBack = inputS / (2 - m_Conf.Photoacoustic);
   float& inputL = inputDim[0];
 
   float& outputS = outputDim[1];
@@ -488,7 +491,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputSBack * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   float mult = 0;
@@ -499,7 +502,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS;
+    s_i = sample / outputS * inputS / (2 - m_Conf.Photoacoustic);
 
     part = part_multiplicator*s_i;
 
@@ -512,13 +515,13 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
 
     apod_mult = apodArraySize / (maxLine - minLine);
 
-    delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
+    delayMultiplicator = pow((inputSBack / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
 
     //calculate the AddSamples beforehand to save some time
     short* AddSample = new short[maxLine - minLine];
     for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i);
+      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) + (1 - m_Conf.Photoacoustic)*s_i;
     }
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
@@ -547,6 +550,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
 void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
   float& inputS = inputDim[1];
+  float inputSBack = inputS / (2 - m_Conf.Photoacoustic);
   float& inputL = inputDim[0];
 
   float& outputS = outputDim[1];
@@ -566,7 +570,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputSBack * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   float mult = 0;
@@ -579,7 +583,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS;
+    s_i = sample / outputS * inputS / (2 - m_Conf.Photoacoustic);
 
     part = part_multiplicator*s_i;
 
@@ -599,8 +603,8 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
       AddSample[l_s] = (short)sqrt(
         pow(s_i, 2)
         +
-        pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((minLine + l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-      );
+        pow((inputSBack / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((minLine + l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
+      ) + (1 - m_Conf.Photoacoustic)*s_i;
     }
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)

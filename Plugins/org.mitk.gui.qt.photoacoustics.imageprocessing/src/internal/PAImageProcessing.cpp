@@ -234,7 +234,11 @@ void PAImageProcessing::StartBmodeThread()
       connect(thread, &BmodeThread::result, this, &PAImageProcessing::HandleBmodeResults);
       connect(thread, &BmodeThread::finished, thread, &QObject::deleteLater);
 
-      thread->setConfig(m_UseLogfilter, m_ResampleSpacing);
+      if(m_Controls.BModeMethod->currentText() == "Simple Abs Filter")
+        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::Abs);
+      else if(m_Controls.BModeMethod->currentText() == "Shape Detection")
+        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::ShapeDetection);
+
       thread->setInputImage(image);
 
       MITK_INFO << "Started new thread for Image Processing";
@@ -569,6 +573,9 @@ void PAImageProcessing::UpdateImageInfo()
       frequency << maxFrequency / 1000000; //[MHz]
       frequency << "MHz";
 
+      m_Controls.BPhigh->setMaximum(maxFrequency / 1000000);
+      m_Controls.BPlow->setMaximum(maxFrequency / 1000000);
+
       frequency << " is the maximal allowed frequency for the selected image.";
       m_Controls.BPhigh->setToolTip(frequency.str().c_str());
       m_Controls.BPlow->setToolTip(frequency.str().c_str());
@@ -806,15 +813,16 @@ void BmodeThread::run()
   mitk::Image::Pointer resultImage;
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
-  resultImage = filterbank->ApplyBmodeFilter(m_InputImage, m_UseLogfilter, m_ResampleSpacing);
+  resultImage = filterbank->ApplyBmodeFilter(m_InputImage, m_Method, m_UseLogfilter, m_ResampleSpacing);
 
   emit result(resultImage);
 }
 
-void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing)
+void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method)
 {
   m_UseLogfilter = useLogfilter;
   m_ResampleSpacing = resampleSpacing;
+  m_Method = method;
 }
 
 void BmodeThread::setInputImage(mitk::Image::Pointer image)

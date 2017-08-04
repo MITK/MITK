@@ -104,7 +104,7 @@ protected:
 
   int GetBytesPerElem()
   {
-    return sizeof(double);
+    return sizeof(float);
   }
 
   virtual us::Module* GetModule();

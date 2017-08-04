@@ -12,6 +12,7 @@
 #include <itkVTKImageImport.h>
 #include <itkImageDuplicator.h>
 #include <itkExceptionObject.h>
+#include <itkLineIterator.h>
 
 #include <vtkPoints.h>
 #include <vtkImageStencil.h>
@@ -19,7 +20,6 @@
 #include <vtkImageExport.h>
 #include <vtkLassoStencilSource.h>
 #include <vtkSmartPointer.h>
-
 
 
 
@@ -31,10 +31,6 @@ void PlanarFigureMaskGenerator::SetPlanarFigure(mitk::PlanarFigure::Pointer plan
     if ( planarFigure.IsNull() )
     {
       throw std::runtime_error( "Error: planar figure empty!" );
-    }
-    if ( !planarFigure->IsClosed() )
-    {
-      throw std::runtime_error( "Masking not possible for non-closed figures" );
     }
 
     const PlaneGeometry *planarFigurePlaneGeometry = planarFigure->GetPlaneGeometry();
@@ -251,6 +247,115 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
   m_InternalITKImageMask2D = duplicator->GetOutput();
 }
 
+template < typename TPixel, unsigned int VImageDimension >
+void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
+  const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
+{
+  typedef itk::Image< TPixel, VImageDimension > ImageType;
+  typedef itk::Image< unsigned short, 2 >       MaskImage2DType;
+  typedef itk::LineIterator< MaskImage2DType >  LineIteratorType;
+  typedef std::vector< Point3D >                Points3DVecType;
+
+  typename MaskImage2DType::Pointer maskImage = MaskImage2DType::New();
+  maskImage->SetOrigin(image->GetOrigin());
+  maskImage->SetSpacing(image->GetSpacing());
+  maskImage->SetLargestPossibleRegion(image->GetLargestPossibleRegion());
+  maskImage->SetBufferedRegion(image->GetBufferedRegion());
+  maskImage->SetDirection(image->GetDirection());
+  maskImage->SetNumberOfComponentsPerPixel(image->GetNumberOfComponentsPerPixel());
+  maskImage->Allocate();
+  maskImage->FillBuffer(0);
+
+  // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
+  const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
+  const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
+  const mitk::BaseGeometry *imageGeometry3D = m_inputImage->GetGeometry( 0 );
+
+  // Determine x- and y-dimensions depending on principal axis
+  // TODO use plane geometry normal to determine that automatically, then check whether the PF is aligned with one of the three principal axis
+  int i0, i1;
+  switch ( axis )
+  {
+  case 0:
+    i0 = 1;
+    i1 = 2;
+    break;
+
+  case 1:
+    i0 = 0;
+    i1 = 2;
+    break;
+
+  case 2:
+  default:
+    i0 = 0;
+    i1 = 1;
+    break;
+  }
+
+  int numPolyLines = m_PlanarFigure->GetPolyLinesSize();
+  for ( int lineId = 0; lineId < numPolyLines; ++lineId )
+  {
+    // store the polyline contour as vtkPoints object
+    bool outOfBounds = false;
+    Points3DVecType points;
+    typename PlanarFigure::PolyLineType::const_iterator it;
+    for ( it = planarFigurePolyline.begin();
+      it != planarFigurePolyline.end();
+      ++it )
+    {
+      Point3D point3D;
+
+      planarFigurePlaneGeometry->Map( *it, point3D );
+
+      if ( !imageGeometry3D->IsInside( point3D ) )
+      {
+        outOfBounds = true;
+      }
+
+      imageGeometry3D->WorldToIndex( point3D, point3D );
+
+      points.push_back( point3D );
+    }
+
+    if ( outOfBounds )
+    {
+      throw std::runtime_error( "Figure at least partially outside of image bounds!" );
+    }
+
+    for ( Points3DVecType::const_iterator it = points.begin(); it != points.end()-1; ++it )
+    {
+      typedef MaskImage2DType::PointType ItkPointType2D;
+
+      MaskImage2DType::IndexType ind1, ind2;
+
+      const Point3D pt1 = *it;
+      ItkPointType2D point1;
+      point1[0] = pt1[0];
+      point1[1] = pt1[1];
+
+      maskImage->TransformPhysicalPointToIndex( point1, ind1 );
+
+      const Point3D pt2 = *(it+1);
+      ItkPointType2D point2;
+      point2[0] = pt2[0];
+      point2[1] = pt2[1];
+
+      maskImage->TransformPhysicalPointToIndex( point2, ind2 );
+
+      LineIteratorType lineIt( maskImage, ind1, ind2 );
+      while ( !lineIt.IsAtEnd() )
+      {
+        lineIt.Set( 1 );
+        ++lineIt;
+      }
+    }
+  }
+
+  // Store mask
+  m_InternalITKImageMask2D = maskImage;
+}
+
 bool PlanarFigureMaskGenerator::GetPrincipalAxis(
   const BaseGeometry *geometry, Vector3D vector,
   unsigned int &axis )
@@ -331,9 +436,19 @@ void PlanarFigureMaskGenerator::CalculateMask()
     mitk::Image::Pointer inputImageSlice = extract2DImageSlice(axis, slice);
     //mitk::IOUtil::SaveImage(inputImageSlice, "/home/fabian/inputSliceImage.nrrd");
     // Compute mask from PlanarFigure
-    AccessFixedDimensionByItk_1(inputImageSlice,
-                                InternalCalculateMaskFromPlanarFigure,
-                                2, axis)
+    // rastering for open planar figure:
+    if ( !m_PlanarFigure->IsClosed() )
+    {
+      AccessFixedDimensionByItk_1(inputImageSlice,
+        InternalCalculateMaskFromOpenPlanarFigure,
+        2, axis)
+    }
+    else//for closed planar figure
+    {
+      AccessFixedDimensionByItk_1(inputImageSlice,
+                                  InternalCalculateMaskFromPlanarFigure,
+                                  2, axis)
+    }
 
     //convert itk mask to mitk::Image::Pointer and return it
     mitk::Image::Pointer planarFigureMaskImage;

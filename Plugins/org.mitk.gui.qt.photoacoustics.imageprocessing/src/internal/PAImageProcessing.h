@@ -70,6 +70,8 @@ class PAImageProcessing : public QmitkAbstractView
 
     void UpdateProgress(int progress, std::string progressInfo);
 
+    void BatchProcessing();
+
   protected:
     virtual void CreateQtPartControl(QWidget *parent) override;
 

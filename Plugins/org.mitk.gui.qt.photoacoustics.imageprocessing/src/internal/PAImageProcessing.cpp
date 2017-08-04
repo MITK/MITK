@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QApplication>
 #include <QMetaType>
+#include <QFileDialog>
 
 //mitk image
 #include <mitkImage.h>
@@ -35,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //other
 #include <thread>
 #include <functional>
+#include <mitkIOUtil.h>
 
 const std::string PAImageProcessing::VIEW_ID = "org.mitk.views.paimageprocessing";
 
@@ -61,14 +63,14 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonApplyCropFilter, SIGNAL(clicked()), this, SLOT(StartCropThread()));
   connect(m_Controls.buttonApplyBandpass, SIGNAL(clicked()), this, SLOT(StartBandpassThread()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
-  connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateRecordTime()));
-  connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateRecordTime()));
-  connect(m_Controls.Samples, SIGNAL(valueChanged(int)), this, SLOT(UpdateRecordTime()));
-  connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UpdateRecordTime()));
-  connect(m_Controls.UseBP, SIGNAL(clicked()), this, SLOT(UseBandpass()));
+  connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateImageInfo()));
+  connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateImageInfo()));
+  connect(m_Controls.Samples, SIGNAL(valueChanged(int)), this, SLOT(UpdateImageInfo()));
+  connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UpdateImageInfo()));
   connect(m_Controls.boundLow, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
   connect(m_Controls.boundHigh, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
   connect(m_Controls.Partial, SIGNAL(clicked()), this, SLOT(UpdateBounds()));
+  connect(m_Controls.BatchProcessing, SIGNAL(clicked()), this, SLOT(BatchProcessing()));
 
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
@@ -81,6 +83,147 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.UseBP->hide();
 
   UseImageSpacing();
+}
+
+std::vector<std::string> splitpath(
+  const std::string& str
+  , const std::set<char> delimiters)
+{
+  std::vector<std::string> result;
+
+  char const* pch = str.c_str();
+  char const* start = pch;
+  for (; *pch; ++pch)
+  {
+    if (delimiters.find(*pch) != delimiters.end())
+    {
+      if (start != pch)
+      {
+        std::string str(start, pch);
+        result.push_back(str);
+      }
+      else
+      {
+        result.push_back("");
+      }
+      start = pch + 1;
+    }
+  }
+  result.push_back(start);
+
+  return result;
+}
+
+void PAImageProcessing::BatchProcessing()
+{
+  QFileDialog LoadDialog(nullptr, "Select Files to be processed");
+  LoadDialog.setFileMode(QFileDialog::FileMode::ExistingFiles);
+  LoadDialog.setNameFilter(tr("Images (*.nrrd)"));
+  LoadDialog.setViewMode(QFileDialog::Detail);
+
+  QStringList fileNames;
+  if (LoadDialog.exec())
+    fileNames = LoadDialog.selectedFiles();
+
+  QString saveDir = QFileDialog::getExistingDirectory(nullptr, tr("Select Directory To Save To"),
+    "",
+    QFileDialog::ShowDirsOnly
+    | QFileDialog::DontResolveSymlinks);
+
+  DisableControls();
+
+  std::set<char> delims{ '/', '.'};
+
+  mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
+
+  for (int fileNumber = 0; fileNumber < fileNames.size(); ++fileNumber)
+  {
+    m_Controls.progressBar->setValue(0);
+    m_Controls.progressBar->setVisible(true);
+    m_Controls.ProgressInfo->setVisible(true);
+    m_Controls.ProgressInfo->setText("loading file");
+
+    QString filename = fileNames.at(fileNumber);
+    auto split = splitpath(filename.toStdString(), delims);
+    std::string imageName = split.at(split.size()-2);
+    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename.toStdString().c_str());
+
+    UpdateBFSettings(image);
+    // Beamforming
+    std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
+      this->UpdateProgress(progress, progressInfo);
+    };
+    m_Controls.progressBar->setValue(100);
+
+    image = filterbank->ApplyBeamforming(image, BFconfig, m_Controls.Cutoff->value(), progressHandle);
+
+    // Cropping
+
+    m_Controls.ProgressInfo->setText("cropping image");
+    image = filterbank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, image->GetDimension(2) - 1);
+    
+    // Bandpass
+
+    m_Controls.ProgressInfo->setText("applying bandpass");
+    float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.BPSpeedOfSound->value();
+    // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
+    float maxFrequency = 1 / (recordTime / image->GetDimension(1)) * image->GetDimension(1) / 2 / 2 / 1000;
+    float BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
+    float BPLowPass = maxFrequency - 1000000 * m_Controls.BPlow->value(); // [Hz]
+
+    if (BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
+    {
+      QMessageBox Msgbox;
+      Msgbox.setText("LowPass too low, disabled it.");
+      Msgbox.exec();
+
+      BPLowPass = 0;
+    }
+    if (BPLowPass < 0 && m_Controls.UseBP->isChecked())
+    {
+      QMessageBox Msgbox;
+      Msgbox.setText("LowPass too high, disabled it.");
+      Msgbox.exec();
+
+      BPLowPass = 0;
+    }
+    if (BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
+    {
+      QMessageBox Msgbox;
+      Msgbox.setText("HighPass too high, disabled it.");
+      Msgbox.exec();
+
+      BPHighPass = 0;
+    }
+    if (BPHighPass > maxFrequency - BFconfig.BPLowPass)
+    {
+      QMessageBox Msgbox;
+      Msgbox.setText("HighPass higher than LowPass, disabled both.");
+      Msgbox.exec();
+
+      BPHighPass = 0;
+      BPLowPass = 0;
+    }
+
+    image = filterbank->BandpassFilter(image, recordTime, BPHighPass, BPLowPass, m_Controls.BPFalloff->value());
+
+    // Bmode
+    m_Controls.ProgressInfo->setText("applying bmode filter");
+
+    if (m_Controls.BModeMethod->currentText() == "Simple Abs Filter")
+      image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, m_UseLogfilter, m_ResampleSpacing);
+    else if (m_Controls.BModeMethod->currentText() == "Shape Detection")
+      image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, m_UseLogfilter, m_ResampleSpacing);
+
+    // Save
+    m_Controls.ProgressInfo->setText("saving");
+
+    std::string saveFileName = saveDir.toStdString() + "/" + imageName + " processed"+ ".nrrd";
+    mitk::IOUtil::Save(image, saveFileName);
+    m_Controls.progressBar->setVisible(false);
+  }
+
+  EnableControls();
 }
 
 void PAImageProcessing::StartBeamformingThread()
@@ -859,7 +1002,6 @@ void BandpassThread::run()
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
   resultImage = filterbank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_TukeyAlpha);
-  MITK_INFO << "lol";
   emit result(resultImage);
 }
 

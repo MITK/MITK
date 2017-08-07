@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PAImageProcessing_h
 #define PAImageProcessing_h
 
+#include <mitkPhotoacousticImage.h>
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
@@ -68,6 +69,9 @@ class PAImageProcessing : public QmitkAbstractView
     void StartBandpassThread();
 
     void UpdateProgress(int progress, std::string progressInfo);
+
+    void BatchProcessing();
+    void UpdateSaveBoxes();
 
   protected:
     virtual void CreateQtPartControl(QWidget *parent) override;
@@ -121,12 +125,15 @@ class BmodeThread : public QThread
     void result(mitk::Image::Pointer);
 
   public:
-    void setConfig(bool useLogfilter, double resampleSpacing);
+    enum BModeMethod { ShapeDetection, Abs };
+
+    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method);
     void setInputImage(mitk::Image::Pointer image);
 
   protected:
     mitk::Image::Pointer m_InputImage;
 
+    mitk::PhotoacousticImage::BModeMethod m_Method;
     bool m_UseLogfilter;
     double m_ResampleSpacing;
 };

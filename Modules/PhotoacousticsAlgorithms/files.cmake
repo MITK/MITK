@@ -4,6 +4,8 @@ set(CPP_FILES
   Algorithms/mitkPhotoacousticBeamformingFilter.cpp
   
   Algorithms/OCL/mitkPhotoacousticOCLBeamformer.cpp
+  
+  Algorithms/OCL/mitkPhotoacousticBModeFilter.cpp
 )
 
 set(RESOURCE_FILES
@@ -11,5 +13,6 @@ set(RESOURCE_FILES
   DMASQuadratic.cl
   DASspherical.cl
   DMASspherical.cl
-  CropFilter.cl
+  BModeAbs.cl
+  BModeAbsLog.cl
 )

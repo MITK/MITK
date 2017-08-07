@@ -130,6 +130,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
     resampleImageFilter->UpdateLargestPossibleRegion();
     return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
   }
+  return nullptr;
 }
 
 /*mitk::Image::Pointer mitk::PhotoacousticImage::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
@@ -187,7 +188,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 {
   
   unsigned int inputDim[3] = { inputImage->GetDimension(0), inputImage->GetDimension(1), inputImage->GetDimension(2) };
-  unsigned int outputDim[3] = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - above - below, maxSlice - minSlice + 1 };
+  unsigned int outputDim[3] = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - (unsigned int)above - (unsigned int)below, (unsigned int)maxSlice - (unsigned int)minSlice + 1 };
  
   void* inputData;
   float* outputData = new float[outputDim[0] * outputDim[1] * outputDim[2]];
@@ -305,7 +306,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
   }
   if (!powerOfTwo)
   {
-    unsigned int dim[2] = { data->GetDimension(0), pow(2,finalPower+1)};
+    unsigned int dim[2] = { data->GetDimension(0), (unsigned int)pow(2,finalPower+1)};
     data = ApplyResampling(data, dim);
   }
 

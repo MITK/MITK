@@ -96,8 +96,8 @@ void mitk::BeamformingFilter::GenerateData()
   if (!output->IsInitialized())
     return;
 
-  float inputDim[2] = { input->GetDimension(0), input->GetDimension(1) };
-  float outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
+  float inputDim[2] = { (float)input->GetDimension(0), (float)input->GetDimension(1) };
+  float outputDim[2] = { (float)output->GetDimension(0), (float)output->GetDimension(1) };
 
   unsigned short chunkSize = 5; // TODO: make this slightly less random
 

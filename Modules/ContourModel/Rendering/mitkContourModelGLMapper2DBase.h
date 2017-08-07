@@ -21,6 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMapper.h"
 #include "mitkTextAnnotation2D.h"
 #include <MitkContourModelExports.h>
+#include "vtkNew.h"
+
+class vtkContext2D;
+class vtkPen;
 
 namespace mitk
 {
@@ -54,11 +58,17 @@ namespace mitk
 
     virtual void InternalDrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer);
 
+    void Initialize(mitk::BaseRenderer *renderer);
+
     TextAnnotationPointerType m_PointNumbersAnnotation;
     TextAnnotationPointerType m_ControlPointNumbersAnnotation;
 
     typedef std::vector<BaseRenderer *> RendererListType;
     RendererListType m_RendererList;
+
+    bool m_Initialized;
+
+    vtkNew<vtkContext2D> m_Context;
   };
 
 } // namespace mitk

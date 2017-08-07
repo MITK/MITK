@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_CONTOUR_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "mitkGLMapper.h"
+#include "mitkMapper.h"
 #include <MitkSegmentationExports.h>
 
 namespace mitk
@@ -32,17 +32,19 @@ namespace mitk
    *
    * @ingroup Mapper
    */
-  class MITKSEGMENTATION_EXPORT ContourMapper2D : public GLMapper
+  class MITKSEGMENTATION_EXPORT ContourMapper2D : public Mapper
   {
   public:
-    mitkClassMacro(ContourMapper2D, GLMapper);
+    mitkClassMacro(ContourMapper2D, Mapper);
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       /**
        * reimplemented from Baseclass
        */
-      virtual void Paint(BaseRenderer *renderer) override;
+      void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type);
+
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor=nullptr);
 
     /**
      * return a refernce of the rendered data object

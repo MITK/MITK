@@ -140,12 +140,12 @@ void mitk::RenderingTestHelper::PrintGLInfo()
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
   ;
 
-  MITK_INFO << "OpenGL Render Context Information: \n"
-            << "- GL_VENDOR: " << glGetString(GL_VENDOR) << "\n"
-            << "- GL_RENDERER: " << glGetString(GL_RENDERER) << "\n"
-            << "- GL_VERSION: " << glGetString(GL_VERSION) << "\n"
-            << "- GL_MAX_TEXTURE_SIZE: " << maxTextureSize << "\n"
-            << "- GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS);
+  //MITK_INFO << "OpenGL Render Context Information: \n"
+  //          << "- GL_VENDOR: " << glGetString(GL_VENDOR) << "\n"
+  //          << "- GL_RENDERER: " << glGetString(GL_RENDERER) << "\n"
+  //          << "- GL_VERSION: " << glGetString(GL_VERSION) << "\n"
+  //          << "- GL_MAX_TEXTURE_SIZE: " << maxTextureSize << "\n"
+  //          << "- GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS);
 }
 
 void mitk::RenderingTestHelper::SetMapperID(mitk::BaseRenderer::StandardMapperSlot id)

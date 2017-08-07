@@ -75,7 +75,7 @@ void mitk::GPUVolumeMapper3D::MitkRenderVolumetricGeometry(mitk::BaseRenderer *r
 
 bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer * /*renderer*/)
 {
-  return false; // TODO 18922
+  return false;
 }
 
 void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer *renderer)

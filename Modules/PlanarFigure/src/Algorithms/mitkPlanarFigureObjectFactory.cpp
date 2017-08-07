@@ -61,7 +61,7 @@ mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNo
   {
     if (id == mitk::BaseRenderer::Standard2D)
     {
-      newMapper = mitk::VtkGLMapperWrapper::New(mitk::PlanarFigureMapper2D::New().GetPointer());
+      newMapper = mitk::PlanarFigureMapper2D::New();
       newMapper->SetDataNode(node);
     }
     else if (id == mitk::BaseRenderer::Standard3D)

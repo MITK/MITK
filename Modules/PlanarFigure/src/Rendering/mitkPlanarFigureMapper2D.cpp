@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkColorProperty.h"
-#include "mitkGL.h"
+#include "mitkGL.h" //TODO GLGLGLGLGL
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
@@ -48,8 +48,47 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
   }
 }
 
-void mitk::PlanarFigureMapper2D::Paint(mitk::BaseRenderer *renderer)
+void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
 {
+  float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  // check for color prop and use it for rendering if it exists
+  GetDataNode()->GetColor(rgba, renderer, "color");
+  // check for opacity prop and use it for rendering if it exists
+  GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
+
+  glColor4fv(rgba);
+}
+
+void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *renderer)
+{/*
+  vtkOpenGLContextDevice2D *device = NULL;
+    device = vtkOpenGLContextDevice2D::New();
+  if (device)
+  {
+    this->Context->Begin(device);
+
+    vtkOpenGLContextDevice3D *dev = vtkOpenGLContextDevice3D::New();
+    dev->Initialize(vtkRenderer::SafeDownCast(viewport), device);
+    this->Context3D->Begin(dev);
+    dev->Delete();
+
+    device->Delete();
+    this->Initialized = true;
+  }
+  else
+  {
+    // Failed
+  }*/
+}
+
+void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
+{
+  if (type != mitk::VtkPropRenderer::Overlay) return;
+  if (!this->m_Initialized)
+  {
+    this->Initialize(renderer);
+  }
+
   bool visible = true;
 
   m_AnnotationAnnotation->SetVisibility(false);
@@ -732,8 +771,8 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *renderer,
   m_AnnotationAnnotation->SetPosition2D(scaledAnchorPoint);
   m_AnnotationAnnotation->SetOffsetVector(offset);
 
-  m_AnnotationAnnotation->Update(renderer);
-  m_AnnotationAnnotation->Paint(renderer);
+  //m_AnnotationAnnotation->Update(renderer);
+  //m_AnnotationAnnotation->Paint(renderer);
   annotationOffset -= 15.0;
   //  annotationOffset -= m_AnnotationAnnotation->GetBoundsOnDisplay( renderer ).Size[1];
 }
@@ -797,8 +836,8 @@ void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *plan
   m_QuantityAnnotation->SetPosition2D(scaledAnchorPoint);
   m_QuantityAnnotation->SetOffsetVector(offset);
 
-  m_QuantityAnnotation->Update(renderer);
-  m_QuantityAnnotation->Paint(renderer);
+  //m_QuantityAnnotation->Update(renderer);
+  //m_QuantityAnnotation->Paint(renderer);
   //  annotationOffset -= m_QuantityAnnotation->GetBoundsOnDisplay( renderer ).Size[1];
   annotationOffset -= 15.0;
 }

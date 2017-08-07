@@ -39,6 +39,17 @@ mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 {
 }
 
+void mitk::ContourModelGLMapper2DBase::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
+{
+  float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  // check for color prop and use it for rendering if it exists
+  GetDataNode()->GetColor(rgba, renderer, "color");
+  // check for opacity prop and use it for rendering if it exists
+  GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
+
+  glColor4fv(rgba);
+}
+
 void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer)
 {
   if (std::find(m_RendererList.begin(), m_RendererList.end(), renderer) == m_RendererList.end())

@@ -344,16 +344,31 @@ void mitk::PlanarFigureMapper2D::DrawMarker(const mitk::Point2D &point,
       glDisable(GL_LINE_SMOOTH);
       if (markerOpacity > 0)
       {
-        glRectf(displayPoint[0] - 4, displayPoint[1] - 4, displayPoint[0] + 4, displayPoint[1] + 4);
+        m_Context->DrawRect(displayPoint[0] - 4, displayPoint[1] - 4, 8, 8);
       }
+
       // Paint outline
       glColor4f(lineColor[0], lineColor[1], lineColor[2], lineOpacity);
-      glBegin(GL_LINE_LOOP);
-      glVertex3f(displayPoint[0] - 4, displayPoint[1] - 4, PLANAR_OFFSET);
+      //glBegin(GL_LINE_LOOP);
+
+      float* outline = new float[8];
+      outline[0] = displayPoint[0] - 4;
+      outline[1] = displayPoint[1] - 4;
+      outline[2] = outline[0];
+      outline[3] = displayPoint[1] + 4;
+      outline[4] = displayPoint[0] + 4;
+      outline[5] = outline[3];
+      outline[6] = outline[4];
+      outline[7] = outline[1];
+
+
+      m_Context->DrawLines(outline, 4);
+
+      /*glVertex3f(displayPoint[0] - 4, displayPoint[1] - 4, PLANAR_OFFSET);
       glVertex3f(displayPoint[0] - 4, displayPoint[1] + 4, PLANAR_OFFSET);
       glVertex3f(displayPoint[0] + 4, displayPoint[1] + 4, PLANAR_OFFSET);
       glVertex3f(displayPoint[0] + 4, displayPoint[1] - 4, PLANAR_OFFSET);
-      glEnd();
+      glEnd();*/
       break;
     }
 

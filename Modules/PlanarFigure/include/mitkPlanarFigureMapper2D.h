@@ -22,8 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureControlPointStyleProperty.h"
 #include <MitkPlanarFigureExports.h>
+#include "vtkNew.h"
 
-class vtkOpenGLContextDevice2D;
+class vtkContext2D;
 
 namespace mitk
 {
@@ -312,6 +313,8 @@ namespace mitk
 
     itk::SmartPointer<mitk::TextAnnotation2D> m_AnnotationAnnotation;
     itk::SmartPointer<mitk::TextAnnotation2D> m_QuantityAnnotation;
+
+    vtkNew<vtkContext2D> m_Context;
   };
 
 } // namespace mitk

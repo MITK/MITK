@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkColorProperty.h"
 #include "mitkGL.h" //TODO GLGLGLGLGL
+#include "vtkContext2D.h"
+#include "vtkContextDevice2D.h"
+#include "vtkOpenGLContextDevice2D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
@@ -32,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static const float PLANAR_OFFSET = 0.5f;
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
-  : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false)
+  : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false), m_Initialized(false)
 {
   m_AnnotationAnnotation = mitk::TextAnnotation2D::New();
   m_QuantityAnnotation = mitk::TextAnnotation2D::New();
@@ -60,25 +63,18 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
 }
 
 void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *renderer)
-{/*
+{
   vtkOpenGLContextDevice2D *device = NULL;
     device = vtkOpenGLContextDevice2D::New();
   if (device)
   {
-    this->Context->Begin(device);
-
-    vtkOpenGLContextDevice3D *dev = vtkOpenGLContextDevice3D::New();
-    dev->Initialize(vtkRenderer::SafeDownCast(viewport), device);
-    this->Context3D->Begin(dev);
-    dev->Delete();
-
+    this->m_Context->Begin(device);
     device->Delete();
-    this->Initialized = true;
+    this->m_Initialized = true;
   }
   else
   {
-    // Failed
-  }*/
+  }
 }
 
 void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
@@ -88,6 +84,8 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   {
     this->Initialize(renderer);
   }
+  vtkOpenGLContextDevice2D::SafeDownCast(
+    this->m_Context->GetDevice())->Begin(renderer->GetVtkRenderer());
 
   bool visible = true;
 
@@ -200,6 +198,7 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   }
 
   glLineWidth(1.0f);
+  this->m_Context->GetDevice()->End();
 }
 
 void mitk::PlanarFigureMapper2D::PaintPolyLine(const mitk::PlanarFigure::PolyLineType vertices,
@@ -240,12 +239,16 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(const mitk::PlanarFigure::PolyLin
 
   // now paint all the points in one run
 
-  glBegin(GL_LINE_STRIP);
-  for (auto pointIter = pointlist.cbegin(); pointIter != pointlist.cend(); pointIter++)
+  //glBegin(GL_LINE_STRIP);
+  float* points = new float[pointlist.size()*2];
+  for (int i = 0 ; i < pointlist.size() ; ++i)
   {
-    glVertex3f((*pointIter)[0], (*pointIter)[1], PLANAR_OFFSET);
+    //glVertex3f((*pointIter)[0], (*pointIter)[1], PLANAR_OFFSET);
+    points[i * 2] = pointlist[i][0];
+    points[i * 2 + 1] = pointlist[i][1];
   }
-  glEnd();
+    this->m_Context->DrawPoly(points,pointlist.size());
+  //glEnd();
 
   anchorPoint = rightMostPoint;
 }

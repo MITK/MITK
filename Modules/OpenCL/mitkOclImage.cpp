@@ -172,16 +172,9 @@ cl_int mitk::OclImage::AllocateGPUImage()
   }
 
   // create new buffer
-  if( this->m_dim > 2)
-  {
-    //Create a 3D Image
-    m_gpuImage = clCreateImage3D(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat, *(m_Dims), *(m_Dims+1), *(m_Dims+2), 0, 0, nullptr, &clErr);
-  }
-  else
-  {
-    //Create a 2D Image
-    m_gpuImage = clCreateImage2D(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat,  *(m_Dims), *(m_Dims+1), 0, nullptr, &clErr);
-  }
+
+  m_gpuImage = clCreateImage(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat, nullptr, nullptr, &clErr);
+
   CHECK_OCL_ERR(clErr);
 
   return clErr;

@@ -374,7 +374,7 @@ int main(int argc, char* argv[])
       CasterType::Pointer caster = CasterType::New();
       caster->SetInput(input_image);
       caster->Update();
-      mitk::TrackingHandlerTensor::ItkTensorImageType::Pointer itkImg = caster->GetOutput();
+      mitk::TrackingHandlerTensor::ItkTensorImageType::ConstPointer itkImg = caster->GetOutput();
       dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->AddTensorImage(itkImg);
     }
 

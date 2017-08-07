@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPhotoacousticBeamformingFilter.h"
 #include <chrono>
 #include <mitkAutoCropImageFilter.h>
-
+#include <mitkPhotoacousticBModeFilter.h>
 
 
 // itk dependencies
@@ -58,65 +58,79 @@ mitk::PhotoacousticImage::~PhotoacousticImage()
   MITK_INFO << "[PhotoacousticImage Debug] destroyed that image";
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter, float resampleSpacing)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseLogFilter, float resampleSpacing)
 {
-  // we use this seperate ApplyBmodeFilter Method for processing of two-dimensional images
-
-  // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
-  typedef itk::Image< float, 3 > itkFloatImageType;
-
-  typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
-  BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter
-
-  typedef itk::PhotoacousticBModeImageFilter < itkFloatImageType, itkFloatImageType > PhotoacousticBModeImageFilter;
-  PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New(); // No LogFilter
-
-  typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
-  ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
-
-  itkFloatImageType::Pointer itkImage;
-
-  mitk::CastToItkImage(inputImage, itkImage);
-
-  itkFloatImageType::Pointer bmode;
-
-  if (UseLogFilter)
+  if (method == BModeMethod::Abs)
   {
-    bModeFilter->SetInput(itkImage);
-    bModeFilter->SetDirection(1);
-    bmode = bModeFilter->GetOutput();
+    auto input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, inputImage->GetDimension(2) - 1);
+    PhotoacousticBModeFilter::Pointer filter = PhotoacousticBModeFilter::New();
+    filter->SetParameters(UseLogFilter);
+    filter->SetInput(input);
+    filter->Update();
+
+    auto out = filter->GetOutput();
+    return out;
   }
-  else
+  else if (method == BModeMethod::ShapeDetection)
   {
-    photoacousticBModeFilter->SetInput(itkImage);
-    photoacousticBModeFilter->SetDirection(1);
-    bmode = photoacousticBModeFilter->GetOutput();
+
+    // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
+    typedef itk::Image< float, 3 > itkFloatImageType;
+
+    typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
+    BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter
+
+    typedef itk::PhotoacousticBModeImageFilter < itkFloatImageType, itkFloatImageType > PhotoacousticBModeImageFilter;
+    PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New(); // No LogFilter
+
+    typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
+    ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
+
+    itkFloatImageType::Pointer itkImage;
+
+    mitk::CastToItkImage(inputImage, itkImage);
+
+    itkFloatImageType::Pointer bmode;
+
+    if (UseLogFilter)
+    {
+      bModeFilter->SetInput(itkImage);
+      bModeFilter->SetDirection(1);
+      bmode = bModeFilter->GetOutput();
+    }
+    else
+    {
+      photoacousticBModeFilter->SetInput(itkImage);
+      photoacousticBModeFilter->SetDirection(1);
+      bmode = photoacousticBModeFilter->GetOutput();
+    }
+
+    // resampleSpacing == 0 means: do no resampling
+    if (resampleSpacing == 0)
+    {
+      return mitk::GrabItkImageMemory(bmode);
+    }
+
+    itkFloatImageType::SpacingType outputSpacing;
+    itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
+    itkFloatImageType::SizeType outputSize = inputSize;
+
+    outputSpacing[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSize[0]) / static_cast<double>(outputSize[0]));
+    outputSpacing[1] = resampleSpacing;
+    outputSpacing[2] = itkImage->GetSpacing()[2];
+
+    outputSize[1] = inputSize[1] * itkImage->GetSpacing()[1] / outputSpacing[1];
+
+    typedef itk::IdentityTransform<double, 3> TransformType;
+    resampleImageFilter->SetInput(bmode);
+    resampleImageFilter->SetSize(outputSize);
+    resampleImageFilter->SetOutputSpacing(outputSpacing);
+    resampleImageFilter->SetTransform(TransformType::New());
+
+    resampleImageFilter->UpdateLargestPossibleRegion();
+    return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
   }
-
-  // resampleSpacing == 0 means: do no resampling
-  if (resampleSpacing == 0)
-  {
-    return mitk::GrabItkImageMemory(bmode);
-  }
-
-  itkFloatImageType::SpacingType outputSpacing;
-  itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
-  itkFloatImageType::SizeType outputSize = inputSize;
-
-  outputSpacing[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSize[0]) / static_cast<double>(outputSize[0]));
-  outputSpacing[1] = resampleSpacing;
-  outputSpacing[2] = itkImage->GetSpacing()[2];
-
-  outputSize[1] = inputSize[1] * itkImage->GetSpacing()[1] / outputSpacing[1];
-
-  typedef itk::IdentityTransform<double,3> TransformType;
-  resampleImageFilter->SetInput(bmode);
-  resampleImageFilter->SetSize(outputSize);
-  resampleImageFilter->SetOutputSpacing(outputSpacing);
-  resampleImageFilter->SetTransform(TransformType::New());
-
-  resampleImageFilter->UpdateLargestPossibleRegion();
-  return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
+  return nullptr;
 }
 
 /*mitk::Image::Pointer mitk::PhotoacousticImage::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
@@ -174,7 +188,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 {
   
   unsigned int inputDim[3] = { inputImage->GetDimension(0), inputImage->GetDimension(1), inputImage->GetDimension(2) };
-  unsigned int outputDim[3] = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - above - below, maxSlice - minSlice + 1 };
+  unsigned int outputDim[3] = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - (unsigned int)above - (unsigned int)below, (unsigned int)maxSlice - (unsigned int)minSlice + 1 };
  
   void* inputData;
   float* outputData = new float[outputDim[0] * outputDim[1] * outputDim[2]];
@@ -292,7 +306,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
   }
   if (!powerOfTwo)
   {
-    unsigned int dim[2] = { data->GetDimension(0), pow(2,finalPower+1)};
+    unsigned int dim[2] = { data->GetDimension(0), (unsigned int)pow(2,finalPower+1)};
     data = ApplyResampling(data, dim);
   }
 

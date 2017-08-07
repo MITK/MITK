@@ -74,10 +74,10 @@ public:
     m_PAImage = PA;
   }
 
-  void SetBeamformingParameters(float SpeedOfSound, float RecordTime, float Pitch, float Angle, bool PAImage, unsigned short transducerElements)
+  void SetBeamformingParameters(float SpeedOfSound, float timeSpacing, float Pitch, float Angle, bool PAImage, unsigned short transducerElements)
   {
     m_SpeedOfSound = SpeedOfSound;
-    m_RecordTime = RecordTime;
+    m_TimeSpacing = timeSpacing;
     m_Pitch = Pitch;
     m_Angle = Angle;
     m_PAImage = PAImage;
@@ -104,7 +104,7 @@ protected:
 
   int GetBytesPerElem()
   {
-    return sizeof(double);
+    return sizeof(float);
   }
 
   virtual us::Module* GetModule();
@@ -120,7 +120,7 @@ private:
   BeamformingAlgorithm m_Algorithm;
   unsigned short m_PAImage;
   float m_SpeedOfSound;
-  float m_RecordTime;
+  float m_TimeSpacing;
   float m_Pitch;
   float m_Angle;
   unsigned short m_TransducerElements;

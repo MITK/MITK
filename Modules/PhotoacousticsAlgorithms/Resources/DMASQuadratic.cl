@@ -20,7 +20,7 @@ __kernel void ckDMASQuad(
   __global float* apodArray,
   unsigned short apodArraySize,
   float SpeedOfSound,
-  float RecordTime,
+  float TimeSpacing,
   float Pitch,
   float Angle,
   unsigned short PAImage,
@@ -37,8 +37,7 @@ __kernel void ckDMASQuad(
   
   // get image width and weight
   const unsigned int inputL = get_image_width( dSource );
-  const unsigned int inputS = get_image_height( dSource ) / (PAImage + 1);
-  const unsigned int inputSBack = get_image_height( dSource ) / 2;
+  const unsigned int inputS = get_image_height( dSource );
   const unsigned int Slices = get_image_depth( dSource );
 
   // create an image sampler
@@ -48,9 +47,9 @@ __kernel void ckDMASQuad(
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {	
     float l_i = (float)globalPosX / outputL * inputL;
-    float s_i = (float)globalPosY / outputS * inputS / (2 - PAImage);
+    float s_i = (float)globalPosY / outputS * inputS / 2;
 
-    float part = (tan(Angle / 360 * 2 * M_PI) * RecordTime / inputSBack * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
+    float part = (tan(Angle / 360 * 2 * M_PI) * TimeSpacing * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
     if (part < 1)
       part = 1;
 
@@ -59,7 +58,7 @@ __kernel void ckDMASQuad(
     short usedLines = (maxLine - minLine);
 	float apod_mult = apodArraySize / (maxLine - minLine);
 	
-    float delayMultiplicator = pow((inputSBack / (RecordTime*SpeedOfSound) * Pitch * TransducerElements / inputL), 2) / s_i / 2;
+    float delayMultiplicator = pow((1 / (TimeSpacing*SpeedOfSound) * Pitch * TransducerElements / inputL), 2) / s_i / 2;
 	
 	float mult = 0;
 	float output = 0;

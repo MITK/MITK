@@ -505,7 +505,7 @@
           </sizepolicy>
          </property>
          <property name="decimals">
-          <number>3</number>
+          <number>2</number>
          </property>
          <property name="minimum">
           <double>0.010000000000000</double>

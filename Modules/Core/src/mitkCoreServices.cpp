@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
-#include <mitkIShaderRepository.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -66,13 +65,6 @@ namespace mitk
     }
 
     return coreService;
-  }
-
-  IShaderRepository *CoreServices::GetShaderRepository()
-  {
-    static us::ServiceTracker<IShaderRepository> tracker(us::GetModuleContext());
-    tracker.Open();
-    return tracker.GetService();
   }
 
   IPropertyAliases *CoreServices::GetPropertyAliases(us::ModuleContext *context)

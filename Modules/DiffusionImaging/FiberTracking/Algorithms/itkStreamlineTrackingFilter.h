@@ -109,12 +109,10 @@ public:
   itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
   itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
-  itkSetMacro( StopTracking, bool)                    ///< Set flag to stop tractography
-
-  void SetSeedPoints(std::vector< itk::Point<float> > seedPoints)	///< Use manually defined points in physical space as seed points instead of seed image
-  {
-    m_SeedPoints = seedPoints;
-    this->Modified();
+  
+  ///< Use manually defined points in physical space as seed points instead of seed image
+  void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {
+    m_SeedPoints = sP;
   }
 
   void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<

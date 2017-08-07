@@ -85,10 +85,10 @@ void vtkPointSetSlicer::SetSlicePlane(vtkPlane *plane)
 
 // Overload standard modified time function. If cut functions is modified,
 // or contour values modified, then this object is modified as well.
-unsigned long vtkPointSetSlicer::GetMTime()
+vtkMTimeType vtkPointSetSlicer::GetMTime()
 {
-  unsigned long mTime = this->Superclass::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime = this->Superclass::GetMTime();
+  vtkMTimeType time;
 
   if (this->SlicePlane != 0)
   {

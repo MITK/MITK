@@ -29,7 +29,6 @@ set(mitk_modules
   SurfaceInterpolation
   Segmentation
   PlanarFigureSegmentation
-  OpenViewCore
   QtWidgets
   QtWidgetsExt
   Chart
@@ -58,7 +57,6 @@ set(mitk_modules
   Persistence
   OpenIGTLinkUI
   IGTUI
-  VtkShaders
   DicomRT
   RTUI
   IOExt

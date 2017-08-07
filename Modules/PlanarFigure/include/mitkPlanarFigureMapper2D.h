@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureControlPointStyleProperty.h"
 #include <MitkPlanarFigureExports.h>
 #include "vtkNew.h"
+#include "vtkPen.h"
 
 class vtkContext2D;
-class vtkPen;
 
 namespace mitk
 {

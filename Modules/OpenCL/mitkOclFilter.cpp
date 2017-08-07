@@ -123,7 +123,7 @@ void mitk::OclFilter::LoadSourceFiles(CStringList &sourceCode, ClSizeList &sourc
     if( !mdr.IsValid() )
       MITK_WARN << "Could not load resource: " << mdr.GetName() << " is invalid!";
 
-    us:ModuleResourceStream rss(mdr);
+    us::ModuleResourceStream rss(mdr);
 
     // read resource file to a string
     std::istreambuf_iterator<char> eos;

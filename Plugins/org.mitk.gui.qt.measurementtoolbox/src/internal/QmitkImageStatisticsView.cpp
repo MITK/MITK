@@ -211,7 +211,7 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
     // display histogram for selected timestep
     this->m_Controls->m_JSHistogram->Clear();
     QmitkImageStatisticsCalculationThread::HistogramType::ConstPointer histogram =
-        this->m_CalculationThread->GetTimeStepHistogram(timestep);
+        (QmitkImageStatisticsCalculationThread::HistogramType::ConstPointer)this->m_CalculationThread->GetTimeStepHistogram(timestep);
 
     if (histogram.IsNotNull())
     {
@@ -944,7 +944,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
           image = this->m_CalculationThread->GetStatisticsImage();
         }
 
-        mitk::IntensityProfile::ConstPointer intensityProfile = mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
+        mitk::IntensityProfile::ConstPointer intensityProfile = (mitk::IntensityProfile::ConstPointer)mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
 
         auto intensityProfileList = ConvertIntensityProfileToVector(intensityProfile);
         m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::line);

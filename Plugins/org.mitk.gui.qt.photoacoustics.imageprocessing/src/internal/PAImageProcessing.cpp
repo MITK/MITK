@@ -197,8 +197,6 @@ void PAImageProcessing::BatchProcessing()
       }
     }
 
-    
-
     // Cropping
     if (doSteps[1])
     {
@@ -873,7 +871,6 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.ReconstructionLines = m_Controls.Lines->value();
   BFconfig.TransducerElements = m_Controls.ElementCount->value();
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
-  BFconfig.ButterworthOrder = m_Controls.BPFalloff->value();
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
   BFconfig.UseGPU = m_Controls.UseGPU->isChecked();
 

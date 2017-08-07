@@ -60,6 +60,10 @@ mitk::PhotoacousticImage::~PhotoacousticImage()
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseLogFilter, float resampleSpacing)
 {
+  // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
+  typedef itk::Image< float, 3 > itkFloatImageType;
+  typedef itk::IdentityTransform<double, 3> TransformType;
+
   if (method == BModeMethod::Abs)
   {
     auto input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, inputImage->GetDimension(2) - 1);
@@ -69,14 +73,36 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
     filter->Update();
 
     auto out = filter->GetOutput();
-    return out;
+
+    if(resampleSpacing == 0)
+      return out;
+
+    typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
+    ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
+
+    itkFloatImageType::Pointer itkImage;
+    mitk::CastToItkImage(out, itkImage);
+    itkFloatImageType::SpacingType outputSpacing;
+    itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
+    itkFloatImageType::SizeType outputSize = inputSize;
+
+    outputSpacing[0] = itkImage->GetSpacing()[0];
+    outputSpacing[1] = resampleSpacing;
+    outputSpacing[2] = itkImage->GetSpacing()[2];
+
+    outputSize[1] = inputSize[1] * itkImage->GetSpacing()[1] / outputSpacing[1];
+
+    typedef itk::IdentityTransform<double, 3> TransformType;
+    resampleImageFilter->SetInput(itkImage);
+    resampleImageFilter->SetSize(outputSize);
+    resampleImageFilter->SetOutputSpacing(outputSpacing);
+    resampleImageFilter->SetTransform(TransformType::New());
+
+    resampleImageFilter->UpdateLargestPossibleRegion();
+    return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
   }
   else if (method == BModeMethod::ShapeDetection)
   {
-
-    // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
-    typedef itk::Image< float, 3 > itkFloatImageType;
-
     typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
     BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter
 
@@ -115,13 +141,12 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
     itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
     itkFloatImageType::SizeType outputSize = inputSize;
 
-    outputSpacing[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSize[0]) / static_cast<double>(outputSize[0]));
+    outputSpacing[0] = itkImage->GetSpacing()[0];
     outputSpacing[1] = resampleSpacing;
     outputSpacing[2] = itkImage->GetSpacing()[2];
 
     outputSize[1] = inputSize[1] * itkImage->GetSpacing()[1] / outputSpacing[1];
 
-    typedef itk::IdentityTransform<double, 3> TransformType;
     resampleImageFilter->SetInput(bmode);
     resampleImageFilter->SetSize(outputSize);
     resampleImageFilter->SetOutputSpacing(outputSpacing);

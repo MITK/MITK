@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkNew.h"
 
 class vtkContext2D;
+class vtkPen;
 
 namespace mitk
 {
@@ -315,6 +316,7 @@ namespace mitk
     itk::SmartPointer<mitk::TextAnnotation2D> m_QuantityAnnotation;
 
     vtkNew<vtkContext2D> m_Context;
+    vtkSmartPointer<vtkPen> m_Pen;
   };
 
 } // namespace mitk

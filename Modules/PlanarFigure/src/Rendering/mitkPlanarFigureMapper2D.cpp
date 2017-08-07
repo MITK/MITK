@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkColorProperty.h"
 #include "mitkGL.h" //TODO GLGLGLGLGL
+#include "vtkPen.h"
 #include "vtkContext2D.h"
 #include "vtkContextDevice2D.h"
 #include "vtkOpenGLContextDevice2D.h"
@@ -59,11 +60,12 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
   // check for opacity prop and use it for rendering if it exists
   GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
-  glColor4fv(rgba);
+  this->m_Pen->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
 }
 
 void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *renderer)
 {
+  this->m_Pen = vtkSmartPointer<vtkPen>::New();
   vtkOpenGLContextDevice2D *device = NULL;
     device = vtkOpenGLContextDevice2D::New();
   if (device)
@@ -71,6 +73,7 @@ void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *renderer)
     this->m_Context->Begin(device);
     device->Delete();
     this->m_Initialized = true;
+    this->m_Context->ApplyPen(this->m_Pen);
   }
   else
   {
@@ -142,11 +145,6 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
   // Apply visual appearance properties from the PropertyList
   ApplyColorAndOpacityProperties(renderer);
 
-  // Enable line antialiasing
-  glEnable(GL_LINE_SMOOTH);
-  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-  glEnable(GL_DEPTH_TEST);
-
   // Get properties from node (if present)
   const mitk::DataNode *node = this->GetDataNode();
   this->InitializePlanarFigurePropertiesFromDataNode(node);
@@ -197,7 +195,6 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
     RenderQuantities(planarFigure, renderer, anchorPoint, annotationOffset, globalOpacity, lineDisplayMode);
   }
 
-  glLineWidth(1.0f);
   this->m_Context->GetDevice()->End();
 }
 

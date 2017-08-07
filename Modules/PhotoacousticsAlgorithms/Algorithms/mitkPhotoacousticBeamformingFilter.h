@@ -106,4 +106,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
+#endif //MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER

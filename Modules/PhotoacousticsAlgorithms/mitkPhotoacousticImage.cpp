@@ -159,7 +159,6 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
 
   mitk::CastToItkImage(inputImage, itkImage);
 
-  itkFloatImageType::SpacingType inputSpacing = itkImage->GetSpacing();
   itkFloatImageType::SpacingType outputSpacingItk;
   itkFloatImageType::SizeType inputSizeItk = itkImage->GetLargestPossibleRegion().GetSize();
   itkFloatImageType::SizeType outputSizeItk = inputSizeItk;
@@ -257,7 +256,11 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
 {
   // crop the image
   // set the Maximum Size of the image to 4096
-  unsigned short lowerCutoff = (4096 + cutoff) < inputImage->GetDimension(1) ? inputImage->GetDimension(1) - 4096 : 0;
+  unsigned short lowerCutoff = 0;
+  if (((unsigned int)(4096 + cutoff)) < inputImage->GetDimension(1))
+  {
+    lowerCutoff = (unsigned short)(inputImage->GetDimension(1) - 4096);
+  }
 
   config.RecordTime = config.RecordTime - (cutoff + lowerCutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "cropping image");
@@ -373,7 +376,7 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
 
   MITK_INFO << width << "width  " << center << "center  " << alpha;
 
-  for (int n = 0; n < reference->GetDimension(1); ++n)
+  for (unsigned int n = 0; n < reference->GetDimension(1); ++n)
   {
       imageData[reference->GetDimension(0)*n] = 0;
   }
@@ -424,16 +427,16 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
   */
 
   // mirror the first half of the image
-  for (int n = reference->GetDimension(1) / 2; n < reference->GetDimension(1); ++n)
+  for (unsigned int n = reference->GetDimension(1) / 2; n < reference->GetDimension(1); ++n)
   {
     imageData[reference->GetDimension(0)*n] = imageData[(reference->GetDimension(1) - (n + 1)) * reference->GetDimension(0)];
   }
   
 
   // copy and paste to all lines
-  for (int line = 1; line < reference->GetDimension(0); ++line)
+  for (unsigned int line = 1; line < reference->GetDimension(0); ++line)
   {
-    for (int sample = 0; sample < reference->GetDimension(1); ++sample)
+    for (unsigned int sample = 0; sample < reference->GetDimension(1); ++sample)
     {
       imageData[reference->GetDimension(0)*sample + line] = imageData[reference->GetDimension(0)*sample];
     }

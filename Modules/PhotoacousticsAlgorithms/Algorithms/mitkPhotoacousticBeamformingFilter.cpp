@@ -135,7 +135,7 @@ void mitk::BeamformingFilter::GenerateData()
   auto begin = std::chrono::high_resolution_clock::now(); // debbuging the performance...
   if (!m_Conf.UseGPU)
   {
-    for (int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
+    for (unsigned int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
     {
       mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
 
@@ -243,11 +243,11 @@ void mitk::BeamformingFilter::GenerateData()
       if (chunkSize < oclOutputDim[2])
       {
         bool skip = false;
-        for (int i = 0; !skip && i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
+        for (unsigned int i = 0; !skip && i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
         {
           m_ProgressHandle(100 * ((float)(i * chunkSize) / (float)oclOutputDim[2]), "performing reconstruction");
           mitk::Image::Pointer chunk = mitk::Image::New();
-          if ((oclOutputDim[2]) - (i * chunkSize) == 1 + chunkSize)
+          if ((int)((oclOutputDim[2]) - (i * chunkSize)) == (int)(1 + chunkSize))
           {
             // A 3d image of 3rd dimension == 1 can not be processed by openCL, make sure that this case never arises
             oclInputDimLastChunk[2] = input->GetDimension(2) % chunkSize + chunkSize;
@@ -274,7 +274,7 @@ void mitk::BeamformingFilter::GenerateData()
           m_oclFilter->Update();
           auto out = m_oclFilter->GetOutput();
 
-          for (int s = i * chunkSize; s < oclOutputDim[2]; ++s)  // TODO: make the bounds here smaller...
+          for (unsigned int s = i * chunkSize; s < oclOutputDim[2]; ++s)  // TODO: make the bounds here smaller...
           {
             mitk::ImageReadAccessor copy(out, out->GetSliceData(s - i * chunkSize));
             output->SetImportSlice(const_cast<void*>(copy.GetData()), s, 0, 0, mitk::Image::ReferenceMemory);
@@ -364,16 +364,11 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
   float l_i = 0;
   float s_i = 0;
 
-  float l = 0;
-  float x = 0;
-  float root = 0;
-
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
   float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   float apod_mult = 1;
 
-  float mult = 0;
   short usedLines = (maxLine - minLine);
 
   //quadratic delay
@@ -419,7 +414,6 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
   short AddSample = 0;
   short maxLine = 0;
   short minLine = 0;
-  float delayMultiplicator = 0;
   float l_i = 0;
   float s_i = 0;
 
@@ -473,17 +467,11 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
   float& outputS = outputDim[1];
   float& outputL = outputDim[0];
 
-  short AddSample1 = 0;
-  short AddSample2 = 0;
   short maxLine = 0;
   short minLine = 0;
   float delayMultiplicator = 0;
   float l_i = 0;
   float s_i = 0;
-
-  float l = 0;
-  float x = 0;
-  float root = 0;
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
@@ -551,17 +539,10 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
   float& outputS = outputDim[1];
   float& outputL = outputDim[0];
 
-  short AddSample1 = 0;
-  short AddSample2 = 0;
   short maxLine = 0;
   short minLine = 0;
-  float delayMultiplicator = 0;
   float l_i = 0;
   float s_i = 0;
-
-  float l = 0;
-  float x = 0;
-  float root = 0;
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);

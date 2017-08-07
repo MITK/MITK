@@ -60,9 +60,9 @@ public:
   std::vector<QmitkChartxyData*>* GetC3xyData() const;
 
 private:
-  QWidget* m_Parent;
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
+  QWidget* m_Parent;
 
   QmitkChartData * m_C3Data;
   std::vector<QmitkChartxyData*> * m_C3xyData;
@@ -284,7 +284,10 @@ void QmitkChartWidget::Clear()
 
 void QmitkChartWidget::OnLoadFinished(bool isLoadSuccessfull)
 {
-  emit PageSuccessfullyLoaded();
+  if(isLoadSuccessfull)
+  {
+    emit PageSuccessfullyLoaded();
+  }
 }
 
 void QmitkChartWidget::SetChartTypeAndReload(ChartType type)

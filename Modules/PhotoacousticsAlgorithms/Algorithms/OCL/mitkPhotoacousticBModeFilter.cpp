@@ -54,8 +54,6 @@ void mitk::PhotoacousticBModeFilter::Update()
 
 void mitk::PhotoacousticBModeFilter::Execute()
 {
-  cl_int clErr = 0;
-
   try
   {
     this->InitExec(this->m_PixelCalculation);
@@ -65,10 +63,6 @@ void mitk::PhotoacousticBModeFilter::Execute()
     MITK_ERROR << "Catched exception while initializing filter: " << e.what();
     return;
   }
-
-  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
-  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-  cl_context gpuContext = resources->GetContext();
 
   // execute the filter on a 3D NDRange
   this->ExecuteKernel(m_PixelCalculation, 3);

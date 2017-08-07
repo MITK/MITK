@@ -454,9 +454,9 @@
           </layout>
          </item>
          <item>
-          <widget class="QCheckBox" name="m_UseDefaultBinSizeBox">
+          <widget class="QCheckBox" name="m_ShowSubchartCheckBox">
            <property name="text">
-            <string>Use default bin size</string>
+            <string>Show Subchart</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -464,9 +464,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="m_ShowSubchartCheckBox">
+          <widget class="QCheckBox" name="m_UseDefaultBinSizeBox">
            <property name="text">
-            <string>Show Subchart</string>
+            <string>Use default bin size</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -555,7 +555,7 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QmitkC3jsWidget" name="m_JSHistogram">
+        <widget class="QmitkChartWidget" name="m_JSHistogram">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -633,9 +633,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkC3jsWidget</class>
+   <class>QmitkChartWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkC3jsWidget.h</header>
+   <header location="global">QmitkChartWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

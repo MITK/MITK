@@ -65,6 +65,10 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
     void InternalCalculateMaskFromPlanarFigure(
       const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
 
+    template < typename TPixel, unsigned int VImageDimension >
+    void InternalCalculateMaskFromOpenPlanarFigure(
+      const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
+
     mitk::Image::Pointer  extract2DImageSlice(unsigned int axis, unsigned int slice);
 
     bool GetPrincipalAxis(const BaseGeometry *geometry, Vector3D vector,

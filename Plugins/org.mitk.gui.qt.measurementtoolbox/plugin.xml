@@ -21,7 +21,7 @@
           name="Statistics"
           category="Quantification"
           class="QmitkImageStatisticsView"
-          icon="resources/ImageStatistic_24.png" >
+          icon="resources/bar-chart.svg" >
       <description>Calculate the statistic of image regions</description>
       <keywordReference id="org.mitk.views.imagestatistics.Keyword"/>
     </view>

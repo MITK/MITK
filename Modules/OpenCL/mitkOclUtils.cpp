@@ -213,10 +213,13 @@ void oclPrintDeviceInfo(cl_device_id device)
 
 std::string GetOclErrorAsString( int _clErr )
 {
-  std::string returnString("CL_SUCCESS\n");
+  std::string returnString("unkown error number: "+std::to_string(_clErr)+" \n");
 
   switch(_clErr)
   {
+  case CL_SUCCESS:
+    returnString =  "CL_SUCCESS\n";
+    break;
   case CL_DEVICE_NOT_FOUND:
     returnString =  "CL_DEVICE_NOT_FOUND\n";
     break;
@@ -361,7 +364,7 @@ std::string GetOclErrorAsString( int _clErr )
 
 void GetOclError(int _clErr)
 {
-  if(_clErr == CL_SUCCESS )
+  if(_clErr == CL_SUCCESS)
     MITK_WARN << "Called GetOclErr() with no error value: [CL_SUCCESS]";
   else
     MITK_ERROR << GetOclErrorAsString(_clErr);

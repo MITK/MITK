@@ -26,9 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPartListener.h>
 
 // mitk includes
-#include <mitkImageStatisticsCalculator.h>
-#include <mitkILifecycleAwarePart.h>
-#include <mitkPlanarLine.h>
+#include "mitkILifecycleAwarePart.h"
+#include "mitkPlanarLine.h"
+#include <mitkIntensityProfile.h>
 
 #include <berryIPreferences.h>
 
@@ -55,6 +55,13 @@ private:
   typedef QList<mitk::DataNode*> SelectedDataNodeVectorType;
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
 
+  std::map<double, double> ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const;
+  std::vector<double> ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const;
+  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image) const;
+
+  QString GetFormattedIndex(const vnl_vector<int>& vector) const;
+  QString GetFormattedString(double value, unsigned int decimals) const;
+
 public:
 
   /*!
@@ -71,7 +78,7 @@ public:
   virtual void CreateConnections();
   /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
 
   static const std::string VIEW_ID;
   static const int STAT_TABLE_BASE_HEIGHT;
@@ -111,12 +118,12 @@ signals:
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
-  void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
+  void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics,
           const mitk::Image *image );
 
-  std::vector<QString> CalculateStatisticsForPlanarFigure( const mitk::Image *image);
+  std::vector<QString> AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image);
 
-  void FillLinearProfileStatisticsTableView( const mitk::Image *image );
+  void FillLinearProfileStatisticsTableView(mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image);
 
   /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();
@@ -124,18 +131,6 @@ protected:
   /** \brief Recalculate statistics for currently selected image and mask and
   * update the GUI. */
   void UpdateStatistics();
-
-  /** \brief Listener for progress events to update progress bar. */
-  void UpdateProgressBar();
-
-  /** \brief Removes any cached images which are no longer referenced elsewhere. */
-  void RemoveOrphanImages();
-
-  /** \brief Computes an Intensity Profile along line and updates the histogram widget with it. */
-  void ComputeIntensityProfile( mitk::PlanarLine* line );
-
-  /** \brief Removes all Observers to images, masks and planar figures and sets corresponding members to zero */
-  void ClearObservers();
 
   virtual void Activated() override;
   virtual void Deactivated() override;

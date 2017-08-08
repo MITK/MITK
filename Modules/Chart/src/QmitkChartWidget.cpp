@@ -298,6 +298,19 @@ void QmitkChartWidget::SetChartTypeAndReload(ChartType type)
   m_Impl->callJavaScriptFuntion(command);
 }
 
+void QmitkChartWidget::ChangeTheme(bool darkThemeEnabled)
+{
+  QString command;
+  if (darkThemeEnabled)
+  {
+    command = QString("changeTheme('dark')");
+  }
+  else {
+    command = QString("changeTheme('default')");
+  }
+  m_Impl->callJavaScriptFuntion(command);
+}
+
 void QmitkChartWidget::Reload(bool showSubChart)
 {
   QString subChartString;

@@ -103,16 +103,14 @@ void QmitkImageStatisticsView::OnPageSuccessfullyLoaded()
 
   QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
 
-  /*if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
+  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
   {
-    this->m_Controls->m_JSHistogram->SendCommand(
-      "changeTheme('dark')");
+    this->m_Controls->m_JSHistogram->ChangeTheme(true);
   }
   else
   {
-    this->m_Controls->m_JSHistogram->SendCommand(
-      "changeTheme(default)");
-  }*/
+    this->m_Controls->m_JSHistogram->ChangeTheme(false);
+  }
 }
 
 void QmitkImageStatisticsView::CreateConnections()

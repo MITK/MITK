@@ -107,6 +107,11 @@ public:
   void Clear();
 
   /*!
+  * \brief Changes the theme of the widget.
+  */
+  void ChangeTheme(bool darkThemeEnabled);
+
+  /*!
   * \brief Reloads the chart in the widget
   * \details reloading may be needed to display added data in an existing chart
   * \param showSubChart if a subchart is displayed inside the widget or not.

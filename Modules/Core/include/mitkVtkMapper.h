@@ -123,7 +123,8 @@ namespace mitk
     /**
     * \brief SHADERTODO
     */
-    void ApplyShaderProperties(mitk::BaseRenderer *renderer);
+    void ApplyShaderProperties(mitk::BaseRenderer *renderer,
+                               std::string property_name="shader");
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.

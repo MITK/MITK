@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Material name='FiberClipping3D'>
+  <Shader scope='Vertex' name='VertexShader' location='Inline' language='GLSL' entry='main'>
+
+  varying vec3 positionWorld;
+  varying vec3 color;
+
+  varying vec3 N;
+  varying vec3 v;
+
+  varying vec3 vlp;
+
+  void main(void)
+  {
+    color = gl_Color.rgb;
+    positionWorld = vec3(gl_Vertex);
+
+    v = vec3(gl_ModelViewMatrix * gl_Vertex);
+    N = normalize(gl_NormalMatrix * gl_Normal);
+
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  }
+  </Shader>
+
+  <Shader scope='Fragment' name='FragmentShader' location='Inline' language='GLSL' entry='main'>
+
+  uniform vec4 slicingPlane;
+  uniform float fiberOpacity;
+  uniform float ambient;
+  uniform float diffuse;
+  uniform float specular;
+  uniform float intensity;
+  uniform int enable_light;
+
+  varying vec3 positionWorld;
+  varying vec3 color;
+
+  varying vec3 N;
+  varying vec3 v;
+
+  void main(void)
+  {
+    float r1 = dot(positionWorld, slicingPlane.xyz) - slicingPlane.w;
+
+    if ( r1 &gt; 0 )
+      discard;
+
+    if (enable_light!=0)
+    {
+      vec3 L = normalize(gl_LightSource[0].position.xyz - v);
+      vec3 E = normalize(-v); // we are in Eye Coordinates, so EyePos is (0,0,0)
+      vec3 R = normalize(-reflect(L,N));
+
+      //calculate Ambient Term:
+      vec4 Iamb = ambient;
+
+      //calculate Diffuse Term:
+      vec4 Idiff = diffuse * max(dot(N,L), 0.0);
+      Idiff = clamp(Idiff, 0.0, 1.0);
+
+      // calculate Specular Term:
+      vec4 Ispec = specular * pow(max(dot(R,E),0.0),0.3*gl_FrontMaterial.shininess);
+      Ispec = clamp(Ispec, 0.0, 1.0);
+
+      Iamb[3] = 1;
+      Idiff[3] = 1;
+      Ispec[3] = 1;
+
+      gl_FragColor = vec4(color, fiberOpacity)*(1-intensity) + vec4(color, fiberOpacity) * (Iamb + Idiff + Ispec) * intensity;
+    }
+    else
+    {
+      gl_FragColor = vec4(color, fiberOpacity);
+    }
+  }
+
+  <Uniform type="vec4" name="slicingPlane" number_of_elements="4" > </Uniform>
+  <Uniform type="float" name="fiberOpacity" number_of_elements="1" > </Uniform>
+  <Uniform type="float" name="ambient" number_of_elements="1" > </Uniform>
+  <Uniform type="float" name="diffuse" number_of_elements="1" > </Uniform>
+  <Uniform type="float" name="specular" number_of_elements="1" > </Uniform>
+  <Uniform type="float" name="intensity" number_of_elements="1" > </Uniform>
+  <Uniform type="int" name="enable_light" number_of_elements="1" > </Uniform>
+
+  </Shader>
+
+</Material>

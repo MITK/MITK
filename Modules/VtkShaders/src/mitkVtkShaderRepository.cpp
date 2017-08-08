@@ -351,9 +351,10 @@ void mitk::VtkShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *
 
 void mitk::VtkShaderRepository::AddDefaultProperties(mitk::DataNode *node,
                                                      mitk::BaseRenderer *renderer,
-                                                     bool overwrite) const
+                                                     bool overwrite,
+                                                     std::string property_name) const
 {
-  node->AddProperty("shader", mitk::ShaderProperty::New(), renderer, overwrite);
+  node->AddProperty(property_name.c_str(), mitk::ShaderProperty::New(), renderer, overwrite);
 
   std::list<Shader::Pointer>::const_iterator i = shaders.begin();
 
@@ -367,7 +368,7 @@ void mitk::VtkShaderRepository::AddDefaultProperties(mitk::DataNode *node,
 
     while (j != uniforms.end())
     {
-      std::string propertyName = "shader." + shaderName + "." + (*j)->name;
+      std::string propertyName = property_name + "." + shaderName + "." + (*j)->name;
 
       switch ((*j)->type)
       {
@@ -476,10 +477,11 @@ mitk::IShaderRepository::Shader::Pointer mitk::VtkShaderRepository::GetShader(in
 
 void mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram *shaderProgram,
                                                     DataNode *node,
-                                                    BaseRenderer *renderer) const
+                                                    BaseRenderer *renderer,
+                                                    std::string property_name) const
 {
   VtkShaderProgram *mitkVtkShaderProgram = dynamic_cast<VtkShaderProgram *>(shaderProgram);
-  mitk::ShaderProperty *sep = dynamic_cast<mitk::ShaderProperty *>(node->GetProperty("shader", renderer));
+  mitk::ShaderProperty *sep = dynamic_cast<mitk::ShaderProperty *>(node->GetProperty(property_name.c_str(), renderer));
   if (!sep)
   {
     mitkVtkShaderProgram->SetVtkShaderProgram(0);
@@ -563,7 +565,7 @@ void mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram *shaderProgram
 
   while (j != s->uniforms.end())
   {
-    std::string propertyName = "shader." + s->GetName() + "." + (*j)->name;
+    std::string propertyName = property_name + "." + s->GetName() + "." + (*j)->name;
 
     //  MITK_INFO << "querying property: " << propertyName;
 

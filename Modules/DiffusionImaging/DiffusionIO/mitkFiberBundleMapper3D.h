@@ -81,7 +81,7 @@ protected:
     virtual ~FiberBundleMapper3D();
     void InternalGenerateData(mitk::BaseRenderer *renderer);
 
-    void UpdateVtkObjects(); //??
+    void UpdateShaderParameter(mitk::BaseRenderer*);
 
 private:
     vtkSmartPointer<vtkLookupTable> m_lut;
@@ -90,6 +90,8 @@ private:
     int     m_LineWidth;
     float   m_RibbonWidth;
     bool    m_Lighting;
+    vtkSmartPointer<vtkPolyData> m_FiberPolyData;
+    mitk::FiberBundle* m_FiberBundle;
 };
 
 } // end namespace mitk

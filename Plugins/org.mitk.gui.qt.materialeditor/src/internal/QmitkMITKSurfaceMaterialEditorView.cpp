@@ -123,7 +123,6 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
 
   if(observerAllocated)
   {
-    observedProperty->RemoveObserver( observerIndex );
     observerAllocated=false;
   }
 

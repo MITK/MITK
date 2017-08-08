@@ -15,7 +15,7 @@
  ===================================================================*/
 
 #include "vtk_glew.h"
-#include "QVTKInternalOpenglRenderWindow.h"
+#include "vtkInternalOpenGLRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"
 
 #include <vtkObjectFactory.h>

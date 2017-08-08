@@ -46,8 +46,8 @@ public:
     void SetF(float f){ m_F = f; }
     void SetG(float g){ m_G = g; }
     void SetFaThreshold(float FaThreshold){ m_FaThreshold = FaThreshold; }
-    void AddTensorImage( ItkTensorImageType::Pointer img ){ m_TensorImages.push_back(img); DataModified(); }
-    void SetTensorImage( ItkTensorImageType::Pointer img ){ m_TensorImages.clear(); m_TensorImages.push_back(img); DataModified(); }
+    void AddTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.push_back(img); DataModified(); }
+    void SetTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.clear(); m_TensorImages.push_back(img); DataModified(); }
     void ClearTensorImages(){ m_TensorImages.clear(); DataModified(); }
     void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; DataModified(); }
     void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }
@@ -78,7 +78,7 @@ protected:
     std::vector< ItkDoubleImgType::Pointer >        m_EmaxImage;    ///< Stores largest eigenvalues per voxel (one for each tensor)
     ItkFloatImgType::Pointer                        m_FaImage;      ///< FA image used to determine streamline termination.
     std::vector< ItkPDImgType::Pointer >            m_PdImage;      ///< Stores principal direction of each tensor in each voxel.
-    std::vector< ItkTensorImageType::Pointer >      m_TensorImages;   ///< Input tensor images. For multi tensor tracking provide multiple tensor images.
+    std::vector< ItkTensorImageType::ConstPointer > m_TensorImages;   ///< Input tensor images. For multi tensor tracking provide multiple tensor images.
     bool                                            m_InterpolateTensors;   ///< If false, then the peaks are interpolated. Otherwiese, The tensors are interpolated.
     int                                             m_NumberOfInputs;
 };

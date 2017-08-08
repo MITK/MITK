@@ -39,8 +39,6 @@ if(MITK_USE_Caffe)
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_args}
-         -DCMAKE_CXX_FLAGS=-std=c++11
-         -DCMAKE_CXX_STANDARD=11
          -DUSE_OPENMP:BOOL=ON
          -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
          -DBoost_LIBRARY_DIR_RELEASE:PATH=${Boost_LIBRARY_DIR}

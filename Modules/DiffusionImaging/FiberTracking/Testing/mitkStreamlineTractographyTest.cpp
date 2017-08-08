@@ -62,7 +62,7 @@ public:
   typedef itk::Image<float, 3> ItkFloatImgType;
 
   mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itk_qball_image;
-  mitk::TrackingHandlerTensor::ItkTensorImageType::Pointer itk_tensor_image;
+  mitk::TrackingHandlerTensor::ItkTensorImageType::ConstPointer itk_tensor_image;
   mitk::TrackingHandlerPeaks::PeakImgType::Pointer itk_peak_image;
   ItkUcharImgType::Pointer itk_seed_image;
   ItkUcharImgType::Pointer itk_mask_image;

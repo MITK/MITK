@@ -785,7 +785,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  MITK_INFO << "Extracting fibers";
+  MITK_INFO << "Extracting fibers with mask image";
   boost::progress_display disp(m_NumFibers);
   for (int i=0; i<m_NumFibers; i++)
   {

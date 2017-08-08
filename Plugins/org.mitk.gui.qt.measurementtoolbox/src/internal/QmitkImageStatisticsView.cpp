@@ -473,6 +473,7 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     m_Controls->m_barRadioButton->setEnabled(true);
     m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
     m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
+    m_Controls->m_UseDefaultBinSizeBox->setEnabled(true);
 
     m_Controls->m_InfoLabel->setText("");
     m_Controls->groupBox->setEnabled(false);
@@ -496,6 +497,7 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
       m_Controls->m_barRadioButton->setEnabled(true);
       m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
+      m_Controls->m_UseDefaultBinSizeBox->setEnabled(true);
       m_Controls->m_InfoLabel->setText("");
     }
     for (int i= 0; i< selectedNodes.size(); ++i)
@@ -686,6 +688,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       m_Controls->m_barRadioButton->setEnabled(true);
       m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
+      m_Controls->m_UseDefaultBinSizeBox->setEnabled(true);
       m_Controls->m_InfoLabel->setText("");
       return;
     }
@@ -885,34 +888,10 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_CurrentStatisticsValid = true;
     }
 
-    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_HistogramBinSizeSpinbox->setValue( this->m_CalculationThread->GetHistogramBinSize() );
-    auto histogram = this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer();
-
-    m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram));
-    m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::bar);
-    this->m_Controls->m_JSHistogram->SetDataLabels({ m_Controls->m_SelectedFeatureImageLabel->text().toStdString() });
-    this->m_Controls->m_JSHistogram->SetXAxisLabel("Gray value");
-    this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
-    m_Controls->m_JSHistogram->Show(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
-
-    this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
-    m_CurrentStatisticsValid = true;
-  }
-  else
-  {
-    m_Controls->m_SelectedMaskLabel->setText( "None" );
-    m_Controls->m_ErrorMessageLabel->setText( m_CalculationThread->GetLastErrorMessage().c_str() );
-    m_Controls->m_ErrorMessageLabel->show();
-
-    // Clear statistics and histogram
-    this->InvalidateStatisticsTableView();
-    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_CurrentStatisticsValid = false;
-
+    if (m_SelectedImage != nullptr) {
+      //all statistics are now computed also on planar figures (lines, paths...)!
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
-    if ( m_SelectedPlanarFigure != nullptr )
-    {
+      if (m_SelectedPlanarFigure != nullptr) {
       // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
       bool outOfBounds = false;
       if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == nullptr)
@@ -924,6 +903,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 
       // check whether PlanarFigure is initialized
       const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
+
       if ( !(planarFigurePlaneGeometry == nullptr || outOfBounds))
       {
         unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
@@ -949,7 +929,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         auto intensityProfileList = ConvertIntensityProfileToVector(intensityProfile);
         m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::line);
         m_Controls->m_JSHistogram->AddData1D(intensityProfileList);
-        m_Controls->m_JSHistogram->SetDataLabels({ "Intensity profile" });
+          m_Controls->m_JSHistogram->SetDataLabels({ "Intensity profile " + m_Controls->m_SelectedMaskLabel->text().toStdString() });
         m_Controls->m_JSHistogram->SetXAxisLabel("Distance");
         m_Controls->m_JSHistogram->SetYAxisLabel("Intensity");
         m_Controls->m_JSHistogram->Show(m_Controls->m_ShowSubchartCheckBox->isChecked());
@@ -959,13 +939,19 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_barRadioButton->setEnabled(false);
         m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
         m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
+          m_Controls->m_UseDefaultBinSizeBox->setEnabled(false);
 
         //Reconnect OnLineRadioButtonSelected()
         connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnLineRadioButtonSelected()));
+          auto statisticsVector = this->m_CalculationThread->GetStatisticsData();
+          //only one entry (current timestep)
+          this->FillLinearProfileStatisticsTableView(statisticsVector.front().GetPointer(), this->m_CalculationThread->GetStatisticsImage());
 
-        this->FillLinearProfileStatisticsTableView(intensityProfile, this->m_CalculationThread->GetStatisticsImage().GetPointer());
-
-        const QString message("<font color='red'>Only linegraph available for an intensity profile!</font>");
+          QString message("<font color='red'>Only linegraph available for an intensity profile!");
+          if (this->m_CalculationThread->GetStatisticsImage()->GetDimension() == 4) {
+            message += "Only current timestep displayed!";
+          }
+          message += "</font>";
         m_Controls->m_InfoLabel->setText(message);
         m_CurrentStatisticsValid = true;
       }
@@ -984,11 +970,37 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
         if (!outOfBounds)
           m_Controls->m_InfoLabel->setText("");
-        return; // Sebastian Wirkert: would suggest to remove this return, since it is an artifact of previous
-        // code architecture. However, removing it will cause m_StatisticsUpdatePending to be set to false
-        // in case of invalid statistics which it previously was not.
+          return;
       }
     }
+      else {
+        m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
+        m_Controls->m_HistogramBinSizeSpinbox->setValue(this->m_CalculationThread->GetHistogramBinSize());
+        auto histogram = this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer();
+
+        m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram));
+        m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::bar);
+        this->m_Controls->m_JSHistogram->SetDataLabels({ m_Controls->m_SelectedFeatureImageLabel->text().toStdString() });
+        this->m_Controls->m_JSHistogram->SetXAxisLabel("Gray value");
+        this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
+        m_Controls->m_JSHistogram->Show(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
+
+        this->FillStatisticsTableView(this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
+  }
+      m_CurrentStatisticsValid = true;
+    }
+  }
+  else
+  {
+    m_Controls->m_SelectedMaskLabel->setText("None");
+    m_Controls->m_ErrorMessageLabel->setText(m_CalculationThread->GetLastErrorMessage().c_str());
+    m_Controls->m_ErrorMessageLabel->show();
+
+    // Clear statistics and histogram
+    this->InvalidateStatisticsTableView();
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
+    m_CurrentStatisticsValid = false;
+
   }
   berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
   m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
@@ -1105,43 +1117,8 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );*/
 }
 
-std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image)
+std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image, bool noVolumeDefined) const
 {
-  std::vector<QString> result;
-
-  unsigned int decimals = 2;
-  //statistics of higher order should have 5 decimal places because they used to be very small
-  unsigned int decimalsHigherOrderStatistics = 5;
-
-  if (image->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE || image->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT)
-  {
-    decimals = 5;
-  }
-
-  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats = mitk::ImageStatisticsCalculator::StatisticsContainer::New();
-
-  mitk::ComputeIntensityProfileStatistics(intensityProfile, stats);
-
-  result.push_back(GetFormattedString(stats->GetMean(), decimals));
-  result.push_back(GetFormattedString(stats->GetMedian(), decimals));
-  result.push_back(GetFormattedString(stats->GetStd(), decimals));
-  result.push_back(GetFormattedString(stats->GetRMS(), decimals));
-  result.push_back(GetFormattedString(stats->GetMax(), decimals));
-  result.push_back(GetFormattedString(stats->GetMin(), decimals));
-  result.push_back(GetFormattedString(stats->GetN(), 0));
-  result.push_back(QString("NA")); //Volume can't be computed on a line
-  result.push_back(GetFormattedString(stats->GetSkewness(), decimalsHigherOrderStatistics));
-  result.push_back(GetFormattedString(stats->GetKurtosis(), decimalsHigherOrderStatistics));
-  result.push_back(GetFormattedString(stats->GetUniformity(), decimalsHigherOrderStatistics));
-  result.push_back(GetFormattedString(stats->GetEntropy(), decimalsHigherOrderStatistics));
-  result.push_back(GetFormattedString(stats->GetMPP(), decimals));
-  result.push_back(GetFormattedString(stats->GetUPP(), decimalsHigherOrderStatistics));
-
-  return result;
-  }
-
-std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image) const
-  {
   std::vector<QString> result;
 
   unsigned int decimals = 2;
@@ -1165,7 +1142,7 @@ std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk
     result.push_back(GetFormattedString(statistics->GetN(), 0));
 
     const mitk::BaseGeometry *geometry = image->GetGeometry();
-    if (geometry != NULL)
+    if (geometry != NULL && !noVolumeDefined)
   {
       const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
       double volume = spacing[0] * spacing[1] * spacing[2] * static_cast<double>(statistics->GetN());
@@ -1176,8 +1153,8 @@ std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk
   }
   }
   else {
-    result.push_back("0");
-    result.push_back("0");
+    result.push_back("NA");
+    result.push_back("NA");
   }
 
   result.push_back(GetFormattedString(statistics->GetSkewness(), decimalsHigherOrderStatistics));
@@ -1190,12 +1167,13 @@ std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk
   return result;
 }
 
-void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image )
+void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics,
+  const mitk::Image *image)
 {
   this->m_Controls->m_StatisticsTable->setColumnCount(1);
   this->m_Controls->m_StatisticsTable->horizontalHeader()->setVisible(false);
 
-  m_PlanarFigureStatistics = this->AssembleStatisticsIntoVectorForPlanarFigure( intensityProfile, image);
+  m_PlanarFigureStatistics = this->AssembleStatisticsIntoVector(statistics, image, true);
 
   for (unsigned int i = 0; i< m_PlanarFigureStatistics.size(); i++)
   {

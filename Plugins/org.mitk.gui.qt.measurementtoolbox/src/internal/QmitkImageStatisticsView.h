@@ -57,7 +57,7 @@ private:
 
   std::map<double, double> ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const;
   std::vector<double> ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const;
-  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image) const;
+  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image, bool noVolumeDefined=false) const;
 
   QString GetFormattedIndex(const vnl_vector<int>& vector) const;
   QString GetFormattedString(double value, unsigned int decimals) const;
@@ -66,7 +66,7 @@ public:
 
   /*!
   \brief default constructor */
-  QmitkImageStatisticsView(QObject *parent=nullptr, const char *name=nullptr);
+  QmitkImageStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
   /*!
   \brief default destructor */
   virtual ~QmitkImageStatisticsView();
@@ -84,46 +84,44 @@ public:
   static const int STAT_TABLE_BASE_HEIGHT;
 
   public slots:
-    /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
-    void OnThreadedStatisticsCalculationEnds();
+  /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
+  void OnThreadedStatisticsCalculationEnds();
 
-    /** \brief Update bin size for histogram resolution. */
-    void OnHistogramBinSizeBoxValueChanged();
+  /** \brief Update bin size for histogram resolution. */
+  void OnHistogramBinSizeBoxValueChanged();
 
-    protected slots:
-      /** \brief  Saves the histogram to the clipboard */
-      void OnClipboardHistogramButtonClicked();
-      /** \brief  Saves the statistics to the clipboard */
-      void OnClipboardStatisticsButtonClicked();
-      /** \brief  Indicates if zeros should be excluded from statistics calculation */
-      void OnIgnoreZerosCheckboxClicked(  );
-      /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
-      void RequestStatisticsUpdate();
-      /** \brief Jump to coordinates stored in the double clicked cell */
-      void JumpToCoordinates(int row, int col);
-      /** \brief Toogle GUI elements if histogram default bin size checkbox value changed. */
-      void OnDefaultBinSizeBoxChanged();
+  protected slots:
+  /** \brief  Saves the histogram to the clipboard */
+  void OnClipboardHistogramButtonClicked();
+  /** \brief  Saves the statistics to the clipboard */
+  void OnClipboardStatisticsButtonClicked();
+  /** \brief  Indicates if zeros should be excluded from statistics calculation */
+  void OnIgnoreZerosCheckboxClicked();
+  /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
+  void RequestStatisticsUpdate();
+  /** \brief Jump to coordinates stored in the double clicked cell */
+  void JumpToCoordinates(int row, int col);
+  /** \brief Toogle GUI elements if histogram default bin size checkbox value changed. */
+  void OnDefaultBinSizeBoxChanged();
 
-      void OnShowSubchartBoxChanged();
+  void OnShowSubchartBoxChanged();
 
-      void OnBarRadioButtonSelected();
+  void OnBarRadioButtonSelected();
 
-      void OnLineRadioButtonSelected();
+  void OnLineRadioButtonSelected();
 
-      void OnPageSuccessfullyLoaded();
+  void OnPageSuccessfullyLoaded();
 
 signals:
-      /** \brief Method to set the data to the member and start the threaded statistics update */
-      void StatisticsUpdate();
+  /** \brief Method to set the data to the member and start the threaded statistics update */
+  void StatisticsUpdate();
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
   void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics,
-          const mitk::Image *image );
+    const mitk::Image *image);
 
-  std::vector<QString> AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image);
-
-  void FillLinearProfileStatisticsTableView(mitk::IntensityProfile::ConstPointer intensityProfile, mitk::Image::ConstPointer image);
+  void FillLinearProfileStatisticsTableView(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, const mitk::Image *image);
 
   /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();
@@ -151,9 +149,9 @@ protected:
   void NodeRemoved(const mitk::DataNode *node) override;
 
   /** \brief Is called right before the view closes (before the destructor) */
-  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& ) override;
+  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer&) override;
   /** \brief Is called from the image navigator once the time step has changed */
-  void OnTimeChanged( const itk::EventObject& );
+  void OnTimeChanged(const itk::EventObject&);
   /** \brief Required for berry::IPartListener */
   virtual Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 

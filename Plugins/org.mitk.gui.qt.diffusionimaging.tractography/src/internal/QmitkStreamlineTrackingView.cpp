@@ -647,8 +647,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         m_TrackingHandler = new mitk::TrackingHandlerTensor();
         for (int i=0; i<(int)m_InputImages.size(); i++)
         {
-          TensorImageType::Pointer itkImg = TensorImageType::New();
-          mitk::CastToItkImage(m_InputImages.at(i), itkImg);
+          typedef mitk::ImageToItk< mitk::TrackingHandlerTensor::ItkTensorImageType > CasterType;
+          CasterType::Pointer caster = CasterType::New();
+          caster->SetInput(m_InputImages.at(i));
+          caster->Update();
+          mitk::TrackingHandlerTensor::ItkTensorImageType::ConstPointer itkImg = caster->GetOutput();
 
           dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->AddTensorImage(itkImg);
         }

@@ -171,17 +171,31 @@ cl_int mitk::OclImage::AllocateGPUImage()
     mitkThrowException(mitk::ImageTypeIsNotSupportedByGPU) << "Original format not supported on the installed graphics card.";
   }
 
+
+  _cl_image_desc imageDescriptor;
+
+  imageDescriptor.image_width = *(m_Dims);
+  imageDescriptor.image_height = *(m_Dims + 1);
+  imageDescriptor.image_depth = *(m_Dims + 2);
+  imageDescriptor.image_array_size = 0;
+  imageDescriptor.image_row_pitch = 0;
+  imageDescriptor.image_slice_pitch = 0;
+  imageDescriptor.num_mip_levels = 0;
+  imageDescriptor.num_samples = 0;
+  imageDescriptor.buffer = nullptr;
   // create new buffer
   if( this->m_dim > 2)
   {
     //Create a 3D Image
-    m_gpuImage = clCreateImage3D(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat, *(m_Dims), *(m_Dims+1), *(m_Dims+2), 0, 0, nullptr, &clErr);
-  }
+    imageDescriptor.image_type = CL_MEM_OBJECT_IMAGE3D;
+   }
   else
   {
     //Create a 2D Image
-    m_gpuImage = clCreateImage2D(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat,  *(m_Dims), *(m_Dims+1), 0, nullptr, &clErr);
+    imageDescriptor.image_type = CL_MEM_OBJECT_IMAGE2D;
   }
+  m_gpuImage = clCreateImage(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat, &imageDescriptor, nullptr, &clErr);
+
   CHECK_OCL_ERR(clErr);
 
   return clErr;

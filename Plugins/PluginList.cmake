@@ -96,5 +96,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.evaluator:OFF
   org.mitk.gui.qt.matchpoint.manipulator:OFF
   org.mitk.gui.qt.photoacoustics.pausviewer:OFF
+  org.mitk.gui.qt.photoacoustics.imageprocessing:OFF
   org.mitk.gui.qt.cest:OFF
 )

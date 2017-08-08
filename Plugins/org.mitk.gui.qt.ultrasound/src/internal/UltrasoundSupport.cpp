@@ -319,7 +319,7 @@ void UltrasoundSupport::UpdateImage()
     {
       MITK_INFO << "now";
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-      if ((renderWindow != NULL) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
+      if ((renderWindow != nullptr) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
       {
         renderWindow->GetRenderingManager()->InitializeViews(
           m_curOutput.at(0)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);

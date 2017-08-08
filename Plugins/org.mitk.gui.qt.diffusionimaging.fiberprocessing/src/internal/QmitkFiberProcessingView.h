@@ -104,7 +104,9 @@ protected:
   void PruneBundle();               ///< remove too short/too long fibers
 
   void ExtractWithMask(bool onlyEnds, bool invert);
-  void ExtractWithPlanarFigure();
+  void ExtractWithPlanarFigure(bool interactive=false);
+
+  void OnEndInteraction();
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
@@ -173,6 +175,10 @@ protected:
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   mitk::DataNode::Pointer               m_MaskImageNode;
 
+  unsigned int                          m_StartInteractionObserverTag;
+  unsigned int                          m_EndInteractionObserverTag;
+  mitk::DataNode::Pointer               m_InteractiveNode;
+
   void AddCompositeToDatastorage(mitk::DataNode::Pointer pfc, std::vector<mitk::DataNode::Pointer> children, mitk::DataNode::Pointer parentNode=nullptr);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void WritePfToImage(mitk::DataNode::Pointer node, mitk::Image* image);
@@ -183,6 +189,8 @@ protected:
 
   void NodeAdded( const mitk::DataNode* node ) override;
   void NodeRemoved(const mitk::DataNode* node) override;
+  void RemoveObservers();
+  void AddObservers();
 };
 
 

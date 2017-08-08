@@ -32,7 +32,7 @@ set(mitk_modules
   OpenViewCore
   QtWidgets
   QtWidgetsExt
-  C3js
+  Chart
   QmlItems
   SegmentationUI
   Classification
@@ -49,6 +49,7 @@ set(mitk_modules
   ToFProcessing
   ToFUI
   PhotoacousticsHardware
+  PhotoacousticsAlgorithms
   US
   USUI
   DicomUI

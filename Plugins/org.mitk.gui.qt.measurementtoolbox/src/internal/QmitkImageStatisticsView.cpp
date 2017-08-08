@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureInteractor.h"
 #include "mitkImageTimeSelector.h"
 #include <QmitkRenderWindow.h>
+#include <QmitkChartWidget.h>
 
 // itk includes
 #include "itksys/SystemTools.hxx"
@@ -105,11 +106,11 @@ void QmitkImageStatisticsView::OnPageSuccessfullyLoaded()
 
   if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
   {
-    this->m_Controls->m_JSHistogram->ChangeTheme(true);
+    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ChartStyle::darkstyle);
   }
   else
   {
-    this->m_Controls->m_JSHistogram->ChangeTheme(false);
+    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ChartStyle::defaultstyle);
   }
 }
 

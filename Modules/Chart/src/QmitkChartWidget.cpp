@@ -298,10 +298,10 @@ void QmitkChartWidget::SetChartTypeAndReload(ChartType type)
   m_Impl->callJavaScriptFuntion(command);
 }
 
-void QmitkChartWidget::ChangeTheme(bool darkThemeEnabled)
+void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
 {
   QString command;
-  if (darkThemeEnabled)
+  if (themeEnabled == ChartStyle::darkstyle)
   {
     command = QString("changeTheme('dark')");
   }

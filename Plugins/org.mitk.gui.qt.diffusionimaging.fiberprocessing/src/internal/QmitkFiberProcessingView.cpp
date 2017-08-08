@@ -993,8 +993,15 @@ void QmitkFiberProcessingView::UpdateGui()
   }
 }
 
-void QmitkFiberProcessingView::NodeRemoved(const mitk::DataNode* )
+void QmitkFiberProcessingView::NodeRemoved(const mitk::DataNode* node )
 {
+  for (auto fnode: m_SelectedFB)
+    if (node == fnode)
+    {
+      m_SelectedFB.clear();
+      break;
+    }
+
   berry::IWorkbenchPart::Pointer nullPart;
   QList<mitk::DataNode::Pointer> nodes;
   OnSelectionChanged(nullPart, nodes);
@@ -1008,11 +1015,6 @@ void QmitkFiberProcessingView::NodeAdded(const mitk::DataNode* )
     QList<mitk::DataNode::Pointer> nodes;
     OnSelectionChanged(nullPart, nodes);
   }
-}
-
-void QmitkFiberProcessingView::OnStartInteraction()
-{
-
 }
 
 void QmitkFiberProcessingView::OnEndInteraction()
@@ -1029,10 +1031,7 @@ void QmitkFiberProcessingView::AddObservers()
     mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
     if (figure!=nullptr)
     {
-      // add observer for event when interaction with figure starts
-      SimpleCommandType::Pointer startInteractionCommand = SimpleCommandType::New();
-      startInteractionCommand->SetCallbackFunction( this, &QmitkFiberProcessingView::OnStartInteraction);
-      m_StartInteractionObserverTag = figure->AddObserver( mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand );
+      figure->RemoveAllObservers();
 
       // add observer for event when interaction with figure starts
       SimpleCommandType::Pointer endInteractionCommand = SimpleCommandType::New();
@@ -1048,15 +1047,7 @@ void QmitkFiberProcessingView::RemoveObservers()
   {
     mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
     if (figure!=nullptr)
-    {
-      //      figure->RemoveAllObservers();
-      if (figure->HasObserver(mitk::StartInteractionPlanarFigureEvent()))
-        figure->RemoveObserver(m_StartInteractionObserverTag);
-      if (figure->HasObserver(mitk::EndInteractionPlanarFigureEvent()))
-        figure->RemoveObserver(m_EndInteractionObserverTag);
-      m_StartInteractionObserverTag = -1;
-      m_EndInteractionObserverTag = -1;
-    }
+      figure->RemoveAllObservers();
   }
 }
 
@@ -1065,6 +1056,7 @@ void QmitkFiberProcessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer
   RemoveObservers();
 
   //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
+  std::vector<mitk::DataNode::Pointer>  lastSelectedFB = m_SelectedFB;
   m_SelectedFB.clear();
   m_SelectedPF.clear();
   m_SelectedSurfaces.clear();
@@ -1089,6 +1081,11 @@ void QmitkFiberProcessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer
       m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
   }
 
+  // if we perform interactive fiber extraction, we want to avoid auto-selection of the extracted bundle
+  if (m_SelectedFB.empty() && m_Controls->m_InteractiveBox->isChecked())
+    m_SelectedFB = lastSelectedFB;
+
+  // if no fibers or surfaces are selected, select topmost
   if (m_SelectedFB.empty() && m_SelectedSurfaces.empty())
   {
     int maxLayer = 0;
@@ -1111,6 +1108,7 @@ void QmitkFiberProcessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer
       }
   }
 
+  // if no plar figure is selected, select topmost
   if (m_SelectedPF.empty())
   {
     int maxLayer = 0;
@@ -1176,12 +1174,14 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
   // figure drawn on the topmost layer / image
   GetDataStorage()->Add(newNode );
 
+  RemoveObservers();
   for(unsigned int i = 0; i < m_SelectedPF.size(); i++)
     m_SelectedPF[i]->SetSelected(false);
 
   newNode->SetSelected(true);
   m_SelectedPF.clear();
   m_SelectedPF.push_back(newNode);
+  AddObservers();
   UpdateGui();
 }
 
@@ -1211,8 +1211,10 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure(bool interactive)
         m_InteractiveNode->SetName(name.toStdString());
         GetDataStorage()->Add(m_InteractiveNode);
       }
+      float op = 5.0/sqrt(fib->GetNumFibers());
+
       fib->SetFiberColors(255, 255, 255);
-      fiberBundles.at(i)->SetFloatProperty("opacity", 0.01);
+      fiberBundles.at(i)->SetFloatProperty("opacity", op);
       fiberBundles.at(i)->SetBoolProperty("Fiber2DfadeEFX", false);
       m_InteractiveNode->SetData(extFB);
 
@@ -1250,8 +1252,10 @@ void QmitkFiberProcessingView::GenerateAndComposite()
   newPFCNode->SetData(PFCAnd);
 
   AddCompositeToDatastorage(newPFCNode, m_SelectedPF);
+  RemoveObservers();
   m_SelectedPF.clear();
   m_SelectedPF.push_back(newPFCNode);
+  AddObservers();
   UpdateGui();
 }
 
@@ -1265,6 +1269,7 @@ void QmitkFiberProcessingView::GenerateOrComposite()
   newPFCNode->SetName("OR");
   newPFCNode->SetData(PFCOr);
 
+  RemoveObservers();
   AddCompositeToDatastorage(newPFCNode, m_SelectedPF);
   m_SelectedPF.clear();
   m_SelectedPF.push_back(newPFCNode);
@@ -1281,9 +1286,11 @@ void QmitkFiberProcessingView::GenerateNotComposite()
   newPFCNode->SetName("NOT");
   newPFCNode->SetData(PFCNot);
 
+  RemoveObservers();
   AddCompositeToDatastorage(newPFCNode, m_SelectedPF);
   m_SelectedPF.clear();
   m_SelectedPF.push_back(newPFCNode);
+  AddObservers();
   UpdateGui();
 }
 

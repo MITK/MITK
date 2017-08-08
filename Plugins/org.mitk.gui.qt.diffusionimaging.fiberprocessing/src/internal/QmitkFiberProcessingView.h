@@ -107,7 +107,6 @@ protected:
   void ExtractWithPlanarFigure(bool interactive=false);
 
   void OnEndInteraction();
-  void OnStartInteraction();
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;

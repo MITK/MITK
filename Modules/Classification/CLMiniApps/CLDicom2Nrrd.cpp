@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
       writeName = path + "/" + filename + "_" + std::to_string(count) + extension;
     }
     mitk::IOUtil::Save(node, writeName);
+    ++count;
   }
 
   /*

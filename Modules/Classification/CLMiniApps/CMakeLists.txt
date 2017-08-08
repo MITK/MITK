@@ -32,6 +32,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CL2Dto3DImage^^MitkCore
         CLWeighting^^MitkCore_MitkCLImportanceWeighting_MitkCLUtilities
         CLOverlayRoiCenterOfMass^^MitkCore_MitkCLUtilities_MitkQtWidgetsExt
+        CLLungSegmentation^^MitkCore_MitkSegmentation_MitkMultilabel
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 

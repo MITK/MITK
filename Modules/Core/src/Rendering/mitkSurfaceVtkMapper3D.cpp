@@ -277,9 +277,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer *renderer, 
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  // Applying shading properties
   Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_Actor);
-  this->ApplyShaderProperties(renderer);
   // VTK Properties
   ApplyMitkPropertiesToVtkProperty(this->GetDataNode(), ls->m_Actor->GetProperty(), renderer);
 
@@ -488,13 +486,6 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     node->AddProperty("material.representation", mitk::VtkRepresentationProperty::New(), renderer, overwrite);
     node->AddProperty("material.interpolation", mitk::VtkInterpolationProperty::New(), renderer, overwrite);
   }
-
-//  // Shaders
-//  IShaderRepository *shaderRepo = CoreServices::GetShaderRepository();
-//  if (shaderRepo)
-//  {
-//    shaderRepo->AddDefaultProperties(node, renderer, overwrite);
-//  }
 }
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)

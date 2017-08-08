@@ -50,6 +50,10 @@ public:
     spline, /*!< spline chart (smoothed line chart), see http://c3js.org/samples/chart_spline.html */
     pie /*!< pie chart, see http://c3js.org/samples/chart_pie.html*/
   };
+  enum class ChartStyle {
+    defaultstyle,
+    darkstyle
+  };
 
   explicit QmitkChartWidget(ChartType type=ChartType::bar, QWidget* parent = nullptr);
   virtual ~QmitkChartWidget();
@@ -105,6 +109,11 @@ public:
   * \brief Clears all data inside and resets the widget.
   */
   void Clear();
+
+  /*!
+  * \brief Changes the theme of the widget.
+  */
+  void SetTheme(ChartStyle themeEnabled);
 
   /*!
   * \brief Reloads the chart in the widget

@@ -53,6 +53,11 @@ mitk::SerialCommunication::~SerialCommunication()
   CloseConnection();
 }
 
+bool mitk::SerialCommunication::IsConnected()
+{
+  return m_Connected;
+}
+
 int mitk::SerialCommunication::OpenConnection()
 {
   if (m_Connected)

@@ -26,11 +26,11 @@ body {
   fill: red !important; /*-- The !important tag prevents the color from being overwritten at rendering--*/}
 
 path.domain { stroke: #ADB1B6 !important; }
-.c3 .c3-axis-x path, .c3 .c3-axis-x line {
-    stroke: #ADB1B6 !important;
+.c3 .c3-axis-x path, .c3 .c3-axis-x line, .c3 .c3-axis-x text {
+  stroke: #ADB1B6 !important;
 }
-.c3 .c3-axis-y path, .c3 .c3-axis-y line {
-    stroke: #ADB1B6 !important;
+.c3 .c3-axis-y path, .c3 .c3-axis-y line, .c3 .c3-axis-y text {
+  stroke: #ADB1B6 !important;
 }
 .tick text { stroke: #ADB1B6 !important; }
 .c3-legend-item text { stroke: #ADB1B6 !important; }

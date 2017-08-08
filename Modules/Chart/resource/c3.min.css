@@ -19,8 +19,8 @@
 .c3-region{fill:#4682b4;fill-opacity:.1}
 .c3-brush .extent{fill-opacity:.1}
 .c3-legend-item{font-size:12px}
-.c3-legend-item-hidden{opacity:.15}
-.c3-legend-background{opacity:.75;fill:#fff;stroke:#d3d3d3;stroke-width:1}
+.c3-legend-item-hidden{opacity:1}
+.c3-legend-background{opacity:1;fill:#fff;stroke:#d3d3d3;stroke-width:1}
 .c3-title{font:14px sans-serif}
 .c3-tooltip-container{z-index:10}
 .c3-tooltip{font:12px sans-serif;border-collapse:collapse;border-spacing:0;background-color:#fff;

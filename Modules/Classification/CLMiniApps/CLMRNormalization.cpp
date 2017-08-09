@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
   parser.addArgument("mask0", "m0", mitkCommandLineParser::InputImage, "Input Mask", "The median of the area covered by this mask will be set to 0", us::Any(), false);
   parser.addArgument("mask1", "m1", mitkCommandLineParser::InputImage, "Input Mask", "The median of the area covered by this mask will be set to 1", us::Any(), true);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output Image", "Target file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("ignore-outlier", "outlier", mitkCommandLineParser::Bool, "Ignore Outlier", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -67,8 +68,15 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
+  bool ignore_outlier = false;
+  if (parsedArgs.count("ignore-outlier"))
+  {
+    ignore_outlier = us::any_cast<bool>(parsedArgs["ignore-outlier"]);
+  }
+
   MITK_INFO << "Mode access";
-  int mode = 5;//us::any_cast<int>(parsedArgs["mode"]);
+  int mode =std::stoi(us::any_cast<std::string>(parsedArgs["mode"]));
+  MITK_INFO << "Mode: " << mode;
 
   MITK_INFO << "Read images";
   mitk::Image::Pointer mask1;
@@ -82,9 +90,10 @@ int main(int argc, char* argv[])
   mitk::MRNormTwoRegionsBasedFilter::Pointer twoRegion = mitk::MRNormTwoRegionsBasedFilter::New();
   mitk::Image::Pointer output;
 
-  //oneRegion->SetInput(image);
+  oneRegion->SetInput(image);
+  oneRegion->SetMask(mask0);
+  oneRegion->SetIgnoreOutlier(ignore_outlier);
   twoRegion->SetInput(image);
-  //oneRegion->SetMask(mask0);
   twoRegion->SetMask1(mask0);
   twoRegion->SetMask2(mask1);
 

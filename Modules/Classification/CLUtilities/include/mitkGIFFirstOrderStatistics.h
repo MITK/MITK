@@ -49,9 +49,19 @@ namespace mitk
     itkGetConstMacro(UseCtRange,bool);
     itkSetMacro(UseCtRange, bool);
 
+    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
+    virtual void AddArguments(mitkCommandLineParser &parser);
+
+
     struct ParameterStruct {
       int m_HistogramSize;
       bool m_UseCtRange;
+
+      double MinimumIntensity;
+      bool UseMinimumIntensity;
+      double MaximumIntensity;
+      bool UseMaximumIntensity;
+      int Bins;
     };
 
   private:

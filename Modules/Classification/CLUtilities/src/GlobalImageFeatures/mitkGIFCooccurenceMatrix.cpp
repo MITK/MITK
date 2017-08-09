@@ -87,6 +87,9 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceMomentNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifference);
+  requestedFeatures->push_back(TextureFilterType::JointAverage);
+  requestedFeatures->push_back(TextureFilterType::FirstMeasureOfInformationCorrelation);
+  requestedFeatures->push_back(TextureFilterType::SecondMeasureOfInformationCorrelation);
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
@@ -95,7 +98,15 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
-  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum()-0.5,minMaxComputer->GetMaximum()+0.5);
+
+  double min = minMaxComputer->GetMinimum() - 0.5;
+  double max = minMaxComputer->GetMaximum() + 0.5;
+  if (config.UseMinimumIntensity)
+    min = config.MinimumIntensity;
+  if (config.UseMaximumIntensity)
+    max = config.MaximumIntensity;
+
+  filter->SetPixelValueMinMax(min,max);
   //filter->SetPixelValueMinMax(-1024,3096);
   //filter->SetNumberOfBinsPerAxis(5);
   filter->Update();
@@ -210,6 +221,18 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Std.",featureStd->ElementAt(i)));
       break;
+    case TextureFilterType::JointAverage :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::FirstMeasureOfInformationCorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::SecondMeasureOfInformationCorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
+      break;
     default:
       break;
     }
@@ -217,8 +240,10 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
 }
 
 mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
-m_Range(1.0), m_Direction(0)
+m_Range(1.0)
 {
+  SetShortName("cooc");
+  SetLongName("cooccurence");
 }
 
 mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -226,8 +251,14 @@ mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::Calculat
   FeatureListType featureList;
 
   GIFCooccurenceMatrixConfiguration config;
-  config.direction = m_Direction;
+  config.direction = GetDirection();
   config.range = m_Range;
+
+  config.MinimumIntensity = GetMinimumIntensity();
+  config.MaximumIntensity = GetMaximumIntensity();
+  config.UseMinimumIntensity = GetUseMinimumIntensity();
+  config.UseMaximumIntensity = GetUseMaximumIntensity();
+  config.Bins = GetBins();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -287,5 +318,52 @@ mitk::GIFCooccurenceMatrix::FeatureNameListType mitk::GIFCooccurenceMatrix::GetF
   featureList.push_back("co-occ. InverseDifferenceNormalized Std.");
   featureList.push_back("co-occ. InverseDifference Means");
   featureList.push_back("co-occ. InverseDifference Std.");
+  featureList.push_back("co-occ. JointAverage Means");
+  featureList.push_back("co-occ. JointAverage Std.");
+  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Means");
+  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Std.");
+  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Means");
+  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Std.");
   return featureList;
 }
+
+
+
+void mitk::GIFCooccurenceMatrix::AddArguments(mitkCommandLineParser &parser)
+{
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
+  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
+}
+
+void
+mitk::GIFCooccurenceMatrix::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+{
+  auto parsedArgs = GetParameter();
+  std::string name = GetOptionPrefix();
+
+  if (parsedArgs.count(GetLongName()))
+  {
+    std::vector<double> ranges;
+    if (parsedArgs.count(name + "::range"))
+    {
+      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
+    }
+    else
+    {
+      ranges.push_back(1);
+    }
+
+    for (std::size_t i = 0; i < ranges.size(); ++i)
+    {
+      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
+      mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
+      coocCalculator->SetRange(ranges[i]);
+      auto localResults = coocCalculator->CalculateFeatures(feature, maskNoNAN);
+      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
+    }
+  }
+}
+

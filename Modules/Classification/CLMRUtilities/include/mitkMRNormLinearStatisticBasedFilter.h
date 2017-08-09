@@ -50,6 +50,9 @@ namespace mitk {
     itkGetConstMacro(CenterMode, NormalizationBase);
     itkSetMacro(CenterMode, NormalizationBase);
 
+    itkGetConstMacro(IgnoreOutlier, bool);
+    itkSetMacro(IgnoreOutlier, bool);
+
   protected:
     MRNormLinearStatisticBasedFilter();
 
@@ -65,6 +68,7 @@ namespace mitk {
     void InternalComputeMask(itk::Image<TPixel, VImageDimension>* itkImage);
 
     NormalizationBase m_CenterMode;
+    bool m_IgnoreOutlier;
   };
 } // namespace mitk
 

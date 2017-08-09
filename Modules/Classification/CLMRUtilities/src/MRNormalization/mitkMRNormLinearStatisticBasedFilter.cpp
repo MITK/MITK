@@ -31,8 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::MRNormLinearStatisticBasedFilter::MRNormLinearStatisticBasedFilter() :
   m_CenterMode(MRNormLinearStatisticBasedFilter::MEDIAN)
 {
-  this->SetNumberOfIndexedInputs(3);
-  this->SetNumberOfRequiredInputs(3);
+  this->SetNumberOfIndexedInputs(2);
+  this->SetNumberOfRequiredInputs(1);
 }
 
 mitk::MRNormLinearStatisticBasedFilter::~MRNormLinearStatisticBasedFilter()
@@ -65,7 +65,7 @@ void mitk::MRNormLinearStatisticBasedFilter::GenerateOutputInformation()
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 
   output->Initialize(input->GetPixelType(), *input->GetTimeGeometry());
   output->SetPropertyList(input->GetPropertyList()->Clone());
@@ -89,10 +89,27 @@ void mitk::MRNormLinearStatisticBasedFilter::InternalComputeMask(itk::Image<TPix
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
   minMaxComputer->Compute();
+  double min = minMaxComputer->GetMinimum();
+  double max = minMaxComputer->GetMaximum();
+
+  if (m_IgnoreOutlier)
+  {
+    typename FilterType::Pointer labelStatisticsImageFilter = FilterType::New();
+    labelStatisticsImageFilter->SetUseHistograms(true);
+    labelStatisticsImageFilter->SetHistogramParameters(2048, min, max);
+    labelStatisticsImageFilter->SetInput(itkImage);
+
+    labelStatisticsImageFilter->SetLabelInput(itkMask0);
+    labelStatisticsImageFilter->Update();
+    auto histo = labelStatisticsImageFilter->GetHistogram(1);
+    min = histo->Quantile(0, 0.02);
+    max = histo->Quantile(0, 0.98);
+  }
+
 
   typename FilterType::Pointer labelStatisticsImageFilter = FilterType::New();
   labelStatisticsImageFilter->SetUseHistograms(true);
-  labelStatisticsImageFilter->SetHistogramParameters(256, minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+  labelStatisticsImageFilter->SetHistogramParameters(256, min, max);
   labelStatisticsImageFilter->SetInput( itkImage );
 
   labelStatisticsImageFilter->SetLabelInput(itkMask0);
@@ -135,6 +152,15 @@ void mitk::MRNormLinearStatisticBasedFilter::InternalComputeMask(itk::Image<TPix
   while (! inIter.IsAtEnd())
   {
     TPixel value = inIter.Value();
+    if (m_IgnoreOutlier && (value < min))
+    {
+      value = min;
+    }
+    else if (m_IgnoreOutlier && (value > max))
+    {
+      value = max;
+    }
+
     outIter.Set((value - offset) / scaling);
     ++inIter;
     ++outIter;

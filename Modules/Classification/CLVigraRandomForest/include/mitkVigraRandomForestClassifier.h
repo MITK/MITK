@@ -31,11 +31,11 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(VigraRandomForestClassifier,AbstractClassifier)
+    mitkClassMacro(VigraRandomForestClassifier, AbstractClassifier)
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-    VigraRandomForestClassifier();
+      VigraRandomForestClassifier();
 
     ~VigraRandomForestClassifier();
 
@@ -78,6 +78,7 @@ namespace mitk
     struct EigenToVigraTransform;
     struct Parameter;
 
+    vigra::MultiArrayView<2, double> m_Probabilities;
     Eigen::MatrixXd m_TreeWeights;
 
     Parameter * m_Parameter;

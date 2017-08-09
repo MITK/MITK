@@ -4,6 +4,7 @@
 #include <itkMultiHistogramFilter.h>
 
 #include <itkNeighborhoodIterator.h>
+#include <itkImageRegionIterator.h>
 #include <itkImageIterator.h>
 
 template< class TInputImageType, class TOuputImageType>
@@ -21,14 +22,9 @@ itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilte
 
 template< class TInputImageType, class TOuputImageType>
 void
-  itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::GenerateData()
+itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::BeforeThreadedGenerateData()
 {
-  double offset = m_Offset;// -3.0;
-  double delta = m_Delta;// 0.6;
-
-  typedef itk::NeighborhoodIterator<TInputImageType> IteratorType;
-  typedef itk::ConstNeighborhoodIterator<TInputImageType> ConstIteratorType;
-
+//  MITK_INFO << "Creating output images";
   InputImagePointer input = this->GetInput(0);
   CreateOutputImage(input, this->GetOutput(0));
   CreateOutputImage(input, this->GetOutput(1));
@@ -41,21 +37,34 @@ void
   CreateOutputImage(input, this->GetOutput(8));
   CreateOutputImage(input, this->GetOutput(9));
   CreateOutputImage(input, this->GetOutput(10));
+}
+template< class TInputImageType, class TOuputImageType>
+void
+itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId)
+{
+  double offset = m_Offset;// -3.0;
+  double delta = m_Delta;// 0.6;
 
+  typedef itk::ImageRegionIterator<TInputImageType> IteratorType;
+  typedef itk::ConstNeighborhoodIterator<TInputImageType> ConstIteratorType;
+
+  InputImagePointer input = this->GetInput(0);
+
+//  MITK_INFO << "Creating output iterator";
   typename TInputImageType::SizeType size; size.Fill(5);
   std::vector<IteratorType> iterVector;
   for (int i = 0; i < 11; ++i)
   {
-    IteratorType iter(size, this->GetOutput(i), this->GetOutput(i)->GetLargestPossibleRegion());
+    IteratorType iter(this->GetOutput(i), outputRegionForThread);
     iterVector.push_back(iter);
   }
 
-  ConstIteratorType inputIter( size, input, input->GetLargestPossibleRegion());
+  ConstIteratorType inputIter(size, input, outputRegionForThread);
   while (!inputIter.IsAtEnd())
   {
     for (unsigned int i = 0; i < 11; ++i)
     {
-      iterVector[i].SetCenterPixel(0);
+      iterVector[i].Set(0);
     }
 
     for (unsigned int i = 0; i < inputIter.Size(); ++i)
@@ -65,7 +74,7 @@ void
       value /= delta;
       int pos = (int)(value);
       pos = std::max(0, std::min(10, pos));
-      iterVector[pos].SetCenterPixel(iterVector[pos].GetCenterPixel() + 1);
+      iterVector[pos].Value() += 1;// (iterVector[pos].GetCenterPixel() + 1);
     }
 
     for (unsigned int i = 0; i < 11; ++i)

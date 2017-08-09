@@ -29,18 +29,25 @@ namespace mitk
 
       itkGetConstMacro(Range,double);
       itkSetMacro(Range, double);
-    itkGetConstMacro(Direction, unsigned int);
-    itkSetMacro(Direction, unsigned int);
+
+    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
+    virtual void AddArguments(mitkCommandLineParser &parser);
+
 
     struct GIFCooccurenceMatrixConfiguration
     {
       double range;
       unsigned int direction;
+
+      double MinimumIntensity;
+      bool UseMinimumIntensity;
+      double MaximumIntensity;
+      bool UseMaximumIntensity;
+      int Bins;
     };
 
     private:
     double m_Range;
-    unsigned int m_Direction;
   };
 
 }

@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkCore MitkCLCore
-  PACKAGE_DEPENDS PUBLIC Eigen
+  DEPENDS MitkCore MitkCLCore MitkCommandLine
+  PACKAGE_DEPENDS PUBLIC Eigen OpenCV
 )
 
 add_subdirectory(test)

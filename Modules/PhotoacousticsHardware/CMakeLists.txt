@@ -1,24 +1,21 @@
-IF(WIN32)
+if(WIN32)
 
-OPTION(MITK_USE_OPOTEK_HARDWARE "Enable support for OPOTEK Lasers" OFF)
-OPTION(MITK_USE_OPHIR_PRYO_HARDWARE "Enable support for Ophir Pyroelectrical Sensors" OFF)
+  option(MITK_USE_GALIL_HARDWARE "Enable support for OPOTEK Lasers" OFF)
+  option(MITK_USE_OPHIR_PRYO_HARDWARE "Enable support for Ophir Pyroelectrical Sensors" OFF)
 
-IF(MITK_USE_OPHIR_PRYO_HARDWARE)
-SET(MITK_OPHIR_API_PATH "" CACHE PATH "Path to Ophir API lib.")
-ENDIF(MITK_USE_OPHIR_PRYO_HARDWARE)
+  if(MITK_USE_OPHIR_PRYO_HARDWARE)
+    set(MITK_OPHIR_API_PATH "" CACHE PATH "Path to Ophir API lib.")
+  endif
 
-IF(MITK_USE_OPOTEK_HARDWARE)
-SET(MITK_GALIL_API_PATH "" CACHE PATH "Path to Galil API header files.")
-
-MITK_CREATE_MODULE(
-  SUBPROJECTS
-  DEPENDS MitkIGT
-  INCLUDE_DIRS PUBLIC "${MITK_GALIL_API_PATH}/include" "${MITK_OPHIR_API_PATH}"
-  INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  ADDITIONAL_LIBS "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclib.lib" "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclibo.lib" tinyxml "${MITK_OPHIR_API_PATH}/OphirPyroWrapper.lib"
-  PACKAGE_DEPENDS tinyxml
-)
-
-ENDIF(MITK_USE_OPOTEK_HARDWARE)
-
-ENDIF(WIN32)
+  if(MITK_USE_GALIL_HARDWARE)
+    set(MITK_GALIL_API_PATH "" CACHE PATH "Path to Galil API header files.")
+    MITK_CREATE_MODULE(
+    SUBPROJECTS
+      DEPENDS MitkIGT
+      INCLUDE_DIRS PUBLIC "${MITK_GALIL_API_PATH}/include" "${MITK_OPHIR_API_PATH}"
+      INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
+      ADDITIONAL_LIBS "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclib.lib" "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclibo.lib" tinyxml "${MITK_OPHIR_API_PATH}/OphirPyroWrapper.lib"
+      PACKAGE_DEPENDS tinyxml
+    )
+  endif
+endif

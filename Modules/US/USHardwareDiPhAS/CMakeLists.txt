@@ -15,6 +15,6 @@ if(WIN32)
       AUTOLOAD_WITH MitkUS
     )
 
-  endif
+  endif()
 
-endif
+endif()

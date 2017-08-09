@@ -5,7 +5,7 @@ if(WIN32)
 
   if(MITK_USE_OPHIR_PRYO_HARDWARE)
     set(MITK_OPHIR_API_PATH "" CACHE PATH "Path to Ophir API lib.")
-  endif
+  endif()
 
   if(MITK_USE_GALIL_HARDWARE)
     set(MITK_GALIL_API_PATH "" CACHE PATH "Path to Galil API header files.")
@@ -17,5 +17,5 @@ if(WIN32)
       ADDITIONAL_LIBS "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclib.lib" "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclibo.lib" tinyxml "${MITK_OPHIR_API_PATH}/OphirPyroWrapper.lib"
       PACKAGE_DEPENDS tinyxml
     )
-  endif
-endif
+  endif()
+endif()

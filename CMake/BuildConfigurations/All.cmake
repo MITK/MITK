@@ -31,8 +31,11 @@ set(_package_excludes
   SOFA_PLUGINS_DIR
   SUPERBUILD
   BiophotonicsHardware_SpectroCam
-  PhotoacousticsHardware
   POLHEMUS_TRACKER
+
+  US_DiPhAS_SDK
+  GALIL_HARDWARE
+  OPHIR_PRYO_HARDWARE
 
   KWSTYLE
   MICROBIRD_TRACKER

@@ -14,22 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef MITKBPREPROCESSINGRESAMPLINGACTIVATOR_H
+#define MITKBPREPROCESSINGRESAMPLINGACTIVATOR_H
 
-#include "org_mitk_gui_qt_classificationsegmentation_Activator.h"
-#include "ClassificationSegmentation.h"
-#include "ClassificationRegionGrow.h"
+#include <ctkPluginActivator.h>
 
 namespace mitk {
 
-void org_mitk_gui_qt_classificationsegmentation_Activator::start(ctkPluginContext* context)
+class PreprocessingResamplingActivator :
+  public QObject, public ctkPluginActivator
 {
-  BERRY_REGISTER_EXTENSION_CLASS(ClassificationSegmentation, context)
-  BERRY_REGISTER_EXTENSION_CLASS(ClassificationRegionGrow, context)
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_preprocessing_resampling")
+  Q_INTERFACES(ctkPluginActivator)
+
+public:
+
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
+
+}; // basicImageProcessingActivator
+
 }
 
-void org_mitk_gui_qt_classificationsegmentation_Activator::stop(ctkPluginContext* context)
-{
-  Q_UNUSED(context)
-}
-
-}
+#endif // MITKBPREPROCESSINGRESAMPLINGACTIVATOR_H

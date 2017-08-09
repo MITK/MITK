@@ -82,4 +82,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.visualizer:OFF
   org.mitk.gui.qt.matchpoint.evaluator:OFF
   org.mitk.gui.qt.matchpoint.manipulator:OFF
+  org.mitk.gui.qt.preprocessing.resampling:OFF
 )

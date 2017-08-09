@@ -24,6 +24,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLSimpleVoxelClassification^^MitkDataCollection_MitkCLVigraRandomForest
         CLVoxelClassification^^MitkDataCollection_MitkCLImportanceWeighting_MitkCLVigraRandomForest
         CLBrainMask^^MitkCLUtilities
+        XRaxSimulationFromCT^^MitkCLUtilities
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 

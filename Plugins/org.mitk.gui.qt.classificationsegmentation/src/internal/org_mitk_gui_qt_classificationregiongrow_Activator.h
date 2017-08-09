@@ -15,19 +15,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef org_mitk_gui_qt_classificationsegmentation_Activator_h
-#define org_mitk_gui_qt_classificationsegmentation_Activator_h
+#ifndef org_mitk_gui_qt_classificationregiongrow_Activator_h
+#define org_mitk_gui_qt_classificationregiongrow_Activator_h
 
 #include <ctkPluginActivator.h>
 
 namespace mitk {
 
-class org_mitk_gui_qt_classificationsegmentation_Activator :
+class org_mitk_gui_qt_classificationregiongrow_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_classificationsegmentation")
-//  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_classificationregiongrow")
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_classificationregiongrow")
   Q_INTERFACES(ctkPluginActivator)
 
 public:
@@ -35,8 +34,8 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
-}; // org_mitk_gui_qt_classificationsegmentation_Activator
+}; // org_mitk_gui_qt_classificationregiongrow_Activator
 
 }
 
-#endif // org_mitk_gui_qt_classificationsegmentation_Activator_h
+#endif // org_mitk_gui_qt_classificationregiongrow_Activator_h

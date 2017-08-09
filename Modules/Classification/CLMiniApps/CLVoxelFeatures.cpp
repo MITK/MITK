@@ -32,8 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLaplacianRecursiveGaussianImageFilter.h>
 #include "itkHessianRecursiveGaussianImageFilter.h"
 #include "itkUnaryFunctorImageFilter.h"
-#include <itkMultiHistogramFilter.h>
 #include "vnl/algo/vnl_symmetric_eigensystem.h"
+#include <itkMultiHistogramFilter.h>
 #include <itkSubtractImageFilter.h>
 
 static std::vector<double> splitDouble(std::string str, char delimiter) {

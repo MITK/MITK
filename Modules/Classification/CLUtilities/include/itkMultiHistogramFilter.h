@@ -25,6 +25,15 @@ namespace itk
       itkSetMacro(Offset, double);
       itkGetConstMacro(Offset, double);
 
+      itkSetMacro(Bins, int);
+      itkGetConstMacro(Bins, int);
+
+      itkSetMacro(Size, int);
+      itkGetConstMacro(Size, int);
+
+      itkSetMacro(UseImageIntensityRange, bool);
+      itkGetConstMacro(UseImageIntensityRange, bool);
+
     protected:
       MultiHistogramFilter();
       ~MultiHistogramFilter(){};
@@ -44,6 +53,9 @@ namespace itk
 
       double m_Delta;
       double m_Offset;
+      int m_Bins;
+      int m_Size;
+      bool m_UseImageIntensityRange;
   };
 }
 

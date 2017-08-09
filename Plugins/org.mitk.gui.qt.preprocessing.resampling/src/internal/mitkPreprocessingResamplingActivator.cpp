@@ -14,20 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include "org_mitk_gui_qt_classificationsegmentation_Activator.h"
-#include "ClassificationSegmentation.h"
-#include "ClassificationRegionGrow.h"
+#include "mitkPreprocessingResamplingActivator.h"
+#include "QmitkPreprocessingResamplingView.h"
 
 namespace mitk {
 
-void org_mitk_gui_qt_classificationsegmentation_Activator::start(ctkPluginContext* context)
+void PreprocessingResamplingActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(ClassificationSegmentation, context)
-  BERRY_REGISTER_EXTENSION_CLASS(ClassificationRegionGrow, context)
+   BERRY_REGISTER_EXTENSION_CLASS(QmitkPreprocessingResampling, context)
 }
 
-void org_mitk_gui_qt_classificationsegmentation_Activator::stop(ctkPluginContext* context)
+void PreprocessingResamplingActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }

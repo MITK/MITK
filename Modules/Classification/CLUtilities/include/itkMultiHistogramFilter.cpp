@@ -6,15 +6,16 @@
 #include <itkNeighborhoodIterator.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageIterator.h>
+#include "itkMinimumMaximumImageCalculator.h"
 
 template< class TInputImageType, class TOuputImageType>
 itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilter():
-  m_Delta(0.6), m_Offset(-3.0)
+m_Offset(-3.0), m_Delta(0.6), m_Bins(11), m_Size(5), m_UseImageIntensityRange(false)
 {
-  this->SetNumberOfRequiredOutputs(11);
+  this->SetNumberOfRequiredOutputs(m_Bins);
   this->SetNumberOfRequiredInputs(0);
 
-  for (unsigned int i = 0; i < 11; ++i)
+  for (int i = 0; i < m_Bins; ++i)
   {
     this->SetNthOutput( i, this->MakeOutput(i) );
   }
@@ -24,19 +25,27 @@ template< class TInputImageType, class TOuputImageType>
 void
 itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::BeforeThreadedGenerateData()
 {
-//  MITK_INFO << "Creating output images";
+  typedef itk::MinimumMaximumImageCalculator <TInputImageType>
+    ImageCalculatorFilterType;
+
+  if (m_UseImageIntensityRange)
+  {
+    ImageCalculatorFilterType::Pointer imageCalculatorFilter
+      = ImageCalculatorFilterType::New();
+    imageCalculatorFilter->SetImage(this->GetInput(0));
+    imageCalculatorFilter->Compute();
+
+    offset = imageCalculatorFilter->GetMinimum();
+    delta = 1.0*(imageCalculatorFilter->GetMaximum() - imageCalculatorFilter->GetMinimum()) / (1.0*m_Bins);
+  }
+
+  std::cout << "Offset: " << offset << " delta: " << delta << std::endl;
+
   InputImagePointer input = this->GetInput(0);
-  CreateOutputImage(input, this->GetOutput(0));
-  CreateOutputImage(input, this->GetOutput(1));
-  CreateOutputImage(input, this->GetOutput(2));
-  CreateOutputImage(input, this->GetOutput(3));
-  CreateOutputImage(input, this->GetOutput(4));
-  CreateOutputImage(input, this->GetOutput(5));
-  CreateOutputImage(input, this->GetOutput(6));
-  CreateOutputImage(input, this->GetOutput(7));
-  CreateOutputImage(input, this->GetOutput(8));
-  CreateOutputImage(input, this->GetOutput(9));
-  CreateOutputImage(input, this->GetOutput(10));
+  for (int i = 0; i < m_Bins; ++i)
+  {
+    CreateOutputImage(input, this->GetOutput(i));
+  }
 }
 template< class TInputImageType, class TOuputImageType>
 void
@@ -48,12 +57,11 @@ itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::ThreadedGenerateDat
   typedef itk::ImageRegionIterator<TInputImageType> IteratorType;
   typedef itk::ConstNeighborhoodIterator<TInputImageType> ConstIteratorType;
 
-  InputImagePointer input = this->GetInput(0);
+  typename TInputImageType::SizeType size; size.Fill(m_Size);
 
 //  MITK_INFO << "Creating output iterator";
-  typename TInputImageType::SizeType size; size.Fill(5);
   std::vector<IteratorType> iterVector;
-  for (int i = 0; i < 11; ++i)
+  for (int i = 0; i < m_Bins; ++i)
   {
     IteratorType iter(this->GetOutput(i), outputRegionForThread);
     iterVector.push_back(iter);
@@ -62,7 +70,7 @@ itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::ThreadedGenerateDat
   ConstIteratorType inputIter(size, input, outputRegionForThread);
   while (!inputIter.IsAtEnd())
   {
-    for (unsigned int i = 0; i < 11; ++i)
+    for (int i = 0; i < m_Bins; ++i)
     {
       iterVector[i].Set(0);
     }
@@ -73,11 +81,11 @@ itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::ThreadedGenerateDat
       value -=  offset;
       value /= delta;
       int pos = (int)(value);
-      pos = std::max(0, std::min(10, pos));
+      pos = std::max(0, std::min(m_Bins-1, pos));
       iterVector[pos].Value() += 1;// (iterVector[pos].GetCenterPixel() + 1);
     }
 
-    for (unsigned int i = 0; i < 11; ++i)
+    for (int i = 0; i < m_Bins; ++i)
     {
       ++(iterVector[i]);
     }

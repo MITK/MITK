@@ -16,14 +16,18 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         NativeHeadCTSegmentation^^MitkCLVigraRandomForest
         ManualSegmentationEvaluation^^MitkCLVigraRandomForest
         CLScreenshot^^MitkCore_MitkQtWidgetsExt_MitkCLUtilities
-        CLGlobalImageFeatures^^MitkCore_MitkCLUtilities_MitkQtWidgetsExt
-        CLMRNormalization^^MitkCore_MitkCLUtilities_MitkCLMRUtilities
-        CLStaple^^MitkCore_MitkCLUtilities
-        CLVoxelFeatures^^MitkCore_MitkCLUtilities
         CLDicom2Nrrd^^MitkCore
-        CLPolyToNrrd^^MitkCore
         CLImageTypeConverter^^MitkCore
         CLResampleImageToReference^^MitkCore
+        CLGlobalImageFeatures^^MitkCLUtilities
+        CLMRNormalization^^MitkCLUtilities_MitkCLMRUtilities
+        CLStaple^^MitkCLUtilities
+        CLVoxelFeatures^^MitkCLUtilities
+        CLPolyToNrrd^^
+        CLSimpleVoxelClassification^^MitkDataCollection_MitkCLVigraRandomForest
+        CLVoxelClassification^^MitkDataCollection_MitkCLImportanceWeighting_MitkCLVigraRandomForest
+        CLBrainMask^^MitkCLUtilities
+        XRaxSimulationFromCT^^MitkCLUtilities
         CLRandomSampling^^MitkCore_MitkCLUtilities
         CLRemoveEmptyVoxels^^MitkCore
         CLN4^^MitkCore

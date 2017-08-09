@@ -160,7 +160,7 @@ void PAImageProcessing::BatchProcessing()
 
   DisableControls();
 
-  std::set<char> delims{ '/', '.'};
+  std::set<char> delims{'/'};
 
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
@@ -176,7 +176,11 @@ void PAImageProcessing::BatchProcessing()
 
     QString filename = fileNames.at(fileNumber);
     auto split = splitpath(filename.toStdString(), delims);
-    std::string imageName = split.at(split.size()-2);
+    std::string imageName = split.at(split.size()-1);
+
+    // remove ".nrrd"
+    imageName = imageName.substr(0, imageName.size()-5);
+
     mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename.toStdString().c_str());
 
     UpdateBFSettings(image);

@@ -182,7 +182,7 @@ control the MITK configuration:
  <li> \b MITK_USE_OpenCV Download, compile, and use OpenCV in MITK
  <li> \b MITK_USE_Python Download and compile 1CableSwig and enable Python
       wrapping in ITK, VTK, OpenCV, and MITK
- <li> \b MITK_USE_QT Use the Qt framework in MITK
+ <li> \b MITK_USE_Qt5 Use the Qt 5 framework in MITK
 </ul>
 
 You can also inject already build third-party libraries from inside your project's

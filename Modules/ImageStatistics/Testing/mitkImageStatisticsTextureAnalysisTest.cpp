@@ -74,11 +74,10 @@ public:
     image->SetRegions(region);
     image->Allocate();
     image->FillBuffer(bufferValue);
-              int i = 0;
 
     for(unsigned int r = 0; r < 50; r++)
     {
-      for(unsigned int c = 0; c < factorOfDividingThePicture; c++)
+      for(int c = 0; c < factorOfDividingThePicture; c++)
       {
         for(unsigned int l = 0; l < 100; l++)
         {
@@ -115,7 +114,7 @@ public:
     StatisticsFilterType::Pointer StatisticsFilter;
     StatisticsFilter = StatisticsFilterType::New();
     StatisticsFilter->SetInput( image );
-    StatisticsFilter->SetBinSize( 20 );
+    StatisticsFilter->SetHistogramParameters( 20, -10, 10 );
     StatisticsFilter->Update();
 
 

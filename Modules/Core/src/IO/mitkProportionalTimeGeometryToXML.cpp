@@ -22,11 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <boost/lexical_cast.hpp>
 
-TiXmlElement* mitk::ProportionalTimeGeometryToXML::ToXML(const ProportionalTimeGeometry* timeGeom)
+TiXmlElement *mitk::ProportionalTimeGeometryToXML::ToXML(const ProportionalTimeGeometry *timeGeom)
 {
   assert(timeGeom);
 
-  TiXmlElement* timeGeomElem = new TiXmlElement("ProportionalTimeGeometry");
+  TiXmlElement *timeGeomElem = new TiXmlElement("ProportionalTimeGeometry");
   timeGeomElem->SetAttribute("NumberOfTimeSteps", timeGeom->CountTimeSteps());
   // TinyXML cannot serialize infinity (default value for time step)
   // So we guard this value and the first time point against serialization problems
@@ -40,25 +40,25 @@ TiXmlElement* mitk::ProportionalTimeGeometryToXML::ToXML(const ProportionalTimeG
   for (TimeStepType t = 0; t < timeGeom->CountTimeSteps(); ++t)
   {
     // add a node for the geometry of each time step
-    const Geometry3D* geom3D(nullptr);
-    if ( (geom3D = dynamic_cast<const Geometry3D*>( timeGeom->GetGeometryForTimeStep(t).GetPointer() )) )
+    const Geometry3D *geom3D(nullptr);
+    if ((geom3D = dynamic_cast<const Geometry3D *>(timeGeom->GetGeometryForTimeStep(t).GetPointer())))
     {
-      TiXmlElement* geom3DElement = Geometry3DToXML::ToXML( geom3D );
+      TiXmlElement *geom3DElement = Geometry3DToXML::ToXML(geom3D);
       geom3DElement->SetAttribute("TimeStep", t); // mark order for us
-      timeGeomElem->LinkEndChild( geom3DElement );
+      timeGeomElem->LinkEndChild(geom3DElement);
     }
     else
     {
       MITK_WARN << "Serializing a ProportionalTimeGeometry that contains something other than Geometry3D!"
                 << " (in time step " << t << ")"
-                <<" File will miss information!";
+                << " File will miss information!";
     }
   }
 
   return timeGeomElem;
 }
 
-mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::FromXML( TiXmlElement* timeGeometryElement )
+mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::FromXML(TiXmlElement *timeGeometryElement)
 {
   if (!timeGeometryElement)
   {
@@ -98,7 +98,7 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
       stepDuration = std::numeric_limits<TimePointType>::infinity();
     }
   }
-  catch (boost::bad_lexical_cast& e)
+  catch (boost::bad_lexical_cast &e)
   {
     MITK_ERROR << "Could not parse string as number: " << e.what();
     return nullptr;
@@ -108,8 +108,7 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
   std::multimap<TimeStepType, BaseGeometry::Pointer> allReadGeometries;
 
   int indexForUnlabeledTimeStep(-1);
-  for( TiXmlElement* currentElement = timeGeometryElement->FirstChildElement();
-       currentElement != nullptr;
+  for (TiXmlElement *currentElement = timeGeometryElement->FirstChildElement(); currentElement != nullptr;
        currentElement = currentElement->NextSiblingElement())
   {
     // different geometries could have been inside a ProportionalTimeGeometry.
@@ -124,15 +123,17 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
         if (TIXML_SUCCESS != currentElement->QueryIntAttribute("TimeStep", &timeStep))
         {
           timeStep = indexForUnlabeledTimeStep--; // decrement index for next one
-          MITK_WARN << "Found <Geometry3D> without 'TimeStep' attribute in <ProportionalTimeGeometry>. No guarantees on order anymore.";
+          MITK_WARN << "Found <Geometry3D> without 'TimeStep' attribute in <ProportionalTimeGeometry>. No guarantees "
+                       "on order anymore.";
         }
 
         if (allReadGeometries.count(static_cast<TimeStepType>(timeStep)) > 0)
         {
-          MITK_WARN << "Found <Geometry3D> tags with identical 'TimeStep' attribute in <ProportionalTimeGeometry>. No guarantees on order anymore.";
+          MITK_WARN << "Found <Geometry3D> tags with identical 'TimeStep' attribute in <ProportionalTimeGeometry>. No "
+                       "guarantees on order anymore.";
         }
 
-        allReadGeometries.insert( std::make_pair(static_cast<TimeStepType>(timeStep), restoredGeometry.GetPointer()));
+        allReadGeometries.insert(std::make_pair(static_cast<TimeStepType>(timeStep), restoredGeometry.GetPointer()));
       }
     }
     else
@@ -146,15 +147,15 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
   ProportionalTimeGeometry::Pointer newTimeGeometry = ProportionalTimeGeometry::New();
   newTimeGeometry->SetFirstTimePoint(firstTimePoint);
   newTimeGeometry->SetStepDuration(stepDuration);
-  newTimeGeometry->ReserveSpaceForGeometries( allReadGeometries.size() );
+  newTimeGeometry->ReserveSpaceForGeometries(allReadGeometries.size());
 
   TimeStepType t(0);
-  for (auto entry: allReadGeometries)
+  for (auto entry : allReadGeometries)
   {
     // We add items with newly assigned time steps.
     // This avoids great confusion when a file contains
     // bogus numbers.
-    newTimeGeometry->SetTimeStepGeometry( entry.second, t++ );
+    newTimeGeometry->SetTimeStepGeometry(entry.second, t++);
   }
 
   // Need to re-calculate global bounding box.

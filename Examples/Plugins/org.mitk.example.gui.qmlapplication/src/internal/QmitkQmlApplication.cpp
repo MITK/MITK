@@ -20,38 +20,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkServiceReference.h>
 #include <mitkIDataStorageService.h>
 
-#include <QQmlApplicationEngine>
-#include <QGuiApplication>
-#include <QtQml>
 #include <QDebug>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
 #include <QQmlComponent>
+#include <QtQml>
 
 #include "QmitkQmlWorkbench.h"
-
 
 QmitkQmlApplication::QmitkQmlApplication()
 {
 }
 
-QmitkQmlApplication::QmitkQmlApplication(const QmitkQmlApplication& other)
-: QObject(other.parent())
+QmitkQmlApplication::QmitkQmlApplication(const QmitkQmlApplication &other) : QObject(other.parent())
 {
   Q_UNUSED(other)
   throw std::runtime_error("Copy constructor not implemented");
 }
 
-QVariant QmitkQmlApplication::Start(berry::IApplicationContext* /*context*/)
+QVariant QmitkQmlApplication::Start(berry::IApplicationContext * /*context*/)
 {
-    QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
+  QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
 
-    QQmlApplicationEngine engine;
+  QQmlApplicationEngine engine;
 
-    QmlMitkWorkbench::initialize(engine);
-    engine.load(QmlMitkWorkbench::workbench);
+  QmlMitkWorkbench::initialize(engine);
+  engine.load(QmlMitkWorkbench::workbench);
 
-    display->RunEventLoop();
+  display->RunEventLoop();
 
-    return EXIT_OK;
+  return EXIT_OK;
 }
 
 void QmitkQmlApplication::Stop()

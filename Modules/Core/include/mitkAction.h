@@ -14,17 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef ACTION_H_HEADER_INCLUDED_C19AE06B
 #define ACTION_H_HEADER_INCLUDED_C19AE06B
 
-#include <MitkCoreExports.h>
 #include "mitkPropertyList.h"
+#include <MitkCoreExports.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
-
-namespace mitk {
+namespace mitk
+{
   //##Documentation
   //## @brief represents an action, that is executed after a certain event (in statemachine-mechanism)
   //##
@@ -42,7 +41,7 @@ namespace mitk {
     /**
     * @brief Adds a property to the list of properties.
     **/
-    void AddProperty(const char* propertyKey, BaseProperty* property);
+    void AddProperty(const char *propertyKey, BaseProperty *property);
 
     /**
     * @brief Returns the Id of this action.
@@ -52,19 +51,20 @@ namespace mitk {
     /**
     * @brief returns the specified property
     **/
-    mitk::BaseProperty* GetProperty( const char *propertyKey ) const;
+    mitk::BaseProperty *GetProperty(const char *propertyKey) const;
 
   protected:
     /**
     * @brief Default Constructor.
     * Set the actionId.
     **/
-    Action( int actionId );
+    Action(int actionId);
 
     /**
     * @brief Default Destructor
     **/
     ~Action();
+
   private:
     /**
     * @brief The Id of this action.

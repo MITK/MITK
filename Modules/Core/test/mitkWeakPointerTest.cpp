@@ -16,12 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
-#include <mitkWeakPointer.h>
 #include <itkObject.h>
+#include <mitkWeakPointer.h>
 
-int mitkWeakPointerTest(int /*argc*/, char* /*argv*/[])
+int mitkWeakPointerTest(int /*argc*/, char * /*argv*/ [])
 {
-
   MITK_TEST_BEGIN("WeakPointer")
 
   mitk::WeakPointer<itk::Object> weakPointer;
@@ -34,7 +33,8 @@ int mitkWeakPointerTest(int /*argc*/, char* /*argv*/[])
   {
     itk::Object::Pointer tmpSmartPointer(weakPointer);
     itk::Object::Pointer tmpSmartPointer2(weakPointer2);
-    MITK_TEST_CONDITION_REQUIRED(tmpSmartPointer.GetPointer() == tmpSmartPointer2.GetPointer(), "Testing equal pointers");
+    MITK_TEST_CONDITION_REQUIRED(tmpSmartPointer.GetPointer() == tmpSmartPointer2.GetPointer(),
+                                 "Testing equal pointers");
   }
 
   weakPointer = smartPointer;

@@ -65,7 +65,7 @@ if(NOT DEFINED VTK_DIR)
         )
   endif()
 
-  if(MITK_USE_QT)
+  if(MITK_USE_Qt5)
     list(APPEND additional_cmake_args
         -DVTK_QT_VERSION:STRING=5
         -DVTK_Group_Qt:BOOL=ON

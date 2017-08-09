@@ -18,30 +18,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSegmentationsProcessingTool_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
-#include "mitkTool.h"
 #include "mitkDataNode.h"
+#include "mitkTool.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
+  /**
+    \brief Batch processing of all selected segmentations/data
 
-/**
-  \brief Batch processing of all selected segmentations/data
-
-  This class is undocumented. Ask the creator ($Author$) to supply useful comments.
-*/
-class MITKSEGMENTATION_EXPORT SegmentationsProcessingTool : public Tool
-{
+    This class is undocumented. Ask the creator ($Author$) to supply useful comments.
+  */
+  class MITKSEGMENTATION_EXPORT SegmentationsProcessingTool : public Tool
+  {
   public:
-
     mitkClassMacro(SegmentationsProcessingTool, Tool);
 
   protected:
-
     SegmentationsProcessingTool(); // purposely hidden
     virtual ~SegmentationsProcessingTool();
 
-    virtual const char* GetGroup() const override;
+    virtual const char *GetGroup() const override;
 
     /**
      \brief Called when the tool gets activated
@@ -74,7 +71,7 @@ class MITKSEGMENTATION_EXPORT SegmentationsProcessingTool : public Tool
       \brief Subclasses should override this method
       \sa ProcessAllObjects
     */
-    virtual bool ProcessOneWorkingData( DataNode* node );
+    virtual bool ProcessOneWorkingData(DataNode *node);
 
     /**
       \brief Subclasses should override this method
@@ -93,9 +90,8 @@ class MITKSEGMENTATION_EXPORT SegmentationsProcessingTool : public Tool
     virtual std::string GetErrorMessage();
 
     std::string m_FailedNodes;
- };
+  };
 
 } // namespace
 
 #endif
-

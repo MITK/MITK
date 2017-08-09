@@ -563,7 +563,7 @@ mitk::LevelWindowManager* QmlMitkSliderLevelWindowItem::GetManager()
     return m_Manager.GetPointer();
 }
 
-void QmlMitkSliderLevelWindowItem::create(QQmlEngine &engine, mitk::DataStorage::Pointer storage)
+void QmlMitkSliderLevelWindowItem::create(QQmlEngine &, mitk::DataStorage::Pointer storage)
 {
     qmlRegisterType<QmlMitkSliderLevelWindowItem>("Mitk.Views", 1, 0, "LevelWindow");
 

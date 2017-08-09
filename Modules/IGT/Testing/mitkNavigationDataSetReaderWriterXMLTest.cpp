@@ -77,8 +77,8 @@ public:
   {
     // Aim is to read an xml into a pointset, write that xml again, and compare the output
 
-    set = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(pathRead).GetPointer());
-    mitk::IOUtil::SaveBaseData(set, pathWrite);
+    set = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(pathRead)[0].GetPointer());
+    mitk::IOUtil::Save(set, pathWrite);
 
     //FIXME: Commented out, because test fails under linux. binary comparison of files is probably not the wa to go
     // See Bug 17775
@@ -116,7 +116,7 @@ public:
     try
     {
       std::string file = GetTestDataFilePath("IGT-Data/InvalidVersionNavigationDataTestData.xml");
-      mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
+      mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(file)[0].GetPointer());
     }
     catch(mitk::Exception)
     {

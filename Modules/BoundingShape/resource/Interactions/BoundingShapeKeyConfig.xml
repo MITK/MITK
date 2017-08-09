@@ -1,0 +1,58 @@
+<config>
+  <event_variant name="Selection" class="MousePressEvent" >
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+<!-- Translation -->
+  <event_variant name="TranslateUpKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowUp"/>
+  </event_variant>
+  <event_variant name="TranslateDownKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowDown"/>
+  </event_variant>
+  <event_variant name="TranslateLeftKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowLeft"/>
+  </event_variant>
+  <event_variant name="TranslateRightKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowRight"/>
+  </event_variant>
+  <event_variant name="TranslateUpModifierKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowUp"/>
+      <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant name="TranslateDownModifierKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowDown"/>
+      <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+<!-- Scaling -->
+  <event_variant name="ScaleUpKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="+"/>
+  </event_variant>
+  <event_variant name="ScaleDownKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="-"/>
+  </event_variant>
+<!-- Rotation -->
+  <event_variant name="RotateUpKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowUp"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateDownKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowDown"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateLeftKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowLeft"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateRightKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowRight"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="RotateUpModifierKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowUp"/>
+      <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+  <event_variant name="RotateDownModifierKey" class="InteractionKeyEvent">
+      <attribute name="Key" value="ArrowDown"/>
+      <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+</config>

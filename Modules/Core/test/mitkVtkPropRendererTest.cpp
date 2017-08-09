@@ -14,42 +14,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "vtkSphereSource.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindowInteractor.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
+#include "vtkSphereSource.h"
 #include "vtkUnsignedCharArray.h"
 
-#include <mitkPicFileReader.h>
 #include <mitkImage.h>
+#include <mitkPicFileReader.h>
 
 #include <mitkDataStorage.h>
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
 
+#include <mitkVtkLayerController.h>
 #include <mitkVtkPropRenderer.h>
 #include <vtkMitkRenderProp.h>
-#include <mitkVtkLayerController.h>
 
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>
-int mitkVtkPropRendererTest(int argc, char* argv[])
+int mitkVtkPropRendererTest(int argc, char *argv[])
 {
-  //independently read header of pic file
-  mitkIpPicDescriptor *picheader = NULL;
+  // independently read header of pic file
+  mitkIpPicDescriptor *picheader = nullptr;
   if (argc >= 1)
   {
-    if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
-      picheader = mitkIpPicGetHeader(argv[1], NULL);
+    if (itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic") !=
+        std::string::npos)
+      picheader = mitkIpPicGetHeader(argv[1], nullptr);
   }
-  if( picheader==NULL)
+  if (picheader == nullptr)
   {
-    std::cout<<"file not found/not a pic-file - test not applied [PASSED]"<<std::endl;
-    std::cout<<"[TEST DONE]"<<std::endl;
+    std::cout << "file not found/not a pic-file - test not applied [PASSED]" << std::endl;
+    std::cout << "[TEST DONE]" << std::endl;
     return EXIT_SUCCESS;
   }
 
@@ -57,35 +58,35 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   mitkIpPicGetTags(argv[1], picheader);
 
-  //Read pic-Image from file
+  // Read pic-Image from file
   std::cout << "Reading image: ";
   mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
   reader->SetFileName(argv[1]);
   reader->Update();
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   mitk::Image::Pointer image = reader->GetOutput();
 
   std::cout << "Creating node: ";
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(image);
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Creating DataStorage: ";
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Adding node via DataStorage: ";
   ds->Add(node);
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Adding level-window property: ";
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( image );
-  levWinProp->SetLevelWindow( levelwindow );
-  node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-  std::cout<<"[PASSED]"<<std::endl;
+  levelwindow.SetAuto(image);
+  levWinProp->SetLevelWindow(levelwindow);
+  node->GetPropertyList()->SetProperty("levelwindow", levWinProp);
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Creating a vtk sphere: ";
   vtkSphereSource *sphere = vtkSphereSource::New();
@@ -100,53 +101,53 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   vtkActor *aSphere = vtkActor::New();
   aSphere->SetMapper(map);
   map->Delete();
-  aSphere->GetProperty()->SetColor(0,0,1); // sphere color blue
-  std::cout<<"[PASSED]"<<std::endl;
+  aSphere->GetProperty()->SetColor(0, 0, 1); // sphere color blue
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Creating a renderer for the sphere: ";
   vtkRenderer *sphereRenderer = vtkRenderer::New();
   sphereRenderer->AddActor(aSphere);
   aSphere->Delete();
-  //sphereRenderer->SetBackground(1,1,1); // Background color white
-  std::cout<<"[PASSED]"<<std::endl;
+  // sphereRenderer->SetBackground(1,1,1); // Background color white
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Creating vtkRenderWindow and VtkPropRenderer: ";
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer propRenderer = mitk::VtkPropRenderer::New( "the renderer", renderWindow );
-  //propRenderer->SetMapperID(2);
-  std::cout<<"[PASSED]"<<std::endl;
+  mitk::VtkPropRenderer::Pointer propRenderer = mitk::VtkPropRenderer::New("the renderer", renderWindow);
+  // propRenderer->SetMapperID(2);
+  std::cout << "[PASSED]" << std::endl;
 
-  //renderWindow->AddRenderer(sphereRenderer);
-  //renderWindow->SetErase(0);
+  // renderWindow->AddRenderer(sphereRenderer);
+  // renderWindow->SetErase(0);
 
   std::cout << "BaseRenderer::SetData(iterator): ";
   propRenderer->SetDataStorage(ds);
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Creating vtkMitkRenderProp and connecting it to the VtkPropRenderer: ";
-  vtkMitkRenderProp* renderProp = vtkMitkRenderProp::New();
+  vtkMitkRenderProp *renderProp = vtkMitkRenderProp::New();
   renderProp->SetPropRenderer(propRenderer);
   propRenderer->GetVtkRenderer()->AddViewProp(renderProp);
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Inserting the sphere into the foreground of the VtkLayerController: ";
-  mitk::VtkLayerController::GetInstance(renderWindow)->InsertForegroundRenderer(sphereRenderer,true);
-  std::cout<<"[PASSED]"<<std::endl;
+  mitk::VtkLayerController::GetInstance(renderWindow)->InsertForegroundRenderer(sphereRenderer, true);
+  std::cout << "[PASSED]" << std::endl;
 
   // mouse interaction for debugging
-  //vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-  //iren->SetRenderWindow(renderWindow);
+  // vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
+  // iren->SetRenderWindow(renderWindow);
 
   std::cout << "Setting and getting size of renderWindow: ";
   renderWindow->SetSize(400, 400);
   int *size = renderWindow->GetSize();
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Do the rendering: ";
   renderWindow->Render();
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
-  //iren->Start();
+  // iren->Start();
 
   std::cout << "Testing to pick a world position: ";
   mitk::Point2D p;
@@ -158,26 +159,26 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   std::cout << "Creating vtkUnsignedCharArray: ";
   vtkUnsignedCharArray *vtkImage = vtkUnsignedCharArray::New();
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "[PASSED]" << std::endl;
 
   cout << "Reading image from renderWindow" << std::endl;
-  renderWindow->GetRGBACharPixelData(0, 0, size[0]-1, size[1]-1, 0, vtkImage);
-  cout << "Read " << size[0]*size[1] << " data points\n";
+  renderWindow->GetRGBACharPixelData(0, 0, size[0] - 1, size[1] - 1, 0, vtkImage);
+  cout << "Read " << size[0] * size[1] << " data points\n";
 
   cout << "Computing sum of all RGBA values..\n";
   long int sum_now = 0;
-  for(int i=0;i<size[0]*size[1];i++)
+  for (int i = 0; i < size[0] * size[1]; i++)
     sum_now += vtkImage->GetValue(i);
   std::cout << "Sum of all RGBA values: " << sum_now << "\n";
   std::cout << "Sum should be: " << sum_orig_Pic3D_pic_gz << "\n";
 
-  //std::string Pic3d_pic_gz_str("Pic3D.pic.gz");
-  //std::cout << "pic3d " << Pic3d_pic_gz_str << "\n";
-  //std::cout << "argv " << argv_str << "\n";
-  //std::cout << "find " << (int) argv_str.find("Pic3D.pic.gz") << "\n";
-  //std::cout << "size " << argv_str.size() << "\n";
+  // std::string Pic3d_pic_gz_str("Pic3D.pic.gz");
+  // std::cout << "pic3d " << Pic3d_pic_gz_str << "\n";
+  // std::cout << "argv " << argv_str << "\n";
+  // std::cout << "find " << (int) argv_str.find("Pic3D.pic.gz") << "\n";
+  // std::cout << "size " << argv_str.size() << "\n";
 
-  //if(argv_str.size() - ((int) argv_str.find("Pic3D.pic.gz")) == 12)
+  // if(argv_str.size() - ((int) argv_str.find("Pic3D.pic.gz")) == 12)
   //{
   //  std::cout << "Input image is Pic3D.pic.gz\n";
   //  std::cout << "Sum should be: " << sum_orig_Pic3D_pic_gz << "\n";
@@ -188,24 +189,21 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   //  }
   //  std::cout<<"[PASSED]"<<std::endl;
   //}
-  //else
+  // else
   //{
   //  std::cout<<"Unknown image, comparison test skipped"<<std::endl;
   //}
 
-
   propRenderer->GetVtkRenderer()->RemoveViewProp(renderProp);
   renderProp->Delete();
-  propRenderer = NULL;
+  propRenderer = nullptr;
   sphereRenderer->Delete();
 
   renderWindow->Delete();
 
   vtkImage->Delete();
-  ds = NULL;
+  ds = nullptr;
 
-  std::cout<<"[TEST DONE]"<<std::endl;
+  std::cout << "[TEST DONE]" << std::endl;
   return EXIT_SUCCESS;
 }
-
-

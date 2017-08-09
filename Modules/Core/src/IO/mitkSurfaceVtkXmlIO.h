@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_SURFACE_VTK_XML_IO_H_
 #define _MITK_SURFACE_VTK_XML_IO_H_
 
@@ -22,30 +21,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseData.h"
 
-namespace mitk {
-
-class SurfaceVtkXmlIO : public mitk::SurfaceVtkIO
+namespace mitk
 {
-public:
+  class SurfaceVtkXmlIO : public mitk::SurfaceVtkIO
+  {
+  public:
+    SurfaceVtkXmlIO();
 
-  SurfaceVtkXmlIO();
+    // -------------- AbstractFileReader -------------
 
-  // -------------- AbstractFileReader -------------
+    using AbstractFileReader::Read;
+    virtual std::vector<BaseData::Pointer> Read() override;
 
-  using AbstractFileReader::Read;
-  virtual std::vector<BaseData::Pointer> Read() override;
+    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
+    // -------------- AbstractFileWriter -------------
 
-  // -------------- AbstractFileWriter -------------
+    virtual void Write() override;
 
-  virtual void Write() override;
-
-private:
-
-  SurfaceVtkXmlIO* IOClone() const override;
-};
-
+  private:
+    SurfaceVtkXmlIO *IOClone() const override;
+  };
 }
 
 #endif //_MITK_SURFACE_VTK_XML_IO_H_

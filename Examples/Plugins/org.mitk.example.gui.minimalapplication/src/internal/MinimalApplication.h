@@ -32,11 +32,10 @@ class MinimalApplication : public QObject, public berry::IApplication
   Q_INTERFACES(berry::IApplication)
 
 public:
-
   MinimalApplication();
   ~MinimalApplication();
 
-  QVariant Start(berry::IApplicationContext* context) override;
+  QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;
 };
 

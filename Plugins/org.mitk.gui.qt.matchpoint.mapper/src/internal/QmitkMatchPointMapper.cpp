@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Mitk
 #include <mitkImageAccessByItk.h>
 #include <mitkStatusBar.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 #include "mitkImageMappingHelper.h"
 #include "mitkMAPRegistrationWrapper.h"
 #include "mitkMatchPointPropertyTags.h"
@@ -49,7 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMatchPointMapper::VIEW_ID = "org.mitk.views.matchpoint.mapper";
 
 QmitkMatchPointMapper::QmitkMatchPointMapper()
-    : m_Parent(NULL), m_preparedForBinaryInput(false)
+    : m_Parent(nullptr), m_preparedForBinaryInput(false)
 {
 }
 
@@ -141,7 +141,7 @@ bool  QmitkMatchPointMapper::IsPointSetInput() const
 
     if (this->m_spSelectedInputNode.IsNotNull())
     {
-        result = dynamic_cast<const mitk::PointSet*>(this->m_spSelectedInputNode->GetData()) != NULL;
+        result = dynamic_cast<const mitk::PointSet*>(this->m_spSelectedInputNode->GetData()) != nullptr;
     }
 
     return result;
@@ -149,7 +149,7 @@ bool  QmitkMatchPointMapper::IsPointSetInput() const
 
 mitk::DataNode::Pointer QmitkMatchPointMapper::GetSelectedRegNode()
 {
-    mitk::DataNode::Pointer spResult = NULL;
+    mitk::DataNode::Pointer spResult = nullptr;
 
     typedef QList<mitk::DataNode::Pointer> NodeListType;
 
@@ -188,17 +188,17 @@ QList<mitk::DataNode::Pointer> QmitkMatchPointMapper::GetSelectedDataNodes()
 
 mitk::DataNode::Pointer QmitkMatchPointMapper::GetAutoRefNodeByReg()
 {
-    mitk::DataNode::Pointer spResult = NULL;
+    mitk::DataNode::Pointer spResult = nullptr;
 
-    if (this->m_spSelectedRegNode.IsNotNull())
+    if (this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedRegNode->GetData())
     {
         std::string nodeName;
-        mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+        mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
         if (uidProp)
         {
             //search for the target node
-            mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+            mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
                 uidProp);
             spResult = this->GetDataStorage()->GetNode(predicate);
         }
@@ -228,7 +228,7 @@ void QmitkMatchPointMapper::CheckInputs()
 
     if (!m_Controls.m_pbLockInput->isChecked())
     {
-        mitk::DataNode::Pointer inputNode = NULL;
+        mitk::DataNode::Pointer inputNode = nullptr;
 
         if (dataNodes.size() > 0)
         {
@@ -246,7 +246,7 @@ void QmitkMatchPointMapper::CheckInputs()
     {
         if (!m_Controls.m_pbLockRef->isChecked())
         {
-            mitk::DataNode::Pointer refNode = NULL;
+            mitk::DataNode::Pointer refNode = nullptr;
 
             int relevantIndex = 1;
 
@@ -389,7 +389,7 @@ void QmitkMatchPointMapper::CheckNodesValidity(bool& validReg, bool& validInput,
 
             const mitk::MAPRegistrationWrapper* wrapper = dynamic_cast < const mitk::MAPRegistrationWrapper* >
                 (m_spSelectedRegNode->GetData());
-            mitk::BaseGeometry* geometry = NULL;
+            mitk::BaseGeometry* geometry = nullptr;
 
             if (m_spSelectedRefNode->GetData())
             {
@@ -469,8 +469,8 @@ void QmitkMatchPointMapper::ConfigureProgressInfos()
 
 }
 
-void QmitkMatchPointMapper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPointMapper::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+    const QList<mitk::DataNode::Pointer>&)
 {
     this->CheckInputs();
     this->ConfigureMappingControls();
@@ -563,7 +563,7 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
     pJob->setAutoDelete(true);
 
     pJob->m_spInputData = this->m_spSelectedInputNode->GetData();
-    pJob->m_InputNodeUID = mitk::EnsureUID(this->m_spSelectedInputNode);
+    pJob->m_InputDataUID = mitk::EnsureUID(this->m_spSelectedInputNode->GetData());
     pJob->m_doGeometryRefinement = doGeometryRefinement;
 
     pJob->m_spRegNode = m_spSelectedRegNode;
@@ -657,7 +657,7 @@ void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMap
         QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
 
     mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
-        spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputNodeUID,
+        spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
         job->m_doGeometryRefinement, job->m_InterpolatorLabel);
     this->GetDataStorage()->Add(spMappedNode);
     this->GetRenderWindowPart()->RequestUpdate();

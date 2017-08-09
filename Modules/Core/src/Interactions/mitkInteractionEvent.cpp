@@ -14,8 +14,8 @@
 
  ===================================================================*/
 
-#include "mitkException.h"
 #include "mitkInteractionEvent.h"
+#include "mitkException.h"
 
 const std::string mitk::InteractionEvent::KeyEsc = "Escape";
 const std::string mitk::InteractionEvent::KeyEnter = "Enter";
@@ -46,22 +46,21 @@ const std::string mitk::InteractionEvent::KeyPageUp = "PageUp";
 const std::string mitk::InteractionEvent::KeyPageDown = "PageDown";
 const std::string mitk::InteractionEvent::KeySpace = "Space";
 
-mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer)
-: m_Sender(baseRenderer)
+mitk::InteractionEvent::InteractionEvent(BaseRenderer *baseRenderer) : m_Sender(baseRenderer)
 {
 }
 
-void mitk::InteractionEvent::SetSender(mitk::BaseRenderer* sender)
+void mitk::InteractionEvent::SetSender(mitk::BaseRenderer *sender)
 {
   m_Sender = sender;
 }
 
-mitk::BaseRenderer* mitk::InteractionEvent::GetSender() const
+mitk::BaseRenderer *mitk::InteractionEvent::GetSender() const
 {
   return m_Sender;
 }
 
-bool mitk::InteractionEvent::IsEqual(const InteractionEvent&) const
+bool mitk::InteractionEvent::IsEqual(const InteractionEvent &) const
 {
   return true;
 }
@@ -70,17 +69,17 @@ mitk::InteractionEvent::~InteractionEvent()
 {
 }
 
-bool mitk::InteractionEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
+bool mitk::InteractionEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<InteractionEvent*>(baseClass.GetPointer()) != NULL) ;
+  return (dynamic_cast<InteractionEvent *>(baseClass.GetPointer()) != nullptr);
 }
 
-bool mitk::operator==(const InteractionEvent& a, const InteractionEvent& b)
+bool mitk::operator==(const InteractionEvent &a, const InteractionEvent &b)
 {
   return (typeid(a) == typeid(b) && a.IsEqual(b));
 }
 
-bool mitk::operator!=(const InteractionEvent& a, const InteractionEvent& b)
+bool mitk::operator!=(const InteractionEvent &a, const InteractionEvent &b)
 {
   return !(a == b);
 }

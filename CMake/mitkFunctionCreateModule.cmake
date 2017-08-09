@@ -12,7 +12,6 @@
 #!     PACKAGE_DEPENDS
 #!       PRIVATE Qt5|Xml+Networking
 #!       PUBLIC  ITK|Watershed
-#!     WARNINGS_AS_ERRORS
 #! \endcode
 #!
 #! The <moduleName> parameter specifies the name of the module which is used
@@ -95,7 +94,7 @@
 #!        symbols will be exported
 #! \param NO_INIT Do not create CppMicroServices initialization code
 #! \param NO_FEATURE_INFO Do not create a feature info by calling add_feature_info()
-#! \param WARNINGS_AS_ERRORS Treat compiler warnings as errors
+#! \param WARNINGS_NO_ERRORS Do not treat compiler warnings as errors
 #
 ##################################################################
 function(mitk_create_module)
@@ -131,7 +130,7 @@ function(mitk_create_module)
       NO_DEFAULT_INCLUDE_DIRS # do not add default include directories like "include" or "."
       NO_INIT                # do not create CppMicroServices initialization code
       NO_FEATURE_INFO        # do not create a feature info by calling add_feature_info()
-      WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
+      WARNINGS_NO_ERRORS     # do not treat compiler warnings as errors
       EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
       C_MODULE               # compile all source files as C sources
       CXX_MODULE             # compile all source files as C++ sources
@@ -339,7 +338,7 @@ function(mitk_create_module)
       set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
     endif()
 
-    if(MODULE_WARNINGS_AS_ERRORS)
+    if(NOT MODULE_WARNINGS_NO_ERRORS)
       if(MSVC_VERSION)
         mitkFunctionCheckCAndCXXCompilerFlags("/WX" module_c_flags module_cxx_flags)
       else()
@@ -365,7 +364,7 @@ function(mitk_create_module)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" module_c_flags module_cxx_flags)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" module_c_flags module_cxx_flags)
       endif()
-    endif(MODULE_WARNINGS_AS_ERRORS)
+    endif()
 
     if(MODULE_FORCE_STATIC)
       set(_STATIC STATIC)
@@ -404,7 +403,7 @@ function(mitk_create_module)
       endif()
     endif()
 
-    if(MITK_USE_QT)
+    if(MITK_USE_Qt5)
       if(UI_FILES)
         qt5_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
       endif()

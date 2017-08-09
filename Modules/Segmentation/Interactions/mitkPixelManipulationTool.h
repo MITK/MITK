@@ -29,23 +29,21 @@ namespace mitk
   {
   public:
     mitkClassMacro(PixelManipulationTool, Tool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    void SetValue( int value );
+      void SetValue(int value);
     int GetValue();
 
-    void SetFixedValue( int value );
+    void SetFixedValue(int value);
     int GetFixedValue();
 
-    virtual const char* GetName() const override;
-    virtual const char** GetXPM() const override;
+    virtual const char *GetName() const override;
+    virtual const char **GetXPM() const override;
 
     virtual void Activated() override;
     virtual void Deactivated() override;
 
     virtual void CalculateImage();
-
 
   protected:
     PixelManipulationTool();
@@ -55,11 +53,14 @@ namespace mitk
     void AddImageToDataStorage(itk::SmartPointer<mitk::Image> image);
 
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKPixelManipulation( itk::Image<TPixel, VImageDimension>* originalImage, Image* maskImage, Image* newImage, int newValue);
+    void ITKPixelManipulation(itk::Image<TPixel, VImageDimension> *originalImage,
+                              Image *maskImage,
+                              Image *newImage,
+                              int newValue);
 
     mitk::DataNode::Pointer m_OriginalImageNode;
     int m_Value;
     bool m_FixedValue;
-  };//clas
-}//namespace
+  }; // clas
+} // namespace
 #endif

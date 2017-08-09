@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class MITKXNAT_EXPORT QmitkHttpStatusCodeHandler final
 {
-
 public:
   static bool HandleErrorMessage(const char *_errorMsg);
 

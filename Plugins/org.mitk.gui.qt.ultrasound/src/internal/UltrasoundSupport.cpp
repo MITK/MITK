@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
+#include <berryIWorkbenchPage.h>
 
 //Mitk
 #include <mitkDataNode.h>
@@ -26,10 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageGenerator.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkRenderingManager.h>
+#include "QmitkRegisterClasses.h"
+#include "QmitkRenderWindow.h"
+#include <QApplication>
+#include <QHBoxLayout>
 
 // Qmitk
 #include "UltrasoundSupport.h"
-
 // Qt
 #include <QMessageBox>
 #include <QSettings>
@@ -43,6 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include "usServiceReference.h"
 #include "internal/org_mitk_gui_qt_ultrasound_Activator.h"
+#include "mitkNodePredicateDataType.h"
+#include <mitkRenderingModeProperty.h>
 
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
@@ -97,66 +103,91 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   m_Controls.tabWidget->setTabEnabled(1, false);
 }
 
-#include <mitkRenderingModeProperty.h>
+void UltrasoundSupport::CreateWindows()
+{
+  auto pausViewer = GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.photoacoustics.pausviewer");
+  if (pausViewer != nullptr)
+  {
+    m_PausViewerView = dynamic_cast<QmitkPAUSViewerView*>(pausViewer.GetPointer());
+    m_PausViewerView->SetPADataStorage(m_PADataStorage);
+    m_PausViewerView->SetUSDataStorage(m_USDataStorage);
+
+    m_PausViewerView->InitWindows();
+    m_PausViewerView->SetUltrasoundReference(&m_PausViewerView);
+    UpdateLevelWindows();
+
+    m_ForceRequestUpdateAll = true;
+  }
+}
 
 void UltrasoundSupport::InitNewNode()
 {
   m_Node.push_back(nullptr);
   auto& Node = m_Node.back();
+
   Node = mitk::DataNode::New();
   Node->SetName("No Data received yet ...");
   //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
   mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255, 0);
   Node->SetData(dummyImage);
   m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
-  UpdateColormaps();
 
+  // Add to Control Datastorage
   this->GetDataStorage()->Add(Node);
+
+  // Add to Display Datastorage
+  if (m_Node.size() > 1)
+    m_USDataStorage->Add(Node);
+  else if (m_Node.size() == 1)
+    m_PADataStorage->Add(Node);
 }
 
 void UltrasoundSupport::DestroyLastNode()
 {
   auto& Node = m_Node.back();
-  this->GetDataStorage()->Remove(Node);
+
+  // Remove from Control Datastorage
+  this->GetDataStorage()->Remove(Node); 
+
+  // Remove from Display Datastorage
+  if (m_Node.size() > 1)
+    m_USDataStorage->Remove(Node);
+  else if (m_Node.size() == 1)
+    m_PADataStorage->Remove(Node);
+
+  // clean up
   Node->ReleaseData();
   m_Node.pop_back();
-  UpdateColormaps();
 }
 
-
-void UltrasoundSupport::UpdateColormaps()
+void UltrasoundSupport::UpdateLevelWindows()
 {
-  // we update here both the colormaps of the nodes, as well as the
-  // level window for the current dynamic range
   mitk::LevelWindow levelWindow;
 
   if (m_Node.size() > 1)
   {
-    for (int index = 0; index < m_AmountOfOutputs - 1; ++index)
+    for (unsigned int index = 0; index < m_AmountOfOutputs; ++index)
     {
-      SetColormap(m_Node.at(index), mitk::LookupTable::LookupTableType::GRAYSCALE);
       m_Node.at(index)->GetLevelWindow(levelWindow);
-      if (!m_Image->IsEmpty())
-        levelWindow.SetAuto(m_Image, true, true);
+      if (!m_curOutput.at(index)->IsEmpty())
+        //levelWindow.SetWindowBounds(0, 4 * (index+1));
+        levelWindow.SetToImageRange(m_curOutput.at(index));
       m_Node.at(index)->SetLevelWindow(levelWindow);
     }
-    SetColormap(m_Node.back(), mitk::LookupTable::LookupTableType::JET_TRANSPARENT);
-    m_Node.back()->GetLevelWindow(levelWindow);
-    levelWindow.SetWindowBounds(10, 150, true);
-    m_Node.back()->SetLevelWindow(levelWindow);
   }
   else if (m_Node.size() == 1)
   {
-    SetColormap(m_Node.back(), mitk::LookupTable::LookupTableType::GRAYSCALE);
     m_Node.back()->GetLevelWindow(levelWindow);
-    if (!m_Image->IsEmpty())
-      levelWindow.SetAuto(m_Image, true, true);
+    if (!m_curOutput.at(0)->IsEmpty())
+      levelWindow.SetToImageRange(m_curOutput.at(0));
     m_Node.back()->SetLevelWindow(levelWindow);
   }
-  
 }
+
 void UltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type)
 {
+  // consider removing this, unused for now, and probably forever
+
   mitk::LookupTable::Pointer lookupTable = mitk::LookupTable::New();
   mitk::LookupTableProperty::Pointer lookupTableProperty = mitk::LookupTableProperty::New();
   lookupTable->SetType(type);
@@ -187,7 +218,7 @@ void UltrasoundSupport::OnClickedEditDevice()
 void UltrasoundSupport::UpdateAmountOfOutputs()
 {
   // Update the amount of Nodes; there should be one Node for every slide that is set. Note that we must check whether the slices are set, 
-  // just using the m_Image->dimension(3) will produce nulltpointers on slices of the image that were not set
+  // just using the m_Image->dimension(3) will produce nullpointers on slices of the image that were not set
   bool isSet = true;
   m_AmountOfOutputs = 0;
   while (isSet) {
@@ -235,7 +266,7 @@ void UltrasoundSupport::UpdateImage()
       return;
     // if there is no image to be displayed, skip the rest of this method
 
-    for (int index = 0; index < m_AmountOfOutputs; ++index)
+    for (unsigned int index = 0; index < m_AmountOfOutputs; ++index)
     {
       if (m_curOutput.at(index)->GetDimension(0) != m_Image->GetDimension(0) ||
         m_curOutput.at(index)->GetDimension(1) != m_Image->GetDimension(1) ||
@@ -250,7 +281,7 @@ void UltrasoundSupport::UpdateImage()
 
       if (!m_Image->IsEmpty())
       {
-        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(m_AmountOfOutputs-index-1,0,0,nullptr,mitk::Image::ReferenceMemory));
+        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index,0,0,nullptr,mitk::Image::ReferenceMemory));
         // just reference the slices, to get a small performance gain
         m_curOutput.at(index)->SetSlice(inputReadAccessor.GetData());
         m_curOutput.at(index)->GetGeometry()->SetIndexToWorldTransform(m_Image->GetSlicedGeometry()->GetIndexToWorldTransform());
@@ -275,14 +306,20 @@ void UltrasoundSupport::UpdateImage()
       }
     }
 
+    float eps = 0.000001f;
     // if the geometry changed: reinitialize the ultrasound image. we use the m_curOutput.at(0) to readjust the geometry
-    if ((m_OldGeometry.IsNotNull()) &&
-      (m_curOutput.at(0)->GetGeometry() != NULL) &&
-      (!mitk::Equal(m_OldGeometry.GetPointer(), m_curOutput.at(0)->GetGeometry(), 0.0001, false))
-      )
+    if (((m_OldGeometry.IsNotNull()) &&
+          (m_curOutput.at(0)->GetGeometry() != nullptr)) &&
+      (
+        (abs(m_OldGeometry->GetSpacing()[0] - m_curOutput.at(0)->GetGeometry()->GetSpacing()[0]) > eps )||
+        (abs(m_OldGeometry->GetSpacing()[1] - m_curOutput.at(0)->GetGeometry()->GetSpacing()[1]) > eps )||
+        (abs(m_OldGeometry->GetCenter()[0] - m_curOutput.at(0)->GetGeometry()->GetCenter()[0]) > eps) ||
+        (abs(m_OldGeometry->GetCenter()[1] - m_curOutput.at(0)->GetGeometry()->GetCenter()[1]) > eps) ||
+        m_ForceRequestUpdateAll))
     {
+      MITK_INFO << "now";
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-      if ((renderWindow != NULL) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
+      if ((renderWindow != nullptr) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
       {
         renderWindow->GetRenderingManager()->InitializeViews(
           m_curOutput.at(0)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -291,6 +328,8 @@ void UltrasoundSupport::UpdateImage()
       m_CurrentImageWidth = m_curOutput.at(0)->GetDimension(0);
       m_CurrentImageHeight = m_curOutput.at(0)->GetDimension(1);
       m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_curOutput.at(0)->GetGeometry());
+      UpdateLevelWindows();
+      m_ForceRequestUpdateAll = false;
     }
   }
 
@@ -316,9 +355,23 @@ void UltrasoundSupport::RenderImage2d()
 {
   if (!m_Controls.m_Update2DView->isChecked())
     return;
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-  renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
+
+  if (m_PausViewerView != nullptr)
+  {
+    auto renderingManager = mitk::RenderingManager::GetInstance();
+    renderingManager->RequestUpdate(m_PausViewerView->GetPARenderWindow());
+    renderingManager->RequestUpdate(m_PausViewerView->GetUSRenderWindow());
+  }
+  else
+  {
+    CreateWindows(); // try to check whether the PausViwer has been opened by now
+  }
+
+  //mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  //renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
+  // TODO: figure out how to proceed with the standard display
   //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+
   m_FrameCounter2d++;
   if (m_FrameCounter2d >= 10)
   {
@@ -388,6 +441,9 @@ void UltrasoundSupport::OnChangedActiveDevice()
   }
   m_Node.clear();
 
+  // disconnect from the PausViewer
+  m_PausViewerView = nullptr;
+
   //get current device, abort if it is invalid
   m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
   if (m_Device.IsNull())
@@ -414,6 +470,9 @@ void UltrasoundSupport::OnChangedActiveDevice()
   {
     m_Controls.m_TimerWidget->setEnabled(false);
   }
+
+  // connect to PausViewer and Set it up
+  CreateWindows();
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
@@ -515,7 +574,7 @@ void UltrasoundSupport::RemoveControlWidgets()
 
 void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
-  if (m_Device.IsNull() || event.getType() != us::ServiceEvent::MODIFIED)
+  if (m_Device.IsNull() || event.getType() != static_cast<ctkServiceEvent::Type>(us::ServiceEvent::MODIFIED))
   {
     return;
   }
@@ -552,7 +611,8 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 UltrasoundSupport::UltrasoundSupport()
   : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
-  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0)
+  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0),
+  m_PADataStorage(mitk::StandaloneDataStorage::New()), m_USDataStorage(mitk::StandaloneDataStorage::New()), m_ForceRequestUpdateAll(false)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 
@@ -568,21 +628,18 @@ UltrasoundSupport::~UltrasoundSupport()
 {
   try
   {
+    StoreUISettings();
     StopTimers();
 
     // Get all active devicesand deactivate them to prevent freeze
-    std::vector<mitk::USDevice*> devices = this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>();
-    for (int i = 0; i < devices.size(); i++)
+    for (auto device : this->m_Controls.m_ActiveVideoDevices->GetAllServices<mitk::USDevice>())
     {
-      mitk::USDevice::Pointer device = devices[i];
-      if (device.IsNotNull() && device->GetIsActive())
+      if (device != nullptr && device->GetIsActive())
       {
         device->Deactivate();
         device->Disconnect();
       }
     }
-
-    StoreUISettings();
   }
   catch (std::exception &e)
   {

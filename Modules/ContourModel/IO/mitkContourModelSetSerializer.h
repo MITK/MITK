@@ -1,27 +1,23 @@
 #ifndef MITKCONTOURMODELSETSERIALIZER_H
 #define MITKCONTOURMODELSETSERIALIZER_H
 
-#include <mitkBaseDataSerializer.h>
 #include <MitkContourModelExports.h>
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {
+  class MITKCONTOURMODEL_EXPORT ContourModelSetSerializer : public BaseDataSerializer
+  {
+  public:
+    mitkClassMacro(ContourModelSetSerializer, BaseDataSerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-class MITKCONTOURMODEL_EXPORT ContourModelSetSerializer : public BaseDataSerializer
-{
-public:
-  mitkClassMacro(ContourModelSetSerializer, BaseDataSerializer);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+      virtual std::string Serialize() override;
 
-  virtual std::string Serialize() override;
-
-protected:
-
-  ContourModelSetSerializer();
-  virtual ~ContourModelSetSerializer();
-};
-
+  protected:
+    ContourModelSetSerializer();
+    virtual ~ContourModelSetSerializer();
+  };
 }
 
 #endif // MITKCONTOURMODELSETSERIALIZER_H

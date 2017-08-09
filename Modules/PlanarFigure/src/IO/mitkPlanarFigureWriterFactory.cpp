@@ -23,74 +23,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-template <class T>
-class CreatePlanarFigureWriter : public itk::CreateObjectFunctionBase
-{
-public:
-
-  /** Standard class typedefs. */
-  typedef CreatePlanarFigureWriter  Self;
-  typedef itk::SmartPointer<Self>    Pointer;
-
-  /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self)
-  LightObject::Pointer CreateObject() override
+  template <class T>
+  class CreatePlanarFigureWriter : public itk::CreateObjectFunctionBase
   {
-    typename T::Pointer p = T::New();
-    p->Register();
-    return p.GetPointer();
+  public:
+    /** Standard class typedefs. */
+    typedef CreatePlanarFigureWriter Self;
+    typedef itk::SmartPointer<Self> Pointer;
+
+    /** Methods from itk:LightObject. */
+    itkFactorylessNewMacro(Self) LightObject::Pointer CreateObject() override
+    {
+      typename T::Pointer p = T::New();
+      p->Register();
+      return p.GetPointer();
+    }
+
+  protected:
+    CreatePlanarFigureWriter() {}
+    ~CreatePlanarFigureWriter() {}
+  private:
+    CreatePlanarFigureWriter(const Self &); // purposely not implemented
+    void operator=(const Self &);           // purposely not implemented
+  };
+
+  PlanarFigureWriterFactory::PlanarFigureWriterFactory()
+  {
+    this->RegisterOverride("IOWriter",
+                           "PlanarFigureWriter",
+                           "PlanarFigure xml Writer",
+                           1,
+                           mitk::CreatePlanarFigureWriter<mitk::PlanarFigureWriter>::New());
   }
 
-protected:
-  CreatePlanarFigureWriter() {}
-  ~CreatePlanarFigureWriter() {}
-
-private:
-  CreatePlanarFigureWriter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
-
-PlanarFigureWriterFactory::PlanarFigureWriterFactory()
-{
-  this->RegisterOverride("IOWriter",
-                         "PlanarFigureWriter",
-                         "PlanarFigure xml Writer",
-                         1,
-                         mitk::CreatePlanarFigureWriter< mitk::PlanarFigureWriter >::New());
-}
-
-PlanarFigureWriterFactory::~PlanarFigureWriterFactory()
-{
-}
-
-itk::ObjectFactoryBase::Pointer PlanarFigureWriterFactory::GetInstance()
-{
-  static itk::ObjectFactoryBase::Pointer factory(mitk::PlanarFigureWriterFactory::New().GetPointer());
-  return factory;
-}
-
-void PlanarFigureWriterFactory::RegisterOneFactory(void)
-{
-  if ( GetInstance()->GetReferenceCount() == 1 )
+  PlanarFigureWriterFactory::~PlanarFigureWriterFactory() {}
+  itk::ObjectFactoryBase::Pointer PlanarFigureWriterFactory::GetInstance()
   {
-    ObjectFactoryBase::RegisterFactory( GetInstance().GetPointer() );
+    static itk::ObjectFactoryBase::Pointer factory(mitk::PlanarFigureWriterFactory::New().GetPointer());
+    return factory;
   }
-}
 
-void PlanarFigureWriterFactory::UnRegisterOneFactory(void)
-{
-  ObjectFactoryBase::UnRegisterFactory( GetInstance().GetPointer() );
-}
+  void PlanarFigureWriterFactory::RegisterOneFactory(void)
+  {
+    if (GetInstance()->GetReferenceCount() == 1)
+    {
+      ObjectFactoryBase::RegisterFactory(GetInstance().GetPointer());
+    }
+  }
 
-const char* PlanarFigureWriterFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
+  void PlanarFigureWriterFactory::UnRegisterOneFactory(void)
+  {
+    ObjectFactoryBase::UnRegisterFactory(GetInstance().GetPointer());
+  }
 
-const char* PlanarFigureWriterFactory::GetDescription() const
-{
-  return "PlanarFigureWriterFactory";
-}
-
+  const char *PlanarFigureWriterFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *PlanarFigureWriterFactory::GetDescription() const { return "PlanarFigureWriterFactory"; }
 } // end namespace mitk

@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPointSet.h"
-#include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
+#include "mitkPointOperation.h"
 
-#include <mitkNumericTypes.h>
 #include <iomanip>
+#include <mitkNumericTypes.h>
 
 mitk::PointSet::PointSet() : m_CalculateBoundingBox(true)
 {
@@ -28,28 +27,24 @@ mitk::PointSet::PointSet() : m_CalculateBoundingBox(true)
 }
 
 mitk::PointSet::PointSet(const PointSet &other)
-  : BaseData(other)
-  , m_PointSetSeries(other.GetPointSetSeriesSize())
-  , m_CalculateBoundingBox(true)
+  : BaseData(other), m_PointSetSeries(other.GetPointSetSeriesSize()), m_CalculateBoundingBox(true)
 {
+  // Copy points
+  for (std::size_t t = 0; t < m_PointSetSeries.size(); ++t)
+  {
+    m_PointSetSeries[t] = DataType::New();
 
-   // Copy points
-   for (std::size_t t = 0; t < m_PointSetSeries.size(); ++t)
-   {
-     m_PointSetSeries[t] = DataType::New();
-
-     DataType::Pointer otherPts = other.GetPointSet(t);
-     for (PointsConstIterator i = other.Begin(t);
-          i != other.End(t); ++i)
+    DataType::Pointer otherPts = other.GetPointSet(t);
+    for (PointsConstIterator i = other.Begin(t); i != other.End(t); ++i)
+    {
+      m_PointSetSeries[t]->SetPoint(i.Index(), i.Value());
+      PointDataType pointData;
+      if (otherPts->GetPointData(i.Index(), &pointData))
       {
-       m_PointSetSeries[t]->SetPoint(i.Index(), i.Value());
-       PointDataType pointData;
-       if (otherPts->GetPointData(i.Index(), &pointData))
-       {
-         m_PointSetSeries[t]->SetPointData(i.Index(), pointData);
-       }
+        m_PointSetSeries[t]->SetPointData(i.Index(), pointData);
       }
-   }
+    }
+  }
 }
 
 mitk::PointSet::~PointSet()
@@ -65,11 +60,11 @@ void mitk::PointSet::ClearData()
 
 void mitk::PointSet::InitializeEmpty()
 {
-  m_PointSetSeries.resize( 1 );
+  m_PointSetSeries.resize(1);
 
   m_PointSetSeries[0] = DataType::New();
   PointDataContainer::Pointer pointData = PointDataContainer::New();
-  m_PointSetSeries[0]->SetPointData( pointData );
+  m_PointSetSeries[0]->SetPointData(pointData);
   m_CalculateBoundingBox = false;
 
   Superclass::InitializeTimeGeometry(1);
@@ -83,7 +78,7 @@ bool mitk::PointSet::IsEmptyTimeStep(unsigned int t) const
   return IsInitialized() && (GetSize(t) == 0);
 }
 
-void mitk::PointSet::Expand( unsigned int timeSteps )
+void mitk::PointSet::Expand(unsigned int timeSteps)
 {
   // Check if the vector is long enough to contain the new element
   // at the given position. If not, expand it with sufficient pre-initialized
@@ -95,35 +90,33 @@ void mitk::PointSet::Expand( unsigned int timeSteps )
 
   unsigned int oldSize = m_PointSetSeries.size();
 
-  if ( timeSteps > oldSize )
+  if (timeSteps > oldSize)
   {
-    Superclass::Expand( timeSteps );
+    Superclass::Expand(timeSteps);
 
-    m_PointSetSeries.resize( timeSteps );
-    for ( unsigned int i = oldSize; i < timeSteps; ++i )
+    m_PointSetSeries.resize(timeSteps);
+    for (unsigned int i = oldSize; i < timeSteps; ++i)
     {
       m_PointSetSeries[i] = DataType::New();
       PointDataContainer::Pointer pointData = PointDataContainer::New();
-      m_PointSetSeries[i]->SetPointData( pointData );
+      m_PointSetSeries[i]->SetPointData(pointData);
     }
 
-    //if the size changes, then compute the bounding box
+    // if the size changes, then compute the bounding box
     m_CalculateBoundingBox = true;
 
-    this->InvokeEvent( PointSetExtendTimeRangeEvent() );
+    this->InvokeEvent(PointSetExtendTimeRangeEvent());
   }
 }
-
 
 unsigned int mitk::PointSet::GetPointSetSeriesSize() const
 {
   return m_PointSetSeries.size();
 }
 
-
-int mitk::PointSet::GetSize( unsigned int t ) const
+int mitk::PointSet::GetSize(unsigned int t) const
 {
-  if ( t < m_PointSetSeries.size() )
+  if (t < m_PointSetSeries.size())
   {
     return m_PointSetSeries[t]->GetNumberOfPoints();
   }
@@ -133,9 +126,9 @@ int mitk::PointSet::GetSize( unsigned int t ) const
   }
 }
 
-mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet( int t ) const
+mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet(int t) const
 {
-  if ( t < (int)m_PointSetSeries.size() )
+  if (t < (int)m_PointSetSeries.size())
   {
     return m_PointSetSeries[t];
   }
@@ -145,7 +138,7 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet( int t ) const
   }
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::Begin( int t )
+mitk::PointSet::PointsIterator mitk::PointSet::Begin(int t)
 {
   if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
   {
@@ -163,7 +156,7 @@ mitk::PointSet::PointsConstIterator mitk::PointSet::Begin(int t) const
   return m_EmptyPointsContainer->End();
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::End( int t )
+mitk::PointSet::PointsIterator mitk::PointSet::End(int t)
 {
   if (t >= 0 && t < static_cast<int>(m_PointSetSeries.size()))
   {
@@ -181,29 +174,29 @@ mitk::PointSet::PointsConstIterator mitk::PointSet::End(int t) const
   return m_EmptyPointsContainer->End();
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::GetMaxId( int t )
+mitk::PointSet::PointsIterator mitk::PointSet::GetMaxId(int t)
 {
-  if ( (unsigned int) t >= m_PointSetSeries.size() )
+  if ((unsigned int)t >= m_PointSetSeries.size())
   {
     return m_EmptyPointsContainer->End();
   }
 
-  return this->Begin( t ) == this->End( t ) ? this->End( t ) : --End( t );
+  return this->Begin(t) == this->End(t) ? this->End(t) : --End(t);
 }
 
-int mitk::PointSet::SearchPoint( Point3D point, ScalarType distance, int t  ) const
+int mitk::PointSet::SearchPoint(Point3D point, ScalarType distance, int t) const
 {
-  if ( t >= (int)m_PointSetSeries.size() )
+  if (t >= (int)m_PointSetSeries.size())
   {
     return -1;
   }
 
   // Out is the point which is checked to be the searched point
   PointType out;
-  out.Fill( 0 );
+  out.Fill(0);
   PointType indexPoint;
 
-  this->GetGeometry( t )->WorldToIndex(point, indexPoint);
+  this->GetGeometry(t)->WorldToIndex(point, indexPoint);
 
   // Searching the first point in the Set, that is +- distance far away fro
   // the given point
@@ -222,51 +215,50 @@ int mitk::PointSet::SearchPoint( Point3D point, ScalarType distance, int t  ) co
   ScalarType bestDist = distance;
   ScalarType dist, tmp;
 
-  for ( it = m_PointSetSeries[t]->GetPoints()->Begin(), i = 0;
-        it != end;
-        ++it, ++i )
+  for (it = m_PointSetSeries[t]->GetPoints()->Begin(), i = 0; it != end; ++it, ++i)
   {
-    bool ok = m_PointSetSeries[t]->GetPoints()
-      ->GetElementIfIndexExists( it->Index(), &out );
+    bool ok = m_PointSetSeries[t]->GetPoints()->GetElementIfIndexExists(it->Index(), &out);
 
-    if ( !ok )
+    if (!ok)
     {
       return -1;
     }
-    else if ( indexPoint == out ) //if totally equal
+    else if (indexPoint == out) // if totally equal
     {
       return it->Index();
     }
 
-    //distance calculation
-    tmp = out[0] - indexPoint[0]; dist  = tmp * tmp;
-    tmp = out[1] - indexPoint[1]; dist += tmp * tmp;
-    tmp = out[2] - indexPoint[2]; dist += tmp * tmp;
+    // distance calculation
+    tmp = out[0] - indexPoint[0];
+    dist = tmp * tmp;
+    tmp = out[1] - indexPoint[1];
+    dist += tmp * tmp;
+    tmp = out[2] - indexPoint[2];
+    dist += tmp * tmp;
 
-    if ( dist < bestDist )
+    if (dist < bestDist)
     {
       bestIndex = it->Index();
-      bestDist  = dist;
+      bestDist = dist;
     }
   }
   return bestIndex;
 }
 
-mitk::PointSet::PointType
-mitk::PointSet::GetPoint( PointIdentifier id, int t ) const
+mitk::PointSet::PointType mitk::PointSet::GetPoint(PointIdentifier id, int t) const
 {
   PointType out;
   out.Fill(0);
 
-  if ( (unsigned int) t >= m_PointSetSeries.size() )
+  if ((unsigned int)t >= m_PointSetSeries.size())
   {
     return out;
   }
 
-  if ( m_PointSetSeries[t]->GetPoints()->IndexExists(id) )
+  if (m_PointSetSeries[t]->GetPoints()->IndexExists(id))
   {
-    m_PointSetSeries[t]->GetPoint( id, &out );
-    this->GetGeometry(t)->IndexToWorld( out, out );
+    m_PointSetSeries[t]->GetPoint(id, &out);
+    this->GetGeometry(t)->IndexToWorld(out, out);
     return out;
   }
   else
@@ -275,19 +267,16 @@ mitk::PointSet::GetPoint( PointIdentifier id, int t ) const
   }
 }
 
-
-bool
-mitk::PointSet
-::GetPointIfExists( PointIdentifier id, PointType* point, int t ) const
+bool mitk::PointSet::GetPointIfExists(PointIdentifier id, PointType *point, int t) const
 {
-  if ( (unsigned int) t >= m_PointSetSeries.size() )
+  if ((unsigned int)t >= m_PointSetSeries.size())
   {
     return false;
   }
 
-  if ( m_PointSetSeries[t]->GetPoints()->GetElementIfIndexExists(id, point) )
+  if (m_PointSetSeries[t]->GetPoints()->GetElementIfIndexExists(id, point))
   {
-    this->GetGeometry( t )->IndexToWorld( *point, *point );
+    this->GetGeometry(t)->IndexToWorld(*point, *point);
     return true;
   }
   else
@@ -296,117 +285,113 @@ mitk::PointSet
   }
 }
 
-
-void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
+void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, int t)
 {
   // Adapt the size of the data vector if necessary
-  this->Expand( t+1 );
+  this->Expand(t + 1);
 
   mitk::Point3D indexPoint;
-  this->GetGeometry( t )->WorldToIndex( point, indexPoint );
-  m_PointSetSeries[t]->SetPoint( id, indexPoint );
+  this->GetGeometry(t)->WorldToIndex(point, indexPoint);
+  m_PointSetSeries[t]->SetPoint(id, indexPoint);
   PointDataType defaultPointData;
   defaultPointData.id = id;
   defaultPointData.selected = false;
   defaultPointData.pointSpec = mitk::PTUNDEFINED;
 
-  m_PointSetSeries[t]->SetPointData( id, defaultPointData );
-  //boundingbox has to be computed anyway
+  m_PointSetSeries[t]->SetPointData(id, defaultPointData);
+  // boundingbox has to be computed anyway
   m_CalculateBoundingBox = true;
   this->Modified();
 }
 
-
-void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t )
+void mitk::PointSet::SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t)
 {
   // Adapt the size of the data vector if necessary
-  this->Expand( t+1 );
+  this->Expand(t + 1);
 
   mitk::Point3D indexPoint;
-  this->GetGeometry( t )->WorldToIndex( point, indexPoint );
-  m_PointSetSeries[t]->SetPoint( id, indexPoint );
+  this->GetGeometry(t)->WorldToIndex(point, indexPoint);
+  m_PointSetSeries[t]->SetPoint(id, indexPoint);
   PointDataType defaultPointData;
   defaultPointData.id = id;
   defaultPointData.selected = false;
   defaultPointData.pointSpec = spec;
-  m_PointSetSeries[t]->SetPointData( id, defaultPointData );
-  //boundingbox has to be computed anyway
+  m_PointSetSeries[t]->SetPointData(id, defaultPointData);
+  // boundingbox has to be computed anyway
   m_CalculateBoundingBox = true;
   this->Modified();
 }
 
-
-void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
+void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, int t)
 {
   this->InsertPoint(id, point, mitk::PTUNDEFINED, t);
 }
 
-
-void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t )
+void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t)
 {
-  if ( (unsigned int) t < m_PointSetSeries.size() )
+  if ((unsigned int)t < m_PointSetSeries.size())
   {
     mitk::Point3D indexPoint;
-    mitk::BaseGeometry* tempGeometry = this->GetGeometry( t );
+    mitk::BaseGeometry *tempGeometry = this->GetGeometry(t);
     if (tempGeometry == nullptr)
     {
-      MITK_INFO<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
+      MITK_INFO << __FILE__ << ", l." << __LINE__ << ": GetGeometry of " << t << " returned nullptr!" << std::endl;
       return;
     }
-    tempGeometry->WorldToIndex( point, indexPoint );
-    m_PointSetSeries[t]->GetPoints()->InsertElement( id, indexPoint );
+    tempGeometry->WorldToIndex(point, indexPoint);
+    m_PointSetSeries[t]->GetPoints()->InsertElement(id, indexPoint);
     PointDataType defaultPointData;
     defaultPointData.id = id;
     defaultPointData.selected = false;
     defaultPointData.pointSpec = spec;
     m_PointSetSeries[t]->GetPointData()->InsertElement(id, defaultPointData);
 
-    //boundingbox has to be computed anyway
+    // boundingbox has to be computed anyway
     m_CalculateBoundingBox = true;
     this->Modified();
   }
 }
 
-mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint( PointType point, int t )
+mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint(PointType point, int t)
 {
-    // Adapt the size of the data vector if necessary
-    this->Expand( t+1 );
+  // Adapt the size of the data vector if necessary
+  this->Expand(t + 1);
 
-    PointIdentifier id = 0;
-    if ( m_PointSetSeries[t]->GetNumberOfPoints() > 0 )
-    {
-        PointsIterator it = --End( t );
-        id = it.Index();
-        ++id;
-    }
+  PointIdentifier id = 0;
+  if (m_PointSetSeries[t]->GetNumberOfPoints() > 0)
+  {
+    PointsIterator it = --End(t);
+    id = it.Index();
+    ++id;
+  }
 
-    mitk::Point3D indexPoint;
-    this->GetGeometry( t )->WorldToIndex( point, indexPoint );
-    m_PointSetSeries[t]->SetPoint( id, indexPoint );
-    PointDataType defaultPointData;
-    defaultPointData.id = id;
-    defaultPointData.selected = false;
-    defaultPointData.pointSpec = mitk::PTUNDEFINED;
+  mitk::Point3D indexPoint;
+  this->GetGeometry(t)->WorldToIndex(point, indexPoint);
+  m_PointSetSeries[t]->SetPoint(id, indexPoint);
+  PointDataType defaultPointData;
+  defaultPointData.id = id;
+  defaultPointData.selected = false;
+  defaultPointData.pointSpec = mitk::PTUNDEFINED;
 
-    m_PointSetSeries[t]->SetPointData( id, defaultPointData );
-    //boundingbox has to be computed anyway
-    m_CalculateBoundingBox = true;
-    this->Modified();
+  m_PointSetSeries[t]->SetPointData(id, defaultPointData);
+  // boundingbox has to be computed anyway
+  m_CalculateBoundingBox = true;
+  this->Modified();
 
-    return id;
+  return id;
 }
 
-bool mitk::PointSet::RemovePointIfExists( PointIdentifier id, int t )
+bool mitk::PointSet::RemovePointIfExists(PointIdentifier id, int t)
 {
-  if ( (unsigned int) t < m_PointSetSeries.size() )
+  if ((unsigned int)t < m_PointSetSeries.size())
   {
-    DataType* pointSet = m_PointSetSeries[ t ];
+    DataType *pointSet = m_PointSetSeries[t];
 
-    PointsContainer* points = pointSet->GetPoints();
-    PointDataContainer* pdata = pointSet->GetPointData();
+    PointsContainer *points = pointSet->GetPoints();
+    PointDataContainer *pdata = pointSet->GetPointData();
 
-    bool exists = points->IndexExists( id );
-    if ( exists )
+    bool exists = points->IndexExists(id);
+    if (exists)
     {
       points->DeleteIndex(id);
       pdata->DeleteIndex(id);
@@ -416,19 +401,19 @@ bool mitk::PointSet::RemovePointIfExists( PointIdentifier id, int t )
   return false;
 }
 
-mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd( int t )
+mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd(int t)
 {
-  if ( (unsigned int) t < m_PointSetSeries.size() )
+  if ((unsigned int)t < m_PointSetSeries.size())
   {
-    DataType* pointSet = m_PointSetSeries[ t ];
+    DataType *pointSet = m_PointSetSeries[t];
 
-    PointsContainer* points = pointSet->GetPoints();
-    PointDataContainer* pdata = pointSet->GetPointData();
+    PointsContainer *points = pointSet->GetPoints();
+    PointDataContainer *pdata = pointSet->GetPointData();
 
     PointsIterator bit = points->Begin();
     PointsIterator eit = points->End();
 
-    if ( eit != bit )
+    if (eit != bit)
     {
       PointsContainer::ElementIdentifier id = (--eit).Index();
       points->DeleteIndex(id);
@@ -444,28 +429,28 @@ mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd( int t )
   return m_EmptyPointsContainer->End();
 }
 
-bool mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, int t )
+bool mitk::PointSet::SwapPointPosition(PointIdentifier id, bool moveUpwards, int t)
 {
-  if(IndexExists(id, t) )
+  if (IndexExists(id, t))
   {
-    PointType point = GetPoint(id,t);
+    PointType point = GetPoint(id, t);
 
-    if(moveUpwards)
-    {//up
-      if(IndexExists(id-1,t))
+    if (moveUpwards)
+    { // up
+      if (IndexExists(id - 1, t))
       {
         InsertPoint(id, GetPoint(id - 1, t), t);
-        InsertPoint(id-1,point,t);
+        InsertPoint(id - 1, point, t);
         this->Modified();
         return true;
       }
     }
     else
-    {//down
-      if(IndexExists(id+1,t))
+    { // down
+      if (IndexExists(id + 1, t))
       {
         InsertPoint(id, GetPoint(id + 1, t), t);
-        InsertPoint(id+1,point,t);
+        InsertPoint(id + 1, point, t);
         this->Modified();
         return true;
       }
@@ -474,11 +459,11 @@ bool mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, in
   return false;
 }
 
-bool mitk::PointSet::IndexExists( int position, int t ) const
+bool mitk::PointSet::IndexExists(int position, int t) const
 {
-  if ( (unsigned int) t < m_PointSetSeries.size() )
+  if ((unsigned int)t < m_PointSetSeries.size())
   {
-    return m_PointSetSeries[t]->GetPoints()->IndexExists( position );
+    return m_PointSetSeries[t]->GetPoints()->IndexExists(position);
   }
   else
   {
@@ -486,12 +471,12 @@ bool mitk::PointSet::IndexExists( int position, int t ) const
   }
 }
 
-bool mitk::PointSet::GetSelectInfo( int position, int t ) const
+bool mitk::PointSet::GetSelectInfo(int position, int t) const
 {
-  if ( this->IndexExists( position, t ) )
+  if (this->IndexExists(position, t))
   {
-    PointDataType pointData = { 0, false, PTUNDEFINED };
-    m_PointSetSeries[t]->GetPointData( position, &pointData );
+    PointDataType pointData = {0, false, PTUNDEFINED};
+    m_PointSetSeries[t]->GetPointData(position, &pointData);
     return pointData.selected;
   }
   else
@@ -500,37 +485,36 @@ bool mitk::PointSet::GetSelectInfo( int position, int t ) const
   }
 }
 
-
-void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
+void mitk::PointSet::SetSelectInfo(int position, bool selected, int t)
 {
-  if ( this->IndexExists( position, t ) )
+  if (this->IndexExists(position, t))
   {
     // timeStep to ms
-    TimePointType timeInMS = this->GetTimeGeometry()->TimeStepToTimePoint( t );
+    TimePointType timeInMS = this->GetTimeGeometry()->TimeStepToTimePoint(t);
 
     // point
-    Point3D point = this->GetPoint( position, t );
+    Point3D point = this->GetPoint(position, t);
 
     std::unique_ptr<PointOperation> op;
     if (selected)
     {
-      op.reset(new mitk::PointOperation(OpSELECTPOINT, timeInMS, point, position ));
+      op.reset(new mitk::PointOperation(OpSELECTPOINT, timeInMS, point, position));
     }
     else
     {
-      op.reset(new mitk::PointOperation(OpDESELECTPOINT, timeInMS, point, position ));
+      op.reset(new mitk::PointOperation(OpDESELECTPOINT, timeInMS, point, position));
     }
 
-    this->ExecuteOperation( op.get() );
+    this->ExecuteOperation(op.get());
   }
 }
 
-mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo( int position, int t ) const
+mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo(int position, int t) const
 {
-  if ( this->IndexExists( position, t ) )
+  if (this->IndexExists(position, t))
   {
-    PointDataType pointData = { 0, false, PTUNDEFINED };
-    m_PointSetSeries[t]->GetPointData( position, &pointData );
+    PointDataType pointData = {0, false, PTUNDEFINED};
+    m_PointSetSeries[t]->GetPointData(position, &pointData);
     return pointData.pointSpec;
   }
   else
@@ -539,18 +523,16 @@ mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo( int posit
   }
 }
 
-int mitk::PointSet::GetNumberOfSelected( int t ) const
+int mitk::PointSet::GetNumberOfSelected(int t) const
 {
-  if ( (unsigned int) t >= m_PointSetSeries.size() )
+  if ((unsigned int)t >= m_PointSetSeries.size())
   {
     return 0;
   }
 
   int numberOfSelected = 0;
   PointDataIterator it;
-  for ( it = m_PointSetSeries[t]->GetPointData()->Begin();
-        it != m_PointSetSeries[t]->GetPointData()->End();
-        it++ )
+  for (it = m_PointSetSeries[t]->GetPointData()->Begin(); it != m_PointSetSeries[t]->GetPointData()->End(); it++)
   {
     if (it->Value().selected == true)
     {
@@ -561,20 +543,17 @@ int mitk::PointSet::GetNumberOfSelected( int t ) const
   return numberOfSelected;
 }
 
-
-int mitk::PointSet::SearchSelectedPoint( int t ) const
+int mitk::PointSet::SearchSelectedPoint(int t) const
 {
-  if ( (unsigned int) t >= m_PointSetSeries.size() )
+  if ((unsigned int)t >= m_PointSetSeries.size())
   {
     return -1;
   }
 
   PointDataIterator it;
-  for ( it = m_PointSetSeries[t]->GetPointData()->Begin();
-        it != m_PointSetSeries[t]->GetPointData()->End();
-        it++ )
+  for (it = m_PointSetSeries[t]->GetPointData()->Begin(); it != m_PointSetSeries[t]->GetPointData()->End(); it++)
   {
-    if ( it->Value().selected == true )
+    if (it->Value().selected == true)
     {
       return it->Index();
     }
@@ -582,18 +561,18 @@ int mitk::PointSet::SearchSelectedPoint( int t ) const
   return -1;
 }
 
-void mitk::PointSet::ExecuteOperation( Operation* operation )
+void mitk::PointSet::ExecuteOperation(Operation *operation)
 {
   int timeStep = -1;
 
   mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
 
-  if ( pointOp )
+  if (pointOp)
   {
-    timeStep = this->GetTimeGeometry()->TimePointToTimeStep( pointOp->GetTimeInMS() );
+    timeStep = this->GetTimeGeometry()->TimePointToTimeStep(pointOp->GetTimeInMS());
   }
 
-  if ( timeStep < 0 )
+  if (timeStep < 0)
   {
     MITK_ERROR << "Time step (" << timeStep << ") outside of PointSet time bounds" << std::endl;
     return;
@@ -601,56 +580,52 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
   switch (operation->GetOperationType())
   {
-  case OpNOTHING:
-    break;
+    case OpNOTHING:
+      break;
 
-  case OpINSERT://inserts the point at the given position and selects it.
+    case OpINSERT: // inserts the point at the given position and selects it.
     {
       int position = pointOp->GetIndex();
 
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
 
-      if(timeStep >= (int)this->GetTimeSteps()) this->Expand(timeStep+1);
+      if (timeStep >= (int)this->GetTimeSteps())
+        this->Expand(timeStep + 1);
 
-      //transfer from world to index coordinates
-      mitk::BaseGeometry* geometry = this->GetGeometry( timeStep );
+      // transfer from world to index coordinates
+      mitk::BaseGeometry *geometry = this->GetGeometry(timeStep);
       if (geometry == nullptr)
       {
-        MITK_INFO<<"GetGeometry returned NULL!\n";
+        MITK_INFO << "GetGeometry returned nullptr!\n";
         return;
       }
       geometry->WorldToIndex(pt, pt);
 
       m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position, pt);
 
-      PointDataType pointData =
-      {
-        static_cast<unsigned int>(pointOp->GetIndex()),
-        pointOp->GetSelected(),
-        pointOp->GetPointType()
-      };
+      PointDataType pointData = {
+        static_cast<unsigned int>(pointOp->GetIndex()), pointOp->GetSelected(), pointOp->GetPointType()};
 
-      m_PointSetSeries[timeStep]->GetPointData()
-        ->InsertElement(position, pointData);
+      m_PointSetSeries[timeStep]->GetPointData()->InsertElement(position, pointData);
 
       this->Modified();
 
-      //boundingbox has to be computed
+      // boundingbox has to be computed
       m_CalculateBoundingBox = true;
 
-      this->InvokeEvent( PointSetAddEvent() );
+      this->InvokeEvent(PointSetAddEvent());
       this->OnPointSetChange();
     }
     break;
 
-  case OpMOVE://moves the point given by index
+    case OpMOVE: // moves the point given by index
     {
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
 
-      //transfer from world to index coordinates
-      this->GetGeometry( timeStep )->WorldToIndex(pt, pt);
+      // transfer from world to index coordinates
+      this->GetGeometry(timeStep)->WorldToIndex(pt, pt);
 
       // Copy new point into container
       m_PointSetSeries[timeStep]->SetPoint(pointOp->GetIndex(), pt);
@@ -658,23 +633,23 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       // Insert a default point data object to keep the containers in sync
       // (if no point data object exists yet)
       PointDataType pointData;
-      if ( !m_PointSetSeries[timeStep]->GetPointData( pointOp->GetIndex(), &pointData ) )
+      if (!m_PointSetSeries[timeStep]->GetPointData(pointOp->GetIndex(), &pointData))
       {
-        m_PointSetSeries[timeStep]->SetPointData( pointOp->GetIndex(), pointData );
+        m_PointSetSeries[timeStep]->SetPointData(pointOp->GetIndex(), pointData);
       }
 
       this->OnPointSetChange();
 
       this->Modified();
 
-      //boundingbox has to be computed anyway
+      // boundingbox has to be computed anyway
       m_CalculateBoundingBox = true;
 
-      this->InvokeEvent( PointSetMoveEvent() );
+      this->InvokeEvent(PointSetMoveEvent());
     }
     break;
 
-  case OpREMOVE://removes the point at given by position
+    case OpREMOVE: // removes the point at given by position
     {
       m_PointSetSeries[timeStep]->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
       m_PointSetSeries[timeStep]->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
@@ -682,14 +657,14 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->OnPointSetChange();
 
       this->Modified();
-      //boundingbox has to be computed anyway
+      // boundingbox has to be computed anyway
       m_CalculateBoundingBox = true;
 
-      this->InvokeEvent( PointSetRemoveEvent() );
+      this->InvokeEvent(PointSetRemoveEvent());
     }
     break;
 
-  case OpSELECTPOINT://select the given point
+    case OpSELECTPOINT: // select the given point
     {
       PointDataType pointData = {0, false, PTUNDEFINED};
       m_PointSetSeries[timeStep]->GetPointData(pointOp->GetIndex(), &pointData);
@@ -699,7 +674,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     }
     break;
 
-  case OpDESELECTPOINT://unselect the given point
+    case OpDESELECTPOINT: // unselect the given point
     {
       PointDataType pointData = {0, false, PTUNDEFINED};
       m_PointSetSeries[timeStep]->GetPointData(pointOp->GetIndex(), &pointData);
@@ -709,7 +684,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     }
     break;
 
-  case OpSETPOINTTYPE:
+    case OpSETPOINTTYPE:
     {
       PointDataType pointData = {0, false, PTUNDEFINED};
       m_PointSetSeries[timeStep]->GetPointData(pointOp->GetIndex(), &pointData);
@@ -719,25 +694,26 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     }
     break;
 
-  case OpMOVEPOINTUP: // swap content of point with ID pointOp->GetIndex() with the point preceding it in the container // move point position within the pointset
-    {
-      PointIdentifier currentID = pointOp->GetIndex();
-      /* search for point with this id and point that precedes this one in the data container */
-      PointsContainer::STLContainerType points = m_PointSetSeries[timeStep]->GetPoints()->CastToSTLContainer();
-      auto it = points.find(currentID);
-      if (it == points.end()) // ID not found
-        break;
-      if (it == points.begin()) // we are at the first element, there is no previous element
-        break;
+    case OpMOVEPOINTUP: // swap content of point with ID pointOp->GetIndex() with the point preceding it in the
+                        // container // move point position within the pointset
+      {
+        PointIdentifier currentID = pointOp->GetIndex();
+        /* search for point with this id and point that precedes this one in the data container */
+        PointsContainer::STLContainerType points = m_PointSetSeries[timeStep]->GetPoints()->CastToSTLContainer();
+        auto it = points.find(currentID);
+        if (it == points.end()) // ID not found
+          break;
+        if (it == points.begin()) // we are at the first element, there is no previous element
+          break;
 
-      /* get and cache current point & pointdata and previous point & pointdata */
-      --it;
-      PointIdentifier prevID = it->first;
-      if (this->SwapPointContents(prevID, currentID, timeStep) == true)
-        this->Modified();
-    }
-    break;
-  case OpMOVEPOINTDOWN: // move point position within the pointset
+        /* get and cache current point & pointdata and previous point & pointdata */
+        --it;
+        PointIdentifier prevID = it->first;
+        if (this->SwapPointContents(prevID, currentID, timeStep) == true)
+          this->Modified();
+      }
+      break;
+    case OpMOVEPOINTDOWN: // move point position within the pointset
     {
       PointIdentifier currentID = pointOp->GetIndex();
       /* search for point with this id and point that succeeds this one in the data container */
@@ -756,43 +732,43 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     }
     break;
 
-  default:
-    itkWarningMacro("mitkPointSet could not understrand the operation. Please check!");
-    break;
+    default:
+      itkWarningMacro("mitkPointSet could not understrand the operation. Please check!");
+      break;
   }
 
-  //to tell the mappers, that the data is modified and has to be updated
-  //only call modified if anything is done, so call in cases
-  //this->Modified();
+  // to tell the mappers, that the data is modified and has to be updated
+  // only call modified if anything is done, so call in cases
+  // this->Modified();
 
   mitk::OperationEndEvent endevent(operation);
-  ((const itk::Object*)this)->InvokeEvent(endevent);
+  ((const itk::Object *)this)->InvokeEvent(endevent);
 
   //*todo has to be done here, cause of update-pipeline not working yet
   // As discussed lately, don't mess with the rendering from inside data structures
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  // mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-
 
 void mitk::PointSet::UpdateOutputInformation()
 {
-  if ( this->GetSource( ) )
+  if (this->GetSource())
   {
-      this->GetSource( )->UpdateOutputInformation( );
+    this->GetSource()->UpdateOutputInformation();
   }
 
   //
   // first make sure, that the associated time sliced geometry has
   // the same number of geometry 3d's as PointSets are present
   //
-  TimeGeometry* timeGeometry = GetTimeGeometry();
-  if ( timeGeometry->CountTimeSteps() != m_PointSetSeries.size() )
+  TimeGeometry *timeGeometry = GetTimeGeometry();
+  if (timeGeometry->CountTimeSteps() != m_PointSetSeries.size())
   {
-    itkExceptionMacro(<<"timeGeometry->CountTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
+    itkExceptionMacro(<< "timeGeometry->CountTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with "
+                         "correct number of timeSteps!");
   }
 
   // This is needed to detect zero objects
-  mitk::ScalarType nullpoint[]={0,0,0,0,0,0};
+  mitk::ScalarType nullpoint[] = {0, 0, 0, 0, 0, 0};
   BoundingBox::BoundsArrayType itkBoundsNull(nullpoint);
 
   //
@@ -801,27 +777,26 @@ void mitk::PointSet::UpdateOutputInformation()
   //
   if (m_CalculateBoundingBox)
   {
-    for ( unsigned int i = 0 ; i < m_PointSetSeries.size() ; ++i )
+    for (unsigned int i = 0; i < m_PointSetSeries.size(); ++i)
     {
       const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
       BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
 
-      if ( m_PointSetSeries[i].IsNull() || (m_PointSetSeries[i]->GetNumberOfPoints() == 0)
-        || (itkBounds == itkBoundsNull) )
+      if (m_PointSetSeries[i].IsNull() || (m_PointSetSeries[i]->GetNumberOfPoints() == 0) ||
+          (itkBounds == itkBoundsNull))
       {
         itkBounds = itkBoundsNull;
         continue;
       }
 
       // Ensure minimal bounds of 1.0 in each dimension
-      for ( unsigned int j = 0; j < 3; ++j )
+      for (unsigned int j = 0; j < 3; ++j)
       {
-        if ( itkBounds[j*2+1] - itkBounds[j*2] < 1.0 )
+        if (itkBounds[j * 2 + 1] - itkBounds[j * 2] < 1.0)
         {
-          BoundingBox::CoordRepType center =
-            (itkBounds[j*2] + itkBounds[j*2+1]) / 2.0;
-          itkBounds[j*2] = center - 0.5;
-          itkBounds[j*2+1] = center + 0.5;
+          BoundingBox::CoordRepType center = (itkBounds[j * 2] + itkBounds[j * 2 + 1]) / 2.0;
+          itkBounds[j * 2] = center - 0.5;
+          itkBounds[j * 2 + 1] = center + 0.5;
         }
       }
       this->GetGeometry(i)->SetBounds(itkBounds);
@@ -837,20 +812,19 @@ void mitk::PointSet::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::PointSet::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;
+  return false;
 }
 
 bool mitk::PointSet::VerifyRequestedRegion()
 {
-    return true;
+  return true;
 }
 
-void mitk::PointSet::SetRequestedRegion(const DataObject * )
+void mitk::PointSet::SetRequestedRegion(const DataObject *)
 {
 }
 
-
-void mitk::PointSet::PrintSelf( std::ostream& os, itk::Indent indent ) const
+void mitk::PointSet::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 
@@ -862,12 +836,11 @@ void mitk::PointSet::PrintSelf( std::ostream& os, itk::Indent indent ) const
     MeshType::Pointer ps = *it;
     itk::Indent nextIndent = indent.GetNextIndent();
     ps->Print(os, nextIndent);
-    MeshType::PointsContainer* points = ps->GetPoints();
-    MeshType::PointDataContainer* datas = ps->GetPointData();
+    MeshType::PointsContainer *points = ps->GetPoints();
+    MeshType::PointDataContainer *datas = ps->GetPointData();
     MeshType::PointDataContainer::Iterator dataIterator = datas->Begin();
-    for (MeshType::PointsContainer::Iterator pointIterator = points->Begin();
-      pointIterator != points->End();
-      ++pointIterator, ++dataIterator)
+    for (MeshType::PointsContainer::Iterator pointIterator = points->Begin(); pointIterator != points->End();
+         ++pointIterator, ++dataIterator)
     {
       os << nextIndent << "Point " << pointIterator->Index() << ": [";
       os << pointIterator->Value().GetElement(0);
@@ -876,7 +849,8 @@ void mitk::PointSet::PrintSelf( std::ostream& os, itk::Indent indent ) const
         os << ", " << pointIterator->Value().GetElement(i);
       }
       os << "]";
-      os << ", selected: " << dataIterator->Value().selected << ", point spec: " << dataIterator->Value().pointSpec << "\n";
+      os << ", selected: " << dataIterator->Value().selected << ", point spec: " << dataIterator->Value().pointSpec
+         << "\n";
     }
   }
 }
@@ -904,70 +878,81 @@ bool mitk::PointSet::SwapPointContents(PointIdentifier id1, PointIdentifier id2,
   return true;
 }
 
-bool mitk::PointSet::PointDataType::operator ==(const mitk::PointSet::PointDataType &other) const
+bool mitk::PointSet::PointDataType::operator==(const mitk::PointSet::PointDataType &other) const
 {
   return id == other.id && selected == other.selected && pointSpec == other.pointSpec;
 }
 
-bool mitk::Equal(const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose, bool checkGeometry)
+bool mitk::Equal(const mitk::PointSet *leftHandSide,
+                 const mitk::PointSet *rightHandSide,
+                 mitk::ScalarType eps,
+                 bool verbose,
+                 bool checkGeometry)
 {
-  if((leftHandSide == nullptr) || (rightHandSide == nullptr))
+  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
-    MITK_ERROR << "mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ) does not work with NULL pointer input.";
+    MITK_ERROR << "mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, "
+                  "mitk::ScalarType eps, bool verbose ) does not work with nullptr pointer input.";
     return false;
   }
-  return Equal( *leftHandSide, *rightHandSide, eps, verbose, checkGeometry);
+  return Equal(*leftHandSide, *rightHandSide, eps, verbose, checkGeometry);
 }
 
-bool mitk::Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose , bool checkGeometry)
+bool mitk::Equal(const mitk::PointSet &leftHandSide,
+                 const mitk::PointSet &rightHandSide,
+                 mitk::ScalarType eps,
+                 bool verbose,
+                 bool checkGeometry)
 {
   bool result = true;
 
-  //If comparing point sets from file, you must not compare the geometries, as they are not saved. In other cases, you do need to check them.
+  // If comparing point sets from file, you must not compare the geometries, as they are not saved. In other cases, you
+  // do need to check them.
   if (checkGeometry)
   {
-    if( !mitk::Equal( *leftHandSide.GetGeometry(), *rightHandSide.GetGeometry(), eps, verbose) )
+    if (!mitk::Equal(*leftHandSide.GetGeometry(), *rightHandSide.GetGeometry(), eps, verbose))
     {
-      if(verbose)
+      if (verbose)
         MITK_INFO << "[( PointSet )] Geometries differ.";
       result = false;
     }
   }
 
-
-  if ( leftHandSide.GetSize() != rightHandSide.GetSize())
+  if (leftHandSide.GetSize() != rightHandSide.GetSize())
   {
-    if(verbose)
+    if (verbose)
       MITK_INFO << "[( PointSet )] Number of points differ.";
     result = false;
   }
   else
   {
-    //if the size is equal, we compare the point values
+    // if the size is equal, we compare the point values
     mitk::Point3D pointLeftHandSide;
     mitk::Point3D pointRightHandSide;
 
     int numberOfIncorrectPoints = 0;
 
-    //Iterate over both pointsets in order to compare all points pair-wise
+    // Iterate over both pointsets in order to compare all points pair-wise
     mitk::PointSet::PointsConstIterator end = leftHandSide.End();
-    for( mitk::PointSet::PointsConstIterator pointSetIteratorLeft = leftHandSide.Begin(), pointSetIteratorRight = rightHandSide.Begin();
-         pointSetIteratorLeft != end; ++pointSetIteratorLeft, ++pointSetIteratorRight) //iterate simultaneously over both sets
+    for (mitk::PointSet::PointsConstIterator pointSetIteratorLeft = leftHandSide.Begin(),
+                                             pointSetIteratorRight = rightHandSide.Begin();
+         pointSetIteratorLeft != end;
+         ++pointSetIteratorLeft, ++pointSetIteratorRight) // iterate simultaneously over both sets
     {
       pointLeftHandSide = pointSetIteratorLeft.Value();
       pointRightHandSide = pointSetIteratorRight.Value();
-      if( !mitk::Equal( pointLeftHandSide, pointRightHandSide, eps, verbose ) )
+      if (!mitk::Equal(pointLeftHandSide, pointRightHandSide, eps, verbose))
       {
-        if(verbose)
+        if (verbose)
           MITK_INFO << "[( PointSet )] Point values are different.";
         result = false;
         numberOfIncorrectPoints++;
       }
     }
 
-    if((numberOfIncorrectPoints > 0) && verbose)
+    if ((numberOfIncorrectPoints > 0) && verbose)
     {
-      MITK_INFO << numberOfIncorrectPoints <<" of a total of " << leftHandSide.GetSize() << " points are different.";
+      MITK_INFO << numberOfIncorrectPoints << " of a total of " << leftHandSide.GetSize() << " points are different.";
     }
   }
   return result;

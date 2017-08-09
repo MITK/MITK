@@ -15,11 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkThinPlateSplineCurvedGeometry.h"
-#include <vtkThinPlateSplineTransform.h>
 #include <vtkPoints.h>
+#include <vtkThinPlateSplineTransform.h>
 
-mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry()
-  : Superclass()
+mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry() : Superclass()
 {
   m_InterpolatingAbstractTransform = m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
 
@@ -28,7 +27,8 @@ mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry()
   m_ThinPlateSplineTransform->SetInverseIterations(5000);
 }
 
-mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other ) : Superclass(other)
+mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry &other)
+  : Superclass(other)
 {
   this->SetSigma(other.GetSigma());
 }
@@ -39,9 +39,9 @@ mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
   // the same as m_InterpolatingAbstractTransform, which will be deleted
   // by the superclass.
 
-  if(m_VtkTargetLandmarks!=nullptr)
+  if (m_VtkTargetLandmarks != nullptr)
     m_VtkTargetLandmarks->Delete();
-  if(m_VtkProjectedLandmarks!=nullptr)
+  if (m_VtkProjectedLandmarks != nullptr)
     m_VtkProjectedLandmarks->Delete();
 }
 
@@ -71,19 +71,19 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
 
   mitk::PointSet::DataType::PointsContainer::ConstIterator targetIt, projectedIt;
 
-  targetIt    = finalTargetLandmarks->Begin();
+  targetIt = finalTargetLandmarks->Begin();
   projectedIt = projectedTargetLandmarks->Begin();
 
-  //initialize Thin-Plate-Spline
+  // initialize Thin-Plate-Spline
   m_VtkTargetLandmarks->Reset();
   m_VtkProjectedLandmarks->Reset();
   vtkIdType id;
-  int size=finalTargetLandmarks->Size();
-  for(id=0; id < size; ++id, ++targetIt, ++projectedIt)
+  int size = finalTargetLandmarks->Size();
+  for (id = 0; id < size; ++id, ++targetIt, ++projectedIt)
   {
-    const mitk::PointSet::PointType& target = targetIt->Value();
+    const mitk::PointSet::PointType &target = targetIt->Value();
     m_VtkTargetLandmarks->InsertPoint(id, target[0], target[1], target[2]);
-    const mitk::PointSet::PointType& projected = projectedIt->Value();
+    const mitk::PointSet::PointType &projected = projectedIt->Value();
     m_VtkProjectedLandmarks->InsertPoint(id, projected[0], projected[1], projected[2]);
   }
   m_VtkTargetLandmarks->Modified();

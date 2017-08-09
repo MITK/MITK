@@ -31,56 +31,46 @@ See LICENSE.txt or http://www.mitk.org for details.
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
+int mitkVtkWidgetRenderingTest(int /* argc */, char * /*argv*/ [])
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkVTKWidgetRenderingTest")
 
   // Test: instantiation
   mitk::VtkWidgetRendering::Pointer widgetRendering = mitk::VtkWidgetRendering::New();
-  MITK_TEST_CONDITION_REQUIRED(widgetRendering.IsNotNull(),"Testing instantiation")
+  MITK_TEST_CONDITION_REQUIRED(widgetRendering.IsNotNull(), "Testing instantiation")
 
   // Test: Create and set vtkRenderWindow
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
-  //mitk::VtkPropRenderer::Pointer propRenderer = mitk::VtkPropRenderer::New( "the renderer", renderWindow );
-  //propRenderer->SetMapperID(2);
-  widgetRendering->SetRenderWindow( renderWindow );
-  MITK_TEST_CONDITION_REQUIRED(widgetRendering->GetRenderWindow() == renderWindow,
-    "Setting vtkRenderWindow...")
+  // mitk::VtkPropRenderer::Pointer propRenderer = mitk::VtkPropRenderer::New( "the renderer", renderWindow );
+  // propRenderer->SetMapperID(2);
+  widgetRendering->SetRenderWindow(renderWindow);
+  MITK_TEST_CONDITION_REQUIRED(widgetRendering->GetRenderWindow() == renderWindow, "Setting vtkRenderWindow...")
 
   // Test: Try to enable before widget has been set (should stay disabled)
   widgetRendering->Enable();
-  MITK_TEST_CONDITION(!widgetRendering->IsEnabled(),
-    "Trying to enable widget rendering before setting widget")
+  MITK_TEST_CONDITION(!widgetRendering->IsEnabled(), "Trying to enable widget rendering before setting widget")
   widgetRendering->Disable();
 
-  // Test: Retrieve widget before it has been set (should return NULL)
-  MITK_TEST_CONDITION(widgetRendering->GetVtkWidget() == nullptr,
-    "Trying to retrieve widget before it has been set")
+  // Test: Retrieve widget before it has been set (should return nullptr)
+  MITK_TEST_CONDITION(widgetRendering->GetVtkWidget() == nullptr, "Trying to retrieve widget before it has been set")
 
   // Test: Create vtkWidget instance (vtkScalarWidget) and add it
   vtkScalarBarWidget *scalarBarWidget = vtkScalarBarWidget::New();
-  widgetRendering->SetVtkWidget( scalarBarWidget );
-  MITK_TEST_CONDITION(widgetRendering->GetVtkWidget() == scalarBarWidget,
-    "Retrieving widget after it has been set")
+  widgetRendering->SetVtkWidget(scalarBarWidget);
+  MITK_TEST_CONDITION(widgetRendering->GetVtkWidget() == scalarBarWidget, "Retrieving widget after it has been set")
 
   // Test: Try to enable widget rendering (should work now)
   widgetRendering->Enable();
-  MITK_TEST_CONDITION(widgetRendering->IsEnabled(),
-    "Enabling widget rendering")
+  MITK_TEST_CONDITION(widgetRendering->IsEnabled(), "Enabling widget rendering")
 
   // Test: Try to disable widget rendering (should be disabled)
   widgetRendering->Disable();
-  MITK_TEST_CONDITION(!widgetRendering->IsEnabled(),
-    "Disabling widget rendering")
-
-
-
+  MITK_TEST_CONDITION(!widgetRendering->IsEnabled(), "Disabling widget rendering")
 
   // Clean up
   scalarBarWidget->Delete();
   renderWindow->Delete();
-
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
@@ -88,4 +78,3 @@ int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
   // always end with this!
   MITK_TEST_END()
 }
-

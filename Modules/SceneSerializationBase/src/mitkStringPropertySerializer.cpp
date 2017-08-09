@@ -23,38 +23,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class StringPropertySerializer : public BasePropertySerializer
-{
+  class StringPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(StringPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( StringPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const StringProperty* prop = dynamic_cast<const StringProperty*>(m_Property.GetPointer()))
+      if (const StringProperty *prop = dynamic_cast<const StringProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("string");
+        auto element = new TiXmlElement("string");
         element->SetAttribute("value", prop->GetValue());
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
-      const char* s( element->Attribute("value") );
-      return StringProperty::New( std::string(s?s:"") ).GetPointer();
+      if (!element)
+        return nullptr;
+      const char *s(element->Attribute("value"));
+      return StringProperty::New(std::string(s ? s : "")).GetPointer();
     }
 
   protected:
-
     StringPropertySerializer() {}
     virtual ~StringPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -62,4 +60,3 @@ class StringPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(StringPropertySerializer);
 
 #endif
-

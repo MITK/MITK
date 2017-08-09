@@ -84,14 +84,12 @@ void WrapperMessageCallback(const char* message)
 void WrapperImageDataCallback(
 	short* rfDataChannelData, int channelDatalinesPerDataset, int channelDataSamplesPerChannel, int channelDataTotalDatasets,
 	short* rfDataArrayBeamformed, int beamformedLines, int beamformedSamples, int beamformedTotalDatasets,
-	unsigned char* imageData, int imageWidth, int imageHeight, int imagePixelFormat, int imageSetsTotal,
-
-	double timeStamp)
+  unsigned char* imageData, int imageWidth, int imageHeight, int imagePixelFormat, int imageSetsTotal, double timeStamp)
 {
 	 w_ISource->ImageDataCallback(
-		 rfDataChannelData, channelDatalinesPerDataset, channelDatalinesPerDataset, channelDataTotalDatasets,
-		 rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
-		 imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
+     rfDataChannelData, channelDatalinesPerDataset, channelDataSamplesPerChannel, channelDataTotalDatasets,
+     rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
+     imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
@@ -154,7 +152,7 @@ void mitk::USDiPhASDevice::OnFreeze(bool freeze)
 void mitk::USDiPhASDevice::UpdateScanmode()
 {
   OnFreeze(true);
-
+  SetInterleaved(m_Interleaved); // update the beamforming parameters...
   UpdateTransmitEvents();
 
   if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))
@@ -180,13 +178,14 @@ void mitk::USDiPhASDevice::UpdateTransmitEvents()
     m_ScanMode.TransmitEvents[ev].BurstCountPerChannel = new int[numChannels];
     m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel = new bool[numChannels];
     m_ScanMode.TransmitEvents[ev].ChannelMultiplexerSetups = nullptr;
+    float tiltStrength = ((m_ScanMode.transmitEventsCount - 1) / 2 - ev) * 20e-9f;
 
     for (int i = 0; i < numChannels; ++i)
     {
       m_ScanMode.TransmitEvents[ev].BurstHalfwaveClockCountPerChannel[i] = m_BurstHalfwaveClockCount; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 7.5 MHz 
       m_ScanMode.TransmitEvents[ev].BurstCountPerChannel[i] = 1; // Burst with 1 cycle
       m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel[i] = true;
-      m_ScanMode.TransmitEvents[ev].transmitEventDelays[i] = 0;
+      m_ScanMode.TransmitEvents[ev].transmitEventDelays[i] = 2e-6f + (i - numChannels / 2) * tiltStrength;
     }
   }
 
@@ -195,6 +194,8 @@ void mitk::USDiPhASDevice::UpdateTransmitEvents()
   m_ScanMode.transmitSequences[0].startEvent = 0;
   m_ScanMode.transmitSequences[0].endEvent = m_ScanMode.transmitEventsCount;
 }
+
+
 
 void mitk::USDiPhASDevice::InitializeScanMode()
 {
@@ -210,7 +211,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.transducerType = 1;
 
   // configure the receive paramters:
-  m_ScanMode.receivePhaseLengthSeconds = 65e-6f; // 5 cm imaging depth
+  m_ScanMode.receivePhaseLengthSeconds = 185e-6f; // about 15 cm imaging depth
   m_ScanMode.tgcdB = new unsigned char[8];
   for (int tgc = 0; tgc < 8; ++tgc)
     m_ScanMode.tgcdB[tgc] = tgc * 2 + 10;
@@ -219,7 +220,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.averagingCount = 1;
 
   // configure general processing:
-  m_ScanMode.transferChannelData = false;
+  m_ScanMode.transferChannelData = true;
 
   // configure reconstruction processing:
   m_ScanMode.averageSpeedOfSound = 1540;
@@ -228,15 +229,15 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   // setup beamforming parameters:
   SetInterleaved(true);
 
-  m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.15f;
-  m_ScanMode.reconstructionLines = 256;
+  m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.3f;
+  m_ScanMode.reconstructionLines = 128;
   m_ScanMode.reconstructionSamplesPerLine = 2048;
   m_ScanMode.transferBeamformedData = true;
 
   // configure the transmit sequence(s):
   m_ScanMode.transmitEventsCount = 1;
   m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
-  m_ScanMode.voltageV = 70;
+  m_ScanMode.voltageV = 75;
   UpdateTransmitEvents();
 
   // configure bandpass:
@@ -249,7 +250,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.imageHeight = 512;
   m_ScanMode.imageMultiplier = 1;
   m_ScanMode.imageLeveling = 0;
-  m_ScanMode.transferImageData = true;
+  m_ScanMode.transferImageData = false;
 
   // Trigger setup:
   m_ScanMode.triggerSetup.enabled = true;

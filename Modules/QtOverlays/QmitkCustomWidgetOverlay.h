@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QmitkCustomWidgetOverlay_H_HEADER_INCLUDED_C10DC4EB
 #define QmitkCustomWidgetOverlay_H_HEADER_INCLUDED_C10DC4EB
 
@@ -22,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkOverlay.h"
 
 #include <MitkQtOverlaysExports.h>
-
 
 /** \class  QmitkCustomWidgetOverlay
 * \brief object representing a custom widget that is handled and positioned
@@ -40,27 +38,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \ingroup Overlays
 */
 
+class MITKQTOVERLAYS_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay
+{
+public:
+  /**
+  * @brief Default Constructor
+  **/
+  QmitkCustomWidgetOverlay(const char *id);
 
-  class MITKQTOVERLAYS_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay
-  {
-  public:
+  /**
+  * @brief Default Destructor
+  **/
+  virtual ~QmitkCustomWidgetOverlay();
 
-    /**
-    * @brief Default Constructor
-    **/
-    QmitkCustomWidgetOverlay( const char* id );
+  void SetWidget(QWidget *widget);
 
-    /**
-    * @brief Default Destructor
-    **/
-    virtual ~QmitkCustomWidgetOverlay();
-
-    void SetWidget( QWidget* widget );
-
-    QSize GetNeededSize() override;
-
-  };
-
+  QSize GetNeededSize() override;
+};
 
 #endif /* QmitkCustomWidgetOverlay_H_HEADER_INCLUDED_C10DC4EB */
-

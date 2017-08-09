@@ -16,22 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIFileIO.h"
 
-namespace mitk {
-
-IFileIO::~IFileIO()
+namespace mitk
 {
-}
+  IFileIO::~IFileIO() {}
+  std::string mitk::IFileIO::PROP_DESCRIPTION()
+  {
+    static std::string s = "org.mitk.IFileIO.description";
+    return s;
+  }
 
-std::string mitk::IFileIO::PROP_DESCRIPTION()
-{
-  static std::string s = "org.mitk.IFileIO.description";
-  return s;
-}
-
-std::string mitk::IFileIO::PROP_MIMETYPE()
-{
-  static std::string s = "org.mitk.IFileIO.mimetype";
-  return s;
-}
-
+  std::string mitk::IFileIO::PROP_MIMETYPE()
+  {
+    static std::string s = "org.mitk.IFileIO.mimetype";
+    return s;
+  }
 }

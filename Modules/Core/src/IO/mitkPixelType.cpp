@@ -14,24 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPixelType.h"
 #include <mitkLogMacros.h>
 
-
-mitk::PixelType::PixelType( const mitk::PixelType& other )
-  : m_ComponentType( other.m_ComponentType ),
-    m_PixelType( other.m_PixelType),
-    m_ComponentTypeName( other.m_ComponentTypeName ),
-    m_PixelTypeName( other.m_PixelTypeName ),
-    m_NumberOfComponents( other.m_NumberOfComponents ),
-    m_BytesPerComponent( other.m_BytesPerComponent )
+mitk::PixelType::PixelType(const mitk::PixelType &other)
+  : m_ComponentType(other.m_ComponentType),
+    m_PixelType(other.m_PixelType),
+    m_ComponentTypeName(other.m_ComponentTypeName),
+    m_PixelTypeName(other.m_PixelTypeName),
+    m_NumberOfComponents(other.m_NumberOfComponents),
+    m_BytesPerComponent(other.m_BytesPerComponent)
 {
 }
 
-mitk::PixelType& mitk::PixelType::operator=(const PixelType& other)
+mitk::PixelType &mitk::PixelType::operator=(const PixelType &other)
 {
-
   m_ComponentType = other.m_ComponentType;
   m_PixelType = other.m_PixelType;
   m_ComponentTypeName = other.m_ComponentTypeName;
@@ -88,105 +85,98 @@ size_t mitk::PixelType::GetBitsPerComponent() const
 }
 
 mitk::PixelType::~PixelType()
-{}
-
-mitk::PixelType::PixelType( const int componentType,
-                            const ItkIOPixelType pixelType,
-                            std::size_t bytesPerComponent,
-                            std::size_t numberOfComponents,
-                            const std::string& componentTypeName,
-                            const std::string& pixelTypeName)
-  : m_ComponentType( componentType ),
-    m_PixelType( pixelType ),
-    m_ComponentTypeName(componentTypeName),
-    m_PixelTypeName(pixelTypeName),
-    m_NumberOfComponents( numberOfComponents ),
-    m_BytesPerComponent( bytesPerComponent )
 {
 }
 
-bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
+mitk::PixelType::PixelType(const int componentType,
+                           const ItkIOPixelType pixelType,
+                           std::size_t bytesPerComponent,
+                           std::size_t numberOfComponents,
+                           const std::string &componentTypeName,
+                           const std::string &pixelTypeName)
+  : m_ComponentType(componentType),
+    m_PixelType(pixelType),
+    m_ComponentTypeName(componentTypeName),
+    m_PixelTypeName(pixelTypeName),
+    m_NumberOfComponents(numberOfComponents),
+    m_BytesPerComponent(bytesPerComponent)
 {
-  MITK_DEBUG << "operator==" << std::endl;
+}
 
-  MITK_DEBUG << "m_NumberOfComponents = " << m_NumberOfComponents << " " << rhs.m_NumberOfComponents << std::endl;
-  MITK_DEBUG << "m_BytesPerComponent = " << m_BytesPerComponent << " " << rhs.m_BytesPerComponent << std::endl;
-  MITK_DEBUG << "m_PixelTypeName = " << m_PixelTypeName << " " << rhs.m_PixelTypeName << std::endl;
-  MITK_DEBUG << "m_PixelType = " << m_PixelType << " " << rhs.m_PixelType << std::endl;
-
+bool mitk::PixelType::operator==(const mitk::PixelType &rhs) const
+{
   bool returnValue = ( this->m_PixelType == rhs.m_PixelType
-                       && this->m_ComponentType == rhs.m_ComponentType
-                       && this->m_NumberOfComponents == rhs.m_NumberOfComponents
-                       && this->m_BytesPerComponent == rhs.m_BytesPerComponent
-                       );
+                    && this->m_ComponentType == rhs.m_ComponentType
+                    && this->m_NumberOfComponents == rhs.m_NumberOfComponents
+                    && this->m_BytesPerComponent == rhs.m_BytesPerComponent );
 
-  if(returnValue)
-    MITK_DEBUG << " [TRUE] ";
-  else
-    MITK_DEBUG << " [FALSE] ";
+ MITK_DEBUG << "|> mitk::PixelType::operator== rhs, lhs: \n"
+            << "| m_BytesPerComponent = " << m_BytesPerComponent << ", " << rhs.m_BytesPerComponent << '\n'
+            << "| m_NumberOfComponents = " << m_NumberOfComponents << ", " << rhs.m_NumberOfComponents << '\n'
+            << "| m_PixelTypeName = " << m_PixelTypeName << ", " << rhs.m_PixelTypeName << '\n'
+            << "| m_ComponentTypeName = " << m_ComponentTypeName << ", " << rhs.m_ComponentTypeName << '\n'
+            << "| m_PixelType = " << m_PixelType << ", " << rhs.m_PixelType << '\n'
+            << "| m_ComponentType = " << m_ComponentType << ", " << rhs.m_ComponentType
+            << ", returnValue = " << returnValue << (returnValue ? "[True]" : "[False]") << ". <|";
 
   return returnValue;
 }
 
-bool mitk::PixelType::operator!=(const mitk::PixelType& rhs) const
+bool mitk::PixelType::operator!=(const mitk::PixelType &rhs) const
 {
   return !(this->operator==(rhs));
 }
 
-mitk::PixelType mitk::MakePixelType(vtkImageData* vtkimagedata)
+mitk::PixelType mitk::MakePixelType(vtkImageData *vtkimagedata)
 {
   int numOfComponents = vtkimagedata->GetNumberOfScalarComponents();
 
-  switch ( vtkimagedata->GetScalarType() )
+  switch (vtkimagedata->GetScalarType())
   {
-  case VTK_BIT:
-  case VTK_CHAR:
-    return mitk::MakePixelType<char, char>(numOfComponents);
-    break;
+    case VTK_BIT:
+    case VTK_CHAR:
+      return mitk::MakePixelType<char, char>(numOfComponents);
+      break;
 
-  case VTK_UNSIGNED_CHAR:
-    return mitk::MakePixelType<unsigned char, unsigned char>(numOfComponents);
-    break;
+    case VTK_UNSIGNED_CHAR:
+      return mitk::MakePixelType<unsigned char, unsigned char>(numOfComponents);
+      break;
 
-  case VTK_SHORT:
-    return mitk::MakePixelType<short, short>(numOfComponents);
-    break;
+    case VTK_SHORT:
+      return mitk::MakePixelType<short, short>(numOfComponents);
+      break;
 
-  case VTK_UNSIGNED_SHORT:
-    return mitk::MakePixelType<unsigned short, unsigned short>(numOfComponents);
-    break;
+    case VTK_UNSIGNED_SHORT:
+      return mitk::MakePixelType<unsigned short, unsigned short>(numOfComponents);
+      break;
 
-  case VTK_INT:
-    return mitk::MakePixelType<int, int>(numOfComponents);
-    break;
+    case VTK_INT:
+      return mitk::MakePixelType<int, int>(numOfComponents);
+      break;
 
-  case VTK_UNSIGNED_INT:
-    return mitk::MakePixelType<unsigned int, unsigned int>(numOfComponents);
-    break;
+    case VTK_UNSIGNED_INT:
+      return mitk::MakePixelType<unsigned int, unsigned int>(numOfComponents);
+      break;
 
-  case VTK_LONG:
-    return mitk::MakePixelType<long, long>(numOfComponents);
-    break;
+    case VTK_LONG:
+      return mitk::MakePixelType<long, long>(numOfComponents);
+      break;
 
-  case VTK_UNSIGNED_LONG:
-    return mitk::MakePixelType<unsigned long, unsigned long>(numOfComponents);
-    break;
+    case VTK_UNSIGNED_LONG:
+      return mitk::MakePixelType<unsigned long, unsigned long>(numOfComponents);
+      break;
 
-  case VTK_FLOAT:
-    return mitk::MakePixelType<float, float>(numOfComponents);
-    break;
+    case VTK_FLOAT:
+      return mitk::MakePixelType<float, float>(numOfComponents);
+      break;
 
-  case VTK_DOUBLE:
-    return mitk::MakePixelType<double, double>(numOfComponents);
-    break;
+    case VTK_DOUBLE:
+      return mitk::MakePixelType<double, double>(numOfComponents);
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   mitkThrow() << "tried to make pixeltype from vtkimage of unknown data type(short, char, int, ...)";
-
 }
-
-
-

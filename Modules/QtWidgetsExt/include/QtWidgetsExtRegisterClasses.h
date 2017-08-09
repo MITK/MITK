@@ -17,10 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QtWidgetsExtRegisterClasses_h
 #define QtWidgetsExtRegisterClasses_h
 
-#include "mitkCommon.h"
 #include "MitkQtWidgetsExtExports.h"
+#include "mitkCommon.h"
 
 MITKQTWIDGETSEXT_EXPORT void QtWidgetsExtRegisterClasses();
 
 #endif
-

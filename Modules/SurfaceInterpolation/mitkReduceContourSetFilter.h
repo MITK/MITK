@@ -17,118 +17,122 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkReduceContourSetFilter_h_Included
 #define mitkReduceContourSetFilter_h_Included
 
-#include <MitkSurfaceInterpolationExports.h>
-#include "mitkSurfaceToSurfaceFilter.h"
-#include "mitkSurface.h"
 #include "mitkProgressBar.h"
+#include "mitkSurface.h"
+#include "mitkSurfaceToSurfaceFilter.h"
+#include <MitkSurfaceInterpolationExports.h>
 
-#include "vtkSmartPointer.h"
-#include "vtkPolyData.h"
-#include "vtkPolygon.h"
-#include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkMath.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
+#include "vtkPolygon.h"
+#include "vtkSmartPointer.h"
 
 #include <stack>
 
-namespace mitk {
+namespace mitk
+{
+  /**
+    \brief A filter that reduces the number of points of contours represented by a mitk::Surface
 
-/**
-  \brief A filter that reduces the number of points of contours represented by a mitk::Surface
+    The type of the reduction can be set via SetReductionType. The two ways provided by this filter is the
 
-  The type of the reduction can be set via SetReductionType. The two ways provided by this filter is the
+    \li NTH_POINT Algorithm which reduces the contours according to a certain stepsize
+    \li DOUGLAS_PEUCKER Algorithm which incorpates an error tolerance into the reduction.
 
-  \li NTH_POINT Algorithm which reduces the contours according to a certain stepsize
-  \li DOUGLAS_PEUCKER Algorithm which incorpates an error tolerance into the reduction.
+    Stepsize and error tolerance can be set via SetStepSize and SetTolerance.
 
-  Stepsize and error tolerance can be set via SetStepSize and SetTolerance.
+    Additional if more than one input contour is provided this filter tries detect contours which occur just because
+    of an intersection. These intersection contours are eliminated. In oder to ensure a correct elimination the min and
+    max
+    spacing of the original image must be provided.
 
-  Additional if more than one input contour is provided this filter tries detect contours which occur just because
-  of an intersection. These intersection contours are eliminated. In oder to ensure a correct elimination the min and max
-  spacing of the original image must be provided.
+    The output is a mitk::Surface.
 
-  The output is a mitk::Surface.
+    $Author: fetzer$
+  */
 
-  $Author: fetzer$
-*/
-
-    class MITKSURFACEINTERPOLATION_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
+  class MITKSURFACEINTERPOLATION_EXPORT ReduceContourSetFilter : public SurfaceToSurfaceFilter
+  {
+  public:
+    enum Reduction_Type
     {
+      NTH_POINT,
+      DOUGLAS_PEUCKER
+    };
 
-    public:
+    struct LineSegment
+    {
+      unsigned int StartIndex;
+      unsigned int EndIndex;
+    };
 
-       enum Reduction_Type
-        {
-            NTH_POINT, DOUGLAS_PEUCKER
-        };
+    mitkClassMacro(ReduceContourSetFilter, SurfaceToSurfaceFilter);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-        struct LineSegment
-        {
-            unsigned int StartIndex;
-            unsigned int EndIndex;
-        };
+      itkSetMacro(MinSpacing, double);
+    itkSetMacro(MaxSpacing, double);
+    itkSetMacro(ReductionType, Reduction_Type);
+    itkSetMacro(StepSize, unsigned int);
+    itkSetMacro(Tolerance, double);
 
-        mitkClassMacro(ReduceContourSetFilter,SurfaceToSurfaceFilter);
-        itkFactorylessNewMacro(Self)
-        itkCloneMacro(Self)
+    itkGetMacro(NumberOfPointsAfterReduction, unsigned int);
 
-        itkSetMacro(MinSpacing, double);
-        itkSetMacro(MaxSpacing, double);
-        itkSetMacro(ReductionType, Reduction_Type);
-        itkSetMacro(StepSize, unsigned int);
-        itkSetMacro(Tolerance, double);
+    // Resets the filter, i.e. removes all inputs and outputs
+    void Reset();
 
-        itkGetMacro(NumberOfPointsAfterReduction, unsigned int);
+    /**
+      \brief Set whether the mitkProgressBar should be used
 
-        //Resets the filter, i.e. removes all inputs and outputs
-        void Reset();
+      \a Parameter true for using the progress bar, false otherwise
+    */
+    void SetUseProgressBar(bool);
 
-        /**
-          \brief Set whether the mitkProgressBar should be used
+    using itk::ProcessObject::SetInput;
+    virtual void SetInput(const mitk::Surface *surface);
+    virtual void SetInput(unsigned int idx, const mitk::Surface *surface);
 
-          \a Parameter true for using the progress bar, false otherwise
-        */
-        void SetUseProgressBar(bool);
+    /**
+      \brief Set the stepsize which the progress bar should proceed
 
+      \a Parameter The stepsize for progressing
+    */
+    void SetProgressStepSize(unsigned int stepSize);
 
-        using itk::ProcessObject::SetInput;
-        virtual void SetInput( const mitk::Surface* surface );
-        virtual void SetInput( unsigned int idx, const mitk::Surface* surface );
+  protected:
+    ReduceContourSetFilter();
+    virtual ~ReduceContourSetFilter();
+    virtual void GenerateData() override;
+    virtual void GenerateOutputInformation() override;
 
-        /**
-          \brief Set the stepsize which the progress bar should proceed
+  private:
+    void ReduceNumberOfPointsByNthPoint(
+      vtkIdType cellSize, vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints);
 
-          \a Parameter The stepsize for progressing
-        */
-        void SetProgressStepSize(unsigned int stepSize);
+    void ReduceNumberOfPointsByDouglasPeucker(
+      vtkIdType cellSize, vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints);
 
-    protected:
-        ReduceContourSetFilter();
-        virtual ~ReduceContourSetFilter();
-        virtual void GenerateData() override;
-        virtual void GenerateOutputInformation() override;
+    bool CheckForIntersection(
+      vtkIdType *currentCell,
+      vtkIdType currentCellSize,
+      vtkPoints *currentPoints,
+      /*vtkIdType numberOfIntersections, vtkIdType* intersectionPoints,*/ unsigned int currentInputIndex);
 
-    private:
-        void ReduceNumberOfPointsByNthPoint (vtkIdType cellSize, vtkIdType* cell, vtkPoints* points, vtkPolygon* reducedPolygon, vtkPoints* reducedPoints);
+    double m_MinSpacing;
+    double m_MaxSpacing;
 
-        void ReduceNumberOfPointsByDouglasPeucker (vtkIdType cellSize, vtkIdType* cell, vtkPoints* points, vtkPolygon* reducedPolygon, vtkPoints* reducedPoints);
+    Reduction_Type m_ReductionType;
+    unsigned int m_StepSize;
+    double m_Tolerance;
+    unsigned int m_MaxSegmentLenght;
 
-        bool CheckForIntersection (vtkIdType* currentCell, vtkIdType currentCellSize, vtkPoints* currentPoints, /*vtkIdType numberOfIntersections, vtkIdType* intersectionPoints,*/ unsigned int currentInputIndex);
+    bool m_UseProgressBar;
+    unsigned int m_ProgressStepSize;
 
-        double m_MinSpacing;
-        double m_MaxSpacing;
+    unsigned int m_NumberOfPointsAfterReduction;
 
-        Reduction_Type m_ReductionType;
-        unsigned int m_StepSize;
-        double m_Tolerance;
-        unsigned int m_MaxSegmentLenght;
+  }; // class
 
-        bool m_UseProgressBar;
-        unsigned int m_ProgressStepSize;
-
-        unsigned int m_NumberOfPointsAfterReduction;
-
-    };//class
-
-}//namespace
+} // namespace
 #endif

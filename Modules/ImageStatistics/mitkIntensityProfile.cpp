@@ -237,7 +237,7 @@ IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, co
   return ::ComputeIntensityProfile(image, CreatePathFromPoints(image->GetGeometry(), startPoint, endPoint), numSamples, interpolator);
 }
 
-IntensityProfile::InstanceIdentifier mitk::ComputeGlobalMaximum(IntensityProfile::Pointer intensityProfile, IntensityProfile::MeasurementType &max)
+IntensityProfile::InstanceIdentifier mitk::ComputeGlobalMaximum(IntensityProfile::ConstPointer intensityProfile, IntensityProfile::MeasurementType &max)
 {
   max = -vcl_numeric_limits<IntensityProfile::MeasurementType>::min();
   IntensityProfile::InstanceIdentifier maxIndex = 0;
@@ -259,7 +259,7 @@ IntensityProfile::InstanceIdentifier mitk::ComputeGlobalMaximum(IntensityProfile
   return maxIndex;
 }
 
-IntensityProfile::InstanceIdentifier mitk::ComputeGlobalMinimum(IntensityProfile::Pointer intensityProfile, IntensityProfile::MeasurementType &min)
+IntensityProfile::InstanceIdentifier mitk::ComputeGlobalMinimum(IntensityProfile::ConstPointer intensityProfile, IntensityProfile::MeasurementType &min)
 {
   min = vcl_numeric_limits<IntensityProfile::MeasurementType>::max();
   IntensityProfile::InstanceIdentifier minIndex = 0;
@@ -281,7 +281,7 @@ IntensityProfile::InstanceIdentifier mitk::ComputeGlobalMinimum(IntensityProfile
   return minIndex;
 }
 
-IntensityProfile::InstanceIdentifier mitk::ComputeCenterOfMaximumArea(IntensityProfile::Pointer intensityProfile, IntensityProfile::InstanceIdentifier radius)
+IntensityProfile::InstanceIdentifier mitk::ComputeCenterOfMaximumArea(IntensityProfile::ConstPointer intensityProfile, IntensityProfile::InstanceIdentifier radius)
 {
   //const IntensityProfile::MeasurementType min = intensityProfile->GetMeasurementVector(ComputeGlobalMinimum(intensityProfile))[0];
   IntensityProfile::MeasurementType min;
@@ -312,7 +312,7 @@ IntensityProfile::InstanceIdentifier mitk::ComputeCenterOfMaximumArea(IntensityP
   return centerOfMaxArea;
 }
 
-std::vector<IntensityProfile::MeasurementType> mitk::CreateVectorFromIntensityProfile(IntensityProfile::Pointer intensityProfile)
+std::vector<IntensityProfile::MeasurementType> mitk::CreateVectorFromIntensityProfile(IntensityProfile::ConstPointer intensityProfile)
 {
   std::vector<IntensityProfile::MeasurementType> result;
   result.reserve(intensityProfile->Size());
@@ -338,7 +338,7 @@ IntensityProfile::Pointer mitk::CreateIntensityProfileFromVector(const std::vect
   return result;
 }
 
-void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensityProfile, ImageStatisticsCalculator::Statistics &stats)
+void mitk::ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsCalculator::StatisticsContainer::Pointer stats)
 {
   typedef std::vector<IntensityProfile::MeasurementType> StatsVecType;
 
@@ -371,10 +371,10 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensity
 
   rms = sqrt( rms );
 
-  stats.SetMin( static_cast<double>( min ) );
-  stats.SetMax( static_cast<double>( max ) );
-  stats.SetN( numSamples );
-  stats.SetMean( mean );
-  stats.SetVariance( var );
-  stats.SetRMS( rms );
+  stats->SetMin( static_cast<double>( min ) );
+  stats->SetMax( static_cast<double>( max ) );
+  stats->SetN( numSamples );
+  stats->SetMean( mean );
+  stats->SetVariance( var );
+  stats->SetRMS( rms );
 }

@@ -58,7 +58,7 @@ public:
     // destructor
     ~QVTKQuickItem();
 
-    Renderer *createRenderer() const;
+    Renderer* createRenderer() const;
 
     // Description:
     // get the render window used with this item
@@ -103,6 +103,12 @@ protected:
     virtual void hoverLeaveEvent(QHoverEvent* e);
     virtual void hoverMoveEvent(QHoverEvent* e);
     QSGNode* updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData);
+
+    //! To be called from rendering thread while synchronized
+    //! with UI thread - should execute a list of queued UI events.
+    //!
+    //! Not yet implemented for QVTKQuickItem but possibly for sub-classes
+    virtual void processPendingEvents() {}
 
 private:
     vtkOpenGLRenderWindow *m_win;

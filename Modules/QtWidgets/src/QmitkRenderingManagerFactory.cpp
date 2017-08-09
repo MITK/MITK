@@ -14,25 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkRenderingManagerFactory.h"
 #include "QmitkRenderingManager.h"
 
-QmitkRenderingManagerFactory
-::QmitkRenderingManagerFactory()
+QmitkRenderingManagerFactory::QmitkRenderingManagerFactory()
 {
-  mitk::RenderingManager::SetFactory( this );
-
+  mitk::RenderingManager::SetFactory(this);
 }
 
-QmitkRenderingManagerFactory
-::~QmitkRenderingManagerFactory()
+QmitkRenderingManagerFactory::~QmitkRenderingManagerFactory()
 {
 }
 
-mitk::RenderingManager::Pointer
-QmitkRenderingManagerFactory
-::CreateRenderingManager() const
+mitk::RenderingManager::Pointer QmitkRenderingManagerFactory::CreateRenderingManager() const
 {
   QmitkRenderingManager::Pointer specificSmartPtr = QmitkRenderingManager::New();
   mitk::RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();

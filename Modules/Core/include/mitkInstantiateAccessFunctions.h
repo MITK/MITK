@@ -14,39 +14,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED
 #define MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED
 
 #include <itkCastImageFilter.h>
-#include <mitkImageToItk.h>
 #include <mitkConfig.h>
+#include <mitkImageToItk.h>
 
+#include <mitkPPCat.h>
+#include <mitkPPExpand.h>
 #include <mitkPPSeqForEach.h>
 #include <mitkPPSeqForEachProduct.h>
 #include <mitkPPSeqToTuple.h>
-#include <mitkPPCat.h>
-#include <mitkPPExpand.h>
 #include <mitkPPTupleRem.h>
 
 #ifndef DOXYGEN_SKIP
 
-#define InstantiateAccessFunctionImpl(r, itkImgFunc, type) \
-  MITK_PP_CAT(InstantiateAccessFunction_, itkImgFunc) type
+#define InstantiateAccessFunctionImpl(r, itkImgFunc, type) MITK_PP_CAT(InstantiateAccessFunction_, itkImgFunc) type
 
 // product is of the form (itkImgFunc)(short)(2)
 #ifdef _MSC_VER
-#define InstantiateAccessFunctionProductImpl(r, product) \
-  MITK_PP_CAT(InstantiateAccessFunction_, MITK_PP_SEQ_HEAD(product)) \
+#define InstantiateAccessFunctionProductImpl(r, product)                                                               \
+  MITK_PP_CAT(InstantiateAccessFunction_, MITK_PP_SEQ_HEAD(product))                                                   \
   MITK_PP_EXPAND(MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))
 #else
-#define InstantiateAccessFunctionProductImpl(r, product) \
-  MITK_PP_EXPAND(MITK_PP_CAT(InstantiateAccessFunction_, MITK_PP_SEQ_HEAD(product)) \
-                 MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))
+#define InstantiateAccessFunctionProductImpl(r, product)                                                               \
+  MITK_PP_EXPAND(MITK_PP_CAT(InstantiateAccessFunction_, MITK_PP_SEQ_HEAD(product))                                    \
+                   MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))
 #endif
 
 #endif // DOXYGEN_SKIP
-
 
 //--------------------------------- instantiation functions  ------------------------------
 
@@ -90,7 +87,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \ingroup Adaptor
  */
-#define InstantiateAccessFunctionForFixedType(itkImgFunc, pixelTypeSeq, dimSeq)                           \
+#define InstantiateAccessFunctionForFixedType(itkImgFunc, pixelTypeSeq, dimSeq)                                        \
   MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((itkImgFunc))(pixelTypeSeq)(dimSeq))
 
 /**
@@ -100,7 +97,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \ingroup Adaptor
  */
-#define InstantiateAccessFunction(itkImgFunc)                                                             \
+#define InstantiateAccessFunction(itkImgFunc)                                                                          \
   InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 /**
@@ -113,7 +110,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \ingroup Adaptor
  */
-#define InstantiateAccessFunctionForFixedDimension(itkImgFunc, dim)                                       \
+#define InstantiateAccessFunctionForFixedDimension(itkImgFunc, dim)                                                    \
   InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, (dim))
 
 /**
@@ -126,7 +123,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \ingroup Adaptor
  */
-#define InstantiateAccessFunctionForFixedPixelType(itkImgFunc, pixelTypeSeq)                              \
+#define InstantiateAccessFunctionForFixedPixelType(itkImgFunc, pixelTypeSeq)                                           \
   InstantiateAccessFunctionForFixedType(itkImgFunc, pixelTypeSeq, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 /**
@@ -138,8 +135,9 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \ingroup Adaptor
  */
-#define InstantiateAccessFunctionForIntegralPixelTypes(itkImgFunc)                                        \
-  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
+#define InstantiateAccessFunctionForIntegralPixelTypes(itkImgFunc)                                                     \
+  InstantiateAccessFunctionForFixedType(                                                                               \
+    itkImgFunc, MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 /**
  * \brief Instantiate access function for floating point datatypes and all dimensions.
@@ -150,8 +148,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \ingroup Adaptor
  */
-#define InstantiateAccessFunctionForFloatingPixelTypes(itkImgFunc)                                        \
-  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
-
+#define InstantiateAccessFunctionForFloatingPixelTypes(itkImgFunc)                                                     \
+  InstantiateAccessFunctionForFixedType(                                                                               \
+    itkImgFunc, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 #endif // of MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED

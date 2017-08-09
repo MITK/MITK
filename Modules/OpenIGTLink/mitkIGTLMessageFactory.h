@@ -71,7 +71,7 @@ namespace mitk {
               IGTLMessageFactory::PointerToMessageBaseNew messageTypeNewPointer);
 
     /**
-    * \brief Get pointer to message type new function, or NULL if the message
+    * \brief Get pointer to message type new function, or nullptr if the message
     * type not registered
     * Usage:
     * igtl::MessageBase::Pointer message = GetMessageTypeNewPointer("IMAGE")();
@@ -82,7 +82,7 @@ namespace mitk {
     /**
     * \brief Creates a new message instance fitting to the given type.
     *
-    * If this type is not registered it returns NULL
+    * If this type is not registered it returns nullptr
     * Usage:
     * igtl::MessageBase::Pointer message = CreateInstance("IMAGE");
     */
@@ -106,7 +106,7 @@ namespace mitk {
                       mitk::IGTLMessageCloneHandler::Pointer msgCloneHandler);
 
     /**
-    * \brief Get pointer to message type clone function, or NULL if the message
+    * \brief Get pointer to message type clone function, or nullptr if the message
     * type is not registered
     * Usage:
     * igtl::TransformMessage::Pointer original = igtl::TransformMessage::New();

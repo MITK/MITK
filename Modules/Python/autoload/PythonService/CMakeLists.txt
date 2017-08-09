@@ -1,3 +1,5 @@
+mitkFunctionCheckCompilerFlags("-Wno-cpp" CMAKE_CXX_FLAGS)
+
 MITK_CREATE_MODULE( PythonService
   INCLUDE_DIRS
     PRIVATE src/PythonService

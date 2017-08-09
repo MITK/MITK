@@ -18,45 +18,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPlanePositionManager_h_Included
 
 #include "mitkCommon.h"
-#include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
+#include "mitkRestorePlanePositionOperation.h"
 
-#include <mitkServiceInterface.h>
 #include <mitkPlaneGeometry.h>
+#include <mitkServiceInterface.h>
 
 class MitkCoreActivator;
 
 namespace mitk
 {
+  /**
+      The mitk::PlanePositionManagerService holds and manages a list of certain planepositions.
+      To store a new position you need to specify the first slice of your slicestack and the
+      slicenumber you want to restore in the mitk::PlanePositionManager::AddNewPlanePosition() function.
 
-/**
-    The mitk::PlanePositionManagerService holds and manages a list of certain planepositions.
-    To store a new position you need to specify the first slice of your slicestack and the
-    slicenumber you want to restore in the mitk::PlanePositionManager::AddNewPlanePosition() function.
+      To restore a position call mitk::PlanePositionManagerService::GetPlanePosition(ID) where ID is the position
+      in the plane positionlist (returned by AddNewPlanePostion). This will give a mitk::RestorePlanePositionOperation
+      which can be executed by the SliceNavigationController of the slicestack.
 
-    To restore a position call mitk::PlanePositionManagerService::GetPlanePosition(ID) where ID is the position
-    in the plane positionlist (returned by AddNewPlanePostion). This will give a mitk::RestorePlanePositionOperation
-    which can be executed by the SliceNavigationController of the slicestack.
-
-    \sa QmitkSegmentationView.cpp
-  */
- class MITKCORE_EXPORT PlanePositionManagerService
- {
-
+      \sa QmitkSegmentationView.cpp
+    */
+  class MITKCORE_EXPORT PlanePositionManagerService
+  {
   public:
-
-   PlanePositionManagerService();
-   ~PlanePositionManagerService();
+    PlanePositionManagerService();
+    ~PlanePositionManagerService();
 
     /**
-      \brief Adds a new plane position to the list. If this geometry is identical to one of the list nothing will be added
+      \brief Adds a new plane position to the list. If this geometry is identical to one of the list nothing will be
+      added
 
       \a plane THE FIRST! slice of the slice stack
       \a sliceIndex the slice number of the selected slice
-      \return returns the ID i.e. the position in the positionlist. If the PlaneGeometry which is to be added already exists the existing
+      \return returns the ID i.e. the position in the positionlist. If the PlaneGeometry which is to be added already
+      exists the existing
               ID will be returned.
     */
-    unsigned int AddNewPlanePosition(const mitk::PlaneGeometry* plane, unsigned int sliceIndex = 0);
+    unsigned int AddNewPlanePosition(const mitk::PlaneGeometry *plane, unsigned int sliceIndex = 0);
 
     /**
       \brief Removes the plane at the position \a ID from the list.
@@ -73,21 +72,22 @@ namespace mitk
       \brief Getter for a specific plane position with a given ID
 
       \a ID the ID of the plane position
-      \return Returns a RestorePlanePositionOperation which can be executed by th SliceNavigationController or NULL for an invalid ID
+      \return Returns a RestorePlanePositionOperation which can be executed by th SliceNavigationController or nullptr for
+      an
+      invalid ID
     */
-    mitk::RestorePlanePositionOperation* GetPlanePosition( unsigned int ID);
+    mitk::RestorePlanePositionOperation *GetPlanePosition(unsigned int ID);
 
     /// \brief Getting the number of all stored planes
     unsigned int GetNumberOfPlanePositions();
 
- private:
+  private:
+    // Disable copy constructor and assignment operator.
+    PlanePositionManagerService(const PlanePositionManagerService &);
+    PlanePositionManagerService &operator=(const PlanePositionManagerService &);
 
-   // Disable copy constructor and assignment operator.
-   PlanePositionManagerService(const PlanePositionManagerService&);
-   PlanePositionManagerService& operator=(const PlanePositionManagerService&);
-
-   std::vector<mitk::RestorePlanePositionOperation*> m_PositionList;
- };
+    std::vector<mitk::RestorePlanePositionOperation *> m_PositionList;
+  };
 }
 MITK_DECLARE_SERVICE_INTERFACE(mitk::PlanePositionManagerService, "org.mitk.PlanePositionManagerService")
 

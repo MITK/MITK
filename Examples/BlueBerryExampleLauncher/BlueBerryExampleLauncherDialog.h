@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef BLUEBERRYEXAMPLELAUNCHERDIALOG_H
 #define BLUEBERRYEXAMPLELAUNCHERDIALOG_H
 
@@ -23,8 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QEventLoop>
 #include <QStringList>
 
-namespace Ui {
-class BlueBerryExampleLauncherDialog;
+namespace Ui
+{
+  class BlueBerryExampleLauncherDialog;
 }
 
 class BlueBerryExampleLauncherDialog : public QDialog
@@ -38,14 +38,12 @@ public:
   QString getDemoConfiguration();
 
 private:
-
   Q_SLOT void configurationSelected();
   Q_SLOT void dialogCanceled();
 
   Q_SLOT void selectionChanged(int row);
 
 private:
-
   Ui::BlueBerryExampleLauncherDialog *ui;
   QStringList provisioningFiles;
   QList<QString> descriptions;

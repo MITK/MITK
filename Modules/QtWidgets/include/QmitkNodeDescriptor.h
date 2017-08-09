@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <map>
 #include "mitkDataNode.h"
-#include <QList>
 #include <QAction>
-#include <QWidgetAction>
-#include <QString>
 #include <QIcon>
+#include <QList>
+#include <QString>
+#include <QWidgetAction>
+#include <map>
 #include <mitkNodePredicateBase.h>
 
 /**
@@ -47,8 +47,10 @@ public:
   ///
   /// Creates a new QmitkNodeQmitkNodeDescriptor
   ///
-  QmitkNodeDescriptor(const QString& _ClassName, const QString& _PathToIcon
-    , mitk::NodePredicateBase* _Predicate, QObject* parent);
+  QmitkNodeDescriptor(const QString &_ClassName,
+                      const QString &_PathToIcon,
+                      mitk::NodePredicateBase *_Predicate,
+                      QObject *parent);
   ///
   /// Deletes all actions
   ///
@@ -64,39 +66,40 @@ public:
   ///
   /// Returns an Icon for this class of DataNodes
   ///
-  virtual QAction* GetSeparator() const;
+  virtual QAction *GetSeparator() const;
   ///
   /// Check if this class describes the given node
   ///
-  virtual bool CheckNode(const mitk::DataNode* node) const;
+  virtual bool CheckNode(const mitk::DataNode *node) const;
   ///
   /// Create and return an action with this descriptor as owner
   ///
-  virtual void AddAction ( QAction * action, bool isBatchAction=true );
+  virtual void AddAction(QAction *action, bool isBatchAction = true);
   ///
   /// Remove and delete (!) an action
   ///
-  virtual void RemoveAction(QAction* _Action);
+  virtual void RemoveAction(QAction *_Action);
   ///
   /// Get all actions associated with this class of nodes
   ///
-  virtual QList<QAction*> GetActions() const;
+  virtual QList<QAction *> GetActions() const;
   ///
   /// Get all actions for this descriptor class that can be executed on multiple nodes
   /// (no priot knowledge abpout the node is required)
   ///
-  virtual QList<QAction*> GetBatchActions() const;
+  virtual QList<QAction *> GetBatchActions() const;
 
 public slots:
   /// Called when an action was destroyed
-  void ActionDestroyed ( QObject * obj = nullptr );
+  void ActionDestroyed(QObject *obj = nullptr);
+
 protected:
   QString m_ClassName;
   QString m_PathToIcon;
   mitk::NodePredicateBase::Pointer m_Predicate;
-  QList<QAction*> m_Actions;
-  QList<QAction*> m_BatchActions;
-  QAction* m_Separator;
+  QList<QAction *> m_Actions;
+  QList<QAction *> m_BatchActions;
+  QAction *m_Separator;
 };
 
 #endif // QmitkNodeDescriptor_h

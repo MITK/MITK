@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef mitkGeometryDataWriterService_h
 #define mitkGeometryDataWriterService_h
 
@@ -26,39 +25,35 @@ class TiXmlNode;
 
 namespace mitk
 {
+  // forward
+  class Geometry3D;
 
-// forward
-class Geometry3D;
+  /**
+   * @internal
+   *
+   * @brief XML-based writer for mitk::GeometryData
+   *
+   * XML-based writer for mitk::GeometryData. Multiple GeometryData instances
+   * can be written in a single XML file by simply setting multiple inputs to the filter.
+   *
+   * @sa Geometry3DToXML
+   *
+   * @ingroup IO
+   */
+  class GeometryDataWriterService : public AbstractFileWriter
+  {
+  public:
+    GeometryDataWriterService();
+    virtual ~GeometryDataWriterService();
 
-/**
- * @internal
- *
- * @brief XML-based writer for mitk::GeometryData
- *
- * XML-based writer for mitk::GeometryData. Multiple GeometryData instances
- * can be written in a single XML file by simply setting multiple inputs to the filter.
- *
- * @sa Geometry3DToXML
- *
- * @ingroup IO
- */
-class GeometryDataWriterService : public AbstractFileWriter
-{
-public:
+    using AbstractFileWriter::Write;
+    virtual void Write() override;
 
-  GeometryDataWriterService();
-  virtual ~GeometryDataWriterService();
+  private:
+    GeometryDataWriterService(const GeometryDataWriterService &other);
 
-  using AbstractFileWriter::Write;
-  virtual void Write() override;
-
-private:
-
-  GeometryDataWriterService(const GeometryDataWriterService& other);
-
-  virtual mitk::GeometryDataWriterService* Clone() const override;
-};
-
+    virtual mitk::GeometryDataWriterService *Clone() const override;
+  };
 }
 
 #endif

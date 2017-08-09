@@ -20,19 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactoryBase.h"
 #include <MitkContourModelExports.h>
 
-namespace mitk {
-
+namespace mitk
+{
   class MITKCONTOURMODEL_EXPORT ContourObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(ContourObjectFactory,CoreObjectFactoryBase);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
-    virtual void SetDefaultProperties(mitk::DataNode* node) override;
-    virtual const char* GetFileExtensions() override;
+    mitkClassMacro(ContourObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual Mapper::Pointer
+      CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    virtual void SetDefaultProperties(mitk::DataNode *node) override;
+    virtual const char *GetFileExtensions() override;
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    virtual const char* GetSaveFileExtensions() override;
+    virtual const char *GetSaveFileExtensions() override;
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
     /** \deprecatedSince{2013_09} */
@@ -46,9 +45,7 @@ namespace mitk {
     MultimapType m_SaveFileExtensionsMap;
 
   private:
-
   };
-
 }
 
 #endif

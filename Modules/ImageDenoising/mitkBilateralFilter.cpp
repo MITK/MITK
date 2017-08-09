@@ -15,14 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkBilateralFilter.h"
-#include <itkBilateralImageFilter.h>
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
+#include <itkBilateralImageFilter.h>
 
 mitk::BilateralFilter::BilateralFilter()
   : m_DomainSigma(2.0f), m_RangeSigma(50.0f), m_AutoKernel(true), m_KernelRadius(1u)
 {
-  //default parameters DomainSigma: 2 , RangeSigma: 50, AutoKernel: true, KernelRadius: 1
+  // default parameters DomainSigma: 2 , RangeSigma: 50, AutoKernel: true, KernelRadius: 1
 }
 
 mitk::BilateralFilter::~BilateralFilter()
@@ -32,57 +32,64 @@ mitk::BilateralFilter::~BilateralFilter()
 void mitk::BilateralFilter::GenerateData()
 {
   mitk::Image::ConstPointer inputImage = this->GetInput(0);
-  if ( (inputImage->GetDimension() > 4) || (inputImage->GetDimension() < 2) )
+  if ((inputImage->GetDimension() > 4) || (inputImage->GetDimension() < 2))
   {
-    MITK_ERROR << "mitk::BilateralFilter:GenerateData works only with 2D, 2D+t, 3D, 3D+t and 4D images, sorry." << std::endl;
+    MITK_ERROR << "mitk::BilateralFilter:GenerateData works only with 2D, 2D+t, 3D, 3D+t and 4D images, sorry."
+               << std::endl;
     itkExceptionMacro("mitk::BilateralFilter:GenerateData works only with 2D, 2D+t, 3D, 3D+t and 4D images, sorry.");
     return;
   }
-  switch(inputImage->GetDimension())
+  switch (inputImage->GetDimension())
   {
-  case 2:
+    case 2:
     {
-      AccessFixedDimensionByItk( inputImage.GetPointer(), ItkImageProcessing, 2 ); break;
+      AccessFixedDimensionByItk(inputImage.GetPointer(), ItkImageProcessing, 2);
+      break;
     }
-  case 3:
+    case 3:
     {
-      AccessFixedDimensionByItk( inputImage.GetPointer(), ItkImageProcessing, 3 ); break;
+      AccessFixedDimensionByItk(inputImage.GetPointer(), ItkImageProcessing, 3);
+      break;
     }
-  case 4:
+    case 4:
     {
-      AccessFixedDimensionByItk( inputImage.GetPointer(), ItkImageProcessing, 4 ); break;
+      AccessFixedDimensionByItk(inputImage.GetPointer(), ItkImageProcessing, 4);
+      break;
     }
-  default: break;
+    default:
+      break;
   }
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::BilateralFilter::ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* itkImage )
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::BilateralFilter::ItkImageProcessing(const itk::Image<TPixel, VImageDimension> *itkImage)
 {
-  //ITK Image type given from the input image
-  typedef itk::Image< TPixel, VImageDimension >   ItkImageType;
-  //bilateral filter with same type
-  typedef itk::BilateralImageFilter<ItkImageType,ItkImageType>        BilateralFilterType;
+  // ITK Image type given from the input image
+  typedef itk::Image<TPixel, VImageDimension> ItkImageType;
+  // bilateral filter with same type
+  typedef itk::BilateralImageFilter<ItkImageType, ItkImageType> BilateralFilterType;
   typename BilateralFilterType::Pointer bilateralFilter = BilateralFilterType::New();
   bilateralFilter->SetInput(itkImage);
-  //set parameters
-  if(!m_AutoKernel){
+  // set parameters
+  if (!m_AutoKernel)
+  {
     bilateralFilter->SetAutomaticKernelSize(m_AutoKernel);
     bilateralFilter->SetRadius(m_KernelRadius);
   }
   bilateralFilter->SetDomainSigma(m_DomainSigma);
   bilateralFilter->SetRangeSigma(m_RangeSigma);
   bilateralFilter->UpdateLargestPossibleRegion();
-  //get  Pointer to output image
+  // get  Pointer to output image
   mitk::Image::Pointer resultImage = this->GetOutput();
-  //write into output image
+  // write into output image
   mitk::CastToMitkImage(bilateralFilter->GetOutput(), resultImage);
 }
 
 void mitk::BilateralFilter::GenerateOutputInformation()
 {
-  mitk::Image::Pointer inputImage  = (mitk::Image*) this->GetInput();
+  mitk::Image::Pointer inputImage = (mitk::Image *)this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
-  itkDebugMacro(<<"GenerateOutputInformation()");
-  if(inputImage.IsNull()) return;
+  itkDebugMacro(<< "GenerateOutputInformation()");
+  if (inputImage.IsNull())
+    return;
 }

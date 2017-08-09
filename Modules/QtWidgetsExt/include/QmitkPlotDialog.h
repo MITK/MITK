@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QmitkPlotDialog_H
 #define _QmitkPlotDialog_H
 
-#include <qdialog.h>
 #include "MitkQtWidgetsExtExports.h"
-#include <QmitkPlotWidget.h>
 #include "mitkCommon.h"
+#include <QmitkPlotWidget.h>
+#include <qdialog.h>
 
 /**
 * Provides a GUI interface for plotting curves using QmitkPlotWidget.
@@ -44,14 +44,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 *    the QwtPlot instance using the method GetQwtPlot().
 * @see QwtPlot, @see QmitkPlotWidget
 */
-class MITKQTWIDGETSEXT_EXPORT QmitkPlotDialog: public QDialog
+class MITKQTWIDGETSEXT_EXPORT QmitkPlotDialog : public QDialog
 {
-
 public:
   /**
   * Standard qt constructor
   */
-  QmitkPlotDialog(const char* title, QWidget* parent = nullptr, const char* name = nullptr);
+  QmitkPlotDialog(const char *title, QWidget *parent = nullptr, const char *name = nullptr);
 
   /**
   * Virtual destructor
@@ -62,20 +61,18 @@ public:
   * Returns the instance of the QmitkPlotWidget. This may be used
   * to modify any detail of the appearance of the plot.
   */
-  QmitkPlotWidget* GetPlot();
+  QmitkPlotWidget *GetPlot();
 
   /**
   * Returns the instance of the plot-widget. This may be used
   * to modify any detail of the appearance of the plot.
   */
-  QwtPlot* GetQwtPlot();
+  QwtPlot *GetQwtPlot();
 
 protected:
+  QmitkPlotWidget *m_Plot;
 
-  QmitkPlotWidget* m_Plot;
-
-  QPushButton* m_CloseDialogButton;
+  QPushButton *m_CloseDialogButton;
 };
 
 #endif
-

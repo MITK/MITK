@@ -17,5 +17,5 @@ set(CPP_FILES
   Filters/mitkImageToIGTLMessageFilter.cpp
   DeviceSources/mitkIGTL2DImageDeviceSource.cpp
   DeviceSources/mitkIGTL3DImageDeviceSource.cpp
-  DeviceSources/mitkIGTLTransformDeviceSource.cpp
+  DeviceSources/mitkIGTLTrackingDataDeviceSource.cpp
 )

@@ -55,6 +55,7 @@ public:
   itkCloneMacro(Self);
 
   typedef mitk::USDiPhASDeviceCustomControls::DataType DataType;
+  typedef mitk::USDiPhASDeviceCustomControls::SavingSettings SavingSettings;
 
   /**
     * Implementation of the superclass method. Returns the pointer
@@ -89,12 +90,14 @@ public:
 
   /** This starts or ends the recording session*/
   void SetRecordingStatus(bool record);
+  void SetSavingSettings(SavingSettings settings);
   void SetVerticalSpacing(float mm);
 
-  void ModifyDataType(DataType DataT);
+  void ModifyDataType(DataType dataT);
   void ModifyUseBModeFilter(bool isSet);
   void ModifyScatteringCoefficient(int coeff);
   void ModifyCompensateForScattering(bool useIt);
+  void ModifyEnergyCompensation(bool compensate);
 
   /**
   * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
@@ -102,7 +105,7 @@ public:
   void UpdateImageGeometry();
 
 protected:
-  void SetDataType(DataType DataT);
+  void SetDataType(DataType dataT);
   void SetUseBModeFilter(bool isSet);
 
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
@@ -110,6 +113,7 @@ protected:
 
   /** This vector holds all the images we record, if recording is set to active. */
   std::vector<mitk::Image::Pointer>     m_RecordedImages;
+  std::vector<mitk::Image::Pointer>     m_RawRecordedImages;
   std::vector<long long>                m_ImageTimestampRecord;
   std::vector<long long>                m_ImageTimestampBuffer;
   long long                             m_CurrentImageTimestamp;
@@ -128,26 +132,30 @@ protected:
   unsigned int                          m_ImageDimensions[3];
   mitk::Vector3D                        m_ImageSpacing;
 
-  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, float resampleSpacing = 0.15);
+  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer image, bool useLogFilter = false);
+  mitk::Image::Pointer ResampleOutputVertical(mitk::Image::Pointer image, float verticalSpacing = 0.1);
+
   mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
   mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3]);
+  mitk::Image::Pointer MultiplyImage(mitk::Image::Pointer inputImage, double value);
 
-  void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
-  void OrderImagesUltrasound(Image::Pointer SoundImage);
+  void OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage, std::vector<Image::Pointer> recordedList, bool raw);
+  void OrderImagesUltrasound(Image::Pointer USImage, std::vector<Image::Pointer> recordedList);
 
-  void GetPixelValues(itk::Index<3> pixel);
+  void GetPixelValues(itk::Index<3> pixel, std::vector<float>& values);
   float GetPixelValue(itk::Index<3> pixel);
   std::vector<float>                    m_PixelValues;
 
-  mitk::USDiPhASDevice*                 m_device;
+  mitk::USDiPhASDevice*                 m_Device;
 
   /** This is a callback to pass text data to the GUI. */
   std::function<void(QString)>          m_GUIOutput;
 
-
   /**
    * Variables for management of current state.
    */
+  SavingSettings                  m_SavingSettings;
+
   float                           m_StartTime;
   bool                            m_UseGUIOutPut;
 
@@ -171,6 +179,10 @@ protected:
   bool                            m_CompensateForScattering;
   bool                            m_CompensateForScatteringNext;
   bool                            m_CompensateForScatteringModified;
+
+  bool                            m_CompensateEnergy;
+  bool                            m_CompensateEnergyNext;
+  bool                            m_CompensateEnergyModified;
 
   DataType                        m_DataType;
 };

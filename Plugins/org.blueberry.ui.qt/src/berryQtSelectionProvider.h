@@ -44,7 +44,7 @@ public:
   void RemoveSelectionChangedListener(ISelectionChangedListener* listener) override;
 
   ISelection::ConstPointer GetSelection() const override;
-  void SetSelection(const ISelection::ConstPointer& selection) override;
+  virtual void SetSelection(const ISelection::ConstPointer& selection) override;
 
   virtual void SetSelection(const ISelection::ConstPointer& selection,
                             QItemSelectionModel::SelectionFlags);

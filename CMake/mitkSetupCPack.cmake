@@ -36,6 +36,8 @@ endif()
 if(EXISTS ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE} )
   install(PROGRAMS ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE}
           DESTINATION thirdpartyinstallers)
+
+  get_filename_component(CPACK_REDISTRIBUTABLE_FILE_NAME ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE} NAME )
 endif()
 
 # On windows set default install directory appropriately for 32 and 64 bit

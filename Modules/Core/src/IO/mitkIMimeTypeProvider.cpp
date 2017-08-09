@@ -16,10 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIMimeTypeProvider.h"
 
-namespace mitk {
-
-IMimeTypeProvider::~IMimeTypeProvider()
+namespace mitk
 {
-}
-
+  IMimeTypeProvider::~IMimeTypeProvider() {}
 }

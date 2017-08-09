@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Mitk
 #include <mitkStatusBar.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include "mitkRegVisPropertyTags.h"
@@ -57,9 +57,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMatchPointRegistrationManipulator::VIEW_ID =
     "org.mitk.views.matchpoint.registration.manipulator";
 
+const std::string QmitkMatchPointRegistrationManipulator::HelperNodeName =
+    "RegistrationManipulationEvaluationHelper";
+
 QmitkMatchPointRegistrationManipulator::QmitkMatchPointRegistrationManipulator()
-  : m_Parent(NULL), m_activeManipulation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0), HelperNodeName("RegistrationManipulationEvaluationHelper"),
-   m_internalUpdate(false)
+  : m_Parent(nullptr), m_activeManipulation(false), m_autoMoving(false), m_autoTarget(false),
+    m_currentSelectedTimeStep(0), m_internalUpdate(false)
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -145,10 +148,10 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
   this->m_autoMoving = false;
   this->m_autoTarget = false;
-  this->m_SelectedMovingNode = NULL;
-  this->m_SelectedTargetNode = NULL;
-  this->m_SelectedPreRegNode = NULL;
-  this->m_SelectedPreReg = NULL;
+  this->m_SelectedMovingNode = nullptr;
+  this->m_SelectedTargetNode = nullptr;
+  this->m_SelectedPreRegNode = nullptr;
+  this->m_SelectedPreReg = nullptr;
 
   if (dataNodes.size() > 0)
   {
@@ -168,23 +171,23 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
       {
         this->m_SelectedPreRegNode = regNode;
 
-        mitk::BaseProperty* uidProp = m_SelectedPreRegNode->GetProperty(mitk::nodeProp_RegAlgMovingData);
+        mitk::BaseProperty* uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
 
         if (uidProp)
         {
           //search for the moving node
-          mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+          mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
             uidProp);
           this->m_SelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
           this->m_autoMoving = this->m_SelectedMovingNode.IsNotNull();
         }
 
-        uidProp = m_SelectedPreRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+        uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
         if (uidProp)
         {
           //search for the target node
-          mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+          mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
             uidProp);
           this->m_SelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
           this->m_autoTarget = this->m_SelectedTargetNode.IsNotNull();
@@ -221,12 +224,28 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
 }
 
 
-void QmitkMatchPointRegistrationManipulator::OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-        const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPointRegistrationManipulator::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+        const QList<mitk::DataNode::Pointer>&)
 {
   this->CheckInputs();
 	this->ConfigureControls();
 };
+
+
+void QmitkMatchPointRegistrationManipulator::NodeRemoved(const mitk::DataNode* node)
+{
+  if (node == this->m_SelectedMovingNode
+    || node == this->m_SelectedTargetNode
+    || node == this->m_EvalNode)
+  {
+    if (node == this->m_EvalNode)
+    {
+      this->m_EvalNode = nullptr;
+    }
+    this->OnCancelBtnPushed();
+    MITK_INFO << "Stopped current MatchPoint manual registration session, because at least one relevant node was removed from storage.";
+  }
+}
 
 void QmitkMatchPointRegistrationManipulator::ConfigureControls()
 {
@@ -358,7 +377,7 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   this->m_Controls.slideTransZ->setMaximum(currenttrans[2] + 250);
 
   //reinit view
-  mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 
   //generate evaluation node
   mitk::RegEvaluationObject::Pointer regEval = mitk::RegEvaluationObject::New();
@@ -388,7 +407,11 @@ void QmitkMatchPointRegistrationManipulator::StopSession()
   this->m_CurrentRegistration = nullptr;
   this->m_CurrentRegistrationWrapper = nullptr;
 
-  this->GetDataStorage()->Remove(this->m_EvalNode);
+  if (this->m_EvalNode.IsNotNull())
+  {
+    this->GetDataStorage()->Remove(this->m_EvalNode);
+  }
+
   this->m_EvalNode = nullptr;
 
   this->m_activeManipulation = false;
@@ -446,7 +469,7 @@ void QmitkMatchPointRegistrationManipulator::UpdateTransform(bool updateRotation
 
 void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
 {
-  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(NULL);
+  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
   unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
   if (m_currentSelectedPosition != currentSelectedPosition
@@ -523,7 +546,7 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
 
   mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(
     this->m_Controls.lbNewRegName->text().toStdString(), newRegWrapper, "org.mitk::manual_registration",
-    mitk::EnsureUID(m_SelectedMovingNode), mitk::EnsureUID(m_SelectedTargetNode));
+    mitk::EnsureUID(m_SelectedMovingNode->GetData()), mitk::EnsureUID(m_SelectedTargetNode->GetData()));
 
   this->GetDataStorage()->Add(spResultRegistrationNode);
 
@@ -533,7 +556,7 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
     pMapJob->setAutoDelete(true);
 
     pMapJob->m_spInputData = this->m_SelectedMovingNode->GetData();
-    pMapJob->m_InputNodeUID = mitk::EnsureUID(m_SelectedMovingNode);
+    pMapJob->m_InputDataUID = mitk::EnsureUID(m_SelectedMovingNode->GetData());
     pMapJob->m_spRegNode = spResultRegistrationNode;
     pMapJob->m_doGeometryRefinement = false;
     pMapJob->m_spRefGeometry = this->m_SelectedTargetNode->GetData()->GetGeometry()->Clone().GetPointer();
@@ -566,7 +589,7 @@ void QmitkMatchPointRegistrationManipulator::OnMapResultIsAvailable(mitk::BaseDa
   const QmitkMappingJob* job)
 {
   mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
-    spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputNodeUID,
+    spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
     job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
   this->GetRenderWindowPart()->RequestUpdate();

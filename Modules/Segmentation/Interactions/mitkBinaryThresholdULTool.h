@@ -17,21 +17,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkBinaryThresholdULTool_h_Included
 #define mitkBinaryThresholdULTool_h_Included
 
-#include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include "mitkCommon.h"
 #include "mitkDataNode.h"
+#include <MitkSegmentationExports.h>
 
-#include <itkImage.h>
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkImage.h>
 
-namespace us {
-class ModuleResource;
+namespace us
+{
+  class ModuleResource;
 }
 
 namespace mitk
 {
-
   /**
   \brief Calculates the segmented volumes for binary images.
 
@@ -44,17 +44,15 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT BinaryThresholdULTool : public AutoSegmentationTool
   {
   public:
-
-    Message3<double,double,bool> IntervalBordersChanged;
-    Message2<mitk::ScalarType, mitk::ScalarType>     ThresholdingValuesChanged;
+    Message3<double, double, bool> IntervalBordersChanged;
+    Message2<mitk::ScalarType, mitk::ScalarType> ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const override;
+      virtual const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
-    virtual const char* GetName() const override;
+    virtual const char *GetName() const override;
 
     virtual void Activated() override;
     virtual void Deactivated() override;
@@ -63,15 +61,13 @@ namespace mitk
     virtual void AcceptCurrentThresholdValue();
     virtual void CancelThresholding();
 
-
   protected:
-
     BinaryThresholdULTool(); // purposely hidden
     virtual ~BinaryThresholdULTool();
 
     void SetupPreviewNode();
 
-    void CreateNewSegmentationFromThreshold(DataNode* node);
+    void CreateNewSegmentationFromThreshold(DataNode *node);
 
     void OnRoiDataChanged();
     void UpdatePreview();
@@ -88,13 +84,11 @@ namespace mitk
     bool m_IsOldBinary = false;
 
     typedef itk::Image<int, 3> ImageType;
-    typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
+    typedef itk::Image<Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
     typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
     ThresholdFilterType::Pointer m_ThresholdFilter;
-
   };
 
 } // namespace
 
 #endif
-

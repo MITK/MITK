@@ -8,20 +8,18 @@
  * TestSuite for PointSet which tests properties on an empty PointSet
  */
 
-#include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
 
-
+#include <mitkInteractionConst.h>
+#include <mitkPointOperation.h>
 #include <mitkPointSet.h>
 #include <mitkVector.h>
-#include <mitkPointOperation.h>
-#include <mitkInteractionConst.h>
 
 #include <fstream>
 
 class mitkPointSetOnEmptyTestSuite : public mitk::TestFixture
 {
-
   CPPUNIT_TEST_SUITE(mitkPointSetOnEmptyTestSuite);
 
   MITK_TEST(TestInstantiation);
@@ -35,15 +33,14 @@ class mitkPointSetOnEmptyTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   mitk::PointSet::Pointer pointSet;
 
-  void TestPointContainerPointDataContainer(mitk::PointSet* ps)
+  void TestPointContainerPointDataContainer(mitk::PointSet *ps)
   {
-    mitk::PointSet::PointsContainer* pc = ps->GetPointSet()->GetPoints();
-    mitk::PointSet::PointDataContainer* pd = ps->GetPointSet()->GetPointData();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("PointContainer and PointDataContainer have same size",
-        true, pc->Size() == pd->Size());
+    mitk::PointSet::PointsContainer *pc = ps->GetPointSet()->GetPoints();
+    mitk::PointSet::PointDataContainer *pd = ps->GetPointSet()->GetPointData();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "PointContainer and PointDataContainer have same size", true, pc->Size() == pd->Size());
     mitk::PointSet::PointsContainer::ConstIterator pIt = pc->Begin();
     mitk::PointSet::PointDataContainer::ConstIterator dIt = pd->Begin();
     bool failed = false;
@@ -53,70 +50,55 @@ private:
         failed = true;
         break;
       }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Indices in PointContainer and PointDataContainer are equal",
-        false, failed);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Indices in PointContainer and PointDataContainer are equal", false, failed);
   }
 
 public:
-
   void setUp() override
   {
-    //Create PointSet
+    // Create PointSet
     pointSet = mitk::PointSet::New();
   }
 
-  void tearDown() override
-  {
-    pointSet = nullptr;
-  }
-
-  void TestInstantiation()
-  {
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing instantiation",
-        true, pointSet.IsNotNull());
-  }
-
+  void tearDown() override { pointSet = nullptr; }
+  void TestInstantiation() { CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing instantiation", true, pointSet.IsNotNull()); }
   void TestGetITKPointSet()
   {
-    //try to get the itkPointSet
+    // try to get the itkPointSet
     mitk::PointSet::DataType::Pointer itkdata = nullptr;
     itkdata = pointSet->GetPointSet();
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("try to get the itkPointSet from a newly created PointSet",
-        true,  itkdata.IsNotNull());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("try to get the itkPointSet from a newly created PointSet", true, itkdata.IsNotNull());
   }
 
   void TestGetSizeIsZero()
   {
-    //fresh PointSet has to be empty!
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if the PointSet size is 0 ",
-        true, pointSet->GetSize() == 0);
+    // fresh PointSet has to be empty!
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if the PointSet size is 0 ", true, pointSet->GetSize() == 0);
   }
 
   void TestIsEmpty()
   {
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if the PointSet is empty",
-        true, pointSet->IsEmptyTimeStep(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if the PointSet is empty", true, pointSet->IsEmptyTimeStep(0));
   }
 
   void TestAddPointDirectly()
   {
-    //add a point directly
-    int id=0;
+    // add a point directly
+    int id = 0;
     mitk::Point3D point;
     mitk::FillVector3D(point, 1.0, 2.0, 3.0);
     ++id;
     pointSet->GetPointSet()->GetPoints()->InsertElement(id, point);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if added points exists",
-        true, pointSet->GetSize()==1 ||pointSet->IndexExists(id));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "check if added points exists", true, pointSet->GetSize() == 1 || pointSet->IndexExists(id));
 
     mitk::Point3D tempPoint;
 
     tempPoint.Fill(0);
     tempPoint = pointSet->GetPoint(id);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if added point contains real value",
-        true, point == tempPoint);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if added point contains real value", true, point == tempPoint);
   }
 
   void TestPointSetClone(void)
@@ -126,73 +108,72 @@ public:
     new0.Fill(0);
     new1.Fill(1);
     new2.Fill(2);
-    pointSet->InsertPoint(5,new0, mitk::PTCORNER,0);
-    pointSet->InsertPoint(112,new1,0);
-    pointSet->InsertPoint(2,new2,0);
-    pointSet->InsertPoint(2,new0,1);
-    pointSet->InsertPoint(1,new1,1);
-    pointSet->InsertPoint(0,new2,1);
-    pointSet->InsertPoint(0,new0,2);
-    pointSet->InsertPoint(2,new1,2);
-    pointSet->InsertPoint(1,new2,2);
+    pointSet->InsertPoint(5, new0, mitk::PTCORNER, 0);
+    pointSet->InsertPoint(112, new1, 0);
+    pointSet->InsertPoint(2, new2, 0);
+    pointSet->InsertPoint(2, new0, 1);
+    pointSet->InsertPoint(1, new1, 1);
+    pointSet->InsertPoint(0, new2, 1);
+    pointSet->InsertPoint(0, new0, 2);
+    pointSet->InsertPoint(2, new1, 2);
+    pointSet->InsertPoint(1, new2, 2);
 
-    MITK_TEST_OUTPUT( << "... pointset ts: " << pointSet->GetTimeSteps() )
+    MITK_TEST_OUTPUT(<< "... pointset ts: " << pointSet->GetTimeSteps())
     mitk::PointSet::Pointer clonePS = pointSet->Clone();
-    MITK_TEST_OUTPUT( << "... clone pointset ts: " << clonePS->GetTimeSteps() )
+    MITK_TEST_OUTPUT(<< "... clone pointset ts: " << clonePS->GetTimeSteps())
 
-    for (unsigned int t=0; t< pointSet->GetTimeSteps(); t++)
+    for (unsigned int t = 0; t < pointSet->GetTimeSteps(); t++)
+    {
+      MITK_TEST_OUTPUT(<< "testing timestep: " << t)
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Clone has same size", true, pointSet->GetSize(t) == clonePS->GetSize(t));
+
+      // test for equal point coordinates
+      for (mitk::PointSet::PointsConstIterator i = pointSet->Begin(), j = clonePS->Begin();
+           i != pointSet->End() && j != clonePS->End();
+           ++i, ++j)
       {
-        MITK_TEST_OUTPUT( << "testing timestep: " << t )
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Clone has same size",
-            true, pointSet->GetSize(t) == clonePS->GetSize(t));
-
-          // test for equal point coordinates
-          for (mitk::PointSet::PointsConstIterator i = pointSet->Begin(), j = clonePS->Begin();
-              i != pointSet->End() && j != clonePS->End(); ++i, ++j)
-            {
-              CPPUNIT_ASSERT_EQUAL_MESSAGE("Cloned PS and PS have same points",
-                  true, i.Index() == j.Index() && mitk::Equal(i.Value(),j.Value()));
-            }
-
-        // test for equal point data
-        mitk::PointSet::PointDataContainer* pointDataCont = pointSet->GetPointSet(t)->GetPointData();
-        mitk::PointSet::PointDataContainer* clonePointDataCont = clonePS->GetPointSet(t)->GetPointData();
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Valid point data container",
-            true, pointDataCont && clonePointDataCont);
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("Cloned point data container has same size",
-            true, pointDataCont->Size() == clonePointDataCont->Size());
-        for (mitk::PointSet::PointDataConstIterator i = pointDataCont->Begin(), j = clonePointDataCont->Begin();
-            i != pointDataCont->End() && j != clonePointDataCont->End(); ++i, ++j)
-          {
-            CPPUNIT_ASSERT_EQUAL_MESSAGE("Cloned PS and PS have same point data",
-                true, i.Index() == j.Index() && i.Value() == j.Value());
-          }
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(
+          "Cloned PS and PS have same points", true, i.Index() == j.Index() && mitk::Equal(i.Value(), j.Value()));
       }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if the PointSet is not empty",
-        false, clonePS->IsEmptyTimeStep(0));
+      // test for equal point data
+      mitk::PointSet::PointDataContainer *pointDataCont = pointSet->GetPointSet(t)->GetPointData();
+      mitk::PointSet::PointDataContainer *clonePointDataCont = clonePS->GetPointSet(t)->GetPointData();
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Valid point data container", true, pointDataCont && clonePointDataCont);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        "Cloned point data container has same size", true, pointDataCont->Size() == clonePointDataCont->Size());
+      for (mitk::PointSet::PointDataConstIterator i = pointDataCont->Begin(), j = clonePointDataCont->Begin();
+           i != pointDataCont->End() && j != clonePointDataCont->End();
+           ++i, ++j)
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(
+          "Cloned PS and PS have same point data", true, i.Index() == j.Index() && i.Value() == j.Value());
+      }
+    }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing cloned point set's size!",
-        true, clonePS->GetPointSetSeriesSize() == pointSet->GetPointSetSeriesSize());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing that the clone is not the source PS!",
-        true, clonePS.GetPointer() != pointSet.GetPointer());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Testing if the geometry is cloned correctly!",
-        true, clonePS->GetGeometry()->GetCenter() == pointSet->GetGeometry()->GetCenter());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing if the property list is cloned correctly!",
-        true, clonePS->GetPropertyList()->GetMap()->size() == pointSet->GetPropertyList()->GetMap()->size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check if the PointSet is not empty", false, clonePS->IsEmptyTimeStep(0));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Testing cloned point set's size!", true, clonePS->GetPointSetSeriesSize() == pointSet->GetPointSetSeriesSize());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Testing that the clone is not the source PS!", true, clonePS.GetPointer() != pointSet.GetPointer());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing if the geometry is cloned correctly!",
+                                 true,
+                                 clonePS->GetGeometry()->GetCenter() == pointSet->GetGeometry()->GetCenter());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Testing if the property list is cloned correctly!",
+      true,
+      clonePS->GetPropertyList()->GetMap()->size() == pointSet->GetPropertyList()->GetMap()->size());
     // Also testing, that clone is independent from original
     mitk::Point3D p, p2;
     p.Fill(42);
     p2.Fill(84);
-    clonePS->InsertPoint(0,p);
-    pointSet->InsertPoint(0,p2);
+    clonePS->InsertPoint(0, p);
+    pointSet->InsertPoint(0, p2);
     p = clonePS->GetPoint(0);
     p2 = pointSet->GetPoint(0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing that the clone is independent from source!",
-        true, p != p2);
-
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Testing that the clone is independent from source!", true, p != p2);
   }
-
 
   void TestPointDataContainerCorrectAfterPointSetManipulation(void)
   {
@@ -217,28 +198,19 @@ public:
     TestPointContainerPointDataContainer(pointSet);
 
     MITK_TEST_OUTPUT(<< "Test OpMove");
-    mitk::PointOperation op2(mitk::OpMOVE, mitk::Point3D(), 4);  // existing index
+    mitk::PointOperation op2(mitk::OpMOVE, mitk::Point3D(), 4); // existing index
     pointSet->ExecuteOperation(&op2);
-    mitk::PointOperation op3(mitk::OpMOVE, mitk::Point3D(), 34);  // non existing index
+    mitk::PointOperation op3(mitk::OpMOVE, mitk::Point3D(), 34); // non existing index
     pointSet->ExecuteOperation(&op3);
     TestPointContainerPointDataContainer(pointSet);
 
     MITK_TEST_OUTPUT(<< "Test OpINSERT");
-    mitk::PointOperation op4(mitk::OpINSERT, mitk::Point3D(), 38);  // non existing index
+    mitk::PointOperation op4(mitk::OpINSERT, mitk::Point3D(), 38); // non existing index
     pointSet->ExecuteOperation(&op4);
-    mitk::PointOperation op5(mitk::OpINSERT, mitk::Point3D(), 17);  // existing index
+    mitk::PointOperation op5(mitk::OpINSERT, mitk::Point3D(), 17); // existing index
     pointSet->ExecuteOperation(&op5);
     TestPointContainerPointDataContainer(pointSet);
   }
-
-
-
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPointSetOnEmpty)
-
-
-
-
-

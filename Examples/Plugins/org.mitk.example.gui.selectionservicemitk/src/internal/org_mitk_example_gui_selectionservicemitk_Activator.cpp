@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "org_mitk_example_gui_selectionservicemitk_Activator.h"
 
-#include "SelectionServiceMitk.h"
 #include "ExtendedPerspective.h"
+#include "SelectionServiceMitk.h"
 
-void org_mitk_example_gui_selectionservicemitk_Activator::start(ctkPluginContext* context)
+void org_mitk_example_gui_selectionservicemitk_Activator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(SelectionServiceMitk, context)
   BERRY_REGISTER_EXTENSION_CLASS(ExtendedPerspective, context)
 }
 
-void org_mitk_example_gui_selectionservicemitk_Activator::stop(ctkPluginContext* context)
+void org_mitk_example_gui_selectionservicemitk_Activator::stop(ctkPluginContext *context)
 {
   Q_UNUSED(context)
 }

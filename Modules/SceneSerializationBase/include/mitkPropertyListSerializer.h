@@ -27,19 +27,17 @@ class TiXmlElement;
 
 namespace mitk
 {
-
-/**
-  \brief Serializes a mitk::PropertyList
-*/
-class MITKSCENESERIALIZATIONBASE_EXPORT PropertyListSerializer : public itk::Object
-{
+  /**
+    \brief Serializes a mitk::PropertyList
+  */
+  class MITKSCENESERIALIZATIONBASE_EXPORT PropertyListSerializer : public itk::Object
+  {
   public:
-
-    mitkClassMacroItkParent( PropertyListSerializer, itk::Object );
+    mitkClassMacroItkParent(PropertyListSerializer, itk::Object);
     itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
-    itkCloneMacro(Self)
+      itkCloneMacro(Self)
 
-    itkSetStringMacro(FilenameHint);
+        itkSetStringMacro(FilenameHint);
     itkGetStringMacro(FilenameHint);
 
     itkSetStringMacro(WorkingDirectory);
@@ -53,23 +51,21 @@ class MITKSCENESERIALIZATIONBASE_EXPORT PropertyListSerializer : public itk::Obj
       */
     virtual std::string Serialize();
 
-    PropertyList* GetFailedProperties();
+    PropertyList *GetFailedProperties();
 
   protected:
-
     PropertyListSerializer();
     virtual ~PropertyListSerializer();
 
-    TiXmlElement* SerializeOneProperty( const std::string& key, const BaseProperty* property );
+    TiXmlElement *SerializeOneProperty(const std::string &key, const BaseProperty *property);
 
     std::string m_FilenameHint;
     std::string m_WorkingDirectory;
     PropertyList::Pointer m_PropertyList;
 
     PropertyList::Pointer m_FailedProperties;
-};
+  };
 
 } // namespace
 
 #endif
-

@@ -5,7 +5,7 @@ set(CPP_FILES
   QVTKMitkInteractorAdapter.cxx
   QVTKQuickItem.cxx
   QVTKFramebufferObjectRenderer.cxx
-  QVTKInternalOpenglRenderWindow.cxx
+  vtkInternalOpenGLRenderWindow.cxx
 )
 
 set(MOC_H_FILES

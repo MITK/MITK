@@ -1,7 +1,0 @@
-project(org_mitk_diffusionimaging)
-
-mitk_create_plugin(
-  EXPORT_DIRECTIVE ORG_MITK_DIFFUSIONIMAGING_EXPORT
-  EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkDiffusionCore MitkQuantification MitkFiberTracking MitkConnectomics MitkQtWidgetsExt
-)

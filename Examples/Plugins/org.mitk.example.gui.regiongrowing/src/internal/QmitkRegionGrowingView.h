@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QmitkRegionGrowingView_h
 #define QmitkRegionGrowingView_h
 
@@ -25,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkRegionGrowingViewControls.h"
 
 //! [includes]
-#include "mitkPointSet.h"
 #include "mitkIRenderWindowPartListener.h"
+#include "mitkPointSet.h"
 #include <itkImage.h>
 
 class QmitkPointListWidget;
@@ -46,52 +45,49 @@ class QmitkRegionGrowingView : public QmitkAbstractView, public mitk::IRenderWin
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
+  static const std::string VIEW_ID;
 
-    static const std::string VIEW_ID;
+  QmitkRegionGrowingView();
 
-    QmitkRegionGrowingView();
+protected slots:
 
-  protected slots:
+  /// \brief Called when the user clicks the GUI button
+  void DoImageProcessing();
 
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
+protected:
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  protected:
+  virtual void SetFocus() override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                  const QList<mitk::DataNode::Pointer> &nodes) override;
 
-    virtual void SetFocus() override;
+  //! [render-window-part-listener]
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  //! [render-window-part-listener]
 
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes ) override;
+  Ui::QmitkRegionGrowingViewControls m_Controls;
 
-    //! [render-window-part-listener]
-    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-    //! [render-window-part-listener]
+private:
+  //! [itkimageprocessing]
+  /**
+    \brief ITK image processing function
+    This function is templated like an ITK image. The MITK-Macro AccessByItk determines the actual pixel type and
+    dimensionality of
+    a given MITK image and calls this function for further processing (in our case region growing)
+  */
+  template <typename TPixel, unsigned int VImageDimension>
+  void ItkImageProcessing(itk::Image<TPixel, VImageDimension> *itkImage, mitk::BaseGeometry *imageGeometry);
+  //! [itkimageprocessing]
 
-    Ui::QmitkRegionGrowingViewControls m_Controls;
+  //! [members]
+  /// \brief This is the actual seed point data object
+  mitk::PointSet::Pointer m_PointSet;
 
-  private:
-
-    //! [itkimageprocessing]
-    /**
-      \brief ITK image processing function
-      This function is templated like an ITK image. The MITK-Macro AccessByItk determines the actual pixel type and dimensionality of
-      a given MITK image and calls this function for further processing (in our case region growing)
-    */
-    template < typename TPixel, unsigned int VImageDimension >
-    void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry );
-    //! [itkimageprocessing]
-
-    //! [members]
-    /// \brief This is the actual seed point data object
-    mitk::PointSet::Pointer m_PointSet;
-
-    QmitkPointListWidget* m_PointListWidget;
-    //! [members]
-
+  QmitkPointListWidget *m_PointListWidget;
+  //! [members]
 };
 
 #endif // QmitkRegionGrowingView_h

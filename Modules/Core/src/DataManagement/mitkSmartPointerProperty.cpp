@@ -14,24 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkSmartPointerProperty.h"
 
-mitk::SmartPointerProperty::ReferenceCountMapType          mitk::SmartPointerProperty::m_ReferenceCount;
-mitk::SmartPointerProperty::ReferencesUIDMapType           mitk::SmartPointerProperty::m_ReferencesUID;
-mitk::SmartPointerProperty::ReadInSmartPointersMapType     mitk::SmartPointerProperty::m_ReadInInstances;
-mitk::SmartPointerProperty::ReadInTargetsMapType           mitk::SmartPointerProperty::m_ReadInTargets;
-mitk::UIDGenerator                                         mitk::SmartPointerProperty::m_UIDGenerator("POINTER_");
+mitk::SmartPointerProperty::ReferenceCountMapType mitk::SmartPointerProperty::m_ReferenceCount;
+mitk::SmartPointerProperty::ReferencesUIDMapType mitk::SmartPointerProperty::m_ReferencesUID;
+mitk::SmartPointerProperty::ReadInSmartPointersMapType mitk::SmartPointerProperty::m_ReadInInstances;
+mitk::SmartPointerProperty::ReadInTargetsMapType mitk::SmartPointerProperty::m_ReadInTargets;
+mitk::UIDGenerator mitk::SmartPointerProperty::m_UIDGenerator("POINTER_");
 
 void mitk::SmartPointerProperty::PostProcessXMLReading()
 {
-  for (auto iter = m_ReadInInstances.begin();
-       iter != m_ReadInInstances.end();
-       ++iter)
+  for (auto iter = m_ReadInInstances.begin(); iter != m_ReadInInstances.end(); ++iter)
   {
-    if ( m_ReadInTargets.find(iter->second) != m_ReadInTargets.end() )
+    if (m_ReadInTargets.find(iter->second) != m_ReadInTargets.end())
     {
-      iter->first->SetSmartPointer(  m_ReadInTargets[ iter->second ] );
+      iter->first->SetSmartPointer(m_ReadInTargets[iter->second]);
     }
   }
 
@@ -39,9 +36,9 @@ void mitk::SmartPointerProperty::PostProcessXMLReading()
 }
 
 /// \return The number of SmartPointerProperties that point to @param object
-unsigned int mitk::SmartPointerProperty::GetReferenceCountFor(itk::Object* object)
+unsigned int mitk::SmartPointerProperty::GetReferenceCountFor(itk::Object *object)
 {
-  if ( m_ReferenceCount.find(object) != m_ReferenceCount.end() )
+  if (m_ReferenceCount.find(object) != m_ReferenceCount.end())
   {
     return m_ReferenceCount[object];
   }
@@ -51,14 +48,14 @@ unsigned int mitk::SmartPointerProperty::GetReferenceCountFor(itk::Object* objec
   }
 }
 
-void mitk::SmartPointerProperty::RegisterPointerTarget(itk::Object* object, const std::string uid)
+void mitk::SmartPointerProperty::RegisterPointerTarget(itk::Object *object, const std::string uid)
 {
   m_ReadInTargets[uid] = object;
 }
 
-std::string mitk::SmartPointerProperty::GetReferenceUIDFor(itk::Object* object)
+std::string mitk::SmartPointerProperty::GetReferenceUIDFor(itk::Object *object)
 {
-  if ( m_ReferencesUID.find(object) != m_ReferencesUID.end() )
+  if (m_ReferencesUID.find(object) != m_ReferencesUID.end())
   {
     return m_ReferencesUID[object];
   }
@@ -68,31 +65,30 @@ std::string mitk::SmartPointerProperty::GetReferenceUIDFor(itk::Object* object)
   }
 }
 
-bool mitk::SmartPointerProperty::IsEqual(const BaseProperty& property) const
+bool mitk::SmartPointerProperty::IsEqual(const BaseProperty &property) const
 {
-  return this->m_SmartPointer == static_cast<const Self&>(property).m_SmartPointer;
+  return this->m_SmartPointer == static_cast<const Self &>(property).m_SmartPointer;
 }
 
-bool mitk::SmartPointerProperty::Assign(const BaseProperty& property)
+bool mitk::SmartPointerProperty::Assign(const BaseProperty &property)
 {
-  this->m_SmartPointer = static_cast<const Self&>(property).m_SmartPointer;
+  this->m_SmartPointer = static_cast<const Self &>(property).m_SmartPointer;
   return true;
 }
 
-mitk::SmartPointerProperty::SmartPointerProperty(itk::Object* pointer)
+mitk::SmartPointerProperty::SmartPointerProperty(itk::Object *pointer)
 {
-  SetSmartPointer( pointer );
+  SetSmartPointer(pointer);
 }
 
-mitk::SmartPointerProperty::SmartPointerProperty(const SmartPointerProperty& other)
-  : BaseProperty(other)
-  , m_SmartPointer(other.m_SmartPointer)
+mitk::SmartPointerProperty::SmartPointerProperty(const SmartPointerProperty &other)
+  : BaseProperty(other), m_SmartPointer(other.m_SmartPointer)
 {
 }
 
 itk::Object::Pointer mitk::SmartPointerProperty::GetSmartPointer() const
 {
-    return m_SmartPointer;
+  return m_SmartPointer;
 }
 
 itk::Object::Pointer mitk::SmartPointerProperty::GetValue() const
@@ -100,18 +96,19 @@ itk::Object::Pointer mitk::SmartPointerProperty::GetValue() const
   return this->GetSmartPointer();
 }
 
-void mitk::SmartPointerProperty::SetSmartPointer(itk::Object* pointer)
+void mitk::SmartPointerProperty::SetSmartPointer(itk::Object *pointer)
 {
-  if(m_SmartPointer.GetPointer() != pointer)
+  if (m_SmartPointer.GetPointer() != pointer)
   {
     // keep track of referenced objects
-    if ( m_SmartPointer.GetPointer() && --m_ReferenceCount[m_SmartPointer.GetPointer()] == 0 ) // if there is no reference left, delete entry
+    if (m_SmartPointer.GetPointer() &&
+        --m_ReferenceCount[m_SmartPointer.GetPointer()] == 0) // if there is no reference left, delete entry
     {
-      m_ReferenceCount.erase( m_SmartPointer.GetPointer() );
-      m_ReferencesUID.erase( m_SmartPointer.GetPointer() );
+      m_ReferenceCount.erase(m_SmartPointer.GetPointer());
+      m_ReferencesUID.erase(m_SmartPointer.GetPointer());
     }
 
-    if ( pointer && ++m_ReferenceCount[pointer] == 1 ) // first reference --> generate UID
+    if (pointer && ++m_ReferenceCount[pointer] == 1) // first reference --> generate UID
     {
       m_ReferencesUID[pointer] = m_UIDGenerator.GetUID();
     }
@@ -122,17 +119,17 @@ void mitk::SmartPointerProperty::SetSmartPointer(itk::Object* pointer)
   }
 }
 
-void mitk::SmartPointerProperty::SetValue(const ValueType & value)
+void mitk::SmartPointerProperty::SetValue(const ValueType &value)
 {
   this->SetSmartPointer(value.GetPointer());
 }
 
 std::string mitk::SmartPointerProperty::GetValueAsString() const
 {
-  if ( m_SmartPointer.IsNotNull() )
-    return m_ReferencesUID[ m_SmartPointer.GetPointer() ];
+  if (m_SmartPointer.IsNotNull())
+    return m_ReferencesUID[m_SmartPointer.GetPointer()];
   else
-    return std::string("NULL");
+    return std::string("nullptr");
 }
 
 itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const

@@ -71,11 +71,11 @@ const char DIR_SEP = '/';
 bool load_impl(const std::string& modulePath)
 {
   void* handle = dlopen(modulePath.c_str(), RTLD_NOW | RTLD_LOCAL);
-  if (handle == NULL)
+  if (handle == nullptr)
   {
     US_WARN << dlerror();
   }
-  return (handle != NULL);
+  return (handle != nullptr);
 }
 
 #elif defined(US_PLATFORM_WINDOWS)
@@ -85,11 +85,11 @@ const char DIR_SEP = '\\';
 bool load_impl(const std::string& modulePath)
 {
   void* handle = LoadLibrary(modulePath.c_str());
-  if (handle == NULL)
+  if (handle == nullptr)
   {
     US_WARN << us::GetLastErrorStr();
   }
-  return (handle != NULL);
+  return (handle != nullptr);
 }
 
 #else
@@ -115,7 +115,7 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
   DIR* dir = opendir(loadPath.c_str());
 #ifdef CMAKE_INTDIR
   // Try intermediate output directories
-  if (dir == NULL)
+  if (dir == nullptr)
   {
     std::size_t indexOfLastSeparator = absoluteBasePath.find_last_of(DIR_SEP);
     if (indexOfLastSeparator != std::string::npos)
@@ -138,10 +138,10 @@ std::vector<std::string> AutoLoadModulesFromPath(const std::string& absoluteBase
   }
 #endif
 
-  if (dir != NULL)
+  if (dir != nullptr)
   {
-    struct dirent *ent = NULL;
-    while ((ent = readdir(dir)) != NULL)
+    struct dirent *ent = nullptr;
+    while ((ent = readdir(dir)) != nullptr)
     {
       bool loadFile = true;
 #ifdef _DIRENT_HAVE_D_TYPE
@@ -244,11 +244,11 @@ std::string GetLastErrorStr()
     FORMAT_MESSAGE_ALLOCATE_BUFFER |
     FORMAT_MESSAGE_FROM_SYSTEM |
     FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
+    nullptr,
     dw,
     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
     (LPTSTR) &lpMsgBuf,
-    0, NULL );
+    0, nullptr );
 
   std::string errMsg((LPCTSTR)lpMsgBuf);
 
@@ -317,7 +317,7 @@ US_Core_EXPORT ::std::string GetDemangledName(const ::std::type_info& typeInfo)
   }
 #elif defined(US_PLATFORM_WINDOWS)
   const char* demangled = typeInfo.name();
-  if (demangled != NULL)
+  if (demangled != nullptr)
   {
     result = demangled;
     // remove "struct" qualifiers

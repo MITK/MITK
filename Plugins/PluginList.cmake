@@ -8,7 +8,7 @@ set(MITK_PLUGINS
   org.blueberry.core.commands:OFF
   org.blueberry.core.jobs:OFF
   org.blueberry.ui.qt:OFF
-  org.blueberry.ui.qt.help:OFF
+  org.blueberry.ui.qt.help:ON
   org.blueberry.ui.qt.log:ON
   org.blueberry.ui.qt.objectinspector:OFF
 
@@ -23,7 +23,6 @@ set(MITK_PLUGINS
   org.mitk.planarfigure:ON
   org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
-  org.mitk.diffusionimaging:OFF
   org.mitk.simulation:OFF
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.coreapplication:OFF
@@ -41,6 +40,18 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.dicominspector:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
+  org.mitk.gui.qt.diffusionimaging.connectomics:OFF
+  org.mitk.gui.qt.diffusionimaging.denoising:OFF
+  org.mitk.gui.qt.diffusionimaging.fiberfox:OFF
+  org.mitk.gui.qt.diffusionimaging.fiberprocessing:OFF
+  org.mitk.gui.qt.diffusionimaging.ivim:OFF
+  org.mitk.gui.qt.diffusionimaging.odfpeaks:OFF
+  org.mitk.gui.qt.diffusionimaging.partialvolume:OFF
+  org.mitk.gui.qt.diffusionimaging.preprocessing:OFF
+  org.mitk.gui.qt.diffusionimaging.reconstruction:OFF
+  org.mitk.gui.qt.diffusionimaging.registration:OFF
+  org.mitk.gui.qt.diffusionimaging.tbss:OFF
+  org.mitk.gui.qt.diffusionimaging.tractography:OFF
   org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
@@ -56,11 +67,11 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   org.mitk.gui.qt.python:OFF
-  org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.simulation:OFF
   org.mitk.gui.qt.aicpregistration:OFF
+  org.mitk.gui.qt.renderwindowmanager:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.tubegraph:OFF
@@ -73,7 +84,8 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF
-  org.mitk.gui.qt.multilabelsegmentation:ON
+  org.mitk.gui.qt.igt.app.hummelprotocolmeasurements:OFF
+  org.mitk.gui.qt.multilabelsegmentation:OFF
   org.mitk.matchpoint.core.helper:OFF
   org.mitk.gui.qt.matchpoint.algorithm.browser:OFF
   org.mitk.gui.qt.matchpoint.algorithm.control:OFF
@@ -83,5 +95,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.visualizer:OFF
   org.mitk.gui.qt.matchpoint.evaluator:OFF
   org.mitk.gui.qt.matchpoint.manipulator:OFF
+  org.mitk.gui.qt.photoacoustics.pausviewer:OFF
   org.mitk.gui.qt.photoacoustics.imageprocessing:OFF
+  org.mitk.gui.qt.cest:OFF
 )

@@ -18,39 +18,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_MATERIAL_H_
 
 #include <MitkCoreExports.h>
-#include <mitkCommon.h>
-#include <itkRGBPixel.h>
 #include <itkObject.h>
+#include <itkRGBPixel.h>
 #include <itkVectorContainer.h>
-#include <vtkSystemIncludes.h>
+#include <mitkCommon.h>
 #include <string>
+#include <vtkSystemIncludes.h>
 
 namespace mitk
 {
-
-/**
- * Encapsulates 3D visualization properties which are forwarded to vtk for
- * color mapping. This includes color, specular coefficient and power, opacity
- * interpolation type (flat, gouraud, phong) and representation (points,
- * wireframe or surface).
- *
- * @see vtkProperty
-*/
-class MITKCORE_EXPORT Material : public itk::Object
-{
-public:
-    mitkClassMacroItkParent( Material, itk::Object );
+  /**
+   * Encapsulates 3D visualization properties which are forwarded to vtk for
+   * color mapping. This includes color, specular coefficient and power, opacity
+   * interpolation type (flat, gouraud, phong) and representation (points,
+   * wireframe or surface).
+   *
+   * @see vtkProperty
+  */
+  class MITKCORE_EXPORT Material : public itk::Object
+  {
+  public:
+    mitkClassMacroItkParent(Material, itk::Object);
 
     typedef itk::RGBPixel<double> Color;
 
     enum InterpolationType
     {
-        Flat, Gouraud, Phong
+      Flat,
+      Gouraud,
+      Phong
     };
 
     enum RepresentationType
     {
-        Points, Wireframe, Surface
+      Points,
+      Wireframe,
+      Surface
     };
 
     /**
@@ -64,7 +67,7 @@ public:
      */
     static Pointer New()
     {
-      Pointer smartPtr = new Material(  );
+      Pointer smartPtr = new Material();
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -80,9 +83,9 @@ public:
      *              are forwarded. Please note, that if this node doesn't have the
      *              needed properties associated, they will be added.
      */
-    static Pointer New( Color color, double opacity = 1.0f)
+    static Pointer New(Color color, double opacity = 1.0f)
     {
-      Pointer smartPtr = new Material(color, opacity );
+      Pointer smartPtr = new Material(color, opacity);
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -99,9 +102,9 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the
      *        needed properties associated, they will be added.
      */
-    static Pointer New( double red, double green, double blue, double opacity = 1.0f)
+    static Pointer New(double red, double green, double blue, double opacity = 1.0f)
     {
-      Pointer smartPtr = new Material(red, green, blue, opacity );
+      Pointer smartPtr = new Material(red, green, blue, opacity);
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -124,10 +127,15 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the
      *        needed properties associated, they will be added.
      */
-    static Pointer New( double red, double green, double blue, double colorCoefficient,
-        double specularCoefficient, double specularPower, double opacity )
+    static Pointer New(double red,
+                       double green,
+                       double blue,
+                       double colorCoefficient,
+                       double specularCoefficient,
+                       double specularPower,
+                       double opacity)
     {
-      Pointer smartPtr = new Material(red, green, blue, colorCoefficient, specularCoefficient, specularPower, opacity );
+      Pointer smartPtr = new Material(red, green, blue, colorCoefficient, specularCoefficient, specularPower, opacity);
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -150,9 +158,10 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the
      *        needed properties associated, they will be added.
      */
-    static Pointer New( Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity )
+    static Pointer New(
+      Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity)
     {
-      Pointer smartPtr = new Material(color, colorCoefficient, specularCoefficient, specularPower, opacity );
+      Pointer smartPtr = new Material(color, colorCoefficient, specularCoefficient, specularPower, opacity);
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -160,27 +169,28 @@ public:
     /**
      * Copy constructor
      */
-    mitkNewMacro1Param(Material, const Material&);
+    mitkNewMacro1Param(Material, const Material &);
 
     /**
      * Copy constructor, provided for convinience. The values are copied from property
      * and afterwards the values provided for red green blue and opacity are written into the object.
      */
-    static Pointer New( const Material& property, double red, double green, double blue, double opacity = 1.0, std::string name = "" )
+    static Pointer New(
+      const Material &property, double red, double green, double blue, double opacity = 1.0, std::string name = "")
     {
-      Pointer smartPtr = new Material(property, red, green, blue, opacity, name );
+      Pointer smartPtr = new Material(property, red, green, blue, opacity, name);
       smartPtr->UnRegister();
       return smartPtr;
     }
 
-    virtual bool Assignable(const Material& other) const;
-    virtual Material& operator=(const Material& other);
+    virtual bool Assignable(const Material &other) const;
+    virtual Material &operator=(const Material &other);
 
-     /* Sets the materials color in RGB space. The rgb components have to be
-     * in the range [0..1]
-     * @param color the new color of the material
-     */
-    virtual void SetColor( Color color );
+    /* Sets the materials color in RGB space. The rgb components have to be
+    * in the range [0..1]
+    * @param color the new color of the material
+    */
+    virtual void SetColor(Color color);
 
     /**
      * Sets the materials color in RGB space. The rgb components have to be
@@ -189,21 +199,21 @@ public:
      * @param green the green component of the materials color (range [0..1])
      * @param blue the blue component of the materials color (range [0..1])
      */
-    virtual void SetColor( double red, double green, double blue );
+    virtual void SetColor(double red, double green, double blue);
 
     /**
      * Sets a attenuation coefficient for the color. A value of 0 results in
      * a black object. VAlid range is [0..1]
      * @param coefficient the color attenuation coefficient
      */
-    virtual void SetColorCoefficient( double coefficient );
+    virtual void SetColorCoefficient(double coefficient);
 
     /**
      * Sets the specular color
      * @param color the specular color in RGB. Each RGB value should be in the
      *        range [0..1]
      */
-    virtual void SetSpecularColor( Color color );
+    virtual void SetSpecularColor(Color color);
 
     /**
      * Sets the specular color
@@ -211,7 +221,7 @@ public:
      * @param green the green component of the specular color (range [0..1])
      * @param blue the blue component of the specular color (range [0..1])
      */
-    virtual void SetSpecularColor( double red, double green, double blue );
+    virtual void SetSpecularColor(double red, double green, double blue);
 
     /**
      * Sets the specular coefficient which controls the shininess of the object
@@ -219,7 +229,7 @@ public:
      * @param specularCoefficient the new specular coefficient. Valid range
      *        is [0..1]
      */
-    virtual void SetSpecularCoefficient( double specularCoefficient );
+    virtual void SetSpecularCoefficient(double specularCoefficient);
 
     /**
      * Sets the specular power which controls the shininess of the object
@@ -227,7 +237,7 @@ public:
      * @param specularCoefficient the new specular coefficient. Valid range
      *        is [0..inf]
      */
-    virtual void SetSpecularPower( double specularPower );
+    virtual void SetSpecularPower(double specularPower);
 
     /**
      * Sets the opacity of the material, which controls how transparent the
@@ -235,7 +245,7 @@ public:
      * and 1 means a solid surface.
      * @param opacity the new opacity of the material
      */
-    virtual void SetOpacity( double opacity );
+    virtual void SetOpacity(double opacity);
 
     /**
      * Sets the surface interpolation method of the object rendered using the
@@ -244,7 +254,7 @@ public:
      * @param interpolation the interpolation method used for rendering of
      *        surfaces.
      */
-    virtual void SetInterpolation( InterpolationType interpolation );
+    virtual void SetInterpolation(InterpolationType interpolation);
 
     /**
      * Sets the surface representation method of the object rendered using the
@@ -253,12 +263,12 @@ public:
      * @param representation the representation method used for rendering of
      *        surfaces.
      */
-    virtual void SetRepresentation( RepresentationType representation );
+    virtual void SetRepresentation(RepresentationType representation);
 
     /**
      * Set/Get the width of a Line. The width is expressed in screen units. The default is 1.0.
      */
-    virtual void SetLineWidth( float lineWidth );
+    virtual void SetLineWidth(float lineWidth);
 
     /**
      * @returns the color of the material
@@ -324,123 +334,127 @@ public:
      * @param property the materials which should be copied in the
      *        current materials
      */
-    virtual void Initialize( const Material& property );
+    virtual void Initialize(const Material &property);
 
     /**
      * comparison operator which uses the member variables for
      * comparison
      */
-    virtual bool operator==( const Material& property ) const;
+    virtual bool operator==(const Material &property) const;
 
     /**
      * Dumps the properties to the out stream out
      */
-    void PrintSelf ( std::ostream &os, itk::Indent ) const override;
+    void PrintSelf(std::ostream &os, itk::Indent) const override;
 
     /**
      * Sets an optional name which may be associated with the material property
      * Please note, that this name is NOT forwarded to the data tree node
      * as the node name
      */
-    itkSetMacro( Name, std::string );
+    itkSetMacro(Name, std::string);
 
     /**
      * returns the name associated with the material property
      */
-    itkGetConstMacro( Name, std::string );
+    itkGetConstMacro(Name, std::string);
 
-protected:
+  protected:
+    /**
+     * Constructor. Materials are set to the following default values:
+     * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
+     * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
+     * Gouraud, representation Surface.
+     * @param node optinally a data tree node may be defined to which the properties
+     *             are forwarded. Please note, that if this node doesn't have the
+     *             needed properties associated, they will be added.
+     */
+    Material();
 
-  /**
-   * Constructor. Materials are set to the following default values:
-   * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
-   * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
-   * Gouraud, representation Surface.
-   * @param node optinally a data tree node may be defined to which the properties
-   *             are forwarded. Please note, that if this node doesn't have the
-   *             needed properties associated, they will be added.
-   */
-  Material(  );
+    /**
+     * Constructor. All values besides the given ones are set to defaults as
+     * described in the default constructor
+     * @param color the material color in RGB. Each RGB value should be in the
+     *              range [0..1]
+     * @param opacity the opacity of the material. 0.0 means fully transparent
+     *              and 1.0 means solid.
+     * @param node optinally a data tree node may be defined to which the properties
+     *              are forwarded. Please note, that if this node doesn't have the
+     *              needed properties associated, they will be added.
+     */
+    Material(Color color, double opacity = 1.0f);
 
-  /**
-   * Constructor. All values besides the given ones are set to defaults as
-   * described in the default constructor
-   * @param color the material color in RGB. Each RGB value should be in the
-   *              range [0..1]
-   * @param opacity the opacity of the material. 0.0 means fully transparent
-   *              and 1.0 means solid.
-   * @param node optinally a data tree node may be defined to which the properties
-   *              are forwarded. Please note, that if this node doesn't have the
-   *              needed properties associated, they will be added.
-   */
-  Material( Color color, double opacity = 1.0f );
+    /**
+     * Constructor. All values besides the given ones are set to defaults as
+     * described in the default constructor
+     * @param red the red component of the materials color (range [0..1])
+     * @param green the green component of the materials color (range [0..1])
+     * @param blue the blue component of the materials color (range [0..1])
+     * @param opacity the opacity of the material. 0.0 means fully transparent
+     *        and 1.0 means solid.
+     * @param node optionally a data tree node may be defined to which the properties
+     *        are forwarded. Please note, that if this node doesn't have the
+     *        needed properties associated, they will be added.
+     */
+    Material(double red, double green, double blue, double opacity = 1.0f);
 
-  /**
-   * Constructor. All values besides the given ones are set to defaults as
-   * described in the default constructor
-   * @param red the red component of the materials color (range [0..1])
-   * @param green the green component of the materials color (range [0..1])
-   * @param blue the blue component of the materials color (range [0..1])
-   * @param opacity the opacity of the material. 0.0 means fully transparent
-   *        and 1.0 means solid.
-   * @param node optionally a data tree node may be defined to which the properties
-   *        are forwarded. Please note, that if this node doesn't have the
-   *        needed properties associated, they will be added.
-   */
-  Material( double red, double green, double blue, double opacity = 1.0f );
+    /**
+     * Constructor. All values besides the given ones are set to defaults as
+     * described in the default constructor
+     * @param red the red component of the materials color (range [0..1])
+     * @param green the green component of the materials color (range [0..1])
+     * @param blue the blue component of the materials color (range [0..1])
+     * @param colorCoefficient a scaling factor for the color coefficient which
+     *        will be multiplied with each color component (range [0..1]).
+     * @param specularCoefficient controls in combination with the specular power
+     *        how shiny the material will appear (range [0..1]).
+     * @param specularPower controls in combination with the specular coefficient
+     *        how shiny the material will appear (range [0..inf]).
+     * @param opacity the opacity of the material. 0.0 means fully transparent
+     *        and 1.0 means solid.
+     * @param node optionally a data tree node may be defined to which the properties
+     *        are forwarded. Please note, that if this node doesn't have the
+     *        needed properties associated, they will be added.
+     */
+    Material(double red,
+             double green,
+             double blue,
+             double colorCoefficient,
+             double specularCoefficient,
+             double specularPower,
+             double opacity);
 
-  /**
-   * Constructor. All values besides the given ones are set to defaults as
-   * described in the default constructor
-   * @param red the red component of the materials color (range [0..1])
-   * @param green the green component of the materials color (range [0..1])
-   * @param blue the blue component of the materials color (range [0..1])
-   * @param colorCoefficient a scaling factor for the color coefficient which
-   *        will be multiplied with each color component (range [0..1]).
-   * @param specularCoefficient controls in combination with the specular power
-   *        how shiny the material will appear (range [0..1]).
-   * @param specularPower controls in combination with the specular coefficient
-   *        how shiny the material will appear (range [0..inf]).
-   * @param opacity the opacity of the material. 0.0 means fully transparent
-   *        and 1.0 means solid.
-   * @param node optionally a data tree node may be defined to which the properties
-   *        are forwarded. Please note, that if this node doesn't have the
-   *        needed properties associated, they will be added.
-   */
-  Material( double red, double green, double blue, double colorCoefficient,
-    double specularCoefficient, double specularPower, double opacity );
+    /**
+     * Constructor. All values besides the given ones are set to defaults as
+     * described in the default constructor
+     *
+     * @param color the material color in RGB. Each RGB value should be in the
+     *        range [0..1]
+     * @param colorCoefficient a scaling factor for the color coefficient which
+     *        will be multiplied with each color component (range [0..1]).
+     * @param specularCoefficient controls in combination with the specular power
+     *        how shiny the material will appear (range [0..1]).
+     * @param specularPower controls in combination with the specular coefficient
+     *        how shiny the material will appear (range [0..inf]).
+     * @param opacity the opacity of the material. 0.0 means fully transparent
+     *        and 1.0 means solid.
+     * @param node optionally a data tree node may be defined to which the properties
+     *        are forwarded. Please note, that if this node doesn't have the
+     *        needed properties associated, they will be added.
+     */
+    Material(Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity);
 
-  /**
-   * Constructor. All values besides the given ones are set to defaults as
-   * described in the default constructor
-   *
-   * @param color the material color in RGB. Each RGB value should be in the
-   *        range [0..1]
-   * @param colorCoefficient a scaling factor for the color coefficient which
-   *        will be multiplied with each color component (range [0..1]).
-   * @param specularCoefficient controls in combination with the specular power
-   *        how shiny the material will appear (range [0..1]).
-   * @param specularPower controls in combination with the specular coefficient
-   *        how shiny the material will appear (range [0..inf]).
-   * @param opacity the opacity of the material. 0.0 means fully transparent
-   *        and 1.0 means solid.
-   * @param node optionally a data tree node may be defined to which the properties
-   *        are forwarded. Please note, that if this node doesn't have the
-   *        needed properties associated, they will be added.
-   */
-  Material( Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity );
+    /**
+     * Copy constructor
+     */
+    Material(const Material &property);
 
-  /**
-   * Copy constructor
-   */
-  Material( const Material& property );
-
-  /**
-   * Copy constructor, provided for convinience. The values are copied from property
-   * and afterwards the values provided for red green blue and opacity are written into the object.
-   */
-  Material( const Material& property, double red, double green, double blue, double opacity = 1.0, std::string name = "");
-
+    /**
+     * Copy constructor, provided for convinience. The values are copied from property
+     * and afterwards the values provided for red green blue and opacity are written into the object.
+     */
+    Material(
+      const Material &property, double red, double green, double blue, double opacity = 1.0, std::string name = "");
 
     virtual void InitializeStandardValues();
 
@@ -465,11 +479,9 @@ protected:
     InterpolationType m_Interpolation;
 
     RepresentationType m_Representation;
-};
+  };
 
-typedef itk::VectorContainer< unsigned int, Material::Pointer > MaterialVectorContainer;
-
+  typedef itk::VectorContainer<unsigned int, Material::Pointer> MaterialVectorContainer;
 }
-
 
 #endif

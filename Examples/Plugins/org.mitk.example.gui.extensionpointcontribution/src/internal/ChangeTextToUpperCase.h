@@ -25,7 +25,6 @@ class ChangeTextToUpperCase : public QObject, public IChangeText
   Q_INTERFACES(IChangeText)
 
 public:
-
   QString ChangeText(const QString &s) override;
 };
 

@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMacro.h>
 #include <vector>
 
-namespace mitk {
+namespace mitk
+{
   /**Documentation
   * \brief   An object of this class represents an exception of MITK.
   *          Please don't instantiate exceptions manually, but use the
@@ -47,14 +48,13 @@ namespace mitk {
   */
   class MITKCORE_EXPORT Exception : public itk::ExceptionObject
   {
-
   public:
-    Exception(const char *file, unsigned int lineNumber=0,
-                  const char *desc="None", const char *loc="Unknown") :
-    itk::ExceptionObject(file,lineNumber,desc,loc){}
+    Exception(const char *file, unsigned int lineNumber = 0, const char *desc = "None", const char *loc = "Unknown")
+      : itk::ExceptionObject(file, lineNumber, desc, loc)
+    {
+    }
 
     virtual ~Exception() throw() {}
-
     itkTypeMacro(ClassName, SuperClassName);
 
     /** \brief Adds rethrow data to this exception. */
@@ -63,7 +63,9 @@ namespace mitk {
     /** \return Returns how often the exception was rethrown. */
     int GetNumberOfRethrows();
 
-    /** @return Returns the rethrow data of the specified rethrow number. Returns empty data, if the rethrowNumber doesn't exist.
+    /** @return Returns the rethrow data of the specified rethrow number. Returns empty data, if the rethrowNumber
+     * doesn't
+     * exist.
       * @param rethrowNumber The internal number of the rethrow.
       * @param file (returnvalue) This varaiable will be filled with the file of the specified rethrow.
       * @param file (returnvalue) This varaiable will be filled with the line of the specified rethrow.
@@ -72,7 +74,8 @@ namespace mitk {
     void GetRethrowData(int rethrowNumber, std::string &file, int &line, std::string &message);
 
     /** \brief Definition of the bit shift operator for this class.*/
-    template <class T> inline Exception& operator<<(const T& data)
+    template <class T>
+    inline Exception &operator<<(const T &data)
     {
       std::stringstream ss;
       ss << this->GetDescription() << data;
@@ -81,7 +84,8 @@ namespace mitk {
     }
 
     /** \brief Definition of the bit shift operator for this class (for non const data).*/
-    template <class T> inline Exception& operator<<(T& data)
+    template <class T>
+    inline Exception &operator<<(T &data)
     {
       std::stringstream ss;
       ss << this->GetDescription() << data;
@@ -90,27 +94,26 @@ namespace mitk {
     }
 
     /** \brief Definition of the bit shift operator for this class (for functions).*/
-    inline Exception& operator<<(std::ostream& (*func)(std::ostream&))
+    inline Exception &operator<<(std::ostream &(*func)(std::ostream &))
     {
       std::stringstream ss;
       ss << this->GetDescription() << func;
       this->SetDescription(ss.str());
       return *this;
     }
-  protected:
 
-  struct ReThrowData
+  protected:
+    struct ReThrowData
     {
-    std::string RethrowClassname;
-    unsigned int RethrowLine;
-    std::string RethrowMessage;
+      std::string RethrowClassname;
+      unsigned int RethrowLine;
+      std::string RethrowMessage;
     };
 
-   std::vector<ReThrowData> m_RethrowData;
-
+    std::vector<ReThrowData> m_RethrowData;
   };
 
-MITKCORE_EXPORT std::ostream& operator<<(std::ostream& os, const mitk::Exception& e);
+  MITKCORE_EXPORT std::ostream &operator<<(std::ostream &os, const mitk::Exception &e);
 } // namespace mitk
 
 #endif

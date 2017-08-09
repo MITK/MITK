@@ -38,17 +38,16 @@ class CustomViewer : public QObject, public berry::IApplication
   Q_INTERFACES(berry::IApplication)
 
 public:
-
-/** Standard constructor.*/
+  /** Standard constructor.*/
   CustomViewer();
 
-/** Standard destructor.*/
+  /** Standard destructor.*/
   ~CustomViewer();
 
-/** Starts the application.*/
-  QVariant Start(berry::IApplicationContext* context) override;
+  /** Starts the application.*/
+  QVariant Start(berry::IApplicationContext *context) override;
 
-/** Exits the application.*/
+  /** Exits the application.*/
   void Stop() override;
 };
 

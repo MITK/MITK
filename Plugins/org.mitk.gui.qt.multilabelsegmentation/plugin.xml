@@ -7,7 +7,7 @@
       id="org.mitk.views.general"
       name="MITK General"/>
     <view id="org.mitk.views.multilabelsegmentation"
-      name="MultiLabelSegmentation"
+      name="MultiLabel Segmentation"
       icon="resources/multilabelsegmentation.png"
       class="QmitkMultiLabelSegmentationView" />
 
@@ -15,16 +15,17 @@
       name="MultiLabel Segmentation Utilities"
       class="QmitkMultiLabelSegmentationUtilitiesView"
       icon="resources/MultiLabelSegmentationUtilities_48x48.png" />
+
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePage" name="MultiLabelSegmentation" class="QmitkMultiLabelSegmentationPreferencePage">
+    <page id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePage" name="MultiLabel Segmentation" class="QmitkMultiLabelSegmentationPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords"></keywordreference>
     </page>
   </extension>
 
    <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords" label="data manager"></keyword>
+    <keyword id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords" label="multi segmentation label multilabel multilabelsegmentation 2d display 3d outline draw transparent overlay show volume rendering data node selection mode enable auto-selection mode smoothed surface creation smoothing value decimation rate"></keyword>
   </extension>
 
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">

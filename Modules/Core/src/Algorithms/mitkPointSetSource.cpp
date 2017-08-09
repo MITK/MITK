@@ -14,9 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPointSetSource.h"
-
 
 mitk::PointSetSource::PointSetSource()
 {
@@ -31,17 +29,17 @@ mitk::PointSetSource::~PointSetSource()
 {
 }
 
-itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::PointSetSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
 {
-    return OutputType::New().GetPointer();
+  return OutputType::New().GetPointer();
 }
 
-itk::DataObject::Pointer mitk::PointSetSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::PointSetSource::MakeOutput(const DataObjectIdentifierType &name)
 {
   itkDebugMacro("MakeOutput(" << name << ")");
-  if( this->IsIndexedOutputName(name) )
+  if (this->IsIndexedOutputName(name))
   {
-    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    return this->MakeOutput(this->MakeIndexFromOutputName(name));
   }
   return OutputType::New().GetPointer();
 }

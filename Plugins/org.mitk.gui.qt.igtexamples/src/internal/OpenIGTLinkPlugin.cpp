@@ -59,8 +59,8 @@ void OpenIGTLinkPlugin::UpdatePipeline()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void OpenIGTLinkPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-  const QList<mitk::DataNode::Pointer>& nodes)
+void OpenIGTLinkPlugin::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+  const QList<mitk::DataNode::Pointer> &)
 {
   // iterate all selected objects, adjust warning visibility
 }
@@ -114,7 +114,7 @@ void OpenIGTLinkPlugin::ReceivingButtonClicked()
   case CONNECTED:
     m_IGTL2DImageDeviceSource = mitk::IGTL2DImageDeviceSource::New();
     m_IGTL3DImageDeviceSource = mitk::IGTL3DImageDeviceSource::New();
-    m_IGTLTransformDeviceSource = mitk::IGTLTransformDeviceSource::New();
+    m_IGTLTransformDeviceSource = mitk::IGTLTrackingDataDeviceSource::New();
 
     m_IGTL2DImageDeviceSource->SetIGTLDevice(m_IGTLClient);
     m_IGTL3DImageDeviceSource->SetIGTLDevice(m_IGTLClient);

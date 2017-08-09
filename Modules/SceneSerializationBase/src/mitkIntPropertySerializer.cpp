@@ -23,32 +23,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class IntPropertySerializer : public BasePropertySerializer
-{
+  class IntPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(IntPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( IntPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const IntProperty* prop = dynamic_cast<const IntProperty*>(m_Property.GetPointer()))
+      if (const IntProperty *prop = dynamic_cast<const IntProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("int");
+        auto element = new TiXmlElement("int");
         element->SetAttribute("value", prop->GetValue());
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
+      if (!element)
+        return nullptr;
 
       int integer;
-      if ( element->QueryIntAttribute( "value", &integer ) == TIXML_SUCCESS )
+      if (element->QueryIntAttribute("value", &integer) == TIXML_SUCCESS)
       {
         return IntProperty::New(integer).GetPointer();
       }
@@ -59,10 +58,9 @@ class IntPropertySerializer : public BasePropertySerializer
     }
 
   protected:
-
     IntPropertySerializer() {}
     virtual ~IntPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -70,4 +68,3 @@ class IntPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(IntPropertySerializer);
 
 #endif
-

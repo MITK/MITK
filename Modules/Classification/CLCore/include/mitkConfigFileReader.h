@@ -103,7 +103,7 @@ public:
     std::string value;
     std::string inSection;
     bool inConfigSection = true;
-    int posEqual;
+    std::string::size_type posEqual;
     while (std::getline(stream,line)) {
       line = RemoveComment(line, "#");
 

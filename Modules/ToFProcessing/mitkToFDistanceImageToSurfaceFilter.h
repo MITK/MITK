@@ -111,6 +111,8 @@ namespace mitk
     */
     void SetTextureImageHeight(int height);
 
+    using itk::ProcessObject::SetInput;
+
     /*!
     \brief Sets the input of this filter
     \param distanceImage input is the distance image of e.g. a ToF camera

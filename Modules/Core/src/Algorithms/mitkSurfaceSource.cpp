@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkSurfaceSource.h"
 #include "mitkSurface.h"
 
@@ -32,19 +31,18 @@ mitk::SurfaceSource::~SurfaceSource()
 {
 }
 
-itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
 {
   return OutputType::New().GetPointer();
 }
 
-
-itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput(const DataObjectIdentifierType &name)
 {
   itkDebugMacro("MakeOutput(" << name << ")");
-  if( this->IsIndexedOutputName(name) )
-    {
-    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
-    }
+  if (this->IsIndexedOutputName(name))
+  {
+    return this->MakeOutput(this->MakeIndexFromOutputName(name));
+  }
   return static_cast<itk::DataObject *>(mitk::Surface::New().GetPointer());
 }
 

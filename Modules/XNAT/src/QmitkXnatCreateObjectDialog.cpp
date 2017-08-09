@@ -17,60 +17,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkXnatCreateObjectDialog.h"
 
 // XNAT
+#include <QmitkXnatExperimentWidget.h>
 #include <QmitkXnatProjectWidget.h>
 #include <QmitkXnatSubjectWidget.h>
-#include <QmitkXnatExperimentWidget.h>
 
 // CTK XNAT Core
 //#include <ctkXnatProject.h>
-#include <ctkXnatSubject.h>
 #include <ctkXnatExperiment.h>
+#include <ctkXnatSubject.h>
 
 // Qt
-#include <QPushButton>
-#include <QMessageBox>
 #include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
 
 // Testing
-#include <stdio.h>
 #include <iostream>
+#include <stdio.h>
 
-QmitkXnatCreateObjectDialog::QmitkXnatCreateObjectDialog(SpecificType type, QWidget* parent)
-  : QDialog(parent)
-  , m_Type(type)
+QmitkXnatCreateObjectDialog::QmitkXnatCreateObjectDialog(SpecificType type, QWidget *parent)
+  : QDialog(parent), m_Type(type)
 {
   switch (m_Type)
   {
-    //case PROJECT:
+    // case PROJECT:
     //  m_Object = new ctkXnatProject();
     //  m_Widget = new QmitkXnatProjectWidget(dynamic_cast<ctkXnatProject*>(m_Object));
     //  break;
-  case SUBJECT:
-    m_Object = new ctkXnatSubject();
-    m_Widget = new QmitkXnatSubjectWidget(QmitkXnatSubjectWidget::Mode::CREATE, parent);
-    dynamic_cast<QmitkXnatSubjectWidget*>(m_Widget)->SetSubject(dynamic_cast<ctkXnatSubject*>(m_Object));
-    break;
-  case EXPERIMENT:
-    m_Object = new ctkXnatExperiment();
-    m_Widget = new QmitkXnatExperimentWidget(QmitkXnatExperimentWidget::Mode::CREATE, parent);
-    dynamic_cast<QmitkXnatExperimentWidget*>(m_Widget)->SetExperiment(dynamic_cast<ctkXnatExperiment*>(m_Object));
-    break;
-  default:
-    break;
+    case SUBJECT:
+      m_Object = new ctkXnatSubject();
+      m_Widget = new QmitkXnatSubjectWidget(QmitkXnatSubjectWidget::Mode::CREATE, parent);
+      dynamic_cast<QmitkXnatSubjectWidget *>(m_Widget)->SetSubject(dynamic_cast<ctkXnatSubject *>(m_Object));
+      break;
+    case EXPERIMENT:
+      m_Object = new ctkXnatExperiment();
+      m_Widget = new QmitkXnatExperimentWidget(QmitkXnatExperimentWidget::Mode::CREATE, parent);
+      dynamic_cast<QmitkXnatExperimentWidget *>(m_Widget)->SetExperiment(dynamic_cast<ctkXnatExperiment *>(m_Object));
+      break;
+    default:
+      break;
   }
 
-  QList<QLineEdit*> children = m_Widget->findChildren<QLineEdit*>();
-  foreach(QLineEdit* child, children)
+  QList<QLineEdit *> children = m_Widget->findChildren<QLineEdit *>();
+  foreach (QLineEdit *child, children)
   {
     child->setReadOnly(false);
   }
 
-  QGridLayout* grid = dynamic_cast<QGridLayout*>(m_Widget->layout());
+  QGridLayout *grid = dynamic_cast<QGridLayout *>(m_Widget->layout());
 
-  QPushButton* btnOk = new QPushButton("Create");
-  QPushButton* btnCancel = new QPushButton("Cancel");
+  QPushButton *btnOk = new QPushButton("Create");
+  QPushButton *btnCancel = new QPushButton("Cancel");
 
-  QHBoxLayout* hLayout = new QHBoxLayout();
+  QHBoxLayout *hLayout = new QHBoxLayout();
   hLayout->addWidget(btnOk);
   hLayout->addWidget(btnCancel);
 
@@ -88,20 +87,20 @@ QmitkXnatCreateObjectDialog::~QmitkXnatCreateObjectDialog()
   delete m_Widget;
 }
 
-ctkXnatObject* QmitkXnatCreateObjectDialog::GetXnatObject()
+ctkXnatObject *QmitkXnatCreateObjectDialog::GetXnatObject()
 {
   return m_Object;
 }
 
 void QmitkXnatCreateObjectDialog::OnAcceptClicked()
 {
-  //ctkXnatProject* project;
-  ctkXnatSubject* subject;
-  ctkXnatExperiment* experiment;
+  // ctkXnatProject* project;
+  ctkXnatSubject *subject;
+  ctkXnatExperiment *experiment;
 
   switch (m_Type)
   {
-    //case PROJECT:
+    // case PROJECT:
     //  project = dynamic_cast<QmitkXnatProjectWidget*>(m_Widget)->GetProject();
 
     //  // Check mandatory field
@@ -117,48 +116,48 @@ void QmitkXnatCreateObjectDialog::OnAcceptClicked()
     //  m_Object = project;
     //  break;
 
-  case SUBJECT:
-    subject = dynamic_cast<QmitkXnatSubjectWidget*>(m_Widget)->GetSubject();
+    case SUBJECT:
+      subject = dynamic_cast<QmitkXnatSubjectWidget *>(m_Widget)->GetSubject();
 
-    // Check mandatory field
-    if (subject->property("label").isEmpty())
-    {
-      QMessageBox msgBox;
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.setText("Please fill in an ID to create a new subject!");
-      msgBox.exec();
-      return;
-    }
+      // Check mandatory field
+      if (subject->property("label").isEmpty())
+      {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Please fill in an ID to create a new subject!");
+        msgBox.exec();
+        return;
+      }
 
-    m_Object = subject;
-    break;
+      m_Object = subject;
+      break;
 
-  case EXPERIMENT:
-    experiment = dynamic_cast<QmitkXnatExperimentWidget*>(m_Widget)->GetExperiment();
+    case EXPERIMENT:
+      experiment = dynamic_cast<QmitkXnatExperimentWidget *>(m_Widget)->GetExperiment();
 
-    // Check mandatory field
-    if (experiment->property("label").isEmpty())
-    {
-      QMessageBox msgBox;
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.setText("Please fill in an ID to create a new experiment!");
-      msgBox.exec();
-      return;
-    }
-    else if (experiment->property("xsiType").isEmpty() || experiment->property("xsiType") == "xnat:experimentData")
-    {
-      QMessageBox msgBox;
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.setText("Please fill in an XSI Type to create a new experiment!");
-      msgBox.exec();
-      return;
-    }
+      // Check mandatory field
+      if (experiment->property("label").isEmpty())
+      {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Please fill in an ID to create a new experiment!");
+        msgBox.exec();
+        return;
+      }
+      else if (experiment->property("xsiType").isEmpty() || experiment->property("xsiType") == "xnat:experimentData")
+      {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Please fill in an XSI Type to create a new experiment!");
+        msgBox.exec();
+        return;
+      }
 
-    m_Object = experiment;
-    break;
+      m_Object = experiment;
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
   accept();
 }

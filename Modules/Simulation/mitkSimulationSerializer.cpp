@@ -32,7 +32,7 @@ std::string mitk::SimulationSerializer::Serialize()
 {
   const Simulation* simulation = dynamic_cast<const Simulation*>(m_Data.GetPointer());
 
-  if (simulation == NULL)
+  if (simulation == nullptr)
   {
     MITK_ERROR << " Invalid simulation object cannot be serialized!";
     return "";

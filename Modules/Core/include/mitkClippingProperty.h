@@ -14,81 +14,74 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKCLIPPINGPROPERTY_H_HEADER_INCLUDED
 #define MITKCLIPPINGPROPERTY_H_HEADER_INCLUDED
 
-#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkNumericTypes.h"
+#include <MitkCoreExports.h>
 
 #include <itkConfigure.h>
 
 #include <string>
 
-
-namespace mitk {
-
+namespace mitk
+{
 #ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
+#pragma warning(push)
+#pragma warning(disable : 4522)
 #endif
 
-/**
- * \brief Property for clipping datasets; currently only
- * clipping planes are possible
- * \ingroup DataManagement
- */
-class MITKCORE_EXPORT ClippingProperty : public BaseProperty
-{
-public:
-  mitkClassMacro(ClippingProperty, BaseProperty);
+  /**
+   * \brief Property for clipping datasets; currently only
+   * clipping planes are possible
+   * \ingroup DataManagement
+   */
+  class MITKCORE_EXPORT ClippingProperty : public BaseProperty
+  {
+  public:
+    mitkClassMacro(ClippingProperty, BaseProperty);
 
-  typedef std::string ValueType;
+    typedef std::string ValueType;
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-  mitkNewMacro2Param( ClippingProperty,
-    const Point3D &, const Vector3D & );
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+      mitkNewMacro2Param(ClippingProperty, const Point3D &, const Vector3D &);
 
-  bool GetClippingEnabled() const;
-  void SetClippingEnabled( bool enabled );
+    bool GetClippingEnabled() const;
+    void SetClippingEnabled(bool enabled);
 
-  const Point3D &GetOrigin() const;
-  void SetOrigin( const Point3D &origin );
+    const Point3D &GetOrigin() const;
+    void SetOrigin(const Point3D &origin);
 
-  const Vector3D &GetNormal() const;
-  void SetNormal( const Vector3D &normal );
+    const Vector3D &GetNormal() const;
+    void SetNormal(const Vector3D &normal);
 
-  virtual std::string GetValueAsString() const override;
+    virtual std::string GetValueAsString() const override;
 
-  using BaseProperty::operator =;
+    using BaseProperty::operator=;
 
-protected:
+  protected:
+    bool m_ClippingEnabled;
 
-  bool m_ClippingEnabled;
+    Point3D m_Origin;
+    Vector3D m_Normal;
 
-  Point3D m_Origin;
-  Vector3D m_Normal;
+    ClippingProperty();
+    ClippingProperty(const ClippingProperty &other);
+    ClippingProperty(const Point3D &origin, const Vector3D &normal);
 
-  ClippingProperty();
-  ClippingProperty(const ClippingProperty& other);
-  ClippingProperty( const Point3D &origin, const Vector3D &normal );
+  private:
+    // purposely not implemented
+    ClippingProperty &operator=(const ClippingProperty &);
 
-private:
+    virtual bool IsEqual(const BaseProperty &property) const override;
+    virtual bool Assign(const BaseProperty &property) override;
 
-  // purposely not implemented
-  ClippingProperty& operator=(const ClippingProperty&);
-
-  virtual bool IsEqual(const BaseProperty& property) const override;
-  virtual bool Assign(const BaseProperty& property) override;
-
-  virtual itk::LightObject::Pointer InternalClone() const override;
-
-};
+    virtual itk::LightObject::Pointer InternalClone() const override;
+  };
 
 #ifdef _MSC_VER
-# pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 } // namespace mitk

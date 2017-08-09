@@ -19,9 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <mitkLevelWindowPreset.h>
-#include <mitkLevelWindowManager.h>
 #include <QMenu>
+#include <mitkLevelWindowManager.h>
+#include <mitkLevelWindowPreset.h>
 
 /**
  * \ingroup QmitkModule
@@ -31,20 +31,19 @@ See LICENSE.txt or http://www.mitk.org for details.
  * a new contextmenu with standard functions or adds Level/Window standard
  * functions to an predefined contextmenu.
  */
-class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget {
-
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget
+{
   Q_OBJECT
 
 public:
-
   /// constructor
-  QmitkLevelWindowWidgetContextMenu(QWidget * parent, Qt::WindowFlags f = nullptr );
+  QmitkLevelWindowWidgetContextMenu(QWidget *parent, Qt::WindowFlags f = nullptr);
   virtual ~QmitkLevelWindowWidgetContextMenu();
 
   /*!
   *  data structure which reads and writes presets defined in a XML-file
   */
-  mitk::LevelWindowPreset* m_LevelWindowPreset;
+  mitk::LevelWindowPreset *m_LevelWindowPreset;
 
   /*!
   *  data structure which stores the values manipulated
@@ -53,46 +52,46 @@ public:
   mitk::LevelWindow m_LevelWindow;
 
   /// submenu with all presets for contextmenu
-  QMenu* m_PresetSubmenu;
+  QMenu *m_PresetSubmenu;
 
   /// submenu with all images for contextmenu
-  QMenu* m_ImageSubmenu;
+  QMenu *m_ImageSubmenu;
 
   /// pointer to the object which manages all Level/Window changes on images and holds the LevelWindowProperty
   /// of the current image
-  mitk::LevelWindowManager* m_Manager;
+  mitk::LevelWindowManager *m_Manager;
 
   /// map to hold all image-properties, one can get the image which is selected in the contextmenu
   /// with the QAction representing the image for the contextmenu
-  std::map<QAction*, mitk::LevelWindowProperty::Pointer> m_Images;
+  std::map<QAction *, mitk::LevelWindowProperty::Pointer> m_Images;
 
   /*!
   * returns the contextmenu with standard functions for Level/Window
   *
   * input is a prefilled contextmenu to which standard functions will be added
   */
-  void getContextMenu(QMenu* contextmenu);
+  void getContextMenu(QMenu *contextmenu);
 
   /// returns the contextmenu with standard functions for Level/Window
   void getContextMenu();
 
   /// lets this object know about the LevelWindowManager to get all images and tell about changes
-  void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
+  void setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
 protected:
-
   /// ID of preset selected in contextmenu
-  QAction* m_PresetAction;
+  QAction *m_PresetAction;
 
   /// ID of image selected in contextmenu
-  QAction* m_ImageAction;
+  QAction *m_ImageAction;
 
 protected slots:
 
   /// sets level and window value of the current image to the values defined for the selected preset
-  void setPreset(QAction* presetAction);
+  void setPreset(QAction *presetAction);
 
-  /// calls the mitkLevelWindow SetAuto method with guessByCentralSlice false, so that the greyvalues from whole image will be considered
+  /// calls the mitkLevelWindow SetAuto method with guessByCentralSlice false, so that the greyvalues from whole image
+  /// will be considered
   void useOptimizedLevelWindow();
 
   /// calls the mitkLevelWindow SetToImageRange method, so that the greyvalues from whole image will be used
@@ -114,10 +113,9 @@ protected slots:
   void changeScaleRange();
 
   /// sets the selected image or the topmost layer image to the new current image
-  void setImage(QAction* imageAction);
+  void setImage(QAction *imageAction);
 
   /// sets the window to its maximum Size to fit the scalerange
   void setMaximumWindow();
-
 };
 #endif

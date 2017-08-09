@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QtPerspectiveSwitcherTabBar.h"
 
+#include <berryIPerspectiveDescriptor.h>
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIPerspectiveDescriptor.h>
 
 /**
  * \brief A Listener class for perspective changes. Neccessary for consistent tab activation
@@ -31,49 +31,39 @@ struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
   /**
    * Constructor.
    */
-  QtPerspectiveSwitcherTabBarListener(QtPerspectiveSwitcherTabBar* switcher)
-  : switcher(switcher)
-  {}
-
+  QtPerspectiveSwitcherTabBarListener(QtPerspectiveSwitcherTabBar *switcher) : switcher(switcher) {}
   /**
    * Only listens to perspective activation events.
    */
-  Events::Types GetPerspectiveEventTypes() const override
-  {
-    return Events::ACTIVATED;
-  }
-
+  Events::Types GetPerspectiveEventTypes() const override { return Events::ACTIVATED; }
   /**
    * Sets the corresponding perspective index within the associated QtPerspectiveSwitcherTabBar instance.
    */
-// //! [SwitchPerspectiveListenerPerspectiveActivated]
-  void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                            const berry::IPerspectiveDescriptor::Pointer& perspective) override
+  // //! [SwitchPerspectiveListenerPerspectiveActivated]
+  void PerspectiveActivated(const berry::IWorkbenchPage::Pointer & /*page*/,
+                            const berry::IPerspectiveDescriptor::Pointer &perspective) override
   {
     int index = perspective->GetId() == "org.mitk.example.viewerperspective" ? 0 : 1;
     switcher->setCurrentIndex(index);
   }
-// //! [SwitchPerspectiveListenerPerspectiveActivated]
+  // //! [SwitchPerspectiveListenerPerspectiveActivated]
 
 private:
-
   /**
    *  The associated QtPerspectiveSwitcherTabBar instance.
    */
-  QtPerspectiveSwitcherTabBar* switcher;
+  QtPerspectiveSwitcherTabBar *switcher;
 };
 
 QtPerspectiveSwitcherTabBar::QtPerspectiveSwitcherTabBar(berry::IWorkbenchWindow::Pointer window)
-: window(window)
-, perspListener(new QtPerspectiveSwitcherTabBarListener(this))
+  : window(window), perspListener(new QtPerspectiveSwitcherTabBarListener(this))
 {
   this->tabChanged = false;
 
-  QWidget* parent = static_cast<QWidget*>(window->GetShell()->GetControl());
+  QWidget *parent = static_cast<QWidget *>(window->GetShell()->GetControl());
   this->setParent(parent);
 
-  QObject::connect( this, SIGNAL( currentChanged( int ) )
-    , this, SLOT( SwitchPerspective( void ) ) );
+  QObject::connect(this, SIGNAL(currentChanged(int)), this, SLOT(SwitchPerspective(void)));
 
   window->AddPerspectiveListener(this->perspListener.data());
 }

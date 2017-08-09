@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkImageNavigatorView.h"
 
+#include <itkSpatialOrientationAdapter.h>
+
 #include <QmitkStepperAdapter.h>
 #include <QmitkRenderWindow.h>
 
@@ -29,37 +31,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkNodePredicateProperty.h>
 
+#include <mitkCompositePixelValueToString.h>
+
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
 
 static mitk::DataNode::Pointer GetTopLayerNode(const mitk::DataStorage::SetOfObjects::ConstPointer nodes, const mitk::Point3D &position, mitk::BaseRenderer* renderer)
 {
-    mitk::DataNode::Pointer node;
-    int  maxlayer = -32768;
+  mitk::DataNode::Pointer node;
+  int  maxlayer = -32768;
 
-    if(nodes.IsNotNull())
+  if(nodes.IsNotNull())
+  {
+    // find node with largest layer, that is the node shown on top in the render window
+    for (unsigned int x = 0; x < nodes->size(); x++)
     {
-        // find node with largest layer, that is the node shown on top in the render window
-        for (unsigned int x = 0; x < nodes->size(); x++)
+      if ( (nodes->at(x)->GetData()->GetGeometry() != nullptr) &&
+           nodes->at(x)->GetData()->GetGeometry()->IsInside(position) )
+      {
+        int layer = 0;
+        if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
+        if(layer > maxlayer)
         {
-            if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
-                 nodes->at(x)->GetData()->GetGeometry()->IsInside(position) )
-            {
-                int layer = 0;
-                if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
-                if(layer > maxlayer)
-                {
-                    if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(renderer) )
-                    {
-                        node = nodes->at(x);
-                        maxlayer = layer;
-                    }
-                }
-            }
+          if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(renderer) )
+          {
+            node = nodes->at(x);
+            maxlayer = layer;
+          }
         }
+      }
     }
+  }
 
-    return node;
+  return node;
 }
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
@@ -81,7 +85,6 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets
   m_Parent = parent;
   m_Controls.setupUi(parent);
-  m_Controls.m_SliceNavigatorAxial->SetInverseDirection(true);
 
   connect(m_Controls.m_XWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
   connect(m_Controls.m_YWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
@@ -181,6 +184,9 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_SliceNavigatorTime->setEnabled(false);
       m_Controls.m_TimeLabel->setEnabled(false);
     }
+
+    this->OnRefetch();
+    this->UpdateStatusBar();
   }
 }
 
@@ -189,7 +195,6 @@ void QmitkImageNavigatorView::UpdateStatusBar()
   if (m_IRenderWindowPart != nullptr)
   {
     mitk::Point3D position = m_IRenderWindowPart->GetSelectedPosition();
-    std::string statusText;
     mitk::BaseRenderer::Pointer renderer = mitk::BaseRenderer::GetInstance(m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetVtkRenderWindow());
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
 
@@ -211,7 +216,7 @@ void QmitkImageNavigatorView::UpdateStatusBar()
         node->GetBoolProperty("binary", isBinary);
         if (isBinary)
         {
-          mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = this->GetDataStorage()->GetSources(node, NULL, true);
+          mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = this->GetDataStorage()->GetSources(node, nullptr, true);
           if (!sourcenodes->empty())
           {
             topSourceNode = GetTopLayerNode(sourcenodes, position, renderer);
@@ -233,47 +238,48 @@ void QmitkImageNavigatorView::UpdateStatusBar()
           node->GetIntProperty("Image.Displayed Component", component);
         }
       }
-      std::stringstream stream;
-      stream.imbue(std::locale::classic());
 
-      // get the position and gray value from the image and build up status bar text
-      if (image3D.IsNotNull())
+      // get the position and pixel value from the image and build up status bar text
+      auto statusBar = mitk::StatusBar::GetInstance();
+
+      if (image3D.IsNotNull() && statusBar != nullptr)
       {
         itk::Index<3> p;
         image3D->GetGeometry()->WorldToIndex(position, p);
-        stream.precision(2);
-        stream << "Position: <" << std::fixed << position[0] << ", " << std::fixed << position[1] << ", " << std::fixed << position[2] << "> mm";
-        stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
 
-        mitk::ScalarType pixelValue;
+        auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
 
-        mitkPixelTypeMultiplex5(
-          mitk::FastSinglePixelAccess,
-          image3D->GetChannelDescriptor().GetPixelType(),
-          image3D,
-          image3D->GetVolumeData(renderer->GetTimeStep()),
-          p,
-          pixelValue,
-          component);
-
-
-
-        if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+        if (pixelType == itk::ImageIOBase::RGB || pixelType == itk::ImageIOBase::RGBA)
         {
-          stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
+          std::string pixelValue = "Pixel RGB(A) value: ";
+          pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
+          statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue.c_str());
+        }
+        else if ( pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR )
+        {
+          std::string pixelValue = "See ODF Details view. ";
+          statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue.c_str());
         }
         else
         {
-          stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
+          itk::Index<3> p;
+          image3D->GetGeometry()->WorldToIndex(position, p);
+          mitk::ScalarType pixelValue;
+          mitkPixelTypeMultiplex5(
+            mitk::FastSinglePixelAccess,
+            image3D->GetChannelDescriptor().GetPixelType(),
+            image3D,
+            image3D->GetVolumeData(renderer->GetTimeStep()),
+            p,
+            pixelValue,
+            component);
+          statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue);
         }
       }
       else
       {
-        stream << "No image information at this position!";
+        statusBar->DisplayImageInfoInvalid();
       }
-
-      statusText = stream.str();
-      mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
     }
   }
 }
@@ -550,6 +556,80 @@ void QmitkImageNavigatorView::OnRefetch()
       m_Controls.m_XWorldCoordinateSpinBox->blockSignals(false);
       m_Controls.m_YWorldCoordinateSpinBox->blockSignals(false);
       m_Controls.m_ZWorldCoordinateSpinBox->blockSignals(false);
+
+      /// Calculating 'inverse direction' property.
+
+      mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
+      matrix.GetVnlMatrix().normalize_columns();
+      mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+
+      for (int worldAxis = 0; worldAxis < 3; ++worldAxis)
+      {
+        QmitkRenderWindow* renderWindow =
+            worldAxis == 0 ? m_IRenderWindowPart->GetQmitkRenderWindow("sagittal") :
+            worldAxis == 1 ? m_IRenderWindowPart->GetQmitkRenderWindow("coronal") :
+                             m_IRenderWindowPart->GetQmitkRenderWindow("axial");
+
+        if (renderWindow)
+        {
+          const mitk::BaseGeometry* rendererGeometry = renderWindow->GetRenderer()->GetCurrentWorldGeometry();
+
+          /// Because of some problems with the current way of event signalling,
+          /// 'Modified' events are sent out from the stepper while the renderer
+          /// does not have a geometry yet. Therefore, we do a nullptr check here.
+          /// See bug T22122. This check can be resolved after T22122 got fixed.
+          if (rendererGeometry)
+          {
+            int dominantAxis = itk::Function::Max3(
+                inverseMatrix[0][worldAxis],
+                inverseMatrix[1][worldAxis],
+                inverseMatrix[2][worldAxis]);
+
+            bool referenceGeometryAxisInverted = inverseMatrix[dominantAxis][worldAxis] < 0;
+            bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[worldAxis] < 0;
+
+            /// `referenceGeometryAxisInverted` tells if the direction of the corresponding axis
+            /// of the reference geometry is flipped compared to the 'world direction' or not.
+            ///
+            /// `rendererZAxisInverted` tells if direction of the renderer geometry z axis is
+            /// flipped compared to the 'world direction' or not. This is the same as the indexing
+            /// direction in the slice navigation controller and matches the 'top' property when
+            /// initialising the renderer planes. (If 'top' was true then the direction is
+            /// inverted.)
+            ///
+            /// The world direction can be +1 ('up') that means right, anterior or superior, or
+            /// it can be -1 ('down') that means left, posterior or inferior, respectively.
+            ///
+            /// If these two do not match, we have to invert the index between the slice navigation
+            /// controller and the slider navigator widget, so that the user can see and control
+            /// the index according to the reference geometry, rather than the slice navigation
+            /// controller. The index in the slice navigation controller depends on in which way
+            /// the reference geometry has been resliced for the renderer, and it does not necessarily
+            /// match neither the world direction, nor the direction of the corresponding axis of
+            /// the reference geometry. Hence, it is a merely internal information that should not
+            /// be exposed to the GUI.
+            ///
+            /// So that one can navigate in the same world direction by dragging the slider
+            /// right, regardless of the direction of the corresponding axis of the reference
+            /// geometry, we invert the direction of the controls if the reference geometry axis
+            /// is inverted but the direction is not ('inversDirection' is false) or the other
+            /// way around.
+
+            bool inverseDirection = referenceGeometryAxisInverted != rendererZAxisInverted;
+
+            QmitkSliderNavigatorWidget* navigatorWidget =
+                worldAxis == 0 ? m_Controls.m_SliceNavigatorSagittal :
+                worldAxis == 1 ? m_Controls.m_SliceNavigatorFrontal :
+                                 m_Controls.m_SliceNavigatorAxial;
+
+            navigatorWidget->SetInverseDirection(inverseDirection);
+
+            // This should be a preference (see T22254)
+            // bool invertedControls = referenceGeometryAxisInverted != inverseDirection;
+            // navigatorWidget->SetInvertedControls(invertedControls);
+          }
+        }
+      }
     }
 
     this->SetBorderColors();

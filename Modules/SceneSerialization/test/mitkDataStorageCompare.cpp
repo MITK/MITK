@@ -20,24 +20,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkMapper.h"
 
-#include "usModuleContext.h"
 #include "usGetModuleContext.h"
 #include "usLDAPFilter.h"
+#include "usModuleContext.h"
 
-mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage* reference,
-                                             const mitk::DataStorage* test,
+mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage *reference,
+                                             const mitk::DataStorage *test,
                                              Tests flags,
                                              double eps)
-: m_Eps(eps)
-, m_TestAspects(flags)
-, m_ReferenceDS(reference)
-, m_TestDS(test)
-, m_HierarchyPassed(true)
-, m_DataPassed(true)
-, m_PropertiesPassed(true)
-, m_MappersPassed(true)
-, m_InteractorsPassed(true)
-, m_AspectsFailed(0)
+  : m_Eps(eps),
+    m_TestAspects(flags),
+    m_ReferenceDS(reference),
+    m_TestDS(test),
+    m_HierarchyPassed(true),
+    m_DataPassed(true),
+    m_PropertiesPassed(true),
+    m_MappersPassed(true),
+    m_InteractorsPassed(true),
+    m_AspectsFailed(0)
 {
   BaseDataCompare::RegisterCoreEquals();
 }
@@ -59,32 +59,40 @@ bool mitk::DataStorageCompare::Compare(bool verbose)
   m_InteractorsPassed = true;
   m_AspectsFailed = 0;
 
-  if ( m_TestAspects & CMP_Hierarchy )
+  if (m_TestAspects & CMP_Hierarchy)
     m_HierarchyPassed = CompareHierarchy(verbose);
 
-  if ( m_TestAspects != CMP_Nothing )
+  if (m_TestAspects != CMP_Nothing)
     CompareDataNodes(verbose);
 
-  if ((m_TestAspects & CMP_Data) && !m_DataPassed) ++m_AspectsFailed;
-  if ((m_TestAspects & CMP_Properties) && !m_PropertiesPassed) ++m_AspectsFailed;
-  if ((m_TestAspects & CMP_Mappers) && !m_MappersPassed) ++m_AspectsFailed;
-  if ((m_TestAspects & CMP_Interactors) && !m_InteractorsPassed) ++m_AspectsFailed;
+  if ((m_TestAspects & CMP_Data) && !m_DataPassed)
+    ++m_AspectsFailed;
+  if ((m_TestAspects & CMP_Properties) && !m_PropertiesPassed)
+    ++m_AspectsFailed;
+  if ((m_TestAspects & CMP_Mappers) && !m_MappersPassed)
+    ++m_AspectsFailed;
+  if ((m_TestAspects & CMP_Interactors) && !m_InteractorsPassed)
+    ++m_AspectsFailed;
 
   if (verbose)
-      Report();
+    Report();
 
   return m_AspectsFailed == 0;
 }
 
-
 void mitk::DataStorageCompare::Report()
 {
   MITK_INFO << "Comparison results:";
-  MITK_INFO << "  Hierarchy comparison:   " << (m_TestAspects & CMP_Hierarchy ? (m_HierarchyPassed ? "pass" : "fail") : "skipped");
-  MITK_INFO << "  Data comparison:        " << (m_TestAspects & CMP_Data ? (m_DataPassed ? "pass" : "fail") : "skipped");
-  MITK_INFO << "  Properties comparison:  " << (m_TestAspects & CMP_Properties ? (m_PropertiesPassed ? "pass" : "fail") : "skipped");
-  MITK_INFO << "  Mappers comparison:     " << (m_TestAspects & CMP_Mappers ? (m_MappersPassed ? "pass" : "fail") : "skipped");
-  MITK_INFO << "  Interactors comparison: " << (m_TestAspects & CMP_Interactors ? (m_InteractorsPassed ? "pass" : "fail") : "skipped");
+  MITK_INFO << "  Hierarchy comparison:   "
+            << (m_TestAspects & CMP_Hierarchy ? (m_HierarchyPassed ? "pass" : "fail") : "skipped");
+  MITK_INFO << "  Data comparison:        "
+            << (m_TestAspects & CMP_Data ? (m_DataPassed ? "pass" : "fail") : "skipped");
+  MITK_INFO << "  Properties comparison:  "
+            << (m_TestAspects & CMP_Properties ? (m_PropertiesPassed ? "pass" : "fail") : "skipped");
+  MITK_INFO << "  Mappers comparison:     "
+            << (m_TestAspects & CMP_Mappers ? (m_MappersPassed ? "pass" : "fail") : "skipped");
+  MITK_INFO << "  Interactors comparison: "
+            << (m_TestAspects & CMP_Interactors ? (m_InteractorsPassed ? "pass" : "fail") : "skipped");
 
   if (m_AspectsFailed == 0)
     MITK_INFO << "  Summary:                 ALL PASSED";
@@ -92,28 +100,30 @@ void mitk::DataStorageCompare::Report()
     MITK_INFO << "  Summary:                " << m_AspectsFailed << " failures";
 }
 
-
-void mitk::DataStorageCompare::DescribeHierarchyOfNodes(DataStorage::ConstPointer storage, HierarchyDescriptorMap& result)
+void mitk::DataStorageCompare::DescribeHierarchyOfNodes(DataStorage::ConstPointer storage,
+                                                        HierarchyDescriptorMap &result)
 {
   result.clear();
-  if (storage.IsNull()) return;
+  if (storage.IsNull())
+    return;
 
   mitk::DataStorage::SetOfObjects::ConstPointer allNodes = storage->GetAll();
   for (auto node : *allNodes)
   {
     std::string descriptor = GenerateHierarchyDescriptor(node, storage);
-    result.insert( std::make_pair(descriptor, node) );
+    result.insert(std::make_pair(descriptor, node));
   }
 }
 
 std::string mitk::DataStorageCompare::GenerateNodeDescriptor(mitk::DataNode::Pointer node)
 {
-  if (node.IsNull()) return "nullptr";
+  if (node.IsNull())
+    return "nullptr";
 
   std::string thisDataDescriptor = "nullptr";
-  mitk::BaseData* data = node->GetData();
+  mitk::BaseData *data = node->GetData();
   if (data != nullptr)
-      thisDataDescriptor = data->GetNameOfClass();
+    thisDataDescriptor = data->GetNameOfClass();
 
   std::string thisNodeName = node->GetName();
 
@@ -121,16 +131,18 @@ std::string mitk::DataStorageCompare::GenerateNodeDescriptor(mitk::DataNode::Poi
   return thisNodesDescriptor;
 }
 
-std::string mitk::DataStorageCompare::GenerateHierarchyDescriptor(mitk::DataNode::Pointer node, mitk::DataStorage::ConstPointer storage)
+std::string mitk::DataStorageCompare::GenerateHierarchyDescriptor(mitk::DataNode::Pointer node,
+                                                                  mitk::DataStorage::ConstPointer storage)
 {
   std::string thisNodesDescriptor = GenerateNodeDescriptor(node);
-  mitk::DataStorage::SetOfObjects::ConstPointer parents = storage->GetSources(node, nullptr, true); // direct sources without filter
+  mitk::DataStorage::SetOfObjects::ConstPointer parents =
+    storage->GetSources(node, nullptr, true); // direct sources without filter
 
   // construct descriptors for parents
   std::vector<std::string> parentDescriptors;
 
   for (auto parent : *parents)
-    parentDescriptors.push_back( GenerateHierarchyDescriptor(parent, storage) );
+    parentDescriptors.push_back(GenerateHierarchyDescriptor(parent, storage));
 
   // sort descriptors (we don't want to rely on potentially random order of parents)
   std::sort(parentDescriptors.begin(), parentDescriptors.end());
@@ -150,7 +162,6 @@ std::string mitk::DataStorageCompare::GenerateHierarchyDescriptor(mitk::DataNode
     thisNodesDescriptor += ")";
   }
 
-
   return thisNodesDescriptor;
 }
 
@@ -165,8 +176,8 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   // multiple nodes that have the same name / type / etc.
   for (auto entry : m_RefNodesByHierarchy)
   {
-    const std::string& key = entry.first;
-    const mitk::DataNode::Pointer& node = entry.second;
+    const std::string &key = entry.first;
+    const mitk::DataNode::Pointer &node = entry.second;
 
     unsigned int timesInReference = m_RefNodesByHierarchy.count(key);
     unsigned int timesInTest = m_TestNodesByHierarchy.count(key);
@@ -187,8 +198,8 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   // test also keys that are _only_ in test!
   for (auto entry : m_TestNodesByHierarchy)
   {
-    const std::string& key = entry.first;
-    const mitk::DataNode::Pointer& node = entry.second;
+    const std::string &key = entry.first;
+    const mitk::DataNode::Pointer &node = entry.second;
 
     unsigned int timesInReference = m_RefNodesByHierarchy.count(key);
     unsigned int timesInTest = m_TestNodesByHierarchy.count(key);
@@ -202,7 +213,8 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
       if (verbose)
       {
         MITK_WARN << "### Hierarchy mismatch problem";
-        MITK_WARN << "  Test storage has more nodes (" << timesInReference << ") than reference storage (" << timesInTest << ")";
+        MITK_WARN << "  Test storage has more nodes (" << timesInReference << ") than reference storage ("
+                  << timesInTest << ")";
         MITK_WARN << "  Node name '" << node->GetName() << "'";
         MITK_WARN << "  Reference hierarchy descriptor: " << key;
       }
@@ -217,8 +229,8 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
     MITK_WARN << "Dumping test storage because there were errors:";
     for (auto entry : m_TestNodesByHierarchy)
     {
-      const std::string& key = entry.first;
-      const mitk::DataNode::Pointer& node = entry.second;
+      const std::string &key = entry.first;
+      const mitk::DataNode::Pointer &node = entry.second;
       MITK_WARN << "  Test node '" << node->GetName() << "', hierarchy : " << key;
     }
   }
@@ -226,7 +238,7 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   return numberOfMisMatches == 0;
 }
 
-bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose)
+bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode *reference, const mitk::DataNode *test, bool verbose)
 {
   if (reference == nullptr && test == nullptr)
     return true;
@@ -260,7 +272,7 @@ bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, co
   return m_AspectsFailed == 0;
 }
 
-bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, bool verbose)
+bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData *reference, const mitk::BaseData *test, bool verbose)
 {
   // early-out for nullptrs
   if (reference == nullptr && test == nullptr)
@@ -281,7 +293,7 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
   }
 
   // two real BaseData objects, need to really compare
-  if (reference->GetNameOfClass() != test->GetNameOfClass() )
+  if (reference->GetNameOfClass() != test->GetNameOfClass())
   {
     if (verbose)
       MITK_WARN << "  Mismatch: Reference data is '" << reference->GetNameOfClass() << "', "
@@ -291,7 +303,8 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
   try
   {
     std::string ldapFilter = std::string("(basedata=") + reference->GetNameOfClass() + "*)";
-    std::vector<us::ServiceReference<BaseDataCompare>> comparators = us::GetModuleContext()->GetServiceReferences<BaseDataCompare>(ldapFilter);
+    std::vector<us::ServiceReference<BaseDataCompare>> comparators =
+      us::GetModuleContext()->GetServiceReferences<BaseDataCompare>(ldapFilter);
     if (comparators.empty())
     {
       // bad, no comparator found, cannot compare
@@ -300,11 +313,12 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
     }
     else if (comparators.size() > 1)
     {
-      MITK_WARN << "Comparison warning: multiple comparisons possible for objects of type '" << reference->GetNameOfClass() << "'. Using just one.";
+      MITK_WARN << "Comparison warning: multiple comparisons possible for objects of type '"
+                << reference->GetNameOfClass() << "'. Using just one.";
       // bad, multiple comparators, need to add ranking or something
     }
 
-    BaseDataCompare* comparator = us::GetModuleContext()->GetService<BaseDataCompare>( comparators.front() );
+    BaseDataCompare *comparator = us::GetModuleContext()->GetService<BaseDataCompare>(comparators.front());
     if (!comparator)
     {
       MITK_ERROR << "Service lookup error, cannot get comparator for class " << reference->GetNameOfClass();
@@ -312,15 +326,16 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
 
     return comparator->AreEqual(reference, test, m_Eps, verbose);
   }
-  catch (std::exception& e)
+  catch (std::exception &e)
   {
     MITK_ERROR << "Exception during comparison: " << e.what();
     return false;
   }
 }
 
-
-bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode& reference, const mitk::DataNode& test, bool verbose)
+bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode &reference,
+                                                     const mitk::DataNode &test,
+                                                     bool verbose)
 {
   DataNode::PropertyListKeyNames refListNames = reference.GetPropertyListNames();
   DataNode::PropertyListKeyNames testListNames = test.GetPropertyListNames();
@@ -335,14 +350,16 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode& refer
     for (auto name : refListNames)
       if (std::find(testListNames.begin(), testListNames.end(), name) == testListNames.end())
       {
-        MITK_WARN << "Propertylist '" << name << "' from reference node (" << reference.GetName() << ") not found in test node.";
+        MITK_WARN << "Propertylist '" << name << "' from reference node (" << reference.GetName()
+                  << ") not found in test node.";
         error = true;
       }
 
     for (auto name : testListNames)
       if (std::find(refListNames.begin(), refListNames.end(), name) == refListNames.end())
       {
-        MITK_WARN << "Propertylist '" << name << "' did not exist in reference node (" << reference.GetName() << "), but is present in test node.";
+        MITK_WARN << "Propertylist '" << name << "' did not exist in reference node (" << reference.GetName()
+                  << "), but is present in test node.";
         error = true;
       }
 
@@ -353,9 +370,9 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode& refer
   // compare each list
   for (auto name : refListNames)
   {
-    if (!ArePropertyListsEqual( *(reference.GetPropertyList(name)), *(test.GetPropertyList(name)), verbose ))
+    if (!ArePropertyListsEqual(*(reference.GetPropertyList(name)), *(test.GetPropertyList(name)), verbose))
     {
-      MITK_WARN << "Property mismatch while comparing propertylist '" << name <<"'. See messages above.";
+      MITK_WARN << "Property mismatch while comparing propertylist '" << name << "'. See messages above.";
       error = true;
     }
   }
@@ -363,9 +380,11 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode& refer
   return !error;
 }
 
-bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList& reference, const mitk::PropertyList& test, bool verbose)
+bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList &reference,
+                                                     const mitk::PropertyList &test,
+                                                     bool verbose)
 {
-  const mitk::PropertyList::PropertyMap* refMap = reference.GetMap();
+  const mitk::PropertyList::PropertyMap *refMap = reference.GetMap();
 
   bool error = false;
 
@@ -375,7 +394,7 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList& r
     BaseProperty::Pointer refProperty = refEntry.second;
     BaseProperty::Pointer testProperty = test.GetProperty(propertyKey);
 
-    if ( testProperty.IsNull() )
+    if (testProperty.IsNull())
     {
       if (verbose)
         MITK_WARN << "Property '" << propertyKey << "' not found in test, only in reference.";
@@ -399,23 +418,24 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList& r
   return !error;
 }
 
-bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, const mitk::DataNode& test, bool verbose)
+bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode &reference,
+                                               const mitk::DataNode &test,
+                                               bool verbose)
 {
   bool error = false;
 
-  mitk::Mapper* refMapper2D = reference.GetMapper( mitk::BaseRenderer::Standard2D );
-  mitk::Mapper* testMapper2D = test.GetMapper( mitk::BaseRenderer::Standard2D );
+  mitk::Mapper *refMapper2D = reference.GetMapper(mitk::BaseRenderer::Standard2D);
+  mitk::Mapper *testMapper2D = test.GetMapper(mitk::BaseRenderer::Standard2D);
 
   if (refMapper2D == nullptr && testMapper2D == nullptr)
   {
-      ; // ok
+    ; // ok
   }
   else if (refMapper2D != nullptr && testMapper2D == nullptr)
   {
     if (verbose)
     {
-      MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
-                << "' in reference, is 'nullptr"
+      MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass() << "' in reference, is 'nullptr"
                 << "' in test (DataNode '" << reference.GetName() << "')";
     }
     error = true;
@@ -425,8 +445,8 @@ bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, 
     if (verbose)
     {
       MITK_WARN << "Mapper for 2D was 'nullptr"
-                << "' in reference, is '" << testMapper2D->GetNameOfClass()
-                << "' in test (DataNode '" << reference.GetName() << "')";
+                << "' in reference, is '" << testMapper2D->GetNameOfClass() << "' in test (DataNode '"
+                << reference.GetName() << "')";
     }
     error = true;
   } // else both are valid pointers, we just compare the type
@@ -434,26 +454,24 @@ bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, 
   {
     if (verbose)
     {
-      MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
-                << "' in reference, is '" << testMapper2D->GetNameOfClass()
-                << "' in test (DataNode '" << reference.GetName() << "')";
+      MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass() << "' in reference, is '"
+                << testMapper2D->GetNameOfClass() << "' in test (DataNode '" << reference.GetName() << "')";
     }
     error = true;
   }
 
-  mitk::Mapper* refMapper3D = reference.GetMapper( mitk::BaseRenderer::Standard3D );
-  mitk::Mapper* testMapper3D = test.GetMapper( mitk::BaseRenderer::Standard3D );
+  mitk::Mapper *refMapper3D = reference.GetMapper(mitk::BaseRenderer::Standard3D);
+  mitk::Mapper *testMapper3D = test.GetMapper(mitk::BaseRenderer::Standard3D);
 
   if (refMapper3D == nullptr && testMapper3D == nullptr)
   {
-      ; // ok
+    ; // ok
   }
   else if (refMapper3D != nullptr && testMapper3D == nullptr)
   {
     if (verbose)
     {
-      MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
-                << "' in reference, is 'nullptr"
+      MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass() << "' in reference, is 'nullptr"
                 << "' in test (DataNode '" << reference.GetName() << "')";
     }
     error = true;
@@ -463,8 +481,8 @@ bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, 
     if (verbose)
     {
       MITK_WARN << "Mapper for 3D was 'nullptr"
-                << "' in reference, is '" << testMapper3D->GetNameOfClass()
-                << "' in test (DataNode '" << reference.GetName() << "')";
+                << "' in reference, is '" << testMapper3D->GetNameOfClass() << "' in test (DataNode '"
+                << reference.GetName() << "')";
     }
     error = true;
   } // else both are valid pointers, we just compare the type
@@ -472,9 +490,8 @@ bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, 
   {
     if (verbose)
     {
-      MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
-                << "' in reference, is '" << testMapper3D->GetNameOfClass()
-                << "' in test (DataNode '" << reference.GetName() << "')";
+      MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass() << "' in reference, is '"
+                << testMapper3D->GetNameOfClass() << "' in test (DataNode '" << reference.GetName() << "')";
     }
     error = true;
   }
@@ -488,8 +505,8 @@ bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
 
   for (auto entry : m_RefNodesByHierarchy)
   {
-    const std::string& key = entry.first;
-    const mitk::DataNode::Pointer& refNode = entry.second;
+    const std::string &key = entry.first;
+    const mitk::DataNode::Pointer &refNode = entry.second;
 
     unsigned int timesInReference = m_RefNodesByHierarchy.count(key);
     unsigned int timesInTest = m_TestNodesByHierarchy.count(key);
@@ -499,7 +516,7 @@ bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
       // go on an compare those two
       auto testEntry = m_TestNodesByHierarchy.find(key);
       mitk::DataNode::Pointer testNode = testEntry->second;
-      if ( ! AreNodesEqual(refNode, testNode, verbose) )
+      if (!AreNodesEqual(refNode, testNode, verbose))
       {
         ++numberOfMisMatches;
         if (verbose)

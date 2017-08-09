@@ -81,13 +81,13 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
             MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
 
         float fiberOpacity;
-        this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
+        this->GetDataNode()->GetOpacity(fiberOpacity, nullptr);
         node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness",thickness);
         node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading);
         node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity);
 
         mitk::FiberBundle* fiberBundle = this->GetInput();
-        if (fiberBundle==NULL)
+        if (fiberBundle==nullptr)
             return;
 
         int lineWidth = 0;
@@ -138,11 +138,11 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
     FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
     mitk::DataNode* node = this->GetDataNode();
-    if ( node == NULL )
+    if ( node == nullptr )
         return;
 
     vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
-    if (fiberPolyData == NULL)
+    if (fiberPolyData == nullptr)
         return;
 
     fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());

@@ -23,12 +23,12 @@ mitk::NodePredicateCompositeBase::~NodePredicateCompositeBase()
 {
 }
 
-void mitk::NodePredicateCompositeBase::AddPredicate( const NodePredicateBase* p )
+void mitk::NodePredicateCompositeBase::AddPredicate(const NodePredicateBase *p)
 {
   m_ChildPredicates.push_back(p);
 }
 
-void mitk::NodePredicateCompositeBase::RemovePredicate( const NodePredicateBase* p )
+void mitk::NodePredicateCompositeBase::RemovePredicate(const NodePredicateBase *p)
 {
   m_ChildPredicates.remove(p);
 }

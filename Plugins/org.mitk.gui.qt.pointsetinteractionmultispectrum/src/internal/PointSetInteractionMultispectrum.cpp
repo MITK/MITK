@@ -52,7 +52,7 @@ const std::string PointSetInteractionMultispectrum::VIEW_ID =
     "org.mitk.views.pointsetinteractionmultispectrum";
 
 PointSetInteractionMultispectrum::PointSetInteractionMultispectrum() :
-                    m_PointListWidget(NULL)
+                    m_PointListWidget(nullptr)
 {
 
 }
@@ -150,7 +150,7 @@ void PointSetInteractionMultispectrum::DoImageProcessing()
   if (!DataManagerNode)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template",
+    QMessageBox::information( nullptr, "Template",
         "Please load and select an image before starting image processing.");
     return;
   }
@@ -171,7 +171,7 @@ void PointSetInteractionMultispectrum::DoImageProcessing()
       if (m_PointSet->GetSize() == 0)
       {
         // no points there. Not good for region growing
-        QMessageBox::information( NULL,
+        QMessageBox::information( nullptr,
             "Reflectance display functionality",
             "Please set some points inside the image first.\n"
             "(hold Shift key and click left mouse button inside the image.)");

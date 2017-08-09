@@ -14,20 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <algorithm>
 #include <mitkCoreServices.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkProperties.h>
 #include <mitkPropertyFilter.h>
 #include <mitkTestingMacros.h>
-#include <algorithm>
 #include <utility>
 
-int mitkPropertyFiltersTest(int, char* [])
+int mitkPropertyFiltersTest(int, char *[])
 {
   MITK_TEST_BEGIN("mitkPropertyFiltersTest");
 
-  mitk::IPropertyFilters* propertyFilters = mitk::CoreServices::GetPropertyFilters();
-  MITK_TEST_CONDITION_REQUIRED(propertyFilters != NULL, "Get property filters service");
+  mitk::IPropertyFilters *propertyFilters = mitk::CoreServices::GetPropertyFilters();
+  MITK_TEST_CONDITION_REQUIRED(propertyFilters != nullptr, "Get property filters service");
 
   typedef std::map<std::string, mitk::BaseProperty::Pointer> PropertyMap;
   typedef PropertyMap::const_iterator PropertyMapConstIterator;

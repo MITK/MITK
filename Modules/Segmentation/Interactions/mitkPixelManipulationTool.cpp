@@ -15,23 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkPixelManipulationTool.h"
 
-#include "mitkToolManager.h"
-#include "mitkImage.h"
-#include "mitkImageCast.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkProperties.h"
 #include "mitkBoundingObjectToSegmentationFilter.h"
+#include "mitkImage.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkImageCast.h"
+#include "mitkProperties.h"
+#include "mitkToolManager.h"
 #include <itkImageRegionIterator.h>
 
 #include "mitkPixelManipulationTool.xpm"
 
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, PixelManipulationTool, "Pixel manipulation tool");
 }
 
-mitk::PixelManipulationTool::PixelManipulationTool() : Tool("dummy"),
-m_Value(0),
-m_FixedValue(false)
+mitk::PixelManipulationTool::PixelManipulationTool() : Tool("dummy"), m_Value(0), m_FixedValue(false)
 {
 }
 
@@ -43,15 +42,16 @@ void mitk::PixelManipulationTool::Activated()
 {
   Superclass::Activated();
 
-  m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::PixelManipulationTool> (this,&mitk::PixelManipulationTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged +=
+    mitk::MessageDelegate<mitk::PixelManipulationTool>(this, &mitk::PixelManipulationTool::OnRoiDataChanged);
   m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
 
   if (m_OriginalImageNode.IsNotNull())
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
-    if ( image.IsNotNull())
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_OriginalImageNode->GetData());
+    if (image.IsNotNull())
     {
-      //mitk::ScalarType scalar = image->GetScalarValueMax();
+      // mitk::ScalarType scalar = image->GetScalarValueMax();
     }
   }
   else
@@ -60,48 +60,48 @@ void mitk::PixelManipulationTool::Activated()
 
 void mitk::PixelManipulationTool::Deactivated()
 {
-  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<mitk::PixelManipulationTool> (this,&mitk::PixelManipulationTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged -=
+    mitk::MessageDelegate<mitk::PixelManipulationTool>(this, &mitk::PixelManipulationTool::OnRoiDataChanged);
 
   Superclass::Deactivated();
 }
 
-const char* mitk::PixelManipulationTool::GetName() const
+const char *mitk::PixelManipulationTool::GetName() const
 {
   return "pixelmanipulation";
 }
 
-const char** mitk::PixelManipulationTool::GetXPM() const
+const char **mitk::PixelManipulationTool::GetXPM() const
 {
   return mitkPixelManipulationTool_xpm;
 }
 
 void mitk::PixelManipulationTool::OnRoiDataChanged()
 {
-
 }
 
 void mitk::PixelManipulationTool::CalculateImage()
 {
   if (m_OriginalImageNode.IsNotNull())
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
-    mitk::DataNode* maskNode = m_ToolManager->GetRoiData(0);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_OriginalImageNode->GetData());
+    mitk::DataNode *maskNode = m_ToolManager->GetRoiData(0);
     mitk::Image::Pointer roi = mitk::Image::New();
 
     if (maskNode)
     {
-      mitk::BoundingObject* boundingObject = dynamic_cast<mitk::BoundingObject*> (maskNode->GetData());
+      mitk::BoundingObject *boundingObject = dynamic_cast<mitk::BoundingObject *>(maskNode->GetData());
 
       if (boundingObject)
       {
         mitk::BoundingObjectToSegmentationFilter::Pointer filter = mitk::BoundingObjectToSegmentationFilter::New();
-        filter->SetBoundingObject( boundingObject);
+        filter->SetBoundingObject(boundingObject);
         filter->SetInput(image);
         filter->Update();
         roi = filter->GetOutput();
       }
       else
-        roi =  dynamic_cast<mitk::Image*> (maskNode->GetData());
+        roi = dynamic_cast<mitk::Image *>(maskNode->GetData());
 
       mitk::Image::Pointer newImage = mitk::Image::New();
       newImage->Initialize(image);
@@ -116,23 +116,25 @@ void mitk::PixelManipulationTool::CalculateImage()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::PixelManipulationTool::ITKPixelManipulation( itk::Image<TPixel, VImageDimension>* originalImage, Image* maskImage, Image* newImage, int newValue)
+void mitk::PixelManipulationTool::ITKPixelManipulation(itk::Image<TPixel, VImageDimension> *originalImage,
+                                                       Image *maskImage,
+                                                       Image *newImage,
+                                                       int newValue)
 {
-
-  typedef itk::Image< TPixel, VImageDimension> itkImageType;
-  typedef itk::Image< unsigned char, 3> itkMaskType;
+  typedef itk::Image<TPixel, VImageDimension> itkImageType;
+  typedef itk::Image<unsigned char, 3> itkMaskType;
   typename itkImageType::Pointer itkImage;
   typename itkMaskType::Pointer itkMask;
-  CastToItkImage( newImage, itkImage);
-  CastToItkImage( maskImage, itkMask);
+  CastToItkImage(newImage, itkImage);
+  CastToItkImage(maskImage, itkMask);
 
-  typedef itk::ImageRegionConstIterator< itkImageType >     InputIteratorType;
-  typedef itk::ImageRegionIterator< itkImageType >     OutputIteratorType;
-  typedef itk::ImageRegionConstIterator< itkMaskType > MaskIteratorType;
+  typedef itk::ImageRegionConstIterator<itkImageType> InputIteratorType;
+  typedef itk::ImageRegionIterator<itkImageType> OutputIteratorType;
+  typedef itk::ImageRegionConstIterator<itkMaskType> MaskIteratorType;
 
-  MaskIteratorType maskIterator ( itkMask, itkMask->GetLargestPossibleRegion() );
-  InputIteratorType inputIterator( originalImage, originalImage->GetLargestPossibleRegion() );
-  OutputIteratorType outputIterator( itkImage, itkImage->GetLargestPossibleRegion() );
+  MaskIteratorType maskIterator(itkMask, itkMask->GetLargestPossibleRegion());
+  InputIteratorType inputIterator(originalImage, originalImage->GetLargestPossibleRegion());
+  OutputIteratorType outputIterator(itkImage, itkImage->GetLargestPossibleRegion());
 
   inputIterator.GoToBegin();
   outputIterator.GoToBegin();
@@ -145,10 +147,10 @@ void mitk::PixelManipulationTool::ITKPixelManipulation( itk::Image<TPixel, VImag
       if (m_FixedValue)
         outputIterator.Set(newValue);
       else
-        outputIterator.Set( inputIterator.Get()+ newValue);
+        outputIterator.Set(inputIterator.Get() + newValue);
     }
     else
-      outputIterator.Set( inputIterator.Get());
+      outputIterator.Set(inputIterator.Get());
 
     ++inputIterator;
     ++outputIterator;
@@ -172,7 +174,7 @@ void mitk::PixelManipulationTool::AddImageToDataStorage(mitk::Image::Pointer ima
   }
 }
 
-void mitk::PixelManipulationTool::SetValue( int value )
+void mitk::PixelManipulationTool::SetValue(int value)
 {
   m_Value = value;
 }
@@ -182,7 +184,7 @@ int mitk::PixelManipulationTool::GetValue()
   return m_Value;
 }
 
-void mitk::PixelManipulationTool::SetFixedValue( int value )
+void mitk::PixelManipulationTool::SetFixedValue(int value)
 {
   m_FixedValue = value;
 }

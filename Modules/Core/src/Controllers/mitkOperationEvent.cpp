@@ -14,16 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkOperationEvent.h"
 #include <itkCommand.h>
 
 int mitk::UndoStackItem::m_CurrObjectEventId = 0;
 int mitk::UndoStackItem::m_CurrGroupEventId = 0;
 
-mitk::UndoStackItem::UndoStackItem(std::string description)
-: m_Reversed(false),
-  m_Description(description)
+mitk::UndoStackItem::UndoStackItem(std::string description) : m_Reversed(false), m_Description(description)
 {
   m_ObjectEventId = GetCurrObjectEventId();
   m_GroupEventId = GetCurrGroupEventId();
@@ -81,37 +78,38 @@ void mitk::UndoStackItem::ReverseAndExecute()
 
 // ******************** mitk::OperationEvent ********************
 
-mitk::Operation* mitk::OperationEvent::GetOperation()
+mitk::Operation *mitk::OperationEvent::GetOperation()
 {
   return m_Operation;
 }
 
-mitk::OperationEvent::OperationEvent(OperationActor* destination,
-                                     Operation* operation, Operation* undoOperation,
+mitk::OperationEvent::OperationEvent(OperationActor *destination,
+                                     Operation *operation,
+                                     Operation *undoOperation,
                                      std::string description)
-: UndoStackItem(description),
-  m_Destination(destination),
-  m_Operation(operation),
-  m_UndoOperation(undoOperation),
-  m_Invalid(false)
+  : UndoStackItem(description),
+    m_Destination(destination),
+    m_Operation(operation),
+    m_UndoOperation(undoOperation),
+    m_Invalid(false)
 {
-  //connect to delete event
-  if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))
+  // connect to delete event
+  if (itk::Object *object = dynamic_cast<itk::Object *>(m_Destination))
   {
-    itk::SimpleMemberCommand< OperationEvent >::Pointer command = itk::SimpleMemberCommand< OperationEvent >::New();
-    command->SetCallbackFunction( this, &OperationEvent::OnObjectDeleted );
-    m_DeleteTag = object->AddObserver( itk::DeleteEvent(), command );
+    itk::SimpleMemberCommand<OperationEvent>::Pointer command = itk::SimpleMemberCommand<OperationEvent>::New();
+    command->SetCallbackFunction(this, &OperationEvent::OnObjectDeleted);
+    m_DeleteTag = object->AddObserver(itk::DeleteEvent(), command);
   }
 }
 
 mitk::OperationEvent::~OperationEvent()
 {
-  //remove the observer if the data m_Destination still is present
+  // remove the observer if the data m_Destination still is present
   if (!m_Invalid)
   {
-    if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))
+    if (itk::Object *object = dynamic_cast<itk::Object *>(m_Destination))
     {
-      object->RemoveObserver( m_DeleteTag );
+      object->RemoveObserver(m_DeleteTag);
     }
   }
 
@@ -137,10 +135,10 @@ void mitk::OperationEvent::ReverseAndExecute()
 {
   ReverseOperations();
   if (m_Destination && m_Operation && !m_Invalid)
-    m_Destination->ExecuteOperation( m_Operation );
+    m_Destination->ExecuteOperation(m_Operation);
 }
 
-mitk::OperationActor* mitk::OperationEvent::GetDestination()
+mitk::OperationActor *mitk::OperationEvent::GetDestination()
 {
   return m_Destination;
 }

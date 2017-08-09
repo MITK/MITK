@@ -16,26 +16,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurfaceVtkWriter.h"
 #include <vtkConfigure.h>
-#include <vtkPolyData.h>
-#include <vtkLinearTransform.h>
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkErrorCode.h>
+#include <vtkLinearTransform.h>
+#include <vtkPolyData.h>
+#include <vtkTransformPolyDataFilter.h>
 
 #include <sstream>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <stdio.h>
 
 template <class VTKWRITER>
-mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
-: m_WriterWriteHasReturnValue( false )
+mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter() : m_WriterWriteHasReturnValue(false)
 {
-  this->SetNumberOfRequiredInputs( 1 );
+  this->SetNumberOfRequiredInputs(1);
 
   m_VtkWriter = vtkSmartPointer<VtkWriterType>::New();
 
-  //enable to write ascii-formatted-file
-  //m_VtkWriter->SetFileTypeToASCII();
+  // enable to write ascii-formatted-file
+  // m_VtkWriter->SetFileTypeToASCII();
 
   SetDefaultExtension(); // and information about the Writer's Write() method
 }
@@ -51,51 +50,54 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::SetDefaultExtension()
   m_Extension = ".vtk";
 }
 
-template<class VTKWRITER>
-void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* vtkWriter )
+template <class VTKWRITER>
+void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite(VtkWriterType *vtkWriter)
 {
-  if ( vtkWriter->Write() == 0 || vtkWriter->GetErrorCode() != 0 )
+  if (vtkWriter->Write() == 0 || vtkWriter->GetErrorCode() != 0)
   {
-    itkExceptionMacro(<<"Error during surface writing: " << vtkErrorCode::GetStringFromErrorCode(vtkWriter->GetErrorCode()) );
+    itkExceptionMacro(<< "Error during surface writing: "
+                      << vtkErrorCode::GetStringFromErrorCode(vtkWriter->GetErrorCode()));
   }
 }
 
 template <class VTKWRITER>
 void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 {
-  if ( m_FileName == "" )
+  if (m_FileName == "")
   {
-    itkWarningMacro( << "Sorry, filename has not been set!" );
-    return ;
+    itkWarningMacro(<< "Sorry, filename has not been set!");
+    return;
   }
 
-  mitk::Surface::Pointer input = const_cast<mitk::Surface*>(this->GetInput());
+  mitk::Surface::Pointer input = const_cast<mitk::Surface *>(this->GetInput());
 
   vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-  vtkPolyData * polyData;
-  BaseGeometry* geometry;
+  vtkPolyData *polyData;
+  BaseGeometry *geometry;
 
   unsigned int t, timesteps = input->GetTimeGeometry()->CountTimeSteps();
 
-  for(t = 0; t < timesteps; ++t)
+  for (t = 0; t < timesteps; ++t)
   {
     // surfaces do not have to exist in all timeteps; therefor, only write valid surfaces
-    if( input->GetVtkPolyData(t) == nullptr ) continue;
+    if (input->GetVtkPolyData(t) == nullptr)
+      continue;
 
     std::ostringstream filename;
     filename.imbue(::std::locale::classic());
     geometry = input->GetGeometry(t);
-    if ( timesteps > 1 )
+    if (timesteps > 1)
     {
-      if(input->GetTimeGeometry()->IsValidTimeStep(t))
+      if (input->GetTimeGeometry()->IsValidTimeStep(t))
       {
-        const TimeBounds& timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
-        filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
+        const TimeBounds &timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
+        filename << m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0)
+                 << timebounds[1] << "_T" << t << m_Extension;
       }
       else
       {
-        itkWarningMacro(<<"Error on write: TimeGeometry invalid of surface " << filename.str() << ".");
-        filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
+        itkWarningMacro(<< "Error on write: TimeGeometry invalid of surface " << filename.str() << ".");
+        filename << m_FileName.c_str() << "_T" << t << m_Extension;
       }
       m_VtkWriter->SetFileName(filename.str().c_str());
     }
@@ -109,41 +111,41 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 
     m_VtkWriter->SetInputData(polyData);
 
-    ExecuteWrite( m_VtkWriter );
+    ExecuteWrite(m_VtkWriter);
   }
 
   m_MimeType = "application/MITK.Surface";
 }
 
 template <class VTKWRITER>
-void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput( mitk::Surface* surface )
+void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput(mitk::Surface *surface)
 {
-  this->ProcessObject::SetNthInput( 0, surface );
+  this->ProcessObject::SetNthInput(0, surface);
 }
 
 template <class VTKWRITER>
-const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
+const mitk::Surface *mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
 {
-  if ( this->GetNumberOfInputs() < 1 )
+  if (this->GetNumberOfInputs() < 1)
   {
     return nullptr;
   }
   else
   {
-    return static_cast< const Surface * >( this->ProcessObject::GetInput( 0 ) );
+    return static_cast<const Surface *>(this->ProcessObject::GetInput(0));
   }
 }
 
 template <class VTKWRITER>
-bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWriteDataType( DataNode* input )
+bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWriteDataType(DataNode *input)
 {
-  if ( input )
+  if (input)
   {
-    BaseData* data = input->GetData();
-    if ( data )
+    BaseData *data = input->GetData();
+    if (data)
     {
-      Surface::Pointer surface = dynamic_cast<Surface*>( data );
-      if( surface.IsNotNull() )
+      Surface::Pointer surface = dynamic_cast<Surface *>(data);
+      if (surface.IsNotNull())
       {
         SetDefaultExtension();
         return true;
@@ -154,10 +156,10 @@ bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWriteDataType( DataNode* input )
 }
 
 template <class VTKWRITER>
-void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput( DataNode* input )
+void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput(DataNode *input)
 {
-  if( input && CanWriteDataType( input ) )
-    SetInput( dynamic_cast<Surface*>( input->GetData() ) );
+  if (input && CanWriteDataType(input))
+    SetInput(dynamic_cast<Surface *>(input->GetData()));
 }
 
 template <class VTKWRITER>

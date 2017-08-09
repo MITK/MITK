@@ -102,7 +102,7 @@ namespace mitk
     \param capturedImageSequence the actually captured image sequence number.
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
+                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=nullptr);
     /*!
     \brief returns the corresponding camera controller
     */

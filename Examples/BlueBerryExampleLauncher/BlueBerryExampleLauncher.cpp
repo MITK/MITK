@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileInfo>
 #include <QVariant>
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   mitk::BaseApplication app(argc, argv);
   app.setApplicationName("BlueBerryExampleLauncher");
@@ -31,7 +31,8 @@ int main(int argc, char** argv)
   BlueBerryExampleLauncherDialog demoDialog;
   QString selectedConfiguration = demoDialog.getDemoConfiguration();
 
-  if (selectedConfiguration.isEmpty()) return EXIT_SUCCESS;
+  if (selectedConfiguration.isEmpty())
+    return EXIT_SUCCESS;
 
   app.setProvisioningFilePath(selectedConfiguration);
 

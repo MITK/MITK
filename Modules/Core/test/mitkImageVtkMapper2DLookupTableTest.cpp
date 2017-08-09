@@ -14,19 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include "mitkTestingMacros.h"
+// MITK
 #include "mitkRenderingTestHelper.h"
-#include <mitkRenderingModeProperty.h>
-#include <mitkLookupTableProperty.h>
-#include <mitkLookupTable.h>
+#include "mitkTestingMacros.h"
 #include <mitkIOUtil.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkRenderingModeProperty.h>
 
-//VTK
+// VTK
 #include <vtkLookupTable.h>
 
-int mitkImageVtkMapper2DLookupTableTest(int argc, char* argv[])
+int mitkImageVtkMapper2DLookupTableTest(int argc, char *argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -36,31 +36,33 @@ int mitkImageVtkMapper2DLookupTableTest(int argc, char* argv[])
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
-  //define an arbitrary lookupTable
+  // define an arbitrary lookupTable
   vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  //use linear interpolation
+  // use linear interpolation
   lookupTable->SetRampToLinear();
-  //use the scalar range of the image to have a nice lookuptable
-  lookupTable->SetTableRange(0 , 255);
+  // use the scalar range of the image to have a nice lookuptable
+  lookupTable->SetTableRange(0, 255);
   lookupTable->Build();
 
   // Fill in a few known colors, the rest will be generated
-  lookupTable->SetTableValue(0,   1.0, 0.0, 0.0, 1.0); //map from red
-  lookupTable->SetTableValue(255, 0.0, 0.0, 1.0, 1.0); //to blue
+  lookupTable->SetTableValue(0, 1.0, 0.0, 0.0, 1.0);   // map from red
+  lookupTable->SetTableValue(255, 0.0, 0.0, 1.0, 1.0); // to blue
 
   mitk::LookupTable::Pointer myLookupTable = mitk::LookupTable::New();
-  myLookupTable->SetVtkLookupTable( lookupTable );
+  myLookupTable->SetVtkLookupTable(lookupTable);
 
-  //set the rendering mode to use the transfer function
-  renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
-  //set the property for the image
+  // set the rendering mode to use the transfer function
+  renderingHelper.SetImageProperty("Image Rendering.Mode",
+                                   mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_COLOR));
+  // set the property for the image
   renderingHelper.SetImageProperty("LookupTable", mitk::LookupTableProperty::New(myLookupTable));
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 20.0) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 20.0) == true,
+                      "CompareRenderWindowAgainstReference test result positive?");
 
-  //use this to generate a reference screenshot or save the file:
-  if(false)
+  // use this to generate a reference screenshot or save the file:
+  if (false)
   {
     renderingHelper.SaveReferenceScreenShot("/media/hdd/thomasHdd/Pictures/tmp/output.png");
   }

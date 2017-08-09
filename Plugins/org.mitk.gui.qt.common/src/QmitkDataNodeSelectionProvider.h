@@ -49,7 +49,7 @@ public:
 
   using QtSelectionProvider::SetSelection;
 
-  void SetSelection(berry::ISelection::ConstPointer selection, QItemSelectionModel::SelectionFlags flags);
+  virtual void SetSelection(const berry::ISelection::ConstPointer& selection, QItemSelectionModel::SelectionFlags flags) override;
 
 protected:
 

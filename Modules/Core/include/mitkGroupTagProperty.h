@@ -14,57 +14,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef GROUPTAGPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 #define GROUPTAGPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 
 #include <mitkBaseProperty.h>
 
-namespace mitk {
-
+namespace mitk
+{
 #ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
+#pragma warning(push)
+#pragma warning(disable : 4522)
 #endif
 
-/*! @brief Property class that has no value.
+  /*! @brief Property class that has no value.
 
-  @ingroup DataManagement
+    @ingroup DataManagement
 
-    The GroupTag property is used to tag a datatree node to show, that it is member of a
-    group of datatree nodes. This can be used to build groups of datatreenodes without the
-    need to contain them in a specific hiearchic order in the datatree
-*/
-class MITKCORE_EXPORT GroupTagProperty : public BaseProperty
-{
+      The GroupTag property is used to tag a datatree node to show, that it is member of a
+      group of datatree nodes. This can be used to build groups of datatreenodes without the
+      need to contain them in a specific hiearchic order in the datatree
+  */
+  class MITKCORE_EXPORT GroupTagProperty : public BaseProperty
+  {
   public:
     mitkClassMacro(GroupTagProperty, BaseProperty);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    using BaseProperty::operator=;
+      using BaseProperty::operator=;
 
   protected:
     GroupTagProperty();
-    GroupTagProperty(const GroupTagProperty&);
+    GroupTagProperty(const GroupTagProperty &);
 
   private:
-
     // purposely not implemented
-    GroupTagProperty& operator=(const GroupTagProperty&);
+    GroupTagProperty &operator=(const GroupTagProperty &);
 
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const override;
-    virtual bool Assign(const BaseProperty& property) override;
-};
+    virtual bool IsEqual(const BaseProperty &property) const override;
+    virtual bool Assign(const BaseProperty &property) override;
+  };
 
 #ifdef _MSC_VER
-# pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 } // namespace mitk
-
-
 
 #endif /* GROUPTAGPROPERTY_H_HEADER_INCLUDED_C1F4DF54 */

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlaneLandmarkProjector.h"
 
 mitk::PlaneLandmarkProjector::PlaneLandmarkProjector() : m_ProjectionPlane(nullptr)
@@ -32,10 +31,9 @@ void mitk::PlaneLandmarkProjector::ComputeCompleteAbstractTransform()
   m_CompleteAbstractTransform = GetInterpolatingAbstractTransform();
 }
 
-void mitk::PlaneLandmarkProjector::ProjectLandmarks(
-  const mitk::PointSet::DataType::PointsContainer* targetLandmarks)
+void mitk::PlaneLandmarkProjector::ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer *targetLandmarks)
 {
-  if(m_ProjectionPlane.IsNull())
+  if (m_ProjectionPlane.IsNull())
   {
     itkExceptionMacro(<< "m_ProjectionPlane is not set.");
   }
@@ -51,9 +49,9 @@ void mitk::PlaneLandmarkProjector::ProjectLandmarks(
   mitk::Point3D point;
   mitk::Point3D projectedPoint;
 
-  unsigned int size=targetLandmarks->Size();
+  unsigned int size = targetLandmarks->Size();
   m_ProjectedLandmarks->Reserve(size);
-  for(id=0, pointiterator=start;id<size;++id, ++pointiterator)
+  for (id = 0, pointiterator = start; id < size; ++id, ++pointiterator)
   {
     point = pointiterator->Value();
     m_ProjectionPlane->Project(point, projectedPoint);

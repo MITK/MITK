@@ -18,8 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QPainter>
 
-QmitkOverlayContainerWidget::QmitkOverlayContainerWidget( QWidget * parent, Qt::WindowFlags f )
-: QWidget( parent, f )
+QmitkOverlayContainerWidget::QmitkOverlayContainerWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
 }
 
@@ -27,10 +26,9 @@ QmitkOverlayContainerWidget::~QmitkOverlayContainerWidget()
 {
 }
 
-
-void QmitkOverlayContainerWidget::paintEvent( QPaintEvent* )
+void QmitkOverlayContainerWidget::paintEvent(QPaintEvent *)
 {
-  QPainter p( this );
-  p.setCompositionMode( QPainter::CompositionMode_Clear );
-  p.fillRect( this->rect(), Qt::transparent );
+  QPainter p(this);
+  p.setCompositionMode(QPainter::CompositionMode_Clear);
+  p.fillRect(this->rect(), Qt::transparent);
 }

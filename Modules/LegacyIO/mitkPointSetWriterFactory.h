@@ -24,47 +24,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-/**
- * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
- */
-class DEPRECATED() MITKLEGACYIO_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
-{
-public:
-
-  mitkClassMacroItkParent( mitk::PointSetWriterFactory, itk::ObjectFactoryBase )
-
-  /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const override;
-  virtual const char* GetDescription(void) const override;
-
-  /** Method for class instantiation. */
-  itkFactorylessNewMacro(Self);
-
   /**
-   * Register one factory of this type
-   * \deprecatedSince{2013_09}
+   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    */
-  DEPRECATED(static void RegisterOneFactory(void))
+  class DEPRECATED() MITKLEGACYIO_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
   {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
+  public:
+    mitkClassMacroItkParent(mitk::PointSetWriterFactory, itk::ObjectFactoryBase)
+
+      /** Class methods used to interface with the registered factories. */
+      virtual const char *GetITKSourceVersion(void) const override;
+    virtual const char *GetDescription(void) const override;
+
+    /** Method for class instantiation. */
+    itkFactorylessNewMacro(Self);
+
+    /**
+     * Register one factory of this type
+     * \deprecatedSince{2013_09}
+     */
+    DEPRECATED(static void RegisterOneFactory(void))
     {
-      PointSetWriterFactory::Pointer pointSetWriterFactory = PointSetWriterFactory::New();
-      ObjectFactoryBase::RegisterFactory( pointSetWriterFactory );
-      IsRegistered = true;
+      static bool IsRegistered = false;
+      if (!IsRegistered)
+      {
+        PointSetWriterFactory::Pointer pointSetWriterFactory = PointSetWriterFactory::New();
+        ObjectFactoryBase::RegisterFactory(pointSetWriterFactory);
+        IsRegistered = true;
+      }
     }
-  }
 
-protected:
-  PointSetWriterFactory();
-  ~PointSetWriterFactory();
+  protected:
+    PointSetWriterFactory();
+    ~PointSetWriterFactory();
 
-private:
-  PointSetWriterFactory(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-
-};
+  private:
+    PointSetWriterFactory(const Self &); // purposely not implemented
+    void operator=(const Self &);        // purposely not implemented
+  };
 
 } // end namespace mitk
 

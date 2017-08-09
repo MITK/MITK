@@ -14,17 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
+#include "mitkIOMimeTypes.h"
 #include "mitkPropertyPersistence.h"
+#include "mitkStringProperty.h"
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
-#include "mitkStringProperty.h"
-#include "mitkIOMimeTypes.h"
-#include <mitkNumericConstants.h>
 #include <mitkEqual.h>
+#include <mitkNumericConstants.h>
 
 class mitkPropertyPersistenceTestSuite : public mitk::TestFixture
 {
@@ -42,7 +42,6 @@ class mitkPropertyPersistenceTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   mitk::PropertyPersistenceInfo::Pointer info1;
   mitk::PropertyPersistenceInfo::Pointer info2;
   mitk::PropertyPersistenceInfo::Pointer info3;
@@ -66,11 +65,12 @@ private:
   std::string keyXTemplate;
   std::string propX2;
 
-  mitk::IPropertyPersistence* service;
+  mitk::IPropertyPersistence *service;
 
-  static bool checkExistance(const mitk::PropertyPersistence::InfoResultType& infos, const mitk::PropertyPersistenceInfo* info)
+  static bool checkExistance(const mitk::PropertyPersistence::InfoResultType &infos,
+                             const mitk::PropertyPersistenceInfo *info)
   {
-    auto predicate = [info](const mitk::PropertyPersistenceInfo::ConstPointer& x){return infosAreEqual(info, x); };
+    auto predicate = [info](const mitk::PropertyPersistenceInfo::ConstPointer &x) { return infosAreEqual(info, x); };
 
     auto finding = std::find_if(infos.begin(), infos.end(), predicate);
 
@@ -78,7 +78,7 @@ private:
     return result;
   }
 
-  static bool infosAreEqual(const mitk::PropertyPersistenceInfo* ref, const mitk::PropertyPersistenceInfo* info)
+  static bool infosAreEqual(const mitk::PropertyPersistenceInfo *ref, const mitk::PropertyPersistenceInfo *info)
   {
     bool result = true;
 
@@ -94,7 +94,6 @@ private:
   }
 
 public:
-
   void setUp() override
   {
     service = mitk::CreateTestInstancePropertyPersistence();
@@ -123,7 +122,7 @@ public:
     info5 = mitk::PropertyPersistenceInfo::New(prop5, "mime5");
     info5->SetNameAndKey(prop5, "key5");
 
-    infoX = mitk::PropertyPersistenceInfo::New("","mimeX");
+    infoX = mitk::PropertyPersistenceInfo::New("", "mimeX");
     infoX->UseRegEx(propX, propXTemplate, keyX, keyXTemplate);
 
     infoX2 = mitk::PropertyPersistenceInfo::New();
@@ -138,11 +137,7 @@ public:
     service->AddInfo(infoX2, false);
   }
 
-  void tearDown() override
-  {
-    delete service;
-  }
-
+  void tearDown() override { delete service; }
   void AddInfo()
   {
     mitk::PropertyPersistenceInfo::Pointer info2_new = mitk::PropertyPersistenceInfo::New(prop2, "otherMime");
@@ -152,17 +147,27 @@ public:
     mitk::PropertyPersistenceInfo::Pointer info_newPropNKey = mitk::PropertyPersistenceInfo::New("", "otherMime");
     info_newPropNKey->SetNameAndKey("newProp", "newKey");
 
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of already existing info (no overwrite) -> no adding", !service->AddInfo(info2_otherKey, false));
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of already existing info (no overwrite) -> no adding -> key should not be changed.", service->GetInfo(prop2, "mime2", false).front()->GetKey() == "key2");
+    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of already existing info (no overwrite) -> no adding",
+                           !service->AddInfo(info2_otherKey, false));
+    CPPUNIT_ASSERT_MESSAGE(
+      "Testing addinfo of already existing info (no overwrite) -> no adding -> key should not be changed.",
+      service->GetInfo(prop2, "mime2", false).front()->GetKey() == "key2");
 
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of already existing info (overwrite) -> adding", service->AddInfo(info2_otherKey, true));
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of already existing info (no overwrite) -> adding -> key should be changed.", service->GetInfo(prop2, "mime2", false).front()->GetKey() == "otherKey");
+    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of already existing info (overwrite) -> adding",
+                           service->AddInfo(info2_otherKey, true));
+    CPPUNIT_ASSERT_MESSAGE(
+      "Testing addinfo of already existing info (no overwrite) -> adding -> key should be changed.",
+      service->GetInfo(prop2, "mime2", false).front()->GetKey() == "otherKey");
 
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (other mime type; no overwrite) -> adding", service->AddInfo(info2_new, false));
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (other mime type; no overwrite) -> adding -> info exists.", !service->GetInfo(prop2, "otherMime", false).empty());
+    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (other mime type; no overwrite) -> adding",
+                           service->AddInfo(info2_new, false));
+    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (other mime type; no overwrite) -> adding -> info exists.",
+                           !service->GetInfo(prop2, "otherMime", false).empty());
 
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (new prop name; no overwrite) -> adding", service->AddInfo(info_newPropNKey, false));
-    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (new prop name; no overwrite) -> adding ->info exists.", !service->GetInfo("newProp", "otherMime", false).empty());
+    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (new prop name; no overwrite) -> adding",
+                           service->AddInfo(info_newPropNKey, false));
+    CPPUNIT_ASSERT_MESSAGE("Testing addinfo of info (new prop name; no overwrite) -> adding ->info exists.",
+                           !service->GetInfo("newProp", "otherMime", false).empty());
   }
 
   void GetInfo()
@@ -217,13 +222,16 @@ public:
   void GetInfo_mime()
   {
     mitk::PropertyPersistence::InfoResultType infos = service->GetInfo(prop1, "mime2", false, false);
-    CPPUNIT_ASSERT_MESSAGE("Check GetInfos (existing element, no wildcard allowed, wildcard exists).", infosAreEqual(info2, infos.front()));
+    CPPUNIT_ASSERT_MESSAGE("Check GetInfos (existing element, no wildcard allowed, wildcard exists).",
+                           infosAreEqual(info2, infos.front()));
     infos = service->GetInfo(prop1, "mime2", true, false);
-    CPPUNIT_ASSERT_MESSAGE("Check GetInfos (existing element, wildcard allowed, wildcard exists).", infosAreEqual(info2, infos.front()));
+    CPPUNIT_ASSERT_MESSAGE("Check GetInfos (existing element, wildcard allowed, wildcard exists).",
+                           infosAreEqual(info2, infos.front()));
     infos = service->GetInfo(prop1, "unknownmime", false, false);
     CPPUNIT_ASSERT_MESSAGE("Check GetInfos (inexisting element, no wildcard allowed, wildcard exists).", infos.empty());
     infos = service->GetInfo(prop1, "unknownmime", true, false);
-    CPPUNIT_ASSERT_MESSAGE("Check GetInfos (inexisting element, wildcard allowed, wildcard exists).", infosAreEqual(info1, infos.front()));
+    CPPUNIT_ASSERT_MESSAGE("Check GetInfos (inexisting element, wildcard allowed, wildcard exists).",
+                           infosAreEqual(info1, infos.front()));
 
     infos = service->GetInfo(prop4, "unknownmime", false, false);
     CPPUNIT_ASSERT_MESSAGE("Check GetInfos (inexisting element, no wildcard allowed).", infos.empty());
@@ -264,11 +272,10 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", !service->HasInfo(prop5));
   }
 
-
   void RemoveInfo()
   {
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfo(prop1));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop1)", !service->HasInfo(prop1,false));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop1)", !service->HasInfo(prop1, false));
     CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop4)", service->HasInfo(prop4, false));
     CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", service->HasInfo(prop5, false));
 
@@ -285,9 +292,11 @@ public:
   void RemoveInfo_withMime()
   {
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfo(prop1, "mime2"));
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos if info was removed",service->GetInfo(prop1, "mime2", false).empty());
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if other info of same property name still exists", !service->GetInfo(prop1, "mime3", false).empty());
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if other info of other property name but same mime still exists", !service->GetInfo(prop4, "mime2", false).empty());
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos if info was removed", service->GetInfo(prop1, "mime2", false).empty());
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if other info of same property name still exists",
+                           !service->GetInfo(prop1, "mime3", false).empty());
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if other info of other property name but same mime still exists",
+                           !service->GetInfo(prop4, "mime2", false).empty());
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfo(prop5, "wrongMime"));
     CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos on prop 5 with wrong mime", service->HasInfo(prop5, false));
@@ -296,9 +305,9 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos on prop 5", !service->HasInfo(prop5, false));
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfo("unkown_prop", "mime2"));
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if unkown property name but exting mime was used", service->HasInfo(prop4, false));
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if unkown property name but exting mime was used",
+                           service->HasInfo(prop4, false));
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPropertyPersistence)

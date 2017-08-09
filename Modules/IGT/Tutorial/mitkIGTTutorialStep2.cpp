@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //is used for visual output.
 
 //! [What we will do]
-int main(int argc, char* argv[])
+int main(int, char**)
 {
   //*************************************************************************
   // Set up Render Window and Tracking Device

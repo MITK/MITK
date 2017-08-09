@@ -19,9 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 
+#include <vtkActor2D.h>
 #include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
-#include <vtkActor2D.h>
 
 class vtkPolyData;
 
@@ -34,8 +34,8 @@ class vtkPolyData;
 class MITKCORE_EXPORT vtkMitkRectangleProp : public vtkActor2D
 {
 public:
-  static vtkMitkRectangleProp* New();
-  vtkTypeMacro(vtkMitkRectangleProp,vtkProp);
+  static vtkMitkRectangleProp *New();
+  vtkTypeMacro(vtkMitkRectangleProp, vtkProp);
 
   /**
      * @brief SetColor Set the color of the rectangle.
@@ -50,7 +50,6 @@ public:
   int RenderOverlay(vtkViewport *viewport);
 
 protected:
-
   vtkMitkRectangleProp();
   virtual ~vtkMitkRectangleProp();
 
@@ -58,14 +57,8 @@ protected:
   int m_Width;
   int m_OriginX;
   int m_OriginY;
-  vtkIdType m_BottomLeftR,
-  m_BottomRightL,
-  m_BottomLeftU,
-  m_TopLeftD,
-  m_TopLeftR,
-  m_TopRightL,
-  m_TopRightD,
-  m_BottomRightU;
+  vtkIdType m_BottomLeftR, m_BottomRightL, m_BottomLeftU, m_TopLeftD, m_TopLeftR, m_TopRightL, m_TopRightD,
+    m_BottomRightU;
 
   /**
      * @brief CreateRectangle internal helper to fill a vtkPolydata with a rectangle.

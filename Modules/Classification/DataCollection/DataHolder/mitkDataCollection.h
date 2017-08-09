@@ -13,15 +13,17 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#pragma warning (disable : 4996)
+#ifdef _MSC_VER
+#  pragma warning (disable : 4996)
+#endif
 
 #ifndef mitkDataCollection_H_
 #define mitkDataCollection_H_
 
-#include <itkLightObject.h>
-#include <itkDataObject.h>
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+//#include <itkLightObject.h>
+//#include <itkDataObject.h>
+//#include "itkObjectFactory.h"
+//#include "mitkCommon.h"
 #include <mitkImage.h>
 #include <mitkDataNode.h>
 
@@ -165,7 +167,7 @@ namespace mitk
     /**
     * @brief GetMitkImage - casts data to  mitk::Image and returns it
     *
-    * \note returns NULL is object  is no mitk::Image or itk::Image
+    * \note returns nullptr is object  is no mitk::Image or itk::Image
     *
     * @param index
     * @return
@@ -175,7 +177,7 @@ namespace mitk
     /**
     * @brief GetMitkImage - casts data to  mitk::Image and returns it
     *
-    * \note returns NULL is object  is no mitk::Image or itk::Image
+    * \note returns nullptr is object  is no mitk::Image or itk::Image
     *
     * @param name
     * @return

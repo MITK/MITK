@@ -19,16 +19,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkSegmentationUIExports.h"
 
-#include <ui_QmitkLabelSetWidgetControls.h>
 #include "mitkColorSequenceRainbow.h"
-#include "mitkNumericTypes.h"
 #include "mitkLabel.h"
-
+#include "mitkNumericTypes.h"
+#include <ui_QmitkLabelSetWidgetControls.h>
 
 class QmitkDataStorageComboBox;
 class QCompleter;
 
-namespace mitk {
+namespace mitk
+{
   class LabelSetImage;
   class LabelSet;
   class Label;
@@ -42,13 +42,12 @@ class MITKSEGMENTATIONUI_EXPORT QmitkLabelSetWidget : public QWidget
   Q_OBJECT
 
 public:
-
-  explicit QmitkLabelSetWidget(QWidget* parent = NULL);
+  explicit QmitkLabelSetWidget(QWidget *parent = nullptr);
   ~QmitkLabelSetWidget();
 
-  void SetDataStorage( mitk::DataStorage* storage );
+  void SetDataStorage(mitk::DataStorage *storage);
 
-  void SetOrganColors(const QStringList& organColors);
+  void SetOrganColors(const QStringList &organColors);
 
   void UpdateControls();
 
@@ -56,22 +55,35 @@ public:
 
   QStringList &GetLabelStringList();
 
-
 signals:
 
   /// \brief Send a signal when it was requested to go to a label.
-  void goToLabel(const mitk::Point3D&);
+  void goToLabel(const mitk::Point3D &);
   void resetView();
 
 public slots:
 
-  void ResetAllTableWidgetItems();
+  /**
+  * @brief Updates the current labels in the label set widget table. For each label (widget item) the 'UpdateTableWidgetItem' is called.
+  *
+  *   Updating means setting the color box of the table, setting the column with and fill it with the label name.
+  *   Furthermore the two push buttons for locking and showing/hiding the layer are checked/unchecked.
+  *   This functions only changes the appearance of the table widget and no render window update is necessary.
+  */
   void UpdateAllTableWidgetItems();
+  /**
+  * @brief Resets the current labels in the label set widget table. For each label a widget item is inserted into the table.
+  *
+  *   Resetting means removing all rows of the widget table and inserting new rows (labels) from the active label set (= layer) of the current working node.
+  *   The currently active label is selected and 'Number of labels' is set.
+  *   As this function is typically used after one label has been removed or the reference node has been changed (e.g.) the render windows have to be updated.
+  */
+  void ResetAllTableWidgetItems();
   void SelectLabelByPixelValue(mitk::Label::PixelType pixelValue);
 
 private slots:
 
-  // Label Set Dependend
+  // LabelSet dependent
   void OnOpacityChanged(int);
   void OnUnlockAllLabels(bool);
   void OnLockAllLabels(bool);
@@ -87,15 +99,15 @@ private slots:
   void OnColorButtonClicked();
   void OnItemClicked(QTableWidgetItem *item);
   void OnItemDoubleClicked(QTableWidgetItem *item);
-  void OnTableViewContextMenuRequested(const QPoint&);
-  void InsertTableWidgetItem(mitk::Label * label);
+  void OnTableViewContextMenuRequested(const QPoint &);
+  void InsertTableWidgetItem(mitk::Label *label);
   void UpdateTableWidgetItem(QTableWidgetItem *item);
   // reaction to "returnPressed" signal from ...
   void OnSearchLabel();
   // reaction to the button "Change Label"
   void OnActiveLabelChanged(int pixelValue);
 
-  //LabelSetImage Dependet
+  // LabelSetImage Dependet
   void OnCreateDetailedSurface(bool);
   void OnCreateSmoothedSurface(bool);
   // reaction to the signal "createMask" from QmitkLabelSetTableWidget
@@ -116,43 +128,48 @@ private slots:
   void OnImportLabeledImage();
 
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
-  void OnLabelListModified(const QStringList& list);
+  void OnLabelListModified(const QStringList &list);
   // reaction to the signal "toggleOutline" from QmitkLabelSetTableWidget
   void OnToggleOutline(bool);
 
 private:
+  enum TableColumns
+  {
+    NAME_COL = 0,
+    LOCKED_COL,
+    COLOR_COL,
+    VISIBLE_COL
+  };
 
-    enum TableColumns { NAME_COL=0, LOCKED_COL, COLOR_COL, VISIBLE_COL };
+  void WaitCursorOn();
 
-    void WaitCursorOn();
+  void WaitCursorOff();
 
-    void WaitCursorOff();
+  void RestoreOverrideCursor();
 
-    void RestoreOverrideCursor();
+  void OnThreadedCalculationDone();
 
-    void OnThreadedCalculationDone();
+  void InitializeTableWidget();
 
-    void InitializeTableWidget();
+  int GetPixelValueOfSelectedItem();
 
-    int GetPixelValueOfSelectedItem();
+  mitk::LabelSetImage *GetWorkingImage();
 
-    mitk::LabelSetImage * GetWorkingImage();
+  mitk::DataNode *GetWorkingNode();
 
-    mitk::DataNode * GetWorkingNode();
+  Ui::QmitkLabelSetWidgetControls m_Controls;
 
-    Ui::QmitkLabelSetWidgetControls m_Controls;
+  mitk::ColorSequenceRainbow m_ColorSequenceRainbow;
 
-    mitk::ColorSequenceRainbow m_ColorSequenceRainbow;
+  mitk::DataStorage *m_DataStorage;
 
-    QCompleter* m_Completer;
+  QCompleter *m_Completer;
 
-    mitk::DataStorage* m_DataStorage;
+  mitk::ToolManager *m_ToolManager;
 
-    mitk::ToolManager* m_ToolManager;
+  QStringList m_OrganColors;
 
-    QStringList m_OrganColors;
-
-    QStringList m_LabelStringList;
+  QStringList m_LabelStringList;
 };
 
 #endif

@@ -19,43 +19,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkAbstractFileReader.h>
 #include <mitkBaseData.h>
-#include <mitkMimeType.h>
 #include <mitkContourModel.h>
 #include <mitkContourModelSet.h>
+#include <mitkMimeType.h>
 
-#include <string>
 #include <stack>
-#include <vtkXMLParser.h>
+#include <string>
 #include <tinyxml.h>
+#include <vtkXMLParser.h>
 
 namespace mitk
 {
-/**
- * @brief
- * @ingroup MitkContourModelModule
-*/
-class ContourModelSetReader : public mitk::AbstractFileReader
-{
-public:
-  ContourModelSetReader(const ContourModelSetReader& other);
+  /**
+   * @brief
+   * @ingroup MitkContourModelModule
+  */
+  class ContourModelSetReader : public mitk::AbstractFileReader
+  {
+  public:
+    ContourModelSetReader(const ContourModelSetReader &other);
 
-  ContourModelSetReader();
+    ContourModelSetReader();
 
-  virtual ~ContourModelSetReader();
+    virtual ~ContourModelSetReader();
 
-  using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-protected:
+  protected:
+  private:
+    ContourModelSetReader *Clone() const override;
 
-private:
-
-  ContourModelSetReader* Clone() const override;
-
-  us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
-};
-
+    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
+  };
 }
-
 
 #endif

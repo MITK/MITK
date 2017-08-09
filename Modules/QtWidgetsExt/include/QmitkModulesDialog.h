@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKMODULESDIALOG_H
 #define QMITKMODULESDIALOG_H
 
@@ -24,12 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class MITKQTWIDGETSEXT_EXPORT QmitkModulesDialog : public QDialog
 {
-
 public:
-
-  explicit QmitkModulesDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-
+  explicit QmitkModulesDialog(QWidget *parent = nullptr,
+                              Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
 };
 
 #endif
-

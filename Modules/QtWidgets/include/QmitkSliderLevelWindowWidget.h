@@ -78,14 +78,13 @@ class QmitkLevelWindowWidgetContextMenu;
  * This information is also presented by a tooltip text when moving the
  * mouse on the upper or lower bound of the bar.
  */
-class MITKQTWIDGETS_EXPORT QmitkSliderLevelWindowWidget : public QWidget {
-
+class MITKQTWIDGETS_EXPORT QmitkSliderLevelWindowWidget : public QWidget
+{
   Q_OBJECT
 
 public:
-
   /// constructor
-  QmitkSliderLevelWindowWidget( QWidget * parent=nullptr, Qt::WindowFlags f = nullptr );
+  QmitkSliderLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /// destructor
   ~QmitkSliderLevelWindowWidget();
@@ -100,25 +99,24 @@ public:
   mitk::LevelWindowManager::Pointer m_Manager;
 
   /// sets the manager who is responsible to collect and deliver changes on Level/Window
-  void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
+  void setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
   /// sets the DataStorage which holds all image-nodes
-  void setDataStorage(mitk::DataStorage* ds);
+  void setDataStorage(mitk::DataStorage *ds);
 
   /// returns the manager who is responsible to collect and deliver changes on Level/Window
-  mitk::LevelWindowManager* GetManager();
+  mitk::LevelWindowManager *GetManager();
 
 private:
-
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
-  void contextMenuEvent ( QContextMenuEvent * ) override;
+  void contextMenuEvent(QContextMenuEvent *) override;
 
   /// change notifications from the mitkLevelWindowManager
-  void OnPropertyModified(const itk::EventObject& e);
+  void OnPropertyModified(const itk::EventObject &e);
 
 protected:
   /// recalculate the size and position of the slider bar
-  virtual void update( );
+  virtual void update();
 
   /*!
   * helper for drawing the component
@@ -147,12 +145,12 @@ protected:
   /*!
   *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
   */
-  QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
+  QmitkLevelWindowWidgetContextMenu *m_Contextmenu;
 
   /*!
   * repaint the slider and the scale
   */
-  void paintEvent( QPaintEvent* e ) override;
+  void paintEvent(QPaintEvent *e) override;
 
   /*!
   * method implements the component behaviour
@@ -161,9 +159,9 @@ protected:
   *
   * checks if left mouse button is pressed and if CTRL is pressed and changes sliderbar in movedirection accordingly
   */
-  void mouseMoveEvent( QMouseEvent* mouseEvent ) override;
+  void mouseMoveEvent(QMouseEvent *mouseEvent) override;
 
-  void enterEvent ( QEvent * event  ) override;
+  void enterEvent(QEvent *event) override;
 
   /*!
   *  registers events when a mousebutton is pressed
@@ -172,17 +170,17 @@ protected:
   *
   * also checks if CTRL is pressed and sets the bool variable m_CtrlPressed
   */
-  void mousePressEvent( QMouseEvent* mouseEvent ) override;
+  void mousePressEvent(QMouseEvent *mouseEvent) override;
 
   /*!
   *  sets the variable m_MouseDown to false
   */
-  void mouseReleaseEvent( QMouseEvent* mouseEvent ) override;
+  void mouseReleaseEvent(QMouseEvent *mouseEvent) override;
 
   /*!
   * causes an update of the sliderbar when resizing the window
   */
-  void virtual resizeEvent ( QResizeEvent * event ) override;
+  void virtual resizeEvent(QResizeEvent *event) override;
 
 protected slots:
 
@@ -192,4 +190,4 @@ protected slots:
   /// shows the scale if "Show Scale" is selected in contextmenu
   void showScale();
 };
-#endif //QMITKSLIDERLEVELWINDOW_WIDGET
+#endif // QMITKSLIDERLEVELWINDOW_WIDGET

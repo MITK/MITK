@@ -31,15 +31,15 @@ mitk::ContourModelSetSerializer::~ContourModelSetSerializer()
 
 std::string mitk::ContourModelSetSerializer::Serialize()
 {
-  const ContourModelSet* contourSet = dynamic_cast<const ContourModelSet*>( m_Data.GetPointer() );
+  const ContourModelSet *contourSet = dynamic_cast<const ContourModelSet *>(m_Data.GetPointer());
   if (!contourSet)
   {
-    MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::ContourModelSet. Cannot serialize as contour model set.";
+    MITK_ERROR << " Object at " << (const void *)this->m_Data
+               << " is not an mitk::ContourModelSet. Cannot serialize as contour model set.";
     return "";
   }
 
-  std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
+  std::string filename(this->GetUniqueFilenameInWorkingDirectory());
   filename += "_";
   filename += m_FilenameHint;
   filename += ".cnt_set";
@@ -51,20 +51,16 @@ std::string mitk::ContourModelSetSerializer::Serialize()
   try
   {
     ContourModelSetWriter writer;
-    writer.SetOutputLocation( fullname );
-    writer.SetInput( const_cast<ContourModelSet*>( contourSet ) );
+    writer.SetOutputLocation(fullname);
+    writer.SetInput(const_cast<ContourModelSet *>(contourSet));
     writer.Write();
   }
-  catch (std::exception& e)
+  catch (std::exception &e)
   {
-    MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
-              << " to "
-              << fullname
-              << ": "
-              << e.what();
+    MITK_ERROR << " Error serializing object at " << (const void *)this->m_Data << " to " << fullname << ": "
+               << e.what();
     return "";
   }
 
   return filename;
 }
-

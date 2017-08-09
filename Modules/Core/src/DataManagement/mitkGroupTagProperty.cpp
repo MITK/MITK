@@ -14,27 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkGroupTagProperty.h"
 
-
-mitk::GroupTagProperty::GroupTagProperty()
- : mitk::BaseProperty()
+mitk::GroupTagProperty::GroupTagProperty() : mitk::BaseProperty()
 {
 }
 
-mitk::GroupTagProperty::GroupTagProperty(const GroupTagProperty& other)
-  : mitk::BaseProperty(other)
+mitk::GroupTagProperty::GroupTagProperty(const GroupTagProperty &other) : mitk::BaseProperty(other)
 {
 }
 
-bool mitk::GroupTagProperty::IsEqual(const BaseProperty& /*property*/) const
+bool mitk::GroupTagProperty::IsEqual(const BaseProperty & /*property*/) const
 {
   // if other property is also a GroupTagProperty, then it is equal to us, because tags have no value themselves
   return true;
 }
 
-bool mitk::GroupTagProperty::Assign(const BaseProperty& /*property*/)
+bool mitk::GroupTagProperty::Assign(const BaseProperty & /*property*/)
 {
   return true;
 }

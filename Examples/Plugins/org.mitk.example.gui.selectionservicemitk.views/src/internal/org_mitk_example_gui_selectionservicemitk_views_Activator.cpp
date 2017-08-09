@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "org_mitk_example_gui_selectionservicemitk_views_Activator.h"
 
 #include "ListenerViewMitk.h"
 #include "SelectionViewMitk.h"
 
-void org_mitk_example_gui_selectionservicemitk_views_Activator::start(ctkPluginContext* context)
+void org_mitk_example_gui_selectionservicemitk_views_Activator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(ListenerViewMitk, context)
   BERRY_REGISTER_EXTENSION_CLASS(SelectionViewMitk, context)
 }
 
-void org_mitk_example_gui_selectionservicemitk_views_Activator::stop(ctkPluginContext* context)
+void org_mitk_example_gui_selectionservicemitk_views_Activator::stop(ctkPluginContext *context)
 {
   Q_UNUSED(context)
 }

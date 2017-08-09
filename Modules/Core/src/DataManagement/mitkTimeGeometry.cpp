@@ -15,25 +15,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <mitkTimeGeometry.h>
 
-#include <mitkGeometry3D.h>
 #include <mitkExceptionMacro.h>
+#include <mitkGeometry3D.h>
 
-mitk::TimeGeometry::TimeGeometry() :
-  m_BoundingBox(BoundingBox::New())
+mitk::TimeGeometry::TimeGeometry() : m_BoundingBox(BoundingBox::New())
 {
   typedef BoundingBox::PointsContainer ContainerType;
   ContainerType::Pointer points = ContainerType::New();
   m_BoundingBox->SetPoints(points.GetPointer());
 }
 
-mitk::TimeGeometry::~TimeGeometry()
-{
-}
+mitk::TimeGeometry::~TimeGeometry() = default;
 
 void mitk::TimeGeometry::Initialize()
 {
 }
-
 
 /* \brief short description
  * parameters
@@ -47,21 +43,37 @@ mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(int id) const
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
 
   Point3D cornerpoint;
-  switch(id)
+  switch (id)
   {
-    case 0: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[4]); break;
-    case 1: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[5]); break;
-    case 2: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[4]); break;
-    case 3: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[5]); break;
-    case 4: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[4]); break;
-    case 5: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[5]); break;
-    case 6: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[4]); break;
-    case 7: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[5]); break;
+    case 0:
+      FillVector3D(cornerpoint, bounds[0], bounds[2], bounds[4]);
+      break;
+    case 1:
+      FillVector3D(cornerpoint, bounds[0], bounds[2], bounds[5]);
+      break;
+    case 2:
+      FillVector3D(cornerpoint, bounds[0], bounds[3], bounds[4]);
+      break;
+    case 3:
+      FillVector3D(cornerpoint, bounds[0], bounds[3], bounds[5]);
+      break;
+    case 4:
+      FillVector3D(cornerpoint, bounds[1], bounds[2], bounds[4]);
+      break;
+    case 5:
+      FillVector3D(cornerpoint, bounds[1], bounds[2], bounds[5]);
+      break;
+    case 6:
+      FillVector3D(cornerpoint, bounds[1], bounds[3], bounds[4]);
+      break;
+    case 7:
+      FillVector3D(cornerpoint, bounds[1], bounds[3], bounds[5]);
+      break;
     default:
-      {
-        itkExceptionMacro(<<"A cube only has 8 corners. These are labeled 0-7.");
-        return Point3D();
-      }
+    {
+      itkExceptionMacro(<< "A cube only has 8 corners. These are labeled 0-7.");
+      return Point3D();
+    }
   }
 
   // TimeGeometry has no Transformation. Therefore the bounding box
@@ -90,7 +102,7 @@ mitk::Point3D mitk::TimeGeometry::GetCenterInWorld() const
 
 double mitk::TimeGeometry::GetDiagonalLength2InWorld() const
 {
-  Vector3D diagonalvector = GetCornerPointInWorld()-GetCornerPointInWorld(false, false, false);
+  const Vector3D diagonalvector = GetCornerPointInWorld()-GetCornerPointInWorld(false, false, false);
   return diagonalvector.GetSquaredNorm();
 }
 
@@ -99,12 +111,12 @@ double mitk::TimeGeometry::GetDiagonalLengthInWorld() const
   return sqrt(GetDiagonalLength2InWorld());
 }
 
-bool mitk::TimeGeometry::IsWorldPointInside(const mitk::Point3D& p) const
+bool mitk::TimeGeometry::IsWorldPointInside(const mitk::Point3D &p) const
 {
   return m_BoundingBox->IsInside(p);
 }
 
-void mitk::TimeGeometry::UpdateBoundingBox ()
+void mitk::TimeGeometry::UpdateBoundingBox()
 {
   assert(m_BoundingBox.IsNotNull());
   typedef BoundingBox::PointsContainer ContainerType;
@@ -113,14 +125,16 @@ void mitk::TimeGeometry::UpdateBoundingBox ()
   unsigned long currentModifiedTime = 0;
 
   ContainerType::Pointer points = ContainerType::New();
-  points->reserve(2*CountTimeSteps());
-  for (TimeStepType step = 0; step <CountTimeSteps(); ++step)
+  const TimeStepType numberOfTimesteps = CountTimeSteps();
+
+  points->reserve(2*numberOfTimesteps);
+  for (TimeStepType step = 0; step <numberOfTimesteps; ++step)
   {
     currentModifiedTime = GetGeometryForTimeStep(step)->GetMTime();
     if (currentModifiedTime > lastModifiedTime)
       lastModifiedTime = currentModifiedTime;
 
-    for (int i=0; i < 8; ++i)
+    for (int i = 0; i < 8; ++i)
     {
       Point3D cornerPoint = GetGeometryForTimeStep(step)->GetCornerPoint(i);
       points->push_back(cornerPoint);
@@ -132,7 +146,7 @@ void mitk::TimeGeometry::UpdateBoundingBox ()
     this->Modified();
 }
 
-mitk::ScalarType mitk::TimeGeometry::GetExtentInWorld (unsigned int direction) const
+mitk::ScalarType mitk::TimeGeometry::GetExtentInWorld(unsigned int direction) const
 {
   assert(direction < 3);
   assert(m_BoundingBox.IsNotNull());
@@ -146,7 +160,7 @@ void mitk::TimeGeometry::Update()
   this->UpdateWithoutBoundingBox();
 }
 
-void mitk::TimeGeometry::ExecuteOperation(mitk::Operation* op)
+void mitk::TimeGeometry::ExecuteOperation(mitk::Operation *op)
 {
   for (TimeStepType step = 0; step < CountTimeSteps(); ++step)
   {
@@ -154,15 +168,15 @@ void mitk::TimeGeometry::ExecuteOperation(mitk::Operation* op)
   }
 }
 
-void mitk::TimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+void mitk::TimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
-  //Superclass::PrintSelf(os,indent);
+  // Superclass::PrintSelf(os,indent);
   os << indent << " TimeSteps: " << this->CountTimeSteps() << std::endl;
 
   os << std::endl;
   os << indent << " GetGeometryForTimeStep(0): ";
-  if(GetGeometryForTimeStep(0).IsNull())
-    os << "NULL" << std::endl;
+  if (GetGeometryForTimeStep(0).IsNull())
+    os << "nullptr" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
 }
@@ -170,7 +184,7 @@ void mitk::TimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
 itk::LightObject::Pointer mitk::TimeGeometry::InternalClone() const
 {
   itk::LightObject::Pointer parent = Superclass::InternalClone();
-  Self::Pointer rval = dynamic_cast<Self *> (parent.GetPointer());
+  Self::Pointer rval = dynamic_cast<Self *>(parent.GetPointer());
   if (rval.IsNull())
   {
     mitkThrow() << " Downcast to type " << this->GetNameOfClass() << " failed.";
@@ -179,48 +193,51 @@ itk::LightObject::Pointer mitk::TimeGeometry::InternalClone() const
   return parent;
 }
 
-
-bool mitk::Equal(const TimeGeometry& leftHandSide, const TimeGeometry& rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const TimeGeometry &leftHandSide, const TimeGeometry &rightHandSide, ScalarType eps, bool verbose)
 {
   bool result = true;
 
   // Compare BoundingBoxInWorld
-  if (!mitk::Equal( *(leftHandSide.GetBoundingBoxInWorld()), *(rightHandSide.GetBoundingBoxInWorld()), eps, verbose ) )
+  if (!mitk::Equal(*(leftHandSide.GetBoundingBoxInWorld()), *(rightHandSide.GetBoundingBoxInWorld()), eps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] BoundingBoxInWorld differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetBoundingBoxInWorld() << " : leftHandSide is " << leftHandSide.GetBoundsInWorld() << " and tolerance is " << eps;
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetBoundingBoxInWorld()
+                << " : leftHandSide is " << leftHandSide.GetBoundsInWorld() << " and tolerance is " << eps;
     }
     result = false;
   }
 
-  if (!mitk::Equal( leftHandSide.CountTimeSteps(), rightHandSide.CountTimeSteps(), eps, verbose ) )
+  if (!mitk::Equal(leftHandSide.CountTimeSteps(), rightHandSide.CountTimeSteps(), eps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] CountTimeSteps differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.CountTimeSteps() << " : leftHandSide is " << leftHandSide.CountTimeSteps() << " and tolerance is " << eps;
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.CountTimeSteps() << " : leftHandSide is "
+                << leftHandSide.CountTimeSteps() << " and tolerance is " << eps;
     }
     result = false;
   }
 
-  if (!mitk::Equal( leftHandSide.GetMinimumTimePoint(), rightHandSide.GetMinimumTimePoint(), eps, verbose ) )
+  if (!mitk::Equal(leftHandSide.GetMinimumTimePoint(), rightHandSide.GetMinimumTimePoint(), eps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] MinimumTimePoint differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMinimumTimePoint() << " : leftHandSide is " << leftHandSide.GetMinimumTimePoint() << " and tolerance is " << eps;
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMinimumTimePoint()
+                << " : leftHandSide is " << leftHandSide.GetMinimumTimePoint() << " and tolerance is " << eps;
     }
     result = false;
   }
 
-  if (!mitk::Equal( leftHandSide.GetMaximumTimePoint(), rightHandSide.GetMaximumTimePoint(), eps, verbose ) )
+  if (!mitk::Equal(leftHandSide.GetMaximumTimePoint(), rightHandSide.GetMaximumTimePoint(), eps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] MaximumTimePoint differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMaximumTimePoint() << " : leftHandSide is " << leftHandSide.GetMaximumTimePoint() << " and tolerance is " << eps;
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMaximumTimePoint()
+                << " : leftHandSide is " << leftHandSide.GetMaximumTimePoint() << " and tolerance is " << eps;
     }
     result = false;
   }
@@ -230,12 +247,13 @@ bool mitk::Equal(const TimeGeometry& leftHandSide, const TimeGeometry& rightHand
 
   for (mitk::TimeStepType t = 0; t < leftHandSide.CountTimeSteps(); ++t)
   {
-    if (!mitk::Equal( leftHandSide.TimeStepToTimePoint(t), rightHandSide.TimeStepToTimePoint(t), eps, verbose ) )
+    if (!mitk::Equal(leftHandSide.TimeStepToTimePoint(t), rightHandSide.TimeStepToTimePoint(t), eps, verbose))
     {
       if (verbose)
       {
         MITK_INFO << "[( TimeGeometry )] TimeStepToTimePoint(" << t << ") differs.";
-        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.TimeStepToTimePoint(t) << " : leftHandSide is " << leftHandSide.TimeStepToTimePoint(t) << " and tolerance is " << eps;
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.TimeStepToTimePoint(t)
+                  << " : leftHandSide is " << leftHandSide.TimeStepToTimePoint(t) << " and tolerance is " << eps;
       }
       result = false;
     }
@@ -243,7 +261,8 @@ bool mitk::Equal(const TimeGeometry& leftHandSide, const TimeGeometry& rightHand
     BaseGeometry::Pointer leftGeometry = leftHandSide.GetGeometryForTimeStep(t);
     BaseGeometry::Pointer rightGeometry = rightHandSide.GetGeometryForTimeStep(t);
 
-    if (leftGeometry.IsNotNull() && rightGeometry.IsNull()) continue; // identical
+    if (leftGeometry.IsNotNull() && rightGeometry.IsNull())
+      continue; // identical
     if (leftGeometry.IsNull())
     {
       if (verbose)

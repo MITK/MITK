@@ -3,22 +3,21 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  mitkImageCropperPluginActivator.cpp
+  org_mitk_gui_qt_imagecropper_Activator.cpp
   QmitkImageCropper.cpp
-  mitkImageCropperEventInterface.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkImageCropperControls.ui
+  src/internal/ImageCropperControls.ui
 )
 
 set(MOC_H_FILES
-  src/internal/mitkImageCropperPluginActivator.h
+  src/internal/org_mitk_gui_qt_imagecropper_Activator.h
   src/internal/QmitkImageCropper.h
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/icon.xpm
+  resources/crop.svg
   plugin.xml
 )
 

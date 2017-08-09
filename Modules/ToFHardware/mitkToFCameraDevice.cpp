@@ -22,9 +22,9 @@ namespace mitk
     m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),m_SourceDataSize(0),
     m_ThreadID(0),m_CameraActive(false),m_CameraConnected(false),m_ImageSequence(0)
   {
-    this->m_AmplitudeArray = NULL;
-    this->m_IntensityArray = NULL;
-    this->m_DistanceArray = NULL;
+    this->m_AmplitudeArray = nullptr;
+    this->m_IntensityArray = nullptr;
+    this->m_DistanceArray = nullptr;
     this->m_PropertyList = mitk::PropertyList::New();
 
     //By default, all devices have no further images (just a distance image)

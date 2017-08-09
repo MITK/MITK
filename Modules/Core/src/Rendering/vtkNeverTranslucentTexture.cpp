@@ -22,23 +22,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 vtkStandardNewMacro(vtkNeverTranslucentTexture);
 
-vtkNeverTranslucentTexture::vtkNeverTranslucentTexture()
-:vtkOpenGLTexture()
+vtkNeverTranslucentTexture::vtkNeverTranslucentTexture() : vtkOpenGLTexture()
 {
 }
-
 
 int vtkNeverTranslucentTexture::IsTranslucent()
 {
   return 0; // THE speedup
 }
 
-
-void vtkNeverTranslucentTexture::PrintSelf(ostream& os, vtkIndent indent)
+void vtkNeverTranslucentTexture::PrintSelf(ostream &os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "Translucent: NEVER\n";
-
 }
 
 // Factory code -------------------------------------------------------------
@@ -54,17 +50,17 @@ vtkNeverTranslucentTextureFactory::vtkNeverTranslucentTextureFactory()
                          vtkObjectFactoryCreatevtkNeverTranslucentTexture);
 }
 
-vtkNeverTranslucentTextureFactory* vtkNeverTranslucentTextureFactory::New()
+vtkNeverTranslucentTextureFactory *vtkNeverTranslucentTextureFactory::New()
 {
   return new vtkNeverTranslucentTextureFactory;
 }
 
-const char* vtkNeverTranslucentTextureFactory::GetVTKSourceVersion()
+const char *vtkNeverTranslucentTextureFactory::GetVTKSourceVersion()
 {
   return VTK_SOURCE_VERSION;
 }
 
-const char* vtkNeverTranslucentTextureFactory::GetDescription()
+const char *vtkNeverTranslucentTextureFactory::GetDescription()
 {
   return "Factory for a quickly decided, never translucent, texture";
 }

@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include "mitkGeometryDataReaderService.h"
-#include "mitkIOMimeTypes.h"
 #include "mitkGeometry3DToXML.h"
+#include "mitkIOMimeTypes.h"
 #include "mitkProportionalTimeGeometryToXML.h"
 
 // STL
@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 
 mitk::GeometryDataReaderService::GeometryDataReaderService()
-  : AbstractFileReader( IOMimeTypes::GEOMETRY_DATA_MIMETYPE(), "MITK Geometry Data Reader")
+  : AbstractFileReader(IOMimeTypes::GEOMETRY_DATA_MIMETYPE(), "MITK Geometry Data Reader")
 {
   RegisterService();
 }
@@ -35,12 +35,12 @@ mitk::GeometryDataReaderService::~GeometryDataReaderService()
 {
 }
 
-std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::GeometryDataReaderService::Read()
 {
   // Switch the current locale to "C"
   LocaleSwitch localeSwitch("C");
 
-  std::vector< itk::SmartPointer<BaseData> > result;
+  std::vector<itk::SmartPointer<BaseData>> result;
 
   InputStream stream(this);
 
@@ -48,14 +48,13 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
   stream >> doc;
   if (!doc.Error())
   {
-    TiXmlHandle docHandle( &doc );
+    TiXmlHandle docHandle(&doc);
 
-    for( TiXmlElement* geomDataElement = docHandle.FirstChildElement("GeometryData").ToElement();
+    for (TiXmlElement *geomDataElement = docHandle.FirstChildElement("GeometryData").ToElement();
          geomDataElement != nullptr;
          geomDataElement = geomDataElement->NextSiblingElement())
     {
-      for( TiXmlElement* currentElement = geomDataElement->FirstChildElement();
-           currentElement != nullptr;
+      for (TiXmlElement *currentElement = geomDataElement->FirstChildElement(); currentElement != nullptr;
            currentElement = currentElement->NextSiblingElement())
       {
         // different geometries could have been serialized from a GeometryData
@@ -67,8 +66,8 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
           if (restoredGeometry.IsNotNull())
           {
             GeometryData::Pointer newGeometryData = GeometryData::New();
-            newGeometryData->SetGeometry( restoredGeometry );
-            result.push_back( newGeometryData.GetPointer() );
+            newGeometryData->SetGeometry(restoredGeometry);
+            result.push_back(newGeometryData.GetPointer());
           }
           else
           {
@@ -77,12 +76,13 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
         }
         else if (tagName == "ProportionalTimeGeometry")
         {
-          ProportionalTimeGeometry::Pointer restoredTimeGeometry = ProportionalTimeGeometryToXML::FromXML(currentElement);
+          ProportionalTimeGeometry::Pointer restoredTimeGeometry =
+            ProportionalTimeGeometryToXML::FromXML(currentElement);
           if (restoredTimeGeometry.IsNotNull())
           {
             GeometryData::Pointer newGeometryData = GeometryData::New();
-            newGeometryData->SetTimeGeometry( restoredTimeGeometry );
-            result.push_back( newGeometryData.GetPointer() );
+            newGeometryData->SetTimeGeometry(restoredTimeGeometry);
+            result.push_back(newGeometryData.GetPointer());
           }
           else
           {
@@ -90,7 +90,7 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
           }
         }
       } // for child of <GeometryData>
-    } // for <GeometryData>
+    }   // for <GeometryData>
   }
   else
   {
@@ -105,12 +105,12 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
   return result;
 }
 
-mitk::GeometryDataReaderService::GeometryDataReaderService(const mitk::GeometryDataReaderService& other)
+mitk::GeometryDataReaderService::GeometryDataReaderService(const mitk::GeometryDataReaderService &other)
   : mitk::AbstractFileReader(other)
 {
 }
 
-mitk::GeometryDataReaderService* mitk::GeometryDataReaderService::Clone() const
+mitk::GeometryDataReaderService *mitk::GeometryDataReaderService::Clone() const
 {
   return new GeometryDataReaderService(*this);
 }

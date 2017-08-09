@@ -15,12 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeGraphVertex.h"
 
-mitk::TubeGraphVertex::TubeGraphVertex()
-: m_element(nullptr)
+mitk::TubeGraphVertex::TubeGraphVertex() : m_element(nullptr)
 {
 }
 
-mitk::TubeGraphVertex::TubeGraphVertex( mitk::TubeElement* element)
+mitk::TubeGraphVertex::TubeGraphVertex(mitk::TubeElement *element)
 {
   m_element = element;
 }
@@ -29,18 +28,17 @@ mitk::TubeGraphVertex::~TubeGraphVertex()
 {
 }
 
-
-void mitk::TubeGraphVertex::SetTubeElement(mitk::TubeElement* element)
+void mitk::TubeGraphVertex::SetTubeElement(mitk::TubeElement *element)
 {
   m_element = element;
 }
 
-const mitk::TubeElement* mitk::TubeGraphVertex::GetTubeElement() const
+const mitk::TubeElement *mitk::TubeGraphVertex::GetTubeElement() const
 {
   return m_element;
 }
 
-bool mitk::TubeGraphVertex::operator==(const mitk::TubeGraphVertex& right) const
+bool mitk::TubeGraphVertex::operator==(const mitk::TubeGraphVertex &right) const
 {
   return (m_element == right.m_element);
 }

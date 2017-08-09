@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkStandardViews_h_included
 #define QmitkStandardViews_h_included
 
-#include "mitkCommon.h"
 #include "MitkQtWidgetsExtExports.h"
 #include "mitkCameraController.h"
+#include "mitkCommon.h"
 
 #include <QWidget>
 
@@ -28,17 +28,15 @@ class vtkRenderWindow;
 
 class MITKQTWIDGETSEXT_EXPORT QmitkStandardViews : public QWidget
 {
-
   Q_OBJECT
 
 public:
-
-  QmitkStandardViews( QWidget * parent = 0, Qt::WindowFlags f = 0 );
+  QmitkStandardViews(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
   virtual ~QmitkStandardViews();
 
-  void SetCameraController( mitk::CameraController* controller );
-  void SetCameraControllerFromRenderWindow( vtkRenderWindow* window );
+  void SetCameraController(mitk::CameraController *controller);
+  void SetCameraControllerFromRenderWindow(vtkRenderWindow *window);
 
 signals:
 
@@ -46,15 +44,12 @@ signals:
 
 protected slots:
 
-  void hotspotClicked(const QString& s);
+  void hotspotClicked(const QString &s);
 
 protected:
-
-  QClickableLabel* m_ClickablePicture;
+  QClickableLabel *m_ClickablePicture;
 
   mitk::CameraController::Pointer m_CameraController;
-
 };
 
 #endif
-

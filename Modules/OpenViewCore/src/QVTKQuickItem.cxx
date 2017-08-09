@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkgl.h"
 #include "vtkOpenGLExtensionManager.h"
 #include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 
 #include "vtkCubeSource.h"
 #include "vtkPolyDataMapper.h"
@@ -46,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkFrameBufferObject2.h>
 
-#include "QVTKInternalOpenglRenderWindow.h"
+#include "vtkInternalOpenGLRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"
 
 QVTKQuickItem::QVTKQuickItem(QQuickItem* parent)
@@ -83,17 +84,15 @@ QVTKQuickItem::~QVTKQuickItem()
 
 QSGNode* QVTKQuickItem::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *nodeData)
 {
-    if (!node) {
-        node = QQuickFramebufferObject::updatePaintNode(node, nodeData);
-        QSGSimpleTextureNode *n = static_cast<QSGSimpleTextureNode *>(node);
-        if (n)
-            n->setTextureCoordinatesTransform(QSGSimpleTextureNode::MirrorVertically);
-        return node;
+    node = QQuickFramebufferObject::updatePaintNode(node, nodeData);
+    if ( node != nullptr ) {
+        QSGSimpleTextureNode* texNode = static_cast<QSGSimpleTextureNode*>(node);
+        texNode->setTextureCoordinatesTransform(QSGSimpleTextureNode::MirrorVertically);
     }
-    return QQuickFramebufferObject::updatePaintNode(node, nodeData);
+    return node;
 }
 
-QQuickFramebufferObject::Renderer *QVTKQuickItem::createRenderer() const
+QQuickFramebufferObject::Renderer* QVTKQuickItem::createRenderer() const
 {
     return new QVTKFramebufferObjectRenderer(static_cast<vtkInternalOpenGLRenderWindow*>(m_win));
 }

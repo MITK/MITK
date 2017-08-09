@@ -54,7 +54,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
     itkImage->SetDirection(newDirection);
 
     // Perform Resampling if reference image is provided
-    if (resampleReference != NULL)
+    if (resampleReference != nullptr)
     {
       typedef itk::ResampleImageFilter<ItkImageType, ItkImageType>  ResampleFilterType;
 
@@ -236,7 +236,7 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );
 
-  if (mask != NULL)
+  if (mask != nullptr)
   {
     registrationMethod->SetFixedImageMask(mask);
     registrationMethod->SetUseFixedImageMask(true);

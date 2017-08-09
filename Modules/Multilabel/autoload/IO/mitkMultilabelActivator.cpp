@@ -15,32 +15,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include <usModule.h>
 
 #include "mitkLabelSetImageIO.h"
 
 namespace mitk
 {
-
   /**
   \brief Registers services for multilabel module.
   */
-  class MultilabelModuleActivator : public us::ModuleActivator
+  class MultilabelIOModuleActivator : public us::ModuleActivator
   {
-    std::vector<AbstractFileIO*> m_FileIOs;
+    std::vector<AbstractFileIO *> m_FileIOs;
 
   public:
-
-    void Load(us::ModuleContext* /*context*/) override
+    void Load(us::ModuleContext * /*context*/) override
     {
       m_FileIOs.push_back(new LabelSetImageIO());
     }
-
-    void Unload(us::ModuleContext*) override
+    void Unload(us::ModuleContext *) override
     {
-      for(auto & elem : m_FileIOs)
+      for (auto &elem : m_FileIOs)
       {
         delete elem;
       }
@@ -48,4 +45,4 @@ namespace mitk
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(mitk::MultilabelModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::MultilabelIOModuleActivator)

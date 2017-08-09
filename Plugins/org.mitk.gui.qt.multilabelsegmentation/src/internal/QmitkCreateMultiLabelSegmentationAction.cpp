@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkMultiLabelSegmentationView.h"
-#include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
+#include "QmitkSegmentationOrganNamesHandling.cpp"
 //needed for qApp
 #include <qcoreapplication.h>
 
@@ -37,6 +37,14 @@ QmitkCreateMultiLabelSegmentationAction::~QmitkCreateMultiLabelSegmentationActio
 
 void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
+  if (m_DataStorage.IsNull())
+  {
+    auto message = tr("Data storage not set.");
+    MITK_ERROR << message;
+    QMessageBox::warning(nullptr, "New Segmentation Session", message);
+    return;
+  }
+
   foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
   {
     if (referenceNode.IsNotNull())
@@ -49,7 +57,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
       newName.append("-labels");
 
       bool ok = false;
-      newName = QInputDialog::getText(NULL, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
+      newName = QInputDialog::getText(nullptr, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
       if(!ok) return;
 
       mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();
@@ -61,7 +69,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
       catch ( mitk::Exception& e )
       {
         MITK_ERROR << "Exception caught: " << e.GetDescription();
-        QMessageBox::information(NULL, "New Segmentation Session", "Could not create a new segmentation session.\n");
+        QMessageBox::warning(nullptr, "New Segmentation Session", "Could not create a new segmentation session.");
         return;
       }
 
@@ -97,17 +105,17 @@ void QmitkCreateMultiLabelSegmentationAction::SetDataStorage(mitk::DataStorage* 
   m_DataStorage = dataStorage;
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
+void QmitkCreateMultiLabelSegmentationAction::SetFunctionality(berry::QtViewPart*)
 {
   //not needed
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetSmoothed(bool smoothed)
+void QmitkCreateMultiLabelSegmentationAction::SetSmoothed(bool)
 {
   //not needed
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetDecimated(bool decimated)
+void QmitkCreateMultiLabelSegmentationAction::SetDecimated(bool)
 {
   //not needed
 }

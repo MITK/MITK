@@ -17,15 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkAboutDialog_h
 #define QmitkAboutDialog_h
 
-#include <ui_QmitkAboutDialogGUI.h>
 #include "MitkQtWidgetsExtExports.h"
+#include <ui_QmitkAboutDialogGUI.h>
 
 class MITKQTWIDGETSEXT_EXPORT QmitkAboutDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  QmitkAboutDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+  QmitkAboutDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
   virtual ~QmitkAboutDialog();
 
   QString GetAboutText() const;

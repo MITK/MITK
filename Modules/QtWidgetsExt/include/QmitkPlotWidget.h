@@ -17,17 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QmitkPlotWidget_H_
 #define _QmitkPlotWidget_H_
 
-#include <qwidget.h>
 #include "MitkQtWidgetsExtExports.h"
+#include "mitkCommon.h"
+#include <qwidget.h>
+#include <qwt_legend.h>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>
-#include <vector>
-#include <tuple>
-#include "mitkCommon.h"
 #include <qwt_symbol.h>
-#include <qwt_legend.h>
-
+#include <tuple>
+#include <vector>
 
 /**
 * Provides a convenient interface for plotting curves using qwt.
@@ -54,9 +53,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @see QwtPlot
 */
 
-class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget: public QWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget : public QWidget
 {
-
 private:
   Q_OBJECT
 
@@ -79,12 +77,15 @@ public:
   * convenience type used to store pairs representing x/y coordinates
   * that should be rendered as a curve by the plot widget
   */
-  typedef std::vector< std::pair< double, double > > XYDataVector;
+  typedef std::vector<std::pair<double, double>> XYDataVector;
 
   /**
   * Standard qt constructor
   */
-  QmitkPlotWidget(QWidget* parent = nullptr,const char* title = nullptr, const char* name = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkPlotWidget(QWidget *parent = nullptr,
+                  const char *title = nullptr,
+                  const char *name = nullptr,
+                  Qt::WindowFlags f = nullptr);
 
   /**
   * Virtual destructor
@@ -95,17 +96,17 @@ public:
   * Returns the instance of the plot-widget. This may be used
   * to modify any detail of the appearance of the plot.
   */
-  QwtPlot* GetPlot();
+  QwtPlot *GetPlot();
 
   /**
     * Set the title using (formatted) QwtText object
     */
-  void SetPlotTitle(const QwtText& qwt_title);
+  void SetPlotTitle(const QwtText &qwt_title);
 
   /**
     * Set plain text title, using default formatting
     */
-  void SetPlotTitle(const char* title);
+  void SetPlotTitle(const char *title);
 
   /**
   * Inserts a new curve into the plot-window.
@@ -113,7 +114,7 @@ public:
   * @returns the id of the curve. Use this id to
   * refer to the curve, if you want to modify or add data.
   */
-  unsigned int InsertCurve(const char* title , QColor color = QColor(Qt::black));
+  unsigned int InsertCurve(const char *title, QColor color = QColor(Qt::black));
 
   /**
   * Sets the title of the given axis. For the set of available axes
@@ -121,7 +122,7 @@ public:
   * @param axis the axis for which the description should be set.
   * @param title the name of the axis.
   */
-  void SetAxisTitle(int axis, const char* title);
+  void SetAxisTitle(int axis, const char *title);
 
   /**
   * Sets the data for a previously added curve. Data is provided as two vectors of double.
@@ -131,7 +132,7 @@ public:
   * @param yValues the y coordinates of the points that define the curve
   * @returns whether data was added successfully or not
   */
-  bool SetCurveData( unsigned int curveId, const DataVector& xValues, const DataVector& yValues );
+  bool SetCurveData(unsigned int curveId, const DataVector &xValues, const DataVector &yValues);
 
   /**
   * @brief Sets the data with errors for a previously added curve.
@@ -143,8 +144,11 @@ public:
   * @param yUpperError the magnitude (>0) of the error in the larger direction of y
   * @returns whether data was added successfully or not
   */
-  bool SetCurveData(unsigned int curveId, const DataVector& xValues, const DataVector& yValues,
-    const DataVector& yLowerError, const DataVector& yUpperError);
+  bool SetCurveData(unsigned int curveId,
+                    const DataVector &xValues,
+                    const DataVector &yValues,
+                    const DataVector &yLowerError,
+                    const DataVector &yUpperError);
 
   /**
   * @brief Sets the data with errors for a previously added curve.
@@ -158,9 +162,13 @@ public:
   * @param yUpperError the magnitude (>0) of the error in the larger direction of y
   * @returns whether data was added successfully or not
   */
-  bool SetCurveData(unsigned int curveId, const DataVector& xValues, const DataVector& yValues,
-    const DataVector& xLowerError, const DataVector& xUpperError,
-    const DataVector& yLowerError, const DataVector& yUpperError);
+  bool SetCurveData(unsigned int curveId,
+                    const DataVector &xValues,
+                    const DataVector &yValues,
+                    const DataVector &xLowerError,
+                    const DataVector &xUpperError,
+                    const DataVector &yLowerError,
+                    const DataVector &yUpperError);
 
   /**
   * Sets the data for a previously added curve. Data is provided as a vectors of pairs.
@@ -169,14 +177,14 @@ public:
   * @param data the coordinates of the points that define the curve
   * @returns whether data was added successfully or not
   */
-  bool SetCurveData( unsigned int curveId, const XYDataVector& data );
+  bool SetCurveData(unsigned int curveId, const XYDataVector &data);
 
   /**
   * Defines how a curve should be drawn. For drawing a curve, a QPen is used.
   * @param curveId the id of the curve for which appearance should be changed
   * @param pen a QPen (@see QPen) defining the line style
   */
-  void SetCurvePen( unsigned int curveId, const QPen& pen );
+  void SetCurvePen(unsigned int curveId, const QPen &pen);
 
   /**
   * Assign a brush, which defines the fill pattern of shapes drawn by a QPainter.
@@ -188,24 +196,24 @@ public:
   * @param curveId the id of the curve for which appearance should be changed
   * @param brush a QBrush (@see QBrush) defining the line style
   */
-  void SetCurveBrush( unsigned int curveId, const QBrush& brush);
+  void SetCurveBrush(unsigned int curveId, const QBrush &brush);
 
   /**
   * Sets the style how the line is drawn for the curve; like, plain line,
   * or with the data points marked with a symbol;
   * @param: style A QwtPlotCurve::CurveStyle
   */
-  void SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle style );
+  void SetCurveStyle(unsigned int curveId, const QwtPlotCurve::CurveStyle style);
 
   /**
   * Sets the style data points are drawn for the curve; like, a line,
   * or dots;
   * @param: symbol A QwtSymbol
   */
-  void SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol );
+  void SetCurveSymbol(unsigned int curveId, QwtSymbol *symbol);
 
-  void SetCurveAntialiasingOn( unsigned int curveId);
-  void SetCurveAntialiasingOff( unsigned int curveId);
+  void SetCurveAntialiasingOn(unsigned int curveId);
+  void SetCurveAntialiasingOff(unsigned int curveId);
 
   /**
   * Sets the title of the given curve. The title will be shown in the legend of
@@ -213,14 +221,14 @@ public:
   * @param curveId the id of the curve for which the title should be set
   * @param title the description of the curve that will be shown in the legend.
   */
-  void SetCurveTitle( unsigned int curveId, const char* title );
+  void SetCurveTitle(unsigned int curveId, const char *title);
 
   /**
   * Defines how a curves errors should be drawn. For drawing a QPen is used.
   * @param curveId the id of the curve for which error appearance should be changed
   * @param pen a QPen (@see QPen) defining the line style
   */
-  void SetErrorPen(unsigned int curveId, const QPen& pen);
+  void SetErrorPen(unsigned int curveId, const QPen &pen);
 
   /**
   * Defines the style of errors, symbols or as a curve.
@@ -233,7 +241,7 @@ public:
   * Sets the legend of the plot
   *
   */
-  void SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos=QwtPlot::RightLegend, double ratio=-1);
+  void SetLegend(QwtLegend *legend, QwtPlot::LegendPosition pos = QwtPlot::RightLegend, double ratio = -1);
 
   /**
   * Set a curve's legend attribute
@@ -253,14 +261,12 @@ public:
   */
   void Clear();
 
-
-
 protected:
   /**
   * Converts the given values into a raw double* array.
   * A new array is allocated via new and must be deleted[] by the caller.
   */
-  double* ConvertToRawArray( const DataVector& values );
+  double *ConvertToRawArray(const DataVector &values);
 
   /**
   * Converts the given values into a raw double* array.
@@ -269,7 +275,7 @@ protected:
   * @param component defines if the x values (0) or the y values(1) should
   * be converted. Other values than 0 and 1 will not be accepted.
   */
-  double* ConvertToRawArray( const XYDataVector& values, unsigned int component );
+  double *ConvertToRawArray(const XYDataVector &values, unsigned int component);
 
   /**
   * Adds an error interval curve.
@@ -283,11 +289,13 @@ protected:
   * @param moreError Error in the positive direction (value + lessError)
   * @param isXError Should the error bars be drawn horizontally
   */
-  bool AddErrorIntervalCurve(unsigned int curveId, const DataVector& lessError, const DataVector& moreError, bool isXError);
+  bool AddErrorIntervalCurve(unsigned int curveId,
+                             const DataVector &lessError,
+                             const DataVector &moreError,
+                             bool isXError);
 
-  QwtPlot*                    m_Plot;
-  std::vector<std::tuple<QwtPlotCurve*, QwtPlotIntervalCurve*, QwtPlotIntervalCurve*> >  m_PlotCurveVector;
+  QwtPlot *m_Plot;
+  std::vector<std::tuple<QwtPlotCurve *, QwtPlotIntervalCurve *, QwtPlotIntervalCurve *>> m_PlotCurveVector;
 };
 
 #endif
-

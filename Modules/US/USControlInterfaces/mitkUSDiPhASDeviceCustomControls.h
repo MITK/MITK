@@ -43,16 +43,24 @@ public:
   virtual void SetIsActive( bool isActive ) override;
 
   enum DataType { Image_uChar, Beamformed_Short };
+
+  struct SavingSettings
+  {
+    bool saveRaw;
+    bool saveBeamformed;
+  };
   /**
     * \return if this custom controls are currently activated
     */
   virtual bool GetIsActive( ) override;
 
+  virtual void SetCompensateEnergy(bool compensate);
   virtual void SetUseBModeFilter(bool isSet);
   virtual void SetVerticalSpacing(float mm);
   virtual void SetRecord(bool record);  
   virtual void SetScatteringCoefficient(float coeff);
   virtual void SetCompensateScattering(bool compensate);
+  virtual void SetSavingSettings(SavingSettings settings);
 
   //Transmit
   virtual void SetTransmitPhaseLength(double us);
@@ -79,7 +87,7 @@ public:
   virtual void SetLowCut(double MHz);
   virtual void SetHighCut(double MHz);
 
-  virtual void passGUIOut(std::function<void(QString)> callback);
+  virtual void passGUIOut(std::function<void(QString)> /*callback*/);
   virtual void SetSilentUpdate(bool silent);
   virtual bool GetSilentUpdate();
 
@@ -98,36 +106,37 @@ protected:
 
   /** virtual handlers implemented in Device Controls
     */
-
-  virtual void OnSetUseBModeFilter(bool isSet);
-  virtual void OnSetRecord(bool record);
-  virtual void OnSetVerticalSpacing(float mm);
-  virtual void OnSetScatteringCoefficient(float coeff);
-  virtual void OnSetCompensateScattering(bool compensate);
+  virtual void OnSetCompensateEnergy(bool /*compensate*/);
+  virtual void OnSetSavingSettings(SavingSettings /*settings*/);
+  virtual void OnSetUseBModeFilter(bool /*isSet*/);
+  virtual void OnSetRecord(bool /*record*/);
+  virtual void OnSetVerticalSpacing(float /*mm*/);
+  virtual void OnSetScatteringCoefficient(float /*coeff*/);
+  virtual void OnSetCompensateScattering(bool /*compensate*/);
   //Transmit
-  virtual void OnSetTransmitPhaseLength(double us);
-  virtual void OnSetExcitationFrequency(double MHz);
-  virtual void OnSetTransmitEvents(int events);
-  virtual void OnSetVoltage(int voltage);
-  virtual void OnSetMode(bool interleaved);
+  virtual void OnSetTransmitPhaseLength(double /*us*/);
+  virtual void OnSetExcitationFrequency(double /*MHz*/);
+  virtual void OnSetTransmitEvents(int /*events*/);
+  virtual void OnSetVoltage(int /*voltage*/);
+  virtual void OnSetMode(bool /*interleaved*/);
 
   //Receive
-  virtual void OnSetScanDepth(double mm);
-  virtual void OnSetAveragingCount(int count);
-  virtual void OnSetTGCMin(int min);
-  virtual void OnSetTGCMax(int max);
-  virtual void OnSetDataType(DataType type);
+  virtual void OnSetScanDepth(double /*mm*/);
+  virtual void OnSetAveragingCount(int /*count*/);
+  virtual void OnSetTGCMin(int /*min*/);
+  virtual void OnSetTGCMax(int /*max*/);
+  virtual void OnSetDataType(DataType /*type*/);
 
   //Beamforming
-  virtual void OnSetPitch(double mm);
-  virtual void OnSetReconstructedSamples(int samples);
-  virtual void OnSetReconstructedLines(int lines);
-  virtual void OnSetSpeedOfSound(int mps);
+  virtual void OnSetPitch(double /*mm*/);
+  virtual void OnSetReconstructedSamples(int /*samples*/);
+  virtual void OnSetReconstructedLines(int /*lines*/);
+  virtual void OnSetSpeedOfSound(int /*mps*/);
 
   //Bandpass
-  virtual void OnSetBandpassEnabled(bool bandpass);
-  virtual void OnSetLowCut(double MHz);
-  virtual void OnSetHighCut(double MHz);
+  virtual void OnSetBandpassEnabled(bool /*bandpass*/);
+  virtual void OnSetLowCut(double /*MHz*/);
+  virtual void OnSetHighCut(double /*MHz*/);
 
 };
 } // namespace mitk

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>259</width>
+    <width>351</width>
     <height>903</height>
    </rect>
   </property>
@@ -43,26 +43,31 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="GeneralLabel">
+    <widget class="QLabel" name="RecordingLabel">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;General Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Record Images&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="General">
      <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QCheckBox" name="SaveBeamformed">
+         <property name="text">
+          <string>Save Beamformed</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="SaveRaw">
+         <property name="text">
+          <string>Save Raw</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="QPushButton" name="StartStopRecord">
@@ -117,12 +122,15 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>200</width>
-         <height>200</height>
+         <width>16777215</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="maximum">
         <number>42</number>
+       </property>
+       <property name="value">
+        <number>10</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -133,6 +141,9 @@
       <widget class="QSlider" name="TimeGainCompensationMaxSlider">
        <property name="maximum">
         <number>42</number>
+       </property>
+       <property name="value">
+        <number>20</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -188,11 +199,14 @@
      </item>
      <item row="0" column="0">
       <widget class="QDoubleSpinBox" name="ScanDepth">
+       <property name="minimum">
+        <double>3.000000000000000</double>
+       </property>
        <property name="maximum">
-        <double>1000.000000000000000</double>
+        <double>200.000000000000000</double>
        </property>
        <property name="value">
-        <double>40.000000000000000</double>
+        <double>50.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -211,7 +225,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLabel" name="TimeGainCompensationMaxlabel">
+      <widget class="QLabel" name="TimeGainCompensationMaxLabel">
        <property name="text">
         <string>TGC Max</string>
        </property>
@@ -287,11 +301,14 @@
      </item>
      <item row="6" column="0">
       <widget class="QDoubleSpinBox" name="PitchOfTransducer">
+       <property name="minimum">
+        <double>0.010000000000000</double>
+       </property>
        <property name="singleStep">
         <double>0.050000000000000</double>
        </property>
        <property name="value">
-        <double>0.150000000000000</double>
+        <double>0.300000000000000</double>
        </property>
       </widget>
      </item>
@@ -310,7 +327,7 @@
         <number>128</number>
        </property>
        <property name="value">
-        <number>256</number>
+        <number>128</number>
        </property>
       </widget>
      </item>
@@ -336,8 +353,11 @@
        <property name="maximum">
         <number>1000000</number>
        </property>
+       <property name="singleStep">
+        <number>5</number>
+       </property>
        <property name="value">
-        <number>1540</number>
+        <number>1480</number>
        </property>
       </widget>
      </item>
@@ -377,17 +397,27 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="CompensateEnergy">
+       <property name="text">
+        <string>Compensate Energy Values</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="VerticalSpacingSubGroup">
        <item>
         <widget class="QDoubleSpinBox" name="VerticalSpacing">
+         <property name="minimum">
+          <double>0.010000000000000</double>
+         </property>
          <property name="maximum">
-          <double>1.000000000000000</double>
+          <double>1.200000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.050000000000000</double>
          </property>
          <property name="value">
-          <double>0.150000000000000</double>
+          <double>0.300000000000000</double>
          </property>
         </widget>
        </item>
@@ -432,6 +462,12 @@
        <property name="minimum">
         <number>1</number>
        </property>
+       <property name="maximum">
+        <number>11</number>
+       </property>
+       <property name="singleStep">
+        <number>2</number>
+       </property>
        <property name="value">
         <number>1</number>
        </property>
@@ -462,7 +498,7 @@
         <double>10000.000000000000000</double>
        </property>
        <property name="value">
-        <double>1.000000000000000</double>
+        <double>4.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -483,7 +519,7 @@
      <item row="4" column="0">
       <widget class="QComboBox" name="Mode">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <item>
         <property name="text">
@@ -503,7 +539,7 @@
         <bool>false</bool>
        </property>
        <property name="minimum">
-        <number>5</number>
+        <number>6</number>
        </property>
        <property name="maximum">
         <number>75</number>
@@ -606,6 +642,19 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

@@ -1,8 +1,8 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.5)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# See http://www.cmake.org/cmake/help/v3.2/manual/cmake-policies.7.html for details
+# See http://www.cmake.org/cmake/help/v3.5/manual/cmake-policies.7.html for details
 #-----------------------------------------------------------------------------
 
 set(project_policies )
@@ -23,7 +23,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2016.03.99)
+  project(MITK VERSION 2016.11.99)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -91,20 +91,20 @@ endif()
 #-----------------------------------------------------------------------------
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # require at least gcc 4.7.3 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 12.04
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7.3)
-    message(FATAL_ERROR "GCC version must be at least 4.7.3
-If you are using Ubuntu 12.04, you can easily install gcc and g++ 4.7.3 (or any later version available) in addition to your version ${CMAKE_CXX_COMPILER_VERSION}:
+  # require at least gcc 4.9 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 14.04
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+    message(FATAL_ERROR "GCC version must be at least 4.9
+If you are using Ubuntu 14.04, you can easily install gcc and g++ 4.9 (or any later version available) in addition to your version ${CMAKE_CXX_COMPILER_VERSION}:
   sudo add-apt-repository ppa:ubuntu-toolchain-r/test
   sudo apt-get update
-  sudo apt-get install gcc-4.7 g++-4.7
+  sudo apt-get install gcc-4.9 g++-4.9
 Make sure to explicitly specify these compilers when configuring MITK:
-  CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc-4.7
-  CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-4.7
+  CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc-4.9
+  CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-4.9
 For more information on the proposed PPA see the Toolchain Updates section of https://wiki.ubuntu.com/ToolChain.")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # require at least clang 3.4 as provided by Ubuntu 12.04
+  # require at least clang 3.4
   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
     message(FATAL_ERROR "Clang version must be at least 3.4")
   endif()
@@ -114,9 +114,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     message(FATAL_ERROR "Apple Clang version must be at least 5.0")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # require at least Visual Studio 2012
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0.61030.0)
-    message(FATAL_ERROR "Microsoft Visual Studio 2012 Update 4 or newer required (MSVC 17.0.61030.0)")
+  # require at least Visual Studio 2013
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0.40629.0)
+    message(FATAL_ERROR "Microsoft Visual Studio 2013 Update 5 or newer required (MSVC 18.0.40629.0)")
   endif()
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
@@ -128,22 +128,18 @@ else()
   set(GCC_VERSION 0)
 endif()
 
-set(MITK_CXX_STANDARD 11)
+set(MITK_CXX_STANDARD 14)
 
 set(CMAKE_CXX_EXTENSIONS 0)
 set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 # This is necessary to avoid problems with compile feature checks.
-# CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
-# However, compile flag checks also need to be done with -std=c++11.
-# The MITK_CXX11_FLAG variable is also used for external projects
+# CMAKE_CXX_STANDARD seems to only set the -std=c++14 flag for targets.
+# However, compile flag checks also need to be done with -std=c++14.
+# The MITK_CXX14_FLAG variable is also used for external projects
 # build during the MITK super-build.
-mitkFunctionCheckCompilerFlags("-std=c++11" MITK_CXX11_FLAG)
-if(NOT MITK_CXX11_FLAG)
-  # Older gcc compilers use -std=c++0x
-  mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX11_FLAG)
-endif()
+mitkFunctionCheckCompilerFlags("-std=c++14" MITK_CXX14_FLAG)
 
 #-----------------------------------------------------------------------------
 # Warn if source or build path is too long
@@ -200,13 +196,13 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-env_option(MITK_USE_QT "Use Qt library" ON)
-env_option(MITK_USE_QT_WEBENGINE "Use Qt WebEngine library" ON)
+env_option(MITK_USE_Qt5 "Use Qt 5 library" ON)
+env_option(MITK_USE_Qt5_WebEngine "Use Qt 5 WebEngine library" ON)
 
-if(MITK_USE_QT)
+if(MITK_USE_Qt5)
   set(MITK_QT5_MINIMUM_VERSION 5.6.0)
   set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns UiTools Help LinguistTools)
-  if(MITK_USE_QT_WEBENGINE)
+  if(MITK_USE_Qt5_WebEngine)
     set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} WebEngineWidgets)
   endif()
   if(APPLE)
@@ -220,8 +216,8 @@ if(MITK_USE_QT)
       set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
     endif()
   endif()
-elseif(MITK_USE_QT_WEBENGINE)
-  set(MITK_USE_QT_WEBENGINE OFF)
+elseif(MITK_USE_Qt5_WebEngine)
+  set(MITK_USE_Qt5_WebEngine OFF)
 endif()
 
 # ------------------------------------------------------------------------
@@ -254,7 +250,7 @@ mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit fo
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
-mitkFunctionAddExternalProject(NAME HDF5        OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
 
 # -----------------------------------------
 # The following external projects must be
@@ -268,21 +264,28 @@ mitkFunctionAddExternalProject(NAME OpenCV    OFF)
 mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 
 # These are "hard" dependencies and always set to ON
-mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
+mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE DEPENDS HDF5)
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
-mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC "Use CTK in MITK")
+mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
-mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
+mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Eigen Boost DOC "Use Simulation Open Framework Architecture")
 mitkFunctionAddExternalProject(NAME VMTK      OFF          DEPENDS ITK VTK)
+mitkFunctionAddExternalProject(NAME DCMQI     OFF          DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
 mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 
-if(MITK_USE_QT)
-  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
+if(MITK_USE_Qt5)
+  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS Qt5)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  mitkFunctionAddExternalProject(NAME Gflags  OFF ADVANCED DOC "Experimental. Only available on Linux systems. Needed for Caffe.")
+  mitkFunctionAddExternalProject(NAME Caffe   OFF ADVANCED DEPENDS HDF5 OpenCV Gflags DOC "Experimental. Only available on Linux systems.")
+  mitkFunctionAddExternalProject(NAME Caffe2  OFF ADVANCED DOC "Experimental. Only available on Linux systems.")
 endif()
 
 # -----------------------------------------
@@ -343,17 +346,6 @@ if(MITK_USE_SOFA)
   # Allow setting external SOFA plugins directory and SOFA plugins
   set(MITK_USE_SOFA_PLUGINS_DIR ${MITK_USE_SOFA_PLUGINS_DIR} CACHE PATH "External SOFA plugins directory" FORCE)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
-endif()
-
-# sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
-if(MITK_USE_QT AND MITK_USE_Python)
-  set(minimum_required_python_qt5_version "5.3.0")
-  find_package(Qt5 COMPONENTS Core REQUIRED)
-
-  if(${Qt5Core_VERSION_STRING} VERSION_LESS ${minimum_required_python_qt5_version})
-    message(WARNING "Can't build MITK Python with Qt version < ${minimum_required_python_qt5_version}. Disabling Python support")
-    set(MITK_USE_Python OFF CACHE BOOL "Use python wrapping in MITK" FORCE)
-  endif()
 endif()
 
 # only windows can't build python in debug mode
@@ -479,7 +471,6 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-IGT
   MITK-ToF
   MITK-DTI
-  MITK-Registration
   MITK-Modules # all modules not contained in a specific subproject
   MITK-Plugins # all plugins not contained in a specific subproject
   MITK-Examples
@@ -538,7 +529,6 @@ include(mitkFunctionCreateCommandLineApp)
 include(mitkFunctionCreateModule)
 include(mitkFunctionCreatePlugin)
 include(mitkFunctionCreateProvisioningFile)
-include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
@@ -570,7 +560,7 @@ include(mitkMacroCreateCTKPlugin)
 # Global CMake variables
 #-----------------------------------------------------------------------------
 
-# Required and enabled C++11 features for all MITK code.
+# Required and enabled C++14 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.
 set(MITK_CXX_FEATURES
   cxx_auto_type
@@ -727,7 +717,7 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX11_FLAG}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX14_FLAG}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 
@@ -808,7 +798,7 @@ endif()
 set(Boost_USE_MULTITHREADED 1)
 set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
-set(Boost_ADDITIONAL_VERSIONS "1.60" "1.60.0")
+set(Boost_ADDITIONAL_VERSIONS "1.64" "1.64.0")
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
@@ -856,6 +846,15 @@ if(MITK_USE_DCMTK)
   find_package(DCMTK REQUIRED MODULE)
 endif()
 
+if(MITK_USE_DCMQI)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMQIConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMQI.
+    # Help our FindDCMQI.cmake script find our super-build DCMQI
+  set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  find_package(DCMQI REQUIRED)
+endif()
+
 if(MITK_USE_Python)
   find_package(PythonLibs REQUIRED)
   find_package(PythonInterp REQUIRED)
@@ -890,7 +889,7 @@ if(MITK_USE_OpenCL)
 endif()
 
 # Qt support
-if(MITK_USE_QT)
+if(MITK_USE_Qt5)
   find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
   get_target_property(_qmake_exec Qt5::qmake LOCATION)
   execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
@@ -954,8 +953,8 @@ if(MITK_USE_QT)
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 
-      if(NOT MITK_USE_QT_WEBENGINE)
-        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_QT_WEBENGINE is OFF.")
+      if(NOT MITK_USE_Qt5_WebEngine)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_Qt5_WebEngine is OFF.")
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 
@@ -1367,24 +1366,6 @@ configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
 
 write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)
-
-# If we are under Windows, create two batch files which correctly
-# set up the environment for the application and for Visual Studio
-if(WIN32)
-  include(mitkFunctionCreateWindowsBatchScript)
-
-  set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
-  if(MITK_USE_HDF5)
-    list(APPEND MITK_LIBRARY_DIRS ${HDF5_DIR}/install/bin)
-    message(STATUS "MITK-Runtime " ${MITK_RUNTIME_PATH})
-  endif(MITK_USE_HDF5)
-  foreach(VS_BUILD_TYPE debug release)
-    mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"
-      ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat
-      ${VS_BUILD_TYPE})
-  endforeach()
-endif(WIN32)
-
 
 #-----------------------------------------------------------------------------
 # MITK Applications

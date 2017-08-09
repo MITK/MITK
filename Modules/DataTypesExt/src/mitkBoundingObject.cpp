@@ -14,17 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkBoundingObject.h"
 #include "mitkBaseProcess.h"
 
-mitk::BoundingObject::BoundingObject()
-  : Surface(), m_Positive(true)
+mitk::BoundingObject::BoundingObject() : Surface(), m_Positive(true)
 {
-//  Initialize(1);
+  //  Initialize(1);
 
   /* bounding box around the unscaled bounding object */
-  ScalarType bounds[6]={-1,1,-1,1,-1,1};  //{xmin,x_max, ymin,y_max,zmin,z_max}
+  ScalarType bounds[6] = {-1, 1, -1, 1, -1, 1}; //{xmin,x_max, ymin,y_max,zmin,z_max}
   GetGeometry()->SetBounds(bounds);
   GetTimeGeometry()->Update();
 }
@@ -38,9 +36,8 @@ mitk::ScalarType mitk::BoundingObject::GetVolume()
   return 0.0;
 }
 
-void mitk::BoundingObject::FitGeometry(mitk::BaseGeometry* aGeometry3D)
+void mitk::BoundingObject::FitGeometry(mitk::BaseGeometry *aGeometry3D)
 {
-
   // Adjusted this function to fix
   // BUG 6951 - Image Cropper - Bounding Box is strange
   // Still, the behavior of the BoundingObject is really strange.
@@ -50,15 +47,13 @@ void mitk::BoundingObject::FitGeometry(mitk::BaseGeometry* aGeometry3D)
   // specifies it's actual bounds. This behavior needs to be analyzed and maybe changed.
   // Check also BUG 11406
 
-
   GetGeometry()->SetIdentity();
   GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
   GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
 
   mitk::Vector3D size;
-  for(unsigned int i=0; i < 3; ++i)
-    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0);
-  GetGeometry()->SetSpacing( size );
+  for (unsigned int i = 0; i < 3; ++i)
+    size[i] = (aGeometry3D->GetExtentInMM(i) / 2.0);
+  GetGeometry()->SetSpacing(size);
   GetTimeGeometry()->Update();
-
 }

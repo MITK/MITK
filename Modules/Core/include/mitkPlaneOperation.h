@@ -14,47 +14,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKPlaneOperation_H
 #define MITKPlaneOperation_H
 
-#include <MitkCoreExports.h>
-#include "mitkPointOperation.h"
 #include "mitkNumericTypes.h"
+#include "mitkPointOperation.h"
+#include <MitkCoreExports.h>
 
-
-
-namespace mitk {
-
-/**
- * @brief Operation for setting a plane (defined by its origin and normal)
- *
- * @ingroup Undo
- */
-class MITKCORE_EXPORT PlaneOperation : public PointOperation
+namespace mitk
 {
-public:
-  PlaneOperation( OperationType operationType, Point3D point, Vector3D normal );
-  PlaneOperation( OperationType operationType, Point3D point, Vector3D axisVec0, Vector3D axisVec1 );
+  /**
+   * @brief Operation for setting a plane (defined by its origin and normal)
+   *
+   * @ingroup Undo
+   */
+  class MITKCORE_EXPORT PlaneOperation : public PointOperation
+  {
+  public:
+    PlaneOperation(OperationType operationType, Point3D point, Vector3D normal);
+    PlaneOperation(OperationType operationType, Point3D point, Vector3D axisVec0, Vector3D axisVec1);
 
-  virtual ~PlaneOperation();
+    virtual ~PlaneOperation();
 
-  Vector3D GetNormal();
-  Vector3D GetAxisVec0();
-  Vector3D GetAxisVec1();
-  bool AreAxisDefined();
+    Vector3D GetNormal();
+    Vector3D GetAxisVec0();
+    Vector3D GetAxisVec1();
+    bool AreAxisDefined();
 
-private:
-  Vector3D m_Normal;
-  Vector3D m_AxisVec0;
-  Vector3D m_AxisVec1;
-  bool m_AreAxisDefined;
+  private:
+    Vector3D m_Normal;
+    Vector3D m_AxisVec0;
+    Vector3D m_AxisVec1;
+    bool m_AreAxisDefined;
+  };
 
-};
-
-} //namespace mitk
-
+} // namespace mitk
 
 #endif /* MITKPlaneOperation_H */
-
-

@@ -21,19 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-/**
-  \brief Serializes mitk::ExampleDataStructure for mitk::SceneIO
-*/
-class ExampleDataStructureSerializer : public BaseDataSerializer
-{
+  /**
+    \brief Serializes mitk::ExampleDataStructure for mitk::SceneIO
+  */
+  class ExampleDataStructureSerializer : public BaseDataSerializer
+  {
   public:
-    mitkClassMacro( ExampleDataStructureSerializer, BaseDataSerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    mitkClassMacro(ExampleDataStructureSerializer, BaseDataSerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual std::string Serialize() override;
+
   protected:
     ExampleDataStructureSerializer();
     virtual ~ExampleDataStructureSerializer();
-};
+  };
 } // namespace
 #endif

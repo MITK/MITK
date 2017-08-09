@@ -26,14 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkMitkOpenGLVolumeTextureMapper3D_h
 #define __vtkMitkOpenGLVolumeTextureMapper3D_h
 
-#include "vtkMitkVolumeTextureMapper3D.h"
-#include "mitkBaseRenderer.h"
 #include "MitkMapperExtExports.h"
+#include "mitkBaseRenderer.h"
+#include "vtkMitkVolumeTextureMapper3D.h"
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
-# include "vtkOpenGL.h" // GLfloat type is used in some method signatures.
+#include "vtkOpenGL.h" // GLfloat type is used in some method signatures.
 #endif
-
 
 class vtkRenderWindow;
 class vtkVolumeProperty;
@@ -43,8 +42,8 @@ class vtkVolumeProperty;
 class MITKMAPPEREXT_EXPORT vtkMitkOpenGLVolumeTextureMapper3D : public vtkMitkVolumeTextureMapper3D
 {
 public:
-  vtkTypeMacro(vtkMitkOpenGLVolumeTextureMapper3D,vtkMitkVolumeTextureMapper3D);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkMitkOpenGLVolumeTextureMapper3D, vtkMitkVolumeTextureMapper3D);
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   static vtkMitkOpenGLVolumeTextureMapper3D *New();
 
@@ -53,9 +52,9 @@ public:
   // more than one independent component, or if the hardware does
   // not support the required extensions
   // int IsRenderSupported(vtkVolumeProperty *);
-  int IsRenderSupported(vtkRenderer *ren,vtkVolumeProperty *) override;
+  int IsRenderSupported(vtkRenderer *ren, vtkVolumeProperty *) override;
 
-//BTX
+  // BTX
 
   // Description:
   // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
@@ -63,13 +62,13 @@ public:
   // Render the volume
   virtual void Render(vtkRenderer *ren, vtkVolume *vol) override;
 
-//ETX
+  // ETX
 
   // Desciption:
   // Initialize when we go to render, or go to answer the
   // IsRenderSupported question. Don't call unless we have
   // a valid OpenGL context!
-  vtkGetMacro( Initialized, int );
+  vtkGetMacro(Initialized, int);
 
   // Description:
   // Release any graphics resources that are being consumed by this texture.
@@ -78,11 +77,11 @@ public:
   // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
   DEPRECATED(void ReleaseGraphicsResources(vtkWindow *) override);
 
-   // Description:
+  // Description:
   // Release any graphics resources that are being consumed by this texture.
   // The parameter renderer could be used to determine which graphic
   // resources to release.
-  void ReleaseGraphicsResources(mitk::BaseRenderer * renderer);
+  void ReleaseGraphicsResources(mitk::BaseRenderer *renderer);
 
 protected:
   vtkMitkOpenGLVolumeTextureMapper3D();
@@ -90,7 +89,7 @@ protected:
 
   bool RenderPossible;
 
-//BTX
+  // BTX
 
   void GetLightInformation(vtkRenderer *ren,
                            vtkVolume *vol,
@@ -98,15 +97,15 @@ protected:
                            GLfloat lightDiffuseColor[2][4],
                            GLfloat lightSpecularColor[2][4],
                            GLfloat halfwayVector[2][4],
-                           GLfloat *ambient );
-//ETX
+                           GLfloat *ambient);
+  // ETX
 
-  int              Initialized;
-  GLuint           Volume1Index;
-  GLuint           Volume2Index;
-  GLuint           Volume3Index;
-  GLuint           ColorLookupIndex;
-  GLuint           AlphaLookupIndex;
+  int Initialized;
+  GLuint Volume1Index;
+  GLuint Volume2Index;
+  GLuint Volume3Index;
+  GLuint ColorLookupIndex;
+  GLuint AlphaLookupIndex;
 
   GLuint prgOneComponentShade;
   GLuint prgRGBAShade;
@@ -115,36 +114,35 @@ protected:
 
   bool SupportsCompressedTexture;
 
-  //void Initialize();
+  // void Initialize();
   void Initialize(vtkRenderer *r);
 
   virtual void RenderFP(vtkRenderer *ren, vtkVolume *vol);
 
-  void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );
-  void RenderOneIndependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
+  void SetupOneIndependentTextures(vtkRenderer *ren, vtkVolume *vol);
+  void RenderOneIndependentShadeFP(vtkRenderer *ren, vtkVolume *vol);
 
-  void SetupRGBATextures( vtkRenderer *ren, vtkVolume *vol );
-  void RenderRGBAShadeFP( vtkRenderer *ren, vtkVolume *vol );
+  void SetupRGBATextures(vtkRenderer *ren, vtkVolume *vol);
+  void RenderRGBAShadeFP(vtkRenderer *ren, vtkVolume *vol);
 
-  void DeleteTextureIndex( GLuint *index );
-  void CreateTextureIndex( GLuint *index );
+  void DeleteTextureIndex(GLuint *index);
+  void CreateTextureIndex(GLuint *index);
 
-  void RenderPolygons( vtkRenderer *ren, vtkVolume *vol, int stages[4] );
+  void RenderPolygons(vtkRenderer *ren, vtkVolume *vol, int stages[4]);
 
-  void SetupProgramLocalsForShadingFP( vtkRenderer *ren, vtkVolume *vol );
+  void SetupProgramLocalsForShadingFP(vtkRenderer *ren, vtkVolume *vol);
 
-  void Setup3DTextureParameters( bool linear );
+  void Setup3DTextureParameters(bool linear);
 
   void ComputeVolumeDimensions();
 
-  bool UpdateVolumes( vtkVolume * );
+  bool UpdateVolumes(vtkVolume *);
 
-  bool UpdateVolumesRGBA( vtkVolume * );
+  bool UpdateVolumesRGBA(vtkVolume *);
 
 private:
-  vtkMitkOpenGLVolumeTextureMapper3D(const vtkMitkOpenGLVolumeTextureMapper3D&);  // Not implemented.
-  void operator=(const vtkMitkOpenGLVolumeTextureMapper3D&);  // Not implemented.
+  vtkMitkOpenGLVolumeTextureMapper3D(const vtkMitkOpenGLVolumeTextureMapper3D &); // Not implemented.
+  void operator=(const vtkMitkOpenGLVolumeTextureMapper3D &);                     // Not implemented.
 };
-
 
 #endif

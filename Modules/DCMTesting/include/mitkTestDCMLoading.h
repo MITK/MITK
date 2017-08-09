@@ -22,54 +22,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class Image;
 
-
-class Image;
-
-class MITKDCMTESTING_EXPORT TestDCMLoading
-{
+  class MITKDCMTESTING_EXPORT TestDCMLoading
+  {
   public:
-
     typedef DicomSeriesReader::StringContainer StringContainer;
-    typedef std::list< DataNode::Pointer > NodeList;
-    typedef std::list< itk::SmartPointer<Image> > ImageList;
+    typedef std::list<DataNode::Pointer> NodeList;
+    typedef std::list<itk::SmartPointer<Image>> ImageList;
 
     TestDCMLoading();
 
-    ImageList
-    LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume = nullptr );
+    ImageList LoadFiles(const StringContainer &files, itk::SmartPointer<Image> preLoadedVolume = nullptr);
 
     /**
       \brief Dump relevant image information for later comparison.
       \sa CompareImageInformationDumps
     */
-    std::string
-    DumpImageInformation( const Image* image );
+    std::string DumpImageInformation(const Image *image);
 
     /**
       \brief Compare two image information dumps.
       \return true, if dumps are sufficiently equal (see parameters)
       \sa DumpImageInformation
     */
-    bool
-    CompareImageInformationDumps( const std::string& reference,
-                                  const std::string& test );
+    bool CompareImageInformationDumps(const std::string &reference, const std::string &test);
 
   private:
-
-    typedef std::map<std::string,std::string> KeyValueMap;
+    typedef std::map<std::string, std::string> KeyValueMap;
 
     void SetDefaultLocale();
 
     void ResetUserLocale();
 
-    std::string ComponentTypeToString( int type );
+    std::string ComponentTypeToString(int type);
 
-    KeyValueMap ParseDump( const std::string& dump );
+    KeyValueMap ParseDump(const std::string &dump);
 
-    bool CompareSpacedValueFields( const std::string& reference,
-                                   const std::string& test,
-                                   double eps = mitk::eps );
+    bool CompareSpacedValueFields(const std::string &reference, const std::string &test, double eps = mitk::eps);
 
     /**
        Compress whitespace in string
@@ -77,33 +67,28 @@ class MITKDCMTESTING_EXPORT TestDCMLoading
        \param pFill replacement whitespace (only whitespace in string after reduction)
        \param pWhitespace characters handled as whitespace
      */
-    std::string reduce(const std::string& pString,
-                       const std::string& pFill = " ",
-                       const std::string& pWhitespace = " \t");
+    std::string reduce(const std::string &pString,
+                       const std::string &pFill = " ",
+                       const std::string &pWhitespace = " \t");
 
     /**
        Remove leading and trailing whitespace
        \param pString input string
        \param pWhitespace characters handled as whitespace
     */
-    std::string trim(const std::string& pString,
-                     const std::string& pWhitespace = " \t");
+    std::string trim(const std::string &pString, const std::string &pWhitespace = " \t");
 
-
-
-    template<typename T>
-    bool StringToNumber(const std::string& s, T& value)
+    template <typename T>
+    bool StringToNumber(const std::string &s, T &value)
     {
       std::stringstream stream(s);
       stream >> value;
       return (!stream.fail()) && (fabs(value) < std::numeric_limits<T>::max());
     }
 
-    const char* m_PreviousCLocale;
+    const char *m_PreviousCLocale;
     std::locale m_PreviousCppLocale;
-
-};
-
+  };
 }
 
 #endif

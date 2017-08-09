@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 #include <mitkLogMacros.h>
 
-QmitkSafeApplication::QmitkSafeApplication(int& argc, char** argv)
-  : QApplication(argc, argv)
-{}
+QmitkSafeApplication::QmitkSafeApplication(int &argc, char **argv) : QApplication(argc, argv)
+{
+}
 
-bool QmitkSafeApplication::notify(QObject* receiver, QEvent* event)
+bool QmitkSafeApplication::notify(QObject *receiver, QEvent *event)
 {
   if (!m_SafeMode)
   {
@@ -44,4 +44,3 @@ bool QmitkSafeApplication::getSafeMode() const
 {
   return m_SafeMode;
 }
-

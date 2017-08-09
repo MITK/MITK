@@ -45,6 +45,12 @@ void mitk::USDiPhASCustomControls::passGUIOut(std::function<void(QString)> callb
 
 // OnSet methods
 
+void mitk::USDiPhASCustomControls::OnSetCompensateEnergy(bool compensate)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->ModifyEnergyCompensation(compensate);
+}
+
 void mitk::USDiPhASCustomControls::OnSetUseBModeFilter(bool isSet)
 {
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
@@ -68,10 +74,17 @@ void mitk::USDiPhASCustomControls::OnSetScatteringCoefficient(float coeff)
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
   imageSource->ModifyScatteringCoefficient(coeff);
 }
+
 void mitk::USDiPhASCustomControls::OnSetCompensateScattering(bool compensate)
 {
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
   imageSource->ModifyCompensateForScattering(compensate);
+}
+
+void mitk::USDiPhASCustomControls::OnSetSavingSettings(SavingSettings settings)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->SetSavingSettings(settings);
 }
 
 //Transmit
@@ -110,8 +123,9 @@ void mitk::USDiPhASCustomControls::OnSetMode(bool interleaved)
 void mitk::USDiPhASCustomControls::OnSetScanDepth(double mm)
 {
   auto& scanMode = m_device->GetScanMode();
-  float time = 2 * (0.001 * mm) / scanMode.averageSpeedOfSound;
-  m_device->GetScanMode().receivePhaseLengthSeconds = time;
+  float time = 2 * (0.001 * (mm)) / scanMode.averageSpeedOfSound;
+  float timeInMicroSeconds = floor(time *1e6); // this is necessary because sub-microsecond accuracy causes undefined behaviour
+  m_device->GetScanMode().receivePhaseLengthSeconds = timeInMicroSeconds*1e-6;
   m_device->UpdateScanmode();
 }
 
@@ -190,6 +204,7 @@ void mitk::USDiPhASCustomControls::OnSetReconstructedLines(int lines)
 void mitk::USDiPhASCustomControls::OnSetSpeedOfSound(int mps)
 {
   m_device->GetScanMode().averageSpeedOfSound = mps;
+  m_device->SetInterleaved(m_device->IsInterleaved()); //update transmit parameters
   m_device->UpdateScanmode();
 }
 

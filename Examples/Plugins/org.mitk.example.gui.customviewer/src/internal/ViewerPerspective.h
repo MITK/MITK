@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef VIEWERPERSPECTIVE_H_
 #define VIEWERPERSPECTIVE_H_
 
@@ -37,7 +36,6 @@ class ViewerPerspective : public QObject, public berry::IPerspectiveFactory
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
-
   ViewerPerspective();
 
   /**
@@ -45,7 +43,6 @@ public:
   * initially being laid out.
   */
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
-
 };
 // //! [ViewerPerspectiveClassDeclaration]
 

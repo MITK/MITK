@@ -169,6 +169,9 @@ private:
   void UpdateAlgorithmSelection(berry::ISelection::ConstPointer selection);
 
   friend struct berry::SelectionChangedAdapter<QmitkMatchPointBatchProcessor>;
+
+  QWidget* m_Parent;
+
   /** @brief this pointer holds the algorithm selection listener */
   QScopedPointer<berry::ISelectionListener> m_AlgorithmSelectionListener;
 
@@ -193,7 +196,6 @@ private:
   bool m_ValidInputs;
   bool m_Working;
 
-  QWidget* m_Parent;
   Ui::MatchPointAdvancedControls m_Controls;
 };
 

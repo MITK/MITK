@@ -8,3 +8,27 @@ mitkUSDiPhASCustomControls.cpp
 mitkUSDiPhASBModeImageFilter.hxx
 mitkUSDiPhASBModeImageFilter.h
 )
+
+set(RESOURCE_FILES
+  Fluence05.nrrd
+  Fluence06.nrrd
+  Fluence07.nrrd
+  Fluence08.nrrd
+  Fluence09.nrrd
+  Fluence10.nrrd
+  Fluence11.nrrd
+  Fluence12.nrrd
+  Fluence13.nrrd
+  Fluence14.nrrd
+  Fluence15.nrrd
+  Fluence16.nrrd
+  Fluence17.nrrd
+  Fluence18.nrrd
+  Fluence19.nrrd
+  Fluence20.nrrd
+  Fluence21.nrrd
+  Fluence22.nrrd
+  Fluence23.nrrd
+  Fluence24.nrrd
+  Fluence25.nrrd
+  )

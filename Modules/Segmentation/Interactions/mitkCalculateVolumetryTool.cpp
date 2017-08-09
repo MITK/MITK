@@ -18,11 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCalculateVolumetryTool.xpm"
 
-#include "mitkVolumeCalculator.h"
 #include "mitkProperties.h"
 #include "mitkToolManager.h"
+#include "mitkVolumeCalculator.h"
 
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CalculateVolumetryTool, "Volumetry tool");
 }
 
@@ -34,12 +35,12 @@ mitk::CalculateVolumetryTool::~CalculateVolumetryTool()
 {
 }
 
-const char** mitk::CalculateVolumetryTool::GetXPM() const
+const char **mitk::CalculateVolumetryTool::GetXPM() const
 {
   return mitkCalculateVolumetryTool_xpm;
 }
 
-const char* mitk::CalculateVolumetryTool::GetName() const
+const char *mitk::CalculateVolumetryTool::GetName() const
 {
   return "Volumetry";
 }
@@ -49,12 +50,13 @@ std::string mitk::CalculateVolumetryTool::GetErrorMessage()
   return "Volume could not be calculated for these nodes:";
 }
 
-bool mitk::CalculateVolumetryTool::ProcessOneWorkingData( DataNode* node )
+bool mitk::CalculateVolumetryTool::ProcessOneWorkingData(DataNode *node)
 {
   if (node)
   {
-    Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
-    if (image.IsNull()) return false;
+    Image::Pointer image = dynamic_cast<Image *>(node->GetData());
+    if (image.IsNull())
+      return false;
 
     if (image->GetDimension() == 4)
     {
@@ -62,17 +64,17 @@ bool mitk::CalculateVolumetryTool::ProcessOneWorkingData( DataNode* node )
     }
 
     VolumeCalculator::Pointer volumetryFilter = VolumeCalculator::New();
-    volumetryFilter->SetImage( image );
-    volumetryFilter->SetThreshold( 1 ); // comparison is >=
+    volumetryFilter->SetImage(image);
+    volumetryFilter->SetThreshold(1); // comparison is >=
     try
     {
       volumetryFilter->ComputeVolume();
 
       float volumeInTimeStep0 = volumetryFilter->GetVolume();
 
-      node->SetProperty( "volume", FloatProperty::New(volumeInTimeStep0) );
+      node->SetProperty("volume", FloatProperty::New(volumeInTimeStep0));
     }
-    catch(...)
+    catch (...)
     {
       return false;
     }
@@ -86,4 +88,3 @@ void mitk::CalculateVolumetryTool::FinishProcessingAllData()
   Superclass::FinishProcessingAllData();
   m_ToolManager->NodePropertiesChanged();
 }
-

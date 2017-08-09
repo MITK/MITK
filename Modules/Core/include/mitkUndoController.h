@@ -14,121 +14,123 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79
 #define UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79
 
-#include <MitkCoreExports.h>
-#include "mitkUndoModel.h"
 #include "mitkOperationEvent.h"
+#include "mitkUndoModel.h"
+#include <MitkCoreExports.h>
 #include <map>
 
-
-namespace mitk {
-
-//## @ingroup Undo
-class MITKCORE_EXPORT UndoController
+namespace mitk
 {
+  //## @ingroup Undo
+  class MITKCORE_EXPORT UndoController
+  {
   public:
-  //different UndoModels:
-  enum UndoType{LIMITEDLINEARUNDO=10, VERBOSE_LIMITEDLINEARUNDO=11, TREEUNDO=20};
+    // different UndoModels:
+    enum UndoType
+    {
+      LIMITEDLINEARUNDO = 10,
+      VERBOSE_LIMITEDLINEARUNDO = 11,
+      TREEUNDO = 20
+    };
 
-  typedef std::map<UndoType, UndoModel::Pointer> UndoModelMap;
-  typedef std::map<UndoType, UndoModel::Pointer>::iterator UndoModelMapIter;
-  //##Documentation
-  //## @brief Default UndoModel to use.
-  static const UndoType DEFAULTUNDOMODEL;
+    typedef std::map<UndoType, UndoModel::Pointer> UndoModelMap;
+    typedef std::map<UndoType, UndoModel::Pointer>::iterator UndoModelMapIter;
+    //##Documentation
+    //## @brief Default UndoModel to use.
+    static const UndoType DEFAULTUNDOMODEL;
 
-  //##Documentation
-  //## Constructor; Adds the new UndoType or if undoType exists ,
-  //## switches it to undoType; for UndoTypes see definitionmitkInteractionConst.h
-  UndoController(UndoType undoType = DEFAULTUNDOMODEL);
-  virtual ~UndoController();
+    //##Documentation
+    //## Constructor; Adds the new UndoType or if undoType exists ,
+    //## switches it to undoType; for UndoTypes see definitionmitkInteractionConst.h
+    UndoController(UndoType undoType = DEFAULTUNDOMODEL);
+    virtual ~UndoController();
 
-  bool SetOperationEvent(UndoStackItem* operationEvent);
+    bool SetOperationEvent(UndoStackItem *operationEvent);
 
-  //##Documentation
-  //## @brief calls the UndoMechanism to undo the last change
-  bool Undo();
+    //##Documentation
+    //## @brief calls the UndoMechanism to undo the last change
+    bool Undo();
 
-  //##Documentation
-  //## @brief calls the UndoMechanism to undo the last change
-  //##
-  //## the UndoMechanism has the possibility to undo the last changes in two different ways:
-  //## first it can Undo a group of operations done at last (e.g. build up a new object; Undo leads to deleting that object);
-  //## or it can Undo a set of operations, that belong together(statechange with Action),
-  //## that way it is possible recall the last set point after you have finished to build up a new object
-  //## @param fine: if set to true, then undo all operations with the same objectEventId
-  //## if set to false, then undo all operations with the same GroupEventId
-  bool Undo(bool fine);
+    //##Documentation
+    //## @brief calls the UndoMechanism to undo the last change
+    //##
+    //## the UndoMechanism has the possibility to undo the last changes in two different ways:
+    //## first it can Undo a group of operations done at last (e.g. build up a new object; Undo leads to deleting that
+    // object);
+    //## or it can Undo a set of operations, that belong together(statechange with Action),
+    //## that way it is possible recall the last set point after you have finished to build up a new object
+    //## @param fine: if set to true, then undo all operations with the same objectEventId
+    //## if set to false, then undo all operations with the same GroupEventId
+    bool Undo(bool fine);
 
-  //##Documentation
-  //## @brief calls the RedoMechanism to redo the operations undone
-  //##
-  //## read the Documentation of Undo!
-  bool Redo();
+    //##Documentation
+    //## @brief calls the RedoMechanism to redo the operations undone
+    //##
+    //## read the Documentation of Undo!
+    bool Redo();
 
-  //##Documentation
-  //## @brief calls the RedoMechanism to redo the operations undone
-  //##
-  //## read the Documentation of Undo!
-  //## only with the possibility to fine redo, like fine undo
-  bool Redo(bool fine);
+    //##Documentation
+    //## @brief calls the RedoMechanism to redo the operations undone
+    //##
+    //## read the Documentation of Undo!
+    //## only with the possibility to fine redo, like fine undo
+    bool Redo(bool fine);
 
-  //##Documentation
-  //## @brief Clears the Undo and the RedoList
-  void Clear();
+    //##Documentation
+    //## @brief Clears the Undo and the RedoList
+    void Clear();
 
-  //##Documentation
-  //## @brief Clears the RedoList
-  void ClearRedoList();
+    //##Documentation
+    //## @brief Clears the RedoList
+    void ClearRedoList();
 
-  //##Documentation
-  //## @brief returns true, if the RedoList is empty
-  bool RedoListEmpty();
+    //##Documentation
+    //## @brief returns true, if the RedoList is empty
+    bool RedoListEmpty();
 
-  bool SwitchUndoModel(UndoType undoType);
+    bool SwitchUndoModel(UndoType undoType);
 
-  bool AddUndoModel(UndoType undoType);
+    bool AddUndoModel(UndoType undoType);
 
-  bool RemoveUndoModel(UndoType undoType);
+    bool RemoveUndoModel(UndoType undoType);
 
-  //##Documentation
-  //## @brief returns the ObjectEventId of the
-  //## top Element in the OperationHistory of the selected
-  //## UndoModel
-  int GetLastObjectEventIdInList();
+    //##Documentation
+    //## @brief returns the ObjectEventId of the
+    //## top Element in the OperationHistory of the selected
+    //## UndoModel
+    int GetLastObjectEventIdInList();
 
-  //##Documentation
-  //## @brief returns the GroupEventId of the
-  //## top Element in the OperationHistory of the selected
-  //## UndoModel
-  int GetLastGroupEventIdInList();
+    //##Documentation
+    //## @brief returns the GroupEventId of the
+    //## top Element in the OperationHistory of the selected
+    //## UndoModel
+    int GetLastGroupEventIdInList();
 
+    //##Documentation
+    //## @brief returns the last specified OperationEvent in Undo-list
+    //## corresponding to the given value; if nothing found, then returns nullptr
+    OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType);
 
-  //##Documentation
-  //## @brief returns the last specified OperationEvent in Undo-list
-  //## corresponding to the given value; if nothing found, then returns NULL
-  OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType);
-
-  //##Documentation
-  //## @brief gives access to the currently used UndoModel
-  //## Introduced to access special functions of more specific UndoModels,
-  //## especially to retrieve text descriptions of the undo/redo stack
-  static UndoModel* GetCurrentUndoModel();
+    //##Documentation
+    //## @brief gives access to the currently used UndoModel
+    //## Introduced to access special functions of more specific UndoModels,
+    //## especially to retrieve text descriptions of the undo/redo stack
+    static UndoModel *GetCurrentUndoModel();
 
   private:
-  //##Documentation
-  //## current selected UndoModel
-  static UndoModel::Pointer m_CurUndoModel;
-  //##Documentation
-  //## current selected Type of m_CurUndoModel
-  static UndoType m_CurUndoType;
-  //##Documentation
-  //## different UndoModels to select and activate
-  static UndoModelMap m_UndoModelList;
-
-};
-}//namespace mitk
+    //##Documentation
+    //## current selected UndoModel
+    static UndoModel::Pointer m_CurUndoModel;
+    //##Documentation
+    //## current selected Type of m_CurUndoModel
+    static UndoType m_CurUndoType;
+    //##Documentation
+    //## different UndoModels to select and activate
+    static UndoModelMap m_UndoModelList;
+  };
+} // namespace mitk
 
 #endif /* UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79 */

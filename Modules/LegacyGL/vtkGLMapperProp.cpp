@@ -18,12 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkObjectFactory.h>
 
-
 vtkStandardNewMacro(vtkGLMapperProp);
 
-vtkGLMapperProp::vtkGLMapperProp() :
-  m_WrappedGLMapper(0),
-  m_BaseRenderer(0)
+vtkGLMapperProp::vtkGLMapperProp() : m_WrappedGLMapper(0), m_BaseRenderer(0)
 {
 }
 
@@ -33,7 +30,7 @@ vtkGLMapperProp::~vtkGLMapperProp()
 
 int vtkGLMapperProp::RenderOpaqueGeometry(vtkViewport *)
 {
-  if(!m_WrappedGLMapper || !m_BaseRenderer)
+  if (!m_WrappedGLMapper || !m_BaseRenderer)
     return 0;
 
   this->m_WrappedGLMapper->MitkRender(m_BaseRenderer, mitk::VtkPropRenderer::Opaque);
@@ -60,7 +57,7 @@ const mitk::GLMapper *vtkGLMapperProp::GetWrappedGLMapper() const
   return m_WrappedGLMapper;
 }
 
-void vtkGLMapperProp::SetWrappedGLMapper(mitk::GLMapper* glMapper)
+void vtkGLMapperProp::SetWrappedGLMapper(mitk::GLMapper *glMapper)
 {
   this->m_WrappedGLMapper = glMapper;
 }

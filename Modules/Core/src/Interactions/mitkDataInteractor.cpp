@@ -36,12 +36,12 @@ mitk::DataInteractor::~DataInteractor()
   }
 }
 
-mitk::DataNode* mitk::DataInteractor::GetDataNode() const
+mitk::DataNode *mitk::DataInteractor::GetDataNode() const
 {
   return m_DataNode;
 }
 
-void mitk::DataInteractor::SetDataNode(DataNode* dataNode)
+void mitk::DataInteractor::SetDataNode(DataNode *dataNode)
 {
   if (dataNode == m_DataNode)
     return;

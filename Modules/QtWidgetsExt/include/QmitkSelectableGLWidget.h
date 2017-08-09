@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKSELECTABLEGLWIDGET_H
 #define QMITKSELECTABLEGLWIDGET_H
 
-#include "ui_QmitkSelectableGLWidget.h"
 #include "mitkCameraRotationController.h"
 #include "mitkCommon.h"
 #include "mitkSliceNavigationController.h"
 #include "mitkVtkPropRenderer.h"
+#include "ui_QmitkSelectableGLWidget.h"
 #include <MitkQtWidgetsExtExports.h>
 
 #include <mitkCommon.h>
@@ -34,21 +34,22 @@ class MITKQTWIDGETSEXT_EXPORT QmitkSelectableGLWidget : public QWidget
 {
   Q_OBJECT
 
-  public:
-  QmitkSelectableGLWidget(QWidget* parent=0);
+public:
+  QmitkSelectableGLWidget(QWidget *parent = 0);
   ~QmitkSelectableGLWidget();
-  mitk::VtkPropRenderer* GetRenderer();
-  QmitkRenderWindow* GetRenderWindow() const;
-  mitk::SliceNavigationController*  GetSliceNavigationController() const;
-  mitk::CameraRotationController* GetCameraRotationController() const;
-  mitk::BaseController* GetController() const;
-  protected:
-  void wheelEvent( QWheelEvent * e ) override;
-    QmitkRenderWindow *m_RenderWindow;
-    mitk::VtkPropRenderer::Pointer m_Renderer;
-  private:
-  Ui::QmitkSelectableGLWidget* m_Ui;
+  mitk::VtkPropRenderer *GetRenderer();
+  QmitkRenderWindow *GetRenderWindow() const;
+  mitk::SliceNavigationController *GetSliceNavigationController() const;
+  mitk::CameraRotationController *GetCameraRotationController() const;
+  mitk::BaseController *GetController() const;
+
+protected:
+  void wheelEvent(QWheelEvent *e) override;
+  QmitkRenderWindow *m_RenderWindow;
+  mitk::VtkPropRenderer::Pointer m_Renderer;
+
+private:
+  Ui::QmitkSelectableGLWidget *m_Ui;
 };
 
 #endif
-

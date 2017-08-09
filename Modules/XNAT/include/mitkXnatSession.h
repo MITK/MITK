@@ -21,10 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usServiceInterface.h>
 
-namespace mitk {
-
+namespace mitk
+{
   typedef ctkXnatSession XnatSession;
-
 }
 US_DECLARE_SERVICE_INTERFACE(mitk::XnatSession, "org.mitk.services.XnatSession")
 

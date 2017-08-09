@@ -33,7 +33,7 @@ QmitkUSControlsCustomDiPhASDeviceWidget::~QmitkUSControlsCustomDiPhASDeviceWidge
 
   if (m_ControlInterface.IsNotNull())
   {
-    m_ControlInterface->passGUIOut([](QString str)->void {} );
+    m_ControlInterface->passGUIOut([](QString /*str*/)->void {} );
   }
   delete ui;
 }
@@ -70,6 +70,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
 
   //now pass the default values
 
+  m_OldReconstructionLines = 0;
+
   m_ControlInterface->SetSilentUpdate(true); // don't update the scanmode everytime
 
   OnTransmitPhaseLengthChanged();
@@ -92,6 +94,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnVerticalSpacingChanged();
   OnScatteringCoefficientChanged();
   OnCompensateScatteringChanged();
+  OnChangedSavingSettings();
+  OnCompensateEnergyChanged();
 
   m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
 
@@ -102,12 +106,14 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 {
   ui->setupUi(this);
 
+  connect(ui->CompensateEnergy, SIGNAL(stateChanged(int)), this, SLOT(OnCompensateEnergyChanged()));
   connect(ui->UseBModeFilter, SIGNAL(stateChanged(int)), this, SLOT(OnUseBModeFilterChanged()));
   connect(ui->StartStopRecord, SIGNAL(clicked()), this, SLOT(OnRecordChanged()));
   connect(ui->ScatteringCoefficient, SIGNAL(valueChanged(int)), this, SLOT(OnScatteringCoefficientChanged()));
   connect(ui->CompensateScattering, SIGNAL(stateChanged(int)), this, SLOT(OnCompensateScatteringChanged()));
   connect(ui->VerticalSpacing, SIGNAL(valueChanged(double)), this, SLOT(OnVerticalSpacingChanged()));
-
+  connect(ui->SaveBeamformed, SIGNAL(stateChanged(int)), this, SLOT(OnChangedSavingSettings()));
+  connect(ui->SaveRaw, SIGNAL(stateChanged(int)), this, SLOT(OnChangedSavingSettings()));
   //transmit
   connect(ui->TransmitPhaseLength, SIGNAL(valueChanged(double)), this, SLOT(OnTransmitPhaseLengthChanged()));
   connect(ui->ExcitationFrequency, SIGNAL(valueChanged(double)), this, SLOT(OnExcitationFrequencyChanged()));
@@ -136,6 +142,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 
 //slots
 
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnCompensateEnergyChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  bool CompensateEnergy = ui->CompensateEnergy->isChecked();
+  m_ControlInterface->SetCompensateEnergy(CompensateEnergy);
+}
+
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnUseBModeFilterChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
@@ -149,11 +162,64 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
   if (ui->StartStopRecord->text() == "Start Recording")
   {
     ui->StartStopRecord->setText("Stop Recording");
+
+    ui->UseBModeFilter->setEnabled(false);
+    ui->ScatteringCoefficient->setEnabled(false);
+    ui->CompensateScattering->setEnabled(false);
+    ui->VerticalSpacing->setEnabled(false);
+    ui->SaveBeamformed->setEnabled(false);
+    ui->SaveRaw->setEnabled(false);
+    ui->TransmitPhaseLength->setEnabled(false);
+    ui->ExcitationFrequency->setEnabled(false);
+    ui->TransmitEvents->setEnabled(false);
+    ui->Voltage->setEnabled(false);
+    ui->Mode->setEnabled(false);
+    ui->ScanDepth->setEnabled(false);
+    ui->AveragingCount->setEnabled(false);
+    ui->TimeGainCompensationMinSlider->setEnabled(false);
+    ui->TimeGainCompensationMaxSlider->setEnabled(false);
+    ui->DataType->setEnabled(false);
+    ui->PitchOfTransducer->setEnabled(false);
+    ui->ReconstructedSamplesPerLine->setEnabled(false);
+    ui->ReconstructedLines->setEnabled(false);
+    ui->SpeedOfSound->setEnabled(false);
+    ui->BandpassEnabled->setEnabled(false);
+    ui->LowCut->setEnabled(false);
+    ui->HighCut->setEnabled(false);
+    ui->CompensateEnergy->setEnabled(false);
+
     m_ControlInterface->SetRecord(true);
   }
   else
   {
     ui->StartStopRecord->setText("Start Recording");
+
+    ui->UseBModeFilter->setEnabled(true);
+    ui->CompensateScattering->setEnabled(true);
+    if(ui->CompensateScattering->isChecked())
+      ui->ScatteringCoefficient->setEnabled(true);
+    ui->VerticalSpacing->setEnabled(true);
+    ui->SaveBeamformed->setEnabled(true);
+    ui->SaveRaw->setEnabled(true);
+    ui->TransmitPhaseLength->setEnabled(true);
+    ui->ExcitationFrequency->setEnabled(true);
+    ui->TransmitEvents->setEnabled(true);
+    ui->Voltage->setEnabled(true);
+    ui->Mode->setEnabled(true);
+    ui->ScanDepth->setEnabled(true);
+    ui->AveragingCount->setEnabled(true);
+    ui->TimeGainCompensationMinSlider->setEnabled(true);
+    ui->TimeGainCompensationMaxSlider->setEnabled(true);
+    ui->DataType->setEnabled(true);
+    ui->PitchOfTransducer->setEnabled(true);
+    ui->ReconstructedSamplesPerLine->setEnabled(true);
+    ui->ReconstructedLines->setEnabled(true);
+    ui->SpeedOfSound->setEnabled(true);
+    ui->BandpassEnabled->setEnabled(true);
+    ui->LowCut->setEnabled(true);
+    ui->HighCut->setEnabled(true);
+    ui->CompensateEnergy->setEnabled(true);
+
     m_ControlInterface->SetRecord(false);
   }
 }
@@ -181,6 +247,17 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnCompensateScatteringChanged()
   m_ControlInterface->SetCompensateScattering(ui->CompensateScattering->isChecked());
 }
 
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnChangedSavingSettings()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+
+  mitk::USDiPhASDeviceCustomControls::SavingSettings settings;
+
+  settings.saveBeamformed = ui->SaveBeamformed->isChecked();
+  settings.saveRaw = ui->SaveRaw->isChecked();
+
+  m_ControlInterface->SetSavingSettings(settings);
+}
 
 //Transmit
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitPhaseLengthChanged()
@@ -244,7 +321,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMinChanged()
     ui->TimeGainCompensationMinSlider->setValue(tgcMax);
     MITK_INFO << "User tried to set tgcMin>tgcMax.";
   }
-  
+  QString text("TGC min = " + QString::fromStdString(std::to_string(ui->TimeGainCompensationMinSlider->value())));
+  ui->TimeGainCompensationMinLabel->setText(text);
   m_ControlInterface->SetTGCMin(ui->TimeGainCompensationMinSlider->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
@@ -257,9 +335,11 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
     ui->TimeGainCompensationMaxSlider->setValue(tgcMin);
     MITK_INFO << "User tried to set tgcMin>tgcMax.";
   }
-  
+  QString text("TGC max = "+QString::fromStdString(std::to_string(ui->TimeGainCompensationMaxSlider->value())));
+  ui->TimeGainCompensationMaxLabel->setText(text);
   m_ControlInterface->SetTGCMax(ui->TimeGainCompensationMaxSlider->value());
 }
+
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
@@ -286,7 +366,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnReconstructedSamplesChanged()
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnReconstructedLinesChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+  if (m_OldReconstructionLines == 0)
+    m_OldReconstructionLines = ui->ReconstructedLines->value();
+
   m_ControlInterface->SetReconstructedLines(ui->ReconstructedLines->value());
+
+  ui->PitchOfTransducer->setValue(ui->PitchOfTransducer->value()*((double)m_OldReconstructionLines / (double)ui->ReconstructedLines->value()));
+  m_OldReconstructionLines = ui->ReconstructedLines->value();
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnSpeedOfSoundChanged()
 {

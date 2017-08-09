@@ -25,7 +25,7 @@ namespace mitk
 QMAPAlgorithmModel::
 QMAPAlgorithmModel(QObject *parent) :
     QAbstractTableModel(parent),
-    m_pMetaInterface(NULL)
+    m_pMetaInterface(nullptr)
 {
 
 }

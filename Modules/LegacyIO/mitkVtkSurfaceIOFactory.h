@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkVtkSurfaceIOFactory_h
 
 #ifdef _MSC_VER
-#pragma warning ( disable : 4786 )
+#pragma warning(disable : 4786)
 #endif
 
 #include <MitkLegacyIOExports.h>
@@ -27,50 +27,48 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-//##Documentation
-//## @brief Create instances of VtkSurfaceReader objects using an object factory.
-//##
-//## @ingroup MitkLegacyIOModule
-//## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MITKLEGACYIO_EXPORT VtkSurfaceIOFactory : public itk::ObjectFactoryBase
-{
-public:
-  /** Standard class typedefs. */
-  typedef VtkSurfaceIOFactory   Self;
-  typedef itk::ObjectFactoryBase  Superclass;
-  typedef itk::SmartPointer<Self>  Pointer;
-  typedef itk::SmartPointer<const Self>  ConstPointer;
-
-  /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const override;
-  virtual const char* GetDescription(void) const override;
-
-  /** Method for class instantiation. */
-  itkFactorylessNewMacro(Self);
-  static VtkSurfaceIOFactory* FactoryNew() { return new VtkSurfaceIOFactory;}
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(VtkSurfaceIOFactory, ObjectFactoryBase);
-
-  /**
-   * Register one factory of this type
-   * \deprecatedSince{2013_09}
-   */
-  DEPRECATED(static void RegisterOneFactory(void))
+  //##Documentation
+  //## @brief Create instances of VtkSurfaceReader objects using an object factory.
+  //##
+  //## @ingroup MitkLegacyIOModule
+  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  class DEPRECATED() MITKLEGACYIO_EXPORT VtkSurfaceIOFactory : public itk::ObjectFactoryBase
   {
-    VtkSurfaceIOFactory::Pointer VtkSurfaceIOFactory = VtkSurfaceIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(VtkSurfaceIOFactory);
-  }
+  public:
+    /** Standard class typedefs. */
+    typedef VtkSurfaceIOFactory Self;
+    typedef itk::ObjectFactoryBase Superclass;
+    typedef itk::SmartPointer<Self> Pointer;
+    typedef itk::SmartPointer<const Self> ConstPointer;
 
-protected:
-  VtkSurfaceIOFactory();
-  ~VtkSurfaceIOFactory();
+    /** Class methods used to interface with the registered factories. */
+    virtual const char *GetITKSourceVersion(void) const override;
+    virtual const char *GetDescription(void) const override;
 
-private:
-  VtkSurfaceIOFactory(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
+    /** Method for class instantiation. */
+    itkFactorylessNewMacro(Self);
+    static VtkSurfaceIOFactory *FactoryNew() { return new VtkSurfaceIOFactory; }
+    /** Run-time type information (and related methods). */
+    itkTypeMacro(VtkSurfaceIOFactory, ObjectFactoryBase);
 
-};
+    /**
+     * Register one factory of this type
+     * \deprecatedSince{2013_09}
+     */
+    DEPRECATED(static void RegisterOneFactory(void))
+    {
+      VtkSurfaceIOFactory::Pointer VtkSurfaceIOFactory = VtkSurfaceIOFactory::New();
+      ObjectFactoryBase::RegisterFactory(VtkSurfaceIOFactory);
+    }
 
+  protected:
+    VtkSurfaceIOFactory();
+    ~VtkSurfaceIOFactory();
+
+  private:
+    VtkSurfaceIOFactory(const Self &); // purposely not implemented
+    void operator=(const Self &);      // purposely not implemented
+  };
 
 } // end namespace mitk
 

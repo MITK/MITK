@@ -27,7 +27,8 @@ namespace mitk
   MITKMULTILABEL_EXPORT Image::Pointer ConvertLabelSetImageToImage(LabelSetImage::ConstPointer labelSetImage);
 
   /**
-   * \brief Convert mitk::Image to mitk::LabelSetImage, templating and differentation between itk::Image and itk::VectorImage is internal
+   * \brief Convert mitk::Image to mitk::LabelSetImage, templating and differentation between itk::Image and
+   * itk::VectorImage is internal
    */
   MITKMULTILABEL_EXPORT LabelSetImage::Pointer ConvertImageToLabelSetImage(Image::Pointer image);
 }

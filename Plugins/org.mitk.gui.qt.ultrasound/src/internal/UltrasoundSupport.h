@@ -29,6 +29,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUSControlsBModeWidget.h"
 #include "QmitkUSControlsDopplerWidget.h"
 #include "QmitkUSControlsProbesWidget.h"
+#include <mitkBaseRenderer.h>
+#include "QmitkRenderWindow.h"
+#include <mitkStandaloneDataStorage.h>
+#include <QmitkLevelWindowWidget.h>
+#include <QmitkSliceWidget.h>
+#include <QmitkPAUSViewerView.h>
 
 #include <QTime>
 
@@ -38,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 \brief UltrasoundSupport
 This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
 
-\sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
 class UltrasoundSupport : public QmitkAbstractView
@@ -99,6 +104,28 @@ protected:
   void CreateControlWidgets();
   void RemoveControlWidgets();
 
+  void CreateWindows();
+
+  QmitkPAUSViewerView* m_PausViewerView;
+
+  Ui::UltrasoundSupportControls m_Controls;
+
+  QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
+  QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
+  QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
+  QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
+
+  bool m_ImageAlreadySetToNode;
+
+  unsigned int m_CurrentImageWidth;
+  unsigned int m_CurrentImageHeight;
+
+  /** Keeps track of the amount of output Nodes*/
+  unsigned int m_AmountOfOutputs;
+
+  mitk::StandaloneDataStorage::Pointer m_PADataStorage;
+  mitk::StandaloneDataStorage::Pointer m_USDataStorage;
+
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
 
@@ -125,42 +152,34 @@ protected:
   /** Loads the properties of some QWidgets (and the tool storage file name) from QSettings.*/
   void LoadUISettings();
 
-    /** The nodes that we feed images into.*/
-    std::vector<mitk::DataNode::Pointer> m_Node;
-    /** Adds a new node to the m_Nodes vector*/
-    void InitNewNode();
-    /** Destroys the last node in the m_Nodes vector */
-    void DestroyLastNode();
-    /** Checks the amount of slices in the image from the USDevice and creates as many Nodes as there are slices */
-    void UpdateAmountOfOutputs();
+  /** The nodes that we feed images into.*/
+  std::vector<mitk::DataNode::Pointer> m_Node;
+  /** Adds a new node to the m_Nodes vector*/
+  void InitNewNode();
+  /** Destroys the last node in the m_Nodes vector */
+  void DestroyLastNode();
+  /** Checks the amount of slices in the image from the USDevice and creates as many Nodes as there are slices */
+  void UpdateAmountOfOutputs();
 
-    /** This function just checks how many nodes there are currently and sets the laser image to a jet transparent colormap. */
-    void UpdateColormaps();
-    void SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type);
+  /** This function just checks how many nodes there are currently and sets the laser image to a jet transparent colormap. */
+  void UpdateLevelWindows();
+  bool m_ForceRequestUpdateAll;
 
-    /** The image that holds all data given by the USDevice.*/
-    mitk::Image::Pointer                m_Image;
-    /** The seperated slices from m_Image */
-    std::vector<mitk::Image::Pointer>   m_curOutput;
-    /** Keeps track of the amount of output Nodes*/
-    int                                 m_AmountOfOutputs;
+  void SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type);
+
+  /** The image that holds all data given by the USDevice.*/
+  mitk::Image::Pointer                m_Image;
+
+
+  /** The seperated slices from m_Image */
+  std::vector<mitk::Image::Pointer>   m_curOutput;
 
   /** The old geometry of m_Image. It is needed to check if the geometry changed (e.g. because
    *  the zoom factor was modified) and the image needs to be reinitialized. */
   mitk::SlicedGeometry3D::Pointer m_OldGeometry;
 
-  Ui::UltrasoundSupportControls m_Controls;
-
-  QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
-  QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
-  QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
-  QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
-
   QList<ctkServiceReference>    m_CustomWidgetServiceReference;
 
-  bool m_ImageAlreadySetToNode;
-  unsigned int m_CurrentImageWidth;
-  unsigned int m_CurrentImageHeight;
   double m_CurrentDynamicRange;
 };
 

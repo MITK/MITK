@@ -17,69 +17,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMIMETYPEPROVIDER_H
 #define MITKMIMETYPEPROVIDER_H
 
-#include "mitkIMimeTypeProvider.h"
 #include "mitkCustomMimeType.h"
+#include "mitkIMimeTypeProvider.h"
 
 #include "usServiceTracker.h"
 #include "usServiceTrackerCustomizer.h"
 
 #include <set>
 
-namespace mitk {
-
-struct MimeTypeTrackerTypeTraits : public us::TrackedTypeTraitsBase<MimeType,MimeTypeTrackerTypeTraits>
+namespace mitk
 {
-  typedef MimeType TrackedType;
-
-  static bool IsValid(const TrackedType& t)
+  struct MimeTypeTrackerTypeTraits : public us::TrackedTypeTraitsBase<MimeType, MimeTypeTrackerTypeTraits>
   {
-    return t.IsValid();
-  }
+    typedef MimeType TrackedType;
 
-  static TrackedType DefaultValue()
+    static bool IsValid(const TrackedType &t) { return t.IsValid(); }
+    static TrackedType DefaultValue() { return TrackedType(); }
+    static void Dispose(TrackedType & /*t*/) {}
+  };
+
+  class MimeTypeProvider : public IMimeTypeProvider, private us::ServiceTrackerCustomizer<CustomMimeType, MimeType>
   {
-    return TrackedType();
-  }
+  public:
+    MimeTypeProvider();
+    ~MimeTypeProvider();
 
-  static void Dispose(TrackedType& /*t*/)
-  {
-  }
-};
+    void Start();
+    void Stop();
 
-class MimeTypeProvider : public IMimeTypeProvider,
-    private us::ServiceTrackerCustomizer<CustomMimeType, MimeType>
-{
-public:
+    virtual std::vector<MimeType> GetMimeTypes() const override;
+    virtual std::vector<MimeType> GetMimeTypesForFile(const std::string &filePath) const override;
+    virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string &category) const override;
+    virtual MimeType GetMimeTypeForName(const std::string &name) const override;
 
-  MimeTypeProvider();
-  ~MimeTypeProvider();
+    virtual std::vector<std::string> GetCategories() const override;
 
-  void Start();
-  void Stop();
+  private:
+    virtual TrackedType AddingService(const ServiceReferenceType &reference) override;
+    virtual void ModifiedService(const ServiceReferenceType &reference, TrackedType service) override;
+    virtual void RemovedService(const ServiceReferenceType &reference, TrackedType service) override;
 
-  virtual std::vector<MimeType> GetMimeTypes() const override;
-  virtual std::vector<MimeType> GetMimeTypesForFile(const std::string& filePath) const override;
-  virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string& category) const override;
-  virtual MimeType GetMimeTypeForName(const std::string& name) const override;
+    MimeType GetMimeType(const ServiceReferenceType &reference) const;
 
-  virtual std::vector<std::string> GetCategories() const override;
+    us::ServiceTracker<CustomMimeType, MimeTypeTrackerTypeTraits> *m_Tracker;
 
-private:
+    typedef std::map<std::string, std::set<MimeType>> MapType;
+    MapType m_NameToMimeTypes;
 
-  virtual TrackedType AddingService(const ServiceReferenceType& reference) override;
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service) override;
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service) override;
-
-  MimeType GetMimeType(const ServiceReferenceType& reference) const;
-
-  us::ServiceTracker<CustomMimeType, MimeTypeTrackerTypeTraits>* m_Tracker;
-
-  typedef std::map<std::string, std::set<MimeType> > MapType;
-  MapType m_NameToMimeTypes;
-
-  std::map<std::string, MimeType> m_NameToMimeType;
-};
-
+    std::map<std::string, MimeType> m_NameToMimeType;
+  };
 }
 
 #endif // MITKMIMETYPEPROVIDER_H

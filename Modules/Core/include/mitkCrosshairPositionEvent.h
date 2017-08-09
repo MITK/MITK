@@ -20,16 +20,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 #include <mitkInteractionEvent.h>
 
-namespace mitk {
-
-/** A special mitk::Event thrown by the SliceNavigationController on mouse scroll
-  */
-class MITKCORE_EXPORT CrosshairPositionEvent : public mitk::InteractionEvent
+namespace mitk
 {
+  /** A special mitk::Event thrown by the SliceNavigationController on mouse scroll
+    */
+  class MITKCORE_EXPORT CrosshairPositionEvent : public mitk::InteractionEvent
+  {
   public:
-    CrosshairPositionEvent(BaseRenderer* sender);
-};
-
+    CrosshairPositionEvent(BaseRenderer *sender);
+  };
 }
 
 #endif

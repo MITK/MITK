@@ -14,26 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkLegacyFileWriterService.h"
 
+#include <mitkCustomMimeType.h>
 #include <mitkDataNode.h>
 #include <mitkIOMimeTypes.h>
-#include <mitkCustomMimeType.h>
 
 mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter,
-                                                       const std::string& description)
-  : AbstractFileWriter(legacyWriter->GetSupportedBaseData())
-  , m_LegacyWriter(legacyWriter)
+                                                       const std::string &description)
+  : AbstractFileWriter(legacyWriter->GetSupportedBaseData()), m_LegacyWriter(legacyWriter)
 {
   this->SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".legacy.");
   this->SetDescription(description);
 
   CustomMimeType customMimeType;
   std::vector<std::string> extensions = legacyWriter->GetPossibleFileExtensions();
-  for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
+  for (std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
   {
-    if (ext->empty()) continue;
+    if (ext->empty())
+      continue;
 
     std::string extension = *ext;
     if (extension.size() > 1 && extension[0] == '*')
@@ -70,19 +69,20 @@ void mitk::LegacyFileWriterService::Write()
   LocalFile localFile(this);
 
   m_LegacyWriter->SetFileName(localFile.GetFileName().c_str());
-  m_LegacyWriter->SetInput(const_cast<BaseData*>(this->GetInput()));
+  m_LegacyWriter->SetInput(const_cast<BaseData *>(this->GetInput()));
   m_LegacyWriter->Write();
 }
 
 mitk::IFileWriter::ConfidenceLevel mitk::LegacyFileWriterService::GetConfidenceLevel() const
 {
-  if (mitk::AbstractFileWriter::GetConfidenceLevel() == Unsupported) return Unsupported;
+  if (mitk::AbstractFileWriter::GetConfidenceLevel() == Unsupported)
+    return Unsupported;
   DataNode::Pointer node = DataNode::New();
-  node->SetData(const_cast<BaseData*>(this->GetInput()));
+  node->SetData(const_cast<BaseData *>(this->GetInput()));
   return m_LegacyWriter->CanWriteDataType(node) ? Supported : Unsupported;
 }
 
-mitk::LegacyFileWriterService* mitk::LegacyFileWriterService::Clone() const
+mitk::LegacyFileWriterService *mitk::LegacyFileWriterService::Clone() const
 {
   return new LegacyFileWriterService(*this);
 }

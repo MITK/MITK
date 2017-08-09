@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKIMAGEDESCRIPTOR_H
 #define MITKIMAGEDESCRIPTOR_H
 
 #include <itkObjectFactory.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "mitkChannelDescriptor.h"
 #include "mitkCommon.h"
@@ -31,77 +30,69 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** \brief An object to hold all essential information about an Image object
 
-/** \brief An object to hold all essential information about an Image object
+    The ImageDescriptor holds an std::vector of pointers to ChannelDescriptor together with the
+    information about the image's dimensions. The general assumption ist, that each channel of an image
+    has to have the same geometry.
 
-  The ImageDescriptor holds an std::vector of pointers to ChannelDescriptor together with the
-  information about the image's dimensions. The general assumption ist, that each channel of an image
-  has to have the same geometry.
-
-  \sa Image, ChannelDescriptor
-  */
-class MITKCORE_EXPORT ImageDescriptor : public itk::Object
-{
+    \sa Image, ChannelDescriptor
+    */
+  class MITKCORE_EXPORT ImageDescriptor : public itk::Object
+  {
   public:
     mitkClassMacroItkParent(ImageDescriptor, itk::Object);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /** Insert new channel
+      /** Insert new channel
 
-       @param ptype Pixel Type
-       @param name channel's name
-    */
-    void AddNewChannel( mitk::PixelType ptype, const char* name = nullptr);
+         @param ptype Pixel Type
+         @param name channel's name
+      */
+      void AddNewChannel(mitk::PixelType ptype, const char *name = nullptr);
 
     /** \brief Initialize the image descriptor by the dimensions */
-    void Initialize( const unsigned int* dims, const unsigned int dim);
+    void Initialize(const unsigned int *dims, const unsigned int dim);
 
     /** \brief Initialize the descriptor by an referenced Descriptor */
-    void Initialize( const ImageDescriptor::Pointer refDescriptor, unsigned int channel = 0);
+    void Initialize(const ImageDescriptor::Pointer refDescriptor, unsigned int channel = 0);
 
     /** \brief Get the C-array of unsigned int holding the size for each dimension of the image
 
       The C-array has allways lenght of MAX_IMAGE_DIMENSIONS
       */
-    const unsigned int* GetDimensions() const
-    { return m_Dimensions; }
-
+    const unsigned int *GetDimensions() const { return m_Dimensions; }
     /** \brief Get the number dimensions used (e.g. non-zero size)
 
       The return value does not exceed MAX_IMAGE_DIMENSIONS
       */
-    unsigned int GetNumberOfDimensions() const
-    { return m_NumberOfDimensions; }
-
+    unsigned int GetNumberOfDimensions() const { return m_NumberOfDimensions; }
     /** \brief Get the name of selected channel
 
       If the name of the channel wasn't initialized, the string returned is set to "Unnamed [ <PixelTypeName> ]"
 
       \sa PixelType, ChannelDescriptor
     */
-    const std::string GetChannelName( unsigned int id ) const;
+    const std::string GetChannelName(unsigned int id) const;
 
     /** \brief Get the pixel type of a channel specified by its name
 
       Returns an uninitialized PixelType object if no channel with given name was found
       */
-    PixelType GetChannelTypeByName( const char* name) const;
+    PixelType GetChannelTypeByName(const char *name) const;
 
     /** \brief Get the pixel type of a channel specified by its id
 
       Returns an uninitialized PixelType object if no channel with given id was found
       */
-    PixelType GetChannelTypeById( unsigned int id) const;
+    PixelType GetChannelTypeById(unsigned int id) const;
 
     /** \brief Get the ChannelDescriptor for a channel specified by its id      */
-    ChannelDescriptor GetChannelDescriptor( unsigned int id = 0) const;
+    ChannelDescriptor GetChannelDescriptor(unsigned int id = 0) const;
 
     /** \brief Get the count of channels used */
-    unsigned int GetNumberOfChannels() const
-    { return m_NumberOfChannels; }
-
+    unsigned int GetNumberOfChannels() const { return m_NumberOfChannels; }
   protected:
     /** Protected constructor */
     ImageDescriptor();
@@ -122,13 +113,12 @@ class MITKCORE_EXPORT ImageDescriptor : public itk::Object
     /** Constant iterator for traversing the vector of ChannelDescriptors */
     typedef std::vector<ChannelDescriptor>::const_iterator ConstChannelsIter;
 
-
     unsigned int m_NumberOfChannels;
 
     unsigned int m_NumberOfDimensions;
 
     unsigned int m_Dimensions[MAX_IMAGE_DIMENSIONS];
-};
+  };
 
 } // end namespace
 #endif // MITKIMAGEDESCRIPTOR_H

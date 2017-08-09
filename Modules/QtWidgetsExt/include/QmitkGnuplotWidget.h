@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkGnuplotWidget_h
 #define QmitkGnuplotWidget_h
 
-#include <itkTimeStamp.h>
 #include <MitkQtWidgetsExtExports.h>
 #include <QProcess>
 #include <QScopedPointer>
 #include <QWidget>
+#include <itkTimeStamp.h>
 
 class QAction;
 class QMenu;
@@ -36,22 +36,22 @@ class MITKQTWIDGETSEXT_EXPORT QmitkGnuplotWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit QmitkGnuplotWidget(QWidget* parent = nullptr);
+  explicit QmitkGnuplotWidget(QWidget *parent = nullptr);
   ~QmitkGnuplotWidget();
 
   QString GetGnuplotPath() const;
-  void SetGnuplotPath(const QString& path);
+  void SetGnuplotPath(const QString &path);
 
   QStringList GetCommands() const;
-  void SetCommands(const QStringList& commands);
+  void SetCommands(const QStringList &commands);
 
   void Update();
 
   QSize sizeHint() const override;
 
 protected:
-  void contextMenuEvent(QContextMenuEvent* event) override;
-  void resizeEvent(QResizeEvent* event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
 
 private slots:
   void OnProcessStateChanged(QProcess::ProcessState state);
@@ -65,10 +65,10 @@ private:
   QString CreateSetTermCommand() const;
 
   QScopedPointer<Ui::QmitkGnuplotWidget> m_Ui;
-  QMenu* m_ContextMenu;
-  QAction* m_CopyPlotAction;
-  QAction* m_CopyScriptAction;
-  QProcess* m_Process;
+  QMenu *m_ContextMenu;
+  QAction *m_CopyPlotAction;
+  QAction *m_CopyScriptAction;
+  QProcess *m_Process;
   QString m_GnuplotPath;
   QStringList m_Commands;
   itk::TimeStamp m_ModifiedTime;

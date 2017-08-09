@@ -22,6 +22,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <regex>
 
+namespace
+{
+  std::string GenerateRegExForNumber(unsigned int tagNumber)
+  {
+    std::ostringstream resultRegEx;
+
+    std::ostringstream hexNumber;
+    hexNumber << std::hex << tagNumber; // default std::hex output is lowercase
+    std::regex reg_character("([a-f]+)"); // so only check for lowercase characters here
+    if (std::regex_search(hexNumber.str(), reg_character))
+    {
+      // hexNumber contains a characters from a-f
+      // needs to be generated with lowercase and uppercase characters
+      resultRegEx << "("
+        << std::setw(4) << std::setfill('0') << std::hex << tagNumber
+        << "|"
+        << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << tagNumber << std::nouppercase
+        << ")";
+    }
+    else
+    {
+      // only decimal values (0-9) contained in hexNumber - no need to modify the result
+      resultRegEx << std::setw(4) << std::setfill('0') << std::hex << tagNumber;
+    }
+
+    return resultRegEx.str();
+  }
+}
+
 namespace mitk
 {
 
@@ -184,7 +213,11 @@ namespace mitk
       }
       else if (node.type != NodeInfo::NodeType::Invalid)
       {
-        nameStream << "(" << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetGroup() << "," << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetElement()<<")";
+        nameStream << "("
+                   << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetGroup() << std::nouppercase
+                   << ","
+                   << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetElement() << std::nouppercase
+                   << ")";
 
         if (node.type == NodeInfo::NodeType::SequenceSelection)
         {
@@ -301,9 +334,9 @@ namespace mitk
       }
       else
       {
-        std::regex reg_element("\\((\\d{4}),(\\d{4})\\)");
-        std::regex reg_anySelection("\\((\\d{4}),(\\d{4})\\)\\[\\*\\]");
-        std::regex reg_Selection("\\((\\d{4}),(\\d{4})\\)\\[(\\d+)\\]");
+        std::regex reg_element("\\(([A - Fa - f\\d]{4}),([A - Fa - f\\d]{4})\\)");
+        std::regex reg_anySelection("\\(([A - Fa - f\\d]{4}),([A - Fa - f\\d]{4})\\)\\[\\*\\]");
+        std::regex reg_Selection("\\(([A - Fa - f\\d]{4}),([A - Fa - f\\d]{4})\\)\\[(\\d+)\\]");
         std::smatch sm;
         if (std::regex_match(subStr, sm, reg_anySelection))
         {
@@ -387,18 +420,7 @@ namespace mitk
     return os;
   };
 
-
-  std::string DICOMTagPathToDCMTKSearchPath(const DICOMTagPath& tagPath)
-  {
-    if (!tagPath.IsExplicit() && !tagPath.HasItemSelectionWildcardsOnly())
-    {
-      mitkThrow() << "Cannot convert DICOMTagPath into DCMTK search path. Path has element wild cards. Path: " << tagPath.ToStr();
-    }
-
-    return tagPath.ToStr();
-  };
-
-  std::string DICOMTagPathToPropertRegEx(const DICOMTagPath& tagPath)
+  std::string DICOMTagPathToPropertyRegEx(const DICOMTagPath& tagPath)
   {
     std::ostringstream nameStream;
 
@@ -410,11 +432,13 @@ namespace mitk
 
       if (node.type == DICOMTagPath::NodeInfo::NodeType::AnyElement)
       {
-        nameStream << "(\\d{4})\\.(\\d{4})";
+        nameStream << "([A-Fa-f\\d]{4})\\.([A-Fa-f\\d]{4})";
       }
       else if (node.type != DICOMTagPath::NodeInfo::NodeType::Invalid)
       {
-        nameStream << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetGroup() << "\\." << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetElement();
+        nameStream << GenerateRegExForNumber(node.tag.GetGroup())
+          << "\\."
+          << GenerateRegExForNumber(node.tag.GetElement());
 
         if (node.type == DICOMTagPath::NodeInfo::NodeType::SequenceSelection)
         {
@@ -446,11 +470,13 @@ namespace mitk
 
       if (node.type == DICOMTagPath::NodeInfo::NodeType::AnyElement)
       {
-        nameStream << "(\\d{4})_(\\d{4})";
+        nameStream << "([A-Fa-f\\d]{4})_([A-Fa-f\\d]{4})";
       }
       else if (node.type != DICOMTagPath::NodeInfo::NodeType::Invalid)
       {
-        nameStream << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetGroup() << "_" << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetElement();
+        nameStream << GenerateRegExForNumber(node.tag.GetGroup())
+          << "_"
+          << GenerateRegExForNumber(node.tag.GetElement());
 
         if (node.type == DICOMTagPath::NodeInfo::NodeType::SequenceSelection)
         {
@@ -489,7 +515,8 @@ namespace mitk
       }
       else if (node.type != DICOMTagPath::NodeInfo::NodeType::Invalid)
       {
-        nameStream << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetGroup() << "_" << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetElement();
+        nameStream << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetGroup() << std::nouppercase << "_"
+          << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetElement();
 
         if (node.type == DICOMTagPath::NodeInfo::NodeType::SequenceSelection)
         {
@@ -528,7 +555,8 @@ namespace mitk
       }
       else if (node.type != DICOMTagPath::NodeInfo::NodeType::Invalid)
       {
-        nameStream << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetGroup() << "." << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetElement();
+        nameStream << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetGroup() << std::nouppercase << "."
+          << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetElement();
 
         if (node.type == DICOMTagPath::NodeInfo::NodeType::SequenceSelection)
         {
@@ -546,6 +574,17 @@ namespace mitk
     }
 
     return nameStream.str();
+  };
+
+
+  std::string DICOMTagPathToDCMTKSearchPath(const DICOMTagPath& tagPath)
+  {
+    if (!tagPath.IsExplicit() && !tagPath.HasItemSelectionWildcardsOnly())
+    {
+      mitkThrow() << "Cannot convert DICOMTagPath into DCMTK search path. Path has element wild cards. Path: " << tagPath.ToStr();
+    }
+
+    return tagPath.ToStr();
   };
 
 
@@ -586,7 +625,7 @@ namespace mitk
         }
         else
         {
-          std::regex reg_element("(\\d{4})");
+          std::regex reg_element("([A-Fa-f\\d]{4})");
           std::regex reg_anySelection("\\[\\*\\]");
           std::regex reg_Selection("\\[(\\d+)\\]");
           std::smatch sm;
@@ -667,7 +706,8 @@ namespace mitk
       }
       else if (node.type != DICOMTagPath::NodeInfo::NodeType::Invalid)
       {
-        nameStream << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetGroup() << "." << std::setw(4) << std::setfill('0') << std::hex << node.tag.GetElement();
+        nameStream << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetGroup() << std::nouppercase << "."
+          << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << node.tag.GetElement();
 
         if (node.type == DICOMTagPath::NodeInfo::NodeType::SequenceSelection)
         {
@@ -686,5 +726,4 @@ namespace mitk
 
     return nameStream.str();
   };
-
 }

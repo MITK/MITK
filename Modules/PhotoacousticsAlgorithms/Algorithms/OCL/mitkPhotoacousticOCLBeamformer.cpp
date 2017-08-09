@@ -64,7 +64,7 @@ void mitk::PhotoacousticOCLBeamformer::Execute()
   }
   catch (const mitk::Exception& e)
   {
-    MITK_ERROR << "Catched exception while initializing filter: " << e.what();
+    MITK_ERROR << "Caught exception while initializing filter: " << e.what();
     return;
   }
 

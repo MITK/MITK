@@ -14,22 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
 
 #include "mitkTestingMacros.h"
 
 void CheckRWSize(int width, int height)
 {
-  MITK_TEST_OUTPUT(<<"Requesting VTK render window of size " << width << "x" << height );
+  MITK_TEST_OUTPUT(<< "Requesting VTK render window of size " << width << "x" << height);
   vtkSmartPointer<vtkRenderWindow> renderWindowVTK = vtkRenderWindow::New();
-  renderWindowVTK->SetSize( width, height );
+  renderWindowVTK->SetSize(width, height);
   renderWindowVTK->SetOffScreenRendering(1); // seems to be related to off-screen rendering (only?)
 
-  int* renderWindowSize = renderWindowVTK->GetSize();
+  int *renderWindowSize = renderWindowVTK->GetSize();
 
-  MITK_TEST_CONDITION( renderWindowSize[0] >= width, "  Window is at least " << width << "px wide (actually:" << renderWindowSize[0] << ")" );
-  MITK_TEST_CONDITION( renderWindowSize[1] >= height, "  Window is at least " << height << "px high (actually:" << renderWindowSize[1] << ")" );
+  MITK_TEST_CONDITION(renderWindowSize[0] >= width,
+                      "  Window is at least " << width << "px wide (actually:" << renderWindowSize[0] << ")");
+  MITK_TEST_CONDITION(renderWindowSize[1] >= height,
+                      "  Window is at least " << height << "px high (actually:" << renderWindowSize[1] << ")");
 }
 
 /**
@@ -41,14 +43,15 @@ void CheckRWSize(int width, int height)
   After moving over to Visual Studio 2012, we found a strange problem where vtkRenderWindow GetSize()
   returns something different than what was provided to SetSize().
   Specifically, width and height are 8 pixels less than expected.
-  I found a problem report which appears to describe what we are seeing. The problem goes away if we change the desktop theme to Windows Classic.
+  I found a problem report which appears to describe what we are seeing. The problem goes away if we change the desktop
+  theme to Windows Classic.
   "
 
   the patch from this bug should be applied to MITK's default VTK version.
 
   Test can be removed with VTK 6.
 */
-int mitkVTKRenderWindowSizeTest(int /*argc*/, char* /*argv*/[])
+int mitkVTKRenderWindowSizeTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("mitkVTKRenderWindowSizeTest")
 

@@ -17,28 +17,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSURFACETOPOINTSETFILTER_H_HEADER_INCLUDED_
 #define MITKSURFACETOPOINTSETFILTER_H_HEADER_INCLUDED_
 
-//mitk headers
-#include <mitkPointSetSource.h>
+// mitk headers
 #include "mitkSurface.h"
+#include <mitkPointSetSource.h>
 
-namespace mitk {
-
-
- /** Documentation
-  *  @brief This filter converts the input surface into a point set. The output point set contains every point exactly one time
-  *         (no dublicated points like in the stl-format).
-  */
+namespace mitk
+{
+  /** Documentation
+   *  @brief This filter converts the input surface into a point set. The output point set contains every point exactly
+   * one time
+   *         (no dublicated points like in the stl-format).
+   */
 
   class SurfaceToPointSetFilter : public mitk::PointSetSource
   {
   public:
+    mitkClassMacro(SurfaceToPointSetFilter, mitk::PointSetSource);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro(SurfaceToPointSetFilter,mitk::PointSetSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    using Superclass::SetInput;
     void SetInput(mitk::Surface::Pointer m_InputSurface);
-
 
     std::string GetErrorMessage();
 
@@ -52,7 +50,6 @@ namespace mitk {
     //############### members ########################
     mitk::Surface::Pointer m_InputSurface;
     std::string m_ErrorMessage;
-
   };
 
 } // namespace mitk

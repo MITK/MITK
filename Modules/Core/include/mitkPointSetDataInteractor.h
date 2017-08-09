@@ -18,11 +18,11 @@
 #define mitkPointSetDataInteractor_h_
 
 #include "itkObject.h"
-#include "itkSmartPointer.h"
 #include "itkObjectFactory.h"
+#include "itkSmartPointer.h"
 #include "mitkCommon.h"
-#include <MitkCoreExports.h>
 #include "mitkDataInteractor.h"
+#include <MitkCoreExports.h>
 #include <mitkPointSet.h>
 
 namespace mitk
@@ -41,7 +41,8 @@ namespace mitk
    * in 2d and 3d render windows.
    *
    * \warn If this Interactor is assigned (SetDataNode) an empty mitk::DataNode it creates a point set,
-   * changing the point set of the assigned mitk::DataNode after this assignment will cause the mitk::PointSetDataInteractor
+   * changing the point set of the assigned mitk::DataNode after this assignment will cause the
+  mitk::PointSetDataInteractor
    * to not work properly. So the usage has follow this general scheme:
    *
    * \code
@@ -53,28 +54,26 @@ namespace mitk
     m_TestPointSet = mitk::PointSet::New();
     // Add the point set to the mitk::DataNode *before* the DataNode is added to the mitk::PointSetDataInteractor
     m_TestPointSetNode->SetData(m_TestPointSet);
-    // finally add the mitk::DataNode (which already is added to the mitk::DataStorage) to the mitk::PointSetDataInteractor
+    // finally add the mitk::DataNode (which already is added to the mitk::DataStorage) to the
+  mitk::PointSetDataInteractor
     m_CurrentInteractor->SetDataNode(m_TestPointSetNode);
 
-\endcode
+  \endcode
    *
    *
    */
 
   // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-  class MITKCORE_EXPORT PointSetDataInteractor: public DataInteractor
+  class MITKCORE_EXPORT PointSetDataInteractor : public DataInteractor
   {
-
   public:
-    mitkClassMacro(PointSetDataInteractor, DataInteractor)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(PointSetDataInteractor, DataInteractor) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /**
-     * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
-     */
-    void SetAccuracy(float accuracy);
-
+      /**
+       * Sets the maximum distance that is accepted when looking for a point at a certain position using the
+       * GetPointIndexByPosition function.
+       */
+      void SetAccuracy(float accuracy);
 
     /**
      * @brief SetMaxPoints Sets the maximal number of points for the pointset
@@ -109,66 +108,64 @@ namespace mitk
      */
     virtual int GetPointIndexByPosition(Point3D position, unsigned int time = 0, float accuracy = -1);
 
-
-
-    virtual bool CheckSelection( const InteractionEvent* interactionEvent );
+    virtual bool CheckSelection(const InteractionEvent *interactionEvent);
 
     /** Adds a point at the given coordinates.
      *  Every time a point is added it is also checked if the maximal number of points is reached,
      *  and if so an InternalEvent with the signal name "MaxNumberOfPoints" is triggered.
      */
-    virtual void AddPoint(StateMachineAction*, InteractionEvent* event);
+    virtual void AddPoint(StateMachineAction *, InteractionEvent *event);
 
     /** Removes point that is selected */
-    virtual void RemovePoint(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void RemovePoint(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
      * Checks if new point is close enough to an old one,
      * if so, trigger the ClosedContour signal which can be caught by the state machine.
      */
-    virtual void IsClosedContour(StateMachineAction*, InteractionEvent*);
+    virtual void IsClosedContour(StateMachineAction *, InteractionEvent *);
 
     /**
      * Moves the currently selected point to the new coodinates.
      */
-    virtual void MovePoint(StateMachineAction*, InteractionEvent*);
+    virtual void MovePoint(StateMachineAction *, InteractionEvent *);
 
     /**
      * Initializes the movement, stores starting position.
      */
-    virtual void InitMove(StateMachineAction*, InteractionEvent*interactionEvent);
+    virtual void InitMove(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
      * Is called when a movement is finished, changes back to regular color.
      */
-    virtual void FinishMove(StateMachineAction*, InteractionEvent*);
+    virtual void FinishMove(StateMachineAction *, InteractionEvent *);
 
     /**
      * Selects a point from the PointSet as currently active.
      */
-    virtual void SelectPoint(StateMachineAction*, InteractionEvent*);
+    virtual void SelectPoint(StateMachineAction *, InteractionEvent *);
 
     /**
      * Unselects a point at the given coordinate.
      */
-    virtual void UnSelectPointAtPosition(StateMachineAction*, InteractionEvent*);
+    virtual void UnSelectPointAtPosition(StateMachineAction *, InteractionEvent *);
 
     /**
      * Unselects all points out of reach.
      */
-    virtual void UnSelectAll(StateMachineAction*, InteractionEvent*);
-
+    virtual void UnSelectAll(StateMachineAction *, InteractionEvent *);
 
     /**
-     * @brief UpdatePointSet Updates the member variable that holds the point set, evaluating the time step of the sender.
+     * @brief UpdatePointSet Updates the member variable that holds the point set, evaluating the time step of the
+     * sender.
      */
 
-    virtual void UpdatePointSet(StateMachineAction* stateMachineAction, InteractionEvent*);
+    virtual void UpdatePointSet(StateMachineAction *stateMachineAction, InteractionEvent *);
 
     /**
      * Calls for inactivation of the DataInteractor
      */
-    virtual void Abort(StateMachineAction*, InteractionEvent*);
+    virtual void Abort(StateMachineAction *, InteractionEvent *);
 
     /** \brief to calculate a direction vector from last point and actual
      * point
@@ -180,13 +177,12 @@ namespace mitk
 
     // DATA
     PointSet::Pointer m_PointSet;
-    int m_MaxNumberOfPoints; // maximum of allowed number of points
+    int m_MaxNumberOfPoints;   // maximum of allowed number of points
     float m_SelectionAccuracy; // accuracy that's needed to select a point
 
     // FUNCTIONS
-    void UnselectAll(unsigned int timeStep , ScalarType timeInMs);
-    void SelectPoint(int position, unsigned int timeStep  , ScalarType timeInMS);
+    void UnselectAll(unsigned int timeStep, ScalarType timeInMs);
+    void SelectPoint(int position, unsigned int timeStep, ScalarType timeInMS);
   };
-
 }
 #endif

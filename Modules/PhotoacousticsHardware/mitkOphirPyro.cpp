@@ -81,10 +81,8 @@ void mitk::OphirPyro::SaveCsvData()
   std::string currentDate = std::ctime(timeptr);
   replaceAll(currentDate, ":", "-");
   currentDate.pop_back();
-  std::string MakeFolder = "mkdir \"c:/DiPhASTimeStamps/" + currentDate + "\"";
-  system(MakeFolder.c_str());
 
-  std::string pathTS = "c:\\DiPhASTimeStamps\\" + currentDate + " Timestamps" + ".csv";
+  std::string pathTS = "c:\\ImageData\\" + currentDate + " pyro-ts" + ".csv";
 
   std::ofstream timestampFile;
   timestampFile.open(pathTS);
@@ -95,7 +93,7 @@ void mitk::OphirPyro::SaveCsvData()
 
   for (int index = 0; index < currentSize; ++index)
   {
-    timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergy.at(index) << "," << (long)m_PulseTime.at(index);
+    timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergySaved.at(index) << "," << (long)m_PulseTimeSaved.at(index);
   }
   timestampFile.close();
 }
@@ -134,12 +132,15 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
       if (noPackages > 0)
       {
         m_PulseEnergy.insert(m_PulseEnergy.end(), newEnergy.begin(), newEnergy.end());
-        for (int i=0; i<noPackages; i++)
+        for (unsigned int i=0; i<noPackages; i++)
           m_TimeStamps.push_back(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
         m_PulseTime.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());
         m_PulseStatus.insert(m_PulseStatus.end(), newStatus.begin(), newStatus.end());
-        MITK_INFO << "Data";
+
+        m_PulseEnergySaved.insert(m_PulseEnergySaved.end(), newEnergy.begin(), newEnergy.end());
+        m_PulseTimeSaved.insert(m_PulseTimeSaved.end(), newTimestamp.begin(), newTimestamp.end());
+        m_PulseStatusSaved.insert(m_PulseStatusSaved.end(), newStatus.begin(), newStatus.end());
       }
     }
     catch (std::exception& ex)
@@ -286,10 +287,33 @@ bool mitk::OphirPyro::OpenConnection()
 {
   if (!m_Connected)
   {
-    char* m_SerialNumber = ophirAPI.ScanUSB();
+    char* m_SerialNumber;
+    try {
+      MITK_INFO << "Scanning for Ophir connection";
+      m_SerialNumber = ophirAPI.ScanUSB();
+    }
+    catch (...)
+    {
+      MITK_INFO << "Scanning failed, trying again in 2 seconds...";
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+      MITK_INFO << "Scanning for Ophir connection";
+      m_SerialNumber = ophirAPI.ScanUSB();
+    }
+
     if (m_SerialNumber != 0)
     {
-      m_DeviceHandle = ophirAPI.OpenDevice(m_SerialNumber);
+      try {
+        MITK_INFO << "Opening Ophir connection";
+        m_DeviceHandle = ophirAPI.OpenDevice(m_SerialNumber);
+      }
+      catch (...)
+      {
+        MITK_INFO << "Ophir connection failed, trying again in 2 seconds...";
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        MITK_INFO << "Opening Ophir connection";
+        m_DeviceHandle = ophirAPI.OpenDevice(m_SerialNumber);
+      }
+      
       if (m_DeviceHandle != 0)
       {
         m_Connected = true;

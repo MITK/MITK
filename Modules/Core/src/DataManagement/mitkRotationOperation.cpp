@@ -14,12 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkRotationOperation.h"
 
-mitk::RotationOperation::RotationOperation(OperationType operationType, Point3D pointOfRotation, Vector3D vectorOfRotation, ScalarType angleOfRotation)
-  : mitk::Operation(operationType)
-  , m_AngleOfRotation(angleOfRotation), m_PointOfRotation(pointOfRotation), m_VectorOfRotation(vectorOfRotation)
+mitk::RotationOperation::RotationOperation(OperationType operationType,
+                                           Point3D pointOfRotation,
+                                           Vector3D vectorOfRotation,
+                                           ScalarType angleOfRotation)
+  : mitk::Operation(operationType),
+    m_AngleOfRotation(angleOfRotation),
+    m_PointOfRotation(pointOfRotation),
+    m_VectorOfRotation(vectorOfRotation)
 {
 }
 

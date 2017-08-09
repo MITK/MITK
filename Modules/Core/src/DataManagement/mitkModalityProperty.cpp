@@ -21,50 +21,48 @@ mitk::ModalityProperty::ModalityProperty()
   AddEnumerationTypes();
 }
 
-mitk::ModalityProperty::ModalityProperty( const IdType& value )
+mitk::ModalityProperty::ModalityProperty(const IdType &value)
 {
   AddEnumerationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    SetValue( value ) ;
+    SetValue(value);
   }
   else
   {
-    SetValue( 0 );
+    SetValue(0);
   }
 }
 
-mitk::ModalityProperty::ModalityProperty( const std::string& value )
+mitk::ModalityProperty::ModalityProperty(const std::string &value)
 {
   AddEnumerationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    SetValue( value );
+    SetValue(value);
   }
   else
   {
-    SetValue( "undefined" );
+    SetValue("undefined");
   }
 }
-
 
 mitk::ModalityProperty::~ModalityProperty()
 {
 }
 
-
 void mitk::ModalityProperty::AddEnumerationTypes()
 {
   IdType newId = static_cast<IdType>(EnumerationProperty::Size());
 
-  AddEnum( "undefined", newId++ );
-  AddEnum( "CR", newId++ ); // computer radiography
-  AddEnum( "CT", newId++ ); // computed tomography
-  AddEnum( "MR", newId++ ); // magnetic resonance
-  AddEnum( "NM", newId++ ); // nuclear medicine
-  AddEnum( "US", newId++ ); // ultrasound
-  AddEnum( "Color Doppler", newId++ ); // ultrasound
-  AddEnum( "Power Doppler", newId++ ); // ultrasound
+  AddEnum("undefined", newId++);
+  AddEnum("CR", newId++);            // computer radiography
+  AddEnum("CT", newId++);            // computed tomography
+  AddEnum("MR", newId++);            // magnetic resonance
+  AddEnum("NM", newId++);            // nuclear medicine
+  AddEnum("US", newId++);            // ultrasound
+  AddEnum("Color Doppler", newId++); // ultrasound
+  AddEnum("Power Doppler", newId++); // ultrasound
 }
 
 itk::LightObject::Pointer mitk::ModalityProperty::InternalClone() const

@@ -19,26 +19,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 
-namespace mitk {
-  class MITKCORE_EXPORT TestManager {
-    public:
-      TestManager() : m_FailedTests(0), m_PassedTests(0) {}
-      static TestManager* GetInstance();
-      /** \brief Must be called at the beginning of a test run. */
-      void Initialize();
-      int NumberOfFailedTests();
-      int NumberOfPassedTests();
-      /** \brief Tell manager a subtest failed */
-      void TestFailed();
-      /** \brief Tell manager a subtest passed */
-      void TestPassed();
-      virtual ~TestManager() {}
-    protected:
-      int m_FailedTests;
-      int m_PassedTests;
+namespace mitk
+{
+  class MITKCORE_EXPORT TestManager
+  {
+  public:
+    TestManager() : m_FailedTests(0), m_PassedTests(0) {}
+    static TestManager *GetInstance();
+    /** \brief Must be called at the beginning of a test run. */
+    void Initialize();
+    int NumberOfFailedTests();
+    int NumberOfPassedTests();
+    /** \brief Tell manager a subtest failed */
+    void TestFailed();
+    /** \brief Tell manager a subtest passed */
+    void TestPassed();
+    virtual ~TestManager() {}
+  protected:
+    int m_FailedTests;
+    int m_PassedTests;
   };
 }
-
-
 
 #endif // MITK_TESTMANAGER_H_INCLUDED

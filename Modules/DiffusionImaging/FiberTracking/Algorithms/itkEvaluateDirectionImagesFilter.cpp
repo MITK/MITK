@@ -31,8 +31,8 @@ namespace itk {
 template< class PixelType >
 EvaluateDirectionImagesFilter< PixelType >
 ::EvaluateDirectionImagesFilter():
-    m_ImageSet(NULL),
-    m_ReferenceImageSet(NULL),
+    m_ImageSet(nullptr),
+    m_ReferenceImageSet(nullptr),
     m_IgnoreMissingDirections(false),
     m_IgnoreEmptyVoxels(false),
     m_Eps(0.0001)

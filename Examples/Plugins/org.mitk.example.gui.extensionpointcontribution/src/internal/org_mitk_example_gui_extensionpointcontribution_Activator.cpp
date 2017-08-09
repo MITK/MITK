@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ChangeTextToLowerCase.h"
 #include "ChangeTextToUpperCase.h"
 
-void org_mitk_example_gui_extensionpointcontribution_Activator::start(ctkPluginContext* context)
+void org_mitk_example_gui_extensionpointcontribution_Activator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(ChangeTextToLowerCase, context)
   BERRY_REGISTER_EXTENSION_CLASS(ChangeTextToUpperCase, context)
 }
 
-void org_mitk_example_gui_extensionpointcontribution_Activator::stop(ctkPluginContext* context)
+void org_mitk_example_gui_extensionpointcontribution_Activator::stop(ctkPluginContext *context)
 {
   Q_UNUSED(context)
 }

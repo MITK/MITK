@@ -20,31 +20,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 
 // itk
-#include <itkBinaryThresholdImageFilter.h>
 #include <itkAntiAliasBinaryImageFilter.h>
-#include <itkLabelObject.h>
-#include <itkLabelMap.h>
-#include <itkLabelImageToLabelMapFilter.h>
 #include <itkAutoCropLabelMapFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkLabelImageToLabelMapFilter.h>
+#include <itkLabelMap.h>
 #include <itkLabelMapToLabelImageFilter.h>
-#include <itkSmoothingRecursiveGaussianImageFilter.h>
+#include <itkLabelObject.h>
 #include <itkNumericTraits.h>
+#include <itkSmoothingRecursiveGaussianImageFilter.h>
 
 // vtk
-#include <vtkSmartPointer.h>
-#include <vtkMarchingCubes.h>
-#include <vtkLinearTransform.h>
-#include <vtkImageChangeInformation.h>
 #include <vtkCleanPolyData.h>
+#include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
+#include <vtkLinearTransform.h>
+#include <vtkMarchingCubes.h>
+#include <vtkSmartPointer.h>
 
-
-mitk::LabelSetImageToSurfaceFilter::LabelSetImageToSurfaceFilter() :
-m_GenerateAllLabels(false),
-m_RequestedLabel(1),
-m_BackgroundLabel(0),
-m_UseSmoothing(0),
-m_Sigma(0.1)
+mitk::LabelSetImageToSurfaceFilter::LabelSetImageToSurfaceFilter()
+  : m_GenerateAllLabels(false), m_RequestedLabel(1), m_BackgroundLabel(0), m_UseSmoothing(0), m_Sigma(0.1)
 {
 }
 
@@ -55,7 +50,7 @@ mitk::LabelSetImageToSurfaceFilter::~LabelSetImageToSurfaceFilter()
 void mitk::LabelSetImageToSurfaceFilter::SetInput(const mitk::Image *image)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, const_cast< mitk::Image * >( image ) );
+  this->ProcessObject::SetNthInput(0, const_cast<mitk::Image *>(image));
 }
 /*
 void mitk::LabelSetImageToSurfaceFilter::SetObserver(mitk::ProcessObserver::Pointer observer)
@@ -70,50 +65,52 @@ const mitk::Image *mitk::LabelSetImageToSurfaceFilter::GetInput(void)
     return nullptr;
   }
 
-  return static_cast<const mitk::Image * >( this->ProcessObject::GetInput(0) );
+  return static_cast<const mitk::Image *>(this->ProcessObject::GetInput(0));
 }
 
 void mitk::LabelSetImageToSurfaceFilter::GenerateOutputInformation()
 {
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 }
 
 void mitk::LabelSetImageToSurfaceFilter::GenerateData()
 {
   Image::ConstPointer inputImage = this->GetInput();
-  if ( inputImage.IsNull() ) return;
+  if (inputImage.IsNull())
+    return;
 
-  mitk::Surface* outputSurface = this->GetOutput( );
-  if (!outputSurface) return;
+  mitk::Surface *outputSurface = this->GetOutput();
+  if (!outputSurface)
+    return;
 
-  AccessFixedDimensionByItk_1( inputImage, InternalProcessing, 3, outputSurface );
+  AccessFixedDimensionByItk_1(inputImage, InternalProcessing, 3, outputSurface);
 }
 
-template < typename TPixel, unsigned int VDimension >
-void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TPixel, VDimension>* input, mitk::Surface* /*surface*/ )
+template <typename TPixel, unsigned int VDimension>
+void mitk::LabelSetImageToSurfaceFilter::InternalProcessing(const itk::Image<TPixel, VDimension> *input,
+                                                            mitk::Surface * /*surface*/)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
 
-  typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > BinaryThresholdFilterType;
-  typedef itk::LabelObject< TPixel, VDimension > LabelObjectType;
-  typedef itk::LabelMap< LabelObjectType > LabelMapType;
-  typedef itk::LabelImageToLabelMapFilter< ImageType, LabelMapType > Image2LabelMapType;
-  typedef itk::AutoCropLabelMapFilter< LabelMapType > AutoCropType;
-  typedef itk::LabelMapToLabelImageFilter< LabelMapType, ImageType > LabelMap2ImageType;
+  typedef itk::BinaryThresholdImageFilter<ImageType, ImageType> BinaryThresholdFilterType;
+  typedef itk::LabelObject<TPixel, VDimension> LabelObjectType;
+  typedef itk::LabelMap<LabelObjectType> LabelMapType;
+  typedef itk::LabelImageToLabelMapFilter<ImageType, LabelMapType> Image2LabelMapType;
+  typedef itk::AutoCropLabelMapFilter<LabelMapType> AutoCropType;
+  typedef itk::LabelMapToLabelImageFilter<LabelMapType, ImageType> LabelMap2ImageType;
 
   typedef itk::Image<float, VDimension> RealImageType;
 
-  typedef itk::AntiAliasBinaryImageFilter< ImageType, RealImageType >  AntiAliasFilterType;
-  typedef itk::SmoothingRecursiveGaussianImageFilter< RealImageType, RealImageType >  GaussianFilterType;
-
+  typedef itk::AntiAliasBinaryImageFilter<ImageType, RealImageType> AntiAliasFilterType;
+  typedef itk::SmoothingRecursiveGaussianImageFilter<RealImageType, RealImageType> GaussianFilterType;
 
   typename BinaryThresholdFilterType::Pointer thresholdFilter = BinaryThresholdFilterType::New();
-  thresholdFilter->SetInput( input );
+  thresholdFilter->SetInput(input);
   thresholdFilter->SetLowerThreshold(m_RequestedLabel);
   thresholdFilter->SetUpperThreshold(m_RequestedLabel);
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
-//  thresholdFilter->ReleaseDataFlagOn();
+  //  thresholdFilter->ReleaseDataFlagOn();
   thresholdFilter->Update();
 
   typename Image2LabelMapType::Pointer image2label = Image2LabelMapType::New();
@@ -125,17 +122,17 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TP
   border[2] = 3;
 
   typename AutoCropType::Pointer autoCropFilter = AutoCropType::New();
-  autoCropFilter->SetInput( image2label->GetOutput() );
+  autoCropFilter->SetInput(image2label->GetOutput());
   autoCropFilter->SetCropBorder(border);
   autoCropFilter->InPlaceOn();
 
   typename LabelMap2ImageType::Pointer label2image = LabelMap2ImageType::New();
-  label2image->SetInput( autoCropFilter->GetOutput() );
+  label2image->SetInput(autoCropFilter->GetOutput());
 
   label2image->Update();
 
   typename AntiAliasFilterType::Pointer antiAliasFilter = AntiAliasFilterType::New();
-  antiAliasFilter->SetInput( label2image->GetOutput() );
+  antiAliasFilter->SetInput(label2image->GetOutput());
   antiAliasFilter->SetMaximumRMSError(0.001);
   antiAliasFilter->SetNumberOfLayers(3);
   antiAliasFilter->SetUseImageSpacing(false);
@@ -148,8 +145,8 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TP
   if (m_UseSmoothing)
   {
     typename GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
-    gaussianFilter->SetSigma( m_Sigma );
-    gaussianFilter->SetInput( antiAliasFilter->GetOutput() );
+    gaussianFilter->SetSigma(m_Sigma);
+    gaussianFilter->SetInput(antiAliasFilter->GetOutput());
     gaussianFilter->Update();
     result = gaussianFilter->GetOutput();
   }
@@ -163,22 +160,23 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TP
   typename ImageType::RegionType cropRegion;
   cropRegion = autoCropFilter->GetOutput()->GetLargestPossibleRegion();
 
-  const typename ImageType::IndexType& cropIndex = cropRegion.GetIndex();
+  const typename ImageType::IndexType &cropIndex = cropRegion.GetIndex();
 
   m_ResultImage = mitk::Image::New();
   mitk::CastToMitkImage(result, m_ResultImage);
 
-  mitk::BaseGeometry* newGeometry = m_ResultImage->GetSlicedGeometry();
+  mitk::BaseGeometry *newGeometry = m_ResultImage->GetSlicedGeometry();
   mitk::Point3D origin;
   vtk2itk(cropIndex, origin);
   this->GetInput()->GetGeometry()->IndexToWorld(origin, origin);
   newGeometry->SetOrigin(origin);
 
-  vtkImageData* vtkimage = const_cast<vtkImageData*>(m_ResultImage->GetVtkImageData(0));
+  vtkImageData *vtkimage = const_cast<vtkImageData *>(m_ResultImage->GetVtkImageData(0));
 
-  vtkSmartPointer<vtkImageChangeInformation> indexCoordinatesImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
+  vtkSmartPointer<vtkImageChangeInformation> indexCoordinatesImageFilter =
+    vtkSmartPointer<vtkImageChangeInformation>::New();
   indexCoordinatesImageFilter->SetInputData(vtkimage);
-  indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
+  indexCoordinatesImageFilter->SetOutputOrigin(0.0, 0.0, 0.0);
 
   vtkSmartPointer<vtkMarchingCubes> marching = vtkSmartPointer<vtkMarchingCubes>::New();
   marching->ComputeScalarsOff();
@@ -189,29 +187,29 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( const itk::Image<TP
 
   marching->Update();
 
-  vtkPolyData* polydata = marching->GetOutput();
+  vtkPolyData *polydata = marching->GetOutput();
 
-  if ( (!polydata) || (!polydata->GetNumberOfPoints()) )
-    throw itk::ExceptionObject (__FILE__,__LINE__,"marching cubes has failed.");
+  if ((!polydata) || (!polydata->GetNumberOfPoints()))
+    throw itk::ExceptionObject(__FILE__, __LINE__, "marching cubes has failed.");
 
   mitk::Vector3D spacing = newGeometry->GetSpacing();
 
-  vtkPoints * points = polydata->GetPoints();
+  vtkPoints *points = polydata->GetPoints();
   vtkMatrix4x4 *vtkmatrix = vtkMatrix4x4::New();
   newGeometry->GetVtkTransform()->GetMatrix(vtkmatrix);
-  double (*matrix)[4] = vtkmatrix->Element;
+  double(*matrix)[4] = vtkmatrix->Element;
 
-  for(int i=0;i<3;++i)
-    for(int j=0;j<3;++j)
-      matrix[i][j]/=spacing[j];
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      matrix[i][j] /= spacing[j];
 
   unsigned int n = points->GetNumberOfPoints();
   double point[3];
 
-  for (unsigned int i=0; i<n; i++)
+  for (unsigned int i = 0; i < n; i++)
   {
     points->GetPoint(i, point);
-    mitkVtkLinearTransformPoint(matrix,point,point);
+    mitkVtkLinearTransformPoint(matrix, point, point);
     points->SetPoint(i, point);
   }
   vtkmatrix->Delete();

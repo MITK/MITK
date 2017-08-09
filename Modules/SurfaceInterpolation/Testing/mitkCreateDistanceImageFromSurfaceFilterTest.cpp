@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkImageAccessByItk.h>
+#include <mitkComputeContourSetNormalsFilter.h>
 #include <mitkCreateDistanceImageFromSurfaceFilter.h>
 #include <mitkIOUtil.h>
+#include <mitkImageAccessByItk.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
-#include <mitkComputeContourSetNormalsFilter.h>
 
 #include <vtkDebugLeaks.h>
 
@@ -32,18 +32,12 @@ class mitkCreateDistanceImageFromSurfaceFilterTestSuite : public mitk::TestFixtu
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   std::vector<mitk::Surface::Pointer> contourList;
 
 public:
-
-  void setUp() override
-  {
-
-  }
-
-  template<typename TPixel, unsigned int VImageDimension>
-  void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result)
+  void setUp() override {}
+  template <typename TPixel, unsigned int VImageDimension>
+  void GetImageBase(itk::Image<TPixel, VImageDimension> *input, itk::ImageBase<3>::Pointer &result)
   {
     result->Graft(input);
   }
@@ -60,18 +54,20 @@ public:
       s << "SurfaceInterpolation/InterpolateLiver/LiverContourWithNormals_";
       s << i;
       s << ".vtk";
-      mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath(s.str()));
+      mitk::Surface::Pointer contour = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath(s.str()))[0].GetPointer());
       contourList.push_back(contour);
     }
 
-    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"));
+    mitk::Image::Pointer segmentationImage =
+      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"))[0].GetPointer());
 
     mitk::ComputeContourSetNormalsFilter::Pointer m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
-    mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter = mitk::CreateDistanceImageFromSurfaceFilter::New();
+    mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter =
+      mitk::CreateDistanceImageFromSurfaceFilter::New();
 
     itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-    AccessFixedDimensionByItk_1( segmentationImage, GetImageBase, 3, itkImage );
-    m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
+    AccessFixedDimensionByItk_1(segmentationImage, GetImageBase, 3, itkImage);
+    m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
 
     for (unsigned int j = 0; j < contourList.size(); j++)
     {
@@ -84,12 +80,12 @@ public:
     mitk::Image::Pointer liverDistanceImage = m_InterpolateSurfaceFilter->GetOutput();
 
     CPPUNIT_ASSERT(liverDistanceImage.IsNotNull());
-    mitk::Image::Pointer liverDistanceImageReference = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverDistanceImage.nrrd"));
+    mitk::Image::Pointer liverDistanceImageReference =
+      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverDistanceImage.nrrd"))[0].GetPointer());
 
-    CPPUNIT_ASSERT_MESSAGE("LiverDistanceImages are not equal!", mitk::Equal(*(liverDistanceImageReference), *(liverDistanceImage), 0.0001, true));
+    CPPUNIT_ASSERT_MESSAGE("LiverDistanceImages are not equal!",
+                           mitk::Equal(*(liverDistanceImageReference), *(liverDistanceImage), 0.0001, true));
   }
-
-
 
   void TestCreateDistanceImageForTube()
   {
@@ -102,19 +98,21 @@ public:
       s << "SurfaceInterpolation/InterpolateWithHoles/ContourWithHoles_";
       s << i;
       s << ".vtk";
-      mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath(s.str()));
+      mitk::Surface::Pointer contour = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath(s.str()))[0].GetPointer());
       contourList.push_back(contour);
     }
 
-    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/SegmentationWithHoles.nrrd"));
+    mitk::Image::Pointer segmentationImage =
+      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/SegmentationWithHoles.nrrd"))[0].GetPointer());
 
     mitk::ComputeContourSetNormalsFilter::Pointer m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
-    mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter = mitk::CreateDistanceImageFromSurfaceFilter::New();
+    mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter =
+      mitk::CreateDistanceImageFromSurfaceFilter::New();
 
     m_NormalsFilter->SetSegmentationBinaryImage(segmentationImage);
     itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-    AccessFixedDimensionByItk_1( segmentationImage, GetImageBase, 3, itkImage );
-    m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
+    AccessFixedDimensionByItk_1(segmentationImage, GetImageBase, 3, itkImage);
+    m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
 
     for (unsigned int j = 0; j < contourList.size(); j++)
     {
@@ -127,11 +125,12 @@ public:
     mitk::Image::Pointer holeDistanceImage = m_InterpolateSurfaceFilter->GetOutput();
 
     CPPUNIT_ASSERT(holeDistanceImage.IsNotNull());
-    mitk::Image::Pointer holesDistanceImageReference = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/HolesDistanceImage.nrrd"));
+    mitk::Image::Pointer holesDistanceImageReference =
+      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/HolesDistanceImage.nrrd"))[0].GetPointer());
 
-    CPPUNIT_ASSERT_MESSAGE("HolesDistanceImages are not equal!", mitk::Equal(*(holesDistanceImageReference), *(holeDistanceImage), 0.0001, true));
+    CPPUNIT_ASSERT_MESSAGE("HolesDistanceImages are not equal!",
+                           mitk::Equal(*(holesDistanceImageReference), *(holeDistanceImage), 0.0001, true));
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkCreateDistanceImageFromSurfaceFilter)

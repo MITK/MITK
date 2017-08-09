@@ -14,47 +14,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKPlanarFigureSOURCE_H_HEADER_INCLUDED
 #define MITKPlanarFigureSOURCE_H_HEADER_INCLUDED
 
+#include "mitkBaseDataSource.h"
+#include "mitkCommon.h"
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
-#include "mitkCommon.h"
-#include "mitkBaseDataSource.h"
 
 namespace mitk
 {
-/**
- * @brief Base class for all filters which have an object of type
- * mitk::PlanarFigure as output
- *
- * Base class for all filters which have an object of type mitk::PlanarFigure
- * as output. mitk::PlanarFigureSources do not provide support
- * for streaming, that is, that the requested region is always the largest
- * possible region.
- * @ingroup MitkPlanarFigureModule
- */
-class MITKPLANARFIGURE_EXPORT PlanarFigureSource : public mitk::BaseDataSource
-{
-public:
-    mitkClassMacro( PlanarFigureSource, BaseDataSource )
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+  /**
+   * @brief Base class for all filters which have an object of type
+   * mitk::PlanarFigure as output
+   *
+   * Base class for all filters which have an object of type mitk::PlanarFigure
+   * as output. mitk::PlanarFigureSources do not provide support
+   * for streaming, that is, that the requested region is always the largest
+   * possible region.
+   * @ingroup MitkPlanarFigureModule
+   */
+  class MITKPLANARFIGURE_EXPORT PlanarFigureSource : public mitk::BaseDataSource
+  {
+  public:
+    mitkClassMacro(PlanarFigureSource, BaseDataSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef mitk::PlanarFigure OutputType;
+      typedef mitk::PlanarFigure OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef itk::DataObject::Pointer DataObjectPointer;
 
     mitkBaseDataSourceGetOutputDeclarations
 
-    /**
-     * Allocates a new output object and returns it. Currently the
-     * index idx is not evaluated.
-     * @param idx the index of the output for which an object should be created
-     * @returns the new object
-     */
-    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
+      /**
+       * Allocates a new output object and returns it. Currently the
+       * index idx is not evaluated.
+       * @param idx the index of the output for which an object should be created
+       * @returns the new object
+       */
+      virtual itk::DataObject::Pointer
+      MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -70,9 +68,9 @@ public:
      */
     void GenerateInputRequestedRegion() override;
 
-protected:
+  protected:
     PlanarFigureSource();
     virtual ~PlanarFigureSource();
-};
+  };
 } // namespace mitk
 #endif

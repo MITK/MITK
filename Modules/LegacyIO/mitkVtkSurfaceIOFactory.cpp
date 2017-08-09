@@ -20,30 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-VtkSurfaceIOFactory::VtkSurfaceIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkVtkSurfaceReader",
-                         "mitk Vtk Surface IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<VtkSurfaceReader> >::New());
-}
+  VtkSurfaceIOFactory::VtkSurfaceIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkVtkSurfaceReader",
+                           "mitk Vtk Surface IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<VtkSurfaceReader>>::New());
+  }
 
-VtkSurfaceIOFactory::~VtkSurfaceIOFactory()
-{
-}
-
-const char* VtkSurfaceIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* VtkSurfaceIOFactory::GetDescription() const
-{
-  return "VtkSurface IO Factory, allows the loading of Vtk files";
-}
+  VtkSurfaceIOFactory::~VtkSurfaceIOFactory() {}
+  const char *VtkSurfaceIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *VtkSurfaceIOFactory::GetDescription() const
+  {
+    return "VtkSurface IO Factory, allows the loading of Vtk files";
+  }
 
 } // end namespace mitk

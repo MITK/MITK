@@ -24,9 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ChangeTextDescriptor : public berry::Object
 {
-
 public:
-
   berryObjectMacro(ChangeTextDescriptor);
 
   /**
@@ -77,10 +75,9 @@ public:
    *           the object for the equation
    * @return true, if the objects are equal :: false, if they differ in any way
    */
-  bool operator==(const Object* object) const override;
+  bool operator==(const Object *object) const override;
 
 private:
-
   // IConfigurationElements are used to access xml files (here: plugin.xml)
   berry::IConfigurationElement::Pointer m_ChangeTextExtensionPoint;
   IChangeText::Pointer m_ChangeText;
@@ -88,7 +85,6 @@ private:
   QString m_Id;
   QString m_Name;
   QString m_Description;
-
 };
 
 #endif /*CHANGETEXTDESCRIPTOR_H_*/

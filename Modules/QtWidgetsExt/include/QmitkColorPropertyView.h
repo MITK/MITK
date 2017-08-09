@@ -16,32 +16,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_COLORPROPERTYVIEW_H_INCLUDED
 #define QMITK_COLORPROPERTYVIEW_H_INCLUDED
 
-#include <mitkPropertyObserver.h>
 #include "MitkQtWidgetsExtExports.h"
-#include <mitkColorProperty.h>
 #include <QLabel>
+#include <mitkColorProperty.h>
+#include <mitkPropertyObserver.h>
 
 /// @ingroup Widgets
 class MITKQTWIDGETSEXT_EXPORT QmitkColorPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkColorPropertyView(const mitk::ColorProperty *, QWidget *parent);
+  virtual ~QmitkColorPropertyView();
 
-    QmitkColorPropertyView( const mitk::ColorProperty*, QWidget* parent );
-    virtual ~QmitkColorPropertyView();
+protected:
+  virtual void PropertyChanged() override;
+  virtual void PropertyRemoved() override;
 
-  protected:
+  void DisplayColor();
 
-    virtual void PropertyChanged() override;
-    virtual void PropertyRemoved() override;
+  const mitk::ColorProperty *m_ColorProperty;
 
-    void DisplayColor();
-
-    const mitk::ColorProperty* m_ColorProperty;
-
-    QPalette m_WidgetPalette;
+  QPalette m_WidgetPalette;
 };
 
 #endif
-

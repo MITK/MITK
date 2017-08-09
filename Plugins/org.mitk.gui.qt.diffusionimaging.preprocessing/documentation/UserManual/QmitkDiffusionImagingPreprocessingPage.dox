@@ -1,0 +1,27 @@
+/**
+\page org_mitk_views_diffusionpreprocessing Preprocessing of Diffusion Images
+
+\section QmitkDiffusionImagingPreprocessingPagePreprocessing Preprocessing
+
+The Preprocessing View bundles a selection of features and tools for dealing with diffusion weighted MR images. It can be used to modify header and geometry information, manipulate gradients and gradient images as well as calculating ADC maps.
+
+\section QmitkDiffusionImagingPreprocessingPageDetails Details
+
+\imageMacro{PreprocessingGUI_1.png,"Gradients tab",9.97}
+
+
+The Gradients tab allows you to examine the number of b values and how many gradients were acquired for each. Here you can also visualize the gradients as points on a sphere, mirror opposite gradients so all are oriented within the same half sphere, round b values and merge similar gradients.
+
+\imageMacro{PreprocessingGUI_2.png,"Image values tab",9.97}
+
+The Image values tab enables you to manipulate the voxel values by e.g. resampling images, averaging repetitions of the same gradient, normalizing the image values or merging several DWIs into one.
+
+\imageMacro{PreprocessingGUI_3.png,"Header tab",9.97}
+
+In the Header tab you can selectively change geometry information of the image and delete or extract specific gradient volumes.
+
+\imageMacro{PreprocessingGUI_4.png,"Other tab",9.97}
+
+Miscellaneous tools in the Other tab allow for ADC map calculation and the extraction of the b0 image with the possibility of averaging all b0 images.
+
+*/

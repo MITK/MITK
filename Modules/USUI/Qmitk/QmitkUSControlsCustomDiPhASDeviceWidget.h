@@ -1,3 +1,4 @@
+
 /*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
@@ -37,11 +38,13 @@ class QmitkUSControlsCustomDiPhASDeviceWidget : public QmitkUSAbstractCustomWidg
     Q_OBJECT
 
 private slots:
+  virtual void OnCompensateEnergyChanged();
   virtual void OnUseBModeFilterChanged();
   virtual void OnVerticalSpacingChanged();
   virtual void OnRecordChanged();
   virtual void OnScatteringCoefficientChanged();
   virtual void OnCompensateScatteringChanged();
+  virtual void OnChangedSavingSettings();
 
   //Transmit
   virtual void OnTransmitPhaseLengthChanged();
@@ -107,6 +110,7 @@ protected:
 private:
   Ui::QmitkUSControlsCustomDiPhASDeviceWidget*         ui;
   mitk::USDiPhASDeviceCustomControls::Pointer  m_ControlInterface;
+  int m_OldReconstructionLines;
 };
 
 #endif // QmitkUSControlsCustomDiPhASDeviceWidget_H

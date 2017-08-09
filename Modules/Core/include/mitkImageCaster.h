@@ -17,17 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGECASTER_H
 #define MITKIMAGECASTER_H
 
-#include <mitkImageCast.h>
-#include <itkImage.h>
 #include <itkCastImageFilter.h>
-#include <vtkRenderWindow.h>
+#include <itkImage.h>
+#include <mitkImageCast.h>
 #include <mitkSurface.h>
+#include <vtkRenderWindow.h>
 
 #include <mitkPPSeqForEach.h>
 
-#define DeclareMitkImageCasterMethods(r, data, type) \
-  static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type> >&); \
-  static void CastToMitkImage(const itk::Image<MITK_PP_TUPLE_REM(2)type>*, itk::SmartPointer<mitk::Image>&);
+#define DeclareMitkImageCasterMethods(r, data, type)                                                                   \
+  static void CastToItkImage(const mitk::Image *, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2) type>> &);         \
+  static void CastToMitkImage(const itk::Image<MITK_PP_TUPLE_REM(2) type> *, itk::SmartPointer<mitk::Image> &);
 
 namespace mitk
 {
@@ -39,27 +39,26 @@ namespace mitk
   class MITKCORE_EXPORT ImageCaster
   {
   public:
-
     MITK_PP_SEQ_FOR_EACH(DeclareMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(2))
     MITK_PP_SEQ_FOR_EACH(DeclareMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(3))
 
-    static void CastBaseData(mitk::BaseData* const, itk::SmartPointer<mitk::Image>&);
-
+    static void CastBaseData(mitk::BaseData *const, itk::SmartPointer<mitk::Image> &);
   };
 
   class MITKCORE_EXPORT Caster
   {
   public:
-    static void Cast(BaseData* dat, Surface* surface);
+    static void Cast(BaseData *dat, Surface *surface);
   };
 
   class MITKCORE_EXPORT RendererAccess
   {
   public:
-    static void Set3DRenderer(vtkRenderer* renderer);
-    static vtkRenderer* Get3DRenderer();
+    static void Set3DRenderer(vtkRenderer *renderer);
+    static vtkRenderer *Get3DRenderer();
+
   protected:
-    static vtkRenderer* m_3DRenderer;
+    static vtkRenderer *m_3DRenderer;
   };
 }
 

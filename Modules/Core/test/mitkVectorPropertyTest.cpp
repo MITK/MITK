@@ -24,40 +24,32 @@ CPPUNIT_NS_BEGIN
 /**
  \brief cppunit Test helper for std::vector types.
 */
-template<typename DATA>
-struct assertion_traits< std::vector<DATA> >   // specialization for the std::string type
+template <typename DATA>
+struct assertion_traits<std::vector<DATA>> // specialization for the std::string type
 {
-    static bool equal( const std::vector<DATA>& x, const std::vector<DATA>& y)
-    {
-        return x == y;
-    }
-
-    static std::string toString(const std::vector<DATA>& values)
-    {
-        OStringStream ost;
-        for (auto v : values)
-          ost << "'" << v << "' ";    // adds quote around the string to see whitespace
-        return ost.str();
-    }
+  static bool equal(const std::vector<DATA> &x, const std::vector<DATA> &y) { return x == y; }
+  static std::string toString(const std::vector<DATA> &values)
+  {
+    OStringStream ost;
+    for (auto v : values)
+      ost << "'" << v << "' "; // adds quote around the string to see whitespace
+    return ost.str();
+  }
 };
 
 /**
  \brief cppunit Test helper for mitk::VectorProperty
 */
-template<typename DATA>
-struct assertion_traits< mitk::VectorProperty<DATA> >   // specialization for the std::string type
+template <typename DATA>
+struct assertion_traits<mitk::VectorProperty<DATA>> // specialization for the std::string type
 {
-    static bool equal( const mitk::VectorProperty<DATA>& x, const mitk::VectorProperty<DATA>& y)
-    {
-        return x == y; // use BaseProperty implementation of things
-    }
+  static bool equal(const mitk::VectorProperty<DATA> &x, const mitk::VectorProperty<DATA> &y)
+  {
+    return x == y; // use BaseProperty implementation of things
+  }
 
-    static std::string toString(const mitk::VectorProperty<DATA>& prop)
-    {
-        return prop.GetValueAsString();
-    }
+  static std::string toString(const mitk::VectorProperty<DATA> &prop) { return prop.GetValueAsString(); }
 };
-
 
 CPPUNIT_NS_END
 
@@ -67,17 +59,16 @@ CPPUNIT_NS_END
 class mitkVectorPropertyTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkVectorPropertyTestSuite);
-    MITK_TEST(Instantiate);
-    MITK_TEST(TestSetGet);
-    MITK_TEST(TestIsEqual);
-    MITK_TEST(TestClone);
+  MITK_TEST(Instantiate);
+  MITK_TEST(TestSetGet);
+  MITK_TEST(TestIsEqual);
+  MITK_TEST(TestClone);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DoubleVectorProperty::Pointer m_DoubleData;
   mitk::IntVectorProperty::Pointer m_IntData;
 
 public:
-
   void setUp() override
   {
     m_DoubleData = mitk::DoubleVectorProperty::New();
@@ -86,16 +77,12 @@ public:
 
   void tearDown() override
   {
-      m_DoubleData = nullptr;
-      m_IntData = nullptr;
+    m_DoubleData = nullptr;
+    m_IntData = nullptr;
   }
-
 
   /// Done by setup/tearDown, verifies that classes can be instantiated.
-  void Instantiate()
-  {
-  }
-
+  void Instantiate() {}
   template <typename T>
   std::vector<T> MakeSimpleList()
   {
@@ -108,14 +95,13 @@ public:
     return data;
   }
 
-
   /// Verifies that GetValue() return what we provided by Setalue()
   template <typename T>
-  void TestSetGet( mitk::VectorProperty<T>& prop)
+  void TestSetGet(mitk::VectorProperty<T> &prop)
   {
     std::vector<T> data = MakeSimpleList<T>();
 
-    prop.SetValue( data );
+    prop.SetValue(data);
     std::vector<T> stored = prop.GetValue();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Result of GetValue() should equal parameter of SetValue(data)", data, stored);
@@ -123,44 +109,43 @@ public:
 
   void TestSetGet()
   {
-    TestSetGet( *m_DoubleData );
-    TestSetGet( *m_IntData );
+    TestSetGet(*m_DoubleData);
+    TestSetGet(*m_IntData);
   }
 
   /// Verifies that IsEqual() notices when elements are different or missing.
   template <typename T>
-  void TestIsEqual( mitk::VectorProperty<T>& prop)
+  void TestIsEqual(mitk::VectorProperty<T> &prop)
   {
     std::vector<T> data = MakeSimpleList<T>();
-    prop.SetValue( data );
+    prop.SetValue(data);
 
     std::vector<T> modifiedData(data);
     modifiedData.back() = -modifiedData.back(); // change last element
     typename mitk::VectorProperty<T>::Pointer modifiedProperty = mitk::VectorProperty<T>::New();
-    modifiedProperty->SetValue( modifiedData );
+    modifiedProperty->SetValue(modifiedData);
 
     CPPUNIT_ASSERT_ASSERTION_FAIL_MESSAGE("Modified list shall be recognized by IsEqual()",
-      CPPUNIT_ASSERT_EQUAL(*modifiedProperty, prop) );
+                                          CPPUNIT_ASSERT_EQUAL(*modifiedProperty, prop));
 
     modifiedData.pop_back(); // remove last element
-    modifiedProperty->SetValue( modifiedData );
+    modifiedProperty->SetValue(modifiedData);
     CPPUNIT_ASSERT_ASSERTION_FAIL_MESSAGE("Removed element shall be recognized by IsEqual()",
-      CPPUNIT_ASSERT_EQUAL(*modifiedProperty, prop) );
+                                          CPPUNIT_ASSERT_EQUAL(*modifiedProperty, prop));
   }
 
   void TestIsEqual()
   {
-    TestIsEqual( *m_DoubleData );
-    TestIsEqual( *m_IntData );
+    TestIsEqual(*m_DoubleData);
+    TestIsEqual(*m_IntData);
   }
-
 
   /// Verifies that Clone() creates an equal copy.
   template <typename T>
-  void TestClone( mitk::VectorProperty<T>& prop)
+  void TestClone(mitk::VectorProperty<T> &prop)
   {
     std::vector<T> data = MakeSimpleList<T>();
-    prop.SetValue( data );
+    prop.SetValue(data);
 
     typename mitk::VectorProperty<T>::Pointer clone = prop.Clone();
     CPPUNIT_ASSERT(clone.IsNotNull());
@@ -174,12 +159,10 @@ public:
 
   void TestClone()
   {
-    TestClone( *m_DoubleData );
-    TestClone( *m_IntData );
+    TestClone(*m_DoubleData);
+    TestClone(*m_IntData);
   }
-
 
 }; // class
 
 MITK_TEST_SUITE_REGISTRATION(mitkVectorProperty)
-

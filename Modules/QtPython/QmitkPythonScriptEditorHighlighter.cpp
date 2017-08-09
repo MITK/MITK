@@ -104,7 +104,7 @@ void QmitkPythonScriptEditorHighlighter::highlightBlock(const QString &text)
   }
 }
 
-void QmitkPythonScriptEditorHighlighter::highlightComments(const QString &text)
+void QmitkPythonScriptEditorHighlighter::highlightComments(const QString &)
 {
 }
 

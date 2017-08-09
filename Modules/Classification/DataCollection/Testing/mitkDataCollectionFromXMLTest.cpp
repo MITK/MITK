@@ -75,7 +75,7 @@ mitk::CollectionWriter::FolderToXml("/home/cweber/SSD-Data/Features/Frychel_Jadw
   mitk::DataCollection* patientCol = dynamic_cast<mitk::DataCollection*> (collection->GetData("Patient2").GetPointer());
 
   MITK_TEST_CONDITION_REQUIRED(
-        patientCol != NULL
+        patientCol != nullptr
       , "02) Check if Collection: Patient2 is found" );
 
 
@@ -90,12 +90,12 @@ mitk::CollectionWriter::FolderToXml("/home/cweber/SSD-Data/Features/Frychel_Jadw
 
 
   MITK_TEST_CONDITION_REQUIRED(
-        image != NULL
+        image != nullptr
       , "04) Check if T2 image can be extracted");
 
 
   // Try saving image to disk to ensure it is a valid object
-  mitk::IOUtil::SaveImage(image, "/tmp/dump.nrrd");
+  mitk::IOUtil::Save(image, "/tmp/dump.nrrd");
 
 
   std::vector<std::string> colIds;

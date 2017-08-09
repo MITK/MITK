@@ -30,20 +30,15 @@ class mitkImageToPointCloudFilterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   /** Members used inside the different test methods. All members are initialized via setUp().*/
   mitk::Image::Pointer m_BallImage;
 
 public:
-
   /**
-   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
+   * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp()
-  {
-    m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd"));
-  }
-
+  void setUp() { m_BallImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("BallBinary30x30x30.nrrd"))[0].GetPointer()); }
   void testImageToPointCloudFilterInitialization()
   {
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
@@ -62,7 +57,7 @@ public:
     mitk::ImageToPointCloudFilter::Pointer testFilter = mitk::ImageToPointCloudFilter::New();
     testFilter->SetInput(m_BallImage);
     testFilter->Update();
-    CPPUNIT_ASSERT_MESSAGE("Testing UnstructuredGrid generation!", testFilter->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing UnstructuredGrid generation!", testFilter->GetOutput() != nullptr);
   }
 
   void testThreshold()
@@ -82,7 +77,6 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Testing Threshold", numberOfPoints1 > numberOfPoints2);
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkImageToPointCloudFilter)

@@ -122,7 +122,6 @@ bool mitk::MeshMitkLoader::load()
   }
 
   vtkCellArray* polys = polyData->GetPolys();
-  vtkIdType numPolys = polys->GetNumberOfCells();
   vtkSmartPointer<vtkIdList> poly = vtkSmartPointer<vtkIdList>::New();
   Edge edge;
   Triangle triangle;

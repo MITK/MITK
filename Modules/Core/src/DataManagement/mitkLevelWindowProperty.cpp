@@ -14,60 +14,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkLevelWindowProperty.h"
-
 
 mitk::LevelWindowProperty::LevelWindowProperty()
 {
 }
 
-mitk::LevelWindowProperty::LevelWindowProperty(const mitk::LevelWindowProperty& other)
-  : BaseProperty(other)
-  , m_LevWin(other.m_LevWin)
+mitk::LevelWindowProperty::LevelWindowProperty(const mitk::LevelWindowProperty &other)
+  : BaseProperty(other), m_LevWin(other.m_LevWin)
 {
 }
 
 mitk::LevelWindowProperty::LevelWindowProperty(const mitk::LevelWindow &levWin)
 {
-    SetLevelWindow(levWin);
+  SetLevelWindow(levWin);
 }
 
 mitk::LevelWindowProperty::~LevelWindowProperty()
 {
 }
 
-bool mitk::LevelWindowProperty::IsEqual(const BaseProperty& property) const
+bool mitk::LevelWindowProperty::IsEqual(const BaseProperty &property) const
 {
-    return this->m_LevWin == static_cast<const Self&>(property).m_LevWin;
+  return this->m_LevWin == static_cast<const Self &>(property).m_LevWin;
 }
 
-bool mitk::LevelWindowProperty::Assign(const BaseProperty& property)
+bool mitk::LevelWindowProperty::Assign(const BaseProperty &property)
 {
-  this->m_LevWin = static_cast<const Self&>(property).m_LevWin;
+  this->m_LevWin = static_cast<const Self &>(property).m_LevWin;
   return true;
 }
 
-const mitk::LevelWindow & mitk::LevelWindowProperty::GetLevelWindow() const
+const mitk::LevelWindow &mitk::LevelWindowProperty::GetLevelWindow() const
 {
-    return m_LevWin;
+  return m_LevWin;
 }
 
-const mitk::LevelWindow & mitk::LevelWindowProperty::GetValue() const
+const mitk::LevelWindow &mitk::LevelWindowProperty::GetValue() const
 {
-    return GetLevelWindow();
+  return GetLevelWindow();
 }
 
 void mitk::LevelWindowProperty::SetLevelWindow(const mitk::LevelWindow &levWin)
 {
-    if(m_LevWin != levWin)
-    {
-        m_LevWin = levWin;
-        Modified();
-    }
+  if (m_LevWin != levWin)
+  {
+    m_LevWin = levWin;
+    Modified();
+  }
 }
 
-void mitk::LevelWindowProperty::SetValue(const ValueType& levWin)
+void mitk::LevelWindowProperty::SetValue(const ValueType &levWin)
 {
   SetLevelWindow(levWin);
 }

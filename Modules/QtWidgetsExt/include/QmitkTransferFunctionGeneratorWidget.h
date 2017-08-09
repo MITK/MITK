@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKTRANSFERFUNCTIONGENERATORWIDGET_H
 #define QMITKTRANSFERFUNCTIONGENERATORWIDGET_H
 
-#include "ui_QmitkTransferFunctionGeneratorWidget.h"
 #include "MitkQtWidgetsExtExports.h"
+#include "ui_QmitkTransferFunctionGeneratorWidget.h"
 
 #include <mitkCommon.h>
 
@@ -27,61 +27,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkTransferFunctionProperty.h>
 
-class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, public Ui::QmitkTransferFunctionGeneratorWidget
+class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget,
+                                                                     public Ui::QmitkTransferFunctionGeneratorWidget
 {
-
   Q_OBJECT
 
-  public:
+public:
+  QmitkTransferFunctionGeneratorWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  ~QmitkTransferFunctionGeneratorWidget();
 
-    QmitkTransferFunctionGeneratorWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
-    ~QmitkTransferFunctionGeneratorWidget () ;
+  void SetDataNode(mitk::DataNode *node);
 
-    void SetDataNode(mitk::DataNode* node);
+  int AddPreset(const QString &presetName);
 
-    int AddPreset(const QString& presetName);
+  void SetPresetsTabEnabled(bool enable);
+  void SetThresholdTabEnabled(bool enable);
+  void SetBellTabEnabled(bool enable);
 
-    void SetPresetsTabEnabled(bool enable);
-    void SetThresholdTabEnabled(bool enable);
-    void SetBellTabEnabled(bool enable);
+public slots:
 
-  public slots:
+  void OnSavePreset();
+  void OnLoadPreset();
 
-    void OnSavePreset( );
-    void OnLoadPreset( );
+  void OnDeltaLevelWindow(int dx, int dy);
+  void OnDeltaThreshold(int dx, int dy);
 
-    void OnDeltaLevelWindow( int dx, int dy );
-    void OnDeltaThreshold( int dx, int dy );
+signals:
 
-  signals:
+  void SignalTransferFunctionModeChanged(int);
+  void SignalUpdateCanvas();
 
-    void SignalTransferFunctionModeChanged( int );
-    void SignalUpdateCanvas();
+protected slots:
 
-  protected slots:
+  void OnPreset(int mode);
 
-    void OnPreset( int mode );
+protected:
+  mitk::TransferFunctionProperty::Pointer tfpToChange;
 
-  protected:
+  double histoMinimum;
+  double histoMaximum;
 
-    mitk::TransferFunctionProperty::Pointer tfpToChange;
+  double thPos;
+  double thDelta;
 
-    double histoMinimum;
-    double histoMaximum;
+  double deltaScale;
+  double deltaMax;
+  double deltaMin;
 
-    double thPos;
-    double thDelta;
+  const mitk::Image::HistogramType *histoGramm;
 
-    double deltaScale;
-    double deltaMax;
-    double deltaMin;
+  QString presetFileName;
 
-    const mitk::Image::HistogramType *histoGramm;
-
-    QString presetFileName;
-
-    double ScaleDelta(int d) const;
+  double ScaleDelta(int d) const;
 };
 
 #endif
-

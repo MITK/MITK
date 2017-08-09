@@ -290,20 +290,8 @@ void QmlMitkImageNavigator::SetStepSize(int axis)
     }
 }
 
-void QmlMitkImageNavigator::SetStepSize(int axis, double stepSize)
+void QmlMitkImageNavigator::SetStepSize(int, double)
 {
-    if (axis == 0)
-    {
-        //m_Controls.m_XWorldCoordinateSpinBox->setSingleStep(stepSize);
-    }
-    else if (axis == 1)
-    {
-        //m_Controls.m_YWorldCoordinateSpinBox->setSingleStep(stepSize);
-    }
-    else if (axis == 2)
-    {
-        //m_Controls.m_ZWorldCoordinateSpinBox->setSingleStep(stepSize);
-    }
 }
 
 

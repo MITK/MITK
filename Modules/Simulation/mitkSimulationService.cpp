@@ -21,8 +21,8 @@ static void SwitchSimuluationContext(mitk::Simulation::Pointer activeSimulation)
 {
   if (activeSimulation.IsNull())
   {
-    sofa::simulation::setSimulation(NULL);
-    sofa::core::visual::VisualParams::defaultInstance()->drawTool() = NULL;
+    sofa::simulation::setSimulation(nullptr);
+    sofa::core::visual::VisualParams::defaultInstance()->drawTool() = nullptr;
   }
   else
   {

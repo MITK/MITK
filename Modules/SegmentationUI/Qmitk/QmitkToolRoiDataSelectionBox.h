@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_TOOLROIDATASELECTIONBOX_H
 #define QMITK_TOOLROIDATASELECTIONBOX_H
 
-#include <MitkSegmentationUIExports.h>
-#include "mitkToolManager.h"
 #include "QmitkBoundingObjectWidget.h"
+#include "mitkToolManager.h"
+#include <MitkSegmentationUIExports.h>
 #include <QComboBox>
 
 /**
@@ -37,19 +37,18 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolRoiDataSelectionBox : public QWidget
   Q_OBJECT
 
 public:
-
-  QmitkToolRoiDataSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
+  QmitkToolRoiDataSelectionBox(QWidget *parent = 0, mitk::DataStorage *storage = 0);
   virtual ~QmitkToolRoiDataSelectionBox();
 
-  mitk::DataStorage* GetDataStorage();
-  void SetDataStorage(mitk::DataStorage& storage);
+  mitk::DataStorage *GetDataStorage();
+  void SetDataStorage(mitk::DataStorage &storage);
 
-  mitk::ToolManager* GetToolManager();
-  void SetToolManager(mitk::ToolManager& manager);
+  mitk::ToolManager *GetToolManager();
+  void SetToolManager(mitk::ToolManager &manager);
 
   void OnToolManagerRoiDataModified();
 
-  void DataStorageChanged(const mitk::DataNode* node );
+  void DataStorageChanged(const mitk::DataNode *node);
 
   mitk::ToolManager::DataVectorType GetSelection();
 
@@ -59,17 +58,16 @@ public:
 
 signals:
 
-  void RoiDataSelected(const mitk::DataNode* node);
+  void RoiDataSelected(const mitk::DataNode *node);
 
 protected slots:
 
-    void OnRoiDataSelectionChanged(const QString& name);
-    void OnRoiDataSelectionChanged();
+  void OnRoiDataSelectionChanged(const QString &name);
+  void OnRoiDataSelectionChanged();
 
 protected:
-
-  QmitkBoundingObjectWidget* m_boundingObjectWidget;
-  QComboBox* m_segmentationComboBox;
+  QmitkBoundingObjectWidget *m_boundingObjectWidget;
+  QComboBox *m_segmentationComboBox;
 
   mitk::ToolManager::Pointer m_ToolManager;
   bool m_SelfCall;

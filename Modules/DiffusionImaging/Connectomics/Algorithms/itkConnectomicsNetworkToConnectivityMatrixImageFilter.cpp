@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::ConnectomicsNetworkToConnectivityMatrixImageFilter()
   : m_BinaryConnectivity(false)
   , m_RescaleConnectivity(false)
-  , m_InputNetwork(NULL)
+  , m_InputNetwork(nullptr)
 {
 }
 
@@ -173,8 +173,8 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
     // if desired rescale to the 0-255 range
     while( !it_connect.IsAtEnd() )
     {
-      it_connect.Set( ( unsigned short ) rescaleFactor *
-        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ]
+      it_connect.Set( ( unsigned short ) (rescaleFactor *
+        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ])
       );
       ++it_connect;
       counter++;

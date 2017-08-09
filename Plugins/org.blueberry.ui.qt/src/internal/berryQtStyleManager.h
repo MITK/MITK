@@ -38,14 +38,22 @@ public:
   QString GetStylesheet() const override;
   QString GetActiveTabStylesheet() const override;
   QString GetTabStylesheet() const override;
+  QString GetFont() const override;
 
-  void AddStyle(const QString& styleFileName, const QString& styleName = QString()) override;
+  void AddStyle(const QString& styleFileName,
+                const QString& styleName = QString()) override;
   void AddStyles(const QString& path) override;
   void RemoveStyle(const QString& styleFileName) override;
   void RemoveStyles(const QString& path = QString()) override;
 
   void GetStyles(StyleList& styles) const override;
   void SetStyle(const QString& fileName) override;
+
+  void GetFonts(QStringList& fontNames) const override;
+
+  void SetFont(const QString& fontName) override;
+  void SetFontSize(const int fontSize) override;
+  void UpdateWorkbenchFont() override;
 
   Style GetDefaultStyle() const override;
   void SetDefaultStyle() override;
@@ -62,6 +70,7 @@ public:
 private:
 
   void AddDefaultStyle();
+  void AddDefaultFonts();
   void ClearStyles();
   void ReadPreferences();
 
@@ -77,11 +86,14 @@ private:
     QString activeTabStylesheet;
   };
 
+  QStringList m_customFontNames;
   void ReadStyleData(ExtStyle* style);
 
   typedef QHash<QString, ExtStyle*> FileNameToStyleMap;
   FileNameToStyleMap styles;
 
+  QString m_currentFont;
+  int m_currentFontSize;
   ExtStyle const* currentStyle;
   ExtStyle* defaultStyle;
 

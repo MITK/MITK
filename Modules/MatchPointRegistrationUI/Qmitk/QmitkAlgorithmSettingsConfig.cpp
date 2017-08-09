@@ -16,10 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAlgorithmSettingsConfig.h"
 
-#include <mapMetaPropertyAccessor.h>
 #include <mapConvert.h>
+#include <mapMetaPropertyAccessor.h>
 
-QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget*)
+QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget *)
 {
   this->setupUi(this);
 
@@ -38,11 +38,11 @@ QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget*)
   this->m_AlgoPropertiesView->setSelectionBehavior(QAbstractItemView::SelectItems);
 }
 
-void setAlgorithm(map::algorithm::RegistrationAlgorithmBase* alg);
+void setAlgorithm(map::algorithm::RegistrationAlgorithmBase *alg);
 
-map::algorithm::RegistrationAlgorithmBase* getAlgorithm();
+map::algorithm::RegistrationAlgorithmBase *getAlgorithm();
 
-void QmitkAlgorithmSettingsConfig::setAlgorithm(map::algorithm::RegistrationAlgorithmBase* alg)
+void QmitkAlgorithmSettingsConfig::setAlgorithm(map::algorithm::RegistrationAlgorithmBase *alg)
 {
   if (alg != this->m_currentAlg)
   {
@@ -54,7 +54,7 @@ void QmitkAlgorithmSettingsConfig::setAlgorithm(map::algorithm::RegistrationAlgo
   }
 }
 
-map::algorithm::RegistrationAlgorithmBase* QmitkAlgorithmSettingsConfig::getAlgorithm()
+map::algorithm::RegistrationAlgorithmBase *QmitkAlgorithmSettingsConfig::getAlgorithm()
 {
   return this->m_currentAlg;
 }

@@ -16,13 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkBaseApplication.h>
 
-#include <QVariant>
 #include <QPixmap>
-#include <QTimer>
 #include <QSplashScreen>
+#include <QTimer>
+#include <QVariant>
 
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   mitk::BaseApplication app(argc, argv);
 
@@ -58,7 +57,7 @@ int main(int argc, char** argv)
   preloadLibs << "liborg_mitk_gui_qt_ext";
   app.setPreloadLibraries(preloadLibs);
 
-  //app.setProperty(mitk::BaseApplication::PROP_APPLICATION, "org.mitk.qt.diffusionimagingapp");
+  // app.setProperty(mitk::BaseApplication::PROP_APPLICATION, "org.mitk.qt.diffusionimagingapp");
   app.setProperty(mitk::BaseApplication::PROP_PRODUCT, "org.mitk.gui.qt.diffusionimagingapp.diffusion");
 
   // Run the workbench.

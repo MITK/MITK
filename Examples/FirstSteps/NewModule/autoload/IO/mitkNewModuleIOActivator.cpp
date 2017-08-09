@@ -30,17 +30,18 @@ namespace mitk
   class NewModuleIOActivator : public us::ModuleActivator
   {
   public:
-
-    void Load(us::ModuleContext* context) override
+    void Load(us::ModuleContext *context) override
     {
       // We can register our read/write services with a custom service ranking
       // services with a higher ranking are prioritized, default us 0
       us::ServiceProperties props;
-      props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
+      props[us::ServiceConstants::SERVICE_RANKING()] = 10;
 
       m_MimeTypes = mitk::ExampleIOMimeTypes::Get();
-      for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
-        iterEnd = m_MimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+      for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
+                                                               iterEnd = m_MimeTypes.end();
+           mimeTypeIter != iterEnd;
+           ++mimeTypeIter)
       {
         context->RegisterService(*mimeTypeIter, props);
       }
@@ -50,7 +51,7 @@ namespace mitk
       m_ExampleDataStructureWriterService = new ExampleDataStructureWriterService();
     }
 
-    void Unload(us::ModuleContext*) override
+    void Unload(us::ModuleContext *) override
     {
       for (unsigned int loop(0); loop < m_MimeTypes.size(); ++loop)
       {
@@ -60,17 +61,14 @@ namespace mitk
       delete m_ExampleDataStructureReaderService;
 
       delete m_ExampleDataStructureWriterService;
-
     }
 
   private:
+    ExampleDataStructureReaderService *m_ExampleDataStructureReaderService;
 
-    ExampleDataStructureReaderService * m_ExampleDataStructureReaderService;
+    ExampleDataStructureWriterService *m_ExampleDataStructureWriterService;
 
-    ExampleDataStructureWriterService * m_ExampleDataStructureWriterService;
-
-    std::vector<mitk::CustomMimeType*> m_MimeTypes;
-
+    std::vector<mitk::CustomMimeType *> m_MimeTypes;
   };
 }
 

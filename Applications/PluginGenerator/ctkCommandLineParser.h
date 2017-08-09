@@ -28,7 +28,6 @@
 
 class QSettings;
 
-
 /**
  * \ingroup Core
  *
@@ -109,7 +108,6 @@ class ctkCommandLineParser : public QObject
   Q_PROPERTY(bool settingsEnabled READ settingsEnabled)
 
 public:
-
   typedef QObject Superclass;
 
   /**
@@ -123,7 +121,7 @@ public:
    *
    * @param newParent The QObject parent.
    */
-  ctkCommandLineParser(QObject* newParent = nullptr);
+  ctkCommandLineParser(QObject *newParent = nullptr);
 
   /**
    * Constructs a parser instance.
@@ -140,7 +138,7 @@ public:
    *
    *
    */
-  ctkCommandLineParser(QSettings* settings, QObject* newParent = nullptr);
+  ctkCommandLineParser(QSettings *settings, QObject *newParent = nullptr);
 
   ~ctkCommandLineParser();
 
@@ -164,13 +162,13 @@ public:
    * @return A QHash object mapping the long argument (if empty, the short one)
    *         to a QVariant containing the value.
    */
-  QHash<QString, QVariant> parseArguments(const QStringList &arguments, bool* ok = nullptr);
+  QHash<QString, QVariant> parseArguments(const QStringList &arguments, bool *ok = nullptr);
 
   /**
     * Convenient method allowing to parse a given list of command line arguments.
     * @see parseArguments(const QStringList &, bool*)
     */
-  QHash<QString, QVariant> parseArguments(int argc, char** argv, bool* ok = nullptr);
+  QHash<QString, QVariant> parseArguments(int argc, char **argv, bool *ok = nullptr);
 
   /**
    * Returns a detailed error description if a call to <code>parseArguments()</code>
@@ -190,7 +188,7 @@ public:
    *
    * @return A list containing unparsed arguments.
    */
-  const QStringList& unparsedArguments() const;
+  const QStringList &unparsedArguments() const;
 
   /**
    * Checks if the given argument has been added via a call
@@ -202,7 +200,7 @@ public:
    * @return <code>true</code> if the argument was added, <code>false</code>
    *         otherwise.
    */
-  Q_INVOKABLE bool argumentAdded(const QString& argument) const;
+  Q_INVOKABLE bool argumentAdded(const QString &argument) const;
 
   /**
    * Checks if the given argument has been parsed successfully by a previous
@@ -212,7 +210,7 @@ public:
    * @return <code>true</code> if the argument was parsed, <code>false</code>
    *         otherwise.
    */
-  Q_INVOKABLE bool argumentParsed(const QString& argument) const;
+  Q_INVOKABLE bool argumentParsed(const QString &argument) const;
 
   /**
    * Adds a command line argument. An argument can have a long name
@@ -258,10 +256,13 @@ public:
    * @throws std::logic_error If the QVariant type of <code>defaultValue</code>
    *         does not match <code>type</code>, a <code>std::logic_error</code> is thrown.
    */
-  void addArgument(const QString& longarg, const QString& shortarg,
-                   QVariant::Type type, const QString& argHelp = QString(),
-                   const QVariant& defaultValue = QVariant(),
-                   bool ignoreRest = false, bool deprecated = false);
+  void addArgument(const QString &longarg,
+                   const QString &shortarg,
+                   QVariant::Type type,
+                   const QString &argHelp = QString(),
+                   const QVariant &defaultValue = QVariant(),
+                   bool ignoreRest = false,
+                   bool deprecated = false);
 
   /**
    * Adds a deprecated command line argument. If a deprecated argument is provided
@@ -275,8 +276,7 @@ public:
    * @param shortarg The short argument name.
    * @param argHelp A help string describing alternatives to the deprecated argument.
    */
-  void addDeprecatedArgument(const QString& longarg, const QString& shortarg,
-                             const QString& argHelp);
+  void addDeprecatedArgument(const QString &longarg, const QString &shortarg, const QString &argHelp);
 
   /**
    * Sets a custom regular expression for validating argument parameters. The method
@@ -292,8 +292,9 @@ public:
    *
    * @see errorString()
    */
-  bool setExactMatchRegularExpression(const QString& argument, const QString& expression,
-                                      const QString& exactMatchFailedMessage);
+  bool setExactMatchRegularExpression(const QString &argument,
+                                      const QString &expression,
+                                      const QString &exactMatchFailedMessage);
 
   /**
    * The field width for the argument names without the help text.
@@ -336,7 +337,7 @@ public:
    * @param longPrefix The prefix for long argument names.
    * @param shortPrefix The prefix for short argument names.
    */
-  void setArgumentPrefix(const QString& longPrefix, const QString& shortPrefix);
+  void setArgumentPrefix(const QString &longPrefix, const QString &shortPrefix);
 
   /**
    * Begins a new group for documenting arguments. All newly added arguments via
@@ -348,7 +349,7 @@ public:
    *
    * @param description The description of the group
    */
-  void beginGroup(const QString& description);
+  void beginGroup(const QString &description);
 
   /**
    * Ends the current group.
@@ -378,8 +379,7 @@ public:
    *
    * @see ctkCommandLineParser(QSettings*)
    */
-  void enableSettings(const QString& disableLongArg = "",
-                      const QString& disableShortArg = "");
+  void enableSettings(const QString &disableLongArg = "", const QString &disableShortArg = "");
 
   /**
    * Controlls the merging behavior of user values and QSettings values.
@@ -403,7 +403,6 @@ public:
    */
   bool settingsEnabled() const;
 
-
   /**
     * Can be used to teach the parser to stop parsing the arguments and return False when
     * an unknown argument is encountered. By default <code>StrictMode</code> is disabled.
@@ -414,6 +413,6 @@ public:
 
 private:
   class ctkInternal;
-  ctkInternal * Internal;
+  ctkInternal *Internal;
 };
 #endif

@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-# /* **************************************************************************
+#/* **************************************************************************
 #  *                                                                          *
 #  *     (C) Copyright Paul Mensonides 2002.
 #  *     Distributed under the Boost Software License, Version 1.0. (See
@@ -22,11 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #  *                                                                          *
 #  ************************************************************************** */
 #
-# /* See http://www.boost.org for most recent version. */
+#/* See http://www.boost.org for most recent version. */
 #
-# ifndef MITK_PREPROCESSOR_EXPAND_HPP
-# define MITK_PREPROCESSOR_EXPAND_HPP
+#ifndef MITK_PREPROCESSOR_EXPAND_HPP
+#define MITK_PREPROCESSOR_EXPAND_HPP
 #
-# include "mitkPPFacilitiesExpand.h"
+#include "mitkPPFacilitiesExpand.h"
 #
-# endif
+#endif

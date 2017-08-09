@@ -21,7 +21,6 @@ set(UI_FILES
   Qmitk/QmitkUSControlsCustomVideoDeviceWidget.ui
   Qmitk/QmitkUSControlsCustomDiPhASDeviceWidget.ui
 )
-
 set(MOC_H_FILES
   Qmitk/QmitkUSDeviceManagerWidget.h
   Qmitk/QmitkUSNewVideoDeviceWidget.h

@@ -207,13 +207,13 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
   // FIXME Filter for correct files and use correct Reader
   QString filter = tr("NavigationData File (*.csv *.xml)");
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+  QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open NavigationData Set"), "", filter);
 
   if ( fileName.isNull() ) { return; } // user pressed cancel
 
   try
   {
-    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
+    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(fileName.toStdString())[0].GetPointer());
   }
   catch ( const mitk::Exception &e )
   {

@@ -136,22 +136,21 @@ namespace mitk
     int CaptureWidth = 0;
     int CaptureHeight = 0;
     int PixelNumber = 0;
-    int ImageSizeInBytes = 0;
+
     if (fileName==this->m_RGBImageFileName)
     {
         CaptureWidth = this->m_RGBCaptureWidth;
         CaptureHeight = this->m_RGBCaptureHeight;
         PixelNumber = this->m_RGBPixelNumber;
-        ImageSizeInBytes = this->m_RGBImageSizeInBytes;
-    } else
+    }
+    else
     {
         CaptureWidth = this->m_ToFCaptureWidth;
         CaptureHeight = this->m_ToFCaptureHeight;
         PixelNumber = this->m_ToFPixelNumber;
-        ImageSizeInBytes = this->m_ToFImageSizeInBytes;
     }
     Image::Pointer imageTemplate = Image::New();
-    int dimension ;
+    unsigned int dimension;
     unsigned int* dimensions;
     if(m_ToFImageType == ToFImageType2DPlusT)
     {
@@ -174,8 +173,8 @@ namespace mitk
     {
       throw std::logic_error("No image type set, please choose between 2D+t and 3D!");
     }
-    float* floatData;
-    unsigned char* rgbData;
+    float* floatData = nullptr;
+    unsigned char* rgbData = nullptr;
     if (fileName==this->m_RGBImageFileName)
     {
       rgbData = new unsigned char[PixelNumber*3];
@@ -219,7 +218,7 @@ namespace mitk
       nrrdWriter->SetOrigin(i,origin[i]);
 
       mitk::Vector3D direction;
-      direction.Set_vnl_vector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+      direction.SetVnlVector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
       vnl_vector< double > axisDirection(dimension);
 
       for(unsigned int j = 0; j < dimension; j++)

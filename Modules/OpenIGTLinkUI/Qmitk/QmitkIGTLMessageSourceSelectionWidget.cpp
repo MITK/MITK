@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkIGTLMessageSourceSelectionWidget::QmitkIGTLMessageSourceSelectionWidget(
     QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
-  m_Controls = NULL;
-  m_CurrentIGTLMessageSource = NULL;
+  m_Controls = nullptr;
+  m_CurrentIGTLMessageSource = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -69,7 +69,7 @@ void QmitkIGTLMessageSourceSelectionWidget::IGTLMessageSourceSelected(us::Servic
     if (!s) //nothing selected
       {
         //reset everything
-        this->m_CurrentIGTLMessageSource = NULL;
+        this->m_CurrentIGTLMessageSource = nullptr;
         emit IGTLMessageSourceSelected(this->m_CurrentIGTLMessageSource);
         return;
       }

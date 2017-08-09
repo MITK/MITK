@@ -14,18 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #if !defined(MITK_PLANEFIT_H__INCLUDED_)
 #define MITK_PLANEFIT_H__INCLUDED_
 
-#include "mitkPointSet.h"
 #include "MitkAlgorithmsExtExports.h"
-#include "mitkTimeGeometry.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkGeometryDataSource.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkPointSet.h"
+#include "mitkTimeGeometry.h"
 
-namespace mitk {
-
+namespace mitk
+{
   //!
   //  kind regards to dr. math!
   // function [x0, a, d, normd] = lsplane(X)
@@ -64,85 +63,80 @@ namespace mitk {
 
   class MITKALGORITHMSEXT_EXPORT PlaneFit : public GeometryDataSource
   {
-    public:
+  public:
+    mitkClassMacro(PlaneFit, GeometryDataSource);
+    itkNewMacro(Self);
 
-      mitkClassMacro( PlaneFit, GeometryDataSource);
-      itkNewMacro(Self);
+    typedef mitk::PointSet::PointDataType PointDataType;
+    typedef mitk::PointSet::PointDataIterator PointDataIterator;
 
-      typedef mitk::PointSet::PointDataType PointDataType;
-      typedef mitk::PointSet::PointDataIterator PointDataIterator;
+    virtual void GenerateOutputInformation() override;
 
-      virtual void GenerateOutputInformation() override;
+    virtual void GenerateData() override;
 
-      virtual void GenerateData() override;
+    /*!Getter for point set.
+     *
+     */
+    const mitk::PointSet *GetInput();
 
-      /*!Getter for point set.
-       *
-       */
-      const mitk::PointSet *GetInput();
+    /*! filter initialisation.
+     *
+     */
+    using mitk::GeometryDataSource::SetInput;
+    virtual void SetInput(const mitk::PointSet *ps);
 
-      /*! filter initialisation.
-       *
-       */
-      using mitk::GeometryDataSource::SetInput;
-      virtual void SetInput( const mitk::PointSet *ps );
+    /*! returns the center of gravity of the point set.
+     *
+     */
+    virtual const mitk::Point3D &GetCentroid(int t = 0) const;
 
-      /*! returns the center of gravity of the point set.
-       *
-       */
-      virtual const mitk::Point3D &GetCentroid( int t = 0 ) const;
+    /*! returns the plane geometry which represents the point set.
+     *
+     */
+    virtual mitk::PlaneGeometry::Pointer GetPlaneGeometry(int t = 0);
 
-      /*! returns the plane geometry which represents the point set.
-       *
-       */
-      virtual mitk::PlaneGeometry::Pointer GetPlaneGeometry( int t = 0 );
+    /*! returns the normal of the plane which represents the point set.
+     *
+     */
+    virtual const mitk::Vector3D &GetPlaneNormal(int t = 0) const;
 
-      /*! returns the normal of the plane which represents the point set.
-       *
-       */
-      virtual const mitk::Vector3D &GetPlaneNormal( int t = 0 ) const;
+  protected:
+    PlaneFit();
+    virtual ~PlaneFit();
 
-    protected:
-      PlaneFit();
-      virtual ~PlaneFit();
+    /*! Calculates the centroid of the point set.
+     * the center of gravity is calculated  through the mean value of the whole point set
+     */
+    void CalculateCentroid(int t = 0);
 
-      /*! Calculates the centroid of the point set.
-       * the center of gravity is calculated  through the mean value of the whole point set
-       */
-      void CalculateCentroid( int t = 0 );
+    /*! working with an SVD algorithm form matrix dataM.
+     * ITK suplies the vnl_svd to solve an plan fit eigentvector problem
+     * points are processed in the SVD matrix. The normal vector is the
+     * singular vector of dataM corresponding to its smalest singular value.
+     * The mehtod uses VNL library from ITK and at least the mehtod nullvector()
+     * to extract the normalvector.
+     */
+    void ProcessPointSet(int t = 0);
 
-      /*! working with an SVD algorithm form matrix dataM.
-       * ITK suplies the vnl_svd to solve an plan fit eigentvector problem
-       * points are processed in the SVD matrix. The normal vector is the
-       * singular vector of dataM corresponding to its smalest singular value.
-       * The mehtod uses VNL library from ITK and at least the mehtod nullvector()
-       * to extract the normalvector.
-       */
-      void ProcessPointSet( int t = 0 );
+    /*! Initialize Plane and configuration.
+     *
+     */
+    void InitializePlane(int t = 0);
 
-      /*! Initialize Plane and configuration.
-       *
-       */
-      void InitializePlane( int t = 0 );
+  private:
+    /*!keeps a copy of the pointset.*/
+    const mitk::PointSet *m_PointSet;
 
+    /* output object - a time sliced geometry.*/
+    mitk::TimeGeometry::Pointer m_TimeGeometry;
 
-    private:
+    std::vector<mitk::PlaneGeometry::Pointer> m_Planes;
 
-      /*!keeps a copy of the pointset.*/
-      const mitk::PointSet* m_PointSet;
+    /*! the calculatet center point of all points in the point set.*/
+    std::vector<mitk::Point3D> m_Centroids;
 
-      /* output object - a time sliced geometry.*/
-      mitk::TimeGeometry::Pointer m_TimeGeometry;
-
-      std::vector< mitk::PlaneGeometry::Pointer > m_Planes;
-
-      /*! the calculatet center point of all points in the point set.*/
-      std::vector< mitk::Point3D > m_Centroids;
-
-      /* the normal vector to descrie a plane gemoetry.*/
-      std::vector< mitk::Vector3D > m_PlaneVectors;
+    /* the normal vector to descrie a plane gemoetry.*/
+    std::vector<mitk::Vector3D> m_PlaneVectors;
   };
-}//namespace mitk
-#endif //MITK_PLANFIT_INCLUDE_
-
-
+} // namespace mitk
+#endif // MITK_PLANFIT_INCLUDE_

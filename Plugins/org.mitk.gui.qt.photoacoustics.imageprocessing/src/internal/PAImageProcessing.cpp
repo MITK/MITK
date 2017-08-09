@@ -160,7 +160,7 @@ void PAImageProcessing::BatchProcessing()
 
   DisableControls();
 
-  std::set<char> delims{ '/', '.'};
+  std::set<char> delims{'/'};
 
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
@@ -176,7 +176,11 @@ void PAImageProcessing::BatchProcessing()
 
     QString filename = fileNames.at(fileNumber);
     auto split = splitpath(filename.toStdString(), delims);
-    std::string imageName = split.at(split.size()-2);
+    std::string imageName = split.at(split.size()-1);
+
+    // remove ".nrrd"
+    imageName = imageName.substr(0, imageName.size()-5);
+
     mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename.toStdString().c_str());
 
     UpdateBFSettings(image);
@@ -196,8 +200,6 @@ void PAImageProcessing::BatchProcessing()
         mitk::IOUtil::Save(image, saveFileName);
       }
     }
-
-    
 
     // Cropping
     if (doSteps[1])
@@ -873,7 +875,6 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.ReconstructionLines = m_Controls.Lines->value();
   BFconfig.TransducerElements = m_Controls.ElementCount->value();
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
-  BFconfig.ButterworthOrder = m_Controls.BPFalloff->value();
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
   BFconfig.UseGPU = m_Controls.UseGPU->isChecked();
 

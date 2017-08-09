@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ImageDescriptor::ImageDescriptor()
 {
-  //initialize the dimensions array
-  for(auto & elem : m_Dimensions)
+  // initialize the dimensions array
+  for (auto &elem : m_Dimensions)
   {
     elem = 1;
   }
@@ -31,15 +31,15 @@ void mitk::ImageDescriptor::AddNewChannel(mitk::PixelType ptype, const char *nam
 {
   size_t elems = 1;
 
-  for( unsigned int i=0; i<this->m_NumberOfDimensions; i++)
+  for (unsigned int i = 0; i < this->m_NumberOfDimensions; i++)
     elems *= this->m_Dimensions[i];
 
   mitk::ChannelDescriptor desc(ptype, elems);
 
-  this->m_ChannelDesc.push_back( desc );
+  this->m_ChannelDesc.push_back(desc);
 
-  if( name == nullptr)
-    m_ChannelNames.push_back( "Unnamed ["+ptype.GetPixelTypeAsString()+"]");
+  if (name == nullptr)
+    m_ChannelNames.push_back("Unnamed [" + ptype.GetPixelTypeAsString() + "]");
   else
     m_ChannelNames.push_back(name);
 
@@ -56,15 +56,15 @@ void mitk::ImageDescriptor::Initialize(const ImageDescriptor::Pointer refDescrip
   const unsigned int *refDims = refDescriptor->GetDimensions();
 
   // copy the dimension information
-  for( unsigned int i=0; i< this->m_NumberOfDimensions; i++)
+  for (unsigned int i = 0; i < this->m_NumberOfDimensions; i++)
   {
     this->m_Dimensions[i] = refDims[i];
   }
 
   // get the channel descriptor and store them and so the name of the channel
   mitk::ChannelDescriptor desc = refDescriptor->GetChannelDescriptor(channel);
-  this->m_ChannelDesc.push_back( desc );
-  this->m_ChannelNames.push_back( refDescriptor->GetChannelName(channel) );
+  this->m_ChannelDesc.push_back(desc);
+  this->m_ChannelNames.push_back(refDescriptor->GetChannelName(channel));
 }
 
 void mitk::ImageDescriptor::Initialize(const unsigned int *dims, const unsigned int dim)
@@ -72,7 +72,7 @@ void mitk::ImageDescriptor::Initialize(const unsigned int *dims, const unsigned 
   this->m_NumberOfDimensions = dim;
 
   // copy the dimension information
-  for( unsigned int i=0; i< this->m_NumberOfDimensions; i++)
+  for (unsigned int i = 0; i < this->m_NumberOfDimensions; i++)
   {
     this->m_Dimensions[i] = dims[i];
   }
@@ -88,10 +88,10 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeByName(const char *name) co
   unsigned int idFound = 0;
   const std::string search_str(name);
 
-  for( auto iter = this->m_ChannelNames.begin();
-       iter < this->m_ChannelNames.end(); iter++)
+  for (auto iter = this->m_ChannelNames.begin(); iter < this->m_ChannelNames.end(); iter++)
   {
-    if( search_str.compare( *iter ) ) idFound = iter - this->m_ChannelNames.begin();
+    if (search_str.compare(*iter))
+      idFound = iter - this->m_ChannelNames.begin();
   }
 
   return (m_ChannelDesc[idFound]).GetPixelType();
@@ -99,22 +99,21 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeByName(const char *name) co
 
 mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id) const
 {
-  if( id > this->m_NumberOfChannels )
+  if (id > this->m_NumberOfChannels)
   {
     throw std::invalid_argument("The given id exceeds the number of active channel.");
   }
   else
   {
     mitk::ChannelDescriptor refDesc = this->m_ChannelDesc[id];
-    return refDesc.GetPixelType();//
+    return refDesc.GetPixelType(); //
   }
 }
 
 const std::string mitk::ImageDescriptor::GetChannelName(unsigned int id) const
 {
-  if( id > this->m_ChannelNames.size() )
+  if (id > this->m_ChannelNames.size())
     return "Out-of-range-access";
   else
-    return this->m_ChannelNames.at( id );
+    return this->m_ChannelNames.at(id);
 }
-

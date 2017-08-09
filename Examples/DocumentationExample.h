@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 class DocumentationExample
 {
 public:
-
   /**
   * \brief A constructor.
   * A more elaborate description of the constructor.
@@ -41,13 +40,15 @@ public:
   * \brief Casts the char at position number to an int and returns it
   *
   * This function will take an int number and a char pointer name, then will try to access the int a position number
-  * and cast it to an int and return it. No verification is done within the function to ensure, that it is a valid position.
+  * and cast it to an int and return it. No verification is done within the function to ensure, that it is a valid
+  * position.
   *
-  * @param number The position of the char to be cast. This should never be below 0 and not above the length of the char array.
+  * @param number The position of the char to be cast. This should never be below 0 and not above the length of the char
+  * array.
   * @param name A constant character pointer.
   * @return The char value of the charakter at position number casted to int
   */
-  int ExampleCastCharToInt(int number,const char *name);
+  int ExampleCastCharToInt(int number, const char *name);
 
   /**
   * \brief Tests whether an integer is within the bounds of a string
@@ -59,7 +60,7 @@ public:
   * @see zero()
   * @return True if character is in range, should never return false but throw an exception instead.
   */
-  bool TestWithin(std::string itsAString,int theInt) throw(std::out_of_range);
+  bool TestWithin(std::string itsAString, int theInt) throw(std::out_of_range);
 
   /**
   * \brief The public definition of zero
@@ -67,5 +68,4 @@ public:
   * This variable is used to determine what will be regarded as zero.
   */
   int zero;
-
 };

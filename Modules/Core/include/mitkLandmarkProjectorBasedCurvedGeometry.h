@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkPointSet.h"
 
-namespace mitk {
+namespace mitk
+{
   //##Documentation
   //## @brief Superclass of AbstractTransformGeometry sub-classes defined
   //## by a set of landmarks.
@@ -33,14 +34,14 @@ namespace mitk {
   public:
     mitkClassMacro(LandmarkProjectorBasedCurvedGeometry, AbstractTransformGeometry);
 
-    void SetLandmarkProjector(mitk::LandmarkProjector* aLandmarkProjector);
+    void SetLandmarkProjector(mitk::LandmarkProjector *aLandmarkProjector);
     itkGetConstObjectMacro(LandmarkProjector, mitk::LandmarkProjector);
 
-    virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry) override;
+    virtual void SetFrameGeometry(const mitk::BaseGeometry *frameGeometry) override;
 
     virtual void ComputeGeometry();
 
-    itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform*);
+    itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform *);
 
     itk::LightObject::Pointer InternalClone() const override;
 
@@ -54,13 +55,13 @@ namespace mitk {
   protected:
     LandmarkProjectorBasedCurvedGeometry();
 
-    LandmarkProjectorBasedCurvedGeometry(const LandmarkProjectorBasedCurvedGeometry& other);
+    LandmarkProjectorBasedCurvedGeometry(const LandmarkProjectorBasedCurvedGeometry &other);
 
     virtual ~LandmarkProjectorBasedCurvedGeometry();
 
     mitk::LandmarkProjector::Pointer m_LandmarkProjector;
 
-    vtkAbstractTransform* m_InterpolatingAbstractTransform;
+    vtkAbstractTransform *m_InterpolatingAbstractTransform;
 
     mitk::PointSet::DataType::PointsContainer::ConstPointer m_TargetLandmarks;
 
@@ -70,7 +71,7 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{ Superclass::PreSetSpacing(aSpacing); };
+    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 

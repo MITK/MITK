@@ -89,7 +89,7 @@ namespace mitk
     *
     * \return Index of the global maximum.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMaximum(IntensityProfile::Pointer intensityProfile, IntensityProfile::MeasurementType &max);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMaximum(IntensityProfile::ConstPointer intensityProfile, IntensityProfile::MeasurementType &max);
 
   /** \brief Compute global minimum of an intensity profile.
     *
@@ -97,7 +97,7 @@ namespace mitk
     *
     * \return Index of the global minimum.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMinimum(IntensityProfile::Pointer intensityProfile, IntensityProfile::MeasurementType &min);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMinimum(IntensityProfile::ConstPointer intensityProfile, IntensityProfile::MeasurementType &min);
 
   /** \brief Compute statistics of an intensity profile.
     *
@@ -106,7 +106,7 @@ namespace mitk
     * \param[in] stats An ImageStatisticsCalculator::Statistics object to hold the calculated statistics.
     *
     */
-  MITKIMAGESTATISTICS_EXPORT void ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensityProfile, ImageStatisticsCalculator::Statistics &stats);
+  MITKIMAGESTATISTICS_EXPORT void ComputeIntensityProfileStatistics(IntensityProfile::ConstPointer intensityProfile, ImageStatisticsCalculator::StatisticsContainer::Pointer stats);
 
   /** \brief Compute center of maximum area under the curve of an intensity profile.
     *
@@ -115,7 +115,7 @@ namespace mitk
     *
     * \return Index of the maximum area center.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeCenterOfMaximumArea(IntensityProfile::Pointer intensityProfile, IntensityProfile::InstanceIdentifier radius);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeCenterOfMaximumArea(IntensityProfile::ConstPointer intensityProfile, IntensityProfile::InstanceIdentifier radius);
 
   /** \brief Convert an intensity profile to a standard library vector.
     *
@@ -123,7 +123,7 @@ namespace mitk
     *
     * \return Standard library vector which contains the input intensity profile measurements.
     */
-  MITKIMAGESTATISTICS_EXPORT std::vector<IntensityProfile::MeasurementType> CreateVectorFromIntensityProfile(IntensityProfile::Pointer intensityProfile);
+  MITKIMAGESTATISTICS_EXPORT std::vector<IntensityProfile::MeasurementType> CreateVectorFromIntensityProfile(IntensityProfile::ConstPointer intensityProfile);
 
   /** \brief Convert a standard library vector to an intensity profile.
     *

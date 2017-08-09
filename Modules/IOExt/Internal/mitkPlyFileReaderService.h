@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef PlyFileReaderService_h
 #define PlyFileReaderService_h
 
 #include <mitkAbstractFileReader.h>
 #include <mitkIOMimeTypes.h>
 
-namespace mitk {
-
+namespace mitk
+{
   class BaseData;
 
   /**
@@ -32,22 +31,20 @@ namespace mitk {
   *
   * @ingroup IOExt
   */
-class PlyFileReaderService : public AbstractFileReader
-{
-public:
+  class PlyFileReaderService : public AbstractFileReader
+  {
+  public:
+    PlyFileReaderService();
+    virtual ~PlyFileReaderService();
 
-  PlyFileReaderService();
-  virtual ~PlyFileReaderService();
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-  using AbstractFileReader::Read;
-  virtual std::vector< itk::SmartPointer<BaseData> > Read() override;
+    static mitk::CustomMimeType mimeType;
 
-  static mitk::CustomMimeType mimeType;
-
-private:
-
-  PlyFileReaderService* Clone() const override;
-};
+  private:
+    PlyFileReaderService *Clone() const override;
+  };
 
 } // namespace mitk
 

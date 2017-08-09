@@ -17,14 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKQUATERNION_H_
 #define MITKQUATERNION_H_
 
-
-#include <vnl/vnl_quaternion.h>
 #include "mitkNumericConstants.h"
+#include <vnl/vnl_quaternion.h>
 
-namespace mitk {
-
-typedef vnl_quaternion<ScalarType> Quaternion;
-
+namespace mitk
+{
+  typedef vnl_quaternion<ScalarType> Quaternion;
 }
 
 #endif /* MITKQUATERNION_H_ */

@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include <mitkRenderingTestHelper.h>
-#include <mitkNodePredicateDataType.h>
+// MITK
 #include <mitkIOUtil.h>
-#include <mitkTestingMacros.h>
-#include <mitkTestFixture.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkRenderingTestHelper.h>
 #include <mitkSplineVtkMapper3D.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <vtkDebugLeaks.h>
 
@@ -34,28 +34,23 @@ class mitkSplineVtkMapper3DTestSuite : public mitk::TestFixture
   MITK_TEST(RenderSpline);
   MITK_TEST(RenderBlueSpline);
   MITK_TEST(RenderThickSpline);
-//  MITK_TEST(RenderThickTranslucentSpline);
+  //  MITK_TEST(RenderThickTranslucentSpline);
   MITK_TEST(RenderLowResolutionSpline);
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   /** Members used inside the different test methods. All members are initialized via setUp().*/
   mitk::RenderingTestHelper m_RenderingTestHelper;
   std::vector<std::string> m_CommandlineArgs;
   std::string m_PathToPointSet;
 
 public:
-
   /**
    * @brief mitkSplineVtkMapper3DTestSuite Because the RenderingTestHelper does not have an
    * empty default constructor, we need this constructor to initialize the helper with a
    * resolution.
    */
-  mitkSplineVtkMapper3DTestSuite():
-    m_RenderingTestHelper(640, 480)
-  {}
-
+  mitkSplineVtkMapper3DTestSuite() : m_RenderingTestHelper(640, 480) {}
   /**
    * @brief Setup Initialize a fresh rendering test helper and a vector of strings
    * to simulate commandline arguments for vtkTesting::Test.
@@ -68,21 +63,19 @@ public:
     // causes problems when doing a pixel-wise comparison to a reference image
     m_RenderingTestHelper.GetVtkRenderWindow()->SetMultiSamples(0);
 
-    m_PathToPointSet = GetTestDataFilePath("InteractionTestData/ReferenceData/PointSetDataInteractor_PointsAdd2d3d.mps");
+    m_PathToPointSet =
+      GetTestDataFilePath("InteractionTestData/ReferenceData/PointSetDataInteractor_PointsAdd2d3d.mps");
 
-    //Build a command line for the vtkTesting::Test method.
-    //See VTK documentation and RenderingTestHelper for more information.
-    //Use the following command line option to save the difference image
-    //and the test image in some tmp folder
-    //m_CommandlineArgs.push_back("-T");
-    //m_CommandlineArgs.push_back("/path/to/save/tmp/difference/images/");
+    // Build a command line for the vtkTesting::Test method.
+    // See VTK documentation and RenderingTestHelper for more information.
+    // Use the following command line option to save the difference image
+    // and the test image in some tmp folder
+    // m_CommandlineArgs.push_back("-T");
+    // m_CommandlineArgs.push_back("/path/to/save/tmp/difference/images/");
     m_CommandlineArgs.push_back("-V");
   }
 
-  void tearDown()
-  {
-  }
-
+  void tearDown() {}
   void RenderSpline()
   {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
@@ -91,16 +84,15 @@ public:
     mitk::SplineVtkMapper3D::Pointer mapper = mitk::SplineVtkMapper3D::New();
     node->SetMapper(mitk::BaseRenderer::StandardMapperSlot::Standard3D, mapper);
 
-    m_RenderingTestHelper.AddNodeToStorage( node );
+    m_RenderingTestHelper.AddNodeToStorage(node);
     m_RenderingTestHelper.SetMapperIDToRender3D();
 
-    //reference screenshot for this test
+    // reference screenshot for this test
     m_CommandlineArgs.push_back(GetTestDataFilePath("RenderingTestData/ReferenceScreenshots/spline_linewidth_1.png"));
-    //Convert vector of strings to argc/argv
+    // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
-    CPPUNIT_ASSERT( m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(),arg.GetArgv()) == true);
+    CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }
-
 
   void RenderBlueSpline()
   {
@@ -111,13 +103,14 @@ public:
     mitk::SplineVtkMapper3D::Pointer mapper = mitk::SplineVtkMapper3D::New();
     node->SetMapper(mitk::BaseRenderer::StandardMapperSlot::Standard3D, mapper);
 
-    m_RenderingTestHelper.AddNodeToStorage( node );
+    m_RenderingTestHelper.AddNodeToStorage(node);
     m_RenderingTestHelper.SetMapperIDToRender3D();
-    //reference screenshot for this test
-    m_CommandlineArgs.push_back(GetTestDataFilePath("RenderingTestData/ReferenceScreenshots/spline_blue_linewidth_1.png"));
-    //Convert vector of strings to argc/argv
+    // reference screenshot for this test
+    m_CommandlineArgs.push_back(
+      GetTestDataFilePath("RenderingTestData/ReferenceScreenshots/spline_blue_linewidth_1.png"));
+    // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
-    CPPUNIT_ASSERT( m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(),arg.GetArgv()) == true);
+    CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }
 
   void RenderThickSpline()
@@ -132,16 +125,16 @@ public:
 
     m_RenderingTestHelper.AddNodeToStorage(node);
     m_RenderingTestHelper.SetMapperIDToRender3D();
-    //reference screenshot for this test
+    // reference screenshot for this test
     m_CommandlineArgs.push_back(GetTestDataFilePath("RenderingTestData/ReferenceScreenshots/spline_linewidth_8.png"));
-    //Convert vector of strings to argc/argv
+    // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }
 
   // Currently, rending of objects with opacity < 1.0 fails on the dashboard
   // see bug 19575
-  //void RenderThickTranslucentSpline()
+  // void RenderThickTranslucentSpline()
   //{
   //  mitk::DataNode::Pointer node = mitk::DataNode::New();
   //  node->SetData(mitk::IOUtil::Load(m_PathToPointSet)[0]);
@@ -173,12 +166,12 @@ public:
 
     m_RenderingTestHelper.AddNodeToStorage(node);
     m_RenderingTestHelper.SetMapperIDToRender3D();
-    //reference screenshot for this test
-    m_CommandlineArgs.push_back(GetTestDataFilePath("RenderingTestData/ReferenceScreenshots/spline_lowRes_linewidth_1.png"));
-    //Convert vector of strings to argc/argv
+    // reference screenshot for this test
+    m_CommandlineArgs.push_back(
+      GetTestDataFilePath("RenderingTestData/ReferenceScreenshots/spline_lowRes_linewidth_1.png"));
+    // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }
-
 };
 MITK_TEST_SUITE_REGISTRATION(mitkSplineVtkMapper3D)

@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_CONTOURMODEL_SOURCE_H
 #define _MITK_CONTOURMODEL_SOURCE_H
 
-#include <MitkContourModelExports.h>
 #include "mitkBaseDataSource.h"
 #include "mitkContourModel.h"
+#include <MitkContourModelExports.h>
 
 namespace mitk
 {
@@ -30,24 +30,22 @@ namespace mitk
   class MITKCONTOURMODEL_EXPORT ContourModelSource : public BaseDataSource
   {
   public:
+    mitkClassMacro(ContourModelSource, BaseDataSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( ContourModelSource, BaseDataSource )
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    typedef ContourModel OutputType;
+      typedef ContourModel OutputType;
 
     typedef OutputType::Pointer OutputTypePointer;
 
     mitkBaseDataSourceGetOutputDeclarations
 
-    /**
-     * Allocates a new output object and returns it. Currently the
-     * index idx is not evaluated.
-     * @param idx the index of the output for which an object should be created
-     * @returns the new object
-     */
-    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
+      /**
+       * Allocates a new output object and returns it. Currently the
+       * index idx is not evaluated.
+       * @param idx the index of the output for which an object should be created
+       * @returns the new object
+       */
+      virtual itk::DataObject::Pointer
+      MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -58,12 +56,9 @@ namespace mitk
     virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
   protected:
-
     ContourModelSource();
 
     virtual ~ContourModelSource();
-
   };
-
 }
 #endif // #_MITK_CONTOURMODEL_SOURCE_H

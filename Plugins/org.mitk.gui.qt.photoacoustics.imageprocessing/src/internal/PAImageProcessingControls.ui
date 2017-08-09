@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>362</width>
-    <height>1074</height>
+    <width>382</width>
+    <height>1217</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -45,12 +45,18 @@
            <property name="text">
             <string>Bandpass</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item row="0" column="1">
           <widget class="QCheckBox" name="StepCropping">
            <property name="text">
-            <string>Cropping</string>
+            <string>Crop</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -59,12 +65,18 @@
            <property name="text">
             <string>Save</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item row="1" column="2">
           <widget class="QCheckBox" name="SaveBandpass">
            <property name="text">
             <string>Save</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -78,7 +90,10 @@
          <item row="0" column="0">
           <widget class="QCheckBox" name="StepBeamforming">
            <property name="text">
-            <string>Beamforming</string>
+            <string>Beamform</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -87,12 +102,18 @@
            <property name="text">
             <string>BMode</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item row="1" column="3">
           <widget class="QCheckBox" name="SaveBMode">
            <property name="text">
             <string>Save</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -122,12 +143,12 @@
           <widget class="QComboBox" name="BModeMethod">
            <item>
             <property name="text">
-             <string>Simple Abs Filter</string>
+             <string>Absolute Filter</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Shape Detection</string>
+             <string>Envelope Detection</string>
             </property>
            </item>
           </widget>
@@ -163,7 +184,7 @@
               <double>0.010000000000000</double>
              </property>
              <property name="value">
-              <double>0.150000000000000</double>
+              <double>0.100000000000000</double>
              </property>
             </widget>
            </item>
@@ -208,79 +229,6 @@
          </property>
          <property name="text">
           <string>Apply B-mode Filter</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QLabel" name="CropSettings">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Crop Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QSpinBox" name="CutoffAbove">
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-           <property name="value">
-            <number>162</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_20">
-           <property name="text">
-            <string>Cut Top</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="CutoffBelow">
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="value">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_21">
-           <property name="text">
-            <string>Cut Bottom</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelWarning2">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;Please select an image!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="buttonApplyCropFilter">
-         <property name="text">
-          <string>Apply Crop Filer</string>
          </property>
         </widget>
        </item>
@@ -430,6 +378,79 @@
       </layout>
      </item>
      <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="CropSettings">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Crop Filter Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QSpinBox" name="CutoffAbove">
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+           <property name="value">
+            <number>165</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_20">
+           <property name="text">
+            <string>Cut Top</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="CutoffBelow">
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>Cut Bottom</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelWarning2">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;Please select an image!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonApplyCropFilter">
+         <property name="text">
+          <string>Apply Crop Filer</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <widget class="Line" name="line_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -537,7 +558,7 @@
           </sizepolicy>
          </property>
          <property name="decimals">
-          <number>1</number>
+          <number>4</number>
          </property>
          <property name="maximum">
           <double>300.000000000000000</double>

@@ -14,12 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QTPERSPECTIVESWITCHERTABBAR_H_
 #define QTPERSPECTIVESWITCHERTABBAR_H_
 
-#include <QTabBar>
 #include <QHash>
+#include <QTabBar>
 
 #include <berryIPerspectiveListener.h>
 #include <berryIWorkbenchWindow.h>
@@ -38,7 +37,6 @@ class QtPerspectiveSwitcherTabBar : public QTabBar
   Q_OBJECT
 
 public:
-
   /**
    * Constructor.
    */
@@ -57,11 +55,10 @@ private Q_SLOTS:
   void SwitchPerspective();
 
 private:
-
   berry::IWorkbenchWindow::Pointer window;
   QScopedPointer<berry::IPerspectiveListener> perspListener;
 
-  QHash<QString, QAction*> perspIdToActionMap;
+  QHash<QString, QAction *> perspIdToActionMap;
 
   /**
    * Neccessary to prevent initial tab switching.
@@ -73,6 +70,5 @@ private:
    */
   friend struct QtPerspectiveSwitcherTabBarListener;
 };
-
 
 #endif /* QTPERSPECTIVESWITCHERTABBAR_H_ */

@@ -1,6 +1,6 @@
-project(org_mitk_gui_qt_igtappechotrack)
+project(org_mitk_gui_qt_igt_app_echotrack)
 
-MACRO_CREATE_MITK_CTK_PLUGIN(
+mitk_create_plugin(
   EXPORT_DIRECTIVE IGTAPPECHOTRACK_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   PACKAGE_DEPENDS CTK Poco

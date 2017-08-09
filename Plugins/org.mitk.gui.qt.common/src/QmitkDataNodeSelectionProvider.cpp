@@ -32,7 +32,7 @@ berry::ISelection::ConstPointer QmitkDataNodeSelectionProvider::GetSelection() c
   return this->GetDataNodeSelection();
 }
 
-void QmitkDataNodeSelectionProvider::SetSelection(berry::ISelection::ConstPointer selection,
+void QmitkDataNodeSelectionProvider::SetSelection(const berry::ISelection::ConstPointer& selection,
                                                   QItemSelectionModel::SelectionFlags flags)
 {
   if (!qSelectionModel) return;

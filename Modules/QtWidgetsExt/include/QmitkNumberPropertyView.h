@@ -16,57 +16,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_NUMBERPROPERTYVIEW_H_INCLUDED
 #define QMITK_NUMBERPROPERTYVIEW_H_INCLUDED
 
-#include <mitkPropertyObserver.h>
 #include "MitkQtWidgetsExtExports.h"
-#include <mitkProperties.h>
 #include <QLabel>
+#include <mitkProperties.h>
+#include <mitkPropertyObserver.h>
 
 /// @ingroup Widgets
 class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
-  Q_PROPERTY( short decimalPlaces READ decimalPlaces WRITE setDecimalPlaces )
-  Q_PROPERTY( QString suffix READ suffix WRITE setSuffix )
-  Q_PROPERTY( bool showPercent READ showPercent WRITE setShowPercent )
+  Q_PROPERTY(short decimalPlaces READ decimalPlaces WRITE setDecimalPlaces)
+  Q_PROPERTY(QString suffix READ suffix WRITE setSuffix)
+  Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent)
 
-  public:
+public:
+  QmitkNumberPropertyView(const mitk::IntProperty *, QWidget *parent);
+  QmitkNumberPropertyView(const mitk::FloatProperty *, QWidget *parent);
+  QmitkNumberPropertyView(const mitk::DoubleProperty *, QWidget *parent);
 
-    QmitkNumberPropertyView( const mitk::IntProperty*, QWidget* parent );
-    QmitkNumberPropertyView( const mitk::FloatProperty*, QWidget* parent );
-    QmitkNumberPropertyView( const mitk::DoubleProperty*, QWidget* parent );
+  virtual ~QmitkNumberPropertyView();
 
-    virtual ~QmitkNumberPropertyView();
+  short decimalPlaces() const;
+  void setDecimalPlaces(short);
 
-    short decimalPlaces() const;
-    void setDecimalPlaces(short);
+  QString suffix() const;
+  void setSuffix(const QString &);
 
-    QString suffix() const;
-    void setSuffix(const QString&);
+  bool showPercent() const;
+  void setShowPercent(bool);
 
-    bool showPercent() const;
-    void setShowPercent(bool);
+protected:
+  void initialize();
 
-  protected:
+  virtual void PropertyChanged() override;
+  virtual void PropertyRemoved() override;
 
-    void initialize();
+  void DisplayNumber();
 
-    virtual void PropertyChanged() override;
-    virtual void PropertyRemoved() override;
+  union {
+    const mitk::GenericProperty<int> *m_IntProperty;
+    const mitk::GenericProperty<float> *m_FloatProperty;
+    const mitk::GenericProperty<double> *m_DoubleProperty;
+  };
 
-    void DisplayNumber();
+  const int m_DataType;
 
-    union {
-      const mitk::GenericProperty<int>*     m_IntProperty;
-      const mitk::GenericProperty<float>*   m_FloatProperty;
-      const mitk::GenericProperty<double>*  m_DoubleProperty;
-    };
-
-    const int m_DataType;
-
-    short m_DecimalPlaces; /// -1 indicates "no limit to decimal places"
-    QString m_Suffix;
-    double m_DisplayFactor;
+  short m_DecimalPlaces; /// -1 indicates "no limit to decimal places"
+  QString m_Suffix;
+  double m_DisplayFactor;
 };
 
 #endif
-

@@ -40,22 +40,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkXMLShader_h
 #define __vtkXMLShader_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkObject.h"
+#include "vtkRenderingCoreModule.h" // For export macro
 
 class vtkXMLDataElement;
 
 class vtkXMLShader : public vtkObject
 {
 public:
-  static vtkXMLShader* New();
+  static vtkXMLShader *New();
   vtkTypeMacro(vtkXMLShader, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   // Description:
   // Get/Set the XML root element that describes this shader.
   vtkGetObjectMacro(RootElement, vtkXMLDataElement);
-  void SetRootElement(vtkXMLDataElement*);
+  void SetRootElement(vtkXMLDataElement *);
 
   // Description:
   // Returns the type of the shader as defined in the XML description.
@@ -74,56 +74,56 @@ public:
 
   // Description:
   // Get the name of the Shader.
-  const char* GetName();
+  const char *GetName();
 
   // Description:
   // Get the entry point to the shader code as defined in the XML.
-  const char* GetEntry();
+  const char *GetEntry();
 
   // Description:
   // Get the shader code.
-  const char* GetCode();
+  const char *GetCode();
 
   // Description:
   // Returns an null terminate array of the pointers to space sepatared Args
   // defined in the XML description.
-  const char** GetArgs();
+  const char **GetArgs();
 
   // Description:
   // Searches the file in the VTK_MATERIALS_DIRS.
   // Note that this allocates new memory for the string.
   // The caller must delete it.
-  static char* LocateFile(const char* filename);
+  static char *LocateFile(const char *filename);
 
-//BTX
+  // BTX
 
   enum ScopeCodes
-    {
-    SCOPE_NONE=0,
+  {
+    SCOPE_NONE = 0,
     SCOPE_MIXED,
     SCOPE_VERTEX,
     SCOPE_FRAGMENT,
     SCOPE_GEOMETRY
-    };
+  };
 
-//ETX
+  // ETX
 protected:
   vtkXMLShader();
   ~vtkXMLShader();
 
-  char* Code; // cache for the code.
+  char *Code; // cache for the code.
   vtkSetStringMacro(Code);
 
-  vtkXMLDataElement* RootElement;
-  vtkXMLDataElement* SourceLibraryElement;
-  void SetSourceLibraryElement(vtkXMLDataElement*);
+  vtkXMLDataElement *RootElement;
+  vtkXMLDataElement *SourceLibraryElement;
+  void SetSourceLibraryElement(vtkXMLDataElement *);
 
-  char** Args;
+  char **Args;
   void CleanupArgs();
+
 private:
-  vtkXMLShader(const vtkXMLShader&); // Not implemented.
-  void operator=(const vtkXMLShader&); // Not implemented.
+  vtkXMLShader(const vtkXMLShader &);   // Not implemented.
+  void operator=(const vtkXMLShader &); // Not implemented.
 };
 
 #endif
-

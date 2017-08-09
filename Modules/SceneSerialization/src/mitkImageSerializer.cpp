@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageSerializer.h"
-#include "mitkImage.h"
 #include "mitkIOUtil.h"
+#include "mitkImage.h"
 #include <Poco/Path.h>
 
 MITK_REGISTER_SERIALIZER(ImageSerializer)
@@ -31,16 +31,15 @@ mitk::ImageSerializer::~ImageSerializer()
 
 std::string mitk::ImageSerializer::Serialize()
 {
-  const Image* image = dynamic_cast<const Image*>( m_Data.GetPointer() );
+  const Image *image = dynamic_cast<const Image *>(m_Data.GetPointer());
   if (!image)
   {
-    MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::Image. Cannot serialize as image.";
+    MITK_ERROR << " Object at " << (const void *)this->m_Data << " is not an mitk::Image. Cannot serialize as image.";
     return "";
   }
 
-  std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
-std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std::endl;
+  std::string filename(this->GetUniqueFilenameInWorkingDirectory());
+  std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std::endl;
   filename += "_";
   filename += m_FilenameHint;
 
@@ -52,14 +51,11 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
   {
     IOUtil::Save(image, fullname);
   }
-  catch (std::exception& e)
+  catch (std::exception &e)
   {
-    MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
-              << " to "
-              << fullname
-              << ": "
-              << e.what();
+    MITK_ERROR << " Error serializing object at " << (const void *)this->m_Data << " to " << fullname << ": "
+               << e.what();
     return "";
   }
-  return Poco::Path(fullname).getFileName();// + ".pic";
+  return Poco::Path(fullname).getFileName(); // + ".pic";
 }

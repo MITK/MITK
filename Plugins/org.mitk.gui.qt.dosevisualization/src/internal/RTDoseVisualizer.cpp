@@ -58,7 +58,7 @@ const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualizati
 
 RTDoseVisualizer::RTDoseVisualizer()
 {
-  m_selectedNode = NULL;
+  m_selectedNode = nullptr;
   m_selectedPresetName = "";
   m_internalUpdate = false;
   m_PrescribedDose_Data = 0.0;
@@ -208,7 +208,7 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
 void RTDoseVisualizer::OnRemoveFreeValueClicked()
 {
   int index = this->m_Controls.listFreeValues->currentRow();
-  if (index > m_freeIsoValuesCount || index < 0)
+  if (index > static_cast<int>(m_freeIsoValuesCount) || index < 0)
     return;
 
   mitk::IsoDoseLevelVectorProperty::Pointer propfreeIsoVec;
@@ -448,12 +448,12 @@ void RTDoseVisualizer::UpdateColorWashTransferFunction()
   }
 }
 
-void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                          const QList<mitk::DataNode::Pointer>& nodes )
+void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer,
+                                          const QList<mitk::DataNode::Pointer>&)
 {
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
 
-  mitk::DataNode* selectedNode = NULL;
+  mitk::DataNode* selectedNode = nullptr;
 
   if (!dataNodes.empty())
   {
@@ -699,21 +699,19 @@ void RTDoseVisualizer::ActualizeDisplayStyleForAllDoseDataNodes()
   /** @TODO Klären ob diese präsentations info global oder auch per node gespeichert wird*/
 }
 
-void RTDoseVisualizer::OnHandleCTKEventReferenceDoseChanged(const ctkEvent& event)
+void RTDoseVisualizer::OnHandleCTKEventReferenceDoseChanged(const ctkEvent&)
 {
   mitk::DoseValueAbs referenceDose = 0.0;
-  bool globalSync = mitk::GetReferenceDoseValue(referenceDose);
-
   this->m_Controls.spinReferenceDose->setValue(referenceDose);
 }
 
-void RTDoseVisualizer::OnHandleCTKEventGlobalVisChanged(const ctkEvent& event)
+void RTDoseVisualizer::OnHandleCTKEventGlobalVisChanged(const ctkEvent&)
 {
   this->m_Controls.checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
   this->m_Controls.checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
 }
 
-void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent& event)
+void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent&)
 {
   std::string currentPresetName  = mitk::GetSelectedPresetName();
 
@@ -737,8 +735,14 @@ mitk::DataNode::Pointer RTDoseVisualizer::GetIsoDoseNode(mitk::DataNode::Pointer
 bool RTDoseVisualizer::ModalityIsRTDose(const mitk::DataNode* dataNode) const
 {
     auto data = dataNode->GetData();
+    if (!data) {
+      return false;
+    }
     auto modalityProperty = data->GetProperty("modality");
     auto modalityGenericProperty = dynamic_cast<mitk::GenericProperty<std::string>*>(modalityProperty.GetPointer());
+    if (!modalityGenericProperty) {
+      return false;
+    }
     std::string modality = modalityGenericProperty->GetValue();
     return modality == "RTDOSE";
 }

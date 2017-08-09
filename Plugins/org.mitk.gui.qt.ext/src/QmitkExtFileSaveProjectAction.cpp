@@ -98,11 +98,11 @@ void QmitkExtFileSaveProjectAction::Run()
     mitk::DataStorage::Pointer storage = dsRef->GetDataStorage();
 
     QString dialogTitle = "Save MITK Scene (%1)";
-    QString fileName = QFileDialog::getSaveFileName(NULL,
+    QString fileName = QFileDialog::getSaveFileName(nullptr,
                                                     dialogTitle.arg(dsRef->GetLabel()),
                                                     m_LastPath,
                                                     "MITK scene files (*.mitk)",
-                                                    NULL );
+                                                    nullptr );
 
     if (fileName.isEmpty() )
       return;
@@ -124,7 +124,7 @@ void QmitkExtFileSaveProjectAction::Run()
 
     if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
     {
-      QMessageBox::information(NULL,
+      QMessageBox::information(nullptr,
                                "Scene saving",
                                "Scene could not be written completely. Please check the log.",
                                QMessageBox::Ok);
@@ -148,7 +148,7 @@ void QmitkExtFileSaveProjectAction::Run()
         }
         else
         {
-          ss << "(NULL)";
+          ss << "(nullptr)";
         }
 
         ss << " contained in node '" << (*iter)->GetName() << "'" << std::endl;

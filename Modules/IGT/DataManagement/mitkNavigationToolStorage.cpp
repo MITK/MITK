@@ -27,7 +27,7 @@ const std::string  mitk::NavigationToolStorage::US_PROPKEY_STORAGE_NAME = US_INT
 
 mitk::NavigationToolStorage::NavigationToolStorage()
   : m_ToolCollection(std::vector<mitk::NavigationTool::Pointer>()),
-    m_DataStorage(NULL),
+    m_DataStorage(nullptr),
     m_storageLocked(false)
   {
   this->SetName("ToolStorage (no name given)");
@@ -152,13 +152,13 @@ mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(int number)
 mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(std::string identifier)
   {
   for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetIdentifier())==identifier) return GetTool(i);
-  return NULL;
+  return nullptr;
   }
 
 mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetToolByName(std::string name)
   {
   for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetToolName())==name) return GetTool(i);
-  return NULL;
+  return nullptr;
   }
 
 int mitk::NavigationToolStorage::GetToolCount()
@@ -194,7 +194,7 @@ bool mitk::NavigationToolStorage::AssignToolNumber(std::string identifier1, int 
     return false;
     }
 
-  if ((number2 >= m_ToolCollection.size()) || (number2 < 0))
+  if ((number2 >= static_cast<int>(m_ToolCollection.size())) || (number2 < 0))
     {
     MITK_WARN << "Invalid number, cannot assign new number";
     return false;
@@ -204,7 +204,7 @@ bool mitk::NavigationToolStorage::AssignToolNumber(std::string identifier1, int 
 
   int number1 = -1;
 
-  for(int i = 0; i<m_ToolCollection.size(); i++)
+  for(int i = 0; i<static_cast<int>(m_ToolCollection.size()); i++)
     {
     if (m_ToolCollection.at(i)->GetIdentifier() == identifier1) {number1=i;}
     }

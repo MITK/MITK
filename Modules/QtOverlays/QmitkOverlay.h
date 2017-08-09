@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 #define MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 
@@ -26,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 #include <MitkQtOverlaysExports.h>
-
 
 /**
  \brief Abstract base class for all overlay-objects in MITK
@@ -57,7 +55,6 @@ class MITKQTOVERLAYS_EXPORT QmitkOverlay : public QObject
   Q_OBJECT
 
 public:
-
   /** \brief enumeration of all possible display positions  */
   enum DisplayPosition
   {
@@ -74,7 +71,7 @@ public:
   /**
   * @brief Constructor with string ID
   **/
-  QmitkOverlay(const char* id);
+  QmitkOverlay(const char *id);
 
   /**
   * @brief Default Destructor
@@ -82,13 +79,13 @@ public:
   virtual ~QmitkOverlay();
 
   /** \brief setter for the display-position  */
-  virtual void SetPosition( DisplayPosition );
+  virtual void SetPosition(DisplayPosition);
 
   /** \brief getter for the display-position  */
   virtual DisplayPosition GetPosition();
 
   /** \brief setter for the layer  */
-  virtual void SetLayer( unsigned int );
+  virtual void SetLayer(unsigned int);
 
   /** \brief getter for the layer  */
   virtual unsigned int GetLayer();
@@ -96,24 +93,22 @@ public:
   /**
   * \brief abstract method to internally setup the overlay
   */
-  virtual void GenerateData( mitk::PropertyList::Pointer /*pl*/ ) {};
+  virtual void GenerateData(mitk::PropertyList::Pointer /*pl*/){};
 
   /**
   * \brief returns the internally handled QWidget
   */
-  virtual QWidget* GetWidget();
+  virtual QWidget *GetWidget();
 
   virtual QSize GetNeededSize() = 0;
 
-
 protected:
-
   /**
     \brief Add drop shadow effect via QGraphicsEffect
   */
-  void AddDropShadow( QWidget* widget );
+  void AddDropShadow(QWidget *widget);
   /** \brief ID of the overlay */
-  const char* m_Id;
+  const char *m_Id;
 
   /** \brief position of the overlay */
   DisplayPosition m_Position;
@@ -122,12 +117,9 @@ protected:
   unsigned int m_Layer;
 
   /** \brief internal QWidget representing the overlay */
-  QWidget* m_Widget;
+  QWidget *m_Widget;
 
   bool m_WidgetIsCustom;
 };
 
-
 #endif /* MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB */
-
-

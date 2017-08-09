@@ -62,7 +62,6 @@ namespace mitk {
       float BPHighPass = 50;
       float BPLowPass = 50;
       bool UseBP = false;
-      unsigned int ButterworthOrder = 8;
     };
 
     void Configure(beamformingSettings settings);
@@ -106,4 +105,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
+#endif //MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER

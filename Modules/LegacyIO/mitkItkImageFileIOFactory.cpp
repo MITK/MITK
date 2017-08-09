@@ -20,30 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-ItkImageFileIOFactory::ItkImageFileIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkItkImageFileReader",
-                         "itk Image IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<ItkImageFileReader> >::New());
-}
+  ItkImageFileIOFactory::ItkImageFileIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkItkImageFileReader",
+                           "itk Image IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<ItkImageFileReader>>::New());
+  }
 
-ItkImageFileIOFactory::~ItkImageFileIOFactory()
-{
-}
-
-const char* ItkImageFileIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* ItkImageFileIOFactory::GetDescription() const
-{
-  return "ItkImageFile IO Factory, allows the loading of images supported by ITK";
-}
+  ItkImageFileIOFactory::~ItkImageFileIOFactory() {}
+  const char *ItkImageFileIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *ItkImageFileIOFactory::GetDescription() const
+  {
+    return "ItkImageFile IO Factory, allows the loading of images supported by ITK";
+  }
 
 } // end namespace mitk

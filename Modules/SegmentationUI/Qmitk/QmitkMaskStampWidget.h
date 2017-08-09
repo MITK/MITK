@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkMaskStampWidgetGUIControls.h"
 
-namespace mitk {
+namespace mitk
+{
   class ToolManager;
 }
 
@@ -39,27 +40,24 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMaskStampWidget : public QWidget
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkMaskStampWidget(QWidget *parent = 0, const char *name = 0);
+  virtual ~QmitkMaskStampWidget();
 
-    QmitkMaskStampWidget(QWidget* parent = 0, const char* name = 0);
-    virtual ~QmitkMaskStampWidget();
+  void SetDataStorage(mitk::DataStorage *storage);
 
-    void SetDataStorage( mitk::DataStorage* storage );
+protected slots:
 
-  protected slots:
+  void OnShowInformation(bool);
 
-    void OnShowInformation(bool);
+  void OnStamp();
 
-    void OnStamp();
+private:
+  mitk::ToolManager *m_ToolManager;
 
-  private:
+  mitk::DataStorage *m_DataStorage;
 
-    mitk::ToolManager* m_ToolManager;
-
-    mitk::DataStorage* m_DataStorage;
-
-    Ui::QmitkMaskStampWidgetGUIControls m_Controls;
-
+  Ui::QmitkMaskStampWidgetGUIControls m_Controls;
 };
 
 #endif

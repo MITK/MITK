@@ -16,16 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include "mitkAnisotropicIterativeClosestPointRegistration.h"
-#include "mitkWeightedPointTransform.h"
 #include "mitkAnisotropicRegistrationCommon.h"
-#include <mitkSurface.h>
+#include "mitkWeightedPointTransform.h"
 #include <mitkProgressBar.h>
+#include <mitkSurface.h>
 // VTK
+#include <vtkIdList.h>
 #include <vtkKdTree.h>
+#include <vtkKdTreePointLocator.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
-#include <vtkIdList.h>
-#include <vtkKdTreePointLocator.h>
 // STL pair
 #include <utility>
 
@@ -34,12 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
   */
 struct AICPComperator
 {
-  typedef std::pair < unsigned int, double > Correspondence;
+  typedef std::pair<unsigned int, double> Correspondence;
 
-  bool operator() (const Correspondence& a, const Correspondence& b)
-  {
-    return (a.second < b.second);
-  }
+  bool operator()(const Correspondence &a, const Correspondence &b) { return (a.second < b.second); }
 } AICPComp;
 
 mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestPointRegistration()
@@ -61,68 +58,62 @@ mitk::AnisotropicIterativeClosestPointRegistration::~AnisotropicIterativeClosest
 {
 }
 
-void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences ( vtkPoints* X,
-                                                                                  vtkPoints* Z,
-                                                                                  vtkKdTreePointLocator* Y,
-                                                                                  const CovarianceMatrixList& sigma_X,
-                                                                                  const CovarianceMatrixList& sigma_Y,
-                                                                                  CovarianceMatrixList& sigma_Z,
-                                                                                  CorrespondenceList& correspondences,
-                                                                                  const double radius
-                                                                                )
+void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences(vtkPoints *X,
+                                                                                vtkPoints *Z,
+                                                                                vtkKdTreePointLocator *Y,
+                                                                                const CovarianceMatrixList &sigma_X,
+                                                                                const CovarianceMatrixList &sigma_Y,
+                                                                                CovarianceMatrixList &sigma_Z,
+                                                                                CorrespondenceList &correspondences,
+                                                                                const double radius)
 {
-  typedef itk::Matrix < double, 3, 3 > WeightMatrix;
+  typedef itk::Matrix<double, 3, 3> WeightMatrix;
 
-# pragma omp parallel for
-  for ( vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i )
+#pragma omp parallel for
+  for (vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i)
   {
     vtkIdType bestIdx = 0;
     mitk::Vector3D x;
     mitk::Vector3D y;
     double bestDist = std::numeric_limits<double>::max();
-    vtkIdList* ids = vtkIdList::New();
+    vtkIdList *ids = vtkIdList::New();
     double r = radius;
     double p[3];
     // get point
-    X->GetPoint(i,p);
+    X->GetPoint(i, p);
     // fill vector
     x[0] = p[0];
     x[1] = p[1];
     x[2] = p[2];
 
     // double the radius till we find at least one point
-    while( ids->GetNumberOfIds() <= 0 )
+    while (ids->GetNumberOfIds() <= 0)
     {
-      Y->FindPointsWithinRadius(r,p,ids);
+      Y->FindPointsWithinRadius(r, p, ids);
       r *= 2.0;
     }
 
     // loop over the points in the sphere and find the point with the
     // minimal weighted squared distance
-    for ( vtkIdType j = 0; j < ids->GetNumberOfIds(); ++j )
+    for (vtkIdType j = 0; j < ids->GetNumberOfIds(); ++j)
     {
       // get id
       const vtkIdType id = ids->GetId(j);
       // compute weightmatrix
-      WeightMatrix m =
-          mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix( sigma_X[i],
-                                                                      sigma_Y[id]
-                                                                    );
+      WeightMatrix m = mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix(sigma_X[i], sigma_Y[id]);
       // point of the fixed data set
-      Y->GetDataSet()->GetPoint(id,p);
+      Y->GetDataSet()->GetPoint(id, p);
 
       // fill mitk vector
       y[0] = p[0];
       y[1] = p[1];
       y[2] = p[2];
 
-      const mitk::Vector3D res = m * ( x - y );
+      const mitk::Vector3D res = m * (x - y);
 
-      const double dist = res[0] * res[0] +
-                          res[1] * res[1] +
-                          res[2] * res[2];
+      const double dist = res[0] * res[0] + res[1] * res[1] + res[2] * res[2];
 
-      if ( dist < bestDist )
+      if (dist < bestDist)
       {
         bestDist = dist;
         bestIdx = id;
@@ -130,11 +121,11 @@ void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences 
     }
 
     // save correspondences of the fixed point set
-    Y->GetDataSet()->GetPoint(bestIdx,p);
-    Z->SetPoint(i,p);
+    Y->GetDataSet()->GetPoint(bestIdx, p);
+    Z->SetPoint(i, p);
     sigma_Z[i] = sigma_Y[bestIdx];
 
-    Correspondence _pair(i,bestDist);
+    Correspondence _pair(i, bestDist);
     correspondences[i] = _pair;
 
     ids->Delete();
@@ -148,13 +139,13 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   double diff = 0.0;
   double FRE_new = std::numeric_limits<double>::max();
   // Moving pointset
-  vtkPoints* X = vtkPoints::New();
+  vtkPoints *X = vtkPoints::New();
   // Correspondences
-  vtkPoints* Z = vtkPoints::New();
+  vtkPoints *Z = vtkPoints::New();
   // Covariance matrices of the pointset X
-  CovarianceMatrixList& Sigma_X = m_CovarianceMatricesMovingSurface;
+  CovarianceMatrixList &Sigma_X = m_CovarianceMatricesMovingSurface;
   // Covariance matrices of the pointset Y
-  CovarianceMatrixList& Sigma_Y = m_CovarianceMatricesFixedSurface;
+  CovarianceMatrixList &Sigma_Y = m_CovarianceMatricesFixedSurface;
   // Covariance matrices of the correspondences
   CovarianceMatrixList Sigma_Z;
   // transform of the current iteration
@@ -163,13 +154,13 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   // corresponding indizes with distance
   CorrespondenceList distanceList;
   // sorted datasets used if trimming is enabled
-  vtkPoints* X_sorted = vtkPoints::New();
-  vtkPoints* Z_sorted = vtkPoints::New();
+  vtkPoints *X_sorted = vtkPoints::New();
+  vtkPoints *Z_sorted = vtkPoints::New();
   CovarianceMatrixList Sigma_X_sorted;
   CovarianceMatrixList Sigma_Z_sorted;
 
   // create kdtree for correspondence search
-  vtkKdTreePointLocator* Y = vtkKdTreePointLocator::New();
+  vtkKdTreePointLocator *Y = vtkKdTreePointLocator::New();
   Y->SetDataSet(m_FixedSurface->GetVtkPolyData());
   Y->BuildLocator();
 
@@ -191,7 +182,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
 
   // compute number of correspondences based
   // on the trimmfactor
-  if ( m_TrimmFactor > 0.0)
+  if (m_TrimmFactor > 0.0)
   {
     numberOfTrimmedPoints = X->GetNumberOfPoints() * m_TrimmFactor;
   }
@@ -208,8 +199,8 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   unsigned int stepSize = m_MaxIterations / 10;
   mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
 
-  do {
-
+  do
+  {
     // reset innerloop
     double currSearchRadius = m_SearchRadius;
     unsigned int radiusDoubled = 0;
@@ -218,32 +209,30 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
 
     MITK_DEBUG << "iteration: " << k;
 
-    do {
+    do
+    {
       // search correspondences
-      ComputeCorrespondences( X, Z, Y, Sigma_X,
-                              Sigma_Y, Sigma_Z,
-                              distanceList,
-                              currSearchRadius );
+      ComputeCorrespondences(X, Z, Y, Sigma_X, Sigma_Y, Sigma_Z, distanceList, currSearchRadius);
 
       // tmp pointers
-      vtkPoints* X_k = X;
-      vtkPoints* Z_k = Z;
-      CovarianceMatrixList* Sigma_Z_k = &Sigma_Z;
-      CovarianceMatrixList* Sigma_X_k = &Sigma_X;
+      vtkPoints *X_k = X;
+      vtkPoints *Z_k = Z;
+      CovarianceMatrixList *Sigma_Z_k = &Sigma_Z;
+      CovarianceMatrixList *Sigma_X_k = &Sigma_X;
 
       // sort the correspondences depending on their
       // distance, if trimming is enabled
-      if ( m_TrimmFactor > 0.0 )
+      if (m_TrimmFactor > 0.0)
       {
-        std::sort ( distanceList.begin(), distanceList.end(), AICPComp );
+        std::sort(distanceList.begin(), distanceList.end(), AICPComp);
         // map correspondences to the data arrays
-        for ( unsigned int i = 0; i < numberOfTrimmedPoints; ++i )
+        for (unsigned int i = 0; i < numberOfTrimmedPoints; ++i)
         {
           const int idx = distanceList[i].first;
           Sigma_Z_sorted[i] = Sigma_Z[idx];
           Sigma_X_sorted[i] = Sigma_X[idx];
-          Z_sorted->SetPoint(i,Z->GetPoint(idx));
-          X_sorted->SetPoint(i,X->GetPoint(idx));
+          Z_sorted->SetPoint(i, Z->GetPoint(idx));
+          X_sorted->SetPoint(i, X->GetPoint(idx));
         }
         // assign pointers
         X_k = X_sorted;
@@ -264,16 +253,16 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
       // run computation
       m_WeightedPointTransform->ComputeTransformation();
       // retrieve result
-      RotationNew =    m_WeightedPointTransform->GetTransformR();
+      RotationNew = m_WeightedPointTransform->GetTransformR();
       TranslationNew = m_WeightedPointTransform->GetTransformT();
-      FRE_new =        m_WeightedPointTransform->GetFRE();
+      FRE_new = m_WeightedPointTransform->GetFRE();
 
       // double the radius
       radiusDoubled += 1;
       currSearchRadius *= 2.0;
 
       // sanity check to prevent endless loop
-      if ( radiusDoubled >= 20 )
+      if (radiusDoubled >= 20)
       {
         mitkThrow() << "Radius doubled 20 times, preventing endless loop, check input and search radius";
       }
@@ -281,12 +270,12 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
       // termination constraint
       diff = m_FRE - FRE_new;
 
-    } while ( diff < -1.0e-3 ); // increase radius as long as the FRE grows
+    } while (diff < -1.0e-3); // increase radius as long as the FRE grows
 
-    MITK_DEBUG << "FRE:" << m_FRE << ", FRE_new: "<< FRE_new;
+    MITK_DEBUG << "FRE:" << m_FRE << ", FRE_new: " << FRE_new;
     // transform points and propagate matrices
-    mitk::AnisotropicRegistrationCommon::TransformPoints(X,X,RotationNew,TranslationNew);
-    mitk::AnisotropicRegistrationCommon::PropagateMatrices(Sigma_X,Sigma_X,RotationNew);
+    mitk::AnisotropicRegistrationCommon::TransformPoints(X, X, RotationNew, TranslationNew);
+    mitk::AnisotropicRegistrationCommon::PropagateMatrices(Sigma_X, Sigma_X, RotationNew);
 
     // update global transformation
     m_Rotation = RotationNew * m_Rotation;
@@ -300,16 +289,16 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
     // to use a simulated endless progress bar since we don't have
     // a fixed amount of iterations
     stepSize = (k % 2 == 0) ? stepSize / 2 : stepSize;
-    stepSize = ( stepSize == 0 ) ? 1 : stepSize;
+    stepSize = (stepSize == 0) ? 1 : stepSize;
     mitk::ProgressBar::GetInstance()->Progress(stepSize);
 
-  } while ( diff > m_Threshold && k < m_MaxIterations );
+  } while (diff > m_Threshold && k < m_MaxIterations);
 
   m_NumberOfIterations = k;
 
   // finish the progress bar if there are more steps
   // left than iterations used
-  if ( k < steps )
+  if (k < steps)
     mitk::ProgressBar::GetInstance()->Progress(steps);
 
   // free memory

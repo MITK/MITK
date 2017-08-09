@@ -26,17 +26,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 */
 
-#include "mitkStandardFileLocations.h"
 #include "mitkDicomSeriesReader.h"
 #include "mitkIOUtil.h"
 #include "mitkImage.h"
+#include "mitkStandardFileLocations.h"
 
-#include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
 
 #include <list>
-#include <locale>
 #include <locale.h>
+#include <locale>
 
 class mitkDICOMLocaleTestSuite : public mitk::TestFixture
 {
@@ -45,9 +45,8 @@ class mitkDICOMLocaleTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   // A custom method for adding a combination of filename and locale tests
-  static void addDICOMLocaleWithReferenceImageTests(TestSuiteBuilderContextType& context)
+  static void addDICOMLocaleWithReferenceImageTests(TestSuiteBuilderContextType &context)
   {
     std::vector<std::string> fileArgs;
     fileArgs.push_back("spacing-ok-ct.dcm");
@@ -73,12 +72,10 @@ private:
   }
 
 private:
-
   std::string m_FileName;
   std::string m_Locale;
+  char *m_OldLocale;
   bool m_SkipImageTest;
-
-  char* m_OldLocale;
 
   void SetTestParameter()
   {
@@ -89,26 +86,22 @@ private:
   }
 
 public:
-
-  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL), m_SkipImageTest(false) {}
-
-
-
+  mitkDICOMLocaleTestSuite() : m_OldLocale(nullptr), m_SkipImageTest(false) {}
   // Change the current locale to m_Locale
   void setUp() override
   {
     m_SkipImageTest = false;
-    m_OldLocale = NULL;
+    m_OldLocale = nullptr;
     SetTestParameter();
 
     try
     {
-      m_OldLocale = setlocale(LC_ALL, NULL);
+      m_OldLocale = setlocale(LC_ALL, nullptr);
       MITK_TEST_OUTPUT(<< " ** Changing locale from " << m_OldLocale << " to '" << m_Locale << "'")
       setlocale(LC_ALL, m_Locale.c_str());
       std::cin.imbue(std::locale(m_Locale.c_str()));
     }
-    catch(...)
+    catch (...)
     {
       MITK_TEST_OUTPUT(<< "Could not activate locale " << m_Locale)
       m_SkipImageTest = true;
@@ -126,13 +119,15 @@ public:
 
   void testLocaleWithReferenceImage()
   {
-    if (m_SkipImageTest) return;
+    if (m_SkipImageTest)
+      return;
 
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(m_FileName);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_FileName)[0].GetPointer());
     CPPUNIT_ASSERT(image.IsNotNull());
 
     // note importance of minor differences in spacings:
-    // DICOM has order y-spacing, x-spacing, while in MITK we assume x-spacing, y-spacing (both meant for 0 and 1 index in array)
+    // DICOM has order y-spacing, x-spacing, while in MITK we assume x-spacing, y-spacing (both meant for 0 and 1 index
+    // in array)
     CPPUNIT_ASSERT_MESSAGE("incorrect x spacing", mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592));
     CPPUNIT_ASSERT_MESSAGE("incorrect y spacing ", mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592));
   }

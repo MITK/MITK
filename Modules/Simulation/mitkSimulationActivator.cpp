@@ -43,8 +43,8 @@ namespace mitk
 
     void Unload(us::ModuleContext*) override
     {
-      m_SimulationIO.reset(NULL);
-      m_SimulationService.reset(NULL);
+      m_SimulationIO.reset(nullptr);
+      m_SimulationService.reset(nullptr);
     }
 
   private:

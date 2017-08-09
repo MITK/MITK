@@ -23,53 +23,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  template <class T>
+  class CreateImageWriter : public itk::CreateObjectFunctionBase
+  {
+  public:
+    /** Standard class typedefs. */
+    typedef CreateImageWriter Self;
+    typedef itk::SmartPointer<Self> Pointer;
 
-template <class T>
-class CreateImageWriter : public itk::CreateObjectFunctionBase
-{
-public:
+    /** Methods from itk:LightObject. */
+    itkFactorylessNewMacro(Self);
+    LightObject::Pointer CreateObject() override
+    {
+      typename T::Pointer p = T::New();
+      p->Register();
+      return p.GetPointer();
+    }
 
-  /** Standard class typedefs. */
-  typedef CreateImageWriter  Self;
-  typedef itk::SmartPointer<Self>    Pointer;
+  protected:
+    CreateImageWriter() {}
+    ~CreateImageWriter() {}
+  private:
+    CreateImageWriter(const Self &); // purposely not implemented
+    void operator=(const Self &);    // purposely not implemented
+  };
 
-  /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self);
-  LightObject::Pointer CreateObject() override { typename T::Pointer p = T::New();
-    p->Register();
-    return p.GetPointer();
+  ImageWriterFactory::ImageWriterFactory()
+  {
+    this->RegisterOverride(
+      "IOWriter", "ImageWriter", "Image Writer", 1, mitk::CreateImageWriter<mitk::ImageWriter>::New());
   }
 
-protected:
-  CreateImageWriter() {}
-  ~CreateImageWriter() {}
-
-private:
-  CreateImageWriter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
-
-ImageWriterFactory::ImageWriterFactory()
-{
-  this->RegisterOverride("IOWriter",
-                         "ImageWriter",
-                         "Image Writer",
-                         1,
-                         mitk::CreateImageWriter<mitk::ImageWriter>::New());
-}
-
-ImageWriterFactory::~ImageWriterFactory()
-{
-}
-
-const char* ImageWriterFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* ImageWriterFactory::GetDescription() const
-{
-  return "ImageWriterFactory";
-}
-
+  ImageWriterFactory::~ImageWriterFactory() {}
+  const char *ImageWriterFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *ImageWriterFactory::GetDescription() const { return "ImageWriterFactory"; }
 } // end namespace mitk

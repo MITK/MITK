@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKMODULETABLEMODEL_H
 #define QMITKMODULETABLEMODEL_H
 
@@ -23,9 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtWidgetsExtExports.h>
 
-namespace us {
-class ModuleContext;
-class Module;
+namespace us
+{
+  class ModuleContext;
+  class Module;
 }
 
 class QmitkModuleTableModelPrivate;
@@ -33,28 +33,24 @@ class QmitkModuleTableModelPrivate;
 class MITKQTWIDGETSEXT_EXPORT QmitkModuleTableModel : public QAbstractTableModel
 {
 public:
-
-  QmitkModuleTableModel(QObject* parent = nullptr, us::ModuleContext* mc = nullptr);
+  QmitkModuleTableModel(QObject *parent = nullptr, us::ModuleContext *mc = nullptr);
   ~QmitkModuleTableModel();
 
 protected:
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-
-  QVariant data(const QModelIndex& index, int role) const override;
+  QVariant data(const QModelIndex &index, int role) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 private:
-
   friend class QmitkModuleTableModelPrivate;
 
-  void insertModule(us::Module* module);
+  void insertModule(us::Module *module);
 
-  QmitkModuleTableModelPrivate* const d;
+  QmitkModuleTableModelPrivate *const d;
 };
 
 #endif
-

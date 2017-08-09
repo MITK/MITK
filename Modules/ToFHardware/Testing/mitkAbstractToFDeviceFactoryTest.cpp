@@ -42,7 +42,7 @@ private:
 
     virtual std::string GetCurrentDeviceName() override{return "dummy device";}
 
-    virtual mitk::ToFCameraDevice::Pointer CreateToFCameraDevice() override {return NULL;}
+    virtual mitk::ToFCameraDevice::Pointer CreateToFCameraDevice() override {return nullptr;}
 
     /**
      * @brief GetIntrinsics Public wrapper to test intrinsics

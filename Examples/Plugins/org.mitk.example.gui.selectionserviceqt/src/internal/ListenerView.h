@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef LISTENERVIEW_H_
 #define LISTENERVIEW_H_
 
 // berry includes
-#include <berryQtViewPart.h>
-#include <berryIStructuredSelection.h>
 #include <berryISelectionListener.h>
+#include <berryIStructuredSelection.h>
+#include <berryQtViewPart.h>
 
 // ui includes
 #include "ui_ListenerViewControls.h"
@@ -41,7 +40,6 @@ class ListenerView : public berry::QtViewPart
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   ListenerView();
@@ -49,7 +47,6 @@ public:
   ~ListenerView();
 
 protected:
-
   void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override;
@@ -63,7 +60,6 @@ private Q_SLOTS:
   void ToggleRadioMethod(QString selectStr);
 
 private:
-
   //! [Qt Selection Listener method and pointer]
   /**
    * @brief Method of berry::ISelectionListener that implements the selection listener functionality.
@@ -72,8 +68,8 @@ private:
    *
    * @see ISelectionListener
    */
-  void SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
-                        const berry::ISelection::ConstPointer& selection);
+  void SelectionChanged(const berry::IWorkbenchPart::Pointer &sourcepart,
+                        const berry::ISelection::ConstPointer &selection);
 
   /** @brief this pointer holds the selection listener */
   QScopedPointer<berry::ISelectionListener> m_SelectionListener;
@@ -83,8 +79,7 @@ private:
 
   Ui::ListenerViewControls m_Controls;
 
-  QWidget* m_Parent;
-
+  QWidget *m_Parent;
 };
 
 #endif /*LISTENERVIEW_H_*/

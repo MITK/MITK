@@ -60,8 +60,8 @@ private:
 protected:
   void InitializeNDIWidget();
 
-  QThread* m_ScanPortsWorkerThread;
   QmitkTrackingDeviceConfigurationWidgetScanPortsWorker* m_ScanPortsWorker;
+  QThread* m_ScanPortsWorkerThread;
 
   virtual void SetPortValueToGUI(int portValue) = 0;
   virtual void SetPortTypeToGUI(int portType) = 0;

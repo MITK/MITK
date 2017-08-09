@@ -40,63 +40,60 @@ class QPushButton;
   This dialog is used to ask a user about the type of a newly created segmentation and a name for it.
 
   \warning Will not create a new organ type in the OrganTypeProperty. Client has to do that.
-
-  Last contribution by $Author: maleike $.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkNewSegmentationDialog(QWidget *parent = nullptr);
 
-    QmitkNewSegmentationDialog(QWidget* parent = nullptr);
+  virtual ~QmitkNewSegmentationDialog();
 
-    virtual ~QmitkNewSegmentationDialog();
+  const QString GetSegmentationName();
+  mitk::Color GetColor();
+  const char *GetOrganType();
 
-    const QString GetSegmentationName();
-    const char* GetOrganType();
-    mitk::Color GetColor();
+  void SetSegmentationName(const QString &segmentationName);
+  void SetColor(const mitk::Color &color);
+  void SetSuggestionList(QStringList organColorList);
 
-    void SetSuggestionList(QStringList organColorList);
+signals:
 
-  signals:
+public slots:
 
-  public slots:
+  void setPrompt(const QString &prompt);
 
-    void setPrompt( const QString& prompt );
-    void setSegmentationName( const QString& name );
+protected slots:
 
-  protected slots:
+  void onAcceptClicked();
+  void onNewOrganNameChanged(const QString &);
+  void onColorBtnClicked();
+  void onColorChange(const QString &completedWord);
 
-    void onAcceptClicked();
-    void onNewOrganNameChanged(const QString&);
-    void onColorBtnClicked();
-    void onColorChange(const QString& completedWord);
+protected:
 
-  protected:
+  QLabel *lblPrompt;
+  Q3ListBox *lstOrgans;
+  QLineEdit *lineEditName;
 
-    QLabel*  lblPrompt;
-    Q3ListBox*  lstOrgans;
-    QLineEdit* edtName;
+  QPushButton *btnColor;
+  QPushButton *btnOk;
 
-    QPushButton* btnColor;
-    QPushButton* btnOk;
+  QLineEdit *edtNewOrgan;
 
-    QLineEdit* edtNewOrgan;
+  QString selectedOrgan;
 
-    QString selectedOrgan;
+  bool newOrganEntry;
 
-    bool newOrganEntry;
+  QColor m_Color;
 
-    QColor m_Color;
+  QCompleter *completer;
 
-    QCompleter* completer;
+  QString m_SegmentationName;
 
-    QString m_SegmentationName;
-
-    QStringList organList;
-    QList<QColor> colorList;
+  QStringList organList;
+  QList<QColor> colorList;
 };
 
 #endif
-

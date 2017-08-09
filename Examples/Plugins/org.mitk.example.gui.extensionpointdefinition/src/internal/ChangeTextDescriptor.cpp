@@ -22,8 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ChangeTextDescriptor::ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint)
   : m_ChangeTextExtensionPoint(changeTextExtensionPoint)
 {
-  this->m_Id = this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID);
-  this->m_Name = this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME);
+  this->m_Id =
+    this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID);
+  this->m_Name =
+    this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME);
 
   // Check if the "id" and "name" attributes are available
   if (this->m_Id.isNull() || this->m_Name.isNull())
@@ -34,9 +36,9 @@ ChangeTextDescriptor::ChangeTextDescriptor(berry::IConfigurationElement::Pointer
 
   // Get the optional "description" child element
   QList<berry::IConfigurationElement::Pointer> descriptions(
-        this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_CHILD_DESCRIPTION));
+    this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_CHILD_DESCRIPTION));
 
-  if(!descriptions.isEmpty())
+  if (!descriptions.isEmpty())
   {
     this->m_Description = descriptions[0]->GetValue();
   }
@@ -48,11 +50,11 @@ ChangeTextDescriptor::~ChangeTextDescriptor()
 
 IChangeText::Pointer ChangeTextDescriptor::CreateChangeText()
 {
-  if(this->m_ChangeText == 0)
+  if (this->m_ChangeText == 0)
   {
     // "class" refers to xml attribute in a xml tag
-    this->m_ChangeText = this->m_ChangeTextExtensionPoint
-      ->CreateExecutableExtension<IChangeText>(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS);
+    this->m_ChangeText = this->m_ChangeTextExtensionPoint->CreateExecutableExtension<IChangeText>(
+      ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS);
   }
   return this->m_ChangeText;
 }
@@ -72,9 +74,9 @@ QString ChangeTextDescriptor::GetName() const
   return this->m_Name;
 }
 
-bool ChangeTextDescriptor::operator==(const Object* object) const
+bool ChangeTextDescriptor::operator==(const Object *object) const
 {
-  if (const ChangeTextDescriptor* other = dynamic_cast<const ChangeTextDescriptor*>(object))
+  if (const ChangeTextDescriptor *other = dynamic_cast<const ChangeTextDescriptor *>(object))
   {
     return this->GetID() == other->GetID();
   }

@@ -13,10 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include <mitkTestingMacros.h>
 #include <mitkContourModelSet.h>
-
-
+#include <mitkTestingMacros.h>
 
 static void TestAddVertex()
 {
@@ -27,9 +25,7 @@ static void TestAddVertex()
   contourSet->AddContourModel(contour);
 
   MITK_TEST_CONDITION(contourSet->GetSize() > 0, "Add a contour, size increased");
-
 }
-
 
 static void TestRemoveContourAtIndex()
 {
@@ -50,8 +46,6 @@ static void TestRemoveContourAtIndex()
   MITK_TEST_CONDITION(contourSet->GetSize() == 0, "removed contour by object");
 }
 
-
-
 static void TestEmptyContour()
 {
   mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
@@ -61,15 +55,13 @@ static void TestEmptyContour()
   MITK_TEST_CONDITION(contourSet->GetSize() == 0, "test numberof vertices of empty contour");
 }
 
-
-
-int mitkContourModelSetTest(int /*argc*/, char* /*argv*/[])
+int mitkContourModelSetTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("mitkContourModelSetTest")
 
-    TestEmptyContour();
-    TestAddVertex();
-    TestRemoveContourAtIndex();
+  TestEmptyContour();
+  TestAddVertex();
+  TestRemoveContourAtIndex();
 
   MITK_TEST_END()
 }

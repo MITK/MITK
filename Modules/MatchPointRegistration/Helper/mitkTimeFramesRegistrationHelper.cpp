@@ -145,7 +145,7 @@ mitk::TimeFramesRegistrationHelper::DoFrameRegistration(const mitk::Image* movin
   if (targetMask)
   {
     mitk::MaskedAlgorithmHelper maskHelper(m_Algorithm);
-    maskHelper.SetMasks(NULL, targetMask);
+    maskHelper.SetMasks(nullptr, targetMask);
   }
 
   return algHelper.GetRegistration();
@@ -222,7 +222,7 @@ mitk::TimeFramesRegistrationHelper::CheckValidInputs() const
   for (IgnoreListType::const_iterator pos = this->m_IgnoreList.begin();
        pos != this->m_IgnoreList.end(); ++pos)
   {
-    if (*pos < 0 || *pos >= m_4DImage->GetTimeSteps())
+    if (*pos >= m_4DImage->GetTimeSteps())
     {
       mitkThrow() <<
                   "Cannot register image. Ignore list containes at least one inexistant frame. Invalid frame index: "

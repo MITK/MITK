@@ -19,9 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 
+#include <MitkCoreExports.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -33,9 +33,9 @@ namespace mitk
   class MITKCORE_EXPORT StandardFileLocations : public itk::Object
   {
   public:
-    typedef  StandardFileLocations   Self;
-    typedef  itk::Command             Superclass;
-    typedef  itk::SmartPointer<Self>  Pointer;
+    typedef StandardFileLocations Self;
+    typedef itk::Command Superclass;
+    typedef itk::SmartPointer<Self> Pointer;
 
     /*!
     \brief Adds a directory into the search queue:
@@ -44,14 +44,14 @@ namespace mitk
     \param dir         directory you want to be searched in
     \param insertInFrontOfSearchList  wheather this search request shall be processed first
     */
-    void AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList = true);
+    void AddDirectoryForSearch(const char *dir, bool insertInFrontOfSearchList = true);
 
     /*!
     \brief Remove a directory from the search queue:
     \      Use this function in combination with FindFile().
     \param dir         directory you want to be searched in
     */
-    void RemoveDirectoryForSearch(const char * dir);
+    void RemoveDirectoryForSearch(const char *dir);
 
     /*!
     \brief looks for a file in several standard locations
@@ -67,15 +67,17 @@ namespace mitk
       <li> Add the .mitk directory in the home folder of the user
       <li> Add the current working directory
       <li> Add the (current working directory)/bin directory
-      <li> Add the directory specified in pathInSourceDir, that is relative to the source code directory root (which is determined at compile time)
+      <li> Add the directory specified in pathInSourceDir, that is relative to the source code directory root (which is
+  determined at compile time)
     </ol>
 
-  Already added directories in the searchqueue by using AddDirectoryForSearch before calling FindFile are still searched first,
+  Already added directories in the searchqueue by using AddDirectoryForSearch before calling FindFile are still searched
+  first,
     because above mentioned standard locations are always appended at the end of the list.
 
 
   */
-    std::string FindFile(const char* filename, const char* pathInSourceDir = nullptr );
+    std::string FindFile(const char *filename, const char *pathInSourceDir = nullptr);
 
     /*!
     \brief Return directory of/for option files
@@ -90,29 +92,24 @@ namespace mitk
     */
     std::string GetOptionDirectory();
 
-    static StandardFileLocations* GetInstance();
+    static StandardFileLocations *GetInstance();
 
   protected:
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    typedef std::vector<std::string> FileSearchVectorType;
-    FileSearchVectorType  m_SearchDirectories;
+      typedef std::vector<std::string> FileSearchVectorType;
+    FileSearchVectorType m_SearchDirectories;
 
     StandardFileLocations();
     virtual ~StandardFileLocations();
 
-    std::string SearchDirectoriesForFile(const char * filename);
+    std::string SearchDirectoriesForFile(const char *filename);
 
   private:
-
     // Private Copy Constructor
-    StandardFileLocations( const StandardFileLocations& );
+    StandardFileLocations(const StandardFileLocations &);
   };
 
 } // namespace
 
 #endif
-
-

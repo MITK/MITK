@@ -32,26 +32,26 @@ class MITKXNAT_EXPORT QmitkXnatCreateObjectDialog : public QDialog
 public:
   enum SpecificType
   {
-    //PROJECT,
+    // PROJECT,
     SUBJECT,
     EXPERIMENT
   };
 
-  QmitkXnatCreateObjectDialog(SpecificType type, QWidget* parent = 0);
+  QmitkXnatCreateObjectDialog(SpecificType type, QWidget *parent = 0);
   virtual ~QmitkXnatCreateObjectDialog();
 
   // Returns a specific xnat object like SpecificType
-  ctkXnatObject* GetXnatObject();
+  ctkXnatObject *GetXnatObject();
 
-  protected slots:
+protected slots:
 
   void OnAcceptClicked();
   void OnCancelClicked();
 
 private:
   SpecificType m_Type;
-  ctkXnatObject* m_Object;
-  QWidget* m_Widget;
+  ctkXnatObject *m_Object;
+  QWidget *m_Widget;
 };
 
 #endif // QMITKXNATCREATEOBJECTDIALOG_H

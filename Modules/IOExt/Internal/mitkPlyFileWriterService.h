@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef PlyFileWriterService_h
 #define PlyFileWriterService_h
 
@@ -22,33 +21,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+   * @brief Used to write Surfaces to the PLY format.
+   *
+   * Currently, this writer uses the binary format as standard. Should the ASCII Format be required,
+   * it is suggested to incorporate Options.
+   *
+   * @ingroup IOExt
+   */
+  class PlyFileWriterService : public AbstractFileWriter
+  {
+  public:
+    PlyFileWriterService();
+    virtual ~PlyFileWriterService();
 
-/**
- * @brief Used to write Surfaces to the PLY format.
- *
- * Currently, this writer uses the binary format as standard. Should the ASCII Format be required,
- * it is suggested to incorporate Options.
- *
- * @ingroup IOExt
- */
-class PlyFileWriterService : public AbstractFileWriter
-{
-public:
+    using AbstractFileWriter::Write;
+    virtual void Write() override;
 
-  PlyFileWriterService();
-  virtual ~PlyFileWriterService();
+  private:
+    PlyFileWriterService(const PlyFileWriterService &other);
 
-  using AbstractFileWriter::Write;
-  virtual void Write() override;
-
-private:
-
-  PlyFileWriterService(const PlyFileWriterService& other);
-
-  virtual mitk::PlyFileWriterService* Clone() const override;
-
-};
-
+    virtual mitk::PlyFileWriterService *Clone() const override;
+  };
 }
 
 #endif

@@ -371,7 +371,7 @@ private:
  * \code
  * MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 ValueType* any_cast(Any* operand)
@@ -389,7 +389,7 @@ ValueType* any_cast(Any* operand)
  * \code
  * const MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 const ValueType* any_cast(const Any* operand)

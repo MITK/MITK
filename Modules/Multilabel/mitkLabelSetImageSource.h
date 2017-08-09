@@ -14,53 +14,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef __mitkLabelSetImageSource_H_
 #define __mitkLabelSetImageSource_H_
 
-#include "mitkImageSource.h"
 #include "MitkMultilabelExports.h"
+#include "mitkImageSource.h"
 
-namespace mitk {
-
-class LabelSetImage;
-
-//##Documentation
-//## @brief Superclass of all classes generating labelset images (instances
-//## of class LabelSetImage) as output.
-//##
-//## @ingroup Process
-class MITKMULTILABEL_EXPORT LabelSetImageSource : public ImageSource
+namespace mitk
 {
-public:
-  mitkClassMacro(LabelSetImageSource, ImageSource);
-  itkNewMacro(Self);
+  class LabelSetImage;
 
-  typedef LabelSetImage OutputType;
-  typedef itk::DataObject::Pointer DataObjectPointer;
+  //##Documentation
+  //## @brief Superclass of all classes generating labelset images (instances
+  //## of class LabelSetImage) as output.
+  //##
+  //## @ingroup Process
+  class MITKMULTILABEL_EXPORT LabelSetImageSource : public ImageSource
+  {
+  public:
+    mitkClassMacro(LabelSetImageSource, ImageSource);
+    itkNewMacro(Self);
 
-  mitkBaseDataSourceGetOutputDeclarations
-  /**
-   * Allocates a new output object and returns it. Currently the
-   * index idx is not evaluated.
-   * @param idx the index of the output for which an object should be created
-   * @returns the new object
-   */
-  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
+    typedef LabelSetImage OutputType;
+    typedef itk::DataObject::Pointer DataObjectPointer;
 
-  /**
-   */
-  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
+    mitkBaseDataSourceGetOutputDeclarations
+      /**
+       * Allocates a new output object and returns it. Currently the
+       * index idx is not evaluated.
+       * @param idx the index of the output for which an object should be created
+       * @returns the new object
+       */
+      virtual itk::DataObject::Pointer
+      MakeOutput(DataObjectPointerArraySizeType idx) override;
 
-protected:
-  LabelSetImageSource();
+    /**
+     */
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
-  virtual ~LabelSetImageSource();
-};
+  protected:
+    LabelSetImageSource();
+
+    virtual ~LabelSetImageSource();
+  };
 
 } // namespace mitk
 
 //#include "mitkLabelSetImageSource.cpp"
-
 
 #endif // __mitkLabelSetImageSource_H_

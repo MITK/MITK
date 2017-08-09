@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef EMPTYVIEW2_H_
 #define EMPTYVIEW2_H_
 
@@ -26,11 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class EmptyView2 : public berry::QtViewPart
 {
-
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   EmptyView2();
@@ -40,15 +37,12 @@ public:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
 protected:
-
   void SetFocus() override;
 
 private:
-
   Ui::EmptyView2Controls m_Controls;
 
-  QWidget* m_Parent;
-
+  QWidget *m_Parent;
 };
 
 #endif /*EMPTYVIEW2_H_*/

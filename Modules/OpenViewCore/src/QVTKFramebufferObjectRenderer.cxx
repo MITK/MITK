@@ -14,8 +14,11 @@
 
  ===================================================================*/
 
-#include "QVTKInternalOpenglRenderWindow.h"
+#include "vtkInternalOpenGLRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"
+
+#include <QQuickWindow>
+
 #include <vtkgl.h>
 
 #include <vtkCubeSource.h>
@@ -42,15 +45,13 @@ m_readyToRender(false)
   m_vtkRenderWindow->QtParentRenderer = this;
 }
 
-QOpenGLFramebufferObject * QVTKFramebufferObjectRenderer::createFramebufferObject(const QSize &size)
+QOpenGLFramebufferObject* QVTKFramebufferObjectRenderer::createFramebufferObject(const QSize &size)
 {
-
   QOpenGLFramebufferObjectFormat format;
   format.setAttachment(QOpenGLFramebufferObject::Depth);
   format.setTextureTarget(GL_TEXTURE_2D);
   format.setInternalTextureFormat(GL_RGBA32F_ARB);
-  QOpenGLFramebufferObject *fbo = new QOpenGLFramebufferObject(size, format);
-
+  QOpenGLFramebufferObject* fbo = new QOpenGLFramebufferObject(size, format);
   m_vtkRenderWindow->SetFramebufferObject(fbo);
   return fbo;
 }
@@ -62,6 +63,7 @@ void QVTKFramebufferObjectRenderer::render()
     return;
   }
 
+  // Ask VTK to render to OpenGL
   m_vtkQuickItem->m_viewLock.lock();
   m_vtkRenderWindow->PushState();
   m_vtkRenderWindow->OpenGLInitState();
@@ -69,7 +71,6 @@ void QVTKFramebufferObjectRenderer::render()
   m_vtkRenderWindow->OpenGLEndState();
   m_vtkRenderWindow->PopState();
   m_vtkQuickItem->m_viewLock.unlock();
-
 }
 
 void QVTKFramebufferObjectRenderer::synchronize(QQuickFramebufferObject * item)
@@ -81,6 +82,12 @@ void QVTKFramebufferObjectRenderer::synchronize(QQuickFramebufferObject * item)
     m_neverRendered = false;
     m_vtkQuickItem->init();
   }
+
+  // Execute events (that might call VTK picking to obtain z coordinates)
+  // while UI and rendering are synchronized.
+  m_vtkQuickItem->processPendingEvents();
+
+  // Update MITK mapper list, then mapper outputs
   m_readyToRender = m_vtkQuickItem->prepareForRender();
 }
 

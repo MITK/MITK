@@ -45,7 +45,7 @@ int StartShConversion(int argc, char* argv[])
     parser.setTitle("Export SH Image");
     parser.setCategory("Preprocessing Tools");
     parser.setDescription("Convert MITK spherical harmonics image type to MRtrix spherical harmonics image");
-    parser.setContributor("MBI");
+    parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "MITK SH image", us::Any(), false);
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Export SH Image");
     parser.setDescription(" ");
-    parser.setContributor("MBI");
+    parser.setContributor("MIC");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

@@ -27,15 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 class CustomViewerWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 // //! [WorkbenchAdvisorDecl]
 {
-
 public:
-
   /**
    * Holds the ID-String of the initial window perspective.
    */
   static const QString DEFAULT_PERSPECTIVE_ID;
 
-  berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer) override;
+  berry::WorkbenchWindowAdvisor *CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer) override;
   ~CustomViewerWorkbenchAdvisor();
 
   /**
@@ -47,5 +45,4 @@ public:
    * Returns the ID-String of the initial window perspective.
    */
   QString GetInitialWindowPerspectiveId() override;
-
 };

@@ -17,15 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2
 #define MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2
 
-#include <MitkCoreExports.h>
 #include "mitkBaseData.h"
 #include "mitkGeometryData.h"
 #include "mitkPlaneGeometry.h"
+#include <MitkCoreExports.h>
 
-namespace mitk {
+namespace mitk
+{
   class PlaneGeometryData;
   /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryData instead. */
-  DEPRECATED( typedef PlaneGeometryData Geometry2DData);
+  DEPRECATED(typedef PlaneGeometryData Geometry2DData);
   //##Documentation
   //## @brief Data class containing PlaneGeometry objects
   //## @ingroup Geometry
@@ -35,8 +36,7 @@ namespace mitk {
   public:
     mitkClassMacro(PlaneGeometryData, GeometryData);
 
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       //##Documentation
       //## @brief Set the reference to a PlaneGeometry that is stored
@@ -48,25 +48,20 @@ namespace mitk {
     //##Documentation
     //## @brief Set the reference to the PlaneGeometry that is stored
     //## by the object
-    virtual void SetPlaneGeometry(mitk::PlaneGeometry* geometry2d);
+    virtual void SetPlaneGeometry(mitk::PlaneGeometry *geometry2d);
     /**
     * \deprecatedSince{2014_10} Please use SetPlaneGeometry
     */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo)){SetPlaneGeometry(geo);};
-
-      //##Documentation
-      //## @brief Get the reference to the PlaneGeometry that is stored
-      //## by the object
-      virtual mitk::PlaneGeometry * GetPlaneGeometry() const
-    {
-      return static_cast<mitk::PlaneGeometry *>(GetGeometry());
-    };
+    DEPRECATED(void SetGeometry2D(PlaneGeometry *geo)) { SetPlaneGeometry(geo); };
+    //##Documentation
+    //## @brief Get the reference to the PlaneGeometry that is stored
+    //## by the object
+    virtual mitk::PlaneGeometry *GetPlaneGeometry() const { return static_cast<mitk::PlaneGeometry *>(GetGeometry()); };
     /**
     * \deprecatedSince{2014_10} Please use GetPlaneGeometry
     */
-    DEPRECATED(const PlaneGeometry* GetGeometry2D()){return GetPlaneGeometry();};
-
-      virtual void UpdateOutputInformation() override;
+    DEPRECATED(const PlaneGeometry *GetGeometry2D()) { return GetPlaneGeometry(); };
+    virtual void UpdateOutputInformation() override;
 
     virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
@@ -74,7 +69,7 @@ namespace mitk {
 
     virtual bool VerifyRequestedRegion() override;
 
-    virtual void SetRequestedRegion( const itk::DataObject *data) override;
+    virtual void SetRequestedRegion(const itk::DataObject *data) override;
 
     virtual void CopyInformation(const itk::DataObject *data) override;
 

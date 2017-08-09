@@ -14,12 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
+#include "mitkImage.h"
 #include "mitkTestDCMLoading.h"
 #include "mitkTestingMacros.h"
-#include "mitkImage.h"
 
-int mitkDCMTestingSanityTest(int argc, char** const argv)
+int mitkDCMTestingSanityTest(int argc, char **const argv)
 {
   MITK_TEST_BEGIN("DCMTestingSanity")
 
@@ -36,33 +35,34 @@ int mitkDCMTestingSanityTest(int argc, char** const argv)
 
   // load files from commandline
   unsigned int numberOfExpectedImages = 0;
-  if (argc > 1) numberOfExpectedImages = atoi(argv[1]);
-  for (int arg = 2; arg < argc; ++arg) files.push_back( argv[arg] );
+  if (argc > 1)
+    numberOfExpectedImages = atoi(argv[1]);
+  for (int arg = 2; arg < argc; ++arg)
+    files.push_back(argv[arg]);
 
   // verify all files are DCM
-  for (mitk::TestDCMLoading::StringContainer::const_iterator fileIter = files.begin();
-       fileIter != files.end();
+  for (mitk::TestDCMLoading::StringContainer::const_iterator fileIter = files.begin(); fileIter != files.end();
        ++fileIter)
   {
-    MITK_TEST_CONDITION_REQUIRED( mitk::DicomSeriesReader::IsDicom(*fileIter) , *fileIter << " is recognized as loadable DCM object" )
-
+    MITK_TEST_CONDITION_REQUIRED(mitk::DicomSeriesReader::IsDicom(*fileIter),
+                                 *fileIter << " is recognized as loadable DCM object")
   }
 
   // compare with expected number of images from commandline
   mitk::TestDCMLoading::ImageList images = loader.LoadFiles(files);
-  MITK_TEST_CONDITION_REQUIRED( images.size() == numberOfExpectedImages, "Loading " << files.size()
-                                                                      << " files from commandline results in " << numberOfExpectedImages
-                                                                      << " images (see test invocation)" )
+  MITK_TEST_CONDITION_REQUIRED(images.size() == numberOfExpectedImages,
+                               "Loading " << files.size() << " files from commandline results in "
+                                          << numberOfExpectedImages
+                                          << " images (see test invocation)")
 
   // check dump equality (dumping image information must always equal itself)
-  for ( mitk::TestDCMLoading::ImageList::const_iterator imageIter = images.begin();
-        imageIter != images.end();
-        ++imageIter )
+  for (mitk::TestDCMLoading::ImageList::const_iterator imageIter = images.begin(); imageIter != images.end();
+       ++imageIter)
   {
-    const mitk::Image* image = *imageIter;
-    MITK_TEST_CONDITION( loader.CompareImageInformationDumps( loader.DumpImageInformation(image),
-                                                              loader.DumpImageInformation(image) ) == true,
-                         "Image information dumping is able to reproduce its result." )
+    const mitk::Image *image = *imageIter;
+    MITK_TEST_CONDITION(loader.CompareImageInformationDumps(loader.DumpImageInformation(image),
+                                                            loader.DumpImageInformation(image)) == true,
+                        "Image information dumping is able to reproduce its result.")
   }
 
   MITK_TEST_END()

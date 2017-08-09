@@ -20,42 +20,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeElement.h"
 
-namespace mitk {
+namespace mitk
+{
   /**
   * \brief Base Class for Tube Graph Vertices
   */
-  class  MITKTUBEGRAPH_EXPORT TubeGraphVertex {
-
+  class MITKTUBEGRAPH_EXPORT TubeGraphVertex
+  {
   public:
-
     TubeGraphVertex();
-    TubeGraphVertex(TubeElement* element);
+    TubeGraphVertex(TubeElement *element);
     virtual ~TubeGraphVertex();
 
     /**
     * Set the TubeElement which contains the information about diameter and position.
     * @param element The TubeElement for the vertex.
     */
-    void SetTubeElement(TubeElement* element);
+    void SetTubeElement(TubeElement *element);
 
     /**
     * Returns the TubeElement.
     * @returns The TubeElement
     */
-    const TubeElement* GetTubeElement() const;
+    const TubeElement *GetTubeElement() const;
 
     /**
     * Comparison operation between this object and the given object.
     * @param right The object to compare with.
     * @return true, if the object is the same;false, if not.
     */
-    bool operator==(const TubeGraphVertex& right)const;
+    bool operator==(const TubeGraphVertex &right) const;
 
   private:
+    TubeElement *m_element;
 
-    TubeElement* m_element;
+  }; // class
 
-  };//class
-
-}//namespace
+} // namespace
 #endif

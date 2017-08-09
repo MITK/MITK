@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qmessagebox.h>
 #include <QDialog>
 #include <mitkIOUtil.h>
+#include <QmitkIGTCommonHelper.h>
 
 //poco headers
 #include <Poco/Path.h>
@@ -41,7 +42,7 @@ const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.n
 QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   m_AdvancedWidget = new QmitkNavigationToolCreationAdvancedWidget(this);
   m_AdvancedWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
   m_AdvancedWidget->setWindowTitle("Tool Creation Advanced Options");
@@ -54,8 +55,8 @@ RefreshTrackingDeviceCollection();
 
 QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
 {
-  m_Controls->m_CalibrationLandmarksList->SetPointSetNode(NULL);
-  m_Controls->m_RegistrationLandmarksList->SetPointSetNode(NULL);
+  m_Controls->m_CalibrationLandmarksList->SetPointSetNode(nullptr);
+  m_Controls->m_RegistrationLandmarksList->SetPointSetNode(nullptr);
   delete m_AdvancedWidget;
 }
 
@@ -105,7 +106,7 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
 }
 
-void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
+void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool)
 {
   int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(type));
 
@@ -180,19 +181,27 @@ m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->cu
   m_CreatedTool->SetToolCalibrationLandmarks(toolCalLandmarks);
   m_CreatedTool->SetToolRegistrationLandmarks(toolRegLandmarks);
 
+  //Tool Axis
+  mitk::Point3D toolAxis;
+  toolAxis.SetElement(0, (m_Controls->m_ToolAxisX->value()));
+  toolAxis.SetElement(1, (m_Controls->m_ToolAxisY->value()));
+  toolAxis.SetElement(2, (m_Controls->m_ToolAxisZ->value()));
+  m_CreatedTool->SetToolAxis(toolAxis);
+
   emit NavigationToolFinished();
 }
 
 void QmitkNavigationToolCreationWidget::OnCancel()
 {
-  m_CreatedTool = NULL;
+  m_CreatedTool = nullptr;
 
   emit Canceled();
 }
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(nullptr,tr("Open Surface"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("STL (*.stl)")).toLatin1().data();
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
   try
   {
     mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
@@ -205,7 +214,9 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 {
-  m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*"));
+  QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
+  m_Controls->m_CalibrationFileName->setText(fileName);
 }
 
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)

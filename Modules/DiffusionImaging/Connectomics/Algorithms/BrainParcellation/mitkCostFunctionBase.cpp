@@ -94,7 +94,6 @@ int mitk::CostFunctionBase<TPixel, VImageDimension>::COMLiesWithinParcel()
   indexCenterOfMass.SetElement(1, centerOfMass[1] + 0.5);
   indexCenterOfMass.SetElement(2, centerOfMass[2] + 0.5);
   it_region.SetIndex(indexCenterOfMass);
-  int value = it_region.Value();
 
   if (it_region.Value() == chosenRegion.second || it_region.Value() == 0)
   {
@@ -118,7 +117,7 @@ int mitk::CostFunctionBase<TPixel, VImageDimension>::CalculateCost()
   m_weight.push_back(0); //weight for COMLiesWithinParcel
 
   //Vector multiplication
-  for (int i = 0; i < costVector.size(); i++)
+  for (std::size_t i = 0; i < costVector.size(); i++)
   {
     costFunctionValue += costVector[i]*m_weight[i];
   }
@@ -171,7 +170,7 @@ template <typename TPixel, unsigned int VImageDimension>
 int mitk::CostFunctionBase<TPixel, VImageDimension>::MaximalValue()
 {
   int maximalValue(0);
-  for (int i = 0; i < m_weight.size(); i++)
+  for (std::size_t i = 0; i < m_weight.size(); i++)
   {
     maximalValue += m_weight[i];
   }

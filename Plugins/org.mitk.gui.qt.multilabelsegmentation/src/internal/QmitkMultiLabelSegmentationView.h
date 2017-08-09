@@ -19,11 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-#include <mitkILifecycleAwarePart.h>
 #include "mitkSegmentationInteractor.h"
+#include <mitkILifecycleAwarePart.h>
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
+// berry
+#include <berryIBerryPreferences.h>
 
 class QmitkRenderWindow;
 
@@ -36,16 +38,15 @@ class QmitkMultiLabelSegmentationView : public QmitkAbstractView, public mitk::I
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   QmitkMultiLabelSegmentationView();
   virtual ~QmitkMultiLabelSegmentationView();
 
-  typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
+  typedef std::map<mitk::DataNode *, unsigned long> NodeTagMapType;
 
   // GUI setup
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget *parent);
 
   // ILifecycleAwarePart interface
 public:
@@ -55,18 +56,12 @@ public:
   void Hidden();
 
   virtual int GetSizeFlags(bool width);
-  virtual int ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult);
+  virtual int ComputePreferredSize(bool width,
+                                   int /*availableParallel*/,
+                                   int /*availablePerpendicular*/,
+                                   int preferredResult);
 
 protected slots:
-
-  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
-  void OnReferenceSelectionChanged(const mitk::DataNode* node);
-
-  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
-  void OnSegmentationSelectionChanged(const mitk::DataNode *node);
-
-  /// \brief reaction to ...
-  void OnInterpolationSelectionChanged(int);
 
   /// \brief reaction to the selection of any 2D segmentation tool
   void OnManualTool2DSelected(int id);
@@ -81,7 +76,7 @@ protected slots:
   void OnNewSegmentationSession();
 
   /// \brief reaction to signal "goToLabel" from labelset widget
-  void OnGoToLabel(const mitk::Point3D& pos);
+  void OnGoToLabel(const mitk::Point3D &pos);
 
   void OnResetView();
 
@@ -106,9 +101,31 @@ protected slots:
   // reaction to the button "Lock exterior"
   void OnLockExteriorToggled(bool);
 
+  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
+  void OnReferenceSelectionChanged(const mitk::DataNode* node);
+
+  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
+  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
+
+  /// \brief reaction to ...
+  void OnInterpolationSelectionChanged(int);
+
 protected:
 
+  // reimplemented from QmitkAbstractView
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+
+  // reimplemented from QmitkAbstractView
+  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+
+  // reimplemented from QmitkAbstractView
+  void NodeAdded(const mitk::DataNode* node) override;
+
+  // reimplemented from QmitkAbstractView
+  void NodeRemoved(const mitk::DataNode* node) override;
+
   void OnEstablishLabelSetConnection();
+
   void OnLooseLabelSetConnection();
 
   void SetFocus();
@@ -121,38 +138,26 @@ protected:
 
   void ResetMouseCursor();
 
-  void SetMouseCursor(const us::ModuleResource, int hotspotX, int hotspotY );
+  void SetMouseCursor(const us::ModuleResource, int hotspotX, int hotspotY);
 
   void InitializeListeners();
 
   /// \brief Checks if two images have the same size and geometry
   bool CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const;
 
-  /// \brief Reimplemented from QmitkAbstractView
-  virtual void NodeAdded(const mitk::DataNode* node);
-
-  /// \brief Reimplemented from QmitkAbstractView
-  virtual void NodeRemoved(const mitk::DataNode* node);
-
   QString GetLastFileOpenPath();
 
-  void SetLastFileOpenPath(const QString& path);
-
-  // handling of a list of known (organ name, organ color) combination
-  // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
-//  QStringList GetDefaultOrganColorString();
-//  void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
-//  void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
+  void SetLastFileOpenPath(const QString &path);
 
   /// \brief the Qt parent of our GUI (NOT of this object)
-  QWidget* m_Parent;
+  QWidget *m_Parent;
 
   /// \brief Qt GUI file
   Ui::QmitkMultiLabelSegmentationControls m_Controls;
 
-  mitk::IRenderWindowPart* m_IRenderWindowPart;
+  mitk::IRenderWindowPart *m_IRenderWindowPart;
 
-  mitk::ToolManager* m_ToolManager;
+  mitk::ToolManager *m_ToolManager;
 
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
@@ -160,14 +165,15 @@ protected:
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 
+  bool m_AutoSelectionEnabled;
   bool m_MouseCursorSet;
 
   mitk::SegmentationInteractor::Pointer m_Interactor;
 
   /**
-    * Reference to the service registration of the observer,
-    * it is needed to unregister the observer on unload.
-  */
+   * Reference to the service registration of the observer,
+   * it is needed to unregister the observer on unload.
+   */
   us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
 };
 

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   /**
   * Writes example data strucutres to a file
   * @ingroup Process
@@ -39,12 +38,9 @@ namespace mitk
     virtual void Write() override;
 
   protected:
-
-    ExampleDataStructureWriterService(const ExampleDataStructureWriterService& other);
-    virtual mitk::ExampleDataStructureWriterService* Clone() const override;
-
+    ExampleDataStructureWriterService(const ExampleDataStructureWriterService &other);
+    virtual mitk::ExampleDataStructureWriterService *Clone() const override;
   };
-
 
 } // end of namespace mitk
 

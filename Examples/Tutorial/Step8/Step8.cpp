@@ -25,8 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //##Documentation
 //## @brief As Step6, but with QmitkStdMultiWidget as widget
-Step8::Step8(int argc, char* argv[], QWidget *parent) :
-  Step6(argc, argv, parent)
+Step8::Step8(int argc, char *argv[], QWidget *parent) : Step6(argc, argv, parent)
 {
 }
 
@@ -37,20 +36,20 @@ void Step8::SetupWidgets()
   //*************************************************************************
 
   // Create toplevel widget with vertical layout
-  QVBoxLayout* vlayout = new QVBoxLayout(this);
+  QVBoxLayout *vlayout = new QVBoxLayout(this);
   vlayout->setMargin(0);
   vlayout->setSpacing(2);
 
   // Create viewParent widget with horizontal layout
-  QWidget* viewParent = new QWidget(this);
+  QWidget *viewParent = new QWidget(this);
   vlayout->addWidget(viewParent);
-  QHBoxLayout* hlayout = new QHBoxLayout(viewParent);
+  QHBoxLayout *hlayout = new QHBoxLayout(viewParent);
   hlayout->setMargin(0);
 
   //*************************************************************************
   // Part Ia: create and initialize QmitkStdMultiWidget
   //*************************************************************************
-  QmitkStdMultiWidget* multiWidget = new QmitkStdMultiWidget(viewParent);
+  QmitkStdMultiWidget *multiWidget = new QmitkStdMultiWidget(viewParent);
 
   hlayout->addWidget(multiWidget);
 
@@ -59,13 +58,11 @@ void Step8::SetupWidgets()
 
   // Initialize views as axial, sagittal, coronar (from
   // top-left to bottom)
-  mitk::TimeGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(
-      m_DataStorage->GetAll());
+  mitk::TimeGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   // Initialize bottom-right view as 3D view
-  multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
-      mitk::BaseRenderer::Standard3D);
+  multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
   // Enable standard handler for levelwindow-slider
   multiWidget->EnableStandardLevelWindow();
@@ -78,7 +75,6 @@ void Step8::SetupWidgets()
   //*************************************************************************
   // Part II: Setup standard interaction with the mouse
   //*************************************************************************
-
 }
 /**
  \example Step8.cpp

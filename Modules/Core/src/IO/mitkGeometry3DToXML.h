@@ -24,35 +24,32 @@ class TiXmlElement;
 
 namespace mitk
 {
-
-/**
- * @internal
- *
- * @brief Helper for Geometry3D related I/O classes.
- *
- * Creates TinyXML elements (blocks) that describe a Geometry3D.
- * Also offers a method to read such blocks and create a corresponding Geometry3D.
- *
- * @sa GeometryDataReaderService, GeometryDataWriterService, PointSetWriterService, PointSetReaderService
- *
- * @ingroup IO
- */
-class Geometry3DToXML
-{
-public:
-
   /**
-   * @brief Serialize given geometry to XML.
+   * @internal
+   *
+   * @brief Helper for Geometry3D related I/O classes.
+   *
+   * Creates TinyXML elements (blocks) that describe a Geometry3D.
+   * Also offers a method to read such blocks and create a corresponding Geometry3D.
+   *
+   * @sa GeometryDataReaderService, GeometryDataWriterService, PointSetWriterService, PointSetReaderService
+   *
+   * @ingroup IO
    */
-  static TiXmlElement* ToXML( const Geometry3D* geometry);
+  class Geometry3DToXML
+  {
+  public:
+    /**
+     * @brief Serialize given geometry to XML.
+     */
+    static TiXmlElement *ToXML(const Geometry3D *geometry);
 
-  /**
-   * @brief Create a Geometry3D from XML.
-   * Interprets only the format created by ToXML().
-   */
-  static Geometry3D::Pointer FromXML( TiXmlElement* node );
-};
-
+    /**
+     * @brief Create a Geometry3D from XML.
+     * Interprets only the format created by ToXML().
+     */
+    static Geometry3D::Pointer FromXML(TiXmlElement *node);
+  };
 }
 
 #endif

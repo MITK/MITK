@@ -82,7 +82,7 @@ public:
     void ApplyPropertySettings();
     virtual void Slice(mitk::BaseRenderer* renderer, OdfDisplayGeometry dispGeo);
     virtual int GetIndex(mitk::BaseRenderer* renderer);
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false);
     virtual void Update(mitk::BaseRenderer * renderer) override;
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const override { return true; }

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef DICOMVIEW_H_
 #define DICOMVIEW_H_
 
@@ -37,7 +36,6 @@ class DicomView : public QmitkAbstractView
   Q_OBJECT
 
 public:
-
   /**
    * String based view identifier.
    */
@@ -70,13 +68,11 @@ protected Q_SLOTS:
   void AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties);
 
 protected:
-
   void SetFocus() override;
 
   Ui::QmitkDicomViewControls m_Controls;
 
-  QWidget* m_Parent;
-
+  QWidget *m_Parent;
 };
 
 #endif /*DICOMVIEW_H_*/

@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     parser.setTitle("Copy Geometry");
     parser.setCategory("Preprocessing Tools");
     parser.setDescription("Copies transformation matrix of one image to another");
-    parser.setContributor("MBI");
+    parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
 
       try
     {
-      Image::Pointer source = mitk::IOUtil::LoadImage(refImage);
-      Image::Pointer target = mitk::IOUtil::LoadImage(imageName);
+      Image::Pointer source = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(refImage)[0].GetPointer());
+      Image::Pointer target = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imageName)[0].GetPointer());
       if (originOnly)
       {
         // Calculate correction to align centroids
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         t_geom->SetIndexToWorldTransform(s_geom->GetIndexToWorldTransform());
         target->SetGeometry(t_geom);
       }
-        mitk::IOUtil::SaveImage(target, outImage);
+        mitk::IOUtil::Save(target, outImage);
     }
     catch (itk::ExceptionObject e)
     {

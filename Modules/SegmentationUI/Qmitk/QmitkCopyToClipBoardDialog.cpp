@@ -16,27 +16,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCopyToClipBoardDialog.h"
 
-#include <qtextedit.h>
 #include <qlayout.h>
+#include <qtextedit.h>
 
-QmitkCopyToClipBoardDialog::QmitkCopyToClipBoardDialog(const QString& text, QWidget* parent, const char*  /*name*/)
-: QDialog(parent)
+QmitkCopyToClipBoardDialog::QmitkCopyToClipBoardDialog(const QString &text, QWidget *parent, const char * /*name*/)
+  : QDialog(parent)
 {
-  QBoxLayout * layout = new QVBoxLayout( this );
-  //!mmueller
-  //QTextEdit* textedit = new QTextEdit(text, "", this);
+  QBoxLayout *layout = new QVBoxLayout(this);
+  //! mmueller
+  // QTextEdit* textedit = new QTextEdit(text, "", this);
   //#changed to:
-  auto  textedit = new QTextEdit(this);
+  auto textedit = new QTextEdit(this);
   // with setPlainText() line breaks are displayed correctly
   textedit->setPlainText(text);
   //!
   textedit->setReadOnly(true);
-  layout->addWidget( textedit );
+  layout->addWidget(textedit);
 
-  QDialog::resize(500,400);
+  QDialog::resize(500, 400);
 }
 
 QmitkCopyToClipBoardDialog::~QmitkCopyToClipBoardDialog()
 {
 }
-

@@ -19,32 +19,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtWidgetsExports.h>
 
+#include "ui_QmitkMemoryUsageIndicator.h"
 #include <QWidget>
 #include <qpixmap.h>
-#include "ui_QmitkMemoryUsageIndicator.h"
 
 /// \ingroup QmitkModule
 class MITKQTWIDGETS_EXPORT QmitkMemoryUsageIndicatorView : public QWidget, public Ui::QmitkMemoryUsageIndicator
 {
-
   Q_OBJECT
 
 public:
-
   /// constructor
-  QmitkMemoryUsageIndicatorView( QWidget * parent=nullptr, Qt::WindowFlags f = nullptr );
+  QmitkMemoryUsageIndicatorView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /// destructor
   ~QmitkMemoryUsageIndicatorView();
 
 protected slots:
-    void UpdateMemoryUsage();
+  void UpdateMemoryUsage();
 
 protected:
-
-  std::string FormatMemorySize( size_t size );
-  std::string FormatPercentage( double val );
-  std::string GetMemoryDescription( size_t processSize, float percentage );
+  std::string FormatMemorySize(size_t size);
+  std::string FormatPercentage(double val);
+  std::string GetMemoryDescription(size_t processSize, float percentage);
 
   QPixmap m_LEDGreen;
   QPixmap m_LEDYellow;
@@ -52,4 +49,4 @@ protected:
   QPixmap m_LEDRed;
   char m_PreviousState;
 };
-#endif //QMITKMEMORYUSAGEINDICATORVIEW_WIDGET
+#endif // QMITKMEMORYUSAGEINDICATORVIEW_WIDGET

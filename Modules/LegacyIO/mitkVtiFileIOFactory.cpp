@@ -20,30 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-VtiFileIOFactory::VtiFileIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkVtiFileReader",
-                         "mitk Vti Image IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<VtiFileReader> >::New());
-}
+  VtiFileIOFactory::VtiFileIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkVtiFileReader",
+                           "mitk Vti Image IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<VtiFileReader>>::New());
+  }
 
-VtiFileIOFactory::~VtiFileIOFactory()
-{
-}
-
-const char* VtiFileIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* VtiFileIOFactory::GetDescription() const
-{
-  return "VtiFile IO Factory, allows the loading of vti files";
-}
-
+  VtiFileIOFactory::~VtiFileIOFactory() {}
+  const char *VtiFileIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *VtiFileIOFactory::GetDescription() const { return "VtiFile IO Factory, allows the loading of vti files"; }
 } // end namespace mitk

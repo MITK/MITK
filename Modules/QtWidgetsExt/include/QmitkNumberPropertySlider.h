@@ -22,29 +22,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <memory>
 
-namespace mitk {
-class IntProperty;
-class FloatProperty;
-class DoubleProperty;
+namespace mitk
+{
+  class IntProperty;
+  class FloatProperty;
+  class DoubleProperty;
 }
 
 /// @ingroup Widgets
 class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertySlider : public QSlider
 {
   Q_OBJECT
-  Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )
-  Q_PROPERTY( bool showPercent READ getShowPercent WRITE setShowPercent )
-  Q_PROPERTY( int minValue READ minValue WRITE setMinValue )
-  Q_PROPERTY( int maxValue READ maxValue WRITE setMaxValue )
+  Q_PROPERTY(short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces)
+  Q_PROPERTY(bool showPercent READ getShowPercent WRITE setShowPercent)
+  Q_PROPERTY(int minValue READ minValue WRITE setMinValue)
+  Q_PROPERTY(int maxValue READ maxValue WRITE setMaxValue)
 
 public:
-
-  QmitkNumberPropertySlider(QWidget* parent = nullptr);
+  QmitkNumberPropertySlider(QWidget *parent = nullptr);
   virtual ~QmitkNumberPropertySlider();
 
-  void SetProperty(mitk::IntProperty* property);
-  void SetProperty(mitk::FloatProperty* property);
-  void SetProperty(mitk::DoubleProperty* property);
+  void SetProperty(mitk::IntProperty *property);
+  void SetProperty(mitk::FloatProperty *property);
+  void SetProperty(mitk::DoubleProperty *property);
 
   short getDecimalPlaces() const;
   void setDecimalPlaces(short);
@@ -64,10 +64,8 @@ protected slots:
   void onValueChanged(int);
 
 private:
-
   class Impl;
   std::unique_ptr<Impl> d;
 };
 
 #endif
-

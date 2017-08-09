@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator() :
   m_StatisticsCalculated(false)
 {
+  m_Statistics = ImageStatisticsCalculator::StatisticsContainer::New();
   m_PointSet1 = mitk::PointSet::New();
   m_PointSet2 = mitk::PointSet::New();
   //m_Statistics.Reset();
@@ -27,6 +28,7 @@ mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalcul
 
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator(mitk::PointSet::Pointer pSet1, mitk::PointSet::Pointer pSet2)
 {
+  m_Statistics = ImageStatisticsCalculator::StatisticsContainer::New();
   m_PointSet1 = pSet1;
   m_PointSet2 = pSet2;
   m_StatisticsCalculated = false;
@@ -75,7 +77,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMean()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetMean();
+  return m_Statistics->GetMean();
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetSD()
@@ -84,7 +86,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetSD()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetSigma();
+  return m_Statistics->GetStd();
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetVariance()
@@ -93,7 +95,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetVariance()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetVariance();
+  return m_Statistics->GetVariance();
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetRMS()
@@ -102,7 +104,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetRMS()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetRMS();
+  return m_Statistics->GetRMS();
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetMedian()
@@ -111,7 +113,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMedian()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetMedian();
+  return m_Statistics->GetMedian();
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetMax()
@@ -120,7 +122,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMax()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetMax();
+  return m_Statistics->GetMax();
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetMin()
@@ -129,7 +131,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetMin()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetMin();
+  return m_Statistics->GetMin();
 }
 
 double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
@@ -138,7 +140,7 @@ double mitk::PointSetDifferenceStatisticsCalculator::GetNumberOfPoints()
   {
     this->ComputeStatistics();
   }
-  return m_Statistics.GetN();
+  return m_Statistics->GetN();
 }
 
 void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
@@ -200,14 +202,14 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     {
       median = differencesVector.at((numberOfPoints-1)/2+1);
     }
-    m_Statistics.SetMean(mean);
-    m_Statistics.SetSigma(sd);
-    m_Statistics.SetVariance(variance);
-    m_Statistics.SetRMS(rms);
-    m_Statistics.SetMin(differencesVector.at(0));
-    m_Statistics.SetMax(differencesVector.at(numberOfPoints-1));
-    m_Statistics.SetMedian(median);
-    m_Statistics.SetN(numberOfPoints);
+    m_Statistics->SetMean(mean);
+    m_Statistics->SetStd(sd);
+    m_Statistics->SetVariance(variance);
+    m_Statistics->SetRMS(rms);
+    m_Statistics->SetMin(differencesVector.at(0));
+    m_Statistics->SetMax(differencesVector.at(numberOfPoints-1));
+    m_Statistics->SetMedian(median);
+    m_Statistics->SetN(numberOfPoints);
 
     m_StatisticsCalculated = true;
   }

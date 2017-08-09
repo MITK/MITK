@@ -30,29 +30,16 @@ namespace mitk
     float SingleStep;
   };
 
-  FloatPropertyExtension::Impl::Impl()
-    : Decimals(2),
-      Maximum(99.9999999999f),
-      Minimum(0.0f),
-      SingleStep(1.0f)
-  {
-  }
-
+  FloatPropertyExtension::Impl::Impl() : Decimals(2), Maximum(99.9999999999f), Minimum(0.0f), SingleStep(1.0f) {}
   FloatPropertyExtension::Impl::Impl(float minimum, float maximum, float singleStep, int decimals)
-    : Decimals(decimals),
-      Maximum(maximum),
-      Minimum(minimum),
-      SingleStep(singleStep)
+    : Decimals(decimals), Maximum(maximum), Minimum(minimum), SingleStep(singleStep)
   {
   }
 
-  FloatPropertyExtension::Impl::~Impl()
-  {
-  }
+  FloatPropertyExtension::Impl::~Impl() {}
 }
 
-mitk::FloatPropertyExtension::FloatPropertyExtension()
-  : m_Impl(new Impl)
+mitk::FloatPropertyExtension::FloatPropertyExtension() : m_Impl(new Impl)
 {
 }
 

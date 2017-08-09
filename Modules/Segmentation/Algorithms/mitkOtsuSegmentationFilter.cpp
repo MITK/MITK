@@ -15,13 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOtsuSegmentationFilter.h"
-#include "mitkImageCast.h"
-#include "mitkImageAccessByItk.h"
 #include "itkOtsuMultipleThresholdsImageFilter.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkImageCast.h"
 
 struct paramContainer
 {
-  paramContainer( unsigned int numThresholds, bool useValley, unsigned int numBins, mitk::Image::Pointer image )
+  paramContainer(unsigned int numThresholds, bool useValley, unsigned int numBins, mitk::Image::Pointer image)
     : m_NumberOfThresholds(numThresholds), m_ValleyEmphasis(useValley), m_NumberOfBins(numBins), m_Image(image)
   {
   }
@@ -32,25 +32,24 @@ struct paramContainer
   mitk::Image::Pointer m_Image;
 };
 
-template<typename TPixel, unsigned int VImageDimension>
-void
-AccessItkOtsuFilter(const itk::Image<TPixel, VImageDimension>* itkImage, paramContainer params)
+template <typename TPixel, unsigned int VImageDimension>
+void AccessItkOtsuFilter(const itk::Image<TPixel, VImageDimension> *itkImage, paramContainer params)
 {
   typedef itk::Image<TPixel, VImageDimension> itkInputImageType;
-  typedef itk::Image< mitk::OtsuSegmentationFilter::OutputPixelType, VImageDimension > itkOutputImageType;
-  typedef itk::OtsuMultipleThresholdsImageFilter< itkInputImageType, itkOutputImageType > OtsuFilterType;
+  typedef itk::Image<mitk::OtsuSegmentationFilter::OutputPixelType, VImageDimension> itkOutputImageType;
+  typedef itk::OtsuMultipleThresholdsImageFilter<itkInputImageType, itkOutputImageType> OtsuFilterType;
 
   typename OtsuFilterType::Pointer filter = OtsuFilterType::New();
-  filter->SetNumberOfThresholds( params.m_NumberOfThresholds );
-  filter->SetInput( itkImage );
-  filter->SetValleyEmphasis( params.m_ValleyEmphasis );
-  filter->SetNumberOfHistogramBins ( params.m_NumberOfBins );
+  filter->SetNumberOfThresholds(params.m_NumberOfThresholds);
+  filter->SetInput(itkImage);
+  filter->SetValleyEmphasis(params.m_ValleyEmphasis);
+  filter->SetNumberOfHistogramBins(params.m_NumberOfBins);
 
   try
   {
     filter->Update();
   }
-  catch( ... )
+  catch (...)
   {
     mitkThrow() << "itkOtsuFilter error.";
   }
@@ -59,20 +58,19 @@ AccessItkOtsuFilter(const itk::Image<TPixel, VImageDimension>* itkImage, paramCo
   return;
 }
 
-namespace mitk {
-
-OtsuSegmentationFilter::OtsuSegmentationFilter()
-  : m_NumberOfThresholds(2), m_ValleyEmphasis(false), m_NumberOfBins(128)
+namespace mitk
 {
-}
+  OtsuSegmentationFilter::OtsuSegmentationFilter()
+    : m_NumberOfThresholds(2), m_ValleyEmphasis(false), m_NumberOfBins(128)
+  {
+  }
 
-OtsuSegmentationFilter::~OtsuSegmentationFilter()
-{
-}
-
-void OtsuSegmentationFilter::GenerateData()
-{
-  mitk::Image::ConstPointer mitkImage = GetInput();
-  AccessByItk_n( mitkImage, AccessItkOtsuFilter, (paramContainer( m_NumberOfThresholds, m_ValleyEmphasis, m_NumberOfBins, this->GetOutput()) ) );
-}
+  OtsuSegmentationFilter::~OtsuSegmentationFilter() {}
+  void OtsuSegmentationFilter::GenerateData()
+  {
+    mitk::Image::ConstPointer mitkImage = GetInput();
+    AccessByItk_n(mitkImage,
+                  AccessItkOtsuFilter,
+                  (paramContainer(m_NumberOfThresholds, m_ValleyEmphasis, m_NumberOfBins, this->GetOutput())));
+  }
 }

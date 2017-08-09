@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include <mitkBaseGeometry.h>
-namespace mitk {
+namespace mitk
+{
   //##Documentation
   //## @brief ModifiedLock manages the calls of Modified() functions
   //##
@@ -31,11 +32,12 @@ namespace mitk {
   {
   public:
     ModifiedLock();
-    ModifiedLock(BaseGeometry* baseGeo);
+    ModifiedLock(BaseGeometry *baseGeo);
     ~ModifiedLock();
+
   private:
-    BaseGeometry* m_baseGeometry;
+    BaseGeometry *m_baseGeometry;
   };
 }
 
-#endif //Header
+#endif // Header

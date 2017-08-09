@@ -88,7 +88,7 @@ public:
     double GetBaselineSignal(int index){ return m_B0Signal.at(index); }
     vnl_vector< double > GetCoefficients(int listIndex){ return m_ShCoefficients.at(listIndex); }
 
-    bool SampleKernels(Image::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage=NULL, QballFilterType::CoefficientImageType::Pointer coeffImage=NULL, ItkDoubleImageType::Pointer adcImage=NULL);
+    bool SampleKernels(Image::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage=nullptr, QballFilterType::CoefficientImageType::Pointer coeffImage=nullptr, ItkDoubleImageType::Pointer adcImage=nullptr);
 
 protected:
 

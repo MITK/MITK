@@ -22,19 +22,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QHeaderView>
-#include <QTableView>
-#include <QLineEdit>
 #include <QLabel>
+#include <QLineEdit>
+#include <QTableView>
+#include <QVBoxLayout>
 
 #include <vtkRenderWindow.h>
 
-QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(QWidget* parent
-                                                       , Qt::WindowFlags f,mitk::DataNode::Pointer  /*_Node*/)
-: QWidget(parent, f)
-, m_NodePropertiesTableView(0)
-, m_Model(0)
+QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(QWidget *parent,
+                                                       Qt::WindowFlags f,
+                                                       mitk::DataNode::Pointer /*_Node*/)
+  : QWidget(parent, f), m_NodePropertiesTableView(0), m_Model(0)
 {
   // set up empty gui elements
   this->init();
@@ -48,9 +47,9 @@ QmitkPropertiesTableEditor::~QmitkPropertiesTableEditor()
 {
 }
 
-void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _List )
+void QmitkPropertiesTableEditor::SetPropertyList(mitk::PropertyList::Pointer _List)
 {
-  if(_List.IsNotNull())
+  if (_List.IsNotNull())
   {
     m_Model->SetPropertyList(_List);
     m_NodePropertiesTableView->resizeColumnsToContents();
@@ -64,7 +63,7 @@ void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _L
   }
 }
 
-QmitkPropertiesTableModel* QmitkPropertiesTableEditor::getModel() const
+QmitkPropertiesTableModel *QmitkPropertiesTableEditor::getModel() const
 {
   return m_Model;
 }
@@ -72,10 +71,10 @@ QmitkPropertiesTableModel* QmitkPropertiesTableEditor::getModel() const
 void QmitkPropertiesTableEditor::init()
 {
   // read/ dim
-  QVBoxLayout* _NodePropertiesLayout = new QVBoxLayout;
-  QWidget* _PropertyFilterKeyWordPane = new QWidget(QWidget::parentWidget());
-  QHBoxLayout* _PropertyFilterKeyWordLayout = new QHBoxLayout;
-  QLabel* _LabelPropertyFilterKeyWord = new QLabel("Filter: ",_PropertyFilterKeyWordPane);
+  QVBoxLayout *_NodePropertiesLayout = new QVBoxLayout;
+  QWidget *_PropertyFilterKeyWordPane = new QWidget(QWidget::parentWidget());
+  QHBoxLayout *_PropertyFilterKeyWordLayout = new QHBoxLayout;
+  QLabel *_LabelPropertyFilterKeyWord = new QLabel("Filter: ", _PropertyFilterKeyWordPane);
   m_TxtPropertyFilterKeyWord = new QLineEdit(_PropertyFilterKeyWordPane);
   m_NodePropertiesTableView = new QTableView(QWidget::parentWidget());
 
@@ -92,25 +91,26 @@ void QmitkPropertiesTableEditor::init()
   _NodePropertiesLayout->addWidget(_PropertyFilterKeyWordPane);
   _NodePropertiesLayout->addWidget(m_NodePropertiesTableView);
 
-  m_NodePropertiesTableView->setSelectionMode( QAbstractItemView::SingleSelection );
-  m_NodePropertiesTableView->setSelectionBehavior( QAbstractItemView::SelectItems );
+  m_NodePropertiesTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_NodePropertiesTableView->setSelectionBehavior(QAbstractItemView::SelectItems);
   m_NodePropertiesTableView->verticalHeader()->hide();
   m_NodePropertiesTableView->setItemDelegate(new QmitkPropertyDelegate(this));
   m_NodePropertiesTableView->setAlternatingRowColors(true);
   m_NodePropertiesTableView->setSortingEnabled(true);
   m_NodePropertiesTableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-  QObject::connect( m_TxtPropertyFilterKeyWord, SIGNAL( textChanged(const QString &) )
-    , this, SLOT( PropertyFilterKeyWordTextChanged(const QString &) ) );
-
+  QObject::connect(m_TxtPropertyFilterKeyWord,
+                   SIGNAL(textChanged(const QString &)),
+                   this,
+                   SLOT(PropertyFilterKeyWordTextChanged(const QString &)));
 }
 
-void QmitkPropertiesTableEditor::PropertyFilterKeyWordTextChanged( const QString &  /*text*/ )
+void QmitkPropertiesTableEditor::PropertyFilterKeyWordTextChanged(const QString & /*text*/)
 {
   m_Model->SetFilterPropertiesKeyWord(m_TxtPropertyFilterKeyWord->text().toStdString());
 }
 
-QTableView* QmitkPropertiesTableEditor::getTable() const
+QTableView *QmitkPropertiesTableEditor::getTable() const
 {
   return m_NodePropertiesTableView;
 }

@@ -19,17 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAddContourTool.xpm"
 
 // us
-#include <usModule.h>
-#include <usModuleResource.h>
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleContext.h>
+#include <usModuleResource.h>
 
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, AddContourTool, "Add tool");
 }
 
-mitk::AddContourTool::AddContourTool()
-:ContourTool(1)
+mitk::AddContourTool::AddContourTool() : ContourTool(1)
 {
 }
 
@@ -37,27 +37,26 @@ mitk::AddContourTool::~AddContourTool()
 {
 }
 
-const char** mitk::AddContourTool::GetXPM() const
+const char **mitk::AddContourTool::GetXPM() const
 {
   return mitkAddContourTool_xpm;
 }
 
 us::ModuleResource mitk::AddContourTool::GetIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Add_48x48.png");
   return resource;
 }
 
 us::ModuleResource mitk::AddContourTool::GetCursorIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Add_Cursor_32x32.png");
   return resource;
 }
 
-const char* mitk::AddContourTool::GetName() const
+const char *mitk::AddContourTool::GetName() const
 {
   return "Add";
 }
-

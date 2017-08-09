@@ -24,9 +24,8 @@ class Step8 : public Step6
 {
   Q_OBJECT
 public:
-  Step8( int argc, char* argv[], QWidget *parent=nullptr );
+  Step8(int argc, char *argv[], QWidget *parent = nullptr);
   ~Step8() {}
-
 protected:
   virtual void SetupWidgets() override;
 protected slots:

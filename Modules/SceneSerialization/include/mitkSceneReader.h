@@ -24,17 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class MITKSCENESERIALIZATION_EXPORT SceneReader : public itk::Object
-{
+  class MITKSCENESERIALIZATION_EXPORT SceneReader : public itk::Object
+  {
   public:
+    mitkClassMacroItkParent(SceneReader, itk::Object);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacroItkParent( SceneReader, itk::Object );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage );
-};
-
+      virtual bool LoadScene(TiXmlDocument &document, const std::string &workingDirectory, DataStorage *storage);
+  };
 }
-

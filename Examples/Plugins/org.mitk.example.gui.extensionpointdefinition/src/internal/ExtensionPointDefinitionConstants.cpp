@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ChangeTextRegistry.h"
 
-const QString ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME = "org.mitk.example.extensionpointdefinition.changetext";
+const QString ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME =
+  "org.mitk.example.extensionpointdefinition.changetext";
 const QString ExtensionPointDefinitionConstants::CHANGETEXT_CHILD_DESCRIPTION = "description";
 const QString ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_CLASS = "class";
 const QString ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME = "name";

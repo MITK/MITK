@@ -139,11 +139,11 @@ public:
         MITK_TEST_OUTPUT (<< "Warning: " << allSerializers.size() << " serializers found for " << prop->GetNameOfClass() << "testing only the first one.");
       }
       mitk::BasePropertySerializer* serializer = dynamic_cast<mitk::BasePropertySerializer*>( allSerializers.begin()->GetPointer());
-      MITK_TEST_CONDITION(serializer != NULL, serializername + std::string(" is valid"));
-      if (serializer != NULL)
+      MITK_TEST_CONDITION(serializer != nullptr, serializername + std::string(" is valid"));
+      if (serializer != nullptr)
       {
         serializer->SetProperty(prop);
-        TiXmlElement* valueelement = NULL;
+        TiXmlElement* valueelement = nullptr;
         try
         {
           valueelement = serializer->Serialize();
@@ -154,9 +154,9 @@ public:
         catch (...)
         {
         }
-        MITK_TEST_CONDITION(valueelement != NULL, std::string("Serialize property with ") + serializername);
+        MITK_TEST_CONDITION(valueelement != nullptr, std::string("Serialize property with ") + serializername);
 
-        if (valueelement == NULL)
+        if (valueelement == nullptr)
         {
           MITK_TEST_OUTPUT( << "serialization failed, skipping deserialization");
           continue;

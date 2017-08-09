@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Mitk
 #include <mitkStatusBar.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include "mitkRegVisPropertyTags.h"
@@ -43,8 +43,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMatchPointRegistrationEvaluator::VIEW_ID =
     "org.mitk.views.matchpoint.registration.evaluator";
 
+const std::string QmitkMatchPointRegistrationEvaluator::HelperNodeName =
+    "RegistrationEvaluationHelper";
+
 QmitkMatchPointRegistrationEvaluator::QmitkMatchPointRegistrationEvaluator()
-  : m_Parent(NULL), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0), HelperNodeName("RegistrationEvaluationHelper")
+  : m_Parent(nullptr), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0)
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -106,35 +109,35 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
   this->m_autoMoving = false;
   this->m_autoTarget = false;
-  this->m_spSelectedMovingNode = NULL;
-  this->m_spSelectedTargetNode = NULL;
-  this->m_spSelectedRegNode = NULL;
+  this->m_spSelectedMovingNode = nullptr;
+  this->m_spSelectedTargetNode = nullptr;
+  this->m_spSelectedRegNode = nullptr;
 
   if (dataNodes.size() > 0)
   {
     //test if auto select works
-    if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]))
+    if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]) && dataNodes[0]->GetData())
     {
       this->m_spSelectedRegNode = dataNodes[0];
       dataNodes.pop_front();
 
-      mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgMovingData);
+      mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
 
       if (uidProp)
       {
         //search for the moving node
-        mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+        mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
         this->m_spSelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
         this->m_autoMoving = this->m_spSelectedMovingNode.IsNotNull();
       }
 
-      uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+      uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
       if (uidProp)
       {
         //search for the target node
-        mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+        mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
         this->m_spSelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
         this->m_autoTarget = this->m_spSelectedTargetNode.IsNotNull();
@@ -170,12 +173,29 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
 }
 
 
-void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-        const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+        const QList<mitk::DataNode::Pointer>&)
 {
   this->CheckInputs();
 	this->ConfigureControls();
 };
+
+
+void QmitkMatchPointRegistrationEvaluator::NodeRemoved(const mitk::DataNode* node)
+{
+  if (node == this->m_spSelectedMovingNode
+    || node == this->m_spSelectedRegNode
+    || node == this->m_spSelectedTargetNode
+    || node == this->m_selectedEvalNode)
+  {
+    if (node == this->m_selectedEvalNode)
+    {
+      this->m_selectedEvalNode = nullptr;
+    }
+    this->OnStopBtnPushed();
+    MITK_INFO << "Stopped current MatchPoint evaluation session, because at least one relevant node was removed from storage.";
+  }
+}
 
 void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 {
@@ -247,7 +267,7 @@ void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 
 void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 {
-  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(NULL);
+  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
   unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
   if (m_currentSelectedPosition != currentSelectedPosition
@@ -274,7 +294,7 @@ void QmitkMatchPointRegistrationEvaluator::OnSettingsChanged(mitk::DataNode*)
 void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 {
   //reinit view
-  mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 
   mitk::RegEvaluationObject::Pointer regEval = mitk::RegEvaluationObject::New();
 
@@ -301,7 +321,7 @@ void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 
   this->m_selectedEvalNode = mitk::DataNode::New();
   this->m_selectedEvalNode->SetData(regEval);
-  
+
   mitk::RegEvaluationMapper2D::SetDefaultProperties(this->m_selectedEvalNode);
   this->m_selectedEvalNode->SetName(HelperNodeName);
   this->m_selectedEvalNode->SetBoolProperty("helper object", true);
@@ -321,8 +341,12 @@ void QmitkMatchPointRegistrationEvaluator::OnStopBtnPushed()
 {
   this->m_activeEvaluation = false;
 
-  this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  if (this->m_selectedEvalNode.IsNotNull())
+  {
+    this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  }
   this->m_selectedEvalNode = nullptr;
+
   this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
 
   this->CheckInputs();

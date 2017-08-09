@@ -16,16 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNodePredicateOr.h"
 
-
-
-
-mitk::NodePredicateOr::NodePredicateOr()
-: NodePredicateCompositeBase()
+mitk::NodePredicateOr::NodePredicateOr() : NodePredicateCompositeBase()
 {
 }
 
-mitk::NodePredicateOr::NodePredicateOr(const NodePredicateBase* p1, const NodePredicateBase* p2)
-: NodePredicateCompositeBase()
+mitk::NodePredicateOr::NodePredicateOr(const NodePredicateBase *p1, const NodePredicateBase *p2)
+  : NodePredicateCompositeBase()
 {
   this->AddPredicate(p1);
   this->AddPredicate(p2);
@@ -35,8 +31,7 @@ mitk::NodePredicateOr::~NodePredicateOr()
 {
 }
 
-
-bool mitk::NodePredicateOr::CheckNode(const DataNode* node) const
+bool mitk::NodePredicateOr::CheckNode(const DataNode *node) const
 {
   if (m_ChildPredicates.empty())
     throw std::invalid_argument("NodePredicateOr: no child predicates available");
@@ -44,7 +39,8 @@ bool mitk::NodePredicateOr::CheckNode(const DataNode* node) const
   if (node == nullptr)
     throw std::invalid_argument("NodePredicateOr: invalid node");
 
-  /* return the disjunction of the child predicate. If any predicate returns true, we return true too. Return false only if all child predicates return false */
+  /* return the disjunction of the child predicate. If any predicate returns true, we return true too. Return false only
+   * if all child predicates return false */
   for (auto it = m_ChildPredicates.cbegin(); it != m_ChildPredicates.cend(); ++it)
     if ((*it)->CheckNode(node) == true)
       return true;

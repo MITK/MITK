@@ -24,27 +24,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class SelectionServiceQtWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
-
 public:
-
   static const QString DEFAULT_PERSPECTIVE_ID;
 
-  berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-      berry::IWorkbenchWindowConfigurer::Pointer configurer) override
+  berry::WorkbenchWindowAdvisor *CreateWorkbenchWindowAdvisor(
+    berry::IWorkbenchWindowConfigurer::Pointer configurer) override
   {
     // Set an individual initial size
-    configurer->SetInitialSize(QPoint(600,400));
+    configurer->SetInitialSize(QPoint(600, 400));
     // Set the window title
     configurer->SetTitle("Qt Selection Service");
 
     return new berry::WorkbenchWindowAdvisor(configurer);
   }
 
-  QString GetInitialWindowPerspectiveId() override
-  {
-    return DEFAULT_PERSPECTIVE_ID;
-  }
-
+  QString GetInitialWindowPerspectiveId() override { return DEFAULT_PERSPECTIVE_ID; }
 };
 
 const QString SelectionServiceQtWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
@@ -57,19 +51,17 @@ SelectionServiceQt::~SelectionServiceQt()
 {
 }
 
-QVariant SelectionServiceQt::Start(berry::IApplicationContext* /*context*/)
+QVariant SelectionServiceQt::Start(berry::IApplicationContext * /*context*/)
 {
-  berry::Display* display = berry::PlatformUI::CreateDisplay();
+  berry::Display *display = berry::PlatformUI::CreateDisplay();
   wbAdvisor.reset(new SelectionServiceQtWorkbenchAdvisor);
 
   int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
 
   // exit the application with an appropriate return code
-  return code == berry::PlatformUI::RETURN_RESTART
-              ? EXIT_RESTART : EXIT_OK;
+  return code == berry::PlatformUI::RETURN_RESTART ? EXIT_RESTART : EXIT_OK;
 }
 
 void SelectionServiceQt::Stop()
 {
-
 }

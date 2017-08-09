@@ -18,41 +18,41 @@
 #define MITKMOUSEMOVEEVENT_H_
 #include "itkObject.h"
 #include "itkObjectFactory.h"
+#include "mitkBaseRenderer.h"
 #include "mitkCommon.h"
+#include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
 #include "mitkInteractionPositionEvent.h"
-#include "mitkBaseRenderer.h"
-#include "mitkInteractionEvent.h"
 
 #include <MitkCoreExports.h>
 
 namespace mitk
 {
-
-  class MITKCORE_EXPORT MouseMoveEvent : public InteractionPositionEvent {
-
+  class MITKCORE_EXPORT MouseMoveEvent : public InteractionPositionEvent
+  {
   public:
-    mitkClassMacro(MouseMoveEvent,InteractionPositionEvent);
-    mitkNewMacro4Param(Self, BaseRenderer*, const Point2D& , MouseButtons , ModifierKeys);
+    mitkClassMacro(MouseMoveEvent, InteractionPositionEvent);
+    mitkNewMacro4Param(Self, BaseRenderer *, const Point2D &, MouseButtons, ModifierKeys);
 
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
     void SetModifiers(ModifierKeys modifiers);
     void SetButtonStates(MouseButtons buttons);
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
   protected:
-    MouseMoveEvent(BaseRenderer*, const Point2D& = Point2D(),  MouseButtons buttonStates = NoButton,
+    MouseMoveEvent(BaseRenderer *,
+                   const Point2D & = Point2D(),
+                   MouseButtons buttonStates = NoButton,
                    ModifierKeys modifiers = NoKey);
     virtual ~MouseMoveEvent();
 
-    virtual bool IsEqual(const InteractionEvent&) const override;
+    virtual bool IsEqual(const InteractionEvent &) const override;
 
   private:
     MouseButtons m_ButtonStates;
     ModifierKeys m_Modifiers;
-
   };
 } /* namespace mitk */
 

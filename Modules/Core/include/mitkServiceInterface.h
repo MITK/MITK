@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifdef Q_DECLARE_INTERFACE
 
-#define MITK_DECLARE_SERVICE_INTERFACE(IFace, IId) \
-  US_DECLARE_SERVICE_INTERFACE(IFace, IId)         \
+#define MITK_DECLARE_SERVICE_INTERFACE(IFace, IId)                                                                     \
+  US_DECLARE_SERVICE_INTERFACE(IFace, IId)                                                                             \
   Q_DECLARE_INTERFACE(IFace, IId)
 
 #else

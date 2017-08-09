@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC
 #define BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC
 
 #include "mitkBaseDataSource.h"
 
-namespace mitk {
-
-DEPRECATED(typedef BaseDataSource BaseProcess);
+namespace mitk
+{
+  DEPRECATED(typedef BaseDataSource BaseProcess);
 
 } // namespace mitk
 

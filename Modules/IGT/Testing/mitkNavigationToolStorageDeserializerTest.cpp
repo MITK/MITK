@@ -50,8 +50,8 @@ public:
 
   void tearDown()
   {
-  m_DataStorage = NULL;
-  m_Deserializer = NULL;
+  m_DataStorage = nullptr;
+  m_Deserializer = nullptr;
   }
 
   void TestInstantiationDeserializer()

@@ -14,21 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
 #include "mitkCoreObjectFactory.h"
+#include "mitkTestingMacros.h"
 
-
-int mitkCoreObjectFactoryTest(int /*argc*/, char* /*argv*/[])
+int mitkCoreObjectFactoryTest(int /*argc*/, char * /*argv*/ [])
 {
-
   MITK_TEST_BEGIN("CoreObjectFactory")
 
   mitk::CoreObjectFactory::Pointer instance = mitk::CoreObjectFactory::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(instance.IsNotNull(),"Testing instantiation");
-  MITK_TEST_CONDITION(strcmp(instance->GetNameOfClass(),"CoreObjectFactory") == 0,"Is this a CoreObjectFactory?");
-
-
-
+  MITK_TEST_CONDITION_REQUIRED(instance.IsNotNull(), "Testing instantiation");
+  MITK_TEST_CONDITION(strcmp(instance->GetNameOfClass(), "CoreObjectFactory") == 0, "Is this a CoreObjectFactory?");
 
   MITK_TEST_END()
 }

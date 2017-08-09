@@ -22,46 +22,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class PlanarFigureWriterFactory : public itk::ObjectFactoryBase
+  {
+  public:
+    mitkClassMacroItkParent(mitk::PlanarFigureWriterFactory, itk::ObjectFactoryBase)
 
-class PlanarFigureWriterFactory : public itk::ObjectFactoryBase
-{
-public:
+      /** Class methods used to interface with the registered factories. */
+      virtual const char *GetITKSourceVersion(void) const override;
+    virtual const char *GetDescription(void) const override;
 
-  mitkClassMacroItkParent( mitk::PlanarFigureWriterFactory, itk::ObjectFactoryBase )
+    /** Method for class instantiation. */
+    itkFactorylessNewMacro(Self)
 
-  /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const override;
-  virtual const char* GetDescription(void) const override;
+      /**
+       * Register one factory of this type
+       * \deprecatedSince{2013_09}
+       */
+      DEPRECATED(static void RegisterOneFactory(void));
 
-  /** Method for class instantiation. */
-  itkFactorylessNewMacro(Self)
+    /**
+     * UnRegister one factory of this type
+     * \deprecatedSince{2013_09}
+     */
+    DEPRECATED(static void UnRegisterOneFactory(void));
 
-  /**
-   * Register one factory of this type
-   * \deprecatedSince{2013_09}
-   */
-  DEPRECATED(static void RegisterOneFactory(void));
+  protected:
+    PlanarFigureWriterFactory();
+    ~PlanarFigureWriterFactory();
 
-  /**
-   * UnRegister one factory of this type
-   * \deprecatedSince{2013_09}
-   */
-  DEPRECATED(static void UnRegisterOneFactory(void));
+  private:
+    PlanarFigureWriterFactory(const Self &); // purposely not implemented
+    void operator=(const Self &);            // purposely not implemented
 
-protected:
-  PlanarFigureWriterFactory();
-  ~PlanarFigureWriterFactory();
-
-private:
-  PlanarFigureWriterFactory(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-
-  static itk::ObjectFactoryBase::Pointer GetInstance();
-};
+    static itk::ObjectFactoryBase::Pointer GetInstance();
+  };
 
 } // end namespace mitk
 
 #endif // PLANARFIGURE_WRITERFACTORY_H_HEADER_INCLUDED
-
-
-

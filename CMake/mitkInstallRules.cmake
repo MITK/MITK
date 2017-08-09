@@ -50,7 +50,7 @@ if(MACOSX_BUNDLE_NAMES)
             DESTINATION "${bundle_name}.app/Contents/MacOS/iconengines"
             CONFIGURATIONS Release)
     # related to MITK:T19679-InstallQtWebEnginProcess
-    if(MITK_USE_QT_WEBENGINE)
+    if(MITK_USE_Qt5_WebEngine)
         get_filename_component(ABS_DIR_HELPERS "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
         install(DIRECTORY ${ABS_DIR_HELPERS}
                 DESTINATION "${bundle_name}.app/Contents/Frameworks/QtWebEngineCore.framework/"
@@ -60,7 +60,7 @@ if(MACOSX_BUNDLE_NAMES)
 endif()
 
 if(WIN32)
-  if(MITK_USE_QT)
+  if(MITK_USE_Qt5)
     get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
                  PROPERTY IMPORT_LOCATION)
     get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
@@ -73,11 +73,17 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
             DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Release)
-    if(MITK_USE_QT_WEBENGINE)
+    install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicon.dll"
+            DESTINATION "bin/plugins/iconengines"
+            CONFIGURATIONS Release)
+    if(MITK_USE_Qt5_WebEngine)
       MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
     endif()
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"
+            CONFIGURATIONS Release)
+    install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+            DESTINATION "bin/translations/qtwebengine_locales/"
             CONFIGURATIONS Release)
     install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
             DESTINATION "bin/plugins/platforms"
@@ -88,8 +94,14 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
             DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Debug)
+    install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicond.dll"
+            DESTINATION "bin/plugins/iconengines"
+            CONFIGURATIONS Debug)
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"
+            CONFIGURATIONS Debug)
+    install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+            DESTINATION "bin/translations/qtwebengine_locales/"
             CONFIGURATIONS Debug)
   endif()
 
@@ -137,6 +149,35 @@ else()
     foreach(_dcmtk_lib ${_dcmtk_libs})
       #MITK_INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
     endforeach()
+  endif()
+
+# We need to install Webengineprocess and related files on unix as well
+  if(UNIX)
+    if(MITK_USE_Qt5)
+      get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+                 PROPERTY IMPORT_LOCATION)
+      get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
+
+      install(FILES "${_qmake_path}/../plugins/platforms/libqxcb.so"
+              DESTINATION "bin/plugins/platforms")
+      install(FILES "${_qmake_path}/../plugins/sqldrivers/libqsqlite.so"
+              DESTINATION "bin/plugins/sqldrivers")
+      install(FILES "${_qmake_path}/../plugins/imageformats/libqsvg.so"
+              DESTINATION "bin/plugins/imageformats")
+      install(FILES "${_qmake_path}/../plugins/iconengines/libqsvgicon.so"
+              DESTINATION "bin/plugins/iconengines")
+      install(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so"
+              DESTINATION "bin/plugins/xcbglintegrations")
+
+      if(MITK_USE_Qt5_WebEngine)
+        MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
+      endif()
+
+      install(DIRECTORY "${_qmake_path}/../resources/"
+              DESTINATION "bin/resources/")
+      install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+              DESTINATION "bin/translations/qtwebengine_locales/")
+    endif()
   endif()
 
 endif()

@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 class vtkPoints;
 class vtkThinPlateSplineTransform;
 
-namespace mitk {
+namespace mitk
+{
   //##Documentation
   //## @brief Thin-plate-spline-based landmark-based curved geometry
   //##
@@ -32,18 +33,13 @@ namespace mitk {
   public:
     mitkClassMacro(ThinPlateSplineCurvedGeometry, LandmarkProjectorBasedCurvedGeometry);
 
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       virtual void ComputeGeometry() override;
 
     virtual itk::LightObject::Pointer InternalClone() const override;
 
-    vtkThinPlateSplineTransform* GetThinPlateSplineTransform() const
-    {
-      return m_ThinPlateSplineTransform;
-    }
-
+    vtkThinPlateSplineTransform *GetThinPlateSplineTransform() const { return m_ThinPlateSplineTransform; }
     virtual void SetSigma(double sigma);
     virtual double GetSigma() const;
 
@@ -51,14 +47,14 @@ namespace mitk {
 
   protected:
     ThinPlateSplineCurvedGeometry();
-    ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other);
+    ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry &other);
 
     virtual ~ThinPlateSplineCurvedGeometry();
 
-    vtkThinPlateSplineTransform* m_ThinPlateSplineTransform;
+    vtkThinPlateSplineTransform *m_ThinPlateSplineTransform;
 
-    vtkPoints* m_VtkTargetLandmarks;
-    vtkPoints* m_VtkProjectedLandmarks;
+    vtkPoints *m_VtkTargetLandmarks;
+    vtkPoints *m_VtkProjectedLandmarks;
 
     //##Documentation
     //## @brief PreSetSpacing
@@ -66,7 +62,7 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{ Superclass::PreSetSpacing(aSpacing); };
+    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 

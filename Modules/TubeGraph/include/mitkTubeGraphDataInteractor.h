@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   // Define events for TubeGraph interaction notifications
-  itkEventMacro( SelectionChangedTubeGraphEvent, itk::AnyEvent );
+  itkEventMacro(SelectionChangedTubeGraphEvent, itk::AnyEvent);
 
   /**
   * \brief
@@ -36,7 +36,7 @@ namespace mitk
   * \ingroup Interaction
   */
   // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-  class MITKTUBEGRAPH_EXPORT TubeGraphDataInteractor: public DataInteractor
+  class MITKTUBEGRAPH_EXPORT TubeGraphDataInteractor : public DataInteractor
   {
   public:
     mitkClassMacro(TubeGraphDataInteractor, DataInteractor);
@@ -72,16 +72,15 @@ namespace mitk
       InformationMode
     };
 
-    void SetActivationMode(const ActivationMode& activationMode);
+    void SetActivationMode(const ActivationMode &activationMode);
     ActivationMode GetActivationMode();
 
-    void SetActionMode(const ActionMode& actionMode);
+    void SetActionMode(const ActionMode &actionMode);
     ActionMode GetActionMode();
 
     void ResetPickedTubes();
 
   protected:
-
     TubeGraphDataInteractor();
     virtual ~TubeGraphDataInteractor();
 
@@ -99,26 +98,26 @@ namespace mitk
     /**
     * Initializes the movement, stores starting position.
     */
-    virtual bool CheckOverTube (const InteractionEvent *);
-    virtual void SelectTube (StateMachineAction*, InteractionEvent*);
-    virtual void DeselectTube (StateMachineAction*, InteractionEvent*);
+    virtual bool CheckOverTube(const InteractionEvent *);
+    virtual void SelectTube(StateMachineAction *, InteractionEvent *);
+    virtual void DeselectTube(StateMachineAction *, InteractionEvent *);
 
     void SelectTubesByActivationModus();
     void UpdateActivation();
 
   private:
-
     std::vector<TubeGraph::TubeDescriptorType> GetTubesToRoot();
     std::vector<TubeGraph::TubeDescriptorType> GetTubesBetweenPoints();
     std::vector<TubeGraph::TubeDescriptorType> GetPathToPeriphery();
-    std::vector<TubeGraph::TubeDescriptorType> GetPathBetweenTubes(const TubeGraph::TubeDescriptorType& start,const TubeGraph::TubeDescriptorType& end);
+    std::vector<TubeGraph::TubeDescriptorType> GetPathBetweenTubes(const TubeGraph::TubeDescriptorType &start,
+                                                                   const TubeGraph::TubeDescriptorType &end);
 
-    TubeGraph::Pointer             m_TubeGraph;
-    TubeGraphProperty::Pointer     m_TubeGraphProperty;
-    TubeGraph::TubeDescriptorType  m_LastPickedTube;
-    TubeGraph::TubeDescriptorType  m_SecondLastPickedTube;
-    ActivationMode                 m_ActivationMode;
-    ActionMode                     m_ActionMode;
+    TubeGraph::Pointer m_TubeGraph;
+    TubeGraphProperty::Pointer m_TubeGraphProperty;
+    TubeGraph::TubeDescriptorType m_LastPickedTube;
+    TubeGraph::TubeDescriptorType m_SecondLastPickedTube;
+    ActivationMode m_ActivationMode;
+    ActionMode m_ActionMode;
   };
 }
 #endif

@@ -37,9 +37,9 @@ class vtkCellData;
 class vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkPointSetSlicer, vtkPolyDataAlgorithm);
 
-  void PrintSelf(std::ostream& os, vtkIndent indent) override;
+  void PrintSelf(std::ostream &os, vtkIndent indent) override;
 
   // Description:
   // Construct with user-specified implicit function; initial value of 0.0; and
@@ -53,22 +53,22 @@ public:
 
   // Description
   // Specify the implicit function to perform the cutting.
-  virtual void SetSlicePlane(vtkPlane*);
-  vtkGetObjectMacro(SlicePlane,vtkPlane);
+  virtual void SetSlicePlane(vtkPlane *);
+  vtkGetObjectMacro(SlicePlane, vtkPlane);
 
   // Description:
   // If this flag is enabled, then the output scalar values will be
   // interpolated from the implicit function values, and not the input scalar
   // data.
-  vtkSetMacro(GenerateCutScalars,int);
-  vtkGetMacro(GenerateCutScalars,int);
-  vtkBooleanMacro(GenerateCutScalars,int);
+  vtkSetMacro(GenerateCutScalars, int);
+  vtkGetMacro(GenerateCutScalars, int);
+  vtkBooleanMacro(GenerateCutScalars, int);
 
   // Description:
   // Specify a spatial locator for merging points. By default,
   // an instance of vtkMergePoints is used.
   void SetLocator(vtkPointLocator *locator);
-  vtkGetObjectMacro(Locator,vtkPointLocator);
+  vtkGetObjectMacro(Locator, vtkPointLocator);
 
   // Description:
   // Create default locator. Used to create one when none is specified. The
@@ -76,7 +76,7 @@ public:
   void CreateDefaultLocator();
 
 protected:
-  vtkPointSetSlicer(vtkPlane* cf = 0);
+  vtkPointSetSlicer(vtkPlane *cf = 0);
   ~vtkPointSetSlicer();
 
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
@@ -85,12 +85,17 @@ protected:
 
   void UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output);
 
-  void ContourUnstructuredGridCell(vtkCell* cell,
-      vtkDataArray* cellScalars, vtkPointLocator* locator,
-      vtkCellArray* verts, vtkCellArray* lines,
-      vtkCellArray* polys, vtkPointData* inPd,
-      vtkPointData* outPd, vtkCellData* inCd,
-      vtkIdType cellId, vtkCellData* outCd);
+  void ContourUnstructuredGridCell(vtkCell *cell,
+                                   vtkDataArray *cellScalars,
+                                   vtkPointLocator *locator,
+                                   vtkCellArray *verts,
+                                   vtkCellArray *lines,
+                                   vtkCellArray *polys,
+                                   vtkPointData *inPd,
+                                   vtkPointData *outPd,
+                                   vtkCellData *inCd,
+                                   vtkIdType cellId,
+                                   vtkCellData *outCd);
 
   vtkPlane *SlicePlane;
   vtkCutter *Cutter;
@@ -99,18 +104,18 @@ protected:
   int GenerateCutScalars;
 
 private:
-  vtkPointSetSlicer(const vtkPointSetSlicer&);  // Not implemented.
-  void operator=(const vtkPointSetSlicer&);  // Not implemented.
+  vtkPointSetSlicer(const vtkPointSetSlicer &); // Not implemented.
+  void operator=(const vtkPointSetSlicer &);    // Not implemented.
 
   static int edges[12][2];
 
   typedef int EDGE_LIST;
-  typedef struct {
+  typedef struct
+  {
     EDGE_LIST edges[8];
   } POLY_CASES;
 
   static POLY_CASES polyCases[256];
 };
-
 
 #endif /* _VTKPOINTSETSLICER_H_ */

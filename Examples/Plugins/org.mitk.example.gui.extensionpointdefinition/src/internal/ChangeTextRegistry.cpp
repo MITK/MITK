@@ -14,23 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <berryPlatform.h>
-#include <berryIExtensionRegistry.h>
-#include <berryIConfigurationElement.h>
 #include "ChangeTextRegistry.h"
 #include "ExtensionPointDefinitionConstants.h"
+#include <berryIConfigurationElement.h>
+#include <berryIExtensionRegistry.h>
+#include <berryPlatform.h>
 
 ChangeTextRegistry::ChangeTextRegistry()
 {
-  //initialize the registry by copying all available extension points into a local variable
-  berry::IExtensionRegistry* extensionRegistry = berry::Platform::GetExtensionRegistry();
-  QList<berry::IConfigurationElement::Pointer> allExtensionsChangeTexts
-    = extensionRegistry->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME);
+  // initialize the registry by copying all available extension points into a local variable
+  berry::IExtensionRegistry *extensionRegistry = berry::Platform::GetExtensionRegistry();
+  QList<berry::IConfigurationElement::Pointer> allExtensionsChangeTexts =
+    extensionRegistry->GetConfigurationElementsFor(ExtensionPointDefinitionConstants::CHANGETEXT_XP_NAME);
 
-  foreach(const berry::IConfigurationElement::Pointer& it, allExtensionsChangeTexts)
+  foreach (const berry::IConfigurationElement::Pointer &it, allExtensionsChangeTexts)
   {
     QString id = it->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID);
-    if(id.isEmpty() || this->m_ListRegisteredTexts.contains(id))
+    if (id.isEmpty() || this->m_ListRegisteredTexts.contains(id))
     {
       BERRY_WARN << "The ChangeText ID: " << id << " is already registered.";
     }

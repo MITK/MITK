@@ -21,155 +21,144 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkShaderProgram2.h>
 #include <vtkXMLShader.h>
 
-
 class vtkXMLDataElement;
 class vtkXMLMaterial;
 class vtkProperty;
 
-namespace mitk {
-
-/**
- * \brief Management class for vtkShader XML descriptions.
- *
- * Looks for all XML shader files in a given directory and adds default properties
- * for each shader object (shader uniforms) to the specified mitk::DataNode.
- *
- * Additionally, it provides a utility function for applying properties for shaders
- * in mappers.
- */
-class VtkShaderRepository : public IShaderRepository
+namespace mitk
 {
-
-protected:
-
-  class Shader : public IShaderRepository::Shader
+  /**
+   * \brief Management class for vtkShader XML descriptions.
+   *
+   * Looks for all XML shader files in a given directory and adds default properties
+   * for each shader object (shader uniforms) to the specified mitk::DataNode.
+   *
+   * Additionally, it provides a utility function for applying properties for shaders
+   * in mappers.
+   */
+  class VtkShaderRepository : public IShaderRepository
   {
-    public:
-
-    mitkClassMacro( Shader, IShaderRepository::Shader )
-    itkFactorylessNewMacro( Self )
-
-    class Uniform : public itk::Object
+  protected:
+    class Shader : public IShaderRepository::Shader
     {
-      public:
+    public:
+      mitkClassMacro(Shader, IShaderRepository::Shader) itkFactorylessNewMacro(Self)
 
-      mitkClassMacroItkParent( Uniform, itk::Object )
-      itkFactorylessNewMacro( Self )
-
-      enum Type
+        class Uniform : public itk::Object
       {
-        glsl_none,
-        glsl_float,
-        glsl_vec2,
-        glsl_vec3,
-        glsl_vec4,
-        glsl_int,
-        glsl_ivec2,
-        glsl_ivec3,
-        glsl_ivec4
+      public:
+        mitkClassMacroItkParent(Uniform, itk::Object) itkFactorylessNewMacro(Self)
+
+          enum Type {
+            glsl_none,
+            glsl_float,
+            glsl_vec2,
+            glsl_vec3,
+            glsl_vec4,
+            glsl_int,
+            glsl_ivec2,
+            glsl_ivec3,
+            glsl_ivec4
+          };
+
+        /**
+         * Constructor
+         */
+        Uniform();
+
+        /**
+         * Destructor
+         */
+        ~Uniform();
+
+        Type type;
+        std::string name;
+
+        int defaultInt[4];
+        float defaultFloat[4];
+
+        void LoadFromXML(vtkXMLDataElement *e);
       };
+
+      std::list<Uniform::Pointer> uniforms;
 
       /**
        * Constructor
        */
-      Uniform();
+      Shader();
 
       /**
        * Destructor
        */
-      ~Uniform();
+      ~Shader();
 
-      Type type;
-      std::string name;
+      void SetVertexShaderCode(const std::string &code);
+      std::string GetVertexShaderCode() const;
 
-      int defaultInt[4];
-      float defaultFloat[4];
+      void SetFragmentShaderCode(const std::string &code);
+      std::string GetFragmentShaderCode() const;
 
-      void LoadFromXML(vtkXMLDataElement *e);
+      void SetGeometryShaderCode(const std::string &code);
+      std::string GetGeometryShaderCode() const;
+
+      std::list<Uniform::Pointer> GetUniforms() const;
+
+    private:
+      friend class VtkShaderRepository;
+
+      std::string m_VertexShaderCode;
+      std::string m_FragmentShaderCode;
+      std::string m_GeometryShaderCode;
+
+      void LoadXmlShader(std::istream &stream);
     };
 
-    std::list<Uniform::Pointer> uniforms;
+    void LoadShaders();
 
+    Shader::Pointer GetShaderImpl(const std::string &name) const;
+
+  private:
+    std::list<Shader::Pointer> shaders;
+
+    static int shaderId;
+    static const bool debug;
+
+  public:
     /**
      * Constructor
      */
-    Shader();
+    VtkShaderRepository();
 
     /**
      * Destructor
      */
-    ~Shader();
+    ~VtkShaderRepository();
 
-    void SetVertexShaderCode(const std::string& code);
-    std::string GetVertexShaderCode() const;
+    ShaderProgram::Pointer CreateShaderProgram() override;
 
-    void SetFragmentShaderCode(const std::string& code);
-    std::string GetFragmentShaderCode() const;
+    std::list<IShaderRepository::Shader::Pointer> GetShaders() const override;
 
-    void SetGeometryShaderCode(const std::string& code);
-    std::string GetGeometryShaderCode() const;
+    IShaderRepository::Shader::Pointer GetShader(const std::string &name) const override;
 
-    std::list<Uniform::Pointer> GetUniforms() const;
+    IShaderRepository::Shader::Pointer GetShader(int id) const override;
 
-  private:
+    /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
+     * used by mappers.
+     */
+    void AddDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite) const override;
 
-    friend class VtkShaderRepository;
+    /** \brief Applies shader and shader specific variables of the specified DataNode
+     * to the VTK object by updating the shader variables of its vtkProperty.
+     */
 
-    std::string m_VertexShaderCode;
-    std::string m_FragmentShaderCode;
-    std::string m_GeometryShaderCode;
+    int LoadShader(std::istream &stream, const std::string &name) override;
 
-    void LoadXmlShader(std::istream& stream);
+    bool UnloadShader(int id) override;
 
+    void UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram *shaderProgram,
+                             DataNode *node,
+                             BaseRenderer *renderer) const override;
   };
 
-  void LoadShaders();
-
-  Shader::Pointer GetShaderImpl(const std::string& name) const;
-
-private:
-
-  std::list<Shader::Pointer> shaders;
-
-  static int shaderId;
-  static const bool debug;
-
-  public:
-
-  /**
-   * Constructor
-   */
-  VtkShaderRepository();
-
-  /**
-   * Destructor
-   */
-  ~VtkShaderRepository();
-
-  ShaderProgram::Pointer CreateShaderProgram() override;
-
-  std::list<IShaderRepository::Shader::Pointer> GetShaders() const override;
-
-  IShaderRepository::Shader::Pointer GetShader(const std::string& name) const override;
-
-  IShaderRepository::Shader::Pointer GetShader(int id) const override;
-
-  /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
-   * used by mappers.
-   */
-  void AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const override;
-
-  /** \brief Applies shader and shader specific variables of the specified DataNode
-   * to the VTK object by updating the shader variables of its vtkProperty.
-   */
-
-  int LoadShader(std::istream& stream, const std::string& name) override;
-
-  bool UnloadShader(int id) override;
-
-  void UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram* shaderProgram,
-                           DataNode* node, BaseRenderer* renderer) const override;
-};
-
-} //end of namespace mitk
+} // end of namespace mitk
 #endif

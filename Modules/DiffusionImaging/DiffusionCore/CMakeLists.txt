@@ -10,7 +10,6 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKTestKernel+ITKRegistrationCommon+ITKMetricsv4+ITKRegistrationMethodsv4+ITKDistanceMap+ITKLabelVoting+ITKVTK
     PUBLIC VTK|vtkFiltersProgrammable
-  WARNINGS_AS_ERRORS
 )
 
 if(MSVC)

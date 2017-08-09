@@ -20,23 +20,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkAbstractFileReader.h>
 
-namespace mitk {
-
-class SceneFileReader : public mitk::AbstractFileReader
+namespace mitk
 {
+  class SceneFileReader : public mitk::AbstractFileReader
+  {
+  public:
+    SceneFileReader();
 
-public:
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    virtual DataStorage::SetOfObjects::Pointer Read(DataStorage &ds) override;
 
-  SceneFileReader();
-
-  using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
-  virtual DataStorage::SetOfObjects::Pointer Read(DataStorage& ds) override;
-
-private:
-
-  SceneFileReader* Clone() const override;
-};
+  private:
+    SceneFileReader *Clone() const override;
+  };
 
 } // namespace mitk
 

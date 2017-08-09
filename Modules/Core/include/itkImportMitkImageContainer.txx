@@ -21,59 +21,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
+  template <typename TElementIdentifier, typename TElement>
+  ImportMitkImageContainer<TElementIdentifier, TElement>::ImportMitkImageContainer() : m_imageAccess(nullptr)
+  {
+  }
 
-template <typename TElementIdentifier, typename TElement>
-ImportMitkImageContainer<TElementIdentifier , TElement>
-::ImportMitkImageContainer() : m_imageAccess(nullptr)
-{
+  template <typename TElementIdentifier, typename TElement>
+  ImportMitkImageContainer<TElementIdentifier, TElement>::~ImportMitkImageContainer()
+  {
+    if (m_imageAccess != nullptr)
+      delete m_imageAccess;
+    m_imageAccess = nullptr;
+  }
 
-}
+  /*
+  template <typename TElementIdentifier, typename TElement>
+  void
+  ImportMitkImageContainer< TElementIdentifier , TElement >
+  ::SetImageDataItem(mitk::ImageDataItem* imageDataItem)
+  {
+    m_ImageDataItem = imageDataItem;
 
+    this->SetImportPointer( (TElement*) m_ImageDataItem->GetData(), m_ImageDataItem->GetSize()/sizeof(Element), false);
 
-template <typename TElementIdentifier, typename TElement>
-ImportMitkImageContainer< TElementIdentifier , TElement >
-::~ImportMitkImageContainer()
-{
-  if(m_imageAccess != nullptr)
-    delete m_imageAccess;
-  m_imageAccess = nullptr;
-}
+    this->Modified();
+  }
+  */
 
-/*
-template <typename TElementIdentifier, typename TElement>
-void
-ImportMitkImageContainer< TElementIdentifier , TElement >
-::SetImageDataItem(mitk::ImageDataItem* imageDataItem)
-{
-  m_ImageDataItem = imageDataItem;
+  template <typename TElementIdentifier, typename TElement>
+  void ImportMitkImageContainer<TElementIdentifier, TElement>::SetImageAccessor(mitk::ImageAccessorBase *imageAccess,
+                                                                                size_t noOfBytes)
+  {
+    m_imageAccess = imageAccess;
 
-  this->SetImportPointer( (TElement*) m_ImageDataItem->GetData(), m_ImageDataItem->GetSize()/sizeof(Element), false);
+    this->SetImportPointer((TElement *)m_imageAccess->GetData(), noOfBytes / sizeof(Element), false);
 
-  this->Modified();
-}
-*/
+    this->Modified();
+  }
 
-template <typename TElementIdentifier, typename TElement>
-void
-ImportMitkImageContainer< TElementIdentifier , TElement >
-::SetImageAccessor(mitk::ImageAccessorBase* imageAccess, size_t noOfBytes)
-{
-  m_imageAccess = imageAccess;
+  template <typename TElementIdentifier, typename TElement>
+  void ImportMitkImageContainer<TElementIdentifier, TElement>::PrintSelf(std::ostream &os, Indent indent) const
+  {
+    Superclass::PrintSelf(os, indent);
 
-  this->SetImportPointer( (TElement*) m_imageAccess->GetData(), noOfBytes/sizeof(Element), false);
-
-  this->Modified();
-}
-
-template <typename TElementIdentifier, typename TElement>
-void
-ImportMitkImageContainer< TElementIdentifier , TElement >
-::PrintSelf(std::ostream& os, Indent indent) const
-{
-  Superclass::PrintSelf(os,indent);
-
-  os << indent << "ImageAccessor: " << m_imageAccess << std::endl;
-}
+    os << indent << "ImageAccessor: " << m_imageAccess << std::endl;
+  }
 
 } // end namespace itk
 

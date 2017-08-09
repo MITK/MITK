@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+
+    <view id="org.mitk.views.ivim"
+    name="IVIM"
+    category="Quantification"
+    class="QmitkIVIMView"
+    icon="resources/IVIM_48.png">
+    <keywordReference id="org.mitk.views.ivim.Keyword"/>
+    </view>
+    
+  </extension>
+     
+
+  <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.ivim"
+    name="Intra-Voxel Incoherent Motion (IVIM)"
+    class="QmitkDIAppIVIMPerspective"
+    icon="resources/ivim.png">
+    <keywordReference id="org.mitk.perspectives.ivim.Keyword"/>
+    </perspective>
+  
+  </extension>  
+  
+</plugin>

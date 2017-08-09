@@ -17,31 +17,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include "mitkNeedleProjectionFilter.h"
 #include <mitkPlaneGeometry.h>
+#include "mitkUSCombinedModality.h"
 
 // VTK
 #include <vtkPlane.h>
 
 
+
 mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   : m_Projection(mitk::PointSet::New()),
-    m_OriginalPoints(mitk::PointSet::New()),
-    m_SelectedInput(-1)
+  m_OriginalPoints(mitk::PointSet::New()),
+  m_SelectedInput(-1)
 {
-  // Tool Coordinates: First point - Tip of Needle, Second Point - 40 cm distance from needle
+  // Tool Coordinates:x axis is chosen as default axis when no axis is specified
   for (int i = 0; i < 2; i++)
   {
     mitk::Point3D point;
-    point.SetElement(0,0);
-    point.SetElement(1,0);
-    point.SetElement(2, i * 400);
+    point.SetElement(0, i * 400);
+    point.SetElement(1, 0);
+    point.SetElement(2, 0);
     m_OriginalPoints->InsertPoint(i, point);
   }
+}
+
+void mitk::NeedleProjectionFilter::SetToolAxisForFilter(mitk::Point3D point)
+{
+  // Tool Coordinates: First point - Tip of Needle, Second Point - 40 cm distance from needle
+  mitk::Point3D originPoint;
+  originPoint.SetElement(0, 0);
+  originPoint.SetElement(1, 0);
+  originPoint.SetElement(2, 0);
+  m_OriginalPoints->SetPoint(0, originPoint);
+
+  mitk::Point3D endPoint;
+  endPoint.SetElement(0, point.GetElement(0) * 400);
+  endPoint.SetElement(1, point.GetElement(1) * 400);
+  endPoint.SetElement(2, point.GetElement(2) * 400);
+  MITK_INFO << "Tool axis in project filter:";
+  MITK_INFO << endPoint;
+  m_OriginalPoints->SetPoint(1, endPoint);
 }
 
 mitk::NeedleProjectionFilter::~NeedleProjectionFilter()
 {
 }
-
 
 void mitk::NeedleProjectionFilter::SelectInput(int i)
 {

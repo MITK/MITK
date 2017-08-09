@@ -40,8 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkXMLMaterial_h
 #define __vtkXMLMaterial_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkObject.h"
+#include "vtkRenderingCoreModule.h" // For export macro
 
 class vtkXMLDataElement;
 class vtkXMLMaterialInternals;
@@ -50,9 +50,9 @@ class vtkXMLShader;
 class vtkXMLMaterial : public vtkObject
 {
 public:
-  static vtkXMLMaterial* New();
+  static vtkXMLMaterial *New();
   vtkTypeMacro(vtkXMLMaterial, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   // Description:
   // Create a new instance. It searches for the material
@@ -60,7 +60,7 @@ public:
   // treat the name as an absolute path and try to locate it; third,
   // search the Material repository. Returns null is it fails to
   // locate the material.
-  static vtkXMLMaterial* CreateInstance(const char* name);
+  static vtkXMLMaterial *CreateInstance(const char *name);
 
   // Description:
   // Get number of elements of type Property.
@@ -81,26 +81,26 @@ public:
 
   // Description:
   // Get the ith vtkXMLDataElement of type <Property />.
-  vtkXMLDataElement* GetProperty(int id=0);
+  vtkXMLDataElement *GetProperty(int id = 0);
 
   // Description:
   // Get the ith vtkXMLDataElement of type <Texture />.
-  vtkXMLDataElement* GetTexture(int id=0);
+  vtkXMLDataElement *GetTexture(int id = 0);
 
   // Description:
   // Get the ith vtkXMLDataElement of type <VertexShader />.
-  vtkXMLShader* GetVertexShader(int id=0);
+  vtkXMLShader *GetVertexShader(int id = 0);
 
   // Description:
   // Get the ith vtkXMLDataElement of type <FragmentShader />.
-  vtkXMLShader* GetFragmentShader(int id=0);
+  vtkXMLShader *GetFragmentShader(int id = 0);
 
-  vtkXMLShader* GetGeometryShader(int id=0);
+  vtkXMLShader *GetGeometryShader(int id = 0);
 
   // Description:
   // Get/Set the XML root element that describes this material.
   vtkGetObjectMacro(RootElement, vtkXMLDataElement);
-  void SetRootElement(vtkXMLDataElement*);
+  void SetRootElement(vtkXMLDataElement *);
 
   // Description:
   // Get the style the shaders.
@@ -111,12 +111,12 @@ protected:
   vtkXMLMaterial();
   ~vtkXMLMaterial();
 
-  vtkXMLDataElement* RootElement;
-  vtkXMLMaterialInternals* Internals;
+  vtkXMLDataElement *RootElement;
+  vtkXMLMaterialInternals *Internals;
+
 private:
-  vtkXMLMaterial(const vtkXMLMaterial&); // Not implemented.
-  void operator=(const vtkXMLMaterial&); // Not implemented.
+  vtkXMLMaterial(const vtkXMLMaterial &); // Not implemented.
+  void operator=(const vtkXMLMaterial &); // Not implemented.
 };
 
 #endif
-

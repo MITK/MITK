@@ -40,8 +40,6 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     int dims = img->GetDimension();
     int chn = img->GetNumberOfChannels();
 
-    MITK_INFO << "Sending image. Dimensions: " << dims << " Channels: " << chn << "\n";
-
     if (dims < 1)
     {
       MITK_ERROR << "Can not handle dimensionless images";
@@ -198,6 +196,11 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
       break;
     }
 
+    //copy timestamp of mitk image
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    timestamp->SetTime(img->GetMTime() / 1000, (int)(img->GetMTime()) % 1000);
+    imgMsg->SetTimeStamp(timestamp);
+
     imgMsg->Pack();
 
     output->SetMessage(imgMsg.GetPointer());
@@ -220,7 +223,7 @@ void mitk::ImageToIGTLMessageFilter::SetInput(unsigned int idx,
 const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::Image*>(this->ProcessObject::GetInput(0));
 }
 
@@ -228,7 +231,7 @@ const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(unsigned int idx)
 {
   if (this->GetNumberOfInputs() < idx + 1)
   {
-    return NULL;
+    return nullptr;
   }
   return static_cast<const mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
@@ -250,7 +253,7 @@ void mitk::ImageToIGTLMessageFilter::CreateOutputsForAllInputs()
 
   for (size_t idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       this->SetNthOutput(idx, this->MakeOutput(idx));
     }

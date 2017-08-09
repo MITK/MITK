@@ -14,23 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkVideoSource.h"
 
 mitk::VideoSource::VideoSource()
-:
-  m_CurrentVideoTexture(nullptr),
-  m_CaptureWidth(0),
-  m_CaptureHeight(0),
-  m_CapturingInProcess(false),
-  m_FrameCount(0),
-  m_CapturePaused(false)
+  : m_CurrentVideoTexture(nullptr),
+    m_CaptureWidth(0),
+    m_CaptureHeight(0),
+    m_CapturingInProcess(false),
+    m_FrameCount(0),
+    m_CapturePaused(false)
 {
 }
 
 mitk::VideoSource::~VideoSource()
 {
-  if(m_CurrentVideoTexture)
+  if (m_CurrentVideoTexture)
     delete m_CurrentVideoTexture;
 }
 

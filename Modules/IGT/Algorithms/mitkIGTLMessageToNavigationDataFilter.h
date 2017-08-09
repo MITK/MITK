@@ -63,8 +63,8 @@ namespace mitk
     * deleting any extra outputs that might have been initialized.
     * Subclasses that have a different number of outputs than inputs
     * must overwrite the SetInput methods.
-    * If the last input is set to NULL, the number of inputs will be decreased by
-    * one (-> removing the last input). If other inputs are set to NULL, the
+    * If the last input is set to nullptr, the number of inputs will be decreased by
+    * one (-> removing the last input). If other inputs are set to nullptr, the
     * number of inputs will not change.
     */
     virtual void SetInput( unsigned int idx, const IGTLMessage* msg);

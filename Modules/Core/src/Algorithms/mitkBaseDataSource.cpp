@@ -25,16 +25,16 @@ mitk::BaseDataSource::~BaseDataSource()
 {
 }
 
-void mitk::BaseDataSource::GraftOutput(OutputType* graft)
+void mitk::BaseDataSource::GraftOutput(OutputType *graft)
 {
   this->GraftNthOutput(0, graft);
 }
 
-void mitk::BaseDataSource::GraftOutput(const DataObjectIdentifierType& key, OutputType* graft)
+void mitk::BaseDataSource::GraftOutput(const DataObjectIdentifierType &key, OutputType *graft)
 {
-  if ( !graft )
+  if (!graft)
   {
-    itkExceptionMacro(<< "Requested to graft output that is a NULL pointer");
+    itkExceptionMacro(<< "Requested to graft output that is a nullptr pointer");
   }
 
   // we use the process object method since all our output may not be
@@ -45,14 +45,15 @@ void mitk::BaseDataSource::GraftOutput(const DataObjectIdentifierType& key, Outp
   output->Graft(graft);
 }
 
-void mitk::BaseDataSource::GraftNthOutput(unsigned int idx, OutputType* graft)
+void mitk::BaseDataSource::GraftNthOutput(unsigned int idx, OutputType *graft)
 {
-  if ( idx >= this->GetNumberOfIndexedOutputs() )
+  if (idx >= this->GetNumberOfIndexedOutputs())
   {
-    itkExceptionMacro(<< "Requested to graft output " << idx
-                      << " but this filter only has " << this->GetNumberOfIndexedOutputs() << " indexed Outputs.");
+    itkExceptionMacro(<< "Requested to graft output " << idx << " but this filter only has "
+                      << this->GetNumberOfIndexedOutputs()
+                      << " indexed Outputs.");
   }
-  this->GraftOutput( this->MakeNameFromOutputIndex(idx), graft );
+  this->GraftOutput(this->MakeNameFromOutputIndex(idx), graft);
 }
 
 bool mitk::BaseDataSource::Updating() const

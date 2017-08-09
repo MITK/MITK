@@ -17,32 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
 #define QMITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
 
-#include "mitkCallbackFromGUIThread.h"
 #include "MitkQtWidgetsExtExports.h"
+#include "mitkCallbackFromGUIThread.h"
 
 #include <QObject>
 
 /*!
   \brief Qt specific implementation of mitk::CallbackFromGUIThreadImplementation
 */
-class MITKQTWIDGETSEXT_EXPORT QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
+class MITKQTWIDGETSEXT_EXPORT QmitkCallbackFromGUIThread : public QObject,
+                                                           public mitk::CallbackFromGUIThreadImplementation
 {
-
   Q_OBJECT
 
-  public:
+public:
+  /// Change the current application cursor
+  virtual void CallThisFromGUIThread(itk::Command *, itk::EventObject *) override;
 
-    /// Change the current application cursor
-    virtual void CallThisFromGUIThread(itk::Command*, itk::EventObject*) override;
+  QmitkCallbackFromGUIThread();
+  virtual ~QmitkCallbackFromGUIThread();
 
-    QmitkCallbackFromGUIThread();
-    virtual ~QmitkCallbackFromGUIThread();
+  virtual bool event(QEvent *e) override;
 
-    virtual bool event( QEvent* e ) override;
-
-  protected:
-  private:
+protected:
+private:
 };
 
 #endif
-

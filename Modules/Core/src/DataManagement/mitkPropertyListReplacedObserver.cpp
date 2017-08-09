@@ -16,10 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyListReplacedObserver.h"
 
-void mitk::PropertyListReplacedObserver::BeforePropertyListReplaced( const std::string& /*id*/, mitk::PropertyList* /*propertyList*/ )
+void mitk::PropertyListReplacedObserver::BeforePropertyListReplaced(const std::string & /*id*/,
+                                                                    mitk::PropertyList * /*propertyList*/)
 {
 }
 
-void mitk::PropertyListReplacedObserver::AfterPropertyListReplaced( const std::string& /*id*/, mitk::PropertyList* /*propertyList*/ )
+void mitk::PropertyListReplacedObserver::AfterPropertyListReplaced(const std::string & /*id*/,
+                                                                   mitk::PropertyList * /*propertyList*/)
 {
 }

@@ -68,7 +68,7 @@ void mitk::NavigationDataPlayerBase::InitPlayer()
 
   if (GetNumberOfOutputs() == 0)
   {
-    int requiredOutputs = m_NavigationDataSet->GetNumberOfTools();
+    unsigned int requiredOutputs = m_NavigationDataSet->GetNumberOfTools();
     this->SetNumberOfRequiredOutputs(requiredOutputs);
 
     for (unsigned int n = this->GetNumberOfOutputs(); n < requiredOutputs; ++n)

@@ -17,81 +17,84 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _mitkSurfaceToImageFilter_h__
 #define _mitkSurfaceToImageFilter_h__
 
-#include "mitkCommon.h"
 #include "MitkCoreExports.h"
+#include "mitkCommon.h"
 #include "mitkImageSource.h"
 #include "mitkSurface.h"
 
 class vtkPolyData;
 
-namespace mitk {
-
-/**
- *
- * @brief Converts surface data to pixel data. Requires a surface and an
- * image, which header information defines the output image.
- *
- * The resulting image has the same dimension, size, and Geometry3D
- * as the input image. The image is cut using a vtkStencil.
- * The user can decide if he wants to keep the original values or create a
- * binary image by setting MakeBinaryOutputOn (default is \a false). If
- * set to \a true all voxels inside the surface are set to one and all
- * outside voxel are set to zero.
- *
- * NOTE: Since the reference input image is passed to the vtkStencil in
- * any case, the image needs to be initialized with pixel values greater than
- * the numerical minimum of the used pixel type (e.g. at least -127 for
- * unsigned char images, etc.) to produce a correct binary image
- * representation of the surface in MakeOutputBinary mode.
- *
- * @ingroup SurfaceFilters
- * @ingroup Process
- */
-class MITKCORE_EXPORT SurfaceToImageFilter : public ImageSource
+namespace mitk
 {
-public:
-  mitkClassMacro(SurfaceToImageFilter, ImageSource);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  /**
+   *
+   * @brief Converts surface data to pixel data. Requires a surface and an
+   * image, which header information defines the output image.
+   *
+   * The resulting image has the same dimension, size, and Geometry3D
+   * as the input image. The image is cut using a vtkStencil.
+   * The user can decide if he wants to keep the original values or create a
+   * binary image by setting MakeBinaryOutputOn (default is \a false). If
+   * set to \a true all voxels inside the surface are set to one and all
+   * outside voxel are set to zero.
+   *
+   * NOTE: Since the reference input image is passed to the vtkStencil in
+   * any case, the image needs to be initialized with pixel values greater than
+   * the numerical minimum of the used pixel type (e.g. at least -127 for
+   * unsigned char images, etc.) to produce a correct binary image
+   * representation of the surface in MakeOutputBinary mode.
+   *
+   * @ingroup SurfaceFilters
+   * @ingroup Process
+   */
+  class MITKCORE_EXPORT SurfaceToImageFilter : public ImageSource
+  {
+  public:
+    mitkClassMacro(SurfaceToImageFilter, ImageSource);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  itkSetMacro(MakeOutputBinary, bool);
-  itkGetMacro(MakeOutputBinary, bool);
-  itkBooleanMacro(MakeOutputBinary);
+      itkSetMacro(MakeOutputBinary, bool);
+    itkGetMacro(MakeOutputBinary, bool);
+    itkBooleanMacro(MakeOutputBinary);
 
-  itkSetMacro(UShortBinaryPixelType, bool);
-  itkGetMacro(UShortBinaryPixelType, bool);
-  itkBooleanMacro(UShortBinaryPixelType);
+    itkSetMacro(UShortBinaryPixelType, bool);
+    itkGetMacro(UShortBinaryPixelType, bool);
+    itkBooleanMacro(UShortBinaryPixelType);
 
-  itkGetConstMacro(BackgroundValue,float);
-  itkSetMacro(BackgroundValue,float);
+    itkGetConstMacro(BackgroundValue, float);
+    itkSetMacro(BackgroundValue, float);
 
-  virtual void GenerateInputRequestedRegion() override;
+    itkGetConstMacro(Tolerance, double);
+    itkSetMacro(Tolerance, double);
 
-  virtual void GenerateOutputInformation() override;
+    virtual void GenerateInputRequestedRegion() override;
 
-  virtual void GenerateData() override;
+    virtual void GenerateOutputInformation() override;
 
-  const mitk::Surface *GetInput(void);
+    virtual void GenerateData() override;
 
-  using itk::ProcessObject::SetInput;
-  virtual void SetInput(const mitk::Surface *surface);
+    const mitk::Surface *GetInput(void);
 
-  void SetImage(const mitk::Image *source);
+    using itk::ProcessObject::SetInput;
+    virtual void SetInput(const mitk::Surface *surface);
 
-  const mitk::Image *GetImage(void);
+    void SetImage(const mitk::Image *source);
 
-protected:
-  SurfaceToImageFilter();
+    const mitk::Image *GetImage(void);
 
-  virtual ~SurfaceToImageFilter();
+  protected:
+    SurfaceToImageFilter();
 
-  void Stencil3DImage(int time = 0);
+    virtual ~SurfaceToImageFilter();
 
-  bool m_MakeOutputBinary;
-  bool m_UShortBinaryPixelType;
+    void Stencil3DImage(int time = 0);
 
-  float m_BackgroundValue;
-};
+    bool m_MakeOutputBinary;
+    bool m_UShortBinaryPixelType;
+
+    float m_BackgroundValue;
+    double m_Tolerance;
+  };
 
 } // namespace mitk
 

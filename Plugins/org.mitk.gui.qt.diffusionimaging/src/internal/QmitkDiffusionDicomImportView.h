@@ -17,17 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDiffusionDicomImportView_H__INCLUDED
 #define QmitkDiffusionDicomImportView_H__INCLUDED
 
-#include "QmitkFunctionality.h"
+#include <QmitkAbstractView.h>
 #include "ui_QmitkDiffusionDicomImportViewControls.h"
 
 
 /*!
 \brief QmitkDiffusionDicomImport
-
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
-class QmitkDiffusionDicomImport : public QmitkFunctionality
+class QmitkDiffusionDicomImport : public QmitkAbstractView
 {
   Q_OBJECT
 
@@ -46,7 +43,6 @@ public:
   \brief default constructor
   */
   QmitkDiffusionDicomImport(QObject *parent=0, const char *name=0);
-  QmitkDiffusionDicomImport(const QmitkDiffusionDicomImport& other);
 
   /*!
   \brief default destructor
@@ -63,7 +59,10 @@ public:
   */
   virtual void CreateConnections();
 
-  virtual void Activated() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
   void SetDwiNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
@@ -98,8 +97,6 @@ protected:
   * controls containing sliders for scrolling through the slices
   */
   Ui::QmitkDiffusionDicomImportControls *m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
   QWidget *m_Parent;
 

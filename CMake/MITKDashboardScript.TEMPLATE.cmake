@@ -7,13 +7,13 @@
 # Note: The specific version and processor type of this machine should be reported in the
 # header above. Indeed, this file will be send to the dashboard as a NOTE file.
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 #
 # Dashboard properties
 #
 
-set(MY_COMPILER "gcc-4.8.x")
+set(MY_COMPILER "gcc-4.9.x")
 # For Windows, e.g.
 #set(MY_COMPILER "VC12.0")
 
@@ -26,9 +26,9 @@ set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 #set(CTEST_DASHBOARD_ROOT "C:/dartclients")
 
 # The directory containing the Qt binaries
-set(QT5_INSTALL_PREFIX "/home/user/Qt/5.4/gcc_64")
+set(QT5_INSTALL_PREFIX "/home/user/Qt/5.6/gcc_64")
 # For Windows, e.g.
-#set(QT5_INSTALL_PREFIX "C:/Qt/5.4/msvc2013_64_opengl")
+#set(QT5_INSTALL_PREFIX "C:/Qt/5.6/msvc2013_64")
 
 set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 
@@ -139,7 +139,7 @@ if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/MITKDashboardSetup.cmake")
 else()
   set(IS_PHABRICATOR_URL TRUE)
-  set(url "https://phabricator.mitk.org/diffusion/MITK/browse/${GIT_BRANCH}/CMake/MITKDashboardSetup.cmake?view=raw")
+  set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH}/CMake/MITKDashboardSetup.cmake?view=raw")
 endif()
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.setup)
 downloadFile("${url}" "${dest}")

@@ -17,33 +17,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSerializeBaseProperty_h_included
 #define mitkSerializeBaseProperty_h_included
 
-#include <MitkSceneSerializationBaseExports.h>
 #include "mitkSerializerMacros.h"
+#include <MitkSceneSerializationBaseExports.h>
 
-#include <itkObjectFactoryBase.h>
 #include "mitkBaseProperty.h"
+#include <itkObjectFactoryBase.h>
 
 #include <tinyxml.h>
 
 namespace mitk
 {
+  /**
+    \brief Base class for objects that serialize BaseProperty types.
 
-/**
-  \brief Base class for objects that serialize BaseProperty types.
+    The name of sub-classes must be deduced from the class name of the object that should be serialized.
+    The serialization assumes that
 
-  The name of sub-classes must be deduced from the class name of the object that should be serialized.
-  The serialization assumes that
-
-  \verbatim
-  If the class derived from BaseProperty is called GreenProperty
-  Then the serializer for this class must be called GreenPropertySerializer
-  \endverbatim
-*/
-class MITKSCENESERIALIZATIONBASE_EXPORT BasePropertySerializer : public itk::Object
-{
+    \verbatim
+    If the class derived from BaseProperty is called GreenProperty
+    Then the serializer for this class must be called GreenPropertySerializer
+    \endverbatim
+  */
+  class MITKSCENESERIALIZATIONBASE_EXPORT BasePropertySerializer : public itk::Object
+  {
   public:
-
-    mitkClassMacroItkParent( BasePropertySerializer, itk::Object );
+    mitkClassMacroItkParent(BasePropertySerializer, itk::Object);
 
     itkSetConstObjectMacro(Property, BaseProperty);
 
@@ -53,7 +51,7 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BasePropertySerializer : public itk::Obj
 
       This should be overwritten by specific sub-classes.
     */
-    virtual TiXmlElement* Serialize();
+    virtual TiXmlElement *Serialize();
 
     /**
       \brief Deserializes given TiXmlElement.
@@ -62,17 +60,15 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BasePropertySerializer : public itk::Obj
       This should be overwritten by specific sub-classes.
     */
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement*);
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *);
 
   protected:
-
     BasePropertySerializer();
     virtual ~BasePropertySerializer();
 
     BaseProperty::ConstPointer m_Property;
-};
+  };
 
 } // namespace
 
 #endif
-

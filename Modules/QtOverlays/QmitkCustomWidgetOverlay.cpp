@@ -14,29 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkCustomWidgetOverlay.h"
 
-
-QmitkCustomWidgetOverlay::QmitkCustomWidgetOverlay( const char* id )
-: QmitkOverlay(id)
+QmitkCustomWidgetOverlay::QmitkCustomWidgetOverlay(const char *id) : QmitkOverlay(id)
 {
-  QmitkOverlay::AddDropShadow( m_Widget );
+  QmitkOverlay::AddDropShadow(m_Widget);
 }
 
 QmitkCustomWidgetOverlay::~QmitkCustomWidgetOverlay()
 {
 }
 
-void QmitkCustomWidgetOverlay::SetWidget( QWidget* widget )
+void QmitkCustomWidgetOverlay::SetWidget(QWidget *widget)
 {
-  if ( widget != nullptr )
+  if (widget != nullptr)
   {
     m_Widget = widget;
     m_WidgetIsCustom = true;
   }
 }
-
 
 QSize QmitkCustomWidgetOverlay::GetNeededSize()
 {

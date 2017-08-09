@@ -9,7 +9,6 @@ $(license)
 
 #include "ui_$(view-file-name)Controls.h"
 
-
 /**
   \brief $(view-class-name)
 
@@ -24,27 +23,24 @@ class $(view-class-name) : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
+  static const std::string VIEW_ID;
 
-    static const std::string VIEW_ID;
+protected slots:
 
-  protected slots:
+  /// \brief Called when the user clicks the GUI button
+  void DoImageProcessing();
 
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
+protected:
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  protected:
+  virtual void SetFocus() override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                  const QList<mitk::DataNode::Pointer> &nodes) override;
 
-    virtual void SetFocus() override;
-
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes ) override;
-
-    Ui::$(view-file-name)Controls m_Controls;
-
+  Ui::$(view-file-name)Controls m_Controls;
 };
 
 #endif // $(view-file-name)_h

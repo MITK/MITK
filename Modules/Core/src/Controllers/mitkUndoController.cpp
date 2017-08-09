@@ -14,55 +14,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkUndoController.h"
-#include "mitkLimitedLinearUndo.h"
-#include "mitkVerboseLimitedLinearUndo.h"
 #include "mitkInteractionConst.h"
+#include "mitkLimitedLinearUndo.h"
 #include "mitkRenderingManager.h"
+#include "mitkVerboseLimitedLinearUndo.h"
 
-//static member-variables init.
+// static member-variables init.
 mitk::UndoModel::Pointer mitk::UndoController::m_CurUndoModel;
 mitk::UndoController::UndoModelMap mitk::UndoController::m_UndoModelList;
 mitk::UndoController::UndoType mitk::UndoController::m_CurUndoType;
 
-//const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
+// const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
 const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = VERBOSE_LIMITEDLINEARUNDO;
-
 
 mitk::UndoController::UndoController(UndoType undoType)
 {
-  if (SwitchUndoModel(undoType)==false) //existiert noch nicht in static-Liste
+  if (SwitchUndoModel(undoType) == false) // existiert noch nicht in static-Liste
   {
     switch (undoType)
     {
-    case LIMITEDLINEARUNDO:
-      m_CurUndoModel = mitk::LimitedLinearUndo::New();
-      m_CurUndoType = undoType;
-      m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
-      break;
-    case VERBOSE_LIMITEDLINEARUNDO:
-      m_CurUndoModel = mitk::VerboseLimitedLinearUndo::New();
-      m_CurUndoType = undoType;
-      m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
-      break;
-      //case ###
-      //insert here, in add- and RemoveUndoModel new sets of UndoModels!
-      //break;
-    default :
-      m_CurUndoModel = VerboseLimitedLinearUndo::New();
-      m_CurUndoType = undoType;
-      m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+      case LIMITEDLINEARUNDO:
+        m_CurUndoModel = mitk::LimitedLinearUndo::New();
+        m_CurUndoType = undoType;
+        m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+        break;
+      case VERBOSE_LIMITEDLINEARUNDO:
+        m_CurUndoModel = mitk::VerboseLimitedLinearUndo::New();
+        m_CurUndoType = undoType;
+        m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+        break;
+      // case ###
+      // insert here, in add- and RemoveUndoModel new sets of UndoModels!
+      // break;
+      default:
+        m_CurUndoModel = VerboseLimitedLinearUndo::New();
+        m_CurUndoType = undoType;
+        m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
     }
   }
 }
 
 mitk::UndoController::~UndoController()
 {
-
 }
 
-bool mitk::UndoController::SetOperationEvent(UndoStackItem* operationEvent)
+bool mitk::UndoController::SetOperationEvent(UndoStackItem *operationEvent)
 {
   m_CurUndoModel->SetOperationEvent(operationEvent);
   return true;
@@ -118,16 +115,16 @@ bool mitk::UndoController::SwitchUndoModel(UndoType undoType)
 {
   if (m_CurUndoType == undoType)
   {
-    return true;//already switched, don't need to be switched!
+    return true; // already switched, don't need to be switched!
   }
 
   auto undoModelIter = m_UndoModelList.find(undoType);
   if (undoModelIter == m_UndoModelList.end())
-  {//undoType not found in List
+  { // undoType not found in List
     return false;
   }
 
-  //found-> switch to UndoModel
+  // found-> switch to UndoModel
   m_CurUndoModel = (undoModelIter)->second;
   m_CurUndoType = (undoModelIter)->first;
   return true;
@@ -140,25 +137,25 @@ bool mitk::UndoController::SwitchUndoModel(UndoType undoType)
 bool mitk::UndoController::AddUndoModel(UndoType undoType)
 {
   if (m_UndoModelList.find(undoType) != m_UndoModelList.end())
-  { //UndoModel already exists
+  { // UndoModel already exists
     return false;
   }
-  //doesn't already exist in list
+  // doesn't already exist in list
   switch (undoType)
   {
-  case LIMITEDLINEARUNDO:
-    m_CurUndoModel = LimitedLinearUndo::New();
-    m_CurUndoType = undoType;
-    m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
-    break;
-  case VERBOSE_LIMITEDLINEARUNDO:
-    m_CurUndoModel = VerboseLimitedLinearUndo::New();
-    m_CurUndoType = undoType;
-    m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
-    break;
-  default:
-    //that undoType is not implemented!
-    return false;
+    case LIMITEDLINEARUNDO:
+      m_CurUndoModel = LimitedLinearUndo::New();
+      m_CurUndoType = undoType;
+      m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+      break;
+    case VERBOSE_LIMITEDLINEARUNDO:
+      m_CurUndoModel = VerboseLimitedLinearUndo::New();
+      m_CurUndoType = undoType;
+      m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+      break;
+    default:
+      // that undoType is not implemented!
+      return false;
   }
   return true;
 }
@@ -171,31 +168,31 @@ bool mitk::UndoController::AddUndoModel(UndoType undoType)
 bool mitk::UndoController::RemoveUndoModel(UndoType undoType)
 {
   if (m_UndoModelList.size() < 2)
-  {//for no empty m_UndoModelList
+  { // for no empty m_UndoModelList
     return false;
   }
-  //try deleting Element
+  // try deleting Element
   int ok = m_UndoModelList.erase(undoType);
   if (ok == 0)
-  {//delete unsucessful; Element of undoType not found
+  { // delete unsucessful; Element of undoType not found
     return false;
   }
 
-  //if m_CurUndoModel is the one removed, then change it to default or to the next or first
+  // if m_CurUndoModel is the one removed, then change it to default or to the next or first
   if (m_CurUndoType == undoType)
-  {//we have to change m_CurUndoModel and m_CurUndoType to an existing Model
+  { // we have to change m_CurUndoModel and m_CurUndoType to an existing Model
 
-    //if defaultUndoModel exists, then set to default
+    // if defaultUndoModel exists, then set to default
     auto undoModelIter = m_UndoModelList.find(DEFAULTUNDOMODEL);
     if (undoModelIter == m_UndoModelList.end())
-    {//DefaultUndoModel does not exists in m_CurUndoModelList
+    { // DefaultUndoModel does not exists in m_CurUndoModelList
       undoModelIter = m_UndoModelList.begin();
     }
     m_CurUndoModel = (undoModelIter)->second;
     m_CurUndoType = (undoModelIter)->first;
     return true;
   }
-  //m_CurUndoType was not undoType and is not changed
+  // m_CurUndoType was not undoType and is not changed
   return true;
 }
 
@@ -209,13 +206,12 @@ int mitk::UndoController::GetLastGroupEventIdInList()
   return m_CurUndoModel->GetLastGroupEventIdInList();
 }
 
-
-mitk::OperationEvent* mitk::UndoController::GetLastOfType(OperationActor* destination, OperationType opType)
+mitk::OperationEvent *mitk::UndoController::GetLastOfType(OperationActor *destination, OperationType opType)
 {
   return m_CurUndoModel->GetLastOfType(destination, opType);
 }
 
-mitk::UndoModel* mitk::UndoController::GetCurrentUndoModel()
+mitk::UndoModel *mitk::UndoController::GetCurrentUndoModel()
 {
   return m_CurUndoModel;
 }

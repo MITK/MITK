@@ -18,16 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPickingToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include <MitkSegmentationUIExports.h>
 #include "mitkPickingTool.h"
 #include "ui_QmitkPickingToolGUIControls.h"
+#include <MitkSegmentationUIExports.h>
 
 class QSlider;
 class QLabel;
 class QFrame;
 class QPushButton;
 #include <QCheckBox>
-
 
 #include "QmitkStepperAdapter.h"
 
@@ -44,19 +43,15 @@ class MITKSEGMENTATIONUI_EXPORT QmitkPickingToolGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkPickingToolGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  protected slots:
+    protected slots :
 
-    void OnNewToolAssociated(mitk::Tool*);
+    void OnNewToolAssociated(mitk::Tool *);
 
-    void OnConfirmSegmentation();
-
-
+  void OnConfirmSegmentation();
 
 protected:
-
   QmitkPickingToolGUI();
   virtual ~QmitkPickingToolGUI();
 

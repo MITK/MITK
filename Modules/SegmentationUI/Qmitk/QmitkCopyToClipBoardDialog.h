@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkCopyToClipBoardDialog_h_Included
 #define QmitkCopyToClipBoardDialog_h_Included
 
-#include <qdialog.h>
 #include <MitkSegmentationUIExports.h>
 #include <mitkCommon.h>
+#include <qdialog.h>
 /**
   \brief Displays read-only QTextEdit.
 
@@ -29,20 +29,17 @@ class MITKSEGMENTATIONUI_EXPORT QmitkCopyToClipBoardDialog : public QDialog
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkCopyToClipBoardDialog(const QString &text, QWidget *parent = nullptr, const char *name = nullptr);
+  virtual ~QmitkCopyToClipBoardDialog();
 
-    QmitkCopyToClipBoardDialog(const QString& text, QWidget* parent = nullptr, const char* name = nullptr);
-    virtual ~QmitkCopyToClipBoardDialog();
+signals:
 
-  signals:
+public slots:
 
-  public slots:
+protected slots:
 
-  protected slots:
-
-  protected:
-
+protected:
 };
 
 #endif
-

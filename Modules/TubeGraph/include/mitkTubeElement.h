@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPoint.h>
 
-namespace mitk {
+namespace mitk
+{
   /**
   * \brief Abstract class for elements which describes tubular structur.
   */
-  class MITKTUBEGRAPH_EXPORT TubeElement {
-
+  class MITKTUBEGRAPH_EXPORT TubeElement
+  {
   public:
-
     virtual ~TubeElement(){};
 
     /**
@@ -38,16 +38,16 @@ namespace mitk {
     /**
     * Returns the 3D position of the element.
     */
-    virtual const Point3D& GetCoordinates() const = 0;
+    virtual const Point3D &GetCoordinates() const = 0;
 
     /**
     * Comparison operation between this object and the given object.
     * @param right The object to compare with.
     * @return true, if the object is the same;false, if not.
     */
-    virtual bool operator==(const TubeElement& right) const = 0;
+    virtual bool operator==(const TubeElement &right) const = 0;
 
-  };//class
+  }; // class
 
-}//namespace
+} // namespace
 #endif

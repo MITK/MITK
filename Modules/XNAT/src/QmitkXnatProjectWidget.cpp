@@ -18,16 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkXnatProject.h>
 
-QmitkXnatProjectWidget::QmitkXnatProjectWidget(QWidget* parent)
-  : QWidget(parent)
+QmitkXnatProjectWidget::QmitkXnatProjectWidget(QWidget *parent) : QWidget(parent)
 {
   m_Mode = INFO;
   Init();
 }
 
-QmitkXnatProjectWidget::QmitkXnatProjectWidget(Mode mode, QWidget* parent)
-  : QWidget(parent)
-  , m_Mode(mode)
+QmitkXnatProjectWidget::QmitkXnatProjectWidget(Mode mode, QWidget *parent) : QWidget(parent), m_Mode(mode)
 {
   Init();
 }
@@ -50,7 +47,7 @@ void QmitkXnatProjectWidget::Init()
   }
 }
 
-void QmitkXnatProjectWidget::SetProject(ctkXnatProject* project)
+void QmitkXnatProjectWidget::SetProject(ctkXnatProject *project)
 {
   m_Project = project;
 
@@ -63,7 +60,7 @@ void QmitkXnatProjectWidget::SetProject(ctkXnatProject* project)
   }
 }
 
-ctkXnatProject* QmitkXnatProjectWidget::GetProject() const
+ctkXnatProject *QmitkXnatProjectWidget::GetProject() const
 {
   if (m_Mode == Mode::CREATE)
   {

@@ -19,14 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPushButton>
 #include <QRadioButton>
 
-MITK_TOOL_GUI_MACRO (, QmitkPixelManipulationToolGUI, "");
-
+MITK_TOOL_GUI_MACRO(, QmitkPixelManipulationToolGUI, "");
 
 QmitkPixelManipulationToolGUI::QmitkPixelManipulationToolGUI() : QmitkToolGUI()
 {
-  QBoxLayout* mainLayout = new QVBoxLayout(this);
-  QRadioButton* radio1 = new QRadioButton("change the masked pixels by value: ", this);
-  QRadioButton* radio2 = new QRadioButton("set the masked pixels to value: ", this);
+  QBoxLayout *mainLayout = new QVBoxLayout(this);
+  QRadioButton *radio1 = new QRadioButton("change the masked pixels by value: ", this);
+  QRadioButton *radio2 = new QRadioButton("set the masked pixels to value: ", this);
 
   radio1->setChecked(true);
 
@@ -40,42 +39,41 @@ QmitkPixelManipulationToolGUI::QmitkPixelManipulationToolGUI() : QmitkToolGUI()
   m_Slider->setRange(-5000, 5000);
   m_Slider->setValue(0);
 
-  connect(m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)) );
+  connect(m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 
   m_Spinner = new QSpinBox(this);
   m_Spinner->setRange(-5000, 5000);
   m_Spinner->setValue(0);
 
-  connect(m_Spinner, SIGNAL(editingFinished()), this, SLOT(OnSpinBoxChanged()) );
+  connect(m_Spinner, SIGNAL(editingFinished()), this, SLOT(OnSpinBoxChanged()));
 
-  QBoxLayout* layout1 = new QHBoxLayout();
+  QBoxLayout *layout1 = new QHBoxLayout();
   layout1->addWidget(m_Slider);
   layout1->addWidget(m_Spinner);
 
-  QPushButton* okButton = new QPushButton("Ok");
+  QPushButton *okButton = new QPushButton("Ok");
 
-  connect(okButton, SIGNAL(clicked()), this, SLOT(OnOkButtonClicked()) );
+  connect(okButton, SIGNAL(clicked()), this, SLOT(OnOkButtonClicked()));
 
   mainLayout->addLayout(layout1);
   mainLayout->addWidget(okButton);
 
-  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+  connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
 
 QmitkPixelManipulationToolGUI::~QmitkPixelManipulationToolGUI()
 {
   if (m_PixelManipulationTool.IsNotNull())
   {
-
   }
 }
 
-void QmitkPixelManipulationToolGUI::OnNewToolAssociated(mitk::Tool* tool)
+void QmitkPixelManipulationToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 {
   if (m_PixelManipulationTool.IsNotNull())
   {
   }
-  m_PixelManipulationTool = dynamic_cast<mitk::PixelManipulationTool*> (tool);
+  m_PixelManipulationTool = dynamic_cast<mitk::PixelManipulationTool *>(tool);
   if (m_PixelManipulationTool.IsNotNull())
   {
   }

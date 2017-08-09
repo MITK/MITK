@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkContourVtkMapper3D.h"
+#include "mitkColorProperty.h"
+#include "mitkContour.h"
 #include "mitkDataNode.h"
 #include "mitkProperties.h"
-#include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"
-#include "mitkContour.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -51,33 +50,33 @@ mitk::ContourVtkMapper3D::ContourVtkMapper3D()
 
 mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
 {
-  if(m_VtkPolyDataMapper)
+  if (m_VtkPolyDataMapper)
     m_VtkPolyDataMapper->Delete();
 
-  if(m_TubeFilter)
+  if (m_TubeFilter)
     m_TubeFilter->Delete();
 
-  if(m_VtkPointList)
+  if (m_VtkPointList)
     m_VtkPointList->Delete();
 
-  if(m_Contour)
+  if (m_Contour)
     m_Contour->Delete();
 
-  if(m_Actor)
+  if (m_Actor)
     m_Actor->Delete();
 }
 
-vtkProp* mitk::ContourVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
+vtkProp *mitk::ContourVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   return m_Actor;
 }
 
-void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
+void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if ( !visible )
+  if (!visible)
   {
     m_Actor->VisibilityOff();
     return;
@@ -86,21 +85,21 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
   m_Contour = vtkPolyData::New();
 
-  mitk::Contour::Pointer input  = const_cast<mitk::Contour*>(this->GetInput());
+  mitk::Contour::Pointer input = const_cast<mitk::Contour *>(this->GetInput());
   bool makeContour = true;
 
-  if ( makeContour )
+  if (makeContour)
   {
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 
-    int numPts=input->GetNumberOfPoints();
-    if ( numPts > 200000 )
+    int numPts = input->GetNumberOfPoints();
+    if (numPts > 200000)
       numPts = 200000;
     mitk::Contour::PathPointer path = input->GetContourPath();
     mitk::Contour::PathType::InputType cstart = path->StartOfInput();
-    mitk::Contour::PathType::InputType cend   = path->EndOfInput();
-    mitk::Contour::PathType::InputType cstep  = (cend-cstart+1)/numPts;
+    mitk::Contour::PathType::InputType cend = path->EndOfInput();
+    mitk::Contour::PathType::InputType cstep = (cend - cstart + 1) / numPts;
     mitk::Contour::PathType::InputType ccur;
 
     vtkIdType ptIndex = 0;
@@ -116,23 +115,23 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
     bool showPoints = true;
     this->GetDataNode()->GetBoolProperty("show points", showPoints);
-    if ( showPoints )
+    if (showPoints)
     {
       m_VtkPointList = vtkAppendPolyData::New();
     }
-    for ( i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep )
+    for (i = 0, ccur = cstart; i < numPts; ++i, ccur += cstep)
     {
       itk2vtk(path->Evaluate(ccur), vtkpoint);
       points->InsertPoint(ptIndex, vtkpoint);
-      if ( ptIndex > 0 )
+      if (ptIndex > 0)
       {
-        vtkIdType cell[2] = {ptIndex-1,ptIndex};
-        lines->InsertNextCell((vtkIdType)2,cell);
+        vtkIdType cell[2] = {ptIndex - 1, ptIndex};
+        lines->InsertNextCell((vtkIdType)2, cell);
       }
       lastPointIndex = ptIndex;
       ++ptIndex;
 
-      if ( showPoints )
+      if (showPoints)
       {
         vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
@@ -144,9 +143,9 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
       }
     }
 
-    if ( input->GetClosed() )
+    if (input->GetClosed())
     {
-      vtkIdType cell[2] = {lastPointIndex,0};
+      vtkIdType cell[2] = {lastPointIndex, 0};
       lines->InsertNextCell((vtkIdType)2, cell);
     }
 
@@ -158,7 +157,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     m_TubeFilter->SetNumberOfSides(8);
     m_TubeFilter->Update();
 
-    if ( showPoints )
+    if (showPoints)
     {
       m_VtkPointList->AddInputConnection(m_TubeFilter->GetOutputPort());
       m_VtkPolyDataMapper->SetInputConnection(m_VtkPointList->GetOutputPort());
@@ -167,7 +166,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     {
       m_VtkPolyDataMapper->SetInputConnection(m_TubeFilter->GetOutputPort());
     }
-    double rgba[4]={0.0f,1.0f,0.0f,0.6f};
+    double rgba[4] = {0.0f, 1.0f, 0.0f, 0.6f};
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }
@@ -175,7 +174,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   SetVtkMapperImmediateModeRendering(m_VtkPolyDataMapper);
 }
 
-const mitk::Contour* mitk::ContourVtkMapper3D::GetInput()
+const mitk::Contour *mitk::ContourVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::Contour* > ( GetDataNode()->GetData() );
+  return static_cast<const mitk::Contour *>(GetDataNode()->GetData());
 }

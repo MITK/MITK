@@ -20,48 +20,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
-QClickableLabel::QClickableLabel( QWidget* parent, Qt::WindowFlags f )
-  : QLabel(parent, f)
+QClickableLabel::QClickableLabel(QWidget *parent, Qt::WindowFlags f) : QLabel(parent, f)
 {
 }
 
-
-QClickableLabel::QClickableLabel( const QString& text, QWidget* parent, Qt::WindowFlags f )
-  : QLabel(text, parent, f)
+QClickableLabel::QClickableLabel(const QString &text, QWidget *parent, Qt::WindowFlags f) : QLabel(text, parent, f)
 {
 }
-
 
 QClickableLabel::~QClickableLabel()
 {
 }
 
-void QClickableLabel::AddHotspot( const QString& name, const QRect position )
+void QClickableLabel::AddHotspot(const QString &name, const QRect position)
 {
-  m_Hotspots.push_back( position );
-  m_HotspotIndexForName.insert( std::make_pair( name, (int)m_Hotspots.size()-1 ) );
-  m_HotspotNameForIndex.insert( std::make_pair( (int)m_Hotspots.size()-1, name ) );
+  m_Hotspots.push_back(position);
+  m_HotspotIndexForName.insert(std::make_pair(name, (int)m_Hotspots.size() - 1));
+  m_HotspotNameForIndex.insert(std::make_pair((int)m_Hotspots.size() - 1, name));
 }
 
-
-void QClickableLabel::RemoveHotspot( const QString& name )
+void QClickableLabel::RemoveHotspot(const QString &name)
 {
-  auto iter = m_HotspotIndexForName.find( name );
+  auto iter = m_HotspotIndexForName.find(name);
 
-  if ( iter != m_HotspotIndexForName.end() )
+  if (iter != m_HotspotIndexForName.end())
   {
-    RemoveHotspot( iter->second );
+    RemoveHotspot(iter->second);
   }
 }
 
-void QClickableLabel::RemoveHotspot( unsigned int hotspotIndex )
+void QClickableLabel::RemoveHotspot(unsigned int hotspotIndex)
 {
-  if ( hotspotIndex < m_Hotspots.size() )
+  if (hotspotIndex < m_Hotspots.size())
   {
-    m_Hotspots.erase( m_Hotspots.begin() + hotspotIndex );
+    m_Hotspots.erase(m_Hotspots.begin() + hotspotIndex);
     QString name = m_HotspotNameForIndex[hotspotIndex];
-    m_HotspotNameForIndex.erase( hotspotIndex );
-    m_HotspotIndexForName.erase( name );
+    m_HotspotNameForIndex.erase(hotspotIndex);
+    m_HotspotIndexForName.erase(name);
   }
 }
 
@@ -72,34 +67,32 @@ void QClickableLabel::RemoveAllHotspots()
   m_HotspotNameForIndex.clear();
 }
 
-void QClickableLabel::mousePressEvent( QMouseEvent* e )
+void QClickableLabel::mousePressEvent(QMouseEvent *e)
 {
-  unsigned int index = matchingRect( e->pos() );
-  if ( index < m_Hotspots.size() )
+  unsigned int index = matchingRect(e->pos());
+  if (index < m_Hotspots.size())
   {
-    emit mouseReleased( index );
-    emit mouseReleased( m_HotspotNameForIndex[index] );
+    emit mouseReleased(index);
+    emit mouseReleased(m_HotspotNameForIndex[index]);
   }
 }
 
-void QClickableLabel::mouseReleaseEvent( QMouseEvent* e )
+void QClickableLabel::mouseReleaseEvent(QMouseEvent *e)
 {
-  unsigned int index = matchingRect( e->pos() );
-  if ( index < m_Hotspots.size() )
+  unsigned int index = matchingRect(e->pos());
+  if (index < m_Hotspots.size())
   {
-    emit mousePressed( index );
-    emit mousePressed( m_HotspotNameForIndex[index] );
+    emit mousePressed(index);
+    emit mousePressed(m_HotspotNameForIndex[index]);
   }
 }
 
-unsigned int QClickableLabel::matchingRect( const QPoint& p )
+unsigned int QClickableLabel::matchingRect(const QPoint &p)
 {
   unsigned int index(0);
-  for ( auto iter = m_Hotspots.begin();
-        iter != m_Hotspots.end();
-        ++iter )
+  for (auto iter = m_Hotspots.begin(); iter != m_Hotspots.end(); ++iter)
   {
-    if ( iter->contains(p) )
+    if (iter->contains(p))
     {
       return index;
     }
@@ -109,4 +102,3 @@ unsigned int QClickableLabel::matchingRect( const QPoint& p )
 
   return index;
 }
-

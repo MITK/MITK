@@ -18,42 +18,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAutoCropTool_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkSegmentationsProcessingTool.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
+  /**
+    \brief Crops selected segmentations.
 
-/**
-  \brief Crops selected segmentations.
+    \ingroup ToolManagerEtAl
+    \sa mitk::Tool
+    \sa QmitkInteractiveSegmentation
 
-  \ingroup ToolManagerEtAl
-  \sa mitk::Tool
-  \sa QmitkInteractiveSegmentation
-
-  Last contributor: $Author$
-*/
-class MITKSEGMENTATION_EXPORT AutoCropTool : public SegmentationsProcessingTool
-{
+    Last contributor: $Author$
+  */
+  class MITKSEGMENTATION_EXPORT AutoCropTool : public SegmentationsProcessingTool
+  {
   public:
-
     mitkClassMacro(AutoCropTool, SegmentationsProcessingTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const override;
-    virtual const char* GetName() const override;
+      virtual const char **GetXPM() const override;
+    virtual const char *GetName() const override;
 
   protected:
-
-    virtual bool ProcessOneWorkingData( DataNode* node ) override;
+    virtual bool ProcessOneWorkingData(DataNode *node) override;
     virtual std::string GetErrorMessage() override;
 
     AutoCropTool(); // purposely hidden
     virtual ~AutoCropTool();
-};
+  };
 
 } // namespace
 
 #endif
-

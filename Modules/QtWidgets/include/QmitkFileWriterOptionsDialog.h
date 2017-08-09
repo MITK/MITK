@@ -21,8 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QDialog>
 
-namespace Ui {
-class QmitkFileWriterOptionsDialog;
+namespace Ui
+{
+  class QmitkFileWriterOptionsDialog;
 }
 
 class QmitkFileReaderWriterOptionsWidget;
@@ -32,8 +33,7 @@ class QmitkFileWriterOptionsDialog : public QDialog
   Q_OBJECT
 
 public:
-
-  explicit QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInfo& saveInfo, QWidget *parent = 0);
+  explicit QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInfo &saveInfo, QWidget *parent = 0);
   ~QmitkFileWriterOptionsDialog();
 
   bool ReuseOptions() const;
@@ -41,9 +41,8 @@ public:
   virtual void accept() override;
 
 private:
-
-  Ui::QmitkFileWriterOptionsDialog* ui;
-  mitk::IOUtil::SaveInfo& m_SaveInfo;
+  Ui::QmitkFileWriterOptionsDialog *ui;
+  mitk::IOUtil::SaveInfo &m_SaveInfo;
   std::vector<mitk::FileWriterSelector::Item> m_WriterItems;
 };
 

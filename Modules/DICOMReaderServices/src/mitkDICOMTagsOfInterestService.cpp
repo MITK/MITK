@@ -80,7 +80,7 @@ AddTagOfInterest(const DICOMTagPath& tagPath, bool makePersistant)
   }
 
   MutexHolder lock(m_Lock);
-  std::string propRegEx = mitk::DICOMTagPathToPropertRegEx(tagPath);
+  std::string propRegEx = mitk::DICOMTagPathToPropertyRegEx(tagPath);
   this->m_Tags.insert(tagPath);
 
   mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
@@ -142,7 +142,7 @@ RemoveTag(const DICOMTagPath& tag)
 {
   MutexHolder lock(m_Lock);
   this->m_Tags.erase(tag);
-  std::string propRegEx = mitk::DICOMTagPathToPropertRegEx(tag);
+  std::string propRegEx = mitk::DICOMTagPathToPropertyRegEx(tag);
 
   mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
   if (descriptionSrv)
@@ -167,7 +167,7 @@ RemoveAllTags()
 
   for (const auto& tag : m_Tags)
   {
-    std::string propRegEx = mitk::DICOMTagPathToPropertRegEx(tag);
+    std::string propRegEx = mitk::DICOMTagPathToPropertyRegEx(tag);
 
     if (descriptionSrv)
     {

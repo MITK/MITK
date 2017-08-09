@@ -20,44 +20,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactoryBase.h"
 #include <MitkPlanarFigureExports.h>
 
-namespace mitk {
-
-class MITKPLANARFIGURE_EXPORT PlanarFigureObjectFactory : public CoreObjectFactoryBase
+namespace mitk
 {
-public:
+  class MITKPLANARFIGURE_EXPORT PlanarFigureObjectFactory : public CoreObjectFactoryBase
+  {
+  public:
+    mitkClassMacro(PlanarFigureObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  mitkClassMacro(PlanarFigureObjectFactory,CoreObjectFactoryBase)
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+      ~PlanarFigureObjectFactory();
 
-  ~PlanarFigureObjectFactory();
+    virtual Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
 
-  virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
+    virtual void SetDefaultProperties(mitk::DataNode *node) override;
 
-  virtual void SetDefaultProperties(mitk::DataNode* node) override;
+    virtual const char *GetFileExtensions() override;
 
-  virtual const char* GetFileExtensions() override;
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
 
-  virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
+    virtual const char *GetSaveFileExtensions() override;
 
-  virtual const char* GetSaveFileExtensions() override;
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
-  virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+    DEPRECATED(void RegisterIOFactories());
 
-  DEPRECATED(void RegisterIOFactories());
+  protected:
+    PlanarFigureObjectFactory();
+    void CreateFileExtensionsMap();
+    MultimapType m_FileExtensionsMap;
+    MultimapType m_SaveFileExtensionsMap;
 
-protected:
-  PlanarFigureObjectFactory();
-  void CreateFileExtensionsMap();
-  MultimapType m_FileExtensionsMap;
-  MultimapType m_SaveFileExtensionsMap;
-
-private:
-
-  itk::ObjectFactoryBase::Pointer m_PlanarFigureIOFactory;
-  itk::ObjectFactoryBase::Pointer m_PlanarFigureWriterFactory;
-};
-
+  private:
+    itk::ObjectFactoryBase::Pointer m_PlanarFigureIOFactory;
+    itk::ObjectFactoryBase::Pointer m_PlanarFigureWriterFactory;
+  };
 }
 
 #endif // PLANARFIGUREOBJECTFACTORY_H_INCLUDED

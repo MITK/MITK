@@ -14,32 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkStepper.h"
 
-mitk::Stepper
-::Stepper()
-: m_Pos( 0 ),
-  m_Steps( 0 ),
-  m_AutoRepeat( false ),
-  m_PingPong( false ),
-  m_InverseDirection( false ),
-  m_RangeMin( 0.0 ),
-  m_RangeMax( -1.0 ),
-  m_RangeValid( false ),
-  m_HasRange( false ),
-  m_HasUnitName( false )
+mitk::Stepper::Stepper()
+  : m_Pos(0),
+    m_Steps(0),
+    m_AutoRepeat(false),
+    m_PingPong(false),
+    m_InverseDirection(false),
+    m_RangeMin(0.0),
+    m_RangeMax(-1.0),
+    m_RangeValid(false),
+    m_HasRange(false),
+    m_HasUnitName(false)
 {
 }
 
-mitk::Stepper
-::~Stepper()
+mitk::Stepper::~Stepper()
 {
 }
 
-void
-mitk::Stepper
-::SetRange( ScalarType min, ScalarType max )
+void mitk::Stepper::SetRange(ScalarType min, ScalarType max)
 {
   m_RangeMin = min;
   m_RangeMax = max;
@@ -48,85 +43,63 @@ mitk::Stepper
   this->Modified();
 }
 
-void
-mitk::Stepper
-::InvalidateRange()
+void mitk::Stepper::InvalidateRange()
 {
   m_HasRange = true;
   m_RangeValid = false;
   this->Modified();
 }
 
-mitk::ScalarType
-mitk::Stepper
-::GetRangeMin() const
+mitk::ScalarType mitk::Stepper::GetRangeMin() const
 {
   return m_RangeMin;
 }
 
-mitk::ScalarType
-mitk::Stepper
-::GetRangeMax() const
+mitk::ScalarType mitk::Stepper::GetRangeMax() const
 {
   return m_RangeMax;
 }
 
-void
-mitk::Stepper
-::RemoveRange()
+void mitk::Stepper::RemoveRange()
 {
   m_HasRange = false;
   this->Modified();
 }
 
-bool
-mitk::Stepper
-::HasValidRange() const
+bool mitk::Stepper::HasValidRange() const
 {
   return (m_HasRange && m_RangeValid);
 }
 
-bool
-mitk::Stepper
-::HasRange() const
+bool mitk::Stepper::HasRange() const
 {
   return m_HasRange;
 }
 
-void
-mitk::Stepper
-::SetUnitName( const char *unitName )
+void mitk::Stepper::SetUnitName(const char *unitName)
 {
-  m_UnitName = std::string( unitName );
+  m_UnitName = std::string(unitName);
   m_HasUnitName = true;
   this->Modified();
 }
 
-const char *
-mitk::Stepper
-::GetUnitName() const
+const char *mitk::Stepper::GetUnitName() const
 {
   return m_UnitName.c_str();
 }
 
-void
-mitk::Stepper
-::RemoveUnitName()
+void mitk::Stepper::RemoveUnitName()
 {
   m_HasUnitName = false;
   this->Modified();
 }
 
-bool
-mitk::Stepper
-::HasUnitName() const
+bool mitk::Stepper::HasUnitName() const
 {
   return m_HasUnitName;
 }
 
-void
-mitk::Stepper
-::Increase()
+void mitk::Stepper::Increase()
 {
   if (this->GetPos() < this->GetSteps() - 1)
   {
@@ -149,9 +122,7 @@ mitk::Stepper
   }
 }
 
-void
-mitk::Stepper
-::Decrease()
+void mitk::Stepper::Decrease()
 {
   if (this->GetPos() > 0)
   {
@@ -174,9 +145,7 @@ mitk::Stepper
   }
 }
 
-void
-mitk::Stepper
-::Next()
+void mitk::Stepper::Next()
 {
   if (!m_InverseDirection)
   {
@@ -188,9 +157,7 @@ mitk::Stepper
   }
 }
 
-void
-mitk::Stepper
-::Previous()
+void mitk::Stepper::Previous()
 {
   if (!m_InverseDirection)
   {
@@ -202,17 +169,12 @@ mitk::Stepper
   }
 }
 
-void
-mitk::Stepper
-::First()
+void mitk::Stepper::First()
 {
   this->SetPos(0);
 }
 
-void
-mitk::Stepper
-::Last()
+void mitk::Stepper::Last()
 {
   this->SetPos(this->GetSteps() - 1);
 }
-

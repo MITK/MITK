@@ -16,9 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkLevelWindowWidget.h"
 #include "QmitkSliderLevelWindowWidget.h"
 
-
-QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget* parent, Qt::WindowFlags f)
- : QWidget(parent, f)
+QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   this->setupUi(this);
 
@@ -28,14 +26,12 @@ QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget* parent, Qt::WindowFlags 
   LineEditLevelWindowWidget->setLevelWindowManager(m_Manager.GetPointer());
 }
 
-
-void QmitkLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds )
+void QmitkLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)
 {
   m_Manager->SetDataStorage(ds);
 }
 
-
-mitk::LevelWindowManager* QmitkLevelWindowWidget::GetManager()
+mitk::LevelWindowManager *QmitkLevelWindowWidget::GetManager()
 {
   return m_Manager.GetPointer();
 }

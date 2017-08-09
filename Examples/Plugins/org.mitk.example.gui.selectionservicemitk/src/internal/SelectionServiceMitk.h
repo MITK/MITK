@@ -39,15 +39,13 @@ class SelectionServiceMitk : public QObject, public berry::IApplication
   Q_INTERFACES(berry::IApplication)
 
 public:
-
   SelectionServiceMitk();
   ~SelectionServiceMitk();
 
-  QVariant Start(berry::IApplicationContext* context) override;
+  QVariant Start(berry::IApplicationContext *context) override;
   void Stop() override;
 
 private:
-
   QScopedPointer<SelectionServiceMITKWorkbenchAdvisor> wbAdvisor;
 };
 

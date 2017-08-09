@@ -15,9 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPointSet.h"
-#include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
-
+#include "mitkTestingMacros.h"
 
 /**
  * @brief mitkPointSetEqualTestSuite A test class for Equal methods in mitk::PointSet.
@@ -25,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class mitkPointSetEqualTestSuite : public mitk::TestFixture
 {
-
   CPPUNIT_TEST_SUITE(mitkPointSetEqualTestSuite);
   MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
   MITK_TEST(Equal_DifferentGeometries_ReturnsFalse);
@@ -34,15 +32,14 @@ class mitkPointSetEqualTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
   mitk::PointSet::Pointer m_PointSet;
   mitk::PointSet::Pointer m_AnotherPointSet;
 
 public:
-
   /**
-* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+* @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members
+* for a new test case. (If the members are not used in a test, the method does not need to be called).
 */
   void setUp() override
   {
@@ -59,7 +56,7 @@ public:
   void Equal_CloneAndOriginal_ReturnsTrue()
   {
     mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
-    MITK_ASSERT_EQUAL( newPointSet, newPointSet->Clone(), "A clone should be equal to its original.");
+    MITK_ASSERT_EQUAL(newPointSet, newPointSet->Clone(), "A clone should be equal to its original.");
   }
 
   void Equal_DifferentGeometries_ReturnsFalse()
@@ -67,10 +64,10 @@ public:
     mitk::Point3D origin;
     origin[0] = 0.0;
     origin[1] = 0.0;
-    origin[2] = 1.0 + 2*mitk::eps;
+    origin[2] = 1.0 + 2 * mitk::eps;
     m_AnotherPointSet->GetGeometry()->SetOrigin(origin);
 
-    MITK_ASSERT_NOT_EQUAL( m_PointSet, m_AnotherPointSet, "Origin was modified. Result should be false.");
+    MITK_ASSERT_NOT_EQUAL(m_PointSet, m_AnotherPointSet, "Origin was modified. Result should be false.");
   }
 
   void Equal_DifferentNumberOfPoints_ReturnsFalse()
@@ -80,12 +77,13 @@ public:
     tmpPoint[1] = 1.0;
     tmpPoint[2] = 1.0;
 
-    m_PointSet->InsertPoint( 1, tmpPoint );
-    m_PointSet->InsertPoint( 2, tmpPoint );
+    m_PointSet->InsertPoint(1, tmpPoint);
+    m_PointSet->InsertPoint(2, tmpPoint);
 
-    m_AnotherPointSet->InsertPoint( 1, tmpPoint );
+    m_AnotherPointSet->InsertPoint(1, tmpPoint);
 
-    MITK_ASSERT_NOT_EQUAL( m_PointSet, m_AnotherPointSet, "One pointset has two points the other has one. Result should be false.");
+    MITK_ASSERT_NOT_EQUAL(
+      m_PointSet, m_AnotherPointSet, "One pointset has two points the other has one. Result should be false.");
   }
 
   void Equal_DifferentPoints_ReturnsFalse()
@@ -95,12 +93,13 @@ public:
     tmpPoint[1] = 1.0;
     tmpPoint[2] = 1.0;
 
-    m_PointSet->InsertPoint( 1, tmpPoint );
+    m_PointSet->InsertPoint(1, tmpPoint);
 
-    tmpPoint[0] = 1.0 + 2*mitk::eps;
-    m_AnotherPointSet->InsertPoint( 1, tmpPoint );
+    tmpPoint[0] = 1.0 + 2 * mitk::eps;
+    m_AnotherPointSet->InsertPoint(1, tmpPoint);
 
-    MITK_ASSERT_NOT_EQUAL( m_PointSet, m_AnotherPointSet, "Two pointsets with different points. Result should be false.");
+    MITK_ASSERT_NOT_EQUAL(
+      m_PointSet, m_AnotherPointSet, "Two pointsets with different points. Result should be false.");
   }
 };
 

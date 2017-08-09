@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <itkImageRegionIterator.h>
 #include <mitkProperties.h>
+#include <vnl/algo/vnl_matrix_inverse.h>
 
 const std::string mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME = "DWMRI.GradientDirections";
 const std::string mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME = "DWMRI.OriginalGradientDirections";
@@ -177,12 +178,12 @@ void mitk::DiffusionPropertyHelper::AverageRedundantGradients(double precision)
 
   m_Image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newDirs ) );
   m_Image->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newDirs ) );
-  ApplyMeasurementFrame();
+  ApplyMeasurementFrameAndRotationMatrix();
   UpdateBValueMap();
   std::cout << std::endl;
 }
 
-void mitk::DiffusionPropertyHelper::ApplyMeasurementFrame()
+void mitk::DiffusionPropertyHelper::ApplyMeasurementFrameAndRotationMatrix()
 {
 
   if(  m_Image->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).IsNull() )
@@ -194,6 +195,21 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrame()
 
   MeasurementFrameType  measurementFrame = GetMeasurementFrame(m_Image);
 
+  mitk::Vector3D s = m_Image->GetGeometry()->GetSpacing();
+  mitk::VnlVector c0 = m_Image->GetGeometry()->GetMatrixColumn(0)/s[0];
+  mitk::VnlVector c1 = m_Image->GetGeometry()->GetMatrixColumn(1)/s[1];
+  mitk::VnlVector c2 = m_Image->GetGeometry()->GetMatrixColumn(2)/s[2];
+  MeasurementFrameType imageRotationMatrix;
+  imageRotationMatrix[0][0] = c0[0];
+  imageRotationMatrix[1][0] = c0[1];
+  imageRotationMatrix[2][0] = c0[2];
+  imageRotationMatrix[0][1] = c1[0];
+  imageRotationMatrix[1][1] = c1[1];
+  imageRotationMatrix[2][1] = c1[2];
+  imageRotationMatrix[0][2] = c2[0];
+  imageRotationMatrix[1][2] = c2[1];
+  imageRotationMatrix[2][2] = c2[2];
+
   GradientDirectionsContainerType::Pointer directions = GradientDirectionsContainerType::New();
 
   if( originalDirections.IsNull() || ( originalDirections->size() == 0 ) )
@@ -202,17 +218,79 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrame()
     return;
   }
 
+  MITK_INFO << "Applying measurement frame to diffusion-gradient directions:";
+  std::cout << measurementFrame << std::endl;
+  MITK_INFO << "Applying image totation to diffusion-gradient directions:";
+  std::cout << imageRotationMatrix << std::endl;
+
   int c = 0;
   for(GradientDirectionsContainerType::ConstIterator gdcit = originalDirections->Begin();
       gdcit != originalDirections->End(); ++gdcit)
   {
     vnl_vector<double> vec = gdcit.Value();
     vec = vec.pre_multiply(measurementFrame);
+    vec = vec.pre_multiply(imageRotationMatrix);
     directions->InsertElement(c, vec);
     c++;
   }
 
   m_Image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
+}
+
+void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix()
+{
+
+  if(  m_Image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).IsNull() )
+  {
+    return;
+  }
+
+  GradientDirectionsContainerType::Pointer  modifiedDirections = static_cast<mitk::GradientDirectionsProperty*>( m_Image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer())->GetGradientDirectionsContainer();
+
+  MeasurementFrameType  measurementFrame = GetMeasurementFrame(m_Image);
+  measurementFrame = vnl_matrix_inverse<double>(measurementFrame).pinverse();
+
+  mitk::Vector3D s = m_Image->GetGeometry()->GetSpacing();
+  mitk::VnlVector c0 = m_Image->GetGeometry()->GetMatrixColumn(0)/s[0];
+  mitk::VnlVector c1 = m_Image->GetGeometry()->GetMatrixColumn(1)/s[1];
+  mitk::VnlVector c2 = m_Image->GetGeometry()->GetMatrixColumn(2)/s[2];
+  MeasurementFrameType imageRotationMatrix;
+  imageRotationMatrix[0][0] = c0[0];
+  imageRotationMatrix[1][0] = c0[1];
+  imageRotationMatrix[2][0] = c0[2];
+  imageRotationMatrix[0][1] = c1[0];
+  imageRotationMatrix[1][1] = c1[1];
+  imageRotationMatrix[2][1] = c1[2];
+  imageRotationMatrix[0][2] = c2[0];
+  imageRotationMatrix[1][2] = c2[1];
+  imageRotationMatrix[2][2] = c2[2];
+  imageRotationMatrix = vnl_matrix_inverse<double>(imageRotationMatrix).pinverse();
+
+  GradientDirectionsContainerType::Pointer directions = GradientDirectionsContainerType::New();
+
+  if( modifiedDirections.IsNull() || ( modifiedDirections->size() == 0 ) )
+  {
+    // original direction container was not set
+    return;
+  }
+
+  MITK_INFO << "Reverting image totation to diffusion-gradient directions:";
+  std::cout << imageRotationMatrix << std::endl;
+  MITK_INFO << "Reverting measurement frame to diffusion-gradient directions:";
+  std::cout << measurementFrame << std::endl;
+
+  int c = 0;
+  for(GradientDirectionsContainerType::ConstIterator gdcit = modifiedDirections->Begin();
+      gdcit != modifiedDirections->End(); ++gdcit)
+  {
+    vnl_vector<double> vec = gdcit.Value();
+    vec = vec.pre_multiply(imageRotationMatrix);
+    vec = vec.pre_multiply(measurementFrame);
+    directions->InsertElement(c, vec);
+    c++;
+  }
+
+  m_Image->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
 }
 
 void mitk::DiffusionPropertyHelper::UpdateBValueMap()
@@ -284,7 +362,13 @@ float mitk::DiffusionPropertyHelper::GetB_Value(unsigned int i)
 
 void mitk::DiffusionPropertyHelper::InitializeImage()
 {
-  this->ApplyMeasurementFrame();
+  if(  m_Image->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).IsNull() )
+  {
+    // we don't have the original gradient directions. Therefore use the modified directions and roatate them back.
+    this->UnApplyMeasurementFrameAndRotationMatrix();
+  }
+  else
+    this->ApplyMeasurementFrameAndRotationMatrix();
   this->UpdateBValueMap();
 
   // initialize missing properties

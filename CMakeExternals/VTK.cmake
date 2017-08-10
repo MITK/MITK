@@ -79,14 +79,10 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  #set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-7.0.0.tar.gz)
-  set(VTK_URL http://www.vtk.org/files/release/7.1/VTK-7.1.0.tar.gz)
-  set(VTK_URL_MD5 a7e814c1db503d896af72458c2d0228f)
-
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${VTK_URL}
-    URL_MD5 ${VTK_URL_MD5}
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.0.0.tar.gz
+    URL_MD5 8de89b8c7a729016ab7128da5e881cf4
     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS

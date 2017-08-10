@@ -243,7 +243,6 @@ mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GLUT        OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME Raptor2     OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME Eigen       ON  ADVANCED DOC "Use the Eigen library")
-mitkFunctionAddExternalProject(NAME GLEW        ON  ADVANCED DOC "Use the GLEW library")
 mitkFunctionAddExternalProject(NAME ANN         ON  ADVANCED DOC "Use Approximate Nearest Neighbor Library")
 mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit for unit tests")
 
@@ -788,8 +787,6 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
       # Otherwise, existing Find<proj>.cmake files could fail.
-      # (e.g. in the case of GLEW and the FindGLEW.cmake file shipped
-      # with CMake).
       find_package(${_package} QUIET CONFIG)
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))

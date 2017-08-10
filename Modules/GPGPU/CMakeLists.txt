@@ -10,7 +10,7 @@ endif()
 MITK_CREATE_MODULE(
 #  INCLUDE_DIRS .
   DEPENDS MitkCore
-  PACKAGE_DEPENDS ${package_deps} GLEW Qt5|Widgets
+  PACKAGE_DEPENDS ${package_deps} Qt5|Widgets
 )
 
 endif(APPLE)

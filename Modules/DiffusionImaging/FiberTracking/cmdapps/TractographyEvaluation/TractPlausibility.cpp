@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
   parser.setTitle("Tract Plausibility");
   parser.setCategory("Fiber Tracking Evaluation");
-  parser.setDescription("Calculates the Tractometer evaluation metrics for tractograms (http://www.tractometer.org/)");
+  parser.setDescription("");
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");

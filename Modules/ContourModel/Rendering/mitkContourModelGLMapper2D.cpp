@@ -34,7 +34,7 @@ mitk::ContourModelGLMapper2D::~ContourModelGLMapper2D()
 {
 }
 
-void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer *renderer)
+void mitk::ContourModelGLMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 

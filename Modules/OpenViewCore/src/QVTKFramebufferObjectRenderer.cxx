@@ -17,10 +17,6 @@
 #include "vtkInternalOpenGLRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"
 
-#include <QQuickWindow>
-
-#include <vtkgl.h>
-
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>

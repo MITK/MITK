@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUnstructuredGridVtkWriter.h"
 #include "mitkUnstructuredGridVtkWriterFactory.h"
 
-#include "mitkGPUVolumeMapper3D.h"
+#include "mitkVolumeMapperVtkSmart3D.h"
 #include "mitkMesh.h"
 #include "mitkMeshMapper2D.h"
 #include "mitkMeshVtkMapper3D.h"
@@ -99,7 +99,7 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
   {
     if ((dynamic_cast<Image *>(data) != nullptr))
     {
-      newMapper = mitk::GPUVolumeMapper3D::New();
+      newMapper = mitk::VolumeMapperVtkSmart3D::New();
       newMapper->SetDataNode(node);
     }
     else if ((dynamic_cast<Mesh *>(data) != nullptr))
@@ -126,7 +126,7 @@ void mitk::IOExtObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
   if (image.IsNotNull() && image->IsInitialized())
   {
-    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
+    mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(node);
   }
 
   if (dynamic_cast<mitk::UnstructuredGrid *>(node->GetData()))

@@ -61,7 +61,7 @@ void mitk::USNavigationTargetUpdateFilter::SetTargetStructure(DataNode::Pointer 
     float color = 1;
     for (int n = 0; n < numberOfPoints ; ++n)
     {
-      colors->InsertNextTupleValue(&color);
+      colors->InsertNextTuple1(color);
     }
 
     // add the scores array to the target surface
@@ -217,7 +217,7 @@ void mitk::USNavigationTargetUpdateFilter::UpdateTargetScores()
           }
         }
       }
-      colors->InsertNextTupleValue(&score);
+      colors->InsertNextTuple1(score);
     }
 
     targetSurfaceVtk->GetPointData()->AddArray(colors);

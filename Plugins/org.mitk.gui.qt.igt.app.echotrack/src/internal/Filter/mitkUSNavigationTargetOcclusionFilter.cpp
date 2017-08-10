@@ -77,7 +77,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     float intersection = -1;
     for ( vtkIdType n = 0; n < numberOfPoints; n++ )
     {
-      colors->InsertNextTupleValue(&intersection);
+      colors->InsertNextTuple1(intersection);
     }
 
     if ( numberOfPoints > 0 )
@@ -96,7 +96,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     float intersection = 0;
     for ( vtkIdType n = 0; n < numberOfPoints; n++ )
     {
-      colors->InsertNextTupleValue(&intersection);
+      colors->InsertNextTuple1(intersection);
     }
 
     if ( numberOfPoints > 0 )
@@ -159,7 +159,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     float one = 1.0f; float zero = 0.0f;
     for ( std::vector<bool>::iterator it = occlusion.begin(); it != occlusion.end(); ++it )
     {
-      colors->InsertNextTupleValue(*it ? &one : &zero);
+      colors->InsertNextTuple1(*it ? one : zero);
     }
 
     targetSurfaceVtk->GetPointData()->AddArray(colors);

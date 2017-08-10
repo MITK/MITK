@@ -205,7 +205,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
   itk::ImageRegion<4> imageRegion4;
 
   spacing4[0] = spacing3[0]; spacing4[1] = spacing3[1]; spacing4[2] = spacing3[2]; spacing4[3] = 1;
-  origin4[0] = origin3[0]; origin4[1] = origin3[1]; origin4[2] = origin3[2]; origin[3] = 0;
+  origin4[0] = origin3[0]; origin4[1] = origin3[1]; origin4[2] = origin3[2]; origin4[3] = 0;
   for (int r=0; r<3; r++)
     for (int c=0; c<3; c++)
       direction4[r][c] = direction3[r][c];

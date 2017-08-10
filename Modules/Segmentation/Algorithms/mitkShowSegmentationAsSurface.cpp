@@ -177,7 +177,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
       np->SetRepresentationToWireframe();
   }
 
-  m_Node->SetProperty("opacity", FloatProperty::New(0.3) );
+  m_Node->SetProperty("opacity", FloatProperty::New(1.0) );
   m_Node->SetProperty("line width", IntProperty::New(1) );
   m_Node->SetProperty("scalar visibility", BoolProperty::New(false) );
 

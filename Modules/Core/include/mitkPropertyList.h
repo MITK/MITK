@@ -104,6 +104,11 @@ namespace mitk
     void ReplaceProperty(const std::string &propertyKey, BaseProperty *property);
 
     /**
+     * @brief Remove a property object from the list/map by reference.
+     */
+    void RemoveProperty(const std::string &propertyKey);
+
+    /**
      * @brief Set a property object in the list/map by reference.
      */
     void ConcatenatePropertyList(PropertyList *pList, bool replace = false);

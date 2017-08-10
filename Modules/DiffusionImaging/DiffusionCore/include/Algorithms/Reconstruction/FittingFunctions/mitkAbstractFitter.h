@@ -39,7 +39,7 @@ public:
   }
 
   GradientContainerType::Pointer gradientDirections;
-  typename DiffusionImageType::PixelType measurements;
+  DiffusionImageType::PixelType measurements;
   std::vector<double> bValues;
   double S0;
   std::vector<int>  weightedIndices;
@@ -49,7 +49,7 @@ public:
     S0 = val;
   }
 
-  void set_measurements(const typename DiffusionImageType::PixelType& m)
+  void set_measurements(const DiffusionImageType::PixelType& m)
   {
     measurements = m;
   }

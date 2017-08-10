@@ -23,7 +23,6 @@ set(MITK_PLUGINS
   org.mitk.planarfigure:ON
   org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
-  org.mitk.simulation:OFF
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.coreapplication:OFF
   org.mitk.gui.qt.ext:OFF
@@ -69,7 +68,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
-  org.mitk.gui.qt.simulation:OFF
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.renderwindowmanager:OFF
   org.mitk.gui.qt.toftutorial:OFF

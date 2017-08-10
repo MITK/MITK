@@ -2,12 +2,6 @@ set(MITK_CONFIG_PACKAGES )
 
 set(_apple_package_excludes)
 
-if(APPLE)
-  set(_apple_package_excludes
-    SOFA
-  )
-endif()
-
 set(_python_excludes )
 
 if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8) )
@@ -27,8 +21,6 @@ set(_package_excludes
   SYSTEM_Boost
   Boost_LIBRARIES
   SYSTEM_PYTHON
-  SOFA_PLUGINS
-  SOFA_PLUGINS_DIR
   SUPERBUILD
   BiophotonicsHardware_SpectroCam
   POLHEMUS_TRACKER

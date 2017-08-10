@@ -80,6 +80,9 @@ protected slots:
   void TensorQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
     int method) ;
 
+  void DoBallStickCalculation();
+  void DoMultiTensorCalculation();
+
 protected:
 
   void DoAdcCalculation(bool fit);

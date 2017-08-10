@@ -98,6 +98,26 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_BallStickButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Ball-Stick</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_MultiTensorButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Multi-Tensor Fit</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

@@ -255,6 +255,7 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
 
   if (m_Controls->m_NormalizationBox->currentIndex() == 0)
     filter->SetNormalizeVectors(false);
+  filter->SetFaThreshold(m_Controls->m_AbsoluteThresholdBox->value());
 
   filter->Update();
 

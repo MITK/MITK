@@ -86,6 +86,14 @@ set(H_FILES
   include/Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   include/Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
   include/Algorithms/Reconstruction/itkDiffusionKurtosisReconstructionImageFilter.h
+  include/Algorithms/Reconstruction/itkBallAndSticksImageFilter.h
+  include/Algorithms/Reconstruction/itkMultiTensorImageFilter.h
+
+  # Fitting functions
+  include/Algorithms/Reconstruction/FittingFunctions/mitkAbstractFitter.h
+  include/Algorithms/Reconstruction/FittingFunctions/mitkMultiTensorFitter.h
+  include/Algorithms/Reconstruction/FittingFunctions/mitkBallStickFitter.h
+
 
   # MultishellProcessing
   include/Algorithms/Reconstruction/MultishellProcessing/itkRadialMultishellToSingleshellImageFilter.h
@@ -125,7 +133,6 @@ set(H_FILES
   include/Algorithms/itkExtractChannelFromRgbaImageFilter.h
   include/Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
   include/Algorithms/itkMergeDiffusionImagesFilter.h
-  include/Algorithms/itkDwiPhantomGenerationFilter.h
   include/Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
   include/Algorithms/itkShCoefficientImageImporter.h
   include/Algorithms/itkShCoefficientImageExporter.h

@@ -104,11 +104,11 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
   newSpacing[0] = spacing[1]; newSpacing[1] = spacing[2];
   image3m->SetSpacing(newSpacing);
 
-  for (int x = 0; x < mask1->GetDimensions()[0]; ++x)
+  for (unsigned int x = 0; x < mask1->GetDimensions()[0]; ++x)
   {
-    for (int y = 0; y < mask1->GetDimensions()[1]; ++y)
+    for (unsigned int y = 0; y < mask1->GetDimensions()[1]; ++y)
     {
-      for (int z = 0; z < mask1->GetDimensions()[2]; ++z)
+      for (unsigned int z = 0; z < mask1->GetDimensions()[2]; ++z)
       {
         NewImageType::IndexType newIndex;
         ImageType::IndexType index;
@@ -138,17 +138,17 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
 
 
   mitk::Image::Pointer img = mitk::ImportItkImage(image1);
-  mitk::IOUtil::SaveImage(img, output + "1.nrrd");
+  mitk::IOUtil::Save(img, output + "1.nrrd");
   img = mitk::ImportItkImage(image2);
-  mitk::IOUtil::SaveImage(img, output + "2.nrrd");
+  mitk::IOUtil::Save(img, output + "2.nrrd");
   img = mitk::ImportItkImage(image3);
-  mitk::IOUtil::SaveImage(img, output + "3.nrrd");
+  mitk::IOUtil::Save(img, output + "3.nrrd");
   img = mitk::ImportItkImage(image1m);
-  mitk::IOUtil::SaveImage(img, output + "1m.nrrd");
+  mitk::IOUtil::Save(img, output + "1m.nrrd");
   img = mitk::ImportItkImage(image2m);
-  mitk::IOUtil::SaveImage(img, output + "2m.nrrd");
+  mitk::IOUtil::Save(img, output + "2m.nrrd");
   img = mitk::ImportItkImage(image3m);
-  mitk::IOUtil::SaveImage(img, output + "3m.nrrd");
+  mitk::IOUtil::Save(img, output + "3m.nrrd");
 }
 
 int main(int argc, char* argv[])

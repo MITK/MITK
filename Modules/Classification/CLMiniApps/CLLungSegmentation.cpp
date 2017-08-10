@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
   mitk::MorphologicalOperations::FillHoles(pickedMask);
 
 
-  mitk::IOUtil::SaveImage(pickedMask, outFileName);
+  mitk::IOUtil::Save(pickedMask, outFileName);
 
   return EXIT_SUCCESS;
 }

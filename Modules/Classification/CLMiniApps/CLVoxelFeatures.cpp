@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
       AccessByItk_2(image, GaussianFilter, ranges[i], output);
       MITK_INFO << "Write output:";
       std::string name = filename + "-gaussian-" + us::any_value_to_string(ranges[i]) + extension;
-      mitk::IOUtil::SaveImage(output, name);
+      mitk::IOUtil::Save(output, name);
     }
   }
 

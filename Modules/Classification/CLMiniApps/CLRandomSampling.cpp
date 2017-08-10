@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
     filter->SetNumberOfSamplesVector(rate);
   }
   filter->Update();
-  mitk::IOUtil::SaveImage(filter->GetOutput(), outputName);
+  mitk::IOUtil::Save(filter->GetOutput(), outputName);
 
   return EXIT_SUCCESS;
 }

@@ -35,11 +35,9 @@ itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::BeforeThreadedGener
     imageCalculatorFilter->SetImage(this->GetInput(0));
     imageCalculatorFilter->Compute();
 
-    offset = imageCalculatorFilter->GetMinimum();
-    delta = 1.0*(imageCalculatorFilter->GetMaximum() - imageCalculatorFilter->GetMinimum()) / (1.0*m_Bins);
+    m_Offset = imageCalculatorFilter->GetMinimum();
+    m_Delta = 1.0*(imageCalculatorFilter->GetMaximum() - imageCalculatorFilter->GetMinimum()) / (1.0*m_Bins);
   }
-
-  std::cout << "Offset: " << offset << " delta: " << delta << std::endl;
 
   InputImagePointer input = this->GetInput(0);
   for (int i = 0; i < m_Bins; ++i)
@@ -58,6 +56,7 @@ itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::ThreadedGenerateDat
   typedef itk::ConstNeighborhoodIterator<TInputImageType> ConstIteratorType;
 
   typename TInputImageType::SizeType size; size.Fill(m_Size);
+  InputImagePointer input = this->GetInput(0);
 
 //  MITK_INFO << "Creating output iterator";
   std::vector<IteratorType> iterVector;

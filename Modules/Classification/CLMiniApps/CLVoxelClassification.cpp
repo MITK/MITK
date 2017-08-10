@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // Read Special Parameter
     //////////////////////////////////////////////////////////////////////////////
-    // TODO bool useWeightedPoints = allConfig.IntValue("Forest", "Use point-based weighting",0);
+    bool useWeightedPoints = allConfig.IntValue("Forest", "Use point-based weighting",0);
     // TODO bool writePointsToFile = allConfig.IntValue("Forest", "Write points to file",0);
     // TODO int importanceWeightAlgorithm = allConfig.IntValue("Forest","Importance weight Algorithm",0);
     std::string importanceWeightName = allConfig.Value("Forest","Importance weight name","");

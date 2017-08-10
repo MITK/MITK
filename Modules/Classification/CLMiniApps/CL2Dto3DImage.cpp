@@ -47,14 +47,13 @@ int main(int argc, char* argv[])
 
   std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
-  
+
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputName);
   mitk::Convert2Dto3DImageFilter::Pointer multiFilter2 = mitk::Convert2Dto3DImageFilter::New();
   multiFilter2->SetInput(image);
   multiFilter2->Update();
   mitk::Image::Pointer image2 = multiFilter2->GetOutput();
-  
-  mitk::IOUtil::SaveImage(image2, outputName);
+  mitk::IOUtil::Save(image2, outputName);
 
   return EXIT_SUCCESS;
 }

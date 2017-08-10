@@ -377,7 +377,7 @@ int main(int argc, char* argv[])
   bool savePNGofSlices = true;
   std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
 
-  std::string version = "Version: 1.19";
+  std::string version = "Version: 1.20";
   MITK_INFO << version;
 
   std::ofstream log;
@@ -571,11 +571,11 @@ int main(int argc, char* argv[])
     }
     if (param.writeAnalysisImage)
     {
-      mitk::IOUtil::SaveImage(cImage, param.anaylsisImagePath);
+      mitk::IOUtil::Save(cImage, param.anaylsisImagePath);
     }
     if (param.writeAnalysisMask)
     {
-      mitk::IOUtil::SaveImage(cImage, param.analysisMaskPath);
+      mitk::IOUtil::Save(cMask, param.analysisMaskPath);
     }
 
     mitk::AbstractGlobalImageFeature::FeatureListType stats;

@@ -146,13 +146,13 @@ int main(int argc, char* argv[])
     std::stringstream s1; s1 << i; std::string number = s1.str();
     mitk::Image::Pointer mitkImage = mitk::Image::New();
     mitk::CastToMitkImage(itkOutputImageVector[i], mitkImage);
-    mitk::IOUtil::SaveImage(mitkImage, parsedArgs["output" + number].ToString());
+    mitk::IOUtil::Save(mitkImage, parsedArgs["output" + number].ToString());
   }
   // Save the new mask
   {
     mitk::Image::Pointer mitkImage = mitk::Image::New();
     mitk::CastToMitkImage(itkNewMask, mitkImage);
-    mitk::IOUtil::SaveImage(mitkImage, parsedArgs["mask-output"].ToString());
+    mitk::IOUtil::Save(mitkImage, parsedArgs["mask-output"].ToString());
   }
 
   return EXIT_SUCCESS;

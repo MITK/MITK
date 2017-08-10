@@ -73,7 +73,7 @@ ResampleImageToReferenceFunction(itk::Image<TPixel, VImageDimension>* itkReferen
   result->InitializeByItk(resampler->GetOutput());
   GrabItkImageMemory(resampler->GetOutput(), result);
   MITK_INFO << "writing result to: " << ergPath;
-  mitk::IOUtil::SaveImage(result, ergPath);
+  mitk::IOUtil::Save(result, ergPath);
   //return result;
 }
 

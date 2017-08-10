@@ -19,7 +19,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLDicom2Nrrd^^MitkCore
         CLImageTypeConverter^^MitkCore
         CLResampleImageToReference^^MitkCore
-        CLGlobalImageFeatures^^MitkCLUtilities
+        CLGlobalImageFeatures^^MitkCLUtilities_MitkQtWidgetsExt
         CLMRNormalization^^MitkCLUtilities_MitkCLMRUtilities
         CLStaple^^MitkCLUtilities
         CLVoxelFeatures^^MitkCLUtilities
@@ -106,16 +106,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
   #  DEPENDS MitkCore MitkCLUtilities
   #  CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
   #)
-
-  mitk_create_executable(CLSimpleVoxelClassification
-    DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLVigraRandomForest MitkCommandLine
-    CPP_FILES CLSimpleVoxelClassification.cpp
-  )
-  # This mini app does not depend on mitkDiffusionImaging at all
-  mitk_create_executable(CLVoxelClassification
-    DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLImportanceWeighting MitkCLVigraRandomForest
-    CPP_FILES CLVoxelClassification.cpp
-  )
   #mitk_create_executable(CLBrainMask
   #  DEPENDS MitkCore MitkCLUtilities
   #  CPP_FILES CLBrainMask.cpp mitkCommandLineParser.cpp

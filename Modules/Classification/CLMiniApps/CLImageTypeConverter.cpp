@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
   }
 
 
-  mitk::IOUtil::SaveImage(outputImage, outputName);
+  mitk::IOUtil::Save(outputImage, outputName);
 
   return EXIT_SUCCESS;
 }

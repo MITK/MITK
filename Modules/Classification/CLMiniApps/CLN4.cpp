@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
   auto out = filter->GetOutput();
   mitk::Image::Pointer outImg = mitk::Image::New();
   mitk::CastToMitkImage(out, outImg);
-  mitk::IOUtil::SaveImage(outImg, parsedArgs["output"].ToString());
+  mitk::IOUtil::Save(outImg, parsedArgs["output"].ToString());
 
   return EXIT_SUCCESS;
 }

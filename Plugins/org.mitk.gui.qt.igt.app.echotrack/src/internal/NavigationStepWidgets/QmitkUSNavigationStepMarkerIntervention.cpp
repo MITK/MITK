@@ -840,7 +840,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdatePlannedTargetProgressDisplay
   }
   else
   {
-    float red[3] = {0.6, 0, 0};
+    float red[3] = {0.6f, 0.0f, 0.0f};
     m_TargetProgressBar->SetBorderColor(red);
     m_TargetProgressBar->setValueInvalid();
   }

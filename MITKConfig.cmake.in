@@ -199,13 +199,6 @@ if(MITK_USE_DCMQI)
 endif()
 
 # -----------------------------------------
-# Special handling for VMTK
-
-if(MITK_USE_VMTK)
-  link_directories(${VMTK_LIBRARY_DIRS})
-endif()
-
-# -----------------------------------------
 # Special handling for Boost
 
 if(MITK_USE_Boost)

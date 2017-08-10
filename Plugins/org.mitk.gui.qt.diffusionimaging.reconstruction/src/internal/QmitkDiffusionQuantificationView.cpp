@@ -80,6 +80,9 @@ void QmitkDiffusionQuantificationView::CreateQtPartControl(QWidget *parent)
         m_Controls->frame_3->setVisible(false);
         m_Controls->m_CurvatureButton->setVisible(false);
 #endif
+
+        m_Controls->m_BallStickButton->setVisible(false);
+        m_Controls->m_MultiTensorButton->setVisible(false);
     }
 }
 

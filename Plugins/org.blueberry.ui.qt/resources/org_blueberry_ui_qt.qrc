@@ -10,7 +10,11 @@
      <file>icon_missing.png</file>
      <file>tab_close_icon.png</file>
      <file>tab_close_icon-active.png</file>
-     
+
+     <file>darkstyle.qss</file>
+     <file>darkstyle-activetab.qss</file>
+     <file>darkstyle-tab.qss</file>
+
      <file>defaultstyle.qss</file>
      <file>defaultstyle-activetab.qss</file>
      <file>defaultstyle-tab.qss</file>

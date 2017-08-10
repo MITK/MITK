@@ -1,0 +1,24 @@
+berry--QCTabBar::tab:selected
+{
+  background: #3399cc;
+  color: #1d1d1c;
+}
+
+berry--QCTabBar QToolButton#TabCloseButton
+{
+  border: none;
+  background-color: transparent;
+  width: 12px;
+  height: 12px;
+}
+
+berry--QCTabBar QToolButton
+{
+  border: none;
+  max-height: 32px;
+}
+
+QFrame#ViewFormContentFrame
+{
+  border: 1px solid #3399cc
+}

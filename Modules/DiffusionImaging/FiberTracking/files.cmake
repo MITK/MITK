@@ -91,4 +91,5 @@ set(RESOURCE_FILES
 
   # Shaders
   Shaders/mitkShaderFiberClipping.xml
+  Shaders/mitkShaderFiberClipping3D.xml
 )

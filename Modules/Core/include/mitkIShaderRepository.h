@@ -106,14 +106,15 @@ namespace mitk
     /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
      * used by mappers.
      */
-    virtual void AddDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite) const = 0;
+    virtual void AddDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite, std::string property_name="shader") const = 0;
 
     /** \brief Applies shader and shader specific variables of the specified DataNode
      * to the VTK object by updating the shader variables of its vtkProperty.
      */
     virtual void UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram *shaderProgram,
                                      mitk::DataNode *node,
-                                     mitk::BaseRenderer *renderer) const = 0;
+                                     mitk::BaseRenderer *renderer,
+                                     std::string property_name="shader") const = 0;
 
     /** \brief Loads a shader from a given file. Make sure that this stream is in the XML shader format.
      *

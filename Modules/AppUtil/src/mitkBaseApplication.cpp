@@ -829,7 +829,7 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
     if (checkFile.exists() && checkFile.isFile())
     {
       QPixmap pixmap(checkFile.absoluteFilePath());
-      d->m_Splashscreen = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+      d->m_Splashscreen = new QSplashScreen(pixmap);
       if (!autoplanVersion.isNull())
       {
         QString autoplanVersionString = autoplanVersion.toString();

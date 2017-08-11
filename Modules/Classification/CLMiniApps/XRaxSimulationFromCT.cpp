@@ -26,11 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
 
-
+struct Params {
+  bool invert;
+  float zeroValue;
+};
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask1, std::string output)
+CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask1, std::string output, Params param)
 {
   typedef itk::Image<TPixel, VImageDimension>         ImageType;
   typedef itk::Image<unsigned char, VImageDimension>  MaskType;
@@ -121,9 +124,14 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
         image2->SetPixel(newIndex, image2->GetPixel(newIndex) + pixel);
         newIndex[0] = y; newIndex[1] = z;
         image3->SetPixel(newIndex, image3->GetPixel(newIndex) + pixel);
-        if (itkMask->GetPixel(index) > 0)
+        if (itkMask->GetPixel(index) > 0 && !param.invert)
         {
-          pixel = -1000 + 1024;
+          pixel = param.zeroValue + 1024;
+          pixel = pixel / 1000.0;
+        }
+        if (itkMask->GetPixel(index) < 1 && param.invert)
+        {
+          pixel = param.zeroValue + 1024;
           pixel = pixel / 1000.0;
         }
         newIndex[0] = x; newIndex[1] = y;
@@ -165,7 +173,9 @@ int main(int argc, char* argv[])
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input image:", "Input folder", us::Any(), false);
   parser.addArgument("mask", "m", mitkCommandLineParser::InputDirectory, "Input mask:", "Input folder", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file",us::Any(),false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("invert", "invert", mitkCommandLineParser::Bool, "Input mask:", "Input folder", us::Any());
+  parser.addArgument("zero_value", "zero", mitkCommandLineParser::Float, "Output file:", "Output file", us::Any());
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
@@ -184,10 +194,23 @@ int main(int argc, char* argv[])
   std::string inputMask = us::any_cast<std::string>(parsedArgs["mask"]);
   MITK_INFO << inputMask;
 
+  Params param;
+  param.invert = false;
+  param.zeroValue = 0;
+  if (parsedArgs.count("invert"))
+  {
+    param.invert = true;
+  }
+  if (parsedArgs.count("zero_value"))
+  {
+    param.zeroValue = us::any_cast<float>(parsedArgs["output-mode"]);
+  }
+
+
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputImage);
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(inputMask);
 
-  AccessByItk_2(image, CreateXRay, mask, parsedArgs["output"].ToString());
+  AccessByItk_3(image, CreateXRay, mask, parsedArgs["output"].ToString(),param);
 
   //const mitk::Image::Pointer image = *imageIter;
   //mitk::IOUtil::SaveImage(image,outFileName);

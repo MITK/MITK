@@ -548,7 +548,7 @@ void mitk::CLUtil::itkHessianOfGaussianFilter(itk::Image<TPixel, VImageDimension
   typename HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
   hessianFilter->SetInput(itkImage);
   hessianFilter->SetSigma(std::sqrt(variance));
-  for (int i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     mitk::Image::Pointer tmpImage = mitk::Image::New();
     typename DetFilterType::Pointer detFilter = DetFilterType::New();

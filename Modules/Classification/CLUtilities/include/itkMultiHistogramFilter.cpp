@@ -10,7 +10,7 @@
 
 template< class TInputImageType, class TOuputImageType>
 itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilter():
-m_Offset(-3.0), m_Delta(0.6), m_Bins(11), m_Size(5), m_UseImageIntensityRange(false)
+m_Delta(0.6), m_Offset(-3.0), m_Bins(11), m_Size(5), m_UseImageIntensityRange(false)
 {
   this->SetNumberOfRequiredOutputs(m_Bins);
   this->SetNumberOfRequiredInputs(0);
@@ -30,7 +30,7 @@ itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::BeforeThreadedGener
 
   if (m_UseImageIntensityRange)
   {
-    ImageCalculatorFilterType::Pointer imageCalculatorFilter
+    typedef ImageCalculatorFilterType::Pointer imageCalculatorFilter
       = ImageCalculatorFilterType::New();
     imageCalculatorFilter->SetImage(this->GetInput(0));
     imageCalculatorFilter->Compute();

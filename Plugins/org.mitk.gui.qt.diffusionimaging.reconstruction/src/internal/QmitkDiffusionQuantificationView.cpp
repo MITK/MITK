@@ -236,7 +236,7 @@ void QmitkDiffusionQuantificationView::DoBallStickCalculation()
         {
           mitk::Image::Pointer dOut = mitk::GrabItkImageMemory( filter->GetOutDwi().GetPointer() );
 
-          dOut->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
+          dOut->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
           dOut->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() );
           mitk::DiffusionPropertyHelper propertyHelper( dOut );
           propertyHelper.InitializeImage();

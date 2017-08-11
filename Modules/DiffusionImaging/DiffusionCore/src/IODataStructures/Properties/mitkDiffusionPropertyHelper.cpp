@@ -177,8 +177,8 @@ void mitk::DiffusionPropertyHelper::AverageRedundantGradients(double precision)
 
   mitk::GrabItkImageMemory( newITKImage, m_Image );
 
-  m_Image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newDirs ) );
-  m_Image->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newDirs ) );
+  m_Image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newDirs ) );
+  m_Image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( newDirs ) );
   ApplyMeasurementFrameAndRotationMatrix();
   UpdateBValueMap();
   std::cout << std::endl;
@@ -244,7 +244,7 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrameAndRotationMatrix()
     c++;
   }
 
-  m_Image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
+  m_Image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
 }
 
 void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix()
@@ -309,7 +309,7 @@ void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix()
     c++;
   }
 
-  m_Image->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
+  m_Image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
 }
 
 
@@ -373,7 +373,7 @@ void mitk::DiffusionPropertyHelper::UpdateBValueMap()
     }
   }
 
-  m_Image->SetProperty( mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( b_ValueMap ) );
+  m_Image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( b_ValueMap ) );
 }
 
 bool mitk::DiffusionPropertyHelper::AreAlike(GradientDirectionType g1,
@@ -441,7 +441,7 @@ void mitk::DiffusionPropertyHelper::InitializeImage()
     //no measurement frame present, identity is assumed
     MeasurementFrameType identity;
     identity.set_identity();
-    m_Image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( identity ));
+    m_Image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( identity ));
   }
 }
 

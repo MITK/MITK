@@ -132,10 +132,10 @@ void mitk::DiffusionImageCreationFilter::GenerateData()
 
   // create BValueMap
   mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap( DiffusionVectors, BValue );
-  outputForCache->SetProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
-  outputForCache->SetProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
-  outputForCache->SetProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
-  outputForCache->SetProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
+  outputForCache->GetPropertyList()->ReplaceProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
+  outputForCache->GetPropertyList()->ReplaceProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
+  outputForCache->GetPropertyList()->ReplaceProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
+  outputForCache->GetPropertyList()->ReplaceProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
 
   outputForCache->Modified();
 }

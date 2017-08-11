@@ -231,6 +231,7 @@ public:
 
   /** \evaluate annotation based on evaluating features. */
   virtual std::string EvaluateAnnotation();
+  virtual std::string EvaluateAnnotationWithTimeStep(unsigned int timeStep);
 
   /** \brief Intherited from parent */
   virtual void UpdateOutputInformation() override;

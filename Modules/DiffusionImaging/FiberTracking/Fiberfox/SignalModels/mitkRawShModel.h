@@ -69,7 +69,6 @@ public:
 
     bool SetShCoefficients(vnl_vector< double > shCoefficients, double b0);
     void SetFiberDirection(GradientType fiberDirection);
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
     void SetFaRange(double min, double max){ m_FaRange.first = min; m_FaRange.second = max; }
     void SetAdcRange(double min, double max){ m_AdcRange.first = min; m_AdcRange.second = max; }
     void SetMaxNumKernels(unsigned int max){ m_MaxNumKernels = max; }

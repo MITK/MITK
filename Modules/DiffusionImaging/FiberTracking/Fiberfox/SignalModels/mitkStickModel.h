@@ -60,7 +60,6 @@ public:
     double GetDiffusivity() { return m_Diffusivity; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
 protected:
 

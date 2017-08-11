@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkPlanarFigureExports.h>
 #include "mitkBaseData.h"
+#include "mitkBaseRenderer.h"
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 
@@ -231,7 +232,7 @@ public:
 
   /** \evaluate annotation based on evaluating features. */
   virtual std::string EvaluateAnnotation();
-  virtual std::string EvaluateAnnotationWithTimeStep(unsigned int timeStep);
+  virtual std::string EvaluateAnnotationWithTimeStep(mitk::BaseRenderer* renderer);
 
   /** \brief Intherited from parent */
   virtual void UpdateOutputInformation() override;

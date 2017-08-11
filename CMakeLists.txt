@@ -289,7 +289,7 @@ mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
-mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
+mitkFunctionAddExternalProject(NAME ACVD      ON           DOC "Use Approximated Centroidal Voronoi Diagrams")
 mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")

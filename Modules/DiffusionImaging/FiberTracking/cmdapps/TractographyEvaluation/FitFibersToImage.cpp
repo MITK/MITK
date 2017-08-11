@@ -31,8 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Eigen/Dense>
 #include <mitkStickModel.h>
 #include <vigra/regression.hxx>
-
-//vigra::linalg::nonnegativeLeastSquares
+#include <itkImageFileWriter.h>
 
 using namespace std;
 typedef itksys::SystemTools ist;
@@ -45,6 +44,7 @@ typedef mitk::StickModel<> ModelType;
 std::vector<float> SolveLinear(mitk::FiberBundle* inputTractogram, mitk::Image::Pointer inputImage, ModelType signalModel)
 {
   unsigned int num_gradients = signalModel.GetGradientList().size();
+  DPH::ImageType::Pointer itkImage = DPH::GetItkVectorImage(inputImage);
 
   unsigned int* image_size = inputImage->GetDimensions();
   int sz_x = image_size[0];
@@ -61,12 +61,37 @@ std::vector<float> SolveLinear(mitk::FiberBundle* inputTractogram, mitk::Image::
   MITK_INFO << "Num. residuals: " << number_of_residuals;
 
   MITK_INFO << "Creating matrices ...";
-  Eigen::MatrixXf A = Eigen::MatrixXf::Constant(number_of_residuals, num_unknowns, 0);
-  Eigen::VectorXf b = Eigen::VectorXf::Constant(number_of_residuals, 0);
+//  Eigen::MatrixXf A = Eigen::MatrixXf::Constant(number_of_residuals, num_unknowns, 0);
+//  Eigen::VectorXf b = Eigen::VectorXf::Constant(number_of_residuals, 0);
+
+  vigra::MultiArray<2, double> A(vigra::Shape2(number_of_residuals, num_unknowns), 0.0);
+  vigra::MultiArray<2, double> b(vigra::Shape2(number_of_residuals, 1), 0.0);
+  vigra::MultiArray<2, double> x(vigra::Shape2(num_unknowns, 1), 1.0);
+
+
+  itk::Image< double, 3>::Pointer temp_img1 = itk::Image< double, 3>::New();
+  temp_img1->SetSpacing( itkImage->GetSpacing() );
+  temp_img1->SetOrigin( itkImage->GetOrigin() );
+  temp_img1->SetDirection( itkImage->GetDirection() );
+  temp_img1->SetLargestPossibleRegion( itkImage->GetLargestPossibleRegion() );
+  temp_img1->SetBufferedRegion( itkImage->GetBufferedRegion() );
+  temp_img1->SetRequestedRegion( itkImage->GetRequestedRegion() );
+  temp_img1->Allocate();
+  temp_img1->FillBuffer(0.0);
+
+  itk::Image< double, 3>::Pointer temp_img2 = itk::Image< double, 3>::New();
+  temp_img2->SetSpacing( itkImage->GetSpacing() );
+  temp_img2->SetOrigin( itkImage->GetOrigin() );
+  temp_img2->SetDirection( itkImage->GetDirection() );
+  temp_img2->SetLargestPossibleRegion( itkImage->GetLargestPossibleRegion() );
+  temp_img2->SetBufferedRegion( itkImage->GetBufferedRegion() );
+  temp_img2->SetRequestedRegion( itkImage->GetRequestedRegion() );
+  temp_img2->Allocate();
+  temp_img2->FillBuffer(0.0);
+
 
   MITK_INFO << "Filling matrices ...";
   unsigned int point_counter = 0;
-  DPH::ImageType::Pointer itkImage = DPH::GetItkVectorImage(inputImage);
   vtkSmartPointer<vtkPolyData> polydata = inputTractogram->GetFiberPolyData();
   for (int i=0; i<inputTractogram->GetNumFibers(); ++i)
   {
@@ -107,37 +132,57 @@ std::vector<float> SolveLinear(mitk::FiberBundle* inputTractogram, mitk::Image::
 
       for (unsigned int k=0; k<num_gradients; ++k)
       {
-        b(num_gradients*linear_index + k) = (float)measured_signal[k];
-        A(num_gradients*linear_index + k, i) += (float)model_signal[k];
+        b(num_gradients*linear_index + k, 0) = (double)measured_signal[k];
+//        b(num_gradients*linear_index + k) = (float)measured_signal[k];
+        A(num_gradients*linear_index + k, i) = A(num_gradients*linear_index + k, i) + (double)model_signal[k];
+        temp_img1->SetPixel(idx, temp_img1->GetPixel(idx) + (double)model_signal[k]);
+        A(num_gradients*linear_index + k, i) = temp_img1->GetPixel(idx);
+        temp_img2->SetPixel(idx, A(num_gradients*linear_index + k, i) );
       }
 
       point_counter++;
     }
   }
 
-  unsigned int num_used_residuals = 0;
-  for (unsigned int i=0; i<number_of_residuals; i++)
-    if (b(i)>0)
-      num_used_residuals++;
+  typedef  itk::ImageFileWriter< itk::Image< double, 3>  > WriterType;
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetFileName("/home/neher/Projects/TractPlausibility/model_signal.nrrd");
+  writer->SetInput(temp_img2);
+  writer->Update();
 
-  Eigen::MatrixXf A2 = Eigen::MatrixXf::Constant(num_used_residuals, num_unknowns, 0);
-  Eigen::VectorXf b2 = Eigen::VectorXf::Constant(num_used_residuals, 0);
+  writer->SetFileName("/home/neher/Projects/TractPlausibility/measured_signal.nrrd");
+  writer->SetInput(temp_img1);
+  writer->Update();
 
-  unsigned int c = 0;
-  for (unsigned int i=0; i<number_of_residuals; i++)
-    if (b(i)>0)
-    {
-      b2(c)=b(i);
-      for (unsigned int j=0; j<num_unknowns; j++)
-        A2(c, j) = A(i,j);
-      ++c;
-    }
+//  unsigned int num_used_residuals = 0;
+//  for (unsigned int i=0; i<number_of_residuals; i++)
+//    if (b(i)>0)
+//      num_used_residuals++;
 
-  MITK_INFO << "Num. used residuals: " << num_used_residuals;
+//  Eigen::MatrixXf A2 = Eigen::MatrixXf::Constant(num_used_residuals, num_unknowns, 0);
+//  Eigen::VectorXf b2 = Eigen::VectorXf::Constant(num_used_residuals, 0);
+
+//  vigra::MultiArray<2, double> A2(vigra::Shape2(num_used_residuals, num_unknowns), 0.0);
+//  vigra::MultiArray<2, double> b2(vigra::Shape2(num_used_residuals, 1), 0.0);
+
+//  unsigned int c = 0;
+//  for (unsigned int i=0; i<number_of_residuals; i++)
+//    if (b(i,0)>0)
+//    {
+//      b2(c,0)=b(i,0);
+//      for (unsigned int j=0; j<num_unknowns; j++)
+//        A2(c, j) = A(i,j);
+//      ++c;
+//    }
+
+//  MITK_INFO << "Num. used residuals: " << num_used_residuals;
   MITK_INFO << "Solving linear system";
-  Eigen::VectorXf x = (A2.transpose() * A2).ldlt().solve(A2.transpose() * b2);
+//  Eigen::VectorXf x = (A2.transpose() * A2).ldlt().solve(A2.transpose() * b2);
 //  Eigen::VectorXf x = A.colPivHouseholderQr().solve(b);
 //  Eigen::VectorXf x = A.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+
+
+  vigra::linalg::nonnegativeLeastSquares(A, b, x);
 
   std::vector<float> weights;
   for (unsigned int i=0; i<num_unknowns; ++i)
@@ -191,7 +236,7 @@ int main(int argc, char* argv[])
       minSpacing = inputImage->GetGeometry()->GetSpacing()[1];
     else
       minSpacing = inputImage->GetGeometry()->GetSpacing()[2];
-    inputTractogram->ResampleLinear(minSpacing/4);
+    inputTractogram->ResampleLinear(minSpacing/5);
 
     // set up signal model
     GradientContainerType* gradients = static_cast<mitk::GradientDirectionsProperty*>( inputImage->GetProperty(DPH::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();

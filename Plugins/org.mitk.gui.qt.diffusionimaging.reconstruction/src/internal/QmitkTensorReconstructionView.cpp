@@ -978,9 +978,9 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
             // TENSORS TO DATATREE
             mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
 
-            image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradientList ) );
+            image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradientList ) );
             image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( bVal ) );
-            image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New() );
+            image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New() );
             mitk::DiffusionPropertyHelper propertyHelper( image );
             propertyHelper.InitializeImage();
 

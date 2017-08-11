@@ -299,8 +299,8 @@ static mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, flo
   resampler->Update();
 
   mitk::Image::Pointer output = mitk::GrabItkImageMemory( resampler->GetOutput() );
-  output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
-  output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
+  output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
+  output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
   mitk::DiffusionPropertyHelper propertyHelper( output );
   propertyHelper.InitializeImage();
 

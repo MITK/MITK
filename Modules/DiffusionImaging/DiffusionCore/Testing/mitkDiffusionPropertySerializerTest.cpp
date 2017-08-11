@@ -95,7 +95,7 @@ public:
 
 
     gradientdirection_prop = mitk::GradientDirectionsProperty::New(gdc.GetPointer()).GetPointer();
-    propList->SetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), gradientdirection_prop);
+    propList->ReplaceProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), gradientdirection_prop);
 
     mitk::MeasurementFrameProperty::MeasurementFrameType mft;
 
@@ -108,7 +108,7 @@ public:
     mft.set_row(2,row2);
 
     measurementframe_prop = mitk::MeasurementFrameProperty::New(mft).GetPointer();
-    propList->SetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), measurementframe_prop);
+    propList->ReplaceProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), measurementframe_prop);
   }
 
   void tearDown() override

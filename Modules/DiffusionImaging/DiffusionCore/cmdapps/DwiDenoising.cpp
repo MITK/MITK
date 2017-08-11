@@ -110,8 +110,8 @@ int main(int argc, char* argv[])
       filter->Update();
 
       DiffusionImageType::Pointer output = mitk::GrabItkImageMemory( filter->GetOutput() );
-      output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) ) );
-      output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) ) );
+      output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) ) );
+      output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) ) );
       mitk::DiffusionPropertyHelper propertyHelper( output );
       propertyHelper.InitializeImage();
 

@@ -765,10 +765,10 @@ void mitk::FiberBundle::GenerateFiberIds()
 
 }
 
-mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction)
+mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction, bool do_resampling)
 {
   vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
-  if (anyPoint)
+  if (anyPoint && do_resampling)
   {
     float minSpacing = 1;
     if(mask->GetSpacing()[0]<mask->GetSpacing()[1] && mask->GetSpacing()[0]<mask->GetSpacing()[2])

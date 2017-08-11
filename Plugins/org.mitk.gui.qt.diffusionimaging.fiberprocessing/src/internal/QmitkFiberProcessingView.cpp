@@ -1201,9 +1201,6 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure(bool interactive)
 
     if (interactive && m_Controls->m_InteractiveBox->isChecked())
     {
-      if (extFB->GetNumFibers()<=0)
-        continue;
-
       if (m_InteractiveNode.IsNull())
       {
         m_InteractiveNode = mitk::DataNode::New();
@@ -1212,14 +1209,16 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure(bool interactive)
         GetDataStorage()->Add(m_InteractiveNode);
       }
       float op = 5.0/sqrt(fib->GetNumFibers());
+      float currentOp = 0;
+      fiberBundles.at(i)->GetFloatProperty("opacity", currentOp);
 
-      fib->SetFiberColors(255, 255, 255);
-      fiberBundles.at(i)->SetFloatProperty("opacity", op);
-      fiberBundles.at(i)->SetBoolProperty("Fiber2DfadeEFX", false);
+      if (currentOp!=op)
+      {
+        fib->SetFiberColors(255, 255, 255);
+        fiberBundles.at(i)->SetFloatProperty("opacity", op);
+        fiberBundles.at(i)->SetBoolProperty("Fiber2DfadeEFX", false);
+      }
       m_InteractiveNode->SetData(extFB);
-
-      if (auto renderWindowPart = this->GetRenderWindowPart())
-        renderWindowPart->RequestUpdate();
     }
     else
     {

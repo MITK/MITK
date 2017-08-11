@@ -101,7 +101,7 @@ public:
     // fiber subset extraction
     FiberBundle::Pointer           ExtractFiberSubset(DataNode *roi, DataStorage* storage);
     std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
-    FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false, bool bothEnds=true, float fraction=0.0);
+    FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false, bool bothEnds=true, float fraction=0.0, bool do_resampling=true);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected

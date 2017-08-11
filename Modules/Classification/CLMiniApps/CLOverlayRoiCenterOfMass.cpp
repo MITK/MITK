@@ -61,7 +61,7 @@ FindMostSampleSlice(itk::Image<TPixel, VImageDimension>* mask, int & selectedSli
     ++mask1Iter;
   }
   selectedSlice = 0;
-  for (int i = 0; i < numberOfSamples.size(); ++i)
+  for (std::size_t i = 0; i < numberOfSamples.size(); ++i)
   {
     if (numberOfSamples[selectedSlice] < numberOfSamples[i])
       selectedSlice = i;

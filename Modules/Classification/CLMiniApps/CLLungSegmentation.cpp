@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConnectedThresholdImageFilter.h>
 
 template<typename TPixel, unsigned int VImageDimension>
-void StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer &result, mitk::BaseGeometry* imageGeometry)
+void StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer &result)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef typename InputImageType::IndexType IndexType;
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer rawMask = resultImage->CreateLabelMask(1);
   mitk::Image::Pointer pickedMask;
 
-  AccessByItk_2(rawMask, StartRegionGrowing, pickedMask, rawMask->GetGeometry());
+  AccessByItk_1(rawMask, StartRegionGrowing, pickedMask);
 
   mitk::MorphologicalOperations::FillHoles(pickedMask);
   mitk::MorphologicalOperations::Closing(pickedMask, 5, mitk::MorphologicalOperations::StructuralElementType::Ball);

@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 int main(int argc, char* argv[])
 {
   MITK_INFO << "Starting MITK_Forest Mini-App";
-  double startTime = time(0);
 
   //////////////////////////////////////////////////////////////////////////////
   // Read Console Input Parameter
@@ -83,7 +82,7 @@ int main(int argc, char* argv[])
     // General
     //////////////////////////////////////////////////////////////////////////////
     int currentRun = allConfig.IntValue("General","Run",0);
-    int doTraining = allConfig.IntValue("General","Do Training",1);
+    //int doTraining = allConfig.IntValue("General","Do Training",1);
     std::string forestPath = allConfig.Value("General","Forest Path");
     std::string trainingCollectionPath = allConfig.Value("General","Patient Collection");
     std::string testCollectionPath = allConfig.Value("General", "Patient Test Collection", trainingCollectionPath);
@@ -118,7 +117,7 @@ int main(int argc, char* argv[])
     std::string statisticShortFilePath = allConfig.Value("Evaluation", "Statistic short output file");
     std::string statisticShortFileLabel = allConfig.Value("Evaluation", "Index for short file");
     std::string statisticGoldStandard = allConfig.Value("Evaluation", "Gold Standard Name","GTV");
-    bool statisticWithHeader = allConfig.IntValue("Evaluation", "Write header in short file",0);
+    //bool statisticWithHeader = allConfig.IntValue("Evaluation", "Write header in short file",0);
     std::vector<std::string> labelGroupA = allConfig.Vector("LabelsA",0);
     std::vector<std::string> labelGroupB = allConfig.Vector("LabelsB",0);
 
@@ -133,7 +132,7 @@ int main(int argc, char* argv[])
     // Read Images
     //////////////////////////////////////////////////////////////////////////////
     std::vector<std::string> usedModalities;
-    for (int i = 0; i < modalities.size(); ++i)
+    for (std::size_t i = 0; i < modalities.size(); ++i)
     {
       usedModalities.push_back(modalities[i]);
     }
@@ -167,7 +166,7 @@ int main(int argc, char* argv[])
     MITK_INFO << "Convert Test data";
     auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(testCollection, modalities, testMask);
 
-    for (int i = 0; i < forestVector.size(); ++i)
+    for (std::size_t i = 0; i < forestVector.size(); ++i)
     {
       forest = dynamic_cast<mitk::VigraRandomForestClassifier*>(mitk::IOUtil::Load(forestVector[i])[0].GetPointer());
 
@@ -221,14 +220,13 @@ int main(int argc, char* argv[])
       stat.SetGoldName(statisticGoldStandard);
       stat.SetTestName(resultMask);
       stat.SetMaskName(testMask);
-      mitk::BinaryValueminusOneToIndexMapper* mapper = new mitk::BinaryValueminusOneToIndexMapper;
-      stat.SetGroundTruthValueToIndexMapper(mapper);
-      stat.SetTestValueToIndexMapper(mapper);
+      mitk::BinaryValueminusOneToIndexMapper mapper;
+      stat.SetGroundTruthValueToIndexMapper(&mapper);
+      stat.SetTestValueToIndexMapper(&mapper);
       stat.Update();
       //stat.Print(statisticFile,sstatisticFile,statisticWithHeader, statisticShortFileLabel);
       stat.Print(statisticFile, sstatisticFile, true, statisticShortFileLabel + "_"+std::to_string(i));
       statisticFile.close();
-      delete mapper;
 
       time(&now);
       seconds = std::difftime(now, lastTimePoint);

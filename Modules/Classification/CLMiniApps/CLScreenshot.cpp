@@ -55,7 +55,7 @@ void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string p
   renderWindow.GetRenderer()->SetDataStorage(ds);
 
   int numberOfSegmentations = 0;
-  bool isSegmentation;
+  bool isSegmentation = false;
   for (auto name : listOfOutputs)
   {
     mitk::Image::Pointer tmpImage = mitk::IOUtil::LoadImage(name);
@@ -148,10 +148,11 @@ int main(int argc, char* argv[])
   std::string version = "Version: 1.0";
   MITK_INFO << version;
 
-  int direction = 0;
+  //int direction = 0;
   if (parsedArgs.count("direction"))
   {
-    direction = mitk::cl::splitDouble(parsedArgs["direction"].ToString(), ';')[0];
+  MITK_INFO << "Warning: Option direction currently not supported";
+  //  direction = mitk::cl::splitDouble(parsedArgs["direction"].ToString(), ';')[0];
   }
 
   auto listOfFiles = mitk::cl::splitString(parsedArgs["image"].ToString(), ';');

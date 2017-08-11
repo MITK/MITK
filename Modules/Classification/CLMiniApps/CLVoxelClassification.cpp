@@ -450,14 +450,13 @@ int main(int argc, char* argv[])
     stat.SetGoldName(statisticGoldStandard);
     stat.SetTestName(resultMask);
     stat.SetMaskName(testMask);
-    mitk::BinaryValueminusOneToIndexMapper* mapper = new mitk::BinaryValueminusOneToIndexMapper;
-    stat.SetGroundTruthValueToIndexMapper(mapper);
-    stat.SetTestValueToIndexMapper(mapper);
+    mitk::BinaryValueminusOneToIndexMapper mapper;
+    stat.SetGroundTruthValueToIndexMapper(&mapper);
+    stat.SetTestValueToIndexMapper(&mapper);
     stat.Update();
     //stat.Print(statisticFile,sstatisticFile,statisticWithHeader, statisticShortFileLabel);
     stat.Print(statisticFile,sstatisticFile,true, statisticShortFileLabel);
     statisticFile.close();
-    delete mapper;
 
     time(&now);
     seconds =  std::difftime(now, lastTimePoint);

@@ -126,14 +126,14 @@ int main(int argc, char* argv[])
     {
       newMaskIter.Set(maskIter.Value());
       ++newMaskIter;
-      for (int i = 0; i < outputIteratorVector.size(); ++i)
+      for (std::size_t i = 0; i < outputIteratorVector.size(); ++i)
       {
         outputIteratorVector[i].Set(inputIteratorVector[i].Value());
         ++(outputIteratorVector[i]);
       }
     }
     ++maskIter;
-    for (int i = 0; i < inputIteratorVector.size(); ++i)
+    for (std::size_t i = 0; i < inputIteratorVector.size(); ++i)
     {
       ++(inputIteratorVector[i]);
     }
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
   }
 
   // Save the new images
-  for (int i = 0; i < outputIteratorVector.size(); ++i)
+  for (std::size_t i = 0; i < outputIteratorVector.size(); ++i)
   {
     std::stringstream s1; s1 << i; std::string number = s1.str();
     mitk::Image::Pointer mitkImage = mitk::Image::New();

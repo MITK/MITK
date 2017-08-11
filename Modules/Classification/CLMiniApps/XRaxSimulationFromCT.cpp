@@ -44,6 +44,9 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
 
   NewImageType::SpacingType newSpacing;
   auto spacing = itkImage->GetSpacing();
+  spacing[0] = itkImage->GetSpacing()[0];
+  spacing[1] = itkImage->GetSpacing()[1];
+  spacing[2] = itkImage->GetSpacing()[2];
 
   NewImageType::RegionType region1,region2,region3,region1m,region2m,region3m;
   NewImageType::IndexType start;
@@ -114,7 +117,7 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
       for (unsigned int z = 0; z < mask1->GetDimensions()[2]; ++z)
       {
         NewImageType::IndexType newIndex;
-        ImageType::IndexType index;
+        typename ImageType::IndexType index;
         index[0] = x; index[1] = y; index[2] = z;
         double pixel = itkImage->GetPixel(index)+1024;
         pixel = pixel / 1000.0;

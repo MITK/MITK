@@ -564,7 +564,6 @@ template<typename TPixel, unsigned int VImageDimension>
 void mitk::CLUtil::itkLocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, int size, int bins)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<double, VImageDimension> FloatImageType;
   typedef itk::MultiHistogramFilter <ImageType, ImageType> MultiHistogramType;
 
   typename MultiHistogramType::Pointer filter = MultiHistogramType::New();

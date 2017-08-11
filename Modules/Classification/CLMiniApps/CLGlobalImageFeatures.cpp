@@ -70,7 +70,7 @@ ResampleImage(itk::Image<TPixel, VImageDimension>* itkImage, float resolution, m
   auto spacing = itkImage->GetSpacing();
   auto size = itkImage->GetLargestPossibleRegion().GetSize();
 
-  for (int i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     size[i] = size[i] / (1.0*resolution)*(1.0*spacing[i])+1.0;
   }
@@ -193,7 +193,7 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
   spacing2D[0] = itkFloat->GetSpacing()[idxA];
   spacing2D[1] = itkFloat->GetSpacing()[idxB];
 
-  for (int i = 0; i < imageSize[idxC]; ++i)
+  for (unsigned int i = 0; i < imageSize[idxC]; ++i)
   {
     FloatImage2DType::RegionType region;
     FloatImage2DType::IndexType start;
@@ -218,9 +218,9 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
 
     unsigned long voxelsInMask = 0;
 
-    for (int a = 0; a < imageSize[idxA]; ++a)
+    for (unsigned int a = 0; a < imageSize[idxA]; ++a)
     {
-      for (int b = 0; b < imageSize[idxB]; ++b)
+      for (unsigned int b = 0; b < imageSize[idxB]; ++b)
       {
         index3D[idxA] = a;
         index3D[idxB] = b;
@@ -374,7 +374,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  bool savePNGofSlices = true;
+  //bool savePNGofSlices = true;
   std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
 
   std::string version = "Version: 1.20";
@@ -484,7 +484,7 @@ int main(int argc, char* argv[])
 
   bool sliceWise = false;
   int sliceDirection = 0;
-  int currentSlice = 0;
+  unsigned int currentSlice = 0;
   bool imageToProcess = true;
 
   std::vector<mitk::Image::Pointer> floatVector;

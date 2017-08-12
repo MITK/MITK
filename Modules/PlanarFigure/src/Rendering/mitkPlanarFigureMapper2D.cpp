@@ -153,7 +153,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // draw name near the anchor point (point located on the right)
   std::string label = node->GetName();
 
-  std::string annotation = planarFigure->EvaluateAnnotation();
+  std::string annotation = planarFigure->EvaluateAnnotationWithTimeStep(renderer);
   if (!annotation.empty()) {
     label = annotation;
   }

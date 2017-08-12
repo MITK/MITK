@@ -435,6 +435,10 @@ std::string mitk::PlanarFigure::EvaluateAnnotation()
   return "";
 }
 
+std::string mitk::PlanarFigure::EvaluateAnnotationWithTimeStep(mitk::BaseRenderer* renderer)
+{
+  return EvaluateAnnotation();
+}
 
 void mitk::PlanarFigure::EvaluateFeatures()
 {

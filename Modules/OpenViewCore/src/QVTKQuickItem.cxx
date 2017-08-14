@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-#include <vtkFrameBufferObject2.h>
+#include <vtkOpenGLFrameBufferObject.h>
 
 #include "vtkInternalOpenGLRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"

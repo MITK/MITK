@@ -175,8 +175,8 @@ SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const DataNo
   }
 
   SemanticTypes::Lesion representedLesion;
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
-  SemanticTypes::ID segmentationID = NodeIdentifier::GetIDFromData(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
+  SemanticTypes::ID segmentationID = DICOMHelper::GetIDFromData(segmentationNode);
   representedLesion = m_RelationStorage->GetRepresentedLesion(caseID, segmentationID);
 
   if (representedLesion.UID.empty())
@@ -377,8 +377,8 @@ SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData(const
   }
 
   SemanticTypes::ControlPoint controlPoint;
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(dataNode);
-  SemanticTypes::ID dataNodeID = NodeIdentifier::GetIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(dataNode);
+  SemanticTypes::ID dataNodeID = DICOMHelper::GetIDFromData(dataNode);
   return m_RelationStorage->GetControlPointOfData(caseID, dataNodeID);
 }
 
@@ -472,8 +472,8 @@ SemanticTypes::InformationType mitk::SemanticRelations::GetInformationTypeOfImag
   }
 
   SemanticTypes::InformationType informationType;
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(imageNode);
-  SemanticTypes::ID imageID = NodeIdentifier::GetIDFromData(imageNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(imageNode);
+  SemanticTypes::ID imageID = DICOMHelper::GetIDFromData(imageNode);
   return m_RelationStorage->GetInformationTypeOfImage(caseID, imageID);
 }
 
@@ -556,7 +556,7 @@ void mitk::SemanticRelations::AddLesionAndLinkData(const DataNode* segmentationN
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
   try
   {
     AddLesion(caseID, lesion);
@@ -584,10 +584,10 @@ void mitk::SemanticRelations::LinkSegmentationToLesion(const DataNode* segmentat
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
   if (InstanceExists(caseID, lesion))
   {
-    SemanticTypes::ID segmentationID = NodeIdentifier::GetIDFromData(segmentationNode);
+    SemanticTypes::ID segmentationID = DICOMHelper::GetIDFromData(segmentationNode);
     m_RelationStorage->LinkSegmentationToLesion(caseID, segmentationID, lesion);
   }
   else
@@ -624,7 +624,7 @@ void mitk::SemanticRelations::AddControlPointAndLinkData(const DataNode* dataNod
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(dataNode);
   if (InstanceExists(caseID, controlPoint))
   {
     mitkThrowException(SemanticRelationException) << "The control point " << controlPoint.UID << " to add already exists for the given case.";
@@ -668,7 +668,7 @@ void mitk::SemanticRelations::OverwriteControlPointAndLinkData(const DataNode* d
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(dataNode);
 
   std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
   const auto existingControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(),
@@ -728,10 +728,10 @@ void mitk::SemanticRelations::LinkDataToControlPoint(const DataNode* dataNode, c
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(dataNode);
   if (InstanceExists(caseID, controlPoint))
   {
-    SemanticTypes::ID dataID = NodeIdentifier::GetIDFromData(dataNode);
+    SemanticTypes::ID dataID = DICOMHelper::GetIDFromData(dataNode);
     bool insideControlPoint = ControlPointManager::InsideControlPoint(dataNode, controlPoint);
     if (insideControlPoint)
     {
@@ -756,10 +756,10 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(dataNode);
   if (InstanceExists(caseID, controlPoint))
   {
-    SemanticTypes::ID dataID = NodeIdentifier::GetIDFromData(dataNode);
+    SemanticTypes::ID dataID = DICOMHelper::GetIDFromData(dataNode);
     m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
 
     try
@@ -802,8 +802,8 @@ void mitk::SemanticRelations::AddInformationTypeToImage(const DataNode* imageNod
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(imageNode);
-  SemanticTypes::ID imageID = NodeIdentifier::GetIDFromData(imageNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(imageNode);
+  SemanticTypes::ID imageID = DICOMHelper::GetIDFromData(imageNode);
   m_RelationStorage->AddInformationTypeToImage(caseID, imageID, informationType);
 }
 
@@ -815,8 +815,8 @@ void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* ima
     return;
   }
 
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(imageNode);
-  SemanticTypes::ID imageID = NodeIdentifier::GetIDFromData(imageNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(imageNode);
+  SemanticTypes::ID imageID = DICOMHelper::GetIDFromData(imageNode);
   m_RelationStorage->RemoveInformationTypeFromImage(caseID, imageID);
 
   std::vector<std::string> allImageIDsVectorValue = m_RelationStorage->GetAllImageIDsOfCase(caseID);

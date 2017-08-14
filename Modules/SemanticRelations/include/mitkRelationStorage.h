@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKRELATIONSTORAGE_H
 
 // semantic relations module
-#include "mitkNodeIdentifier.h"
+#include "mitkDICOMHelper.h"
 #include "mitkSemanticTypes.h"
 
 // mitk core

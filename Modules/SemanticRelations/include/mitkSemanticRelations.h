@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include "mitkControlPointManager.h"
-#include "mitkNodeIdentifier.h"
+#include "mitkDICOMHelper.h"
 #include "mitkRelationStorage.h"
 #include "mitkSemanticTypes.h"
 

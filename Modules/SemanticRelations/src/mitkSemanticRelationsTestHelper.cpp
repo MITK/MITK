@@ -36,8 +36,8 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(dataNode);
-  SemanticTypes::ID nodeID = NodeIdentifier::GetIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(dataNode);
+  SemanticTypes::ID nodeID = DICOMHelper::GetIDFromData(dataNode);
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->AddCase(caseID);
@@ -115,9 +115,9 @@ void SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* 
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = NodeIdentifier::GetIDFromData(segmentationNode);
-  SemanticTypes::ID parentNodeID = NodeIdentifier::GetIDFromData(parentNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
+  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromData(segmentationNode);
+  SemanticTypes::ID parentNodeID = DICOMHelper::GetIDFromData(parentNode);
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->AddCase(caseID);
@@ -137,8 +137,8 @@ void SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNod
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = NodeIdentifier::GetIDFromData(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
+  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromData(segmentationNode);
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->RemoveSegmentation(caseID, segmentationNodeID);

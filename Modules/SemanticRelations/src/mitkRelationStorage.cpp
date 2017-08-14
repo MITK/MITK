@@ -178,8 +178,8 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   {
     DataNode* segmentationNode = it->Value();
     // find the corresponding segmentation node for the given segmentation ID
-    std::string nodeCaseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
-    std::string nodeSegmentationID = NodeIdentifier::GetIDFromData(segmentationNode);
+    std::string nodeCaseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
+    std::string nodeSegmentationID = DICOMHelper::GetIDFromData(segmentationNode);
     if (nodeCaseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), nodeSegmentationID) != allSegmentationIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector
@@ -488,8 +488,8 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllImagesOfCase(c
   {
     DataNode* imageNode = it->Value();
     // find the corresponding image node for the given segmentation ID
-    std::string nodeCaseID = NodeIdentifier::GetCaseIDFromData(imageNode);
-    std::string nodeImageID = NodeIdentifier::GetIDFromData(imageNode);
+    std::string nodeCaseID = DICOMHelper::GetCaseIDFromData(imageNode);
+    std::string nodeImageID = DICOMHelper::GetIDFromData(imageNode);
     if (nodeCaseID == caseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), nodeImageID) != allImageIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector

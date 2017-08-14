@@ -105,7 +105,7 @@ bool mitk::OclFilter::Initialize()
     }
     catch(const mitk::Exception& e)
     {
-      MITK_INFO << "Program not stored in resource manager, compiling.";
+      MITK_INFO << "Program not stored in resource manager, compiling. " << e;
       this->CompileSource();
     }
   }

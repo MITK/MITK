@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // c++
 #include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <string>
 #include <tuple>
 
 namespace SemanticTypes
@@ -51,6 +54,10 @@ namespace SemanticTypes
     {
       return (!operator<(other) && !operator>(other));
     }
+    bool operator!=(const Date& other) const
+    {
+      return (operator<(other) || operator>(other));
+    }
     bool operator<=(const Date& other) const
     {
       return (operator<(other) || operator==(other));
@@ -75,6 +82,25 @@ namespace SemanticTypes
     bool operator<(const ControlPoint& other) const
     {
       return startPoint < other.startPoint;
+    }
+    bool operator!=(const ControlPoint& other) const
+    {
+      return (startPoint != other.startPoint) || (endPoint != other.endPoint);
+    }
+
+    std::string AsString() const
+    {
+      std::stringstream dateAsString;
+      dateAsString << std::to_string(startPoint.year) << "-"
+                   << std::setfill('0') << std::setw(2) << std::to_string(startPoint.month) << "-"
+                   << std::setfill('0') << std::setw(2) << std::to_string(startPoint.day);
+      if (startPoint != endPoint)
+      {
+        dateAsString << " to \n " << std::to_string(endPoint.year) << "-"
+                     << std::setfill('0') << std::setw(2) << std::to_string(endPoint.month) << "-"
+                     << std::setfill('0') << std::setw(2) << std::to_string(endPoint.day);
+      }
+      return dateAsString.str();
     }
   };
 

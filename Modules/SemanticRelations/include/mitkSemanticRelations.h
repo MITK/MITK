@@ -183,6 +183,9 @@ namespace mitk
     */
     std::vector<DataNode::Pointer> GetAllDataOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
 
+
+    std::vector<mitk::DataNode::Pointer> GetFilteredData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
+
     /*
     * @brief  Check if the given control point instance exists.
     *         This function can be used before calling 'GetAllDataOfControlPoint' in order to avoid a possible exception.

@@ -497,6 +497,43 @@ std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllDataOfInform
   }
 }
 
+std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetFilteredData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const
+{
+  if (InstanceExists(caseID, controlPoint))
+  {
+    if (InstanceExists(caseID, informationType))
+    {
+      // control point exists, retrieve all images from the storage
+      std::vector<DataNode::Pointer> allDataOfControlPoint = m_RelationStorage->GetAllImagesOfCase(caseID);
+      // information type exists, retrieve all images from the storage
+      std::vector<DataNode::Pointer> allDataOfInformationType = m_RelationStorage->GetAllImagesOfCase(caseID);
+
+      // concatenate the two resulting vectors
+      std::vector<DataNode::Pointer> allFilteredData = allDataOfControlPoint;
+      allFilteredData.reserve(allDataOfControlPoint.size() + allDataOfInformationType.size());
+      allFilteredData.insert(allFilteredData.end(), allDataOfInformationType.begin(), allDataOfInformationType.end());
+
+      // filter all images to remove the ones with a different control point and information type using a lambda function
+      allFilteredData.erase(std::remove_if(allFilteredData.begin(), allFilteredData.end(),
+        [&controlPoint, &informationType, this](DataNode::Pointer imageNode) {
+        return (informationType != GetInformationTypeOfImage(imageNode)) || (controlPoint != GetControlPointOfData(imageNode)); }),
+        allFilteredData.end());
+
+      std::sort(allFilteredData.begin(), allFilteredData.end());
+      allFilteredData.erase(std::unique(allFilteredData.begin(), allFilteredData.end()), allFilteredData.end());
+      return allFilteredData;
+    }
+    else
+    {
+      mitkThrowException(SemanticRelationException) << "Could not find an existing information type for the given caseID " << caseID << " and information type " << informationType;
+    }
+  }
+  else
+  {
+    mitkThrowException(SemanticRelationException) << "Could not find an existing control point for the given caseID " << caseID << " and control point " << controlPoint.UID;
+  }
+}
+
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
 {
   std::vector<SemanticTypes::InformationType> allInformationTypes = GetAllInformationTypesOfCase(caseID);

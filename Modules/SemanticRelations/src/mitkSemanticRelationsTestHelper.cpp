@@ -43,6 +43,7 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
   relationStorage->AddCase(caseID);
   relationStorage->AddImage(caseID, nodeID);
 
+  semanticRelationsInstance.AddInformationTypeToImage(dataNode, "unspecified");
   // find the correct control point for this image
   std::vector<SemanticTypes::ControlPoint> allControlPoints = relationStorage->GetAllControlPointsOfCase(caseID);
   if (allControlPoints.empty())

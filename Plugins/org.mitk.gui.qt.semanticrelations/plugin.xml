@@ -5,7 +5,7 @@
     <view id="org.mitk.views.semanticrelations"
           name="Semantic Relations"
           class="QmitkSemanticRelationsView"
-					icon="resources/SemanticRelations_48.png" />
+		  icon="resources/SemanticRelations_48.png" />
   </extension>
 
 </plugin>

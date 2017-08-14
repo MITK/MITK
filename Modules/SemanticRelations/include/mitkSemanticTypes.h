@@ -87,6 +87,10 @@ namespace SemanticTypes
     {
       return (startPoint != other.startPoint) || (endPoint != other.endPoint);
     }
+    bool operator==(const ControlPoint& other) const
+    {
+      return (startPoint == other.startPoint) && (endPoint == other.endPoint);
+    }
 
     std::string AsString() const
     {

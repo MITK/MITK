@@ -46,6 +46,8 @@ namespace ControlPointManager
 
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindControlPoint(const mitk::DataNode* datanode, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
 
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindControlPoint(const std::string& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
+
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint ExtendClosestControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
 
   void ExtendControlPoint(SemanticTypes::ControlPoint& controlPoint, SemanticTypes::Date date);

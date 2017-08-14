@@ -189,6 +189,20 @@ SemanticTypes::ControlPoint ControlPointManager::FindControlPoint(const mitk::Da
   return SemanticTypes::ControlPoint();
 }
 
+SemanticTypes::ControlPoint ControlPointManager::FindControlPoint(const std::string& controlPointString, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+{
+  for (const auto& controlPoint : allControlPoints)
+  {
+    if (controlPointString == controlPoint.AsString())
+    {
+      return controlPoint;
+    }
+  }
+
+  return SemanticTypes::ControlPoint();
+}
+
+
 SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   SemanticTypes::Date dateFromDataNode = GetDateFromDataNode(dataNode);

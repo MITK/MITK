@@ -19,18 +19,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCustomVariants.h"
 
-// semantic relations module
-#include <mitkSemanticRelationsTestHelper.h>
+// semantic relations (UI) module
 #include <mitkDICOMHelper.h>
+#include <mitkSemanticRelationsTestHelper.h>
+#include "mitkSemanticRelationException.h"
 #include <mitkSemanticTypes.h>
+#include <mitkUIDGeneratorBoost.h>
+#include <QmitkControlPointDialog.h>
 
 // blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
 // qt
-#include <QInputDialog.>
-#include <qcompleter.h>
+#include <QInputDialog>
+#include <QMessageBox>
 
 // mitk core
 #include <mitkBaseRenderer.h>
@@ -92,7 +95,7 @@ void QmitkSemanticRelationsView::NodeAdded(const mitk::DataNode* node)
 
   // not a helper object; add the image and generate a pixmap of the DICOM image
   SemanticRelationsTestHelper::AddImageInstance(node, *m_SemanticRelations);
-  const SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(node);
+  const SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(node);
   int foundIndex = m_Controls.caseIDComboBox->findText(QString::fromStdString(caseID));
   if (-1 == foundIndex)
   {
@@ -115,7 +118,7 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
 
   // not a helper object; remove the image and the pixmap
   SemanticTypes::ControlPoint controlPoint = m_SemanticRelations->GetControlPointOfData(node);
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(node);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(node);
   if (m_SemanticRelations->InstanceExists(caseID, controlPoint))
   {
     m_SemanticRelations->UnlinkDataFromControlPoint(node, controlPoint);
@@ -181,35 +184,103 @@ void QmitkSemanticRelationsView::OnContextMenuSetInformationType()
 
 void QmitkSemanticRelationsView::OnContextMenuSetControlPoint()
 {
+  QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.patientDataTableView);
+  inputDialog->setWindowTitle("Set control point");
+  inputDialog->SetCurrentDate(DICOMHelper::GetDateFromDataNode(m_SelectedDataNode));
+
+  int dialogReturnValue = inputDialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  // store the current control point to relink it, if anything goes wrong
+  SemanticTypes::ControlPoint originalControlPoint = m_SemanticRelations->GetControlPointOfData(m_SelectedDataNode);
+  // unlink the data, that is about to receive a new date
+  // this is needed in order to not extend a single control point, to which the selected node is currently linked
+  m_SemanticRelations->UnlinkDataFromControlPoint(m_SelectedDataNode, originalControlPoint);
+
+  const QDate& userSelectedDate = inputDialog->GetCurrentDate();
+  SemanticTypes::Date date;
+  date.UID = UIDGeneratorBoost::GenerateUID();
+  date.year = userSelectedDate.year();
+  date.month = userSelectedDate.month();
+  date.day = userSelectedDate.day();
 
   std::vector<SemanticTypes::ControlPoint> allControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_SemanticRelationsDataModel->GetCurrentCaseID());
-
-  QInputDialog* inputDialog = new QInputDialog(m_Controls.patientDataTableView);
-  inputDialog->setWindowTitle("Set control point of selected node");
-  inputDialog->setLabelText("Control point:");
-
-  QLineEdit* lineEdit = new QLineEdit(inputDialog);
-  QStringList completionList;
-  for (const auto& controlPoint : allControlPoints)
+  if (!allControlPoints.empty())
   {
-    completionList << QString::fromStdString(controlPoint.AsString());
+    // need to check if an already existing control point fits/contains the user control point
+    SemanticTypes::ControlPoint fittingControlPoint = ControlPointManager::FindFittingControlPoint(date, allControlPoints);
+    if (!fittingControlPoint.UID.empty())
+    {
+      try
+      {
+        // found a fitting control point
+        m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, fittingControlPoint, false);
+        m_SemanticRelationsDataModel->DataChanged();
+      }
+      catch (const mitk::SemanticRelationException&)
+      {
+        MITK_INFO << "The data can not be linked to the fitting control point.";
+        try
+        {
+          m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
+        }
+        catch (const mitk::SemanticRelationException&)
+        {
+          MITK_INFO << "The data can not be linked to its original control point. Inconsistency in the semantic relations storage assumed.";
+        }
+      }
+      return;
+    }
+
+    // did not find a fitting control point, although some control points already exist
+    // need to check if a close control point can be found and extended
+    SemanticTypes::ControlPoint extendedControlPoint = ControlPointManager::ExtendClosestControlPoint(date, allControlPoints);
+    if (!extendedControlPoint.UID.empty())
+    {
+      try
+      {
+        // found and extended a close control point
+        m_SemanticRelations->OverwriteControlPointAndLinkData(m_SelectedDataNode, extendedControlPoint, false);
+        m_SemanticRelationsDataModel->DataChanged();
+      }
+      catch (const mitk::SemanticRelationException&)
+      {
+        MITK_INFO << "The extended control point can not be overwritten and the data can not be linked to this control point.";
+        try
+        {
+          m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
+        }
+        catch (const mitk::SemanticRelationException&)
+        {
+          MITK_INFO << "The data can not be linked to its original control point. Inconsistency in the semantic relations storage assumed.";
+        }
+      }
+      return;
+    }
   }
-  QCompleter* completer;
-  completer = new QCompleter(completionList);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  lineEdit->setCompleter(completer);
 
-  inputDialog->exec();
-  /*
-  bool ok = false;
-  QString text = QInputDialog::getText(m_Controls.patientDataTableView, tr("Set control point of selected node"), tr("Control point:"), QLineEdit::Normal, "", &ok);
-  if (ok && !text.isEmpty())
+  // generate a control point from the user-given date
+  SemanticTypes::ControlPoint controlPointFromUserDate = ControlPointManager::GenerateControlPoint(date);
+  try
   {
-    m_SemanticRelations->UnlinkDataFromControlPoint(m_SelectedDataNode, m_SemanticRelations->GetControlPointOfData(m_SemanticRelationsDataModel->get));
-    //m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, text.toStdString());
+    m_SemanticRelations->AddControlPointAndLinkData(m_SelectedDataNode, controlPointFromUserDate, false);
     m_SemanticRelationsDataModel->DataChanged();
   }
-  */
+  catch (const mitk::SemanticRelationException&)
+  {
+    MITK_INFO << "The control point can not be added and the data can not be linked to this control point.";
+    try
+    {
+      m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
+    }
+    catch (const mitk::SemanticRelationException&)
+    {
+      MITK_INFO << "The data can not be linked to its original control point. Inconsistency in the semantic relations storage assumed.";
+    }
+  }
 }
 
 void QmitkSemanticRelationsView::OnTableViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)

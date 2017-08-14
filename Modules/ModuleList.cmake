@@ -26,7 +26,7 @@ set(mitk_modules
   Gizmo
   GraphAlgorithms
   Multilabel
-  SemanticRelations
+
   ImageStatistics
   ContourModel
   SurfaceInterpolation
@@ -38,6 +38,8 @@ set(mitk_modules
   C3js
   QmlItems
   SegmentationUI
+  SemanticRelations
+  SemanticRelationsUI
   DiffusionImaging
   GPGPU
   OpenIGTLink

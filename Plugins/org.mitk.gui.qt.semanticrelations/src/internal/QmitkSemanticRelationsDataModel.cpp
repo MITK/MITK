@@ -97,7 +97,7 @@ QVariant QmitkSemanticRelationsDataModel::data(const QModelIndex &index, int rol
   }
   else if (Qt::DecorationRole == role)
   {
-    auto it = m_PixmapMap.find(DICOMHelper::GetIDFromData(dataNode));
+    auto it = m_PixmapMap.find(DICOMHelper::GetIDFromDataNode(dataNode));
     if (it != m_PixmapMap.end())
     {
       return QVariant(it->second);
@@ -114,7 +114,7 @@ QVariant QmitkSemanticRelationsDataModel::headerData(int section, Qt::Orientatio
     {
       SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(section);
       // generate a string from the control point
-      std::string currentControlPointAsString = currentControlPoint.AsString();
+      std::string currentControlPointAsString = ControlPointManager::GetControlPointAsString(currentControlPoint);
       return QVariant(QString::fromStdString(currentControlPointAsString));
     }
   }
@@ -166,7 +166,7 @@ void QmitkSemanticRelationsDataModel::SetCurrentCaseID(const SemanticTypes::Case
 
 void QmitkSemanticRelationsDataModel::SetPixmapOfNode(const mitk::DataNode* dataNode, const QPixmap& pixmapFromImage)
 {
-  SemanticTypes::ID nodeID = DICOMHelper::GetIDFromData(dataNode);
+  SemanticTypes::ID nodeID = DICOMHelper::GetIDFromDataNode(dataNode);
   m_PixmapMap.insert(std::make_pair(nodeID, pixmapFromImage.scaled(120, 120, Qt::IgnoreAspectRatio)));
 }
 

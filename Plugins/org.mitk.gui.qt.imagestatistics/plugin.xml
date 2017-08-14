@@ -14,13 +14,6 @@
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword label="Planar Figure" id="org.mitk.views.measurement.Keyword"/>
-    <keyword label="Measurement" id="org.mitk.views.measurement.Keyword"/>
-    <keyword label="Circle" id="org.mitk.views.measurement.Keyword"/>
-    <keyword label="Line" id="org.mitk.views.measurement.Keyword"/>
-    <keyword label="Length" id="org.mitk.views.measurement.Keyword"/>
-    <keyword label="Area" id="org.mitk.views.measurement.Keyword"/>
-    
     <keyword label="Mean" id="org.mitk.views.imagestatistics.Keyword"/>
     <keyword label="Statistic" id="org.mitk.views.imagestatistics.Keyword"/>
     <keyword label="Grey Value" id="org.mitk.views.imagestatistics.Keyword"/>

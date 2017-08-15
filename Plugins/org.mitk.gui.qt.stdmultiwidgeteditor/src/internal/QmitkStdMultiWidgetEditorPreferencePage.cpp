@@ -63,8 +63,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   QObject::connect( m_Ui->m_RenderWindowChooser, SIGNAL(activated(int) )
                     , this, SLOT( OnWidgetComboBoxChanged(int) ) );
-  QObject::connect( m_Ui->m_RenderWindowDecorationText, SIGNAL(textChanged(QString) )
-                    , this, SLOT( AnnotationTextChanged(QString) ) );
 
   this->Update();
 }
@@ -84,11 +82,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::PerformCancel()
 
 bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
 {
-  m_Preferences->Put("widget1 corner annotation", m_WidgetAnnotation[0]);
-  m_Preferences->Put("widget2 corner annotation", m_WidgetAnnotation[1]);
-  m_Preferences->Put("widget3 corner annotation", m_WidgetAnnotation[2]);
-  m_Preferences->Put("widget4 corner annotation", m_WidgetAnnotation[3]);
-
   m_Preferences->Put("widget1 decoration color", m_WidgetDecorationColor[0]);
   m_Preferences->Put("widget2 decoration color", m_WidgetDecorationColor[1]);
   m_Preferences->Put("widget3 decoration color", m_WidgetDecorationColor[2]);
@@ -136,13 +129,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_WidgetDecorationColor[2] = m_Preferences->Get("widget3 decoration color", "#0000FF");
   m_WidgetDecorationColor[3] = m_Preferences->Get("widget4 decoration color", "#FFFF00");
 
-  //annotation text
-  m_WidgetAnnotation[0] = m_Preferences->Get("widget1 corner annotation", "Axial");
-  m_WidgetAnnotation[1] = m_Preferences->Get("widget2 corner annotation", "Sagittal");
-  m_WidgetAnnotation[2] = m_Preferences->Get("widget3 corner annotation", "Coronal");
-  m_WidgetAnnotation[3] = m_Preferences->Get("widget4 corner annotation", "3D");
-
-
   //Ui stuff
   int index = m_Ui->m_RenderWindowChooser->currentIndex();
   QColor firstBackgroundColor(m_WidgetBackgroundColor1[index]);
@@ -152,8 +138,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   this->SetStyleSheetToColorChooserButton(firstBackgroundColor, m_Ui->m_ColorButton1);
   this->SetStyleSheetToColorChooserButton(secondBackgroundColor, m_Ui->m_ColorButton2);
   this->SetStyleSheetToColorChooserButton(widgetColor, m_Ui->m_RenderWindowDecorationColor);
-
-  m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[index]);
 
   m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and panning", true));
   m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
@@ -226,17 +210,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::SetStyleSheetToColorChooserButton(
   button->setStyleSheet(styleSheet);
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::AnnotationTextChanged(QString text)
-{
-  unsigned int widgetIndex = m_Ui->m_RenderWindowChooser->currentIndex();
-  if( widgetIndex > 3)
-  {
-    MITK_INFO << "Selected index for unknown widget.";
-    return;
-  }
-  m_WidgetAnnotation[widgetIndex] = text;
-}
-
 void QmitkStdMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
   m_Preferences->Clear();
@@ -256,7 +229,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
   this->SetStyleSheetToColorChooserButton(widgetColor, m_Ui->m_RenderWindowDecorationColor);
   this->SetStyleSheetToColorChooserButton(gradientBackground1, m_Ui->m_ColorButton1);
   this->SetStyleSheetToColorChooserButton(gradientBackground2, m_Ui->m_ColorButton2);
-  m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[i]);
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)

@@ -436,7 +436,8 @@ QString QmitkIOUtil::Save(const mitk::BaseData* data, const QString& defaultBase
   dataVector.push_back(data);
   QStringList defaultBaseNames;
   defaultBaseNames.push_back(defaultBaseName);
-  return Save(dataVector, defaultBaseNames, defaultPath, parent).back();
+  QStringList savedPath = Save(dataVector, defaultBaseNames, defaultPath, parent);
+  return savedPath.isEmpty() ? "" : savedPath.back();
 }
 
 QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
@@ -449,6 +450,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
 
   std::vector<SaveInfo> saveInfos;
 
+  bool isUserCanceled = false;
   int counter = 0;
   for(std::vector<const mitk::BaseData*>::const_iterator dataIter = data.begin(),
       dataIterEnd = data.end(); dataIter != dataIterEnd; ++dataIter, ++counter)
@@ -499,6 +501,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     {
       // We stop asking for further file names, but we still save the
       // data where the user already confirmed the save dialog.
+      isUserCanceled = true;
       break;
     }
 
@@ -606,7 +609,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
     saveInfos.push_back(saveInfo);
   }
 
-  if (!saveInfos.empty())
+  if (!saveInfos.empty() && !isUserCanceled)
   {
     Impl::WriterOptionsDialogFunctor optionsCallback;
     std::string errMsg = Save(saveInfos, &optionsCallback);

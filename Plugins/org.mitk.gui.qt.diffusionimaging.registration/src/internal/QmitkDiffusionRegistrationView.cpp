@@ -457,7 +457,7 @@ void QmitkDiffusionRegistrationView::StartBatch()
     dirIterator.next();
 
     list.append(dirIterator.fileInfo().absoluteFilePath());
-    std::cout << dirIterator.fileInfo().absoluteFilePath().toStdString() << endl;
+    std::cout << dirIterator.fileInfo().absoluteFilePath().toStdString() << std::endl;
     m_BatchList = list;
 
     m_IsBatch = true;

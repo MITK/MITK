@@ -54,6 +54,7 @@ public:
   mitkNewMacro1Param(Self, mitk::USDiPhASDevice*);
   itkCloneMacro(Self);
 
+  typedef itk::Image< float, 3 > itkFloatImageType;
   typedef mitk::USDiPhASDeviceCustomControls::DataType DataType;
   typedef mitk::USDiPhASDeviceCustomControls::SavingSettings SavingSettings;
 
@@ -133,6 +134,7 @@ protected:
   mitk::Vector3D                        m_ImageSpacing;
 
   mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer image, bool useLogFilter = false);
+  mitk::Image::Pointer CutOffTop(mitk::Image::Pointer image, int cutOffSize = 165);
   mitk::Image::Pointer ResampleOutputVertical(mitk::Image::Pointer image, float verticalSpacing = 0.1);
 
   mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);

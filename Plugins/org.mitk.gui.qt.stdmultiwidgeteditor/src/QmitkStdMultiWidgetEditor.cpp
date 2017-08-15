@@ -53,7 +53,6 @@ public:
   QString m_WidgetBackgroundColor1[4];
   QString m_WidgetBackgroundColor2[4];
   QString m_WidgetDecorationColor[4];
-  QString m_WidgetAnnotation[4];
   bool m_MenuWidgetsEnabled;
   QScopedPointer<berry::IPartListener> m_PartListener;
 
@@ -399,11 +398,6 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   d->m_StdMultiWidget->SetDecorationColor(2, colorDecorationWidget3);
   d->m_StdMultiWidget->SetDecorationColor(3, colorDecorationWidget4);
 
-  for(unsigned int i = 0; i < 4; ++i)
-  {
-    d->m_StdMultiWidget->SetDecorationProperties(d->m_WidgetAnnotation[i].toStdString(),
-                                             HexColorToMitkColor(d->m_WidgetDecorationColor[i]), i);
-  }
   //The crosshair gap
   int crosshairgapsize = prefs->GetInt("crosshair gap size", 32);
   d->m_StdMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
@@ -484,7 +478,6 @@ void QmitkStdMultiWidgetEditor::FillMembersWithCurrentDecorations()
     d->m_WidgetDecorationColor[i] = MitkColorToHex(d->m_StdMultiWidget->GetDecorationColor(i));
     d->m_WidgetBackgroundColor1[i] = MitkColorToHex(d->m_StdMultiWidget->GetGradientColors(i).first);
     d->m_WidgetBackgroundColor2[i] = MitkColorToHex(d->m_StdMultiWidget->GetGradientColors(i).second);
-    d->m_WidgetAnnotation[i] = QString::fromStdString(d->m_StdMultiWidget->GetCornerAnnotationText(i));
   }
 }
 
@@ -504,11 +497,6 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
   d->m_WidgetDecorationColor[1] = preferences->Get("widget2 decoration color", d->m_WidgetDecorationColor[1]);
   d->m_WidgetDecorationColor[2] = preferences->Get("widget3 decoration color", d->m_WidgetDecorationColor[2]);
   d->m_WidgetDecorationColor[3] = preferences->Get("widget4 decoration color", d->m_WidgetDecorationColor[3]);
-
-  d->m_WidgetAnnotation[0] = preferences->Get("widget1 corner annotation", d->m_WidgetAnnotation[0]);
-  d->m_WidgetAnnotation[1] = preferences->Get("widget2 corner annotation", d->m_WidgetAnnotation[1]);
-  d->m_WidgetAnnotation[2] = preferences->Get("widget3 corner annotation", d->m_WidgetAnnotation[2]);
-  d->m_WidgetAnnotation[3] = preferences->Get("widget4 corner annotation", d->m_WidgetAnnotation[3]);
 }
 
 void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences * preferences)
@@ -517,10 +505,6 @@ void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences *
   this->GetPreferenceDecorations(preferences); //overwrite if preferences are defined
 
   //create new preferences
-  preferences->Put("widget1 corner annotation", d->m_WidgetAnnotation[0]);
-  preferences->Put("widget2 corner annotation", d->m_WidgetAnnotation[1]);
-  preferences->Put("widget3 corner annotation", d->m_WidgetAnnotation[2]);
-  preferences->Put("widget4 corner annotation", d->m_WidgetAnnotation[3]);
 
   preferences->Put("widget1 decoration color", d->m_WidgetDecorationColor[0]);
   preferences->Put("widget2 decoration color", d->m_WidgetDecorationColor[1]);

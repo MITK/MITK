@@ -35,12 +35,17 @@ bool mitk::DiffusionHeaderGEDICOMFileReader
 
   // start with b-value
   success = RevealBinaryTag( ge_bvalue_tag, gdcmReader.GetFile().GetDataSet(), ge_tagvalue_string );
-  // b value stored in the first bytes
-  // typical example:  "1000\8\0\0" for bvalue=1000
-  //                   "40\8\0\0" for bvalue=40
-  int slashPos = ge_tagvalue_string.find('\\');
-  std::string bval_string = ge_tagvalue_string.substr(0, slashPos);
-  header_info.b_value = std::stoi(bval_string);
+
+  if (success) {
+    // b value stored in the first bytes
+    // typical example:  "1000\8\0\0" for bvalue=1000
+    //                   "40\8\0\0" for bvalue=40
+    int slashPos = ge_tagvalue_string.find('\\');
+    std::string bval_string = ge_tagvalue_string.substr(0, slashPos);
+    if (!bval_string.empty()) {
+      header_info.b_value = std::stoi(bval_string);
+    }
+  }
 
   // now retrieve the gradient direction
   if(success &&

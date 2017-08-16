@@ -27,7 +27,6 @@ set(MITK_PLUGINS
   #org.mitk.gui.qt.igt.app.echotrack:OFF
   #org.mitk.gui.qt.spectrocamrecorder:OFF
   #org.mitk.gui.qt.classificationsegmentation:OFF
-  #org.mitk.gui.qt.overlaymanager:OFF
   #org.mitk.gui.qt.igtexamples:OFF
   #org.mitk.gui.qt.datamanagerlight:OFF
   #org.mitk.gui.qt.dicom:OFF
@@ -42,6 +41,7 @@ set(MITK_PLUGINS
   #Testing/org.blueberry.core.runtime.tests:ON
   #Testing/org.blueberry.osgi.tests:ON
 
+  org.mitk.gui.qt.overlaymanager:ON
   org.mitk.gui.qt.segmentation:ON
   org.mitk.gui.qt.viewnavigator:ON
   org.mitk.gui.qt.registration:OFF

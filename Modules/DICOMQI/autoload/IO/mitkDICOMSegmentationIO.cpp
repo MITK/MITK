@@ -296,9 +296,9 @@ namespace mitk
 
       // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
       dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
-      pair<map<unsigned, ImageType::Pointer>, string> dcmqiOutput = converter->dcmSegmentation2itkimage(dataSet);
+      pair<map<unsigned, itkInternalImageType::Pointer>, string> dcmqiOutput = converter->dcmSegmentation2itkimage(dataSet);
 
-      map<unsigned, ImageType::Pointer> segItkImages = dcmqiOutput.first;
+      map<unsigned, itkInternalImageType::Pointer> segItkImages = dcmqiOutput.first;
 
       dcmqi::JSONSegmentationMetaInformationHandler metaInfo(dcmqiOutput.second.c_str());
       metaInfo.read();

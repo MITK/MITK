@@ -4,22 +4,27 @@
   <extension point="org.blueberry.ui.views">
      <view id="org.mitk.views.mitkigtnavigationtoolmanager"
           name="IGT Navigation Tool Manager"
+          category="IGT"
           class="QmitkMITKIGTNavigationToolManagerView"
           icon="resources/iconTrackingToolManager.svg" />
      <view id="org.mitk.views.navigationdataplayer"
           name="IGT Navigation Data Player"
+          category="IGT"
           class="QmitkNavigationDataPlayerView"
           icon="resources/iconTrackingDataPlayer.svg" />
      <view id="org.mitk.views.mitkigttrackingtoolbox"
           name="IGT Tracking Toolbox"
+          category="IGT"
           class="QmitkMITKIGTTrackingToolboxView"
           icon="resources/iconTrackingToolbox.svg" />
      <view id="org.mitk.views.igtnavigationtoolcalibration"
           name="IGT Navigation Tool Calibration"
+          category="IGT"
           class="IGTNavigationToolCalibration"
           icon="resources/iconTrackingToolCalibration.svg" />
 	 <view id="org.mitk.views.IGTFiducialRegistration"
           name="IGT Fiducial Registration"
+          category="IGT"
           class="IGTFiducialRegistration"
           icon="resources/iconTrackingRegistration.svg" />
   </extension>

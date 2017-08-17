@@ -239,7 +239,7 @@ void mitk::BeamformingFilter::GenerateData()
       m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
       m_oclFilter->SetOutputDim(oclOutputDimChunk);
       m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.TimeSpacing, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
-      
+
       if (chunkSize < oclOutputDim[2])
       {
         bool skip = false;
@@ -273,6 +273,12 @@ void mitk::BeamformingFilter::GenerateData()
           m_oclFilter->SetInput(chunk);
           m_oclFilter->Update();
           auto out = m_oclFilter->GetOutput();
+          
+          unsigned int lastCopiedSlice = 0;
+          if(skip)
+          {
+            lastCopiedSlice = i * chunkSize + 1;
+          }
 
           for (unsigned int s = i * chunkSize; s < oclOutputDim[2]; ++s)  // TODO: make the bounds here smaller...
           {

@@ -5,11 +5,13 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.multilabelsegmentation"
       name="MultiLabel Segmentation"
+      category="Segmentation"
       icon="resources/multilabelsegmentation.png"
       class="QmitkMultiLabelSegmentationView" />
 
     <view id="org.mitk.views.multilabelsegmentationutilities"
       name="MultiLabel Segmentation Utilities"
+      category="Segmentation"
       class="QmitkMultiLabelSegmentationUtilitiesView"
       icon="resources/MultiLabelSegmentationUtilities_48x48.png" />
 

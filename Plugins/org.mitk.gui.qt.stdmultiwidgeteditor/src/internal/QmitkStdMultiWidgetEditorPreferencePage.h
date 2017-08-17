@@ -62,12 +62,6 @@ public slots:
    */
   void OnWidgetComboBoxChanged(int i);
 
-  /**
-   * @brief AnnotationTextChanged called when QLineEdit for the annotation was changed.
-   * @param text The new text.
-   */
-  void AnnotationTextChanged(QString text);
-
 protected:
 
   /**
@@ -89,11 +83,6 @@ protected:
    * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
    */
   QString m_WidgetDecorationColor[4];
-
-  /**
-   * @brief m_Widget1Annotation the text of the corner annotation.
-   */
-  QString m_WidgetAnnotation[4];
 
   /**
    * @brief m_Preferences the berry preferences.

@@ -298,10 +298,15 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Original );
 
-  SetDecorationProperties("Axial", GetDecorationColor(0), 0);
-  SetDecorationProperties("Sagittal", GetDecorationColor(1), 1);
-  SetDecorationProperties("Coronal", GetDecorationColor(2), 2);
-  SetDecorationProperties("3D", GetDecorationColor(3), 3);
+  std::string axialCornerAnnotation = std::string(tr("Axial").toUtf8().data());
+  std::string sagittalCornerAnnotation = std::string(tr("Sagittal").toUtf8().data());
+  std::string coronalCornerAnnotation = std::string(tr("Coronal").toUtf8().data());
+  std::string cornerAnnotation3D = std::string(tr("3D").toUtf8().data());
+
+  SetDecorationProperties(axialCornerAnnotation, GetDecorationColor(0), 0);
+  SetDecorationProperties(sagittalCornerAnnotation, GetDecorationColor(1), 1);
+  SetDecorationProperties(coronalCornerAnnotation, GetDecorationColor(2), 2);
+  SetDecorationProperties(cornerAnnotation3D, GetDecorationColor(3), 3);
 
   for(int i = 0; i < 4; i++) {
     cornerText[i] = vtkCornerAnnotation::New();

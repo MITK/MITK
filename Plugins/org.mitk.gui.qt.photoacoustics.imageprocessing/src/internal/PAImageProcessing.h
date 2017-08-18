@@ -73,6 +73,9 @@ class PAImageProcessing : public QmitkAbstractView
     void BatchProcessing();
     void UpdateSaveBoxes();
 
+    void ChangedSOSBandpass();
+    void ChangedSOSBeamforming();
+
   protected:
     virtual void CreateQtPartControl(QWidget *parent) override;
 

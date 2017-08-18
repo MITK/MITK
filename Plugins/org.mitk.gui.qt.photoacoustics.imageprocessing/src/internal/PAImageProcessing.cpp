@@ -65,6 +65,8 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
   connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateImageInfo()));
   connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateImageInfo()));
+  connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(ChangedSOSBeamforming()));
+  connect(m_Controls.BPSpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(ChangedSOSBandpass()));
   connect(m_Controls.Samples, SIGNAL(valueChanged(int)), this, SLOT(UpdateImageInfo()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UpdateImageInfo()));
   connect(m_Controls.boundLow, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
@@ -88,6 +90,16 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.UseBP->hide();
 
   UseImageSpacing();
+}
+
+void PAImageProcessing::ChangedSOSBandpass()
+{
+  m_Controls.SpeedOfSound->setValue(m_Controls.BPSpeedOfSound->value());
+}
+
+void PAImageProcessing::ChangedSOSBeamforming()
+{
+  m_Controls.BPSpeedOfSound->setValue(m_Controls.SpeedOfSound->value());
 }
 
 std::vector<std::string> splitpath(

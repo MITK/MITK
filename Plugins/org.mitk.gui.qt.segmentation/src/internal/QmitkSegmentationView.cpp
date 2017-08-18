@@ -50,9 +50,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
 
 QmitkSegmentationView::QmitkSegmentationView()
-  : m_MouseCursorSet(false)
-  , m_Parent(nullptr)
+  : m_Parent(nullptr)
   , m_Controls(nullptr)
+  , m_RenderWindowPart(nullptr)
+  , m_MouseCursorSet(false)
   , m_DataSelectionChanged(false)
   , m_AutoSelectionEnabled(false)
 {
@@ -143,30 +144,36 @@ void QmitkSegmentationView::Deactivated()
 
 void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-   if (m_Parent)
-   {
-      m_Parent->setEnabled(true);
-   }
+  if (m_RenderWindowPart != renderWindowPart)
+  {
+    m_RenderWindowPart = renderWindowPart;
+  }
 
-   // tell the interpolation about toolmanager and render window part (and data storage)
-   if (m_Controls)
-   {
-      mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-      m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDataStorage());
-      QList<mitk::SliceNavigationController*> controllers;
-      controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
-      controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
-      controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-      m_Controls->m_SlicesInterpolator->Initialize( toolManager, controllers );
-   }
+  if (m_Parent)
+  {
+    m_Parent->setEnabled(true);
+  }
+
+  // tell the interpolation about tool manager, data storage and render window part
+  if (m_Controls)
+  {
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    m_Controls->m_SlicesInterpolator->SetDataStorage(this->GetDataStorage());
+    QList<mitk::SliceNavigationController*> controllers;
+    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+    m_Controls->m_SlicesInterpolator->Initialize(toolManager, controllers);
+  }
 }
 
 void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-   if (m_Parent)
-   {
-      m_Parent->setEnabled(false);
-   }
+  m_RenderWindowPart = nullptr;
+  if (m_Parent)
+  {
+    m_Parent->setEnabled(false);
+  }
 }
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
@@ -1127,6 +1134,12 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver(mitk::RenderingManagerViewsInitializedEvent(), command);
 
    InitToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
+
+   m_RenderWindowPart = GetRenderWindowPart();
+   if (m_RenderWindowPart)
+   {
+     RenderWindowPartActivated(m_RenderWindowPart);
+   }
 }
 
 void QmitkSegmentationView::SetFocus()

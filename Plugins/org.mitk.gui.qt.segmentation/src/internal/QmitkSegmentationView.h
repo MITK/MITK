@@ -131,8 +131,6 @@ protected:
 
   void SetToolSelectionBoxesEnabled(bool);
 
-  bool m_MouseCursorSet;
-
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected(const mitk::DataNode* node);
 
@@ -148,9 +146,13 @@ protected:
   QWidget* m_Parent;
 
   // our GUI
-  Ui::QmitkSegmentationControls * m_Controls;
+  Ui::QmitkSegmentationControls* m_Controls;
+
+  mitk::IRenderWindowPart* m_RenderWindowPart;
 
   unsigned long m_VisibilityChangedObserverTag;
+
+  bool m_MouseCursorSet;
 
   bool m_DataSelectionChanged;
 

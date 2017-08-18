@@ -49,8 +49,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "usServiceRegistration.h"
 
-
-
 /*!
 @brief QmitkImageCropperView
 \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
@@ -120,6 +118,10 @@ protected:
   */
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   /*!
+  @brief called by QmitkFunctionality when DataNode is removed from DataManager
+  */
+  void NodeRemoved(const mitk::DataNode* node) override;
+  /*!
   @brief Sets the selected bounding object as current bounding object and set up interactor
   */
   void OnComboBoxSelectionChanged(const mitk::DataNode* node);
@@ -127,8 +129,6 @@ protected:
   * @brief Initializes a new bounding shape using the selected image geometry.
   */
   mitk::Geometry3D::Pointer InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry);
-
- 
 
   void CreateBoundingShapeInteractor(bool rotationEnabled);
 
@@ -162,7 +162,7 @@ private:
   QList<QString> m_BoundingObjectNames;
 
   /*!
-  * @brief Resets GUI to default  
+  * @brief Resets GUI to default
   */
   void setDefaultGUI();
 
@@ -176,6 +176,5 @@ private:
 
   Ui::ImageCropperControls m_Controls;
 };
-
 
 #endif // QmitkImageCropper_h

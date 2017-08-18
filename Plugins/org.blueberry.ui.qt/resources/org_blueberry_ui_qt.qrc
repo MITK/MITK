@@ -42,11 +42,16 @@
     <file>dark/checkbox_checked_disabled.png</file>
     <file>dark/checkbox_checked_focus.png</file>
     <file>dark/checkbox_checked.png</file>
-    <file>dark/checkbox_indeterminate.png</file>
+    <file>dark/checkbox_indeterminate_disabled.png</file>
     <file>dark/checkbox_indeterminate_focus.png</file>
+    <file>dark/checkbox_indeterminate.png</file>
     <file>dark/checkbox_unchecked_disabled.png</file>
     <file>dark/checkbox_unchecked_focus.png</file>
     <file>dark/checkbox_unchecked.png</file>
+    <file>dark/checkbox_big_checked_disabled.png</file>
+    <file>dark/checkbox_big_checked.png</file>
+    <file>dark/checkbox_big_unchecked_disabled.png</file>
+    <file>dark/checkbox_big_unchecked.png</file>
     <file>dark/radio_checked_disabled.png</file>
     <file>dark/radio_checked_focus.png</file>
     <file>dark/radio_checked.png</file>

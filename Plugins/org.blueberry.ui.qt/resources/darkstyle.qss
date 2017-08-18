@@ -1081,24 +1081,24 @@ QTreeView, QListView
 
 QTreeView::indicator:unchecked
 {
-  image: url(:/org.blueberry.ui.qt/dark/checkbox_unchecked.png);
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_big_unchecked.png);
 }
 
 QTreeView::indicator:checked,
 QTreeView::indicator:indeterminate
 {
-  image: url(:/org.blueberry.ui.qt/dark/checkbox_checked.png);
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_big_checked.png);
 }
 
 QTreeView::indicator:unchecked:selected
 {
-    image: url(:/org.blueberry.ui.qt/dark/checkbox_unchecked_disabled.png);
+    image: url(:/org.blueberry.ui.qt/dark/checkbox_big_unchecked_disabled.png);
 }
 
 QTreeView::indicator:indeterminate:selected,
 QTreeView::indicator:checked:selected
 {
-  image: url(:/org.blueberry.ui.qt/dark/checkbox_checked_disabled.png);
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_big_checked_disabled.png);
 }
 
 QTreeView:branch:selected, 

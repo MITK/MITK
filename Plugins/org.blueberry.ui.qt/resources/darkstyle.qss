@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*
   foregroundColor = #adb1b6
+  iconColor       = #adb1b6 <- This line is parsed by MITK
   backgroundColor = #323231
   inactiveColor   = #1d1d1c
   highlightColor  = #3399cc
@@ -450,14 +451,14 @@ QScrollBar::sub-line:horizontal:on
   subcontrol-origin: margin;
 }
 
-QScrollBar::up-arrow:horizontal, 
+QScrollBar::up-arrow:horizontal,
 QScrollBar::down-arrow:horizontal
 {
   background: none;
 }
 
 
-QScrollBar::add-page:horizontal, 
+QScrollBar::add-page:horizontal,
 QScrollBar::sub-page:horizontal
 {
   background: none;
@@ -521,14 +522,14 @@ QScrollBar::add-line:vertical:on
   subcontrol-origin: margin;
 }
 
-QScrollBar::up-arrow:vertical, 
+QScrollBar::up-arrow:vertical,
 QScrollBar::down-arrow:vertical
 {
   background: none;
 }
 
 
-QScrollBar::add-page:vertical, 
+QScrollBar::add-page:vertical,
 QScrollBar::sub-page:vertical
 {
   background: none;
@@ -729,7 +730,7 @@ QPushButton:pressed
 QComboBox
 {
   selection-background-color: #3399cc;
-  selection-color: #1d1d1c; 
+  selection-color: #1d1d1c;
   border: 1px solid #1d1d1c;
   border-radius: 0px;
   padding: 3px;
@@ -790,7 +791,7 @@ QComboBox::down-arrow
   image: url(:/org.blueberry.ui.qt/dark/down_arrow_disabled.png);
 }
 
-QComboBox::down-arrow:on, 
+QComboBox::down-arrow:on,
 QComboBox::down-arrow:hover,
 QComboBox::down-arrow:focus
 {
@@ -1101,7 +1102,7 @@ QTreeView::indicator:checked:selected
   image: url(:/org.blueberry.ui.qt/dark/checkbox_big_checked_disabled.png);
 }
 
-QTreeView:branch:selected, 
+QTreeView:branch:selected,
 QTreeView:branch:hover
 {
   background: url(:/org.blueberry.ui.qt/dark/transparent.png);
@@ -1205,7 +1206,7 @@ QmitkRenderWindowMenu
 }
 
 /* this fixes the size of the icons in the stdMultiWidget */
-QmitkRenderWindowMenu QToolButton, 
+QmitkRenderWindowMenu QToolButton,
 QmitkRenderWindowMenu QToolButton::menu-button {
   background-color: transparent;
   border: 0px solid #1d1d1c;
@@ -1216,7 +1217,7 @@ QmitkRenderWindowMenu QToolButton::menu-button {
   padding: 0px;
 }
 
-QmitkRenderWindowMenu QToolButton:hover, 
+QmitkRenderWindowMenu QToolButton:hover,
 QmitkRenderWindowMenu QToolButton::menu-button:hover
 {
   background-color: #adb1b6;
@@ -1227,9 +1228,9 @@ QmitkRenderWindowMenu QToolButton::menu-button:hover
   padding: 0px;
 }
 
-QToolButton:checked, 
-QToolButton:pressed, 
-QToolButton::menu-button:pressed 
+QToolButton:checked,
+QToolButton:pressed,
+QToolButton::menu-button:pressed
 {
   color: #3399cc;
   border: 1px solid #3399cc;
@@ -1237,7 +1238,7 @@ QToolButton::menu-button:pressed
 }
 
 /* the subcontrol below is used only in the InstantPopup or DelayedPopup mode */
-QToolButton::menu-indicator 
+QToolButton::menu-indicator
 {
   image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
   top: -7px; left: -2px; /* shift it a bit */

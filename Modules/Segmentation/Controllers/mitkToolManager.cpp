@@ -443,14 +443,13 @@ void mitk::ToolManager::SetDataStorage(DataStorage &storage)
 
 mitk::DataNode *mitk::ToolManager::GetWorkingData(int idx)
 {
-  try
-  {
-    return m_WorkingData.at(idx);
-  }
-  catch (const std::exception &)
-  {
+  if (m_WorkingData.empty())
     return nullptr;
-  }
+
+  if (m_WorkingData.size() > idx)
+    return m_WorkingData[idx];
+
+  return nullptr;
 }
 
 int mitk::ToolManager::GetActiveToolID()

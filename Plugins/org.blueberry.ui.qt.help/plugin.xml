@@ -29,7 +29,7 @@
     <editor id="org.blueberry.editors.help"
             name="Help Contents"
             class="berry::HelpEditor"
-            icon="resources/help.scg">
+            icon="resources/help.svg">
     </editor>
   </extension>
 

@@ -441,7 +441,7 @@ void mitk::ToolManager::SetDataStorage(DataStorage &storage)
   m_DataStorage = &storage;
 }
 
-mitk::DataNode *mitk::ToolManager::GetWorkingData(int idx)
+mitk::DataNode *mitk::ToolManager::GetWorkingData(unsigned int idx)
 {
   if (m_WorkingData.empty())
     return nullptr;

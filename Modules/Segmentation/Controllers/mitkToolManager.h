@@ -201,7 +201,7 @@ namespace mitk
       \brief Get the current working data.
       \warning If there is a list of items, this method will only return the first list item.
     */
-    DataNode *GetWorkingData(int);
+    DataNode *GetWorkingData(unsigned int);
 
     /*
      \brief Get the current roi data

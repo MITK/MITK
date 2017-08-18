@@ -76,6 +76,8 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.tubegraph:OFF
   org.mitk.gui.qt.ugvisualization:OFF
+  org.mitk.gui.qt.photoacoustics.pausviewer:OFF
+  org.mitk.gui.qt.photoacoustics.imageprocessing:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF
@@ -95,7 +97,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.visualizer:OFF
   org.mitk.gui.qt.matchpoint.evaluator:OFF
   org.mitk.gui.qt.matchpoint.manipulator:OFF
-  org.mitk.gui.qt.photoacoustics.pausviewer:OFF
-  org.mitk.gui.qt.photoacoustics.imageprocessing:OFF
   org.mitk.gui.qt.cest:OFF
 )

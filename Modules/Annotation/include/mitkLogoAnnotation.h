@@ -22,12 +22,10 @@
 #include <mitkVtkAnnotation.h>
 #include <vtkSmartPointer.h>
 
+class mitkVtkLogoRepresentation;
 class vtkImageData;
 class vtkImageReader2Factory;
 class vtkImageImport;
-class vtkActor2D;
-class vtkImageMapper;
-class vtkImageResize;
 
 namespace mitk
 {
@@ -40,13 +38,10 @@ namespace mitk
     public:
       /** \brief Actor of a 2D render window. */
       vtkSmartPointer<vtkImageData> m_LogoImage;
+      vtkSmartPointer<mitkVtkLogoRepresentation> m_LogoRep;
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
-
-      vtkSmartPointer<vtkActor2D> m_ImageActor;
-      vtkSmartPointer<vtkImageMapper> m_ImageMapper;
-      vtkSmartPointer<vtkImageResize> m_ImageResize;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -61,9 +56,6 @@ namespace mitk
 
     void SetLogoImagePath(std::string text);
     std::string GetLogoImagePath() const;
-    
-    virtual Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
-    virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
 
     /** \brief The relative offset to the corner position */
     void SetOffsetVector(const Point2D &OffsetVector);

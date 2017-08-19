@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
-#include <mitkLayoutAnnotationRenderer.h>
+#include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkCameraController.h>
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
@@ -305,9 +305,13 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering = mitk::LogoAnnotation::New();
   mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
   m_LogoRendering->SetOpacity(0.5);
+  mitk::Point2D offset;
+  offset.Fill(0.03);
+  m_LogoRendering->SetOffsetVector(offset);
   m_LogoRendering->SetRelativeSize(0.15);
+  m_LogoRendering->SetCornerPosition(1);
   m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  mitk::LayoutAnnotationRenderer::AddAnnotation(m_LogoRendering.GetPointer(), renderer4, mitk::LayoutAnnotationRenderer::BottomRight,30,30);
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoRendering.GetPointer(), renderer4);
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()

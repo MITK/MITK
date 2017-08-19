@@ -31,7 +31,6 @@ namespace mitk
 {
   class BaseRenderer;
   class Contour;
-  class TextAnnotation2D;
 
   /**
   * \brief OpenGL-based mapper to render display sub-class instances of mitk::PlanarFigure
@@ -311,9 +310,6 @@ namespace mitk
     bool m_NodeModifiedObserverAdded;
 
     bool m_Initialized;
-
-    itk::SmartPointer<mitk::TextAnnotation2D> m_AnnotationAnnotation;
-    itk::SmartPointer<mitk::TextAnnotation2D> m_QuantityAnnotation;
 
     vtkNew<vtkContext2D> m_Context;
     vtkSmartPointer<vtkPen> m_Pen;

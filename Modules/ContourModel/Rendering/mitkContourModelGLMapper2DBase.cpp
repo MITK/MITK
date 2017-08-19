@@ -41,7 +41,7 @@ mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 {
 }
 
-void mitk::ContourModelGLMapper2DBase::Initialize(mitk::BaseRenderer *renderer)
+void mitk::ContourModelGLMapper2DBase::Initialize(mitk::BaseRenderer */*renderer*/)
 {
   vtkOpenGLContextDevice2D *device = NULL;
   device = vtkOpenGLContextDevice2D::New();
@@ -183,7 +183,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp, p);
 
-      renderer->WorldToDisplay(p, pt2d);
+      renderer->WorldToView(p, pt2d);
 
       ScalarType scalardiff = fabs(renderer->GetCurrentWorldPlaneGeometry()->SignedDistance(p));
 

@@ -389,9 +389,20 @@ namespace mitk
     void WorldToDisplay(const Point3D &worldIndex, Point2D &displayPoint) const;
 
     //##Documentation
+    //## @brief This method converts a 3D world index to the point on the viewport
+    //## using the geometry of the renderWindow.
+    void WorldToView(const Point3D &worldIndex, Point2D &viewPoint) const;
+
+    //##Documentation
     //## @brief This method converts a 2D plane coordinate to the display point
     //## using the geometry of the renderWindow.
     void PlaneToDisplay(const Point2D &planePointInMM, Point2D &displayPoint) const;
+
+    //##Documentation
+    //## @brief This method converts a 2D plane coordinate to the point on the viewport
+    //## using the geometry of the renderWindow.
+    void PlaneToView(const Point2D &planePointInMM, Point2D &viewPoint) const;
+
 
     double GetScaleFactorMMPerDisplayUnit() const;
 

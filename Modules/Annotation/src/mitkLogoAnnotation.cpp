@@ -46,7 +46,7 @@ public:
   mitk::LogoAnnotation::LocalStorage* ls;
   double relativeSize = 0.;
 
-  virtual void Execute(vtkObject *caller, unsigned long, void* calldata)
+  virtual void Execute(vtkObject *caller, unsigned long, void* /*calldata*/)
   {
     vtkRenderWindow* window = static_cast<vtkRenderWindow*>(caller);
 

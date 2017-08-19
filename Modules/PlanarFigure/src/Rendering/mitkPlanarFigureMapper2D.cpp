@@ -23,8 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkOpenGLContextDevice2D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
-
-#include "mitkTextAnnotation2D.h"
+#include "vtkTextProperty.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -36,8 +35,6 @@ static const float PLANAR_OFFSET = 0.5f;
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false), m_Initialized(false)
 {
-  m_AnnotationAnnotation = mitk::TextAnnotation2D::New();
-  m_QuantityAnnotation = mitk::TextAnnotation2D::New();
 
   this->InitializeDefaultPlanarFigureProperties();
 }
@@ -61,7 +58,7 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
   this->m_Pen->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
 }
 
-void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *renderer)
+void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer */*renderer*/)
 {
   this->m_Pen = vtkSmartPointer<vtkPen>::New();
   vtkOpenGLContextDevice2D *device = NULL;
@@ -89,10 +86,6 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
     this->m_Context->GetDevice())->Begin(renderer->GetVtkRenderer());
 
   bool visible = true;
-
-  m_AnnotationAnnotation->SetVisibility(false);
-
-  m_QuantityAnnotation->SetVisibility(false);
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
@@ -235,7 +228,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(const mitk::PlanarFigure::PolyLin
   // now paint all the points in one run
 
   float* points = new float[pointlist.size()*2];
-  for (int i = 0 ; i < pointlist.size() ; ++i)
+  for (unsigned int i = 0 ; i < pointlist.size() ; ++i)
   {
     points[i * 2] = pointlist[i][0];
     points[i * 2 + 1] = pointlist[i][1];
@@ -298,7 +291,7 @@ void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(const mitk::Point2D &p
   objectGeometry->Map(point2D, point3D);
 
   // Project 3D world point onto display geometry
-  renderer->WorldToDisplay(point3D, displayPoint);
+  renderer->WorldToView(point3D, displayPoint);
 }
 
 void mitk::PlanarFigureMapper2D::DrawMarker(const mitk::Point2D &point,
@@ -339,7 +332,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(const mitk::Point2D &point,
 
       // Paint outline
       this->m_Context->GetPen()->SetColorF((double)lineColor[0], (double)lineColor[1], (double)lineColor[2], (double)lineOpacity);
-      
+
       float* outline = new float[8];
       outline[0] = displayPoint[0] - 4;
       outline[1] = displayPoint[1] - 4;
@@ -736,7 +729,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints(const mitk::PlanarFigure *p
   }
 }
 
-void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *renderer,
+void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer */*renderer*/,
                                                    const std::string name,
                                                    const mitk::Point2D anchorPoint,
                                                    float globalOpacity,
@@ -748,17 +741,14 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *renderer,
     return;
   }
 
-  m_AnnotationAnnotation->SetText(name);
-  m_AnnotationAnnotation->SetColor(m_AnnotationColor[lineDisplayMode][0],
-                                m_AnnotationColor[lineDisplayMode][1],
-                                m_AnnotationColor[lineDisplayMode][2]);
-  m_AnnotationAnnotation->SetOpacity(globalOpacity);
-  m_AnnotationAnnotation->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
-  m_AnnotationAnnotation->SetBoolProperty("drawShadow", m_AnnotationsShadow);
-  m_AnnotationAnnotation->SetVisibility(true);
-  m_AnnotationAnnotation->SetStringProperty("font.family", m_AnnotationFontFamily);
-  m_AnnotationAnnotation->SetBoolProperty("font.bold", m_DrawAnnotationBold);
-  m_AnnotationAnnotation->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
+  vtkTextProperty* textProp = vtkTextProperty::New();
+  textProp->SetFontSize(m_AnnotationSize);
+  textProp->SetFontFamilyAsString(m_AnnotationFontFamily.c_str());
+  textProp->SetJustificationToLeft();
+  textProp->SetOpacity(globalOpacity);
+  textProp->SetShadow(0);
+  textProp->SetBold(m_DrawAnnotationBold);
+  textProp->SetItalic(m_DrawAnnotationItalic);
 
   mitk::Point2D offset;
   offset.Fill(5);
@@ -770,17 +760,26 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *renderer,
   offset[0] = offset[0] * m_DevicePixelRatio;
   offset[1] = offset[1] * m_DevicePixelRatio;
 
-  m_AnnotationAnnotation->SetPosition2D(scaledAnchorPoint);
-  m_AnnotationAnnotation->SetOffsetVector(offset);
 
-  m_AnnotationAnnotation->Update(renderer);
-  m_AnnotationAnnotation->Paint(renderer);
+  if(m_DrawShadow)
+  {
+    textProp->SetColor(0.0,0.0,0.0);
+    this->m_Context->ApplyTextProp(textProp);
+    this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0]+1, scaledAnchorPoint[1]+offset[1]-1, name.c_str());
+  }
+  textProp->SetColor(m_AnnotationColor[lineDisplayMode][0],
+          m_AnnotationColor[lineDisplayMode][1],
+          m_AnnotationColor[lineDisplayMode][2]);
+  this->m_Context->ApplyTextProp(textProp);
+  this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0], scaledAnchorPoint[1]+offset[1], name.c_str());
+
   annotationOffset -= 15.0;
   //  annotationOffset -= m_AnnotationAnnotation->GetBoundsOnDisplay( renderer ).Size[1];
+  textProp->Delete();
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *planarFigure,
-                                                  mitk::BaseRenderer *renderer,
+                                                  mitk::BaseRenderer */*renderer*/,
                                                   const mitk::Point2D anchorPoint,
                                                   double &annotationOffset,
                                                   float globalOpacity,
@@ -810,23 +809,17 @@ void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *plan
     }
   }
 
-  m_QuantityAnnotation->SetColor(m_AnnotationColor[lineDisplayMode][0],
-                              m_AnnotationColor[lineDisplayMode][1],
-                              m_AnnotationColor[lineDisplayMode][2]);
+  vtkTextProperty* textProp = vtkTextProperty::New();
+  textProp->SetFontSize(m_AnnotationSize);
+  textProp->SetFontFamilyAsString(m_AnnotationFontFamily.c_str());
+  textProp->SetJustificationToLeft();
+  textProp->SetOpacity(globalOpacity);
+  textProp->SetShadow(0);
+  textProp->SetBold(m_DrawAnnotationBold);
+  textProp->SetItalic(m_DrawAnnotationItalic);
 
-  m_QuantityAnnotation->SetOpacity(globalOpacity);
-  m_QuantityAnnotation->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
-  m_QuantityAnnotation->SetBoolProperty("drawShadow", m_DrawShadow);
-  m_QuantityAnnotation->SetVisibility(true);
-
-  m_AnnotationAnnotation->SetStringProperty("font.family", m_AnnotationFontFamily);
-  m_AnnotationAnnotation->SetBoolProperty("font.bold", m_DrawAnnotationBold);
-  m_AnnotationAnnotation->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
-
-  m_QuantityAnnotation->SetText(quantityString.str().c_str());
   mitk::Point2D offset;
   offset.Fill(5);
-  offset[1] += annotationOffset;
 
   mitk::Point2D scaledAnchorPoint;
   scaledAnchorPoint[0] = anchorPoint[0] * m_DevicePixelRatio;
@@ -835,13 +828,22 @@ void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *plan
   offset[0] = offset[0] * m_DevicePixelRatio;
   offset[1] = offset[1] * m_DevicePixelRatio;
 
-  m_QuantityAnnotation->SetPosition2D(scaledAnchorPoint);
-  m_QuantityAnnotation->SetOffsetVector(offset);
 
-  m_QuantityAnnotation->Update(renderer);
-  m_QuantityAnnotation->Paint(renderer);
-  //  annotationOffset -= m_QuantityAnnotation->GetBoundsOnDisplay( renderer ).Size[1];
+  if(m_DrawShadow)
+  {
+    textProp->SetColor(0,0,0);
+    this->m_Context->ApplyTextProp(textProp);
+    this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0]+1, scaledAnchorPoint[1]+offset[1]-1, quantityString.str().c_str());
+  }
+  textProp->SetColor(m_AnnotationColor[lineDisplayMode][0],
+          m_AnnotationColor[lineDisplayMode][1],
+          m_AnnotationColor[lineDisplayMode][2]);
+  this->m_Context->ApplyTextProp(textProp);
+  this->m_Context->DrawString(scaledAnchorPoint[0]+offset[0], scaledAnchorPoint[1]+offset[1], quantityString.str().c_str());
+
   annotationOffset -= 15.0;
+  //  annotationOffset -= m_AnnotationAnnotation->GetBoundsOnDisplay( renderer ).Size[1];
+  textProp->Delete();
 }
 
 void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineDisplayMode,

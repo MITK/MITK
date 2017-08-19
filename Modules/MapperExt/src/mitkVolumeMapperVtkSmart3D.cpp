@@ -48,7 +48,7 @@ void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *r
   this->Modified();
 }
 
-vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer */*renderer*/)
 {
   if (!m_Volume->GetMapper())
   {
@@ -60,7 +60,7 @@ vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *renderer)
   return m_Volume;
 }
 
-void mitk::VolumeMapperVtkSmart3D::ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer)
+void mitk::VolumeMapperVtkSmart3D::ApplyProperties(vtkActor */*actor*/, mitk::BaseRenderer */*renderer*/)
 {
 
 }

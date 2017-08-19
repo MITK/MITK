@@ -969,7 +969,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
         if (!outOfBounds)
           m_Controls->m_InfoLabel->setText("");
-          return;
+        return;
       }
     }
       else {

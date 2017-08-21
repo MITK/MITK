@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relation module
 #include "mitkSemanticRelationException.h"
-#include "mitkUIDGenerator.h"
+#include "mitkUIDGeneratorBoost.h"
 
 // c++
 #include <algorithm>
@@ -36,8 +36,8 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(dataNode);
-  SemanticTypes::ID nodeID = DICOMHelper::GetIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  SemanticTypes::ID nodeID = DICOMHelper::GetIDFromDataNode(dataNode);
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->AddCase(caseID);
@@ -58,13 +58,13 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
     }
     catch (const mitk::SemanticRelationException&)
     {
-      MITK_INFO << "The control point can not be added and the data can not be linked to this control point.";
+      MITK_INFO << "The control point cannot be added and the data can not be linked to this control point.";
       return;
     }
   }
 
   // some control points already exist - find a control point where the date of the data node fits in
-  SemanticTypes::ControlPoint fittingControlPoint = ControlPointManager::FindControlPoint(dataNode, allControlPoints);
+  SemanticTypes::ControlPoint fittingControlPoint = ControlPointManager::FindFittingControlPoint(dataNode, allControlPoints);
   if (fittingControlPoint.UID.empty())
   {
     // did not find a fitting control point, although some control points already exist
@@ -82,7 +82,7 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
       }
       catch (const mitk::SemanticRelationException&)
       {
-        MITK_INFO << "The control point can not be added and the data can not be linked to this control point.";
+        MITK_INFO << "The control point cannot be added and the data can not be linked to this control point.";
         return;
       }
     }
@@ -95,7 +95,7 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
       }
       catch (const mitk::SemanticRelationException&)
       {
-        MITK_INFO << "The fitting control point can not be overwritten and the data can not be linked to this control point.";
+        MITK_INFO << "The extended control point can not be overwritten and the data can not be linked to this control point.";
         return;
       }
     }
@@ -116,9 +116,9 @@ void SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* 
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromData(segmentationNode);
-  SemanticTypes::ID parentNodeID = DICOMHelper::GetIDFromData(parentNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromDataNode(segmentationNode);
+  SemanticTypes::ID parentNodeID = DICOMHelper::GetIDFromDataNode(parentNode);
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->AddCase(caseID);
@@ -138,8 +138,8 @@ void SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNod
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromData(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromDataNode(segmentationNode);
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->RemoveSegmentation(caseID, segmentationNodeID);

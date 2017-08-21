@@ -320,13 +320,15 @@ namespace mitk
     * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given data.
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.
     *
-    * @pre    The UID of the control point has to exist for a control point instance. If it does, the function throws an exception (this can be checked via 'InstanceExists').
-    *         The function assures that the time period of the control point is not already covered by another control point.
+    * @pre    The UID of the control point must not already exist for a control point instance. If it does, the function throws an exception (this can be checked via 'InstanceExists').
+    *         The function checks, if the given control point is already contained in an existing control point interval. If so, the function throws an exception (this can be checked via 'XXX').
+    *         To add a new control point, the control point is always expected to have "startDate = endDate".
     *
-    * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint   The control point instance to add.
+    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @par controlPoint     The control point instance to add. For a newly added control point always has "startDate = endDate".
+    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
-    void AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
 
     /*
     * @brief  Link the given data to an already existing control point and overwrite the start or end point of the control point.
@@ -336,10 +338,11 @@ namespace mitk
     *        The function assures that the overwritten control point instance is extended / shortened to its necessary time period
     *        (e.g.moving the start point to an earlier date).
     *
-    * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint   The control point instance that overwrites an existing control point.
+    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @par controlPoint     The control point instance that overwrites an existing control point.
+    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
-    void OverwriteControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void OverwriteControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
 
     /*
     * @brief  Link the given data to an already existing control point.
@@ -347,10 +350,11 @@ namespace mitk
     * @pre    The UID of the control point has to exist for a control point instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
     *         The function assures that the date of the data lies inside the time period of the control point.
     *
-    * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint   The control point instance to add link.
+    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @par controlPoint     The control point instance to add link.
+    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
-    void LinkDataToControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void LinkDataToControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
 
     /*
     * @brief  Unlink the given image from the control point.
@@ -401,6 +405,13 @@ namespace mitk
     */
     bool CheckOverlappingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
 
+    /*
+    * @brief
+    *
+    * @par caseID         The current case identifier is defined by the given string.
+    * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    */
+    bool CheckContainingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
   };
 
 } // namespace mitk

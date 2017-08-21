@@ -54,7 +54,6 @@ std::vector<SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfCase(co
   mitk::VectorProperty<std::string>* vectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
   if (nullptr == vectorProperty)
   {
-    MITK_INFO << "Could not find any lesions in the storage.";
     return std::vector<SemanticTypes::Lesion>();
   }
 
@@ -178,8 +177,8 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   {
     DataNode* segmentationNode = it->Value();
     // find the corresponding segmentation node for the given segmentation ID
-    std::string nodeCaseID = DICOMHelper::GetCaseIDFromData(segmentationNode);
-    std::string nodeSegmentationID = DICOMHelper::GetIDFromData(segmentationNode);
+    std::string nodeCaseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+    std::string nodeSegmentationID = DICOMHelper::GetIDFromDataNode(segmentationNode);
     if (nodeCaseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), nodeSegmentationID) != allSegmentationIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector
@@ -308,7 +307,6 @@ std::vector<SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllControlPoi
   mitk::VectorProperty<std::string>* vectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("controlpoints"));
   if (nullptr == vectorProperty)
   {
-    MITK_INFO << "Could not find any control points in the storage.";
     return std::vector<SemanticTypes::ControlPoint>();
   }
 
@@ -436,7 +434,6 @@ std::vector<SemanticTypes::InformationType> mitk::RelationStorage::GetAllInforma
   mitk::VectorProperty<std::string>* informationTypeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("informationtypes"));
   if (nullptr == informationTypeVectorProperty)
   {
-    MITK_INFO << "Could not find any information type in the storage.";
     return std::vector<SemanticTypes::InformationType>();
   }
 
@@ -488,8 +485,8 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllImagesOfCase(c
   {
     DataNode* imageNode = it->Value();
     // find the corresponding image node for the given segmentation ID
-    std::string nodeCaseID = DICOMHelper::GetCaseIDFromData(imageNode);
-    std::string nodeImageID = DICOMHelper::GetIDFromData(imageNode);
+    std::string nodeCaseID = DICOMHelper::GetCaseIDFromDataNode(imageNode);
+    std::string nodeImageID = DICOMHelper::GetIDFromDataNode(imageNode);
     if (nodeCaseID == caseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), nodeImageID) != allImageIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector
@@ -567,7 +564,6 @@ void mitk::RelationStorage::AddCase(const SemanticTypes::CaseID& caseID)
   std::vector<std::string> caseIDsVectorValue;
   if (nullptr == caseIDsVectorProperty)
   {
-    MITK_INFO << "Could not find the property " << listIdentifier << " for the " << listIdentifier << " property list. Creating a new property list.";
     caseIDsVectorProperty = mitk::VectorProperty<std::string>::New();
   }
   else
@@ -578,7 +574,6 @@ void mitk::RelationStorage::AddCase(const SemanticTypes::CaseID& caseID)
   auto existingCase = std::find(caseIDsVectorValue.begin(), caseIDsVectorValue.end(), caseID);
   if (existingCase != caseIDsVectorValue.end())
   {
-    MITK_INFO << "Case will not be added to the storage. The case " << caseID << " already exists.";
     return;
   }
   else
@@ -604,7 +599,6 @@ void mitk::RelationStorage::AddImage(const SemanticTypes::CaseID& caseID, const 
   std::vector<std::string> allImagesIDs;
   if (nullptr == allImagesVectorProperty)
   {
-    MITK_INFO << "Could not find any image in the storage. Creating a new 'images' property list.";
     allImagesVectorProperty = mitk::VectorProperty<std::string>::New();
   }
   else
@@ -615,7 +609,6 @@ void mitk::RelationStorage::AddImage(const SemanticTypes::CaseID& caseID, const 
   auto existingImage = std::find(allImagesIDs.begin(), allImagesIDs.end(), imageNodeID);
   if (existingImage != allImagesIDs.end())
   {
-    MITK_INFO << "Image will not be added to the storage. The image " << imageNodeID << " already exists.";
     return;
   }
   else
@@ -631,7 +624,6 @@ void mitk::RelationStorage::AddImage(const SemanticTypes::CaseID& caseID, const 
     std::vector<std::string> imageNodeVectorValue(2);
     imageNodeVectorProperty->SetValue(imageNodeVectorValue);
     propertyList->SetProperty(imageNodeID, imageNodeVectorProperty);
-    MITK_INFO << "Image " << imageNodeID << " successfully added to the storage.";
   }
 }
 
@@ -649,7 +641,6 @@ void mitk::RelationStorage::AddSegmentation(const SemanticTypes::CaseID& caseID,
   std::vector<std::string> allSegmentationsIDs;
   if (nullptr == allSegmentationsVectorProperty)
   {
-    MITK_INFO << "Could not find any segmentation in the storage. Creating a new 'segmentations' property list.";
     allSegmentationsVectorProperty = mitk::VectorProperty<std::string>::New();
   }
   else
@@ -660,7 +651,6 @@ void mitk::RelationStorage::AddSegmentation(const SemanticTypes::CaseID& caseID,
   auto existingImage = std::find(allSegmentationsIDs.begin(), allSegmentationsIDs.end(), segmentationNodeID);
   if (existingImage != allSegmentationsIDs.end())
   {
-    MITK_INFO << "Segmentation will not be added to the storage. The segmentation " << segmentationNodeID << " already exists.";
     return;
   }
   else
@@ -677,7 +667,6 @@ void mitk::RelationStorage::AddSegmentation(const SemanticTypes::CaseID& caseID,
     segmentationNodeVectorValue[0] = parentNodeID;
     segmentationNodeVectorProperty->SetValue(segmentationNodeVectorValue);
     propertyList->SetProperty(segmentationNodeID, segmentationNodeVectorProperty);
-    MITK_INFO << "Segmentation " << segmentationNodeID << " successfully added to the storage.";
   }
 }
 
@@ -714,7 +703,6 @@ void mitk::RelationStorage::RemoveSegmentation(const SemanticTypes::CaseID& case
 
   // remove the lesion instance itself
   propertyList->DeleteProperty(segmentationNodeID);
-  MITK_INFO << "Segmentation " << segmentationNodeID << " successfully removed from the storage.";
 }
 
 void mitk::RelationStorage::AddLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
@@ -730,7 +718,6 @@ void mitk::RelationStorage::AddLesion(const SemanticTypes::CaseID& caseID, const
   std::vector<std::string> lesionsVectorValue;
   if (nullptr == lesionsVectorProperty)
   {
-    MITK_INFO << "Could not find any lesion in the storage. Creating a new 'lesions' property list.";
     lesionsVectorProperty = mitk::VectorProperty<std::string>::New();
   }
   else
@@ -741,7 +728,6 @@ void mitk::RelationStorage::AddLesion(const SemanticTypes::CaseID& caseID, const
   const auto& existingIndex = std::find(lesionsVectorValue.begin(), lesionsVectorValue.end(), lesion.UID);
   if (existingIndex != lesionsVectorValue.end())
   {
-    MITK_INFO << "Lesion instance will not be added to the storage. The lesion " << lesion.UID << " already exists.";
     return;
   }
   else
@@ -931,7 +917,6 @@ void mitk::RelationStorage::AddControlPoint(const SemanticTypes::CaseID& caseID,
   std::vector<std::string> controlPointVectorValue;
   if (nullptr == controlPointVectorProperty)
   {
-    MITK_INFO << "Could not find any control point property in the storage. Creating a new 'controlpoints' property list.";
     controlPointVectorProperty = mitk::VectorProperty<std::string>::New();
   }
   else
@@ -942,7 +927,6 @@ void mitk::RelationStorage::AddControlPoint(const SemanticTypes::CaseID& caseID,
   const auto existingControlPoint = std::find(controlPointVectorValue.begin(), controlPointVectorValue.end(), controlPoint.UID);
   if (existingControlPoint != controlPointVectorValue.end())
   {
-    MITK_INFO << "Control point instance will not be added to the storage. The control point " << controlPoint.UID << " already exists.";
     return;
   }
   else
@@ -1205,7 +1189,6 @@ void mitk::RelationStorage::AddInformationTypeToImage(const SemanticTypes::CaseI
   std::vector<std::string> informationTypeVectorValue;
   if (nullptr == informationTypeVectorProperty)
   {
-    MITK_INFO << "Could not find any information type property in the storage. Creating a new 'informationtypes' property list.";
     informationTypeVectorProperty = mitk::VectorProperty<std::string>::New();
   }
   else

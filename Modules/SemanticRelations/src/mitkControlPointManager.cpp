@@ -16,7 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include "mitkControlPointManager.h"
-#include "mitkUIDGenerator.h"
+#include "mitkDICOMHelper.h"
+#include "mitkUIDGeneratorBoost.h"
 
 // mitk core
 #include <mitkPropertyNameHelper.h>
@@ -41,13 +42,21 @@ SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const std:
 SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const mitk::DataNode* datanode)
 {
   SemanticTypes::ControlPoint controlPoint;
-  SemanticTypes::Date startPoint = GetDateFromDataNode(datanode);
-  SemanticTypes::Date endPoint = GetDateFromDataNode(datanode);
+  SemanticTypes::Date date = DICOMHelper::GetDateFromDataNode(datanode);
+
+  return GenerateControlPoint(date);
+}
+
+SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const SemanticTypes::Date& date)
+{
+  SemanticTypes::ControlPoint controlPoint;
 
   // set the values of the control point
   controlPoint.UID = UIDGeneratorBoost::GenerateUID();
-  controlPoint.startPoint = startPoint;
-  controlPoint.endPoint = endPoint;
+  controlPoint.startPoint = date;
+  controlPoint.endPoint = date;
+  // create new UID so that the start point and the end point have a different UID
+  controlPoint.endPoint.UID = UIDGeneratorBoost::GenerateUID();
 
   return controlPoint;
 }
@@ -57,7 +66,7 @@ SemanticTypes::Date ControlPointManager::GetStartPoint(const std::vector<mitk::D
   SemanticTypes::Date startPoint;
   for (const auto& dataNode : dataOfControlPoint)
   {
-    SemanticTypes::Date currentStartPoint = GetDateFromDataNode(dataNode);
+    SemanticTypes::Date currentStartPoint = DICOMHelper::GetDateFromDataNode(dataNode);
     if (startPoint.year == 0 || currentStartPoint < startPoint)
     {
       // set the new, earlier start point
@@ -73,7 +82,7 @@ SemanticTypes::Date ControlPointManager::GetEndPoint(const std::vector<mitk::Dat
   SemanticTypes::Date endPoint;
   for (const auto& dataNode : dataOfControlPoint)
   {
-    SemanticTypes::Date currentEndPoint = GetDateFromDataNode(dataNode);
+    SemanticTypes::Date currentEndPoint = DICOMHelper::GetDateFromDataNode(dataNode);
     if (currentEndPoint > endPoint)
     {
       // set the new, later end point
@@ -84,57 +93,42 @@ SemanticTypes::Date ControlPointManager::GetEndPoint(const std::vector<mitk::Dat
   return endPoint;
 }
 
-SemanticTypes::Date ControlPointManager::GetDateFromDataNode(const mitk::DataNode* dataNode)
+std::string ControlPointManager::GetControlPointAsString(const SemanticTypes::ControlPoint& controlPoint)
 {
-  if (nullptr == dataNode)
+  std::stringstream dateAsString;
+
+  SemanticTypes::Date startPoint = controlPoint.startPoint;
+  SemanticTypes::Date endPoint = controlPoint.endPoint;
+
+  dateAsString << std::to_string(controlPoint.startPoint.year) << "-"
+    << std::setfill('0') << std::setw(2) << std::to_string(startPoint.month) << "-"
+    << std::setfill('0') << std::setw(2) << std::to_string(startPoint.day);
+  if (startPoint != endPoint)
   {
-    MITK_INFO << "Not a valid data node.";
-    return SemanticTypes::Date();
+    dateAsString << " to \n " << std::to_string(endPoint.year) << "-"
+      << std::setfill('0') << std::setw(2) << std::to_string(endPoint.month) << "-"
+      << std::setfill('0') << std::setw(2) << std::to_string(endPoint.day);
   }
 
-  mitk::BaseData* baseData = dataNode->GetData();
-  if (nullptr == baseData)
-  {
-    MITK_INFO << "No valid base data.";
-    return SemanticTypes::Date();
-  }
-
-  // DICOM study date       = DICOMTag(0x0008, 0x0020)
-  // DICOM series date      = DICOMTag(0x0008, 0x0021)
-  // DICOM acquisition date = DICOMTag(0x0008, 0x0022)
-  // => TODO: which to chose?
-  mitk::BaseProperty* acquisitionDateProperty = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str());
-  if (nullptr != acquisitionDateProperty)
-  {
-    std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
-    return GetDateFromString(acquisitionDateAsString);
-  }
-  
-  return SemanticTypes::Date();
-}
-
-SemanticTypes::Date ControlPointManager::GetDateFromString(std::string& dateAsString)
-{
-  if (dateAsString.size() != 8) // string does not represent a DICOM date
-  {
-    return SemanticTypes::Date();
-  }
-
-  SemanticTypes::Date date;
-  date.UID = UIDGeneratorBoost::GenerateUID();
-  // date expected to be YYYYMMDD (8 characters)
-  date.year = std::strtoul(dateAsString.substr(0, 4).c_str(), nullptr, 10);
-  date.month = std::strtoul(dateAsString.substr(4, 2).c_str(), nullptr, 10);
-  date.day = std::strtoul(dateAsString.substr(6, 2).c_str(), nullptr, 10);
-
-  return date;
+  return dateAsString.str();
 }
 
 bool ControlPointManager::InsideControlPoint(const mitk::DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint)
 {
-  SemanticTypes::Date startPoint = GetDateFromDataNode(dataNode);
-  SemanticTypes::Date endPoint = GetDateFromDataNode(dataNode);
-  if (startPoint >= controlPoint.startPoint && endPoint <= controlPoint.endPoint && !controlPoint.UID.empty())
+  SemanticTypes::Date date = DICOMHelper::GetDateFromDataNode(dataNode);
+  if (date >= controlPoint.startPoint && date <= controlPoint.endPoint && !controlPoint.UID.empty())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool ControlPointManager::InsideControlPoint(const SemanticTypes::ControlPoint& containedControlPoint, const SemanticTypes::ControlPoint& containingControlPoint)
+{
+  if (containedControlPoint.startPoint >= containingControlPoint.startPoint && containedControlPoint.endPoint <= containingControlPoint.endPoint)
   {
     return true;
   }
@@ -168,45 +162,47 @@ bool ControlPointManager::CheckForOverlap(const SemanticTypes::ControlPoint& con
   }
 }
 
-SemanticTypes::ControlPoint ControlPointManager::FindControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+SemanticTypes::ControlPoint ControlPointManager::FindFittingControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
-  SemanticTypes::Date dateFromDataNode = GetDateFromDataNode(dataNode);
+  SemanticTypes::Date dateFromDataNode = DICOMHelper::GetDateFromDataNode(dataNode);
   if (0 == dateFromDataNode.year)
   {
     MITK_INFO << "Could not deduce a valid date from the given data node.";
     return SemanticTypes::ControlPoint();
   }
 
+  return FindFittingControlPoint(dateFromDataNode, allControlPoints);
+}
+
+SemanticTypes::ControlPoint ControlPointManager::FindFittingControlPoint(const SemanticTypes::Date& date, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+{
   // check if the date of the data node fits into an existing control point interval
   for (const auto& controlPoint : allControlPoints)
   {
-    if (ControlPointManager::InsideControlPoint(dateFromDataNode, controlPoint))
+    if (ControlPointManager::InsideControlPoint(date, controlPoint))
     {
+      // return the fitting control point that contains the date from the given data node
       return controlPoint;
     }
   }
 
   return SemanticTypes::ControlPoint();
 }
-
-SemanticTypes::ControlPoint ControlPointManager::FindControlPoint(const std::string& controlPointString, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
-{
-  for (const auto& controlPoint : allControlPoints)
-  {
-    if (controlPointString == controlPoint.AsString())
-    {
-      return controlPoint;
-    }
-  }
-
-  return SemanticTypes::ControlPoint();
-}
-
 
 SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
-  SemanticTypes::Date dateFromDataNode = GetDateFromDataNode(dataNode);
+  SemanticTypes::Date dateFromDataNode = DICOMHelper::GetDateFromDataNode(dataNode);
+  if (0 == dateFromDataNode.year)
+  {
+    MITK_INFO << "Could not deduce a valid date from the given data node.";
+    return SemanticTypes::ControlPoint();
+  }
 
+  return ExtendClosestControlPoint(dateFromDataNode, allControlPoints);
+}
+
+SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const SemanticTypes::Date& date, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+{
   // sort the vector of control points for easier lookup
   std::sort(allControlPoints.begin(), allControlPoints.end());
   // new date does not fit into an existing control point
@@ -214,7 +210,7 @@ SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const
   std::vector<SemanticTypes::ControlPoint>::const_iterator it;
   for (it = allControlPoints.begin(); it != allControlPoints.end(); ++it)
   {
-    if (dateFromDataNode < it->startPoint)
+    if (date < it->startPoint)
     {
       break; // cannot be inside this control point; therefore has to be greater ("newer") than 'it->endPoint'
     }
@@ -247,8 +243,8 @@ SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const
   }
 
   // test distance to next and previous time period
-  double distanceToNextTimePeriod = CalculateDistanceInDays(nextDate, dateFromDataNode);
-  double distanceToPreviousTimePeriod = CalculateDistanceInDays(previousDate, dateFromDataNode);
+  double distanceToNextTimePeriod = CalculateDistanceInDays(nextDate, date);
+  double distanceToPreviousTimePeriod = CalculateDistanceInDays(previousDate, date);
 
   SemanticTypes::ControlPoint closestControlPoint;
   double closestDistanceInDays;
@@ -271,12 +267,11 @@ SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const
   if (std::abs(closestDistanceInDays) < THRESHOLD_DISTANCE_IN_DAYS)
   {
     // extend the closest control point
-    ExtendControlPoint(closestControlPoint, dateFromDataNode);
+    ExtendControlPoint(closestControlPoint, date);
     return closestControlPoint;
   }
   else
   {
-    MITK_INFO << "Could not find a close control point to extend. Distance threshold is too large.";
     return SemanticTypes::ControlPoint();
   }
 }

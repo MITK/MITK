@@ -32,10 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace DICOMHelper
 {
 
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::CaseID GetCaseIDFromData(const mitk::DataNode* dataNode);
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ID GetIDFromData(const mitk::DataNode* dataNode);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::CaseID GetCaseIDFromDataNode(const mitk::DataNode* dataNode);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ID GetIDFromDataNode(const mitk::DataNode* dataNode);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Date GetDateFromDataNode(const mitk::DataNode* dataNode);
 
   MITKSEMANTICRELATIONS_EXPORT void ReformatDICOMTag(const std::string& tag, std::string& identifier);
+
+  SemanticTypes::Date GetDateFromString(const std::string& dateAsString);
 
   std::string Trim(const std::string& identifier);
   std::string DICOMTagToName(const std::string& propertyName);

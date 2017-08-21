@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relation module
 #include "mitkDICOMHelper.h"
+#include "mitkUIDGeneratorBoost.h"
 
 // mitk core
 #include <mitkPropertyNameHelper.h>
@@ -23,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <algorithm>
 
-SemanticTypes::CaseID DICOMHelper::GetCaseIDFromData(const mitk::DataNode* dataNode)
+SemanticTypes::CaseID DICOMHelper::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -50,7 +51,7 @@ SemanticTypes::CaseID DICOMHelper::GetCaseIDFromData(const mitk::DataNode* dataN
   return "";
 }
 
-SemanticTypes::ID DICOMHelper::GetIDFromData(const mitk::DataNode* dataNode)
+SemanticTypes::ID DICOMHelper::GetIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -76,6 +77,35 @@ SemanticTypes::ID DICOMHelper::GetIDFromData(const mitk::DataNode* dataNode)
   return "";
 }
 
+SemanticTypes::Date DICOMHelper::GetDateFromDataNode(const mitk::DataNode* dataNode)
+{
+  if (nullptr == dataNode)
+  {
+    MITK_INFO << "Not a valid data node.";
+    return SemanticTypes::Date();
+  }
+
+  mitk::BaseData* baseData = dataNode->GetData();
+  if (nullptr == baseData)
+  {
+    MITK_INFO << "No valid base data.";
+    return SemanticTypes::Date();
+  }
+
+  // DICOM study date       = DICOMTag(0x0008, 0x0020)
+  // DICOM series date      = DICOMTag(0x0008, 0x0021)
+  // DICOM acquisition date = DICOMTag(0x0008, 0x0022)
+  // => TODO: which to chose?
+  mitk::BaseProperty* acquisitionDateProperty = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str());
+  if (nullptr != acquisitionDateProperty)
+  {
+    std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
+    return GetDateFromString(acquisitionDateAsString);
+  }
+
+  return SemanticTypes::Date();
+}
+
 void DICOMHelper::ReformatDICOMTag(const std::string &tag, std::string &identifier)
 {
   // remove leading and trailing whitespace
@@ -92,6 +122,23 @@ void DICOMHelper::ReformatDICOMTag(const std::string &tag, std::string &identifi
       DICOMHelper::ReformatDICOMTime(identifier);
     }
   }
+}
+
+SemanticTypes::Date DICOMHelper::GetDateFromString(const std::string& dateAsString)
+{
+  if (dateAsString.size() != 8) // string does not represent a DICOM date
+  {
+    return SemanticTypes::Date();
+  }
+
+  SemanticTypes::Date date;
+  date.UID = UIDGeneratorBoost::GenerateUID();
+  // date expected to be YYYYMMDD (8 characters)
+  date.year = std::strtoul(dateAsString.substr(0, 4).c_str(), nullptr, 10);
+  date.month = std::strtoul(dateAsString.substr(4, 2).c_str(), nullptr, 10);
+  date.day = std::strtoul(dateAsString.substr(6, 2).c_str(), nullptr, 10);
+
+  return date;
 }
 
 std::string DICOMHelper::Trim(const std::string& identifier)

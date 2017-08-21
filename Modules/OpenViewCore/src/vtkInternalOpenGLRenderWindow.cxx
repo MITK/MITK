@@ -14,6 +14,7 @@
 
  ===================================================================*/
 
+#include <QOpenGLFramebufferObject>
 #include "vtk_glew.h"
 #include "vtkInternalOpenGLRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"

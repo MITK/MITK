@@ -5,6 +5,6 @@ set(CPP_FILES
   mitkDICOMHelper.cpp
   mitkRelationStorage.cpp
   mitkSemanticRelations.cpp
-  mitkUIDGenerator.cpp
+  mitkUIDGeneratorBoost.cpp
   mitkSemanticRelationsTestHelper.cpp
 )

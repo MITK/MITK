@@ -14,15 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUIDGENERATOR_H
-#define MITKUIDGENERATOR_H
+// semantic relation module
+#include "mitkUIDGeneratorBoost.h"
 
-#include <iostream>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
-namespace UIDGeneratorBoost
+std::string UIDGeneratorBoost::GenerateUID()
 {
-  std::string GenerateUID();
-
-} // namespace UIDGeneratorBoost
-
-#endif // MITKUIDGENERATOR_H
+  boost::uuids::uuid uuid = boost::uuids::random_generator()();
+  return boost::uuids::to_string(uuid);
+}

@@ -286,7 +286,7 @@ QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(
 {
   QListWidgetItem* result = new QListWidgetItem;
   std::string text =
-    device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
+    device->GetManufacturer() + "|" + device->GetName();
   result->setText(text.c_str());
   return result;
 }

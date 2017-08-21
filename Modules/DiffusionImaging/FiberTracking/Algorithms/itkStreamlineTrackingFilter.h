@@ -109,7 +109,12 @@ public:
   itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
   itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
-  itkSetMacro( SeedPoints, std::vector< itk::Point<float> >)	///< Use manually defined points in physical space as seed points instead of seed image
+  itkSetMacro( StopTracking, bool )
+  
+  ///< Use manually defined points in physical space as seed points instead of seed image
+  void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {
+    m_SeedPoints = sP;
+  }
 
   void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<
   {
@@ -119,6 +124,8 @@ public:
   virtual void Update() override{
     this->GenerateData();
   }
+
+  std::string GetStatusText();
 
 protected:
 
@@ -138,7 +145,6 @@ protected:
   bool IsInGm(const itk::Point<float, 3> &pos);
   vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
-  float GetRandDouble(float min=-1, float max=1);
   std::vector< vnl_vector_fixed<float,3> > CreateDirections(int NPoints);
 
   void BeforeTracking();
@@ -150,22 +156,30 @@ protected:
   BundleType                          m_Tractogram;
   BundleType                          m_GmStubs;
 
+  ItkUcharImgType::Pointer            m_StoppingRegions;
+  ItkUcharImgType::Pointer            m_SeedImage;
+  ItkUcharImgType::Pointer            m_MaskImage;
+  ItkUcharImgType::Pointer            m_TissueImage;
+  ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
+
   float                               m_AngularThresholdDeg;
   float                               m_StepSizeVox;
   float                               m_SamplingDistanceVox;
-
   float                               m_AngularThreshold;
   float                               m_StepSize;
   int                                 m_MaxLength;
   float                               m_MinTractLength;
   float                               m_MaxTractLength;
   int                                 m_SeedsPerVoxel;
+
+  bool                                m_AvoidStop;
   bool                                m_RandomSampling;
   float                               m_SamplingDistance;
   float                               m_DeflectionMod;
   bool                                m_OnlyForwardSamples;
   bool                                m_UseStopVotes;
   unsigned int                        m_NumberOfSamples;
+
   unsigned int                        m_NumPreviousDirections;
   int                                 m_WmLabel;
   int                                 m_GmLabel;
@@ -173,19 +187,15 @@ protected:
   bool                                m_ControlGmEndings;
   int                                 m_MaxNumTracts;
 
-  ItkUcharImgType::Pointer            m_StoppingRegions;
-  ItkUcharImgType::Pointer            m_SeedImage;
-  ItkUcharImgType::Pointer            m_MaskImage;
-  ItkUcharImgType::Pointer            m_TissueImage;
-  ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
-
   bool                                m_Verbose;
   bool                                m_AposterioriCurvCheck;
-  bool                                m_AvoidStop;
   bool                                m_DemoMode;
   bool                                m_Random;
   bool                                m_UseOutputProbabilityMap;
   std::vector< itk::Point<float> >    m_SeedPoints;
+  unsigned int                        m_CurrentTracts;
+  unsigned int                        m_Progress;
+  bool                                m_StopTracking;
 
   void BuildFibers(bool check);
   int CheckCurvature(FiberType* fib, bool front);

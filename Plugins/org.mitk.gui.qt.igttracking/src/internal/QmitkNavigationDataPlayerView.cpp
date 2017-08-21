@@ -94,7 +94,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile()
 
   try
   {
-    m_Data = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
+    m_Data = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(fileName.toStdString())[0].GetPointer());
   }
   catch ( const mitk::Exception &e )
   {

@@ -49,7 +49,7 @@ namespace mitk
     mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
     mitk::OpenIGTLinkTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::OpenIGTLinkTrackingDevice*>(trackingDevice.GetPointer());
     thisDevice->DiscoverTools();
-    if (thisDevice->GetToolCount() != navigationTools->GetToolCount())
+    if (static_cast<int>(thisDevice->GetToolCount()) != navigationTools->GetToolCount())
     {
       errorMessage->append("The number of tools in the connected device differs from the tool storage, cannot add tools.");
       return nullptr;

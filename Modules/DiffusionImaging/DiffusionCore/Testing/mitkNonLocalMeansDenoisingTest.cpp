@@ -53,7 +53,7 @@ public:
     //generate test images
     std::string imagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi.dwi");
 
-    m_Image =  mitk::IOUtil::LoadImage(imagePath);
+    m_Image =  dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imagePath)[0].GetPointer());
     m_ReferenceImage = nullptr;
     m_DenoisedImage = mitk::Image::New();
 
@@ -80,7 +80,7 @@ public:
   void Denoise_NLMg_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMg.dwi");
-    m_ReferenceImage =  mitk::IOUtil::LoadImage(referenceImagePath);
+    m_ReferenceImage =  dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImagePath)[0].GetPointer());
 
     m_DenoisingFilter->SetUseRicianAdaption(false);
     m_DenoisingFilter->SetUseJointInformation(false);
@@ -102,7 +102,7 @@ public:
   void Denoise_NLMr_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMr.dwi");
-    m_ReferenceImage = mitk::IOUtil::LoadImage(referenceImagePath);
+    m_ReferenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImagePath)[0].GetPointer());
 
     m_DenoisingFilter->SetUseRicianAdaption(true);
     m_DenoisingFilter->SetUseJointInformation(false);
@@ -124,7 +124,7 @@ public:
   void Denoise_NLMv_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMv.dwi");
-    m_ReferenceImage = mitk::IOUtil::LoadImage(referenceImagePath);
+    m_ReferenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImagePath)[0].GetPointer());
     m_DenoisingFilter->SetUseRicianAdaption(false);
     m_DenoisingFilter->SetUseJointInformation(true);
     try
@@ -145,7 +145,7 @@ public:
   void Denoise_NLMvr_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMvr.dwi");
-    m_ReferenceImage = mitk::IOUtil::LoadImage(referenceImagePath);
+    m_ReferenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImagePath)[0].GetPointer());
 
     m_DenoisingFilter->SetUseRicianAdaption(true);
     m_DenoisingFilter->SetUseJointInformation(true);

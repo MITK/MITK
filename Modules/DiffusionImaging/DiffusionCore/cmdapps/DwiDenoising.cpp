@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
   try
   {
       mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
-      DiffusionImageType::Pointer dwi = mitk::IOUtil::LoadImage(inFileName, &functor);
+      DiffusionImageType::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(inFileName, &functor).GetPointer());
 
       mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
       mitk::CastToItkImage(dwi, itkVectorImagePointer);
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 
       if (!maskName.empty())
       {
-        mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(maskName);
+        mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskName)[0].GetPointer());
         ImageType::Pointer itkMask = ImageType::New();
         mitk::CastToItkImage(mask, itkMask);
         filter->SetInputMask(itkMask);
@@ -110,8 +110,8 @@ int main(int argc, char* argv[])
       filter->Update();
 
       DiffusionImageType::Pointer output = mitk::GrabItkImageMemory( filter->GetOutput() );
-      output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) ) );
-      output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) ) );
+      output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) ) );
+      output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) ) );
       mitk::DiffusionPropertyHelper propertyHelper( output );
       propertyHelper.InitializeImage();
 

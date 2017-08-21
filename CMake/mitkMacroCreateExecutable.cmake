@@ -13,7 +13,7 @@
 #!     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
 #!     [INCLUDE_DIRS <list of additional include directories>]
 #!     [TARGET_DEPENDS <list of additional dependencies>
-#!     [WARNINGS_AS_ERRORS]
+#!     [WARNINGS_NO_ERRORS]
 #! \endcode
 #!
 #! \param EXECUTABLE_NAME The name for the new executable target
@@ -41,7 +41,7 @@ macro(mitk_create_executable)
       NO_INIT                # do not create CppMicroServices initialization code
       NO_FEATURE_INFO        # do not create a feature info by calling add_feature_info()
       NO_BATCH_FILE          # do not create batch files on Windows
-      WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
+      WARNINGS_NO_ERRORS     # do not treat compiler warnings as errors
      )
 
   cmake_parse_arguments(EXEC "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
@@ -50,8 +50,8 @@ macro(mitk_create_executable)
   if(EXEC_NO_INIT)
     list(APPEND _EXEC_OPTIONS NO_INIT)
   endif()
-  if(EXEC_WARNINGS_AS_ERRORS)
-    list(APPEND _EXEC_OPTIONS WARNINGS_AS_ERRORS)
+  if(EXEC_WARNINGS_NO_ERRORS)
+    list(APPEND _EXEC_OPTIONS WARNINGS_NO_ERRORS)
   endif()
   if(EXEC_NO_FEATURE_INFO)
     list(APPEND _EXEC_OPTIONS NO_FEATURE_INFO)

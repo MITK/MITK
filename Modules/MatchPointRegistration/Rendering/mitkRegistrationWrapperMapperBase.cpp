@@ -47,13 +47,20 @@ mitk::MITKRegistrationWrapperMapperBase::~MITKRegistrationWrapperMapperBase()
 
 void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-    if ( !this->IsVisible( renderer ) )
+    mitk::DataNode::Pointer node = this->GetDataNode();
+
+    if (node.IsNull())
+      return;
+
+    bool isVisible = true;
+    node->GetVisibility(isVisible, renderer);
+
+    if (!isVisible)
         return;
 
     RegWrapperLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
     //check if updates occured in the node or on the display
-    const DataNode *node = this->GetDataNode();
     bool outdatedRendererGeometry = RendererGeometryIsOutdated(renderer,localStorage->m_LastUpdateTime);
 
     if ( (localStorage->m_LastUpdateTime < node->GetMTime())
@@ -80,15 +87,12 @@ void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::Bas
         bool isPointsActiveOutdated = mitk::PropertyIsOutdated(node,mitk::nodeProp_RegVisPoints,localStorage->m_LastUpdateTime);
         bool showStartGridOutdated = mitk::PropertyIsOutdated(node,mitk::nodeProp_RegVisGridShowStart,localStorage->m_LastUpdateTime);
 
-        const mitk::BaseData* baseData = this->GetData();
-        if (baseData == nullptr)
+        mitk::BaseData::Pointer baseData = node->GetData();
+
+        if (baseData.IsNull())
             return;
 
-        const DataNode *node = this->GetDataNode();
-        if (node == nullptr)
-            return;
-
-        const mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<const mitk::MAPRegistrationWrapper*>(baseData);
+        const mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<const mitk::MAPRegistrationWrapper*>(baseData.GetPointer());
         if (regWrapper == nullptr)
             return;
 

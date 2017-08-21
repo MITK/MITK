@@ -84,7 +84,7 @@ void DwiNormilzationFilter< TInPixelType>::BeforeThreadedGenerateData()
       {
         for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
         {
-          if (i==m_B0Index)
+          if ((int)i==m_B0Index)
             continue;
           m_Mean += git.Get()[i];
           n++;
@@ -104,7 +104,7 @@ void DwiNormilzationFilter< TInPixelType>::BeforeThreadedGenerateData()
       {
         for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
         {
-          if (i==m_B0Index)
+          if ((int)i==m_B0Index)
             continue;
           double diff = (double)(git.Get()[i]) - m_Mean;
           m_Stdev += diff*diff;

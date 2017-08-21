@@ -377,8 +377,8 @@ namespace itk
     m_UseRelativeNonFiberVolumeFractions = false;
 
     // check for fiber volume fraction maps
-    int fibVolImages = 0;
-    for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
+    unsigned int fibVolImages = 0;
+    for (std::size_t i=0; i<m_Parameters.m_FiberModelList.size(); i++)
     {
       if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNotNull())
       {
@@ -388,8 +388,8 @@ namespace itk
     }
 
     // check for non-fiber volume fraction maps
-    int nonfibVolImages = 0;
-    for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
+    unsigned int nonfibVolImages = 0;
+    for (std::size_t i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
     {
       if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
       {
@@ -466,7 +466,7 @@ namespace itk
 
     // initialize the images that store the output volume fraction of each compartment
     m_VolumeFractions.clear();
-    for (int i=0; i<m_Parameters.m_FiberModelList.size()+m_Parameters.m_NonFiberModelList.size(); i++)
+    for (std::size_t i=0; i<m_Parameters.m_FiberModelList.size()+m_Parameters.m_NonFiberModelList.size(); i++)
     {
       auto doubleImg = ItkDoubleImgType::New();
       doubleImg->SetSpacing( m_WorkingSpacing );
@@ -966,9 +966,9 @@ namespace itk
         SimulateMotion(g);
 
         // Set signal model random generator seeds to get same configuration in each voxel
-        for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
+        for (std::size_t i=0; i<m_Parameters.m_FiberModelList.size(); i++)
           m_Parameters.m_FiberModelList.at(i)->SetSeed(signalModelSeed);
-        for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
+        for (std::size_t i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
           m_Parameters.m_NonFiberModelList.at(i)->SetSeed(signalModelSeed);
 
         // storing voxel-wise intra-axonal volume in mm³

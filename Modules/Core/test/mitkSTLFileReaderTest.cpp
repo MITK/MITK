@@ -46,7 +46,7 @@ public:
   void testReadFile()
   {
     // Read STL-Image from file
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(m_SurfacePath);
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(m_SurfacePath)[0].GetPointer());
 
     // check some basic stuff
     CPPUNIT_ASSERT_MESSAGE("Reader output not nullptr", surface.IsNotNull());

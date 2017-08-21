@@ -14,11 +14,10 @@
 
  ===================================================================*/
 
+#include "vtk_glew.h"
 #include "vtkInternalOpenGLRenderWindow.h"
-
 #include "QVTKFramebufferObjectRenderer.h"
 
-#include <vtkgl.h>
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(vtkInternalOpenGLRenderWindow);
@@ -46,8 +45,7 @@ void vtkInternalOpenGLRenderWindow::OpenGLEndState()
 void vtkInternalOpenGLRenderWindow::OpenGLInitState()
 {
   Superclass::OpenGLInitState();
-  vtkgl::UseProgram(0);
-
+//  vtkgl::UseProgram(0); TODO18922
   glEnable(GL_BLEND);
   glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST);
   glDepthMask(GL_TRUE);
@@ -63,11 +61,10 @@ void vtkInternalOpenGLRenderWindow::Render()
 
 void vtkInternalOpenGLRenderWindow::SetFramebufferObject(QOpenGLFramebufferObject *fbo)
 {
-  this->SetFrontBuffer(vtkgl::COLOR_ATTACHMENT0);
-  // Why all those buffers, too??
-  this->SetFrontRightBuffer(vtkgl::COLOR_ATTACHMENT0);
-  this->SetBackLeftBuffer(vtkgl::COLOR_ATTACHMENT0);
-  this->SetBackRightBuffer(vtkgl::COLOR_ATTACHMENT0);
+  this->SetFrontBuffer(GL_COLOR_ATTACHMENT0);
+  this->SetFrontLeftBuffer(GL_COLOR_ATTACHMENT0);
+  this->SetBackBuffer(GL_COLOR_ATTACHMENT0);
+  this->SetBackLeftBuffer(GL_COLOR_ATTACHMENT0);
 
   QSize fboSize = fbo->size();
   this->SetSize(fboSize.width(), fboSize.height());

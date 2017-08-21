@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkImageDataItem.h"
-#include "mitkLegacyAdaptors.h"
 
 #include <mitkContourModelUtils.h>
 

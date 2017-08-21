@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>523</width>
-    <height>1158</height>
+    <height>1192</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -103,7 +103,20 @@
          </column>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="5" column="0">
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="0" rowspan="2">
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -127,25 +140,6 @@
           <property name="horizontalSpacing">
            <number>6</number>
           </property>
-          <item row="5" column="0">
-           <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Show gradients</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="1">
            <layout class="QFormLayout" name="formLayout">
             <item row="0" column="0">
@@ -182,25 +176,6 @@
             </item>
            </layout>
           </item>
-          <item row="8" column="0">
-           <widget class="QCommandLinkButton" name="m_ReduceGradientsButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere using an iterative energy repulsion strategy.</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Reduce number of gradients</string>
-            </property>
-           </widget>
-          </item>
           <item row="6" column="0">
            <widget class="QCommandLinkButton" name="m_MirrorGradientToHalfSphereButton">
             <property name="enabled">
@@ -220,13 +195,22 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
+          <item row="5" column="0">
+           <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
+            <property name="toolTip">
+             <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string>Round b-values</string>
+             <string>Show gradients</string>
             </property>
            </widget>
           </item>
@@ -246,6 +230,25 @@
             </property>
             <property name="text">
              <string>Flip gradients</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QCommandLinkButton" name="m_ReduceGradientsButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere using an iterative energy repulsion strategy.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Reduce number of gradients</string>
             </property>
            </widget>
           </item>
@@ -297,21 +300,37 @@
             </layout>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Round b-values</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QCommandLinkButton" name="m_ClearRotationButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>By default, the image matrix is applied to the image gradients. This button removes this additional rotation.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Clear rotation of gradients</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
-       </item>
-       <item row="5" column="0">
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -1654,14 +1673,14 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBoxWithSelectNone</class>
-   <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

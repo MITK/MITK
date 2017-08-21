@@ -37,12 +37,12 @@ class QmitkMappingJob;
 \ingroup ${plugin_target}_internal
 */
 class QmitkMatchPointRegistrationManipulator : public QmitkAbstractView, public mitk::IRenderWindowPartListener
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-public:  
+public:
 
   static const std::string VIEW_ID;
 
@@ -143,6 +143,10 @@ private:
   itk::TimeStamp m_selectedNodeTime;
   itk::TimeStamp m_currentPositionTime;
 
+  bool m_activeManipulation;
+  bool m_autoMoving;
+  bool m_autoTarget;
+
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;
   /** @brief indicates if the currently selected position is valid for the currently selected fit.
@@ -163,12 +167,8 @@ private:
   MAPRegistrationType::Pointer m_CurrentRegistration;
   MAPRegistrationType::ConstPointer m_SelectedPreReg;
 
-  bool m_autoTarget;
-  bool m_autoMoving;
-  bool m_activeManipulation;
-
   bool m_internalUpdate;
-  const std::string HelperNodeName;
+  static const std::string HelperNodeName;
 };
 
 #endif // MatchPoint_h

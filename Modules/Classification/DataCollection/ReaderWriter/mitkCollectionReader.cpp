@@ -131,7 +131,7 @@ mitk::DataCollection::Pointer mitk::CollectionReader::FolderToCollection(std::st
     DataCollection::Pointer subCollection = DataCollection::New();
     for (unsigned int i=0; i< suffixes.size(); ++i)
     {
-      Image::Pointer image = IOUtil::LoadImage(fileList.at(i).at(k));
+      Image::Pointer image = dynamic_cast<mitk::Image*>(IOUtil::Load(fileList.at(i).at(k))[0].GetPointer());
       subCollection->AddData(image.GetPointer(),seriesNames.at(i), fileList.at(i).at(k));
     }
     std::string sDate =  GetDate(fileList.at(0).at(k),suffixes.at(0));
@@ -200,7 +200,7 @@ void mitk::CollectionReader::StartElement(const char* elementName, const char **
       return;
 
     // Populate Sub-Collection
-    Image::Pointer image = IOUtil::LoadImage(itemLink);
+    Image::Pointer image = dynamic_cast<mitk::Image*>(IOUtil::Load(itemLink)[0].GetPointer());
     if (image.IsNotNull())
       m_DataItemCollection->AddData(image.GetPointer(),itemName,relativeItemLink);
     else

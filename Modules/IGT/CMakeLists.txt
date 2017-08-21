@@ -21,17 +21,13 @@ if(MITK_USE_POLHEMUS_TRACKER)
   set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_POLHEMUS_TRACKER_LIB})
 endif(MITK_USE_POLHEMUS_TRACKER)
 
-message(STATUS "ADDITIONAL_INCLUDE_DIRS" ${ADDITIONAL_INCLUDE_DIRS})
-message(STATUS "ADDITIONAL_LIBS" ${ADDITIONAL_LIBS})
-
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-IGT
-  INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper 
+  INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
   INTERNAL_INCLUDE_DIRS ${ADDITIONAL_INCLUDE_DIRS}
   DEPENDS MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
   PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml OpenIGTLink
-  ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-  #WARNINGS_AS_ERRORS disabled for release 2014-03 because of bug 17463
+  ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )
 
 if(MitkIGT_IS_ENABLED)

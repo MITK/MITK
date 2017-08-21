@@ -42,7 +42,6 @@ MITK_CREATE_MODULE(
   INCLUDE_DIRS Fiberfox Fiberfox/SignalModels Fiberfox/Sequences Algorithms Algorithms/TrackingHandlers Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundle IODataStructures/PlanarFigureComposite Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${_module_deps}
   PACKAGE_DEPENDS PUBLIC ITK|ITKFFT ITK|ITKDiffusionTensorImage Vigra HDF5
-  #WARNINGS_AS_ERRORS
 )
 
 if(MODULE_IS_ENABLED)

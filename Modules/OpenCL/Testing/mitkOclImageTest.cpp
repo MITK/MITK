@@ -64,7 +64,7 @@ int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
 
   // test if oclImage correct initialized
   MITK_TEST_CONDITION( oclTestImage->GetMITKImage() == reference, "oclImage has the correct reference mitk::Image");
-  MITK_TEST_CONDITION( oclTestImage->GetDimension() == reference->GetDimension(), "Same dimensionality.");
+  MITK_TEST_CONDITION( (unsigned int)oclTestImage->GetDimension() == reference->GetDimension(), "Same dimensionality.");
 
   cl_int clErr = 0;
   cl_command_queue cmdQueue = clCreateCommandQueue( gpuContext, gpuDevice,

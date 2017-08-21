@@ -154,8 +154,6 @@ static void TestModiciationTimeCorrectness()
   MITK_TEST_CONDITION( mTime3 < tool->GetMTime(),
                        "Testing MTime updated after new orientation set" );
 
-  unsigned long mTime4 = tool->GetMTime();
-
   mitk::Point3D position3;
   mitk::FillVector3D(position3, 1.10002, 2.2, 3.3);
 }

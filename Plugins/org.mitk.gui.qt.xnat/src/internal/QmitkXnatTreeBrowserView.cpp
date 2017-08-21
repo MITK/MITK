@@ -224,18 +224,6 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 
   m_Tracker->Open();
 
-  ctkXnatSession* session;
-
-  try
-  {
-    session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
-  }
-  catch (std::invalid_argument)
-  {
-    session = nullptr;
-  }
-
   connect(m_Controls.treeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnXnatNodeSelected(const QModelIndex&)));
   connect(m_TreeModel, SIGNAL(ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&)), this, SLOT(OnUploadResource(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&)));
@@ -991,7 +979,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 
     //        fileInfo.setFile(origFile);
     //        if (!fileInfo.exists())
-    //          mitk::IOUtil::SaveSurface(surface, dir.path().toStdString());
+    //          mitk::IOUtil::Save(surface, dir.path().toStdString());
     //      }
     //    this->uploadFileToXnat(xnatFile, dir.path());
   }

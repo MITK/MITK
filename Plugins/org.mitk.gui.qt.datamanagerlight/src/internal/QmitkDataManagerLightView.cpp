@@ -24,11 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
-#include <mitkCoreObjectFactory.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkIRenderingManager.h>
-#include <mitkIOUtil.h>
+#include <QmitkIOUtil.h>
 
 const std::string QmitkDataManagerLightView::VIEW_ID = "org.mitk.views.datamanagerlight";
 
@@ -166,7 +165,7 @@ void QmitkDataManagerLightView::ListSelectionChanged()
 void QmitkDataManagerLightView::on_Load_pressed()
 {
     MITK_DEBUG << "on_Load_pressed";
-  QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Load data", "", mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+  QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Load data", "", QmitkIOUtil::GetFileOpenFilterString());
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
     FileOpen((*it).toLatin1(), 0);
@@ -236,7 +235,7 @@ void QmitkDataManagerLightView::ToggleVisibility()
 {
     bool changedAnything = false;
     bool isVisible = false;
-    for(size_t i=0; i<d->m_DataNodes.size(); ++i)
+    for(int i=0; i<d->m_DataNodes.size(); ++i)
     {
         isVisible = false;
         d->m_DataNodes.at(i)->GetVisibility(isVisible, 0 );

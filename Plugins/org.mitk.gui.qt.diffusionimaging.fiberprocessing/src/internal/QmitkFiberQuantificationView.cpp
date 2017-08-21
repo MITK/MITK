@@ -209,7 +209,7 @@ void QmitkFiberQuantificationView::GenerateStats()
 
   QString stats("");
 
-  for( int i=0; i<m_SelectedFB.size(); i++ )
+  for( unsigned int i=0; i<m_SelectedFB.size(); i++ )
   {
     mitk::DataNode::Pointer node = m_SelectedFB[i];
     if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
@@ -261,7 +261,7 @@ void QmitkFiberQuantificationView::ProcessSelectedBundles()
 
   int generationMethod = m_Controls->m_GenerationBox->currentIndex();
 
-  for( int i=0; i<m_SelectedFB.size(); i++ )
+  for( unsigned int i=0; i<m_SelectedFB.size(); i++ )
   {
     mitk::DataNode::Pointer node = m_SelectedFB[i];
     if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))

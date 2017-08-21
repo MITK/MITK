@@ -95,6 +95,9 @@ namespace mitk
 
     std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
 
+    if (byteString.empty()) {
+      return false;
+    }
     mitk::CustomTagParser tagParser(relevantFiles[0]);
 
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);

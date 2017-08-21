@@ -39,23 +39,18 @@ set(_plugins
   org.mitk.gui.qt.volumevisualization
   org.mitk.gui.qt.diffusionimaging
   org.mitk.gui.qt.diffusionimaging.connectomics
-  org.mitk.gui.qt.diffusionimaging.denoising
   org.mitk.gui.qt.diffusionimaging.fiberfox
   org.mitk.gui.qt.diffusionimaging.fiberprocessing
   org.mitk.gui.qt.diffusionimaging.ivim
   org.mitk.gui.qt.diffusionimaging.odfpeaks
-  org.mitk.gui.qt.diffusionimaging.partialvolume
   org.mitk.gui.qt.diffusionimaging.preprocessing
   org.mitk.gui.qt.diffusionimaging.reconstruction
-  org.mitk.gui.qt.diffusionimaging.registration
-  org.mitk.gui.qt.diffusionimaging.tbss
   org.mitk.gui.qt.diffusionimaging.tractography
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing
   org.mitk.gui.qt.properties
   org.mitk.gui.qt.viewnavigator
-  org.mitk.gui.qt.cmdlinemodules
 )
 
 # Plug-ins listed below will not be

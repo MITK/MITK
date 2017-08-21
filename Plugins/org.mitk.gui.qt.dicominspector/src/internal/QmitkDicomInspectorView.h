@@ -109,9 +109,6 @@ protected:
   typedef std::multimap<const mitk::SliceNavigationController*, ObserverInfo> ObserverMapType;
   ObserverMapType m_ObserverMap;
 
-  /**	@brief	Is a visualization currently running? */
-  bool m_internalUpdateFlag;
-
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;
   /** @brief indicates if the currently selected position is valid for the currently selected fit.
@@ -126,6 +123,9 @@ protected:
   mitk::DataNode::ConstPointer m_currentSelectedNode;
 
   mitk::BaseData::ConstPointer m_currentSelectedData;
+
+  /**	@brief	Is a visualization currently running? */
+  bool m_internalUpdateFlag;
 
   /** @brief	Number of interpolation steps between two x values */
   static const unsigned int INTERPOLATION_STEPS;

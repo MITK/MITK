@@ -166,7 +166,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
   // Take the ItkImageFile Reader for the .nrrd data format.
   // (was previously pic which is now deprecated format)
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
 
   // create some DataNodes to fill the ds
   mitk::DataNode::Pointer n1 = mitk::DataNode::New(); // node with image and name property

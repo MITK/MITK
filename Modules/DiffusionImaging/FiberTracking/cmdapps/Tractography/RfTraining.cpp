@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkFiberBundle.h>
 #include <mitkTrackingHandlerRandomForest.h>
+#include <mitkTractographyForest.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -138,7 +139,7 @@ int main(int argc, char* argv[])
     std::vector< ItkUcharImgType::Pointer > maskImageVector;
     for (auto maskFile : maskFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(maskFile).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFile)[0].GetPointer());
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
         mitk::CastToItkImage(img, mask);
         maskImageVector.push_back(mask);
@@ -148,7 +149,7 @@ int main(int argc, char* argv[])
     std::vector< ItkUcharImgType::Pointer > wmMaskImageVector;
     for (auto wmFile : wmMaskFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(wmFile).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(wmFile)[0].GetPointer());
         ItkUcharImgType::Pointer wmmask = ItkUcharImgType::New();
         mitk::CastToItkImage(img, wmmask);
         wmMaskImageVector.push_back(wmmask);
@@ -166,7 +167,7 @@ int main(int argc, char* argv[])
     std::vector< ItkFloatImgType::Pointer > volumeModImages;
     for (auto file : volModFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(file).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(file)[0].GetPointer());
         ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
         mitk::CastToItkImage(img, itkimg);
         volumeModImages.push_back(itkimg);
@@ -174,19 +175,20 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "loading additional feature images";
     std::vector< std::vector< ItkFloatImgType::Pointer > > addFeatImages;
-    for (int i=0; i<rawData.size(); i++)
+    for (std::size_t i=0; i<rawData.size(); ++i)
         addFeatImages.push_back(std::vector< ItkFloatImgType::Pointer >());
 
     int c = 0;
     for (auto file : addFeatFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(file).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(file)[0].GetPointer());
         ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
         mitk::CastToItkImage(img, itkimg);
         addFeatImages.at(c%addFeatImages.size()).push_back(itkimg);
         c++;
     }
 
+    mitk::TractographyForest::Pointer forest = nullptr;
     if (shfeatures)
     {
         mitk::TrackingHandlerRandomForest<6,28> forestHandler;
@@ -200,10 +202,10 @@ int main(int argc, char* argv[])
         forestHandler.SetMaxTreeDepth(max_tree_depth);
         forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(sampling_distance);
+        forestHandler.SetFiberSamplingStep(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
-        forestHandler.SaveForest(forestFile);
+        forest = forestHandler.GetForest();
     }
     else
     {
@@ -218,11 +220,13 @@ int main(int argc, char* argv[])
         forestHandler.SetMaxTreeDepth(max_tree_depth);
         forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(sampling_distance);
+        forestHandler.SetFiberSamplingStep(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
-        forestHandler.SaveForest(forestFile);
+        forest = forestHandler.GetForest();
     }
+
+    mitk::IOUtil::Save(forest, forestFile);
 
     return EXIT_SUCCESS;
 }

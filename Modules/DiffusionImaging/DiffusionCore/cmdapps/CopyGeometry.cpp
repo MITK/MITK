@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
 
       try
     {
-      Image::Pointer source = mitk::IOUtil::LoadImage(refImage);
-      Image::Pointer target = mitk::IOUtil::LoadImage(imageName);
+      Image::Pointer source = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(refImage)[0].GetPointer());
+      Image::Pointer target = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imageName)[0].GetPointer());
       if (originOnly)
       {
         // Calculate correction to align centroids
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         t_geom->SetIndexToWorldTransform(s_geom->GetIndexToWorldTransform());
         target->SetGeometry(t_geom);
       }
-        mitk::IOUtil::SaveImage(target, outImage);
+        mitk::IOUtil::Save(target, outImage);
     }
     catch (itk::ExceptionObject e)
     {

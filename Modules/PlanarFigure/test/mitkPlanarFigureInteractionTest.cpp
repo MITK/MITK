@@ -78,7 +78,7 @@ public:
     mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionXmlPath));
 
     // Load a bounding image
-    mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    mitk::Image::Pointer testImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd"))[0].GetPointer());
     figure->SetGeometry(testImage->GetGeometry());
 
     mitk::DataNode::Pointer dn = mitk::DataNode::New();

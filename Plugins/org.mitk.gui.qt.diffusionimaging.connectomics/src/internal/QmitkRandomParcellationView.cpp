@@ -65,7 +65,7 @@ void QmitkRandomParcellationView::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.radioButtonSmallestParcel, SIGNAL(clicked()), this, SLOT(OnRadioButtonSmallestParcelChanged(int)));
 }
 
-void QmitkRandomParcellationView::OnMergingCheckboxChanged(int state)
+void QmitkRandomParcellationView::OnMergingCheckboxChanged(int )
 {
   if (m_Controls.checkBoxMerging->isChecked())
   {
@@ -80,7 +80,7 @@ void QmitkRandomParcellationView::OnMergingCheckboxChanged(int state)
   }
 }
 
-void QmitkRandomParcellationView::OnRadioButtonNumberParcelsChanged(int state)
+void QmitkRandomParcellationView::OnRadioButtonNumberParcelsChanged(int )
 {
   if (m_Controls.radioButtonNumberParcels->isChecked())
   {
@@ -93,7 +93,7 @@ void QmitkRandomParcellationView::OnRadioButtonNumberParcelsChanged(int state)
   }
 }
 
-void QmitkRandomParcellationView::OnRadioButtonSmallestParcelChanged(int state)
+void QmitkRandomParcellationView::OnRadioButtonSmallestParcelChanged(int )
 {
   if (m_Controls.radioButtonSmallestParcel->isChecked())
   {
@@ -278,7 +278,7 @@ void QmitkRandomParcellationView::GetRandomParcels( itk::Image<TPixel, VImageDim
   generator.ShowSizeOfRegions();
 
   //Check if the Merge-Buttons are chosen
-  int newNumberNodes;
+  int newNumberNodes = 0;
 
   if (m_Controls.checkBoxMerging->isChecked())
   {

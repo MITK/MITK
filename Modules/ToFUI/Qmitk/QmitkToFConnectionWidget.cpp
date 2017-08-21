@@ -119,7 +119,6 @@ void QmitkToFConnectionWidget::OnSelectCamera()
   }
   m_Controls->m_ConnectCameraButton->setEnabled(true); //ConnectCameraButton gets enabled
   m_SelectedCameraName = selectedCamera;
-  emit  (selectedCamera);
 }
 //This Methods hides all Widgets (later each widget is activated on its own)
 void QmitkToFConnectionWidget::HideAllParameterWidgets()

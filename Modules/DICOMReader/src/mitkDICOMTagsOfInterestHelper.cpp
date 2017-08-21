@@ -148,6 +148,18 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTagPath(beamSequence).AddElement(0x300A, 0x00C6)));          //dicom.BeamSequence.RadiationType
     result.insert(MakeEntry(DICOMTagPath(referencedStructureSetSequence).AddElement(0x0008, 0x1155))); //dicom.ReferencedStructureSetSequence.ReferencedSOPInstanceUID
 
+    //Additions for RTSTRUCT
+    DICOMTagPath structureSetROISequence;
+    structureSetROISequence.AddAnySelection(0x3006, 0x0020);
+    result.insert(MakeEntry(DICOMTagPath(structureSetROISequence).AddElement(0x3006, 0x0022))); //dicom.StructureSetROISequence.ROINumber
+    result.insert(MakeEntry(DICOMTagPath(structureSetROISequence).AddElement(0x3006, 0x0026))); //dicom.StructureSetROISequence.ROIName
+    result.insert(MakeEntry(DICOMTagPath(structureSetROISequence).AddElement(0x3006, 0x0024))); //dicom.StructureSetROISequence.ReferencedFrameOfReferenceUID
+
+    //Additions for RTDOSE
+    DICOMTagPath planReferenceSequence;
+    planReferenceSequence.AddAnySelection(0x300C, 0x0002);
+    result.insert(MakeEntry(DICOMTagPath(planReferenceSequence).AddElement(0x0008, 0x1155))); //dicom.PlanReferenceSequence.ReferencedSOPInstanceUID
+
     //Additions for PET
     DICOMTagPath radioPharmaRootTag;
     radioPharmaRootTag.AddAnySelection(0x0054, 0x0016);

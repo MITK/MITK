@@ -400,8 +400,8 @@ void QmitkMatchPointBatchProcessor::ConfigureRegistrationControls()
     m_Controls.m_pbStartReg->setEnabled(m_ValidInputs && !m_Working);
     /////////////////////////////////////////////
 
-    const IStoppableAlgorithm* pIterativ = dynamic_cast<const IStoppableAlgorithm*>
-                                           (m_LoadedAlgorithm.GetPointer());
+    //const IStoppableAlgorithm* pIterativ = dynamic_cast<const IStoppableAlgorithm*>
+    //                                       (m_LoadedAlgorithm.GetPointer());
 
     /**@TODO reactivate as soon as crex processor allows to stop batch processing.*/
     //if (pIterativ)
@@ -509,7 +509,7 @@ void QmitkMatchPointBatchProcessor::OnStartRegBtnPushed()
 
 bool QmitkMatchPointBatchProcessor::SpawnNextJob()
 {
-  if (this->m_nextNodeToSpawn < this->m_selectedMovingNodes.size())
+  if (static_cast<int>(this->m_nextNodeToSpawn) < this->m_selectedMovingNodes.size())
   {
     QmitkRegistrationJob* pJob = new QmitkRegistrationJob(m_LoadedAlgorithm);
     pJob->setAutoDelete(true);

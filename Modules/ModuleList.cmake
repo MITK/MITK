@@ -20,7 +20,6 @@ set(mitk_modules
   PlanarFigure
   ImageDenoising
   ImageExtraction
-  LegacyAdaptors
   SceneSerialization
   Gizmo
   GraphAlgorithms
@@ -33,7 +32,7 @@ set(mitk_modules
   OpenViewCore
   QtWidgets
   QtWidgetsExt
-  C3js
+  Chart
   QmlItems
   SegmentationUI
   Classification
@@ -49,17 +48,17 @@ set(mitk_modules
   ToFHardware
   ToFProcessing
   ToFUI
+  PhotoacousticsHardware
+  PhotoacousticsAlgorithms
   US
   USUI
   DicomUI
-  Simulation
   Remeshing
   Python
   QtPython
   Persistence
   OpenIGTLinkUI
   IGTUI
-  VtkShaders
   DicomRT
   RTUI
   IOExt

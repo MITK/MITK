@@ -79,7 +79,7 @@ public:
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
     mitk::LabelSetImage::Pointer loadedImage =
-      dynamic_cast<mitk::LabelSetImage *>(mitk::IOUtil::LoadBaseData(pathToImage).GetPointer());
+      dynamic_cast<mitk::LabelSetImage *>(mitk::IOUtil::Load(pathToImage)[0].GetPointer());
 
     // This information is currently not serialized but also checked within the Equals function
     loadedImage->SetActiveLayer(multilabelImage->GetActiveLayer());
@@ -124,7 +124,7 @@ public:
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
     mitk::LabelSetImage::Pointer loadedImage =
-      dynamic_cast<mitk::LabelSetImage *>(mitk::IOUtil::LoadBaseData(pathToImage).GetPointer());
+      dynamic_cast<mitk::LabelSetImage *>(mitk::IOUtil::Load(pathToImage)[0].GetPointer());
 
     // This information is currently not serialized but also checked within the Equals function
     loadedImage->SetActiveLayer(multilabelImage->GetActiveLayer());

@@ -36,6 +36,7 @@ std::vector<CustomMimeType*> DiffusionIOMimeTypes::Get()
   mimeTypes.push_back(FIBERBUNDLE_TCK_MIMETYPE().Clone());
 
   mimeTypes.push_back(CONNECTOMICS_MIMETYPE().Clone());
+  mimeTypes.push_back(TRACTOGRAPHYFOREST_MIMETYPE().Clone());
 
   mimeTypes.push_back(PLANARFIGURECOMPOSITE_MIMETYPE().Clone());
 
@@ -50,6 +51,17 @@ CustomMimeType DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE()
   mimeType.SetComment("Planar Figure Composite");
   mimeType.SetCategory(category);
   mimeType.AddExtension("pfc");
+  return mimeType;
+}
+
+
+CustomMimeType DiffusionIOMimeTypes::TRACTOGRAPHYFOREST_MIMETYPE()
+{
+  CustomMimeType mimeType(TRACTOGRAPHYFOREST_MIMETYPE_NAME());
+  std::string category = "Tractography Forest";
+  mimeType.SetComment("Tractography Forest");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("rf");
   return mimeType;
 }
 
@@ -157,6 +169,12 @@ std::string DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE_NAME()
   return name;
 }
 
+std::string DiffusionIOMimeTypes::TRACTOGRAPHYFOREST_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".rf";
+  return name;
+}
+
 // Descriptions
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION()
 {
@@ -173,6 +191,12 @@ std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION()
 std::string DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE_DESCRIPTION()
 {
   static std::string description = "Planar Figure Composite";
+  return description;
+}
+
+std::string DiffusionIOMimeTypes::TRACTOGRAPHYFOREST_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Tractography Forest";
   return description;
 }
 

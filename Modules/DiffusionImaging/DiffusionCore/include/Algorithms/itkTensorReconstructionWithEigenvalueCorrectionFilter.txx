@@ -182,12 +182,12 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for(int x=0;x<size[0];x++)
-    for(int y=0;y<size[1];y++)
-      for(int z=0;z<size[2];z++)
+  for(int x=0;x<(int)size[0];x++)
+    for(int y=0;y<(int)size[1];y++)
+      for(int z=0;z<(int)size[2];z++)
       {
         double mean_b=0.0;
-        itk::Index<3> ix = {{x,y,z}};
+        itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
 
         GradientVectorType pixel = m_GradientImagePointer->GetPixel(ix);
         for (int i=0;i<nof;i++)
@@ -218,12 +218,12 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (int x=0;x<size[0];x++)
-    for (int y=0;y<size[1];y++)
-      for (int z=0;z<size[2];z++)
+  for (int x=0;x<(int)size[0];x++)
+    for (int y=0;y<(int)size[1];y++)
+      for (int z=0;z<(int)size[2];z++)
       {
         vnl_vector<double> org_vec(nof);
-        itk::Index<3> ix = {{x,y,z}};
+        itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
 
         double mask_val = mask->GetPixel(ix);
 
@@ -510,13 +510,13 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (int x=0;x<size[0];x++)
-    for (int y=0;y<size[1];y++)
-      for (int z=0;z<size[2];z++)
+  for (int x=0;x<(int)size[0];x++)
+    for (int y=0;y<(int)size[1];y++)
+      for (int z=0;z<(int)size[2];z++)
       {
         double pixel=0;
 
-        itk::Index<3> ix = {{x,y,z}};
+        itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
         pixel = mask->GetPixel(ix);
 
         // but only if previously marked as bad one-negative eigen value
@@ -558,15 +558,15 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (int z=0;z<size[2];z++)
-    for (int x=0;x<size[0];x++)
-      for (int y=0;y<size[1];y++)
+  for (int z=0;z<(int)size[2];z++)
+    for (int x=0;x<(int)size[0];x++)
+      for (int y=0;y<(int)size[1];y++)
       {
         vnl_vector<double> org_data(nof);
         vnl_vector<double> atten(nof-numberb0);
         double cnt_atten=0;
 
-        itk::Index<3> ix = {{x, y, z}};
+        itk::Index<3> ix = {{(itk::IndexValueType)x, (itk::IndexValueType)y, (itk::IndexValueType)z}};
 
         if(mask->GetPixel(ix) > 1.0)
         {
@@ -617,9 +617,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
                 double tempsum=0;
                 double temp_number=0;
 
-                for(unsigned int i=back_x; i<=forth_x; i++)
-                  for (unsigned int j=back_y; j<=forth_y; j++)
-                    for (unsigned int k=back_z; k<=forth_z; k++)
+                for(int i=back_x; i<=forth_x; i++)
+                  for (int j=back_y; j<=forth_y; j++)
+                    for (int k=back_z; k<=forth_z; k++)
                     {
                       itk::Index<3> ix = {{i,j,k}};
 
@@ -633,7 +633,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
                     }
 
                 //getting back to the original position of the voxel
-                itk::Index<3> ix = {{x,y,z}};
+                itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
                 if (temp_number <= 0.0)
                 {
                   tempsum=0;
@@ -667,9 +667,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
               double tempsum=0;
               double temp_number=0;
 
-              for(unsigned int i=back_x; i<=forth_x; i++)
-                for (unsigned int j=back_y; j<=forth_y; j++)
-                  for (unsigned int k=back_z; k<=forth_z; k++)
+              for(int i=back_x; i<=forth_x; i++)
+                for (int j=back_y; j<=forth_y; j++)
+                  for (int k=back_z; k<=forth_z; k++)
                   {
                     itk::Index<3> ix = {{i,j,k}};
 
@@ -688,7 +688,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
                   }
 
               //getting back to the original position of the voxel
-              itk::Index<3> ix = {{x,y,z}};
+              itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
               if (temp_number <= 0.0)
               {
                 tempsum=0;
@@ -724,7 +724,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 template <class TDiffusionPixelType, class TTensorPixelType>
 void
 TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-::GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask, typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg)
+::GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double , typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg)
 {
   // in this method the whole tensor image is updated with a tensors for defined voxels ( defined by a value of mask);
 
@@ -733,9 +733,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for (int x=0;x<size[0];x++)
-    for (int y=0;y<size[1];y++)
-      for (int z=0;z<size[2];z++)
+  for (int x=0;x<(int)size[0];x++)
+    for (int y=0;y<(int)size[1];y++)
+      for (int z=0;z<(int)size[2];z++)
       {
         itk::Index<3> ix;
 
@@ -839,9 +839,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 #else
 #pragma omp parallel for collapse(3)
 #endif
-  for(int x=0;x<size[0];x++)
-    for(int y=0;y<size[1];y++)
-      for(int z=0;z<size[2];z++)
+  for(int x=0;x<(int)size[0];x++)
+    for(int y=0;y<(int)size[1];y++)
+      for(int z=0;z<(int)size[2];z++)
       {
         ix[0] = x; ix[1] = y; ix[2] = z;
         temp_mask_value=mask->GetPixel(ix);

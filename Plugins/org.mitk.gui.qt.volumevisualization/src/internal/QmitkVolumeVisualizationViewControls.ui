@@ -260,16 +260,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="m_EnableLOD">
-       <property name="toolTip">
-        <string>Level of detail (LOD) enables a fast but lower quality preview rendering to increase interactivity.</string>
-       </property>
-       <property name="text">
-        <string>LOD</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QComboBox" name="m_RenderMode">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -281,6 +271,9 @@
         <string>Select render mode</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="m_BlendMode"/>
      </item>
     </layout>
    </item>

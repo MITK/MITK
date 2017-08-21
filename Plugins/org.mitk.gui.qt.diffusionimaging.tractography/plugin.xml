@@ -29,7 +29,7 @@
     </view>
 
     <view id="org.mitk.views.mlbtview"
-    name="ML-Based Streamline Tractography"
+    name="ML-Based Tractography Training"
     category="Fiber Tractography"
     class="QmitkMLBTView"
     icon="resources/ml_tractography.png">
@@ -95,7 +95,7 @@
     </perspective>
 
     <perspective id="org.mitk.perspectives.tractography4"
-    name="Machine-learning Tractography"
+    name="ML-Based Tractography Training"
     category="Fiber Tractography"
     class="QmitkMachineLearningTractographyPerspective"
     icon="resources/ml_tractography.png">

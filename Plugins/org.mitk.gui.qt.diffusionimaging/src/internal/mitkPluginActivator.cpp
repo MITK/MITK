@@ -54,6 +54,9 @@ void PluginActivator::start(ctkPluginContext* context)
 
     mitk::NodePredicateDataType::Pointer isConnectomicsNetwork = mitk::NodePredicateDataType::New("ConnectomicsNetwork");
     manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("ConnectomicsNetwork"), QString(":/QmitkDiffusionImaging/ConnectomicsNetwork.png"), isConnectomicsNetwork, manager));
+
+    mitk::NodePredicateDataType::Pointer isTractographyForestNetwork = mitk::NodePredicateDataType::New("TractographyForest");
+    manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("TractographyForest"), QString(":/QmitkDiffusionImaging/ml_tractogram.png"), isTractographyForestNetwork, manager));
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

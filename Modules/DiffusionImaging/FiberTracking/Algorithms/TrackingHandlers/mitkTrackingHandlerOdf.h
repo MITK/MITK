@@ -44,12 +44,12 @@ public:
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
     vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
-
+    void SetSharpenOdfs(bool doSharpen) { m_SharpenOdfs=doSharpen; }
+    void SetOdfThreshold(float odfThreshold){ m_OdfThreshold = odfThreshold; }
     void SetGfaThreshold(float gfaThreshold){ m_GfaThreshold = gfaThreshold; }
     void SetOdfImage( ItkOdfImageType::Pointer img ){ m_OdfImage = img; DataModified(); }
     void SetGfaImage( ItkFloatImgType::Pointer img ){ m_GfaImage = img; DataModified(); }
     void SetMode( MODE m ){ m_Mode = m; }
-
 
     ItkUcharImgType::SpacingType GetSpacing(){ return m_OdfImage->GetSpacing(); }
     itk::Point<float,3> GetOrigin(){ return m_OdfImage->GetOrigin(); }
@@ -59,25 +59,19 @@ public:
     int OdfPower() const;
     void SetNumProbSamples(int NumProbSamples);
 
-    void SetSecondOrder(bool SecondOrder);
-
-    bool MinMaxNormalize() const;
-    void SetMinMaxNormalize(bool MinMaxNormalize);
-
 protected:
 
-    vnl_vector< float > GetSecondOrderProbabilities(const itk::Point<float, 3>& itkP, vnl_vector< float >& angles, vnl_vector< float >& probs);
+    int SampleOdf(vnl_vector< float >& probs, vnl_vector< float >& angles);
 
-    float   m_GfaThreshold;
+    float                           m_GfaThreshold;
+    float                           m_OdfThreshold;
+    bool                            m_SharpenOdfs;
     ItkFloatImgType::Pointer        m_GfaImage;     ///< GFA image used to determine streamline termination.
     ItkOdfImageType::Pointer        m_OdfImage;     ///< Input odf image.
     ItkOdfImageType::Pointer        m_WorkingOdfImage;     ///< Modified odf image.
     std::vector< int >              m_OdfHemisphereIndices;
     vnl_matrix< float >             m_OdfFloatDirs;
-    bool                            m_SecondOrder;
-    bool                            m_MinMaxNormalize;
     int                             m_NumProbSamples;
-    std::vector< int >              m_OdfReducedIndices;
 };
 
 }

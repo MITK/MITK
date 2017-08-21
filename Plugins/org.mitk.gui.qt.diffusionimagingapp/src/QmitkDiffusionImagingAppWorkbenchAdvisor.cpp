@@ -31,6 +31,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 const QString QmitkDiffusionImagingAppWorkbenchAdvisor::WELCOME_PERSPECTIVE_ID = "org.mitk.diffusionimagingapp.perspectives.welcome";
 
 
+class QmitkDiffusionImagingAppWorkbenchWindowAdvisor : public QmitkExtWorkbenchWindowAdvisor
+{
+
+public:
+
+  QmitkDiffusionImagingAppWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
+                                                 berry::IWorkbenchWindowConfigurer::Pointer configurer)
+    : QmitkExtWorkbenchWindowAdvisor(wbAdvisor, configurer)
+  {
+
+  }
+
+  void PostWindowOpen()
+  {
+    QmitkExtWorkbenchWindowAdvisor::PostWindowOpen();
+    berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
+    configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(configurer->GetWindow(), false);
+  }
+
+};
+
 void
 QmitkDiffusionImagingAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
 {
@@ -51,11 +72,12 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
 
   QList<QString> viewExcludeList;
   viewExcludeList.push_back( "org.mitk.views.controlvisualizationpropertiesview" );
+  viewExcludeList.push_back( "org.mitk.views.modules" );
 
-  QRect rec = QApplication::desktop()->screenGeometry();
-  configurer->SetInitialSize(QPoint(rec.width(),rec.height()));
+  //QRect rec = QApplication::desktop()->screenGeometry();
+  //configurer->SetInitialSize(QPoint(rec.width(),rec.height()));
 
-  QmitkExtWorkbenchWindowAdvisor* advisor = new QmitkExtWorkbenchWindowAdvisor(this, configurer);
+  QmitkDiffusionImagingAppWorkbenchWindowAdvisor* advisor = new QmitkDiffusionImagingAppWorkbenchWindowAdvisor(this, configurer);
   advisor->ShowViewMenuItem(true);
   advisor->ShowNewWindowMenuItem(true);
   advisor->ShowClosePerspectiveMenuItem(true);
@@ -63,8 +85,8 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   advisor->SetViewExcludeList(viewExcludeList);
   advisor->ShowViewToolbar(false);
   advisor->ShowPerspectiveToolbar(true);
-  advisor->ShowVersionInfo(true);
-  advisor->ShowMitkVersionInfo(true);
+  advisor->ShowVersionInfo(false);
+  advisor->ShowMitkVersionInfo(false);
   advisor->ShowMemoryIndicator(false);
   advisor->SetProductName("MITK Diffusion");
   advisor->SetWindowIcon(":/org.mitk.gui.qt.diffusionimagingapp/app-icon.png");

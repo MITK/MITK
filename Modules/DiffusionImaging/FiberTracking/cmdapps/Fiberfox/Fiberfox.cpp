@@ -167,9 +167,9 @@ int main(int argc, char* argv[])
   tractsToDwiFilter->Update();
 
   mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-  image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
+  image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
                       mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-  image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
+  image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
                       mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ) );
   mitk::DiffusionPropertyHelper propertyHelper( image );
   propertyHelper.InitializeImage();

@@ -61,6 +61,8 @@ class QmitkPreprocessingView : public QmitkAbstractView, public mitk::ILifecycle
   typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
   typedef itk::Image< unsigned char, 3 >                                  UcharImageType;
   typedef itk::Image< double, 3 >                                         ItkDoubleImageType;
+  typedef mitk::DiffusionPropertyHelper                                   PropHelper;
+  typedef mitk::GradientDirectionsProperty                                GradProp;
 
   QmitkPreprocessingView();
   virtual ~QmitkPreprocessingView();
@@ -110,6 +112,7 @@ protected slots:
   void DoFlipAxis();
   void OnImageSelectionChanged();
   void DoFlipGradientDirections();
+  void DoClearRotationOfGradients();
 
 protected:
 

@@ -675,11 +675,40 @@ void mitk::BaseRenderer::WorldToDisplay(const Point3D &worldIndex, Point2D &disp
   return;
 }
 
+void mitk::BaseRenderer::WorldToView(const mitk::Point3D &worldIndex, mitk::Point2D &viewPoint) const
+{
+  double world[4], *view;
+
+  world[0] = worldIndex[0];
+  world[1] = worldIndex[1];
+  world[2] = worldIndex[2];
+  world[3] = 1.0;
+
+  this->GetVtkRenderer()->SetWorldPoint(world);
+  this->GetVtkRenderer()->WorldToView();
+  view = this->GetVtkRenderer()->GetViewPoint();
+  this->GetVtkRenderer()->ViewToNormalizedViewport(view[0], view[1], view[2]);
+
+  viewPoint[0] = view[0] * this->GetViewportSize()[0];
+  viewPoint[1] = view[1] * this->GetViewportSize()[1];
+
+  return;
+}
+
 void mitk::BaseRenderer::PlaneToDisplay(const Point2D &planePointInMM, Point2D &displayPoint) const
 {
   Point3D worldPoint;
   this->m_CurrentWorldPlaneGeometry->Map(planePointInMM, worldPoint);
   this->WorldToDisplay(worldPoint, displayPoint);
+
+  return;
+}
+
+void mitk::BaseRenderer::PlaneToView(const Point2D &planePointInMM, Point2D &viewPoint) const
+{
+  Point3D worldPoint;
+  this->m_CurrentWorldPlaneGeometry->Map(planePointInMM, worldPoint);
+  this->WorldToView(worldPoint,viewPoint);
 
   return;
 }

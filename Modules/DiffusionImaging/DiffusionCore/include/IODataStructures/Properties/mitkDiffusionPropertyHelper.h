@@ -52,6 +52,7 @@ namespace mitk
     static const std::string REFERENCEBVALUEPROPERTYNAME;
     static const std::string BVALUEMAPPROPERTYNAME;
     static const std::string MODALITY;
+    static const std::string KEEP_ORIGINAL_DIRECTIONS;
 
     /// Public constructor, takes a mitk::Image pointer as argument
     DiffusionPropertyHelper( mitk::Image* inputImage );
@@ -69,6 +70,9 @@ namespace mitk
      */
     static bool IsDiffusionWeightedImage(const mitk::Image *);
     static bool IsDiffusionWeightedImage(const mitk::DataNode* node);
+
+    static void ClearMeasurementFrameAndRotationMatrixFromGradients(mitk::Image* image);
+    static void CopyProperties(mitk::Image* source, mitk::Image* target, bool ignore_original_gradients=false);
 
     static ImageType::Pointer GetItkVectorImage(Image *image);
 

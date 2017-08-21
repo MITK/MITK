@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   try
   {
       mitk::FiberBundle::Pointer result = LoadFib(inFibs.at(0));
-      for (int i=1; i<inFibs.size(); i++)
+      for (std::size_t i=1; i<inFibs.size(); ++i)
       {
           try
           {
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
           }
           catch(...){ std::cout << "could not load: " << inFibs.at(i); }
       }
-      mitk::IOUtil::SaveBaseData(result, outFib);
+      mitk::IOUtil::Save(result, outFib);
   }
   catch (itk::ExceptionObject e)
   {

@@ -291,7 +291,7 @@ static ImageList LoadPreprocessedFiles(FileList files)
   ImageList images;
   for (unsigned int i = 0; i < files.size(); ++i)
   {
-    images.push_back(mitk::IOUtil::LoadImage(files.at(i)));
+    images.push_back(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(files.at(i))[0].GetPointer()));
   }
   return images;
 }

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclBaseData.h"
 
 mitk::OclBaseData::OclBaseData()
-: m_BufferSize ( nullptr ), m_GPUBuffer( nullptr ), m_CPUBuffer( nullptr )
+: m_BufferSize ( 0 ), m_GPUBuffer( nullptr ), m_CPUBuffer( nullptr )
 {
 }
 

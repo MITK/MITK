@@ -32,8 +32,8 @@ TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::TrackingHandlerR
   , m_NumberOfSamples(0)
   , m_GmSamplesPerVoxel(-1)
   , m_NumPreviousDirections(1)
-  , m_ZeroDirWmFeatures(true)
   , m_BidirectionalFiberSampling(false)
+  , m_ZeroDirWmFeatures(true)
   , m_MaxNumWmSamples(-1)
 {
   vnl_vector_fixed<float,3> ref; ref.fill(0); ref[0]=1;
@@ -251,7 +251,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     return last_dir;
 
   // store feature pixel values in a vigra data type
-  vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->feature_count()) );
+  vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->GetNumFeatures()) );
   typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0), m_Interpolate);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
@@ -305,8 +305,8 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   }
 
   // perform classification
-  vigra::MultiArray<2, float> probs(vigra::Shape2(1, m_Forest->class_count()));
-  m_Forest->predictProbabilities(featureData, probs);
+  vigra::MultiArray<2, float> probs(vigra::Shape2(1, m_Forest->GetNumClasses()));
+  m_Forest->PredictProbabilities(featureData, probs);
 
   vnl_vector< float > angles = m_OdfFloatDirs*last_dir;
   vnl_vector< float > probs2; probs2.set_size(m_DirectionContainer.size()); probs2.fill(0.0); // used for probabilistic direction sampling
@@ -315,20 +315,23 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   float pNonFib = 0;     // probability that we left the white matter
   float w = 0;           // weight of the predicted direction
 
-  for (int i=0; i<m_Forest->class_count(); i++)   // for each class (number of possible directions + out-of-wm class)
+  for (int i=0; i<m_Forest->GetNumClasses(); i++)   // for each class (number of possible directions + out-of-wm class)
   {
     if (probs(0,i)>0)   // if probability of respective class is 0, do nothing
     {
       // get label of class (does not correspond to the loop variable i)
-      unsigned int classLabel = 0;
-      m_Forest->ext_param_.to_classlabel(i, classLabel);
+      unsigned int classLabel = m_Forest->IndexToClassLabel(i);
 
       if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
       {
+        float angle = angles[classLabel];
+        float abs_angle = fabs(angle);
+
         if (m_Mode==MODE::PROBABILISTIC)
         {
-          if (!check_last_dir || fabs(angles[classLabel])>=m_AngularThreshold)
-            probs2[classLabel] = probs(0,i);
+          probs2[classLabel] = probs(0,i);
+          if (check_last_dir)
+            probs2[classLabel] *= abs_angle;
           probs_sum += probs2[classLabel];
         }
         else if (m_Mode==MODE::DETERMINISTIC)
@@ -336,16 +339,11 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
           vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
           if (check_last_dir)   // do we have a previous streamline direction or did we just start?
           {
-            // TODO: check if hard curvature threshold is necessary.
-            // alternatively try square of dot product as weight.
-            // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
-
-            float dot = angles[classLabel];    // claculate angle between the candidate direction vector and the previous streamline direction
-            if (fabs(dot)>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
+            if (abs_angle>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
             {
-              if (dot<0)                          // make sure we don't walk backwards
+              if (angle<0)                          // make sure we don't walk backwards
                 d *= -1;
-              float w_i = probs(0,i)*fabs(dot);
+              float w_i = probs(0,i)*abs_angle;
               output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
               w += w_i;           // increase output weight of the final direction
             }
@@ -365,14 +363,19 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
   if (m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
   {
-    probs2 /= probs_sum;
     boost::random::discrete_distribution<int, float> dist(probs2.begin(), probs2.end());
-
     int sampled_idx = 0;
-#pragma omp critical
+
+    for (int i=0; i<50; i++)  // we allow 50 trials to exceed m_AngularThreshold
     {
+  #pragma omp critical
+      {
         boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
         sampled_idx = sampler();
+      }
+
+      if ( probs2[sampled_idx]>0.1 && (!check_last_dir || (check_last_dir && fabs(angles[sampled_idx])>=m_AngularThreshold)) )
+        break;
     }
 
     output_direction = m_DirectionContainer.at(sampled_idx);
@@ -448,8 +451,9 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::StartTraini
   for (int i = 1; i < m_NumTrees; ++i)
     trees.at(0)->trees_.push_back(trees.at(i)->trees_[0]);
 
-  m_Forest = trees.at(0);
-  m_Forest->options_.tree_count_ = m_NumTrees;
+  std::shared_ptr< vigra::RandomForest<int> > forest = trees.at(0);
+  forest->options_.tree_count_ = m_NumTrees;
+  m_Forest = mitk::TractographyForest::New(forest);
   MITK_INFO << "Training finsihed";
 
   m_EndTime = std::chrono::system_clock::now();
@@ -478,16 +482,16 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestVal
     additional_features = m_AdditionalFeatureImages.at(0).size();
 
   if (!m_Forest)
-    MITK_ERROR << "Forest could not be read!";
+    MITK_INFO << "No forest available!";
   else
   {
-    if (m_Forest->tree_count()<=0)
+    if (m_Forest->GetNumTrees() <= 0)
       MITK_ERROR << "Forest contains no trees!";
-    if ( m_Forest->feature_count()!=(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
-      MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->feature_count() << ", expected " << (NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features);
+    if ( m_Forest->GetNumFeatures() != static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
+      MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->GetNumFeatures() << ", expected " << (NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features);
   }
 
-  if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
+  if(m_Forest && m_Forest->GetNumTrees()>0 && m_Forest->GetNumFeatures() == static_cast<int>(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
     return true;
 
   return false;
@@ -923,26 +927,6 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
   MITK_INFO << "done";
 }
 
-template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::SaveForest(std::string forestFile)
-{
-  MITK_INFO << "Saving forest to " << forestFile;
-  if (IsForestValid())
-  {
-    vigra::rf_export_HDF5( *m_Forest, forestFile, "" );
-    MITK_INFO << "Forest saved successfully.";
-  }
-  else
-    MITK_INFO << "Forest invalid! Could not be saved.";
-}
-
-template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::LoadForest(std::string forestFile)
-{
-  MITK_INFO << "Loading forest from " << forestFile;
-  m_Forest = std::make_shared< vigra::RandomForest<int> >();
-  vigra::rf_import_HDF5( *m_Forest, forestFile);
-}
 }
 
 #endif

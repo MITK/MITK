@@ -143,6 +143,6 @@ void QmitkToFScreenshotMaker::SaveImage(mitk::Image::Pointer image, bool saveIma
   {
     std::stringstream outdepthimage;
     outdepthimage << path << name<< m_SavingCounter << extension;
-    mitk::IOUtil::SaveImage( image, outdepthimage.str() );
+    mitk::IOUtil::Save( image, outdepthimage.str() );
   }
 }

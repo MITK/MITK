@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include "itkPointShell.h"
 #include <itkRescaleIntensityImageFilter.h>
+#include <boost/lexical_cast.hpp>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -37,15 +38,26 @@ StreamlineTrackingFilter
 ::StreamlineTrackingFilter()
   : m_PauseTracking(false)
   , m_AbortTracking(false)
+  , m_BuildFibersFinished(false)
+  , m_BuildFibersReady(0)
   , m_FiberPolyData(nullptr)
   , m_Points(nullptr)
   , m_Cells(nullptr)
+  , m_StoppingRegions(nullptr)
+  , m_SeedImage(nullptr)
+  , m_MaskImage(nullptr)
+  , m_TissueImage(nullptr)
+  , m_OutputProbabilityMap(nullptr)
+  , m_AngularThresholdDeg(-1)
+  , m_StepSizeVox(-1)
+  , m_SamplingDistanceVox(-1)
   , m_AngularThreshold(-1)
   , m_StepSize(0)
   , m_MaxLength(10000)
   , m_MinTractLength(20.0)
   , m_MaxTractLength(400.0)
   , m_SeedsPerVoxel(1)
+  , m_AvoidStop(true)
   , m_RandomSampling(false)
   , m_SamplingDistance(-1)
   , m_DeflectionMod(1.0)
@@ -53,30 +65,40 @@ StreamlineTrackingFilter
   , m_UseStopVotes(true)
   , m_NumberOfSamples(30)
   , m_NumPreviousDirections(1)
-  , m_StoppingRegions(nullptr)
-  , m_SeedImage(nullptr)
-  , m_MaskImage(nullptr)
-  , m_AposterioriCurvCheck(false)
-  , m_AvoidStop(true)
-  , m_DemoMode(false)
-  , m_SeedOnlyGm(false)
-  , m_ControlGmEndings(false)
   , m_WmLabel(3) // mrtrix 5ttseg labels
   , m_GmLabel(1) // mrtrix 5ttseg labels
-  , m_StepSizeVox(-1)
-  , m_SamplingDistanceVox(-1)
-  , m_AngularThresholdDeg(-1)
+  , m_SeedOnlyGm(false)
+  , m_ControlGmEndings(false)
   , m_MaxNumTracts(-1)
-  , m_Random(true)
   , m_Verbose(true)
+  , m_AposterioriCurvCheck(false)
+  , m_DemoMode(false)
+  , m_Random(true)
   , m_UseOutputProbabilityMap(false)
+  , m_CurrentTracts(0)
+  , m_Progress(0)
+  , m_StopTracking(false)
 {
   this->SetNumberOfRequiredInputs(0);
 }
 
+std::string StreamlineTrackingFilter::GetStatusText()
+{
+  std::string status = "Seedpoints processed: " + boost::lexical_cast<std::string>(m_Progress) + "/" + boost::lexical_cast<std::string>(m_SeedPoints.size());
+  if (m_SeedPoints.size()>0)
+    status += " (" + boost::lexical_cast<std::string>(100*m_Progress/m_SeedPoints.size()) + "%)";
+  if (m_MaxNumTracts>0)
+    status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts) + "/" + boost::lexical_cast<std::string>(m_MaxNumTracts);
+  else
+    status += "\nFibers accepted: " + boost::lexical_cast<std::string>(m_CurrentTracts);
+
+  return status;
+}
 
 void StreamlineTrackingFilter::BeforeTracking()
 {
+  m_StopTracking = false;
+  m_TrackingHandler->SetRandom(m_Random);
   m_TrackingHandler->InitForTracking();
   m_FiberPolyData = PolyDataType::New();
   m_Points = vtkSmartPointer< vtkPoints >::New();
@@ -354,13 +376,6 @@ bool StreamlineTrackingFilter
   return false;
 }
 
-
-float StreamlineTrackingFilter::GetRandDouble(float min, float max)
-{
-  return (float)(rand()%((int)(10000*(max-min))) + 10000*min)/10000;
-}
-
-
 std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirections(int NPoints)
 {
   std::vector< vnl_vector_fixed<float,3> > pointshell;
@@ -429,17 +444,17 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
   int alternatives = 1;
   int stop_votes = 0;
   int possible_stop_votes = 0;
-  for (int i=0; i<probeVecs.size(); i++)
+  for (unsigned int i=0; i<probeVecs.size(); i++)
   {
     vnl_vector_fixed<float,3> d;
     bool is_stop_voter = false;
-    if (m_RandomSampling)
+    if (m_Random && m_RandomSampling)
     {
-      d[0] = GetRandDouble();
-      d[1] = GetRandDouble();
-      d[2] = GetRandDouble();
+      d[0] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+      d[1] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+      d[2] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
       d.normalize();
-      d *= GetRandDouble(0,m_SamplingDistance);
+      d *= m_TrackingHandler->GetRandDouble(0,m_SamplingDistance);
     }
     else
     {
@@ -617,7 +632,7 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
   if (front)
   {
     int c=0;
-    while(dist<m_Distance && c<fib->size()-1)
+    while(dist<m_Distance && c<(int)fib->size()-1)
     {
       itk::Point<float> p1 = fib->at(c);
       itk::Point<float> p2 = fib->at(c+1);
@@ -649,14 +664,14 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
       dist += v.magnitude();
       v.normalize();
       vectors.push_back(v);
-      if (c==fib->size()-1)
+      if (c==(int)fib->size()-1)
         meanV += v;
       c--;
     }
   }
   meanV.normalize();
 
-  for (int c=0; c<vectors.size(); c++)
+  for (unsigned int c=0; c<vectors.size(); c++)
   {
     float angle = dot_product(meanV, vectors.at(c));
     if (angle>1.0)
@@ -676,7 +691,7 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
 
 void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
 {
-  MITK_INFO << "Calculating seed points.";
+  MITK_INFO << "StreamlineTracking - Calculating seed points.";
   m_SeedPoints.clear();
 
   if (!m_ControlGmEndings)
@@ -702,9 +717,9 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
           m_SeedPoints.push_back(worldPos);
           for (int s = 1; s < m_SeedsPerVoxel; s++)
           {
-            start[0] = index[0] + GetRandDouble(-0.5, 0.5);
-            start[1] = index[1] + GetRandDouble(-0.5, 0.5);
-            start[2] = index[2] + GetRandDouble(-0.5, 0.5);
+            start[0] = index[0] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+            start[1] = index[1] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+            start[2] = index[2] + m_TrackingHandler->GetRandDouble(-0.5, 0.5);
 
             itk::Point<float> worldPos;
             m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
@@ -725,25 +740,20 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
 void StreamlineTrackingFilter::GenerateData()
 {
   this->BeforeTracking();
-
   if (m_Random)
-  {
-    std::srand(std::time(0));
     std::random_shuffle(m_SeedPoints.begin(), m_SeedPoints.end());
-  }
 
-  bool stop = false;
-  unsigned int current_tracts = 0;
+  m_CurrentTracts = 0;
   int num_seeds = m_SeedPoints.size();
   itk::Index<3> zeroIndex; zeroIndex.Fill(0);
-  int progress = 0;
+  m_Progress = 0;
   int i = 0;
   int print_interval = num_seeds/100;
   if (print_interval<100)
     m_Verbose=false;
 
 #pragma omp parallel
-  while (i<num_seeds && !stop)
+  while (i<num_seeds && !m_StopTracking)
   {
 
 
@@ -754,17 +764,17 @@ void StreamlineTrackingFilter::GenerateData()
       i++;
     }
 
-    if (temp_i>=num_seeds || stop)
+    if (temp_i>=num_seeds || m_StopTracking)
       continue;
     else if (m_Verbose && i%print_interval==0)
 #pragma omp critical
     {
-      progress += print_interval;
+      m_Progress += print_interval;
       std::cout << "                                                                                                     \r";
       if (m_MaxNumTracts>0)
-        std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << "/" << m_MaxNumTracts << '\r';
+        std::cout << "Tried: " << m_Progress << "/" << num_seeds << " | Accepted: " << m_CurrentTracts << "/" << m_MaxNumTracts << '\r';
       else
-        std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << '\r';
+        std::cout << "Tried: " << m_Progress << "/" << num_seeds << " | Accepted: " << m_CurrentTracts << '\r';
       cout.flush();
     }
 
@@ -827,22 +837,22 @@ void StreamlineTrackingFilter::GenerateData()
 #pragma omp critical
       if (tractLength>=m_MinTractLength && counter>=2)
       {
-        if (!stop)
+        if (!m_StopTracking)
         {
           if (!m_UseOutputProbabilityMap)
             m_Tractogram.push_back(fib);
           else
             FiberToProbmap(&fib);
-          current_tracts++;
+          m_CurrentTracts++;
         }
-        if (m_MaxNumTracts > 0 && current_tracts>=static_cast<unsigned int>(m_MaxNumTracts))
+        if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
         {
-          if (!stop)
+          if (!m_StopTracking)
           {
             std::cout << "                                                                                                     \r";
-            MITK_INFO << "Reconstructed maximum number of tracts (" << current_tracts << "). Stopping tractography.";
+            MITK_INFO << "Reconstructed maximum number of tracts (" << m_CurrentTracts << "). Stopping tractography.";
           }
-          stop = true;
+          m_StopTracking = true;
         }
       }
 
@@ -952,7 +962,7 @@ void StreamlineTrackingFilter::BuildFibers(bool check)
   vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
-  for (int i=0; i<m_Tractogram.size(); i++)
+  for (unsigned int i=0; i<m_Tractogram.size(); i++)
   {
     vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
     FiberType fib = m_Tractogram.at(i);

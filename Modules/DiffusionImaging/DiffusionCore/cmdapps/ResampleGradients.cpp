@@ -173,19 +173,10 @@ mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, doub
   }
 
   mitk::Image::Pointer newImage = mitk::GrabItkImageMemory( filter->GetOutput() );
+  mitk::DiffusionPropertyHelper::CopyProperties(image, newImage, true);
 
-  newImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
+  newImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
                          mitk::GradientDirectionsProperty::New( filter->GetGradientDirections() ) );
-
-  newImage->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(),
-                         mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>
-                         (image->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )
-                           ->GetMeasurementFrame() ) );
-
-  newImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
-                         mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>
-                         (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                           ->GetValue() ) );
 
   mitk::DiffusionPropertyHelper propertyHelper( newImage );
   propertyHelper.InitializeImage(); //needed?
@@ -219,7 +210,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
 
 
-    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);    
+    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
     std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
     double bValue = us::any_cast<float>(parsedArgs["bValue"]);
     unsigned int nrOfGradients = us::any_cast<int>(parsedArgs["nrOfGradients"]);
@@ -229,7 +220,7 @@ int main(int argc, char* argv[])
         mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({ "Diffusion Weighted Images" }, {});
         mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(inFileName, &functor).GetPointer());
         mitk::Image::Pointer newImage = DoReduceGradientDirections(mitkImage, bValue, nrOfGradients);
-        //mitk::IOUtil::SaveImage(newImage, outFileName); //save as dwi image
+        //mitk::IOUtil::Save(newImage, outFileName); //save as dwi image
         mitk::IOUtil::Save(newImage, "application/vnd.mitk.nii.gz", outFileName);  //save as nifti image
 
     }

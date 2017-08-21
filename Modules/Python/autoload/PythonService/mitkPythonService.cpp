@@ -25,7 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
+
 #include <numpy/arrayobject.h>
+
 #include <mitkExceptionMacro.h>
 
 #ifndef WIN32

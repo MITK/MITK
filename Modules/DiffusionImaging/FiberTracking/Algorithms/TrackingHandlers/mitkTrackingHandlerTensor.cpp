@@ -20,8 +20,11 @@ namespace mitk
 {
 
 TrackingHandlerTensor::TrackingHandlerTensor()
-  : m_InterpolateTensors(true)
-  , m_FaThreshold(0.1)
+  : m_FaThreshold(0.1)
+  , m_F(1.0)
+  , m_G(0.0)
+  , m_InterpolateTensors(true)
+  , m_NumberOfInputs(0)
 {
 
 }
@@ -71,31 +74,23 @@ void TrackingHandlerTensor::InitForTracking()
     }
 
     typedef itk::DiffusionTensor3D<float>    TensorType;
-    TensorType::EigenValuesArrayType eigenvalues;
-    TensorType::EigenVectorsMatrixType eigenvectors;
 
-#ifdef WIN32
-#pragma omp parallel for
-#else
-#pragma omp parallel for collapse(3)
-#endif
-    for (int x=0; x<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[0]; x++)
-      for (int y=0; y<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[1]; y++)
-        for (int z=0; z<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[2]; z++)
+    for (int x=0; x<(int)m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[0]; x++)
+      for (int y=0; y<(int)m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[1]; y++)
+        for (int z=0; z<(int)m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[2]; z++)
         {
           ItkTensorImageType::IndexType index;
           index[0] = x; index[1] = y; index[2] = z;
           for (int i=0; i<m_NumberOfInputs; i++)
           {
+            TensorType::EigenValuesArrayType eigenvalues;
+            TensorType::EigenVectorsMatrixType eigenvectors;
 
             ItkTensorImageType::PixelType tensor;
-#pragma omp critical
-            {
-              tensor = m_TensorImages.at(i)->GetPixel(index);
-              tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
-            }
-
             vnl_vector_fixed<float,3> dir;
+            tensor = m_TensorImages.at(i)->GetPixel(index);
+            tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
+
             dir[0] = eigenvectors(2, 0);
             dir[1] = eigenvectors(2, 1);
             dir[2] = eigenvectors(2, 2);
@@ -104,19 +99,13 @@ void TrackingHandlerTensor::InitForTracking()
             else
               dir.fill(0.0);
 
-#pragma omp critical
-            {
-              m_PdImage.at(i)->SetPixel(index, dir);
-              if (!useUserFaImage)
-                m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)+tensor.GetFractionalAnisotropy());
-              m_EmaxImage.at(i)->SetPixel(index, 2/eigenvalues[2]);
-            }
+            m_PdImage.at(i)->SetPixel(index, dir);
+            if (!useUserFaImage)
+              m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)+tensor.GetFractionalAnisotropy());
+            m_EmaxImage.at(i)->SetPixel(index, 2/eigenvalues[2]);
           }
           if (!useUserFaImage)
-          {
-#pragma omp critical
             m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)/m_NumberOfInputs);
-          }
         }
 
     m_NeedsDataInit = false;
@@ -129,6 +118,10 @@ void TrackingHandlerTensor::InitForTracking()
     m_F /= temp;
     m_G /= temp;
   }
+
+  std::cout << "TrackingHandlerTensor - FA threshold: " << m_FaThreshold << std::endl;
+  std::cout << "TrackingHandlerTensor - f: " << m_F << std::endl;
+  std::cout << "TrackingHandlerTensor - g: " << m_G << std::endl;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num)

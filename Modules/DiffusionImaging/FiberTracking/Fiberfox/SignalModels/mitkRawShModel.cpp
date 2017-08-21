@@ -114,7 +114,7 @@ bool RawShModel< ScalarType >::SampleKernels(Image::Pointer diffImg, ItkUcharIma
         adcImage = adcFilter->GetOutput();
     }
 
-    int b0Index;
+    int b0Index = 0;
     for (unsigned int i=0; i<static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size(); i++)
         if ( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->GetElement(i).magnitude()<0.001 )
         {

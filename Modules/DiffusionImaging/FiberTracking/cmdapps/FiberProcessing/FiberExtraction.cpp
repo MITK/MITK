@@ -74,11 +74,13 @@ int main(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
 
         // load fiber bundle
-        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(inFib)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(inFib)[0].GetPointer());
         mitk::FiberBundle::Pointer result;
 
         mitk::StandaloneDataStorage::Pointer storage = mitk::StandaloneDataStorage::New();
-        mitk::DataNode::Pointer input1 = mitk::IOUtil::LoadDataNode(pf1_path);
+        auto data = mitk::IOUtil::Load(pf1_path)[0];
+        auto input1 = mitk::DataNode::New();
+        input1->SetData(data);
 
         if (input1.IsNotNull())
         {
@@ -89,10 +91,11 @@ int main(int argc, char* argv[])
             set1->push_back(pfcNode);
             storage->Add(pfcNode);
 
-            mitk::DataNode::Pointer input2;
+            auto input2 = mitk::DataNode::New();
             if (!pf2_path.empty())
             {
-                input2 = mitk::IOUtil::LoadDataNode(pf2_path);
+                data = mitk::IOUtil::Load(pf2_path)[0];
+                input2->SetData(data);
             }
 
             if (operation.empty())
@@ -130,7 +133,7 @@ int main(int argc, char* argv[])
         else
         {
             ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
-            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(pf1_path)->GetData());
+            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pf1_path)[0].GetPointer());
             mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
 
             if (operation=="NOT")
@@ -140,7 +143,7 @@ int main(int argc, char* argv[])
         }
 
         if (result.IsNotNull())
-            mitk::IOUtil::SaveBaseData(result, outFib);
+            mitk::IOUtil::Save(result, outFib);
         else
             std::cout << "No valid fiber bundle extracted.";
     }

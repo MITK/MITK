@@ -111,9 +111,9 @@ private:
   std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> m_StatisticsVector; ///< member variable holds the result structs.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
-  double m_HistogramBinSize;                                      ///< member variable holds the bin size for histogram resolution.
-  bool m_StatisticChanged;                                        ///< flag set if statistics have changed
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
+  bool m_StatisticChanged;                                        ///< flag set if statistics have changed
+  double m_HistogramBinSize;                                      ///< member variable holds the bin size for histogram resolution.
   std::vector<HistogramType::Pointer> m_HistogramVector;          ///< member holds the histograms of all time steps.
   std::string m_message;
   bool m_UseDefaultNBins;

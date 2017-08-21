@@ -42,7 +42,7 @@ public:
 
   static vtkMitkLevelWindowFilter *New();
 
-  virtual unsigned long int GetMTime() override;
+  virtual vtkMTimeType GetMTime() override;
   /** \brief Get the lookup table for the RGB level window */
   vtkScalarsToColors *GetLookupTable();
   /** \brief Set the lookup table for the RGB level window */

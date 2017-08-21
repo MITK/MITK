@@ -1,7 +1,6 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkCore MitkAlgorithmsExt MitkSceneSerializationBase MitkDICOMReader
   PACKAGE_DEPENDS PRIVATE ITK|ITKQuadEdgeMesh+ITKAntiAlias+ITKIONRRD
-  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(autoload/IO)

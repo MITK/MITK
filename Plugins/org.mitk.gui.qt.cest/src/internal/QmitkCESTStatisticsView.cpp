@@ -357,7 +357,7 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
   QmitkPlotWidget::DataVector::size_type numberOfSpectra = this->m_zSpectrum.size();
   auto maxIndex = this->m_PointSet->GetMaxId().Index();
 
-  for (int number = 0; number < maxIndex + 1; ++number)
+  for (std::size_t number = 0; number < maxIndex + 1; ++number)
   {
     mitk::PointSet::PointType point;
     if (!m_PointSet->GetPointIfExists(number, &point))
@@ -375,7 +375,7 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
 
     QmitkPlotWidget::DataVector values(numberOfSpectra);
 
-    for (int step = 0; step < numberOfSpectra; ++step)
+    for (std::size_t step = 0; step < numberOfSpectra; ++step)
     {
       if( VImageDimension == 4 )
       {
@@ -493,7 +493,7 @@ void QmitkCESTStatisticsView::RemoveMZeros(QmitkPlotWidget::DataVector& xValues,
 {
   QmitkPlotWidget::DataVector tempX;
   QmitkPlotWidget::DataVector tempY;
-  for (int index = 0; index < xValues.size(); ++index)
+  for (std::size_t index = 0; index < xValues.size(); ++index)
   {
     if ((xValues.at(index) < -299) || (xValues.at(index)) > 299)
     {
@@ -515,7 +515,7 @@ void QmitkCESTStatisticsView::RemoveMZeros(QmitkPlotWidget::DataVector& xValues,
   QmitkPlotWidget::DataVector tempX;
   QmitkPlotWidget::DataVector tempY;
   QmitkPlotWidget::DataVector tempDevs;
-  for (int index = 0; index < xValues.size(); ++index)
+  for (std::size_t index = 0; index < xValues.size(); ++index)
   {
     if ((xValues.at(index) < -299) || (xValues.at(index)) > 299)
     {

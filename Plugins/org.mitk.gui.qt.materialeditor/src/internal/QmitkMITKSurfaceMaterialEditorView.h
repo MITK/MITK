@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"
-#include "mitkShaderProperty.h"
 #include "mitkSurface.h"
 #include "vtkRenderer.h"
 #include "vtkTextActor.h"
@@ -91,7 +90,6 @@ private:
 
   unsigned long observerIndex;
   bool observerAllocated;
-  mitk::ShaderProperty::Pointer observedProperty;
 
   void InitPreviewWindow();
 

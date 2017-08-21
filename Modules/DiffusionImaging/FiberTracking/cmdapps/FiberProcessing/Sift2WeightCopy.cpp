@@ -83,11 +83,11 @@ int main(int argc, char* argv[])
         std::vector<float> weights;
         for (float d; fin >> d; ) { weights.push_back(d); }
 
-        for(int i = 0; i != weights.size(); i++) {
+        for(std::size_t i = 0; i != weights.size(); i++) {
           fib->SetFiberWeight(i, weights[i]);
         }
 
-        mitk::IOUtil::SaveBaseData(fib.GetPointer(), outFileName );
+        mitk::IOUtil::Save(fib.GetPointer(), outFileName );
     }
     catch (itk::ExceptionObject e)
     {

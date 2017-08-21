@@ -757,6 +757,11 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
   return true;
 }
 
+bool mitk::Image::SetImportVolume(const void *const_data, int t, int n)
+{
+  return this->SetImportVolume(const_cast<void*>(const_data), t, n, CopyMemory);
+}
+
 bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType importMemoryManagement)
 {
   if (IsValidChannel(n) == false)

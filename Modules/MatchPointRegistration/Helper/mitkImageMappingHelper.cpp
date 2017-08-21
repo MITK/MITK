@@ -267,7 +267,8 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
       InputImageType::Pointer timeStepInput = imageTimeSelector->GetOutput();
       ResultImageType::Pointer timeStepResult;
       AccessByItk_n(timeStepInput, doMITKMap, (timeStepResult, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-      result->SetVolume(timeStepResult->GetVolumeData()->GetData(),i);
+      mitk::ImageReadAccessor readAccess(timeStepResult);
+      result->SetVolume(readAccess.GetData(),i);
     }
   }
 
@@ -277,7 +278,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::map(const InputImageType* input, const MITKRegistrationType* registration,
   bool throwOnOutOfInputAreaError, const double& paddingValue, const ResultImageGeometryType* resultGeometry,
-  bool throwOnMappingError, const double& errorValue, mitk::ImageMappingInterpolator::Type interpolatorType)
+  bool throwOnMappingError, const double& errorValue, mitk::ImageMappingInterpolator::Type)
 {
   if (!registration)
   {

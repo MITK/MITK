@@ -227,7 +227,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
   int progress = 0;
   std::vector< int > ids;
 #pragma omp parallel for
-  for (int i=0; i<points1.size(); i++)
+  for (int i=0; i<(int)points1.size(); i++)
   {
 #pragma omp critical
     {
@@ -237,14 +237,14 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     }
 
     bool match = false;
-    for (int j=0; j<points2.size(); j++)
+    for (unsigned int j=0; j<points2.size(); j++)
     {
       auto v1 = points1.at(i);
       auto v2 = points2.at(j);
 
       unsigned int matches = 0;
       unsigned int reverse_matches = 0;
-      for (int c=0; c<v1.size(); c++)
+      for (unsigned int c=0; c<v1.size(); c++)
       {
         if (v1[c].SquaredEuclideanDistanceTo(v2[c])<mitk::eps)
           matches++;
@@ -423,7 +423,7 @@ void mitk::FiberBundle::ColorFibersByOrientation()
           rgba[2] = (unsigned char) (255.0 * std::fabs(diff2[2]));
           rgba[3] = (unsigned char) (255.0);
         }
-        m_FiberColors->InsertTupleValue(idList[i], rgba);
+        m_FiberColors->InsertTypedTuple(idList[i], rgba);
       }
     }
     else if (pointsPerFiber == 1)
@@ -558,11 +558,8 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool opacity, bool normalize)
       rgba[0] = (unsigned char) (255.0 * color[0]);
       rgba[1] = (unsigned char) (255.0 * color[1]);
       rgba[2] = (unsigned char) (255.0 * color[2]);
-      if (opacity)
-        rgba[3] = (unsigned char) (255.0 * dev);
-      else
-        rgba[3] = (unsigned char) (255.0);
-      m_FiberColors->InsertTupleValue(cell->GetPointId(j), rgba);
+      rgba[3] = (unsigned char) (255.0);
+      m_FiberColors->InsertTypedTuple(cell->GetPointId(j), rgba);
       count++;
     }
   }
@@ -655,7 +652,7 @@ void mitk::FiberBundle::ColorFibersByScalarMap(const mitk::PixelType, mitk::Imag
       rgba[3] = (unsigned char) (255.0 * pixelValue);
     else
       rgba[3] = (unsigned char) (255.0);
-    m_FiberColors->InsertTupleValue(i, rgba);
+    m_FiberColors->InsertTypedTuple(i, rgba);
   }
   m_UpdateTime3D.Modified();
   m_UpdateTime2D.Modified();
@@ -719,7 +716,7 @@ void mitk::FiberBundle::ColorFibersByFiberWeights(bool opacity, bool normalize)
       else
         rgba[3] = (unsigned char) (255.0);
 
-      m_FiberColors->InsertTupleValue(counter, rgba);
+      m_FiberColors->InsertTypedTuple(counter, rgba);
       counter++;
     }
   }
@@ -742,7 +739,7 @@ void mitk::FiberBundle::SetFiberColors(float r, float g, float b, float alpha)
     rgba[1] = (unsigned char) g;
     rgba[2] = (unsigned char) b;
     rgba[3] = (unsigned char) alpha;
-    m_FiberColors->InsertTupleValue(i, rgba);
+    m_FiberColors->InsertTypedTuple(i, rgba);
   }
   m_UpdateTime3D.Modified();
   m_UpdateTime2D.Modified();
@@ -785,7 +782,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  MITK_INFO << "Extracting fibers";
+  MITK_INFO << "Extracting fibers with mask image";
   boost::progress_display disp(m_NumFibers);
   for (int i=0; i<m_NumFibers; i++)
   {
@@ -1341,14 +1338,14 @@ void mitk::FiberBundle::SetFiberColors(vtkSmartPointer<vtkUnsignedCharArray> fib
   for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
   {
     unsigned char source[4] = {0,0,0,0};
-    fiberColors->GetTupleValue(i, source);
+    fiberColors->GetTypedTuple(i, source);
 
     unsigned char target[4] = {0,0,0,0};
     target[0] = source[0];
     target[1] = source[1];
     target[2] = source[2];
     target[3] = source[3];
-    m_FiberColors->InsertTupleValue(i, target);
+    m_FiberColors->InsertTypedTuple(i, target);
   }
   m_UpdateTime3D.Modified();
   m_UpdateTime2D.Modified();
@@ -2047,7 +2044,7 @@ void mitk::FiberBundle::Compress(float error)
       double minError = error;
       int removeIndex = -1;
 
-      for (int j=0; j<vertices.size(); j++)
+      for (unsigned int j=0; j<vertices.size(); j++)
       {
         if (removedPoints[j]==0)
         {
@@ -2290,6 +2287,19 @@ bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
   }
 
   return true;
+}
+
+void mitk::FiberBundle::PrintSelf(std::ostream &os, itk::Indent indent) const
+{
+  os << indent << this->GetNameOfClass() << ":\n";
+  os << indent << "Number of fibers: " << this->GetNumFibers() << std::endl;
+  os << indent << "Min. fiber length: " << this->GetMinFiberLength() << std::endl;
+  os << indent << "Max. fiber length: " << this->GetMaxFiberLength() << std::endl;
+  os << indent << "Mean fiber length: " << this->GetMeanFiberLength() << std::endl;
+  os << indent << "Median fiber length: " << this->GetMedianFiberLength() << std::endl;
+  os << indent << "STDEV fiber length: " << this->GetLengthStDev() << std::endl;
+  os << indent << "Number of points: " << this->GetNumberOfPoints() << std::endl;
+  Superclass::PrintSelf(os, indent);
 }
 
 /* ESSENTIAL IMPLEMENTATION OF SUPERCLASS METHODS */

@@ -111,7 +111,7 @@ void ShCoefficientImageImporter< PixelType, ShOrder >
                 typename QballImageType::PixelType pix2;
                 vnl_matrix<double> odf = m_ShBasis*coeffs;
                 for (int d=0; d<QBALL_ODFSIZE; d++)
-                    pix2[d] = odf(d,0)*M_PI*4/QBALL_ODFSIZE;
+                    pix2[d] = odf(d,0);
 
                 m_QballImage->SetPixel(index2,pix2);
             }

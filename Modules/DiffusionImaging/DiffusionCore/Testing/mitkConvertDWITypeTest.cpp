@@ -30,7 +30,7 @@ int mitkConvertDWITypeTest( int argc, char* argv[] )
 
   MITK_TEST_CONDITION_REQUIRED( argc > 2, "Specify input and output.");
 
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( argv[1] );
+  mitk::Image::Pointer inputImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( argv[1] )[0].GetPointer());
 
   try
   {

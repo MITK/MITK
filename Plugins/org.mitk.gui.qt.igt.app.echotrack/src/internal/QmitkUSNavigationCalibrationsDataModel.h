@@ -58,6 +58,7 @@ public:
   /** \brief Set model data for the selected cell. */
   virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
 
+  using QAbstractTableModel::removeRows;
   /** \brief Remove given rows from the model.
    *  \param removeFromDataStorage zone nodes are removed from the data storage too, if this is set to true
    */

@@ -206,24 +206,6 @@ namespace mitk
  * comparisons and will give verbose output on the dashboard/console.
  * Feel free to implement mitk::Equal for your own datatype or purpose.
  *
- * @deprecatedSince{2013_09} Use MITK_ASSERT_EQUAL instead.
- *
- * @param OBJ1 First object.
- * @param OBJ2 Second object.
- * @param MSG Message to appear with the test.
- */
-#define MITK_TEST_EQUAL(OBJ1, OBJ2, MSG)                                                                               \
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(OBJ1, OBJ2, mitk::eps, true) == true, MSG)
-
-/**
- * @brief Testing macro to test if two objects are equal.
- *
- * @ingroup MITKTestingAPI
- *
- * This macro uses mitk::eps and the corresponding mitk::Equal methods for all
- * comparisons and will give verbose output on the dashboard/console.
- * Feel free to implement mitk::Equal for your own datatype or purpose.
- *
  * @param EXPECTED First object.
  * @param ACTUAL Second object.
  * @param MSG Message to appear with the test.

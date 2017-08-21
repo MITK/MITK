@@ -30,10 +30,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 #include <random>
 #include <mitkPointSet.h>
 #include <mitkPointSetShapeProperty.h>
+#include <mitkTractographyForest.h>
+#include <QThread>
+#include <QTimer>
+#include <QmitkStdMultiWidget.h>
+#include <QmitkSliceNavigationListener.h>
 
+class QmitkStreamlineTrackingView;
+
+class QmitkStreamlineTrackingWorker : public QObject
+{
+  Q_OBJECT
+
+public:
+
+  QmitkStreamlineTrackingWorker(QmitkStreamlineTrackingView* view);
+
+public slots:
+
+  void run();
+
+private:
+
+  QmitkStreamlineTrackingView* m_View;
+};
 
 /*!
 \brief View for tensor based deterministic streamline fiber tracking.
@@ -48,8 +72,9 @@ public:
 
   static const std::string VIEW_ID;
 
-  typedef itk::Image< unsigned char, 3 > ItkUCharImageType;
-  typedef itk::Image< float, 3 > ItkFloatImageType;
+  typedef itk::Image< unsigned char, 3 >  ItkUCharImageType;
+  typedef itk::Image< float, 3 >          ItkFloatImageType;
+  typedef itk::StreamlineTrackingFilter   TrackerType;
 
   QmitkStreamlineTrackingView();
   virtual ~QmitkStreamlineTrackingView();
@@ -61,12 +86,25 @@ public:
   ///
   virtual void SetFocus() override;
 
+  TrackerType::Pointer              m_Tracker;
+  QmitkStreamlineTrackingWorker     m_TrackingWorker;
+  QThread                           m_TrackingThread;
+
 protected slots:
 
   void DoFiberTracking();   ///< start fiber tracking
   void UpdateGui();
   void ToggleInteractive();
   void DeleteTrackingHandler();
+  void OnParameterChanged();
+  void InteractiveSeedChanged(bool posChanged=false);
+  void ForestSwitched();
+  void OutputStyleSwitched();
+  void AfterThread();                       ///< update gui etc. after tracking has finished
+  void BeforeThread();                      ///< start timer etc.
+  void TimerUpdate();
+  void StopTractography();
+  void OnSliceChanged();
 
 protected:
 
@@ -79,19 +117,24 @@ protected slots:
 
 private:
 
-  int m_SliceObserverTag1;
-  int m_SliceObserverTag2;
-  int m_SliceObserverTag3;
-  std::vector< itk::Point<float> > m_SeedPoints;
-  mitk::DataNode::Pointer m_InteractiveNode;
-  mitk::DataNode::Pointer m_InteractivePointSetNode;
+  void StartStopTrackingGui(bool start);
 
-  std::vector< mitk::DataNode::Pointer > m_InputImageNodes; ///< input images
-  std::vector< mitk::Image::Pointer > m_InputImages; ///< input image datanode
-  bool		m_FirstTensorProbRun;
+  std::vector< itk::Point<float> >        m_SeedPoints;
+  mitk::DataNode::Pointer                 m_InteractiveNode;
+  mitk::DataNode::Pointer                 m_InteractivePointSetNode;
 
-  void OnSliceChanged(const itk::EventObject& e);
-  mitk::TrackingDataHandler*      m_TrackingHandler;
+  std::vector< mitk::DataNode::Pointer >  m_InputImageNodes; ///< input image nodes
+  std::vector< mitk::Image::ConstPointer >     m_InputImages; ///< input images
+  std::vector< mitk::Image::ConstPointer >     m_AdditionalInputImages;
+  bool                                    m_FirstTensorProbRun;
+  bool                                    m_FirstInteractiveRun;
+
+  mitk::TrackingDataHandler*              m_TrackingHandler;
+  bool                                    m_ThreadIsRunning;
+  QTimer*                                 m_TrackingTimer;
+  bool                                    m_DeleteTrackingHandler;
+  QmitkSliceNavigationListener            m_SliceChangeListener;
+
 };
 
 

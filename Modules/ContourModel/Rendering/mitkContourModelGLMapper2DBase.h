@@ -18,9 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_ContourModelGLMapper2DBase_H_
 
 #include "mitkCommon.h"
-#include "mitkGLMapper.h"
+#include "mitkMapper.h"
 #include "mitkTextAnnotation2D.h"
 #include <MitkContourModelExports.h>
+#include "vtkNew.h"
+
+class vtkContext2D;
+class vtkPen;
 
 namespace mitk
 {
@@ -33,10 +37,12 @@ namespace mitk
   *
   * @ingroup MitkContourModelModule
   */
-  class MITKCONTOURMODEL_EXPORT ContourModelGLMapper2DBase : public GLMapper
+  class MITKCONTOURMODEL_EXPORT ContourModelGLMapper2DBase : public Mapper
   {
   public:
-    mitkClassMacro(ContourModelGLMapper2DBase, GLMapper);
+    mitkClassMacro(ContourModelGLMapper2DBase, Mapper);
+
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor = nullptr) override;
 
   protected:
     typedef TextAnnotation2D::Pointer TextAnnotationPointerType;
@@ -52,11 +58,17 @@ namespace mitk
 
     virtual void InternalDrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer);
 
+    void Initialize(mitk::BaseRenderer *renderer);
+
     TextAnnotationPointerType m_PointNumbersAnnotation;
     TextAnnotationPointerType m_ControlPointNumbersAnnotation;
 
     typedef std::vector<BaseRenderer *> RendererListType;
     RendererListType m_RendererList;
+
+    bool m_Initialized;
+
+    vtkNew<vtkContext2D> m_Context;
   };
 
 } // namespace mitk

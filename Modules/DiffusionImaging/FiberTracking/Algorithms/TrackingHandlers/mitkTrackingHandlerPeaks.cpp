@@ -23,7 +23,7 @@ TrackingHandlerPeaks::TrackingHandlerPeaks()
   : m_PeakThreshold(0.1)
   , m_ApplyDirectionMatrix(false)
 {
-  std::srand(0);
+
 }
 
 TrackingHandlerPeaks::~TrackingHandlerPeaks()
@@ -64,6 +64,8 @@ void TrackingHandlerPeaks::InitForTracking()
     m_NumDirs = imageRegion4.GetSize(3)/3;
     m_NeedsDataInit = false;
   }
+
+  std::cout << "TrackingHandlerPeaks - Peak threshold: " << m_PeakThreshold << std::endl;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir)
@@ -74,19 +76,25 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
   if (mag<mitk::eps)
   {
     bool found = false;
-    // try m_NumDirs times to get a non-zero random direction
-    for (int j=0; j<m_NumDirs; j++)
-    {
-      int i = std::rand()%m_NumDirs;
-      out_dir = GetDirection(idx3, i);
 
-      if (out_dir.magnitude()>mitk::eps)
+    if (m_Random)
+    {
+      // try m_NumDirs times to get a non-zero random direction
+      for (int j=0; j<m_NumDirs; j++)
       {
-        oldDir[0] = out_dir[0];
-        oldDir[1] = out_dir[1];
-        oldDir[2] = out_dir[2];
-        found = true;
-        break;
+        int i = 0;
+#pragma omp critical
+        i = m_RngItk->GetIntegerVariate(m_NumDirs-1);
+        out_dir = GetDirection(idx3, i);
+
+        if (out_dir.magnitude()>mitk::eps)
+        {
+          oldDir[0] = out_dir[0];
+          oldDir[1] = out_dir[1];
+          oldDir[2] = out_dir[2];
+          found = true;
+          break;
+        }
       }
     }
 

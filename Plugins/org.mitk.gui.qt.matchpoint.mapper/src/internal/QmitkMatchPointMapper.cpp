@@ -469,8 +469,8 @@ void QmitkMatchPointMapper::ConfigureProgressInfos()
 
 }
 
-void QmitkMatchPointMapper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPointMapper::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+    const QList<mitk::DataNode::Pointer>&)
 {
     this->CheckInputs();
     this->ConfigureMappingControls();

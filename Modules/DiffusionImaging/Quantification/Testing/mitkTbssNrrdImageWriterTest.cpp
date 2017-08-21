@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "mitkNrrdTbssImageWriter".
  */
-int mitkTbssNrrdImageWriterTest(int argc , char* argv[])
+int mitkTbssNrrdImageWriterTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("TbssNrrdImageWriterTest");
 

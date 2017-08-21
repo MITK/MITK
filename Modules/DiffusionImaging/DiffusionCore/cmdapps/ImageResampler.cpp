@@ -278,20 +278,10 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
   image->InitializeByItk(_pResizeFilter->GetOutput());
   mitk::GrabItkImageMemory( _pResizeFilter->GetOutput(), image);
   return image;
-
 }
 
-/// Save images according to file type
-static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
+static mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing)
 {
-  std::cout << "----Save to " << fileName;
-
-  mitk::IOUtil::Save(image, fileName);
-}
-
-mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing, bool useLinInt = true)
-{
-
   itk::Vector<double, 3> spacingVector;
   spacingVector[0] = spacing[0];
   spacingVector[1] = spacing[1];
@@ -309,8 +299,8 @@ mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spa
   resampler->Update();
 
   mitk::Image::Pointer output = mitk::GrabItkImageMemory( resampler->GetOutput() );
-  output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
-  output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
+  output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
+  output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
   mitk::DiffusionPropertyHelper propertyHelper( output );
   propertyHelper.InitializeImage();
 
@@ -367,7 +357,7 @@ int main( int argc, char* argv[] )
   std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
 
   std::vector<std::string> spacings;
-  float spacing[3];
+  float spacing[] = { 0.0f, 0.0f, 0.0f };
   if (parsedArgs.count("spacing"))
   {
 
@@ -397,9 +387,9 @@ int main( int argc, char* argv[] )
 
   mitk::Image::Pointer refImage;
   if (!useSpacing)
-    refImage = mitk::IOUtil::LoadImage(refImageFile);
+    refImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(refImageFile)[0].GetPointer());
 
-  mitk::Image::Pointer inputDWI = mitk::IOUtil::LoadImage(inputFile);
+  mitk::Image::Pointer inputDWI = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputFile)[0].GetPointer());
   if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI.GetPointer()))
   {
     mitk::Image::Pointer outputImage;
@@ -416,7 +406,7 @@ int main( int argc, char* argv[] )
 
     return EXIT_SUCCESS;
   }
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inputFile);
+  mitk::Image::Pointer inputImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputFile)[0].GetPointer());
 
 
   mitk::Image::Pointer resultImage;
@@ -427,7 +417,7 @@ int main( int argc, char* argv[] )
     resultImage = TransformToReference(refImage,inputImage,useLinearInterpol,useNN);
 
 
-  mitk::IOUtil::SaveImage(resultImage, outputFile);
+  mitk::IOUtil::Save(resultImage, outputFile);
 
   return EXIT_SUCCESS;
 }

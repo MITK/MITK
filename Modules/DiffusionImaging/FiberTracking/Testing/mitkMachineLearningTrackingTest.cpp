@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <omp.h>
+#include <mitkTractographyForest.h>
 
 #include "mitkTestFixture.h"
 
@@ -56,14 +57,16 @@ public:
         mitk::BaseData::Pointer baseData = fibInfile.at(0);
         ref = dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
 
-        dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/DiffusionImage.dwi")).GetPointer());
+        dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/DiffusionImage.dwi"))[0].GetPointer());
 
 
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/seed.nrrd")).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/seed.nrrd"))[0].GetPointer());
         seed = ItkUcharImgType::New();
         mitk::CastToItkImage(img, seed);
 
-        tfh->LoadForest(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"));
+        mitk::TractographyForest::Pointer forest = dynamic_cast<mitk::TractographyForest*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"))[0].GetPointer());
+
+        tfh->SetForest(forest);
         tfh->AddDwi(dwi);
     }
 

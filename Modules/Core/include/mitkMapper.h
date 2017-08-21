@@ -117,7 +117,7 @@ namespace mitk
     /** \brief Returns whether this is an vtk-based mapper
    * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
    */
-    virtual bool IsVtkBased() const = 0;
+    virtual bool IsVtkBased() const { return true; }
 
     /** \brief Calls the time step of the input data for the specified renderer and checks
     * whether the time step is valid and calls method GenerateDataForRenderer()

@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
       roundfilter->Update();
 
       dwi->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( roundfilter->GetNewBValue()  ) );
-      dwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( roundfilter->GetOutputGradientDirectionContainer() ) );
+      dwi->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( roundfilter->GetOutputGradientDirectionContainer() ) );
 
       // filter input parameter
       const mitk::DiffusionPropertyHelper::BValueMapType
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
         // create new DWI image
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
         outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
-        outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
+        outImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
         mitk::DiffusionPropertyHelper propertyHelper( outImage );
         propertyHelper.InitializeImage();
 
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
         // create new DWI image
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
         outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
-        outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
+        outImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
         mitk::DiffusionPropertyHelper propertyHelper( outImage );
         propertyHelper.InitializeImage();
 
@@ -192,7 +192,7 @@ int main(int argc, char* argv[])
         // create new DWI image
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
         outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
-        outImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
+        outImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
         mitk::DiffusionPropertyHelper propertyHelper( outImage );
         propertyHelper.InitializeImage();
 

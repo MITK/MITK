@@ -177,7 +177,7 @@ void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
 void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
 {
   // first we load an mitk::Image from the data repository
-  mitk::Image::Pointer mitkTestImage = mitk::IOUtil::LoadImage(imageFileName);
+  mitk::Image::Pointer mitkTestImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imageFileName)[0].GetPointer());
 
   // some format checking
   mitk::Image::Pointer resultImg = nullptr;
@@ -209,7 +209,7 @@ void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
   ConvertCVMatForthAndBack(resultImg, imageFileName);
 }
 
-void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string imageFileName)
+void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string)
 {
   // now we convert it to OpenCV IplImage
   mitk::ImageToOpenCVImageFilter::Pointer toOCvConverter = mitk::ImageToOpenCVImageFilter::New();
@@ -229,11 +229,11 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
 
   if( result->GetPixelType().GetNumberOfComponents() == 1 )
   {
-    MITK_TEST_EQUAL( result, inputForCVMat, "Testing equality of input and output image of cv::Mat conversion for " << imageFileName );
+    MITK_ASSERT_EQUAL( result, inputForCVMat, "Testing equality of input and output image of cv::Mat conversion" );
   }
   else if( result->GetPixelType().GetNumberOfComponents() == 3 )
   {
-    MITK_TEST_EQUAL( result, inputForCVMat, "Testing equality of input and output image of cv::Mat conversion for " << imageFileName );
+    MITK_ASSERT_EQUAL( result, inputForCVMat, "Testing equality of input and output image of cv::Mat conversion" );
   }
   else
   {
@@ -242,7 +242,6 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
 
   // change OpenCV image to test if the filter gets updated
   cv::Mat changedcvmatTestImage = cvmatTestImage.clone();
-  std::size_t numBits = result->GetPixelType().GetBitsPerComponent();
   if (result->GetPixelType().GetBitsPerComponent() == sizeof(char)*8)
   {
     changedcvmatTestImage.at<char>(0,0) = cvmatTestImage.at<char>(0,0) != 0 ? 0 : 1;
@@ -251,12 +250,6 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
   {
     changedcvmatTestImage.at<float>(0,0) = cvmatTestImage.at<float>(0,0) != 0 ? 0 : 1;
   }
-  /*
-  if (result->GetPixelType().GetBitsPerComponent() == 3*sizeof(char))
-  {
-    changedcvmatTestImage.at<char>(0,0) = cvmatTestImage.at<char>(0,0) != 0 ? 0 : 1;
-  }
-  */
 
   toMitkConverter->SetOpenCVMat(changedcvmatTestImage);
   toMitkConverter->Update();
@@ -264,7 +257,7 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
   MITK_TEST_NOT_EQUAL(toMitkConverter->GetOutput(), inputForCVMat, "Converted image must not be the same as before.");
 }
 
-void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string imageFileName)
+void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string)
 {
   // now we convert it to OpenCV IplImage
   mitk::ImageToOpenCVImageFilter::Pointer toOCvConverter = mitk::ImageToOpenCVImageFilter::New();
@@ -284,11 +277,11 @@ void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string i
 
   if( result->GetPixelType().GetNumberOfComponents() == 1 )
   {
-    MITK_TEST_EQUAL( result, inputForIpl, "Testing equality of input and output image of IplImage conversion  for " << imageFileName );
+    MITK_ASSERT_EQUAL( result, inputForIpl, "Testing equality of input and output image of IplImage conversion" );
   }
   else if( result->GetPixelType().GetNumberOfComponents() == 3 )
   {
-    MITK_TEST_EQUAL( result, inputForIpl, "Testing equality of input and output image of cv::Mat conversion for " << imageFileName );
+    MITK_ASSERT_EQUAL( result, inputForIpl, "Testing equality of input and output image of cv::Mat conversion" );
   }
   else
   {

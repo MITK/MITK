@@ -9,6 +9,7 @@ The Preprocessing View bundles a selection of features and tools for dealing wit
 
 \imageMacro{PreprocessingGUI_1.png,"Gradients tab",9.97}
 
+
 The Gradients tab allows you to examine the number of b values and how many gradients were acquired for each. Here you can also visualize the gradients as points on a sphere, mirror opposite gradients so all are oriented within the same half sphere, round b values and merge similar gradients.
 
 \imageMacro{PreprocessingGUI_2.png,"Image values tab",9.97}

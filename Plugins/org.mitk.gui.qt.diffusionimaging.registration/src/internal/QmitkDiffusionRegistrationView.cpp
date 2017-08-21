@@ -93,7 +93,7 @@ void QmitkRegistrationWorker::run()
     }
     else
     {
-      mitk::Image::Pointer inImage = mitk::IOUtil::LoadImage( m_View->m_BatchList.at(i).toStdString() );
+      mitk::Image::Pointer inImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( m_View->m_BatchList.at(i).toStdString() )[0].GetPointer());
       mitk::GradientDirectionsProperty::Pointer gradDir = static_cast<mitk::GradientDirectionsProperty*>(inImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer());
     }
 
@@ -457,7 +457,7 @@ void QmitkDiffusionRegistrationView::StartBatch()
     dirIterator.next();
 
     list.append(dirIterator.fileInfo().absoluteFilePath());
-    std::cout << dirIterator.fileInfo().absoluteFilePath().toStdString() << endl;
+    std::cout << dirIterator.fileInfo().absoluteFilePath().toStdString() << std::endl;
     m_BatchList = list;
 
     m_IsBatch = true;

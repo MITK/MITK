@@ -199,30 +199,9 @@ if(MITK_USE_DCMQI)
 endif()
 
 # -----------------------------------------
-# Special handling for SOFA
-
-if(MITK_USE_SOFA)
-  # The SOFAConfig.cmake file does not provide exported targets or
-  # libraries with absolute paths, hence we need to make the link
-  # directories globally available until the SOFAConfig.cmake file
-  # supports a proper mechanism for handling targets.
-# find_package(SOFA PATHS ${SOFA_DIR} CONFIG REQUIRED)
-  link_directories(${SOFA_LIBRARY_DIRS})
-endif()
-
-# -----------------------------------------
-# Special handling for VMTK
-
-if(MITK_USE_VMTK)
-  # Same as SOFA above
-  link_directories(${VMTK_LIBRARY_DIRS})
-endif()
-
-# -----------------------------------------
 # Special handling for Boost
 
 if(MITK_USE_Boost)
-  # Same as SOFA above
   link_directories(${Boost_LIBRARY_DIRS})
 endif()
 
@@ -230,7 +209,6 @@ endif()
 # Special handling for OpenIGTLink
 
 if(MITK_USE_OpenIGTLink)
-  # Same as SOFA above
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
 endif()
 

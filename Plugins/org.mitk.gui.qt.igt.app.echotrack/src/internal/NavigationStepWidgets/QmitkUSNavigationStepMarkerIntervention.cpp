@@ -75,10 +75,10 @@ QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention
     m_TargetOcclusionFilter(mitk::USNavigationTargetOcclusionFilter::New()),
     m_TargetIntersectionFilter(mitk::USNavigationTargetIntersectionFilter::New()),
     m_PlacementQualityCalculator(mitk::USTargetPlacementQualityCalculator::New()),
-    m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
     m_TargetStructureWarnOverlay(mitk::TextAnnotation2D::New()),
     m_ReferenceSensorIndex(1),
     m_NeedleSensorIndex(0),
+    m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
     ui(new Ui::QmitkUSNavigationStepMarkerIntervention)
 {
   m_ActiveTargetColor[0] = 1;
@@ -783,7 +783,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetScore()
 void QmitkUSNavigationStepMarkerIntervention::UpdateTargetProgressDisplay()
 {
   QString description;
-  if (m_CurrentTargetIndex >= m_NumberOfTargets)
+  if (m_CurrentTargetIndex >= static_cast<int>(m_NumberOfTargets))
   {
     description = "All Targets Reached";
     if (m_TargetProgressBar)
@@ -840,7 +840,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdatePlannedTargetProgressDisplay
   }
   else
   {
-    float red[3] = {0.6, 0, 0};
+    float red[3] = {0.6f, 0.0f, 0.0f};
     m_TargetProgressBar->SetBorderColor(red);
     m_TargetProgressBar->setValueInvalid();
   }
@@ -885,7 +885,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetViolationStatus()
 void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
 {
   // clear quality display if there aren't all targets reached
-  if (m_ReachedTargetsNodes.size() != m_NumberOfTargets)
+  if (m_ReachedTargetsNodes.size() != static_cast<int>(m_NumberOfTargets))
   {
     ui->placementQualityGroupBox->setEnabled(false);
     ui->angleDifferenceValue->setText("");
@@ -932,7 +932,7 @@ void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
     "USNavigation::AngleDifferences",
     mitk::GenericProperty<mitk::VnlVector>::New(m_PlacementQualityCalculator->GetAngleDifferences()));
 
-  if (m_PlannedTargetsNodes.size() == m_NumberOfTargets)
+  if (m_PlannedTargetsNodes.size() == static_cast<int>(m_NumberOfTargets))
   {
     mitk::VnlVector reachedPlannedDifferences;
     double reachedPlannedDifferencesSum = 0;

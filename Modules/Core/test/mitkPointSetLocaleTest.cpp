@@ -47,7 +47,7 @@ void ReaderLocaleTest(mitk::Point3D &refPoint, std::string filename)
 {
   MITK_TEST_OUTPUT(<< "---- Reader Test ---- ");
 
-  mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(filename);
+  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename)[0].GetPointer());
 
   mitk::Point3D point;
   if (pointSet->GetPointIfExists(0, &point))

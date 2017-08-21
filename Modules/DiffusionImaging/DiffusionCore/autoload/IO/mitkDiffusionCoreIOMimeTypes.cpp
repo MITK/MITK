@@ -252,6 +252,20 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageFslMimeType::AppliesTo(const std::s
       return canRead;
     }
 
+    if (itksys::SystemTools::FileExists(std::string(base + ext + ".bvec").c_str())
+      && itksys::SystemTools::FileExists(std::string(base + ext + ".bval").c_str())
+      )
+    {
+      return canRead;
+    }
+
+    if (itksys::SystemTools::FileExists(std::string(base + ext + ".bvecs").c_str())
+      && itksys::SystemTools::FileExists(std::string(base + ext + ".bvals").c_str())
+      )
+    {
+      return canRead;
+    }
+
     canRead = false;
   }
 

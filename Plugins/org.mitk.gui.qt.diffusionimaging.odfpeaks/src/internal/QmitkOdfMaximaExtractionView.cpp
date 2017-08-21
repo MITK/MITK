@@ -255,6 +255,7 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
 
   if (m_Controls->m_NormalizationBox->currentIndex() == 0)
     filter->SetNormalizeVectors(false);
+  filter->SetFaThreshold(m_Controls->m_AbsoluteThresholdBox->value());
 
   filter->Update();
 
@@ -454,7 +455,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image* img)
   }
 }
 
-void QmitkOdfMaximaExtractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkOdfMaximaExtractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes)
 {
   (void) nodes;
   this->OnImageSelectionChanged();

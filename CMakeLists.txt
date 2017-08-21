@@ -243,7 +243,6 @@ mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GLUT        OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME Raptor2     OFF ADVANCED)
 mitkFunctionAddExternalProject(NAME Eigen       ON  ADVANCED DOC "Use the Eigen library")
-mitkFunctionAddExternalProject(NAME GLEW        ON  ADVANCED DOC "Use the GLEW library")
 mitkFunctionAddExternalProject(NAME ANN         ON  ADVANCED DOC "Use Approximate Nearest Neighbor Library")
 mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit for unit tests")
 
@@ -273,8 +272,6 @@ mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated
 mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
-mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Eigen Boost DOC "Use Simulation Open Framework Architecture")
-mitkFunctionAddExternalProject(NAME VMTK      OFF          DEPENDS ITK VTK)
 mitkFunctionAddExternalProject(NAME DCMQI     OFF          DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
 mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 
@@ -322,31 +319,6 @@ mitkFunctionFindWhitelists(MITK)
 
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
-
-if(MITK_USE_SOFA)
-  # SOFA requires boost system library
-  list(FIND MITK_USE_Boost_LIBRARIES system _result)
-  if(_result LESS 0)
-    message("> Adding 'system' to MITK_USE_Boost_LIBRARIES.")
-    list(APPEND MITK_USE_Boost_LIBRARIES system)
-  endif()
-  # SOFA requires boost thread library
-  list(FIND MITK_USE_Boost_LIBRARIES thread _result)
-  if(_result LESS 0)
-    message("> Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
-    list(APPEND MITK_USE_Boost_LIBRARIES thread)
-  endif()
-  # Simulation plugin requires boost chrono library
-  list(FIND MITK_USE_Boost_LIBRARIES chrono _result)
-  if(_result LESS 0)
-    message("> Adding 'chrono' to MITK_USE_Boost_LIBRARIES.")
-    list(APPEND MITK_USE_Boost_LIBRARIES chrono)
-  endif()
-  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
-  # Allow setting external SOFA plugins directory and SOFA plugins
-  set(MITK_USE_SOFA_PLUGINS_DIR ${MITK_USE_SOFA_PLUGINS_DIR} CACHE PATH "External SOFA plugins directory" FORCE)
-  set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
-endif()
 
 # only windows can't build python in debug mode
 if(MITK_USE_Python AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND WIN32)
@@ -815,8 +787,6 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
       # Otherwise, existing Find<proj>.cmake files could fail.
-      # (e.g. in the case of GLEW and the FindGLEW.cmake file shipped
-      # with CMake).
       find_package(${_package} QUIET CONFIG)
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
@@ -863,20 +833,9 @@ if(MITK_USE_Python)
   endif()
 endif()
 
-if(MITK_USE_SOFA)
-  # The SOFAConfig.cmake file does not provide exported targets or
-  # libraries with absolute paths, hence we need to make the link
-  # directories globally available until the SOFAConfig.cmake file
-  # supports a proper mechanism for handling targets.
-  # The same code is needed in MITKConfig.cmake.
-  link_directories(${SOFA_LIBRARY_DIRS})
-endif()
-
-# Same as SOFA above
 link_directories(${Boost_LIBRARY_DIRS})
 
 if(MITK_USE_OpenIGTLink)
-  # Same as SOFA above
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
 endif()
 

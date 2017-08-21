@@ -218,7 +218,7 @@ void DoseVisualizationPreferencePage::UpdatePresetsWidgets()
   m_Controls->btnDelPreset->setEnabled((m_Controls->listPresets->currentItem() != nullptr) && (m_Controls->listPresets->count()>1));
 }
 
-void DoseVisualizationPreferencePage::OnCurrentItemChanged ( QListWidgetItem * currentItem, QListWidgetItem * previousItem)
+void DoseVisualizationPreferencePage::OnCurrentItemChanged (QListWidgetItem*, QListWidgetItem*)
 {
   this->m_LevelSetModel->setIsoDoseLevelSet(this->GetSelectedIsoLevelSet());
 }
@@ -283,7 +283,7 @@ void DoseVisualizationPreferencePage::OnShowContextMenuIsoSet(const QPoint& pos)
   }
 }
 
-void DoseVisualizationPreferencePage::OnAddPresetClicked(bool checked)
+void DoseVisualizationPreferencePage::OnAddPresetClicked(bool)
 {
   bool done = false;
   QString name = tr("new_preset");
@@ -324,7 +324,7 @@ void DoseVisualizationPreferencePage::OnAddPresetClicked(bool checked)
   UpdatePresetsWidgets();
 }
 
-void DoseVisualizationPreferencePage::OnDelPresetClicked(bool checked)
+void DoseVisualizationPreferencePage::OnDelPresetClicked(bool)
 {
   QListWidgetItem* selectedItem = m_Controls->listPresets->currentItem();
 
@@ -341,7 +341,7 @@ void DoseVisualizationPreferencePage::OnDelPresetClicked(bool checked)
 }
 
 
-void DoseVisualizationPreferencePage::OnResetPresetClicked(bool checked)
+void DoseVisualizationPreferencePage::OnResetPresetClicked(bool)
 {
   QMessageBox box;
   box.setText("Do you want to reset the presets?");
@@ -363,12 +363,12 @@ void DoseVisualizationPreferencePage::OnResetPresetClicked(bool checked)
 }
 
 
-void DoseVisualizationPreferencePage::OnAddLevelClicked(bool checked)
+void DoseVisualizationPreferencePage::OnAddLevelClicked(bool)
 {
   this->m_LevelSetModel->addLevel();
 }
 
-void DoseVisualizationPreferencePage::OnDelLevelClicked(bool checked)
+void DoseVisualizationPreferencePage::OnDelLevelClicked(bool)
 {
   QModelIndex selectedIndex = m_Controls->isoLevelSetView->currentIndex();
 
@@ -380,12 +380,12 @@ void DoseVisualizationPreferencePage::OnDelLevelClicked(bool checked)
   this->m_LevelSetModel->deleteLevel(selectedIndex);
 }
 
-void DoseVisualizationPreferencePage::OnReferenceDoseChanged(double dose)
+void DoseVisualizationPreferencePage::OnReferenceDoseChanged(double)
 {
   this->m_referenceDoseChanged = true;
 }
 
-void DoseVisualizationPreferencePage::OnGlobalVisChanged(bool vis)
+void DoseVisualizationPreferencePage::OnGlobalVisChanged(bool)
 {
   this->m_globalVisChanged = true;
 }

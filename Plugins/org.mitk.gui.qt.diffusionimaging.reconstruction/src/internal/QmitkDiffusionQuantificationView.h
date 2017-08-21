@@ -42,7 +42,6 @@ class QmitkDiffusionQuantificationView : public QmitkAbstractView
   static const std::string VIEW_ID;
 
   QmitkDiffusionQuantificationView();
-  QmitkDiffusionQuantificationView(const QmitkDiffusionQuantificationView& other);
   virtual ~QmitkDiffusionQuantificationView();
 
   typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
@@ -80,6 +79,9 @@ protected slots:
   void TensorQuantify(int method);
   void TensorQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
     int method) ;
+
+  void DoBallStickCalculation();
+  void DoMultiTensorCalculation();
 
 protected:
 

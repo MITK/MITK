@@ -74,7 +74,7 @@ void SetInputFileNames( std::string input_directory )
 }
 
 
-mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, std::string output_file )
+static mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, const std::string &)
 {
   mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
   //mitk::ClassicDICOMSeriesReader::Pointer gdcmReader = mitk::ClassicDICOMSeriesReader::New();
@@ -289,9 +289,9 @@ int main(int argc, char* argv[])
       vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
 
       image = mitk::GrabItkImageMemory( filter->GetOutput() );
-      image->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
-      image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
-      image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
+      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
+      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
+      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
       mitk::DiffusionPropertyHelper propertyHelper( image );
       propertyHelper.InitializeImage();
     }

@@ -105,7 +105,7 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
       MITK_WARN << "Found an invalid storage object!";
       return;
       }
-    if (m_CurrentStorage->GetToolCount() != m_CurrentSource->GetNumberOfOutputs()) //there is something wrong with the storage
+    if (m_CurrentStorage->GetToolCount() != static_cast<int>(m_CurrentSource->GetNumberOfOutputs())) //there is something wrong with the storage
       {
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
       m_CurrentStorage = nullptr;

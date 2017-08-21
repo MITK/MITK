@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>
+#include <vtkOpenGL.h>
 
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 

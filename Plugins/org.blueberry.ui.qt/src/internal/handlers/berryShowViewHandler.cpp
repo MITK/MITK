@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIViewDescriptor.h"
 #include "berryPlatformUI.h"
 
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 #include "internal/berryQtShowViewDialog.h"
 
 #include <berryCommandExceptions.h>

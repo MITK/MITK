@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
         if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
             fib->ScaleFibers(scaleX, scaleY, scaleZ);
 
-        mitk::IOUtil::SaveBaseData(fib.GetPointer(), outFileName );
+        mitk::IOUtil::Save(fib.GetPointer(), outFileName );
 
     }
     catch (itk::ExceptionObject e)

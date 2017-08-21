@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
   ws.RunNetOnce(init_net);
   ws.CreateNet(predict_net, true);
 
-  for (auto i = 0; i < inputVec.size(); ++i)
+  for (unsigned int i = 0; i < inputVec.size(); ++i)
   {
     auto* blob = ws.GetBlob(predict_net.external_input(i));
     TensorType* tensor = blob->template GetMutable<TensorType>();
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
   CAFFE_ENFORCE(ws.RunNet(predict_net.name()));
 
   outputVec.resize(predict_net.external_output_size());
-  for (auto i = 0; i < outputVec.size(); ++i)
+  for (unsigned int i = 0; i < outputVec.size(); ++i)
   {
     auto* blob = ws.GetBlob(predict_net.external_output(i));
     outputVec[i] = blob->template GetMutable<TensorType>();
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
   // get ourput from network
   TensorType* output = outputVec[outputVec.size()];
 
-  const float* output_data =  output->data<float>();
+//  const float* output_data =  output->data<float>();
   cv::Mat out_img = cv::Mat(64,64,CV_32FC3,output->mutable_data<float>());
 
   cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.

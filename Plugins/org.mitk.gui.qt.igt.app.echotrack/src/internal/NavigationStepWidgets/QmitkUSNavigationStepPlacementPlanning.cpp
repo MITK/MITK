@@ -63,9 +63,9 @@ QmitkUSNavigationStepPlacementPlanning::QmitkUSNavigationStepPlacementPlanning(Q
     m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
     m_TargetIntersectionFilter(mitk::USNavigationTargetIntersectionFilter::New()),
     m_PlacementQualityCalculator(mitk::USTargetPlacementQualityCalculator::New()),
-    m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepPlacementPlanning::UpdateTargetCoordinates),
     m_ReferenceSensorIndex(1),
     m_NeedleSensorIndex(0),
+    m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepPlacementPlanning::UpdateTargetCoordinates),
     ui(new Ui::QmitkUSNavigationStepPlacementPlanning)
 {
   ui->setupUi(this);
@@ -460,7 +460,7 @@ void QmitkUSNavigationStepPlacementPlanning::OnRemoveCurrentTargetClicked()
   m_PlannedNeedlePaths.remove(m_CurrentTargetIndex);
   this->ReinitNodeDisplacementFilter();
 
-  for (unsigned int n = 0; n < m_PlannedTargetNodes.size(); ++n)
+  for (int n = 0; n < m_PlannedTargetNodes.size(); ++n)
   {
     // set name of the target node according to its new index
     m_PlannedTargetNodes.at(n)->SetName(
@@ -723,7 +723,7 @@ mitk::DataNode::Pointer QmitkUSNavigationStepPlacementPlanning::CalculatePlannin
   return planningQualityResult;
 }
 
-itk::SmartPointer<mitk::Surface> QmitkUSNavigationStepPlacementPlanning::CreateSphere(float radius)
+itk::SmartPointer<mitk::Surface> QmitkUSNavigationStepPlacementPlanning::CreateSphere(float)
 {
   mitk::Surface::Pointer surface = mitk::Surface::New();
 

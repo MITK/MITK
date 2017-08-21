@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOrientationDistributionFunction.h>
 #include <chrono>
 
+#include <mitkTractographyForest.h>
+
 #undef DIFFERENCE
 #define VIGRA_STATIC_LIB
 #include <vigra/random_forest.hxx>
@@ -72,27 +74,25 @@ public:
   void SetAdditionalFeatureImages( std::vector< std::vector< ItkFloatImgType::Pointer > > images ){ m_AdditionalFeatureImages = images; DataModified(); }
 
   void StartTraining();
-  void SaveForest(std::string forestFile);
-  void LoadForest(std::string forestFile);
 
   void SetMode( MODE m ){ m_Mode = m; }
-
+  void SetForest(mitk::TractographyForest::Pointer forest){ m_Forest = forest; }
   void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
   void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
   void SetNumTrees(int num){ m_NumTrees = num; }
   void SetMaxTreeDepth(int depth){ m_MaxTreeDepth = depth; }
-  void SetStepSize(float step){ m_WmSampleDistance = step; }
+  void SetFiberSamplingStep(float step){ m_WmSampleDistance = step; }
   void SetGrayMatterSamplesPerVoxel(int samples){ m_GmSamplesPerVoxel = samples; }
   void SetSampleFraction(float fraction){ m_SampleFraction = fraction; }
   void SetBidirectionalFiberSampling(bool val) { m_BidirectionalFiberSampling = val; }
   void SetZeroDirWmFeatures(bool val) { m_ZeroDirWmFeatures = val; }
-  std::shared_ptr< vigra::RandomForest<int> > GetForest(){ return m_Forest; }
 
   void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
   vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
   bool IsForestValid();   ///< true is forest is not null, has more than 0 trees and the correct number of features (NumberOfSignalFeatures + 3)
 
+  mitk::TractographyForest::Pointer GetForest(){ return m_Forest; }
 
   ItkUcharImgType::SpacingType GetSpacing(){ return m_DwiFeatureImages.at(0)->GetSpacing(); }
   itk::Point<float,3> GetOrigin(){ return m_DwiFeatureImages.at(0)->GetOrigin(); }
@@ -116,7 +116,7 @@ protected:
 
 
   std::vector< Image::Pointer >                               m_InputDwis;                ///< original input DWI data
-  std::shared_ptr< vigra::RandomForest<int> >                 m_Forest;                   ///< random forest classifier
+  mitk::TractographyForest::Pointer                           m_Forest;                   ///< random forest classifier
   std::chrono::time_point<std::chrono::system_clock>          m_StartTime;
   std::chrono::time_point<std::chrono::system_clock>          m_EndTime;
 

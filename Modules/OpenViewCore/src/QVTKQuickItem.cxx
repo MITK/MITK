@@ -36,8 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QVTKMitkInteractorAdapter.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkgl.h"
-#include "vtkOpenGLExtensionManager.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 
@@ -45,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-#include <vtkFrameBufferObject2.h>
+#include <vtkOpenGLFrameBufferObject.h>
 
 #include "vtkInternalOpenGLRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"
@@ -243,8 +241,8 @@ void QVTKQuickItem::hoverMoveEvent(QHoverEvent* e)
 void QVTKQuickItem::init()
 {
     m_win->OpenGLInitContext();
-    m_win->GetExtensionManager()->LoadExtension("GL_VERSION_1_4");
-    m_win->GetExtensionManager()->LoadExtension("GL_VERSION_2_0");
+//    m_win->GetExtensionManager()->LoadExtension("GL_VERSION_1_4");
+//    m_win->GetExtensionManager()->LoadExtension("GL_VERSION_2_0");
 }
 
 bool QVTKQuickItem::prepareForRender()

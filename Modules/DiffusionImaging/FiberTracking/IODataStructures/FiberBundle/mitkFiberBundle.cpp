@@ -441,7 +441,7 @@ void mitk::FiberBundle::ColorFibersByOrientation()
   m_UpdateTime2D.Modified();
 }
 
-void mitk::FiberBundle::ColorFibersByCurvature(bool opacity, bool normalize)
+void mitk::FiberBundle::ColorFibersByCurvature(bool, bool normalize)
 {
   double window = 5;
 

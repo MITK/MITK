@@ -41,7 +41,7 @@ mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 {
 }
 
-void mitk::ContourModelGLMapper2DBase::Initialize(mitk::BaseRenderer */*renderer*/)
+void mitk::ContourModelGLMapper2DBase::Initialize(mitk::BaseRenderer *)
 {
   vtkOpenGLContextDevice2D *device = NULL;
   device = vtkOpenGLContextDevice2D::New();

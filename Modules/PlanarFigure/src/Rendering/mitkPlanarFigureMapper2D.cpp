@@ -58,7 +58,7 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
   this->m_Pen->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
 }
 
-void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer */*renderer*/)
+void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *)
 {
   this->m_Pen = vtkSmartPointer<vtkPen>::New();
   vtkOpenGLContextDevice2D *device = NULL;
@@ -729,7 +729,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints(const mitk::PlanarFigure *p
   }
 }
 
-void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer */*renderer*/,
+void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *,
                                                    const std::string name,
                                                    const mitk::Point2D anchorPoint,
                                                    float globalOpacity,
@@ -779,7 +779,7 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer */*rendere
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *planarFigure,
-                                                  mitk::BaseRenderer */*renderer*/,
+                                                  mitk::BaseRenderer *,
                                                   const mitk::Point2D anchorPoint,
                                                   double &annotationOffset,
                                                   float globalOpacity,

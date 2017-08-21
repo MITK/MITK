@@ -383,7 +383,7 @@ namespace mitk
 
       // Add black background for all images (which may be transparent)
       m_BackgroundMapper->SetInputData(surface->GetVtkPolyData());
-      m_ImageAssembly->AddPart(m_BackgroundActor);
+      //      m_ImageAssembly->AddPart(m_BackgroundActor);
 
       LayerSortedActorList layerSortedActors;
 

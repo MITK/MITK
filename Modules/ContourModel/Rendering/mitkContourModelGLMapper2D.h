@@ -43,7 +43,7 @@ namespace mitk
       /**
       * reimplemented from Baseclass
       */
-      virtual void Paint(BaseRenderer *renderer) override;
+      virtual void MitkRender(BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 

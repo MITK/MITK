@@ -138,26 +138,18 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
       COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
   endif()
 
-  ExternalProject_Add(${proj}-download
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
-      URL_MD5 ace404a1c6be8b74544a77b85f828d40
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ""
-      INSTALL_COMMAND ""
-    )
-
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    SOURCE_DIR "${ep_prefix}/src/${proj}-download"
-    BINARY_DIR "${ep_prefix}/src/${proj}-download"
-    DOWNLOAD_COMMAND ""
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
+    URL_MD5 ace404a1c6be8b74544a77b85f828d40
+    BINARY_DIR "${ep_prefix}/src/${proj}"
     CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
       --with-toolset=${_boost_with_toolset}
       --with-libraries=${_boost_libs}
       "--prefix=<INSTALL_DIR>"
     ${_boost_build_cmd}
     INSTALL_COMMAND "" # done in BUILD_COMMAND
-    DEPENDS ${proj}-download ${proj_DEPENDENCIES}
+    DEPENDS ${proj_DEPENDENCIES}
     )
 
   ExternalProject_Get_Property(${proj} install_dir)

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExtractSliceFilter.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
-#include <mitkIShaderRepository.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkProperties.h>
@@ -278,9 +277,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer *renderer, 
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  // Applying shading properties
   Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_Actor);
-  this->ApplyShaderProperties(renderer);
   // VTK Properties
   ApplyMitkPropertiesToVtkProperty(this->GetDataNode(), ls->m_Actor->GetProperty(), renderer);
 
@@ -488,13 +485,6 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
 
     node->AddProperty("material.representation", mitk::VtkRepresentationProperty::New(), renderer, overwrite);
     node->AddProperty("material.interpolation", mitk::VtkInterpolationProperty::New(), renderer, overwrite);
-  }
-
-  // Shaders
-  IShaderRepository *shaderRepo = CoreServices::GetShaderRepository();
-  if (shaderRepo)
-  {
-    shaderRepo->AddDefaultProperties(node, renderer, overwrite);
   }
 }
 

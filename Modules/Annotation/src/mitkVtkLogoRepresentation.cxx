@@ -152,6 +152,7 @@ void mitkVtkLogoRepresentation::BuildRepresentation()
       }
     }
   }
+  this->TexturePoints->Modified();
 }
 
 mitkVtkLogoRepresentation::mitkVtkLogoRepresentation() : cornerPosition(0)

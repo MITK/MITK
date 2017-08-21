@@ -53,14 +53,12 @@ set(mitk_modules
   US
   USUI
   DicomUI
-  Simulation
   Remeshing
   Python
   QtPython
   Persistence
   OpenIGTLinkUI
   IGTUI
-  VtkShaders
   DicomRT
   RTUI
   IOExt

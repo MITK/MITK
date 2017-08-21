@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMovieGenerator.h"
 #include "mitkConfig.h"
-#include "mitkGL.h"
 #include <mitkRenderingManager.h>
+#include "vtk_glew.h"
 
 #if WIN32
 #ifndef __GNUC__

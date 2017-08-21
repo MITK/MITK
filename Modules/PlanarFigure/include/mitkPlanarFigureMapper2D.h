@@ -18,16 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_PLANAR_FIGURE_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "mitkGLMapper.h"
+#include "mitkMapper.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureControlPointStyleProperty.h"
 #include <MitkPlanarFigureExports.h>
+#include "vtkNew.h"
+#include "vtkPen.h"
+
+class vtkContext2D;
 
 namespace mitk
 {
   class BaseRenderer;
   class Contour;
-  class TextAnnotation2D;
 
   /**
   * \brief OpenGL-based mapper to render display sub-class instances of mitk::PlanarFigure
@@ -106,19 +109,24 @@ namespace mitk
   * @ingroup MitkPlanarFigureModule
   */
 
-  class MITKPLANARFIGURE_EXPORT PlanarFigureMapper2D : public GLMapper
+  class MITKPLANARFIGURE_EXPORT PlanarFigureMapper2D : public Mapper
   {
   public:
-    mitkClassMacro(PlanarFigureMapper2D, GLMapper);
+    mitkClassMacro(PlanarFigureMapper2D, Mapper);
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      /**
-      * reimplemented from Baseclass
-      */
-      virtual void Paint(BaseRenderer *renderer) override;
+    /**
+    * reimplemented from Baseclass
+    */
+      void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
+
+    /** \brief Apply color and opacity properties read from the PropertyList.
+    * The actor is not used in the GLMappers. Called by mapper subclasses.
+    */
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = nullptr) override;
 
   protected:
     enum PlanarFigureDisplayMode
@@ -249,7 +257,10 @@ namespace mitk
     */
     void OnNodeModified();
 
+    void Initialize(mitk::BaseRenderer *renderer);
+
   private:
+
     bool m_IsSelected;
     bool m_IsHovering;
     bool m_DrawOutline;
@@ -298,8 +309,10 @@ namespace mitk
     // Bool flag that indicates if a node modified observer was added
     bool m_NodeModifiedObserverAdded;
 
-    itk::SmartPointer<mitk::TextAnnotation2D> m_AnnotationAnnotation;
-    itk::SmartPointer<mitk::TextAnnotation2D> m_QuantityAnnotation;
+    bool m_Initialized;
+
+    vtkNew<vtkContext2D> m_Context;
+    vtkSmartPointer<vtkPen> m_Pen;
   };
 
 } // namespace mitk

@@ -88,7 +88,4 @@ set(RESOURCE_FILES
   # Binary directory resources
   FiberTrackingLUTBaryCoords.bin
   FiberTrackingLUTIndices.bin
-
-  # Shaders
-  Shaders/mitkShaderFiberClipping.xml
 )

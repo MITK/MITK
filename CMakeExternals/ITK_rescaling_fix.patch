@@ -1,0 +1,35 @@
+From b1eff4f29e4c906d7d9c2dfaadc35899250049aa Mon Sep 17 00:00:00 2001
+From: KuznetsovAlexander <KuznetsovAlexander@rambler.ru>
+Date: Tue, 22 Aug 2017 14:08:21 +0400
+Subject: [PATCH] Fixed loading of multicomponent images with rescaling.
+
+AUT-2882
+Signed-off-by: KuznetsovAlexander <KuznetsovAlexander@rambler.ru>
+---
+ Modules/IO/GDCM/src/itkGDCMImageIO.cxx | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/Modules/IO/GDCM/src/itkGDCMImageIO.cxx b/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
+index 2ea3587..7abf1dd 100644
+--- a/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
++++ b/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
+@@ -320,8 +320,14 @@ void GDCMImageIO::InternalReadImageInformation()
+       itkExceptionMacro("Unhandled PixelFormat: " << pixeltype);
+     }
+ 
+-  m_RescaleIntercept = image.GetIntercept();
+-  m_RescaleSlope = image.GetSlope();
++  // GDCM can't handle rescaling of multiple components
++  if (pixeltype.GetSamplesPerPixel() == 1) {
++    m_RescaleIntercept = image.GetIntercept();
++    m_RescaleSlope = image.GetSlope();
++  } else {
++    m_RescaleIntercept = 0.0;
++    m_RescaleSlope = 1.0;
++  }
+   gdcm::Rescaler r;
+   r.SetIntercept(m_RescaleIntercept);
+   r.SetSlope(m_RescaleSlope);
+-- 
+2.9.0.windows.1
+

@@ -87,7 +87,7 @@ namespace mitk
         all about files and tags from files that have been scanned
         previously.
       */
-      virtual void Scan();
+      virtual void Scan() override;
 
       /**
         \brief Retrieve a result list for file-by-file tag access.

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  ShowSegmentationAsSurface::ShowSegmentationAsSurface() : m_UIDGeneratorSurfaces("Surface_"), m_AddToTree(false) {}
+  ShowSegmentationAsSurface::ShowSegmentationAsSurface() : m_UIDGeneratorSurfaces("Surface_") {}
   ShowSegmentationAsSurface::~ShowSegmentationAsSurface() {}
   void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm *other)
   {

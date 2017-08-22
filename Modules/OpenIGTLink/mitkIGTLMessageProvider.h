@@ -202,9 +202,6 @@ namespace mitk {
     /** \brief flag to indicate if the provider is streaming */
     bool                                      m_IsStreaming;
 
-    unsigned long m_LostConnectionObserverTag;
-
-    bool m_LogMessages;
   };
 
   /**

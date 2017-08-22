@@ -62,7 +62,6 @@ public:
 private:
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
-  QWidget* m_Parent;
 
   QmitkChartData * m_C3Data;
   std::vector<QmitkChartxyData*> * m_C3xyData;
@@ -71,8 +70,7 @@ private:
 
 QmitkChartWidget::Impl::Impl(QWidget* parent)
   : m_WebChannel(new QWebChannel(parent)),
-  m_WebEngineView(new QWebEngineView(parent)),
-  m_Parent(parent)
+  m_WebEngineView(new QWebEngineView(parent))
 {
   //disable context menu for QWebEngineView
   m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);

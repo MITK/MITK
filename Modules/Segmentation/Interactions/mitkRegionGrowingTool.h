@@ -145,7 +145,6 @@ namespace mitk
     int m_ScreenXDifference;
 
   private:
-    ScalarType m_VisibleWindow;
     ScalarType m_MouseDistanceScaleFactor;
     int m_PaintingPixelValue;
     bool m_FillFeedbackContour;

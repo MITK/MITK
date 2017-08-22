@@ -46,7 +46,6 @@ namespace mitk
     Surface::Pointer m_Surface;
     DataNode::Pointer m_Node;
 
-    bool m_AddToTree;
   };
 
 } // namespace

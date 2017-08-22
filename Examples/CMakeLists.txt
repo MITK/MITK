@@ -38,7 +38,6 @@ set(_example_dirs
   QtFreeRender
   Tutorial
   FirstSteps
-  QuickRender
   Annotation
 )
 

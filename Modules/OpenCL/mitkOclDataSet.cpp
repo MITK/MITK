@@ -50,7 +50,7 @@ cl_mem mitk::OclDataSet::CreateGPUBuffer(unsigned int _size, unsigned int _bpe)
   m_context = resources->GetContext();
 
   int clErr;
-  m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_ONLY, m_bufferSize * m_BpE, nullptr, &clErr);
+  m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE, m_bufferSize * m_BpE, nullptr, &clErr);
 
   CHECK_OCL_ERR(clErr);
 

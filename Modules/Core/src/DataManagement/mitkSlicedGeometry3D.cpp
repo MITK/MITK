@@ -251,6 +251,10 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
   /// you need to add 0.5 to safely convert it to unsigned it. I have seen a
   /// case when the result was less by one without this.
   unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis) + 0.5);
+  if ( slices == 0 && geometry3D->GetExtent(dominantAxis) > 0) {
+      // require at least one slice if there is _some_ extent
+      slices = 1;
+  }
 
 #ifndef NDEBUG
   int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);

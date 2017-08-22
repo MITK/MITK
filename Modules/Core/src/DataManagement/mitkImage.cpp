@@ -51,9 +51,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
     return m_MetaDataDictionaryArray;
   }
 
-  mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(GetProperty("autoplan.mainAxisIndex").GetPointer());
-  int mainAxisIndex = prop ? prop->GetValue() : 2;
-  int numberSlices = GetLargestPossibleRegion().GetSize()[mainAxisIndex];
+  int numberSlices = GetLargestPossibleRegion().GetSize()[2];
   
   //mitk::ReaderType::DictionaryArrayType outputArray;
   m_MetaDataDictionaryArray.resize(numberSlices);
@@ -151,9 +149,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
 
 void  mitk::Image::SetMetaDataDictionary(ReaderType::DictionaryArrayType metaData)
 {
-  mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(GetProperty("autoplan.mainAxisIndex")));
-  int mainAxisIndex = prop ? prop->GetValue() : 2;
-  int numberSlices = GetLargestPossibleRegion().GetSize()[mainAxisIndex];
+  int numberSlices = GetLargestPossibleRegion().GetSize()[2];
   
   // Setup slices
   mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);

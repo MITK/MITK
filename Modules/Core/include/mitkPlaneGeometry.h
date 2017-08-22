@@ -140,9 +140,12 @@ namespace mitk {
     *   thisgeometry->SetExtentInMM(2, 1.0);
     * \endcode
     */
-    virtual void InitializeStandardPlane(const BaseGeometry* geometry3D,
-      PlaneOrientation planeorientation = Axial, ScalarType zPosition = 0,
-      bool frontside = true, bool rotated = false);
+    virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
+                                         PlaneOrientation planeorientation = Axial,
+                                         ScalarType zPosition = 0,
+                                         bool frontside = true,
+                                         bool rotated = false,
+                                         bool top = true);
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
@@ -174,19 +177,28 @@ namespace mitk {
     * \a Cave/Caution: Currently only RPI, LAI, LPS and RAS in the three standard planes are covered,
     * i.e. 12 cases of 144:  3 standard planes * 48 coordinate orientations = 144 cases.
     */
-    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-                                         const AffineTransform3D* transform = nullptr,
+    virtual void InitializeStandardPlane(ScalarType width,
+                                         ScalarType height,
+                                         const AffineTransform3D *transform = nullptr,
                                          PlaneOrientation planeorientation = Axial,
-                                         ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
+                                         ScalarType zPosition = 0,
+                                         bool frontside = true,
+                                         bool rotated = false,
+                                         bool top = true);
 
     /**
     * \brief Initialize plane with orientation \a planeorientation
     * (default: axial) given width, height and spacing.
     *
     */
-    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const Vector3D & spacing, PlaneOrientation planeorientation = Axial,
-      ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
+    virtual void InitializeStandardPlane(ScalarType width,
+                                         ScalarType height,
+                                         const Vector3D &spacing,
+                                         PlaneOrientation planeorientation = Axial,
+                                         ScalarType zPosition = 0,
+                                         bool frontside = true,
+                                         bool rotated = false,
+                                         bool top = true);
 
     /**
     * \brief Initialize plane by width and height in pixels, right-/down-vector

@@ -2252,45 +2252,15 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
   }
 }
 
-int valFromIntProp(mitk::Image* image, int axisIndex, int slice, int defaultVal)
-{
-  mitk::IntProperty* prop = nullptr;
-  if (image) {
-    static const char* axisNameInd[] = { "autoplan.mainAxisIndex_%d", "autoplan.secondaryAxisIndex_%d", "autoplan.tertiaryAxisIndex_%d" };
-    auto propName = boost::str(boost::format(axisNameInd[axisIndex]) % slice);
-    prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(propName.c_str())));
-    if (!prop) {
-      static const char* axisName[] = { "autoplan.mainAxisIndex", "autoplan.secondaryAxisIndex", "autoplan.tertiaryAxisIndex" };
-      prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(axisName[axisIndex])));
-    }
-  }
-  return prop ? prop->GetValue() : defaultVal;
-}
-
-bool valFromBoolProp(mitk::Image* image, int axisIndex, int slice, bool defaultVal)
-{
-  mitk::BoolProperty* prop = nullptr;
-  if (image) {
-    static const char* axisNameInd[] = { "autoplan.mainAxisSign_%d", "autoplan.secondaryAxisSign_%d", "autoplan.tertiaryAxisSign_%d" };
-    auto propName = boost::str(boost::format(axisNameInd[axisIndex]) % slice);
-    prop = dynamic_cast<mitk::BoolProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(propName.c_str())));
-    if (!prop) {
-      static const char* axisName[] = { "autoplan.mainAxisSign", "autoplan.secondaryAxisSign", "autoplan.tertiaryAxisSign" };
-      prop = dynamic_cast<mitk::BoolProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty(axisName[axisIndex])));
-    }
-  }
-  return prop ? prop->GetValue() : defaultVal;
-}
-
 void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int slice, int i)
 {
-  auto mainAxis = valFromIntProp(image, 0, slice, -1);
-  auto secondAxis = valFromIntProp(image, 1, slice, -1);
-  auto tertiaryAxis = valFromIntProp(image, 2, slice, -1);
+  auto mainAxis = 2;
+  auto secondAxis = 0;
+  auto tertiaryAxis = 1;
 
-  auto mainSign = valFromBoolProp(image, 0, slice, true);
-  auto secondSign = valFromBoolProp(image, 1, slice, true);
-  auto tertiarySign = valFromBoolProp(image, 2, slice, true);
+  auto mainSign = true;
+  auto secondSign = true;
+  auto tertiarySign = true;
 
   if (!m_displayMetaInfo) {
     mainAxis = secondAxis = -1;

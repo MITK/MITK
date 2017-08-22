@@ -191,20 +191,28 @@ const char* SliceNavigationController::GetViewDirectionAsString() const
     return viewDirectionString;
 }
 
-void SliceNavigationController::Update()
-{
-  if ( !m_BlockUpdate )
+  void SliceNavigationController::Update()
   {
-    if ( m_ViewDirection == Axial )
+    if (!m_BlockUpdate)
     {
-      this->Update( Axial, m_Top, false, true );
-    }
-    else
-    {
-      this->Update( m_ViewDirection );
+      if (m_ViewDirection == Sagittal)
+      {
+        this->Update(Sagittal, true, true, false);
+      }
+      else if (m_ViewDirection == Frontal)
+      {
+        this->Update(Frontal, false, true, false);
+      }
+      else if (m_ViewDirection == Axial)
+      {
+        this->Update(Axial, false, false, true);
+      }
+      else
+      {
+        this->Update(m_ViewDirection);
+      }
     }
   }
-}
 
 
 void

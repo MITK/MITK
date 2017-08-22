@@ -14,18 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPlaneGeometry.h"
-#include "mitkRotationOperation.h"
-#include "mitkInteractionConst.h"
-#include "mitkLine.h"
-#include "mitkGeometry3D.h"
-#include "mitkThinPlateSplineCurvedGeometry.h"
-#include "mitkSlicedGeometry3D.h"
 #include "mitkAffineTransform3D.h"
 #include "mitkBaseGeometry.h"
+#include "mitkGeometry3D.h"
+#include "mitkInteractionConst.h"
+#include "mitkLine.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkRotationOperation.h"
+#include "mitkSlicedGeometry3D.h"
+#include "mitkThinPlateSplineCurvedGeometry.h"
 
-#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.txx>
@@ -62,7 +62,7 @@ private:
   // private test members that are initialized by setUp()
   mitk::PlaneGeometry::Pointer planegeometry;
   mitk::Point3D origin;
-  mitk::Vector3D right, bottom, normal;
+  mitk::Vector3D right, bottom, normal, spacing;
   mitk::ScalarType width, height;
   mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
 
@@ -74,13 +74,15 @@ public:
     width  = 100;    widthInMM  = width;
     height = 200;    heightInMM = height;
     thicknessInMM = 1.0;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+    mitk::FillVector3D(origin, 4.5, 7.3, 11.2);
+    mitk::FillVector3D(right, widthInMM, 0, 0);
+    mitk::FillVector3D(bottom, 0, heightInMM, 0);
+    mitk::FillVector3D(normal, 0, 0, thicknessInMM);
+    mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
 
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+    planegeometry->InitializeStandardPlane(right, bottom);
     planegeometry->SetOrigin(origin);
+    planegeometry->SetSpacing(spacing);
   }
 
   void tearDown() override
@@ -631,8 +633,7 @@ public:
   void TestSaggitalInitialization()
   {
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
-
-    mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
+    mitk::PlaneGeometry::Pointer clonedplanegeometry = planegeometry->Clone();
 
     // Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Sagittal, zPosition = 0, frontside=true):
     planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Sagittal);
@@ -666,16 +667,19 @@ public:
 
     // set origin back to the one of the axial slice:
     origin = clonedplanegeometry->GetOrigin();
-    // Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, frontside=false, rotated=true):
+    // Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition
+    // = 0, frontside=false, rotated=true):
     planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Axial, 0, false, true);
     mitk::Point3D backsideorigin;
-    backsideorigin=origin+clonedplanegeometry->GetAxisVector(1);//+clonedplanegeometry->GetAxisVector(2);
+    backsideorigin = origin + clonedplanegeometry->GetAxisVector(1); //+clonedplanegeometry->GetAxisVector(2);
 
     CPPUNIT_ASSERT_MESSAGE("Testing origin of backsidedly, axially initialized version: ", mitk::Equal(planegeometry->GetOrigin(), backsideorigin, testEps));
 
     mitk::Point3D backsidecornerpoint0;
-    backsidecornerpoint0 = cornerpoint0+clonedplanegeometry->GetAxisVector(1);//+clonedplanegeometry->GetAxisVector(2);
-    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of sagitally initialized version: ", mitk::Equal(planegeometry->GetCornerPoint(0), backsidecornerpoint0, testEps));
+    backsidecornerpoint0 =
+      cornerpoint0 + clonedplanegeometry->GetAxisVector(1); //+clonedplanegeometry->GetAxisVector(2);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of sagitally initialized version: ",
+                           mitk::Equal(planegeometry->GetCornerPoint(0), backsidecornerpoint0, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of backsidedly, axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
         mitk::Equal(planegeometry->GetExtent(0), width, testEps));
@@ -777,9 +781,12 @@ public:
     // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
     mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
 
-    CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ", ! ((clonedplanegeometry.IsNull()) || (clonedplanegeometry->GetReferenceCount()!=1)) );
+    CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ",
+                           !((clonedplanegeometry.IsNull()) || (clonedplanegeometry->GetReferenceCount() != 1)));
 
-    std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, frontside=true): " <<std::endl;
+    std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, "
+                 "frontside=true): "
+              << std::endl;
     planegeometry->InitializeStandardPlane(clonedplanegeometry);
 
     CPPUNIT_ASSERT_MESSAGE("Testing origin of axially initialized version: ", mitk::Equal(planegeometry->GetOrigin(), origin));
@@ -814,11 +821,15 @@ public:
   void TestPlaneComparison()
   {
     // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
-    mitk::PlaneGeometry::Pointer clonedplanegeometry2 = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
+    mitk::PlaneGeometry::Pointer clonedplanegeometry2 =
+      dynamic_cast<mitk::PlaneGeometry *>(planegeometry->Clone().GetPointer());
 
-    CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ", ! ((clonedplanegeometry2.IsNull()) || (clonedplanegeometry2->GetReferenceCount()!=1)) );
-    CPPUNIT_ASSERT_MESSAGE("Testing wheter original and clone are at the same position", clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()));
-    CPPUNIT_ASSERT_MESSAGE(" Asserting that origin is on the plane cloned plane:", clonedplanegeometry2->IsOnPlane(origin));
+    CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ",
+                           !((clonedplanegeometry2.IsNull()) || (clonedplanegeometry2->GetReferenceCount() != 1)));
+    CPPUNIT_ASSERT_MESSAGE("Testing wheter original and clone are at the same position",
+                           clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()));
+    CPPUNIT_ASSERT_MESSAGE(" Asserting that origin is on the plane cloned plane:",
+                           clonedplanegeometry2->IsOnPlane(origin));
 
     mitk::VnlVector newaxis(3);
     mitk::FillVector3D(newaxis, 1.0, 1.0, 1.0); newaxis.normalize();
@@ -897,13 +908,21 @@ private:
   /**
    * This function tests for correct mapping and is called several times from other tests
    **/
-  void mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
+  void mappingTests2D(const mitk::PlaneGeometry *planegeometry,
+                      const mitk::ScalarType &width,
+                      const mitk::ScalarType &height,
+                      const mitk::ScalarType &widthInMM,
+                      const mitk::ScalarType &heightInMM,
+                      const mitk::Point3D &origin,
+                      const mitk::Vector3D &right,
+                      const mitk::Vector3D &bottom)
   {
     std::cout << "Testing mapping Map(pt2d_mm(x=widthInMM/2.3,y=heightInMM/2.5), pt3d_mm) and compare with expected: ";
     mitk::Point2D pt2d_mm;
     mitk::Point3D pt3d_mm, expected_pt3d_mm;
-    pt2d_mm[0] = widthInMM/2.3; pt2d_mm[1] = heightInMM/2.5;
-    expected_pt3d_mm = origin+right*(pt2d_mm[0]/right.GetNorm())+bottom*(pt2d_mm[1]/bottom.GetNorm());
+    pt2d_mm[0] = widthInMM / 2.3;
+    pt2d_mm[1] = heightInMM / 2.5;
+    expected_pt3d_mm = origin + right * (pt2d_mm[0] / right.GetNorm()) + bottom * (pt2d_mm[1] / bottom.GetNorm());
     planegeometry->Map(pt2d_mm, pt3d_mm);
     CPPUNIT_ASSERT_MESSAGE("Testing mapping Map(pt2d_mm(x=widthInMM/2.3,y=heightInMM/2.5), pt3d_mm) and compare with expected", mitk::Equal(pt3d_mm, expected_pt3d_mm, testEps));
 

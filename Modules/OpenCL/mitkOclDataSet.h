@@ -62,7 +62,7 @@ public:
   /** Create the GPU buffer for image
       *
       */
-  cl_mem CreateGPUBuffer(unsigned int _size, unsigned int _bpe);
+  cl_mem CreateGPUBuffer();
 
   /** \brief Returns the status of the image buffer
      *
@@ -86,10 +86,10 @@ public:
     m_Data = data;
   }
 
-  /*! \brief returns the size of the DataSet */
-  int GetSize() const
+  /*! \brief returns the amount of elements in the DataSet */
+  int GetBufferSize() const
   {
-    return this->m_size;
+    return this->m_bufferSize;
   }
 
   short GetBytesPerElement() const
@@ -97,8 +97,11 @@ public:
     return this->m_BpE;
   }
 
-  /** @brief Set the DataSet size*/
-  void SetSize(unsigned short size);
+  /** @brief Set the amount of elements in buffer*/
+  void SetBufferSize(unsigned int size);
+
+  /** @brief Set the DataSet memory Size per Element in Bytes*/
+  void SetBpE(unsigned short BpE);
 
 protected:
   /*! \brief Constructor */
@@ -113,9 +116,6 @@ protected:
   /*! GPU Context the Buffer was created in, needed for access */
   cl_context m_context;
 
-  /*! GMEM Buffer Size */
-  unsigned int m_bufferSize;
-
 private:
 
   bool m_gpuModified;
@@ -124,8 +124,10 @@ private:
   /*! Reference to the data */
   void* m_Data;
 
-  unsigned short m_size;
+  /*! GMEM Buffer Size in elements*/
+  unsigned int m_bufferSize;
 
+  /*! Bytes per Element in Buffer*/
   unsigned short m_BpE;
 };
 

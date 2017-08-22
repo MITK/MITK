@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 __kernel void ckDMASQuad(
-  __read_only image3d_t dSource, // input image
+  __global float* dSource, // input image
   __global float* dDest, // output buffer
   __global float* apodArray,
   unsigned short apodArraySize,
@@ -24,7 +24,10 @@ __kernel void ckDMASQuad(
   float Pitch,
   float Angle,
   unsigned short PAImage,
-  unsigned short TransducerElements  // parameters
+  unsigned short TransducerElements,
+  unsigned int inputL,
+  unsigned int inputS,
+  unsigned int Slices // parameters
 )
 {
   // get thread identifier
@@ -34,11 +37,6 @@ __kernel void ckDMASQuad(
   
   unsigned short outputS = get_global_size(1);
   unsigned short outputL = get_global_size(0);
-  
-  // get image width and weight
-  const unsigned int inputL = get_image_width( dSource );
-  const unsigned int inputS = get_image_height( dSource );
-  const unsigned int Slices = get_image_depth( dSource );
 
   // create an image sampler
   const sampler_t defaultSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST ;
@@ -56,14 +54,14 @@ __kernel void ckDMASQuad(
     short maxLine = min((l_i + part) + 1, (float)inputL);
     short minLine = max((l_i - part), 0.0f);
     short usedLines = (maxLine - minLine);
-	float apod_mult = apodArraySize / (maxLine - minLine);
+    float apod_mult = apodArraySize / (maxLine - minLine);
 	
     float delayMultiplicator = pow((1 / (TimeSpacing*SpeedOfSound) * Pitch * TransducerElements / inputL), 2) / s_i / 2;
 	
-	float mult = 0;
-	float output = 0;
-	float AddSample1 = 0;
-	float AddSample2 = 0;
+    float mult = 0;
+    float output = 0;
+    float AddSample1 = 0;
+    float AddSample2 = 0;
 	
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
@@ -75,10 +73,10 @@ __kernel void ckDMASQuad(
           AddSample2 = delayMultiplicator * pow((l_s2 - l_i), 2) + s_i + (1-PAImage)*s_i;
           if (AddSample2 < inputS && AddSample2 >= 0)
           {
-            mult = read_imagef( dSource, defaultSampler, (int4)(l_s2, AddSample2, globalPosZ, 0 )).x
-			* apodArray[(short)((l_s2 - minLine)*apod_mult)]
-			* read_imagef( dSource, defaultSampler, (int4)(l_s1, AddSample1, globalPosZ, 0 )).x 
-			* apodArray[(short)((l_s1 - minLine)*apod_mult)];
+            mult = dSource[(unsigned int)(globalPosZ * inputL * inputS + AddSample2 * inputL + l_s2)]
+              * apodArray[(short)((l_s2 - minLine)*apod_mult)]
+              * dSource[(unsigned int)(globalPosZ * inputL * inputS + AddSample1 * inputL + l_s1)]
+              * apodArray[(short)((l_s1 - minLine)*apod_mult)];
             output += sqrt(mult * ((float)(mult>0)-(float)(mult<0))) * ((mult > 0) - (mult < 0));
           }
         }

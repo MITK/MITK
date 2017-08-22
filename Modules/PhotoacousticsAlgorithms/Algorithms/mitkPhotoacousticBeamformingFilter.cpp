@@ -139,10 +139,7 @@ void mitk::BeamformingFilter::GenerateData()
     {
       mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
 
-      m_OutputData = new float[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
-      m_InputDataPuffer = new float[input->GetDimension(0)*input->GetDimension(1)];
-
-      // first, we convert any data to float, which we use by default
+      // first, we check whether the dara is float, other formats are unsupported
       if (input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)")
       {
         m_InputData = (float*)inputReadAccessor.GetData();
@@ -152,6 +149,8 @@ void mitk::BeamformingFilter::GenerateData()
         MITK_INFO << "Pixel type is not float, abort";
         return;
       }
+
+      m_OutputData = new float[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
 
       // fill the image with zeros
       for (int l = 0; l < outputDim[0]; ++l)
@@ -211,7 +210,6 @@ void mitk::BeamformingFilter::GenerateData()
         m_ProgressHandle((int)((i + 1) / (float)output->GetDimension(2) * 100), "performing reconstruction");
 
       delete[] m_OutputData;
-      delete[] m_InputDataPuffer;
       m_OutputData = nullptr;
       m_InputData = nullptr;
     }
@@ -240,50 +238,43 @@ void mitk::BeamformingFilter::GenerateData()
       m_oclFilter->SetOutputDim(oclOutputDimChunk);
       m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.TimeSpacing, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
 
+      mitk::ImageReadAccessor inputReadAccessor(input);
+
+      // first, we check whether the data is float, other formats are unsupported
+      if (input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)")
+      {
+        m_InputData = (float*)inputReadAccessor.GetData();
+      }
+      else
+      {
+        MITK_INFO << "Pixel type is not float, abort";
+        return;
+      }
+
       if (chunkSize < oclOutputDim[2])
       {
-        bool skip = false;
-        for (unsigned int i = 0; !skip && i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
+        unsigned short curChunkSize = chunkSize;
+
+        for (unsigned int i = 0; i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
         {
           m_ProgressHandle(100 * ((float)(i * chunkSize) / (float)oclOutputDim[2]), "performing reconstruction");
-          mitk::Image::Pointer chunk = mitk::Image::New();
-          if ((int)((oclOutputDim[2]) - (i * chunkSize)) == (int)(1 + chunkSize))
+
+          if ((oclOutputDim[2]) - (i * chunkSize) >= chunkSize)
           {
-            // A 3d image of 3rd dimension == 1 can not be processed by openCL, make sure that this case never arises
-            oclInputDimLastChunk[2] = input->GetDimension(2) % chunkSize + chunkSize;
-            oclOutputDimLastChunk[2] = input->GetDimension(2) % chunkSize + chunkSize;
-            
-            chunk->Initialize(input->GetPixelType(), 3, oclInputDimLastChunk);
-            m_oclFilter->SetOutputDim(oclOutputDimLastChunk);
-            skip = true; //skip the last chunk
+            m_oclFilter->SetInput((void*)&m_InputData[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)], oclInputDimChunk, sizeof(float));
           }
-          else if ((oclOutputDim[2]) - (i * chunkSize) >= chunkSize)
-            chunk->Initialize(input->GetPixelType(), 3, oclInputDimChunk);
           else
           {
-            chunk->Initialize(input->GetPixelType(), 3, oclInputDimLastChunk);
-            m_oclFilter->SetOutputDim(oclOutputDimLastChunk);
+            m_oclFilter->SetInput((void*)&m_InputData[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)], oclInputDimLastChunk, sizeof(float));
+            curChunkSize = (unsigned short)oclOutputDimLastChunk[2]; // the last chunk might have a different size!
           }
-
-          chunk->SetSpacing(input->GetGeometry()->GetSpacing());
-
-          mitk::ImageReadAccessor ChunkMove(input);
-          chunk->SetImportVolume((void*)&(((float*)const_cast<void*>(ChunkMove.GetData()))[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)]), 0, 0, mitk::Image::ReferenceMemory);
-
-          m_oclFilter->SetInput(chunk);
-          m_oclFilter->Update();
-          auto out = m_oclFilter->GetOutput();
           
-          unsigned int lastCopiedSlice = 0;
-          if(skip)
-          {
-            lastCopiedSlice = i * chunkSize + 1;
-          }
+          m_oclFilter->Update();
+          float* out = (float*)m_oclFilter->GetOutput();
 
-          for (unsigned int s = i * chunkSize; s < oclOutputDim[2]; ++s)  // TODO: make the bounds here smaller...
+          for (unsigned short s = 0; s < curChunkSize; ++s)
           {
-            mitk::ImageReadAccessor copy(out, out->GetSliceData(s - i * chunkSize));
-            output->SetImportSlice(const_cast<void*>(copy.GetData()), s, 0, 0, mitk::Image::ReferenceMemory);
+            output->SetImportSlice( (void*)&(out[s * oclOutputDim[0] * oclOutputDim[1]]), i * chunkSize + s, 0, 0, mitk::Image::ReferenceMemory);
           }
         }
       }
@@ -295,9 +286,8 @@ void mitk::BeamformingFilter::GenerateData()
         m_oclFilter->SetInput(input);
         m_oclFilter->Update();
 
-        auto out = m_oclFilter->GetOutput();
-        mitk::ImageReadAccessor copy(out);
-        output->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ReferenceMemory);
+        float* out = (float*)m_oclFilter->GetOutput();
+        output->SetImportVolume((void*)out, 0, 0, mitk::Image::ReferenceMemory);
       }
     }
     catch (mitk::Exception &e)

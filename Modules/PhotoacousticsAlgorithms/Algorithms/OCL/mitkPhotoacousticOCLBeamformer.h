@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 
-#include "mitkOclImageToImageFilter.h"
+#include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
 
 namespace mitk
@@ -34,7 +34,7 @@ class OclImageToImageFilter;
   */
 
 
-class PhotoacousticOCLBeamformer : public OclImageToImageFilter, public itk::Object
+class PhotoacousticOCLBeamformer : public OclDataSetToDataSetFilter, public itk::Object
 {
 
 public:
@@ -47,8 +47,9 @@ public:
   * @throw mitk::Exception if the dimesion is not 3.
   */
   void SetInput(Image::Pointer image);
+  void SetInput(void* data, unsigned int* dimensions, unsigned int BpE);
 
-  mitk::Image::Pointer GetOutput();
+  mitk::Image::Pointer GetOutputAsImage();
 
   /** Update the filter */
   void Update();
@@ -115,6 +116,7 @@ private:
   cl_kernel m_PixelCalculation;
 
   unsigned int m_OutputDim[3];
+  unsigned int m_InputDim[3];
   float* m_Apodisation;
   unsigned short m_ApodArraySize;
   BeamformingAlgorithm m_Algorithm;
@@ -124,6 +126,16 @@ private:
   float m_Pitch;
   float m_Angle;
   unsigned short m_TransducerElements;
+
+  mitk::Image::Pointer m_InputImage;
 };
 }
 #endif
+
+/*
+float* data = new float[m_InputDim[0] * m_InputDim[1] * m_InputDim[2]];
+for (unsigned int i = 0; i < m_InputDim[0] * m_InputDim[1] * m_InputDim[2]; ++i)
+{
+  data[i] = i;
+}
+mitk::OclDataSetToDataSetFilter::SetInput(data, m_InputDim[0] * m_InputDim[1] * m_InputDim[2], sizeof(float));*/

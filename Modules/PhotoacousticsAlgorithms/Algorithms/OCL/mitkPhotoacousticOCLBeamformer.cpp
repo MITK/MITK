@@ -18,12 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 
 mitk::PhotoacousticOCLBeamformer::PhotoacousticOCLBeamformer()
-: m_PixelCalculation( NULL )
+: m_PixelCalculation( NULL ), m_InputImage(mitk::Image::New())
 {
   this->AddSourceFile("DASQuadratic.cl");
   this->AddSourceFile("DMASQuadratic.cl");
   this->AddSourceFile("DASspherical.cl");
   this->AddSourceFile("DMASspherical.cl");
+
+  unsigned int dim[] = { 128, 2048, 2 };
+
+  mitk::Vector3D spacing;
+  spacing[0] = 1;
+  spacing[1] = 1;
+  spacing[2] = 1;
+
+  m_InputImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, dim);
+  m_InputImage->SetSpacing(spacing);
 
   this->m_FilterID = "PixelCalculation";
 }
@@ -60,7 +70,7 @@ void mitk::PhotoacousticOCLBeamformer::Execute()
 
   try
   {
-    this->InitExec(this->m_PixelCalculation, m_OutputDim);
+    this->InitExec(this->m_PixelCalculation, m_OutputDim, sizeof(float));
   }
   catch (const mitk::Exception& e)
   {
@@ -92,11 +102,17 @@ void mitk::PhotoacousticOCLBeamformer::Execute()
   clErr |= clSetKernelArg( this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_Angle) );
   clErr |= clSetKernelArg( this->m_PixelCalculation, 8, sizeof(cl_ushort), &(this->m_PAImage));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_ushort), &(this->m_TransducerElements));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(this->m_InputDim[0]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 11, sizeof(cl_uint), &(this->m_InputDim[1]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 12, sizeof(cl_uint), &(this->m_InputDim[2]));
 
   CHECK_OCL_ERR( clErr );
 
   // execute the filter on a 3D NDRange
-  this->ExecuteKernel( m_PixelCalculation, 3);
+  if (m_OutputDim[2] == 1)
+    this->ExecuteKernel(m_PixelCalculation, 2);
+  else
+    this->ExecuteKernel(m_PixelCalculation, 3);
   
   // signalize the GPU-side data changed
   m_Output->Modified( GPU_DATA );
@@ -144,34 +160,45 @@ bool mitk::PhotoacousticOCLBeamformer::Initialize()
 
 void mitk::PhotoacousticOCLBeamformer::SetInput(mitk::Image::Pointer image)
 {
-  if(image->GetDimension() != 3)
-  {
-    mitkThrowException(mitk::Exception) << "Input for " << this->GetNameOfClass() <<
-                                           " is not 3D. The filter only supports 3D. Please change your input.";
-  }
-  OclImageToImageFilter::SetInput(image);
+  OclDataSetToDataSetFilter::SetInput(image);
+
+  m_InputImage = image;
+  m_InputDim[0] = m_InputImage->GetDimension(0);
+  m_InputDim[1] = m_InputImage->GetDimension(1);
+  m_InputDim[2] = m_InputImage->GetDimension(2);
 }
 
-mitk::Image::Pointer mitk::PhotoacousticOCLBeamformer::GetOutput()
+void mitk::PhotoacousticOCLBeamformer::SetInput(void* data, unsigned int* dimensions, unsigned int BpE)
 {
+  OclDataSetToDataSetFilter::SetInput(data, dimensions[0] * dimensions[1] * dimensions[2], BpE);
+
+  m_InputDim[0] = dimensions[0];
+  m_InputDim[1] = dimensions[1];
+  m_InputDim[2] = dimensions[2];
+}
+
+mitk::Image::Pointer mitk::PhotoacousticOCLBeamformer::GetOutputAsImage()
+{
+  mitk::Image::Pointer outputImage = mitk::Image::New();
+
   if (m_Output->IsModified(GPU_DATA))
   {
     void* pData = m_Output->TransferDataToCPU(m_CommandQue);
 
     const unsigned int dimension = 3;
-    unsigned int* dimensions = m_OutputDim;
+    unsigned int dimensions[3] = { (unsigned int)m_OutputDim[0], (unsigned int)m_OutputDim[1], (unsigned int)m_OutputDim[2] };
 
-    const mitk::SlicedGeometry3D::Pointer p_slg = m_Input->GetMITKImage()->GetSlicedGeometry();
+    const mitk::SlicedGeometry3D::Pointer p_slg = m_InputImage->GetSlicedGeometry();
 
     MITK_DEBUG << "Creating new MITK Image.";
 
-    m_Output->GetMITKImage()->Initialize(this->GetOutputType(), dimension, dimensions);
-    m_Output->GetMITKImage()->SetSpacing(p_slg->GetSpacing());
-    m_Output->GetMITKImage()->SetGeometry(m_Input->GetMITKImage()->GetGeometry());
-    m_Output->GetMITKImage()->SetImportVolume(pData, 0, 0, mitk::Image::ReferenceMemory);
+    outputImage->Initialize(this->GetOutputType(), dimension, dimensions);
+    outputImage->SetSpacing(p_slg->GetSpacing());
+    outputImage->SetGeometry(m_InputImage->GetGeometry());
+    outputImage->SetImportVolume(pData, 0, 0, mitk::Image::ReferenceMemory);
   }
 
   MITK_DEBUG << "Image Initialized.";
 
-  return m_Output->GetMITKImage();
+  return outputImage;
 }

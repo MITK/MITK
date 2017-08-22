@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 __kernel void ckDASQuad(
-  __read_only image3d_t dSource, // input image
+  __global float* dSource, // input image
   __global float* dDest, // output buffer
   __global float* apodArray,
   unsigned short apodArraySize,
@@ -24,7 +24,10 @@ __kernel void ckDASQuad(
   float Pitch,
   float Angle,
   unsigned short PAImage,
-  unsigned short TransducerElements  // parameters
+  unsigned short TransducerElements,
+  unsigned int inputL,
+  unsigned int inputS,
+  unsigned int Slices // parameters
 )
 {
   // get thread identifier
@@ -34,11 +37,6 @@ __kernel void ckDASQuad(
   
   unsigned short outputS = get_global_size(1);
   unsigned short outputL = get_global_size(0);
-  
-  // get image width and weight
-  const unsigned int inputL = get_image_width( dSource );
-  const unsigned int inputS = get_image_height( dSource );
-  const unsigned int Slices = get_image_depth( dSource );
 
   // create an image sampler
   const sampler_t defaultSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST ;
@@ -56,21 +54,24 @@ __kernel void ckDASQuad(
     short maxLine = min((l_i + part) + 1, (float)inputL);
     short minLine = max((l_i - part), 0.0f);
     short usedLines = (maxLine - minLine);
-	float apod_mult = apodArraySize / (maxLine - minLine);
-	
-	short AddSample = 0;
-	float output = 0;
-	float delayMultiplicator = pow(1 / (TimeSpacing*SpeedOfSound) * Pitch * TransducerElements / inputL, 2) / s_i / 2;
+    float apod_mult = apodArraySize / (maxLine - minLine);
+    
+    short AddSample = 0;
+    
+    float output = 0;
+
+    float delayMultiplicator = pow(1 / (TimeSpacing*SpeedOfSound) * Pitch * TransducerElements / inputL, 2) / s_i / 2;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
       AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-PAImage)*s_i;
-      if (AddSample < inputS && AddSample >= 0) 
-        output += apodArray[(short)((l_s - minLine)*apod_mult)] * read_imagef( dSource, defaultSampler, (int4)(l_s, AddSample, globalPosZ, 0 )).x;
+      if (AddSample < inputS && AddSample >= 0) {
+        output += apodArray[(short)((l_s - minLine)*apod_mult)] * dSource[(unsigned int)(globalPosZ * inputL * inputS + AddSample * inputL + l_s)];
+        }
       else
         --usedLines;
     }
-	
+	  
     dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / usedLines;
   }
 }

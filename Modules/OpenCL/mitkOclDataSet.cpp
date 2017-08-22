@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 
 mitk::OclDataSet::OclDataSet() : m_gpuBuffer(nullptr), m_context(nullptr), m_bufferSize(0), m_gpuModified(false), m_cpuModified(false),
-  m_Data(nullptr), m_size(0), m_BpE(1)
+  m_Data(nullptr), m_BpE(1)
 {
 }
 
@@ -36,13 +36,9 @@ mitk::OclDataSet::~OclDataSet()
 }
 
 
-cl_mem mitk::OclDataSet::CreateGPUBuffer(unsigned int _size, unsigned int _bpe)
+cl_mem mitk::OclDataSet::CreateGPUBuffer()
 {
-  MITK_INFO << "InitializeGPUBuffer call with: BPE=" << _bpe;
-
-  m_bufferSize = _size;
-
-  m_BpE = _bpe;
+  MITK_INFO << "InitializeGPUBuffer call with: BPE=" << m_BpE;
 
   us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
@@ -51,6 +47,8 @@ cl_mem mitk::OclDataSet::CreateGPUBuffer(unsigned int _size, unsigned int _bpe)
 
   int clErr;
   m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE, m_bufferSize * m_BpE, nullptr, &clErr);
+
+  MITK_INFO << "Created GPU Buffer Object of size: " << m_BpE* m_bufferSize << " Bytes";
 
   CHECK_OCL_ERR(clErr);
 
@@ -86,13 +84,13 @@ int mitk::OclDataSet::TransferDataToGPU(cl_command_queue gpuComQueue)
     //check the buffer
     if(m_gpuBuffer == nullptr)
     {
-      MITK_ERROR("ocl.DataSet") << "(mitk) No GPU buffer present!\n";
-      return -1;
+      CreateGPUBuffer();
     }
 
     if (m_gpuBuffer != nullptr)
     {
       clErr = clEnqueueWriteBuffer(gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * m_BpE, m_Data, 0, NULL, NULL);
+      MITK_INFO << "Wrote Data to GPU Buffer Object.";
     }
     else
     {
@@ -149,7 +147,12 @@ void* mitk::OclDataSet::TransferDataToCPU(cl_command_queue gpuComQueue)
   return (void*) data;
 }
 
-void mitk::OclDataSet::SetSize(unsigned short size)
+void mitk::OclDataSet::SetBufferSize(unsigned int size)
 {
-  m_size = size;
+  m_bufferSize = size;
+}
+
+void mitk::OclDataSet::SetBpE(unsigned short BpE)
+{
+  m_BpE = BpE;
 }

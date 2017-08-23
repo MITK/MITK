@@ -14,6 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// needs for "crossplatform" way ot get screen resolution
+// TODO: there is no case for MacOS (and wayland) at the moment
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <X11/Xlib.h>
+#include <X11/X.h>
+#include <X11/Xutil.h>
+// None define from X11 breaks other stuff
+// in X.h it's 0L
+#undef None
+#endif
+
 #include "mitkRegionGrowingTool.h"
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
@@ -454,9 +468,88 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
         indexInWorkingSlice2D[0] = m_SeedPoint[0];
         indexInWorkingSlice2D[1] = m_SeedPoint[1];
 
-        m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
-        m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
-        m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+        // Calculate screen borders and cursor position
+        int y = 1; // 0 will cause conflict with border logic
+        int x = 0;
+
+#ifdef _WIN32
+        //screen height
+        const int height = GetSystemMetrics(SM_CYSCREEN);
+
+        //cursor position
+        POINT p;
+        if (GetCursorPos(&p))
+        {
+            x = p.x;
+            y = p.y;
+        }
+        else
+        {
+            // but why
+            MITK_WARN("Failed to get cursor position");
+            return;
+        }
+#else
+        Display* disp = XOpenDisplay(NULL);
+        if (!disp)
+        {
+            // it happens!
+            MITK_WARN("Failed to open Display");
+            return;
+        }
+
+        //screen height
+        Screen* scrn = DefaultScreenOfDisplay(disp);
+        Window root_window = DefaultRootWindow(disp);
+        const int height = scrn->height;
+
+        //cursor position
+        Window root, child;
+        int winX, winY;
+        unsigned int mask;
+        XQueryPointer( disp, root_window, &root, &child
+                     , &x, &y, &winX, &winY, &mask);
+#endif
+
+        bool atTop = y == 0;
+        bool atBottom = y == (height - 1);
+
+        auto setCursorPosition = [=](int x, int y)
+        {
+#ifdef _WIN32
+            SetCursorPos(x, y);
+#else
+            XSelectInput(disp, root_window, KeyReleaseMask);
+            XWarpPointer(disp, 0L, root_window, 0, 0, 0, 0, x, y);
+            XFlush(disp);
+#endif
+        };
+
+        m_ScreenYDifference += y - m_LastScreenPosition[1];
+        m_ScreenXDifference += x - m_LastScreenPosition[0];
+
+        if (atTop || atBottom)
+        {
+            //translate cursor to the next srcreen
+            mitk::Point2D newBeginning;
+            newBeginning[0] = x;
+            if (atTop)
+            {
+                newBeginning[1] = (height - 2);
+                m_LastScreenPosition = newBeginning;
+            }
+            else
+            {   // atBottom
+                newBeginning[1] = 1;
+                m_LastScreenPosition = newBeginning;
+            }
+            setCursorPosition(newBeginning[0], newBeginning[1]);
+        }
+        else
+        {
+            m_LastScreenPosition[0] = x;
+            m_LastScreenPosition[1] = y;
+        }
 
         // Moving the mouse up and down adjusts the width of the threshold window, moving it left and right shifts the threshold window
         m_Thresholds[0] = std::min<ScalarType>(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);

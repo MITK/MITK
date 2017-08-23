@@ -1682,21 +1682,31 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     std::string seriesNumber;
     imageProperties->GetStringProperty("dicom.series.SeriesNumber", seriesNumber);
 
+    auto secondaryProp = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty("autoplan.secondaryAxisIndex")));
+    auto tertiaryProp = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty("autoplan.tertiaryAxisIndex")));
+    auto mainProp = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty("autoplan.mainAxisIndex")));
+    
+    int axisIndices[3] = {
+      secondaryProp ? secondaryProp->GetValue() : 0,
+      tertiaryProp ? tertiaryProp->GetValue() : 1,
+      mainProp ? mainProp->GetValue() : 2
+    };
+
     for(int i = 0; i < 3; i++) {
       if (m_displayPositionInfo) {
-        _infoStringStream[i] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
+        _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
         if (timeSteps > 1) {
-          _infoStringStream[i]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
+          _infoStringStream[axisIndices[i]]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
         }
         if (seriesNumber != "") {
-          _infoStringStream[i] << "\nSe: " << seriesNumber;
+          _infoStringStream[axisIndices[i]] << "\nSe: " << seriesNumber;
         }
       } else {
-        _infoStringStream[i].clear();
+        _infoStringStream[axisIndices[i]].clear();
       }
-      cornerimgtext[i] = _infoStringStream[i].str();
-      setCornerAnnotation(2, i, cornerimgtext[i].c_str());
-      setViewDirectionAnnontation(image, p[i], i);
+      cornerimgtext[axisIndices[i]] = _infoStringStream[axisIndices[i]].str();
+      setCornerAnnotation(2, axisIndices[i], cornerimgtext[axisIndices[i]].c_str());
+      setViewDirectionAnnontation(image, p[i], axisIndices[i]);
     }
 
     unsigned long newImageMTime = image->GetMTime();

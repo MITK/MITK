@@ -105,7 +105,7 @@ public:
   itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
   itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
   itkSetMacro( NumPreviousDirections, unsigned int )  ///< How many "old" steps do we want to consider in our decision where to go next?
-  itkSetMacro( MaxNumTracts, unsigned int )           ///< Tracking is stopped if the maximum number of tracts is exceeded
+  itkSetMacro( MaxNumTracts, int )                    ///< Tracking is stopped if the maximum number of tracts is exceeded
   itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
   itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.

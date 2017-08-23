@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageMaskSpatialObject.h"
 #include "itkNotImageFilter.h"
 #include <itkCenteredVersorTransformInitializer.h>
+#include <itkOptimizerParameters.h>
+
 #include <vnl/vnl_matrix_fixed.h>
 
 #include "mitkImage.h"

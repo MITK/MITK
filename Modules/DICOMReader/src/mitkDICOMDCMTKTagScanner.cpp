@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMDCMTKTagScanner.h"
 #include "mitkDICOMGenericImageFrameInfo.h"
 
-#include <dcfilefo.h>
-#include <dcpath.h>
+#include <dcmtk/dcmdata/dcfilefo.h>
+#include <dcmtk/dcmdata/dcpath.h>
 
 mitk::DICOMDCMTKTagScanner::DICOMDCMTKTagScanner()
 {

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define MBILOG_ENABLE_DEBUG
 
-#include <dcvrdt.h>
+#include <dcmtk/dcmdata/dcvrdt.h>
 
 #define BOOST_DATE_TIME_NO_LIB
 //Prevent unnecessary/unwanted auto link in this compilation when activating boost libraries in the MITK superbuild
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMGDCMTagScanner.h"
 #include "mitkArbitraryTimeGeometry.h"
 
-#include "dcvrda.h"
+#include "dcmtk/dcmdata/dcvrda.h"
 
 
 const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionDateTag = mitk::DICOMTag( 0x0008, 0x0022 );

@@ -387,7 +387,6 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
     momentsCalc->Compute();
     MomentsType::VectorType cog = momentsCalc->GetCenterOfGravity();
     MomentsType::MatrixType axes = momentsCalc->GetPrincipalAxes();
-    MomentsType::VectorType moments = momentsCalc->GetPrincipalMoments();
 
     // moments-coord conversion
     // third coordinate min oder max?

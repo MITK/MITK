@@ -405,8 +405,7 @@ template< class TInputPixelType, class TOutputPixelType>
 void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::SetInitialSolution(const vnl_vector<double>& x0 )
 {
-  unsigned int param_size = 2 + static_cast<int>( this->m_OmitBZero );
-  assert( x0.size() == param_size );
+  assert( x0.size() == (2 + static_cast<int>( this->m_OmitBZero )) );
 
   this->m_InitialPosition = x0;
 }

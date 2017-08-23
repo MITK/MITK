@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSortByTag.h"
 
-#include "ofstd.h"
+#include "dcmtk/ofstd/ofstd.h"
 
 mitk::DICOMSortByTag
 ::DICOMSortByTag(const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion)

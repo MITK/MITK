@@ -90,8 +90,6 @@ void QmitkFiberQuantificationView::SetFocus()
 void QmitkFiberQuantificationView::CalculateFiberDirections()
 {
   typedef itk::Image<unsigned char, 3>                                            ItkUcharImgType;
-  typedef itk::Image< itk::Vector< float, 3>, 3 >                                 ItkDirectionImage3DType;
-  typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >  ItkDirectionImageContainerType;
 
   // load fiber bundle
   mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.back()->GetData());

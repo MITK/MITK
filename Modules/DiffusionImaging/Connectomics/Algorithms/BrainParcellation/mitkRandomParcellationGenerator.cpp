@@ -417,7 +417,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::GetRandomSeedVo
   itk::ImageRegionIterator<ImageType> it_image(m_Image, m_Image->GetLargestPossibleRegion());
 
 
-  for (it_image.GoToBegin(); !it_image.IsAtEnd(), regionNumber < m_NumberNodes; ++it_image)
+  for (it_image.GoToBegin(); !it_image.IsAtEnd() && regionNumber < m_NumberNodes; ++it_image)
   {
     if (it_image.Value() >= 1)
     {

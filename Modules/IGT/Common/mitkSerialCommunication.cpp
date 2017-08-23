@@ -212,7 +212,9 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
   }
   if (bytesRead > 0)
     answer.assign(buffer, bytesRead); // copy buffer to answer
-  delete buffer;
+
+  delete[] buffer;
+
   if ( bytesRead == numberOfBytes ||                            // everything was received
        (eol && answer.size() > 0 && *eol == answer.at(answer.size()-1)) )  // end of line char reached
     return OK;

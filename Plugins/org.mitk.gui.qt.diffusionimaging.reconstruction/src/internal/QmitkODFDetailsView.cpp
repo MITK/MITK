@@ -312,7 +312,6 @@ void QmitkODFDetailsView::UpdateOdf()
         /** Array of eigen-values. */
         typedef itk::FixedArray<float, 3> EigenValuesArrayType;
         /** Matrix of eigen-vectors. */
-        typedef itk::Matrix<float, 3, 3> MatrixType;
         typedef itk::Matrix<float, 3, 3> EigenVectorsMatrixType;
 
         EigenValuesArrayType eigenValues;

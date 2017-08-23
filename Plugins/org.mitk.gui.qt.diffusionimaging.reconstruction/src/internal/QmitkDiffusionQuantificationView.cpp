@@ -456,8 +456,6 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         MBI_INFO << "Computing GFA ";
         mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
                                                         "Computing GFA for %s", nodename.c_str()).toLatin1());
-        typedef OdfVectorType::ValueType                 RealValueType;
-        typedef itk::Image< RealValueType, 3 >                 RAImageType;
         typedef itk::DiffusionQballGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,odfsize>
                 GfaFilterType;
         GfaFilterType::Pointer gfaFilter = GfaFilterType::New();

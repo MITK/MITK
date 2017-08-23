@@ -128,7 +128,6 @@ void QmitkRandomParcellationView::OnSelectionChanged(berry::IWorkbenchPart::Poin
 template <typename TPixel, unsigned int VImageDimension>
 void QmitkRandomParcellationView::ShowNumberOfVoxels( itk::Image<TPixel, VImageDimension> * inputImage)
 {
-  typedef itk::Image< TPixel, VImageDimension > ImageType;
 
   mitk::RegionVoxelCounter<TPixel, VImageDimension> counter;
   counter.SetRegion(inputImage->GetLargestPossibleRegion());

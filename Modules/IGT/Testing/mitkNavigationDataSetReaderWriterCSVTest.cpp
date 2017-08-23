@@ -116,9 +116,8 @@ public:
         returnValue = returnValue &&        mitk::Equal( ori[2] , sample [line] [(tool*10)+7] );
         returnValue = returnValue &&        mitk::Equal( ori[3] , sample [line] [(tool*10)+8] );
       }
-
-      return returnValue;
     }
+    return returnValue;
   }
 
 

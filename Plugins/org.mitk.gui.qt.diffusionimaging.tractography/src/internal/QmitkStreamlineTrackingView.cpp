@@ -529,7 +529,7 @@ void QmitkStreamlineTrackingView::UpdateGui()
   if(!m_InputImageNodes.empty())
   {
     if (m_InputImageNodes.size()>1)
-      m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.size()+" images selected");
+      m_Controls->m_TensorImageLabel->setText( ( std::to_string(m_InputImageNodes.size()) + " images selected").c_str() );
     else
       m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.at(0)->GetName().c_str());
     m_Controls->m_InputData->setTitle("Input Data");

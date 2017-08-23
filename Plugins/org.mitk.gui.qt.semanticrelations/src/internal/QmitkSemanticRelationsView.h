@@ -19,17 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsControls.h"
-#include "QmitkSemanticRelationsDataModel.h"
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
 
+// semantic relations UI module
+#include <QmitkSemanticRelationsTableView.h>
+#include <QmitkPatientInfoWidget.h>
+
 // blueberry
 #include <berryISelectionListener.h>
 
-// qt
+// mitk qt
 #include <QmitkAbstractView.h>
-#include <QMenu>
 
 /**
 * @brief SemanticRelation
@@ -48,33 +50,22 @@ protected:
 
   virtual void CreateQtPartControl(QWidget* parent) override;
 
+private Q_SLOTS:
+
+  void OnTableViewSelectionChanged(const mitk::DataNode* node);
+
+private:
+
   virtual void NodeAdded(const mitk::DataNode* node) override;
 
   virtual void NodeRemoved(const mitk::DataNode* node) override;
 
-private Q_SLOTS:
-
-  void OnCaseIDSelectionChanged(const QString& caseID);
-  void OnTableViewDataChanged();
-  void OnTableViewContextMenuRequested(const QPoint& pos);
-  void OnContextMenuSetInformationType();
-  void OnContextMenuSetControlPoint();
-  void OnTableViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-  void OnTableViewItemClicked(const QModelIndex& selectedIndex);
-
-private:
-
-  QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode) const;
-
   // the Qt parent of our GUI
   QWidget* m_Parent;
-  Ui::QmitkSemanticRelationControls m_Controls;
-  QMenu* m_ContextMenu;
+  Ui::QmitkSemanticRelationsControls m_Controls;
 
-  std::unique_ptr<QmitkSemanticRelationsDataModel> m_SemanticRelationsDataModel;
-  std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
-
-  mitk::DataNode* m_SelectedDataNode;
+  QmitkSemanticRelationsTableView* m_SemanticRelationsTableView;
+  QmitkPatientInfoWidget* m_PatientInfoWidget;
 };
 
 #endif // QMITKSEMANTICRELATIONSVIEW_H

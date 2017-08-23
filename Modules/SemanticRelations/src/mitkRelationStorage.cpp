@@ -1044,7 +1044,7 @@ void mitk::RelationStorage::OverwriteControlPoint(const SemanticTypes::CaseID& c
   }
 }
 
-void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationNodeID, const SemanticTypes::ControlPoint& controlPoint)
+void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID, const SemanticTypes::ControlPoint& controlPoint)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -1066,10 +1066,10 @@ void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& 
   {
     // set / overwrite the control point reference of the given data
     // retrieve a vector property that contains the referenced ID of a data node (0. information type 1. control point ID)
-    mitk::VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(segmentationNodeID));
+    mitk::VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(dataNodeID));
     if (nullptr == dataNodeVectorProperty)
     {
-      MITK_INFO << "Could not find the data node " << segmentationNodeID << " in the storage. Cannot link data to control point.";
+      MITK_INFO << "Could not find the data node " << dataNodeID << " in the storage. Cannot link data to control point.";
       return;
     }
 
@@ -1093,7 +1093,7 @@ void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& 
   }
 }
 
-void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationNodeID)
+void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -1102,10 +1102,10 @@ void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::Case
     return;
   }
   // retrieve a vector property that contains the referenced ID of a date (0. information type 1. control point ID)
-  mitk::VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(segmentationNodeID));
+  mitk::VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(dataNodeID));
   if (nullptr == dataNodeVectorProperty)
   {
-    MITK_INFO << "Could not find the date " << segmentationNodeID << " in the storage. Cannot unlink control point from date.";
+    MITK_INFO << "Could not find the date " << dataNodeID << " in the storage. Cannot unlink control point from date.";
     return;
   }
 

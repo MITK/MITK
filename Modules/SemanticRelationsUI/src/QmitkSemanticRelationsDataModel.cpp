@@ -164,10 +164,28 @@ void QmitkSemanticRelationsDataModel::SetCurrentCaseID(const SemanticTypes::Case
   DataChanged();
 }
 
-void QmitkSemanticRelationsDataModel::SetPixmapOfNode(const mitk::DataNode* dataNode, const QPixmap& pixmapFromImage)
+void QmitkSemanticRelationsDataModel::SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage)
 {
   SemanticTypes::ID nodeID = DICOMHelper::GetIDFromDataNode(dataNode);
-  m_PixmapMap.insert(std::make_pair(nodeID, pixmapFromImage.scaled(120, 120, Qt::IgnoreAspectRatio)));
+  std::map<std::string, QPixmap>::iterator iter = m_PixmapMap.find(nodeID);
+  if (iter != m_PixmapMap.end())
+  {
+    // key already existing
+    if (nullptr != pixmapFromImage)
+    {
+      // overwrite already stored pixmap
+      m_PixmapMap[nodeID] = pixmapFromImage->scaled(120, 120, Qt::IgnoreAspectRatio);
+    }
+    else
+    {
+      // remove key if no pixmap is given
+      m_PixmapMap.erase(nodeID);
+    }
+  }
+  else
+  {
+    m_PixmapMap.insert(std::make_pair(nodeID, pixmapFromImage->scaled(120, 120, Qt::IgnoreAspectRatio)));
+  }
 }
 
 void QmitkSemanticRelationsDataModel::DataChanged(const mitk::DataNode* dataNode)

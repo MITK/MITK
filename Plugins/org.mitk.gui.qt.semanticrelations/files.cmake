@@ -1,7 +1,6 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkSemanticRelationsView.cpp
-  QmitkSemanticRelationsDataModel.cpp
 )
 
 set(UI_FILES
@@ -11,7 +10,6 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSemanticRelationsView.h
-  src/internal/QmitkSemanticRelationsDataModel.h
 )
 
 set(CACHED_RESOURCE_FILES

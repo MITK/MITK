@@ -36,7 +36,7 @@ public:
   QmitkPatientInfoWidget(QWidget* parent = nullptr);
   ~QmitkPatientInfoWidget();
 
-  void SetPatientInfo(mitk::DataNode* dataNode);
+  void SetPatientInfo(const mitk::DataNode* dataNode);
 
 private:
 

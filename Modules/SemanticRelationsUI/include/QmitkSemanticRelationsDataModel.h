@@ -54,7 +54,7 @@ public:
   const SemanticTypes::CaseID& GetCurrentCaseID() { return m_CaseID; }
   void SetCurrentCaseID(const SemanticTypes::CaseID& caseID);
 
-  void SetPixmapOfNode(const mitk::DataNode* dataNode, const QPixmap& pixmapFromImage);
+  void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
   void DataChanged(const mitk::DataNode* dataNode = nullptr);
   mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
 

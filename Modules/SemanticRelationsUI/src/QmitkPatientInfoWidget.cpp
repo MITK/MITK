@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkPropertyNameHelper.h>
 
-// qt
-#include <QCompleter>
-
 QmitkPatientInfoWidget::QmitkPatientInfoWidget(QWidget* parent)
   : QWidget(parent)
 {
@@ -42,7 +39,7 @@ void QmitkPatientInfoWidget::Init()
   m_Controls.setupUi(this);
 }
 
-void QmitkPatientInfoWidget::SetPatientInfo(mitk::DataNode* dataNode)
+void QmitkPatientInfoWidget::SetPatientInfo(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {

@@ -832,7 +832,7 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
   }
   else
   {
-    mitkThrowException(SemanticRelationException) << "The control point to unlink does not exist for the given case.";
+    mitkThrowException(SemanticRelationException) << "The control point " << controlPoint.UID << " to unlink does not exist for the given case.";
   }
 }
 

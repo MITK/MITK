@@ -6,6 +6,7 @@ set(CPP_FILES
   ThreadPoolUtilities.cpp
   internal/Invoker.cpp
   PathUtilities.cpp
+  TranslationUtilities.cpp
 )
 
 set(MOC_H_FILES

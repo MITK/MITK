@@ -1,20 +1,12 @@
 #include <iterator>
 #include <sstream>
 
+#include <TranslationUtilities.h>
+
 #include "mitkTransferFunctionPresetManager.h"
 
 namespace
 {
-const char* presetNames[] = { "choose an internal transferfunction preset",
-  "CT Generic",
-  "CT Black & White",
-  "CT Thorax large",
-  "CT Thorax small",
-  "CT Bone",
-  "CT Bone (with Gradient)",
-  "CT Cardiac",
-  "MR Generic"
-};
 
 const mitk::TransferFunctionPreset presetCtGeneric = {
   { // grayvalue->opacity
@@ -180,7 +172,7 @@ TransferFunctionPresetManager& TransferFunctionPresetManager::GetInstance()
 }
 
 TransferFunctionPresetManager::TransferFunctionPresetManager()
-  : m_presetNames(std::begin(presetNames), std::end(presetNames))
+  : m_presetNames(TranslationUtilities::getTranslatedTransferFunctionPresets())
   , m_presetPoints({ presetCtGeneric, presetCtBlackWhite, presetCtThoraxLarge, presetCtThoraxSmall,
     presetCtBone, presetCtBoneGradient, presetCtCardiac, presetMrGeneric })
 {
@@ -266,7 +258,7 @@ int TransferFunctionPresetManager::AddPreset(const TransferFunctionPreset& prese
   const auto index = m_presetPoints.size();
   if (name.empty()) {
     std::ostringstream out;
-    out << "User Preset #" << (index - TF_MODE_COUNT);
+    out << TranslationUtilities::getDefaultUserPresetName() << (index - TF_MODE_COUNT);
     m_presetNames.push_back(out.str());
   } else {
     m_presetNames.push_back(name);

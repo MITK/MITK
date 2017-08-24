@@ -258,63 +258,89 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   // find contextMenuAction extension points and add them to the node descriptor
   berry::IExtensionRegistry* extensionPointService = berry::Platform::GetExtensionRegistry();
-  QList<berry::IConfigurationElement::Pointer> cmActions(
-    extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions") );
-  QList<berry::IConfigurationElement::Pointer>::iterator cmActionsIt;
+  QList<berry::IConfigurationElement::Pointer> customMenuConfigs =
+    extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions");
 
-  QmitkNodeDescriptor* tmpDescriptor;
-  QAction* contextMenuAction;
-  QVariant cmActionDataIt;
+  // Prepare all custom QActions
   m_ConfElements.clear();
-
-  int i=1;
-  for (cmActionsIt = cmActions.begin()
-    ; cmActionsIt != cmActions.end()
-    ; ++cmActionsIt)
+  DescriptorActionListType customMenuEntries;
+  for (auto& customMenuConfig : customMenuConfigs)
   {
-    QString cmNodeDescriptorName = (*cmActionsIt)->GetAttribute("nodeDescriptorName");
-    QString cmLabel = (*cmActionsIt)->GetAttribute("label");
-    QString cmClass = (*cmActionsIt)->GetAttribute("class");
-    if(!cmNodeDescriptorName.isEmpty() &&
-       !cmLabel.isEmpty() &&
-       !cmClass.isEmpty())
-    {
-      QString cmIcon = (*cmActionsIt)->GetAttribute("icon");
-      // create context menu entry here
-      tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(cmNodeDescriptorName);
-      if(!tmpDescriptor)
-      {
-        MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
-        continue;
-      }
-      // check if the user specified an icon attribute
-      if ( !cmIcon.isEmpty() )
-      {
-        QIcon icon;
-        if (QFile::exists(cmIcon))
-        {
-          icon = QIcon(cmIcon);
-        }
-        else
-        {
-          icon = berry::AbstractUICTKPlugin::ImageDescriptorFromPlugin(
-            (*cmActionsIt)->GetContributor()->GetName(), cmIcon);
-        }
-        contextMenuAction = new QAction(icon, cmLabel, parent);
-      }
-      else
-      {
-        contextMenuAction = new QAction( cmLabel, parent);
-      }
-      tmpDescriptor->AddAction(contextMenuAction);
-      m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(tmpDescriptor,contextMenuAction));
-      m_ConfElements[contextMenuAction] = *cmActionsIt;
+    QString actionNodeDescriptorName = customMenuConfig->GetAttribute("nodeDescriptorName");
+    QString actionLabel = customMenuConfig->GetAttribute("label");
+    QString actionClass = customMenuConfig->GetAttribute("class");
 
-      cmActionDataIt.setValue<int>(i);
-      contextMenuAction->setData( cmActionDataIt );
-      connect( contextMenuAction, SIGNAL( triggered(bool) ) , this, SLOT( ContextMenuActionTriggered(bool) ) );
-      ++i;
+    if (actionNodeDescriptorName.isEmpty() || actionLabel.isEmpty() || actionClass.isEmpty())
+    {
+        continue;
     }
+
+    QString actionIconName = customMenuConfig->GetAttribute("icon");
+
+    // Find matching descriptor
+    auto nodeDescriptor  = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(actionNodeDescriptorName);
+    if ( nodeDescriptor == nullptr)
+    {
+        MITK_WARN << "Cannot add action \"" << actionLabel << "\" because descriptor " << actionNodeDescriptorName << " does not exist.";
+        continue;
+    }
+
+    // Create action with or without icon
+    QAction* contextMenuAction;
+    if ( !actionIconName.isEmpty() )
+    {
+        QIcon actionIcon;
+        if ( QFile::exists(actionIconName) )
+        {
+          actionIcon = QIcon(actionIconName);
+        } else
+        {
+          actionIcon = berry::AbstractUICTKPlugin::ImageDescriptorFromPlugin(
+            customMenuConfig->GetContributor()->GetName(), actionIconName);
+        }
+        contextMenuAction = new QAction(actionIcon, actionLabel, parent);
+    } else
+    {
+        contextMenuAction = new QAction(actionLabel, parent);
+    }
+
+    // Define menu handler to trigger on click
+    connect(contextMenuAction, static_cast<void(QAction::*)(bool)>(&QAction::triggered),
+            this, &QmitkDataManagerView::ContextMenuActionTriggered);
+
+    // Mark configuration element into lookup list for context menu handler
+    m_ConfElements[contextMenuAction] = customMenuConfig;
+    // Mark new action in sortable list for addition to descriptor
+    customMenuEntries.emplace_back(nodeDescriptor, contextMenuAction);
+  }
+
+  // Sort all custom QActions by their texts
+  {
+    using ListEntryType = std::pair<QmitkNodeDescriptor*,QAction*>;
+    std::sort(customMenuEntries.begin(), customMenuEntries.end(),
+              [](const ListEntryType& left, const ListEntryType& right) -> bool
+              {
+                  assert (left.second != nullptr && right.second != nullptr); // unless we messed up above
+                  return left.second->text() < right.second->text();
+              });
+  }
+
+  // Add custom QActions in sorted order
+  int globalAddedMenuIndex=1;
+  for (auto& menuEntryToAdd : customMenuEntries)
+  {
+    auto& nodeDescriptor = menuEntryToAdd.first;
+    auto& contextMenuAction = menuEntryToAdd.second;
+
+    // TODO is the action "data" used by anything? Otherwise remove!
+    contextMenuAction->setData(static_cast<int>(globalAddedMenuIndex));
+    ++globalAddedMenuIndex;
+
+    // Really add this action to that descriptor (in pre-defined order)
+    nodeDescriptor->AddAction(contextMenuAction);
+
+    // Mark new action into list of descriptors to remove in d'tor
+    m_DescriptorActionList.push_back(menuEntryToAdd);
   }
 
   m_OpacitySlider = new QSlider;

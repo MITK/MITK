@@ -45,7 +45,7 @@ void mitk::NrrdQBallImageWriter::Write()
   InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
     if (input.IsNull())
     {
-        MITK_ERROR <<"Sorry, input to NrrdQBallImageWriter is NULL!";
+        MITK_ERROR <<"Sorry, input to NrrdQBallImageWriter is nullptr!";
         return;
     }
     if ( this->GetOutputLocation().empty() )

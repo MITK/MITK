@@ -110,7 +110,7 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
       i->GetInteractorStyle()->AddObserver((vtkCommand::EventIds)(*it), this->EventCallbackCommand, this->Priority);
     }
 
-    this->InvokeEvent(vtkCommand::EnableEvent, NULL);
+    this->InvokeEvent(vtkCommand::EnableEvent, nullptr);
   }
 
   else // disabling-----------------------------------------------------------
@@ -128,7 +128,7 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
     this->Interactor->RemoveObserver(this->EventCallbackCommand);
     // this->Interactor->HandleEventLoop = 0;
 
-    this->InvokeEvent(vtkCommand::DisableEvent, NULL);
+    this->InvokeEvent(vtkCommand::DisableEvent, nullptr);
   }
 }
 

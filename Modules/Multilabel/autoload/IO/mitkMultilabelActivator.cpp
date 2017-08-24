@@ -26,12 +26,15 @@ namespace mitk
   /**
   \brief Registers services for multilabel module.
   */
-  class MultilabelModuleActivator : public us::ModuleActivator
+  class MultilabelIOModuleActivator : public us::ModuleActivator
   {
     std::vector<AbstractFileIO *> m_FileIOs;
 
   public:
-    void Load(us::ModuleContext * /*context*/) override { m_FileIOs.push_back(new LabelSetImageIO()); }
+    void Load(us::ModuleContext * /*context*/) override
+    {
+      m_FileIOs.push_back(new LabelSetImageIO());
+    }
     void Unload(us::ModuleContext *) override
     {
       for (auto &elem : m_FileIOs)
@@ -42,4 +45,4 @@ namespace mitk
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(mitk::MultilabelModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::MultilabelIOModuleActivator)

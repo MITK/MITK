@@ -95,7 +95,7 @@ protected:
   virtual void SetFocus() override;
   virtual void NodeRemoved(const mitk::DataNode*) override;
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,const QList<mitk::DataNode::Pointer>& nodes ) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkTubeGraphViewControls m_Controls;
   // the Qt parent of our GUI (NOT of this object)

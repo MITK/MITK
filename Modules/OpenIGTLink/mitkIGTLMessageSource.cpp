@@ -62,7 +62,7 @@ mitk::IGTLMessage* mitk::IGTLMessageSource::GetOutput(
 {
   IGTLMessage* out =
       dynamic_cast<IGTLMessage*>( this->ProcessObject::GetOutput(idx) );
-  if ( out == nullptr && this->ProcessObject::GetOutput(idx) != NULL )
+  if ( out == nullptr && this->ProcessObject::GetOutput(idx) != nullptr )
   {
     itkWarningMacro (<< "Unable to convert output number " << idx << " to type "
                      <<  typeid( IGTLMessage ).name () );
@@ -147,13 +147,13 @@ void mitk::IGTLMessageSource::GraftNthOutput(unsigned int idx,
 
   if ( !graft )
   {
-    itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
+    itkExceptionMacro(<<"Requested to graft output with a nullptr pointer object" );
   }
 
   itk::DataObject* output = this->GetOutput(idx);
   if ( !output )
   {
-    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
+    itkExceptionMacro(<<"Requested to graft output that is a nullptr pointer" );
   }
   // Call Graft on IGTLMessage to copy member data
   output->Graft( graft );

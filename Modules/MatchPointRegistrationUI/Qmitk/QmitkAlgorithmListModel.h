@@ -37,7 +37,7 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmListModel : public QAbst
   Q_OBJECT
 
 public:
-  QmitkAlgorithmListModel(QObject *parent = NULL);
+  QmitkAlgorithmListModel(QObject *parent = nullptr);
   virtual ~QmitkAlgorithmListModel(){};
 
   void SetAlgorithms(::map::deployment::DLLDirectoryBrowser::DLLInfoListType algList);

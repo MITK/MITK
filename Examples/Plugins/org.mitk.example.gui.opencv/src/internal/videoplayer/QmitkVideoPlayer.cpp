@@ -37,7 +37,7 @@ void QmitkVideoPlayer::CreateQtPartControl(QWidget *parent)
   m_VideoBackground->setParent(parent);
 
   QVBoxLayout *layout = new QVBoxLayout;
-  QmitkRenderWindow *renderWindow = NULL;
+  QmitkRenderWindow *renderWindow = nullptr;
   if (this->GetRenderWindowPart())
   {
     renderWindow = this->GetRenderWindowPart()->GetActiveQmitkRenderWindow();
@@ -60,5 +60,5 @@ void QmitkVideoPlayer::RenderWindowPartActivated(mitk::IRenderWindowPart *render
 
 void QmitkVideoPlayer::RenderWindowPartDeactivated(mitk::IRenderWindowPart * /*renderWindowPart*/)
 {
-  m_OpenCVVideoControls->SetRenderWindow(NULL);
+  m_OpenCVVideoControls->SetRenderWindow(nullptr);
 }

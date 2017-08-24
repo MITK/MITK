@@ -35,7 +35,7 @@ const std::string QmitkToFConnectionWidget::VIEW_ID = "org.mitk.views.qmitktofco
 
 //Constructor of QmitkToFConnectionWidget
 QmitkToFConnectionWidget::QmitkToFConnectionWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
-, m_Controls(NULL)
+, m_Controls(nullptr)
 , m_IntegrationTime(0)
 , m_ModulationFrequency(0)
 , m_SelectedCameraName("")
@@ -119,7 +119,6 @@ void QmitkToFConnectionWidget::OnSelectCamera()
   }
   m_Controls->m_ConnectCameraButton->setEnabled(true); //ConnectCameraButton gets enabled
   m_SelectedCameraName = selectedCamera;
-  emit  (selectedCamera);
 }
 //This Methods hides all Widgets (later each widget is activated on its own)
 void QmitkToFConnectionWidget::HideAllParameterWidgets()
@@ -176,7 +175,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         }
 
         //open a QFileDialog to chose the corresponding file from the disc
-        tmpFileName = QFileDialog::getOpenFileName(NULL, "Play Image From...", "", fileFilter);
+        tmpFileName = QFileDialog::getOpenFileName(nullptr, "Play Image From...", "", fileFilter);
 
         //If no fileName is returned by the Dialog,Button and Widget have to return to default(disconnected) + Opening a MessageBox
         if (tmpFileName.isEmpty())

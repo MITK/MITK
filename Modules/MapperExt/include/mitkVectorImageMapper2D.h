@@ -59,7 +59,7 @@ namespace mitk
 
     /**
      * Get the explicitly set image
-     * @returns NULL if no Image has been set instead of GetData();
+     * @returns nullptr if no Image has been set instead of GetData();
      */
     itkGetConstObjectMacro(Image, mitk::Image);
 

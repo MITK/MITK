@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
+#include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkCameraController.h>
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
@@ -37,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkOverlayManager.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
@@ -55,32 +55,32 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
                                          mitk::BaseRenderer::RenderingMode::Type renderingMode,
                                          const QString &name)
   : QWidget(parent, f),
-    mitkWidget1(NULL),
-    mitkWidget2(NULL),
-    mitkWidget3(NULL),
-    mitkWidget4(NULL),
-    levelWindowWidget(NULL),
-    QmitkStdMultiWidgetLayout(NULL),
+    mitkWidget1(nullptr),
+    mitkWidget2(nullptr),
+    mitkWidget3(nullptr),
+    mitkWidget4(nullptr),
+    levelWindowWidget(nullptr),
+    QmitkStdMultiWidgetLayout(nullptr),
     m_Layout(LAYOUT_DEFAULT),
     m_PlaneMode(PLANE_MODE_SLICING),
     m_RenderingManager(renderingManager),
     m_GradientBackgroundFlag(true),
-    m_TimeNavigationController(NULL),
-    m_MainSplit(NULL),
-    m_LayoutSplit(NULL),
-    m_SubSplit1(NULL),
-    m_SubSplit2(NULL),
-    mitkWidget1Container(NULL),
-    mitkWidget2Container(NULL),
-    mitkWidget3Container(NULL),
-    mitkWidget4Container(NULL),
+    m_TimeNavigationController(nullptr),
+    m_MainSplit(nullptr),
+    m_LayoutSplit(nullptr),
+    m_SubSplit1(nullptr),
+    m_SubSplit2(nullptr),
+    mitkWidget1Container(nullptr),
+    mitkWidget2Container(nullptr),
+    mitkWidget3Container(nullptr),
+    mitkWidget4Container(nullptr),
     m_PendingCrosshairPositionEvent(false),
     m_CrosshairNavigationEnabled(false)
 {
   /******************************************************
    * Use the global RenderingManager if none was specified
    * ****************************************************/
-  if (m_RenderingManager == NULL)
+  if (m_RenderingManager == nullptr)
   {
     m_RenderingManager = mitk::RenderingManager::GetInstance();
   }
@@ -161,23 +161,23 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
   m_SubSplit2->addWidget(mitkWidget4Container);
 
   // Create RenderWindows 1
-  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager, renderingMode);
+  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", nullptr, m_RenderingManager, renderingMode);
   mitkWidget1->SetLayoutIndex(AXIAL);
   mitkWidgetLayout1->addWidget(mitkWidget1);
 
   // Create RenderWindows 2
-  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, name + ".widget2", NULL, m_RenderingManager, renderingMode);
+  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, name + ".widget2", nullptr, m_RenderingManager, renderingMode);
   mitkWidget2->setEnabled(true);
   mitkWidget2->SetLayoutIndex(SAGITTAL);
   mitkWidgetLayout2->addWidget(mitkWidget2);
 
   // Create RenderWindows 3
-  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, name + ".widget3", NULL, m_RenderingManager, renderingMode);
+  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, name + ".widget3", nullptr, m_RenderingManager, renderingMode);
   mitkWidget3->SetLayoutIndex(CORONAL);
   mitkWidgetLayout3->addWidget(mitkWidget3);
 
   // Create RenderWindows 4
-  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, name + ".widget4", NULL, m_RenderingManager, renderingMode);
+  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, name + ".widget4", nullptr, m_RenderingManager, renderingMode);
   mitkWidget4->SetLayoutIndex(THREE_D);
   mitkWidgetLayout4->addWidget(mitkWidget4);
 
@@ -269,12 +269,6 @@ void QmitkStdMultiWidget::InitializeWidget()
   layer = mitk::IntProperty::New(1000);
   m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
 
-  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
-  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetOverlayManager(OverlayManager);
-
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
@@ -308,7 +302,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
 
   // setup the department logo rendering
-  m_LogoRendering = mitk::LogoOverlay::New();
+  m_LogoRendering = mitk::LogoAnnotation::New();
   mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
   m_LogoRendering->SetOpacity(0.5);
   mitk::Point2D offset;
@@ -317,7 +311,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
   m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(), renderer4);
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoRendering.GetPointer(), renderer4);
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
@@ -654,7 +648,7 @@ QmitkRenderWindow *QmitkStdMultiWidget::GetRenderWindow(unsigned int number)
       MITK_ERROR << "Requested unknown render window";
       break;
   }
-  return NULL;
+  return nullptr;
 }
 
 void QmitkStdMultiWidget::changeLayoutToDefault()
@@ -1219,9 +1213,14 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
   this->UpdateAllWidgets();
 }
 
-void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
+void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown(unsigned int id2Dwindow)
 {
   SMW_INFO << "changing layout to 2D up and 3D down" << std::endl;
+  if (id2Dwindow < 1 || id2Dwindow > 3)
+  {
+    MITK_WARN << "Only 2D render window IDs 1,2 or 3 are valid. Got ID " << id2Dwindow << ". " << "Using default ID 2 instead.";
+    id2Dwindow = 2;
+  }
 
   // Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -1250,7 +1249,18 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   m_SubSplit2 = new QSplitter(m_LayoutSplit);
 
   // insert Widget Container into splitter top
-  m_SubSplit1->addWidget(mitkWidget1Container);
+  switch (id2Dwindow)
+  {
+  case 1:
+    m_SubSplit1->addWidget(mitkWidget1Container);
+    break;
+  case 2:
+    m_SubSplit1->addWidget(mitkWidget2Container);
+    break;
+  case 3:
+    m_SubSplit1->addWidget(mitkWidget3Container);
+    break;
+  }
 
   // set SplitterSize for splitter top
   QList<int> splitterSize;
@@ -1266,10 +1276,29 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   m_MainSplit->show();
 
   // show/hide Widgets
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  mitkWidget2->hide();
-  mitkWidget3->hide();
+  switch (id2Dwindow)
+  {
+  case 1:
+    if (mitkWidget1->isHidden())
+      mitkWidget1->show();
+    mitkWidget2->hide();
+    mitkWidget3->hide();
+    break;
+  case 2:
+    if (mitkWidget2->isHidden())
+      mitkWidget2->show();
+    mitkWidget1->hide();
+    mitkWidget3->hide();
+    break;
+  case 3:
+    if (mitkWidget3->isHidden())
+      mitkWidget3->show();
+    mitkWidget1->hide();
+    mitkWidget2->hide();
+    break;
+  }
+
+  //always show 3D widget
   if (mitkWidget4->isHidden())
     mitkWidget4->show();
 
@@ -1303,19 +1332,19 @@ void QmitkStdMultiWidget::Fit()
 {
   vtkSmartPointer<vtkRenderer> vtkrenderer;
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCameraController()->Fit();
@@ -1422,7 +1451,7 @@ void QmitkStdMultiWidget::wheelEvent(QWheelEvent *e)
   emit WheelMoved(e);
 }
 
-void QmitkStdMultiWidget::mousePressEvent(QMouseEvent *e)
+void QmitkStdMultiWidget::mousePressEvent(QMouseEvent *)
 {
 }
 
@@ -1430,7 +1459,7 @@ void QmitkStdMultiWidget::moveEvent(QMoveEvent *e)
 {
   QWidget::moveEvent(e);
 
-  // it is necessary to readjust the position of the overlays as the StdMultiWidget has moved
+  // it is necessary to readjust the position of the Annotation as the StdMultiWidget has moved
   // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
   emit Moved();
 }
@@ -1462,10 +1491,10 @@ const mitk::Point3D QmitkStdMultiWidget::GetCrossPosition() const
   const mitk::PlaneGeometry *plane3 = mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
   mitk::Line3D line;
-  if ((plane1 != NULL) && (plane2 != NULL) && (plane1->IntersectionLine(plane2, line)))
+  if ((plane1 != nullptr) && (plane2 != nullptr) && (plane1->IntersectionLine(plane2, line)))
   {
     mitk::Point3D point;
-    if ((plane3 != NULL) && (plane3->IntersectionPoint(line, point)))
+    if ((plane3 != nullptr) && (plane3->IntersectionPoint(line, point)))
     {
       return point;
     }
@@ -1530,7 +1559,7 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
     // find node with largest layer, that is the node shown on top in the render window
     for (unsigned int x = 0; x < nodes->size(); x++)
     {
-      if ((nodes->at(x)->GetData()->GetGeometry() != NULL) &&
+      if ((nodes->at(x)->GetData()->GetGeometry() != nullptr) &&
           nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos))
       {
         int layer = 0;
@@ -1569,7 +1598,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     node->GetBoolProperty("binary", isBinary);
     if (isBinary)
     {
-      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
+      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, nullptr, true);
       if (!sourcenodes->empty())
       {
         topSourceNode = this->GetTopLayerNode(sourcenodes);
@@ -1679,7 +1708,7 @@ void QmitkStdMultiWidget::DisableDepartmentLogo()
 
 bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const
 {
-  return m_LogoRendering->IsVisible(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+  return m_LogoRendering->IsVisible();
 }
 
 void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char *widgetName, bool visible, mitk::BaseRenderer *renderer)
@@ -1687,7 +1716,7 @@ void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char *widgetName, bool 
   if (m_DataStorage.IsNotNull())
   {
     mitk::DataNode *n = m_DataStorage->GetNamedNode(widgetName);
-    if (n != NULL)
+    if (n != nullptr)
       n->SetVisibility(visible, renderer);
   }
 }
@@ -2022,6 +2051,6 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
       return this->m_PlaneNode3;
       break;
     default:
-      return NULL;
+      return nullptr;
   }
 }

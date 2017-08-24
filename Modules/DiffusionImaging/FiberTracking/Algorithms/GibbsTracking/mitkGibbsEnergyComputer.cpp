@@ -139,17 +139,19 @@ float GibbsEnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, 
         if (dp != neighbour)                        // don't evaluate against itself
         {
             // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-            float dot = fabs(dot_product(N,neighbour->GetDir()));
-            float bw = mbesseli0(dot);
+            float dot = fabs( dot_product(N,neighbour->GetDir()) );
+            float I_0 = CalcI0(dot) + m_ParticleChemicalPotential;
+
             float dpos = (neighbour->GetPos()-R).squared_magnitude();
-            float w = mexp(dpos*gamma_s);
-            modelVal += w*(bw+m_ParticleChemicalPotential);
-            w = mexp(dpos*gamma_reg_s);
+            float pos_w = exp(-dpos*m_SigmaInv);
+
+            modelVal += pos_w*I_0;
         }
         neighbour =  m_ParticleGrid->GetNextNeighbor();
     }
+    modelVal += CalcI0(1.0)+m_ParticleChemicalPotential;
 
-    float energy = 2*(odfVal/m_ParticleWeight-modelVal) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
+    float energy = 2*odfVal/m_ParticleWeight - modelVal;
     return energy*m_ExtStrength;
 }
 

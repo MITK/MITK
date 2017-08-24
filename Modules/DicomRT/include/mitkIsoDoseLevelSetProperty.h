@@ -35,9 +35,9 @@ protected:
 
     IsoDoseLevelSetProperty();
 
-    IsoDoseLevelSetProperty(const IsoDoseLevelSetProperty& other);
+    explicit IsoDoseLevelSetProperty(const IsoDoseLevelSetProperty& other);
 
-    IsoDoseLevelSetProperty(IsoDoseLevelSet* levelSet);
+    explicit IsoDoseLevelSetProperty(IsoDoseLevelSet* levelSet);
 
 public:
     mitkClassMacro(IsoDoseLevelSetProperty, BaseProperty);
@@ -63,9 +63,6 @@ public:
     using BaseProperty::operator=;
 
 private:
-
-    // purposely not implemented
-    IsoDoseLevelSetProperty& operator=(const IsoDoseLevelSetProperty&);
 
     itk::LightObject::Pointer InternalClone() const override;
 

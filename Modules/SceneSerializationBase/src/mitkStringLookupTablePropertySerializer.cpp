@@ -36,7 +36,7 @@ namespace mitk
         return nullptr;
       StringLookupTable lut = prop->GetValue();
       // if (lut.IsNull())
-      //  return NULL; // really?
+      //  return nullptr; // really?
       const StringLookupTable::LookupTableType &map = lut.GetLookupTable();
 
       auto element = new TiXmlElement("StringLookupTable");

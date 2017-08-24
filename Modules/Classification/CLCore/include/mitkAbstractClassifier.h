@@ -186,7 +186,7 @@ public:
     if(IsInitialized() == false)
       return true;
     const TimeGeometry* timeGeometry = const_cast<AbstractClassifier*>(this)->GetUpdatedTimeGeometry();
-    if(timeGeometry == NULL)
+    if(timeGeometry == nullptr)
       return true;
     return false;
   }

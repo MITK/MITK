@@ -48,10 +48,10 @@ vtkMitkLevelWindowFilter::~vtkMitkLevelWindowFilter()
 {
 }
 
-unsigned long int vtkMitkLevelWindowFilter::GetMTime()
+vtkMTimeType vtkMitkLevelWindowFilter::GetMTime()
 {
-  unsigned long mTime = this->vtkObject::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime = this->vtkObject::GetMTime();
+  vtkMTimeType time;
 
   if (this->m_LookupTable != nullptr)
   {

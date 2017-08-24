@@ -42,10 +42,10 @@ public:
 };
 
 KinectController::KinectControllerPrivate::KinectControllerPrivate():
-  m_Context(NULL),
-  m_DepthGenerator(NULL),
-  m_ImageGenerator(NULL),
-  m_IRGenerator(NULL),
+  m_Context(nullptr),
+  m_DepthGenerator(nullptr),
+  m_ImageGenerator(nullptr),
+  m_IRGenerator(nullptr),
   m_ConnectionCheck(false),
   m_UseIR(false),
   m_CaptureWidth(640),
@@ -186,7 +186,7 @@ KinectController::~KinectController()
       xn::ImageMetaData ImageMD;
       d->m_ImageGenerator.GetMetaData(ImageMD);
       const XnRGB24Pixel* rgbPixelArray = ImageMD.RGB24Data();
-      for (int i=0; i<d->m_CaptureWidth*d->m_CaptureHeight; i++)
+      for (unsigned int i=0; i<d->m_CaptureWidth*d->m_CaptureHeight; i++)
       {
         rgb[i*3] = rgbPixelArray[i].nRed;
         rgb[i*3+1] = rgbPixelArray[i].nGreen;
@@ -203,10 +203,10 @@ KinectController::~KinectController()
     const XnDepthPixel* DepthData = DepthMD.Data();
     // IR data
     xn::IRMetaData IRData;
-    const XnIRPixel* IRPixelData;
+    const XnIRPixel* IRPixelData = nullptr;
     // Image data
     xn::ImageMetaData ImageMD;
-    const XnRGB24Pixel* rgbPixelArray;
+    const XnRGB24Pixel* rgbPixelArray = nullptr;
     if (d->m_UseIR)
     {
       d->m_IRGenerator.GetMetaData(IRData);
@@ -250,7 +250,7 @@ KinectController::~KinectController()
     }
   }
 
-  void KinectController::GetIntensities( float* intensities )
+  void KinectController::GetIntensities( float* )
   {
   }
 

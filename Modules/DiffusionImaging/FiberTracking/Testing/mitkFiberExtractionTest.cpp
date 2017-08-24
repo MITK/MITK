@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkStandaloneDataStorage.h>
 #include <vtkDebugLeaks.h>
+#include <omp.h>
 
 /**Documentation
  *  Test if fiber transfortaiom methods work correctly
@@ -36,15 +37,24 @@ int mitkFiberExtractionTest(int argc, char* argv[])
     MITK_INFO << "argc: " << argc;
     MITK_TEST_CONDITION_REQUIRED(argc==13,"check for input data");
 
-            try{
+    omp_set_num_threads(1);
+    try{
         mitk::FiberBundle::Pointer groundTruthFibs = dynamic_cast<mitk::FiberBundle*>( mitk::IOUtil::Load(argv[1]).front().GetPointer() );
         mitk::FiberBundle::Pointer testFibs = dynamic_cast<mitk::FiberBundle*>( mitk::IOUtil::Load(argv[2]).front().GetPointer() );
 
         // test planar figure based extraction
-        mitk::DataNode::Pointer pf1 = mitk::IOUtil::LoadDataNode(argv[3]);
-        mitk::DataNode::Pointer pf2 = mitk::IOUtil::LoadDataNode(argv[4]);
-        mitk::DataNode::Pointer pf3 = mitk::IOUtil::LoadDataNode(argv[5]);
-
+        auto data = mitk::IOUtil::Load(argv[3])[0];
+        auto pf1 = mitk::DataNode::New();
+        pf1->SetData(data);
+        
+        data = mitk::IOUtil::Load(argv[4])[0];
+        auto pf2 = mitk::DataNode::New();
+        pf2->SetData(data);
+        
+        data = mitk::IOUtil::Load(argv[5])[0];
+        auto pf3 = mitk::DataNode::New();
+        pf3->SetData(data);
+        
         mitk::StandaloneDataStorage::Pointer storage = mitk::StandaloneDataStorage::New();
 
         mitk::PlanarFigureComposite::Pointer pfc2 = mitk::PlanarFigureComposite::New();
@@ -90,21 +100,8 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         itkUCharImageType::Pointer itkRoiImage = itkUCharImageType::New();
         mitk::CastToItkImage(mitkRoiImage, itkRoiImage);
 
-//        mitk::FiberBundle::Pointer inside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, false);
-//        mitk::IOUtil::SaveBaseData(inside, mitk::IOUtil::GetTempPath()+"inside.fib");
-//        mitk::FiberBundle::Pointer outside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, true);
-//        mitk::IOUtil::SaveBaseData(outside, mitk::IOUtil::GetTempPath()+"outside.fib");
-
         mitk::FiberBundle::Pointer passing = groundTruthFibs->ExtractFiberSubset(itkRoiImage, true);
-//        mitk::IOUtil::SaveBaseData(passing, mitk::IOUtil::GetTempPath()+"passing.fib");
         mitk::FiberBundle::Pointer ending = groundTruthFibs->ExtractFiberSubset(itkRoiImage, false);
-//        mitk::IOUtil::SaveBaseData(ending, mitk::IOUtil::GetTempPath()+"ending.fib");
-
-//        testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
-//        MITK_TEST_CONDITION_REQUIRED(inside->Equals(testFibs),"check inside mask extraction")
-
-//        testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[8])->GetData());
-//        MITK_TEST_CONDITION_REQUIRED(outside->Equals(testFibs),"check outside mask extraction")
 
         testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[9]).front().GetPointer());
         MITK_TEST_CONDITION_REQUIRED(passing->Equals(testFibs),"check passing mask extraction");

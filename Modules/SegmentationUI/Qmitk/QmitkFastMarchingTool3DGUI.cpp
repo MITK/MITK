@@ -181,6 +181,7 @@ QmitkFastMarchingTool3DGUI::QmitkFastMarchingTool3DGUI() : QmitkToolGUI(), m_Tim
 
   m_btClearSeeds = new QPushButton("Clear");
   m_btClearSeeds->setToolTip("Clear current result and start over again");
+  m_btClearSeeds->setEnabled(false);
   widgetLayout->addWidget(m_btClearSeeds);
   connect(m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()));
 
@@ -192,11 +193,11 @@ QmitkFastMarchingTool3DGUI::QmitkFastMarchingTool3DGUI() : QmitkToolGUI(), m_Tim
 
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 
-  this->setEnabled(false);
-
   m_slSigma->setDecimals(2);
   m_slBeta->setDecimals(2);
   m_slAlpha->setDecimals(2);
+
+  this->EnableWidgets(false);
 }
 
 QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
@@ -342,7 +343,9 @@ void QmitkFastMarchingTool3DGUI::OnClearSeeds()
 {
   // event from image navigator recieved - timestep has changed
   m_FastMarchingTool->ClearSeeds();
+  m_btClearSeeds->setEnabled(false);
   m_btConfirm->setEnabled(false);
+  this->EnableWidgets(false);
   this->Update();
 }
 
@@ -356,6 +359,16 @@ void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 
 void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()
 {
-  this->setEnabled(true);
+  this->EnableWidgets(true);
+  this->m_btClearSeeds->setEnabled(true);
   this->m_btConfirm->setEnabled(true);
+}
+
+void QmitkFastMarchingTool3DGUI::EnableWidgets(bool enable)
+{
+  m_slSigma->setEnabled(enable);
+  m_slAlpha->setEnabled(enable);
+  m_slBeta->setEnabled(enable);
+  m_slStoppingValue->setEnabled(enable);
+  m_slwThreshold->setEnabled(enable);
 }

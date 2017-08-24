@@ -86,8 +86,8 @@ bool RawShModel< ScalarType >::SampleKernels(Image::Pointer diffImg, ItkUcharIma
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
 
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-        filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
         filter->SetBValue(static_cast<mitk::FloatProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
+        filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
         filter->Update();
         tensorImage = filter->GetOutput();
     }
@@ -96,8 +96,8 @@ bool RawShModel< ScalarType >::SampleKernels(Image::Pointer diffImg, ItkUcharIma
     if (itkFeatureImage.IsNull())
     {
         QballFilterType::Pointer qballfilter = QballFilterType::New();
-        qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
         qballfilter->SetBValue(static_cast<mitk::FloatProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
+        qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
         qballfilter->SetLambda(0.006);
         qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
         qballfilter->Update();
@@ -114,7 +114,7 @@ bool RawShModel< ScalarType >::SampleKernels(Image::Pointer diffImg, ItkUcharIma
         adcImage = adcFilter->GetOutput();
     }
 
-    int b0Index;
+    int b0Index = 0;
     for (unsigned int i=0; i<static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size(); i++)
         if ( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->GetElement(i).magnitude()<0.001 )
         {
@@ -311,7 +311,7 @@ ScalarType RawShModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     if (this->m_GradientList[dir].GetNorm()>0.001)
     {
         j=0;
-        for (int l=0; l<=m_ShOrder; l=l+2)
+        for (int l=0; l<=static_cast<int>(m_ShOrder); l=l+2)
             for (m=-l; m<=l; m++)
             {
                 plm = legendre_p<double>(l,abs(m),cos(m_SphCoords(dir,0)));
@@ -358,7 +358,7 @@ typename RawShModel< ScalarType >::PixelType RawShModel< ScalarType >::SimulateM
         if (this->m_GradientList[p].GetNorm()>0.001)
         {
             j=0;
-            for (int l=0; l<=m_ShOrder; l=l+2)
+            for (int l=0; l<=static_cast<int>(m_ShOrder); l=l+2)
                 for (m=-l; m<=l; m++)
                 {
                     plm = legendre_p<double>(l,abs(m),cos(m_SphCoords(p,0)));

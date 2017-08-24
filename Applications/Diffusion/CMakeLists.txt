@@ -27,7 +27,6 @@ set(_plugins
   org.mitk.gui.common
   org.mitk.planarfigure
   org.mitk.core.ext
-  org.mitk.diffusionimaging
   org.mitk.gui.qt.application
   org.mitk.gui.qt.ext
   org.mitk.gui.qt.diffusionimagingapp
@@ -39,13 +38,19 @@ set(_plugins
   org.mitk.gui.qt.segmentation
   org.mitk.gui.qt.volumevisualization
   org.mitk.gui.qt.diffusionimaging
+  org.mitk.gui.qt.diffusionimaging.connectomics
+  org.mitk.gui.qt.diffusionimaging.fiberfox
+  org.mitk.gui.qt.diffusionimaging.fiberprocessing
+  org.mitk.gui.qt.diffusionimaging.ivim
+  org.mitk.gui.qt.diffusionimaging.odfpeaks
+  org.mitk.gui.qt.diffusionimaging.preprocessing
+  org.mitk.gui.qt.diffusionimaging.reconstruction
+  org.mitk.gui.qt.diffusionimaging.tractography
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing
-  org.mitk.gui.qt.registration
   org.mitk.gui.qt.properties
   org.mitk.gui.qt.viewnavigator
-  org.mitk.gui.qt.cmdlinemodules
 )
 
 # Plug-ins listed below will not be

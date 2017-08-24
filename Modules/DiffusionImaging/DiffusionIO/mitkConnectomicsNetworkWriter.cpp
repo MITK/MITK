@@ -46,7 +46,7 @@ void mitk::ConnectomicsNetworkWriter::Write()
   InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
   if (input.IsNull() )
   {
-    MITK_ERROR <<"Sorry, input to ConnectomicsNetworkWriter is NULL!";
+    MITK_ERROR <<"Sorry, input to ConnectomicsNetworkWriter is nullptr!";
     return;
   }
   if ( this->GetOutputLocation().empty() )

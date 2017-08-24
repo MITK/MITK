@@ -71,7 +71,7 @@ public:                                                                         
   US_CONCAT(ModuleInitializer_, US_MODULE_NAME)()                                            \
   {                                                                                          \
     ModuleInfo*(*moduleInfoPtr)() = moduleInfo;                                              \
-    void* moduleInfoSym = NULL;                                                              \
+    void* moduleInfoSym = nullptr;                                                              \
     std::memcpy(&moduleInfoSym, &moduleInfoPtr, sizeof(void*));                              \
     std::string location = ModuleUtils::GetLibraryPath(moduleInfoSym);                       \
     moduleInfoPtr()->location = location;                                                    \

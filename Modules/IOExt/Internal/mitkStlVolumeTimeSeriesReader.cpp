@@ -35,11 +35,11 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
     std::string fileName = m_MatchedFileNames[i];
     MITK_INFO << "Loading " << fileName << " as stl..." << std::endl;
 
-    mitk::Surface::Pointer timestepSurface = IOUtil::LoadSurface(fileName.c_str());
+    mitk::Surface::Pointer timestepSurface = dynamic_cast<mitk::Surface*>(IOUtil::Load(fileName.c_str())[0].GetPointer());
 
     if (timestepSurface.IsNull())
     {
-      itkWarningMacro(<< "stlReader returned NULL while reading " << fileName
+      itkWarningMacro(<< "stlReader returned nullptr while reading " << fileName
                       << ". Trying to continue with empty vtkPolyData...");
       result->SetVtkPolyData(vtkPolyData::New(), i);
       return;

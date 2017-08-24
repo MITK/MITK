@@ -93,6 +93,19 @@ void mitk::PropertyList::ReplaceProperty(const std::string &propertyKey, BasePro
   Modified();
 }
 
+void mitk::PropertyList::RemoveProperty(const std::string &propertyKey)
+{
+  auto it(m_Properties.find(propertyKey));
+
+  // Is a property with key @a propertyKey contained in the list?
+  if (it != m_Properties.cend())
+  {
+    it->second = nullptr;
+    m_Properties.erase(it);
+    Modified();
+  }
+}
+
 mitk::PropertyList::PropertyList()
 {
 }
@@ -119,7 +132,7 @@ unsigned long mitk::PropertyList::GetMTime() const
   {
     if (it->second.IsNull())
     {
-      itkWarningMacro(<< "Property '" << it->first << "' contains nothing (NULL).");
+      itkWarningMacro(<< "Property '" << it->first << "' contains nothing (nullptr).");
       continue;
     }
     if (Superclass::GetMTime() < it->second->GetMTime())

@@ -109,7 +109,7 @@ namespace mitk
 
   mitk::XML2EventParser::XML2EventParser(const std::string &filename, const us::Module *module)
   {
-    if (module == NULL)
+    if (module == nullptr)
     {
       module = us::GetModuleContext()->GetModule();
     }

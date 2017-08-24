@@ -42,7 +42,7 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMAPAlgorithmModel : public QAbstr
   Q_OBJECT
 
 public:
-  QmitkMAPAlgorithmModel(QObject *parent = NULL);
+  QmitkMAPAlgorithmModel(QObject *parent = nullptr);
   virtual ~QmitkMAPAlgorithmModel(){};
 
   void SetAlgorithm(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);

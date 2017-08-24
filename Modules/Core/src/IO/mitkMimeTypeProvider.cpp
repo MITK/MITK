@@ -30,11 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  MimeTypeProvider::MimeTypeProvider() : m_Tracker(NULL) {}
+  MimeTypeProvider::MimeTypeProvider() : m_Tracker(nullptr) {}
   MimeTypeProvider::~MimeTypeProvider() { delete m_Tracker; }
   void MimeTypeProvider::Start()
   {
-    if (m_Tracker == NULL)
+    if (m_Tracker == nullptr)
     {
       m_Tracker = new us::ServiceTracker<CustomMimeType, MimeTypeTrackerTypeTraits>(us::GetModuleContext(), this);
     }
@@ -147,7 +147,7 @@ namespace mitk
       return result;
 
     CustomMimeType *mimeType = us::GetModuleContext()->GetService(reference);
-    if (mimeType != NULL)
+    if (mimeType != nullptr)
     {
       try
       {

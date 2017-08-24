@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 ToFImageGrabber::ToFImageGrabber():
-  m_ToFCameraDevice(NULL),
+  m_ToFCameraDevice(nullptr),
   m_CaptureWidth(-1),
   m_CaptureHeight(-1),
   m_PixelNumber(-1),
@@ -30,11 +30,11 @@ ToFImageGrabber::ToFImageGrabber():
   m_RGBPixelNumber(0),
   m_ImageSequence(0),
   m_SourceDataSize(0),
-  m_IntensityArray(NULL),
-  m_DistanceArray(NULL),
-  m_AmplitudeArray(NULL),
-  m_SourceDataArray(NULL),
-  m_RgbDataArray(NULL),
+  m_IntensityArray(nullptr),
+  m_DistanceArray(nullptr),
+  m_AmplitudeArray(nullptr),
+  m_SourceDataArray(nullptr),
+  m_RgbDataArray(nullptr),
   m_DeviceObserverTag()
 {
   // Create the output. We use static_cast<> here because we know the default
@@ -141,7 +141,7 @@ void ToFImageGrabber::StartCamera()
 void ToFImageGrabber::StopCamera()
 {
   m_ToFCameraDevice->StopCamera();
-  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration != nullptr) m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }
 
@@ -294,27 +294,27 @@ void ToFImageGrabber::CleanUpImageArrays()
   if (m_IntensityArray)
   {
     delete [] m_IntensityArray;
-    m_IntensityArray = NULL;
+    m_IntensityArray = nullptr;
   }
   if (m_DistanceArray)
   {
     delete [] m_DistanceArray;
-    m_DistanceArray = NULL;
+    m_DistanceArray = nullptr;
   }
   if (m_AmplitudeArray)
   {
     delete [] m_AmplitudeArray;
-    m_AmplitudeArray = NULL;
+    m_AmplitudeArray = nullptr;
   }
   if (m_SourceDataArray)
   {
     delete [] m_SourceDataArray;
-    m_SourceDataArray = NULL;
+    m_SourceDataArray = nullptr;
   }
   if (m_RgbDataArray)
   {
     delete [] m_RgbDataArray;
-    m_RgbDataArray = NULL;
+    m_RgbDataArray = nullptr;
   }
 }
 

@@ -42,11 +42,11 @@ const std::string QmitkToFRecorderWidget::VIEW_ID = "org.mitk.views.qmitktofreco
 
 QmitkToFRecorderWidget::QmitkToFRecorderWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {
-  this->m_ToFImageRecorder = NULL;
-  this->m_ToFImageGrabber = NULL;
+  this->m_ToFImageRecorder = nullptr;
+  this->m_ToFImageGrabber = nullptr;
   this->m_RecordMode = mitk::ToFImageRecorder::PerFrames;
 
-  this-> m_Controls = NULL;
+  this-> m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -184,7 +184,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     mitk::ToFImageWriter::ToFImageType tofImageType;
     tmpFileName = QmitkToFRecorderWidget::getSaveFileName(tofImageType,
       distanceImageSelected, amplitudeImageSelected, intensityImageSelected, rgbImageSelected, rawDataSelected,
-      NULL, "Save Image To...", imageFileName, "NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic);;Text (*.csv)", &selectedFilter);
+      nullptr, "Save Image To...", imageFileName, "NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic);;Text (*.csv)", &selectedFilter);
 
     if (tmpFileName.isEmpty())
     {
@@ -239,7 +239,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
         //default
         this->m_ToFImageRecorder->SetFileFormat(".pic");
 
-        QMessageBox::warning(NULL, "Deprecated File Format!",
+        QMessageBox::warning(nullptr, "Deprecated File Format!",
           "Please note that *.pic file format is deprecated and not longer supported! The suggested file format for images is *.nrrd!");
       }
       else if (selectedFilter.compare("NRRD Images (*.nrrd)") == 0)
@@ -248,7 +248,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
       }
       else
       {
-        QMessageBox::warning(NULL, "Unsupported file format!", "Please specify one of the supported file formats *.nrrd, *.csv!");
+        QMessageBox::warning(nullptr, "Unsupported file format!", "Please specify one of the supported file formats *.nrrd, *.csv!");
         return;
       }
 
@@ -275,7 +275,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
   }
   catch(std::exception& e)
   {
-    QMessageBox::critical(NULL, "Error", QString(e.what()));
+    QMessageBox::critical(nullptr, "Error", QString(e.what()));
     this->OnRecordingStopped();
   }
 }
@@ -291,7 +291,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
                                      const QString &dir,
                                      const QString &filter,
                                      QString *selectedFilter,
-                                     QFileDialog::Options options
+                                     QFileDialog::Options
                                      )
 {
   QString selectedFileName = "";

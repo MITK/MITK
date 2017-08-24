@@ -64,7 +64,7 @@ namespace mitk
   template <class TTransformType1, class TTransformType2>
   void ConvertItkTransform(const TTransformType1 *sourceTransform, TTransformType2 *destTransform)
   {
-    if ((sourceTransform == NULL) || (destTransform == NULL))
+    if ((sourceTransform == nullptr) || (destTransform == nullptr))
       return;
 
     // transfer offset

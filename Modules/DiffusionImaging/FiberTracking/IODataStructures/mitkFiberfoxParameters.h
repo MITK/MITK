@@ -89,8 +89,8 @@ namespace mitk
       , m_DoSimulateRelaxation(true)
       , m_DoAddMotion(false)
       , m_DoRandomizeMotion(true)
-      , m_FrequencyMap(NULL)
-      , m_MaskImage(NULL)
+      , m_FrequencyMap(nullptr)
+      , m_MaskImage(nullptr)
     {
       m_ImageRegion.SetSize(0, 12);
       m_ImageRegion.SetSize(1, 12);
@@ -142,7 +142,7 @@ namespace mitk
     ///< with positive numbers, inverted logic with negative numbers.
     itk::Vector<double,3>               m_Translation;              ///< Maximum translational motion.
     itk::Vector<double,3>               m_Rotation;                 ///< Maximum rotational motion.
-    ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != NULL, distortions are added to the image using this frequency map.
+    ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != nullptr, distortions are added to the image using this frequency map.
     ItkUcharImgType::Pointer            m_MaskImage;                ///< Signal is only genrated inside of the mask image.
 
     inline void GenerateGradientHalfShell();                        ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
@@ -154,6 +154,7 @@ namespace mitk
     inline unsigned int GetNumVolumes();                            ///< Get number of baseline and diffusion-weighted image volumes
     inline GradientListType GetGradientDirections();                ///< Return gradient direction container
     inline GradientType GetGradientDirection(unsigned int i);
+    inline std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
 
     inline void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
     inline void SetGradienDirections(GradientListType gradientList);
@@ -214,7 +215,7 @@ namespace mitk
   public:
     MiscFiberfoxParameters()
       : m_ResultNode(DataNode::New())
-      , m_ParentNode(NULL)
+      , m_ParentNode(nullptr)
       , m_SignalModelString("")
       , m_ArtifactModelString("")
       , m_OutputPath("/tmp/")
@@ -288,7 +289,7 @@ namespace mitk
       out.m_SignalGen = m_SignalGen;
       out.m_Misc = m_Misc;
 
-      if (m_NoiseModel!=NULL)
+      if (m_NoiseModel!=nullptr)
       {
         if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
           out.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<OutType> >();
@@ -299,8 +300,8 @@ namespace mitk
 
       for (unsigned int i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
       {
-        mitk::DiffusionSignalModel<OutType>* outModel = NULL;
-        mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
+        mitk::DiffusionSignalModel<OutType>* outModel = nullptr;
+        mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
         if (i<m_FiberModelList.size())
           signalModel = m_FiberModelList.at(i);
         else
@@ -336,7 +337,7 @@ namespace mitk
     /** Templated parameters */
     DiffusionModelListType              m_FiberModelList;       ///< Intra- and inter-axonal compartments.
     DiffusionModelListType              m_NonFiberModelList;    ///< Extra-axonal compartments.
-    std::shared_ptr< NoiseModelType >   m_NoiseModel;           ///< If != NULL, noise is added to the image.
+    std::shared_ptr< NoiseModelType >   m_NoiseModel;           ///< If != nullptr, noise is added to the image.
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.

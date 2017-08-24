@@ -56,17 +56,18 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     tensor[3] = tensorMatrix[1][1]; tensor[4] = tensorMatrix[1][2]; tensor[5] = tensorMatrix[2][2];
 
     GradientType g = this->m_GradientList[dir];
-    ScalarType bVal = g.GetNorm(); bVal *= bVal;
+    float norm = g.GetNorm();
+    ScalarType bVal = norm*norm;
 
     if (bVal>0.0001)
     {
         itk::DiffusionTensor3D< ScalarType > S;
-        S[0] = g[0]*g[0];
-        S[1] = g[1]*g[0];
-        S[2] = g[2]*g[0];
-        S[3] = g[1]*g[1];
-        S[4] = g[2]*g[1];
-        S[5] = g[2]*g[2];
+        S[0] = g[0]*g[0]/bVal;
+        S[1] = g[1]*g[0]/bVal;
+        S[2] = g[2]*g[0]/bVal;
+        S[3] = g[1]*g[1]/bVal;
+        S[4] = g[2]*g[1]/bVal;
+        S[5] = g[2]*g[2]/bVal;
 
         ScalarType D = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
                        tensor[1]*S[1] + tensor[3]*S[3] + tensor[4]*S[4] +
@@ -106,12 +107,12 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
         if (bVal>0.0001)
         {
             itk::DiffusionTensor3D< ScalarType > S;
-            S[0] = g[0]*g[0];
-            S[1] = g[1]*g[0];
-            S[2] = g[2]*g[0];
-            S[3] = g[1]*g[1];
-            S[4] = g[2]*g[1];
-            S[5] = g[2]*g[2];
+            S[0] = g[0]*g[0]/bVal;
+            S[1] = g[1]*g[0]/bVal;
+            S[2] = g[2]*g[0]/bVal;
+            S[3] = g[1]*g[1]/bVal;
+            S[4] = g[2]*g[1]/bVal;
+            S[5] = g[2]*g[2]/bVal;
 
             ScalarType D = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
                            tensor[1]*S[1] + tensor[3]*S[3] + tensor[4]*S[4] +

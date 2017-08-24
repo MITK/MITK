@@ -356,7 +356,7 @@ namespace mitk
     timeGeometry->Initialize(slicedGeometry, image->GetDimension(3));
     image->SetTimeGeometry(timeGeometry);
 
-    buffer = NULL;
+    buffer = nullptr;
     MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents() << std::endl;
 
     const itk::MetaDataDictionary &dictionary = nrrdImageIO->GetMetaDataDictionary();

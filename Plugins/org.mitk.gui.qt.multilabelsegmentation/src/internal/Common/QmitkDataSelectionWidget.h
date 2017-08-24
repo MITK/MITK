@@ -42,13 +42,13 @@ public:
     SurfacePredicate
   };
 
-  explicit QmitkDataSelectionWidget(QWidget* parent = NULL);
+  explicit QmitkDataSelectionWidget(QWidget* parent = nullptr);
   ~QmitkDataSelectionWidget();
 
   unsigned int AddDataStorageComboBox(PredicateType predicate);
-  unsigned int AddDataStorageComboBox(mitk::NodePredicateBase* predicate = NULL);
+  unsigned int AddDataStorageComboBox(mitk::NodePredicateBase* predicate = nullptr);
   unsigned int AddDataStorageComboBox(const QString &labelText, PredicateType predicate);
-  unsigned int AddDataStorageComboBox(const QString &labelText, mitk::NodePredicateBase* predicate = NULL);
+  unsigned int AddDataStorageComboBox(const QString &labelText, mitk::NodePredicateBase* predicate = nullptr);
 
   mitk::DataStorage::Pointer GetDataStorage() const;
   mitk::DataNode::Pointer GetSelection(unsigned int index);

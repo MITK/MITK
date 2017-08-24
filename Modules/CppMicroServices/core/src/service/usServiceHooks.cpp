@@ -32,7 +32,7 @@ US_BEGIN_NAMESPACE
 
 ServiceHooks::ServiceHooks(CoreModuleContext* coreCtx)
   : coreCtx(coreCtx)
-  , listenerHookTracker(NULL)
+  , listenerHookTracker(nullptr)
   , bOpen(false)
 {
 }
@@ -89,7 +89,7 @@ void ServiceHooks::Close()
   {
     listenerHookTracker->Close();
     delete listenerHookTracker;
-    listenerHookTracker = NULL;
+    listenerHookTracker = nullptr;
   }
 
   bOpen = false;
@@ -116,7 +116,7 @@ void ServiceHooks::FilterServiceReferences(ModuleContext* mc, const std::string&
     {
       ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
       ServiceFindHook* const fh = reinterpret_cast<ServiceFindHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
-      if (fh != NULL)
+      if (fh != nullptr)
       {
         try
         {
@@ -166,7 +166,7 @@ void ServiceHooks::FilterServiceEventReceivers(const ServiceEvent& evt,
     {
       ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
       ServiceEventListenerHook* elh = reinterpret_cast<ServiceEventListenerHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
-      if(elh != NULL)
+      if(elh != nullptr)
       {
         try
         {

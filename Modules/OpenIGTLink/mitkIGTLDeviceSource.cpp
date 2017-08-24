@@ -35,7 +35,7 @@ const std::string mitk::IGTLDeviceSource::US_PROPKEY_IGTLDEVICENAME =
 mitk::IGTLMessageSource::US_INTERFACE_NAME + ".igtldevicename";
 
 mitk::IGTLDeviceSource::IGTLDeviceSource()
-  : mitk::IGTLMessageSource(), m_IGTLDevice(NULL)
+  : mitk::IGTLMessageSource(), m_IGTLDevice(nullptr)
 {
   this->SetName("IGTLDeviceSource (no defined type)");
 }
@@ -53,7 +53,7 @@ mitk::IGTLDeviceSource::~IGTLDeviceSource()
       this->Disconnect();
     }
     this->RemoveObservers();
-    m_IGTLDevice = NULL;
+    m_IGTLDevice = nullptr;
   }
 }
 
@@ -142,7 +142,7 @@ void mitk::IGTLDeviceSource::CreateOutputs()
     return;
 
   this->SetNumberOfIndexedOutputs(1);
-  if (this->GetOutput(0) == NULL)
+  if (this->GetOutput(0) == nullptr)
   {
     DataObjectPointer newOutput = this->MakeOutput(0);
     this->SetNthOutput(0, newOutput);
@@ -212,7 +212,7 @@ void mitk::IGTLDeviceSource::UpdateOutputInformation()
 
 void mitk::IGTLDeviceSource::SetInput(unsigned int idx, const IGTLMessage* msg)
 {
-  if (msg == NULL) // if an input is set to NULL, remove it
+  if (msg == nullptr) // if an input is set to nullptr, remove it
   {
     this->RemoveInput(idx);
   }
@@ -274,7 +274,7 @@ void mitk::IGTLDeviceSource::OnLostConnection()
 const mitk::IGTLMessage* mitk::IGTLDeviceSource::GetInput(void) const
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(0));
 }
@@ -283,7 +283,7 @@ const mitk::IGTLMessage*
 mitk::IGTLDeviceSource::GetInput(unsigned int idx) const
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(idx));
 }
@@ -297,7 +297,7 @@ mitk::IGTLDeviceSource::GetInput(std::string msgName) const
     if (std::string(msgName) ==
       (static_cast<IGTLMessage*>(it->GetPointer()))->GetName())
       return static_cast<IGTLMessage*>(it->GetPointer());
-  return NULL;
+  return nullptr;
 }
 
 itk::ProcessObject::DataObjectPointerArraySizeType

@@ -36,8 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStringProperty.h>
 #include <mitkDicomSeriesReader.h>
 
-#include <mitkRTDoseReader.h>
-#include <mitkRTStructureSetReader.h>
+#include <mitkRTDoseReaderService.h>
+#include <mitkRTPlanReaderService.h>
+#include <mitkRTStructureSetReaderService.h>
 #include <mitkRTConstants.h>
 #include <mitkIsoDoseLevelCollections.h>
 #include <mitkIsoDoseLevelSetProperty.h>
@@ -75,14 +76,15 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
     //for rt data, if the modality tag isn't defined or is "CT" the image is handled like before
     if(ctkEvent.containsProperty("Modality") &&
        (ctkEvent.getProperty("Modality").toString().compare("RTDOSE",Qt::CaseInsensitive) == 0 ||
-        ctkEvent.getProperty("Modality").toString().compare("RTSTRUCT",Qt::CaseInsensitive) == 0))
+        ctkEvent.getProperty("Modality").toString().compare("RTSTRUCT",Qt::CaseInsensitive) == 0 ||
+        ctkEvent.getProperty("Modality").toString().compare("RTPLAN", Qt::CaseInsensitive) == 0))
     {
       QString modality = ctkEvent.getProperty("Modality").toString();
 
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
-          auto doseReader = mitk::RTDoseReader();
-          doseReader.SetInput(listOfFilesForSeries.at(0).toStdString());
+          auto doseReader = mitk::RTDoseReaderService();
+          doseReader.SetInput(listOfFilesForSeries.front().toStdString());
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader.Read();
           if (!readerOutput.empty()){
             mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
@@ -246,25 +248,62 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
-        mitk::RTStructureSetReader::Pointer structreader = mitk::RTStructureSetReader::New();
-        std::deque<mitk::DataNode::Pointer> modelVector = structreader->ReadStructureSet(listOfFilesForSeries.at(0).toStdString().c_str());
+          auto structReader = mitk::RTStructureSetReaderService();
+          structReader.SetInput(listOfFilesForSeries.front().toStdString());
+          std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader.Read();
 
-        if(modelVector.empty())
-        {
-          MITK_ERROR << "No structuresets were created" << endl;
-        }
-        else
-        {
-          ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-          mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
-          mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
-
-          for(int i=0; i<modelVector.size();i++)
-          {
-            dataStorage->Add(modelVector.at(i));
+          if (readerOutput.empty()){
+              MITK_ERROR << "No structure sets were created" << endl;
           }
-          mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
-        }
+          else {
+              std::vector<mitk::DataNode::Pointer> modelVector;
+
+              ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+              mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+              mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+              for (const auto& aStruct : readerOutput){
+                  mitk::ContourModelSet::Pointer countourModelSet = dynamic_cast<mitk::ContourModelSet*>(aStruct.GetPointer());
+
+                  mitk::DataNode::Pointer structNode = mitk::DataNode::New();
+                  structNode->SetData(countourModelSet);
+                  structNode->SetProperty("name", aStruct->GetProperty("name"));
+                  structNode->SetProperty("color", aStruct->GetProperty("contour.color"));
+                  structNode->SetProperty("contour.color", aStruct->GetProperty("contour.color"));
+                  structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+                  structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+                  structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
+                  structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+                  structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+
+                  dataStorage->Add(structNode);
+              }
+              mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
+          }
+      }
+      else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
+      {
+          auto planReader = mitk::RTPlanReaderService();
+          planReader.SetInput(listOfFilesForSeries.front().toStdString());
+          std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader.Read();
+          if (!readerOutput.empty()){
+              //there is no image, only the properties are interesting
+              mitk::Image::Pointer planDummyImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
+
+              mitk::DataNode::Pointer planImageNode = mitk::DataNode::New();
+              planImageNode->SetData(planDummyImage);
+              planImageNode->SetName("RTPlan");
+
+              ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+              mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+              mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+              dataStorage->Add(planImageNode);
+          }
       }
     }
     else

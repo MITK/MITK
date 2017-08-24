@@ -1,9 +1,0 @@
-set(MODULE_CUSTOM_TESTS
-    mitkLabelOverlay3DRendering2DTest.cpp
-    mitkLabelOverlay3DRendering3DTest.cpp
-    mitkTextOverlay2DRenderingTest.cpp
-    mitkTextOverlay2DLayouterRenderingTest.cpp
-    mitkTextOverlay3DRendering2DTest.cpp
-    mitkTextOverlay3DRendering3DTest.cpp
-    mitkTextOverlay3DColorRenderingTest.cpp
-)

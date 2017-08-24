@@ -74,9 +74,8 @@ private:
 private:
   std::string m_FileName;
   std::string m_Locale;
-  bool m_SkipImageTest;
-
   char *m_OldLocale;
+  bool m_SkipImageTest;
 
   void SetTestParameter()
   {
@@ -87,17 +86,17 @@ private:
   }
 
 public:
-  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL), m_SkipImageTest(false) {}
+  mitkDICOMLocaleTestSuite() : m_OldLocale(nullptr), m_SkipImageTest(false) {}
   // Change the current locale to m_Locale
   void setUp() override
   {
     m_SkipImageTest = false;
-    m_OldLocale = NULL;
+    m_OldLocale = nullptr;
     SetTestParameter();
 
     try
     {
-      m_OldLocale = setlocale(LC_ALL, NULL);
+      m_OldLocale = setlocale(LC_ALL, nullptr);
       MITK_TEST_OUTPUT(<< " ** Changing locale from " << m_OldLocale << " to '" << m_Locale << "'")
       setlocale(LC_ALL, m_Locale.c_str());
       std::cin.imbue(std::locale(m_Locale.c_str()));
@@ -123,7 +122,7 @@ public:
     if (m_SkipImageTest)
       return;
 
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(m_FileName);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_FileName)[0].GetPointer());
     CPPUNIT_ASSERT(image.IsNotNull());
 
     // note importance of minor differences in spacings:

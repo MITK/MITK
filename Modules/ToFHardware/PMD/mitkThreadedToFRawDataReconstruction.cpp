@@ -65,25 +65,25 @@ namespace mitk
 
   ThreadedToFRawDataReconstruction::~ThreadedToFRawDataReconstruction()
   {
-    if(m_ThreadData != NULL)
+    if(m_ThreadData != nullptr)
       delete m_ThreadData;
 
-    if(m_CISDist != NULL)
+    if(m_CISDist != nullptr)
       delete[] m_CISDist;
 
-    if(m_CISAmpl != NULL)
+    if(m_CISAmpl != nullptr)
       delete[] m_CISAmpl;
 
-    if(m_CISInten != NULL)
+    if(m_CISInten != nullptr)
       delete[] m_CISInten;
 
-    if(m_ThreadedCISInten != NULL)
+    if(m_ThreadedCISInten != nullptr)
       delete[] m_ThreadedCISInten;
 
-    if(m_ThreadedCISAmpl != NULL)
+    if(m_ThreadedCISAmpl != nullptr)
       delete[] m_ThreadedCISAmpl;
 
-    if(m_ThreadedCISDist != NULL)
+    if(m_ThreadedCISDist != nullptr)
       delete[] m_ThreadedCISDist;
 
   }
@@ -236,11 +236,11 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
   {
     /* extract this pointer from Thread Info structure */
     struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)data;
-    if (pInfo == NULL)
+    if (pInfo == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
-    if (pInfo->UserData == NULL)
+    if (pInfo->UserData == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }

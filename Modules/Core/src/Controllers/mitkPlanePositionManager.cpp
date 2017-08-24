@@ -93,7 +93,7 @@ mitk::RestorePlanePositionOperation *mitk::PlanePositionManagerService::GetPlane
   }
   else
   {
-    MITK_WARN << "GetPlanePosition returned NULL!";
+    MITK_WARN << "GetPlanePosition returned nullptr!";
     return 0;
   }
 }

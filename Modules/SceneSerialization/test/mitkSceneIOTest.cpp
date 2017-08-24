@@ -41,7 +41,7 @@ class SceneIOTestClass
 public:
   static mitk::Image::Pointer LoadImage(const std::string &filename)
   {
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
     if (image.IsNull())
     {
       MITK_TEST_FAILED_MSG(<< "Test image '" << filename << "' was not loaded as an mitk::Image");
@@ -51,7 +51,7 @@ public:
 
   static mitk::Surface::Pointer LoadSurface(const std::string &filename)
   {
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(filename);
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(filename)[0].GetPointer());
     if (surface.IsNull())
     {
       MITK_TEST_FAILED_MSG(<< "Test surface '" << filename << "' was not loaded as an mitk::Surface");
@@ -296,7 +296,7 @@ int mitkSceneIOTest(int, char *argv[])
         }
         else
         {
-          MITK_TEST_OUTPUT_NO_ENDL(<< "(NULL)");
+          MITK_TEST_OUTPUT_NO_ENDL(<< "(nullptr)");
         }
 
         MITK_TEST_OUTPUT(<< " contained in node '" << (*iter)->GetName() << "'");
@@ -343,7 +343,7 @@ int mitkSceneIOTest(int, char *argv[])
         }
         else
         {
-          MITK_TEST_OUTPUT_NO_ENDL(<< "(NULL)");
+          MITK_TEST_OUTPUT_NO_ENDL(<< "(nullptr)");
         }
 
         MITK_TEST_OUTPUT(<< " contained in node '" << (*iter)->GetName() << "'");

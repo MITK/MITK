@@ -15,5 +15,4 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mbilogConfig.h.in"
 
 mitk_create_module(
   NO_INIT
-  WARNINGS_AS_ERRORS
 )

@@ -23,10 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
 {
   m_initialized = false;
-  m_aviWriter   = NULL;
+  m_aviWriter   = nullptr;
   m_dwRate = 20;
 
-  m_FourCCCodec = NULL;
+  m_FourCCCodec = nullptr;
   m_RemoveColouredFrame = true;
 }
 
@@ -37,9 +37,9 @@ void mitk::MovieGeneratorOpenCV::SetFileName( const char *fileName )
   m_sFile = fileName;
 }
 
-void mitk::MovieGeneratorOpenCV::SetFrameRate(int rate)
+void mitk::MovieGeneratorOpenCV::SetFrameRate(unsigned int rate)
 {
-  m_dwRate = rate;
+  m_dwRate = static_cast<int>(rate);
 }
 
 void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool RemoveColouredFrame)
@@ -86,7 +86,7 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
   1 = If it is not zero, the encoder will expect and encode color frames, otherwise it will work with grayscale frames
   (the flag is currently supported on Windows only).*/
 
-  if(m_FourCCCodec != NULL)
+  if(m_FourCCCodec != nullptr)
   {
     #ifdef WIN32
       m_aviWriter = cvCreateVideoWriter(m_sFile.c_str(),CV_FOURCC(m_FourCCCodec[0],m_FourCCCodec[1],m_FourCCCodec[2],

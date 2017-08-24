@@ -25,9 +25,7 @@ mitk::TimeGeometry::TimeGeometry() : m_BoundingBox(BoundingBox::New())
   m_BoundingBox->SetPoints(points.GetPointer());
 }
 
-mitk::TimeGeometry::~TimeGeometry()
-{
-}
+mitk::TimeGeometry::~TimeGeometry() = default;
 
 void mitk::TimeGeometry::Initialize()
 {
@@ -104,7 +102,7 @@ mitk::Point3D mitk::TimeGeometry::GetCenterInWorld() const
 
 double mitk::TimeGeometry::GetDiagonalLength2InWorld() const
 {
-  Vector3D diagonalvector = GetCornerPointInWorld() - GetCornerPointInWorld(false, false, false);
+  const Vector3D diagonalvector = GetCornerPointInWorld()-GetCornerPointInWorld(false, false, false);
   return diagonalvector.GetSquaredNorm();
 }
 
@@ -127,8 +125,10 @@ void mitk::TimeGeometry::UpdateBoundingBox()
   unsigned long currentModifiedTime = 0;
 
   ContainerType::Pointer points = ContainerType::New();
-  points->reserve(2 * CountTimeSteps());
-  for (TimeStepType step = 0; step < CountTimeSteps(); ++step)
+  const TimeStepType numberOfTimesteps = CountTimeSteps();
+
+  points->reserve(2*numberOfTimesteps);
+  for (TimeStepType step = 0; step <numberOfTimesteps; ++step)
   {
     currentModifiedTime = GetGeometryForTimeStep(step)->GetMTime();
     if (currentModifiedTime > lastModifiedTime)
@@ -176,7 +176,7 @@ void mitk::TimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << std::endl;
   os << indent << " GetGeometryForTimeStep(0): ";
   if (GetGeometryForTimeStep(0).IsNull())
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
 }

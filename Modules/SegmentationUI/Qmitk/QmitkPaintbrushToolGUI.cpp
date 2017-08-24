@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qpushbutton.h>
 #include <qslider.h>
 
-QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI() : QmitkToolGUI(), m_Slider(NULL)
+QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI() : QmitkToolGUI(), m_Slider(nullptr)
 {
   // create the visible widgets
   QBoxLayout *layout = new QHBoxLayout(this);

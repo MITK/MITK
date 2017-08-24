@@ -60,7 +60,7 @@ private:
 
 protected:
   IsoDoseLevelSet() {};
-  IsoDoseLevelSet(const IsoDoseLevelSet & other);
+  explicit IsoDoseLevelSet(const IsoDoseLevelSet & other);
 
   virtual ~IsoDoseLevelSet() {};
 

@@ -26,7 +26,7 @@ set(CPP_FILES )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  resources/DataManager_48.png
+  resources/data-manager.svg
 )
 
 set(QRC_FILES

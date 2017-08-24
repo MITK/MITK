@@ -43,8 +43,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMatchPointRegistrationEvaluator::VIEW_ID =
     "org.mitk.views.matchpoint.registration.evaluator";
 
+const std::string QmitkMatchPointRegistrationEvaluator::HelperNodeName =
+    "RegistrationEvaluationHelper";
+
 QmitkMatchPointRegistrationEvaluator::QmitkMatchPointRegistrationEvaluator()
-  : m_Parent(NULL), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0), HelperNodeName("RegistrationEvaluationHelper")
+  : m_Parent(nullptr), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0)
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -106,9 +109,9 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
   this->m_autoMoving = false;
   this->m_autoTarget = false;
-  this->m_spSelectedMovingNode = NULL;
-  this->m_spSelectedTargetNode = NULL;
-  this->m_spSelectedRegNode = NULL;
+  this->m_spSelectedMovingNode = nullptr;
+  this->m_spSelectedTargetNode = nullptr;
+  this->m_spSelectedRegNode = nullptr;
 
   if (dataNodes.size() > 0)
   {
@@ -170,8 +173,8 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
 }
 
 
-void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-        const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+        const QList<mitk::DataNode::Pointer>&)
 {
   this->CheckInputs();
 	this->ConfigureControls();
@@ -264,7 +267,7 @@ void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 
 void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 {
-  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(NULL);
+  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
   unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
   if (m_currentSelectedPosition != currentSelectedPosition
@@ -291,7 +294,7 @@ void QmitkMatchPointRegistrationEvaluator::OnSettingsChanged(mitk::DataNode*)
 void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 {
   //reinit view
-  mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 
   mitk::RegEvaluationObject::Pointer regEval = mitk::RegEvaluationObject::New();
 
@@ -318,7 +321,7 @@ void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 
   this->m_selectedEvalNode = mitk::DataNode::New();
   this->m_selectedEvalNode->SetData(regEval);
-  
+
   mitk::RegEvaluationMapper2D::SetDefaultProperties(this->m_selectedEvalNode);
   this->m_selectedEvalNode->SetName(HelperNodeName);
   this->m_selectedEvalNode->SetBoolProperty("helper object", true);

@@ -211,14 +211,14 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(sourcePos1,pointC,mitk::eps,true), "Testing if point generation of third point is correct");
 
   // deleting helper objects
-  myFilter = NULL;
-  quaternionTransform = NULL;
-  snd1 = NULL;
-  snd2 = NULL;
-  snd3 = NULL;
-  tnd1 = NULL;
-  tnd2 = NULL;
-  tnd3 = NULL;
+  myFilter = nullptr;
+  quaternionTransform = nullptr;
+  snd1 = nullptr;
+  snd2 = nullptr;
+  snd3 = nullptr;
+  tnd1 = nullptr;
+  tnd2 = nullptr;
+  tnd3 = nullptr;
 
     // always end with this!
   MITK_TEST_END();

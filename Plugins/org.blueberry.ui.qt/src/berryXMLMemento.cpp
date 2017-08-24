@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryXMLMemento.h"
 
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 #include <Poco/NumberParser.h>
 #include <Poco/NumberFormatter.h>

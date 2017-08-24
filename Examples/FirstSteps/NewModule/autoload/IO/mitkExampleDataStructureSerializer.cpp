@@ -33,7 +33,7 @@ mitk::ExampleDataStructureSerializer::~ExampleDataStructureSerializer()
 std::string mitk::ExampleDataStructureSerializer::Serialize()
 {
   const ExampleDataStructure *exData = dynamic_cast<const ExampleDataStructure *>(m_Data.GetPointer());
-  if (exData == NULL)
+  if (exData == nullptr)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data
                << " is not an mitk::ExampleDataStructure. Cannot serialize as ExampleDataStructure.";

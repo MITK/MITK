@@ -128,11 +128,11 @@ int mitkCompressedImageContainerTest(int argc, char *argv[])
 
   // load the image
 
-  mitk::Image::Pointer image = NULL;
+  mitk::Image::Pointer image = nullptr;
   try
   {
     std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
-    image = mitk::IOUtil::LoadImage(argv[1]);
+    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
   }
   catch (const mitk::Exception &)
   {
@@ -169,7 +169,7 @@ int mitkCompressedImageContainerTest(int argc, char *argv[])
   std::cout << "Testing destruction" << std::endl;
 
   // freeing
-  container = NULL;
+  container = nullptr;
 
   std::cout << "  (II) Freeing works." << std::endl;
 

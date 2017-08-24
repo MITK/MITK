@@ -70,8 +70,7 @@ protected:
     int     m_NumActiveVoxels;              // voxels inside mask
     float   m_ConnectionPotential;          // larger value results in larger energy value -> higher proposal acceptance probability
     float   m_ParticleChemicalPotential;    // larger value results in larger energy value -> higher proposal acceptance probability
-    float   gamma_s;
-    float   gamma_reg_s;
+    float   m_SigmaInv;
     float   m_ParticleWeight;               // defines how much one particle contributes to the artificial signal
     float   m_ExtStrength;                  // weighting factor for external energy
     float   m_IntStrength;                  // weighting factor for internal energy
@@ -81,7 +80,7 @@ protected:
 
     float SpatProb(vnl_vector_fixed<float, 3> pos);
     float EvaluateOdf(vnl_vector_fixed<float, 3> &pos, vnl_vector_fixed<float, 3> dir);
-    float mbesseli0(float x);
+    float CalcI0(float x);
     float mexp(float x);
 };
 

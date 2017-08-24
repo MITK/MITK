@@ -40,8 +40,6 @@ class QPushButton;
   This dialog is used to ask a user about the type of a newly created segmentation and a name for it.
 
   \warning Will not create a new organ type in the OrganTypeProperty. Client has to do that.
-
-  Last contribution by $Author: maleike $.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
@@ -53,9 +51,11 @@ public:
   virtual ~QmitkNewSegmentationDialog();
 
   const QString GetSegmentationName();
-  const char *GetOrganType();
   mitk::Color GetColor();
+  const char *GetOrganType();
 
+  void SetSegmentationName(const QString &segmentationName);
+  void SetColor(const mitk::Color &color);
   void SetSuggestionList(QStringList organColorList);
 
 signals:
@@ -63,7 +63,6 @@ signals:
 public slots:
 
   void setPrompt(const QString &prompt);
-  void setSegmentationName(const QString &name);
 
 protected slots:
 
@@ -73,9 +72,10 @@ protected slots:
   void onColorChange(const QString &completedWord);
 
 protected:
+
   QLabel *lblPrompt;
   Q3ListBox *lstOrgans;
-  QLineEdit *edtName;
+  QLineEdit *lineEditName;
 
   QPushButton *btnColor;
   QPushButton *btnOk;

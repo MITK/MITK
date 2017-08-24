@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNDIPolarisTypeInformation.h>
 #include <mitkNDIAuroraTypeInformation.h>
 
+// vtk
+#include <vtkSphereSource.h>
+
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
@@ -1209,6 +1212,56 @@ const char* mitk::NDITrackingDevice::GetFirmwareRevisionNumber()
     return revision.c_str();
   }
   return revision.c_str();
+}
+
+bool mitk::NDITrackingDevice::AutoDetectToolsAvailable()
+{
+  if (this->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) { return true; }
+  else { return false; }
+}
+
+mitk::NavigationToolStorage::Pointer mitk::NDITrackingDevice::AutoDetectTools()
+{
+  mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New();
+  if (this->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName())
+  {
+    try
+    {
+      this->OpenConnection();
+      this->StartTracking();
+    }
+    catch (mitk::Exception& e)
+    {
+      MITK_WARN << "Warning, can not auto-detect tools! (" << e.GetDescription() << ")";
+      return autoDetectedStorage;
+    }
+
+    for (unsigned int i = 0; i < this->GetToolCount(); i++)
+    {
+      //create a navigation tool with sphere as surface
+      std::stringstream toolname;
+      toolname << "AutoDetectedTool" << i;
+      mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
+      newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i))->GetSerialNumber());
+      newTool->SetIdentifier(toolname.str());
+      newTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
+      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+      mitk::Surface::Pointer mySphere = mitk::Surface::New();
+      vtkSphereSource *vtkData = vtkSphereSource::New();
+      vtkData->SetRadius(3.0f);
+      vtkData->SetCenter(0.0, 0.0, 0.0);
+      vtkData->Update();
+      mySphere->SetVtkPolyData(vtkData->GetOutput());
+      vtkData->Delete();
+      newNode->SetData(mySphere);
+      newNode->SetName(toolname.str());
+      newTool->SetDataNode(newNode);
+      autoDetectedStorage->AddTool(newTool);
+    }
+    this->StopTracking();
+    this->CloseConnection();
+  }
+  return autoDetectedStorage;
 }
 
 bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes, mitk::NDITrackingDevice::NDITrackingVolumeContainerType* volumes, mitk::NDITrackingDevice::TrackingVolumeDimensionType* volumesDimensions)

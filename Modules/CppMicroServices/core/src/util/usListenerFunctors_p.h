@@ -80,7 +80,7 @@ US_END_NAMESPACE
 US_HASH_FUNCTION_NAMESPACE_BEGIN
 US_HASH_FUNCTION_BEGIN(US_SERVICE_LISTENER_FUNCTOR)
   void(*targetFunc)(const US_PREPEND_NAMESPACE(ServiceEvent)&) = arg.target<void(const US_PREPEND_NAMESPACE(ServiceEvent)&)>();
-  void* targetPtr = NULL;
+  void* targetPtr = nullptr;
   std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
   return US_HASH_FUNCTION(void*, targetPtr);
 US_HASH_FUNCTION_END

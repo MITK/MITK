@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOperationActor.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProportionalTimeGeometry.h"
+#include "mitkArbitraryTimeGeometry.h"
 #include "mitkRenderingManager.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkVtkPropRenderer.h"
@@ -48,13 +49,13 @@ namespace mitk
 {
   SliceNavigationController::SliceNavigationController()
     : BaseController(),
-      m_InputWorldGeometry3D(NULL),
-      m_InputWorldTimeGeometry(NULL),
-      m_CreatedWorldGeometry(NULL),
+  m_InputWorldGeometry3D( mitk::BaseGeometry::ConstPointer() ),
+  m_InputWorldTimeGeometry( mitk::TimeGeometry::ConstPointer() ),
+  m_CreatedWorldGeometry( mitk::TimeGeometry::Pointer() ),
       m_ViewDirection(Axial),
       m_DefaultViewDirection(Axial),
-      m_RenderingManager(NULL),
-      m_Renderer(NULL),
+  m_RenderingManager( mitk::RenderingManager::Pointer() ),
+  m_Renderer( nullptr ),
       m_Top(false),
       m_FrontSide(false),
       m_Rotated(false),
@@ -87,36 +88,36 @@ namespace mitk
   SliceNavigationController::~SliceNavigationController() {}
   void SliceNavigationController::SetInputWorldGeometry3D(const BaseGeometry *geometry)
   {
-    if (geometry != NULL)
+  if ( geometry != nullptr )
     {
       if (const_cast<BoundingBox *>(geometry->GetBoundingBox())->GetDiagonalLength2() < eps)
       {
         itkWarningMacro("setting an empty bounding-box");
-        geometry = NULL;
+      geometry = nullptr;
       }
     }
     if (m_InputWorldGeometry3D != geometry)
     {
       m_InputWorldGeometry3D = geometry;
-      m_InputWorldTimeGeometry = NULL;
+    m_InputWorldTimeGeometry = mitk::TimeGeometry::ConstPointer();
       this->Modified();
     }
   }
 
   void SliceNavigationController::SetInputWorldTimeGeometry(const TimeGeometry *geometry)
   {
-    if (geometry != NULL)
+  if ( geometry != nullptr )
     {
       if (const_cast<BoundingBox *>(geometry->GetBoundingBoxInWorld())->GetDiagonalLength2() < eps)
       {
         itkWarningMacro("setting an empty bounding-box");
-        geometry = NULL;
+        geometry = nullptr;
       }
     }
     if (m_InputWorldTimeGeometry != geometry)
     {
       m_InputWorldTimeGeometry = geometry;
-      m_InputWorldGeometry3D = NULL;
+      m_InputWorldGeometry3D = mitk::BaseGeometry::ConstPointer();
       this->Modified();
     }
   }
@@ -125,14 +126,14 @@ namespace mitk
   {
     mitk::RenderingManager *renderingManager = m_RenderingManager.GetPointer();
 
-    if (renderingManager != NULL)
+    if (renderingManager != nullptr)
       return renderingManager;
 
-    if (m_Renderer != NULL)
+    if ( m_Renderer != nullptr )
     {
       renderingManager = m_Renderer->GetRenderingManager();
 
-      if (renderingManager != NULL)
+      if (renderingManager != nullptr)
         return renderingManager;
     }
 
@@ -224,8 +225,8 @@ namespace mitk
       m_LastUpdateTime = GetMTime();
 
       // initialize the viewplane
-      SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
-      BaseGeometry::ConstPointer currentGeometry = NULL;
+      SlicedGeometry3D::Pointer slicedWorldGeometry = SlicedGeometry3D::Pointer();
+      BaseGeometry::ConstPointer currentGeometry = BaseGeometry::ConstPointer();
       if (m_InputWorldTimeGeometry.IsNotNull())
         if (m_InputWorldTimeGeometry->IsValidTimeStep(GetTime()->GetPos()))
           currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
@@ -234,7 +235,7 @@ namespace mitk
       else
         currentGeometry = m_InputWorldGeometry3D;
 
-      m_CreatedWorldGeometry = NULL;
+      m_CreatedWorldGeometry = mitk::TimeGeometry::Pointer();
       switch (viewDirection)
       {
         case Original:
@@ -257,7 +258,7 @@ namespace mitk
             const SlicedGeometry3D *worldSlicedGeometry =
               dynamic_cast<const SlicedGeometry3D *>(currentGeometry.GetPointer());
 
-            if (worldSlicedGeometry != NULL)
+          if ( worldSlicedGeometry != nullptr )
             {
               slicedWorldGeometry = static_cast<SlicedGeometry3D *>(currentGeometry->Clone().GetPointer());
               break;
@@ -292,16 +293,12 @@ namespace mitk
       m_Slice->SetPos(0);
       m_Slice->SetSteps((int)slicedWorldGeometry->GetSlices());
 
-      if (m_CreatedWorldGeometry.IsNull())
+      if ( worldTimeGeometry.IsNull() )
       {
-        // initialize TimeGeometry
-        m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
-      }
-      if (worldTimeGeometry.IsNull())
-      {
-        m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
-        dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())
-          ->Initialize(slicedWorldGeometry, 1);
+        auto createdTimeGeometry = ProportionalTimeGeometry::New();
+        createdTimeGeometry->Initialize( slicedWorldGeometry, 1 );
+        m_CreatedWorldGeometry = createdTimeGeometry;
+      
         m_Time->SetSteps(0);
         m_Time->SetPos(0);
         m_Time->InvalidateRange();
@@ -317,19 +314,41 @@ namespace mitk
 
         m_BlockUpdate = false;
 
-        assert(worldTimeGeometry->GetGeometryForTimeStep(this->GetTime()->GetPos()).IsNotNull());
+        const auto currentTemporalPosition = this->GetTime()->GetPos();
+        assert( worldTimeGeometry->GetGeometryForTimeStep( currentTemporalPosition ).IsNotNull() );
 
-        TimePointType minimumTimePoint = worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos());
-        TimePointType stepDuration = worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos() + 1) -
-                                     worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos());
+      if ( dynamic_cast<const mitk::ProportionalTimeGeometry*>( worldTimeGeometry.GetPointer() ) != nullptr )
+      {
+        const TimePointType minimumTimePoint =
+          worldTimeGeometry->TimeStepToTimePoint( currentTemporalPosition );
+        
+        const TimePointType stepDuration =
+          worldTimeGeometry->TimeStepToTimePoint( currentTemporalPosition + 1 ) - minimumTimePoint;
 
-        //@todo implement for non-evenly-timed geometry!
-        m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
-        dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())
-          ->Initialize(slicedWorldGeometry, worldTimeGeometry->CountTimeSteps());
-        dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())
-          ->GetMinimumTimePoint(minimumTimePoint);
-        dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->SetStepDuration(stepDuration);
+        auto createdTimeGeometry = ProportionalTimeGeometry::New();
+        createdTimeGeometry->Initialize( slicedWorldGeometry, worldTimeGeometry->CountTimeSteps() );
+        createdTimeGeometry->SetFirstTimePoint( minimumTimePoint );
+        createdTimeGeometry->SetStepDuration( stepDuration );
+
+        m_CreatedWorldGeometry = createdTimeGeometry;
+      }
+      else
+      {
+        auto createdTimeGeometry = mitk::ArbitraryTimeGeometry::New();
+        const TimeStepType numberOfTimeSteps = worldTimeGeometry->CountTimeSteps();
+        createdTimeGeometry->ReserveSpaceForGeometries( numberOfTimeSteps );
+
+        for ( TimeStepType i = 0; i < numberOfTimeSteps; ++i )
+        {
+          const BaseGeometry::Pointer clonedGeometry = slicedWorldGeometry->Clone().GetPointer();
+          const auto bounds = worldTimeGeometry->GetTimeBounds( i );
+          createdTimeGeometry->AppendNewTimeStep( clonedGeometry,
+            bounds[0], bounds[1]);
+        }
+        createdTimeGeometry->Update();
+
+        m_CreatedWorldGeometry = createdTimeGeometry;
+      }
       }
     }
 
@@ -405,12 +424,11 @@ namespace mitk
     }
 
     const SliceNavigationController::GeometryTimeEvent *timeEvent =
-      dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
-
-    assert(timeEvent != NULL);
+      dynamic_cast< const SliceNavigationController::GeometryTimeEvent * >(&geometryTimeEvent);
+    assert( timeEvent != nullptr );
 
     TimeGeometry *timeGeometry = timeEvent->GetTimeGeometry();
-    assert(timeGeometry != NULL);
+    assert( timeGeometry != nullptr );
 
     int timeStep = (int)timeEvent->GetPos();
     ScalarType timeInMS;
@@ -423,7 +441,7 @@ namespace mitk
   {
     const SliceNavigationController::GeometrySliceEvent *sliceEvent =
       dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
-    assert(sliceEvent != NULL);
+    assert(sliceEvent!=nullptr);
 
     this->GetSlice()->SetPos(sliceEvent->GetPos());
   }
@@ -456,7 +474,7 @@ namespace mitk
         plane->Project(point, projectedPoint);
 
         // Check whether the point is somewhere within the slice stack volume;
-        // otherwise, the defualt slice (0) will be selected
+        // otherwise, the default slice (0) will be selected
         if (direction[0] * (point[0] - projectedPoint[0]) + direction[1] * (point[1] - projectedPoint[1]) +
               direction[2] * (point[2] - projectedPoint[2]) >=
             0)
@@ -470,7 +488,7 @@ namespace mitk
         for (s = 0; s < slices; ++s)
         {
           slicedWorldGeometry->GetPlaneGeometry(s)->Project(point, projectedPoint);
-          Vector3D distance = projectedPoint - point;
+          const Vector3D distance = projectedPoint - point;
           ScalarType currentDistance = distance.GetSquaredNorm();
 
           if (currentDistance < bestDistance)
@@ -528,7 +546,7 @@ namespace mitk
     }
     else
     {
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -544,7 +562,7 @@ namespace mitk
     }
     else
     {
-      return NULL;
+      return nullptr;
     }
   }
 

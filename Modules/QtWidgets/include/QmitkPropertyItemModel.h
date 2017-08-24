@@ -45,7 +45,7 @@ class MITKQTWIDGETS_EXPORT QmitkPropertyItemModel : public QAbstractItemModel
   Q_OBJECT
 
 public:
-  explicit QmitkPropertyItemModel(QObject *parent = NULL);
+  explicit QmitkPropertyItemModel(QObject *parent = nullptr);
   ~QmitkPropertyItemModel();
 
   int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -68,8 +68,9 @@ public:
 private:
   void CreateRootItem();
   QModelIndex FindProperty(const mitk::BaseProperty *property);
-  void OnPropertyDeleted(const itk::Object *property, const itk::EventObject &event);
+  void OnPropertyListModified(const itk::Object *propertyList);
   void OnPropertyListDeleted(const itk::Object *propertyList);
+  void OnPropertyDeleted(const itk::Object *property, const itk::EventObject &event);
   void OnPropertyModified(const itk::Object *property, const itk::EventObject &event);
   void SetNewPropertyList(mitk::PropertyList *propertyList);
 

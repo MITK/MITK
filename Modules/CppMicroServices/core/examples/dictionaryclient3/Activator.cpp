@@ -51,8 +51,8 @@ class US_ABI_LOCAL Activator : public ModuleActivator
 public:
 
   Activator()
-   : m_context(NULL)
-   , m_tracker(NULL)
+   : m_context(nullptr)
+   , m_tracker(nullptr)
   {}
 
   /**
@@ -103,7 +103,7 @@ public:
         break;
       }
       // If there is no dictionary, then say so.
-      else if (dictionary == NULL)
+      else if (dictionary == nullptr)
       {
         std::cout << "No dictionary available." << std::endl;
       }

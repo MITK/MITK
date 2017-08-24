@@ -131,7 +131,7 @@ namespace
 }
 
 QmitkDiffusionImagingAppIntroPart::QmitkDiffusionImagingAppIntroPart()
-  : m_Controls(NULL)
+  : m_Controls(nullptr)
 {
   berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);

@@ -194,7 +194,7 @@ namespace mitk
     bool IsFeatureVisible(unsigned int index) const;
 
     /** \brief Defines if the feature with the specified index will be shown as an
-    * overlay in the RenderWindow */
+    * Annotation in the RenderWindow */
     void SetFeatureVisible(unsigned int index, bool visible);
 
     /** \brief Calculates quantities of all features of this planar figure. */

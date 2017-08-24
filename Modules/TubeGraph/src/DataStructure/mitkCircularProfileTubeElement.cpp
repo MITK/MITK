@@ -43,7 +43,7 @@ void mitk::CircularProfileTubeElement::SetCoordinates(mitk::Point3D coordinates)
   m_coordinates = coordinates;
 }
 
-const float mitk::CircularProfileTubeElement::GetDiameter() const
+float mitk::CircularProfileTubeElement::GetDiameter() const
 {
   return m_diameter;
 }

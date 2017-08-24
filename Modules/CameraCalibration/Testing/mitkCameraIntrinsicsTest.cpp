@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "CameraIntrinsics".
  */
-int mitkCameraIntrinsicsTest(int argc, char* argv[])
+int mitkCameraIntrinsicsTest(int, char* [])
 {
   MITK_TEST_BEGIN("CameraIntrinsics")
 

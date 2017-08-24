@@ -68,7 +68,7 @@ void mitk::ImageLiveWireContourModelFilter::SetInput(unsigned int idx,
 const mitk::ImageLiveWireContourModelFilter::InputType *mitk::ImageLiveWireContourModelFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType *>(this->ProcessObject::GetInput(0));
 }
 
@@ -76,7 +76,7 @@ const mitk::ImageLiveWireContourModelFilter::InputType *mitk::ImageLiveWireConto
   unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType *>(this->ProcessObject::GetInput(idx));
 }
 
@@ -278,7 +278,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
   std::vector<itk::Index<VImageDimension>> shortestPath;
 
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image *>(this->GetInput());
-  if (path == NULL)
+  if (path == nullptr)
   {
     OutputType::Pointer output = this->GetOutput();
     mitk::ContourModel::VertexIterator it = output->IteratorBegin();

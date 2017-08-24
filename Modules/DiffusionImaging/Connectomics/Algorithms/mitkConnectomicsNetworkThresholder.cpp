@@ -74,7 +74,7 @@ bool mitk::ConnectomicsNetworkThresholder::CheckValidity()
   if( m_Network.IsNull() )
   {
     valid = false;
-    MITK_ERROR << "Network is NULL.";
+    MITK_ERROR << "Network is nullptr.";
   }
 
   switch(m_ThresholdingScheme)

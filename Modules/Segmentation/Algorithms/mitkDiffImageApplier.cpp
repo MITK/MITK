@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <itkImageSliceIteratorWithIndex.h>
 
+#include <type_traits>
+
 mitk::DiffImageApplier::DiffImageApplier()
 {
 }
@@ -329,6 +331,11 @@ void mitk::DiffImageApplier::ItkImageProcessing3DDiff(itk::Image<TPixel1, VImage
   }
 }
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable:4146) // unary minus operator applied to unsigned type, result still unsigned
+#endif
+
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::DiffImageApplier::ItkInvertPixelValues(itk::Image<TPixel, VImageDimension> *itkImage)
 {
@@ -342,3 +349,7 @@ void mitk::DiffImageApplier::ItkInvertPixelValues(itk::Image<TPixel, VImageDimen
     ++iter;
   }
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif

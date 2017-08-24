@@ -52,12 +52,12 @@ static std::string GetLastErrorStr()
   DWORD dw = GetLastError();
 
   FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
+                nullptr,
                 dw,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                 (LPTSTR)&lpMsgBuf,
                 0,
-                NULL);
+                nullptr);
 
   std::string errMsg((LPCTSTR)lpMsgBuf);
 
@@ -137,7 +137,7 @@ static int mkstemps_compat(char *tmpl, int suffixlen)
 #else
   {
     struct timeval tv;
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nullptr);
     unsigned long long randomTimeBits =
       ((static_cast<unsigned long long>(tv.tv_usec) << 32) | static_cast<unsigned long long>(tv.tv_sec));
     value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
@@ -199,7 +199,7 @@ static char *mkdtemps_compat(char *tmpl, int suffixlen)
   if ((len - suffixlen) < 6 || strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6))
   {
     errno = EINVAL;
-    return NULL;
+    return nullptr;
   }
 
   /* This is where the Xs start.  */
@@ -217,7 +217,7 @@ static char *mkdtemps_compat(char *tmpl, int suffixlen)
     if (!SystemTimeToFileTime(&stNow, &ftNow))
     {
       errno = -1;
-      return NULL;
+      return nullptr;
     }
     unsigned long long randomTimeBits = ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32) |
                                          static_cast<unsigned long long>(ftNow.dwLowDateTime));
@@ -226,7 +226,7 @@ static char *mkdtemps_compat(char *tmpl, int suffixlen)
 #else
   {
     struct timeval tv;
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nullptr);
     unsigned long long randomTimeBits =
       ((static_cast<unsigned long long>(tv.tv_usec) << 32) | static_cast<unsigned long long>(tv.tv_sec));
     value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
@@ -263,13 +263,13 @@ static char *mkdtemps_compat(char *tmpl, int suffixlen)
     }
     else if (errno != EEXIST)
     {
-      return NULL;
+      return nullptr;
     }
   }
 
   /* We got out of the loop because we ran out of combinations to try.  */
   errno = EEXIST;
-  return NULL;
+  return nullptr;
 }
 
 //#endif
@@ -284,7 +284,7 @@ namespace mitk
     struct FixedReaderOptionsFunctor : public ReaderOptionsFunctorBase
     {
       FixedReaderOptionsFunctor(const IFileReader::Options &options) : m_Options(options) {}
-      virtual bool operator()(LoadInfo &loadInfo) override
+      virtual bool operator()(LoadInfo &loadInfo) const override
       {
         IFileReader *reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
         if (reader)
@@ -301,7 +301,7 @@ namespace mitk
     struct FixedWriterOptionsFunctor : public WriterOptionsFunctorBase
     {
       FixedWriterOptionsFunctor(const IFileReader::Options &options) : m_Options(options) {}
-      virtual bool operator()(SaveInfo &saveInfo) override
+      virtual bool operator()(SaveInfo &saveInfo) const override
       {
         IFileWriter *writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
         if (writer)
@@ -315,16 +315,26 @@ namespace mitk
       const IFileWriter::Options &m_Options;
     };
 
-    static BaseData::Pointer LoadBaseDataFromFile(const std::string &path);
+    static BaseData::Pointer LoadBaseDataFromFile(const std::string &path, const ReaderOptionsFunctorBase* optionsCallback = nullptr);
 
     static void SetDefaultDataNodeProperties(mitk::DataNode *node, const std::string &filePath = std::string());
   };
+
+  BaseData::Pointer IOUtil::Impl::LoadBaseDataFromFile(const std::string &path,
+                                                       const ReaderOptionsFunctorBase *optionsCallback)
+  {
+    std::vector<BaseData::Pointer> baseDataList = Load(path, optionsCallback);
+
+    // The Load(path) call above should throw an exception if nothing could be loaded
+    assert(!baseDataList.empty());
+    return baseDataList.front();
+  }
 
 #ifdef US_PLATFORM_WINDOWS
   std::string IOUtil::GetProgramPath()
   {
     char path[512];
-    std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
+    std::size_t index = std::string(path, GetModuleFileName(nullptr, path, 512)).find_last_of('\\');
     return std::string(path, index);
   }
 #elif defined(US_PLATFORM_APPLE)
@@ -471,7 +481,7 @@ namespace mitk
     }
     std::size_t suffixlen = lastX == std::string::npos ? path.size() : path.size() - lastX - 1;
 
-    if (mkdtemps_compat(&dst_path[0], suffixlen) == NULL)
+    if (mkdtemps_compat(&dst_path[0], suffixlen) == nullptr)
     {
       mitkThrow() << "Creating temporary directory " << &dst_path[0] << " failed: " << GetLastErrorStr();
     }
@@ -480,11 +490,11 @@ namespace mitk
     return path;
   }
 
-  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string &path, DataStorage &storage)
+  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string &path, DataStorage &storage, const ReaderOptionsFunctorBase *optionsCallback)
   {
     std::vector<std::string> paths;
     paths.push_back(path);
-    return Load(paths, storage);
+    return Load(paths, storage, optionsCallback);
   }
 
   DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string &path,
@@ -503,11 +513,11 @@ namespace mitk
     return nodeResult;
   }
 
-  std::vector<BaseData::Pointer> IOUtil::Load(const std::string &path)
+  std::vector<BaseData::Pointer> IOUtil::Load(const std::string &path, const ReaderOptionsFunctorBase *optionsCallback)
   {
     std::vector<std::string> paths;
     paths.push_back(path);
-    return Load(paths);
+    return Load(paths, optionsCallback);
   }
 
   std::vector<BaseData::Pointer> IOUtil::Load(const std::string &path, const IFileReader::Options &options)
@@ -515,7 +525,7 @@ namespace mitk
     std::vector<LoadInfo> loadInfos;
     loadInfos.push_back(LoadInfo(path));
     Impl::FixedReaderOptionsFunctor optionsCallback(options);
-    std::string errMsg = Load(loadInfos, NULL, NULL, &optionsCallback);
+    std::string errMsg = Load(loadInfos, nullptr, nullptr, &optionsCallback);
     if (!errMsg.empty())
     {
       mitkThrow() << errMsg;
@@ -523,7 +533,7 @@ namespace mitk
     return loadInfos.front().m_Output;
   }
 
-  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::vector<std::string> &paths, DataStorage &storage)
+  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::vector<std::string> &paths, DataStorage &storage, const ReaderOptionsFunctorBase *optionsCallback)
   {
     DataStorage::SetOfObjects::Pointer nodeResult = DataStorage::SetOfObjects::New();
     std::vector<LoadInfo> loadInfos;
@@ -531,7 +541,7 @@ namespace mitk
     {
       loadInfos.push_back(loadInfo);
     }
-    std::string errMsg = Load(loadInfos, nodeResult, &storage, NULL);
+    std::string errMsg = Load(loadInfos, nodeResult, &storage, optionsCallback);
     if (!errMsg.empty())
     {
       mitkThrow() << errMsg;
@@ -539,7 +549,7 @@ namespace mitk
     return nodeResult;
   }
 
-  std::vector<BaseData::Pointer> IOUtil::Load(const std::vector<std::string> &paths)
+  std::vector<BaseData::Pointer> IOUtil::Load(const std::vector<std::string> &paths, const ReaderOptionsFunctorBase *optionsCallback)
   {
     std::vector<BaseData::Pointer> result;
     std::vector<LoadInfo> loadInfos;
@@ -547,7 +557,7 @@ namespace mitk
     {
       loadInfos.push_back(loadInfo);
     }
-    std::string errMsg = Load(loadInfos, NULL, NULL, NULL);
+    std::string errMsg = Load(loadInfos, nullptr, nullptr, optionsCallback);
     if (!errMsg.empty())
     {
       mitkThrow() << errMsg;
@@ -561,42 +571,10 @@ namespace mitk
     return result;
   }
 
-  int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
+  Image::Pointer IOUtil::LoadImage(const std::string &path,
+    const ReaderOptionsFunctorBase *optionsCallback)
   {
-    return static_cast<int>(Load(fileNames, ds)->Size());
-  }
-
-  DataStorage::Pointer IOUtil::LoadFiles(const std::vector<std::string> &fileNames)
-  {
-    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-    Load(fileNames, *ds);
-    return ds.GetPointer();
-  }
-
-  BaseData::Pointer IOUtil::LoadBaseData(const std::string &path) { return Impl::LoadBaseDataFromFile(path); }
-  BaseData::Pointer IOUtil::Impl::LoadBaseDataFromFile(const std::string &path)
-  {
-    std::vector<BaseData::Pointer> baseDataList = Load(path);
-
-    // The Load(path) call above should throw an exception if nothing could be loaded
-    assert(!baseDataList.empty());
-    return baseDataList.front();
-  }
-
-  DataNode::Pointer IOUtil::LoadDataNode(const std::string &path)
-  {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
-
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(baseData);
-    Impl::SetDefaultDataNodeProperties(node, path);
-
-    return node;
-  }
-
-  Image::Pointer IOUtil::LoadImage(const std::string &path)
-  {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
+    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
     mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(baseData.GetPointer());
     if (image.IsNull())
     {
@@ -605,9 +583,10 @@ namespace mitk
     return image;
   }
 
-  Surface::Pointer IOUtil::LoadSurface(const std::string &path)
+  Surface::Pointer IOUtil::LoadSurface(const std::string &path,
+    const ReaderOptionsFunctorBase *optionsCallback)
   {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
+    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface *>(baseData.GetPointer());
     if (surface.IsNull())
     {
@@ -616,9 +595,10 @@ namespace mitk
     return surface;
   }
 
-  PointSet::Pointer IOUtil::LoadPointSet(const std::string &path)
+  PointSet::Pointer IOUtil::LoadPointSet(const std::string &path,
+    const ReaderOptionsFunctorBase *optionsCallback)
   {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
+    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
     mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet *>(baseData.GetPointer());
     if (pointset.IsNull())
     {
@@ -630,7 +610,7 @@ namespace mitk
   std::string IOUtil::Load(std::vector<LoadInfo> &loadInfos,
                            DataStorage::SetOfObjects *nodeResult,
                            DataStorage *ds,
-                           ReaderOptionsFunctorBase *optionsCallback)
+                           const ReaderOptionsFunctorBase *optionsCallback)
   {
     if (loadInfos.empty())
     {
@@ -719,9 +699,9 @@ namespace mitk
       }
 
       IFileReader *reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
-      if (reader == NULL)
+      if (reader == nullptr)
       {
-        errMsg += "Unexpected NULL reader.";
+        errMsg += "Unexpected nullptr reader.";
         break;
       }
 
@@ -729,7 +709,7 @@ namespace mitk
       try
       {
         DataStorage::SetOfObjects::Pointer nodes;
-        if (ds != NULL)
+        if (ds != nullptr)
         {
           nodes = reader->Read(*ds);
         }
@@ -838,13 +818,13 @@ namespace mitk
                     const IFileWriter::Options &options,
                     bool addExtension)
   {
-    if ((data == NULL) || (data->IsEmpty()))
+    if ((data == nullptr) || (data->IsEmpty()))
       mitkThrow() << "BaseData cannotbe null or empty for save methods in IOUtil.h.";
 
     std::string errMsg;
     if (options.empty())
     {
-      errMsg = Save(data, mimeType, path, NULL, addExtension);
+      errMsg = Save(data, mimeType, path, nullptr, addExtension);
     }
     else
     {
@@ -860,35 +840,11 @@ namespace mitk
 
   void IOUtil::Save(std::vector<IOUtil::SaveInfo> &saveInfos)
   {
-    std::string errMsg = Save(saveInfos, NULL);
+    std::string errMsg = Save(saveInfos, nullptr);
     if (!errMsg.empty())
     {
       mitkThrow() << errMsg;
     }
-  }
-
-  bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string &path)
-  {
-    Save(image, path);
-    return true;
-  }
-
-  bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string &path)
-  {
-    Save(surface, path);
-    return true;
-  }
-
-  bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string &path)
-  {
-    Save(pointset, path);
-    return true;
-  }
-
-  bool IOUtil::SaveBaseData(mitk::BaseData *data, const std::string &path)
-  {
-    Save(data, path);
-    return true;
   }
 
   std::string IOUtil::Save(const BaseData *data,
@@ -1001,9 +957,9 @@ namespace mitk
       }
 
       IFileWriter *writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
-      if (writer == NULL)
+      if (writer == nullptr)
       {
-        errMsg += "Unexpected NULL writer.";
+        errMsg += "Unexpected nullptr writer.";
         break;
       }
 

@@ -62,7 +62,7 @@ mitk::MimeType mitk::FileReaderRegistry::GetMimeTypeForFile(const std::string &p
 std::vector<mitk::FileReaderRegistry::ReaderReference> mitk::FileReaderRegistry::GetReferences(
   const MimeType &mimeType, us::ModuleContext *context)
 {
-  if (context == NULL)
+  if (context == nullptr)
     context = us::GetModuleContext();
 
   std::string filter = us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileReader>() &&
@@ -73,7 +73,7 @@ std::vector<mitk::FileReaderRegistry::ReaderReference> mitk::FileReaderRegistry:
 mitk::IFileReader *mitk::FileReaderRegistry::GetReader(const mitk::FileReaderRegistry::ReaderReference &ref,
                                                        us::ModuleContext *context)
 {
-  if (context == NULL)
+  if (context == nullptr)
     context = us::GetModuleContext();
 
   us::ServiceObjects<mitk::IFileReader> serviceObjects = context->GetServiceObjects(ref);
@@ -85,7 +85,7 @@ mitk::IFileReader *mitk::FileReaderRegistry::GetReader(const mitk::FileReaderReg
 std::vector<mitk::IFileReader *> mitk::FileReaderRegistry::GetReaders(const MimeType &mimeType,
                                                                       us::ModuleContext *context)
 {
-  if (context == NULL)
+  if (context == nullptr)
     context = us::GetModuleContext();
 
   std::vector<mitk::IFileReader *> result;

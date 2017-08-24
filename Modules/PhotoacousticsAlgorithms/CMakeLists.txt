@@ -1,0 +1,8 @@
+MITK_CREATE_MODULE(
+  SUBPROJECTS
+  DEPENDS MitkCore MitkAlgorithmsExt MitkOpenCL
+  #AUTOLOAD_WITH MitkCore
+  INCLUDE_DIRS PUBLIC Algorithms/ITKUltrasound Algorithms Algorithms/OCL
+  INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
+  PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity
+)

@@ -26,9 +26,9 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
                                  const char *name,
                                  mitk::RenderingManager *rm,
                                  mitk::BaseRenderer::RenderingMode::Type rmtype)
-  : m_vtkRenderWindow(renWin), m_vtkRenderWindowInteractor(NULL), m_vtkMitkEventProvider(NULL)
+  : m_vtkRenderWindow(renWin), m_vtkRenderWindowInteractor(nullptr), m_vtkMitkEventProvider(nullptr)
 {
-  if (m_vtkRenderWindow == NULL)
+  if (m_vtkRenderWindow == nullptr)
   {
     m_vtkRenderWindow = vtkRenderWindow::New();
 

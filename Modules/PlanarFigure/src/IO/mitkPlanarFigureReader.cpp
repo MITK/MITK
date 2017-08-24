@@ -419,7 +419,7 @@ int mitk::PlanarFigureReader::CanReadFile(const char *name)
   // TiXmlDocument document(name);
   // if (document.LoadFile() == false)
   //  return false;
-  // return (document.FirstChildElement("PlanarFigure") != NULL);
+  // return (document.FirstChildElement("PlanarFigure") != nullptr);
 }
 
 bool mitk::PlanarFigureReader::CanReadFile(const std::string filename, const std::string, const std::string)
@@ -433,7 +433,7 @@ bool mitk::PlanarFigureReader::CanReadFile(const std::string filename, const std
   // TiXmlDocument document(filename);
   // if (document.LoadFile() == false)
   //  return false;
-  // return (document.FirstChildElement("PlanarFigure") != NULL);
+  // return (document.FirstChildElement("PlanarFigure") != nullptr);
 }
 
 void mitk::PlanarFigureReader::ResizeOutputs(const unsigned int &num)

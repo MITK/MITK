@@ -32,6 +32,10 @@ mitk::NavigationTool::NavigationTool() : m_Identifier("None"),
     m_ToolTipPosition[0] = 0;
     m_ToolTipPosition[1] = 0;
     m_ToolTipPosition[2] = 0;
+
+    m_ToolAxis[0] = 1;
+    m_ToolAxis[1] = 0;
+    m_ToolAxis[2] = 0;
   }
 
 mitk::NavigationTool::~NavigationTool()
@@ -82,6 +86,7 @@ void mitk::NavigationTool::Graft( const DataObject *data )
   m_ToolCalibrationLandmarks = nd->GetToolCalibrationLandmarks();
   m_ToolTipPosition = nd->GetToolTipPosition();
   m_ToolTipOrientation = nd->GetToolTipOrientation();
+  m_ToolAxis = nd->GetToolAxis();
 
 }
 

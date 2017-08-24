@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageDataItem.h"
 
+#include <typeinfo>
+
 namespace mitk
 {
   /**
@@ -31,8 +33,6 @@ namespace mitk
   template <class TPixel, unsigned int VDimension = 3>
   class ImagePixelAccessor
   {
-    friend class Image;
-
   public:
     typedef itk::Index<VDimension> IndexType;
     typedef ImagePixelAccessor<TPixel, VDimension> ImagePixelAccessorType;
@@ -40,6 +40,10 @@ namespace mitk
 
     /** Get Dimensions from ImageDataItem */
     int GetDimension(int i) const { return m_ImageDataItem->GetDimension(i); }
+
+  private:
+  friend class Image;
+
   protected:
     /**  \param ImageDataItem* specifies the allocated image part */
     ImagePixelAccessor(ImageConstPointer iP, const mitk::ImageDataItem *iDI) : m_ImageDataItem(iDI)
@@ -53,36 +57,41 @@ namespace mitk
 
     /** Destructor */
     virtual ~ImagePixelAccessor() {}
-    void CheckData(const Image *image)
+
+    void CheckData( const Image *image )
     {
       // Check if Dimensions are correct
-      if (m_ImageDataItem == nullptr)
+      if ( m_ImageDataItem == nullptr )
       {
-        if (image->GetDimension() != VDimension)
+        if ( image->GetDimension() != VDimension )
         {
-          mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and Image are not equal. They have to "
-                         "be equal if an entire image is requested";
+          mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and Image are not equal."
+          << " They have to be equal if an entire image is requested."
+          << " image->GetDimension(): " << image->GetDimension() << " , VDimension: " << VDimension;
         }
       }
       else
       {
-        if (m_ImageDataItem->GetDimension() != VDimension)
+        if ( m_ImageDataItem->GetDimension() != VDimension )
         {
-          mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
+          mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal."
+          << " m_ImageDataItem->GetDimension(): " << m_ImageDataItem->GetDimension() << " , VDimension: " << VDimension;
         }
       }
 
-      // Check if PixelType is correct
-      if (!(image->GetPixelType() == mitk::MakePixelType<itk::Image<TPixel, VDimension>>() ||
-            image->GetPixelType() ==
-              mitk::MakePixelType<itk::VectorImage<TPixel, VDimension>>(image->GetPixelType().GetNumberOfComponents())))
+      if (!( image->GetPixelType() == mitk::MakePixelType< itk::Image< TPixel, VDimension > >() ||
+             image->GetPixelType() == mitk::MakePixelType< itk::VectorImage< TPixel, VDimension > >
+               ( image->GetPixelType().GetNumberOfComponents() )
+         ) )
       {
-        mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
+        mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal."
+        << " image->GetPixelType(): " << typeid(image->GetPixelType()).name()
+        << "\n m_ImageDataItem->GetDimension(): " << m_ImageDataItem->GetDimension()
+        << " , VDimension: " << VDimension
+        << " , TPixel: " << typeid(TPixel).name()
+        << " , NumberOfComponents: " << image->GetPixelType().GetNumberOfComponents() << std::endl;
       }
     }
-
-  protected:
-    // protected members
 
     /** Holds the specified ImageDataItem */
     const ImageDataItem *m_ImageDataItem;

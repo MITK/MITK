@@ -33,6 +33,15 @@ QmitkUSNavigationStepZoneMarking::QmitkUSNavigationStepZoneMarking(QWidget *pare
   connect( ui->freezeButton, SIGNAL(SignalFreezed(bool)), this, SLOT(OnFreeze(bool)) );
   connect( ui->zonesWidget, SIGNAL(ZoneAdded()), this, SLOT(OnZoneAdded()) );
   connect( ui->zonesWidget, SIGNAL(ZoneRemoved()), this, SLOT(OnZoneRemoved()) );
+  connect(ui->showStructureList, SIGNAL(stateChanged(int)), this, SLOT(OnShowListClicked(int)));
+  ui->zonesLabel->setVisible(false);
+  ui->zonesWidget->setVisible(false);
+}
+
+void QmitkUSNavigationStepZoneMarking::OnShowListClicked(int state)
+{
+  ui->zonesLabel->setVisible(state);
+  ui->zonesWidget->setVisible(state);
 }
 
 QmitkUSNavigationStepZoneMarking::~QmitkUSNavigationStepZoneMarking()

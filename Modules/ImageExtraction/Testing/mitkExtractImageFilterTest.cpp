@@ -25,7 +25,7 @@ unsigned int CompareImageSliceTestHelper::m_Dimension1 = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceDimension = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceIndex = 0;
 bool CompareImageSliceTestHelper::m_ComparisonResult = false;
-mitk::Image *CompareImageSliceTestHelper::m_SliceImage = NULL;
+mitk::Image *CompareImageSliceTestHelper::m_SliceImage = nullptr;
 
 class mitkExtractImageFilterTestClass
 {
@@ -335,7 +335,7 @@ int mitkExtractImageFilterTest(int argc, char *argv[])
 
   // load the image
 
-  mitk::Image::Pointer image = NULL;
+  mitk::Image::Pointer image = nullptr;
   mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
@@ -397,7 +397,7 @@ int mitkExtractImageFilterTest(int argc, char *argv[])
   std::cout << "Testing filter destruction" << std::endl;
 
   // freeing
-  filter = NULL;
+  filter = nullptr;
 
   std::cout << "  (II) Freeing works." << std::endl;
 

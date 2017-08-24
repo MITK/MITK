@@ -94,7 +94,7 @@ void TestServiceFactoryModuleScope()
   US_TEST_CONDITION_REQUIRED(service.size() >= 1, "GetService()")
   InterfaceMap::const_iterator serviceIter = service.find("us::TestModuleH");
   US_TEST_CONDITION_REQUIRED(serviceIter != service.end(), "GetService()")
-  US_TEST_CONDITION_REQUIRED(serviceIter->second != NULL, "GetService()")
+  US_TEST_CONDITION_REQUIRED(serviceIter->second != nullptr, "GetService()")
 
   InterfaceMap service2 = mc->GetService(sr1);
   US_TEST_CONDITION(service == service2, "Same service pointer")

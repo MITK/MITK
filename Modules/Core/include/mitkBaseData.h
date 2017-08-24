@@ -267,7 +267,7 @@ namespace mitk
     virtual void SetTimeGeometry(TimeGeometry *geometry);
 
     /**
-    * \brief Set a clone of the provided TimeGeometry as TimeGeometry of the data.
+    * \brief Set a clone of the provided Geometry as Geometry of the data.
     * Assumes the data object has only 1 time step ( is a 3D object ) and
     * creates a new TimeGeometry. If an TimeGeometry has already
     * been set for the object, it will be replaced after calling this function.

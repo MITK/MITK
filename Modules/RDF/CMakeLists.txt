@@ -1,7 +1,6 @@
 mitk_create_module(
   DEPENDS MitkCore
   PACKAGE_DEPENDS Redland
-  WARNINGS_AS_ERRORS
 )
 
 add_subdirectory(Testing)

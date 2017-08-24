@@ -72,5 +72,5 @@ bool mitk::MouseReleaseEvent::IsEqual(const mitk::InteractionEvent &interactionE
 
 bool mitk::MouseReleaseEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<MouseReleaseEvent *>(baseClass.GetPointer()) != NULL);
+  return (dynamic_cast<MouseReleaseEvent *>(baseClass.GetPointer()) != nullptr);
 }

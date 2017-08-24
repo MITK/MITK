@@ -63,18 +63,6 @@ public:
 
   void SetTimesStep(int i); ///< which time step to display/model
 
-  ///@{
-  /**
-  * \brief Sets the SliceNavigationController of the three 2D Renderwindows.
-  *  If they are defined, they can be used to automatically set the crosshair to the selected point
-  *
-  * \deprecatedSince{2013_03} Use AddSliceNavigationController and RemoveSliceNavigationController instead.
-  */
-  DEPRECATED(void SetSnc1(mitk::SliceNavigationController *snc));
-  DEPRECATED(void SetSnc2(mitk::SliceNavigationController *snc));
-  DEPRECATED(void SetSnc3(mitk::SliceNavigationController *snc));
-  ///@}
-
   /**
    * @brief Add a mitk::SliceNavigationController instance.
    * @param snc The mitk::SliceNavigationController instance.
@@ -128,10 +116,6 @@ protected:
   void keyPressEvent(QKeyEvent *e) override;    ///< react to F2, F3 and DEL keys
   void wheelEvent(QWheelEvent *event) override; ///< change timestep of the current pointset by mouse wheel
   void fadeTimeStepIn();                        ///< fade a label with the currently shown timestep in
-
-  mitk::SliceNavigationController *m_Snc1;
-  mitk::SliceNavigationController *m_Snc2;
-  mitk::SliceNavigationController *m_Snc3;
 
   std::set<mitk::SliceNavigationController *> m_Sncs;
 

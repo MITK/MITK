@@ -97,7 +97,7 @@ mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes() const
   else
   {
     MITK_ERROR << "InteractionEventHandler::GetAttributes() requested, but not configuration loaded.";
-    return NULL;
+    return nullptr;
   }
 }
 

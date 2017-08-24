@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 #include <vtkLinearTransform.h>
-
-#include "mitkGL.h"
+#include "vtk_glew.h"
 
 mitk::ContourMapper2D::ContourMapper2D()
 {
@@ -32,7 +31,18 @@ mitk::ContourMapper2D::~ContourMapper2D()
 {
 }
 
-void mitk::ContourMapper2D::Paint(mitk::BaseRenderer *renderer)
+void mitk::ContourMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
+{
+  float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  // check for color prop and use it for rendering if it exists
+  GetDataNode()->GetColor(rgba, renderer, "color");
+  // check for opacity prop and use it for rendering if it exists
+  GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
+
+  glColor4fv(rgba);
+}
+
+void mitk::ContourMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -59,7 +69,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer *renderer)
     float vtkp[3];
     float lineWidth = 3.0;
 
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width")) != NULL)
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width")) != nullptr)
       lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width"))->GetValue();
     glLineWidth(lineWidth);
 

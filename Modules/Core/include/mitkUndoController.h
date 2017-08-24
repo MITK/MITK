@@ -111,7 +111,7 @@ namespace mitk
 
     //##Documentation
     //## @brief returns the last specified OperationEvent in Undo-list
-    //## corresponding to the given value; if nothing found, then returns NULL
+    //## corresponding to the given value; if nothing found, then returns nullptr
     OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType);
 
     //##Documentation

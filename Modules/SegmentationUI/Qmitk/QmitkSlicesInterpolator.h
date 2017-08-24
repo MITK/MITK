@@ -145,7 +145,7 @@ public slots:
   /**
     Call this from the outside to accept all interpolations
   */
-  void FinishInterpolation(mitk::SliceNavigationController *slicer = NULL);
+  void FinishInterpolation(mitk::SliceNavigationController *slicer = nullptr);
 
 protected slots:
 

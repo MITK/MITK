@@ -48,14 +48,14 @@ std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry:
 std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(
   const mitk::BaseData *baseData, const std::string &mimeType, us::ModuleContext *context)
 {
-  if (baseData == NULL)
+  if (baseData == nullptr)
   {
     mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
     std::vector<mitk::FileWriterRegistry::WriterReference> emptyResult;
     return emptyResult;
   }
 
-  if (context == NULL)
+  if (context == nullptr)
     context = us::GetModuleContext();
 
   std::vector<WriterReference> result;
@@ -81,9 +81,9 @@ mitk::IFileWriter *mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterReg
                                                        us::ModuleContext *context)
 {
   if (!ref)
-    return NULL;
+    return nullptr;
 
-  if (context == NULL)
+  if (context == nullptr)
     context = us::GetModuleContext();
 
   us::ServiceObjects<mitk::IFileWriter> serviceObjects = context->GetServiceObjects(ref);
@@ -96,14 +96,14 @@ std::vector<mitk::IFileWriter *> mitk::FileWriterRegistry::GetWriters(const mitk
                                                                       const std::string &mimeType,
                                                                       us::ModuleContext *context)
 {
-  if (baseData == NULL)
+  if (baseData == nullptr)
   {
     mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
     std::vector<mitk::IFileWriter *> emptyResult;
     return emptyResult;
   }
 
-  if (context == NULL)
+  if (context == nullptr)
     context = us::GetModuleContext();
 
   std::vector<mitk::IFileWriter *> result;

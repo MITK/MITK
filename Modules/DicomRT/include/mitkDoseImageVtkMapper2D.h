@@ -160,10 +160,10 @@ namespace mitk {
       vtkSmartPointer<vtkImageData> m_ReslicedImage;
       /** \brief Empty vtkPolyData that is set when rendering geometry does not
       *   intersect the image geometry.
-      *   \warning This member variable is set to NULL,
+      *   \warning This member variable is set to nullptr,
       *   if no image geometry is inside the plane geometry
       *   of the respective render window. Any user of this
-      *   slice has to check whether it is set to NULL!
+      *   slice has to check whether it is set to nullptr!
       */
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
       /** \brief Plane on which the slice is rendered as texture. */
@@ -205,7 +205,7 @@ namespace mitk {
     LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
     /** \brief Set the default properties for general image rendering. */
-    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
 
     /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
     * Detailed documentation about the modes can be found here: \link mitk::RenderingerModeProperty \endlink

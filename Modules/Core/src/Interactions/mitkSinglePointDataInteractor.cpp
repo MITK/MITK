@@ -45,7 +45,7 @@ void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction * /*stateMachi
 
   // To add a point the minimal information is the position, this method accepts all InteractionsPositionEvents
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     PointOperation *doOp;
     PointOperation *undoOp;
@@ -93,7 +93,7 @@ void mitk::SinglePointDataInteractor::DataNodeChanged()
   if (GetDataNode() != nullptr)
   {
     PointSet *points = dynamic_cast<PointSet *>(GetDataNode()->GetData());
-    if (points == NULL)
+    if (points == nullptr)
     {
       m_PointSet = PointSet::New();
       GetDataNode()->SetData(m_PointSet);

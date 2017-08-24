@@ -128,7 +128,7 @@ mitk::LinearSplitting<TLossAccumulator>::operator()(TDataSourceFeature const &co
     else // If Random split is selected, e.g. ExtraTree behaviour
     {
       int size = end - begin + 1;
-      srand(time(NULL));
+      srand(time(nullptr));
       int offset = rand() % size;
       TDataIterator iter = begin + offset;
 

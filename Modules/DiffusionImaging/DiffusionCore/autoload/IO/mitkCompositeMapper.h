@@ -100,7 +100,7 @@ namespace mitk {
       m_OdfMapper->ReleaseGraphicsResources(renderer);
     }
 
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false )
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false )
     {
       mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node, renderer, overwrite);
       mitk::CopyImageMapper2D::SetDefaultProperties(node, renderer, overwrite);

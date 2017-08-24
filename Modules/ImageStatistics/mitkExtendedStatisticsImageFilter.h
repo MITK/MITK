@@ -123,7 +123,7 @@ namespace itk
           }
           else
           {
-              return ITK_NULLPTR;
+              return nullptr;
           }
       }
 
@@ -179,7 +179,8 @@ namespace itk
 
     const RealObjectType* GetMedianOutput() const;
 
-    virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
+    using Superclass::MakeOutput;
+    virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx ) override;
 
 private:
     Array< RealType >       m_ThreadSum;

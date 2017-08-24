@@ -34,9 +34,9 @@ namespace itk {
 
 template< class TInPixelType >
 DwiNormilzationFilter< TInPixelType>::DwiNormilzationFilter()
-    :m_B0Index(-1)
-    ,m_ScalingFactor(1000)
-    ,m_UseGlobalReference(false)
+    : m_B0Index(-1)
+    , m_NewMean(1000)
+    , m_NewStdev(500)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -56,8 +56,68 @@ void DwiNormilzationFilter< TInPixelType>::BeforeThreadedGenerateData()
     if (m_B0Index==-1)
         itkExceptionMacro(<< "DwiNormilzationFilter: No b-Zero indecies found!");
 
-    if (m_UseGlobalReference)
-        MITK_INFO << "Using global reference value: " << m_Reference;
+    if (m_MaskImage.IsNull())
+    {
+      // initialize mask image
+      m_MaskImage = UcharImageType::New();
+      m_MaskImage->SetSpacing( inputImagePointer->GetSpacing() );
+      m_MaskImage->SetOrigin( inputImagePointer->GetOrigin() );
+      m_MaskImage->SetDirection( inputImagePointer->GetDirection() );
+      m_MaskImage->SetRegions( inputImagePointer->GetLargestPossibleRegion() );
+      m_MaskImage->Allocate();
+      m_MaskImage->FillBuffer(1);
+    }
+    else
+      std::cout << "DwiNormilzationFilter: using mask image" << std::endl;
+
+    InputIteratorType git( inputImagePointer, inputImagePointer->GetLargestPossibleRegion() );
+    MaskIteratorType mit( m_MaskImage, m_MaskImage->GetLargestPossibleRegion() );
+    git.GoToBegin();
+    mit.GoToBegin();
+
+    int n = 0;
+    m_Mean = 0;
+    m_Stdev = 0;
+    while( !git.IsAtEnd() )
+    {
+      if (mit.Get()>0)
+      {
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        {
+          if ((int)i==m_B0Index)
+            continue;
+          m_Mean += git.Get()[i];
+          n++;
+        }
+      }
+      ++git;
+      ++mit;
+    }
+    m_Mean /= n;
+
+    git.GoToBegin();
+    mit.GoToBegin();
+
+    while( !git.IsAtEnd() )
+    {
+      if (mit.Get()>0)
+      {
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        {
+          if ((int)i==m_B0Index)
+            continue;
+          double diff = (double)(git.Get()[i]) - m_Mean;
+          m_Stdev += diff*diff;
+        }
+      }
+      ++git;
+      ++mit;
+    }
+
+    m_Stdev = std::sqrt(m_Stdev/(n-1));
+
+    MITK_INFO << "Mean: " << m_Mean;
+    MITK_INFO << "Stdev: " << m_Stdev;
 }
 
 template< class TInPixelType >
@@ -68,45 +128,41 @@ void DwiNormilzationFilter< TInPixelType>::ThreadedGenerateData(const OutputImag
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
 
-    typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-    typename OutputImageType::PixelType nullPix;
-    nullPix.SetSize(inputImagePointer->GetVectorLength());
-    nullPix.Fill(0);
-
+    MaskIteratorType mit( m_MaskImage, outputRegionForThread );
+    mit.GoToBegin();
     InputIteratorType git( inputImagePointer, outputRegionForThread );
     git.GoToBegin();
+
     while( !git.IsAtEnd() )
     {
         typename InputImageType::PixelType pix = git.Get();
         typename OutputImageType::PixelType outPix;
         outPix.SetSize(inputImagePointer->GetVectorLength());
 
-        double S0 = pix[m_B0Index];
-        if (m_UseGlobalReference)
-            S0 = m_Reference;
-
-        if (S0>0.1 && pix[m_B0Index]>0)
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
         {
-            for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+            double val = (double)pix[i] - m_Mean;
+            val /= m_Stdev;
+            val *= m_NewStdev;
+            val += m_NewMean;
+            if (val<0)
             {
-                double val = (double)pix[i];
-
-                if (val!=val || val<0)
-                    val = 0;
-                else
-                {
-                    val /= S0;
-                    val *= (double)m_ScalingFactor;
-                }
-                outPix[i] = (TInPixelType)val;
+              val = 0;
+              MITK_INFO << "Negative value.";
             }
-            oit.Set(outPix);
+            if (val>32767)
+            {
+              val = 32767;
+              MITK_INFO << "Range overflow. Value is too large for datatype short.";
+            }
+            outPix[i] = (TInPixelType)val;
         }
-        else
-            oit.Set(nullPix);
 
+        oit.Set(outPix);
+
+        ++mit;
         ++oit;
         ++git;
     }

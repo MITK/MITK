@@ -76,7 +76,7 @@ void QmitkConvertMaskToLabelAction::Run( const QList<mitk::DataNode::Pointer> &s
     }
     else
     {
-      MITK_INFO << "   a NULL node was selected";
+      MITK_INFO << "   a nullptr node was selected";
     }
   }
 }

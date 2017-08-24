@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageToItk.h>
-#include <mitkImageWriter.h>
 #include <mitkPixelType.h>
 #include <mitkPlaneGeometry.h>
 
@@ -292,7 +291,7 @@ static ImageList LoadPreprocessedFiles(FileList files)
   ImageList images;
   for (unsigned int i = 0; i < files.size(); ++i)
   {
-    images.push_back(mitk::IOUtil::LoadImage(files.at(i)));
+    images.push_back(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(files.at(i))[0].GetPointer()));
   }
   return images;
 }
@@ -451,7 +450,7 @@ int main(int argc, char *argv[])
 
   // Now iterate over all data sets, extract overlay and add it to reference image
   mitk::Image *morphImage;
-  mitk::Image *segmentationImage = NULL;
+  mitk::Image *segmentationImage = nullptr;
 
   for (unsigned int i = 0; i < noOfTimeSteps; i++)
   {
@@ -483,7 +482,7 @@ int main(int argc, char *argv[])
     if (!blank)
     {
       segmentationImage = segImages.at(i);
-      if (segmentationImage != NULL)
+      if (segmentationImage != nullptr)
       {
         MITK_INFO << "-- Add Overlay";
         progressVis.AddColouredOverlay(rgbImage, segmentationImage, color);

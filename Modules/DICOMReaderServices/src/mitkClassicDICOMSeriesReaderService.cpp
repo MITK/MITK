@@ -26,7 +26,7 @@ namespace mitk {
   this->RegisterService();
 }
 
-  DICOMFileReader::Pointer ClassicDICOMSeriesReaderService::GetReader(const mitk::StringList& relevantFiles) const
+  DICOMFileReader::Pointer ClassicDICOMSeriesReaderService::GetReader(const mitk::StringList&) const
 {
   mitk::ClassicDICOMSeriesReader::Pointer reader = mitk::ClassicDICOMSeriesReader::New();
   return reader.GetPointer();

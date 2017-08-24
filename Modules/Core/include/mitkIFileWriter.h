@@ -87,7 +87,7 @@ namespace mitk
      * @brief Get the current output location.
      * @return The output location.
      *
-     * If no stream is set (i.e. GetOutputStream returns \c NULL), the
+     * If no stream is set (i.e. GetOutputStream returns \c nullptr), the
      * returned location string is required to represent a file-system path.
      */
     virtual std::string GetOutputLocation() const = 0;
@@ -97,7 +97,7 @@ namespace mitk
      * @param location A custom label for the output stream.
      * @param os The output stream.
      *
-     * If \c os is \c NULL, this clears the current output stream and \c location
+     * If \c os is \c nullptr, this clears the current output stream and \c location
      * is interpreted as a file-system path. Otherwise, \c location is a custom
      * label describing the output stream \c os.
      */

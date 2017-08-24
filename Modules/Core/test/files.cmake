@@ -87,7 +87,6 @@ set(MODULE_TESTS
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkUIDGeneratorTest.cpp
-  mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
   mitkAffineTransformBaseTest.cpp
   mitkPropertyAliasesTest.cpp
@@ -115,6 +114,8 @@ set(MODULE_TESTS
   mitkVectorPropertyTest.cpp
   mitkTemporoSpatialStringPropertyTest.cpp
   mitkPropertyNameHelperTest.cpp
+  mitkNodePredicateGeometryTest.cpp
+  mitkPreferenceListReaderOptionsFunctorTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

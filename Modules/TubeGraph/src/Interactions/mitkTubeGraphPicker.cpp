@@ -87,6 +87,6 @@ std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement *> mitk::TubeGr
       }
     }
   }
-  std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement *> pickedTubeWithElement(tubeId, tubeElement);
-  return pickedTubeWithElement;
+
+  return std::make_pair(tubeId, tubeElement);
 }

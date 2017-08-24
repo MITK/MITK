@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // MITK - DataCollection
-#include <mitkCollectionReader.h>
-#include <mitkCollectionWriter.h>
+#include <mitkDiffusionCollectionReader.h>
+#include <mitkDiffusionCollectionWriter.h>
 #include <mitkDataCollection.h>
 #include <mitkImageCast.h>
 
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
   mitk::DataCollection::Pointer trainCollection;
   mitk::DataCollection::Pointer testCollection;
   {
-    mitk::CollectionReader colReader;
+    mitk::DiffusionCollectionReader colReader;
     // Load only relevant images
     colReader.SetDataItemNames(loadIds);
     colReader.AddSubColIds(testingIds);
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
   if (outputFolder != "")
   {
     std::cout << "Saving files to " << outputFolder << std::endl;
-    mitk::CollectionWriter::ExportCollectionToFolder(trainCollection, "/tmp/dumple");
+    mitk::DiffusionCollectionWriter::ExportCollectionToFolder(trainCollection, "/tmp/dumple");
   }
 
   /* prepare target values to match training values:
@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
   if (outputFolder != "")
   {
     std::cout << "Saving files to " << outputFolder << std::endl;
-    mitk::CollectionWriter::ExportCollectionToFolder(testCollection, outputFolder);
+    mitk::DiffusionCollectionWriter::ExportCollectionToFolder(testCollection, outputFolder);
   }
 
   return EXIT_SUCCESS;

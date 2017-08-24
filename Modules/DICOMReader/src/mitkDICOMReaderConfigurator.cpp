@@ -194,7 +194,6 @@ mitk::DICOMReaderConfigurator
   const char* configDescriptionC = element->Attribute("description");
   if (configDescriptionC)
   {
-    std::string configDescription(configDescriptionC);
     reader->SetConfigurationDescription(configDescriptionC);
   }
 
@@ -442,7 +441,6 @@ mitk::DICOMReaderConfigurator
     throw std::invalid_argument( ss.str() );
   }
 
-  std::string name = requiredStringAttribute(xmlElement, "name");
   std::string groupS = requiredStringAttribute(xmlElement, "group");
   std::string elementS = requiredStringAttribute(xmlElement, "element");
 

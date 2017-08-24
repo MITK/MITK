@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QKeyEvent>
 
 QmitkPointListViewWidget::QmitkPointListViewWidget(QWidget *parent)
-  : QListWidget(parent), m_TimeStep(0), m_SelfCall(false), m_MultiWidget(NULL)
+  : QListWidget(parent), m_TimeStep(0), m_SelfCall(false), m_MultiWidget(nullptr)
 {
   QListWidget::setAlternatingRowColors(true);
   // logic

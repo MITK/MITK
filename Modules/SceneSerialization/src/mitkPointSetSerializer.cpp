@@ -30,7 +30,7 @@ mitk::PointSetSerializer::~PointSetSerializer()
 std::string mitk::PointSetSerializer::Serialize()
 {
   const PointSet *ps = dynamic_cast<const PointSet *>(m_Data.GetPointer());
-  if (ps == NULL)
+  if (ps == nullptr)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data
                << " is not an mitk::PointSet. Cannot serialize as pointset.";

@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
   auto strl = dir.entryList(filter.split(" "),QDir::Files);
 
   // load class mask
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(classmask);
+  mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(classmask)[0].GetPointer());
   unsigned int num_samples = 0;
   mitk::CLUtil::CountVoxel(mask,num_samples);
 
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
   for(int i = 0 ; i < strl.size(); i++)
   {
     // load feature image
-    mitk::Image::Pointer img = mitk::IOUtil::LoadImage(inputdir + strl[i].toStdString());
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputdir + strl[i].toStdString())[0].GetPointer());
     // transfom it into a [num_samples, 1] vector depending on the classmask
     Eigen::MatrixXd _x = mitk::CLUtil::Transform<double>(img,mask);
     // replace i-th (empty) col with feature vector in _x

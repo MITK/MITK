@@ -156,7 +156,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
     point = worldPlaneGeometry->GetOrigin();
     normal = worldPlaneGeometry->GetNormal();
     normal.Normalize();
-    m_Plane->SetTransform((vtkAbstractTransform *)NULL);
+    m_Plane->SetTransform((vtkAbstractTransform *)nullptr);
   }
   else
   {

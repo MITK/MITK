@@ -35,7 +35,7 @@ QmitkPropertyListPopup::QmitkPropertyListPopup(
   : QObject(parent, name),
     m_PopupMenu(new QMenu(name, dynamic_cast<QWidget *>(parent))),
     m_PropertyList(list),
-    m_MaterialEditor(NULL),
+    m_MaterialEditor(nullptr),
     m_NameMenuAction(0),
     m_VisibleMenuAction(0),
     m_ColorMenuAction(0),
@@ -131,7 +131,7 @@ void QmitkPropertyListPopup::fillPopup()
     m_NameMenuAction = new QAction(QString("Name..."), this);
     m_PopupMenu->addAction(m_NameMenuAction);
     mitk::StringProperty *nameProperty = dynamic_cast<mitk::StringProperty *>(m_PropertyList->GetProperty("name"));
-    m_NameMenuAction->setEnabled(nameProperty != NULL);
+    m_NameMenuAction->setEnabled(nameProperty != nullptr);
     if (nameProperty)
     {
       connect(m_NameMenuAction, SIGNAL(triggered()), this, SLOT(onNameClicked()));
@@ -141,7 +141,7 @@ void QmitkPropertyListPopup::fillPopup()
     m_VisibleMenuAction->setCheckable(true);
     m_PopupMenu->addAction(m_VisibleMenuAction);
     mitk::BoolProperty *visibleProperty = dynamic_cast<mitk::BoolProperty *>(m_PropertyList->GetProperty("visible"));
-    m_VisibleMenuAction->setEnabled(visibleProperty != NULL);
+    m_VisibleMenuAction->setEnabled(visibleProperty != nullptr);
     if (visibleProperty)
     {
       m_VisibleMenuAction->setChecked(visibleProperty->GetValue());
@@ -389,8 +389,8 @@ void QmitkPropertyListPopup::UpdateNodeMaterialOnPopupHiding(bool &changes)
   if (material)
   {
     mitk::DataNode *node = material->GetDataNode();
-    material->SetDataNode(NULL);
-    m_OriginalMaterial->SetDataNode(NULL);
+    material->SetDataNode(nullptr);
+    m_OriginalMaterial->SetDataNode(nullptr);
     if (!(*material == *m_OriginalMaterial))
     {
       changes = true;

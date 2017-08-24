@@ -16,10 +16,11 @@ namespace Utilities
 {
   ThreadPool::ThreadPool()
     : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
+    , m_id(0)
   {
     const auto count = boost::thread::hardware_concurrency();
     for (size_t i = 0; i < count; ++i) {
-      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)));
+      m_threads.insert(m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)))->get_id());
     }
   }
 
@@ -34,17 +35,202 @@ namespace Utilities
     return s_instance;
   }
 
+  size_t ThreadPool::Enqueue(const Task& task, TaskPriority priority)
+  {
+    UniqueLock lockTask(m_taskGuard);
+    const auto taskId = m_id++;
+    m_task.emplace(taskId, task);
+    lockTask.unlock();
+
+    UniqueLock lockQueue(m_queueGuard);
+    m_queue.emplace(priority, taskId);
+    lockQueue.unlock();
+
+    m_service.post([this] { DoTask(); });
+    return taskId;
+  }
+
+  bool ThreadPool::Dequeue(size_t taskId)
+  {
+    const UniqueLock lock(m_taskGuard);
+    if (m_runing.end() != m_runing.find(taskId)) {
+      return false;
+    }
+    m_task.erase(taskId);
+    m_event.notify_all();
+    return true;
+  }
+
+  size_t ThreadPool::Dequeue(const std::set<size_t>& taskIds)
+  {
+    size_t n = taskIds.size();
+    const UniqueLock lock(m_taskGuard);
+    for (auto id : taskIds) {
+      if (m_runing.end() == m_runing.find(id)) {
+        m_task.erase(id);
+      } else {
+        --n;
+      }
+    }
+    m_event.notify_all();
+    return n;
+  }
+
+  size_t ThreadPool::DequeueAll()
+  {
+    const UniqueLock lock(m_taskGuard);
+    for (auto it = m_task.begin(); it != m_task.end(); ) {
+      if (m_runing.end() == m_runing.find(it->first)) {
+        it = m_task.erase(it);
+      } else {
+        ++it;
+      }
+    }
+    m_event.notify_all();
+    return m_task.size();
+  }
+
+  bool ThreadPool::Empty() const
+  {
+    const SharedLock lock(m_taskGuard);
+    return m_task.empty();
+  }
+
+  size_t ThreadPool::DoTask()
+  {
+    UniqueLock lockQueue(m_queueGuard);
+    if (m_queue.empty()) {
+      return 0;
+    }
+    auto info = m_queue.top();
+    m_queue.pop();
+    lockQueue.unlock();
+
+    UniqueLock lockTask(m_taskGuard);
+    auto it = m_task.find(info.second);
+    if (m_task.end() == it) {
+      return info.second;
+    }
+    m_runing.insert(it->first);
+    lockTask.unlock();
+
+    it->second();
+
+    lockTask.lock();
+    m_runing.erase(it->first);
+    m_task.erase(it);
+    m_event.notify_all();
+    return info.second;
+  }
+
+  template <typename TCheck>
+  void ThreadPool::Wait(const TCheck& check)
+  {
+    if (IsThisThreadInPool()) {
+      while (!check()) {
+        DoTask();
+      }
+      return;
+    }
+
+    const auto isMain = isGuiThread();
+    
+    while (!check()) {
+      if (isMain) {
+        for (;;)
+        {
+          QCoreApplication::processEvents();
+
+          SharedLock lock(m_taskGuard);
+          if (boost::cv_status::timeout != m_event.wait_for(lock, boost::chrono::milliseconds(10))) {
+            break;
+          }
+        }
+      } else {
+        SharedLock lock(m_taskGuard);
+        m_event.wait(lock);
+      }
+    }
+  }
+
+  size_t ThreadPool::WaitFirst(const std::set<size_t>& ids, volatile bool * stop)
+  {
+    size_t id;
+    if (ids.empty()) {
+      return id;
+    }
+    auto check = [this, &id, &ids, stop]() -> bool {
+      if (stop && *stop) {
+        return true;
+      }
+      const SharedLock lock(m_taskGuard);
+      for (auto task : ids) {
+        if (m_task.end() != m_task.find(task)) {
+          continue;
+        }
+        id = task;
+        return true;
+      }
+      return false;
+    };
+    Wait(check);
+    return id;
+  }
+
+  void ThreadPool::WaitAll(std::set<size_t> ids, volatile bool * stop)
+  {
+    auto check = [this, &ids, stop]() -> bool {
+      if (stop && *stop) {
+        return true;
+      }
+      const SharedLock lock(m_taskGuard);
+      for (auto it = ids.begin(); it != ids.end(); ) {
+        if (m_task.end() != m_task.find(*it)) {
+          ++it;
+        } else {
+          it = ids.erase(it);
+        }
+      }
+      return ids.empty();
+    };
+    Wait(check);
+  }
+
+  void ThreadPool::WaitAll(volatile bool * stop)
+  {
+    auto check = [this, stop]() -> bool {
+      if (stop && *stop) {
+        return true;
+      }
+      const SharedLock lock(m_taskGuard);
+      return m_task.empty();
+    };
+    Wait(check);
+  }
+
+  bool ThreadPool::Check(const std::set<size_t>& ids) const
+  {
+    const SharedLock lock(m_taskGuard);
+    for (auto task : ids) {
+      if (m_task.end() != m_task.find(task)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool ThreadPool::IsThisThreadInPool() const
+  {
+    return m_threads.end() != m_threads.find(boost::this_thread::get_id());
+  }
+
   TaskGroup::TaskGroup()
     : m_pool(ThreadPool::Instance())
-    , m_count(0)
-    , m_valid(true)
   {
   }
 
   TaskGroup::TaskGroup(ThreadPool& pool)
     : m_pool(pool)
-    , m_count(0)
-    , m_valid(true)
   {
   }
 
@@ -53,43 +239,97 @@ namespace Utilities
     Stop();
   }
 
-  bool TaskGroup::WaitFirst()
-  {
-    Lock lock(m_mutex);
-    if (!m_count)
-      return true;
-    return Wait(lock, isGuiThread());
-  }
-
-  bool TaskGroup::WaitAll()
-  {
-    Lock lock(m_mutex);
-    for (const auto isMain = isGuiThread(); !!m_count; Wait(lock, isMain)) {}
-    return m_valid && !!m_count;
-  }
-
-  bool TaskGroup::Wait(Lock& lock, bool isMain)
-  {
-    if (isMain) {
-      while (boost::cv_status::timeout == m_event.wait_for(lock, boost::chrono::milliseconds(10)))
-      {
-        QCoreApplication::processEvents();
-      }
-    } else {
-      m_event.wait(lock);
-    }
-    return m_valid;
-  }
-
   void TaskGroup::Stop()
   {
     Lock lock(m_mutex);
-    m_valid = false;
-    m_event.notify_all();
+    const auto ids = m_ids;
+    lock.unlock();
+    m_pool.Dequeue(std::move(ids));
   }
 
-  bool TaskGroup::Empty() const
+  bool TaskGroup::WaitFirst(volatile bool * stop)
   {
-    return !m_count;
+    if (stop && *stop) {
+      return false;
+    }
+
+    Lock lock(m_mutex);
+    const auto ids = m_ids;
+    lock.unlock();
+
+    const auto id = m_pool.WaitFirst(std::move(ids), stop);
+    if (stop && *stop) {
+      return false;
+    }
+
+    lock.lock();
+    m_ids.erase(id);
+    return !stop || !*stop;
+  }
+
+  bool TaskGroup::WaitAll(volatile bool * stop)
+  {
+    while (!stop || !*stop) {
+      Lock lock(m_mutex);
+      const auto ids = m_ids;
+      lock.unlock();
+
+      m_pool.WaitAll(ids, stop);
+      if (stop && *stop) {
+        return false;
+      }
+
+      lock.lock();
+      for (auto id : ids) {
+        m_ids.erase(id);
+      }
+      if (m_ids.empty()) {
+        break;
+      }
+    }
+    return !stop || !*stop;
+  }
+
+  bool TaskGroup::Empty(bool check) const
+  {
+    const Lock lock(m_mutex);
+    return check ? m_pool.Check(m_ids) : m_ids.empty();
+  }
+
+  void TaskGroup::Enqueue(const Task& task, TaskPriority priority)
+  {
+    const Lock lock(m_mutex);
+    m_ids.insert(m_pool.Enqueue(task, priority));
+  }
+
+  NoLockedTask::NoLockedTask(ThreadPool& pool, const Task& task, TaskPriority priority)
+    : m_group(pool)
+  {
+    m_group.Enqueue(task, priority);
+  }
+
+  NoLockedTask::NoLockedTask(const Task& task, TaskPriority priority)
+  {
+    m_group.Enqueue(task, priority);
+  }
+
+  NoLockedTask::~NoLockedTask()
+  {
+    m_group.WaitAll();
+  }
+
+  void NoLockedTask::Wait()
+  {
+    m_group.WaitAll();
+  }
+
+  void NoLockedTask::Stop()
+  {
+    m_group.Stop();
+  }
+
+  bool NoLockedTask::Complete(bool check) const
+  {
+    return m_group.Empty(check);
   }
 }

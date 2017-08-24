@@ -1,8 +1,14 @@
 #pragma once
 
+#include <queue>
+#include <map>
+#include <set>
+#include <initializer_list>
+
 #include <boost/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/optional.hpp>
@@ -11,29 +17,63 @@
 
 namespace Utilities
 {
+  enum class TaskPriority
+  {
+    CRITICAL,
+    HI,
+    NORMAL,
+    LOW,
+    LOWEST
+  };
+
+  typedef std::function<void()> Task;
+
   class MITKUTILITIES_EXPORT ThreadPool : private boost::noncopyable
   {
   public:
     ThreadPool();
     ~ThreadPool();
 
-    template <typename TTask>
-    void Enqueue(const TTask& task);
+    size_t Enqueue(const Task& task, TaskPriority priority = TaskPriority::NORMAL);
+
+    bool Dequeue(size_t taskId);
+    size_t Dequeue(const std::set<size_t>& taskIds);
+    size_t DequeueAll();
+
+    bool Empty() const;
+
+    size_t WaitFirst(const std::set<size_t>& ids, volatile bool * stop = nullptr);
+    void WaitAll(std::set<size_t> ids, volatile bool * stop = nullptr);
+    void WaitAll(volatile bool * stop = nullptr);
+
+    bool Check(const std::set<size_t>& ids) const;
 
     static ThreadPool& Instance();
 
   private:
+    typedef boost::unique_lock<boost::shared_mutex> UniqueLock;
+    typedef boost::shared_lock<boost::shared_mutex> SharedLock;
+
+    size_t DoTask();
+    bool IsThisThreadInPool() const;
+    template <typename TCheck>
+    void Wait(const TCheck& check);
+
     boost::asio::io_service m_service;
     boost::optional<boost::asio::io_service::work> m_work;
     boost::thread_group m_pool;
     boost::system::error_code m_error;
-  };
+    std::set<boost::thread::id> m_threads;
 
-  template <typename TTask>
-  void ThreadPool::Enqueue(const TTask& task)
-  {
-    m_service.post(task);
-  }
+    boost::shared_mutex m_queueGuard;
+    size_t m_id;
+    std::priority_queue<std::pair<TaskPriority, size_t>> m_queue;
+
+    mutable boost::shared_mutex m_taskGuard;
+    std::map<size_t, Task> m_task;
+    std::set<size_t> m_runing;
+    boost::condition_variable_any m_event;
+  };
 
   class MITKUTILITIES_EXPORT TaskGroup : private boost::noncopyable
   {
@@ -43,46 +83,39 @@ namespace Utilities
 
     ~TaskGroup();
 
-    template <typename TTask>
-    bool Enqueue(const TTask& task);
+    void Enqueue(const Task& task, TaskPriority priority = TaskPriority::NORMAL);
 
-    bool WaitFirst();
-    bool WaitAll();
+    bool WaitFirst(volatile bool * stop = nullptr);
+    bool WaitAll(volatile bool * stop = nullptr);
 
     void Stop();
-    bool Empty() const;
+
+    bool Empty(bool check = false) const;
 
   private:
     typedef boost::recursive_mutex::scoped_lock Lock;
 
-    bool Wait(Lock& lock, bool isMain);
-
     ThreadPool& m_pool;
-    boost::recursive_mutex m_mutex;
-    boost::condition_variable_any m_event;
-    volatile size_t m_count;
-    volatile bool m_valid;
+
+    mutable boost::recursive_mutex m_mutex;
+    std::set<size_t> m_ids;
   };
 
-  template <typename TTask>
-  bool TaskGroup::Enqueue(const TTask& task)
+  class MITKUTILITIES_EXPORT NoLockedTask : private boost::noncopyable
   {
-    {
-      const Lock lock(m_mutex);
-      if (!m_valid) {
-        return false;
-      }
-      ++m_count;
-    }
-    m_pool.Enqueue([this, task] {
-      if (!m_valid) {
-        return;
-      }
-      task();
-      const Lock lock(m_mutex);
-      --m_count;
-      m_event.notify_all();
-    });
-    return true;
-  }
+  public:
+    NoLockedTask(ThreadPool& pool, const Task& task, TaskPriority priority = TaskPriority::NORMAL);
+    explicit NoLockedTask(const Task& task, TaskPriority priority = TaskPriority::NORMAL);
+
+    ~NoLockedTask();
+
+    void Wait();
+
+    void Stop();
+
+    bool Complete(bool check = true) const;
+
+  private:
+    TaskGroup m_group;
+  };
 }

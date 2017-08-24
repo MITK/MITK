@@ -26,11 +26,9 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
-| Ubuntu Linux 14.04 (x64)            | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
-| Ubuntu Linux 12.04 (x64)            | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
-| Microsoft Windows 7 (x64)           | MSVC 2012 Express Update 4
-| Apple OS X 10.10 "Yosemite"         | Clang 6.0
-
+| Ubuntu Linux 14.04  (x64)           | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
+| Ubuntu Linux 16.04  (x64)           | GNU 4.9
+| Microsoft Windows 7 (x64)           | MSVC 2013 Community Update 5
 
 Tier 2 Platforms
 ----------------
@@ -42,9 +40,9 @@ as well as in the current master branch.
 
 | Platform                           | Compilers
 | ---------------------------------- | --------------------------------------------------
-| Ubuntu Linux 12.04 (x86)           | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
-| Microsoft Windows 7 (x64)          | MSVC 2012 Express Update 4 (x86)
-| Microsoft Windows 8 (x64)          | MSVC 2013 Community Update 4
+| Microsoft Windows 10 (x64)         | MSVC 2013 Community Update 5
+| Microsoft Windows 10 (x64)         | MSVC 2015 Community
+| Apple OS X 10.10 "Yosemite"        | Clang 6.0
 | Apple OS X 10.9 "Mavericks"        | Clang 5.0
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept

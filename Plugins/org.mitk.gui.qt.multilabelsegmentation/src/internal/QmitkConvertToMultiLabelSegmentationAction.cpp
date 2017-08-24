@@ -72,12 +72,12 @@ void QmitkConvertToMultiLabelSegmentationAction::SetFunctionality(berry::QtViewP
   //not needed
 }
 
-void QmitkConvertToMultiLabelSegmentationAction::SetSmoothed(bool smoothed)
+void QmitkConvertToMultiLabelSegmentationAction::SetSmoothed(bool)
 {
   //not needed
 }
 
-void QmitkConvertToMultiLabelSegmentationAction::SetDecimated(bool decimated)
+void QmitkConvertToMultiLabelSegmentationAction::SetDecimated(bool)
 {
   //not needed
 }

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef BERRY_NULLPROGRESSMONITOR_H
-#define BERRY_NULLPROGRESSMONITOR_H
+#ifndef BERRY_nullptrPROGRESSMONITOR_H
+#define BERRY_nullptrPROGRESSMONITOR_H
 
 #include <string>
 #include "berryIProgressMonitor.h"
@@ -130,4 +130,4 @@ private:
 
 }
 
-#endif /* BERRY_NULLPROGRESSMONITOR_H  */
+#endif /* BERRY_nullptrPROGRESSMONITOR_H  */

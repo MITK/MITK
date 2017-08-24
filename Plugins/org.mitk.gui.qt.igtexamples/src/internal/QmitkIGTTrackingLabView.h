@@ -146,7 +146,7 @@ Ui::QmitkIGTTrackingLabViewControls m_Controls;
 /**
 \brief This method creates all widgets this bundle needs.
 */
-void CreateBundleWidgets( QWidget* parent );
+void CreateBundleWidgets();
 /**
 \brief This method creates the SIGNAL SLOT connections.
 */

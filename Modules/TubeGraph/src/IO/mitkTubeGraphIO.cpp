@@ -124,9 +124,7 @@ namespace mitk
       if (pElem != 0)
       {
         // walk through the vertices
-        TiXmlElement *vertexElement = pElem->FirstChildElement();
-
-        for (vertexElement; vertexElement; vertexElement = vertexElement->NextSiblingElement())
+        for (TiXmlElement *vertexElement = pElem->FirstChildElement(); vertexElement != nullptr; vertexElement = vertexElement->NextSiblingElement())
         {
           int vertexID(0);
           mitk::Point3D coordinate;
@@ -150,7 +148,7 @@ namespace mitk
           vertexData.SetTubeElement(newElement);
 
           mitk::TubeGraph::VertexDescriptorType newVertex = newTubeGraph->AddVertex(vertexData);
-          if (newVertex != vertexID)
+          if (static_cast<int>(newVertex) != vertexID)
           {
             MITK_ERROR << "Aborting tube graph creation, different vertex ids.";
             return result;
@@ -161,12 +159,11 @@ namespace mitk
 
       // read edges
       pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_EDGES).Element();
-      if (pElem != 0)
+      if (pElem != nullptr)
       {
         // walk through the edges
-        TiXmlElement *edgeElement = pElem->FirstChildElement();
-
-        for (edgeElement; edgeElement; edgeElement = edgeElement->NextSiblingElement())
+        auto edgeElement = pElem->FirstChildElement();
+        for ( ; edgeElement != nullptr; edgeElement = edgeElement->NextSiblingElement())
         {
           int edgeID(0), edgeSourceID(0), edgeTargetID(0);
           mitk::Point3D coordinate;
@@ -178,8 +175,7 @@ namespace mitk
 
           mitk::TubeGraphEdge edgeData;
 
-          TiXmlElement *tubeElement = edgeElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_ELEMENT);
-          for (tubeElement; tubeElement; tubeElement = tubeElement->NextSiblingElement())
+          for (TiXmlElement *tubeElement = edgeElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_ELEMENT); tubeElement != nullptr; tubeElement = tubeElement->NextSiblingElement())
           {
             tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X, &temp);
             coordinate[0] = temp;
@@ -221,9 +217,7 @@ namespace mitk
       if (pElem != 0)
       {
         // walk through the label groups
-        TiXmlElement *labelGroupElement = pElem->FirstChildElement();
-
-        for (labelGroupElement; labelGroupElement; labelGroupElement = labelGroupElement->NextSiblingElement())
+        for (TiXmlElement *labelGroupElement = pElem->FirstChildElement(); labelGroupElement != nullptr; labelGroupElement = labelGroupElement->NextSiblingElement())
         {
           mitk::TubeGraphProperty::LabelGroup *newLabelGroup = new mitk::TubeGraphProperty::LabelGroup();
           const char *labelGroupName;
@@ -233,11 +227,7 @@ namespace mitk
           if (labelGroupName)
             newLabelGroup->labelGroupName = labelGroupName;
 
-          // labelGroupElement->Attribute(mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME, &labelGroupName);
-          // newLabelGroup.labeGroupName = labelGroupName;
-
-          TiXmlElement *labelElement = labelGroupElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_LABEL);
-          for (labelElement; labelElement; labelElement = labelElement->NextSiblingElement())
+          for (TiXmlElement *labelElement = labelGroupElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_LABEL); labelElement != nullptr; labelElement = labelElement->NextSiblingElement())
           {
             mitk::TubeGraphProperty::LabelGroup::Label *newLabel = new mitk::TubeGraphProperty::LabelGroup::Label();
             const char *labelName;
@@ -271,9 +261,8 @@ namespace mitk
       pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTIONS).Element();
       if (pElem != 0)
       {
-        TiXmlElement *tubeToLabelElement = pElem->FirstChildElement();
         std::map<TubeGraphProperty::TubeToLabelGroupType, std::string> tubeToLabelsMap;
-        for (tubeToLabelElement; tubeToLabelElement; tubeToLabelElement = tubeToLabelElement->NextSiblingElement())
+        for (TiXmlElement *tubeToLabelElement = pElem->FirstChildElement(); tubeToLabelElement != nullptr; tubeToLabelElement = tubeToLabelElement->NextSiblingElement())
         {
           TubeGraph::TubeDescriptorType tube;
           mitk::TubeGraphProperty::LabelGroup *labelGroup = new mitk::TubeGraphProperty::LabelGroup();
@@ -293,7 +282,7 @@ namespace mitk
           if (labelName)
             label = newProperty->GetLabelByName(labelGroup, labelName);
 
-          if (tube != TubeGraph::ErrorId && labelGroup != NULL && label != NULL)
+          if (tube != TubeGraph::ErrorId && labelGroup != nullptr && label != nullptr)
           {
             TubeGraphProperty::TubeToLabelGroupType tubeToLabelGroup(tube, labelGroupName);
             tubeToLabelsMap.insert(
@@ -307,8 +296,7 @@ namespace mitk
       pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_ANNOTATIONS).Element();
       if (pElem != 0)
       {
-        TiXmlElement *annotationElement = pElem->FirstChildElement();
-        for (annotationElement; annotationElement; annotationElement = annotationElement->NextSiblingElement())
+        for (TiXmlElement *annotationElement = pElem->FirstChildElement(); annotationElement != nullptr; annotationElement = annotationElement->NextSiblingElement())
         {
           mitk::TubeGraphProperty::Annotation *annotation = new mitk::TubeGraphProperty::Annotation();
           std::string annotationName;

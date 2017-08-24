@@ -53,7 +53,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
     for (TiXmlElement *element = document.FirstChildElement(mitk::InteractionEventConst::xmlTagInteractions())
                                    ->FirstChildElement(mitk::InteractionEventConst::xmlTagConfigRoot())
                                    ->FirstChildElement(mitk::InteractionEventConst::xmlTagRenderer());
-         element != NULL;
+         element != nullptr;
          element = element->NextSiblingElement(mitk::InteractionEventConst::xmlTagRenderer()))
     {
       // get name of renderer
@@ -62,7 +62,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
       // get view direction
       mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Axial;
-      if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection()) != NULL)
+      if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection()) != nullptr)
       {
         int viewDirectionNum =
           std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection())->c_str());
@@ -71,7 +71,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
       // get mapper slot id
       mitk::BaseRenderer::MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
-      if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID()) != NULL)
+      if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID()) != nullptr)
       {
         int mapperIDNum =
           std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID())->c_str());
@@ -81,22 +81,22 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       // Get Size of Render Windows
       int size[3];
       size[0] = size[1] = size[2] = 0;
-      if (element->Attribute(mitk::InteractionEventConst::xmlRenderSizeX()) != NULL)
+      if (element->Attribute(mitk::InteractionEventConst::xmlRenderSizeX()) != nullptr)
       {
         size[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeX())->c_str());
       }
-      if (element->Attribute(mitk::InteractionEventConst::xmlRenderSizeY()) != NULL)
+      if (element->Attribute(mitk::InteractionEventConst::xmlRenderSizeY()) != nullptr)
       {
         size[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeY())->c_str());
       }
-      if (element->Attribute(mitk::InteractionEventConst::xmlRenderSizeZ()) != NULL)
+      if (element->Attribute(mitk::InteractionEventConst::xmlRenderSizeZ()) != nullptr)
       {
         size[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeZ())->c_str());
       }
 
       // create renderWindow, renderer and dispatcher
       mitk::RenderWindow::Pointer rw =
-        mitk::RenderWindow::New(NULL, rendererName, rm); // VtkRenderWindow is created within constructor if NULL
+        mitk::RenderWindow::New(nullptr, rendererName, rm); // VtkRenderWindow is created within constructor if nullptr
 
       if (size[0] != 0 && size[1] != 0)
       {
@@ -120,7 +120,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
       if (mapperID == mitk::BaseRenderer::Standard3D)
       {
-        if (element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX()) != NULL)
+        if (element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX()) != nullptr)
         {
           double cameraFocalPoint[3];
 
@@ -133,7 +133,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
           rw->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(cameraFocalPoint);
         }
 
-        if (element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX()) != NULL)
+        if (element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX()) != nullptr)
         {
           double cameraPosition[3];
 
@@ -143,7 +143,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
           rw->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(cameraPosition);
         }
 
-        if (element->Attribute(mitk::InteractionEventConst::xmlViewUpX()) != NULL)
+        if (element->Attribute(mitk::InteractionEventConst::xmlViewUpX()) != nullptr)
         {
           double viewUp[3];
 
@@ -286,7 +286,7 @@ mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByName(const std
       return (*it).GetPointer();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByDefaultViewDirection(
@@ -301,7 +301,7 @@ mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByDefaultViewDir
       return (*it).GetPointer();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindow(unsigned int index)
@@ -312,7 +312,7 @@ mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindow(unsigned int in
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -361,7 +361,7 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
     for (TiXmlElement *element = document.FirstChildElement(mitk::InteractionEventConst::xmlTagInteractions())
                                    ->FirstChildElement(mitk::InteractionEventConst::xmlTagConfigRoot())
                                    ->FirstChildElement(mitk::InteractionEventConst::xmlTagRenderer());
-         element != NULL;
+         element != nullptr;
          element = element->NextSiblingElement(mitk::InteractionEventConst::xmlTagRenderer()))
     {
       // get name of renderer
@@ -370,7 +370,7 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
 
       // get mapper slot id
       mitk::BaseRenderer::MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
-      if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID()) != NULL)
+      if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID()) != nullptr)
       {
         int mapperIDNum =
           std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID())->c_str());
@@ -397,7 +397,7 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
         }
         namedRenderer->GetRenderer()->PrepareRender();
 
-        if (element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX()) != NULL)
+        if (element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX()) != nullptr)
         {
           double cameraFocalPoint[3];
 
@@ -410,7 +410,7 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
           namedRenderer->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(cameraFocalPoint);
         }
 
-        if (element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX()) != NULL)
+        if (element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX()) != nullptr)
         {
           double cameraPosition[3];
 
@@ -420,7 +420,7 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
           namedRenderer->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(cameraPosition);
         }
 
-        if (element->Attribute(mitk::InteractionEventConst::xmlViewUpX()) != NULL)
+        if (element->Attribute(mitk::InteractionEventConst::xmlViewUpX()) != nullptr)
         {
           double viewUp[3];
 

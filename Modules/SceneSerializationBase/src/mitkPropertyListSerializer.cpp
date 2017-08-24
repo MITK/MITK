@@ -36,7 +36,7 @@ std::string mitk::PropertyListSerializer::Serialize()
 
   if (m_PropertyList.IsNull() || m_PropertyList->IsEmpty())
   {
-    MITK_ERROR << "Not serializing NULL or empty PropertyList";
+    MITK_ERROR << "Not serializing nullptr or empty PropertyList";
     return "";
   }
 

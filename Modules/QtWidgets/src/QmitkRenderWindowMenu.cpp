@@ -50,7 +50,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
                                              Qt::WindowFlags f,
                                              mitk::BaseRenderer *b,
                                              QmitkStdMultiWidget *mw)
-  : QWidget(NULL, Qt::Tool | Qt::FramelessWindowHint),
+  : QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint),
 
 #else
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
@@ -60,8 +60,8 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
   : QWidget(parent, f),
 #endif
 
-    m_Settings(NULL),
-    m_CrosshairMenu(NULL),
+    m_Settings(nullptr),
+    m_CrosshairMenu(nullptr),
     m_Layout(0),
     m_LayoutDesign(0),
     m_OldLayoutDesign(0),
@@ -364,7 +364,7 @@ void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
 /// \brief
 void QmitkRenderWindowMenu::OnSettingsButton(bool /*checked*/)
 {
-  if (m_Settings == NULL)
+  if (m_Settings == nullptr)
     this->CreateSettingsWidget();
 
   QPoint point = this->mapToGlobal(m_SettingsButton->geometry().topLeft());
@@ -531,7 +531,7 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(int layoutDesignIndex)
 {
   m_LayoutDesign = layoutDesignIndex;
 
-  if (m_Settings == NULL)
+  if (m_Settings == nullptr)
     this->CreateSettingsWidget();
 
   switch (m_LayoutDesign)

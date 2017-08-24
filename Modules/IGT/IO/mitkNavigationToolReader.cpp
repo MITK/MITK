@@ -49,7 +49,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   if (!file.good())
   {
     m_ErrorMessage = "Cannot open '" + filename + "' for reading";
-    return NULL;
+    return nullptr;
   }
 
   std::string tempDirectory = m_ToolfilePath + GetFileWithoutPath(filename);
@@ -63,7 +63,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   if (loadedStorage->GetAll()->size() == 0 || loadedStorage.IsNull())
   {
     m_ErrorMessage = "Invalid file: cannot parse tool data.";
-    return NULL;
+    return nullptr;
   }
 
   //convert the DataStorage back to a NavigationTool-Object
@@ -84,6 +84,9 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(node->GetName());
   newNode->SetData(node->GetData());
+  bool visible = true;
+  node->GetVisibility(visible, NULL);
+  newNode->SetVisibility(visible);
   returnValue->SetDataNode(newNode);
 
   //Identifier
@@ -184,6 +187,11 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   {
     MITK_WARN << "Tooltip definition incomplete: position and orientation have to be set! Skipping tooltip definition.";
   }
+
+  //Tool Axis
+  std::string ToolAxisString;
+  node->GetStringProperty("ToolAxis", ToolAxisString);
+  returnValue->SetToolAxis(ConvertStringToPoint(ToolAxisString));
 
   return returnValue;
 }

@@ -49,7 +49,7 @@ namespace mitk
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
   protected:
-    MouseWheelEvent(BaseRenderer * = NULL,
+    MouseWheelEvent(BaseRenderer * = nullptr,
                     const Point2D &mousePosition = Point2D(),
                     MouseButtons buttonStates = NoButton,
                     ModifierKeys modifiers = NoKey,

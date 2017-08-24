@@ -51,7 +51,7 @@ public:
   void TestComputeNormals()
   {
     mitk::Surface::Pointer contour =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"))[0].GetPointer());
     m_ContourNormalsFilter->SetInput(contour);
     m_ContourNormalsFilter->Update();
     // Get the computed normals (basically lines)
@@ -60,9 +60,9 @@ public:
     mitk::Surface::Pointer contourWithNormals = m_ContourNormalsFilter->GetOutput();
 
     mitk::Surface::Pointer referenceContour =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourWithNormals.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourWithNormals.vtk"))[0].GetPointer());
     mitk::Surface::Pointer referenceNormals =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourNormals.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourNormals.vtk"))[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE(
       "Unequal contours",
@@ -76,10 +76,10 @@ public:
   void TestComputeNormalsWithHole()
   {
     mitk::Image::Pointer segmentationImage =
-      mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"));
+      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"))[0].GetPointer());
 
     mitk::Surface::Pointer contour =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/ComputeNormals/ContourWithHoles.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/ComputeNormals/ContourWithHoles.vtk"))[0].GetPointer());
     m_ContourNormalsFilter->SetInput(contour);
     m_ContourNormalsFilter->SetSegmentationBinaryImage(segmentationImage);
     m_ContourNormalsFilter->Update();
@@ -87,9 +87,9 @@ public:
     mitk::Surface::Pointer normals = m_ContourNormalsFilter->GetNormalsAsSurface();
 
     mitk::Surface::Pointer contourReference =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourWithHolesWithNormals.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourWithHolesWithNormals.vtk"))[0].GetPointer());
     mitk::Surface::Pointer normalsReference =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/NormalsWithHoles.vtk"));
+      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/NormalsWithHoles.vtk"))[0].GetPointer());
 
     CPPUNIT_ASSERT_MESSAGE(
       "Error computing normals",

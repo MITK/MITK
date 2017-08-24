@@ -52,6 +52,11 @@ public:
 
   static std::string FIBERBUNDLE_MIMETYPE_DESCRIPTION();
 
+  // ------------------------------ MRtrix formats ----------------------------------
+
+  static CustomMimeType FIBERBUNDLE_TCK_MIMETYPE();
+  static std::string FIBERBUNDLE_TCK_MIMETYPE_NAME();
+
   // ------------------------------ TrackVis formats ----------------------------------
 
   static CustomMimeType FIBERBUNDLE_TRK_MIMETYPE();
@@ -88,10 +93,12 @@ public:
   static std::string CONNECTOMICS_MIMETYPE_DESCRIPTION();
 
   static CustomMimeType PLANARFIGURECOMPOSITE_MIMETYPE();
-
   static std::string PLANARFIGURECOMPOSITE_MIMETYPE_NAME();
-
   static std::string PLANARFIGURECOMPOSITE_MIMETYPE_DESCRIPTION();
+
+  static CustomMimeType TRACTOGRAPHYFOREST_MIMETYPE();
+  static std::string TRACTOGRAPHYFOREST_MIMETYPE_NAME();
+  static std::string TRACTOGRAPHYFOREST_MIMETYPE_DESCRIPTION();
 
 private:
 

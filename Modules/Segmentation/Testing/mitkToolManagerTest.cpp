@@ -24,18 +24,18 @@ public:
   static void TestToolManagerWithOutTools(mitk::ToolManager::Pointer toolManager)
   {
     MITK_TEST_CONDITION(toolManager->GetTools().size() == 0, "Get empty tool list")
-    MITK_TEST_CONDITION(toolManager->GetToolById(0) == NULL, "Get empty tool by id")
+    MITK_TEST_CONDITION(toolManager->GetToolById(0) == nullptr, "Get empty tool by id")
   }
 
   static void TestToolManagerWithTools(mitk::ToolManager::Pointer toolManager)
   {
     MITK_TEST_CONDITION(toolManager->GetTools().size() > 0, "Get tool list with size 1")
-    MITK_TEST_CONDITION(toolManager->GetToolById(0) != NULL, "Test GetToolById() method")
+    MITK_TEST_CONDITION(toolManager->GetToolById(0) != nullptr, "Test GetToolById() method")
     MITK_TEST_CONDITION(toolManager->ActivateTool(0) == true, "Activate tool")
     MITK_TEST_CONDITION(toolManager->GetActiveToolID() == 0, "Check for right tool id")
 
     mitk::Tool *tool = toolManager->GetActiveTool();
-    MITK_TEST_CONDITION(tool != NULL, "Check for right tool")
+    MITK_TEST_CONDITION(tool != nullptr, "Check for right tool")
   }
 
   static void TestSetterMethods(mitk::ToolManager::Pointer toolManager)

@@ -77,6 +77,7 @@ if(MITK_USE_SimpleITK)
          -DITK_DIR:PATH=${ITK_DIR}
          -DSWIG_DIR:PATH=${SWIG_DIR}
          -DSWIG_EXECUTABLE:FILEPATH=${SWIG_EXECUTABLE}
+         -DHDF5_DIR:PATH=${HDF5_DIR}
        CMAKE_CACHE_DEFAULT_ARGS
          ${ep_common_cache_default_args}
        DEPENDS ${proj_DEPENDENCIES}

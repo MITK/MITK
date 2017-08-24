@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVersion.h"
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
+#include "mitkEventStateMachine.h"
+#include "mitkInteractionEventObserver.h"
+#include "mitkLabelSetImage.h"
 #include "mitkMessage.h"
 #include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateDataType.h"
@@ -31,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolEvents.h"
 #include "mitkToolFactoryMacro.h"
 #include <MitkSegmentationExports.h>
+#include <mitkLabel.h>
 
 #include <iostream>
 #include <map>
@@ -39,10 +43,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 
 #include "usServiceRegistration.h"
-
-#include "mitkEventStateMachine.h"
-#include "mitkInteractionEventObserver.h"
-#include <mitkLabel.h>
 
 namespace us
 {
@@ -95,23 +95,23 @@ namespace mitk
     typedef mitk::Label::PixelType DefaultSegmentationDataType;
 
     /**
-    * \brief To let GUI process new events (e.g. qApp->processEvents() )
-    */
+     * \brief To let GUI process new events (e.g. qApp->processEvents() )
+     */
     Message<> GUIProcessEventsMessage;
 
     /**
-    * \brief To send error messages (to be shown by some GUI)
-    */
+     * \brief To send error messages (to be shown by some GUI)
+     */
     Message1<std::string> ErrorMessage;
 
     /**
-    * \brief To send whether the tool is busy (to be shown by some GUI)
-    */
+     * \brief To send whether the tool is busy (to be shown by some GUI)
+     */
     Message1<bool> CurrentlyBusy;
 
     /**
-    * \brief To send general messages (to be shown by some GUI)
-    */
+     * \brief To send general messages (to be shown by some GUI)
+     */
     Message1<std::string> GeneralMessage;
 
     mitkClassMacro(Tool, EventStateMachine);
@@ -165,26 +165,26 @@ namespace mitk
     virtual void InitializeStateMachine();
 
     /**
-    * \brief Interface for GUI creation.
-    *
-    * This is the basic interface for creation of a GUI object belonging to one tool.
-    *
-    * Tools that support a GUI (e.g. for display/editing of parameters) should follow some rules:
-    *
-    *  - A Tool and its GUI are two separate classes
-    *  - There may be several instances of a GUI at the same time.
-    *  - mitk::Tool is toolkit (Qt, wxWidgets, etc.) independent, the GUI part is of course dependent
-    *  - The GUI part inherits both from itk::Object and some GUI toolkit class
-    *  - The GUI class name HAS to be constructed like "toolkitPrefix" tool->GetClassName() + "toolkitPostfix", e.g.
-    * MyTool -> wxMyToolGUI
-    *  - For each supported toolkit there is a base class for tool GUIs, which contains some convenience methods
-    *  - Tools notify the GUI about changes using ITK events. The GUI must observe interesting events.
-    *  - The GUI base class may convert all ITK events to the GUI toolkit's favoured messaging system (Qt -> signals)
-    *  - Calling methods of a tool by its GUI is done directly.
-    *    In some cases GUIs don't want to be notified by the tool when they cause a change in a tool.
-    *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a
-    * method call.
-    */
+     * \brief Interface for GUI creation.
+     *
+     * This is the basic interface for creation of a GUI object belonging to one tool.
+     *
+     * Tools that support a GUI (e.g. for display/editing of parameters) should follow some rules:
+     *
+     *  - A Tool and its GUI are two separate classes
+     *  - There may be several instances of a GUI at the same time.
+     *  - mitk::Tool is toolkit (Qt, wxWidgets, etc.) independent, the GUI part is of course dependent
+     *  - The GUI part inherits both from itk::Object and some GUI toolkit class
+     *  - The GUI class name HAS to be constructed like "toolkitPrefix" tool->GetClassName() + "toolkitPostfix", e.g.
+     * MyTool -> wxMyToolGUI
+     *  - For each supported toolkit there is a base class for tool GUIs, which contains some convenience methods
+     *  - Tools notify the GUI about changes using ITK events. The GUI must observe interesting events.
+     *  - The GUI base class may convert all ITK events to the GUI toolkit's favoured messaging system (Qt -> signals)
+     *  - Calling methods of a tool by its GUI is done directly.
+     *    In some cases GUIs don't want to be notified by the tool when they cause a change in a tool.
+     *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a
+     * method call.
+     */
     virtual itk::Object::Pointer GetGUI(const std::string &toolkitPrefix, const std::string &toolkitPostfix);
 
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;

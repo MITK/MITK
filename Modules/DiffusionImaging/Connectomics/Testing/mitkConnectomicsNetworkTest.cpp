@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
 *  Test for synthetic connectomics generation and connectomics network functionality
 */
-int mitkConnectomicsNetworkTest(int argc, char* argv[])
+int mitkConnectomicsNetworkTest(int, char* [])
 {
   // Test begins
   MITK_TEST_BEGIN("mitkConnectomicsNetworkTest");
@@ -41,7 +41,6 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
 
   // Typedefs
   typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexType;
-  typedef mitk::ConnectomicsNetwork::EdgeDescriptorType EdgeType;
   typedef mitk::ConnectomicsNetwork::NetworkNode NodeType;
 
   // The test network

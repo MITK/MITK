@@ -158,7 +158,7 @@ int mitkFileReaderRegistryTest(int /*argc*/, char * /*argv*/ [])
 
   //  optionsFilter.push_back("canFly");
   //  returned = readerRegistry->GetReader("test", optionsFilter);
-  //  MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching reader was
+  //  MITK_TEST_CONDITION_REQUIRED(returned == nullptr, "Testing correct return of 0 value when no matching reader was
   //  found");
 
   //  // Onward to test the retrieval of multiple readers

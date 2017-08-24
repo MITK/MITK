@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 class FLmitkComfortWidget : public FLmitkRenderWindow {
   public:
-    FLmitkComfortWidget(int x,int y,int w,int h,const char* label=NULL);
+    FLmitkComfortWidget(int x,int y,int w,int h,const char* label=nullptr);
 
     void SetNode(mitk::DataNode::Pointer node) {m_Node = node;}
     int handle(int event);

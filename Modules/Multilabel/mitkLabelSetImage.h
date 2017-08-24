@@ -69,18 +69,21 @@ namespace mitk
 
     /**
      * @brief Merges the mitk::Label with a given target value with the active label
-     * @param targetPixelValue the value of the mitk::Label that should be merged with the active one
-     * @param layer the layer in which the merge should be performed
+     *
+     * @param pixelValue          the value of the label that should be the new merged label
+     * @param sourcePixelValue    the value of the label that should be merged into the specified one
+     * @param layer               the layer in which the merge should be performed
      */
-    void MergeLabel(PixelType targetPixelValue, unsigned int layer = 0);
+    void MergeLabel(PixelType pixelValue, PixelType sourcePixelValue, unsigned int layer = 0);
 
     /**
      * @brief Merges a list of mitk::Labels with the mitk::Label that has a specific value
-     * @param VectorOfLablePixelValues the list of labels that should be merge with the specified one
-     * @param index the value of the label into which the other should be merged
-     * @param layer the layer in which the merge should be performed
+     *
+     * @param pixelValue                  the value of the label that should be the new merged label
+     * @param vectorOfSourcePixelValues   the list of label values that should be merge into the specified one
+     * @param layer                       the layer in which the merge should be performed
      */
-    void MergeLabels(std::vector<PixelType> &VectorOfLablePixelValues, PixelType index, unsigned int layer = 0);
+    void MergeLabels(PixelType pixelValue, std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer = 0);
 
     /**
       * \brief  */
@@ -137,20 +140,20 @@ namespace mitk
      * @brief Returns the mitk::Label with the given pixelValue and for the given layer
      * @param pixelValue the pixel value of the label
      * @param layer the layer in which the labels should be located
-     * @return the mitk::Label if available otherwise NULL
+     * @return the mitk::Label if available otherwise nullptr
      */
     mitk::Label *GetLabel(PixelType pixelValue, unsigned int layer = 0) const;
 
     /**
      * @brief Returns the currently active mitk::LabelSet
-     * @return the mitk::LabelSet of the active layer or NULL if non is present
+     * @return the mitk::LabelSet of the active layer or nullptr if non is present
      */
     mitk::LabelSet *GetActiveLabelSet();
 
     /**
      * @brief Gets the mitk::LabelSet for the given layer
      * @param layer the layer for which the mitk::LabelSet should be retrieved
-     * @return the respective mitk::LabelSet or NULL if non exists for the given layer
+     * @return the respective mitk::LabelSet or nullptr if non exists for the given layer
      */
     mitk::LabelSet *GetLabelSet(unsigned int layer = 0);
     const mitk::LabelSet *GetLabelSet(unsigned int layer = 0) const;

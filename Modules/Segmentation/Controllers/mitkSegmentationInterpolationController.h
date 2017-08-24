@@ -79,7 +79,7 @@ namespace mitk
 
       /**
         \brief Find interpolator for a given image.
-        \return NULL if there is no interpolator yet.
+        \return nullptr if there is no interpolator yet.
 
         This method is useful if several "clients" modify the same image and want to access the interpolations.
         Then they can share the same object.

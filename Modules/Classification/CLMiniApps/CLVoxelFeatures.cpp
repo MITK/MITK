@@ -155,7 +155,7 @@ void
   typename HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
   hessianFilter->SetInput(itkImage);
   hessianFilter->SetSigma(std::sqrt(variance));
-  for (int i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     typename DetFilterType::Pointer detFilter = DetFilterType::New();
     detFilter->SetInput(hessianFilter->GetOutput());
@@ -170,7 +170,6 @@ void
   LocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, double offset, double delta)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<double, VImageDimension> FloatImageType;
   typedef itk::MultiHistogramFilter <ImageType,ImageType> MultiHistogramType;
 
   typename MultiHistogramType::Pointer filter = MultiHistogramType::New();
@@ -178,7 +177,7 @@ void
   filter->SetOffset(offset);
   filter->SetDelta(delta);
   filter->Update();
-  for (int i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     mitk::Image::Pointer img = mitk::Image::New();
     mitk::CastToMitkImage(filter->GetOutput(), img);
@@ -215,9 +214,8 @@ int main(int argc, char* argv[])
   {
     return EXIT_SUCCESS;
   }
-  bool useCooc = parsedArgs.count("cooccurence");
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
   std::string filename=parsedArgs["output"].ToString();
 
   ////////////////////////////////////////////////////////////////
@@ -235,10 +233,10 @@ int main(int argc, char* argv[])
     else
     {
       AccessByItk_3(image, LocalHistograms, outs, ranges[0], ranges[1]);
-      for (int i = 0; i < outs.size(); ++i)
+      for (std::size_t i = 0; i < outs.size(); ++i)
       {
         std::string name = filename + "-lh" + us::any_value_to_string<int>(i)+".nii.gz";
-        mitk::IOUtil::SaveImage(outs[i], name);
+        mitk::IOUtil::Save(outs[i], name);
       }
     }
   }
@@ -252,12 +250,12 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate Gaussian... " << parsedArgs["gaussian"].ToString();
     auto ranges = splitDouble(parsedArgs["gaussian"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       mitk::Image::Pointer output;
       AccessByItk_2(image, GaussianFilter, ranges[i], output);
       std::string name = filename + "-gaussian-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -270,12 +268,12 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate Difference of Gaussian... " << parsedArgs["difference-of-gaussian"].ToString();
     auto ranges = splitDouble(parsedArgs["difference-of-gaussian"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       mitk::Image::Pointer output;
       AccessByItk_2(image, DifferenceOfGaussFilter, ranges[i], output);
       std::string name = filename + "-dog-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -288,12 +286,12 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate LoG... " << parsedArgs["laplace-of-gauss"].ToString();
     auto ranges = splitDouble(parsedArgs["laplace-of-gauss"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       mitk::Image::Pointer output;
       AccessByItk_2(image, LaplacianOfGaussianFilter, ranges[i], output);
       std::string name = filename + "-log-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -306,7 +304,7 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate HoG... " << parsedArgs["hessian-of-gauss"].ToString();
     auto ranges = splitDouble(parsedArgs["hessian-of-gauss"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       std::vector<mitk::Image::Pointer> outs;
       outs.push_back(mitk::Image::New());
@@ -314,11 +312,11 @@ int main(int argc, char* argv[])
       outs.push_back(mitk::Image::New());
       AccessByItk_2(image, HessianOfGaussianFilter, ranges[i], outs);
       std::string name = filename + "-hog0-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[0], name);
+      mitk::IOUtil::Save(outs[0], name);
       name = filename + "-hog1-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[1], name);
+      mitk::IOUtil::Save(outs[1], name);
       name = filename + "-hog2-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[2], name);
+      mitk::IOUtil::Save(outs[2], name);
     }
   }
 

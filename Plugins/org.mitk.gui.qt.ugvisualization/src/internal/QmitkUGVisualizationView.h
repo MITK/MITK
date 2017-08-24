@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkUGVisualizationViewControls.h"
 
@@ -35,11 +35,8 @@ namespace mitk {
   \brief QmitkUGVisualizationView
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
-class QmitkUGVisualizationView : public QmitkFunctionality
+class QmitkUGVisualizationView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -54,8 +51,10 @@ class QmitkUGVisualizationView : public QmitkFunctionality
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-    virtual void StdMultiWidgetNotAvailable() override;
+    ///
+    /// Sets the focus to an internal widget.
+    ///
+    virtual void SetFocus() override;
 
   protected slots:
 
@@ -68,8 +67,8 @@ class QmitkUGVisualizationView : public QmitkFunctionality
 
   protected:
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+    /// \brief called by QmitkAbstractView when DataManager's selection has changed
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     void CreateConnections();
 
@@ -82,8 +81,6 @@ class QmitkUGVisualizationView : public QmitkFunctionality
     void UpdateEnablement();
 
     Ui::QmitkUGVisualizationViewControls m_Controls;
-
-    QmitkStdMultiWidget* m_MultiWidget;
 
     QWidgetAction* m_Outline2DAction;
     QmitkBoolPropertyWidget* m_Outline2DWidget;

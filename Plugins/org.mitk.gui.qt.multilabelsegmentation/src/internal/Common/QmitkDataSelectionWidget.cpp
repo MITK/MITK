@@ -84,7 +84,7 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
 
     default:
       assert(false && "Unknown predefined predicate!");
-      return NULL;
+      return nullptr;
   }
 }
 

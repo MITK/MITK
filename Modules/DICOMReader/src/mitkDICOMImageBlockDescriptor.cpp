@@ -755,12 +755,11 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
     unsigned int slice(0);
     int timePoint(-1);
-    unsigned int zSlice(0);
     const int framesPerTimeStep = this->GetNumberOfFramesPerTimeStep();
     for ( auto frameIter = m_ImageFrameList.begin(); frameIter != m_ImageFrameList.end();
           ++slice, ++frameIter )
     {
-      zSlice = slice%framesPerTimeStep;
+      unsigned int zSlice = slice%framesPerTimeStep;
       if ( zSlice == 0)
       {
         timePoint++;

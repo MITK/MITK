@@ -202,7 +202,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   int timestep = this->GetTimestep();
   mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet(timestep);
 
-  if (itkPointSet.GetPointer() == NULL)
+  if (itkPointSet.GetPointer() == nullptr)
   {
     ls->m_PropAssembly->VisibilityOff();
     return;
@@ -327,7 +327,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 
       //---- LABEL -----//
       // paint label for each point if available
-      if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label")) != NULL)
+      if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label")) != nullptr)
       {
         const char *pointLabel =
           dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label"))->GetValue();
@@ -570,7 +570,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
   const mitk::DataNode *node = GetDataNode();
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -643,7 +643,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
     // get selected color property
     if (dynamic_cast<mitk::ColorProperty *>(
-          this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor")) != NULL)
+          this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor")) != nullptr)
     {
       mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(
                                this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor"))
@@ -654,10 +654,10 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
       selectedColor[3] = 1.0f; // alpha value
     }
     else if (dynamic_cast<mitk::ColorProperty *>(
-               this->GetDataNode()->GetPropertyList(NULL)->GetProperty("selectedcolor")) != NULL)
+               this->GetDataNode()->GetPropertyList(nullptr)->GetProperty("selectedcolor")) != nullptr)
     {
       mitk::Color tmpColor =
-        dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("selectedcolor"))
+        dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(nullptr)->GetProperty("selectedcolor"))
           ->GetValue();
       selectedColor[0] = tmpColor[0];
       selectedColor[1] = tmpColor[1];
@@ -684,7 +684,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
     // get contour color property
     if (dynamic_cast<mitk::ColorProperty *>(
-          this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor")) != NULL)
+          this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor")) != nullptr)
     {
       mitk::Color tmpColor =
         dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor"))
@@ -695,10 +695,10 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
       contourColor[3] = 1.0f;
     }
     else if (dynamic_cast<mitk::ColorProperty *>(
-               this->GetDataNode()->GetPropertyList(NULL)->GetProperty("contourcolor")) != NULL)
+               this->GetDataNode()->GetPropertyList(nullptr)->GetProperty("contourcolor")) != nullptr)
     {
       mitk::Color tmpColor =
-        dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("contourcolor"))
+        dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(nullptr)->GetProperty("contourcolor"))
           ->GetValue();
       contourColor[0] = tmpColor[0];
       contourColor[1] = tmpColor[1];

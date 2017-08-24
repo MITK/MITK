@@ -52,7 +52,7 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   if (m_OldnXPelsPerUnit != resolutionInMetersActual.nXPelsPerUnit || m_OldnYPelsPerUnit != resolutionInMetersActual.nYPelsPerUnit)
     {
       //we can only update if the image exists and has a geometry
-      if (m_Image.IsNotNull() && m_Image->GetGeometry() != NULL)
+      if (m_Image.IsNotNull() && m_Image->GetGeometry() != nullptr)
      {
         m_OldnXPelsPerUnit = resolutionInMetersActual.nXPelsPerUnit;
         m_OldnYPelsPerUnit = resolutionInMetersActual.nYPelsPerUnit;
@@ -88,13 +88,13 @@ void mitk::USTelemedImageSource::UpdateImageGeometry()
   spacing[2] = 1;
 
   m_ImageMutex->Lock();
-  if(m_Image.IsNotNull() && (m_Image->GetGeometry()!=NULL))
+  if(m_Image.IsNotNull() && (m_Image->GetGeometry()!=nullptr))
     {
     m_Image->GetGeometry()->SetSpacing(spacing);
     m_Image->GetGeometry()->Modified();
     }
   else
-    {MITK_WARN << "image or geometry was NULL, can't adapt geometry";}
+    {MITK_WARN << "image or geometry was nullptr, can't adapt geometry";}
   m_ImageMutex->Unlock();
 
   MITK_DEBUG << "UpdateImageGeometry called!";
@@ -104,7 +104,7 @@ void mitk::USTelemedImageSource::UpdateImageGeometry()
 
 bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(Usgfw2Lib::IUsgDataView* usgDataView, Usgfw2Lib::tagScanMode scanMode)
 {
-  IUnknown* tmp_obj = NULL;
+  IUnknown* tmp_obj = nullptr;
 
   // create control object from Telemed API
   mitk::telemed::CreateUsgControl( usgDataView, Usgfw2Lib::IID_IUsgScanConverterPlugin, scanMode, 0, (void**)&tmp_obj );

@@ -64,20 +64,20 @@ bool mitk::Equal(mitk::ExampleDataStructure *leftHandSide,
 {
   bool noDifferenceFound = true;
 
-  if (rightHandSide == NULL)
+  if (rightHandSide == nullptr)
   {
     if (verbose)
     {
-      MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] rightHandSide NULL.";
+      MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] rightHandSide nullptr.";
     }
     return false;
   }
 
-  if (leftHandSide == NULL)
+  if (leftHandSide == nullptr)
   {
     if (verbose)
     {
-      MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] leftHandSide NULL.";
+      MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] leftHandSide nullptr.";
     }
     return false;
   }

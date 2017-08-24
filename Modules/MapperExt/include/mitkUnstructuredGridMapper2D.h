@@ -69,19 +69,19 @@ namespace mitk
     /**
      * Determines, if the associated BaseData is mapped three-dimensionally (mapper-slot id 2)
      * with a class convertable to vtkAbstractMapper3D().
-     * @returns NULL if it is not convertable or the appropriate Mapper otherwise
+     * @returns nullptr if it is not convertable or the appropriate Mapper otherwise
      */
     virtual vtkAbstractMapper3D *GetVtkAbstractMapper3D(BaseRenderer *renderer);
 
     /**
      * Determines the pointset object to be cut.
-     * returns the pointset if possible, otherwise NULL.
+     * returns the pointset if possible, otherwise nullptr.
      */
     virtual vtkPointSet *GetVtkPointSet(BaseRenderer *renderer, int time = 0);
 
     /**
      * Determines the LookupTable used by the associated vtkMapper.
-     * returns the LUT if possible, otherwise NULL.
+     * returns the LUT if possible, otherwise nullptr.
      */
     virtual vtkScalarsToColors *GetVtkLUT(BaseRenderer *renderer);
 

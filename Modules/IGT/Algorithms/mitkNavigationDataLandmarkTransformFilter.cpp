@@ -27,8 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter() : mitk::NavigationDataToNavigationDataFilter(),
 m_ErrorMean(-1.0), m_ErrorStdDev(-1.0), m_ErrorRMS(-1.0), m_ErrorMin(-1.0), m_ErrorMax(-1.0), m_ErrorAbsMax(-1.0),
-m_SourcePoints(), m_TargetPoints(), m_LandmarkTransformInitializer(NULL), m_LandmarkTransform(NULL),
-m_QuatLandmarkTransform(NULL), m_QuatTransform(NULL), m_Errors(), m_UseICPInitialization(false)
+m_SourcePoints(), m_TargetPoints(), m_LandmarkTransformInitializer(nullptr), m_LandmarkTransform(nullptr),
+m_QuatLandmarkTransform(nullptr), m_QuatTransform(nullptr), m_Errors(), m_UseICPInitialization(false)
 {
   m_LandmarkTransform = LandmarkTransformType::New();
 
@@ -43,10 +43,10 @@ m_QuatLandmarkTransform(NULL), m_QuatTransform(NULL), m_Errors(), m_UseICPInitia
 
 mitk::NavigationDataLandmarkTransformFilter::~NavigationDataLandmarkTransformFilter()
 {
-  m_LandmarkTransform = NULL;
-  m_LandmarkTransformInitializer = NULL;
-  m_QuatLandmarkTransform = NULL;
-  m_QuatTransform = NULL;
+  m_LandmarkTransform = nullptr;
+  m_LandmarkTransformInitializer = nullptr;
+  m_QuatLandmarkTransform = nullptr;
+  m_QuatTransform = nullptr;
 }
 
 
@@ -300,15 +300,9 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
 
   /* lots of type definitions */
   typedef itk::PointSet<mitk::ScalarType, 3> PointSetType;
-  //typedef itk::BoundingBox<PointSetType::PointIdentifier, PointSetType::PointDimension> BoundingBoxType;
 
   typedef itk::EuclideanDistancePointMetric< PointSetType, PointSetType> MetricType;
-  //typedef MetricType::TransformType TransformBaseType;
-  //typedef MetricType::TransformType::ParametersType ParametersType;
-  //typedef TransformBaseType::JacobianType JacobianType;
-  //typedef itk::Euler3DTransform< double > TransformType;
   typedef itk::VersorRigid3DTransform< double > TransformType;
-  typedef TransformType ParametersType;
   typedef itk::PointSetToPointSetRegistrationMethod< PointSetType, PointSetType > RegistrationType;
 
   /* copy landmarks to itk pointsets for registration */
@@ -330,18 +324,8 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
     targetPointSet->SetPoint(i++, doublePoint /**it*/);
   }
 
-  /* get centroid and extends of our pointsets */
-  //BoundingBoxType::Pointer sourceBoundingBox = BoundingBoxType::New();
-  //sourceBoundingBox->SetPoints(sourcePointSet->GetPoints());
-  //sourceBoundingBox->ComputeBoundingBox();
-  //BoundingBoxType::Pointer targetBoundingBox = BoundingBoxType::New();
-  //targetBoundingBox->SetPoints(targetPointSet->GetPoints());
-  //targetBoundingBox->ComputeBoundingBox();
-
-
   TransformType::Pointer transform = TransformType::New();
   transform->SetIdentity();
-  //transform->SetTranslation(targetBoundingBox->GetCenter() - sourceBoundingBox->GetCenter());
 
   itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();
   optimizer->SetUseCostFunctionGradient(false);
@@ -358,7 +342,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   scales[3] = 1.0 / translationScale;
   scales[4] = 1.0 / translationScale;
   scales[5] = 1.0 / translationScale;
-  //scales.Fill(0.01);
+
   unsigned long numberOfIterations = 80000;
   double gradientTolerance = 1e-10; // convergence criterion
   double valueTolerance = 1e-10; // convergence criterion
@@ -397,13 +381,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   MITK_INFO << "Metric value: " << metric->GetValue(transform->GetParameters());
 
   /* find point correspondences */
-  //mitk::PointLocator::Pointer pointLocator = mitk::PointLocator::New();  // <<- use mitk::PointLocator instead of searching manually?
-  //pointLocator->SetPoints()
-  for (LandmarkPointContainer::const_iterator sourcesIt = sources.begin(); sourcesIt != sources.end(); ++sourcesIt)
-  {
-  }
-  //MetricType::MeasureType closestDistances = metric->GetValue(transform->GetParameters());
-  //unsigned int index = 0;
+
   LandmarkPointContainer sortedSources;
   for (LandmarkPointContainer::const_iterator targetsIt = targets.begin(); targetsIt != targets.end(); ++targetsIt)
   {

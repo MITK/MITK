@@ -57,7 +57,7 @@ class QmitkComboBoxListView : public QListView
   Q_OBJECT
 
 public:
-  explicit QmitkComboBoxListView(QComboBox *comboBox = NULL);
+  explicit QmitkComboBoxListView(QComboBox *comboBox = nullptr);
   ~QmitkComboBoxListView();
 
 protected:
@@ -74,7 +74,7 @@ class MITKQTWIDGETS_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegat
   Q_OBJECT
 
 public:
-  explicit QmitkPropertyItemDelegate(QObject *parent = NULL);
+  explicit QmitkPropertyItemDelegate(QObject *parent = nullptr);
   ~QmitkPropertyItemDelegate();
 
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;

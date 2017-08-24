@@ -337,7 +337,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D &origin)
       }
     }
     // ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
-    // if(timeGeometry != NULL)
+    // if(timeGeometry != nullptr)
     //{
     //  timeGeometry->Initialize(slicedGeometry, steps);
     //  break;

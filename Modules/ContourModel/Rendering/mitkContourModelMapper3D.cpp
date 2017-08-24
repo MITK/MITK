@@ -77,7 +77,7 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
   mitk::ContourModel *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
-  if (data == NULL)
+  if (data == nullptr)
   {
     return;
   }
@@ -88,7 +88,7 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(renderer->GetTimeStep())) || (this->GetTimestep() == -1))
   {
     // clear the rendered polydata

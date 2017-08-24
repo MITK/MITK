@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mapMetaProperty.h"
 
-QmitkMAPAlgorithmModel::QmitkMAPAlgorithmModel(QObject *parent) : QAbstractTableModel(parent), m_pMetaInterface(NULL)
+QmitkMAPAlgorithmModel::QmitkMAPAlgorithmModel(QObject *parent) : QAbstractTableModel(parent), m_pMetaInterface(nullptr)
 {
 }
 
@@ -67,14 +67,14 @@ QVariant QmitkMAPAlgorithmModel::data(const QModelIndex &index, int role) const
 
   QVariant result;
 
-  if (index.row() < m_MetaProperties.size())
+  if (index.row() < static_cast<int>(m_MetaProperties.size()))
   {
     map::algorithm::MetaPropertyInfo *pInfo = m_MetaProperties[index.row()];
 
     switch (index.column())
     {
       case 0:
-        if (Qt::DisplayRole == role && index.row() < m_MetaProperties.size())
+        if (Qt::DisplayRole == role && index.row() < static_cast<int>(m_MetaProperties.size()))
         {
           result = QVariant(pInfo->getName().c_str());
         }
@@ -99,7 +99,7 @@ Qt::ItemFlags QmitkMAPAlgorithmModel::flags(const QModelIndex &index) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
 
-  if (index.row() < m_MetaProperties.size())
+  if (index.row() < static_cast<int>(m_MetaProperties.size()))
   {
     map::algorithm::MetaPropertyInfo *pInfo = m_MetaProperties[index.row()];
     if (index.column() == 1)
@@ -132,7 +132,7 @@ QVariant QmitkMAPAlgorithmModel::headerData(int section, Qt::Orientation orienta
 
 bool QmitkMAPAlgorithmModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-  if (!index.isValid() || (m_MetaProperties.size() <= index.row()) || (1 != index.column()))
+  if (!index.isValid() || (static_cast<int>(m_MetaProperties.size()) <= index.row()) || (1 != index.column()))
   {
     return false;
   }

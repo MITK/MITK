@@ -65,7 +65,18 @@ mitk::ToolManager::~ToolManager()
 
 void mitk::ToolManager::InitializeTools()
 {
-  m_Tools.resize(0);
+  // clear all previous tool pointers (tools may be still activated from another recently used plugin)
+  if (m_ActiveTool)
+  {
+    m_ActiveTool->Deactivated();
+    m_ActiveToolRegistration.Unregister();
+
+    m_ActiveTool = nullptr;
+    m_ActiveToolID = -1; // no tool active
+
+    ActiveToolChanged.Send();
+  }
+  m_Tools.clear();
   // get a list of all known mitk::Tools
   std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
 
@@ -301,7 +312,7 @@ void mitk::ToolManager::SetWorkingData(DataNode *data)
 {
   DataVectorType v;
 
-  if (data) // don't allow for NULL nodes
+  if (data) // don't allow for nullptr nodes
   {
     v.push_back(data);
   }
@@ -430,16 +441,15 @@ void mitk::ToolManager::SetDataStorage(DataStorage &storage)
   m_DataStorage = &storage;
 }
 
-mitk::DataNode *mitk::ToolManager::GetWorkingData(int idx)
+mitk::DataNode *mitk::ToolManager::GetWorkingData(unsigned int idx)
 {
-  try
-  {
-    return m_WorkingData.at(idx);
-  }
-  catch (const std::exception &)
-  {
+  if (m_WorkingData.empty())
     return nullptr;
-  }
+
+  if (m_WorkingData.size() > idx)
+    return m_WorkingData[idx];
+
+  return nullptr;
 }
 
 int mitk::ToolManager::GetActiveToolID()

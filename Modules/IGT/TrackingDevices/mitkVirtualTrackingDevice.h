@@ -94,7 +94,7 @@ namespace mitk
 
     /**
     * \param toolNumber The number of the tool which should be given back.
-    * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
+    * \return Returns the tool which the number "toolNumber". Returns nullptr, if there is
     * no tool with this number.
     */
     TrackingTool* GetTool(unsigned int toolNumber) const override;

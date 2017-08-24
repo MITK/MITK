@@ -145,7 +145,7 @@ void mitk::ImageToItk<TOutputImage>::GenerateData()
   else
   {
     itkDebugMacro("do not copyMem ...");
-    typedef itk::ImportMitkImageContainer<unsigned long, InternalPixelType> ImportContainerType;
+    typedef itk::ImportMitkImageContainer<itk::SizeValueType, InternalPixelType> ImportContainerType;
     typename ImportContainerType::Pointer import;
 
     import = ImportContainerType::New();

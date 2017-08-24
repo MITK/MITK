@@ -68,11 +68,16 @@ DiffusionImageNiftiReaderService::
 {}
 
 DiffusionImageNiftiReaderService::
-DiffusionImageNiftiReaderService()
-  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION() )
+DiffusionImageNiftiReaderService(CustomMimeType mime_type, std::string mime_type_description ) : mitk::AbstractFileReader( mime_type, mime_type_description )
 {
   m_ServiceReg = this->RegisterService();
 }
+
+//DiffusionImageNiftiReaderService::
+//DiffusionImageNiftiReaderService() : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION() )
+//{
+//  m_ServiceReg = this->RegisterService();
+//}
 
 std::vector<itk::SmartPointer<mitk::BaseData> >
 DiffusionImageNiftiReaderService::
@@ -267,7 +272,6 @@ void DiffusionImageNiftiReaderService::InternalRead()
 
       // Diffusion Image information START
       GradientDirectionContainerType::Pointer DiffusionVectors = GradientDirectionContainerType::New();
-      GradientDirectionContainerType::Pointer OriginalDiffusionVectors = GradientDirectionContainerType::New();
       MeasurementFrameType MeasurementFrame;
       float BValue = -1;
       // Diffusion Image information END
@@ -279,8 +283,13 @@ void DiffusionImageNiftiReaderService::InternalRead()
         std::string bvecsExtension("");
         std::string bvalsExtension("");
 
-        std::string base = itksys::SystemTools::GetFilenamePath( this->GetInputLocation() ) + "/"
-            + this->GetMimeType()->GetFilenameWithoutExtension( this->GetInputLocation() );
+        std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetInputLocation());
+        std::string base = this->GetMimeType()->GetFilenameWithoutExtension(this->GetInputLocation());
+        if (!base_path.empty())
+        {
+            base = base_path + "/" + base;
+            base_path += "/";
+        }
 
         // check for possible file names
         {
@@ -314,6 +323,16 @@ void DiffusionImageNiftiReaderService::InternalRead()
         {
           fname = std::string( base + bvecsExtension);
         }
+
+        // for hcp data
+        if ( !itksys::SystemTools::FileExists( fname.c_str() ) )
+        {
+            if ( itksys::SystemTools::FileExists( std::string( base_path + "bvec").c_str() ) )
+                fname = std::string( base_path + "bvec");
+            else  if ( itksys::SystemTools::FileExists( std::string( base_path + "bvecs").c_str() ) )
+                fname = std::string( base_path + "bvecs");
+        }
+
         std::ifstream myfile (fname.c_str());
         if (myfile.is_open())
         {
@@ -354,6 +373,16 @@ void DiffusionImageNiftiReaderService::InternalRead()
         {
           fname2 = std::string( base + bvalsExtension);
         }
+
+        // for hcp data
+        if ( !itksys::SystemTools::FileExists( fname2.c_str() ) )
+        {
+            if ( itksys::SystemTools::FileExists( std::string( base_path + "bval").c_str() ) )
+                fname2 = std::string( base_path + "bval");
+            else  if ( itksys::SystemTools::FileExists( std::string( base_path + "bvals").c_str() ) )
+                fname2 = std::string( base_path + "bvals");
+        }
+
         std::ifstream myfile2 (fname2.c_str());
         if (myfile2.is_open())
         {
@@ -379,19 +408,16 @@ void DiffusionImageNiftiReaderService::InternalRead()
         }
 
 
+        // Take the largest entry in bvals as the reference b-value
         BValue = -1;
         unsigned int numb = bval_entries.size();
         for(unsigned int i=0; i<numb; i++)
-        {
-
-          // Take the first entry in bvals as the reference b-value
-          if(BValue == -1 && bval_entries.at(i) != 0)
-          {
+          if (bval_entries.at(i)>BValue)
             BValue = bval_entries.at(i);
-          }
 
+        for(unsigned int i=0; i<numb; i++)
+        {
           float b_val = bval_entries.at(i);
-
 
           vnl_vector_fixed< double, 3 > vec;
           vec[0] = bvec_entries.at(i);
@@ -419,12 +445,12 @@ void DiffusionImageNiftiReaderService::InternalRead()
 
       // create BValueMap
       mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap(DiffusionVectors,BValue);
-      outputForCache->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
-      outputForCache->SetProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( OriginalDiffusionVectors ) );
-      outputForCache->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
-      outputForCache->SetProperty( mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
-      outputForCache->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
-
+      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
+      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
+      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
+      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
+      mitk::DiffusionPropertyHelper propertyHelper( outputForCache );
+      propertyHelper.InitializeImage();
 
       // Since we have already read the tree, we can store it in a cache variable
       // so that it can be assigned to the DataObject in GenerateData();

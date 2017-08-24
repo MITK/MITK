@@ -35,10 +35,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 template<class Interface>
 inline void SafeRelease(Interface *& pInterfaceToRelease)
 {
-  if (pInterfaceToRelease != NULL)
+  if (pInterfaceToRelease != nullptr)
   {
     pInterfaceToRelease->Release();
-    pInterfaceToRelease = NULL;
+    pInterfaceToRelease = nullptr;
   }
 }
 
@@ -75,10 +75,10 @@ namespace mitk
   };
 
   KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
-    m_pKinectSensor(NULL),
-    m_pMultiSourceFrameReader(NULL),
-    m_pCoordinateMapper(NULL),
-    m_pColorRGBX(NULL),
+    m_pKinectSensor(nullptr),
+    m_pMultiSourceFrameReader(nullptr),
+    m_pCoordinateMapper(nullptr),
+    m_pColorRGBX(nullptr),
     m_ConnectionCheck(false),
     m_DepthCaptureWidth(512),
     m_DepthCaptureHeight(424),
@@ -86,9 +86,9 @@ namespace mitk
     m_RGBCaptureHeight(1080),
     m_RGBBufferSize(1920*1080*3),
     m_DepthBufferSize(sizeof(float)*512*424),
-    m_CameraCoordinates(NULL),
-    m_ColorPoints(NULL),
-    m_PolyData(NULL),
+    m_CameraCoordinates(nullptr),
+    m_ColorPoints(nullptr),
+    m_PolyData(nullptr),
     m_TriangulationThreshold(0.0),
     m_GenerateTriangularMesh(false)
   {
@@ -205,8 +205,8 @@ namespace mitk
       MITK_ERROR << "Unable to initialize MultiFrameReader";
       return;
     }
-    IMultiSourceFrame* pMultiSourceFrame = NULL;
-    IDepthFrame* pDepthFrame = NULL;
+    IMultiSourceFrame* pMultiSourceFrame = nullptr;
+    IDepthFrame* pDepthFrame = nullptr;
 
     HRESULT hr = -1; //SDK error format
 
@@ -221,7 +221,7 @@ namespace mitk
 
     if (SUCCEEDED(hr))
     {
-      IDepthFrameReference* pDepthFrameReference = NULL;
+      IDepthFrameReference* pDepthFrameReference = nullptr;
 
       hr = pMultiSourceFrame->get_DepthFrameReference(&pDepthFrameReference);
       if (SUCCEEDED(hr))
@@ -234,7 +234,7 @@ namespace mitk
     if (SUCCEEDED(hr))
     {
       UINT nDepthBufferSize = 0;
-      UINT16 *pDepthBuffer = NULL;
+      UINT16 *pDepthBuffer = nullptr;
 
       if (SUCCEEDED(hr))
       {
@@ -303,8 +303,8 @@ namespace mitk
       MITK_ERROR << "Unable to initialize MultiFrameReader";
       return;
     }
-    IMultiSourceFrame* pMultiSourceFrame = NULL;
-    IColorFrame* pColorFrame = NULL;
+    IMultiSourceFrame* pMultiSourceFrame = nullptr;
+    IColorFrame* pColorFrame = nullptr;
 
     HRESULT hr = -1;
 
@@ -319,7 +319,7 @@ namespace mitk
 
     ColorImageFormat imageFormat = ColorImageFormat_None;
     UINT nColorBufferSize = 0;
-    RGBQUAD *pColorBuffer = NULL;
+    RGBQUAD *pColorBuffer = nullptr;
     // get color frame data
     if (SUCCEEDED(hr))
     {
@@ -373,10 +373,10 @@ namespace mitk
       return;
     }
 
-    IMultiSourceFrame* pMultiSourceFrame = NULL;
-    IDepthFrame* pDepthFrame = NULL;
-    IColorFrame* pColorFrame = NULL;
-    IInfraredFrame* pInfraRedFrame = NULL;
+    IMultiSourceFrame* pMultiSourceFrame = nullptr;
+    IDepthFrame* pDepthFrame = nullptr;
+    IColorFrame* pColorFrame = nullptr;
+    IInfraredFrame* pInfraRedFrame = nullptr;
 
     HRESULT hr = -1;
 
@@ -391,7 +391,7 @@ namespace mitk
 
     if (SUCCEEDED(hr))
     {
-      IDepthFrameReference* pDepthFrameReference = NULL;
+      IDepthFrameReference* pDepthFrameReference = nullptr;
 
       hr = pMultiSourceFrame->get_DepthFrameReference(&pDepthFrameReference);
       if (SUCCEEDED(hr))
@@ -403,7 +403,7 @@ namespace mitk
 
     if (SUCCEEDED(hr))
     {
-      IColorFrameReference* pColorFrameReference = NULL;
+      IColorFrameReference* pColorFrameReference = nullptr;
 
       hr = pMultiSourceFrame->get_ColorFrameReference(&pColorFrameReference);
       if (SUCCEEDED(hr))
@@ -415,7 +415,7 @@ namespace mitk
 
     if (SUCCEEDED(hr))
     {
-      IInfraredFrameReference* pInfraredFrameReference = NULL;
+      IInfraredFrameReference* pInfraredFrameReference = nullptr;
 
       hr = pMultiSourceFrame->get_InfraredFrameReference(&pInfraredFrameReference);
       if (SUCCEEDED(hr))
@@ -428,12 +428,12 @@ namespace mitk
     if (SUCCEEDED(hr))
     {
       UINT nDepthBufferSize = 0;
-      UINT16 *pDepthBuffer = NULL;
-      UINT16 *pInfraRedBuffer = NULL;
+      UINT16 *pDepthBuffer = nullptr;
+      UINT16 *pInfraRedBuffer = nullptr;
 
       ColorImageFormat imageFormat = ColorImageFormat_None;
       UINT nColorBufferSize = 0;
-      RGBQUAD *pColorBuffer = NULL;
+      RGBQUAD *pColorBuffer = nullptr;
 
       if (SUCCEEDED(hr))
       {
@@ -665,8 +665,8 @@ namespace mitk
       return;
     }
 
-    IMultiSourceFrame* pMultiSourceFrame = NULL;
-    IInfraredFrame* pInfraRedFrame = NULL;
+    IMultiSourceFrame* pMultiSourceFrame = nullptr;
+    IInfraredFrame* pInfraRedFrame = nullptr;
 
     HRESULT hr = -1;
 
@@ -681,7 +681,7 @@ namespace mitk
 
     if (SUCCEEDED(hr))
     {
-      IInfraredFrameReference* pInfraredFrameReference = NULL;
+      IInfraredFrameReference* pInfraredFrameReference = nullptr;
 
       hr = pMultiSourceFrame->get_InfraredFrameReference(&pInfraredFrameReference);
       if (SUCCEEDED(hr))
@@ -694,7 +694,7 @@ namespace mitk
     if (SUCCEEDED(hr))
     {
       UINT nDepthBufferSize = 0;
-      UINT16 *pInfraRedBuffer = NULL;
+      UINT16 *pInfraRedBuffer = nullptr;
 
       if (SUCCEEDED(hr))
       {

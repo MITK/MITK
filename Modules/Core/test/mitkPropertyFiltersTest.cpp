@@ -27,7 +27,7 @@ int mitkPropertyFiltersTest(int, char *[])
   MITK_TEST_BEGIN("mitkPropertyFiltersTest");
 
   mitk::IPropertyFilters *propertyFilters = mitk::CoreServices::GetPropertyFilters();
-  MITK_TEST_CONDITION_REQUIRED(propertyFilters != NULL, "Get property filters service");
+  MITK_TEST_CONDITION_REQUIRED(propertyFilters != nullptr, "Get property filters service");
 
   typedef std::map<std::string, mitk::BaseProperty::Pointer> PropertyMap;
   typedef PropertyMap::const_iterator PropertyMapConstIterator;

@@ -155,7 +155,7 @@ set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
 set(BOOST_ROOT "@BOOST_ROOT@" CACHE PATH "")
 set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
-set(Boost_ADDITIONAL_VERSIONS "1.60" "1.60.0")
+set(Boost_ADDITIONAL_VERSIONS "1.64" "1.64.0")
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig "@DCMTK_DIR@")
@@ -188,30 +188,20 @@ if(MITK_USE_DCMTK)
 endif()
 
 # -----------------------------------------
-# Special handling for SOFA
-
-if(MITK_USE_SOFA)
-  # The SOFAConfig.cmake file does not provide exported targets or
-  # libraries with absolute paths, hence we need to make the link
-  # directories globally available until the SOFAConfig.cmake file
-  # supports a proper mechanism for handling targets.
-# find_package(SOFA PATHS ${SOFA_DIR} CONFIG REQUIRED)
-  link_directories(${SOFA_LIBRARY_DIRS})
-endif()
-
-# -----------------------------------------
-# Special handling for VMTK
-
-if(MITK_USE_VMTK)
-  # Same as SOFA above
-  link_directories(${VMTK_LIBRARY_DIRS})
+# Special handling for DCMQI
+if(MITK_USE_DCMQI)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMQIConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMQI.
+    # Help our FindDCMQI.cmake script find our super-build DCMQI
+  set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  find_package(DCMQI REQUIRED)
 endif()
 
 # -----------------------------------------
 # Special handling for Boost
 
 if(MITK_USE_Boost)
-  # Same as SOFA above
   link_directories(${Boost_LIBRARY_DIRS})
 endif()
 
@@ -219,7 +209,6 @@ endif()
 # Special handling for OpenIGTLink
 
 if(MITK_USE_OpenIGTLink)
-  # Same as SOFA above
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
 endif()
 

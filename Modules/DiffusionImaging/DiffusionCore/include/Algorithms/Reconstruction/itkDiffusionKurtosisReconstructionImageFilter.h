@@ -223,7 +223,11 @@ namespace itk
   struct KurtosisFitConfiguration
   {
     KurtosisFitConfiguration()
-      : omit_bzero(false),use_K_limits(false),exclude_high_b(false) {}
+      : omit_bzero(false)
+      , use_K_limits(false)
+      , exclude_high_b(false)
+      , b_upper_threshold(10e9)
+    {}
 
     bool omit_bzero;
     FitScale fit_scale;

@@ -16,15 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 
+#include <mitkAnatomicalStructureColorPresets.h>
 #include "mitkDisplayInteractor.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
-#include "mitkLabelSetImage.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
-#include "mitkProperties.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+#include <mitkDICOMSegmentationPropertyHelper.cpp>
 
 // us
 #include <usGetModuleContext.h>
@@ -34,8 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char *type)
-  : m_PredicateImages(NodePredicateDataType::New("Image")) // for reference images
-    ,
+  : m_EventConfig("DisplayConfigMITK.xml"),
+    m_ToolManager(nullptr),
+    m_PredicateImages(NodePredicateDataType::New("Image")), // for reference images
     m_PredicateDim3(NodePredicateDimension::New(3, 1)),
     m_PredicateDim4(NodePredicateDimension::New(4, 1)),
     m_PredicateDimension(mitk::NodePredicateOr::New(m_PredicateDim3, m_PredicateDim4)),
@@ -52,8 +53,7 @@ mitk::Tool::Tool(const char *type)
     m_IsSegmentationPredicate(
       NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper)),
     m_InteractorType(type),
-    m_DisplayInteractorConfigs(),
-    m_EventConfig("DisplayConfigMITK.xml")
+    m_DisplayInteractorConfigs()
 {
 }
 
@@ -264,6 +264,11 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(Image *original,
     Tool::ErrorMessage("Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.");
     return nullptr;
   }
+
+  // Add some DICOM Tags as properties to segmentation image
+  PropertyList::Pointer dicomSegPropertyList = mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(original->GetPropertyList());
+  segmentation->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
+  mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(segmentation->GetActiveLabel(segmentation->GetActiveLayer()));
 
   return CreateSegmentationNode(segmentation, organName, color);
 }

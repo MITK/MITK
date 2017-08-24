@@ -68,7 +68,7 @@ public:
   3D bottom ... ). */
   bool GetSettingsMenuVisibilty()
   {
-    if (m_Settings == NULL)
+    if (m_Settings == nullptr)
       return false;
     else
       return m_Settings->isVisible();

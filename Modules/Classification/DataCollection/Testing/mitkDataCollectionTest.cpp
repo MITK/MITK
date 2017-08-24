@@ -30,7 +30,7 @@ public:
   {
     mitk::DataCollection::Pointer col = mitk::DataCollection::New();
     mitk::Image::Pointer image1 = mitk::ImageGenerator::GenerateGradientImage<float>(10,5,8);
-    mitk::IOUtil::SaveImage(image1, "d:\\tmp\\test.nrrd");
+    mitk::IOUtil::Save(image1, "d:\\tmp\\test.nrrd");
     typedef itk::Image<float, 3> ImageType;
     ImageType::Pointer iImage1;
     mitk::CastToItkImage(image1, iImage1);
@@ -79,7 +79,7 @@ public:
     coll.AddImage(0,0,image1);
     for (int i=0;i<60;i++)
       MITK_INFO << i << ": " << coll.GetDataPoint(i,0);
-    mitk::IOUtil::SaveImage(image1,"d:\\tmp\\testbld.nrrd");
+    mitk::IOUtil::Save(image1,"d:\\tmp\\testbld.nrrd");
   }*/
 };
 

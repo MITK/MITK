@@ -104,10 +104,10 @@ public:
 
     /** \brief Empty vtkPolyData that is set when rendering geometry does not
       *   intersect the image geometry.
-      *   \warning This member variable is set to NULL,
+      *   \warning This member variable is set to nullptr,
       *   if no image geometry is inside the plane geometry
       *   of the respective render window. Any user of this
-      *   slice has to check whether it is set to NULL!
+      *   slice has to check whether it is set to nullptr!
       */
     vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
     /** \brief Plane on which the slice is rendered as texture. */
@@ -154,7 +154,7 @@ public:
   LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
   /** \brief Set the default properties for general image rendering. */
-  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
 
 protected:
   /** \brief Transforms the actor to the actual position in 3D.
@@ -235,13 +235,13 @@ protected:
     * \brief Calculates whether the given rendering geometry intersects the
     * given SlicedGeometry3D.
     *
-    * This method checks if the given Geometry2D intersects the given
-    * SlicedGeometry3D. It calculates the distance of the Geometry2D to all
+    * This method checks if the given PlaneGeometry intersects the given
+    * SlicedGeometry3D. It calculates the distance of the PlaneGeometry to all
     * 8 cornerpoints of the SlicedGeometry3D. If all distances have the same
     * sign (all positive or all negative) there is no intersection.
     * If the distances have different sign, there is an intersection.
     **/
-  bool RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry );
+  bool RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry );
 };
 
 } // namespace mitk

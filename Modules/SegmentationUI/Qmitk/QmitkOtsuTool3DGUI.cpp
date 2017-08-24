@@ -116,7 +116,7 @@ void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
       return;
   }
 
-  if (m_OtsuTool3DTool.IsNotNull() && m_Controls.m_selectionListWidget->currentItem() != NULL)
+  if (m_OtsuTool3DTool.IsNotNull() && m_Controls.m_selectionListWidget->currentItem() != nullptr)
   {
     m_OtsuTool3DTool->ConfirmSegmentation();
   }
@@ -135,7 +135,7 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
     {
       int proceed;
       QMessageBox *messageBox = new QMessageBox(QMessageBox::Question,
-                                                NULL,
+                                                nullptr,
                                                 "The otsu segmentation computation may take several minutes depending "
                                                 "on the number of Regions you selected. Proceed anyway?",
                                                 QMessageBox::Ok | QMessageBox::Cancel);
@@ -159,7 +159,7 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       this->setCursor(Qt::ArrowCursor);
       QMessageBox *messageBox =
         new QMessageBox(QMessageBox::Critical,
-                        NULL,
+                        nullptr,
                         "itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled.");
       messageBox->exec();
       delete messageBox;

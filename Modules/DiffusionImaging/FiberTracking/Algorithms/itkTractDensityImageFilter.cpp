@@ -29,17 +29,16 @@ namespace itk{
 
 template< class OutputImageType >
 TractDensityImageFilter< OutputImageType >::TractDensityImageFilter()
-    : m_InvertImage(false)
-    , m_FiberBundle(NULL)
-    , m_UpsamplingFactor(1)
-    , m_InputImage(NULL)
+    : m_UpsamplingFactor(1)
+    , m_InvertImage(false)
     , m_BinaryOutput(false)
     , m_UseImageGeometry(false)
     , m_OutputAbsoluteValues(false)
     , m_UseTrilinearInterpolation(false)
     , m_DoFiberResampling(true)
+    , m_WorkOnFiberCopy(true)
+    , m_MaxDensity(0)
 {
-
 }
 
 template< class OutputImageType >
@@ -130,32 +129,33 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     else
         minSpacing = newSpacing[2];
 
-    MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
     if (m_DoFiberResampling)
     {
+      MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
+      if (m_WorkOnFiberCopy)
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
-        m_FiberBundle->ResampleSpline(minSpacing/10);
+      m_FiberBundle->ResampleLinear(minSpacing/10);
     }
 
     MITK_INFO << "TractDensityImageFilter: starting image generation";
 
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
-    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-    vLines->InitTraversal();
+
     int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
         ++disp;
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
+        vtkCell* cell = fiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
         float weight = m_FiberBundle->GetFiberWeight(i);
 
         // fill output image
         for( int j=0; j<numPoints; j++)
         {
-            itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[j]));
+            itk::Point<float, 3> vertex = GetItkPoint(points->GetPoint(j));
             itk::Index<3> index;
             itk::ContinuousIndex<float, 3> contIndex;
             outImage->TransformPhysicalPointToIndex(vertex, index);
@@ -166,7 +166,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
                 if (m_BinaryOutput)
                     outImage->SetPixel(index, 1);
                 else
-                    outImage->SetPixel(index, outImage->GetPixel(index)+0.01*weight);
+                    outImage->SetPixel(index, outImage->GetPixel(index)+weight);
                 continue;
             }
 
@@ -227,17 +227,17 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
         }
     }
 
+    m_MaxDensity = 0;
+    for (int i=0; i<w*h*d; i++)
+        if (m_MaxDensity < outImageBufferPointer[i])
+            m_MaxDensity = outImageBufferPointer[i];
     if (!m_OutputAbsoluteValues && !m_BinaryOutput)
     {
         MITK_INFO << "TractDensityImageFilter: max-normalizing output image";
-        OutPixelType max = 0;
-        for (int i=0; i<w*h*d; i++)
-            if (max < outImageBufferPointer[i])
-                max = outImageBufferPointer[i];
-        if (max>0)
+        if (m_MaxDensity>0)
             for (int i=0; i<w*h*d; i++)
             {
-                outImageBufferPointer[i] /= max;
+                outImageBufferPointer[i] /= m_MaxDensity;
             }
     }
     if (m_InvertImage)

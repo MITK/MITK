@@ -144,7 +144,7 @@ public:
       MITK_ERROR << "Test error stream.";
       MITK_FATAL << "Test fatal stream.";
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       testSucceded = false;
     }
@@ -174,7 +174,7 @@ public:
       MITK_INFO << testStringStream.str();
       MITK_INFO << testMitkPoint;
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       testSucceded = false;
     }

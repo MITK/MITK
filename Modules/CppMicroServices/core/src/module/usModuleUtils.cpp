@@ -123,10 +123,10 @@ std::string GetLibraryPath_impl(void *symbol)
 
 void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
 {
-  HMODULE handle = NULL;
+  HMODULE handle = nullptr;
   if (!sharedLibMode || moduleInfo.name == "main")
   {
-    handle = GetModuleHandle(NULL);
+    handle = GetModuleHandle(nullptr);
   }
   else
   {

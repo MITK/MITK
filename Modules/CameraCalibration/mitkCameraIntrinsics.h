@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkXMLSerializable.h"
 #include <MitkCameraCalibrationExports.h>
 
-int mitkCameraIntrinsicsTest(int argc, char* argv[]);
+int mitkCameraIntrinsicsTest(int, char* []);
 
 namespace mitk
 {

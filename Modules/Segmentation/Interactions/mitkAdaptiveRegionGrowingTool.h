@@ -53,7 +53,7 @@ namespace mitk
 
     /**
      * @brief Get XPM
-     * @return NULL
+     * @return nullptr
      */
     virtual const char **GetXPM() const override;
 

@@ -44,7 +44,7 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage(itk::Image<TPixel, VImageDimensio
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText(
       "An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
-    MITK_ERROR << "image is NULL...returning" << std::endl;
+    MITK_ERROR << "image is nullptr...returning" << std::endl;
     return;
   }
 

@@ -79,14 +79,10 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-7.0.0.tar.gz)
-  set(VTK_URL_MD5 5fe35312db5fb2341139b8e4955c367d)
-
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${VTK_URL}
-    URL_MD5 ${VTK_URL_MD5}
-    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK.patch
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.0.0.tar.gz
+    URL_MD5 8de89b8c7a729016ab7128da5e881cf4
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -98,7 +94,7 @@ if(NOT DEFINED VTK_DIR)
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         -DVTK_USE_CXX11_FEATURES:BOOL=ON
-        -DVTK_RENDERING_BACKEND:STRING=OpenGL
+        -DVTK_RENDERING_BACKEND:STRING=OpenGL2
         ${additional_cmake_args}
     CMAKE_CACHE_ARGS
       ${ep_common_cache_args}

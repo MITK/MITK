@@ -59,7 +59,8 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
         m_NumSticks = 30 + this->m_RandGen->GetIntegerVariate()%31;
 
     GradientType g = this->m_GradientList[dir];
-    ScalarType bVal = g.GetNorm(); bVal *= bVal;
+    float norm = g.GetNorm();
+    ScalarType bVal = norm*norm;
 
     if (bVal>0.0001)    // is weighted direction
     {
@@ -67,9 +68,9 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
         {
             ScalarType dot = 0;
             if(m_RandomizeSticks)
-                dot = GetRandomDirection()*g;
+                dot = GetRandomDirection()*g/norm;
             else
-                dot = m_Sticks[j]*g;
+                dot = m_Sticks[j]*g/norm;
             signal += std::exp( (double)(b*bVal*dot*dot) );
         }
         signal /= m_NumSticks;
@@ -104,7 +105,8 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        ScalarType bVal = g.GetNorm(); bVal *= bVal;
+        float norm = g.GetNorm();
+        ScalarType bVal = norm*norm;
 
         if (bVal>0.0001)
         {
@@ -112,9 +114,9 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
             {
                 ScalarType dot = 0;
                 if(m_RandomizeSticks)
-                    dot = GetRandomDirection()*g;
+                    dot = GetRandomDirection()*g/norm;
                 else
-                    dot = m_Sticks[j]*g;
+                    dot = m_Sticks[j]*g/norm;
                 signal[i] += std::exp( (double)(b*bVal*dot*dot) );
             }
             signal[i] /= m_NumSticks;

@@ -29,12 +29,12 @@ namespace mitk
 {
   ToFOpenCVImageGrabber::ToFOpenCVImageGrabber()
   {
-    m_CurrentOpenCVIntensityImage = NULL;
-    m_CurrentOpenCVAmplitudeImage = NULL;
-    m_CurrentOpenCVDistanceImage = NULL;
+    m_CurrentOpenCVIntensityImage = nullptr;
+    m_CurrentOpenCVAmplitudeImage = nullptr;
+    m_CurrentOpenCVDistanceImage = nullptr;
     m_ImageType = 0;
     m_ImageDepth = IPL_DEPTH_32F;
-    m_ImageGrabber = NULL;
+    m_ImageGrabber = nullptr;
   }
 
   ToFOpenCVImageGrabber::~ToFOpenCVImageGrabber()

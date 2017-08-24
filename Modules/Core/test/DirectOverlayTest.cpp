@@ -34,7 +34,7 @@ public:
     thresholder->Update();
 
     output = mitk::ImportItkImage(thresholder->GetOutput());
-    // mitk::IOUtil::SaveImage( output, "/tmp/out.nii" );
+    // mitk::IOUtil::Save( output, "/tmp/out.nii" );
     std::cout << "extra line";
   }
 
@@ -76,11 +76,11 @@ public:
 
         overlayImage = mitk::ImportItkImage( itkOverlayImage );
     */
-    // mitk::IOUtil::SaveImage(truth, "/tmp/truth_TestOverlay.nii");
+    // mitk::IOUtil::Save(truth, "/tmp/truth_TestOverlay.nii");
     try
     {
       // mitk::Image::Pointer temp = overlayImage;
-      mitk::IOUtil::SaveImage(overlayImage, "/tmp/overlayImage_TestOverlay.nrrd");
+      mitk::IOUtil::Save(overlayImage, "/tmp/overlayImage_TestOverlay.nrrd");
     }
     catch (const itk::ExceptionObject &e)
     {
@@ -194,8 +194,8 @@ public:
 
   static void TestDirectOverlay(char *in, char *gt, const int lower, const int upper)
   {
-    mitk::Image::Pointer original = mitk::IOUtil::LoadImage(in);
-    mitk::Image::Pointer truth = mitk::IOUtil::LoadImage(gt);
+    mitk::Image::Pointer original = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(in)[0].GetPointer());
+    mitk::Image::Pointer truth = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(gt)[0].GetPointer());
 
     if (original.IsNotNull() && original->GetDimension() == 3 && truth.IsNotNull() && truth->GetDimension() == 3 &&
         upper > lower)

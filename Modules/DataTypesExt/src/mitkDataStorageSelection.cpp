@@ -262,7 +262,7 @@ namespace mitk
       if (m_AutoAddNodes && m_Predicate.IsNotNull())
         // get subset
         _NodeSet = m_DataStorage->GetSubset(m_Predicate);
-      // if predicate is NULL, select all nodes
+      // if predicate is nullptr, select all nodes
       else if (m_AutoAddNodes)
       {
         _NodeSet = m_DataStorage->GetAll();

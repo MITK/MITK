@@ -17,8 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetwork.h"
 #include <mitkConnectomicsStatisticsCalculator.h>
+
 #include <boost/graph/clustering_coefficient.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4172)
+#endif
+
 #include <boost/graph/betweenness_centrality.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 /* Constructor and Destructor */
 mitk::ConnectomicsNetwork::ConnectomicsNetwork()
@@ -726,7 +737,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
   {
     if(verbose)
     {
-      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide NULL.";
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide nullptr.";
     }
     return false;
   }
@@ -735,7 +746,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
   {
     if(verbose)
     {
-      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide NULL.";
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide nullptr.";
     }
     return false;
   }

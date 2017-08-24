@@ -149,7 +149,7 @@ public:
 
 };
 
-int mitkDataCollectionImageIteratorTest(int argc, char* argv[])
+int mitkDataCollectionImageIteratorTest(int, char* [])
 {
   MITK_TEST_BEGIN("mitkDataCollectionImageIteratorTest");
 

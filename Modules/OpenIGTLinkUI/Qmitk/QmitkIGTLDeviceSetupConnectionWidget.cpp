@@ -44,8 +44,8 @@ QmitkIGTLDeviceSetupConnectionWidget::QmitkIGTLDeviceSetupConnectionWidget(
   QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f), m_IsClient(false)
 {
-  m_Controls = NULL;
-  this->m_IGTLDevice = NULL;
+  m_Controls = nullptr;
+  this->m_IGTLDevice = nullptr;
   CreateQtPartControl(this);
   m_NumSentFramesSinceLastUpdate = 0;
   m_NumReceivedFramesSinceLastUpdate = 0;
@@ -218,7 +218,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
 
     //check if the device is a server or a client
     if (dynamic_cast<mitk::IGTLClient*>(
-      this->m_IGTLDevice.GetPointer()) == NULL)
+      this->m_IGTLDevice.GetPointer()) == nullptr)
     {
       m_IsClient = false;
     }
@@ -271,7 +271,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
   }
   else
   {
-    m_IGTLDevice = NULL;
+    m_IGTLDevice = nullptr;
   }
 }
 
@@ -385,7 +385,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferIncomingMessages(int state)
 {
   if (this->m_IGTLDevice.IsNotNull())
   {
-    this->m_IGTLDevice->EnableInfiniteBufferingMode(
+    this->m_IGTLDevice->EnableNoBufferingMode(
       this->m_IGTLDevice->GetMessageQueue(), (bool)state);
   }
 }
@@ -394,7 +394,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferOutgoingMessages(int state)
 {
   if (this->m_IGTLDevice.IsNotNull())
   {
-    this->m_IGTLDevice->EnableInfiniteBufferingMode(
+    this->m_IGTLDevice->EnableNoBufferingMode(
       this->m_IGTLDevice->GetMessageQueue(), (bool)state);
   }
 }

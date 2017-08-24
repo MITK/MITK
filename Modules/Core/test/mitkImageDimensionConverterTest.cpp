@@ -109,7 +109,7 @@ int mitkImageDimensionConverterTest(int /*argc*/, char * /*argv*/ [])
           << "/rotatedImage2D.nrrd";
   mitk::IOUtil::Save(mitkImage2D, sstream.str());
 
-  mitk::Image::Pointer imageLoaded2D = mitk::IOUtil::LoadImage(sstream.str());
+  mitk::Image::Pointer imageLoaded2D = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(sstream.str())[0].GetPointer());
 
   // check if image can be loaded
   MITK_TEST_CONDITION_REQUIRED(imageLoaded2D.IsNotNull(), "Loading saved 2D Image");
@@ -214,7 +214,7 @@ int mitkImageDimensionConverterTest(int /*argc*/, char * /*argv*/ [])
   sstream2 << MITK_TEST_OUTPUT_DIR << ""
            << "/rotatedImage.nrrd";
   mitk::IOUtil::Save(mitkImage3D, sstream2.str());
-  mitk::Image::Pointer imageLoaded = mitk::IOUtil::LoadImage(sstream2.str());
+  mitk::Image::Pointer imageLoaded = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(sstream2.str())[0].GetPointer());
 
   // check if image can be loaded
   MITK_TEST_CONDITION_REQUIRED(imageLoaded.IsNotNull(), "Loading saved Image");

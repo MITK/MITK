@@ -137,7 +137,7 @@ namespace mitk
     LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
 
     /** \brief Set the default properties for general image rendering. */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
      * Detailed documentation about the modes can be found here: \link mitk::RenderingerModeProperty \endlink

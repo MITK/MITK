@@ -96,7 +96,7 @@ namespace itk
           m_BoundingBox[i] = NumericTraits< IndexValueType >::max();
           m_BoundingBox[i + 1] = NumericTraits< IndexValueType >::NonpositiveMin();
           }
-        m_Histogram = ITK_NULLPTR;
+        m_Histogram = nullptr;
       }
 
       // constructor with histogram enabled

@@ -40,14 +40,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 int mitkVtkPropRendererTest(int argc, char *argv[])
 {
   // independently read header of pic file
-  mitkIpPicDescriptor *picheader = NULL;
+  mitkIpPicDescriptor *picheader = nullptr;
   if (argc >= 1)
   {
     if (itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic") !=
         std::string::npos)
-      picheader = mitkIpPicGetHeader(argv[1], NULL);
+      picheader = mitkIpPicGetHeader(argv[1], nullptr);
   }
-  if (picheader == NULL)
+  if (picheader == nullptr)
   {
     std::cout << "file not found/not a pic-file - test not applied [PASSED]" << std::endl;
     std::cout << "[TEST DONE]" << std::endl;
@@ -196,13 +196,13 @@ int mitkVtkPropRendererTest(int argc, char *argv[])
 
   propRenderer->GetVtkRenderer()->RemoveViewProp(renderProp);
   renderProp->Delete();
-  propRenderer = NULL;
+  propRenderer = nullptr;
   sphereRenderer->Delete();
 
   renderWindow->Delete();
 
   vtkImage->Delete();
-  ds = NULL;
+  ds = nullptr;
 
   std::cout << "[TEST DONE]" << std::endl;
   return EXIT_SUCCESS;

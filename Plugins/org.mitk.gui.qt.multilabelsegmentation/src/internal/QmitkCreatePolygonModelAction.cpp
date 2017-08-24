@@ -20,10 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkShowSegmentationAsSurface.h>
 #include <mitkProgressBar.h>
 #include <mitkStatusBar.h>
-#include <QmitkStdMultiWidget.h>
-
 #include <mitkIRenderWindowPart.h>
-#include <mitkIRenderingManager.h>
+#include <mitkSliceNavigationController.h>
 
 // Blueberry
 #include <berryIPreferences.h>
@@ -104,7 +102,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       mitk::SliceNavigationController* timeNavController = 0;
       if (renderPart != 0)
       {
-        timeNavController = renderPart->GetRenderingManager()->GetTimeNavigationController();
+        timeNavController = renderPart->GetTimeNavigationController();
       }
 
       int timeNr = timeNavController != 0 ? timeNavController->GetTime()->GetPos() : 0;

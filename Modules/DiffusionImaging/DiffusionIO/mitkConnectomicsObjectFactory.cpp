@@ -39,7 +39,7 @@ mitk::ConnectomicsObjectFactory::~ConnectomicsObjectFactory()
 
 mitk::Mapper::Pointer mitk::ConnectomicsObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper=NULL;
+  mitk::Mapper::Pointer newMapper=nullptr;
 
   if ( id == mitk::BaseRenderer::Standard3D )
   {

@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
         ++imageIter )
   {
     const mitk::Image::Pointer image = *imageIter;
-    mitk::IOUtil::SaveImage(image,outFileName);
+    mitk::IOUtil::Save(image,outFileName);
   }
   return EXIT_SUCCESS;
 }

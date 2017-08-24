@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkFeedbackContourTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "mitkPointOperation.h"
 #include "mitkPointSet.h"
 #include <MitkSegmentationExports.h>

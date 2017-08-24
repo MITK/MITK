@@ -119,7 +119,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
     }
     else
     {
-      MITK_INFO << "   a NULL node selected";
+      MITK_INFO << "   a nullptr node selected";
     }
   }
 }
@@ -135,8 +135,8 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
   typedef itk::ConstantPadImageFilter< ImageType, PADOutputImageType > PadFilterType;
   PadFilterType::Pointer padFilter = PadFilterType::New();
 
-  unsigned long upperPad[3];
-  unsigned long lowerPad[3];
+  itk::SizeValueType upperPad[3];
+  itk::SizeValueType lowerPad[3];
   int borderLiner = 3;
 
   mitk::Point3D mitkOriginPoint;
@@ -192,7 +192,7 @@ void QmitkAutocropAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)
   //not needed
 }
 
-void QmitkAutocropAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
+void QmitkAutocropAction::SetFunctionality(berry::QtViewPart* /*view*/)
 {
   //not needed
 }

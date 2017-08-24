@@ -38,7 +38,6 @@ namespace mitk
   class BaseRenderer;
   class BaseData;
   class DataNode;
-  class OverlayManager;
 
   /** \brief Base class of all mappers, Vtk as well as OpenGL mappers
   *
@@ -118,7 +117,7 @@ namespace mitk
     /** \brief Returns whether this is an vtk-based mapper
    * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
    */
-    virtual bool IsVtkBased() const = 0;
+    virtual bool IsVtkBased() const { return true; }
 
     /** \brief Calls the time step of the input data for the specified renderer and checks
     * whether the time step is valid and calls method GenerateDataForRenderer()
@@ -144,7 +143,7 @@ namespace mitk
     * \param node The node for which the properties are set
     * \param overwrite overwrite existing properties (default: \a false)
     * \param renderer defines which property list of node is used
-    * (default: \a NULL, i.e. default property list)
+    * (default: \a nullptr, i.e. default property list)
     */
     static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
@@ -177,8 +176,6 @@ namespace mitk
     * To be implemented in sub-classes.
     */
     virtual void ResetMapper(BaseRenderer * /*renderer*/) {}
-    virtual OverlayManager *GetOverlayManager() const;
-
     mitk::DataNode *m_DataNode;
 
   private:

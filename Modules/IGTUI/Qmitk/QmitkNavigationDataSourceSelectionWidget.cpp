@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkNavigationDataSourceSelectionWidget::QmitkNavigationDataSourceSelectionWidget(QWidget* parent, Qt::WindowFlags f)
 : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
 
@@ -72,8 +72,8 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     if (!s) //no device selected
       {
         //reset everything
-        m_CurrentSource = NULL;
-        m_CurrentStorage = NULL;
+        m_CurrentSource = nullptr;
+        m_CurrentStorage = nullptr;
         emit NavigationDataSourceSelected(m_CurrentSource);
         return;
       }
@@ -105,10 +105,10 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
       MITK_WARN << "Found an invalid storage object!";
       return;
       }
-    if (m_CurrentStorage->GetToolCount() != m_CurrentSource->GetNumberOfOutputs()) //there is something wrong with the storage
+    if (m_CurrentStorage->GetToolCount() != static_cast<int>(m_CurrentSource->GetNumberOfOutputs())) //there is something wrong with the storage
       {
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
-      m_CurrentStorage = NULL;
+      m_CurrentStorage = nullptr;
       }
 
     emit NavigationDataSourceSelected(m_CurrentSource);
@@ -128,8 +128,8 @@ int QmitkNavigationDataSourceSelectionWidget::GetSelectedToolID()
 
 mitk::NavigationTool::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationTool()
   {
-    if (this->m_CurrentStorage.IsNull()) return NULL;
-    if (m_Controls->m_ToolView->currentIndex().row() >= m_CurrentStorage->GetToolCount()) return NULL;
+    if (this->m_CurrentStorage.IsNull()) return nullptr;
+    if (m_Controls->m_ToolView->currentIndex().row() >= m_CurrentStorage->GetToolCount()) return nullptr;
     return this->m_CurrentStorage->GetTool(m_Controls->m_ToolView->currentIndex().row());
   }
 

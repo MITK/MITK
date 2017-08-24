@@ -69,7 +69,7 @@ namespace mitk
 
   bool MimeType::IsValid() const
   {
-    return m_Data.Data() != NULL && m_Data->m_CustomMimeType.get() != NULL &&
+    return m_Data.Data() != nullptr && m_Data->m_CustomMimeType.get() != nullptr &&
            !m_Data->m_CustomMimeType->GetName().empty();
   }
 

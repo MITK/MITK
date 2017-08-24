@@ -84,17 +84,17 @@ void QmitkNavigationDataPlayerView::CreateConnections()
 
 void QmitkNavigationDataPlayerView::OnOpenFile()
 {
-  mitk::NavigationDataReaderInterface::Pointer reader = NULL;
+  mitk::NavigationDataReaderInterface::Pointer reader = nullptr;
 
   QString filter = tr("NavigationData File (*.csv *.xml)");
 
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+  QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open NavigationData Set"), "", filter);
 
   if ( fileName.isNull() ) { return; } // user pressed cancel
 
   try
   {
-    m_Data = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
+    m_Data = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(fileName.toStdString())[0].GetPointer());
   }
   catch ( const mitk::Exception &e )
   {
@@ -103,6 +103,9 @@ void QmitkNavigationDataPlayerView::OnOpenFile()
                           +"' could not be read.\n" + e.GetDescription() );
     return;
   }
+
+  if (m_Controls->m_ChkConvertToPointSet->isChecked())
+    m_Data->ConvertNavigationDataToPointSet();
 
   // Update Labels
   m_Controls->m_LblFilePath->setText(fileName);
@@ -172,7 +175,7 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
     m_ToolStorage->RegisterAsMicroservice(m_Player->GetMicroserviceID());
   } else {
     if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();
-    m_ToolStorage = NULL;
+    m_ToolStorage = nullptr;
     m_Player->UnRegisterMicroservice();
   }
 }
@@ -224,7 +227,7 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
 }
 
 void QmitkNavigationDataPlayerView::DestroyPipeline(){
-  m_VisFilter = NULL;
+  m_VisFilter = nullptr;
   for (unsigned int i = 0; i < m_RenderingNodes.size(); i++){
     this->GetDataStorage()->Remove(m_RenderingNodes[i]);
   }

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 class FLmitkComfortWidget : public FLmitkRenderWindow {
   public:
-    FLmitkComfortWidget(int x,int y,int w,int h,const char* label=NULL) : FLmitkRenderWindow(x,y,w,h,label) {
+    FLmitkComfortWidget(int x,int y,int w,int h,const char* label=nullptr) : FLmitkRenderWindow(x,y,w,h,label) {
 
   }
 

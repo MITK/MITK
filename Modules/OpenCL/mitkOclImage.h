@@ -89,6 +89,7 @@ public:
      */
   bool IsModified(int _type);
 
+  using OclBaseData::Modified;
   /** \brief Set the modified flag for one of the buffers
      *
      * @param _type The flag to specify the buffer type ( GPU / CPU )

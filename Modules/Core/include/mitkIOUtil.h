@@ -42,14 +42,15 @@ namespace mitk
    *
    * \brief A utility class to load and save data from/to the local file system.
    *
-   * The methods LoadImage, LoadSurface, and LoadPointSet are convenience methods for general loading of
-   * the three main data types in MITK. They all use the more generic method Load().
-   *
    * \see QmitkIOUtil
    */
   class MITKCORE_EXPORT IOUtil
   {
   public:
+    /**Struct that containes information regarding the current loading process. (e.g. Path that should be loaded,
+    all found readers for the load path,...). It is set be IOUtil and used to pass information via the option callback
+    in load operations.
+    */
     struct MITKCORE_EXPORT LoadInfo
     {
       LoadInfo(const std::string &path);
@@ -59,6 +60,15 @@ namespace mitk
 
       FileReaderSelector m_ReaderSelector;
       bool m_Cancel;
+    };
+
+    /**Struct that is the base class for option callbacks used in load operations. The callback is used by IOUtil, if
+    more than one suitable reader was found or the a reader containes options that can be set. The callback allows to
+    change option settings and select the reader that should be used (via loadInfo).
+    */
+    struct MITKCORE_EXPORT ReaderOptionsFunctorBase
+    {
+      virtual bool operator()(LoadInfo &loadInfo) const = 0;
     };
 
     struct MITKCORE_EXPORT SaveInfo
@@ -78,6 +88,15 @@ namespace mitk
       std::string m_Path;
       /// Flag indicating if sub-sequent save operations are to be canceled.
       bool m_Cancel;
+    };
+
+    /**Struct that is the base class for option callbacks used in save operations. The callback is used by IOUtil, if
+    more than one suitable writer was found or the a writer containes options that can be set. The callback allows to
+    change option settings and select the writer that should be used (via saveInfo).
+    */
+    struct MITKCORE_EXPORT WriterOptionsFunctorBase
+    {
+      virtual bool operator()(SaveInfo &saveInfo) const = 0;
     };
 
     /**
@@ -202,19 +221,68 @@ namespace mitk
      *
      * @param path The absolute file name including the file extension.
      * @param storage A DataStorage object to which the loaded data will be added.
+     * @param optionsCallback Pointer to a callback instance. The callback is used by
+     * the load operation if more the suitable reader was found or the reader has options
+     * that can be set.
      * @return The set of added DataNode objects.
      * @throws mitk::Exception if \c path could not be loaded.
      *
      * @sa Load(const std::vector<std::string>&, DataStorage&)
      */
-    static DataStorage::SetOfObjects::Pointer Load(const std::string &path, DataStorage &storage);
+    static DataStorage::SetOfObjects::Pointer Load(const std::string &path, DataStorage &storage,
+                                                   const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
+    /**
+    * @brief Load a file into the given DataStorage given user defined IFileReader::Options.
+    *
+    * This method calls Load(const std::vector<std::string>&, DataStorage&) with a
+    * one-element vector.
+    *
+    * @param path The absolute file name including the file extension.
+    * @param options IFileReader option instance that should be used if selected reader
+    * has options.
+    * @param storage A DataStorage object to which the loaded data will be added.
+    * @return The set of added DataNode objects.
+    * @throws mitk::Exception if \c path could not be loaded.
+    *
+    * @sa Load(const std::vector<std::string>&, DataStorage&)
+    */
     static DataStorage::SetOfObjects::Pointer Load(const std::string &path,
                                                    const IFileReader::Options &options,
                                                    DataStorage &storage);
 
-    static std::vector<BaseData::Pointer> Load(const std::string &path);
+    /**
+    * @brief Load a file and return the loaded data.
+    *
+    * This method calls Load(const std::vector<std::string>&) with a
+    * one-element vector.
+    *
+    * @param path The absolute file name including the file extension.
+    * @param optionsCallback Pointer to a callback instance. The callback is used by
+    * the load operation if more the suitable reader was found or the reader has options
+    * that can be set.
+    * @return The set of added DataNode objects.
+    * @throws mitk::Exception if \c path could not be loaded.
+    *
+    * @sa Load(const std::vector<std::string>&, DataStorage&)
+    */
+    static std::vector<BaseData::Pointer> Load(const std::string &path,
+                                               const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
+    /**
+    * @brief Load a file and return the loaded data.
+    *
+    * This method calls Load(const std::vector<std::string>&) with a
+    * one-element vector.
+    *
+    * @param path The absolute file name including the file extension.
+    * @param options IFileReader option instance that should be used if selected reader
+    * has options.
+    * @return The set of added DataNode objects.
+    * @throws mitk::Exception if \c path could not be loaded.
+    *
+    * @sa Load(const std::vector<std::string>&, DataStorage&)
+    */
     static std::vector<BaseData::Pointer> Load(const std::string &path, const IFileReader::Options &options);
 
     /**
@@ -225,82 +293,53 @@ namespace mitk
      *
      * @param paths A list of absolute file names including the file extension.
      * @param storage A DataStorage object to which the loaded data will be added.
+     * @param optionsCallback Pointer to a callback instance. The callback is used by
+     * the load operation if more the suitable reader was found or the reader has options
+     * that can be set.
      * @return The set of added DataNode objects.
      * @throws mitk::Exception if an entry in \c paths could not be loaded.
      */
-    static DataStorage::SetOfObjects::Pointer Load(const std::vector<std::string> &paths, DataStorage &storage);
+    static DataStorage::SetOfObjects::Pointer Load(const std::vector<std::string> &paths, DataStorage &storage,
+                                                   const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
-    static std::vector<BaseData::Pointer> Load(const std::vector<std::string> &paths);
-
-    /**
-     * Load files in <code>fileNames</code> and add the constructed mitk::DataNode instances
-     * to the mitk::DataStorage <code>storage</code>
-     *
-     * @param fileNames A list (vector) of absolute file name paths.
-     * @param storage The data storage to which the constructed data nodes are added.
-     * @return The number of added mitk::DataNode instances.
-     *
-     * @deprecatedSince{2014_10} Use Load() instead
-     */
-    DEPRECATED(static int LoadFiles(const std::vector<std::string> &fileNames, DataStorage &storage));
-
-    /**
-     * This method will create a new mitk::DataStorage instance and pass it to
-     * LoadFiles(std::vector<std::string>,DataStorage).
-     *
-     * @param fileNames A list (vector) of absolute file name paths.
-     * @return The new mitk::DataStorage containing the constructed data nodes.
-     *
-     * @see LoadFiles(std::vector<std::string>,DataStorage)
-     *
-     * @deprecatedSince{2014_10} Use Load() instead
-     */
-    DEPRECATED(static DataStorage::Pointer LoadFiles(const std::vector<std::string> &fileNames));
-
-    /**
-     * @brief Create a BaseData object from the given file.
-     * @param path The path to the file including file name and file extension.
-     * @throws mitk::Exception In case of an error when reading the file.
-     * @return Returns the created BaseData object.
-     *
-     * @deprecatedSince{2014_10} Use Load() or FileReaderRegistry::Read() instead.
-     */
-    DEPRECATED(static mitk::BaseData::Pointer LoadBaseData(const std::string &path));
-
-    /**
-     * @brief LoadDataNode Method to load an arbitrary DataNode.
-     * @param path The path to the file including file name and file extension.
-     * @throws mitk::Exception This exception is thrown when the DataNodeFactory is not able to read/find the file
-     * or the DataNode is NULL.
-     * @return Returns the DataNode.
-     *
-     * @deprecatedSince{2014_10} Use Load() instead.
-     */
-    DEPRECATED(static mitk::DataNode::Pointer LoadDataNode(const std::string &path));
+    static std::vector<BaseData::Pointer> Load(const std::vector<std::string> &paths,
+                                               const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
     /**
      * @brief LoadImage Convenience method to load an arbitrary mitkImage.
      * @param path The path to the image including file name and file extension.
-     * @throws mitk::Exception This exception is thrown when the Image is NULL.
+     * @param optionsCallback Pointer to a callback instance. The callback is used by
+     * the load operation if more the suitable reader was found or the reader has options
+     * that can be set.
+     * @throws mitk::Exception This exception is thrown when the Image is nullptr.
      * @return Returns the mitkImage.
      */
-    static mitk::Image::Pointer LoadImage(const std::string &path);
+    static mitk::Image::Pointer LoadImage(const std::string &path,
+      const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
     /**
      * @brief LoadSurface Convenience method to load an arbitrary mitkSurface.
      * @param path The path to the surface including file name and file extension.
-     * @throws mitk::Exception This exception is thrown when the Surface is NULL.
+     * @param optionsCallback Pointer to a callback instance. The callback is used by
+     * the load operation if more the suitable reader was found or the reader has options
+     * that can be set.
+     * @throws mitk::Exception This exception is thrown when the Surface is nullptr.
      * @return Returns the mitkSurface.
      */
-    static mitk::Surface::Pointer LoadSurface(const std::string &path);
+    static mitk::Surface::Pointer LoadSurface(const std::string &path,
+      const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
     /**
      * @brief LoadPointSet Convenience method to load an arbitrary mitkPointSet.
      * @param path The path to the pointset including file name and file extension (currently, only .mps is supported).
-     * @throws mitk::Exception This exception is thrown when the PointSet is NULL.
+     * @param optionsCallback Pointer to a callback instance. The callback is used by
+     * the load operation if more the suitable reader was found or the reader has options
+     * that can be set.
+     * @throws mitk::Exception This exception is thrown when the PointSet is nullptr.
      * @return Returns the mitkPointSet.
      */
-    static mitk::PointSet::Pointer LoadPointSet(const std::string &path);
+    static mitk::PointSet::Pointer LoadPointSet(const std::string &path,
+      const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
     /**
      * @brief Loads the contents of a us::ModuleResource and returns the corresponding mitk::BaseData
@@ -385,68 +424,11 @@ namespace mitk
      */
     static void Save(std::vector<SaveInfo> &saveInfos);
 
-    /**
-     * @brief SaveImage Convenience method to save an arbitrary mitkImage.
-     * @param path The path to the image including file name and file extension.
-     *        If no extention is set, the default value (defined in DEFAULTIMAGEEXTENSION) is used.
-     * @param image The image to save.
-     * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
-     * @return Returns true for success else false.
-     *
-     * @deprecatedSince{2014_10} Use Save() instead.
-     */
-    DEPRECATED(static bool SaveImage(mitk::Image::Pointer image, const std::string &path));
-
-    /**
-     * @brief SaveBaseData Convenience method to save arbitrary baseData.
-     * @param path The path to the image including file name and file extension.
-     *        If no extention is set, the default extension is used.
-     * @param data The data to save.
-     * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
-     * @return Returns true for success else false.
-     *
-     * @deprecatedSince{2014_10} Use Save() instead.
-     */
-    DEPRECATED(static bool SaveBaseData(mitk::BaseData *data, const std::string &path));
-
-    /**
-     * @brief SaveSurface Convenience method to save an arbitrary mitkSurface.
-     * @param path The path to the surface including file name and file extension.
-     *        If no extention is set, the default extension is used.
-     * @throws mitk::Exception This exception is thrown when the writer is not able to write the surface.
-     * or if the fileextension is not suitable for writing.
-     * @return Returns true for success else false.
-     *
-     * @deprecatedSince{2014_10} Use Save() instead.
-     */
-    DEPRECATED(static bool SaveSurface(mitk::Surface::Pointer surface, const std::string &path));
-
-    /**
-     * @brief SavePointSet Convenience method to save an mitkPointSet.
-     * @param path The path to the pointset including file name and file extension.
-     *        If no extention is set, the default extension is used.
-     * @throws mitk::Exception This exception is thrown when the writer is not able to write the pointset.
-     * @return Returns true for success else false.
-     *
-     * @deprecatedSince{2014_10} Use Save() instead.
-     */
-    DEPRECATED(static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string &path));
-
   protected:
-    struct ReaderOptionsFunctorBase
-    {
-      virtual bool operator()(LoadInfo &loadInfo) = 0;
-    };
-
-    struct WriterOptionsFunctorBase
-    {
-      virtual bool operator()(SaveInfo &saveInfo) = 0;
-    };
-
     static std::string Load(std::vector<LoadInfo> &loadInfos,
                             DataStorage::SetOfObjects *nodeResult,
                             DataStorage *ds,
-                            ReaderOptionsFunctorBase *optionsCallback);
+                            const ReaderOptionsFunctorBase *optionsCallback);
 
     static std::string Save(const BaseData *data,
                             const std::string &mimeType,

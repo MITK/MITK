@@ -148,12 +148,12 @@ void QmitkSliceWidget::InitWidget(mitk::SliceNavigationController::ViewDirection
 
   mitk::BaseGeometry::Pointer geometry = static_cast<mitk::BaseGeometry *>(m_SlicedGeometry->Clone().GetPointer());
 
-  const mitk::BoundingBox::Pointer boundingbox = m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
+  const mitk::BoundingBox::Pointer boundingbox = m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), nullptr);
 
   if (boundingbox->GetPoints()->Size() > 0)
   {
     // let's see if we have data with a limited live-span ...
-    mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(GetRenderer(), NULL);
+    mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(GetRenderer(), nullptr);
 
     mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
     timeGeometry->Initialize(geometry, 1);

@@ -287,6 +287,8 @@ public:
         const QString& pluginId, const QString& imageFilePath);
 
     static QIcon GetMissingIcon();
+
+    static QByteArray ApplyTheme(const QByteArray &originalSVG);
 };
 
 }  // namespace berry

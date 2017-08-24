@@ -47,8 +47,8 @@ class US_ABI_LOCAL Activator : public ModuleActivator
 public:
 
   Activator()
-   : m_context(NULL)
-   , m_dictionary(NULL)
+   : m_context(nullptr)
+   , m_dictionary(nullptr)
   {}
 
   /**
@@ -118,7 +118,7 @@ public:
         break;
       }
       // If there is no dictionary, then say so.
-      else if (m_dictionary == NULL)
+      else if (m_dictionary == nullptr)
       {
         std::cout << "No dictionary available." << std::endl;
       }
@@ -177,7 +177,7 @@ public:
         // Unget service object and null references.
         m_context->UngetService(m_ref);
         m_ref = 0;
-        m_dictionary = NULL;
+        m_dictionary = nullptr;
 
         // Query to see if we can get another service.
         std::vector<ServiceReference<IDictionaryService> > refs;

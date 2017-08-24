@@ -64,6 +64,9 @@ namespace mitk
     itkGetConstMacro(BackgroundValue, float);
     itkSetMacro(BackgroundValue, float);
 
+    itkGetConstMacro(Tolerance, double);
+    itkSetMacro(Tolerance, double);
+
     virtual void GenerateInputRequestedRegion() override;
 
     virtual void GenerateOutputInformation() override;
@@ -90,6 +93,7 @@ namespace mitk
     bool m_UShortBinaryPixelType;
 
     float m_BackgroundValue;
+    double m_Tolerance;
   };
 
 } // namespace mitk

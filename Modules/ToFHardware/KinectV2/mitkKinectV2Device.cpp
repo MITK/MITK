@@ -28,9 +28,9 @@ namespace mitk
 {
 
   KinectV2Device::KinectV2Device():
-    m_DistanceDataBuffer(NULL),
-    m_AmplitudeDataBuffer(NULL),
-    m_RGBDataBuffer(NULL),
+    m_DistanceDataBuffer(nullptr),
+    m_AmplitudeDataBuffer(nullptr),
+    m_RGBDataBuffer(nullptr),
     m_DepthBufferSize(sizeof(float)*512*424),
     m_RGBBufferSize(3*1920*1080)
   {
@@ -180,16 +180,16 @@ namespace mitk
   {
     /* extract this pointer from Thread Info structure */
     struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-    if (pInfo == NULL)
+    if (pInfo == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
-    if (pInfo->UserData == NULL)
+    if (pInfo->UserData == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
     KinectV2Device* toFCameraDevice = (KinectV2Device*)pInfo->UserData;
-    if (toFCameraDevice!=NULL)
+    if (toFCameraDevice!=nullptr)
     {
       mitk::RealTimeClock::Pointer realTimeClock;
       realTimeClock = mitk::RealTimeClock::New();

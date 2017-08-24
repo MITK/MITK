@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "mitkNrrdTbssImageWriter".
  */
-int mitkTbssNrrdImageWriterTest(int argc , char* argv[])
+int mitkTbssNrrdImageWriterTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("TbssNrrdImageWriterTest");
 
@@ -37,7 +37,7 @@ int mitkTbssNrrdImageWriterTest(int argc , char* argv[])
 
   mitk::TbssImage* tbssImg = tbssNrrdReader->GetOutput();
 
-  MITK_TEST_CONDITION_REQUIRED(tbssImg != NULL, "Testing that tbssImg is not null");
+  MITK_TEST_CONDITION_REQUIRED(tbssImg != nullptr, "Testing that tbssImg is not null");
 
   mitk::NrrdTbssImageWriter::Pointer tbssNrrdWriter = mitk::NrrdTbssImageWriter::New();
 

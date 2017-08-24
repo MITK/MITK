@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.igttrackingsemiautomaticmeasurement"
+          name="IGT Hummel Protocol Measurement"
+          category="IGT"
+          class="QmitkIGTTrackingSemiAutomaticMeasurementView"
+          icon="resources/iconMeasurementTracking.svg" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.igttrackingdataevaluation"
+          name="IGT Hummel Protocol Data Evaluation"
+          category="IGT"
+          class="QmitkIGTTrackingDataEvaluationView"
+          icon="resources/iconMeasurementEvaluation.svg" />
+  </extension>
+
+</plugin>

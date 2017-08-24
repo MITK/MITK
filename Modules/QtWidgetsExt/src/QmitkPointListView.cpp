@@ -30,13 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkPointListView::QmitkPointListView(QWidget *parent)
   : QListView(parent),
-    m_Snc1(NULL),
-    m_Snc2(NULL),
-    m_Snc3(NULL),
     m_PointListModel(new QmitkPointListModel()),
     m_SelfCall(false),
     m_showFading(false),
-    m_MultiWidget(NULL)
+    m_MultiWidget(nullptr)
 {
   QListView::setAlternatingRowColors(true);
 
@@ -87,6 +84,9 @@ const mitk::PointSet *QmitkPointListView::GetPointSet() const
 void QmitkPointListView::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
 {
   m_MultiWidget = multiWidget;
+  this->AddSliceNavigationController(multiWidget->mitkWidget1->GetSliceNavigationController());
+  this->AddSliceNavigationController(multiWidget->mitkWidget2->GetSliceNavigationController());
+  this->AddSliceNavigationController(multiWidget->mitkWidget3->GetSliceNavigationController());
 }
 
 QmitkStdMultiWidget *QmitkPointListView::GetMultiWidget() const
@@ -107,7 +107,7 @@ void QmitkPointListView::OnPointDoubleClicked(const QModelIndex &index)
 void QmitkPointListView::OnPointSetSelectionChanged()
 {
   const mitk::PointSet *pointSet = m_PointListModel->GetPointSet();
-  if (pointSet == NULL)
+  if (pointSet == nullptr)
     return;
 
   // update this view's selection status as a result to changes in the point set data structure
@@ -147,7 +147,7 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
 
   mitk::PointSet *pointSet = const_cast<mitk::PointSet *>(m_PointListModel->GetPointSet());
 
-  if (pointSet == NULL)
+  if (pointSet == nullptr)
     return;
 
   // (take care that this widget doesn't react to self-induced changes by setting m_SelfCall)
@@ -168,32 +168,10 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
       {
         pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
 
-        // Use Multiwidget or SliceNavigationControllers to set crosshair to selected point
-        if (m_MultiWidget != NULL)
-        {
-          m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));
-        }
-
         mitk::Point3D p = pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep());
 
-        // remove the three ifs below after the SetSnc* methods have been removed
-        if (m_Snc1 != NULL)
-        {
-          m_Snc1->SelectSliceByPoint(p);
-        }
-        if (m_Snc2 != NULL)
-        {
-          m_Snc2->SelectSliceByPoint(p);
-        }
-        if (m_Snc3 != NULL)
-        {
-          m_Snc3->SelectSliceByPoint(p);
-        }
-
-        for (std::set<mitk::SliceNavigationController *>::const_iterator i = m_Sncs.begin(); i != m_Sncs.end(); ++i)
-        {
-          (*i)->SelectSliceByPoint(p);
-        }
+        for (auto snc : m_Sncs)
+          snc->SelectSliceByPoint(p);
       }
       else
       {
@@ -211,7 +189,7 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
 
 void QmitkPointListView::keyPressEvent(QKeyEvent *e)
 {
-  if (m_PointListModel == NULL)
+  if (m_PointListModel == nullptr)
     return;
 
   int key = e->key();
@@ -378,31 +356,16 @@ void QmitkPointListView::ClearPointListTS()
 {
 }
 
-void QmitkPointListView::SetSnc1(mitk::SliceNavigationController *snc)
-{
-  m_Snc1 = snc;
-}
-
-void QmitkPointListView::SetSnc2(mitk::SliceNavigationController *snc)
-{
-  m_Snc2 = snc;
-}
-
-void QmitkPointListView::SetSnc3(mitk::SliceNavigationController *snc)
-{
-  m_Snc3 = snc;
-}
-
 void QmitkPointListView::AddSliceNavigationController(mitk::SliceNavigationController *snc)
 {
-  if (snc == NULL)
+  if (snc == nullptr)
     return;
   m_Sncs.insert(snc);
 }
 
 void QmitkPointListView::RemoveSliceNavigationController(mitk::SliceNavigationController *snc)
 {
-  if (snc == NULL)
+  if (snc == nullptr)
     return;
   m_Sncs.erase(snc);
 }

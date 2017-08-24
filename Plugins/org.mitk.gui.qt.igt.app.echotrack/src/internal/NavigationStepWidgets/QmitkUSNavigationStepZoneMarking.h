@@ -62,6 +62,8 @@ protected slots:
    */
   void OnZoneRemoved();
 
+  void OnShowListClicked(int state);
+
 public:
   explicit QmitkUSNavigationStepZoneMarking(QWidget *parent = 0);
   ~QmitkUSNavigationStepZoneMarking();

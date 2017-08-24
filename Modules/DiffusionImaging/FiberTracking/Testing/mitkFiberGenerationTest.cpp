@@ -19,23 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundle.h>
 #include <mitkPlanarEllipse.h>
 #include <itkFibersFromPlanarFiguresFilter.h>
+#include <omp.h>
 
 /**Documentation
  *  Test if fiber transfortaiom methods work correctly
  */
 int mitkFiberGenerationTest(int argc, char* argv[])
 {
+    omp_set_num_threads(1);
     MITK_TEST_BEGIN("mitkFiberGenerationTest");
 
     MITK_TEST_CONDITION_REQUIRED(argc==6,"check for input data")
 
             try{
-
-        mitk::PlanarEllipse::Pointer pf1 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
-        mitk::PlanarEllipse::Pointer pf2 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
-        mitk::PlanarEllipse::Pointer pf3 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
-        mitk::FiberBundle::Pointer uniform = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
-        mitk::FiberBundle::Pointer gaussian = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
+              
+        mitk::PlanarEllipse::Pointer pf1 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
+        mitk::PlanarEllipse::Pointer pf2 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[2])[0].GetPointer());
+        mitk::PlanarEllipse::Pointer pf3 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[3])[0].GetPointer());
+        mitk::FiberBundle::Pointer uniform = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[4])[0].GetPointer());
+        mitk::FiberBundle::Pointer gaussian = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[5])[0].GetPointer());
 
         FiberGenerationParameters parameters;
         vector< mitk::PlanarEllipse::Pointer > fid; fid.push_back(pf1); fid.push_back(pf2); fid.push_back(pf3);

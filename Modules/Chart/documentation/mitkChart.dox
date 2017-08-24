@@ -1,0 +1,169 @@
+/**
+
+\page ChartModule The MITK Chart Module
+
+\tableofcontents
+
+\section ChartModule_brief Description
+The MITK chart module is able to show different types of charts in a widget with customizable labels. Four types of charts are supported: line, bar, spline and pie.
+
+\imageMacro{images\barChartTemperature.png,"Example bar chart",6}
+\imageMacro{images\lineChartTemperature.png,"Example line chart",6}
+\imageMacro{images\splineChartTemperature.png,"Example spline chart",6}
+\imageMacro{images\pieChartExample.png,"Example pie chart",6}
+
+\subsection Chart_Technical Technical background 
+
+The module uses the java script library C3js (http://www.c3js.org) to display the chart in a <a href="http://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content). For examples, please visit http://c3js.org/examples.html.
+
+\subsection Chart_GUI GUI
+
+\note Be sure that the dependency to the Chart Module is resolved in the CMakeLists.txt of the plugin: <code>MODULE_DEPENDS MitkChart</code>.
+
+Open the ui file of the plugin. Then add a widget (we always use the name <code>chartWidget</code> in the following) at the desired position. Change the class of the widget to a user-defined widget (right click &rarr; user defined classes, see http://doc.qt.io/qt-5/designer-using-custom-widgets.html). Set "QWidget" as base class. Set "QmitkChartWidget" as class name and "QmitkChartWidget.h" as include file.
+
+\imageMacro{images\userDefinedWidget.png,"User defined widget",10}
+
+\subsection Chart_data Data
+
+The most important functionality is to add data to the chartWidget. Either one dimensional or two dimensional data can be used. One-dimensional data has the same interval between values on the x-axis (and no x-axis values) while the two-dimensional data has arbitrary x-axis difference values (and given x-axis values). 
+
+An example for one-dimensional data is the temperature for each month of a year: <code>std::vector<double> temperatureHD = {1.8, 3.1, 6.3, 10.2, 14.5, 17.4, 19.4, 18.9, 15.5, 11.2, 5.8, 2.6}</code>. The first entry corresponds (implicitly) to the temperature in january, two second to the temperature in february the last entry to the temperature in december. Thus, the x values have same intervals. The given temperature values are defined as y-axis values.
+
+An example for two-dimensional data is the people living in a city in different years: <code>std::map<double,double> peopleHeidelberg={{1975, 129368 }, { 1985, 134724 },{ 1990, 136796 },{ 2010, 147312 }}.</code>
+
+Thus, the x-values are given as their intervals are different (10 years, 5 years, 10 years). Each x value is connected to an y-value that represents the amount of people (1975 &rarr; 129368, 1985 &rarr; 134724, ...).
+
+Data is added by calling <code>chartWidget->AddData1D(temperatureHD)</code> or <code>chartWidget->AddData2D(peopleHeidelberg)</code>.
+
+\note All data can be cleared by calling <code>chartWidget->Clear()</code>.
+
+\imageMacro{images\2DDataExample.png,"2D data example: Heidelberg has fewer entries and their x-range (years) is smaller than Freiburg",8}
+
+\subsection Chart_type Chart type
+
+The default chart type is bar. To use a different type, you have to change it. See \ref ChartModule_brief for the available chart types.
+
+Call e.g. <code>chartWidget->SetChartType(QmitkChartWidget::ChartType::line)</code> for changing the chart type. Note that it is not directly displayed. A convenience function if you want to change the chart type and display the result directly is to use <code>chartWidget->SetChartTypeAndReload(QmitkChartWidget::ChartType::line)</code>.
+
+bar chart, line chart and spline chart are somewhat similar. Pie charts are handled differently. The input data sum is regarded as 100%. The values of all data entries are summed. Example: 
+\code{.cpp}
+chartWidget->AddData1D({5})
+chartWidget->AddData1D({2})
+chartWidget->AddData1D({3})
+\endcode
+
+The pie chart has then entries of 50%, 20% and 30%. Calling <code>chartWidget->AddData1D({5,2,3})</code> leads to a pie chart with one class having 100%. Calling
+\code{.cpp}
+chartWidget->AddData1D({2,2,1})
+chartWidget->AddData1D({1,1})
+chartWidget->AddData1D({3})
+\endcode
+leads to the first result again (50%, 20% and 30%) as entries are summed.
+
+\note pie charts differ significantly from the other chart types. Be aware of the differences.
+
+\subsection Chart_labels Labels
+
+Three labels can be set to custom strings. These are
+
+<ul>
+  <li> the data labels,
+  <li> the x-axis label and
+  <li> the y-axis label.
+</ul>
+
+Data labels provide the name for data legend entries ("Heidelberg" for our 1D data \ref{Chart_data} as it is the average temperature in Heidelberg). An example x-Axis and y-axis label would be <i>month</i> and <i>temperature</i>, respectively.
+
+If not set, the data labels are set to <i>data1</i>, <i>data2</i> and so on. The x and y-axis labels are empty strings by default.
+
+Call <code>chartWidget->setDataLabels({"Heidelberg"})</code> to set the labels for the different data entries. Order is defined by order of calling <code>AddData1D()</code> and <code>AddData2D()</code>.
+
+<code>chartWidget->setXAxisLabel("month")</code> and <code>chartWidget->setYAxisLabel("temperature")</code> ensures the labeling of x- and y-Axis in the chart. No labels are defined as default.
+
+\subsection Chart_show Displaying the chart
+
+Finally, the chart is displayed by calling <code>chartWidget->Show(bool)</code>. If the optional parameter is set to true, a subchart is shown additionally. That's useful for ensuring the overview if the user wants to zoom in.
+
+\subsection Chart_changingData changing the data
+
+If you want to add more data, just call <code>chartWidget->AddData1D()</code> or <code>chartWidget->AddData2D()</code> as often as desired. Then, call <code>chartWidget->Show()</code>. The range of x- and y-axis is adjusted automatically.
+
+\section Chart_example Example
+
+\subsection Chart_exampleBarChart Bar chart
+
+To create and visualize a bar chart with two data sets, x/y-axis labels and data labels, the following code is used:
+
+\code{.cpp}
+std::vector<double> temperatureHD = {1.8, 3.1, 6.3, 10.2, 14.5, 17.4, 19.4, 18.9, 15.5, 11.2, 5.8, 2.6};
+std::vector<double> temperatureOslo = {-4.3, -4, -0.2, 4.6, 10.8, 15.2, 16.4, 15.2, 10.8, 6.4, 0.7, -2.8};
+chartWidget->AddData1D(temperatureHD);
+chartWidget->AddData1D(temperatureOslo);
+chartWidget->SetChartType(QmitkChartWidget::ChartType::bar);
+chartWidget->SetDataLabels({ "Heidelberg", "Oslo" });
+chartWidget->SetXAxisLabel("month");
+chartWidget->SetYAxisLabel("temperature");
+chartWidget->Show();
+\endcode
+
+The order when AddData1D() is called  influences the colors of the bars and the order of the shown data. The line <code>chartWidget->SetChartType(QmitkChartWidget::ChartType::bar)</code> is superfluos (bar is the default type) and only for completeness. After <code>Show()</code> is called, the chart is visualized.
+
+The chart type can be changed to spline and directly showed:
+
+\code{.cpp}
+chartWidget->SetChartTypeAndReload(QmitkChartWidget::ChartType::spline);
+\endcode
+
+the equivalent code is:
+\code{.cpp}
+chartWidget->SetChartType(QmitkChartWidget::ChartType::spline);
+chartWidget->Show();
+\endcode
+
+The temperature of another city can be added:
+\code{.cpp}
+std::vector<double> temperatureRome = {8.1, 8.7, 8.7, 11.6, 18.8, 22.8, 25.4, 25.7, 21.4, 17.6, 12.6, 8.9};
+chartWidget->AddData1D(temperatureRome);
+chartWidget->SetDataLabels({ "Heidelberg", "Oslo", "Rome" });
+chartWidget->Show(true);
+\endcode
+
+If <code>SetDataLabels()</code> is not called, the label <i>data2</i> is automatically created. As <code>Show(true)</code> is used, a subchart is shown.
+
+\subsection Chart_examplePieChart Pie chart
+
+A pie chart (the same as \ref ChartModule_brief) can be generated with the following code:
+
+\code{.cpp}
+chartWidget->AddData1D({5});
+chartWidget->AddData1D({3});
+chartWidget->AddData1D({2});
+chartWidget->SetChartType(QmitkChartWidget::ChartType::pie);
+chartWidget->SetDataLabels({ "Heidelberg", "Oslo", "New York" });
+chartWidget->Show();
+\endcode
+
+\subsection Chart_example2DData Chart with 2D data
+
+A line chart with two-dimensional data is the following example:
+
+\code{.cpp}
+      std::map<double, double> peopleHD= { {1975, 129368 }, { 1985, 134724 },{ 1990, 136796 },{ 2010, 147312 } };
+      std::map<double, double> peopleFreiburg = { { 1969, 165960 },{ 1973, 174997 },{ 1982, 178545 },{ 2001, 208294 },{ 2015, 222203 } };
+      chartWidget->AddData2D(peopleHD);
+      chartWidget->AddData2D(peopleFreiburg);
+      chartWidget->SetChartType(QmitkChartWidget::ChartType::line);
+      chartWidget->SetDataLabels({ "Heidelberg", "Freiburg" });
+      chartWidget->SetXAxisLabel("year");
+      chartWidget->SetYAxisLabel("people");
+      chartWidget->Show();
+\endcode
+
+Hence, 2D data is having the following assignment: year &rarr; people. In the vector peopleHD, four values are defined, in the vector peopleFreiburg, five values are defined. The defined years are different for Heidelberg (1975-2010) than for Freiburg (1969-2015).
+
+\subsection Chart_imageStatistics image statistics plugin
+
+Another example of the use of QmitkChartWidget can be found in the image statistics plugin (<code>org.mitk.gui.qt.measurementtoolbox\QmitkImageStatisticsView</code>). The <code>chartWidget</code> is named <code>m_Controls->m_JSHistogram</code> there.
+
+ */

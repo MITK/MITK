@@ -95,21 +95,21 @@ namespace mitk
     /**
      * @brief GetRenderWindowByName Get renderWindow by the name of its renderer.
      * @param name The name of the renderer of the desired renderWindow.
-     * @return NULL if not found.
+     * @return nullptr if not found.
      */
     RenderWindow *GetRenderWindowByName(const std::string &name);
 
     /**
      * @brief GetRenderWindowByDefaultViewDirection Get a renderWindow by its default viewdirection.
      * @param viewDirection
-     * @return NULL if not found.
+     * @return nullptr if not found.
      */
     RenderWindow *GetRenderWindowByDefaultViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection);
 
     /**
      * @brief GetRenderWindow Get renderWindow at position 'index'.
      * @param index Position within the renderWindow list.
-     * @return NULL if index is out of bounds.
+     * @return nullptr if index is out of bounds.
      */
     RenderWindow *GetRenderWindow(unsigned int index);
 

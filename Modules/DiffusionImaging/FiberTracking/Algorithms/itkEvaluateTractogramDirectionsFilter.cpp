@@ -31,7 +31,7 @@ namespace itk {
 template< class PixelType >
 EvaluateTractogramDirectionsFilter< PixelType >
 ::EvaluateTractogramDirectionsFilter():
-    m_ReferenceImageSet(NULL),
+    m_ReferenceImageSet(nullptr),
     m_IgnoreMissingDirections(false),
     m_Eps(0.0001),
     m_UseInterpolation(false)

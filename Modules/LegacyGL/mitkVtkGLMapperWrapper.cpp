@@ -91,7 +91,7 @@ mitk::DataNode *mitk::VtkGLMapperWrapper::GetDataNode() const
 Enable2DOpenGL() and Disable2DOpenGL() are used to switch between 2D rendering (orthographic projection) and 3D
 rendering (perspective projection)
 */
-void mitk::VtkGLMapperWrapper::Enable2DOpenGL(mitk::BaseRenderer *renderer)
+void mitk::VtkGLMapperWrapper::Enable2DOpenGL(mitk::BaseRenderer *)
 {
   GLint vp[4];
 

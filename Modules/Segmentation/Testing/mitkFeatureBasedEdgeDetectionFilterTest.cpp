@@ -40,8 +40,8 @@ public:
    */
   void setUp()
   {
-    m_Pic3D = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
-    m_Segmentation = mitk::IOUtil::LoadImage(GetTestDataFilePath("PlaneSuggestion/pic3D_segmentation.nrrd"));
+    m_Pic3D = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd"))[0].GetPointer());
+    m_Segmentation = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("PlaneSuggestion/pic3D_segmentation.nrrd"))[0].GetPointer());
   }
 
   void testFeatureBasedEdgeDetectionFilterInitialization()
@@ -64,7 +64,7 @@ public:
     testFilter->SetSegmentationMask(m_Segmentation);
     testFilter->Update();
 
-    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput()->GetVtkUnstructuredGrid() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput()->GetVtkUnstructuredGrid() != nullptr);
   }
 };
 

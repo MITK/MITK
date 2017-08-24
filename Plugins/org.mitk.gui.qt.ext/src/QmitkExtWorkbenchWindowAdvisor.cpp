@@ -660,7 +660,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
 
-    QMenu* viewMenu;
+    QMenu* viewMenu = nullptr;
     if (showViewMenuItem)
     {
       viewMenu = windowMenu->addMenu("Show &View");
@@ -831,21 +831,45 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   else
     delete qPerspectiveToolbar;
 
-  // ==== View Toolbar ==================================
-  auto   qToolbar = new QToolBar;
-  qToolbar->setObjectName("viewToolBar");
-
   if (showViewToolbar)
   {
-    mainWindow->addToolBar(qToolbar);
+    // Order view descriptors by category
 
-    for (auto viewAction : viewActions)
+    QMultiMap<QString, berry::IViewDescriptor::Pointer> categoryViewDescriptorMap;
+
+    for (auto labelViewDescriptorPair : VDMap)
     {
-      qToolbar->addAction(viewAction);
+      auto viewDescriptor = labelViewDescriptorPair.second;
+      auto category = !viewDescriptor->GetCategoryPath().isEmpty()
+        ? viewDescriptor->GetCategoryPath().back()
+        : QString();
+
+      categoryViewDescriptorMap.insert(category, viewDescriptor);
+    }
+
+    // Create a separate toolbar for each category
+
+    for (auto category : categoryViewDescriptorMap.uniqueKeys())
+    {
+      auto viewDescriptorsInCurrentCategory = categoryViewDescriptorMap.values(category);
+
+      if (!viewDescriptorsInCurrentCategory.isEmpty())
+      {
+        auto toolbar = new QToolBar;
+        toolbar->setObjectName(category + " View Toolbar");
+        mainWindow->addToolBar(toolbar);
+
+        if (!category.isEmpty())
+          toolbar->addWidget(new QLabel(category + " "));
+
+        for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
+        {
+          auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
+          toolbar->addAction(viewAction);
+        }
+      }
     }
   }
-  else
-    delete qToolbar;
 
   QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
   mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());

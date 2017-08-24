@@ -68,7 +68,7 @@ namespace mitk
      *
      * This method must be implemented for each specific writer. Call
      * GetOutputStream() first and check for a non-null stream to write to.
-     * If the output stream is \c NULL, use GetOutputLocation() to write
+     * If the output stream is \c nullptr, use GetOutputLocation() to write
      * to a local file-system path.
      *
      * If the reader cannot use streams directly, use GetLocalFile() to retrieve
@@ -167,7 +167,7 @@ namespace mitk
      *
      * @param context
      * @return
-     * @throws std::invalid_argument if \c context is NULL.
+     * @throws std::invalid_argument if \c context is nullptr.
      */
     virtual us::ServiceRegistration<CustomMimeType> RegisterMimeType(us::ModuleContext *context);
 

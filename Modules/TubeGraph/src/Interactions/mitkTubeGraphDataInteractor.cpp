@@ -55,7 +55,7 @@ void mitk::TubeGraphDataInteractor::DataNodeChanged()
 {
   if (GetDataNode() != nullptr)
   {
-    if (GetDataNode()->GetData() != NULL)
+    if (GetDataNode()->GetData() != nullptr)
     {
       m_TubeGraph = dynamic_cast<TubeGraph *>(GetDataNode()->GetData());
       m_TubeGraphProperty = dynamic_cast<TubeGraphProperty *>(
@@ -64,16 +64,16 @@ void mitk::TubeGraphDataInteractor::DataNodeChanged()
         MITK_ERROR << "Something went wrong! No tube graph property!";
     }
     else
-      m_TubeGraph = NULL;
+      m_TubeGraph = nullptr;
   }
   else
-    m_TubeGraph = NULL;
+    m_TubeGraph = nullptr;
 }
 
 bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return false;
 
   TubeGraphPicker *picker = new mitk::TubeGraphPicker();

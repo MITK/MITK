@@ -38,16 +38,16 @@ mitk::ToFCompositeFilter::~ToFCompositeFilter()
   }
 }
 
-void mitk::ToFCompositeFilter::SetInput(  mitk::Image* distanceImage )
+void mitk::ToFCompositeFilter::SetInput(  const InputImageType* distanceImage )
 {
   this->SetInput(0, distanceImage);
 }
 
-void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
+void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  const InputImageType* distanceImage )
 {
-  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   }
   else
   {
@@ -77,7 +77,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
         CreateItkImage(this->m_ItkInputImage);
       }
     }
-    this->ProcessObject::SetNthInput(idx, distanceImage);   // Process object is not const-correct so the const_cast is required here
+    this->ProcessObject::SetNthInput(idx, const_cast<InputImageType*>(distanceImage));   // Process object is not const-correct so the const_cast is required here
   }
 
   this->CreateOutputsForAllInputs();
@@ -148,14 +148,16 @@ void mitk::ToFCompositeFilter::GenerateData()
 
 void mitk::ToFCompositeFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
+  {
     if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
     }
-    this->Modified();
+  }
+  this->Modified();
 }
 
 void mitk::ToFCompositeFilter::GenerateOutputInformation()

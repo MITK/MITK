@@ -347,7 +347,6 @@ mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializ
 
   boost::property_tree::read_json(stream, root);
 
-  // Iterator over all animals
   for (boost::property_tree::ptree::value_type &element : root.get_child("values"))
   {
     std::string value = element.second.get("value", "");

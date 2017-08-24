@@ -64,7 +64,6 @@ int testExpectedAxisParallelBoundingBox(mitk::BaseGeometry *geometry, TScalarTyp
 
 int testSurfaceBoundingBoxConsistency(mitk::Surface *surface, bool expectIdentityTransform)
 {
-  int result;
   std::cout << "  Testing surface contents: ";
   if ((surface == nullptr) || (surface->GetVtkPolyData() == nullptr) ||
       (surface->GetVtkPolyData()->GetNumberOfPoints() == 0))

@@ -67,7 +67,7 @@ void itk::StructureTensorEigenvalueImageFilter<TInputImageType,TOutputImageType,
   vigra::MultiArray<3, vigra::TinyVector<InputPixelType, 3> > eigenvalues_image(shape);
 
 
-  for(int i = 0 ; i < zdim; ++i )
+  for(unsigned int i = 0 ; i < zdim; ++i )
   {
     vigra::Shape2 slice_shape(xdim,ydim);
     vigra::MultiArrayView<2, InputPixelType, vigra::StridedArrayTag > input_image_slice_view(

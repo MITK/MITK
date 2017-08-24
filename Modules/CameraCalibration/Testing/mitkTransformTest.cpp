@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "Transform".
  */
-int mitkTransformTest(int argc, char* argv[])
+int mitkTransformTest(int, char*[])
 {
   MITK_TEST_BEGIN("Transform")
 

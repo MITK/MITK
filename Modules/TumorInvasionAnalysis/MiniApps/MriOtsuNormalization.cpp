@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
   }
 
   std::string outFile = us::any_cast<string>(parsedArgs["output"]);
-  mitk::Image::Pointer inputFile = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["input"]));
+  mitk::Image::Pointer inputFile = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["input"]))[0].GetPointer());
   int numberOfThresholds = us::any_cast<int>(parsedArgs["bins"]);
   int minBin = us::any_cast<int>(parsedArgs["minBin"]);
   int maxBin = us::any_cast<int>(parsedArgs["maxBin"]);

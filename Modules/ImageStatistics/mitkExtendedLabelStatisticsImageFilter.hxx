@@ -581,16 +581,11 @@ namespace itk
 
         // if enabled, update the histogram for this label
         if ( labelStats.m_Histogram.IsNotNull() )
-          {
+        {
           histogramMeasurement[0] = value;
           labelStats.m_Histogram->GetIndex(histogramMeasurement, histogramIndex);
           labelStats.m_Histogram->IncreaseFrequencyOfIndex(histogramIndex, 1);
-          }
-        else
-        {
-          int x = 0;
         }
-
 
         ++labelIt;
         ++it;

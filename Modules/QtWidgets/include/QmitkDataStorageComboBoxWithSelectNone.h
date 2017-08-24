@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \class QmitkDataStorageComboBoxWithSelectNone
  * \brief Displays all or a subset (defined by a predicate) of nodes of the Data Storage,
  * and additionally, index 0 is always "please select", indicating no selection, and will
- * hence always return a NULL mitk::DataNode* if asked for the node at index 0.
+ * hence always return a nullptr mitk::DataNode* if asked for the node at index 0.
  *
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  * \ingroup org_mitk_gui_qt_cmdlinemodules_internal
@@ -69,20 +69,20 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public Qmitk
 
     /**
      * \brief Searches for a given node, returning the index if found.
-     * \param dataNode an mitk::DataNode, can be NULL.
+     * \param dataNode an mitk::DataNode, can be nullptr.
      * \return int -1 if not found, and compared to base class, will add 1 onto the retrieved index.
      */
     virtual int Find( const mitk::DataNode* dataNode ) const override;
 
     /**
-     * \brief Retrieves the node at a given index, where if index is zero, will always return NULL.
+     * \brief Retrieves the node at a given index, where if index is zero, will always return nullptr.
      * \param index An integer between 0 and n = number of nodes.
-     * \return mitk::DataNode::Pointer NULL or a data node pointer.
+     * \return mitk::DataNode::Pointer nullptr or a data node pointer.
      */
     virtual mitk::DataNode::Pointer GetNode(int index) const override;
 
     /**
-     * \brief Returns the selected DataNode or NULL if there is none, or the current index is zero.
+     * \brief Returns the selected DataNode or nullptr if there is none, or the current index is zero.
      */
     virtual mitk::DataNode::Pointer GetSelectedNode() const override;
 

@@ -147,7 +147,7 @@ namespace mitk
     }
     return roi;
     */
-    return NULL;
+    return nullptr;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetExposureMode( int mode )

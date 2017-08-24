@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationDataTransformFilter::NavigationDataTransformFilter()
 : mitk::NavigationDataToNavigationDataFilter()
 {
-  m_Rigid3DTransform = NULL;
+  m_Rigid3DTransform = nullptr;
   m_Precompose = false;
 }
 
 
 mitk::NavigationDataTransformFilter::~NavigationDataTransformFilter()
 {
-  m_Rigid3DTransform = NULL;
+  m_Rigid3DTransform = nullptr;
 }
 
 void mitk::NavigationDataTransformFilter::GenerateData()

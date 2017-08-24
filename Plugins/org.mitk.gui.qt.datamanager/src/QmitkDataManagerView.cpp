@@ -48,6 +48,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkInfoDialog.h"
 #include "src/internal/QmitkDataManagerItemDelegate.h"
 //## Berry
+#include <berryAbstractUICTKPlugin.h>
+#include <berryIContributor.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
@@ -92,7 +94,7 @@ const QString QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
 QmitkDataManagerView::QmitkDataManagerView()
     : m_GlobalReinitOnNodeDelete(true),
-      m_ItemDelegate(NULL)
+      m_ItemDelegate(nullptr)
 {
 }
 
@@ -202,9 +204,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   auto surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
-  auto labelSetImageDataNodeDescriptor =
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("LabelSetImage");
-
   auto pointSetNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PointSet");
 
@@ -273,7 +272,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
         continue;
     }
 
-    QString actionIcon = customMenuConfig->GetAttribute("icon");
+    QString actionIconName = customMenuConfig->GetAttribute("icon");
 
     // Find matching descriptor
     auto nodeDescriptor  = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(actionNodeDescriptorName);
@@ -285,9 +284,18 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
     // Create action with or without icon
     QAction* contextMenuAction;
-    if ( !actionIcon.isEmpty() )
+    if ( !actionIconName.isEmpty() )
     {
-        contextMenuAction = new QAction(QIcon(actionIcon), actionLabel, parent);
+        QIcon actionIcon;
+        if ( QFile::exists(actionIconName) )
+        {
+          actionIcon = QIcon(actionIconName);
+        } else
+        {
+          actionIcon = berry::AbstractUICTKPlugin::ImageDescriptorFromPlugin(
+            customMenuConfig->GetContributor()->GetName(), actionIconName);
+        }
+        contextMenuAction = new QAction(actionIcon, actionLabel, parent);
     } else
     {
         contextMenuAction = new QAction(actionLabel, parent);
@@ -375,108 +383,108 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ColorActionChanged() ) );
 
   { // only give the color context menu option where appropriate
-    if (imageDataNodeDescriptor != NULL)
+    if (imageDataNodeDescriptor != nullptr)
     {
       imageDataNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(imageDataNodeDescriptor, colorAction));
     }
-    if (multiComponentImageDataNodeDescriptor != NULL)
+    if (multiComponentImageDataNodeDescriptor != nullptr)
     {
       multiComponentImageDataNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(multiComponentImageDataNodeDescriptor, colorAction));
     }
-    if (diffusionImageDataNodeDescriptor != NULL)
+    if (diffusionImageDataNodeDescriptor != nullptr)
     {
       diffusionImageDataNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(diffusionImageDataNodeDescriptor, colorAction));
     }
-    if (surfaceDataNodeDescriptor != NULL)
+    if (surfaceDataNodeDescriptor != nullptr)
     {
       surfaceDataNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(surfaceDataNodeDescriptor, colorAction));
     }
-    if (pointSetNodeDescriptor != NULL)
+    if (pointSetNodeDescriptor != nullptr)
     {
       pointSetNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(pointSetNodeDescriptor, colorAction));
     }
 
-    if (planarLineNodeDescriptor != NULL)
+    if (planarLineNodeDescriptor != nullptr)
     {
       planarLineNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarLineNodeDescriptor, colorAction));
     }
 
-    if (planarCircleNodeDescriptor != NULL)
+    if (planarCircleNodeDescriptor != nullptr)
     {
       planarCircleNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarCircleNodeDescriptor, colorAction));
     }
 
-    if (planarEllipseNodeDescriptor != NULL)
+    if (planarEllipseNodeDescriptor != nullptr)
     {
       planarEllipseNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarEllipseNodeDescriptor, colorAction));
     }
 
-    if (planarAngleNodeDescriptor != NULL)
+    if (planarAngleNodeDescriptor != nullptr)
     {
       planarAngleNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarAngleNodeDescriptor, colorAction));
     }
 
-    if (planarFourPointAngleNodeDescriptor != NULL)
+    if (planarFourPointAngleNodeDescriptor != nullptr)
     {
       planarFourPointAngleNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarFourPointAngleNodeDescriptor, colorAction));
     }
 
-    if (planarRectangleNodeDescriptor != NULL)
+    if (planarRectangleNodeDescriptor != nullptr)
     {
       planarRectangleNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarRectangleNodeDescriptor, colorAction));
     }
 
-    if (planarPolygonNodeDescriptor != NULL)
+    if (planarPolygonNodeDescriptor != nullptr)
     {
       planarPolygonNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarPolygonNodeDescriptor, colorAction));
     }
 
-    if (planarPathNodeDescriptor != NULL)
+    if (planarPathNodeDescriptor != nullptr)
     {
       planarPathNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarPathNodeDescriptor, colorAction));
     }
 
-    if (planarDoubleEllipseNodeDescriptor != NULL)
+    if (planarDoubleEllipseNodeDescriptor != nullptr)
     {
       planarDoubleEllipseNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarDoubleEllipseNodeDescriptor, colorAction));
     }
 
-    if (planarBezierCurveNodeDescriptor != NULL)
+    if (planarBezierCurveNodeDescriptor != nullptr)
     {
       planarBezierCurveNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(planarBezierCurveNodeDescriptor, colorAction));
     }
 
-    if (planarSubdivisionPolygonNodeDescriptor != NULL)
+    if (planarSubdivisionPolygonNodeDescriptor != nullptr)
     {
       planarSubdivisionPolygonNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
@@ -506,7 +514,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ComponentActionChanged() ) );
   multiComponentImageDataNodeDescriptor->AddAction(componentAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(multiComponentImageDataNodeDescriptor,componentAction));
-  if (diffusionImageDataNodeDescriptor!=NULL)
+  if (diffusionImageDataNodeDescriptor!=nullptr)
   {
       diffusionImageDataNodeDescriptor->AddAction(componentAction, false);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(diffusionImageDataNodeDescriptor,componentAction));
@@ -520,7 +528,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( TextureInterpolationToggled(bool) ) );
   imageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,m_TextureInterpolation));
-  if (diffusionImageDataNodeDescriptor!=NULL)
+  if (diffusionImageDataNodeDescriptor!=nullptr)
   {
       diffusionImageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(diffusionImageDataNodeDescriptor,m_TextureInterpolation));
@@ -532,7 +540,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ColormapMenuAboutToShow() ) );
   imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor, m_ColormapAction));
-  if (diffusionImageDataNodeDescriptor!=NULL)
+  if (diffusionImageDataNodeDescriptor!=nullptr)
   {
       diffusionImageDataNodeDescriptor->AddAction(m_ColormapAction, false);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(diffusionImageDataNodeDescriptor, m_ColormapAction));
@@ -608,6 +616,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
 
   if(className == "QmitkCreatePolygonModelAction")
   {
+
     if(smoothed == "false")
     {
       contextMenuAction->SetSmoothed(false);
@@ -731,14 +740,14 @@ void QmitkDataManagerView::OpacityActionChanged()
 void QmitkDataManagerView::ComponentActionChanged()
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  mitk::IntProperty* componentProperty = NULL;
+  mitk::IntProperty* componentProperty = nullptr;
   int numComponents = 0;
   if(node)
   {
     componentProperty =
         dynamic_cast<mitk::IntProperty*>(node->GetProperty("Image.Displayed Component"));
     mitk::Image* img = dynamic_cast<mitk::Image*>(node->GetData());
-    if (img != NULL)
+    if (img != nullptr)
     {
       numComponents = img->GetPixelType().GetNumberOfComponents();
     }
@@ -751,7 +760,7 @@ void QmitkDataManagerView::ComponentActionChanged()
   }
   else
   {
-    m_ComponentSlider->SetProperty(static_cast<mitk::IntProperty*>(NULL));
+    m_ComponentSlider->SetProperty(static_cast<mitk::IntProperty*>(nullptr));
   }
 }
 
@@ -964,7 +973,7 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
     renderWindow = this->OpenRenderWindowPart(false);
 
   QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
@@ -1093,11 +1102,11 @@ void QmitkDataManagerView::GlobalReinit( bool )
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
     renderWindow = this->OpenRenderWindowPart(false);
 
   // no render window available
-  if (renderWindow == NULL) return;
+  if (renderWindow == nullptr) return;
 
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }

@@ -46,7 +46,7 @@ typedef itk::ThresholdImageFilter<ItkImageType_2D> ThresholdFilterType;
 typedef itk::MedianImageFilter<ItkImageType_2D,ItkImageType_2D> MedianFilterType;
 
 
-static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_2D::Pointer& itkImage2D)
+/*static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_2D::Pointer& itkImage2D)
 {
 
   //initialize ITK output image
@@ -107,7 +107,7 @@ static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_
   }
   return true;
 
-}
+}*/
 
 bool CreateRandomDistanceImage(unsigned int dimX, unsigned int dimY, ItkImageType_2D::Pointer& itkImage, mitk::Image::Pointer& mitkImage) //TODO warum ITK image?
 {
@@ -251,7 +251,7 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   mitk::Image::Pointer itkOutputImageConverted;
   mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
 
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(itkOutputImageConverted,mitkOutputImage,mitk::eps,true),
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(*itkOutputImageConverted, *mitkOutputImage, mitk::eps, true),
                                 "Test threshold filter in pipeline");
 
   //-------------------------------------------------------------------------------------------------------
@@ -270,7 +270,7 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   //compare output
   mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
 
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(itkOutputImageConverted,mitkOutputImage,mitk::eps,true),
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(*itkOutputImageConverted, *mitkOutputImage, mitk::eps, true),
                                "Test threshold and median filter in pipeline");
 
 
@@ -290,7 +290,7 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   //compare output
   mitk::CastToMitkImage(itkOutputImage,itkOutputImageConverted);
 
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(itkOutputImageConverted,mitkOutputImage,mitk::eps,true),
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(*itkOutputImageConverted, *mitkOutputImage, mitk::eps, true),
                                "Test threshold filter, bilateral filter and temporal median filter in pipeline");
 
 

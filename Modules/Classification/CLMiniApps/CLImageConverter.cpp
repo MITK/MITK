@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
   std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputName);
-  mitk::IOUtil::SaveImage(image, outputName);
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputName)[0].GetPointer());
+  mitk::IOUtil::Save(image, outputName);
 
   return EXIT_SUCCESS;
 }

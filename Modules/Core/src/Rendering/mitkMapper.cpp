@@ -17,10 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
-#include "mitkOverlayManager.h"
 #include "mitkProperties.h"
 
-mitk::Mapper::Mapper() : m_DataNode(NULL), m_TimeStep(0)
+mitk::Mapper::Mapper() : m_DataNode(nullptr), m_TimeStep(0)
 {
 }
 
@@ -30,7 +29,7 @@ mitk::Mapper::~Mapper()
 
 mitk::BaseData *mitk::Mapper::GetData() const
 {
-  return m_DataNode == NULL ? NULL : m_DataNode->GetData();
+  return m_DataNode == nullptr ? nullptr : m_DataNode->GetData();
 }
 
 mitk::DataNode *mitk::Mapper::GetDataNode() const
@@ -41,7 +40,7 @@ mitk::DataNode *mitk::Mapper::GetDataNode() const
 bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer *renderer, const char *name) const
 {
   const mitk::DataNode *node = GetDataNode();
-  if (node == NULL)
+  if (node == nullptr)
     return false;
 
   return node->GetColor(rgb, renderer, name);
@@ -50,7 +49,7 @@ bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer *renderer, const ch
 bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer *renderer, const char *name) const
 {
   const mitk::DataNode *node = GetDataNode();
-  if (node == NULL)
+  if (node == nullptr)
     return false;
 
   return node->GetVisibility(visible, renderer, name);
@@ -59,7 +58,7 @@ bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer *renderer, co
 bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer *renderer, const char *name) const
 {
   const mitk::DataNode *node = GetDataNode();
-  if (node == NULL)
+  if (node == nullptr)
     return false;
 
   return node->GetOpacity(opacity, renderer, name);
@@ -68,7 +67,7 @@ bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer *renderer, cons
 bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer *renderer, const char *name) const
 {
   const mitk::DataNode *node = GetDataNode();
-  if (node == NULL)
+  if (node == nullptr)
     return false;
 
   return node->GetLevelWindow(levelWindow, renderer, name);
@@ -83,7 +82,7 @@ bool mitk::Mapper::IsVisible(mitk::BaseRenderer *renderer, const char *name) con
 
 void mitk::Mapper::CalculateTimeStep(mitk::BaseRenderer *renderer)
 {
-  if ((renderer != NULL) && (m_DataNode != NULL))
+  if ((renderer != nullptr) && (m_DataNode != nullptr))
   {
     m_TimeStep = renderer->GetTimeStep(m_DataNode->GetData());
   }
@@ -95,12 +94,9 @@ void mitk::Mapper::CalculateTimeStep(mitk::BaseRenderer *renderer)
 
 void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 {
-  if (GetOverlayManager())
-    GetOverlayManager()->AddBaseRenderer(renderer);
-
   const DataNode *node = GetDataNode();
 
-  assert(node != NULL);
+  assert(node != nullptr);
 
   mitk::BaseData *data = static_cast<mitk::BaseData *>(node->GetData());
 
@@ -112,7 +108,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(m_TimeStep)))
   {
     // TimeGeometry or time step is not valid for this data:
@@ -122,8 +118,6 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   }
 
   this->GenerateDataForRenderer(renderer);
-  if (GetOverlayManager())
-    GetOverlayManager()->UpdateOverlays(renderer);
 }
 
 bool mitk::Mapper::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer,
@@ -155,9 +149,4 @@ void mitk::Mapper::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer
   node->AddProperty("visible", mitk::BoolProperty::New(true), renderer, overwrite);
   node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
   node->AddProperty("name", mitk::StringProperty::New("No Name!"), renderer, overwrite);
-}
-
-mitk::OverlayManager *mitk::Mapper::GetOverlayManager() const
-{
-  return NULL;
 }

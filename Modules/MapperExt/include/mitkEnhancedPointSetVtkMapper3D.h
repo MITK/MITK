@@ -77,7 +77,7 @@ namespace mitk
 
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 

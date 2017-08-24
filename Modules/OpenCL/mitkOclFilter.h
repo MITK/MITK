@@ -46,7 +46,7 @@ public:
     void AddSourceFile(const char* filename);
 
   /**
-    * @brief Set specific compilerflags to compile the CL source. Default is set to NULL;
+    * @brief Set specific compilerflags to compile the CL source. Default is set to nullptr;
     *        example: "-cl-fast-relaxed-math -cl-mad-enable -cl-strict-aliasing"
     *
     *  @param flags to the modulefolder that contains the gpuSource

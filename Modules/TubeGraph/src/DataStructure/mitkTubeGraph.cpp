@@ -33,33 +33,9 @@ mitk::TubeGraph::~TubeGraph()
 }
 
 std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraph::SearchShortestPath(
-  const TubeDescriptorType &startTube, const TubeDescriptorType &endTube /*, std::vector<unsigned long> barrier*/)
+  const TubeDescriptorType &, const TubeDescriptorType &)
 {
   std::vector<TubeDescriptorType> shortestPath;
-  /*
-  EdgeDescriptorType startEdge = boost::edge(startTube.first, startTube.second, m_Graph).first;
-
-  std::vector< DescriptorType > predecessorMap( boost::num_vertices( *boostGraph ) );
-  int numberOfNodes( boost::num_vertices( *boostGraph ) );
-
-  m_DistanceMatrix.resize( numberOfNodes );
-  for( int index(0); index < m_DistanceMatrix.size(); index++ )
-  {
-  m_DistanceMatrix[ index ].resize( numberOfNodes );
-  }
-
-  IteratorType iterator, end;
-  boost::tie(iterator, end) = boost::vertices( *boostGraph );
-
-  for ( int index(0) ; iterator != end; ++iterator, index++)
-  {
-  boost::dijkstra_shortest_paths(*boostGraph, *iterator, boost::predecessor_map(&predecessorMap[ 0
-  ]).distance_map(&m_DistanceMatrix[ index ][ 0 ]).weight_map( boost::get(
-  &mitk::ConnectomicsNetwork::NetworkEdge::edge_weight ,*boostGraph ) ) ) ;
-  }
-
-
-  */
   return shortestPath;
 }
 
@@ -227,7 +203,7 @@ mitk::TubeGraph::Pointer mitk::TubeGraph::CreateSubGraph(std::vector<TubeDescrip
     // edge data: copy the TubeGraphEdge object using the origin edge desciptor and the origin graph
     VertexDescriptorType sourceVertex = vertexDescriptorOldToNewMap[it->first];
     VertexDescriptorType targetVertex = vertexDescriptorOldToNewMap[it->second];
-    EdgeDescriptorType newEdgeDescriptor = subGraph->AddEdge(sourceVertex, targetVertex, this->GetEdge(edgeDescriptor));
+    subGraph->AddEdge(sourceVertex, targetVertex, this->GetEdge(edgeDescriptor));
   }
   subGraph->CopyInformation(this);
 

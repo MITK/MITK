@@ -51,8 +51,8 @@ int mitkPeakExtractionTest(int argc, char* argv[])
     {
         mitk::CoreObjectFactory::GetInstance();
 
-        mitk::Image::Pointer image = mitk::IOUtil::LoadImage(shCoeffFileName);
-        mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(maskFileName);
+        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(shCoeffFileName)[0].GetPointer());
+        mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFileName)[0].GetPointer());
 
         typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
         typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, 4, 20242 > MaximaExtractionFilterType;

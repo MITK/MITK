@@ -45,7 +45,7 @@ namespace mitk
     reader->SetFileName(fileName.c_str());
     reader->Update();
 
-    if (reader->GetOutput() != NULL)
+    if (reader->GetOutput() != nullptr)
     {
       mitk::Image::Pointer output = mitk::Image::New();
       output->Initialize(reader->GetOutput());
@@ -91,7 +91,7 @@ namespace mitk
       writer->SetFileTypeToBinary();
     }
 
-    ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
+    ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), nullptr, input->GetVtkImageData());
     writer->SetInputData(const_cast<vtkImageData *>(vtkReadAccessor.GetVtkImageData()));
 
     if (writer->Write() == 0 || writer->GetErrorCode() != 0)

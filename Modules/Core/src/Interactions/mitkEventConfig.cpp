@@ -244,7 +244,7 @@ mitk::EventConfig::EventConfig(const EventConfig &other) : d(other.d)
 
 mitk::EventConfig::EventConfig(const std::string &filename, const us::Module *module) : d(new EventConfigPrivate)
 {
-  if (module == NULL)
+  if (module == nullptr)
   {
     module = us::GetModuleContext()->GetModule();
   }
@@ -331,7 +331,7 @@ bool mitk::EventConfig::IsValid() const
 
 bool mitk::EventConfig::AddConfig(const std::string &fileName, const us::Module *module)
 {
-  if (module == NULL)
+  if (module == nullptr)
   {
     module = us::GetModuleContext()->GetModule();
   }
@@ -404,7 +404,7 @@ void mitk::EventConfig::ClearConfig()
   d->m_PropertyList->Clear();
   d->m_EventPropertyList->Clear();
   d->m_CurrEventMapping.variantName.clear();
-  d->m_CurrEventMapping.interactionEvent = NULL;
+  d->m_CurrEventMapping.interactionEvent = nullptr;
   d->m_EventList.clear();
   d->m_Errors = false;
 }

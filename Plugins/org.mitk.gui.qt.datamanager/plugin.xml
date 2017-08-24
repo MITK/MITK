@@ -2,14 +2,11 @@
 <?eclipse version="3.0"?>
 <plugin>
   <extension point="org.blueberry.ui.views">
-    <category
-      name="MITK General"
-      id="org.mitk.views.general"/>
     <view
       id="org.mitk.views.datamanager"
       name="Data Manager"
       category="Data handling"
-      icon="resources/DataManager_48.png"
+      icon="resources/data-manager.svg"
       class="QmitkDataManagerView" />
   </extension>
 

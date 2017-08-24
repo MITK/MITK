@@ -20,8 +20,7 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-
-  resources/Logging.png
+  resources/logging.svg
 )
 
 set(QRC_FILES

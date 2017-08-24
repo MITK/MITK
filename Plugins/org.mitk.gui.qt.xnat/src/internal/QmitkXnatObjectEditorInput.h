@@ -25,7 +25,7 @@ class QmitkXnatObjectEditorInput : public berry::IEditorInput {
 public:
   berryObjectMacro(QmitkXnatObjectEditorInput);
 
-  QmitkXnatObjectEditorInput(ctkXnatObject* object);
+  explicit QmitkXnatObjectEditorInput(ctkXnatObject* object);
   ~QmitkXnatObjectEditorInput();
 
   /// \brief Returns the kept ctkXnatObject.

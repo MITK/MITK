@@ -2023,8 +2023,6 @@ void QmitkPreprocessingView::MergeDwis()
   if ( image2 == nullptr ) { return; }
 
   typedef itk::VectorImage<DiffusionPixelType,3> DwiImageType;
-  typedef DwiImageType::PixelType                DwiPixelType;
-  typedef DwiImageType::RegionType               DwiRegionType;
   typedef std::vector< DwiImageType::Pointer >   DwiImageContainerType;
 
   typedef std::vector< GradientContainerType::Pointer >  GradientListContainerType;
@@ -2101,8 +2099,6 @@ void QmitkPreprocessingView::ExtractB0()
   bool isDiffusionImage( PropHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage ) { return; }
 
-  typedef GradProp::GradientDirectionsContainerType GradientContainerType;
-
   // call the extraction withou averaging if the check-box is checked
   if( this->m_Controls->m_CheckExtractAll->isChecked() )
   {
@@ -2145,7 +2141,6 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
   if ( !isDiffusionImage ) { return; }
 
   // typedefs
-  typedef GradProp::GradientDirectionsContainerType    GradientContainerType;
   typedef itk::B0ImageExtractionToSeparateImageFilter< short, short> FilterType;
 
   ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();

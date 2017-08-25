@@ -41,10 +41,6 @@ private:
 
   IWorkbench* workbench;
 
-  bool oldAutomatedMode;
-
-  bool oldIgnoreErrors;
-
   Poco::Thread thread;
 
   class WorkbenchTestRunnable: public Poco::Runnable

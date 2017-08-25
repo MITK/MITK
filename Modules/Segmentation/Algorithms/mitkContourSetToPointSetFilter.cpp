@@ -78,11 +78,11 @@ const mitk::ContourSet *mitk::ContourSetToPointSetFilter::GetInput(void)
     return nullptr;
   }
 
-  return static_cast<const mitk::ContourSet *>(this->BaseProcess::GetInput(0));
+  return static_cast<const mitk::ContourSet *>(this->BaseDataSource::GetInput(0));
 }
 
 void mitk::ContourSetToPointSetFilter::SetInput(const mitk::ContourSet *input)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->BaseProcess::SetNthInput(0, const_cast<mitk::ContourSet *>(input));
+  this->BaseDataSource::SetNthInput(0, const_cast<mitk::ContourSet *>(input));
 }

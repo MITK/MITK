@@ -55,8 +55,6 @@ QmitkRegistrationWorker::QmitkRegistrationWorker(QmitkDiffusionRegistrationView*
 void QmitkRegistrationWorker::run()
 {
 
-  typedef mitk::DiffusionPropertyHelper::BValueMapType BValueMap;
-
   unsigned int totalImagesCount;
   if( !m_View->m_IsBatch )
   {

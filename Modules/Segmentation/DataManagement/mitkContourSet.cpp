@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourSet.h"
 #include <mitkProportionalTimeGeometry.h>
 
-mitk::ContourSet::ContourSet() : m_ContourVector(ContourVectorType()), m_NumberOfContours(0)
+mitk::ContourSet::ContourSet() : m_ContourVector(ContourVectorType())
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(1);

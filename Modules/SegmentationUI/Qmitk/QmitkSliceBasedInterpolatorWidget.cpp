@@ -154,7 +154,7 @@ void QmitkSliceBasedInterpolatorWidget::SetSliceNavigationControllers(
     timeChangedCommand->SetCallbackFunction(this, &QmitkSliceBasedInterpolatorWidget::OnTimeChanged);
     m_ControllerToTimeObserverTag.insert(
       slicer,
-      slicer->AddObserver(mitk::SliceNavigationController::TimeSlicedGeometryEvent(nullptr, 0), timeChangedCommand));
+      slicer->AddObserver(mitk::SliceNavigationController::TimeGeometryEvent(nullptr, 0), timeChangedCommand));
 
     itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer sliceChangedCommand =
       itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::New();

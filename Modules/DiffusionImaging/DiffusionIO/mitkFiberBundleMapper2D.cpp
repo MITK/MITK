@@ -62,9 +62,9 @@ public:
     cellBO->Program->SetUniformf("fiberOpacity", fiberOpacity);
     cellBO->Program->SetUniformi("fiberFadingON", fiberFading);
     cellBO->Program->SetUniformf("fiberThickness", fiberThickness);
-    
+
     if (this->renderer)
-    {      
+    {
       //get information about current position of views
       mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
       mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
@@ -79,7 +79,7 @@ public:
       float tmp2 = planeGeo->GetOrigin()[1] * planeNormal[1];
       float tmp3 = planeGeo->GetOrigin()[2] * planeNormal[2];
       float thickness = tmp1 + tmp2 + tmp3; //attention, correct normalvector
-      
+
       node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.w", thickness, renderer);
       node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.x", planeNormal[0], renderer);
       node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.y", planeNormal[1], renderer);
@@ -88,7 +88,7 @@ public:
       float* a = new float[4];
       for (int i = 0; i < 3; ++i)
         a[i] = planeNormal[i];
-       
+
       a[3] = thickness;
       cellBO->Program->SetUniform4f("slicingPlane", a);
 
@@ -169,10 +169,9 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
         }
 }
 
-void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
+void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer *)
 {
     // see new vtkShaderCallback
-
 }
 
 // vtkActors and Mappers are feeded here
@@ -202,7 +201,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   localStorage->m_FiberMapper->SetVertexShaderCode(
     "//VTK::System::Dec\n"
     "attribute vec4 vertexMC;\n"
-    
+
     "//VTK::Normal::Dec\n"
     "uniform mat4 MCDCMatrix;\n"
 
@@ -216,7 +215,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
     "  colorVertex = scalarColor;\n"
     "  positionWorld = vertexMC;\n"
     "  gl_Position = MCDCMatrix * vertexMC;\n"
-    "}\n" 
+    "}\n"
     );
   localStorage->m_FiberMapper->SetFragmentShaderCode(
     "//VTK::System::Dec\n"  // always start with this line
@@ -228,7 +227,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
     "varying vec4 positionWorld;\n"
     "varying vec4 colorVertex;\n"
-    
+
     "void main(void)\n"
     "{\n"
     "  float r1 = dot(positionWorld.xyz, slicingPlane.xyz) - slicingPlane.w;\n"
@@ -252,13 +251,10 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   myCallback->renderer = renderer;
   myCallback->node = this->GetDataNode();
   localStorage->m_FiberMapper->AddObserver(vtkCommand::UpdateShaderEvent,myCallback);
-  
+
   localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
   localStorage->m_PointActor->GetProperty()->ShadingOn();
   localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
-
-  // Applying shading properties
-  this->ApplyShaderProperties(renderer);
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();

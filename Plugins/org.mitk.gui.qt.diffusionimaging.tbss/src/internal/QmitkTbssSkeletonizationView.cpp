@@ -482,8 +482,8 @@ void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType, mitk::Image* im
           {
             for(unsigned int z=0; z<image->GetDimension(2); z++)
             {
-              itk::Index<3> ix = {x, y, z};
-              itk::Index<4> ix4 = {x, y, z, t};
+              itk::Index<3> ix = {{x, y, z}};
+              itk::Index<4> ix4 = {{x, y, z, t}};
 
               output->SetPixel(ix4, inAcc.GetPixelByIndex(ix));
 

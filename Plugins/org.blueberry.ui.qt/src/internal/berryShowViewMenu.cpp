@@ -211,7 +211,9 @@ CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& v
 
   public:
 
-    berryObjectMacro(PluginCCIP, CommandContributionItemParameter, IPluginContribution)
+    typedef PluginCCIP Self;
+    static const char* GetStaticClassName() { return "PluginCCIP"; }
+    berryObjectTypeInfo(CommandContributionItemParameter, IPluginContribution)
 
     PluginCCIP(const IViewDescriptor::Pointer& v, IServiceLocator* serviceLocator,
                const QString& id, const QString& commandId, CommandContributionItem::Style style)

@@ -122,7 +122,6 @@ private:
   std::vector<unsigned char> m_ConnectionGold;
   std::vector<unsigned char> m_ConnectionTest;
   std::vector<unsigned char> m_ConnectionClass;
-  size_t m_VituralClassCount;
 
   MultiDataVector m_ImageClassStatistic;
   std::vector<std::string> m_ImageNames;

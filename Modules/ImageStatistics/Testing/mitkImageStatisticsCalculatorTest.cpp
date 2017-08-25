@@ -599,7 +599,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
   this->VerifyStatistics( statisticsCalculator->GetStatistics(), -21474836.480, -21474836.480, -21474836.480);
 
   // activate voxel in the mask image
-  itk::Index<3U> test_index = {11, 8, 0};
+  itk::Index<3U> test_index = {{11, 8, 0}};
   mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
   writeAccess.SetPixelByIndex( test_index, 1);
 

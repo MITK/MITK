@@ -1137,7 +1137,7 @@ std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk
   result.push_back(GetFormattedString(statistics->GetMax(), decimals) + " " + GetFormattedIndex(statistics->GetMaxIndex()));
   result.push_back(GetFormattedString(statistics->GetMin(), decimals) + " " + GetFormattedIndex(statistics->GetMinIndex()));
   //to prevent large negative values of empty image statistics
-  if (statistics->GetN() != std::numeric_limits<long>::max() + 1) {
+  if (statistics->GetN() != std::numeric_limits<long>::min()) {
     result.push_back(GetFormattedString(statistics->GetN(), 0));
 
     const mitk::BaseGeometry *geometry = image->GetGeometry();

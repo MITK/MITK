@@ -29,11 +29,9 @@ set(mitk_modules
   SurfaceInterpolation
   Segmentation
   PlanarFigureSegmentation
-  OpenViewCore
   QtWidgets
   QtWidgetsExt
   Chart
-  QmlItems
   SegmentationUI
   Classification
   DiffusionImaging

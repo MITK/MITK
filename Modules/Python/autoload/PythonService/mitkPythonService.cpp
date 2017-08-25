@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 
 #include <mitkExceptionMacro.h>
@@ -597,9 +598,9 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
   PyArrayObject* py_nrComponents = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_nrComponents").arg(varName).toStdString().c_str() );
 
-  unsigned int nr_Components = *((unsigned int*) py_nrComponents->data);
+  unsigned int nr_Components = *(reinterpret_cast<unsigned int*>(PyArray_DATA(py_nrComponents)));
 
-  unsigned int nr_dimensions = py_data->nd;
+  unsigned int nr_dimensions = PyArray_NDIM(py_data);
   if (nr_Components > 1) // for VectorImages the last dimension in the numpy array are the vector components.
   {
     --nr_dimensions;
@@ -611,16 +612,16 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   // fill backwards , nd data saves dimensions in opposite direction
   for( unsigned i = 0; i < nr_dimensions; ++i )
   {
-    dimensions[i] = py_data->dimensions[nr_dimensions - 1 - i];
+    dimensions[i] = PyArray_DIMS(py_data)[nr_dimensions - 1 - i];
   }
 
   mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
 
 
-  mitkImage->SetChannel(py_data->data);
+  mitkImage->SetChannel(PyArray_DATA(py_data));
 
 
-  ds = (double*)py_spacing->data;
+  ds = reinterpret_cast<double*>(PyArray_DATA(py_spacing));
   spacing[0] = ds[0];
   spacing[1] = ds[1];
   spacing[2] = ds[2];
@@ -628,7 +629,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   mitkImage->GetGeometry()->SetSpacing(spacing);
 
 
-  ds = (double*)py_origin->data;
+  ds = reinterpret_cast<double*>(PyArray_DATA(py_origin));
   origin[0] = ds[0];
   origin[1] = ds[1];
   origin[2] = ds[2];
@@ -637,7 +638,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
   itk::Matrix<double,3,3> py_transform;
 
-  ds = (double*)py_direction->data;
+  ds = reinterpret_cast<double*>(PyArray_DATA(py_direction));
   py_transform[0][0] = ds[0];
   py_transform[0][1] = ds[1];
   py_transform[0][2] = ds[2];
@@ -807,7 +808,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_np_array").arg(varName).toStdString().c_str() );
   PyArrayObject* shape = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_shape").arg(varName).toStdString().c_str() );
 
-  size_t* d = (size_t*)shape->data;
+  size_t* d = reinterpret_cast<size_t*>(PyArray_DATA(shape));
 
   unsigned int dimensions[3];
   dimensions[0] = d[1];
@@ -827,7 +828,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   {
     mitk::ImageWriteAccessor ra(mitkImage);
     char* data = (char*)(ra.GetData());
-    memcpy(data, (void*)py_data->data, dimensions[0] * dimensions[1] * pixelType.GetSize());
+    memcpy(data, PyArray_DATA(py_data), dimensions[0] * dimensions[1] * pixelType.GetSize());
   }
 
   command.clear();

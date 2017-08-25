@@ -17,7 +17,7 @@
 
 namespace itk{
 
-static bool CompareVectorLengths(const vnl_vector_fixed< double, 3 >& v1, const vnl_vector_fixed< double, 3 >& v2)
+static inline bool CompareVectorLengths(const vnl_vector_fixed< double, 3 >& v1, const vnl_vector_fixed< double, 3 >& v2)
 {
     return (v1.magnitude()>v2.magnitude());
 }

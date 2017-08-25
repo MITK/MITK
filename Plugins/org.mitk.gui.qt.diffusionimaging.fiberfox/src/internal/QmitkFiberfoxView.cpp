@@ -2890,8 +2890,8 @@ void QmitkFiberfoxView::SetFocus()
 void QmitkFiberfoxView::SetOutputPath()
 {
   // SELECT FOLDER DIALOG
-
-  string outputPath = QFileDialog::getExistingDirectory(nullptr, "Save images to...", QString(outputPath.c_str())).toStdString();
+  string outputPath;
+  outputPath = QFileDialog::getExistingDirectory(nullptr, "Save images to...", QString(outputPath.c_str())).toStdString();
 
   if (outputPath.empty())
     m_Controls->m_SavePathEdit->setText("-");

@@ -164,7 +164,7 @@ public:
     persistenceService->AddPropertyListReplacedObserver(&testObserver);
     persistenceService->Load(testTempFile);
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing observer functionality: testObserver.counter == 2, testObserver.counter is " + testObserver.counter,
+      "Testing observer functionality: testObserver.counter == 2, testObserver.counter is " + std::to_string(testObserver.counter),
       testObserver.counter == 2);
 
     autoLoadTestClass.param1 = param1;

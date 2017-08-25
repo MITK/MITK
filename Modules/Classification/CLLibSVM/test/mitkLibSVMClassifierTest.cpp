@@ -138,8 +138,8 @@ public:
     unsigned int maxcols = p->GetMatrix().cols();
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix(maxrowrange,maxcols);
 
-    for(int rows = 0; rows < maxrowrange; rows++){
-      for(int cols = 0; cols < maxcols; cols++ ){
+    for(unsigned int rows = 0; rows < maxrowrange; rows++){
+      for(unsigned int cols = 0; cols < maxcols; cols++ ){
         matrix(rows,cols) = p->GetData(rows,cols);
       }
     }

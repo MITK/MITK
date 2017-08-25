@@ -57,9 +57,9 @@ public:
   {
     typename mitk::VectorProperty<DATATYPE>::Pointer vectorProperty = mitk::VectorProperty<DATATYPE>::New();
     std::vector<DATATYPE> data;
-    data.push_back(-918273674.6172838);
+    data.push_back(static_cast<DATATYPE>(-918273674.6172838));
     data.push_back(0);
-    data.push_back(+6172838.918273674);
+    data.push_back(static_cast<DATATYPE>(+6172838.918273674));
     data.push_back(sqrt(2));
     if (std::numeric_limits<DATATYPE>::has_infinity)
     {

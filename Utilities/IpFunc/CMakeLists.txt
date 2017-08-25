@@ -7,6 +7,7 @@ mitk_create_module(
   DEPENDS PUBLIC MitkIpPic
   ${_options}
   C_MODULE
+  WARNINGS_NO_ERRORS
 )
 
 if(UNIX)

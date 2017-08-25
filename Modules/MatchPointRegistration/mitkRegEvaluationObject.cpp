@@ -107,13 +107,14 @@ namespace mitk
     typedef ::itk::Image<TPixelType, VImageDimension> InputImageType;
     typedef itk::CastImageFilter<InputImageType, InternalImageType> CastFilterType;
     typedef itk::RescaleIntensityImageFilter<InputImageType, InputImageType> RescaleFilterType;
+    typedef typename RescaleFilterType::OutputImagePixelType RescaleOutputPixelType;
 
     typename CastFilterType::Pointer caster = CastFilterType::New();
     typename RescaleFilterType::Pointer rescaler = RescaleFilterType::New();
 
     rescaler->SetInput(input);
     rescaler->SetOutputMinimum(0);
-    rescaler->SetOutputMaximum(255);
+    rescaler->SetOutputMaximum(std::min(itk::NumericTraits<RescaleOutputPixelType>::max(), static_cast<typename RescaleFilterType::OutputPixelType>(255)));
     caster->SetInput(rescaler->GetOutput());
     caster->Update();
     InternalImageType::Pointer internalImage = caster->GetOutput();

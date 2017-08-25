@@ -949,19 +949,19 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
 
       mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry1 =
+      mitk::PlaneGeometry::ConstPointer worldGeometry1 =
           axialRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane1 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry1.GetPointer() );
       mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry2 =
+      mitk::PlaneGeometry::ConstPointer worldGeometry2 =
           sagittalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane2 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry2.GetPointer() );
       mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry3 =
+      mitk::PlaneGeometry::ConstPointer worldGeometry3 =
           coronalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane3 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry3.GetPointer() );

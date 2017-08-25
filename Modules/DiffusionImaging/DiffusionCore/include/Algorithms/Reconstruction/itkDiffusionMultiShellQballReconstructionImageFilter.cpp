@@ -689,7 +689,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread)
+::NumericalNShellReconstruction(const OutputImageRegionType& /*outputRegionForThread*/)
 {
 
   /* itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();

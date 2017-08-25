@@ -194,7 +194,7 @@ namespace itk
         }
       }
 
-      delete localsum;
+      delete[] localsum;
 
     }
 

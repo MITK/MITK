@@ -145,9 +145,6 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     typedef itk::Image< float, 3 >              FloatImageType;
     typedef itk::Image< unsigned int, 3 >       CImageType;
     typedef itk::StochasticTractographyFilter< DWIVectorImageType, FloatImageType, CImageType > TrackingFilterType;
-    typedef itk::DTITubeSpatialObject<3>        DTITubeType;
-    typedef itk::DTITubeSpatialObjectPoint<3>   DTITubePointType;
-    typedef itk::SceneSpatialObject<3>          SceneSpatialObjectType;
 
     /* get Gradients/Direction of dwi */
     GradientDirectionContainerType::Pointer Pdir = static_cast<mitk::GradientDirectionsProperty*>( m_DiffusionImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();

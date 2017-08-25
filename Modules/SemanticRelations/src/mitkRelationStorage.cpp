@@ -42,7 +42,7 @@ void mitk::RelationStorage::SetDataStorage(DataStorage::Pointer dataStorage)
   }
 }
 
-std::vector<SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID)
+std::vector<mitk::SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -94,7 +94,7 @@ std::vector<SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfCase(co
   return allLesionsOfCase;
 }
 
-SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID)
+mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -189,7 +189,7 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   return allSegmentationsOfCase;
 }
 
-SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID)
+mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -294,7 +294,7 @@ SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfData(const S
   return controlPoint;
 }
 
-std::vector<SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID)
+std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -392,7 +392,7 @@ std::vector<SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllControlPoi
   return allControlPoints;
 }
 
-SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID)
+mitk::SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -422,7 +422,7 @@ SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOfImage(
   }
 }
 
-std::vector<SemanticTypes::InformationType> mitk::RelationStorage::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID)
+std::vector<mitk::SemanticTypes::InformationType> mitk::RelationStorage::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -516,7 +516,7 @@ std::vector<std::string> mitk::RelationStorage::GetAllImageIDsOfCase(const Seman
   return allImagesVectorProperty->GetValue();
 }
 
-std::vector<SemanticTypes::CaseID> mitk::RelationStorage::GetAllCaseIDs()
+std::vector<mitk::SemanticTypes::CaseID> mitk::RelationStorage::GetAllCaseIDs()
 {
   PERSISTENCE_GET_SERVICE_MACRO
   if (nullptr == persistenceService)
@@ -832,7 +832,7 @@ void mitk::RelationStorage::LinkSegmentationToLesion(const SemanticTypes::CaseID
   }
 }
 
-void mitk::RelationStorage::RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
+void mitk::RelationStorage::RemoveLesion(const mitk::SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)

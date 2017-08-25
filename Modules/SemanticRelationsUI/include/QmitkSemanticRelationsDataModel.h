@@ -51,8 +51,8 @@ public:
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
   void SetSemanticRelations(mitk::SemanticRelations* semanticRelations);
-  const SemanticTypes::CaseID& GetCurrentCaseID() { return m_CaseID; }
-  void SetCurrentCaseID(const SemanticTypes::CaseID& caseID);
+  const mitk::SemanticTypes::CaseID& GetCurrentCaseID() { return m_CaseID; }
+  void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
 
   void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
   void DataChanged(const mitk::DataNode* dataNode = nullptr);
@@ -65,11 +65,11 @@ private:
 
   mitk::SemanticRelations* m_SemanticRelations;
   mitk::DataStorage::Pointer m_DataStorage;
-  SemanticTypes::CaseID m_CaseID;
+  mitk::SemanticTypes::CaseID m_CaseID;
 
   std::map<std::string, QPixmap> m_PixmapMap;
-  std::vector<SemanticTypes::InformationType> m_InformationTypes;
-  std::vector<SemanticTypes::ControlPoint> m_ControlPoints;
+  std::vector<mitk::SemanticTypes::InformationType> m_InformationTypes;
+  std::vector<mitk::SemanticTypes::ControlPoint> m_ControlPoints;
 
 };
 

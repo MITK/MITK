@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /* functions to add/remove image and segmentation instances				      */
 /************************************************************************/
 
-void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNode, mitk::SemanticRelations& semanticRelationsInstance)
+void mitk::SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNode, mitk::SemanticRelations& semanticRelationsInstance)
 {
   if (nullptr == dataNode)
   {
@@ -107,7 +107,7 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
   }
 }
 
-void SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, mitk::SemanticRelations& semanticRelationsInstance)
+void mitk::SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, mitk::SemanticRelations& semanticRelationsInstance)
 {
   if (nullptr == segmentationNode)
   {
@@ -116,20 +116,21 @@ void SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* 
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(parentNode);
   SemanticTypes::ID parentNodeID = DICOMHelper::GetIDFromDataNode(parentNode);
+  SemanticTypes::ID segmentationNodeID = "SEG_" + parentNodeID;
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->AddCase(caseID);
   relationStorage->AddSegmentation(caseID, segmentationNodeID, parentNodeID);
 
-  SemanticTypes::Lesion lesion; lesion.UID = UIDGeneratorBoost::GenerateUID();
+  SemanticTypes::Lesion lesion;
+  lesion.UID = UIDGeneratorBoost::GenerateUID();
   lesion.lesionClass = SemanticTypes::LesionClass();
   semanticRelationsInstance.AddLesionAndLinkData(segmentationNode, lesion);
 }
 
-void SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, mitk::SemanticRelations& semanticRelationsInstance)
+void mitk::SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, mitk::SemanticRelations& semanticRelationsInstance)
 {
   if (nullptr == segmentationNode)
   {
@@ -138,8 +139,9 @@ void SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNod
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = DICOMHelper::GetIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(parentNode);
+  SemanticTypes::ID parentNodeID = DICOMHelper::GetIDFromDataNode(parentNode);
+  SemanticTypes::ID segmentationNodeID = "SEG_" + parentNodeID;
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->RemoveSegmentation(caseID, segmentationNodeID);

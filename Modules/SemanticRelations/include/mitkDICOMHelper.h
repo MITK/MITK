@@ -29,23 +29,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <string>
 
-namespace DICOMHelper
+namespace mitk
 {
+  namespace DICOMHelper
+  {
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::CaseID GetCaseIDFromDataNode(const mitk::DataNode* dataNode);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ID GetIDFromDataNode(const mitk::DataNode* dataNode);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Date GetDateFromDataNode(const mitk::DataNode* dataNode);
 
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::CaseID GetCaseIDFromDataNode(const mitk::DataNode* dataNode);
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ID GetIDFromDataNode(const mitk::DataNode* dataNode);
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Date GetDateFromDataNode(const mitk::DataNode* dataNode);
+    MITKSEMANTICRELATIONS_EXPORT void ReformatDICOMTag(const std::string& tag, std::string& identifier);
 
-  MITKSEMANTICRELATIONS_EXPORT void ReformatDICOMTag(const std::string& tag, std::string& identifier);
+    SemanticTypes::Date GetDateFromString(const std::string& dateAsString);
 
-  SemanticTypes::Date GetDateFromString(const std::string& dateAsString);
+    std::string Trim(const std::string& identifier);
+    std::string DICOMTagToName(const std::string& propertyName);
+    std::string DICOMTagPathToName(const mitk::DICOMTagPath& tagPath);
+    void ReformatDICOMDate(std::string& identifier);
+    void ReformatDICOMTime(std::string& identifier);
 
-  std::string Trim(const std::string& identifier);
-  std::string DICOMTagToName(const std::string& propertyName);
-  std::string DICOMTagPathToName(const mitk::DICOMTagPath& tagPath);
-  void ReformatDICOMDate(std::string& identifier);
-  void ReformatDICOMTime(std::string& identifier);
-
-} // namespace DICOMHelper
+  } // namespace DICOMHelper
+} // namespace mitk
 
 #endif // MITKDICOMHELPER_H

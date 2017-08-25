@@ -59,7 +59,7 @@ void QmitkPatientInfoWidget::SetPatientInfo(const mitk::DataNode* dataNode)
   if (nullptr != acquisitionDate)
   {
     acquisitionDateAsString = acquisitionDate->GetValueAsString();
-    DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str(), acquisitionDateAsString);
+    mitk::DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str(), acquisitionDateAsString);
   }
 
   mitk::BaseProperty* acquisitionTime = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0032).c_str());
@@ -67,7 +67,7 @@ void QmitkPatientInfoWidget::SetPatientInfo(const mitk::DataNode* dataNode)
   if (nullptr != acquisitionTime)
   {
     acquisitionTimeAsString = acquisitionTime->GetValueAsString();
-    DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0032).c_str(), acquisitionTimeAsString);
+    mitk::DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0032).c_str(), acquisitionTimeAsString);
   }
 
   std::string patiensBirthDateAsString = "";
@@ -75,7 +75,7 @@ void QmitkPatientInfoWidget::SetPatientInfo(const mitk::DataNode* dataNode)
   if (nullptr != patientBirthDate)
   {
     patiensBirthDateAsString = patientBirthDate->GetValueAsString();
-    DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0030).c_str(), patiensBirthDateAsString);
+    mitk::DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0030).c_str(), patiensBirthDateAsString);
   }
 
   mitk::BaseProperty* modality = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str());
@@ -83,7 +83,7 @@ void QmitkPatientInfoWidget::SetPatientInfo(const mitk::DataNode* dataNode)
   if (nullptr != modality)
   {
     modalityAsString = modality->GetValueAsString();
-    DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), modalityAsString);
+    mitk::DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), modalityAsString);
   }
 
   mitk::BaseProperty* gender = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0040).c_str());
@@ -91,11 +91,11 @@ void QmitkPatientInfoWidget::SetPatientInfo(const mitk::DataNode* dataNode)
   if (nullptr != gender)
   {
     genderAsString = gender->GetValueAsString();
-    DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), genderAsString);
+    mitk::DICOMHelper::ReformatDICOMTag(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), genderAsString);
   }
 
-  m_Controls.dataIDLineEdit->setText(QString::fromStdString(DICOMHelper::GetIDFromDataNode(dataNode)));
-  m_Controls.nameLineEdit->setText(QString::fromStdString(DICOMHelper::GetCaseIDFromDataNode(dataNode)));
+  m_Controls.dataIDLineEdit->setText(QString::fromStdString(mitk::DICOMHelper::GetIDFromDataNode(dataNode)));
+  m_Controls.nameLineEdit->setText(QString::fromStdString(mitk::DICOMHelper::GetCaseIDFromDataNode(dataNode)));
   m_Controls.dateLineEdit->setText(QString::fromStdString(acquisitionDateAsString));
   m_Controls.timeLineEdit->setText(QString::fromStdString(acquisitionTimeAsString));
   m_Controls.scannerLineEdit->setText("");

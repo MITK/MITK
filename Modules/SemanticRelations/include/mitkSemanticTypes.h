@@ -24,95 +24,92 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <tuple>
 
-namespace SemanticTypes
+namespace mitk
 {
-  typedef std::string ID;
-  typedef std::string CaseID; // an ID of the current case (e.g. the DICOM PatientID)
-  typedef std::string InformationType;
-
-  /*
-  * @brief The date type to be used for control points.
-  *
-  * TODO: use an already existing date format
-  */
-  struct Date
+  namespace SemanticTypes
   {
-    ID UID;
-    int year = 0;
-    int month = 0;
-    int day = 0;
+    typedef std::string ID;
+    typedef std::string CaseID; // an ID of the current case (e.g. the DICOM PatientID)
+    typedef std::string InformationType;
 
-    bool operator<(const Date& other) const
+    /*
+    * @brief The date type to be used for control points.
+    */
+    struct Date
     {
-      return std::tie(year, month, day) < std::tie(other.year, other.month, other.day);
-    }
-    bool operator>(const Date& other) const
-    {
-      return std::tie(year, month, day) > std::tie(other.year, other.month, other.day);
-    }
-    bool operator==(const Date& other) const
-    {
-      return (!operator<(other) && !operator>(other));
-    }
-    bool operator!=(const Date& other) const
-    {
-      return (operator<(other) || operator>(other));
-    }
-    bool operator<=(const Date& other) const
-    {
-      return (operator<(other) || operator==(other));
-    }
-    bool operator>=(const Date& other) const
-    {
-      return (operator>(other) || operator==(other));
-    }
-  };
+      ID UID;
+      int year = 0;
+      int month = 0;
+      int day = 0;
 
-  /*
-  * @brief The concept of a control point.
-  *
-  * TODO: use an already existing date format
-  */
-  struct ControlPoint // alternatively: ExaminationPoint
-  {
-    ID UID;
-    Date startPoint;
-    Date endPoint;
+      bool operator<(const Date& other) const
+      {
+        return std::tie(year, month, day) < std::tie(other.year, other.month, other.day);
+      }
+      bool operator>(const Date& other) const
+      {
+        return std::tie(year, month, day) > std::tie(other.year, other.month, other.day);
+      }
+      bool operator==(const Date& other) const
+      {
+        return (!operator<(other) && !operator>(other));
+      }
+      bool operator!=(const Date& other) const
+      {
+        return (operator<(other) || operator>(other));
+      }
+      bool operator<=(const Date& other) const
+      {
+        return (operator<(other) || operator==(other));
+      }
+      bool operator>=(const Date& other) const
+      {
+        return (operator>(other) || operator==(other));
+      }
+    };
 
-    bool operator<(const ControlPoint& other) const
+    /*
+    * @brief The concept of a control point.
+    */
+    struct ControlPoint // alternatively: ExaminationPoint
     {
-      return startPoint < other.startPoint;
-    }
-    bool operator!=(const ControlPoint& other) const
+      ID UID;
+      Date startPoint;
+      Date endPoint;
+
+      bool operator<(const ControlPoint& other) const
+      {
+        return startPoint < other.startPoint;
+      }
+      bool operator!=(const ControlPoint& other) const
+      {
+        return (startPoint != other.startPoint) || (endPoint != other.endPoint);
+      }
+      bool operator==(const ControlPoint& other) const
+      {
+        return (startPoint == other.startPoint) && (endPoint == other.endPoint);
+      }
+    };
+
+    /*
+    * @brief The concept of a lesion.
+    */
+    struct LesionClass
     {
-      return (startPoint != other.startPoint) || (endPoint != other.endPoint);
-    }
-    bool operator==(const ControlPoint& other) const
+      ID UID;
+      std::string classType = ""; // could be a "focal lesion" or "diffuse lesion" in the BlackSwan context
+    };
+
+    /*
+    * @brief The concept of a lesion.
+    */
+    struct Lesion
     {
-      return (startPoint == other.startPoint) && (endPoint == other.endPoint);
-    }
-  };
+      ID UID;
+      LesionClass lesionClass;
+    };
 
-  /*
-  * @brief The concept of a lesion.
-  *
-  * TODO: example lesion classes
-  */
-  struct LesionClass
-  {
-    ID UID;
-    std::string classType = ""; // could be a "focal lesion" or "diffuse lesion" in the BlackSwan context
-  };
-
-  /*
-  * @brief The concept of a lesion.
-  */
-  struct Lesion
-  {
-    ID UID;
-    LesionClass lesionClass;
-  };
-
-} // namespace SemanticTypes
+  } // namespace SemanticTypes
+} // namespace mitk
 
 #endif // MITKSEMANTICTYPES_H

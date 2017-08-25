@@ -95,9 +95,9 @@ void QmitkSemanticRelationsTableView::SetUpConnections()
 
 void QmitkSemanticRelationsTableView::AddImageInstance(const mitk::DataNode* dataNode)
 {
-  SemanticRelationsTestHelper::AddImageInstance(dataNode, *m_SemanticRelations);
+  mitk::SemanticRelationsTestHelper::AddImageInstance(dataNode, *m_SemanticRelations);
 
-  const SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  const mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(dataNode);
   int foundIndex = m_Controls.caseIDComboBox->findText(QString::fromStdString(caseID));
   if (-1 == foundIndex)
   {
@@ -113,8 +113,8 @@ void QmitkSemanticRelationsTableView::RemoveImageInstance(const mitk::DataNode* 
 {
   // ToDO: Remove image?
 
-  SemanticTypes::ControlPoint controlPoint = m_SemanticRelations->GetControlPointOfData(dataNode);
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  mitk::SemanticTypes::ControlPoint controlPoint = m_SemanticRelations->GetControlPointOfData(dataNode);
+  mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(dataNode);
   if (m_SemanticRelations->InstanceExists(caseID, controlPoint))
   {
     m_SemanticRelations->UnlinkDataFromControlPoint(dataNode, controlPoint);
@@ -194,7 +194,7 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
 {
   QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.patientDataTableView);
   inputDialog->setWindowTitle("Set control point");
-  inputDialog->SetCurrentDate(DICOMHelper::GetDateFromDataNode(m_SelectedDataNode));
+  inputDialog->SetCurrentDate(mitk::DICOMHelper::GetDateFromDataNode(m_SelectedDataNode));
 
   int dialogReturnValue = inputDialog->exec();
   if (QDialog::Rejected == dialogReturnValue)
@@ -203,23 +203,23 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
   }
 
   // store the current control point to relink it, if anything goes wrong
-  SemanticTypes::ControlPoint originalControlPoint = m_SemanticRelations->GetControlPointOfData(m_SelectedDataNode);
+  mitk::SemanticTypes::ControlPoint originalControlPoint = m_SemanticRelations->GetControlPointOfData(m_SelectedDataNode);
   // unlink the data, that is about to receive a new date
   // this is needed in order to not extend a single control point, to which the selected node is currently linked
   m_SemanticRelations->UnlinkDataFromControlPoint(m_SelectedDataNode, originalControlPoint);
 
   const QDate& userSelectedDate = inputDialog->GetCurrentDate();
-  SemanticTypes::Date date;
-  date.UID = UIDGeneratorBoost::GenerateUID();
+  mitk::SemanticTypes::Date date;
+  date.UID = mitk::UIDGeneratorBoost::GenerateUID();
   date.year = userSelectedDate.year();
   date.month = userSelectedDate.month();
   date.day = userSelectedDate.day();
 
-  std::vector<SemanticTypes::ControlPoint> allControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_SemanticRelationsDataModel->GetCurrentCaseID());
+  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_SemanticRelationsDataModel->GetCurrentCaseID());
   if (!allControlPoints.empty())
   {
     // need to check if an already existing control point fits/contains the user control point
-    SemanticTypes::ControlPoint fittingControlPoint = ControlPointManager::FindFittingControlPoint(date, allControlPoints);
+    mitk::SemanticTypes::ControlPoint fittingControlPoint = mitk::ControlPointManager::FindFittingControlPoint(date, allControlPoints);
     if (!fittingControlPoint.UID.empty())
     {
       try
@@ -245,7 +245,7 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
 
     // did not find a fitting control point, although some control points already exist
     // need to check if a close control point can be found and extended
-    SemanticTypes::ControlPoint extendedControlPoint = ControlPointManager::ExtendClosestControlPoint(date, allControlPoints);
+    mitk::SemanticTypes::ControlPoint extendedControlPoint = mitk::ControlPointManager::ExtendClosestControlPoint(date, allControlPoints);
     if (!extendedControlPoint.UID.empty())
     {
       try
@@ -271,7 +271,7 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
   }
 
   // generate a control point from the user-given date
-  SemanticTypes::ControlPoint controlPointFromUserDate = ControlPointManager::GenerateControlPoint(date);
+  mitk::SemanticTypes::ControlPoint controlPointFromUserDate = mitk::ControlPointManager::GenerateControlPoint(date);
   try
   {
     m_SemanticRelations->AddControlPointAndLinkData(m_SelectedDataNode, controlPointFromUserDate, false);

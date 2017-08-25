@@ -35,7 +35,7 @@ public:
 
   virtual ~QmitkControlPointDialog();
 
-  void SetCurrentDate(SemanticTypes::Date currentDate);
+  void SetCurrentDate(mitk::SemanticTypes::Date currentDate);
   QDate GetCurrentDate() const;
 
 private:

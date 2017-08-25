@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <ctime>
 
-SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const std::vector<mitk::DataNode::Pointer>& dataOfControlPoint)
+mitk::SemanticTypes::ControlPoint mitk::ControlPointManager::GenerateControlPoint(const std::vector<mitk::DataNode::Pointer>& dataOfControlPoint)
 {
   SemanticTypes::ControlPoint controlPoint;
   SemanticTypes::Date startPoint = GetStartPoint(dataOfControlPoint);
@@ -39,7 +39,7 @@ SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const std:
   return controlPoint;
 }
 
-SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const mitk::DataNode* datanode)
+mitk::SemanticTypes::ControlPoint mitk::ControlPointManager::GenerateControlPoint(const mitk::DataNode* datanode)
 {
   SemanticTypes::ControlPoint controlPoint;
   SemanticTypes::Date date = DICOMHelper::GetDateFromDataNode(datanode);
@@ -47,7 +47,7 @@ SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const mitk
   return GenerateControlPoint(date);
 }
 
-SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const SemanticTypes::Date& date)
+mitk::SemanticTypes::ControlPoint mitk::ControlPointManager::GenerateControlPoint(const SemanticTypes::Date& date)
 {
   SemanticTypes::ControlPoint controlPoint;
 
@@ -61,7 +61,7 @@ SemanticTypes::ControlPoint ControlPointManager::GenerateControlPoint(const Sema
   return controlPoint;
 }
 
-SemanticTypes::Date ControlPointManager::GetStartPoint(const std::vector<mitk::DataNode::Pointer>& dataOfControlPoint)
+mitk::SemanticTypes::Date mitk::ControlPointManager::GetStartPoint(const std::vector<mitk::DataNode::Pointer>& dataOfControlPoint)
 {
   SemanticTypes::Date startPoint;
   for (const auto& dataNode : dataOfControlPoint)
@@ -77,7 +77,7 @@ SemanticTypes::Date ControlPointManager::GetStartPoint(const std::vector<mitk::D
   return startPoint;
 }
 
-SemanticTypes::Date ControlPointManager::GetEndPoint(const std::vector<mitk::DataNode::Pointer>& dataOfControlPoint)
+mitk::SemanticTypes::Date mitk::ControlPointManager::GetEndPoint(const std::vector<mitk::DataNode::Pointer>& dataOfControlPoint)
 {
   SemanticTypes::Date endPoint;
   for (const auto& dataNode : dataOfControlPoint)
@@ -93,7 +93,7 @@ SemanticTypes::Date ControlPointManager::GetEndPoint(const std::vector<mitk::Dat
   return endPoint;
 }
 
-std::string ControlPointManager::GetControlPointAsString(const SemanticTypes::ControlPoint& controlPoint)
+std::string mitk::ControlPointManager::GetControlPointAsString(const SemanticTypes::ControlPoint& controlPoint)
 {
   std::stringstream dateAsString;
 
@@ -113,7 +113,7 @@ std::string ControlPointManager::GetControlPointAsString(const SemanticTypes::Co
   return dateAsString.str();
 }
 
-bool ControlPointManager::InsideControlPoint(const mitk::DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint)
+bool mitk::ControlPointManager::InsideControlPoint(const mitk::DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint)
 {
   SemanticTypes::Date date = DICOMHelper::GetDateFromDataNode(dataNode);
   if (date >= controlPoint.startPoint && date <= controlPoint.endPoint && !controlPoint.UID.empty())
@@ -126,7 +126,7 @@ bool ControlPointManager::InsideControlPoint(const mitk::DataNode* dataNode, con
   }
 }
 
-bool ControlPointManager::InsideControlPoint(const SemanticTypes::ControlPoint& containedControlPoint, const SemanticTypes::ControlPoint& containingControlPoint)
+bool mitk::ControlPointManager::InsideControlPoint(const SemanticTypes::ControlPoint& containedControlPoint, const SemanticTypes::ControlPoint& containingControlPoint)
 {
   if (containedControlPoint.startPoint >= containingControlPoint.startPoint && containedControlPoint.endPoint <= containingControlPoint.endPoint)
   {
@@ -138,7 +138,7 @@ bool ControlPointManager::InsideControlPoint(const SemanticTypes::ControlPoint& 
   }
 }
 
-bool ControlPointManager::InsideControlPoint(const SemanticTypes::Date& date, const SemanticTypes::ControlPoint& controlPoint)
+bool mitk::ControlPointManager::InsideControlPoint(const SemanticTypes::Date& date, const SemanticTypes::ControlPoint& controlPoint)
 {
   if (date >= controlPoint.startPoint && date <= controlPoint.endPoint)
   {
@@ -150,7 +150,7 @@ bool ControlPointManager::InsideControlPoint(const SemanticTypes::Date& date, co
   }
 }
 
-bool ControlPointManager::CheckForOverlap(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ControlPoint& neighboringControlPoint)
+bool mitk::ControlPointManager::CheckForOverlap(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ControlPoint& neighboringControlPoint)
 {
   if (controlPoint.startPoint >= neighboringControlPoint.endPoint || controlPoint.endPoint <= neighboringControlPoint.startPoint)
   {
@@ -162,7 +162,7 @@ bool ControlPointManager::CheckForOverlap(const SemanticTypes::ControlPoint& con
   }
 }
 
-SemanticTypes::ControlPoint ControlPointManager::FindFittingControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::ControlPointManager::FindFittingControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   SemanticTypes::Date dateFromDataNode = DICOMHelper::GetDateFromDataNode(dataNode);
   if (0 == dateFromDataNode.year)
@@ -174,7 +174,7 @@ SemanticTypes::ControlPoint ControlPointManager::FindFittingControlPoint(const m
   return FindFittingControlPoint(dateFromDataNode, allControlPoints);
 }
 
-SemanticTypes::ControlPoint ControlPointManager::FindFittingControlPoint(const SemanticTypes::Date& date, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::ControlPointManager::FindFittingControlPoint(const SemanticTypes::Date& date, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   // check if the date of the data node fits into an existing control point interval
   for (const auto& controlPoint : allControlPoints)
@@ -189,7 +189,7 @@ SemanticTypes::ControlPoint ControlPointManager::FindFittingControlPoint(const S
   return SemanticTypes::ControlPoint();
 }
 
-SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::ControlPointManager::ExtendClosestControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   SemanticTypes::Date dateFromDataNode = DICOMHelper::GetDateFromDataNode(dataNode);
   if (0 == dateFromDataNode.year)
@@ -201,7 +201,7 @@ SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const
   return ExtendClosestControlPoint(dateFromDataNode, allControlPoints);
 }
 
-SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const SemanticTypes::Date& date, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::ControlPointManager::ExtendClosestControlPoint(const SemanticTypes::Date& date, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   // sort the vector of control points for easier lookup
   std::sort(allControlPoints.begin(), allControlPoints.end());
@@ -276,7 +276,7 @@ SemanticTypes::ControlPoint ControlPointManager::ExtendClosestControlPoint(const
   }
 }
 
-void ControlPointManager::ExtendControlPoint(SemanticTypes::ControlPoint& controlPoint, SemanticTypes::Date date)
+void mitk::ControlPointManager::ExtendControlPoint(SemanticTypes::ControlPoint& controlPoint, SemanticTypes::Date date)
 {
   if (controlPoint.startPoint > date)
   {
@@ -295,7 +295,7 @@ void ControlPointManager::ExtendControlPoint(SemanticTypes::ControlPoint& contro
   // else: date is inside the control point
 }
 
-double ControlPointManager::CalculateDistanceInDays(SemanticTypes::Date neighboringDicomDate, SemanticTypes::Date newDicomDate)
+double mitk::ControlPointManager::CalculateDistanceInDays(SemanticTypes::Date neighboringDicomDate, SemanticTypes::Date newDicomDate)
 {
   // compute distance here
   std::tm neighboringTimeStructure = { 0, 0, 0, neighboringDicomDate.day, neighboringDicomDate.month - 1, neighboringDicomDate.year - 1900 };

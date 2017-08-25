@@ -53,12 +53,12 @@ std::shared_ptr<mitk::RelationStorage> mitk::SemanticRelations::GetRelationStora
 /* functions to get instances / attributes                              */
 /************************************************************************/
 
-std::vector<SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const
+std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllLesionsOfCase(caseID);
 }
 
-std::vector<SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
+std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
   // prepare node predicate to find image nodes
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -131,7 +131,7 @@ std::vector<SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(
   return allLesions;
 }
 
-std::vector<SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsInImage(const DataNode* imageNode) const
+std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsInImage(const DataNode* imageNode) const
 {
   if (nullptr == imageNode)
   {
@@ -166,7 +166,7 @@ std::vector<SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsInImage
   return allLesionsInImage;
 }
 
-SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const DataNode* segmentationNode) const
+mitk::SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const DataNode* segmentationNode) const
 {
   if (nullptr == segmentationNode)
   {
@@ -252,12 +252,12 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-std::vector<SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const
+std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllControlPointsOfCase(caseID);
 }
 
-std::vector<SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
+std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
   // prepare node predicate to find image nodes
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -330,7 +330,7 @@ std::vector<SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlP
   return allControlPoints;
 }
 
-std::vector<SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
+std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
 {
   std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
 
@@ -368,7 +368,7 @@ std::vector<SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlP
   return allControlPoints;
 }
 
-SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData(const DataNode* dataNode) const
+mitk::SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData(const DataNode* dataNode) const
 {
   if (nullptr == dataNode)
   {
@@ -420,12 +420,12 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-std::vector<SemanticTypes::InformationType> mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const
+std::vector<mitk::SemanticTypes::InformationType> mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllInformationTypesOfCase(caseID);
 }
 
-std::vector<SemanticTypes::InformationType> mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
+std::vector<mitk::SemanticTypes::InformationType> mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
   std::vector<SemanticTypes::InformationType> allInformationTypes = GetAllInformationTypesOfCase(caseID);
 
@@ -463,7 +463,7 @@ std::vector<SemanticTypes::InformationType> mitk::SemanticRelations::GetAllInfor
   return allInformationTypes;
 }
 
-SemanticTypes::InformationType mitk::SemanticRelations::GetInformationTypeOfImage(const DataNode* imageNode) const
+mitk::SemanticTypes::InformationType mitk::SemanticRelations::GetInformationTypeOfImage(const DataNode* imageNode) const
 {
   if (nullptr == imageNode)
   {
@@ -552,7 +552,7 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-std::vector<SemanticTypes::CaseID> mitk::SemanticRelations::GetAllCaseIDs() const
+std::vector<mitk::SemanticTypes::CaseID> mitk::SemanticRelations::GetAllCaseIDs() const
 {
   return m_RelationStorage->GetAllCaseIDs();
 }

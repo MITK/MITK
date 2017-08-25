@@ -97,7 +97,7 @@ QVariant QmitkSemanticRelationsDataModel::data(const QModelIndex &index, int rol
   }
   else if (Qt::DecorationRole == role)
   {
-    auto it = m_PixmapMap.find(DICOMHelper::GetIDFromDataNode(dataNode));
+    auto it = m_PixmapMap.find(mitk::DICOMHelper::GetIDFromDataNode(dataNode));
     if (it != m_PixmapMap.end())
     {
       return QVariant(it->second);
@@ -112,9 +112,9 @@ QVariant QmitkSemanticRelationsDataModel::headerData(int section, Qt::Orientatio
   {
     if (m_ControlPoints.size() > section)
     {
-      SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(section);
+      mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(section);
       // generate a string from the control point
-      std::string currentControlPointAsString = ControlPointManager::GetControlPointAsString(currentControlPoint);
+      std::string currentControlPointAsString = mitk::ControlPointManager::GetControlPointAsString(currentControlPoint);
       return QVariant(QString::fromStdString(currentControlPointAsString));
     }
   }
@@ -122,7 +122,7 @@ QVariant QmitkSemanticRelationsDataModel::headerData(int section, Qt::Orientatio
   {
     if (m_InformationTypes.size() > section)
     {
-      SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(section);
+      mitk::SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(section);
       return QVariant(QString::fromStdString(currentInformationType));
     }
   }
@@ -158,7 +158,7 @@ void QmitkSemanticRelationsDataModel::SetDataStorage(mitk::DataStorage::Pointer 
   }
 }
 
-void QmitkSemanticRelationsDataModel::SetCurrentCaseID(const SemanticTypes::CaseID& caseID)
+void QmitkSemanticRelationsDataModel::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
 {
   m_CaseID = caseID;
   DataChanged();
@@ -166,7 +166,7 @@ void QmitkSemanticRelationsDataModel::SetCurrentCaseID(const SemanticTypes::Case
 
 void QmitkSemanticRelationsDataModel::SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage)
 {
-  SemanticTypes::ID nodeID = DICOMHelper::GetIDFromDataNode(dataNode);
+  mitk::SemanticTypes::ID nodeID = mitk::DICOMHelper::GetIDFromDataNode(dataNode);
   std::map<std::string, QPixmap>::iterator iter = m_PixmapMap.find(nodeID);
   if (iter != m_PixmapMap.end())
   {
@@ -224,8 +224,8 @@ void QmitkSemanticRelationsDataModel::DataChanged(const mitk::DataNode* dataNode
 
 mitk::DataNode* QmitkSemanticRelationsDataModel::GetCurrentDataNode(const QModelIndex& index) const
 {
-  SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(index.column());
-  SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(index.row());
+  mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(index.column());
+  mitk::SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(index.row());
   std::vector<mitk::DataNode::Pointer> filteredDataNodes = m_SemanticRelations->GetFilteredData(m_CaseID, currentControlPoint, currentInformationType);
   if (filteredDataNodes.empty())
   {

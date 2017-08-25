@@ -21,10 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
-namespace UIDGeneratorBoost
+namespace mitk
 {
-  MITKSEMANTICRELATIONS_EXPORT std::string GenerateUID();
-
-} // namespace UIDGeneratorBoost
+  namespace UIDGeneratorBoost
+  {
+    MITKSEMANTICRELATIONS_EXPORT std::string GenerateUID();
+  } // namespace UIDGeneratorBoost
+} // namespace mitk
 
 #endif // MITKUIDGENERATORBOOST_H

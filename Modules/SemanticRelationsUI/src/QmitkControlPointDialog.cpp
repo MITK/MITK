@@ -58,7 +58,7 @@ QmitkControlPointDialog::~QmitkControlPointDialog()
 {
 }
 
-void QmitkControlPointDialog::SetCurrentDate(SemanticTypes::Date currentDate)
+void QmitkControlPointDialog::SetCurrentDate(mitk::SemanticTypes::Date currentDate)
 {
   m_DateEdit->setDate(QDate(currentDate.year, currentDate.month, currentDate.day));
 }

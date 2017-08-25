@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-std::string UIDGeneratorBoost::GenerateUID()
+std::string mitk::UIDGeneratorBoost::GenerateUID()
 {
   boost::uuids::uuid uuid = boost::uuids::random_generator()();
   return boost::uuids::to_string(uuid);

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <algorithm>
 
-SemanticTypes::CaseID DICOMHelper::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
+mitk::SemanticTypes::CaseID mitk::DICOMHelper::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -51,7 +51,7 @@ SemanticTypes::CaseID DICOMHelper::GetCaseIDFromDataNode(const mitk::DataNode* d
   return "";
 }
 
-SemanticTypes::ID DICOMHelper::GetIDFromDataNode(const mitk::DataNode* dataNode)
+mitk::SemanticTypes::ID mitk::DICOMHelper::GetIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -77,7 +77,7 @@ SemanticTypes::ID DICOMHelper::GetIDFromDataNode(const mitk::DataNode* dataNode)
   return "";
 }
 
-SemanticTypes::Date DICOMHelper::GetDateFromDataNode(const mitk::DataNode* dataNode)
+mitk::SemanticTypes::Date mitk::DICOMHelper::GetDateFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -106,7 +106,7 @@ SemanticTypes::Date DICOMHelper::GetDateFromDataNode(const mitk::DataNode* dataN
   return SemanticTypes::Date();
 }
 
-void DICOMHelper::ReformatDICOMTag(const std::string &tag, std::string &identifier)
+void mitk::DICOMHelper::ReformatDICOMTag(const std::string &tag, std::string &identifier)
 {
   // remove leading and trailing whitespace
   identifier = Trim(identifier);
@@ -124,7 +124,7 @@ void DICOMHelper::ReformatDICOMTag(const std::string &tag, std::string &identifi
   }
 }
 
-SemanticTypes::Date DICOMHelper::GetDateFromString(const std::string& dateAsString)
+mitk::SemanticTypes::Date mitk::DICOMHelper::GetDateFromString(const std::string& dateAsString)
 {
   if (dateAsString.size() != 8) // string does not represent a DICOM date
   {
@@ -141,7 +141,7 @@ SemanticTypes::Date DICOMHelper::GetDateFromString(const std::string& dateAsStri
   return date;
 }
 
-std::string DICOMHelper::Trim(const std::string& identifier)
+std::string mitk::DICOMHelper::Trim(const std::string& identifier)
 {
   if (identifier.empty())
   {
@@ -157,13 +157,13 @@ std::string DICOMHelper::Trim(const std::string& identifier)
   return identifier.substr(first, last - first + 1);
 }
 
-std::string DICOMHelper::DICOMTagToName(const std::string& propertyName)
+std::string mitk::DICOMHelper::DICOMTagToName(const std::string& propertyName)
 {
   mitk::DICOMTagPath tagPath = mitk::PropertyNameToDICOMTagPath(propertyName);
   return DICOMTagPathToName(tagPath);
 }
 
-std::string DICOMHelper::DICOMTagPathToName(const mitk::DICOMTagPath& tagPath)
+std::string mitk::DICOMHelper::DICOMTagPathToName(const mitk::DICOMTagPath& tagPath)
 {
   std::string tagName;
   int i = 0;
@@ -180,7 +180,7 @@ std::string DICOMHelper::DICOMTagPathToName(const mitk::DICOMTagPath& tagPath)
   return tagName;
 }
 
-void DICOMHelper::ReformatDICOMDate(std::string& identifier)
+void mitk::DICOMHelper::ReformatDICOMDate(std::string& identifier)
 {
   if (identifier.size() != 8) // identifier does not represent a DICOM date
     return;
@@ -191,7 +191,7 @@ void DICOMHelper::ReformatDICOMDate(std::string& identifier)
   identifier.insert(7, 1, '-');
 }
 
-void DICOMHelper::ReformatDICOMTime(std::string& identifier)
+void mitk::DICOMHelper::ReformatDICOMTime(std::string& identifier)
 {
   if (identifier.size() != 6) // identifier does not represent a DICOM time
     return;

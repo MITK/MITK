@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   class SemanticRelationException : public Exception
   {
 
@@ -31,7 +30,6 @@ namespace mitk
     mitkExceptionClassMacro(SemanticRelationException, Exception);
 
   };
-
 } // namespace mitk
 
 #endif // MITKSEMANTICRELATIONEXCEPTION_H

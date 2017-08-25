@@ -14,20 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relation module
+// semantic relations module
 #include "mitkSemanticRelations.h"
 #include "mitkSemanticRelationException.h"
+#include "mitkNodePredicates.h"
 #include "mitkUIDGeneratorBoost.h"
 
 // multi label module
 #include <mitkLabelSetImage.h>
-
-// mitk core
-#include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateOr.h>
-#include <mitkNodePredicateProperty.h>
-#include <mitkNodePredicateDataType.h>
 
 // c++
 #include <algorithm>
@@ -60,29 +54,11 @@ std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsO
 
 std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
-  // prepare node predicate to find image nodes
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-
-  // prepare node predicate to filter segmentation nodes
-  NodePredicateAnd::Pointer segmentationPredicate = NodePredicateAnd::New();
-  segmentationPredicate->AddPredicate(TNodePredicateDataType<LabelSetImage>::New());
-  segmentationPredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
-  NodePredicateOr::Pointer validImages = NodePredicateOr::New();
-  validImages->AddPredicate(isImage);
-
-  NodePredicateAnd::Pointer imagePredicate = NodePredicateAnd::New();
-  imagePredicate->AddPredicate(validImages);
-  imagePredicate->AddPredicate(NodePredicateNot::New(segmentationPredicate));
-  imagePredicate->AddPredicate(NodePredicateNot::New(NodePredicateAnd::New(isBinary, isImage)));
-  imagePredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
   std::vector<SemanticTypes::Lesion> allLesions = GetAllLesionsOfCase(caseID);
 
   // filter the lesions: use only those, where the associated data refers to the given control point using a lambda function
   allLesions.erase(std::remove_if(allLesions.begin(), allLesions.end(),
-    [&controlPoint, &caseID, &imagePredicate, this](const SemanticTypes::Lesion& lesion)
+    [&controlPoint, &caseID, this](const SemanticTypes::Lesion& lesion)
   {
     std::vector<DataNode::Pointer> allDataOfLesion;
     try
@@ -96,7 +72,7 @@ std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsO
         for (const auto& segmentationNode : allSegmentationsOfLesion)
         {
           // get parent node of the current segmentation node with the node predicate
-          DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, imagePredicate, false);
+          DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
           for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
           {
             DataNode::Pointer dataNode = it->Value();
@@ -140,15 +116,10 @@ std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsI
   }
 
   std::vector<SemanticTypes::Lesion> allLesionsInImage;
-  // prepare node predicate to find images
-  NodePredicateAnd::Pointer segmentationPredicate = NodePredicateAnd::New();
-  segmentationPredicate->AddPredicate(TNodePredicateDataType<LabelSetImage>::New());
-  segmentationPredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
   if (m_DataStorage.IsNotNull())
   {
     // get child nodes of the current node with the segmentation predicate
-    DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetDerivations(imageNode, segmentationPredicate, false);
+    DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetDerivations(imageNode, NodePredicates::GetSegmentationPredicate(), false);
     for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
     {
       DataNode* segmentationNode = it->Value();
@@ -259,29 +230,11 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllCo
 
 std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
-  // prepare node predicate to find image nodes
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-
-  // prepare node predicate to filter segmentation nodes
-  NodePredicateAnd::Pointer segmentationPredicate = NodePredicateAnd::New();
-  segmentationPredicate->AddPredicate(TNodePredicateDataType<LabelSetImage>::New());
-  segmentationPredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
-  NodePredicateOr::Pointer validImages = NodePredicateOr::New();
-  validImages->AddPredicate(isImage);
-
-  NodePredicateAnd::Pointer imagePredicate = NodePredicateAnd::New();
-  imagePredicate->AddPredicate(validImages);
-  imagePredicate->AddPredicate(NodePredicateNot::New(segmentationPredicate));
-  imagePredicate->AddPredicate(NodePredicateNot::New(NodePredicateAnd::New(isBinary, isImage)));
-  imagePredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
   std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
 
   // filter the control points: use only those, where the associated data has a segmentation that refers to the given lesion using a lambda function
   allControlPoints.erase(std::remove_if(allControlPoints.begin(), allControlPoints.end(),
-    [&lesion, &caseID, &imagePredicate, this](const SemanticTypes::ControlPoint& controlPoint)
+    [&lesion, &caseID, this](const SemanticTypes::ControlPoint& controlPoint)
   {
     std::vector<DataNode::Pointer> allDataOfControlPoint;
     try
@@ -304,7 +257,7 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllCo
         for (const auto& segmentationNode : allSegmentationsOfLesion)
         {
           // get parent node of the current segmentation node with the node predicate
-          DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, imagePredicate, false);
+          DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
           for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
           {
             DataNode::Pointer dataNode = it->Value();

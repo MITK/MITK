@@ -14,19 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relation module
+// semantic relations module
 #include "mitkRelationStorage.h"
+#include "mitkNodePredicates.h"
 
 // multi label module
 #include <mitkLabelSetImage.h>
 
 // mitk core
 #include <mitkIPersistenceService.h>
-#include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateOr.h>
-#include <mitkNodePredicateProperty.h>
-#include <mitkNodePredicateDataType.h>
 #include <mitkVectorProperty.h>
 
 // c++
@@ -164,15 +160,10 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   }
 
   std::vector<std::string> allSegmentationIDsOfCase = segmentationsProperty->GetValue();
-  // prepare node predicate to find segmentation nodes
-  NodePredicateAnd::Pointer segmentationPredicate = NodePredicateAnd::New();
-  segmentationPredicate->AddPredicate(TNodePredicateDataType<LabelSetImage>::New());
-  segmentationPredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
   std::vector<DataNode::Pointer> allSegmentationsOfCase;
   // get all segmentation nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
-  DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetSubset(segmentationPredicate);
+  DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetSubset(NodePredicates::GetSegmentationPredicate());
   for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
   {
     DataNode* segmentationNode = it->Value();
@@ -449,38 +440,10 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllImagesOfCase(c
   }
 
   std::vector<std::string> allImageIDsOfCase = GetAllImageIDsOfCase(caseID);
-
-  // prepare node predicate to find image nodes
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  /*
-  mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-  mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-  mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
-  */
-
-  // prepare node predicate to filter segmentation nodes
-  NodePredicateAnd::Pointer segmentationPredicate = NodePredicateAnd::New();
-  segmentationPredicate->AddPredicate(TNodePredicateDataType<LabelSetImage>::New());
-  segmentationPredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
-  NodePredicateOr::Pointer validImages = NodePredicateOr::New();
-  validImages->AddPredicate(isImage);
-  /*
-  validImages->AddPredicate(isDwi);
-  validImages->AddPredicate(isDti);
-  validImages->AddPredicate(isQbi);
-  */
-  NodePredicateAnd::Pointer imagePredicate = NodePredicateAnd::New();
-  imagePredicate->AddPredicate(validImages);
-  imagePredicate->AddPredicate(NodePredicateNot::New(segmentationPredicate));
-  imagePredicate->AddPredicate(NodePredicateNot::New(NodePredicateAnd::New(isBinary, isImage)));
-  imagePredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
-
   std::vector<DataNode::Pointer> allImagesOfCase;
   // get all image nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
-  DataStorage::SetOfObjects::ConstPointer imageNodes = m_DataStorage->GetSubset(imagePredicate);
+  DataStorage::SetOfObjects::ConstPointer imageNodes = m_DataStorage->GetSubset(NodePredicates::GetImagePredicate());
   for (auto it = imageNodes->Begin(); it != imageNodes->End(); ++it)
   {
     DataNode* imageNode = it->Value();

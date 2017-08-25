@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsControls.h"
 
-// semantic relations module
-#include <mitkSemanticRelations.h>
-
 // semantic relations UI module
 #include <QmitkSemanticRelationsTableView.h>
 #include <QmitkPatientInfoWidget.h>
@@ -52,12 +49,12 @@ protected:
 
 private Q_SLOTS:
 
-  void OnTableViewSelectionChanged(const mitk::DataNode* node);
+  void OnTableViewSelectionChanged(const mitk::DataNode*);
+  void OnSemanticRelationsDataChanged(const mitk::SemanticTypes::CaseID&);
 
 private:
 
   virtual void NodeAdded(const mitk::DataNode* node) override;
-
   virtual void NodeRemoved(const mitk::DataNode* node) override;
 
   // the Qt parent of our GUI

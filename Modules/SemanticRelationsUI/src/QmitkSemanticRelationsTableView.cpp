@@ -111,10 +111,8 @@ void QmitkSemanticRelationsTableView::AddImageInstance(const mitk::DataNode* dat
 
 void QmitkSemanticRelationsTableView::RemoveImageInstance(const mitk::DataNode* dataNode)
 {
-  // ToDO: Remove image?
-
-  mitk::SemanticTypes::ControlPoint controlPoint = m_SemanticRelations->GetControlPointOfData(dataNode);
   mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  mitk::SemanticTypes::ControlPoint controlPoint = m_SemanticRelations->GetControlPointOfData(dataNode);
   if (m_SemanticRelations->InstanceExists(caseID, controlPoint))
   {
     m_SemanticRelations->UnlinkDataFromControlPoint(dataNode, controlPoint);
@@ -130,9 +128,24 @@ void QmitkSemanticRelationsTableView::RemoveImageInstance(const mitk::DataNode* 
   m_SemanticRelationsDataModel->SetPixmapOfNode(dataNode, nullptr);
 }
 
+void QmitkSemanticRelationsTableView::RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode)
+{
+  mitk::SemanticRelationsTestHelper::RemoveSegmentationInstance(segmentationNode, parentNode, *m_SemanticRelations);
+  mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+  emit DataChanged(caseID);
+}
+
+void QmitkSemanticRelationsTableView::AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode)
+{
+  mitk::SemanticRelationsTestHelper::AddSegmentationInstance(segmentationNode, parentNode, *m_SemanticRelations);
+  const mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+  emit DataChanged(caseID);
+}
+
 void QmitkSemanticRelationsTableView::OnCaseIDSelectionChanged(const QString& caseID)
 {
   m_SemanticRelationsDataModel->SetCurrentCaseID(caseID.toStdString());
+  emit DataChanged(caseID.toStdString());
 }
 
 void QmitkSemanticRelationsTableView::OnTableViewDataChanged()

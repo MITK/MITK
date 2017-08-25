@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include "mitkSemanticRelationsTestHelper.h"
+#include "mitkNodePredicates.h"
 
 // blueberry
 #include <berryISelectionService.h>
@@ -45,6 +46,7 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   m_PatientInfoWidget->hide();
 
   connect(m_SemanticRelationsTableView, SIGNAL(SelectionChanged(const mitk::DataNode*)), SLOT(OnTableViewSelectionChanged(const mitk::DataNode*)));
+  connect(m_SemanticRelationsTableView, SIGNAL(DataChanged(const mitk::SemanticTypes::CaseID&)), SLOT(OnSemanticRelationsDataChanged(const mitk::SemanticTypes::CaseID&)));
 }
 
 void QmitkSemanticRelationsView::NodeAdded(const mitk::DataNode* node)
@@ -56,8 +58,19 @@ void QmitkSemanticRelationsView::NodeAdded(const mitk::DataNode* node)
     return;
   }
 
-  // not a helper object; add the image to the table view widget
-  m_SemanticRelationsTableView->AddImageInstance(node);
+  // not a helper object
+  if (mitk::NodePredicates::GetImagePredicate()->CheckNode(node))
+  {
+    // add the image to the semantic relations storage (and trigger GUI elements to change)
+    m_SemanticRelationsTableView->AddImageInstance(node);
+  }
+  else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(node))
+  {
+    // get parent node of the current segmentation node with the node predicate
+    mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = GetDataStorage()->GetSources(node, mitk::NodePredicates::GetImagePredicate(), false);
+    // add the segmentation to the semantic relations storage (and receive a signal to change the lesion list)
+    m_SemanticRelationsTableView->AddSegmentationInstance(node, parentNodes->front());
+  }
 }
 
 void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
@@ -69,12 +82,28 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
     return;
   }
 
-  // not a helper object; remove the image from the table view widget
-  m_SemanticRelationsTableView->RemoveImageInstance(node);
+  // not a helper object
+  if (mitk::NodePredicates::GetImagePredicate()->CheckNode(node))
+  {
+    // remove the image from the semantic relations storage (and trigger GUI elements to change)
+    m_SemanticRelationsTableView->RemoveImageInstance(node);
+  }
+  else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(node))
+  {
+    // get parent node of the current segmentation node with the node predicate
+    mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = GetDataStorage()->GetSources(node, mitk::NodePredicates::GetImagePredicate(), false);
+    // remove the segmentation from the semantic relations storage (and receive a signal to change the lesion list)
+    m_SemanticRelationsTableView->RemoveSegmentationInstance(node, parentNodes->front());
+  }
 }
 
 void QmitkSemanticRelationsView::OnTableViewSelectionChanged(const mitk::DataNode* node)
 {
   m_PatientInfoWidget->SetPatientInfo(node);
   m_PatientInfoWidget->show();
+}
+
+void QmitkSemanticRelationsView::OnSemanticRelationsDataChanged(const mitk::SemanticTypes::CaseID& caseID)
+{
+  // update lesion list here
 }

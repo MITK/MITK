@@ -41,9 +41,12 @@ public:
 
   void AddImageInstance(const mitk::DataNode* dataNode);
   void RemoveImageInstance(const mitk::DataNode* dataNode);
+  void AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode);
+  void RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode);
 
 Q_SIGNALS:
-  void SelectionChanged(const mitk::DataNode* dataNode);
+  void SelectionChanged(const mitk::DataNode*);
+  void DataChanged(const mitk::SemanticTypes::CaseID&);
 
 private Q_SLOTS:
 

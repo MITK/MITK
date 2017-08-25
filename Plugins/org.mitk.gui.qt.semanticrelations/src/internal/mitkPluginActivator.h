@@ -14,22 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKSEMANTICRELATIONEXCEPTION_H
-#define MITKSEMANTICRELATIONEXCEPTION_H
+#ifndef MITKPLUGINACTIVATOR_H
+#define MITKPLUGINACTIVATOR_H
 
-// mitk core
-#include <mitkException.h>
+#include <ctkPluginActivator.h>
 
 namespace mitk
 {
-  class SemanticRelationException : public Exception
+  class SemanticRelationsActivator : public QObject, public ctkPluginActivator
   {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_semanticrelations")
+    Q_INTERFACES(ctkPluginActivator)
 
   public:
-
-    mitkExceptionClassMacro(SemanticRelationException, Exception);
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext* context) override;
 
   };
-} // namespace mitk
+}
 
-#endif // MITKSEMANTICRELATIONEXCEPTION_H
+#endif // MITKPLUGINACTIVATOR_H

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include "mitkControlPointManager.h"
-#include "mitkNodeIdentifier.h"
+#include "mitkDICOMHelper.h"
 #include "mitkRelationStorage.h"
 #include "mitkSemanticTypes.h"
 
@@ -92,7 +92,7 @@ namespace mitk
     * @brief  Returns the lesion that is defined by the given segmentation data.
     *
     * @pre    Each segmentation has to define a lesion, regardless of a known lesion class. So this function always returns a lesion.
-    *         If the segmentation refers to a non-existing lesion, an exception is thrown (this can be checked via 'IsRepresentingALesion').
+    * @throw  SemanticRelationException, if the segmentation refers to a non-existing lesion (this can be checked via 'IsRepresentingALesion').
     *
     * @par segmentationNode   The segmentation identifier is extracted from the given data node.
     * @return                 The represented lesion.
@@ -112,7 +112,8 @@ namespace mitk
     * @brief  Return a vector of all segmentations that define the given lesion. These segmentations don't have to be linked to the same image.
     *         If the lesion is not referred to by any segmentation, an empty vector is returned.
     *
-    * @pre    The UID of the lesion has to exist for a lesion instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the lesion has to exist for a lesion instance.
+    * @throw  SemanticRelationException, if UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
     * @par caseID   The current case identifier is defined by the given string.
     * @par lesion   A Lesion with a UID that identifies the corresponding lesion instance.
@@ -175,7 +176,8 @@ namespace mitk
     * @brief  Return a vector of all data nodes that link to the given control point.
     *         If the control point is not referred to by any data node, an empty vector is returned.
     *
-    * @pre    The UID of the control point has to exist for a control point instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the control point has to exist for a control point instance.
+    * @throw  SemanticRelationException, if the UID of the control point does not exist for a control point instance (this can be checked via 'InstanceExists').
     *
     * @par caseID         The current case identifier is defined by the given string.
     * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
@@ -224,13 +226,30 @@ namespace mitk
 
     /*
     * @brief  Return a vector of all data nodes that are defined as the given information type.
-    *         If the information type is not used by any data node, the function throws an exception (this can be checked via 'InstanceExists').
+    *
+    * @pre    The information type has to exist for the given case (and is therefore used by at least one data node).
+    * @throw  SemanticRelationException, if the information type is not used by any data node (this can be checked via 'InstanceExists').
     *
     * @par caseID             The current case identifier is defined by the given string.
     * @par informationType    An information type that identifies the corresponding information type instance.
     * @return                 A vector of data nodes that are defined as the given information type.
     */
     std::vector<mitk::DataNode::Pointer> GetAllDataOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
+
+    /*
+    * @brief  Return a vector of all data nodes that are defined as the given information type with the given control point.
+
+    * @pre    The UID of the control point has to exist for a control point instance.
+    *         The information type has to exist for the given case (and is therefore used by at least one data node).
+    * @throw  SemanticRelationException, if the UID of the control point does not exist for a control point instance (this can be checked via 'InstanceExists') or
+    *                                    if the information type is not used by any data node (this can be checked via 'InstanceExists')
+    *
+    * @par caseID             The current case identifier is defined by the given string.
+    * @par controlPoint       A control point with a UID that identifies the corresponding control point instance.
+    * @par informationType    An information type that identifies the corresponding information type instance.
+    * @return                 A vector of data nodes that are defined as the given information type with the given control point.
+    */
+    std::vector<mitk::DataNode::Pointer> GetFilteredData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
 
     /*
     * @brief  Check if the given information type exists.
@@ -256,7 +275,8 @@ namespace mitk
     /*
     * @brief  Add a newly created lesion to the set of already existing lesions - with no connection to a specific image / segmentation of the case data.
     *
-    * @pre    The UID of the lesion must not already exist for a lesion instance. If it does, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the lesion must not already exist for a lesion instance.
+    * @throw  SemanticRelationException, it the UID of the lesion already exists for a lesion instance (this can be checked via 'InstanceExists').
     *
     * @par caseID   The current case identifier is defined by the given string.
     * @par lesion   The lesion instance to add.
@@ -266,7 +286,8 @@ namespace mitk
     /*
     * @brief  Overwrite an already existing lesion instance (this may be useful to overwrite the lesion with a different lesion class).
     *
-    * @pre    The UID of the lesion has to exist for a lesion instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the lesion has to exist for a lesion instance.
+    * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
     * @par caseID   The current case identifier is defined by the given string.
     * @par lesion   The lesion instance that overwrites an existing lesion.
@@ -278,7 +299,8 @@ namespace mitk
     *         the lesion is added to the segmentation data. If the segmentation is already linked to a lesion, the
     *         old linkage is overwritten (this can be checked via 'IsRepresentingALesion').
     *
-    * @pre    The UID of the lesion must not already exist for a lesion instance. If it does, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the lesion must not already exist for a lesion instance.
+    * @throw  SemanticRelationException, if the UID of the lesion already exists for a lesion instance (this can be checked via 'InstanceExists').
     *
     * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has a connected
     *                         image node, which contains DICOM information about the case.
@@ -293,7 +315,8 @@ namespace mitk
     *         To unlink the segmentation from a lesion instance the segmentation has to be removed completely.
     *         A segmentation without an associated lesion can not exists.
     *
-    * @pre    The UID of the lesion has to exist for a lesion instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the lesion has to exist for a lesion instance.
+    * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
     * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has a connected
     *                         image node, which contains DICOM information about the case.
@@ -304,9 +327,10 @@ namespace mitk
     /*
     * @brief  Remove the given lesion from the set of already existing lesions.
     *
-    * @pre    The UID of the lesion has to exist for a lesion instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
-    *         If the lesion instance should be removed, the function needs to assure that no segmentation is still representing (linked to) this lesion. If so,
-    *         an exception is thrown (this can be checked via 'GetAllSegmentationsOfLesion') (TODO: really throw exception if lesion won't be removed?)
+    * @pre    The UID of the lesion has to exist for a lesion instance.
+    *         If the lesion instance should be removed, the function needs to assure that no segmentation is still representing (linked to) this lesion.
+    * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
+    * @throw  SemanticRelationException, if the lesion instance to remove is still linked to by any segmentation (this can be checked via 'GetAllSegmentationsOfLesion').
     *
     * @par caseID   The current case identifier is defined by the given string.
     * @par lesion   The lesion instance to remove.
@@ -317,45 +341,59 @@ namespace mitk
     * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given data.
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.
     *
-    * @pre    The UID of the control point has to exist for a control point instance. If it does, the function throws an exception (this can be checked via 'InstanceExists').
-    *         The function assures that the time period of the control point is not already covered by another control point.
+    * @pre    The UID of the control point must not already exist for a control point instance.
+    *         The function checks, if the given control point is already contained in an existing control point interval.
+    *         To add a new control point, the control point is always expected to have "startDate = endDate".
+    * @throw  SemanticRelationException, if the UID of the control point already exists for a control point instance (this can be checked via 'InstanceExists').
+    * @throw  SemanticRelationException, if the given control point is already contained in an existing control point interval (this can be checked via 'CheckContainingControlPoint').
+    * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
     *
-    * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint   The control point instance to add.
+    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @par controlPoint     The control point instance to add. For a newly added control point always has "startDate = endDate".
+    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
-    void AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
 
     /*
     * @brief  Link the given data to an already existing control point and overwrite the start or end point of the control point.
     *
-    *@pre    The UID of the control point has to exist for a control point instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
+    *@pre    The UID of the control point has to exist for a control point instance.
     *        The function assures that the date of the data lies inside the time period of the control point.
     *        The function assures that the overwritten control point instance is extended / shortened to its necessary time period
-    *        (e.g.moving the start point to an earlier date).
+    *        (e.g.moving the start point to an earlier date) and does not overlap with an already existing control point.
+    * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
+    * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
+    * @throw  SemanticRelationException, if the given control point does not differ from the overwritten control point or if the given control point differs in the start date and the end date from the overwritten control point.
+    * @throw  SemanticRelationException, if the given control point overlaps with an already existing control point interval (this can be checked via 'CheckOverlappingControlPoint').
     *
-    * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint   The control point instance that overwrites an existing control point.
+    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @par controlPoint     The control point instance that overwrites an existing control point.
+    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
-    void OverwriteControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void OverwriteControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
 
     /*
     * @brief  Link the given data to an already existing control point.
     *
-    * @pre    The UID of the control point has to exist for a control point instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the control point has to exist for a control point instance
     *         The function assures that the date of the data lies inside the time period of the control point.
+    * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
+    * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
     *
-    * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint   The control point instance to add link.
+    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @par controlPoint     The control point instance to add link.
+    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
-    void LinkDataToControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void LinkDataToControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
 
     /*
     * @brief  Unlink the given image from the control point.
     *
-    * @pre    The UID of the control point has to exist for a control point instance. If it does not, the function throws an exception (this can be checked via 'InstanceExists').
+    * @pre    The UID of the control point has to exist for a control point instance.
     *         If data is unlinked from a control point, the function needs to check whether the control point is still linked to any other data:
     *           - if not, the control point instance can be removed (has to be removed since a control point with no associated data is not allowed).
     *           - if so, the function has to make sure that the control point instance is shortened to its minimum time period (e.g. moving the end point to an earlier date).
+    * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
     *
     * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     * @par controlPoint   The control point instance to unlink.
@@ -398,6 +436,13 @@ namespace mitk
     */
     bool CheckOverlappingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
 
+    /*
+    * @brief
+    *
+    * @par caseID         The current case identifier is defined by the given string.
+    * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    */
+    bool CheckContainingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
   };
 
 } // namespace mitk

@@ -14,21 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKNODEIDENTIFIER_H
-#define MITKNODEIDENTIFIER_H
-
 // semantic relation module
-#include "mitkSemanticTypes.h"
+#include "mitkUIDGeneratorBoost.h"
 
-// mitk core
-#include <mitkDataNode.h>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
-namespace NodeIdentifier
+std::string mitk::UIDGeneratorBoost::GenerateUID()
 {
-
-  SemanticTypes::CaseID GetCaseIDFromData(const mitk::DataNode* dataNode);
-  SemanticTypes::ID GetIDFromData(const mitk::DataNode* dataNode);
-
-} // namespace NodeIdentifier
-
-#endif // MITKNODEIDENTIFIER_H
+  boost::uuids::uuid uuid = boost::uuids::random_generator()();
+  return boost::uuids::to_string(uuid);
+}

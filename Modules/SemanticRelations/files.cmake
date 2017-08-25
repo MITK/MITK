@@ -2,9 +2,9 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 
 set(CPP_FILES
   mitkControlPointManager.cpp
-  mitkNodeIdentifier.cpp
+  mitkDICOMHelper.cpp
   mitkRelationStorage.cpp
   mitkSemanticRelations.cpp
-  mitkUIDGenerator.cpp
+  mitkUIDGeneratorBoost.cpp
   mitkSemanticRelationsTestHelper.cpp
 )

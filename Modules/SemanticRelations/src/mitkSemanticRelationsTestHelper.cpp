@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relation module
 #include "mitkSemanticRelationException.h"
-#include "mitkUIDGenerator.h"
+#include "mitkUIDGeneratorBoost.h"
 
 // c++
 #include <algorithm>
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /* functions to add/remove image and segmentation instances				      */
 /************************************************************************/
 
-void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNode, mitk::SemanticRelations& semanticRelationsInstance)
+void mitk::SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNode, mitk::SemanticRelations& semanticRelationsInstance)
 {
   if (nullptr == dataNode)
   {
@@ -36,13 +36,14 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(dataNode);
-  SemanticTypes::ID nodeID = NodeIdentifier::GetIDFromData(dataNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  SemanticTypes::ID nodeID = DICOMHelper::GetIDFromDataNode(dataNode);
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->AddCase(caseID);
   relationStorage->AddImage(caseID, nodeID);
 
+  semanticRelationsInstance.AddInformationTypeToImage(dataNode, "unspecified");
   // find the correct control point for this image
   std::vector<SemanticTypes::ControlPoint> allControlPoints = relationStorage->GetAllControlPointsOfCase(caseID);
   if (allControlPoints.empty())
@@ -57,13 +58,13 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
     }
     catch (const mitk::SemanticRelationException&)
     {
-      MITK_INFO << "The control point can not be added and the data can not be linked to this control point.";
+      MITK_INFO << "The control point cannot be added and the data can not be linked to this control point.";
       return;
     }
   }
 
   // some control points already exist - find a control point where the date of the data node fits in
-  SemanticTypes::ControlPoint fittingControlPoint = ControlPointManager::FindControlPoint(dataNode, allControlPoints);
+  SemanticTypes::ControlPoint fittingControlPoint = ControlPointManager::FindFittingControlPoint(dataNode, allControlPoints);
   if (fittingControlPoint.UID.empty())
   {
     // did not find a fitting control point, although some control points already exist
@@ -81,7 +82,7 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
       }
       catch (const mitk::SemanticRelationException&)
       {
-        MITK_INFO << "The control point can not be added and the data can not be linked to this control point.";
+        MITK_INFO << "The control point cannot be added and the data can not be linked to this control point.";
         return;
       }
     }
@@ -94,7 +95,7 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
       }
       catch (const mitk::SemanticRelationException&)
       {
-        MITK_INFO << "The fitting control point can not be overwritten and the data can not be linked to this control point.";
+        MITK_INFO << "The extended control point can not be overwritten and the data can not be linked to this control point.";
         return;
       }
     }
@@ -106,7 +107,7 @@ void SemanticRelationsTestHelper::AddImageInstance(const mitk::DataNode* dataNod
   }
 }
 
-void SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, mitk::SemanticRelations& semanticRelationsInstance)
+void mitk::SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, mitk::SemanticRelations& semanticRelationsInstance)
 {
   if (nullptr == segmentationNode)
   {
@@ -115,20 +116,21 @@ void SemanticRelationsTestHelper::AddSegmentationInstance(const mitk::DataNode* 
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = NodeIdentifier::GetIDFromData(segmentationNode);
-  SemanticTypes::ID parentNodeID = NodeIdentifier::GetIDFromData(parentNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(parentNode);
+  SemanticTypes::ID parentNodeID = DICOMHelper::GetIDFromDataNode(parentNode);
+  SemanticTypes::ID segmentationNodeID = "SEG_" + parentNodeID;
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->AddCase(caseID);
   relationStorage->AddSegmentation(caseID, segmentationNodeID, parentNodeID);
 
-  SemanticTypes::Lesion lesion; lesion.UID = UIDGeneratorBoost::GenerateUID();
+  SemanticTypes::Lesion lesion;
+  lesion.UID = UIDGeneratorBoost::GenerateUID();
   lesion.lesionClass = SemanticTypes::LesionClass();
   semanticRelationsInstance.AddLesionAndLinkData(segmentationNode, lesion);
 }
 
-void SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, mitk::SemanticRelations& semanticRelationsInstance)
+void mitk::SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, mitk::SemanticRelations& semanticRelationsInstance)
 {
   if (nullptr == segmentationNode)
   {
@@ -137,8 +139,9 @@ void SemanticRelationsTestHelper::RemoveSegmentationInstance(const mitk::DataNod
   }
 
   // continue with a valid data node
-  SemanticTypes::CaseID caseID = NodeIdentifier::GetCaseIDFromData(segmentationNode);
-  SemanticTypes::ID segmentationNodeID = NodeIdentifier::GetIDFromData(segmentationNode);
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(parentNode);
+  SemanticTypes::ID parentNodeID = DICOMHelper::GetIDFromDataNode(parentNode);
+  SemanticTypes::ID segmentationNodeID = "SEG_" + parentNodeID;
 
   std::shared_ptr<mitk::RelationStorage> relationStorage = semanticRelationsInstance.GetRelationStorage();
   relationStorage->RemoveSegmentation(caseID, segmentationNodeID);

@@ -14,15 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUIDGENERATOR_H
-#define MITKUIDGENERATOR_H
+#include "mitkPluginActivator.h"
+#include "QmitkSemanticRelationsView.h"
+#include <mitkPersistenceService.h>
 
-#include <iostream>
-
-namespace UIDGeneratorBoost
+namespace mitk
 {
-  std::string GenerateUID();
+  void SemanticRelationsActivator::start(ctkPluginContext *context)
+  {
+    mitk::PersistenceService::LoadModule();
 
-} // namespace UIDGeneratorBoost
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkSemanticRelationsView, context)
+  }
 
-#endif // MITKUIDGENERATOR_H
+  void SemanticRelationsActivator::stop(ctkPluginContext *context) { Q_UNUSED(context) }
+}

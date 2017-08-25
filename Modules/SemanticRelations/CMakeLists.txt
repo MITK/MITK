@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkSceneSerializationBase MitkMultilabel MitkPersistence
+  DEPENDS MitkSceneSerializationBase MitkDICOMReader MitkMultilabel MitkPersistence
   WARNINGS_AS_ERRORS
 )
 

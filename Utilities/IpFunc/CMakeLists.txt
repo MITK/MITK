@@ -3,11 +3,6 @@ if(MITK_WIN32_FORCE_STATIC)
   list(APPEND _options FORCE_STATIC)
 endif()
 
-set(_additional_libs)
-if(UNIX)
-  list(APPEND _additional_libs m)
-endif(UNIX)
-
 mitk_create_module(
   DEPENDS PUBLIC MitkIpPic
   ${_options}
@@ -15,3 +10,6 @@ mitk_create_module(
   WARNINGS_NO_ERRORS
 )
 
+if(UNIX)
+  target_link_libraries(${MODULE_TARGET} PRIVATE m)
+endif(UNIX)

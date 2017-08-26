@@ -378,3 +378,15 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest.hxx Vigra/include/vi
  
  }
  
+diff -u -r Vigra.orig/include/vigra/imagecontainer.hxx Vigra/include/vigra/imagecontainer.hxx
+--- Vigra.orig/include/vigra/imagecontainer.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/imagecontainer.hxx	2017-08-26 11:02:40.079669325 +0200
+@@ -760,7 +760,7 @@
+         /** swap contents of this array with the contents of other
+             (STL-Container interface)
+          */
+-    void swap(const ImagePyramid<ImageType, Alloc> &other)
++    void swap(ImagePyramid<ImageType, Alloc> &other)
+     {
+         images_.swap(other.images_);
+         std::swap(lowestLevel_, other.lowestLevel_);

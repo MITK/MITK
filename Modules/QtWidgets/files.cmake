@@ -64,7 +64,6 @@ set(MOC_H_FILES
   include/QmitkStdMultiWidget.h
   include/QmitkMouseModeSwitcher.h
   include/QmitkDataStorageComboBoxWithSelectNone.h
-  include/QmitkPropertyItem.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
 )

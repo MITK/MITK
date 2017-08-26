@@ -80,7 +80,7 @@ namespace itk
      * in order to inform the pipeline execution model.
      *
      * \sa ImageToImageFilter::GenerateInputRequestedRegion() */
-    virtual void GenerateInputRequestedRegion() throw(InvalidRequestedRegionError);
+    virtual void GenerateInputRequestedRegion();
 
   protected:
     LocalVariationImageFilter();

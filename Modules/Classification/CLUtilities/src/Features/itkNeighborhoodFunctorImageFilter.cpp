@@ -39,7 +39,6 @@ template< typename TInputImage, typename TFeatureImageType , class  FunctorType>
 void
 NeighborhoodFunctorImageFilter< TInputImage, TFeatureImageType, FunctorType >
 ::GenerateInputRequestedRegion()
-throw ( InvalidRequestedRegionError )
 {
 
   // call the superclass' implementation of this method. this should

@@ -148,7 +148,7 @@ struct BERRY_JOBS InternalJob : public Object
   /**
    * Sets whether this job was canceled when it was about to run
    */
-  void SetAboutToRunCanceled(bool value) throw (JobRuntimeException);
+  void SetAboutToRunCanceled(bool value);
 
   /**
    * Sets the next entry in this linked list of jobs.

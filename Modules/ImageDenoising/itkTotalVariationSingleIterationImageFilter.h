@@ -75,7 +75,7 @@ namespace itk
      * is provided.
      *
      * \sa ImageToImageFilter::GenerateInputRequestedRegion() */
-    virtual void GenerateInputRequestedRegion() throw(InvalidRequestedRegionError);
+    virtual void GenerateInputRequestedRegion();
 
     itkSetMacro(Lambda, double);
     itkGetMacro(Lambda, double);

@@ -192,6 +192,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
         }
         else // if not selected
         {
+          // TODO: check if this is used anywhere, since it never worked before the last fix
           glColor3f(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
           switch (dataIt->Value().pointSpec)
           {

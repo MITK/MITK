@@ -170,7 +170,7 @@ InternalJob::Pointer InternalJob::Remove()
 }
 
 
-void InternalJob::SetAboutToRunCanceled(bool value) throw (JobRuntimeException)
+void InternalJob::SetAboutToRunCanceled(bool value)
 {
   flags = value ? flags | M_ABOUT_TO_RUN_CANCELED : flags
       & ~M_ABOUT_TO_RUN_CANCELED;

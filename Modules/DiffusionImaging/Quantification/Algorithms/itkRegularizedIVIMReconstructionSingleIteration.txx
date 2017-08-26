@@ -53,7 +53,7 @@ namespace itk
   template <class TInputPixel, class TOutputPixel, class TRefPixelType>
   void
   RegularizedIVIMReconstructionSingleIteration<TInputPixel, TOutputPixel, TRefPixelType>
-    ::GenerateInputRequestedRegion() throw (InvalidRequestedRegionError)
+    ::GenerateInputRequestedRegion()
   {
     // call the superclass' implementation of this method
     Superclass::GenerateInputRequestedRegion();

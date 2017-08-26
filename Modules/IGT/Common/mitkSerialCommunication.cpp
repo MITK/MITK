@@ -378,7 +378,10 @@ int mitk::SerialCommunication::ApplyConfigurationUnix()
   case Even:
     termIOStructure.c_cflag |= PARENB;
     termIOStructure.c_cflag &= ~PARODD;
+    // TODO: check if this is intended
+    // FALLTHRU
   case None:
+    // FALLTHRU
   default:
     termIOStructure.c_cflag &= ~PARENB;
     break;

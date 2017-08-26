@@ -525,6 +525,7 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
   int dataType = self->GetOutput()->GetScalarType();
   int numscalars = self->GetOutput()->GetNumberOfScalarComponents();
 
+  // TODO: this switch should be examined
   switch (numscalars)
   {
     case 1:
@@ -534,6 +535,8 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
         default:
           setpixels = nullptr;
       }
+      // just to make the compiler happy, TODO: check!
+      // FALLTHRU
     default:
       switch (dataType)
       {

@@ -123,8 +123,11 @@ std::vector<double> OdfMaximaExtractionFilter< TOdfPixelType >
             tmp=-B;
             tmp=cbrt(tmp);
             root=2*tmp-offset;      roots.push_back(root);
+            // TODO: check if this is correct (see history)
             if (A!=0 || B!=0)
+            {
                 root=-tmp-offset;   roots.push_back(root);
+            }
         }
     }
     else if (b!=0) // solve bx² + cx + d = 0
@@ -136,12 +139,17 @@ std::vector<double> OdfMaximaExtractionFilter< TOdfPixelType >
             root = (-c+tmp)/(2.0*b); roots.push_back(root);
             root = (-c-tmp)/(2.0*b); roots.push_back(root);
         }
+        // TODO: check if this is correct (see history)
         else if (D==0)
+        {
             root = -c/(2.0*b); roots.push_back(root);
+        }
     }
+    // TODO: check if this is correct (see history)
     else if (c!=0) // solve cx + d = 0
+    {
         root = -d/c; roots.push_back(root);
-
+    }
     return roots;
 }
 

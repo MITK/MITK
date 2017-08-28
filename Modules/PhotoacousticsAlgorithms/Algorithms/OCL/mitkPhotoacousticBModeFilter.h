@@ -23,23 +23,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObject.h>
 
+#include "mitkOclDataSetToDataSetFilter.h"
 #include "mitkImageToImageFilter.h"
 
 namespace mitk
 {
   #ifdef PHOTOACOUSTICS_USE_GPU
-  class OclImageToImageFilter;
 
   /** Documentation
   *
-  * \brief The OclBinaryThresholdImageFilter computes a binary segmentation based on given
-  threshold values.
-
+  * \brief The PhotoacousticOCLBModeFilter simply takes the absolute of all pixels in the image.
   *
-  * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
+  * The filter gives the option to use a log after taking the absolute.
   */
 
-  class PhotoacousticOCLBModeFilter : public OclImageToImageFilter, public itk::Object
+  class PhotoacousticOCLBModeFilter : public OclDataSetToDataSetFilter, public itk::Object
   {
 
   public:
@@ -47,9 +45,8 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-    * @brief SetInput Set the input image. Only 3D images are supported for now.
-    * @param image a 3D image.
-    * @throw mitk::Exception if the dimesion is not 3.
+    * @brief SetInput Set the input image
+    * @param image a image.
     */
     void SetInput(Image::Pointer image);
 
@@ -59,17 +56,19 @@ namespace mitk
     void SetParameters(bool useLogFilter)
     {
       m_UseLogFilter = useLogFilter;
-    }
+    }    
+    
+    /**
+     * @brief GetOutputAsImage Returns an mitk::Image constructed from the processed data
+     */
+    mitk::Image::Pointer GetOutput();
 
   protected:
 
-    /** Constructor */
     PhotoacousticOCLBModeFilter();
 
-    /** Destructor */
     virtual ~PhotoacousticOCLBModeFilter();
 
-    /** Initialize the filter */
     bool Initialize();
 
     void Execute();
@@ -86,11 +85,15 @@ namespace mitk
 
     virtual us::Module* GetModule();
 
-
   private:
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
     bool m_UseLogFilter;
+
+    mitk::Image::Pointer m_InputImage;
+    unsigned int m_InputDim[3];
+    unsigned int m_Size;
+
   };
   #endif
 

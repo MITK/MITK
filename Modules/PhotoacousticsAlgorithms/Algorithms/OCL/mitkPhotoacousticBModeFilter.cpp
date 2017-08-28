@@ -59,13 +59,18 @@ void mitk::PhotoacousticOCLBModeFilter::Execute()
 {
   try
   {
-    this->InitExec(this->m_PixelCalculation);
+    this->InitExec(this->m_PixelCalculation, m_InputDim, sizeof(float));
   }
   catch (const mitk::Exception& e)
   {
     MITK_ERROR << "Catched exception while initializing filter: " << e.what();
     return;
   }
+
+  cl_int clErr;
+  clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Size));
+
+  CHECK_OCL_ERR(clErr);
 
   // execute the filter on a 3D NDRange
   this->ExecuteKernel(m_PixelCalculation, 3);
@@ -97,12 +102,39 @@ bool mitk::PhotoacousticOCLBModeFilter::Initialize()
 
 void mitk::PhotoacousticOCLBModeFilter::SetInput(mitk::Image::Pointer image)
 {
-  if (image->GetDimension() != 3)
+  OclDataSetToDataSetFilter::SetInput(image);
+
+  m_InputImage = image;
+  m_InputDim[0] = m_InputImage->GetDimension(0);
+  m_InputDim[1] = m_InputImage->GetDimension(1);
+  m_InputDim[2] = m_InputImage->GetDimension(2);
+  m_Size = m_InputDim[0] * m_InputDim[1] * m_InputDim[2];
+}
+
+mitk::Image::Pointer mitk::PhotoacousticOCLBModeFilter::GetOutput()
+{
+  mitk::Image::Pointer outputImage = mitk::Image::New();
+
+  if (m_Output->IsModified(GPU_DATA))
   {
-    mitkThrowException(mitk::Exception) << "Input for " << this->GetNameOfClass() <<
-      " is not 3D. The filter only supports 3D. Please change your input.";
+    void* pData = m_Output->TransferDataToCPU(m_CommandQue);
+
+    const unsigned int dimension = 3;
+    unsigned int dimensions[3] = { m_InputDim[0], m_InputDim[1], m_InputDim[2] };
+
+    const mitk::SlicedGeometry3D::Pointer p_slg = m_InputImage->GetSlicedGeometry();
+
+    MITK_DEBUG << "Creating new MITK Image.";
+
+    outputImage->Initialize(this->GetOutputType(), dimension, dimensions);
+    outputImage->SetSpacing(p_slg->GetSpacing());
+    outputImage->SetGeometry(m_InputImage->GetGeometry());
+    outputImage->SetImportVolume(pData, 0, 0, mitk::Image::ReferenceMemory);
   }
-  OclImageToImageFilter::SetInput(image);
+
+  MITK_DEBUG << "Image Initialized.";
+
+  return outputImage;
 }
 
 #endif

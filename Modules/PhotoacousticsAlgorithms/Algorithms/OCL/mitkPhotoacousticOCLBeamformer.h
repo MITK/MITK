@@ -24,8 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class OclImageToImageFilter;
-
 /** Documentation
   *
   * \brief The OclBinaryThresholdImageFilter computes a binary segmentation based on given
@@ -119,7 +117,6 @@ protected:
   }
 
   virtual us::Module* GetModule();
-
 
 private:
   /** The OpenCL kernel for the filter */

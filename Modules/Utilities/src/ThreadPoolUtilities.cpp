@@ -57,6 +57,8 @@ namespace Utilities
       return false;
     }
     m_task.erase(taskId);
+
+    const boost::unique_lock<boost::mutex> guard(m_lock);
     m_event.notify_all();
     return true;
   }
@@ -72,6 +74,8 @@ namespace Utilities
         --n;
       }
     }
+
+    const boost::unique_lock<boost::mutex> guard(m_lock);
     m_event.notify_all();
     return n;
   }
@@ -86,6 +90,8 @@ namespace Utilities
         ++it;
       }
     }
+
+    const boost::unique_lock<boost::mutex> guard(m_lock);
     m_event.notify_all();
     return m_task.size();
   }
@@ -119,6 +125,8 @@ namespace Utilities
     lockTask.lock();
     m_runing.erase(it->first);
     m_task.erase(it);
+
+    const boost::unique_lock<boost::mutex> guard(m_lock);
     m_event.notify_all();
     return info.second;
   }
@@ -134,20 +142,12 @@ namespace Utilities
     }
 
     const auto isMain = isGuiThread();
-    
-    while (!check()) {
+    for (boost::unique_lock<boost::mutex> lock(m_lock); !check(); ) {
       if (isMain) {
-        for (;;)
-        {
+        while (boost::cv_status::timeout == m_event.wait_for(lock, boost::chrono::milliseconds(10))) {
           QCoreApplication::processEvents();
-
-          SharedLock lock(m_taskGuard);
-          if (boost::cv_status::timeout != m_event.wait_for(lock, boost::chrono::milliseconds(10))) {
-            break;
-          }
         }
       } else {
-        SharedLock lock(m_taskGuard);
         m_event.wait(lock);
       }
     }

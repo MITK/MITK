@@ -676,7 +676,7 @@ QToolButton[popupMode="2"]
 QToolButton:hover,
 QToolButton::menu-button:hover
 {
-  background-color: #323231;
+  background-color: #3399cc;
   border: 1px solid #3399cc;
   min-width: 30px;
   min-height: 30px;
@@ -684,9 +684,11 @@ QToolButton::menu-button:hover
   padding: 0px;
 }
 
-QToolButton#qt_toolbar_ext_button
+QToolButton#qt_toolbar_ext_button,
+QToolBarExtension
 {
-  image: url(:/org.blueberry.ui.qt/dark/right_arrows.svg);
+  qproperty-icon: url(:/org.blueberry.ui.qt/dark/right_arrows.svg);
+  min-width: 10px;
 }
 
 QPushButton

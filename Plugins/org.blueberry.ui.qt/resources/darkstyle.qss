@@ -684,10 +684,9 @@ QToolButton::menu-button:hover
   padding: 0px;
 }
 
-/* TODO what is this and do we need it */
 QToolButton#qt_toolbar_ext_button
 {
-  background: #58595a
+  image: url(:/org.blueberry.ui.qt/dark/right_arrows.svg);
 }
 
 QPushButton

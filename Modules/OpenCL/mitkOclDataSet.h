@@ -117,15 +117,14 @@ protected:
   cl_context m_context;
 
 private:
+  /*! GMEM Buffer Size in elements*/
+  unsigned int m_bufferSize;
 
   bool m_gpuModified;
   bool m_cpuModified;
 
   /*! Reference to the data */
   void* m_Data;
-
-  /*! GMEM Buffer Size in elements*/
-  unsigned int m_bufferSize;
 
   /*! Bytes per Element in Buffer*/
   unsigned short m_BpE;

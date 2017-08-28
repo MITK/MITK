@@ -58,7 +58,7 @@ mitk::PhotoacousticImage::~PhotoacousticImage()
   MITK_INFO << "[PhotoacousticImage Debug] destroyed that image";
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseLogFilter, float resampleSpacing)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseGPU, bool UseLogFilter, float resampleSpacing)
 {
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
   typedef itk::Image< float, 3 > itkFloatImageType;
@@ -66,21 +66,39 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
 
   if (method == BModeMethod::Abs)
   {
-    auto input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, inputImage->GetDimension(2) - 1);
-    #ifdef PHOTOACOUSTICS_USE_GPU
-      PhotoacousticOCLBModeFilter::Pointer filter = PhotoacousticOCLBModeFilter::New();
-    #else
+    mitk::Image::Pointer input;
+    mitk::Image::Pointer out;
+    if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
+      input = inputImage;
+    else
+      input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, inputImage->GetDimension(2) - 1);
+
+    if (!UseGPU)
+    {
       PhotoacousticBModeFilter::Pointer filter = PhotoacousticBModeFilter::New();
+      filter->SetParameters(UseLogFilter);
+      filter->SetInput(input);
+      filter->Update();
+
+      out = filter->GetOutput();
+
+      if (resampleSpacing == 0)
+        return out;
+    }
+    #ifdef PHOTOACOUSTICS_USE_GPU
+    else
+    {
+      PhotoacousticOCLBModeFilter::Pointer filter = PhotoacousticOCLBModeFilter::New();
+      filter->SetParameters(UseLogFilter);
+      filter->SetInput(input);
+      filter->Update();
+
+      out = filter->GetOutput();
+
+      if (resampleSpacing == 0)
+        return out;
+    }
     #endif
-
-    filter->SetParameters(UseLogFilter);
-    filter->SetInput(input);
-    filter->Update();
-
-    auto out = filter->GetOutput();
-
-    if(resampleSpacing == 0)
-      return out;
 
     typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
     ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();

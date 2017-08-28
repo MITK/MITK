@@ -98,7 +98,7 @@ void mitk::BeamformingFilter::GenerateData()
   float inputDim[2] = { (float)input->GetDimension(0), (float)input->GetDimension(1) };
   float outputDim[2] = { (float)output->GetDimension(0), (float)output->GetDimension(1) };
 
-  unsigned short chunkSize = 2; // TODO: make this slightly less arbitrary
+  unsigned short chunkSize = 1; // 1 chunk = 1 image
 
   unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
 

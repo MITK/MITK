@@ -90,8 +90,10 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.UseBP->hide();
 
   #ifndef PHOTOACOUSTICS_USE_GPU
-    m_Controls.UseGPU->setEnabled(false);
-    m_Controls.UseGPU->setChecked(false);
+    m_Controls.UseGPUBf->setEnabled(false);
+    m_Controls.UseGPUBf->setChecked(false);
+    m_Controls.UseGPUBmode->setEnabled(false);
+    m_Controls.UseGPUBmode->setChecked(false);
   #endif
   
   UseImageSpacing();
@@ -288,12 +290,13 @@ void PAImageProcessing::BatchProcessing()
     if (doSteps[3])
     {
       m_Controls.ProgressInfo->setText("applying bmode filter");
-
+      bool useGPU = m_Controls.UseGPUBmode->isChecked();
+      
       if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
-        image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, m_UseLogfilter, m_ResampleSpacing);
+        image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, useGPU, m_UseLogfilter, m_ResampleSpacing);
       else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, m_UseLogfilter, m_ResampleSpacing);
-
+        image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, useGPU, m_UseLogfilter, m_ResampleSpacing);
+      
       if (saveSteps[3])
       {
         std::string saveFileName = saveDir.toStdString() + "/" + imageName + " bmode" + ".nrrd";
@@ -457,10 +460,12 @@ void PAImageProcessing::StartBmodeThread()
       connect(thread, &BmodeThread::result, this, &PAImageProcessing::HandleBmodeResults);
       connect(thread, &BmodeThread::finished, thread, &QObject::deleteLater);
 
+      bool useGPU = m_Controls.UseGPUBmode->isChecked();
+
       if(m_Controls.BModeMethod->currentText() == "Absolute Filter")
-        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::Abs);
+        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::Abs, useGPU);
       else if(m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::ShapeDetection);
+        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, useGPU);
       thread->setInputImage(image);
 
       MITK_INFO << "Started new thread for Image Processing";
@@ -893,7 +898,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.TransducerElements = m_Controls.ElementCount->value();
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
-  BFconfig.UseGPU = m_Controls.UseGPU->isChecked();
+  BFconfig.UseGPU = m_Controls.UseGPUBf->isChecked();
 
   UpdateRecordTime(image);
   UpdateBounds();
@@ -905,7 +910,7 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
   {
     BFconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
     BFconfig.TimeSpacing = image->GetGeometry()->GetSpacing()[1] / 1000000;
-    MITK_INFO << "Calculated Scan Depth of " << BFconfig.RecordTime * BFconfig.SpeedOfSound * 100 << "cm";
+    MITK_INFO << "Calculated Scan Depth of " << BFconfig.RecordTime * BFconfig.SpeedOfSound * 100 / 2<< "cm";
   }
   else
   {
@@ -944,7 +949,8 @@ void PAImageProcessing::EnableControls()
   m_Controls.UseBP->setEnabled(true);
 
   #ifdef PHOTOACOUSTICS_USE_GPU
-    m_Controls.UseGPU->setEnabled(true);
+    m_Controls.UseGPUBf->setEnabled(true);
+    m_Controls.UseGPUBmode->setEnabled(true);
   #endif
 
   m_Controls.BPhigh->setEnabled(true);
@@ -982,7 +988,8 @@ void PAImageProcessing::DisableControls()
   m_Controls.UseBP->setEnabled(false);
 
   #ifdef PHOTOACOUSTICS_USE_GPU
-    m_Controls.UseGPU->setEnabled(false);
+    m_Controls.UseGPUBf->setEnabled(false);
+    m_Controls.UseGPUBmode->setEnabled(false);
   #endif
 
   m_Controls.BPhigh->setEnabled(false);
@@ -1044,16 +1051,17 @@ void BmodeThread::run()
   mitk::Image::Pointer resultImage;
   mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
-  resultImage = filterbank->ApplyBmodeFilter(m_InputImage, m_Method, m_UseLogfilter, m_ResampleSpacing);
+  resultImage = filterbank->ApplyBmodeFilter(m_InputImage, m_Method, m_UseGPU, m_UseLogfilter, m_ResampleSpacing);
 
   emit result(resultImage);
 }
 
-void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method)
+void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method, bool useGPU)
 {
   m_UseLogfilter = useLogfilter;
   m_ResampleSpacing = resampleSpacing;
   m_Method = method;
+  m_UseGPU = useGPU;
 }
 
 void BmodeThread::setInputImage(mitk::Image::Pointer image)

@@ -130,7 +130,7 @@ class BmodeThread : public QThread
   public:
     enum BModeMethod { ShapeDetection, Abs };
 
-    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method);
+    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method, bool useGPU);
     void setInputImage(mitk::Image::Pointer image);
 
   protected:
@@ -139,6 +139,7 @@ class BmodeThread : public QThread
     mitk::PhotoacousticImage::BModeMethod m_Method;
     bool m_UseLogfilter;
     double m_ResampleSpacing;
+    bool m_UseGPU;
 };
 
 class CropThread : public QThread

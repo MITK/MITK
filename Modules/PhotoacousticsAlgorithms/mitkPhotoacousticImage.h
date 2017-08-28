@@ -33,7 +33,7 @@ namespace mitk {
       mitkClassMacroItkParent(mitk::PhotoacousticImage, itk::Object);
       itkFactorylessNewMacro(Self);
       enum BModeMethod { ShapeDetection, Abs };
-      mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method = BModeMethod::Abs, bool UseLogFilter = false, float resampleSpacing = 0.15);
+      mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method = BModeMethod::Abs, bool UseGPU = false, bool UseLogFilter = false, float resampleSpacing = 0.15);
 //      mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
       mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[2]);
       mitk::Image::Pointer ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});

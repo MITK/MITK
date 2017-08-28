@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
 #define MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
 

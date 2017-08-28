@@ -16,9 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
+#ifdef PHOTOACOUSTICS_USE_GPU
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
+
 
 namespace mitk
 {
@@ -42,18 +44,23 @@ public:
   itkNewMacro(Self);
 
   /**
-  * @brief SetInput Set the input image. Only 3D images are supported for now.
-  * @param image a 3D image.
-  * @throw mitk::Exception if the dimesion is not 3.
+  * @brief SetInput Set the input data through an image. Arbitrary images are supported
   */
   void SetInput(Image::Pointer image);
+  /**
+  * @brief SetInput Manually set the input data while providing dimensions and memory size of the input data.
+  */
   void SetInput(void* data, unsigned int* dimensions, unsigned int BpE);
 
+  /**
+  * @brief GetOutputAsImage Returns an mitk::Image constructed from the processed data
+  */
   mitk::Image::Pointer GetOutputAsImage();
 
   /** Update the filter */
   void Update();
   
+  /** Set the Output dimensions, which are also used for the openCL global worksize */
   void SetOutputDim( unsigned int outputDim[3])
   {
 	  m_OutputDim[0] = outputDim[0];
@@ -61,6 +68,7 @@ public:
     m_OutputDim[2] = outputDim[2];
   }
 
+  /** Set the Apodisation function to apply when beamforming */
   void SetApodisation(float* apodisation, unsigned short apodArraySize)
   {
     m_ApodArraySize = apodArraySize;
@@ -69,12 +77,14 @@ public:
 
   enum BeamformingAlgorithm { DASQuad, DMASQuad, DASSphe, DMASSphe };
 
+  /** Set which Algorithm should be used for beamforming */
   void SetAlgorithm(BeamformingAlgorithm algorithm, bool PA)
   {
     m_Algorithm = algorithm;
     m_PAImage = PA;
   }
 
+  /** Set various beamforming parameters */
   void SetBeamformingParameters(float SpeedOfSound, float timeSpacing, float Pitch, float Angle, bool PAImage, unsigned short transducerElements)
   {
     m_SpeedOfSound = SpeedOfSound;
@@ -131,11 +141,4 @@ private:
 };
 }
 #endif
-
-/*
-float* data = new float[m_InputDim[0] * m_InputDim[1] * m_InputDim[2]];
-for (unsigned int i = 0; i < m_InputDim[0] * m_InputDim[1] * m_InputDim[2]; ++i)
-{
-  data[i] = i;
-}
-mitk::OclDataSetToDataSetFilter::SetInput(data, m_InputDim[0] * m_InputDim[1] * m_InputDim[2], sizeof(float));*/
+#endif

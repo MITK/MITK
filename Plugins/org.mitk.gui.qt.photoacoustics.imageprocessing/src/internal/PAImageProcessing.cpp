@@ -89,6 +89,11 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.ProgressInfo->setVisible(false);
   m_Controls.UseBP->hide();
 
+  #ifndef PHOTOACOUSTICS_USE_GPU
+    m_Controls.UseGPU->setEnabled(false);
+    m_Controls.UseGPU->setChecked(false);
+  #endif
+  
   UseImageSpacing();
 }
 
@@ -937,7 +942,11 @@ void PAImageProcessing::EnableControls()
   m_Controls.ImageType->setEnabled(true);
   m_Controls.Apodization->setEnabled(true);
   m_Controls.UseBP->setEnabled(true);
-  m_Controls.UseGPU->setEnabled(true);
+
+  #ifdef PHOTOACOUSTICS_USE_GPU
+    m_Controls.UseGPU->setEnabled(true);
+  #endif
+
   m_Controls.BPhigh->setEnabled(true);
   m_Controls.BPlow->setEnabled(true);
   m_Controls.BPFalloff->setEnabled(true);
@@ -971,7 +980,11 @@ void PAImageProcessing::DisableControls()
   m_Controls.ImageType->setEnabled(false);
   m_Controls.Apodization->setEnabled(false);
   m_Controls.UseBP->setEnabled(false);
-  m_Controls.UseGPU->setEnabled(false);
+
+  #ifdef PHOTOACOUSTICS_USE_GPU
+    m_Controls.UseGPU->setEnabled(false);
+  #endif
+
   m_Controls.BPhigh->setEnabled(false);
   m_Controls.BPlow->setEnabled(false);
   m_Controls.BPFalloff->setEnabled(false);

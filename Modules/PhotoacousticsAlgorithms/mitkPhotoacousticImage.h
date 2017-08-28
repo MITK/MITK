@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef mitkPhotoacousticImage_H_HEADER_INCLUDED
 #define mitkPhotoacousticImage_H_HEADER_INCLUDED
 

@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include <mitkPhotoacousticOCLBeamformer.h>
 
-
 mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputData(nullptr)
 {
   this->SetNumberOfIndexedInputs(1);
@@ -214,6 +213,7 @@ void mitk::BeamformingFilter::GenerateData()
       m_InputData = nullptr;
     }
   }
+  #ifdef PHOTOACOUSTICS_USE_GPU
   else
   {
     mitk::PhotoacousticOCLBeamformer::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformer::New();
@@ -297,7 +297,7 @@ void mitk::BeamformingFilter::GenerateData()
       MITK_ERROR << errorMessage;
     }
   }
-
+  #endif
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();

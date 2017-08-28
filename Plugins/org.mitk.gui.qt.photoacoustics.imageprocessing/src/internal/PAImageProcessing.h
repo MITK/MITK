@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef PAImageProcessing_h
 #define PAImageProcessing_h
 
 #include <mitkPhotoacousticImage.h>
+
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>

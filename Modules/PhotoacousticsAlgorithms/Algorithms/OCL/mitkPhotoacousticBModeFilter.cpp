@@ -16,8 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPhotoacousticBModeFilter.h"
 #include "usServiceReference.h"
+#include <mitkImageReadAccessor.h>
 
-mitk::PhotoacousticBModeFilter::PhotoacousticBModeFilter()
+#ifdef PHOTOACOUSTICS_USE_GPU
+
+mitk::PhotoacousticOCLBModeFilter::PhotoacousticOCLBModeFilter()
   : m_PixelCalculation(NULL)
 {
   this->AddSourceFile("BModeAbs.cl");
@@ -26,7 +29,7 @@ mitk::PhotoacousticBModeFilter::PhotoacousticBModeFilter()
   this->m_FilterID = "PixelCalculation";
 }
 
-mitk::PhotoacousticBModeFilter::~PhotoacousticBModeFilter()
+mitk::PhotoacousticOCLBModeFilter::~PhotoacousticOCLBModeFilter()
 {
   if (this->m_PixelCalculation)
   {
@@ -34,7 +37,7 @@ mitk::PhotoacousticBModeFilter::~PhotoacousticBModeFilter()
   }
 }
 
-void mitk::PhotoacousticBModeFilter::Update()
+void mitk::PhotoacousticOCLBModeFilter::Update()
 {
   //Check if context & program available
   if (!this->Initialize())
@@ -52,7 +55,7 @@ void mitk::PhotoacousticBModeFilter::Update()
   }
 }
 
-void mitk::PhotoacousticBModeFilter::Execute()
+void mitk::PhotoacousticOCLBModeFilter::Execute()
 {
   try
   {
@@ -71,12 +74,12 @@ void mitk::PhotoacousticBModeFilter::Execute()
   m_Output->Modified(GPU_DATA);
 }
 
-us::Module *mitk::PhotoacousticBModeFilter::GetModule()
+us::Module *mitk::PhotoacousticOCLBModeFilter::GetModule()
 {
   return us::GetModuleContext()->GetModule();
 }
 
-bool mitk::PhotoacousticBModeFilter::Initialize()
+bool mitk::PhotoacousticOCLBModeFilter::Initialize()
 {
   bool buildErr = true;
   cl_int clErr = 0;
@@ -92,7 +95,7 @@ bool mitk::PhotoacousticBModeFilter::Initialize()
   return (OclFilter::IsInitialized() && buildErr);
 }
 
-void mitk::PhotoacousticBModeFilter::SetInput(mitk::Image::Pointer image)
+void mitk::PhotoacousticOCLBModeFilter::SetInput(mitk::Image::Pointer image)
 {
   if (image->GetDimension() != 3)
   {
@@ -100,4 +103,84 @@ void mitk::PhotoacousticBModeFilter::SetInput(mitk::Image::Pointer image)
       " is not 3D. The filter only supports 3D. Please change your input.";
   }
   OclImageToImageFilter::SetInput(image);
+}
+
+#endif
+
+
+mitk::PhotoacousticBModeFilter::PhotoacousticBModeFilter() : m_UseLogFilter(false)
+{
+  this->SetNumberOfIndexedInputs(1);
+  this->SetNumberOfRequiredInputs(1);
+}
+
+mitk::PhotoacousticBModeFilter::~PhotoacousticBModeFilter()
+{
+}
+
+void mitk::PhotoacousticBModeFilter::GenerateInputRequestedRegion()
+{
+  Superclass::GenerateInputRequestedRegion();
+
+  mitk::Image* output = this->GetOutput();
+  mitk::Image* input = const_cast<mitk::Image *> (this->GetInput());
+  if (!output->IsInitialized())
+  {
+    return;
+  }
+
+  input->SetRequestedRegionToLargestPossibleRegion();
+
+  //GenerateTimeInInputRegion(output, input);
+}
+
+void mitk::PhotoacousticBModeFilter::GenerateOutputInformation()
+{
+  mitk::Image::ConstPointer input = this->GetInput();
+  mitk::Image::Pointer output = this->GetOutput();
+
+  if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
+    return;
+
+  itkDebugMacro(<< "GenerateOutputInformation()");
+
+  output->Initialize(input);
+  output->GetGeometry()->SetSpacing(input->GetGeometry()->GetSpacing());
+  output->GetGeometry()->Modified();
+  output->SetPropertyList(input->GetPropertyList()->Clone());
+
+  m_TimeOfHeaderInitialization.Modified();
+}
+
+void mitk::PhotoacousticBModeFilter::GenerateData()
+{
+  GenerateOutputInformation();
+  mitk::Image::Pointer input = this->GetInput();
+  mitk::Image::Pointer output = this->GetOutput();
+
+  if (!output->IsInitialized())
+    return;
+
+  mitk::ImageReadAccessor reader(input);
+
+  unsigned int size = output->GetDimension(0) * output->GetDimension(1) * output->GetDimension(2);
+
+  float* InputData = (float*)const_cast<void*>(reader.GetData());
+  float* OutputData = new float[size];
+  if(!m_UseLogFilter)
+    for (unsigned int i = 0; i < size; ++i)
+    {
+      OutputData[i] = abs(InputData[i]);
+    }
+  else
+  {
+    for (unsigned int i = 0; i < size; ++i)
+    {
+      OutputData[i] = log(abs(InputData[i]));
+    }
+  }
+
+  output->SetImportVolume(OutputData, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
+
+  m_TimeOfHeaderInitialization.Modified();
 }

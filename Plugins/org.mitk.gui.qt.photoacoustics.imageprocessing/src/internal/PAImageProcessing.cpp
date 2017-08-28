@@ -289,10 +289,11 @@ void PAImageProcessing::BatchProcessing()
     {
       m_Controls.ProgressInfo->setText("applying bmode filter");
 
-      if (m_Controls.BModeMethod->currentText() == "Simple Abs Filter")
+      if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
         image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, m_UseLogfilter, m_ResampleSpacing);
-      else if (m_Controls.BModeMethod->currentText() == "Shape Detection")
+      else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
         image = filterbank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, m_UseLogfilter, m_ResampleSpacing);
+
       if (saveSteps[3])
       {
         std::string saveFileName = saveDir.toStdString() + "/" + imageName + " bmode" + ".nrrd";
@@ -456,11 +457,10 @@ void PAImageProcessing::StartBmodeThread()
       connect(thread, &BmodeThread::result, this, &PAImageProcessing::HandleBmodeResults);
       connect(thread, &BmodeThread::finished, thread, &QObject::deleteLater);
 
-      if(m_Controls.BModeMethod->currentText() == "Simple Abs Filter")
+      if(m_Controls.BModeMethod->currentText() == "Absolute Filter")
         thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::Abs);
-      else if(m_Controls.BModeMethod->currentText() == "Shape Detection")
+      else if(m_Controls.BModeMethod->currentText() == "Envelope Detection")
         thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::ShapeDetection);
-
       thread->setInputImage(image);
 
       MITK_INFO << "Started new thread for Image Processing";

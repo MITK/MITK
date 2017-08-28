@@ -21,10 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include <functional>
-#include "mitkOclImageToImageFilter.h"
 
 #include "mitkPhotoacousticBeamformingFilter.h"
-
 #include "MitkPhotoacousticsAlgorithmsExports.h"
 
 namespace mitk {

@@ -17,11 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 
+#ifdef PHOTOACOUSTICS_USE_GPU
 #include "mitkOclImageToImageFilter.h"
+#endif
+
 #include <itkObject.h>
+
+#include "mitkImageToImageFilter.h"
 
 namespace mitk
 {
+  #ifdef PHOTOACOUSTICS_USE_GPU
   class OclImageToImageFilter;
 
   /** Documentation
@@ -33,12 +39,11 @@ namespace mitk
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
 
-
-  class PhotoacousticBModeFilter : public OclImageToImageFilter, public itk::Object
+  class PhotoacousticOCLBModeFilter : public OclImageToImageFilter, public itk::Object
   {
 
   public:
-    mitkClassMacroItkParent(PhotoacousticBModeFilter, itk::Object);
+    mitkClassMacroItkParent(PhotoacousticOCLBModeFilter, itk::Object);
     itkNewMacro(Self);
 
     /**
@@ -59,10 +64,10 @@ namespace mitk
   protected:
 
     /** Constructor */
-    PhotoacousticBModeFilter();
+    PhotoacousticOCLBModeFilter();
 
     /** Destructor */
-    virtual ~PhotoacousticBModeFilter();
+    virtual ~PhotoacousticOCLBModeFilter();
 
     /** Initialize the filter */
     bool Initialize();
@@ -85,6 +90,39 @@ namespace mitk
   private:
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
+    bool m_UseLogFilter;
+  };
+  #endif
+
+  class PhotoacousticBModeFilter : public ImageToImageFilter
+  {
+  public:
+    mitkClassMacro(PhotoacousticBModeFilter, ImageToImageFilter);
+
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
+
+    void SetParameters(bool useLogFilter)
+    {
+      m_UseLogFilter = useLogFilter;
+    }
+
+  protected:
+
+    PhotoacousticBModeFilter();
+
+    ~PhotoacousticBModeFilter();
+
+    virtual void GenerateInputRequestedRegion() override;
+
+    virtual void GenerateOutputInformation() override;
+
+    virtual void GenerateData() override;
+
+    //##Description
+    //## @brief Time when Header was last initialized
+    itk::TimeStamp m_TimeOfHeaderInitialization;
+
     bool m_UseLogFilter;
   };
 }

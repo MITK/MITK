@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifdef PHOTOACOUSTICS_USE_GPU
+
 #include "mitkPhotoacousticOCLBeamformer.h"
 #include "usServiceReference.h"
 
@@ -202,3 +204,4 @@ mitk::Image::Pointer mitk::PhotoacousticOCLBeamformer::GetOutputAsImage()
 
   return outputImage;
 }
+#endif

@@ -1,5 +1,5 @@
 diff --git a/CMake/DCMQIConfig.cmake.in b/CMake/DCMQIConfig.cmake.in
-index 7cf66b2..c0d7827
+index 7cf66b2..c0d7827 100644
 --- a/CMake/DCMQIConfig.cmake.in
 +++ b/CMake/DCMQIConfig.cmake.in
 @@ -1,7 +1,6 @@
@@ -11,7 +11,7 @@ index 7cf66b2..c0d7827
  set_and_check(DCMQI_TARGETS "@PACKAGE_CONFIG_DIR_CONFIG@/DCMQITargets.cmake")
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9c6dcc2..20a90d5
+index f9f215f..5680327 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -279,7 +279,6 @@ if(NOT Slicer_DIR)
@@ -30,19 +30,56 @@ index 9c6dcc2..20a90d5
        NO_CHECK_REQUIRED_COMPONENTS_MACRO
    )
 
+@@ -303,33 +301,5 @@ endif()
+
+ if(DEFINED Slicer_DIR)
+   include(${Slicer_EXTENSION_CPACK})
+-else()
+-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};RuntimeLibraries;/")
+-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${DCMTK_DIR};DCMTK;shlib;/")
+-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${ITK_DIR};ITK;RuntimeLibraries;/")
+-  set(CPACK_PACKAGE_NAME "dcmqi")
+-  set(CPACK_PACKAGE_VENDOR "Quantitative Image Informatics for Cancer Research (QIICR)")
+-  set(CPACK_PACKAGE_VERSION_MAJOR ${DCMQI_MAJOR_VERSION})
+-  set(CPACK_PACKAGE_VERSION_MINOR ${DCMQI_MINOR_VERSION})
+-  set(CPACK_PACKAGE_VERSION_PATCH ${DCMQI_PATCH_VERSION})
+-  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+-    set(CPACK_SYSTEM_NAME "mac")
+-  elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+-    set(CPACK_SYSTEM_NAME "linux")
+-  elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+-      set(CPACK_SYSTEM_NAME win64)
+-    else()
+-      set(CPACK_SYSTEM_NAME win32)
+-    endif()
+-  endif()
+-  set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_SYSTEM_NAME}")
+-  set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+-  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${EXTENSION_DESCRIPTION})
+-  if(UNIX)
+-    set(CPACK_GENERATOR "TGZ")
+-  elseif(WIN32)
+-    set(CPACK_GENERATOR "ZIP")
+-  endif()
+   include(CPack)
+ endif()
 diff --git a/libsrc/CMakeLists.txt b/libsrc/CMakeLists.txt
-index 4d25e05..057326e
+index 4d25e05..e10edad 100644
 --- a/libsrc/CMakeLists.txt
 +++ b/libsrc/CMakeLists.txt
-@@ -2,6 +2,7 @@
+@@ -1,9 +1,8 @@
+
  #-----------------------------------------------------------------------------
  include(FindGit)
- include(dcmqiMacroExtractRepositoryInfo)
+-include(dcmqiMacroExtractRepositoryInfo)
 +include(CheckCXXCompilerFlag)
 
- dcmqiMacroExtractRepositoryInfo(VAR_PREFIX dcmqi)
+-dcmqiMacroExtractRepositoryInfo(VAR_PREFIX dcmqi)
  configure_file(
-@@ -37,6 +38,11 @@ add_library(${lib_name} STATIC
+   ${DCMQI_SOURCE_DIR}/CMake/dcmqiVersionConfigure.h.in
+   ${DCMQI_BINARY_DIR}/include/dcmqi/internal/VersionConfigure.h
+@@ -37,6 +36,11 @@ add_library(${lib_name} STATIC
    ${ADDITIONAL_SRCS}
    )
 

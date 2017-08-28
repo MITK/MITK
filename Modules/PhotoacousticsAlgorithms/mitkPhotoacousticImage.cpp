@@ -279,15 +279,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
-  // crop the image
-  // set the Maximum Size of the image to 4096
-  unsigned short lowerCutoff = 0;
-  if (((unsigned int)(4096 + cutoff)) < inputImage->GetDimension(1))
-  {
-    lowerCutoff = (unsigned short)(inputImage->GetDimension(1) - 4096);
-  }
-
-  config.RecordTime = config.RecordTime - (cutoff + lowerCutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  config.RecordTime = config.RecordTime - (cutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "cropping image");
   if (!config.partial)
   {
@@ -295,7 +287,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
 
-  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, lowerCutoff, 0, 0, config.CropBounds[0], config.CropBounds[1]);
+  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
 
   // resample the image in horizontal direction
   if (inputImage->GetDimension(0) != config.ReconstructionLines)

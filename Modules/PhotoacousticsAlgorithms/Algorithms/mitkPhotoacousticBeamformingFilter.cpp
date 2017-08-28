@@ -98,16 +98,6 @@ void mitk::BeamformingFilter::GenerateData()
   float inputDim[2] = { (float)input->GetDimension(0), (float)input->GetDimension(1) };
   float outputDim[2] = { (float)output->GetDimension(0), (float)output->GetDimension(1) };
 
-  unsigned short chunkSize = 1; // 1 chunk = 1 image
-
-  unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
-
-  unsigned int oclOutputDimChunk[3] = { output->GetDimension(0), output->GetDimension(1), chunkSize};
-  unsigned int oclInputDimChunk[3] = { input->GetDimension(0), input->GetDimension(1), chunkSize};
-
-  unsigned int oclOutputDimLastChunk[3] = { output->GetDimension(0), output->GetDimension(1), input->GetDimension(2) % chunkSize };
-  unsigned int oclInputDimLastChunk[3] = { input->GetDimension(0), input->GetDimension(1), input->GetDimension(2) % chunkSize };
-
   const int apodArraySize = m_Conf.TransducerElements * 4; // set the resolution of the apodization array
   float* ApodWindow;
 
@@ -214,8 +204,19 @@ void mitk::BeamformingFilter::GenerateData()
     }
   }
   #ifdef PHOTOACOUSTICS_USE_GPU
+
   else
   {
+    unsigned short chunkSize = 1; // 1 chunk = 1 image
+
+    unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
+
+    unsigned int oclOutputDimChunk[3] = { output->GetDimension(0), output->GetDimension(1), chunkSize};
+    unsigned int oclInputDimChunk[3] = { input->GetDimension(0), input->GetDimension(1), chunkSize};
+
+    unsigned int oclOutputDimLastChunk[3] = { output->GetDimension(0), output->GetDimension(1), input->GetDimension(2) % chunkSize };
+    unsigned int oclInputDimLastChunk[3] = { input->GetDimension(0), input->GetDimension(1), input->GetDimension(2) % chunkSize };
+
     mitk::PhotoacousticOCLBeamformer::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformer::New();
 
     try

@@ -28,7 +28,7 @@ if(MITK_USE_DCMTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.2.tar.gz
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.2.tar.gz
       URL_MD5 d219a4152772985191c9b89d75302d12
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS

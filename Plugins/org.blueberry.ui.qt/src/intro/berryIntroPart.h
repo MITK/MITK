@@ -187,8 +187,7 @@ public:
    * @exception PartInitException
    *                if this part was not initialized successfully
    */
-  void Init(IIntroSite::Pointer site, IMemento::Pointer memento)
-      throw (PartInitException) override;
+  void Init(IIntroSite::Pointer site, IMemento::Pointer memento) override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#removePropertyListener(org.eclipse.ui.IPropertyListener)

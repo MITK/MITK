@@ -134,7 +134,7 @@ public:
    * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
    */
   void Init(IViewSite::Pointer site, IMemento::Pointer memento =
-      IMemento::Pointer(nullptr)) throw (PartInitException) override;
+      IMemento::Pointer(nullptr)) override;
 
   /*
    * (non-Javadoc)

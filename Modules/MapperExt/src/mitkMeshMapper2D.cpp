@@ -151,7 +151,6 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
           switch (dataIt->Value().pointSpec)
           {
             case PTSTART:
-            {
               // a quad
               glBegin(GL_LINE_LOOP);
               tmp = pt2d - horz + vert;
@@ -163,10 +162,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d - horz - vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
-            break;
+              break;
             case PTUNDEFINED:
-            {
               // a diamond around the point
               glBegin(GL_LINE_LOOP);
               tmp = pt2d - horz;
@@ -178,8 +175,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d - vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
-            break;
+              break;
             default:
               break;
           } // switch
@@ -196,7 +192,6 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
           switch (dataIt->Value().pointSpec)
           {
             case PTSTART:
-            {
               // a quad
               glBegin(GL_LINE_LOOP);
               tmp = pt2d - horz + vert;
@@ -208,9 +203,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d - horz - vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
+              break;
             case PTUNDEFINED:
-            {
               // drawing crosses
               glBegin(GL_LINES);
               tmp = pt2d - horz;
@@ -222,7 +216,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d + vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
+              break;
             default:
             {
               break;

@@ -477,7 +477,7 @@ namespace itk
   }
 
   template <class TInputImage>
-  void ContourExtractor2DImageFilter<TInputImage>::GenerateInputRequestedRegion() throw(InvalidRequestedRegionError)
+  void ContourExtractor2DImageFilter<TInputImage>::GenerateInputRequestedRegion()
   {
     InputImageType *input = const_cast<InputImageType *>(this->GetInput());
     if (!input)

@@ -124,10 +124,14 @@ namespace mitk
       {
         case 4:
           offset += idx[3] * imageDims[0] * imageDims[1] * imageDims[2];
+          /* FALLTHRU */
         case 3:
           offset += idx[2] * imageDims[0] * imageDims[1];
+          /* FALLTHRU */
         case 2:
           offset += idx[0] + idx[1] * imageDims[0];
+          /* FALLTHRU */
+        default:
           break;
       }
       return offset;

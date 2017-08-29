@@ -109,7 +109,7 @@ protected:
        * execution model.
        *
        * \sa ProcessObject::GenerateInputRequestedRegion() */
-    virtual void GenerateInputRequestedRegion() throw ( InvalidRequestedRegionError );
+    void GenerateInputRequestedRegion() override;
 
 
 private:

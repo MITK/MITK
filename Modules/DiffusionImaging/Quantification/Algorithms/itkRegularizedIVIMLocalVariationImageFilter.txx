@@ -39,7 +39,7 @@ namespace itk
   template <class TInputImage, class TOutputImage>
   void
     RegularizedIVIMLocalVariationImageFilter<TInputImage, TOutputImage>
-    ::GenerateInputRequestedRegion() throw (InvalidRequestedRegionError)
+    ::GenerateInputRequestedRegion()
   {
     // call the superclass' implementation of this method
     Superclass::GenerateInputRequestedRegion();

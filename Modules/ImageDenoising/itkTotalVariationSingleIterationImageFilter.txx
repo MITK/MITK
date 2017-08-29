@@ -55,8 +55,7 @@ namespace itk
  * generate requested region
  */
   template <class TInputImage, class TOutputImage>
-  void TotalVariationSingleIterationImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion() throw(
-    InvalidRequestedRegionError)
+  void TotalVariationSingleIterationImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   {
     // call the superclass' implementation of this method
     Superclass::GenerateInputRequestedRegion();

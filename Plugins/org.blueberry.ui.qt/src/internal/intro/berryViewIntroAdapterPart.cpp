@@ -76,7 +76,7 @@ QString ViewIntroAdapterPart::GetPartName() const
 }
 
 void ViewIntroAdapterPart::Init(IViewSite::Pointer site,
-    IMemento::Pointer memento) throw (PartInitException)
+    IMemento::Pointer memento)
 {
   ViewPart::Init(site);
   Workbench* workbench =

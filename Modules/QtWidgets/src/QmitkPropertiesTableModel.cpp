@@ -252,8 +252,9 @@ void QmitkPropertiesTableModel::PropertyDelete(const itk::Object *caller, const 
 
 bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+  // TODO: check 'role' condition
   if (index.isValid() && !m_SelectedProperties.empty() && index.row() < (int)(m_SelectedProperties.size()) &&
-      (role == Qt::EditRole || Qt::CheckStateRole))
+      (role == Qt::EditRole || role == Qt::CheckStateRole))
   {
     // block all events now!
     m_BlockEvents = true;

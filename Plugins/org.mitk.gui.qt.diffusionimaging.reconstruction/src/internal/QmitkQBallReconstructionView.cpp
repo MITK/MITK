@@ -975,42 +975,43 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   it2 = currSelectionMap.rbegin();
   ++it2;
   for(; it2 != currSelectionMap.rend(); ++it1,++it2)
+  {
     if(avdistance != (int)it1->first - (int)it2->first)
     {
       QMessageBox::information(0, "Reconstruction not possible:" ,QString("Selected Shells are not in a equidistant configuration. (ImageName: " + QString(nodename.c_str()) + ")"));
       return;
     }
+  }
+  ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
-    ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
-    mitk::CastToItkImage(dwi, itkVectorImagePointer);
+  filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
+  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer, static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
+  filter->SetLambda(lambda);
+  filter->Update();
 
-    filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
-    filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer, static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-    filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
-    filter->SetLambda(lambda);
-    filter->Update();
+  if(m_Controls->m_OutputCoeffsImage->isChecked())
+  {
+    mitk::Image::Pointer coeffsImage = mitk::Image::New();
+    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
+    coeffsNode->SetData( coeffsImage );
+    coeffsNode->SetProperty( "name", mitk::StringProperty::New(
+      QString(nodename.c_str()).append("_SH-Coefficients").toStdString()) );
+    GetDataStorage()->Add(coeffsNode, dataNodePointer);
+  }
 
-    if(m_Controls->m_OutputCoeffsImage->isChecked())
-    {
-      mitk::Image::Pointer coeffsImage = mitk::Image::New();
-      coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
-      coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
-      mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
-      coeffsNode->SetData( coeffsImage );
-      coeffsNode->SetProperty( "name", mitk::StringProperty::New(
-        QString(nodename.c_str()).append("_SH-Coefficients").toStdString()) );
-      GetDataStorage()->Add(coeffsNode, dataNodePointer);
-    }
+  // ODFs TO DATATREE
+  mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+  image->InitializeByItk( filter->GetOutput() );
+  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  mitk::DataNode::Pointer node=mitk::DataNode::New();
+  node->SetData( image );
+  SetDefaultNodeProperties(node, nodename+"_SH_MultiShell_Qball");
 
-    // ODFs TO DATATREE
-    mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-    image->InitializeByItk( filter->GetOutput() );
-    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
-    mitk::DataNode::Pointer node=mitk::DataNode::New();
-    node->SetData( image );
-    SetDefaultNodeProperties(node, nodename+"_SH_MultiShell_Qball");
-
-    GetDataStorage()->Add(node, dataNodePointer);
+  GetDataStorage()->Add(node, dataNodePointer);
 }
 
 void QmitkQBallReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name)

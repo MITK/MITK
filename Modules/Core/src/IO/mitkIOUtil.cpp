@@ -974,14 +974,21 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
     // check if we already used a writer for this base data type
     // which should be re-used
-    std::set<SaveInfo>::const_iterator oldSaveInfoIter = m_usedSaveInfos.find(saveInfo);
-    if (oldSaveInfoIter != m_usedSaveInfos.end())
+    SaveInfo* oldSaveinfo = nullptr;
+    for (SaveInfo si : m_usedSaveInfos) {
+      if (si.m_MimeType == saveInfo.m_MimeType) {
+        oldSaveinfo = &si;
+        break;
+      }
+    }
+
+    if (oldSaveinfo)
     {
       // we previously saved a base data object of the same data with the same mime-type,
       // check if the same writer is contained in the current writer set and if the
       // confidence level matches
       FileWriterSelector::Item oldSelectedItem =
-          oldSaveInfoIter->m_WriterSelector.Get(oldSaveInfoIter->m_WriterSelector.GetSelectedId());
+        oldSaveinfo->m_WriterSelector.Get(oldSaveinfo->m_WriterSelector.GetSelectedId());
       for (std::vector<FileWriterSelector::Item>::const_iterator currWriterItem = writers.begin(),
            currWriterItemEnd = writers.end(); currWriterItem != currWriterItemEnd; ++currWriterItem)
       {
@@ -990,7 +997,7 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
         {
           // okay, we used the same writer already, re-use its options
           callOptionsCallback = false;
-          saveInfo.m_WriterSelector.Select(oldSaveInfoIter->m_WriterSelector.GetSelectedId());
+          saveInfo.m_WriterSelector.Select(oldSaveinfo->m_WriterSelector.GetSelectedId());
           saveInfo.m_WriterSelector.GetSelected().GetWriter()->SetOptions(
                 oldSelectedItem.GetWriter()->GetOptions());
           break;

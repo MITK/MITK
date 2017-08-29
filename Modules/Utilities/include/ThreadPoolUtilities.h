@@ -9,6 +9,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/optional.hpp>
@@ -72,7 +73,9 @@ namespace Utilities
     mutable boost::shared_mutex m_taskGuard;
     std::map<size_t, Task> m_task;
     std::set<size_t> m_runing;
-    boost::condition_variable_any m_event;
+
+    boost::mutex m_lock;
+    boost::condition_variable m_event;
   };
 
   class MITKUTILITIES_EXPORT TaskGroup : private boost::noncopyable

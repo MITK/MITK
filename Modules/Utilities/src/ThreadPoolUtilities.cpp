@@ -17,10 +17,11 @@ namespace Utilities
   ThreadPool::ThreadPool()
     : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
     , m_id(0)
+    , m_count(0)
   {
     const auto count = boost::thread::hardware_concurrency();
     for (size_t i = 0; i < count; ++i) {
-      m_threads.insert(m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)))->get_id());
+      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)))->get_id();
     }
   }
 
@@ -57,8 +58,7 @@ namespace Utilities
       return false;
     }
     m_task.erase(taskId);
-
-    const boost::unique_lock<boost::mutex> guard(m_lock);
+    ++m_count;
     m_event.notify_all();
     return true;
   }
@@ -70,12 +70,11 @@ namespace Utilities
     for (auto id : taskIds) {
       if (m_runing.end() == m_runing.find(id)) {
         m_task.erase(id);
+        ++m_count;
       } else {
         --n;
       }
     }
-
-    const boost::unique_lock<boost::mutex> guard(m_lock);
     m_event.notify_all();
     return n;
   }
@@ -86,12 +85,11 @@ namespace Utilities
     for (auto it = m_task.begin(); it != m_task.end(); ) {
       if (m_runing.end() == m_runing.find(it->first)) {
         it = m_task.erase(it);
+        ++m_count;
       } else {
         ++it;
       }
     }
-
-    const boost::unique_lock<boost::mutex> guard(m_lock);
     m_event.notify_all();
     return m_task.size();
   }
@@ -125,8 +123,7 @@ namespace Utilities
     lockTask.lock();
     m_runing.erase(it->first);
     m_task.erase(it);
-
-    const boost::unique_lock<boost::mutex> guard(m_lock);
+    ++m_count;
     m_event.notify_all();
     return info.second;
   }
@@ -134,21 +131,22 @@ namespace Utilities
   template <typename TCheck>
   void ThreadPool::Wait(const TCheck& check)
   {
-    if (IsThisThreadInPool()) {
+    if (m_pool.is_this_thread_in()) {
       while (!check()) {
         DoTask();
       }
       return;
     }
 
-    const auto isMain = isGuiThread();
-    for (boost::unique_lock<boost::mutex> lock(m_lock); !check(); ) {
-      if (isMain) {
-        while (boost::cv_status::timeout == m_event.wait_for(lock, boost::chrono::milliseconds(10))) {
-          QCoreApplication::processEvents();
-        }
-      } else {
-        m_event.wait(lock);
+    if (!isGuiThread()) {
+      SharedLock lock(m_taskGuard);
+      m_event.wait(lock, check);
+      return;
+    }
+
+    for (auto count = m_count; !check(); count = m_count) {
+      while (count == m_count) {
+        QCoreApplication::processEvents();
       }
     }
   }
@@ -217,11 +215,6 @@ namespace Utilities
       }
     }
     return true;
-  }
-
-  bool ThreadPool::IsThisThreadInPool() const
-  {
-    return m_threads.end() != m_threads.find(boost::this_thread::get_id());
   }
 
   TaskGroup::TaskGroup()

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 #include "berryIQtPreferencePage.h"
 
+#include <ui_QmitkSegmentationPreferencePage.h>
+
 class QWidget;
 class QCheckBox;
 class QRadioButton;
@@ -66,18 +68,9 @@ protected slots:
 
 protected:
 
+  Ui::QmitkSegmentationPreferencePage m_Controls;
   QWidget* m_MainControl;
-  QCheckBox* m_SlimViewCheckBox;
-  QRadioButton* m_RadioOutline;
-  QRadioButton* m_RadioOverlay;
-  QCheckBox* m_VolumeRenderingCheckBox;
-  QCheckBox* m_SmoothingCheckBox;
-  QDoubleSpinBox* m_SmoothingSpinBox;
-  QDoubleSpinBox* m_DecimationSpinBox;
-  QDoubleSpinBox* m_ClosingSpinBox;
-  QCheckBox* m_SelectionModeCheckBox;
-  QSpinBox* m_dequeMaxSize;
-
+  
   bool m_Initializing;
 
   berry::IPreferences::Pointer m_SegmentationPreferencesNode;

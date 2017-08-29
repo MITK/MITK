@@ -31,6 +31,7 @@ set(UI_FILES
   src/internal/SegmentationUtilities/ContourModelToImage/QmitkContourModelToImageWidgetControls.ui
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidgetControls.ui
+  src/QmitkSegmentationPreferencePage.ui
 )
 
 set(MOC_H_FILES

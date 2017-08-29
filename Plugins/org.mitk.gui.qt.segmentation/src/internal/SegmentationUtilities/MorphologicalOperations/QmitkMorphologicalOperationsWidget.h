@@ -37,6 +37,7 @@ public slots:
   void OnDilatationButtonClicked();
   void OnErosionButtonClicked();
   void OnFillHolesButtonClicked();
+  void OnRemoveFragmentsClicked();
   void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
   void OnRadioButtonsClicked();
 

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
+
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryCrossStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
@@ -26,6 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryFillholeImageFilter.h>
 #include <itkBinaryMorphologicalClosingImageFilter.h>
 #include <itkBinaryMorphologicalOpeningImageFilter.h>
+
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkConnectedComponentImageFilter.h>
+#include <itkLabelImageToShapeLabelMapFilter.h>
+#include <itkLabelShapeKeepNObjectsImageFilter.h>
+
 
 void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer& image, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
@@ -202,6 +209,40 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
   MITK_INFO << "Finished FillHole";
 }
 
+void mitk::MorphologicalOperations::RemoveFragments(mitk::Image::Pointer& image, int percent)
+{
+  MITK_INFO << "Start RemoveFragments...";
+
+  int timeSteps = static_cast<int>(image->GetTimeSteps());
+
+  if (timeSteps > 1)
+  {
+    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+    timeSelector->SetInput(image);
+
+    for (int t = 0; t < timeSteps; ++t)
+    {
+      MITK_INFO << "  Processing time step " << t;
+
+      timeSelector->SetTimeNr(t);
+      timeSelector->Update();
+
+      mitk::Image::Pointer img3D = timeSelector->GetOutput();
+      img3D->DisconnectPipeline();
+
+      AccessByItk_2(img3D, itkRemoveFragments, percent, img3D);
+
+      mitk::ImageReadAccessor accessor(img3D);
+      image->SetVolume(accessor.GetData(), t);
+    }
+  } else
+  {
+    AccessByItk_2(image, itkRemoveFragments, percent, image);
+  }
+
+  MITK_INFO << "Finished RemoveFragments";
+}
+
 template<typename TPixel, unsigned int VDimension>
 void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
 {
@@ -356,4 +397,63 @@ void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension>*
   fillHoleFilter->UpdateLargestPossibleRegion();
 
   mitk::CastToMitkImage(fillHoleFilter->GetOutput(), resultImage);
+}
+
+template<typename TPixel, unsigned int VDimension>
+void mitk::MorphologicalOperations::itkRemoveFragments(itk::Image<TPixel, VDimension>* sourceImage, int percent, mitk::Image::Pointer& resultImage)
+{
+  typedef itk::Image<TPixel, VDimension> ImageType;
+  typedef itk::Image<unsigned char, VDimension> OutputImageType;
+  typedef itk::ConnectedComponentImageFilter<ImageType, OutputImageType> ConnectedComponentImageFilterType;
+  typename ConnectedComponentImageFilterType::Pointer connected = ConnectedComponentImageFilterType::New();
+  connected->SetInput(sourceImage);
+  connected->SetFullyConnected(true);
+  connected->Update();
+  auto connectedImage = connected->GetOutput();
+
+  typedef itk::LabelImageToShapeLabelMapFilter<OutputImageType> LabelImageToShapeLabelMapFilterType;
+  typename LabelImageToShapeLabelMapFilterType::Pointer labelShapeMapFilter = LabelImageToShapeLabelMapFilterType::New();
+  labelShapeMapFilter->SetInput(connectedImage);
+  labelShapeMapFilter->Update();
+
+  // Loop over each region
+  typedef std::pair<int, int> LabelInfo;
+  typename std::vector<LabelInfo> labels;
+  for (int i = 0; i < labelShapeMapFilter->GetOutput()->GetNumberOfLabelObjects(); i++) {
+    LabelImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = labelShapeMapFilter->GetOutput()->GetNthLabelObject(i);
+    labels.push_back(std::pair<int, int>(i, int(labelObject->GetNumberOfPixels())));
+  }
+  std::sort(labels.begin(), labels.end(), [](LabelInfo &left, LabelInfo &right)
+  {
+    return left.second > right.second;
+  });
+
+  // Count number of remaining fragments, using given percent
+  int remainingFragments = labels.size();
+  for (int i = 1; i < labels.size(); ++i) {
+    double ratio = double(labels[i].second) * 100.0 / double(labels[0].second);
+    if (ratio < percent) {
+      remainingFragments = i;
+      break;
+    }
+  }
+
+  typedef itk::LabelShapeKeepNObjectsImageFilter<OutputImageType> LabelShapeKeepNObjectsImageFilterType;
+  typename LabelShapeKeepNObjectsImageFilterType::Pointer labelShapeKeepNObjectsImageFilter = LabelShapeKeepNObjectsImageFilterType::New();
+  labelShapeKeepNObjectsImageFilter->SetInput(connectedImage);
+  labelShapeKeepNObjectsImageFilter->SetBackgroundValue(0);
+  labelShapeKeepNObjectsImageFilter->SetNumberOfObjects(remainingFragments);
+  labelShapeKeepNObjectsImageFilter->SetAttribute(LabelShapeKeepNObjectsImageFilterType::LabelObjectType::NUMBER_OF_PIXELS);
+  labelShapeKeepNObjectsImageFilter->Update();
+
+  typedef itk::BinaryThresholdImageFilter< OutputImageType, ImageType > BinaryThresholdImageFilter;
+  typename BinaryThresholdImageFilter::Pointer thresholdFilter = BinaryThresholdImageFilter::New();
+  thresholdFilter->SetLowerThreshold(1);
+  thresholdFilter->SetUpperThreshold(255);
+  thresholdFilter->SetOutsideValue(0);
+  thresholdFilter->SetInsideValue(1);
+  thresholdFilter->SetInput(labelShapeKeepNObjectsImageFilter->GetOutput());
+  thresholdFilter->Update();
+
+  mitk::CastToMitkImage(thresholdFilter->GetOutput(), resultImage);
 }

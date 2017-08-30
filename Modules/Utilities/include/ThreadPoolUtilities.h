@@ -3,13 +3,11 @@
 #include <queue>
 #include <map>
 #include <set>
-#include <initializer_list>
 
 #include <boost/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/optional.hpp>
@@ -56,7 +54,6 @@ namespace Utilities
     typedef boost::shared_lock<boost::shared_mutex> SharedLock;
 
     size_t DoTask();
-    bool IsThisThreadInPool() const;
     template <typename TCheck>
     void Wait(const TCheck& check);
 
@@ -64,7 +61,6 @@ namespace Utilities
     boost::optional<boost::asio::io_service::work> m_work;
     boost::thread_group m_pool;
     boost::system::error_code m_error;
-    std::set<boost::thread::id> m_threads;
 
     boost::shared_mutex m_queueGuard;
     size_t m_id;
@@ -73,9 +69,8 @@ namespace Utilities
     mutable boost::shared_mutex m_taskGuard;
     std::map<size_t, Task> m_task;
     std::set<size_t> m_runing;
-
-    boost::mutex m_lock;
-    boost::condition_variable m_event;
+    boost::condition_variable_any m_event;
+    volatile size_t m_count;
   };
 
   class MITKUTILITIES_EXPORT TaskGroup : private boost::noncopyable

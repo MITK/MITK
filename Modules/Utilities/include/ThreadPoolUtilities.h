@@ -69,8 +69,10 @@ namespace Utilities
     mutable boost::shared_mutex m_taskGuard;
     std::map<size_t, Task> m_task;
     std::set<size_t> m_runing;
-    boost::condition_variable_any m_event;
     volatile size_t m_count;
+
+    boost::shared_mutex m_eventGuard;
+    boost::condition_variable_any m_event;
   };
 
   class MITKUTILITIES_EXPORT TaskGroup : private boost::noncopyable

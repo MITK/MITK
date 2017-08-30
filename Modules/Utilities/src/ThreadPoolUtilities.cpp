@@ -59,6 +59,8 @@ namespace Utilities
     }
     m_task.erase(taskId);
     ++m_count;
+
+    const SharedLock guard(m_eventGuard);
     m_event.notify_all();
     return true;
   }
@@ -75,6 +77,8 @@ namespace Utilities
         --n;
       }
     }
+
+    const SharedLock guard(m_eventGuard);
     m_event.notify_all();
     return n;
   }
@@ -90,6 +94,8 @@ namespace Utilities
         ++it;
       }
     }
+
+    const SharedLock guard(m_eventGuard);
     m_event.notify_all();
     return m_task.size();
   }
@@ -124,6 +130,8 @@ namespace Utilities
     m_runing.erase(it->first);
     m_task.erase(it);
     ++m_count;
+
+    const SharedLock guard(m_eventGuard);
     m_event.notify_all();
     return info.second;
   }
@@ -139,7 +147,7 @@ namespace Utilities
     }
 
     if (!isGuiThread()) {
-      SharedLock lock(m_taskGuard);
+      SharedLock lock(m_eventGuard);
       m_event.wait(lock, check);
       return;
     }

@@ -63,18 +63,20 @@ namespace mitk
     itkSetMacro(ApplyBilateralFilter,bool);
     itkGetConstMacro(ApplyBilateralFilter,bool);
 
+    using itk::ProcessObject::SetInput;
+
      /*!
     \brief sets the input of this filter
     \param distanceImage input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput( Image* distanceImage);
+    virtual void SetInput( const InputImageType* distanceImage) override;
 
     /*!
     \brief sets the input of this filter at idx
     \param idx number of the current input
     \param distanceImage input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput(unsigned int idx,  Image* distanceImage);
+    virtual void SetInput(unsigned int idx,  const InputImageType* distanceImage) override;
 
     /*!
     \brief returns the input of this filter

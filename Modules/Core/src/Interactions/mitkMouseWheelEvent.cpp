@@ -74,5 +74,5 @@ bool mitk::MouseWheelEvent::IsEqual(const mitk::InteractionEvent &interactionEve
 
 bool mitk::MouseWheelEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<MouseWheelEvent *>(baseClass.GetPointer()) != NULL);
+  return (dynamic_cast<MouseWheelEvent *>(baseClass.GetPointer()) != nullptr);
 }

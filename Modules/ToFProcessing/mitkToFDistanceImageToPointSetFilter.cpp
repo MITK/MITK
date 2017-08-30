@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFProcessingCommon.h"
 
 mitk::ToFDistanceImageToPointSetFilter::ToFDistanceImageToPointSetFilter()
-: m_Subset(NULL), m_CameraIntrinsics(), m_InterPixelDistance()
+: m_Subset(0), m_CameraIntrinsics(), m_InterPixelDistance()
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -36,16 +36,16 @@ mitk::ToFDistanceImageToPointSetFilter::~ToFDistanceImageToPointSetFilter()
 {
 }
 
-void mitk::ToFDistanceImageToPointSetFilter::SetInput(const mitk::Image* distanceImage )
+void mitk::ToFDistanceImageToPointSetFilter::SetInput(const Image *distanceImage )
 {
   this->SetInput(0,distanceImage);
 }
 
-void mitk::ToFDistanceImageToPointSetFilter::SetInput( unsigned int idx,const mitk::Image* distanceImage )
+void mitk::ToFDistanceImageToPointSetFilter::SetInput( unsigned int idx,const Image* distanceImage )
 {
-  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   }
   else
   {
@@ -74,17 +74,19 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<itk::Index<3>
 
   unsigned int xDim = UINT_MAX;
   unsigned int yDim = UINT_MAX;
+
   if(input.IsNotNull() && input->IsInitialized())
   {
-    unsigned int xDim = input->GetDimension(0);
-    unsigned int yDim = input->GetDimension(1);
+    xDim = input->GetDimension(0);
+    yDim = input->GetDimension(1);
   }
 
   bool pointSetValid = true;
   for (unsigned int i=0; i<subset.size(); i++)
   {
     itk::Index<3> currentIndex = subset.at(i);
-    if (currentIndex[0]<0||currentIndex[0]>xDim||currentIndex[1]<0||currentIndex[1]>yDim)
+    if (currentIndex[0] < 0 || currentIndex[0] > static_cast<itk::IndexValueType>(xDim) ||
+        currentIndex[1] < 0 || currentIndex[1] > static_cast<itk::IndexValueType>(yDim))
     {
       pointSetValid = false;
     }
@@ -123,9 +125,14 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
   {
     focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
     focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
+    focalLengthInMm = 0.0;
   }
   else
+  {
+    focalLengthInPixelUnits[0] = 0.0;
+    focalLengthInPixelUnits[1] = 0.0;
     focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  }
 
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
   principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
@@ -173,11 +180,11 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 
         mitk::ToFProcessingCommon::ToFScalarType distance = (double)imageAcces.GetPixelByIndex(pixel);
 
-      mitk::Point3D currentPoint;
-      if (m_ReconstructionMode)
-        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthInPixelUnits,principalPoint);
-      else
-        currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
+        mitk::Point3D currentPoint;
+        if (m_ReconstructionMode)
+          currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthInPixelUnits,principalPoint);
+        else
+          currentPoint = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
 
         if (distance>mitk::eps)
         {
@@ -191,14 +198,14 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 
 void mitk::ToFDistanceImageToPointSetFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
     if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
     }
-    this->Modified();
+  this->Modified();
 }
 
 void mitk::ToFDistanceImageToPointSetFilter::GenerateOutputInformation()

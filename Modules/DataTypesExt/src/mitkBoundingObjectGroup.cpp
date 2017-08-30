@@ -179,12 +179,12 @@ bool mitk::BoundingObjectGroup::VerifyRequestedRegion()
 
 mitk::BaseGeometry *mitk::BoundingObjectGroup::GetGeometry(int t) const
 {
-  // if ( m_BoundingObjects == NULL )
+  // if ( m_BoundingObjects == nullptr )
   return Superclass::GetGeometry(t);
 
   // mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boI = m_BoundingObjects->Begin();
   // const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boIEnd = m_BoundingObjects->End();
-  // mitk::Geometry3D* currentGeometry = NULL;
+  // mitk::Geometry3D* currentGeometry = nullptr;
 
   // while ( boI != boIEnd )
   //{

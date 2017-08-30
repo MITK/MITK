@@ -32,7 +32,6 @@ template <typename TPixel, unsigned int VDimension>
 typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageRandom(short int size)
 {
   typedef typename itk::Image<TPixel, VDimension> ImageType;
-  typedef typename ImageType::Pointer ImagePointer;
 
   itk::Size<VDimension> regionSize;
   regionSize.Fill(size);

@@ -91,12 +91,12 @@ bool mitk::CostingStatistic::UpdateCollection()
 
   std::vector<DataCollectionImageIterator<double, 3> > iterProbA;
   std::vector<DataCollectionImageIterator<double, 3> > iterProbB;
-  for (int i = 0; i < m_ProbabilityClassA.size(); ++i)
+  for (std::size_t i = 0; i < m_ProbabilityClassA.size(); ++i)
   {
     DataCollectionImageIterator<double, 3> iter(m_Collection, m_ProbabilityClassA[i]);
     iterProbA.push_back(iter);
   }
-  for (int i = 0; i < m_ProbabilityClassB.size(); ++i)
+  for (std::size_t i = 0; i < m_ProbabilityClassB.size(); ++i)
   {
     DataCollectionImageIterator<double, 3> iter(m_Collection, m_ProbabilityClassB[i]);
     iterProbB.push_back(iter);
@@ -111,11 +111,11 @@ bool mitk::CostingStatistic::UpdateCollection()
     {
       double probA = 0;
       double probB = 0;
-      for (int i = 0; i < iterProbA.size(); ++i)
+      for (std::size_t i = 0; i < iterProbA.size(); ++i)
       {
         probA += iterProbA[i].GetVoxel();
       }
-      for (int i = 0; i < iterProbB.size(); ++i)
+      for (std::size_t i = 0; i < iterProbB.size(); ++i)
       {
         probB += iterProbB[i].GetVoxel();
       }
@@ -131,11 +131,11 @@ bool mitk::CostingStatistic::UpdateCollection()
     ++iterCombineA;
     ++iterCombineB;
     ++iterMask;
-    for (int i = 0; i < iterProbA.size(); ++i)
+    for (std::size_t i = 0; i < iterProbA.size(); ++i)
     {
       ++(iterProbA[i]);
     }
-    for (int i = 0; i < iterProbB.size(); ++i)
+    for (std::size_t i = 0; i < iterProbB.size(); ++i)
     {
       ++(iterProbB[i]);
     }

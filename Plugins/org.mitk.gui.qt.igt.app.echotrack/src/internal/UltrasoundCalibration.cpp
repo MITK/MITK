@@ -308,15 +308,17 @@ void UltrasoundCalibration::OnAddCurrentTipPositionForVerification()
   MITK_INFO << "Current Error: " << currentError << " mm";
   m_allErrors.push_back(currentError);
 
-  m_currentPoint++;
-  if (m_currentPoint < m_allReferencePoints.size()) { m_Controls.m_CurrentPointLabel->setText("Point " + QString::number(m_currentPoint) + " of " + QString::number(m_allReferencePoints.size())); }
+  if (++m_currentPoint < static_cast<int>(m_allReferencePoints.size()))
+  {
+    m_Controls.m_CurrentPointLabel->setText("Point " + QString::number(m_currentPoint) + " of " + QString::number(m_allReferencePoints.size()));
+  }
   else
   {
     m_currentPoint = -1;
     double meanError = 0;
-    for (int i = 0; i < m_allErrors.size(); i++)
+    for (std::size_t i = 0; i < m_allErrors.size(); ++i)
     {
-      meanError += m_allErrors.at(i);
+      meanError += m_allErrors[i];
     }
     meanError /= m_allErrors.size();
 
@@ -513,7 +515,6 @@ void UltrasoundCalibration::OnStartStreaming()
   m_TrackingMessageProvider->StartStreamingOfSource(m_TrackingToIGTLMessageFilter, 5);
   m_Controls.m_StartStreaming->setEnabled(false);
   m_Controls.m_ConnectionStatus->setText("");
-  unsigned int interval = this->m_USMessageProvider->GetStreamingTime();
   m_StreamingTimer->start((1.0 / 5.0 * 1000.0));
 }
 
@@ -733,7 +734,7 @@ void UltrasoundCalibration::OnCalibration()
 
   mitk::SlicedGeometry3D::Pointer sliced3d = dynamic_cast<mitk::SlicedGeometry3D*> (m_Node->GetData()->GetGeometry());
 
-  mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetGeometry2D(0));
+  mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetPlaneGeometry(0));
 
   plane->SetIndexToWorldTransform(m_Transformation);
 
@@ -877,10 +878,10 @@ void UltrasoundCalibration::OnReset()
   if (m_Transformation.IsNull()) { m_Transformation = mitk::AffineTransform3D::New(); }
   m_Transformation->SetIdentity();
 
-  if (m_Node.IsNotNull() && (m_Node->GetData() != NULL) && (m_Node->GetData()->GetGeometry() != NULL))
+  if (m_Node.IsNotNull() && (m_Node->GetData() != nullptr) && (m_Node->GetData()->GetGeometry() != nullptr))
   {
     mitk::SlicedGeometry3D::Pointer sliced3d = dynamic_cast<mitk::SlicedGeometry3D*> (m_Node->GetData()->GetGeometry());
-    mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetGeometry2D(0));
+    mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetPlaneGeometry(0));
     plane->SetIndexToWorldTransform(m_Transformation);
   }
 
@@ -1032,10 +1033,10 @@ double UltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials,
 {
   if (imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
   double FRE = 0;
-  for (unsigned int i = 0; i < imageFiducials->GetSize(); i++)
+  for (int i = 0; i < imageFiducials->GetSize(); ++i)
   {
     itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
-    if (transform != NULL)
+    if (transform != nullptr)
     {
       current_image_fiducial_point = transform->TransformPoint(imageFiducials->GetPoint(i)[0], imageFiducials->GetPoint(i)[1], imageFiducials->GetPoint(i)[2]);
     }
@@ -1050,7 +1051,7 @@ double UltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials,
 
 void UltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform)
 {
-  for (unsigned int i = 0; i < pointSet->GetSize(); i++)
+  for (int i = 0; i < pointSet->GetSize(); ++i)
   {
     itk::Point<double> current_point_transformed = itk::Point<double>();
     current_point_transformed = transform->TransformPoint(pointSet->GetPoint(i)[0], pointSet->GetPoint(i)[1], pointSet->GetPoint(i)[2]);

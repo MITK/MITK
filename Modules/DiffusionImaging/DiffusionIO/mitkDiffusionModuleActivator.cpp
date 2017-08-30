@@ -17,9 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 #include <mitkFiberBundleVtkReader.h>
+#include <mitkFiberBundleTckReader.h>
 #include <mitkFiberBundleTrackVisReader.h>
 #include <mitkConnectomicsNetworkReader.h>
 #include <mitkPlanarFigureCompositeReader.h>
+#include <mitkTractographyForestReader.h>
 
 #include <mitkFiberBundleVtkWriter.h>
 #include <mitkFiberBundleTrackVisWriter.h>
@@ -27,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsNetworkCSVWriter.h>
 #include <mitkConnectomicsNetworkMatrixWriter.h>
 #include <mitkPlanarFigureCompositeWriter.h>
+#include <mitkTractographyForestWriter.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPropertyDescriptions.h>
@@ -57,8 +60,10 @@ namespace mitk
 
       m_FiberBundleVtkReader = new FiberBundleVtkReader();
       m_FiberBundleTrackVisReader = new FiberBundleTrackVisReader();
+      m_FiberBundleTckReader = new FiberBundleTckReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
       m_PlanarFigureCompositeReader = new PlanarFigureCompositeReader();
+      m_TractographyForestReader = new TractographyForestReader();
 
       m_FiberBundleVtkWriter = new FiberBundleVtkWriter();
       m_FiberBundleTrackVisWriter = new FiberBundleTrackVisWriter();
@@ -66,6 +71,7 @@ namespace mitk
       m_ConnectomicsNetworkCSVWriter = new ConnectomicsNetworkCSVWriter();
       m_ConnectomicsNetworkMatrixWriter = new ConnectomicsNetworkMatrixWriter();
       m_PlanarFigureCompositeWriter = new PlanarFigureCompositeWriter();
+      m_TractographyForestWriter = new TractographyForestWriter();
     }
 
     void Unload(us::ModuleContext*) override
@@ -76,9 +82,11 @@ namespace mitk
       }
 
       delete m_FiberBundleVtkReader;
+      delete m_FiberBundleTckReader;
       delete m_FiberBundleTrackVisReader;
       delete m_ConnectomicsNetworkReader;
       delete m_PlanarFigureCompositeReader;
+      delete m_TractographyForestReader;
 
       delete m_FiberBundleVtkWriter;
       delete m_FiberBundleTrackVisWriter;
@@ -86,14 +94,17 @@ namespace mitk
       delete m_ConnectomicsNetworkCSVWriter;
       delete m_ConnectomicsNetworkMatrixWriter;
       delete m_PlanarFigureCompositeWriter;
+      delete m_TractographyForestWriter;
     }
 
   private:
 
     FiberBundleVtkReader * m_FiberBundleVtkReader;
+    FiberBundleTckReader * m_FiberBundleTckReader;
     FiberBundleTrackVisReader * m_FiberBundleTrackVisReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
     PlanarFigureCompositeReader* m_PlanarFigureCompositeReader;
+    TractographyForestReader* m_TractographyForestReader;
 
     FiberBundleVtkWriter * m_FiberBundleVtkWriter;
     FiberBundleTrackVisWriter * m_FiberBundleTrackVisWriter;
@@ -101,6 +112,7 @@ namespace mitk
     ConnectomicsNetworkCSVWriter * m_ConnectomicsNetworkCSVWriter;
     ConnectomicsNetworkMatrixWriter * m_ConnectomicsNetworkMatrixWriter;
     PlanarFigureCompositeWriter* m_PlanarFigureCompositeWriter;
+    TractographyForestWriter* m_TractographyForestWriter;
 
     std::vector<mitk::CustomMimeType*> m_MimeTypes;
 

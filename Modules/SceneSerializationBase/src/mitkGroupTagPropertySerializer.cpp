@@ -43,7 +43,7 @@ namespace mitk
     virtual BaseProperty::Pointer Deserialize(TiXmlElement *) override
     {
       // if (!element)
-      //  return NULL;
+      //  return nullptr;
       return GroupTagProperty::New().GetPointer();
     }
 

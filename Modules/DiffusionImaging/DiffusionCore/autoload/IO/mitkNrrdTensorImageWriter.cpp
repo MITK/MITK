@@ -46,7 +46,7 @@ void mitk::NrrdTensorImageWriter::Write()
   InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
   if (input.IsNull() )
   {
-    MITK_ERROR <<"Sorry, input to NrrdTensorImageWriter is NULL!";
+    MITK_ERROR <<"Sorry, input to NrrdTensorImageWriter is nullptr!";
     return;
   }
   if ( this->GetOutputLocation().empty() )

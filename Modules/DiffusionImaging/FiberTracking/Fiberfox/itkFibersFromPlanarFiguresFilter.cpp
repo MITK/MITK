@@ -56,7 +56,7 @@ void FibersFromPlanarFiguresFilter::GeneratePoints()
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     randGen->SetSeed((unsigned int)0);
     m_2DPoints.clear();
-    int count = 0;
+    unsigned int count = 0;
 
     while (count < m_Parameters.m_Density)
     {
@@ -102,7 +102,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             fliplist.resize(bundle.size(), 0);
 
         GeneratePoints();
-        for (int j=0; j<m_Parameters.m_Density; j++)
+        for (unsigned int j = 0; j < m_Parameters.m_Density; ++j)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 

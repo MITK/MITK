@@ -90,7 +90,7 @@ namespace mitk
      *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest
      * Layer,
      *  since empty DataNodes have a layer of -1, the DataNode must be filled here in order to get a layer assigned.
-     *  \note Is also called when the DataNode is set to NULL.
+     *  \note Is also called when the DataNode is set to nullptr.
      */
     virtual void DataNodeChanged();
 

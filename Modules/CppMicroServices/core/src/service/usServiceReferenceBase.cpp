@@ -60,7 +60,7 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool_type() const
 {
-  return GetModule() != 0 ? &ServiceReferenceBase::d : NULL;
+  return GetModule() != 0 ? &ServiceReferenceBase::d : nullptr;
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(int null)
@@ -197,7 +197,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
 {
   if (serviceRef)
   {
-    assert(serviceRef.GetModule() != NULL);
+    assert(serviceRef.GetModule() != nullptr);
 
     os << "Reference for service object registered from "
        << serviceRef.GetModule()->GetName() << " " << serviceRef.GetModule()->GetVersion()

@@ -318,12 +318,12 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor * /*actor*/, mi
   //
   //   mitk::VtkRepresentationProperty* representationProperty;
   //   node->GetProperty(representationProperty, "material.representation", renderer);
-  //   if ( representationProperty != NULL )
+  //   if ( representationProperty != nullptr )
   //     m_Volume->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
   //
   //   mitk::VtkInterpolationProperty* interpolationProperty;
   //   node->GetProperty(interpolationProperty, "material.interpolation", renderer);
-  //   if ( interpolationProperty != NULL )
+  //   if ( interpolationProperty != nullptr )
   //     m_Volume->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
   //
 

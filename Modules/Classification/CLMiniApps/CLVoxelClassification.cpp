@@ -51,7 +51,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 int main(int argc, char* argv[])
 {
   MITK_INFO << "Starting MITK_Forest Mini-App";
-  double startTime = time(0);
 
   //////////////////////////////////////////////////////////////////////////////
   // Read Console Input Parameter
@@ -140,7 +139,7 @@ int main(int argc, char* argv[])
       weightLambda = 0.0;
     }
     int maximumTreeDepth =  allConfig.IntValue("Forest", "Maximum Tree Depth",10000);
-    int randomSplit = allConfig.IntValue("Forest","Use RandomSplit",0);
+    // TODO int randomSplit = allConfig.IntValue("Forest","Use RandomSplit",0);
     //////////////////////////////////////////////////////////////////////////////
     // Read Statistic Parameter
     //////////////////////////////////////////////////////////////////////////////
@@ -148,15 +147,15 @@ int main(int argc, char* argv[])
     std::string statisticShortFilePath = allConfig.Value("Evaluation", "Statistic short output file");
     std::string statisticShortFileLabel = allConfig.Value("Evaluation", "Index for short file");
     std::string statisticGoldStandard = allConfig.Value("Evaluation", "Gold Standard Name","GTV");
-    bool statisticWithHeader = allConfig.IntValue("Evaluation", "Write header in short file",0);
+    // TODO bool statisticWithHeader = allConfig.IntValue("Evaluation", "Write header in short file",0);
     std::vector<std::string> labelGroupA = allConfig.Vector("LabelsA",0);
     std::vector<std::string> labelGroupB = allConfig.Vector("LabelsB",0);
     //////////////////////////////////////////////////////////////////////////////
     // Read Special Parameter
     //////////////////////////////////////////////////////////////////////////////
-    bool useWeightedPoints = allConfig.IntValue("Forest", "Use point-based weighting",0);
-    bool writePointsToFile = allConfig.IntValue("Forest", "Write points to file",0);
-    int importanceWeightAlgorithm = allConfig.IntValue("Forest","Importance weight Algorithm",0);
+    // TODO bool useWeightedPoints = allConfig.IntValue("Forest", "Use point-based weighting",0);
+    // TODO bool writePointsToFile = allConfig.IntValue("Forest", "Write points to file",0);
+    // TODO int importanceWeightAlgorithm = allConfig.IntValue("Forest","Importance weight Algorithm",0);
     std::string importanceWeightName = allConfig.Value("Forest","Importance weight name","");
 
     std::ofstream timingFile;
@@ -169,7 +168,7 @@ int main(int argc, char* argv[])
     // Read Images
     //////////////////////////////////////////////////////////////////////////////
     std::vector<std::string> usedModalities;
-    for (int i = 0; i < modalities.size(); ++i)
+    for (std::size_t i = 0; i < modalities.size(); ++i)
     {
       usedModalities.push_back(modalities[i]);
     }
@@ -230,7 +229,7 @@ int main(int argc, char* argv[])
     forest->SetMaximumTreeDepth(maximumTreeDepth);
     forest->SetWeightLambda(weightLambda);
 
-    // TOOD forest.UseRandomSplit(randomSplit);
+    // TODO forest.UseRandomSplit(randomSplit);
 
     if (doTraining)
     {

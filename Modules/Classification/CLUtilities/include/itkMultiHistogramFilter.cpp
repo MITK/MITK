@@ -8,12 +8,12 @@
 
 template< class TInputImageType, class TOuputImageType>
 itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilter():
-  m_Offset(-3.0), m_Delta(0.6)
+  m_Delta(0.6), m_Offset(-3.0)
 {
   this->SetNumberOfRequiredOutputs(11);
   this->SetNumberOfRequiredInputs(0);
 
-  for (int i = 0; i < 11; ++i)
+  for (unsigned int i = 0; i < 11; ++i)
   {
     this->SetNthOutput( i, this->MakeOutput(i) );
   }
@@ -53,12 +53,12 @@ void
   ConstIteratorType inputIter( size, input, input->GetLargestPossibleRegion());
   while (!inputIter.IsAtEnd())
   {
-    for (int i = 0; i < 11; ++i)
+    for (unsigned int i = 0; i < 11; ++i)
     {
       iterVector[i].SetCenterPixel(0);
     }
 
-    for (int i = 0; i < inputIter.Size(); ++i)
+    for (unsigned int i = 0; i < inputIter.Size(); ++i)
     {
       double value = inputIter.GetPixel(i);
       value -=  offset;
@@ -68,7 +68,7 @@ void
       iterVector[pos].SetCenterPixel(iterVector[pos].GetCenterPixel() + 1);
     }
 
-    for (int i = 0; i < 11; ++i)
+    for (unsigned int i = 0; i < 11; ++i)
     {
       ++(iterVector[i]);
     }
@@ -77,12 +77,12 @@ void
 }
 
 template< class TInputImageType, class TOuputImageType>
-itk::DataObject::Pointer
-  itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MakeOutput(unsigned int /*idx*/)
+itk::ProcessObject::DataObjectPointer
+  itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MakeOutput(itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/)
 {
-  DataObject::Pointer output;
+  itk::ProcessObject::DataObjectPointer output;
   output = ( TOuputImageType::New() ).GetPointer();
-  return output.GetPointer();
+  return output;
 }
 
 template< class TInputImageType, class TOuputImageType>

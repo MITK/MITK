@@ -31,13 +31,13 @@ int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
   MITK_TEST_CONDITION_REQUIRED( ref != 0, "Got valid ServiceReference" );
 
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-  MITK_TEST_CONDITION_REQUIRED( resources != NULL, "OpenCL Resource service available." );
+  MITK_TEST_CONDITION_REQUIRED( resources != nullptr, "OpenCL Resource service available." );
 
   cl_context gpuContext = resources->GetContext();
-  MITK_TEST_CONDITION_REQUIRED( gpuContext != NULL, "Got not-null OpenCL context.");
+  MITK_TEST_CONDITION_REQUIRED( gpuContext != nullptr, "Got not-null OpenCL context.");
 
   cl_device_id gpuDevice = resources->GetCurrentDevice();
-  MITK_TEST_CONDITION_REQUIRED( gpuDevice != NULL, "Got not-null OpenCL device.");
+  MITK_TEST_CONDITION_REQUIRED( gpuDevice != nullptr, "Got not-null OpenCL device.");
 
   //create a random image
   mitk::Image::Pointer reference;
@@ -64,7 +64,7 @@ int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
 
   // test if oclImage correct initialized
   MITK_TEST_CONDITION( oclTestImage->GetMITKImage() == reference, "oclImage has the correct reference mitk::Image");
-  MITK_TEST_CONDITION( oclTestImage->GetDimension() == reference->GetDimension(), "Same dimensionality.");
+  MITK_TEST_CONDITION( (unsigned int)oclTestImage->GetDimension() == reference->GetDimension(), "Same dimensionality.");
 
   cl_int clErr = 0;
   cl_command_queue cmdQueue = clCreateCommandQueue( gpuContext, gpuDevice,
@@ -79,7 +79,7 @@ int mitkOclImageTest( int /*argc*/, char* /*argv*/[] )
 
     // check if the created GPU object is valid
     cl_mem gpuImage = oclTestImage->GetGPUImage(cmdQueue);
-    MITK_TEST_CONDITION_REQUIRED( gpuImage != NULL, "oclImage returned a valid GPU memory pointer");
+    MITK_TEST_CONDITION_REQUIRED( gpuImage != nullptr, "oclImage returned a valid GPU memory pointer");
     size_t returned = 0;
     cl_image_format imgFmt;
     clErr = clGetImageInfo( gpuImage, CL_IMAGE_FORMAT, sizeof(cl_image_format),

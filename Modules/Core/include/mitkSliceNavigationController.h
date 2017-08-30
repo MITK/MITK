@@ -279,7 +279,7 @@ namespace mitk
     /**
      * \brief Set the RenderingManager to be used
      *
-     * If \a NULL, the default RenderingManager will be used.
+     * If \a nullptr, the default RenderingManager will be used.
      */
     itkSetObjectMacro(RenderingManager, RenderingManager);
     mitk::RenderingManager *GetRenderingManager() const;
@@ -428,7 +428,7 @@ namespace mitk
 
     /** \brief Gets the BaseRenderer associated with this SNC (if any). While
      * the BaseRenderer is not directly used by SNC, this is a convenience
-     * method to enable BaseRenderer access via the SNC. Returns NULL if no
+     * method to enable BaseRenderer access via the SNC. Returns nullptr if no
      * BaseRenderer has been specified*/
     BaseRenderer *GetRenderer() const;
 

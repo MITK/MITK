@@ -58,6 +58,7 @@ namespace mitk
     itkSetMacro(InterPixelDistance,mitk::ToFProcessingCommon::ToFPoint2D);
     itkGetMacro(InterPixelDistance,mitk::ToFProcessingCommon::ToFPoint2D);
 
+    using itk::ProcessObject::SetInput;
 
     /*!
     \brief Sets the input of this filter
@@ -70,7 +71,7 @@ namespace mitk
     \param idx number of the current input
     \param distanceImage input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput(unsigned int idx,const Image* distanceImage);
+    virtual void SetInput(unsigned int idx, const Image *distanceImage);
 
     /*!
     \brief Returns the input of this filter

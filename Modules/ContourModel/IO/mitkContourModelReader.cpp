@@ -59,11 +59,11 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::Read()
 
       /*++++ handle n contourModels within data tags ++++*/
       for (TiXmlElement *currentContourElement = docHandle.FirstChildElement("contourModel").ToElement();
-           currentContourElement != NULL;
+           currentContourElement != nullptr;
            currentContourElement = currentContourElement->NextSiblingElement())
       {
         mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
-        if (currentContourElement->FirstChildElement("data")->FirstChildElement("timestep") != NULL)
+        if (currentContourElement->FirstChildElement("data")->FirstChildElement("timestep") != nullptr)
         {
           // handle geometry information
           // TiXmlElement* currentGeometryInfo =
@@ -73,7 +73,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::Read()
           /*++++ handle n timesteps within timestep tags ++++*/
           for (TiXmlElement *currentTimeSeries =
                  currentContourElement->FirstChildElement("data")->FirstChildElement("timestep")->ToElement();
-               currentTimeSeries != NULL;
+               currentTimeSeries != nullptr;
                currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
             unsigned int currentTimeStep(0);
@@ -131,11 +131,11 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
   }
 
   // read all points within controlPoints tag
-  if (currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point") != NULL)
+  if (currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point") != nullptr)
   {
     for (TiXmlElement *currentPoint =
            currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point")->ToElement();
-         currentPoint != NULL;
+         currentPoint != nullptr;
          currentPoint = currentPoint->NextSiblingElement())
     {
       double x(0.0);

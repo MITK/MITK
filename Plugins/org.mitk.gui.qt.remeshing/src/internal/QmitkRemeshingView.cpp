@@ -207,7 +207,7 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
 
 void QmitkRemeshingView::OnSelectedSurfaceChanged(const mitk::DataNode *node)
 {
-  if (node != NULL)
+  if (node != nullptr)
   {
     int numVertices = static_cast<int>(static_cast<mitk::Surface*>(node->GetData())->GetVtkPolyData()->GetNumberOfPoints());
     int minimum = numVertices < 100 ? numVertices : 100;

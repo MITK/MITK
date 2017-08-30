@@ -170,7 +170,7 @@ void QmitkNDIPolarisWidget::LoadUISettings()
 
 mitk::IlluminationActivationRate QmitkNDIPolarisWidget::GetPolarisFrameRate()
 {
-  mitk::IlluminationActivationRate frameRate;
+  mitk::IlluminationActivationRate frameRate = mitk::Hz20;
   QString comboBox = m_Controls->m_frameRateComboBoxPolaris->currentText();
   if (comboBox == "20 Hz") frameRate = mitk::Hz20;
   else if (comboBox == "30 Hz") frameRate = mitk::Hz30;

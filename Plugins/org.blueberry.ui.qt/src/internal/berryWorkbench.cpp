@@ -748,7 +748,7 @@ void Workbench::InitializeDefaultServices()
    * of wrappers for legacy APIs. By the time this phase completes, any
    * code trying to access commands through legacy APIs should work.
    */
-  //IHandlerService* handlerService = NULL;
+  //IHandlerService* handlerService = nullptr;
 //      StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
 //        public void runWithException() {

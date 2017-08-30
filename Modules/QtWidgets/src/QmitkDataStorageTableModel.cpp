@@ -146,7 +146,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       // get name of node (may also be edited)
       if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
-        data = QFile::encodeName(nodeName.c_str());
+        data = QString::fromStdString(nodeName);
       }
       else if (role == QmitkDataNodeRole)
       {
@@ -420,7 +420,7 @@ void QmitkDataStorageTableModel::Reset()
     if (m_Predicate.IsNotNull())
       // get subset
       _NodeSet = m_DataStorage->GetSubset(m_Predicate);
-    // if predicate is NULL, select all nodes
+    // if predicate is nullptr, select all nodes
     else
     {
       _NodeSet = m_DataStorage->GetAll();

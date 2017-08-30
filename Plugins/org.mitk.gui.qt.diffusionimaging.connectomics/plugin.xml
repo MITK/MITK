@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+  
+    <view id="org.mitk.views.connectomicsdata"
+    name="Network Data"
+    category="Connectomics"
+    class="QmitkConnectomicsDataView"
+    icon="resources/QmitkConnectomicsDataViewIcon_48.png">
+    <keywordReference id="org.mitk.views.connectomicsdata.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.connectomicsstatistics"
+    name="Network Statistics"
+    category="Connectomics"
+    class="QmitkConnectomicsStatisticsView"
+    icon="resources/QmitkConnectomicsStatisticsViewIcon_48.png">
+    <keywordReference id="org.mitk.views.connectomicsstatistics.Keyword"/>
+    </view>
+          
+    <view id="org.mitk.views.randomparcellationview"
+          name="Random Parcellation View"
+          category="Connectomics"
+          class="QmitkRandomParcellationView"
+          icon="resources/QmitkRandomParcellationIcon.png" >
+    <keywordReference id="org.mitk.views.randomparcellationview.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.connectomicsnetworkoperations"
+    name="Network Operations"
+    category="Connectomics"
+    class="QmitkConnectomicsNetworkOperationsView"
+    icon="resources/QmitkConnectomicsNetworkOperationsViewIcon_48.png">
+    <keywordReference id="org.mitk.views.connectomicsnetworkoperations.Keyword"/>
+    </view>
+	
+  </extension>
+  
+  
+    <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.connectomics"
+    name="Connectomics"
+    class="QmitkConnectomicsPerspective"
+    icon="resources/parcellation.png">
+    <keywordReference id="org.mitk.perspectives.connectomics.Keyword"/>
+    </perspective>
+  
+  </extension>  
+  
+</plugin>

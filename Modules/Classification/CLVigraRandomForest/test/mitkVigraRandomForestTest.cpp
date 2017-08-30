@@ -130,12 +130,10 @@ public:
     /* Testing the matching between the calculated colunmvector and the result of the RandomForest */
     unsigned int maxrows = classes.rows();
 
-    bool isYPredictVector = false;
     int count = 0;
 
     for(unsigned int i= 0; i < maxrows; i++){
       if(classes(i,0) == Labels_Testing(i,0)){
-        isYPredictVector = true;
         count++;
       }
     }

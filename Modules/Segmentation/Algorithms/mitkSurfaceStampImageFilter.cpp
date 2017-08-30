@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTriangleMeshToBinaryImageFilter.h>
 
 mitk::SurfaceStampImageFilter::SurfaceStampImageFilter()
-  : m_MakeOutputBinary(false), m_OverwriteBackground(false), m_ForegroundValue(1.0), m_BackgroundValue(0.0)
+  : m_MakeOutputBinary(false), m_OverwriteBackground(false), m_BackgroundValue(0.0), m_ForegroundValue(1.0)
 {
 }
 
@@ -54,7 +54,7 @@ void mitk::SurfaceStampImageFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 
-  if (inputImage.IsNull() || (inputImage->IsInitialized() == false) || (inputImage->GetTimeGeometry() == NULL))
+  if (inputImage.IsNull() || (inputImage->IsInitialized() == false) || (inputImage->GetTimeGeometry() == nullptr))
     return;
 
   if (m_MakeOutputBinary)
@@ -147,7 +147,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   vtkPoints *points = polydata->GetPoints();
 
   MeshType::PointType point;
-  for (int i = 0; i < numberOfPoints; i++)
+  for (unsigned int i = 0; i < numberOfPoints; i++)
   {
     double *aux = points->GetPoint(i);
     point[0] = aux[0];
@@ -166,7 +166,6 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   // Read the number of polygons
   CellIdentifierType numberOfPolygons = 0;
   numberOfPolygons = polydata->GetNumberOfPolys();
-  vtkCellArray *polys = polydata->GetPolys();
 
   PointIdentifierType numberOfCellPoints = 3;
   CellIdentifierType i = 0;

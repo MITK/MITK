@@ -54,7 +54,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::Read
     // unsigned int pointSetCounter(0);
     for (TiXmlElement *currentPointSetElement =
            docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
-         currentPointSetElement != NULL;
+         currentPointSetElement != nullptr;
          currentPointSetElement = currentPointSetElement->NextSiblingElement())
     {
       mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
@@ -63,10 +63,10 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::Read
       // else the SetPoint method would already transform the points that we provide it
       mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
 
-      if (currentPointSetElement->FirstChildElement("time_series") != NULL)
+      if (currentPointSetElement->FirstChildElement("time_series") != nullptr)
       {
         for (TiXmlElement *currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
-             currentTimeSeries != NULL;
+             currentTimeSeries != nullptr;
              currentTimeSeries = currentTimeSeries->NextSiblingElement())
         {
           unsigned int currentTimeStep(0);
@@ -233,9 +233,9 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::
                                                                 TiXmlElement *currentTimeSeries,
                                                                 unsigned int currentTimeStep)
 {
-  if (currentTimeSeries->FirstChildElement("point") != NULL)
+  if (currentTimeSeries->FirstChildElement("point") != nullptr)
   {
-    for (TiXmlElement *currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement(); currentPoint != NULL;
+    for (TiXmlElement *currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement(); currentPoint != nullptr;
          currentPoint = currentPoint->NextSiblingElement())
     {
       unsigned int id(0);
@@ -245,7 +245,7 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::
       double z(0.0);
 
       id = atoi(currentPoint->FirstChildElement("id")->GetText());
-      if (currentPoint->FirstChildElement("specification") != NULL)
+      if (currentPoint->FirstChildElement("specification") != nullptr)
       {
         spec = (mitk::PointSpecificationType)atoi(currentPoint->FirstChildElement("specification")->GetText());
       }

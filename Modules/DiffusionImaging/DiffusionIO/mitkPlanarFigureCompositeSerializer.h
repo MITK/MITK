@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 /**
-  \brief Serializes mitk::Surface for mitk::SceneIO
+  \brief Serializes mitk::PlanarFigureComposite for mitk::SceneIO
 */
 class PlanarFigureCompositeSerializer : public BaseDataSerializer
 {

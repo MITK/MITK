@@ -77,7 +77,7 @@ public:
   void UpdateDataDisplay();
 
   mitk::ToolManager *GetToolManager();
-  void SetToolManager(mitk::ToolManager &); // no NULL pointer allowed here, a manager is required
+  void SetToolManager(mitk::ToolManager &); // no nullptr pointer allowed here, a manager is required
 
   void OnToolManagerReferenceDataModified();
 

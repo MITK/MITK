@@ -31,7 +31,7 @@ int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char *argv[])
     mitk::MultiComponentImageDataComparisonFilter::New();
   MITK_TEST_CONDITION_REQUIRED(testObject.IsNotNull(), "Testing instantiation of test class!");
 
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCompareFilterResult() == NULL, "Testing initialization of result struct");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCompareFilterResult() == nullptr, "Testing initialization of result struct");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetTolerance() == 0.0f, "Testing initialization of tolerance member");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetResult() == false, "Testing initialization of CompareResult member");
 
@@ -45,12 +45,12 @@ int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char *argv[])
   compareResult.m_PixelsWithDifference = 0;
   testObject->SetCompareFilterResult(&compareResult);
 
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCompareFilterResult() != NULL,
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCompareFilterResult() != nullptr,
                                "Testing set/get of compare result struct");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetResult() == false, "CompareResult still false");
 
   // now load an image with several components and present it to the filter
-  mitk::Image::Pointer testImg = mitk::IOUtil::LoadImage(argv[1]);
+  mitk::Image::Pointer testImg = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
   mitk::Image::Pointer testImg2 = testImg->Clone();
 
   testObject->SetValidImage(testImg);

@@ -31,11 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::PlanarFigureSegmentationController::PlanarFigureSegmentationController()
   : itk::Object(),
-    m_ReduceFilter(NULL),
-    m_NormalsFilter(NULL),
-    m_DistanceImageCreator(NULL),
-    m_ReferenceImage(NULL),
-    m_SegmentationAsImage(NULL)
+    m_ReduceFilter(nullptr),
+    m_NormalsFilter(nullptr),
+    m_DistanceImageCreator(nullptr),
+    m_ReferenceImage(nullptr),
+    m_SegmentationAsImage(nullptr)
 {
   InitializeFilters();
 }
@@ -66,7 +66,7 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure(mitk::PlanarFigur
     }
   }
 
-  mitk::Surface::Pointer figureAsSurface = NULL;
+  mitk::Surface::Pointer figureAsSurface = nullptr;
 
   if (newFigure)
   {
@@ -169,7 +169,7 @@ void mitk::PlanarFigureSegmentationController::GetImageBase(itk::Image<TPixel, V
 
 mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationResult()
 {
-  m_SegmentationAsImage = NULL;
+  m_SegmentationAsImage = nullptr;
 
   if (m_PlanarFigureList.size() == 0)
   {
@@ -191,10 +191,10 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
 
   // Cleanup the pipeline
   distanceImage->DisconnectPipeline();
-  m_DistanceImageCreator = NULL;
-  m_NormalsFilter = NULL;
-  m_ReduceFilter = NULL;
-  itkImage = NULL;
+  m_DistanceImageCreator = nullptr;
+  m_NormalsFilter = nullptr;
+  m_ReduceFilter = nullptr;
+  itkImage = nullptr;
 
   // If this bool flag is true, the distanceImage will be written to the
   // filesystem as nrrd-image and as surface-representation.
@@ -213,7 +213,7 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
 
   // Cleanup the pipeline
   segmentationAsSurface->DisconnectPipeline();
-  imageToSurfaceFilter = NULL;
+  imageToSurfaceFilter = nullptr;
 
   if (debugOutput)
   {
@@ -239,8 +239,8 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
 {
   if (figure.IsNull())
   {
-    MITK_ERROR << "Given PlanarFigure is NULL. Please provide valid PlanarFigure.";
-    return NULL;
+    MITK_ERROR << "Given PlanarFigure is nullptr. Please provide valid PlanarFigure.";
+    return nullptr;
   }
 
   mitk::Surface::Pointer newSurface = mitk::Surface::New();

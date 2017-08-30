@@ -218,7 +218,7 @@ static std::string GetPositionInWorld(mitk::InteractionEvent *event)
 {
   std::stringstream ss;
   mitk::InteractionPositionEvent *pe = dynamic_cast<mitk::InteractionPositionEvent *>(event);
-  if (pe != NULL)
+  if (pe != nullptr)
   {
     mitk::Point3D p = pe->GetPositionInWorld();
     ss << p[0] << "," << p[1] << "," << p[2];
@@ -235,7 +235,7 @@ static std::string GetPositionOnScreen(mitk::InteractionEvent *event)
 {
   std::stringstream ss;
   mitk::InteractionPositionEvent *pe = dynamic_cast<mitk::InteractionPositionEvent *>(event);
-  if (pe != NULL)
+  if (pe != nullptr)
   {
     mitk::Point2D p = pe->GetPointerPositionOnScreen();
     ss << p[0] << "," << p[1];
@@ -397,7 +397,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   list->GetStringProperty(InteractionEventConst::xmlEventPropertySignalName().c_str(), strSignalName);
 
   // Get BaseRenderer by name
-  mitk::BaseRenderer *renderer = NULL;
+  mitk::BaseRenderer *renderer = nullptr;
   std::string strRenderer;
 
   // only search for a renderer if there is at least one renderer registered
@@ -410,7 +410,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
 
     // if not found always use first registered renderer
-    if (renderer == NULL)
+    if (renderer == nullptr)
       renderer = (*(mitk::BaseRenderer::baseRendererMap.cbegin())).second;
   }
 
@@ -454,7 +454,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "INTERNALEVENT")
   {
-    event = InternalEvent::New(renderer, NULL, strSignalName);
+    event = InternalEvent::New(renderer, nullptr, strSignalName);
   }
   else if (eventClass == "INTERACTIONEVENT")
   {
@@ -465,7 +465,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     MITK_WARN << "Event couldn't be constructed. Please check your StateMachine patterns and config files\n for the "
                  "following event class, which is not valid: "
               << eventClass;
-    return NULL;
+    return nullptr;
   }
   return event;
 }
@@ -473,7 +473,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
 {
   InternalEvent *ie = dynamic_cast<InternalEvent *>(event);
-  if (ie != NULL)
+  if (ie != nullptr)
     return "";
 
   std::string eventClass = event->GetNameOfClass();

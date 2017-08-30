@@ -43,7 +43,7 @@ using namespace mitk;
 using namespace std;
 
 QmitkOtsuAction::QmitkOtsuAction()
-: m_OtsuSegmentationDialog(NULL)
+: m_OtsuSegmentationDialog(nullptr)
 {
 }
 
@@ -96,7 +96,7 @@ void QmitkOtsuAction::OtsuSegmentationDone()
   this->PerformOtsuSegmentation();
 
   m_OtsuSegmentationDialog->deleteLater();
-  m_OtsuSegmentationDialog = NULL;
+  m_OtsuSegmentationDialog = nullptr;
 
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -106,7 +106,7 @@ void QmitkOtsuAction::SetDataStorage(DataStorage *dataStorage)
   m_DataStorage = dataStorage;
 }
 
-void QmitkOtsuAction::SetFunctionality(QtViewPart* /*functionality*/)
+void QmitkOtsuAction::SetFunctionality(QtViewPart* /*view*/)
 {
 }
 
@@ -117,7 +117,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
   int numberOfThresholds = this->m_OtsuSpinBox->value() - 1;
   int proceed;
 
-  QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
+  QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, nullptr, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
   if (numberOfThresholds >= 5)
   {
     proceed = messageBox->exec();

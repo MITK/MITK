@@ -107,12 +107,15 @@ void mitk::NavigationDataToPointSetFilter::CreateOutputsForAllInputs()
   }
 
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
+  {
     if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
     }
-    this->Modified();
+  }
+
+  this->Modified();
 }
 
 

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkNavigationToolCreationAdvancedWidget::VIEW_ID = "org.mitk.views.navigationtoolcreationadvancedwidget";
 
 QmitkNavigationToolCreationAdvancedWidget::QmitkNavigationToolCreationAdvancedWidget(QWidget* parent, Qt::WindowFlags f)
-  : QDialog(parent, f), m_Controls(NULL), m_DataStorage(NULL), m_ToolTipSurface(NULL), m_ManipulatedToolTip(NULL),
+  : QDialog(parent, f), m_Controls(nullptr), m_DataStorage(nullptr), m_ToolTipSurface(nullptr), m_ManipulatedToolTip(nullptr),
   m_SurfaceNodeName("")
 {
   CreateQtPartControl(this);
@@ -85,8 +85,8 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
    if (m_DataStorage.IsNull()) return;
 
    //reset some variables
-   m_ManipulatedToolTip = NULL;
-   m_ToolTipSurface = NULL;
+   m_ManipulatedToolTip = nullptr;
+   m_ToolTipSurface = nullptr;
    m_SurfaceNodeName = "";
    mitk::Geometry3D::Pointer geo3d = mitk::Geometry3D::New();
    mitk::BaseGeometry::Pointer emptyGeo = dynamic_cast<mitk::BaseGeometry*>(geo3d.GetPointer());
@@ -96,7 +96,7 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
    this->RetrieveAndInitializeDataForTooltipManipulation();
 
    //care for new data nodes
-   mitk::DataNode::Pointer manipulatedTipNode = NULL;
+   mitk::DataNode::Pointer manipulatedTipNode = nullptr;
    if(!m_DataStorage->Exists(m_DataStorage->GetNamedNode("ManipulatedToolTip")))
     {
       manipulatedTipNode = mitk::DataNode::New();
@@ -123,7 +123,7 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
 
   if(m_ToolTipSurface.IsNotNull())
   {
-    mitk::DataNode::Pointer toolTipNode = NULL;
+    mitk::DataNode::Pointer toolTipNode = nullptr;
 
     if(m_SurfaceNodeName.empty())
     {
@@ -162,9 +162,9 @@ void QmitkNavigationToolCreationAdvancedWidget::SetDefaultTooltip(mitk::AffineTr
   m_DefaultToolTip = defaultToolTip;
 }
 
-void QmitkNavigationToolCreationAdvancedWidget::SetToolTipSurface( bool cone, mitk::DataNode::Pointer node /*= NULL*/ )
+void QmitkNavigationToolCreationAdvancedWidget::SetToolTipSurface( bool cone, mitk::DataNode::Pointer node /*= nullptr*/ )
 {
-  m_ToolTipSurface = NULL;
+  m_ToolTipSurface = nullptr;
   if(cone)
   {
     m_ToolTipSurface = mitk::Surface::New();

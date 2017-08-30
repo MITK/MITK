@@ -52,6 +52,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="checkBoxLogMessages">
+     <property name="text">
+      <string>Log incoming / outgoing messages</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QmitkIGTLDeviceSourceManagementWidget" name="m_SourceManagerWidget" native="true"/>
    </item>
    <item>

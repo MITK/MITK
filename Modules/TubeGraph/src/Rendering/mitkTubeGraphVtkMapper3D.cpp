@@ -47,7 +47,7 @@ mitk::TubeGraphVtkMapper3D::~TubeGraphVtkMapper3D()
 
 const mitk::TubeGraph *mitk::TubeGraphVtkMapper3D::GetInput()
 {
-  return dynamic_cast<const TubeGraph *>(GetData());
+  return dynamic_cast<const TubeGraph *>(GetDataNode()->GetData());
 }
 
 vtkProp *mitk::TubeGraphVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
@@ -66,7 +66,7 @@ void mitk::TubeGraphVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   if (tubeGraph.IsNull() || tubeGraphProperty.IsNull())
   {
-    itkWarningMacro(<< "Input of tube graph mapper is NULL!");
+    itkWarningMacro(<< "Input of tube graph mapper is nullptr!");
     return;
   }
   // Check if the tube graph has changed; if the data has changed, generate the spheres and tubes new;
@@ -453,7 +453,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
     EdgeDescriptorType edgeDesc = graph->GetEdgeDescriptor(*edge);
 
     // get source and target vertex descriptor
-    std::pair<TubeGraphVertex, TubeGraphVertex> soureTargetPair = graph->GetVerticesOfAnEdge(edgeDesc);
+    auto soureTargetPair = graph->GetVerticesOfAnEdge(edgeDesc);
     TubeGraphVertex source = soureTargetPair.first;
     TubeGraphVertex target = soureTargetPair.second;
 
@@ -531,8 +531,8 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
       {
         double lastDistance = 0, distance = 0;
         // Get the first element behind the radius of the sphere; now backwards through the element list
-        unsigned int index = (*edge).GetNumberOfElements() - 1;
-        for (; index >= 0; index--)
+        int index = (*edge).GetNumberOfElements();
+        for ( ; index >= 0; --index)
         {
           mitk::Vector3D diffVec = (*edge).GetTubeElement(index)->GetCoordinates() - centerVertex;
           distance = std::sqrt(pow(diffVec[0], 2) + pow(diffVec[1], 2) + pow(diffVec[2], 2));
@@ -547,7 +547,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
 
           interpolationValue = (radius - lastDistance) / (distance - lastDistance);
 
-          if (index == (*edge).GetNumberOfElements() - 1)
+          if (index == static_cast<int>((*edge).GetNumberOfElements() - 1))
           {
             if (dynamic_cast<mitk::CircularProfileTubeElement *>(
                   (*edge).GetTubeElement((*edge).GetNumberOfElements() - 1)))
@@ -565,11 +565,10 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
               outsideSphereDiameter =
                 (dynamic_cast<mitk::CircularProfileTubeElement *>((*edge).GetTubeElement(index)))->GetDiameter();
           }
-          // interpolate the diameter for clipping
+        // interpolate the diameter for clipping
           cylinderDiameter =
             (1 - interpolationValue) * withinSphereDiameter + interpolationValue * outsideSphereDiameter;
         }
-
         // Get the reference point, so the direction of the tube can be calculated
         edgeDirectionPoint = (*edge).GetTubeElement((*edge).GetNumberOfElements() - 1)->GetCoordinates();
       }
@@ -685,7 +684,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
     vtkSmartPointer<vtkPolyDataMapper> sphereMapper =
       dynamic_cast<vtkPolyDataMapper *>(ls->m_vtkSpheresActorMap[vertexDesc]->GetMapper());
 
-    if (sphereMapper != NULL)
+    if (sphereMapper != nullptr)
     {
       // first clip the sphere with the cylinder
       vtkSmartPointer<vtkClipPolyData> clipperSphere = vtkSmartPointer<vtkClipPolyData>::New();
@@ -716,7 +715,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
         vtkSmartPointer<vtkPolyDataMapper> tubeMapper =
           dynamic_cast<vtkPolyDataMapper *>(ls->m_vtkTubesActorMap[toBeClippedTube]->GetMapper());
 
-        if (tubeMapper != NULL)
+        if (tubeMapper != nullptr)
         {
           // first clip the sphere with the cylinder
           vtkSmartPointer<vtkClipPolyData> clipperTube = vtkSmartPointer<vtkClipPolyData>::New();
@@ -747,7 +746,7 @@ bool mitk::TubeGraphVtkMapper3D::ClipStructures()
   DataNode::Pointer node = this->GetDataNode();
   if (node.IsNull())
   {
-    itkWarningMacro(<< "associated node is NULL!");
+    itkWarningMacro(<< "associated node is nullptr!");
     return false;
   }
 

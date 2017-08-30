@@ -35,7 +35,7 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
 
 //  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
 
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage( argv[1] );
+  mitk::Image::Pointer inputImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( argv[1] )[0].GetPointer());
   DiffusionImageType* dwimage =
       static_cast<DiffusionImageType*>( inputImage.GetPointer() );
 
@@ -48,7 +48,7 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
 
   try
   {
-    mitk::IOUtil::SaveBaseData(corrfilter->GetOutput(), argv[2]);
+    mitk::IOUtil::Save(corrfilter->GetOutput(), argv[2]);
   }
   catch( const itk::ExceptionObject& e)
   {

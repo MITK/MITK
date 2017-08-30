@@ -199,7 +199,7 @@ bool PerspectiveExtensionReader::ProcessView(
   else
   {
     // The ratio has not been specified.
-    ratio = IPageLayout::NULL_RATIO;
+    ratio = IPageLayout::nullptr_RATIO;
   }
 
 
@@ -241,7 +241,7 @@ bool PerspectiveExtensionReader::ProcessView(
 //  // If the view is a fast view...
 //  else if (fast)
 //  {
-//    if (ratio == IPageLayout::NULL_RATIO)
+//    if (ratio == IPageLayout::nullptr_RATIO)
 //    {
 //      // The ratio has not been specified.
 //      pageLayout->AddFastView(id);
@@ -256,7 +256,7 @@ bool PerspectiveExtensionReader::ProcessView(
 
     // The view is a regular view.
     // If the ratio is not specified or is invalid, use the default ratio.
-    if (ratio == IPageLayout::NULL_RATIO || ratio == IPageLayout::INVALID_RATIO)
+    if (ratio == IPageLayout::nullptr_RATIO || ratio == IPageLayout::INVALID_RATIO)
     {
       ratio = IPageLayout::DEFAULT_VIEW_RATIO;
     }

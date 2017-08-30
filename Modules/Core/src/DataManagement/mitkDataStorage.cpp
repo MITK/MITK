@@ -42,14 +42,14 @@ mitk::DataStorage::~DataStorage()
 void mitk::DataStorage::Add(mitk::DataNode *node, mitk::DataNode *parent)
 {
   mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
-  if (parent != NULL) //< Return empty set if parent is null
+  if (parent != nullptr) //< Return empty set if parent is null
     parents->InsertElement(0, parent);
   this->Add(node, parents);
 }
 
 void mitk::DataStorage::Remove(const mitk::DataStorage::SetOfObjects *nodes)
 {
-  if (nodes == NULL)
+  if (nodes == nullptr)
     return;
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
     this->Remove(it.Value());
@@ -64,8 +64,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
 mitk::DataNode *mitk::DataStorage::GetNamedNode(const char *name) const
 
 {
-  if (name == NULL)
-    return NULL;
+  if (name == nullptr)
+    return nullptr;
 
   mitk::StringProperty::Pointer s(mitk::StringProperty::New(name));
   mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("name", s);
@@ -73,27 +73,27 @@ mitk::DataNode *mitk::DataStorage::GetNamedNode(const char *name) const
   if (rs->Size() >= 1)
     return rs->GetElement(0);
   else
-    return NULL;
+    return nullptr;
 }
 
 mitk::DataNode *mitk::DataStorage::GetNode(const NodePredicateBase *condition) const
 {
-  if (condition == NULL)
-    return NULL;
+  if (condition == nullptr)
+    return nullptr;
 
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(condition);
   if (rs->Size() >= 1)
     return rs->GetElement(0);
   else
-    return NULL;
+    return nullptr;
 }
 
 mitk::DataNode *mitk::DataStorage::GetNamedDerivedNode(const char *name,
                                                        const mitk::DataNode *sourceNode,
                                                        bool onlyDirectDerivations) const
 {
-  if (name == NULL)
-    return NULL;
+  if (name == nullptr)
+    return nullptr;
 
   mitk::StringProperty::Pointer s(mitk::StringProperty::New(name));
   mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("name", s);
@@ -101,7 +101,7 @@ mitk::DataNode *mitk::DataStorage::GetNamedDerivedNode(const char *name,
   if (rs->Size() >= 1)
     return rs->GetElement(0);
   else
-    return NULL;
+    return nullptr;
 }
 
 void mitk::DataStorage::PrintSelf(std::ostream &os, itk::Indent indent) const
@@ -114,7 +114,7 @@ void mitk::DataStorage::PrintSelf(std::ostream &os, itk::Indent indent) const
     std::string name;
     allIt.Value()->GetName(name);
     std::string datatype;
-    if (allIt.Value()->GetData() != NULL)
+    if (allIt.Value()->GetData() != nullptr)
       datatype = allIt.Value()->GetData()->GetNameOfClass();
     os << indent << " " << allIt.Value().GetPointer() << "<" << datatype << ">: " << name << std::endl;
     mitk::DataStorage::SetOfObjects::ConstPointer parents = this->GetSources(allIt.Value());
@@ -143,12 +143,12 @@ void mitk::DataStorage::PrintSelf(std::ostream &os, itk::Indent indent) const
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObjects(
   const SetOfObjects *set, const NodePredicateBase *condition) const
 {
-  if (set == NULL)
-    return NULL;
+  if (set == nullptr)
+    return nullptr;
 
   mitk::DataStorage::SetOfObjects::Pointer result = mitk::DataStorage::SetOfObjects::New();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
-    if (condition == NULL ||
+    if (condition == nullptr ||
         condition->CheckNode(it.Value()) ==
           true) // alway copy the set, otherwise the iterator in mitk::DataStorage::Remove() will crash
       result->InsertElement(result->Size(), it.Value());
@@ -169,7 +169,7 @@ const mitk::DataNode::GroupTagList mitk::DataStorage::GetGroupTags() const
     mitk::PropertyList *pl = nodeIt.Value()->GetPropertyList();
     for (mitk::PropertyList::PropertyMap::const_iterator propIt = pl->GetMap()->begin(); propIt != pl->GetMap()->end();
          ++propIt)
-      if (dynamic_cast<mitk::GroupTagProperty *>(propIt->second.GetPointer()) != NULL)
+      if (dynamic_cast<mitk::GroupTagProperty *>(propIt->second.GetPointer()) != nullptr)
         result.insert(propIt->first);
   }
 
@@ -260,7 +260,7 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
                                                                          const mitk::BaseRenderer *renderer,
                                                                          const char *boolPropertyKey2) const
 {
-  if (input == NULL)
+  if (input == nullptr)
     throw std::invalid_argument("DataStorage: input is invalid");
 
   BoundingBox::PointsContainer::Pointer pointscontainer = BoundingBox::PointsContainer::New();
@@ -286,12 +286,12 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
   for (SetOfObjects::ConstIterator it = input->Begin(); it != input->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-    if ((node.IsNotNull()) && (node->GetData() != NULL) && (node->GetData()->IsEmpty() == false) &&
+    if ((node.IsNotNull()) && (node->GetData() != nullptr) && (node->GetData()->IsEmpty() == false) &&
         node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
     {
       const TimeGeometry *timeGeometry = node->GetData()->GetUpdatedTimeGeometry();
 
-      if (timeGeometry != NULL)
+      if (timeGeometry != nullptr)
       {
         // bounding box (only if non-zero)
         BoundingBox::BoundsArrayType itkBounds = timeGeometry->GetBoundingBoxInWorld()->GetBounds();
@@ -374,7 +374,7 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
   }
   numberOfTimeSteps = static_cast<unsigned int>((maximalTime - minimalTime) / minimalIntervallSize);
 
-  TimeGeometry::Pointer timeGeometry = NULL;
+  TimeGeometry::Pointer timeGeometry = nullptr;
   if (result->GetPoints()->Size() > 0)
   {
     // Initialize a geometry of a single time step
@@ -432,11 +432,11 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox(const char *boo
   for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-    if ((node.IsNotNull()) && (node->GetData() != NULL) && (node->GetData()->IsEmpty() == false) &&
+    if ((node.IsNotNull()) && (node->GetData() != nullptr) && (node->GetData()->IsEmpty() == false) &&
         node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
     {
       const TimeGeometry *geometry = node->GetData()->GetUpdatedTimeGeometry();
-      if (geometry != NULL)
+      if (geometry != nullptr)
       {
         // bounding box (only if non-zero)
         BoundingBox::BoundsArrayType itkBounds = geometry->GetBoundingBoxInWorld()->GetBounds();
@@ -485,11 +485,11 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds(const char *boolPropertyKe
   for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-    if ((node.IsNotNull()) && (node->GetData() != NULL) && (node->GetData()->IsEmpty() == false) &&
+    if ((node.IsNotNull()) && (node->GetData() != nullptr) && (node->GetData()->IsEmpty() == false) &&
         node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
     {
       const TimeGeometry *geometry = node->GetData()->GetUpdatedTimeGeometry();
-      if (geometry != NULL)
+      if (geometry != nullptr)
       {
         const TimeBounds &curTimeBounds = geometry->GetTimeBounds();
         cur = curTimeBounds[0];

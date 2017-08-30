@@ -366,7 +366,7 @@ SmartPointer<T>::SmartPointer(const WeakPointer<Other>& wp)
   }
   else
   {
-    throw BadWeakPointerException("Weak pointer is NULL");
+    throw BadWeakPointerException("Weak pointer is nullptr");
   }
 }
 

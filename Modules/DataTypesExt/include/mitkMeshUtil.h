@@ -55,7 +55,7 @@ class NullScalarAccessor
 public:
   static inline double GetPointScalar(typename MeshType::PointDataContainer * /*pointData*/,
                                       typename MeshType::PointIdentifier /*idx*/,
-                                      MeshType * /*mesh*/ = NULL,
+                                      MeshType * /*mesh*/ = nullptr,
                                       unsigned int /*type*/ = 0)
   {
     return (double)0.0;
@@ -63,7 +63,7 @@ public:
 
   static inline double GetCellScalar(typename MeshType::CellDataContainer * /*cellData*/,
                                      typename MeshType::CellIdentifier /*idx*/,
-                                     MeshType * /*mesh*/ = NULL,
+                                     MeshType * /*mesh*/ = nullptr,
                                      unsigned int /*type*/ = 0)
   {
     return (double)0.0;
@@ -76,7 +76,7 @@ class MeshScalarAccessor
 public:
   static inline double GetPointScalar(typename MeshType::PointDataContainer *pointData,
                                       typename MeshType::PointIdentifier idx,
-                                      MeshType * /*mesh*/ = NULL,
+                                      MeshType * /*mesh*/ = nullptr,
                                       unsigned int /*type*/ = 0)
   {
     return (double)pointData->GetElement(idx);
@@ -84,7 +84,7 @@ public:
 
   static inline double GetCellScalar(typename MeshType::CellDataContainer *cellData,
                                      typename MeshType::CellIdentifier idx,
-                                     MeshType * /*mesh*/ = NULL,
+                                     MeshType * /*mesh*/ = nullptr,
                                      unsigned int /*type*/ = 0)
   {
     return (double)cellData->GetElement(idx);
@@ -720,8 +720,8 @@ public:
   create an itkMesh object from a vtkPolyData
   */
   static typename MeshType::Pointer MeshFromPolyData(vtkPolyData *poly,
-                                                     mitk::BaseGeometry *geometryFrame = NULL,
-                                                     mitk::BaseGeometry *polyDataGeometryFrame = NULL)
+                                                     mitk::BaseGeometry *geometryFrame = nullptr,
+                                                     mitk::BaseGeometry *polyDataGeometryFrame = nullptr)
   {
     // Create a new mesh
     typename MeshType::Pointer output = MeshType::New();
@@ -745,9 +745,9 @@ public:
     // output->SetPoints(points);
     double vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
-    if (geometryFrame == NULL)
+    if (geometryFrame == nullptr)
     {
-      if (polyDataGeometryFrame == NULL)
+      if (polyDataGeometryFrame == nullptr)
       {
         for (unsigned int i = 0; i < numPoints; ++i)
         {
@@ -776,7 +776,7 @@ public:
     else
     {
       mitk::Point3D mitkWorldPoint;
-      if (polyDataGeometryFrame == NULL)
+      if (polyDataGeometryFrame == nullptr)
       {
         for (unsigned int i = 0; i < numPoints; ++i)
         {
@@ -986,10 +986,10 @@ public:
   /*!
   create an itkMesh object from an mitk::Surface
   */
-  static typename MeshType::Pointer MeshFromSurface(mitk::Surface *surface, mitk::BaseGeometry *geometryFrame = NULL)
+  static typename MeshType::Pointer MeshFromSurface(mitk::Surface *surface, mitk::BaseGeometry *geometryFrame = nullptr)
   {
-    if (surface == NULL)
-      return NULL;
+    if (surface == nullptr)
+      return nullptr;
     return MeshFromPolyData(surface->GetVtkPolyData(), geometryFrame, surface->GetGeometry());
   }
 
@@ -1000,7 +1000,7 @@ public:
                                                      bool usePointScalarAccessor = false,
                                                      bool useCellScalarAccessor = false,
                                                      unsigned int pointDataType = 0,
-                                                     mitk::BaseGeometry *geometryFrame = NULL)
+                                                     mitk::BaseGeometry *geometryFrame = nullptr)
   {
     /*!
     default SingleCellArray line cell visitior definition
@@ -1236,8 +1236,8 @@ public:
                                      bool onlyTriangles = false,
                                      bool useScalarAccessor = false,
                                      unsigned int pointDataType = 0,
-                                     mitk::BaseGeometry *geometryFrame = NULL,
-                                     vtkPolyData *polydata = NULL)
+                                     mitk::BaseGeometry *geometryFrame = nullptr,
+                                     vtkPolyData *polydata = nullptr)
   {
     /*!
     default Distribute line cell visitior definition
@@ -1295,7 +1295,7 @@ public:
       MITK_ERROR << "no points in Grid " << std::endl;
     }
     // Create a vtkPolyData
-    if (polydata == NULL)
+    if (polydata == nullptr)
       polydata = vtkPolyData::New();
     else
       polydata->Initialize();
@@ -1327,7 +1327,7 @@ public:
 
     double vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
-    if (geometryFrame == NULL)
+    if (geometryFrame == nullptr)
     {
       for (i = points->Begin(); i != points->End(); ++i)
       {
@@ -1395,7 +1395,7 @@ public:
 
       // 2. Create a triangle visitor and add it to the multivisitor
       typename ExactTriangleVisitor::Pointer tv = ExactTriangleVisitor::New();
-      tv->SetCellArrays(NULL, trianglecells, NULL, NULL);
+      tv->SetCellArrays(nullptr, trianglecells, nullptr, nullptr);
       mv->AddVisitor(tv);
       // 3. Now ask the mesh to accept the multivisitor which
       // will Call Visit for each cell in the mesh that matches the

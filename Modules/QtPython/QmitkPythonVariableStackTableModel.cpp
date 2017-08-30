@@ -42,7 +42,7 @@ QmitkPythonVariableStackTableModel::~QmitkPythonVariableStackTableModel()
   m_PythonService->RemovePythonCommandObserver( this );
 }
 
-bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent )
+bool QmitkPythonVariableStackTableModel::dropMimeData(const QMimeData * data, Qt::DropAction action, int, int, const QModelIndex &)
 {
     // Early exit, returning true, but not actually doing anything (ignoring data).
     if (action == Qt::IgnoreAction)
@@ -58,7 +58,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
         int i = 0;
         QList<mitk::DataNode*> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
-        mitk::DataNode* node = NULL;
+        mitk::DataNode* node = nullptr;
         foreach(node, dataNodeList)
         {
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
@@ -84,7 +84,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
             if( exportAsCvImage )
             {
-              int ret = QMessageBox::question(NULL, "Export option",
+              int ret = QMessageBox::question(nullptr, "Export option",
                 "2D image detected. Export as OpenCV image to Python instead of an SimpleITK image?",
                                               QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
               exportAsCvImage = ret == QMessageBox::Yes;

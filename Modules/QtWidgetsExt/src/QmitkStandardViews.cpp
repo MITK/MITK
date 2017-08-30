@@ -72,15 +72,15 @@ void QmitkStandardViews::SetCameraController(mitk::CameraController *controller)
 
 void QmitkStandardViews::SetCameraControllerFromRenderWindow(vtkRenderWindow *window)
 {
-  if (window != NULL)
+  if (window != nullptr)
   {
-    if (mitk::BaseRenderer::GetInstance(window) != NULL)
-      if (mitk::BaseRenderer::GetInstance(window)->GetCameraController() != NULL)
+    if (mitk::BaseRenderer::GetInstance(window) != nullptr)
+      if (mitk::BaseRenderer::GetInstance(window)->GetCameraController() != nullptr)
         m_CameraController = mitk::BaseRenderer::GetInstance(window)->GetCameraController();
   }
   else
   {
-    std::cerr << "Warning in " << __FILE__ << ", " << __LINE__ << ": render window is NULL!" << std::endl;
+    std::cerr << "Warning in " << __FILE__ << ", " << __LINE__ << ": render window is nullptr!" << std::endl;
   }
 }
 

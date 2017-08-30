@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkInteractiveTransformationWidget::VIEW_ID = "org.mitk.views.interactivetransformationwidget";
 
 QmitkInteractiveTransformationWidget::QmitkInteractiveTransformationWidget(QWidget* parent, Qt::WindowFlags f)
-: QWidget(parent, f), m_Geometry(nullptr), m_ResetGeometry(nullptr), m_Controls(nullptr)
+: QWidget(parent, f), m_Controls(nullptr), m_Geometry(nullptr), m_ResetGeometry(nullptr)
 {
   CreateQtPartControl(this);
   CreateConnections();

@@ -39,7 +39,7 @@ bool mitk::NodePredicateDataType::CheckNode(const mitk::DataNode *node) const
   mitk::BaseData *data = node->GetData();
 
   if (data == nullptr)
-    return false; // or should we check if m_ValidDataType == "NULL" so that nodes without data can be requested?
+    return false; // or should we check if m_ValidDataType == "nullptr" so that nodes without data can be requested?
 
   return (m_ValidDataType.compare(data->GetNameOfClass()) == 0); // return true if data type matches
 }

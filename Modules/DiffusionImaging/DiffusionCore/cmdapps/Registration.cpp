@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRegistrationWrapper.h>
 #include <mitkImage.h>
 #include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageTimeSelector.h>
 #include <itkImageFileWriter.h>
@@ -106,7 +107,7 @@ static std::string GetSavePath(std::string outputFolder, std::string fileName)
 }
 
 
-static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing, bool useLinInt = false)
+static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing)
 {
   InputImageType::Pointer itkImage = InputImageType::New();
   CastToItkImage(input,itkImage);
@@ -159,18 +160,11 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
   _pResizeFilter->SetOutputSpacing(outputSpacing);
   _pResizeFilter->SetSize(outputSize);
 
-
-  typedef itk::LinearInterpolateImageFunction< InputImageType > LinearInterpolatorType;
-  LinearInterpolatorType::Pointer lin_interpolator = LinearInterpolatorType::New();
-
   typedef itk::Function::WelchWindowFunction<4> WelchWindowFunction;
   typedef itk::WindowedSincInterpolateImageFunction< InputImageType, 4,WelchWindowFunction> WindowedSincInterpolatorType;
   WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
-  if (useLinInt)
-    _pResizeFilter->SetInterpolator(lin_interpolator);
-  else
-    _pResizeFilter->SetInterpolator(sinc_interpolator);
+  _pResizeFilter->SetInterpolator(sinc_interpolator);
 
   // Specify the input.
   _pResizeFilter->SetInput(itkImage);
@@ -205,14 +199,6 @@ static FileListType CreateDerivedFileList(std::string baseFN, std::string baseSu
   return files;
 }
 
-/// Save images according to file type
-static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
-{
-  MITK_INFO << "----Save to " << fileName;
-
-  mitk::IOUtil::Save(image, fileName);
-}
-
 /// Copy derived resources from first time step. Append _reg tag, but leave data untouched.
 static void CopyResources(FileListType fileList, std::string outputPath)
 {
@@ -223,8 +209,8 @@ static void CopyResources(FileListType fileList, std::string outputPath)
     std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(derivedResourceFilename);
     std::string savePathAndFileName = outputPath +fileStem + "." + fileType;
     MITK_INFO << "Copy resource " << savePathAndFileName;
-    mitk::Image::Pointer resImage = ExtractFirstTS(mitk::IOUtil::LoadImage(derivedResourceFilename), fileType);
-    mitk::IOUtil::SaveImage(resImage, savePathAndFileName);
+    mitk::Image::Pointer resImage = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(derivedResourceFilename)[0].GetPointer()), fileType);
+    mitk::IOUtil::Save(resImage, savePathAndFileName);
   }
 }
 
@@ -236,7 +222,7 @@ int main( int argc, char* argv[] )
   parser.setTitle("Folder Registration");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("For detail description see http://docs.mitk.org/nightly/DiffusionMiniApps.html");
-  parser.setContributor("MBI");
+  parser.setContributor("MIC");
 
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help", "Show this help text");
@@ -259,15 +245,12 @@ int main( int argc, char* argv[] )
   bool silent = false;
   bool isBinary = false;
   bool alignOrigin = false;
-  bool useLinearInterpol = true;
+
   {
     if (parsedArgs.size() == 0)
     {
       return EXIT_FAILURE;
     }
-
-    if (parsedArgs.count("sinc-int"))
-      useLinearInterpol = false;
 
     if (parsedArgs.count("silent"))
       silent = true;
@@ -316,7 +299,7 @@ int main( int argc, char* argv[] )
 
 
   std::vector<std::string> spacings;
-  float spacing[3];
+  float spacing[] = { 0.0f, 0.0f, 0.0f };
   bool doResampling = false;
   if (parsedArgs.count("resample") || parsedArgs.count("d") )
   {
@@ -343,8 +326,8 @@ int main( int argc, char* argv[] )
 
   MITK_INFO << "Loading Reference (fixed) image: " << referenceFileName;
   std::string fileType = itksys::SystemTools::GetFilenameExtension(referenceFileName);
-  mitk::Image::Pointer refImage = ExtractFirstTS(mitk::IOUtil::LoadImage(referenceFileName), fileType);
-  mitk::Image::Pointer resampleReference = NULL;
+  mitk::Image::Pointer refImage = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceFileName)[0].GetPointer()), fileType);
+  mitk::Image::Pointer resampleReference = nullptr;
   if (doResampling)
   {
     refImage = ResampleBySpacing(refImage,spacing);
@@ -352,19 +335,19 @@ int main( int argc, char* argv[] )
   }
 
   if (refImage.IsNull())
-    MITK_ERROR << "Loaded fixed image is NULL";
+    MITK_ERROR << "Loaded fixed image is nullptr";
 
   // Copy reference image to destination
   std::string savePathAndFileName = GetSavePath(outputPath, referenceFileName);
 
-  mitk::IOUtil::SaveImage(refImage, savePathAndFileName);
+  mitk::IOUtil::Save(refImage, savePathAndFileName);
 
   // Copy all derived resources also to output folder, adding _reg suffix
   referenceFileList = CreateDerivedFileList(referenceFileName, movingImgPattern,derPatterns);
   CopyResources(referenceFileList, outputPath);
 
   std::string derivedResourceFilename;
-  mitk::Image::Pointer referenceMask = NULL; // union of all segmentations
+  mitk::Image::Pointer referenceMask = nullptr; // union of all segmentations
 
   if (!silent)
   {
@@ -383,13 +366,6 @@ int main( int argc, char* argv[] )
 
   FileListType movingImagesList = CreateFileList(inputPath, movingImgPattern);
 
-
-  // TODO Reactivate Resampling Feature
-  //  mitk::Image::Pointer resampleImage = NULL;
-  //  if (QFileInfo(resampleReference).isFile())
-  //  {
-  //    resampleImage = mitk::IOUtil::LoadImage(resampleReference.toStdString());
-  //  }
   for (unsigned int i =0; i < movingImagesList.size(); i++)
   {
     std::string fileMorphName = movingImagesList.at(i);
@@ -414,10 +390,10 @@ int main( int argc, char* argv[] )
     double offset[3];
     {
       std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
-      mitk::Image::Pointer movingImage = ExtractFirstTS(mitk::IOUtil::LoadImage(fileMorphName), fileType);
+      mitk::Image::Pointer movingImage = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fileMorphName)[0].GetPointer()), fileType);
 
       if (movingImage.IsNull())
-        MITK_ERROR << "Loaded moving image is NULL";
+        MITK_ERROR << "Loaded moving image is nullptr";
 
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";
@@ -429,11 +405,12 @@ int main( int argc, char* argv[] )
       if (fileType == ".dwi")
         fileType = "dwi";
 
-      if (movingImage->GetData() == nullptr)
-        MITK_INFO <<"POST DATA is null";
+      {
+        mitk::ImageReadAccessor readAccess(movingImage);
 
-
-
+        if (readAccess.GetData() == nullptr)
+          MITK_INFO <<"POST DATA is null";
+      }
 
       mitk::IOUtil::Save(movingImage, savePathAndFileName);
     }
@@ -456,12 +433,12 @@ int main( int argc, char* argv[] )
       derivedResourceFilename = fList.at(j);
       MITK_INFO << "----Processing derived resorce " << derivedResourceFilename << " ...";
       std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);
-      mitk::Image::Pointer derivedMovingResource = ExtractFirstTS(mitk::IOUtil::LoadImage(derivedResourceFilename), fileType);
+      mitk::Image::Pointer derivedMovingResource = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(derivedResourceFilename)[0].GetPointer()), fileType);
       // Apply transformation to derived resource, treat derived resource as binary
       mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference,isBinary);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
-      mitk::IOUtil::SaveImage(derivedMovingResource, savePathAndFileName);
+      mitk::IOUtil::Save(derivedMovingResource, savePathAndFileName);
     }
   }
 

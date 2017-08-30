@@ -60,7 +60,7 @@ namespace mitk
     std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileWriter>> result;
     result.first = this->AbstractFileReader::RegisterService(context);
     const CustomMimeType *writerMimeType = this->AbstractFileWriter::GetMimeType();
-    if (writerMimeType == NULL || (writerMimeType->GetName().empty() && writerMimeType->GetExtensions().empty()))
+    if (writerMimeType == nullptr || (writerMimeType->GetName().empty() && writerMimeType->GetExtensions().empty()))
     {
       this->AbstractFileWriter::SetMimeType(
         CustomMimeType(this->AbstractFileReader::GetRegisteredMimeType().GetName()));

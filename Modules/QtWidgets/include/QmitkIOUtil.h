@@ -95,31 +95,31 @@ public:
    * This methods tries to load all specified files and pop-ups dialog boxes if further
    * user input is required (e.g. ambiguous mime-types or reader options).
    *
-   * If the provided DataStorage is not NULL, some files will be added to it automatically,
+   * If the provided DataStorage is not nullptr, some files will be added to it automatically,
    * dependeing on the IFileReader used.
    *
    * @param files A list of files to load.
    * @param ds An optional data storage passed to IFileReader instances
    * @return A list of BaseData instances which have not already been added to the data storage.
    */
-  static QList<mitk::BaseData::Pointer> Load(const QStringList &paths, QWidget *parent = NULL);
+  static QList<mitk::BaseData::Pointer> Load(const QStringList &paths, QWidget *parent = nullptr);
 
   static mitk::DataStorage::SetOfObjects::Pointer Load(const QStringList &paths,
                                                        mitk::DataStorage &storage,
-                                                       QWidget *parent = NULL);
+                                                       QWidget *parent = nullptr);
 
-  static QList<mitk::BaseData::Pointer> Load(const QString &path, QWidget *parent = NULL);
+  static QList<mitk::BaseData::Pointer> Load(const QString &path, QWidget *parent = nullptr);
 
   static mitk::DataStorage::SetOfObjects::Pointer Load(const QString &path,
                                                        mitk::DataStorage &storage,
-                                                       QWidget *parent = NULL);
+                                                       QWidget *parent = nullptr);
 
   using mitk::IOUtil::Load;
 
   static QString Save(const mitk::BaseData *data,
                       const QString &defaultBaseName,
                       const QString &defaultPath = QString(),
-                      QWidget *parent = NULL);
+                      QWidget *parent = nullptr);
 
   /**
    * @brief Save a list of BaseData objects using a "File Save Dialog".
@@ -182,7 +182,7 @@ public:
   static QStringList Save(const std::vector<const mitk::BaseData *> &data,
                           const QStringList &defaultBaseNames,
                           const QString &defaultPath = QString(),
-                          QWidget *parent = NULL);
+                          QWidget *parent = nullptr);
 
   using mitk::IOUtil::Save;
 
@@ -194,7 +194,7 @@ public:
    * screen.
    * @deprecatedSince{2014_10} Use Save() instead.
    */
-  DEPRECATED(static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget *parent = NULL));
+  DEPRECATED(static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget *parent = nullptr));
 
   /**
    * @brief SaveSurfaceWithDialog Convenience method to save a surface with a Qt dialog.
@@ -206,7 +206,7 @@ public:
    */
   DEPRECATED(static void SaveSurfaceWithDialog(mitk::Surface::Pointer surface,
                                                std::string fileName = "",
-                                               QWidget *parent = NULL));
+                                               QWidget *parent = nullptr));
 
   /**
    * @brief SaveImageWithDialog Convenience method to save an image with a Qt dialog.
@@ -218,7 +218,7 @@ public:
    */
   DEPRECATED(static void SaveImageWithDialog(mitk::Image::Pointer image,
                                              std::string fileName = "",
-                                             QWidget *parent = NULL));
+                                             QWidget *parent = nullptr));
 
   /**
    * @brief SavePointSetWithDialog Convenience method to save a pointset with a Qt dialog.
@@ -230,7 +230,7 @@ public:
    */
   DEPRECATED(static void SavePointSetWithDialog(mitk::PointSet::Pointer pointset,
                                                 std::string fileName = "",
-                                                QWidget *parent = NULL));
+                                                QWidget *parent = nullptr));
 
 private:
   struct Impl;

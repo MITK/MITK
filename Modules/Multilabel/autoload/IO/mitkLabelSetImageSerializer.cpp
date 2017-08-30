@@ -34,7 +34,7 @@ mitk::LabelSetImageSerializer::~LabelSetImageSerializer()
 std::string mitk::LabelSetImageSerializer::Serialize()
 {
   const LabelSetImage *image = dynamic_cast<const LabelSetImage *>(m_Data.GetPointer());
-  if (image == NULL)
+  if (image == nullptr)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data
                << " is not an mitk::LabelSetImage. Cannot serialize as LabelSetImage.";

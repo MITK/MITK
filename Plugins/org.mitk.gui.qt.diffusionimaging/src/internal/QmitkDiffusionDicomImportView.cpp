@@ -54,20 +54,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/Directory.hxx>
 
 #include <QMessageBox>
+#include <QTreeView>
 
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
 
 
 QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject* /*parent*/, const char* /*name*/)
-  : QmitkFunctionality(), m_Controls(NULL), m_MultiWidget(NULL),
-    m_OutputFolderName(""), m_OutputFolderNameSet(false)
+  : m_Controls(nullptr)
+  , m_OutputFolderName("")
+  , m_OutputFolderNameSet(false)
 {
-}
-
-QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(const QmitkDiffusionDicomImport& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
 }
 
 QmitkDiffusionDicomImport::~QmitkDiffusionDicomImport()
@@ -76,7 +72,7 @@ QmitkDiffusionDicomImport::~QmitkDiffusionDicomImport()
 void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
 {
   m_Parent = parent;
-  if (m_Controls == NULL)
+  if (m_Controls == nullptr)
   {
     m_Controls = new Ui::QmitkDiffusionDicomImportControls;
     m_Controls->setupUi(parent);
@@ -113,6 +109,11 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_ResetPrefixButton, SIGNAL(clicked()), this, SLOT(ResetPrefixButtonPushed()));
     connect( m_Controls->m_DicomLoadRecursiveCheckbox, SIGNAL(clicked()), this, SLOT(RecursiveSettingsChanged()) );
   }
+}
+
+void QmitkDiffusionDicomImport::SetFocus()
+{
+  m_Controls->textBrowser->setFocus();
 }
 
 void QmitkDiffusionDicomImport::RecursiveSettingsChanged()
@@ -183,11 +184,6 @@ void QmitkDiffusionDicomImport::AverageClicked()
   m_Controls->m_Blur->setEnabled(m_Controls->m_DicomLoadAverageDuplicatesCheckbox->isChecked());
 }
 
-void QmitkDiffusionDicomImport::Activated()
-{
-  QmitkFunctionality::Activated();
-}
-
 void QmitkDiffusionDicomImport::DicomLoadDeleteFolderNames()
 {
   m_Controls->listWidget->clear();
@@ -196,14 +192,24 @@ void QmitkDiffusionDicomImport::DicomLoadDeleteFolderNames()
 void QmitkDiffusionDicomImport::DicomLoadAddFolderNames()
 {
   // SELECT FOLDER DIALOG
-  QFileDialog* w = new QFileDialog( m_Parent, QString("Select folders containing DWI data") );
-  w->setFileMode( QFileDialog::Directory );
+  QFileDialog w( m_Parent, QString("Select folders containing DWI data") );
+  w.setFileMode( QFileDialog::DirectoryOnly );
+  w.setOption(QFileDialog::DontUseNativeDialog,true);
+
+  QListView *l = w.findChild<QListView*>("listView");
+  if (l) {
+    l->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
+  QTreeView *t = w.findChild<QTreeView*>();
+  if (t) {
+    t->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
 
   // RETRIEVE SELECTION
-  if ( w->exec() != QDialog::Accepted )
+  if ( w.exec() != QDialog::Accepted )
     return;
 
-  m_Controls->listWidget->addItems(w->selectedFiles());
+  m_Controls->listWidget->addItems(w.selectedFiles());
 }
 
 bool SortBySeriesUID(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
@@ -329,13 +335,13 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
   try
   {
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
     if ( locale.compare(currLocale)!=0 )
     {
       try
       {
-        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, nullptr) << " to '" << locale << "'";
         setlocale(LC_ALL, locale.c_str());
       }
       catch(...)
@@ -453,18 +459,18 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
       mitk::DICOMSortCriterion::ConstPointer sorting =
-        mitk::SortByImagePositionPatient::New(  // Image Position (Patient)
-          //mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
-             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
-                mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
-                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
-                      mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
-                    ).GetPointer()
-                  ).GetPointer()
-                ).GetPointer()
-             ).GetPointer()
-        // ).GetPointer()
-        ).GetPointer();
+          mitk::SortByImagePositionPatient::New(  // Image Position (Patient)
+                                                  //mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
+                                                  mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
+                                                                             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
+                                                                                                        mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
+                                                                                                                                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
+                                                                                                                                                              ).GetPointer()
+                                                                                                                                   ).GetPointer()
+                                                                                                        ).GetPointer()
+                                                                             ).GetPointer()
+                                                  // ).GetPointer()
+                                                  ).GetPointer();
       tagSorter->SetSortCriterion( sorting );
 
       // mosaic
@@ -486,7 +492,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
       gdcmReader->LoadImages();
 
-      for( int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
+      for( unsigned int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
       {
         mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(o).GetMitkImage();
 
@@ -500,7 +506,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
         node->SetName( outname.c_str() );
 
-        GetDefaultDataStorage()->Add(node);
+        GetDataStorage()->Add(node);
         //SetDwiNodeProperties(node, ss.str() );
         //Status(QString("Image %1 added to datastorage").arg(descr));
       }
@@ -526,7 +532,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
     try
     {
-      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, nullptr) << " to '" << currLocale << "'";
       setlocale(LC_ALL, currLocale.c_str());
     }
     catch(...)
@@ -541,7 +547,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
   }
 
   if (!imageSuccessfullySaved)
-    QMessageBox::warning(NULL,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
+    QMessageBox::warning(nullptr,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
   Status(QString("Finished import with memory:"));
 
   PrintMemoryUsage();

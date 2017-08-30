@@ -58,16 +58,16 @@ const mitk::FiberBundle* mitk::FiberBundleMapper3D::GetInput()
 void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *renderer)
 {
     mitk::FiberBundle* fiberBundle = dynamic_cast<mitk::FiberBundle*> (GetDataNode()->GetData());
-    if (fiberBundle == NULL)
+    if (fiberBundle == nullptr)
         return;
 
     vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
-    if (fiberPolyData == NULL)
+    if (fiberPolyData == nullptr)
         return;
 
     fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
     float tmpopa;
-    this->GetDataNode()->GetOpacity(tmpopa, NULL);
+    this->GetDataNode()->GetOpacity(tmpopa, nullptr);
     FBXLocalStorage3D *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
     if (m_TubeRadius>0.0)

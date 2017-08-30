@@ -23,9 +23,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
 
-QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
-  m_StatisticsImage(nullptr), m_BinaryMask(nullptr), m_PlanarFigureMask(nullptr), m_TimeStep(0),
-  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(10.0), m_UseDefaultNBins(true), m_nBinsForHistogramStatistics(100), m_prioritizeNBinsOverBinSize(true)
+QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread()
+  : QThread()
+  , m_StatisticsImage(nullptr)
+  , m_BinaryMask(nullptr)
+  , m_PlanarFigureMask(nullptr)
+  , m_TimeStep(0)
+  , m_IgnoreZeros(false)
+  , m_HistogramBinSize(10.0)
+  , m_StatisticChanged(false)
+  , m_CalculationSuccessful(false)
+  , m_UseDefaultNBins(true)
+  , m_nBinsForHistogramStatistics(100)
+  , m_prioritizeNBinsOverBinSize(true)
 {
 }
 
@@ -168,14 +178,14 @@ void QmitkImageStatisticsCalculationThread::run()
       calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
+  catch (const mitk::Exception& e)
+  {
+    MITK_ERROR << "MITK Exception: " << e.what();
+    statisticCalculationSuccessful = false;
+  }
   catch( const itk::ExceptionObject& e)
   {
     MITK_ERROR << "ITK Exception:" << e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch( const mitk::Exception& e )
-  {
-    MITK_ERROR<< "MITK Exception: " << e.what();
     statisticCalculationSuccessful = false;
   }
   catch ( const std::runtime_error &e )
@@ -185,7 +195,6 @@ void QmitkImageStatisticsCalculationThread::run()
   }
   catch ( const std::exception &e )
   {
-    //m_message = "Failure: " + std::string(e.what());
     MITK_ERROR<< "Standard Exception: " << e.what();
     statisticCalculationSuccessful = false;
   }

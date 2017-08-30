@@ -168,7 +168,7 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
         resContourSize *= 2; // explodes, but such contours must be very strange
         res.traceline = (float*)realloc( res.traceline,  resContourSize*sizeof(float)*2 );
         res.onGradient = (bool*)realloc( res.onGradient, resContourSize*sizeof(bool) );
-        if ((res.traceline == NULL) || (res.onGradient == NULL))
+        if ((res.traceline == nullptr) || (res.onGradient == nullptr))
         {
           res.numPoints = 0;
           res.cutIt = false;

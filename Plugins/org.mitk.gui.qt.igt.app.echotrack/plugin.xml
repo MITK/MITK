@@ -7,10 +7,12 @@
           icon="resources/icon.xpm" /> -->
     <view id="org.mitk.views.usmarkerplacement"
           name="IGT EchoTrack"
+          category="IGT"
           class="USNavigationMarkerPlacement"
           icon="resources/icon2.xpm" />
     <view id="org.mitk.views.ultrasoundcalibration"
           name="IGT EchoTrack Calibration"
+          category="IGT"
           class="UltrasoundCalibration"
           icon="resources/icon_US_calibration.svg" />
   </extension>

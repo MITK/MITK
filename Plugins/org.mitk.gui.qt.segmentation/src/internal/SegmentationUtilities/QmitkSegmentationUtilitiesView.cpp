@@ -100,6 +100,6 @@ void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWi
   m_SurfaceToImageWidget->SetTimeNavigationController(nullptr);
 
 #ifdef ENABLE_CTK_WIDGETS_WIDGET
-  m_CTKWidgetsWidget->SetTimeNavigationController(NULL);
+  m_CTKWidgetsWidget->SetTimeNavigationController(nullptr);
 #endif
 }

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 
-mitk::CameraController::CameraController() : BaseController(), m_Renderer(NULL)
+mitk::CameraController::CameraController() : BaseController(), m_Renderer(nullptr)
 {
 }
 
@@ -142,14 +142,14 @@ void mitk::CameraController::SetViewToCaudal()
 void mitk::CameraController::SetStandardView(mitk::CameraController::StandardView view)
 {
   const mitk::VtkPropRenderer *glRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(m_Renderer);
-  if (glRenderer == NULL)
+  if (glRenderer == nullptr)
     return;
   vtkRenderer *vtkRenderer = glRenderer->GetVtkRenderer();
   assert(vtkRenderer);
 
   mitk::BoundingBox::Pointer bb;
   mitk::DataStorage *ds = m_Renderer->GetDataStorage();
-  if (ds != NULL)
+  if (ds != nullptr)
     bb = ds->ComputeBoundingBox();
   else
     return;
@@ -274,7 +274,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D &PlanePoint)
       AdjustConstrainedCameraPosition(_planePoint);
     }
     const PlaneGeometry *planeGeometry = this->GetRenderer()->GetCurrentWorldPlaneGeometry();
-    if (planeGeometry != NULL)
+    if (planeGeometry != nullptr)
     {
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 1, 0); // set the view-up for the camera
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(_planePoint[0], _planePoint[1], 900000);

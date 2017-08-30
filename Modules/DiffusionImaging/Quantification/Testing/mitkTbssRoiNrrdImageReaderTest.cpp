@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "mitkNrrdTbssImageReader".
  */
-int mitkTbssRoiNrrdImageReaderTest(int argc , char* argv[])
+int mitkTbssRoiNrrdImageReaderTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("NrrdTbssRoiImageReaderTest");
 
@@ -42,7 +42,7 @@ int mitkTbssRoiNrrdImageReaderTest(int argc , char* argv[])
 
   mitk::TbssRoiImage* roiImg = roiReader->GetOutput();
 
-  MITK_TEST_CONDITION_REQUIRED(roiImg != NULL, "Testing that roiImg is not null");
+  MITK_TEST_CONDITION_REQUIRED(roiImg != nullptr, "Testing that roiImg is not null");
 
   mitk::TbssRoiImage::SizeType size = roiImg->GetLargestPossibleRegion().GetSize();
 

@@ -108,7 +108,7 @@ void mitk::AffineImageCropperInteractor::DeselectObject(StateMachineAction *, In
 void mitk::AffineImageCropperInteractor::ScaleRadius(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   const MouseWheelEvent *wheelEvent = dynamic_cast<const MouseWheelEvent *>(interactionEvent);
-  if (wheelEvent == NULL)
+  if (wheelEvent == nullptr)
     return;
 
   if (m_SelectedNode.IsNull())
@@ -130,7 +130,7 @@ void mitk::AffineImageCropperInteractor::InitTranslate(StateMachineAction *, Int
   if (m_SelectedNode.IsNull())
     return;
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   m_InitialPickedPoint = positionEvent->GetPositionInWorld();
@@ -144,7 +144,7 @@ void mitk::AffineImageCropperInteractor::InitTranslate(StateMachineAction *, Int
 void mitk::AffineImageCropperInteractor::InitRotate(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   m_InitialPickedPoint = positionEvent->GetPositionInWorld();
@@ -158,7 +158,7 @@ void mitk::AffineImageCropperInteractor::InitRotate(StateMachineAction *, Intera
 void mitk::AffineImageCropperInteractor::InitDeformation(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   m_InitialPickedPoint = positionEvent->GetPositionInWorld();
@@ -172,7 +172,7 @@ void mitk::AffineImageCropperInteractor::InitDeformation(StateMachineAction *, I
 void mitk::AffineImageCropperInteractor::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
@@ -193,7 +193,7 @@ void mitk::AffineImageCropperInteractor::TranslateObject(StateMachineAction *, I
 void mitk::AffineImageCropperInteractor::DeformObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
@@ -221,7 +221,7 @@ void mitk::AffineImageCropperInteractor::DeformObject(StateMachineAction *, Inte
 void mitk::AffineImageCropperInteractor::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();

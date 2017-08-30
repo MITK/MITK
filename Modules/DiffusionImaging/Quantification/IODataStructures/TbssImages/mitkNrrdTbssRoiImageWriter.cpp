@@ -46,7 +46,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
 
   if (input == nullptr)
   {
-    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!")
+    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is nullptr!")
     return;
   }
   if ( m_FileName == "" )
@@ -57,7 +57,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
 
 
   char keybuffer[512];
-  char valbuffer[512];
+  std::stringstream valbuffer;
 
   std::vector< itk::Index<3> > roi = input->GetRoi();
 
@@ -69,13 +69,13 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
     itk::Index<3> ix = *it;
 
     sprintf( keybuffer, "ROI_index_%04d", i );
-    sprintf( valbuffer, "%ld %ld %ld", ix[0],ix[1],ix[2]);
+    valbuffer << ix[0] << " " << ix[1] << " " << ix[2];
 
-    std::cout << valbuffer << std::endl;
+    std::cout << valbuffer.str() << std::endl;
 
     //input->GetImage()->GetMetaDataDictionary();
 
-    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(), std::string(keybuffer), valbuffer.str());
 
     it++;
     ++i;

@@ -72,7 +72,7 @@ mitk::TumorInvasionClassification::TumorInvasionClassification()
 
 void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollection *collection, unsigned int mode)
 {
-  srand(time(NULL));
+  srand(time(nullptr));
   MITK_INFO << "LearnProgressionFeatures: Selecting training voxels.";
   switch (mode)
   {
@@ -495,7 +495,7 @@ void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollecti
 
 void mitk::TumorInvasionClassification::PrepareResponseSamples(mitk::DataCollection *collection)
 {
-  srand(time(NULL));
+  srand(time(nullptr));
   MITK_INFO << "PrepareResponseSamples: Selecting training voxels.";
 
   EnsureDataImageInCollection(collection, m_TumorID, "WEIGHTS");
@@ -614,7 +614,7 @@ void mitk::TumorInvasionClassification::LearnProgressionFeatures(mitk::DataColle
 void mitk::TumorInvasionClassification::PredictInvasion(mitk::DataCollection *collection,
                                                         std::vector<std::string> modalitiesList)
 {
-  if (collection != NULL)
+  if (collection != nullptr)
   {
     MITK_INFO << "Evaluating Forest";
 
@@ -636,7 +636,7 @@ void mitk::TumorInvasionClassification::PredictInvasion(mitk::DataCollection *co
     }
   }
   else
-    MITK_ERROR << "TumorInvasionClassification::PredictInvasion - provided collection is NULL.";
+    MITK_ERROR << "TumorInvasionClassification::PredictInvasion - provided collection is nullptr.";
 }
 
 void mitk::TumorInvasionClassification::SanitizeResults(mitk::DataCollection *collection, std::string resultID)

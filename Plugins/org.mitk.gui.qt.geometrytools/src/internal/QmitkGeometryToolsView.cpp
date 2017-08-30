@@ -70,7 +70,7 @@ void QmitkGeometryToolsView::OnUsageInfoBoxChanged(bool flag)
 void QmitkGeometryToolsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
-  foreach( mitk::DataNode::Pointer node, nodes )
+  for (mitk::DataNode::Pointer node: nodes)
   {
     if( node.IsNotNull() )
     {

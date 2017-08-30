@@ -229,11 +229,11 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 {
   if (!registration)
   {
-    mitkThrow() << "Cannot map image. Passed registration wrapper pointer is NULL.";
+    mitkThrow() << "Cannot map image. Passed registration wrapper pointer is nullptr.";
   }
   if (!input)
   {
-    mitkThrow() << "Cannot map image. Passed image pointer is NULL.";
+    mitkThrow() << "Cannot map image. Passed image pointer is nullptr.";
   }
 
   ResultImageType::Pointer result;
@@ -267,7 +267,8 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
       InputImageType::Pointer timeStepInput = imageTimeSelector->GetOutput();
       ResultImageType::Pointer timeStepResult;
       AccessByItk_n(timeStepInput, doMITKMap, (timeStepResult, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-      result->SetVolume(timeStepResult->GetVolumeData()->GetData(),i);
+      mitk::ImageReadAccessor readAccess(timeStepResult);
+      result->SetVolume(readAccess.GetData(),i);
     }
   }
 
@@ -277,11 +278,11 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::map(const InputImageType* input, const MITKRegistrationType* registration,
   bool throwOnOutOfInputAreaError, const double& paddingValue, const ResultImageGeometryType* resultGeometry,
-  bool throwOnMappingError, const double& errorValue, mitk::ImageMappingInterpolator::Type interpolatorType)
+  bool throwOnMappingError, const double& errorValue, mitk::ImageMappingInterpolator::Type)
 {
   if (!registration)
   {
-    mitkThrow() << "Cannot map image. Passed registration wrapper pointer is NULL.";
+    mitkThrow() << "Cannot map image. Passed registration wrapper pointer is nullptr.";
   }
   if (!registration->GetRegistration())
   {
@@ -289,7 +290,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
   }
   if (!input)
   {
-    mitkThrow() << "Cannot map image. Passed image pointer is NULL.";
+    mitkThrow() << "Cannot map image. Passed image pointer is nullptr.";
   }
 
   ResultImageType::Pointer result = map(input, registration->GetRegistration(), throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue);
@@ -302,15 +303,15 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
   refineGeometry(const InputImageType* input, const RegistrationType* registration,
   bool throwOnError)
 {
-  mitk::ImageMappingHelper::ResultImageType::Pointer result = NULL;
+  mitk::ImageMappingHelper::ResultImageType::Pointer result = nullptr;
 
   if (!registration)
   {
-    mitkThrow() << "Cannot refine image geometry. Passed registration pointer is NULL.";
+    mitkThrow() << "Cannot refine image geometry. Passed registration pointer is nullptr.";
   }
   if (!input)
   {
-    mitkThrow() << "Cannot refine image geometry. Passed image pointer is NULL.";
+    mitkThrow() << "Cannot refine image geometry. Passed image pointer is nullptr.";
   }
 
   mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer spTransform = mitk::MITKRegistrationHelper::getAffineMatrix(registration,false);
@@ -342,7 +343,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 {
   if (!registration)
   {
-    mitkThrow() << "Cannot refine image geometry. Passed registration wrapper pointer is NULL.";
+    mitkThrow() << "Cannot refine image geometry. Passed registration wrapper pointer is nullptr.";
   }
   if (!registration->GetRegistration())
   {
@@ -350,7 +351,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
   }
   if (!input)
   {
-    mitkThrow() << "Cannot refine image geometry. Passed image pointer is NULL.";
+    mitkThrow() << "Cannot refine image geometry. Passed image pointer is nullptr.";
   }
 
   ResultImageType::Pointer result = refineGeometry(input, registration->GetRegistration(), throwOnError);
@@ -365,7 +366,7 @@ bool
 
   if (!registration)
   {
-    mitkThrow() << "Cannot check refine capability of registration. Passed registration pointer is NULL.";
+    mitkThrow() << "Cannot check refine capability of registration. Passed registration pointer is nullptr.";
   }
 
   //if the helper does not return null, we can refine the geometry.
@@ -380,7 +381,7 @@ bool
 {
   if (!registration)
   {
-    mitkThrow() << "Cannot check refine capability of registration. Passed registration wrapper pointer is NULL.";
+    mitkThrow() << "Cannot check refine capability of registration. Passed registration wrapper pointer is nullptr.";
   }
   if (!registration->GetRegistration())
   {

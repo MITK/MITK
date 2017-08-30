@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ArbitraryTimeGeometry_h
 #define ArbitraryTimeGeometry_h
 
-// MITK
-#include <MitkCoreExports.h>
-#include <mitkCommon.h>
+//MITK
 #include <mitkTimeGeometry.h>
+#include <mitkCommon.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -34,8 +34,8 @@ namespace mitk
   * geometries are different for each time step it is not possible
   * to set the same geometry to different time steps. Instead
   * copies should be used.
-  * @remark The lower time bound of a succeeding time step may not be smaller or equal
-  * to the lower time bound of its predecessor. Thus the list of time points is
+  * @remark The lower time bound of a succeeding time step may not be smaller
+  * than the upper time bound of its predecessor. Thus the list of time points is
   * always sorted by its lower time bounds.
   * @remark For the conversion between time step and time point the following assumption
   * is used.:\n
@@ -52,7 +52,8 @@ namespace mitk
 
     ArbitraryTimeGeometry();
     typedef ArbitraryTimeGeometry self;
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
       /**
       * \brief Returns the number of time steps.
@@ -218,18 +219,18 @@ namespace mitk
     void ClearAllGeometries();
 
     /** Append the passed geometry to the time geometry.
-     * @remark if it is not the first time step the passed minimum time point is ignored, so the existing time "grid"
-     * stays untouched.
      * @pre The passed geometry pointer must be valid.
-     * @pre The maximumTimePoint must be larger then the maximum time point of the currently last time step.*/
-    void AppendTimeStep(BaseGeometry *geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint = 0);
+     * @pre The minimumTimePoint must not be smaller than the maximum time point of the currently last time step.
+     * Therefore time steps must not be overlapping in time.
+     * @pre minimumTimePoint must not be larger then maximumTimePoint.*/
+    void AppendNewTimeStep(BaseGeometry *geometry, TimePointType minimumTimePoint, TimePointType maximumTimePoint);
 
-    /** Same than AppendTimeStep. But clones geometry before adding it.*/
-    void AppendTimeStepClone(const BaseGeometry *geometry,
-                             TimePointType maximumTimePoint,
-                             TimePointType minimumTimePoint = 0);
+    /** Same than AppendNewTimeStep. But clones geometry before adding it.*/
+    void AppendNewTimeStepClone(const BaseGeometry* geometry,
+                              TimePointType minimumTimePoint,
+                              TimePointType maximumTimePoint );
 
-    void ReserveSpaceForGeometries(TimeStepType numberOfGeometries);
+    void ReserveSpaceForGeometries( TimeStepType numberOfGeometries );
 
     virtual void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
@@ -237,8 +238,8 @@ namespace mitk
     virtual ~ArbitraryTimeGeometry();
 
     std::vector<BaseGeometry::Pointer> m_GeometryVector;
+    std::vector<TimePointType> m_MinimumTimePoints;
     std::vector<TimePointType> m_MaximumTimePoints;
-    TimePointType m_MinimumTimePoint;
 
   }; // end class ArbitraryTimeGeometry
 

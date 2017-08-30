@@ -19,6 +19,7 @@
 #include "mitkLabelSetImage.h"
 #include "mitkToolManager.h"
 #include "mitkToolManagerProvider.h"
+#include <mitkImagePixelReadAccessor.h>
 
 #include <string.h>
 
@@ -48,7 +49,8 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, Inter
     assert(workingImage);
 
     int timestep = positionEvent->GetSender()->GetTimeStep();
-    int pixelValue = workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep);
+    int pixelValue = static_cast<int>(workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep));
+
     workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
 
     // Call Events

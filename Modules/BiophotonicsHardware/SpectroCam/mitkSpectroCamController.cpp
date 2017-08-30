@@ -180,7 +180,7 @@ static cv::Mat createLLSQSolutionFromHMatrix()
 }
 
 mitk::SpectroCamController_pimpl::SpectroCamController_pimpl()
-  :m_hDS(NULL),
+  :m_hDS(nullptr),
   m_NumRecordedImages(1),
   m_IsCameraRunning(false),
   m_SmallWidth(614),
@@ -411,7 +411,7 @@ static void DisplayCameraStream(SpectroCamImage image)
     else
     {
       // Allocate the buffer to hold converted the image. (We only want to do this once for performance reasons)
-      if (image.m_pAcqImage->pImageBuffer == NULL)
+      if (image.m_pAcqImage->pImageBuffer == nullptr)
       {
         if (J_Image_Malloc(image.m_pAcqImage, image.m_pAcqImage) != J_ST_SUCCESS)
         {
@@ -677,7 +677,7 @@ int mitk::SpectroCamController_pimpl::CloseCameraConnection()
   if(m_hDS)
   {
     J_DataStream_Close(m_hDS);
-    m_hDS = NULL;
+    m_hDS = nullptr;
   }
 
 

@@ -116,7 +116,7 @@ void mitk::SplineVtkMapper3D::ApplyAllProperties(BaseRenderer *renderer, vtkActo
 
   // getting the color from DataNode
   float temprgba[4];
-  this->GetDataNode()->GetColor(&temprgba[0], NULL);
+  this->GetDataNode()->GetColor(&temprgba[0], nullptr);
   // convert to rgba, what ever type it has!
   rgba[0] = temprgba[0];
   rgba[1] = temprgba[1];
@@ -126,7 +126,7 @@ void mitk::SplineVtkMapper3D::ApplyAllProperties(BaseRenderer *renderer, vtkActo
   m_SplinesActor->GetProperty()->SetColor(rgba);
 
   float lineWidth;
-  if (dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
+  if (dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetProperty("line width")) == nullptr)
     lineWidth = 1.0;
   else
     lineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetProperty("line width"))->GetValue();
@@ -145,7 +145,7 @@ vtkPolyData *mitk::SplineVtkMapper3D::GetSplinesPolyData()
   if (m_SplinesAvailable)
     return (dynamic_cast<vtkPolyDataMapper *>(m_SplinesActor->GetMapper()))->GetInput();
   else
-    return NULL;
+    return nullptr;
 }
 
 vtkActor *mitk::SplineVtkMapper3D::GetSplinesActor()

@@ -671,7 +671,7 @@ void ClassificationSegmentation::SampleClassMaskByPointSet(const mitk::Image::Po
 
 //  if (cb_image == nullptr || cb_classifier == nullptr || cb_maskimage == nullptr)
 //  {
-//    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
+//    QMessageBox::information( nullptr, "Template", "Please load and select an image before starting image processing.");
 //    return;
 //  }
 

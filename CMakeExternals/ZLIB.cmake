@@ -52,14 +52,14 @@ if(MITK_USE_ZLIB)
 
     set(ZLIB_LIBRARY )
     if(ZLIB_LIBRARY_RELEASE)
-      list(APPEND ZLIB_LIBRARY optimized ${ZLIB_LIBRARY_RELEASE})
+      list(APPEND ZLIB_LIBRARY ${ZLIB_LIBRARY_RELEASE})
       install(FILES ${ZLIB_LIBRARY_RELEASE}
               DESTINATION lib
               CONFIGURATIONS Release
               COMPONENT dev)
     endif()
     if(ZLIB_LIBRARY_DEBUG)
-      list(APPEND ZLIB_LIBRARY debug ${ZLIB_LIBRARY_DEBUG})
+      list(APPEND ZLIB_LIBRARY ${ZLIB_LIBRARY_DEBUG})
       install(FILES ${ZLIB_LIBRARY_DEBUG}
               DESTINATION lib
               CONFIGURATIONS Debug

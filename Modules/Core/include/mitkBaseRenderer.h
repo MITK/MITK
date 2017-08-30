@@ -45,7 +45,6 @@ namespace mitk
   class DataStorage;
   class Mapper;
   class BaseLocalStorageHandler;
-  class OverlayManager;
   class KeyEvent;
 
   //##Documentation
@@ -166,14 +165,14 @@ namespace mitk
     //##
     //## Depending of the type of the passed BaseGeometry more or less information can be extracted:
     //## \li if it is a PlaneGeometry (which is a sub-class of BaseGeometry), m_CurrentWorldPlaneGeometry is
-    //## also set to point to it. m_WorldTimeGeometry is set to NULL.
+    //## also set to point to it. m_WorldTimeGeometry is set to nullptr.
     //## \li if it is a TimeGeometry, m_WorldTimeGeometry is also set to point to it.
     //## If m_WorldTimeGeometry contains instances of SlicedGeometry3D, m_CurrentWorldPlaneGeometry is set to
     //## one of geometries stored in the SlicedGeometry3D according to the value of m_Slice;  otherwise
     //## a PlaneGeometry describing the top of the bounding-box of the BaseGeometry is set as the
     //## m_CurrentWorldPlaneGeometry.
     //## \li otherwise a PlaneGeometry describing the top of the bounding-box of the BaseGeometry
-    //## is set as the m_CurrentWorldPlaneGeometry. m_WorldTimeGeometry is set to NULL.
+    //## is set as the m_CurrentWorldPlaneGeometry. m_WorldTimeGeometry is set to nullptr.
     //## @todo add calculation of PlaneGeometry describing the top of the bounding-box of the BaseGeometry
     //## when the passed BaseGeometry is not sliced.
     //## \sa m_WorldGeometry
@@ -220,16 +219,6 @@ namespace mitk
     //##
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
-
-    //##Documentation
-    //## @brief Sets an OverlayManager which is used to add various Overlays to this
-    //## renderer. If an OverlayManager was already set it will be overwritten.
-    void SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager);
-
-    //##Documentation
-    //## @brief Get the OverlayManager registered with this renderer
-    //## if none was set, it will be created at this point.
-    itk::SmartPointer<OverlayManager> GetOverlayManager();
 
     itkGetConstMacro(Slice, unsigned int)
 
@@ -400,9 +389,20 @@ namespace mitk
     void WorldToDisplay(const Point3D &worldIndex, Point2D &displayPoint) const;
 
     //##Documentation
+    //## @brief This method converts a 3D world index to the point on the viewport
+    //## using the geometry of the renderWindow.
+    void WorldToView(const Point3D &worldIndex, Point2D &viewPoint) const;
+
+    //##Documentation
     //## @brief This method converts a 2D plane coordinate to the display point
     //## using the geometry of the renderWindow.
     void PlaneToDisplay(const Point2D &planePointInMM, Point2D &displayPoint) const;
+
+    //##Documentation
+    //## @brief This method converts a 2D plane coordinate to the point on the viewport
+    //## using the geometry of the renderWindow.
+    void PlaneToView(const Point2D &planePointInMM, Point2D &viewPoint) const;
+
 
     double GetScaleFactorMMPerDisplayUnit() const;
 
@@ -464,14 +464,7 @@ namespace mitk
     //## @brief Sets m_CurrentWorldGeometry
     virtual void SetCurrentWorldGeometry(BaseGeometry *geometry);
 
-    //##Documentation
-    //## @brief This method is called during the rendering process to update or render the Overlays
-    //## which are stored in the OverlayManager
-    void UpdateOverlays();
-
   private:
-    itk::SmartPointer<OverlayManager> m_OverlayManager;
-
     //##Documentation
     //## m_WorldTimeGeometry is set by SetWorldGeometry if the passed BaseGeometry is a
     //## TimeGeometry (or a sub-class of it). If it contains instances of SlicedGeometry3D,

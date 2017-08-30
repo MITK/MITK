@@ -102,6 +102,7 @@ set(SRC_CPP_FILES
   berryWindow.cpp
   berryWorkbenchActionConstants.cpp
   berryWorkbenchPart.cpp
+  berryWorkbenchPlugin.cpp
   berryWorkbenchPreferenceConstants.cpp
   berryXMLMemento.cpp
 
@@ -401,7 +402,6 @@ set(INTERNAL_CPP_FILES
   berryWorkbenchMenuService.cpp
   berryWorkbenchPagePartList.cpp
   berryWorkbenchPartReference.cpp
-  berryWorkbenchPlugin.cpp
   berryWorkbenchRegistryConstants.cpp
   berryWorkbenchServiceRegistry.cpp
   berryWorkbenchSourceProvider.cpp
@@ -422,6 +422,7 @@ set(MOC_H_FILES
   src/berryQtSelectionProvider.h
   src/berryViewPart.h
   src/berryWorkbenchPart.h
+  src/berryWorkbenchPlugin.h
 
   src/actions/berryCommandContributionItem.h
   src/actions/berryMenuManager.h
@@ -457,7 +458,6 @@ set(MOC_H_FILES
   src/internal/berryReopenEditorMenu.h
   src/internal/berryShowViewMenu.h
   src/internal/berrySwitchToWindowMenu.h
-  src/internal/berryWorkbenchPlugin.h
   src/internal/berryWorkbenchSourceProvider.h
 
   src/internal/defaultpresentation/berryNativeTabFolder.h

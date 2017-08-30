@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImagePixelReadAccessor.h"
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
-  : m_SegmentationBinaryImage(NULL),
+  : m_SegmentationBinaryImage(nullptr),
     m_MaxSpacing(5),
     m_NegativeNormalCounter(0),
     m_PositiveNormalCounter(0),
@@ -52,7 +52,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
     existingPolys->InitTraversal();
 
-    vtkIdType *cell(NULL);
+    vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     // The array that contains all the vertex normals of the current polygon
@@ -272,7 +272,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
     existingPolys->InitTraversal();
 
-    vtkIdType *cell(NULL);
+    vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     for (existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)

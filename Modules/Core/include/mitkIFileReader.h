@@ -76,7 +76,7 @@ namespace mitk
      * @param location A custom label for the input stream.
      * @param is The input stream.
      *
-     * If \c is is \c NULL, this clears the current input stream and \c location
+     * If \c is is \c nullptr, this clears the current input stream and \c location
      * is interpreted as a file-system path. Otherwise, \c location is a custom
      * label describing the input stream \c is.
      */

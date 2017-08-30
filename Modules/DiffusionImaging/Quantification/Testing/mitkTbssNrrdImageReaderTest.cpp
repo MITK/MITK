@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "mitkNrrdTbssImageReader".
  */
-int mitkTbssNrrdImageReaderTest(int argc , char* argv[])
+int mitkTbssNrrdImageReaderTest(int  , char* argv[])
 {
   MITK_TEST_BEGIN("TbssNrrdImageReaderTest");
 
@@ -36,7 +36,7 @@ int mitkTbssNrrdImageReaderTest(int argc , char* argv[])
 
   mitk::TbssImage* tbssImg = tbssNrrdReader->GetOutput();
 
-  MITK_TEST_CONDITION_REQUIRED(tbssImg != NULL, "Testing that tbssImg is not null");
+  MITK_TEST_CONDITION_REQUIRED(tbssImg != nullptr, "Testing that tbssImg is not null");
 
   mitk::TbssImage::SizeType size = tbssImg->GetLargestPossibleRegion().GetSize();
 

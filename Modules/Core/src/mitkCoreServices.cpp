@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
-#include <mitkIShaderRepository.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -49,30 +48,23 @@ namespace mitk
   template <class S>
   static S *GetCoreService(us::ModuleContext *context)
   {
-    if (context == NULL)
+    if (context == nullptr)
       context = us::GetModuleContext();
 
-    S *coreService = NULL;
+    S *coreService = nullptr;
     us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
     if (serviceRef)
     {
       coreService = context->GetService(serviceRef);
     }
 
-    assert(coreService && "Asserting non-NULL MITK core service");
+    assert(coreService && "Asserting non-nullptr MITK core service");
     {
       itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
       s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
     }
 
     return coreService;
-  }
-
-  IShaderRepository *CoreServices::GetShaderRepository()
-  {
-    static us::ServiceTracker<IShaderRepository> tracker(us::GetModuleContext());
-    tracker.Open();
-    return tracker.GetService();
   }
 
   IPropertyAliases *CoreServices::GetPropertyAliases(us::ModuleContext *context)

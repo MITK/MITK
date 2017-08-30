@@ -103,8 +103,6 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
                                                                           const mitk::Image::Pointer &upper,
                                                                           float ratio)
 {
-  typedef itk::Image<TPixel, VImageDimension> ResultImageType;
-
   typename DistanceFilterImageType::Pointer lowerITK = DistanceFilterImageType::New();
   typename DistanceFilterImageType::Pointer upperITK = DistanceFilterImageType::New();
 

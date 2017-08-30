@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
   \brief QmitkToFDeviceGeneration
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
 class QmitkToFDeviceGeneration : public QmitkAbstractView
 {

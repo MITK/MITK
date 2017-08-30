@@ -83,14 +83,14 @@ namespace mitk
       errorMessage->append("Hardware error on opening the connection (");
       errorMessage->append(e.GetDescription());
       errorMessage->append(")");
-      return NULL;
+      return nullptr;
     }
     catch (mitk::IGTException& e)
     {
       errorMessage->append("Error on opening the connection (");
       errorMessage->append(e.GetDescription());
       errorMessage->append(")");
-      return NULL;
+      return nullptr;
     }
 
     //now search for automatically detected tools in the tool storage and save them
@@ -129,7 +129,7 @@ namespace mitk
       if (!toolFound)
       {
         errorMessage->append("Error: did not find every automatically detected tool in the loaded tool storage: aborting initialization.");
-        return NULL;
+        return nullptr;
       }
     }
 

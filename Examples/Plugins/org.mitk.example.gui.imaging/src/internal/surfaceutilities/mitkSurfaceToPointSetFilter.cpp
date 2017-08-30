@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::SurfaceToPointSetFilter::SurfaceToPointSetFilter()
 {
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
 }
 
 mitk::SurfaceToPointSetFilter::~SurfaceToPointSetFilter()

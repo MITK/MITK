@@ -38,7 +38,7 @@ namespace mitk
   // Constants for EventIds; use the according constant to through an event in the code
   enum EEventIds
   {
-    EIDNULLEVENT = 0,
+    EIDnullptrEVENT = 0,
     EIDLEFTMOUSEBTN = 1,
     EIDRIGHTMOUSEBTN = 2,
     EIDLEFTMOUSEBTNANDSHIFT = 3,

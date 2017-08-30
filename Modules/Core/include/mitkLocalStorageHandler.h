@@ -72,6 +72,17 @@ namespace mitk
       delete l;
     }
 
+    std::vector<mitk::BaseRenderer *> GetRegisteredBaseRenderer()
+    {
+      std::vector<mitk::BaseRenderer *> baserenderers;
+      typename std::map<mitk::BaseRenderer *, L *>::iterator it;
+      for (it = m_BaseRenderer2LS.begin(); it != m_BaseRenderer2LS.end(); ++it)
+      {
+        baserenderers.push_back(it->first);
+      }
+      return baserenderers;
+    }
+
     /** \brief Retrieves a LocalStorage for a specific BaseRenderer.
      *
      * Should be used by mappers in GenerateDataForRenderer()

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCircularProfileTubeElement.h"
 #include "mitkTubeGraph.h"
 #include "mitkTubeGraphProperty.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -39,14 +39,14 @@ namespace mitk
   *
   */
 
-  class MITKTUBEGRAPH_EXPORT TubeGraphVtkMapper3D : public VtkMapper3D
+  class MITKTUBEGRAPH_EXPORT TubeGraphVtkMapper3D : public VtkMapper
   {
   public:
     /* Typedefs */
     typedef TubeGraph::EdgeDescriptorType EdgeDescriptorType;
     typedef TubeGraph::VertexDescriptorType VertexDescriptorType;
 
-    mitkClassMacro(TubeGraphVtkMapper3D, VtkMapper3D);
+    mitkClassMacro(TubeGraphVtkMapper3D, VtkMapper);
     itkNewMacro(Self);
     /**
     * Returns the input data object of the given filter. In this

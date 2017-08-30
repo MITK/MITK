@@ -110,7 +110,15 @@ void mitk::ToFImageDownsamplingFilter::ItkImageResampling( const itk::Image<TPix
 
   outputSpacing[0] = inputSpacing[0] * ( inputSize[0]/ m_ResampledX );
   outputSpacing[1] = inputSpacing[1] * ( inputSize[1]/ m_ResampledY );
-  outputSpacing[2] = inputSpacing[2] * ( inputSize[2]/ m_ResampledZ );
+
+  if (VImageDimension > 2)
+  {
+    outputSpacing[2] = inputSpacing[2] * ( inputSize[2]/ m_ResampledZ );
+  }
+  else
+  {
+    outputSpacing[2] = 0.0;
+  }
 
   mitk::Vector3D mitkspacing;
   mitkspacing[0] = outputSpacing[0];

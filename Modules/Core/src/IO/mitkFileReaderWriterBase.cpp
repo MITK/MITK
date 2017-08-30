@@ -151,8 +151,8 @@ namespace mitk
 
   us::ServiceRegistration<CustomMimeType> FileReaderWriterBase::RegisterMimeType(us::ModuleContext *context)
   {
-    if (context == NULL)
-      throw std::invalid_argument("The context argument must not be NULL.");
+    if (context == nullptr)
+      throw std::invalid_argument("The context argument must not be nullptr.");
 
     CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider(context));
 

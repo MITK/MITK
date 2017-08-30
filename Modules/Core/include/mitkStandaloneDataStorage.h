@@ -51,7 +51,7 @@ namespace mitk
       //## of source objects, that were used to create this object. The new object will have
       //## a 'was created from' relation to its source objects.
       //## the addition of a new object will fire the notification mechanism.
-      //## If the node parameter is NULL or if the DataNode has already been added,
+      //## If the node parameter is nullptr or if the DataNode has already been added,
       //## an exception will be thrown.
       void Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents = nullptr) override;
 

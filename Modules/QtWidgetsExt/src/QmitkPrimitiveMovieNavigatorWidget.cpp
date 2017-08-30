@@ -27,7 +27,7 @@ QmitkPrimitiveMovieNavigatorWidget::QmitkPrimitiveMovieNavigatorWidget(QWidget *
   connect(m_Controls.m_GoButton, SIGNAL(clicked()), this, SLOT(goButton_clicked()));
   connect(m_Controls.m_TimerInterval, SIGNAL(valueChanged(int)), this, SLOT(setTimerInterval(int)));
 
-  m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the
+  m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != nullptr (additionally to the
                       // avoiding recursions during refetching)
   m_Timer = new QTimer(this);
   m_TimerIntervalInMS = 120;
@@ -57,7 +57,7 @@ void QmitkPrimitiveMovieNavigatorWidget::Refetch()
 void QmitkPrimitiveMovieNavigatorWidget::SetStepper(mitk::Stepper *stepper)
 {
   m_Stepper = stepper;
-  m_InRefetch = (stepper == nullptr); // this avoids trying to use m_Stepper until it is set to something != NULL
+  m_InRefetch = (stepper == nullptr); // this avoids trying to use m_Stepper until it is set to something != nullptr
                                       // (additionally to the avoiding recursions during refetching)
 }
 

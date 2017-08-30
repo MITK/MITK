@@ -140,7 +140,7 @@ namespace mitk
     }
     return roi;
     */
-    return NULL;
+    return nullptr;
   }
 
   bool mitk::ToFCameraPMDCamBoardController::SetFieldOfView( float fov )

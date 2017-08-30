@@ -40,7 +40,6 @@ public:
   void setUp()
   {
     typedef itk::Image<double, 3> ImageType;
-    typedef itk::VectorImage<double, 3> VectorImageType;
     typedef itk::ImageRegionIterator<ImageType> ImageIteratorType;
     typedef itk::ImageDuplicator<ImageType> DuplicatorType;
     typedef itk::ComposeImageFilter<ImageType> CompositeFilterType;

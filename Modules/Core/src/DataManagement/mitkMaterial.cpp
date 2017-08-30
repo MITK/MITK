@@ -307,7 +307,7 @@ bool mitk::Material::operator==(const Material &property) const
 {
   const Self *other = dynamic_cast<const Self *>(&property);
 
-  if (other == NULL)
+  if (other == nullptr)
     return false;
   else
     return (m_Color == other->GetColor() && m_ColorCoefficient == other->GetColorCoefficient() &&

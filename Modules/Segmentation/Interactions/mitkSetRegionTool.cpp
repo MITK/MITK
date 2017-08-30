@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
 #include "mitkLabelSetImage.h"
-#include "mitkLegacyAdaptors.h"
 
 #include <mitkITKImageImport.h>
 #include <mitkImagePixelReadAccessor.h>
@@ -114,14 +113,6 @@ void mitk::SetRegionTool::OnMousePressed(StateMachineAction *, InteractionEvent 
   DataNode *workingNode(m_ToolManager->GetWorkingData(0));
   if (!workingNode)
     return;
-
-  Image *image = dynamic_cast<Image *>(workingNode->GetData());
-  LabelSetImage *labelImage = dynamic_cast<LabelSetImage *>(image);
-  int activeColor = 1;
-  if (labelImage != 0)
-  {
-    activeColor = labelImage->GetActiveLabel()->GetValue();
-  }
 
   mitk::ImageToContourModelFilter::Pointer contourextractor = mitk::ImageToContourModelFilter::New();
   contourextractor->SetInput(resultImage);

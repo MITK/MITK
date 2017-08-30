@@ -8,7 +8,7 @@ TrackVisFiberReader::~TrackVisFiberReader() { if (m_FilePointer) fclose( m_FileP
 
 // Create a TrackVis file and store standard metadata. The file is ready to append fibers.
 // ---------------------------------------------------------------------------------------
-short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib)
+short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib, bool lps)
 {
     // prepare the header
     for(int i=0; i<3 ;i++)
@@ -28,7 +28,10 @@ short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib
     }
     m_Header.n_scalars = 0;
     m_Header.n_properties = 0;
-    sprintf(m_Header.voxel_order,"LPS");
+    if (lps)
+        sprintf(m_Header.voxel_order,"LPS");
+    else
+        sprintf(m_Header.voxel_order,"RAS");
     m_Header.image_orientation_patient[0] = 1.0;
     m_Header.image_orientation_patient[1] = 0.0;
     m_Header.image_orientation_patient[2] = 0.0;
@@ -71,7 +74,7 @@ short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib
 // -------------------------------------------------------------
 short TrackVisFiberReader::open( string filename )
 {
-    m_FilePointer = fopen(filename.c_str(),"r+b");
+    m_FilePointer = fopen(filename.c_str(), "rb");
     if (m_FilePointer == nullptr)
     {
         printf("[ERROR] Unable to open file '%s'\n",filename.c_str());

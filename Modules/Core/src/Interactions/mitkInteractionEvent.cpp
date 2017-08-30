@@ -71,7 +71,7 @@ mitk::InteractionEvent::~InteractionEvent()
 
 bool mitk::InteractionEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<InteractionEvent *>(baseClass.GetPointer()) != NULL);
+  return (dynamic_cast<InteractionEvent *>(baseClass.GetPointer()) != nullptr);
 }
 
 bool mitk::operator==(const InteractionEvent &a, const InteractionEvent &b)

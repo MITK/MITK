@@ -142,7 +142,7 @@ public:
 
   void TestLoadAndSaveImage()
   {
-    mitk::Image::Pointer img1 = mitk::IOUtil::LoadImage(m_ImagePath);
+    mitk::Image::Pointer img1 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_ImagePath)[0].GetPointer());
     CPPUNIT_ASSERT(img1.IsNotNull());
 
     std::ofstream tmpStream;
@@ -156,7 +156,7 @@ public:
     CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::Save(img1.GetPointer(), imagePath2));
 
     // load data which does not exist
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadImage("fileWhichDoesNotExist.nrrd"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load("fileWhichDoesNotExist.nrrd"), mitk::Exception);
 
     // delete the files after the test is done
     std::remove(imagePath.c_str());
@@ -166,7 +166,7 @@ public:
     std::string imagePath3 = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.nrrd");
     tmpStream.close();
     mitk::IOUtil::Save(relativImage, imagePath3);
-    CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::LoadImage(imagePath3));
+    CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::Load(imagePath3));
     std::remove(imagePath3.c_str());
   }
 
@@ -175,9 +175,6 @@ public:
   **/
   void TestNullLoad()
   {
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadImage(""), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadSurface(""), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadPointSet(""), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::Load(""), mitk::Exception);
   }
 
@@ -187,15 +184,13 @@ public:
   **/
   void TestNullSave()
   {
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(NULL, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(mitk::Image::New().GetPointer(), ""), mitk::Exception);
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(NULL, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(nullptr, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(mitk::Image::New().GetPointer(), ""), mitk::Exception);
   }
 
   void TestLoadAndSavePointSet()
   {
-    mitk::PointSet::Pointer pointset = mitk::IOUtil::LoadPointSet(m_PointSetPath);
+    mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(m_PointSetPath)[0].GetPointer());
     CPPUNIT_ASSERT(pointset.IsNotNull());
 
     std::ofstream tmpStream;
@@ -220,7 +215,7 @@ public:
 
   void TestLoadAndSaveSurface()
   {
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(m_SurfacePath);
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(m_SurfacePath)[0].GetPointer());
     CPPUNIT_ASSERT(surface.IsNotNull());
 
     std::ofstream tmpStream;

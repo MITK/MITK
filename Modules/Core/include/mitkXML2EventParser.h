@@ -52,7 +52,7 @@ namespace mitk
        * @param filename The resource name relative to the Interactions resource folder.
        * @param module
        */
-    XML2EventParser(const std::string &filename, const us::Module *module = NULL);
+    XML2EventParser(const std::string &filename, const us::Module *module = nullptr);
 
     /**
        * @brief Construct an InteractionEventList object based on a XML configuration file.

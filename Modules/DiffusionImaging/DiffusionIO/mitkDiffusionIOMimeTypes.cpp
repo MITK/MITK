@@ -33,8 +33,10 @@ std::vector<CustomMimeType*> DiffusionIOMimeTypes::Get()
 
   mimeTypes.push_back(FIBERBUNDLE_VTK_MIMETYPE().Clone());
   mimeTypes.push_back(FIBERBUNDLE_TRK_MIMETYPE().Clone());
+  mimeTypes.push_back(FIBERBUNDLE_TCK_MIMETYPE().Clone());
 
   mimeTypes.push_back(CONNECTOMICS_MIMETYPE().Clone());
+  mimeTypes.push_back(TRACTOGRAPHYFOREST_MIMETYPE().Clone());
 
   mimeTypes.push_back(PLANARFIGURECOMPOSITE_MIMETYPE().Clone());
 
@@ -52,6 +54,17 @@ CustomMimeType DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE()
   return mimeType;
 }
 
+
+CustomMimeType DiffusionIOMimeTypes::TRACTOGRAPHYFOREST_MIMETYPE()
+{
+  CustomMimeType mimeType(TRACTOGRAPHYFOREST_MIMETYPE_NAME());
+  std::string category = "Tractography Forest";
+  mimeType.SetComment("Tractography Forest");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("rf");
+  return mimeType;
+}
+
 CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE()
 {
   CustomMimeType mimeType(FIBERBUNDLE_VTK_MIMETYPE_NAME());
@@ -60,6 +73,16 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE()
   mimeType.SetCategory(category);
   mimeType.AddExtension("fib");
 //  mimeType.AddExtension("vtk");
+  return mimeType;
+}
+
+CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_TCK_MIMETYPE()
+{
+  CustomMimeType mimeType(FIBERBUNDLE_TCK_MIMETYPE_NAME());
+  std::string category = "MRtrix Fibers";
+  mimeType.SetComment("MRtrix Fibers");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("tck");
   return mimeType;
 }
 
@@ -110,6 +133,12 @@ std::string DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME()
   return name;
 }
 
+std::string DiffusionIOMimeTypes::FIBERBUNDLE_TCK_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.tck";
+  return name;
+}
+
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME()
 {
   static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.trk";
@@ -140,6 +169,12 @@ std::string DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE_NAME()
   return name;
 }
 
+std::string DiffusionIOMimeTypes::TRACTOGRAPHYFOREST_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".rf";
+  return name;
+}
+
 // Descriptions
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_MIMETYPE_DESCRIPTION()
 {
@@ -156,6 +191,12 @@ std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION()
 std::string DiffusionIOMimeTypes::PLANARFIGURECOMPOSITE_MIMETYPE_DESCRIPTION()
 {
   static std::string description = "Planar Figure Composite";
+  return description;
+}
+
+std::string DiffusionIOMimeTypes::TRACTOGRAPHYFOREST_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Tractography Forest";
   return description;
 }
 

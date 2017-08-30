@@ -72,11 +72,11 @@ int main(int argc, char* argv[])
 
   MITK_INFO << "Read images";
   mitk::Image::Pointer mask1;
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
-  mitk::Image::Pointer mask0 = mitk::IOUtil::LoadImage(parsedArgs["mask0"].ToString());
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+  mitk::Image::Pointer mask0 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["mask0"].ToString())[0].GetPointer());
   if (mode > 3)
   {
-    mask1 = mitk::IOUtil::LoadImage(parsedArgs["mask1"].ToString());
+    mask1 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["mask1"].ToString())[0].GetPointer());
   }
   mitk::MRNormLinearStatisticBasedFilter::Pointer oneRegion = mitk::MRNormLinearStatisticBasedFilter::New();
   mitk::MRNormTwoRegionsBasedFilter::Pointer twoRegion = mitk::MRNormTwoRegionsBasedFilter::New();
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
     break;
   }
 
-  mitk::IOUtil::SaveImage(output, parsedArgs["output"].ToString());
+  mitk::IOUtil::Save(output, parsedArgs["output"].ToString());
 
   return 0;
 }

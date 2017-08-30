@@ -275,7 +275,7 @@ void mitk::OpenCVVideoSource::GetCurrentFrameAsItkHSVPixelImage(HSVPixelImageTyp
 
   // Prepare iteration
   HSVConstIteratorType itImage( Image, Image->GetLargestPossibleRegion());
-  itImage.Begin();
+  itImage.GoToBegin();
   HSVPixelType pixel;
   int rowsize = 3 * m_CaptureWidth;
 

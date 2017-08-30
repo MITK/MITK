@@ -411,7 +411,7 @@ void QmitkDataStorageComboBox::Reset()
   {
     mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects;
 
-    // select all if predicate == NULL
+    // select all if predicate == nullptr
     if (m_Predicate.IsNotNull())
       setOfObjects = m_DataStorage->GetSubset(m_Predicate);
     else

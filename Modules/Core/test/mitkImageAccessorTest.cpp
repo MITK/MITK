@@ -45,11 +45,11 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
   struct itk::MultiThreader::ThreadInfoStruct *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)data;
 
   // some data validity checking
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
@@ -174,10 +174,10 @@ int mitkImageAccessorTest(int argc, char *argv[])
     std::cout << "no file specified [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  mitk::Image::Pointer image = NULL;
+  mitk::Image::Pointer image = nullptr;
   try
   {
-    image = mitk::IOUtil::LoadImage(std::string(argv[1]));
+    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(std::string(argv[1]))[0].GetPointer());
 
     if (image.IsNull())
     {
@@ -203,7 +203,7 @@ int mitkImageAccessorTest(int argc, char *argv[])
   try
   {
     mitk::ImageWriteAccessor first(image);
-    mitk::ImageReadAccessor second(image, NULL, mitk::ImageAccessorBase::IgnoreLock);
+    mitk::ImageReadAccessor second(image, nullptr, mitk::ImageAccessorBase::IgnoreLock);
     MITK_TEST_CONDITION_REQUIRED(true, "Testing the option flag \"IgnoreLock\" in ReadAccessor");
   }
   catch (const mitk::Exception & /*e*/)

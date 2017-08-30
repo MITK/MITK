@@ -37,7 +37,7 @@ mitk::ConnectomicsNetworkSerializer::~ConnectomicsNetworkSerializer()
 std::string mitk::ConnectomicsNetworkSerializer::Serialize()
 {
   const ConnectomicsNetwork* conNet = dynamic_cast<const ConnectomicsNetwork*>( m_Data.GetPointer() );
-  if (conNet == NULL)
+  if (conNet == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::ConnectomicsNetwork. Cannot serialize as ConnectomicsNetwork.";

@@ -42,10 +42,10 @@ OdfMaximaExtractionFilter< TOdfPixelType >::OdfMaximaExtractionFilter():
     m_NormalizationMethod(MAX_VEC_NORM),
     m_PeakThreshold(0.2),
     m_MaxNumPeaks(10),
-    m_ShCoeffImage(NULL),
-    m_OutputFiberBundle(NULL),
-    m_NumDirectionsImage(NULL),
-    m_DirectionImageContainer(NULL)
+    m_ShCoeffImage(nullptr),
+    m_OutputFiberBundle(nullptr),
+    m_NumDirectionsImage(nullptr),
+    m_DirectionImageContainer(nullptr)
 {
 
 }
@@ -63,8 +63,8 @@ bool OdfMaximaExtractionFilter<TOdfPixelType>::ReconstructQballImage()
     cout << "Starting qball reconstruction\n";
     try {
         QballReconstructionFilterType::Pointer filter = QballReconstructionFilterType::New();
-        filter->SetGradientImage( m_DiffusionGradients, m_DiffusionImage );
         filter->SetBValue(m_Bvalue);
+        filter->SetGradientImage( m_DiffusionGradients, m_DiffusionImage );
         filter->SetLambda(0.006);
         filter->SetNormalizationMethod(QballReconstructionFilterType::QBAR_SOLID_ANGLE);
         filter->Update();

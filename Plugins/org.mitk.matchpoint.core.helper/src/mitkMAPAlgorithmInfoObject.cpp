@@ -20,7 +20,7 @@ namespace mitk
 {
 
 MAPAlgorithmInfoObject::MAPAlgorithmInfoObject() :
-  m_Info(NULL)
+  m_Info(nullptr)
 {
 
 }

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
-  : m_Image(image) /*, m_TimeSelectorForExtremaObject(NULL)*/
+  : m_Image(image) /*, m_TimeSelectorForExtremaObject(nullptr)*/
 {
   m_CountOfMinValuedVoxels.resize(1, 0);
   m_CountOfMaxValuedVoxels.resize(1, 0);
@@ -41,8 +41,8 @@ mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
 mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 {
   m_HistogramGeneratorObject = nullptr;
-  // m_TimeSelectorForExtremaObject = NULL;
-  // m_Image = NULL;
+  // m_TimeSelectorForExtremaObject = nullptr;
+  // m_Image = nullptr;
 }
 
 const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::GetScalarHistogram(

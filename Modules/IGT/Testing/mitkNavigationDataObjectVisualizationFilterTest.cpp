@@ -164,7 +164,7 @@ public:
 
   void TestOutput(){
     //testing getting the output
-    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput()", output != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput()", output != nullptr);
     CPPUNIT_ASSERT_MESSAGE("Testing GetOutput() == GetOutput()", output == myFilter->GetOutput());
     CPPUNIT_ASSERT_MESSAGE("Testing GetOutput() != GetOutput(1)", output != myFilter->GetOutput(1));
   }
@@ -183,7 +183,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE( "Testing GetRepresentationObject() != Dummy node", myFilter->GetRepresentationObject(0) != mitkToolDataDummy);
     CPPUNIT_ASSERT_MESSAGE( "Testing GetRepresentationObject() node 2", myFilter->GetRepresentationObject(1) == mitkToolData2);
     CPPUNIT_ASSERT_MESSAGE( "Testing GetRepresentationObject() != Dummy node", myFilter->GetRepresentationObject(1) != mitkToolDataDummy);
-    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() with out of range parameter", myFilter->GetRepresentationObject(111) == NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() with out of range parameter", myFilter->GetRepresentationObject(111) == nullptr);
   }
 
   void TestTransforms(){
@@ -272,7 +272,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Adding new input and testing GetNumberOfInputs == 3", myFilter->GetNumberOfInputs() == 3);
     CPPUNIT_ASSERT_MESSAGE("testing GetNumberOfOutputs == 3", myFilter->GetNumberOfOutputs() == 3);
     CPPUNIT_ASSERT_MESSAGE("Testing Input == newly added input", myFilter->GetInput(2) == ndDummy);
-    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput(2) != NULL", myFilter->GetOutput(2) != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput(2) != nullptr", myFilter->GetOutput(2) != nullptr);
     CPPUNIT_ASSERT_MESSAGE( "Testing GetOutput(2) != GetOutput(1)", myFilter->GetOutput(2) != myFilter->GetOutput(1));
     myFilter->SetRepresentationObject(2, mitkToolDataDummy);
     CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations() after adding latest tool", myFilter->GetNumberOfToolRepresentations() == 3);
@@ -425,7 +425,7 @@ public:
     // Test that the second RepresentationObject is updated properly even when
     // the first RepresentationObject is invalid
     nd2->Modified();
-    myFilter->SetRepresentationObject(0, NULL);
+    myFilter->SetRepresentationObject(0, nullptr);
     mitkToolData2->GetGeometry()->SetIdentity();
     myFilter->Update();
     CPPUNIT_ASSERT_MESSAGE( "Test that the second repr object is updated correctly when the first repr object is invalid",

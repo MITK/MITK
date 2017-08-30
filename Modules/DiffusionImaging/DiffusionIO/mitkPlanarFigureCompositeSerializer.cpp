@@ -39,7 +39,7 @@ mitk::PlanarFigureCompositeSerializer::~PlanarFigureCompositeSerializer()
 std::string mitk::PlanarFigureCompositeSerializer::Serialize()
 {
   const PlanarFigureComposite* fb = dynamic_cast<const PlanarFigureComposite*>( m_Data.GetPointer() );
-  if (fb == NULL)
+  if (fb == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::PlanarFigureComposite. Cannot serialize as PlanarFigureComposite.";

@@ -91,3 +91,41 @@ index 4d25e05..e10edad 100644
  if(DCMQI_LIBRARY_PROPERTIES)
    set_target_properties(${lib_name} PROPERTIES ${DCMQI_LIBRARY_PROPERTIES})
  endif()
+diff --git a/libsrc/Helper.cpp b/libsrc/Helper.cpp
+index 92f69c3..eb5aa39 100644
+--- a/libsrc/Helper.cpp
++++ b/libsrc/Helper.cpp
+@@ -2,6 +2,10 @@
+ // DCMQI includes
+ #include "dcmqi/Helper.h"
+
++// DCMTK includes
++#include <dcmtk/ofstd/oflist.h>
++
++
+ namespace dcmqi {
+
+   bool Helper::isUndefinedOrPathDoesNotExist(const string &var, const string &humanReadableName) {
+@@ -57,7 +61,7 @@ namespace dcmqi {
+ #endif
+     cout << "Searching recursively " << directory << " for DICOM files" << endl;
+     if(OFStandard::searchDirectoryRecursively(directory.c_str(), fileList)) {
+-      for(OFIterator<OFString> fileListIterator=fileList.begin(); fileListIterator!=fileList.end(); fileListIterator++) {
++      for(OFListIterator(OFString) fileListIterator=fileList.begin(); fileListIterator!=fileList.end(); fileListIterator++) {
+         dicomImageFiles.push_back((*fileListIterator).c_str());
+       }
+     }
+diff --git a/libsrc/ParaMapConverter.cpp b/libsrc/ParaMapConverter.cpp
+index 3aa3933..fbb63b3 100644
+--- a/libsrc/ParaMapConverter.cpp
++++ b/libsrc/ParaMapConverter.cpp
+@@ -133,7 +133,7 @@ namespace dcmqi {
+     realWorldValueMappingItem->setRealWorldValueSlope(metaInfo.getRealWorldValueSlope());
+     realWorldValueMappingItem->setRealWorldValueIntercept(atof(metaInfo.getRealWorldValueIntercept().c_str()));
+
+-    realWorldValueMappingItem->setRealWorldValueFirstValueMappeSigned(metaInfo.getFirstValueMapped());
++    realWorldValueMappingItem->setRealWorldValueFirstValueMappedSigned(metaInfo.getFirstValueMapped());
+     realWorldValueMappingItem->setRealWorldValueLastValueMappedSigned(metaInfo.getLastValueMapped());
+
+     CodeSequenceMacro* measurementUnitCode = metaInfo.getMeasurementUnitsCode();
+

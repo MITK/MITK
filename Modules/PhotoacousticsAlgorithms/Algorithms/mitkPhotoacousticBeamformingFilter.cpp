@@ -207,36 +207,29 @@ void mitk::BeamformingFilter::GenerateData()
 
   else
   {
-    unsigned short chunkSize = 1; // 1 chunk = 1 image
+    //unsigned short chunkSize = 1; // 1 chunk = 1 image
 
     unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
 
-    unsigned int oclOutputDimChunk[3] = { output->GetDimension(0), output->GetDimension(1), chunkSize};
-    unsigned int oclInputDimChunk[3] = { input->GetDimension(0), input->GetDimension(1), chunkSize};
-
-    unsigned int oclOutputDimLastChunk[3] = { output->GetDimension(0), output->GetDimension(1), input->GetDimension(2) % chunkSize };
-    unsigned int oclInputDimLastChunk[3] = { input->GetDimension(0), input->GetDimension(1), input->GetDimension(2) % chunkSize };
-
-    mitk::PhotoacousticOCLBeamformer::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformer::New();
-
     try
     {
+      mitk::PhotoacousticOCLBeamformingFilter::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
+
       if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
       {
         if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASQuad, true);
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DASQuad, true);
         else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASSphe, true);
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DASSphe, true);
       }
       else if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
       {
         if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASQuad, true);
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DMASQuad, true);
         else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASSphe, true);
+          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DMASSphe, true);
       }
       m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
-      m_oclFilter->SetOutputDim(oclOutputDimChunk);
       m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.TimeSpacing, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
 
       mitk::ImageReadAccessor inputReadAccessor(input);
@@ -252,44 +245,15 @@ void mitk::BeamformingFilter::GenerateData()
         return;
       }
 
-      if (chunkSize < oclOutputDim[2])
-      {
-        unsigned short curChunkSize = chunkSize;
+      m_ProgressHandle(50, "performing reconstruction");
 
-        for (unsigned int i = 0; i < ceil((float)oclOutputDim[2] / (float)chunkSize); ++i)
-        {
-          m_ProgressHandle(100 * ((float)(i * chunkSize) / (float)oclOutputDim[2]), "performing reconstruction");
+      m_oclFilter->SetOutputDim(oclOutputDim);
+      m_oclFilter->SetInput(input);
+      m_oclFilter->Update();
 
-          if ((oclOutputDim[2]) - (i * chunkSize) >= chunkSize)
-          {
-            m_oclFilter->SetInput((void*)&m_InputData[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)], oclInputDimChunk, sizeof(float));
-          }
-          else
-          {
-            m_oclFilter->SetInput((void*)&m_InputData[i * chunkSize * input->GetDimension(0) * input->GetDimension(1)], oclInputDimLastChunk, sizeof(float));
-            curChunkSize = (unsigned short)oclOutputDimLastChunk[2]; // the last chunk might have a different size!
-          }
-          
-          m_oclFilter->Update();
-          float* out = (float*)m_oclFilter->GetOutput();
+      void* out = m_oclFilter->GetOutput();
+      output->SetImportVolume(out, 0, 0, mitk::Image::ReferenceMemory);
 
-          for (unsigned short s = 0; s < curChunkSize; ++s)
-          {
-            output->SetImportSlice( (void*)&(out[s * oclOutputDim[0] * oclOutputDim[1]]), i * chunkSize + s, 0, 0, mitk::Image::ReferenceMemory);
-          }
-        }
-      }
-      else
-      {
-        m_ProgressHandle(50, "performing reconstruction");
-
-        m_oclFilter->SetOutputDim(oclOutputDim);
-        m_oclFilter->SetInput(input);
-        m_oclFilter->Update();
-
-        float* out = (float*)m_oclFilter->GetOutput();
-        output->SetImportVolume((void*)out, 0, 0, mitk::Image::ReferenceMemory);
-      }
     }
     catch (mitk::Exception &e)
     {

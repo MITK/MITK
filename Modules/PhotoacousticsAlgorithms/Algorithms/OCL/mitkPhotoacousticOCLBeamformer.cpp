@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPhotoacousticOCLBeamformer.h"
 #include "usServiceReference.h"
 
-mitk::PhotoacousticOCLBeamformer::PhotoacousticOCLBeamformer()
+mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
 : m_PixelCalculation( NULL ), m_InputImage(mitk::Image::New())
 {
   this->AddSourceFile("DASQuadratic.cl");
@@ -40,7 +40,7 @@ mitk::PhotoacousticOCLBeamformer::PhotoacousticOCLBeamformer()
   this->m_FilterID = "PixelCalculation";
 }
 
-mitk::PhotoacousticOCLBeamformer::~PhotoacousticOCLBeamformer()
+mitk::PhotoacousticOCLBeamformingFilter::~PhotoacousticOCLBeamformingFilter()
 {
   if ( this->m_PixelCalculation )
   {
@@ -48,7 +48,7 @@ mitk::PhotoacousticOCLBeamformer::~PhotoacousticOCLBeamformer()
   }
 }
 
-void mitk::PhotoacousticOCLBeamformer::Update()
+void mitk::PhotoacousticOCLBeamformingFilter::Update()
 {
   //Check if context & program available
   if (!this->Initialize())
@@ -66,7 +66,7 @@ void mitk::PhotoacousticOCLBeamformer::Update()
   }
 }
 
-void mitk::PhotoacousticOCLBeamformer::Execute()
+void mitk::PhotoacousticOCLBeamformingFilter::Execute()
 {
   cl_int clErr = 0;
 
@@ -120,12 +120,12 @@ void mitk::PhotoacousticOCLBeamformer::Execute()
   m_Output->Modified( GPU_DATA );
 }
 
-us::Module *mitk::PhotoacousticOCLBeamformer::GetModule()
+us::Module *mitk::PhotoacousticOCLBeamformingFilter::GetModule()
 {
   return us::GetModuleContext()->GetModule();
 }
 
-bool mitk::PhotoacousticOCLBeamformer::Initialize()
+bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
 {
   bool buildErr = true;
   cl_int clErr = 0;
@@ -160,7 +160,7 @@ bool mitk::PhotoacousticOCLBeamformer::Initialize()
   return (OclFilter::IsInitialized() && buildErr );
 }
 
-void mitk::PhotoacousticOCLBeamformer::SetInput(mitk::Image::Pointer image)
+void mitk::PhotoacousticOCLBeamformingFilter::SetInput(mitk::Image::Pointer image)
 {
   OclDataSetToDataSetFilter::SetInput(image);
 
@@ -170,7 +170,7 @@ void mitk::PhotoacousticOCLBeamformer::SetInput(mitk::Image::Pointer image)
   m_InputDim[2] = m_InputImage->GetDimension(2);
 }
 
-void mitk::PhotoacousticOCLBeamformer::SetInput(void* data, unsigned int* dimensions, unsigned int BpE)
+void mitk::PhotoacousticOCLBeamformingFilter::SetInput(void* data, unsigned int* dimensions, unsigned int BpE)
 {
   OclDataSetToDataSetFilter::SetInput(data, dimensions[0] * dimensions[1] * dimensions[2], BpE);
 
@@ -179,7 +179,7 @@ void mitk::PhotoacousticOCLBeamformer::SetInput(void* data, unsigned int* dimens
   m_InputDim[2] = dimensions[2];
 }
 
-mitk::Image::Pointer mitk::PhotoacousticOCLBeamformer::GetOutputAsImage()
+mitk::Image::Pointer mitk::PhotoacousticOCLBeamformingFilter::GetOutputAsImage()
 {
   mitk::Image::Pointer outputImage = mitk::Image::New();
 

@@ -34,11 +34,11 @@ namespace mitk
   */
 
 
-class PhotoacousticOCLBeamformer : public OclDataSetToDataSetFilter, public itk::Object
+class PhotoacousticOCLBeamformingFilter : public OclDataSetToDataSetFilter, public itk::Object
 {
 
 public:
-  mitkClassMacroItkParent(PhotoacousticOCLBeamformer, itk::Object);
+  mitkClassMacroItkParent(PhotoacousticOCLBeamformingFilter, itk::Object);
   itkNewMacro(Self);
 
   /**
@@ -96,10 +96,10 @@ public:
 protected:
 
   /** Constructor */
-  PhotoacousticOCLBeamformer();
+  PhotoacousticOCLBeamformingFilter();
 
   /** Destructor */
-  virtual ~PhotoacousticOCLBeamformer();
+  virtual ~PhotoacousticOCLBeamformingFilter();
 
   /** Initialize the filter */
   bool Initialize();

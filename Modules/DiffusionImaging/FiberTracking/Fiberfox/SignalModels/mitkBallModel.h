@@ -61,7 +61,6 @@ public:
     double GetBvalue() { return m_BValue; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
 protected:
 

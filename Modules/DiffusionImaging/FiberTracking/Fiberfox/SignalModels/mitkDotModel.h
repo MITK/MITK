@@ -52,7 +52,6 @@ public:
     ScalarType SimulateMeasurement(unsigned int dir);
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
 protected:
 

@@ -52,9 +52,11 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
   }
 
   int numberSlices = GetLargestPossibleRegion().GetSize()[2];
+  int timeSteps = GetTimeSteps();
+  int numberOfComponents = GetPixelType().GetNumberOfComponents();
   
   //mitk::ReaderType::DictionaryArrayType outputArray;
-  m_MetaDataDictionaryArray.resize(numberSlices);
+  m_MetaDataDictionaryArray.resize(numberSlices * timeSteps * numberOfComponents);
 
   for (unsigned int i = 0; i < m_MetaDataDictionaryArray.size(); ++i)
   {
@@ -66,7 +68,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
   {
     std::string tagkey = dicomTagsList[i];
     mitk::StringLookupTableProperty* tagsValueList =
-    dynamic_cast<mitk::StringLookupTableProperty*>(GetProperty(tagkey.c_str()).GetPointer());
+      dynamic_cast<mitk::StringLookupTableProperty*>(GetProperty(tagkey.c_str()).GetPointer());
 
     for (unsigned int j = 0; j < m_MetaDataDictionaryArray.size(); ++j)
     {

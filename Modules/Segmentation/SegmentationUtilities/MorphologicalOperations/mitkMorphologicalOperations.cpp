@@ -420,7 +420,7 @@ void mitk::MorphologicalOperations::itkRemoveFragments(itk::Image<TPixel, VDimen
   typedef std::pair<int, int> LabelInfo;
   typename std::vector<LabelInfo> labels;
   for (int i = 0; i < labelShapeMapFilter->GetOutput()->GetNumberOfLabelObjects(); i++) {
-    LabelImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = labelShapeMapFilter->GetOutput()->GetNthLabelObject(i);
+    typename LabelImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = labelShapeMapFilter->GetOutput()->GetNthLabelObject(i);
     labels.push_back(std::pair<int, int>(i, int(labelObject->GetNumberOfPixels())));
   }
   std::sort(labels.begin(), labels.end(), [](LabelInfo &left, LabelInfo &right)

@@ -28,9 +28,10 @@ if(MITK_USE_DCMTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      # specific version post-3.6.2 but before an API change which breaks DCMQI
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk_065a4b1f.tar.gz
-      URL_MD5 9362231aba67812deed65b35308de8bd
+      # specific version post-3.6.2 without the API change which breaks DCMQI
+      # 065a4b + 525490
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk_2ceb446c.tar.gz
+      URL_MD5 a4802436feffdb135d7d1e1e8917d1fa
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}

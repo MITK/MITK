@@ -128,17 +128,3 @@ index 3aa3933..fbb63b3 100644
      realWorldValueMappingItem->setRealWorldValueLastValueMappedSigned(metaInfo.getLastValueMapped());
 
      CodeSequenceMacro* measurementUnitCode = metaInfo.getMeasurementUnitsCode();
-
-diff --git a/libsrc/Helper.cpp b/libsrc/Helper.cpp
-index 92f69c3..b1968f2 100644
---- a/libsrc/Helper.cpp
-+++ b/libsrc/Helper.cpp
-@@ -57,7 +57,7 @@ namespace dcmqi {
- #endif
-     cout << "Searching recursively " << directory << " for DICOM files" << endl;
-     if(OFStandard::searchDirectoryRecursively(directory.c_str(), fileList)) {
--      for(OFIterator<OFString> fileListIterator=fileList.begin(); fileListIterator!=fileList.end(); fileListIterator++) {
-+      for(OFListIterator(OFString) fileListIterator=fileList.begin(); fileListIterator!=fileList.end(); fileListIterator++) {
-         dicomImageFiles.push_back((*fileListIterator).c_str());
-       }
-     }

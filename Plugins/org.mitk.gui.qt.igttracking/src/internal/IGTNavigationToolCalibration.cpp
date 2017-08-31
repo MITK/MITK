@@ -100,6 +100,8 @@ void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_ComputePivot, SIGNAL(clicked()), this, SLOT(OnComputePivot()));
   connect(m_Controls.m_UseComputedPivotPoint, SIGNAL(clicked()), this, SLOT(OnUseComputedPivotPoint()));
   connect(m_Controls.m_StartEditTooltipManually, SIGNAL(clicked()), this, SLOT(OnStartManualToolTipCalibration()));
+  connect(m_Controls.m_GetPositions, SIGNAL(clicked()), this, SLOT(OnGetPositions()));
+  connect(m_Controls.m_CalibrateToolAxis, SIGNAL(clicked()), this, SLOT(OnCalibrateToolAxis()));
   connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
   connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessManualTooltipEditDialogCloseRequest()));
   connect(m_Controls.m_CalibrationMethodComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnToolCalibrationMethodChanged(int)));
@@ -457,6 +459,55 @@ void IGTNavigationToolCalibration::OnProcessManualTooltipEditDialogCloseRequest(
   UpdateManualToolTipCalibrationView();
   m_ManualToolTipEditWidget->hide();
   this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
+}
+
+void IGTNavigationToolCalibration::OnGetPositions()
+{
+  //tool tip from tool to be calibrated 
+  mitk::NavigationData::Pointer StartTool = mitk::NavigationData::New();
+  StartTool->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDToolToCalibrate));
+  double startX = StartTool->GetPosition().GetVnlVector()[0];
+  double startY = StartTool->GetPosition().GetVnlVector()[1];
+  double startZ = StartTool->GetPosition().GetVnlVector()[2];
+  m_StartToolPosition.SetElement(0, startX);
+  m_StartToolPosition.SetElement(1, startY);
+  m_StartToolPosition.SetElement(2, startZ);
+
+  //tool end from calibration tool
+  mitk::NavigationData::Pointer EndTool = mitk::NavigationData::New();
+  EndTool->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDCalibrationPointer));
+  double endX = EndTool->GetPosition().GetVnlVector()[0];
+  double endY = EndTool->GetPosition().GetVnlVector()[1];
+  double endZ = EndTool->GetPosition().GetVnlVector()[2];
+  m_EndToolPosition.SetElement(0, endX);
+  m_EndToolPosition.SetElement(1, endY);
+  m_EndToolPosition.SetElement(2, endZ);
+
+  mitk::NavigationData::Pointer trackingToToolTransform = m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDToolToCalibrate)->GetInverse();
+  mitk::Vector3D trackingToToolPos;
+  trackingToToolPos.SetElement(0, trackingToToolTransform->GetPosition()[0]);
+  trackingToToolPos.SetElement(1, trackingToToolTransform->GetPosition()[1]);
+  trackingToToolPos.SetElement(2, trackingToToolTransform->GetPosition()[2]);
+
+  mitk::Vector3D startPosToolCoordinates = trackingToToolTransform->GetRotationMatrix() * (m_StartToolPosition)+trackingToToolPos;
+  mitk::Vector3D endPosToolCoordinates = trackingToToolTransform->GetRotationMatrix() * (m_EndToolPosition)+trackingToToolPos;
+  m_CalibratedToolAxis.SetElement(0, (-1 * endPosToolCoordinates[0] + startPosToolCoordinates[0]));
+  m_CalibratedToolAxis.SetElement(1, (-1 * endPosToolCoordinates[1] + startPosToolCoordinates[1]));
+  m_CalibratedToolAxis.SetElement(2, (-1 * endPosToolCoordinates[2] + startPosToolCoordinates[2]));
+  m_CalibratedToolAxis.Normalize();
+}
+
+void IGTNavigationToolCalibration::OnCalibrateToolAxis()
+{
+  QString xString = QString::number(m_CalibratedToolAxis.GetElement(0),'g',3);
+  QString yString = QString::number(m_CalibratedToolAxis.GetElement(1), 'g', 3);
+  QString zString = QString::number(m_CalibratedToolAxis.GetElement(2),'g',3);
+
+  QString calibratedToolAxisString = xString + ", " + yString + ", " + zString;
+  m_Controls.m_ToolAxis->setText(calibratedToolAxisString);
+  MITK_INFO << m_CalibratedToolAxis;
+
+  m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
 }
 
 void IGTNavigationToolCalibration::SetToolToCalibrate()

@@ -47,6 +47,7 @@ namespace Ui
 }
 
 class QmitkUSAbstractNavigationStep;
+class QmitkUSNavigationStepPunctuationIntervention;
 class QmitkStdMultiWidget;
 class QTimer;
 class QSignalMapper;
@@ -102,6 +103,9 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
 	*/
 	void OnActiveNavigationStepChanged(int);
 
+  /** Initializes the next navigation step */
+  void OnNextNavigationStepInitialization(int);
+
 	/**
 	* \brief The data node is given to the experiment logging and scene is saved to the file system.
 	*/
@@ -133,11 +137,6 @@ public:
 	static const std::string VIEW_ID;
 
 	void OnCombinedModalityPropertyChanged(const std::string &, const std::string &);
-  /**
-  * \returns the point defining the needle axis in the tool storage
-  */
-  void SetToolAxisMarkerPlacement();
-  mitk::Point3D m_ToolAxis;
 
 protected:
 	/**
@@ -154,6 +153,8 @@ protected:
 	* \brief Helper function for being able to serialize the 2d ultrasound image.
 	*/
 	void Convert2DImagesTo3D(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
+
+  void UpdateToolStorage();
 
 	void CreateOverlays();
 

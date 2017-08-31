@@ -22,40 +22,65 @@ See LICENSE.txt or http://www.mitk.org for details.
 // VTK
 #include <vtkPlane.h>
 
-
-
 mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   : m_Projection(mitk::PointSet::New()),
   m_OriginalPoints(mitk::PointSet::New()),
-  m_SelectedInput(-1)
+  m_SelectedInput(-1),
+  m_ShowToolAxis(false)
 {
   // Tool Coordinates:x axis is chosen as default axis when no axis is specified
-  for (int i = 0; i < 2; i++)
+
+  MITK_DEBUG << "Constructor called";
+
+  mitk::Point3D toolAxis;
+  mitk::FillVector3D(toolAxis, 1, 0, 0);
+  m_ToolAxis = toolAxis;
+  InitializeOriginalPoints(toolAxis, m_ShowToolAxis);
+
+  MITK_DEBUG << "orginal point 0 set constructor" << m_OriginalPoints->GetPoint(0);
+  MITK_DEBUG << "orginal point 1 set constructor" << m_OriginalPoints->GetPoint(1);
+}
+
+void mitk::NeedleProjectionFilter::InitializeOriginalPoints(mitk::Point3D toolAxis, bool showToolAxis)
+{
+  m_OriginalPoints = mitk::PointSet::New();
+
+  mitk::Point3D projectionPoint;
+  projectionPoint.SetElement(0, toolAxis.GetElement(0) * 400);
+  projectionPoint.SetElement(1, toolAxis.GetElement(1) * 400);
+  projectionPoint.SetElement(2, toolAxis.GetElement(2) * 400);
+  m_OriginalPoints->InsertPoint(projectionPoint);
+
+  mitk::Point3D toolOrigin;
+  toolOrigin.SetElement(0, 0);
+  toolOrigin.SetElement(1, 0);
+  toolOrigin.SetElement(2, 0);
+  m_OriginalPoints->InsertPoint(toolOrigin);
+
+  if (showToolAxis)
   {
-    mitk::Point3D point;
-    point.SetElement(0, i * 400);
-    point.SetElement(1, 0);
-    point.SetElement(2, 0);
-    m_OriginalPoints->InsertPoint(i, point);
+    mitk::Point3D axisPoint;
+    axisPoint.SetElement(0, toolAxis.GetElement(0) * -400);
+    axisPoint.SetElement(1, toolAxis.GetElement(1) * -400);
+    axisPoint.SetElement(2, toolAxis.GetElement(2) * -400);
+    m_OriginalPoints->InsertPoint(axisPoint);
   }
+
+}
+
+void mitk::NeedleProjectionFilter::ShowToolAxis(bool enabled)
+{
+  m_ShowToolAxis = enabled;
+  InitializeOriginalPoints(m_ToolAxis,m_ShowToolAxis);
 }
 
 void mitk::NeedleProjectionFilter::SetToolAxisForFilter(mitk::Point3D point)
 {
-  // Tool Coordinates: First point - Tip of Needle, Second Point - 40 cm distance from needle
-  mitk::Point3D originPoint;
-  originPoint.SetElement(0, 0);
-  originPoint.SetElement(1, 0);
-  originPoint.SetElement(2, 0);
-  m_OriginalPoints->SetPoint(0, originPoint);
+  m_ToolAxis = point;
+  InitializeOriginalPoints(m_ToolAxis, m_ShowToolAxis);
 
-  mitk::Point3D endPoint;
-  endPoint.SetElement(0, point.GetElement(0) * 400);
-  endPoint.SetElement(1, point.GetElement(1) * 400);
-  endPoint.SetElement(2, point.GetElement(2) * 400);
-  MITK_INFO << "Tool axis in project filter:";
-  MITK_INFO << endPoint;
-  m_OriginalPoints->SetPoint(1, endPoint);
+  MITK_DEBUG << "orginal point 1 set mutator" << m_OriginalPoints->GetPoint(1);
+  MITK_DEBUG << "orginal point 0 set mutator" << m_OriginalPoints->GetPoint(0);
 }
 
 mitk::NeedleProjectionFilter::~NeedleProjectionFilter()
@@ -88,11 +113,14 @@ void mitk::NeedleProjectionFilter::GenerateData()
   // 1) Generate Pseudo-Geometry for Input
   mitk::AffineTransform3D::Pointer refTrans = this->NavigationDataToTransform(this->GetInput(m_SelectedInput));
   mitk::Geometry3D::Pointer refGeom = this->TransformToGeometry(refTrans);
+
   // 2) Transform Original Pointset
   m_OriginalPoints->SetGeometry(refGeom);
   // Update Projection (We do not clone, since we want to keep properties alive)
   m_Projection->SetPoint(0, m_OriginalPoints->GetPoint(0));
   m_Projection->SetPoint(1, m_OriginalPoints->GetPoint(1));
+  if (m_ShowToolAxis) { m_Projection->SetPoint(2, m_OriginalPoints->GetPoint(2)); }
+
   // 3a) If no target Plane has been set, then leave it at that
   if (this->m_TargetPlane.IsNull())
     return;
@@ -124,7 +152,8 @@ void mitk::NeedleProjectionFilter::GenerateData()
     intersection[2] = x[2];
 
     // Replace distant point with image intersection
-    m_Projection->SetPoint(1, intersection);
+    m_Projection->SetPoint(0, intersection);
+
   }
 }
 

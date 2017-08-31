@@ -80,6 +80,44 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
   return ( clErr == CL_SUCCESS );
 }
 
+bool mitk::OclFilter::ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim )
+{
+  size_t offset[3] ={0, 0, 0};
+  cl_int clErr = 0;
+
+  if(workSizeDim == 2)
+  {
+    for(offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for(offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        clErr = clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
+                                        offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
+        CHECK_OCL_ERR( clErr );
+      }
+    }
+  }
+  else if(workSizeDim == 3)
+  {
+    for(offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for(offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        for(offset[2] = 0; offset[2] < m_GlobalWorkSize[2]; offset[2] += chunksDim[2])
+        {
+          clErr = clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
+                                          offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
+          CHECK_OCL_ERR( clErr );
+
+          MITK_INFO<< "started new chunk";
+        }
+      }
+    }
+  }
+
+  return ( clErr == CL_SUCCESS );
+}
+
 
 bool mitk::OclFilter::Initialize()
 {

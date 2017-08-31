@@ -108,6 +108,10 @@ protected:
       */
   bool ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim );
 
+  /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes, but divide it into chunks of dimension chunksDim
+      */
+  bool ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim );
+
   /**
       * \brief Initialize all necessary parts of the filter
       *

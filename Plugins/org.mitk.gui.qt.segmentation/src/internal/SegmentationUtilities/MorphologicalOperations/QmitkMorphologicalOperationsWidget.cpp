@@ -34,9 +34,13 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
   connect(m_Controls.btnDilatation, SIGNAL(clicked()), this, SLOT(OnDilatationButtonClicked()));
   connect(m_Controls.btnErosion, SIGNAL(clicked()), this, SLOT(OnErosionButtonClicked()));
   connect(m_Controls.btnFillHoles, SIGNAL(clicked()), this, SLOT(OnFillHolesButtonClicked()));
+  connect(m_Controls.btnRemoveFragments, SIGNAL(clicked()), this, SLOT(OnRemoveFragmentsClicked()));
   connect(m_Controls.radioButtonMorphoCross, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()));
   connect(m_Controls.radioButtonMorphoBall, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()));
   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+
+  connect(m_Controls.sliderPercent, SIGNAL(valueChanged(int)), m_Controls.spinPercent, SLOT(setValue(int)));
+  connect(m_Controls.spinPercent, SIGNAL(valueChanged(int)), m_Controls.sliderPercent, SLOT(setValue(int)));
 
   if (m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull())
     this->OnSelectionChanged(0, m_Controls.dataSelectionWidget->GetSelection(0));
@@ -70,6 +74,7 @@ void QmitkMorphologicalOperationsWidget::EnableButtons(bool enable)
   m_Controls.btnErosion->setEnabled(enable);
   m_Controls.btnFillHoles->setEnabled(enable);
   m_Controls.btnOpening->setEnabled(enable);
+  m_Controls.btnRemoveFragments->setEnabled(enable);
 }
 
 void QmitkMorphologicalOperationsWidget::OnRadioButtonsClicked()
@@ -219,6 +224,31 @@ void QmitkMorphologicalOperationsWidget::OnFillHolesButtonClicked()
   QApplication::restoreOverrideCursor();
 }
 
+void QmitkMorphologicalOperationsWidget::OnRemoveFragmentsClicked()
+{
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
+
+  try
+  {
+    mitk::MorphologicalOperations::RemoveFragments(image, m_Controls.spinPercent->value());
+  } catch (const itk::ExceptionObject& exception)
+  {
+    MITK_WARN << "Exception caught: " << exception.GetDescription();
+
+    QApplication::restoreOverrideCursor();
+    return;
+  }
+
+  node->SetData(image);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QApplication::restoreOverrideCursor();
+}
 
 mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperationsWidget::CreateStructerElement_UI()
 {

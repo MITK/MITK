@@ -51,6 +51,7 @@ namespace mitk
     static void Dilate(mitk::Image::Pointer& image, int factor, StructuralElementType structuralElement);
     static void Opening(mitk::Image::Pointer& image, int factor, StructuralElementType structuralElement);
     static void FillHoles(mitk::Image::Pointer& image);
+    static void RemoveFragments(mitk::Image::Pointer& image, int percent);
     ///@}
 
   private:
@@ -106,6 +107,9 @@ namespace mitk
 
     template<typename TPixel, unsigned int VDimension>
     void static itkFillHoles(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage);
+
+    template<typename TPixel, unsigned int VDimension>
+    void static itkRemoveFragments(itk::Image<TPixel, VDimension>* sourceImage, int percent, mitk::Image::Pointer& resultImage);
     ///@}
   };
 

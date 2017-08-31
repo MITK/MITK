@@ -693,6 +693,22 @@ namespace mitk {
     "7fe0|0010", // TAG_PIXEL_DATA
     "0051|100E", // TAG_EX_INFO
     "0018|0050", // TAG_SLICE_THICKNESS
+
+    // Diffusion vendor-specific tags
+    "0043|0010",
+    "0043|1039",
+    "0019|10bb",
+    "0019|10bc",
+    "0019|10bd",
+    "0029|1010",
+    "0018|9087",
+    "0021|1146",
+    "0052|9230",
+    "0018|9117",
+    "0021|9230",
+    "2001|1003",
+    "0018|9087",
+    "0018|9089"
   };
   
   static const std::map<std::string, std::string> tagToPropertyMap = {

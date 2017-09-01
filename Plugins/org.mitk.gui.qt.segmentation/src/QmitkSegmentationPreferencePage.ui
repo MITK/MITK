@@ -7,37 +7,38 @@
     <x>0</x>
     <y>0</y>
     <width>902</width>
-    <height>656</height>
+    <height>814</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>5</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>General</string>
+      <string>Slim view</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
        <widget class="QCheckBox" name="m_SlimViewCheckBox">
         <property name="text">
          <string>Hide tool button text and increase icon size</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="m_VolumeRenderingCheckBox">
-        <property name="text">
-         <string>Show as volume rendering</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="m_SelectionModeCheckBox">
-        <property name="text">
-         <string>Enable auto-selection mode</string>
         </property>
        </widget>
       </item>
@@ -53,14 +54,46 @@
       <item row="0" column="0">
        <widget class="QRadioButton" name="m_RadioOutline">
         <property name="text">
-         <string>Draw as outline</string>
+         <string>&amp;Draw as outline</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QRadioButton" name="m_RadioOverlay">
         <property name="text">
-         <string>Draw as transparent overlay</string>
+         <string>Draw &amp;as transparent overlay</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>3D display</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="m_VolumeRenderingCheckBox">
+        <property name="text">
+         <string>Show as volume rendering</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
+      <string>Data node selection mode</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="m_SelectionModeCheckBox">
+        <property name="text">
+         <string>Enable auto-selection mode</string>
         </property>
        </widget>
       </item>
@@ -183,7 +216,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>195</height>
+       <height>269</height>
       </size>
      </property>
     </spacer>

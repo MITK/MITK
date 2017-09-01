@@ -24,9 +24,8 @@ if(MITK_USE_DCMQI)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmqi-1.0.5.tar.gz
-      URL_MD5 85ac2734f65658e21e55cd5f3141b962
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMQI.patch
+      GIT_REPOSITORY https://github.com/nolden/dcmqi.git
+      GIT_TAG 8772b4e8d4babeb6e828b3fdb834cb9a4d1d7997
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

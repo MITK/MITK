@@ -14,6 +14,15 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index f9f215f..5680327 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
+@@ -5,6 +5,8 @@ if(NOT DCMQI_CMAKE_CXX_STANDARD)
+ endif()
+ set(CMAKE_CXX_STANDARD ${DCMQI_CMAKE_CXX_STANDARD})
+
++set(CMAKE_POSITION_INDEPENDENT_CODE 1)
++
+ set(DCMQI_CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+
+ #-----------------------------------------------------------------------------
 @@ -279,7 +279,6 @@ if(NOT Slicer_DIR)
    # For a build tree
    set(CONFIG_DIR_CONFIG ${CMAKE_BINARY_DIR})

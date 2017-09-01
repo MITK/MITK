@@ -982,6 +982,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         this->m_Controls->m_JSHistogram->SetDataLabels({ m_Controls->m_SelectedFeatureImageLabel->text().toStdString() });
         this->m_Controls->m_JSHistogram->SetXAxisLabel("Gray value");
         this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
+        m_Controls->m_UseDefaultBinSizeBox->setEnabled(true);
         m_Controls->m_JSHistogram->Show(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
 
         this->FillStatisticsTableView(this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());

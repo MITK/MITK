@@ -157,11 +157,14 @@ namespace mitk
 
       try
       {
+        // Hack: Remove the const attribute to switch between the layer images. Normally you could get the different
+        // layer images by input->GetLayerImage(layer)
+        mitk::LabelSetImage *mitkLayerImage = const_cast<mitk::LabelSetImage *>(input);
+        mitkLayerImage->SetActiveLayer(layer);
+
         // Cast mitk layer image to itk
         ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();
-        // BUG: It must be the layer image, but there are some errors with it (dcmqi: generate the dcmSeg "No frame data
-        // available") --> input->GetLayerImage(layer)
-        imageToItkFilter->SetInput(input);
+        imageToItkFilter->SetInput(mitkLayerImage);
         imageToItkFilter->Update();
 
         // Cast from original itk type to dcmqi input itk image type

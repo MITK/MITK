@@ -403,7 +403,7 @@ template<typename TPixel, unsigned int VDimension>
 void mitk::MorphologicalOperations::itkRemoveFragments(itk::Image<TPixel, VDimension>* sourceImage, int percent, mitk::Image::Pointer& resultImage)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
-  typedef itk::Image<unsigned char, VDimension> OutputImageType;
+  typedef itk::Image<unsigned int, VDimension> OutputImageType;
   typedef itk::ConnectedComponentImageFilter<ImageType, OutputImageType> ConnectedComponentImageFilterType;
   typename ConnectedComponentImageFilterType::Pointer connected = ConnectedComponentImageFilterType::New();
   connected->SetInput(sourceImage);
@@ -449,7 +449,7 @@ void mitk::MorphologicalOperations::itkRemoveFragments(itk::Image<TPixel, VDimen
   typedef itk::BinaryThresholdImageFilter< OutputImageType, ImageType > BinaryThresholdImageFilter;
   typename BinaryThresholdImageFilter::Pointer thresholdFilter = BinaryThresholdImageFilter::New();
   thresholdFilter->SetLowerThreshold(1);
-  thresholdFilter->SetUpperThreshold(255);
+  thresholdFilter->SetUpperThreshold(std::numeric_limits<unsigned int>::max());
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
   thresholdFilter->SetInput(labelShapeKeepNObjectsImageFilter->GetOutput());

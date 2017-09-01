@@ -64,7 +64,7 @@ namespace mitk
 
         try
         {
-          std::string fname3 = mitk::IOUtil::GetTempPath()+"/temp_dti.nii";
+          std::string fname3 = mitk::IOUtil::GetTempPath()+"/temp_dti.nii.gz";
           itksys::SystemTools::CopyAFile(location.c_str(), fname3.c_str());
 
           typedef itk::VectorImage<float,3> ImageType;

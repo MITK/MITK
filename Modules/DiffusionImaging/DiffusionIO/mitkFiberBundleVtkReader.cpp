@@ -86,12 +86,14 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
                 if (weights!=nullptr)
                 {
 //                    float weight=0;
-                    for (int i=0; i<weights->GetSize(); i++)
+                    for (int i=0; i<weights->GetNumberOfValues(); i++)
+                    {
                         if (weights->GetValue(i)<0.0)
                         {
                             MITK_ERROR << "Fiber weight<0 detected! Setting value to 0.";
                             weights->SetValue(i,0);
                         }
+                    }
 //                        if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
 //                        {
 //                            MITK_INFO << "Weight: " << weights->GetValue(i);

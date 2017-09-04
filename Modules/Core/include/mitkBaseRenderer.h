@@ -250,6 +250,14 @@ namespace mitk
 
     itkGetConstMacro(TimeStep, unsigned int)
 
+    //##Documentation
+    //## @brief Set/Get m_Component which defines displayed component for vector images
+    //##
+    //## \sa m_Component
+    virtual void SetComponent(unsigned int component);
+
+    itkGetConstMacro(Component, unsigned int);
+
       //##Documentation
       //## @brief Get the time-step of a BaseData object which
       //## exists at the time of the currently displayed content
@@ -284,6 +292,11 @@ namespace mitk
     //## @brief SetTimeStep is called according to the geometrySliceEvent,
     //## which is supposed to be a SliceNavigationController::GeometryTimeEvent
     virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
+
+    //##Documentation
+    //## @brief SetTimeStep is called according to the geometrySliceEvent,
+    //## which is supposed to be a SliceNavigationController::GeometryComponentEvent
+    virtual void SetGeometryComponent(const itk::EventObject& geometryComponentEvent);
 
       //##Documentation
       //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
@@ -526,6 +539,9 @@ namespace mitk
     //## is used as m_CurrentWorldPlaneGeometry: m_WorldTimeGeometry->GetPlaneGeometry(m_Slice, m_TimeStep).
     //## \sa m_WorldTimeGeometry
     unsigned int m_TimeStep;
+    //##Documentation
+    //## Defines which component is displayed
+    unsigned  int m_Component;
 
     //##Documentation
     //## @brief timestamp of last call of SetWorldGeometry

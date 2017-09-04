@@ -65,10 +65,11 @@ SliceNavigationController::SliceNavigationController( )
   m_OldPos(0)
 {
   typedef itk::SimpleMemberCommand< SliceNavigationController > SNCCommandType;
-  SNCCommandType::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
+  SNCCommandType::Pointer sliceStepperChangedCommand, timeStepperChangedCommand, componentStepperChangedCommand;
 
   sliceStepperChangedCommand = SNCCommandType::New();
   timeStepperChangedCommand = SNCCommandType::New();
+  componentStepperChangedCommand = SNCCommandType::New();
 
   sliceStepperChangedCommand->SetCallbackFunction(
     this, &SliceNavigationController::SendSlice );
@@ -76,8 +77,11 @@ SliceNavigationController::SliceNavigationController( )
   timeStepperChangedCommand->SetCallbackFunction(
     this, &SliceNavigationController::SendTime );
 
+  componentStepperChangedCommand->SetCallbackFunction(this, &SliceNavigationController::SendComponent);
+
   m_Slice->AddObserver( itk::ModifiedEvent(), sliceStepperChangedCommand );
   m_Time->AddObserver( itk::ModifiedEvent(), timeStepperChangedCommand );
+  m_Component->AddObserver(itk::ModifiedEvent(), componentStepperChangedCommand);
 
   m_Slice->SetUnitName( "mm" );
   m_Time->SetUnitName( "ms" );
@@ -333,6 +337,7 @@ SliceNavigationController::Update(
       // initialize TimeGeometry
       m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
     }
+    m_Component->SetSteps(m_InputWorldTimeGeometry->componentSize);
     if ( worldTimeGeometry.IsNull())
     {
       m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
@@ -435,6 +440,23 @@ SliceNavigationController::SendTime()
   }
 }
 
+void SliceNavigationController::SendComponent()
+{
+  if (m_BlockUpdate) {
+    return;
+  }
+
+  if (m_CreatedWorldGeometry.IsNull()) {
+    return;
+  }
+
+  this->InvokeEvent(GeometryComponentEvent(m_CreatedWorldGeometry, m_Component->GetPos()));
+
+  crosshairPositionEvent.Send();
+
+  this->GetRenderingManager()->RequestUpdateAll();
+}
+
 void
 SliceNavigationController::SetGeometry( const itk::EventObject & )
 {
@@ -475,6 +497,20 @@ SliceNavigationController
   assert(sliceEvent!=NULL);
 
   this->GetSlice()->SetPos(sliceEvent->GetPos());
+}
+
+void SliceNavigationController::SetGeometryComponent(const itk::EventObject & geometryComponentEvent) 
+{
+  if (m_CreatedWorldGeometry.IsNull()) {
+    return;
+  }
+
+  const SliceNavigationController::GeometryComponentEvent* componentEvent 
+    = dynamic_cast<const SliceNavigationController::GeometryComponentEvent*>(&geometryComponentEvent);
+
+  assert(componentEvent != NULL);
+
+  this->GetComponent()->SetPos(componentEvent->GetPos());
 }
 
 void

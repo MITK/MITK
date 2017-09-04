@@ -218,6 +218,7 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
     BaseGeometry::Pointer tempGeometry = GetGeometryForTimeStep(i)->Clone();
     newTimeGeometry->SetTimeStepGeometry(tempGeometry, i);
   }
+  newTimeGeometry->componentSize = componentSize;
   return parent;
 }
 

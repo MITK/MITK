@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSegmentationIO.h"
 
+#include "mitkDICOMQIIOMimeTypes.h"
+
 namespace mitk
 {
   /**
@@ -31,8 +33,20 @@ namespace mitk
     std::vector<AbstractFileIO *> m_FileIOs;
 
   public:
-    void Load(us::ModuleContext * /*context*/) override
+    void Load(us::ModuleContext * context) override
     {
+      us::ServiceProperties props;
+      props[us::ServiceConstants::SERVICE_RANKING()] = 10;
+
+      std::vector<mitk::CustomMimeType *> mimeTypes = mitk::MitkDICOMQIIOMimeTypes::Get();
+      for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = mimeTypes.begin(),
+        iterEnd = mimeTypes.end();
+        mimeTypeIter != iterEnd;
+        ++mimeTypeIter)
+      {
+        context->RegisterService(*mimeTypeIter, props);
+      }
+
       m_FileIOs.push_back(new DICOMSegmentationIO());
     }
     void Unload(us::ModuleContext *) override

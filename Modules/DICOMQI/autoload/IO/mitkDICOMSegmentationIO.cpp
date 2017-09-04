@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkPropertyNameHelper.h>
+#include "mitkDICOMQIIOMimeTypes.h"
 
 // itk
 #include <itkThresholdImageFilter.h>
@@ -42,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
-    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::DICOM_MIMETYPE(), "DICOM Segmentation")
+    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(), "DICOM Segmentation")
   {
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);

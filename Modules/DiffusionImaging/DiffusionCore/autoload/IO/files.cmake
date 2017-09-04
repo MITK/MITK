@@ -8,6 +8,7 @@ set(CPP_FILES
 
   mitkDiffusionCoreIOMimeTypes.cpp
 
+  mitkDiffusionImageDicomReaderService.cpp
   mitkDiffusionImageNrrdReaderService.cpp
   mitkDiffusionImageNrrdWriterService.cpp
   mitkDiffusionImageNiftiReaderService.cpp

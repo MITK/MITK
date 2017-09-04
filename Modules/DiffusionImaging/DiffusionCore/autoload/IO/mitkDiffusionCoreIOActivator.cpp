@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDiffusionImageNrrdReaderService.h>
 #include <mitkDiffusionImageNiftiReaderService.h>
+#include <mitkDiffusionImageDicomReaderService.h>
 #include <mitkNrrdTensorImageReader.h>
 #include <mitkNrrdQBallImageReader.h>
 
@@ -58,6 +59,7 @@ namespace mitk
       m_DiffusionImageNrrdReaderService = new DiffusionImageNrrdReaderService();
       m_DiffusionImageNiftiReaderService = new DiffusionImageNiftiReaderService( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION() );
       m_DiffusionImageFslNiftiReaderService = new DiffusionImageNiftiReaderService( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_FSL_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_FSL_MIMETYPE_DESCRIPTION() );
+      m_DiffusionImageDicomReaderService = new DiffusionImageDicomReaderService();
 
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
       m_NrrdQBallImageReader = new NrrdQBallImageReader();
@@ -102,6 +104,7 @@ namespace mitk
       delete m_DiffusionImageNrrdReaderService;
       delete m_DiffusionImageNiftiReaderService;
       delete m_DiffusionImageFslNiftiReaderService;
+      delete m_DiffusionImageDicomReaderService;
       delete m_NrrdTensorImageReader;
       delete m_NrrdQBallImageReader;
 
@@ -116,6 +119,7 @@ namespace mitk
     DiffusionImageNrrdReaderService * m_DiffusionImageNrrdReaderService;
     DiffusionImageNiftiReaderService * m_DiffusionImageNiftiReaderService;
     DiffusionImageNiftiReaderService * m_DiffusionImageFslNiftiReaderService;
+    DiffusionImageDicomReaderService * m_DiffusionImageDicomReaderService;
     NrrdTensorImageReader * m_NrrdTensorImageReader;
     NrrdQBallImageReader * m_NrrdQBallImageReader;
 

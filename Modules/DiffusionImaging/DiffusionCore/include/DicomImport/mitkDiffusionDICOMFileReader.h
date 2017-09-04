@@ -47,6 +47,9 @@ public:
     m_ResolveMosaic = flag;
   }
 
+  std::string GetStudyName(int i){ return m_Study_names.at(i); }
+  std::string GetSeriesName(int i){ return m_Series_names.at(i); }
+
 protected:
     DiffusionDICOMFileReader();
     virtual ~DiffusionDICOMFileReader();
@@ -58,6 +61,8 @@ protected:
     std::vector< mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType > m_OutputHeaderContainer;
     std::vector< mitk::DiffusionHeaderDICOMFileReader::Pointer> m_OutputReaderContainer;
     std::vector< bool > m_IsMosaicData;
+    std::vector< std::string > m_Study_names;
+    std::vector< std::string > m_Series_names;
 
     bool m_ResolveMosaic;
 };

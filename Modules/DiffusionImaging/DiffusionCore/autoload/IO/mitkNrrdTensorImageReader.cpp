@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDataItem.h"
 #include <mitkLocaleSwitch.h>
 #include <mitkIOUtil.h>
+#include <boost/lexical_cast.hpp>
 
 namespace mitk
 {
@@ -64,7 +65,15 @@ namespace mitk
 
         try
         {
-          std::string fname3 = mitk::IOUtil::GetTempPath()+"/temp_dti.nii";
+          std::string fname3 = mitk::IOUtil::GetTempPath()+"/temp_dti.nii.gz";
+
+          int c = 0;
+          while( itksys::SystemTools::FileExists(fname3) )
+          {
+            fname3 = mitk::IOUtil::GetTempPath()+"/temp_dti_" + boost::lexical_cast<std::string>(c) + ".nii.gz";
+            ++c;
+          }
+
           itksys::SystemTools::CopyAFile(location.c_str(), fname3.c_str());
 
           typedef itk::VectorImage<float,3> ImageType;

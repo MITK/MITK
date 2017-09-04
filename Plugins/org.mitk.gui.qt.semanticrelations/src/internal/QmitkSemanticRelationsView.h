@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkSemanticRelationsControls.h"
 
 // semantic relations UI module
-#include <QmitkSemanticRelationsTableView.h>
+#include <QmitkPatientTableWidget.h>
+#include <QmitkLesionInfoWidget.h>
 #include <QmitkPatientInfoWidget.h>
 
 // blueberry
@@ -31,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 /**
-* @brief SemanticRelation
+* @brief QmitkSemanticRelationsView
 */
 class QmitkSemanticRelationsView : public QmitkAbstractView
 {
@@ -49,8 +50,8 @@ protected:
 
 private Q_SLOTS:
 
-  void OnTableViewSelectionChanged(const mitk::DataNode*);
-  void OnSemanticRelationsDataChanged(const mitk::SemanticTypes::CaseID&);
+  void OnCaseIDSelectionChanged(const QString&);
+  void OnPatientTableSelectionChanged(const mitk::DataNode*);
 
 private:
 
@@ -61,7 +62,9 @@ private:
   QWidget* m_Parent;
   Ui::QmitkSemanticRelationsControls m_Controls;
 
-  QmitkSemanticRelationsTableView* m_SemanticRelationsTableView;
+  std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
+  QmitkPatientTableWidget* m_PatientTableWidget;
+  QmitkLesionInfoWidget* m_LesionInfoWidget;
   QmitkPatientInfoWidget* m_PatientInfoWidget;
 };
 

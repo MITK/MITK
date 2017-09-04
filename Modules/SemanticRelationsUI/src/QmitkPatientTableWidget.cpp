@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // semantic relations UI module
-#include "QmitkSemanticRelationsTableView.h"
+#include "QmitkPatientTableWidget.h"
 #include "QmitkControlPointDialog.h"
 
 #include "QmitkCustomVariants.h"
@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkDICOMHelper.h>
 #include <mitkSemanticRelationException.h>
-#include <mitkSemanticRelationsTestHelper.h>
 #include <mitkSemanticTypes.h>
 #include <mitkUIDGeneratorBoost.h>
 
@@ -42,119 +41,74 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QInputDialog>
 #include <QMessageBox>
 
-QmitkSemanticRelationsTableView::QmitkSemanticRelationsTableView(mitk::DataStorage::Pointer dataStorage, QWidget* parent /*=nullptr*/)
+QmitkPatientTableWidget::QmitkPatientTableWidget(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QWidget* parent /*=nullptr*/)
   : QWidget(parent)
-  , m_DataStorage(dataStorage)
+  , m_SemanticRelations(semanticRelations)
 {
   Init();
 }
 
-QmitkSemanticRelationsTableView::~QmitkSemanticRelationsTableView()
+QmitkPatientTableWidget::~QmitkPatientTableWidget()
 {
   // nothing here
 }
 
-void QmitkSemanticRelationsTableView::Init()
+void QmitkPatientTableWidget::Init()
 {
   // create GUI from the Qt Designer's .ui file
   m_Controls.setupUi(this);
 
-  // initialize the semantic relations 
-  m_SemanticRelations = std::make_unique<mitk::SemanticRelations>(m_DataStorage);
-
   // create a new model
-  m_SemanticRelationsDataModel = std::make_unique<QmitkSemanticRelationsDataModel>(this);
-  m_SemanticRelationsDataModel->SetSemanticRelations(m_SemanticRelations.get());
-  m_SemanticRelationsDataModel->SetDataStorage(m_DataStorage);
+  m_PatientTableModel = std::make_unique<QmitkPatientTableModel>(m_SemanticRelations, this);
 
-  m_Controls.patientDataTableView->setModel(m_SemanticRelationsDataModel.get());
-  m_Controls.patientDataTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  m_Controls.patientDataTableView->horizontalHeader()->setHighlightSections(false);
-  m_Controls.patientDataTableView->verticalHeader()->setHighlightSections(false);
-  m_Controls.patientDataTableView->setSelectionBehavior(QAbstractItemView::SelectItems);
-  m_Controls.patientDataTableView->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_Controls.patientDataTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls.patientTableView->setModel(m_PatientTableModel.get());
+  m_Controls.patientTableView->horizontalHeader()->setHighlightSections(false);
+  m_Controls.patientTableView->verticalHeader()->setHighlightSections(false);
+  m_Controls.patientTableView->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_Controls.patientTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls.patientTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  m_ContextMenu = new QMenu(m_Controls.patientDataTableView);
-
-  //m_Controls.patientInfoWidget->hide();
+  m_ContextMenu = new QMenu(m_Controls.patientTableView);
 
   SetUpConnections();
 }
 
-void QmitkSemanticRelationsTableView::SetUpConnections()
+void QmitkPatientTableWidget::SetUpConnections()
 {
-  connect(m_Controls.caseIDComboBox,  SIGNAL(currentIndexChanged(const QString&)), SLOT(OnCaseIDSelectionChanged(const QString&)));
-
-  connect(m_SemanticRelationsDataModel.get(), SIGNAL(ModelReset()), SLOT(OnTableViewDataChanged()));
-
-  connect(m_Controls.patientDataTableView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnTableViewItemClicked(const QModelIndex&)));
-  connect(m_Controls.patientDataTableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnTableViewContextMenuRequested(const QPoint&)));
-  connect(m_Controls.patientDataTableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnTableViewSelectionChanged(const QItemSelection&, const QItemSelection&)));
+  connect(m_PatientTableModel.get(), SIGNAL(ModelUpdated()), SLOT(OnPatientTableModelUpdated()));
+  connect(m_Controls.patientTableView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnPatientTableViewItemClicked(const QModelIndex&)));
+  connect(m_Controls.patientTableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnPatientTableViewContextMenuRequested(const QPoint&)));
+  connect(m_Controls.patientTableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnPatientTableViewSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
 
-void QmitkSemanticRelationsTableView::AddImageInstance(const mitk::DataNode* dataNode)
+void QmitkPatientTableWidget::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
 {
-  mitk::SemanticRelationsTestHelper::AddImageInstance(dataNode, *m_SemanticRelations);
+  m_PatientTableModel->SetCurrentCaseID(caseID);
+}
 
-  const mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(dataNode);
-  int foundIndex = m_Controls.caseIDComboBox->findText(QString::fromStdString(caseID));
-  if (-1 == foundIndex)
-  {
-    // add the caseID to the combo box, if it is not already contained
-    m_Controls.caseIDComboBox->addItem(QString::fromStdString(caseID));
-  }
+void QmitkPatientTableWidget::UpdatePatientTable()
+{
+  m_PatientTableModel->SetPatientData();
+}
 
+void QmitkPatientTableWidget::SetPixmapOfNode(const mitk::DataNode* dataNode)
+{
   QPixmap pixmapFromImage = GetPixmapFromImageNode(dataNode);
-  m_SemanticRelationsDataModel->SetPixmapOfNode(dataNode, &pixmapFromImage);
+  m_PatientTableModel->SetPixmapOfNode(dataNode, &pixmapFromImage);
 }
 
-void QmitkSemanticRelationsTableView::RemoveImageInstance(const mitk::DataNode* dataNode)
+void QmitkPatientTableWidget::DeletePixmapOfNode(const mitk::DataNode* dataNode)
 {
-  mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(dataNode);
-  mitk::SemanticTypes::ControlPoint controlPoint = m_SemanticRelations->GetControlPointOfData(dataNode);
-  if (m_SemanticRelations->InstanceExists(caseID, controlPoint))
-  {
-    m_SemanticRelations->UnlinkDataFromControlPoint(dataNode, controlPoint);
-  }
-
-  int foundIndex = m_Controls.caseIDComboBox->findText(QString::fromStdString(caseID));
-  if (-1 != foundIndex)
-  {
-    // remove the caseID
-    m_Controls.caseIDComboBox->removeItem(foundIndex);
-  }
-
-  m_SemanticRelationsDataModel->SetPixmapOfNode(dataNode, nullptr);
+  m_PatientTableModel->SetPixmapOfNode(dataNode, nullptr);
 }
 
-void QmitkSemanticRelationsTableView::RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode)
+void QmitkPatientTableWidget::OnPatientTableModelUpdated()
 {
-  mitk::SemanticRelationsTestHelper::RemoveSegmentationInstance(segmentationNode, parentNode, *m_SemanticRelations);
-  mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
-  emit DataChanged(caseID);
+  m_Controls.patientTableView->resizeRowsToContents();
+  m_Controls.patientTableView->resizeColumnsToContents();
 }
 
-void QmitkSemanticRelationsTableView::AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode)
-{
-  mitk::SemanticRelationsTestHelper::AddSegmentationInstance(segmentationNode, parentNode, *m_SemanticRelations);
-  const mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
-  emit DataChanged(caseID);
-}
-
-void QmitkSemanticRelationsTableView::OnCaseIDSelectionChanged(const QString& caseID)
-{
-  m_SemanticRelationsDataModel->SetCurrentCaseID(caseID.toStdString());
-  emit DataChanged(caseID.toStdString());
-}
-
-void QmitkSemanticRelationsTableView::OnTableViewDataChanged()
-{
-  m_Controls.patientDataTableView->resizeRowsToContents();
-  m_Controls.patientDataTableView->resizeColumnsToContents();
-}
-
-void QmitkSemanticRelationsTableView::OnTableViewItemClicked(const QModelIndex& selectedIndex)
+void QmitkPatientTableWidget::OnPatientTableViewItemClicked(const QModelIndex& selectedIndex)
 {
   if (!selectedIndex.isValid())
   {
@@ -164,15 +118,15 @@ void QmitkSemanticRelationsTableView::OnTableViewItemClicked(const QModelIndex& 
   // clicked is called each time the item is selected, regardless of the previous selection
 }
 
-void QmitkSemanticRelationsTableView::OnTableViewContextMenuRequested(const QPoint& pos)
+void QmitkPatientTableWidget::OnPatientTableViewContextMenuRequested(const QPoint& pos)
 {
-  QModelIndex selectedIndex = m_Controls.patientDataTableView->indexAt(pos);
+  QModelIndex selectedIndex = m_Controls.patientTableView->indexAt(pos);
   if (!selectedIndex.isValid())
   {
     return;
   }
 
-  QVariant qvariantDataNode = m_SemanticRelationsDataModel->data(selectedIndex, Qt::UserRole);
+  QVariant qvariantDataNode = m_PatientTableModel->data(selectedIndex, Qt::UserRole);
   if (qvariantDataNode.canConvert<mitk::DataNode*>())
   {
     m_SelectedDataNode = qvariantDataNode.value<mitk::DataNode*>();
@@ -191,21 +145,21 @@ void QmitkSemanticRelationsTableView::OnTableViewContextMenuRequested(const QPoi
   }
 }
 
-void QmitkSemanticRelationsTableView::OnContextMenuSetInformationType()
+void QmitkPatientTableWidget::OnContextMenuSetInformationType()
 {
   bool ok = false;
-  QString text = QInputDialog::getText(m_Controls.patientDataTableView, tr("Set information type of selected node"), tr("Information type:"), QLineEdit::Normal, "", &ok);
+  QString text = QInputDialog::getText(m_Controls.patientTableView, tr("Set information type of selected node"), tr("Information type:"), QLineEdit::Normal, "", &ok);
   if (ok && !text.isEmpty())
   {
-    m_SemanticRelations->RemoveInformationTypeFromImage(m_SelectedDataNode, m_SemanticRelations->GetInformationTypeOfImage(m_SelectedDataNode));
+    m_SemanticRelations->RemoveInformationTypeFromImage(m_SelectedDataNode);
     m_SemanticRelations->AddInformationTypeToImage(m_SelectedDataNode, text.toStdString());
-    m_SemanticRelationsDataModel->DataChanged();
+    m_PatientTableModel->SetPatientData();
   }
 }
 
-void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
+void QmitkPatientTableWidget::OnContextMenuSetControlPoint()
 {
-  QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.patientDataTableView);
+  QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.patientTableView);
   inputDialog->setWindowTitle("Set control point");
   inputDialog->SetCurrentDate(mitk::DICOMHelper::GetDateFromDataNode(m_SelectedDataNode));
 
@@ -219,7 +173,7 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
   mitk::SemanticTypes::ControlPoint originalControlPoint = m_SemanticRelations->GetControlPointOfData(m_SelectedDataNode);
   // unlink the data, that is about to receive a new date
   // this is needed in order to not extend a single control point, to which the selected node is currently linked
-  m_SemanticRelations->UnlinkDataFromControlPoint(m_SelectedDataNode, originalControlPoint);
+  m_SemanticRelations->UnlinkDataFromControlPoint(m_SelectedDataNode);
 
   const QDate& userSelectedDate = inputDialog->GetCurrentDate();
   mitk::SemanticTypes::Date date;
@@ -228,7 +182,7 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
   date.month = userSelectedDate.month();
   date.day = userSelectedDate.day();
 
-  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_SemanticRelationsDataModel->GetCurrentCaseID());
+  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_PatientTableModel->GetCurrentCaseID());
   if (!allControlPoints.empty())
   {
     // need to check if an already existing control point fits/contains the user control point
@@ -239,13 +193,14 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
       {
         // found a fitting control point
         m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, fittingControlPoint, false);
-        m_SemanticRelationsDataModel->DataChanged();
+        m_PatientTableModel->SetPatientData();
       }
       catch (const mitk::SemanticRelationException&)
       {
         MITK_INFO << "The data can not be linked to the fitting control point.";
         try
         {
+          // link to the original control point
           m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
         }
         catch (const mitk::SemanticRelationException&)
@@ -265,13 +220,14 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
       {
         // found and extended a close control point
         m_SemanticRelations->OverwriteControlPointAndLinkData(m_SelectedDataNode, extendedControlPoint, false);
-        m_SemanticRelationsDataModel->DataChanged();
+        m_PatientTableModel->SetPatientData();
       }
       catch (const mitk::SemanticRelationException&)
       {
         MITK_INFO << "The extended control point can not be overwritten and the data can not be linked to this control point.";
         try
         {
+          // link to the original control point
           m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
         }
         catch (const mitk::SemanticRelationException&)
@@ -288,13 +244,14 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
   try
   {
     m_SemanticRelations->AddControlPointAndLinkData(m_SelectedDataNode, controlPointFromUserDate, false);
-    m_SemanticRelationsDataModel->DataChanged();
+    m_PatientTableModel->SetPatientData();
   }
   catch (const mitk::SemanticRelationException&)
   {
     MITK_INFO << "The control point can not be added and the data can not be linked to this control point.";
     try
     {
+      // link to the original control point
       m_SemanticRelations->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
     }
     catch (const mitk::SemanticRelationException&)
@@ -304,15 +261,15 @@ void QmitkSemanticRelationsTableView::OnContextMenuSetControlPoint()
   }
 }
 
-void QmitkSemanticRelationsTableView::OnTableViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkPatientTableWidget::OnPatientTableViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-  QModelIndex selectedIndex = m_Controls.patientDataTableView->currentIndex();
+  QModelIndex selectedIndex = m_Controls.patientTableView->currentIndex();
   if (!selectedIndex.isValid())
   {
     return;
   }
 
-  QVariant qvariantDataNode = m_SemanticRelationsDataModel->data(selectedIndex, Qt::UserRole);
+  QVariant qvariantDataNode = m_PatientTableModel->data(selectedIndex, Qt::UserRole);
   if (qvariantDataNode.canConvert<mitk::DataNode*>())
   {
     m_SelectedDataNode = qvariantDataNode.value<mitk::DataNode*>();
@@ -321,7 +278,7 @@ void QmitkSemanticRelationsTableView::OnTableViewSelectionChanged(const QItemSel
   }
 }
 
-QPixmap QmitkSemanticRelationsTableView::GetPixmapFromImageNode(const mitk::DataNode* dataNode) const
+QPixmap QmitkPatientTableWidget::GetPixmapFromImageNode(const mitk::DataNode* dataNode) const
 {
   if (nullptr == dataNode)
   {

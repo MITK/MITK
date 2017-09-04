@@ -586,6 +586,20 @@ void mitk::SemanticRelations::LinkSegmentationToLesion(const DataNode* segmentat
   }
 }
 
+void mitk::SemanticRelations::UnlinkSegmentationFromLesion(const DataNode* segmentationNode)
+{
+  if (nullptr == segmentationNode)
+  {
+    MITK_WARN << "Not a valid data node.";
+    return;
+  }
+
+  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::ID segmentationID = DICOMHelper::GetIDFromDataNode(segmentationNode);
+  mitk::SemanticTypes::Lesion lesion = m_RelationStorage->GetRepresentedLesion(caseID, segmentationID);
+  m_RelationStorage->UnlinkSegmentationFromLesion(caseID, segmentationID);
+}
+
 void mitk::SemanticRelations::RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
 {
   if (InstanceExists(caseID, lesion))
@@ -593,6 +607,8 @@ void mitk::SemanticRelations::RemoveLesion(const SemanticTypes::CaseID& caseID, 
     std::vector<DataNode::Pointer> allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
     if (allSegmentationsOfLesion.empty())
     {
+      // no more segmentations are linked to the specific lesion
+      // the lesion can be removed from the storage
       m_RelationStorage->RemoveLesion(caseID, lesion);
     }
     else
@@ -743,7 +759,7 @@ void mitk::SemanticRelations::LinkDataToControlPoint(const DataNode* dataNode, c
   }
 }
 
-void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint)
+void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -752,40 +768,34 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
   }
 
   SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
-  if (InstanceExists(caseID, controlPoint))
-  {
-    SemanticTypes::ID dataID = DICOMHelper::GetIDFromDataNode(dataNode);
-    m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
+  SemanticTypes::ID dataID = DICOMHelper::GetIDFromDataNode(dataNode);
+  mitk::SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfData(caseID, dataID);
+  m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
 
-    try
+  try
+  {
+    std::vector<DataNode::Pointer> allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
+    if (allDataOfControlPoint.empty())
     {
-      std::vector<DataNode::Pointer> allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
-      if (allDataOfControlPoint.empty())
-      {
-        // no more data is linked to the specific control point
-        // the control point can be removed from the storage
-        m_RelationStorage->RemoveControlPointFromCase(caseID, controlPoint);
-      }
-      else
-      {
-        // some data is still linked to this control point
-        // the control point can not be removed, but has to be adjusted to fit the remaining data
-        SemanticTypes::ControlPoint adjustedControlPoint = ControlPointManager::GenerateControlPoint(allDataOfControlPoint);
-        // set the UIDs to be the same, so that all references still work
-        adjustedControlPoint.UID = controlPoint.UID;
-        adjustedControlPoint.startPoint.UID = controlPoint.startPoint.UID;
-        adjustedControlPoint.endPoint.UID = controlPoint.endPoint.UID;
-        m_RelationStorage->OverwriteControlPoint(caseID, adjustedControlPoint);
-      }
+      // no more data is linked to the specific control point
+      // the control point can be removed from the storage
+      m_RelationStorage->RemoveControlPointFromCase(caseID, controlPoint);
     }
-    catch (SemanticRelationException& e)
+    else
     {
-      mitkReThrow(e);
+      // some data is still linked to this control point
+      // the control point can not be removed, but has to be adjusted to fit the remaining data
+      SemanticTypes::ControlPoint adjustedControlPoint = ControlPointManager::GenerateControlPoint(allDataOfControlPoint);
+      // set the UIDs to be the same, so that all references still work
+      adjustedControlPoint.UID = controlPoint.UID;
+      adjustedControlPoint.startPoint.UID = controlPoint.startPoint.UID;
+      adjustedControlPoint.endPoint.UID = controlPoint.endPoint.UID;
+      m_RelationStorage->OverwriteControlPoint(caseID, adjustedControlPoint);
     }
   }
-  else
+  catch (SemanticRelationException& e)
   {
-    mitkThrowException(SemanticRelationException) << "The control point " << controlPoint.UID << " to unlink does not exist for the given case.";
+    mitkReThrow(e);
   }
 }
 
@@ -802,7 +812,7 @@ void mitk::SemanticRelations::AddInformationTypeToImage(const DataNode* imageNod
   m_RelationStorage->AddInformationTypeToImage(caseID, imageID, informationType);
 }
 
-void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* imageNode, const SemanticTypes::InformationType& informationType)
+void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* imageNode)
 {
   if (nullptr == imageNode)
   {
@@ -812,13 +822,15 @@ void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* ima
 
   SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(imageNode);
   SemanticTypes::ID imageID = DICOMHelper::GetIDFromDataNode(imageNode);
+  SemanticTypes::InformationType originalInformationType = m_RelationStorage->GetInformationTypeOfImage(caseID, imageID);
   m_RelationStorage->RemoveInformationTypeFromImage(caseID, imageID);
 
+  // check for further references to the removed information type
   std::vector<std::string> allImageIDsVectorValue = m_RelationStorage->GetAllImageIDsOfCase(caseID);
   for (const auto otherImageID : allImageIDsVectorValue)
   {
     SemanticTypes::InformationType otherInformationType = m_RelationStorage->GetInformationTypeOfImage(caseID, otherImageID);
-    if (otherInformationType == informationType)
+    if (otherInformationType == originalInformationType)
     {
       // found the information type in another image -> cannot remove the information type from the case
       return;
@@ -826,7 +838,7 @@ void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* ima
   }
 
   // given information type was not referred by any other image of the case -> the information type can be removed from the case
-  m_RelationStorage->RemoveInformationTypeFromCase(caseID, informationType);
+  m_RelationStorage->RemoveInformationTypeFromCase(caseID, originalInformationType);
 }
 
 /************************************************************************/

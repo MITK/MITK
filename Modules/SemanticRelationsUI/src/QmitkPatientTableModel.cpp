@@ -15,31 +15,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // semantic relations plugin
-#include "QmitkSemanticRelationsDataModel.h"
+#include "QmitkPatientTableModel.h"
 
 #include "QmitkCustomVariants.h"
 
 // qt
 #include <QPixmap>
 
-QmitkSemanticRelationsDataModel::QmitkSemanticRelationsDataModel(QObject* parent /*= nullptr*/)
+QmitkPatientTableModel::QmitkPatientTableModel(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QObject* parent /*= nullptr*/)
   : QAbstractTableModel(parent)
-  , m_SemanticRelations(nullptr)
-  , m_DataStorage(nullptr)
+  , m_SemanticRelations(semanticRelations)
 {
   // nothing here
 }
 
-QmitkSemanticRelationsDataModel::~QmitkSemanticRelationsDataModel()
+QmitkPatientTableModel::~QmitkPatientTableModel()
 {
-  if (m_DataStorage.IsNotNull())
-  {
-    m_DataStorage->ChangedNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkSemanticRelationsDataModel, const mitk::DataNode*>(this, &QmitkSemanticRelationsDataModel::DataChanged));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkSemanticRelationsDataModel, const mitk::DataNode*>(this, &QmitkSemanticRelationsDataModel::DataChanged));
-  }
+  // nothing here
 }
 
-Qt::ItemFlags QmitkSemanticRelationsDataModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QmitkPatientTableModel::flags(const QModelIndex &index) const
 {
   Qt::ItemFlags flags;
   mitk::DataNode* dataNode = GetCurrentDataNode(index);
@@ -51,7 +46,7 @@ Qt::ItemFlags QmitkSemanticRelationsDataModel::flags(const QModelIndex &index) c
   return flags;
 }
 
-int QmitkSemanticRelationsDataModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+int QmitkPatientTableModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
   if (parent.isValid())
   {
@@ -61,7 +56,7 @@ int QmitkSemanticRelationsDataModel::rowCount(const QModelIndex &parent /*= QMod
   return m_InformationTypes.size();
 }
 
-int QmitkSemanticRelationsDataModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
+int QmitkPatientTableModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
   if (parent.isValid())
   {
@@ -71,7 +66,7 @@ int QmitkSemanticRelationsDataModel::columnCount(const QModelIndex &parent /*= Q
   return m_ControlPoints.size();
 }
 
-QVariant QmitkSemanticRelationsDataModel::data(const QModelIndex &index, int role) const
+QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role /*=Qt::DisplayRole*/) const
 {
   if (!index.isValid())
   {
@@ -106,7 +101,7 @@ QVariant QmitkSemanticRelationsDataModel::data(const QModelIndex &index, int rol
   return QVariant();
 }
 
-QVariant QmitkSemanticRelationsDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkPatientTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (Qt::Horizontal == orientation && Qt::DisplayRole == role)
   {
@@ -129,42 +124,13 @@ QVariant QmitkSemanticRelationsDataModel::headerData(int section, Qt::Orientatio
   return QVariant();
 }
 
-void QmitkSemanticRelationsDataModel::SetSemanticRelations(mitk::SemanticRelations* semanticRelations)
-{
-  m_SemanticRelations = semanticRelations;
-}
-
-// TODO: listener needed?
-void QmitkSemanticRelationsDataModel::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
-{
-  if (m_DataStorage != dataStorage)
-  {
-    // given data storage is a new data storage
-    if (m_DataStorage.IsNotNull())
-    {
-      // remove listener from old data storage
-      m_DataStorage->ChangedNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkSemanticRelationsDataModel, const mitk::DataNode*>(this, &QmitkSemanticRelationsDataModel::DataChanged));
-      m_DataStorage->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkSemanticRelationsDataModel, const mitk::DataNode*>(this, &QmitkSemanticRelationsDataModel::DataChanged));
-    }
-    // set the new data storage
-    m_DataStorage = dataStorage;
-    // register new data storage listener
-    if (m_DataStorage.IsNotNull())
-    {
-      m_DataStorage->ChangedNodeEvent.AddListener(mitk::MessageDelegate1<QmitkSemanticRelationsDataModel, const mitk::DataNode*>(this, &QmitkSemanticRelationsDataModel::DataChanged));
-      m_DataStorage->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkSemanticRelationsDataModel, const mitk::DataNode*>(this, &QmitkSemanticRelationsDataModel::DataChanged));
-    }
-    DataChanged();
-  }
-}
-
-void QmitkSemanticRelationsDataModel::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
+void QmitkPatientTableModel::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
 {
   m_CaseID = caseID;
-  DataChanged();
+  SetPatientData();
 }
 
-void QmitkSemanticRelationsDataModel::SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage)
+void QmitkPatientTableModel::SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage)
 {
   mitk::SemanticTypes::ID nodeID = mitk::DICOMHelper::GetIDFromDataNode(dataNode);
   std::map<std::string, QPixmap>::iterator iter = m_PixmapMap.find(nodeID);
@@ -174,12 +140,12 @@ void QmitkSemanticRelationsDataModel::SetPixmapOfNode(const mitk::DataNode* data
     if (nullptr != pixmapFromImage)
     {
       // overwrite already stored pixmap
-      m_PixmapMap[nodeID] = pixmapFromImage->scaled(120, 120, Qt::IgnoreAspectRatio);
+      iter->second = pixmapFromImage->scaled(120, 120, Qt::IgnoreAspectRatio);
     }
     else
     {
       // remove key if no pixmap is given
-      m_PixmapMap.erase(nodeID);
+      m_PixmapMap.erase(iter);
     }
   }
   else
@@ -188,24 +154,12 @@ void QmitkSemanticRelationsDataModel::SetPixmapOfNode(const mitk::DataNode* data
   }
 }
 
-void QmitkSemanticRelationsDataModel::DataChanged(const mitk::DataNode* dataNode)
+void QmitkPatientTableModel::SetPatientData()
 {
-  if (nullptr == m_SemanticRelations || nullptr == m_DataStorage)
+  if (nullptr == m_SemanticRelations)
   {
     return;
   }
-
-  if (nullptr != dataNode)
-  {
-    // if the function is called with a data node, check if this is a helper object
-    bool helperObject = false;
-    dataNode->GetBoolProperty("helper object", helperObject);
-    if (helperObject)
-    {
-      return;
-    }
-  }
-  // function not called with a data node (nullptr)
 
   // update the model, so that the table will be filled with the new patient information
   beginResetModel();
@@ -219,10 +173,10 @@ void QmitkSemanticRelationsDataModel::DataChanged(const mitk::DataNode* dataNode
   m_InformationTypes = m_SemanticRelations->GetAllInformationTypesOfCase(m_CaseID);
 
   endResetModel();
-  emit ModelReset();
+  emit ModelUpdated();
 }
 
-mitk::DataNode* QmitkSemanticRelationsDataModel::GetCurrentDataNode(const QModelIndex& index) const
+mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& index) const
 {
   mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(index.column());
   mitk::SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(index.row());

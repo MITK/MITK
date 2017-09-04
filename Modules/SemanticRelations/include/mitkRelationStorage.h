@@ -48,13 +48,15 @@ namespace mitk
     std::vector<SemanticTypes::CaseID> GetAllCaseIDs();
 
     void AddCase(const SemanticTypes::CaseID& caseID);
-    void AddImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID);
-    void AddSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID, const SemanticTypes::ID& parentDataNodeID);
+    void AddImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageNodeID);
+    void RemoveImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageNodeID);
+    void AddSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationNodeID, const SemanticTypes::ID& parentDataNodeID);
     void RemoveSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationNodeID);
 
     void AddLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     void OverwriteLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     void LinkSegmentationToLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID, const SemanticTypes::Lesion& lesion);
+    void UnlinkSegmentationFromLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
     void RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
 
     void AddControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);

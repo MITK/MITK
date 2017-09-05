@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImage.h>
 
+#include <mitkNodePredicateBase.h>
+
 #include "mitkDoseVisPreferenceHelper.h"
 
 // Shader
@@ -103,8 +105,6 @@ public:
 
     void ActualizeFreeIsoLine();
 
-    void OnDoseClicked();
-
 protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
@@ -163,9 +163,10 @@ protected:
 
   bool m_internalUpdate;
 
+  mitk::NodePredicateBase::Pointer m_isDosePredicate;
+
 private:
   mitk::DataNode::Pointer GetIsoDoseNode(mitk::DataNode::Pointer doseNode);
-  bool ModalityIsRTDose(const mitk::DataNode* dataNode) const;
 };
 
 #endif // RTDoseVisualizer_h

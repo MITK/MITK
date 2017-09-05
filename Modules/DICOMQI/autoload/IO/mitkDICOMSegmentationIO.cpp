@@ -19,22 +19,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSegmentationIO.h"
 
+#include "mitkDICOMQIIOMimeTypes.h"
+#include "mitkDICOMSegIOHelper.h"
 #include "mitkDICOMSegmentationConstants.h"
+#include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMProperty.h>
 #include <mitkIDICOMTagsOfInterest.h>
-#include <mitkIOMimeTypes.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkPropertyNameHelper.h>
-#include "mitkDICOMQIIOMimeTypes.h"
 
 // itk
 #include <itkThresholdImageFilter.h>
 
 // dcmqi
 #include <dcmqi/ImageSEGConverter.h>
-#include <dcmqi/JSONSegmentationMetaInformationHandler.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -43,7 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
-    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(), "DICOM Segmentation")
+    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(),
+                     mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(),
+                     "DICOM Segmentation")
   {
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);
@@ -54,17 +56,7 @@ namespace mitk
 
   void DICOMSegmentationIO::AddDICOMTagsToService()
   {
-    IDICOMTagsOfInterest *toiService = nullptr;
-
-    std::vector<us::ServiceReference<IDICOMTagsOfInterest>> toiRegisters =
-      us::GetModuleContext()->GetServiceReferences<IDICOMTagsOfInterest>();
-    if (!toiRegisters.empty())
-    {
-      if (toiRegisters.size() > 1)
-        MITK_WARN << "Multiple DICOM tags of interest services found. Using just one.";
-      toiService = us::GetModuleContext()->GetService<IDICOMTagsOfInterest>(toiRegisters.front());
-    }
-
+    IDICOMTagsOfInterest *toiService = GetDicomTagsOfInterestService();
     if (toiService != nullptr)
     {
       toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_SEQUENCE_PATH());
@@ -298,15 +290,19 @@ namespace mitk
       if (dataSet == nullptr)
         mitkThrow() << "Can't read data from input file!";
 
+      //=============================== dcmqi part ====================================
       // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
       dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
-      pair<map<unsigned, itkInternalImageType::Pointer>, string> dcmqiOutput = converter->dcmSegmentation2itkimage(dataSet);
+      pair<map<unsigned, itkInternalImageType::Pointer>, string> dcmqiOutput =
+        converter->dcmSegmentation2itkimage(dataSet);
 
       map<unsigned, itkInternalImageType::Pointer> segItkImages = dcmqiOutput.first;
 
       dcmqi::JSONSegmentationMetaInformationHandler metaInfo(dcmqiOutput.second.c_str());
       metaInfo.read();
+
       MITK_INFO << "Input " << metaInfo.getJSONOutputAsString();
+      //===============================================================================
 
       // Get the label information from segment attributes for each itk image
       vector<map<unsigned, dcmqi::SegmentAttributes *>>::const_iterator segmentIter =
@@ -342,35 +338,34 @@ namespace mitk
         }
         // Get Segment information map
         map<unsigned, dcmqi::SegmentAttributes *> segmentMap = (*segmentIter);
-        // TODO: Check when we have to iterate over the map
         map<unsigned, dcmqi::SegmentAttributes *>::const_iterator segmentMapIter = (*segmentIter).begin();
-        dcmqi::SegmentAttributes *segmentAttr = (*segmentMapIter).second;
+        dcmqi::SegmentAttributes *segmentAttribute = (*segmentMapIter).second;
 
         OFString labelName;
 
-        if (segmentAttr->getSegmentedPropertyTypeCodeSequence() != nullptr)
+        if (segmentAttribute->getSegmentedPropertyTypeCodeSequence() != nullptr)
         {
-          segmentAttr->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
-          if (segmentAttr->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
+          segmentAttribute->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
+          if (segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
           {
             OFString modifier;
-            segmentAttr->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
+            segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
             labelName.append(" (").append(modifier).append(")");
           }
         }
         else
         {
-          labelName = std::to_string(segmentAttr->getLabelID()).c_str();
+          labelName = std::to_string(segmentAttribute->getLabelID()).c_str();
           if (labelName.empty())
             labelName = "Unnamed";
         }
 
         float tmp[3] = {0.0, 0.0, 0.0};
-        if (segmentAttr->getRecommendedDisplayRGBValue() != nullptr)
+        if (segmentAttribute->getRecommendedDisplayRGBValue() != nullptr)
         {
-          tmp[0] = segmentAttr->getRecommendedDisplayRGBValue()[0] / 255.0;
-          tmp[1] = segmentAttr->getRecommendedDisplayRGBValue()[1] / 255.0;
-          tmp[2] = segmentAttr->getRecommendedDisplayRGBValue()[2] / 255.0;
+          tmp[0] = segmentAttribute->getRecommendedDisplayRGBValue()[0] / 255.0;
+          tmp[1] = segmentAttribute->getRecommendedDisplayRGBValue()[1] / 255.0;
+          tmp[2] = segmentAttribute->getRecommendedDisplayRGBValue()[2] / 255.0;
         }
 
         Label *newLabel = nullptr;
@@ -400,155 +395,33 @@ namespace mitk
         }
 
         // Add some more label properties
-
-        // Segment Number:Identification number of the segment.The value of Segment Number(0062, 0004) shall be unique
-        // within the Segmentation instance in which it is created
-        newLabel->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str(),
-                              StringProperty::New(std::to_string(segValue)));
-        // Segment Label: User-defined label identifying this segment.
-        newLabel->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_LABEL_PATH()).c_str(),
-                              StringProperty::New(labelName.c_str()));
-        // Segment Algorithm Type: Type of algorithm used to generate the segment.
-        if (!segmentAttr->getSegmentAlgorithmType().empty())
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_PATH()).c_str(),
-            StringProperty::New(segmentAttr->getSegmentAlgorithmType()));
-        // Add Segmented Property Category Code Sequence tags
-        auto categoryCodeSequence = segmentAttr->getSegmentedPropertyCategoryCodeSequence();
-        if (categoryCodeSequence != nullptr)
-        {
-          OFString codeValue; // (0008,0100) Code Value
-          categoryCodeSequence->getCodeValue(codeValue);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_PATH()).c_str(),
-            StringProperty::New(codeValue.c_str()));
-
-          OFString codeScheme; // (0008,0102) Coding Scheme Designator
-          categoryCodeSequence->getCodingSchemeDesignator(codeScheme);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_PATH()).c_str(),
-            StringProperty::New(codeScheme.c_str()));
-
-          OFString codeMeaning; // (0008,0104) Code Meaning
-          categoryCodeSequence->getCodeMeaning(codeMeaning);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_PATH()).c_str(),
-            StringProperty::New(codeMeaning.c_str()));
-        }
-        // Add Segmented Property Type Code Sequence tags
-        auto typeCodeSequence = segmentAttr->getSegmentedPropertyTypeCodeSequence();
-        if (typeCodeSequence != nullptr)
-        {
-          OFString codeValue; // (0008,0100) Code Value
-          typeCodeSequence->getCodeValue(codeValue);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_PATH()).c_str(),
-            StringProperty::New(codeValue.c_str()));
-
-          OFString codeScheme; // (0008,0102) Coding Scheme Designator
-          typeCodeSequence->getCodingSchemeDesignator(codeScheme);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_PATH()).c_str(),
-            StringProperty::New(codeScheme.c_str()));
-
-          OFString codeMeaning; // (0008,0104) Code Meaning
-          typeCodeSequence->getCodeMeaning(codeMeaning);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_PATH()).c_str(),
-            StringProperty::New(codeMeaning.c_str()));
-        }
-        // Add Segmented Property Type Modifier Code Sequence tags
-        auto modifierCodeSequence = segmentAttr->getSegmentedPropertyTypeModifierCodeSequence();
-        if (modifierCodeSequence != nullptr)
-        {
-          OFString codeValue; // (0008,0100) Code Value
-          modifierCodeSequence->getCodeValue(codeValue);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_VALUE_PATH()).c_str(),
-            StringProperty::New(codeValue.c_str()));
-
-          OFString codeScheme; // (0008,0102) Coding Scheme Designator
-          modifierCodeSequence->getCodingSchemeDesignator(codeScheme);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_SCHEME_PATH()).c_str(),
-            StringProperty::New(codeScheme.c_str()));
-
-          OFString codeMeaning; // (0008,0104) Code Meaning
-          modifierCodeSequence->getCodeMeaning(codeMeaning);
-          newLabel->SetProperty(
-            DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH()).c_str(),
-            StringProperty::New(codeMeaning.c_str()));
-        }
-        // Add Atomic RegionSequence tags
-          auto atomicRegionSequence = segmentAttr->getAnatomicRegionSequence();
-          if (atomicRegionSequence != nullptr)
-          {
-            OFString codeValue; // (0008,0100) Code Value
-            atomicRegionSequence->getCodeValue(codeValue);
-            newLabel->SetProperty(
-              DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_PATH()).c_str(),
-              StringProperty::New(codeValue.c_str()));
-
-            OFString codeScheme; // (0008,0102) Coding Scheme Designator
-            atomicRegionSequence->getCodingSchemeDesignator(codeScheme);
-            newLabel->SetProperty(
-              DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_PATH()).c_str(),
-              StringProperty::New(codeScheme.c_str()));
-
-            OFString codeMeaning; // (0008,0104) Code Meaning
-            atomicRegionSequence->getCodeMeaning(codeMeaning);
-            newLabel->SetProperty(
-              DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_PATH()).c_str(),
-              StringProperty::New(codeMeaning.c_str()));
-          }
+        this->SetLabelProperties(newLabel, segmentAttribute);
         ++segmentIter;
       }
 
-      //------------- Add some general DICOM Segmentation properties ----------------------
-      // Add DICOM Tag (0008, 0060) Modality "SEG"
-      labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), StringProperty::New("SEG"));
+      // Add some general DICOM Segmentation properties
+      mitk::IDICOMTagsOfInterest *toiSrv = GetDicomTagsOfInterestService();
+      auto tagsOfInterest = toiSrv->GetTagsOfInterest();
+      DICOMTagPathList tagsOfInterestList;
+      for (const auto &tag : tagsOfInterest)
+      {
+        tagsOfInterestList.push_back(tag.first);
+      }
 
-      // Add DICOM Tag (0008,103E) Series Description
-      string seriesDescription = metaInfo.getSeriesDescription();
-      if (!seriesDescription.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str(),
-                                   StringProperty::New(seriesDescription.c_str()));
-      // Add DICOM Tag (0070,0084) Content Creator Name
-      string contentCreatorName = metaInfo.getContentCreatorName();
-      if (!contentCreatorName.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),
-                                   StringProperty::New(contentCreatorName.c_str()));
-      // Add DICOM Tag (0012, 0071) Clinical Trial Series ID
-      string clinicalTrailSeriesId = metaInfo.getClinicalTrialSeriesID();
-      if (!clinicalTrailSeriesId.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
-                                   StringProperty::New(clinicalTrailSeriesId.c_str()));
-      // Add DICOM Tag (0012,0050) Clinical Trial Time Point ID
-      string clinicalTrialTimePointID = metaInfo.getClinicalTrialTimePointID();
-      if (!clinicalTrialTimePointID.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
-                                   StringProperty::New(clinicalTrialTimePointID.c_str()));
-      // Add DICOM Tag (0012, 0060) Clinical Trial Coordinating Center Name
-      string clinicalTrialCoordinatingCenterName = metaInfo.getClinicalTrialCoordinatingCenterName();
-      if (!clinicalTrialCoordinatingCenterName.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
-                                   StringProperty::New(clinicalTrialCoordinatingCenterName.c_str()));
-      // Add DICOM Tag (0020, 0011) Series Number
-      string seriesNumber = metaInfo.getSeriesNumber();
-      if (!seriesNumber.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0020, 0x0011).c_str(),
-                                   StringProperty::New(seriesNumber.c_str()));
-      // Add DICOM Tag (0020, 0013) Instance Number
-      string instanceNumber = metaInfo.getInstanceNumber();
-      if (!instanceNumber.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0020, 0x0013).c_str(),
-                                   StringProperty::New(instanceNumber.c_str()));
-      // Add DICOM Tag (0018, 0015) Body Part Examined
-      string bodyPartExamined = metaInfo.getBodyPartExamined();
-      if (!bodyPartExamined.empty())
-        labelSetImage->SetProperty(GeneratePropertyNameForDICOMTag(0x0018, 0x0015).c_str(),
-                                   StringProperty::New(bodyPartExamined.c_str()));
-      //-------------------
+      mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
+      scanner->SetInputFiles({GetInputLocation()});
+      scanner->AddTagPaths(tagsOfInterestList);
+      scanner->Scan();
+
+      mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
+      if (frames.empty())
+      {
+        MITK_ERROR << "Error reading the DICOM Seg file" << std::endl;
+        return result;
+      }
+
+      auto findings = ExtractPathsOfInterest(tagsOfInterestList, frames);
+      SetProperties(labelSetImage, findings);
 
       // Set active layer to the first layer of the labelset image
       if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)
@@ -576,6 +449,7 @@ namespace mitk
     const std::string output;
     dcmqi::JSONSegmentationMetaInformationHandler handler;
 
+    // 1. Metadata attributes that will be listed in the resulting DICOM SEG object
     std::string contentCreatorName;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),
                                                      contentCreatorName))
@@ -604,7 +478,8 @@ namespace mitk
     if (!image->GetPropertyList()->GetStringProperty("name", seriesDescription))
       seriesDescription = "MITK Segmentation";
     handler.setSeriesDescription(seriesDescription);
-    handler.setSeriesNumber("34" + std::to_string(layer)); // TODO:Create own series number
+
+    handler.setSeriesNumber("0" + std::to_string(layer));
     handler.setInstanceNumber("1");
     handler.setBodyPartExamined("");
 
@@ -655,7 +530,7 @@ namespace mitk
         StringProperty *segmentModifierCodeMeaningProp = dynamic_cast<mitk::StringProperty *>(label->GetProperty(
           mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH()).c_str()));
 
-        dcmqi::SegmentAttributes *segAttr = nullptr;
+        dcmqi::SegmentAttributes *segmentAttribute = nullptr;
 
         if (segmentNumberProp->GetValue() == nullptr)
         {
@@ -664,48 +539,159 @@ namespace mitk
         else
         {
           int labelId = std::stoi(segmentNumberProp->GetValue());
-          segAttr = handler.createAndGetNewSegment(labelId);
+          segmentAttribute = handler.createAndGetNewSegment(labelId);
         }
-        if (segAttr != nullptr)
+        if (segmentAttribute != nullptr)
         {
-          segAttr->setSegmentDescription(segmentLabelProp->GetValueAsString());
-          segAttr->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
-          segAttr->setSegmentAlgorithmName("MITK Segmentation");
+          segmentAttribute->setSegmentDescription(segmentLabelProp->GetValueAsString());
+          segmentAttribute->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
+          segmentAttribute->setSegmentAlgorithmName("MITK Segmentation");
           if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
               segmentCategoryCodeMeaningProp != nullptr)
-            segAttr->setSegmentedPropertyCategoryCodeSequence(segmentCategoryCodeValueProp->GetValueAsString(),
-                                                              segmentCategoryCodeSchemeProp->GetValueAsString(),
-                                                              segmentCategoryCodeMeaningProp->GetValueAsString());
+            segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
+              segmentCategoryCodeValueProp->GetValueAsString(),
+              segmentCategoryCodeSchemeProp->GetValueAsString(),
+              segmentCategoryCodeMeaningProp->GetValueAsString());
           else
             // some default values
-            segAttr->setSegmentedPropertyCategoryCodeSequence("M-01000", "SRT", "Morphologically Altered Structure");
+            segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
+              "M-01000", "SRT", "Morphologically Altered Structure");
 
           if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
               segmentTypeCodeMeaningProp != nullptr)
           {
-            segAttr->setSegmentedPropertyTypeCodeSequence(segmentTypeCodeValueProp->GetValueAsString(),
-                                                          segmentTypeCodeSchemeProp->GetValueAsString(),
-                                                          segmentTypeCodeMeaningProp->GetValueAsString());
+            segmentAttribute->setSegmentedPropertyTypeCodeSequence(segmentTypeCodeValueProp->GetValueAsString(),
+                                                                   segmentTypeCodeSchemeProp->GetValueAsString(),
+                                                                   segmentTypeCodeMeaningProp->GetValueAsString());
             handler.setBodyPartExamined(segmentTypeCodeMeaningProp->GetValueAsString());
           }
           else
           {
             // some default values
-            segAttr->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
+            segmentAttribute->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
             handler.setBodyPartExamined("Mass");
           }
           if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
               segmentModifierCodeMeaningProp != nullptr)
-            segAttr->setSegmentedPropertyTypeModifierCodeSequence(segmentModifierCodeValueProp->GetValueAsString(),
-                                                                  segmentModifierCodeSchemeProp->GetValueAsString(),
-                                                                  segmentModifierCodeMeaningProp->GetValueAsString());
+            segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(
+              segmentModifierCodeValueProp->GetValueAsString(),
+              segmentModifierCodeSchemeProp->GetValueAsString(),
+              segmentModifierCodeMeaningProp->GetValueAsString());
 
           Color color = label->GetColor();
-          segAttr->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);
+          segmentAttribute->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);
         }
       }
     }
     return handler.getJSONOutputAsString();
+  }
+
+  void mitk::DICOMSegmentationIO::SetLabelProperties(mitk::Label *label, dcmqi::SegmentAttributes *segmentAttribute)
+  {
+    // Segment Number:Identification number of the segment.The value of Segment Number(0062, 0004) shall be unique
+    // within the Segmentation instance in which it is created
+    label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str(),
+                       StringProperty::New(std::to_string(label->GetValue())));
+
+    // Segment Label: User-defined label identifying this segment.
+    label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_LABEL_PATH()).c_str(),
+                       StringProperty::New(label->GetName()));
+
+    // Segment Algorithm Type: Type of algorithm used to generate the segment.
+    if (!segmentAttribute->getSegmentAlgorithmType().empty())
+      label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_PATH()).c_str(),
+                         StringProperty::New(segmentAttribute->getSegmentAlgorithmType()));
+
+    // Add Segmented Property Category Code Sequence tags
+    auto categoryCodeSequence = segmentAttribute->getSegmentedPropertyCategoryCodeSequence();
+    if (categoryCodeSequence != nullptr)
+    {
+      OFString codeValue; // (0008,0100) Code Value
+      categoryCodeSequence->getCodeValue(codeValue);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_PATH()).c_str(),
+        StringProperty::New(codeValue.c_str()));
+
+      OFString codeScheme; // (0008,0102) Coding Scheme Designator
+      categoryCodeSequence->getCodingSchemeDesignator(codeScheme);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_PATH()).c_str(),
+        StringProperty::New(codeScheme.c_str()));
+
+      OFString codeMeaning; // (0008,0104) Code Meaning
+      categoryCodeSequence->getCodeMeaning(codeMeaning);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_MEANING_PATH()).c_str(),
+        StringProperty::New(codeMeaning.c_str()));
+    }
+
+    // Add Segmented Property Type Code Sequence tags
+    auto typeCodeSequence = segmentAttribute->getSegmentedPropertyTypeCodeSequence();
+    if (typeCodeSequence != nullptr)
+    {
+      OFString codeValue; // (0008,0100) Code Value
+      typeCodeSequence->getCodeValue(codeValue);
+      label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_PATH()).c_str(),
+                         StringProperty::New(codeValue.c_str()));
+
+      OFString codeScheme; // (0008,0102) Coding Scheme Designator
+      typeCodeSequence->getCodingSchemeDesignator(codeScheme);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_SCHEME_PATH()).c_str(),
+        StringProperty::New(codeScheme.c_str()));
+
+      OFString codeMeaning; // (0008,0104) Code Meaning
+      typeCodeSequence->getCodeMeaning(codeMeaning);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_MEANING_PATH()).c_str(),
+        StringProperty::New(codeMeaning.c_str()));
+    }
+
+    // Add Segmented Property Type Modifier Code Sequence tags
+    auto modifierCodeSequence = segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence();
+    if (modifierCodeSequence != nullptr)
+    {
+      OFString codeValue; // (0008,0100) Code Value
+      modifierCodeSequence->getCodeValue(codeValue);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_VALUE_PATH()).c_str(),
+        StringProperty::New(codeValue.c_str()));
+
+      OFString codeScheme; // (0008,0102) Coding Scheme Designator
+      modifierCodeSequence->getCodingSchemeDesignator(codeScheme);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_SCHEME_PATH()).c_str(),
+        StringProperty::New(codeScheme.c_str()));
+
+      OFString codeMeaning; // (0008,0104) Code Meaning
+      modifierCodeSequence->getCodeMeaning(codeMeaning);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH()).c_str(),
+        StringProperty::New(codeMeaning.c_str()));
+    }
+
+    // Add Atomic RegionSequence tags
+    auto atomicRegionSequence = segmentAttribute->getAnatomicRegionSequence();
+    if (atomicRegionSequence != nullptr)
+    {
+      OFString codeValue; // (0008,0100) Code Value
+      atomicRegionSequence->getCodeValue(codeValue);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_PATH()).c_str(),
+        StringProperty::New(codeValue.c_str()));
+
+      OFString codeScheme; // (0008,0102) Coding Scheme Designator
+      atomicRegionSequence->getCodingSchemeDesignator(codeScheme);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_PATH()).c_str(),
+        StringProperty::New(codeScheme.c_str()));
+
+      OFString codeMeaning; // (0008,0104) Code Meaning
+      atomicRegionSequence->getCodeMeaning(codeMeaning);
+      label->SetProperty(
+        DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_PATH()).c_str(),
+        StringProperty::New(codeMeaning.c_str()));
+    }
   }
 
   DICOMSegmentationIO *DICOMSegmentationIO::IOClone() const { return new DICOMSegmentationIO(*this); }

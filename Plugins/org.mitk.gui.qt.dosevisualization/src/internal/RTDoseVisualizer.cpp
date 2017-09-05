@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkNodePredicateDataProperty.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
 #include <mitkDoseNodeHelper.h>
 #include "mitkPropertyNameHelper.h"
 #include <mitkRTConstants.h>
@@ -54,6 +57,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkDecimatePro.h"
 
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
+
+const std::string RTDoseVisualizer::ISO_LINE_NODE_NAME = "dose iso lines";
 
 namespace mitk
 {
@@ -102,11 +107,17 @@ RTDoseVisualizer::RTDoseVisualizer()
   m_freeIsoValuesCount = 0;
 
   m_internalUpdate = false;
-  m_isDosePredicate = mitk::NodePredicateDose::New();
+
+  m_isDoseOrIsoPredicate = mitk::NodePredicateDose::New();
+  m_isIsoPredicate = mitk::NodePredicateProperty::New("name", mitk::StringProperty::New(ISO_LINE_NODE_NAME));
+  m_isDosePredicate = mitk::NodePredicateAnd::New(m_isDoseOrIsoPredicate, mitk::NodePredicateNot::New(m_isIsoPredicate));
 }
 
 RTDoseVisualizer::~RTDoseVisualizer()
 {
+  mitk::DataStorage::SetOfObjects::ConstPointer isoNodes = this->GetDataStorage()->GetSubset(m_isIsoPredicate);
+  this->GetDataStorage()->Remove(isoNodes);
+
   delete m_LevelSetModel;
   delete m_DoseColorDelegate;
   delete m_DoseValueDelegate;
@@ -128,6 +139,16 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
 
 
   this->UpdateByPreferences();
+
+  auto doseNodes = this->GetDataStorage()->GetSubset(this->m_isDosePredicate);
+  auto doseNodeIter = doseNodes->begin();
+
+  while (doseNodeIter != doseNodes->end())
+  {
+    PrepareDoseNode(*doseNodeIter);
+    ++doseNodeIter;
+  }
+
   this->ActualizeIsoLevelsForAllDoseDataNodes();
   this->ActualizeReferenceDoseForAllDoseDataNodes();
   this->ActualizeDisplayStyleForAllDoseDataNodes();
@@ -500,28 +521,42 @@ void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer,
   if (selectedNode != m_selectedNode.GetPointer())
   {
     m_selectedNode = selectedNode;
-    if (selectedNode && !hasDoseVisProperties(m_selectedNode))
+    if (selectedNode)
     {
-      mitk::DataNode::Pointer doseOutlineNode;
-      mitk::DoseValueAbs dose;
-      mitk::GetReferenceDoseValue(dose);
-      auto presetMap = mitk::LoadPresetsMap();
-      auto colorPreset = mitk::GeneratIsoLevels_Virtuos();
-      auto finding = presetMap.find(mitk::GetSelectedPresetName());
-      if (finding!=presetMap.end())
-      {
-        colorPreset = finding->second;
-      }
-
-      mitk::ConfigureNodeAsDoseNode(m_selectedNode, doseOutlineNode, colorPreset, dose, true, true);
-      if (doseOutlineNode.IsNotNull())
-      {
-        this->GetDataStorage()->Add(doseOutlineNode, m_selectedNode);
-      }
+      PrepareDoseNode(m_selectedNode);
     }
   }
 
   UpdateBySelectedNode();
+}
+
+void RTDoseVisualizer::PrepareDoseNode( mitk::DataNode* doseNode ) const
+{
+  mitk::DoseValueAbs dose;
+  mitk::GetReferenceDoseValue(dose);
+  auto presetMap = mitk::LoadPresetsMap();
+  auto colorPreset = mitk::GeneratIsoLevels_Virtuos();
+  auto finding = presetMap.find(mitk::GetSelectedPresetName());
+  if (finding != presetMap.end())
+  {
+    colorPreset = finding->second;
+  }
+
+  if (!hasDoseVisProperties(doseNode))
+  {
+    mitk::ConfigureNodeAsDoseNode(doseNode, colorPreset, dose, true);
+  }
+
+  mitk::DataNode::Pointer doseOutlineNode = this->GetIsoDoseNode(doseNode);
+  if (doseOutlineNode.IsNull())
+  {
+    doseOutlineNode = mitk::DataNode::New();
+    doseOutlineNode->SetData(doseNode->GetData());
+    doseOutlineNode->SetName(ISO_LINE_NODE_NAME);
+
+    mitk::ConfigureNodeAsIsoLineNode(doseOutlineNode, colorPreset, dose, true);
+    this->GetDataStorage()->Add(doseOutlineNode, doseNode);
+  }
 }
 
 void RTDoseVisualizer::UpdateBySelectedNode()
@@ -599,13 +634,17 @@ void RTDoseVisualizer::NodeRemoved(const mitk::DataNode* node)
 {
   /**@TODO This removal seems to be needed because of the current dose rendering approach (additional sub node for iso dose lines).
    As soon as we have a better and sound single node rendering mechanism for doses. This method should be removed.*/
-  mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(node);
-  mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
-
-  while (iterChildNodes != childNodes->end())
+  bool isdose = m_isDosePredicate->CheckNode(node);
+  if (isdose)
   {
-    this->GetDataStorage()->Remove((*iterChildNodes));
-    ++iterChildNodes;
+    mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(node, m_isIsoPredicate);
+    auto iterChildNodes = childNodes->begin();
+
+    while (iterChildNodes != childNodes->end())
+    {
+      this->GetDataStorage()->Remove((*iterChildNodes));
+      ++iterChildNodes;
+    }
   }
 }
 
@@ -619,7 +658,7 @@ void RTDoseVisualizer::NodeChanged(const mitk::DataNode *node)
     bool isvisible = true;
     if(node->GetBoolProperty("visible", isvisible))
     {
-      mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(node);
+      mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(node, m_isIsoPredicate);
       mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
 
       while (iterChildNodes != childNodes->end())
@@ -699,7 +738,7 @@ void RTDoseVisualizer::ActualizeIsoLevelsForAllDoseDataNodes()
 
   mitk::PresetMapType presetMap = mitk::LoadPresetsMap();
 
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(m_isDosePredicate);
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(m_isDoseOrIsoPredicate);
 
   if(presetMap.empty())
     return;
@@ -726,12 +765,13 @@ void RTDoseVisualizer::ActualizeReferenceDoseForAllDoseDataNodes()
 
     if (sync)
     {
-        mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(m_isDosePredicate);
+      mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(m_isDoseOrIsoPredicate);
 
         for(mitk::DataStorage::SetOfObjects::const_iterator pos = nodes->begin(); pos != nodes->end(); ++pos)
         {
             (*pos)->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
-            //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
+
+            /**@TODO: ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring*/
             mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(*pos);
             mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
 
@@ -769,15 +809,15 @@ void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent&)
 }
 
 /**@TODO ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring*/
-mitk::DataNode::Pointer RTDoseVisualizer::GetIsoDoseNode(mitk::DataNode::Pointer doseNode)
+mitk::DataNode::Pointer RTDoseVisualizer::GetIsoDoseNode(mitk::DataNode::Pointer doseNode) const
 {
-  mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(doseNode);
+  mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(doseNode, m_isIsoPredicate);
   if (childNodes->empty())
   {
     return nullptr;
   }
   else
   {
-    return doseNode = (*childNodes->begin());
+    return (*childNodes->begin());
   }
 }

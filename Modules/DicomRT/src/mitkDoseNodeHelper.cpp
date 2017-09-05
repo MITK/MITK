@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingModeProperty.h>
 
 
-void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* doseNode, mitk::DataNode::Pointer& doseOutlineNode, const mitk::IsoDoseLevelSet* colorPreset, mitk::DoseValueAbs referenceDose, bool showColorWashGlobal, bool showIsolinesGlobal)
+void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* doseNode, const mitk::IsoDoseLevelSet* colorPreset, mitk::DoseValueAbs referenceDose, bool showColorWashGlobal)
 {
   if (!doseNode) return;
 
@@ -39,7 +39,7 @@ void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* doseNode, mitk::DataNode::Poi
 
   if (doseImage != nullptr)
   {
-    //set some specific colorwash and isoline properties
+    //set some specific color wash and isoline properties
     doseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), showColorWashGlobal);
 
     //Set reference dose property
@@ -48,11 +48,6 @@ void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* doseNode, mitk::DataNode::Poi
     mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(dynamic_cast<mitk::IsoDoseLevelSet*>(colorPreset->Clone().GetPointer()));
 
     doseNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
-
-    mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
-    mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
-
-    doseNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
 
     mitk::RenderingModeProperty::Pointer renderingModeProp = mitk::RenderingModeProperty::New();
 
@@ -88,15 +83,22 @@ void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* doseNode, mitk::DataNode::Poi
 
     doseNode->SetProperty("Image Rendering.Mode", renderingModeProp);
     doseNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+  }
+};
 
 
-    if (doseOutlineNode.IsNull())
+void mitk::ConfigureNodeAsIsoLineNode(mitk::DataNode* doseOutlineNode, const mitk::IsoDoseLevelSet* colorPreset, mitk::DoseValueAbs referenceDose, bool showIsolinesGlobal)
+{
+  if (doseOutlineNode != nullptr)
+  {
+    mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseOutlineNode->GetData());
+
+    if (doseImage != nullptr)
     {
-      doseOutlineNode = mitk::DataNode::New();
-      doseOutlineNode->SetData(doseImage);
+      mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(dynamic_cast<mitk::IsoDoseLevelSet*>(colorPreset->Clone().GetPointer()));
 
-      //////////////////////////////
-      //set the properties
+      mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
+      mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
 
       doseOutlineNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsolinesGlobal);
       doseOutlineNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);

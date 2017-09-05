@@ -42,16 +42,4 @@
 
   </extension>
 
-
-  <extension point="org.blueberry.ui.perspectives">
-
-    <perspective id="org.mitk.perspectives.diffusiondefault"
-    name="Diffusion DICOM Import"
-    class="QmitkDiffusionDefaultPerspective"
-    icon="resources/dwiimport.png">
-    <keywordReference id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-    </perspective>
-
-  </extension>
-
 </plugin>

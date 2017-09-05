@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMetaDataDictionary.h>
 #include <itkMetaDataObject.h>
 #include <mitkLogMacros.h>
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkCustomMimeType.h>
+#include <itkGDCMImageIO.h>
 
 namespace mitk
 {
@@ -34,6 +37,7 @@ std::vector<CustomMimeType*> DiffusionCoreIOMimeTypes::Get()
   mimeTypes.push_back(DWI_NRRD_MIMETYPE().Clone());
   mimeTypes.push_back(DWI_NIFTI_MIMETYPE().Clone());
   mimeTypes.push_back(DWI_FSL_MIMETYPE().Clone());
+  mimeTypes.push_back(DWI_DICOM_MIMETYPE().Clone());
   mimeTypes.push_back(DTI_MIMETYPE().Clone());
   mimeTypes.push_back(QBI_MIMETYPE().Clone());
 
@@ -283,6 +287,73 @@ DiffusionCoreIOMimeTypes::DiffusionImageFslMimeType DiffusionCoreIOMimeTypes::DW
   return DiffusionImageFslMimeType();
 }
 
+
+DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType::DiffusionImageDicomMimeType()
+  : CustomMimeType(DWI_DICOM_MIMETYPE_NAME())
+{
+  std::string category = "Diffusion Weighted Images";
+  this->SetCategory(category);
+  this->SetComment("Diffusion Weighted Images");
+
+  this->AddExtension("gdcm");
+  this->AddExtension("dcm");
+  this->AddExtension("DCM");
+  this->AddExtension("dc3");
+  this->AddExtension("DC3");
+  this->AddExtension("ima");
+  this->AddExtension("img");
+}
+
+bool DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType::AppliesTo(const std::string &path) const
+{
+  itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
+  bool canRead = gdcmIO->CanReadFile(path.c_str());
+
+  if (!canRead)
+    return canRead;
+
+  mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
+  mitk::DICOMTag ImageTypeTag(0x0008, 0x0008);
+
+  mitk::StringList relevantFiles;
+  relevantFiles.push_back(path);
+
+  scanner->AddTag(ImageTypeTag);
+  scanner->SetInputFiles(relevantFiles);
+  scanner->Scan();
+  mitk::DICOMTagCache::Pointer tagCache = scanner->GetScanCache();
+
+  mitk::DICOMImageFrameList imageFrameList = mitk::ConvertToDICOMImageFrameList(tagCache->GetFrameInfoList());
+  mitk::DICOMImageFrameInfo *firstFrame = imageFrameList.begin()->GetPointer();
+
+  std::string byteString = tagCache->GetTagValue(firstFrame, ImageTypeTag).value;
+
+  if (byteString.empty()) {
+    return false;
+  }
+
+  std::size_t found = byteString.find("DIFFUSION");
+  if (found==std::string::npos)
+    return false;
+  found = byteString.find("NONE");
+  if (found==std::string::npos)
+    return false;
+
+  return canRead;
+}
+
+DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType* DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType::Clone() const
+{
+  return new DiffusionImageDicomMimeType(*this);
+}
+
+
+DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE()
+{
+  return DiffusionImageDicomMimeType();
+}
+
+
 CustomMimeType DiffusionCoreIOMimeTypes::DTI_MIMETYPE()
 {
   CustomMimeType mimeType(DTI_MIMETYPE_NAME());
@@ -324,6 +395,12 @@ std::string DiffusionCoreIOMimeTypes::DWI_FSL_MIMETYPE_NAME()
   return name;
 }
 
+std::string DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".IMA";
+  return name;
+}
+
 std::string DiffusionCoreIOMimeTypes::DTI_MIMETYPE_NAME()
 {
   static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dti";
@@ -351,6 +428,12 @@ std::string DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION()
 }
 
 std::string DiffusionCoreIOMimeTypes::DWI_FSL_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Diffusion Weighted Images";
+  return description;
+}
+
+std::string DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE_DESCRIPTION()
 {
   static std::string description = "Diffusion Weighted Images";
   return description;

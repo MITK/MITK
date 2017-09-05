@@ -158,8 +158,8 @@ bool mitk::DiffusionDICOMFileReader
 
   mitk::DiffusionPropertyHelper propertyHelper( output_image );
   propertyHelper.InitializeImage();
-
   output_image->SetProperty("diffusion.dicom.importname", mitk::StringProperty::New( helper.GetOutputName(filenames) ) );
+
   block.SetMitkImage( (mitk::Image::Pointer) output_image );
 
   return block.GetMitkImage().IsNotNull();
@@ -169,6 +169,8 @@ bool mitk::DiffusionDICOMFileReader
 void mitk::DiffusionDICOMFileReader
 ::AnalyzeInputFiles()
 {
+  m_Study_names.clear();
+  m_Series_names.clear();
   this->SetGroup3DandT(true);
 
   Superclass::AnalyzeInputFiles();
@@ -200,12 +202,16 @@ void mitk::DiffusionDICOMFileReader
     gdcm::Scanner gdcmScanner;
 
     gdcm::Tag t_vendor(0x008, 0x0070);
-    gdcm::Tag t_imagetype(0x008, 0x008);
+    gdcm::Tag t_imagetype(0x0008, 0x0008);
+    gdcm::Tag t_StudyDescription(0x0008, 0x1030);
+    gdcm::Tag t_SeriesDescription(0x0008, 0x103E);
 
     // add DICOM Tag for vendor
     gdcmScanner.AddTag( t_vendor );
     // add DICOM Tag for image type
     gdcmScanner.AddTag( t_imagetype );
+    gdcmScanner.AddTag( t_StudyDescription );
+    gdcmScanner.AddTag( t_SeriesDescription );
     if( gdcmScanner.Scan( inputFilename ) )
     {
 
@@ -268,7 +274,6 @@ void mitk::DiffusionDICOMFileReader
       continue;
     }
 
-
     bool canread = false;
     // iterate over the threeD+t block
 
@@ -291,6 +296,18 @@ void mitk::DiffusionDICOMFileReader
       m_OutputHeaderContainer.push_back( retrievedHeader );
       m_OutputReaderContainer.push_back( headerReader );
       valid_input_list.push_back(true);
+
+      const char* ch_StudyDescription = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_StudyDescription );
+      const char* ch_SeriesDescription = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_SeriesDescription );
+      if( ch_StudyDescription != nullptr )
+        m_Study_names.push_back(ch_StudyDescription);
+      else
+        m_Study_names.push_back("-");
+
+      if( ch_SeriesDescription != nullptr )
+        m_Series_names.push_back(ch_SeriesDescription);
+      else
+        m_Series_names.push_back("-");
     }
   }
 
@@ -310,11 +327,7 @@ void mitk::DiffusionDICOMFileReader
 
   // insert only the valid ones
   for ( unsigned int outputidx = 0; valid_outputs.size(); ++outputidx )
-  {
-      this->SetOutput( outputidx, valid_outputs.at( outputidx ) );
-  }
-
-
+    this->SetOutput( outputidx, valid_outputs.at( outputidx ) );
 
   for( unsigned int outputidx = 0; outputidx < this->GetNumberOfOutputs(); outputidx++ )
   {
@@ -330,11 +343,7 @@ void mitk::DiffusionDICOMFileReader
     }
 
     MITK_INFO("diffusion.dicomreader") << "===========================================";
-
   }
-
-
-
 }
 
 

@@ -22,9 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsNetworkReader.h>
 #include <mitkPlanarFigureCompositeReader.h>
 #include <mitkTractographyForestReader.h>
+#include <mitkFiberBundleDicomReader.h>
 
 #include <mitkFiberBundleVtkWriter.h>
 #include <mitkFiberBundleTrackVisWriter.h>
+#include <mitkFiberBundleDicomWriter.h>
 #include <mitkConnectomicsNetworkWriter.h>
 #include <mitkConnectomicsNetworkCSVWriter.h>
 #include <mitkConnectomicsNetworkMatrixWriter.h>
@@ -48,25 +50,31 @@ namespace mitk
 
     void Load(us::ModuleContext* context) override
     {
-      us::ServiceProperties props;
-      props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
-
       m_MimeTypes = mitk::DiffusionIOMimeTypes::Get();
       for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
         iterEnd = m_MimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
       {
+        us::ServiceProperties props;
+        mitk::CustomMimeType* mt = *mimeTypeIter;
+        if (mt->GetName()==mitk::DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME())
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = -10;
+        else
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
+
         context->RegisterService(*mimeTypeIter, props);
       }
 
       m_FiberBundleVtkReader = new FiberBundleVtkReader();
       m_FiberBundleTrackVisReader = new FiberBundleTrackVisReader();
       m_FiberBundleTckReader = new FiberBundleTckReader();
+      m_FiberBundleDicomReader = new FiberBundleDicomReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
       m_PlanarFigureCompositeReader = new PlanarFigureCompositeReader();
       m_TractographyForestReader = new TractographyForestReader();
 
       m_FiberBundleVtkWriter = new FiberBundleVtkWriter();
       m_FiberBundleTrackVisWriter = new FiberBundleTrackVisWriter();
+      m_FiberBundleDicomWriter = new FiberBundleDicomWriter();
       m_ConnectomicsNetworkWriter = new ConnectomicsNetworkWriter();
       m_ConnectomicsNetworkCSVWriter = new ConnectomicsNetworkCSVWriter();
       m_ConnectomicsNetworkMatrixWriter = new ConnectomicsNetworkMatrixWriter();
@@ -87,7 +95,9 @@ namespace mitk
       delete m_ConnectomicsNetworkReader;
       delete m_PlanarFigureCompositeReader;
       delete m_TractographyForestReader;
+      delete m_FiberBundleDicomReader;
 
+      delete m_FiberBundleDicomWriter;
       delete m_FiberBundleVtkWriter;
       delete m_FiberBundleTrackVisWriter;
       delete m_ConnectomicsNetworkWriter;
@@ -102,10 +112,12 @@ namespace mitk
     FiberBundleVtkReader * m_FiberBundleVtkReader;
     FiberBundleTckReader * m_FiberBundleTckReader;
     FiberBundleTrackVisReader * m_FiberBundleTrackVisReader;
+    FiberBundleDicomReader * m_FiberBundleDicomReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
     PlanarFigureCompositeReader* m_PlanarFigureCompositeReader;
     TractographyForestReader* m_TractographyForestReader;
 
+    FiberBundleDicomWriter * m_FiberBundleDicomWriter;
     FiberBundleVtkWriter * m_FiberBundleVtkWriter;
     FiberBundleTrackVisWriter * m_FiberBundleTrackVisWriter;
     ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;

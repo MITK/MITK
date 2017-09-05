@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMetaDataObject.h>
 #include <mitkLogMacros.h>
 
+#include "dcmtk/dcmtract/trctractographyresults.h"
+
 namespace mitk
 {
 
@@ -34,6 +36,7 @@ std::vector<CustomMimeType*> DiffusionIOMimeTypes::Get()
   mimeTypes.push_back(FIBERBUNDLE_VTK_MIMETYPE().Clone());
   mimeTypes.push_back(FIBERBUNDLE_TRK_MIMETYPE().Clone());
   mimeTypes.push_back(FIBERBUNDLE_TCK_MIMETYPE().Clone());
+  mimeTypes.push_back(FIBERBUNDLE_DICOM_MIMETYPE().Clone());
 
   mimeTypes.push_back(CONNECTOMICS_MIMETYPE().Clone());
   mimeTypes.push_back(TRACTOGRAPHYFOREST_MIMETYPE().Clone());
@@ -72,7 +75,7 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE()
   mimeType.SetComment("VTK Fibers");
   mimeType.SetCategory(category);
   mimeType.AddExtension("fib");
-//  mimeType.AddExtension("vtk");
+  mimeType.AddExtension("vtk");
   return mimeType;
 }
 
@@ -94,6 +97,44 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE()
   mimeType.SetCategory(category);
   mimeType.AddExtension("trk");
   return mimeType;
+}
+
+DiffusionIOMimeTypes::FiberBundleDicomMimeType::FiberBundleDicomMimeType()
+  : CustomMimeType(FIBERBUNDLE_DICOM_MIMETYPE_NAME())
+{
+  std::string category = "DICOM Fibers";
+  this->SetCategory(category);
+  this->SetComment("DICOM Fibers");
+
+  this->AddExtension("dcm");
+  this->AddExtension("DCM");
+  this->AddExtension("gdcm");
+  this->AddExtension("dc3");
+  this->AddExtension("DC3");
+  this->AddExtension("ima");
+  this->AddExtension("img");
+}
+
+bool DiffusionIOMimeTypes::FiberBundleDicomMimeType::AppliesTo(const std::string &path) const
+{
+  OFCondition result;
+  TrcTractographyResults *trc = NULL;
+  result = TrcTractographyResults::loadFile(path.c_str(), trc);
+  if (result.bad())
+    return false;
+
+  return true;
+}
+
+DiffusionIOMimeTypes::FiberBundleDicomMimeType* DiffusionIOMimeTypes::FiberBundleDicomMimeType::Clone() const
+{
+  return new FiberBundleDicomMimeType(*this);
+}
+
+
+DiffusionIOMimeTypes::FiberBundleDicomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_DICOM_MIMETYPE()
+{
+  return FiberBundleDicomMimeType();
 }
 
 CustomMimeType DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE()
@@ -142,6 +183,12 @@ std::string DiffusionIOMimeTypes::FIBERBUNDLE_TCK_MIMETYPE_NAME()
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME()
 {
   static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.trk";
+  return name;
+}
+
+std::string DiffusionIOMimeTypes::FIBERBUNDLE_DICOM_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.dcm";
   return name;
 }
 

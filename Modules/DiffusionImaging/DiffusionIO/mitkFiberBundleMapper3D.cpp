@@ -213,11 +213,12 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
         "uniform mat4 MCVCMatrix;\n"
 
         "//VTK::Color::Dec\n"
-        "attribute vec3 a_vNormal;\n"
+        "attribute vec3 normalMC;\n"
+        "uniform mat3 normalMatrix;\n"
 
         "varying vec4 positionWorld;\n"
         "varying vec4 colorVertex;\n"
-        "varying vec4 N;\n"
+        "varying vec3 N;\n"
         "varying vec4 v;\n"
 
         "void main(void)\n"
@@ -226,7 +227,7 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
         "  positionWorld = vertexMC;\n"
         "  v = MCVCMatrix * vertexMC;\n"
         "  mat4 glNormalMatrix = transpose(inverse(MCVCMatrix));\n"
-        "  N = normalize(glNormalMatrix * vec4(a_vNormal,0));\n"
+        "  N = normalize(normalMatrix * normalMC);\n"
         "  gl_Position = MCDCMatrix * vertexMC;\n"
         "}\n"
         );
@@ -244,7 +245,7 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
         "varying vec4 positionWorld;\n"
         "varying vec4 colorVertex;\n"
 
-        "varying vec4 N;\n"
+        "varying vec3 N;\n"
         "varying vec4 v;\n"
 
         "void main(void)\n"
@@ -258,10 +259,10 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
         "     vec3 L = normalize(-v.xyz);\n"
 //        "normalize(gl_LightSource[0].position.xyz - v.xyz);\n"
         "     vec3 E = normalize(-v.xyz); // we are in Eye Coordinates, so EyePos is (0,0,0)\n"
-        "     vec3 R = normalize(-reflect(L,N.xyz));\n"
+        "     vec3 R = normalize(-reflect(L,N));\n"
 
         //calculate Diffuse Term:
-        "     float Idiff = diffuse * max(dot(N.xyz,L), 0.0);\n"
+        "     float Idiff = diffuse * max(dot(N,L), 0.0);\n"
         "     Idiff = clamp(Idiff, 0.0, 1.0);\n"
 
         // calculate Specular Term:

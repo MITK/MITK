@@ -276,6 +276,7 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
   ScalarType minimalIntervallSize = stmax;
   ScalarType minimalTime = stmax;
   ScalarType maximalTime = 0;
+  unsigned int maximalComponent = 0;
 
   // Needed for check of zero bounding boxes
   mitk::ScalarType nullpoint[]={0,0,0,0,0,0};
@@ -352,6 +353,11 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
               minimalIntervallSize = curTimeBounds[1]-curTimeBounds[0];
             }
           }
+
+          // Get components bounds
+          if (timeGeometry->componentSize > maximalComponent) {
+            maximalComponent = timeGeometry->componentSize;
+          }
         }
         catch(itk::ExceptionObject& e)
         {
@@ -399,6 +405,8 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
     dynamic_cast<ProportionalTimeGeometry*>(timeGeometry.GetPointer())->Initialize(geometry,numberOfTimeSteps);
     dynamic_cast<ProportionalTimeGeometry*>(timeGeometry.GetPointer())->SetFirstTimePoint(minimalTime);
     dynamic_cast<ProportionalTimeGeometry*>(timeGeometry.GetPointer())->SetStepDuration(minimalIntervallSize);
+    // Add components size
+    timeGeometry->componentSize = maximalComponent;
   }
   return timeGeometry;
 }

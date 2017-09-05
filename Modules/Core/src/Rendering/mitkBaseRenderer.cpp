@@ -396,7 +396,10 @@ void mitk::BaseRenderer::SetComponent(unsigned int component)
 
   m_Component = component;
   
-  m_DataStorage->GetAll()->at(0)->SetIntProperty("Image.Displayed Component", component);
+  auto nodes = m_DataStorage->GetAll();
+  for (int i = 0; i < nodes->size(); i++)
+    nodes->at(i)->SetIntProperty("Image.Displayed Component", component);
+
 }
 
 int mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) const

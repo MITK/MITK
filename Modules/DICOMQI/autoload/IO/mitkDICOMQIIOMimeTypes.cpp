@@ -46,16 +46,9 @@ namespace mitk
 
   MitkDICOMQIIOMimeTypes::MitkDICOMQIMimeType::MitkDICOMQIMimeType() : CustomMimeType(DICOMQI_MIMETYPE_NAME())
   {
-    this->AddExtension("gdcm");
     this->AddExtension("dcm");
-    this->AddExtension("DCM");
-    this->AddExtension("dc3");
-    this->AddExtension("DC3");
-    this->AddExtension("ima");
-    this->AddExtension("img");
-
     this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
-    this->SetComment("DCMQI");
+    this->SetComment("DICOM SEG");
   }
 
   bool MitkDICOMQIIOMimeTypes::MitkDICOMQIMimeType::AppliesTo(const std::string &path) const

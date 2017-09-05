@@ -201,6 +201,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   auto diffusionImageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("DiffusionImage");
 
+  auto fiberBundleDataNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("FiberBundle");
+
   auto surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
@@ -374,6 +377,12 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       diffusionImageDataNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(diffusionImageDataNodeDescriptor, colorAction));
+    }
+    if (fiberBundleDataNodeDescriptor != nullptr)
+    {
+      fiberBundleDataNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(fiberBundleDataNodeDescriptor, colorAction));
     }
     if (surfaceDataNodeDescriptor != nullptr)
     {

@@ -50,13 +50,17 @@ namespace mitk
 
     void Load(us::ModuleContext* context) override
     {
-      us::ServiceProperties props;
-      props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
-
       m_MimeTypes = mitk::DiffusionIOMimeTypes::Get();
       for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
         iterEnd = m_MimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
       {
+        us::ServiceProperties props;
+        mitk::CustomMimeType* mt = *mimeTypeIter;
+        if (mt->GetName()==mitk::DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME())
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = -10;
+        else
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
+
         context->RegisterService(*mimeTypeIter, props);
       }
 

@@ -77,7 +77,6 @@ void mitk::FiberBundleVtkWriter::Write()
     const std::string& currLocale = setlocale( LC_ALL, nullptr );
     setlocale(LC_ALL, locale.c_str());
 
-    std::locale previousLocale(out->getloc());
     std::locale I("C");
     out->imbue(I);
 
@@ -163,7 +162,7 @@ void mitk::FiberBundleVtkWriter::Write()
       fibPoly->GetPointData()->AddArray(fiberColors);
 
     setlocale(LC_ALL, currLocale.c_str());
-    MITK_INFO << "Fiber bundle written";
+    MITK_INFO << "VTK Fiber bundle written to " << filename;
   }
   catch(...)
   {

@@ -62,6 +62,18 @@ public:
   static CustomMimeType FIBERBUNDLE_TRK_MIMETYPE();
   static std::string FIBERBUNDLE_TRK_MIMETYPE_NAME();
 
+  // ------------------------------ DICOM formats ----------------------------------
+
+  class  FiberBundleDicomMimeType : public CustomMimeType
+  {
+  public:
+    FiberBundleDicomMimeType();
+    virtual bool AppliesTo(const std::string &path) const override;
+    virtual FiberBundleDicomMimeType* Clone() const override;
+  };
+
+  static FiberBundleDicomMimeType FIBERBUNDLE_DICOM_MIMETYPE();
+  static std::string FIBERBUNDLE_DICOM_MIMETYPE_NAME();
 
   // ------------------------- Image formats (ITK based) --------------------------
 

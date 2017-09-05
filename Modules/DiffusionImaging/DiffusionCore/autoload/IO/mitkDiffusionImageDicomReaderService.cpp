@@ -77,7 +77,7 @@ DiffusionImageDicomReaderService()
   : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE_DESCRIPTION() )
 {
   Options defaultOptions;
-  defaultOptions["Load recoursive"] = false;
+  defaultOptions["Load recursive"] = false;
   defaultOptions["Split mosaic"] = true;
   this->SetDefaultOptions(defaultOptions);
 
@@ -119,13 +119,13 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
     try
     {
       Options options = this->GetOptions();
-      bool load_recoursive = us::any_cast<bool>(options["Load recoursive"]);
+      bool load_recursive = us::any_cast<bool>(options["Load recursive"]);
       bool split_mosaic = us::any_cast<bool>(options["Split mosaic"]);
 
       gdcm::Directory::FilenamesType complete_list;
       std::string folderName = itksys::SystemTools::GetFilenamePath( this->GetInputLocation() );
 
-      if( load_recoursive )
+      if( load_recursive )
       {
         std::string subdir_prefix = "";
 
@@ -162,7 +162,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
       else
       {
         gdcm::Directory d;
-        d.Load( folderName.c_str(), load_recoursive ); // recursive !
+        d.Load( folderName.c_str(), load_recursive ); // recursive !
         const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
         const unsigned int ntotalfiles = l1.size();
 

@@ -32,6 +32,7 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "Automatic Segmentation", QAction::tr("Automatic Segmentation")},
   { "BasicImageProcessing", QAction::tr("BasicImageProcessing") },
   { "Clipping Plane", QAction::tr("Clipping Plane") },
+  { "Cpr", QAction::tr("Cpr") },
   { "Display", QAction::tr("Display") },
   { "Dicom Inspector", QAction::tr("Dicom Inspector") },
   { "Data Manager", QAction::tr("Data Manager") },
@@ -39,6 +40,7 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "Emphysema Diagnostics", QAction::tr("Emphysema Diagnostics") },
   { "Geometry Tools", QAction::tr("Geometry Tools") },
   { "Hepar Couinaud Segmentation", QAction::tr("Hepar Couinaud Segmentation") },
+  { "IGS Case Maker", QAction::tr("IGS Case Maker") },
   { "IGT EchoTrack", QAction::tr("IGT EchoTrack") },
   { "IGT EchoTrack Calibration", QAction::tr("IGT EchoTrack Calibration") },
   { "Image Denoising", QAction::tr("Image Denoising") },
@@ -61,6 +63,7 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "PointSet Interaction Ext", QAction::tr("PointSet Interaction Ext") },
   { "Point Set Interaction Multispectrum", QAction::tr("Point Set Interaction Multispectrum") },
   { "Properties", QAction::tr("Properties") },
+  { "Registration", QAction::tr("Registration") },
   { "Remeshing", QAction::tr("Remeshing") },
   { "RigidRegistration", QAction::tr("RigidRegistration") },
   { "RT Dose Visualization", QAction::tr("RT Dose Visualization") },
@@ -72,7 +75,6 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "Statistics", QAction::tr("Statistics") },
   { "ThoraxView", QAction::tr("ThoraxView") },
   { "Tracking", QAction::tr("Tracking") },
-  { "IGS Case Maker", QAction::tr("IGS Case Maker") },
   { "Tube Graph", QAction::tr("Tube Graph") },
   { "TumorSegmentation", QAction::tr("TumorSegmentation") },
   { "Vascular Structure Segmentation", QAction::tr("Vascular Structure Segmentation") },
@@ -80,7 +82,6 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "Vessels Enhancing", QAction::tr("Vessels Enhancing") },
   { "View Navigator", QAction::tr("View Navigator") },
   { "Volume Visualization", QAction::tr("Volume Visualization") },
-  { "Cpr", QAction::tr("Cpr") },
 };
 
 

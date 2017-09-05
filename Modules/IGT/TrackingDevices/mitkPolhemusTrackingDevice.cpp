@@ -70,6 +70,9 @@ bool mitk::PolhemusTrackingDevice::StartTracking()
   {
     mitk::IGTTimeStamp::GetInstance()->Start(this);
     this->SetState(Tracking);
+    this->m_StopTrackingMutex->Lock();
+    this->m_StopTracking = false;
+    this->m_StopTrackingMutex->Unlock();
     m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
     return true;
   }
@@ -83,6 +86,7 @@ bool mitk::PolhemusTrackingDevice::StartTracking()
 
 bool mitk::PolhemusTrackingDevice::StopTracking()
 {
+  m_Device->StopTracking();
   return Superclass::StopTracking();
 }
 

@@ -40,17 +40,12 @@ int main(int argc, char* argv[])
   parser.setTitle("Fiberfox");
   parser.setCategory("Diffusion Simulation Tools");
   parser.setContributor("MIC");
-  parser.setDescription("Command line interface to Fiberfox."
-                        " Simulate a diffusion-weighted image from a tractogram using the specified parameter file.");
+  parser.setDescription("Command line interface to Fiberfox." " Simulate a diffusion-weighted image from a tractogram using the specified parameter file.");
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:",
-                     "output root", us::Any(), false);
-  parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:",
-                     "fiberfox parameter file (.ffp)", us::Any(), false);
-  parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:",
-                     "Input tractogram or diffusion-weighted image.", us::Any(), false);
-  parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:",
-                     "output volume fraction images etc.", us::Any());
+  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
+  parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file (.ffp)", us::Any(), false);
+  parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "Input tractogram or diffusion-weighted image.", us::Any(), false);
+  parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "output volume fraction images etc.", us::Any());
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

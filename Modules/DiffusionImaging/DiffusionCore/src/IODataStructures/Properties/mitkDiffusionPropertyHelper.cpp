@@ -226,7 +226,7 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrameAndRotationMatrix()
   {
     MITK_INFO << "Applying measurement frame to diffusion-gradient directions:";
     std::cout << measurementFrame << std::endl;
-    MITK_INFO << "Applying image totation to diffusion-gradient directions:";
+    MITK_INFO << "Applying image rotation to diffusion-gradient directions:";
     std::cout << imageRotationMatrix << std::endl;
   }
 
@@ -289,7 +289,7 @@ void mitk::DiffusionPropertyHelper::UnApplyMeasurementFrameAndRotationMatrix()
 
   if (!keep_originals)
   {
-    MITK_INFO << "Reverting image totation to diffusion-gradient directions:";
+    MITK_INFO << "Reverting image rotation to diffusion-gradient directions:";
     std::cout << imageRotationMatrix << std::endl;
     MITK_INFO << "Reverting measurement frame to diffusion-gradient directions:";
     std::cout << measurementFrame << std::endl;

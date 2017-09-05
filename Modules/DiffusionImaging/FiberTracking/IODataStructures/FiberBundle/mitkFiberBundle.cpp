@@ -762,10 +762,10 @@ void mitk::FiberBundle::GenerateFiberIds()
 
 }
 
-mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction)
+mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction, bool do_resampling)
 {
   vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
-  if (anyPoint)
+  if (anyPoint && do_resampling)
   {
     float minSpacing = 1;
     if(mask->GetSpacing()[0]<mask->GetSpacing()[1] && mask->GetSpacing()[0]<mask->GetSpacing()[2])
@@ -1228,7 +1228,7 @@ void mitk::FiberBundle::UpdateFiberGeometry()
   if (m_FiberColors==nullptr || m_FiberColors->GetNumberOfTuples()!=m_FiberPolyData->GetNumberOfPoints())
     this->ColorFibersByOrientation();
 
-  if (m_FiberWeights->GetSize()!=m_NumFibers)
+  if (m_FiberWeights->GetNumberOfValues()!=m_NumFibers)
   {
     m_FiberWeights = vtkSmartPointer<vtkFloatArray>::New();
     m_FiberWeights->SetName("FIBER_WEIGHTS");
@@ -1310,19 +1310,19 @@ float mitk::FiberBundle::GetFiberWeight(unsigned int fiber) const
 
 void mitk::FiberBundle::SetFiberWeights(float newWeight)
 {
-  for (int i=0; i<m_FiberWeights->GetSize(); i++)
+  for (int i=0; i<m_FiberWeights->GetNumberOfValues(); i++)
     m_FiberWeights->SetValue(i, newWeight);
 }
 
 void mitk::FiberBundle::SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights)
 {
-  if (m_NumFibers!=weights->GetSize())
+  if (m_NumFibers!=weights->GetNumberOfValues())
   {
-    MITK_INFO << "Weights array not equal to number of fibers!";
+    MITK_INFO << "Weights array not equal to number of fibers! " << weights->GetNumberOfValues() << " vs " << m_NumFibers;
     return;
   }
 
-  for (int i=0; i<weights->GetSize(); i++)
+  for (int i=0; i<weights->GetNumberOfValues(); i++)
     m_FiberWeights->SetValue(i, weights->GetValue(i));
 
   m_FiberWeights->SetName("FIBER_WEIGHTS");

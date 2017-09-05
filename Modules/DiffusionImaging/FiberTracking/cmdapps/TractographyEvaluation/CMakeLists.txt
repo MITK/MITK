@@ -14,6 +14,8 @@ if(BUILD_DiffusionTractographyEvaluationCmdApps OR MITK_BUILD_ALL_APPS)
     set( diffusionTractographyEvaluationcmdapps
     PeaksAngularError^^MitkFiberTracking
     TractometerMetrics^^MitkFiberTracking
+    TractPlausibility^^MitkFiberTracking
+    FitFibersToImage^^MitkFiberTracking
     # LocalDirectionalFiberPlausibility^^MitkFiberTracking # HAS TO USE NEW PEAK IMAGE FORMAT
     )
 

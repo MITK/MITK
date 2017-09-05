@@ -52,12 +52,12 @@ public:
     vtkOpenGLHelper *cellBO = reinterpret_cast<vtkOpenGLHelper*>(cbo);
 
     float fiberOpacity;
-    int fiberFading = 300;
-    float fiberThickness;
+    bool fiberFading = false;
+    float fiberThickness = 0.0;
 
     node->GetOpacity(fiberOpacity, nullptr);
-    node->GetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness", fiberThickness);
-    node->GetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON", fiberFading);
+    node->GetFloatProperty("Fiber2DSliceThickness", fiberThickness);
+    node->GetBoolProperty("Fiber2DfadeEFX", fiberFading);
 
     cellBO->Program->SetUniformf("fiberOpacity", fiberOpacity);
     cellBO->Program->SetUniformi("fiberFadingON", fiberFading);
@@ -80,11 +80,6 @@ public:
       float tmp3 = planeGeo->GetOrigin()[2] * planeNormal[2];
       float thickness = tmp1 + tmp2 + tmp3; //attention, correct normalvector
 
-      node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.w", thickness, renderer);
-      node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.x", planeNormal[0], renderer);
-      node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.y", planeNormal[1], renderer);
-      node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.z", planeNormal[2], renderer);
-
       float* a = new float[4];
       for (int i = 0; i < 3; ++i)
         a[i] = planeNormal[i];
@@ -101,10 +96,10 @@ public:
 
 
 mitk::FiberBundleMapper2D::FiberBundleMapper2D()
-    : m_LineWidth(1)
+  : m_LineWidth(1)
 {
-    m_lut = vtkLookupTable::New();
-    m_lut->Build();
+  m_lut = vtkLookupTable::New();
+  m_lut->Build();
 
 }
 
@@ -115,63 +110,57 @@ mitk::FiberBundleMapper2D::~FiberBundleMapper2D()
 
 mitk::FiberBundle* mitk::FiberBundleMapper2D::GetInput()
 {
-    return dynamic_cast< mitk::FiberBundle * > ( GetDataNode()->GetData() );
+  return dynamic_cast< mitk::FiberBundle * > ( GetDataNode()->GetData() );
 }
 
 
 
 void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
 {
-        bool visible = true;
-        GetDataNode()->GetVisibility(visible, renderer, "visible");
-        if ( !visible )
-            return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible )
+    return;
 
-        // Calculate time step of the input data for the specified renderer (integer value)
-        // this method is implemented in mitkMapper
-        this->CalculateTimeStep( renderer );
+  // Calculate time step of the input data for the specified renderer (integer value)
+  // this method is implemented in mitkMapper
+  this->CalculateTimeStep( renderer );
 
-        //check if updates occured in the node or on the display
-        FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  //check if updates occured in the node or on the display
+  FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
-        //set renderer independent shader properties
-        const DataNode::Pointer node = this->GetDataNode();
-        float thickness = 2.0;
-        if(!this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness))
-            MITK_INFO << "FIBER2D SLICE THICKNESS PROPERTY ERROR";
+  //set renderer independent shader properties
+  const DataNode::Pointer node = this->GetDataNode();
+  float thickness = 2.0;
+  if(!this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness))
+    MITK_INFO << "FIBER2D SLICE THICKNESS PROPERTY ERROR";
 
-        bool fiberfading = false;
-        if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
-            MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
+  bool fiberfading = false;
+  if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
+    MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
 
-        float fiberOpacity;
-        this->GetDataNode()->GetOpacity(fiberOpacity, nullptr);
-        node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness",thickness);
-        node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading);
-        node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity);
+  mitk::FiberBundle* fiberBundle = this->GetInput();
+  if (fiberBundle==nullptr)
+    return;
 
-        mitk::FiberBundle* fiberBundle = this->GetInput();
-        if (fiberBundle==nullptr)
-            return;
+  int lineWidth = 0;
+  node->GetIntProperty("LineWidth", lineWidth);
+  if (m_LineWidth!=lineWidth)
+  {
+    m_LineWidth = lineWidth;
+    fiberBundle->RequestUpdate2D();
+  }
 
-        int lineWidth = 0;
-        node->GetIntProperty("LineWidth", lineWidth);
-        if (m_LineWidth!=lineWidth)
-        {
-            m_LineWidth = lineWidth;
-            fiberBundle->RequestUpdate2D();
-        }
-
-        if ( localStorage->m_LastUpdateTime<renderer->GetCurrentWorldPlaneGeometryUpdateTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
-        {
-            this->UpdateShaderParameter(renderer);
-            this->GenerateDataForRenderer( renderer );
-        }
+  if ( localStorage->m_LastUpdateTime<renderer->GetCurrentWorldPlaneGeometryUpdateTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
+  {
+    this->UpdateShaderParameter(renderer);
+    this->GenerateDataForRenderer( renderer );
+  }
 }
 
 void mitk::FiberBundleMapper2D::UpdateShaderParameter(mitk::BaseRenderer *)
 {
-    // see new vtkShaderCallback
+  // see new vtkShaderCallback
 }
 
 // vtkActors and Mappers are feeded here
@@ -199,53 +188,53 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
   localStorage->m_FiberMapper->SetInputData(fiberPolyData);
   localStorage->m_FiberMapper->SetVertexShaderCode(
-    "//VTK::System::Dec\n"
-    "attribute vec4 vertexMC;\n"
+        "//VTK::System::Dec\n"
+        "attribute vec4 vertexMC;\n"
 
-    "//VTK::Normal::Dec\n"
-    "uniform mat4 MCDCMatrix;\n"
+        "//VTK::Normal::Dec\n"
+        "uniform mat4 MCDCMatrix;\n"
 
-    "//VTK::Color::Dec\n"
+        "//VTK::Color::Dec\n"
 
-    "varying vec4 positionWorld;\n"
-    "varying vec4 colorVertex;\n"
+        "varying vec4 positionWorld;\n"
+        "varying vec4 colorVertex;\n"
 
-    "void main(void)\n"
-    "{\n"
-    "  colorVertex = scalarColor;\n"
-    "  positionWorld = vertexMC;\n"
-    "  gl_Position = MCDCMatrix * vertexMC;\n"
-    "}\n"
-    );
+        "void main(void)\n"
+        "{\n"
+        "  colorVertex = scalarColor;\n"
+        "  positionWorld = vertexMC;\n"
+        "  gl_Position = MCDCMatrix * vertexMC;\n"
+        "}\n"
+        );
   localStorage->m_FiberMapper->SetFragmentShaderCode(
-    "//VTK::System::Dec\n"  // always start with this line
-    "//VTK::Output::Dec\n"  // always have this line in your FS
-    "uniform vec4 slicingPlane;\n"
-    "uniform float fiberThickness;\n"
-    "uniform int fiberFadingON;\n"
-    "uniform float fiberOpacity;\n"
+        "//VTK::System::Dec\n"  // always start with this line
+        "//VTK::Output::Dec\n"  // always have this line in your FS
+        "uniform vec4 slicingPlane;\n"
+        "uniform float fiberThickness;\n"
+        "uniform int fiberFadingON;\n"
+        "uniform float fiberOpacity;\n"
 
-    "varying vec4 positionWorld;\n"
-    "varying vec4 colorVertex;\n"
+        "varying vec4 positionWorld;\n"
+        "varying vec4 colorVertex;\n"
 
-    "void main(void)\n"
-    "{\n"
-    "  float r1 = dot(positionWorld.xyz, slicingPlane.xyz) - slicingPlane.w;\n"
+        "void main(void)\n"
+        "{\n"
+        "  float r1 = dot(positionWorld.xyz, slicingPlane.xyz) - slicingPlane.w;\n"
 
-    "  if (abs(r1) >= fiberThickness)\n"
-    "    discard;\n"
+        "  if (abs(r1) >= fiberThickness)\n"
+        "    discard;\n"
 
-    "  if (fiberFadingON != 0)\n"
-    "  {\n"
-    "    float x = (r1 + fiberThickness) / (fiberThickness*2.0);\n"
-    "    x = 1.0 - x;\n"
-    "    gl_FragColor = vec4(colorVertex.xyz*x, fiberOpacity);\n"
-    "  }\n"
-    "  else{\n"
-    "    gl_FragColor = vec4(colorVertex.xyz,fiberOpacity);\n"
-    "  }\n"
-    "}\n"
-    );
+        "  if (fiberFadingON != 0)\n"
+        "  {\n"
+        "    float x = (r1 + fiberThickness) / (fiberThickness*2.0);\n"
+        "    x = 1.0 - x;\n"
+        "    gl_FragColor = vec4(colorVertex.xyz*x, fiberOpacity);\n"
+        "  }\n"
+        "  else{\n"
+        "    gl_FragColor = vec4(colorVertex.xyz,fiberOpacity);\n"
+        "  }\n"
+        "}\n"
+        );
 
   vtkSmartPointer<vtkShaderCallback> myCallback = vtkSmartPointer<vtkShaderCallback>::New();
   myCallback->renderer = renderer;
@@ -263,25 +252,25 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
 vtkProp* mitk::FiberBundleMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-    this->Update(renderer);
-    return m_LocalStorageHandler.GetLocalStorage(renderer)->m_PointActor;
+  this->Update(renderer);
+  return m_LocalStorageHandler.GetLocalStorage(renderer)->m_PointActor;
 }
 
 
 void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-    Superclass::SetDefaultProperties(node, renderer, overwrite);
-//    node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
+  //    node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
 
-    //add other parameters to propertylist
-    node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(1.0f), renderer, overwrite );
-    node->AddProperty( "Fiber2DfadeEFX", mitk::BoolProperty::New(true), renderer, overwrite );
-    node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
+  //add other parameters to propertylist
+  node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+  node->AddProperty( "Fiber2DfadeEFX", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
 }
 
 
 mitk::FiberBundleMapper2D::FBXLocalStorage::FBXLocalStorage()
 {
-    m_PointActor = vtkSmartPointer<vtkActor>::New();
-    m_FiberMapper = vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER>::New();
+  m_PointActor = vtkSmartPointer<vtkActor>::New();
+  m_FiberMapper = vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER>::New();
 }

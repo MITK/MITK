@@ -18,12 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef FiberBundleMapper3D_H_HEADER_INCLUDED
 #define FiberBundleMapper3D_H_HEADER_INCLUDED
 
-//#include <mitkBaseData.h> //?? necessary
 #include <mitkVtkMapper.h>
 #include <mitkFiberBundle.h>
 
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkSmartPointer.h>
 
+//#define MITKFIBERBUNDLEMAPPER3D_POLYDATAMAPPER vtkOpenGLPolyDataMapper
+
+//class MITKFIBERBUNDLEMAPPER3D_POLYDATAMAPPER;
 class vtkPropAssembly;
 class vtkPolyDataMapper;
 class vtkLookupTable;
@@ -57,7 +60,7 @@ public:
         /** \brief Point Actor of a 3D render window. */
         vtkSmartPointer<vtkActor> m_FiberActor;
         /** \brief Point Mapper of a 3D render window. */
-        vtkSmartPointer<vtkPolyDataMapper> m_FiberMapper;
+        vtkSmartPointer<vtkOpenGLPolyDataMapper> m_FiberMapper;
 
         vtkSmartPointer<vtkPropAssembly> m_FiberAssembly;
 
@@ -81,7 +84,7 @@ protected:
     virtual ~FiberBundleMapper3D();
     void InternalGenerateData(mitk::BaseRenderer *renderer);
 
-    void UpdateVtkObjects(); //??
+    void UpdateShaderParameter(mitk::BaseRenderer*);
 
 private:
     vtkSmartPointer<vtkLookupTable> m_lut;
@@ -90,6 +93,8 @@ private:
     int     m_LineWidth;
     float   m_RibbonWidth;
     bool    m_Lighting;
+    vtkSmartPointer<vtkPolyData> m_FiberPolyData;
+    mitk::FiberBundle* m_FiberBundle;
 };
 
 } // end namespace mitk

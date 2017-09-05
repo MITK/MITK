@@ -34,7 +34,6 @@ namespace mitk
   /*
   * @brief The API provides functions to query and manipulate medical case relations.
   *
-  * ##TODO: adjust description
   *   The class is able to generate IDs from given data nodes using DICOM information.
   *   These IDs are used to identify the corresponding instances of a specific case.
   *   The case can also be directly identified by the given case ID.
@@ -50,7 +49,7 @@ namespace mitk
 
     SemanticRelations(mitk::DataStorage::Pointer dataStorage);
     ~SemanticRelations();
-    std::shared_ptr<RelationStorage> GetRelationStorage();
+    mitk::RelationStorage& mitk::SemanticRelations::GetRelationStorage();
 
     /************************************************************************/
     /* functions to get instances / attributes                              */

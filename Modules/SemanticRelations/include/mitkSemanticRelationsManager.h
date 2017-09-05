@@ -20,19 +20,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSemanticRelationsExports.h>
 
 // semantic relations module
+#include "mitkISemanticRelationsObservable.h"
+#include "mitkISemanticRelationsObserver.h"
 #include "mitkSemanticRelations.h"
+
+// mitk core
+#include <mitkDataStorage.h>
 
 namespace mitk
 {
-  class SemanticRelationsManager
+  class MITKSEMANTICRELATIONS_EXPORT SemanticRelationsManager : public ISemanticRelationsObservable
   {
   public:
-    static SemanticRelationsManager* SemanticRelationsManager::GetInstance();
 
-    bool SemanticRelationsManager::IsInstantiated();
+    SemanticRelationsManager(mitk::DataStorage::Pointer dataStorage);
+    ~SemanticRelationsManager();
 
-    SemanticRelationsManager(const SemanticRelationsManager&) = delete;
-    void operator=(const SemanticRelationsManager&) = delete;
+    virtual void AddObserver(ISemanticRelationsObserver* observer) override;
+    virtual void RemoveObserver(ISemanticRelationsObserver* observer) override;
+
+    void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
 
     /************************************************************************/
     /* functions to add/remove image and segmentation instances				      */
@@ -40,37 +47,38 @@ namespace mitk
     /*
     * @brief  Add a new image to the storage.
     *
-    * @par dataNode                   The current case identifier and node identifier is extracted from the given data node, which contains DICOM information about the case and the node.
-    * @par semanticRelationsInstance  An instance of the currently used semantic relations class.
+    * @par dataNode   The current case identifier and node identifier is extracted from the given data node, which contains DICOM information about the case and the node.
     */
-    MITKSEMANTICRELATIONS_EXPORT void AddImageInstance(const mitk::DataNode* imageNode, mitk::SemanticRelations& semanticRelationsInstance);
+    void AddImageInstance(const mitk::DataNode* imageNode);
     /*
     * @brief  Remove an existing image from the storage.
     *
-    * @par dataNode                   The current case identifier and node identifier is extracted from the given data node, which contains DICOM information about the case and the node.
-    * @par semanticRelationsInstance  An instance of the currently used semantic relations class.
+    * @par dataNode   The current case identifier and node identifier is extracted from the given data node, which contains DICOM information about the case and the node.
     */
-    MITKSEMANTICRELATIONS_EXPORT void RemoveImageInstance(const mitk::DataNode* imageNode, mitk::SemanticRelations& semanticRelationsInstance);
+    void RemoveImageInstance(const mitk::DataNode* imageNode);
     /*
     * @brief  Add a new segmentation to the storage.
     *
-    * @par segmentationNode           The current case identifier and node identifier is extracted from the given segmentation data node.
-    * @par parentNode                 The node identifier of the parent node is extracted from the given parent data node.
-    * @par semanticRelationsInstance  An instance of the currently used semantic relations class.
+    * @par segmentationNode   The current case identifier and node identifier is extracted from the given segmentation data node.
+    * @par parentNode         The node identifier of the parent node is extracted from the given parent data node.
     */
-    MITKSEMANTICRELATIONS_EXPORT void AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, mitk::SemanticRelations& semanticRelationsInstance);
+    void AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode);
     /*
     * @brief  Remove an existing segmentation from the storage.
     *
-    * @par segmentationNode           The current case identifier and node identifier is extracted from the given segmentation data node.
-    * @par semanticRelationsInstance  An instance of the currently used semantic relations class.
+    * @par segmentationNode   The current case identifier and node identifier is extracted from the given segmentation data node.
     */
-    MITKSEMANTICRELATIONS_EXPORT void RemoveSegmentationInstance(const mitk::DataNode* segmentationNode, mitk::SemanticRelations& semanticRelationsInstance);
+    void RemoveSegmentationInstance(const mitk::DataNode* segmentationNode);
 
   private:
-    SemanticRelationsManager() {}
 
-  } // class SemanticRelationsManager
+    virtual void NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) override;
+
+    std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
+    mitk::SemanticTypes::CaseID m_CaseID;
+    std::vector<mitk::ISemanticRelationsObserver*> m_ObserverVector;
+
+  }; // class SemanticRelationsManager
 } // namespace mitk
 
 #endif // MITKSEMANTICRELATIONSMANAGER_H

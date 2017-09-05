@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ui_QmitkPatientTableWidgetControls.h>
 #include "QmitkPatientTableModel.h"
 
+// semantic relations module
+#include <mitkISemanticRelationsObserver.h>
+
 // mitk core
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
@@ -30,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QWidget>
 
-class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableWidget : public QWidget
+class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableWidget : public QWidget, public mitk::ISemanticRelationsObserver
 {
   Q_OBJECT
 
@@ -39,8 +42,8 @@ public:
   QmitkPatientTableWidget(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QWidget* parent = nullptr);
   ~QmitkPatientTableWidget();
 
-  void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
-  void UpdatePatientTable();
+  // override observer interface
+  virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
   void SetPixmapOfNode(const mitk::DataNode* dataNode);
   void DeletePixmapOfNode(const mitk::DataNode* dataNode);
 

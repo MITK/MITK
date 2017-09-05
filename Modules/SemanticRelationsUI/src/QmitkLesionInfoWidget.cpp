@@ -35,22 +35,17 @@ QmitkLesionInfoWidget::~QmitkLesionInfoWidget()
   // nothing here
 }
 
-void QmitkLesionInfoWidget::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
-{
-  m_CaseID = caseID;
-  UpdateLesionInfoWidget();
-}
 
-void QmitkLesionInfoWidget::UpdateLesionInfoWidget()
+void QmitkLesionInfoWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
 {
   ClearLesionInfoWidget();
 
   // create new toolbox items with the current lesions and their corresponding segmentations
-  std::vector<mitk::SemanticTypes::Lesion> allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(m_CaseID);
+  std::vector<mitk::SemanticTypes::Lesion> allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(caseID);
   for (const auto& lesion : allLesionsOfCase)
   {
     // get the corresponding segmentation of the lesion
-    std::vector<mitk::DataNode::Pointer> allSegmentations = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, lesion);
+    std::vector<mitk::DataNode::Pointer> allSegmentations = m_SemanticRelations->GetAllSegmentationsOfLesion(caseID, lesion);
 
     QListWidget* lesionListWidget = new QListWidget(m_Controls.lesionToolBox);
     for (const auto& segmentation : allSegmentations)

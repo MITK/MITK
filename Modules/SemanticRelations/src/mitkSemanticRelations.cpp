@@ -38,9 +38,9 @@ mitk::SemanticRelations::~SemanticRelations()
   // nothing here
 }
 
-std::shared_ptr<mitk::RelationStorage> mitk::SemanticRelations::GetRelationStorage()
+mitk::RelationStorage& mitk::SemanticRelations::GetRelationStorage()
 {
-  return m_RelationStorage;
+  return *m_RelationStorage;
 }
 
 /************************************************************************/

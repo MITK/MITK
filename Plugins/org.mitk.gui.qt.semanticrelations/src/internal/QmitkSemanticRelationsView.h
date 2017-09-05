@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkLesionInfoWidget.h>
 #include <QmitkPatientInfoWidget.h>
 
+// semantic relations module
+#include <mitkSemanticRelations.h>
+#include <mitkSemanticRelationsManager.h>
+
 // blueberry
 #include <berryISelectionListener.h>
 
@@ -63,6 +67,7 @@ private:
   Ui::QmitkSemanticRelationsControls m_Controls;
 
   std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
+  std::unique_ptr<mitk::SemanticRelationsManager> m_SemanticRelationsManager;
   QmitkPatientTableWidget* m_PatientTableWidget;
   QmitkLesionInfoWidget* m_LesionInfoWidget;
   QmitkPatientInfoWidget* m_PatientInfoWidget;

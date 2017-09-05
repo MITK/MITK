@@ -81,14 +81,9 @@ void QmitkPatientTableWidget::SetUpConnections()
   connect(m_Controls.patientTableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnPatientTableViewSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
 
-void QmitkPatientTableWidget::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
+void QmitkPatientTableWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
 {
   m_PatientTableModel->SetCurrentCaseID(caseID);
-}
-
-void QmitkPatientTableWidget::UpdatePatientTable()
-{
-  m_PatientTableModel->SetPatientData();
 }
 
 void QmitkPatientTableWidget::SetPixmapOfNode(const mitk::DataNode* dataNode)

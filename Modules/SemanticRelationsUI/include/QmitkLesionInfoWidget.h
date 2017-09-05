@@ -23,11 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
+#include <mitkISemanticRelationsObserver.h>
 
 // qt
 #include <QWidget>
 
-class MITKSEMANTICRELATIONSUI_EXPORT QmitkLesionInfoWidget : public QWidget
+class MITKSEMANTICRELATIONSUI_EXPORT QmitkLesionInfoWidget : public QWidget, public mitk::ISemanticRelationsObserver
 {
   Q_OBJECT
 
@@ -36,8 +37,8 @@ public:
   QmitkLesionInfoWidget::QmitkLesionInfoWidget(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QWidget* parent = nullptr);
   ~QmitkLesionInfoWidget();
 
-  void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
-  void UpdateLesionInfoWidget();
+  // override observer interface
+  virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
   void ClearLesionInfoWidget();
 
 Q_SIGNALS:
@@ -53,8 +54,6 @@ private:
   Ui::QmitkLesionInfoWidgetControls m_Controls;
 
   std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
-  mitk::SemanticTypes::CaseID m_CaseID;
-
 };
 
 #endif // QMITKLESIONINFOWIDGET_H

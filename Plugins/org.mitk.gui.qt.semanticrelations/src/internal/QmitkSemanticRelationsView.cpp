@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSemanticRelationsView.h"
 
 // semantic relations module
-#include <mitkSemanticRelationsManager.h>
 #include <mitkNodePredicates.h>
 #include <mitkUIDGeneratorBoost.h>
 
@@ -39,21 +38,25 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   m_Controls.setupUi(parent);
 
   // initialize the semantic relations
-  m_SemanticRelations = std::make_unique<mitk::SemanticRelations>(GetDataStorage());
+  m_SemanticRelations = std::make_shared<mitk::SemanticRelations>(GetDataStorage());
+  m_SemanticRelationsManager = std::make_unique<mitk::SemanticRelationsManager>(GetDataStorage());
 
-  //m_PatientTableWidget = new QmitkPatientTableWidget(m_SemanticRelations, parent);
-  //m_PatientTableWidget->setObjectName(QStringLiteral("m_SemanticRelationsTableView"));
-  //m_Controls.verticalLayout->addWidget(m_PatientTableWidget);
+  m_PatientTableWidget = new QmitkPatientTableWidget(m_SemanticRelations, parent);
+  m_PatientTableWidget->setObjectName(QStringLiteral("m_SemanticRelationsTableView"));
+  m_Controls.verticalLayout->addWidget(m_PatientTableWidget);
 
   m_LesionInfoWidget = new QmitkLesionInfoWidget(m_SemanticRelations, parent);
   m_Controls.verticalLayout->addWidget(m_LesionInfoWidget);
 
   m_PatientInfoWidget = new QmitkPatientInfoWidget(parent);
-  //m_Controls.verticalLayout->addWidget(m_PatientInfoWidget);
-  //m_PatientInfoWidget->hide();
+  m_Controls.verticalLayout->addWidget(m_PatientInfoWidget);
+  m_PatientInfoWidget->hide();
 
   connect(m_Controls.caseIDComboBox, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnCaseIDSelectionChanged(const QString&)));
-  //connect(m_PatientTableWidget, SIGNAL(SelectionChanged(const mitk::DataNode*)), SLOT(OnPatientTableSelectionChanged(const mitk::DataNode*)));
+  connect(m_PatientTableWidget, SIGNAL(SelectionChanged(const mitk::DataNode*)), SLOT(OnPatientTableSelectionChanged(const mitk::DataNode*)));
+
+  m_SemanticRelationsManager->AddObserver(m_PatientTableWidget);
+  m_SemanticRelationsManager->AddObserver(m_LesionInfoWidget);
 }
 
 void QmitkSemanticRelationsView::NodeAdded(const mitk::DataNode* node)
@@ -69,14 +72,8 @@ void QmitkSemanticRelationsView::NodeAdded(const mitk::DataNode* node)
   if (mitk::NodePredicates::GetImagePredicate()->CheckNode(node))
   {
     // add the image to the semantic relations storage
-    mitk::SemanticRelationsManager::AddImageInstance(node, *m_SemanticRelations);
-    mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(mitk::DICOMHelper::GetCaseIDFromDataNode(node));
+    m_SemanticRelationsManager->AddImageInstance(node);
     m_PatientTableWidget->SetPixmapOfNode(node);
-    if (m_Controls.caseIDComboBox->currentText().toStdString() == caseIDTag->GetValueAsString())
-    {
-      // updating the patient table of the case that is currently active / visible
-      m_PatientTableWidget->UpdatePatientTable();
-    }
   }
   else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(node))
   {
@@ -97,12 +94,12 @@ void QmitkSemanticRelationsView::NodeAdded(const mitk::DataNode* node)
     baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
 
     // add the segmentation to the semantic relations storage
-    mitk::SemanticRelationsManager::AddSegmentationInstance(node, parentNodes->front(), *m_SemanticRelations);
-    if (m_Controls.caseIDComboBox->currentText().toStdString() == caseIDTag->GetValueAsString())
-    {
-      // updating the lesion list of the case that is currently active / visible
-      m_LesionInfoWidget->UpdateLesionInfoWidget();
-    }
+    m_SemanticRelationsManager->AddSegmentationInstance(node, parentNodes->front());
+  }
+  else
+  {
+    // unknown node type
+    return;
   }
 
   const mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(node);
@@ -127,14 +124,8 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
   if (mitk::NodePredicates::GetImagePredicate()->CheckNode(node))
   {
     // remove the image from the semantic relations storage
-    mitk::SemanticRelationsManager::RemoveImageInstance(node, *m_SemanticRelations);
-    mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(mitk::DICOMHelper::GetCaseIDFromDataNode(node));
     m_PatientTableWidget->DeletePixmapOfNode(node);
-    if (m_Controls.caseIDComboBox->currentText().toStdString() == caseIDTag->GetValueAsString())
-    {
-      // updating the patient table of the case that is currently active / visible
-      m_PatientTableWidget->UpdatePatientTable();
-    }
+    m_SemanticRelationsManager->RemoveImageInstance(node);
   }
   else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(node))
   {
@@ -148,13 +139,12 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
       return;
     }
     // remove the segmentation from the semantic relations storage
-    mitk::SemanticRelationsManager::RemoveSegmentationInstance(node, *m_SemanticRelations);
-    mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(mitk::DICOMHelper::GetCaseIDFromDataNode(node));
-    if (m_Controls.caseIDComboBox->currentText().toStdString() == caseIDTag->GetValueAsString())
-    {
-      // updating the lesion list of the case that is currently active / visible
-      m_LesionInfoWidget->UpdateLesionInfoWidget();
-    }
+    m_SemanticRelationsManager->RemoveSegmentationInstance(node);
+  }
+  else
+  {
+    // unknown node type
+    return;
   }
 
   const mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(node);
@@ -169,8 +159,7 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
 
 void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)
 {
-  m_PatientTableWidget->SetCurrentCaseID(caseID.toStdString());
-  m_LesionInfoWidget->SetCurrentCaseID(caseID.toStdString());
+  m_SemanticRelationsManager->SetCurrentCaseID(caseID.toStdString());
 }
 
 void QmitkSemanticRelationsView::OnPatientTableSelectionChanged(const mitk::DataNode* node)

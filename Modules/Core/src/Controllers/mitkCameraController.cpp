@@ -55,6 +55,11 @@ mitk::ScalarType mitk::CameraController::ComputeMaxParallelScale()
   return heightInMM *0.5;
 }
 
+mitk::ScalarType mitk::CameraController::ComputeMaxAllowedParallelScale()
+{
+  return ComputeMaxParallelScale() * ALLOWED_TO_MAX_ZOOM_COF;
+}
+
 void mitk::CameraController::AdjustConstrainedCameraPosition(mitk::Point2D &planePoint)
 {
   //TODO: GetExtentInMM is calculated wrong for rotated planes, e.g. crosshair rotation (bug 19105)
@@ -210,7 +215,7 @@ void mitk::CameraController::Zoom(ScalarType factor, const Point2D& zoomPointInM
     double parallelScale = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->GetParallelScale()/factor;
     if (this->GetRenderer()->GetConstrainZoomingAndPanning() && factor < 1.0)
     {
-      double maxParallelScale = ComputeMaxParallelScale();
+      double maxParallelScale = ComputeMaxAllowedParallelScale();
       if (maxParallelScale - parallelScale * factor  < mitk::eps)//this is not the famous 05-bug... Return if already near max zooming
         return;
 
@@ -251,7 +256,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
     if (this->GetRenderer()->GetConstrainZoomingAndPanning())
     {
       double parallelScale = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
-      double maxParallelScale = ComputeMaxParallelScale();
+      double maxParallelScale = ComputeMaxAllowedParallelScale();
       if (parallelScale > maxParallelScale)
       {
         this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(maxParallelScale);

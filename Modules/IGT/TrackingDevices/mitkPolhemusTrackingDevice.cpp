@@ -51,6 +51,13 @@ bool mitk::PolhemusTrackingDevice::IsDeviceInstalled()
 
 mitk::TrackingTool* mitk::PolhemusTrackingDevice::AddTool( const char* toolName)
 {
+  //Only add tool if it doesn't exist already.
+  if (this->GetToolByName(toolName))
+  {
+    MITK_DEBUG << "Did not add tool, tool name already exists.";
+    return this->GetToolByName(toolName);
+  }
+
   mitk::PolhemusTool::Pointer t = mitk::PolhemusTool::New();
   t->SetToolName(toolName);
   if (this->InternalAddTool(t) == false)

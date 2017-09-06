@@ -220,23 +220,8 @@ void mitk::BeamformingFilter::GenerateData()
 
       mitk::PhotoacousticOCLBeamformingFilter::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
 
-      if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
-      {
-        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DASQuad, true);
-        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DASSphe, true);
-      }
-      else if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
-      {
-        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DMASQuad, true);
-        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-          m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DMASSphe, true);
-      }
-
       m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
-      m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.TimeSpacing, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
+      m_oclFilter->SetConfig(m_Conf);
       m_oclFilter->SetOutputDim(output->GetDimensions());
       m_oclFilter->SetInput(input);
       m_oclFilter->Update();

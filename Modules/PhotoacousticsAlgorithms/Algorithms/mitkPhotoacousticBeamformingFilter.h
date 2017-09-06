@@ -41,10 +41,11 @@ namespace mitk {
       unsigned int ReconstructionLines = 128;
       float RecordTime = 0.00006; // [s]
       float TimeSpacing = 0.0000000000001; // [s]
-      unsigned int TransducerElements = 128;
+      unsigned short TransducerElements = 128;
       bool partial = false;
       unsigned int CropBounds[2] = { 0,0 };
       unsigned int Slices;
+      unsigned int* inputDim;
 
       bool UseGPU = true;
 

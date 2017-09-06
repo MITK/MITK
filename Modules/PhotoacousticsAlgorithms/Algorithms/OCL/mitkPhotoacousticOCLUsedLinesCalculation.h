@@ -78,11 +78,6 @@ namespace mitk
       return sizeof(unsigned short);
     }
 
-    void SetInputLines(unsigned int inputL)
-    {
-      m_InputLines = inputL;
-    }
-
     virtual us::Module* GetModule();
 
     int m_sizeThis;
@@ -94,7 +89,6 @@ namespace mitk
 
     mitk::BeamformingFilter::beamformingSettings m_Conf;
     float m_part;
-    unsigned int m_InputLines;
   };
 }
 #endif

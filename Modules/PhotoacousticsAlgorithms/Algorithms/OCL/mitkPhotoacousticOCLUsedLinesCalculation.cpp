@@ -25,7 +25,7 @@ mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation()
   : m_PixelCalculation(NULL)
 {
   this->AddSourceFile("UsedLinesCalculation.cl");
-  this->m_FilterID = "PixelCalculation";
+  this->m_FilterID = "UsedLinesCalculation";
 }
 
 mitk::OCLUsedLinesCalculation::~OCLUsedLinesCalculation()
@@ -58,12 +58,12 @@ void mitk::OCLUsedLinesCalculation::Execute()
 {
   cl_int clErr = 0;
 
-  unsigned int outputDim[3] = { m_Conf.ReconstructionLines * 3, m_Conf.SamplesPerLine, m_Conf.Slices };
-  size_t outputSize = outputDim[0] * outputDim[1] * outputDim[2];
+  unsigned int gridDim[3] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, 1 };
+  size_t outputSize = gridDim[0] * gridDim[1] * 3;
 
   try
   {
-    this->InitExecNoInput(this->m_PixelCalculation, outputDim, outputSize, sizeof(unsigned short));
+    this->InitExecNoInput(this->m_PixelCalculation, gridDim, outputSize, sizeof(unsigned short));
   }
   catch (const mitk::Exception& e)
   {
@@ -71,22 +71,16 @@ void mitk::OCLUsedLinesCalculation::Execute()
     return;
   }
 
-  m_part = (tan(m_Conf.Angle / 360 * 2 * M_PI) * ((m_Conf.SpeedOfSound * m_Conf.TimeSpacing)) / (m_Conf.Pitch * m_Conf.TransducerElements)) * m_InputLines;
+  m_part = (tan(m_Conf.Angle / 360 * 2 * M_PI) * ((m_Conf.SpeedOfSound * m_Conf.TimeSpacing)) / (m_Conf.Pitch * m_Conf.TransducerElements)) * m_Conf.inputDim[0];
   
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(this->m_Conf.Slices));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
 
   CHECK_OCL_ERR(clErr);
 
-  size_t chunkSize[3] = { 128, 128, 8 };
-
   // execute the filter on a 3D NDRange
-  if (outputDim[2] == 1)
-    this->ExecuteKernelChunks(m_PixelCalculation, 2, chunkSize);
-  else
-    this->ExecuteKernelChunks(m_PixelCalculation, 3, chunkSize);
+  this->ExecuteKernel(m_PixelCalculation, 2);
 
   // signalize the GPU-side data changed
   m_Output->Modified(GPU_DATA);

@@ -18,20 +18,18 @@ __kernel void ckUsedLines(
   __global unsigned short* dDest, // output buffer
   float partMult,
   unsigned int inputL,
-  unsigned int inputS,
-  unsigned int Slices // parameters
+  unsigned int inputS
 )
 {
   // get thread identifier
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
-  unsigned int globalPosZ = get_global_id(2);
   
   unsigned short outputS = get_global_size(1);
   unsigned short outputL = get_global_size(0);
   
   // terminate non-valid threads
-  if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
+  if ( globalPosX < outputL && globalPosY < outputS)
   {
     float l_i = (float)globalPosX / outputL * inputL;
     float s_i = (float)globalPosY / outputS * inputS / 2;
@@ -39,9 +37,12 @@ __kernel void ckUsedLines(
     float part = partMult * s_i;
     if (part < 1)
       part = 1;
-
-    dDest[globalPosZ * outputL*3 * outputS + globalPosY * outputL*3 + globalPosX] = max((l_i - part), 0.0f); //minLine
-    dDest[globalPosZ * outputL*3 * outputS + globalPosY * outputL*3 + globalPosX+1] = min((l_i + part) + 1, (float)inputL); //maxLine
-    dDest[globalPosZ * outputL*3 * outputS + globalPosY * outputL*3 + globalPosX+2] = (maxLine - minLine); //usedLines
+    
+    unsigned short maxLine = min((l_i + part) + 1, (float)inputL);
+    unsigned short minLine = max((l_i - part), 0.0f);
+    
+    dDest[globalPosY * outputL + globalPosX] = minLine; //minLine
+    dDest[globalPosY * outputL + globalPosX + 1 * outputL * outputS] = maxLine; //maxLine
+    dDest[globalPosY * outputL + globalPosX + 2 * outputL * outputS] = (maxLine - minLine); //usedLines
   }
 }

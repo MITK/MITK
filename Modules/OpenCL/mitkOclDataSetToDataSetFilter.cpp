@@ -98,9 +98,6 @@ bool mitk::OclDataSetToDataSetFilter::InitExecNoInput(cl_kernel ckKernel, unsign
 {
   cl_int clErr = 0;
 
-  if (m_Input.IsNull())
-    mitkThrow() << "Input DataSet is null.";
-
   // get DataSet size once
   const unsigned int uiDataSetWidth = dimensions[0];
   const unsigned int uiDataSetHeight = dimensions[1];

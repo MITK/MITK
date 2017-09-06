@@ -17,4 +17,5 @@ set(RESOURCE_FILES
   DMASSpherical.cl
   BModeAbs.cl
   BModeAbsLog.cl
+  UsedLinesCalculation.cl
 )

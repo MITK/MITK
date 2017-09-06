@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
+#include "mitkPhotoacousticBeamformingFilter.h"
 
+#include <mitkPhotoacousticOCLUsedLinesCalculation.h>
 
 namespace mitk
 {
@@ -32,7 +34,6 @@ namespace mitk
   *
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
-
 
 class PhotoacousticOCLBeamformingFilter : public OclDataSetToDataSetFilter, public itk::Object
 {
@@ -73,24 +74,9 @@ public:
     m_Apodisation = apodisation;
   }
 
-  enum BeamformingAlgorithm { DASQuad, DMASQuad, DASSphe, DMASSphe };
-
-  /** Set which Algorithm should be used for beamforming */
-  void SetAlgorithm(BeamformingAlgorithm algorithm, bool PA)
+  void SetConfig(BeamformingFilter::beamformingSettings settings)
   {
-    m_Algorithm = algorithm;
-    m_PAImage = PA;
-  }
-
-  /** Set various beamforming parameters */
-  void SetBeamformingParameters(float SpeedOfSound, float timeSpacing, float Pitch, float Angle, bool PAImage, unsigned short transducerElements)
-  {
-    m_SpeedOfSound = SpeedOfSound;
-    m_TimeSpacing = timeSpacing;
-    m_Pitch = Pitch;
-    m_Angle = Angle;
-    m_PAImage = PAImage;
-    m_TransducerElements = transducerElements;
+    m_Conf = settings;
   }
 
 protected:
@@ -124,15 +110,13 @@ private:
 
   unsigned int m_OutputDim[3];
   unsigned int m_InputDim[3];
+
   float* m_Apodisation;
   unsigned short m_ApodArraySize;
-  BeamformingAlgorithm m_Algorithm;
+
   unsigned short m_PAImage;
-  float m_SpeedOfSound;
-  float m_TimeSpacing;
-  float m_Pitch;
-  float m_Angle;
-  unsigned short m_TransducerElements;
+
+  BeamformingFilter::beamformingSettings m_Conf;
 
   mitk::Image::Pointer m_InputImage;
 };

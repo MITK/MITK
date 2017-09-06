@@ -6,7 +6,7 @@
     <view id="org.mitk.views.measurement"
           name="Measurement"
           category="Quantification"
-          icon="resources/measurement.png"
+          icon="resources/measurement.svg"
           class="QmitkMeasurementView" >
       <description>Measure distance and areas in the image</description>
       <keywordReference id="org.mitk.views.measurement.Keyword"/>

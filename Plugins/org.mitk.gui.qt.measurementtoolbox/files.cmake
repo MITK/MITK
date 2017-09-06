@@ -30,7 +30,7 @@ set(CACHED_RESOURCE_FILES
   resources/four-point-angle.png
   resources/lena.xpm
   resources/line.png
-  resources/measurement.png
+  resources/measurement.svg
   resources/path.png
   resources/polygon.png
   resources/rectangle.png

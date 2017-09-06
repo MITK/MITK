@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMSegmentationIO.h"
 
 #include "mitkDICOMQIIOMimeTypes.h"
-#include "mitkDICOMSegIOHelper.h"
 #include "mitkDICOMSegmentationConstants.h"
 #include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkDICOMIOHelper.h>
 #include <mitkDICOMProperty.h>
 #include <mitkIDICOMTagsOfInterest.h>
 #include <mitkImageAccessByItk.h>

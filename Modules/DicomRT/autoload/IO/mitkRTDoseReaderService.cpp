@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMTagPath.h>
 #include "mitkDICOMDCMTKTagScanner.h"
 #include "mitkDicomRTIOMimeTypes.h"
-#include "mitkDicomRTIOHelper.h"
+#include <mitkDICOMIOHelper.h>
 
 #include "dcmtk/dcmrt/drtdose.h"
 

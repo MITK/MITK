@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkDICOMDCMTKTagScanner.h"
 #include "mitkIOMimeTypes.h"
-#include "mitkDicomRTIOHelper.h"
+#include <mitkDICOMIOHelper.h>
 #include "mitkDICOMTagPath.h"
 #include "mitkDICOMTagsOfInterestService.h"
 #include "mitkDICOMDatasetAccessingImageFrameInfo.h"

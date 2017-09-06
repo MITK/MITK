@@ -14,20 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDICOMSegIOHelper.h"
+#include "mitkDICOMIOHelper.h"
 
-#include <usModuleContext.h>
+#include <mitkImage.h>
+#include <mitkTemporoSpatialStringProperty.h>
+
 #include <usGetModuleContext.h>
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkImage.h"
+#include <usModuleContext.h>
 
 namespace mitk
 {
-  mitk::IDICOMTagsOfInterest* GetDicomTagsOfInterestService()
+  mitk::IDICOMTagsOfInterest *GetDicomTagsOfInterestService()
   {
-    mitk::IDICOMTagsOfInterest* result = nullptr;
+    mitk::IDICOMTagsOfInterest *result = nullptr;
 
-    std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest> > toiRegisters = us::GetModuleContext()->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+    std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest>> toiRegisters =
+      us::GetModuleContext()->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
     if (!toiRegisters.empty())
     {
       if (toiRegisters.size() > 1)
@@ -40,19 +42,23 @@ namespace mitk
     return result;
   }
 
-  FindingsListVectorType ExtractPathsOfInterest(const DICOMTagPathList& pathsOfInterest, const DICOMDatasetAccessingImageFrameList& frames)
+  FindingsListVectorType ExtractPathsOfInterest(const DICOMTagPathList &pathsOfInterest,
+                                                const DICOMDatasetAccessingImageFrameList &frames)
   {
-    std::vector<mitk::DICOMDatasetAccess::FindingsListType > findings;
-    for (const auto& entry : pathsOfInterest) {
+    std::vector<mitk::DICOMDatasetAccess::FindingsListType> findings;
+    for (const auto &entry : pathsOfInterest)
+    {
       findings.push_back(frames.front()->GetTagValueAsString(entry));
     }
     return findings;
   }
 
-  void SetProperties(BaseDataPointer image, const FindingsListVectorType& findings)
+  void SetProperties(BaseDataPointer image, const FindingsListVectorType &findings)
   {
-    for (const auto& finding : findings) {
-      for (const auto& entry : finding) {
+    for (const auto &finding : findings)
+    {
+      for (const auto &entry : finding)
+      {
         const std::string propertyName = mitk::DICOMTagPathToPropertyName(entry.path);
         auto property = mitk::TemporoSpatialStringProperty::New();
         property->SetValue(entry.value);
@@ -60,5 +66,4 @@ namespace mitk
       }
     }
   }
-
 }

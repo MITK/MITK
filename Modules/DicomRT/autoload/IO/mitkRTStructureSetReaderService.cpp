@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRTStructureSetReaderService.h"
 
 #include "mitkDicomRTIOMimeTypes.h"
-#include "mitkDicomRTIOHelper.h"
+#include <mitkDICOMIOHelper.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 

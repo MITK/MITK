@@ -14,25 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKDicomRTIOHelper_H
-#define MITKDicomRTIOHelper_H
+#ifndef MITKDICOMIOHelper_H
+#define MITKDICOMIOHelper_H
 
-#include <mitkIDICOMTagsOfInterest.h>
 #include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include "mitkIDICOMTagsOfInterest.h"
 
-#include <MitkDicomRTIOExports.h>
+#include <MitkDICOMReaderExports.h>
 
-namespace mitk {
+namespace mitk
+{
   class BaseData;
 
   typedef std::vector<mitk::DICOMDatasetAccess::FindingsListType> FindingsListVectorType;
-  typedef BaseData* BaseDataPointer;
+  typedef BaseData *BaseDataPointer;
 
-  mitk::IDICOMTagsOfInterest* GetDicomTagsOfInterestService();
+  MITKDICOMREADER_EXPORT mitk::IDICOMTagsOfInterest *GetDicomTagsOfInterestService();
 
-  FindingsListVectorType ExtractPathsOfInterest(const DICOMTagPathList& pathsOfInterest, const DICOMDatasetAccessingImageFrameList& frames);
+  MITKDICOMREADER_EXPORT FindingsListVectorType ExtractPathsOfInterest(const DICOMTagPathList &pathsOfInterest,
+                                                const DICOMDatasetAccessingImageFrameList &frames);
 
-  void SetProperties(BaseDataPointer image, const FindingsListVectorType& findings);
+  MITKDICOMREADER_EXPORT void SetProperties(BaseDataPointer image, const FindingsListVectorType &findings);
 }
 
 #endif

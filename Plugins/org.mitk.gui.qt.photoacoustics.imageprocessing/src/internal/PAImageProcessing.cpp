@@ -736,13 +736,11 @@ void PAImageProcessing::UpdateBounds()
     BFconfig.partial = true;
   }
 
-  if(m_Controls.boundLow->value()>m_Controls.boundHigh->value())
+  if(m_Controls.boundLow->value() > m_Controls.boundHigh->value())
   {
-    MITK_INFO << "high bound < low bound -> setting both to beamform only first slice";
-    m_Controls.boundLow->setValue(0); 
-    m_Controls.boundHigh->setValue(0);
-    BFconfig.CropBounds[0] = 0;
-    BFconfig.CropBounds[1] = 0;
+    m_Controls.boundHigh->setValue(m_Controls.boundLow->value());
+    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
+    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
   }
   else
   {
@@ -788,6 +786,7 @@ void PAImageProcessing::UpdateImageInfo()
         m_Controls.ElementCount->setValue(image->GetDimension(0));
         m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
         m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
+        m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
       }
       UpdateRecordTime(image);
 
@@ -826,6 +825,8 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
       m_Controls.buttonApplyCropFilter->setEnabled(true);
       m_Controls.labelWarning3->setVisible(false);
       m_Controls.buttonApplyBandpass->setEnabled(true);
+      m_Controls.labelWarning4->setVisible(false);
+      m_Controls.buttonApplyBeamforming->setEnabled(true);
       UpdateImageInfo();
       return;
     }
@@ -836,6 +837,8 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
   m_Controls.buttonApplyCropFilter->setEnabled(false);
   m_Controls.labelWarning3->setVisible(true);
   m_Controls.buttonApplyBandpass->setEnabled(false);
+  m_Controls.labelWarning4->setVisible(true);
+  m_Controls.buttonApplyBeamforming->setEnabled(false);
 }
 
 void PAImageProcessing::UseResampling()
@@ -942,6 +945,9 @@ void PAImageProcessing::EnableControls()
 
   m_Controls.buttonApplyBandpass->setEnabled(true);
 
+  m_Controls.Partial->setEnabled(true);
+  m_Controls.boundHigh->setEnabled(true);
+  m_Controls.boundLow->setEnabled(true);
   m_Controls.BFAlgorithm->setEnabled(true);
   m_Controls.DelayCalculation->setEnabled(true);
   m_Controls.ImageType->setEnabled(true);
@@ -981,6 +987,9 @@ void PAImageProcessing::DisableControls()
 
   m_Controls.buttonApplyBandpass->setEnabled(false);
 
+  m_Controls.Partial->setEnabled(false);
+  m_Controls.boundHigh->setEnabled(false);
+  m_Controls.boundLow->setEnabled(false);
   m_Controls.BFAlgorithm->setEnabled(false);
   m_Controls.DelayCalculation->setEnabled(false);
   m_Controls.ImageType->setEnabled(false);

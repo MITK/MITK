@@ -39,7 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "dcmtk/dcmtract/trctractographyresults.h"
 #include "dcmtk/dcmtract/trctrack.h"
 
-
 mitk::FiberBundleDicomReader::FiberBundleDicomReader()
   : mitk::AbstractFileReader( mitk::DiffusionIOMimeTypes::FIBERBUNDLE_DICOM_MIMETYPE_NAME(), "DICOM Fiber Bundle Reader" )
 {
@@ -74,18 +73,17 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleDicomReader::Re
     if (result.bad())
       mitkThrow() << "Unable to load Tractography Results file: " << result.text();
 
-    OFString val;
+    OFString val = "-";
     trc->getPatient().getPatientName(val);
-    MITK_INFO << "Patient Name: " <<  val;
+    MITK_INFO << "Patient Name: " <<  val; val = "-";
     trc->getStudy().getStudyInstanceUID(val);
-    MITK_INFO << "Study       : " << val;
+    MITK_INFO << "Study       : " << val; val = "-";
     trc->getSeries().getSeriesInstanceUID(val);
-    MITK_INFO << "Series      : " << val;
+    MITK_INFO << "Series      : " << val; val = "-";
     trc->getSOPCommon().getSOPInstanceUID(val);
-    MITK_INFO << "Instance    : " << val;
+    MITK_INFO << "Instance    : " << val; val = "-";
     MITK_INFO << "-------------------------------------------------------------------------";
     size_t numTrackSets = trc->getNumberOfTrackSets();
-    MITK_INFO << "Track Sets (total: " << numTrackSets  << ")";
     OFVector<TrcTrackSet*>& sets = trc->getTrackSets();
     for (size_t ts = 0; ts < numTrackSets; ts++)
     {
@@ -132,6 +130,40 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleDicomReader::Re
 //      transformFilter->Update();
 
       FiberBundle::Pointer fib = FiberBundle::New(fiberPolyData);
+
+      CodeSequenceMacro* algoCode = sets[ts]->getTrackingAlgorithmIdentification().at(0);
+      val = "-"; algoCode->getCodeValue(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.algo_code.value",val.c_str());
+      val = "-"; algoCode->getCodeMeaning(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.algo_code.meaning",val.c_str());
+
+      CodeSequenceMacro modelCode = sets[ts]->getDiffusionModelCode();
+      val = "-"; modelCode.getCodeValue(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.model_code.value",val.c_str());
+      val = "-"; modelCode.getCodeMeaning(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.model_code.meaning",val.c_str());
+
+      CodeWithModifiers anatomy = sets[ts]->getTrackSetAnatomy();
+      val = "-"; anatomy.getCodeValue(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.anatomy.value",val.c_str());
+      val = "-"; anatomy.getCodeMeaning(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.anatomy.meaning",val.c_str());
+
+      val = "-"; trc->getPatient().getPatientID(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.patient_id",val.c_str());
+      val = "-"; trc->getPatient().getPatientName(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.patient_name",val.c_str());
+      val = "-"; trc->getStudy().getStudyInstanceUID(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.study_instance_uid",val.c_str());
+      val = "-"; trc->getSeries().getSeriesInstanceUID(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.series_instance_uid",val.c_str());
+      val = "-"; trc->getSOPCommon().getSOPInstanceUID(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.sop_instance_uid",val.c_str());
+      val = "-"; trc->getSOPCommon().getSOPClassUID(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.sop_class_uid",val.c_str());
+      val = "-"; trc->getFrameOfReference().getFrameOfReferenceUID(val);
+      fib->GetPropertyList()->SetStringProperty("DICOM.frame_of_reference_uid",val.c_str());
+
       output_fibs.push_back(fib.GetPointer());
       MITK_INFO << "Fiber bundle read";
     }

@@ -5,6 +5,7 @@ set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkDiffusionDicomImportView.cpp
   QmitkControlVisualizationPropertiesView.cpp
+  QmitkDicomTractogramTagEditorView.cpp
 
   Perspectives/QmitkDiffusionDefaultPerspective.cpp
 )
@@ -12,12 +13,14 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkDiffusionDicomImportViewControls.ui
   src/internal/QmitkControlVisualizationPropertiesViewControls.ui
+  src/internal/QmitkDicomTractogramTagEditorViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkDiffusionDicomImportView.h
   src/internal/QmitkControlVisualizationPropertiesView.h
+  src/internal/QmitkDicomTractogramTagEditorView.h
 
   src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h
 )

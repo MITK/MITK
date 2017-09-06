@@ -312,17 +312,6 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
 
   Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
 
-  // resample the image in horizontal direction
-  if (inputImage->GetDimension(0) != config.ReconstructionLines)
-  {
-    progressHandle(0, "resampling image");
-    auto begin = std::chrono::high_resolution_clock::now();
-    unsigned int dim[2] = { config.ReconstructionLines, processedImage->GetDimension(1) };
-    processedImage = ApplyResampling(processedImage, dim);
-    auto end = std::chrono::high_resolution_clock::now();
-    MITK_DEBUG << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
-  }
-
   // perform the beamforming
   BeamformingFilter::Pointer Beamformer = BeamformingFilter::New();
   Beamformer->SetInput(processedImage);

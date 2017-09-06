@@ -43,7 +43,7 @@ __kernel void ckDASSphe(
     float l_i = (float)globalPosX / outputL * inputL;
     float s_i = (float)globalPosY / outputS * inputS / 2;
 
-    float part = (tan(Angle / 360 * 2 * M_PI) * TimeSpacing * SpeedOfSound / Pitch * outputL / TransducerElements) * s_i;
+    float part = (tan(Angle / 360 * 2 * M_PI) * ((SpeedOfSound * TimeSpacing) * s_i) / (Pitch * TransducerElements)) * inputL;
     if (part < 1)
       part = 1;
 

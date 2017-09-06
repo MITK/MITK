@@ -95,35 +95,36 @@ void mitk::BeamformingFilter::GenerateData()
   if (!output->IsInitialized())
     return;
 
-  float inputDim[2] = { (float)input->GetDimension(0), (float)input->GetDimension(1) };
-  float outputDim[2] = { (float)output->GetDimension(0), (float)output->GetDimension(1) };
-
   const int apodArraySize = m_Conf.TransducerElements * 4; // set the resolution of the apodization array
   float* ApodWindow;
 
   // calculate the appropiate apodization window
   switch (m_Conf.Apod)
   {
-  case beamformingSettings::Apodization::Hann:
-    ApodWindow = VonHannFunction(apodArraySize);
-    break;
-  case beamformingSettings::Apodization::Hamm:
-    ApodWindow = HammFunction(apodArraySize);
-    break;
-  case beamformingSettings::Apodization::Box:
-    ApodWindow = BoxFunction(apodArraySize);
-    break;
-  default:
-    ApodWindow = BoxFunction(apodArraySize);
-    break;
+    case beamformingSettings::Apodization::Hann:
+      ApodWindow = VonHannFunction(apodArraySize);
+      break;
+    case beamformingSettings::Apodization::Hamm:
+      ApodWindow = HammFunction(apodArraySize);
+      break;
+    case beamformingSettings::Apodization::Box:
+      ApodWindow = BoxFunction(apodArraySize);
+      break;
+    default:
+      ApodWindow = BoxFunction(apodArraySize);
+      break;
   }
 
-  int progInterval = output->GetDimension(2) / 20 > 1 ? output->GetDimension(2) / 20 : 1;
-  // the interval at which we update the gui progress bar
-
   auto begin = std::chrono::high_resolution_clock::now(); // debbuging the performance...
+
   if (!m_Conf.UseGPU)
   {
+    int progInterval = output->GetDimension(2) / 20 > 1 ? output->GetDimension(2) / 20 : 1;
+    // the interval at which we update the gui progress bar
+
+    float inputDim[2] = { (float)input->GetDimension(0), (float)input->GetDimension(1) };
+    float outputDim[2] = { (float)output->GetDimension(0), (float)output->GetDimension(1) };
+
     for (unsigned int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
     {
       mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
@@ -204,15 +205,19 @@ void mitk::BeamformingFilter::GenerateData()
     }
   }
   #ifdef PHOTOACOUSTICS_USE_GPU
-
   else
   {
-    //unsigned short chunkSize = 1; // 1 chunk = 1 image
-
-    unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
-
     try
     {
+      // first, we check whether the data is float, other formats are unsupported
+      if (!(input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)"))
+      {
+        MITK_ERROR << "Pixel type is not float, abort";
+        return;
+      }
+
+      m_ProgressHandle(50, "performing reconstruction");
+
       mitk::PhotoacousticOCLBeamformingFilter::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
 
       if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
@@ -229,31 +234,15 @@ void mitk::BeamformingFilter::GenerateData()
         else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
           m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformingFilter::BeamformingAlgorithm::DMASSphe, true);
       }
+
       m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
       m_oclFilter->SetBeamformingParameters(m_Conf.SpeedOfSound, m_Conf.TimeSpacing, m_Conf.Pitch, m_Conf.Angle, m_Conf.Photoacoustic, m_Conf.TransducerElements);
-
-      mitk::ImageReadAccessor inputReadAccessor(input);
-
-      // first, we check whether the data is float, other formats are unsupported
-      if (input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)")
-      {
-        m_InputData = (float*)inputReadAccessor.GetData();
-      }
-      else
-      {
-        MITK_INFO << "Pixel type is not float, abort";
-        return;
-      }
-
-      m_ProgressHandle(50, "performing reconstruction");
-
-      m_oclFilter->SetOutputDim(oclOutputDim);
+      m_oclFilter->SetOutputDim(output->GetDimensions());
       m_oclFilter->SetInput(input);
       m_oclFilter->Update();
 
       void* out = m_oclFilter->GetOutput();
       output->SetImportVolume(out, 0, 0, mitk::Image::ReferenceMemory);
-
     }
     catch (mitk::Exception &e)
     {
@@ -327,7 +316,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   short usedLines = (maxLine - minLine);
@@ -380,7 +369,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   short usedLines = (maxLine - minLine);
@@ -436,7 +425,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   float mult = 0;
@@ -507,7 +496,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
   float apod_mult = 1;
 
   float mult = 0;

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkPolhemusTrackerWidget.h"
 
 #include "QmitkAbstractTrackingDeviceWidget.h"
+#include <mitkPolhemusTrackingDevice.h>
 
 
 /** Documentation:
@@ -37,14 +38,12 @@ public:
   QmitkPolhemusTrackerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkPolhemusTrackerWidget();
 
-  mitk::TrackingDevice::Pointer GetTrackingDevice();
-
   virtual void Initialize();
 
 signals:
 
-protected slots :
-
+  protected slots :
+    void on_m_hemisphereTracking_clicked();
 private:
 
   /// \brief Creation of the connections
@@ -57,7 +56,7 @@ protected:
 
   Ui::QmitkPolhemusTrackerWidget* m_Controls;
 
-  mitk::TrackingDevice::Pointer m_TrackingDevice;
+  mitk::PolhemusTrackingDevice::Pointer m_TrackingDevice;
 
 public:
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();

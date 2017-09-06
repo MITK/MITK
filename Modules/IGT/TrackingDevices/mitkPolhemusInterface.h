@@ -83,7 +83,10 @@ namespace mitk
     unsigned int GetNumberOfTools();
 
     /** Enables/disables hemisphere tracking for all sensors. */
-    itkSetMacro(HemisphereTrackingEnabled, bool);
+    void SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled);
+
+    /** Convenient method to print the status of the tracking device (true/false) if connection is established. For debugging...*/
+    void PrintStatus();
 
   protected:
     /**
@@ -108,8 +111,6 @@ namespace mitk
     bool InitializeDevice();
 
     bool SetupDevice();
-
-    bool m_HemisphereTrackingEnabled;
 
 
   };

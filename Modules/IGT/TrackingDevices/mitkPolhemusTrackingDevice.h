@@ -102,7 +102,7 @@ namespace mitk
     virtual mitk::NavigationToolStorage::Pointer AutoDetectTools();
 
     /** Enables/disables hemisphere tracking for all sensors. */
-    itkSetMacro(HemisphereTrackingEnabled, bool);
+    void SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled);
 
   protected:
     PolhemusTrackingDevice();

@@ -61,9 +61,6 @@ bool mitk::PolhemusInterface::SetupDevice()
 
   if (!(cBE.IsClear())) {m_pdiDev->ClearBITErrs();}
 
-  if (this->m_HemisphereTrackingEnabled) { m_pdiDev->SetSHemiTrack(-1); }
-  else { m_pdiDev->SetSHemisphere(-1, { (float)2.54,0,0 }); }
-
   return true;
 }
 
@@ -89,6 +86,7 @@ bool mitk::PolhemusInterface::StartTracking()
 bool mitk::PolhemusInterface::StopTracking()
 {
   m_continousTracking = false;
+  m_pdiDev->StopContPno();
   return true;
 }
 
@@ -204,4 +202,24 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
     i += shSize;
   }
   return returnValue;
+}
+
+void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled)
+{
+  //HemisphereTracking is switched on by SetSHeiTrack(-1). "-1" means for all sensors.
+  //To switch heisphere tracking of, you need to set a hemisphere vector by calling SetSHemisphere(-1, { (float)1,0,0 })
+  if (_HeisphereTrackingEnabeled)
+  {
+    m_pdiDev->SetSHemiTrack(-1);
+  }
+  else
+  {
+    m_pdiDev->SetSHemisphere(-1, { (float)1, 0, 0 });
+    //MITK_INFO << m_pdiDev->GetLastResultStr();
+  }
+}
+
+void mitk::PolhemusInterface::PrintStatus()
+{
+  MITK_INFO << "Polhemus status: "<<this->m_pdiDev->CnxReady();
 }

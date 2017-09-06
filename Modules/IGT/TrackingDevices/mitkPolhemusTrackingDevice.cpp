@@ -37,6 +37,7 @@ mitk::PolhemusTrackingDevice::PolhemusTrackingDevice(): mitk::TrackingDevice()
   m_ThreadID = 0;
 
   m_Device = mitk::PolhemusInterface::New();
+
 }
 
 mitk::PolhemusTrackingDevice::~PolhemusTrackingDevice()
@@ -110,8 +111,8 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
 {
   //reset everything
   if (m_Device.IsNull()) {m_Device = mitk::PolhemusInterface::New();}
-  m_Device->SetHemisphereTrackingEnabled(m_HemisphereTrackingEnabled);
   m_Device->Connect();
+  m_Device->SetHemisphereTrackingEnabled(m_HemisphereTrackingEnabled);
   this->SetState(Ready);
   return true;
 }
@@ -154,6 +155,8 @@ void mitk::PolhemusTrackingDevice::TrackTools()
     this->m_StopTrackingMutex->Unlock();
     Sleep(100);//Wait a bit until the tracker is ready...
 
+
+
     while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
       std::vector<mitk::PolhemusInterface::trackingData> lastData = this->GetDevice()->GetLastFrame();
@@ -164,6 +167,8 @@ void mitk::PolhemusTrackingDevice::TrackTools()
       }
       else
       {
+
+
         std::vector<mitk::PolhemusTool::Pointer> allTools = this->GetAllTools();
         for (int i = 0; i < allTools.size(); i++)
         {
@@ -178,6 +183,7 @@ void mitk::PolhemusTrackingDevice::TrackTools()
       this->m_StopTrackingMutex->Lock();
       localStopTracking = m_StopTracking;
       this->m_StopTrackingMutex->Unlock();
+
     }
   }
   catch(...)
@@ -250,5 +256,15 @@ mitk::NavigationToolStorage::Pointer mitk::PolhemusTrackingDevice::AutoDetectToo
     returnValue->AddTool(newTool);
   }
   return returnValue;
+}
+
+void  mitk::PolhemusTrackingDevice::SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled)
+{
+  if (m_HemisphereTrackingEnabled != _HemisphereTrackingEnabled)
+  {
+    m_HemisphereTrackingEnabled = _HemisphereTrackingEnabled;
+    this->m_Device->SetHemisphereTrackingEnabled(_HemisphereTrackingEnabled);
+  }
+
 
 }

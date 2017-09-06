@@ -109,6 +109,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   , m_CurrentWorldPlaneGeometry(nullptr)
   , m_Slice(0)
   , m_TimeStep()
+  , m_Component()
   , m_CurrentWorldPlaneGeometryUpdateTime()
   , m_TimeStepUpdateTime()
   , m_KeepDisplayedRegion(true)
@@ -172,6 +173,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   sliceNavigationController->ConnectGeometrySliceEvent(this);
   sliceNavigationController->ConnectGeometryUpdateEvent(this);
   sliceNavigationController->ConnectGeometryTimeEvent(this, false);
+  sliceNavigationController->ConnectGeometryComponentEvent(this, false);
   m_SliceNavigationController = sliceNavigationController;
 
   m_CameraRotationController = mitk::CameraRotationController::New();
@@ -386,6 +388,20 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
   }
 }
 
+void mitk::BaseRenderer::SetComponent(unsigned int component)
+{
+  if (m_Component == component) {
+    return;
+  }
+
+  m_Component = component;
+  
+  auto nodes = m_DataStorage->GetAll();
+  for (int i = 0; i < nodes->size(); i++)
+    nodes->at(i)->SetIntProperty("Image.Displayed Component", component);
+
+}
+
 int mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) const
 {
   if ((data == nullptr) || (data->IsInitialized() == false))
@@ -587,6 +603,14 @@ const double* mitk::BaseRenderer::GetBounds() const
   return m_Bounds;
 }
 
+void mitk::BaseRenderer::SetGeometryComponent(const itk::EventObject& geometryComponentEvent)
+{
+  const SliceNavigationController::GeometryComponentEvent* componentEvent =
+    dynamic_cast<const SliceNavigationController::GeometryComponentEvent*> (&geometryComponentEvent);
+
+  assert(componentEvent != nullptr);
+  SetComponent(componentEvent->GetPos());
+}
 
 void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& itkNotUsed(p2d))
 {

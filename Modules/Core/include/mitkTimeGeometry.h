@@ -76,6 +76,12 @@ namespace mitk {
     * minimum time steps is always 0.
     */
     virtual TimeStepType     CountTimeSteps() const = 0;
+
+      /**
+     *\brief Contains number of components
+    */
+    unsigned int componentSize = 0;
+
     /**
     * \brief Returns the first time point for which the object is valid.
     *

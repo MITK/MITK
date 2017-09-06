@@ -58,6 +58,10 @@ public:
   //## @brief Get the Stepper through the time
   mitk::Stepper* GetTime();
 
+  //##Documentation
+  //## @brief Get the Stepper through the components
+  mitk::Stepper* GetComponent();
+
 protected:
   /**
   * @brief Default Constructor
@@ -76,6 +80,8 @@ protected:
   Stepper::Pointer m_Time;
   //## @brief Stepper through the slices
   Stepper::Pointer m_Slice;
+  //## @brief Stepper through the components
+  Stepper::Pointer m_Component;
 
   unsigned long m_LastUpdateTime;
 };

@@ -1008,6 +1008,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+  timeGeometry->componentSize = GetPixelType().GetNumberOfComponents();
   for (TimeStepType step = 0; step < timeGeometry->CountTimeSteps(); ++step)
   {
     timeGeometry->GetGeometryForTimeStep(step)->ImageGeometryOn();
@@ -1186,6 +1187,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, vtkImageData* vtkimage
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+  timeGeometry->componentSize = GetPixelType().GetNumberOfComponents();
   SetTimeGeometry(timeGeometry);
 
   delete[] tmpDimensions;

@@ -238,6 +238,7 @@ itk::LightObject::Pointer mitk::ArbitraryTimeGeometry::InternalClone() const
   {
     newTimeGeometry->m_GeometryVector.push_back(this->m_GeometryVector[i]->Clone());
   }
+  newTimeGeometry->componentSize = componentSize;
   return parent;
 }
 

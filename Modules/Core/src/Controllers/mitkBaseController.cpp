@@ -22,6 +22,7 @@ mitk::BaseController::BaseController() : m_LastUpdateTime(0)
 {
   m_Slice = Stepper::New();
   m_Time  = Stepper::New();
+  m_Component = Stepper::New();
 }
 
 mitk::BaseController::~BaseController()
@@ -41,4 +42,9 @@ mitk::Stepper* mitk::BaseController::GetSlice()
 mitk::Stepper* mitk::BaseController::GetTime()
 {
   return m_Time.GetPointer();
+}
+
+mitk::Stepper* mitk::BaseController::GetComponent()
+{
+  return m_Component.GetPointer();
 }

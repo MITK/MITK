@@ -287,6 +287,13 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
     virtual void SendTime();
 
     /**
+     * \brief Send the currently selected component to the connected obsercers (renders)
+     *
+     * Called by Update()
+    */
+    virtual void SendComponent();
+
+    /**
      * \brief Set the RenderingManager to be used
      *
      * If \a NULL, the default RenderingManager will be used.
@@ -347,6 +354,8 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
       GeometryTimeEvent, TimeGeometryEvent );
     mitkTimeGeometryEventMacro(
       GeometrySliceEvent, TimeGeometryEvent );
+    mitkTimeGeometryEventMacro(
+      GeometryComponentEvent, TimeGeometryEvent);
 
     template <typename T>
     void ConnectGeometrySendEvent(T* receiver)
@@ -400,12 +409,26 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
         ConnectGeometrySendEvent(receiver);
     }
 
+    template<typename T>
+    void ConnectGeometryComponentEvent(T* receiver, bool connectSendEvent = true)
+    {
+      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
+      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryComponent);
+      unsigned long tag = AddObserver(GeometryComponentEvent(nullptr, 0), eventReceptorCommand);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
+      if (connectSendEvent) {
+        ConnectGeometrySendEvent(receiver);
+      }
+    }
+
     template <typename T>
     void ConnectGeometryEvents(T* receiver)
     {
       //connect sendEvent only once
       ConnectGeometrySliceEvent(receiver, false);
       ConnectGeometryTimeEvent(receiver);
+      ConnectGeometryComponentEvent(receiver);
     }
 
     // use a templated method to get the right offset when casting to void*
@@ -444,6 +467,11 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
      */
     virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
 
+    /**
+     * \brief To connect multiple SliceNavigationController, we can
+     * act as an observer ourselves: implemented interface
+    */
+    virtual void SetGeometryComponent(const itk::EventObject & geometryComponentEvent);
 
     /** \brief Positions the SNC according to the specified point */
     void SelectSliceByPoint( const mitk::Point3D &point );

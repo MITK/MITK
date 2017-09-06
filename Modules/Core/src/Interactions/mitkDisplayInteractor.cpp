@@ -576,30 +576,30 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
   }
 }
 
-void mitk::DisplayInteractor::ScrollOneDown(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::DisplayInteractor::ScrollOneDown(StateMachineAction* action, InteractionEvent* interactionEvent)
 {
   mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
   if (!sliceNaviController->GetSliceLocked())
   {
     mitk::Stepper* stepper = sliceNaviController->GetSlice();
-    if (stepper->GetSteps() <= 1)
-    {
-      stepper = sliceNaviController->GetTime();
+    if (stepper->GetSteps() <= 1) {
+      ScrollTimeOneDown(action, interactionEvent);
+      return;
     }
     stepper->Next();
     interactionEvent->GetSender()->RequestUpdate();
   }
 }
 
-void mitk::DisplayInteractor::ScrollOneUp(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::DisplayInteractor::ScrollOneUp(StateMachineAction* action, InteractionEvent* interactionEvent)
 {
   mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
   if (!sliceNaviController->GetSliceLocked())
   {
     mitk::Stepper* stepper = sliceNaviController->GetSlice();
-    if (stepper->GetSteps() <= 1)
-    {
-      stepper = sliceNaviController->GetTime();
+    if (stepper->GetSteps() <= 1) {
+      ScrollTimeOneUp(action, interactionEvent);
+      return;
     }
     stepper->Previous();
     interactionEvent->GetSender()->RequestUpdate();
@@ -612,6 +612,11 @@ void mitk::DisplayInteractor::ScrollTimeOneDown(StateMachineAction*, Interaction
   if (!sliceNaviController->GetSliceLocked())
   {
     mitk::Stepper* stepper = sliceNaviController->GetTime();
+
+    if (stepper->GetSteps() < 2 && sliceNaviController->GetComponent()->GetSteps() > 1) {
+      stepper = sliceNaviController->GetComponent();
+    }
+
     stepper->Next();
     interactionEvent->GetSender()->RequestUpdate();
   }
@@ -624,6 +629,11 @@ void mitk::DisplayInteractor::ScrollTimeOneUp(StateMachineAction*, InteractionEv
   if (!sliceNaviController->GetSliceLocked())
   {
     mitk::Stepper* stepper = sliceNaviController->GetTime();
+
+    if (stepper->GetSteps() < 2 && sliceNaviController->GetComponent()->GetSteps() > 1) {
+      stepper = sliceNaviController->GetComponent();
+    }
+
     stepper->Previous();
     interactionEvent->GetSender()->RequestUpdate();
   }

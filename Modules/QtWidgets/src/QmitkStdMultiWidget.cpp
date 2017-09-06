@@ -1655,11 +1655,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   mitk::DataNode::Pointer topSourceNode;
   mitk::Image::Pointer image;
   node = this->GetTopLayerNode(nodes);
-  int component = 0;
-  if (node.IsNotNull())
-  {
+  if (node.IsNotNull()) {
     image = dynamic_cast<mitk::Image*>(node->GetData());
-    node->GetIntProperty("Image.Displayed Component", component);
   }
 
   mitk::Point3D crosshairPos = this->GetCrossPosition();
@@ -1669,6 +1666,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   unsigned int timestep = baseRenderer->GetTimeStep();
   auto timeSteps = image.IsNotNull() ? image->GetTimeSteps() : 0;
+  unsigned int component = baseRenderer->GetComponent();
+  unsigned int componentMax = image.IsNotNull() ? image->GetPixelType().GetNumberOfComponents() : 0;
 
   if(image.IsNotNull() && (timeSteps > timestep ))
   {
@@ -1697,6 +1696,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
         if (timeSteps > 1) {
           _infoStringStream[axisIndices[i]]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
+        }
+        if (componentMax > 1) {
+          _infoStringStream[axisIndices[i]]<<"\nV: " <<(component + 1) << "/" << componentMax;
         }
         if (seriesNumber != "") {
           _infoStringStream[axisIndices[i]] << "\nSe: " << seriesNumber;

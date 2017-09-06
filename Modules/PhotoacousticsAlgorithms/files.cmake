@@ -11,8 +11,8 @@ set(CPP_FILES
 set(RESOURCE_FILES
   DASQuadratic.cl
   DMASQuadratic.cl
-  DASspherical.cl
-  DMASspherical.cl
+  DASSpherical.cl
+  DMASSpherical.cl
   BModeAbs.cl
   BModeAbsLog.cl
 )

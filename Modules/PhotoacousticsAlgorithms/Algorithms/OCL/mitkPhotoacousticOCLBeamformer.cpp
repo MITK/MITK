@@ -107,14 +107,18 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
   clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(this->m_InputDim[0]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 11, sizeof(cl_uint), &(this->m_InputDim[1]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 12, sizeof(cl_uint), &(this->m_InputDim[2]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 13, sizeof(cl_uint), &(this->m_OutputDim[0]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 14, sizeof(cl_uint), &(this->m_OutputDim[1]));
 
   CHECK_OCL_ERR( clErr );
 
+  size_t chunkSize[3] = { 128, 128, 8 };
+
   // execute the filter on a 3D NDRange
   if (m_OutputDim[2] == 1)
-    this->ExecuteKernel(m_PixelCalculation, 2);
+    this->ExecuteKernelChunks(m_PixelCalculation, 2, chunkSize);
   else
-    this->ExecuteKernel(m_PixelCalculation, 3);
+    this->ExecuteKernelChunks(m_PixelCalculation, 3, chunkSize);
   
   // signalize the GPU-side data changed
   m_Output->Modified( GPU_DATA );

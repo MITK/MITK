@@ -27,19 +27,15 @@ __kernel void ckDASQuad(
   unsigned short TransducerElements,
   unsigned int inputL,
   unsigned int inputS,
-  unsigned int Slices // parameters
+  unsigned int Slices,
+  unsigned int outputL,
+  unsigned int outputS  // parameters
 )
 {
   // get thread identifier
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
   unsigned int globalPosZ = get_global_id(2);
-  
-  unsigned short outputS = get_global_size(1);
-  unsigned short outputL = get_global_size(0);
-
-  // create an image sampler
-  const sampler_t defaultSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST ;
 
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )

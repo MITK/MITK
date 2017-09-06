@@ -69,8 +69,8 @@ set(CACHED_RESOURCE_FILES
   resources/Icons.svg
   resources/ImageMasking_48x48.png
   resources/MorphologicalOperations_48x48.png
-  resources/multilabelsegmentation.png
-  resources/MultiLabelSegmentationUtilities_48x48.png
+  resources/multilabelsegmentation.svg
+  resources/multilabelsegmentation_utilities.svg
   resources/NewLabel_48x48.png
   resources/NewSegmentationSession_48x48.png
   resources/Opening_48x48.png

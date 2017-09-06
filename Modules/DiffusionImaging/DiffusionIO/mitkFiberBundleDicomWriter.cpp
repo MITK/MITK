@@ -50,6 +50,47 @@ void mitk::FiberBundleDicomWriter::Write()
 {
   try
   {
+    mitk::FiberBundle::ConstPointer fib = dynamic_cast<const mitk::FiberBundle*>(this->GetInput());
+    vtkPolyData* poly = fib->GetFiberPolyData();
+    mitk::PropertyList* p_list = fib->GetPropertyList();
+
+    std::string patient_id = "";
+    if (!p_list->GetStringProperty("DICOM.patient_id", patient_id))
+      patient_id = "-";
+    std::string patient_name = "";
+    if (!p_list->GetStringProperty("DICOM.patient_name", patient_name))
+      patient_name = "-";
+    std::string study_instance_uid = "";
+    if (!p_list->GetStringProperty("DICOM.study_instance_uid", study_instance_uid))
+      study_instance_uid = "-";
+    std::string series_instance_uid = "";
+    if (!p_list->GetStringProperty("DICOM.series_instance_uid", series_instance_uid))
+      series_instance_uid = "-";
+    std::string sop_instance_uid = "";
+    if (!p_list->GetStringProperty("DICOM.sop_instance_uid", sop_instance_uid))
+      sop_instance_uid = "-";
+    std::string frame_of_reference_uid = "";
+    if (!p_list->GetStringProperty("DICOM.frame_of_reference_uid", frame_of_reference_uid))
+      frame_of_reference_uid = "-";
+    std::string algo_code_value = "";
+    if (!p_list->GetStringProperty("DICOM.algo_code.value", algo_code_value))
+      algo_code_value = "-";
+    std::string algo_code_meaning = "";
+    if (!p_list->GetStringProperty("DICOM.algo_code.meaning", algo_code_meaning))
+      algo_code_meaning = "-";
+    std::string model_code_value = "";
+    if (!p_list->GetStringProperty("DICOM.model_code.value", model_code_value))
+      model_code_value = "-";
+    std::string model_code_meaning = "";
+    if (!p_list->GetStringProperty("DICOM.model_code.meaning", model_code_meaning))
+      model_code_meaning = "-";
+    std::string anatomy_value = "";
+    if (!p_list->GetStringProperty("DICOM.anatomy.value", anatomy_value))
+      anatomy_value = "-";
+    std::string anatomy_meaning = "";
+    if (!p_list->GetStringProperty("DICOM.anatomy.meaning", anatomy_meaning))
+      anatomy_meaning = "-";
+
     const std::string& locale = "C";
     const std::string& currLocale = setlocale( LC_ALL, nullptr );
     setlocale(LC_ALL, locale.c_str());
@@ -63,7 +104,7 @@ void mitk::FiberBundleDicomWriter::Write()
 
     // We need at least one image reference this Tractography Results object is based on.
     // We provide: Patient ID, Study Instance UID, Series Instance UID, SOP Instance UID, SOP Class UID
-    IODImageReference* ref = new IODImageReference("PAT_ID_4711", "1.2.3", "4.5.6", "7.8.9", UID_MRImageStorage);
+    IODImageReference* ref = new IODImageReference(patient_id.c_str(), study_instance_uid.c_str(), series_instance_uid.c_str(), sop_instance_uid.c_str(), UID_MRImageStorage);
     refs.add(ref);
 
     OFString contentDate = boost::gregorian::to_iso_string(boost::gregorian::day_clock::universal_day()).c_str();
@@ -71,21 +112,20 @@ void mitk::FiberBundleDicomWriter::Write()
 
     TrcTractographyResults *trc = NULL;
     TrcTractographyResults::create(id, contentDate, contentTime, equipment, refs, trc);
+    OFString val = "-"; trc->getStudy().getStudyInstanceUID(val);
+    MITK_INFO << "getStudyInstanceUID " << val;
 
     // Create track set
     CodeWithModifiers anatomy("");
-    anatomy.set("T-A0095", "SRT", "White matter of brain and spinal cord");
+    anatomy.set(anatomy_value.c_str(), "SRT", anatomy_meaning.c_str());
 
     // Every CodeSequenceMacro has: Code Value, Coding Scheme Designator, Code Meaning
-    CodeSequenceMacro diffusionModel("sup181_bb03", "DCM", "Single Tensor");
-    CodeSequenceMacro algorithmId("sup181_ee01", "DCM", "Deterministic");
+    CodeSequenceMacro diffusionModel(model_code_value.c_str(), "DCM", model_code_meaning.c_str());
+    CodeSequenceMacro algorithmId(algo_code_value.c_str(), "DCM", algo_code_meaning.c_str());
     TrcTrackSet *set = NULL;
-    trc->addTrackSet("First and last Track Set", "Mini description", anatomy, diffusionModel, algorithmId, set);
+    trc->addTrackSet("TRACTOGRAM", "Tractogram processed with MITK Diffusion", anatomy, diffusionModel, algorithmId, set);
 
     // Create trackset
-    mitk::FiberBundle::ConstPointer fib = dynamic_cast<const mitk::FiberBundle*>(this->GetInput());
-    vtkPolyData* poly = fib->GetFiberPolyData();
-
     Uint16 cieLabColor[3]; // color the whole track with this color; we use some blue
     cieLabColor[0] = 30000; // L
     cieLabColor[1] = 0 ; // a
@@ -112,12 +152,12 @@ void mitk::FiberBundleDicomWriter::Write()
     }
 
     // Frame of Reference is required; could be the same as from related MR series
-    trc->getFrameOfReference().setFrameOfReferenceUID("10.11.12");
+    trc->getFrameOfReference().setFrameOfReferenceUID(frame_of_reference_uid.c_str());
 
     // Set some optional data
-    trc->getPatient().setPatientID("4711");
-    trc->getPatient().setPatientName("Doe^John");
-    trc->getSeries().setSeriesDescription("This is just a test series with a single Tractography Results object inside");
+    trc->getPatient().setPatientID(patient_id.c_str());
+    trc->getPatient().setPatientName(patient_name.c_str());
+    trc->getSeries().setSeriesDescription("Tractogram processed with MITK Diffusion");
 
     // Save file
     trc->saveFile(this->GetOutputLocation().c_str());

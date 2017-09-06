@@ -105,11 +105,12 @@ protected:
       typedef itk::OrientationDistributionFunction<float,QBALL_ODFSIZE> OdfType;
       OdfType odf(x.GetDataPointer());
 
+      vnl_vector_fixed<double,3> dir;
       int pd = odf.GetPrincipleDiffusionDirection();
       if (pd==-1)
-        MITK_ERROR << "ODF corrupted: GetPrincipleDiffusionDirection returned -1";
-
-      vnl_vector_fixed<double,3> dir = OdfType::GetDirection(pd);
+        dir.fill(0);
+      else
+        dir = OdfType::GetDirection(pd);
 
       const float fa = odf.GetGeneralizedFractionalAnisotropy();
       float r = fabs(dir[0]) * fa;

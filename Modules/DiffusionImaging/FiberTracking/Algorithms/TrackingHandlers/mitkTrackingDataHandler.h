@@ -186,7 +186,10 @@ protected:
       }
 
       if (pix!=pix)
-        mitkThrow() << "nan values in image!";
+      {
+        pix = 0;
+        MITK_WARN << "nan values in image!";
+      }
 
       return pix;
     }
@@ -272,7 +275,10 @@ protected:
       }
 
       if (pix!=pix)
-        mitkThrow() << "nan values in image!";
+      {
+        pix = 0;
+        MITK_WARN << "nan values in image!";
+      }
 
       return pix;
     }
@@ -285,7 +291,7 @@ protected:
       image->TransformPhysicalPointToIndex(itkP, idx);
       image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
-      itk::Vector< TPixelType, components > pix = 0.0;
+      itk::Vector< TPixelType, components > pix; pix.Fill(0.0);
       if ( image->GetLargestPossibleRegion().IsInside(idx) )
       {
         pix = image->GetPixel(idx);
@@ -358,7 +364,10 @@ protected:
       }
 
       if (pix!=pix)
+      {
+        pix.Fill(0.0);
         mitkThrow() << "nan values in image!";
+      }
 
       return pix;
     }

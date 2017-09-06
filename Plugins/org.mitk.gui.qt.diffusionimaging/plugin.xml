@@ -5,19 +5,16 @@
 
   <extension point="org.blueberry.ui.keywords">
 
+  <keyword label="DICOM" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tractography" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tracking" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tractogram" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tag" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+
   <keyword label="DICOM" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="image" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="data" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="load" id="org.mitk.views.diffusiondicomimport.Keyword"/>
-
-  <keyword label="default" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="data" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="standard" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="DICOM" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="image" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="data" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="load" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
 
   </extension>
 
@@ -38,6 +35,14 @@
     icon="resources/vizControls.png"
     class="QmitkControlVisualizationPropertiesView">
     <keywordReference id="org.mitk.views.controlvisualizationpropertiesview.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.dicomtractogramtageditor"
+    name="DICOM Tractogram Tag Editor"
+    category="Fiber Tractography"
+    class="QmitkDicomTractogramTagEditorView"
+    icon="resources/dwiimport.png">
+    <keywordReference id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
     </view>
 
   </extension>

@@ -34,7 +34,7 @@ mitk::FiberBundleVtkWriter::FiberBundleVtkWriter()
   Options defaultOptions;
   defaultOptions["Save as binary file"] = true;
   defaultOptions["Save as xml file (vtp style)"] = false;
-  defaultOptions["Save color information"] = false;
+  defaultOptions["Save color information"] = true;
   defaultOptions["Save fiber weights"] = true;
   this->SetDefaultOptions(defaultOptions);
   RegisterService();

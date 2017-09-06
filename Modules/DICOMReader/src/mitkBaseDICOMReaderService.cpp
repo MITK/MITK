@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 #include <iostream>
 
+
+#include <itksys/SystemTools.hxx>
+#include <itksys/Directory.hxx>
+
 namespace mitk {
 
   BaseDICOMReaderService::BaseDICOMReaderService(const std::string& description)
@@ -72,6 +76,30 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 
   //Normal DICOM handling (It wasn't a Philips 3D US)
   mitk::StringList relevantFiles = this->GetRelevantFiles();
+
+  // check whether directory or file
+  // if directory try to find first file within it instead
+  // We only support this for a single directory at once
+  if (relevantFiles.empty())
+  {
+    bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(this->GetLocalFileName());
+    if (pathIsDirectory)
+    {
+      itksys::Directory input;
+      input.Load(this->GetLocalFileName().c_str());
+
+      std::vector<std::string> files;
+      for (unsigned long idx = 0; idx<input.GetNumberOfFiles(); idx++)
+      {
+        if (!itksys::SystemTools::FileIsDirectory(input.GetFile(idx)))
+        {
+          std::string fullpath = this->GetLocalFileName() + "/" + std::string(input.GetFile(idx));
+          files.push_back(fullpath.c_str());
+        }
+      }
+      relevantFiles = files;
+    }
+  }
 
   if (relevantFiles.empty())
   {
@@ -142,6 +170,22 @@ StringList BaseDICOMReaderService::GetRelevantFiles() const
   mitk::StringList relevantFiles = mitk::GetDICOMFilesInSameDirectory(fileName);
 
   return relevantFiles;
+}
+
+IFileReader::ConfidenceLevel BaseDICOMReaderService::GetConfidenceLevel() const
+{
+  IFileReader::ConfidenceLevel abstractConfidence = AbstractFileReader::GetConfidenceLevel();
+
+  if (Unsupported == abstractConfidence)
+  {
+    if (itksys::SystemTools::FileIsDirectory(this->GetInputLocation().c_str()))
+    {
+      // In principle we support dicom directories
+      return Supported;
+    }
+  }
+
+  return abstractConfidence;
 }
 
 

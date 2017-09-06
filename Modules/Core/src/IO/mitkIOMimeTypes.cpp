@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkGDCMImageIO.h"
 #include "itkMetaDataObject.h"
 
+#include <itksys/SystemTools.hxx>
+#include <itksys/Directory.hxx>
+
 namespace mitk
 {
   IOMimeTypes::DicomMimeType::DicomMimeType() : CustomMimeType(DICOM_MIMETYPE_NAME())
@@ -40,9 +43,32 @@ namespace mitk
 
   bool IOMimeTypes::DicomMimeType::AppliesTo(const std::string &path) const
   {
+    // check whether directory or file
+    // if directory try to find first file within it instead
+    bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(path);
+
+    std::string filepath = path;
+
+    if (pathIsDirectory)
+    {
+      itksys::Directory input;
+      input.Load(path.c_str());
+
+      std::vector<std::string> files;
+      for (unsigned long idx = 0; idx<input.GetNumberOfFiles(); idx++)
+      {
+        if (!itksys::SystemTools::FileIsDirectory(input.GetFile(idx)))
+        {
+          std::string fullpath = path + "/" + std::string(input.GetFile(idx));
+          files.push_back(fullpath.c_str());
+        }
+      }
+      filepath = files.front();
+    }
+
     // Ask the GDCM ImageIO class directly
     itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
-    gdcmIO->SetFileName(path);
+    gdcmIO->SetFileName(filepath);
     try {
       gdcmIO->ReadImageInformation();
     }
@@ -59,7 +85,7 @@ namespace mitk
       return false;
     }
     else {
-      return gdcmIO->CanReadFile(path.c_str());
+      return gdcmIO->CanReadFile(filepath.c_str());
     }
   }
 

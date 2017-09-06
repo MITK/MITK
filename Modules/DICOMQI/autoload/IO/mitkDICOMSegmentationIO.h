@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkDICOMQIIOExports.h"
 
+#include <dcmqi/JSONSegmentationMetaInformationHandler.h>
+
 namespace mitk
 {
   /**
@@ -58,6 +60,7 @@ namespace mitk
 
     // -------------- DICOMSegmentationIO specific functions -------------
     const std::string CreateMetaDataJsonFile(int layer);
+    void SetLabelProperties(Label *label, dcmqi::SegmentAttributes *segmentAttribute);
     void AddDICOMTagsToService();
   };
 } // end of namespace mitk

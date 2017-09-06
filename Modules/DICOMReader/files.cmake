@@ -12,6 +12,7 @@ set(CPP_FILES
   mitkDICOMTagBasedSorter.cpp
   mitkDICOMGDCMImageFrameInfo.cpp
   mitkDICOMImageFrameInfo.cpp
+  mitkDICOMIOHelper.cpp
   mitkDICOMGenericImageFrameInfo.cpp
   mitkDICOMDatasetAccessingImageFrameInfo.cpp
   mitkDICOMSortCriterion.cpp

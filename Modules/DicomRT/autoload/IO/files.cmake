@@ -4,5 +4,4 @@ set(CPP_FILES
   mitkRTDoseReaderService.cpp
   mitkRTPlanReaderService.cpp
   mitkRTStructureSetReaderService.cpp
-  mitkDicomRTIOHelper.cpp
 )

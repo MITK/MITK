@@ -311,6 +311,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
   }
 
   Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
+  config.Slices = processedImage->GetDimension(2);
 
   // perform the beamforming
   BeamformingFilter::Pointer Beamformer = BeamformingFilter::New();

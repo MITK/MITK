@@ -45,7 +45,7 @@ int mitk::OclDataSetToDataSetFilter::GetBytesPerElem()
   return this->m_CurrentSizeOutput;
 }
 
-bool mitk::OclDataSetToDataSetFilter::InitExec(cl_kernel ckKernel, unsigned int* dimensions, unsigned int outputBpE)
+bool mitk::OclDataSetToDataSetFilter::InitExec(cl_kernel ckKernel, unsigned int* dimensions, size_t outputDataSize, unsigned int outputBpE)
 {
   cl_int clErr = 0;
 
@@ -78,7 +78,7 @@ bool mitk::OclDataSetToDataSetFilter::InitExec(cl_kernel ckKernel, unsigned int*
   {
     MITK_DEBUG << "Create GPU DataSet call " << uiDataSetWidth << "x" << uiDataSetHeight << "x" << uiDataSetDepth;
     m_Output->SetBpE(outputBpE);
-    m_Output->SetBufferSize(uiDataSetWidth*uiDataSetHeight*uiDataSetDepth);
+    m_Output->SetBufferSize(outputDataSize);
     clBuffOut = m_Output->CreateGPUBuffer();
     m_CurrentSizeOutput = outputBpE;
   }
@@ -86,6 +86,42 @@ bool mitk::OclDataSetToDataSetFilter::InitExec(cl_kernel ckKernel, unsigned int*
   clErr = 0;
   clErr = clSetKernelArg(ckKernel, 0, sizeof(cl_mem), &clBuffIn);
   clErr |= clSetKernelArg(ckKernel, 1, sizeof(cl_mem), &clBuffOut);
+  CHECK_OCL_ERR(clErr);
+
+  if (clErr != CL_SUCCESS)
+    mitkThrow() << "OpenCL Part initialization failed with " << GetOclErrorAsString(clErr);
+
+  return(clErr == CL_SUCCESS);
+}
+
+bool mitk::OclDataSetToDataSetFilter::InitExecNoInput(cl_kernel ckKernel, unsigned int* dimensions, size_t outputDataSize, unsigned int outputBpE)
+{
+  cl_int clErr = 0;
+
+  if (m_Input.IsNull())
+    mitkThrow() << "Input DataSet is null.";
+
+  // get DataSet size once
+  const unsigned int uiDataSetWidth = dimensions[0];
+  const unsigned int uiDataSetHeight = dimensions[1];
+  const unsigned int uiDataSetDepth = dimensions[2];
+
+  // compute work sizes
+  this->SetWorkingSize(8, uiDataSetWidth, 8, uiDataSetHeight, 8, uiDataSetDepth);
+
+  cl_mem clBuffOut = m_Output->GetGPUBuffer();
+
+  // output DataSet not initialized
+  if (!clBuffOut)
+  {
+    MITK_DEBUG << "Create GPU DataSet call " << uiDataSetWidth << "x" << uiDataSetHeight << "x" << uiDataSetDepth;
+    m_Output->SetBpE(outputBpE);
+    m_Output->SetBufferSize(outputDataSize);
+    clBuffOut = m_Output->CreateGPUBuffer();
+    m_CurrentSizeOutput = outputBpE;
+  }
+
+  clErr = clSetKernelArg(ckKernel, 0, sizeof(cl_mem), &clBuffOut);
   CHECK_OCL_ERR(clErr);
 
   if (clErr != CL_SUCCESS)

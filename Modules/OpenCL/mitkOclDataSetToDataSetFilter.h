@@ -64,7 +64,9 @@ protected:
    * @throws mitk::Exception if something goes wrong.
    * @return True for success.
    */
-  bool InitExec(cl_kernel ckKernel, unsigned int* dimensions, unsigned int outputBpE);
+  bool InitExec(cl_kernel ckKernel, unsigned int* dimensions, size_t outputDataSize, unsigned int outputBpE);
+
+  bool InitExecNoInput(cl_kernel ckKernel, unsigned int* dimensions, size_t outputDataSize, unsigned int outputBpE);
 
   /** @brief Get the memory size needed for each element */
   virtual int GetBytesPerElem();

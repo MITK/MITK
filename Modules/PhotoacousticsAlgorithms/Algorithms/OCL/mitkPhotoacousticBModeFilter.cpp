@@ -59,7 +59,8 @@ void mitk::PhotoacousticOCLBModeFilter::Execute()
 {
   try
   {
-    this->InitExec(this->m_PixelCalculation, m_InputDim, sizeof(float));
+    size_t outputSize = m_InputDim[0] * m_InputDim[1] * m_InputDim[2];
+    this->InitExec(this->m_PixelCalculation, m_InputDim, outputSize, sizeof(float));
   }
   catch (const mitk::Exception& e)
   {

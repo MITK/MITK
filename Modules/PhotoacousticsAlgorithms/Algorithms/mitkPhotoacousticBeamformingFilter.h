@@ -44,6 +44,7 @@ namespace mitk {
       unsigned int TransducerElements = 128;
       bool partial = false;
       unsigned int CropBounds[2] = { 0,0 };
+      unsigned int Slices;
 
       bool UseGPU = true;
 

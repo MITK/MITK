@@ -72,7 +72,8 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
 
   try
   {
-    this->InitExec(this->m_PixelCalculation, m_OutputDim, sizeof(float));
+    size_t outputSize = m_OutputDim[0] * m_OutputDim[1] * m_OutputDim[2];
+    this->InitExec(this->m_PixelCalculation, m_OutputDim, outputSize, sizeof(float));
   }
   catch (const mitk::Exception& e)
   {

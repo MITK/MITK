@@ -6,6 +6,8 @@ set(CPP_FILES
   Algorithms/OCL/mitkPhotoacousticOCLBeamformer.cpp
   
   Algorithms/OCL/mitkPhotoacousticBModeFilter.cpp
+  
+  Algorithms/OCL/mitkPhotoacousticOCLUsedLinesCalculation.cpp
 )
 
 set(RESOURCE_FILES

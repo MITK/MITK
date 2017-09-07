@@ -590,6 +590,41 @@ void mitk::RelationStorage::AddImage(const SemanticTypes::CaseID& caseID, const 
   }
 }
 
+void mitk::RelationStorage::RemoveImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageNodeID)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+
+  // retrieve a vector property that contains the valid image-IDs for the current case
+  mitk::VectorProperty<std::string>::Pointer allImagesVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("images"));
+  if (nullptr == allImagesVectorProperty)
+  {
+    MITK_INFO << "Could not find any images in the storage.";
+    return;
+  }
+
+  // remove the image reference from the list of all images of the current case
+  std::vector<std::string> allImagesIDs = allImagesVectorProperty->GetValue();
+  allImagesIDs.erase(std::remove(allImagesIDs.begin(), allImagesIDs.end(), imageNodeID), allImagesIDs.end());
+  if (allImagesIDs.size() == 0)
+  {
+    // no more images stored -> remove the images property list
+    propertyList->DeleteProperty("images");
+  }
+  else
+  {
+    // or store the modified vector value
+    allImagesVectorProperty->SetValue(allImagesIDs);
+  }
+
+  // remove the image instance itself
+  propertyList->DeleteProperty(imageNodeID);
+}
+
 void mitk::RelationStorage::AddSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationNodeID, const SemanticTypes::ID& parentNodeID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
@@ -792,6 +827,38 @@ void mitk::RelationStorage::LinkSegmentationToLesion(const SemanticTypes::CaseID
   else
   {
     MITK_INFO << "Could not find lesion " << lesion.UID << " in the storage. Cannot link segmentation to lesion.";
+  }
+}
+
+void mitk::RelationStorage::UnlinkSegmentationFromLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+  // retrieve a vector property that contains the referenced ID of a segmentation (0. image ID 1. lesion ID)
+  mitk::VectorProperty<std::string>* segmentationVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(segmentationID));
+  if (nullptr == segmentationVectorProperty)
+  {
+    MITK_INFO << "Could not find the segmentation node " << segmentationID << " in the storage. Cannot unlink lesion from segmentation.";
+    return;
+  }
+
+  std::vector<std::string> segmentationVectorValue = segmentationVectorProperty->GetValue();
+  // a segmentation has to have exactly two values (the ID of the linked image and the ID of the lesion)
+  if (segmentationVectorValue.size() != 2)
+  {
+    MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+    return;
+  }
+  else
+  {
+    // the second value of the data node vector is the ID of the referenced lesion
+    // set the lesion reference to an empty string for removal
+    segmentationVectorValue[1] = "";
+    segmentationVectorProperty->SetValue(segmentationVectorValue);
   }
 }
 

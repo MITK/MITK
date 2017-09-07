@@ -34,7 +34,6 @@ namespace mitk
   /*
   * @brief The API provides functions to query and manipulate medical case relations.
   *
-  * ##TODO: adjust description
   *   The class is able to generate IDs from given data nodes using DICOM information.
   *   These IDs are used to identify the corresponding instances of a specific case.
   *   The case can also be directly identified by the given case ID.
@@ -50,7 +49,7 @@ namespace mitk
 
     SemanticRelations(mitk::DataStorage::Pointer dataStorage);
     ~SemanticRelations();
-    std::shared_ptr<RelationStorage> GetRelationStorage();
+    mitk::RelationStorage& mitk::SemanticRelations::GetRelationStorage();
 
     /************************************************************************/
     /* functions to get instances / attributes                              */
@@ -302,8 +301,7 @@ namespace mitk
     * @pre    The UID of the lesion must not already exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion already exists for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has a connected
-    *                         image node, which contains DICOM information about the case.
+    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     * @par lesion             The lesion instance to add and link.
     */
     void AddLesionAndLinkData(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
@@ -312,17 +310,20 @@ namespace mitk
     * @brief  Link the given segmentation instance to an an already existing lesion instance. If the segmentation is already linked to a lesion instance, the
     *         old linkage is overwritten (this can be checked via 'IsRepresentingALesion').
     *
-    *         To unlink the segmentation from a lesion instance the segmentation has to be removed completely.
-    *         A segmentation without an associated lesion can not exists.
-    *
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has a connected
-    *                         image node, which contains DICOM information about the case.
+    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     * @par lesion             The lesion instance to link.
     */
     void LinkSegmentationToLesion(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
+
+    /*
+    * @brief  Unlink the given segmentation instance from the linked lesion instance.
+    *
+    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    */
+    void UnlinkSegmentationFromLesion(const DataNode* segmentationNode);
 
     /*
     * @brief  Remove the given lesion from the set of already existing lesions.
@@ -387,18 +388,16 @@ namespace mitk
     void LinkDataToControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
 
     /*
-    * @brief  Unlink the given image from the control point.
+    * @brief  Unlink the given image from the linked control point.
     *
-    * @pre    The UID of the control point has to exist for a control point instance.
-    *         If data is unlinked from a control point, the function needs to check whether the control point is still linked to any other data:
+    * @pre    If data is unlinked from a control point, the function needs to check whether the control point is still linked to any other data:
     *           - if not, the control point instance can be removed (has to be removed since a control point with no associated data is not allowed).
     *           - if so, the function has to make sure that the control point instance is shortened to its minimum time period (e.g. moving the end point to an earlier date).
-    * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
+    * @throw  SemanticRelationException, if the linked control point of the data is not correctly stored (this can be checked via 'InstanceExists').
     *
     * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint   The control point instance to unlink.
     */
-    void UnlinkDataFromControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void UnlinkDataFromControlPoint(const DataNode* dataNode);
 
     /*
     * @brief Set the information type of the given image.
@@ -418,9 +417,8 @@ namespace mitk
     *           - if so, the information type is just removed from the given image.
     *
     * @par imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par informationType  An information type that identifies the corresponding information type instance.
     */
-    void RemoveInformationTypeFromImage(const DataNode* imageNode, const SemanticTypes::InformationType& informationType);
+    void RemoveInformationTypeFromImage(const DataNode* imageNode);
 
   private:
 

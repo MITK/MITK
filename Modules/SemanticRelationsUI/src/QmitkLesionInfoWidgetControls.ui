@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkLesionInfoWidgetControls</class>
+ <widget class="QWidget" name="QmitkLesionInfoWidgetControls">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>350</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+  <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="lesionInfoWidgetLabel">
+     <property name="text">
+      <string>Available lesion data</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QToolBox" name="lesionToolBox"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="addLesionPushButton">
+     <property name="text">
+      <string>Add lesion</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="removeLesionPushButton">
+     <property name="text">
+      <string>Remove lesion</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

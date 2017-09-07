@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSEMANTICRELATIONSDATAMODEL_H
-#define QMITKSEMANTICRELATIONSDATAMODEL_H
+#ifndef QMITKPATIENTTABLEMODEL_H
+#define QMITKPATIENTTABLEMODEL_H
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -27,14 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkDataNode.h>
 
-class QmitkSemanticRelationsDataModel : public QAbstractTableModel
+class QmitkPatientTableModel : public QAbstractTableModel
 {
   Q_OBJECT 
    
 public:
 
-  QmitkSemanticRelationsDataModel(QObject* parent = nullptr);
-  ~QmitkSemanticRelationsDataModel();
+  QmitkPatientTableModel(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QObject* parent = nullptr);
+  ~QmitkPatientTableModel();
 
   //////////////////////////////////////////////////////////////////////////
   // overridden functions from QAbstractItemModel
@@ -42,29 +42,27 @@ public:
   virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
   virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
   virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-  virtual QVariant data(const QModelIndex &index, int role) const override;
+  virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
   //virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
   virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
   //////////////////////////////////////////////////////////////////////////
   /// end override
   /////////////////////////////////////////////////////////////////////////
 
-  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
-  void SetSemanticRelations(mitk::SemanticRelations* semanticRelations);
-  const mitk::SemanticTypes::CaseID& GetCurrentCaseID() { return m_CaseID; }
+  const mitk::SemanticTypes::CaseID& GetCurrentCaseID() const { return m_CaseID; }
   void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
-
   void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
-  void DataChanged(const mitk::DataNode* dataNode = nullptr);
-  mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
+  void SetPatientData();
 
 Q_SIGNALS:
-  void ModelReset();
+  void ModelUpdated();
 
 private:
 
-  mitk::SemanticRelations* m_SemanticRelations;
+  mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
+
   mitk::DataStorage::Pointer m_DataStorage;
+  std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
 
   std::map<std::string, QPixmap> m_PixmapMap;
@@ -73,4 +71,4 @@ private:
 
 };
 
-#endif // QMITKSEMANTICRELATIONSDATAMODEL_H
+#endif // QMITKPATIENTTABLEMODEL_H

@@ -1,20 +1,23 @@
 file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
 
 set(CPP_FILES
-  QmitkPatientInfoWidget.cpp
   QmitkControlPointDialog.cpp
-  QmitkSemanticRelationsDataModel.cpp
-  QmitkSemanticRelationsTableView.cpp
+  QmitkPatientInfoWidget.cpp
+  QmitkPatientTableModel.cpp
+  QmitkPatientTableWidget.cpp
+  QmitkLesionInfoWidget.cpp
 )
 
 set(MOC_H_FILES
- include/QmitkPatientInfoWidget.h
  include/QmitkControlPointDialog.h
- include/QmitkSemanticRelationsDataModel.h
- include/QmitkSemanticRelationsTableView.h
+ include/QmitkPatientInfoWidget.h
+ include/QmitkPatientTableModel.h
+ include/QmitkPatientTableWidget.h
+ include/QmitkLesionInfoWidget.h
 )
 
 set(UI_FILES
   src/QmitkPatientInfoWidgetControls.ui
-  src/QmitkSemanticRelationsTableViewControls.ui
+  src/QmitkPatientTableWidgetControls.ui
+  src/QmitkLesionInfoWidgetControls.ui
 )

@@ -71,7 +71,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleDicomReader::Re
     TrcTractographyResults *trc = NULL;
     result = TrcTractographyResults::loadFile(filename.c_str(), trc);
     if (result.bad())
-      mitkThrow() << "Unable to load Tractography Results file: " << result.text();
+      mitkThrow() << "Unable to load tractography dicom file: " << result.text();
 
     OFString val = "-";
     trc->getPatient().getPatientName(val);

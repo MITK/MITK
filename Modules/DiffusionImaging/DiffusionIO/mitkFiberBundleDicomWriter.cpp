@@ -130,6 +130,7 @@ void mitk::FiberBundleDicomWriter::Write()
     cieLabColor[0] = 30000; // L
     cieLabColor[1] = 0 ; // a
     cieLabColor[2] = 0 ; // b
+    std::vector< Float32* > tracts;
 
     for (int i=0; i<fib->GetNumFibers(); i++)
     {
@@ -137,7 +138,7 @@ void mitk::FiberBundleDicomWriter::Write()
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
 
-        Float32 pointData[numPoints*3];
+        Float32* pointData = new Float32[numPoints*3];
         for(int i=0; i<numPoints ;i++)
         {
             double* p = points->GetPoint(i);
@@ -146,6 +147,7 @@ void mitk::FiberBundleDicomWriter::Write()
             pointData[i*3+1] = p[1];
             pointData[i*3+2] = p[2];
         }
+        tracts.push_back(pointData);
 
         TrcTrack* track = NULL;
         set->addTrack(pointData, numPoints, cieLabColor, 1 /* numColors */, track);
@@ -160,8 +162,13 @@ void mitk::FiberBundleDicomWriter::Write()
     trc->getSeries().setSeriesDescription("Tractogram processed with MITK Diffusion");
 
     // Save file
-    trc->saveFile(this->GetOutputLocation().c_str());
+    OFCondition result = trc->saveFile(this->GetOutputLocation().c_str());
     delete trc;
+    if (result.bad())
+      mitkThrow() << "Unable to save tractography as DICOM file: " << result.text();
+
+    for (Float32* tract : tracts)
+      delete [] tract;
 
     setlocale(LC_ALL, currLocale.c_str());
     MITK_INFO << "DICOM Fiber bundle written to " << this->GetOutputLocation();

@@ -113,6 +113,7 @@ void QmitkDicomTractogramTagEditorView::OnItemChanged(QTableWidgetItem* item)
     mitk::PropertyList* p_list = fib->GetPropertyList();
 
     p_list->SetStringProperty(tag.c_str(), item->text().toStdString().c_str());
+    MITK_INFO << tag.c_str();
   }
   UpdateGui();
 }

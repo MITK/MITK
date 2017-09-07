@@ -24,13 +24,12 @@ BYTE  MotionBuf[0x1FA400];
 
 mitk::PolhemusInterface::PolhemusInterface() : m_continousTracking(false)
 {
-	m_pdiDev = new CPDIdev();
-
+  m_pdiDev = new CPDIdev();
 }
 
 mitk::PolhemusInterface::~PolhemusInterface()
 {
-	delete m_pdiDev;
+  delete m_pdiDev;
 }
 
 bool mitk::PolhemusInterface::InitializeDevice()
@@ -59,7 +58,7 @@ bool mitk::PolhemusInterface::SetupDevice()
   CPDIbiterr cBE;
   m_pdiDev->GetBITErrs(cBE);
 
-  if (!(cBE.IsClear())) {m_pdiDev->ClearBITErrs();}
+  if (!(cBE.IsClear())) { m_pdiDev->ClearBITErrs(); }
 
   return true;
 }
@@ -119,12 +118,16 @@ bool mitk::PolhemusInterface::Connect()
 
 bool mitk::PolhemusInterface::Disconnect()
 {
+  bool returnValue = true;
+  //If Tracking is running, stop tracking first
   if (m_continousTracking)
   {
-    m_continousTracking = false;
-    if (!m_pdiDev->Disconnect()) return false;
+    this->StopTracking();
   }
-  return true;
+
+  returnValue = m_pdiDev->Disconnect();
+  MITK_INFO << "Disconnect: " << m_pdiDev->GetLastResultStr();
+  return returnValue;
 }
 
 std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetLastFrame()
@@ -133,7 +136,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
   DWORD dwSize;
 
   //read one frame
-  if (!m_pdiDev->LastPnoPtr(pBuf, dwSize)) {MITK_WARN << m_pdiDev->GetLastResultStr();}
+  if (!m_pdiDev->LastPnoPtr(pBuf, dwSize)) { MITK_WARN << m_pdiDev->GetLastResultStr(); }
 
   std::vector<mitk::PolhemusInterface::trackingData> returnValue = ParsePolhemusRawData(pBuf, dwSize);
 
@@ -173,7 +176,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
 
   DWORD i = 0;
 
-  while (i<dwSize)
+  while (i < dwSize)
   {
     BYTE ucSensor = pBuf[i + 2];
     SHORT shSize = pBuf[i + 6];
@@ -221,5 +224,5 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
 
 void mitk::PolhemusInterface::PrintStatus()
 {
-  MITK_INFO << "Polhemus status: "<<this->m_pdiDev->CnxReady();
+  MITK_INFO << "Polhemus status: " << this->m_pdiDev->CnxReady();
 }

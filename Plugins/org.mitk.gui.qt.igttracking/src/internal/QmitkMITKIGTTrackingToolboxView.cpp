@@ -138,7 +138,7 @@ QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
     this->GetDataStorage()->Remove(m_TrackingVolumeNode);
     //unregister microservices
     if (m_toolStorage) { m_toolStorage->UnRegisterMicroservice(); }
-    if (m_TrackingDeviceSource) { m_TrackingDeviceSource->UnRegisterMicroservice(); }
+
     if (m_IGTLMessageProvider.IsNotNull()){ m_IGTLMessageProvider->UnRegisterMicroservice(); }
   }
   catch (std::exception& e) { MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what(); }
@@ -347,13 +347,13 @@ void QmitkMITKIGTTrackingToolboxView::OnFreezeUnfreezeTracking()
 {
   if (m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Freeze Tracking")
   {
-    m_TrackingDeviceSource->Freeze();
+    m_Worker->GetTrackingDeviceSource()->Freeze();
     m_Controls->m_FreezeUnfreezeTrackingButton->setText("Unfreeze Tracking");
     m_Controls->m_TrackingFrozenLabel->setVisible(true);
   }
   else if (m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Unfreeze Tracking")
   {
-    m_TrackingDeviceSource->UnFreeze();
+    m_Worker->GetTrackingDeviceSource()->UnFreeze();
     m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
     m_Controls->m_TrackingFrozenLabel->setVisible(false);
   }
@@ -427,7 +427,6 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
 
   //! [Thread 6]
   //get data from worker thread
-  m_TrackingDeviceSource = m_Worker->GetTrackingDeviceSource();
   m_TrackingDeviceData = m_Worker->GetTrackingDeviceData();
   m_ToolVisualizationFilter = m_Worker->GetToolVisualizationFilter();
   //! [Thread 6]
@@ -521,9 +520,9 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_Controls->m_TrackingControlLabel->setText("Status: tracking");
 
   //connect the tool visualization widget
-  for (std::size_t i = 0; i < m_TrackingDeviceSource->GetNumberOfOutputs(); i++)
+  for (std::size_t i = 0; i < m_Worker->GetTrackingDeviceSource()->GetNumberOfOutputs(); i++)
   {
-    m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
+    m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_Worker->GetTrackingDeviceSource()->GetOutput(i));
   }
   m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
   if (m_Controls->m_ShowToolQuaternions->isChecked()) { m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true); }

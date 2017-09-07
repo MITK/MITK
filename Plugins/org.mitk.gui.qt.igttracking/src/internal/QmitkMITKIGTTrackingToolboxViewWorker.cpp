@@ -57,6 +57,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include "usServiceReference.h"
 
+QmitkMITKIGTTrackingToolboxViewWorker::QmitkMITKIGTTrackingToolboxViewWorker()
+{
+}
+
+QmitkMITKIGTTrackingToolboxViewWorker::~QmitkMITKIGTTrackingToolboxViewWorker()
+{
+}
+
 void QmitkMITKIGTTrackingToolboxViewWorker::SetWorkerMethod(WorkerMethod w)
 {
   m_WorkerMethod = w;
@@ -133,7 +141,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
   }
   m_NavigationToolStorage = autoDetectedStorage;
   //::ProgressBar::GetInstance()->Progress();
-    emit AutoDetectToolsFinished(true, "");
+  emit AutoDetectToolsFinished(true, "");
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
@@ -157,6 +165,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 
   //Create Navigation Data Source with the factory class
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(m_NavigationToolStorage, trackingDevice);
+
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(m_ToolVisualizationFilter);
   //mitk::ProgressBar::GetInstance()->Progress();
 
@@ -180,6 +189,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
   }
 
   MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
+
   //mitk::ProgressBar::GetInstance()->Progress();
 
   //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
@@ -212,6 +222,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     //mitk::ProgressBar::GetInstance()->Reset();
     //Microservice registration:
     m_TrackingDeviceSource->RegisterAsMicroservice();
+
     m_NavigationToolStorage->UnRegisterMicroservice();
     m_NavigationToolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
     m_NavigationToolStorage->LockStorage();
@@ -224,6 +235,11 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
   }
   emit ConnectDeviceFinished(true, QString(message.c_str()));
   //mitk::ProgressBar::GetInstance()->Reset();
+}
+
+mitk::TrackingDeviceSource::Pointer QmitkMITKIGTTrackingToolboxViewWorker::GetTrackingDeviceSource()
+{
+  return this->m_TrackingDeviceSource;
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
@@ -293,7 +309,10 @@ void QmitkMITKIGTTrackingToolboxViewWorker::DisconnectDevice()
     if (m_TrackingDeviceSource->IsTracking()) { m_TrackingDeviceSource->StopTracking(); }
     m_TrackingDeviceSource->Disconnect();
     m_TrackingDeviceSource->UnRegisterMicroservice();
+
     m_NavigationToolStorage->UnLockStorage();
+
+    m_TrackingDeviceSource = nullptr;
   }
   catch (mitk::Exception& e)
   {

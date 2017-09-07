@@ -49,6 +49,9 @@ public:
     eDisconnectDevice = 4
   };
 
+  QmitkMITKIGTTrackingToolboxViewWorker();
+  ~QmitkMITKIGTTrackingToolboxViewWorker();
+
   void SetWorkerMethod(WorkerMethod w);
   void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
   void SetDataStorage(mitk::DataStorage::Pointer d);
@@ -56,49 +59,46 @@ public:
   void SetTrackingDeviceData(mitk::TrackingDeviceData d);
   void SetNavigationToolStorage(mitk::NavigationToolStorage::Pointer n);
 
-  itkGetMacro(NavigationToolStorage,mitk::NavigationToolStorage::Pointer);
+  itkGetMacro(NavigationToolStorage, mitk::NavigationToolStorage::Pointer);
 
-  itkGetMacro(TrackingDeviceSource,mitk::TrackingDeviceSource::Pointer);
-  itkGetMacro(TrackingDeviceData,mitk::TrackingDeviceData);
-  itkGetMacro(ToolVisualizationFilter,mitk::NavigationDataObjectVisualizationFilter::Pointer);
+  mitk::TrackingDeviceSource::Pointer GetTrackingDeviceSource();
+  itkGetMacro(TrackingDeviceData, mitk::TrackingDeviceData);
+  itkGetMacro(ToolVisualizationFilter, mitk::NavigationDataObjectVisualizationFilter::Pointer);
 
   public slots:
-    void ThreadFunc();
+  void ThreadFunc();
 
-  signals:
-    void AutoDetectToolsFinished(bool success, QString errorMessage);
-    void ConnectDeviceFinished(bool success, QString errorMessage);
-    void StartTrackingFinished(bool success, QString errorMessage);
-    void StopTrackingFinished(bool success, QString errorMessage);
-    void DisconnectDeviceFinished(bool success, QString errorMessage);
+signals:
+  void AutoDetectToolsFinished(bool success, QString errorMessage);
+  void ConnectDeviceFinished(bool success, QString errorMessage);
+  void StartTrackingFinished(bool success, QString errorMessage);
+  void StopTrackingFinished(bool success, QString errorMessage);
+  void DisconnectDeviceFinished(bool success, QString errorMessage);
 
+protected:
 
-  protected:
+  mitk::TrackingDevice::Pointer m_TrackingDevice;
+  WorkerMethod m_WorkerMethod;
+  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
 
-    mitk::TrackingDevice::Pointer m_TrackingDevice;
-    WorkerMethod m_WorkerMethod;
-    mitk::DataStorage::Pointer m_DataStorage;
-    mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
+  //members for the filter pipeline which is created in the worker thread during ConnectDevice()
+  mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline
+  mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
+  mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
 
-    //members for the filter pipeline which is created in the worker thread during ConnectDevice()
-    mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline
-    mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
-    mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
+  //members some internal flags
+  bool m_InverseMode;     //flag that is true when the inverse mode is enabled
 
-    //members some internal flags
-    bool m_InverseMode;     //flag that is true when the inverse mode is enabled
+  //stores the original colors of the tracking tools
+  std::map<mitk::DataNode::Pointer, mitk::Color> m_OriginalColors;
 
-    //stores the original colors of the tracking tools
-    std::map<mitk::DataNode::Pointer,mitk::Color> m_OriginalColors;
-
-    //internal methods
-    void AutoDetectTools();
-    void ConnectDevice();
-    void StartTracking();
-    void StopTracking();
-    void DisconnectDevice();
+  //internal methods
+  void AutoDetectTools();
+  void ConnectDevice();
+  void StartTracking();
+  void StopTracking();
+  void DisconnectDevice();
 };
-
-
 
 #endif // _QMITKMITKIGTTRACKINGTOOLBOXVIEWWorker_H_INCLUDED

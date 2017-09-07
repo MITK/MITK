@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations UI module
 #include "MitkSemanticRelationsUIExports.h"
 #include <ui_QmitkPatientTableWidgetControls.h>
+#include "QmitkSelectionWidget.h"
 #include "QmitkPatientTableModel.h"
 
 // semantic relations module
@@ -31,29 +32,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt
 #include <QMenu>
-#include <QWidget>
 
-class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableWidget : public QWidget, public mitk::ISemanticRelationsObserver
+/*
+* @brief The QmitkPatientTableWidget is a widget that shows the currently available data of the semantic relations model in a control point-information type matrix.
+*
+*   The QmitkPatientTableWidget has a model that presents the semantic relations data as a table, showing a QPixmap as thumbnail for the image data.
+*
+*   The QmitkPatientTableWidget implements the 'ISemanticRelationsObserver', so that it is automatically updated, if the
+*   semantic relations model changes. Updating means freshly getting all control point data and information type data.
+*   This is done by updating the data in the 'QmitkPatientTableModel' model.
+*
+*   The QmitkPatientTableWidget is derived from 'QmitkSelectionWidget', so that the "SelectionChanged"-signal can be emitted.
+*   This is done in order to inform other widgets about a changed selection in this widget (e.g. the 'QmitkSelectNodeDialog').
+*   The QmitkPatientTableWidget is currently injected in the 'QmitkSelectNodeDialog' in the 'QmitkSemanticRelationsView' class.
+*/
+class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableWidget : public QmitkSelectionWidget, public mitk::ISemanticRelationsObserver
 {
   Q_OBJECT
 
 public:
 
-  QmitkPatientTableWidget(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QWidget* parent = nullptr);
-  ~QmitkPatientTableWidget();
+  QmitkPatientTableWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
+  virtual ~QmitkPatientTableWidget();
 
-  // override observer interface
+  /*
+  * @brief Updates the model with the current control point data and information type data from the semantic relations model.
+  *
+  *       Overridden from 'ISemanticRelationsObserver'.
+  *       In order for Update-function to be called, this widget has to be added as a observer of the SemanticRelationsManager
+  *       (e.g. m_SemanticRelationsManager->AddObserver(m_LesionInfoWidget);)
+  *
+  * @par caseID    The current case ID to identify the patient.
+  */
   virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
-  void SetPixmapOfNode(const mitk::DataNode* dataNode);
-  void DeletePixmapOfNode(const mitk::DataNode* dataNode);
 
-Q_SIGNALS:
-  void SelectionChanged(const mitk::DataNode*);
+  /*
+  * @brief Sets a QPixmap of a DICOM image.
+  *
+  * @par dataNode    The data node that holds the image data.
+  */
+  void SetPixmapOfNode(const mitk::DataNode* dataNode);
+  /*
+  * @brief Removes the corresponding pixmap of a DICOM image
+  *
+  * @par dataNode    The data node that holds the image data.
+  */
+  void DeletePixmapOfNode(const mitk::DataNode* dataNode);
 
 private Q_SLOTS:
 
   void OnPatientTableModelUpdated();
-  void OnPatientTableViewItemClicked(const QModelIndex&);
   void OnPatientTableViewContextMenuRequested(const QPoint&);
   void OnContextMenuSetInformationType();
   void OnContextMenuSetControlPoint();
@@ -64,14 +92,17 @@ private:
   void Init();
   void SetUpConnections();
 
+  /*
+  * @brief Generates a QPixmap of a DICOM image.
+  *
+  *       The center sagittal image slice is extracted and used as the thumbnail image.
+  *
+  * @par dataNode    The data node that holds the image data.
+  */
   QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode) const;
 
   Ui::QmitkPatientTableWidgetControls m_Controls;
-
-  mitk::DataStorage::Pointer m_DataStorage;
-  std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
   std::unique_ptr<QmitkPatientTableModel> m_PatientTableModel;
-
   QMenu* m_ContextMenu;
   mitk::DataNode* m_SelectedDataNode;
 

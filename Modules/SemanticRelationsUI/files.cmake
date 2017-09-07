@@ -6,6 +6,9 @@ set(CPP_FILES
   QmitkPatientTableModel.cpp
   QmitkPatientTableWidget.cpp
   QmitkLesionInfoWidget.cpp
+  QmitkSelectNodeDialog.cpp
+  QmitkSelectionWidget.cpp
+  QmitkSimpleDatamanagerWidget.cpp
 )
 
 set(MOC_H_FILES
@@ -14,10 +17,14 @@ set(MOC_H_FILES
  include/QmitkPatientTableModel.h
  include/QmitkPatientTableWidget.h
  include/QmitkLesionInfoWidget.h
+ include/QmitkSelectNodeDialog.h
+ include/QmitkSelectionWidget.h
+ include/QmitkSimpleDatamanagerWidget.h
 )
 
 set(UI_FILES
   src/QmitkPatientInfoWidgetControls.ui
   src/QmitkPatientTableWidgetControls.ui
   src/QmitkLesionInfoWidgetControls.ui
+  src/QmitkSimpleDatamanagerWidgetControls.ui
 )

@@ -27,6 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkDataNode.h>
 
+/*
+* @brief The QmitkPatientInfoWidget is a widget that shows some DICOM information about a specific patient (data node).
+*
+* CURRENTLY NOT USED
+*/
 class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientInfoWidget : public QWidget
 {
   Q_OBJECT

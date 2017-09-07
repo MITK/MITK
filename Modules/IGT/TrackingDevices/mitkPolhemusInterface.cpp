@@ -152,7 +152,7 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetS
 {
   if (m_continousTracking)
   {
-    MITK_WARN << "Cannot get tool count when continously tracking";
+    MITK_WARN << "Cannot get a single frame when continuous tracking is on!";
     return std::vector<mitk::PolhemusInterface::trackingData>();
   }
   PBYTE pBuf;

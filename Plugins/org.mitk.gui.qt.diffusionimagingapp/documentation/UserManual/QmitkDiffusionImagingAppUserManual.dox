@@ -1,12 +1,8 @@
 /**
-\page org_mitk_gui_qt_diffusionimagingapp Using MITK Diffusion
-
-\section QMitkDiffusionApplicationManualOverview What is the Diffusion Imaging Application
+\page org_mitk_gui_qt_diffusionimagingapp What is the Diffusion Imaging Application
 
 The Diffusion Imaging Application contains selected views for the analysis of images of the human brain. These encompass the views developed by the <a href="http://www.dkfz.de/en/mbi/research/MIC/index.html">Medical Image Computing Group</a> of the Division Medical and Biological Informatics as well as basic image processing views such as segmentation and volumevisualization.
 
-See <a href="http://mitk.org/wiki/DiffusionImaging">http://mitk.org/wiki/DiffusionImaging</a> for more details on MITK Diffusion.
-
-For a basic guide to MITK see \ref MITKUserManualPage .
+For a detailed description of MITK Diffusion refer to \ref org_mitk_gui_qt_diffusionimaging .
 
 */

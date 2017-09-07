@@ -4,7 +4,6 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   QmitkGibbsTrackingView.cpp
-  QmitkStochasticFiberTrackingView.cpp
   QmitkStreamlineTrackingView.cpp
   QmitkMLBTView.cpp
 
@@ -17,7 +16,6 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkGibbsTrackingViewControls.ui
-  src/internal/QmitkStochasticFiberTrackingViewControls.ui
   src/internal/QmitkStreamlineTrackingViewControls.ui
   src/internal/QmitkMLBTViewControls.ui
 
@@ -28,7 +26,6 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
 
   src/internal/QmitkGibbsTrackingView.h
-  src/internal/QmitkStochasticFiberTrackingView.h
   src/internal/QmitkStreamlineTrackingView.h
   src/internal/QmitkMLBTView.h
 
@@ -45,7 +42,6 @@ set(CACHED_RESOURCE_FILES
   resources/tractography.png
   resources/fiberTracking1.png
   resources/StreamlineTracking.png
-  resources/stochFB.png
   resources/GibbsTracking.png
   resources/ml_tractography.png
 )

@@ -12,14 +12,6 @@
     <keywordReference id="org.mitk.views.gibbstracking.Keyword"/>
     </view>
 
-<!--    <view id="org.mitk.views.stochasticfibertracking"
-    name="Stochastic Tractography"
-    category="Fiber Tractography"
-    class="QmitkStochasticFiberTrackingView"
-    icon="resources/stochFB.png">
-    <keywordReference id="org.mitk.views.stochasticfibertracking.Keyword"/>
-    </view>-->
-
     <view id="org.mitk.views.streamlinetracking"
     name="Streamline Tractography"
     category="Fiber Tractography"

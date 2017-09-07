@@ -14,48 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-
 // Qmitk
 #include "QmitkMITKIGTTrackingToolboxViewWorker.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
-#include "QmitkStdMultiWidget.h"
 
-// Qt
-#include <QMessageBox>
-#include <QSettings>
-#include <qfiledialog.h>
-
-// MITK
-#include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkTrackingDeviceSourceConfigurator.h>
-#include <mitkTrackingVolumeGenerator.h>
-#include <mitkNDITrackingDevice.h>
-#include <mitkNodePredicateNot.h>
-#include <mitkNodePredicateProperty.h>
-#include <mitkNavigationToolStorageSerializer.h>
-//#include <mitkProgressBar.h>
-#include <mitkIOUtil.h>
-#include <mitkLog.h>
-#include <usModule.h>
-#include <mitkTrackingDeviceTypeCollection.h>
-#include <mitkUnspecifiedTrackingTypeInformation.h>
-#include "mitkNDIAuroraTypeInformation.h"
-
-// vtk
-#include <vtkSphereSource.h>
-
-//for exceptions
-#include <mitkIGTException.h>
-#include <mitkIGTIOException.h>
-
-//for Microservice
-#include "mitkPluginActivator.h"
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
-#include "usServiceReference.h"
 
 QmitkMITKIGTTrackingToolboxViewWorker::QmitkMITKIGTTrackingToolboxViewWorker()
 {
@@ -124,30 +86,25 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
 
 void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
 {
-  //mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
   mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(m_DataStorage);
   try
   {
     mitk::NavigationToolStorage::Pointer tempStorage = m_TrackingDevice->AutoDetectTools();
-    //mitk::ProgressBar::GetInstance()->Progress();
     for (int i = 0; i < tempStorage->GetToolCount(); i++) { autoDetectedStorage->AddTool(tempStorage->GetTool(i)); }
   }
   catch (mitk::Exception& e)
   {
     MITK_WARN << e.GetDescription();
-    //mitk::ProgressBar::GetInstance()->Reset();
     emit AutoDetectToolsFinished(false, e.GetDescription());
     return;
   }
   m_NavigationToolStorage = autoDetectedStorage;
-  //::ProgressBar::GetInstance()->Progress();
   emit AutoDetectToolsFinished(true, "");
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 {
   std::string message = "";
-  //mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
 
   //build the IGT pipeline
   mitk::TrackingDevice::Pointer trackingDevice = m_TrackingDevice;
@@ -161,13 +118,11 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 
   //Get Tracking Volume Data
   mitk::TrackingDeviceData data = m_TrackingDeviceData;
-  //mitk::ProgressBar::GetInstance()->Progress();
 
   //Create Navigation Data Source with the factory class
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(m_NavigationToolStorage, trackingDevice);
 
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(m_ToolVisualizationFilter);
-  //mitk::ProgressBar::GetInstance()->Progress();
 
   if (m_TrackingDeviceSource.IsNull())
   {
@@ -190,8 +145,6 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 
   MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
 
-  //mitk::ProgressBar::GetInstance()->Progress();
-
   //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
   mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
 
@@ -201,25 +154,16 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     //we cannot simply replace the tool storage because the new storage is
     //not correctly initialized with the right data storage
 
-    /*
-    m_NavigationToolStorage->DeleteAllTools();
-    for (int i=0; i < toolsInNewOrder->GetToolCount(); i++) {m_NavigationToolStorage->AddTool(toolsInNewOrder->GetTool(i));}
-
-    This was replaced and thereby fixed Bug 18318 DeleteAllTools() is not Threadsafe!
-    */
     for (int i = 0; i < toolsInNewOrder->GetToolCount(); i++)
     {
       m_NavigationToolStorage->AssignToolNumber(toolsInNewOrder->GetTool(i)->GetIdentifier(), i);
     }
   }
 
-  //mitk::ProgressBar::GetInstance()->Progress();
-
   //connect to device
   try
   {
     m_TrackingDeviceSource->Connect();
-    //mitk::ProgressBar::GetInstance()->Reset();
     //Microservice registration:
     m_TrackingDeviceSource->RegisterAsMicroservice();
 
@@ -234,7 +178,6 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     return;
   }
   emit ConnectDeviceFinished(true, QString(message.c_str()));
-  //mitk::ProgressBar::GetInstance()->Reset();
 }
 
 mitk::TrackingDeviceSource::Pointer QmitkMITKIGTTrackingToolboxViewWorker::GetTrackingDeviceSource()

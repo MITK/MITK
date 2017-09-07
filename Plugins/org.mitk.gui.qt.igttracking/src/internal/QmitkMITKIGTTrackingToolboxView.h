@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include <mitkNavigationToolStorage.h>
-#include <mitkTrackingDeviceSource.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 #include <mitkNavigationDataRecorder.h>
 #include <mitkNavigationDataToIGTLMessageFilter.h>

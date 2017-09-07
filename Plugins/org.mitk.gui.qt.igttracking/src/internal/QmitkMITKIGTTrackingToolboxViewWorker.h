@@ -25,16 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <mitkTrackingDeviceSource.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
-#include <mitkNavigationDataRecorder.h>
-#include <mitkNavigationDataToIGTLMessageFilter.h>
-#include <mitkIGTLServer.h>
-#include <mitkIGTLMessageProvider.h>
 
 //QT headers
 #include <QTimer>
 
 /**
- * Worker thread class for this view.
+ * Worker thread class for QmitkMITKIGTTrackingToolboxView view.
  */
 class QmitkMITKIGTTrackingToolboxViewWorker : public QObject
 {

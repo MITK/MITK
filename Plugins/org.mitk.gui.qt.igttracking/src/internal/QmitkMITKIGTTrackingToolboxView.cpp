@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkMITKIGTTrackingToolboxView.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
 #include "QmitkStdMultiWidget.h"
 
 // Qt
@@ -30,32 +29,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
-#include <mitkTrackingDeviceSourceConfigurator.h>
 #include <mitkTrackingVolumeGenerator.h>
-#include <mitkNDITrackingDevice.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
-//#include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
-#include <usModule.h>
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
 #include "mitkNDIAuroraTypeInformation.h"
-
-// vtk
-#include <vtkSphereSource.h>
 
 //for exceptions
 #include <mitkIGTException.h>
 #include <mitkIGTIOException.h>
 
-//for Microservice
 #include "mitkPluginActivator.h"
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
-#include "usServiceReference.h"
+
 
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 

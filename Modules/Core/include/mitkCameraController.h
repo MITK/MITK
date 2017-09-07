@@ -99,6 +99,7 @@ protected:
     const BaseRenderer* m_Renderer;
 
     ScalarType ComputeMaxParallelScale();
+    ScalarType ComputeMaxAllowedParallelScale();
 
 private:
 
@@ -111,6 +112,8 @@ private:
     void AdjustCameraToPlane(const Point2D& PlanePoint);
 
     void AdjustConstrainedCameraPosition(Point2D& planePoint);
+
+    const float ALLOWED_TO_MAX_ZOOM_COF = 3.;
 
 };
 

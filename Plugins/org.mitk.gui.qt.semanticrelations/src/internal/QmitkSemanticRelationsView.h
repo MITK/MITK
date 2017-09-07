@@ -20,14 +20,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsControls.h"
 
-// semantic relations UI module
-#include <QmitkPatientTableWidget.h>
-#include <QmitkLesionInfoWidget.h>
-#include <QmitkPatientInfoWidget.h>
-
 // semantic relations module
 #include <mitkSemanticRelations.h>
 #include <mitkSemanticRelationsManager.h>
+#include <mitkSemanticTypes.h>
+
+// semantic relations UI module
+#include <QmitkPatientTableWidget.h>
+#include <QmitkSimpleDatamanagerWidget.h>
+#include <QmitkSelectNodeDialog.h>
 
 // blueberry
 #include <berryISelectionListener.h>
@@ -35,8 +36,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk qt
 #include <QmitkAbstractView.h>
 
-/**
-* @brief QmitkSemanticRelationsView
+/*
+* @brief The QmitkSemanticRelationsView is a MITK view to combine and show the widgets of the 'SemanticRelationsUI'-module.
+*
+*         It allows the MITK user to see and modify the content of the SemanticRelations-session.
+*         It provides a dialog to add images from the data storage to the semantic relations model and a dialog to select
+*         data nodes that were added to the semantic relations model before.
+*         If provides functionality to create new lesions and link them with segmentation nodes.
+*         A combo box is used to select and show the current patient.
+*
+*         SIDE NOTE: Modifying the control points and information types of data in the semantic relations model is currently done
+*                    by using the right-click context-menu of the "PatientTableWidget" in the "Select Patient Node"-Dialog.
+*                    This is a leftover from when the widget was not used as a selection widget. Those functionality will be moved
+*                    to this main GUI soon.
 */
 class QmitkSemanticRelationsView : public QmitkAbstractView
 {
@@ -49,28 +61,36 @@ public:
 protected:
 
   virtual void SetFocus() override;
-
   virtual void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
   void OnCaseIDSelectionChanged(const QString&);
-  void OnPatientTableSelectionChanged(const mitk::DataNode*);
+  void OnSelectPatientNodeButtonClicked();
+  void OnAddLesionButtonClicked();
+  void OnRemoveLesionButtonClicked();
+  void OnLinkLesionButtonClicked();
+  void OnUnlinkLesionButtonClicked();
+  void OnAddImageButtonClicked();
+  void OnRemoveImageButtonClicked();
 
 private:
 
-  virtual void NodeAdded(const mitk::DataNode* node) override;
   virtual void NodeRemoved(const mitk::DataNode* node) override;
+  void AddToComboBox(const mitk::SemanticTypes::CaseID& caseID);
+  void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
 
   // the Qt parent of our GUI
   QWidget* m_Parent;
   Ui::QmitkSemanticRelationsControls m_Controls;
+  QmitkPatientTableWidget* m_PatientTableWidget;
+  QmitkSimpleDatamanagerWidget* m_SimpleDatamanagerWidget;
+  QmitkSelectNodeDialog* m_SelectPatientNodeDialog;
+  QmitkSelectNodeDialog* m_SimpleDatamanagerNodeDialog;
 
+  mitk::SemanticTypes::CaseID m_CaseID;
   std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
   std::unique_ptr<mitk::SemanticRelationsManager> m_SemanticRelationsManager;
-  QmitkPatientTableWidget* m_PatientTableWidget;
-  QmitkLesionInfoWidget* m_LesionInfoWidget;
-  QmitkPatientInfoWidget* m_PatientInfoWidget;
 };
 
 #endif // QMITKSEMANTICRELATIONSVIEW_H

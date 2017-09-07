@@ -41,9 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QInputDialog>
 #include <QMessageBox>
 
-QmitkPatientTableWidget::QmitkPatientTableWidget(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QWidget* parent /*=nullptr*/)
-  : QWidget(parent)
-  , m_SemanticRelations(semanticRelations)
+QmitkPatientTableWidget::QmitkPatientTableWidget(mitk::DataStorage* dataStorage, QWidget* parent /*=nullptr*/)
+  : QmitkSelectionWidget(dataStorage, parent)
 {
   Init();
 }
@@ -76,7 +75,6 @@ void QmitkPatientTableWidget::Init()
 void QmitkPatientTableWidget::SetUpConnections()
 {
   connect(m_PatientTableModel.get(), SIGNAL(ModelUpdated()), SLOT(OnPatientTableModelUpdated()));
-  connect(m_Controls.patientTableView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnPatientTableViewItemClicked(const QModelIndex&)));
   connect(m_Controls.patientTableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnPatientTableViewContextMenuRequested(const QPoint&)));
   connect(m_Controls.patientTableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnPatientTableViewSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
@@ -101,16 +99,6 @@ void QmitkPatientTableWidget::OnPatientTableModelUpdated()
 {
   m_Controls.patientTableView->resizeRowsToContents();
   m_Controls.patientTableView->resizeColumnsToContents();
-}
-
-void QmitkPatientTableWidget::OnPatientTableViewItemClicked(const QModelIndex& selectedIndex)
-{
-  if (!selectedIndex.isValid())
-  {
-    return;
-  }
-
-  // clicked is called each time the item is selected, regardless of the previous selection
 }
 
 void QmitkPatientTableWidget::OnPatientTableViewContextMenuRequested(const QPoint& pos)

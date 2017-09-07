@@ -185,6 +185,7 @@ void mitk::SemanticRelationsManager::AddSegmentationInstance(const mitk::DataNod
   SemanticTypes::Lesion lesion;
   lesion.UID = UIDGeneratorBoost::GenerateUID();
   lesion.lesionClass = SemanticTypes::LesionClass();
+  lesion.lesionClass.UID = UIDGeneratorBoost::GenerateUID();
   m_SemanticRelations->AddLesionAndLinkData(segmentationNode, lesion);
   NotifyObserver(caseID);
 }
@@ -204,5 +205,16 @@ void mitk::SemanticRelationsManager::RemoveSegmentationInstance(const mitk::Data
   m_SemanticRelations->UnlinkSegmentationFromLesion(segmentationNode);
   mitk::RelationStorage& relationStorage = m_SemanticRelations->GetRelationStorage();
   relationStorage.RemoveSegmentation(caseID, segmentationNodeID);
+  NotifyObserver(caseID);
+}
+
+void mitk::SemanticRelationsManager::GenerateNewLesion(const mitk::SemanticTypes::CaseID caseID)
+{
+  SemanticTypes::Lesion newLesion;
+  newLesion.UID = UIDGeneratorBoost::GenerateUID();
+  newLesion.lesionClass = SemanticTypes::LesionClass();
+  newLesion.lesionClass.UID = UIDGeneratorBoost::GenerateUID();
+
+  m_SemanticRelations->AddLesion(caseID, newLesion);
   NotifyObserver(caseID);
 }

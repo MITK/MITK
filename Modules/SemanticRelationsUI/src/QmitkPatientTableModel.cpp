@@ -79,12 +79,7 @@ QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role /*=Qt::
     return QVariant();
   }
 
-  if (Qt::ToolTipRole == role)
-  {
-    // TODO: add tool tip
-    return QVariant();
-  }
-  else if (Qt::UserRole == role)
+  if (Qt::UserRole == role)
   {
     // user role always returns a reference to the data node,
     // which can be used to modify the data node in the data storage

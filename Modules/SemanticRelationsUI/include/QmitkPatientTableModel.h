@@ -27,6 +27,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkDataNode.h>
 
+/*
+* @brief The QmitkPatientTableModel is the model for the 'QmitkPatientTableWidget' and holds the control point data and information type data of the currently selected case.
+*
+*   The QmitkPatientTableModel uses the 'data' function to return either the data node of a table cell or the thumbnail of the underlying image.
+*   The horizontal header of the table shows the control points of the current case and the vertical header of the table shows the information types of the current case.
+*   Using the 'GetFilteredData'-function of the SemanticRelations-class the model is able to retrieve the correct data node for each table entry.
+*
+*   Additionally the QmitkPatientTableWidget holds the QPixmaps of the known data nodes in order to return a thumbnail, if needed.
+*
+*   If the 'QmitkPatientTableWidget' is updated, the 'SetCurrentCaseID'-function is called, which leads to a fresh retrieval of the control point data
+*   and the information type data.
+*/
 class QmitkPatientTableModel : public QAbstractTableModel
 {
   Q_OBJECT 
@@ -59,6 +71,15 @@ Q_SIGNALS:
 
 private:
 
+  /*
+  * @brief Returns the data node that is associated with the given table entry (index).
+  *
+  *         The function uses the SemanticRelations-class and the current control point data and information type data to
+  *         filter the nodes of the current case.
+  *         The index is used to access the correct row in the table (information type) and the correct column in the table (control point).
+  *
+  * @par index    The QModelIndex of the table entry
+  */
   mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
 
   mitk::DataStorage::Pointer m_DataStorage;

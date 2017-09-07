@@ -69,6 +69,12 @@ namespace mitk
     * @par segmentationNode   The current case identifier and node identifier is extracted from the given segmentation data node.
     */
     void RemoveSegmentationInstance(const mitk::DataNode* segmentationNode);
+    /*
+    * @brief  Generate a new, empty lesion to add to the storage under the current case ID.
+    *
+    * @par caseID   The current case identifier is defined by the given string.
+    */
+    void GenerateNewLesion(const mitk::SemanticTypes::CaseID caseID);
 
   private:
 

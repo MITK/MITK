@@ -31,6 +31,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /*
+  * @brief The DICOMHelper provides functions to convert DICOM Tag information
+  *
+  *   In order to identify the patient of an image or segmentation or to set the control point of DICOM data,
+  *   the DICOMHelper is able to retrieve the DICOM tags from the given data nodes and convert them into semantic types
+  *   that are used by the SemanticRelations class.
+  */
   namespace DICOMHelper
   {
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::CaseID GetCaseIDFromDataNode(const mitk::DataNode* dataNode);

@@ -770,6 +770,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     }
     catch(...)
     {
+      QMessageBox::information(nullptr, "Error", "Peak tracker could not be initialized. Is your input image in the correct format (4D float image, peaks in the 4th dimension)?");
       StartStopTrackingGui(false);
       return;
     }

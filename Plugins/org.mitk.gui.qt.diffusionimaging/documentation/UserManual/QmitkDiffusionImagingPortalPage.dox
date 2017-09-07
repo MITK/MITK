@@ -20,14 +20,14 @@ MITK Diffusion consists of multiple components with their own documentation:
 \li \subpage org_mitk_views_qballreconstruction
 
 \subsection sub3 Visualization and Quantification
-\li \subpage QmitkDiffusionImagingVisualizationSettings
+\li \subpage org_mitk_views_controlvisualizationpropertiesview
 \li \subpage org_mitk_views_odfdetails
 \li \subpage org_mitk_views_odfmaximaextraction
 \li \subpage org_mitk_views_partialvolumeanalysisview
 \li \subpage org_mitk_views_diffusionquantification
 \li \subpage org_mitk_views_ivim
 
-\subsection sub3 Fiber Tractography
+\subsection sub4 Fiber Tractography
 \li \subpage org_mitk_views_streamlinetracking
 \li \subpage org_mitk_views_gibbstracking
 \li \subpage org_mitk_views_mlbtview
@@ -35,11 +35,11 @@ MITK Diffusion consists of multiple components with their own documentation:
 \li \subpage org_mitk_views_fiberprocessing
 \li \subpage org_mitk_views_fiberquantification
 
-\subsection sub3 Fiberfox dMRI Simulation
+\subsection sub5 Fiberfox dMRI Simulation
 \li \subpage org_mitk_views_fiberfoxview
 \li \subpage org_mitk_views_fieldmapgenerator
 
-\subsection sub3 TBSS and Connectomics
+\subsection sub6 TBSS and Connectomics
 \li \subpage org_mitk_views_tractbasedspatialstatistics
 \li \subpage org_mitk_diffusionimagingapp_perspectives_connectomics
 

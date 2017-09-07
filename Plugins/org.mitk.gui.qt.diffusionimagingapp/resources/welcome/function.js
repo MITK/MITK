@@ -3,8 +3,7 @@
 // The buttons will be generated in order to the array's index. e.g. data at array's index '0' will generate the first button.
 
 // enter the name of your module here
-var moduleNames = new Array("Dicom Import",
-                            "Preprocessing and Reconstruction",
+var moduleNames = new Array("Preprocessing and Reconstruction",
                             "Tractography",
                             "Connectomics",
                             "Fiberfox",
@@ -16,8 +15,7 @@ var moduleNames = new Array("Dicom Import",
                             "MITK Downloads & News");
 
 // add the MITK-link to your module
-var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.reconstruction1?clear=false",
+var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.perspectives.reconstruction1?clear=false",
                             "mitk://mitk.perspectives/org.mitk.perspectives.tractography2?clear=false",
                             "mitk://mitk.perspectives/org.mitk.perspectives.connectomics?clear=false",
                             "mitk://mitk.perspectives/org.mitk.perspectives.syntheticdata?clear=false",
@@ -31,8 +29,7 @@ var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.perspectives.diff
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
 // The picture's width should be 136 pixel; the height 123 pixel.
-var picFilenames = new Array("01dicomimport.png",
-                             "02preprocessingreconstruction.png",
+var picFilenames = new Array("02preprocessingreconstruction.png",
 //                             "03quantification.png",
                              "04tractography.png",
                              "06connectomics.png",
@@ -46,8 +43,7 @@ var picFilenames = new Array("01dicomimport.png",
 
 // if you want to create an animated icon, add the name of your animated gif (placed in subdirectory "pics"). Otherwise enter an empty string "".
 // The animation's width should be 136 pixel; the height 123 pixel.
-var aniFilenames = new Array("01adicomimport.png",
-                             "02apreprocessingreconstruction.png",
+var aniFilenames = new Array("02apreprocessingreconstruction.png",
 //                             "03aquantification.png",
                              "04atractography.png",
                              "06aconnectomics.png",
@@ -68,15 +64,13 @@ var experimental = new Array(false,
                              false,
                              false,
                              false,
-                             false,
 //                             false,
 //                             false,
                              false,
                              false);
 
 // add the description for your module. The description is displayed in a PopUp-window.
-var moduleDescriptions = new Array("MITK Diffusion supports direct import of Siemens diffusion weighted DICOM files.",
-                            "You can use MITK Diffusion to preprocess diffusion weighted MR Images using techniques like gradient averaging or reduction and baseline image extraction. Then you can estimate diffusion tensors or q-balls using different reconstruction methods and calculates scalar indices (FA, GFA, ...).",
+var moduleDescriptions = new Array("You can use MITK Diffusion to preprocess diffusion weighted MR Images using techniques like gradient averaging or reduction and baseline image extraction. Then you can estimate diffusion tensors or q-balls using different reconstruction methods and calculates scalar indices (FA, GFA, ...).",
 //                            "MITK Diffusion allows partial volume analysis and the evaluation and exploration of Tract Based Spatial Statistic datasets (it does NOT reimplement the TBSS methods available in FSL). The Partial Volume Analysis view provides a very robust method for semi-automatic ROI analysis. It uses EM clustering to probabilistically segment fiber vs. non-fiber vs. partial volume.",
                             "The tractography components of MITK Diffusion implement several fiber tractography algorithms (global and streamline; tensor, dODF/fODF/FOD, peak based as well as machine learning based using the raw signal). The fiber bundle operations view enables fiber postprocessing in various ways. The fiber quantification view generates a variety of images from given fiber tracts, extracts the principal fiber directions and gives detailed information about the fiberbundle itself.",
                             "Connectomics aims at building graphs (nodes and edges) from a tractogram and applying graph theory for data analysis.",

@@ -57,7 +57,13 @@ namespace mitk
         us::ServiceProperties props;
         mitk::CustomMimeType* mt = *mimeTypeIter;
         if (mt->GetName()==mitk::DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME())
-          props[ us::ServiceConstants::SERVICE_RANKING() ] = -10;
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = -1;
+        else if (mt->GetName()==mitk::DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME())
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = -2;
+        else if (mt->GetName()==mitk::DiffusionIOMimeTypes::FIBERBUNDLE_TCK_MIMETYPE_NAME())
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = -3;
+        else if (mt->GetName()==mitk::DiffusionIOMimeTypes::FIBERBUNDLE_DICOM_MIMETYPE_NAME())
+          props[ us::ServiceConstants::SERVICE_RANKING() ] = -4;
         else
           props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
 

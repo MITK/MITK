@@ -369,7 +369,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     font.setFamily("Courier");
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
-    font.setPointSize(8);
+    font.setPointSize(7);
     m_Controls->m_SimulationStatusText->setFont(font);
 
     connect( m_SimulationTimer, SIGNAL(timeout()), this, SLOT(UpdateSimulationStatus()) );

@@ -2174,7 +2174,8 @@
         <widget class="QTextEdit" name="m_SimulationStatusText">
          <property name="font">
           <font>
-           <pointsize>8</pointsize>
+           <family>Courier</family>
+           <pointsize>7</pointsize>
           </font>
          </property>
          <property name="readOnly">

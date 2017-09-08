@@ -707,7 +707,11 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
   mitk::NavigationToolStorage::Pointer autoDetectedStorage = m_Worker->GetNavigationToolStorage();
 
   //save detected tools
-  this->ReplaceCurrentToolStorage(autoDetectedStorage, "Autodetected NDI Aurora Storage");
+  std::string _autoDetectText;
+  _autoDetectText = "Autodetected ";
+  _autoDetectText.append(this->m_TrackingDeviceData.Line); //This is the device name as string of the current TrackingDevice.
+  _autoDetectText.append( " Storage");
+  this->ReplaceCurrentToolStorage(autoDetectedStorage, _autoDetectText);
   //auto save the new storage to hard disc (for persistence)
   AutoSaveToolStorage();
   //update label

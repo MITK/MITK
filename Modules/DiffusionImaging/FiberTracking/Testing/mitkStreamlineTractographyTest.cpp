@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundle.h>
 #include <itkStreamlineTrackingFilter.h>
@@ -61,7 +61,7 @@ public:
   typedef itk::Image<unsigned char, 3> ItkUcharImgType;
   typedef itk::Image<float, 3> ItkFloatImgType;
 
-  mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itk_qball_image;
+  mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itk_odf_image;
   mitk::TrackingHandlerTensor::ItkTensorImageType::ConstPointer itk_tensor_image;
   mitk::TrackingHandlerPeaks::PeakImgType::Pointer itk_peak_image;
   ItkUcharImgType::Pointer itk_seed_image;
@@ -82,7 +82,7 @@ public:
     odf_threshold = 0.1;
     peak_threshold = 0.1;
 
-    mitk::Image::Pointer qball_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_image.qbi"));
+    mitk::Image::Pointer odf_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_image.qbi"));
     mitk::Image::Pointer tensor_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/tensor_image.dti"));
     mitk::Image::Pointer peak_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_peak_image.nii.gz"));
     mitk::Image::Pointer seed_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/seed_image.nii.gz"));
@@ -108,9 +108,9 @@ public:
     {
       typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
       CasterType::Pointer caster = CasterType::New();
-      caster->SetInput(qball_image);
+      caster->SetInput(odf_image);
       caster->Update();
-      itk_qball_image = caster->GetOutput();
+      itk_odf_image = caster->GetOutput();
     }
 
     itk_gfa_image = ItkFloatImgType::New();
@@ -303,7 +303,7 @@ public:
   void Test_Odf1()
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
-    handler->SetOdfImage(itk_qball_image);
+    handler->SetOdfImage(itk_odf_image);
     handler->SetGfaThreshold(gfa_threshold);
     handler->SetOdfThreshold(0);
     handler->SetSharpenOdfs(true);
@@ -322,7 +322,7 @@ public:
   void Test_Odf2()
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
-    handler->SetOdfImage(itk_qball_image);
+    handler->SetOdfImage(itk_odf_image);
     handler->SetGfaThreshold(gfa_threshold);
     handler->SetOdfThreshold(0);
     handler->SetSharpenOdfs(false);
@@ -342,7 +342,7 @@ public:
   void Test_Odf3()
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
-    handler->SetOdfImage(itk_qball_image);
+    handler->SetOdfImage(itk_odf_image);
     handler->SetGfaThreshold(gfa_threshold);
     handler->SetOdfThreshold(0);
     handler->SetSharpenOdfs(true);
@@ -362,7 +362,7 @@ public:
   void Test_Odf4()
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
-    handler->SetOdfImage(itk_qball_image);
+    handler->SetOdfImage(itk_odf_image);
     handler->SetGfaThreshold(gfa_threshold);
     handler->SetOdfThreshold(0);
     handler->SetSharpenOdfs(true);
@@ -382,7 +382,7 @@ public:
   void Test_Odf5()
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
-    handler->SetOdfImage(itk_qball_image);
+    handler->SetOdfImage(itk_odf_image);
     handler->SetGfaThreshold(gfa_threshold);
     handler->SetOdfThreshold(0);
     handler->SetSharpenOdfs(true);
@@ -403,7 +403,7 @@ public:
   void Test_Odf6()
   {
     mitk::TrackingHandlerOdf* handler = new mitk::TrackingHandlerOdf();
-    handler->SetOdfImage(itk_qball_image);
+    handler->SetOdfImage(itk_odf_image);
     handler->SetGfaThreshold(gfa_threshold);
     handler->SetOdfThreshold(0);
     handler->SetSharpenOdfs(true);

@@ -36,7 +36,7 @@ set(CACHED_RESOURCE_FILES
   resources/vizControls.png
   resources/arrow.png
   resources/dwi.png
-  resources/qball.png
+  resources/odf.png
   resources/tensor.png
   resources/tractogram.png
   resources/ml_tractogram.png

@@ -32,7 +32,7 @@ Q_OBJECT
 
 public:
 
-  void SetParameters( itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf );
+  void SetParameters( itk::OrientationDistributionFunction<double, ODF_SAMPLING_SIZE> odf );
 
   QmitkODFDetailsWidget( QWidget * /*parent = 0 */);
   virtual ~QmitkODFDetailsWidget();

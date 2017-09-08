@@ -69,21 +69,21 @@ public:
   static DiffusionImageFslMimeType DWI_FSL_MIMETYPE();
   static DiffusionImageDicomMimeType DWI_DICOM_MIMETYPE();
   static CustomMimeType DTI_MIMETYPE(); // dti, hdti
-  static CustomMimeType QBI_MIMETYPE(); // qbi, hqbi
+  static CustomMimeType ODF_MIMETYPE(); // odf, qbi
 
   static std::string DWI_NRRD_MIMETYPE_NAME();
   static std::string DWI_NIFTI_MIMETYPE_NAME();
   static std::string DWI_FSL_MIMETYPE_NAME();
   static std::string DWI_DICOM_MIMETYPE_NAME();
   static std::string DTI_MIMETYPE_NAME();
-  static std::string QBI_MIMETYPE_NAME();
+  static std::string ODF_MIMETYPE_NAME();
 
   static std::string DWI_NRRD_MIMETYPE_DESCRIPTION();
   static std::string DWI_NIFTI_MIMETYPE_DESCRIPTION();
   static std::string DWI_FSL_MIMETYPE_DESCRIPTION();
   static std::string DWI_DICOM_MIMETYPE_DESCRIPTION();
   static std::string DTI_MIMETYPE_DESCRIPTION();
-  static std::string QBI_MIMETYPE_DESCRIPTION();
+  static std::string ODF_MIMETYPE_DESCRIPTION();
 
 private:
 

@@ -22,11 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNodePredicateDataType.h"
 #include "mitkDataNodeObject.h"
-#include "mitkQBallImage.h"
+#include "mitkOdfImage.h"
 #include <mitkTensorImage.h>
 #include "mitkImageCast.h"
 #include "mitkStatusBar.h"
-#include "itkDiffusionQballGeneralizedFaImageFilter.h"
+#include "itkDiffusionOdfGeneralizedFaImageFilter.h"
 #include "itkShiftScaleImageFilter.h"
 #include "itkTensorFractionalAnisotropyImageFilter.h"
 #include "itkTensorRelativeAnisotropyImageFilter.h"
@@ -55,7 +55,7 @@ QmitkDiffusionQuantificationView::QmitkDiffusionQuantificationView()
     : QmitkAbstractView(),
       m_Controls(nullptr)
 {
-    m_QBallImages = mitk::DataStorage::SetOfObjects::New();
+    m_OdfImages = mitk::DataStorage::SetOfObjects::New();
     m_TensorImages = mitk::DataStorage::SetOfObjects::New();
     m_DwImages = mitk::DataStorage::SetOfObjects::New();
 }
@@ -113,10 +113,10 @@ void QmitkDiffusionQuantificationView::SetFocus()
 
 void QmitkDiffusionQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
-    m_QBallImages = mitk::DataStorage::SetOfObjects::New();
+    m_OdfImages = mitk::DataStorage::SetOfObjects::New();
     m_TensorImages = mitk::DataStorage::SetOfObjects::New();
     m_DwImages = mitk::DataStorage::SetOfObjects::New();
-    bool foundQBIVolume = false;
+    bool foundOdfVolume = false;
     bool foundTensorVolume = false;
     bool foundDwVolume = false;
     mitk::DataNode::Pointer  selNode = nullptr;
@@ -124,10 +124,10 @@ void QmitkDiffusionQuantificationView::OnSelectionChanged(berry::IWorkbenchPart:
     int c=0;
     for (mitk::DataNode::Pointer node: nodes)
     {
-        if( node.IsNotNull() && dynamic_cast<mitk::QBallImage*>(node->GetData()) )
+        if( node.IsNotNull() && dynamic_cast<mitk::OdfImage*>(node->GetData()) )
         {
-            foundQBIVolume = true;
-            m_QBallImages->push_back(node);
+            foundOdfVolume = true;
+            m_OdfImages->push_back(node);
             selNode = node;
             c++;
         }
@@ -147,8 +147,8 @@ void QmitkDiffusionQuantificationView::OnSelectionChanged(berry::IWorkbenchPart:
         }
     }
 
-    m_Controls->m_GFAButton->setEnabled(foundQBIVolume);
-    m_Controls->m_CurvatureButton->setEnabled(foundQBIVolume);
+    m_Controls->m_GFAButton->setEnabled(foundOdfVolume);
+    m_Controls->m_CurvatureButton->setEnabled(foundOdfVolume);
 
     if (c>0)
     {
@@ -367,17 +367,17 @@ void QmitkDiffusionQuantificationView::GFA()
 {
     if(m_Controls->m_StandardGFACheckbox->isChecked())
     {
-        QBIQuantify(13);
+        OdfQuantify(13);
     }
     else
     {
-        QBIQuantify(0);
+        OdfQuantify(0);
     }
 }
 
 void QmitkDiffusionQuantificationView::Curvature()
 {
-    QBIQuantify(12);
+    OdfQuantify(12);
 }
 
 void QmitkDiffusionQuantificationView::FA()
@@ -410,9 +410,9 @@ void QmitkDiffusionQuantificationView::MD()
     TensorQuantify(5);
 }
 
-void QmitkDiffusionQuantificationView::QBIQuantify(int method)
+void QmitkDiffusionQuantificationView::OdfQuantify(int method)
 {
-    QBIQuantification(m_QBallImages, method);
+    OdfQuantification(m_OdfImages, method);
 }
 
 void QmitkDiffusionQuantificationView::TensorQuantify(int method)
@@ -420,7 +420,7 @@ void QmitkDiffusionQuantificationView::TensorQuantify(int method)
     TensorQuantification(m_TensorImages, method);
 }
 
-void QmitkDiffusionQuantificationView::QBIQuantification(
+void QmitkDiffusionQuantificationView::OdfQuantification(
         mitk::DataStorage::SetOfObjects::Pointer inImages, int method)
 {
     itk::TimeProbe clock;
@@ -437,7 +437,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
     {
 
         typedef float TOdfPixelType;
-        const int odfsize = QBALL_ODFSIZE;
+        const int odfsize = ODF_SAMPLING_SIZE;
         typedef itk::Vector<TOdfPixelType,odfsize> OdfVectorType;
         typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
         mitk::Image* vol =
@@ -456,7 +456,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         MBI_INFO << "Computing GFA ";
         mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
                                                         "Computing GFA for %s", nodename.c_str()).toLatin1());
-        typedef itk::DiffusionQballGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,odfsize>
+        typedef itk::DiffusionOdfGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,odfsize>
                 GfaFilterType;
         GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
         gfaFilter->SetInput(itkvol);

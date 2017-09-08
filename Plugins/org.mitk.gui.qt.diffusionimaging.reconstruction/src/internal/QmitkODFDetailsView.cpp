@@ -142,7 +142,7 @@ void QmitkODFDetailsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*pa
   // iterate selection
   for (mitk::DataNode::Pointer node: nodes)
   {
-    if( node.IsNotNull() && (dynamic_cast<mitk::QBallImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData())) )
+    if( node.IsNotNull() && (dynamic_cast<mitk::OdfImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData())) )
     {
       m_Controls->m_InputImageLabel->setText(node->GetName().c_str());
       m_ImageNode = node;
@@ -181,12 +181,12 @@ void QmitkODFDetailsView::UpdateOdf()
     if(nmp)
       m_OdfNormalization = nmp->GetNormalization();
 
-    m_TemplateOdf = itk::OrientationDistributionFunction<float,QBALL_ODFSIZE>::GetBaseMesh();
+    m_TemplateOdf = itk::OrientationDistributionFunction<float,ODF_SAMPLING_SIZE>::GetBaseMesh();
     m_OdfTransform = vtkSmartPointer<vtkTransform>::New();
     m_OdfTransform->Identity();
     m_OdfVals = vtkSmartPointer<vtkDoubleArray>::New();
     m_OdfSource = vtkSmartPointer<vtkOdfSource>::New();
-    itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf;
+    itk::OrientationDistributionFunction<double, ODF_SAMPLING_SIZE> odf;
 
     mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
     mitk::Point3D index;
@@ -202,30 +202,30 @@ void QmitkODFDetailsView::UpdateOdf()
 
     // check if dynamic_cast successfull and if the crosshair position is inside of the geometry of the ODF data
     // otherwise possible crash for a scenario with multiple nodes
-    if (dynamic_cast<mitk::QBallImage*>(m_ImageNode->GetData()) && ( m_ImageNode->GetData()->GetGeometry()->IsInside(world) ) )
+    if (dynamic_cast<mitk::OdfImage*>(m_ImageNode->GetData()) && ( m_ImageNode->GetData()->GetGeometry()->IsInside(world) ) )
     {
       m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(true);
 
       try
       {
-        const mitk::QBallImage* qball_image = dynamic_cast< mitk::QBallImage* >( m_ImageNode->GetData() );
+        const mitk::OdfImage* Odf_image = dynamic_cast< mitk::OdfImage* >( m_ImageNode->GetData() );
 
-        // get access to the qball image data with explicitely allowing exceptions if memory locked
-        mitk::ImageReadAccessor readAccess( qball_image, qball_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
-        const float* qball_cPtr = static_cast< const float*>(readAccess.GetData());
+        // get access to the Odf image data with explicitely allowing exceptions if memory locked
+        mitk::ImageReadAccessor readAccess( Odf_image, Odf_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
+        const float* Odf_cPtr = static_cast< const float*>(readAccess.GetData());
 
         OdfVectorImgType::IndexType ind;
         ind[0] = (int)(index[0]+0.5);
         ind[1] = (int)(index[1]+0.5);
         ind[2] = (int)(index[2]+0.5);
 
-        // pixel size = QBALL_ODFSIZE
+        // pixel size = ODF_SAMPLING_SIZE
         // position offset = standard offset
-        unsigned int offset_to_data = QBALL_ODFSIZE * (ind[2] * img_dimension[1] * img_dimension[0] + ind[1] * img_dimension[0] + ind[0]);
-        const float *pixel_data = qball_cPtr + offset_to_data;
+        unsigned int offset_to_data = ODF_SAMPLING_SIZE * (ind[2] * img_dimension[1] * img_dimension[0] + ind[1] * img_dimension[0] + ind[0]);
+        const float *pixel_data = Odf_cPtr + offset_to_data;
 
-        for (int i=0; i<QBALL_ODFSIZE; i++)
+        for (int i=0; i<ODF_SAMPLING_SIZE; i++)
         {
           float val = pixel_data[i];
           odf.SetNthComponent(i, val);
@@ -236,16 +236,16 @@ void QmitkODFDetailsView::UpdateOdf()
           if (val<min)
             min = val;
         }
-        float mean = sum/QBALL_ODFSIZE;
+        float mean = sum/ODF_SAMPLING_SIZE;
 
         float stdev = 0;
-        for (int i=0; i<QBALL_ODFSIZE; i++)
+        for (int i=0; i<ODF_SAMPLING_SIZE; i++)
         {
           float val = pixel_data[i];
           float diff = val - mean;
           stdev += diff*diff;
         }
-        stdev = std::sqrt(stdev/(QBALL_ODFSIZE-1));
+        stdev = std::sqrt(stdev/(ODF_SAMPLING_SIZE-1));
 
         QString pos = QString::number(ind[0])+", "+QString::number(ind[1])+", "+QString::number(ind[2]);
         overviewText += "Coordinates: "+pos+"\n";
@@ -278,14 +278,14 @@ void QmitkODFDetailsView::UpdateOdf()
       m_Controls->m_OdfBox->setVisible(false);
 
 
-      const mitk::TensorImage* qball_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
+      const mitk::TensorImage* Odf_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
 
       // pixel access block
       try
       {
-        // get access to the qball image data with explicitely allowing exceptions if memory locked
-        mitk::ImageReadAccessor readAccess( qball_image, qball_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
-        const float* qball_cPtr = static_cast< const float*>(readAccess.GetData());
+        // get access to the Odf image data with explicitely allowing exceptions if memory locked
+        mitk::ImageReadAccessor readAccess( Odf_image, Odf_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
+        const float* Odf_cPtr = static_cast< const float*>(readAccess.GetData());
 
         TensorImageType::IndexType ind;
         ind[0] = (int)(index[0]+0.5);
@@ -295,7 +295,7 @@ void QmitkODFDetailsView::UpdateOdf()
         // 6 - tensorsize
         // remaining computation - standard offset
         unsigned int offset_to_data = 6 * (ind[2] * img_dimension[1] * img_dimension[0] + ind[1] * img_dimension[0] + ind[0]);
-        const float *pixel_data = qball_cPtr + offset_to_data;
+        const float *pixel_data = Odf_cPtr + offset_to_data;
 
         float tensorelems[6] = {
           *(pixel_data    ),

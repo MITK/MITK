@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkNrrdQBallImageReader_h
-#define __mitkNrrdQBallImageReader_h
+#ifndef __mitkNrrdOdfImageReader_h
+#define __mitkNrrdOdfImageReader_h
 
 #include "mitkCommon.h"
 #include "itkVectorContainer.h"
 #include "vnl/vnl_vector_fixed.h"
-#include "mitkQBallImage.h"
+#include "mitkOdfImage.h"
 #include "itkVectorImage.h"
 #include <mitkAbstractFileReader.h>
 #include <mitkBaseData.h>
@@ -32,15 +32,15 @@ namespace mitk
   /** \brief
   */
 
-  class NrrdQBallImageReader : public mitk::AbstractFileReader
+  class NrrdOdfImageReader : public mitk::AbstractFileReader
   {
   public:
 
-    typedef mitk::QBallImage OutputType;
+    typedef mitk::OdfImage OutputType;
 
-    NrrdQBallImageReader(const NrrdQBallImageReader& other);
-    NrrdQBallImageReader();
-    virtual ~NrrdQBallImageReader();
+    NrrdOdfImageReader(const NrrdOdfImageReader& other);
+    NrrdOdfImageReader();
+    virtual ~NrrdOdfImageReader();
 
     using AbstractFileReader::Read;
     virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
@@ -50,11 +50,11 @@ namespace mitk
 
   private:
   private:
-    NrrdQBallImageReader* Clone() const override;
+    NrrdOdfImageReader* Clone() const override;
 
     us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };
 
 } //namespace MITK
 
-#endif // __mitkNrrdQBallImageReader_h
+#endif // __mitkNrrdOdfImageReader_h

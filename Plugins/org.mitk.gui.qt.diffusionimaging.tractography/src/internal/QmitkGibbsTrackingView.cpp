@@ -54,7 +54,7 @@ void QmitkTrackingWorker::run()
 {
   m_View->m_GlobalTracker = QmitkGibbsTrackingView::GibbsTrackingFilterType::New();
 
-  m_View->m_GlobalTracker->SetQBallImage(m_View->m_ItkQBallImage);
+  m_View->m_GlobalTracker->SetOdfImage(m_View->m_ItkOdfImage);
   m_View->m_GlobalTracker->SetTensorImage(m_View->m_ItkTensorImage);
   m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
   m_View->m_GlobalTracker->SetStartTemperature((float)m_View->m_Controls->m_StartTempSlider->value()/100);
@@ -86,8 +86,8 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
   , m_FiberBundle(nullptr)
   , m_MaskImage(nullptr)
   , m_TensorImage(nullptr)
-  , m_QBallImage(nullptr)
-  , m_ItkQBallImage(nullptr)
+  , m_OdfImage(nullptr)
+  , m_ItkOdfImage(nullptr)
   , m_ItkTensorImage(nullptr)
   , m_ImageNode(nullptr)
   , m_MaskImageNode(nullptr)
@@ -170,7 +170,7 @@ void QmitkGibbsTrackingView::AfterThread()
 
   // images not needed anymore ( relevant only for computation )
   // we need to release them to remove the memory access block created through CastToItk<> calls
-  this->m_ItkQBallImage = 0;
+  this->m_ItkOdfImage = 0;
   this->m_ItkTensorImage = 0;
 }
 
@@ -290,7 +290,7 @@ void QmitkGibbsTrackingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   // iterate all selected objects
   for (mitk::DataNode::Pointer node: nodes)
   {
-    if( node.IsNotNull() && dynamic_cast<mitk::QBallImage*>(node->GetData()) )
+    if( node.IsNotNull() && dynamic_cast<mitk::OdfImage*>(node->GetData()) )
       m_ImageNode = node;
     else if( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
       m_ImageNode = node;
@@ -343,12 +343,12 @@ void QmitkGibbsTrackingView::UpdateGUI()
 {
   if (m_ImageNode.IsNotNull())
   {
-    m_Controls->m_QballImageLabel->setText(m_ImageNode->GetName().c_str());
+    m_Controls->m_OdfImageLabel->setText(m_ImageNode->GetName().c_str());
     m_Controls->m_DataFrame->setTitle("Input Data");
   }
   else
   {
-    m_Controls->m_QballImageLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_OdfImageLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_DataFrame->setTitle("Please Select Input Data");
   }
   if (m_MaskImageNode.IsNotNull())
@@ -375,7 +375,7 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_IterationsBox->setEnabled(true);
     m_Controls->m_AdvancedFrame->setEnabled(true);
     m_Controls->m_TrackingStop->setText("Stop Tractography");
-    m_Controls->m_TrackingStart->setToolTip("No Q-Ball image selected.");
+    m_Controls->m_TrackingStart->setToolTip("No ODF image selected.");
     m_Controls->m_TrackingStop->setToolTip("");
   }
   else
@@ -420,7 +420,7 @@ void QmitkGibbsTrackingView::SetMask()
   }
 }
 
-// check for mask and qbi and start tracking thread
+// check for mask and odf and start tracking thread
 void QmitkGibbsTrackingView::StartGibbsTracking()
 {
   if(m_ThreadIsRunning)
@@ -432,28 +432,28 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
 
   if (m_ImageNode.IsNull())
   {
-    QMessageBox::information( nullptr, "Warning", "Please load and select a qball image before starting image processing.");
+    QMessageBox::information( nullptr, "Warning", "Please load and select a Odf image before starting image processing.");
     return;
   }
 
-  if (dynamic_cast<mitk::QBallImage*>(m_ImageNode->GetData()))
-    m_QBallImage = dynamic_cast<mitk::QBallImage*>(m_ImageNode->GetData());
+  if (dynamic_cast<mitk::OdfImage*>(m_ImageNode->GetData()))
+    m_OdfImage = dynamic_cast<mitk::OdfImage*>(m_ImageNode->GetData());
   else if (dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData()))
     m_TensorImage = dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData());
 
-  if (m_QBallImage.IsNull() && m_TensorImage.IsNull())
+  if (m_OdfImage.IsNull() && m_TensorImage.IsNull())
     return;
 
-  // cast qbi to itk
+  // cast odf to itk
   m_TrackingNode = m_ImageNode;
   m_ItkTensorImage = nullptr;
-  m_ItkQBallImage = nullptr;
+  m_ItkOdfImage = nullptr;
   m_MaskImage = nullptr;
 
-  if (m_QBallImage.IsNotNull())
+  if (m_OdfImage.IsNotNull())
   {
-    m_ItkQBallImage = ItkQBallImgType::New();
-    mitk::CastToItkImage(m_QBallImage, m_ItkQBallImage);
+    m_ItkOdfImage = ItkOdfImgType::New();
+    mitk::CastToItkImage(m_OdfImage, m_ItkOdfImage);
   }
   else
   {

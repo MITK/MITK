@@ -8,11 +8,11 @@
 
 using namespace mitk;
 
-GibbsEnergyComputer::GibbsEnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen)
+GibbsEnergyComputer::GibbsEnergyComputer(ItkOdfImgType* OdfImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen)
 :EnergyComputer(mask, particleGrid, interpolator, randGen)
 
 {
-  m_Image = qballImage;
+  m_Image = OdfImage;
 }
 
 GibbsEnergyComputer::~GibbsEnergyComputer()
@@ -40,7 +40,7 @@ float GibbsEnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vect
 
         if (!m_UseTrilinearInterpolation)   // image has not enough slices to use trilinear interpolation
         {
-            ItkQBallImgType::IndexType index;
+            ItkOdfImgType::IndexType index;
             index[0] = floor(pos[0]/m_Spacing[0]);
             index[1] = floor(pos[1]/m_Spacing[1]);
             index[2] = floor(pos[2]/m_Spacing[2]);
@@ -67,7 +67,7 @@ float GibbsEnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vect
                 float yfrac = Ry-yint;
                 float zfrac = Rz-zint;
 
-                ItkQBallImgType::IndexType index;
+                ItkOdfImgType::IndexType index;
                 float weight;
 
                 weight = (1-xfrac)*(1-yfrac)*(1-zfrac);

@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_NRRDQBI_WRITER__H_
-#define _MITK_NRRDQBI_WRITER__H_
+#ifndef _MITK_NRRDODF_WRITER__H_
+#define _MITK_NRRDODF_WRITER__H_
 
 #include <mitkAbstractFileWriter.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 
 
 namespace mitk
@@ -28,14 +28,14 @@ namespace mitk
  * Writes diffusion volumes to a file
  * @ingroup Process
  */
-  class NrrdQBallImageWriter : public mitk::AbstractFileWriter
+  class NrrdOdfImageWriter : public mitk::AbstractFileWriter
   {
   public:
 
-    typedef mitk::QBallImage InputType;
+    typedef mitk::OdfImage InputType;
 
-    NrrdQBallImageWriter();
-    virtual ~NrrdQBallImageWriter();
+    NrrdOdfImageWriter();
+    virtual ~NrrdOdfImageWriter();
 
     using AbstractFileWriter::Write;
     virtual void Write() override;
@@ -44,11 +44,11 @@ namespace mitk
 
   protected:
 
-    NrrdQBallImageWriter(const NrrdQBallImageWriter& other);
-    virtual mitk::NrrdQBallImageWriter* Clone() const override;
+    NrrdOdfImageWriter(const NrrdOdfImageWriter& other);
+    virtual mitk::NrrdOdfImageWriter* Clone() const override;
   };
 
 
 } // end of namespace mitk
 
-#endif //_MITK_NRRDQBI_WRITER__H_
+#endif //_MITK_NRRDODF_WRITER__H_

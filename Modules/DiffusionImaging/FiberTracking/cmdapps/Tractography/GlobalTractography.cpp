@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkImageCast.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <mitkTensorImage.h>
 #include <mitkFiberBundle.h>
 #include <itkGibbsTrackingFilter.h>
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 
 template<int shOrder>
-typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Pointer TemplatedConvertShCoeffs(mitk::Image* mitkImg, int toolkit, bool noFlip = false)
+typename itk::ShCoefficientImageImporter< float, shOrder >::OdfImageType::Pointer TemplatedConvertShCoeffs(mitk::Image* mitkImg, int toolkit, bool noFlip = false)
 {
     typedef itk::ShCoefficientImageImporter< float, shOrder > FilterType;
     typedef mitk::ImageToItk< itk::Image< float, 4 > > CasterType;
@@ -78,7 +78,7 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
         filter->SetToolkit(FilterType::FSL);
     }
     filter->GenerateData();
-    return filter->GetQballImage();
+    return filter->GetOdfImage();
 }
 
 /*!
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or FSL/MRTrix SH-coefficient image)", us::Any(), false);
     parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameters:", "parameter file (.gtp)", us::Any(), false);
     parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask:", "binary mask image");
     parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "SH coefficient:", "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
@@ -116,22 +116,22 @@ int main(int argc, char* argv[])
     try
     {
         // instantiate gibbs tracker
-        typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
-        typedef itk::Image<OdfVectorType,3>         ItkQballImageType;
-        typedef itk::GibbsTrackingFilter<ItkQballImageType> GibbsTrackingFilterType;
+        typedef itk::Vector<float, ODF_SAMPLING_SIZE>   OdfVectorType;
+        typedef itk::Image<OdfVectorType,3>         ItkOdfImageType;
+        typedef itk::GibbsTrackingFilter<ItkOdfImageType> GibbsTrackingFilterType;
         GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
 
         // load input image
         mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inFileName)[0].GetPointer());
 
-        // try to cast to qball image
-        if( boost::algorithm::ends_with(inFileName, ".qbi") )
+        // try to cast to Odf image
+        if( boost::algorithm::ends_with(inFileName, ".odf") || boost::algorithm::ends_with(inFileName, ".qbi") )
         {
-            std::cout << "Loading qball image ...";
-            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(mitkImage.GetPointer());
-            ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
-            mitk::CastToItkImage(mitkQballImage, itk_qbi);
-            gibbsTracker->SetQBallImage(itk_qbi.GetPointer());
+            std::cout << "Loading Odf image ...";
+            mitk::OdfImage::Pointer mitkOdfImage = dynamic_cast<mitk::OdfImage*>(mitkImage.GetPointer());
+            ItkOdfImageType::Pointer itk_odf = ItkOdfImageType::New();
+            mitk::CastToItkImage(mitkOdfImage, itk_odf);
+            gibbsTracker->SetOdfImage(itk_odf.GetPointer());
         }
         else if( boost::algorithm::ends_with(inFileName, ".dti") )
         {
@@ -180,19 +180,19 @@ int main(int argc, char* argv[])
             switch (shOrder)
             {
             case 4:
-                gibbsTracker->SetQBallImage(TemplatedConvertShCoeffs<4>(mitkImage, toolkitConvention, noFlip));
+                gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<4>(mitkImage, toolkitConvention, noFlip));
                 break;
             case 6:
-                gibbsTracker->SetQBallImage(TemplatedConvertShCoeffs<6>(mitkImage, toolkitConvention, noFlip));
+                gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<6>(mitkImage, toolkitConvention, noFlip));
                 break;
             case 8:
-                gibbsTracker->SetQBallImage(TemplatedConvertShCoeffs<8>(mitkImage, toolkitConvention, noFlip));
+                gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<8>(mitkImage, toolkitConvention, noFlip));
                 break;
             case 10:
-                gibbsTracker->SetQBallImage(TemplatedConvertShCoeffs<10>(mitkImage, toolkitConvention, noFlip));
+                gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<10>(mitkImage, toolkitConvention, noFlip));
                 break;
             case 12:
-                gibbsTracker->SetQBallImage(TemplatedConvertShCoeffs<12>(mitkImage, toolkitConvention, noFlip));
+                gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<12>(mitkImage, toolkitConvention, noFlip));
                 break;
             default:
                 std::cout << "SH-order " << shOrder << " not supported";

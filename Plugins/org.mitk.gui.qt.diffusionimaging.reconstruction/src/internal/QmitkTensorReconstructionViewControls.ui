@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
+    <width>381</width>
     <height>1019</height>
    </rect>
   </property>
@@ -345,11 +345,11 @@
    <item>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
-      <string>Estimate Q-Ball Image from Tensors</string>
+      <string>Estimate ODF Image from Tensors</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
-       <widget class="QCommandLinkButton" name="m_TensorsToQbiButton">
+       <widget class="QCommandLinkButton" name="m_TensorsToOdfButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -363,7 +363,7 @@
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Start QBI Estimation</string>
+         <string>Start ODF Estimation</string>
         </property>
        </widget>
       </item>

@@ -39,7 +39,7 @@ std::vector<CustomMimeType*> DiffusionCoreIOMimeTypes::Get()
   mimeTypes.push_back(DWI_FSL_MIMETYPE().Clone());
   mimeTypes.push_back(DWI_DICOM_MIMETYPE().Clone());
   mimeTypes.push_back(DTI_MIMETYPE().Clone());
-  mimeTypes.push_back(QBI_MIMETYPE().Clone());
+  mimeTypes.push_back(ODF_MIMETYPE().Clone());
 
   return mimeTypes;
 }
@@ -365,14 +365,14 @@ CustomMimeType DiffusionCoreIOMimeTypes::DTI_MIMETYPE()
   return mimeType;
 }
 
-CustomMimeType DiffusionCoreIOMimeTypes::QBI_MIMETYPE()
+CustomMimeType DiffusionCoreIOMimeTypes::ODF_MIMETYPE()
 {
-  CustomMimeType mimeType(QBI_MIMETYPE_NAME());
-  std::string category = "Q-Ball Images";
-  mimeType.SetComment("Diffusion Q-Ball Images");
+  CustomMimeType mimeType(ODF_MIMETYPE_NAME());
+  std::string category = "ODF Images";
+  mimeType.SetComment("Diffusion ODF Images");
   mimeType.SetCategory(category);
-  mimeType.AddExtension("qbi");
-  //mimeType.AddExtension("hqbi"); // saving with detached header does not work out of the box
+  mimeType.AddExtension("odf");
+  mimeType.AddExtension("qbi"); // legacy support
   return mimeType;
 }
 
@@ -407,9 +407,9 @@ std::string DiffusionCoreIOMimeTypes::DTI_MIMETYPE_NAME()
   return name;
 }
 
-std::string DiffusionCoreIOMimeTypes::QBI_MIMETYPE_NAME()
+std::string DiffusionCoreIOMimeTypes::ODF_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".qbi";
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".odf";
   return name;
 }
 
@@ -445,9 +445,9 @@ std::string DiffusionCoreIOMimeTypes::DTI_MIMETYPE_DESCRIPTION()
   return description;
 }
 
-std::string DiffusionCoreIOMimeTypes::QBI_MIMETYPE_DESCRIPTION()
+std::string DiffusionCoreIOMimeTypes::ODF_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "Q-Ball Images";
+  static std::string description = "ODF Images";
   return description;
 }
 

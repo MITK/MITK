@@ -57,7 +57,7 @@ public:
     typedef itk::Image< double, 3 >                                         ItkDoubleImageType;
     typedef itk::Image< unsigned char, 3 >                                  ItkUcharImageType;
     typedef itk::Image< itk::DiffusionTensor3D< double >, 3 >               TensorImageType;
-    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,2,QBALL_ODFSIZE> QballFilterType;
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,2,ODF_SAMPLING_SIZE> QballFilterType;
     typedef typename DiffusionSignalModel< ScalarType >::PixelType          PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType       GradientType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;

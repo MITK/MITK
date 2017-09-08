@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <itkExceptionObject.h>
 #include <itkImageFileWriter.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <itkTensorDerivedMeasurementsFilter.h>
-#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <itkDiffusionOdfGeneralizedFaImageFilter.h>
 #include <mitkTensorImage.h>
 #include "mitkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace std;
 
 /**
- * Calculate indices derived from Qball or tensor images
+ * Calculate indices derived from Odf or tensor images
  */
 int main(int argc, char* argv[])
 {
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or FSL/MRTrix SH-coefficient image)", us::Any(), false);
     parser.addArgument("index", "idx", mitkCommandLineParser::String, "Index:", "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
     parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
@@ -63,18 +63,18 @@ int main(int argc, char* argv[])
         // load input image
         std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( inFileName );
 
-        if( boost::algorithm::ends_with(inFileName, ".qbi") && index=="gfa" )
+        if( (boost::algorithm::ends_with(inFileName, ".odf") || boost::algorithm::ends_with(inFileName, ".qbi")) && index=="gfa" )
         {
-            typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
-            typedef itk::Image<OdfVectorType,3>         ItkQballImageType;
-            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile[0].GetPointer());
-            ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
-            mitk::CastToItkImage(mitkQballImage, itk_qbi);
+            typedef itk::Vector<float, ODF_SAMPLING_SIZE>   OdfVectorType;
+            typedef itk::Image<OdfVectorType,3>         ItkOdfImageType;
+            mitk::OdfImage::Pointer mitkOdfImage = dynamic_cast<mitk::OdfImage*>(infile[0].GetPointer());
+            ItkOdfImageType::Pointer itk_odf = ItkOdfImageType::New();
+            mitk::CastToItkImage(mitkOdfImage, itk_odf);
 
 
-            typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
+            typedef itk::DiffusionOdfGeneralizedFaImageFilter<float,float,ODF_SAMPLING_SIZE> GfaFilterType;
             GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
-            gfaFilter->SetInput(itk_qbi);
+            gfaFilter->SetInput(itk_odf);
             gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
             gfaFilter->Update();
 

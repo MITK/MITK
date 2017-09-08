@@ -53,7 +53,7 @@ public:
   /** Runtime information support. */
   itkTypeMacro(OdfMaximaExtractionFilter, ImageToImageFilter)
 
-  typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> QballReconstructionFilterType;
+  typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,ODF_SAMPLING_SIZE> QballReconstructionFilterType;
   typedef QballReconstructionFilterType::CoefficientImageType                                       CoefficientImageType;
   typedef CoefficientImageType::PixelType                                                           CoefficientPixelType;
   typedef itk::VectorImage< short, 3 >                                                              DiffusionImageType;

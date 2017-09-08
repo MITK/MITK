@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*=========================================================================
 
 Program:   Tensor ToolKit - TTK
-Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkTensorImageToQBallImageFilter.h $
+Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkTensorImageToOdfImageFilter.h $
 Language:  C++
 Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
 Version:   $Revision: 68 $
@@ -29,11 +29,11 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef _itk_TensorImageToQBallImageFilter_h_
-#define _itk_TensorImageToQBallImageFilter_h_
+#ifndef _itk_TensorImageToOdfImageFilter_h_
+#define _itk_TensorImageToOdfImageFilter_h_
 
 #include "itkImageToImageFilter.h"
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <itkDiffusionTensor3D.h>
 
 
@@ -41,8 +41,8 @@ namespace itk
 {
 
   template <class TInputScalarType, class TOutputScalarType>
-  class TensorImageToQBallImageFilter
-    : public ImageToImageFilter<itk::Image<itk::DiffusionTensor3D<TInputScalarType>,3>, itk::Image<itk::Vector<TOutputScalarType,QBALL_ODFSIZE>,3> >
+  class TensorImageToOdfImageFilter
+    : public ImageToImageFilter<itk::Image<itk::DiffusionTensor3D<TInputScalarType>,3>, itk::Image<itk::Vector<TOutputScalarType,ODF_SAMPLING_SIZE>,3> >
   {
 
   public:
@@ -53,17 +53,17 @@ namespace itk
     typedef typename InputImageType::RegionType       InputImageRegionType;
 
     typedef TOutputScalarType                            OutputScalarType;
-    typedef itk::Vector<OutputScalarType,QBALL_ODFSIZE>  OutputPixelType;
+    typedef itk::Vector<OutputScalarType,ODF_SAMPLING_SIZE>  OutputPixelType;
     typedef itk::Image<OutputPixelType,3>                OutputImageType;
     typedef typename OutputImageType::RegionType         OutputImageRegionType;
 
-    typedef TensorImageToQBallImageFilter Self;
+    typedef TensorImageToOdfImageFilter Self;
     typedef ImageToImageFilter<InputImageType, OutputImageType> Superclass;
 
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
-    itkTypeMacro (TensorImageToQBallImageFilter, ImageToImageFilter);
+    itkTypeMacro (TensorImageToOdfImageFilter, ImageToImageFilter);
 
     itkStaticConstMacro (ImageDimension, unsigned int,
       OutputImageType::ImageDimension);
@@ -73,8 +73,8 @@ namespace itk
 
 
   protected:
-    TensorImageToQBallImageFilter(){};
-    ~TensorImageToQBallImageFilter(){};
+    TensorImageToOdfImageFilter(){};
+    ~TensorImageToOdfImageFilter(){};
 
     void PrintSelf (std::ostream& os, Indent indent) const
     {
@@ -90,18 +90,18 @@ namespace itk
 
   private:
 
-    TensorImageToQBallImageFilter (const Self&);
+    TensorImageToOdfImageFilter (const Self&);
     void operator=(const Self&);
 
     typename InputImageType::Pointer m_ItkTensorImage;
-    typename OutputImageType::Pointer m_ItkQBallImage;
+    typename OutputImageType::Pointer m_ItkOdfImage;
   };
 
 } // end of namespace
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTensorImageToQBallImageFilter.txx"
+#include "itkTensorImageToOdfImageFilter.txx"
 #endif
 
 

@@ -20,12 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImageNiftiReaderService.h>
 #include <mitkDiffusionImageDicomReaderService.h>
 #include <mitkNrrdTensorImageReader.h>
-#include <mitkNrrdQBallImageReader.h>
+#include <mitkNrrdOdfImageReader.h>
 
 #include <mitkDiffusionImageNrrdWriterService.h>
 #include <mitkDiffusionImageNiftiWriterService.h>
 #include <mitkNrrdTensorImageWriter.h>
-#include <mitkNrrdQBallImageWriter.h>
+#include <mitkNrrdOdfImageWriter.h>
 
 #include <mitkDiffusionPropertyHelper.h>
 
@@ -62,12 +62,12 @@ namespace mitk
       m_DiffusionImageDicomReaderService = new DiffusionImageDicomReaderService();
 
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
-      m_NrrdQBallImageReader = new NrrdQBallImageReader();
+      m_NrrdOdfImageReader = new NrrdOdfImageReader();
 
       m_DiffusionImageNrrdWriterService = new DiffusionImageNrrdWriterService();
       m_DiffusionImageNiftiWriterService = new DiffusionImageNiftiWriterService();
       m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
-      m_NrrdQBallImageWriter = new NrrdQBallImageWriter();
+      m_NrrdOdfImageWriter = new NrrdOdfImageWriter();
 
       //register relevant properties
       //non-persistent properties
@@ -106,12 +106,12 @@ namespace mitk
       delete m_DiffusionImageFslNiftiReaderService;
       delete m_DiffusionImageDicomReaderService;
       delete m_NrrdTensorImageReader;
-      delete m_NrrdQBallImageReader;
+      delete m_NrrdOdfImageReader;
 
       delete m_DiffusionImageNrrdWriterService;
       delete m_DiffusionImageNiftiWriterService;
       delete m_NrrdTensorImageWriter;
-      delete m_NrrdQBallImageWriter;
+      delete m_NrrdOdfImageWriter;
     }
 
   private:
@@ -121,12 +121,12 @@ namespace mitk
     DiffusionImageNiftiReaderService * m_DiffusionImageFslNiftiReaderService;
     DiffusionImageDicomReaderService * m_DiffusionImageDicomReaderService;
     NrrdTensorImageReader * m_NrrdTensorImageReader;
-    NrrdQBallImageReader * m_NrrdQBallImageReader;
+    NrrdOdfImageReader * m_NrrdOdfImageReader;
 
     DiffusionImageNrrdWriterService * m_DiffusionImageNrrdWriterService;
     DiffusionImageNiftiWriterService * m_DiffusionImageNiftiWriterService;
     NrrdTensorImageWriter * m_NrrdTensorImageWriter;
-    NrrdQBallImageWriter * m_NrrdQBallImageWriter;
+    NrrdOdfImageWriter * m_NrrdOdfImageWriter;
 
     std::vector<mitk::CustomMimeType*> m_MimeTypes;
 

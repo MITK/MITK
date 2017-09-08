@@ -15,10 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkQBallImageSource.h"
+#include "mitkOdfImageSource.h"
 
 
-mitk::QBallImageSource::QBallImageSource()
+mitk::OdfImageSource::OdfImageSource()
 {
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type TOutputImage
@@ -28,13 +28,13 @@ mitk::QBallImageSource::QBallImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-itk::DataObject::Pointer mitk::QBallImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::OdfImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
   return OutputImageType::New().GetPointer();
 }
 
 
-itk::DataObject::Pointer mitk::QBallImageSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::OdfImageSource::MakeOutput( const DataObjectIdentifierType & name )
 {
   itkDebugMacro("MakeOutput(" << name << ")");
   if( this->IsIndexedOutputName(name) )

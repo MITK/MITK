@@ -14,9 +14,9 @@ set(CPP_FILES
   mitkDiffusionImageNiftiReaderService.cpp
   mitkDiffusionImageNiftiWriterService.cpp
 
-  mitkNrrdQBallImageReader.cpp
-  mitkNrrdQBallImageWriter.cpp
-  mitkQBallImageSerializer.cpp
+  mitkNrrdOdfImageReader.cpp
+  mitkNrrdOdfImageWriter.cpp
+  mitkOdfImageSerializer.cpp
 
   mitkCompositeMapper.cpp
 )

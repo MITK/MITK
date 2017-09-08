@@ -837,9 +837,9 @@ void mitk::OdfVtkMapper2D<T,N>
     if(classname.compare(input->GetNameOfClass())==0)
         m_VtkImage = dynamic_cast<mitk::TensorImage*>( this->GetInput() )->GetNonRgbVtkImageData();
 
-    std::string qclassname("QBallImage");
+    std::string qclassname("OdfImage");
     if(qclassname.compare(input->GetNameOfClass())==0)
-        m_VtkImage = dynamic_cast<mitk::QBallImage*>( this->GetInput() )->GetNonRgbVtkImageData();
+        m_VtkImage = dynamic_cast<mitk::OdfImage*>( this->GetInput() )->GetNonRgbVtkImageData();
 
     if( m_VtkImage )
     {

@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __itkDiffusionQballPrepareVisualizationImageFilter_cpp
-#define __itkDiffusionQballPrepareVisualizationImageFilter_cpp
+#ifndef __itkDiffusionOdfPrepareVisualizationImageFilter_cpp
+#define __itkDiffusionOdfPrepareVisualizationImageFilter_cpp
 
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "itkDiffusionQballPrepareVisualizationImageFilter.h"
+#include "itkDiffusionOdfPrepareVisualizationImageFilter.h"
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkImageRegionIterator.h"
@@ -34,11 +34,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk {
 
-  //#define QBALL_RECON_PI       M_PI
+  //#define Odf_RECON_PI       M_PI
 
   template< class TOdfPixelType, int NrOdfDirections>
-    DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType, NrOdfDirections>
-    ::DiffusionQballPrepareVisualizationImageFilter() :
+    DiffusionOdfPrepareVisualizationImageFilter< TOdfPixelType, NrOdfDirections>
+    ::DiffusionOdfPrepareVisualizationImageFilter() :
   m_Threshold(0),
     m_ScaleByGfaType(GfaFilterType::GFA_STANDARD),
     m_DoScaleGfa(false),
@@ -52,7 +52,7 @@ namespace itk {
 
   template< class TOdfPixelType,
     int NrOdfDirections>
-    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType,
+    void DiffusionOdfPrepareVisualizationImageFilter< TOdfPixelType,
     NrOdfDirections>
     ::BeforeThreadedGenerateData()
   {
@@ -96,7 +96,7 @@ namespace itk {
 
   template< class TOdfPixelType,
     int NrOdfDirections>
-    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType,
+    void DiffusionOdfPrepareVisualizationImageFilter< TOdfPixelType,
     NrOdfDirections>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
     ThreadIdType )
@@ -172,7 +172,7 @@ namespace itk {
 
   template< class TOdfPixelType,
     int NrOdfDirections>
-    void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType,
+    void DiffusionOdfPrepareVisualizationImageFilter< TOdfPixelType,
     NrOdfDirections>
     ::PrintSelf(std::ostream& os, Indent indent) const
   {
@@ -183,4 +183,4 @@ namespace itk {
 
 }
 
-#endif // __itkDiffusionQballPrepareVisualizationImageFilter_cpp
+#endif // __itkDiffusionOdfPrepareVisualizationImageFilter_cpp

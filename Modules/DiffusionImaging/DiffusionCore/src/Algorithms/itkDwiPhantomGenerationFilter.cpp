@@ -66,7 +66,7 @@ namespace itk {
     outImage->SetLargestPossibleRegion( m_ImageRegion );
     outImage->SetBufferedRegion( m_ImageRegion );
     outImage->SetRequestedRegion( m_ImageRegion );
-    outImage->SetVectorLength(QBALL_ODFSIZE);
+    outImage->SetVectorLength(ODF_SAMPLING_SIZE);
     outImage->Allocate();
     // ITKv4 migration fix : removing OutputImageType::PixelType(0.0)
     // the conversion is handled internally by the itk::Image

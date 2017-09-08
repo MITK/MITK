@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 
 #include <fstream>
 #include <exception>
@@ -52,7 +52,7 @@ SphereInterpolator::SphereInterpolator(const string& lutPath)
 
   size = 301;
   sN = (size-1)/2;
-  nverts = QBALL_ODFSIZE;
+  nverts = ODF_SAMPLING_SIZE;
   beta = 0.5;
 
   inva = (sqrt(1+beta)-sqrt(beta));

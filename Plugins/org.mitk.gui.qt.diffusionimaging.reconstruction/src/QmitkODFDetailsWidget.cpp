@@ -38,7 +38,7 @@ QmitkODFDetailsWidget::~QmitkODFDetailsWidget()
 {
 }
 
-void QmitkODFDetailsWidget::SetParameters( itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf )
+void QmitkODFDetailsWidget::SetParameters( itk::OrientationDistributionFunction<double, ODF_SAMPLING_SIZE> odf )
 {
   this->Clear();
 
@@ -47,7 +47,7 @@ void QmitkODFDetailsWidget::SetParameters( itk::OrientationDistributionFunction<
   float max = itk::NumericTraits<float>::NonpositiveMin();
   float min = itk::NumericTraits<float>::max();
 
-  for (int i=0; i<QBALL_ODFSIZE; i++){
+  for (int i=0; i<ODF_SAMPLING_SIZE; i++){
     xVals.push_back(i);
     yVals.push_back(odf[i]);
     if (odf[i]>max)

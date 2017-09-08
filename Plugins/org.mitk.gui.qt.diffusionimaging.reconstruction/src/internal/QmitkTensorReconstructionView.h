@@ -86,7 +86,7 @@ class QmitkTensorReconstructionView : public QmitkAbstractView, public mitk::ILi
 
 protected slots:
 
-  void TensorsToQbi();
+  void TensorsToOdf();
   void TensorsToDWI();
   void DoTensorsToDWI(mitk::DataStorage::SetOfObjects::Pointer inImages);
   void Advanced1CheckboxClicked();

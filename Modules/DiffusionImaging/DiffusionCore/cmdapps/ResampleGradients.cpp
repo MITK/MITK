@@ -60,7 +60,7 @@ typedef itk::VectorImage< short, 3 > ItkDwiType;
 #include <itkDwiGradientLengthCorrectionFilter.h>
 #include <itkDwiNormilzationFilter.h>
 #include <mitkTensorImage.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 
 // Multishell includes
 #include <itkRadialMultishellToSingleshellImageFilter.h>

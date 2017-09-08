@@ -205,7 +205,7 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
     GradientBackground
     ItkBaseDataAdapter
     SlicedData
-    QBallImage
+    OdfImage
     SeedsImage
     TensorImage
     BoundingObject

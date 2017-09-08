@@ -58,7 +58,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 #include <mitkITKImageImport.h>
 
-#include <itkTensorImageToQBallImageFilter.h>
+#include <itkTensorImageToOdfImageFilter.h>
 #include <itkResidualImageFilter.h>
 
 #include <berryIWorkbenchWindow.h>
@@ -111,7 +111,7 @@ void QmitkTensorReconstructionView::CreateConnections()
         connect( (QObject*)(m_Controls->m_StartReconstruction), SIGNAL(clicked()), this, SLOT(Reconstruct()) );
         connect( (QObject*)(m_Controls->m_Advanced1), SIGNAL(clicked()), this, SLOT(Advanced1CheckboxClicked()) );
         connect( (QObject*)(m_Controls->m_TensorsToDWIButton), SIGNAL(clicked()), this, SLOT(TensorsToDWI()) );
-        connect( (QObject*)(m_Controls->m_TensorsToQbiButton), SIGNAL(clicked()), this, SLOT(TensorsToQbi()) );
+        connect( (QObject*)(m_Controls->m_TensorsToOdfButton), SIGNAL(clicked()), this, SLOT(TensorsToOdf()) );
         connect( (QObject*)(m_Controls->m_ResidualButton), SIGNAL(clicked()), this, SLOT(ResidualCalculation()) );
         connect( (QObject*)(m_Controls->m_PerSliceView), SIGNAL(pointSelected(int, int)), this, SLOT(ResidualClicked(int, int)) );
         connect( (QObject*)(m_Controls->m_TensorReconstructionThreshold), SIGNAL(valueChanged(int)), this, SLOT(PreviewThreshold(int)) );
@@ -780,12 +780,12 @@ void QmitkTensorReconstructionView::TensorsToDWI()
     DoTensorsToDWI(m_TensorImages);
 }
 
-void QmitkTensorReconstructionView::TensorsToQbi()
+void QmitkTensorReconstructionView::TensorsToOdf()
 {
     for (unsigned int i=0; i<m_TensorImages->size(); i++)
     {
         mitk::DataNode::Pointer tensorImageNode = m_TensorImages->at(i);
-        MITK_INFO << "starting Q-Ball estimation";
+        MITK_INFO << "starting ODF estimation";
 
         typedef float                                       TTensorPixelType;
         typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
@@ -794,21 +794,21 @@ void QmitkTensorReconstructionView::TensorsToQbi()
         TensorImageType::Pointer itkvol = TensorImageType::New();
         mitk::CastToItkImage(dynamic_cast<mitk::TensorImage*>(tensorImageNode->GetData()), itkvol);
 
-        typedef itk::TensorImageToQBallImageFilter< TTensorPixelType, TTensorPixelType > FilterType;
+        typedef itk::TensorImageToOdfImageFilter< TTensorPixelType, TTensorPixelType > FilterType;
         FilterType::Pointer filter = FilterType::New();
         filter->SetInput( itkvol );
         filter->Update();
 
-        typedef itk::Vector<TTensorPixelType,QBALL_ODFSIZE>  OutputPixelType;
+        typedef itk::Vector<TTensorPixelType,ODF_SAMPLING_SIZE>  OutputPixelType;
         typedef itk::Image<OutputPixelType,3>                OutputImageType;
 
-        mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+        mitk::OdfImage::Pointer image = mitk::OdfImage::New();
         OutputImageType::Pointer outimg = filter->GetOutput();
         image->InitializeByItk( outimg.GetPointer() );
         image->SetVolume( outimg->GetBufferPointer() );
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData( image );
-        node->SetName(tensorImageNode->GetName()+"_Qball");
+        node->SetName(tensorImageNode->GetName()+"_Odf");
         GetDataStorage()->Add(node, tensorImageNode);
     }
 }
@@ -852,7 +852,7 @@ void QmitkTensorReconstructionView::OnSelectionChanged(berry::IWorkbenchPart::Po
     m_Controls->m_StartReconstruction->setEnabled(foundDwiVolume);
 
     m_Controls->m_TensorsToDWIButton->setEnabled(foundTensorVolume);
-    m_Controls->m_TensorsToQbiButton->setEnabled(foundTensorVolume);
+    m_Controls->m_TensorsToOdfButton->setEnabled(foundTensorVolume);
 
     if (foundDwiVolume || foundTensorVolume)
         m_Controls->m_InputData->setTitle("Input Data");

@@ -566,7 +566,7 @@ float mitk::LabelSetImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer *re
   int layer = 0;
   GetDataNode()->GetIntProperty("layer", layer, renderer);
   // add the layer property for each image to render images with a higher layer on top of the others
-  depth += layer * 10; //*10: keep some room for each image (e.g. for QBalls in between)
+  depth += layer * 10; //*10: keep some room for each image (e.g. for ODFs in between)
   if (depth > 0.0f)
   {
     depth = 0.0f;

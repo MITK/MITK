@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 
 #include <mitkImage.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <mitkBaseData.h>
 #include "mitkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>

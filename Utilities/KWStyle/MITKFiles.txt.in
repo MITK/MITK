@@ -124,8 +124,8 @@ MITK_SOURCE_DIR@/Modules/RigidRegistration/*.cpp
 @MITK_SOURCE_DIR@/Modules/DiffusionImaging/IODataStructures/DiffusionWeightedImages/*.h
 @MITK_SOURCE_DIR@/Modules/DiffusionImaging/IODataStructures/TensorImages/*.cpp
 @MITK_SOURCE_DIR@/Modules/DiffusionImaging/IODataStructures/TensorImages/*.h
-@MITK_SOURCE_DIR@/Modules/DiffusionImaging/IODataStructures/QBallImages/*.cpp
-@MITK_SOURCE_DIR@/Modules/DiffusionImaging/IODataStructures/QBallImages/*.h
+@MITK_SOURCE_DIR@/Modules/DiffusionImaging/IODataStructures/OdfImages/*.cpp
+@MITK_SOURCE_DIR@/Modules/DiffusionImaging/IODataStructures/OdfImages/*.h
 @MITK_SOURCE_DIR@/Modules/IGT/*.cpp
 @MITK_SOURCE_DIR@/Modules/IGT/*.h
 @MITK_SOURCE_DIR@/Modules/IGT/IGTTrackingDevices/*.cpp

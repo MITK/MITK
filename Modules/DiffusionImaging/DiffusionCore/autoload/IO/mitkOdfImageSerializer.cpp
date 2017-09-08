@@ -14,40 +14,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkQBallImageSerializer.h"
-#include "mitkQBallImage.h"
-#include "mitkNrrdQBallImageWriter.h"
+#include "mitkOdfImageSerializer.h"
+#include "mitkOdfImage.h"
+#include "mitkNrrdOdfImageWriter.h"
 
 #include <itksys/SystemTools.hxx>
 
 
-MITK_REGISTER_SERIALIZER(QBallImageSerializer)
+MITK_REGISTER_SERIALIZER(OdfImageSerializer)
 
 
-mitk::QBallImageSerializer::QBallImageSerializer()
+mitk::OdfImageSerializer::OdfImageSerializer()
 {
 }
 
 
-mitk::QBallImageSerializer::~QBallImageSerializer()
+mitk::OdfImageSerializer::~OdfImageSerializer()
 {
 }
 
 
-std::string mitk::QBallImageSerializer::Serialize()
+std::string mitk::OdfImageSerializer::Serialize()
 {
-  const QBallImage* image = dynamic_cast<const QBallImage*>( m_Data.GetPointer() );
+  const OdfImage* image = dynamic_cast<const OdfImage*>( m_Data.GetPointer() );
   if (image == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::NrrdQBallImage. Cannot serialize as NrrdQBallImage.";
+              << " is not an mitk::NrrdOdfImage. Cannot serialize as NrrdOdfImage.";
     return "";
   }
 
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
   filename += "_";
   filename += m_FilenameHint;
-  filename += ".qbi";
+  filename += ".odf";
 
   std::string fullname(m_WorkingDirectory);
   fullname += "/";
@@ -55,9 +55,9 @@ std::string mitk::QBallImageSerializer::Serialize()
 
   try
   {
-    NrrdQBallImageWriter writer;
+    NrrdOdfImageWriter writer;
     writer.SetOutputLocation(fullname);
-    writer.SetInput(const_cast<QBallImage*>(image));
+    writer.SetInput(const_cast<OdfImage*>(image));
     writer.Write();
   }
   catch (std::exception& e)

@@ -40,8 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk {
 
-//#define QBALL_RECON_PI       M_PI
-
 template< class TTensorPixelType>
 DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>::DiffusionTensorPrincipalDirectionImageFilter()
     : m_NormalizeVectors(true)
@@ -279,4 +277,4 @@ void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
 }
 
 }
-#endif // __itkDiffusionQballPrincipleDirectionsImageFilter_txx
+#endif

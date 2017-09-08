@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkNrrdQBallImageReader.h"
+#include "mitkNrrdOdfImageReader.h"
 #include <mitkCustomMimeType.h>
 #include "mitkDiffusionCoreIOMimeTypes.h"
 
@@ -28,22 +28,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  NrrdQBallImageReader::NrrdQBallImageReader(const NrrdQBallImageReader& other)
+  NrrdOdfImageReader::NrrdOdfImageReader(const NrrdOdfImageReader& other)
     : mitk::AbstractFileReader(other)
   {
   }
 
-  NrrdQBallImageReader::NrrdQBallImageReader()
-    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::QBI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::QBI_MIMETYPE_DESCRIPTION() )
+  NrrdOdfImageReader::NrrdOdfImageReader()
+    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::ODF_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::ODF_MIMETYPE_DESCRIPTION() )
   {
     m_ServiceReg = this->RegisterService();
   }
 
-  NrrdQBallImageReader::~NrrdQBallImageReader()
+  NrrdOdfImageReader::~NrrdOdfImageReader()
   {
   }
 
-  std::vector<itk::SmartPointer<BaseData> > NrrdQBallImageReader::Read()
+  std::vector<itk::SmartPointer<BaseData> > NrrdOdfImageReader::Read()
   {
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
     std::string location = GetInputLocation();
@@ -67,7 +67,7 @@ namespace mitk
         reader->Update();
         ImageType::Pointer img = reader->GetOutput();
 
-        typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> VecImgType;
+        typedef itk::Image<itk::Vector<float,ODF_SAMPLING_SIZE>,3> VecImgType;
         VecImgType::Pointer vecImg = VecImgType::New();
         vecImg->SetSpacing( img->GetSpacing() );   // Set the image spacing
         vecImg->SetOrigin( img->GetOrigin() );     // Set the image origin
@@ -112,7 +112,7 @@ namespace mitk
 
 } //namespace MITK
 
-mitk::NrrdQBallImageReader* mitk::NrrdQBallImageReader::Clone() const
+mitk::NrrdOdfImageReader* mitk::NrrdOdfImageReader::Clone() const
 {
-  return new NrrdQBallImageReader(*this);
+  return new NrrdOdfImageReader(*this);
 }

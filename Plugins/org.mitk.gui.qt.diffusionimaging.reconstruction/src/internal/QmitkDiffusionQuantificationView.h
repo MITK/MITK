@@ -72,8 +72,8 @@ protected slots:
   void ADC_DWI();
   void MD_DWI();
 
-  void QBIQuantify(int method);
-  void QBIQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
+  void OdfQuantify(int method);
+  void OdfQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
     int method) ;
 
   void TensorQuantify(int method);
@@ -92,7 +92,7 @@ protected:
 
   Ui::QmitkDiffusionQuantificationViewControls* m_Controls;
 
-  mitk::DataStorage::SetOfObjects::Pointer m_QBallImages;
+  mitk::DataStorage::SetOfObjects::Pointer m_OdfImages;
   mitk::DataStorage::SetOfObjects::Pointer m_TensorImages;
   mitk::DataStorage::SetOfObjects::Pointer m_DwImages;
 

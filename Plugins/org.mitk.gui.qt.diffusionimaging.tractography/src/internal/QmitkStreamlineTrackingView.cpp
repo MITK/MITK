@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDimension.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <mitkSliceNavigationController.h>
 
 // VTK
@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCellData.h>
 
-#include <itkTensorImageToQBallImageFilter.h>
+#include <itkTensorImageToOdfImageFilter.h>
 #include <omp.h>
 
 const std::string QmitkStreamlineTrackingView::VIEW_ID = "org.mitk.views.streamlinetracking";
@@ -450,7 +450,7 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
         m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
         retrack = true;
       }
-      else if ( dynamic_cast<mitk::QBallImage*>(node->GetData()) )
+      else if ( dynamic_cast<mitk::OdfImage*>(node->GetData()) )
       {
         m_InputImageNodes.push_back(node);
         m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
@@ -547,7 +547,7 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->mFaImageLabel->setEnabled(true);
       m_Controls->m_FaImageBox->setEnabled(true);
     }
-    else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
+    else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
       m_Controls->mFaImageLabel->setEnabled(true);
       m_Controls->m_FaImageBox->setEnabled(true);
@@ -621,7 +621,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         TensorImageType::Pointer itkImg = TensorImageType::New();
         mitk::CastToItkImage(m_InputImages.at(0), itkImg);
 
-        typedef itk::TensorImageToQBallImageFilter< float, float > FilterType;
+        typedef itk::TensorImageToOdfImageFilter< float, float > FilterType;
         FilterType::Pointer filter = FilterType::New();
         filter->SetInput( itkImg );
         filter->Update();
@@ -670,7 +670,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetG((float)m_Controls->m_gBox->value());
     }
   }
-  else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
+  else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) )
   {
     if (m_TrackingHandler==nullptr)
     {

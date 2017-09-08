@@ -10,12 +10,12 @@ The corresponding comman line application is named "MitkGlobalTractography".
 \section QmitkGibbsTrackingUserManualInputData Input Data
 
 Mandatory Input:
-\li One Q-Ball or tensor image selected in the datamanager
+\li One ODF or tensor image selected in the datamanager
 
 Optional Input:
 \li Mask Image: White matter probability mask. Corresponds to the probability to generate fiber segments in the respective voxel.
 
-\section QmitkGibbsTrackingUserManualParameters Q-Ball Reconstruction
+\section QmitkGibbsTrackingUserManualParameters ODF Reconstruction
 
 \li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Recommended: minimum 10^8 iterations for full brain tractography.
 \li Particle length/width/weight controlling the contribution of each particle to the model M

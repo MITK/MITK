@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
-#ifndef __itkDiffusionQballGeneralizedFaImageFilter_h_
-#define __itkDiffusionQballGeneralizedFaImageFilter_h_
+#ifndef __itkDiffusionOdfGeneralizedFaImageFilter_h_
+#define __itkDiffusionOdfGeneralizedFaImageFilter_h_
 
 //#include "MitkDiffusionImagingMBIExports.h"
 #include "itkImageToImageFilter.h"
@@ -32,13 +32,13 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkVectorImage.h"
 
 namespace itk{
-/** \class DiffusionQballGeneralizedFaImageFilter
+/** \class DiffusionOdfGeneralizedFaImageFilter
  */
 
 template< class TOdfPixelType,
           class TGfaPixelType,
           int NrOdfDirections>
-class DiffusionQballGeneralizedFaImageFilter :
+class DiffusionOdfGeneralizedFaImageFilter :
   public ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
                               Image< TGfaPixelType, 3 > >
 {
@@ -63,7 +63,7 @@ public:
     GFA_GENERALIZED_GFA
   };
 
-  typedef DiffusionQballGeneralizedFaImageFilter Self;
+  typedef DiffusionOdfGeneralizedFaImageFilter Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
   typedef ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
@@ -75,7 +75,7 @@ public:
   itkCloneMacro(Self)
 
   /** Runtime information support. */
-  itkTypeMacro(DiffusionQballGeneralizedFaImageFilter,
+  itkTypeMacro(DiffusionOdfGeneralizedFaImageFilter,
                                                    ImageToImageFilter);
 
   typedef TOdfPixelType                 OdfComponentType;
@@ -103,8 +103,8 @@ public:
   itkSetMacro(Param2, double);
 
 protected:
-  DiffusionQballGeneralizedFaImageFilter();
-  ~DiffusionQballGeneralizedFaImageFilter() {};
+  DiffusionOdfGeneralizedFaImageFilter();
+  ~DiffusionOdfGeneralizedFaImageFilter() {};
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   void BeforeThreadedGenerateData();
@@ -121,8 +121,8 @@ protected:
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkDiffusionQballGeneralizedFaImageFilter.txx"
+#include "itkDiffusionOdfGeneralizedFaImageFilter.txx"
 #endif
 
-#endif //__itkDiffusionQballGeneralizedFaImageFilter_h_
+#endif //__itkDiffusionOdfGeneralizedFaImageFilter_h_
 

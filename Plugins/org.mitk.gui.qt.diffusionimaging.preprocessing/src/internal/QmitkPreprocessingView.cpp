@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDwiGradientLengthCorrectionFilter.h>
 #include <itkDwiNormilzationFilter.h>
 #include <mitkTensorImage.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 
 // Multishell includes
 #include <itkRadialMultishellToSingleshellImageFilter.h>
@@ -140,8 +140,8 @@ void QmitkPreprocessingView::CreateConnections()
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
 
     mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-    mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
-    mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isQbi, isDti);
+    mitk::NodePredicateDataType::Pointer isOdf = mitk::NodePredicateDataType::New("OdfImage");
+    mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isOdf, isDti);
 
     mitk::NodePredicateAnd::Pointer noDiffusionImage = mitk::NodePredicateAnd::New(isMitkImage, mitk::NodePredicateNot::New(isDiffusionImage));
     mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));

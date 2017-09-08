@@ -86,7 +86,7 @@ protected slots:
 
   void Welcome();
 
-  /// \brief Slot function for switching tensor view between ODF q-balls and ellipsoids from tensors.
+  /// \brief Slot function for switching tensor view between ODF and ellipsoids from tensors.
   void OnTensorViewChanged();
 
   /// \brief Slot function for switching colourisation mode of glyphs.

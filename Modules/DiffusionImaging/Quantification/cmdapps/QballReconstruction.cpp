@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
         propertyHelper.AverageRedundantGradients(0.001);
         propertyHelper.InitializeImage();
 
-        mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+        mitk::OdfImage::Pointer image = mitk::OdfImage::New();
         mitk::Image::Pointer coeffsImage = mitk::Image::New();
 
         std::cout << "SH order: " << shOrder;
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
         {
         case 4:
         {
-            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,ODF_SAMPLING_SIZE> FilterType;
             mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
         }
         case 6:
         {
-            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6,QBALL_ODFSIZE> FilterType;
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6,ODF_SAMPLING_SIZE> FilterType;
             mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
         }
         case 8:
         {
-            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,8,QBALL_ODFSIZE> FilterType;
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,8,ODF_SAMPLING_SIZE> FilterType;
             mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
         }
         case 10:
         {
-            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,10,QBALL_ODFSIZE> FilterType;
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,10,ODF_SAMPLING_SIZE> FilterType;
             mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
         }
         case 12:
         {
-            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,12,QBALL_ODFSIZE> FilterType;
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,12,ODF_SAMPLING_SIZE> FilterType;
             mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
         default:
         {
             std::cout << "Supplied SH order not supported. Using default order of 4.";
-            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,ODF_SAMPLING_SIZE> FilterType;
             mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
             mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
@@ -241,7 +241,7 @@ int main(int argc, char* argv[])
         std::string coeffout = outfilename;
         coeffout += "_shcoeffs.nrrd";
 
-        outfilename += ".qbi";
+        outfilename += ".odf";
         mitk::IOUtil::Save(image, outfilename);
 
         if (outCoeffs)

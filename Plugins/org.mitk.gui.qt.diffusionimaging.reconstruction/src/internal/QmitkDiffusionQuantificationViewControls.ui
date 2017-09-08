@@ -124,7 +124,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Q-Ball image</string>
+      <string>ODF image</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>

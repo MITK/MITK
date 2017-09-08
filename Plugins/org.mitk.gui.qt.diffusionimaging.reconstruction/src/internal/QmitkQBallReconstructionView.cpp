@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkB0ImageExtractionImageFilter.h"
 #include <itkBinaryThresholdImageFilter.h>
 
-#include "mitkQBallImage.h"
+#include "mitkOdfImage.h"
 #include "mitkProperties.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkLookupTable.h"
@@ -586,7 +586,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
                                                     "QBall reconstruction for %s", nodename.c_str()).toLatin1());
 
       typedef itk::DiffusionQballReconstructionImageFilter
-          <DiffusionPixelType, DiffusionPixelType, TTensorPixelType, QBALL_ODFSIZE>
+          <DiffusionPixelType, DiffusionPixelType, TTensorPixelType, ODF_SAMPLING_SIZE>
           QballReconstructionImageFilterType;
 
       ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
@@ -637,7 +637,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       MITK_DEBUG << "took " << clock.GetMean() << "s." ;
 
       // ODFs TO DATATREE
-      mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+      mitk::OdfImage::Pointer image = mitk::OdfImage::New();
       image->InitializeByItk( filter->GetOutput() );
       image->SetVolume( filter->GetOutput()->GetBufferPointer() );
       mitk::DataNode::Pointer node=mitk::DataNode::New();
@@ -757,7 +757,7 @@ template<int L>
 void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::DataNode* dataNodePointer, float lambda, int normalization)
 {
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter
-      <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
+      <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,ODF_SAMPLING_SIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
 
   mitk::Image* vols = dynamic_cast<mitk::Image*>(dataNodePointer->GetData());
@@ -831,7 +831,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   filter->Update();
 
   // ODFs TO DATATREE
-  mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
   image->InitializeByItk( filter->GetOutput() );
   image->SetVolume( filter->GetOutput()->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
@@ -945,7 +945,7 @@ template<int L>
 void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambda, mitk::DataNode* dataNodePointer)
 {
   typedef itk::DiffusionMultiShellQballReconstructionImageFilter
-      <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
+      <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,ODF_SAMPLING_SIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
 
   std::string nodename;
@@ -1004,7 +1004,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   }
 
   // ODFs TO DATATREE
-  mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
   image->InitializeByItk( filter->GetOutput() );
   image->SetVolume( filter->GetOutput()->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();

@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
-#include <itkTensorImageToQBallImageFilter.h>
+#include <itkTensorImageToOdfImageFilter.h>
 #include <mitkTractographyForest.h>
 
 #define _USE_MATH_DEFINES
@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
     caster->Update();
     mitk::TrackingHandlerTensor::ItkTensorImageType::Pointer itkTensorImg = caster->GetOutput();
 
-    typedef itk::TensorImageToQBallImageFilter< float, float > FilterType;
+    typedef itk::TensorImageToOdfImageFilter< float, float > FilterType;
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( itkTensorImg );
     filter->Update();

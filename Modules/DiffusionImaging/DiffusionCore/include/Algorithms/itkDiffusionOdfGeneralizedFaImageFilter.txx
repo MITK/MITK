@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __itkDiffusionQballGeneralizedFaImageFilter_txx
-#define __itkDiffusionQballGeneralizedFaImageFilter_txx
+#ifndef __itkDiffusionOdfGeneralizedFaImageFilter_txx
+#define __itkDiffusionOdfGeneralizedFaImageFilter_txx
 
 #include <time.h>
 #include <stdio.h>
@@ -33,14 +33,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk {
 
-  //#define QBALL_RECON_PI       M_PI
-
   template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
+    DiffusionOdfGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
-    ::DiffusionQballGeneralizedFaImageFilter() :
+    ::DiffusionOdfGeneralizedFaImageFilter() :
         m_ComputationMethod(GFA_STANDARD)
   {
     // At least 1 inputs is necessary for a vector image.
@@ -51,7 +49,7 @@ namespace itk {
   template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
+    void DiffusionOdfGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::BeforeThreadedGenerateData()
   {
@@ -60,7 +58,7 @@ namespace itk {
   template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
+    void DiffusionOdfGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
     ThreadIdType )
@@ -210,7 +208,7 @@ namespace itk {
   template< class TOdfPixelType,
   class TGfaPixelType,
     int NrOdfDirections>
-    void DiffusionQballGeneralizedFaImageFilter< TOdfPixelType,
+    void DiffusionOdfGeneralizedFaImageFilter< TOdfPixelType,
     TGfaPixelType, NrOdfDirections>
     ::PrintSelf(std::ostream& os, Indent indent) const
   {
@@ -219,4 +217,4 @@ namespace itk {
 
 }
 
-#endif // __itkDiffusionQballGeneralizedFaImageFilter_txx
+#endif // __itkDiffusionOdfGeneralizedFaImageFilter_txx

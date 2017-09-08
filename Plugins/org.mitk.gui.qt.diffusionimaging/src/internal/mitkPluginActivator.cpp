@@ -42,14 +42,14 @@ void PluginActivator::start(ctkPluginContext* context)
     QmitkNodeDescriptorManager* manager = QmitkNodeDescriptorManager::GetInstance();
 
     mitk::NodePredicateIsDWI::Pointer isDiffusionImage = mitk::NodePredicateIsDWI::New();
-    QmitkNodeDescriptor* desc = new QmitkNodeDescriptor(QObject::tr("DiffusionImage"), QString(":/QmitkDiffusionImaging/QBallData24.png"), isDiffusionImage, manager);
+    QmitkNodeDescriptor* desc = new QmitkNodeDescriptor(QObject::tr("DiffusionImage"), QString(":/QmitkDiffusionImaging/DiffData24.png"), isDiffusionImage, manager);
     manager->AddDescriptor(desc);
 
     mitk::NodePredicateDataType::Pointer isTensorImage = mitk::NodePredicateDataType::New("TensorImage");
     manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("TensorImage"), QString(":/QmitkDiffusionImaging/tensor.png"), isTensorImage, manager));
 
-    mitk::NodePredicateDataType::Pointer isQBallImage = mitk::NodePredicateDataType::New("QBallImage");
-    manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("QBallImage"), QString(":/QmitkDiffusionImaging/qball.png"), isQBallImage, manager));
+    mitk::NodePredicateDataType::Pointer isOdfImage = mitk::NodePredicateDataType::New("OdfImage");
+    manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("OdfImage"), QString(":/QmitkDiffusionImaging/odf.png"), isOdfImage, manager));
 
     mitk::NodePredicateDataType::Pointer isFiberBundle = mitk::NodePredicateDataType::New("FiberBundle");
     manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundle"), QString(":/QmitkDiffusionImaging/tractogram.png"), isFiberBundle, manager));

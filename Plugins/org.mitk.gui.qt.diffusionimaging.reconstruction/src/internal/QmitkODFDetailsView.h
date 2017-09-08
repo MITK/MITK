@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkImage.h>
 #include <itkOrientationDistributionFunction.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <vtkTransform.h>
 #include <vtkDoubleArray.h>
 #include <vtkOdfSource.h>
@@ -56,7 +56,7 @@ public:
   virtual ~QmitkODFDetailsView();
 
   typedef float TOdfPixelType;
-  typedef itk::Vector<TOdfPixelType,QBALL_ODFSIZE> OdfVectorType;
+  typedef itk::Vector<TOdfPixelType,ODF_SAMPLING_SIZE> OdfVectorType;
   typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
 
   typedef itk::DiffusionTensor3D< TOdfPixelType >  TensorPixelType;

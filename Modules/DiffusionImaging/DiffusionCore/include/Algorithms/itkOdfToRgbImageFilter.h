@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __itkQBallToRgbImageFilter_h
-#define __itkQBallToRgbImageFilter_h
+#ifndef __itkOdfToRgbImageFilter_h
+#define __itkOdfToRgbImageFilter_h
 
 #include "itkUnaryFunctorImageFilter.h"
 #include "itkOrientationDistributionFunction.h"
@@ -30,17 +30,17 @@ namespace itk
   ( (val) < 0 ) ? ( 0 ) : ( ( (val)>1 ) ? ( 1 ) : ( (val) ) );
 
 
-/** \class QBallToRgbImageFilter
+/** \class OdfToRgbImageFilter
 *
 */
 template <typename TInputImage,
 typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
-                      class QBallToRgbImageFilter :
+                      class OdfToRgbImageFilter :
                       public ImageToImageFilter<TInputImage,TOutputImage>
                       {
                       public:
   /** Standard class typedefs. */
-  typedef QBallToRgbImageFilter  Self;
+  typedef OdfToRgbImageFilter  Self;
   typedef ImageToImageFilter<TInputImage,TOutputImage>
       Superclass;
   typedef SmartPointer<Self>                     Pointer;
@@ -53,7 +53,7 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
   typedef typename InputPixelType::ValueType      InputValueType;
 
   /** Run-time type information (and related methods).   */
-  itkTypeMacro( QBallToRgbImageFilter, ImageToImageFilter )
+  itkTypeMacro( OdfToRgbImageFilter, ImageToImageFilter )
 
   /** Method for creation through the object factory. */
   itkFactorylessNewMacro(Self)
@@ -71,38 +71,38 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
 #endif
 
 protected:
-  QBallToRgbImageFilter(){}
-  virtual ~QBallToRgbImageFilter(){}
+  OdfToRgbImageFilter(){}
+  virtual ~OdfToRgbImageFilter(){}
 
   void GenerateData()
   {
 
-    typename InputImageType::Pointer qballImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+    typename InputImageType::Pointer OdfImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
     typename OutputImageType::Pointer outputImage =
         static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
-    typename InputImageType::RegionType region = qballImage->GetLargestPossibleRegion();
+    typename InputImageType::RegionType region = OdfImage->GetLargestPossibleRegion();
 
-    outputImage->SetSpacing( qballImage->GetSpacing() );   // Set the image spacing
-    outputImage->SetOrigin( qballImage->GetOrigin() );     // Set the image origin
-    outputImage->SetDirection( qballImage->GetDirection() );  // Set the image direction
-    outputImage->SetRegions( qballImage->GetLargestPossibleRegion());
+    outputImage->SetSpacing( OdfImage->GetSpacing() );   // Set the image spacing
+    outputImage->SetOrigin( OdfImage->GetOrigin() );     // Set the image origin
+    outputImage->SetDirection( OdfImage->GetDirection() );  // Set the image direction
+    outputImage->SetRegions( OdfImage->GetLargestPossibleRegion());
     outputImage->Allocate();
 
-    typedef ImageRegionConstIterator< InputImageType > QBallImageIteratorType;
-    QBallImageIteratorType qballIt(qballImage, qballImage->GetLargestPossibleRegion());
+    typedef ImageRegionConstIterator< InputImageType > OdfImageIteratorType;
+    OdfImageIteratorType OdfIt(OdfImage, OdfImage->GetLargestPossibleRegion());
 
     typedef ImageRegionIterator< OutputImageType > OutputImageIteratorType;
     OutputImageIteratorType outputIt(outputImage, outputImage->GetLargestPossibleRegion());
 
-    qballIt.GoToBegin();
+    OdfIt.GoToBegin();
     outputIt.GoToBegin();
 
-    while(!qballIt.IsAtEnd() && !outputIt.IsAtEnd()){
+    while(!OdfIt.IsAtEnd() && !outputIt.IsAtEnd()){
 
-      InputPixelType x = qballIt.Get();
-      typedef itk::OrientationDistributionFunction<float,QBALL_ODFSIZE> OdfType;
+      InputPixelType x = OdfIt.Get();
+      typedef itk::OrientationDistributionFunction<float,ODF_SAMPLING_SIZE> OdfType;
       OdfType odf(x.GetDataPointer());
 
       vnl_vector_fixed<double,3> dir;
@@ -132,14 +132,14 @@ protected:
 
       outputIt.Set(out);
 
-      ++qballIt;
+      ++OdfIt;
       ++outputIt;
     }
 
   }
 
 private:
-  QBallToRgbImageFilter(const Self&); //purposely not implemented
+  OdfToRgbImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 };
 

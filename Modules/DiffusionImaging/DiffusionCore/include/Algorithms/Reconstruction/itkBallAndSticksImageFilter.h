@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include <mitkDiffusionPropertyHelper.h>
 #include <vnl/algo/vnl_levenberg_marquardt.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <itkDiffusionTensor3D.h>
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <cmath>

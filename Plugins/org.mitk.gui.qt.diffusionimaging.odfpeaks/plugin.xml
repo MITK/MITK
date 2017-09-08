@@ -8,7 +8,7 @@
     name="Peak Extraction"
     category="Signal modeling"
     class="QmitkOdfMaximaExtractionView"
-    icon="resources/qball_peaks.png">
+    icon="resources/odf_peaks.png">
     <keywordReference id="org.mitk.views.odfmaximaextraction.Keyword"/>
     </view>
 

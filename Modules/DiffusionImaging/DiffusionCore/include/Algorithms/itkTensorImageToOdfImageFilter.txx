@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*=========================================================================
 
 Program:   Tensor ToolKit - TTK
-Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkTensorImageToQBallImageFilter.txx $
+Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkTensorImageToOdfImageFilter.txx $
 Language:  C++
 Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
 Version:   $Revision: 68 $
@@ -29,11 +29,11 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef _itk_TensorImageToQBallImageFilter_txx_
-#define _itk_TensorImageToQBallImageFilter_txx_
+#ifndef _itk_TensorImageToOdfImageFilter_txx_
+#define _itk_TensorImageToOdfImageFilter_txx_
 #endif
 
-#include "itkTensorImageToQBallImageFilter.h"
+#include "itkTensorImageToOdfImageFilter.h"
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkOrientationDistributionFunction.h>
@@ -42,7 +42,7 @@ namespace itk
 {
   template <class TInputScalarType, class TOutputScalarType>
   void
-    TensorImageToQBallImageFilter<TInputScalarType, TOutputScalarType>
+    TensorImageToOdfImageFilter<TInputScalarType, TOutputScalarType>
     ::BeforeThreadedGenerateData()
   {
     typename OutputImageType::Pointer outImage = OutputImageType::New();
@@ -61,7 +61,7 @@ namespace itk
 
   template <class TInputScalarType, class TOutputScalarType>
   void
-    TensorImageToQBallImageFilter<TInputScalarType, TOutputScalarType>
+    TensorImageToOdfImageFilter<TInputScalarType, TOutputScalarType>
     ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
   {
 
@@ -100,11 +100,11 @@ namespace itk
       };
       itk::DiffusionTensor3D<float> tensor(tensorelems);
 
-      itk::OrientationDistributionFunction<TOutputScalarType, QBALL_ODFSIZE> odf;
+      itk::OrientationDistributionFunction<TOutputScalarType, ODF_SAMPLING_SIZE> odf;
       odf.InitFromTensor(tensor);
       odf.Normalize();
 
-      for( unsigned int i=0; i<QBALL_ODFSIZE; i++)
+      for( unsigned int i=0; i<ODF_SAMPLING_SIZE; i++)
           out[i] = odf.GetElement(i);
 
       itOut.Set(out);
@@ -126,6 +126,6 @@ namespace itk
     {
       this->UpdateProgress (1.0);
     }
-    MITK_INFO << "one thread finished Q-Ball estimation";
+    MITK_INFO << "one thread finished ODF estimation";
   }
 } // end of namespace

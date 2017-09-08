@@ -313,9 +313,9 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
       m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max())
     return; // Values already calculated before...
 
-  // used to avoid statistics calculation on qball images. property will be replaced as soons as bug 17928 is merged and
+  // used to avoid statistics calculation on Odf images. property will be replaced as soons as bug 17928 is merged and
   // the diffusion image refactoring is complete.
-  mitk::BoolProperty *isqball = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsQballImage").GetPointer());
+  mitk::BoolProperty *isOdf = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsOdfImage").GetPointer());
   const mitk::PixelType pType = m_Image->GetPixelType(0);
   if (pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::ImageIOBase::UNKNOWNPIXELTYPE) &&
       (pType.GetPixelType() != itk::ImageIOBase::VECTOR))
@@ -331,7 +331,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
     }
   }
   else if (pType.GetPixelType() == itk::ImageIOBase::VECTOR &&
-           (!isqball || !isqball->GetValue())) // we have a vector image
+           (!isOdf || !isOdf->GetValue())) // we have a vector image
   {
     // recompute
     mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();

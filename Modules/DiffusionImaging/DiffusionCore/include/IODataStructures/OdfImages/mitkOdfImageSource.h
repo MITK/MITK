@@ -15,25 +15,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QBallImageSource_H_HEADER_INCLUDED_C1E7D6EC
-#define QBallImageSource_H_HEADER_INCLUDED_C1E7D6EC
+#ifndef OdfImageSource_H_HEADER_INCLUDED_C1E7D6EC
+#define OdfImageSource_H_HEADER_INCLUDED_C1E7D6EC
 
 #include "mitkImageSource.h"
-#include "mitkQBallImage.h"
+#include "mitkOdfImage.h"
 #include <MitkDiffusionCoreExports.h>
 
 namespace mitk {
 
-class MITKDIFFUSIONCORE_EXPORT QBallImageSource : public ImageSource
+class MITKDIFFUSIONCORE_EXPORT OdfImageSource : public ImageSource
 {
 public:
 
-  typedef mitk::QBallImage OutputImageType;
+  typedef mitk::OdfImage OutputImageType;
   typedef OutputImageType::Pointer OutputImagePointer;
   typedef SlicedData::RegionType OutputImageRegionType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
-  mitkClassMacro(QBallImageSource,ImageSource);
+  mitkClassMacro(OdfImageSource,ImageSource);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
@@ -54,11 +54,11 @@ public:
   virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
 protected:
-  QBallImageSource();
-  virtual ~QBallImageSource() {}
+  OdfImageSource();
+  virtual ~OdfImageSource() {}
 
 };
 
 } // namespace mitk
 
-#endif /* QBallImageSource_H_HEADER_INCLUDED_C1E7D6EC */
+#endif /* OdfImageSource_H_HEADER_INCLUDED_C1E7D6EC */

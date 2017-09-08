@@ -35,7 +35,7 @@ namespace mitk
  * @brief Performs standard head-motion correction by using affine registration of the gradient images.
  *
  * (Head) motion correction is a essential pre-processing step before performing any further analysis of a diffusion-weighted
- * images since all model fits ( tensor, QBI ) rely on an aligned diffusion-weighted dataset. The correction is done in two steps. First the
+ * images since all model fits ( tensor, ODF ) rely on an aligned diffusion-weighted dataset. The correction is done in two steps. First the
  * unweighted images ( if multiple present ) are separately registered on the first one by means of rigid registration and normalized correlation
  * as error metric. Second, the weighted gradient images are registered to the unweighted reference ( computed as average from the aligned images from first step )
  * by an affine transformation using the MattesMutualInformation metric as optimizer guidance.

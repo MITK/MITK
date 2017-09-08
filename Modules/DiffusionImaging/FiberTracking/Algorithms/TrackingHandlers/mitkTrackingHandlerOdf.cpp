@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTrackingHandlerOdf.h"
-#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <itkDiffusionOdfGeneralizedFaImageFilter.h>
 #include <itkImageRegionIterator.h>
 #include <itkPointShell.h>
 #include <omp.h>
@@ -44,10 +44,10 @@ void TrackingHandlerOdf::InitForTracking()
   if (m_NeedsDataInit)
   {
     m_OdfHemisphereIndices.clear();
-    itk::OrientationDistributionFunction< float, QBALL_ODFSIZE > odf;
+    itk::OrientationDistributionFunction< float, ODF_SAMPLING_SIZE > odf;
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 
-    for (int i=0; i<QBALL_ODFSIZE; i++)
+    for (int i=0; i<ODF_SAMPLING_SIZE; i++)
       if (dot_product(ref, odf.GetDirection(i))>0)
         m_OdfHemisphereIndices.push_back(i);
     m_OdfFloatDirs.set_size(m_OdfHemisphereIndices.size(), 3);
@@ -62,7 +62,7 @@ void TrackingHandlerOdf::InitForTracking()
     if (m_GfaImage.IsNull())
     {
       MITK_INFO << "Calculating GFA image.";
-      typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
+      typedef itk::DiffusionOdfGeneralizedFaImageFilter<float,float,ODF_SAMPLING_SIZE> GfaFilterType;
       GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
       gfaFilter->SetInput(m_OdfImage);
       gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
@@ -130,7 +130,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   if (!m_Interpolate && oldIndex==idx)
     return last_dir;
 
-  ItkOdfImageType::PixelType odf_values = GetImageValue<float, QBALL_ODFSIZE>(pos, m_OdfImage, m_Interpolate);
+  ItkOdfImageType::PixelType odf_values = GetImageValue<float, ODF_SAMPLING_SIZE>(pos, m_OdfImage, m_Interpolate);
   vnl_vector< float > probs; probs.set_size(m_OdfHemisphereIndices.size());
   vnl_vector< float > angles; angles.set_size(m_OdfHemisphereIndices.size()); angles.fill(1.0);
 

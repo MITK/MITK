@@ -7,7 +7,7 @@
     <view id="org.mitk.views.qballreconstruction"
     name="Q-Balls"
     category="Signal modeling"
-    icon="resources/qball.png"
+    icon="resources/odf.png"
     class="QmitkQBallReconstructionView">
     <description>Q-Ball reconstruction view</description>
     <keywordReference id="org.mitk.views.qballreconstruction.Keyword"/>
@@ -18,7 +18,7 @@
     category="Quantification"
     class="QmitkDiffusionQuantificationView"
     icon="resources/quantification.png">
-    <description>Calculation of tensor and Q-ball derived measures.</description>
+    <description>Calculation of tensor, ODF and raw signal scalar maps.</description>
     <keywordReference id="org.mitk.views.diffusionquantification.Keyword"/>
     </view>
 
@@ -96,7 +96,7 @@
     <perspective id="org.mitk.perspectives.reconstruction1"
     name="ODF Reconstruction/Signal Modelling"
     class="QmitkReconstructionPerspective"
-    icon="resources/qball.png">
+    icon="resources/odf.png">
     <keywordReference id="org.mitk.perspectives.reconstruction1.Keyword"/>
     </perspective>
 

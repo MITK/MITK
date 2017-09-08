@@ -42,7 +42,7 @@ QmitkODFRenderWidget::~QmitkODFRenderWidget()
 {
 }
 
-void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf )
+void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<double, ODF_SAMPLING_SIZE> odf )
 {
   try
   {
@@ -50,13 +50,13 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   m_ds = mitk::StandaloneDataStorage::New();
   m_Node = mitk::DataNode::New();
 
-  vtkPolyData* m_TemplateOdf = itk::OrientationDistributionFunction<float,QBALL_ODFSIZE>::GetBaseMesh();
+  vtkPolyData* m_TemplateOdf = itk::OrientationDistributionFunction<float,ODF_SAMPLING_SIZE>::GetBaseMesh();
 
   vtkPolyData *polyData = vtkPolyData::New();
   vtkPoints *points = vtkPoints::New();
   vtkFloatArray *scalars = vtkFloatArray::New();
 
-  for (int i=0; i<QBALL_ODFSIZE; i++){
+  for (int i=0; i<ODF_SAMPLING_SIZE; i++){
     double p[3];
     m_TemplateOdf->GetPoints()->GetPoint(i,p);
     double val = odf[i];

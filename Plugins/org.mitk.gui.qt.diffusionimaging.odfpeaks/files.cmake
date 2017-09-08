@@ -5,7 +5,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  
+
   QmitkOdfMaximaExtractionView.cpp
 )
 
@@ -15,15 +15,15 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  
+
   src/internal/QmitkOdfMaximaExtractionView.h
 
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  
-  resources/qball_peaks.png
+
+  resources/odf_peaks.png
 )
 
 set(QRC_FILES

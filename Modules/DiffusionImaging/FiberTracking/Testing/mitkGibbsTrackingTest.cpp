@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkImageCast.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <itkGibbsTrackingFilter.h>
 #include <mitkFiberBundle.h>
 #include <mitkIOUtil.h>
@@ -32,20 +32,20 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(argc>4,"check for input data")
 
-  QBallImage::Pointer mitkQballImage;
+  OdfImage::Pointer mitkOdfImage;
   Image::Pointer mitkMaskImage;
   mitk::FiberBundle::Pointer fib1;
 
   try{
 
-    MITK_INFO << "Q-Ball image: " << argv[1];
+    MITK_INFO << "ODF image: " << argv[1];
     MITK_INFO << "Mask image: " << argv[2];
     MITK_INFO << "Parameter file: " << argv[3];
     MITK_INFO << "Reference bundle: " << argv[4];
 
     std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( argv[1]);
-    mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
-    MITK_TEST_CONDITION_REQUIRED(mitkQballImage.IsNotNull(),"check qball image")
+    mitkOdfImage = dynamic_cast<mitk::OdfImage*>(infile.at(0).GetPointer());
+    MITK_TEST_CONDITION_REQUIRED(mitkOdfImage.IsNotNull(),"check Odf image")
 
     infile = mitk::IOUtil::Load( argv[2] );
     mitkMaskImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
@@ -55,19 +55,19 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     fib1 = dynamic_cast<mitk::FiberBundle*>(infile.at(0).GetPointer());
     MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(),"check fiber bundle")
 
-    typedef itk::Vector<float, QBALL_ODFSIZE> OdfVectorType;
+    typedef itk::Vector<float, ODF_SAMPLING_SIZE> OdfVectorType;
     typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
     typedef itk::Image<float,3> MaskImgType;
     typedef itk::GibbsTrackingFilter<OdfVectorImgType> GibbsTrackingFilterType;
 
-    OdfVectorImgType::Pointer itk_qbi = OdfVectorImgType::New();
-    mitk::CastToItkImage(mitkQballImage, itk_qbi);
+    OdfVectorImgType::Pointer itk_odf = OdfVectorImgType::New();
+    mitk::CastToItkImage(mitkOdfImage, itk_odf);
 
     MaskImgType::Pointer itk_mask = MaskImgType::New();
     mitk::CastToItkImage(mitkMaskImage, itk_mask);
 
     GibbsTrackingFilterType::Pointer gibbsTracker = GibbsTrackingFilterType::New();
-    gibbsTracker->SetQBallImage(itk_qbi.GetPointer());
+    gibbsTracker->SetOdfImage(itk_odf.GetPointer());
     gibbsTracker->SetMaskImage(itk_mask);
     gibbsTracker->SetDuplicateImage(false);
     gibbsTracker->SetRandomSeed(1);

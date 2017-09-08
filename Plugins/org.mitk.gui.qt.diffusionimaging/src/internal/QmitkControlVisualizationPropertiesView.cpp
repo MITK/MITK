@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
 #include "mitkPlanarFigureInteractor.h"
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <mitkTensorImage.h>
 #include <mitkImage.h>
 #include <mitkDiffusionPropertyHelper.h>
@@ -441,7 +441,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       m_Controls->m_FiberThicknessSlider->setMaximum(max * 10);
       m_Controls->m_FiberThicknessSlider->setValue(range * 10);
     }
-    else if(dynamic_cast<mitk::QBallImage*>(nodeData) || dynamic_cast<mitk::TensorImage*>(nodeData))
+    else if(dynamic_cast<mitk::OdfImage*>(nodeData) || dynamic_cast<mitk::TensorImage*>(nodeData))
     {
       m_Controls->m_ImageControlsFrame->setVisible(true);
       m_Controls->m_NumberGlyphsFrame->setVisible(true);
@@ -889,7 +889,7 @@ void QmitkControlVisualizationPropertiesView::ShowMaxNumberChanged()
     maxNr = 1;
   }
 
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
        || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetIntProperty("ShowMaxNumber", maxNr);
@@ -922,7 +922,7 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
     normMeth->SetNormalizationToMinMax();
   }
 
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
        || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetProperty("Normalization", normMeth.GetPointer());
@@ -934,7 +934,7 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
 
 void QmitkControlVisualizationPropertiesView::ScalingFactorChanged(double scalingFactor)
 {
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
        || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetFloatProperty("Scaling", scalingFactor);
@@ -973,7 +973,7 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
     scaleBy->SetScaleByNothing();
   }
 
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
        || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetProperty("Normalization", scaleBy.GetPointer());

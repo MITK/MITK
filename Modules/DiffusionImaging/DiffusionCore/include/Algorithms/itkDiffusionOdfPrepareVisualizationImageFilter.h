@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
-#ifndef __itkDiffusionQballPrepareVisualizationImageFilter_h_
-#define __itkDiffusionQballPrepareVisualizationImageFilter_h_
+#ifndef __itkDiffusionOdfPrepareVisualizationImageFilter_h_
+#define __itkDiffusionOdfPrepareVisualizationImageFilter_h_
 
 #include <MitkDiffusionCoreExports.h>
 #include "itkImageToImageFilter.h"
@@ -30,15 +30,15 @@ This file is based heavily on a corresponding ITK filter.
 #include "vnl/algo/vnl_svd.h"
 #include "itkVectorContainer.h"
 #include "itkVectorImage.h"
-#include "itkDiffusionQballGeneralizedFaImageFilter.h"
+#include "itkDiffusionOdfGeneralizedFaImageFilter.h"
 
 namespace itk{
-/** \class DiffusionQballPrepareVisualizationImageFilter
+/** \class DiffusionOdfPrepareVisualizationImageFilter
  */
 
 template< class TOdfPixelType,
           int NrOdfDirections>
-class MITKDIFFUSIONCORE_EXPORT DiffusionQballPrepareVisualizationImageFilter :
+class MITKDIFFUSIONCORE_EXPORT DiffusionOdfPrepareVisualizationImageFilter :
   public ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
                               Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {
@@ -54,14 +54,14 @@ public:
     PV_MIN_MAX_INVERT
   };
 
-  typedef DiffusionQballPrepareVisualizationImageFilter Self;
+  typedef DiffusionOdfPrepareVisualizationImageFilter Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
   typedef ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
     Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
                           Superclass;
 
-  typedef DiffusionQballGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,NrOdfDirections>
+  typedef DiffusionOdfGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,NrOdfDirections>
                                                   GfaFilterType;
   typedef typename GfaFilterType::OutputImageType          GfaImageType;
   typedef typename GfaFilterType::GfaComputationMethod     GfaComputationMethod;
@@ -71,7 +71,7 @@ public:
   itkCloneMacro(Self)
 
   /** Runtime information support. */
-  itkTypeMacro(DiffusionQballPrepareVisualizationImageFilter,
+  itkTypeMacro(DiffusionOdfPrepareVisualizationImageFilter,
                                                    ImageToImageFilter);
 
   typedef TOdfPixelType                 OdfComponentType;
@@ -104,8 +104,8 @@ public:
   itkGetMacro( GfaParam2, double );
 
 protected:
-  DiffusionQballPrepareVisualizationImageFilter();
-  ~DiffusionQballPrepareVisualizationImageFilter() {};
+  DiffusionOdfPrepareVisualizationImageFilter();
+  ~DiffusionOdfPrepareVisualizationImageFilter() {};
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   void BeforeThreadedGenerateData();
@@ -135,8 +135,8 @@ private:
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkDiffusionQballPrepareVisualizationImageFilter.cpp"
+#include "itkDiffusionOdfPrepareVisualizationImageFilter.cpp"
 #endif
 
-#endif //__itkDiffusionQballPrepareVisualizationImageFilter_h_
+#endif //__itkDiffusionOdfPrepareVisualizationImageFilter_h_
 

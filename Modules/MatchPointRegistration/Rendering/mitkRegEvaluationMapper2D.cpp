@@ -106,7 +106,7 @@ float mitk::RegEvaluationMapper2D::CalculateLayerDepth(mitk::BaseRenderer* rende
   int layer = 0;
   GetDataNode()->GetIntProperty( "layer", layer, renderer);
   //add the layer property for each image to render images with a higher layer on top of the others
-  depth += layer*10; //*10: keep some room for each image (e.g. for QBalls in between)
+  depth += layer*10; //*10: keep some room for each image (e.g. for ODFs in between)
   if(depth > 0.0f) {
     depth = 0.0f;
     MITK_WARN << "Layer value exceeds clipping range. Set to minimum instead.";
@@ -734,7 +734,7 @@ void mitk::RegEvaluationMapper2D::SetDefaultProperties(mitk::DataNode* node, mit
   node->AddProperty(mitk::nodeProp_RegEvalTargetContour, mitk::BoolProperty::New(true), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalWipeStyle, mitk::RegEvalWipeStyleProperty::New(0), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::GenericProperty<mitk::Point3D>::New(mitk::Point3D()), renderer, overwrite);
-  
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

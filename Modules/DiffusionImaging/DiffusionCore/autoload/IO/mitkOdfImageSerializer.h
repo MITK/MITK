@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkQBallImageSerializer_h_included
-#define mitkQBallImageSerializer_h_included
+#ifndef mitkOdfImageSerializer_h_included
+#define mitkOdfImageSerializer_h_included
 
 #include "mitkBaseDataSerializer.h"
 
@@ -24,16 +24,16 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class QBallImageSerializer : public BaseDataSerializer
+class OdfImageSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( QBallImageSerializer, BaseDataSerializer );
+    mitkClassMacro( OdfImageSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     virtual std::string Serialize() override;
   protected:
-    QBallImageSerializer();
-    virtual ~QBallImageSerializer();
+    OdfImageSerializer();
+    virtual ~OdfImageSerializer();
 };
 } // namespace
 #endif

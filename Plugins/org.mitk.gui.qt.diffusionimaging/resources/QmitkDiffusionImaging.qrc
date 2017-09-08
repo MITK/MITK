@@ -6,7 +6,6 @@
         <file>texIntOFFIcon.png</file>
         <file>vizControls.png</file>
         <file>Refresh_48.png</file>
-        <file>QBallData24.png</file>
         <file>glyphsoff_C.png</file>
         <file>glyphsoff_S.png</file>
         <file>glyphsoff_T.png</file>
@@ -21,10 +20,11 @@
         <file>reset.png</file>
         <file>MapperEfx2D.png</file>
         <file>refresh.xpm</file>
-        <file>qball.png</file>
         <file>tensor.png</file>
         <file>tractogram.png</file>
         <file>ml_tractogram.png</file>
         <file>ConnectomicsNetwork.png</file>
+        <file>odf.png</file>
+        <file>DiffData24.png</file>
     </qresource>
 </RCC>

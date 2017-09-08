@@ -34,9 +34,9 @@ set(CPP_FILES
   IODataStructures/Properties/mitkGradientDirectionsPropertySerializer.cpp
   IODataStructures/Properties/mitkMeasurementFramePropertySerializer.cpp
 
-  # DataStructures -> QBall
-  IODataStructures/QBallImages/mitkQBallImageSource.cpp
-  IODataStructures/QBallImages/mitkQBallImage.cpp
+  # DataStructures -> Odf
+  IODataStructures/OdfImages/mitkOdfImageSource.cpp
+  IODataStructures/OdfImages/mitkOdfImage.cpp
 
   # DataStructures -> Tensor
   IODataStructures/TensorImages/mitkTensorImage.cpp
@@ -112,8 +112,8 @@ set(H_FILES
   include/IODataStructures/DiffusionWeightedImages/mitkDiffusionImageTransformedCreationFilter.h
 
   # Algorithms
-  include/Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
-  include/Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h
+  include/Algorithms/itkDiffusionOdfGeneralizedFaImageFilter.h
+  include/Algorithms/itkDiffusionOdfPrepareVisualizationImageFilter.h
   include/Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
   include/Algorithms/itkTensorDerivedMeasurementsFilter.h
   include/Algorithms/itkBrainMaskExtractionImageFilter.h

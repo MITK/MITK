@@ -100,7 +100,7 @@ float mitk::DoseImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer *render
   int layer = 0;
   GetDataNode()->GetIntProperty("layer", layer, renderer);
   // add the layer property for each image to render images with a higher layer on top of the others
-  depth += layer * 10; //*10: keep some room for each image (e.g. for QBalls in between)
+  depth += layer * 10; //*10: keep some room for each image (e.g. for ODFs in between)
   if (depth > 0.0f)
   {
     depth = 0.0f;
@@ -774,7 +774,7 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
 
     std::string className = image->GetNameOfClass();
 
-    if (className != "TensorImage" && className != "QBallImage")
+    if (className != "TensorImage" && className != "OdfImage")
     {
       PixelType pixelType = image->GetPixelType();
       size_t numComponents = pixelType.GetNumberOfComponents();

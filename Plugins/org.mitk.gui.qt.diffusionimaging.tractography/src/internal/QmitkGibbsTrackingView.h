@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkGibbsTrackingViewControls.h"
 
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <QThread>
 #include <mitkFiberBundle.h>
 #include <QTime>
@@ -72,10 +72,10 @@ class QmitkGibbsTrackingView : public QmitkAbstractView
 public:
 
   typedef itk::Image<float,3>                               ItkFloatImageType;
-  typedef itk::Vector<float, QBALL_ODFSIZE>                 OdfVectorType;
-  typedef itk::Image<OdfVectorType, 3>                      ItkQBallImgType;
+  typedef itk::Vector<float, ODF_SAMPLING_SIZE>                 OdfVectorType;
+  typedef itk::Image<OdfVectorType, 3>                      ItkOdfImgType;
   typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-  typedef itk::GibbsTrackingFilter< ItkQBallImgType >       GibbsTrackingFilterType;
+  typedef itk::GibbsTrackingFilter< ItkOdfImgType >       GibbsTrackingFilterType;
 
   static const std::string VIEW_ID;
 
@@ -137,8 +137,8 @@ private:
   mitk::FiberBundle::Pointer    m_FiberBundle;      ///< tracking output
   ItkFloatImageType::Pointer    m_MaskImage;        ///< used to reduce the algorithms search space. tracking only inside of the mask.
   mitk::TensorImage::Pointer    m_TensorImage;      ///< actual image that is tracked
-  mitk::QBallImage::Pointer     m_QBallImage;       ///< actual image that is tracked
-  ItkQBallImgType::Pointer      m_ItkQBallImage;    ///< actual image that is tracked
+  mitk::OdfImage::Pointer     m_OdfImage;       ///< actual image that is tracked
+  ItkOdfImgType::Pointer      m_ItkOdfImage;    ///< actual image that is tracked
   ItkTensorImage::Pointer       m_ItkTensorImage;   ///< actual image that is tracked
 
   /** data nodes */

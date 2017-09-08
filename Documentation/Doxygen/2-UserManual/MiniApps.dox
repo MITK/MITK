@@ -16,7 +16,7 @@ Below you can see the help output of the MitkGibbsTracking MiniApp:
 \code
 $./MitkGibbsTracking
 
- -i, --input, input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)
+ -i, --input, input image (tensor, ODF or FSL/MRTrix SH-coefficient image)
  -p, --parameters, parameter file (.gtp)
  -m, --mask, binary mask image (optional)
  -s, --shConvention, sh coefficient convention (FSL, MRtrix) (optional), (default: FSL)

@@ -46,7 +46,7 @@ public:
   QmitkODFRenderWidget( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   virtual ~QmitkODFRenderWidget();
 
-  void GenerateODF( itk::OrientationDistributionFunction<double, QBALL_ODFSIZE> odf );
+  void GenerateODF( itk::OrientationDistributionFunction<double, ODF_SAMPLING_SIZE> odf );
 
 protected:
 

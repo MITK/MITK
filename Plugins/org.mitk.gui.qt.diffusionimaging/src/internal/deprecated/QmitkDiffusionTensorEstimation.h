@@ -81,11 +81,11 @@ public:
 
     void TensorVolumesRemoveButton();
 
-    void QBallVolumesSaveButton();
+    void OdfVolumesSaveButton();
 
-    void QBallVolumesLoadButton();
+    void OdfVolumesLoadButton();
 
-    void QBallVolumesRemoveButton();
+    void OdfVolumesRemoveButton();
 
     void DirectionVolumesSaveButton();
 
@@ -97,9 +97,9 @@ public:
 
     void TensorEstimationTeemEstimateButton();
 
-    void QBallReconstructionButton();
+    void OdfReconstructionButton();
 
-    void QBallReconstructionAnalyticalButton();
+    void OdfReconstructionAnalyticalButton();
 
     void TensorEstimationButton();
 
@@ -109,13 +109,13 @@ public:
 
     void StandardAlgorithmsDirectionButton();
 
-    void QBallStandardAlgorithmsDirectionButton();
+    void OdfStandardAlgorithmsDirectionButton();
 
-    void QBallStandardAlgorithmsDeconvolutionButton();
+    void OdfStandardAlgorithmsDeconvolutionButton();
 
-    void QBallStandardAlgorithmsGFAButton();
+    void OdfStandardAlgorithmsGFAButton();
 
-    void QBallVolumesVisualizeSelectedButton();
+    void OdfVolumesVisualizeSelectedButton();
 
     void DiffusionVolumeSaveButton();
 
@@ -140,7 +140,7 @@ protected:
 
   mitk::DataTreeFilter::Pointer m_TensorVolumesDataTreeFilter;
 
-  mitk::DataTreeFilter::Pointer m_QballVolumesDataTreeFilter;
+  mitk::DataTreeFilter::Pointer m_OdfVolumesDataTreeFilter;
 
   mitk::DataTreeFilter::Pointer m_DirectionVolumesDataTreeFilter;
 

@@ -37,7 +37,7 @@ namespace itk
 {
 
 /** \class OrientationDistributionFunction
- * \brief Represents an ODF for Q-Ball imaging.
+ * \brief Represents an ODF
  *
  * Reference: David S. Tuch, Q-ball imaging,
  * Magnetic Resonance in Medicine Volume 52 Issue 6, Pages 1358 - 1372

@@ -26,7 +26,7 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkVectorImage.h"
 #include <mitkDiffusionPropertyHelper.h>
 #include <vnl/algo/vnl_levenberg_marquardt.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 
 namespace itk{
 /** \class MultiTensorImageFilter

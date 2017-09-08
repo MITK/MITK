@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef __mitkQBallImage__h
-#define __mitkQBallImage__h
+#ifndef __mitkOdfImage__h
+#define __mitkOdfImage__h
 
 #include "mitkImage.h"
 #include "itkVectorImage.h"
@@ -35,20 +35,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 // 8 - 642
 // 9 - 812
 // 10 - 1002
-#define QBALL_ODFSIZE 252
+#define ODF_SAMPLING_SIZE 252
 
 namespace mitk
 {
 
   /**
-  * \brief this class encapsulates qball images
+  * \brief this class encapsulates orientation distribution images
   */
-  class MITKDIFFUSIONCORE_EXPORT QBallImage : public Image
+  class MITKDIFFUSIONCORE_EXPORT OdfImage : public Image
   {
 
   public:
 
-    mitkClassMacro( QBallImage, Image );
+    mitkClassMacro( OdfImage, Image );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -61,8 +61,8 @@ namespace mitk
     virtual void ConstructRgbImage() const;
 
   protected:
-    QBallImage();
-    virtual ~QBallImage();
+    OdfImage();
+    virtual ~OdfImage();
 
     mutable mitk::Image::Pointer m_RgbImage;
 
@@ -70,4 +70,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* __mitkQBallImage__h */
+#endif /* __mitkOdfImage__h */

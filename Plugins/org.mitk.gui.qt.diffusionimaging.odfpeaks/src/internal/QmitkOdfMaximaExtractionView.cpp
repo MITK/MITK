@@ -83,8 +83,8 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl(QWidget *parent)
 
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
     mitk::NodePredicateNot::Pointer isDwi = mitk::NodePredicateNot::New(mitk::NodePredicateIsDWI::New());
-    mitk::NodePredicateNot::Pointer isQbi = mitk::NodePredicateNot::New(mitk::NodePredicateDataType::New("QBallImage"));
-    mitk::NodePredicateAnd::Pointer unwanted = mitk::NodePredicateAnd::New(isQbi, isDwi);
+    mitk::NodePredicateNot::Pointer isOdf = mitk::NodePredicateNot::New(mitk::NodePredicateDataType::New("OdfImage"));
+    mitk::NodePredicateAnd::Pointer unwanted = mitk::NodePredicateAnd::New(isOdf, isDwi);
     mitk::NodePredicateDimension::Pointer dim3 = mitk::NodePredicateDimension::New(3);
     mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
 
@@ -141,7 +141,7 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
 
   filter->SetInputImage(caster->GetOutput());
   filter->GenerateData();
-  typename FilterType::QballImageType::Pointer itkQbi = filter->GetQballImage();
+  typename FilterType::OdfImageType::Pointer itkodf = filter->GetOdfImage();
   typename FilterType::CoefficientImageType::Pointer itkCi = filter->GetCoefficientImage();
 
   {
@@ -159,9 +159,9 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
   }
 
     {
-      mitk::QBallImage::Pointer img = mitk::QBallImage::New();
-      img->InitializeByItk(itkQbi.GetPointer());
-      img->SetVolume(itkQbi->GetBufferPointer());
+      mitk::OdfImage::Pointer img = mitk::OdfImage::New();
+      img->InitializeByItk(itkodf.GetPointer());
+      img->SetVolume(itkodf->GetBufferPointer());
       DataNode::Pointer node = DataNode::New();
       node->SetData(img);
 

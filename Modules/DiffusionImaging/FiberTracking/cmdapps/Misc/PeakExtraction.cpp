@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
 
 #include <mitkImage.h>
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>

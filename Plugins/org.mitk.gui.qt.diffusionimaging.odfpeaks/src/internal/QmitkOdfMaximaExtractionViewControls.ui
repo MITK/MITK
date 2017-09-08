@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
+    <width>397</width>
     <height>848</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
       <bool>true</bool>
      </property>
      <property name="toolTip">
-      <string>Generate Q-Ball image and MITK compatible SH coefficient from other toolkits.</string>
+      <string>Generate ODF image and MITK compatible SH coefficient from other toolkits.</string>
      </property>
      <property name="text">
       <string>Start SH Coefficient Import</string>

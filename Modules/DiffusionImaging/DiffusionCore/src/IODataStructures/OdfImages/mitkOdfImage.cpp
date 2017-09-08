@@ -14,43 +14,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkQBallImage.h"
+#include "mitkOdfImage.h"
 #include "mitkImageCast.h"
 #include "itkImage.h"
 #include "mitkImageVtkAccessor.h"
-#include "itkQBallToRgbImageFilter.h"
+#include "itkOdfToRgbImageFilter.h"
 #include <mitkProperties.h>
 
-mitk::QBallImage::QBallImage() : Image()
+mitk::OdfImage::OdfImage() : Image()
 {
   m_RgbImage = nullptr;
   // not needed anymore as soon as all diffusion images are identified via properties anyway
-  this->SetProperty("IsQballImage", mitk::BoolProperty::New(true));
+  this->SetProperty("IsOdfImage", mitk::BoolProperty::New(true));
 }
 
-mitk::QBallImage::~QBallImage()
+mitk::OdfImage::~OdfImage()
 {
 
 }
 
-const vtkImageData* mitk::QBallImage::GetVtkImageData(int t, int n) const
-{
-  if(m_RgbImage.IsNull())
-    ConstructRgbImage();
-  return m_RgbImage->GetVtkImageData(t,n);
-}
-
-vtkImageData*mitk::QBallImage::GetVtkImageData(int t, int n)
+const vtkImageData* mitk::OdfImage::GetVtkImageData(int t, int n) const
 {
   if(m_RgbImage.IsNull())
     ConstructRgbImage();
   return m_RgbImage->GetVtkImageData(t,n);
 }
 
-void mitk::QBallImage::ConstructRgbImage() const
+vtkImageData*mitk::OdfImage::GetVtkImageData(int t, int n)
 {
-  typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> ImageType;
-  typedef itk::QBallToRgbImageFilter<ImageType> FilterType;
+  if(m_RgbImage.IsNull())
+    ConstructRgbImage();
+  return m_RgbImage->GetVtkImageData(t,n);
+}
+
+void mitk::OdfImage::ConstructRgbImage() const
+{
+  typedef itk::Image<itk::Vector<float,ODF_SAMPLING_SIZE>,3> ImageType;
+  typedef itk::OdfToRgbImageFilter<ImageType> FilterType;
   FilterType::Pointer filter = FilterType::New();
 
   ImageType::Pointer itkvol = ImageType::New();
@@ -63,18 +63,18 @@ void mitk::QBallImage::ConstructRgbImage() const
   m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
 }
 
-const vtkImageData* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n) const
+const vtkImageData* mitk::OdfImage::GetNonRgbVtkImageData(int t, int n) const
 {
   return Superclass::GetVtkImageData(t,n);
 }
 
-vtkImageData* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)
+vtkImageData* mitk::OdfImage::GetNonRgbVtkImageData(int t, int n)
 {
   return Superclass::GetVtkImageData(t,n);
 }
 
 //
-//void mitk::QBallImage::CopyConstruct(mitk::Image::Pointer img)
+//void mitk::OdfImage::CopyConstruct(mitk::Image::Pointer img)
 //{
 //  m_LargestPossibleRegion = img->GetLargestPossibleRegion();
 //  m_RequestedRegion = img->GetRequestedRegion();

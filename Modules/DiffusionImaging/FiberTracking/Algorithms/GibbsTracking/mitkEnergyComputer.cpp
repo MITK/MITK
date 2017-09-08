@@ -25,7 +25,6 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
 {
     m_ParticleGrid = particleGrid;
     m_RandGen = randGen;
-    //m_Image = qballImage;
     m_SphereInterpolator = interpolator;
     m_Mask = mask;
 
@@ -58,7 +57,7 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
     }
     m_RotationMatrix = directionMatrix;
 
-    if (QBALL_ODFSIZE != m_SphereInterpolator->nverts)
+    if (ODF_SAMPLING_SIZE != m_SphereInterpolator->nverts)
         fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
 
     int totsz = m_Size[0]*m_Size[1]*m_Size[2];

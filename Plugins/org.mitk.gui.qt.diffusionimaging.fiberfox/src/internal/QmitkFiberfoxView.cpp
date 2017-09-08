@@ -341,9 +341,9 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
     mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New( );
     mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-    mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+    mitk::NodePredicateDataType::Pointer isOdf = mitk::NodePredicateDataType::New("Odfmage");
     mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
-    isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+    isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isOdf);
     mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
     mitk::NodePredicateAnd::Pointer isNonDiffMitkImage = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
     mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
@@ -1181,7 +1181,7 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
   mitk::Image::Pointer diffImg = nullptr;
   itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = nullptr;
   const int shOrder = 2;
-  typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
+  typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,ODF_SAMPLING_SIZE> QballFilterType;
   QballFilterType::CoefficientImageType::Pointer itkFeatureImage = nullptr;
   ItkDoubleImgType::Pointer adcImage = nullptr;
 
@@ -2349,7 +2349,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
     mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
     itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = nullptr;
     const int shOrder = 2;
-    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,ODF_SAMPLING_SIZE> QballFilterType;
     QballFilterType::CoefficientImageType::Pointer itkFeatureImage = nullptr;
     ItkDoubleImgType::Pointer adcImage = nullptr;
 

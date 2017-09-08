@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkNrrdQBallImageWriter.h"
+#include "mitkNrrdOdfImageWriter.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
@@ -25,27 +25,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 
 
-mitk::NrrdQBallImageWriter::NrrdQBallImageWriter()
-  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionCoreIOMimeTypes::QBI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::QBI_MIMETYPE_DESCRIPTION())
+mitk::NrrdOdfImageWriter::NrrdOdfImageWriter()
+  : AbstractFileWriter(mitk::OdfImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionCoreIOMimeTypes::ODF_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::ODF_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }
 
-mitk::NrrdQBallImageWriter::NrrdQBallImageWriter(const mitk::NrrdQBallImageWriter& other)
+mitk::NrrdOdfImageWriter::NrrdOdfImageWriter(const mitk::NrrdOdfImageWriter& other)
   : AbstractFileWriter(other)
 {
 }
 
-mitk::NrrdQBallImageWriter::~NrrdQBallImageWriter()
+mitk::NrrdOdfImageWriter::~NrrdOdfImageWriter()
 {}
 
 
-void mitk::NrrdQBallImageWriter::Write()
+void mitk::NrrdOdfImageWriter::Write()
 {
   InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
     if (input.IsNull())
     {
-        MITK_ERROR <<"Sorry, input to NrrdQBallImageWriter is nullptr!";
+        MITK_ERROR <<"Sorry, input to NrrdOdfImageWriter is nullptr!";
         return;
     }
     if ( this->GetOutputLocation().empty() )
@@ -62,7 +62,7 @@ void mitk::NrrdQBallImageWriter::Write()
 
     typedef itk::VectorImage<float, 3> VecImgType;
 
-    typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> ImageType;
+    typedef itk::Image<itk::Vector<float,ODF_SAMPLING_SIZE>,3> ImageType;
     typedef itk::ImageFileWriter<VecImgType> WriterType;
     WriterType::Pointer nrrdWriter = WriterType::New();
 
@@ -75,7 +75,7 @@ void mitk::NrrdQBallImageWriter::Write()
     vecImg->SetDirection( outimage->GetDirection() );  // Set the image direction
     vecImg->SetLargestPossibleRegion( outimage->GetLargestPossibleRegion());
     vecImg->SetBufferedRegion( outimage->GetLargestPossibleRegion() );
-    vecImg->SetVectorLength(QBALL_ODFSIZE);
+    vecImg->SetVectorLength(ODF_SAMPLING_SIZE);
     vecImg->Allocate();
 
     itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
@@ -89,7 +89,7 @@ void mitk::NrrdQBallImageWriter::Write()
     for (it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
       VecPixType vec = it.Get();
-      VarVecType varVec(vec.GetVnlVector().data_block(), QBALL_ODFSIZE);
+      VarVecType varVec(vec.GetVnlVector().data_block(), ODF_SAMPLING_SIZE);
       ot.Set(varVec);
       ++ot;
     }
@@ -110,12 +110,12 @@ void mitk::NrrdQBallImageWriter::Write()
     }
 }
 
-mitk::NrrdQBallImageWriter* mitk::NrrdQBallImageWriter::Clone() const
+mitk::NrrdOdfImageWriter* mitk::NrrdOdfImageWriter::Clone() const
 {
-  return new NrrdQBallImageWriter(*this);
+  return new NrrdOdfImageWriter(*this);
 }
 
-mitk::IFileWriter::ConfidenceLevel mitk::NrrdQBallImageWriter::GetConfidenceLevel() const
+mitk::IFileWriter::ConfidenceLevel mitk::NrrdOdfImageWriter::GetConfidenceLevel() const
 {
   InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
   if (input.IsNull() )

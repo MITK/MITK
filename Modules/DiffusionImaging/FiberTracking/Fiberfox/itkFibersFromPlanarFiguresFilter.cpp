@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <itkOrientationDistributionFunction.h>
-#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <itkDiffusionOdfGeneralizedFaImageFilter.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkFiberBuilder.h>
 #include <mitkMetropolisHastingsSampler.h>
-#include <itkTensorImageToQBallImageFilter.h>
+#include <itkTensorImageToOdfImageFilter.h>
 #include <mitkGibbsEnergyComputer.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>

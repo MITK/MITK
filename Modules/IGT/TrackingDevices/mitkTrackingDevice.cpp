@@ -59,6 +59,11 @@ bool mitk::TrackingDevice::AutoDetectToolsAvailable()
   return false;
 }
 
+bool mitk::TrackingDevice::AddSingleToolIsAvailable()
+{
+  return true;
+}
+
 mitk::NavigationToolStorage::Pointer mitk::TrackingDevice::AutoDetectTools()
 {
   return mitk::NavigationToolStorage::New();

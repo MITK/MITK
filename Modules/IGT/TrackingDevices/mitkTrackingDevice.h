@@ -167,6 +167,9 @@ namespace mitk {
     /** @return Returns true if this device can autodetects its tools. */
     virtual bool AutoDetectToolsAvailable();
 
+    /** @return Returns true if it is possible to add a single tool. Default return is true.*/
+    virtual bool AddSingleToolIsAvailable();
+
     /** Autodetects tools from this device and returns them as a navigation tool storage.
      *  @return Returns the detected tools. Returns an empty storage if no tools are present
      *          or if detection is not possible

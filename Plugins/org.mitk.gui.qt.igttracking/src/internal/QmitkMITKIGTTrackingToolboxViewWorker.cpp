@@ -143,7 +143,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     return;
   }
 
-  MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
+  MITK_INFO << "Connected device with " << m_TrackingDeviceSource->GetNumberOfOutputs() << " tools.";
 
   //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
   mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();

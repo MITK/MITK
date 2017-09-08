@@ -1220,6 +1220,14 @@ bool mitk::NDITrackingDevice::AutoDetectToolsAvailable()
   else { return false; }
 }
 
+bool mitk::NDITrackingDevice::AddSingleToolIsAvailable()
+{
+  //For Aurora, only AutoDetecion or loading of toolStorage should be used. It is not possible to add a single tool.
+  if (this->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) { return false; }
+  //For Polaris, a single tool can be added, there is no autoDetection.
+  else { return true; }
+}
+
 mitk::NavigationToolStorage::Pointer mitk::NDITrackingDevice::AutoDetectTools()
 {
   mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New();

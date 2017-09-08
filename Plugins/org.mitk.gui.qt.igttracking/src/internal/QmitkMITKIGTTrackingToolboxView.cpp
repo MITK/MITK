@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLog.h>
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
-#include "mitkNDIAuroraTypeInformation.h"
 
 //for exceptions
 #include <mitkIGTException.h>
@@ -356,7 +355,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectDisconnect()
 
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
 {
-  MITK_INFO << "Connect Clicked";
+  MITK_DEBUG << "Connect Clicked";
   //check if everything is ready to start tracking
   if (this->m_toolStorage.IsNull())
   {
@@ -619,10 +618,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   else
     { m_Controls->m_AutoDetectTools->setVisible(false); }
 
-  if (Type == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) //Aurora
-    { m_Controls->m_AddSingleTool->setEnabled(false);}
-  else //other trackers
-    { m_Controls->m_AddSingleTool->setEnabled(true); }
+  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_configurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
 
   // Code to select appropriate tracking volume for current type
   std::vector<mitk::TrackingDeviceData> Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(Type);
@@ -1100,7 +1096,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(true);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(true);
+  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_configurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
   m_Controls->m_LoadTools->setEnabled(true);
   m_Controls->m_ResetTools->setEnabled(true);
 }
@@ -1108,7 +1104,7 @@ void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(false);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(false);
+  m_Controls->m_AddSingleTool->setEnabled(false);
   m_Controls->m_LoadTools->setEnabled(false);
   m_Controls->m_ResetTools->setEnabled(false);
 }

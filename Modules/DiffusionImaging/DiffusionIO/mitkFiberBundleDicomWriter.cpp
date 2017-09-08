@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileWriter.h>
 #include <mitkCustomMimeType.h>
 #include "mitkDiffusionIOMimeTypes.h"
-#include <boost/date_time.hpp>
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
 #include "dcmtk/dcmtract/trctractographyresults.h"
 
@@ -107,8 +106,13 @@ void mitk::FiberBundleDicomWriter::Write()
     IODImageReference* ref = new IODImageReference(patient_id.c_str(), study_instance_uid.c_str(), series_instance_uid.c_str(), sop_instance_uid.c_str(), UID_MRImageStorage);
     refs.add(ref);
 
-    OFString contentDate = boost::gregorian::to_iso_string(boost::gregorian::day_clock::universal_day()).c_str();
-    OFString contentTime = boost::posix_time::to_iso_string(boost::posix_time::second_clock::universal_time()).substr(9).c_str();
+    std::time_t t = std::time(NULL);
+    char date_buffer[20];
+    std::strftime(date_buffer, sizeof(date_buffer), "%Y%m%d", std::gmtime(&t));
+    char time_buffer[20];
+    std::strftime(time_buffer, sizeof(time_buffer), "%H%M%S", std::gmtime(&t));
+    OFString contentDate(date_buffer);
+    OFString contentTime(time_buffer);
 
     TrcTractographyResults *trc = NULL;
     TrcTractographyResults::create(id, contentDate, contentTime, equipment, refs, trc);

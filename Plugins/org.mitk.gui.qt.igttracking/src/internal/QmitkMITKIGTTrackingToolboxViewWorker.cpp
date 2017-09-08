@@ -98,6 +98,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
     emit AutoDetectToolsFinished(false, e.GetDescription());
     return;
   }
+  m_NavigationToolStorage = nullptr;
   m_NavigationToolStorage = autoDetectedStorage;
   emit AutoDetectToolsFinished(true, "");
 }

@@ -192,6 +192,7 @@ void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
 
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructTrackingDevice()
 {
+  MITK_DEBUG << "Construct Tracking Device";
   QmitkAbstractTrackingDeviceWidget* currentWidget = this->GetWidget(this->GetCurrentDeviceName());
 
   if (currentWidget == nullptr)

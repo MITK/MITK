@@ -151,3 +151,7 @@ mitk::TrackingTool* mitk::TrackingDevice::GetToolByName( std::string name ) cons
   return nullptr;
 }
 
+std::string mitk::TrackingDevice::GetTrackingDeviceName()
+{
+  return this->GetData().Line;
+}

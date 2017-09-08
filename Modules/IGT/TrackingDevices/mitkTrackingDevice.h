@@ -130,13 +130,20 @@ namespace mitk {
       TrackingDeviceState GetState() const;
 
       /**
-       * \brief Deprecated! Use the more specific getDeviceData instead. return device type identifier
+       * \brief Deprecated! Use the more specific getData or GetTrackingDeviceName instead. return device type identifier
        */
     TrackingDeviceType GetType() const;
        /**
        * \brief Deprecated! Use the more specific setDeviceData instead. set device type
        */
     void SetType(TrackingDeviceType type);
+
+    /**
+    * \brief Convenient Method to get the Name of the Tracking Device.
+    * This is identical with GetData().Line and can be used to compare with TrackingDeviceTypeInformation::GetTrackingDeviceName()
+    * to check if you have a specific device.
+    */
+    std::string GetTrackingDeviceName();
 
      /**
        * \brief return device data

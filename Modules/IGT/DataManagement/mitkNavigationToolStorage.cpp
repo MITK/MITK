@@ -33,10 +33,12 @@ mitk::NavigationToolStorage::NavigationToolStorage()
   this->SetName("ToolStorage (no name given)");
   }
 
-mitk::NavigationToolStorage::NavigationToolStorage(mitk::DataStorage::Pointer ds) : m_storageLocked(false)
+mitk::NavigationToolStorage::NavigationToolStorage(mitk::DataStorage::Pointer ds)
+  : m_storageLocked(false)
   {
   m_ToolCollection = std::vector<mitk::NavigationTool::Pointer>();
   this->m_DataStorage = ds;
+  this->SetName("Tool Storage (no name given)");
   }
 
 void mitk::NavigationToolStorage::SetName(std::string n)
@@ -44,6 +46,11 @@ void mitk::NavigationToolStorage::SetName(std::string n)
   m_Name = n;
   m_props[ US_PROPKEY_STORAGE_NAME ] = m_Name;
   }
+
+std::string mitk::NavigationToolStorage::GetName() const
+{
+  return m_Name;
+}
 
  void mitk::NavigationToolStorage::UpdateMicroservice()
   {

@@ -204,7 +204,11 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
 
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
 {
-  m_TrackingDevice = ConstructTrackingDevice();
+  //Only create a new device, if we don't have one yet or if the device selection in the widget has changed.
+  //otherwise, hundered of devices will be created each time someone calls Get...
+  if (m_TrackingDevice.IsNull() || m_TrackingDevice->GetTrackingDeviceName() != this->GetCurrentDeviceName())
+    m_TrackingDevice = ConstructTrackingDevice();
+
   if (m_TrackingDevice.IsNull() || !m_TrackingDevice->IsDeviceInstalled()) return nullptr;
   else return this->m_TrackingDevice;
 }

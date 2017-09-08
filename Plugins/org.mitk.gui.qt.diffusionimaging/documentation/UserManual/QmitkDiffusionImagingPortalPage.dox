@@ -3,13 +3,13 @@
 
 \tableofcontents
 
-This module provides means to diffusion weighted image processing.
+MITK Diffusion offers a selection of image analysis methods for dMRI processing. It encompasses the research of the <a href="https://www.dkfz.de/en/mic/index.php">Division of Medical Image Computing</a> of the German Cancer Research Center (DKFZ).
 
 \section org_mitk_gui_qt_diffusionimagingComponents Components
 
 MITK Diffusion consists of multiple components with their own documentation:
 
-\subsection sub1 DICOM Import
+\subsection sub1 Data formats, import and export
 \li \subpage QmitkDiffusionImagingDataImportPage
 
 \subsection sub2 Preprocessing and Reconstruction

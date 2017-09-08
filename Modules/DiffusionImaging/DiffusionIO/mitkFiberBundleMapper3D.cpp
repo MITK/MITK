@@ -156,9 +156,10 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
     vtkSmartPointer<vtkDepthSortPolyData> depthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
     depthSort->SetInputData( m_FiberPolyData );
     depthSort->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
-    depthSort->SetDirectionToFrontToBack();
+    depthSort->SetDirectionToBackToFront();
     depthSort->Update();
     localStorage->m_FiberMapper->SetInputConnection(depthSort->GetOutputPort());
+
   }
   else
   {

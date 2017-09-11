@@ -81,6 +81,9 @@ public:
 
   virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer) override;
 
+  void setClipping(bool clipping);
+  void setClippingPlanes(double planes[6]);
+
 protected:
 
   GPUVolumeMapper3D();
@@ -125,6 +128,9 @@ protected:
   vtkSmartPointer<vtkPiecewiseFunction> m_BinaryOpacityTransferFunction;
   vtkSmartPointer<vtkPiecewiseFunction> m_BinaryGradientTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BinaryColorTransferFunction;
+
+  double m_ClippingRegionPlanes[6];
+  bool m_Clipping;
 
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {

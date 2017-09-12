@@ -1,9 +1,11 @@
 set(CPP_FILES
   mitkPhotoacousticImage.cpp
   Algorithms/mitkPhotoacousticBeamformingFilter.cpp
-  Algorithms/OCL/mitkPhotoacousticOCLBeamformer.cpp
-  Algorithms/OCL/mitkPhotoacousticBModeFilter.cpp
-  Algorithms/OCL/mitkPhotoacousticOCLUsedLinesCalculation.cpp
+  Algorithms/OpenCLFilter/mitkPhotoacousticOCLBeamformer.cpp
+  Algorithms/OpenCLFilter/mitkPhotoacousticBModeFilter.cpp
+  Algorithms/OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.cpp
+  Algorithms/OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.cpp
+  Algorithms/OpenCLFilter/mitkPhotoacousticOCLMemoryLocSum.cpp
 )
 
 set(RESOURCE_FILES
@@ -14,4 +16,7 @@ set(RESOURCE_FILES
   BModeAbs.cl
   BModeAbsLog.cl
   UsedLinesCalculation.cl
+  MemoryLocSum.cl
+  DelayCalculation.cl
+  DMAS.cl
 )

@@ -50,10 +50,9 @@ __kernel void ckDASQuad(
     short maxLine = min((l_i + part) + 1, (float)inputL);
     short minLine = max((l_i - part), 0.0f);
     short usedLines = (maxLine - minLine);
-    float apod_mult = apodArraySize / (maxLine - minLine);
+    float apod_mult = (float)apodArraySize / (float)usedLines;
     
     short AddSample = 0;
-    
     float output = 0;
 
     float delayMultiplicator = pow(1 / (TimeSpacing*SpeedOfSound) * Pitch * TransducerElements / inputL, 2) / s_i / 2;
@@ -62,7 +61,7 @@ __kernel void ckDASQuad(
     {
       AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-PAImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) {
-        output += apodArray[(short)((l_s - minLine)*apod_mult)] * dSource[(unsigned int)(globalPosZ * inputL * inputS + AddSample * inputL + l_s)];
+        output += apodArray[(int)((l_s - minLine)*apod_mult)] * dSource[(int)(globalPosZ * inputL * inputS + AddSample * inputL + l_s)];
         }
       else
         --usedLines;

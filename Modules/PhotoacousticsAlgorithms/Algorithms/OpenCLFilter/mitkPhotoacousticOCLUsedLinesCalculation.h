@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKPHOTOACOUSTICSTESTOCL_H_
-#define _MITKPHOTOACOUSTICSTESTOCL_H_
+#ifndef _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
+#define _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
 
 #ifdef PHOTOACOUSTICS_USE_GPU
 

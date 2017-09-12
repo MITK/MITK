@@ -26,7 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <thread>
 #include <itkImageIOBase.h>
 #include "mitkImageCast.h"
-#include <mitkPhotoacousticOCLBeamformer.h>
+#include "./OpenCLFilter/mitkPhotoacousticOCLBeamformer.h"
+#include "./OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.h"
+#include "./OpenCLFilter/mitkPhotoacousticOCLMemoryLocSum.h"
+#include "./OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.h"
 
 mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputData(nullptr)
 {
@@ -86,6 +89,7 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
   m_TimeOfHeaderInitialization.Modified();
 }
 
+
 void mitk::BeamformingFilter::GenerateData()
 {
   GenerateOutputInformation();
@@ -95,7 +99,7 @@ void mitk::BeamformingFilter::GenerateData()
   if (!output->IsInitialized())
     return;
 
-  const int apodArraySize = m_Conf.TransducerElements * 4; // set the resolution of the apodization array
+  const int apodArraySize = m_Conf.TransducerElements; // set the resolution of the apodization array
   float* ApodWindow;
 
   // calculate the appropiate apodization window
@@ -322,7 +326,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
     minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
-    apod_mult = apodArraySize / (maxLine - minLine);
+    apod_mult = (float)apodArraySize / (float)usedLines;
 
     delayMultiplicator = pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
 
@@ -376,7 +380,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
     minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
-    apod_mult = apodArraySize / (maxLine - minLine);
+    apod_mult = (float)apodArraySize / (float)usedLines;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
@@ -432,7 +436,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
     minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
-    apod_mult = apodArraySize / (maxLine - minLine);
+    apod_mult = (float)apodArraySize / (float)usedLines;
 
     delayMultiplicator = pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
 
@@ -505,7 +509,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
     minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
-    apod_mult = apodArraySize / (maxLine - minLine);
+    apod_mult = (float)apodArraySize / (float)usedLines;
 
     //calculate the AddSamples beforehand to save some time
     short* AddSample = new short[maxLine - minLine];

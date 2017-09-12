@@ -50,7 +50,7 @@ __kernel void ckDASSphe(
     short maxLine = min((l_i + part) + 1, (float)inputL);
     short minLine = max((l_i - part), 0.0f);
     short usedLines = (maxLine - minLine);
-    float apod_mult = apodArraySize / (maxLine - minLine);
+    float apod_mult = (float)apodArraySize / (float)usedLines;
     
     short AddSample = 0;
     float output = 0;

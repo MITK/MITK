@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
-#define _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
+#ifndef _MITKPHOTOACOUSTICSDELAYCALC_H_
+#define _MITKPHOTOACOUSTICSDELAYCALC_H_
 
 #ifdef PHOTOACOUSTICS_USE_GPU
 
@@ -34,11 +34,11 @@ namespace mitk
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
 
-  class OCLUsedLinesCalculation : public OclDataSetToDataSetFilter, public itk::Object
+  class OCLDelayCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
 
   public:
-    mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
+    mitkClassMacroItkParent(OCLDelayCalculation, itk::Object);
     itkNewMacro(Self);
 
     /**
@@ -55,13 +55,20 @@ namespace mitk
       m_Conf = conf;
     }
 
+    void SetInputs(cl_mem usedLines, cl_mem memoryLocations, unsigned int bufferSize)
+    {
+      m_MemLoc = memoryLocations;
+      m_UsedLines = usedLines;
+      m_BufferSize = bufferSize;
+    }
+
   protected:
 
     /** Constructor */
-    OCLUsedLinesCalculation();
+    OCLDelayCalculation();
 
     /** Destructor */
-    virtual ~OCLUsedLinesCalculation();
+    virtual ~OCLDelayCalculation();
 
     /** Initialize the filter */
     bool Initialize();
@@ -82,13 +89,16 @@ namespace mitk
 
     int m_sizeThis;
 
-
   private:
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
     mitk::BeamformingFilter::beamformingSettings m_Conf;
-    float m_part;
+    cl_mem m_MemLoc;
+    cl_mem m_UsedLines;
+    unsigned int m_BufferSize;
+    float m_DelayMultiplicatorRaw;
+    char m_IsPAImage;
   };
 }
 #endif

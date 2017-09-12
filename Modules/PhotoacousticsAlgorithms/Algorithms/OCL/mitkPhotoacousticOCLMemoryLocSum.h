@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
-#define _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
+#ifndef _MITKPHOTOACOUSTICSPARALLELSUM_H_
+#define _MITKPHOTOACOUSTICSPARALLELSUM_H_
 
 #ifdef PHOTOACOUSTICS_USE_GPU
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
-#include <mitkPhotoacousticBeamformingFilter.h>
 
 namespace mitk
 {
@@ -34,11 +33,11 @@ namespace mitk
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
 
-  class OCLUsedLinesCalculation : public OclDataSetToDataSetFilter, public itk::Object
+  class OCLMemoryLocSum : public OclDataSetToDataSetFilter, public itk::Object
   {
 
   public:
-    mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
+    mitkClassMacroItkParent(OCLMemoryLocSum, itk::Object);
     itkNewMacro(Self);
 
     /**
@@ -50,18 +49,24 @@ namespace mitk
     /** Update the filter */
     void Update();
 
-    void SetConfig(mitk::BeamformingFilter::beamformingSettings conf)
+    void SetInputDimensions(unsigned int* dimensions)
     {
-      m_Conf = conf;
+      m_Dim[0] = dimensions[0];
+      m_Dim[1] = dimensions[1];
+    }
+
+    unsigned int GetSum()
+    {
+      return m_Sum;
     }
 
   protected:
 
     /** Constructor */
-    OCLUsedLinesCalculation();
+    OCLMemoryLocSum();
 
     /** Destructor */
-    virtual ~OCLUsedLinesCalculation();
+    virtual ~OCLMemoryLocSum();
 
     /** Initialize the filter */
     bool Initialize();
@@ -82,13 +87,12 @@ namespace mitk
 
     int m_sizeThis;
 
-
   private:
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
-    mitk::BeamformingFilter::beamformingSettings m_Conf;
-    float m_part;
+    unsigned int m_Sum;
+    unsigned int m_Dim[3];
   };
 }
 #endif

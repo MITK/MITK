@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPhotoacousticBeamformingFilter.h"
 #include <chrono>
 #include <mitkAutoCropImageFilter.h>
-#include <mitkPhotoacousticBModeFilter.h>
+#include "./OpenCLFilter/mitkPhotoacousticBModeFilter.h"
 
 
 // itk dependencies

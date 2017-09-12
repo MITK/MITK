@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
+#ifdef PHOTOACOUSTICS_USE_GPU
 #define _USE_MATH_DEFINES
 
 #include <cmath>
@@ -103,3 +103,4 @@ bool mitk::OCLUsedLinesCalculation::Initialize()
   }
   return (OclFilter::IsInitialized() && buildErr);
 }
+#endif

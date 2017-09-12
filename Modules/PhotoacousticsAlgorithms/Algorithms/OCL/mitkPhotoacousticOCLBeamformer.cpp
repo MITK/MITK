@@ -24,8 +24,8 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
 {
   this->AddSourceFile("DASQuadratic.cl");
   this->AddSourceFile("DMASQuadratic.cl");
-  this->AddSourceFile("DASspherical.cl");
-  this->AddSourceFile("DMASspherical.cl");
+  this->AddSourceFile("DASSpherical.cl");
+  this->AddSourceFile("DMASSpherical.cl");
 
   unsigned int dim[] = { 128, 2048, 2 };
 

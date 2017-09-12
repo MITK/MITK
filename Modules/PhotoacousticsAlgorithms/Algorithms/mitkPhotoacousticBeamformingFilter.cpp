@@ -464,7 +464,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
         --usedLines;
     }
 
-    output[sample*(short)outputL + line] = 10 * output[sample*(short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
 
     delete[] AddSample;
   }
@@ -539,7 +539,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
         --usedLines;
     }
 
-    output[sample*(short)outputL + line] = 10 * output[sample*(short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1));
 
     delete[] AddSample;
   }

@@ -80,7 +80,7 @@ namespace mitk {
       /**
      *\brief Contains number of components
     */
-    unsigned int componentSize = 0;
+    unsigned int componentSize = 1;
 
     /**
     * \brief Returns the first time point for which the object is valid.

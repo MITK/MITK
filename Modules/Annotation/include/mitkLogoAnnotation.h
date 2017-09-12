@@ -52,7 +52,8 @@ namespace mitk
     mitkClassMacro(LogoAnnotation, mitk::VtkAnnotation);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      vtkSmartPointer<vtkImageReader2Factory> m_readerFactory;
+    vtkSmartPointer<vtkImageReader2Factory> m_readerFactory;
+    void SetLogoImage(vtkSmartPointer<vtkImageData> logo);
 
     void SetLogoImagePath(std::string text);
     std::string GetLogoImagePath() const;
@@ -80,8 +81,6 @@ namespace mitk
     virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
     void UpdateVtkAnnotation(mitk::BaseRenderer *renderer) override;
 
-    vtkImageData *CreateMbiLogo();
-
     /** \brief explicit constructor which disallows implicit conversions */
     explicit LogoAnnotation();
 
@@ -89,6 +88,8 @@ namespace mitk
     virtual ~LogoAnnotation();
 
   private:
+
+    vtkSmartPointer<vtkImageData> m_UpdatedLogoImage;
     vtkSmartPointer<vtkImageImport> m_VtkImageImport;
 
     /** \brief copy constructor */

@@ -34,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkMouseModeSwitcher.h>
 #include <QmitkStdMultiWidget.h>
 
-#include <mbilogo.h>
-
 class QmitkStdMultiWidgetEditorPrivate
 {
 public:
@@ -338,6 +336,11 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   // If no logo was set for this plug-in specifically, walk the parent preference nodes
   // and lookup a logo value there.
 
+  //We need to disable the logo first, otherwise setting a new logo will have no effect due to how mitkManufacturerLogo works
+  d->m_StdMultiWidget->DisableDepartmentLogo();
+  d->m_StdMultiWidget->SetDepartmentLogo(qPrintable(":/org.mitk.gui.qt.stdmultiwidgeteditor/defaultWatermark.png"));
+  d->m_StdMultiWidget->EnableDepartmentLogo();
+
   const berry::IPreferences* currentNode = prefs;
 
   while(currentNode)
@@ -358,7 +361,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
           // we need to disable the logo first, otherwise setting a new logo will have
           // no effect due to how mitkManufacturerLogo works...
           d->m_StdMultiWidget->DisableDepartmentLogo();
-          d->m_StdMultiWidget->SetDepartmentLogoPath(qPrintable(departmentLogoLocation));
+          d->m_StdMultiWidget->SetDepartmentLogo(qPrintable(departmentLogoLocation));
           d->m_StdMultiWidget->EnableDepartmentLogo();
         }
         logoFound = true;

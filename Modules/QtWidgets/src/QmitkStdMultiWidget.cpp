@@ -43,6 +43,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkStatusBar.h>
 #include <mitkVtkLayerController.h>
+#include <vtkSmartPointer.h>
+#include <vtkQImageToImageSource.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
 #include <vtkTextProperty.h>
@@ -308,9 +310,9 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitk::Point2D offset;
   offset.Fill(0.03);
   m_LogoRendering->SetOffsetVector(offset);
-  m_LogoRendering->SetRelativeSize(0.15);
+  m_LogoRendering->SetRelativeSize(0.25);
   m_LogoRendering->SetCornerPosition(1);
-  m_LogoRendering->SetLogoImagePath("DefaultLogo");
+  SetDepartmentLogo(":/org.mitk.gui.qt.stdmultiwidgeteditor/defaultWatermark.png");
   mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoRendering.GetPointer(), renderer4);
 }
 
@@ -319,7 +321,7 @@ void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
   // We have 4 widgets and ...
   for (unsigned int i = 0; i < 4; ++i)
   {
-    float black[3] = {0.0f, 0.0f, 0.0f};
+    float black[3] = { 0.0f, 0.0f, 0.0f };
     m_GradientBackgroundColors[i] = std::make_pair(mitk::Color(black), mitk::Color(black));
   }
 }
@@ -329,7 +331,7 @@ std::pair<mitk::Color, mitk::Color> QmitkStdMultiWidget::GetGradientColors(unsig
   if (widgetNumber > 3)
   {
     MITK_ERROR << "Decoration color for unknown widget!";
-    float black[3] = {0.0f, 0.0f, 0.0f};
+    float black[3] = { 0.0f, 0.0f, 0.0f };
     return std::make_pair(mitk::Color(black), mitk::Color(black));
   }
   return m_GradientBackgroundColors[widgetNumber];
@@ -1814,9 +1816,17 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors(const mitk::Color &upper, 
   m_GradientBackgroundFlag = true;
 }
 
-void QmitkStdMultiWidget::SetDepartmentLogoPath(const char *path)
+void QmitkStdMultiWidget::SetDepartmentLogo(const char *path)
 {
-  m_LogoRendering->SetLogoImagePath(path);
+  MITK_INFO << path;
+  QImage* qimage = new QImage(path);
+  vtkSmartPointer<vtkQImageToImageSource> qImageToVtk;
+  qImageToVtk = vtkSmartPointer<vtkQImageToImageSource>::New();
+
+  qImageToVtk->SetQImage(qimage);
+  qImageToVtk->Update();
+
+  m_LogoRendering->SetLogoImage(qImageToVtk->GetOutput());
   mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
   m_LogoRendering->Update(renderer);
   RequestUpdate();

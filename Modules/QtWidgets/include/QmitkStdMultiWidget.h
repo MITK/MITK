@@ -233,7 +233,7 @@ public slots:
 
   void SetGradientBackgroundColors(const mitk::Color &upper, const mitk::Color &lower);
 
-  void SetDepartmentLogoPath(const char *path);
+  void SetDepartmentLogo(const char *path);
 
   void SetWidgetPlaneModeToSlicing(bool activate);
 

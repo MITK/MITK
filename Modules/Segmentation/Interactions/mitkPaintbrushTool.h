@@ -58,6 +58,9 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
 
     void SetSize(int value);
 
+    void SetGeometrySlice(const itk::EventObject& geometrySliceEvent);
+    void SetGeometry(const itk::EventObject&) {};
+
   protected:
 
     PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
@@ -75,11 +78,13 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* );
     virtual void OnInvertLogic  ( StateMachineAction*, InteractionEvent* );
 
+    void MouseMovedImpl(const mitk::PlaneGeometry* planeGeometry, bool leftMouseButtonPressed);
+
     /**
      * \todo This is a possible place where to introduce
      *       different types of pens
      */
-    void UpdateContour( const InteractionPositionEvent* );
+    void UpdateContour();
 
 
     /**
@@ -90,7 +95,7 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     /**
       * Checks  if the current slice has changed
       */
-    void CheckIfCurrentSliceHasChanged(const InteractionPositionEvent* event);
+    void CheckIfCurrentSliceHasChanged(const mitk::PlaneGeometry* planeGeometry);
 
     void OnToolManagerWorkingDataModified();
     void OnToolManagerImageModified(const itk::EventObject&);
@@ -108,6 +113,8 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     mitk::Point3D m_LastPosition;
     Image::Pointer m_WorkingImage;
     int m_ImageObserverTag;
+    int m_LastTimeStep;
+    Point3D m_LastWorldCoordinates;
 };
 
 } // namespace

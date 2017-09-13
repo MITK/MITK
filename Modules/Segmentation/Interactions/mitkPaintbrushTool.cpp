@@ -34,7 +34,8 @@ mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
     m_PaintingPixelValue(paintingPixelValue),
     m_LastContourSize(0), // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
     m_WorkingImage(nullptr),
-    m_ImageObserverTag(0)
+    m_ImageObserverTag(0),
+    m_LastTimeStep(0)
 {
   m_MasterContour = ContourModel::New();
   m_MasterContour->Initialize();
@@ -65,10 +66,30 @@ void mitk::PaintbrushTool::Activated()
   FeedbackContourTool::SetFeedbackContourVisible(true);
   SizeChanged.Send(m_Size);
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
+
+  std::vector<mitk::BaseRenderer*> windows = {
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")),
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")),
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
+  };
+
+  for (auto window : windows) {
+    window->GetSliceNavigationController()->ConnectGeometrySliceEvent(this, false);
+  }
 }
 
 void mitk::PaintbrushTool::Deactivated()
 {
+  std::vector<mitk::BaseRenderer*> windows = {
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")),
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")),
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))
+  };
+
+  for (auto window : windows) {
+    window->GetSliceNavigationController()->Disconnect(this);
+  }
+
   FeedbackContourTool::SetFeedbackContourVisible(false);
   if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
       m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
@@ -86,6 +107,19 @@ void mitk::PaintbrushTool::Deactivated()
   Superclass::Deactivated();
 }
 
+void mitk::PaintbrushTool::SetGeometrySlice(const itk::EventObject& geometrySliceEvent)
+{
+  const SliceNavigationController::GeometrySliceEvent* sliceEvent =
+    dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
+  int pos = sliceEvent->GetPos();
+  const mitk::TimeGeometry* timeGeom = sliceEvent->GetTimeGeometry();
+  const mitk::BaseGeometry* baseGeometry = timeGeom->GetGeometryForTimeStep(m_LastTimeStep);
+  const mitk::SlicedGeometry3D *slicedGeometry = dynamic_cast<const mitk::SlicedGeometry3D*>(baseGeometry);
+  const mitk::PlaneGeometry* planeGeometry = slicedGeometry->GetPlaneGeometry(pos);
+
+  MouseMovedImpl(planeGeometry, false);
+}
+
 void mitk::PaintbrushTool::SetSize(int value)
 {
   m_Size = value;
@@ -99,17 +133,8 @@ mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
 }
 
 
-void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positionEvent)
+void mitk::PaintbrushTool::UpdateContour()
 {
-  //MITK_INFO<<"Update...";
-  // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
-  //mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return;
-
-  // Get Spacing of current Slice
-  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing();
-
   //
   // Draw a contour in Square according to selected brush size
   //
@@ -325,44 +350,51 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
-  CheckIfCurrentSliceHasChanged( positionEvent );
+  m_LastTimeStep = positionEvent->GetSender()->GetTimeStep();
+  m_LastWorldCoordinates = positionEvent->GetPositionInWorld();
 
-  if ( m_LastContourSize != m_Size )
-  {
-    UpdateContour( positionEvent );
+  MouseMovedImpl(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), leftMouseButtonPressed);
+
+  assert( positionEvent->GetSender()->GetRenderWindow() );
+
+  RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+}
+
+void mitk::PaintbrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeometry, bool leftMouseButtonPressed)
+{
+  CheckIfCurrentSliceHasChanged(planeGeometry);
+
+  if (m_LastContourSize != m_Size) {
+    UpdateContour();
     m_LastContourSize = m_Size;
   }
 
-  Point3D worldCoordinates = positionEvent->GetPositionInWorld();
   Point3D indexCoordinates;
+  m_WorkingSlice->GetGeometry()->WorldToIndex(m_LastWorldCoordinates, indexCoordinates);
 
-  m_WorkingSlice->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
-
-  MITK_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
-  MITK_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
+  MITK_DEBUG << "Mouse at W " << m_LastWorldCoordinates << std::endl;
+  MITK_DEBUG << "Mouse at I " << m_LastWorldCoordinates << std::endl;
 
   // round to nearest voxel center (abort if this hasn't changed)
-  if ( m_Size % 2 == 0 ) // even
+  if (m_Size % 2 == 0) // even
   {
-    indexCoordinates[0] = ROUND( indexCoordinates[0]);// /*+ 0.5*/) + 0.5;
-    indexCoordinates[1] = ROUND( indexCoordinates[1]);// /*+ 0.5*/ ) + 0.5;
-  }
-  else // odd
+    indexCoordinates[0] = ROUND(indexCoordinates[0]);// /*+ 0.5*/) + 0.5;
+    indexCoordinates[1] = ROUND(indexCoordinates[1]);// /*+ 0.5*/ ) + 0.5;
+  } else // odd
   {
-    indexCoordinates[0] = ROUND( indexCoordinates[0]  ) ;
-    indexCoordinates[1] = ROUND( indexCoordinates[1] ) ;
+    indexCoordinates[0] = ROUND(indexCoordinates[0]);
+    indexCoordinates[1] = ROUND(indexCoordinates[1]);
   }
 
   static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
-  if ( fabs(indexCoordinates[0] - lastPos[0]) > mitk::eps ||
-       fabs(indexCoordinates[1] - lastPos[1]) > mitk::eps ||
-       fabs(indexCoordinates[2] - lastPos[2]) > mitk::eps ||
-       leftMouseButtonPressed
-     )
+  if (fabs(indexCoordinates[0] - lastPos[0]) > mitk::eps ||
+    fabs(indexCoordinates[1] - lastPos[1]) > mitk::eps ||
+    fabs(indexCoordinates[2] - lastPos[2]) > mitk::eps ||
+    leftMouseButtonPressed
+    )
   {
     lastPos = indexCoordinates;
-  }
-  else
+  } else
   {
     MITK_DEBUG << "." << std::flush;
     return;
@@ -370,22 +402,20 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
 
   MITK_DEBUG << "Mouse at C " << indexCoordinates;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-
   ContourModel::Pointer contour = ContourModel::New();
-  contour->Expand(timestep + 1);
-  contour->SetClosed(true, timestep);
+  contour->Expand(m_LastTimeStep + 1);
+  contour->SetClosed(true, m_LastTimeStep);
 
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();
 
-  while(it != end)
+  while (it != end)
   {
     Point3D point = (*it)->Coordinates;
-    point[0] += indexCoordinates[ 0 ];
-    point[1] += indexCoordinates[ 1 ];
+    point[0] += indexCoordinates[0];
+    point[1] += indexCoordinates[1];
 
-    contour->AddVertex( point, timestep );
+    contour->AddVertex(point, m_LastTimeStep);
     it++;
   }
 
@@ -395,13 +425,13 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
     const double radius = static_cast<double>(m_Size) / 2.0;
 
     // draw it the old way
-    FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+    FeedbackContourTool::FillContourInSlice(contour, m_LastTimeStep, m_WorkingSlice, m_PaintingPixelValue);
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
 
     // if points are >= radius away draw rectangle to fill empty holes
     // in between the 2 points
-    if ( dist > radius )
+    if (dist > radius)
     {
       const mitk::Point3D& currentPos = indexCoordinates;
       mitk::Point3D direction;
@@ -446,7 +476,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
 
       contour->AddVertex(vertex);
 
-      FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+      FeedbackContourTool::FillContourInSlice(contour, m_LastTimeStep, m_WorkingSlice, m_PaintingPixelValue);
       m_WorkingNode->SetData(m_WorkingSlice);
       m_WorkingNode->Modified();
     }
@@ -458,27 +488,22 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   ContourModel::Pointer displayContour = this->GetFeedbackContour();
   displayContour->Clear();
 
-  ContourModel::Pointer tmp = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  ContourModel::Pointer tmp = FeedbackContourTool::BackProjectContourFrom2DSlice(m_WorkingSlice->GetGeometry(), /*displayContour*/contour);
 
   // copy transformed contour into display contour
-  it =  tmp->Begin();
+  it = tmp->Begin();
   end = tmp->End();
 
-  while(it != end)
+  while (it != end)
   {
     Point3D point = (*it)->Coordinates;
 
-    displayContour->AddVertex( point, timestep );
+    displayContour->AddVertex(point, m_LastTimeStep);
     it++;
   }
 
   m_FeedbackContourNode->GetData()->Modified();
-
-  assert( positionEvent->GetSender()->GetRenderWindow() );
-
-  RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 }
-
 
 void mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
@@ -486,7 +511,7 @@ void mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEven
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return;
 
-  CheckIfCurrentSliceHasChanged(positionEvent);
+  CheckIfCurrentSliceHasChanged(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry());
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 }
 
@@ -509,10 +534,9 @@ void mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
+void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeometry* planeGeometry)
 {
-    const PlaneGeometry* planeGeometry( (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-    const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+    const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (planeGeometry) );
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 
     if (!workingNode)
@@ -545,7 +569,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
     {
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
-        m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+        m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, m_LastTimeStep)->Clone();
         m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
 
@@ -562,7 +586,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
             m_WorkingSlice = nullptr;
             m_WorkingNode = nullptr;
             m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
-            m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+            m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, m_LastTimeStep)->Clone();
 
             m_WorkingNode = mitk::DataNode::New();
             m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );

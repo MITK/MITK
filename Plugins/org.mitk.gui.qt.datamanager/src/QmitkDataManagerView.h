@@ -226,7 +226,8 @@ protected:
 
 
   ///# A list of ALL actions for the Context Menu
-  std::vector< std::pair< QmitkNodeDescriptor*, QAction* > > m_DescriptorActionList;
+  using DescriptorActionListType = std::vector< std::pair< QmitkNodeDescriptor*, QAction* > >;
+  DescriptorActionListType m_DescriptorActionList;
 
   /// A Slider widget to change the opacity of a node
   QSlider* m_OpacitySlider;

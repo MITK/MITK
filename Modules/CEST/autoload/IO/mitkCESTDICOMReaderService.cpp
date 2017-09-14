@@ -28,6 +28,16 @@ namespace mitk
   CESTDICOMReaderService::CESTDICOMReaderService()
     : BaseDICOMReaderService(CustomMimeType(MitkCESTIOMimeTypes::CEST_DICOM_MIMETYPE_NAME()), "MITK CEST DICOM Reader")
   {
+    Options defaultOptions;
+
+    std::vector<std::string> parseStrategy;
+    parseStrategy.push_back("Automatic");
+    parseStrategy.push_back("CEST/WASABI");
+    parseStrategy.push_back("T1");
+    defaultOptions["Force type"] = parseStrategy;
+
+    this->SetDefaultOptions(defaultOptions);
+
     this->RegisterService();
   }
 
@@ -54,6 +64,10 @@ namespace mitk
   {
     std::vector<BaseData::Pointer> result = BaseDICOMReaderService::Read();
 
+    const Options options = this->GetOptions();
+
+    const std::string parseStrategy = options.find("Force type")->second.ToString();
+
     mitk::StringList relevantFiles = this->GetRelevantFiles();
 
     mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
@@ -71,6 +85,7 @@ namespace mitk
     std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
 
     mitk::CustomTagParser tagParser(relevantFiles[0]);
+    tagParser.SetParseStrategy(parseStrategy);
 
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
 

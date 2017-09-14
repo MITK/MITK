@@ -68,6 +68,8 @@ namespace mitk
     /// parse the provided string and return a property list based on the closest revision parameter mapping
     mitk::PropertyList::Pointer ParseDicomPropertyString(std::string dicomPropertyString);
 
+    void SetParseStrategy(std::string parseStrategy);
+
     /// name of the property for the offsets, including normalization offsets
     static const std::string m_OffsetsPropertyName;
 
@@ -104,6 +106,8 @@ namespace mitk
     static const std::string m_DefaultJsonString;
     /// path to the dicom data
     std::string m_DicomDataPath;
+    /// Should the kind of data be automatically determined or should it be parsed as a specific one
+    std::string m_ParseStrategy;
   };
 }
 

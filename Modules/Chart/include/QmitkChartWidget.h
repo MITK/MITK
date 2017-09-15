@@ -55,6 +55,16 @@ public:
     darkstyle
   };
 
+  /*!
+  * \brief enum of legend position. Supported are bottom, right, inset.
+  * See http://c3js.org/reference.html#legend-position
+  */
+  enum class LegendPosition {
+    bottom,
+    right,
+    inset
+  };
+
   explicit QmitkChartWidget(ChartType type=ChartType::bar, QWidget* parent = nullptr);
   virtual ~QmitkChartWidget();
 
@@ -85,6 +95,9 @@ public:
   void SetYAxisLabel(const std::string& label);
   std::string GetYAxisLabel() const;
 
+  void SetDiagramTitle(const std::string &title);
+  std::string GetDiagramTitle() const;
+
   /*!
   * \brief sets the diagram type
   *  \note to also display the changes, call ChangeDiagramTypeAndReload()
@@ -92,6 +105,9 @@ public:
   */
   void SetChartType(ChartType type);
   ChartType GetChartType() const;
+
+  void SetLegendPosition(LegendPosition position);
+  LegendPosition GetLegendPosition() const;
 
   /*!
   * \brief Reloads the chart and changes the chart type

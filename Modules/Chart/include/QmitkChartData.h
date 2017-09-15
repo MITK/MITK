@@ -31,7 +31,9 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QList<QVariant> m_dataLabels READ GetDataLabels WRITE SetDataLabels NOTIFY SignalDataLabelsChanged);
   Q_PROPERTY(QVariant m_xAxisLabel READ GetXAxisLabel WRITE SetXAxisLabel NOTIFY SignalXAxisLabelChanged);
   Q_PROPERTY(QVariant m_yAxisLabel READ GetYAxisLabel WRITE SetYAxisLabel NOTIFY SignalYAxisLabelChanged);
+  Q_PROPERTY(QVariant m_diagramTitle READ GetDiagramTitle WRITE SetDiagramTitle NOTIFY SignalDiagramTitleChanged);
   Q_PROPERTY(QVariant m_DiagramTypeName READ GetDiagramType WRITE SetDiagramType NOTIFY SignalDiagramTypeChanged);
+  Q_PROPERTY(QVariant m_LegendPosition READ GetLegendPosition WRITE SetLegendPosition NOTIFY SignalLegendPositionChanged);
   Q_PROPERTY(QVariant m_ShowSubchart READ GetShowSubchart WRITE SetShowSubchart NOTIFY SignalShowSubchartChanged);
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
 
@@ -49,8 +51,14 @@ public:
   Q_INVOKABLE QVariant GetYAxisLabel() const { return m_yAxisLabel; };
   Q_INVOKABLE void SetYAxisLabel(const QVariant& label) { m_yAxisLabel = label; emit SignalYAxisLabelChanged(label); };
 
+  Q_INVOKABLE QVariant GetDiagramTitle() const { return m_diagramTitle; };
+  Q_INVOKABLE void SetDiagramTitle(const QVariant& title) { m_diagramTitle = title; emit SignalDiagramTitleChanged(title); };
+
   Q_INVOKABLE QVariant GetDiagramType() const { return m_DiagramTypeName; };
   Q_INVOKABLE void SetDiagramType(const QVariant& diagramTypeName) { m_DiagramTypeName = diagramTypeName; emit SignalDiagramTypeChanged(diagramTypeName); };
+
+  Q_INVOKABLE QVariant GetLegendPosition() const { return m_LegendPosition; };
+  Q_INVOKABLE void SetLegendPosition(const QVariant& legendPosition) { m_LegendPosition = legendPosition; emit SignalLegendPositionChanged(legendPosition); };
 
   Q_INVOKABLE QVariant GetShowSubchart() const { return m_ShowSubchart; };
   Q_INVOKABLE void SetShowSubchart(const QVariant& showSubchart) { m_ShowSubchart = showSubchart; emit SignalShowSubchartChanged(showSubchart); };
@@ -63,6 +71,8 @@ signals:
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
   void SignalDiagramTypeChanged(const QVariant chartType);
+  void SignalLegendPositionChanged(const QVariant legendPosition);
+  void SignalDiagramTitleChanged(const QVariant title);
   void SignalShowSubchartChanged(const QVariant showSubchart);
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
 
@@ -73,6 +83,7 @@ private:
   QVariant m_diagramTitle;
 
   QVariant m_DiagramTypeName;
+  QVariant m_LegendPosition;
   QVariant m_ShowSubchart;
   QVariant m_UsePercentageInPieChart;
   QVariant m_numberDatasets;

@@ -11,6 +11,7 @@ var chartData;
 var xValues=[];
 var yValues=[];
 var xs = {};
+var dataColors = {};
 
 //Is executed when js is loaded first.
 //Extracts relevant information from chartData in variables
@@ -41,6 +42,7 @@ window.onload = function()
 			yDataTemp.push(null); //append null value, to make sure the last tick on y-axis is displayed correctly
 			xValues[count] = xDataTemp
 			yValues[count] = yDataTemp
+			dataColors[dataLabelsTemp] = channel.objects[propertyName].m_Color
 			count++;
 		}
 	}
@@ -142,7 +144,9 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
         selection: {
           enabled: false,
           multiple: false,
-        }
+        },
+		colors: dataColors,
+
     },
     legend: {
         position: 'bottom'

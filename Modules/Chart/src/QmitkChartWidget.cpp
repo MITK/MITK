@@ -40,6 +40,8 @@ public:
 
   std::vector<std::string> GetDataLabels() const;
 
+  void SetColor(const std::string& label, const std::string& colorName);
+
   void SetXAxisLabel(const std::string& label);
   std::string GetXAxisLabel() const;
 
@@ -120,7 +122,7 @@ void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const 
   for (const auto& aValue : data1D) {
     data1DConverted.append(aValue);
   }
-  GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted));
+  GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted, QVariant(QString::fromStdString(label))));
   auto definedLabels = GetC3Data()->GetDataLabels();
   AddLabelIfNotAlreadyDefined(definedLabels, label);
   GetC3Data()->SetDataLabels(definedLabels);
@@ -131,7 +133,7 @@ void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, c
   for (const auto& aValue : data2D) {
     data2DConverted.insert(aValue.first, aValue.second);
   }
-  GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted));
+  GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(label))));
   auto definedLabels = GetC3Data()->GetDataLabels();
   AddLabelIfNotAlreadyDefined(definedLabels, label);
   GetC3Data()->SetDataLabels(definedLabels);
@@ -144,6 +146,18 @@ std::vector<std::string> QmitkChartWidget::Impl::GetDataLabels() const {
     dataLabelsAsStringVector.push_back(label.toString().toStdString());
   }
   return dataLabelsAsStringVector;
+}
+
+void QmitkChartWidget::Impl::SetColor(const std::string& label, const std::string& colorName)
+{
+  auto C3xyData = GetC3xyData();
+  for (auto element = C3xyData->begin(); element != C3xyData->end(); ++element) {
+    if ((*element)->GetLabel().toString().toStdString() == label) {
+      (*element)->SetColor(QVariant(QString::fromStdString(colorName)));
+      return;
+    }
+  }
+  MITK_WARN << "label " << label << " not found: color " << colorName << " could not be set in chartWidget";
 }
 
 void QmitkChartWidget::Impl::SetXAxisLabel(const std::string& label) { 
@@ -229,6 +243,11 @@ QmitkChartWidget::~QmitkChartWidget()
 void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D, const std::string& label)
 {
   m_Impl->AddData2D(data2D, label);
+}
+
+void QmitkChartWidget::SetColor(const std::string& label, const std::string& colorName)
+{
+  m_Impl->SetColor(label, colorName);
 }
 
 void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label)

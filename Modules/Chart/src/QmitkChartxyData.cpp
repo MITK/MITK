@@ -16,11 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkChartxyData.h>
 
-QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data) {
-  SetData(data);
+QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data, const QVariant& label) {
+  SetData(data, label);
+  m_Color = "";
 }
 
-QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data) {
+QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& label) {
   QMap<QVariant, QVariant> augmentedData;
   unsigned int count = 0;
   //just augment the 1D data
@@ -28,17 +29,19 @@ QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data) {
     augmentedData[count] = ele;
     count++;
   }
-  SetData(augmentedData);
+  SetData(augmentedData, label);
+  m_Color = "";
 }
 
 
-void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data)
+void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data, const QVariant& label)
 {
 	for (const auto& entry : data.toStdMap())
 	{
 		m_XData.push_back(entry.first);
 		m_YData.push_back(entry.second);
 	}
+  m_Label = label;
 }
 
 void QmitkChartxyData::ClearData()

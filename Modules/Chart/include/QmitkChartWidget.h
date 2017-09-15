@@ -72,6 +72,8 @@ public:
   */
   void AddData2D(const std::map<double, double>& data2D, const std::string& label);
 
+  void SetColor(const std::string& label, const std::string& colorName);
+
   std::vector<std::string> GetDataLabels() const;
 
   void SetXAxisLabel(const std::string& label);

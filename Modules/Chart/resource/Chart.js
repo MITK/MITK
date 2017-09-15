@@ -74,7 +74,8 @@ function setupChart(chartData)
 {
   window.onresize();
 
-  GenerateChart(chartData.m_DiagramTypeName, chartData.m_ShowSubchart, chartData.m_UsePercentageInPieChart, chartData.m_xAxisLabel, chartData.m_yAxisLabel)
+  GenerateChart(chartData.m_DiagramTypeName, chartData.m_ShowSubchart, chartData.m_UsePercentageInPieChart, 
+  chartData.m_xAxisLabel, chartData.m_yAxisLabel, chartData.m_diagramTitle, chartData.m_LegendPosition)
     
   chart.unload(); //unload data before loading new data
   
@@ -116,7 +117,7 @@ function changeTheme(color) {
 //chartType: either bar, line or pie
 //showSubchart: see http://c3js.org/samples/options_subchart.html
 //usePercentageInPieChart: percentage labels (only for pie chart)
-function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLabel, yAxisLabel)
+function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLabel, yAxisLabel, title, legendPosition)
 {
 	//adaption for bar ratio indepenend of amount of data points
 	//otherwise, bars could be covered.
@@ -135,6 +136,10 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
 		formatCharacter = 's'
 	}
   chart = c3.generate({
+	title:{
+		text: title,
+		position: 'top-center'
+	},
     data: {
         xs: {}, //use first "column" as x axis values
         columns: [],  //initialize empty. Data will be loaded in function setupChart(chartData)
@@ -145,7 +150,8 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
         }
     },
     legend: {
-        position: 'bottom'
+        position: legendPosition,
+		show: true
     },
     grid: {
       y: {

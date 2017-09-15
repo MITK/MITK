@@ -39,7 +39,6 @@ public:
   void ClearData2D();
 
   void SetDataLabels(const std::vector<std::string>& labels);
-
   std::vector<std::string> GetDataLabels() const;
 
   void SetXAxisLabel(const std::string& label);
@@ -47,6 +46,13 @@ public:
 
   void SetYAxisLabel(const std::string& label);
   std::string GetYAxisLabel() const;
+
+  void SetDiagramTitle(const std::string &title);
+  std::string GetDiagramTitle() const;
+
+  void SetLegendPosition(LegendPosition position);
+  LegendPosition GetLegendPosition() const;
+  std::string GetLegendPositionAsString() const;
 
   void SetDiagramType(QmitkChartWidget::ChartType diagramType);
   ChartType GetDiagramType() const;
@@ -66,6 +72,7 @@ private:
   QmitkChartData * m_C3Data;
   std::vector<QmitkChartxyData*> * m_C3xyData;
   std::map<QmitkChartWidget::ChartType, std::string> m_DiagramTypeToName;
+  std::map<QmitkChartWidget::LegendPosition, std::string> m_LegendPositionToName;
 };
 
 QmitkChartWidget::Impl::Impl(QWidget* parent)
@@ -91,6 +98,10 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
   m_DiagramTypeToName.emplace(ChartType::line, "line");
   m_DiagramTypeToName.emplace(ChartType::spline, "spline");
   m_DiagramTypeToName.emplace(ChartType::pie, "pie");
+
+  m_LegendPositionToName.emplace(LegendPosition::bottom, "bottom");
+  m_LegendPositionToName.emplace(LegendPosition::right, "right");
+  m_LegendPositionToName.emplace(LegendPosition::inset, "inset");
 
   m_C3Data = new QmitkChartData();
   m_C3xyData = new std::vector<QmitkChartxyData*>();
@@ -151,6 +162,33 @@ void QmitkChartWidget::Impl::SetYAxisLabel(const std::string& label) {
 std::string QmitkChartWidget::Impl::GetYAxisLabel() const { 
   return GetC3Data()->GetYAxisLabel().toString().toStdString(); 
 }
+
+void QmitkChartWidget::Impl::SetDiagramTitle(const std::string& title) {
+  GetC3Data()->SetDiagramTitle(QString::fromStdString(title));
+}
+
+std::string QmitkChartWidget::Impl::GetDiagramTitle() const {
+  return GetC3Data()->GetDiagramTitle().toString().toStdString();
+}
+
+void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition legendPosition) {
+  const std::string legendPositionName(m_LegendPositionToName.at(legendPosition));
+  GetC3Data()->SetLegendPosition(QString::fromStdString(legendPositionName));
+}
+
+QmitkChartWidget::LegendPosition QmitkChartWidget::Impl::GetLegendPosition() const {
+  for (const auto& aLegendPosition : m_LegendPositionToName) {
+    if (aLegendPosition.second == GetLegendPositionAsString()) {
+      return aLegendPosition.first;
+    }
+  }
+  mitkThrow() << "can't find legend position!";
+}
+
+std::string QmitkChartWidget::Impl::GetLegendPositionAsString() const {
+  return GetC3Data()->GetLegendPosition().toString().toStdString();
+}
+
 
 void QmitkChartWidget::Impl::SetDiagramType(QmitkChartWidget::ChartType diagramType) {
   const std::string diagramTypeName(m_DiagramTypeToName.at(diagramType));
@@ -256,6 +294,16 @@ std::string QmitkChartWidget::GetYAxisLabel() const
 	return m_Impl->GetYAxisLabel();
 }
 
+void QmitkChartWidget::SetDiagramTitle(const std::string & title)
+{
+  m_Impl->SetDiagramTitle(title);
+}
+
+std::string QmitkChartWidget::GetDiagramTitle() const
+{
+  return m_Impl->GetDiagramTitle();
+}
+
 void QmitkChartWidget::SetChartType(ChartType type)
 {
 	m_Impl->SetDiagramType(type);
@@ -264,6 +312,16 @@ void QmitkChartWidget::SetChartType(ChartType type)
 QmitkChartWidget::ChartType QmitkChartWidget::GetChartType() const
 {
   return m_Impl->GetDiagramType();
+}
+
+void QmitkChartWidget::SetLegendPosition(LegendPosition position)
+{
+  m_Impl->SetLegendPosition(position);
+}
+
+QmitkChartWidget::LegendPosition QmitkChartWidget::GetLegendPosition() const
+{
+  return m_Impl->GetLegendPosition();
 }
 
 void QmitkChartWidget::Show(bool showSubChart)

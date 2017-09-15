@@ -63,20 +63,15 @@ public:
   * \details internally, the list is converted to a map with increasing integers keys starting at 0.
   * \note the data can be cleared with ClearDiagram()
   */
-  void AddData1D(const std::vector<double>& data1D);
+  void AddData1D(const std::vector<double>& data1D, const std::string& label);
 
   /*!
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
   * \details each entry represents a data point: key: value --> x-value: y-value.
   * \note the data can be cleared with ClearDiagram() 
   */
-  void AddData2D(const std::map<double, double>& data2D);
+  void AddData2D(const std::map<double, double>& data2D, const std::string& label);
 
-  /*!
-  * \brief Sets the data labels as legend
-  * \details Sets a label for each data entry (i.e. line). Default is data+#number
-  */
-  void SetDataLabels(const std::vector<std::string>& labels);
   std::vector<std::string> GetDataLabels() const;
 
   void SetXAxisLabel(const std::string& label);

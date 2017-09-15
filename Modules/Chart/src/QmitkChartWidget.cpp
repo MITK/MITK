@@ -32,13 +32,11 @@ public:
   Impl(const Impl&) = delete;
   Impl& operator=(const Impl&) = delete;
 
-  void AddData1D(const std::vector<double>& data1D);
+  void AddData1D(const std::vector<double>& data1D, const std::string& label);
 
-  void AddData2D(const std::map<double, double>& data2D);
+  void AddData2D(const std::map<double, double>& data2D, const std::string& label);
 
   void ClearData2D();
-
-  void SetDataLabels(const std::vector<std::string>& labels);
 
   std::vector<std::string> GetDataLabels() const;
 
@@ -60,6 +58,8 @@ public:
   std::vector<QmitkChartxyData*>* GetC3xyData() const;
 
 private:
+  void AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label);
+
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
 
@@ -102,29 +102,39 @@ QmitkChartWidget::Impl::~Impl()
   delete m_C3xyData;
 }
 
-void QmitkChartWidget::Impl::SetDataLabels(const std::vector<std::string>& labels)
+
+void QmitkChartWidget::Impl::AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label)
 {
-  QList<QVariant> variantList;
-  for (const auto& label : labels) {
-    variantList.append(QString::fromStdString(label));
+  QString currentLabel = QString::fromStdString(label);
+  int counter = 0;
+  while (labelList.contains(currentLabel))
+  {
+    currentLabel = QString::fromStdString(label + std::to_string(counter));
+    counter++;
   }
-  GetC3Data()->SetDataLabels(variantList);
+  labelList.append(currentLabel);
 }
 
-void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D) {
+void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label) {
   QList<QVariant> data1DConverted;
   for (const auto& aValue : data1D) {
     data1DConverted.append(aValue);
   }
   GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted));
+  auto definedLabels = GetC3Data()->GetDataLabels();
+  AddLabelIfNotAlreadyDefined(definedLabels, label);
+  GetC3Data()->SetDataLabels(definedLabels);
 }
 
-void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D) {
+void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label) {
   QMap<QVariant, QVariant> data2DConverted;
   for (const auto& aValue : data2D) {
     data2DConverted.insert(aValue.first, aValue.second);
   }
   GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted));
+  auto definedLabels = GetC3Data()->GetDataLabels();
+  AddLabelIfNotAlreadyDefined(definedLabels, label);
+  GetC3Data()->SetDataLabels(definedLabels);
 }
 
 std::vector<std::string> QmitkChartWidget::Impl::GetDataLabels() const {
@@ -216,19 +226,14 @@ QmitkChartWidget::~QmitkChartWidget()
   delete m_Impl;
 }
 
-void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D)
+void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D, const std::string& label)
 {
-	m_Impl->AddData2D(data2D);
+  m_Impl->AddData2D(data2D, label);
 }
 
-void QmitkChartWidget::AddData1D(const std::vector<double>& data1D)
+void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label)
 {
-  m_Impl->AddData1D(data1D);
-}
-
-void QmitkChartWidget::SetDataLabels(const std::vector<std::string>& labels)
-{
-	m_Impl->SetDataLabels(labels);
+  m_Impl->AddData1D(data1D, label);
 }
 
 std::vector<std::string> QmitkChartWidget::GetDataLabels() const

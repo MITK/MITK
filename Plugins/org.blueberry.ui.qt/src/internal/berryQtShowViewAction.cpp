@@ -79,6 +79,7 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "Vessels Enhancing", QAction::tr("Vessels Enhancing") },
   { "View Navigator", QAction::tr("View Navigator") },
   { "Volume Visualization", QAction::tr("Volume Visualization") },
+  { "Cpr", QAction::tr("Cpr") },
 };
 
 

@@ -434,6 +434,9 @@ SliceNavigationController::SendTime()
       this->InvokeEvent(
         GeometryTimeEvent(m_CreatedWorldGeometry, m_Time->GetPos()) );
 
+      // send crosshair event
+      crosshairPositionEvent.Send();
+
       // Request rendering update for all views
       this->GetRenderingManager()->RequestUpdateAll();
     }

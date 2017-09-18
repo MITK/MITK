@@ -54,6 +54,10 @@ public:
     defaultstyle,
     darkstyle
   };
+  enum class LineStyle {
+    solid,
+    dashed
+  };
 
   explicit QmitkChartWidget(ChartType type=ChartType::bar, QWidget* parent = nullptr);
   virtual ~QmitkChartWidget();
@@ -73,6 +77,8 @@ public:
   void AddData2D(const std::map<double, double>& data2D, const std::string& label);
 
   void SetColor(const std::string& label, const std::string& colorName);
+
+  void SetLineStyle(const std::string& label, LineStyle style);
 
   std::vector<std::string> GetDataLabels() const;
 

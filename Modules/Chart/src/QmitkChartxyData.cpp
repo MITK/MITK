@@ -16,12 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkChartxyData.h>
 
-QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data, const QVariant& label) {
+QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data, const QVariant& label) : m_Color(""), m_LineStyleName("solid") {
   SetData(data, label);
-  m_Color = "";
 }
 
-QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& label) {
+QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& label) : m_Color(""), m_LineStyleName("solid") {
   QMap<QVariant, QVariant> augmentedData;
   unsigned int count = 0;
   //just augment the 1D data
@@ -30,7 +29,6 @@ QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& 
     count++;
   }
   SetData(augmentedData, label);
-  m_Color = "";
 }
 
 

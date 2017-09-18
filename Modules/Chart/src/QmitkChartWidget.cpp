@@ -41,6 +41,7 @@ public:
   std::vector<std::string> GetDataLabels() const;
 
   void SetColor(const std::string& label, const std::string& colorName);
+  void SetLineStyle(const std::string& label, LineStyle style);
 
   void SetXAxisLabel(const std::string& label);
   std::string GetXAxisLabel() const;
@@ -96,6 +97,9 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
   m_DiagramTypeToName.emplace(ChartType::spline, "spline");
   m_DiagramTypeToName.emplace(ChartType::pie, "pie");
 
+  m_LineStyleToName.emplace(LineStyle::solid, "solid");
+  m_LineStyleToName.emplace(LineStyle::dashed, "dashed");
+
   m_C3Data = new QmitkChartData();
   m_C3xyData = new std::vector<QmitkChartxyData*>();
 }
@@ -107,7 +111,7 @@ QmitkChartWidget::Impl::~Impl()
 }
 
 
-void QmitkChartWidget::Impl::AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label)
+void QmitkChartWidget::Impl::AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label) const
 {
   QString currentLabel = QString::fromStdString(label);
   int counter = 0;
@@ -152,14 +156,29 @@ std::vector<std::string> QmitkChartWidget::Impl::GetDataLabels() const {
 
 void QmitkChartWidget::Impl::SetColor(const std::string& label, const std::string& colorName)
 {
-  auto C3xyData = GetC3xyData();
-  for (auto element = C3xyData->begin(); element != C3xyData->end(); ++element) {
+  auto element = GetElementByLabel(GetC3xyData(), label);
+  if (element) {
+    element->SetColor(QVariant(QString::fromStdString(colorName)));
+  }
+}
+
+void QmitkChartWidget::Impl::SetLineStyle(const std::string& label, LineStyle style) {
+  auto element = GetElementByLabel(GetC3xyData(), label);
+  if (element) {
+    const std::string lineStyleName(m_LineStyleToName.at(style));
+    element->SetLineStyle(QVariant(QString::fromStdString(lineStyleName)));
+  }
+}
+
+QmitkChartxyData* QmitkChartWidget::Impl::GetElementByLabel(const std::vector<QmitkChartxyData*>* c3xyData, const std::string& label) const
+{
+  for (auto element = c3xyData->begin(); element != c3xyData->end(); ++element) {
     if ((*element)->GetLabel().toString().toStdString() == label) {
-      (*element)->SetColor(QVariant(QString::fromStdString(colorName)));
-      return;
+      return *element;
     }
   }
-  MITK_WARN << "label " << label << " not found: color " << colorName << " could not be set in chartWidget";
+  MITK_WARN << "label " << label << " not found in QmitkChartWidget";
+  return nullptr;
 }
 
 void QmitkChartWidget::Impl::SetXAxisLabel(const std::string& label) { 
@@ -250,6 +269,13 @@ void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D, const s
 void QmitkChartWidget::SetColor(const std::string& label, const std::string& colorName)
 {
   m_Impl->SetColor(label, colorName);
+}
+
+void QmitkChartWidget::SetLineStyle(const std::string& label, LineStyle style)
+{
+  if (m_Impl->GetDiagramType() == ChartType::line) {
+    m_Impl->SetLineStyle(label, style);
+  }
 }
 
 void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label)

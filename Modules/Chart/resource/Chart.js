@@ -12,6 +12,7 @@ var xValues=[];
 var yValues=[];
 var xs = {};
 var dataColors = {};
+var lineStyle = {};
 
 //Is executed when js is loaded first.
 //Extracts relevant information from chartData in variables
@@ -43,6 +44,14 @@ window.onload = function()
 			xValues[count] = xDataTemp
 			yValues[count] = yDataTemp
 			dataColors[dataLabelsTemp] = channel.objects[propertyName].m_Color
+
+			if (channel.objects[propertyName].m_LineStyleName=="solid"){
+				lineStyle[dataLabelsTemp]= ''
+			}
+			else {
+				lineStyle[dataLabelsTemp]= [{'style':'dashed'}]
+			}
+
 			count++;
 		}
 	}
@@ -146,7 +155,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
           multiple: false,
         },
 		colors: dataColors,
-
+		regions: lineStyle,
     },
     legend: {
         position: 'bottom'

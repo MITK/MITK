@@ -26,7 +26,9 @@ mitk::PhotoacousticOCLBModeFilter::PhotoacousticOCLBModeFilter()
   this->AddSourceFile("BModeAbs.cl");
   this->AddSourceFile("BModeAbsLog.cl");
 
-  this->m_FilterID = "PixelCalculation";
+  this->m_FilterID = "BModeFilter";
+
+  this->Initialize();
 }
 
 mitk::PhotoacousticOCLBModeFilter::~PhotoacousticOCLBModeFilter()

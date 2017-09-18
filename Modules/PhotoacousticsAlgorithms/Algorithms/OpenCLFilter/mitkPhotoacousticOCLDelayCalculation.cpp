@@ -26,6 +26,8 @@ mitk::OCLDelayCalculation::OCLDelayCalculation()
 {
   this->AddSourceFile("DelayCalculation.cl");
   this->m_FilterID = "DelayCalculation";
+
+  this->Initialize();
 }
 
 mitk::OCLDelayCalculation::~OCLDelayCalculation()
@@ -75,7 +77,7 @@ void mitk::OCLDelayCalculation::Execute()
   else if (m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::Spherical)
     m_DelayMultiplicatorRaw = 1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements);
 
-  m_IsPAImage = m_Conf.Photoacoustic;
+  m_IsPAImage = m_Conf.isPhotoacousticImage;
   
   clErr |= clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &m_UsedLines);
   clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &m_MemLoc);

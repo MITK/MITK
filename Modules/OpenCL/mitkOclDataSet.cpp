@@ -46,6 +46,8 @@ cl_mem mitk::OclDataSet::CreateGPUBuffer()
   m_context = resources->GetContext();
 
   int clErr;
+  if (m_gpuBuffer) clReleaseMemObject(m_gpuBuffer);
+
   m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE, m_bufferSize * m_BpE, nullptr, &clErr);
 
   MITK_INFO << "Created GPU Buffer Object of size: " << m_BpE* m_bufferSize << " Bytes";

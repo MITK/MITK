@@ -60,14 +60,6 @@ public:
 
   /** Update the filter */
   void Update();
-  
-  /** Set the Output dimensions, which are also used for the openCL global worksize */
-  void SetOutputDim( unsigned int outputDim[3])
-  {
-	  m_OutputDim[0] = outputDim[0];
-	  m_OutputDim[1] = outputDim[1];
-    m_OutputDim[2] = outputDim[2];
-  }
 
   /** Set the Apodisation function to apply when beamforming */
   void SetApodisation(float* apodisation, unsigned short apodArraySize)
@@ -78,6 +70,7 @@ public:
 
   void SetConfig(BeamformingFilter::beamformingSettings settings)
   {
+    m_ConfOld = m_Conf;
     m_Conf = settings;
   }
 
@@ -111,7 +104,6 @@ private:
   cl_kernel m_PixelCalculation;
 
   unsigned int m_OutputDim[3];
-  unsigned int m_InputDim[3];
 
   float* m_Apodisation;
   unsigned short m_ApodArraySize;
@@ -119,6 +111,7 @@ private:
   unsigned short m_PAImage;
 
   BeamformingFilter::beamformingSettings m_Conf;
+  BeamformingFilter::beamformingSettings m_ConfOld;
 
   mitk::Image::Pointer m_InputImage;
 
@@ -127,6 +120,11 @@ private:
   mitk::OCLMemoryLocSum::Pointer m_SumFilter;
   mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
   mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
+
+  cl_mem m_ApodizationBuffer; 
+  cl_mem m_UsedLinesBuffer;
+  cl_mem m_MemoryLocationsBuffer;
+  cl_mem m_DelaysBuffer;
 };
 }
 #endif

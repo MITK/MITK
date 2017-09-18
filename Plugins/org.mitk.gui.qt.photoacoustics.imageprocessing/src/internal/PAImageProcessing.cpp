@@ -923,11 +923,11 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
 
   if ("US Image" == m_Controls.ImageType->currentText())
   {
-    BFconfig.Photoacoustic = false;
+    BFconfig.isPhotoacousticImage = false;
   }
   else if ("PA Image" == m_Controls.ImageType->currentText())
   {
-    BFconfig.Photoacoustic = true;
+    BFconfig.isPhotoacousticImage = true;
   }
 }
 

@@ -226,7 +226,6 @@ void mitk::BeamformingFilter::GenerateData()
 
       m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
       m_oclFilter->SetConfig(m_Conf);
-      m_oclFilter->SetOutputDim(output->GetDimensions());
       m_oclFilter->SetInput(input);
       m_oclFilter->Update();
 
@@ -332,7 +331,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1 - m_Conf.Photoacoustic)*s_i;
+      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1 - m_Conf.isPhotoacousticImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
@@ -388,7 +387,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
         pow(s_i, 2)
         +
         pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-      ) + (1 - m_Conf.Photoacoustic)*s_i;
+      ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
@@ -444,7 +443,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
     short* AddSample = new short[maxLine - minLine];
     for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) + (1 - m_Conf.Photoacoustic)*s_i;
+      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) + (1 - m_Conf.isPhotoacousticImage)*s_i;
     }
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
@@ -519,7 +518,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
         pow(s_i, 2)
         +
         pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * ((minLine + l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-      ) + (1 - m_Conf.Photoacoustic)*s_i;
+      ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
     }
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)

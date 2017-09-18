@@ -26,6 +26,8 @@ mitk::OCLMemoryLocSum::OCLMemoryLocSum()
 {
   this->AddSourceFile("MemoryLocSum.cl");
   this->m_FilterID = "MemoryLocSum";
+
+  this->Initialize();
 }
 
 mitk::OCLMemoryLocSum::~OCLMemoryLocSum()

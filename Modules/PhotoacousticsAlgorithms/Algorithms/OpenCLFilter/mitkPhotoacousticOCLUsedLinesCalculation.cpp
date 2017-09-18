@@ -26,6 +26,8 @@ mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation()
 {
   this->AddSourceFile("UsedLinesCalculation.cl");
   this->m_FilterID = "UsedLinesCalculation";
+
+  this->Initialize();
 }
 
 mitk::OCLUsedLinesCalculation::~OCLUsedLinesCalculation()

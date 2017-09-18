@@ -118,6 +118,8 @@ namespace mitk
     //! (passing by the general surface mapper and the gizmo object)
     Gizmo::HandleType PickFrom3D(const InteractionPositionEvent *positionEvent);
 
+    void UpdateHandleHighlight();
+
     //! the Gizmo used for visual feedback and picking
     Gizmo::Pointer m_Gizmo;
 
@@ -127,8 +129,17 @@ namespace mitk
     //! For picking on the vtkPolyData representing the gizmo
     std::map<BaseRenderer *, vtkSmartPointer<vtkCellPicker>> m_Picker;
 
-    //! Part of the gizmo that was clicked initially
-    Gizmo::HandleType m_PickedHandle;
+    //! Part of the gizmo that was picked on last check
+    Gizmo::HandleType m_PickedHandle = Gizmo::NoHandle;
+
+    //! Part of the gizmo that is currently highlighted
+    Gizmo::HandleType m_HighlightedHandle = Gizmo::NoHandle;
+
+    //! Color (RGBA) used for highlighting
+    double m_ColorForHighlight[4];
+
+    //! Color (RGBA) that has been replaced by m_ColorForHighlight
+    double m_ColorReplacedByHighlight[4];
 
     Point2D m_InitialClickPosition2D; //< Initial screen click position
     double m_InitialClickPosition2DZ; //< Z value of the initial screen click position

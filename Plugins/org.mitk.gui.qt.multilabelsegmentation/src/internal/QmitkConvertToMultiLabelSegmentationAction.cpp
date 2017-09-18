@@ -31,12 +31,16 @@ QmitkConvertToMultiLabelSegmentationAction::~QmitkConvertToMultiLabelSegmentatio
 
 void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
+  for (auto referenceNode : selectedNodes)
   {
     if (referenceNode.IsNotNull())
     {
-      mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
-      if (referenceImage.IsNull()) return;
+      mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
+      if (nullptr == referenceImage)
+      {
+        MITK_WARN << "Could not convert to multi label segmentation for non-image node - skipping action.";
+        continue;
+      }
 
       mitk::LabelSetImage::Pointer lsImage = mitk::LabelSetImage::New();
       try

@@ -45,13 +45,16 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
     return;
   }
 
-  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
+  for ( auto referenceNode : selectedNodes )
   {
     if (referenceNode.IsNotNull())
     {
-
       mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
-      assert(referenceImage);
+      if (nullptr == referenceImage)
+      {
+        MITK_WARN << "Could not create multi label segmentation for non-image node - skipping action.";
+        continue;
+      }
 
       QString newName = QString::fromStdString(referenceNode->GetName());
       newName.append("-labels");

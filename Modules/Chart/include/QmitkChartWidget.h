@@ -65,19 +65,37 @@ public:
   /*!
   * \brief Adds 1D data to the widget
   * \details internally, the list is converted to a map with increasing integers keys starting at 0.
+  * \param label the name of the data that is also used as identifier.
   * \note the data can be cleared with ClearDiagram()
+  * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
   void AddData1D(const std::vector<double>& data1D, const std::string& label);
 
   /*!
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
   * \details each entry represents a data point: key: value --> x-value: y-value.
+  * \param label the name of the data that is also used as identifier.
   * \note the data can be cleared with ClearDiagram() 
+  * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
   void AddData2D(const std::map<double, double>& data2D, const std::string& label);
 
+  /*!
+  * \brief sets the color of one data entry (identifier is previously assigned label)
+  *  \details the color name can be "red" or a hex number (#FF0000).
+  * Either define all data entries with a color or none. If a mixed approach is used, different data entries could have the same color.
+  * If an unknown label is given, nothing happens.
+  *  \sa https://www.w3schools.com/cssref/css_colors.asp
+  */
   void SetColor(const std::string& label, const std::string& colorName);
 
+  /*!
+  * \brief sets the line style of one data entry (identifier is previously assigned label)
+  *  \details two line styles are possible: LineStyle::solid and LineStyle::dashed.
+  * The default linestyle is solid.
+  * If an unknown label is given, nothing happens.
+  *  \warning only sets the line style if the current chart type is ChartType::line. However, the line style remains also if the chart changes (e.g. new chart type)
+  */
   void SetLineStyle(const std::string& label, LineStyle style);
 
   std::vector<std::string> GetDataLabels() const;

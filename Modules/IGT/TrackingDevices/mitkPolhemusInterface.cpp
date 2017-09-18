@@ -91,29 +91,55 @@ bool mitk::PolhemusInterface::StopTracking()
 
 bool mitk::PolhemusInterface::Connect()
 {
-  if (!InitializeDevice()) { return false; }
-
-  if (m_pdiDev->CnxReady()) { return true; }
-  CPDIser	pdiSer;
-  m_pdiDev->SetSerialIF(&pdiSer);
-
-  ePiCommType eType = m_pdiDev->DiscoverCnx();
-  switch (eType)
+  bool returnValue;
+  //Initialize, and if it is not successful, return false.
+  if (!InitializeDevice())
   {
-  case PI_CNX_USB:
-    MITK_INFO << "USB Connection: " << m_pdiDev->GetLastResultStr();
-    break;
-  case PI_CNX_SERIAL:
-    MITK_INFO << "Serial Connection: " << m_pdiDev->GetLastResultStr();
-    break;
-  default:
-    MITK_INFO << "DiscoverCnx result: " << m_pdiDev->GetLastResultStr();
-    break;
+    returnValue = false;
+  }
+  //Connect
+  else if (m_pdiDev->CnxReady())
+  {
+    returnValue = true;
+  }
+  //If it is not successful, search for connections.
+  else
+  {
+    CPDIser  pdiSer;
+    m_pdiDev->SetSerialIF(&pdiSer);
+
+    ePiCommType eType = m_pdiDev->DiscoverCnx();
+    switch (eType)
+    {
+    case PI_CNX_USB:
+      MITK_INFO << "USB Connection: " << m_pdiDev->GetLastResultStr();
+      break;
+    case PI_CNX_SERIAL:
+      MITK_INFO << "Serial Connection: " << m_pdiDev->GetLastResultStr();
+      break;
+    default:
+      MITK_INFO << "DiscoverCnx result: " << m_pdiDev->GetLastResultStr();
+      break;
+    }
+
+    //Setup device
+    if (!SetupDevice())
+    {
+      returnValue = false;
+    }
+    else
+    {
+      returnValue = m_pdiDev->CnxReady();
+    }
   }
 
-  if (!SetupDevice()) { return false; }
+  if (returnValue)
+  {
 
-  return m_pdiDev->CnxReady();
+    return true;
+  }
+  else
+    return false;
 }
 
 bool mitk::PolhemusInterface::Disconnect()

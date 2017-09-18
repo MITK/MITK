@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "mitkPhotoacousticImage.h"
-#include "ITKFilter/ITKUltrasound/itkBModeImageFilter.h"
-#include "ITKFilter/itkPhotoacousticBModeImageFilter.h"
+#include "../ITKFilter/ITKUltrasound/itkBModeImageFilter.h"
+#include "../ITKFilter/itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkPhotoacousticBeamformingFilter.h"
@@ -45,8 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiplyImageFilter.h"
 #include "itkComplexToModulusImageFilter.h"
 #include <itkAddImageFilter.h>
-#include "ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
-#include "ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
+#include "../ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
+#include "../ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
 
 mitk::PhotoacousticImage::PhotoacousticImage()
 {

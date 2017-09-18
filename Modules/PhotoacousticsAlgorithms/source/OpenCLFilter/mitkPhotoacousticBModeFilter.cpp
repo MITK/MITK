@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPhotoacousticBModeFilter.h"
+#include "./OpenCLFilter/mitkPhotoacousticBModeFilter.h"
 #include "usServiceReference.h"
 #include <mitkImageReadAccessor.h>
 

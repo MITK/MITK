@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
-#include <mitkPhotoacousticBeamformingFilter.h>
+#include "mitkPhotoacousticBeamformingSettings.h"
 
 namespace mitk
 {
@@ -50,7 +50,7 @@ namespace mitk
     /** Update the filter */
     void Update();
 
-    void SetConfig(mitk::BeamformingFilter::beamformingSettings conf)
+    void SetConfig(BeamformingSettings conf)
     {
       m_Conf = conf;
     }
@@ -87,7 +87,7 @@ namespace mitk
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
-    mitk::BeamformingFilter::beamformingSettings m_Conf;
+    BeamformingSettings m_Conf;
     float m_part;
   };
 }

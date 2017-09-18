@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 
 #include <cmath>
-#include "mitkPhotoacousticOCLUsedLinesCalculation.h"
+#include "./OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.h"
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
 

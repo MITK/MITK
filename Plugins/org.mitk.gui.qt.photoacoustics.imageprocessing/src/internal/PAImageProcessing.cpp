@@ -380,14 +380,14 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
 
   newNodeName << m_OldNodeName << " ";
 
-  if (BFconfig.Algorithm == mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DAS)
+  if (BFconfig.Algorithm == mitk::BeamformingSettings::BeamformingAlgorithm::DAS)
     newNodeName << "DAS bf, ";
-  else if (BFconfig.Algorithm == mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DMAS)
+  else if (BFconfig.Algorithm == mitk::BeamformingSettings::BeamformingAlgorithm::DMAS)
     newNodeName << "DMAS bf, ";
 
-  if (BFconfig.DelayCalculationMethod == mitk::BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox)
+  if (BFconfig.DelayCalculationMethod == mitk::BeamformingSettings::DelayCalc::QuadApprox)
     newNodeName << "q. delay";
-  if (BFconfig.DelayCalculationMethod == mitk::BeamformingFilter::beamformingSettings::DelayCalc::Spherical)
+  if (BFconfig.DelayCalculationMethod == mitk::BeamformingSettings::DelayCalc::Spherical)
     newNodeName << "s. delay";
 
   newNode->SetName(newNodeName.str());
@@ -868,30 +868,30 @@ void PAImageProcessing::SetResampling()
 void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
 {
   if ("DAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig.Algorithm = mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DAS;
+    BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig.Algorithm = mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DMAS;
+    BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DMAS;
 
   if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {
-    BFconfig.DelayCalculationMethod = mitk::BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox;
+    BFconfig.DelayCalculationMethod = mitk::BeamformingSettings::DelayCalc::QuadApprox;
   }
   else if ("Spherical Wave" == m_Controls.DelayCalculation->currentText())
   {
-    BFconfig.DelayCalculationMethod = mitk::BeamformingFilter::beamformingSettings::DelayCalc::Spherical;
+    BFconfig.DelayCalculationMethod = mitk::BeamformingSettings::DelayCalc::Spherical;
   }
 
   if ("Von Hann" == m_Controls.Apodization->currentText())
   {
-    BFconfig.Apod = mitk::BeamformingFilter::beamformingSettings::Apodization::Hann;
+    BFconfig.Apod = mitk::BeamformingSettings::Apodization::Hann;
   }
   else if ("Hamming" == m_Controls.Apodization->currentText())
   {
-    BFconfig.Apod = mitk::BeamformingFilter::beamformingSettings::Apodization::Hamm;
+    BFconfig.Apod = mitk::BeamformingSettings::Apodization::Hamm;
   }
   else if ("Box" == m_Controls.Apodization->currentText())
   {
-    BFconfig.Apod = mitk::BeamformingFilter::beamformingSettings::Apodization::Box;
+    BFconfig.Apod = mitk::BeamformingSettings::Apodization::Box;
   }
 
   BFconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
@@ -1040,7 +1040,7 @@ void BeamformingThread::run()
    emit result(resultImage);
 }
 
-void BeamformingThread::setConfig(mitk::BeamformingFilter::beamformingSettings BFconfig)
+void BeamformingThread::setConfig(mitk::BeamformingSettings BFconfig)
 {
   m_BFconfig = BFconfig;
 }

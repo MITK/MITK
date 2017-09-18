@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_PAImageProcessingControls.h"
 
 #include "mitkPhotoacousticBeamformingFilter.h"
+#include "mitkPhotoacousticBeamformingSettings.h"
 
 Q_DECLARE_METATYPE(mitk::Image::Pointer)
 Q_DECLARE_METATYPE(std::string)
@@ -91,7 +92,7 @@ class PAImageProcessing : public QmitkAbstractView
     bool m_UseLogfilter;
     std::string m_OldNodeName;
 
-    mitk::BeamformingFilter::beamformingSettings BFconfig;
+    mitk::BeamformingSettings BFconfig;
 
     void UpdateBFSettings(mitk::Image::Pointer image);
 
@@ -109,12 +110,12 @@ class BeamformingThread : public QThread
     void updateProgress(int, std::string);
 
   public:
-    void setConfig(mitk::BeamformingFilter::beamformingSettings BFconfig);
+    void setConfig(mitk::BeamformingSettings BFconfig);
     void setInputImage(mitk::Image::Pointer image);
     void setCutoff(int cutoff);
 
   protected:
-    mitk::BeamformingFilter::beamformingSettings m_BFconfig;
+    mitk::BeamformingSettings m_BFconfig;
     mitk::Image::Pointer m_InputImage;
     int m_Cutoff;
 };

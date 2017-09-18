@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 
 #include <cmath>
-#include "mitkPhotoacousticOCLDelayCalculation.h"
+#include "./OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.h"
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
 
@@ -72,9 +72,9 @@ void mitk::OCLDelayCalculation::Execute()
     return;
   }
 
-  if (m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox)
+  if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
     m_DelayMultiplicatorRaw = pow(1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * m_Conf.Pitch * m_Conf.TransducerElements / m_Conf.inputDim[0], 2) / 2;
-  else if (m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::Spherical)
+  else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
     m_DelayMultiplicatorRaw = 1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements);
 
   m_IsPAImage = m_Conf.isPhotoacousticImage;
@@ -109,9 +109,9 @@ bool mitk::OCLDelayCalculation::Initialize()
 
   if (OclFilter::Initialize())
   {
-    if(m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox)
+    if(m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
       this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationQuad", &clErr);
-    if (m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::Spherical)
+    if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
       this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDelayCalculationSphe", &clErr);
     buildErr |= CHECK_OCL_ERR(clErr);
   }

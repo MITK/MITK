@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include <functional>
 
-#include "mitkPhotoacousticBeamformingFilter.h"
+#include "mitkPhotoacousticBeamformingSettings.h"
 #include "MitkPhotoacousticsAlgorithmsExports.h"
 
 namespace mitk {

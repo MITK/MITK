@@ -16,8 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifdef PHOTOACOUSTICS_USE_GPU
 
-#include "mitkPhotoacousticOCLBeamformer.h"
-
+#include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
 #include "usServiceReference.h"
 
 mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
@@ -146,7 +145,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
     m_ConfOld = m_Conf;
   }
 
-  if (m_Conf.Algorithm == BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DAS)
+  if (m_Conf.Algorithm == BeamformingSettings::BeamformingAlgorithm::DAS)
   {
     m_PAImage = (unsigned short)m_Conf.isPhotoacousticImage;
 
@@ -167,7 +166,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
 
     CHECK_OCL_ERR(clErr);
   }
-  else if (m_Conf.Algorithm == BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DMAS)
+  else if (m_Conf.Algorithm == BeamformingSettings::BeamformingAlgorithm::DMAS)
   {
     clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_UsedLinesBuffer));
     clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_mem), &(this->m_MemoryLocationsBuffer));
@@ -207,19 +206,19 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
   {
     switch (m_Conf.Algorithm)
     {
-      case BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DAS:
+      case BeamformingSettings::BeamformingAlgorithm::DAS:
       {
-        if(m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox)
+        if(m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
           this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDASQuad", &clErr);
-        else if (m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::Spherical)
+        else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
           this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDASSphe", &clErr);
         break;
       }
-      case BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DMAS:
+      case BeamformingSettings::BeamformingAlgorithm::DMAS:
       {
-        if (m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox)
+        if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
           this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDMAS", &clErr);
-        else if (m_Conf.DelayCalculationMethod == BeamformingFilter::beamformingSettings::DelayCalc::Spherical)
+        else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
           this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDMAS", &clErr);
         break;
       }

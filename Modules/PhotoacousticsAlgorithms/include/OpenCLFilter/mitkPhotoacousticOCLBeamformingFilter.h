@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
-#include "mitkPhotoacousticBeamformingFilter.h"
 
 #include "mitkPhotoacousticOCLDelayCalculation.h"
 #include "mitkPhotoacousticOCLMemoryLocSum.h"
 #include "mitkPhotoacousticOCLUsedLinesCalculation.h"
+
+#include "mitkPhotoacousticBeamformingSettings.h"
 
 namespace mitk
 {
@@ -68,7 +69,7 @@ public:
     m_Apodisation = apodisation;
   }
 
-  void SetConfig(BeamformingFilter::beamformingSettings settings)
+  void SetConfig(BeamformingSettings settings)
   {
     m_ConfOld = m_Conf;
     m_Conf = settings;
@@ -110,8 +111,8 @@ private:
 
   unsigned short m_PAImage;
 
-  BeamformingFilter::beamformingSettings m_Conf;
-  BeamformingFilter::beamformingSettings m_ConfOld;
+  BeamformingSettings m_Conf;
+  BeamformingSettings m_ConfOld;
 
   mitk::Image::Pointer m_InputImage;
 

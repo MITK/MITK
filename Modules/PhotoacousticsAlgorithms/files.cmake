@@ -1,13 +1,15 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
-  mitkPhotoacousticImage.cpp
+  source/mitkPhotoacousticImage.cpp
   
-  Algorithms/mitkPhotoacousticBeamformingFilter.cpp
+  source/mitkPhotoacousticBeamformingFilter.cpp
   
-  Algorithms/OpenCLFilter/mitkPhotoacousticOCLBeamformer.cpp
-  Algorithms/OpenCLFilter/mitkPhotoacousticBModeFilter.cpp
-  Algorithms/OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.cpp
-  Algorithms/OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.cpp
-  Algorithms/OpenCLFilter/mitkPhotoacousticOCLMemoryLocSum.cpp
+  source/OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.cpp
+  source/OpenCLFilter/mitkPhotoacousticBModeFilter.cpp
+  source/OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.cpp
+  source/OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.cpp
+  source/OpenCLFilter/mitkPhotoacousticOCLMemoryLocSum.cpp
 )
 
 set(RESOURCE_FILES

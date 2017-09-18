@@ -98,6 +98,8 @@ class PAImageProcessing : public QmitkAbstractView
 
     void EnableControls();
     void DisableControls();
+
+    mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 class BeamformingThread : public QThread
@@ -112,12 +114,18 @@ class BeamformingThread : public QThread
   public:
     void setConfig(mitk::BeamformingSettings BFconfig);
     void setInputImage(mitk::Image::Pointer image);
-    void setCutoff(int cutoff);
+    void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+    {
+      m_FilterBank = filterBank;
+    }
+
 
   protected:
     mitk::BeamformingSettings m_BFconfig;
     mitk::Image::Pointer m_InputImage;
     int m_Cutoff;
+
+    mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 class BmodeThread : public QThread
@@ -133,6 +141,11 @@ class BmodeThread : public QThread
 
     void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method, bool useGPU);
     void setInputImage(mitk::Image::Pointer image);
+    void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+    {
+      m_FilterBank = filterBank;
+    }
+
 
   protected:
     mitk::Image::Pointer m_InputImage;
@@ -141,6 +154,8 @@ class BmodeThread : public QThread
     bool m_UseLogfilter;
     double m_ResampleSpacing;
     bool m_UseGPU;
+
+    mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 class CropThread : public QThread
@@ -154,12 +169,18 @@ signals:
 public:
   void setConfig(unsigned int CutAbove, unsigned int CutBelow);
   void setInputImage(mitk::Image::Pointer image);
+  void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+  {
+    m_FilterBank = filterBank;
+  }
 
 protected:
   mitk::Image::Pointer m_InputImage;
 
   unsigned int m_CutAbove;
   unsigned int m_CutBelow;
+
+  mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 
@@ -174,6 +195,10 @@ signals:
 public:
   void setConfig(float BPHighPass, float BPLowPass, float TukeyAlpha, float recordTime);
   void setInputImage(mitk::Image::Pointer image);
+  void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+  {
+    m_FilterBank = filterBank;
+  }
 
 protected:
   mitk::Image::Pointer m_InputImage;
@@ -182,6 +207,8 @@ protected:
   float m_BPLowPass;
   float m_TukeyAlpha;
   float m_RecordTime;
+
+  mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 #endif // PAImageProcessing_h

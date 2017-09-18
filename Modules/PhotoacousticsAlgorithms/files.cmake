@@ -14,13 +14,12 @@ set(CPP_FILES
 
 set(RESOURCE_FILES
   DASQuadratic.cl
-  DMASQuadratic.cl
   DASSpherical.cl
-  DMASSpherical.cl
   BModeAbs.cl
   BModeAbsLog.cl
   UsedLinesCalculation.cl
   MemoryLocSum.cl
   DelayCalculation.cl
   DMAS.cl
+  DAS.cl
 )

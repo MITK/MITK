@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_PHOTOACOUSTICS_BEAMFORMING_SETTINGS
 #define MITK_PHOTOACOUSTICS_BEAMFORMING_SETTINGS
 
+
+
 namespace mitk {
   //##Documentation
   //## @brief
@@ -35,6 +37,7 @@ namespace mitk {
     bool partial = false;
     unsigned int CropBounds[2] = { 0,0 };
     unsigned int inputDim[3] = { 1,1,1 };
+    unsigned int upperCutoff = 0;
 
     bool UseGPU = true;
 
@@ -53,29 +56,20 @@ namespace mitk {
     float BPLowPass = 50;
     bool UseBP = false;
 
-    friend bool operator==(const BeamformingSettings& lhs, const BeamformingSettings& rhs)
+    //this method ignores changes in BPLow/BPHigh/cropBounds/Algorithm/some more, as those are insignifiant in all current situations
+    static bool SettingsChangedOpenCL(const BeamformingSettings& lhs, const BeamformingSettings& rhs)
     {
-      return (lhs.Algorithm == rhs.Algorithm) &&
-        (lhs.Angle == rhs.Angle) &&
+      return !(((lhs.Angle - rhs.Angle) < 0.001f) &&
         (lhs.Apod == rhs.Apod) &&
-        (lhs.BPHighPass == rhs.BPHighPass) &&
-        (lhs.BPLowPass == rhs.BPLowPass) &&
-        (lhs.CropBounds == rhs.CropBounds) &&
         (lhs.DelayCalculationMethod == rhs.DelayCalculationMethod) &&
         (lhs.isPhotoacousticImage == rhs.isPhotoacousticImage) &&
-        (lhs.inputDim[0] == rhs.inputDim[0]) &&
-        (lhs.inputDim[1] == rhs.inputDim[1]) &&
-        (lhs.inputDim[2] == rhs.inputDim[2]) &&
-        (lhs.partial == rhs.partial) &&
-        (lhs.Pitch == rhs.Pitch) &&
+        ((lhs.Pitch - rhs.Pitch) < 0.0000001f) &&
         (lhs.ReconstructionLines == rhs.ReconstructionLines) &&
-        (lhs.RecordTime == rhs.RecordTime) &&
+        (lhs.RecordTime - rhs.RecordTime) < 0.00000001f &&
         (lhs.SamplesPerLine == rhs.SamplesPerLine) &&
-        (lhs.SpeedOfSound == rhs.SpeedOfSound) &&
-        (lhs.TimeSpacing == rhs.TimeSpacing) &&
-        (lhs.TransducerElements == rhs.TransducerElements) &&
-        (lhs.UseBP == rhs.UseBP) &&
-        (lhs.UseGPU == rhs.UseGPU);
+        ((lhs.SpeedOfSound - rhs.SpeedOfSound) < 0.01f) &&
+        ((lhs.TimeSpacing - rhs.TimeSpacing) < 0.0000000001f) &&
+        (lhs.TransducerElements == rhs.TransducerElements));
     }
   };
 }

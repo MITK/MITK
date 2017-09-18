@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPhotoacousticBeamformingSettings.h"
 
+#include <chrono>
+
 namespace mitk
 {
 /** Documentation
@@ -53,6 +55,8 @@ public:
   * @brief SetInput Manually set the input data while providing dimensions and memory size of the input data.
   */
   void SetInput(void* data, unsigned int* dimensions, unsigned int BpE);
+
+  void* GetOutput();
 
   /**
   * @brief GetOutputAsImage Returns an mitk::Image constructed from the processed data
@@ -85,6 +89,8 @@ protected:
 
   /** Initialize the filter */
   bool Initialize();
+
+  void UpdateDataBuffers();
 
   void Execute();
 
@@ -126,6 +132,8 @@ private:
   cl_mem m_UsedLinesBuffer;
   cl_mem m_MemoryLocationsBuffer;
   cl_mem m_DelaysBuffer;
+
+  std::chrono::steady_clock::time_point m_Begin;
 };
 }
 #endif

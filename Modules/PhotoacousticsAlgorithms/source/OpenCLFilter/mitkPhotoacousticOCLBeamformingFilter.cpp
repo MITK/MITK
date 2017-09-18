@@ -23,7 +23,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
 : m_PixelCalculation( NULL ), m_InputImage(mitk::Image::New()), m_ApodizationBuffer(nullptr), m_MemoryLocationsBuffer(nullptr), m_DelaysBuffer(nullptr), m_UsedLinesBuffer(nullptr)
 {
   this->AddSourceFile("DASQuadratic.cl");
-  this->AddSourceFile("DMASQuadratic.cl");
+  this->AddSourceFile("DAS.cl");
   this->AddSourceFile("DMAS.cl");
   this->m_FilterID = "OpenCLBeamformingFilter";
 
@@ -76,12 +76,12 @@ void mitk::PhotoacousticOCLBeamformingFilter::Update()
   }
 }
 
-void mitk::PhotoacousticOCLBeamformingFilter::Execute()
+void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
 {
-  cl_int clErr = 0;
-
-  if (!(m_Conf == m_ConfOld))
+  if (BeamformingSettings::SettingsChangedOpenCL(m_Conf, m_ConfOld))
   {
+    cl_int clErr = 0;
+    MITK_INFO << "Updating Data for new configuration";
     //Initialize the Output
     try
     {
@@ -144,50 +144,32 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
 
     m_ConfOld = m_Conf;
   }
+}
 
-  if (m_Conf.Algorithm == BeamformingSettings::BeamformingAlgorithm::DAS)
-  {
-    m_PAImage = (unsigned short)m_Conf.isPhotoacousticImage;
+void mitk::PhotoacousticOCLBeamformingFilter::Execute()
+{
+  cl_int clErr = 0;
+  UpdateDataBuffers();
 
-    // set kernel arguments
-    clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_ApodizationBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_ushort), &(this->m_ApodArraySize));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_float), &(this->m_Conf.SpeedOfSound));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_float), &(this->m_Conf.TimeSpacing));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_float), &(this->m_Conf.Pitch));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_Conf.Angle));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_ushort), &(this->m_PAImage));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_ushort), &(this->m_Conf.TransducerElements));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 11, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 12, sizeof(cl_uint), &(this->m_Conf.inputDim[2]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 13, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 14, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
+  clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_UsedLinesBuffer));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_mem), &(this->m_MemoryLocationsBuffer));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_mem), &(this->m_DelaysBuffer));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_mem), &(this->m_ApodizationBuffer));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_ushort), &(this->m_ApodArraySize));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_uint), &(this->m_Conf.inputDim[2]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 11, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
 
-    CHECK_OCL_ERR(clErr);
-  }
-  else if (m_Conf.Algorithm == BeamformingSettings::BeamformingAlgorithm::DMAS)
-  {
-    clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_UsedLinesBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_mem), &(this->m_MemoryLocationsBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_mem), &(this->m_DelaysBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_mem), &(this->m_ApodizationBuffer));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_ushort), &(this->m_ApodArraySize));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_uint), &(this->m_Conf.inputDim[2]));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
-    clErr |= clSetKernelArg(this->m_PixelCalculation, 11, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
-
-    CHECK_OCL_ERR(clErr);
-  }
+  CHECK_OCL_ERR(clErr);
 
   // execute the filter on a 3D NDRange
-  if (m_OutputDim[2] == 1)
+  if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)
     this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize);
   else
     this->ExecuteKernelChunks(m_PixelCalculation, 3, m_ChunkSize);
-  
+
   // signalize the GPU-side data changed
   m_Output->Modified( GPU_DATA );
 }
@@ -208,23 +190,18 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
     {
       case BeamformingSettings::BeamformingAlgorithm::DAS:
       {
-        if(m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
-          this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDASQuad", &clErr);
-        else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
-          this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDASSphe", &clErr);
+        this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDAS", &clErr);
         break;
       }
       case BeamformingSettings::BeamformingAlgorithm::DMAS:
       {
-        if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
-          this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDMAS", &clErr);
-        else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
-          this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDMAS", &clErr);
+        this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDMAS", &clErr);
         break;
       }
       default:
       {
-        this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDASQuad", &clErr);
+        MITK_INFO << "No beamforming algorithm specified, setting to DAS";
+        this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDAS", &clErr);
         break;
       }
     }
@@ -275,5 +252,10 @@ mitk::Image::Pointer mitk::PhotoacousticOCLBeamformingFilter::GetOutputAsImage()
   MITK_DEBUG << "Image Initialized.";
 
   return outputImage;
+}
+
+void* mitk::PhotoacousticOCLBeamformingFilter::GetOutput()
+{
+  return OclDataSetToDataSetFilter::GetOutput();
 }
 #endif

@@ -48,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
 #include "../ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
 
-mitk::PhotoacousticImage::PhotoacousticImage()
+mitk::PhotoacousticImage::PhotoacousticImage() : m_BeamformingFilter(BeamformingFilter::New())
 {
   MITK_INFO << "[PhotoacousticImage Debug] created that image";
 }
@@ -300,9 +300,9 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   return output;
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, std::function<void(int, std::string)> progressHandle)
 {
-  config.RecordTime = config.RecordTime - (cutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  config.RecordTime = config.RecordTime - (float)(config.upperCutoff) / (float)inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "cropping image");
   if (!config.partial)
   {
@@ -310,19 +310,18 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
 
-  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
+  Image::Pointer processedImage = ApplyCropping(inputImage, config.upperCutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
   config.inputDim[0] = processedImage->GetDimension(0);
   config.inputDim[1] = processedImage->GetDimension(1);
   config.inputDim[2] = processedImage->GetDimension(2);
 
   // perform the beamforming
-  BeamformingFilter::Pointer Beamformer = BeamformingFilter::New();
-  Beamformer->SetInput(processedImage);
-  Beamformer->Configure(config);
-  Beamformer->SetProgressHandle(progressHandle);
-  Beamformer->UpdateLargestPossibleRegion();
+  m_BeamformingFilter->SetInput(processedImage);
+  m_BeamformingFilter->Configure(config);
+  m_BeamformingFilter->SetProgressHandle(progressHandle);
+  m_BeamformingFilter->UpdateLargestPossibleRegion();
 
-  processedImage = Beamformer->GetOutput();
+  processedImage = m_BeamformingFilter->GetOutput();
 
   return processedImage;
 }

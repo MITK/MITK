@@ -56,6 +56,7 @@ void QmitkPolhemusTrackerWidget::CreateConnections()
   if (m_Controls)
   {
     connect((QObject*)(m_Controls->m_hemisphereTracking), SIGNAL(clicked()), this, SLOT(on_m_hemisphereTracking_clicked()));
+    connect((QObject*)(m_Controls->m_ToggleHemisphere), SIGNAL(clicked()), this, SLOT(on_m_ToggleHemisphere_clicked()));
   }
 }
 
@@ -83,4 +84,9 @@ QmitkPolhemusTrackerWidget* QmitkPolhemusTrackerWidget::Clone(QWidget* parent) c
 void QmitkPolhemusTrackerWidget::on_m_hemisphereTracking_clicked()
 {
   m_TrackingDevice->SetHemisphereTrackingEnabled(m_Controls->m_hemisphereTracking->isChecked());
+}
+
+void QmitkPolhemusTrackerWidget::on_m_ToggleHemisphere_clicked()
+{
+  m_TrackingDevice->ToggleHemisphere();
 }

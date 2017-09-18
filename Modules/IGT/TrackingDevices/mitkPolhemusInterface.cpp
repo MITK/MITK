@@ -25,6 +25,7 @@ BYTE  MotionBuf[0x1FA400];
 mitk::PolhemusInterface::PolhemusInterface() : m_continousTracking(false)
 {
   m_pdiDev = new CPDIdev();
+  m_numberOfTools = 0;
 }
 
 mitk::PolhemusInterface::~PolhemusInterface()
@@ -135,11 +136,21 @@ bool mitk::PolhemusInterface::Connect()
 
   if (returnValue)
   {
-
-    return true;
+    m_numberOfTools = this->GetNumberOfTools();
+    //On first startUp or if number of tools changed
+    if (m_Hemispheres.empty() || m_Hemispheres.size() != m_numberOfTools)
+    {
+      //Set Hemisphere for all tools to default 1,0,0...
+      mitk::Vector3D temp;
+      mitk::FillVector3D(temp, 1, 0, 0);
+      m_Hemispheres.clear();
+      m_Hemispheres.assign(m_numberOfTools, temp);
+      this->SetHemisphere(-1, temp);
+    }
   }
-  else
-    return false;
+
+  return returnValue;
+
 }
 
 bool mitk::PolhemusInterface::Disconnect()
@@ -235,17 +246,67 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
 
 void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled)
 {
-  //HemisphereTracking is switched on by SetSHeiTrack(-1). "-1" means for all sensors.
+  //HemisphereTracking is switched on by SetSHemiTrack(-1). "-1" means for all sensors.
   //To switch heisphere tracking of, you need to set a hemisphere vector by calling SetSHemisphere(-1, { (float)1,0,0 })
   if (_HeisphereTrackingEnabeled)
   {
     m_pdiDev->SetSHemiTrack(-1);
   }
+  else if (!m_Hemispheres.empty())
+  {
+    for (int i = 0; i < m_numberOfTools; ++i)
+      SetHemisphere(i + 1, m_Hemispheres.at(i));
+  }
   else
   {
-    m_pdiDev->SetSHemisphere(-1, { (float)1, 0, 0 });
+    //Default Hemisphere
+    mitk::Vector3D temp;
+    mitk::FillVector3D(temp, 1, 0, 0);
+    m_Hemispheres.clear();
+    m_Hemispheres.assign(m_numberOfTools, temp);
+    this->SetHemisphere(-1, temp);
     //MITK_INFO << m_pdiDev->GetLastResultStr();
   }
+}
+
+void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
+{
+  BOOL _hemiTrack;
+  //m_hemisphere indices start at 0, tool count starts at 1
+  //-1 == all tools
+  if (_tool == -1)
+  {
+    for (int i = 0; i < m_numberOfTools; ++i)
+    {
+      //is hemiTrack on?
+      m_pdiDev->GetSHemiTrack(i+1,_hemiTrack);
+
+      m_Hemispheres.at(i)[0] = -m_Hemispheres.at(i)[0];
+      m_Hemispheres.at(i)[1] = -m_Hemispheres.at(i)[1];
+      m_Hemispheres.at(i)[2] = -m_Hemispheres.at(i)[2];
+      SetHemisphere(i+1, m_Hemispheres.at(i));
+      if (_hemiTrack) m_pdiDev->SetSHemiTrack(i+1);
+    }
+  }
+  else
+  {
+    //is hemiTrack on?
+    m_pdiDev->GetSHemiTrack(_tool, _hemiTrack);
+
+    m_Hemispheres.at(_tool - 1)[0] = -m_Hemispheres.at(_tool - 1)[0];
+    m_Hemispheres.at(_tool - 1)[1] = -m_Hemispheres.at(_tool - 1)[1];
+    m_Hemispheres.at(_tool - 1)[2] = -m_Hemispheres.at(_tool - 1)[2];
+    SetHemisphere(_tool, m_Hemispheres.at(_tool - 1));
+    if (_hemiTrack) m_pdiDev->SetSHemiTrack(_tool);
+  }
+
+
+
+}
+
+void mitk::PolhemusInterface::SetHemisphere(int _tool, mitk::Vector3D _hemisphere)
+{
+  m_pdiDev->SetSHemisphere(_tool, { (float)_hemisphere[0], (float)_hemisphere[1], (float)_hemisphere[2] });
 }
 
 void mitk::PolhemusInterface::PrintStatus()

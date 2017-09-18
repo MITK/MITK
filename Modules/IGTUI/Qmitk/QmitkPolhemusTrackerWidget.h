@@ -44,6 +44,7 @@ signals:
 
   protected slots :
     void on_m_hemisphereTracking_clicked();
+    void on_m_ToggleHemisphere_clicked();
 private:
 
   /// \brief Creation of the connections

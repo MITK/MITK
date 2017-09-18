@@ -272,6 +272,9 @@ void  mitk::PolhemusTrackingDevice::SetHemisphereTrackingEnabled(bool _Hemispher
     m_HemisphereTrackingEnabled = _HemisphereTrackingEnabled;
     this->m_Device->SetHemisphereTrackingEnabled(_HemisphereTrackingEnabled);
   }
+}
 
-
+void  mitk::PolhemusTrackingDevice::ToggleHemisphere(int _tool)
+{
+    this->m_Device->ToggleHemisphere(_tool);
 }

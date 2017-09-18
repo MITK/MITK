@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNavigationData.h>
 
+
 class CPDIdev;
 
 namespace mitk
@@ -85,8 +86,14 @@ namespace mitk
     /** Enables/disables hemisphere tracking for all sensors. */
     void SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled);
 
+    /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.*/
+    void ToggleHemisphere(int _tool = -1);
+
     /** Convenient method to print the status of the tracking device (true/false) if connection is established. For debugging...*/
     void PrintStatus();
+
+    /** Sets the Hemisphere of tool _tool to the vector _hemisphere */
+    void SetHemisphere(int _tool, mitk::Vector3D _hemisphere);
 
   protected:
     /**
@@ -112,6 +119,8 @@ namespace mitk
 
     bool SetupDevice();
 
+  private:
+    std::vector<mitk::Vector3D> m_Hemispheres;
 
   };
 }//mitk

@@ -142,8 +142,13 @@ QList<QAction *> QmitkNodeDescriptorManager::GetActions(const QList<mitk::DataNo
   // find all descriptors for the nodes (unique)
   foreach (mitk::DataNode::Pointer node, _Nodes)
   {
-    lastDescriptor = this->GetDescriptor(node);
-    nodeDescriptors.insert(lastDescriptor);
+    for (QList<QmitkNodeDescriptor *>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
+    {
+      if ((*it)->CheckNode(node))
+      {
+        nodeDescriptors.insert(*it);
+      }
+    }
   }
   // add all actions for the found descriptors
   lastDescriptor = m_UnknownDataNodeDescriptor;

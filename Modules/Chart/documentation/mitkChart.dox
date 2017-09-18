@@ -7,10 +7,10 @@
 \section ChartModule_brief Description
 The MITK chart module is able to show different types of charts in a widget with customizable labels. Four types of charts are supported: line, bar, spline and pie.
 
-\imageMacro{images\barChartTemperature.png,"Example bar chart",6}
-\imageMacro{images\lineChartTemperature.png,"Example line chart",6}
-\imageMacro{images\splineChartTemperature.png,"Example spline chart",6}
-\imageMacro{images\pieChartExample.png,"Example pie chart",6}
+\imageMacro{barChartTemperature.png,"Example bar chart",6}
+\imageMacro{lineChartTemperature.png,"Example line chart",6}
+\imageMacro{splineChartTemperature.png,"Example spline chart",6}
+\imageMacro{pieChartExample.png,"Example pie chart",6}
 
 \subsection Chart_Technical Technical background 
 
@@ -24,7 +24,7 @@ For examples, please visit http://c3js.org/examples.html.
 
 Open the ui file of the plugin. Then add a widget (we always use the name <code>chartWidget</code> in the following) at the desired position. Change the class of the widget to a user-defined widget (right click &rarr; user defined classes, see http://doc.qt.io/qt-5/designer-using-custom-widgets.html). Set "QWidget" as base class. Set "QmitkChartWidget" as class name and "QmitkChartWidget.h" as include file.
 
-\imageMacro{images\userDefinedWidget.png,"User defined widget",10}
+\imageMacro{userDefinedWidget.png,"User defined widget",10}
 
 \subsection Chart_data Data
 
@@ -48,7 +48,7 @@ will result in the labels "Heidelberg" and "Heidelberg0", whereas "Heidelberg0" 
 
 \note All data can be cleared by calling <code>chartWidget->Clear()</code>.
 
-\imageMacro{images\2DDataExample.png,"2D data example: Heidelberg has fewer entries and their x-range (years) is smaller than Freiburg",8}
+\imageMacro{2DDataExample.png,"2D data example: Heidelberg has fewer entries and their x-range (years) is smaller than Freiburg",8}
 
 \subsection Chart_type Chart type
 

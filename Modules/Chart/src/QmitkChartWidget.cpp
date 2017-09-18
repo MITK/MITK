@@ -53,14 +53,15 @@ public:
   std::string GetDiagramTypeAsString() const;
 
   void ClearJavaScriptChart();
-  void initializeJavaScriptChart();
-  void callJavaScriptFuntion(const QString& command);
+  void InitializeJavaScriptChart();
+  void CallJavaScriptFuntion(const QString& command);
 
   QmitkChartData* GetC3Data() const;
   std::vector<QmitkChartxyData*>* GetC3xyData() const;
 
 private:
-  void AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label);
+  void AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label) const;
+  QmitkChartxyData* GetElementByLabel(const std::vector<QmitkChartxyData*>* c3xyData, const std::string& label) const;
 
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
@@ -68,6 +69,7 @@ private:
   QmitkChartData * m_C3Data;
   std::vector<QmitkChartxyData*> * m_C3xyData;
   std::map<QmitkChartWidget::ChartType, std::string> m_DiagramTypeToName;
+  std::map<QmitkChartWidget::LineStyle, std::string> m_LineStyleToName;
 };
 
 QmitkChartWidget::Impl::Impl(QWidget* parent)
@@ -213,7 +215,7 @@ QmitkChartWidget::QmitkChartWidget(ChartType type, QWidget* parent)
   SetChartType(type);
 }
 
-void QmitkChartWidget::Impl::callJavaScriptFuntion(const QString& command)
+void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
 {
   m_WebEngineView->page()->runJavaScript(command);
 }
@@ -223,7 +225,7 @@ void QmitkChartWidget::Impl::ClearJavaScriptChart()
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
 }
 
-void QmitkChartWidget::Impl::initializeJavaScriptChart()
+void QmitkChartWidget::Impl::InitializeJavaScriptChart()
 {
   m_WebChannel->registerObject(QStringLiteral("chartData"), m_C3Data);
   unsigned count = 0;
@@ -292,9 +294,8 @@ QmitkChartWidget::ChartType QmitkChartWidget::GetChartType() const
 
 void QmitkChartWidget::Show(bool showSubChart)
 {
-	this->m_Impl->GetC3Data()->SetAppearance(m_Impl->GetC3Data()->GetDiagramType(), showSubChart, m_Impl->GetC3Data()->GetDiagramType()== QVariant("pie"));
-
-	m_Impl->initializeJavaScriptChart();
+  this->m_Impl->GetC3Data()->SetAppearance(m_Impl->GetC3Data()->GetDiagramType(), showSubChart, m_Impl->GetC3Data()->GetDiagramType()== QVariant("pie"));
+  m_Impl->InitializeJavaScriptChart();
 }
 
 void QmitkChartWidget::Clear()
@@ -317,7 +318,7 @@ void QmitkChartWidget::SetChartTypeAndReload(ChartType type)
   SetChartType(type);
   auto diagramTypeName = m_Impl->GetDiagramTypeAsString();
   const QString command = QString::fromStdString("transformView('" + diagramTypeName + "')");
-  m_Impl->callJavaScriptFuntion(command);
+  m_Impl->CallJavaScriptFuntion(command);
 }
 
 void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
@@ -330,7 +331,7 @@ void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
   else {
     command = QString("changeTheme('default')");
   }
-  m_Impl->callJavaScriptFuntion(command);
+  m_Impl->CallJavaScriptFuntion(command);
 }
 
 void QmitkChartWidget::Reload(bool showSubChart)
@@ -343,5 +344,5 @@ void QmitkChartWidget::Reload(bool showSubChart)
     subChartString = "false";
   }
   const QString command = QString("ReloadChart(" + subChartString + ")");
-  m_Impl->callJavaScriptFuntion(command);
+  m_Impl->CallJavaScriptFuntion(command);
 }

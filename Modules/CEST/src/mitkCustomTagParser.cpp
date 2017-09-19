@@ -122,6 +122,7 @@ mitk::CustomTagParser::CustomTagParser(std::string relevantFile) : m_ClosestInte
   std::string fileName;
   itksys::SystemTools::SplitProgramPath(relevantFile, pathToDirectory, fileName);
   m_DicomDataPath = pathToDirectory;
+  m_ParseStrategy = "Automatic";
 }
 
 mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std::string dicomPropertyString)
@@ -228,6 +229,54 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
   results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
+
+  if ("" == measurements)
+  {
+    std::string stringRepetitions = "";
+    std::string stringAverages = "";
+    results->GetStringProperty("CEST.repetitions", stringRepetitions);
+    results->GetStringProperty("CEST.averages", stringAverages);
+    std::stringstream  measurementStream;
+    measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
+    measurements = measurementStream.str();
+    MITK_INFO << "Could not find measurements, assuming repetitions + averages. Which is: " << measurements;
+  }
+
+  std::string preparationType = "";
+  std::string recoveryMode = "";
+  results->GetStringProperty("CEST.PreparationType", preparationType);
+  results->GetStringProperty("CEST.RecoveryMode", recoveryMode);
+
+  if ((("T1Recovery" == preparationType) || ("T1Inversion" == preparationType) || ("1" == recoveryMode) || ("T1" == m_ParseStrategy)) && !("CEST/WASABI" == m_ParseStrategy))
+  {
+    MITK_INFO << "Parsed as T1 image";
+
+    mitk::LocaleSwitch localeSwitch("C");
+
+    std::stringstream trecStream;
+
+    std::string trecPath = m_DicomDataPath + "/TREC.txt";
+    std::ifstream list(trecPath.c_str());
+
+    if (list.good())
+    {
+      std::string currentTime;
+      while (std::getline(list, currentTime))
+      {
+        trecStream << currentTime << " ";
+      }
+    }
+    else
+    {
+      MITK_WARN << "Assumed T1, but could not load TREC at " << trecPath;
+    }
+
+    results->SetStringProperty("CEST.TREC", trecStream.str().c_str());
+  }
+  else
+  {
+    MITK_INFO << "Parsed as CEST or WASABI image";
+  }
 
   if (hasSamplingInformation)
   {
@@ -578,4 +627,9 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
   }
 
   return resultString;
+}
+
+void mitk::CustomTagParser::SetParseStrategy(std::string parseStrategy)
+{
+  m_ParseStrategy = parseStrategy;
 }

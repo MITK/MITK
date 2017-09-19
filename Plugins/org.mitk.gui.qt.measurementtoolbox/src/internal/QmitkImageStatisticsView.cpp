@@ -802,6 +802,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       m_Controls->m_ErrorMessageLabel->show();
       this->m_StatisticsUpdatePending = false;
     }
+    AdaptBinSizeCheckboxStepsize(m_SelectedImage);
   }
   else
   {
@@ -1267,6 +1268,19 @@ void QmitkImageStatisticsView::Hidden()
 
 void QmitkImageStatisticsView::SetFocus()
 {
+}
+
+void QmitkImageStatisticsView::AdaptBinSizeCheckboxStepsize(mitk::Image::ConstPointer image)
+{
+  auto componentType = image->GetPixelType().GetComponentType();
+  if (componentType == itk::ImageIOBase::DOUBLE || componentType == itk::ImageIOBase::FLOAT) {
+    m_Controls->m_HistogramBinSizeSpinbox->setDecimals(2);
+    m_Controls->m_HistogramBinSizeSpinbox->setSingleStep(.01);
+  }
+  else {
+    m_Controls->m_HistogramBinSizeSpinbox->setDecimals(0);
+    m_Controls->m_HistogramBinSizeSpinbox->setSingleStep(1);
+  }
 }
 
 std::map<double, double> QmitkImageStatisticsView::ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const

@@ -1316,6 +1316,60 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   this->UpdateAllWidgets();
 }
 
+void QmitkStdMultiWidget::changeLayoutToColumnWidget1And2()
+{
+  SMW_INFO << "changing layout to Widget1 and 2 in one Column..." << std::endl;
+
+  //Hide all Menu Widgets
+  this->HideAllWidgetToolbars();
+
+  delete QmitkStdMultiWidgetLayout;
+
+  //create Main Layout
+  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
+
+  //create main splitter
+  m_MainSplit = new QSplitter(this);
+  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
+
+  //create m_LayoutSplit  and add to the mainSplit
+  m_LayoutSplit = new QSplitter(m_MainSplit);
+  m_MainSplit->addWidget(m_LayoutSplit);
+
+  //add LevelWindow Widget to mainSplitter
+  m_MainSplit->addWidget(levelWindowWidget);
+
+  //add Widgets to splitter
+  m_LayoutSplit->addWidget(mitkWidget1Container);
+  m_LayoutSplit->addWidget(mitkWidget2Container);
+
+  //set SplitterSize
+  QList<int> splitterSize;
+  splitterSize.push_back(1000);
+  splitterSize.push_back(1000);
+  m_LayoutSplit->setSizes(splitterSize);
+
+  //show mainSplitt and add to Layout
+  m_MainSplit->show();
+
+  //show/hide Widgets
+  if (mitkWidget1->isHidden()) mitkWidget1->show();
+  if (mitkWidget2->isHidden()) mitkWidget2->show();
+  mitkWidget3->hide();
+  mitkWidget4->hide();
+
+  m_Layout = LAYOUT_COLUMN_WIDGET_1_AND_2;
+
+  //update Layout Design List
+  mitkWidget1->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_1_AND_2);
+  mitkWidget2->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_1_AND_2);
+  mitkWidget3->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_1_AND_2);
+  mitkWidget4->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_1_AND_2);
+
+  //update Alle Widgets
+  this->UpdateAllWidgets();
+}
+
 void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
 {
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(ds);
@@ -2127,6 +2181,11 @@ void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex )
   case LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET:
     {
       this->changeLayoutToLeft2Dand3DRight2D();
+      break;
+    }
+  case LAYOUT_COLUMN_WIDGET_1_AND_2:
+    {
+      this->changeLayoutToColumnWidget1And2();
       break;
     }
   };

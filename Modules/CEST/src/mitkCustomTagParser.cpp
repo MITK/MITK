@@ -229,6 +229,55 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
 
+  if ("" == measurements)
+  {
+    std::string stringRepetitions = "";
+    std::string stringAverages = "";
+    results->GetStringProperty("CEST.repetitions", stringRepetitions);
+    results->GetStringProperty("CEST.averages", stringAverages);
+    std::stringstream  measurementStream;
+    measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
+    measurements = measurementStream.str();
+    MITK_INFO << "Could not find measurements, assuming repetitions + averages. Which is: " << measurements;
+  }
+
+  std::string preparationType = "";
+  std::string recoveryMode = "";
+  results->GetStringProperty("CEST.PreparationType", preparationType);
+  results->GetStringProperty("CEST.RecoveryMode", recoveryMode);
+
+  if (("T1Recovery" == preparationType) || ("T1Inversion" == preparationType) || ("1" == recoveryMode))
+  {
+    MITK_INFO << "Parsed as T1 image";
+
+    mitk::LocaleSwitch localeSwitch("C");
+
+    std::stringstream trecStream;
+
+    std::string trecPath = m_DicomDataPath + "/TREC.txt";
+    std::ifstream list(trecPath.c_str());
+
+    if (list.good())
+    {
+      std::string currentTime;
+      while (std::getline(list, currentTime))
+      {
+        trecStream << currentTime << " ";
+      }
+    }
+    else
+    {
+      MITK_WARN << "Assumed T1, but could not load TREC at " << trecPath;
+    }
+
+    results->SetStringProperty("CEST.TREC", trecStream.str().c_str());
+  }
+  else
+  {
+    MITK_INFO << "Parsed as CEST or WASABI image";
+  }
+
+
   if (hasSamplingInformation)
   {
     std::string offsets = GetOffsetString(sampling, offset, measurements);

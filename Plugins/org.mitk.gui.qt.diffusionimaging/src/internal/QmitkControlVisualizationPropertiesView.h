@@ -84,6 +84,8 @@ protected slots:
   void SetInteractor();
   void Toggle3DClipping(bool enabled=true);
 
+  void FlipPeaks();
+
   void Welcome();
 
   /// \brief Slot function for switching tensor view between ODF and ellipsoids from tensors.

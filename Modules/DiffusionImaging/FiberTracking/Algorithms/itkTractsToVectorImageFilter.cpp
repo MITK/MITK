@@ -29,8 +29,7 @@ TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
     m_NormalizeVectors(false),
     m_UseWorkingCopy(true),
     m_MaxNumDirections(3),
-    m_SizeThreshold(0.3),
-    m_CreateDirectionImages(true)
+    m_SizeThreshold(0.3)
 {
     this->SetNumberOfRequiredOutputs(1);
 }
@@ -272,13 +271,6 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         int count = 0;
         for (unsigned int i=0; i<numDir; i++)
         {
-            vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-            itk::ContinuousIndex<double, 3> center;
-            center[0] = idx3[0];
-            center[1] = idx3[1];
-            center[2] = idx3[2];
-            itk::Point<double> worldCenter;
-            m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
             DirectionType dir = directions->at(i);
 
             if (dir.magnitude()<m_SizeThreshold)
@@ -292,30 +284,10 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
               idx4[3] = i*3 + j;
               m_DirectionImage->SetPixel(idx4, dir[j]);
             }
-
-            // add direction to vector field (with spacing compensation)
-            itk::Point<double> worldStart;
-            worldStart[0] = worldCenter[0]-dir[0]/2*minSpacing;
-            worldStart[1] = worldCenter[1]-dir[1]/2*minSpacing;
-            worldStart[2] = worldCenter[2]-dir[2]/2*minSpacing;
-            vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
-            container->GetPointIds()->InsertNextId(id);
-            itk::Point<double> worldEnd;
-            worldEnd[0] = worldCenter[0]+dir[0]/2*minSpacing;
-            worldEnd[1] = worldCenter[1]+dir[1]/2*minSpacing;
-            worldEnd[2] = worldCenter[2]+dir[2]/2*minSpacing;
-            id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
-            container->GetPointIds()->InsertNextId(id);
-            m_VtkCellArray->InsertNextCell(container);
         }
         dirIt.Set(count);
         ++dirIt;
     }
-
-    vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();
-    directionsPolyData->SetPoints(m_VtkPoints);
-    directionsPolyData->SetLines(m_VtkCellArray);
-    m_OutputFiberBundle = mitk::FiberBundle::New(directionsPolyData);
 }
 
 

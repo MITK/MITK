@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImageDicomReaderService.h>
 #include <mitkNrrdTensorImageReader.h>
 #include <mitkNrrdOdfImageReader.h>
+#include <mitkPeakImageReader.h>
 
 #include <mitkDiffusionImageNrrdWriterService.h>
 #include <mitkDiffusionImageNiftiWriterService.h>
@@ -63,6 +64,7 @@ namespace mitk
 
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
       m_NrrdOdfImageReader = new NrrdOdfImageReader();
+      m_PeakImageReader = new PeakImageReader();
 
       m_DiffusionImageNrrdWriterService = new DiffusionImageNrrdWriterService();
       m_DiffusionImageNiftiWriterService = new DiffusionImageNiftiWriterService();
@@ -107,6 +109,7 @@ namespace mitk
       delete m_DiffusionImageDicomReaderService;
       delete m_NrrdTensorImageReader;
       delete m_NrrdOdfImageReader;
+      delete m_PeakImageReader;
 
       delete m_DiffusionImageNrrdWriterService;
       delete m_DiffusionImageNiftiWriterService;
@@ -122,6 +125,7 @@ namespace mitk
     DiffusionImageDicomReaderService * m_DiffusionImageDicomReaderService;
     NrrdTensorImageReader * m_NrrdTensorImageReader;
     NrrdOdfImageReader * m_NrrdOdfImageReader;
+    PeakImageReader * m_PeakImageReader;
 
     DiffusionImageNrrdWriterService * m_DiffusionImageNrrdWriterService;
     DiffusionImageNiftiWriterService * m_DiffusionImageNiftiWriterService;

@@ -354,6 +354,36 @@ DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType DiffusionCoreIOMimeTypes::
 }
 
 
+DiffusionCoreIOMimeTypes::PeakImageMimeType::PeakImageMimeType()
+  : CustomMimeType(PEAK_MIMETYPE_NAME())
+{
+  std::string category = "Peak Image";
+  this->SetCategory(category);
+  this->SetComment("Peak Image");
+
+  this->AddExtension(".nrrd");
+  this->AddExtension(".nii");
+  this->AddExtension(".nii.gz");
+}
+
+bool DiffusionCoreIOMimeTypes::PeakImageMimeType::AppliesTo(const std::string &path) const
+{
+  MITK_INFO << path;
+  return true;
+}
+
+DiffusionCoreIOMimeTypes::PeakImageMimeType* DiffusionCoreIOMimeTypes::PeakImageMimeType::Clone() const
+{
+  return new PeakImageMimeType(*this);
+}
+
+
+DiffusionCoreIOMimeTypes::PeakImageMimeType DiffusionCoreIOMimeTypes::PEAK_MIMETYPE()
+{
+  return PeakImageMimeType();
+}
+
+
 CustomMimeType DiffusionCoreIOMimeTypes::DTI_MIMETYPE()
 {
   CustomMimeType mimeType(DTI_MIMETYPE_NAME());
@@ -361,7 +391,6 @@ CustomMimeType DiffusionCoreIOMimeTypes::DTI_MIMETYPE()
   mimeType.SetComment("Diffusion Tensor Images");
   mimeType.SetCategory(category);
   mimeType.AddExtension("dti");
-  //mimeType.AddExtension("hdti"); // saving with detached header does not work out of the box
   return mimeType;
 }
 
@@ -377,6 +406,12 @@ CustomMimeType DiffusionCoreIOMimeTypes::ODF_MIMETYPE()
 }
 
 // Names
+std::string DiffusionCoreIOMimeTypes::PEAK_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".nrrd";
+  return name;
+}
+
 std::string DiffusionCoreIOMimeTypes::DWI_NRRD_MIMETYPE_NAME()
 {
   static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dwi";
@@ -414,6 +449,11 @@ std::string DiffusionCoreIOMimeTypes::ODF_MIMETYPE_NAME()
 }
 
 // Descriptions
+std::string DiffusionCoreIOMimeTypes::PEAK_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "Peak Image";
+  return description;
+}
 
 std::string DiffusionCoreIOMimeTypes::DWI_NRRD_MIMETYPE_DESCRIPTION()
 {

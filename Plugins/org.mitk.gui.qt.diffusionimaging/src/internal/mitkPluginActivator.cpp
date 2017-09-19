@@ -54,6 +54,10 @@ void PluginActivator::start(ctkPluginContext* context)
     mitk::NodePredicateDataType::Pointer isFiberBundle = mitk::NodePredicateDataType::New("FiberBundle");
     manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundle"), QString(":/QmitkDiffusionImaging/tractogram.png"), isFiberBundle, manager));
 
+    mitk::NodePredicateDataType::Pointer isPeakImage = mitk::NodePredicateDataType::New("PeakImage");
+    manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PeakImage"), QString(":/QmitkDiffusionImaging/odf_peaks.png"), isPeakImage, manager));
+
+
     mitk::NodePredicateDataType::Pointer isConnectomicsNetwork = mitk::NodePredicateDataType::New("ConnectomicsNetwork");
     manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("ConnectomicsNetwork"), QString(":/QmitkDiffusionImaging/ConnectomicsNetwork.png"), isConnectomicsNetwork, manager));
 

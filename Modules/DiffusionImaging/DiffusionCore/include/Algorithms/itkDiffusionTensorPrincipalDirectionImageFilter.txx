@@ -108,69 +108,7 @@ template< class TTensorPixelType>
 void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
 ::AfterThreadedGenerateData()
 {
-    vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-    typename OutputImageType::Pointer numDirImage = static_cast< OutputImageType* >( this->ProcessObject::GetPrimaryOutput() );
-    ImageRegionConstIterator< OutputImageType > it(numDirImage, numDirImage->GetLargestPossibleRegion() );
-
-    mitk::Vector3D spacing = numDirImage->GetSpacing();
-    double minSpacing = spacing[0];
-    if (spacing[1]<minSpacing)
-        minSpacing = spacing[1];
-    if (spacing[2]<minSpacing)
-        minSpacing = spacing[2];
-
-    while( !it.IsAtEnd() )
-    {
-        typename OutputImageType::IndexType index = it.GetIndex();
-        if (m_MaskImage->GetPixel(index)==0)
-        {
-            ++it;
-            continue;
-        }
-
-        typename PeakImageType::IndexType peakIndex;
-        peakIndex[0] = it.GetIndex()[0];
-        peakIndex[1] = it.GetIndex()[1];
-        peakIndex[2] = it.GetIndex()[2];
-        DirectionType dir;
-        peakIndex[3] = 0;
-        dir[0] = m_PeakImage->GetPixel(peakIndex);
-        peakIndex[3] = 1;
-        dir[1] = m_PeakImage->GetPixel(peakIndex);
-        peakIndex[3] = 2;
-        dir[2] = m_PeakImage->GetPixel(peakIndex);
-
-        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-        itk::ContinuousIndex<double, 3> center;
-        center[0] = index[0];
-        center[1] = index[1];
-        center[2] = index[2];
-        itk::Point<double> worldCenter;
-        numDirImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
-
-        itk::Point<double> worldStart;
-        worldStart[0] = worldCenter[0]-dir[0]/2 * minSpacing;
-        worldStart[1] = worldCenter[1]-dir[1]/2 * minSpacing;
-        worldStart[2] = worldCenter[2]-dir[2]/2 * minSpacing;
-        vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
-        container->GetPointIds()->InsertNextId(id);
-        itk::Point<double> worldEnd;
-        worldEnd[0] = worldCenter[0]+dir[0]/2 * minSpacing;
-        worldEnd[1] = worldCenter[1]+dir[1]/2 * minSpacing;
-        worldEnd[2] = worldCenter[2]+dir[2]/2 * minSpacing;
-        id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
-        container->GetPointIds()->InsertNextId(id);
-        m_VtkCellArray->InsertNextCell(container);
-
-        ++it;
-    }
-
-    vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();
-    directionsPolyData->SetPoints(m_VtkPoints);
-    directionsPolyData->SetLines(m_VtkCellArray);
-    m_OutputFiberBundle = mitk::FiberBundle::New(directionsPolyData);
 }
 
 template< class TTensorPixelType>

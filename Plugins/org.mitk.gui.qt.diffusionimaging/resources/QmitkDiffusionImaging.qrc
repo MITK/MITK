@@ -26,5 +26,6 @@
         <file>ConnectomicsNetwork.png</file>
         <file>odf.png</file>
         <file>DiffData24.png</file>
+        <file>odf_peaks.png</file>
     </qresource>
 </RCC>

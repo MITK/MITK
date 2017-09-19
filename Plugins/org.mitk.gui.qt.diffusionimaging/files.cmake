@@ -39,6 +39,7 @@ set(CACHED_RESOURCE_FILES
   resources/odf.png
   resources/tensor.png
   resources/tractogram.png
+  resources/odf_peaks.png
   resources/ml_tractogram.png
   resources/refresh.xpm
  )

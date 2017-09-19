@@ -93,7 +93,6 @@ Image< unsigned char, 3 > >
     // output
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer )
     itkGetMacro( PeakImage, PeakImageType::Pointer )
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                ///< vector field (peak sizes rescaled for visualization purposes)
 
     itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
     itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
@@ -129,7 +128,6 @@ Image< unsigned char, 3 > >
     double                                      m_AngularThreshold;     ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
     const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients
 
-    mitk::FiberBundle::Pointer                  m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
     PeakImageType::Pointer                      m_PeakImage;
     ItkUcharImgType::Pointer                    m_NumDirectionsImage;     ///< number of peaks per voxel
     ItkUcharImgType::Pointer                    m_MaskImage;              ///< only voxels inside the binary mask are processed

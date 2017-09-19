@@ -34,10 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkConnectomicsNetwork.h>
 #include "usModuleRegistry.h"
-
+#include <mitkPeakImage.h>
 #include <mitkBaseRenderer.h>
 #include "mitkPlaneGeometry.h"
 #include <QmitkRenderWindow.h>
+#include <itkFlipPeaksFilter.h>
+#include <mitkImageToItk.h>
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -91,6 +93,18 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+  if (renderWindow)
+  {
+    mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag1);
+    slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag2);
+    slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag3);
+  }
+
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
 }
 
@@ -251,6 +265,32 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_ScalingFrame->setVisible(false);
     m_Controls->m_NormalizationFrame->setVisible(false);
     m_Controls->m_Crosshair->setVisible(false);
+
+    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+    if (renderWindow)
+    {
+      {
+        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnAxialChanged );
+        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
+      }
+
+      {
+        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnSagittalChanged );
+        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
+      }
+
+      {
+        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnCoronalChanged );
+        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
+      }
+    }
   }
 }
 
@@ -312,6 +352,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Clip2, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_Clip3, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_FlipClipBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DClipping()));
+
+    connect((QObject*) m_Controls->m_FlipPeaksButton, SIGNAL(clicked()), (QObject*) this, SLOT(FlipPeaks()));
   }
 }
 
@@ -349,6 +391,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
 {
   m_Controls->m_BundleControlsFrame->setVisible(false);
   m_Controls->m_ImageControlsFrame->setVisible(false);
+  m_Controls->m_PeakImageFrame->setVisible(false);
 
   if (nodes.size()>1) // only do stuff if one node is selected
     return;
@@ -501,6 +544,10 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
     {
       PlanarFigureFocus();
     }
+    else if(dynamic_cast<mitk::PeakImage*>(nodeData))
+    {
+      m_Controls->m_PeakImageFrame->setVisible(true);
+    }
     else if( dynamic_cast<mitk::Image*>(nodeData) )
     {
       m_Controls->m_ImageControlsFrame->setVisible(true);
@@ -620,46 +667,12 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
 
 void QmitkControlVisualizationPropertiesView::Visible()
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow)
-  {
-    {
-      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnAxialChanged );
-      m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnSagittalChanged );
-      m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnCoronalChanged );
-      m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-  }
 }
 
 void QmitkControlVisualizationPropertiesView::Hidden()
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow)
-  {
-    mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag1);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag2);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag3);
-  }
 }
 
 void QmitkControlVisualizationPropertiesView::Activated()
@@ -668,6 +681,33 @@ void QmitkControlVisualizationPropertiesView::Activated()
 
 void QmitkControlVisualizationPropertiesView::Deactivated()
 {
+}
+
+void QmitkControlVisualizationPropertiesView::FlipPeaks()
+{
+  if (m_SelectedNode.IsNull() || dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr)
+    return;
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
+
+  typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(image);
+  caster->Update();
+  mitk::PeakImage::ItkPeakImageType::Pointer itkImg = caster->GetOutput();
+
+  itk::FlipPeaksFilter< float >::Pointer flipper = itk::FlipPeaksFilter< float >::New();
+  flipper->SetInput(itkImg);
+  flipper->SetFlipX(m_Controls->m_FlipPeaksX->isChecked());
+  flipper->SetFlipY(m_Controls->m_FlipPeaksY->isChecked());
+  flipper->SetFlipZ(m_Controls->m_FlipPeaksZ->isChecked());
+  flipper->Update();
+
+  mitk::Image::Pointer resultImage = dynamic_cast<mitk::Image*>(mitk::PeakImage::New().GetPointer());
+  mitk::CastToMitkImage(flipper->GetOutput(), resultImage);
+  resultImage->SetVolume(flipper->GetOutput()->GetBufferPointer());
+  m_SelectedNode->SetData(resultImage);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkControlVisualizationPropertiesView::Toggle3DClipping(bool enabled)

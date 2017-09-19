@@ -43,26 +43,13 @@
    <item row="5" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Output</string>
+      <string>Additional Output</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <property name="fieldGrowthPolicy">
        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
       <item row="0" column="0">
-       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
-        <property name="toolTip">
-         <string>Only for visualization purposes! The vectors are automatically corrected for image spacing and for the largest eigenvalue in case of the tensor peak extraction.</string>
-        </property>
-        <property name="text">
-         <string>Vector Field</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
        <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
         <property name="toolTip">
          <string>Output unsigned char image containing the number of directions per voxel.</string>
@@ -72,19 +59,6 @@
         </property>
         <property name="checked">
          <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
-        <property name="toolTip">
-         <string>4D image cotaining peak information</string>
-        </property>
-        <property name="text">
-         <string>Peak Image</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
         </property>
        </widget>
       </item>

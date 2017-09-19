@@ -26,14 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "QmitkOdfMaximaExtractionView.h"
 
-// MITK
 #include <mitkImageCast.h>
 #include <mitkFiberBundle.h>
 #include <mitkImage.h>
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>
-
-// ITK
 #include <itkVectorImage.h>
 #include <itkOdfMaximaExtractionFilter.h>
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
@@ -46,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateIsDWI.h>
+#include <mitkPeakImage.h>
 
 // Qt
 #include <QMessageBox>
@@ -106,14 +104,14 @@ void QmitkOdfMaximaExtractionView::SetFocus()
 
 void QmitkOdfMaximaExtractionView::StartPeakExtraction()
 {
-    if (dynamic_cast<TensorImage*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData()) != nullptr)
-    {
-        StartTensorPeakExtraction(dynamic_cast<TensorImage*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData()));
-    }
-    else
-    {
-        StartMaximaExtraction(dynamic_cast<Image*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData()));
-    }
+  if (dynamic_cast<TensorImage*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData()) != nullptr)
+  {
+    StartTensorPeakExtraction(dynamic_cast<TensorImage*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData()));
+  }
+  else
+  {
+    StartMaximaExtraction(dynamic_cast<Image*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData()));
+  }
 }
 
 template<int shOrder>
@@ -158,19 +156,19 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
     GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 
-    {
-      mitk::OdfImage::Pointer img = mitk::OdfImage::New();
-      img->InitializeByItk(itkodf.GetPointer());
-      img->SetVolume(itkodf->GetBufferPointer());
-      DataNode::Pointer node = DataNode::New();
-      node->SetData(img);
+  {
+    mitk::OdfImage::Pointer img = mitk::OdfImage::New();
+    img->InitializeByItk(itkodf.GetPointer());
+    img->SetVolume(itkodf->GetBufferPointer());
+    DataNode::Pointer node = DataNode::New();
+    node->SetData(img);
 
-      QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
-      name += "_OdfImage_Imported";
-      node->SetName(name.toStdString().c_str());
+    QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
+    name += "_OdfImage_Imported";
+    node->SetName(name.toStdString().c_str());
 
-      GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
-    }
+    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
+  }
 }
 
 void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
@@ -187,18 +185,18 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
 
   int nrCoeffs = mitkImg->GetLargestPossibleRegion().GetSize()[3];
 
-//  // solve bx² + cx + d = 0 = shOrder² + 2*shOrder + 2-2*neededCoeffs;
-//  int c = 3, d = 2 - 2 * nrCoeffs;
-//  double D = c*c - 4 * d;
-//  int shOrder;
-//  if (D>0)
-//  {
-//    shOrder = (-c + sqrt(D)) / 2.0;
-//    if (shOrder<0)
-//      shOrder = (-c - sqrt(D)) / 2.0;
-//  }
-//  else if (D == 0)
-//    shOrder = -c / 2.0;
+  //  // solve bx² + cx + d = 0 = shOrder² + 2*shOrder + 2-2*neededCoeffs;
+  //  int c = 3, d = 2 - 2 * nrCoeffs;
+  //  double D = c*c - 4 * d;
+  //  int shOrder;
+  //  if (D>0)
+  //  {
+  //    shOrder = (-c + sqrt(D)) / 2.0;
+  //    if (shOrder<0)
+  //      shOrder = (-c - sqrt(D)) / 2.0;
+  //  }
+  //  else if (D == 0)
+  //    shOrder = -c / 2.0;
 
   switch (nrCoeffs)
   {
@@ -221,7 +219,7 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
     TemplatedConvertShCoeffs<12>(mitkImg);
     break;
   default :
-      QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
+    QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
   }
 }
 
@@ -259,19 +257,16 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
 
   filter->Update();
 
-  if (m_Controls->m_OutputDirectionImagesBox->isChecked())
-  {
-    MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
-    mitk::Image::Pointer img = mitk::Image::New();
-    CastToMitkImage(itkImg, img);
+  MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
+  mitk::Image::Pointer mitkPeakImage = dynamic_cast<Image*>(PeakImage::New().GetPointer());
+  CastToMitkImage(itkImg, mitkPeakImage);
 
-    DataNode::Pointer node = DataNode::New();
-    node->SetData(img);
-    QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
-    name += "_PrincipalDirection";
-    node->SetName(name.toStdString().c_str());
-    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
-  }
+  DataNode::Pointer node = DataNode::New();
+  node->SetData(mitkPeakImage);
+  QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
+  name += "_PrincipalDirection";
+  node->SetName(name.toStdString().c_str());
+  GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
 
   if (m_Controls->m_OutputNumDirectionsBox->isChecked())
   {
@@ -285,29 +280,6 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
     name += "_NumDirections";
     node2->SetName(name.toStdString().c_str());
     GetDataStorage()->Add(node2, m_Controls->m_ImageBox->GetSelectedNode());
-  }
-
-  if (m_Controls->m_OutputVectorFieldBox->isChecked())
-  {
-    mitk::Vector3D outImageSpacing = geometry->GetSpacing();
-    float minSpacing = 1;
-    if (outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])
-      minSpacing = outImageSpacing[0];
-    else if (outImageSpacing[1] < outImageSpacing[2])
-      minSpacing = outImageSpacing[1];
-    else
-      minSpacing = outImageSpacing[2];
-
-    mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
-    // directions->SetGeometry(geometry);
-    DataNode::Pointer node = DataNode::New();
-    node->SetData(directions);
-    QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
-    name += "_VectorField";
-    node->SetName(name.toStdString().c_str());
-    node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
-    node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 }
 
@@ -374,19 +346,16 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
 
   filter->Update();
 
-  if (m_Controls->m_OutputDirectionImagesBox->isChecked())
-  {
-    typename MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
-    mitk::Image::Pointer img = mitk::Image::New();
-    CastToMitkImage(itkImg, img);
+  typename MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
+  mitk::Image::Pointer img = dynamic_cast<Image*>(PeakImage::New().GetPointer());
+  CastToMitkImage(itkImg, img);
 
-    DataNode::Pointer node = DataNode::New();
-    node->SetData(img);
-    QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
-    name += "_PEAKS";
-    node->SetName(name.toStdString().c_str());
-    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
-  }
+  DataNode::Pointer node = DataNode::New();
+  node->SetData(img);
+  QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
+  name += "_PEAKS";
+  node->SetName(name.toStdString().c_str());
+  GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
 
   if (m_Controls->m_OutputNumDirectionsBox->isChecked())
   {
@@ -400,29 +369,6 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
     name += "_NUM_DIRECTIONS";
     node2->SetName(name.toStdString().c_str());
     GetDataStorage()->Add(node2, m_Controls->m_ImageBox->GetSelectedNode());
-  }
-
-  if (m_Controls->m_OutputVectorFieldBox->isChecked())
-  {
-    mitk::Vector3D outImageSpacing = geometry->GetSpacing();
-    float minSpacing = 1;
-    if (outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])
-      minSpacing = outImageSpacing[0];
-    else if (outImageSpacing[1] < outImageSpacing[2])
-      minSpacing = outImageSpacing[1];
-    else
-      minSpacing = outImageSpacing[2];
-
-    mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
-    // directions->SetGeometry(geometry);
-    DataNode::Pointer node = DataNode::New();
-    node->SetData(directions);
-    QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
-    name += "_VECTOR_FIELD";
-    node->SetName(name.toStdString().c_str());
-    node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
-    node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 }
 
@@ -451,7 +397,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image* img)
     StartMaximaExtraction<12>(img);
     break;
   default :
-      QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
+    QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
   }
 }
 
@@ -463,16 +409,16 @@ void QmitkOdfMaximaExtractionView::OnSelectionChanged(berry::IWorkbenchPart::Poi
 
 void QmitkOdfMaximaExtractionView::OnImageSelectionChanged()
 {
-    m_Controls->m_StartPeakExtractionButton->setVisible(false);
-    m_Controls->m_ImportShCoeffs->setVisible(false);
+  m_Controls->m_StartPeakExtractionButton->setVisible(false);
+  m_Controls->m_ImportShCoeffs->setVisible(false);
 
-    mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
-    if (node.IsNull())
-        return;
+  mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
+  if (node.IsNull())
+    return;
 
-    Image::Pointer img = dynamic_cast<Image*>(node->GetData());
-    if (img->GetDimension()==4)
-        m_Controls->m_ImportShCoeffs->setVisible(true);
-    else
-        m_Controls->m_StartPeakExtractionButton->setVisible(true);
+  Image::Pointer img = dynamic_cast<Image*>(node->GetData());
+  if (img->GetDimension()==4)
+    m_Controls->m_ImportShCoeffs->setVisible(true);
+  else
+    m_Controls->m_StartPeakExtractionButton->setVisible(true);
 }

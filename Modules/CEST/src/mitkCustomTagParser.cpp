@@ -122,6 +122,7 @@ mitk::CustomTagParser::CustomTagParser(std::string relevantFile) : m_ClosestInte
   std::string fileName;
   itksys::SystemTools::SplitProgramPath(relevantFile, pathToDirectory, fileName);
   m_DicomDataPath = pathToDirectory;
+  m_ParseStrategy = "Automatic";
 }
 
 mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std::string dicomPropertyString)
@@ -246,7 +247,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   results->GetStringProperty("CEST.PreparationType", preparationType);
   results->GetStringProperty("CEST.RecoveryMode", recoveryMode);
 
-  if (("T1Recovery" == preparationType) || ("T1Inversion" == preparationType) || ("1" == recoveryMode))
+  if ((("T1Recovery" == preparationType) || ("T1Inversion" == preparationType) || ("1" == recoveryMode) || ("T1" == m_ParseStrategy)) && !("CEST/WASABI" == m_ParseStrategy))
   {
     MITK_INFO << "Parsed as T1 image";
 
@@ -276,7 +277,6 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   {
     MITK_INFO << "Parsed as CEST or WASABI image";
   }
-
 
   if (hasSamplingInformation)
   {
@@ -627,4 +627,9 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
   }
 
   return resultString;
+}
+
+void mitk::CustomTagParser::SetParseStrategy(std::string parseStrategy)
+{
+  m_ParseStrategy = parseStrategy;
 }

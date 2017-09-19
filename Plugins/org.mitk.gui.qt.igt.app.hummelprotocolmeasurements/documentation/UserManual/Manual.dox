@@ -1,12 +1,11 @@
 /**
-\bundlemainpage{org.mitk.gui.qt.igttrackingsemiautomaticmeasurement} IGT Tracking Semi Automatic Measurement
+\page org_mitk_gui_qt_igttrackingsemiautomaticmeasurement IGT Tracking Semi Automatic Measurement
 
 \imageMacro{icon.png,"Icon of IGT Tracking Semi Automatic Measurement",2.00}
 
-Available sections:
-  - \ref org.mitk.gui.qt.igttrackingsemiautomaticmeasurementOverview
+\tableofcontents
 
-\section org.mitk.gui.qt.igttrackingsemiautomaticmeasurementOverview
+\section Overview
 Dieses PlugIn dient zur semiautomatischen Aufzeichnung von Messreihen mit Trackingsystemen. Entsprechend konfiguriert ist es auch für das Hummel-Protokoll einsetzbar. Zentrale Komponente des PlugIns ist eine IGT Pipeline zur Messdatenaufzeichnung, wie in Abbildung 1 dargestellt.
 
 \imageMacro{pipeline.png,"Icon of IGT Tracking Semi Automatic Measurement",10.00}

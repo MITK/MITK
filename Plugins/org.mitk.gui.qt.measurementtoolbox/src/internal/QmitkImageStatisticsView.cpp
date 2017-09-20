@@ -802,6 +802,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       m_Controls->m_ErrorMessageLabel->show();
       this->m_StatisticsUpdatePending = false;
     }
+    AdaptBinSizeCheckboxStepsize(m_SelectedImage);
   }
   else
   {
@@ -981,7 +982,8 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
         m_Controls->m_UseDefaultBinSizeBox->setEnabled(true);
         m_Controls->m_JSHistogram->Show(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
-
+        auto currentTime = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+        this->AdaptBinSizeCheckBoxMinMax((this->m_CalculationThread->GetStatisticsData()).at(currentTime).GetPointer(), this->m_CalculationThread->GetStatisticsImage()->GetPixelType().GetComponentType());
         this->FillStatisticsTableView(this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }
       m_CurrentStatisticsValid = true;
@@ -1267,6 +1269,43 @@ void QmitkImageStatisticsView::Hidden()
 
 void QmitkImageStatisticsView::SetFocus()
 {
+}
+
+void QmitkImageStatisticsView::AdaptBinSizeCheckboxStepsize(mitk::Image::ConstPointer image)
+{
+  auto componentType = image->GetPixelType().GetComponentType();
+  if (componentType == itk::ImageIOBase::DOUBLE || componentType == itk::ImageIOBase::FLOAT) {
+    m_Controls->m_HistogramBinSizeSpinbox->setDecimals(2);
+    m_Controls->m_HistogramBinSizeSpinbox->setSingleStep(.01);
+  }
+  else {
+    m_Controls->m_HistogramBinSizeSpinbox->setDecimals(0);
+    m_Controls->m_HistogramBinSizeSpinbox->setSingleStep(1);
+  }
+}
+
+void QmitkImageStatisticsView::AdaptBinSizeCheckBoxMinMax(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, int componentType)
+{
+  auto minValue = statistics->GetMin();
+  auto maxValue = statistics->GetMax();
+  //10 bins are minimum as defined in ImageStatisticsCalculator::GetStatistics
+  const unsigned int minHistogramBins = 10;
+  //10000 bins are just a maximum arbitrary number to keep computation time reasonable
+  const unsigned int maxHistogramBins = 10000;
+  double minHistogramBinSize = static_cast<double>((maxValue - minValue) / maxHistogramBins);
+  double maxHistogramBinSize = static_cast<double>((maxValue - minValue) / minHistogramBins);
+  if (componentType == itk::ImageIOBase::DOUBLE || componentType == itk::ImageIOBase::FLOAT) {
+    //smallest value for double/float images
+    const double minHistogramBinSizeValid = 0.01;
+    m_Controls->m_HistogramBinSizeSpinbox->setMinimum(std::max(minHistogramBinSize, minHistogramBinSizeValid));
+    m_Controls->m_HistogramBinSizeSpinbox->setMaximum(maxHistogramBinSize);
+  }
+  else {
+    //smallest valid value for int/short images
+    const double minHistogramBinSizeValid = 1;
+    m_Controls->m_HistogramBinSizeSpinbox->setMinimum(std::max(static_cast<int>(minHistogramBinSize), static_cast<int>(minHistogramBinSizeValid)));
+    m_Controls->m_HistogramBinSizeSpinbox->setMaximum(static_cast<int>(maxHistogramBinSize));
+  }
 }
 
 std::map<double, double> QmitkImageStatisticsView::ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const

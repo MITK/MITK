@@ -1745,8 +1745,10 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       mainProp ? mainProp->GetValue() : 2
     };
 
+    bool imageIsFlat = image->GetDimension(2) < 2 && seriesNumber == "";
+
     for(int i = 0; i < 3; i++) {
-      if (m_displayPositionInfo) {
+      if (m_displayPositionInfo && !imageIsFlat) {
         _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
         if (timeSteps > 1) {
           _infoStringStream[axisIndices[i]]<< "\nT: " << (timestep + 1) << "/" << timeSteps;

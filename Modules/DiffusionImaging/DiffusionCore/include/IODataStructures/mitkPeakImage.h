@@ -49,11 +49,12 @@ namespace mitk
       return m_PolyData;
     }
 
+    void SetCustomColor(float r, float g, float b);
+    void ColorByOrientation();
+
   protected:
     PeakImage();
     virtual ~PeakImage();
-
-    void ColorByOrientation();
 
     mutable vtkSmartPointer< vtkPolyData > m_PolyData;
 

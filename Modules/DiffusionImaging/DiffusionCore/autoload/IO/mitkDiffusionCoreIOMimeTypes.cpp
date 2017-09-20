@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkCustomMimeType.h>
 #include <itkGDCMImageIO.h>
+#include <itkNiftiImageIO.h>
 
 namespace mitk
 {
@@ -40,6 +41,7 @@ std::vector<CustomMimeType*> DiffusionCoreIOMimeTypes::Get()
   mimeTypes.push_back(DWI_DICOM_MIMETYPE().Clone());
   mimeTypes.push_back(DTI_MIMETYPE().Clone());
   mimeTypes.push_back(ODF_MIMETYPE().Clone());
+  mimeTypes.push_back(PEAK_MIMETYPE().Clone());
 
   return mimeTypes;
 }
@@ -354,22 +356,41 @@ DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType DiffusionCoreIOMimeTypes::
 }
 
 
-DiffusionCoreIOMimeTypes::PeakImageMimeType::PeakImageMimeType()
-  : CustomMimeType(PEAK_MIMETYPE_NAME())
+DiffusionCoreIOMimeTypes::PeakImageMimeType::PeakImageMimeType() : CustomMimeType(PEAK_MIMETYPE_NAME())
 {
   std::string category = "Peak Image";
   this->SetCategory(category);
   this->SetComment("Peak Image");
 
-  this->AddExtension(".nrrd");
-  this->AddExtension(".nii");
-  this->AddExtension(".nii.gz");
+  this->AddExtension("nrrd");
+  this->AddExtension("nii");
+  this->AddExtension("nii.gz");
 }
 
 bool DiffusionCoreIOMimeTypes::PeakImageMimeType::AppliesTo(const std::string &path) const
 {
-  MITK_INFO << path;
-  return true;
+  {
+    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+    if ( io->CanReadFile( path.c_str() ) )
+    {
+      io->SetFileName( path.c_str() );
+      io->ReadImageInformation();
+      if ( io->GetPixelType() == itk::ImageIOBase::SCALAR && io->GetNumberOfDimensions()==4 && io->GetDimensions(3)%3==0)
+        return true;
+    }
+  }
+  {
+    itk::NiftiImageIO::Pointer io = itk::NiftiImageIO::New();
+    if ( io->CanReadFile( path.c_str() ) )
+    {
+      io->SetFileName( path.c_str() );
+      io->ReadImageInformation();
+      if ( io->GetPixelType() == itk::ImageIOBase::SCALAR && io->GetNumberOfDimensions()==4 && io->GetDimensions(3)%3==0)
+        return true;
+    }
+  }
+
+  return false;
 }
 
 DiffusionCoreIOMimeTypes::PeakImageMimeType* DiffusionCoreIOMimeTypes::PeakImageMimeType::Clone() const

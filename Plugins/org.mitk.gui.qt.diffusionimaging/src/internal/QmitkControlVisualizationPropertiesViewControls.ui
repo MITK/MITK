@@ -851,7 +851,21 @@ p, li { white-space: pre-wrap; }
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="2" column="0">
+      <item row="2" column="4">
+       <widget class="QCheckBox" name="m_FlipPeaksZ">
+        <property name="text">
+         <string>z</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QCheckBox" name="m_FlipPeaksX">
+        <property name="text">
+         <string>x</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
        <widget class="QCommandLinkButton" name="m_FlipPeaksButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -864,28 +878,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
-       <widget class="QCheckBox" name="m_FlipPeaksZ">
-        <property name="text">
-         <string>z</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QCheckBox" name="m_FlipPeaksY">
-        <property name="text">
-         <string>y</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QCheckBox" name="m_FlipPeaksX">
-        <property name="text">
-         <string>x</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
+      <item row="2" column="5">
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -897,6 +890,27 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="2" column="3">
+       <widget class="QCheckBox" name="m_FlipPeaksY">
+        <property name="text">
+         <string>y</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QToolButton" name="m_ResetColoring2">
+        <property name="toolTip">
+         <string>Reset to Default Coloring</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

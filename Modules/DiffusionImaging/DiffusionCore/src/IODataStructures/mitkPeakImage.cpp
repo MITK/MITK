@@ -36,6 +36,8 @@ mitk::PeakImage::~PeakImage()
 void mitk::PeakImage::ConstructPolydata()
 {
   MITK_INFO << "PeakImage constructing polydata";
+  if (this->GetDimensions()[3]%3!=0)
+    mitkThrow() << "Fourth dimension needs to be a multiple of 3";
 
   typedef mitk::ImageToItk< ItkPeakImageType > CasterType;
   CasterType::Pointer caster = CasterType::New();
@@ -125,6 +127,35 @@ void mitk::PeakImage::ConstructPolydata()
   this->Modified();
 }
 
+void mitk::PeakImage::SetCustomColor(float r, float g, float b)
+{
+  vtkPoints* extrPoints = nullptr;
+  extrPoints = m_PolyData->GetPoints();
+  int numOfPoints = 0;
+  if (extrPoints!=nullptr)
+    numOfPoints = extrPoints->GetNumberOfPoints();
+
+  int componentSize = 4;
+
+  vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  colors->Allocate(numOfPoints * componentSize);
+  colors->SetNumberOfComponents(componentSize);
+  colors->SetName("FIBER_COLORS");
+
+  unsigned char rgba[4] = {0,0,0,0};
+  for(long i=0; i<m_PolyData->GetNumberOfPoints(); ++i)
+  {
+    rgba[0] = (unsigned char) r;
+    rgba[1] = (unsigned char) g;
+    rgba[2] = (unsigned char) b;
+    rgba[3] = (unsigned char) 255;
+    colors->InsertTypedTuple(i, rgba);
+  }
+
+  m_PolyData->GetPointData()->AddArray(colors);
+  this->Modified();
+}
+
 void mitk::PeakImage::ColorByOrientation()
 {
   //===== FOR WRITING A TEST ========================
@@ -186,4 +217,5 @@ void mitk::PeakImage::ColorByOrientation()
   }
 
   m_PolyData->GetPointData()->AddArray(colors);
+  this->Modified();
 }

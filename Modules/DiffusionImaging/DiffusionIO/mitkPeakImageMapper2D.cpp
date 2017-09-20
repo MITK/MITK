@@ -205,7 +205,10 @@ void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *render
 
   localStorage->m_PointActor->SetMapper(localStorage->m_Mapper);
   localStorage->m_PointActor->GetProperty()->ShadingOn();
-//  localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
+
+  float linewidth = 1.0;
+  this->GetDataNode()->GetFloatProperty("shape.linewidth",linewidth);
+  localStorage->m_PointActor->GetProperty()->SetLineWidth(linewidth);
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
@@ -225,6 +228,7 @@ void mitk::PeakImageMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::B
 
   //add other parameters to propertylist
   node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
+  node->AddProperty( "shape.linewidth", mitk::FloatProperty::New(1.0), renderer, overwrite);
 }
 
 

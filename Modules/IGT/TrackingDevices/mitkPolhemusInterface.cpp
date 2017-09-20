@@ -66,21 +66,8 @@ bool mitk::PolhemusInterface::SetupDevice()
 
 bool mitk::PolhemusInterface::StartTracking()
 {
-  LPCTSTR	szWindowClass = _T("PDIconsoleWinClass");
-  HINSTANCE hInst = GetModuleHandle(0);
-  HWND	hwnd = CreateWindowEx(
-    WS_EX_NOACTIVATE,//WS_EX_STATICEDGE, //
-    szWindowClass,
-    _T("MyWindowName"),
-    WS_POPUP,
-    0, 0, 1, 1,
-    HWND_MESSAGE,
-    0,
-    hInst,
-    0);
-
   m_continousTracking = true;
-  return m_pdiDev->StartContPno(hwnd);
+  return m_pdiDev->StartContPno(0);
 }
 
 bool mitk::PolhemusInterface::StopTracking()

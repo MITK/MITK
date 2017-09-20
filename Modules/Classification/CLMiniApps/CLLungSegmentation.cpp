@@ -46,19 +46,23 @@ void StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Ima
   startIndex[0] = itkImage->GetLargestPossibleRegion().GetSize()[0]/2;
   startIndex[1] = itkImage->GetLargestPossibleRegion().GetSize()[1]/2;
   startIndex[2] = itkImage->GetLargestPossibleRegion().GetSize()[2]/2;
+  auto region = itkImage->GetLargestPossibleRegion();
 
   for (int x = -50; x < 50; ++x)
   {
     for (int y = -50; y < 50; ++y)
     {
-      for (int z = -50; z < 50; ++z)
+      for (int z = -20; z < 20; ++z)
       {
         seedIndex[0] = startIndex[0] + x;
         seedIndex[1] = startIndex[1] + y;
         seedIndex[2] = startIndex[2] + z;
-        if (itkImage->GetPixel(seedIndex) > 0)
+        if (region.IsInside(seedIndex))
         {
-          x = 100; y = 100; z = 100;
+          if (itkImage->GetPixel(seedIndex) > 0)
+          {
+            x = 100; y = 100; z = 100;
+          }
         }
       }
     }
@@ -120,7 +124,11 @@ int main(int argc, char* argv[])
   std::string inputFile = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
 
+  MITK_INFO << "Start Image Loading";
+
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputFile);
+
+  MITK_INFO << "Loaded Image";
 
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
   otsuFilter->SetNumberOfThresholds(2);
@@ -135,6 +143,8 @@ int main(int argc, char* argv[])
   {
     mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
   }
+
+  MITK_INFO << "Calculated Otsu";
 
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(otsuFilter->GetOutput());

@@ -25,70 +25,76 @@ class TractsToVectorImageFilter : public ImageSource< Image< PixelType, 4 > >
 {
 
 public:
-    typedef TractsToVectorImageFilter Self;
-    typedef ProcessObject Superclass;
-    typedef SmartPointer< Self > Pointer;
-    typedef SmartPointer< const Self > ConstPointer;
 
-    typedef itk::Vector<float,3>                    OutputVectorType;
-    typedef itk::Image<OutputVectorType, 3>         OutputImageType;
-    typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
+  enum NormalizationMethods {
+      GLOBAL_MAX,         ///< global maximum normalization
+      SINGLE_VEC_NORM,    ///< normalize the single peaks to length 1
+      MAX_VEC_NORM        ///< normalize all peaks according to their length in comparison to the largest peak in the voxel (0-1)
+  };
 
-    typedef vnl_vector_fixed< double, 3 >                                       DirectionType;
-    typedef VectorContainer< unsigned int, DirectionType >                      DirectionContainerType;
-    typedef VectorContainer< unsigned int, DirectionContainerType::Pointer >    ContainerType;
-    typedef Image< PixelType, 4 >                                               ItkDirectionImageType;
-    typedef itk::Image<unsigned char, 3>                                        ItkUcharImgType;
-    typedef itk::Image<double, 3>                                               ItkDoubleImgType;
+  typedef TractsToVectorImageFilter Self;
+  typedef ProcessObject Superclass;
+  typedef SmartPointer< Self > Pointer;
+  typedef SmartPointer< const Self > ConstPointer;
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    itkTypeMacro( TractsToVectorImageFilter, ImageSource )
+  typedef itk::Vector<float,3>                    OutputVectorType;
+  typedef itk::Image<OutputVectorType, 3>         OutputImageType;
+  typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
 
-    itkSetMacro( SizeThreshold, float)
-    itkGetMacro( SizeThreshold, float)
-    itkSetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
-    itkGetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
-    itkSetMacro( NormalizeVectors, bool)                                ///< Normalize vectors to length 1
-    itkGetMacro( NormalizeVectors, bool)                                ///< Normalize vectors to length 1
-    itkSetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
-    itkGetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
-    itkSetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
-    itkGetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
-    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                   ///< only process voxels inside mask
-    itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)               ///< input fiber bundle
-    itkGetMacro( ClusteredDirectionsContainer, ContainerType::Pointer)  ///< output directions
-    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)          ///< number of directions per voxel
-    itkGetMacro( DirectionImage, typename ItkDirectionImageType::Pointer)        ///< output directions
+  typedef vnl_vector_fixed< double, 3 >                                       DirectionType;
+  typedef VectorContainer< unsigned int, DirectionType >                      DirectionContainerType;
+  typedef VectorContainer< unsigned int, DirectionContainerType::Pointer >    ContainerType;
+  typedef Image< PixelType, 4 >                                               ItkDirectionImageType;
+  typedef itk::Image<unsigned char, 3>                                        ItkUcharImgType;
+  typedef itk::Image<double, 3>                                               ItkDoubleImgType;
 
-    void GenerateData() override;
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
+  itkTypeMacro( TractsToVectorImageFilter, ImageSource )
+
+  itkSetMacro( SizeThreshold, float)
+  itkGetMacro( SizeThreshold, float)
+  itkSetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
+  itkGetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
+  itkSetMacro( NormalizationMethod, NormalizationMethods)             ///< normalization method of peaks
+  itkSetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
+  itkGetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
+  itkSetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
+  itkGetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
+  itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                   ///< only process voxels inside mask
+  itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)               ///< input fiber bundle
+  itkGetMacro( ClusteredDirectionsContainer, ContainerType::Pointer)  ///< output directions
+  itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)          ///< number of directions per voxel
+  itkGetMacro( DirectionImage, typename ItkDirectionImageType::Pointer)        ///< output directions
+
+  void GenerateData() override;
 
 protected:
 
-    DirectionContainerType::Pointer FastClustering(DirectionContainerType::Pointer inDirs, std::vector< double > lengths);  ///< cluster fiber directions
+  DirectionContainerType::Pointer FastClustering(DirectionContainerType::Pointer inDirs, std::vector< double > lengths);  ///< cluster fiber directions
 
-    vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
-    itk::Point<double, 3> GetItkPoint(double point[3]);
+  vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
+  itk::Point<double, 3> GetItkPoint(double point[3]);
 
 
-    TractsToVectorImageFilter();
-    virtual ~TractsToVectorImageFilter();
+  TractsToVectorImageFilter();
+  virtual ~TractsToVectorImageFilter();
 
-    mitk::FiberBundle::Pointer          m_FiberBundle;                      ///< input fiber bundle
-    float                               m_AngularThreshold;                 ///< cluster directions that are closer together than the specified threshold
-    float                               m_Epsilon;                          ///< epsilon for vector equality check
-    ItkUcharImgType::Pointer            m_MaskImage;                        ///< only voxels inside the binary mask are processed
-    bool                                m_NormalizeVectors;                 ///< normalize vectors to length 1
-    itk::Vector<float>                  m_OutImageSpacing;                  ///< spacing of output image
-    ContainerType::Pointer              m_DirectionsContainer;              ///< container for fiber directions
-    bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
-    unsigned long                       m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
-    float                               m_SizeThreshold;
+  NormalizationMethods                m_NormalizationMethod;              ///< normalization method of peaks
+  mitk::FiberBundle::Pointer          m_FiberBundle;                      ///< input fiber bundle
+  float                               m_AngularThreshold;                 ///< cluster directions that are closer together than the specified threshold
+  float                               m_Epsilon;                          ///< epsilon for vector equality check
+  ItkUcharImgType::Pointer            m_MaskImage;                        ///< only voxels inside the binary mask are processed
+  itk::Vector<float>                  m_OutImageSpacing;                  ///< spacing of output image
+  ContainerType::Pointer              m_DirectionsContainer;              ///< container for fiber directions
+  bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
+  unsigned long                       m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
+  float                               m_SizeThreshold;
 
-    // output datastructures
-    typename ItkDirectionImageType::Pointer m_DirectionImage;
-    ContainerType::Pointer                  m_ClusteredDirectionsContainer; ///< contains direction vectors for each voxel
-    ItkUcharImgType::Pointer                m_NumDirectionsImage;           ///< shows number of fibers per voxel
+  // output datastructures
+  typename ItkDirectionImageType::Pointer m_DirectionImage;
+  ContainerType::Pointer                  m_ClusteredDirectionsContainer; ///< contains direction vectors for each voxel
+  ItkUcharImgType::Pointer                m_NumDirectionsImage;           ///< shows number of fibers per voxel
 };
 
 }

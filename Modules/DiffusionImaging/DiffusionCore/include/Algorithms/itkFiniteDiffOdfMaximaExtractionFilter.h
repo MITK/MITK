@@ -48,7 +48,7 @@ Image< unsigned char, 3 > >
     enum NormalizationMethods {
         NO_NORM,            ///< no length normalization of the output peaks
         SINGLE_VEC_NORM,    ///< normalize the single peaks to length 1
-        MAX_VEC_NORM        ///< normalize all peaks according to their length in comparison to the largest peak (0-1)
+        MAX_VEC_NORM        ///< normalize all peaks according to their length in comparison to the largest peak in the respective voxel (0-1)
     };
 
     typedef FiniteDiffOdfMaximaExtractionFilter Self;

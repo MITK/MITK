@@ -96,7 +96,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
-        fOdfFilter->SetNormalizeVectors(true);
+        fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::SINGLE_VEC_NORM);
         fOdfFilter->SetMaxNumDirections(3);
         fOdfFilter->SetSizeThreshold(0.3);
 

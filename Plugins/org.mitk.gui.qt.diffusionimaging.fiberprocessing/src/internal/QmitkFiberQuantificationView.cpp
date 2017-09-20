@@ -106,7 +106,18 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
   // extract directions from fiber bundle
   fOdfFilter->SetFiberBundle(inputTractogram);
   fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*M_PI/180));
-  fOdfFilter->SetNormalizeVectors(m_Controls->m_NormalizeDirectionsBox->isChecked());
+  switch (m_Controls->m_FiberDirNormBox->currentIndex())
+  {
+  case 0:
+    fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::GLOBAL_MAX);
+    break;
+  case 1:
+    fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::SINGLE_VEC_NORM);
+    break;
+  case 2:
+    fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::MAX_VEC_NORM);
+    break;
+  }
   fOdfFilter->SetUseWorkingCopy(true);
   fOdfFilter->SetSizeThreshold(m_Controls->m_PeakThreshold->value());
   fOdfFilter->SetMaxNumDirections(m_Controls->m_MaxNumDirections->value());
@@ -126,14 +137,9 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
     GetDataStorage()->Add(node, m_SelectedFB.back());
   }
 
-  itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
-
-  if (itkImg.IsNull())
-    return;
-
-  mitk::Image::Pointer mitkImage = dynamic_cast<Image*>(PeakImage::New().GetPointer());
-  mitkImage->InitializeByItk( itkImg.GetPointer() );
-  mitkImage->SetVolume( itkImg->GetBufferPointer() );
+  Image::Pointer mitkImage = dynamic_cast<Image*>(PeakImage::New().GetPointer());
+  mitk::CastToMitkImage(fOdfFilter->GetDirectionImage(), mitkImage);
+  mitkImage->SetVolume(fOdfFilter->GetDirectionImage()->GetBufferPointer());
 
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(mitkImage);

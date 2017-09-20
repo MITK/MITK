@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   parser.addArgument("peakthresh", "t", mitkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
   parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
   parser.addArgument("numdirs", "d", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
-  parser.addArgument("normalize", "n", mitkCommandLineParser::Bool, "Normalize:", "normalize vectors");
+  parser.addArgument("normalization", "n", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum, 2=single vector, 3=voxel-wise maximum", 1);
   parser.addArgument("file_ending", "f", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -83,9 +83,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("numdirs"))
     maxNumDirs = us::any_cast<int>(parsedArgs["numdirs"]);
 
-  bool normalize = false;
-  if (parsedArgs.count("normalize"))
-    normalize = us::any_cast<bool>(parsedArgs["normalize"]);
+  int normalization = 1;
+  if (parsedArgs.count("normalization"))
+    normalization = us::any_cast<int>(parsedArgs["normalization"]);
 
   std::string file_ending = ".nrrd";
   if (parsedArgs.count("file_ending"))
@@ -114,7 +114,18 @@ int main(int argc, char* argv[])
     fOdfFilter->SetFiberBundle(inputTractogram);
     fOdfFilter->SetMaskImage(itkMaskImage);
     fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
-    fOdfFilter->SetNormalizeVectors(normalize);
+    switch (normalization)
+    {
+    case 1:
+      fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::GLOBAL_MAX);
+      break;
+    case 2:
+      fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::SINGLE_VEC_NORM);
+      break;
+    case 3:
+      fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::MAX_VEC_NORM);
+      break;
+    }
     fOdfFilter->SetUseWorkingCopy(false);
     fOdfFilter->SetSizeThreshold(peakThreshold);
     fOdfFilter->SetMaxNumDirections(maxNumDirs);

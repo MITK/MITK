@@ -43,10 +43,14 @@ void StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Ima
   // convert world coordinates to image indices
   IndexType startIndex;
   IndexType seedIndex;
+  IndexType bestSeedIndex;
   startIndex[0] = itkImage->GetLargestPossibleRegion().GetSize()[0]/2;
   startIndex[1] = itkImage->GetLargestPossibleRegion().GetSize()[1]/2;
   startIndex[2] = itkImage->GetLargestPossibleRegion().GetSize()[2]/2;
   auto region = itkImage->GetLargestPossibleRegion();
+  auto spacing = itkImage->GetSpacing();
+
+  int minimumDistance = 50 * 50 * (spacing[0] + spacing[1] + spacing[2]);
 
   for (int x = -50; x < 50; ++x)
   {
@@ -61,12 +65,18 @@ void StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Ima
         {
           if (itkImage->GetPixel(seedIndex) > 0)
           {
-            x = 100; y = 100; z = 100;
+            int newDistance = x*x*spacing[0] + y*y*spacing[1] + z*z*spacing[2];
+            if (newDistance < minimumDistance)
+            {
+              bestSeedIndex = seedIndex;
+              minimumDistance = newDistance;
+            }
           }
         }
       }
     }
   }
+  seedIndex = bestSeedIndex;
 
   MITK_INFO << "Seedpoint: " << seedIndex;
   //perform region growing in desired segmented region

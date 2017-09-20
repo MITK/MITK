@@ -120,6 +120,19 @@ bool DiffusionIOMimeTypes::FiberBundleDicomMimeType::AppliesTo(const std::string
 {
   try
   {
+    std::ifstream myfile;
+    myfile.open (path, std::ios::binary);
+//    myfile.seekg (128);
+    char *buffer = new char [128];
+    myfile.read (buffer,128);
+    myfile.read (buffer,4);
+    if (std::string(buffer).compare("DICM")!=0)
+    {
+      delete[] buffer;
+      return false;
+    }
+    delete[] buffer;
+
     mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
     mitk::DICOMTag SOPInstanceUID(0x0008, 0x0016);
 

@@ -259,20 +259,19 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
 void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
 {
   BOOL _hemiTrack;
-  //m_hemisphere indices start at 0, tool count starts at 1
   //-1 == all tools
   if (_tool == -1)
   {
     for (int i = 0; i < m_numberOfTools; ++i)
     {
       //is hemiTrack on?
-      m_pdiDev->GetSHemiTrack(i+1,_hemiTrack);
+      m_pdiDev->GetSHemiTrack(i,_hemiTrack);
 
       m_Hemispheres.at(i)[0] = -m_Hemispheres.at(i)[0];
       m_Hemispheres.at(i)[1] = -m_Hemispheres.at(i)[1];
       m_Hemispheres.at(i)[2] = -m_Hemispheres.at(i)[2];
-      SetHemisphere(i+1, m_Hemispheres.at(i));
-      if (_hemiTrack) m_pdiDev->SetSHemiTrack(i+1);
+      SetHemisphere(i, m_Hemispheres.at(i));
+      if (_hemiTrack) m_pdiDev->SetSHemiTrack(i);
     }
   }
   else
@@ -280,10 +279,10 @@ void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
     //is hemiTrack on?
     m_pdiDev->GetSHemiTrack(_tool, _hemiTrack);
 
-    m_Hemispheres.at(_tool - 1)[0] = -m_Hemispheres.at(_tool - 1)[0];
-    m_Hemispheres.at(_tool - 1)[1] = -m_Hemispheres.at(_tool - 1)[1];
-    m_Hemispheres.at(_tool - 1)[2] = -m_Hemispheres.at(_tool - 1)[2];
-    SetHemisphere(_tool, m_Hemispheres.at(_tool - 1));
+    m_Hemispheres.at(_tool)[0] = -m_Hemispheres.at(_tool)[0];
+    m_Hemispheres.at(_tool)[1] = -m_Hemispheres.at(_tool)[1];
+    m_Hemispheres.at(_tool)[2] = -m_Hemispheres.at(_tool)[2];
+    SetHemisphere(_tool, m_Hemispheres.at(_tool));
     if (_hemiTrack) m_pdiDev->SetSHemiTrack(_tool);
   }
 

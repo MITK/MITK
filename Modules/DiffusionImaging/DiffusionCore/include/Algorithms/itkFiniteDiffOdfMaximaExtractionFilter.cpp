@@ -270,75 +270,7 @@ template< class PixelType, int ShOrder, int NrOdfDirections >
 void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 ::AfterThreadedGenerateData()
 {
-  MITK_INFO << "Generating vector field";
-  vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
-  vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-  typename CoefficientImageType::Pointer ShCoeffImage = static_cast< CoefficientImageType* >( this->ProcessObject::GetInput(0) );
-  ImageRegionConstIterator< CoefficientImageType > cit(ShCoeffImage, ShCoeffImage->GetLargestPossibleRegion() );
-
-  mitk::Vector3D spacing = ShCoeffImage->GetSpacing();
-  double minSpacing = spacing[0];
-  if (spacing[1]<minSpacing)
-    minSpacing = spacing[1];
-  if (spacing[2]<minSpacing)
-    minSpacing = spacing[2];
-
-  int maxProgress = ShCoeffImage->GetLargestPossibleRegion().GetSize()[0]*ShCoeffImage->GetLargestPossibleRegion().GetSize()[1]*ShCoeffImage->GetLargestPossibleRegion().GetSize()[2];
-  boost::progress_display disp(maxProgress);
-
-  while( !cit.IsAtEnd() )
-  {
-    ++disp;
-
-    typename CoefficientImageType::IndexType idx3 = cit.GetIndex();
-    if (m_MaskImage->GetPixel(idx3)==0)
-    {
-      ++cit;
-      continue;
-    }
-
-    itk::Index<4> idx4; idx4[0] = idx3[0]; idx4[1] = idx3[1]; idx4[2] = idx3[2];
-
-    for (unsigned int i=0; i<m_MaxNumPeaks; i++)
-    {
-      DirectionType dir;
-      idx4[3] = i*3;
-      dir[0] = m_PeakImage->GetPixel(idx4);
-      idx4[3] = i*3 + 1;
-      dir[1] = m_PeakImage->GetPixel(idx4);
-      idx4[3] = i*3 + 2;
-      dir[2] = m_PeakImage->GetPixel(idx4);
-
-      vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-      itk::ContinuousIndex<double, 3> center;
-      center[0] = idx3[0];
-      center[1] = idx3[1];
-      center[2] = idx3[2];
-      itk::Point<double> worldCenter;
-      m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
-
-      itk::Point<double> worldStart;
-      worldStart[0] = worldCenter[0]-dir[0]/2 * minSpacing;
-      worldStart[1] = worldCenter[1]-dir[1]/2 * minSpacing;
-      worldStart[2] = worldCenter[2]-dir[2]/2 * minSpacing;
-      vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
-      container->GetPointIds()->InsertNextId(id);
-      itk::Point<double> worldEnd;
-      worldEnd[0] = worldCenter[0]+dir[0]/2 * minSpacing;
-      worldEnd[1] = worldCenter[1]+dir[1]/2 * minSpacing;
-      worldEnd[2] = worldCenter[2]+dir[2]/2 * minSpacing;
-      id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
-      container->GetPointIds()->InsertNextId(id);
-      m_VtkCellArray->InsertNextCell(container);
-    }
-    ++cit;
-  }
-
-  vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();
-  directionsPolyData->SetPoints(m_VtkPoints);
-  directionsPolyData->SetLines(m_VtkCellArray);
-  m_OutputFiberBundle = mitk::FiberBundle::New(directionsPolyData);
 }
 
 template< class PixelType, int ShOrder, int NrOdfDirections >

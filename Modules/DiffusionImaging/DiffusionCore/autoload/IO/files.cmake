@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkDiffusionCoreIOActivator.cpp
+  mitkPeakImageReader.cpp
   mitkNrrdTensorImageReader.cpp
   mitkNrrdTensorImageWriter.cpp
   mitkTensorImageSerializer.cpp

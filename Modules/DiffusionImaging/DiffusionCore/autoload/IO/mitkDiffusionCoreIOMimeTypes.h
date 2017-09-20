@@ -59,6 +59,14 @@ public:
     virtual DiffusionImageDicomMimeType* Clone() const override;
   };
 
+  class  PeakImageMimeType : public CustomMimeType
+  {
+  public:
+    PeakImageMimeType();
+    virtual bool AppliesTo(const std::string &path) const override;
+    virtual PeakImageMimeType* Clone() const override;
+  };
+
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
 
@@ -68,9 +76,11 @@ public:
   static DiffusionImageNiftiMimeType DWI_NIFTI_MIMETYPE();
   static DiffusionImageFslMimeType DWI_FSL_MIMETYPE();
   static DiffusionImageDicomMimeType DWI_DICOM_MIMETYPE();
-  static CustomMimeType DTI_MIMETYPE(); // dti, hdti
+  static PeakImageMimeType PEAK_MIMETYPE();
+  static CustomMimeType DTI_MIMETYPE(); // dti
   static CustomMimeType ODF_MIMETYPE(); // odf, qbi
 
+  static std::string PEAK_MIMETYPE_NAME();
   static std::string DWI_NRRD_MIMETYPE_NAME();
   static std::string DWI_NIFTI_MIMETYPE_NAME();
   static std::string DWI_FSL_MIMETYPE_NAME();
@@ -78,6 +88,7 @@ public:
   static std::string DTI_MIMETYPE_NAME();
   static std::string ODF_MIMETYPE_NAME();
 
+  static std::string PEAK_MIMETYPE_DESCRIPTION();
   static std::string DWI_NRRD_MIMETYPE_DESCRIPTION();
   static std::string DWI_NIFTI_MIMETYPE_DESCRIPTION();
   static std::string DWI_FSL_MIMETYPE_DESCRIPTION();

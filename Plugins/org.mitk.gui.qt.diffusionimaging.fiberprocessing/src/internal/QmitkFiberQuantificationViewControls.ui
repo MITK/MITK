@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>484</width>
-    <height>558</height>
+    <height>574</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -203,21 +203,33 @@
       <string>Principal Fiber Directions</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Angular Threshold:</string>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="m_MaxNumDirections">
+        <property name="toolTip">
+         <string>Maximum number of fiber directions per voxel.</string>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>3</number>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="m_NumDirectionsBox">
+        <property name="toolTip">
+         <string>Image containing the number of distinct fiber clusters per voxel.</string>
+        </property>
         <property name="text">
-         <string>Size Threshold:</string>
+         <string>Output #Directions per Voxel</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
+      <item row="6" column="0">
        <widget class="QCommandLinkButton" name="m_ExtractFiberPeaks">
         <property name="enabled">
          <bool>false</bool>
@@ -247,13 +259,24 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QCheckBox" name="m_VectorFieldBox">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Output Vector Field</string>
+         <string>Max. clusters:</string>
         </property>
-        <property name="checked">
-         <bool>true</bool>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Size Threshold:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Angular Threshold:</string>
         </property>
        </widget>
       </item>
@@ -273,26 +296,6 @@
         </property>
         <property name="value">
          <double>0.300000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Max. clusters:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="m_MaxNumDirections">
-        <property name="toolTip">
-         <string>Maximum number of fiber directions per voxel.</string>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>3</number>
         </property>
        </widget>
       </item>
@@ -318,43 +321,30 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QCheckBox" name="m_DirectionImagesBox">
-        <property name="toolTip">
-         <string>4D image containing the principal fiber directions.</string>
-        </property>
-        <property name="text">
-         <string>Output Direction image</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QCheckBox" name="m_NumDirectionsBox">
-        <property name="toolTip">
-         <string>Image containing the number of distinct fiber clusters per voxel.</string>
-        </property>
-        <property name="text">
-         <string>Output #Directions per Voxel</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0">
-       <widget class="QCheckBox" name="m_NormalizeDirectionsBox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normalize output directions to length 1 otherwise directions are max normalized (voxel-wise).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Normalize directions</string>
+         <string>Normalization:</string>
         </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="m_FiberDirNormBox">
+        <item>
+         <property name="text">
+          <string>Global maximum</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Single vector</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Voxel-wise maximum</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

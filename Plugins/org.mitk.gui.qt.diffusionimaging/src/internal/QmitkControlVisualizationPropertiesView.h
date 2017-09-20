@@ -63,27 +63,23 @@ protected slots:
   void VisibleOdfsON_S();
   void VisibleOdfsON_T();
   void VisibleOdfsON_C();
-
   void ShowMaxNumberChanged();
   void NormalizationDropdownChanged(int);
   void ScalingFactorChanged(double);
   void AdditionalScaling(int);
   void ScalingCheckbox();
-
   void OnThickSlicesModeSelected( QAction* action );
   void OnTSNumChanged(int num);
-
-  void BundleRepresentationResetColoring();
+  void ResetColoring();
   void PlanarFigureFocus();
   void Fiber2DfadingEFX();
   void FiberSlicingThickness2D();
   void FiberSlicingUpdateLabel(int);
   void LineWidthChanged();
   void TubeRadiusChanged();
-
   void SetInteractor();
   void Toggle3DClipping(bool enabled=true);
-
+  void FlipPeaks();
   void Welcome();
 
   /// \brief Slot function for switching tensor view between ODF and ellipsoids from tensors.
@@ -109,8 +105,7 @@ protected:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   virtual void NodeAdded(const mitk::DataNode *node) override;
-  void SetFiberBundleCustomColor(const itk::EventObject& /*e*/);
-  void SetFiberBundleOpacity(const itk::EventObject& /*e*/);
+  void SetCustomColor(const itk::EventObject& /*e*/);
   bool IsPlaneRotated();
 
   void SliceRotation(const itk::EventObject&);
@@ -150,8 +145,8 @@ protected:
   mitk::DataNode::Pointer m_SelectedNode;
   mitk::DataNode* m_CurrentPickingNode;
 
-  unsigned long m_FiberBundleObserverTag;
-  unsigned long m_FiberBundleObserveOpacityTag;
+  unsigned long m_ColorPropertyObserverTag;
+  unsigned long m_OpacityPropertyObserverTag;
   mitk::ColorProperty::Pointer m_Color;
   mitk::FloatProperty::Pointer m_Opacity;
 

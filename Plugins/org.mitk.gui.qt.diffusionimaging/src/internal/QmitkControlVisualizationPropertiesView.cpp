@@ -34,10 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkConnectomicsNetwork.h>
 #include "usModuleRegistry.h"
-
+#include <mitkPeakImage.h>
 #include <mitkBaseRenderer.h>
 #include "mitkPlaneGeometry.h"
 #include <QmitkRenderWindow.h>
+#include <itkFlipPeaksFilter.h>
+#include <mitkImageToItk.h>
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -77,8 +79,8 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
     m_GlyIsOn_C(false),
     m_GlyIsOn_S(false),
     m_CurrentPickingNode(0),
-    m_FiberBundleObserverTag(0),
-    m_FiberBundleObserveOpacityTag(0)
+    m_ColorPropertyObserverTag(0),
+    m_OpacityPropertyObserverTag(0)
 {
   currentThickSlicesMode = 1;
   m_MyMenu = nullptr;
@@ -91,6 +93,18 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+  if (renderWindow)
+  {
+    mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag1);
+    slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag2);
+    slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
+    slicer->RemoveObserver(m_SliceObserverTag3);
+  }
+
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
 }
 
@@ -251,6 +265,32 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_ScalingFrame->setVisible(false);
     m_Controls->m_NormalizationFrame->setVisible(false);
     m_Controls->m_Crosshair->setVisible(false);
+
+    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+    if (renderWindow)
+    {
+      {
+        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnAxialChanged );
+        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
+      }
+
+      {
+        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnSagittalChanged );
+        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
+      }
+
+      {
+        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnCoronalChanged );
+        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
+      }
+    }
   }
 }
 
@@ -297,7 +337,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ScalingFactor), SIGNAL(valueChanged(double)), this, SLOT(ScalingFactorChanged(double)) );
     connect( (QObject*)(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
     connect( (QObject*)(m_Controls->m_ScalingCheckbox), SIGNAL(clicked()), this, SLOT(ScalingCheckbox()) );
-    connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationResetColoring()));
+    connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(ResetColoring()));
+    connect((QObject*) m_Controls->m_ResetColoring2, SIGNAL(clicked()), (QObject*) this, SLOT(ResetColoring()));
     connect((QObject*) m_Controls->m_FiberFading2D, SIGNAL(clicked()), (QObject*) this, SLOT( Fiber2DfadingEFX() ) );
     connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(sliderReleased()), (QObject*) this, SLOT( FiberSlicingThickness2D() ) );
     connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(valueChanged(int)), (QObject*) this, SLOT( FiberSlicingUpdateLabel(int) ));
@@ -312,6 +353,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Clip2, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_Clip3, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_FlipClipBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DClipping()));
+
+    connect((QObject*) m_Controls->m_FlipPeaksButton, SIGNAL(clicked()), (QObject*) this, SLOT(FlipPeaks()));
   }
 }
 
@@ -349,6 +392,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
 {
   m_Controls->m_BundleControlsFrame->setVisible(false);
   m_Controls->m_ImageControlsFrame->setVisible(false);
+  m_Controls->m_PeakImageFrame->setVisible(false);
 
   if (nodes.size()>1) // only do stuff if one node is selected
     return;
@@ -371,7 +415,20 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
 
     m_SelectedNode = node;
 
-    if (dynamic_cast<mitk::FiberBundle*>(nodeData))
+    if (dynamic_cast<mitk::PeakImage*>(nodeData))
+    {
+      m_Controls->m_PeakImageFrame->setVisible(true);
+
+      if (m_Color.IsNotNull())
+        m_Color->RemoveObserver(m_ColorPropertyObserverTag);
+
+      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetCustomColor );
+      m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", nullptr));
+      if (m_Color.IsNotNull())
+        m_ColorPropertyObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
+    }
+    else if (dynamic_cast<mitk::FiberBundle*>(nodeData))
     {
       int Fiber3DClippingPlaneId = -1;
       m_SelectedNode->GetPropertyValue("Fiber3DClippingPlaneId",Fiber3DClippingPlaneId);
@@ -393,27 +450,15 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
         m_Controls->m_Clip0->setChecked(1);
       }
 
-      // handle fiber bundle property observers
-      if (m_Color.IsNotNull()) { m_Color->RemoveObserver(m_FiberBundleObserverTag); }
+      // handle fiber property observers
+      if (m_Color.IsNotNull())
+        m_Color->RemoveObserver(m_ColorPropertyObserverTag);
       itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor );
+      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetCustomColor );
       m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", nullptr));
       if (m_Color.IsNotNull())
-        m_FiberBundleObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
+        m_ColorPropertyObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
 
-      if (m_Opacity.IsNotNull())
-      {
-        m_Opacity->RemoveObserver(m_FiberBundleObserveOpacityTag);
-      }
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command2
-          = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command2->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleOpacity );
-      m_Opacity = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("opacity", nullptr));
-
-      if (m_Opacity.IsNotNull())
-      {
-        m_FiberBundleObserveOpacityTag = m_Opacity->AddObserver( itk::ModifiedEvent(), command2 );
-      }
 
       m_Controls->m_BundleControlsFrame->setVisible(true);
 
@@ -620,46 +665,12 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
 
 void QmitkControlVisualizationPropertiesView::Visible()
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow)
-  {
-    {
-      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnAxialChanged );
-      m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnSagittalChanged );
-      m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnCoronalChanged );
-      m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-  }
 }
 
 void QmitkControlVisualizationPropertiesView::Hidden()
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow)
-  {
-    mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag1);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag2);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag3);
-  }
 }
 
 void QmitkControlVisualizationPropertiesView::Activated()
@@ -668,6 +679,33 @@ void QmitkControlVisualizationPropertiesView::Activated()
 
 void QmitkControlVisualizationPropertiesView::Deactivated()
 {
+}
+
+void QmitkControlVisualizationPropertiesView::FlipPeaks()
+{
+  if (m_SelectedNode.IsNull() || dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr)
+    return;
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
+
+  typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(image);
+  caster->Update();
+  mitk::PeakImage::ItkPeakImageType::Pointer itkImg = caster->GetOutput();
+
+  itk::FlipPeaksFilter< float >::Pointer flipper = itk::FlipPeaksFilter< float >::New();
+  flipper->SetInput(itkImg);
+  flipper->SetFlipX(m_Controls->m_FlipPeaksX->isChecked());
+  flipper->SetFlipY(m_Controls->m_FlipPeaksY->isChecked());
+  flipper->SetFlipZ(m_Controls->m_FlipPeaksZ->isChecked());
+  flipper->Update();
+
+  mitk::Image::Pointer resultImage = dynamic_cast<mitk::Image*>(mitk::PeakImage::New().GetPointer());
+  mitk::CastToMitkImage(flipper->GetOutput(), resultImage);
+  resultImage->SetVolume(flipper->GetOutput()->GetBufferPointer());
+  m_SelectedNode->SetData(resultImage);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkControlVisualizationPropertiesView::Toggle3DClipping(bool enabled)
@@ -1035,19 +1073,7 @@ void QmitkControlVisualizationPropertiesView::FiberSlicingUpdateLabel(int value)
   FiberSlicingThickness2D();
 }
 
-
-void QmitkControlVisualizationPropertiesView::SetFiberBundleOpacity(const itk::EventObject& /*e*/)
-{
-  if(m_SelectedNode)
-  {
-    mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
-    fib->RequestUpdate();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-}
-
-
-void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const itk::EventObject& /*e*/)
+void QmitkControlVisualizationPropertiesView::SetCustomColor(const itk::EventObject& /*e*/)
 {
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
@@ -1057,15 +1083,29 @@ void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const it
     fib->SetFiberColors(color[0]*255, color[1]*255, color[2]*255);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+  else if (m_SelectedNode && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData()))
+  {
+    float color[3];
+    m_SelectedNode->GetColor(color);
+    mitk::PeakImage::Pointer img = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
+    img->SetCustomColor(color[0]*255, color[1]*255, color[2]*255);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 
-void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring()
+void QmitkControlVisualizationPropertiesView::ResetColoring()
 {
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
     mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
     fib->ColorFibersByOrientation();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else if(m_SelectedNode && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData()))
+  {
+    mitk::PeakImage::Pointer fib = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
+    fib->ColorByOrientation();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkDataNodeObject.h>
 #include <mitkTensorImage.h>
+#include <mitkPeakImage.h>
 
 // ITK
 #include <itkResampleImageFilter.h>
@@ -105,40 +106,24 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
   // extract directions from fiber bundle
   fOdfFilter->SetFiberBundle(inputTractogram);
   fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*M_PI/180));
-  fOdfFilter->SetNormalizeVectors(m_Controls->m_NormalizeDirectionsBox->isChecked());
+  switch (m_Controls->m_FiberDirNormBox->currentIndex())
+  {
+  case 0:
+    fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::GLOBAL_MAX);
+    break;
+  case 1:
+    fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::SINGLE_VEC_NORM);
+    break;
+  case 2:
+    fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::MAX_VEC_NORM);
+    break;
+  }
   fOdfFilter->SetUseWorkingCopy(true);
-  fOdfFilter->SetCreateDirectionImages(m_Controls->m_DirectionImagesBox->isChecked());
   fOdfFilter->SetSizeThreshold(m_Controls->m_PeakThreshold->value());
   fOdfFilter->SetMaxNumDirections(m_Controls->m_MaxNumDirections->value());
   fOdfFilter->Update();
 
   QString name = m_SelectedFB.back()->GetName().c_str();
-
-  if (m_Controls->m_VectorFieldBox->isChecked())
-  {
-    float minSpacing = 1;
-    if (m_SelectedImage.IsNotNull())
-    {
-      mitk::Vector3D outImageSpacing = m_SelectedImage->GetGeometry()->GetSpacing();
-
-      if(outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])
-        minSpacing = outImageSpacing[0];
-      else if (outImageSpacing[1] < outImageSpacing[2])
-        minSpacing = outImageSpacing[1];
-      else
-        minSpacing = outImageSpacing[2];
-    }
-
-    mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(directions);
-    node->SetName((name+"_VECTOR_FIELD").toStdString().c_str());
-    node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
-    node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    node->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 1.0f));
-
-    GetDataStorage()->Add(node, m_SelectedFB.back());
-  }
 
   if (m_Controls->m_NumDirectionsBox->isChecked())
   {
@@ -152,22 +137,14 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
     GetDataStorage()->Add(node, m_SelectedFB.back());
   }
 
-  if (m_Controls->m_DirectionImagesBox->isChecked())
-  {
-    itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
+  Image::Pointer mitkImage = dynamic_cast<Image*>(PeakImage::New().GetPointer());
+  mitk::CastToMitkImage(fOdfFilter->GetDirectionImage(), mitkImage);
+  mitkImage->SetVolume(fOdfFilter->GetDirectionImage()->GetBufferPointer());
 
-    if (itkImg.IsNull())
-      return;
-
-    mitk::Image::Pointer mitkImage = mitk::Image::New();
-    mitkImage->InitializeByItk( itkImg.GetPointer() );
-    mitkImage->SetVolume( itkImg->GetBufferPointer() );
-
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(mitkImage);
-    node->SetName( (name+"_DIRECTIONS").toStdString().c_str());
-    GetDataStorage()->Add(node, m_SelectedFB.back());
-  }
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(mitkImage);
+  node->SetName( (name+"_DIRECTIONS").toStdString().c_str());
+  GetDataStorage()->Add(node, m_SelectedFB.back());
 }
 
 void QmitkFiberQuantificationView::UpdateGui()

@@ -294,15 +294,6 @@ int StartPeakExtraction(int argc, char* argv[])
             writer->SetInput(numDirImage);
             writer->Update();
         }
-
-        // write vector field
-        {
-            mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
-
-            string outfilename = outRoot.c_str();
-            outfilename.append("_VECTOR_FIELD.fib");
-            mitk::IOUtil::Save(directions.GetPointer(),outfilename.c_str());
-        }
     }
     catch (itk::ExceptionObject e)
     {

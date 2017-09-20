@@ -37,143 +37,144 @@ using namespace std;
 */
 int main(int argc, char* argv[])
 {
-    mitkCommandLineParser parser;
+  mitkCommandLineParser parser;
 
-    parser.setTitle("Fiber Direction Extraction");
-    parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("Extract principal fiber directions from a tractogram");
-    parser.setContributor("MIC");
+  parser.setTitle("Fiber Direction Extraction");
+  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setDescription("Extract principal fiber directions from a tractogram");
+  parser.setContributor("MIC");
 
-    parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
-    parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask:", "mask image");
-    parser.addArgument("athresh", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
-    parser.addArgument("peakthresh", "t", mitkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
-    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
-    parser.addArgument("numdirs", "d", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
-    parser.addArgument("normalize", "n", mitkCommandLineParser::Bool, "Normalize:", "normalize vectors");
-    parser.addArgument("file_ending", "f", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz");
+  parser.setArgumentPrefix("--", "-");
+  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
+  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+  parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask:", "mask image");
+  parser.addArgument("athresh", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
+  parser.addArgument("peakthresh", "t", mitkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
+  parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
+  parser.addArgument("numdirs", "d", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
+  parser.addArgument("normalization", "n", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum, 2=single vector, 3=voxel-wise maximum", 1);
+  parser.addArgument("file_ending", "f", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
-    if (parsedArgs.size()==0)
-        return EXIT_FAILURE;
+  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  if (parsedArgs.size()==0)
+    return EXIT_FAILURE;
 
-    string fibFile = us::any_cast<string>(parsedArgs["input"]);
+  string fibFile = us::any_cast<string>(parsedArgs["input"]);
 
-    string maskImage("");
-    if (parsedArgs.count("mask"))
-        maskImage = us::any_cast<string>(parsedArgs["mask"]);
+  string maskImage("");
+  if (parsedArgs.count("mask"))
+    maskImage = us::any_cast<string>(parsedArgs["mask"]);
 
-    float peakThreshold = 0.2;
-    if (parsedArgs.count("peakthresh"))
-        peakThreshold = us::any_cast<float>(parsedArgs["peakthresh"]);
+  float peakThreshold = 0.2;
+  if (parsedArgs.count("peakthresh"))
+    peakThreshold = us::any_cast<float>(parsedArgs["peakthresh"]);
 
-    float angularThreshold = 25;
-    if (parsedArgs.count("athresh"))
-        angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
+  float angularThreshold = 25;
+  if (parsedArgs.count("athresh"))
+    angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
 
-    string outRoot = us::any_cast<string>(parsedArgs["out"]);
+  string outRoot = us::any_cast<string>(parsedArgs["out"]);
 
-    bool verbose = false;
-    if (parsedArgs.count("verbose"))
-        verbose = us::any_cast<bool>(parsedArgs["verbose"]);
+  bool verbose = false;
+  if (parsedArgs.count("verbose"))
+    verbose = us::any_cast<bool>(parsedArgs["verbose"]);
 
-    int maxNumDirs = 3;
-    if (parsedArgs.count("numdirs"))
-        maxNumDirs = us::any_cast<int>(parsedArgs["numdirs"]);
+  int maxNumDirs = 3;
+  if (parsedArgs.count("numdirs"))
+    maxNumDirs = us::any_cast<int>(parsedArgs["numdirs"]);
 
-    bool normalize = false;
-    if (parsedArgs.count("normalize"))
-        normalize = us::any_cast<bool>(parsedArgs["normalize"]);
+  int normalization = 1;
+  if (parsedArgs.count("normalization"))
+    normalization = us::any_cast<int>(parsedArgs["normalization"]);
 
-    std::string file_ending = ".nrrd";
-    if (parsedArgs.count("file_ending"))
-        file_ending = us::any_cast<std::string>(parsedArgs["file_ending"]);
+  std::string file_ending = ".nrrd";
+  if (parsedArgs.count("file_ending"))
+    file_ending = us::any_cast<std::string>(parsedArgs["file_ending"]);
 
 
-    try
+  try
+  {
+    typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
+
+    // load fiber bundle
+    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
+
+    // load/create mask image
+    ItkUcharImgType::Pointer itkMaskImage = nullptr;
+    if (maskImage.compare("")!=0)
     {
-        typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
-
-        // load fiber bundle
-        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
-
-        // load/create mask image
-        ItkUcharImgType::Pointer itkMaskImage = nullptr;
-        if (maskImage.compare("")!=0)
-        {
-            std::cout << "Using mask image";
-            itkMaskImage = ItkUcharImgType::New();
-            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImage)[0].GetPointer());
-            mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
-        }
-
-        // extract directions from fiber bundle
-        itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
-        fOdfFilter->SetFiberBundle(inputTractogram);
-        fOdfFilter->SetMaskImage(itkMaskImage);
-        fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
-        fOdfFilter->SetNormalizeVectors(normalize);
-        fOdfFilter->SetUseWorkingCopy(false);
-        fOdfFilter->SetSizeThreshold(peakThreshold);
-        fOdfFilter->SetMaxNumDirections(maxNumDirs);
-        fOdfFilter->Update();
-
-        {
-            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
-            typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
-            WriterType::Pointer writer = WriterType::New();
-
-            string outfilename = outRoot;
-            outfilename.append("_DIRECTIONS");
-            outfilename.append(file_ending);
-
-            writer->SetFileName(outfilename.c_str());
-            writer->SetInput(itkImg);
-            writer->Update();
-        }
-
-        if (verbose)
-        {
-            // write vector field
-            mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
-
-            string outfilename = outRoot;
-            outfilename.append("_VECTOR_FIELD.fib");
-
-            mitk::IOUtil::Save(directions.GetPointer(), outfilename );
-
-            // write num direction image
-            {
-                ItkUcharImgType::Pointer numDirImage = fOdfFilter->GetNumDirectionsImage();
-                typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
-                WriterType::Pointer writer = WriterType::New();
-
-                string outfilename = outRoot;
-                outfilename.append("_NUM_DIRECTIONS");
-                outfilename.append(file_ending);
-
-                writer->SetFileName(outfilename.c_str());
-                writer->SetInput(numDirImage);
-                writer->Update();
-            }
-        }
+      std::cout << "Using mask image";
+      itkMaskImage = ItkUcharImgType::New();
+      mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImage)[0].GetPointer());
+      mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
     }
-    catch (itk::ExceptionObject e)
+
+    // extract directions from fiber bundle
+    itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
+    fOdfFilter->SetFiberBundle(inputTractogram);
+    fOdfFilter->SetMaskImage(itkMaskImage);
+    fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
+    switch (normalization)
     {
-        std::cout << e;
-        return EXIT_FAILURE;
+    case 1:
+      fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::GLOBAL_MAX);
+      break;
+    case 2:
+      fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::SINGLE_VEC_NORM);
+      break;
+    case 3:
+      fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::MAX_VEC_NORM);
+      break;
     }
-    catch (std::exception e)
+    fOdfFilter->SetUseWorkingCopy(false);
+    fOdfFilter->SetSizeThreshold(peakThreshold);
+    fOdfFilter->SetMaxNumDirections(maxNumDirs);
+    fOdfFilter->Update();
+
     {
-        std::cout << e.what();
-        return EXIT_FAILURE;
+      itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
+      typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
+      WriterType::Pointer writer = WriterType::New();
+
+      string outfilename = outRoot;
+      outfilename.append("_DIRECTIONS");
+      outfilename.append(file_ending);
+
+      writer->SetFileName(outfilename.c_str());
+      writer->SetInput(itkImg);
+      writer->Update();
     }
-    catch (...)
+
+    if (verbose)
     {
-        std::cout << "ERROR!?!";
-        return EXIT_FAILURE;
+      // write num direction image
+      ItkUcharImgType::Pointer numDirImage = fOdfFilter->GetNumDirectionsImage();
+      typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
+      WriterType::Pointer writer = WriterType::New();
+
+      string outfilename = outRoot;
+      outfilename.append("_NUM_DIRECTIONS");
+      outfilename.append(file_ending);
+
+      writer->SetFileName(outfilename.c_str());
+      writer->SetInput(numDirImage);
+      writer->Update();
     }
-    return EXIT_SUCCESS;
+  }
+  catch (itk::ExceptionObject e)
+  {
+    std::cout << e;
+    return EXIT_FAILURE;
+  }
+  catch (std::exception e)
+  {
+    std::cout << e.what();
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::cout << "ERROR!?!";
+    return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }

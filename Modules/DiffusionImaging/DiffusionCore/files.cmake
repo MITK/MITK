@@ -16,7 +16,6 @@ set(CPP_FILES
   DicomImport/mitkDiffusionHeaderGEDICOMFileReader.cpp
   DicomImport/mitkDiffusionHeaderPhilipsDICOMFileReader.cpp
 
-
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
@@ -40,6 +39,9 @@ set(CPP_FILES
 
   # DataStructures -> Tensor
   IODataStructures/TensorImages/mitkTensorImage.cpp
+
+  # DataStructures -> Peaks
+  IODataStructures/mitkPeakImage.cpp
 
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
@@ -144,6 +146,7 @@ set(H_FILES
   include/Algorithms/itkSplitDWImageFilter.h
   include/Algorithms/itkRemoveDwiChannelFilter.h
   include/Algorithms/itkExtractDwiChannelFilter.h
+  include/Algorithms/itkFlipPeaksFilter.h
 
   include/Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
   include/Algorithms/itkNonLocalMeansDenoisingFilter.h

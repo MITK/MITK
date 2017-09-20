@@ -204,6 +204,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   auto fiberBundleDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("FiberBundle");
 
+  auto peakImageDataNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PeakImage");
+
   auto surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
@@ -410,6 +413,12 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       fiberBundleDataNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(fiberBundleDataNodeDescriptor, colorAction));
+    }
+    if (peakImageDataNodeDescriptor != nullptr)
+    {
+      peakImageDataNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(peakImageDataNodeDescriptor, colorAction));
     }
     if (surfaceDataNodeDescriptor != nullptr)
     {

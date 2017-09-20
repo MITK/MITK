@@ -72,7 +72,6 @@ public:
     itkSetMacro( FaThreshold, float)
 
     // output
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)
     itkGetMacro( PeakImage, PeakImageType::Pointer)
 
     protected:
@@ -87,7 +86,6 @@ public:
 private:
 
     bool                                m_NormalizeVectors;     ///< Normalizes the output vector to length 1
-    mitk::FiberBundle::Pointer          m_OutputFiberBundle;    ///< Vector field representation of the output vectors
     ItkUcharImgType::Pointer            m_MaskImage;            ///< Extraction is only performed inside of the binary mask
     PeakImageType::Pointer              m_PeakImage;
     bool                                m_UsePolarCoordinates;

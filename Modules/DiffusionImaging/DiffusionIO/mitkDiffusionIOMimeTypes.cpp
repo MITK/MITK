@@ -21,8 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMetaDataDictionary.h>
 #include <itkMetaDataObject.h>
 #include <mitkLogMacros.h>
-
-#include "dcmtk/dcmtract/trctractographyresults.h"
+#include <dcmtk/dcmtract/trctractographyresults.h>
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <itkGDCMImageIO.h>
 
 namespace mitk
 {
@@ -117,13 +118,40 @@ DiffusionIOMimeTypes::FiberBundleDicomMimeType::FiberBundleDicomMimeType()
 
 bool DiffusionIOMimeTypes::FiberBundleDicomMimeType::AppliesTo(const std::string &path) const
 {
-  OFCondition result;
-  TrcTractographyResults *trc = NULL;
-  result = TrcTractographyResults::loadFile(path.c_str(), trc);
-  if (result.bad())
-    return false;
+  try
+  {
+    mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
+    mitk::DICOMTag SOPInstanceUID(0x0008, 0x0016);
 
-  return true;
+    mitk::StringList relevantFiles;
+    relevantFiles.push_back(path);
+
+    scanner->AddTag(SOPInstanceUID);
+    scanner->SetInputFiles(relevantFiles);
+    scanner->Scan();
+    mitk::DICOMTagCache::Pointer tagCache = scanner->GetScanCache();
+
+    mitk::DICOMImageFrameList imageFrameList = mitk::ConvertToDICOMImageFrameList(tagCache->GetFrameInfoList());
+    if (imageFrameList.empty())
+      return false;
+
+    mitk::DICOMImageFrameInfo *firstFrame = imageFrameList.begin()->GetPointer();
+
+    std::string tag_value = tagCache->GetTagValue(firstFrame, SOPInstanceUID).value;
+    if (tag_value.empty()) {
+      return false;
+    }
+
+    if (tag_value.compare(UID_TractographyResultsStorage)!=0)
+      return false;
+
+    return true;
+  }
+  catch (std::exception& e)
+  {
+    MITK_INFO << e.what();
+  }
+  return false;
 }
 
 DiffusionIOMimeTypes::FiberBundleDicomMimeType* DiffusionIOMimeTypes::FiberBundleDicomMimeType::Clone() const

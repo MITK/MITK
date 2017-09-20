@@ -49,6 +49,9 @@ void StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Ima
   startIndex[2] = itkImage->GetLargestPossibleRegion().GetSize()[2]/2;
   auto region = itkImage->GetLargestPossibleRegion();
   auto spacing = itkImage->GetSpacing();
+  spacing[0] = itkImage->GetSpacing()[0];
+  spacing[1] = itkImage->GetSpacing()[1];
+  spacing[2] = itkImage->GetSpacing()[2];
 
   int minimumDistance = 50 * 50 * (spacing[0] + spacing[1] + spacing[2]);
 

@@ -181,6 +181,7 @@ namespace mitk {
   const std::string TAG_NO_STUDY_REL_SERIES = "0020|1206";
   const std::string TAG_NO_STUDY_REL_IMAGES = "0020|1208";
   const std::string TAG_NO_SERIES_REL_IMAGES = "0020|1209";
+  const std::string TAG_TEMPORAL_INDEX = "0020|9128";
   const std::string TAG_SAMPLES_PER_PX = "0028|0002";
   const std::string TAG_PHOTOMETRIC = "0028|0004";
   const std::string TAG_ROWS = "0028|0010";
@@ -527,6 +528,7 @@ namespace mitk {
     "0020|1206", // TAG_NO_STUDY_REL_SERIES
     "0020|1208", // TAG_NO_STUDY_REL_IMAGES
     "0020|1209", // TAG_NO_SERIES_REL_IMAGES
+    "0020|9128", // TAG_TEMPORAL_INDEX
     "0028|0002", // TAG_SAMPLES_PER_PX
     "0028|0004", // TAG_PHOTOMETRIC
     "0028|0010", // TAG_ROWS

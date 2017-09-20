@@ -62,7 +62,7 @@ private:
   QString GetFormattedIndex(const vnl_vector<int>& vector) const;
   QString GetFormattedString(double value, unsigned int decimals) const;
   void AdaptBinSizeCheckboxStepsize(mitk::Image::ConstPointer image);
-
+  void AdaptBinSizeCheckBoxMinMax(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, int componentType);
 public:
 
   /*!

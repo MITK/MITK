@@ -30,36 +30,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingModeProperty.h>
 
-void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* node, mitk::DoseValueAbs referenceDose)
+
+void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* doseNode, const mitk::IsoDoseLevelSet* colorPreset, mitk::DoseValueAbs referenceDose, bool showColorWashGlobal)
 {
-  if (node)
+  if (!doseNode) return;
+
+  mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());
+
+  if (doseImage != nullptr)
   {
-    //set some specific colorwash and isoline properties
-    node->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), true);
-    node->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), false);
+    //set some specific color wash and isoline properties
+    doseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), showColorWashGlobal);
 
-    node->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
+    //Set reference dose property
+    doseNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
 
-    mitk::IsoDoseLevelSet::Pointer isoDoseLevelPreset = mitk::GeneratIsoLevels_Virtuos();
-    mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(isoDoseLevelPreset);
+    mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(dynamic_cast<mitk::IsoDoseLevelSet*>(colorPreset->Clone().GetPointer()));
 
-    node->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
-
-    mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
-    mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
-    node->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
+    doseNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
 
     mitk::RenderingModeProperty::Pointer renderingModeProp = mitk::RenderingModeProperty::New();
 
-      //Generating the Colorwash
+    if (showColorWashGlobal)
+    {
+      //Generating the color wash
       vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
 
-      for (mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelPreset->Begin(); itIsoDoseLevel != isoDoseLevelPreset->End(); ++itIsoDoseLevel)
+      for (mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = colorPreset->Begin(); itIsoDoseLevel != colorPreset->End(); ++itIsoDoseLevel)
       {
-        if (itIsoDoseLevel->GetVisibleColorWash())
-        {
-          double rgbValue[] = { itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2] };
-          transferFunction->AddRGBPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, rgbValue[0], rgbValue[1], rgbValue[2]);
+        float *hsv = new float[3];
+        //used for transfer rgb to hsv
+        vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+        if (itIsoDoseLevel->GetVisibleColorWash()){
+          cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2], &hsv[0], &hsv[1], &hsv[2]);
+          transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, hsv[0], hsv[1], hsv[2], 1.0, 1.0);
         }
       }
 
@@ -67,12 +71,50 @@ void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* node, mitk::DoseValueAbs refe
       mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
       mitkTransFunc->SetColorTransferFunction(transferFunction);
       mitkTransFuncProp->SetValue(mitkTransFunc);
-      node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
 
-
+      doseNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
       renderingModeProp->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
+    }
+    else
+    {
+      //Set rendering mode to levelwindow color mode
+      renderingModeProp->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+    }
 
-    node->SetProperty("Image Rendering.Mode", renderingModeProp);
-    node->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+    doseNode->SetProperty("Image Rendering.Mode", renderingModeProp);
+    doseNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+  }
+};
+
+
+void mitk::ConfigureNodeAsIsoLineNode(mitk::DataNode* doseOutlineNode, const mitk::IsoDoseLevelSet* colorPreset, mitk::DoseValueAbs referenceDose, bool showIsolinesGlobal)
+{
+  if (doseOutlineNode != nullptr)
+  {
+    mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseOutlineNode->GetData());
+
+    if (doseImage != nullptr)
+    {
+      mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(dynamic_cast<mitk::IsoDoseLevelSet*>(colorPreset->Clone().GetPointer()));
+
+      mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
+      mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
+
+      doseOutlineNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsolinesGlobal);
+      doseOutlineNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
+
+      doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
+
+      doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
+
+      //set the outline properties
+      doseOutlineNode->SetBoolProperty("outline binary", true);
+      doseOutlineNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+      doseOutlineNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+
+      //set the dose mapper for outline drawing; the colorwash is realized by the imagevtkmapper2D
+      mitk::DoseImageVtkMapper2D::Pointer contourMapper = mitk::DoseImageVtkMapper2D::New();
+      doseOutlineNode->SetMapper(1, contourMapper);
+    }
   }
 };

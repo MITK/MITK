@@ -62,7 +62,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
       m_ScreenYDifference(0),
       m_ScreenXDifference(0),
       m_VisibleWindow(0),
-      m_MouseDistanceScaleFactor(0.5),
+      m_MouseDistanceScaleFactor(0.25),
       m_FillFeedbackContour(true),
       m_ConnectedComponentValue(1)
 {
@@ -279,7 +279,22 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
 
     m_LastEventSender = positionEvent->GetSender();
     m_LastEventSlice = m_LastEventSender->GetSlice();
+#ifdef _WIN32
+    //screen height
+    const int height = GetSystemMetrics(SM_CYSCREEN);
+
+    //cursor position
+    POINT p;
+    if (GetCursorPos(&p)) {
+      m_LastScreenPosition[0] = p.x;
+      m_LastScreenPosition[1] = p.y;
+    } else {
+      // but why
+      MITK_WARN("Failed to get cursor position");
+    }
+#else
     m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+#endif
 
     // ReferenceSlice is from the underlying image, WorkingSlice from the active segmentation (can be empty)
     m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
@@ -473,8 +488,8 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
         int x = 0;
 
 #ifdef _WIN32
-        //screen height
-        const int height = GetSystemMetrics(SM_CYSCREEN);
+        const int height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        const int top = height - GetSystemMetrics(SM_CYSCREEN);
 
         //cursor position
         POINT p;
@@ -501,6 +516,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
         //screen height
         Screen* scrn = DefaultScreenOfDisplay(disp);
         Window root_window = DefaultRootWindow(disp);
+        const int top = 0;
         const int height = scrn->height;
 
         //cursor position
@@ -511,7 +527,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
                      , &x, &y, &winX, &winY, &mask);
 #endif
 
-        bool atTop = y == 0;
+        bool atTop = y == top;
         bool atBottom = y == (height - 1);
 
         auto setCursorPosition = [=](int x, int y)
@@ -525,7 +541,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
 #endif
         };
 
-        m_ScreenYDifference += y - m_LastScreenPosition[1];
+        m_ScreenYDifference += m_LastScreenPosition[1] - y;
         m_ScreenXDifference += x - m_LastScreenPosition[0];
 
         if (atTop || atBottom)
@@ -539,8 +555,9 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
                 m_LastScreenPosition = newBeginning;
             }
             else
-            {   // atBottom
-                newBeginning[1] = 1;
+            {
+                // atBottom
+                newBeginning[1] = top + 1;
                 m_LastScreenPosition = newBeginning;
             }
             setCursorPosition(newBeginning[0], newBeginning[1]);
@@ -554,7 +571,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
         // Moving the mouse up and down adjusts the width of the threshold window, moving it left and right shifts the threshold window
         m_Thresholds[0] = std::min<ScalarType>(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
         m_Thresholds[1] = std::max<ScalarType>(m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
-        MITK_INFO << "Screen difference : " << m_ScreenXDifference << " , " << m_ScreenYDifference;
+        MITK_INFO << "Screen difference : " << m_ScreenXDifference << " , " << m_ScreenYDifference << " Thresholds: " << m_Thresholds[0] << " , " << m_Thresholds[1];
 
         thresholdsChanged.Send(m_Thresholds[0], m_Thresholds[1]);
 

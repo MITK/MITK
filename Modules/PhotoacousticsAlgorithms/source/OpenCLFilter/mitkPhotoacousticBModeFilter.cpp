@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPhotoacousticBModeFilter.h"
+#include "./OpenCLFilter/mitkPhotoacousticBModeFilter.h"
 #include "usServiceReference.h"
 #include <mitkImageReadAccessor.h>
 
@@ -26,7 +26,9 @@ mitk::PhotoacousticOCLBModeFilter::PhotoacousticOCLBModeFilter()
   this->AddSourceFile("BModeAbs.cl");
   this->AddSourceFile("BModeAbsLog.cl");
 
-  this->m_FilterID = "PixelCalculation";
+  this->m_FilterID = "BModeFilter";
+
+  this->Initialize();
 }
 
 mitk::PhotoacousticOCLBModeFilter::~PhotoacousticOCLBModeFilter()

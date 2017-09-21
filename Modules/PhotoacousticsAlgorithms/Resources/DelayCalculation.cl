@@ -29,12 +29,12 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
     uint globalPosY = get_global_id(1);
     uint globalPosZ = get_global_id(2);
     
-    if(globalPosZ < usedLines[globalPosY * outputL + globalPosX])
+    if(globalPosZ < usedLines[globalPosY * 3 * outputL + 3 * globalPosX])
     {
       float l_i = (float)globalPosX / outputL * inputL;
       float s_i = (float)globalPosY / outputS * inputS / 2;
       
-      float l_s = usedLines[outputL * outputS + globalPosY * outputL + globalPosX] + globalPosZ;
+      float l_s = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1] + globalPosZ;
 
       float delayMultiplicator = delayMultiplicatorRaw / s_i;
       float AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-isPAImage)*s_i;
@@ -57,12 +57,12 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
     uint globalPosY = get_global_id(1);
     uint globalPosZ = get_global_id(2);
     
-    if(globalPosZ < usedLines[globalPosY * outputL + globalPosX])
+    if(globalPosZ < usedLines[globalPosY * 3 * outputL + 3 * globalPosX])
     {
       float l_i = (float)globalPosX / outputL * inputL;
       float s_i = (float)globalPosY / outputS * inputS / 2;
       
-      float l_s = usedLines[outputL * outputS + globalPosY * outputL + globalPosX] + globalPosZ;
+      float l_s = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1] + globalPosZ;
 
       gDest[memoryLocations[globalPosY * outputL + globalPosX] + globalPosZ] = 
         sqrt(

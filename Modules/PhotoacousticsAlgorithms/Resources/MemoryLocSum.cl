@@ -25,11 +25,11 @@ __kernel void ckMemoryLocSum( __global unsigned short *input,
   
   for (uint pos = 0; pos < id; ++pos)
   {
-    sum += input[pos];
+    sum += input[3 * pos];
   }
   
   sums[id] = sum;
 
   if (id == (get_global_size(0) - 1) + (get_global_size(1) - 1) * get_global_size(0))
-    finalSum[0] = sum + input[id];
- }                                      
+    finalSum[0] = sum + input[3 * id];
+ }

@@ -41,8 +41,8 @@ __kernel void ckUsedLines(
     unsigned short maxLine = min((l_i + part) + 1, (float)inputL);
     unsigned short minLine = max((l_i - part), 0.0f);
     
-    dDest[globalPosY * outputL + globalPosX] = (maxLine - minLine); //usedLines
-    dDest[globalPosY * outputL + globalPosX + 1 * outputL * outputS] = minLine; //minLine
-    dDest[globalPosY * outputL + globalPosX + 2 * outputL * outputS] = maxLine; //maxLine
+    dDest[globalPosY * 3 * outputL + 3 * globalPosX] = (maxLine - minLine); //usedLines
+    dDest[globalPosY * 3 * outputL + 3 * globalPosX + 1] = minLine; //minLine
+    dDest[globalPosY * 3 * outputL + 3 * globalPosX + 2] = maxLine; //maxLine
   }
 }

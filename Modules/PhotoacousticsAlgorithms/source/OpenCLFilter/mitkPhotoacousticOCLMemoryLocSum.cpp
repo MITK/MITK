@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 
 #include <cmath>
-#include "mitkPhotoacousticOCLMemoryLocSum.h"
+#include "./OpenCLFilter/mitkPhotoacousticOCLMemoryLocSum.h"
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
 
@@ -26,6 +26,8 @@ mitk::OCLMemoryLocSum::OCLMemoryLocSum()
 {
   this->AddSourceFile("MemoryLocSum.cl");
   this->m_FilterID = "MemoryLocSum";
+
+  this->Initialize();
 }
 
 mitk::OCLMemoryLocSum::~OCLMemoryLocSum()

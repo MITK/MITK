@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-__kernel void ckDMAS(
+__kernel void ckDAS(
   __global float* dSource, // input image
   __global float* dDest, // output buffer
   __global unsigned short* usedLines,
@@ -43,35 +43,23 @@ __kernel void ckDMAS(
     
     float apod_mult = (float)apodArraySize / (float)curUsedLines;
     
-    unsigned short AddSample1 = 0;
-    unsigned short AddSample2 = 0;
+    unsigned short AddSample = 0;
     
     float output = 0;
     float mult = 0;
     
     unsigned int MemoryStartAccessPoint = memoryLocations[globalPosY * outputL + globalPosX];
 
-    for (short l_s1 = minLine; l_s1 < maxLine; ++l_s1)
+    for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample1 = AddSamples[MemoryStartAccessPoint + l_s1 - minLine];
-      if (AddSample1 < inputS && AddSample1 >= 0) {
-        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
-        {
-          AddSample2 = AddSamples[MemoryStartAccessPoint + l_s2 - minLine];
-          if (AddSample1 < inputS && AddSample1 >= 0) {
-            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * 
-              dSource[(int)(globalPosZ * inputL * inputS + AddSample2 * inputL + l_s2)]
-              * apodArray[(int)((l_s1 - minLine)*apod_mult)] * 
-              dSource[(int)(globalPosZ * inputL * inputS + AddSample1 * inputL + l_s1)];
-              
-            output += sqrt(mult * ((float)(mult>0)-(float)(mult<0))) * ((mult > 0) - (mult < 0));
-          }
-        }
+      AddSample = AddSamples[MemoryStartAccessPoint + l_s - minLine];
+      if (AddSample < inputS && AddSample >= 0) {
+        output += apodArray[(int)((l_s - minLine)*apod_mult)] * dSource[(int)(globalPosZ * inputL * inputS + AddSample * inputL + l_s)];
       }
       else
         --curUsedLines;
     }
     
-    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (pow((float)curUsedLines, 2.0f) - (curUsedLines - 1));
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)curUsedLines;
   }
 }

@@ -14,16 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
-#define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
+#ifndef _MITKPHOTOACOUSTICSBMODEFILTER_H_
+#define _MITKPHOTOACOUSTICSBMODEFILTER_H_
 
 #ifdef PHOTOACOUSTICS_USE_GPU
 #include "mitkOclDataSetToDataSetFilter.h"
 #endif
 
 #include <itkObject.h>
-
-
 #include "mitkImageToImageFilter.h"
 
 namespace mitk

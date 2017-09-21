@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define _USE_MATH_DEFINES
 
-#include "mitkPhotoacousticBeamformingFilter.h"
 #include "mitkProperties.h"
 #include "mitkImageReadAccessor.h"
 #include <algorithm>
@@ -26,10 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <thread>
 #include <itkImageIOBase.h>
 #include "mitkImageCast.h"
-#include "./OpenCLFilter/mitkPhotoacousticOCLBeamformer.h"
-#include "./OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.h"
-#include "./OpenCLFilter/mitkPhotoacousticOCLMemoryLocSum.h"
-#include "./OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.h"
+#include "mitkPhotoacousticBeamformingFilter.h"
 
 mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputData(nullptr)
 {
@@ -37,6 +33,8 @@ mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputDat
   this->SetNumberOfRequiredInputs(1);
 
   m_ProgressHandle = [](int, std::string) {};
+
+  m_BeamformingOclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
 }
 
 void mitk::BeamformingFilter::SetProgressHandle(std::function<void(int, std::string)> progressHandle)
@@ -105,13 +103,13 @@ void mitk::BeamformingFilter::GenerateData()
   // calculate the appropiate apodization window
   switch (m_Conf.Apod)
   {
-    case beamformingSettings::Apodization::Hann:
+    case BeamformingSettings::Apodization::Hann:
       ApodWindow = VonHannFunction(apodArraySize);
       break;
-    case beamformingSettings::Apodization::Hamm:
+    case BeamformingSettings::Apodization::Hamm:
       ApodWindow = HammFunction(apodArraySize);
       break;
-    case beamformingSettings::Apodization::Box:
+    case BeamformingSettings::Apodization::Box:
       ApodWindow = BoxFunction(apodArraySize);
       break;
     default:
@@ -158,16 +156,16 @@ void mitk::BeamformingFilter::GenerateData()
       std::thread *threads = new std::thread[(short)outputDim[0]];
 
       // every line will be beamformed in a seperate thread
-      if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
+      if (m_Conf.Algorithm == BeamformingSettings::BeamformingAlgorithm::DAS)
       {
-        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+        if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
           }
         }
-        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+        else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
@@ -175,16 +173,16 @@ void mitk::BeamformingFilter::GenerateData()
           }
         }
       }
-      else if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
+      else if (m_Conf.Algorithm == BeamformingSettings::BeamformingAlgorithm::DMAS)
       {
-        if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+        if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingFilter::DMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
           }
         }
-        else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+        else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
@@ -222,15 +220,12 @@ void mitk::BeamformingFilter::GenerateData()
 
       m_ProgressHandle(50, "performing reconstruction");
 
-      mitk::PhotoacousticOCLBeamformingFilter::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
+      m_BeamformingOclFilter->SetApodisation(ApodWindow, apodArraySize);
+      m_BeamformingOclFilter->SetConfig(m_Conf);
+      m_BeamformingOclFilter->SetInput(input);
+      m_BeamformingOclFilter->Update();
 
-      m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
-      m_oclFilter->SetConfig(m_Conf);
-      m_oclFilter->SetOutputDim(output->GetDimensions());
-      m_oclFilter->SetInput(input);
-      m_oclFilter->Update();
-
-      void* out = m_oclFilter->GetOutput();
+      void* out = m_BeamformingOclFilter->GetOutput();
       output->SetImportVolume(out, 0, 0, mitk::Image::ReferenceMemory);
     }
     catch (mitk::Exception &e)
@@ -247,7 +242,7 @@ void mitk::BeamformingFilter::GenerateData()
   MITK_INFO << "Beamforming of " << output->GetDimension(2) << " Images completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
 }
 
-void mitk::BeamformingFilter::Configure(beamformingSettings settings)
+void mitk::BeamformingFilter::Configure(BeamformingSettings settings)
 {
   m_Conf = settings;
 }
@@ -332,7 +327,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1 - m_Conf.Photoacoustic)*s_i;
+      AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1 - m_Conf.isPhotoacousticImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
@@ -388,7 +383,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
         pow(s_i, 2)
         +
         pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-      ) + (1 - m_Conf.Photoacoustic)*s_i;
+      ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
@@ -444,7 +439,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
     short* AddSample = new short[maxLine - minLine];
     for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) + (1 - m_Conf.Photoacoustic)*s_i;
+      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) + (1 - m_Conf.isPhotoacousticImage)*s_i;
     }
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
@@ -519,7 +514,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
         pow(s_i, 2)
         +
         pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * ((minLine + l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-      ) + (1 - m_Conf.Photoacoustic)*s_i;
+      ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
     }
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)

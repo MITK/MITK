@@ -207,6 +207,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="UseGPUBmode">
+         <property name="text">
+          <string>Use GPU</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="labelWarning">
          <property name="styleSheet">
           <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
@@ -526,7 +533,7 @@
           </sizepolicy>
          </property>
          <property name="decimals">
-          <number>2</number>
+          <number>3</number>
          </property>
          <property name="minimum">
           <double>0.010000000000000</double>
@@ -693,13 +700,6 @@
          </property>
          <property name="value">
           <number>0</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_12">
-         <property name="text">
-          <string>Cutoff Upper Voxels</string>
          </property>
         </widget>
        </item>
@@ -900,7 +900,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QCheckBox" name="UseGPU">
+        <widget class="QCheckBox" name="UseGPUBf">
          <property name="text">
           <string>Compute On GPU</string>
          </property>
@@ -948,9 +948,36 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Cutoff Upper Voxels</string>
+         </property>
+        </widget>
+       </item>
+       <item row="28" column="1">
+        <widget class="QLabel" name="labelWarning4">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;Please select an image!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

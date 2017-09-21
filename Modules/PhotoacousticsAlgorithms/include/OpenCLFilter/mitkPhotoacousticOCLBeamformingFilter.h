@@ -16,14 +16,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
+#ifdef PHOTOACOUSTICS_USE_GPU
 
-#include "mitkOclImageToImageFilter.h"
+#include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
+
+#include "mitkPhotoacousticOCLDelayCalculation.h"
+#include "mitkPhotoacousticOCLMemoryLocSum.h"
+#include "mitkPhotoacousticOCLUsedLinesCalculation.h"
+
+#include "mitkPhotoacousticBeamformingSettings.h"
+
+#include <chrono>
 
 namespace mitk
 {
-class OclImageToImageFilter;
-
 /** Documentation
   *
   * \brief The OclBinaryThresholdImageFilter computes a binary segmentation based on given
@@ -33,67 +40,57 @@ class OclImageToImageFilter;
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
 
-
-class PhotoacousticOCLBeamformer : public OclImageToImageFilter, public itk::Object
+class PhotoacousticOCLBeamformingFilter : public OclDataSetToDataSetFilter, public itk::Object
 {
 
 public:
-  mitkClassMacroItkParent(PhotoacousticOCLBeamformer, itk::Object);
+  mitkClassMacroItkParent(PhotoacousticOCLBeamformingFilter, itk::Object);
   itkNewMacro(Self);
 
   /**
-  * @brief SetInput Set the input image. Only 3D images are supported for now.
-  * @param image a 3D image.
-  * @throw mitk::Exception if the dimesion is not 3.
+  * @brief SetInput Set the input data through an image. Arbitrary images are supported
   */
   void SetInput(Image::Pointer image);
+  /**
+  * @brief SetInput Manually set the input data while providing dimensions and memory size of the input data.
+  */
+  void SetInput(void* data, unsigned int* dimensions, unsigned int BpE);
 
-  mitk::Image::Pointer GetOutput();
+  void* GetOutput();
+
+  /**
+  * @brief GetOutputAsImage Returns an mitk::Image constructed from the processed data
+  */
+  mitk::Image::Pointer GetOutputAsImage();
 
   /** Update the filter */
   void Update();
-  
-  void SetOutputDim( unsigned int outputDim[3])
-  {
-	  m_OutputDim[0] = outputDim[0];
-	  m_OutputDim[1] = outputDim[1];
-    m_OutputDim[2] = outputDim[2];
-  }
 
+  /** Set the Apodisation function to apply when beamforming */
   void SetApodisation(float* apodisation, unsigned short apodArraySize)
   {
     m_ApodArraySize = apodArraySize;
     m_Apodisation = apodisation;
   }
 
-  enum BeamformingAlgorithm { DASQuad, DMASQuad, DASSphe, DMASSphe };
-
-  void SetAlgorithm(BeamformingAlgorithm algorithm, bool PA)
+  void SetConfig(BeamformingSettings settings)
   {
-    m_Algorithm = algorithm;
-    m_PAImage = PA;
-  }
-
-  void SetBeamformingParameters(float SpeedOfSound, float timeSpacing, float Pitch, float Angle, bool PAImage, unsigned short transducerElements)
-  {
-    m_SpeedOfSound = SpeedOfSound;
-    m_TimeSpacing = timeSpacing;
-    m_Pitch = Pitch;
-    m_Angle = Angle;
-    m_PAImage = PAImage;
-    m_TransducerElements = transducerElements;
+    m_ConfOld = m_Conf;
+    m_Conf = settings;
   }
 
 protected:
 
   /** Constructor */
-  PhotoacousticOCLBeamformer();
+  PhotoacousticOCLBeamformingFilter();
 
   /** Destructor */
-  virtual ~PhotoacousticOCLBeamformer();
+  virtual ~PhotoacousticOCLBeamformingFilter();
 
   /** Initialize the filter */
   bool Initialize();
+
+  void UpdateDataBuffers();
 
   void Execute();
 
@@ -109,21 +106,35 @@ protected:
 
   virtual us::Module* GetModule();
 
-
 private:
   /** The OpenCL kernel for the filter */
   cl_kernel m_PixelCalculation;
 
   unsigned int m_OutputDim[3];
+
   float* m_Apodisation;
   unsigned short m_ApodArraySize;
-  BeamformingAlgorithm m_Algorithm;
+
   unsigned short m_PAImage;
-  float m_SpeedOfSound;
-  float m_TimeSpacing;
-  float m_Pitch;
-  float m_Angle;
-  unsigned short m_TransducerElements;
+
+  BeamformingSettings m_Conf;
+  BeamformingSettings m_ConfOld;
+
+  mitk::Image::Pointer m_InputImage;
+
+  size_t m_ChunkSize[3];
+
+  mitk::OCLMemoryLocSum::Pointer m_SumFilter;
+  mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
+  mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
+
+  cl_mem m_ApodizationBuffer;
+  cl_mem m_MemoryLocationsBuffer;
+  cl_mem m_DelaysBuffer;
+  cl_mem m_UsedLinesBuffer;
+
+  std::chrono::steady_clock::time_point m_Begin;
 };
 }
+#endif
 #endif

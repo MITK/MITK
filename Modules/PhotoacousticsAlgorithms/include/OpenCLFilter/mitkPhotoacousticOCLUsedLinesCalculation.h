@@ -14,16 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
-#define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
+#ifndef _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
+#define _MITKPHOTOACOUSTICSOCLUSEDLINESCALCULATION_H_
 
-#include "mitkOclImageToImageFilter.h"
+#ifdef PHOTOACOUSTICS_USE_GPU
+
+#include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
+#include "mitkPhotoacousticBeamformingSettings.h"
 
 namespace mitk
 {
-  class OclImageToImageFilter;
-
   /** Documentation
   *
   * \brief The OclBinaryThresholdImageFilter computes a binary segmentation based on given
@@ -33,12 +34,11 @@ namespace mitk
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
 
-
-  class PhotoacousticBModeFilter : public OclImageToImageFilter, public itk::Object
+  class OCLUsedLinesCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
 
   public:
-    mitkClassMacroItkParent(PhotoacousticBModeFilter, itk::Object);
+    mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
     itkNewMacro(Self);
 
     /**
@@ -46,23 +46,22 @@ namespace mitk
     * @param image a 3D image.
     * @throw mitk::Exception if the dimesion is not 3.
     */
-    void SetInput(Image::Pointer image);
 
     /** Update the filter */
     void Update();
 
-    void SetParameters(bool useLogFilter)
+    void SetConfig(BeamformingSettings conf)
     {
-      m_UseLogFilter = useLogFilter;
+      m_Conf = conf;
     }
 
   protected:
 
     /** Constructor */
-    PhotoacousticBModeFilter();
+    OCLUsedLinesCalculation();
 
     /** Destructor */
-    virtual ~PhotoacousticBModeFilter();
+    virtual ~OCLUsedLinesCalculation();
 
     /** Initialize the filter */
     bool Initialize();
@@ -71,21 +70,26 @@ namespace mitk
 
     mitk::PixelType GetOutputType()
     {
-      return mitk::MakeScalarPixelType<float>();
+      return mitk::MakeScalarPixelType<unsigned short>();
     }
 
     int GetBytesPerElem()
     {
-      return sizeof(float);
+      return sizeof(unsigned short);
     }
 
     virtual us::Module* GetModule();
+
+    int m_sizeThis;
 
 
   private:
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
-    bool m_UseLogFilter;
+
+    BeamformingSettings m_Conf;
+    float m_part;
   };
 }
+#endif
 #endif

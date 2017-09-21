@@ -14,18 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
 #define MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
 
 #include "mitkImageToImageFilter.h"
 #include <functional>
+#include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
+#include "mitkPhotoacousticBeamformingSettings.h"
 
 namespace mitk {
-
   //##Documentation
   //## @brief
   //## @ingroup Process
+
   class BeamformingFilter : public ImageToImageFilter
   {
   public:
@@ -34,37 +35,7 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-    struct beamformingSettings
-    {
-      float Pitch = 0.0003; // [m]
-      float SpeedOfSound = 1540; // [m/s]
-      unsigned int SamplesPerLine = 2048;
-      unsigned int ReconstructionLines = 128;
-      float RecordTime = 0.00006; // [s]
-      float TimeSpacing = 0.0000000000001; // [s]
-      unsigned int TransducerElements = 128;
-      bool partial = false;
-      unsigned int CropBounds[2] = { 0,0 };
-
-      bool UseGPU = true;
-
-      enum DelayCalc {QuadApprox, Spherical};
-      DelayCalc DelayCalculationMethod = QuadApprox;
-
-      enum Apodization {Hamm, Hann, Box};
-      Apodization Apod = Hann;
-
-      enum BeamformingAlgorithm {DMAS, DAS};
-      BeamformingAlgorithm Algorithm = DAS;
-
-      float Angle = 10;
-      bool Photoacoustic = true;
-      float BPHighPass = 50;
-      float BPLowPass = 50;
-      bool UseBP = false;
-    };
-
-    void Configure(beamformingSettings settings);
+    void Configure(BeamformingSettings settings);
 
     void SetProgressHandle(std::function<void(int, std::string)> progressHandle);
 
@@ -100,9 +71,10 @@ namespace mitk {
     float* m_InputData;
     float* m_InputDataPuffer;
 
-    beamformingSettings m_Conf;
-  };
+    BeamformingSettings m_Conf;
 
+    mitk::PhotoacousticOCLBeamformingFilter::Pointer m_BeamformingOclFilter;
+  };
 } // namespace mitk
 
 #endif //MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER

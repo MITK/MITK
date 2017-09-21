@@ -15,8 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 __kernel void ckBmodeAbsLog(
-  __read_only image3d_t dSource, // input image
-  __global float* dDest // output buffer
+  __global float* dSource, // input image
+  __global float* dDest, // output buffer
+  unsigned int size
 )
 {
   // get thread identifier
@@ -24,17 +25,14 @@ __kernel void ckBmodeAbsLog(
   unsigned int globalPosY = get_global_id(1);
   unsigned int globalPosZ = get_global_id(2);
   
-  // get image width and weight
-  const unsigned int inputL = get_image_width( dSource );
-  const unsigned int inputS = get_image_height( dSource );
-  const unsigned int Slices = get_image_depth( dSource );
-
-  // create an image sampler
-  const sampler_t defaultSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST ;
+  // get image width and height
+  unsigned short inputS = get_global_size(1);
+  unsigned short inputL = get_global_size(0);
+  unsigned short slices = get_global_size(2);
 
   // terminate non-valid threads
-  if ( globalPosX < inputL && globalPosY < inputS && globalPosZ < Slices )
+  if ( globalPosX + inputL * globalPosY + inputL * inputS * globalPosZ < size )
   {
-    dDest[ globalPosZ * inputL * inputS + globalPosY * inputL + globalPosX ] = log(fabs((float)read_imagef( dSource, defaultSampler, (int4)(globalPosX, globalPosY, globalPosZ, 0 )).x));
+    dDest[ globalPosZ * inputL * inputS + globalPosY * inputL + globalPosX ] = log(fabs(dSource[ globalPosZ * inputL * inputS + globalPosY * inputL + globalPosX ]));
   }
 }

@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef PAImageProcessing_h
 #define PAImageProcessing_h
 
 #include <mitkPhotoacousticImage.h>
+
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_PAImageProcessingControls.h"
 
 #include "mitkPhotoacousticBeamformingFilter.h"
+#include "mitkPhotoacousticBeamformingSettings.h"
 
 Q_DECLARE_METATYPE(mitk::Image::Pointer)
 Q_DECLARE_METATYPE(std::string)
@@ -73,6 +74,9 @@ class PAImageProcessing : public QmitkAbstractView
     void BatchProcessing();
     void UpdateSaveBoxes();
 
+    void ChangedSOSBandpass();
+    void ChangedSOSBeamforming();
+
   protected:
     virtual void CreateQtPartControl(QWidget *parent) override;
 
@@ -88,12 +92,14 @@ class PAImageProcessing : public QmitkAbstractView
     bool m_UseLogfilter;
     std::string m_OldNodeName;
 
-    mitk::BeamformingFilter::beamformingSettings BFconfig;
+    mitk::BeamformingSettings BFconfig;
 
     void UpdateBFSettings(mitk::Image::Pointer image);
 
     void EnableControls();
     void DisableControls();
+
+    mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 class BeamformingThread : public QThread
@@ -106,14 +112,20 @@ class BeamformingThread : public QThread
     void updateProgress(int, std::string);
 
   public:
-    void setConfig(mitk::BeamformingFilter::beamformingSettings BFconfig);
+    void setConfig(mitk::BeamformingSettings BFconfig);
     void setInputImage(mitk::Image::Pointer image);
-    void setCutoff(int cutoff);
+    void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+    {
+      m_FilterBank = filterBank;
+    }
+
 
   protected:
-    mitk::BeamformingFilter::beamformingSettings m_BFconfig;
+    mitk::BeamformingSettings m_BFconfig;
     mitk::Image::Pointer m_InputImage;
     int m_Cutoff;
+
+    mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 class BmodeThread : public QThread
@@ -127,8 +139,13 @@ class BmodeThread : public QThread
   public:
     enum BModeMethod { ShapeDetection, Abs };
 
-    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method);
+    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method, bool useGPU);
     void setInputImage(mitk::Image::Pointer image);
+    void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+    {
+      m_FilterBank = filterBank;
+    }
+
 
   protected:
     mitk::Image::Pointer m_InputImage;
@@ -136,6 +153,9 @@ class BmodeThread : public QThread
     mitk::PhotoacousticImage::BModeMethod m_Method;
     bool m_UseLogfilter;
     double m_ResampleSpacing;
+    bool m_UseGPU;
+
+    mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 class CropThread : public QThread
@@ -149,12 +169,18 @@ signals:
 public:
   void setConfig(unsigned int CutAbove, unsigned int CutBelow);
   void setInputImage(mitk::Image::Pointer image);
+  void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+  {
+    m_FilterBank = filterBank;
+  }
 
 protected:
   mitk::Image::Pointer m_InputImage;
 
   unsigned int m_CutAbove;
   unsigned int m_CutBelow;
+
+  mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 
@@ -169,6 +195,10 @@ signals:
 public:
   void setConfig(float BPHighPass, float BPLowPass, float TukeyAlpha, float recordTime);
   void setInputImage(mitk::Image::Pointer image);
+  void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+  {
+    m_FilterBank = filterBank;
+  }
 
 protected:
   mitk::Image::Pointer m_InputImage;
@@ -177,6 +207,8 @@ protected:
   float m_BPLowPass;
   float m_TukeyAlpha;
   float m_RecordTime;
+
+  mitk::PhotoacousticImage::Pointer m_FilterBank;
 };
 
 #endif // PAImageProcessing_h

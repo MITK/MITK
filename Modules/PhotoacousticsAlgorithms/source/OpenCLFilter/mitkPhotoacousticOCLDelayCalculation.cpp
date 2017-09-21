@@ -60,7 +60,8 @@ void mitk::OCLDelayCalculation::Execute()
 {
   cl_int clErr = 0;
 
-  unsigned int gridDim[3] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, m_Conf.ReconstructionLines };
+  unsigned int gridDim[3] = { m_Conf.inputDim[0], m_Conf.SamplesPerLine, 1 };
+  m_BufferSize = gridDim[0] * gridDim[1] * 1;
 
   try
   {
@@ -79,19 +80,18 @@ void mitk::OCLDelayCalculation::Execute()
 
   m_IsPAImage = m_Conf.isPhotoacousticImage;
   
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &m_UsedLines);
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &m_MemLoc);
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_char), &(this->m_IsPAImage));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
+  clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &(this->m_UsedLines));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_char), &(this->m_IsPAImage));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
   
   CHECK_OCL_ERR(clErr);
 
   // execute the filter on a 3D NDRange
-  this->ExecuteKernel(m_PixelCalculation, 3);
+  this->ExecuteKernel(m_PixelCalculation, 2);
 
   // signalize the GPU-side data changed
   m_Output->Modified(GPU_DATA);

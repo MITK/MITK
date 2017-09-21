@@ -139,7 +139,7 @@ void* mitk::OclDataSet::TransferDataToCPU(cl_command_queue gpuComQueue)
   // debug info
   oclPrintMemObjectInfo( m_gpuBuffer );
 
-  clErr = clEnqueueReadBuffer( gpuComQueue, m_gpuBuffer, CL_FALSE, 0, m_bufferSize * m_BpE, data ,0, nullptr, nullptr);
+  clErr = clEnqueueReadBuffer( gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * m_BpE, data ,0, nullptr, nullptr);
   CHECK_OCL_ERR(clErr);
 
   clFlush( gpuComQueue );

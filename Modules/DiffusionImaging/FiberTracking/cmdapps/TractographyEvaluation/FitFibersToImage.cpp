@@ -93,10 +93,14 @@ class VnlCostFunction : public vnl_cost_function
 public:
 
   vnl_sparse_matrix_linear_system< double >* S;
+  vnl_sparse_matrix< double > m_A;
+  vnl_vector< double > m_b;
 
   void SetProblem(vnl_sparse_matrix< double >& A, vnl_vector<double>& b)
   {
     S = new vnl_sparse_matrix_linear_system<double>(A, b);
+    m_A = A;
+    m_b = b;
   }
 
   VnlCostFunction(const int NumVars) : vnl_cost_function(NumVars)
@@ -105,14 +109,41 @@ public:
 
   double f(vnl_vector<double> const &x)
   {
-    return S->get_rms_error(x);
+    double cost = S->get_rms_error(x);
+
+    double regu = x.squared_magnitude()/x.size();
+
+//    unsigned int norm = 0;
+//    for (unsigned int i=0; i<m_b.size(); ++i)
+//    {
+//      if (m_A.get_row(i).empty())
+//        continue;
+
+//      float mean = 0;
+//      for (auto el : m_A.get_row(i))
+//        mean += x[el.first];
+
+//      mean /= m_A.get_row(i).size();
+
+//      for (auto el : m_A.get_row(i))
+//      {
+//       float d = x[el.first] - mean;
+//       {
+//       regu += d*d;
+//       norm++;
+//       }
+//      }
+//    }
+//    regu /= norm;
+
+    cost += regu;
+    return cost;
   }
 
   void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     fdgradf(x, dx);
   }
-
 };
 
 std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Pointer > input_tracts, mitk::Image::Pointer inputImage, bool single_fiber_fit, int max_iter, float g_tol, bool lb )
@@ -273,7 +304,6 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   if (max_iter>0)
     minimizer.set_max_function_evals(max_iter);
 
-
   itk::TimeProbe clock;
   clock.Start();
   minimizer.minimize(x_vnl);
@@ -288,11 +318,15 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
 
   std::vector<float> weights;
+//  float max_w = 0;
   for (unsigned int i=0; i<num_unknowns; ++i)
   {
 //    MITK_INFO << x_vnl[i];
+//    if (x_vnl[i]>max_w)
+//      max_w = x_vnl[i];
     weights.push_back(x_vnl[i]);
   }
+//  MITK_INFO << "Max w: " << max_w;
 
   return weights;
 }

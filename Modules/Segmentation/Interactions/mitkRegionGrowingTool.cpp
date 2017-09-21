@@ -285,10 +285,13 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
 
     //cursor position
     POINT p;
-    if (GetCursorPos(&p)) {
+    if (GetCursorPos(&p))
+    {
       m_LastScreenPosition[0] = p.x;
       m_LastScreenPosition[1] = p.y;
-    } else {
+    }
+    else
+    {
       // but why
       MITK_WARN("Failed to get cursor position");
     }

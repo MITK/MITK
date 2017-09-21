@@ -24,7 +24,15 @@ struct TransferFunctionPreset
 class MITKCORE_EXPORT TransferFunctionPresetManager : public itk::Object
 {
 public:
-  mitkClassMacroItkParent(TransferFunctionPresetManager, itk::Object);
+  typedef TransferFunctionPresetManager Self;
+  typedef itk::ObjectFactoryBase  Superclass;
+  typedef itk::SmartPointer<Self>  Pointer;
+  typedef itk::SmartPointer<const Self>  ConstPointer;
+
+  itkTypeMacro(TransferFunctionPresetManager, itk::Object);
+  itkFactorylessNewMacro(Self);
+
+  //mitkClassMacroItkParent(TransferFunctionPresetManager, itk::Object);
 
   //Define Transfer Function
   enum TransferFunctionMode
@@ -64,6 +72,16 @@ private:
   std::vector<std::string> m_presetNames;
   std::vector<TransferFunctionPreset> m_presetPoints;
 };
+
+class TransferFunctionPresetManagerHolder
+{
+public:
+  TransferFunctionPresetManagerHolder();
+  ~TransferFunctionPresetManagerHolder();
+
+  TransferFunctionPresetManager::Pointer m_tfpm;
+};
+
 }
 
 #endif /* MITK_TRANSFER_FUNCTION_PRESET_MANAGER_H_HEADER_INCLUDED */

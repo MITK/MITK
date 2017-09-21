@@ -165,10 +165,24 @@ const mitk::TransferFunctionPreset presetMrGeneric = {
 
 namespace mitk
 {
+
+TransferFunctionPresetManagerHolder tfpmHolder;
+
+TransferFunctionPresetManagerHolder::TransferFunctionPresetManagerHolder()
+  : m_tfpm(TransferFunctionPresetManager::New().GetPointer())
+{
+
+}
+
+TransferFunctionPresetManagerHolder::~TransferFunctionPresetManagerHolder()
+{
+
+}
+
+
 TransferFunctionPresetManager& TransferFunctionPresetManager::GetInstance()
 {
-  static TransferFunctionPresetManager instance;
-  return instance;
+  return *tfpmHolder.m_tfpm;
 }
 
 TransferFunctionPresetManager::TransferFunctionPresetManager()

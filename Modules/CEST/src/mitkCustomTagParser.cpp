@@ -237,9 +237,18 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     results->GetStringProperty("CEST.repetitions", stringRepetitions);
     results->GetStringProperty("CEST.averages", stringAverages);
     std::stringstream  measurementStream;
-    measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
-    measurements = measurementStream.str();
-    MITK_INFO << "Could not find measurements, assuming repetitions + averages. Which is: " << measurements;
+    try
+    {
+      measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
+      measurements = measurementStream.str();
+      MITK_INFO << "Could not find measurements, assuming repetitions + averages. Which is: " << measurements;
+    }
+    catch (const std::invalid_argument &ia)
+    {
+      MITK_ERROR
+        << "Could not find measurements, fallback assumption of repetitions + averages could not be determined either: "
+        << ia.what();
+    }
   }
 
   std::string preparationType = "";

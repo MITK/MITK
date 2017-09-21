@@ -205,6 +205,8 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   this->UpdateTree();
 
   activeDialog = this;
+  
+  setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 }
 
 QmitkPreferencesDialog::~QmitkPreferencesDialog()

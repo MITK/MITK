@@ -45,12 +45,20 @@ signals:
   protected slots :
     void on_m_hemisphereTracking_clicked();
     void on_m_ToggleHemisphere_clicked();
+    void on_m_SetHemisphere_clicked();
+    void on_m_GetHemisphere_clicked();
+    void on_m_AdjustHemisphere_clicked();
+
 private:
 
   /// \brief Creation of the connections
   void CreateConnections();
 
   void CreateQtPartControl(QWidget *parent);
+
+  void SetAdvancedSettingsVisible(bool _enable);
+
+  int GetSelectedToolIndex();
 
 protected:
   virtual QmitkPolhemusTrackerWidget* Clone(QWidget* parent) const;
@@ -61,5 +69,15 @@ protected:
 
 public:
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
+  * Can e.g. be used to activate options of a tracking device only when it is connected.
+  */
+  virtual void OnConnected();
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
+  * Can e.g. be used to activate/disactivate options of a tracking device.
+  */
+  virtual void OnDisconnected();
 };
 #endif

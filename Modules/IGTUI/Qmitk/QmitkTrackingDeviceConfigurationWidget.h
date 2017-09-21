@@ -60,6 +60,18 @@ signals:
   /* @brief This signal is sent if the tracking device was changed. */
   void TrackingDeviceSelectionChanged();
 
+public slots:
+/**
+* \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
+* Can e.g. be used to activate options of a tracking device only when it is connected.
+*/
+  void OnConnected();
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
+  * Can e.g. be used to activate/disactivate options of a tracking device.
+  */
+  void OnDisconnected();
+
 protected:
 
   /// \brief Creation of the connections

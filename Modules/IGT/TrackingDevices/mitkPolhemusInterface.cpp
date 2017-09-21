@@ -164,7 +164,10 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
 
   std::vector<mitk::PolhemusInterface::trackingData> returnValue = ParsePolhemusRawData(pBuf, dwSize);
 
-  if (returnValue.empty()) { MITK_WARN << "Cannot parse data / no tools present"; }
+  if (returnValue.empty())
+  {
+    MITK_WARN << "Cannot parse data / no tools present";
+  }
 
   return returnValue;
 }
@@ -239,11 +242,12 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
   {
     m_pdiDev->SetSHemiTrack(-1);
   }
-  else if (!m_Hemispheres.empty())
-  {
-    for (int i = 0; i < m_numberOfTools; ++i)
-      SetHemisphere(i + 1, m_Hemispheres.at(i));
-  }
+  //TODO: Logik umbauen. Vermutlich wenn im negativen Bereich -1, sonst 1 setzen?!
+  //else if (!m_Hemispheres.empty())
+  //{
+  //  for (int i = 0; i < m_numberOfTools; ++i)
+  //    SetHemisphere(i + 1, m_Hemispheres.at(i));
+  //}
   else
   {
     //Default Hemisphere
@@ -293,6 +297,34 @@ void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
 void mitk::PolhemusInterface::SetHemisphere(int _tool, mitk::Vector3D _hemisphere)
 {
   m_pdiDev->SetSHemisphere(_tool, { (float)_hemisphere[0], (float)_hemisphere[1], (float)_hemisphere[2] });
+}
+
+mitk::Vector3D mitk::PolhemusInterface::GetHemisphere(int _tool)
+{
+  PDI3vec _hemisphere;
+  mitk::Vector3D _returnVector;
+
+  //Doesn't work in continuous mode. Don't know why, but so it is... Hence: stop and restart...
+  if (m_continousTracking)
+  {
+    m_continousTracking = false;
+    m_pdiDev->StopContPno();
+
+    m_pdiDev->GetSHemisphere(_tool, _hemisphere);
+    MITK_DEBUG << "Get Hemisphere: " << m_pdiDev->GetLastResultStr();
+    mitk::FillVector3D(_returnVector, _hemisphere[0], _hemisphere[1], _hemisphere[2]);
+
+    m_pdiDev->StartContPno(0);
+    m_continousTracking = true;
+  }
+  else
+  {
+    m_pdiDev->GetSHemisphere(_tool, _hemisphere);
+    MITK_DEBUG << "Get Hemisphere: " << m_pdiDev->GetLastResultStr();
+    mitk::FillVector3D(_returnVector, _hemisphere[0], _hemisphere[1], _hemisphere[2]);
+  }
+
+  return _returnVector;
 }
 
 void mitk::PolhemusInterface::PrintStatus()

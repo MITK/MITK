@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPolhemusTrackerTypeInformation.h"
 #include <vtkConeSource.h>
 
+
+
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
@@ -277,4 +279,14 @@ void  mitk::PolhemusTrackingDevice::SetHemisphereTrackingEnabled(bool _Hemispher
 void  mitk::PolhemusTrackingDevice::ToggleHemisphere(int _tool)
 {
     this->m_Device->ToggleHemisphere(_tool);
+}
+
+void mitk::PolhemusTrackingDevice::SetHemisphere(int _tool, mitk::Vector3D _hemisphere)
+{
+  this->m_Device->SetHemisphere(_tool, _hemisphere);
+}
+
+mitk::Vector3D mitk::PolhemusTrackingDevice::GetHemisphere(int _tool)
+{
+  return this->m_Device->GetHemisphere(_tool);
 }

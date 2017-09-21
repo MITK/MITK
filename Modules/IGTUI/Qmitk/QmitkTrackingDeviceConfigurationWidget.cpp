@@ -350,3 +350,12 @@ QmitkAbstractTrackingDeviceWidget* QmitkTrackingDeviceConfigurationWidget::GetWi
 
   return nullptr;
 }
+
+void QmitkTrackingDeviceConfigurationWidget::OnConnected()
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnConnected();
+}
+void QmitkTrackingDeviceConfigurationWidget::OnDisconnected()
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnDisconnected();
+}

@@ -107,6 +107,12 @@ namespace mitk
     /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.*/
     void ToggleHemisphere(int _tool = -1);
 
+    /** Sets the Hemisphere of tool _tool to the vector _hemisphere */
+    void SetHemisphere(int _tool, mitk::Vector3D _hemisphere);
+
+    /** Get the Hemisphere for _tool as mitk vector */
+    mitk::Vector3D GetHemisphere(int _tool);
+
   protected:
     PolhemusTrackingDevice();
     ~PolhemusTrackingDevice();

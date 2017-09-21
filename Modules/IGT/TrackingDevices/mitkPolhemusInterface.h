@@ -95,6 +95,9 @@ namespace mitk
     /** Sets the Hemisphere of tool _tool to the vector _hemisphere */
     void SetHemisphere(int _tool, mitk::Vector3D _hemisphere);
 
+    /** Get the Hemisphere for _tool as mitk vector */
+    mitk::Vector3D GetHemisphere(int _tool);
+
   protected:
     /**
     * \brief standard constructor

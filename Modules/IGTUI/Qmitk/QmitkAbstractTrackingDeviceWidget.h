@@ -131,6 +131,18 @@ public:
   */
   virtual bool IsDeviceInstalled() { return true; }
 
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
+  * Can e.g. be used to activate options of a tracking device only when it is connected.
+  */
+  virtual void OnConnected() {};
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
+  * Can e.g. be used to activate/disactivate options of a tracking device.
+  */
+  virtual void OnDisconnected() {};
+
+
   std::string m_ErrorMessage; ///< current problem description
 
 private:

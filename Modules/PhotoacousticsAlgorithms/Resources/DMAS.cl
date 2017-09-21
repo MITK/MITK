@@ -57,7 +57,7 @@ __kernel void ckDMAS(
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
           Delay2 = AddSamples[globalPosY * inputL + (int)fabs(l_s2 - l_i)];
-          if (Delay1 < inputS && Delay1 >= 0) {
+          if (Delay2 < inputS && Delay2 >= 0) {
             mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * 
               dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)]
               * apodArray[(int)((l_s1 - minLine)*apod_mult)] * 

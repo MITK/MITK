@@ -70,38 +70,34 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QSpinBox" name="m_Hemisphere_X">
-         <property name="minimum">
-          <number>-10</number>
-         </property>
-         <property name="maximum">
-          <number>10</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="m_Hemisphere_Y">
-         <property name="minimum">
-          <number>-10</number>
-         </property>
-         <property name="maximum">
-          <number>10</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="m_Hemisphere_Z">
-         <property name="minimum">
-          <number>-10</number>
-         </property>
-         <property name="maximum">
-          <number>10</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QSpinBox" name="m_Hemisphere_X">
+       <property name="minimum">
+        <number>-10</number>
+       </property>
+       <property name="maximum">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_Hemisphere_Y">
+       <property name="minimum">
+        <number>-10</number>
+       </property>
+       <property name="maximum">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_Hemisphere_Z">
+       <property name="minimum">
+        <number>-10</number>
+       </property>
+       <property name="maximum">
+        <number>10</number>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="m_SetHemisphere">

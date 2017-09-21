@@ -167,15 +167,14 @@ void QmitkPolhemusTrackerWidget::SetAdvancedSettingsVisible(bool _enable)
 
 int QmitkPolhemusTrackerWidget::GetSelectedToolIndex()
 {
-  // Index 0 == All Tools == -1 for Polhemus interface; Index 2 == Tool 2 == 1 for Polhemus; etc...
-  int _index = m_Controls->m_ToolSelection->currentIndex() - 1;
+  // Index 0 == All Tools == -1 for Polhemus interface; Index 1 == Tool 1 == 1 for Polhemus Interface; etc...
+  int _index = m_Controls->m_ToolSelection->currentIndex()-1;
   if (_index != -1)
   {
     //we need to find the internal Polhemus index for this tool. This is the last number of the tool name. It might not be identical with the _index.
     //e.g. Sensor 1 and Sensor 3 is plugged --> Sensor 1 has index 1, but sensor 3 has index 2...
-    _index = ((int)m_Controls->m_ToolSelection->currentText().toStdString().back()) - '0' - 1;
-    //"-'0'" to convert from ascii to int (i.e. -48), "-1" to convert from tool name (1,2,3,...) to tool index by Polhemus (0,1,2,...)
+    _index = ((int)m_Controls->m_ToolSelection->currentText().toStdString().back()) - '0';
+    //"-'0'" to convert from ascii to int (i.e. -48)
   }
-  MITK_INFO << "INDEX: " << _index;
   return _index;
 }

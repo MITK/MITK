@@ -7,16 +7,12 @@ set(CPP_FILES
   source/OpenCLFilter/mitkPhotoacousticBModeFilter.cpp
   source/OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.cpp
   source/OpenCLFilter/mitkPhotoacousticOCLDelayCalculation.cpp
-  source/OpenCLFilter/mitkPhotoacousticOCLMemoryLocSum.cpp
 )
 
 set(RESOURCE_FILES
-  DASQuadratic.cl
-  DASSpherical.cl
   BModeAbs.cl
   BModeAbsLog.cl
   UsedLinesCalculation.cl
-  MemoryLocSum.cl
   DelayCalculation.cl
   DMAS.cl
   DAS.cl

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 
 #include "mitkPhotoacousticOCLDelayCalculation.h"
-#include "mitkPhotoacousticOCLMemoryLocSum.h"
 #include "mitkPhotoacousticOCLUsedLinesCalculation.h"
 
 #include "mitkPhotoacousticBeamformingSettings.h"
@@ -124,7 +123,6 @@ private:
 
   size_t m_ChunkSize[3];
 
-  mitk::OCLMemoryLocSum::Pointer m_SumFilter;
   mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
   mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
 

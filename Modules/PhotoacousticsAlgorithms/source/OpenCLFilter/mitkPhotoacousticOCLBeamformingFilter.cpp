@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
 : m_PixelCalculation( NULL ), m_InputImage(mitk::Image::New()), m_ApodizationBuffer(nullptr), m_MemoryLocationsBuffer(nullptr), m_DelaysBuffer(nullptr), m_UsedLinesBuffer(nullptr)
 {
-  this->AddSourceFile("DASQuadratic.cl");
   this->AddSourceFile("DAS.cl");
   this->AddSourceFile("DMAS.cl");
   this->m_FilterID = "OpenCLBeamformingFilter";

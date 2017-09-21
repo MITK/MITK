@@ -18,7 +18,6 @@ __kernel void ckDMAS(
   __global float* dSource, // input image
   __global float* dDest, // output buffer
   __global unsigned short* usedLines,
-  __global unsigned int* memoryLocations,
   __global unsigned short* AddSamples,
   __constant float* apodArray,
   unsigned short apodArraySize,
@@ -37,32 +36,32 @@ __kernel void ckDMAS(
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {	
+    float l_i = (float)globalPosX / (float)outputL * (float)inputL;
+
     unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
     unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
     unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
-    
+
     float apod_mult = (float)apodArraySize / (float)curUsedLines;
-    
-    unsigned short AddSample1 = 0;
-    unsigned short AddSample2 = 0;
-    
+
+    unsigned short Delay1 = 0;
+    unsigned short Delay2 = 0;
+
     float output = 0;
     float mult = 0;
-    
-    unsigned int MemoryStartAccessPoint = memoryLocations[globalPosY * outputL + globalPosX];
 
     for (short l_s1 = minLine; l_s1 < maxLine; ++l_s1)
     {
-      AddSample1 = AddSamples[MemoryStartAccessPoint + l_s1 - minLine];
-      if (AddSample1 < inputS && AddSample1 >= 0) {
+      Delay1 = AddSamples[globalPosY * inputL + (int)fabs(l_s1 - l_i)];
+      if (Delay1 < inputS && Delay1 >= 0) {
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
-          AddSample2 = AddSamples[MemoryStartAccessPoint + l_s2 - minLine];
-          if (AddSample1 < inputS && AddSample1 >= 0) {
+          Delay2 = AddSamples[globalPosY * inputL + (int)fabs(l_s2 - l_i)];
+          if (Delay1 < inputS && Delay1 >= 0) {
             mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * 
-              dSource[(int)(globalPosZ * inputL * inputS + AddSample2 * inputL + l_s2)]
+              dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)]
               * apodArray[(int)((l_s1 - minLine)*apod_mult)] * 
-              dSource[(int)(globalPosZ * inputL * inputS + AddSample1 * inputL + l_s1)];
+              dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
               
             output += sqrt(mult * ((float)(mult>0)-(float)(mult<0))) * ((mult > 0) - (mult < 0));
           }
@@ -71,7 +70,7 @@ __kernel void ckDMAS(
       else
         --curUsedLines;
     }
-    
+
     dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (pow((float)curUsedLines, 2.0f) - (curUsedLines - 1));
   }
 }

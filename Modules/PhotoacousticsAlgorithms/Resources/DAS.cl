@@ -18,8 +18,7 @@ __kernel void ckDAS(
   __global float* dSource, // input image
   __global float* dDest, // output buffer
   __global unsigned short* usedLines,
-  __global unsigned int* memoryLocations,
-  __global unsigned short* AddSamples,
+  __global unsigned short* delays,
   __constant float* apodArray,
   unsigned short apodArraySize,
   unsigned int inputL,
@@ -37,24 +36,24 @@ __kernel void ckDAS(
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS && globalPosZ < Slices )
   {	
+    float l_i = (float)globalPosX / (float)outputL * (float)inputL;
+
     unsigned short curUsedLines = usedLines[globalPosY * 3 * outputL + 3 * globalPosX];
     unsigned short minLine = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1];
     unsigned short maxLine = usedLines[globalPosY * 3 *outputL + 3 * globalPosX + 2];
     
     float apod_mult = (float)apodArraySize / (float)curUsedLines;
     
-    unsigned short AddSample = 0;
+    unsigned short Delay = 0;
     
     float output = 0;
     float mult = 0;
     
-    unsigned int MemoryStartAccessPoint = memoryLocations[globalPosY * outputL + globalPosX];
-
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = AddSamples[MemoryStartAccessPoint + l_s - minLine];
-      if (AddSample < inputS && AddSample >= 0) {
-        output += apodArray[(int)((l_s - minLine)*apod_mult)] * dSource[(int)(globalPosZ * inputL * inputS + AddSample * inputL + l_s)];
+      Delay = delays[globalPosY * inputL + (int)fabs(l_s - l_i)];
+      if (Delay < inputS && Delay >= 0) {
+        output += apodArray[(int)((l_s - minLine)*apod_mult)] * dSource[(int)(globalPosZ * inputL * inputS + Delay * inputL + l_s)];
       }
       else
         --curUsedLines;

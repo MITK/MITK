@@ -15,8 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
-                         __global unsigned short *usedLines, 
-                         __global unsigned int *memoryLocations,
+                         __global unsigned short *usedLines,
                          unsigned int inputL,
                          unsigned int inputS,
                          unsigned int outputL,
@@ -24,25 +23,24 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
                          char isPAImage,
                          float delayMultiplicatorRaw // parameters
                          )
- {
-    uint globalPosX = get_global_id(0);
-    uint globalPosY = get_global_id(1);
-    uint globalPosZ = get_global_id(2);
-    
-    if(globalPosZ < usedLines[globalPosY * 3 * outputL + 3 * globalPosX])
-    {
-      float l_i = (float)globalPosX / outputL * inputL;
-      float s_i = (float)globalPosY / outputS * inputS / 2;
-      
-      float l_s = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1] + globalPosZ;
+{
+  uint globalPosX = get_global_id(0);
+  uint globalPosY = get_global_id(1);
+  uint globalPosZ = get_global_id(2);
 
-      float delayMultiplicator = delayMultiplicatorRaw / s_i;
-      float AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-isPAImage)*s_i;
-      gDest[memoryLocations[globalPosY * outputL + globalPosX] + globalPosZ] = AddSample;
-    }
- }
+  if (globalPosX < inputL && globalPosY < outputS)
+  {
+    float l_i = 0; // we calculate the delays relative to line zero
+    float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;
+
+    float l_s = (float)globalPosX; // the currently calculated line
+
+    float delayMultiplicator = delayMultiplicatorRaw / s_i;
+    gDest[globalPosY * inputL + globalPosX] = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-isPAImage)*s_i;
+  }
+}
  
- __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
+__kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
                          __global unsigned short *usedLines, 
                          __global unsigned int *memoryLocations,
                          unsigned int inputL,
@@ -52,23 +50,23 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
                          char isPAImage,
                          float delayMultiplicatorRaw // parameters
                          )
- {
-    uint globalPosX = get_global_id(0);
-    uint globalPosY = get_global_id(1);
-    uint globalPosZ = get_global_id(2);
-    
-    if(globalPosZ < usedLines[globalPosY * 3 * outputL + 3 * globalPosX])
-    {
-      float l_i = (float)globalPosX / outputL * inputL;
-      float s_i = (float)globalPosY / outputS * inputS / 2;
-      
-      float l_s = usedLines[globalPosY * 3 * outputL + 3 * globalPosX + 1] + globalPosZ;
+{
+  uint globalPosX = get_global_id(0);
+  uint globalPosY = get_global_id(1);
+  uint globalPosZ = get_global_id(2);
 
-      gDest[memoryLocations[globalPosY * outputL + globalPosX] + globalPosZ] = 
-        sqrt(
-          pow(s_i, 2)
-          +
-          pow((delayMultiplicatorRaw * ((l_s - l_i)) / inputL), 2)
-        ) + (1-isPAImage)*s_i;
-    }
- }
+  if (globalPosX < inputL && globalPosY < outputS)
+  {
+    float l_i = 0; // we calculate the delays relative to line zero
+    float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;
+
+    float l_s = (float)globalPosX; // the currently calculated line
+
+    gDest[globalPosY * outputL + globalPosX] =
+      sqrt(
+        pow(s_i, 2)
+        +
+        pow((delayMultiplicatorRaw * ((l_s - l_i)) / inputL), 2)
+      ) + (1-isPAImage)*s_i;
+  }
+}

@@ -55,11 +55,9 @@ namespace mitk
       m_Conf = conf;
     }
 
-    void SetInputs(cl_mem usedLines, cl_mem memoryLocations, unsigned int bufferSize)
+    void SetInputs(cl_mem usedLines)
     {
-      m_MemLoc = memoryLocations;
       m_UsedLines = usedLines;
-      m_BufferSize = bufferSize;
     }
 
   protected:
@@ -94,7 +92,6 @@ namespace mitk
     cl_kernel m_PixelCalculation;
 
     BeamformingSettings m_Conf;
-    cl_mem m_MemLoc;
     cl_mem m_UsedLines;
     unsigned int m_BufferSize;
     float m_DelayMultiplicatorRaw;

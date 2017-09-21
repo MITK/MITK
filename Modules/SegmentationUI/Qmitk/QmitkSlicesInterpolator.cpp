@@ -99,7 +99,8 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_LastSNC(0),
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false),
-    m_FirstRun(true)
+    m_FirstRun(true),
+    m_Activate3DInterpolation(false)
 {
   m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox(TR_INTERPOLATION, this);
 
@@ -432,6 +433,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
   {
     case 0: // Disabled
       m_GroupBoxEnableExclusiveInterpolationMode->setTitle(TR_INTERPOLATION);
+      m_Activate3DInterpolation = false;
       this->HideAllInterpolationControls();
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(false);
@@ -441,6 +443,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
 
     case 1: // 2D
       m_GroupBoxEnableExclusiveInterpolationMode->setTitle(TR_INTERPOLATION_ENB);
+      m_Activate3DInterpolation = false;
       this->HideAllInterpolationControls();
       this->Show2DInterpolationControls(true);
       this->OnInterpolationActivated(true);
@@ -450,6 +453,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
 
     case 2: // 3D
       m_GroupBoxEnableExclusiveInterpolationMode->setTitle(TR_INTERPOLATION_ENB);
+      m_Activate3DInterpolation = true;
       this->HideAllInterpolationControls();
       this->Show3DInterpolationControls(true);
       this->OnInterpolationActivated(false);
@@ -611,7 +615,11 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
-    this->Show3DInterpolationResult(true);
+    if (m_Activate3DInterpolation) {
+      this->Show3DInterpolationResult(true);
+    } else {
+      this->Show3DInterpolationResult(false);
+    }
 
     if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) )
     {

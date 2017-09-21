@@ -314,6 +314,7 @@ private:
     QFutureWatcher<void> m_PlaneWatcher;
 
     bool m_FirstRun;
+    bool m_Activate3DInterpolation;
 };
 
 #endif

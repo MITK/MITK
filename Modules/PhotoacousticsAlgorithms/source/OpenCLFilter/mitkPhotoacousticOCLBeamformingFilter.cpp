@@ -78,13 +78,12 @@ void mitk::PhotoacousticOCLBeamformingFilter::Update()
 
 void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
 {
-  if (BeamformingSettings::SettingsChangedOpenCL(m_Conf, m_ConfOld))
+  if (BeamformingSettings::OutputDimensionsChanged(m_Conf,m_ConfOld))
   {
-    cl_int clErr = 0;
-    MITK_INFO << "Updating Data for new configuration";
     //Initialize the Output
     try
     {
+      MITK_INFO << "Updating Workgroup size for new dimensions";
       size_t outputSize = m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * m_Conf.inputDim[2];
       m_OutputDim[0] = m_Conf.ReconstructionLines;
       m_OutputDim[1] = m_Conf.SamplesPerLine;
@@ -96,6 +95,12 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
       MITK_ERROR << "Caught exception while initializing filter: " << e.what();
       return;
     }
+  }
+
+  if (BeamformingSettings::SettingsChangedOpenCL(m_Conf, m_ConfOld))
+  {
+    cl_int clErr = 0;
+    MITK_INFO << "Updating Buffers for new configuration";
 
     // create the apodisation buffer
 

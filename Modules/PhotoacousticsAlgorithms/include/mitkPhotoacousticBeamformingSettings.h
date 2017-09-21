@@ -71,6 +71,13 @@ namespace mitk {
         ((lhs.TimeSpacing - rhs.TimeSpacing) < 0.0000000001f) &&
         (lhs.TransducerElements == rhs.TransducerElements));
     }
+
+    static bool OutputDimensionsChanged(const BeamformingSettings& lhs, const BeamformingSettings& rhs)
+    {
+      return !((lhs.ReconstructionLines == rhs.ReconstructionLines) &&
+        (lhs.SamplesPerLine == rhs.SamplesPerLine) &&
+        (lhs.inputDim[2] == rhs.inputDim[2]));
+    }
   };
 }
 #endif

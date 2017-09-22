@@ -42,6 +42,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/algo/vnl_lsqr.h>
 #include <itkImageDuplicator.h>
 #include <itkTimeProbe.h>
+#include <random>
+#include <itkParticleSwarmOptimizer.h>
+#include <itkOnePlusOneEvolutionaryOptimizer.h>
+#include <itkGradientDescentOptimizer.h>
+#include <itkSPSAOptimizer.h>
 
 using namespace std;
 typedef itksys::SystemTools ist;
@@ -95,16 +100,30 @@ public:
   vnl_sparse_matrix_linear_system< double >* S;
   vnl_sparse_matrix< double > m_A;
   vnl_vector< double > m_b;
+  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen;
 
   void SetProblem(vnl_sparse_matrix< double >& A, vnl_vector<double>& b)
   {
     S = new vnl_sparse_matrix_linear_system<double>(A, b);
     m_A = A;
     m_b = b;
+    randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
   }
 
   VnlCostFunction(const int NumVars) : vnl_cost_function(NumVars)
   {
+  }
+
+  double f_itk(vnl_vector<double> const &x) const
+  {
+    double min = x.min_value();
+    if( min<0 )
+     return 10000 * -min;
+
+    double cost = S->get_rms_error(x);
+    double regu = x.squared_magnitude()/x.size();
+    cost += regu;
+    return cost;
   }
 
   double f(vnl_vector<double> const &x)
@@ -140,11 +159,119 @@ public:
     return cost;
   }
 
+  // Finite differences gradient (SLOW)
+//  void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
+//  {
+//    fdgradf(x, dx);
+//  }
+
   void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
-    fdgradf(x, dx);
+    dx.fill(0.0);
+    double mag = x.magnitude();
+    unsigned int N = m_b.size();
+
+    vnl_vector<double> d; d.set_size(N);
+    S->multiply(x,d);
+    d -= m_b;
+
+    vnl_vector<double> numerator; numerator.set_size(x.size());
+    S->transpose_multiply(d, dx);
+    dx *= 2.0/N;
+
+    if (mag>0)
+      dx += x/mag;
   }
+
 };
+
+class ItkCostFunction : public itk::SingleValuedCostFunction
+{
+public:
+  /** Standard class typedefs. */
+  typedef ItkCostFunction      Self;
+  typedef SingleValuedCostFunction  Superclass;
+  typedef itk::SmartPointer<Self>        Pointer;
+  typedef itk::SmartPointer<const Self>  ConstPointer;
+
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self)
+
+  /** Run-time type information (and related methods). */
+  itkTypeMacro(ItkCostFunction, SingleValuedCostfunction)
+
+  void SetVnlCostFunction(VnlCostFunction& cf) { m_VnlCostFunction = cf; }
+  unsigned int GetNumberOfParameters(void) const { return m_VnlCostFunction.get_number_of_unknowns(); } // itk::CostFunction
+
+  MeasureType GetValue(const ParametersType & parameters) const
+  {
+    return m_VnlCostFunction.f_itk(parameters);
+  }
+
+  void GetDerivative(const ParametersType &, DerivativeType &  ) const {
+    throw itk::ExceptionObject( __FILE__, __LINE__, "No derivative is available for this cost function.");
+  }
+
+protected:
+  ItkCostFunction(){}
+  ~ItkCostFunction(){}
+
+  VnlCostFunction m_VnlCostFunction = VnlCostFunction(1);
+
+private:
+  ItkCostFunction(const Self &); //purposely not implemented
+  void operator = (const Self &); //purposely not implemented
+};
+
+void OptimizeItk(VnlCostFunction& cf, vnl_vector<double>& x, int iter, double lb, double ub)
+{
+  ItkCostFunction::ParametersType p; p.SetData(x.data_block(), x.size());
+
+  ItkCostFunction::Pointer itk_cf = ItkCostFunction::New();
+  itk_cf->SetVnlCostFunction(cf);
+
+  std::pair< double, double > bounds; bounds.first = lb; bounds.second = ub;
+  MITK_INFO <<  bounds;
+
+//  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+//  itk::OnePlusOneEvolutionaryOptimizer::Pointer opt = itk::OnePlusOneEvolutionaryOptimizer::New();
+//  opt->SetCostFunction(itk_cf);
+//  opt->MinimizeOn();
+//  opt->SetInitialPosition(p);
+//  opt->SetNormalVariateGenerator(randGen);
+//  opt->SetMaximumIteration(iter);
+//  opt->StartOptimization();
+
+//  itk::ParticleSwarmOptimizer::Pointer opt = itk::ParticleSwarmOptimizer::New();
+//  opt->SetCostFunction(itk_cf);
+//  opt->SetInitialPosition(p);
+//  opt->SetParameterBounds(bounds, x.size());
+//  opt->SetMaximalNumberOfIterations(iter);
+//  opt->SetNumberOfParticles(100);
+//  opt->SetParametersConvergenceTolerance(0.01, x.size());
+//  opt->SetNumberOfGenerationsWithMinimalImprovement(3);
+//  opt->StartOptimization();
+
+//  itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
+//  opt->SetCostFunction(itk_cf);
+//  opt->SetInitialPosition(p);
+//  opt->SetMinimize(true);
+//  opt->SetNumberOfIterations(iter);
+//  opt->StartOptimization();
+
+  itk::SPSAOptimizer::Pointer opt = itk::SPSAOptimizer::New();
+  opt->SetCostFunction(itk_cf);
+  opt->SetInitialPosition(p);
+  opt->SetMinimize(true);
+  opt->SetNumberOfPerturbations(iter);
+  opt->StartOptimization();
+
+  x.copy_in(opt->GetCurrentPosition().data_block());
+  for (unsigned int i=0; i<x.size(); i++)
+    MITK_INFO << opt->GetCurrentPosition()[i];
+//  MITK_INFO << "Cost: " << opt->GetCurrentCost();
+
+}
 
 std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Pointer > input_tracts, mitk::Image::Pointer inputImage, bool single_fiber_fit, int max_iter, float g_tol, bool lb )
 {
@@ -176,8 +303,8 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   MITK_INFO << "Num. residuals: " << number_of_residuals;
 
   MITK_INFO << "Creating system ...";
-  vnl_sparse_matrix< double > A_vnl; A_vnl.set_size(number_of_residuals, num_unknowns);
-  vnl_vector<double> b_vnl; b_vnl.set_size(number_of_residuals); b_vnl.fill(0.0);
+  vnl_sparse_matrix< double > A; A.set_size(number_of_residuals, num_unknowns);
+  vnl_vector<double> b; b.set_size(number_of_residuals); b.fill(0.0);
 
   float max_peak_mag = 0;
   int max_peak_idx = -1;
@@ -248,13 +375,13 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
         {
           if (single_fiber_fit)
           {
-            b_vnl[linear_index + 3*peak_id + k] = (double)odf_peak[k];
-            A_vnl.put(linear_index + 3*peak_id + k, fiber_count, A_vnl.get(linear_index + 3*peak_id + k, fiber_count) + (double)fiber_dir[k]);
+            b[linear_index + 3*peak_id + k] = (double)odf_peak[k];
+            A.put(linear_index + 3*peak_id + k, fiber_count, A.get(linear_index + 3*peak_id + k, fiber_count) + (double)fiber_dir[k]);
           }
           else
           {
-            b_vnl[linear_index + 3*peak_id + k] = (double)odf_peak[k];
-            A_vnl.put(linear_index + 3*peak_id + k, bundle, A_vnl.get(linear_index + 3*peak_id + k, bundle) + (double)fiber_dir[k]);
+            b[linear_index + 3*peak_id + k] = (double)odf_peak[k];
+            A.put(linear_index + 3*peak_id + k, bundle, A.get(linear_index + 3*peak_id + k, bundle) + (double)fiber_dir[k]);
           }
         }
 
@@ -268,13 +395,13 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   vnl_vector_fixed<float,3> min_corr_fiber_dir; min_corr_fiber_dir.fill(0.0);
   for (unsigned int i=0; i<fiber_count; ++i)
   {
-    max_corr_fiber_dir[0] += A_vnl.get(max_peak_idx, i);
-    max_corr_fiber_dir[1] += A_vnl.get(max_peak_idx+1, i);
-    max_corr_fiber_dir[2] += A_vnl.get(max_peak_idx+2, i);
+    max_corr_fiber_dir[0] += A.get(max_peak_idx, i);
+    max_corr_fiber_dir[1] += A.get(max_peak_idx+1, i);
+    max_corr_fiber_dir[2] += A.get(max_peak_idx+2, i);
 
-    min_corr_fiber_dir[0] += A_vnl.get(min_peak_idx, i);
-    min_corr_fiber_dir[1] += A_vnl.get(min_peak_idx+1, i);
-    min_corr_fiber_dir[2] += A_vnl.get(min_peak_idx+2, i);
+    min_corr_fiber_dir[0] += A.get(min_peak_idx, i);
+    min_corr_fiber_dir[1] += A.get(min_peak_idx+1, i);
+    min_corr_fiber_dir[2] += A.get(min_peak_idx+2, i);
   }
 
   float upper_bound = max_peak_mag/max_corr_fiber_dir.magnitude();
@@ -286,16 +413,21 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   MITK_INFO << "Lower bound: " << lower_bound;
   MITK_INFO << "Upper bound: " << upper_bound;
 
+  itk::TimeProbe clock;
+  clock.Start();
+
   MITK_INFO << "Fitting fibers";
   VnlCostFunction cost(num_unknowns);
-  cost.SetProblem(A_vnl, b_vnl);
-  vnl_lbfgsb minimizer(cost);
+  cost.SetProblem(A, b);
 
+  MITK_INFO << g_tol << " " << max_iter;
+  vnl_vector<double> x; x.set_size(num_unknowns); x.fill( (upper_bound-lower_bound)/2 );
+//  OptimizeItk(cost, x, max_iter, lower_bound, upper_bound);
+
+  vnl_lbfgsb minimizer(cost);
   vnl_vector<double> l; l.set_size(num_unknowns); l.fill(lower_bound);
   vnl_vector<double> u; u.set_size(num_unknowns); u.fill(upper_bound);
   vnl_vector<long> bound_selection; bound_selection.set_size(num_unknowns); bound_selection.fill(2);
-  vnl_vector<double> x_vnl; x_vnl.set_size(num_unknowns); x_vnl.fill( (upper_bound-lower_bound)/2 );
-
   minimizer.set_bound_selection(bound_selection);
   minimizer.set_lower_bound(l);
   minimizer.set_upper_bound(u);
@@ -303,30 +435,32 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   minimizer.set_projected_gradient_tolerance(g_tol);
   if (max_iter>0)
     minimizer.set_max_function_evals(max_iter);
+  minimizer.minimize(x);
+  MITK_INFO << "Residual error: " << minimizer.get_end_error();
+  MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
+  MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
 
-  itk::TimeProbe clock;
-  clock.Start();
-  minimizer.minimize(x_vnl);
+//  vnl_sparse_matrix_linear_system<double> S(A, b);
+//  vnl_lsqr linear_solver( S );
+//  linear_solver.set_max_iterations(max_iter);
+//  linear_solver.minimize(x);
+
   clock.Stop();
   int h = clock.GetTotal()/3600;
   int m = ((int)clock.GetTotal()%3600)/60;
   int s = (int)clock.GetTotal()%60;
   MITK_INFO << "Optimization took " << h << "h, " << m << "m and " << s << "s";
 
-  MITK_INFO << "Residual error: " << minimizer.get_end_error();
-  MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
-  MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
-
   std::vector<float> weights;
-//  float max_w = 0;
+  float max_w = 0;
   for (unsigned int i=0; i<num_unknowns; ++i)
   {
-//    MITK_INFO << x_vnl[i];
-//    if (x_vnl[i]>max_w)
-//      max_w = x_vnl[i];
-    weights.push_back(x_vnl[i]);
+//    MITK_INFO << x[i];
+    if (x[i]>max_w)
+      max_w = x[i];
+    weights.push_back(x[i]);
   }
-//  MITK_INFO << "Max w: " << max_w;
+  MITK_INFO << "Max w: " << max_w;
 
   return weights;
 }
@@ -384,7 +518,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("it"))
     max_iter = us::any_cast<int>(parsedArgs["it"]);
 
-  float g_tol = 0.1;
+  float g_tol = 1e-5;
   if (parsedArgs.count("g"))
     g_tol = us::any_cast<float>(parsedArgs["g"]);
 
@@ -417,7 +551,7 @@ int main(int argc, char* argv[])
           mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
           if (inputTractogram.IsNull())
             continue;
-          inputTractogram->ResampleLinear(minSpacing/4);
+          inputTractogram->ResampleLinear(minSpacing/10);
           input_tracts.push_back(inputTractogram);
           fib_names.push_back(fibFile);
         }
@@ -427,7 +561,7 @@ int main(int argc, char* argv[])
         mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(item)[0].GetPointer());
         if (inputTractogram.IsNull())
           continue;
-        inputTractogram->ResampleLinear(minSpacing/4);
+        inputTractogram->ResampleLinear(minSpacing/10);
         input_tracts.push_back(inputTractogram);
         fib_names.push_back(item);
       }

@@ -124,16 +124,6 @@ bool mitk::PolhemusInterface::Connect()
   if (returnValue)
   {
     m_numberOfTools = this->GetNumberOfTools();
-    //On first startUp or if number of tools changed
-    if (m_Hemispheres.empty() || m_Hemispheres.size() != m_numberOfTools)
-    {
-      //Set Hemisphere for all tools to default 1,0,0...
-      mitk::Vector3D temp;
-      mitk::FillVector3D(temp, 1, 0, 0);
-      m_Hemispheres.clear();
-      m_Hemispheres.assign(m_numberOfTools, temp);
-      this->SetHemisphere(-1, temp);
-    }
   }
 
   return returnValue;
@@ -240,21 +230,47 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
   //To switch heisphere tracking of, you need to set a hemisphere vector by calling SetSHemisphere(-1, { (float)1,0,0 })
   if (_HeisphereTrackingEnabeled)
   {
+    //Remember the Hemisphere and Position when switching on to avoid wrong positions ("jumps") when swithing HemiTracking off.
+    for (int i = 0; i < m_numberOfTools; ++i)
+    {
+      m_Hemispheres.push_back(GetHemisphere(i + 1));
+    }
+
     m_pdiDev->SetSHemiTrack(-1);
   }
-  //TODO: Logik umbauen. Vermutlich wenn im negativen Bereich -1, sonst 1 setzen?!
-  //else if (!m_Hemispheres.empty())
-  //{
-  //  for (int i = 0; i < m_numberOfTools; ++i)
-  //    SetHemisphere(i + 1, m_Hemispheres.at(i));
-  //}
+  else if (!m_Hemispheres.empty())
+  {
+    //Get Tool Position. ToDo, this should not be the tool tip but the sensor position. Any chance, to get that from Polhemus interface?!
+    std::vector<mitk::PolhemusInterface::trackingData> _position;
+    if (m_continousTracking)
+    {
+      _position = GetLastFrame();
+    }
+    else
+    {
+      _position = GetSingleFrame();
+    }
+    for (int i = 0; i < m_numberOfTools; ++i)
+    {
+      //Scalar product between mitk::point and mitk::vector
+      double _scalarProduct = _position.at(i).pos.GetVectorFromOrigin() * m_Hemispheres.at(i);
+      //if scalar product is negative, then the tool is in the opposite sphere then when we started to track.
+      //Hence, we have to set the inverted hemisphere.
+      //For default (1|0|0) this means, if x is negative, we have to set (-1|0|0). But we want to keep it generic if user sets different hemisphere...
+      if (_scalarProduct < 0)
+      {
+        m_Hemispheres.at(i) = -1. * m_Hemispheres.at(i);
+      }
+      //Tool count for Polhemus starts at 1...
+      SetHemisphere(i + 1, m_Hemispheres.at(i));
+    }
+
+  }
   else
   {
-    //Default Hemisphere
+    //Default Hemisphere, first setup...
     mitk::Vector3D temp;
     mitk::FillVector3D(temp, 1, 0, 0);
-    m_Hemispheres.clear();
-    m_Hemispheres.assign(m_numberOfTools, temp);
     this->SetHemisphere(-1, temp);
     //MITK_INFO << m_pdiDev->GetLastResultStr();
   }

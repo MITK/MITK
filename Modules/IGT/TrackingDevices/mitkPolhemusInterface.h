@@ -41,6 +41,9 @@ namespace mitk
 
   /** Documentation:
   *   \brief An object of this class represents the interface to Polhemus trackers.
+  *   All variables with the name "tool" start with index 1, which is the station number of Polhemus.
+  *   Make sure to call functions in this class with parameter "1" if you want to loop over all tools.
+  *   If you need to access an array (e.g. m_Hemisphere), you need to use "_tool -1" and adapt your index for loops...
   *   \ingroup IGT
   */
   class MITKIGT_EXPORT PolhemusInterface : public itk::Object
@@ -83,19 +86,25 @@ namespace mitk
     /** @return Returns the number of tools. Returns 0 if no information is avialable.*/
     unsigned int GetNumberOfTools();
 
-    /** Enables/disables hemisphere tracking for all sensors. */
+    /** Enables/disables hemisphere tracking for all stations/tools. */
     void SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled);
 
-    /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.*/
+    /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.
+        Index starts at "1" for the first tool (i.e. station number of Polhemus). Not 0!
+    */
     void ToggleHemisphere(int _tool = -1);
 
     /** Convenient method to print the status of the tracking device (true/false) if connection is established. For debugging...*/
     void PrintStatus();
 
-    /** Sets the Hemisphere of tool _tool to the vector _hemisphere */
+    /** Sets the Hemisphere of tool _tool to the vector _hemisphere. "-1" sets all tools.
+        Index starts at "1" for the first tool (i.e. station number of Polhemus). Not 0!
+    */
     void SetHemisphere(int _tool, mitk::Vector3D _hemisphere);
 
-    /** Get the Hemisphere for _tool as mitk vector */
+    /** Get the Hemisphere for _tool as mitk vector. -1 ("all tools") returns hemisphere of first tool.
+        Index starts at "1" for the first tool (i.e. station number of Polhemus). Not 0!
+    */
     mitk::Vector3D GetHemisphere(int _tool);
 
   protected:
@@ -124,6 +133,10 @@ namespace mitk
 
   private:
     std::vector<mitk::Vector3D> m_Hemispheres;
+
+    //This vector stores the order of tools, which are available.
+    //E.g. only Sensor 1 and 3 are attached, then this vector maps the first tool (0) to Polhemus identifier 1 and the second tool (1) to Polhemus 3.
+    std::vector<int> m_ToolName;
 
   };
 }//mitk

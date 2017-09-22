@@ -126,8 +126,12 @@ bool mitk::PolhemusInterface::Connect()
     m_numberOfTools = this->GetNumberOfTools();
   }
 
-  return returnValue;
+  //TODO: Hier muss die ToolListe irgendwie erstellt werden. Das muss das device wissen. arg.
+  m_ToolName.push_back(1);
+  m_ToolName.push_back(3);
+  //HACK ENDE
 
+  return returnValue;
 }
 
 bool mitk::PolhemusInterface::Disconnect()
@@ -226,19 +230,28 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
 
 void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled)
 {
+  //only if connection is ready!
+  if (!this->m_pdiDev->CnxReady())
+    return;
+
   //HemisphereTracking is switched on by SetSHemiTrack(-1). "-1" means for all sensors.
   //To switch heisphere tracking of, you need to set a hemisphere vector by calling SetSHemisphere(-1, { (float)1,0,0 })
   if (_HeisphereTrackingEnabeled)
   {
     //Remember the Hemisphere and Position when switching on to avoid wrong positions ("jumps") when swithing HemiTracking off.
-    for (int i = 0; i < m_numberOfTools; ++i)
+    if (m_Hemispheres.empty())
     {
-      m_Hemispheres.push_back(GetHemisphere(i + 1));
+      //only if it is empty. Otherwise, it might already be on and we overwrite it with (0|0|0).
+      for (int i = 0; i < m_numberOfTools; ++i)
+      {
+        m_Hemispheres.push_back(GetHemisphere(m_ToolName[i]));
+      }
     }
-
     m_pdiDev->SetSHemiTrack(-1);
   }
-  else if (!m_Hemispheres.empty())
+
+  //switch HemiTracking OFF
+  else
   {
     //Get Tool Position. ToDo, this should not be the tool tip but the sensor position. Any chance, to get that from Polhemus interface?!
     std::vector<mitk::PolhemusInterface::trackingData> _position;
@@ -250,8 +263,24 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
     {
       _position = GetSingleFrame();
     }
+
+    if (m_Hemispheres.empty())
+    {
+      //Default Hemisphere for all tools, maybe the first setup...
+      //But we still check the position, 'cause maybe the tool is in negative space...
+      mitk::Vector3D temp;
+      mitk::FillVector3D(temp, 1, 0, 0);
+      m_Hemispheres.assign(m_numberOfTools, temp);
+    }
+
     for (int i = 0; i < m_numberOfTools; ++i)
     {
+      if (m_Hemispheres.at(i).GetNorm() == 0)
+      {
+        //hemisphere vector can be 0 if Polhemus was in "HemiTracking" status when MITK connected or when user manually set it...
+        mitk::FillVector3D(m_Hemispheres.at(i), 1, 0, 0);
+      }
+
       //Scalar product between mitk::point and mitk::vector
       double _scalarProduct = _position.at(i).pos.GetVectorFromOrigin() * m_Hemispheres.at(i);
       //if scalar product is negative, then the tool is in the opposite sphere then when we started to track.
@@ -261,62 +290,61 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
       {
         m_Hemispheres.at(i) = -1. * m_Hemispheres.at(i);
       }
-      //Tool count for Polhemus starts at 1...
-      SetHemisphere(i + 1, m_Hemispheres.at(i));
-    }
 
-  }
-  else
-  {
-    //Default Hemisphere, first setup...
-    mitk::Vector3D temp;
-    mitk::FillVector3D(temp, 1, 0, 0);
-    this->SetHemisphere(-1, temp);
-    //MITK_INFO << m_pdiDev->GetLastResultStr();
+      SetHemisphere(m_ToolName[i], m_Hemispheres.at(i));
+    }
+    //clean up hemispheres!
+    m_Hemispheres.clear();
   }
 }
 
 void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
 {
+  //only if connection is ready!
+  if (!this->m_pdiDev->CnxReady())
+    return;
+
+  //we have a single tool number, which is identical with Polhemus index, i.e. first tool is "1", not "0"...
+  //is hemiTracking on?
   BOOL _hemiTrack;
-  //-1 == all tools
+  m_pdiDev->GetSHemiTrack(_tool, _hemiTrack);
+
+  //if hemiTracing is on, switch it off.
+  if (_hemiTrack)
+    SetHemisphereTrackingEnabled(false);
+
+  //toggel.
   if (_tool == -1)
   {
+    //GetHemisphere(-1) returns the first tool. Hence, we have to loop over all tools manually...
     for (int i = 0; i < m_numberOfTools; ++i)
     {
-      //is hemiTrack on?
-      m_pdiDev->GetSHemiTrack(i,_hemiTrack);
-
-      m_Hemispheres.at(i)[0] = -m_Hemispheres.at(i)[0];
-      m_Hemispheres.at(i)[1] = -m_Hemispheres.at(i)[1];
-      m_Hemispheres.at(i)[2] = -m_Hemispheres.at(i)[2];
-      SetHemisphere(i, m_Hemispheres.at(i));
-      if (_hemiTrack) m_pdiDev->SetSHemiTrack(i);
+      this->SetHemisphere(m_ToolName[i], -1.*this->GetHemisphere(m_ToolName[i]));
     }
   }
   else
   {
-    //is hemiTrack on?
-    m_pdiDev->GetSHemiTrack(_tool, _hemiTrack);
-
-    m_Hemispheres.at(_tool)[0] = -m_Hemispheres.at(_tool)[0];
-    m_Hemispheres.at(_tool)[1] = -m_Hemispheres.at(_tool)[1];
-    m_Hemispheres.at(_tool)[2] = -m_Hemispheres.at(_tool)[2];
-    SetHemisphere(_tool, m_Hemispheres.at(_tool));
-    if (_hemiTrack) m_pdiDev->SetSHemiTrack(_tool);
+    this->SetHemisphere(_tool, -1.*this->GetHemisphere(_tool));
   }
 
-
-
+  //if hemiTracing was on, switch it on again.
+  if (_hemiTrack)
+    SetHemisphereTrackingEnabled(true);
 }
 
 void mitk::PolhemusInterface::SetHemisphere(int _tool, mitk::Vector3D _hemisphere)
 {
+  //only if connection is ready!
+  if (!this->m_pdiDev->CnxReady())
+    return;
   m_pdiDev->SetSHemisphere(_tool, { (float)_hemisphere[0], (float)_hemisphere[1], (float)_hemisphere[2] });
 }
 
 mitk::Vector3D mitk::PolhemusInterface::GetHemisphere(int _tool)
 {
+  //only if connection is ready!
+  if (!this->m_pdiDev->CnxReady())
+    return nullptr;
   PDI3vec _hemisphere;
   mitk::Vector3D _returnVector;
 

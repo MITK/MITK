@@ -5,7 +5,6 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
     tinyxml
     PUBLIC ITK
-    PUBLIC Boost
 )
 
 add_subdirectory(MCxyz)

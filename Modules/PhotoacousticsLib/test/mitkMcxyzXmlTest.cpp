@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 
 #include <mitkPAProbe.h>
-#include <boost\locale.hpp>
 
 // us
 #include <usModule.h>
@@ -26,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usModuleResourceStream.h>
-
+#include <mitkLocaleSwitch.h>
 #include <random>
 #include <chrono>
 
@@ -71,8 +70,7 @@ public:
     if (pointSourceXml.IsValid() && pointSourceXml.IsFile())
     {
       us::ModuleResourceStream stream(pointSourceXml);
-      boost::locale::generator gen;
-      stream.std::istream::imbue(gen("en_GB.UTF-8"));
+      stream.std::istream::imbue(std::locale("C"));
       while (std::getline(stream, line))
       {
         *lines = *lines + line + " ";

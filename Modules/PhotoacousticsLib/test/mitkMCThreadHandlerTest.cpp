@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 
 #include <mitkPAMonteCarloThreadHandler.h>
-#include <boost\locale.hpp>
 
 // us
 #include <usModule.h>

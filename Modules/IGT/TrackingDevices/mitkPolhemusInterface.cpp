@@ -126,10 +126,40 @@ bool mitk::PolhemusInterface::Connect()
     m_numberOfTools = this->GetNumberOfTools();
   }
 
-  //TODO: Hier muss die ToolListe irgendwie erstellt werden. Das muss das device wissen. arg.
-  m_ToolName.push_back(1);
-  m_ToolName.push_back(3);
-  //HACK ENDE
+  //Get the tracking data to find out which tools are available.
+  std::vector<mitk::PolhemusInterface::trackingData> _trackingData;
+  if (m_continousTracking)
+  {
+    _trackingData = GetLastFrame();
+  }
+  else
+  {
+    _trackingData = GetSingleFrame();
+  }
+
+  //if we had tool before, check if they are still the same.
+  if (m_ToolName.size() == _trackingData.size())
+  {
+    for (int i = 0; i < _trackingData.size(); ++i)
+    {
+      //if they are not the same, clear hemispheres and toolNames and break.
+      if (m_ToolName[i] != _trackingData.at(i).id)
+      {
+        m_ToolName.clear();
+        m_Hemispheres.clear();
+        break;
+      }
+    }
+  }
+
+  //if we don't have old tool names or if the old ones don't match any more, assign them again.
+  if (m_ToolName.size() == 0)
+  {
+    for (int i = 0; i < _trackingData.size(); ++i)
+    {
+      m_ToolName.push_back(_trackingData.at(i).id);
+    }
+  }
 
   return returnValue;
 }
@@ -266,8 +296,9 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
 
     if (m_Hemispheres.empty())
     {
-      //Default Hemisphere for all tools, maybe the first setup...
-      //But we still check the position, 'cause maybe the tool is in negative space...
+      //Default Hemisphere for all tools, maybe the first setup.
+      //But we still check the position, 'cause maybe the tool is in negative space.
+      //We can't do that every time, in case the user wants to use e.g. (0|1|0). Therefore, storing the last one makes sense...
       mitk::Vector3D temp;
       mitk::FillVector3D(temp, 1, 0, 0);
       m_Hemispheres.assign(m_numberOfTools, temp);
@@ -306,8 +337,19 @@ void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
 
   //we have a single tool number, which is identical with Polhemus index, i.e. first tool is "1", not "0"...
   //is hemiTracking on?
+  //Get function again doesn't work in continuous mode...
   BOOL _hemiTrack;
+  if (m_continousTracking)
+  {
+    m_pdiDev->StopContPno();
+  }
   m_pdiDev->GetSHemiTrack(_tool, _hemiTrack);
+  if (m_continousTracking)
+  {
+    m_pdiDev->StartContPno(0);
+  }
+
+  MITK_INFO << "HemisphereTracking: " << m_pdiDev->GetLastResultStr();
 
   //if hemiTracing is on, switch it off.
   if (_hemiTrack)
@@ -337,6 +379,7 @@ void mitk::PolhemusInterface::SetHemisphere(int _tool, mitk::Vector3D _hemispher
   //only if connection is ready!
   if (!this->m_pdiDev->CnxReady())
     return;
+
   m_pdiDev->SetSHemisphere(_tool, { (float)_hemisphere[0], (float)_hemisphere[1], (float)_hemisphere[2] });
 }
 
@@ -345,6 +388,7 @@ mitk::Vector3D mitk::PolhemusInterface::GetHemisphere(int _tool)
   //only if connection is ready!
   if (!this->m_pdiDev->CnxReady())
     return nullptr;
+
   PDI3vec _hemisphere;
   mitk::Vector3D _returnVector;
 

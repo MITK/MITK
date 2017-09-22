@@ -48,6 +48,7 @@ set(mitk_modules
   ToFUI
   PhotoacousticsHardware
   PhotoacousticsAlgorithms
+  PhotoacousticsLib
   US
   USUI
   DicomUI

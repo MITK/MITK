@@ -13,7 +13,7 @@
 #include "mitkPAVolumeManipulator.h"
 #include <mitkProperties.h>
 #include <itkDirectory.h>
-#include <itksys\SystemTools.hxx>
+#include <itksys/SystemTools.hxx>
 
 static std::vector<int> splitString(const std::string &s, const char* delim) {
   std::vector<int> elems;

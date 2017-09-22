@@ -251,7 +251,9 @@ void mitk::pa::InSilicoTissueVolume::FillZLayer(int x, int y, double startIdx, d
   SegmentationType segmentationType)
 {
   for (int z = startIdx; z < endIdx; z++)
+  {
     if (IsInsideVolume(x, y, z))
+    {
       if (endIdx - z < 1)
       {
         //Simulate partial volume effects
@@ -274,6 +276,8 @@ void mitk::pa::InSilicoTissueVolume::FillZLayer(int x, int y, double startIdx, d
         m_AnisotropyVolume->SetData(anisotropy, x, y, z);
         m_SegmentationVolume->SetData(segmentationType, x, y, z);
       }
+    }
+  }
 }
 
 void mitk::pa::InSilicoTissueVolume::RandomizeTissueCoefficients(long rngSeed, bool useRngSeed, double percentage)

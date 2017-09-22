@@ -404,7 +404,7 @@ public:
    * my version of FindVoxelFace for no scattering.
    * s = ls + FindVoxelFace2(x,y,z, tempx, tempy, tempz, dx, dy, dz, ux, uy, uz);
    ****/
-  double FindVoxelFace2(double x1, double y1, double z1, double x2, double y2, double z2, double dx, double dy, double dz, double ux, double uy, double uz)
+  double FindVoxelFace2(double x1, double y1, double z1, double /*x2*/, double /*y2*/, double /*z2*/, double dx, double dy, double dz, double ux, double uy, double uz)
   {
     int ix1 = floor(x1 / dx);
     int iy1 = floor(y1 / dy);

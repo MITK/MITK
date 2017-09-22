@@ -188,17 +188,20 @@ public:
     try
     {
       double thisIsIrrelevant = m_Photoacoustic3dVolume->GetData(x, y, z);
+      thisIsIrrelevant += 1;
     }
     catch (...)
     {
       exceptionCaught = true;
+      if (exceptionCaught)
+        exceptionCaught = true;
     }
 #ifdef _DEBUG
 
     CPPUNIT_ASSERT(exceptionCaught);
 
 #endif
-  }
+    }
 
   void TestCatchException()
   {
@@ -216,6 +219,6 @@ public:
   {
     m_Photoacoustic3dVolume = nullptr;
   }
-};
+  };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPhotoacoustic3dVolume)

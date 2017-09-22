@@ -54,7 +54,6 @@ std::string mitk::pa::SimulationBatchGenerator::CreateBatchSimulationString(
   std::string outputFolderName = GetOutputFolderName(parameters);
   std::string savePath = outputFolderName + ".nrrd";
   std::stringstream batchstring;
-  double d = 0;
   for (double d = parameters->GetYOffsetLowerThresholdInCentimeters();
     d <= parameters->GetYOffsetUpperThresholdInCentimeters() + 1e-5;
     d += parameters->GetYOffsetStepInCentimeters())

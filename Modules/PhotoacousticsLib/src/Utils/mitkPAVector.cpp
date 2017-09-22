@@ -85,7 +85,7 @@ void mitk::pa::Vector::Randomize(std::mt19937* rng)
   Randomize(-1, 1, -1, 1, -1, 1, rng);
 }
 
-void mitk::pa::Vector::PrintSelf(std::ostream& os, itk::Indent indent) const
+void mitk::pa::Vector::PrintSelf(std::ostream& os, itk::Indent /*indent*/) const
 {
   os << "X: " << m_Vector.GetElement(0) << std::endl;
   os << "Y: " << m_Vector.GetElement(1) << std::endl;

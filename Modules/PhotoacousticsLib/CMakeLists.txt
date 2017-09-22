@@ -7,6 +7,6 @@ MITK_CREATE_MODULE(
     PUBLIC ITK
 )
 
-add_subdirectory(MCxyz)
+add_subdirectory(MitkMCxyz)
 
 add_subdirectory(test)

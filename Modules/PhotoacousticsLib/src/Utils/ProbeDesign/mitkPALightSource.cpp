@@ -91,7 +91,7 @@ void mitk::pa::LightSource::ParseAngle(TiXmlElement* direction, std::string angl
 {
   double minimum;
   double maximum;
-  DistributionMode mode;
+  DistributionMode mode = DistributionMode::GAUSSIAN;
 
   if (m_Verbose)
     std::cout << "Parsing " << angle << std::endl;

@@ -225,19 +225,23 @@ void mitk::pa::InSilicoTissueVolume::AddSkinAndAirLayers()
     {
       // Add air from index 0 to airvoxel
       if (m_TissueParameters->GetAirThicknessInMillimeters() > mitk::eps)
+      {
         FillZLayer(x, y, 0, airvoxel,
           m_TissueParameters->GetAirAbsorption(),
           m_TissueParameters->GetAirScattering(),
           m_TissueParameters->GetAirAnisotropy(),
           SegmentationType::AIR);
+      }
 
       //Add skin from index airvoxel to skinvoxel
       if (m_TissueParameters->GetSkinThicknessInMillimeters() > mitk::eps)
+      {
         FillZLayer(x, y, airvoxel, skinvoxel,
           m_TissueParameters->GetSkinAbsorption(),
           m_TissueParameters->GetSkinScattering(),
           m_TissueParameters->GetSkinAnisotropy(),
           SegmentationType::SKIN);
+      }
     }
   }
 }

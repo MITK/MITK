@@ -42,14 +42,13 @@ void mitk::pa::NoiseGenerator::ApplyNoiseModel(mitk::pa::Volume::Pointer image, 
   std::normal_distribution<> detector(detectorNoise / 2, detectorNoise / 2);
   std::normal_distribution<> speckle(1, speckleNoise);
 
-  int negativecounter = 0;
-  int length = image->GetXDim() * image->GetYDim() * image->GetZDim();
+  unsigned int negativecounter = 0;
 
   double* data = image->GetData();
 
-  for (int x = 0, xLength = image->GetXDim(); x < xLength; x++)
-    for (int y = 0, yLength = image->GetYDim(); y < yLength; y++)
-      for (int z = 0, zLength = image->GetZDim(); z < zLength; z++)
+  for (unsigned int x = 0, xLength = image->GetXDim(); x < xLength; x++)
+    for (unsigned int y = 0, yLength = image->GetYDim(); y < yLength; y++)
+      for (unsigned int z = 0, zLength = image->GetZDim(); z < zLength; z++)
       {
         double additiveNoise = detector(rng);
 

@@ -118,7 +118,7 @@ public:
   {
     double min = x.min_value();
     if( min<0 )
-     return 10000 * -min;
+      return 10000 * -min;
 
     double cost = S->get_rms_error(x);
     double regu = x.squared_magnitude()/x.size();
@@ -128,29 +128,46 @@ public:
 
   double f(vnl_vector<double> const &x)
   {
+    // cost for x (mean squared error)
     double cost = S->get_rms_error(x);
+    cost *= cost;
 
+    // cost for e^x
+//    vnl_vector<double> x_exp; x_exp.set_size(x.size());
+//    for (unsigned int c=0; c<x.size(); c++)
+//      x_exp[c] = std::exp(x[c]);
+//    vnl_vector<double> d; d.set_size(x.size());
+//    S->multiply(x_exp, d);
+//    d -= m_b;
+//    double cost = d.squared_magnitude()/x.size();
+
+//    // Tikhonov regu
     double regu = x.squared_magnitude()/x.size();
 
+    // aTV regu
+//    double regu = 0;
+//    unsigned int N = m_b.size();
+//    vnl_vector<double> ones; ones.set_size(x.size()); ones.fill(1.0);
+//    vnl_vector<double> means; means.set_size(N);
+//    S->multiply(ones, means);
+
 //    unsigned int norm = 0;
-//    for (unsigned int i=0; i<m_b.size(); ++i)
+//    for (unsigned int i=0; i<N; ++i)
 //    {
 //      if (m_A.get_row(i).empty())
 //        continue;
-
-//      float mean = 0;
-//      for (auto el : m_A.get_row(i))
-//        mean += x[el.first];
-
-//      mean /= m_A.get_row(i).size();
+//      means[i] /= m_A.get_row(i).size();
 
 //      for (auto el : m_A.get_row(i))
 //      {
-//       float d = x[el.first] - mean;
-//       {
-//       regu += d*d;
-//       norm++;
-//       }
+//        float d = 0;
+//        if (x[el.first]>means[i])
+//          d = std::exp(x[el.first]) - std::exp(means[i]);
+//        else
+//          d = x[el.first] - means[i];
+
+//        regu += d*d;
+//        norm++;
 //      }
 //    }
 //    regu /= norm;
@@ -160,27 +177,34 @@ public:
   }
 
   // Finite differences gradient (SLOW)
-//  void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
-//  {
-//    fdgradf(x, dx);
-//  }
+  //  void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  //  {
+  //    fdgradf(x, dx);
+  //  }
 
   void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     dx.fill(0.0);
-    double mag = x.magnitude();
     unsigned int N = m_b.size();
+
+//    vnl_vector<double> x_exp; x_exp.set_size(x.size());
+//    for (unsigned int c=0; c<x.size(); c++)
+//      x_exp[c] = std::exp(x[c]);
 
     vnl_vector<double> d; d.set_size(N);
     S->multiply(x,d);
     d -= m_b;
 
-    vnl_vector<double> numerator; numerator.set_size(x.size());
     S->transpose_multiply(d, dx);
     dx *= 2.0/N;
 
-    if (mag>0)
-      dx += x/mag;
+//    for (unsigned int c=0; c<x.size(); c++)
+//      dx[c] *= x_exp[c];  // only for e^x weights
+
+//    double mag = x.magnitude();
+//    if (mag>0)
+//      dx += x/mag;
+    dx += 2.0*x/x.size();
   }
 
 };
@@ -233,31 +257,31 @@ void OptimizeItk(VnlCostFunction& cf, vnl_vector<double>& x, int iter, double lb
   std::pair< double, double > bounds; bounds.first = lb; bounds.second = ub;
   MITK_INFO <<  bounds;
 
-//  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-//  itk::OnePlusOneEvolutionaryOptimizer::Pointer opt = itk::OnePlusOneEvolutionaryOptimizer::New();
-//  opt->SetCostFunction(itk_cf);
-//  opt->MinimizeOn();
-//  opt->SetInitialPosition(p);
-//  opt->SetNormalVariateGenerator(randGen);
-//  opt->SetMaximumIteration(iter);
-//  opt->StartOptimization();
+  //  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+  //  itk::OnePlusOneEvolutionaryOptimizer::Pointer opt = itk::OnePlusOneEvolutionaryOptimizer::New();
+  //  opt->SetCostFunction(itk_cf);
+  //  opt->MinimizeOn();
+  //  opt->SetInitialPosition(p);
+  //  opt->SetNormalVariateGenerator(randGen);
+  //  opt->SetMaximumIteration(iter);
+  //  opt->StartOptimization();
 
-//  itk::ParticleSwarmOptimizer::Pointer opt = itk::ParticleSwarmOptimizer::New();
-//  opt->SetCostFunction(itk_cf);
-//  opt->SetInitialPosition(p);
-//  opt->SetParameterBounds(bounds, x.size());
-//  opt->SetMaximalNumberOfIterations(iter);
-//  opt->SetNumberOfParticles(100);
-//  opt->SetParametersConvergenceTolerance(0.01, x.size());
-//  opt->SetNumberOfGenerationsWithMinimalImprovement(3);
-//  opt->StartOptimization();
+  //  itk::ParticleSwarmOptimizer::Pointer opt = itk::ParticleSwarmOptimizer::New();
+  //  opt->SetCostFunction(itk_cf);
+  //  opt->SetInitialPosition(p);
+  //  opt->SetParameterBounds(bounds, x.size());
+  //  opt->SetMaximalNumberOfIterations(iter);
+  //  opt->SetNumberOfParticles(100);
+  //  opt->SetParametersConvergenceTolerance(0.01, x.size());
+  //  opt->SetNumberOfGenerationsWithMinimalImprovement(3);
+  //  opt->StartOptimization();
 
-//  itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
-//  opt->SetCostFunction(itk_cf);
-//  opt->SetInitialPosition(p);
-//  opt->SetMinimize(true);
-//  opt->SetNumberOfIterations(iter);
-//  opt->StartOptimization();
+  //  itk::GradientDescentOptimizer::Pointer opt = itk::GradientDescentOptimizer::New();
+  //  opt->SetCostFunction(itk_cf);
+  //  opt->SetInitialPosition(p);
+  //  opt->SetMinimize(true);
+  //  opt->SetNumberOfIterations(iter);
+  //  opt->StartOptimization();
 
   itk::SPSAOptimizer::Pointer opt = itk::SPSAOptimizer::New();
   opt->SetCostFunction(itk_cf);
@@ -269,7 +293,7 @@ void OptimizeItk(VnlCostFunction& cf, vnl_vector<double>& x, int iter, double lb
   x.copy_in(opt->GetCurrentPosition().data_block());
   for (unsigned int i=0; i<x.size(); i++)
     MITK_INFO << opt->GetCurrentPosition()[i];
-//  MITK_INFO << "Cost: " << opt->GetCurrentCost();
+  //  MITK_INFO << "Cost: " << opt->GetCurrentCost();
 
 }
 
@@ -311,6 +335,9 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
 
   float min_peak_mag = 999999999;
   int min_peak_idx = -1;
+
+  double FD = 0;
+  double TD = 0;
 
   unsigned int fiber_count = 0;
   for (unsigned int bundle=0; bundle<input_tracts.size(); bundle++)
@@ -371,6 +398,9 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
           min_peak_idx = linear_index + 3*peak_id;
         }
 
+        FD += peak_mag;
+        TD += 1;
+
         for (unsigned int k=0; k<3; ++k)
         {
           if (single_fiber_fit)
@@ -390,6 +420,11 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
       ++fiber_count;
     }
   }
+
+  double mu = FD/TD;
+  mu = 1.0;
+  MITK_INFO << "mu: " << mu;
+//  A *= mu;
 
   vnl_vector_fixed<float,3> max_corr_fiber_dir; max_corr_fiber_dir.fill(0.0);
   vnl_vector_fixed<float,3> min_corr_fiber_dir; min_corr_fiber_dir.fill(0.0);
@@ -422,7 +457,8 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
 
   MITK_INFO << g_tol << " " << max_iter;
   vnl_vector<double> x; x.set_size(num_unknowns); x.fill( (upper_bound-lower_bound)/2 );
-//  OptimizeItk(cost, x, max_iter, lower_bound, upper_bound);
+
+  //  OptimizeItk(cost, x, max_iter, lower_bound, upper_bound);
 
   vnl_lbfgsb minimizer(cost);
   vnl_vector<double> l; l.set_size(num_unknowns); l.fill(lower_bound);
@@ -440,10 +476,10 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
 
-//  vnl_sparse_matrix_linear_system<double> S(A, b);
-//  vnl_lsqr linear_solver( S );
-//  linear_solver.set_max_iterations(max_iter);
-//  linear_solver.minimize(x);
+  //  vnl_sparse_matrix_linear_system<double> S(A, b);
+  //  vnl_lsqr linear_solver( S );
+  //  linear_solver.set_max_iterations(max_iter);
+  //  linear_solver.minimize(x);
 
   clock.Stop();
   int h = clock.GetTotal()/3600;
@@ -451,11 +487,12 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   int s = (int)clock.GetTotal()%60;
   MITK_INFO << "Optimization took " << h << "h, " << m << "m and " << s << "s";
 
+  x *= mu;
   std::vector<float> weights;
   float max_w = 0;
   for (unsigned int i=0; i<num_unknowns; ++i)
   {
-//    MITK_INFO << x[i];
+    MITK_INFO << x[i];
     if (x[i]>max_w)
       max_w = x[i];
     weights.push_back(x[i]);
@@ -582,6 +619,7 @@ int main(int argc, char* argv[])
           ++fiber_count;
         }
 
+        fib->Compress(0.1);
         std::string name = fib_names.at(bundle);
         name = ist::GetFilenameWithoutExtension(name);
         mitk::IOUtil::Save(fib, outRoot + name + "_fitted.fib");
@@ -596,6 +634,7 @@ int main(int argc, char* argv[])
         MITK_INFO << name << ": " << weights.at(i);
         mitk::FiberBundle::Pointer bundle = input_tracts.at(i);
         bundle->SetFiberWeights(weights.at(i));
+        bundle->Compress(0.1);
         mitk::IOUtil::Save(bundle, outRoot + name + "_fitted.fib");
       }
     }

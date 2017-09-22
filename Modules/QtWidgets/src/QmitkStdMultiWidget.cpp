@@ -1747,24 +1747,26 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
     bool imageIsFlat = image->GetDimension(2) < 2 && seriesNumber == "";
 
-    for(int i = 0; i < 3; i++) {
-      if (m_displayPositionInfo && !imageIsFlat) {
-        _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
-        if (timeSteps > 1) {
-          _infoStringStream[axisIndices[i]]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
+    if (!imageIsFlat) {
+      for(int i = 0; i < 3; i++) {
+        if (m_displayPositionInfo) {
+          _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
+          if (timeSteps > 1) {
+            _infoStringStream[axisIndices[i]]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
+          }
+          if (componentMax > 1) {
+            _infoStringStream[axisIndices[i]]<<"\nV: " <<(component + 1) << "/" << componentMax;
+          }
+          if (seriesNumber != "") {
+            _infoStringStream[axisIndices[i]] << "\nSe: " << seriesNumber;
+          }
+        } else {
+          _infoStringStream[axisIndices[i]].clear();
         }
-        if (componentMax > 1) {
-          _infoStringStream[axisIndices[i]]<<"\nV: " <<(component + 1) << "/" << componentMax;
-        }
-        if (seriesNumber != "") {
-          _infoStringStream[axisIndices[i]] << "\nSe: " << seriesNumber;
-        }
-      } else {
-        _infoStringStream[axisIndices[i]].clear();
+        cornerimgtext[axisIndices[i]] = _infoStringStream[axisIndices[i]].str();
+        setCornerAnnotation(2, axisIndices[i], cornerimgtext[axisIndices[i]].c_str());
+        setViewDirectionAnnontation(image, p[i], axisIndices[i]);
       }
-      cornerimgtext[axisIndices[i]] = _infoStringStream[axisIndices[i]].str();
-      setCornerAnnotation(2, axisIndices[i], cornerimgtext[axisIndices[i]].c_str());
-      setViewDirectionAnnontation(image, p[i], axisIndices[i]);
     }
 
     unsigned long newImageMTime = image->GetMTime();

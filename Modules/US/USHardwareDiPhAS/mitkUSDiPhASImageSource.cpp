@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkIndex.h>
 #include "itkMultiplyImageFilter.h"
 
-
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   : m_Device(device),
   m_StartTime(((float)std::clock()) / CLOCKS_PER_SEC),
@@ -153,11 +152,11 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   // do image processing before displaying it
   if (image.IsNotNull())
   {
-    typedef itk::Image< float, 3 > itkFloatImageType;
     itkFloatImageType::Pointer itkImage;
 
     mitk::CastToItkImage(image, itkImage);
     image = mitk::GrabItkImageMemory(itkImage); //thereby using float images
+    image = CutOffTop(image, 165);
 
     // now apply filters to the image, if the options have been selected.
     if ((m_CompensateForScattering || m_UseBModeFilter) && m_DataType == DataType::Beamformed_Short)
@@ -273,8 +272,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   // we use this seperate ApplyBmodeFilter Method for processing of two-dimensional images
 
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
-  typedef itk::Image< float, 3 > itkFloatImageType;
-  
+
   typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
   BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter
 
@@ -282,10 +280,8 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New(); // No LogFilter
 
   itkFloatImageType::Pointer itkImage;
-
-  mitk::CastToItkImage(image, itkImage);
-
   itkFloatImageType::Pointer bmode;
+  mitk::CastToItkImage(image, itkImage);
 
   if (useLogFilter)
   {
@@ -302,9 +298,28 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   return mitk::GrabItkImageMemory(bmode);
 }
 
+mitk::Image::Pointer mitk::USDiPhASImageSource::CutOffTop(mitk::Image::Pointer image, int cutOffSize)
+{
+  typedef itk::CropImageFilter < itkFloatImageType, itkFloatImageType > CutImageFilter;
+  itkFloatImageType::SizeType cropSize;
+  itkFloatImageType::Pointer itkImage;
+  mitk::CastToItkImage(image, itkImage);
+
+  cropSize[0] = 0;
+  if(itkImage->GetLargestPossibleRegion().GetSize()[1] == 2048)
+    cropSize[1] = cutOffSize;
+  else
+    cropSize[1] = 0;
+  cropSize[2] = 0;
+  CutImageFilter::Pointer cutOffFilter = CutImageFilter::New();
+  cutOffFilter->SetInput(itkImage);
+  cutOffFilter->SetLowerBoundaryCropSize(cropSize);
+  cutOffFilter->UpdateLargestPossibleRegion();
+  return mitk::GrabItkImageMemory(cutOffFilter->GetOutput());
+}
+
 mitk::Image::Pointer mitk::USDiPhASImageSource::ResampleOutputVertical(mitk::Image::Pointer image, float verticalSpacing)
 {
-  typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
   ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
 
@@ -333,7 +348,6 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ResampleOutputVertical(mitk::Ima
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
 {
-  typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
 
   itkFloatImageType::Pointer itkImage;
@@ -348,8 +362,6 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyScatteringCompensation(mitk
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3])
 {
-  typedef itk::Image< double, 3 > itkFloatImageType; 
-  
   typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
   ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
 
@@ -382,7 +394,6 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Poi
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::MultiplyImage(mitk::Image::Pointer inputImage, double value)
 {
-  typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
 
   itkFloatImageType::Pointer itkImage;

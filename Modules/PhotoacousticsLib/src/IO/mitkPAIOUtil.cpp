@@ -146,12 +146,17 @@ std::vector<std::string> mitk::pa::IOUtil::GetAllChildfoldersFromFolder(std::str
 
   itksys::Directory directoryHandler;
   directoryHandler.Load(folderPath.c_str());
-  for (unsigned int fileIndex = 2, numFiles = directoryHandler.GetNumberOfFiles(); fileIndex < numFiles; ++fileIndex)
+  for (unsigned int fileIndex = 0, numFiles = directoryHandler.GetNumberOfFiles(); fileIndex < numFiles; ++fileIndex)
   {
-    std::string filename = folderPath + "/" + std::string(directoryHandler.GetFile(fileIndex));
+    std::string foldername = std::string(directoryHandler.GetFile(fileIndex));
+    std::string filename = folderPath + "/" + foldername;
     if (itksys::SystemTools::FileIsDirectory(filename))
     {
-      returnVector.push_back(filename);
+      if (foldername != std::string(".") && foldername != std::string(".."))
+      {
+        MITK_INFO << filename;
+        returnVector.push_back(filename);
+      }
       continue;
     }
 

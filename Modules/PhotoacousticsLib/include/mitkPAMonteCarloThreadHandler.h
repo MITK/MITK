@@ -38,10 +38,18 @@ namespace mitk {
 
       mitkClassMacroItkParent(MonteCarloThreadHandler, itk::LightObject)
         mitkNewMacro2Param(MonteCarloThreadHandler, long, bool)
+        mitkNewMacro3Param(MonteCarloThreadHandler, long, bool, bool)
 
         long GetNextWorkPackage();
 
       void SetPackageSize(long sizeInMilliseconsOrNumberOfPhotons);
+
+      itkGetMacro(NumberPhotonsToSimulate, long);
+      itkGetMacro(NumberPhotonsRemaining, long);
+      itkGetMacro(WorkPackageSize, long);
+      itkGetMacro(SimulationTime, long);
+      itkGetMacro(SimulateOnTimeBasis, bool);
+      itkGetMacro(Verbose, bool);
 
     protected:
       long m_NumberPhotonsToSimulate;
@@ -50,6 +58,7 @@ namespace mitk {
       long m_SimulationTime;
       long m_Time;
       bool m_SimulateOnTimeBasis;
+      bool m_Verbose;
       std::mutex m_MutexRemainingPhotonsManipulation;
 
       /**
@@ -58,8 +67,28 @@ namespace mitk {
        * @param simulateOnTimeBasis
        */
       MonteCarloThreadHandler(long timInMilliseconsOrNumberofPhotons, bool simulateOnTimeBasis);
+
+      /**
+      * @brief PhotoacousticThreadhandler
+      * @param timInMilliseconsOrNumberofPhotons
+      * @param simulateOnTimeBasis
+      * @param verbose
+      */
+      MonteCarloThreadHandler(long timInMilliseconsOrNumberofPhotons, bool simulateOnTimeBasis, bool verbose);
       virtual ~MonteCarloThreadHandler();
     };
+
+    /**
+    * @brief Equal A function comparing two thread handlers for beeing equal
+    *
+    * @param rightHandSide A object to be compared
+    * @param leftHandSide A object to be compared
+    * @param eps tolarence for comparison. You can use mitk::eps in most cases.
+    * @param verbose flag indicating if the user wants detailed console output or not.
+    * @return true, if all subsequent comparisons are true, false otherwise
+    */
+    MITKPHOTOACOUSTICSLIB_EXPORT bool Equal(const MonteCarloThreadHandler::Pointer leftHandSide,
+      const MonteCarloThreadHandler::Pointer rightHandSide, double eps, bool verbose);
   }
 }
 

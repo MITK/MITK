@@ -189,6 +189,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_WorkerThread, SIGNAL(started()), m_Worker, SLOT(ThreadFunc()));
     connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnConnected()));
     connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnDisconnected()));
+    connect(m_Worker, SIGNAL(StartTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStartTracking()));
+    connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStopTracking()));
 
     //move the worker to the thread
     m_Worker->moveToThread(m_WorkerThread);

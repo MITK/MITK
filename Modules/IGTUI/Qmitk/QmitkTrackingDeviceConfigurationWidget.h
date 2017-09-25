@@ -72,6 +72,17 @@ public slots:
   */
   void OnDisconnected();
 
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Start Tracking" was clicked and the device successfully started tracking.
+  * Can e.g. be used to activate options of a tracking device only when tracking is started.
+  */
+  void OnStartTracking();
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Stop Tracking" was clicked and the device successful stopped tracking.
+  * Can e.g. be used to activate/disactivate options when device is not tracking.
+  */
+  void OnStopTracking();
+
 protected:
 
   /// \brief Creation of the connections

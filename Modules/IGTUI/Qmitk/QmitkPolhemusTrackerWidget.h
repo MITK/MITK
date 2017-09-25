@@ -79,5 +79,11 @@ public:
   * Can e.g. be used to activate/disactivate options of a tracking device.
   */
   virtual void OnDisconnected();
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Start Tracking" was clicked and the device successfully started tracking.
+  * Can e.g. be used to activate options of a tracking device only when tracking is started.
+  */
+  virtual void OnStartTracking();
+
 };
 #endif

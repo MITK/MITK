@@ -24,7 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Path.h>
 #include <QSettings>
 
-#include <QmitkToolSelectionWidget.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCameraController.h>
+#include "vtkRenderer.h"
+#include "vtkCamera.h"
 
 const std::string QmitkPolhemusTrackerWidget::VIEW_ID = "org.mitk.views.PolhemusTrackerWidget";
 
@@ -190,6 +193,14 @@ void QmitkPolhemusTrackerWidget::OnConnected()
       m_Controls->m_ToolSelection->addItem(m_TrackingDevice->GetTool(i)->GetToolName());
     }
   }
+}
+
+void QmitkPolhemusTrackerWidget::OnStartTracking()
+{
+  //Rotate mitk standard multi widget, so that the view matches the sensor. Positive x == right, y == front, z == down;
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToPosterior();
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 0, -1);
+
 }
 
 void QmitkPolhemusTrackerWidget::OnDisconnected()

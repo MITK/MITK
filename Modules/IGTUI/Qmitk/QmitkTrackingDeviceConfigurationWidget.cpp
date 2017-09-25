@@ -359,3 +359,12 @@ void QmitkTrackingDeviceConfigurationWidget::OnDisconnected()
 {
   this->GetWidget(this->GetCurrentDeviceName())->OnDisconnected();
 }
+
+void QmitkTrackingDeviceConfigurationWidget::OnStartTracking()
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnStartTracking();
+}
+void QmitkTrackingDeviceConfigurationWidget::OnStopTracking()
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnStopTracking();
+}

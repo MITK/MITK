@@ -106,6 +106,9 @@ namespace mitk
     /** Enables/disables hemisphere tracking for all sensors. */
     void SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled);
 
+    /** Is Hemisphere Tracking Enabled for this tool? */
+    bool GetHemisphereTrackingEnabled(int _tool);
+
     /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.*/
     void ToggleHemisphere(int _tool = -1);
 

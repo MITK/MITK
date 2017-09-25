@@ -337,19 +337,9 @@ void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
 
   //we have a single tool number, which is identical with Polhemus index, i.e. first tool is "1", not "0"...
   //is hemiTracking on?
-  //Get function again doesn't work in continuous mode...
-  BOOL _hemiTrack;
-  if (m_continousTracking)
-  {
-    m_pdiDev->StopContPno();
-  }
-  m_pdiDev->GetSHemiTrack(_tool, _hemiTrack);
-  if (m_continousTracking)
-  {
-    m_pdiDev->StartContPno(0);
-  }
+  bool _hemiTrack = GetHemisphereTrackingEnabled(_tool);
 
-  MITK_INFO << "HemisphereTracking: " << m_pdiDev->GetLastResultStr();
+  //MITK_INFO << "HemisphereTracking: " << m_pdiDev->GetLastResultStr();
 
   //if hemiTracing is on, switch it off.
   if (_hemiTrack)
@@ -423,4 +413,22 @@ void mitk::PolhemusInterface::PrintStatus()
 std::vector<int> mitk::PolhemusInterface::GetToolPorts()
 {
   return m_ToolPorts;
+}
+
+
+bool mitk::PolhemusInterface::GetHemisphereTrackingEnabled(int _tool)
+{
+  BOOL _hemiTrack;
+  //Get function again doesn't work in continuous mode...
+  if (m_continousTracking)
+  {
+    m_pdiDev->StopContPno();
+  }
+  m_pdiDev->GetSHemiTrack(_tool, _hemiTrack);
+  if (m_continousTracking)
+  {
+    m_pdiDev->StartContPno(0);
+  }
+
+  return _hemiTrack;
 }

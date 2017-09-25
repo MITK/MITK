@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <QScrollBar>
+#include <QMessageBox>
 
 #include <itksys/SystemTools.hxx>
 #include <Poco/Path.h>
@@ -53,7 +54,6 @@ void QmitkPolhemusTrackerWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkPolhemusTrackerWidget;
     m_Controls->setupUi(parent);
   }
-
 }
 
 void QmitkPolhemusTrackerWidget::CreateConnections()
@@ -68,7 +68,6 @@ void QmitkPolhemusTrackerWidget::CreateConnections()
   }
 }
 
-
 mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::ConstructTrackingDevice()
 {
   if (m_TrackingDevice.IsNull())
@@ -79,8 +78,6 @@ mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::ConstructTrackingDevic
 
   return static_cast<mitk::TrackingDevice::Pointer>(m_TrackingDevice);
 }
-
-
 
 QmitkPolhemusTrackerWidget* QmitkPolhemusTrackerWidget::Clone(QWidget* parent) const
 {
@@ -98,6 +95,8 @@ void QmitkPolhemusTrackerWidget::on_m_ToggleHemisphere_clicked()
 {
   // Index 0 == All Tools == -1 for Polhemus interface; Index 2 == Tool 2 == 1 for Polhemus; etc...
   m_TrackingDevice->ToggleHemisphere(GetSelectedToolIndex());
+
+  MITK_INFO << "Toggle Hemisphere for tool " << m_Controls->m_ToolSelection->currentText().toStdString();
 }
 
 void QmitkPolhemusTrackerWidget::on_m_SetHemisphere_clicked()
@@ -110,21 +109,70 @@ void QmitkPolhemusTrackerWidget::on_m_SetHemisphere_clicked()
   //disable the checkbox in case it was on before, so that it can be reactivated...
   if (_hemisphere.GetNorm() != 0)
     m_Controls->m_hemisphereTracking->setChecked(false);
+
+  MITK_INFO << "Hemisphere set for tool " << m_Controls->m_ToolSelection->currentText().toStdString();
 }
 
 void QmitkPolhemusTrackerWidget::on_m_GetHemisphere_clicked()
 {
-
-
   mitk::Vector3D _hemisphere = m_TrackingDevice->GetHemisphere(GetSelectedToolIndex());
   m_Controls->m_Hemisphere_X->setValue(_hemisphere[0]);
   m_Controls->m_Hemisphere_Y->setValue(_hemisphere[1]);
   m_Controls->m_Hemisphere_Z->setValue(_hemisphere[2]);
+
+  MITK_INFO << "Updated SpinBox for Hemisphere of tool " << m_Controls->m_ToolSelection->currentText().toStdString();
 }
 
 void QmitkPolhemusTrackerWidget::on_m_AdjustHemisphere_clicked()
 {
-  MITK_INFO << "Not implemented yet!";
+  int _tool = GetSelectedToolIndex();
+  QMessageBox msgBox;
+  QString _text;
+  if (_tool == -1)
+  {
+    _text.append("Adjusting hemisphere for all tools.");
+    msgBox.setText(_text);
+    _text.clear();
+    _text = tr("Please make sure, that the entire tools (including tool tip AND sensor) are placed in the positive x hemisphere. Press 'Adjust hemisphere' if you are ready.");
+    msgBox.setInformativeText(_text);
+  }
+  else
+  {
+    _text.append("Adjusting hemisphere for tool '");
+    _text.append(m_Controls->m_ToolSelection->currentText());
+    _text.append(tr("' at port %2.").arg(_tool));
+    msgBox.setText(_text);
+    _text.clear();
+    _text = tr("Please make sure, that the entire tool (including tool tip AND sensor) is placed in the positive x hemisphere. Press 'Adjust hemisphere' if you are ready.");
+    msgBox.setInformativeText(_text);
+  }
+
+  QPushButton *adjustButton = msgBox.addButton(tr("Adjust hemisphere"), QMessageBox::ActionRole);
+  QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+  msgBox.exec();
+  if (msgBox.clickedButton() == adjustButton) {
+    // adjust
+    mitk::Vector3D _hemisphere;
+    mitk::FillVector3D(_hemisphere, 1, 0, 0);
+
+    //Was HemiTracking on before?
+    bool _hemiTrack = m_TrackingDevice->GetHemisphereTrackingEnabled(_tool);
+
+    //Set Hemisphere to (1|0|0) where user placed the tool
+    m_TrackingDevice->SetHemisphere(_tool, _hemisphere);
+
+    //If HemiTrack was on, switch it on again by setting (0|0|0). Don't use general fuction SetHemisphereTrackingEnabled, as we might only adapt a single tool.
+    if (_hemiTrack)
+    {
+      mitk::FillVector3D(_hemisphere, 0, 0, 0);
+      m_TrackingDevice->SetHemisphere(_tool, _hemisphere);
+    }
+    MITK_INFO << "Adjusting Hemisphere for tool " << m_Controls->m_ToolSelection->currentText().toStdString();
+  }
+  else if (msgBox.clickedButton() == cancelButton) {
+    // abort
+    MITK_INFO << "Cancel 'Adjust hemisphere'. No harm done...";
+  }
 }
 
 void QmitkPolhemusTrackerWidget::OnConnected()
@@ -142,9 +190,7 @@ void QmitkPolhemusTrackerWidget::OnConnected()
       m_Controls->m_ToolSelection->addItem(m_TrackingDevice->GetTool(i)->GetToolName());
     }
   }
-
 }
-
 
 void QmitkPolhemusTrackerWidget::OnDisconnected()
 {
@@ -168,13 +214,12 @@ void QmitkPolhemusTrackerWidget::SetAdvancedSettingsVisible(bool _enable)
 int QmitkPolhemusTrackerWidget::GetSelectedToolIndex()
 {
   // Index 0 == All Tools == -1 for Polhemus interface; Index 1 == Tool 1 == 1 for Polhemus Interface; etc...
-  int _index = m_Controls->m_ToolSelection->currentIndex()-1;
+  int _index = m_Controls->m_ToolSelection->currentIndex() - 1;
   if (_index != -1)
   {
     //we need to find the internal Polhemus index for this tool. This is stored in the identifier of a navigation tool or as Port in PolhemusTool.
     mitk::PolhemusTool* _tool = dynamic_cast<mitk::PolhemusTool*>(m_TrackingDevice->GetToolByName(m_Controls->m_ToolSelection->currentText().toStdString()));
     _index = _tool->GetToolPort();
-
   }
   return _index;
 }

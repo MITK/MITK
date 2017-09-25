@@ -111,6 +111,9 @@ namespace mitk
     */
     std::vector<int> GetToolPorts();
 
+    /** Is Hemisphere Tracking Enabled for this tool? */
+    bool GetHemisphereTrackingEnabled(int _tool);
+
   protected:
     /**
     * \brief standard constructor

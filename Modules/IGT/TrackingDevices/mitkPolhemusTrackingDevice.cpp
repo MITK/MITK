@@ -324,3 +324,12 @@ mitk::Vector3D mitk::PolhemusTrackingDevice::GetHemisphere(int _tool)
 {
   return this->m_Device->GetHemisphere(_tool);
 }
+
+/** Is Hemisphere Tracking Enabled for this tool? */
+bool mitk::PolhemusTrackingDevice::GetHemisphereTrackingEnabled(int _tool)
+{
+  if (_tool == -1)
+    return this->m_HemisphereTrackingEnabled;
+  else
+    return this->m_Device->GetHemisphereTrackingEnabled(_tool);
+}

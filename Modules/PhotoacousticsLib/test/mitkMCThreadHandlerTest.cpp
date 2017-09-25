@@ -32,10 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkMCThreadHandlerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkMCThreadHandlerTestSuite);
-  MITK_TEST(testCorrectTimeMeasure);
+  MITK_TEST(testConstructorBehavior);
   MITK_TEST(testCorrectNumberOfPhotons);
   MITK_TEST(testCorrectNumberOfPhotonsWithUnevenPackageSize);
   MITK_TEST(testCorrectNumberOfPhotonsWithTooLargePackageSize);
+  MITK_TEST(testCorrectTimeMeasure);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -49,11 +50,19 @@ public:
   {
   }
 
+  void testConstructorBehavior()
+  {
+    auto threadHandler1 = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, true, true);
+    auto threadHandler2 = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, true);
+
+    CPPUNIT_ASSERT(mitk::pa::Equal(threadHandler1, threadHandler2, 1e-6, true));
+  }
+
   void testCorrectTimeMeasure()
   {
     for (int i = 0; i < 10; i++)
     {
-      m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, true);
+      m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, true, false);
       auto timeBefore = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
       long nextWorkPackage = 0;
       while ((nextWorkPackage = m_MonteCarloThreadHandler->GetNextWorkPackage()) > 0)
@@ -61,14 +70,15 @@ public:
       }
       auto timeAfter = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
-      //Assert that the time error is less than 5% in a 500ms sample size
-      CPPUNIT_ASSERT(abs((timeAfter - timeBefore) - m_NumberOrTime) <= 25);
+      //Assert that the time error is less than 10% in a 500ms sample size
+      //This test might not be stable when on different machines.
+      CPPUNIT_ASSERT(abs((timeAfter - timeBefore) - m_NumberOrTime) <= 50);
     }
   }
 
   void testCorrectNumberOfPhotons()
   {
-    m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, false);
+    m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, false, false);
     m_MonteCarloThreadHandler->SetPackageSize(100);
     long numberOfPhotonsSimulated = 0;
     long nextWorkPackage = 0;
@@ -81,7 +91,7 @@ public:
 
   void testCorrectNumberOfPhotonsWithUnevenPackageSize()
   {
-    m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, false);
+    m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, false, false);
     m_MonteCarloThreadHandler->SetPackageSize(77);
     long numberOfPhotonsSimulated = 0;
     long nextWorkPackage = 0;

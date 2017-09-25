@@ -138,14 +138,14 @@ bool mitk::PolhemusInterface::Connect()
   }
 
   //if we had tool before, check if they are still the same.
-  if (m_ToolName.size() == _trackingData.size())
+  if (m_ToolPorts.size() == _trackingData.size())
   {
     for (int i = 0; i < _trackingData.size(); ++i)
     {
       //if they are not the same, clear hemispheres and toolNames and break.
-      if (m_ToolName[i] != _trackingData.at(i).id)
+      if (m_ToolPorts[i] != _trackingData.at(i).id)
       {
-        m_ToolName.clear();
+        m_ToolPorts.clear();
         m_Hemispheres.clear();
         break;
       }
@@ -153,11 +153,11 @@ bool mitk::PolhemusInterface::Connect()
   }
 
   //if we don't have old tool names or if the old ones don't match any more, assign them again.
-  if (m_ToolName.size() == 0)
+  if (m_ToolPorts.size() == 0)
   {
     for (int i = 0; i < _trackingData.size(); ++i)
     {
-      m_ToolName.push_back(_trackingData.at(i).id);
+      m_ToolPorts.push_back(_trackingData.at(i).id);
     }
   }
 
@@ -274,7 +274,7 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
       //only if it is empty. Otherwise, it might already be on and we overwrite it with (0|0|0).
       for (int i = 0; i < m_numberOfTools; ++i)
       {
-        m_Hemispheres.push_back(GetHemisphere(m_ToolName[i]));
+        m_Hemispheres.push_back(GetHemisphere(m_ToolPorts[i]));
       }
     }
     m_pdiDev->SetSHemiTrack(-1);
@@ -322,7 +322,7 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
         m_Hemispheres.at(i) = -1. * m_Hemispheres.at(i);
       }
 
-      SetHemisphere(m_ToolName[i], m_Hemispheres.at(i));
+      SetHemisphere(m_ToolPorts[i], m_Hemispheres.at(i));
     }
     //clean up hemispheres!
     m_Hemispheres.clear();
@@ -361,7 +361,7 @@ void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
     //GetHemisphere(-1) returns the first tool. Hence, we have to loop over all tools manually...
     for (int i = 0; i < m_numberOfTools; ++i)
     {
-      this->SetHemisphere(m_ToolName[i], -1.*this->GetHemisphere(m_ToolName[i]));
+      this->SetHemisphere(m_ToolPorts[i], -1.*this->GetHemisphere(m_ToolPorts[i]));
     }
   }
   else
@@ -418,4 +418,9 @@ mitk::Vector3D mitk::PolhemusInterface::GetHemisphere(int _tool)
 void mitk::PolhemusInterface::PrintStatus()
 {
   MITK_INFO << "Polhemus status: " << this->m_pdiDev->CnxReady();
+}
+
+std::vector<int> mitk::PolhemusInterface::GetToolPorts()
+{
+  return m_ToolPorts;
 }

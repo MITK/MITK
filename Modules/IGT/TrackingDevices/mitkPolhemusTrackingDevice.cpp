@@ -54,11 +54,14 @@ bool mitk::PolhemusTrackingDevice::IsDeviceInstalled()
 
 mitk::TrackingTool* mitk::PolhemusTrackingDevice::AddTool(const char* toolName, int toolPort)
 {
-  //Only add tool if it doesn't exist already.
-  if (this->GetToolByName(toolName))
+  //Only add tool if port isn't already used.
+  for (auto _tool : m_AllTools)
   {
-    MITK_DEBUG << "Did not add tool, tool name already exists.";
-    return this->GetToolByName(toolName);
+    if (_tool->GetToolPort() == toolPort)
+    {
+      MITK_DEBUG << "There is already a tool connected to this port. Returning existing tool";
+      return _tool;
+    }
   }
 
   mitk::PolhemusTool::Pointer t = mitk::PolhemusTool::New();
@@ -124,6 +127,34 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
   if (m_Device.IsNull()) {m_Device = mitk::PolhemusInterface::New();}
   m_Device->Connect();
   m_Device->SetHemisphereTrackingEnabled(m_HemisphereTrackingEnabled);
+
+  //check if connected ports of Polhemus matches the tools in the toolStorage.
+  std::vector<int> toolPorts = m_Device->GetToolPorts();
+
+  //first, check size.
+  if (this->GetToolCount() != toolPorts.size())
+  {
+    MITK_ERROR << "Cannot connect device, number of tools in toolstorage doesn't match the number of tools connected to Polhemus device!";
+    CloseConnection();
+    return false;
+  }
+
+  //second, check if toolStorage identifier is included in this port.
+  for (auto _tool : m_AllTools)
+  {
+    if (std::find(toolPorts.begin(), toolPorts.end(), _tool->GetToolPort()) == toolPorts.end())
+    {
+      MITK_ERROR << "Cannot connect device, tool " << _tool->GetToolPort() << " is not connected to its port.";
+      CloseConnection();
+      return false;
+    }
+    else
+    {
+      //erase this port to avoid that two tools want to connect to the same port.
+      toolPorts.erase(std::find(toolPorts.begin(), toolPorts.end(), _tool->GetToolPort()));
+    }
+  }
+
   this->SetState(Ready);
   return true;
 }

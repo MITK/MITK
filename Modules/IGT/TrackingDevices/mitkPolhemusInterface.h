@@ -107,6 +107,10 @@ namespace mitk
     */
     mitk::Vector3D GetHemisphere(int _tool);
 
+    /** Get the ports on which tools are connected. Returns empty vector if device is not connected!
+    */
+    std::vector<int> GetToolPorts();
+
   protected:
     /**
     * \brief standard constructor
@@ -136,7 +140,7 @@ namespace mitk
 
     //This vector stores the order of tools, which are available.
     //E.g. only Sensor 1 and 3 are attached, then this vector maps the first tool (0) to Polhemus identifier 1 and the second tool (1) to Polhemus 3.
-    std::vector<int> m_ToolName;
+    std::vector<int> m_ToolPorts;
 
   };
 }//mitk

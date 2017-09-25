@@ -61,7 +61,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
 
     bool smoothingHint = segPref->GetBool("smoothing hint", true);
     ScalarType smoothing = segPref->GetDouble("smoothing value", 1.0);
-    ScalarType decimation = segPref->GetDouble("decimation rate", 0.5);
+    ScalarType decimation = segPref->GetDouble("decimation rate", 0.2);
 
     if (smoothingHint)
     {

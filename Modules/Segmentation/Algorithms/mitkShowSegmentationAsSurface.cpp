@@ -52,7 +52,7 @@ void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm* other)
   SetParameter("Smooth", true );
   SetParameter("Gaussian SD", 1.5f );
   SetParameter("Decimate mesh", true );
-  SetParameter("Decimation rate", 0.8f );
+  SetParameter("Decimation rate", 0.2f );
   SetParameter("Wireframe", false );
   SetParameter("Creation type", 0u );
 }
@@ -94,7 +94,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   float gaussianSD(1.5);
   GetParameter("Gaussian SD", gaussianSD );
 
-  float reductionRate(0.8);
+  float reductionRate(0.2);
   GetParameter("Decimation rate", reductionRate );
 
   MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD

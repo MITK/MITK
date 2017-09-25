@@ -199,6 +199,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     mitkCloneMacro( DICOMITKSeriesGDCMReader );
     itkFactorylessNewMacro( DICOMITKSeriesGDCMReader );
     mitkNewMacro1Param( DICOMITKSeriesGDCMReader, unsigned int );
+    mitkNewMacro2Param( DICOMITKSeriesGDCMReader, unsigned int, bool );
 
     /**
       \brief Runs the sorting / splitting process described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
@@ -246,6 +247,22 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     */
     void SetToleratedOriginOffset(double millimeters = 0.005) const;
 
+    /**
+    \brief Ignore all dicom tags that are non-essential for simple 3D volume import.
+    */
+    void SetSimpleVolumeReading(bool read)
+    {
+      m_SimpleVolumeReading = read;
+    };
+
+    /**
+    \brief Ignore all dicom tags that are non-essential for simple 3D volume import.
+    */
+    bool GetSimpleVolumeReading()
+    {
+      return m_SimpleVolumeReading;
+    };
+
     double GetToleratedOriginError() const;
     bool IsToleratedOriginOffsetAbsolute() const;
 
@@ -254,6 +271,11 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     virtual bool operator==(const DICOMFileReader& other) const override;
 
     virtual DICOMTagPathList GetTagsOfInterest() const override;
+
+    static const int GetDefaultDecimalPlacesForOrientation()
+    {
+      return m_DefaultDecimalPlacesForOrientation; 
+    }
 
   protected:
 
@@ -272,7 +294,9 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     */
     void PopLocale() const;
 
-    DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = 5);
+    const static int m_DefaultDecimalPlacesForOrientation = 5;
+
+    DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = m_DefaultDecimalPlacesForOrientation, bool simpleVolumeImport = false);
     virtual ~DICOMITKSeriesGDCMReader();
 
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
@@ -304,12 +328,14 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
   private:
 
     /// \brief Creates the required sorting steps described in \ref DICOMITKSeriesGDCMReader_ForcedConfiguration
-    void EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation);
+    void EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation, bool simpleVolumeImport = false);
 
   protected:
 
     // NOT nice, made available to ThreeDnTDICOMSeriesReader due to lack of time
     bool m_FixTiltByShearing; // could be removed by ITKDICOMSeriesReader NOT flagging tilt unless requested to fix it!
+
+    bool m_SimpleVolumeReading;
 
   private:
 

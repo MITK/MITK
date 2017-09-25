@@ -143,7 +143,7 @@ void QmitkSegmentationPreferencePage::Update()
   m_Controls.m_SelectionModeCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("auto selection", true));
 
   m_Controls.m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
-  m_Controls.m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
+  m_Controls.m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.2));
   m_Controls.m_ClosingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
 }
 

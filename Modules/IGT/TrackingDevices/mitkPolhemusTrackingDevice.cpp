@@ -51,7 +51,8 @@ bool mitk::PolhemusTrackingDevice::IsDeviceInstalled()
   return true;
 }
 
-mitk::TrackingTool* mitk::PolhemusTrackingDevice::AddTool( const char* toolName)
+
+mitk::TrackingTool* mitk::PolhemusTrackingDevice::AddTool(const char* toolName, int toolPort)
 {
   //Only add tool if it doesn't exist already.
   if (this->GetToolByName(toolName))
@@ -62,6 +63,7 @@ mitk::TrackingTool* mitk::PolhemusTrackingDevice::AddTool( const char* toolName)
 
   mitk::PolhemusTool::Pointer t = mitk::PolhemusTool::New();
   t->SetToolName(toolName);
+  t->SetToolPort(toolPort);
   if (this->InternalAddTool(t) == false)
     return nullptr;
   return t.GetPointer();
@@ -257,8 +259,9 @@ mitk::NavigationToolStorage::Pointer mitk::PolhemusTrackingDevice::AutoDetectToo
     mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
     newTool->SetDataNode(newNode);
 
+    //The identifier defines, which plug is used (e.g. "Sens 2" --> 2).
     std::stringstream identifier;
-    identifier << "AutoDetectedTool-" << ((int)t.id);
+    identifier << ((int)t.id);
     newTool->SetIdentifier(identifier.str());
 
     newTool->SetTrackingDeviceType(mitk::PolhemusTrackerTypeInformation::GetDeviceDataPolhemusTrackerLiberty().Line);

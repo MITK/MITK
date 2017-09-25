@@ -36,11 +36,25 @@ namespace mitk
     friend class PolhemusTrackingDevice;
     mitkClassMacro(PolhemusTool, InternalTrackingTool);
 
+    /**
+    * \brief Sets the port of the tool. (e.g. 1 for port "SENS 1" etc.)
+    */
+    virtual void SetToolPort(int _ToolPort);
+
+    /**
+    * \brief Sets the port of the tool. (e.g. 1 for port "SENS 1" etc.)
+    */
+    virtual int GetToolPort();
+
   protected:
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     PolhemusTool();
     virtual ~PolhemusTool();
+
+    //This is the port, on which the tool is connected. It is identical with the "ToolIdentifier" set on NavigationDataTools.
+    //If tool is connected on port "SENS 2", the m_ToolPort is 2 etc.
+    int m_ToolPort;
   };
 }//mitk
 #endif // MITKPolhemusTOOL_H_HEADER_INCLUDED_

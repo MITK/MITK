@@ -88,7 +88,9 @@ namespace mitk
     *
     * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
-    mitk::TrackingTool* AddTool(const char* toolName);
+    mitk::TrackingTool* AddTool(const char* toolName, int toolPort);
+
+
 
     bool IsDeviceInstalled();
 

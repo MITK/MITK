@@ -36,7 +36,7 @@ mitk::pa::Volume::Volume(double* data,
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<double>();
 
   m_InternalMitkImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
-  m_InternalMitkImage->SetImportVolume(data, Image::ImportMemoryManagementType::RtlCopyMemory);
+  m_InternalMitkImage->SetImportVolume(data, Image::ImportMemoryManagementType::CopyMemory);
 
   m_FastAccessDataPointer = GetData();
 

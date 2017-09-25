@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreServices.h>
 #include <mitkPropertyPersistence.h>
 #include <mitkPropertyPersistenceInfo.h>
-#include <boost\filesystem.hpp>
+#include <itkFileTools.h>
 
 class mitkPhotoacousticIOTestSuite : public mitk::TestFixture
 {
@@ -57,11 +57,14 @@ public:
     m_VolumeProperties = createTestVolumeParameters();
     m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_VolumeProperties);
     m_Test3DVolume = createTest3DVolume(5);
-
-    CPPUNIT_ASSERT(boost::filesystem::create_directories(TEST_FOLDER_PATH));
-    CPPUNIT_ASSERT(boost::filesystem::create_directories(TEST_QUALIFIED_FOLDER_PATH));
-    CPPUNIT_ASSERT(boost::filesystem::create_directories(TEST_FOLDER_PATH + FOLDER_FOLDER + FOLDER_FOLDER));
-    CPPUNIT_ASSERT(boost::filesystem::create_directories(FCM_PATH));
+    itk::FileTools::CreateDirectory(TEST_FOLDER_PATH);
+    itk::FileTools::CreateDirectory(TEST_QUALIFIED_FOLDER_PATH);
+    itk::FileTools::CreateDirectory(TEST_FOLDER_PATH + FOLDER_FOLDER + FOLDER_FOLDER);
+    itk::FileTools::CreateDirectory(FCM_PATH);
+    CPPUNIT_ASSERT(itksys::SystemTools::FileIsDirectory(TEST_FOLDER_PATH));
+    CPPUNIT_ASSERT(itksys::SystemTools::FileIsDirectory(TEST_QUALIFIED_FOLDER_PATH));
+    CPPUNIT_ASSERT(itksys::SystemTools::FileIsDirectory(TEST_FOLDER_PATH + FOLDER_FOLDER + FOLDER_FOLDER));
+    CPPUNIT_ASSERT(itksys::SystemTools::FileIsDirectory(FCM_PATH));
 
     mitk::IOUtil::Save(m_TestInSilicoVolume->ConvertToMitkImage(),
       TEST_FOLDER_PATH + TEST_IN_SILICO_VOLUME_PATH + TEST_FILE_ENDING);
@@ -150,6 +153,7 @@ public:
     CPPUNIT_ASSERT(childFolders.size() == 1);
     CPPUNIT_ASSERT(childFolders[0] == TEST_FOLDER_PATH);
     childFolders = mitk::pa::IOUtil::GetAllChildfoldersFromFolder(TEST_FOLDER_PATH + FOLDER_FOLDER);
+    MITK_INFO << "ChildFolders: " << childFolders.size();
     CPPUNIT_ASSERT(childFolders.size() == 1);
     CPPUNIT_ASSERT(childFolders[0] == TEST_FOLDER_PATH + FOLDER_FOLDER + "/folder");
   }
@@ -176,7 +180,7 @@ public:
 
   void tearDown()
   {
-    CPPUNIT_ASSERT_MESSAGE("Resource leak of test files onto hard drive..", boost::filesystem::remove_all(TEST_FOLDER_PATH) > 0);
+    //CPPUNIT_ASSERT_MESSAGE("Resource leak of test files onto hard drive..", itksys::SystemTools::RemoveADirectory(TEST_FOLDER_PATH) == true);
   }
 };
 

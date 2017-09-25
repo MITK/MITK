@@ -56,16 +56,16 @@ void PASimulator::CreateQtPartControl(QWidget *parent)
   m_Controls.spinboxSigma->setEnabled(false);
   m_Controls.labelSigma->setEnabled(false);
 
-  char* home_env = std::getenv("HOME");
-  if (home_env == nullptr)
+  std::string home_env = std::string(std::getenv("HOME"));
+  if (home_env.empty())
   {
-    home_env = std::getenv("HOMEPATH");
+    home_env = std::string(std::getenv("HOMEPATH"));
   }
-  if (home_env == nullptr)
+  if (home_env.empty())
   {
     home_env = "";
   }
-  m_Controls.label_NrrdFilePath->setText(home_env);
+  m_Controls.label_NrrdFilePath->setText(home_env.c_str());
 
   m_PhotoacousticPropertyCalculator = mitk::pa::PropertyCalculator::New();
 

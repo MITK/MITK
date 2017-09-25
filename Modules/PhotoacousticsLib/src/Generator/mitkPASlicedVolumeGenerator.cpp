@@ -26,7 +26,9 @@ mitk::pa::SlicedVolumeGenerator::SlicedVolumeGenerator(int centralYSlice, bool p
   m_PrecorrectionVolume = nullptr;
 
   if (m_Precorrect)
+  {
     m_PrecorrectionVolume = precorrectionVolume;
+  }
 }
 
 mitk::pa::SlicedVolumeGenerator::~SlicedVolumeGenerator()
@@ -54,13 +56,17 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedFluenceImage
         imageArray[index] = composedVolume->GetFluenceValue(fluenceComponentIdx, x, m_CentralYSlice, z);
 
         if (m_Precorrect)
+        {
           imageArray[index] = imageArray[index] / m_PrecorrectionVolume->GetData(x, m_CentralYSlice, z);
+        }
 
         if (m_Inverse)
+        {
           if (abs(imageArray[index] - 0) >= mitk::eps)
             imageArray[index] = 1 / imageArray[index];
           else
             imageArray[index] = INFINITY;
+        }
       }
 
   return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim);

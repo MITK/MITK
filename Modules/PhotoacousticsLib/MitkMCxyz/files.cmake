@@ -1,3 +1,3 @@
 set(CPP_FILES
-  MCxyz.cpp
+  MitkMCxyz.cpp
 )

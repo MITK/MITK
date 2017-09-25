@@ -3,8 +3,6 @@
 #include "mitkIOUtil.h"
 #include "mitkImageReadAccessor.h"
 
-#include "boost/filesystem.hpp"
-
 #include <string>
 #include <sstream>
 #include <vector>
@@ -14,6 +12,8 @@
 #include "mitkPANoiseGenerator.h"
 #include "mitkPAVolumeManipulator.h"
 #include <mitkProperties.h>
+#include <itkDirectory.h>
+#include <itksys/SystemTools.hxx>
 
 static std::vector<int> splitString(const std::string &s, const char* delim) {
   std::vector<int> elems;
@@ -71,13 +71,14 @@ mitk::pa::IOUtil::LoadFluenceContributionMaps(std::string foldername, double blu
 {
   std::map<IOUtil::Position, Volume::Pointer> resultMap;
 
-  boost::filesystem::directory_iterator end_itr;
-  for (boost::filesystem::directory_iterator itr(foldername); itr != end_itr; itr++)
+  itk::Directory::Pointer directoryHandler = itk::Directory::New();
+  directoryHandler->Load(foldername.c_str());
+  for (unsigned int fileIndex = 0, numFiles = directoryHandler->GetNumberOfFiles(); fileIndex < numFiles; ++fileIndex)
   {
-    if (boost::filesystem::is_directory(itr->status()))
+    std::string filename = std::string(directoryHandler->GetFile(fileIndex));
+    if (itksys::SystemTools::FileIsDirectory(filename))
       continue;
 
-    std::string filename = itr->path().string();
     if (!DoesFileHaveEnding(filename, ".nrrd"))
       continue;
 
@@ -96,7 +97,7 @@ mitk::pa::IOUtil::LoadFluenceContributionMaps(std::string foldername, double blu
     else
     {
       MITK_DEBUG << "Extracted coords: " << coords[0] << "|" << coords[1] << "|" << coords[2] << " from string " << sub;
-      Volume::Pointer nrrdFile = LoadNrrd(filename, blur);
+      Volume::Pointer nrrdFile = LoadNrrd(foldername + filename, blur);
       if (doLog10)
         VolumeManipulator::Log10Image(nrrdFile);
       resultMap[Position{ coords[0], coords[2] }] = nrrdFile;
@@ -115,13 +116,14 @@ int mitk::pa::IOUtil::GetNumberOfNrrdFilesInDirectory(std::string directory)
 std::vector<std::string> mitk::pa::IOUtil::GetListOfAllNrrdFilesInDirectory(std::string directory, bool keepFileFormat)
 {
   std::vector<std::string> filenames;
-  boost::filesystem::directory_iterator end_itr;
-  for (boost::filesystem::directory_iterator itr(directory); itr != end_itr; itr++)
+  itk::Directory::Pointer directoryHandler = itk::Directory::New();
+  directoryHandler->Load(directory.c_str());
+  for (unsigned int fileIndex = 0, numFiles = directoryHandler->GetNumberOfFiles(); fileIndex < numFiles; ++fileIndex)
   {
-    if (boost::filesystem::is_directory(itr->status()))
+    std::string filename = std::string(directoryHandler->GetFile(fileIndex));
+    if (itksys::SystemTools::FileIsDirectory(filename))
       continue;
 
-    std::string filename = itr->path().filename().string();
     if (!DoesFileHaveEnding(filename, ".nrrd"))
       continue;
 
@@ -142,13 +144,14 @@ std::vector<std::string> mitk::pa::IOUtil::GetAllChildfoldersFromFolder(std::str
 {
   std::vector<std::string> returnVector;
 
-  boost::filesystem::directory_iterator end_itr;
-  for (boost::filesystem::directory_iterator itr(folderPath + "/"); itr != end_itr; itr++)
+  itksys::Directory directoryHandler;
+  directoryHandler.Load(folderPath.c_str());
+  for (unsigned int fileIndex = 2, numFiles = directoryHandler.GetNumberOfFiles(); fileIndex < numFiles; ++fileIndex)
   {
-    std::string filename = itr->path().filename().string();
-    if (boost::filesystem::is_directory(itr->status()))
+    std::string filename = folderPath + "/" + std::string(directoryHandler.GetFile(fileIndex));
+    if (itksys::SystemTools::FileIsDirectory(filename))
     {
-      returnVector.push_back(folderPath + "/" + filename);
+      returnVector.push_back(filename);
       continue;
     }
 

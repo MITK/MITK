@@ -178,14 +178,11 @@ public:
     double b = 2.0;
     double c = 3.0;
 
-    double length;
-
     for (double testFactor = -2.0; testFactor <= 2.0; testFactor += 0.3)
     {
       double potElement0Fctr;
       double potElement1Fctr;
       double potElement2Fctr;
-      double testLength;
 
       std::stringstream output;
 
@@ -193,13 +190,9 @@ public:
       m_TestVector->SetElement(1, b);
       m_TestVector->SetElement(2, c);
 
-      length = m_TestVector->GetNorm();
-
       potElement0Fctr = (m_TestVector->GetElement(0)*testFactor)*(m_TestVector->GetElement(0)*testFactor);
       potElement1Fctr = (m_TestVector->GetElement(1)*testFactor)*(m_TestVector->GetElement(1)*testFactor);
       potElement2Fctr = (m_TestVector->GetElement(2)*testFactor)*(m_TestVector->GetElement(2)*testFactor);
-
-      testLength = sqrt(potElement0Fctr + potElement1Fctr + potElement2Fctr);
 
       m_TestVector->Scale(testFactor);
 

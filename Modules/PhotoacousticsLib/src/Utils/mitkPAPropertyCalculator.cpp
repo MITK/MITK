@@ -99,6 +99,7 @@ CalculatePropertyForSpecificWavelength(
 
   // We want the reduced scattering coefficient directly.
   double musp = musp500 * (fray * pow(wavelength / 500.0, -4.0) + ((1 - fray) * pow(wavelength / 500.0, -bmie)));
+  returnValue.mus = musp;
   returnValue.mus = 15;//musp;
 
   double mua = bloodVolumeFraction*bloodOxygenation*m_SpectralLibMap[MapType::OXYGENATED][wavelength] +

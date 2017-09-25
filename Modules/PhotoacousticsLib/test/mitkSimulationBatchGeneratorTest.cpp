@@ -18,7 +18,7 @@
 
 #include <mitkPASimulationBatchGenerator.h>
 #include <mitkPAVolume.h>
-#include <boost\filesystem.hpp>
+#include <itkFileTools.h>
 
 class mitkSimulationBatchGeneratorTestSuite : public mitk::TestFixture
 {
@@ -48,7 +48,8 @@ public:
     m_Parameters->SetYOffsetStepInCentimeters(0.5);
 
     m_Test3DVolume = createTest3DVolume(5);
-    CPPUNIT_ASSERT(boost::filesystem::create_directories(TEST_FOLDER_PATH));
+    itk::FileTools::CreateDirectory(TEST_FOLDER_PATH);
+    CPPUNIT_ASSERT(itksys::SystemTools::FileIsDirectory(TEST_FOLDER_PATH));
   }
 
   mitk::pa::Volume::Pointer createTest3DVolume(double value)
@@ -73,16 +74,16 @@ public:
   void testGenerateBatchFileAndSaveFile()
   {
     mitk::pa::SimulationBatchGenerator::WriteBatchFileAndSaveTissueVolume(m_Parameters, m_Test3DVolume->AsMitkImage());
-    CPPUNIT_ASSERT(boost::filesystem::exists(TEST_FOLDER_PATH + m_Parameters->GetTissueName() + "000.nrrd"));
-    CPPUNIT_ASSERT(boost::filesystem::exists(TEST_FOLDER_PATH + "simulate_all.sh") || boost::filesystem::exists(TEST_FOLDER_PATH + "simulate_all.bat"));
-    CPPUNIT_ASSERT(boost::filesystem::exists(TEST_FOLDER_PATH + m_Parameters->GetTissueName() + "000")
-      && boost::filesystem::is_directory(TEST_FOLDER_PATH + m_Parameters->GetTissueName() + "000"));
+    CPPUNIT_ASSERT(itksys::SystemTools::FileExists(TEST_FOLDER_PATH + m_Parameters->GetTissueName() + "000.nrrd"));
+    CPPUNIT_ASSERT(itksys::SystemTools::FileExists(TEST_FOLDER_PATH + "simulate_all.sh") || itksys::SystemTools::FileExists(TEST_FOLDER_PATH + "simulate_all.bat"));
+    CPPUNIT_ASSERT(itksys::SystemTools::FileExists(TEST_FOLDER_PATH + m_Parameters->GetTissueName() + "000")
+      && itksys::SystemTools::FileIsDirectory(TEST_FOLDER_PATH + m_Parameters->GetTissueName() + "000"));
   }
 
   void tearDown()
   {
     m_Parameters = nullptr;
-    CPPUNIT_ASSERT_MESSAGE("Resource leak of test files onto hard drive..", boost::filesystem::remove_all(TEST_FOLDER_PATH) > 0);
+    CPPUNIT_ASSERT_MESSAGE("Resource leak of test files onto hard drive..", itksys::SystemTools::RemoveADirectory(TEST_FOLDER_PATH) == true);
   }
 };
 

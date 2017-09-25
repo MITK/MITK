@@ -104,7 +104,7 @@ public:
 
   void testCorrectNumberOfPhotonsWithTooLargePackageSize()
   {
-    m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, false);
+    m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, false, false);
     m_MonteCarloThreadHandler->SetPackageSize(10000);
     long numberOfPhotonsSimulated = 0;
     long nextWorkPackage = 0;

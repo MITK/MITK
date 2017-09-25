@@ -18,9 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 
 mitk::pa::MonteCarloThreadHandler::MonteCarloThreadHandler(long timInMillisecondsOrNumberofPhotons, bool simulateOnTimeBasis) :
-  MonteCarloThreadHandler(timInMillisecondsOrNumberofPhotons, simulateOnTimeBasis, true)
-{
-}
+  MonteCarloThreadHandler(timInMillisecondsOrNumberofPhotons, simulateOnTimeBasis, true){}
 
 mitk::pa::MonteCarloThreadHandler::MonteCarloThreadHandler(long timInMillisecondsOrNumberofPhotons, bool simulateOnTimeBasis, bool verbose)
 {
@@ -42,7 +40,6 @@ mitk::pa::MonteCarloThreadHandler::MonteCarloThreadHandler(long timInMillisecond
     m_NumberPhotonsToSimulate = timInMillisecondsOrNumberofPhotons;
     m_NumberPhotonsRemaining = timInMillisecondsOrNumberofPhotons;
   }
-  MITK_INFO << "Created!";
 }
 
 mitk::pa::MonteCarloThreadHandler::~MonteCarloThreadHandler()

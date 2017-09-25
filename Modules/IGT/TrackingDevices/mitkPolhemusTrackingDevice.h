@@ -30,6 +30,8 @@ namespace mitk
   *   \brief An object of this class represents Polhemus tracking device. You can add tools to this
   *          device, then open the connection and start tracking. The tracking device will then
   *          continuously update the tool coordinates.
+  *          The tools which are used by Polhemus need to be connected to the correct port.
+  *          The port of the tool is stored as m_ToolPort in PolhemusTool AND as identifier in the NavigationTool (ToolStorage).
   *   \ingroup IGT
   */
   class MITKIGT_EXPORT PolhemusTrackingDevice : public TrackingDevice

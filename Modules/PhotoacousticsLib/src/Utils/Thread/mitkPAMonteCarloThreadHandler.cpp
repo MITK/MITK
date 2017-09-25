@@ -95,7 +95,7 @@ void mitk::pa::MonteCarloThreadHandler::SetPackageSize(long sizeInMilliseconsOrN
 }
 
 bool mitk::pa::Equal(const MonteCarloThreadHandler::Pointer leftHandSide,
-  const MonteCarloThreadHandler::Pointer rightHandSide, double eps, bool verbose)
+  const MonteCarloThreadHandler::Pointer rightHandSide, double /*eps*/, bool verbose)
 {
   if (rightHandSide->GetNumberPhotonsRemaining() != leftHandSide->GetNumberPhotonsRemaining())
   {

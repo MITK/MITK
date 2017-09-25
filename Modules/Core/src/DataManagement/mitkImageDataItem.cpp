@@ -207,7 +207,7 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
   const unsigned int *dims = m_Dimensions;
   const unsigned int dim = m_Dimension;
 
-  unsigned long size = 0;
+  size_t size = 0;
   if ( dim == 1 )
   {
     inData->SetDimensions( dims[0] -1, 1, 1);

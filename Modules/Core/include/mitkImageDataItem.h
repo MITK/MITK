@@ -164,7 +164,7 @@ namespace mitk {
 
     virtual void ConstructVtkImageData(ImageConstPointer) const;
 
-    size_t GetSize_z() const
+    size_t GetSize() const
     {
       return m_Size;
     }

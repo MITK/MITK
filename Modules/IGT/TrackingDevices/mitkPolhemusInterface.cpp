@@ -385,21 +385,18 @@ mitk::Vector3D mitk::PolhemusInterface::GetHemisphere(int _tool)
   //Doesn't work in continuous mode. Don't know why, but so it is... Hence: stop and restart...
   if (m_continousTracking)
   {
-    m_continousTracking = false;
     m_pdiDev->StopContPno();
-
-    m_pdiDev->GetSHemisphere(_tool, _hemisphere);
-    MITK_DEBUG << "Get Hemisphere: " << m_pdiDev->GetLastResultStr();
-    mitk::FillVector3D(_returnVector, _hemisphere[0], _hemisphere[1], _hemisphere[2]);
-
-    m_pdiDev->StartContPno(0);
-    m_continousTracking = true;
   }
-  else
+
+  m_pdiDev->GetSHemisphere(_tool, _hemisphere);
+  MITK_DEBUG << "Get Hemisphere: " << m_pdiDev->GetLastResultStr();
+  mitk::FillVector3D(_returnVector, _hemisphere[0], _hemisphere[1], _hemisphere[2]);
+
+  if (m_continousTracking)
   {
-    m_pdiDev->GetSHemisphere(_tool, _hemisphere);
-    MITK_DEBUG << "Get Hemisphere: " << m_pdiDev->GetLastResultStr();
-    mitk::FillVector3D(_returnVector, _hemisphere[0], _hemisphere[1], _hemisphere[2]);
+    m_pdiDev->StartContPno(0);
+    //I don't know why, but restart breaks the next (and only the next) frame. Hence: Get one and never use it...
+    std::vector<mitk::PolhemusInterface::trackingData> _test = GetLastFrame();
   }
 
   return _returnVector;
@@ -415,7 +412,6 @@ std::vector<int> mitk::PolhemusInterface::GetToolPorts()
   return m_ToolPorts;
 }
 
-
 bool mitk::PolhemusInterface::GetHemisphereTrackingEnabled(int _tool)
 {
   BOOL _hemiTrack;
@@ -428,6 +424,8 @@ bool mitk::PolhemusInterface::GetHemisphereTrackingEnabled(int _tool)
   if (m_continousTracking)
   {
     m_pdiDev->StartContPno(0);
+    //I don't know why, but restart breaks the next (and only the next) frame. Hence: Get one and never use it...
+    std::vector<mitk::PolhemusInterface::trackingData> _test = GetLastFrame();
   }
 
   return _hemiTrack;

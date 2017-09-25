@@ -74,7 +74,7 @@ public:
   /// Sets a pixel value at given index.
   void SetPixelByIndex(const itk::Index<VDimension>& idx, const TPixel & value)
   {
-    unsigned int offset = ImagePixelAccessor<TPixel,VDimension>::GetOffset(idx);
+    size_t offset = ImagePixelAccessor<TPixel,VDimension>::GetOffset(idx);
 
     *(((TPixel*)m_WriteAccessor.m_AddressBegin) + offset) = value;
   }
@@ -83,7 +83,7 @@ public:
   /** Extends SetPixel by integrating index validation to prevent overflow. */
   void SetPixelByIndexSafe(const itk::Index<VDimension>& idx, const TPixel & value)
   {
-    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
+    size_t offset = ImagePixelAccessorType::GetOffset(idx);
 
     TPixel* targetAddress = ((TPixel*)m_WriteAccessor.m_AddressBegin) + offset;
 
@@ -104,7 +104,7 @@ public:
   /** Returns a const reference to the pixel at given index. */
   const TPixel & GetPixelByIndex(const itk::Index<VDimension>& idx) const
   {
-    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
+    size_t offset = ImagePixelAccessorType::GetOffset(idx);
 
     return *(((TPixel*)m_WriteAccessor.m_AddressBegin) + offset);
   }
@@ -115,7 +115,7 @@ public:
     */
   const TPixel & GetPixelByIndexSafe(const itk::Index<VDimension>& idx) const
   {
-    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
+    size_t offset = ImagePixelAccessorType::GetOffset(idx);
 
     TPixel* targetAddress = ((TPixel*)m_WriteAccessor.m_AddressBegin) + offset;
 

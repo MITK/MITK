@@ -87,7 +87,7 @@ public:
   }
 
   /*! \brief returns the amount of elements in the DataSet */
-  int GetBufferSize() const
+  size_t GetBufferSize() const
   {
     return this->m_bufferSize;
   }
@@ -98,7 +98,7 @@ public:
   }
 
   /** @brief Set the amount of elements in buffer*/
-  void SetBufferSize(unsigned int size);
+  void SetBufferSize(size_t size);
 
   /** @brief Set the DataSet memory Size per Element in Bytes*/
   void SetBpE(unsigned short BpE);
@@ -118,7 +118,7 @@ protected:
 
 private:
   /*! GMEM Buffer Size in elements*/
-  unsigned int m_bufferSize;
+  size_t m_bufferSize;
 
   bool m_gpuModified;
   bool m_cpuModified;

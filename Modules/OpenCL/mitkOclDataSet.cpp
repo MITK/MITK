@@ -48,11 +48,14 @@ cl_mem mitk::OclDataSet::CreateGPUBuffer()
   int clErr;
   if (m_gpuBuffer) clReleaseMemObject(m_gpuBuffer);
 
-  m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE, m_bufferSize * m_BpE, nullptr, &clErr);
+  m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE, m_bufferSize * (size_t)m_BpE, nullptr, &clErr);
 
-  MITK_INFO << "Created GPU Buffer Object of size: " << m_BpE* m_bufferSize << " Bytes";
+  MITK_INFO << "Created GPU Buffer Object of size: " << (size_t)m_BpE * m_bufferSize << " Bytes";
 
   CHECK_OCL_ERR(clErr);
+
+  if (clErr != CL_SUCCESS)
+    mitkThrow() << "openCL Error when creating Buffer";
 
   return m_gpuBuffer;
 }
@@ -91,15 +94,19 @@ int mitk::OclDataSet::TransferDataToGPU(cl_command_queue gpuComQueue)
 
     if (m_gpuBuffer != nullptr)
     {
-      clErr = clEnqueueWriteBuffer(gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * m_BpE, m_Data, 0, NULL, NULL);
+      clErr = clEnqueueWriteBuffer(gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * (size_t)m_BpE, m_Data, 0, NULL, NULL);
       MITK_INFO << "Wrote Data to GPU Buffer Object.";
+
+      CHECK_OCL_ERR(clErr);
+      m_gpuModified = true;
+
+      if (clErr != CL_SUCCESS)
+        mitkThrow() << "openCL Error when writing Buffer";
     }
     else
     {
       MITK_ERROR << "No GPU buffer present!";
     }
-    CHECK_OCL_ERR(clErr);
-    m_gpuModified = true;
   }
 
   return clErr;
@@ -134,13 +141,16 @@ void* mitk::OclDataSet::TransferDataToCPU(cl_command_queue gpuComQueue)
   }
 
   // check buffersize
-  char* data = new char[m_bufferSize * m_BpE];
+  char* data = new char[m_bufferSize * (size_t)m_BpE];
 
   // debug info
   oclPrintMemObjectInfo( m_gpuBuffer );
 
-  clErr = clEnqueueReadBuffer( gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * m_BpE, data ,0, nullptr, nullptr);
+  clErr = clEnqueueReadBuffer( gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * (size_t)m_BpE, data ,0, nullptr, nullptr);
   CHECK_OCL_ERR(clErr);
+
+  if(clErr != CL_SUCCESS)
+    mitkThrow() << "openCL Error when reading Output Buffer";
 
   clFlush( gpuComQueue );
   // the cpu data is same as gpu
@@ -149,7 +159,7 @@ void* mitk::OclDataSet::TransferDataToCPU(cl_command_queue gpuComQueue)
   return (void*) data;
 }
 
-void mitk::OclDataSet::SetBufferSize(unsigned int size)
+void mitk::OclDataSet::SetBufferSize(size_t size)
 {
   m_bufferSize = size;
 }

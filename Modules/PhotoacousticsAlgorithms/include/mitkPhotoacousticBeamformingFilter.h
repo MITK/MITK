@@ -35,7 +35,16 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-    void Configure(BeamformingSettings settings);
+    void Configure(BeamformingSettings settings)
+    {
+      m_ConfOld = m_Conf;
+      m_Conf = settings;
+    }
+
+    std::string GetMessageString()
+    {
+      return m_Message;
+    }
 
     void SetProgressHandle(std::function<void(int, std::string)> progressHandle);
 
@@ -71,9 +80,16 @@ namespace mitk {
     float* m_InputData;
     float* m_InputDataPuffer;
 
+    float* m_VonHannFunction;
+    float* m_HammFunction;
+    float* m_BoxFunction;
+
     BeamformingSettings m_Conf;
+    BeamformingSettings m_ConfOld;
 
     mitk::PhotoacousticOCLBeamformingFilter::Pointer m_BeamformingOclFilter;
+
+    std::string m_Message;
   };
 } // namespace mitk
 

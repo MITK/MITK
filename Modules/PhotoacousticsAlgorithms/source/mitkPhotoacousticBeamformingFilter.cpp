@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkPhotoacousticBeamformingFilter.h"
 
-mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputData(nullptr)
+mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputData(nullptr), m_Message("noMessage")
 {
   this->SetNumberOfIndexedInputs(1);
   this->SetNumberOfRequiredInputs(1);
@@ -35,6 +35,10 @@ mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputDat
   m_ProgressHandle = [](int, std::string) {};
 
   m_BeamformingOclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
+
+  m_VonHannFunction = VonHannFunction(m_Conf.apodizationArraySize);
+  m_HammFunction = HammFunction(m_Conf.apodizationArraySize);
+  m_BoxFunction = BoxFunction(m_Conf.apodizationArraySize);
 }
 
 void mitk::BeamformingFilter::SetProgressHandle(std::function<void(int, std::string)> progressHandle)
@@ -44,6 +48,9 @@ void mitk::BeamformingFilter::SetProgressHandle(std::function<void(int, std::str
 
 mitk::BeamformingFilter::~BeamformingFilter()
 {
+  delete[] m_VonHannFunction;
+  delete[] m_HammFunction;
+  delete[] m_BoxFunction;
 }
 
 void mitk::BeamformingFilter::GenerateInputRequestedRegion()
@@ -97,24 +104,34 @@ void mitk::BeamformingFilter::GenerateData()
   if (!output->IsInitialized())
     return;
 
-  const int apodArraySize = m_Conf.TransducerElements; // set the resolution of the apodization array
   float* ApodWindow;
+  if (m_ConfOld.apodizationArraySize != m_Conf.apodizationArraySize)
+  {
+    delete[] m_VonHannFunction;
+    delete[] m_HammFunction;
+    delete[] m_BoxFunction;
+    m_VonHannFunction = VonHannFunction(m_Conf.apodizationArraySize);
+    m_HammFunction = HammFunction(m_Conf.apodizationArraySize);
+    m_BoxFunction = BoxFunction(m_Conf.apodizationArraySize);
 
-  // calculate the appropiate apodization window
+    m_ConfOld = m_Conf;
+  }
+
+  // set the appropiate apodization window
   switch (m_Conf.Apod)
   {
-    case BeamformingSettings::Apodization::Hann:
-      ApodWindow = VonHannFunction(apodArraySize);
-      break;
-    case BeamformingSettings::Apodization::Hamm:
-      ApodWindow = HammFunction(apodArraySize);
-      break;
-    case BeamformingSettings::Apodization::Box:
-      ApodWindow = BoxFunction(apodArraySize);
-      break;
-    default:
-      ApodWindow = BoxFunction(apodArraySize);
-      break;
+  case BeamformingSettings::Apodization::Hann:
+    ApodWindow = m_VonHannFunction;
+    break;
+  case BeamformingSettings::Apodization::Hamm:
+    ApodWindow = m_HammFunction;
+    break;
+  case BeamformingSettings::Apodization::Box:
+    ApodWindow = m_BoxFunction;
+    break;
+  default:
+    ApodWindow = m_BoxFunction;
+    break;
   }
 
   auto begin = std::chrono::high_resolution_clock::now(); // debbuging the performance...
@@ -162,14 +179,14 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&BeamformingFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+            threads[line] = std::thread(&BeamformingFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, m_Conf.apodizationArraySize);
           }
         }
         else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&BeamformingFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+            threads[line] = std::thread(&BeamformingFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, m_Conf.apodizationArraySize);
           }
         }
       }
@@ -179,14 +196,14 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&BeamformingFilter::DMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+            threads[line] = std::thread(&BeamformingFilter::DMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, m_Conf.apodizationArraySize);
           }
         }
         else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&BeamformingFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
+            threads[line] = std::thread(&BeamformingFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, m_Conf.apodizationArraySize);
           }
         }
       }
@@ -206,7 +223,7 @@ void mitk::BeamformingFilter::GenerateData()
       m_InputData = nullptr;
     }
   }
-  #ifdef PHOTOACOUSTICS_USE_GPU
+#ifdef PHOTOACOUSTICS_USE_GPU
   else
   {
     try
@@ -220,7 +237,7 @@ void mitk::BeamformingFilter::GenerateData()
 
       m_ProgressHandle(50, "performing reconstruction");
 
-      m_BeamformingOclFilter->SetApodisation(ApodWindow, apodArraySize);
+      m_BeamformingOclFilter->SetApodisation(ApodWindow, m_Conf.apodizationArraySize);
       m_BeamformingOclFilter->SetConfig(m_Conf);
       m_BeamformingOclFilter->SetInput(input);
       m_BeamformingOclFilter->Update();
@@ -233,18 +250,18 @@ void mitk::BeamformingFilter::GenerateData()
       std::string errorMessage = "Caught unexpected exception ";
       errorMessage.append(e.what());
       MITK_ERROR << errorMessage;
+
+      float* dummyData = new float[m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * m_Conf.inputDim[2]];
+      output->SetImportVolume(dummyData, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
+
+      m_Message = "An openCL error occurred; all GPU operations in this and the next session may be corrupted.";
     }
   }
-  #endif
+#endif
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();
   MITK_INFO << "Beamforming of " << output->GetDimension(2) << " Images completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
-}
-
-void mitk::BeamformingFilter::Configure(BeamformingSettings settings)
-{
-  m_Conf = settings;
 }
 
 float* mitk::BeamformingFilter::VonHannFunction(int samples)

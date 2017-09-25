@@ -48,7 +48,9 @@ class PAImageProcessing : public QmitkAbstractView
 
     /// \brief Called when the user clicks the GUI button
 
-    void UpdateBounds();
+    void UpperSliceBoundChanged();
+    void LowerSliceBoundChanged();
+    void SliceBoundsEnabled();
     
     void UseResampling();
     void UseLogfilter();
@@ -70,6 +72,7 @@ class PAImageProcessing : public QmitkAbstractView
     void StartBandpassThread();
 
     void UpdateProgress(int progress, std::string progressInfo);
+    void PAMessageBox(std::string message);
 
     void BatchProcessing();
     void UpdateSaveBoxes();
@@ -110,6 +113,7 @@ class BeamformingThread : public QThread
   signals:
     void result(mitk::Image::Pointer);
     void updateProgress(int, std::string);
+    void message(std::string);
 
   public:
     void setConfig(mitk::BeamformingSettings BFconfig);

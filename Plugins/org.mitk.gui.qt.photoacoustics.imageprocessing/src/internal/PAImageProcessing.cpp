@@ -69,9 +69,9 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.BPSpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(ChangedSOSBandpass()));
   connect(m_Controls.Samples, SIGNAL(valueChanged(int)), this, SLOT(UpdateImageInfo()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UpdateImageInfo()));
-  connect(m_Controls.boundLow, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
-  connect(m_Controls.boundHigh, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
-  connect(m_Controls.Partial, SIGNAL(clicked()), this, SLOT(UpdateBounds()));
+  connect(m_Controls.boundLow, SIGNAL(valueChanged(int)), this, SLOT(LowerSliceBoundChanged()));
+  connect(m_Controls.boundHigh, SIGNAL(valueChanged(int)), this, SLOT(UpperSliceBoundChanged()));
+  connect(m_Controls.Partial, SIGNAL(clicked()), this, SLOT(SliceBoundsEnabled()));
   connect(m_Controls.BatchProcessing, SIGNAL(clicked()), this, SLOT(BatchProcessing()));
   connect(m_Controls.StepBeamforming, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
   connect(m_Controls.StepCropping, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
@@ -208,8 +208,9 @@ void PAImageProcessing::BatchProcessing()
         this->UpdateProgress(progress, progressInfo);
       };
       m_Controls.progressBar->setValue(100);
+      std::string errorMessage = "";
 
-      image = m_FilterBank->ApplyBeamforming(image, BFconfig, progressHandle);
+      image = m_FilterBank->ApplyBeamforming(image, BFconfig, errorMessage, progressHandle);
 
       if (saveSteps[0])
       {
@@ -356,6 +357,7 @@ void PAImageProcessing::StartBeamformingThread()
       BeamformingThread *thread = new BeamformingThread();
       connect(thread, &BeamformingThread::result, this, &PAImageProcessing::HandleBeamformingResults);
       connect(thread, &BeamformingThread::updateProgress, this, &PAImageProcessing::UpdateProgress);
+      connect(thread, &BeamformingThread::message, this, &PAImageProcessing::PAMessageBox);
       connect(thread, &BeamformingThread::finished, thread, &QObject::deleteLater);
 
       thread->setConfig(BFconfig);
@@ -721,7 +723,7 @@ void PAImageProcessing::HandleBandpassResults(mitk::Image::Pointer image)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void PAImageProcessing::UpdateBounds()
+void PAImageProcessing::SliceBoundsEnabled()
 {
   if (!m_Controls.Partial->isChecked())
   {
@@ -737,7 +739,27 @@ void PAImageProcessing::UpdateBounds()
     BFconfig.partial = true;
   }
 
+  UpperSliceBoundChanged();
+}
+
+void PAImageProcessing::UpperSliceBoundChanged()
+{
   if(m_Controls.boundLow->value() > m_Controls.boundHigh->value())
+  {
+    m_Controls.boundLow->setValue(m_Controls.boundHigh->value());
+    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
+    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
+  }
+  else
+  {
+    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
+    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
+  }
+}
+
+void PAImageProcessing::LowerSliceBoundChanged()
+{
+  if (m_Controls.boundLow->value() > m_Controls.boundHigh->value())
   {
     m_Controls.boundHigh->setValue(m_Controls.boundLow->value());
     BFconfig.CropBounds[0] = m_Controls.boundLow->value();
@@ -758,6 +780,16 @@ void PAImageProcessing::UpdateProgress(int progress, std::string progressInfo)
     m_Controls.progressBar->setValue(100);
   m_Controls.ProgressInfo->setText(progressInfo.c_str());
   qApp->processEvents();
+}
+
+void PAImageProcessing::PAMessageBox(std::string message)
+{
+  if (0 != message.compare("noMessage"))
+  {
+    QMessageBox msgBox;
+    msgBox.setText(message.c_str());
+    msgBox.exec();
+  }
 }
 
 void PAImageProcessing::UpdateImageInfo()
@@ -900,13 +932,14 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.SamplesPerLine = m_Controls.Samples->value();
   BFconfig.ReconstructionLines = m_Controls.Lines->value();
   BFconfig.TransducerElements = m_Controls.ElementCount->value();
+  BFconfig.apodizationArraySize = m_Controls.ElementCount->value();
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
   BFconfig.UseGPU = m_Controls.UseGPUBf->isChecked();
   BFconfig.upperCutoff = m_Controls.Cutoff->value();
 
   UpdateRecordTime(image);
-  UpdateBounds();
+  SliceBoundsEnabled();
 }
 
 void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
@@ -1032,13 +1065,15 @@ void PAImageProcessing::UseImageSpacing()
 void BeamformingThread::run()
 {
   mitk::Image::Pointer resultImage;
+  std::string errorMessage = "";
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
       emit updateProgress(progress, progressInfo);
     };
 
-  resultImage = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, progressHandle);
+  resultImage = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, errorMessage, progressHandle);
 
-   emit result(resultImage);
+  emit result(resultImage);
+  emit message(errorMessage);
 }
 
 void BeamformingThread::setConfig(mitk::BeamformingSettings BFconfig)

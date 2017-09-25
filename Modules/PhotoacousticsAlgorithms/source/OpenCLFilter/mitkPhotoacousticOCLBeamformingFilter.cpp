@@ -80,7 +80,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
   try
   {
     MITK_INFO << "Updating Workgroup size for new dimensions";
-    size_t outputSize = m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * m_Conf.inputDim[2];
+    size_t outputSize = (size_t)m_Conf.ReconstructionLines * (size_t)m_Conf.SamplesPerLine * (size_t)m_Conf.inputDim[2];
     m_OutputDim[0] = m_Conf.ReconstructionLines;
     m_OutputDim[1] = m_Conf.SamplesPerLine;
     m_OutputDim[2] = m_Conf.inputDim[2];
@@ -151,9 +151,15 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
 
   // execute the filter on a 3D NDRange
   if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)
-    this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize);
+  {
+    if(!this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize))
+      mitkThrow() << "openCL Error when executing Kernel";
+  }
   else
-    this->ExecuteKernelChunks(m_PixelCalculation, 3, m_ChunkSize);
+  {
+    if(!this->ExecuteKernelChunks(m_PixelCalculation, 3, m_ChunkSize))
+      mitkThrow() << "openCL Error when executing Kernel";
+  }
 
   // signalize the GPU-side data changed
   m_Output->Modified( GPU_DATA );

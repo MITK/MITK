@@ -55,6 +55,7 @@ namespace mitk {
     float BPHighPass = 50;
     float BPLowPass = 50;
     bool UseBP = false;
+    int apodizationArraySize = 128;
 
     //this method ignores changes in BPLow/BPHigh/cropBounds/Algorithm/some more, as those are insignifiant in all current situations
     static bool SettingsChangedOpenCL(const BeamformingSettings& lhs, const BeamformingSettings& rhs)

@@ -52,7 +52,7 @@ using namespace std;
 typedef itksys::SystemTools ist;
 typedef itk::Point<float, 4> PointType4;
 typedef itk::Image< float, 4 >  PeakImgType;
-const float UPSCALE = 1000.0;
+const double UPSCALE = 1.0;
 
 vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id )
 {
@@ -85,7 +85,6 @@ vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer
       else
         out_dir = dir;
       out_dir *= mag;
-      out_dir *= UPSCALE;  // for the fit it's better if the magnitude is larger since many fibers pass each voxel and otherwise the individual contributions would be very small
       id = i;
     }
   }
@@ -100,14 +99,14 @@ public:
   vnl_sparse_matrix_linear_system< double >* S;
   vnl_sparse_matrix< double > m_A;
   vnl_vector< double > m_b;
-  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen;
+  double m_Lambda;
 
-  void SetProblem(vnl_sparse_matrix< double >& A, vnl_vector<double>& b)
+  void SetProblem(vnl_sparse_matrix< double >& A, vnl_vector<double>& b, double lambda)
   {
     S = new vnl_sparse_matrix_linear_system<double>(A, b);
     m_A = A;
     m_b = b;
-    randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    m_Lambda = lambda;
   }
 
   VnlCostFunction(const int NumVars) : vnl_cost_function(NumVars)
@@ -121,75 +120,78 @@ public:
       return 10000 * -min;
 
     double cost = S->get_rms_error(x);
-    double regu = x.squared_magnitude()/x.size();
+    double regu = m_Lambda*1e8*x.squared_magnitude()/x.size();
     cost += regu;
     return cost;
   }
 
   double f(vnl_vector<double> const &x)
   {
-//    // cost for x (mean squared error)
+    //    // cost for x (mean squared error)
     double cost = S->get_rms_error(x);
-//    cost *= cost;
+    cost *= cost;
+
+//    double cost = 0;
+//    vnl_vector<double> d; d.set_size(m_b.size());
+//    S->multiply(x, d);
+//    d -= m_b;
+//    for (int i=0; i<d.size(); i++)
+//    {
+
+//    }
 
     // cost for e^x
-//    vnl_vector<double> x_exp; x_exp.set_size(x.size());
-//    for (unsigned int c=0; c<x.size(); c++)
-//      x_exp[c] = std::exp(x[c]);
-//    vnl_vector<double> d; d.set_size(x.size());
-//    S->multiply(x_exp, d);
-//    d -= m_b;
-//    double cost = d.squared_magnitude()/x.size();
+    //    vnl_vector<double> x_exp; x_exp.set_size(x.size());
+    //    for (unsigned int c=0; c<x.size(); c++)
+    //      x_exp[c] = std::exp(x[c]);
+    //    vnl_vector<double> d; d.set_size(x.size());
+    //    S->multiply(x_exp, d);
+    //    d -= m_b;
+    //    double cost = d.squared_magnitude()/x.size();
 
-//    // Tikhonov regu
-    double regu = 100*x.squared_magnitude()/x.size();
+    //    // Tikhonov regu
+    double regu = m_Lambda*1e8*x.squared_magnitude()/x.size();
 
     // aTV regu
-//    double regu = 0;
-//    unsigned int N = m_b.size();
-//    vnl_vector<double> ones; ones.set_size(x.size()); ones.fill(1.0);
-//    vnl_vector<double> means; means.set_size(N);
-//    S->multiply(ones, means);
+    //    double regu = 0;
+    //    unsigned int N = m_b.size();
+    //    vnl_vector<double> ones; ones.set_size(x.size()); ones.fill(1.0);
+    //    vnl_vector<double> means; means.set_size(N);
+    //    S->multiply(ones, means);
 
-//    unsigned int norm = 0;
-//    for (unsigned int i=0; i<N; ++i)
-//    {
-//      if (m_A.get_row(i).empty())
-//        continue;
-//      means[i] /= m_A.get_row(i).size();
+    //    unsigned int norm = 0;
+    //    for (unsigned int i=0; i<N; ++i)
+    //    {
+    //      if (m_A.get_row(i).empty())
+    //        continue;
+    //      means[i] /= m_A.get_row(i).size();
 
-//      for (auto el : m_A.get_row(i))
-//      {
-//        float d = 0;
-//        if (x[el.first]>means[i])
-//          d = std::exp(x[el.first]) - std::exp(means[i]);
-//        else
-//          d = x[el.first] - means[i];
+    //      for (auto el : m_A.get_row(i))
+    //      {
+    //        float d = 0;
+    //        if (x[el.first]>means[i])
+    //          d = std::exp(x[el.first]) - std::exp(means[i]);
+    //        else
+    //          d = x[el.first] - means[i];
 
-//        regu += d*d;
-//        norm++;
-//      }
-//    }
-//    regu /= norm;
+    //        regu += d*d;
+    //        norm++;
+    //      }
+    //    }
+    //    regu /= norm;
 
     cost += regu;
     return cost;
   }
-
-  // Finite differences gradient (SLOW)
-  //  void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
-  //  {
-  //    fdgradf(x, dx);
-  //  }
 
   void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     dx.fill(0.0);
     unsigned int N = m_b.size();
 
-//    vnl_vector<double> x_exp; x_exp.set_size(x.size());
-//    for (unsigned int c=0; c<x.size(); c++)
-//      x_exp[c] = std::exp(x[c]);
+    //    vnl_vector<double> x_exp; x_exp.set_size(x.size());
+    //    for (unsigned int c=0; c<x.size(); c++)
+    //      x_exp[c] = std::exp(x[c]);
 
     vnl_vector<double> d; d.set_size(N);
     S->multiply(x,d);
@@ -198,13 +200,10 @@ public:
     S->transpose_multiply(d, dx);
     dx *= 2.0/N;
 
-//    for (unsigned int c=0; c<x.size(); c++)
-//      dx[c] *= x_exp[c];  // only for e^x weights
+    //    for (unsigned int c=0; c<x.size(); c++)
+    //      dx[c] *= x_exp[c];  // only for e^x weights
 
-//    double mag = x.magnitude();
-//    if (mag>0)
-//      dx += x/mag;
-    dx += 100.0*2.0*x/x.size();
+    dx += m_Lambda*1e8*2.0*x/x.size();
   }
 
 };
@@ -297,7 +296,7 @@ void OptimizeItk(VnlCostFunction& cf, vnl_vector<double>& x, int iter, double lb
 
 }
 
-std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Pointer > input_tracts, mitk::Image::Pointer inputImage, bool single_fiber_fit, int max_iter, float g_tol, bool lb )
+std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Pointer > input_tracts, mitk::Image::Pointer inputImage, bool single_fiber_fit, int max_iter, float g_tol, float lambda )
 {
   typedef mitk::ImageToItk< PeakImgType > CasterType;
   CasterType::Pointer caster = CasterType::New();
@@ -312,7 +311,7 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   int sz_peaks = image_size[3]/3;
   int num_voxels = sz_x*sz_y*sz_z;
 
-  unsigned int num_unknowns = input_tracts.size(); //inputTractogram->GetNumFibers();
+  unsigned int num_unknowns = input_tracts.size();
   if (single_fiber_fit)
   {
     num_unknowns = 0;
@@ -330,16 +329,11 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   vnl_sparse_matrix< double > A; A.set_size(number_of_residuals, num_unknowns);
   vnl_vector<double> b; b.set_size(number_of_residuals); b.fill(0.0);
 
-  float max_peak_mag = 0;
-  int max_peak_idx = -1;
-
-  float min_peak_mag = 999999999;
-  int min_peak_idx = -1;
-
-  double FD = 0;
   double TD = 0;
-
+  double FD = 0;
+  unsigned int dir_count = 0;
   unsigned int fiber_count = 0;
+
   for (unsigned int bundle=0; bundle<input_tracts.size(); bundle++)
   {
     vtkSmartPointer<vtkPolyData> polydata = input_tracts.at(bundle)->GetFiberPolyData();
@@ -386,110 +380,74 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
 
         unsigned int linear_index = sz_peaks*(x + sz_x*y + sz_x*sz_y*z);
 
-        if (peak_mag>max_peak_mag)
+        if (b[linear_index + peak_id] == 0)
         {
-          max_peak_mag = peak_mag;
-          max_peak_idx = linear_index + peak_id;
+          dir_count++;
+          FD += peak_mag;
         }
-
-        if (peak_mag<min_peak_mag)
-        {
-          min_peak_mag = peak_mag;
-          min_peak_idx = linear_index + peak_id;
-        }
-
-        FD += peak_mag;
         TD += 1;
 
-//        for (unsigned int k=0; k<3; ++k)
-//        {
-          if (single_fiber_fit)
-          {
-            b[linear_index + peak_id] = peak_mag;
-            A.put(linear_index + peak_id, fiber_count, A.get(linear_index + peak_id, fiber_count) + 1);
-          }
-          else
-          {
-            b[linear_index + peak_id] = peak_mag;
-            A.put(linear_index + peak_id, bundle, A.get(linear_index + peak_id, bundle) + 1);
-          }
-//        }
-
+        if (single_fiber_fit)
+        {
+          b[linear_index + peak_id] = peak_mag;
+          A.put(linear_index + peak_id, fiber_count, A.get(linear_index + peak_id, fiber_count) + 1);
+        }
+        else
+        {
+          b[linear_index + peak_id] = peak_mag;
+          A.put(linear_index + peak_id, bundle, A.get(linear_index + peak_id, bundle) + 1);
+        }
       }
 
       ++fiber_count;
     }
   }
 
-  float max_TD = 0;
-  for (unsigned int i=0; i<fiber_count; ++i)
-    max_TD += A.get(max_peak_idx, i);
+  TD /= (dir_count*fiber_count);
+  FD /= dir_count;
 
-// Todo: NORMALISIERUNG
-  MITK_INFO << max_peak_idx;
-  MITK_INFO << lb;
-  MITK_INFO << min_peak_idx;
-  double mu = FD/TD;
-  mu = max_peak_mag/max_TD;
-//  mu = 1.0;
-  MITK_INFO << "mu: " << mu;
-//  A *= mu;
+  A *= 1.0/TD;
+  b *= 100.0*UPSCALE/FD;  // times 100 because we want to avoid too small weights
 
-//  vnl_vector_fixed<float,3> max_corr_fiber_dir; max_corr_fiber_dir.fill(0.0);
-//  vnl_vector_fixed<float,3> min_corr_fiber_dir; min_corr_fiber_dir.fill(0.0);
-//  for (unsigned int i=0; i<fiber_count; ++i)
-//  {
-//    max_corr_fiber_dir[0] += A.get(max_peak_idx, i);
-//    max_corr_fiber_dir[1] += A.get(max_peak_idx+1, i);
-//    max_corr_fiber_dir[2] += A.get(max_peak_idx+2, i);
-
-//    min_corr_fiber_dir[0] += A.get(min_peak_idx, i);
-//    min_corr_fiber_dir[1] += A.get(min_peak_idx+1, i);
-//    min_corr_fiber_dir[2] += A.get(min_peak_idx+2, i);
-//  }
-
-  float upper_bound = mu; //max_peak_mag/max_corr_fiber_dir.magnitude();
-  float lower_bound = 0;//min_peak_mag/min_corr_fiber_dir.magnitude();
-
-//  if (!lb || lower_bound>=upper_bound)
-//    lower_bound = 0;
-
-//  MITK_INFO << "Lower bound: " << lower_bound;
-//  MITK_INFO << "Upper bound: " << upper_bound;
+  MITK_INFO << "TD: " << TD;
+  MITK_INFO << "FD: " << FD;
+  MITK_INFO << "Regularization: " << lambda; // pretty large regularization needed --> internally upscale by 1e8
 
   itk::TimeProbe clock;
   clock.Start();
 
   MITK_INFO << "Fitting fibers";
   VnlCostFunction cost(num_unknowns);
-  cost.SetProblem(A, b);
+  cost.SetProblem(A, b, lambda);
 
-  MITK_INFO << g_tol << " " << max_iter;
-  vnl_vector<double> x; x.set_size(num_unknowns); x.fill( (upper_bound-lower_bound)/2 );
-//  x.fill(1);
-
-  //  OptimizeItk(cost, x, max_iter, lower_bound, upper_bound);
+  vnl_vector<double> x; x.set_size(num_unknowns); x.fill( TD/100.0 * FD/2.0 );
 
   vnl_lbfgsb minimizer(cost);
-  vnl_vector<double> l; l.set_size(num_unknowns); l.fill(lower_bound);
-  vnl_vector<double> u; u.set_size(num_unknowns); u.fill(upper_bound);
-  vnl_vector<long> bound_selection; bound_selection.set_size(num_unknowns); bound_selection.fill(2);
+  vnl_vector<double> l; l.set_size(num_unknowns); l.fill(0);
+
+  vnl_vector<long> bound_selection; bound_selection.set_size(num_unknowns); bound_selection.fill(1);
   minimizer.set_bound_selection(bound_selection);
   minimizer.set_lower_bound(l);
-  minimizer.set_upper_bound(u);
   minimizer.set_trace(true);
   minimizer.set_projected_gradient_tolerance(g_tol);
   if (max_iter>0)
     minimizer.set_max_function_evals(max_iter);
   minimizer.minimize(x);
+
+  // SECOND RUN // USE QUARTILE AS LIMIT???
+  float mean_w = x.mean();
+  x.fill(mean_w);
+  MITK_INFO << "Mean weight: " << mean_w;
+
+  vnl_vector<double> u; u.set_size(num_unknowns); u.fill(mean_w * 3);
+  minimizer.set_upper_bound(u);
+  bound_selection.fill(2);
+  minimizer.set_bound_selection(bound_selection);
+  minimizer.minimize(x);
+
   MITK_INFO << "Residual error: " << minimizer.get_end_error();
   MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
-
-  //  vnl_sparse_matrix_linear_system<double> S(A, b);
-  //  vnl_lsqr linear_solver( S );
-  //  linear_solver.set_max_iterations(max_iter);
-  //  linear_solver.minimize(x);
 
   clock.Stop();
   int h = clock.GetTotal()/3600;
@@ -497,18 +455,13 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   int s = (int)clock.GetTotal()%60;
   MITK_INFO << "Optimization took " << h << "h, " << m << "m and " << s << "s";
 
-//  x *= mu;
   std::vector<float> weights;
-  float max_w = 0;
   for (unsigned int i=0; i<num_unknowns; ++i)
   {
-//    x[i] = std::exp(x[i]);
 //    MITK_INFO << x[i];
-    if (x[i]>max_w)
-      max_w = x[i];
-    weights.push_back(x[i]);
+    weights.push_back(FD*x[i]);
+//    weights.push_back(x[i]);
   }
-  MITK_INFO << "Max w: " << max_w;
 
   return weights;
 }
@@ -546,8 +499,8 @@ int main(int argc, char* argv[])
   parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
   parser.addArgument("", "it", mitkCommandLineParser::Int, "", "");
   parser.addArgument("", "s", mitkCommandLineParser::Bool, "", "");
-  parser.addArgument("", "lb", mitkCommandLineParser::Bool, "", "");
   parser.addArgument("", "g", mitkCommandLineParser::Float, "", "");
+  parser.addArgument("", "l", mitkCommandLineParser::Float, "", "");
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -570,9 +523,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("g"))
     g_tol = us::any_cast<float>(parsedArgs["g"]);
 
-  bool lb = false;
-  if (parsedArgs.count("lb"))
-    lb = us::any_cast<bool>(parsedArgs["lb"]);
+  float lambda = 1.0;
+  if (parsedArgs.count("l"))
+    lambda = us::any_cast<float>(parsedArgs["l"]);
 
   try
   {
@@ -599,7 +552,7 @@ int main(int argc, char* argv[])
           mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
           if (inputTractogram.IsNull())
             continue;
-          inputTractogram->ResampleLinear(minSpacing/10);
+          inputTractogram->ResampleLinear(minSpacing/4);
           input_tracts.push_back(inputTractogram);
           fib_names.push_back(fibFile);
         }
@@ -609,48 +562,31 @@ int main(int argc, char* argv[])
         mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(item)[0].GetPointer());
         if (inputTractogram.IsNull())
           continue;
-        inputTractogram->ResampleLinear(minSpacing/10);
+        inputTractogram->ResampleLinear(minSpacing/4);
         input_tracts.push_back(inputTractogram);
         fib_names.push_back(item);
       }
     }
 
-    std::vector<float> weights = FitFibers(outRoot, input_tracts, inputImage, single_fib, max_iter, g_tol, lb);
+    std::vector<float> weights = FitFibers(outRoot, input_tracts, inputImage, single_fib, max_iter, g_tol, lambda);
 
     if (single_fib)
     {
       unsigned int fiber_count = 0;
-
       for (unsigned int bundle=0; bundle<input_tracts.size(); bundle++)
       {
-        mitk::FiberBundle::Pointer fib = input_tracts.at(bundle);
-        for (int i=0; i<fib->GetNumFibers(); i++)
+        for (int i=0; i<input_tracts.at(bundle)->GetNumFibers(); i++)
         {
-          fib->SetFiberWeight(i, weights.at(fiber_count));
+          input_tracts.at(bundle)->SetFiberWeight(i, weights.at(fiber_count));
           ++fiber_count;
         }
-
-        fib->Compress(0.1);
-        std::string name = fib_names.at(bundle);
-        name = ist::GetFilenameWithoutExtension(name);
-        mitk::IOUtil::Save(fib, outRoot + name + "_fitted.fib");
       }
     }
     else
     {
       for (unsigned int i=0; i<fib_names.size(); ++i)
-      {
-        std::string name = fib_names.at(i);
-        name = ist::GetFilenameWithoutExtension(name);
-        MITK_INFO << name << ": " << weights.at(i);
-        mitk::FiberBundle::Pointer bundle = input_tracts.at(i);
-        bundle->SetFiberWeights(weights.at(i));
-        bundle->Compress(0.1);
-        mitk::IOUtil::Save(bundle, outRoot + name + "_fitted.fib");
-      }
+        input_tracts.at(i)->SetFiberWeights(weights.at(i));
     }
-
-    return 0;
 
     // OUTPUT IMAGES
     MITK_INFO << "Generating output images ...";
@@ -687,7 +623,7 @@ int main(int argc, char* argv[])
         if (numPoints<2)
           MITK_INFO << "FIBER WITH ONLY ONE POINT ENCOUNTERED!";
 
-        float w = input_tracts.at(bundle)->GetFiberWeight(i)/UPSCALE;
+        float w = input_tracts.at(bundle)->GetFiberWeight(i);
 
         for (int j=0; j<numPoints-1; ++j)
         {
@@ -723,20 +659,20 @@ int main(int argc, char* argv[])
           idx4[3] = peak_id*3;
           unexplained_dir[0] = unexplained_image->GetPixel(idx4);
           explained_dir[0] = explained_image->GetPixel(idx4);
-          peak_dir[0] = itkImage->GetPixel(idx4);
           res_dir[0] = residual_image->GetPixel(idx4);
+          peak_dir[0] = itkImage->GetPixel(idx4);
 
           idx4[3] += 1;
           unexplained_dir[1] = unexplained_image->GetPixel(idx4);
           explained_dir[1] = explained_image->GetPixel(idx4);
-          peak_dir[1] = itkImage->GetPixel(idx4);
           res_dir[1] = residual_image->GetPixel(idx4);
+          peak_dir[1] = itkImage->GetPixel(idx4);
 
           idx4[3] += 1;
           unexplained_dir[2] = unexplained_image->GetPixel(idx4);
           explained_dir[2] = explained_image->GetPixel(idx4);
-          peak_dir[2] = itkImage->GetPixel(idx4);
           res_dir[2] = residual_image->GetPixel(idx4);
+          peak_dir[2] = itkImage->GetPixel(idx4);
 
           if (dot_product(peak_dir, fiber_dir)<0)
             fiber_dir *= -1;
@@ -750,7 +686,6 @@ int main(int argc, char* argv[])
 
           idx4[3] += 1;
           residual_image->SetPixel(idx4, res_dir[2] - fiber_dir[2]);
-
 
           if ( fabs(unexplained_dir[0]) - fabs(fiber_dir[0]) < 0 )  // did we "overexplain" stuff?
             fiber_dir = unexplained_dir;
@@ -783,6 +718,14 @@ int main(int argc, char* argv[])
     writer->SetInput(residual_image);
     writer->SetFileName(outRoot + "residual_image.nrrd");
     writer->Update();
+
+    for (unsigned int bundle=0; bundle<input_tracts.size(); bundle++)
+    {
+      input_tracts.at(bundle)->Compress(0.1);
+      std::string name = fib_names.at(bundle);
+      name = ist::GetFilenameWithoutExtension(name);
+      mitk::IOUtil::Save(input_tracts.at(bundle), outRoot + name + "_fitted.fib");
+    }
   }
   catch (itk::ExceptionObject e)
   {

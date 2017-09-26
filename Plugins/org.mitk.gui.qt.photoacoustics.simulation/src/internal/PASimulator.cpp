@@ -56,14 +56,19 @@ void PASimulator::CreateQtPartControl(QWidget *parent)
   m_Controls.spinboxSigma->setEnabled(false);
   m_Controls.labelSigma->setEnabled(false);
 
-  std::string home_env = std::string(std::getenv("HOME"));
-  if (home_env.empty())
+  auto home = std::getenv("HOME");
+  std::string home_env = "";
+  if (home != nullptr)
   {
-    home_env = std::string(std::getenv("HOMEPATH"));
+    home_env = std::string(home);
   }
-  if (home_env.empty())
+  else
   {
-    home_env = "";
+    home = std::getenv("HOMEPATH");
+    if (home != nullptr)
+    {
+      home_env = std::string(home);
+    }
   }
   m_Controls.label_NrrdFilePath->setText(home_env.c_str());
 

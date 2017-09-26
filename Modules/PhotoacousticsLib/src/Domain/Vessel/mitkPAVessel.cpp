@@ -101,9 +101,9 @@ void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
     fromPosition->SetElement(1, fromPosition->GetElement(1) + stepSize->GetElement(1));
     fromPosition->SetElement(2, fromPosition->GetElement(2) + stepSize->GetElement(2));
 
-    int xPos = fromPosition->GetElement(0);
-    int yPos = fromPosition->GetElement(1);
-    int zPos = fromPosition->GetElement(2);
+    double xPos = fromPosition->GetElement(0);
+    double yPos = fromPosition->GetElement(1);
+    double zPos = fromPosition->GetElement(2);
 
     if (!volume->IsInsideVolume(xPos, yPos, zPos))
     {
@@ -112,17 +112,54 @@ void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
     }
 
     double radius = m_VesselProperties->GetRadiusInVoxel();
+    double ceiledRadius = ceil(radius);
 
-    for (int x = xPos - radius; x <= xPos + radius; x++)
-      for (int y = yPos - radius; y <= yPos + radius; y++)
-        for (int z = zPos - radius; z <= zPos + radius; z++)
+    for (int x = xPos - ceiledRadius; x <= xPos + ceiledRadius; x += 1)
+      for (int y = yPos - ceiledRadius; y <= yPos + ceiledRadius; y += 1)
+        for (int z = zPos - ceiledRadius; z <= zPos + ceiledRadius; z += 1)
         {
-          if (radius*radius >= (x - xPos)*(x - xPos) + (y - yPos)*(y - yPos) + (z - zPos)*(z - zPos))
+          if (!volume->IsInsideVolume(x, y, z))
           {
-            volume->SetVolumeValues(x, y, z, m_VesselProperties->GetAbsorptionCoefficient(),
+            continue;
+          }
+          double xDiff = x - xPos;
+          double yDiff = y - yPos;
+          double zDiff = z - zPos;
+          double vectorLengthDiff = radius*radius - (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
+
+          if (vectorLengthDiff > 0)
+          {
+            volume->SetVolumeValues(x, y, z,
+              m_VesselProperties->GetAbsorptionCoefficient(),
               m_VesselProperties->GetScatteringCoefficient(),
               m_VesselProperties->GetAnisotopyCoefficient(),
               mitk::pa::InSilicoTissueVolume::SegmentationType::VESSEL);
+          }
+          else
+          {
+            double backgroundFraction = abs(sqrt((xDiff*xDiff + yDiff*yDiff + zDiff*zDiff)) - radius);
+            double vesselFraction = 1.0 - backgroundFraction;
+            auto type = mitk::pa::InSilicoTissueVolume::SegmentationType::BACKGROUND;
+            if (vesselFraction >= 0.5)
+            {
+              type = mitk::pa::InSilicoTissueVolume::SegmentationType::VESSEL;
+            }
+            double absorption = backgroundFraction * volume->GetAbsorptionVolume()->GetData(
+              x, y, z)
+              + vesselFraction * m_VesselProperties->GetAbsorptionCoefficient();
+            double scattering = backgroundFraction * volume->GetScatteringVolume()->GetData(
+              x, y, z)
+              + vesselFraction * m_VesselProperties->GetScatteringCoefficient();
+            double anisotropy = backgroundFraction * volume->GetAnisotropyVolume()->GetData(
+              x, y, z)
+              + vesselFraction * m_VesselProperties->GetAnisotopyCoefficient();
+
+            volume->SetVolumeValues(x, y, z,
+              absorption,
+              scattering,
+              anisotropy,
+              type
+            );
           }
         }
 

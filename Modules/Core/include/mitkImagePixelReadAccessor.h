@@ -101,7 +101,7 @@ public:
   /** Returns a const reference to the pixel at given index. */
   const TPixel & GetPixelByIndex(const itk::Index<VDimension>& idx) const
   {
-     unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
+    size_t offset = ImagePixelAccessorType::GetOffset(idx);
 
     return *(((TPixel*)m_ReadAccessor.m_AddressBegin) + offset);
   }
@@ -116,7 +116,7 @@ public:
     */
   const TPixel & GetPixelByIndexSafe(const itk::Index<VDimension>& idx) const
   {
-    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
+    size_t offset = ImagePixelAccessorType::GetOffset(idx);
 
     TPixel* targetAddress = ((TPixel*)m_ReadAccessor.m_AddressBegin) + offset;
 

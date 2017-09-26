@@ -112,11 +112,11 @@ protected:
   int m_Options;
 
   /** Get memory offset for a given image index */
-  unsigned int GetOffset(const IndexType & idx) const
+  size_t GetOffset(const IndexType & idx) const
   {
     const unsigned int * imageDims = m_ImageDataItem->m_Dimensions;
 
-    unsigned int offset = 0;
+    size_t offset = 0;
     switch(VDimension)
     {
     case 4:

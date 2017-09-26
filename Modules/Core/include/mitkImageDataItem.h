@@ -106,7 +106,7 @@ namespace mitk {
       m_IsComplete = complete;
     }
 
-    int GetOffset() const
+    size_t GetOffset() const
     {
       return m_Offset;
     }
@@ -164,7 +164,7 @@ namespace mitk {
 
     virtual void ConstructVtkImageData(ImageConstPointer) const;
 
-    unsigned long GetSize() const
+    size_t GetSize() const
     {
       return m_Size;
     }
@@ -181,11 +181,11 @@ namespace mitk {
     mutable vtkImageData* m_VtkImageData;
     mutable ImageVtkReadAccessor* m_VtkImageReadAccessor;
     ImageVtkWriteAccessor* m_VtkImageWriteAccessor;
-    int m_Offset;
+    size_t m_Offset;
 
     bool m_IsComplete;
 
-    unsigned long m_Size;
+    size_t m_Size;
 
   private:
     void ComputeItemSize( const unsigned int* dimensions, unsigned int dimension);

@@ -54,7 +54,7 @@ typedef itk::Point<float, 4> PointType4;
 typedef itk::Image< float, 4 >  PeakImgType;
 const double UPSCALE = 1.0;
 
-vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id )
+vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w )
 {
   int m_NumDirs = peak_image->GetLargestPossibleRegion().GetSize()[3]/3;
   vnl_vector_fixed<float,3> out_dir; out_dir.fill(0);
@@ -80,6 +80,7 @@ vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer
     if (fabs(a)>angle)
     {
       angle = fabs(a);
+      w = angle;
       if (a<0)
         out_dir = -dir;
       else
@@ -368,11 +369,13 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
         fiber_dir[2] = p[2]-p2[2];
         fiber_dir.normalize();
 
+        double w = 0;
         int peak_id = -1;
-        vnl_vector_fixed<float,3> odf_peak = GetClosestPeak(idx4, itkImage, fiber_dir, peak_id);
-        float peak_mag = odf_peak.magnitude();
+        vnl_vector_fixed<float,3> odf_peak = GetClosestPeak(idx4, itkImage, fiber_dir, peak_id, w);
         if (peak_id<0)
           continue;
+
+        float peak_mag = odf_peak.magnitude();
 
         int x = idx4[0];
         int y = idx4[1];
@@ -385,17 +388,17 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
           dir_count++;
           FD += peak_mag;
         }
-        TD += 1;
+        TD += w;
 
         if (single_fiber_fit)
         {
           b[linear_index + peak_id] = peak_mag;
-          A.put(linear_index + peak_id, fiber_count, A.get(linear_index + peak_id, fiber_count) + 1);
+          A.put(linear_index + peak_id, fiber_count, A.get(linear_index + peak_id, fiber_count) + w);
         }
         else
         {
           b[linear_index + peak_id] = peak_mag;
-          A.put(linear_index + peak_id, bundle, A.get(linear_index + peak_id, bundle) + 1);
+          A.put(linear_index + peak_id, bundle, A.get(linear_index + peak_id, bundle) + w);
         }
       }
 

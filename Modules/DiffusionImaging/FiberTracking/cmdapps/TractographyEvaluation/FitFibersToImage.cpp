@@ -309,7 +309,7 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   int sz_x = image_size[0];
   int sz_y = image_size[1];
   int sz_z = image_size[2];
-  int sz_peaks = image_size[3]/3;
+  int sz_peaks = image_size[3]/3 + 1; // +1 for zero - peak
   int num_voxels = sz_x*sz_y*sz_z;
 
   unsigned int num_unknowns = input_tracts.size();
@@ -369,12 +369,9 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
         fiber_dir[2] = p[2]-p2[2];
         fiber_dir.normalize();
 
-        double w = 0;
-        int peak_id = -1;
+        double w = 1;
+        int peak_id = sz_peaks-1;
         vnl_vector_fixed<float,3> odf_peak = GetClosestPeak(idx4, itkImage, fiber_dir, peak_id, w);
-        if (peak_id<0)
-          continue;
-
         float peak_mag = odf_peak.magnitude();
 
         int x = idx4[0];
@@ -383,7 +380,7 @@ std::vector<float> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
 
         unsigned int linear_index = sz_peaks*(x + sz_x*y + sz_x*sz_y*z);
 
-        if (b[linear_index + peak_id] == 0)
+        if (b[linear_index + peak_id] == 0 && peak_id<3)
         {
           dir_count++;
           FD += peak_mag;
@@ -650,7 +647,8 @@ int main(int argc, char* argv[])
           fiber_dir.normalize();
 
           int peak_id = -1;
-          GetClosestPeak(idx4, itkImage, fiber_dir, peak_id);
+          double contr = 1;
+          GetClosestPeak(idx4, itkImage, fiber_dir, peak_id, contr);
           if (peak_id<0)
             continue;
 

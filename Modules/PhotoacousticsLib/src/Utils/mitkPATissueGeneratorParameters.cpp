@@ -22,8 +22,7 @@ mitk::pa::TissueGeneratorParameters::TissueGeneratorParameters()
   m_YDim = 50;
   m_ZDim = 50;
   m_VoxelSpacingInCentimeters = 1;
-  m_VolumeSmoothingSigma = 0;
-  m_DoVolumeSmoothing = false;
+  m_DoPartialVolume = false;
   m_UseRngSeed = false;
   m_RngSeed = 1337L;
   m_RandomizePhysicalProperties = false;

@@ -25,6 +25,7 @@ mitk::pa::VesselProperties::VesselProperties()
   m_ScatteringCoefficient = 0;
   m_AnisotopyCoefficient = 0;
   m_BifurcationFrequency = 0;
+  m_DoPartialVolume = false;
 }
 
 mitk::pa::VesselProperties::VesselProperties(Self::Pointer other)
@@ -36,6 +37,7 @@ mitk::pa::VesselProperties::VesselProperties(Self::Pointer other)
   m_ScatteringCoefficient = other->GetScatteringCoefficient();
   m_AnisotopyCoefficient = other->GetAnisotopyCoefficient();
   m_BifurcationFrequency = other->GetBifurcationFrequency();
+  m_DoPartialVolume = other->GetDoPartialVolume();
 }
 
 mitk::pa::VesselProperties::~VesselProperties()
@@ -93,7 +95,13 @@ bool mitk::pa::Equal(const VesselProperties::Pointer leftHandSide, const VesselP
 
   if (!Equal(leftHandSide->GetDirectionVector(), rightHandSide->GetDirectionVector(), eps, verbose))
   {
-    MITK_INFO(verbose) << "PositionVector not equal";
+    MITK_INFO(verbose) << "DirectionVector not equal";
+    return false;
+  }
+
+  if (!(leftHandSide->GetDoPartialVolume() == rightHandSide->GetDoPartialVolume()))
+  {
+    MITK_INFO(verbose) << "GetDoPartialVolume not equal";
     return false;
   }
 

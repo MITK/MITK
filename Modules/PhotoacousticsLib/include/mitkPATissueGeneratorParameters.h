@@ -42,8 +42,7 @@ namespace mitk {
         itkGetMacro(YDim, int)
         itkGetMacro(ZDim, int)
         itkGetMacro(VoxelSpacingInCentimeters, double)
-        itkGetMacro(VolumeSmoothingSigma, double)
-        itkGetMacro(DoVolumeSmoothing, bool)
+        itkGetMacro(DoPartialVolume, bool)
         itkGetMacro(UseRngSeed, bool)
         itkGetMacro(RngSeed, long)
         itkGetMacro(RandomizePhysicalProperties, bool)
@@ -97,8 +96,7 @@ namespace mitk {
         itkSetMacro(YDim, int)
         itkSetMacro(ZDim, int)
         itkSetMacro(VoxelSpacingInCentimeters, double)
-        itkSetMacro(VolumeSmoothingSigma, double)
-        itkSetMacro(DoVolumeSmoothing, bool)
+        itkSetMacro(DoPartialVolume, bool)
         itkSetMacro(UseRngSeed, bool)
         itkSetMacro(RngSeed, long)
         itkSetMacro(RandomizePhysicalProperties, bool)
@@ -158,8 +156,7 @@ namespace mitk {
       int m_YDim;
       int m_ZDim;
       double m_VoxelSpacingInCentimeters;
-      double m_VolumeSmoothingSigma;
-      bool m_DoVolumeSmoothing;
+      bool m_DoPartialVolume;
       bool m_UseRngSeed;
       long m_RngSeed;
       bool m_RandomizePhysicalProperties;

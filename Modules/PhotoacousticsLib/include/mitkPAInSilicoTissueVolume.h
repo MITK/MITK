@@ -61,7 +61,19 @@ namespace mitk {
        * @param anisotropy
        * @param segmentType
        */
-      void SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy, SegmentationType segmentType = SegmentationType::BACKGROUND);
+      void SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy, SegmentationType segmentType);
+
+      /**
+      * @brief SetVolumeValues sets the values for aborption, scattering and anisotropy at the specified voxel location.
+      *
+      * @param x
+      * @param y
+      * @param z
+      * @param absorption
+      * @param scattering
+      * @param anisotropy
+      */
+      void SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy);
 
       /**
        * @brief IsInsideVolume

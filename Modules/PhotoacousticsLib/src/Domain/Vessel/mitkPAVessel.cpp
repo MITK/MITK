@@ -137,29 +137,40 @@ void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
           }
           else
           {
-            double backgroundFraction = abs(sqrt((xDiff*xDiff + yDiff*yDiff + zDiff*zDiff)) - radius);
-            double vesselFraction = 1.0 - backgroundFraction;
-            auto type = mitk::pa::InSilicoTissueVolume::SegmentationType::BACKGROUND;
-            if (vesselFraction >= 0.5)
+            if (m_VesselProperties->GetDoPartialVolume())
             {
-              type = mitk::pa::InSilicoTissueVolume::SegmentationType::VESSEL;
-            }
-            double absorption = backgroundFraction * volume->GetAbsorptionVolume()->GetData(
-              x, y, z)
-              + vesselFraction * m_VesselProperties->GetAbsorptionCoefficient();
-            double scattering = backgroundFraction * volume->GetScatteringVolume()->GetData(
-              x, y, z)
-              + vesselFraction * m_VesselProperties->GetScatteringCoefficient();
-            double anisotropy = backgroundFraction * volume->GetAnisotropyVolume()->GetData(
-              x, y, z)
-              + vesselFraction * m_VesselProperties->GetAnisotopyCoefficient();
+              double backgroundFraction = abs(sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) - radius);
+              if (backgroundFraction <= 1 && backgroundFraction >= 0)
+              {
+                double vesselFraction = 1.0 - backgroundFraction;
 
-            volume->SetVolumeValues(x, y, z,
-              absorption,
-              scattering,
-              anisotropy,
-              type
-            );
+                double absorption = backgroundFraction * volume->GetAbsorptionVolume()->GetData(
+                  x, y, z)
+                  + vesselFraction * m_VesselProperties->GetAbsorptionCoefficient();
+                double scattering = backgroundFraction * volume->GetScatteringVolume()->GetData(
+                  x, y, z)
+                  + vesselFraction * m_VesselProperties->GetScatteringCoefficient();
+                double anisotropy = backgroundFraction * volume->GetAnisotropyVolume()->GetData(
+                  x, y, z)
+                  + vesselFraction * m_VesselProperties->GetAnisotopyCoefficient();
+
+                if (vesselFraction >= 0.5)
+                {
+                  volume->SetVolumeValues(x, y, z,
+                    absorption,
+                    scattering,
+                    anisotropy,
+                    InSilicoTissueVolume::SegmentationType::VESSEL);
+                }
+                else
+                {
+                  volume->SetVolumeValues(x, y, z,
+                    absorption,
+                    scattering,
+                    anisotropy);
+                }
+              }
+            }
           }
         }
 

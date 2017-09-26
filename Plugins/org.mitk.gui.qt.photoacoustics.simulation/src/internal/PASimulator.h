@@ -51,7 +51,6 @@ public:
 
   /// \brief Called when the user clicks the GUI button
   void DoImageProcessing();
-  void ClickedGaussBox();
   void ClickedCheckboxFixedSeed();
   void ClickedRandomizePhysicalParameters();
   void OpenFolder();

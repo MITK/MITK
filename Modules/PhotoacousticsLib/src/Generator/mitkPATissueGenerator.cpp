@@ -133,6 +133,7 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     vesselParams->SetScatteringCoefficient(vesselScattering);
     vesselParams->SetAnisotopyCoefficient(vesselAnisotropy);
     vesselParams->SetBifurcationFrequency(parameters->GetVesselBifurcationFrequency());
+    vesselParams->SetDoPartialVolume(parameters->GetDoPartialVolume());
 
     VesselTree::Pointer vesselTree = VesselTree::New(vesselParams);
 
@@ -141,10 +142,6 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
       vesselTree->Step(generatedVolume, parameters->GetCalculateNewVesselPositionCallback(), bendingFactor, &randomNumberGenerator);
     }
   }
-
-  mitk::pa::VolumeManipulator::GaussianBlur3D(generatedVolume->GetAbsorptionVolume(), parameters->GetVolumeSmoothingSigma());
-  mitk::pa::VolumeManipulator::GaussianBlur3D(generatedVolume->GetScatteringVolume(), parameters->GetVolumeSmoothingSigma());
-  mitk::pa::VolumeManipulator::GaussianBlur3D(generatedVolume->GetAnisotropyVolume(), parameters->GetVolumeSmoothingSigma());
 
   generatedVolume->FinalizeVolume();
 

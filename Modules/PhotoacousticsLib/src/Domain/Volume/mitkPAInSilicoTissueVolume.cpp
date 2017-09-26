@@ -73,10 +73,7 @@ void mitk::pa::InSilicoTissueVolume::UpdatePropertyList()
   AddDoubleProperty("trajectoryVectorZ", m_TissueParameters->GetMCTrajectoryVectorZ());
   AddDoubleProperty("radius", m_TissueParameters->GetMCRadius());
   AddDoubleProperty("waist", m_TissueParameters->GetMCWaist());
-  if (m_TissueParameters->GetDoVolumeSmoothing())
-    AddDoubleProperty("sigma", m_TissueParameters->GetVolumeSmoothingSigma());
-  else
-    AddDoubleProperty("sigma", 0);
+  AddDoubleProperty("partialVolume", m_TissueParameters->GetDoPartialVolume());
   AddDoubleProperty("standardTissueAbsorption", m_TissueParameters->GetBackgroundAbsorption());
   AddDoubleProperty("standardTissueScattering", m_TissueParameters->GetBackgroundScattering());
   AddDoubleProperty("standardTissueAnisotropy", m_TissueParameters->GetBackgroundAnisotropy());
@@ -172,6 +169,16 @@ mitk::pa::InSilicoTissueVolume::~InSilicoTissueVolume()
   m_SegmentationVolume = nullptr;
   m_TissueParameters = nullptr;
   m_PropertyList = nullptr;
+}
+
+void mitk::pa::InSilicoTissueVolume::SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy)
+{
+  if (IsInsideVolume(x, y, z))
+  {
+    m_AbsorptionVolume->SetData(absorption, x, y, z);
+    m_ScatteringVolume->SetData(scattering, x, y, z);
+    m_AnisotropyVolume->SetData(anisotropy, x, y, z);
+  }
 }
 
 void mitk::pa::InSilicoTissueVolume::SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy, SegmentationType segmentType)

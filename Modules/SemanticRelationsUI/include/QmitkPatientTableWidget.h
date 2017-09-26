@@ -62,7 +62,7 @@ public:
   *       In order for Update-function to be called, this widget has to be added as a observer of the SemanticRelationsManager
   *       (e.g. m_SemanticRelationsManager->AddObserver(m_LesionInfoWidget);)
   *
-  * @par caseID    The current case ID to identify the patient.
+  * @par caseID    The current case ID to identify the currently active patient / case.
   */
   virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 

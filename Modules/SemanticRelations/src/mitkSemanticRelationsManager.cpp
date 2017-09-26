@@ -35,6 +35,13 @@ mitk::SemanticRelationsManager::~SemanticRelationsManager()
 
 void mitk::SemanticRelationsManager::AddObserver(ISemanticRelationsObserver* observer)
 {
+  std::vector<mitk::ISemanticRelationsObserver*>::iterator existingObserver = std::find(m_ObserverVector.begin(), m_ObserverVector.end(), observer);
+  if (existingObserver != m_ObserverVector.end())
+  {
+    // no need to add the already existing observer
+    return;
+  }
+
   m_ObserverVector.push_back(observer);
 }
 
@@ -43,7 +50,7 @@ void mitk::SemanticRelationsManager::RemoveObserver(ISemanticRelationsObserver* 
   m_ObserverVector.erase(std::remove(m_ObserverVector.begin(), m_ObserverVector.end(), observer), m_ObserverVector.end());
 }
 
-void mitk::SemanticRelationsManager::NotifyObserver(const mitk::SemanticTypes::CaseID& caseID)
+void mitk::SemanticRelationsManager::NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) const
 {
   // if the case ID of updates instance is equal to the currently active caseID
   if (caseID == m_CaseID)

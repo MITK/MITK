@@ -21,10 +21,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /*
+  * @brief This interface declares a functions each observer has to implement
+  *        in order to be notified in the 'Observer pattern' sense.
+  */
   class ISemanticRelationsObserver
   {
   public:
-
+    /*
+    * @brief Updates the concrete observer.
+    *        The caseID can be used to get access to a certain patient (case),
+    *        whose data should be used for updating.
+    *
+    * @par caseID    The current case ID to identify the currently active patient / case.
+    */
     virtual void Update(const mitk::SemanticTypes::CaseID& caseID) = 0;
 
   }; // class ISemanticRelationsObserver

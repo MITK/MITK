@@ -158,7 +158,7 @@ public:
       regu += d*d;
       ++num_elements;
     }
-    cost += m_Lambda*regu/num_elements;
+    cost += m_Lambda*1e3*regu/num_elements;
   }
 
   void grad_regu_MSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
@@ -205,34 +205,34 @@ public:
       else
         tdx[c] += (x[c] - local_weight_means[r])/row_sums[r];
     }
-    dx += tdx*2.0*m_Lambda;
+    dx += tdx*1e3*2.0*m_Lambda;
 
-//    vnl_vector<double> dr; dr.set_size(dim); dr.fill(0);
-//    for (unsigned int r=0; r<m_A_Ones.rows(); r++)
-//    {
-//      int n = row_sums[r];
-//      vnl_vector<double> weights; weights.set_size(n);
-//      vnl_matrix<double> temp(n,n,1); temp.fill_diagonal(n-1);
+    //    vnl_vector<double> dr; dr.set_size(dim); dr.fill(0);
+    //    for (unsigned int r=0; r<m_A_Ones.rows(); r++)
+    //    {
+    //      int n = row_sums[r];
+    //      vnl_vector<double> weights; weights.set_size(n);
+    //      vnl_matrix<double> temp(n,n,1); temp.fill_diagonal(n-1);
 
-//      int i=0;
-//      for (auto w : m_A_Ones.get_row(r))
-//      {
-//        weights[i]=w.second;
-//        ++i;
-//      }
+    //      int i=0;
+    //      for (auto w : m_A_Ones.get_row(r))
+    //      {
+    //        weights[i]=w.second;
+    //        ++i;
+    //      }
 
-//      weights -= local_weight_means[r];
-//      weights = temp*weights;
+    //      weights -= local_weight_means[r];
+    //      weights = temp*weights;
 
-//      i=0;
-//      for (auto w : m_A_Ones.get_row(r))
-//      {
-//        dr[w.second] += weights[i];
-//        ++i;
-//      }
-//    }
+    //      i=0;
+    //      for (auto w : m_A_Ones.get_row(r))
+    //      {
+    //        dr[w.second] += weights[i];
+    //        ++i;
+    //      }
+    //    }
 
-//    dx += dr*2.0*m_Lambda;
+    //    dx += dr*2.0*m_Lambda;
   }
 
 
@@ -249,7 +249,7 @@ public:
     //    cost *= cost;
 
     regu_localMSE(x, cost);
-//    regu_MSM(x, cost);
+    //    regu_MSM(x, cost);
 
     return cost;
   }
@@ -274,7 +274,7 @@ public:
     //      dx[c] *= x_exp[c];  // only for e^x weights
 
     grad_regu_localMSE(x,dx);
-//    grad_regu_MSM(x,dx);
+    //    grad_regu_MSM(x,dx);
   }
 };
 
@@ -388,11 +388,11 @@ vnl_vector<double> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   FD /= dir_count;
 
   A /= TD;
-  b *= 100.0/FD;  // times 100 because we want to avoid too small weights
+  b *= 100.0/FD;  // times 100 because we want to avoid too small values for computational reasons
 
-  MITK_INFO << "TD: " << TD;
-  MITK_INFO << "FD: " << FD;
-  MITK_INFO << "Regularization: " << lambda; // pretty large regularization needed --> internally upscale by 1e8
+//  MITK_INFO << "TD: " << TD;
+//  MITK_INFO << "FD: " << FD;
+//  MITK_INFO << "Regularization: " << lambda;
 
   itk::TimeProbe clock;
   clock.Start();
@@ -415,20 +415,37 @@ vnl_vector<double> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
     minimizer.set_max_function_evals(max_iter);
   minimizer.minimize(x);
 
-  // SECOND RUN // USE QUARTILE AS LIMIT???
-  float mean_w = x.mean();
-  MITK_INFO << "Mean weight: " << mean_w;
-
-  x.fill(mean_w);
-  vnl_vector<double> u; u.set_size(num_unknowns); u.fill(mean_w * 3);
+  // SECOND RUN
+  std::vector< double > weights;
+  for (auto w : x)
+    weights.push_back(w);
+  sort(weights.begin(), weights.end());
+  MITK_INFO << "Setting upper weight bound to " << weights.at(num_unknowns*0.95);
+  vnl_vector<double> u; u.set_size(num_unknowns); u.fill(weights.at(num_unknowns*0.95));
   minimizer.set_upper_bound(u);
   bound_selection.fill(2);
   minimizer.set_bound_selection(bound_selection);
   minimizer.minimize(x);
 
-  MITK_INFO << "Residual error: " << minimizer.get_end_error();
+  weights.clear();
+  for (auto w : x)
+    weights.push_back(w);
+  sort(weights.begin(), weights.end());
+
+  MITK_INFO << "*************************";
+  MITK_INFO << "Weight statistics";
+  MITK_INFO << "Mean: " << x.mean();
+  MITK_INFO << "Median: " << weights.at(num_unknowns*0.5);
+  MITK_INFO << "75% quantile: " << weights.at(num_unknowns*0.75);
+  MITK_INFO << "95% quantile: " << weights.at(num_unknowns*0.95);
+  MITK_INFO << "99% quantile: " << weights.at(num_unknowns*0.99);
+  MITK_INFO << "Min: " << weights.at(0);
+  MITK_INFO << "Max: " << weights.at(num_unknowns-1);
+  MITK_INFO << "*************************";
   MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
+  MITK_INFO << "Residual cost: " << minimizer.get_end_error();
+  MITK_INFO << "Final RMS: " << cost.S->get_rms_error(x);
 
   clock.Stop();
   int h = clock.GetTotal()/3600;
@@ -436,12 +453,9 @@ vnl_vector<double> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   int s = (int)clock.GetTotal()%60;
   MITK_INFO << "Optimization took " << h << "h, " << m << "m and " << s << "s";
 
-
-//    vnl_sparse_matrix_linear_system<double> S(A, b);
-//    vnl_vector<double> fitted_b; fitted_b.set_size(b.size());
-//    S.multiply(x, fitted_b);
-//    for (unsigned int r=0; r<b.size(); r++)
-//      MITK_INFO << fitted_b[r] << " - " << b[r];
+  // transform back for peak image creation
+  A *= FD/100.0;
+  b *= FD/100.0;
 
   return x;
 }
@@ -477,12 +491,13 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("", "i1", mitkCommandLineParser::StringList, "Input tractograms:", "input tractograms (.fib, vtk ascii file format)", us::Any(), false);
   parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
-  parser.addArgument("", "it", mitkCommandLineParser::Int, "", "");
-  parser.addArgument("", "b", mitkCommandLineParser::Bool, "", "");
-  parser.addArgument("", "g", mitkCommandLineParser::Float, "", "");
-  parser.addArgument("", "l", mitkCommandLineParser::Float, "", "");
-  parser.addArgument("", "r", mitkCommandLineParser::Int, "", "");
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+
+  parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
+  parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
+  parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. g:", "lower termination threshold for gradient magnitude", 1e-5);
+  parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "weighting factor for regularization", 1.0);
+  parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Residuals:", "save residual images", false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -493,24 +508,24 @@ int main(int argc, char* argv[])
   string outRoot = us::any_cast<string>(parsedArgs["o"]);
 
   bool single_fib = true;
-  if (parsedArgs.count("b"))
-    single_fib = !us::any_cast<bool>(parsedArgs["b"]);
+  if (parsedArgs.count("bundle_based"))
+    single_fib = !us::any_cast<bool>(parsedArgs["bundle_based"]);
 
-  int max_iter = 0;
+  bool save_residuals = false;
+  if (parsedArgs.count("save_res"))
+    save_residuals = us::any_cast<bool>(parsedArgs["residuals"]);
+
+  int max_iter = 20;
   if (parsedArgs.count("it"))
     max_iter = us::any_cast<int>(parsedArgs["it"]);
 
-//  int regu = 0;
-//  if (parsedArgs.count("r"))
-//    regu = us::any_cast<int>(parsedArgs["r"]);
-
   float g_tol = 1e-5;
-  if (parsedArgs.count("g"))
-    g_tol = us::any_cast<float>(parsedArgs["g"]);
+  if (parsedArgs.count("min_g"))
+    g_tol = us::any_cast<float>(parsedArgs["min_g"]);
 
   float lambda = 1.0;
-  if (parsedArgs.count("l"))
-    lambda = us::any_cast<float>(parsedArgs["l"]);
+  if (parsedArgs.count("lambda"))
+    lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
   try
   {
@@ -576,140 +591,129 @@ int main(int argc, char* argv[])
         input_tracts.at(i)->SetFiberWeights(x[i]);
     }
 
-    // OUTPUT IMAGES
-    MITK_INFO << "Generating output images ...";
-    typedef mitk::ImageToItk< PeakImgType > CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(inputImage);
-    caster->Update();
-    PeakImgType::Pointer peak_image = caster->GetOutput();
+    if (save_residuals)
+    {
+      // OUTPUT IMAGES
+      MITK_INFO << "Generating output images ...";
+      typedef mitk::ImageToItk< PeakImgType > CasterType;
+      CasterType::Pointer caster = CasterType::New();
+      caster->SetInput(inputImage);
+      caster->Update();
+      PeakImgType::Pointer peak_image = caster->GetOutput();
 
-    itk::ImageDuplicator< PeakImgType >::Pointer duplicator = itk::ImageDuplicator< PeakImgType >::New();
-    duplicator->SetInputImage(peak_image);
-    duplicator->Update();
-    PeakImgType::Pointer unexplained_image = duplicator->GetOutput();
-    unexplained_image->FillBuffer(0.0);
+      itk::ImageDuplicator< PeakImgType >::Pointer duplicator = itk::ImageDuplicator< PeakImgType >::New();
+      duplicator->SetInputImage(peak_image);
+      duplicator->Update();
+      PeakImgType::Pointer underexplained_image = duplicator->GetOutput();
+      underexplained_image->FillBuffer(0.0);
 
-    duplicator->SetInputImage(unexplained_image);
-    duplicator->Update();
-    PeakImgType::Pointer residual_image = duplicator->GetOutput();
-    residual_image->FillBuffer(0.0);
+      duplicator->SetInputImage(underexplained_image);
+      duplicator->Update();
+      PeakImgType::Pointer overexplained_image = duplicator->GetOutput();
+      overexplained_image->FillBuffer(0.0);
 
-    duplicator->SetInputImage(residual_image);
-    duplicator->Update();
-    PeakImgType::Pointer fitted_image = duplicator->GetOutput();
-    fitted_image->FillBuffer(0.0);
+      duplicator->SetInputImage(overexplained_image);
+      duplicator->Update();
+      PeakImgType::Pointer residual_image = duplicator->GetOutput();
+      residual_image->FillBuffer(0.0);
 
-//    vnl_sparse_matrix_linear_system<double> S(A, b);
-//    vnl_vector<double> fitted_b; fitted_b.set_size(b.size());
-//    S.multiply(x, fitted_b);
+      duplicator->SetInputImage(residual_image);
+      duplicator->Update();
+      PeakImgType::Pointer fitted_image = duplicator->GetOutput();
+      fitted_image->FillBuffer(0.0);
 
-//    unsigned int* image_size = inputImage->GetDimensions();
-//    int sz_x = image_size[0];
-//    int sz_y = image_size[1];
-//    int sz_z = image_size[2];
-//    int sz_peaks = image_size[3]/3 + 1; // +1 for zero - peak
-//    for (unsigned int r=0; r<b.size(); r++)
-//    {
-//      itk::Index<4> idx;
-//      unsigned int linear_index = r;
-//      idx[0] = linear_index % sz_x; linear_index /= sz_x;
-//      idx[1] = linear_index % sz_y; linear_index /= sz_y;
-//      idx[2] = linear_index % sz_z; linear_index /= sz_z;
-//      int peak_id = linear_index % sz_peaks;
+      vnl_sparse_matrix_linear_system<double> S(A, b);
+      vnl_vector<double> fitted_b; fitted_b.set_size(b.size());
+      S.multiply(x, fitted_b);
 
-//      if (peak_id<sz_peaks-1)
-//      {
-//        vnl_vector_fixed<float,3> peak_dir;
+      unsigned int* image_size = inputImage->GetDimensions();
+      int sz_x = image_size[0];
+      int sz_y = image_size[1];
+      int sz_z = image_size[2];
+      int sz_peaks = image_size[3]/3 + 1; // +1 for zero - peak
+      for (unsigned int r=0; r<b.size(); r++)
+      {
+        itk::Index<4> idx;
+        unsigned int linear_index = r;
+        idx[0] = linear_index % sz_x; linear_index /= sz_x;
+        idx[1] = linear_index % sz_y; linear_index /= sz_y;
+        idx[2] = linear_index % sz_z; linear_index /= sz_z;
+        int peak_id = linear_index % sz_peaks;
 
-//        idx[3] = peak_id*3;
-//        peak_dir[0] = peak_image->GetPixel(idx);
-//        idx[3] += 1;
-//        peak_dir[1] = peak_image->GetPixel(idx);
-//        idx[3] += 1;
-//        peak_dir[2] = peak_image->GetPixel(idx);
+        if (peak_id<sz_peaks-1)
+        {
+          vnl_vector_fixed<float,3> peak_dir;
 
-//        peak_dir.normalize();
-//        peak_dir *= fitted_b[r];
-//        //        MITK_INFO << fitted_b[r] << " - " << b[r];
+          idx[3] = peak_id*3;
+          peak_dir[0] = peak_image->GetPixel(idx);
+          idx[3] += 1;
+          peak_dir[1] = peak_image->GetPixel(idx);
+          idx[3] += 1;
+          peak_dir[2] = peak_image->GetPixel(idx);
 
-//        idx[3] = peak_id*3;
-//        fitted_image->SetPixel(idx, peak_dir[0]);
+          peak_dir.normalize();
+          peak_dir *= fitted_b[r];
 
-//        idx[3] += 1;
-//        fitted_image->SetPixel(idx, peak_dir[1]);
+          idx[3] = peak_id*3;
+          fitted_image->SetPixel(idx, peak_dir[0]);
 
-//        idx[3] += 1;
-//        fitted_image->SetPixel(idx, peak_dir[2]);
-//      }
-//    }
+          idx[3] += 1;
+          fitted_image->SetPixel(idx, peak_dir[1]);
 
+          idx[3] += 1;
+          fitted_image->SetPixel(idx, peak_dir[2]);
+        }
+      }
 
-    //    for (unsigned int bundle=0; bundle<input_tracts.size(); bundle++)
-    //    {
-    //      vtkSmartPointer<vtkPolyData> polydata = input_tracts.at(bundle)->GetFiberPolyData();
+      itk::Index<4> idx;
+      for (idx[0]=0; idx[0]<sz_x; ++idx[0])
+        for (idx[1]=0; idx[1]<sz_y; ++idx[1])
+          for (idx[2]=0; idx[2]<sz_z; ++idx[2])
+          {
+            vnl_vector_fixed<float,3> peak_dir;
+            vnl_vector_fixed<float,3> fitted_dir;
+            for (idx[3]=0; idx[3]<image_size[3]; ++idx[3])
+            {
+              peak_dir[idx[3]%3] = peak_image->GetPixel(idx);
+              fitted_dir[idx[3]%3] = fitted_image->GetPixel(idx);
+              residual_image->SetPixel(idx, peak_image->GetPixel(idx) - fitted_image->GetPixel(idx));
 
-    //      for (int i=0; i<input_tracts.at(bundle)->GetNumFibers(); ++i)
-    //      {
-    //        vtkCell* cell = polydata->GetCell(i);
-    //        int numPoints = cell->GetNumberOfPoints();
-    //        vtkPoints* points = cell->GetPoints();
+              if (idx[3]%3==2)
+              {
+                itk::Index<4> tidx= idx;
+                if (peak_dir.magnitude()>fitted_dir.magnitude())
+                {
+                  underexplained_image->SetPixel(tidx, peak_dir[2]-fitted_dir[2]); tidx[3]--;
+                  underexplained_image->SetPixel(tidx, peak_dir[1]-fitted_dir[1]); tidx[3]--;
+                  underexplained_image->SetPixel(tidx, peak_dir[0]-fitted_dir[0]);
+                }
+                else
+                {
+                  overexplained_image->SetPixel(tidx, fitted_dir[2]-peak_dir[2]); tidx[3]--;
+                  overexplained_image->SetPixel(tidx, fitted_dir[1]-peak_dir[1]); tidx[3]--;
+                  overexplained_image->SetPixel(tidx, fitted_dir[0]-peak_dir[0]);
+                }
+              }
+            }
+          }
 
-    //        if (numPoints<2)
-    //          MITK_INFO << "FIBER WITH ONLY ONE POINT ENCOUNTERED!";
+      itk::ImageFileWriter< PeakImgType >::Pointer writer = itk::ImageFileWriter< PeakImgType >::New();
+      writer->SetInput(fitted_image);
+      writer->SetFileName(outRoot + "fitted_image.nrrd");
+      writer->Update();
 
-    //        float w = input_tracts.at(bundle)->GetFiberWeight(i);
+      writer->SetInput(residual_image);
+      writer->SetFileName(outRoot + "residual_image.nrrd");
+      writer->Update();
 
-    //        for (int j=0; j<numPoints-1; ++j)
-    //        {
-    //          double* p1 = points->GetPoint(j);
-    //          PointType4 p;
-    //          p[0]=p1[0];
-    //          p[1]=p1[1];
-    //          p[2]=p1[2];
-    //          p[3]=0;
+      writer->SetInput(overexplained_image);
+      writer->SetFileName(outRoot + "overexplained_image.nrrd");
+      writer->Update();
 
-    //          itk::Index<4> idx4;
-    //          peak_image->TransformPhysicalPointToIndex(p, idx4);
-    //          if (!peak_image->GetLargestPossibleRegion().IsInside(idx4))
-    //            continue;
-
-    //          double* p2 = points->GetPoint(j+1);
-    //          vnl_vector_fixed<float,3> tract_dir;
-    //          tract_dir[0] = p[0]-p2[0];
-    //          tract_dir[1] = p[1]-p2[1];
-    //          tract_dir[2] = p[2]-p2[2];
-    //          tract_dir.normalize();
-
-    //          int peak_id = -1;
-    //          double contr = 1;
-    //          vnl_vector_fixed<float,3> peak_dir = GetClosestPeak(idx4, peak_image, tract_dir, peak_id, contr);
-
-    //          idx4[3] = peak_id*3;
-    //          tract_image->SetPixel(idx4, tract_image->GetPixel(idx4) + tract_dir[0]);
-
-    //          idx4[3] += 1;
-    //          tract_image->SetPixel(idx4, tract_image->GetPixel(idx4) + tract_dir[1]);
-
-    //          idx4[3] += 1;
-    //          tract_image->SetPixel(idx4, tract_image->GetPixel(idx4) + tract_dir[2]);
-    //        }
-
-    //      }
-    //    }
-
-    //    itk::ImageFileWriter< PeakImgType >::Pointer writer = itk::ImageFileWriter< PeakImgType >::New();
-    //    writer->SetInput(fitted_image);
-    //    writer->SetFileName(outRoot + "fitted_image.nrrd");
-    //    writer->Update();
-
-    //    writer->SetInput(tract_image);
-    //    writer->SetFileName(outRoot + "explained_image.nrrd");
-    //    writer->Update();
-
-    //    writer->SetInput(residual_image);
-    //    writer->SetFileName(outRoot + "residual_image.nrrd");
-    //    writer->Update();
+      writer->SetInput(underexplained_image);
+      writer->SetFileName(outRoot + "underexplained_image.nrrd");
+      writer->Update();
+    }
 
     for (unsigned int bundle=0; bundle<input_tracts.size(); bundle++)
     {

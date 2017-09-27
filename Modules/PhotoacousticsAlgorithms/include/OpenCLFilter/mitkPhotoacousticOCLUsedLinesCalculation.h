@@ -25,9 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief
-  //## @ingroup Process
+  /*!
+  * \brief Class implementing a mitk::OclDataSetToDataSetFilter to calculate which lines each sample should use when beamforming.
+  *
+  *  The class must be given a configuration class instance of mitk::BeamformingSettings for beamforming parameters through mitk::OCLDelayCalculation::SetConfig(BeamformingSettings conf)
+  */
 
   class OCLUsedLinesCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
@@ -36,15 +38,12 @@ namespace mitk
     mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
     itkNewMacro(Self);
 
-    /**
-    * @brief SetInput Set the input image. Only 3D images are supported for now.
-    * @param image a 3D image.
-    * @throw mitk::Exception if the dimesion is not 3.
-    */
-
-    /** Update the filter */
     void Update();
 
+    /** \brief Sets a new configuration to use.
+    *
+    * @param conf The configuration set to use for the calculation of the used lines.
+    */
     void SetConfig(BeamformingSettings conf)
     {
       m_Conf = conf;

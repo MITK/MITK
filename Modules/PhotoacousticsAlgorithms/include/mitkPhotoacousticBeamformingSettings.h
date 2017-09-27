@@ -43,7 +43,7 @@ namespace mitk {
     float TimeSpacing = 0.0000000000001; // [s]
     /** \brief The angle of the transducer elements
     */
-    float Angle = 10;
+    float Angle = -1;
     /** \brief Flag whether processed image is a photoacoustic image or an ultrasound image
     */
     bool isPhotoacousticImage = true;

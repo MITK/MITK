@@ -31,9 +31,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief
-  //## @ingroup Process
+  /*!
+  * \brief Class implementing a mitk::OclDataSetToDataSetFilter for beamforming on GPU
+  *
+  *  The class must be given a configuration class instance of mitk::BeamformingSettings for beamforming parameters through mitk::PhotoacousticOCLBeamformingFilter::SetConfig(BeamformingSettings settings)
+  *  Additional configuration of the apodisation function is needed.
+  */
 
 class PhotoacousticOCLBeamformingFilter : public OclDataSetToDataSetFilter, public itk::Object
 {
@@ -47,10 +50,12 @@ public:
   */
   void SetInput(Image::Pointer image);
   /**
-  * @brief SetInput Manually set the input data while providing dimensions and memory size of the input data.
+  *  brief SetInput Manually set the input data while providing 3 dimensions and memory size of the input data (Bytes per element).
   */
   void SetInput(void* data, unsigned int* dimensions, unsigned int BpE);
-
+  /**
+  * @brief GetOutput Get a pointer to the processed data. The standard datatype is float.
+  */
   void* GetOutput();
 
   /**
@@ -58,16 +63,17 @@ public:
   */
   mitk::Image::Pointer GetOutputAsImage();
 
-  /** Update the filter */
+  /** \brief Update the filter */
   void Update();
 
-  /** Set the Apodisation function to apply when beamforming */
+  /** \brief Set the Apodisation function to apply when beamforming */
   void SetApodisation(float* apodisation, unsigned short apodArraySize)
   {
     m_ApodArraySize = apodArraySize;
     m_Apodisation = apodisation;
   }
 
+  /** \brief Set beamforming settings to use when beamforming */
   void SetConfig(BeamformingSettings settings)
   {
     m_ConfOld = m_Conf;
@@ -76,17 +82,16 @@ public:
 
 protected:
 
-  /** Constructor */
   PhotoacousticOCLBeamformingFilter();
-
-  /** Destructor */
   virtual ~PhotoacousticOCLBeamformingFilter();
 
-  /** Initialize the filter */
+  /** \brief Initialize the filter */
   bool Initialize();
 
+  /** \brief Updated the used data for beamforming depending on whether the configuration has significantly changed */
   void UpdateDataBuffers();
 
+  /** \brief Execute the filter */
   void Execute();
 
   mitk::PixelType GetOutputType()
@@ -126,8 +131,6 @@ private:
   cl_mem m_MemoryLocationsBuffer;
   cl_mem m_DelaysBuffer;
   cl_mem m_UsedLinesBuffer;
-
-  std::chrono::steady_clock::time_point m_Begin;
 };
 }
 #else

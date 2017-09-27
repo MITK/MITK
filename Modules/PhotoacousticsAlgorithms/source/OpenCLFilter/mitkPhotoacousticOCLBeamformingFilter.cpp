@@ -83,7 +83,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
 
   try
   {
-    MITK_INFO << "Updating Workgroup size for new dimensions";
+    MITK_DEBUG << "Updating Workgroup size for new dimensions";
     size_t outputSize = (size_t)m_Conf.ReconstructionLines * (size_t)m_Conf.SamplesPerLine * (size_t)m_Conf.inputDim[2];
     m_OutputDim[0] = m_Conf.ReconstructionLines;
     m_OutputDim[1] = m_Conf.SamplesPerLine;
@@ -99,7 +99,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
   if (BeamformingSettings::SettingsChangedOpenCL(m_Conf, m_ConfOld))
   {
     cl_int clErr = 0;
-    MITK_INFO << "Updating Buffers for new configuration";
+    MITK_DEBUG << "Updating Buffers for new configuration";
 
     // create the apodisation buffer
 

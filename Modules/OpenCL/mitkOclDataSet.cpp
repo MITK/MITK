@@ -29,7 +29,7 @@ mitk::OclDataSet::OclDataSet() : m_gpuBuffer(nullptr), m_context(nullptr), m_buf
 
 mitk::OclDataSet::~OclDataSet()
 {
-  MITK_INFO << "OclDataSet Destructor";
+  MITK_DEBUG << "OclDataSet Destructor";
 
   //release GMEM Image buffer
   if (m_gpuBuffer) clReleaseMemObject(m_gpuBuffer);
@@ -38,7 +38,7 @@ mitk::OclDataSet::~OclDataSet()
 
 cl_mem mitk::OclDataSet::CreateGPUBuffer()
 {
-  MITK_INFO << "InitializeGPUBuffer call with: BPE=" << m_BpE;
+  MITK_DEBUG << "InitializeGPUBuffer call with: BPE=" << m_BpE;
 
   us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
@@ -50,7 +50,7 @@ cl_mem mitk::OclDataSet::CreateGPUBuffer()
 
   m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE, m_bufferSize * (size_t)m_BpE, nullptr, &clErr);
 
-  MITK_INFO << "Created GPU Buffer Object of size: " << (size_t)m_BpE * m_bufferSize << " Bytes";
+  MITK_DEBUG << "Created GPU Buffer Object of size: " << (size_t)m_BpE * m_bufferSize << " Bytes";
 
   CHECK_OCL_ERR(clErr);
 
@@ -95,7 +95,7 @@ int mitk::OclDataSet::TransferDataToGPU(cl_command_queue gpuComQueue)
     if (m_gpuBuffer != nullptr)
     {
       clErr = clEnqueueWriteBuffer(gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * (size_t)m_BpE, m_Data, 0, NULL, NULL);
-      MITK_INFO << "Wrote Data to GPU Buffer Object.";
+      MITK_DEBUG << "Wrote Data to GPU Buffer Object.";
 
       CHECK_OCL_ERR(clErr);
       m_gpuModified = true;
@@ -121,11 +121,13 @@ cl_mem mitk::OclDataSet::GetGPUBuffer()
   // query image object info only if already initialized
   if( this->m_gpuBuffer )
   {
+    #ifdef MBILOG_ENABLE_DEBUG
     clErr = clGetMemObjectInfo(this->m_gpuBuffer, CL_MEM_TYPE, sizeof(cl_mem_object_type), &memInfo, nullptr );
     CHECK_OCL_ERR(clErr);
+    #endif
   }
 
-  MITK_INFO << "Querying info for object, recieving: " << memInfo;
+  MITK_DEBUG << "Querying info for object, recieving: " << memInfo;
 
   return m_gpuBuffer;
 }
@@ -144,7 +146,9 @@ void* mitk::OclDataSet::TransferDataToCPU(cl_command_queue gpuComQueue)
   char* data = new char[m_bufferSize * (size_t)m_BpE];
 
   // debug info
+  #ifdef MBILOG_ENABLE_DEBUG
   oclPrintMemObjectInfo( m_gpuBuffer );
+  #endif
 
   clErr = clEnqueueReadBuffer( gpuComQueue, m_gpuBuffer, CL_TRUE, 0, m_bufferSize * (size_t)m_BpE, data ,0, nullptr, nullptr);
   CHECK_OCL_ERR(clErr);

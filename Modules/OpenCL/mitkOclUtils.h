@@ -57,6 +57,9 @@ MITKOPENCL_EXPORT cl_int oclGetPlatformID(cl_platform_id* selectedPlatform);
 /*! \brief Prints out the essential support information about current device */
 MITKOPENCL_EXPORT void oclPrintDeviceInfo(cl_device_id);
 
+/*! \brief Returns the Global memory size of the current device */
+MITKOPENCL_EXPORT cl_ulong oclGetGlobalMemSize(cl_device_id device);
+
 /*! @brief Prints the available memory info about the given object to std::cout
   */
 MITKOPENCL_EXPORT void oclPrintMemObjectInfo( cl_mem memobj);

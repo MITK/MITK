@@ -215,6 +215,13 @@ void oclPrintDeviceInfo(cl_device_id device)
 
 }
 
+cl_ulong oclGetGlobalMemSize(cl_device_id device)
+{
+  cl_ulong mem_size;
+  clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(mem_size), &mem_size, nullptr);
+  return mem_size;
+}
+
 std::string GetOclErrorAsString( int _clErr )
 {
   std::string returnString("unkown error number: "+std::to_string(_clErr)+" \n");

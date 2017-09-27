@@ -16,28 +16,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
-#ifdef PHOTOACOUSTICS_USE_GPU
+
+#include <itkObject.h>
+
+#if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
 #include "mitkOclDataSetToDataSetFilter.h"
-#include <itkObject.h>
 
 #include "mitkPhotoacousticOCLDelayCalculation.h"
 #include "mitkPhotoacousticOCLUsedLinesCalculation.h"
-
 #include "mitkPhotoacousticBeamformingSettings.h"
 
 #include <chrono>
 
 namespace mitk
 {
-/** Documentation
-  *
-  * \brief The OclBinaryThresholdImageFilter computes a binary segmentation based on given
-  threshold values.
-
-  *
-  * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
-  */
+  //##Documentation
+  //## @brief
+  //## @ingroup Process
 
 class PhotoacousticOCLBeamformingFilter : public OclDataSetToDataSetFilter, public itk::Object
 {
@@ -132,6 +128,21 @@ private:
   cl_mem m_UsedLinesBuffer;
 
   std::chrono::steady_clock::time_point m_Begin;
+};
+}
+#else
+class PhotoacousticOCLBeamformingFilter : public itk::Object
+{
+public:
+  mitkClassMacroItkParent(mitk::PhotoacousticOCLBeamformingFilter, itk::Object);
+  itkNewMacro(Self);
+
+protected:
+  /** Constructor */
+  PhotoacousticOCLBeamformingFilter() {}
+
+  /** Destructor */
+  virtual ~PhotoacousticOCLBeamformingFilter() {}
 };
 }
 #endif

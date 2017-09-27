@@ -84,7 +84,7 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
 
   mitk::Vector3D spacing;
   spacing[0] = m_Conf.Pitch * m_Conf.TransducerElements * 1000 / m_Conf.ReconstructionLines;
-  spacing[1] = m_Conf.RecordTime / 2 * m_Conf.SpeedOfSound * 1000 / m_Conf.SamplesPerLine;
+  spacing[1] = (m_Conf.TimeSpacing * m_Conf.inputDim[1]) / 2 * m_Conf.SpeedOfSound * 1000 / m_Conf.SamplesPerLine;
   spacing[2] = 1;
 
   output->GetGeometry()->SetSpacing(spacing);
@@ -223,7 +223,7 @@ void mitk::BeamformingFilter::GenerateData()
       m_InputData = nullptr;
     }
   }
-#ifdef PHOTOACOUSTICS_USE_GPU
+  #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
   else
   {
     try
@@ -257,7 +257,7 @@ void mitk::BeamformingFilter::GenerateData()
       m_Message = "An openCL error occurred; all GPU operations in this and the next session may be corrupted.";
     }
   }
-#endif
+  #endif
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();

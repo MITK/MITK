@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITKPHOTOACOUSTICSBMODEFILTER_H_
 #define _MITKPHOTOACOUSTICSBMODEFILTER_H_
 
-#ifdef PHOTOACOUSTICS_USE_GPU
+#if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 #include "mitkOclDataSetToDataSetFilter.h"
 #endif
 
@@ -26,14 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  #ifdef PHOTOACOUSTICS_USE_GPU
+  #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
-  /** Documentation
-  *
-  * \brief The PhotoacousticOCLBModeFilter simply takes the absolute of all pixels in the image.
-  *
-  * The filter gives the option to use a log after taking the absolute.
-  */
+  //##Documentation
+  //## @brief
+  //## @ingroup Process
 
   class PhotoacousticOCLBModeFilter : public OclDataSetToDataSetFilter, public itk::Object
   {
@@ -42,10 +39,8 @@ namespace mitk
     mitkClassMacroItkParent(PhotoacousticOCLBModeFilter, itk::Object);
     itkNewMacro(Self);
 
-    /**
-    * @brief SetInput Set the input image
-    * @param image a image.
-    */
+    //##Description
+    //## @brief Time when Header was last initialized
     void SetInput(Image::Pointer image);
 
     /** Update the filter */

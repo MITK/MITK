@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITKPHOTOACOUSTICSDELAYCALC_H_
 #define _MITKPHOTOACOUSTICSDELAYCALC_H_
 
-#ifdef PHOTOACOUSTICS_USE_GPU
+#if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
@@ -25,14 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /** Documentation
-  *
-  * \brief The OclBinaryThresholdImageFilter computes a binary segmentation based on given
-  threshold values.
-
-  *
-  * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
-  */
+  //##Documentation
+  //## @brief
+  //## @ingroup Process
 
   class OCLDelayCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {

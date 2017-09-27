@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include <mitkImageReadAccessor.h>
 
-#ifdef PHOTOACOUSTICS_USE_GPU
+#if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
 mitk::PhotoacousticOCLBModeFilter::PhotoacousticOCLBModeFilter()
   : m_PixelCalculation(NULL)

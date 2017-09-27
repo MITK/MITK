@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifdef PHOTOACOUSTICS_USE_GPU
+#if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
 #include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
 #include "usServiceReference.h"
@@ -76,7 +76,11 @@ void mitk::PhotoacousticOCLBeamformingFilter::Update()
 
 void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
 {
+  /*us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+  cl_ulong globalMemSize = oclGetGlobalMemSize(resources->GetCurrentDevice());*/
   //Initialize the Output
+
   try
   {
     MITK_INFO << "Updating Workgroup size for new dimensions";

@@ -294,7 +294,7 @@ void PAImageProcessing::BatchProcessing()
       if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
         image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, useGPU, m_UseLogfilter, m_ResampleSpacing);
       else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, useGPU, m_UseLogfilter, m_ResampleSpacing);
+        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::EnvelopeDetection, useGPU, m_UseLogfilter, m_ResampleSpacing);
       
       if (saveSteps[3])
       {
@@ -465,7 +465,7 @@ void PAImageProcessing::StartBmodeThread()
       if(m_Controls.BModeMethod->currentText() == "Absolute Filter")
         thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::Abs, useGPU);
       else if(m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::ShapeDetection, useGPU);
+        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::EnvelopeDetection, useGPU);
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 

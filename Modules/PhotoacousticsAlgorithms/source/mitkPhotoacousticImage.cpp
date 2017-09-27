@@ -124,7 +124,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
     resampleImageFilter->UpdateLargestPossibleRegion();
     return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
   }
-  else if (method == BModeMethod::ShapeDetection)
+  else if (method == BModeMethod::EnvelopeDetection)
   {
     typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
     BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter

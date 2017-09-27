@@ -479,6 +479,9 @@ std::vector< string > get_file_list(const std::string& path)
   return file_list;
 }
 
+/*!
+\brief Fits the tractogram to the input peak image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).
+*/
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -504,7 +507,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
 
   mitkCommandLineParser::StringContainerType fib_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i1"]);
-  string dwiFile = us::any_cast<string>(parsedArgs["i2"]);
+  string peak_file_name = us::any_cast<string>(parsedArgs["i2"]);
   string outRoot = us::any_cast<string>(parsedArgs["o"]);
 
   bool single_fib = true;
@@ -532,7 +535,7 @@ int main(int argc, char* argv[])
     std::vector< mitk::FiberBundle::Pointer > input_tracts;
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
-    mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(dwiFile, &functor)[0].GetPointer());
+    mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(peak_file_name, &functor)[0].GetPointer());
 
     float minSpacing = 1;
     if(inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[1] && inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[2])

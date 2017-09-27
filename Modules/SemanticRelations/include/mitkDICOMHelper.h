@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSemanticRelationsExports.h>
 
-// semantic relation module
+// semantic relations module
 #include "mitkSemanticTypes.h"
 
 // mitk core
@@ -29,32 +29,68 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <string>
 
+/*
+* @brief Provides helper functions to convert DICOM Tag information.
+*
+*   In order to identify the patient of an image or segmentation or to set the control point of DICOM data,
+*   these functions are used to retrieve the DICOM tags from the given data nodes and convert them into semantic types
+*   that can be used by the SemanticRelations class.
+*/
 namespace mitk
 {
   /*
-  * @brief The DICOMHelper provides functions to convert DICOM Tag information
+  * @brief  Extracts a specific DICOM tag (currently "0x0010, 0x0020": PatientID) from the node's base data
+  *         and returns the tag as a string. This tag string is used as an identifier for the patient (case).
   *
-  *   In order to identify the patient of an image or segmentation or to set the control point of DICOM data,
-  *   the DICOMHelper is able to retrieve the DICOM tags from the given data nodes and convert them into semantic types
-  *   that are used by the SemanticRelations class.
+  * @pre    The given data node or the node's base data has to be valid (!nullptr).
+  * @pre    The node's base data has to have the "0x0010, 0x0020" DICOM Tag property set.
+  * @throw  mitk::Exception if the given data node, the node's base data or the extracted DICOM tag are invalid (==nullptr).
+  *
+  * @par dataNode   The data node, of which the DICOM tag should be extracted.
+  *
+  * @return         The extracted DICOM tag as string.
+  *                 An empty string, if the DICOM tag can not be extracted (i.e. the data node or
+  *                 the underlying base data is invalid or the DICOM tag does not exist for the given data node).
   */
-  namespace DICOMHelper
-  {
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::CaseID GetCaseIDFromDataNode(const mitk::DataNode* dataNode);
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ID GetIDFromDataNode(const mitk::DataNode* dataNode);
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Date GetDateFromDataNode(const mitk::DataNode* dataNode);
-
-    MITKSEMANTICRELATIONS_EXPORT void ReformatDICOMTag(const std::string& tag, std::string& identifier);
-
-    SemanticTypes::Date GetDateFromString(const std::string& dateAsString);
-
-    std::string Trim(const std::string& identifier);
-    std::string DICOMTagToName(const std::string& propertyName);
-    std::string DICOMTagPathToName(const mitk::DICOMTagPath& tagPath);
-    void ReformatDICOMDate(std::string& identifier);
-    void ReformatDICOMTime(std::string& identifier);
-
-  } // namespace DICOMHelper
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::CaseID GetCaseIDFromDataNode(const mitk::DataNode* dataNode);
+  /*
+  * @brief Extracts a specific DICOM tag (currently "0x0020, 0x000e": SeriesInstanceUID) from the node's base data
+  *        and returns the tag as a string. This tag string is used as an identifier for the image instance.
+  *
+  * @pre    The given data node or the node's base data has to be valid (!nullptr).
+  * @pre    The node's base data has to have the "0x0020, 0x000e" DICOM Tag property set.
+  * @throw  mitk::Exception if the given data node, the node's base data or the extracted DICOM tag are invalid (==nullptr).
+  *
+  * @par dataNode   The data node, of which the DICOM tag should be extracted.
+  *
+  * @return         The extracted DICOM tag as string.
+  *                 An empty string, if the DICOM tag can not be extracted (i.e. the data node or
+  *                 the underlying base data is invalid or the DICOM tag does not exist for the given data node).
+  */
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ID GetIDFromDataNode(const mitk::DataNode* dataNode);
+  /*
+  * @brief Extracts a specific DICOM tag (currently "0x0008, 0x0022": AcquisitionDate) from the node's base data
+  *        and returns the tag as a string. This tag string is used as the date of the image data.
+  *
+  * @pre    The given data node or the node's base data has to be valid (!nullptr).
+  * @pre    The node's base data has to have the "0x0008, 0x0022" DICOM Tag property set.
+  * @throw  mitk::Exception if the given data node, the node's base data or the extracted DICOM tag are invalid (==nullptr).
+  *
+  * @par dataNode   The data node, of which the DICOM tag should be extracted.
+  *
+  * @return         The extracted DICOM tag as string.
+  *                 An empty string, if the DICOM tag can not be extracted (i.e. the data node or
+  *                 the underlying base data is invalid or the DICOM tag does not exist for the given data node).
+  */
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Date GetDICOMDateFromDataNode(const mitk::DataNode* dataNode);
+  /*
+  * @brief Removes leading and trailing whitespace from the given string.
+  *
+  * @par identifier   The value of a DICOM tag.
+  *
+  * @return       The trimmed DICOM tag
+  */
+  MITKSEMANTICRELATIONS_EXPORT std::string TrimDICOM(const std::string& identifier);
 } // namespace mitk
 
 #endif // MITKDICOMHELPER_H

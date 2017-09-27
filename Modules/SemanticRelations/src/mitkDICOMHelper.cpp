@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relation module
+// semantic relations module
 #include "mitkDICOMHelper.h"
 #include "mitkUIDGeneratorBoost.h"
 
@@ -24,46 +24,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <algorithm>
 
-mitk::SemanticTypes::CaseID mitk::DICOMHelper::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
+mitk::SemanticTypes::Date GetDateFromString(const std::string& dateAsString);
+
+mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
-    MITK_INFO << "Not a valid data node.";
-    return SemanticTypes::CaseID();
+    mitkThrow() << "Not a valid data node.";
   }
 
   mitk::BaseData* baseData = dataNode->GetData();
   if (nullptr == baseData)
   {
-    MITK_INFO << "No valid base data.";
-    return SemanticTypes::CaseID();
+    mitkThrow() << "No valid base data.";
   }
 
   // extract suitable DICOM tag to use as the case id
-  // DICOM tag "0x0010, 0x0010" is PatientName
-  // DICOM tag "0x0010, 0x0020" is PatientID
-  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str());
-  if (nullptr != dicomTag)
+  // two alternatives can be used:
+  //        - DICOM tag "0x0010, 0x0010" is PatientName
+  //        - DICOM tag "0x0010, 0x0020" is PatientID
+  // in the current implementation the PatientID (0x0010, 0x0020) is used
+  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0020).c_str());
+  if (nullptr == dicomTag)
   {
-    std::string dicomTagAsString = dicomTag->GetValueAsString();
-    return dicomTagAsString;
+    mitkThrow() << "not a valid DICOM property.";
   }
-  return "";
+
+  std::string dicomTagAsString = dicomTag->GetValueAsString();
+  return dicomTagAsString;
 }
 
-mitk::SemanticTypes::ID mitk::DICOMHelper::GetIDFromDataNode(const mitk::DataNode* dataNode)
+mitk::SemanticTypes::ID mitk::GetIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
-    MITK_INFO << "Not a valid data node.";
-    return SemanticTypes::CaseID();
+    mitkThrow() << "Not a valid data node.";
   }
 
   mitk::BaseData* baseData = dataNode->GetData();
   if (nullptr == baseData)
   {
-    MITK_INFO << "No valid base data.";
-    return SemanticTypes::CaseID();
+    mitkThrow() << "No valid base data.";
   }
 
   // extract suitable DICOM tag to use as the data node id
@@ -71,133 +72,67 @@ mitk::SemanticTypes::ID mitk::DICOMHelper::GetIDFromDataNode(const mitk::DataNod
   mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str());
   if (nullptr != dicomTag)
   {
-    std::string dicomTagAsString = dicomTag->GetValueAsString();
-    return dicomTagAsString;
+    mitkThrow() << "not a valid DICOM property.";
   }
-  return "";
+  std::string dicomTagAsString = dicomTag->GetValueAsString();
+  return dicomTagAsString;
 }
 
-mitk::SemanticTypes::Date mitk::DICOMHelper::GetDateFromDataNode(const mitk::DataNode* dataNode)
+mitk::SemanticTypes::Date mitk::GetDICOMDateFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
-    MITK_INFO << "Not a valid data node.";
-    return SemanticTypes::Date();
+    mitkThrow() << "Not a valid data node.";
   }
 
   mitk::BaseData* baseData = dataNode->GetData();
   if (nullptr == baseData)
   {
-    MITK_INFO << "No valid base data.";
-    return SemanticTypes::Date();
+    mitkThrow() << "No valid base data.";
   }
 
-  // DICOM study date       = DICOMTag(0x0008, 0x0020)
-  // DICOM series date      = DICOMTag(0x0008, 0x0021)
-  // DICOM acquisition date = DICOMTag(0x0008, 0x0022)
-  // => TODO: which to chose?
+  // extract suitable DICOM tag to use as the data node id
+  // DICOM tag "0x0008, 0x0022" is AcquisitionDate
   mitk::BaseProperty* acquisitionDateProperty = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str());
   if (nullptr != acquisitionDateProperty)
   {
-    std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
-    return GetDateFromString(acquisitionDateAsString);
+    mitkThrow() << "not a valid DICOM property.";
   }
-
-  return SemanticTypes::Date();
+  std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
+  return GetDateFromString(acquisitionDateAsString);
 }
 
-void mitk::DICOMHelper::ReformatDICOMTag(const std::string &tag, std::string &identifier)
-{
-  // remove leading and trailing whitespace
-  identifier = Trim(identifier);
-  std::string tagName = DICOMTagToName(tag);
-  if (tagName.length() >= 4)
-  {
-    if ("Date" == tagName.substr(tagName.length() - 4))
-    {
-      DICOMHelper::ReformatDICOMDate(identifier);
-    }
-    else if ("Time" == tagName.substr(tagName.length() - 4))
-    {
-      DICOMHelper::ReformatDICOMTime(identifier);
-    }
-  }
-}
-
-mitk::SemanticTypes::Date mitk::DICOMHelper::GetDateFromString(const std::string& dateAsString)
-{
-  if (dateAsString.size() != 8) // string does not represent a DICOM date
-  {
-    return SemanticTypes::Date();
-  }
-
-  SemanticTypes::Date date;
-  date.UID = UIDGeneratorBoost::GenerateUID();
-  // date expected to be YYYYMMDD (8 characters)
-  date.year = std::strtoul(dateAsString.substr(0, 4).c_str(), nullptr, 10);
-  date.month = std::strtoul(dateAsString.substr(4, 2).c_str(), nullptr, 10);
-  date.day = std::strtoul(dateAsString.substr(6, 2).c_str(), nullptr, 10);
-
-  return date;
-}
-
-std::string mitk::DICOMHelper::Trim(const std::string& identifier)
+std::string mitk::TrimDICOM(const std::string& identifier)
 {
   if (identifier.empty())
   {
     return identifier;
   }
 
+  // leading whitespace
   std::size_t first = identifier.find_first_not_of(' ');
   if (std::string::npos == first)
   {
     return "";
   }
+  // trailing whitespace
   std::size_t last = identifier.find_last_not_of(' ');
   return identifier.substr(first, last - first + 1);
 }
 
-std::string mitk::DICOMHelper::DICOMTagToName(const std::string& propertyName)
+mitk::SemanticTypes::Date GetDateFromString(const std::string& dateAsString)
 {
-  mitk::DICOMTagPath tagPath = mitk::PropertyNameToDICOMTagPath(propertyName);
-  return DICOMTagPathToName(tagPath);
-}
-
-std::string mitk::DICOMHelper::DICOMTagPathToName(const mitk::DICOMTagPath& tagPath)
-{
-  std::string tagName;
-  int i = 0;
-  for (const auto& node : tagPath.GetNodes())
+  if (dateAsString.size() != 8) // string does not represent a DICOM date
   {
-    if (i > 0)
-    {
-      tagName += "/";
-    }
-
-    tagName += node.tag.GetName();
-    ++i;
+    return mitk::SemanticTypes::Date();
   }
-  return tagName;
-}
 
-void mitk::DICOMHelper::ReformatDICOMDate(std::string& identifier)
-{
-  if (identifier.size() != 8) // identifier does not represent a DICOM date
-    return;
-
+  mitk::SemanticTypes::Date date;
+  date.UID = mitk::UIDGeneratorBoost::GenerateUID();
   // date expected to be YYYYMMDD (8 characters)
-  // should output YYYY-MM-DD
-  identifier.insert(4, 1, '-');
-  identifier.insert(7, 1, '-');
-}
+  date.year = std::strtoul(dateAsString.substr(0, 4).c_str(), nullptr, 10);
+  date.month = std::strtoul(dateAsString.substr(4, 2).c_str(), nullptr, 10);
+  date.day = std::strtoul(dateAsString.substr(6, 2).c_str(), nullptr, 10);
 
-void mitk::DICOMHelper::ReformatDICOMTime(std::string& identifier)
-{
-  if (identifier.size() != 6) // identifier does not represent a DICOM time
-    return;
-
-  // time expected to be HHMMSS (6 characters)
-  // should output HH:MM:SS
-  identifier.insert(2, 1, ':');
-  identifier.insert(5, 1, ':');
+  return date;
 }

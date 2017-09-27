@@ -28,10 +28,12 @@ namespace mitk
 {
   #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
-  //##Documentation
-  //## @brief
-  //## @ingroup Process
-
+  /*!
+  * \brief Class implementing a mitk::OclDataSetToDataSetFilter for BMode filtering on GPU
+  *
+  *  The only parameter that needs to be provided is whether it should use a logfilter.
+  *  Currently this class only performs an absolute BMode filter.
+  */
   class PhotoacousticOCLBModeFilter : public OclDataSetToDataSetFilter, public itk::Object
   {
 
@@ -39,20 +41,23 @@ namespace mitk
     mitkClassMacroItkParent(PhotoacousticOCLBModeFilter, itk::Object);
     itkNewMacro(Self);
 
-    //##Description
-    //## @brief Time when Header was last initialized
+    /** \brief Set the input image to be processed
+    */
     void SetInput(Image::Pointer image);
 
-    /** Update the filter */
     void Update();
 
+    /** \brief Set parameters for the filter
+    *
+    * @param useLogFilter If true, the filter will apply a logfilter on the processed image
+    */
     void SetParameters(bool useLogFilter)
     {
       m_UseLogFilter = useLogFilter;
     }    
     
     /**
-     * @brief GetOutputAsImage Returns an mitk::Image constructed from the processed data
+     * @brief GetOutput Returns an mitk::Image constructed from the processed data
      */
     mitk::Image::Pointer GetOutput();
 
@@ -90,6 +95,12 @@ namespace mitk
   };
   #endif
 
+  /*!
+  * \brief Class implementing a mitk::ImageToImageFilter for BMode filtering on CPU
+  *
+  *  The only parameter that needs to be provided is whether it should use a logfilter.
+  *  Currently this class only performs an absolute BMode filter.
+  */
   class PhotoacousticBModeFilter : public ImageToImageFilter
   {
   public:
@@ -98,6 +109,10 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    /** \brief Set parameters for the filter
+    *
+    * @param useLogFilter If true, the filter will apply a logfilter on the processed image
+    */
     void SetParameters(bool useLogFilter)
     {
       m_UseLogFilter = useLogFilter;

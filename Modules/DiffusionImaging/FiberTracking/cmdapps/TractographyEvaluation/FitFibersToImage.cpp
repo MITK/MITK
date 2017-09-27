@@ -146,7 +146,7 @@ public:
     local_weight_means = element_quotient(local_weight_means, row_sums);
 
     m_A_Ones.reset();
-    unsigned int num_elements = 0;
+//    unsigned int num_elements = 0;
     double regu = 0;
     while (m_A_Ones.next())
     {
@@ -156,9 +156,9 @@ public:
       else
         d = x[m_A_Ones.getcolumn()] - local_weight_means[m_A_Ones.getrow()];
       regu += d*d;
-      ++num_elements;
+//      ++num_elements;
     }
-    cost += m_Lambda*1e3*regu/num_elements;
+    cost += m_Lambda*regu/dim;
   }
 
   void grad_regu_MSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
@@ -193,46 +193,19 @@ public:
 
     vnl_vector<double> tdx(dim, 0);
     m_A_Ones.reset();
+//    unsigned int num_elements = 0;
     while (m_A_Ones.next())
     {
       int c = m_A_Ones.getcolumn();
       int r = m_A_Ones.getrow();
-      if (row_sums[r]==0)
-        continue;
 
       if (x[c]>local_weight_means[r])
-        tdx[c] += (exp_x[c] * ( exp_x[c] - exp_means[r] ))/row_sums[r];
+        tdx[c] += exp_x[c] * ( exp_x[c] - exp_means[r] );
       else
-        tdx[c] += (x[c] - local_weight_means[r])/row_sums[r];
+        tdx[c] += x[c] - local_weight_means[r];
+//      ++num_elements;
     }
-    dx += tdx*1e3*2.0*m_Lambda;
-
-    //    vnl_vector<double> dr; dr.set_size(dim); dr.fill(0);
-    //    for (unsigned int r=0; r<m_A_Ones.rows(); r++)
-    //    {
-    //      int n = row_sums[r];
-    //      vnl_vector<double> weights; weights.set_size(n);
-    //      vnl_matrix<double> temp(n,n,1); temp.fill_diagonal(n-1);
-
-    //      int i=0;
-    //      for (auto w : m_A_Ones.get_row(r))
-    //      {
-    //        weights[i]=w.second;
-    //        ++i;
-    //      }
-
-    //      weights -= local_weight_means[r];
-    //      weights = temp*weights;
-
-    //      i=0;
-    //      for (auto w : m_A_Ones.get_row(r))
-    //      {
-    //        dr[w.second] += weights[i];
-    //        ++i;
-    //      }
-    //    }
-
-    //    dx += dr*2.0*m_Lambda;
+    dx += tdx*2.0*m_Lambda/dim;
   }
 
 
@@ -241,15 +214,7 @@ public:
     double cost = S->get_rms_error(x);
     cost *= cost;
 
-    // cost for e^x
-    //    vnl_vector<double> x_exp; x_exp.set_size(x.size());
-    //    for (unsigned int c=0; c<x.size(); c++)
-    //      x_exp[c] = std::exp(x[c]);
-    //    double cost = S->get_rms_error(x_exp);
-    //    cost *= cost;
-
     regu_localMSE(x, cost);
-    //    regu_MSM(x, cost);
 
     return cost;
   }
@@ -259,10 +224,6 @@ public:
     dx.fill(0.0);
     unsigned int N = m_b.size();
 
-    //    vnl_vector<double> x_exp; x_exp.set_size(x.size());
-    //    for (unsigned int c=0; c<x.size(); c++)
-    //      x_exp[c] = std::exp(x[c]);
-
     vnl_vector<double> d; d.set_size(N);
     S->multiply(x,d);
     d -= m_b;
@@ -270,11 +231,7 @@ public:
     S->transpose_multiply(d, dx);
     dx *= 2.0/N;
 
-    //    for (unsigned int c=0; c<x.size(); c++)
-    //      dx[c] *= x_exp[c];  // only for e^x weights
-
     grad_regu_localMSE(x,dx);
-    //    grad_regu_MSM(x,dx);
   }
 };
 
@@ -386,20 +343,17 @@ vnl_vector<double> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
 
   TD /= (dir_count*fiber_count);
   FD /= dir_count;
-
   A /= TD;
   b *= 100.0/FD;  // times 100 because we want to avoid too small values for computational reasons
 
-//  MITK_INFO << "TD: " << TD;
-//  MITK_INFO << "FD: " << FD;
-//  MITK_INFO << "Regularization: " << lambda;
+//  double init_lambda = TD*fiber_count;  // initialization for lambda estimation
+  double init_lambda = 1e5;  // initialization for lambda estimation
 
   itk::TimeProbe clock;
   clock.Start();
 
-  MITK_INFO << "Fitting fibers";
   VnlCostFunction cost(num_unknowns);
-  cost.SetProblem(A, b, lambda);
+  cost.SetProblem(A, b, init_lambda);
 
   vnl_vector<double> x; x.set_size(num_unknowns); x.fill( TD/100.0 * FD/2.0 );
 
@@ -409,10 +363,52 @@ vnl_vector<double> FitFibers( std::string , std::vector< mitk::FiberBundle::Poin
   vnl_vector<long> bound_selection; bound_selection.set_size(num_unknowns); bound_selection.fill(1);
   minimizer.set_bound_selection(bound_selection);
   minimizer.set_lower_bound(l);
-  minimizer.set_trace(true);
   minimizer.set_projected_gradient_tolerance(g_tol);
-  if (max_iter>0)
-    minimizer.set_max_function_evals(max_iter);
+
+  MITK_INFO << "Estimating lambda";
+  minimizer.set_trace(false);
+  minimizer.set_max_function_evals(1);
+
+  minimizer.minimize(x);
+  vnl_vector<double> dx; dx.set_size(num_unknowns); dx.fill(0.0);
+  cost.grad_regu_localMSE(x, dx);
+  double r = dx.magnitude()/x.magnitude();
+//  MITK_INFO << r;
+  cost.m_Lambda *= lambda*55.0/r;
+
+//  double r = 10000;
+//  int count = 0;
+//  double best_lambda = cost.m_Lambda;
+//  double min_dist = 100000;
+//  while (fabs(r-60)>10 && count<10)
+//  {
+//    x.fill( TD/100.0 * FD/2.0 );
+//    minimizer.minimize(x);
+//    dx.fill(0.0);
+//    cost.grad_regu_localMSE(x, dx);
+//    r = dx.magnitude()/x.magnitude();
+
+//    if (fabs(r-60)<min_dist)
+//    {
+//      min_dist = fabs(r-60);
+//      best_lambda = cost.m_Lambda;
+//    }
+
+//    MITK_INFO << "ratio: " << r << " - lambda: " << cost.m_Lambda;
+//    if (fabs(r-60)>1000)
+//      cost.m_Lambda /= 10;
+//    else
+//      cost.m_Lambda /= 2;
+//    if (r<60)
+//      break;
+//    ++count;
+//  }
+//  cost.m_Lambda = best_lambda * lambda;
+  MITK_INFO << "Using lambda of " << cost.m_Lambda;
+
+  MITK_INFO << "Fitting fibers";
+  minimizer.set_trace(true);
+  minimizer.set_max_function_evals(max_iter);
   minimizer.minimize(x);
 
   // SECOND RUN
@@ -499,7 +495,7 @@ int main(int argc, char* argv[])
   parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
   parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
   parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. g:", "lower termination threshold for gradient magnitude", 1e-5);
-  parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "weighting factor for regularization", 1.0);
+  parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modification for estimated weighting factor of regularization", 1.0);
   parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Residuals:", "save residual images", false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -516,11 +512,11 @@ int main(int argc, char* argv[])
 
   bool save_residuals = false;
   if (parsedArgs.count("save_res"))
-    save_residuals = us::any_cast<bool>(parsedArgs["residuals"]);
+    save_residuals = us::any_cast<bool>(parsedArgs["save_res"]);
 
   int max_iter = 20;
-  if (parsedArgs.count("it"))
-    max_iter = us::any_cast<int>(parsedArgs["it"]);
+  if (parsedArgs.count("max_iter"))
+    max_iter = us::any_cast<int>(parsedArgs["max_iter"]);
 
   float g_tol = 1e-5;
   if (parsedArgs.count("min_g"))

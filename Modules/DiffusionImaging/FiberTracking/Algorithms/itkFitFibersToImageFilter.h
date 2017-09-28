@@ -51,6 +51,8 @@ public:
   itkGetMacro( FilterOutliers, bool)
   itkSetMacro( Verbose, bool)
   itkGetMacro( Verbose, bool)
+  itkSetMacro( DeepCopy, bool)
+  itkGetMacro( DeepCopy, bool)
 
   itkGetMacro( Weights, vnl_vector<double>)
   itkGetMacro( FittedImage, PeakImgType::Pointer)
@@ -92,6 +94,7 @@ protected:
   double                                      m_MinWeight;
   double                                      m_MaxWeight;
   bool                                        m_Verbose;
+  bool                                        m_DeepCopy;
 
   // output
   vnl_vector<double>                          m_Weights;

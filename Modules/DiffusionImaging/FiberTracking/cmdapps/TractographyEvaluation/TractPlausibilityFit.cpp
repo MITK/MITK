@@ -70,12 +70,13 @@ int main(int argc, char* argv[])
   parser.addArgument("", "i1", mitkCommandLineParser::InputFile, "Input tractogram:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
   parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
   parser.addArgument("", "i3", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
+  parser.addArgument("min_gain", "", mitkCommandLineParser::Float, "Min. gain:", "process stops if remaining bundles don't contribute enough", 0.05);
 
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
 
   parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
   parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
-  parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. g:", "lower termination threshold for gradient magnitude", 1e-5);
+  parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. gradient:", "lower termination threshold for gradient magnitude", 1e-5);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", true);
 
@@ -99,6 +100,10 @@ int main(int argc, char* argv[])
   float g_tol = 1e-5;
   if (parsedArgs.count("min_g"))
     g_tol = us::any_cast<float>(parsedArgs["min_g"]);
+
+  float min_gain = 0.05;
+  if (parsedArgs.count("min_gain"))
+    min_gain = us::any_cast<float>(parsedArgs["min_gain"]);
 
   float lambda = 0.1;
   if (parsedArgs.count("lambda"))
@@ -148,6 +153,7 @@ int main(int argc, char* argv[])
     fitter->SetFilterOutliers(filter_outliers);
     fitter->SetPeakImage(peak_image);
     fitter->SetVerbose(false);
+    fitter->SetDeepCopy(false);
     fitter->Update();
     mitk::IOUtil::Save(fitter->GetTractograms().at(0), outRoot + "0_" + name + ".fib");
     peak_image = fitter->GetUnderexplainedImage();
@@ -162,7 +168,7 @@ int main(int argc, char* argv[])
     MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << 100.0*coverage << "%";
 //    fitter->SetPeakImage(peak_image);
 
-    while (coverage<0.9 && !input_candidates.empty())
+    while (!input_candidates.empty())
     {
       streambuf *old = cout.rdbuf(); // <-- save
       stringstream ss;
@@ -182,6 +188,7 @@ int main(int argc, char* argv[])
         fitter->SetFilterOutliers(filter_outliers);
         fitter->SetVerbose(false);
         fitter->SetPeakImage(peak_image);
+        fitter->SetDeepCopy(false);
         // ******************************
         fitter->SetTractograms({fib});
         fitter->Update();
@@ -190,12 +197,12 @@ int main(int argc, char* argv[])
 
         if (candidate_coverage>next_coverage)
         {
-          if ((1.0-coverage) * next_coverage >= 0.01)
+          next_coverage = candidate_coverage;
+          if ((1.0-coverage) * next_coverage >= min_gain)
           {
             best_candidate = fitter->GetTractograms().at(0);
             peak_image = fitter->GetUnderexplainedImage();
           }
-          next_coverage = candidate_coverage;
         }
       }
 

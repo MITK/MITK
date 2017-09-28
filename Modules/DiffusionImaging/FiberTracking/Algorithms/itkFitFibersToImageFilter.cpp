@@ -18,6 +18,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_MinWeight(1.0)
   , m_MaxWeight(1.0)
   , m_Verbose(true)
+  , m_DeepCopy(true)
 {
   this->SetNumberOfRequiredOutputs(3);
 }
@@ -53,7 +54,8 @@ void FitFibersToImageFilter::GenerateData()
 
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
   {
-    m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
+    if (m_DeepCopy)
+      m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
     m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
   }
 

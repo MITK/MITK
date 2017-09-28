@@ -61,8 +61,8 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
 
   parser.setTitle("Fit Fibers To Image");
-  parser.setCategory("Fiber Tracking Evaluation");
-  parser.setDescription("");
+  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setDescription("Assigns a weight to each fiber in order to optimally explain the input peak image");
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");

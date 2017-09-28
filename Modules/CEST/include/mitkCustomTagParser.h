@@ -69,6 +69,7 @@ namespace mitk
     mitk::PropertyList::Pointer ParseDicomPropertyString(std::string dicomPropertyString);
 
     void SetParseStrategy(std::string parseStrategy);
+    void SetRevisionMappingStrategy(std::string revisionMappingStrategy);
 
     /// name of the property for the offsets, including normalization offsets
     static const std::string m_OffsetsPropertyName;
@@ -95,6 +96,9 @@ namespace mitk
     /// returns a vector revision numbers of all REVISIONNUMBER.json provided as resources during the compile
     std::vector<int> GetInternalRevisions();
 
+    /// returns the path where external jsons are expected to be located
+    std::string GetExternalJSONDirectory();
+
     /// the closest lower revision provided as resource, empty if none found
     std::string m_ClosestInternalRevision;
     /// the closest lower revision provided as a json beside the library, empty if none found
@@ -108,6 +112,8 @@ namespace mitk
     std::string m_DicomDataPath;
     /// Should the kind of data be automatically determined or should it be parsed as a specific one
     std::string m_ParseStrategy;
+    /// How to handle parameter mapping based on absent revision jsons
+    std::string m_RevisionMappingStrategy;
   };
 }
 

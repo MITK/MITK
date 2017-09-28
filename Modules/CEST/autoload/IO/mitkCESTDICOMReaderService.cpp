@@ -36,6 +36,11 @@ namespace mitk
     parseStrategy.push_back("T1");
     defaultOptions["Force type"] = parseStrategy;
 
+    std::vector<std::string> mappingStrategy;
+    mappingStrategy.push_back("Strict");
+    mappingStrategy.push_back("Fuzzy");
+    defaultOptions["Revision mapping"] = mappingStrategy;
+
     this->SetDefaultOptions(defaultOptions);
 
     this->RegisterService();
@@ -67,6 +72,7 @@ namespace mitk
     const Options options = this->GetOptions();
 
     const std::string parseStrategy = options.find("Force type")->second.ToString();
+    const std::string mappingStrategy = options.find("Revision mapping")->second.ToString();
 
     mitk::StringList relevantFiles = this->GetRelevantFiles();
 
@@ -86,6 +92,7 @@ namespace mitk
 
     mitk::CustomTagParser tagParser(relevantFiles[0]);
     tagParser.SetParseStrategy(parseStrategy);
+    tagParser.SetRevisionMappingStrategy(mappingStrategy);
 
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
 

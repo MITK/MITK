@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //itksys
 #include <itksys/SystemTools.hxx>
+#include <itkFileTools.h>
 
 // microservice includes
 #include "usGetModuleContext.h"
@@ -190,10 +191,17 @@ public:
     // we assume the test library will be in the same location as the MitkCEST library on windows
     // on linux the test driver should have a relative path of ../bin/
 #ifdef _WIN32
-    std::string filename = m_PathToModule + "/" + "118.json";
+    std::string dirname = m_PathToModule + "/CESTRevisionMapping";  
 #else
-    std::string filename = m_PathToModule + "/../lib/" + "118.json";
+    std::string dirname = m_PathToModule + "/../lib/CESTRevisionMapping";
 #endif
+
+    //bool dirWasThere = itksys::SystemTools::FileIsDirectory(dirname);
+
+    std::string filename = dirname + "/118.json";
+
+    itk::FileTools::CreateDirectory(dirname);
+
     std::ofstream externalFile(filename.c_str());
 
     if (externalFile.is_open())

@@ -13,6 +13,11 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_Coverage(0)
   , m_Overshoot(0)
   , m_FilterOutliers(true)
+  , m_MeanWeight(1.0)
+  , m_MedianWeight(1.0)
+  , m_MinWeight(1.0)
+  , m_MaxWeight(1.0)
+  , m_Verbose(true)
 {
   this->SetNumberOfRequiredOutputs(3);
 }
@@ -43,19 +48,21 @@ void FitFibersToImageFilter::GenerateData()
   {
     num_unknowns = 0;
     for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-    {
-      m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
       num_unknowns += m_Tractograms.at(bundle)->GetNumFibers();
-    }
+  }
+
+  for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+  {
+    m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
+    m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
   }
 
   unsigned int number_of_residuals = num_voxels * sz_peaks;
 
-  // create linear system
   MITK_INFO << "Num. unknowns: " << num_unknowns;
   MITK_INFO << "Num. residuals: " << number_of_residuals;
-
   MITK_INFO << "Creating system ...";
+
   vnl_sparse_matrix<double> A;
   vnl_vector<double> b;
   A.set_size(number_of_residuals, num_unknowns);
@@ -162,10 +169,16 @@ void FitFibersToImageFilter::GenerateData()
   cost.grad_regu_localMSE(m_Weights, dx);
   double r = dx.magnitude()/m_Weights.magnitude();
   cost.m_Lambda *= m_Lambda*55.0/r;
+  if (cost.m_Lambda>10e7)
+  {
+    MITK_INFO << "Regularization estimation failed. Using default value.";
+    cost.m_Lambda = fiber_count;
+  }
   MITK_INFO << "Using regularization factor of " << cost.m_Lambda << " (λ: " << m_Lambda << ")";
 
   MITK_INFO << "Fitting fibers";
-  minimizer.set_trace(true);
+  minimizer.set_trace(m_Verbose);
+
   minimizer.set_max_function_evals(m_MaxIterations);
   minimizer.minimize(m_Weights);
 
@@ -188,15 +201,20 @@ void FitFibersToImageFilter::GenerateData()
     weights.push_back(w);
   std::sort(weights.begin(), weights.end());
 
+  m_MeanWeight = m_Weights.mean();
+  m_MedianWeight = weights.at(num_unknowns*0.5);
+  m_MinWeight = weights.at(0);
+  m_MaxWeight = weights.at(num_unknowns-1);
+
   MITK_INFO << "*************************";
   MITK_INFO << "Weight statistics";
-  MITK_INFO << "Mean: " << m_Weights.mean();
-  MITK_INFO << "Median: " << weights.at(num_unknowns*0.5);
+  MITK_INFO << "Mean: " << m_MeanWeight;
+  MITK_INFO << "Median: " << m_MedianWeight;
   MITK_INFO << "75% quantile: " << weights.at(num_unknowns*0.75);
   MITK_INFO << "95% quantile: " << weights.at(num_unknowns*0.95);
   MITK_INFO << "99% quantile: " << weights.at(num_unknowns*0.99);
-  MITK_INFO << "Min: " << weights.at(0);
-  MITK_INFO << "Max: " << weights.at(num_unknowns-1);
+  MITK_INFO << "Min: " << m_MinWeight;
+  MITK_INFO << "Max: " << m_MaxWeight;
   MITK_INFO << "*************************";
   MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
@@ -343,11 +361,11 @@ void FitFibersToImageFilter::GenerateData()
         }
       }
 
-  m_Coverage = 100.0*m_Coverage/FD;
-  m_Overshoot = 100.0*m_Overshoot/FD;
+  m_Coverage = m_Coverage/FD;
+  m_Overshoot = m_Overshoot/FD;
 
-  MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << m_Coverage << "%";
-  MITK_INFO << std::fixed << "Overshoot: " << setprecision(1) << m_Overshoot << "%";
+  MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << 100.0*m_Coverage << "%";
+  MITK_INFO << std::fixed << "Overshoot: " << setprecision(1) << 100.0*m_Overshoot << "%";
 }
 
 vnl_vector_fixed<float,3> FitFibersToImageFilter::GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w )

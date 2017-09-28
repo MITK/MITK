@@ -49,6 +49,8 @@ public:
   itkGetMacro( FiberSampling, float)
   itkSetMacro( FilterOutliers, bool)
   itkGetMacro( FilterOutliers, bool)
+  itkSetMacro( Verbose, bool)
+  itkGetMacro( Verbose, bool)
 
   itkGetMacro( Weights, vnl_vector<double>)
   itkGetMacro( FittedImage, PeakImgType::Pointer)
@@ -57,6 +59,10 @@ public:
   itkGetMacro( UnderexplainedImage, PeakImgType::Pointer)
   itkGetMacro( Coverage, double)
   itkGetMacro( Overshoot, double)
+  itkGetMacro( MeanWeight, double)
+  itkGetMacro( MedianWeight, double)
+  itkGetMacro( MinWeight, double)
+  itkGetMacro( MaxWeight, double)
 
   void SetTractograms(const std::vector<mitk::FiberBundle::Pointer> &tractograms);
 
@@ -81,6 +87,11 @@ protected:
   double                                      m_Coverage;
   double                                      m_Overshoot;
   bool                                        m_FilterOutliers;
+  double                                      m_MeanWeight;
+  double                                      m_MedianWeight;
+  double                                      m_MinWeight;
+  double                                      m_MaxWeight;
+  bool                                        m_Verbose;
 
   // output
   vnl_vector<double>                          m_Weights;

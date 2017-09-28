@@ -123,6 +123,7 @@ mitk::CustomTagParser::CustomTagParser(std::string relevantFile) : m_ClosestInte
   itksys::SystemTools::SplitProgramPath(relevantFile, pathToDirectory, fileName);
   m_DicomDataPath = pathToDirectory;
   m_ParseStrategy = "Automatic";
+  m_RevisionMappingStrategy = "Fuzzy";
 }
 
 mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std::string dicomPropertyString)
@@ -350,12 +351,9 @@ std::vector<int> mitk::CustomTagParser::GetInternalRevisions()
 
 std::vector<int> mitk::CustomTagParser::GetExternalRevisions()
 {
-  std::string moduleLocation = us::GetModuleContext()->GetModule()->GetLocation();
-  std::string stringToModule;
-  std::string libraryName;
-  itksys::SystemTools::SplitProgramPath(moduleLocation, stringToModule, libraryName);
+  std::string stringToJSONDirectory = GetExternalJSONDirectory();
 
-  std::string prospectiveJsonsPath = stringToModule + "/*.json";
+  std::string prospectiveJsonsPath = stringToJSONDirectory + "/*.json";
 
   std::set<std::string> JsonFiles;
   Poco::Glob::glob(prospectiveJsonsPath, JsonFiles, Poco::Glob::GLOB_CASELESS);
@@ -420,6 +418,33 @@ void mitk::CustomTagParser::GetClosestLowerRevision(std::string revisionString)
 {
   m_ClosestInternalRevision = GetClosestLowerRevision(revisionString, GetInternalRevisions());
   m_ClosestExternalRevision = GetClosestLowerRevision(revisionString, GetExternalRevisions());
+
+  if ("Strict" == m_RevisionMappingStrategy && !((0 == m_ClosestInternalRevision.compare(revisionString)) ||
+                                                 (0 == m_ClosestExternalRevision.compare(revisionString))))
+  { // strict revision mapping and neither revision does match the dicom meta data
+    std::stringstream errorMessageStream;
+    errorMessageStream << "\nCould not parse dicom data in strict mode, data revision " << revisionString
+      << " has no known matching parameter mapping. To use the closest known older parameter mapping select the "
+      << "\"Fuzzy\" revision mapping option when loading the data.\n"
+      << "\nCurrently known revision mappings are:\n  Precompiled:";
+    for (const auto revision : GetInternalRevisions())
+    {
+      errorMessageStream << " " << revision;
+    }
+    errorMessageStream << "\n  External:";
+    for (const auto revision : GetExternalRevisions())
+    {
+      errorMessageStream << " " << revision;
+    }
+    errorMessageStream << "\n\nExternal revision mapping descriptions should be located at\n\n";
+    std::string stringToJSONDirectory = GetExternalJSONDirectory();
+    errorMessageStream << stringToJSONDirectory;
+
+    errorMessageStream << "\n\nTo provide an external mapping for this revision create a " << revisionString
+                       << ".json there. You might need to create the directory first.";
+
+    mitkThrow() << errorMessageStream.str();
+  }
 }
 
 std::string mitk::CustomTagParser::GetRevisionAppropriateJSONString(std::string revisionString)
@@ -456,12 +481,9 @@ std::string mitk::CustomTagParser::GetRevisionAppropriateJSONString(std::string 
 
     if (useExternal)
     {
-      std::string moduleLocation = us::GetModuleContext()->GetModule()->GetLocation();
-      std::string stringToModule;
-      std::string libraryName;
-      itksys::SystemTools::SplitProgramPath(moduleLocation, stringToModule, libraryName);
+      std::string stringToJSONDirectory = GetExternalJSONDirectory();
 
-      std::string prospectiveJsonPath = stringToModule + "/" + m_ClosestExternalRevision + ".json";
+      std::string prospectiveJsonPath = stringToJSONDirectory + "/" + m_ClosestExternalRevision + ".json";
 
       std::ifstream externalJSON(prospectiveJsonPath.c_str());
 
@@ -641,4 +663,22 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
 void mitk::CustomTagParser::SetParseStrategy(std::string parseStrategy)
 {
   m_ParseStrategy = parseStrategy;
+}
+
+void mitk::CustomTagParser::SetRevisionMappingStrategy(std::string revisionMappingStrategy)
+{
+  m_RevisionMappingStrategy = revisionMappingStrategy;
+}
+
+std::string mitk::CustomTagParser::GetExternalJSONDirectory()
+{
+  std::string moduleLocation = us::GetModuleContext()->GetModule()->GetLocation();
+  std::string stringToModule;
+  std::string libraryName;
+  itksys::SystemTools::SplitProgramPath(moduleLocation, stringToModule, libraryName);
+
+  std::stringstream jsonDirectory;
+  jsonDirectory << stringToModule << "/CESTRevisionMapping";
+
+  return jsonDirectory.str();
 }

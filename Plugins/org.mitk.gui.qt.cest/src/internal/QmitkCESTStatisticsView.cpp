@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTimeGeometry.h>
+#include <mitkSliceNavigationController.h>
 
 // boost
 #include <boost/tokenizer.hpp>
@@ -62,6 +63,10 @@ static const int STAT_TABLE_BASE_HEIGHT = 180;
 QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject* /*parent*/, const char* /*name*/)
 {
   this->m_CalculatorThread = new QmitkImageStatisticsCalculationThread;
+
+  m_currentSelectedPosition.Fill(0.0);
+  m_currentSelectedTimeStep = 0;
+  m_CrosshairPointSet = mitk::PointSet::New();
 }
 
 QmitkCESTStatisticsView::~QmitkCESTStatisticsView()
@@ -92,6 +97,20 @@ void QmitkCESTStatisticsView::CreateQtPartControl( QWidget *parent )
 
   m_Controls.normalizeImagePushButton->setEnabled(false);
   m_Controls.threeDimToFourDimPushButton->setEnabled(false);
+
+  this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+}
+
+void QmitkCESTStatisticsView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->m_SliceChangeListener.RenderWindowPartActivated(renderWindowPart);
+}
+
+void QmitkCESTStatisticsView::RenderWindowPartDeactivated(
+  mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
 void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -150,8 +169,6 @@ void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer
   // We only want to offer normalization or timestep copying if one object is selected
   if (nodes.size() == 1)
   {
-    this->Clear();
-
     if (dynamic_cast<mitk::Image*>(nodes.front()->GetData()) )
     {
       m_Controls.normalizeImagePushButton->setEnabled(atLeastOneWasCESTImage);
@@ -218,7 +235,7 @@ void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer
 
   if (m_PointSet.IsNull())
   {
-    //// initialize thread and trigger it
+    // initialize thread and trigger it
     this->m_CalculatorThread->SetIgnoreZeroValueVoxel(false);
     this->m_CalculatorThread->Initialize(m_ZImage, m_MaskImage, m_MaskPlanarFigure);
     std::stringstream message;
@@ -355,15 +372,37 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
   this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::yLeft, "z");
 
   QmitkPlotWidget::DataVector::size_type numberOfSpectra = this->m_zSpectrum.size();
-  auto maxIndex = this->m_PointSet->GetMaxId().Index();
+  mitk::PointSet::Pointer internalPointset;
+
+  if (m_PointSet.IsNotNull())
+  {
+    internalPointset = m_PointSet;
+  }
+  else
+  {
+    internalPointset = m_CrosshairPointSet;
+  }
+
+  if (internalPointset.IsNull())
+  {
+    return;
+  }
+
+  auto maxIndex = internalPointset->GetMaxId().Index();
 
   for (std::size_t number = 0; number < maxIndex + 1; ++number)
   {
     mitk::PointSet::PointType point;
-    if (!m_PointSet->GetPointIfExists(number, &point))
+    if (!internalPointset->GetPointIfExists(number, &point))
     {
       continue;
     }
+
+    if (!this->m_ZImage->GetGeometry()->IsInside(point))
+    {
+      continue;
+    }
+
     itk::Index<3> itkIndex;
 
     this->m_ZImage->GetGeometry()->WorldToIndex(point, itkIndex);
@@ -802,4 +841,59 @@ void QmitkCESTStatisticsView::OnCopyStatisticsToClipboardPushButtonClicked()
     clipboard, QClipboard::Clipboard);
 
   QLocale::setDefault(tempLocal);
+}
+
+void QmitkCESTStatisticsView::OnSliceChanged()
+{
+  mitk::Point3D currentSelectedPosition = this->GetRenderWindowPart()->GetSelectedPosition(nullptr);
+  unsigned int currentSelectedTimeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+
+  if (m_currentSelectedPosition != currentSelectedPosition
+    || m_currentSelectedTimeStep != currentSelectedTimeStep)
+    //|| m_selectedNodeTime > m_currentPositionTime)
+  {
+    //the current position has been changed or the selected node has been changed since the last position validation -> check position
+    m_currentSelectedPosition = currentSelectedPosition;
+    m_currentSelectedTimeStep = currentSelectedTimeStep;
+    m_currentPositionTime.Modified();
+
+    m_CrosshairPointSet->Clear();
+
+    m_CrosshairPointSet->SetPoint(0, m_currentSelectedPosition);
+
+    QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+    if (nodes.empty() || nodes.size() > 1) return;
+
+    mitk::DataNode* node = nodes.front();
+
+    if (!node)
+    {
+      return;
+    }
+
+    if (dynamic_cast<mitk::Image *>(node->GetData()) != nullptr)
+    {
+      m_Controls.labelWarning->setVisible(false);
+      bool zSpectrumSet = SetZSpectrum(dynamic_cast<mitk::StringProperty *>(
+        node->GetData()->GetProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str()).GetPointer()));
+
+      if (zSpectrumSet)
+      {
+        m_ZImage = dynamic_cast<mitk::Image *>(node->GetData());
+      }
+      else
+      {
+        return;
+      }
+    }
+    else
+    {
+      return;
+    }
+
+    this->m_Controls.m_DataViewWidget->Clear();
+
+    AccessFixedDimensionByItk(m_ZImage, PlotPointSet, 4);
+
+  }
 }

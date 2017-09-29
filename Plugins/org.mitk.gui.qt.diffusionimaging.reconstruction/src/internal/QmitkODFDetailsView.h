@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 #include <itkDiffusionTensor3D.h>
+#include <QmitkSliceNavigationListener.h>
 
 /*!
   \brief View displaying details of the orientation distribution function in the voxel at the current crosshair position.
@@ -64,9 +65,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  void OnSliceChanged(const itk::EventObject& e);
 
 protected slots:
+
+  void OnSliceChanged();
 
 protected:
 
@@ -105,8 +107,8 @@ protected:
   vtkRenderWindow*              m_VtkRenderWindow;
   vtkRenderWindowInteractor*    m_RenderWindowInteractor;
   vtkCamera*                    m_Camera;
-
-  mitk::DataNode::Pointer m_ImageNode;
+  mitk::DataNode::Pointer       m_ImageNode;
+  QmitkSliceNavigationListener  m_SliceChangeListener;
 };
 
 

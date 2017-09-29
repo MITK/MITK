@@ -114,7 +114,7 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   painter.setFont(m_Font);
   painter.setPen(this->palette().color(this->foregroundRole()));
 
-  QColor c(93, 144, 169);
+  QColor c(51, 153, 204);
   QColor cl = c.light();
   QColor cd = c.dark();
 

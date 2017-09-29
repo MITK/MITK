@@ -122,20 +122,21 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   painter.drawRect(m_Rect);
 
   float mr = m_LevelWindow.GetRange();
-
-  if (mr < 1)
-    mr = 1;
+  float smallestLevelableValue = 1e-9;
+  // avoiding a division by 0 while still enabling small level windows
+  if (mr < smallestLevelableValue)
+    mr = smallestLevelableValue;
 
   float fact = (float)m_MoveHeight / mr;
 
   // begin draw scale
   if (m_ScaleVisible)
   {
-    int minRange = (int)m_LevelWindow.GetRangeMin();
-    int maxRange = (int)m_LevelWindow.GetRangeMax();
+    double minRange = (double)m_LevelWindow.GetRangeMin();
+    double maxRange = (double)m_LevelWindow.GetRangeMax();
     int yValue = m_MoveHeight + (int)(minRange * fact);
     QString s = " 0";
-    if (minRange <= 0 && maxRange >= 0)
+    if (minRange < 0 && maxRange > 0)
     {
       painter.drawLine(5, yValue, 15, yValue);
       painter.drawText(21, yValue + 3, s);
@@ -150,8 +151,12 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
 
     for (int i = m_MoveHeight + (int)(minRange * fact); i < m_MoveHeight;) // negative
     {
+
       if (-count * dStepSize < minRange)
+      {
         break;
+      }
+
       yValue = m_MoveHeight + (int)((minRange + count * dStepSize) * fact);
 
       s = QString::number(-count * dStepSize);
@@ -189,17 +194,18 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
         count = k;
       }
     }
+
     count = 1;
     k = 5;
     enoughSpace = false;
     enoughSpace2 = false;
-
     for (int i = m_MoveHeight + (int)(minRange * fact); i >= 0;)
     {
       if (count * dStepSize > maxRange)
+      {
         break;
+      }
       yValue = m_MoveHeight + (int)((minRange - count * dStepSize) * fact);
-
       s = QString::number(count * dStepSize);
       if (count % k && ((dStepSize * fact) > 2.5))
       {
@@ -471,8 +477,8 @@ void QmitkSliderLevelWindowWidget::update()
   }
   float mr = m_LevelWindow.GetRange();
 
-  if (mr < 1)
-    mr = 1;
+  if (mr < 1e-9)
+    mr = 1e-9;
 
   float fact = (float)m_MoveHeight / mr;
 

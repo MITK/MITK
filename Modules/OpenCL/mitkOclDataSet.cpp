@@ -116,12 +116,12 @@ cl_mem mitk::OclDataSet::GetGPUBuffer()
 {
   // clGetMemObjectInfo()
   cl_mem_object_type memInfo;
-  cl_int clErr = 0;
 
   // query image object info only if already initialized
   if( this->m_gpuBuffer )
   {
     #ifdef MBILOG_ENABLE_DEBUG
+    cl_int clErr = 0;
     clErr = clGetMemObjectInfo(this->m_gpuBuffer, CL_MEM_TYPE, sizeof(cl_mem_object_type), &memInfo, nullptr );
     CHECK_OCL_ERR(clErr);
     #endif

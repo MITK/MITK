@@ -1054,7 +1054,7 @@ void BeamformingThread::run()
 
   resultImage->Initialize(resultImageBuffer);
   resultImage->SetSpacing(resultImageBuffer->GetGeometry()->GetSpacing());
-  resultImage->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ImportMemoryManagementType::RtlCopyMemory);
+  resultImage->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::CopyMemory);
 
   emit result(resultImage);
   emit message(errorMessage);

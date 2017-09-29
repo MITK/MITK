@@ -36,7 +36,9 @@ public:
 
   void AddData2D(const std::map<double, double>& data2D, const std::string& label);
 
-  void ClearData2D();
+  void RemoveData(const std::string& label);
+
+  void ClearData();
 
   void SetDataLabels(const std::vector<std::string>& labels);
   std::vector<std::string> GetDataLabels() const;
@@ -145,6 +147,19 @@ void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const 
   auto definedLabels = GetC3Data()->GetDataLabels();
   AddLabelIfNotAlreadyDefined(definedLabels, label);
   GetC3Data()->SetDataLabels(definedLabels);
+}
+
+void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
+  std::vector<QmitkChartxyData*>::const_iterator iter_temp;
+  for (std::vector<QmitkChartxyData*>::const_iterator iter = GetC3xyData()->begin(); iter != GetC3xyData()->end(); ++iter)
+  {
+    const auto &temp = *iter;
+    if (temp->GetLabel().toString().toStdString() == label)
+    {
+      iter_temp = iter;
+    }
+  }
+  GetC3xyData()->erase(iter_temp);
 }
 
 void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label) {
@@ -263,7 +278,7 @@ std::vector<QmitkChartxyData*>* QmitkChartWidget::Impl::GetC3xyData() const {
   return m_C3xyData; 
 }
 
-void QmitkChartWidget::Impl::ClearData2D() {
+void QmitkChartWidget::Impl::ClearData() {
   GetC3xyData()->clear(); 
 }
 
@@ -321,6 +336,11 @@ void QmitkChartWidget::SetLineStyle(const std::string& label, LineStyle style)
 void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label)
 {
   m_Impl->AddData1D(data1D, label);
+}
+
+void QmitkChartWidget::RemoveData(const std::string& label)
+{
+  m_Impl->RemoveData(label);
 }
 
 std::vector<std::string> QmitkChartWidget::GetDataLabels() const
@@ -386,8 +406,8 @@ void QmitkChartWidget::Show(bool showSubChart)
 
 void QmitkChartWidget::Clear()
 {
-	m_Impl->ClearData2D();
-	m_Impl->GetC3xyData()->clear();
+	m_Impl->ClearData();
+	//m_Impl->GetC3xyData()->clear();
 	m_Impl->ClearJavaScriptChart();
 }
 

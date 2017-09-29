@@ -96,7 +96,7 @@ QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
   d->ToPropertyList();
 }
 
-void QmitkOpenCVVideoControls::on_VideoProgressSlider_valueChanged(int value)
+void QmitkOpenCVVideoControls::on_VideoProgressSlider_valueChanged(int /*value*/)
 {
   //Fixes T23169
   on_VideoProgressSlider_sliderReleased();

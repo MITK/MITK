@@ -60,6 +60,7 @@ public:
   //## @param: steps the number of steps done since last Progress(int steps) call.
   virtual void Progress(unsigned int steps) override;
 
+  virtual bool active() override;
 signals:
 
   void SignalAddStepsToDo(unsigned int steps);

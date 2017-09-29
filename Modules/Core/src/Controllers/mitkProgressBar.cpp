@@ -138,6 +138,19 @@ namespace mitk
     }
   }
 
+  bool ProgressBar::IsProgressBarActive() const
+  {
+    for (auto impl : m_Implementations) 
+    {
+      if (impl->active())
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   ProgressBar::ProgressBar()
   {
   }

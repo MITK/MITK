@@ -53,6 +53,8 @@ namespace mitk
     //## @brief Sets the current amount of progress to current progress + steps.
     //## @param steps the number of steps done since last Progress(int steps) call.
     virtual void Progress(unsigned int steps) =0;
+
+    virtual bool active() = 0;
   };
 
 }// end namespace mitk

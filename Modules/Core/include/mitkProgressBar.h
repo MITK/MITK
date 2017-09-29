@@ -69,6 +69,8 @@ namespace mitk
     //## @brief Sets whether the current progress value is displayed.
     void SetPercentageVisible (bool visible);
 
+    bool IsProgressBarActive() const;
+
   protected:
 
     typedef std::vector< ProgressBarImplementation* > ProgressBarImplementationsList;

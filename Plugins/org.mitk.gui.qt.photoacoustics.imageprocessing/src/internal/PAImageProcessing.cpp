@@ -729,17 +729,13 @@ void PAImageProcessing::SliceBoundsEnabled()
   {
     m_Controls.boundLow->setEnabled(false);
     m_Controls.boundHigh->setEnabled(false);
-    BFconfig.partial = false;
     return;
   }
   else
   {
     m_Controls.boundLow->setEnabled(true);
     m_Controls.boundHigh->setEnabled(true);
-    BFconfig.partial = true;
   }
-
-  UpperSliceBoundChanged();
 }
 
 void PAImageProcessing::UpperSliceBoundChanged()
@@ -747,13 +743,6 @@ void PAImageProcessing::UpperSliceBoundChanged()
   if(m_Controls.boundLow->value() > m_Controls.boundHigh->value())
   {
     m_Controls.boundLow->setValue(m_Controls.boundHigh->value());
-    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
-    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
-  }
-  else
-  {
-    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
-    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
   }
 }
 
@@ -762,13 +751,6 @@ void PAImageProcessing::LowerSliceBoundChanged()
   if (m_Controls.boundLow->value() > m_Controls.boundHigh->value())
   {
     m_Controls.boundHigh->setValue(m_Controls.boundLow->value());
-    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
-    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
-  }
-  else
-  {
-    BFconfig.CropBounds[0] = m_Controls.boundLow->value();
-    BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
   }
 }
 
@@ -821,14 +803,10 @@ void PAImageProcessing::UpdateImageInfo()
         m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
         m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
       }
-      UpdateRecordTime(image);
-
-      // bandpass configs
-      float speedOfSound = m_Controls.BPSpeedOfSound->value(); // [m/s]
-      float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / speedOfSound;
+      UpdateBFSettings(image);
 
       std::stringstream frequency;
-      float maxFrequency = 1 / (recordTime / image->GetDimension(1)) * image->GetDimension(1) / 2 / 2 / 1000;
+      float maxFrequency = (1 / BFconfig.TimeSpacing) * image->GetDimension(1) / 2 / 2 / 1000;
       frequency << maxFrequency / 1000000; //[MHz]
       frequency << "MHz";
 
@@ -938,17 +916,11 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.UseGPU = m_Controls.UseGPUBf->isChecked();
   BFconfig.upperCutoff = m_Controls.Cutoff->value();
 
-  UpdateRecordTime(image);
-  SliceBoundsEnabled();
-}
-
-void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
-{
   if (m_Controls.UseImageSpacing->isChecked())
   {
     BFconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
     BFconfig.TimeSpacing = image->GetGeometry()->GetSpacing()[1] / 1000000;
-    MITK_INFO << "Calculated Scan Depth of " << BFconfig.RecordTime * BFconfig.SpeedOfSound * 100 / 2<< "cm";
+    MITK_INFO << "Calculated Scan Depth of " << BFconfig.RecordTime * BFconfig.SpeedOfSound * 100 / 2 << "cm";
   }
   else
   {
@@ -964,6 +936,10 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
   {
     BFconfig.isPhotoacousticImage = true;
   }
+
+  BFconfig.partial = m_Controls.Partial->isChecked();
+  BFconfig.CropBounds[0] = m_Controls.boundLow->value();
+  BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
 }
 
 void PAImageProcessing::EnableControls()

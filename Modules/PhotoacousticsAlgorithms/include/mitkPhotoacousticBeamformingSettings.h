@@ -120,16 +120,16 @@ namespace mitk {
     */
     static bool SettingsChangedOpenCL(const BeamformingSettings& lhs, const BeamformingSettings& rhs)
     {
-      return !(((lhs.Angle - rhs.Angle) < 0.001f) &&
+      return !((abs(lhs.Angle - rhs.Angle) < 0.001f) &&
         (lhs.Apod == rhs.Apod) &&
         (lhs.DelayCalculationMethod == rhs.DelayCalculationMethod) &&
         (lhs.isPhotoacousticImage == rhs.isPhotoacousticImage) &&
-        ((lhs.Pitch - rhs.Pitch) < 0.0000001f) &&
+        (abs(lhs.Pitch - rhs.Pitch) < 0.0000001f) &&
         (lhs.ReconstructionLines == rhs.ReconstructionLines) &&
-        (lhs.RecordTime - rhs.RecordTime) < 0.00000001f &&
+        (abs(lhs.RecordTime - rhs.RecordTime) < 0.00000001f) &&
         (lhs.SamplesPerLine == rhs.SamplesPerLine) &&
-        ((lhs.SpeedOfSound - rhs.SpeedOfSound) < 0.01f) &&
-        ((lhs.TimeSpacing - rhs.TimeSpacing) < 0.0000000001f) &&
+        (abs(lhs.SpeedOfSound - rhs.SpeedOfSound) < 0.01f) &&
+        (abs(lhs.TimeSpacing - rhs.TimeSpacing) < 0.0000000001f) &&
         (lhs.TransducerElements == rhs.TransducerElements));
     }
   };

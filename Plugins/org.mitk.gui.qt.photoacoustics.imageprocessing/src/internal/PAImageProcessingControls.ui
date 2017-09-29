@@ -685,7 +685,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QSpinBox" name="Cutoff">
+        <widget class="QSpinBox" name="CutoffBeforeBF">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>

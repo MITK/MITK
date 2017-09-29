@@ -65,7 +65,6 @@ void mitk::BeamformingFilter::GenerateInputRequestedRegion()
   }
 
   input->SetRequestedRegionToLargestPossibleRegion();
-
   //GenerateTimeInInputRegion(output, input);
 }
 
@@ -243,7 +242,7 @@ void mitk::BeamformingFilter::GenerateData()
       m_BeamformingOclFilter->Update();
 
       void* out = m_BeamformingOclFilter->GetOutput();
-      output->SetImportVolume(out, 0, 0, mitk::Image::ReferenceMemory);
+      output->SetImportVolume(out, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
     }
     catch (mitk::Exception &e)
     {

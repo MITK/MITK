@@ -395,8 +395,7 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
   // update level window for the current dynamic range
   mitk::LevelWindow levelWindow;
   newNode->GetLevelWindow(levelWindow);
-  auto data = newNode->GetData();
-  levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
+  levelWindow.SetAuto(image, true, true);
   newNode->SetLevelWindow(levelWindow);
 
   // add new node to data storage
@@ -409,8 +408,7 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
   EnableControls();
 
   // update rendering
-  mitk::RenderingManager::GetInstance()->InitializeViews(
-    dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->InitializeViews(image->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -805,6 +803,8 @@ void PAImageProcessing::UpdateImageInfo()
       }
       UpdateBFSettings(image);
 
+      m_Controls.CutoffBeforeBF->setValue(0.000001 / BFconfig.TimeSpacing); // 1us standard offset for our transducer
+
       std::stringstream frequency;
       float maxFrequency = (1 / BFconfig.TimeSpacing) * image->GetDimension(1) / 2 / 2 / 1000;
       frequency << maxFrequency / 1000000; //[MHz]
@@ -914,7 +914,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
   BFconfig.UseGPU = m_Controls.UseGPUBf->isChecked();
-  BFconfig.upperCutoff = m_Controls.Cutoff->value();
+  BFconfig.upperCutoff = m_Controls.CutoffBeforeBF->value();
 
   if (m_Controls.UseImageSpacing->isChecked())
   {
@@ -951,7 +951,7 @@ void PAImageProcessing::EnableControls()
 
   m_Controls.CutoffAbove->setEnabled(true);
   m_Controls.CutoffBelow->setEnabled(true);
-  m_Controls.Cutoff->setEnabled(true);
+  m_Controls.CutoffBeforeBF->setEnabled(true);
   m_Controls.buttonApplyCropFilter->setEnabled(true);
 
   m_Controls.buttonApplyBandpass->setEnabled(true);
@@ -993,7 +993,7 @@ void PAImageProcessing::DisableControls()
 
   m_Controls.CutoffAbove->setEnabled(false);
   m_Controls.CutoffBelow->setEnabled(false);
-  m_Controls.Cutoff->setEnabled(false);
+  m_Controls.CutoffBeforeBF->setEnabled(false);
   m_Controls.buttonApplyCropFilter->setEnabled(false);
 
   m_Controls.buttonApplyBandpass->setEnabled(false);
@@ -1038,15 +1038,23 @@ void PAImageProcessing::UseImageSpacing()
   }
 }
 
+#include <mitkImageReadAccessor.h>
+
 void BeamformingThread::run()
 {
-  mitk::Image::Pointer resultImage;
+  mitk::Image::Pointer resultImage = mitk::Image::New();
+  mitk::Image::Pointer resultImageBuffer;
   std::string errorMessage = "";
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
       emit updateProgress(progress, progressInfo);
     };
 
-  resultImage = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, errorMessage, progressHandle);
+  resultImageBuffer = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, errorMessage, progressHandle);
+  mitk::ImageReadAccessor copy(resultImageBuffer);
+
+  resultImage->Initialize(resultImageBuffer);
+  resultImage->SetSpacing(resultImageBuffer->GetGeometry()->GetSpacing());
+  resultImage->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::ImportMemoryManagementType::RtlCopyMemory);
 
   emit result(resultImage);
   emit message(errorMessage);

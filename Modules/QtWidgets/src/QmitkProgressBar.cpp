@@ -172,3 +172,8 @@ void QmitkProgressBar::SlotOnTimeout()
 
   QApplication::processEvents();
 }
+
+bool QmitkProgressBar::active()
+{
+  return m_TotalSteps > 0;
+}

@@ -283,6 +283,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
     //DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
+    int compressSteps = sceneNodes->size() / 3;
+
     if ( sceneNodes.IsNull() )
     {
       MITK_WARN << "Saving empty scene to " << filename;
@@ -304,6 +306,11 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       }
 
       ProgressBar::GetInstance()->AddStepsToDo( sceneNodes->size() );
+      if (compress)
+      {
+        ProgressBar::GetInstance()->AddStepsToDo(compressSteps);
+      }
+
 
       // find out about dependencies
       typedef std::map< DataNode*, std::string > UIDMapType;
@@ -522,6 +529,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
             zipper.addRecursive(tmpdir);
             zipper.close();
           }
+
+          ProgressBar::GetInstance()->Progress(compressSteps);
         }
         else
         {

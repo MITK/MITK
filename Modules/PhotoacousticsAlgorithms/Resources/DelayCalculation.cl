@@ -62,7 +62,7 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
 
     float l_s = (float)globalPosX; // the currently calculated line
 
-    gDest[globalPosY * outputL + globalPosX] =
+    gDest[globalPosY * inputL + globalPosX] =
       sqrt(
         pow(s_i, 2)
         +

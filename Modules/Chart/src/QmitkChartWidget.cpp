@@ -105,6 +105,7 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
   m_DiagramTypeToName.emplace(ChartType::line, "line");
   m_DiagramTypeToName.emplace(ChartType::spline, "spline");
   m_DiagramTypeToName.emplace(ChartType::pie, "pie");
+  m_DiagramTypeToName.emplace(ChartType::area, "area");
 
   m_LegendPositionToName.emplace(LegendPosition::bottom, "bottom");
   m_LegendPositionToName.emplace(LegendPosition::right, "right");

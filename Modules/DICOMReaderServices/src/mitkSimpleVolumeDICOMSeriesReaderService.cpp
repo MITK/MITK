@@ -38,7 +38,7 @@ DICOMFileReader::Pointer SimpleVolumeDICOMSeriesReaderService::GetReader(const m
   std::string descr;
 
   us::ModuleResource resource = 
-    us::ModuleRegistry::GetModule("MitkDICOMReader")->GetResource("configurations/3D/slicelocation_simple.xml");
+    us::ModuleRegistry::GetModule("MitkDICOMReader")->GetResource("configurations/3D/simpleinstancenumber_soft.xml");
 
   /*us::ModuleResource resource = 
     us::GetModuleContext()->GetModule()->GetResource("E:/BS-280417/MITK/Modules/DICOMReader/resource/configurations/3D/slicelocation_simple.xml");*/

@@ -88,6 +88,10 @@ void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
   diffVector->SetElement(1, fromPosition->GetElement(1) - toPosition->GetElement(1));
   diffVector->SetElement(2, fromPosition->GetElement(2) - toPosition->GetElement(2));
 
+  Volume::Pointer originalVolumeAbsorption = volume->GetAbsorptionVolume()->DeepCopy();
+  Volume::Pointer originalVolumeScattering = volume->GetScatteringVolume()->DeepCopy();
+  Volume::Pointer originalVolumeAnisotropy = volume->GetAnisotropyVolume()->DeepCopy();
+
   //1/SCALING_FACTOR steps along the direction vector are taken and drawn into the image.
   Vector::Pointer stepSize = Vector::New();
   stepSize->SetValue(m_VesselProperties->GetDirectionVector());
@@ -113,6 +117,9 @@ void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
 
     double radius = m_VesselProperties->GetRadiusInVoxel();
     double ceiledRadius = ceil(radius);
+    double radiusSquared = radius*radius;
+    double PI = 3.141;
+    unsigned int totalPoints = 8000;
 
     for (int x = xPos - ceiledRadius; x <= xPos + ceiledRadius; x += 1)
       for (int y = yPos - ceiledRadius; y <= yPos + ceiledRadius; y += 1)
@@ -125,9 +132,14 @@ void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
           double xDiff = x - xPos;
           double yDiff = y - yPos;
           double zDiff = z - zPos;
-          double vectorLengthDiff = radius*radius - (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
+          double vectorLengthDiff = radius - sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
 
-          if (vectorLengthDiff > 0)
+          if (vectorLengthDiff < -2)
+          {
+            continue;
+          }
+
+          if (vectorLengthDiff > 1)
           {
             volume->SetVolumeValues(x, y, z,
               m_VesselProperties->GetAbsorptionCoefficient(),
@@ -137,20 +149,44 @@ void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
           }
           else
           {
-            if (m_VesselProperties->GetDoPartialVolume())
+            if (m_VesselProperties->GetDoPartialVolume() && volume->GetSegmentationVolume()->GetData(x, y, z) != InSilicoTissueVolume::SegmentationType::VESSEL)
             {
-              double backgroundFraction = abs(sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) - radius);
-              if (backgroundFraction <= 1 && backgroundFraction >= 0)
-              {
-                double vesselFraction = 1.0 - backgroundFraction;
+              unsigned int pointsWithin = 0;
 
-                double absorption = backgroundFraction * volume->GetAbsorptionVolume()->GetData(
+              double phi = atan2(y, x);
+              double theta = atan2(sqrt(x*x + y*y), z);
+              double signx = (phi < PI || phi >(3 * PI / 2)) ? -1 : 1;
+              double signy = (phi < PI) ? -1 : 1;
+              double signz = (theta < PI / 2) ? -1 : 1;
+
+              for (double checkx = 0; checkx < 1; checkx += 0.05)
+                for (double checky = 0; checky < 1; checky += 0.05)
+                  for (double checkz = 0; checkz < 1; checkz += 0.05)
+                  {
+                    double checkxSign = checkx*signx;
+                    double checkySign = checky*signy;
+                    double checkzSign = checkz*signz;
+                    if (((xDiff - checkxSign) + (xDiff - checkxSign)
+                      + (yDiff - checkySign) + (yDiff - checkySign)
+                      + (zDiff - checkzSign) + (zDiff - checkzSign)) < radiusSquared)
+                    {
+                      pointsWithin += 1;
+                    }
+                  }
+
+              double vesselFraction = pointsWithin / totalPoints;
+
+              if (vesselFraction <= 1 && vesselFraction >= 0)
+              {
+                double backgroundFraction = 1.0 - vesselFraction;
+
+                double absorption = backgroundFraction * originalVolumeAbsorption->GetData(
                   x, y, z)
                   + vesselFraction * m_VesselProperties->GetAbsorptionCoefficient();
-                double scattering = backgroundFraction * volume->GetScatteringVolume()->GetData(
+                double scattering = backgroundFraction * originalVolumeScattering->GetData(
                   x, y, z)
                   + vesselFraction * m_VesselProperties->GetScatteringCoefficient();
-                double anisotropy = backgroundFraction * volume->GetAnisotropyVolume()->GetData(
+                double anisotropy = backgroundFraction * originalVolumeAnisotropy->GetData(
                   x, y, z)
                   + vesselFraction * m_VesselProperties->GetAnisotopyCoefficient();
 

@@ -35,7 +35,7 @@ public:
   ///
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
 
-  QmitkOpenCVVideoControls* q;
+    QmitkOpenCVVideoControls* q;
 
   ///
   /// muellerm: a unique id for the prop list
@@ -78,7 +78,7 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoB
 
 QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
 {
-  if(m_VideoSource != 0 && m_VideoSource->IsCapturingEnabled())
+  if (m_VideoSource != 0 && m_VideoSource->IsCapturingEnabled())
   {
     this->Stop(); // emulate stop
   }
@@ -94,6 +94,12 @@ QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
   }
 
   d->ToPropertyList();
+}
+
+void QmitkOpenCVVideoControls::on_VideoProgressSlider_valueChanged(int value)
+{
+  //Fixes T23169
+  on_VideoProgressSlider_sliderReleased();
 }
 
 void QmitkOpenCVVideoControls::on_UseGrabbingDeviceButton_clicked(bool /*checked=false*/)
@@ -273,9 +279,9 @@ void QmitkOpenCVVideoControls::NewFrameAvailable(mitk::VideoSource* /*videoSourc
   emit NewOpenCVFrameAvailable(m_VideoSource->GetCurrentFrame());
   if (!m_SliderCurrentlyMoved)
   {
-	  m_Controls->VideoProgressSlider->setValue(itk::Math::Round<int, double>(m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_FRAMES)
-		  *(1 / m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_FRAME_COUNT)
-			  *m_Controls->VideoProgressSlider->maximum())));
+    m_Controls->VideoProgressSlider->setValue(itk::Math::Round<int, double>(m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_FRAMES)
+      *(1 / m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_FRAME_COUNT)
+        *m_Controls->VideoProgressSlider->maximum())));
   }
 }
 
@@ -326,7 +332,7 @@ void QmitkOpenCVVideoControls::SetVideoBackground(QmitkVideoBackground* _VideoBa
 
   if (m_VideoBackground != nullptr)
     this->disconnect(m_VideoBackground, SIGNAL(destroyed(QObject*))
-    , this, SLOT(QObjectDestroyed(QObject*)));
+      , this, SLOT(QObjectDestroyed(QObject*)));
 
   this->Reset();
 
@@ -386,11 +392,11 @@ void QmitkOpenCVVideoControlsPrivate::ToPropertyList()
 
   if (persistenceService != nullptr)
   {
-      mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(m_Id);
-      propList->Set("deviceType", q->m_Controls->UseGrabbingDeviceButton->isChecked() ? 0 : 1);
-      propList->Set("grabbingDeviceNumber", q->m_Controls->GrabbingDeviceNumber->value());
-      propList->Set("updateRate", q->m_Controls->UpdateRate->value());
-      propList->Set("repeatVideo", q->m_Controls->RepeatVideoButton->isChecked());
+    mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(m_Id);
+    propList->Set("deviceType", q->m_Controls->UseGrabbingDeviceButton->isChecked() ? 0 : 1);
+    propList->Set("grabbingDeviceNumber", q->m_Controls->GrabbingDeviceNumber->value());
+    propList->Set("updateRate", q->m_Controls->UpdateRate->value());
+    propList->Set("repeatVideo", q->m_Controls->RepeatVideoButton->isChecked());
   }
   else
   {

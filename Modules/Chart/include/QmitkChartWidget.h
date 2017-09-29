@@ -49,7 +49,8 @@ public:
     line, /*!< line chart, see http://c3js.org/samples/simple_multiple.html */
     spline, /*!< spline chart (smoothed line chart), see http://c3js.org/samples/chart_spline.html */
     pie, /*!< pie chart, see http://c3js.org/samples/chart_pie.html*/
-    area /*!< area chart, see http://c3js.org/samples/chart_area.html*/
+    area, /*!< area chart, see http://c3js.org/samples/chart_area.html*/
+    area_spline /*!< area-spline chart, see http://c3js.org/samples/chart_area.html*/
   };
   enum class ChartStyle {
     defaultstyle,

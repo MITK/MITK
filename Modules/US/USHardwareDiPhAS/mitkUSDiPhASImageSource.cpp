@@ -535,7 +535,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
         mitk::Vector3D rawSpacing;
         rawSpacing[0] = m_Device->GetScanMode().transducerPitchMeter * 1000; // save in mm
-        rawSpacing[1] = recordTime / channelDataSamplesPerChannel / 2 * 1000000;  // save in us
+        rawSpacing[1] = recordTime / channelDataSamplesPerChannel * 1000000;  // save in us
         rawSpacing[2] = 1;
 
         rawImage->GetGeometry()->SetSpacing(rawSpacing);

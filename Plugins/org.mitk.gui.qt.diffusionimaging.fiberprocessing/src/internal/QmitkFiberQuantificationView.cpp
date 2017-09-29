@@ -202,22 +202,25 @@ void QmitkFiberQuantificationView::GenerateStats()
       stats += "Standard deviation:  "+ QString::number(fib->GetLengthStDev(),'f',1) + " mm\n";
 
       vtkSmartPointer<vtkFloatArray> weights = fib->GetFiberWeights();
+
       if (weights!=nullptr)
       {
-        float weight = -1;
-        int c = 0;
+        std::vector< float > weights2;
         for (int i=0; i<weights->GetSize(); i++)
-          if (!mitk::Equal(weights->GetValue(i),weight,0.0001))
-          {
-            weight = weights->GetValue(i);
-                c++;
-            if (c>1)
-              break;
-          }
-        if (c>1)
-          stats += "Detected fiber weights. Fibers are not weighted uniformly.\n";
-        else
-          stats += "Fibers are weighted equally.\n";
+          weights2.push_back(weights->GetValue(i));
+
+        std::sort(weights2.begin(), weights2.end());
+
+        stats += "\nFiber weight statistics\n";
+        stats += "Min: " + QString::number(weights2.front()) + "\n";
+        stats += "1% quantile: " + QString::number(weights2.at(weights2.size()*0.01)) + "\n";
+        stats += "5% quantile: " + QString::number(weights2.at(weights2.size()*0.05)) + "\n";
+        stats += "25% quantile: " + QString::number(weights2.at(weights2.size()*0.25)) + "\n";
+        stats += "Median: " + QString::number(weights2.at(weights2.size()*0.5)) + "\n";
+        stats += "75% quantile: " + QString::number(weights2.at(weights2.size()*0.75)) + "\n";
+        stats += "95% quantile: " + QString::number(weights2.at(weights2.size()*0.95)) + "\n";
+        stats += "99% quantile: " + QString::number(weights2.at(weights2.size()*0.99)) + "\n";
+        stats += "Max: " + QString::number(weights2.back()) + "\n";
       }
       else
         stats += "No fiber weight array found.\n";

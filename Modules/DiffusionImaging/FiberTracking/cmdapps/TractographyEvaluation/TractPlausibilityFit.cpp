@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
   parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. gradient:", "lower termination threshold for gradient magnitude", 1e-5);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
-  parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", true);
+  parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -110,11 +110,13 @@ int main(int argc, char* argv[])
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
   bool filter_outliers = true;
-  if (parsedArgs.count("filter_outliers"))
-    filter_outliers = us::any_cast<bool>(parsedArgs["filter_outliers"]);
+  if (parsedArgs.count("dont_filter_outliers"))
+    filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
 
   try
   {
+    itk::TimeProbe clock;
+    clock.Start();
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
     mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(peak_file_name, &functor)[0].GetPointer());
@@ -152,13 +154,12 @@ int main(int argc, char* argv[])
     fitter->SetLambda(lambda);
     fitter->SetFilterOutliers(filter_outliers);
     fitter->SetPeakImage(peak_image);
-    fitter->SetVerbose(false);
+    fitter->SetVerbose(true);
     fitter->SetDeepCopy(false);
     fitter->Update();
 
-
-    fitter->GetTractograms().at(0)->SetFiberWeights(fitter->GetCoverage());
-    fitter->GetTractograms().at(0)->ColorFibersByFiberWeights(false, false);
+//    fitter->GetTractograms().at(0)->SetFiberWeights(fitter->GetCoverage());
+//    fitter->GetTractograms().at(0)->ColorFibersByFiberWeights(false, false);
 
     mitk::IOUtil::Save(fitter->GetTractograms().at(0), outRoot + "0_" + name + ".fib");
     peak_image = fitter->GetUnderexplainedImage();
@@ -218,8 +219,8 @@ int main(int argc, char* argv[])
       }
 
 //      fitter->SetPeakImage(peak_image);
-      best_candidate->SetFiberWeights((1.0-coverage) * next_coverage);
-      best_candidate->ColorFibersByFiberWeights(false, false);
+//      best_candidate->SetFiberWeights((1.0-coverage) * next_coverage);
+//      best_candidate->ColorFibersByFiberWeights(false, false);
 
       coverage += (1.0-coverage) * next_coverage;
 
@@ -250,7 +251,12 @@ int main(int argc, char* argv[])
       MITK_INFO << "Iteration: " << iteration;
       MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << 100.0*coverage << "% (+" << 100*(1.0-coverage) * next_coverage << "%)";
     }
-    MITK_INFO << "DONE";
+
+    clock.Stop();
+    int h = clock.GetTotal()/3600;
+    int m = ((int)clock.GetTotal()%3600)/60;
+    int s = (int)clock.GetTotal()%60;
+    MITK_INFO << "Plausibility estimation took " << h << "h, " << m << "m and " << s << "s";
   }
   catch (itk::ExceptionObject e)
   {

@@ -148,14 +148,15 @@ void FitFibersToImageFilter::GenerateData()
   A /= TD;
   b *= 100.0/FD;  // times 100 because we want to avoid too small values for computational reasons
 
-  double init_lambda = 1e5;  // initialization for lambda estimation
+  double init_lambda = fiber_count;  // initialization for lambda estimation
 
   itk::TimeProbe clock;
   clock.Start();
 
   VnlCostFunction cost(num_unknowns);
   cost.SetProblem(A, b, init_lambda);
-  m_Weights.set_size(num_unknowns); m_Weights.fill( TD/100.0 * FD/2.0 );
+  m_Weights.set_size(num_unknowns); // m_Weights.fill( TD/100.0 * FD/2.0 );
+  m_Weights.fill( 0.0 );
   vnl_lbfgsb minimizer(cost);
   vnl_vector<double> l; l.set_size(num_unknowns); l.fill(0);
   vnl_vector<long> bound_selection; bound_selection.set_size(num_unknowns); bound_selection.fill(1);
@@ -165,12 +166,13 @@ void FitFibersToImageFilter::GenerateData()
 
   MITK_INFO << "Estimating regularization";
   minimizer.set_trace(false);
-  minimizer.set_max_function_evals(1);
+  minimizer.set_max_function_evals(2);
   minimizer.minimize(m_Weights);
   vnl_vector<double> dx; dx.set_size(num_unknowns); dx.fill(0.0);
   cost.grad_regu_localMSE(m_Weights, dx);
   double r = dx.magnitude()/m_Weights.magnitude();
   cost.m_Lambda *= m_Lambda*55.0/r;
+  MITK_INFO << r << " - " << m_Lambda*55.0/r;
   if (cost.m_Lambda>10e7)
   {
     MITK_INFO << "Regularization estimation failed. Using default value.";
@@ -190,8 +192,8 @@ void FitFibersToImageFilter::GenerateData()
     for (auto w : m_Weights)
       weights.push_back(w);
     std::sort(weights.begin(), weights.end());
-    MITK_INFO << "Setting upper weight bound to " << weights.at(num_unknowns*0.95);
-    vnl_vector<double> u; u.set_size(num_unknowns); u.fill(weights.at(num_unknowns*0.95));
+    MITK_INFO << "Setting upper weight bound to " << weights.at(num_unknowns*0.99);
+    vnl_vector<double> u; u.set_size(num_unknowns); u.fill(weights.at(num_unknowns*0.99));
     minimizer.set_upper_bound(u);
     bound_selection.fill(2);
     minimizer.set_bound_selection(bound_selection);

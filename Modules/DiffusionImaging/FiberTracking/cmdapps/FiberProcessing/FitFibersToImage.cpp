@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. g:", "lower termination threshold for gradient magnitude", 1e-5);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Residuals:", "save residual images", false);
-  parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", true);
+  parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -106,8 +106,8 @@ int main(int argc, char* argv[])
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
   bool filter_outliers = true;
-  if (parsedArgs.count("filter_outliers"))
-    filter_outliers = us::any_cast<bool>(parsedArgs["filter_outliers"]);
+  if (parsedArgs.count("dont_filter_outliers"))
+    filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
 
   try
   {

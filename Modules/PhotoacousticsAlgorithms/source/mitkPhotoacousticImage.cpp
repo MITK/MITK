@@ -244,7 +244,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   inputData = const_cast<void*>(acc.GetData());
   
   // convert the data to float by default
-  // as of now only those float, short, float are used at all... though it's easy to add other ones
+  // as of now only float, short, double are used at all.
   if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
   {
     // copy the data into the cropped image
@@ -261,7 +261,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   }
   else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (short)" || inputImage->GetPixelType().GetTypeAsString() == " (short)")
   {
-    // copy the data unsigned shorto the cropped image
+    // copy the data to the cropped image
     for (unsigned short sl = 0; sl < outputDim[2]; ++sl)
     {
       for (unsigned short l = 0; l < outputDim[0]; ++l)
@@ -275,7 +275,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   }
   else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (double)" || inputImage->GetPixelType().GetTypeAsString() == " (double)")
   {
-    // copy the data unsigned shorto the cropped image
+    // copy the data to the cropped image
     for (unsigned short sl = 0; sl < outputDim[2]; ++sl)
     {
       for (unsigned short l = 0; l < outputDim[0]; ++l)
@@ -309,8 +309,11 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
     config.CropBounds[0] = 0;
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
-
+  auto begin = std::chrono::high_resolution_clock::now();
   Image::Pointer processedImage = ApplyCropping(inputImage, config.upperCutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
+  auto end = std::chrono::high_resolution_clock::now();
+  MITK_INFO << "dddd " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
+
   config.inputDim[0] = processedImage->GetDimension(0);
   config.inputDim[1] = processedImage->GetDimension(1);
   config.inputDim[2] = processedImage->GetDimension(2);

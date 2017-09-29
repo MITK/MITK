@@ -401,8 +401,32 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="2">
+          <widget class="QSpinBox" name="CutoffBelow">
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_203">
+           <property name="text">
+            <string>Cut Top</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>Cut Bottom</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
           <widget class="QSpinBox" name="CutoffAbove">
            <property name="maximum">
             <number>99999</number>
@@ -415,27 +439,23 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="label_20">
+         <item row="1" column="0">
+          <widget class="QSpinBox" name="CutoffFirstSlice"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_19">
            <property name="text">
-            <string>Cut Top</string>
+            <string>Cut Slices first</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QSpinBox" name="CutoffBelow">
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="value">
-            <number>10</number>
-           </property>
-          </widget>
+         <item row="1" column="2">
+          <widget class="QSpinBox" name="CutoffLastSlice"/>
          </item>
-         <item>
-          <widget class="QLabel" name="label_21">
+         <item row="1" column="3">
+          <widget class="QLabel" name="label_23">
            <property name="text">
-            <string>Cut Bottom</string>
+            <string>Cut Slices last</string>
            </property>
           </widget>
          </item>
@@ -965,19 +985,6 @@
       </layout>
      </item>
     </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

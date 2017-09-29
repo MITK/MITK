@@ -58,9 +58,9 @@ __kernel void ckDMAS(
         {
           Delay2 = AddSamples[globalPosY * inputL + (int)fabs(l_s2 - l_i)];
           if (Delay2 < inputS && Delay2 >= 0) {
-            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] * 
+            mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] *
               dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)]
-              * apodArray[(int)((l_s1 - minLine)*apod_mult)] * 
+              * apodArray[(int)((l_s1 - minLine)*apod_mult)] *
               dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
               
             output += sqrt(mult * ((float)(mult>0)-(float)(mult<0))) * ((mult > 0) - (mult < 0));
@@ -71,6 +71,6 @@ __kernel void ckDMAS(
         --curUsedLines;
     }
 
-    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (pow((float)curUsedLines, 2.0f) - (curUsedLines - 1));
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1));
   }
 }

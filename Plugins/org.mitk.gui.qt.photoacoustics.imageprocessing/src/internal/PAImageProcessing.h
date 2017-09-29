@@ -205,7 +205,7 @@ signals:
   void result(mitk::Image::Pointer);
 
 public:
-  void setConfig(unsigned int CutAbove, unsigned int CutBelow);
+  void setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast);
   void setInputImage(mitk::Image::Pointer image);
   void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
   {
@@ -217,6 +217,8 @@ protected:
 
   unsigned int m_CutAbove;
   unsigned int m_CutBelow;
+  unsigned int m_CutSliceLast;
+  unsigned int m_CutSliceFirst;
 
   mitk::PhotoacousticImage::Pointer m_FilterBank;
 };

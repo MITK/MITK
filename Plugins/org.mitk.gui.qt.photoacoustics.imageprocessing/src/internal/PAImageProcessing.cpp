@@ -552,7 +552,7 @@ void PAImageProcessing::StartCropThread()
       connect(thread, &CropThread::result, this, &PAImageProcessing::HandleCropResults);
       connect(thread, &CropThread::finished, thread, &QObject::deleteLater);
 
-      thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value());
+      thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), m_Controls.CutoffFirstSlice->value(), m_Controls.CutoffLastSlice->value());
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 
@@ -800,6 +800,9 @@ void PAImageProcessing::UpdateImageInfo()
         m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
         m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
         m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
+        m_Controls.CutoffFirstSlice->setValue(0);
+        m_Controls.CutoffLastSlice->setValue(image->GetDimension(2) - 1);
+        m_Controls.CutoffLastSlice->setMaximum(image->GetDimension(2) - 1);
       }
       UpdateBFSettings(image);
 
@@ -1096,15 +1099,17 @@ void CropThread::run()
 {
   mitk::Image::Pointer resultImage;
 
-  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, 0, m_InputImage->GetDimension(2) - 1);
+  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, m_CutSliceLast);
 
   emit result(resultImage);
 }
 
-void CropThread::setConfig(unsigned int CutAbove, unsigned int CutBelow)
+void CropThread::setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast)
 {
   m_CutAbove = CutAbove;
   m_CutBelow = CutBelow;
+  m_CutSliceLast = CutSliceLast;
+  m_CutSliceFirst = CutSliceFirst;
 }
 
 void CropThread::setInputImage(mitk::Image::Pointer image)

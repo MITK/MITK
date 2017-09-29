@@ -61,9 +61,9 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Fit Fibers To Image");
-  parser.setCategory("Fiber Tracking and Processing Methods");
-  parser.setDescription("Assigns a weight to each fiber in order to optimally explain the input peak image");
+  parser.setTitle("");
+  parser.setCategory("Fiber Tracking Evaluation");
+  parser.setDescription("");
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
@@ -155,6 +155,11 @@ int main(int argc, char* argv[])
     fitter->SetVerbose(false);
     fitter->SetDeepCopy(false);
     fitter->Update();
+
+
+    fitter->GetTractograms().at(0)->SetFiberWeights(fitter->GetCoverage());
+    fitter->GetTractograms().at(0)->ColorFibersByFiberWeights(false, false);
+
     mitk::IOUtil::Save(fitter->GetTractograms().at(0), outRoot + "0_" + name + ".fib");
     peak_image = fitter->GetUnderexplainedImage();
 
@@ -213,6 +218,9 @@ int main(int argc, char* argv[])
       }
 
 //      fitter->SetPeakImage(peak_image);
+      best_candidate->SetFiberWeights((1.0-coverage) * next_coverage);
+      best_candidate->ColorFibersByFiberWeights(false, false);
+
       coverage += (1.0-coverage) * next_coverage;
 
       int i=0;

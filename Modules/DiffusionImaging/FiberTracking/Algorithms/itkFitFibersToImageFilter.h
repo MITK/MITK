@@ -15,7 +15,7 @@
 namespace itk{
 
 /**
-* \brief   */
+* \brief Fits the tractogram to the input peak image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).  */
 
 class FitFibersToImageFilter : public ImageSource< mitk::PeakImage::ItkPeakImageType >
 {
@@ -29,7 +29,6 @@ public:
 
   typedef itk::Point<float, 4> PointType4;
   typedef mitk::PeakImage::ItkPeakImageType       PeakImgType;
-//  typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)

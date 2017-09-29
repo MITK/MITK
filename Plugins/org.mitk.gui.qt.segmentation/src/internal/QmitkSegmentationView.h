@@ -164,15 +164,9 @@ protected:
 
   bool m_AutoSelectionEnabled;
 
-  mitk::NodePredicateOr::Pointer m_IsOfTypeImagePredicate;
-  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
-  mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;
-  mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
-  mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
-
+  mitk::NodePredicateAnd::Pointer m_IsOfTypeImagePredicate;
   mitk::NodePredicateOr::Pointer m_IsASegmentationImagePredicate;
   mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;
-
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

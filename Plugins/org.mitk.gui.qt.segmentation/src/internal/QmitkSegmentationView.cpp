@@ -57,21 +57,29 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DataSelectionChanged(false)
   , m_AutoSelectionEnabled(false)
 {
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
   mitk::NodePredicateDataType::Pointer isOdf = mitk::NodePredicateDataType::New("OdfImage");
-  mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
-  isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isOdf);
-  m_IsOfTypeImagePredicate = mitk::NodePredicateOr::New(isDiffusionImage, mitk::TNodePredicateDataType<mitk::Image>::New());
 
-  m_IsBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  m_IsNotBinaryPredicate = mitk::NodePredicateNot::New(m_IsBinaryPredicate);
+  mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
+  validImages->AddPredicate(isImage);
+  validImages->AddPredicate(isDwi);
+  validImages->AddPredicate(isDti);
+  validImages->AddPredicate(isOdf);
 
-  m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New(m_IsOfTypeImagePredicate, m_IsNotBinaryPredicate);
-  m_IsABinaryImagePredicate = mitk::NodePredicateAnd::New(m_IsOfTypeImagePredicate, m_IsBinaryPredicate);
+  mitk::NodePredicateNot::Pointer isNotAHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
 
-  m_IsASegmentationImagePredicate = mitk::NodePredicateOr::New(m_IsABinaryImagePredicate, mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  m_IsAPatientImagePredicate = mitk::NodePredicateAnd::New(m_IsNotABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New()));
+  m_IsOfTypeImagePredicate = mitk::NodePredicateAnd::New(validImages, isNotAHelperObject);
+
+  mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateNot::Pointer isNotBinaryPredicate = mitk::NodePredicateNot::New(isBinaryPredicate);
+
+  mitk::NodePredicateAnd::Pointer isABinaryImagePredicate = mitk::NodePredicateAnd::New(m_IsOfTypeImagePredicate, isBinaryPredicate);
+  mitk::NodePredicateAnd::Pointer isNotABinaryImagePredicate = mitk::NodePredicateAnd::New(m_IsOfTypeImagePredicate, isNotBinaryPredicate);
+
+  m_IsASegmentationImagePredicate = mitk::NodePredicateOr::New(isABinaryImagePredicate, mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
+  m_IsAPatientImagePredicate = mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New()));
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -358,11 +366,7 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
    for (mitk::DataStorage::SetOfObjects::ConstIterator it = patImages->Begin(); it != patImages->End(); ++it)
    {
       const mitk::DataNode* node = it->Value();
-      node->GetBoolProperty("binary", isBinary);
-      mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-      isBinary = isBinary || labelSetImage.IsNotNull();
-
-      if(isBinary)
+      if(m_IsASegmentationImagePredicate->CheckNode(node))
       {
          m_Controls->patImageSelector->RemoveNode(node);
          m_Controls->segImageSelector->AddNode(node);
@@ -378,16 +382,14 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
    for (mitk::DataStorage::SetOfObjects::ConstIterator it = segImages->Begin(); it != segImages->End(); ++it)
    {
       const mitk::DataNode* node = it->Value();
-      node->GetBoolProperty("binary", isBinary);
-      mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-      isBinary = isBinary || labelSetImage.IsNotNull();
-
-      if(!isBinary)
+      if(!m_IsASegmentationImagePredicate->CheckNode(node))
       {
          m_Controls->segImageSelector->RemoveNode(node);
          m_Controls->patImageSelector->AddNode(node);
          if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0) == node)
-            mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(nullptr);
+         {
+           mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(nullptr);
+         }
          return;
       }
    }
@@ -640,12 +642,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
         return;
       }
 
-      bool isASegmentation(false);
-      selectedNode->GetBoolProperty("binary", isASegmentation);
-      mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(selectedNode->GetData());
-      isASegmentation = isASegmentation || labelSetImage.IsNotNull();
-
-      if (isASegmentation)
+      if (m_IsASegmentationImagePredicate->CheckNode(selectedNode))
       {
         // set all nodes to invisible
         mitk::DataStorage::SetOfObjects::ConstPointer allImages = GetDataStorage()->GetSubset(m_IsOfTypeImagePredicate);
@@ -654,7 +651,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
           (*iter)->SetVisibility(false);
         }
 
-        // if a segmentation is selected find a possible reference image:
+        // if a segmentation is selected find a possible patient image
         mitk::DataStorage::SetOfObjects::ConstPointer sources = GetDataStorage()->GetSources(selectedNode, m_IsAPatientImagePredicate);
         mitk::DataNode::Pointer refNode;
         if (sources->Size() != 0)
@@ -667,7 +664,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
         }
         else
         {
-          // did not find a source, check all images an compare geometry
+          // did not find a source / patient image, check all images and compare geometry
           mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
           for (mitk::DataStorage::SetOfObjects::ConstIterator iter = possiblePatientImages->Begin(); iter != possiblePatientImages->End(); ++iter)
           {
@@ -1020,7 +1017,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->setupUi(parent);
 
    m_Controls->patImageSelector->SetDataStorage(GetDataStorage());
-   m_Controls->patImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsAPatientImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
+   m_Controls->patImageSelector->SetPredicate(m_IsAPatientImagePredicate);
 
    UpdateWarningLabel(tr("Please load an image"));
 
@@ -1030,7 +1027,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    }
 
    m_Controls->segImageSelector->SetDataStorage(GetDataStorage());
-   m_Controls->segImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsASegmentationImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
+   m_Controls->segImageSelector->SetPredicate(m_IsASegmentationImagePredicate);
    if (m_Controls->segImageSelector->GetSelectedNode().IsNotNull())
    {
      UpdateWarningLabel("");

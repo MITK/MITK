@@ -95,7 +95,7 @@ protected slots:
   void Play();
   void Stop();
   void Reset();
-  void SwitchPlayButton(bool paused);
+  void IsPlaying(bool paused);
   void QObjectDestroyed( QObject * obj = 0 );
 
   void NewFrameAvailable(mitk::VideoSource* videoSource);

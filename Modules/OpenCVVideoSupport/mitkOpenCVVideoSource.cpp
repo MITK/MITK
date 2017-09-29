@@ -220,6 +220,7 @@ void mitk::OpenCVVideoSource::StartCapturing()
 
 void mitk::OpenCVVideoSource::StopCapturing()
 {
+  m_CapturePaused = false;
   m_CapturingInProcess = false;
 }
 
@@ -391,6 +392,7 @@ void mitk::OpenCVVideoSource::Reset()
 {
   // set capturing to false
   this->StopCapturing();
+  this->m_FrameCount = 0;
   if(m_VideoCapture)
     cvReleaseCapture(&m_VideoCapture);
   m_VideoCapture = nullptr;

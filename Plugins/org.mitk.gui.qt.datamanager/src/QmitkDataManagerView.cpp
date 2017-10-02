@@ -124,10 +124,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       , &QmitkDataManagerView::OnPreferencesChanged ) );
 
   //# GUI
-  m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage());
+  m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage(), prefs->GetBool("Place new nodes on top", true));
   m_NodeTreeModel->setParent( parent );
-  m_NodeTreeModel->SetPlaceNewNodesOnTop(
-      prefs->GetBool("Place new nodes on top", true) );
   m_NodeTreeModel->SetAllowHierarchyChange(
     prefs->GetBool("Allow changing of parent node", false));
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);

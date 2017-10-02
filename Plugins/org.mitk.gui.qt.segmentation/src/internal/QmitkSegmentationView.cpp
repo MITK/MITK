@@ -361,8 +361,6 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
 {
    mitk::DataStorage::SetOfObjects::ConstPointer patImages = m_Controls->patImageSelector->GetNodes();
 
-   bool isBinary(false);
-
    for (mitk::DataStorage::SetOfObjects::ConstIterator it = patImages->Begin(); it != patImages->End(); ++it)
    {
       const mitk::DataNode* node = it->Value();
@@ -376,8 +374,6 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
    }
 
    mitk::DataStorage::SetOfObjects::ConstPointer segImages = m_Controls->segImageSelector->GetNodes();
-
-   isBinary = true;
 
    for (mitk::DataStorage::SetOfObjects::ConstIterator it = segImages->Begin(); it != segImages->End(); ++it)
    {

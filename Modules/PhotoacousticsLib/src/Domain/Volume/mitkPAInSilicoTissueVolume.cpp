@@ -125,21 +125,16 @@ mitk::Image::Pointer mitk::pa::InSilicoTissueVolume::ConvertToMitkImage()
   dimensionsOfImage[2] = m_TissueParameters->GetZDim();
   dimensionsOfImage[3] = m_TDim;
 
-  MITK_INFO << "Initializing image...";
   resultImage->Initialize(TPixel, 4, dimensionsOfImage, 1);
-  MITK_INFO << "Initializing image...[Done]";
 
   mitk::Vector3D spacing;
   spacing.Fill(m_TissueParameters->GetVoxelSpacingInCentimeters());
   resultImage->SetSpacing(spacing);
 
-  MITK_INFO << "Set Import Volumes...";
-  //Copy memory, deal with cleaning up memory yourself!
   resultImage->SetImportVolume(m_AbsorptionVolume->GetData(), 0, 0, mitk::Image::CopyMemory);
   resultImage->SetImportVolume(m_ScatteringVolume->GetData(), 1, 0, mitk::Image::CopyMemory);
   resultImage->SetImportVolume(m_AnisotropyVolume->GetData(), 2, 0, mitk::Image::CopyMemory);
   resultImage->SetImportVolume(m_SegmentationVolume->GetData(), 3, 0, mitk::Image::CopyMemory);
-  MITK_INFO << "Set Import Volumes...[Done]";
 
   resultImage->SetPropertyList(m_PropertyList);
 

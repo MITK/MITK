@@ -48,16 +48,6 @@ namespace mitk {
     private:
     };
 
-    /**
-    * @brief Equal A function comparing two vessel drawer instances for beeing equal
-    *
-    * @param rightHandSide A vesseldrawer to be compared
-    * @param leftHandSide A vesseldrawer to be compared
-    * @param eps tolarence for comparison. You can use mitk::eps in most cases.
-    * @param verbose flag indicating if the user wants detailed console output or not.
-    * @return true, if all subsequent comparisons are true, false otherwise
-    */
-    MITKPHOTOACOUSTICSLIB_EXPORT bool Equal(const VesselDrawer::Pointer leftHandSide, const VesselDrawer::Pointer rightHandSide, double eps, bool verbose);
-  }
+    }
 }
 #endif // MITKVESSELDRAWER_H

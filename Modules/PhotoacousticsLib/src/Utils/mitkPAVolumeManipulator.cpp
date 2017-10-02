@@ -18,10 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPAExceptions.h"
 #include "mitkPAInSilicoTissueVolume.h"
 #include "itkResampleImageFilter.h"
+#include "itkGaussianInterpolateImageFunction.h"
 
 // Includes for image casting between ITK and MITK
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
+
+#include <mitkIOUtil.h>
 
 mitk::pa::VolumeManipulator::VolumeManipulator() {}
 
@@ -63,16 +66,17 @@ void mitk::pa::VolumeManipulator::Log10Image(Volume::Pointer image)
 
 void mitk::pa::VolumeManipulator::RescaleImage(InSilicoTissueVolume::Pointer image, double ratio)
 {
-  image->SetAbsorptionVolume(RescaleImage(image->GetAbsorptionVolume(), ratio));
   image->SetScatteringVolume(RescaleImage(image->GetScatteringVolume(), ratio));
   image->SetAnisotropyVolume(RescaleImage(image->GetAnisotropyVolume(), ratio));
   image->SetSegmentationVolume(RescaleImage(image->GetSegmentationVolume(), ratio));
+  image->SetAbsorptionVolume(RescaleImage(image->GetAbsorptionVolume(), ratio));
 }
 
 mitk::pa::Volume::Pointer mitk::pa::VolumeManipulator::RescaleImage(Volume::Pointer image, double ratio)
 {
   typedef itk::Image<double, 3> ImageType;
   typedef itk::ResampleImageFilter<ImageType, ImageType> FilterType;
+  typedef itk::GaussianInterpolateImageFunction<ImageType, double> InterpolatorType;
 
   auto input = image->AsMitkImage();
   ImageType::Pointer itkInput = ImageType::New();
@@ -86,7 +90,8 @@ mitk::pa::Volume::Pointer mitk::pa::VolumeManipulator::RescaleImage(Volume::Poin
   FilterType::Pointer resampleImageFilter = FilterType::New();
   resampleImageFilter->SetInput(itkInput);
   resampleImageFilter->SetSize(outputSize);
-  resampleImageFilter->SetOutputSpacing(input->GetGeometry()->GetSpacing()[0] * ratio);
+  resampleImageFilter->SetInterpolator(InterpolatorType::New());
+  resampleImageFilter->SetOutputSpacing(input->GetGeometry()->GetSpacing()[0] / ratio);
 
   resampleImageFilter->UpdateLargestPossibleRegion();
 

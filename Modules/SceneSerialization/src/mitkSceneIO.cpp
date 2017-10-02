@@ -476,14 +476,13 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         {
           MITK_WARN << "Ignoring NULL node during scene serialization.";
         }
-
-        ProgressBar::GetInstance()->Progress();
       };
 
       // write out objects, dependencies and properties
       for (auto node : sceneNodes->CastToSTLConstContainer())
       {
         serialize(node);
+        ProgressBar::GetInstance()->Progress();
       } // end for all nodes
 
       if (Logger::Options::get().datastoragelog && Logger::Log::get().getDataBackend())
@@ -499,6 +498,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     if ( !document.SaveFile( defaultLocale_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
     {
       MITK_ERROR << "Could not write scene to " << defaultLocale_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+      ProgressBar::GetInstance()->Reset();
       return false;
     }
     else
@@ -520,6 +520,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           if (!file.good())
           {
             MITK_ERROR << "Could not open a zip file for writing: '" << defaultLocaleFilename << "'";
+            ProgressBar::GetInstance()->Reset();
             return false;
           }
           else
@@ -551,6 +552,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       catch(std::exception& e)
       {
         MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory << "\nReason: " << e.what();
+        ProgressBar::GetInstance()->Reset();
         return false;
       }
       return true;
@@ -559,6 +561,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
   catch(std::exception& e)
   {
     MITK_ERROR << "Caught exception during saving temporary files to disk. Error description: '" << e.what() << "'";
+    ProgressBar::GetInstance()->Reset();
     return false;
   }
 }

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <MitkPhotoacousticsLibExports.h>
 #include "mitkPAVolume.h"
+#include "mitkPAInSilicoTissueVolume.h"
 
 namespace mitk {
   namespace pa {
@@ -42,6 +43,10 @@ namespace mitk {
       static void GaussianBlur3D(mitk::pa::Volume::Pointer paVolume, double sigma);
 
       static void Log10Image(mitk::pa::Volume::Pointer image);
+
+      static void RescaleImage(InSilicoTissueVolume::Pointer image, double ratio);
+
+      static mitk::pa::Volume::Pointer RescaleImage(Volume::Pointer image, double ratio);
 
     private:
       VolumeManipulator();

@@ -106,6 +106,11 @@ namespace mitk {
       Volume::Pointer GetAnisotropyVolume();
       Volume::Pointer GetSegmentationVolume();
 
+      void SetAbsorptionVolume(Volume::Pointer volume);
+      void SetScatteringVolume(Volume::Pointer volume);
+      void SetAnisotropyVolume(Volume::Pointer volume);
+      void SetSegmentationVolume(Volume::Pointer volume);
+
       void FinalizeVolume();
       itkGetMacro(TissueParameters, TissueGeneratorParameters::Pointer);
       itkGetMacro(TDim, unsigned int);

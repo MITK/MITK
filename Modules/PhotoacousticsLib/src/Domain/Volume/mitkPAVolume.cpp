@@ -43,6 +43,21 @@ mitk::pa::Volume::Volume(double* data,
   delete data;
 }
 
+mitk::pa::Volume::Volume(mitk::Image::Pointer image)
+{
+  if (image.IsNull())
+    mitkThrow() << "You may not initialize a mitk::Volume with a null reference to an mitk image";
+
+  unsigned int* dimensions = image->GetDimensions();
+  m_XDim = dimensions[1];
+  m_YDim = dimensions[0];
+  m_ZDim = dimensions[2];
+
+  m_InternalMitkImage = image;
+
+  m_FastAccessDataPointer = GetData();
+}
+
 mitk::pa::Volume::~Volume()
 {
   m_InternalMitkImage = nullptr;
@@ -51,6 +66,13 @@ mitk::pa::Volume::~Volume()
 mitk::pa::Volume::Pointer mitk::pa::Volume::New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim)
 {
   mitk::pa::Volume::Pointer smartPtr = new mitk::pa::Volume(data, xDim, yDim, zDim);
+  smartPtr->UnRegister();
+  return smartPtr;
+}
+
+mitk::pa::Volume::Pointer mitk::pa::Volume::New(mitk::Image::Pointer image)
+{
+  mitk::pa::Volume::Pointer smartPtr = new mitk::pa::Volume(image);
   smartPtr->UnRegister();
   return smartPtr;
 }

@@ -41,30 +41,11 @@ namespace mitk {
         VesselProperties::Pointer properties,
         InSilicoTissueVolume::Pointer volume);
 
-      itkGetMacro(VolumeState, Volume::Pointer);
-
     protected:
       VesselDrawer();
       virtual ~VesselDrawer();
 
     private:
-
-      void InitializeVolumeState(InSilicoTissueVolume::Pointer volume);
-
-      enum VolumeState
-      {
-        UNTOUCHED, PARTIAL, FULL
-      };
-
-      Volume::Pointer m_VolumeState;
-      Volume::Pointer m_OriginalVolumeAbsorption;
-      Volume::Pointer m_OriginalVolumeScattering;
-      Volume::Pointer m_OriginalVolumeAnisotropy;
-
-      void FillInVolumeValues(mitk::pa::InSilicoTissueVolume::Pointer volume,
-        mitk::pa::VesselProperties::Pointer properties,
-        double vesselFraction,
-        int x, int y, int z)
     };
 
     /**

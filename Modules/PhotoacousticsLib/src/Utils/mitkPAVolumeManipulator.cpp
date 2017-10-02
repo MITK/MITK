@@ -16,12 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPAVolumeManipulator.h"
 #include "mitkPAExceptions.h"
+#include "mitkPAInSilicoTissueVolume.h"
+#include "itkResampleImageFilter.h"
+
+// Includes for image casting between ITK and MITK
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 
 mitk::pa::VolumeManipulator::VolumeManipulator() {}
 
 mitk::pa::VolumeManipulator::~VolumeManipulator() {}
 
-void mitk::pa::VolumeManipulator::ThresholdImage(mitk::pa::Volume::Pointer image, double threshold)
+void mitk::pa::VolumeManipulator::ThresholdImage(Volume::Pointer image, double threshold)
 {
   for (unsigned int z = 0; z < image->GetZDim(); z++)
     for (unsigned int y = 0; y < image->GetYDim(); y++)
@@ -32,7 +38,7 @@ void mitk::pa::VolumeManipulator::ThresholdImage(mitk::pa::Volume::Pointer image
           image->SetData(0, x, y, z);
 }
 
-void mitk::pa::VolumeManipulator::MultiplyImage(mitk::pa::Volume::Pointer image, double factor)
+void mitk::pa::VolumeManipulator::MultiplyImage(Volume::Pointer image, double factor)
 {
   for (unsigned int z = 0; z < image->GetZDim(); z++)
     for (unsigned int y = 0; y < image->GetYDim(); y++)
@@ -40,7 +46,7 @@ void mitk::pa::VolumeManipulator::MultiplyImage(mitk::pa::Volume::Pointer image,
         image->SetData(image->GetData(x, y, z)*factor, x, y, z);
 }
 
-void mitk::pa::VolumeManipulator::Log10Image(mitk::pa::Volume::Pointer image)
+void mitk::pa::VolumeManipulator::Log10Image(Volume::Pointer image)
 {
   for (unsigned int z = 0; z < image->GetZDim(); z++)
     for (unsigned int y = 0; y < image->GetYDim(); y++)
@@ -49,10 +55,47 @@ void mitk::pa::VolumeManipulator::Log10Image(mitk::pa::Volume::Pointer image)
         if (image->GetData(x, y, z) < 0)
         {
           MITK_ERROR << "Signal was smaller than 0. There is an error in the input image file.";
-          throw mitk::pa::InvalidValueException("Signal was smaller than 0. There is an error in the input image file.");
+          throw InvalidValueException("Signal was smaller than 0. There is an error in the input image file.");
         }
         image->SetData(log10(image->GetData(x, y, z)), x, y, z);
       }
+}
+
+void mitk::pa::VolumeManipulator::RescaleImage(InSilicoTissueVolume::Pointer image, double ratio)
+{
+  image->SetAbsorptionVolume(RescaleImage(image->GetAbsorptionVolume(), ratio));
+  image->SetScatteringVolume(RescaleImage(image->GetScatteringVolume(), ratio));
+  image->SetAnisotropyVolume(RescaleImage(image->GetAnisotropyVolume(), ratio));
+  image->SetSegmentationVolume(RescaleImage(image->GetSegmentationVolume(), ratio));
+}
+
+mitk::pa::Volume::Pointer mitk::pa::VolumeManipulator::RescaleImage(Volume::Pointer image, double ratio)
+{
+  typedef itk::Image<double, 3> ImageType;
+  typedef itk::ResampleImageFilter<ImageType, ImageType> FilterType;
+
+  auto input = image->AsMitkImage();
+  ImageType::Pointer itkInput = ImageType::New();
+  mitk::CastToItkImage(input, itkInput);
+
+  ImageType::SizeType outputSize;
+  outputSize[0] = input->GetDimensions()[0] * ratio;
+  outputSize[1] = input->GetDimensions()[1] * ratio;
+  outputSize[2] = input->GetDimensions()[2] * ratio;
+
+  FilterType::Pointer resampleImageFilter = FilterType::New();
+  resampleImageFilter->SetInput(itkInput);
+  resampleImageFilter->SetSize(outputSize);
+  resampleImageFilter->SetOutputSpacing(input->GetGeometry()->GetSpacing()[0] * ratio);
+
+  resampleImageFilter->UpdateLargestPossibleRegion();
+
+  ImageType::Pointer output = resampleImageFilter->GetOutput();
+  mitk::Image::Pointer mitkOutput = mitk::Image::New();
+
+  GrabItkImageMemory(output, mitkOutput);
+
+  return Volume::New(mitkOutput);
 }
 
 /**

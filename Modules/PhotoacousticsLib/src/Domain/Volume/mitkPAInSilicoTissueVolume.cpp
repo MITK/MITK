@@ -330,3 +330,23 @@ mitk::pa::Volume::Pointer mitk::pa::InSilicoTissueVolume::GetAnisotropyVolume()
 {
   return m_AnisotropyVolume;
 }
+
+void mitk::pa::InSilicoTissueVolume::SetAbsorptionVolume(Volume::Pointer volume)
+{
+  m_AbsorptionVolume = volume;
+}
+
+void mitk::pa::InSilicoTissueVolume::SetScatteringVolume(Volume::Pointer volume)
+{
+  m_ScatteringVolume = volume;
+}
+
+void mitk::pa::InSilicoTissueVolume::SetAnisotropyVolume(Volume::Pointer volume)
+{
+  m_AnisotropyVolume = volume;
+}
+
+void mitk::pa::InSilicoTissueVolume::SetSegmentationVolume(Volume::Pointer volume)
+{
+  m_SegmentationVolume = volume;
+}

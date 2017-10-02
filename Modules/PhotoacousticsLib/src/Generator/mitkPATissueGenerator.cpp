@@ -45,6 +45,15 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     }
   }
 
+  if (parameters->GetDoPartialVolume())
+  {
+    parameters->SetXDim(parameters->GetXDim() * 10);
+    parameters->SetYDim(parameters->GetYDim() * 10);
+    parameters->SetZDim(parameters->GetZDim() * 10);
+    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() * 10);
+    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / 10);
+  }
+
   std::uniform_int_distribution<int> randomNumVesselDistribution(parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());
   std::uniform_real_distribution<double> randomBendingDistribution(parameters->GetMinVesselBending(), parameters->GetMaxVesselBending());
   std::uniform_real_distribution<double> randomAbsorptionDistribution(parameters->GetMinVesselAbsorption(), parameters->GetMaxVesselAbsorption());
@@ -141,6 +150,16 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     {
       vesselTree->Step(generatedVolume, parameters->GetCalculateNewVesselPositionCallback(), bendingFactor, &randomNumberGenerator);
     }
+  }
+
+  if (parameters->GetDoPartialVolume())
+  {
+    VolumeManipulator::RescaleImage(generatedVolume, 0.1);
+    parameters->SetXDim(parameters->GetXDim() / 10);
+    parameters->SetYDim(parameters->GetYDim() / 10);
+    parameters->SetZDim(parameters->GetZDim() / 10);
+    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() / 10);
+    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() * 10);
   }
 
   generatedVolume->FinalizeVolume();

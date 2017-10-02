@@ -248,7 +248,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>140</number>
+                 <number>35</number>
                 </property>
                </widget>
               </item>
@@ -301,7 +301,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>200</number>
+                 <number>50</number>
                 </property>
                </widget>
               </item>
@@ -354,7 +354,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>200</number>
+                 <number>50</number>
                 </property>
                </widget>
               </item>
@@ -421,13 +421,13 @@
                  </size>
                 </property>
                 <property name="decimals">
-                 <number>2</number>
+                 <number>5</number>
                 </property>
                 <property name="singleStep">
                  <double>0.010000000000000</double>
                 </property>
                 <property name="value">
-                 <double>0.030000000000000</double>
+                 <double>0.120000000000000</double>
                 </property>
                </widget>
               </item>
@@ -619,6 +619,9 @@
               <property name="text">
                <string/>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -793,7 +796,7 @@
                  <number>999999999</number>
                 </property>
                 <property name="value">
-                 <number>170704057</number>
+                 <number>1337</number>
                 </property>
                </widget>
               </item>

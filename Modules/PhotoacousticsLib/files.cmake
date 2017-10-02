@@ -6,6 +6,7 @@ SET(H_FILES
   include/mitkPATissueGenerator.h
   include/mitkPAVesselTree.h
   include/mitkPAVessel.h
+  include/mitkPAVesselDrawer.h
   include/mitkPAVesselMeanderStrategy.h
   include/mitkPANoiseGenerator.h
   include/mitkPAVolume.h
@@ -45,6 +46,7 @@ set(CPP_FILES
   Utils/ProbeDesign/mitkPAProbe.cpp
   Utils/ProbeDesign/mitkPALightSource.cpp
   Utils/Thread/mitkPAMonteCarloThreadHandler.cpp
+  Utils/mitkPAVesselDrawer.cpp
 )
 
 set(RESOURCE_FILES

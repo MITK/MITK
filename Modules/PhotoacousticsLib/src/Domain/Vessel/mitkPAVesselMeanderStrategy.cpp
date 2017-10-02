@@ -32,9 +32,13 @@ void mitk::pa::VesselMeanderStrategy::CalculateNewPositionInStraightLine(
     direction->Randomize(rng);
   }
 
+  direction->Normalize();
+
   position->SetElement(0, position->GetElement(0) + direction->GetElement(0));
   position->SetElement(1, position->GetElement(1) + direction->GetElement(1));
   position->SetElement(2, position->GetElement(2) + direction->GetElement(2));
+
+  position->Normalize();
 }
 
 void mitk::pa::VesselMeanderStrategy::CalculateRandomlyDivergingPosition(
@@ -46,6 +50,8 @@ void mitk::pa::VesselMeanderStrategy::CalculateRandomlyDivergingPosition(
   }
 
   direction->RandomizeByPercentage(RANDOMIZATION_PERCENTAGE, bendingFactor, rng);
+
+  direction->Normalize();
 
   position->SetElement(0, position->GetElement(0) + direction->GetElement(0));
   position->SetElement(1, position->GetElement(1) + direction->GetElement(1));

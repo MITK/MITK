@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPAInSilicoTissueVolume.h"
 #include "mitkPAVector.h"
 #include "mitkPAVesselProperties.h"
+#include "mitkPAVesselDrawer.h"
 
 #include <MitkPhotoacousticsLibExports.h>
 
@@ -88,9 +89,6 @@ namespace mitk {
       const double NEW_RADIUS_MINIMUM_RELATIVE_SIZE = 0.6;
       const double NEW_RADIUS_MAXIMUM_RELATIVE_SIZE = 0.8;
 
-      void DrawVesselInVolume(Vector::Pointer toPosition, mitk::pa::InSilicoTissueVolume::Pointer volume);
-      VesselProperties::Pointer m_VesselProperties;
-
       VesselMeanderStrategy::Pointer m_VesselMeanderStrategy;
       bool m_Finished;
       double m_WalkedDistance;
@@ -100,6 +98,10 @@ namespace mitk {
       std::uniform_real_distribution<> m_RadiusRangeDistribution;
 
       int GetSign(std::mt19937* rng);
+
+      VesselProperties::Pointer m_VesselProperties;
+
+      VesselDrawer::Pointer m_VesselDrawer;
     };
 
     /**

@@ -1023,11 +1023,11 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
     if (saveInfo.m_Cancel)
     {
-      errMsg += "Writing operation(s) cancelled.";
+      // Cancelation should not cause some Error
+      //errMsg += "Writing operation(s) cancelled.";
       if (!mitk::ProgressBar::GetInstance()->IsProgressBarActive()) {
         mitk::ProgressBar::GetInstance()->Progress(2 * filesToWrite);
       }
-
       break;
     }
 

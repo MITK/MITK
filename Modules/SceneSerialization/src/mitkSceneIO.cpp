@@ -383,9 +383,11 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
       } // end for all nodes
     }   // end if sceneNodes
 
-    if (!document.SaveFile(m_WorkingDirectory + Poco::Path::separator() + "index.xml"))
+    std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+
+    if (!document.SaveFile(defaultLocale_WorkingDirectory + Poco::Path::separator() + "index.xml"))
     {
-      MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml"
+      MITK_ERROR << "Could not write scene to " << defaultLocale_WorkingDirectory << Poco::Path::separator() << "index.xml"
                  << "\nTinyXML reports '" << document.ErrorDesc() << "'";
       return false;
     }
@@ -471,7 +473,8 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
     {
       serializer->SetData(data);
       serializer->SetFilenameHint(filenamehint);
-      serializer->SetWorkingDirectory(m_WorkingDirectory);
+      std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+      serializer->SetWorkingDirectory(defaultLocale_WorkingDirectory);
       try
       {
         std::string writtenfilename = serializer->Serialize();
@@ -501,7 +504,8 @@ TiXmlElement *mitk::SceneIO::SavePropertyList(PropertyList *propertyList, const 
 
   serializer->SetPropertyList(propertyList);
   serializer->SetFilenameHint(filenamehint);
-  serializer->SetWorkingDirectory(m_WorkingDirectory);
+  std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+  serializer->SetWorkingDirectory(defaultLocale_WorkingDirectory);
   try
   {
     std::string writtenfilename = serializer->Serialize();

@@ -703,10 +703,6 @@ bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D(const Interac
   const mitk::Point3D worldPoint3D = positionEvent->GetPositionInWorld();
 
   // TODO: proper handling of distance tolerance
-  if (planarFigureGeometry->Distance(worldPoint3D) > 0.1)
-  {
-    return false;
-  }
 
   // Project point onto plane of this PlanarFigure
   planarFigureGeometry->Map(worldPoint3D, point2D);

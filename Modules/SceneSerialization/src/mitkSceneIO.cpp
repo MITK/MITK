@@ -152,6 +152,9 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
                << "'. Will attempt to read whatever could be unzipped.";
   }
 
+  // transcode locale-dependent string
+  m_WorkingDirectory = Poco::Path::transcode (m_WorkingDirectory);
+
   // test if index.xml exists
   // parse index.xml with TinyXML
   TiXmlDocument document(m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml");

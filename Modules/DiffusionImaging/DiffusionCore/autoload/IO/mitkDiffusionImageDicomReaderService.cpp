@@ -155,7 +155,10 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
             const unsigned int ntotalfiles = l1.size();
 
             for( unsigned int i=0; i< ntotalfiles; i++)
+            {
               complete_list.push_back( l1.at(i) );
+              m_ReadFiles.push_back( l1.at(i) );
+            }
           }
         }
       }
@@ -167,7 +170,10 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
         const unsigned int ntotalfiles = l1.size();
 
         for( unsigned int i=0; i< ntotalfiles; i++)
+        {
           complete_list.push_back( l1.at(i) );
+          m_ReadFiles.push_back( l1.at(i) );
+        }
       }
 
       mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();

@@ -205,6 +205,8 @@ namespace mitk
     return d->RegisterMimeType(context);
   }
 
+  std::vector< std::string > AbstractFileReader::GetReadFiles(){ return m_ReadFiles; }
+
   void AbstractFileReader::SetMimeType(const CustomMimeType &mimeType) { d->SetMimeType(mimeType); }
   void AbstractFileReader::SetDescription(const std::string &description) { d->SetDescription(description); }
   void AbstractFileReader::SetRanking(int ranking) { d->SetRanking(ranking); }

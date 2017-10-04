@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+#include <mitkAbstractFileReader.h>
 
 // ITK
 #include <itksys/SystemTools.hxx>
@@ -624,8 +625,12 @@ namespace mitk
 
     std::map<std::string, FileReaderSelector::Item> usedReaderItems;
 
+    std::vector< std::string > read_files;
     for (auto &loadInfo : loadInfos)
     {
+      if(std::find(read_files.begin(), read_files.end(), loadInfo.m_Path) != read_files.end())
+        continue;
+
       std::vector<FileReaderSelector::Item> readers = loadInfo.m_ReaderSelector.Get();
 
       if (readers.empty())
@@ -712,6 +717,9 @@ namespace mitk
         if (ds != nullptr)
         {
           nodes = reader->Read(*ds);
+
+          std::vector< std::string > new_files =  reader->GetReadFiles();
+          read_files.insert( read_files.end(), new_files.begin(), new_files.end() );
         }
         else
         {
@@ -726,6 +734,9 @@ namespace mitk
               nodes->InsertElement(nodes->Size(), node);
             }
           }
+
+          std::vector< std::string > new_files =  reader->GetReadFiles();
+          read_files.insert( read_files.end(), new_files.begin(), new_files.end() );
         }
 
         for (DataStorage::SetOfObjects::ConstIterator nodeIter = nodes->Begin(), nodeIterEnd = nodes->End();

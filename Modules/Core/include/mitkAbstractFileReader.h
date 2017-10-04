@@ -105,6 +105,11 @@ namespace mitk
     us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext *context = us::GetModuleContext());
     void UnregisterService();
 
+    /**
+     * @return A list of files that were loaded during the last call of Read. Has to be filled by the actual reader class.
+     */
+    std::vector< std::string > GetReadFiles();
+
   protected:
     /**
      * @brief An input stream wrapper.
@@ -214,6 +219,8 @@ namespace mitk
     std::string GetLocalFileName() const;
 
     virtual void SetDefaultDataNodeProperties(DataNode *node, const std::string &filePath);
+
+    std::vector< std::string > m_ReadFiles;
 
   private:
     AbstractFileReader &operator=(const AbstractFileReader &other);

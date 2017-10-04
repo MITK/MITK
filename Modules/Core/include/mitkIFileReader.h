@@ -121,6 +121,11 @@ namespace mitk
      * \throws mitk::Exception
      */
     virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage &ds) = 0;
+
+    /**
+     * @return A list of files that were loaded during the last call of Read.
+     */
+    virtual std::vector< std::string > GetReadFiles() = 0;
   };
 
 } // namespace mitk

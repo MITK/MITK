@@ -1192,51 +1192,58 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure(bool interactive)
     return;
   }
 
-  std::vector<mitk::DataNode::Pointer> fiberBundles = m_SelectedFB;
-  mitk::DataNode::Pointer planarFigure = m_SelectedPF.at(0);
-  for (unsigned int i=0; i<fiberBundles.size(); i++)
+  try
   {
-    mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(fiberBundles.at(i)->GetData());
-    mitk::FiberBundle::Pointer extFB = fib->ExtractFiberSubset(planarFigure, GetDataStorage());
-
-    if (interactive && m_Controls->m_InteractiveBox->isChecked())
+    std::vector<mitk::DataNode::Pointer> fiberBundles = m_SelectedFB;
+    mitk::DataNode::Pointer planarFigure = m_SelectedPF.at(0);
+    for (unsigned int i=0; i<fiberBundles.size(); i++)
     {
-      if (m_InteractiveNode.IsNull())
-      {
-        m_InteractiveNode = mitk::DataNode::New();
-        QString name("Interactive");
-        m_InteractiveNode->SetName(name.toStdString());
-        GetDataStorage()->Add(m_InteractiveNode);
-      }
-      float op = 5.0/sqrt(fib->GetNumFibers());
-      float currentOp = 0;
-      fiberBundles.at(i)->GetFloatProperty("opacity", currentOp);
+      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(fiberBundles.at(i)->GetData());
+      mitk::FiberBundle::Pointer extFB = fib->ExtractFiberSubset(planarFigure, GetDataStorage());
 
-      if (currentOp!=op)
+      if (interactive && m_Controls->m_InteractiveBox->isChecked())
       {
-        fib->SetFiberColors(255, 255, 255);
-        fiberBundles.at(i)->SetFloatProperty("opacity", op);
-        fiberBundles.at(i)->SetBoolProperty("Fiber2DfadeEFX", false);
-      }
-      m_InteractiveNode->SetData(extFB);
-    }
-    else
-    {
-      if (extFB->GetNumFibers()<=0)
-      {
-        QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
-        continue;
-      }
+        if (m_InteractiveNode.IsNull())
+        {
+          m_InteractiveNode = mitk::DataNode::New();
+          QString name("Interactive");
+          m_InteractiveNode->SetName(name.toStdString());
+          GetDataStorage()->Add(m_InteractiveNode);
+        }
+        float op = 5.0/sqrt(fib->GetNumFibers());
+        float currentOp = 0;
+        fiberBundles.at(i)->GetFloatProperty("opacity", currentOp);
 
-      mitk::DataNode::Pointer node;
-      node = mitk::DataNode::New();
-      node->SetData(extFB);
-      QString name(fiberBundles.at(i)->GetName().c_str());
-      name += "*";
-      node->SetName(name.toStdString());
-      fiberBundles.at(i)->SetVisibility(false);
-      GetDataStorage()->Add(node);
+        if (currentOp!=op)
+        {
+          fib->SetFiberColors(255, 255, 255);
+          fiberBundles.at(i)->SetFloatProperty("opacity", op);
+          fiberBundles.at(i)->SetBoolProperty("Fiber2DfadeEFX", false);
+        }
+        m_InteractiveNode->SetData(extFB);
+      }
+      else
+      {
+        if (extFB->GetNumFibers()<=0)
+        {
+          QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
+          continue;
+        }
+
+        mitk::DataNode::Pointer node;
+        node = mitk::DataNode::New();
+        node->SetData(extFB);
+        QString name(fiberBundles.at(i)->GetName().c_str());
+        name += "*";
+        node->SetName(name.toStdString());
+        fiberBundles.at(i)->SetVisibility(false);
+        GetDataStorage()->Add(node);
+      }
     }
+  }
+  catch(const std::out_of_range& )
+  {
+    QMessageBox::warning( nullptr, "Fiber extraction failed", "Did you only create the planar figure, using the circle or polygon button, but forgot to actually place it in the image afterwards? \nAfter creating a planar figure, simply left-click at the desired position in the image or on the tractogram to place it.");
   }
 }
 

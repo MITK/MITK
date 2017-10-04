@@ -71,7 +71,7 @@ void QmitkPolhemusTrackerWidget::CreateConnections()
   }
 }
 
-mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::GetTrackingDevice()
 {
   if (m_TrackingDevice.IsNull())
   {

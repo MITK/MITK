@@ -32,7 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
  *         Inherited widgets should be registered in the Microservice (TrackingDeviceCollectionWidget),
  *         If done so, they will be included in the QmitkTrackingDeviceConfigurationWidget of the Tracking Toolbox.
  *
- *         - Each implementation of this class must have a method to construct a tracking Device (ConstructTrackingDevice).
+ *         - Each implementation of this class must have a method to get a TrackingDevice
+ *         - Each implementation handles itself, if a new TrackingDevice needs to be constructed.
+ *                Attention: In former MITK versions, there was no pure virtual GetTrackingDevice function but a pure virtual ConstructTrackingDevice function.
+ *                You can simply rename these, but you should give it a thought, if each time "Construct" was called, a new device needs to be constructed,
+ *                or if you can store your TrackingDevice in a member variable and return this. Up to you.
  *         - Please create the UI elements in a function like CreateQtPartControl (e.g. see QmitkVitrualTrackerWidget).
  *         - You might want to use own buttons etc., please connect them in a private CreateConnections (e.g. see QmitkVitrualTrackerWidget).
  *         - Due to initialization of qt during autoloading of the IGT module, you constructor should be as slim as possible and only contain a call
@@ -112,7 +116,7 @@ public:
   * \brief Optional method to add output to a small screen in the trackingToolbox (see QmitkNDIPolarisWidget)
   */
   virtual void AddOutput(std::string) {}
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice() = 0;
+  virtual mitk::TrackingDevice::Pointer GetTrackingDevice() = 0;
 
   /**
   * \brief Optional method to store and load settings of your widget (see QmitkNDIPolarisWidget)

@@ -74,7 +74,7 @@ void QmitkNPOptitrackWidget::AddOutput(std::string s)
   m_Controls->m_outputTextOptitrack->verticalScrollBar()->setValue(m_Controls->m_outputTextOptitrack->verticalScrollBar()->maximum());
 }
 
-mitk::TrackingDevice::Pointer QmitkNPOptitrackWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkNPOptitrackWidget::GetTrackingDevice()
 {
   // Create the Tracking Device
   mitk::OptitrackTrackingDevice::Pointer tempTrackingDevice = mitk::OptitrackTrackingDevice::New();

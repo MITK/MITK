@@ -92,15 +92,12 @@ protected:
 
   Ui::QmitkTrackingDeviceConfigurationWidgetControls* m_Controls;
 
-  mitk::TrackingDevice::Pointer m_TrackingDevice;
-
   // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
   typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
 
   //######################### internal help methods #######################################
   void ResetOutput();
   void AddOutput(std::string s);
-  mitk::TrackingDevice::Pointer ConstructTrackingDevice();
 
   void StoreUISettings();
   void LoadUISettings();

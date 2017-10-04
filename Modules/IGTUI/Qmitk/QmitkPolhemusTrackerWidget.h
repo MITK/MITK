@@ -68,7 +68,7 @@ protected:
   mitk::PolhemusTrackingDevice::Pointer m_TrackingDevice;
 
 public:
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  virtual mitk::TrackingDevice::Pointer GetTrackingDevice();
   /**
   * \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
   * Can e.g. be used to activate options of a tracking device only when it is connected.

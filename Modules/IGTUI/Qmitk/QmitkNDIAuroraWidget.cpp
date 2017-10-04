@@ -80,7 +80,7 @@ void QmitkNDIAuroraWidget::AddOutput(std::string s)
   m_Controls->m_outputTextAurora->verticalScrollBar()->setValue(m_Controls->m_outputTextAurora->verticalScrollBar()->maximum());
 }
 
-mitk::TrackingDevice::Pointer QmitkNDIAuroraWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkNDIAuroraWidget::GetTrackingDevice()
 {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
 

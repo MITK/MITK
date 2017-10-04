@@ -198,8 +198,12 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
 
 unsigned int mitk::PolhemusInterface::GetNumberOfTools()
 {
-  if (m_continousTracking) return GetLastFrame().size();
-  else return GetSingleFrame().size();
+  std::vector<mitk::PolhemusInterface::trackingData> _trackingData;
+  if (m_continousTracking)
+    _trackingData = GetLastFrame();
+  else
+    _trackingData = GetSingleFrame();
+  return _trackingData.size();
 }
 
 std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetSingleFrame()
@@ -293,7 +297,6 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
     {
       _position = GetSingleFrame();
     }
-
     if (m_Hemispheres.empty())
     {
       //Default Hemisphere for all tools, maybe the first setup.
@@ -345,7 +348,7 @@ void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
   if (_hemiTrack)
     SetHemisphereTrackingEnabled(false);
 
-  //toggel.
+  //toggle.
   if (_tool == -1)
   {
     //GetHemisphere(-1) returns the first tool. Hence, we have to loop over all tools manually...
@@ -359,7 +362,7 @@ void mitk::PolhemusInterface::ToggleHemisphere(int _tool)
     this->SetHemisphere(_tool, -1.*this->GetHemisphere(_tool));
   }
 
-  //if hemiTracing was on, switch it on again.
+  //if hemiTracking was on, switch it on again.
   if (_hemiTrack)
     SetHemisphereTrackingEnabled(true);
 }

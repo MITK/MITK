@@ -125,7 +125,12 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
 {
   //reset everything
   if (m_Device.IsNull()) {m_Device = mitk::PolhemusInterface::New();}
-  m_Device->Connect();
+  if (!m_Device->Connect()) //Connect the device, if it fails, throw an error.
+  {
+    MITK_ERROR << "Cannot connect Polhemus device!";
+    CloseConnection();
+    return false;
+  }
   m_Device->SetHemisphereTrackingEnabled(m_HemisphereTrackingEnabled);
 
   //check if connected ports of Polhemus matches the tools in the toolStorage.

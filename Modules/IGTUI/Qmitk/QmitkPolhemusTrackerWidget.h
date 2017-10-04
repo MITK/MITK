@@ -73,17 +73,17 @@ public:
   * \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
   * Can e.g. be used to activate options of a tracking device only when it is connected.
   */
-  virtual void OnConnected();
+  virtual void OnConnected( bool _success);
   /**
   * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
   * Can e.g. be used to activate/disactivate options of a tracking device.
   */
-  virtual void OnDisconnected();
+  virtual void OnDisconnected(bool _success);
   /**
   * \brief This function is called, when in the TrackingToolboxView "Start Tracking" was clicked and the device successfully started tracking.
   * Can e.g. be used to activate options of a tracking device only when tracking is started.
   */
-  virtual void OnStartTracking();
+  virtual void OnStartTracking(bool _success);
 
 };
 #endif

@@ -351,20 +351,22 @@ QmitkAbstractTrackingDeviceWidget* QmitkTrackingDeviceConfigurationWidget::GetWi
   return nullptr;
 }
 
-void QmitkTrackingDeviceConfigurationWidget::OnConnected()
+void QmitkTrackingDeviceConfigurationWidget::OnConnected(bool _success)
 {
-  this->GetWidget(this->GetCurrentDeviceName())->OnConnected();
+  if (!_success)
+    this->m_TrackingDevice = nullptr;
+  this->GetWidget(this->GetCurrentDeviceName())->OnConnected(_success);
 }
-void QmitkTrackingDeviceConfigurationWidget::OnDisconnected()
+void QmitkTrackingDeviceConfigurationWidget::OnDisconnected(bool _success)
 {
-  this->GetWidget(this->GetCurrentDeviceName())->OnDisconnected();
+  this->GetWidget(this->GetCurrentDeviceName())->OnDisconnected(_success);
 }
 
-void QmitkTrackingDeviceConfigurationWidget::OnStartTracking()
+void QmitkTrackingDeviceConfigurationWidget::OnStartTracking(bool _success)
 {
-  this->GetWidget(this->GetCurrentDeviceName())->OnStartTracking();
+  this->GetWidget(this->GetCurrentDeviceName())->OnStartTracking(_success);
 }
-void QmitkTrackingDeviceConfigurationWidget::OnStopTracking()
+void QmitkTrackingDeviceConfigurationWidget::OnStopTracking(bool _success)
 {
-  this->GetWidget(this->GetCurrentDeviceName())->OnStopTracking();
+  this->GetWidget(this->GetCurrentDeviceName())->OnStopTracking(_success);
 }

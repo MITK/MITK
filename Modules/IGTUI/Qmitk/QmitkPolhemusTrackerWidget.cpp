@@ -178,8 +178,14 @@ void QmitkPolhemusTrackerWidget::on_m_AdjustHemisphere_clicked()
   }
 }
 
-void QmitkPolhemusTrackerWidget::OnConnected()
+void QmitkPolhemusTrackerWidget::OnConnected(bool _success)
 {
+  if (!_success)
+  {
+    this->m_TrackingDevice = nullptr;
+    return;
+  }
+
   SetAdvancedSettingsVisible(true);
 
   if (m_TrackingDevice->GetToolCount() != m_Controls->m_ToolSelection->count())
@@ -195,16 +201,20 @@ void QmitkPolhemusTrackerWidget::OnConnected()
   }
 }
 
-void QmitkPolhemusTrackerWidget::OnStartTracking()
+void QmitkPolhemusTrackerWidget::OnStartTracking(bool _success)
 {
+  if (!_success)
+    return;
   //Rotate mitk standard multi widget, so that the view matches the sensor. Positive x == right, y == front, z == down;
   mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToPosterior();
   mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 0, -1);
 
 }
 
-void QmitkPolhemusTrackerWidget::OnDisconnected()
+void QmitkPolhemusTrackerWidget::OnDisconnected(bool _success)
 {
+  if (!_success)
+    return;
   SetAdvancedSettingsVisible(false);
 }
 

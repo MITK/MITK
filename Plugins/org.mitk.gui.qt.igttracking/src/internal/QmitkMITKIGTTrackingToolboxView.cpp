@@ -187,10 +187,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), this, SLOT(OnStopTrackingFinished(bool, QString)));
     connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), this, SLOT(OnDisconnectFinished(bool, QString)));
     connect(m_WorkerThread, SIGNAL(started()), m_Worker, SLOT(ThreadFunc()));
-    connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnConnected()));
-    connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnDisconnected()));
-    connect(m_Worker, SIGNAL(StartTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStartTracking()));
-    connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStopTracking()));
+    connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnConnected(bool)));
+    connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnDisconnected(bool)));
+    connect(m_Worker, SIGNAL(StartTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStartTracking(bool)));
+    connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStopTracking(bool)));
 
     //move the worker to the thread
     m_Worker->moveToThread(m_WorkerThread);

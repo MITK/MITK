@@ -65,23 +65,23 @@ public slots:
 * \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
 * Can e.g. be used to activate options of a tracking device only when it is connected.
 */
-  void OnConnected();
+  void OnConnected(bool _success);
   /**
   * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
   * Can e.g. be used to activate/disactivate options of a tracking device.
   */
-  void OnDisconnected();
+  void OnDisconnected(bool _success);
 
   /**
   * \brief This function is called, when in the TrackingToolboxView "Start Tracking" was clicked and the device successfully started tracking.
   * Can e.g. be used to activate options of a tracking device only when tracking is started.
   */
-  void OnStartTracking();
+  void OnStartTracking(bool _success);
   /**
   * \brief This function is called, when in the TrackingToolboxView "Stop Tracking" was clicked and the device successful stopped tracking.
   * Can e.g. be used to activate/disactivate options when device is not tracking.
   */
-  void OnStopTracking();
+  void OnStopTracking(bool _success);
 
 protected:
 

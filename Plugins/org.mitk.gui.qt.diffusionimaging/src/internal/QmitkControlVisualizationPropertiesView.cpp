@@ -93,19 +93,7 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow)
-  {
-    mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag1);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag2);
-    slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-    slicer->RemoveObserver(m_SliceObserverTag3);
-  }
-
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
 }
 
 

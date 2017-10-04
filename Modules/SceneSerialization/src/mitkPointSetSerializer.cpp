@@ -37,6 +37,12 @@ std::string mitk::PointSetSerializer::Serialize()
     return "";
   }
 
+  // do not save empty PointSet
+  if (ps->GetSize() == 0)
+  {
+    return "";
+  }
+
   std::string filename(this->GetUniqueFilenameInWorkingDirectory());
   filename += "_";
   filename += m_FilenameHint;

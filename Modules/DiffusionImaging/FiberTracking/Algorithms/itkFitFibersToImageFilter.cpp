@@ -5,7 +5,9 @@
 namespace itk{
 
 FitFibersToImageFilter::FitFibersToImageFilter()
-  : m_FitIndividualFibers(true)
+  : m_PeakImage(nullptr)
+  , m_MaskImage(nullptr)
+  , m_FitIndividualFibers(true)
   , m_GradientTolerance(1e-5)
   , m_Lambda(0.1)
   , m_MaxIterations(20)
@@ -19,6 +21,9 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_MaxWeight(1.0)
   , m_Verbose(true)
   , m_DeepCopy(true)
+  , m_NumUnknowns(0)
+  , m_NumResiduals(0)
+  , m_NumCoveredDirections(0)
 {
   this->SetNumberOfRequiredOutputs(3);
 }
@@ -44,12 +49,12 @@ void FitFibersToImageFilter::GenerateData()
   else
     minSpacing = m_PeakImage->GetSpacing()[2];
 
-  unsigned int num_unknowns = m_Tractograms.size();
+  m_NumUnknowns = m_Tractograms.size();
   if (m_FitIndividualFibers)
   {
-    num_unknowns = 0;
+    m_NumUnknowns = 0;
     for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-      num_unknowns += m_Tractograms.at(bundle)->GetNumFibers();
+      m_NumUnknowns += m_Tractograms.at(bundle)->GetNumFibers();
   }
 
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
@@ -59,20 +64,20 @@ void FitFibersToImageFilter::GenerateData()
     m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
   }
 
-  unsigned int number_of_residuals = num_voxels * sz_peaks;
+  m_NumResiduals = num_voxels * sz_peaks;
 
-  MITK_INFO << "Num. unknowns: " << num_unknowns;
-  MITK_INFO << "Num. residuals: " << number_of_residuals;
+  MITK_INFO << "Num. unknowns: " << m_NumUnknowns;
+  MITK_INFO << "Num. residuals: " << m_NumResiduals;
   MITK_INFO << "Creating system ...";
 
   vnl_sparse_matrix<double> A;
   vnl_vector<double> b;
-  A.set_size(number_of_residuals, num_unknowns);
-  b.set_size(number_of_residuals); b.fill(0.0);
+  A.set_size(m_NumResiduals, m_NumUnknowns);
+  b.set_size(m_NumResiduals); b.fill(0.0);
 
   double TD = 0;
   double FD = 0;
-  unsigned int dir_count = 0;
+  m_NumCoveredDirections = 0;
   unsigned int fiber_count = 0;
 
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
@@ -99,7 +104,8 @@ void FitFibersToImageFilter::GenerateData()
 
         itk::Index<4> idx4;
         m_PeakImage->TransformPhysicalPointToIndex(p, idx4);
-        if (!m_PeakImage->GetLargestPossibleRegion().IsInside(idx4))
+        itk::Index<3> idx3; idx3[0] = idx4[0]; idx3[1] = idx4[1]; idx3[2] = idx4[2];
+        if (!m_PeakImage->GetLargestPossibleRegion().IsInside(idx4) || (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0))
           continue;
 
         double* p2 = points->GetPoint(j+1);
@@ -122,7 +128,7 @@ void FitFibersToImageFilter::GenerateData()
 
         if (b[linear_index] == 0 && peak_id<3)
         {
-          dir_count++;
+          m_NumCoveredDirections++;
           FD += peak_mag;
         }
         TD += w;
@@ -143,8 +149,8 @@ void FitFibersToImageFilter::GenerateData()
     }
   }
 
-  TD /= (dir_count*fiber_count);
-  FD /= dir_count;
+  TD /= (m_NumCoveredDirections*fiber_count);
+  FD /= m_NumCoveredDirections;
   A /= TD;
   b *= 100.0/FD;  // times 100 because we want to avoid too small values for computational reasons
 
@@ -153,13 +159,13 @@ void FitFibersToImageFilter::GenerateData()
   itk::TimeProbe clock;
   clock.Start();
 
-  VnlCostFunction cost(num_unknowns);
+  VnlCostFunction cost(m_NumUnknowns);
   cost.SetProblem(A, b, init_lambda);
-  m_Weights.set_size(num_unknowns); // m_Weights.fill( TD/100.0 * FD/2.0 );
+  m_Weights.set_size(m_NumUnknowns); // m_Weights.fill( TD/100.0 * FD/2.0 );
   m_Weights.fill( 0.0 );
   vnl_lbfgsb minimizer(cost);
-  vnl_vector<double> l; l.set_size(num_unknowns); l.fill(0);
-  vnl_vector<long> bound_selection; bound_selection.set_size(num_unknowns); bound_selection.fill(1);
+  vnl_vector<double> l; l.set_size(m_NumUnknowns); l.fill(0);
+  vnl_vector<long> bound_selection; bound_selection.set_size(m_NumUnknowns); bound_selection.fill(1);
   minimizer.set_bound_selection(bound_selection);
   minimizer.set_lower_bound(l);
   minimizer.set_projected_gradient_tolerance(m_GradientTolerance);
@@ -168,7 +174,7 @@ void FitFibersToImageFilter::GenerateData()
   minimizer.set_trace(false);
   minimizer.set_max_function_evals(2);
   minimizer.minimize(m_Weights);
-  vnl_vector<double> dx; dx.set_size(num_unknowns); dx.fill(0.0);
+  vnl_vector<double> dx; dx.set_size(m_NumUnknowns); dx.fill(0.0);
   cost.grad_regu_localMSE(m_Weights, dx);
   double r = dx.magnitude()/m_Weights.magnitude();
   cost.m_Lambda *= m_Lambda*55.0/r;
@@ -192,8 +198,8 @@ void FitFibersToImageFilter::GenerateData()
     for (auto w : m_Weights)
       weights.push_back(w);
     std::sort(weights.begin(), weights.end());
-    MITK_INFO << "Setting upper weight bound to " << weights.at(num_unknowns*0.99);
-    vnl_vector<double> u; u.set_size(num_unknowns); u.fill(weights.at(num_unknowns*0.99));
+    MITK_INFO << "Setting upper weight bound to " << weights.at(m_NumUnknowns*0.99);
+    vnl_vector<double> u; u.set_size(m_NumUnknowns); u.fill(weights.at(m_NumUnknowns*0.99));
     minimizer.set_upper_bound(u);
     bound_selection.fill(2);
     minimizer.set_bound_selection(bound_selection);
@@ -206,17 +212,17 @@ void FitFibersToImageFilter::GenerateData()
   std::sort(weights.begin(), weights.end());
 
   m_MeanWeight = m_Weights.mean();
-  m_MedianWeight = weights.at(num_unknowns*0.5);
+  m_MedianWeight = weights.at(m_NumUnknowns*0.5);
   m_MinWeight = weights.at(0);
-  m_MaxWeight = weights.at(num_unknowns-1);
+  m_MaxWeight = weights.at(m_NumUnknowns-1);
 
   MITK_INFO << "*************************";
   MITK_INFO << "Weight statistics";
   MITK_INFO << "Mean: " << m_MeanWeight;
   MITK_INFO << "Median: " << m_MedianWeight;
-  MITK_INFO << "75% quantile: " << weights.at(num_unknowns*0.75);
-  MITK_INFO << "95% quantile: " << weights.at(num_unknowns*0.95);
-  MITK_INFO << "99% quantile: " << weights.at(num_unknowns*0.99);
+  MITK_INFO << "75% quantile: " << weights.at(m_NumUnknowns*0.75);
+  MITK_INFO << "95% quantile: " << weights.at(m_NumUnknowns*0.95);
+  MITK_INFO << "99% quantile: " << weights.at(m_NumUnknowns*0.99);
   MITK_INFO << "Min: " << m_MinWeight;
   MITK_INFO << "Max: " << m_MaxWeight;
   MITK_INFO << "*************************";
@@ -288,35 +294,35 @@ void FitFibersToImageFilter::GenerateData()
 
   for (unsigned int r=0; r<b.size(); r++)
   {
-    itk::Index<4> idx;
+    itk::Index<4> idx4;
     unsigned int linear_index = r;
-    idx[0] = linear_index % sz_x; linear_index /= sz_x;
-    idx[1] = linear_index % sz_y; linear_index /= sz_y;
-    idx[2] = linear_index % sz_z; linear_index /= sz_z;
+    idx4[0] = linear_index % sz_x; linear_index /= sz_x;
+    idx4[1] = linear_index % sz_y; linear_index /= sz_y;
+    idx4[2] = linear_index % sz_z; linear_index /= sz_z;
     int peak_id = linear_index % sz_peaks;
 
     if (peak_id<sz_peaks-1)
     {
       vnl_vector_fixed<float,3> peak_dir;
 
-      idx[3] = peak_id*3;
-      peak_dir[0] = m_PeakImage->GetPixel(idx);
-      idx[3] += 1;
-      peak_dir[1] = m_PeakImage->GetPixel(idx);
-      idx[3] += 1;
-      peak_dir[2] = m_PeakImage->GetPixel(idx);
+      idx4[3] = peak_id*3;
+      peak_dir[0] = m_PeakImage->GetPixel(idx4);
+      idx4[3] += 1;
+      peak_dir[1] = m_PeakImage->GetPixel(idx4);
+      idx4[3] += 1;
+      peak_dir[2] = m_PeakImage->GetPixel(idx4);
 
       peak_dir.normalize();
       peak_dir *= fitted_b[r];
 
-      idx[3] = peak_id*3;
-      m_FittedImage->SetPixel(idx, peak_dir[0]);
+      idx4[3] = peak_id*3;
+      m_FittedImage->SetPixel(idx4, peak_dir[0]);
 
-      idx[3] += 1;
-      m_FittedImage->SetPixel(idx, peak_dir[1]);
+      idx4[3] += 1;
+      m_FittedImage->SetPixel(idx4, peak_dir[1]);
 
-      idx[3] += 1;
-      m_FittedImage->SetPixel(idx, peak_dir[2]);
+      idx4[3] += 1;
+      m_FittedImage->SetPixel(idx4, peak_dir[2]);
     }
   }
 
@@ -324,25 +330,29 @@ void FitFibersToImageFilter::GenerateData()
   m_Coverage = 0;
   m_Overshoot = 0;
 
-  itk::Index<4> idx;
-  for (idx[0]=0; idx[0]<sz_x; ++idx[0])
-    for (idx[1]=0; idx[1]<sz_y; ++idx[1])
-      for (idx[2]=0; idx[2]<sz_z; ++idx[2])
+  itk::Index<4> idx4;
+  for (idx4[0]=0; idx4[0]<sz_x; ++idx4[0])
+    for (idx4[1]=0; idx4[1]<sz_y; ++idx4[1])
+      for (idx4[2]=0; idx4[2]<sz_z; ++idx4[2])
       {
+        itk::Index<3> idx3; idx3[0] = idx4[0]; idx3[1] = idx4[1]; idx3[2] = idx4[2];
+        if (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0)
+          continue;
+
         vnl_vector_fixed<float,3> peak_dir;
         vnl_vector_fixed<float,3> fitted_dir;
         vnl_vector_fixed<float,3> overshoot_dir;
-        for (idx[3]=0; idx[3]<(itk::IndexValueType)m_PeakImage->GetLargestPossibleRegion().GetSize(3); ++idx[3])
+        for (idx4[3]=0; idx4[3]<(itk::IndexValueType)m_PeakImage->GetLargestPossibleRegion().GetSize(3); ++idx4[3])
         {
-          peak_dir[idx[3]%3] = m_PeakImage->GetPixel(idx);
-          fitted_dir[idx[3]%3] = m_FittedImage->GetPixel(idx);
-          m_ResidualImage->SetPixel(idx, m_PeakImage->GetPixel(idx) - m_FittedImage->GetPixel(idx));
+          peak_dir[idx4[3]%3] = m_PeakImage->GetPixel(idx4);
+          fitted_dir[idx4[3]%3] = m_FittedImage->GetPixel(idx4);
+          m_ResidualImage->SetPixel(idx4, m_PeakImage->GetPixel(idx4) - m_FittedImage->GetPixel(idx4));
 
-          if (idx[3]%3==2)
+          if (idx4[3]%3==2)
           {
             FD += peak_dir.magnitude();
 
-            itk::Index<4> tidx= idx;
+            itk::Index<4> tidx= idx4;
             if (peak_dir.magnitude()>fitted_dir.magnitude())
             {
               m_Coverage += fitted_dir.magnitude();

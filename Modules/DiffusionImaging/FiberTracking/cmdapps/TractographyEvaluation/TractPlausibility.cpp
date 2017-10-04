@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDirectory.h>
 #include <mitkFiberBundle.h>
 #include <vtkTransformPolyDataFilter.h>
+#include <fstream>
 
 using namespace std;
 typedef itksys::SystemTools ist;
@@ -51,12 +52,16 @@ ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
   return itkMask;
 }
 
-std::vector< MaskType > get_file_list(const std::string& path)
+std::vector< MaskType > get_file_list(const std::string& path, const std::string& skipped)
 {
+  std::srand(std::time(0));
+
   std::vector< MaskType > mask_list;
 
   itk::Directory::Pointer dir = itk::Directory::New();
 
+  ofstream myfile;
+  myfile.open (skipped);
   if (dir->Load(path.c_str()))
   {
     int n = dir->GetNumberOfFiles();
@@ -67,6 +72,7 @@ std::vector< MaskType > get_file_list(const std::string& path)
       if (std::rand()%3==0 && ist::GetFilenameWithoutExtension(filename)!="CC")
       {
         MITK_INFO << "Dismissing " << ist::GetFilenameWithoutExtension(filename);
+        myfile << ist::GetFilenameName(filename) << "\n";
         continue;
       }
 
@@ -85,6 +91,7 @@ std::vector< MaskType > get_file_list(const std::string& path)
       }
     }
   }
+  myfile.close();
 
   return mask_list;
 }
@@ -120,7 +127,7 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output folder", us::Any(), false);
   parser.addArgument("reference_mask_folder", "m", mitkCommandLineParser::String, "Reference Mask Folder:", "reference masks of known bundles", false);
   parser.addArgument("gray_matter_mask", "gm", mitkCommandLineParser::String, "", "", false);
 
@@ -131,13 +138,13 @@ int main(int argc, char* argv[])
   string fibFile = us::any_cast<string>(parsedArgs["input"]);
   string gray_matter_mask = us::any_cast<string>(parsedArgs["gray_matter_mask"]);
   string reference_mask_folder = us::any_cast<string>(parsedArgs["reference_mask_folder"]);
-  string outRoot = us::any_cast<string>(parsedArgs["out"]);
+  string out_folder = us::any_cast<string>(parsedArgs["out"]);
 
   try
   {
-    CreateFolderStructure(outRoot);
+    CreateFolderStructure(out_folder);
 
-    std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder);
+    std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder, out_folder + "skipped_masks.txt");
     if (known_tract_masks.empty())
       return EXIT_FAILURE;
 
@@ -147,7 +154,7 @@ int main(int argc, char* argv[])
 
     // filter gray matter fibers
     mitk::FiberBundle::Pointer not_gm_fibers = inputTractogram->ExtractFiberSubset(gm_image, false, true, true);
-    mitk::IOUtil::Save(not_gm_fibers, outRoot + "/implausible_tracts/no_gm_endings.trk");
+    mitk::IOUtil::Save(not_gm_fibers, out_folder + "/implausible_tracts/no_gm_endings.trk");
     inputTractogram = inputTractogram->ExtractFiberSubset(gm_image, false, false, true);
 
     // resample fibers
@@ -166,20 +173,20 @@ int main(int argc, char* argv[])
     {
       ItkUcharImgType::Pointer mask_image = std::get<0>(mask);
       std::string mask_name = std::get<1>(mask);
-      mitk::FiberBundle::Pointer known_tract = inputTractogram->ExtractFiberSubset(mask_image, true, false, false, 0.9, false);
-      mitk::IOUtil::Save(known_tract, outRoot + "/known_tracts/" + mask_name + ".trk");
+      mitk::FiberBundle::Pointer known_tract = inputTractogram->ExtractFiberSubset(mask_image, true, false, false, 0.7, false);
+      mitk::IOUtil::Save(known_tract, out_folder + "/known_tracts/" + mask_name + ".trk");
 
       if (all_known_tracts.IsNull())
         all_known_tracts = mitk::FiberBundle::New(known_tract->GetFiberPolyData());
       else
         all_known_tracts = all_known_tracts->AddBundle(known_tract);
     }
-    mitk::IOUtil::Save(all_known_tracts, outRoot + "/known_tracts/all_known_tracts.trk");
-    mitk::IOUtil::Save(TransformToMRtrixSpace(all_known_tracts), outRoot + "/known_tracts/all_known_tracts_mrtrixspace.fib");
+    mitk::IOUtil::Save(all_known_tracts, out_folder + "/known_tracts/all_known_tracts.trk");
+    mitk::IOUtil::Save(TransformToMRtrixSpace(all_known_tracts), out_folder + "/known_tracts/all_known_tracts_mrtrixspace.fib");
 
     mitk::FiberBundle::Pointer remaining_tracts = inputTractogram->SubtractBundle(all_known_tracts);
-    mitk::IOUtil::Save(remaining_tracts, outRoot + "/plausible_tracts/remaining_tracts.trk");
-    mitk::IOUtil::Save(TransformToMRtrixSpace(remaining_tracts), outRoot + "/plausible_tracts/remaining_tracts_mrtrixspace.fib");
+    mitk::IOUtil::Save(remaining_tracts, out_folder + "/plausible_tracts/remaining_tracts.trk");
+    mitk::IOUtil::Save(TransformToMRtrixSpace(remaining_tracts), out_folder + "/plausible_tracts/remaining_tracts_mrtrixspace.fib");
     MITK_INFO << "step_size: " << minSpacing/5;
   }
   catch (itk::ExceptionObject e)

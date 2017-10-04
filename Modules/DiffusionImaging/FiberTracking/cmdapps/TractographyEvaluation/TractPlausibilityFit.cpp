@@ -70,9 +70,11 @@ int main(int argc, char* argv[])
   parser.addArgument("", "i1", mitkCommandLineParser::InputFile, "Input tractogram:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
   parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
   parser.addArgument("", "i3", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any());
+
+  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
   parser.addArgument("min_gain", "", mitkCommandLineParser::Float, "Min. gain:", "process stops if remaining bundles don't contribute enough", 0.05);
 
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
 
   parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
   parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
@@ -113,6 +115,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("dont_filter_outliers"))
     filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
 
+  string mask_file = "";
+  if (parsedArgs.count("mask"))
+    mask_file = us::any_cast<string>(parsedArgs["mask"]);
+
   try
   {
     itk::TimeProbe clock;
@@ -120,6 +126,13 @@ int main(int argc, char* argv[])
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
     mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(peak_file_name, &functor)[0].GetPointer());
+
+    itk::FitFibersToImageFilter::UcharImgType::Pointer mask = nullptr;
+    if (mask_file.compare("")!=0)
+    {
+      mitk::Image::Pointer mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(mask_file)[0].GetPointer());
+      mitk::CastToItkImage(mitk_mask, mask);
+    }
 
     typedef mitk::ImageToItk< PeakImgType > CasterType;
     CasterType::Pointer caster = CasterType::New();
@@ -156,6 +169,7 @@ int main(int argc, char* argv[])
     fitter->SetPeakImage(peak_image);
     fitter->SetVerbose(true);
     fitter->SetDeepCopy(false);
+    fitter->SetMaskImage(mask);
     fitter->Update();
 
 //    fitter->GetTractograms().at(0)->SetFiberWeights(fitter->GetCoverage());
@@ -171,7 +185,7 @@ int main(int argc, char* argv[])
 
     double coverage = fitter->GetCoverage();
     MITK_INFO << "Iteration: " << iteration;
-    MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << 100.0*coverage << "%";
+    MITK_INFO << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "%";
 //    fitter->SetPeakImage(peak_image);
 
     while (!input_candidates.empty())
@@ -195,6 +209,7 @@ int main(int argc, char* argv[])
         fitter->SetVerbose(false);
         fitter->SetPeakImage(peak_image);
         fitter->SetDeepCopy(false);
+        fitter->SetMaskImage(mask);
         // ******************************
         fitter->SetTractograms({fib});
         fitter->Update();
@@ -249,7 +264,7 @@ int main(int argc, char* argv[])
       std::cout.rdbuf (old);              // <-- restore
 
       MITK_INFO << "Iteration: " << iteration;
-      MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << 100.0*coverage << "% (+" << 100*(1.0-coverage) * next_coverage << "%)";
+      MITK_INFO << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "% (+" << 100*(1.0-coverage) * next_coverage << "%)";
     }
 
     clock.Stop();

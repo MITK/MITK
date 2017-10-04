@@ -159,32 +159,6 @@ namespace mitk
       return iter == m_FWProps.end() ? QVariant() : iter.value();
     }
 
-    void BaseApplication::installTranslator(QTranslator* translator)
-    {
-      this->getQApplication()->installTranslator(translator);
-    }
-
-    bool BaseApplication::isRunning()
-    {
-      QmitkSingleApplication* qCoreApp =
-          dynamic_cast<QmitkSingleApplication*>( this->getQApplication() );
-      if (qCoreApp != nullptr)
-      {
-        return qCoreApp->isRunning();
-      }
-      return false;
-    }
-
-    void BaseApplication::sendMessage(const QByteArray msg)
-    {
-      QmitkSingleApplication* qCoreApp =
-        dynamic_cast<QmitkSingleApplication*>(this->getQApplication());
-      if (qCoreApp != nullptr)
-      {
-        qCoreApp->sendMessage(msg);
-      }
-    }
-
     void handleBooleanOption(const std::string &name, const std::string & /*value*/)
     {
       QString fwKey = QString::fromStdString(name);
@@ -851,4 +825,31 @@ namespace mitk
 
   void BaseApplication::setProperty(const QString &property, const QVariant &value) { d->m_FWProps[property] = value; }
   QVariant BaseApplication::getProperty(const QString &property) const { return d->getProperty(property); }
+
+  void BaseApplication::installTranslator(QTranslator* translator)
+  {
+    this->getQApplication()->installTranslator(translator);
+  }
+
+  bool BaseApplication::isRunning()
+  {
+    QmitkSingleApplication* qCoreApp =
+      dynamic_cast<QmitkSingleApplication*>( this->getQApplication() );
+    if (qCoreApp != nullptr)
+    {
+      return qCoreApp->isRunning();
+    }
+    return false;
+  }
+
+  void BaseApplication::sendMessage(const QByteArray msg)
+  {
+    QmitkSingleApplication* qCoreApp =
+      dynamic_cast<QmitkSingleApplication*>(this->getQApplication());
+    if (qCoreApp != nullptr)
+    {
+      qCoreApp->sendMessage(msg);
+    }
+  }
+
 }

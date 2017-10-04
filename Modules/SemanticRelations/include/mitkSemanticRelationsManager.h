@@ -73,24 +73,32 @@ namespace mitk
     */
     void RemoveImageInstance(const mitk::DataNode* imageNode);
     /*
-    * @brief  Adds a new segmentation to the storage.
+    * @brief  Links (and possibly adds) a segmentation to a lesion inside the storage.
     *
     * @par segmentationNode   The current case identifier and node identifier is extracted from the given segmentation data node.
     * @par parentNode         The node identifier of the parent node is extracted from the given parent data node.
+    * @par selectedLesion    The selected lesion that should be linked with the given segmentation.
     */
-    void AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode);
+    void AddAndLinkSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, const SemanticTypes::Lesion& selectedLesion);
     /*
-    * @brief  Removes an existing segmentation from the storage.
+    * @brief  Unlinks (and possibly removes) a segmentation from a lesion inside the storage.
     *
     * @par segmentationNode   The current case identifier and node identifier is extracted from the given segmentation data node.
     */
-    void RemoveSegmentationInstance(const mitk::DataNode* segmentationNode);
+    void RemoveAndUnlinkSegmentationInstance(const mitk::DataNode* segmentationNode);
     /*
     * @brief  Generates a new, empty lesion to add to the storage under the current case ID.
     *
     * @par caseID   The current case identifier is defined by the given string.
     */
     void GenerateNewLesion(const mitk::SemanticTypes::CaseID caseID);
+    /*
+    * @brief  Remove a selected lesion from the storage.
+    *
+    * @par caseID           The current case identifier is defined by the given string.
+    * @par selectedLesion   The selected lesion that should be removed.
+    */
+    void RemoveLesion(const mitk::SemanticTypes::CaseID caseID, const SemanticTypes::Lesion& selectedLesion);
 
   private:
     /*

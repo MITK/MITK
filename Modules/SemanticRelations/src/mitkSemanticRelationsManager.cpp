@@ -172,7 +172,7 @@ void mitk::SemanticRelationsManager::RemoveImageInstance(const mitk::DataNode* d
   NotifyObserver(caseID);
 }
 
-void mitk::SemanticRelationsManager::AddSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode)
+void mitk::SemanticRelationsManager::AddAndLinkSegmentationInstance(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode, const SemanticTypes::Lesion& selectedLesion)
 {
   if (nullptr == segmentationNode)
   {
@@ -189,15 +189,11 @@ void mitk::SemanticRelationsManager::AddSegmentationInstance(const mitk::DataNod
   relationStorage.AddCase(caseID);
   relationStorage.AddSegmentation(caseID, segmentationNodeID, parentNodeID);
 
-  SemanticTypes::Lesion lesion;
-  lesion.UID = UIDGeneratorBoost::GenerateUID();
-  lesion.lesionClass = SemanticTypes::LesionClass();
-  lesion.lesionClass.UID = UIDGeneratorBoost::GenerateUID();
-  m_SemanticRelations->AddLesionAndLinkData(segmentationNode, lesion);
+  m_SemanticRelations->LinkSegmentationToLesion(segmentationNode, selectedLesion);
   NotifyObserver(caseID);
 }
 
-void mitk::SemanticRelationsManager::RemoveSegmentationInstance(const mitk::DataNode* segmentationNode)
+void mitk::SemanticRelationsManager::RemoveAndUnlinkSegmentationInstance(const mitk::DataNode* segmentationNode)
 {
   if (nullptr == segmentationNode)
   {
@@ -223,5 +219,18 @@ void mitk::SemanticRelationsManager::GenerateNewLesion(const mitk::SemanticTypes
   newLesion.lesionClass.UID = UIDGeneratorBoost::GenerateUID();
 
   m_SemanticRelations->AddLesion(caseID, newLesion);
+  NotifyObserver(caseID);
+}
+
+void mitk::SemanticRelationsManager::RemoveLesion(const mitk::SemanticTypes::CaseID caseID, const SemanticTypes::Lesion& selectedLesion)
+{
+  try
+  {
+    m_SemanticRelations->RemoveLesion(caseID, selectedLesion);
+  }
+  catch (mitk::SemanticRelationException& e)
+  {
+    MITK_INFO << e;
+  }
   NotifyObserver(caseID);
 }

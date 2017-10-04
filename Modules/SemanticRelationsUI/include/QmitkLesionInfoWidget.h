@@ -65,6 +65,9 @@ public:
   */
   virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 
+  const mitk::SemanticTypes::Lesion& GetSelectedLesion() const { return m_CurrentLesion; }
+  const mitk::DataNode* GetSelectedSegmentation() const { return m_CurrentSegmentation; }
+  const mitk::DataNode* GetSelectedImage() const { return m_CurrentImage; }
   /*
   * @brief Removes all items from the lesion list widget, the segmentation list widget and the image list widget
   */
@@ -73,16 +76,15 @@ public:
   * @brief Removes all items from the the segmentation list widget and the image list widget
   */
   void ClearSegmentationList();
-  /*
-  * @brief Removes all items from the image list widget
-  */
-  void ClearImageList();
 
 private Q_SLOTS:
 
-  void OnLesionListSelectionChanged(const QItemSelection&, const QItemSelection&);
-  void OnImageListSelectionChanged(const QItemSelection&, const QItemSelection&);
-  void OnSegmentationListSelectionChanged(const QItemSelection&, const QItemSelection&);
+  void OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*);
+  void OnLesionItemDoubleClicked(QListWidgetItem*);
+  void OnCurrentSegmentationItemChanged(QListWidgetItem*, QListWidgetItem*);
+  void OnSegmentationItemDoubleClicked(QListWidgetItem*);
+  void OnCurrentImageItemChanged(QListWidgetItem*, QListWidgetItem*);
+  void OnImageItemDoubleClicked(QListWidgetItem*);
 
 private:
 
@@ -90,6 +92,10 @@ private:
   mitk::DataStorage* m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
+
+  mitk::SemanticTypes::Lesion m_CurrentLesion;
+  mitk::DataNode::Pointer m_CurrentSegmentation;
+  mitk::DataNode::Pointer m_CurrentImage;
 };
 
 #endif // QMITKLESIONINFOWIDGET_H

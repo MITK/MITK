@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include <mitkNodePredicates.h>
+#include <mitkSemanticRelationException.h>
 #include <mitkUIDGeneratorBoost.h>
 
 // blueberry
@@ -114,12 +115,26 @@ void QmitkSemanticRelationsView::OnAddLesionButtonClicked()
 
 void QmitkSemanticRelationsView::OnRemoveLesionButtonClicked()
 {
+  if (m_CaseID.empty())
+  {
+    MITK_INFO << "No case ID selected";
+    return;
+  }
 
+  // get the currently selected lesion from the lesion info widget to remove
+  mitk::SemanticTypes::Lesion selectedLesion = m_Controls.lesionInfoWidget->GetSelectedLesion();
+  if (!selectedLesion.UID.empty())
+  {
+    m_SemanticRelationsManager->RemoveLesion(m_CaseID, selectedLesion);
+  }
+  else
+  {
+    MITK_INFO << "No lesion to remove selected.";
+  }
 }
 
 void QmitkSemanticRelationsView::OnLinkLesionButtonClicked()
 {
-  // ToDo: link with selected lesion item from QmitkLesionInfoWidget
   int dialogReturnValue = m_SimpleDatamanagerNodeDialog->exec();
   if (QDialog::Rejected == dialogReturnValue)
   {
@@ -131,57 +146,63 @@ void QmitkSemanticRelationsView::OnLinkLesionButtonClicked()
   {
     if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(selectedDataNode))
     {
-      // get parent node of the current segmentation node with the node predicate
-      mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = GetDataStorage()->GetSources(selectedDataNode, mitk::NodePredicates::GetImagePredicate(), false);
-
       mitk::BaseData* baseData = selectedDataNode->GetData();
       if (nullptr == baseData)
       {
-        MITK_INFO << "No valid base data: Cannot transfer DICOM tags to the segmentation node";
+        MITK_INFO << "No valid base data for the selected segmentation node.";
         return;
       }
-      // transfer DICOM tags to the segmentation node
-      mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(parentNodes->front());
-      mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(caseID);
-      baseData->SetProperty("DICOM.0010.0010", caseIDTag); // DICOM tag is "PatientName"
-                                                           // add UID to distinguish between different segmentations of the same parent node
-      mitk::StringProperty::Pointer nodeIDTag = mitk::StringProperty::New(caseID + mitk::UIDGeneratorBoost::GenerateUID());
-      baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
-                                                           // add the segmentation to the semantic relations storage
-      m_SemanticRelationsManager->AddSegmentationInstance(selectedDataNode, parentNodes->front());
 
+      // get the currently selected lesion from the lesion info widget to link the segmentation to this selected lesion
+      mitk::SemanticTypes::Lesion selectedLesion = m_Controls.lesionInfoWidget->GetSelectedLesion();
+      if (selectedLesion.UID.empty())
+      {
+        MITK_INFO << "No lesion to link selected.";
+        return;
+      }
+
+      // get parent node of the current segmentation node with the node predicate
+      mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = GetDataStorage()->GetSources(selectedDataNode, mitk::NodePredicates::GetImagePredicate(), false);
+      mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(parentNodes->front());
+
+      // check for already existing, identifying base properties
+      mitk::BaseProperty* caseIDProperty = baseData->GetProperty("DICOM.0010.0010");
+      mitk::BaseProperty* nodeIDProperty = baseData->GetProperty("DICOM.0020.000E");
+      if (nullptr == caseIDProperty && nullptr == nodeIDProperty)
+      {
+        MITK_INFO << "No DICOM tags for case and node identification found. Transferring DICOM tags from the parent node to the selected segmentation node.";
+
+        // transfer DICOM tags to the segmentation node
+        mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(caseID);
+        baseData->SetProperty("DICOM.0010.0010", caseIDTag); // DICOM tag is "PatientName"
+        // add UID to distinguish between different segmentations of the same parent node
+        mitk::StringProperty::Pointer nodeIDTag = mitk::StringProperty::New(caseID + mitk::UIDGeneratorBoost::GenerateUID());
+        baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
+      }
+
+      m_SemanticRelationsManager->AddAndLinkSegmentationInstance(selectedDataNode, parentNodes->front(), selectedLesion);
       AddToComboBox(caseID);
     }
     else
     {
-      MITK_INFO << "No segmentation node selected";
-      return;
+      MITK_INFO << "No segmentation node selected.";
     }
   }
 }
 
 void QmitkSemanticRelationsView::OnUnlinkLesionButtonClicked()
 {
-  /*
-  int dialogReturnValue = m_SelectPatientNodeDialog->exec();
-  if (QDialog::Rejected == dialogReturnValue)
-  {
-    return;
-  }
-
-  mitk::DataNode* selectedSegmentation = m_SelectPatientNodeDialog->GetSelectedDataNode();
+  // get the currently selected segmentation from the lesion info widget to unlink
+  const mitk::DataNode* selectedSegmentation = m_Controls.lesionInfoWidget->GetSelectedSegmentation();
   if (nullptr != selectedSegmentation)
   {
-    if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(selectedSegmentation))
-    {
-      // remove the segmentation from the semantic relations storage
-      m_SemanticRelationsManager->RemoveSegmentationInstance(node);
-
-      mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(node);
-      RemoveFromComboBox(caseID);
-    }
+    // remove the segmentation from the semantic relations storage
+    m_SemanticRelationsManager->RemoveAndUnlinkSegmentationInstance(selectedSegmentation);
   }
-  */
+  else
+  {
+    MITK_INFO << "No segmentation node to unlink selected.";
+  }
 }
 
 void QmitkSemanticRelationsView::OnAddImageButtonClicked()
@@ -205,35 +226,25 @@ void QmitkSemanticRelationsView::OnAddImageButtonClicked()
     }
     else
     {
-      MITK_INFO << "No image node selected";
-      return;
+      MITK_INFO << "No image node to add selected.";
     }
   }
 }
 
 void QmitkSemanticRelationsView::OnRemoveImageButtonClicked()
 {
-  // TODO: remove from lesion list widget?
-  int dialogReturnValue = m_SimpleDatamanagerNodeDialog->exec();
-  if (QDialog::Rejected == dialogReturnValue)
+  // get the currently selected image from the lesion info widget to unlink
+  const mitk::DataNode* selectedImage = m_Controls.lesionInfoWidget->GetSelectedImage();
+  if (nullptr != selectedImage)
   {
-    return;
+    // remove the image from the semantic relations storage
+    m_PatientTableWidget->DeletePixmapOfNode(selectedImage);
+    m_SemanticRelationsManager->RemoveImageInstance(selectedImage);
   }
-
-  mitk::DataNode* selectedDataNode = m_SimpleDatamanagerNodeDialog->GetSelectedDataNode();
-  if (nullptr != selectedDataNode)
+  else
   {
-    if (mitk::NodePredicates::GetImagePredicate()->CheckNode(selectedDataNode))
-    {
-      // remove the image from the semantic relations storage
-      m_PatientTableWidget->DeletePixmapOfNode(selectedDataNode);
-      m_SemanticRelationsManager->RemoveImageInstance(selectedDataNode);
-    }
-    else
-    {
-      MITK_INFO << "No image node selected";
-      return;
-    }
+    MITK_INFO << "No image node to remove selected";
+    return;
   }
 }
 

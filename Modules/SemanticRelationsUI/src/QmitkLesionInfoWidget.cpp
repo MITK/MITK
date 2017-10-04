@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCustomVariants.h"
 
+// semantic relations module
+#include <mitkNodePredicates.h>
+
 // qt
 #include <QListWidget>
 
@@ -38,10 +41,13 @@ QmitkLesionInfoWidget::~QmitkLesionInfoWidget()
 
 void QmitkLesionInfoWidget::SetupConnections()
 {
-  // connect each list widget with our custom slots
-  connect(m_Controls.lesionListWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnLesionListSelectionChanged(const QItemSelection&, const QItemSelection&)));
-  connect(m_Controls.segmentationListWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnSegmentationListSelectionChanged(const QItemSelection&, const QItemSelection&)));
-  connect(m_Controls.imageListWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnImageListSelectionChanged(const QItemSelection&, const QItemSelection&)));
+  // connect each list widget with a custom slots
+  connect(m_Controls.lesionListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*)));
+  connect(m_Controls.lesionListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnLesionItemDoubleClicked(QListWidgetItem*)));
+  connect(m_Controls.segmentationListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentSegmentationItemChanged(QListWidgetItem*, QListWidgetItem*)));
+  connect(m_Controls.segmentationListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnSegmentationItemDoubleClicked(QListWidgetItem*)));
+  connect(m_Controls.imageListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentImageItemChanged(QListWidgetItem*, QListWidgetItem*)));
+  connect(m_Controls.imageListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnImageItemDoubleClicked(QListWidgetItem*)));
 }
 
 void QmitkLesionInfoWidget::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -67,8 +73,7 @@ void QmitkLesionInfoWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
   }
 
   ClearLesionInfoWidget();
-
-  // create list widget entries with the current lesions and their corresponding images and segmentations
+  // create list widget entries with the current lesions
   std::vector<mitk::SemanticTypes::Lesion> allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(caseID);
   for (const auto& lesion : allLesionsOfCase)
   {
@@ -76,65 +81,140 @@ void QmitkLesionInfoWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
   }
 }
 
-void QmitkLesionInfoWidget::OnLesionListSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
 {
-  QString lesionUID = m_Controls.lesionListWidget->currentItem()->text();
-  if (lesionUID.isEmpty())
-  {
-    return;
-  }
-
   if (nullptr == m_SemanticRelations)
   {
     return;
   }
 
-  ClearSegmentationList();
-  ClearImageList();
+  if (nullptr == current)
+  {
+    // no item clicked; cannot retrieve the current lesion
+    return;
+  }
 
-  mitk::SemanticTypes::Lesion selectedLesion;
+  QString lesionUID = current->text();
   // only the UID is needed to identify a representing lesion
-  selectedLesion.UID = lesionUID.toStdString();
-  std::vector<mitk::DataNode::Pointer> allSegmentationsOfLesion = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, selectedLesion);
+  m_CurrentLesion.UID = lesionUID.toStdString();
+  if (lesionUID.isEmpty())
+  {
+    return;
+  }
+
+  ClearSegmentationList();
+  // create list widget entries with the corresponding segmentations of the current lesion
+  std::vector<mitk::DataNode::Pointer> allSegmentationsOfLesion = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, m_CurrentLesion);
+  if (allSegmentationsOfLesion.empty())
+  {
+    m_Controls.segmentationListWidget->addItem("No segmentation found");
+    return;
+  }
   for (const auto& segmentation : allSegmentationsOfLesion)
   {
     m_Controls.segmentationListWidget->addItem(QString::fromStdString(segmentation->GetName()));
   }
 }
 
-void QmitkLesionInfoWidget::OnSegmentationListSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkLesionInfoWidget::OnLesionItemDoubleClicked(QListWidgetItem* clickedItem)
 {
-  // TODO: load images in imageListWidget, that are connected to the selected segmentation
+  if (nullptr == m_SemanticRelations)
+  {
+    return;
+  }
+
+  if (nullptr == clickedItem)
+  {
+    // no item clicked; cannot retrieve the current lesion
+    return;
+  }
 }
 
-void QmitkLesionInfoWidget::OnImageListSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
 {
-  // TODO: not needed, since image selection does not filter any further?
+  if (nullptr == m_SemanticRelations)
+  {
+    return;
+  }
+
+  if (nullptr == current)
+  {
+    // no item clicked; cannot retrieve the current segmentation
+    return;
+  }
+
+  QString segmentationName = current->text();
+  m_CurrentSegmentation = m_DataStorage->GetNamedNode(segmentationName.toStdString());
+  if (nullptr == m_CurrentSegmentation)
+  {
+    return;
+  }
+
+  m_Controls.imageListWidget->clear();
+  // create list widget entry with the parent image of the current segmentation
+  mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(m_CurrentSegmentation, mitk::NodePredicates::GetImagePredicate(), false);
+  mitk::DataNode::ConstPointer parentImageOfSegmentation = parentNodes->front();
+  m_Controls.imageListWidget->addItem(QString::fromStdString(parentImageOfSegmentation->GetName()));
+}
+
+void QmitkLesionInfoWidget::OnSegmentationItemDoubleClicked(QListWidgetItem* clickedItem)
+{
+  if (nullptr == m_SemanticRelations)
+  {
+    return;
+  }
+
+  if (nullptr == clickedItem)
+  {
+    // no item clicked; cannot retrieve the current segmentation
+    return;
+  }
+}
+
+void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
+{
+  if (nullptr == m_SemanticRelations)
+  {
+    return;
+  }
+
+  if (nullptr == current)
+  {
+    // no item clicked; cannot retrieve the current image
+    return;
+  }
+
+  QString imageName = current->text();
+  m_CurrentImage = m_DataStorage->GetNamedNode(imageName.toStdString());
+  if (nullptr == m_CurrentImage)
+  {
+    return;
+  }
+}
+
+void QmitkLesionInfoWidget::OnImageItemDoubleClicked(QListWidgetItem* clickedItem)
+{
+  if (nullptr == m_SemanticRelations)
+  {
+    return;
+  }
+
+  if (nullptr == clickedItem)
+  {
+    // no item clicked; cannot retrieve the current image
+    return;
+  }
 }
 
 void QmitkLesionInfoWidget::ClearLesionInfoWidget()
 {
-  while (m_Controls.lesionListWidget->count() > 0)
-  {
-    m_Controls.lesionListWidget->takeItem(0);
-  }
-
+  m_Controls.lesionListWidget->clear();
+  m_CurrentLesion.UID = "";
   ClearSegmentationList();
-  ClearImageList();
 }
 
 void QmitkLesionInfoWidget::ClearSegmentationList()
 {
-  while (m_Controls.segmentationListWidget->count() > 0)
-  {
-    m_Controls.segmentationListWidget->takeItem(0);
-  }
-}
-
-void QmitkLesionInfoWidget::ClearImageList()
-{
-  while (m_Controls.imageListWidget->count() > 0)
-  {
-    m_Controls.imageListWidget->takeItem(0);
-  }
+  m_Controls.segmentationListWidget->clear();
+  m_Controls.imageListWidget->clear();
 }

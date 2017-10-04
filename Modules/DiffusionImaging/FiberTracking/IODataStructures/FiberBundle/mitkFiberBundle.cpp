@@ -765,6 +765,7 @@ void mitk::FiberBundle::GenerateFiberIds()
 mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction, bool do_resampling)
 {
   vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
+  mitk::FiberBundle::Pointer fibCopy = this;
   if (anyPoint && do_resampling)
   {
     float minSpacing = 1;
@@ -775,12 +776,14 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
     else
       minSpacing = mask->GetSpacing()[2];
 
-    mitk::FiberBundle::Pointer fibCopy = this->GetDeepCopy();
+    fibCopy = this->GetDeepCopy();
     fibCopy->ResampleLinear(minSpacing/5);
     PolyData = fibCopy->GetFiberPolyData();
   }
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+  std::vector< float > new_weights;
 
   MITK_INFO << "Extracting fibers with mask image";
   boost::progress_display disp(m_NumFibers);
@@ -937,7 +940,11 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
       }
     }
 
-    vtkNewCells->InsertNextCell(container);
+    if (container->GetNumberOfPoints()>0)
+    {
+      new_weights.push_back(fibCopy->GetFiberWeight(i));
+      vtkNewCells->InsertNextCell(container);
+    }
   }
 
   if (vtkNewCells->GetNumberOfCells()<=0)
@@ -946,7 +953,10 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
   vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
   newPolyData->SetPoints(vtkNewPoints);
   newPolyData->SetLines(vtkNewCells);
-  return mitk::FiberBundle::New(newPolyData);
+  mitk::FiberBundle::Pointer newfib = mitk::FiberBundle::New(newPolyData);
+  for (unsigned int i=0; i<new_weights.size(); i++)
+    newfib->SetFiberWeight(i, new_weights.at(i));
+  return newfib;
 }
 
 mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgType* mask, bool invert)

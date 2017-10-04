@@ -29,6 +29,7 @@ public:
 
   typedef itk::Point<float, 4> PointType4;
   typedef mitk::PeakImage::ItkPeakImageType       PeakImgType;
+  typedef itk::Image<unsigned char, 3>            UcharImgType;
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -36,6 +37,8 @@ public:
 
   itkSetMacro( PeakImage, PeakImgType::Pointer)
   itkGetMacro( PeakImage, PeakImgType::Pointer)
+  itkSetMacro( MaskImage, UcharImgType::Pointer)
+  itkGetMacro( MaskImage, UcharImgType::Pointer)
   itkSetMacro( FitIndividualFibers, bool)
   itkGetMacro( FitIndividualFibers, bool)
   itkSetMacro( GradientTolerance, double)
@@ -64,6 +67,9 @@ public:
   itkGetMacro( MedianWeight, double)
   itkGetMacro( MinWeight, double)
   itkGetMacro( MaxWeight, double)
+  itkGetMacro( NumUnknowns, unsigned int)
+  itkGetMacro( NumResiduals, unsigned int)
+  itkGetMacro( NumCoveredDirections, unsigned int)
 
   void SetTractograms(const std::vector<mitk::FiberBundle::Pointer> &tractograms);
 
@@ -80,6 +86,7 @@ protected:
 
   std::vector< mitk::FiberBundle::Pointer >   m_Tractograms;
   PeakImgType::Pointer                        m_PeakImage;
+  UcharImgType::Pointer                       m_MaskImage;
   bool                                        m_FitIndividualFibers;
   double                                      m_GradientTolerance;
   double                                      m_Lambda;
@@ -94,6 +101,9 @@ protected:
   double                                      m_MaxWeight;
   bool                                        m_Verbose;
   bool                                        m_DeepCopy;
+  unsigned int                                m_NumUnknowns;
+  unsigned int                                m_NumResiduals;
+  unsigned int                                m_NumCoveredDirections;
 
   // output
   vnl_vector<double>                          m_Weights;

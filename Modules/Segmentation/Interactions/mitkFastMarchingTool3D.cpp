@@ -273,37 +273,65 @@ void mitk::FastMarchingTool3D::Initialize()
   m_NeedUpdate = true;
 }
 
+mitk::Image::Pointer mitk::FastMarchingTool3D::getImageAtCurrentTimeStep(mitk::Image::Pointer workingImage)
+{
+  mitk::Image::Pointer imageAtCurrentTimeStep = mitk::Image::New();
+  if (workingImage->GetTimeGeometry()->CountTimeSteps() > 1) {
+    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+    timeSelector->SetInput(workingImage);
+    timeSelector->SetTimeNr(m_CurrentTimeStep);
+    timeSelector->UpdateLargestPossibleRegion();
+    imageAtCurrentTimeStep = timeSelector->GetOutput();
+  } else {
+    imageAtCurrentTimeStep = workingImage;
+  }
+
+  return imageAtCurrentTimeStep;
+}
 void mitk::FastMarchingTool3D::ConfirmSegmentation()
 {
   // combine preview image with current working segmentation
   if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
   {
-    //logical or combination of preview and segmentation slice
-    OutputImageType::Pointer segmentationImageInITK = OutputImageType::New();
+    mitk::Image::Pointer segmentationResult = mitk::Image::New();
 
-    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(GetTargetSegmentationNode()->GetData());
-    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
-    {
-      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-      timeSelector->SetInput( workingImage );
-      timeSelector->SetTimeNr( m_CurrentTimeStep );
-      timeSelector->UpdateLargestPossibleRegion();
-      CastToItkImage( timeSelector->GetOutput(), segmentationImageInITK );
+    DataNode::Pointer workingNode = GetTargetSegmentationNode();
+    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
+
+    bool isDeprecatedUnsignedCharSegmentation =
+      (workingImage->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
+
+    if (isDeprecatedUnsignedCharSegmentation) {
+      typedef itk::Image<unsigned char, 3> OutputUCharImageType;
+      OutputUCharImageType::Pointer workingImageInITK = OutputUCharImageType::New();
+
+      CastToItkImage(getImageAtCurrentTimeStep(workingImage), workingImageInITK);
+
+      typedef itk::OrImageFilter<OutputImageType, OutputUCharImageType, OutputUCharImageType> OrImageFilterType;
+      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+
+      orFilter->SetInput1(m_ThresholdFilter->GetOutput());
+      orFilter->SetInput2(workingImageInITK);
+      orFilter->Update();
+
+      //set image volume in current time step from itk image
+      workingImage->SetVolume((void*)(orFilter->GetOutput()->GetPixelContainer()->GetBufferPointer()), m_CurrentTimeStep);
+    } else {
+      OutputImageType::Pointer workingImageInITK = OutputImageType::New();
+
+      CastToItkImage(getImageAtCurrentTimeStep(workingImage), workingImageInITK);
+
+      typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
+      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+
+      orFilter->SetInput(0, m_ThresholdFilter->GetOutput());
+      orFilter->SetInput(1, workingImageInITK);
+      orFilter->Update();
+
+      //set image volume in current time step from itk image
+      workingImage->SetVolume((void*)(orFilter->GetOutput()->GetPixelContainer()->GetBufferPointer()), m_CurrentTimeStep);
     }
-    else
-    {
-      CastToItkImage( workingImage, segmentationImageInITK );
-    }
 
-    typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
-    OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
-
-    orFilter->SetInput(0, m_ThresholdFilter->GetOutput());
-    orFilter->SetInput(1, segmentationImageInITK);
-    orFilter->Update();
-
-    //set image volume in current time step from itk image
-    workingImage->SetVolume( (void*)(m_ThresholdFilter->GetOutput()->GetPixelContainer()->GetBufferPointer()), m_CurrentTimeStep);
     this->m_ResultImageNode->SetVisibility(false);
     this->ClearSeeds();
     workingImage->Modified();

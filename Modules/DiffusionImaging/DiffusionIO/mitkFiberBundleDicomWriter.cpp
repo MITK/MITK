@@ -114,10 +114,13 @@ void mitk::FiberBundleDicomWriter::Write()
     OFString contentDate(date_buffer);
     OFString contentTime(time_buffer);
 
+    OFString val = "-";
     TrcTractographyResults *trc = NULL;
     TrcTractographyResults::create(id, contentDate, contentTime, equipment, refs, trc);
-    OFString val = "-"; trc->getStudy().getStudyInstanceUID(val);
-    MITK_INFO << "getStudyInstanceUID " << val;
+    trc->getStudy().setStudyInstanceUID(study_instance_uid.c_str());
+    trc->getSeries().setSeriesInstanceUID(series_instance_uid.c_str());
+    trc->getSOPCommon().setSOPInstanceUID(sop_instance_uid.c_str());
+    trc->getSeries().getSeriesInstanceUID(val);
 
     // Create track set
     CodeWithModifiers anatomy("");

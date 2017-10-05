@@ -146,21 +146,6 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 
   MITK_INFO << "Connected device with " << m_TrackingDeviceSource->GetNumberOfOutputs() << " tools.";
 
-  //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
-  mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
-
-  if ((toolsInNewOrder.IsNotNull()) && (toolsInNewOrder->GetToolCount() > 0))
-  {
-    //so delete the old tools in wrong order and add them in the right order
-    //we cannot simply replace the tool storage because the new storage is
-    //not correctly initialized with the right data storage
-
-    for (int i = 0; i < toolsInNewOrder->GetToolCount(); i++)
-    {
-      m_NavigationToolStorage->AssignToolNumber(toolsInNewOrder->GetTool(i)->GetIdentifier(), i);
-    }
-  }
-
   //connect to device
   try
   {
@@ -168,8 +153,6 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     //Microservice registration:
     m_TrackingDeviceSource->RegisterAsMicroservice();
 
-    m_NavigationToolStorage->UnRegisterMicroservice();
-    m_NavigationToolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
     m_NavigationToolStorage->LockStorage();
   }
   catch (...) //todo: change to mitk::IGTException

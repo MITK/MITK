@@ -132,6 +132,8 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     /// \brief Reset all relevant inputs of the itk pipeline.
     void Reset();
 
+    mitk::Image::Pointer getImageAtCurrentTimeStep(mitk::Image::Pointer workingImage);
+
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
     Image::Pointer m_ReferenceImage;

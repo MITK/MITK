@@ -139,7 +139,7 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
   //first, check size.
   if (this->GetToolCount() != toolPorts.size())
   {
-    MITK_ERROR << "Cannot connect device, number of tools in toolstorage doesn't match the number of tools connected to Polhemus device!";
+    MITK_WARN << "Cannot connect device, number of tools in toolstorage doesn't match the number of tools connected to Polhemus device!";
     CloseConnection();
     return false;
   }
@@ -149,7 +149,7 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
   {
     if (std::find(toolPorts.begin(), toolPorts.end(), _tool->GetToolPort()) == toolPorts.end())
     {
-      MITK_ERROR << "Cannot connect device, tool " << _tool->GetToolPort() << " is not connected to its port.";
+      MITK_WARN << "Cannot connect device, tool " << _tool->GetToolPort() << " is not connected to its port.";
       CloseConnection();
       return false;
     }

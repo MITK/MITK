@@ -43,7 +43,8 @@ void QmitkPolhemusTrackerWidget::Initialize()
   InitializeSuperclassWidget();
   CreateQtPartControl(this);
 
-  SetAdvancedSettingsVisible(false);
+  SetAdvancedSettingsEnabled(false);
+  on_m_AdvancedSettings_clicked(); //hide advanced settings on setup
 }
 
 QmitkPolhemusTrackerWidget::~QmitkPolhemusTrackerWidget()
@@ -71,7 +72,7 @@ void QmitkPolhemusTrackerWidget::ToolStorageChanged(const us::ServiceEvent event
 {
   if ((event.GetType() == us::ServiceEvent::MODIFIED)) {
     this->m_TrackingDevice = nullptr;
-    MITK_INFO<<"Resetting Polhemus Tracking Device, because tool storage changed.";
+    MITK_DEBUG<<"Resetting Polhemus Tracking Device, because tool storage changed.";
   }
 }
 
@@ -84,6 +85,7 @@ void QmitkPolhemusTrackerWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_SetHemisphere), SIGNAL(clicked()), this, SLOT(on_m_SetHemisphere_clicked()));
     connect((QObject*)(m_Controls->m_GetHemisphere), SIGNAL(clicked()), this, SLOT(on_m_GetHemisphere_clicked()));
     connect((QObject*)(m_Controls->m_AdjustHemisphere), SIGNAL(clicked()), this, SLOT(on_m_AdjustHemisphere_clicked()));
+    connect((QObject*)(m_Controls->m_AdvancedSettings), SIGNAL(clicked()), this, SLOT(on_m_AdvancedSettings_clicked()));
   }
 }
 
@@ -202,7 +204,7 @@ void QmitkPolhemusTrackerWidget::OnConnected(bool _success)
     return;
   }
 
-  SetAdvancedSettingsVisible(true);
+  SetAdvancedSettingsEnabled(true);
 
   if (m_TrackingDevice->GetToolCount() != m_Controls->m_ToolSelection->count())
   {
@@ -231,11 +233,26 @@ void QmitkPolhemusTrackerWidget::OnDisconnected(bool _success)
 {
   if (!_success)
     return;
-  SetAdvancedSettingsVisible(false);
+  SetAdvancedSettingsEnabled(false);
 }
 
-void QmitkPolhemusTrackerWidget::SetAdvancedSettingsVisible(bool _enable)
+void QmitkPolhemusTrackerWidget::SetAdvancedSettingsEnabled(bool _enable)
 {
+  m_Controls->m_ToolSelection->setEnabled(_enable);
+  m_Controls->label_toolsToChange->setEnabled(_enable);
+  m_Controls->label_UpdateOnRequest->setEnabled(_enable);
+  m_Controls->m_GetHemisphere->setEnabled(_enable);
+  m_Controls->m_Hemisphere_X->setEnabled(_enable);
+  m_Controls->m_Hemisphere_Y->setEnabled(_enable);
+  m_Controls->m_Hemisphere_Z->setEnabled(_enable);
+  m_Controls->m_SetHemisphere->setEnabled(_enable);
+  m_Controls->m_ToggleHemisphere->setEnabled(_enable);
+  m_Controls->m_AdjustHemisphere->setEnabled(_enable);
+}
+
+void QmitkPolhemusTrackerWidget::on_m_AdvancedSettings_clicked()
+{
+  bool _enable = m_Controls->m_AdvancedSettings->isChecked();
   m_Controls->m_ToolSelection->setVisible(_enable);
   m_Controls->label_toolsToChange->setVisible(_enable);
   m_Controls->label_UpdateOnRequest->setVisible(_enable);

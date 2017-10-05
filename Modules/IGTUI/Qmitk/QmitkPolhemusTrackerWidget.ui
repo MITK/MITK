@@ -23,14 +23,25 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="m_hemisphereTracking">
-     <property name="text">
-      <string>Enable hemisphere tracking (for all tools)</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QCheckBox" name="m_hemisphereTracking">
+       <property name="text">
+        <string>Enable hemisphere tracking (for all tools)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="m_AdvancedSettings">
+       <property name="text">
+        <string>Show Advanced Settings</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -120,14 +131,14 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="m_AdjustHemisphere">
+       <property name="text">
+        <string>Adjust Hemisphere</string>
+       </property>
+      </widget>
+     </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="m_AdjustHemisphere">
-     <property name="text">
-      <string>Adjust Hemisphere</string>
-     </property>
-    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">

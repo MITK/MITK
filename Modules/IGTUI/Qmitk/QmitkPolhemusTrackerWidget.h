@@ -48,6 +48,7 @@ signals:
     void on_m_SetHemisphere_clicked();
     void on_m_GetHemisphere_clicked();
     void on_m_AdjustHemisphere_clicked();
+    void on_m_AdvancedSettings_clicked();
 
 private:
 
@@ -56,7 +57,7 @@ private:
 
   void CreateQtPartControl(QWidget *parent);
 
-  void SetAdvancedSettingsVisible(bool _enable);
+  void SetAdvancedSettingsEnabled(bool _enable);
 
   int GetSelectedToolIndex();
 

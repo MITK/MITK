@@ -75,6 +75,8 @@ void mitk::NavigationToolStorage::RegisterAsMicroservice(std::string sourceID){
   // Define ServiceProps
   m_props[US_PROPKEY_SOURCE_ID] = sourceID;
   m_ServiceRegistration = context->RegisterService(this, m_props);
+  //Tell all widgets, that there is a new toolStorage registered, e.g. the old one might have changed.
+  UpdateMicroservice();
 }
 
 void mitk::NavigationToolStorage::UnRegisterMicroservice(){
@@ -107,6 +109,8 @@ bool mitk::NavigationToolStorage::DeleteTool(int number)
     m_DataStorage->Remove((*it)->GetDataNode());
   m_ToolCollection.erase(it);
 
+  //This line is important so that other widgets can get a notice that the toolStorage has changed!
+  this->UpdateMicroservice();
   return true;
 }
 
@@ -142,6 +146,8 @@ bool mitk::NavigationToolStorage::AddTool(mitk::NavigationTool::Pointer tool)
       if (!m_DataStorage->Exists(tool->GetDataNode()))
         m_DataStorage->Add(tool->GetDataNode());
     }
+    //This line is important so that other widgets can get a notice that the toolStorage has changed!
+    this->UpdateMicroservice();
     return true;
   }
 }
@@ -216,6 +222,9 @@ bool mitk::NavigationToolStorage::AssignToolNumber(std::string identifier1, int 
   m_ToolCollection[number1] = tool2;
 
   MITK_DEBUG << "Swapped tool " << number2 << " with tool " << number1;
+
+  //This line is important so that other widgets can get a notice that the toolStorage has changed!
+  this->UpdateMicroservice();
 
   return true;
 }

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::pa::Volume::Volume(double* data,
   unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing)
 {
+  MITK_INFO << "Initialized by data*";
   if (data == nullptr)
     mitkThrow() << "You may not initialize a mitk::Volume with a nullptr";
   m_InternalMitkImage = mitk::Image::New();
@@ -47,12 +48,14 @@ mitk::pa::Volume::Volume(double* data,
 
 mitk::pa::Volume::Volume(mitk::Image::Pointer image)
 {
+  MITK_INFO << "Initialized by mitk::Image";
+
   if (image.IsNull())
     mitkThrow() << "You may not initialize a mitk::Volume with a null reference to an mitk image";
 
   unsigned int* dimensions = image->GetDimensions();
-  m_XDim = dimensions[1];
   m_YDim = dimensions[0];
+  m_XDim = dimensions[1];
   m_ZDim = dimensions[2];
 
   m_InternalMitkImage = image;

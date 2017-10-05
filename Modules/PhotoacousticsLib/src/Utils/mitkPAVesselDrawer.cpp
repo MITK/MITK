@@ -83,16 +83,3 @@ void mitk::pa::VesselDrawer::DrawVesselInVolume(
 
   properties->SetPositionVector(fromPosition);
 }
-
-bool mitk::pa::Equal(const VesselDrawer::Pointer leftHandSide, const VesselDrawer::Pointer rightHandSide, double eps, bool verbose)
-{
-  MITK_INFO(verbose) << "=== mitk::pa::Vessel Equal ===";
-
-  if (rightHandSide.IsNull() || leftHandSide.IsNull())
-  {
-    MITK_INFO(verbose) << "Cannot compare nullpointers";
-    return false;
-  }
-
-  return true;
-}

@@ -107,6 +107,10 @@ namespace mitk {
        */
       Vector::Pointer Clone();
 
+      void Subtract(Vector::Pointer other);
+
+      void Add(Vector::Pointer other);
+
     protected:
       Vector();
       virtual ~Vector();

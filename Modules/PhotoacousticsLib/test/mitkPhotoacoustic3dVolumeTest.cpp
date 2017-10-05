@@ -49,7 +49,7 @@ public:
     bool exceptionEncountered = false;
     try
     {
-      m_Photoacoustic3dVolume = mitk::pa::Volume::New(nullptr, 3, 3, 3);
+      m_Photoacoustic3dVolume = mitk::pa::Volume::New(nullptr, 3, 3, 3, 1);
     }
     catch (...)
     {
@@ -62,7 +62,7 @@ public:
   {
     double* data = new double[1];
     data[0] = 3;
-    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
+    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1, 1);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetData(0, 0, 0) == 3);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetXDim() == 1);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetYDim() == 1);
@@ -73,7 +73,7 @@ public:
   {
     double* data = new double[1];
     data[0] = 3;
-    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
+    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1, 1);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_Photoacoustic3dVolume->GetData(0, 0, 0)), m_Photoacoustic3dVolume->GetData(0, 0, 0) == 3);
     m_Photoacoustic3dVolume->SetData(17, 0, 0, 0);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetData(0, 0, 0) == 17);
@@ -89,7 +89,7 @@ public:
     for (unsigned int i = 0; i < length; i++)
       data[i] = 5;
 
-    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, xDim, yDim, zDim);
+    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, xDim, yDim, zDim, 1);
 
     for (unsigned int z = 0; z < zDim; z++)
       for (unsigned int y = 0; y < yDim; y++)
@@ -111,7 +111,7 @@ public:
     for (unsigned int i = 0; i < length; i++)
       data[i] = 0;
 
-    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, xDim, yDim, zDim);
+    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, xDim, yDim, zDim, 1);
 
     for (unsigned int z = 0; z < zDim; z++)
       for (unsigned int y = 0; y < yDim; y++)
@@ -132,7 +132,7 @@ public:
     data[3] = 3;
     data[4] = 3;
     data[5] = 3;
-    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 2, 3);
+    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 2, 3, 1);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetData(0, 0, 0) == 3);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetData(0, 0, 1) == 3);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetData(0, 0, 2) == 3);
@@ -169,7 +169,7 @@ public:
   {
     double* data = new double[1];
     data[0] = 3;
-    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
+    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1, 1);
     mitk::pa::Volume::Pointer copiedVolume = m_Photoacoustic3dVolume->DeepCopy();
 
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetXDim() == copiedVolume->GetXDim());
@@ -201,13 +201,13 @@ public:
     CPPUNIT_ASSERT(exceptionCaught);
 
 #endif
-    }
+  }
 
   void TestCatchException()
   {
     double* data = new double[1];
     data[0] = 3;
-    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
+    m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1, 1);
 
     AssertIndexException(1, 0, 0);
     AssertIndexException(0, 1, 0);
@@ -219,6 +219,6 @@ public:
   {
     m_Photoacoustic3dVolume = nullptr;
   }
-  };
+};
 
 MITK_TEST_SUITE_REGISTRATION(mitkPhotoacoustic3dVolume)

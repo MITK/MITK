@@ -23,6 +23,15 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
 {
   MITK_DEBUG << "Initializing Empty Volume";
 
+  if (parameters->GetDoPartialVolume())
+  {
+    parameters->SetXDim(parameters->GetXDim() * 10);
+    parameters->SetYDim(parameters->GetYDim() * 10);
+    parameters->SetZDim(parameters->GetZDim() * 10);
+    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() * 10);
+    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / 10);
+  }
+
   auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters);
 
   const double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
@@ -43,15 +52,6 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     {
       randomNumberGenerator.seed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
     }
-  }
-
-  if (parameters->GetDoPartialVolume())
-  {
-    parameters->SetXDim(parameters->GetXDim() * 10);
-    parameters->SetYDim(parameters->GetYDim() * 10);
-    parameters->SetZDim(parameters->GetZDim() * 10);
-    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() * 10);
-    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / 10);
   }
 
   std::uniform_int_distribution<int> randomNumVesselDistribution(parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());

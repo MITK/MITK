@@ -177,7 +177,7 @@ public:
     double* data = new double[27];
     for (int i = 0; i < 27; ++i)
       data[i] = value;
-    return mitk::pa::Volume::New(data, 3, 3, 3);
+    return mitk::pa::Volume::New(data, 3, 3, 3, 1);
   }
 
   void assertEqual(mitk::pa::Volume::Pointer first, mitk::pa::Volume::Pointer second)

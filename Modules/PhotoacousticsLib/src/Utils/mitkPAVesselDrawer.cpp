@@ -25,51 +25,63 @@ mitk::pa::VesselDrawer::~VesselDrawer()
 {
 }
 
-void mitk::pa::VesselDrawer::DrawVesselInVolume(Vector::Pointer fromPosition,
+void mitk::pa::VesselDrawer::DrawVesselInVolume(
   VesselProperties::Pointer properties,
   InSilicoTissueVolume::Pointer volume)
 {
-  Vector::Pointer stepSize = properties->GetDirectionVector();
+  Vector::Pointer stepDirection = properties->GetDirectionVector();
+  Vector::Pointer fromPosition = properties->GetPositionVector()->Clone();
 
-  fromPosition->SetElement(0, fromPosition->GetElement(0) + stepSize->GetElement(0));
-  fromPosition->SetElement(1, fromPosition->GetElement(1) + stepSize->GetElement(1));
-  fromPosition->SetElement(2, fromPosition->GetElement(2) + stepSize->GetElement(2));
+  Vector::Pointer toPosition = properties->GetPositionVector()->Clone();
+  Vector::Pointer totalWalkingDistance = stepDirection->Clone();
+  totalWalkingDistance->Scale(1.0 / volume->GetSpacing());
 
-  double xPos = fromPosition->GetElement(0);
-  double yPos = fromPosition->GetElement(1);
-  double zPos = fromPosition->GetElement(2);
+  MITK_INFO << "STEP DIRECTION NORM: " << stepDirection->GetNorm();
+  MITK_INFO << "TOTAL WALKING DISTANCE NORM: " << totalWalkingDistance->GetNorm();
 
-  if (!volume->IsInsideVolume(xPos, yPos, zPos))
+  while (totalWalkingDistance->GetNorm() >= 1)
   {
-    properties->SetRadiusInVoxel(0);
-    return;
+    double xPos = fromPosition->GetElement(0);
+    double yPos = fromPosition->GetElement(1);
+    double zPos = fromPosition->GetElement(2);
+
+    if (!volume->IsInsideVolume(xPos, yPos, zPos))
+    {
+      properties->SetRadiusInVoxel(0);
+      return;
+    }
+
+    double radius = properties->GetRadiusInVoxel();
+    double ceiledRadius = ceil(radius);
+
+    for (int x = xPos - ceiledRadius; x <= xPos + ceiledRadius; x += 1)
+      for (int y = yPos - ceiledRadius; y <= yPos + ceiledRadius; y += 1)
+        for (int z = zPos - ceiledRadius; z <= zPos + ceiledRadius; z += 1)
+        {
+          if (!volume->IsInsideVolume(x, y, z))
+          {
+            continue;
+          }
+          double xDiff = x - xPos;
+          double yDiff = y - yPos;
+          double zDiff = z - zPos;
+          double vectorLengthDiff = radius - sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
+
+          if (vectorLengthDiff > 0)
+          {
+            volume->SetVolumeValues(x, y, z,
+              properties->GetAbsorptionCoefficient(),
+              properties->GetScatteringCoefficient(),
+              properties->GetAnisotopyCoefficient(),
+              mitk::pa::InSilicoTissueVolume::SegmentationType::VESSEL);
+          }
+        }
+
+    totalWalkingDistance->Subtract(stepDirection);
+    fromPosition->Add(stepDirection);
   }
 
-  double radius = properties->GetRadiusInVoxel();
-  double ceiledRadius = ceil(radius);
-
-  for (int x = xPos - ceiledRadius; x <= xPos + ceiledRadius; x += 1)
-    for (int y = yPos - ceiledRadius; y <= yPos + ceiledRadius; y += 1)
-      for (int z = zPos - ceiledRadius; z <= zPos + ceiledRadius; z += 1)
-      {
-        if (!volume->IsInsideVolume(x, y, z))
-        {
-          continue;
-        }
-        double xDiff = x - xPos;
-        double yDiff = y - yPos;
-        double zDiff = z - zPos;
-        double vectorLengthDiff = radius - sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
-
-        if (vectorLengthDiff > 0)
-        {
-          volume->SetVolumeValues(x, y, z,
-            properties->GetAbsorptionCoefficient(),
-            properties->GetScatteringCoefficient(),
-            properties->GetAnisotopyCoefficient(),
-            mitk::pa::InSilicoTissueVolume::SegmentationType::VESSEL);
-        }
-      }
+  properties->SetPositionVector(fromPosition);
 }
 
 bool mitk::pa::Equal(const VesselDrawer::Pointer leftHandSide, const VesselDrawer::Pointer rightHandSide, double eps, bool verbose)

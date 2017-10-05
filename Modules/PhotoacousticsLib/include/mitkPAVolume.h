@@ -46,7 +46,7 @@ namespace mitk
       *@param zDim
       *@return smartpointer reference to a new instance of this object
       */
-      static Volume::Pointer New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim);
+      static Volume::Pointer New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);
 
       static Volume::Pointer New(mitk::Image::Pointer image);
 
@@ -113,6 +113,10 @@ namespace mitk
       */
       int GetIndex(unsigned int x, unsigned int y, unsigned int z);
 
+      double GetSpacing();
+
+      void SetSpacing(double spacing);
+
     protected:
       /**
        * @brief Initialize initializes this volume with the given pointer to the data array.
@@ -125,7 +129,7 @@ namespace mitk
        * @param yDim y dimension of the data
        * @param zDim z dimension of the data
        */
-      Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim);
+      Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);
       Volume(mitk::Image::Pointer image);
       virtual ~Volume();
 

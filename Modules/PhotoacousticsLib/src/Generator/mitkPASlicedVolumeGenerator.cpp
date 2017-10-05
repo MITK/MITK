@@ -69,7 +69,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedFluenceImage
         }
       }
 
-  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim);
+  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim, composedVolume->GetGroundTruthVolume()->GetSpacing());
 }
 
 mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedSignalImageFromComposedVolume(
@@ -92,7 +92,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedSignalImageF
           * composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetData(x, y, z);
       }
 
-  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim);
+  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim, composedVolume->GetGroundTruthVolume()->GetSpacing());
 }
 
 mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedGroundTruthImageFromComposedVolume(
@@ -114,5 +114,5 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedGroundTruthI
           composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetData(x, y, z);
       }
 
-  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim);
+  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim, composedVolume->GetGroundTruthVolume()->GetSpacing());
 }

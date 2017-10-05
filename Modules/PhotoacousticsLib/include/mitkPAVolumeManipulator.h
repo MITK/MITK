@@ -32,21 +32,21 @@ namespace mitk {
       * @brief ThresholdImage applies a binary threshold filter to this image.
       * @param threshold
       */
-      static void ThresholdImage(mitk::pa::Volume::Pointer image, double threshold);
+      static void ThresholdImage(Volume::Pointer image, double threshold);
 
       /**
       * @brief Multiplies the image with a given factor
       * @param factor
       */
-      static void MultiplyImage(mitk::pa::Volume::Pointer image, double factor);
+      static void MultiplyImage(Volume::Pointer image, double factor);
 
-      static void GaussianBlur3D(mitk::pa::Volume::Pointer paVolume, double sigma);
+      static void GaussianBlur3D(Volume::Pointer paVolume, double sigma);
 
-      static void Log10Image(mitk::pa::Volume::Pointer image);
+      static void Log10Image(Volume::Pointer image);
 
       static void RescaleImage(InSilicoTissueVolume::Pointer image, double ratio);
 
-      static mitk::pa::Volume::Pointer RescaleImage(Volume::Pointer image, double ratio);
+      static Volume::Pointer RescaleImage(Volume::Pointer image, double ratio);
 
     private:
       VolumeManipulator();

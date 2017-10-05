@@ -60,7 +60,7 @@ public:
     double* data = new double[27];
     for (int i = 0; i < 27; ++i)
       data[i] = 0.5;
-    return mitk::pa::Volume::New(data, 3, 3, 3);
+    return mitk::pa::Volume::New(data, 3, 3, 3, 1);
   }
 
   void FillYSliceWith(mitk::pa::Volume::Pointer fluenceVolume, double ySlice, double value)
@@ -75,7 +75,7 @@ public:
   mitk::pa::FluenceYOffsetPair::Pointer CreateValidationPair(double yOffset, int start)
   {
     double* data = new double[27];
-    mitk::pa::Volume::Pointer fluenceVolume = mitk::pa::Volume::New(data, 3, 3, 3);
+    mitk::pa::Volume::Pointer fluenceVolume = mitk::pa::Volume::New(data, 3, 3, 3, 1);
 
     FillYSliceWith(fluenceVolume, 0, start + 0);
     FillYSliceWith(fluenceVolume, 1, start + 1);

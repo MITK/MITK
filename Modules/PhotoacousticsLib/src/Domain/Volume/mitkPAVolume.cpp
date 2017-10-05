@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mutex>
 
 mitk::pa::Volume::Volume(double* data,
-  unsigned int xDim, unsigned int yDim, unsigned int zDim)
+  unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing)
 {
   if (data == nullptr)
     mitkThrow() << "You may not initialize a mitk::Volume with a nullptr";
@@ -37,6 +37,8 @@ mitk::pa::Volume::Volume(double* data,
 
   m_InternalMitkImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
   m_InternalMitkImage->SetImportVolume(data, Image::ImportMemoryManagementType::CopyMemory);
+
+  SetSpacing(spacing);
 
   m_FastAccessDataPointer = GetData();
 
@@ -58,14 +60,25 @@ mitk::pa::Volume::Volume(mitk::Image::Pointer image)
   m_FastAccessDataPointer = GetData();
 }
 
+double mitk::pa::Volume::GetSpacing()
+{
+  return m_InternalMitkImage->GetGeometry()->GetSpacing()[0];
+}
+
+void mitk::pa::Volume::SetSpacing(double spacing)
+{
+  const mitk::ScalarType spacingArray[]{ spacing, spacing, spacing };
+  m_InternalMitkImage->SetSpacing(spacingArray);
+}
+
 mitk::pa::Volume::~Volume()
 {
   m_InternalMitkImage = nullptr;
 }
 
-mitk::pa::Volume::Pointer mitk::pa::Volume::New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim)
+mitk::pa::Volume::Pointer mitk::pa::Volume::New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing)
 {
-  mitk::pa::Volume::Pointer smartPtr = new mitk::pa::Volume(data, xDim, yDim, zDim);
+  mitk::pa::Volume::Pointer smartPtr = new mitk::pa::Volume(data, xDim, yDim, zDim, spacing);
   smartPtr->UnRegister();
   return smartPtr;
 }
@@ -88,7 +101,7 @@ mitk::pa::Volume::Pointer mitk::pa::Volume::DeepCopy()
   double* data = new double[length];
   memcpy(data, GetData(), length * sizeof(double));
 
-  return mitk::pa::Volume::New(data, GetXDim(), GetYDim(), GetZDim());
+  return mitk::pa::Volume::New(data, GetXDim(), GetYDim(), GetZDim(), GetSpacing());
 }
 
 double mitk::pa::Volume::GetData(unsigned int x, unsigned int y, unsigned int z)

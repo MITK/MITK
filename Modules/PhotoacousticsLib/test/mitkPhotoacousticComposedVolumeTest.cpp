@@ -54,7 +54,7 @@ public:
     double* data = new double[125];
     for (int i = 0; i < 125; ++i)
       data[i] = value;
-    mitk::pa::Volume::Pointer volume = mitk::pa::Volume::New(data, 5, 5, 5);
+    mitk::pa::Volume::Pointer volume = mitk::pa::Volume::New(data, 5, 5, 5, 1);
     return mitk::pa::FluenceYOffsetPair::New(volume, yOffset);
   }
 

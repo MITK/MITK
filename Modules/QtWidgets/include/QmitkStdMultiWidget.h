@@ -170,7 +170,8 @@ protected:
   void HideAllWidgetToolbars();
 
   mitk::PropertyList::Pointer imageProperties;
-  unsigned long imageMTime;
+  unsigned long m_ImageMTime;
+  std::string m_ImageName;
 
   vtkCornerAnnotation* cornerText[4];
   vtkTextProperty* textProp[4];

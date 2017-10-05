@@ -79,7 +79,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   m_PendingCrosshairPositionEvent(false),
   m_CrosshairNavigationEnabled(false),
   m_drawTextInStatusBar(true),
-  imageMTime(0),
+  m_ImageMTime(0),
   m_displayMetaInfo(false),
   m_displayMetaInfoEx(false),
   m_displayPatientInfo(true),
@@ -1664,31 +1664,31 @@ void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* tex
 void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
 {
   m_displayMetaInfo = metainfo;
-  imageMTime = -1;
+  m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayMetaInfoEx(bool metainfo)
 {
   m_displayMetaInfoEx = metainfo;
-  imageMTime = -1;
+  m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPatientInfo(bool patientinfo)
 {
   m_displayPatientInfo = patientinfo;
-  imageMTime = -1;
+  m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPatientInfoEx(bool patientinfo)
 {
   m_displayPatientInfoEx = patientinfo;
-  imageMTime = -1;
+  m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPositionInfo(bool positioninfo)
 {
   m_displayPositionInfo = positioninfo;
-  imageMTime = -1;
+  m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setSelectionMode(bool selection)
@@ -1770,11 +1770,19 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     }
 
     unsigned long newImageMTime = image->GetMTime();
-    if (imageMTime != newImageMTime) {
-      imageMTime = newImageMTime;
+    std::string newNodeName = node->GetName();
+
+    // check if image is changed or node is renamed
+    if ( m_ImageMTime != newImageMTime
+      || m_ImageName != newNodeName ) {
+
+      m_ImageMTime = newImageMTime;
+      m_ImageName = newNodeName;
+
+      // seriesDescription replaced by newNodeName
       std::string patient, patientId,
         birthday, sex, institution, studyDate, studyTime,
-        studiId, seriesDescription, studyDescription, exInfo,
+        studiId/*, seriesDescription*/, studyDescription, exInfo,
         magneticFieldStrength, dicomTR, dicomTE, bodyPart, protocolName,
         sliceThickness, xrayTubeCurrent, kvp, imagePosition, windowCenter, windowWidth;
 
@@ -1791,7 +1799,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       }
       imageProperties->GetStringProperty("dicom.study.StudyID", studiId);
       imageProperties->GetStringProperty("dicom.study.StudyDescription", studyDescription);
-      imageProperties->GetStringProperty("dicom.series.SeriesDescription", seriesDescription);
+      //imageProperties->GetStringProperty("dicom.series.SeriesDescription", seriesDescription);
       imageProperties->GetStringProperty("dicom.ExInfo", exInfo);
       imageProperties->GetStringProperty("dicom.MagneticFieldStrength", magneticFieldStrength);
       imageProperties->GetStringProperty("dicom.TR", dicomTR);
@@ -1840,7 +1848,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         if (m_displayPatientInfoEx) {
           infoStringStream[0]
             << "\n" << studyDescription
-            << "\n" << seriesDescription
+            << "\n" << newNodeName
             << "\n" << exInfo
             << "\n" << bodyPart
             << "\n" << protocolName;

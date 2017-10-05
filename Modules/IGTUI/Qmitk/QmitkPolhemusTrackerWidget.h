@@ -85,5 +85,7 @@ public:
   */
   virtual void OnStartTracking(bool _success);
 
+  void ToolStorageChanged(const us::ServiceEvent event);
+
 };
 #endif

@@ -66,14 +66,18 @@ void mitk::pa::VolumeManipulator::Log10Image(Volume::Pointer image)
 
 void mitk::pa::VolumeManipulator::RescaleImage(InSilicoTissueVolume::Pointer image, double ratio)
 {
-  image->SetScatteringVolume(RescaleImage(image->GetScatteringVolume(), ratio));
-  image->SetAnisotropyVolume(RescaleImage(image->GetAnisotropyVolume(), ratio));
-  image->SetSegmentationVolume(RescaleImage(image->GetSegmentationVolume(), ratio));
-  image->SetAbsorptionVolume(RescaleImage(image->GetAbsorptionVolume(), ratio));
+  MITK_INFO << "Rescaling images..";
+  double sigma = image->GetSpacing() / (ratio * 2);
+  image->SetAbsorptionVolume(RescaleImage(image->GetAbsorptionVolume(), ratio, sigma));
+  image->SetScatteringVolume(RescaleImage(image->GetScatteringVolume(), ratio, sigma));
+  image->SetAnisotropyVolume(RescaleImage(image->GetAnisotropyVolume(), ratio, sigma));
+  image->SetSegmentationVolume(RescaleImage(image->GetSegmentationVolume(), ratio, 0));
+  MITK_INFO << "Rescaling images..[Done]";
 }
 
-mitk::pa::Volume::Pointer mitk::pa::VolumeManipulator::RescaleImage(Volume::Pointer image, double ratio)
+mitk::pa::Volume::Pointer mitk::pa::VolumeManipulator::RescaleImage(Volume::Pointer image, double ratio, double sigma)
 {
+  MITK_INFO << "Rescaling image..";
   typedef itk::Image<double, 3> ImageType;
   typedef itk::ResampleImageFilter<ImageType, ImageType> FilterType;
   typedef itk::GaussianInterpolateImageFunction<ImageType, double> InterpolatorType;
@@ -90,16 +94,23 @@ mitk::pa::Volume::Pointer mitk::pa::VolumeManipulator::RescaleImage(Volume::Poin
   FilterType::Pointer resampleImageFilter = FilterType::New();
   resampleImageFilter->SetInput(itkInput);
   resampleImageFilter->SetSize(outputSize);
-  resampleImageFilter->SetInterpolator(InterpolatorType::New());
+  if (sigma > mitk::eps)
+  {
+    auto interpolator = InterpolatorType::New();
+    interpolator->SetSigma(sigma);
+    resampleImageFilter->SetInterpolator(interpolator);
+  }
   resampleImageFilter->SetOutputSpacing(input->GetGeometry()->GetSpacing()[0] / ratio);
 
+  MITK_INFO << "Update..";
   resampleImageFilter->UpdateLargestPossibleRegion();
+  MITK_INFO << "Update..[Done]";
 
   ImageType::Pointer output = resampleImageFilter->GetOutput();
   mitk::Image::Pointer mitkOutput = mitk::Image::New();
 
   GrabItkImageMemory(output, mitkOutput);
-
+  MITK_INFO << "Rescaling image..[Done]";
   return Volume::New(mitkOutput);
 }
 

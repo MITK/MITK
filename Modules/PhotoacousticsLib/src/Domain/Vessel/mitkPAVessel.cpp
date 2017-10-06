@@ -45,7 +45,7 @@ void mitk::pa::Vessel::ExpandVessel(InSilicoTissueVolume::Pointer volume,
 {
   m_VesselDrawer->DrawVesselInVolume(m_VesselProperties, volume);
   (m_VesselMeanderStrategy->*calculateNewPosition)(m_VesselProperties->GetPositionVector(), m_VesselProperties->GetDirectionVector(), bendingFactor, rng);
-  m_WalkedDistance += m_VesselProperties->GetDirectionVector()->GetNorm();
+  m_WalkedDistance += (m_VesselProperties->GetDirectionVector()->GetNorm() / volume->GetSpacing());
 }
 
 bool mitk::pa::Vessel::CanBifurcate()

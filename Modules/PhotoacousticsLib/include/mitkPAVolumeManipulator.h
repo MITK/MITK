@@ -46,7 +46,7 @@ namespace mitk {
 
       static void RescaleImage(InSilicoTissueVolume::Pointer image, double ratio);
 
-      static Volume::Pointer RescaleImage(Volume::Pointer image, double ratio);
+      static Volume::Pointer RescaleImage(Volume::Pointer image, double ratio, double sigma);
 
     private:
       VolumeManipulator();

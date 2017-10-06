@@ -23,13 +23,15 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
 {
   MITK_DEBUG << "Initializing Empty Volume";
 
+  const double RESAMPLING_FACTOR = 2;
+
   if (parameters->GetDoPartialVolume())
   {
-    parameters->SetXDim(parameters->GetXDim() * 10);
-    parameters->SetYDim(parameters->GetYDim() * 10);
-    parameters->SetZDim(parameters->GetZDim() * 10);
-    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() * 10);
-    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / 10);
+    parameters->SetXDim(parameters->GetXDim() * RESAMPLING_FACTOR);
+    parameters->SetYDim(parameters->GetYDim() * RESAMPLING_FACTOR);
+    parameters->SetZDim(parameters->GetZDim() * RESAMPLING_FACTOR);
+    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() * RESAMPLING_FACTOR);
+    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / RESAMPLING_FACTOR);
   }
 
   auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters);
@@ -154,12 +156,12 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
 
   if (parameters->GetDoPartialVolume())
   {
-    VolumeManipulator::RescaleImage(generatedVolume, 0.1);
-    parameters->SetXDim(parameters->GetXDim() / 10);
-    parameters->SetYDim(parameters->GetYDim() / 10);
-    parameters->SetZDim(parameters->GetZDim() / 10);
-    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() / 10);
-    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() * 10);
+    VolumeManipulator::RescaleImage(generatedVolume, (1.0 / RESAMPLING_FACTOR));
+    parameters->SetXDim(parameters->GetXDim() / RESAMPLING_FACTOR);
+    parameters->SetYDim(parameters->GetYDim() / RESAMPLING_FACTOR);
+    parameters->SetZDim(parameters->GetZDim() / RESAMPLING_FACTOR);
+    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() / RESAMPLING_FACTOR);
+    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() * RESAMPLING_FACTOR);
   }
 
   generatedVolume->FinalizeVolume();

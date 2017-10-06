@@ -9,4 +9,6 @@ MITK_CREATE_MODULE(
 
 add_subdirectory(MitkMCxyz)
 
+add_subdirectory(MitkTissueBatchGenerator)
+
 add_subdirectory(test)

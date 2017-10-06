@@ -36,9 +36,6 @@ void mitk::pa::VesselDrawer::DrawVesselInVolume(
   Vector::Pointer totalWalkingDistance = stepDirection->Clone();
   totalWalkingDistance->Scale(1.0 / volume->GetSpacing());
 
-  MITK_INFO << "STEP DIRECTION NORM: " << stepDirection->GetNorm();
-  MITK_INFO << "TOTAL WALKING DISTANCE NORM: " << totalWalkingDistance->GetNorm();
-
   while (totalWalkingDistance->GetNorm() >= 1)
   {
     double xPos = fromPosition->GetElement(0);

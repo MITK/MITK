@@ -596,8 +596,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   if( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
   {
-    typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
-    typedef mitk::ImageToItk<TensorImageType> CasterType;
+    typedef mitk::ImageToItk<mitk::TensorImage::ItkTensorImageType> CasterType;
 
     if (m_Controls->m_ModeBox->currentIndex()==1)
     {
@@ -618,7 +617,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       {
         typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
         m_TrackingHandler = new mitk::TrackingHandlerOdf();
-        TensorImageType::Pointer itkImg = TensorImageType::New();
+        mitk::TensorImage::ItkTensorImageType::Pointer itkImg = mitk::TensorImage::ItkTensorImageType::New();
         mitk::CastToItkImage(m_InputImages.at(0), itkImg);
 
         typedef itk::TensorImageToOdfImageFilter< float, float > FilterType;

@@ -279,7 +279,7 @@ void QmitkDiffusionQuantificationView::DoMultiTensorCalculation()
 
         filter->Update();
 
-        typedef itk::Image<itk::DiffusionTensor3D<float>, 3> TensorImageType;
+        typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
         for (int i=0; i<NUM_TENSORS; i++)
         {
           TensorImageType::Pointer tensorImage = filter->GetTensorImages().at(i);
@@ -630,9 +630,9 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     while ( itemiter != itemiterend ) // for all items
     {
 
-        typedef float                                       TTensorPixelType;
-        typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
-        typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
+        typedef mitk::TensorImage::ScalarPixelType    TTensorPixelType;
+        typedef mitk::TensorImage::PixelType          TensorPixelType;
+        typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
         mitk::Image* vol =
                 static_cast<mitk::Image*>((*itemiter)->GetData());

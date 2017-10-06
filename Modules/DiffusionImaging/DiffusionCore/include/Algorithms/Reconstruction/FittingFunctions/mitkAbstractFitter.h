@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_least_squares_function.h>
 #include <mitkDiffusionPropertyHelper.h>
 #include <itkVectorImage.h>
+#include <mitkTensorImage.h>
 
 namespace mitk {
 
@@ -30,7 +31,7 @@ public:
   typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
   typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientContainerType;
   typedef itk::VectorImage< unsigned short, 3 >                           DiffusionImageType;
-  typedef itk::DiffusionTensor3D<float>                                   TensorType;
+  typedef TensorImage::PixelType                                          TensorType;
 
   AbstractFitter(unsigned int number_of_parameters, unsigned int number_of_measurements) :
     vnl_least_squares_function(number_of_parameters, number_of_measurements, no_gradient)

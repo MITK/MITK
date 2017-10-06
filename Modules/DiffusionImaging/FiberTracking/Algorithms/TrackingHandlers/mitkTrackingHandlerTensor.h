@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDataHandler.h"
 #include <itkDiffusionTensor3D.h>
 #include <MitkFiberTrackingExports.h>
+#include <mitkTensorImage.h>
 
 namespace mitk
 {
@@ -35,8 +36,8 @@ public:
     TrackingHandlerTensor();
     ~TrackingHandlerTensor();
 
-    typedef itk::DiffusionTensor3D<float>    TensorType;
-    typedef itk::Image< TensorType, 3 > ItkTensorImageType;
+    typedef TensorImage::PixelType    TensorType;
+    typedef TensorImage::ItkTensorImageType ItkTensorImageType;
     typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
 
 

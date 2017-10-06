@@ -35,6 +35,7 @@ namespace mitk
 
   public:
     typedef itk::Image<float, 4> ItkPeakImageType;
+    typedef float PixelType;
 
     mitkClassMacro( PeakImage, Image )
     itkFactorylessNewMacro(Self)

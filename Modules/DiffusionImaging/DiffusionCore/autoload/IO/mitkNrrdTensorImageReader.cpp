@@ -85,22 +85,21 @@ namespace mitk
           reader->Update();
           ImageType::Pointer img = reader->GetOutput();
 
-          typedef itk::Image<itk::DiffusionTensor3D<float>,3> VecImgType;
-          VecImgType::Pointer vecImg = VecImgType::New();
+          TensorImage::ItkTensorImageType::Pointer vecImg = TensorImage::ItkTensorImageType::New();
           vecImg->SetSpacing( img->GetSpacing() );   // Set the image spacing
           vecImg->SetOrigin( img->GetOrigin() );     // Set the image origin
           vecImg->SetDirection( img->GetDirection() );  // Set the image direction
           vecImg->SetRegions( img->GetLargestPossibleRegion());
           vecImg->Allocate();
 
-          itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
+          itk::ImageRegionIterator<TensorImage::ItkTensorImageType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
           ot.GoToBegin();
 
           itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
           it.GoToBegin();
 
           typedef ImageType::PixelType  VarPixType;
-          typedef VecImgType::PixelType FixPixType;
+          typedef TensorImage::PixelType FixPixType;
           int numComponents = img->GetNumberOfComponentsPerPixel();
 
           if (numComponents==6)
@@ -111,7 +110,7 @@ namespace mitk
               VarPixType vec = it.Get();
               FixPixType fixVec(vec.GetDataPointer());
 
-              itk::DiffusionTensor3D<float> tensor;
+              TensorImage::PixelType tensor;
               tensor.SetElement(0, vec.GetElement(0));
               tensor.SetElement(1, vec.GetElement(1));
               tensor.SetElement(2, vec.GetElement(2));
@@ -132,7 +131,7 @@ namespace mitk
             while (!it.IsAtEnd())
             {
               VarPixType vec = it.Get();
-              itk::DiffusionTensor3D<float> tensor;
+              TensorImage::PixelType tensor;
               tensor.SetElement(0, vec.GetElement(0));
               tensor.SetElement(1, vec.GetElement(1));
               tensor.SetElement(2, vec.GetElement(2));
@@ -161,7 +160,7 @@ namespace mitk
 
             while (!ot.IsAtEnd())
             {
-              itk::DiffusionTensor3D<float> tensor;
+              TensorImage::PixelType tensor;
               ImageType::IndexType idx;
               idx[0] = ot.GetIndex()[0]; idx[1] = ot.GetIndex()[1]; idx[2] = ot.GetIndex()[2];
 
@@ -214,22 +213,21 @@ namespace mitk
           reader->Update();
           ImageType::Pointer img = reader->GetOutput();
 
-          typedef itk::Image<itk::DiffusionTensor3D<float>,3> VecImgType;
-          VecImgType::Pointer vecImg = VecImgType::New();
+          TensorImage::ItkTensorImageType::Pointer vecImg = TensorImage::ItkTensorImageType::New();
           vecImg->SetSpacing( img->GetSpacing() );   // Set the image spacing
           vecImg->SetOrigin( img->GetOrigin() );     // Set the image origin
           vecImg->SetDirection( img->GetDirection() );  // Set the image direction
           vecImg->SetRegions( img->GetLargestPossibleRegion());
           vecImg->Allocate();
 
-          itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
+          itk::ImageRegionIterator<TensorImage::ItkTensorImageType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
           ot.GoToBegin();
 
           itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
           it.GoToBegin();
 
           typedef ImageType::PixelType  VarPixType;
-          typedef VecImgType::PixelType FixPixType;
+          typedef TensorImage::PixelType FixPixType;
           int numComponents = img->GetNumberOfComponentsPerPixel();
 
           itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
@@ -282,7 +280,7 @@ namespace mitk
 
               if(readFrame)
               {
-                itk::DiffusionTensor3D<float> tensor;
+                TensorImage::PixelType tensor;
                 tensor.SetElement(0, vec.GetElement(0));
                 tensor.SetElement(1, vec.GetElement(1));
                 tensor.SetElement(2, vec.GetElement(2));
@@ -305,7 +303,7 @@ namespace mitk
             while (!it.IsAtEnd())
             {
               VarPixType vec = it.Get();
-              itk::DiffusionTensor3D<float> tensor;
+              TensorImage::PixelType tensor;
               tensor.SetElement(0, vec.GetElement(0));
               tensor.SetElement(1, vec.GetElement(1));
               tensor.SetElement(2, vec.GetElement(2));
@@ -340,7 +338,7 @@ namespace mitk
 
             while (!ot.IsAtEnd())
             {
-              itk::DiffusionTensor3D<float> tensor;
+              TensorImage::PixelType tensor;
               ImageType::IndexType idx;
               idx[0] = ot.GetIndex()[0]; idx[1] = ot.GetIndex()[1]; idx[2] = ot.GetIndex()[2];
 
@@ -405,14 +403,14 @@ namespace mitk
     return result;
   }
 
-itk::DiffusionTensor3D<float> NrrdTensorImageReader
-::ConvertMatrixTypeToFixedArrayType(const itk::DiffusionTensor3D<float>::Superclass::MatrixType & matrix)
+TensorImage::PixelType NrrdTensorImageReader
+::ConvertMatrixTypeToFixedArrayType(const TensorImage::PixelType::Superclass::MatrixType & matrix)
 {
     /*       | 0  1  2  |
       *       | X  3  4  |
       *       | X  X  5  |
       */
-    itk::DiffusionTensor3D<float> arr;
+    TensorImage::PixelType arr;
     arr.SetElement(0,matrix(0,0));
     arr.SetElement(1,matrix(0,1));
     arr.SetElement(2,matrix(0,2));

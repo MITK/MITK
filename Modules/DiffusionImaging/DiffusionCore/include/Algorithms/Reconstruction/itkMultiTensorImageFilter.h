@@ -27,6 +27,8 @@ This file is based heavily on a corresponding ITK filter.
 #include <mitkDiffusionPropertyHelper.h>
 #include <vnl/algo/vnl_levenberg_marquardt.h>
 #include <mitkOdfImage.h>
+#include <mitkPeakImage.h>
+#include <mitkTensorImage.h>
 
 namespace itk{
 /** \class MultiTensorImageFilter
@@ -46,9 +48,9 @@ public:
   typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
   typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType GradientContainerType;
   typedef itk::Image< unsigned char, 3>     ItkUcharImageType;
-  typedef itk::Image< float, 4 >            PeakImageType;
-  typedef itk::DiffusionTensor3D<float> TensorType;
-  typedef itk::Image<TensorType, 3> TensorImageType;
+  typedef mitk::PeakImage::ItkPeakImageType PeakImageType;
+  typedef mitk::TensorImage::PixelType TensorType;
+  typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
   /** Method for creation through the object factory. */
   itkFactorylessNewMacro(Self)

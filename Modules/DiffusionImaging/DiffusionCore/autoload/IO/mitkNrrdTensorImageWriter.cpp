@@ -54,17 +54,15 @@ void mitk::NrrdTensorImageWriter::Write()
     MITK_ERROR << "Sorry, filename has not been set!" ;
     return ;
   }
-  mitk::LocaleSwitch localeSwitch("C");
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   io->SetFileType( itk::ImageIOBase::Binary );
   io->UseCompressionOn();
 
-  typedef itk::Image<itk::DiffusionTensor3D<float>,3> ImageType;
-  typedef itk::ImageFileWriter<ImageType> WriterType;
+  typedef itk::ImageFileWriter<TensorImage::ItkTensorImageType> WriterType;
   WriterType::Pointer nrrdWriter = WriterType::New();
 
-  ImageType::Pointer outimage = ImageType::New();
+  TensorImage::ItkTensorImageType::Pointer outimage = TensorImage::ItkTensorImageType::New();
   CastToItkImage(input, outimage);
 
   nrrdWriter->SetInput( outimage );

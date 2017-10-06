@@ -39,6 +39,7 @@ void QmitkProgressBar::Reset()
   m_TotalSteps = 0;
   m_Progress = 0;
   m_pulce = false;
+  m_Active = false;
 }
 
 /**
@@ -55,6 +56,7 @@ void QmitkProgressBar::SetPercentageVisible(bool visible)
  */
 void QmitkProgressBar::AddStepsToDo(unsigned int steps)
 {
+  m_Active = true;
   emit SignalAddStepsToDo(steps);
 }
 
@@ -73,6 +75,7 @@ QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
 :QProgressBar(parent), ProgressBarImplementation()
 {
   m_TotalSteps = 0; m_Progress = 0;
+  m_Active = false;
   this->hide();
   this->SetPercentageVisible(true);
 
@@ -175,5 +178,5 @@ void QmitkProgressBar::SlotOnTimeout()
 
 bool QmitkProgressBar::active()
 {
-  return m_TotalSteps > 0;
+  return m_Active;
 }

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkDoseNodeHelper.h>
-#include "mitkPropertyNameHelper.h"
+#include <mitkPropertyNameHelper.h>
 #include <mitkRTConstants.h>
 #include <mitkIsoDoseLevelSetProperty.h>
 #include <mitkIsoDoseLevelVectorProperty.h>

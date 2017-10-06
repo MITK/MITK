@@ -202,7 +202,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   // # Actions
   berry::IEditorRegistry* editorRegistry = berry::PlatformUI::GetWorkbench()->GetEditorRegistry();
-  QList<berry::IEditorDescriptor::Pointer> editors = editorRegistry->GetEditors("*.mitk");
+  QList<berry::IEditorDescriptor::Pointer> editors = editorRegistry->GetEditors("*.autoplan");
   if (editors.size() > 1)
   {
     m_ShowInMapper = new QSignalMapper(this);

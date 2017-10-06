@@ -102,7 +102,7 @@ public:
     {
       MITK_TEST_OUTPUT(<< "\n===== Test_ReconstructionOfScenes, scenario '" << scenario.key << "' =====");
 
-      std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", tempDir);
+      std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.autoplan", tempDir);
       mitk::SceneIO::Pointer writer = mitk::SceneIO::New();
       mitk::DataStorage::Pointer originalStorage = scenario.BuildDataStorage();
       CPPUNIT_ASSERT_MESSAGE(std::string("Save test scenario '") + scenario.key + "' to '" + archiveFilename + "'",

@@ -222,7 +222,7 @@ berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Poi
   }
 
   // open the editor on the data storage
-  QString name = input->GetName() + ".mitk";
+  QString name = input->GetName() + ".autoplan";
   berry::IEditorDescriptor::Pointer editorDesc =
       WorkbenchUtilPrivate::GetEditorDescriptor(name,
                                                 berry::PlatformUI::GetWorkbench()->GetEditorRegistry(),

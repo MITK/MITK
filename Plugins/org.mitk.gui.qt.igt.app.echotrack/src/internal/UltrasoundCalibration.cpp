@@ -862,7 +862,7 @@ void UltrasoundCalibration::OnSaveCalibration()
   if (m_Controls.m_saveAdditionalCalibrationLog->isChecked())
   {
     mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
-    QString filenameScene = filename + "_mitkScene.mitk";
+    QString filenameScene = filename + "_mitkScene.autoplan";
     mitk::NodePredicateNot::Pointer isNotHelperObject =
       mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = this->GetDataStorage()->GetSubset(isNotHelperObject);

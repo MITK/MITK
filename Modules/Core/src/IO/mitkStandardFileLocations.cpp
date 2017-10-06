@@ -130,7 +130,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   {
     directoryPath = homeDrive;
     directoryPath += homePath;
-    directoryPath += "/.mitk/";
+    directoryPath += "/.autoplan/";
     AddDirectoryForSearch(directoryPath.c_str(), false);
   }
 
@@ -139,7 +139,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   if(homeDirectory != nullptr)
   {
     directoryPath = homeDirectory;
-    directoryPath += "/.mitk/";
+    directoryPath += "/.autoplan/";
     AddDirectoryForSearch(directoryPath.c_str(), false);
   }
 
@@ -220,7 +220,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
 #endif // defined(_WIN32) && !defined(__CYGWIN__)
 
     optionsDirectory = homeDirectory;
-    optionsDirectory += "/.mitk";
+    optionsDirectory += "/.autoplan";
   }
 
   optionsDirectory = itksys::SystemTools::ConvertToOutputPath(optionsDirectory.c_str());
@@ -233,7 +233,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
 
   if(itksys::SystemTools::MakeDirectory(optionsDirectory.c_str())==false)
   {
-    itkGenericExceptionMacro( << "Could not create .mitk directory at " << optionsDirectory );
+    itkGenericExceptionMacro( << "Could not create .autoplan directory at " << optionsDirectory );
   }
   return optionsDirectory;
 }

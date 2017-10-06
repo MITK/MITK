@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
   //  float precision = parsedArgs.count("precision") ? us::any_cast<float>(parsedArgs["precision"]) : mitk::eps;
   //  float fraction = parsedArgs.count("fraction") ? us::any_cast<float>(parsedArgs["fraction"]) : 0.6;
   //  bool withreplacement = parsedArgs.count("replacment") ? us::any_cast<float>(parsedArgs["replacment"]) : true;
-  std::string filt_select = parsedArgs.count("select") ? us::any_cast<std::string>(parsedArgs["select"]) : "*.mitk";
+  std::string filt_select = parsedArgs.count("select") ? us::any_cast<std::string>(parsedArgs["select"]) : "*.autoplan";
 
   QString filter(filt_select.c_str());
   QDir dir(inputdir.c_str());

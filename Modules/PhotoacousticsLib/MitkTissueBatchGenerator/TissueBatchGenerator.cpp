@@ -19,6 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPATissueGeneratorParameters.h>
 #include <mitkPATissueGenerator.h>
 #include <mitkIOUtil.h>
+#include <mitkCommandLineParser.h>
+#include <mitkUIDGenerator.h>
+#include <mitkException.h>
+
+#include <itksys/SystemTools.hxx>
 
 using namespace mitk::pa;
 
@@ -61,12 +66,92 @@ struct InputParameters
   std::string saveFolderPath;
   std::string identifyer;
   std::string exePath;
+  std::string probePath;
+  bool verbose;
 };
 
 InputParameters parseInput(int argc, char* argv[])
 {
+  MITK_INFO << "Paring arguments...";
+  mitkCommandLineParser parser;
+  // set general information
+  parser.setCategory("MITK-Photoacoustics");
+  parser.setTitle("Mitk Tissue Batch Generator");
+  parser.setDescription("Creates in silico tissue in batch processing and automatically calculates fluence values for the central slice of the volume.");
+  parser.setContributor("Computer Assisted Medical Interventions, DKFZ");
+
+  // how should arguments be prefixed
+  parser.setArgumentPrefix("--", "-");
+  // add each argument, unless specified otherwise each argument is optional
+  // see mitkCommandLineParser::addArgument for more information
+  parser.beginGroup("Required parameters");
+  parser.addArgument(
+    "savePath", "s", mitkCommandLineParser::InputDirectory,
+    "Input save folder (directory)", "input save folder",
+    us::Any(), false);
+  parser.addArgument(
+    "mitkMcxyz", "m", mitkCommandLineParser::OutputFile,
+    "MitkMcxyz binary (file)", "path to the MitkMcxyz binary",
+    us::Any(), false);
+  parser.addArgument(
+    "probe", "p", mitkCommandLineParser::OutputFile,
+    "xml probe file (file)", "file to the definition of the used probe (*.xml)",
+    us::Any(), false);
+  parser.endGroup();
+  parser.beginGroup("Optional parameters");
+  parser.addArgument(
+    "verbose", "v", mitkCommandLineParser::Bool,
+    "Verbose Output", "Whether to produce verbose, or rather debug output");
+  parser.addArgument(
+    "identifyer", "i", mitkCommandLineParser::String,
+    "Generator identifyer (string)", "A unique identifyer for the calculation instance");
+
   InputParameters input;
 
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  if (parsedArgs.size() == 0)
+    exit(-1);
+
+  if (parsedArgs.count("verbose"))
+  {
+    MITK_INFO << "verbose";
+    input.verbose = us::any_cast<bool>(parsedArgs["verbose"]);
+  }
+  else
+  {
+    input.verbose = false;
+  }
+
+  if (parsedArgs.count("savePath"))
+  {
+    MITK_INFO << "savePath";
+    input.saveFolderPath = us::any_cast<std::string>(parsedArgs["savePath"]);
+  }
+
+  if (parsedArgs.count("mitkMcxyz"))
+  {
+    MITK_INFO << "mitkMcxyz";
+    input.exePath = us::any_cast<std::string>(parsedArgs["mitkMcxyz"]);
+  }
+
+  if (parsedArgs.count("probe"))
+  {
+    MITK_INFO << "probe";
+    input.probePath = us::any_cast<std::string>(parsedArgs["probe"]);
+  }
+
+  if (parsedArgs.count("identifyer"))
+  {
+    MITK_INFO << "identifyer";
+    input.identifyer = us::any_cast<std::string>(parsedArgs["identifyer"]);
+  }
+  else
+  {
+    MITK_INFO << "generating identifyer";
+    auto uid = mitk::UIDGenerator("", 8);
+    input.identifyer = uid.GetUID();
+  }
+  MITK_INFO << "Paring arguments...[Done]";
   return input;
 }
 
@@ -75,14 +160,31 @@ int main(int argc, char * argv[])
   auto input = parseInput(argc, argv);
   unsigned int iterationNumber = 0;
 
-  while (iterationNumber == 0)
+  while (true)
   {
     auto parameters = CreateMultivessel_06_10_17_Parameters();
+    MITK_INFO(input.verbose) << "Generating tissue..";
     auto resultTissue = InSilicoTissueGenerator::GenerateInSilicoData(parameters);
+    MITK_INFO(input.verbose) << "Generating tissue..[Done]";
 
-    std::string savePath = input.saveFolderPath + "/MultiVessel_" + input.identifyer + std::to_string(iterationNumber) + ".nrrd";
+    auto inputfolder = std::string(input.saveFolderPath + "input/");
+    auto outputfolder = std::string(input.saveFolderPath + "output/");
+    if (!itksys::SystemTools::FileIsDirectory(inputfolder))
+    {
+      itksys::SystemTools::MakeDirectory(inputfolder);
+    }
+    if (!itksys::SystemTools::FileIsDirectory(outputfolder))
+    {
+      itksys::SystemTools::MakeDirectory(outputfolder);
+    }
+
+    std::string savePath = input.saveFolderPath + "input/MultiVessel_" + input.identifyer + "_" + std::to_string(iterationNumber) + ".nrrd";
     mitk::IOUtil::Save(resultTissue->ConvertToMitkImage(), savePath);
+    std::string outputPath = input.saveFolderPath + "output/Fluence_MultiVessel_" + input.identifyer + "_" + std::to_string(iterationNumber) + ".nrrd";
 
+    MITK_INFO(input.verbose) << "Simulating fluence..";
+    std::system(std::string(input.exePath + " -i " + savePath + " -o " + outputPath + " -p " + input.probePath + " -n 100000000").c_str());
+    MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
     iterationNumber++;
   }
 }

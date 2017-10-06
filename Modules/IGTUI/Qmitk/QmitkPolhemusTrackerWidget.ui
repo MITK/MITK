@@ -67,7 +67,7 @@ p, li { white-space: pre-wrap; }
    <item>
     <widget class="QLabel" name="label_UpdateOnRequest">
      <property name="text">
-      <string>Spinbox values are only updated on request (click 'Get Hemisphere').</string>
+      <string>Spinbox values and label are only updated on request (click 'Get Hemisphere').</string>
      </property>
     </widget>
    </item>
@@ -118,6 +118,13 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="m_StatusLabelHemisphereTracking">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout"/>

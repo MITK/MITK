@@ -141,6 +141,21 @@ void QmitkPolhemusTrackerWidget::on_m_GetHemisphere_clicked()
   m_Controls->m_Hemisphere_Y->setValue(_hemisphere[1]);
   m_Controls->m_Hemisphere_Z->setValue(_hemisphere[2]);
 
+  QString label;
+
+  if (m_TrackingDevice->GetHemisphereTrackingEnabled(GetSelectedToolIndex()))
+  {
+    label = "HemisphereTracking is ON for tool ";
+    label.append(m_Controls->m_ToolSelection->currentText());
+  }
+  else
+  {
+    label = "HemisphereTracking is OFF for tool ";
+    label.append(m_Controls->m_ToolSelection->currentText());
+  }
+
+  m_Controls->m_StatusLabelHemisphereTracking->setText(label);
+
   MITK_INFO << "Updated SpinBox for Hemisphere of tool " << m_Controls->m_ToolSelection->currentText().toStdString();
 }
 
@@ -249,6 +264,7 @@ void QmitkPolhemusTrackerWidget::on_m_AdvancedSettings_clicked()
   m_Controls->m_SetHemisphere->setVisible(_enable);
   m_Controls->m_ToggleHemisphere->setVisible(_enable);
   m_Controls->m_AdjustHemisphere->setVisible(_enable);
+  m_Controls->m_StatusLabelHemisphereTracking->setVisible(_enable);
 }
 
 int QmitkPolhemusTrackerWidget::GetSelectedToolIndex()

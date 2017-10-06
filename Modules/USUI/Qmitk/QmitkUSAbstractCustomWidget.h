@@ -61,7 +61,7 @@ namespace us {
   * mitk::USDevice device = // get the ultrasound device
   *
   * // get service references for ultrasound device
-  * std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + device->GetDeviceClass() + ")";
+  * std::string filter = "(org.mitk.services.UltrasoundCustomWidget.deviceClass=" + device->GetDeviceClass() + ")";
   * QString interfaceName ( us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
   * QList<ctkServiceReference> serviceRefs = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
   *

@@ -117,7 +117,7 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 1:
-      initialPosition->Randomize(parameters->GetXDim(), parameters->GetXDim(), initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(parameters->GetXDim() - 1, parameters->GetXDim() - 1, initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-2, -1, -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
@@ -129,12 +129,16 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 3:
-      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, parameters->GetYDim(), parameters->GetYDim(), parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, parameters->GetYDim() - 1, parameters->GetYDim() - 1, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, -2, -1,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     }
+
+    initialDirection->Normalize();
+    MITK_INFO << initialPosition->GetElement(0) << " | " << initialPosition->GetElement(1) << " | " << initialPosition->GetElement(2);
+    MITK_INFO << initialDirection->GetElement(0) << " | " << initialDirection->GetElement(1) << " | " << initialDirection->GetElement(2);
 
     VesselProperties::Pointer vesselParams = VesselProperties::New();
     vesselParams->SetDirectionVector(initialDirection);

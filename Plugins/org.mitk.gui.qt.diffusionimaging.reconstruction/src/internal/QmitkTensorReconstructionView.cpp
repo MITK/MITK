@@ -67,9 +67,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkTensorReconstructionView::VIEW_ID = "org.mitk.views.tensorreconstruction";
 
-typedef float                                       TTensorPixelType;
-typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
-typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
+typedef mitk::TensorImage::ScalarPixelType          TTensorPixelType;
+typedef mitk::TensorImage::PixelType                TensorPixelType;
+typedef mitk::TensorImage::ItkTensorImageType       TensorImageType;
 
 using namespace berry;
 
@@ -597,7 +597,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
             reconFilter->SetB0Threshold(b0Threshold);
             reconFilter->Update();
 
-            typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
+            typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
             TensorImageType::Pointer outputTensorImg = reconFilter->GetOutput();
 
             typedef itk::ImageRegionIterator<TensorImageType> TensorImageIteratorType;
@@ -607,7 +607,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
             int negatives = 0;
             while(!tensorIt.IsAtEnd())
             {
-                typedef itk::DiffusionTensor3D<TTensorPixelType> TensorType;
+                typedef mitk::TensorImage::PixelType TensorType;
                 TensorType tensor = tensorIt.Get();
 
                 TensorType::EigenValuesArrayType ev;
@@ -703,7 +703,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             // TENSORS TO DATATREE
             mitk::TensorImage::Pointer image = mitk::TensorImage::New();
 
-            typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
+            typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
             TensorImageType::Pointer tensorImage;
             tensorImage = tensorReconstructionFilter->GetOutput();
 
@@ -717,7 +717,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
                 while(!tensorIt.IsAtEnd())
                 {
 
-                    typedef itk::DiffusionTensor3D<TTensorPixelType> TensorType;
+                    typedef mitk::TensorImage::PixelType TensorType;
                     //typedef itk::Tensor<TTensorPixelType, 3> TensorType2;
 
                     TensorType tensor = tensorIt.Get();
@@ -787,9 +787,9 @@ void QmitkTensorReconstructionView::TensorsToOdf()
         mitk::DataNode::Pointer tensorImageNode = m_TensorImages->at(i);
         MITK_INFO << "starting ODF estimation";
 
-        typedef float                                       TTensorPixelType;
-        typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
-        typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
+        typedef mitk::TensorImage::ScalarPixelType    TTensorPixelType;
+        typedef mitk::TensorImage::PixelType          TensorPixelType;
+        typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
         TensorImageType::Pointer itkvol = TensorImageType::New();
         mitk::CastToItkImage(dynamic_cast<mitk::TensorImage*>(tensorImageNode->GetData()), itkvol);
@@ -909,9 +909,9 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
             mitk::TensorImage* vol =
                     static_cast<mitk::TensorImage*>((*itemiter)->GetData());
 
-            typedef float                                       TTensorPixelType;
-            typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
-            typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
+            typedef mitk::TensorImage::ScalarPixelType      TTensorPixelType;
+            typedef mitk::TensorImage::PixelType            TensorPixelType;
+            typedef mitk::TensorImage::ItkTensorImageType   TensorImageType;
 
 
             TensorImageType::Pointer itkvol = TensorImageType::New();

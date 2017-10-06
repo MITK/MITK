@@ -48,7 +48,11 @@ namespace mitk
 
   public:
 
-    mitkClassMacro( OdfImage, Image );
+    typedef float ScalarPixelType;
+    typedef itk::Vector< ScalarPixelType, ODF_SAMPLING_SIZE > PixelType;
+    typedef itk::Image< itk::Vector< ScalarPixelType, ODF_SAMPLING_SIZE >, 3 > ItkOdfImageType;
+
+    mitkClassMacro( OdfImage, Image )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

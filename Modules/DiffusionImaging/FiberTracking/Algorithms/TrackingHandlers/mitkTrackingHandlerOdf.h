@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTrackingDataHandler.h"
 #include <mitkOdfImage.h>
+#include <mitkTensorImage.h>
 #include <itkOrientationDistributionFunction.h>
 #include <MitkFiberTrackingExports.h>
 
@@ -36,8 +37,8 @@ public:
     TrackingHandlerOdf();
     ~TrackingHandlerOdf();
 
-    typedef itk::DiffusionTensor3D<float>    TensorType;
-    typedef itk::Image< itk::Vector< float, ODF_SAMPLING_SIZE >, 3 > ItkOdfImageType;
+    typedef TensorImage::PixelType    TensorType;
+    typedef OdfImage::ItkOdfImageType ItkOdfImageType;
     typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
 
 

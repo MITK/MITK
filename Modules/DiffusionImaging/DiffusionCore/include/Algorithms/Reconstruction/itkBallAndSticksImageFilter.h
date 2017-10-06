@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <cmath>
+#include <mitkTensorImage.h>
 
 #define NUM_TENSORS 2
 
@@ -49,8 +50,8 @@ public:
   typedef itk::Image< float, 4 >            PeakImageType;
 
   typedef itk::DiffusionTensor3DReconstructionImageFilter< TInPixelType, TInPixelType, float > TensorRecFilterType;
-  typedef itk::DiffusionTensor3D<float> TensorType;
-  typedef itk::Image<TensorType, 3> TensorImageType;
+  typedef mitk::TensorImage::PixelType TensorType;
+  typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
   /** Method for creation through the object factory. */
   itkFactorylessNewMacro(Self)

@@ -272,7 +272,7 @@ void QmitkODFDetailsView::UpdateOdf()
           *(pixel_data + 5),
         };
 
-        itk::DiffusionTensor3D<float> tensor(tensorelems);
+        TensorPixelType tensor(tensorelems);
         odf.InitFromTensor(tensor);
 
         /** Array of eigen-values. */

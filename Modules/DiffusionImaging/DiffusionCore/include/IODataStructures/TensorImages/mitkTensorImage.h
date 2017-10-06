@@ -37,7 +37,11 @@ namespace mitk
 
   public:
 
-    mitkClassMacro( TensorImage, Image );
+    typedef float ScalarPixelType;
+    typedef itk::DiffusionTensor3D<ScalarPixelType> PixelType;
+    typedef itk::Image<PixelType,3> ItkTensorImageType;
+
+    mitkClassMacro( TensorImage, Image )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

@@ -71,10 +71,10 @@ class QmitkGibbsTrackingView : public QmitkAbstractView
 
 public:
 
-  typedef itk::Image<float,3>                               ItkFloatImageType;
-  typedef itk::Vector<float, ODF_SAMPLING_SIZE>                 OdfVectorType;
-  typedef itk::Image<OdfVectorType, 3>                      ItkOdfImgType;
-  typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
+  typedef itk::Image<float,3>                             ItkFloatImageType;
+  typedef itk::Vector<float, ODF_SAMPLING_SIZE>           OdfVectorType;
+  typedef mitk::OdfImage::ItkOdfImageType                 ItkOdfImgType;
+  typedef mitk::TensorImage::ItkTensorImageType           ItkTensorImage;
   typedef itk::GibbsTrackingFilter< ItkOdfImgType >       GibbsTrackingFilterType;
 
   static const std::string VIEW_ID;

@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <itkDiffusionTensor3D.h>
 #include <QmitkSliceNavigationListener.h>
+#include <mitkTensorImage.h>
 
 /*!
   \brief View displaying details of the orientation distribution function in the voxel at the current crosshair position.
@@ -56,12 +57,12 @@ public:
   QmitkODFDetailsView();
   virtual ~QmitkODFDetailsView();
 
-  typedef float TOdfPixelType;
-  typedef itk::Vector<TOdfPixelType,ODF_SAMPLING_SIZE> OdfVectorType;
-  typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
+  typedef mitk::OdfImage::ScalarPixelType TOdfPixelType;
+  typedef mitk::OdfImage::PixelType       OdfVectorType;
+  typedef mitk::OdfImage::ItkOdfImageType OdfVectorImgType;
 
-  typedef itk::DiffusionTensor3D< TOdfPixelType >  TensorPixelType;
-  typedef itk::Image< TensorPixelType, 3 >         TensorImageType;
+  typedef mitk::TensorImage::PixelType          TensorPixelType;
+  typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 

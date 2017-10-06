@@ -268,7 +268,7 @@ bool mitk::PolhemusTrackingDevice::AutoDetectToolsAvailable()
 mitk::NavigationToolStorage::Pointer mitk::PolhemusTrackingDevice::AutoDetectTools()
 {
   this->OpenConnection();
-  std::vector<mitk::PolhemusInterface::trackingData> singeFrameData = this->m_Device->GetFrame();
+  std::vector<mitk::PolhemusInterface::trackingData> singeFrameData = this->m_Device->GetSingleFrame();
   MITK_INFO << "Found " << singeFrameData.size() << " tools.";
   this->CloseConnection();
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();

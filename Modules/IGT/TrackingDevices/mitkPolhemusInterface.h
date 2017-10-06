@@ -116,12 +116,6 @@ namespace mitk
     /** @return Returns the last frame when the tracking device is in continous tracking mode. Returns an empty vector in case of an error.*/
     std::vector<trackingData> GetLastFrame();
 
-
-    /** @brief Convenient method to get a frame from the tracking device.
-      * @return Returns a single OR the last frame depending on m_continuousTracking.
-      * @warning Don't use this function if you use different threads. You need to make sure, that you are still in the right mode! */
-    std::vector<trackingData> GetFrame();
-
   protected:
     /**
     * \brief standard constructor
@@ -144,6 +138,11 @@ namespace mitk
 
     //returns the index in the arrays of tool _tool. Eg. sensor 3 (_tool = 3) is the second tool --> index 1 in m_Hemispheres etc.
     int GetToolIndex(int _tool);
+
+    /** @brief Convenient method to get a frame from the tracking device.
+    * @return Returns a single OR the last frame depending on m_continuousTracking.
+    * @warning Don't use this function if you use different threads. You need to make sure, that you are still in the right mode! */
+    std::vector<trackingData> GetFrame();
 
   private:
     //returns vector with tool index as only element if tool != -1, else returns vector from 0 to numberOfTools

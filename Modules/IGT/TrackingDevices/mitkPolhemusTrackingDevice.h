@@ -120,6 +120,10 @@ namespace mitk
     /** Get the Hemisphere for _tool as mitk vector */
     mitk::Vector3D GetHemisphere(int _tool);
 
+    /** Adjust the Hemisphere for this tool. User needs to make sure, that the tool is located in hemisphere (1|0|0) when calling this function.
+    In contrast to SetHemisphere(1,0,0), this method restores the original HemisphereTracking settings at the end. */
+    void AdjustHemisphere(int _tool);
+
   protected:
     PolhemusTrackingDevice();
     ~PolhemusTrackingDevice();

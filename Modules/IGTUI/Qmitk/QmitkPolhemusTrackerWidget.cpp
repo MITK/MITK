@@ -126,7 +126,7 @@ void QmitkPolhemusTrackerWidget::on_m_SetHemisphere_clicked()
   mitk::FillVector3D(_hemisphere, m_Controls->m_Hemisphere_X->value(), m_Controls->m_Hemisphere_Y->value(), m_Controls->m_Hemisphere_Z->value());
   m_TrackingDevice->SetHemisphere(GetSelectedToolIndex(), _hemisphere);
 
-  //If you set a hemisphere vector which is unequal (0|0|0), this means, that there is no hemisphere tracing any more
+  //If you set a hemisphere vector which is unequal (0|0|0), this means, that there is no hemisphere tracking any more
   //disable the checkbox in case it was on before, so that it can be reactivated...
   if (_hemisphere.GetNorm() != 0)
     m_Controls->m_hemisphereTracking->setChecked(false);
@@ -173,21 +173,7 @@ void QmitkPolhemusTrackerWidget::on_m_AdjustHemisphere_clicked()
   msgBox.exec();
   if (msgBox.clickedButton() == adjustButton) {
     // adjust
-    mitk::Vector3D _hemisphere;
-    mitk::FillVector3D(_hemisphere, 1, 0, 0);
-
-    //Was HemiTracking on before?
-    bool _hemiTrack = m_TrackingDevice->GetHemisphereTrackingEnabled(_tool);
-
-    //Set Hemisphere to (1|0|0) where user placed the tool
-    m_TrackingDevice->SetHemisphere(_tool, _hemisphere);
-
-    //If HemiTrack was on, switch it on again by setting (0|0|0). Don't use general fuction SetHemisphereTrackingEnabled, as we might only adapt a single tool.
-    if (_hemiTrack)
-    {
-      mitk::FillVector3D(_hemisphere, 0, 0, 0);
-      m_TrackingDevice->SetHemisphere(_tool, _hemisphere);
-    }
+    m_TrackingDevice->AdjustHemisphere(_tool);
     MITK_INFO << "Adjusting Hemisphere for tool " << m_Controls->m_ToolSelection->currentText().toStdString();
   }
   else if (msgBox.clickedButton() == cancelButton) {

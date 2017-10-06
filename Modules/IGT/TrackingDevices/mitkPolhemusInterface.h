@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPolhemusINTERFACE_H_HEADER_INCLUDED_
 #define MITKPolhemusINTERFACE_H_HEADER_INCLUDED_
 
-
 #include <vector>
 #include <string>
 
@@ -33,12 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNavigationData.h>
 
-
 class CPDIdev;
 
 namespace mitk
 {
-
   /** Documentation:
   *   \brief An object of this class represents the interface to Polhemus trackers.
   *   All variables with the name "tool" start with index 1, which is the station number of Polhemus.
@@ -50,7 +47,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacroItkParent(PolhemusInterface,itk::Object);
+    mitkClassMacroItkParent(PolhemusInterface, itk::Object);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
@@ -87,11 +84,11 @@ namespace mitk
     unsigned int GetNumberOfTools();
 
     /** Enables/disables hemisphere tracking for all stations/tools. */
-    void SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled);
+    void SetHemisphereTrackingEnabled(bool _HeisphereTrackingEnabeled, int _tool = -1);
 
     /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.
         Index starts at "1" for the first tool (i.e. station number of Polhemus). Not 0!
-    */
+        */
     void ToggleHemisphere(int _tool = -1);
 
     /** Convenient method to print the status of the tracking device (true/false) if connection is established. For debugging...*/
@@ -99,20 +96,25 @@ namespace mitk
 
     /** Sets the Hemisphere of tool _tool to the vector _hemisphere. "-1" sets all tools.
         Index starts at "1" for the first tool (i.e. station number of Polhemus). Not 0!
-    */
+        */
     void SetHemisphere(int _tool, mitk::Vector3D _hemisphere);
 
     /** Get the Hemisphere for _tool as mitk vector. -1 ("all tools") returns hemisphere of first tool.
         Index starts at "1" for the first tool (i.e. station number of Polhemus). Not 0!
-    */
+        */
     mitk::Vector3D GetHemisphere(int _tool);
 
     /** Get the ports on which tools are connected. Returns empty vector if device is not connected!
     */
     std::vector<int> GetToolPorts();
 
-    /** Is Hemisphere Tracking Enabled for this tool? */
+    /** Is Hemisphere Tracking Enabled for this tool?
+     * if tool is -1, this means "All Tools". We return true if HemiTracking is enabled for all tools, and false if it is off for at least one tool.*/
     bool GetHemisphereTrackingEnabled(int _tool);
+
+    /** Adjust the Hemisphere for this tool. User needs to make sure, that the tool is located in hemisphere (1|0|0) when calling this function.
+    In contrast to SetHemisphere(1,0,0), this method restores the original HemisphereTracking settings at the end. */
+    void AdjustHemisphere(int _tool);
 
   protected:
     /**
@@ -124,10 +126,10 @@ namespace mitk
     */
     ~PolhemusInterface();
 
-	/** Polhemus liberty/patriot tracker object*/
+    /** Polhemus liberty/patriot tracker object*/
     CPDIdev* m_pdiDev;
-	
-	/** Parses polhemus raw data to a collection of tracking data of single tools. */
+
+    /** Parses polhemus raw data to a collection of tracking data of single tools. */
     std::vector<mitk::PolhemusInterface::trackingData> ParsePolhemusRawData(PBYTE pBuf, DWORD dwSize);
 
     unsigned int m_numberOfTools;
@@ -138,13 +140,23 @@ namespace mitk
 
     bool SetupDevice();
 
+    //returns the index in the arrays of tool _tool. Eg. sensor 3 (_tool = 3) is the second tool --> index 1 in m_Hemispheres etc.
+    int GetToolIndex(int _tool);
+
   private:
+    //returns vector with tool index as only element if tool != -1, else returns vector from 0 to numberOfTools
+    std::vector<int> GetToolIterator(int _tool);
+
+  private:
+    //Stores the hemispheres for all sensors. Default is (1|0|0).
     std::vector<mitk::Vector3D> m_Hemispheres;
+
+    //Stores, if hemisphereTracking is on for this Sensor.
+    std::vector<bool> m_HemisphereTracking;
 
     //This vector stores the order of tools, which are available.
     //E.g. only Sensor 1 and 3 are attached, then this vector maps the first tool (0) to Polhemus identifier 1 and the second tool (1) to Polhemus 3.
     std::vector<int> m_ToolPorts;
-
   };
 }//mitk
 #endif

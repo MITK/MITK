@@ -308,11 +308,13 @@ mitk::NavigationToolStorage::Pointer mitk::PolhemusTrackingDevice::AutoDetectToo
 
 void  mitk::PolhemusTrackingDevice::SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled)
 {
-  if (m_HemisphereTrackingEnabled != _HemisphereTrackingEnabled)
-  {
+  //We need to remember if HemisphereTracking is switch on for this reason:
+  /* m_Device->SetHemi works only if the device is connected. However, GUI can also change if it is not connected.
+     In this case, we remember it in the m_HemisphereTrackingEnabled variable. And when connecting, we know, which
+     status is wanted from the user by GUI.
+  */
     m_HemisphereTrackingEnabled = _HemisphereTrackingEnabled;
     this->m_Device->SetHemisphereTrackingEnabled(_HemisphereTrackingEnabled);
-  }
 }
 
 void  mitk::PolhemusTrackingDevice::ToggleHemisphere(int _tool)
@@ -322,6 +324,11 @@ void  mitk::PolhemusTrackingDevice::ToggleHemisphere(int _tool)
 
 void mitk::PolhemusTrackingDevice::SetHemisphere(int _tool, mitk::Vector3D _hemisphere)
 {
+  //If you set a hemisphere vector which is unequal (0|0|0), this means, that there is no hemisphere tracking any more
+  //disable the option, so that it can be reactivated... Also if it is just a single tool.
+  if (_hemisphere.GetNorm() != 0)
+    m_HemisphereTrackingEnabled = false;
+
   this->m_Device->SetHemisphere(_tool, _hemisphere);
 }
 
@@ -330,11 +337,12 @@ mitk::Vector3D mitk::PolhemusTrackingDevice::GetHemisphere(int _tool)
   return this->m_Device->GetHemisphere(_tool);
 }
 
-/** Is Hemisphere Tracking Enabled for this tool? */
 bool mitk::PolhemusTrackingDevice::GetHemisphereTrackingEnabled(int _tool)
 {
-  if (_tool == -1)
-    return this->m_HemisphereTrackingEnabled;
-  else
     return this->m_Device->GetHemisphereTrackingEnabled(_tool);
+}
+
+void mitk::PolhemusTrackingDevice::AdjustHemisphere(int _tool)
+{
+  return this->m_Device->AdjustHemisphere(_tool);
 }

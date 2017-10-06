@@ -127,15 +127,7 @@ bool mitk::PolhemusInterface::Connect()
   }
 
   //Get the tracking data to find out which tools are available.
-  std::vector<mitk::PolhemusInterface::trackingData> _trackingData;
-  if (m_continousTracking)
-  {
-    _trackingData = GetLastFrame();
-  }
-  else
-  {
-    _trackingData = GetSingleFrame();
-  }
+  std::vector<mitk::PolhemusInterface::trackingData> _trackingData = GetFrame();
 
   //if we had tool before, check if they are still the same.
   if (m_ToolPorts.size() == _trackingData.size())
@@ -186,6 +178,20 @@ bool mitk::PolhemusInterface::Disconnect()
   return returnValue;
 }
 
+unsigned int mitk::PolhemusInterface::GetNumberOfTools()
+{
+  std::vector<mitk::PolhemusInterface::trackingData> _trackingData = GetFrame();
+  return _trackingData.size();
+}
+
+std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetFrame()
+{
+  if (m_continousTracking)
+    return this->GetLastFrame();
+  else
+    return this->GetSingleFrame();
+}
+
 std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetLastFrame()
 {
   PBYTE pBuf;
@@ -202,16 +208,6 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
   }
 
   return returnValue;
-}
-
-unsigned int mitk::PolhemusInterface::GetNumberOfTools()
-{
-  std::vector<mitk::PolhemusInterface::trackingData> _trackingData;
-  if (m_continousTracking)
-    _trackingData = GetLastFrame();
-  else
-    _trackingData = GetSingleFrame();
-  return _trackingData.size();
 }
 
 std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetSingleFrame()
@@ -300,15 +296,7 @@ void mitk::PolhemusInterface::SetHemisphereTrackingEnabled(bool _HeisphereTracki
   else
   {
     //Get Tool Position. ToDo, this should not be the tool tip but the sensor position. Any chance, to get that from Polhemus interface?!
-    std::vector<mitk::PolhemusInterface::trackingData> _position;
-    if (m_continousTracking)
-    {
-      _position = GetLastFrame();
-    }
-    else
-    {
-      _position = GetSingleFrame();
-    }
+    std::vector<mitk::PolhemusInterface::trackingData> _position = GetFrame();
 
     for (int index : GetToolIterator(_tool))
     {

@@ -74,12 +74,6 @@ namespace mitk
 
     bool Disconnect();
 
-    /** @return Returns a single frame. Only works if the tracking device is not in continous tracking mode. Returns an empty vector in case of an error.*/
-    std::vector<trackingData> GetSingleFrame();
-
-    /** @return Returns the last frame when the tracking device is in continous tracking mode. Returns an empty vector in case of an error.*/
-    std::vector<trackingData> GetLastFrame();
-
     /** @return Returns the number of tools. Returns 0 if no information is avialable.*/
     unsigned int GetNumberOfTools();
 
@@ -116,6 +110,18 @@ namespace mitk
     In contrast to SetHemisphere(1,0,0), this method restores the original HemisphereTracking settings at the end. */
     void AdjustHemisphere(int _tool);
 
+    /** @return Returns a single frame. Only works if the tracking device is not in continous tracking mode. Returns an empty vector in case of an error.*/
+    std::vector<trackingData> GetSingleFrame();
+
+    /** @return Returns the last frame when the tracking device is in continous tracking mode. Returns an empty vector in case of an error.*/
+    std::vector<trackingData> GetLastFrame();
+
+
+    /** @brief Convenient method to get a frame from the tracking device.
+      * @return Returns a single OR the last frame depending on m_continuousTracking.
+      * @warning Don't use this function if you use different threads. You need to make sure, that you are still in the right mode! */
+    std::vector<trackingData> GetFrame();
+
   protected:
     /**
     * \brief standard constructor
@@ -132,10 +138,6 @@ namespace mitk
     /** Parses polhemus raw data to a collection of tracking data of single tools. */
     std::vector<mitk::PolhemusInterface::trackingData> ParsePolhemusRawData(PBYTE pBuf, DWORD dwSize);
 
-    unsigned int m_numberOfTools;
-
-    bool m_continousTracking;
-
     bool InitializeDevice();
 
     bool SetupDevice();
@@ -147,6 +149,7 @@ namespace mitk
     //returns vector with tool index as only element if tool != -1, else returns vector from 0 to numberOfTools
     std::vector<int> GetToolIterator(int _tool);
 
+
   private:
     //Stores the hemispheres for all sensors. Default is (1|0|0).
     std::vector<mitk::Vector3D> m_Hemispheres;
@@ -157,6 +160,10 @@ namespace mitk
     //This vector stores the order of tools, which are available.
     //E.g. only Sensor 1 and 3 are attached, then this vector maps the first tool (0) to Polhemus identifier 1 and the second tool (1) to Polhemus 3.
     std::vector<int> m_ToolPorts;
+
+    unsigned int m_numberOfTools;
+
+    bool m_continousTracking;
   };
 }//mitk
 #endif

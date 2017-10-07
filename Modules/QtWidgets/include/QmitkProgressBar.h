@@ -89,6 +89,7 @@ private:
 
   QTimer* m_timer;
   bool m_pulce;
+  bool m_Active;
 };
 
 #endif /* define QMITKPROGRESSBAR_H */

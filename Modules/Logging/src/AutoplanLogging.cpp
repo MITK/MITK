@@ -200,7 +200,7 @@ namespace Logger
     return impl;
   }
 
-  void Log::reinitLogger() const
+  void Log::reinitLogger()
   {
     boost::log::core::get()->flush();
     boost::log::core::get()->remove_all_sinks();
@@ -250,7 +250,12 @@ namespace Logger
       boost::shared_ptr< boost::asio::ip::tcp::iostream > stream =
         boost::make_shared< boost::asio::ip::tcp::iostream >();
 
-      stream->connect(Options::get().iphost, Options::get().ipport);
+      m_TaskGroup.Enqueue([stream] {
+        stream->connect(Options::get().iphost, Options::get().ipport);
+      });
+
+      //not sure if we should even wait here
+      //m_TaskGroup.WaitAll();
 
       backend->add_stream(stream);
       backend->auto_flush(true);

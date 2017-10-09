@@ -27,6 +27,8 @@
 
 #include <MitkLoggingExports.h>
 
+#include <ThreadPoolUtilities.h>
+
 // TODO add call BOOST_CURRENT_FUNCTION after investigate it behavior on Apple system
 #ifdef __APPLE__
   #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info)
@@ -96,6 +98,8 @@ namespace Logger
       boost::shared_ptr< boost::log::sinks::text_ostream_backend > dataBackend;
       boost::log::attributes::mutable_constant<std::string> sourceAttribute;
 
+      Utilities::TaskGroup m_TaskGroup;
+
     public:
       boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
       boost::shared_ptr< std::stringstream > getDataStream() const;
@@ -104,7 +108,7 @@ namespace Logger
       static Log& get();
       static Log& get(const std::string& src);
 
-      void reinitLogger() const;
+      void reinitLogger();
 
       void setSource(const std::string& src);
 

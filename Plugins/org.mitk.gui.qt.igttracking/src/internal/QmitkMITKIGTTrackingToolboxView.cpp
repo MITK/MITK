@@ -680,7 +680,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
     m_Worker->SetTrackingDevice(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
     m_Worker->SetDataStorage(this->GetDataStorage());
     m_WorkerThread->start();
-    m_TimeoutTimer->start(5000);
+    m_TimeoutTimer->start(7000);
     //disable controls until worker thread is finished
     this->m_Controls->m_MainWidget->setEnabled(false);
   }
@@ -688,9 +688,14 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QString errorMessage)
 {
-  m_TimeoutTimer->stop();
-  m_WorkerThread->quit();
-  m_WorkerThread->wait();
+  //Check, if the thread is running. There might have been a timeOut inbetween and this causes crashes...
+  if (m_WorkerThread->isRunning())
+  {
+    m_TimeoutTimer->stop();
+    m_WorkerThread->quit();
+    m_WorkerThread->wait();
+  }
+
 
   //enable controls again
   this->m_Controls->m_MainWidget->setEnabled(true);

@@ -76,7 +76,7 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
 
   //initialize logging
   mitk::LoggingBackend::Register();
-  QString logFilenamePrefix = "mitk";
+  QString logFilenamePrefix = "autoplan";
   QFileInfo path = context->getDataFile(logFilenamePrefix);
   try
     {

@@ -101,7 +101,7 @@ public:
       testParams( autoLoadTestClass, "autoLoadTestClass" );
     }
 
-    std::string testTempFile = mitk::IOUtil::CreateTemporaryFile("XXXXXX.mitk");
+    std::string testTempFile = mitk::IOUtil::CreateTemporaryFile("XXXXXX.autoplan");
     std::string testXmlTempFile = mitk::IOUtil::CreateTemporaryFile("PersistenceTestFileXXXXXX.xml");
 
     MITK_INFO << "Testing standard write to scene file/xml file.";

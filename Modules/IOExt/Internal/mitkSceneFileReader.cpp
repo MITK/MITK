@@ -26,11 +26,12 @@ SceneFileReader::SceneFileReader()
   : AbstractFileReader()
 {
   CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".scene");
-  mimeType.SetComment("MITK Scene Files");
-  mimeType.SetCategory("MITK Scenes");
+  mimeType.SetComment("Autoplan Scene Files");
+  mimeType.SetCategory("Autoplan Scenes");
+  mimeType.AddExtension("autoplan");
   mimeType.AddExtension("mitk");
 
-  this->SetDescription("MITK Scene Reader");
+  this->SetDescription("Autoplan Scene Reader");
   this->SetMimeType(mimeType);
 
   this->RegisterService();

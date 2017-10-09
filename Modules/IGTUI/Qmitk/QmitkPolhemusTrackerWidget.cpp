@@ -29,8 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 
-#include <usGetModuleContext.h>
-
 const std::string QmitkPolhemusTrackerWidget::VIEW_ID = "org.mitk.views.PolhemusTrackerWidget";
 
 QmitkPolhemusTrackerWidget::QmitkPolhemusTrackerWidget(QWidget* parent, Qt::WindowFlags f)
@@ -60,20 +58,12 @@ void QmitkPolhemusTrackerWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkPolhemusTrackerWidget;
     m_Controls->setupUi(parent);
   }
-
-  //Add Listener, so that we know when the toolStorage changed.
-  us::ModuleContext* moduleContext = us::GetModuleContext();
-  std::string m_Filter = "(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.NavigationToolStorage" + ")";
-  moduleContext->AddServiceListener(this, &QmitkPolhemusTrackerWidget::ToolStorageChanged, m_Filter);
-
 }
 
-void QmitkPolhemusTrackerWidget::ToolStorageChanged(const us::ServiceEvent event)
+void QmitkPolhemusTrackerWidget::OnToolStorageChanged()
 {
-  if ((event.GetType() == us::ServiceEvent::MODIFIED)) {
     this->m_TrackingDevice = nullptr;
     MITK_DEBUG<<"Resetting Polhemus Tracking Device, because tool storage changed.";
-  }
 }
 
 void QmitkPolhemusTrackerWidget::CreateConnections()

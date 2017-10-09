@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkTrackingDeviceWidgetCollection.h"
 
+
 /** Documentation:
  *   \brief An object of this class offers an UI to configurate
  *          a tracking device. If the user finished the configuration process and
@@ -54,6 +55,12 @@ public:
    *         configuration process or if there is an error during configuration NULL is returned.
    */
   mitk::TrackingDevice::Pointer GetTrackingDevice();
+
+  /**
+  * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
+  * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
+  */
+  void OnToolStorageChanged();
 
 signals:
 

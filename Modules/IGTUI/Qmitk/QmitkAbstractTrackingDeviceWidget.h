@@ -156,6 +156,12 @@ public:
   * Can e.g. be used to activate/disactivate options when device is not tracking.
   */
   virtual void OnStopTracking(bool _success) {};
+  /**
+  * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
+  * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
+  */
+  virtual void OnToolStorageChanged() {};
+
 
   std::string m_ErrorMessage; ///< current problem description
 

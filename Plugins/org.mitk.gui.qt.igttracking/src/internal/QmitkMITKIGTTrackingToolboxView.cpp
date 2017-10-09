@@ -178,6 +178,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //connections for the tracking device configuration widget
     connect(m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
 
+
     //! [Thread 3]
     //connect worker thread
     connect(m_Worker, SIGNAL(AutoDetectToolsFinished(bool, QString)), this, SLOT(OnAutoDetectToolsFinished(bool, QString)));
@@ -186,10 +187,16 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), this, SLOT(OnStopTrackingFinished(bool, QString)));
     connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), this, SLOT(OnDisconnectFinished(bool, QString)));
     connect(m_WorkerThread, SIGNAL(started()), m_Worker, SLOT(ThreadFunc()));
+
     connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnConnected(bool)));
     connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnDisconnected(bool)));
     connect(m_Worker, SIGNAL(StartTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStartTracking(bool)));
     connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStopTracking(bool)));
+
+
+    //Add Listener, so that we know when the toolStorage changed.
+    std::string m_Filter = "(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.NavigationToolStorage" + ")";
+    mitk::PluginActivator::GetContext()->connectServiceListener(this, "OnToolStorageChanged", QString(m_Filter.c_str()));
 
     //move the worker to the thread
     m_Worker->moveToThread(m_WorkerThread);
@@ -1154,6 +1161,14 @@ void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
     m_WorkerThread->wait();
   }
   m_TimeoutTimer->stop();
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnToolStorageChanged(const ctkServiceEvent event)
+{
+  if ((event.getType() == ctkServiceEvent::MODIFIED))
+  {
+    m_Controls->m_configurationWidget->OnToolStorageChanged();
+  }
 }
 
 //! [StoreUISettings]

@@ -355,3 +355,8 @@ void QmitkTrackingDeviceConfigurationWidget::OnStopTracking(bool _success)
 {
   this->GetWidget(this->GetCurrentDeviceName())->OnStopTracking(_success);
 }
+
+void QmitkTrackingDeviceConfigurationWidget::OnToolStorageChanged()
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnToolStorageChanged();
+}

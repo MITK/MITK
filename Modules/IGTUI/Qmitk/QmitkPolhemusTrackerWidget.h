@@ -85,8 +85,11 @@ public:
   * Can e.g. be used to activate options of a tracking device only when tracking is started.
   */
   virtual void OnStartTracking(bool _success);
-
-  void ToolStorageChanged(const us::ServiceEvent event);
+  /**
+  * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
+  * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
+  */
+  virtual void OnToolStorageChanged();
 
 };
 #endif

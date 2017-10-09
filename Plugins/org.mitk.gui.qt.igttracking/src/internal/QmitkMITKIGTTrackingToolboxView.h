@@ -138,6 +138,12 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     void OnTimeOut();
 
+    /**
+    * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
+    * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
+    */
+    void OnToolStorageChanged(const ctkServiceEvent event);
+
   protected slots:
 
    //help slots for enable/disable buttons

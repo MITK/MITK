@@ -44,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPluginActivator.h"
 
-
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 
 QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
@@ -528,16 +527,23 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
     QString dataModeSelection = this->m_Controls->m_OpenIGTLinkDataFormat->currentText();
     if (dataModeSelection == "TDATA")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
+    }
     else if (dataModeSelection == "TRANSFORM")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);
+    }
     else if (dataModeSelection == "QTDATA")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTDataMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTDataMsg);
+    }
     else if (dataModeSelection == "POSITION")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);
+    }
     m_IGTLConversionFilter->ConnectTo(m_ToolVisualizationFilter);
     m_IGTLConversionFilter->RegisterAsMicroservice();
-
 
     //create server and message provider
     m_IGTLServer = mitk::IGTLServer::New(false);
@@ -552,7 +558,6 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
   m_Controls->m_StartTrackingSimpleMode->setText("Stop\nTracking");
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(true);
-
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
@@ -618,9 +623,13 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 
   // Code to enable/disable device specific buttons
   if (m_Controls->m_configurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
-    { m_Controls->m_AutoDetectTools->setVisible(true); }
+  {
+    m_Controls->m_AutoDetectTools->setVisible(true);
+  }
   else
-    { m_Controls->m_AutoDetectTools->setVisible(false); }
+  {
+    m_Controls->m_AutoDetectTools->setVisible(false);
+  }
 
   m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_configurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
 
@@ -696,7 +705,6 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
     m_WorkerThread->wait();
   }
 
-
   //enable controls again
   this->m_Controls->m_MainWidget->setEnabled(true);
   EnableTrackingConfigurationButtons();
@@ -715,7 +723,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
   std::string _autoDetectText;
   _autoDetectText = "Autodetected ";
   _autoDetectText.append(this->m_TrackingDeviceData.Line); //This is the device name as string of the current TrackingDevice.
-  _autoDetectText.append( " Storage");
+  _autoDetectText.append(" Storage");
   this->ReplaceCurrentToolStorage(autoDetectedStorage, _autoDetectText);
   //auto save the new storage to hard disc (for persistence)
   AutoSaveToolStorage();
@@ -1136,8 +1144,15 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
 
 void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
 {
-  m_WorkerThread->terminate();
-  m_WorkerThread->wait();
+  MITK_WARN << "TimeOut. Quitting the thread...";
+  m_WorkerThread->quit();
+  //only if we can't quit use terminate.
+  if (!m_WorkerThread->wait(1000))
+  {
+    MITK_ERROR << "Can't quit the thread. Terminating... Might cause further problems, be careful!";
+    m_WorkerThread->terminate();
+    m_WorkerThread->wait();
+  }
   m_TimeoutTimer->stop();
 }
 

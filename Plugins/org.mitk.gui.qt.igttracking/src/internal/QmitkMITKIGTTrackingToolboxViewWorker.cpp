@@ -101,6 +101,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
   m_NavigationToolStorage = nullptr;
   m_NavigationToolStorage = autoDetectedStorage;
   emit AutoDetectToolsFinished(true, "");
+  MITK_INFO << "AutoDetect Tools Finished.";
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()

@@ -46,6 +46,8 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging.preprocessing
   org.mitk.gui.qt.diffusionimaging.reconstruction
   org.mitk.gui.qt.diffusionimaging.tractography
+  org.mitk.gui.qt.matchpoint.algorithm.browser
+  org.mitk.gui.qt.matchpoint.algorithm.control
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing

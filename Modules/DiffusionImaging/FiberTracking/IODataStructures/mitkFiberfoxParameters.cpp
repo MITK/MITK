@@ -718,6 +718,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetDiffusivity(ReadVal<double>(v2,"d",model->GetDiffusivity()));
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
+          model->SetBvalue(m_SignalGen.m_Bvalue);
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
           if (ReadVal<string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
@@ -733,6 +734,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetDiffusivity3(ReadVal<double>(v2,"d3",model->GetDiffusivity3()));
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
+          model->SetBvalue(m_SignalGen.m_Bvalue);
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
           if (ReadVal<string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
@@ -746,6 +748,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetDiffusivity(ReadVal<double>(v2,"d",model->GetDiffusivity()));
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
+          model->SetBvalue(m_SignalGen.m_Bvalue);
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
           if (ReadVal<string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
@@ -759,6 +762,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetDiffusivity(ReadVal<double>(v2,"d",model->GetDiffusivity()));
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
+          model->SetBvalue(m_SignalGen.m_Bvalue);
           model->SetRandomizeSticks(ReadVal<bool>(v2,"randomize",model->GetRandomizeSticks()));
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
           if (ReadVal<string>(v2,"type","",true)=="fiber")

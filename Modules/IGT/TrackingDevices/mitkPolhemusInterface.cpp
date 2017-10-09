@@ -77,7 +77,7 @@ bool mitk::PolhemusInterface::StopTracking()
   return true;
 }
 
-bool mitk::PolhemusInterface::Connect()
+bool mitk::PolhemusInterface::OpenConnection()
 {
   bool returnValue;
   //Initialize, and if it is not successful, return false.
@@ -120,16 +120,33 @@ bool mitk::PolhemusInterface::Connect()
       returnValue = m_pdiDev->CnxReady();
     }
   }
+  return returnValue;
+}
 
-  if (returnValue)
+bool mitk::PolhemusInterface::Connect()
+{
+  bool returnValue = OpenConnection();
+
+  if (!returnValue)
   {
-    m_numberOfTools = this->GetNumberOfTools();
+    return returnValue;
   }
+
+  m_numberOfTools = this->GetNumberOfTools();
 
   //Get the tracking data to find out which tools are available.
   std::vector<mitk::PolhemusInterface::trackingData> _trackingData = GetFrame();
 
-  //if we had tool before, check if they are still the same.
+  //if we have more/less tools than before, reset all data.
+  //check with toolStorage changes is nto enough, 'cause a sensor could just have been unplugged.
+  if (m_ToolPorts.size() != _trackingData.size())
+  {
+    m_ToolPorts.clear();
+    m_Hemispheres.clear();
+    m_HemisphereTracking.clear();
+  }
+
+  //if we have the same number of tools as before, check if they are still the same.
   if (m_ToolPorts.size() == _trackingData.size())
   {
     for (int i = 0; i < _trackingData.size(); ++i)
@@ -176,6 +193,14 @@ bool mitk::PolhemusInterface::Disconnect()
   returnValue = m_pdiDev->Disconnect();
   MITK_INFO << "Disconnect: " << m_pdiDev->GetLastResultStr();
   return returnValue;
+}
+
+std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::AutoDetectTools()
+{
+  OpenConnection();
+  std::vector<mitk::PolhemusInterface::trackingData> frame = GetSingleFrame();
+  m_pdiDev->Disconnect();
+  return frame;
 }
 
 unsigned int mitk::PolhemusInterface::GetNumberOfTools()

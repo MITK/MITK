@@ -25,12 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPolhemusTrackerTypeInformation.h"
 #include <vtkConeSource.h>
 
-
-
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
-
-mitk::PolhemusTrackingDevice::PolhemusTrackingDevice(): mitk::TrackingDevice()
+mitk::PolhemusTrackingDevice::PolhemusTrackingDevice() : mitk::TrackingDevice()
 {
   //set the type of this tracking device
   this->m_Data = mitk::PolhemusTrackerTypeInformation::GetDeviceDataPolhemusTrackerLiberty();
@@ -39,7 +36,6 @@ mitk::PolhemusTrackingDevice::PolhemusTrackingDevice(): mitk::TrackingDevice()
   m_ThreadID = 0;
 
   m_Device = mitk::PolhemusInterface::New();
-
 }
 
 mitk::PolhemusTrackingDevice::~PolhemusTrackingDevice()
@@ -50,7 +46,6 @@ bool mitk::PolhemusTrackingDevice::IsDeviceInstalled()
 {
   return true;
 }
-
 
 mitk::TrackingTool* mitk::PolhemusTrackingDevice::AddTool(const char* toolName, int toolPort)
 {
@@ -105,33 +100,32 @@ bool mitk::PolhemusTrackingDevice::StopTracking()
   return Superclass::StopTracking();
 }
 
-
 unsigned int mitk::PolhemusTrackingDevice::GetToolCount() const
 {
   return (unsigned int)this->m_AllTools.size();
 }
 
-
 mitk::TrackingTool* mitk::PolhemusTrackingDevice::GetTool(unsigned int toolNumber) const
 {
-  if ( toolNumber >= this->GetToolCount())
+  if (toolNumber >= this->GetToolCount())
     return nullptr;
   else
     return this->m_AllTools[toolNumber];
 }
 
-
 bool mitk::PolhemusTrackingDevice::OpenConnection()
 {
   //reset everything
-  if (m_Device.IsNull()) {m_Device = mitk::PolhemusInterface::New();}
+  if (m_Device.IsNull()) { m_Device = mitk::PolhemusInterface::New(); }
   if (!m_Device->Connect()) //Connect the device, if it fails, throw an error.
   {
     MITK_ERROR << "Cannot connect Polhemus device!";
     CloseConnection();
     return false;
   }
-  m_Device->SetHemisphereTrackingEnabled(m_HemisphereTrackingEnabled);
+
+  //Ready must be set here, 'cause if tools don't match we need to be able to disconnect.
+  this->SetState(Ready);
 
   //check if connected ports of Polhemus matches the tools in the toolStorage.
   std::vector<int> toolPorts = m_Device->GetToolPorts();
@@ -139,7 +133,7 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
   //first, check size.
   if (this->GetToolCount() != toolPorts.size())
   {
-    MITK_WARN << "Cannot connect device, number of tools in toolstorage doesn't match the number of tools connected to Polhemus device!";
+    MITK_ERROR << "Cannot connect device, number of tools in toolstorage doesn't match the number of tools connected to Polhemus device!";
     CloseConnection();
     return false;
   }
@@ -149,7 +143,7 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
   {
     if (std::find(toolPorts.begin(), toolPorts.end(), _tool->GetToolPort()) == toolPorts.end())
     {
-      MITK_WARN << "Cannot connect device, tool " << _tool->GetToolPort() << " is not connected to its port.";
+      MITK_ERROR << "Cannot connect device, tool " << _tool->GetToolPort() << " is not connected to its port.";
       CloseConnection();
       return false;
     }
@@ -160,7 +154,8 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
     }
   }
 
-  this->SetState(Ready);
+  m_Device->SetHemisphereTrackingEnabled(m_HemisphereTrackingEnabled);
+
   return true;
 }
 
@@ -176,18 +171,15 @@ bool mitk::PolhemusTrackingDevice::CloseConnection()
   return returnValue;
 }
 
-
 mitk::PolhemusInterface* mitk::PolhemusTrackingDevice::GetDevice()
 {
   return m_Device;
 }
 
-
 std::vector<mitk::PolhemusTool::Pointer> mitk::PolhemusTrackingDevice::GetAllTools()
 {
   return this->m_AllTools;
 }
-
 
 void mitk::PolhemusTrackingDevice::TrackTools()
 {
@@ -202,8 +194,6 @@ void mitk::PolhemusTrackingDevice::TrackTools()
     this->m_StopTrackingMutex->Unlock();
     Sleep(100);//Wait a bit until the tracker is ready...
 
-
-
     while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
       std::vector<mitk::PolhemusInterface::trackingData> lastData = this->GetDevice()->GetLastFrame();
@@ -214,8 +204,6 @@ void mitk::PolhemusTrackingDevice::TrackTools()
       }
       else
       {
-
-
         std::vector<mitk::PolhemusTool::Pointer> allTools = this->GetAllTools();
         for (int i = 0; i < allTools.size(); i++)
         {
@@ -230,10 +218,9 @@ void mitk::PolhemusTrackingDevice::TrackTools()
       this->m_StopTrackingMutex->Lock();
       localStopTracking = m_StopTracking;
       this->m_StopTrackingMutex->Unlock();
-
     }
   }
-  catch(...)
+  catch (...)
   {
     this->StopTracking();
     mitkThrowException(mitk::IGTHardwareException) << "Error while trying to track tools. Thread stopped.";
@@ -267,14 +254,11 @@ bool mitk::PolhemusTrackingDevice::AutoDetectToolsAvailable()
 
 mitk::NavigationToolStorage::Pointer mitk::PolhemusTrackingDevice::AutoDetectTools()
 {
-  this->OpenConnection();
-  std::vector<mitk::PolhemusInterface::trackingData> singeFrameData = this->m_Device->GetSingleFrame();
+  std::vector<mitk::PolhemusInterface::trackingData> singeFrameData = this->m_Device->AutoDetectTools();
   MITK_INFO << "Found " << singeFrameData.size() << " tools.";
-  this->CloseConnection();
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
   for each (mitk::PolhemusInterface::trackingData t in singeFrameData)
   {
-
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     std::stringstream name;
     name << "Sensor-" << ((int)t.id);
@@ -312,14 +296,14 @@ void  mitk::PolhemusTrackingDevice::SetHemisphereTrackingEnabled(bool _Hemispher
   /* m_Device->SetHemi works only if the device is connected. However, GUI can also change if it is not connected.
      In this case, we remember it in the m_HemisphereTrackingEnabled variable. And when connecting, we know, which
      status is wanted from the user by GUI.
-  */
-    m_HemisphereTrackingEnabled = _HemisphereTrackingEnabled;
-    this->m_Device->SetHemisphereTrackingEnabled(_HemisphereTrackingEnabled);
+     */
+  m_HemisphereTrackingEnabled = _HemisphereTrackingEnabled;
+  this->m_Device->SetHemisphereTrackingEnabled(_HemisphereTrackingEnabled);
 }
 
 void  mitk::PolhemusTrackingDevice::ToggleHemisphere(int _tool)
 {
-    this->m_Device->ToggleHemisphere(_tool);
+  this->m_Device->ToggleHemisphere(_tool);
 }
 
 void mitk::PolhemusTrackingDevice::SetHemisphere(int _tool, mitk::Vector3D _hemisphere)
@@ -339,7 +323,7 @@ mitk::Vector3D mitk::PolhemusTrackingDevice::GetHemisphere(int _tool)
 
 bool mitk::PolhemusTrackingDevice::GetHemisphereTrackingEnabled(int _tool)
 {
-    return this->m_Device->GetHemisphereTrackingEnabled(_tool);
+  return this->m_Device->GetHemisphereTrackingEnabled(_tool);
 }
 
 void mitk::PolhemusTrackingDevice::AdjustHemisphere(int _tool)

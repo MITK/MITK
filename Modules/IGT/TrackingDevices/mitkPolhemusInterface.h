@@ -113,6 +113,9 @@ namespace mitk
     /** @return Returns a single frame. Only works if the tracking device is not in continous tracking mode. Returns an empty vector in case of an error.*/
     std::vector<trackingData> GetSingleFrame();
 
+    /** @return Returns a single frame with all tools, which could be auto detected.*/
+    std::vector<trackingData> AutoDetectTools();
+
     /** @return Returns the last frame when the tracking device is in continous tracking mode. Returns an empty vector in case of an error.*/
     std::vector<trackingData> GetLastFrame();
 
@@ -147,6 +150,9 @@ namespace mitk
   private:
     //returns vector with tool index as only element if tool != -1, else returns vector from 0 to numberOfTools
     std::vector<int> GetToolIterator(int _tool);
+
+    //helper method to open connection
+    bool OpenConnection();
 
 
   private:

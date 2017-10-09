@@ -29,6 +29,7 @@ SceneFileReader::SceneFileReader()
   mimeType.SetComment("Autoplan Scene Files");
   mimeType.SetCategory("Autoplan Scenes");
   mimeType.AddExtension("autoplan");
+  mimeType.AddExtension("mitk");
 
   this->SetDescription("Autoplan Scene Reader");
   this->SetMimeType(mimeType);

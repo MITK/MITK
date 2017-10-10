@@ -28,9 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 void QmitkProgressBar::Reset()
 {
-  if (m_pulce)
+  if (m_Pulse)
   {
-    QMetaObject::invokeMethod(m_timer, "stop");
+    QMetaObject::invokeMethod(m_Timer, "stop");
   }
 
   QMetaObject::invokeMethod(this, "reset");
@@ -38,7 +38,7 @@ void QmitkProgressBar::Reset()
 
   m_TotalSteps = 0;
   m_Progress = 0;
-  m_pulce = false;
+  m_Pulse = false;
   m_Active = false;
 }
 
@@ -79,10 +79,10 @@ QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
   this->hide();
   this->SetPercentageVisible(true);
 
-  m_pulce = false;
+  m_Pulse = false;
 
-  m_timer = new QTimer();
-  connect(m_timer, SIGNAL(timeout()), this, SLOT(SlotOnTimeout()));
+  m_Timer = new QTimer();
+  connect(m_Timer, SIGNAL(timeout()), this, SLOT(SlotOnTimeout()));
 
   connect( this, SIGNAL(SignalAddStepsToDo(unsigned int)), this, SLOT(SlotAddStepsToDo(unsigned int)) );
   connect( this, SIGNAL(SignalProgress(unsigned int)), this, SLOT(SlotProgress(unsigned int)) );
@@ -103,16 +103,17 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
 
   if (m_Progress >= m_TotalSteps)
   {
-    if (!m_pulce)
+    if (!m_Pulse)
     {
       Reset();
     }
     else
     {
-      if (m_Progress >= m_TotalSteps)
+      if (m_Progress > m_TotalSteps)
       {
         m_Progress = 0;
         m_TotalSteps = 100;
+        setValue(0);
       }
     }
   }
@@ -136,20 +137,23 @@ void QmitkProgressBar::SlotAddStepsToDo(unsigned int steps)
   this->setValue(m_Progress);
   if (m_TotalSteps > 0)
   {
-    m_pulce = false;
-    this->show();
+    m_Pulse = false;
+
+    setTextVisible(true);
+    show();
   }
   else
   {
-    m_pulce = true;
+    m_Pulse = true;
 
-    setRange(0, 0);
+    setRange(0, 100);
     setValue(0);
 
-    m_timer->start(100);
+    m_Timer->start(50);
 
     m_TotalSteps = 100;
 
+    this->setTextVisible(false);
     show();
   }
 
@@ -168,11 +172,7 @@ void QmitkProgressBar::SlotSetPercentageVisible(bool visible)
 
 void QmitkProgressBar::SlotOnTimeout()
 {
-  int progressPos = value();
-  progressPos += 10;
-
-  Progress(progressPos);
-
+  Progress(5);
   QApplication::processEvents();
 }
 

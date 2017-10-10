@@ -87,8 +87,8 @@ private:
 
   unsigned int m_Progress;
 
-  QTimer* m_timer;
-  bool m_pulce;
+  QTimer* m_Timer;
+  bool m_Pulse;
   bool m_Active;
 };
 

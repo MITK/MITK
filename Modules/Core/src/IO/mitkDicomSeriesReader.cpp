@@ -433,6 +433,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   lastDifferentOrigin.Fill(0.0f);
 
   bool lastOriginInitialized(false);
+  bool serieEnded(false);
 
   MITK_DEBUG << "--------------------------------------------------------------------------------";
   MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << true << ")";
@@ -441,6 +442,12 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
        fileIter != files.end();
        ++fileIter, ++fileIndex)
   {
+    // If serie ended add rest of files to unsorted block
+    if (serieEnded) {
+      result.AddFileToUnsortedBlock(*fileIter);
+      continue;
+    }
+
     bool fileFitsIntoPattern(false);
     std::string thisOriginString;
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
@@ -592,9 +599,10 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           // We split the input file list at this point, i.e. all files up to this one (excluding it)
           // are returned as group 1, the remaining files (including the faulty one) are group 2
 
-          /* Optimistic approach: check if any of the remaining slices fits in */
+          // Consider that old serie has ended and all next files belong to unsorted
           result.AddFileToUnsortedBlock( *fileIter ); // sort away for further analysis
           fileFitsIntoPattern = false;
+          serieEnded = true;
         }
         else
         {
@@ -1151,32 +1159,26 @@ DicomSeriesReader::GdcmSortFunction(
       dist2 += normal[i] * image_pos2[i];
     }
 
-    // if we can sort by just comparing the distance, we do exactly that
-    if ( fabs(dist1 - dist2) >= mitk::eps)
-    {
-      // default: compare position
-      return dist1 < dist2;
+    // Try to sort by Acquisition Number
+    static const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
+
+    double acquisition_number1 = 0.0;
+    double acquisition_number2 = 0.0;
+    if (ds1.second.find(tagAcquisitionNumber) != ds1.second.end() && ds2.second.find(tagAcquisitionNumber) != ds2.second.end()) {
+      acquisition_number1 = std::stod(ds1.second.at(tagAcquisitionNumber)); // Acquisition number
+      acquisition_number2 = std::stod(ds2.second.at(tagAcquisitionNumber));
     }
-    else // we need to check more properties to distinguish slices
-    {
-      // try to sort by Acquisition Number
-      static const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
 
-      double acquisition_number1 = 0.0;
-      double acquisition_number2 = 0.0;
-      if (ds1.second.find(tagAcquisitionNumber) != ds1.second.end() && ds2.second.find(tagAcquisitionNumber) != ds2.second.end())
-      {
-        acquisition_number1 = std::stod(ds1.second.at(tagAcquisitionNumber)); // Acquisition number
-        acquisition_number2 = std::stod(ds2.second.at(tagAcquisitionNumber));
-      }
-
-      if (acquisition_number1 != acquisition_number2)
-      {
-        return acquisition_number1 < acquisition_number2;
-      }
-      else // neither position nor acquisition number are good for sorting, so check more
-      {
-        // let's try temporal index
+    if (acquisition_number1 != acquisition_number2) {
+      return acquisition_number1 < acquisition_number2;
+    } else {
+      // We need to check more properties to distinguish slices
+      if (fabs(dist1 - dist2) >= mitk::eps) {
+        // Default: compare position
+        return dist1 < dist2;
+      } else {
+        // Neither position nor acquisition number are good for sorting, so check more
+        // Let's try temporal index
         static const gdcm::Tag tagTemporalIndex(0x0020, 0x9128);
         double temporalIndex1 = 0.0;
         double temporalIndex2 = 0.0;

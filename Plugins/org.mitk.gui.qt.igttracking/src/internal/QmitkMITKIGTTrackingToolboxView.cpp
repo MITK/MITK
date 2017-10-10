@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkMITKIGTTrackingToolboxView.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
 #include "QmitkStdMultiWidget.h"
 
 // Qt
@@ -30,32 +29,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
-#include <mitkTrackingDeviceSourceConfigurator.h>
 #include <mitkTrackingVolumeGenerator.h>
-#include <mitkNDITrackingDevice.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
-//#include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
-#include <usModule.h>
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
-#include "mitkNDIAuroraTypeInformation.h"
-
-// vtk
-#include <vtkSphereSource.h>
 
 //for exceptions
 #include <mitkIGTException.h>
 #include <mitkIGTIOException.h>
 
-//for Microservice
 #include "mitkPluginActivator.h"
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
-#include "usServiceReference.h"
 
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 
@@ -138,7 +125,7 @@ QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
     this->GetDataStorage()->Remove(m_TrackingVolumeNode);
     //unregister microservices
     if (m_toolStorage) { m_toolStorage->UnRegisterMicroservice(); }
-    if (m_TrackingDeviceSource) { m_TrackingDeviceSource->UnRegisterMicroservice(); }
+
     if (m_IGTLMessageProvider.IsNotNull()){ m_IGTLMessageProvider->UnRegisterMicroservice(); }
   }
   catch (std::exception& e) { MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what(); }
@@ -191,6 +178,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //connections for the tracking device configuration widget
     connect(m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
 
+
     //! [Thread 3]
     //connect worker thread
     connect(m_Worker, SIGNAL(AutoDetectToolsFinished(bool, QString)), this, SLOT(OnAutoDetectToolsFinished(bool, QString)));
@@ -199,6 +187,16 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), this, SLOT(OnStopTrackingFinished(bool, QString)));
     connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), this, SLOT(OnDisconnectFinished(bool, QString)));
     connect(m_WorkerThread, SIGNAL(started()), m_Worker, SLOT(ThreadFunc()));
+
+    connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnConnected(bool)));
+    connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnDisconnected(bool)));
+    connect(m_Worker, SIGNAL(StartTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStartTracking(bool)));
+    connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStopTracking(bool)));
+
+
+    //Add Listener, so that we know when the toolStorage changed.
+    std::string m_Filter = "(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.NavigationToolStorage" + ")";
+    mitk::PluginActivator::GetContext()->connectServiceListener(this, "OnToolStorageChanged", QString(m_Filter.c_str()));
 
     //move the worker to the thread
     m_Worker->moveToThread(m_WorkerThread);
@@ -347,13 +345,13 @@ void QmitkMITKIGTTrackingToolboxView::OnFreezeUnfreezeTracking()
 {
   if (m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Freeze Tracking")
   {
-    m_TrackingDeviceSource->Freeze();
+    m_Worker->GetTrackingDeviceSource()->Freeze();
     m_Controls->m_FreezeUnfreezeTrackingButton->setText("Unfreeze Tracking");
     m_Controls->m_TrackingFrozenLabel->setVisible(true);
   }
   else if (m_Controls->m_FreezeUnfreezeTrackingButton->text() == "Unfreeze Tracking")
   {
-    m_TrackingDeviceSource->UnFreeze();
+    m_Worker->GetTrackingDeviceSource()->UnFreeze();
     m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
     m_Controls->m_TrackingFrozenLabel->setVisible(false);
   }
@@ -367,7 +365,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectDisconnect()
 
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
 {
-  MITK_INFO << "Connect Clicked";
+  MITK_DEBUG << "Connect Clicked";
   //check if everything is ready to start tracking
   if (this->m_toolStorage.IsNull())
   {
@@ -427,7 +425,6 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
 
   //! [Thread 6]
   //get data from worker thread
-  m_TrackingDeviceSource = m_Worker->GetTrackingDeviceSource();
   m_TrackingDeviceData = m_Worker->GetTrackingDeviceData();
   m_ToolVisualizationFilter = m_Worker->GetToolVisualizationFilter();
   //! [Thread 6]
@@ -521,9 +518,9 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_Controls->m_TrackingControlLabel->setText("Status: tracking");
 
   //connect the tool visualization widget
-  for (std::size_t i = 0; i < m_TrackingDeviceSource->GetNumberOfOutputs(); i++)
+  for (std::size_t i = 0; i < m_Worker->GetTrackingDeviceSource()->GetNumberOfOutputs(); i++)
   {
-    m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
+    m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_Worker->GetTrackingDeviceSource()->GetOutput(i));
   }
   m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
   if (m_Controls->m_ShowToolQuaternions->isChecked()) { m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true); }
@@ -537,16 +534,23 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
     QString dataModeSelection = this->m_Controls->m_OpenIGTLinkDataFormat->currentText();
     if (dataModeSelection == "TDATA")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
+    }
     else if (dataModeSelection == "TRANSFORM")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);
+    }
     else if (dataModeSelection == "QTDATA")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTDataMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTDataMsg);
+    }
     else if (dataModeSelection == "POSITION")
-      {m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);}
+    {
+      m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendQTransMsg);
+    }
     m_IGTLConversionFilter->ConnectTo(m_ToolVisualizationFilter);
     m_IGTLConversionFilter->RegisterAsMicroservice();
-
 
     //create server and message provider
     m_IGTLServer = mitk::IGTLServer::New(false);
@@ -561,7 +565,6 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
   m_Controls->m_StartTrackingSimpleMode->setText("Stop\nTracking");
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(true);
-
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
@@ -627,14 +630,15 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 
   // Code to enable/disable device specific buttons
   if (m_Controls->m_configurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
-    { m_Controls->m_AutoDetectTools->setVisible(true); }
+  {
+    m_Controls->m_AutoDetectTools->setVisible(true);
+  }
   else
-    { m_Controls->m_AutoDetectTools->setVisible(false); }
+  {
+    m_Controls->m_AutoDetectTools->setVisible(false);
+  }
 
-  if (Type == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) //Aurora
-    { m_Controls->m_AddSingleTool->setEnabled(false);}
-  else //other trackers
-    { m_Controls->m_AddSingleTool->setEnabled(true); }
+  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_configurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
 
   // Code to select appropriate tracking volume for current type
   std::vector<mitk::TrackingDeviceData> Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(Type);
@@ -692,7 +696,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
     m_Worker->SetTrackingDevice(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
     m_Worker->SetDataStorage(this->GetDataStorage());
     m_WorkerThread->start();
-    m_TimeoutTimer->start(5000);
+    m_TimeoutTimer->start(7000);
     //disable controls until worker thread is finished
     this->m_Controls->m_MainWidget->setEnabled(false);
   }
@@ -700,9 +704,13 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QString errorMessage)
 {
-  m_TimeoutTimer->stop();
-  m_WorkerThread->quit();
-  m_WorkerThread->wait();
+  //Check, if the thread is running. There might have been a timeOut inbetween and this causes crashes...
+  if (m_WorkerThread->isRunning())
+  {
+    m_TimeoutTimer->stop();
+    m_WorkerThread->quit();
+    m_WorkerThread->wait();
+  }
 
   //enable controls again
   this->m_Controls->m_MainWidget->setEnabled(true);
@@ -719,7 +727,11 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
   mitk::NavigationToolStorage::Pointer autoDetectedStorage = m_Worker->GetNavigationToolStorage();
 
   //save detected tools
-  this->ReplaceCurrentToolStorage(autoDetectedStorage, "Autodetected NDI Aurora Storage");
+  std::string _autoDetectText;
+  _autoDetectText = "Autodetected ";
+  _autoDetectText.append(this->m_TrackingDeviceData.Line); //This is the device name as string of the current TrackingDevice.
+  _autoDetectText.append(" Storage");
+  this->ReplaceCurrentToolStorage(autoDetectedStorage, _autoDetectText);
   //auto save the new storage to hard disc (for persistence)
   AutoSaveToolStorage();
   //update label
@@ -1108,7 +1120,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(true);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(true);
+  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_configurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
   m_Controls->m_LoadTools->setEnabled(true);
   m_Controls->m_ResetTools->setEnabled(true);
 }
@@ -1116,7 +1128,7 @@ void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(false);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(false);
+  m_Controls->m_AddSingleTool->setEnabled(false);
   m_Controls->m_LoadTools->setEnabled(false);
   m_Controls->m_ResetTools->setEnabled(false);
 }
@@ -1139,9 +1151,24 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
 
 void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
 {
-  m_WorkerThread->terminate();
-  m_WorkerThread->wait();
+  MITK_WARN << "TimeOut. Quitting the thread...";
+  m_WorkerThread->quit();
+  //only if we can't quit use terminate.
+  if (!m_WorkerThread->wait(1000))
+  {
+    MITK_ERROR << "Can't quit the thread. Terminating... Might cause further problems, be careful!";
+    m_WorkerThread->terminate();
+    m_WorkerThread->wait();
+  }
   m_TimeoutTimer->stop();
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnToolStorageChanged(const ctkServiceEvent event)
+{
+  if ((event.getType() == ctkServiceEvent::MODIFIED))
+  {
+    m_Controls->m_configurationWidget->OnToolStorageChanged();
+  }
 }
 
 //! [StoreUISettings]
@@ -1227,249 +1254,4 @@ void QmitkMITKIGTTrackingToolboxView::AutoSaveToolStorage()
   m_ToolStorageFilename = m_AutoSaveFilename;
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
   mySerializer->Serialize(m_ToolStorageFilename.toStdString(), m_toolStorage);
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::SetWorkerMethod(WorkerMethod w)
-{
-  m_WorkerMethod = w;
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::SetTrackingDevice(mitk::TrackingDevice::Pointer t)
-{
-  m_TrackingDevice = t;
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::SetDataStorage(mitk::DataStorage::Pointer d)
-{
-  m_DataStorage = d;
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::SetInverseMode(bool mode)
-{
-  m_InverseMode = mode;
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::SetTrackingDeviceData(mitk::TrackingDeviceData d)
-{
-  m_TrackingDeviceData = d;
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::SetNavigationToolStorage(mitk::NavigationToolStorage::Pointer n)
-{
-  m_NavigationToolStorage = n;
-}
-
-//! [Thread 7]
-void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
-{
-  switch (m_WorkerMethod)
-  {
-  case eAutoDetectTools:
-    this->AutoDetectTools();
-    break;
-  case eConnectDevice:
-    this->ConnectDevice();
-    break;
-  case eStartTracking:
-    this->StartTracking();
-    break;
-  case eStopTracking:
-    this->StopTracking();
-    break;
-  case eDisconnectDevice:
-    this->DisconnectDevice();
-    break;
-  default:
-    MITK_WARN << "Undefined worker method was set ... something went wrong!";
-    break;
-  }
-}
-//! [Thread 7]
-
-void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
-{
-  //mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-  mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(m_DataStorage);
-  try
-  {
-    mitk::NavigationToolStorage::Pointer tempStorage = m_TrackingDevice->AutoDetectTools();
-    //mitk::ProgressBar::GetInstance()->Progress();
-    for (int i = 0; i < tempStorage->GetToolCount(); i++) { autoDetectedStorage->AddTool(tempStorage->GetTool(i)); }
-  }
-  catch (mitk::Exception& e)
-  {
-    MITK_WARN << e.GetDescription();
-    //mitk::ProgressBar::GetInstance()->Reset();
-    emit AutoDetectToolsFinished(false, e.GetDescription());
-    return;
-  }
-  m_NavigationToolStorage = autoDetectedStorage;
-  //::ProgressBar::GetInstance()->Progress();
-  emit AutoDetectToolsFinished(true, "");
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
-{
-  std::string message = "";
-  //mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
-
-  //build the IGT pipeline
-  mitk::TrackingDevice::Pointer trackingDevice = m_TrackingDevice;
-  trackingDevice->SetData(m_TrackingDeviceData);
-
-  //set device to rotation mode transposed becaus we are working with VNL style quaternions
-  if (m_InverseMode)
-  {
-    trackingDevice->SetRotationMode(mitk::TrackingDevice::RotationTransposed);
-  }
-
-  //Get Tracking Volume Data
-  mitk::TrackingDeviceData data = m_TrackingDeviceData;
-  //mitk::ProgressBar::GetInstance()->Progress();
-
-  //Create Navigation Data Source with the factory class
-  mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(m_NavigationToolStorage, trackingDevice);
-  m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(m_ToolVisualizationFilter);
-  //mitk::ProgressBar::GetInstance()->Progress();
-
-  if (m_TrackingDeviceSource.IsNull())
-  {
-    message = std::string("Cannot connect to device: ") + myTrackingDeviceSourceFactory->GetErrorMessage();
-    emit ConnectDeviceFinished(false, QString(message.c_str()));
-    return;
-  }
-
-  //set filter to rotation mode transposed becaus we are working with VNL style quaternions
-  if (m_InverseMode)
-    m_ToolVisualizationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
-
-  //First check if the created object is valid
-  if (m_TrackingDeviceSource.IsNull())
-  {
-    message = myTrackingDeviceSourceFactory->GetErrorMessage();
-    emit ConnectDeviceFinished(false, QString(message.c_str()));
-    return;
-  }
-
-  MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
-  //mitk::ProgressBar::GetInstance()->Progress();
-
-  //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
-  mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
-
-  if ((toolsInNewOrder.IsNotNull()) && (toolsInNewOrder->GetToolCount() > 0))
-  {
-    //so delete the old tools in wrong order and add them in the right order
-    //we cannot simply replace the tool storage because the new storage is
-    //not correctly initialized with the right data storage
-
-    /*
-    m_NavigationToolStorage->DeleteAllTools();
-    for (int i=0; i < toolsInNewOrder->GetToolCount(); i++) {m_NavigationToolStorage->AddTool(toolsInNewOrder->GetTool(i));}
-
-    This was replaced and thereby fixed Bug 18318 DeleteAllTools() is not Threadsafe!
-    */
-    for (int i = 0; i < toolsInNewOrder->GetToolCount(); i++)
-    {
-      m_NavigationToolStorage->AssignToolNumber(toolsInNewOrder->GetTool(i)->GetIdentifier(), i);
-    }
-  }
-
-  //mitk::ProgressBar::GetInstance()->Progress();
-
-  //connect to device
-  try
-  {
-    m_TrackingDeviceSource->Connect();
-    //mitk::ProgressBar::GetInstance()->Reset();
-    //Microservice registration:
-    m_TrackingDeviceSource->RegisterAsMicroservice();
-    m_NavigationToolStorage->UnRegisterMicroservice();
-    m_NavigationToolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
-    m_NavigationToolStorage->LockStorage();
-  }
-  catch (...) //todo: change to mitk::IGTException
-  {
-    message = "Error on connecting the tracking device.";
-    emit ConnectDeviceFinished(false, QString(message.c_str()));
-    return;
-  }
-  emit ConnectDeviceFinished(true, QString(message.c_str()));
-  //mitk::ProgressBar::GetInstance()->Reset();
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
-{
-  QString errorMessage = "";
-  try
-  {
-    m_TrackingDeviceSource->StartTracking();
-  }
-  catch (...) //todo: change to mitk::IGTException
-  {
-    errorMessage += "Error while starting the tracking device!";
-    emit StartTrackingFinished(false, errorMessage);
-    return;
-  }
-  //remember the original colors of the tools
-  m_OriginalColors = std::map<mitk::DataNode::Pointer, mitk::Color>();
-  for (int i = 0; i < this->m_NavigationToolStorage->GetToolCount(); i++)
-  {
-    mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
-    float c[3];
-    currentToolNode->GetColor(c);
-    mitk::Color color;
-    color.SetRed(c[0]);
-    color.SetGreen(c[1]);
-    color.SetBlue(c[2]);
-    m_OriginalColors[currentToolNode] = color;
-  }
-
-  emit StartTrackingFinished(true, errorMessage);
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
-{
-  //stop tracking
-  try
-  {
-    m_TrackingDeviceSource->StopTracking();
-  }
-  catch (mitk::Exception& e)
-  {
-    emit StopTrackingFinished(false, e.GetDescription());
-  }
-
-  //restore the original colors of the tools
-  for (int i = 0; i < this->m_NavigationToolStorage->GetToolCount(); i++)
-  {
-    mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
-    if (m_OriginalColors.find(currentToolNode) == m_OriginalColors.end())
-    {
-      MITK_WARN << "Cannot restore original color of tool " << m_NavigationToolStorage->GetTool(i)->GetToolName();
-    }
-    else
-    {
-      currentToolNode->SetColor(m_OriginalColors[currentToolNode]);
-    }
-  }
-
-  //emit signal
-  emit StopTrackingFinished(true, "");
-}
-
-void QmitkMITKIGTTrackingToolboxViewWorker::DisconnectDevice()
-{
-  try
-  {
-    if (m_TrackingDeviceSource->IsTracking()) { m_TrackingDeviceSource->StopTracking(); }
-    m_TrackingDeviceSource->Disconnect();
-    m_TrackingDeviceSource->UnRegisterMicroservice();
-    m_NavigationToolStorage->UnLockStorage();
-  }
-  catch (mitk::Exception& e)
-  {
-    emit DisconnectDeviceFinished(false, e.GetDescription());
-  }
-  emit DisconnectDeviceFinished(true, "");
 }

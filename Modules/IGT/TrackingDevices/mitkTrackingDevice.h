@@ -130,13 +130,20 @@ namespace mitk {
       TrackingDeviceState GetState() const;
 
       /**
-       * \brief Deprecated! Use the more specific getDeviceData instead. return device type identifier
+       * \brief Deprecated! Use the more specific getData or GetTrackingDeviceName instead. return device type identifier
        */
     TrackingDeviceType GetType() const;
        /**
        * \brief Deprecated! Use the more specific setDeviceData instead. set device type
        */
     void SetType(TrackingDeviceType type);
+
+    /**
+    * \brief Convenient Method to get the Name of the Tracking Device.
+    * This is identical with GetData().Line and can be used to compare with TrackingDeviceTypeInformation::GetTrackingDeviceName()
+    * to check if you have a specific device.
+    */
+    std::string GetTrackingDeviceName();
 
      /**
        * \brief return device data
@@ -166,6 +173,9 @@ namespace mitk {
 
     /** @return Returns true if this device can autodetects its tools. */
     virtual bool AutoDetectToolsAvailable();
+
+    /** @return Returns true if it is possible to add a single tool. Default return is true.*/
+    virtual bool AddSingleToolIsAvailable();
 
     /** Autodetects tools from this device and returns them as a navigation tool storage.
      *  @return Returns the detected tools. Returns an empty storage if no tools are present

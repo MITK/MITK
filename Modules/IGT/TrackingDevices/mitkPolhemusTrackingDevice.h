@@ -30,6 +30,8 @@ namespace mitk
   *   \brief An object of this class represents Polhemus tracking device. You can add tools to this
   *          device, then open the connection and start tracking. The tracking device will then
   *          continuously update the tool coordinates.
+  *          The tools which are used by Polhemus need to be connected to the correct port.
+  *          The port of the tool is stored as m_ToolPort in PolhemusTool AND as identifier in the NavigationTool (ToolStorage).
   *   \ingroup IGT
   */
   class MITKIGT_EXPORT PolhemusTrackingDevice : public TrackingDevice
@@ -88,7 +90,9 @@ namespace mitk
     *
     * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
-    mitk::TrackingTool* AddTool(const char* toolName);
+    mitk::TrackingTool* AddTool(const char* toolName, int toolPort);
+
+
 
     bool IsDeviceInstalled();
 
@@ -102,7 +106,23 @@ namespace mitk
     virtual mitk::NavigationToolStorage::Pointer AutoDetectTools();
 
     /** Enables/disables hemisphere tracking for all sensors. */
-    itkSetMacro(HemisphereTrackingEnabled, bool);
+    void SetHemisphereTrackingEnabled(bool _HemisphereTrackingEnabled);
+
+    /** Is Hemisphere Tracking Enabled for this tool? */
+    bool GetHemisphereTrackingEnabled(int _tool);
+
+    /** Toggles the current hemisphere. Parameter _tool describes, for which tool the hemisphere should change. Default -1 toggles all tools.*/
+    void ToggleHemisphere(int _tool = -1);
+
+    /** Sets the Hemisphere of tool _tool to the vector _hemisphere */
+    void SetHemisphere(int _tool, mitk::Vector3D _hemisphere);
+
+    /** Get the Hemisphere for _tool as mitk vector */
+    mitk::Vector3D GetHemisphere(int _tool);
+
+    /** Adjust the Hemisphere for this tool. User needs to make sure, that the tool is located in hemisphere (1|0|0) when calling this function.
+    In contrast to SetHemisphere(1,0,0), this method restores the original HemisphereTracking settings at the end. */
+    void AdjustHemisphere(int _tool);
 
   protected:
     PolhemusTrackingDevice();

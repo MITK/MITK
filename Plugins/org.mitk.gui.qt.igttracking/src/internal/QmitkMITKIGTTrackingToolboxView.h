@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include <mitkNavigationToolStorage.h>
-#include <mitkTrackingDeviceSource.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 #include <mitkNavigationDataRecorder.h>
 #include <mitkNavigationDataToIGTLMessageFilter.h>
@@ -35,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QTimer>
 
-class QmitkMITKIGTTrackingToolboxViewWorker;
+#include "QmitkMITKIGTTrackingToolboxViewWorker.h"
 
 /*!
   \brief QmitkMITKIGTTrackingToolboxView
@@ -139,6 +138,12 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     void OnTimeOut();
 
+    /**
+    * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
+    * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
+    */
+    void OnToolStorageChanged(const ctkServiceEvent event);
+
   protected slots:
 
    //help slots for enable/disable buttons
@@ -186,7 +191,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     void GlobalReinit();
 
    //members for the filter pipeline
-   mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline
    mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
    mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
    mitk::NavigationDataRecorder::Pointer m_loggingFilter; ///> holds the logging filter if logging is on (third filter of the IGT pipeline)
@@ -235,74 +239,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    ctkServiceReference m_DeviceTypeServiceReference;
    mitk::TrackingDeviceTypeCollection* m_DeviceTypeCollection;
 };
-
-
-/**
- * Worker thread class for this view.
- */
-class QmitkMITKIGTTrackingToolboxViewWorker : public QObject
-{
-  Q_OBJECT
-
-public:
-  enum WorkerMethod{
-    eAutoDetectTools = 0,
-    eConnectDevice = 1,
-    eStartTracking = 2,
-    eStopTracking = 3,
-    eDisconnectDevice = 4
-  };
-
-  void SetWorkerMethod(WorkerMethod w);
-  void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
-  void SetDataStorage(mitk::DataStorage::Pointer d);
-  void SetInverseMode(bool mode);
-  void SetTrackingDeviceData(mitk::TrackingDeviceData d);
-  void SetNavigationToolStorage(mitk::NavigationToolStorage::Pointer n);
-
-  itkGetMacro(NavigationToolStorage,mitk::NavigationToolStorage::Pointer);
-
-  itkGetMacro(TrackingDeviceSource,mitk::TrackingDeviceSource::Pointer);
-  itkGetMacro(TrackingDeviceData,mitk::TrackingDeviceData);
-  itkGetMacro(ToolVisualizationFilter,mitk::NavigationDataObjectVisualizationFilter::Pointer);
-
-  public slots:
-    void ThreadFunc();
-
-  signals:
-    void AutoDetectToolsFinished(bool success, QString errorMessage);
-    void ConnectDeviceFinished(bool success, QString errorMessage);
-    void StartTrackingFinished(bool success, QString errorMessage);
-    void StopTrackingFinished(bool success, QString errorMessage);
-    void DisconnectDeviceFinished(bool success, QString errorMessage);
-
-
-  protected:
-
-    mitk::TrackingDevice::Pointer m_TrackingDevice;
-    WorkerMethod m_WorkerMethod;
-    mitk::DataStorage::Pointer m_DataStorage;
-    mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
-
-    //members for the filter pipeline which is created in the worker thread during ConnectDevice()
-    mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline
-    mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
-    mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
-
-    //members some internal flags
-    bool m_InverseMode;     //flag that is true when the inverse mode is enabled
-
-    //stores the original colors of the tracking tools
-    std::map<mitk::DataNode::Pointer,mitk::Color> m_OriginalColors;
-
-    //internal methods
-    void AutoDetectTools();
-    void ConnectDevice();
-    void StartTracking();
-    void StopTracking();
-    void DisconnectDevice();
-};
-
 
 
 #endif // _QMITKMITKIGTTRACKINGTOOLBOXVIEW_H_INCLUDED

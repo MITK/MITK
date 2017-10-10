@@ -83,8 +83,7 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
       m_DataStorage->Remove(readTool->GetDataNode());
     }
     UpdateToolTable();
-    m_NavigationToolStorage->UpdateMicroservice();
-  }
+}
 }
 
 void QmitkNavigationToolManagementWidget::OnSaveTool()
@@ -144,7 +143,6 @@ void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorag
     DisableStorageControls();
   }
   UpdateToolTable();
-  m_NavigationToolStorage->UpdateMicroservice();
 }
 
 //##################################################################################
@@ -166,7 +164,6 @@ void QmitkNavigationToolManagementWidget::OnMoveToolUp()
         if (NewNumber < 0) { MITK_WARN << "Cannot move tool up because it is on the top!"; }
         else { m_NavigationToolStorage->AssignToolNumber(currentIdentifier, NewNumber); }
         UpdateToolTable();
-        m_NavigationToolStorage->UpdateMicroservice();
       }
     }
   }
@@ -187,7 +184,6 @@ void QmitkNavigationToolManagementWidget::OnMoveToolDown()
         if (NewNumber >= m_NavigationToolStorage->GetToolCount()) { MITK_WARN << "Cannot move tool down because it is the last tool in this storage!"; }
         else { m_NavigationToolStorage->AssignToolNumber(currentIdentifier, NewNumber); }
         UpdateToolTable();
-        m_NavigationToolStorage->UpdateMicroservice();
       }
     }
   }
@@ -205,7 +201,6 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
   m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage, defaultIdentifier.toStdString(), defaultName.toStdString());
   m_edit = false;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
-  m_NavigationToolStorage->UpdateMicroservice();
 }
 
 void QmitkNavigationToolManagementWidget::OnDeleteTool()
@@ -225,7 +220,6 @@ void QmitkNavigationToolManagementWidget::OnDeleteTool()
   m_DataStorage->Remove(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetDataNode());
   m_NavigationToolStorage->DeleteTool(m_Controls->m_ToolList->currentIndex().row());
   UpdateToolTable();
-  m_NavigationToolStorage->UpdateMicroservice();
 }
 
 void QmitkNavigationToolManagementWidget::OnEditTool()
@@ -245,7 +239,6 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
   m_NavigationToolStorage->SetName("test");
   m_edit = true;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
-  m_NavigationToolStorage->UpdateMicroservice();
 }
 
 void QmitkNavigationToolManagementWidget::OnCreateStorage()
@@ -284,7 +277,6 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
         tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
         this->LoadStorage(tempStorage);
         emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
-        m_NavigationToolStorage->UpdateMicroservice();
       }
     }
     catch (const mitk::Exception& exception)
@@ -296,7 +288,6 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
   {
     MessageBox(exception.GetDescription());
   }
-  m_NavigationToolStorage->UpdateMicroservice();
 }
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
@@ -335,6 +326,8 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
   {
     mitk::NavigationTool::Pointer editedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
     editedTool->Graft(newTool);
+    //Keep this line, 'cause otherwise, the NavigationToolStorage wouldn't notice, that the toolStorage changed.
+    m_NavigationToolStorage->UpdateMicroservice();
   }
   else //here we create a new tool
   {
@@ -344,7 +337,7 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
   UpdateToolTable();
 
   m_Controls->m_MainWidgets->setCurrentIndex(0);
-  m_NavigationToolStorage->UpdateMicroservice();
+
 }
 
 void QmitkNavigationToolManagementWidget::OnAddToolCancel()

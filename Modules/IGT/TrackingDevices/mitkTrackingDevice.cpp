@@ -59,6 +59,11 @@ bool mitk::TrackingDevice::AutoDetectToolsAvailable()
   return false;
 }
 
+bool mitk::TrackingDevice::AddSingleToolIsAvailable()
+{
+  return true;
+}
+
 mitk::NavigationToolStorage::Pointer mitk::TrackingDevice::AutoDetectTools()
 {
   return mitk::NavigationToolStorage::New();
@@ -146,3 +151,7 @@ mitk::TrackingTool* mitk::TrackingDevice::GetToolByName( std::string name ) cons
   return nullptr;
 }
 
+std::string mitk::TrackingDevice::GetTrackingDeviceName()
+{
+  return this->GetData().Line;
+}

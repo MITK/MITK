@@ -49,6 +49,6 @@ protected:
 
   Ui::QmitkOpenIGTLinkWidget* m_Controls;
 public:
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  virtual mitk::TrackingDevice::Pointer GetTrackingDevice();
 };
 #endif

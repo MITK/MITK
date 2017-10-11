@@ -466,6 +466,9 @@ namespace mitk
     case Axial:
       width  = extents[0];
       height = extents[1];
+      if (directions[0] < 0) {
+        rotated = !rotated;
+      }
       break;
     case Frontal:
       width  = extents[0];
@@ -478,6 +481,7 @@ namespace mitk
     default:
       itkExceptionMacro("unknown PlaneOrientation");
     }
+
 
     ScalarType bounds[6]= { 0, width, 0, height, 0, 1 };
     this->SetBounds( bounds );

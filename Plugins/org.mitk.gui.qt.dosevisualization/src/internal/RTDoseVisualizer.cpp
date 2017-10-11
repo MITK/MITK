@@ -792,7 +792,7 @@ void RTDoseVisualizer::ActualizeDisplayStyleForAllDoseDataNodes()
 void RTDoseVisualizer::OnHandleCTKEventReferenceDoseChanged(const ctkEvent&)
 {
   mitk::DoseValueAbs referenceDose = 0.0;
-  bool globalSync = mitk::GetReferenceDoseValue(referenceDose);
+  mitk::GetReferenceDoseValue(referenceDose);
 
   this->m_Controls.spinReferenceDose->setValue(referenceDose);
 }

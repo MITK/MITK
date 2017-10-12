@@ -74,7 +74,8 @@ public:
   void OnRunSingleRefToolCalibrationClicked();
   void OnLoginSingleRefToolNavigationDataClicked();
   void OnSetNewToolTipPosButtonClicked();
-
+  void OnGetPositions();
+  void OnCalibrateToolAxis();
 
 protected:
 
@@ -129,6 +130,11 @@ protected:
   mitk::DataNode::Pointer m_CalibrationLandmarksNode;
   mitk::PointSet::Pointer m_RegistrationLandmarks;
   mitk::DataNode::Pointer m_RegistrationLandmarksNode;
+
+  //members and helper methods for tool axis calibration 
+  mitk::Vector3D m_CalibratedToolAxis;
+  mitk::Vector3D m_EndToolPosition;
+  mitk::Vector3D m_StartToolPosition;
 
 };
 

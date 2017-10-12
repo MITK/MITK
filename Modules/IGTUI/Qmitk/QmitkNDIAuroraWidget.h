@@ -46,7 +46,7 @@ private:
 protected:
   virtual void ResetOutput();
   virtual void AddOutput(std::string s);
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  virtual mitk::TrackingDevice::Pointer GetTrackingDevice();
 
   virtual void StoreUISettings();
   virtual void LoadUISettings();

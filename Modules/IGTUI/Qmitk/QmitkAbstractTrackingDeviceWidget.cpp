@@ -53,7 +53,7 @@ void QmitkAbstractTrackingDeviceWidget::TestConnection()
 {
   this->setEnabled(false);
   //construct a tracking device:
-  mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
+  mitk::TrackingDevice::Pointer testTrackingDevice = GetTrackingDevice();
   m_TestConnectionWorker->SetTrackingDevice(testTrackingDevice);
   m_TestConnectionWorkerThread->start();
 }

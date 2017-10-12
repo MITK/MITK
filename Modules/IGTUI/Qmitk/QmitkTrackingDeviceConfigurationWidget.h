@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkTrackingDeviceWidgetCollection.h"
 
+
 /** Documentation:
  *   \brief An object of this class offers an UI to configurate
  *          a tracking device. If the user finished the configuration process and
@@ -55,10 +56,39 @@ public:
    */
   mitk::TrackingDevice::Pointer GetTrackingDevice();
 
+  /**
+  * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
+  * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
+  */
+  void OnToolStorageChanged();
+
 signals:
 
   /* @brief This signal is sent if the tracking device was changed. */
   void TrackingDeviceSelectionChanged();
+
+public slots:
+/**
+* \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
+* Can e.g. be used to activate options of a tracking device only when it is connected.
+*/
+  void OnConnected(bool _success);
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
+  * Can e.g. be used to activate/disactivate options of a tracking device.
+  */
+  void OnDisconnected(bool _success);
+
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Start Tracking" was clicked and the device successfully started tracking.
+  * Can e.g. be used to activate options of a tracking device only when tracking is started.
+  */
+  void OnStartTracking(bool _success);
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Stop Tracking" was clicked and the device successful stopped tracking.
+  * Can e.g. be used to activate/disactivate options when device is not tracking.
+  */
+  void OnStopTracking(bool _success);
 
 protected:
 
@@ -69,15 +99,12 @@ protected:
 
   Ui::QmitkTrackingDeviceConfigurationWidgetControls* m_Controls;
 
-  mitk::TrackingDevice::Pointer m_TrackingDevice;
-
   // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
   typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
 
   //######################### internal help methods #######################################
   void ResetOutput();
   void AddOutput(std::string s);
-  mitk::TrackingDevice::Pointer ConstructTrackingDevice();
 
   void StoreUISettings();
   void LoadUISettings();

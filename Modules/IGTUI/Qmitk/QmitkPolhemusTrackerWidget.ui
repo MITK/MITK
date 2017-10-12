@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>475</width>
-    <height>181</height>
+    <height>324</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -23,14 +23,129 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="m_hemisphereTracking">
-     <property name="text">
-      <string>Enable hemisphere tracking</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QCheckBox" name="m_hemisphereTracking">
+       <property name="text">
+        <string>Enable hemisphere tracking (for all tools)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="m_AdvancedSettings">
+       <property name="text">
+        <string>Show Advanced Settings</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="1">
+      <widget class="QComboBox" name="m_ToolSelection"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_toolsToChange">
+       <property name="text">
+        <string>Tools to change:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_UpdateOnRequest">
+     <property name="text">
+      <string>Spinbox values and label are only updated on request (click 'Get Hemisphere').</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="m_GetHemisphere">
+       <property name="text">
+        <string>Get Hemisphere</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_Hemisphere_X">
+       <property name="minimum">
+        <number>-10</number>
+       </property>
+       <property name="maximum">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_Hemisphere_Y">
+       <property name="minimum">
+        <number>-10</number>
+       </property>
+       <property name="maximum">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_Hemisphere_Z">
+       <property name="minimum">
+        <number>-10</number>
+       </property>
+       <property name="maximum">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_SetHemisphere">
+       <property name="text">
+        <string>Set Hemisphere</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="m_StatusLabelHemisphereTracking">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="m_ToggleHemisphere">
+       <property name="text">
+        <string>Toggle Hemisphere</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_AdjustHemisphere">
+       <property name="text">
+        <string>Adjust Hemisphere</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">

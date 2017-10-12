@@ -97,6 +97,8 @@ namespace Logger
       boost::shared_ptr< std::stringstream > dataStream;
       boost::shared_ptr< boost::log::sinks::text_ostream_backend > dataBackend;
       boost::log::attributes::mutable_constant<std::string> sourceAttribute;
+      boost::log::attributes::mutable_constant<std::string> fullNameAttribute;
+      boost::log::attributes::mutable_constant<std::string> organizationAttribute;
 
       Utilities::TaskGroup m_TaskGroup;
 
@@ -111,6 +113,7 @@ namespace Logger
       void reinitLogger();
 
       void setSource(const std::string& src);
+      void setUserData(const std::string& fullName, const std::string& organization);
 
       static std::string getLastDateTime(std::string str);
       void resetData() const;

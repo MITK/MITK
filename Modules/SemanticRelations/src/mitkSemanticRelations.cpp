@@ -47,75 +47,30 @@ mitk::RelationStorage& mitk::SemanticRelations::GetRelationStorage()
 /* functions to get instances / attributes                              */
 /************************************************************************/
 
-std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllLesionsOfCase(caseID);
 }
 
-std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
+mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
-  std::vector<SemanticTypes::Lesion> allLesions = GetAllLesionsOfCase(caseID);
+  LesionVector allLesions = GetAllLesionsOfCase(caseID);
 
-  // filter the lesions: use only those, where the associated data refers to the given control point using a lambda function
-  allLesions.erase(std::remove_if(allLesions.begin(), allLesions.end(),
-    [&controlPoint, &caseID, this](const SemanticTypes::Lesion& lesion)
-  {
-    std::vector<DataNode::Pointer> allDataOfLesion;
-    try
-    {
-      if (m_DataStorage.IsNotNull())
-      {
-        // 1. get all segmentations that define the lesion
-        // 2. retrieve the parent node (source) of the found segmentation node
-        // 3. use the parent node (the image) to compare the control points (intersect)
-        std::vector<DataNode::Pointer> allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
-        for (const auto& segmentationNode : allSegmentationsOfLesion)
-        {
-          // get parent node of the current segmentation node with the node predicate
-          DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
-          for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
-          {
-            DataNode::Pointer dataNode = it->Value();
-            allDataOfLesion.push_back(it->Value());
-          }
-        }
-      }
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::vector<DataNode::Pointer> allDataOfControlPoint;
-    try
-    {
-      allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::sort(allDataOfLesion.begin(), allDataOfLesion.end());
-    std::sort(allDataOfControlPoint.begin(), allDataOfControlPoint.end());
-    std::vector<DataNode::Pointer> allDataIntersection;
-    // set intersection removes duplicated nodes, since 'allDataOfControlPoint' only contains at most one of each node
-    std::set_intersection(allDataOfLesion.begin(), allDataOfLesion.end(),
-      allDataOfControlPoint.begin(), allDataOfControlPoint.end(), std::back_inserter(allDataIntersection));
-    return allDataIntersection.empty();
-  }),
-    allLesions.end());
+  // filter the lesions: use only those, where the associated data is connected to image data that refers to the given control point using a lambda function
+  auto lambda = [&caseID, &controlPoint, this](const SemanticTypes::Lesion& lesion) { return !ControlPointContainsLesion(caseID, lesion, controlPoint); };
+  allLesions.erase(std::remove_if(allLesions.begin(), allLesions.end(), lambda), allLesions.end());
 
   return allLesions;
 }
 
-std::vector<mitk::SemanticTypes::Lesion> mitk::SemanticRelations::GetAllLesionsInImage(const DataNode* imageNode) const
+mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsInImage(const DataNode* imageNode) const
 {
   if (nullptr == imageNode)
   {
-    MITK_WARN << "Not a valid image data node.";
-    return std::vector<SemanticTypes::Lesion>();
+    mitkThrow() << "Not a valid image data node.";
   }
 
-  std::vector<SemanticTypes::Lesion> allLesionsInImage;
+  LesionVector allLesionsInImage;
   if (m_DataStorage.IsNotNull())
   {
     // get child nodes of the current node with the segmentation predicate
@@ -141,14 +96,12 @@ mitk::SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const 
 {
   if (nullptr == segmentationNode)
   {
-    MITK_WARN << "Not a valid segmentation node.";
-    return SemanticTypes::Lesion();
+    mitkThrow() << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::Lesion representedLesion;
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationID = DICOMHelper::GetIDFromDataNode(segmentationNode);
-  representedLesion = m_RelationStorage->GetRepresentedLesion(caseID, segmentationID);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
+  SemanticTypes::Lesion representedLesion = m_RelationStorage->GetRepresentedLesion(caseID, segmentationID);
 
   if (representedLesion.UID.empty())
   {
@@ -162,28 +115,30 @@ mitk::SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const 
 
 bool mitk::SemanticRelations::IsRepresentingALesion(const DataNode* segmentationNode) const
 {
-  SemanticTypes::Lesion representedLesion;
   try
   {
-    representedLesion = GetRepresentedLesion(segmentationNode);
+    SemanticTypes::Lesion representedLesion = GetRepresentedLesion(segmentationNode);
     return true;
   }
   catch (const SemanticRelationException&)
   {
     return false;
   }
+  catch (mitk::Exception& e)
+  {
+    mitkReThrow(e);
+  }
 }
 
-std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
   if (InstanceExists(caseID, lesion))
   {
     // lesion exists, retrieve all case segmentations from the storage
-    std::vector<DataNode::Pointer> allSegmentationsOfLesion = m_RelationStorage->GetAllSegmentationsOfCase(caseID);
+    DataNodeVector allSegmentationsOfLesion = m_RelationStorage->GetAllSegmentationsOfCase(caseID);
 
     // filter all segmentations: check for semantic relation with the given lesion using a lambda function
-    allSegmentationsOfLesion.erase(std::remove_if(allSegmentationsOfLesion.begin(), allSegmentationsOfLesion.end(),
-      [&lesion, this](DataNode::Pointer segmentation)
+    auto lambda = [&lesion, this](DataNode::Pointer segmentation)
     {
       try
       {
@@ -194,8 +149,8 @@ std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllSegmentation
       {
         return true;
       }
-    }),
-      allSegmentationsOfLesion.end());
+    };
+    allSegmentationsOfLesion.erase(std::remove_if(allSegmentationsOfLesion.begin(), allSegmentationsOfLesion.end(), lambda), allSegmentationsOfLesion.end());
 
     return allSegmentationsOfLesion;
   }
@@ -205,13 +160,46 @@ std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllSegmentation
   }
 }
 
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
+{
+  DataNodeVector allDataOfLesion;
+  if (m_DataStorage.IsNotNull())
+  {
+    // 1. get all segmentations that define the lesion
+    // 2. retrieve the parent node (source) of the found segmentation node
+    try
+    {
+      DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
+      for (const auto& segmentationNode : allSegmentationsOfLesion)
+      {
+        // get parent node of the current segmentation node with the node predicate
+        DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
+        for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
+        {
+          DataNode::Pointer dataNode = it->Value();
+          allDataOfLesion.push_back(it->Value());
+        }
+      }
+      return allDataOfLesion;
+    }
+    catch (SemanticRelationException& e)
+    {
+      mitkReThrow(e);
+    }
+  }
+  else
+  {
+    mitkThrow() << "Not a valid data storage.";
+  }
+}
+
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
-  std::vector<SemanticTypes::Lesion> allLesions = GetAllLesionsOfCase(caseID);
+  LesionVector allLesions = GetAllLesionsOfCase(caseID);
 
   // filter all lesions: check for equality with the given lesion using a lambda function
-  const auto existingLesion = std::find_if(allLesions.begin(), allLesions.end(),
-    [&lesion](const SemanticTypes::Lesion& currentLesion) { return currentLesion.UID == lesion.UID; });
+  auto lambda = [&lesion](const SemanticTypes::Lesion& currentLesion) { return currentLesion.UID == lesion.UID; };
+  const auto existingLesion = std::find_if(allLesions.begin(), allLesions.end(), lambda);
 
   if (existingLesion != allLesions.end())
   {
@@ -223,100 +211,29 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticRelations::ControlpointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllControlPointsOfCase(caseID);
 }
 
-std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
+mitk::SemanticRelations::ControlpointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
-  std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
+  ControlpointVector allControlPoints = GetAllControlPointsOfCase(caseID);
 
-  // filter the control points: use only those, where the associated data has a segmentation that refers to the given lesion using a lambda function
-  allControlPoints.erase(std::remove_if(allControlPoints.begin(), allControlPoints.end(),
-    [&lesion, &caseID, this](const SemanticTypes::ControlPoint& controlPoint)
-  {
-    std::vector<DataNode::Pointer> allDataOfControlPoint;
-    try
-    {
-      allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::vector<DataNode::Pointer> allDataOfLesion;
-    try
-    {
-      if (m_DataStorage.IsNotNull())
-      {
-        // 1. get all segmentations that define the lesion
-        // 2. retrieve the parent node (source) of the found segmentation node
-        // 3. use the parent node (the image) to compare the control points (intersect)
-        std::vector<DataNode::Pointer> allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
-        for (const auto& segmentationNode : allSegmentationsOfLesion)
-        {
-          // get parent node of the current segmentation node with the node predicate
-          DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
-          for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
-          {
-            DataNode::Pointer dataNode = it->Value();
-            allDataOfLesion.push_back(it->Value());
-          }
-        }
-      }
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::sort(allDataOfControlPoint.begin(), allDataOfControlPoint.end());
-    std::sort(allDataOfLesion.begin(), allDataOfLesion.end());
-    std::vector<DataNode::Pointer> allDataIntersection;
-    // set intersection removes duplicated nodes, since 'allDataOfControlPoint' only contains at most one of each node
-    std::set_intersection(allDataOfControlPoint.begin(), allDataOfControlPoint.end(),
-      allDataOfLesion.begin(), allDataOfLesion.end(), std::back_inserter(allDataIntersection));
-    return allDataIntersection.empty();
-  }),
-    allControlPoints.end());
+  // filter the control points: use only those, where the associated image data has a segmentation that refers to the given lesion using a lambda function
+  auto lambda = [&caseID, &lesion, this](const SemanticTypes::ControlPoint& controlPoint) { return !ControlPointContainsLesion(caseID, lesion, controlPoint); };
+  allControlPoints.erase(std::remove_if(allControlPoints.begin(), allControlPoints.end(), lambda), allControlPoints.end());
 
   return allControlPoints;
 }
 
-std::vector<mitk::SemanticTypes::ControlPoint> mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
+mitk::SemanticRelations::ControlpointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
 {
-  std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
+  ControlpointVector allControlPoints = GetAllControlPointsOfCase(caseID);
 
-  // filter the control points: use only those, where the associated data refers to the given information type using a lambda function
-  allControlPoints.erase(std::remove_if(allControlPoints.begin(), allControlPoints.end(),
-    [&informationType, &caseID, this](const SemanticTypes::ControlPoint& controlPoint)
-  {
-    std::vector<DataNode::Pointer> allDataOfControlPoint;
-    try
-    {
-      allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::vector<DataNode::Pointer> allDataOfInformationType;
-    try
-    {
-      allDataOfInformationType = GetAllDataOfInformationType(caseID, informationType);
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::sort(allDataOfControlPoint.begin(), allDataOfControlPoint.end());
-    std::sort(allDataOfInformationType.begin(), allDataOfInformationType.end());
-    std::vector<DataNode::Pointer> allDataIntersection;
-    std::set_intersection(allDataOfControlPoint.begin(), allDataOfControlPoint.end(),
-      allDataOfInformationType.begin(), allDataOfInformationType.end(), std::back_inserter(allDataIntersection));
-    return allDataIntersection.empty();
-  }),
-    allControlPoints.end());
+  // filter the control points: use only those, where the associated image data refers to the given information type using a lambda function
+  auto lambda = [&caseID, &informationType, this](const SemanticTypes::ControlPoint& controlPoint) { return !ControlPointContainsInformationType(caseID, informationType, controlPoint); };
+  allControlPoints.erase(std::remove_if(allControlPoints.begin(), allControlPoints.end(), lambda), allControlPoints.end());
 
   return allControlPoints;
 }
@@ -325,27 +242,24 @@ mitk::SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData
 {
   if (nullptr == dataNode)
   {
-    MITK_WARN << "Not a valid data node.";
-    return SemanticTypes::ControlPoint();
+    mitkThrow() << "Not a valid data node.";
   }
 
-  SemanticTypes::ControlPoint controlPoint;
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
-  SemanticTypes::ID dataNodeID = DICOMHelper::GetIDFromDataNode(dataNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
+  SemanticTypes::ID dataNodeID = GetIDFromDataNode(dataNode);
   return m_RelationStorage->GetControlPointOfData(caseID, dataNodeID);
 }
 
-std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllDataOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllDataOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
   if (InstanceExists(caseID, controlPoint))
   {
     // control point exists, retrieve all images from the storage
-    std::vector<DataNode::Pointer> allDataOfControlPoint = m_RelationStorage->GetAllImagesOfCase(caseID);
+    DataNodeVector allDataOfControlPoint = m_RelationStorage->GetAllImagesOfCase(caseID);
 
     // filter all images to remove the ones with a different control point using a lambda function
-    allDataOfControlPoint.erase(std::remove_if(allDataOfControlPoint.begin(), allDataOfControlPoint.end(),
-      [&controlPoint, this](DataNode::Pointer imageNode) { return controlPoint.UID != GetControlPointOfData(imageNode).UID; }),
-    allDataOfControlPoint.end());
+    auto lambda = [&controlPoint, this](DataNode::Pointer imageNode) { return controlPoint.UID != GetControlPointOfData(imageNode).UID; };
+    allDataOfControlPoint.erase(std::remove_if(allDataOfControlPoint.begin(), allDataOfControlPoint.end(), lambda), allDataOfControlPoint.end());
 
     return allDataOfControlPoint;
   }
@@ -357,11 +271,11 @@ std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllDataOfContro
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
-  std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
+  ControlpointVector allControlPoints = GetAllControlPointsOfCase(caseID);
 
   // filter all control points: check for equality with the given control point using a lambda function
-  const auto existingControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(),
-    [&controlPoint](const SemanticTypes::ControlPoint& currentControlPoint) { return currentControlPoint.UID == controlPoint.UID; });
+  auto lambda = [&controlPoint](const SemanticTypes::ControlPoint& currentControlPoint) { return currentControlPoint.UID == controlPoint.UID; };
+  const auto existingControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(), lambda);
 
   if (existingControlPoint != allControlPoints.end())
   {
@@ -373,45 +287,18 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-std::vector<mitk::SemanticTypes::InformationType> mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticRelations::InformationTypeVector mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllInformationTypesOfCase(caseID);
 }
 
-std::vector<mitk::SemanticTypes::InformationType> mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
+mitk::SemanticRelations::InformationTypeVector mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
-  std::vector<SemanticTypes::InformationType> allInformationTypes = GetAllInformationTypesOfCase(caseID);
+  InformationTypeVector allInformationTypes = GetAllInformationTypesOfCase(caseID);
 
   // filter the information types: use only those, where the associated data refers to the given control point using a lambda function
-  allInformationTypes.erase(std::remove_if(allInformationTypes.begin(), allInformationTypes.end(),
-    [&controlPoint, &caseID, this](const SemanticTypes::InformationType& informationType)
-  {
-    std::vector<DataNode::Pointer> allDataOfInformationType;
-    try
-    {
-      allDataOfInformationType = GetAllDataOfInformationType(caseID, informationType);
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::vector<DataNode::Pointer> allDataOfControlPoint;
-    try
-    {
-      allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
-    }
-    catch (const SemanticRelationException&)
-    {
-      return true;
-    }
-    std::sort(allDataOfInformationType.begin(), allDataOfInformationType.end());
-    std::sort(allDataOfControlPoint.begin(), allDataOfControlPoint.end());
-    std::vector<DataNode::Pointer> allDataIntersection;
-    std::set_intersection(allDataOfInformationType.begin(), allDataOfInformationType.end(),
-      allDataOfControlPoint.begin(), allDataOfControlPoint.end(), std::back_inserter(allDataIntersection));
-    return allDataIntersection.empty();
-  }),
-    allInformationTypes.end());
+  auto lambda = [&caseID, &controlPoint, this](const SemanticTypes::InformationType& informationType) { return !ControlPointContainsInformationType(caseID, informationType, controlPoint); };
+  allInformationTypes.erase(std::remove_if(allInformationTypes.begin(), allInformationTypes.end(), lambda), allInformationTypes.end());
 
   return allInformationTypes;
 }
@@ -420,27 +307,24 @@ mitk::SemanticTypes::InformationType mitk::SemanticRelations::GetInformationType
 {
   if (nullptr == imageNode)
   {
-    MITK_WARN << "Not a valid image data node.";
-    return SemanticTypes::InformationType();
+    mitkThrow() << "Not a valid image data node.";
   }
 
-  SemanticTypes::InformationType informationType;
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID imageID = DICOMHelper::GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
   return m_RelationStorage->GetInformationTypeOfImage(caseID, imageID);
 }
 
-std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllDataOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllDataOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
 {
   if (InstanceExists(caseID, informationType))
   {
     // information type exists, retrieve all images from the storage
-    std::vector<DataNode::Pointer> allDataOfInformationType = m_RelationStorage->GetAllImagesOfCase(caseID);
+    DataNodeVector allDataOfInformationType = m_RelationStorage->GetAllImagesOfCase(caseID);
 
     // filter all images to remove the ones with a different information type using a lambda function
-    allDataOfInformationType.erase(std::remove_if(allDataOfInformationType.begin(), allDataOfInformationType.end(),
-      [&informationType, this](DataNode::Pointer imageNode) { return informationType != GetInformationTypeOfImage(imageNode); }),
-      allDataOfInformationType.end());
+    auto lambda = [&informationType, this](DataNode::Pointer imageNode) { return informationType != GetInformationTypeOfImage(imageNode); };
+    allDataOfInformationType.erase(std::remove_if(allDataOfInformationType.begin(), allDataOfInformationType.end(), lambda), allDataOfInformationType.end());
 
     return allDataOfInformationType;
   }
@@ -450,31 +334,23 @@ std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetAllDataOfInform
   }
 }
 
-std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetFilteredData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetFilteredData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const
 {
   if (InstanceExists(caseID, controlPoint))
   {
     if (InstanceExists(caseID, informationType))
     {
-      // control point exists, retrieve all images from the storage
-      std::vector<DataNode::Pointer> allDataOfControlPoint = m_RelationStorage->GetAllImagesOfCase(caseID);
-      // information type exists, retrieve all images from the storage
-      std::vector<DataNode::Pointer> allDataOfInformationType = m_RelationStorage->GetAllImagesOfCase(caseID);
-
-      // concatenate the two resulting vectors
-      std::vector<DataNode::Pointer> allFilteredData = allDataOfControlPoint;
-      allFilteredData.reserve(allDataOfControlPoint.size() + allDataOfInformationType.size());
-      allFilteredData.insert(allFilteredData.end(), allDataOfInformationType.begin(), allDataOfInformationType.end());
-
+      // control point exists, information type exists, retrieve all images from the storage
+      DataNodeVector allImagesOfCase = m_RelationStorage->GetAllImagesOfCase(caseID);
       // filter all images to remove the ones with a different control point and information type using a lambda function
-      allFilteredData.erase(std::remove_if(allFilteredData.begin(), allFilteredData.end(),
-        [&controlPoint, &informationType, this](DataNode::Pointer imageNode) {
-        return (informationType != GetInformationTypeOfImage(imageNode)) || (controlPoint != GetControlPointOfData(imageNode)); }),
-        allFilteredData.end());
+      auto lambda = [&controlPoint, &informationType, this](DataNode::Pointer imageNode)
+      {
+        return (informationType != GetInformationTypeOfImage(imageNode)) || (controlPoint != GetControlPointOfData(imageNode));
+      };
 
-      std::sort(allFilteredData.begin(), allFilteredData.end());
-      allFilteredData.erase(std::unique(allFilteredData.begin(), allFilteredData.end()), allFilteredData.end());
-      return allFilteredData;
+      allImagesOfCase.erase(std::remove_if(allImagesOfCase.begin(), allImagesOfCase.end(), lambda), allImagesOfCase.end());
+
+      return allImagesOfCase;
     }
     else
     {
@@ -489,11 +365,11 @@ std::vector<mitk::DataNode::Pointer> mitk::SemanticRelations::GetFilteredData(co
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
 {
-  std::vector<SemanticTypes::InformationType> allInformationTypes = GetAllInformationTypesOfCase(caseID);
+  InformationTypeVector allInformationTypes = GetAllInformationTypesOfCase(caseID);
 
   // filter all information types: check for equality with the given information type using a lambda function
-  const auto existingInformationType = std::find_if(allInformationTypes.begin(), allInformationTypes.end(),
-    [&informationType](const SemanticTypes::InformationType& currentInformationType) { return currentInformationType == informationType; });
+  auto lambda = [&informationType](const SemanticTypes::InformationType& currentInformationType) { return currentInformationType == informationType; };
+  const auto existingInformationType = std::find_if(allInformationTypes.begin(), allInformationTypes.end(), lambda);
 
   if (existingInformationType != allInformationTypes.end())
   {
@@ -542,11 +418,10 @@ void mitk::SemanticRelations::AddLesionAndLinkData(const DataNode* segmentationN
 {
   if (nullptr == segmentationNode)
   {
-    MITK_WARN << "Not a valid segmentation node.";
-    return;
+    mitkThrow() << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
   try
   {
     AddLesion(caseID, lesion);
@@ -570,14 +445,13 @@ void mitk::SemanticRelations::LinkSegmentationToLesion(const DataNode* segmentat
 {
   if (nullptr == segmentationNode)
   {
-    MITK_WARN << "Not a valid segmentation node.";
-    return;
+    mitkThrow() << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
   if (InstanceExists(caseID, lesion))
   {
-    SemanticTypes::ID segmentationID = DICOMHelper::GetIDFromDataNode(segmentationNode);
+    SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
     m_RelationStorage->LinkSegmentationToLesion(caseID, segmentationID, lesion);
   }
   else
@@ -590,12 +464,11 @@ void mitk::SemanticRelations::UnlinkSegmentationFromLesion(const DataNode* segme
 {
   if (nullptr == segmentationNode)
   {
-    MITK_WARN << "Not a valid data node.";
-    return;
+    mitkThrow() << "Not a valid segmentation data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
-  SemanticTypes::ID segmentationID = DICOMHelper::GetIDFromDataNode(segmentationNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
   mitk::SemanticTypes::Lesion lesion = m_RelationStorage->GetRepresentedLesion(caseID, segmentationID);
   m_RelationStorage->UnlinkSegmentationFromLesion(caseID, segmentationID);
 }
@@ -604,7 +477,7 @@ void mitk::SemanticRelations::RemoveLesion(const SemanticTypes::CaseID& caseID, 
 {
   if (InstanceExists(caseID, lesion))
   {
-    std::vector<DataNode::Pointer> allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
+    DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
     if (allSegmentationsOfLesion.empty())
     {
       // no more segmentations are linked to the specific lesion
@@ -626,11 +499,10 @@ void mitk::SemanticRelations::AddControlPointAndLinkData(const DataNode* dataNod
 {
   if (nullptr == dataNode)
   {
-    MITK_WARN << "Not a valid data node.";
-    return;
+    mitkThrow() << "Not a valid data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
   if (InstanceExists(caseID, controlPoint))
   {
     mitkThrowException(SemanticRelationException) << "The control point " << controlPoint.UID << " to add already exists for the given case. \n Use 'LinkDataToControlPoint' instead.";
@@ -647,7 +519,7 @@ void mitk::SemanticRelations::AddControlPointAndLinkData(const DataNode* dataNod
   if (checkConsistence)
   {
     // to check the consistency, the control point manager checks, if the date extracted from the data node is inside the given control point
-    bool insideControlPoint = ControlPointManager::InsideControlPoint(dataNode, controlPoint);
+    bool insideControlPoint = InsideControlPoint(dataNode, controlPoint);
     if (!insideControlPoint)
     {
       mitkThrowException(SemanticRelationException) << "The control point " << controlPoint.UID << " to add does not contain the date of the given data node.";
@@ -669,13 +541,12 @@ void mitk::SemanticRelations::OverwriteControlPointAndLinkData(const DataNode* d
 {
   if (nullptr == dataNode)
   {
-    MITK_WARN << "Not a valid data node.";
-    return;
+    mitkThrow() << "Not a valid data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
 
-  std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
+  ControlpointVector allControlPoints = GetAllControlPointsOfCase(caseID);
   const auto existingControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(),
     [&controlPoint](const SemanticTypes::ControlPoint& currentControlPoint) { return currentControlPoint.UID == controlPoint.UID; });
 
@@ -685,7 +556,7 @@ void mitk::SemanticRelations::OverwriteControlPointAndLinkData(const DataNode* d
     if (checkConsistence)
     {
       // to check the consistency, the control point manager checks, if the date extracted from the data node is inside the given control point
-      bool insideControlPoint = ControlPointManager::InsideControlPoint(dataNode, controlPoint);
+      bool insideControlPoint = InsideControlPoint(dataNode, controlPoint);
       if (!insideControlPoint)
       {
         mitkThrowException(SemanticRelationException) << "The overwriting control point " << controlPoint.UID << " does not contain the date of the given data node.";
@@ -732,20 +603,19 @@ void mitk::SemanticRelations::LinkDataToControlPoint(const DataNode* dataNode, c
 {
   if (nullptr == dataNode)
   {
-    MITK_WARN << "Not a valid data node.";
-    return;
+    mitkThrow() << "Not a valid data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
   if (InstanceExists(caseID, controlPoint))
   {
-    SemanticTypes::ID dataID = DICOMHelper::GetIDFromDataNode(dataNode);
+    SemanticTypes::ID dataID = GetIDFromDataNode(dataNode);
 
     // control point does already exist
     if (checkConsistence)
     {
       // to check the consistency, the control point manager checks, if the date extracted from the data node is inside the given control point
-      bool insideControlPoint = ControlPointManager::InsideControlPoint(dataNode, controlPoint);
+      bool insideControlPoint = InsideControlPoint(dataNode, controlPoint);
       if (!insideControlPoint)
       {
         mitkThrowException(SemanticRelationException) << "The data to link does not lie inside the given control point " << controlPoint.UID << " .";
@@ -763,18 +633,17 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
 {
   if (nullptr == dataNode)
   {
-    MITK_WARN << "Not a valid data node.";
-    return;
+    mitkThrow() << "Not a valid data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(dataNode);
-  SemanticTypes::ID dataID = DICOMHelper::GetIDFromDataNode(dataNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
+  SemanticTypes::ID dataID = GetIDFromDataNode(dataNode);
   mitk::SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfData(caseID, dataID);
   m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
 
   try
   {
-    std::vector<DataNode::Pointer> allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
+    DataNodeVector allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
     if (allDataOfControlPoint.empty())
     {
       // no more data is linked to the specific control point
@@ -785,7 +654,7 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
     {
       // some data is still linked to this control point
       // the control point can not be removed, but has to be adjusted to fit the remaining data
-      SemanticTypes::ControlPoint adjustedControlPoint = ControlPointManager::GenerateControlPoint(allDataOfControlPoint);
+      SemanticTypes::ControlPoint adjustedControlPoint = GenerateControlPoint(allDataOfControlPoint);
       // set the UIDs to be the same, so that all references still work
       adjustedControlPoint.UID = controlPoint.UID;
       adjustedControlPoint.startPoint.UID = controlPoint.startPoint.UID;
@@ -803,12 +672,11 @@ void mitk::SemanticRelations::AddInformationTypeToImage(const DataNode* imageNod
 {
   if (nullptr == imageNode)
   {
-    MITK_WARN << "Not a valid image node.";
-    return;
+    mitkThrow() << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID imageID = DICOMHelper::GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
   m_RelationStorage->AddInformationTypeToImage(caseID, imageID, informationType);
 }
 
@@ -816,12 +684,11 @@ void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* ima
 {
   if (nullptr == imageNode)
   {
-    MITK_WARN << "Not a valid image node.";
-    return;
+    mitkThrow() << "Not a valid image data node.";
   }
 
-  SemanticTypes::CaseID caseID = DICOMHelper::GetCaseIDFromDataNode(imageNode);
-  SemanticTypes::ID imageID = DICOMHelper::GetIDFromDataNode(imageNode);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
   SemanticTypes::InformationType originalInformationType = m_RelationStorage->GetInformationTypeOfImage(caseID, imageID);
   m_RelationStorage->RemoveInformationTypeFromImage(caseID, imageID);
 
@@ -844,9 +711,78 @@ void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* ima
 /************************************************************************/
 /* private functions                                                    */
 /************************************************************************/
+bool mitk::SemanticRelations::ControlPointContainsLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion, const SemanticTypes::ControlPoint& controlPoint) const
+{
+  DataNodeVector allDataOfLesion;
+  try
+  {
+    allDataOfLesion = GetAllImagesOfLesion(caseID, lesion);
+  }
+  catch (const SemanticRelationException&)
+  {
+    // error retrieving image data; lesion has to be outside the control point
+    return false;
+  }
+
+  DataNodeVector allDataOfControlPoint;
+  try
+  {
+    allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
+  }
+  catch (const SemanticRelationException&)
+  {
+    // error retrieving control point data; lesion has to be outside the control point
+    return false;
+  }
+
+  std::sort(allDataOfLesion.begin(), allDataOfLesion.end());
+  std::sort(allDataOfControlPoint.begin(), allDataOfControlPoint.end());
+  DataNodeVector allDataIntersection;
+  // set intersection removes duplicated nodes, since 'allDataOfControlPoint' only contains at most one of each node
+  std::set_intersection(allDataOfLesion.begin(), allDataOfLesion.end(),
+                        allDataOfControlPoint.begin(), allDataOfControlPoint.end(),
+                        std::back_inserter(allDataIntersection));
+
+  // if the vector of intersecting data is empty, the control point does not contain the lesion
+  return !allDataIntersection.empty();
+}
+
+bool mitk::SemanticRelations::ControlPointContainsInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType, const SemanticTypes::ControlPoint& controlPoint) const
+{
+  DataNodeVector allDataOfInformationType;
+  try
+  {
+    allDataOfInformationType = GetAllDataOfInformationType(caseID, informationType);
+  }
+  catch (const SemanticRelationException&)
+  {
+    // error retrieving image data; information type has to be outside the control point
+    return false;
+  }
+
+  DataNodeVector allDataOfControlPoint;
+  try
+  {
+    allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
+  }
+  catch (const SemanticRelationException&)
+  {
+    // error retrieving control point data; information type has to be outside the control point
+    return false;
+  }
+
+  std::sort(allDataOfInformationType.begin(), allDataOfInformationType.end());
+  std::sort(allDataOfControlPoint.begin(), allDataOfControlPoint.end());
+  DataNodeVector allDataIntersection;
+  std::set_intersection(allDataOfInformationType.begin(), allDataOfInformationType.end(),
+                        allDataOfControlPoint.begin(), allDataOfControlPoint.end(),
+                        std::back_inserter(allDataIntersection));
+  return !allDataIntersection.empty();
+}
+
 bool mitk::SemanticRelations::CheckOverlappingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
 {
-  std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
+  ControlpointVector allControlPoints = GetAllControlPointsOfCase(caseID);
   if (allControlPoints.empty())
   {
     return false;
@@ -856,49 +792,43 @@ bool mitk::SemanticRelations::CheckOverlappingControlPoint(const SemanticTypes::
   const auto existingControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(),
     [&controlPoint](const SemanticTypes::ControlPoint& currentControlPoint) { return currentControlPoint.UID == controlPoint.UID; });
 
+  auto nextControlPoint = allControlPoints.end();
+  auto previousControlPoint = allControlPoints.begin();
   if (existingControlPoint != allControlPoints.end())
   {
     // case overwriting: control point already contained in the list of all existing control points
-    // check the neighboring control points for overlap
-    bool overlapWithNext = false;
-    bool overlapWithPrevious = false;
-
-    const auto nextControlPoint = std::next(existingControlPoint, 1);
-    if (nextControlPoint != allControlPoints.end())
-    {
-      overlapWithNext = ControlPointManager::CheckForOverlap(controlPoint, *nextControlPoint);
-    }
+    nextControlPoint = std::next(existingControlPoint, 1);
     if (existingControlPoint != allControlPoints.begin())
     {
-      overlapWithPrevious = ControlPointManager::CheckForOverlap(controlPoint, *std::prev(existingControlPoint, 1));
+      previousControlPoint = std::prev(existingControlPoint, 1);
     }
-    return overlapWithNext || overlapWithPrevious; // return true if at least one overlap is detected
   }
   else
   {
     // case adding: control point not contained in the list of all existing control points
-    // find the neighboring control points and check for overlap
-    const auto nextControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(),
+    nextControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(),
       [&controlPoint](const SemanticTypes::ControlPoint& currentControlPoint) { return currentControlPoint.startPoint >= controlPoint.endPoint; });
-
-    if (nextControlPoint != allControlPoints.end())
+    if (nextControlPoint != allControlPoints.begin())
     {
-      bool overlapWithNext = ControlPointManager::CheckForOverlap(controlPoint, *nextControlPoint);
-      bool overlapWithPrevious = false;
-      if (nextControlPoint != allControlPoints.begin())
-      {
-        overlapWithPrevious = ControlPointManager::CheckForOverlap(controlPoint, *std::prev(nextControlPoint, 1));
-      }
-
-      return overlapWithNext || overlapWithPrevious; // return true if at least one overlap is detected
+      previousControlPoint = std::prev(existingControlPoint, 1);
     }
   }
-  return false;
+
+  // check the neighboring control points for overlap
+  bool overlapWithNext = false;
+  bool overlapWithPrevious = CheckForOverlap(controlPoint, *previousControlPoint);
+
+  if (nextControlPoint != allControlPoints.end())
+  {
+    overlapWithNext = CheckForOverlap(controlPoint, *nextControlPoint);
+  }
+
+  return overlapWithNext || overlapWithPrevious; // return true if at least one overlap is detected
 }
 
 bool mitk::SemanticRelations::CheckContainingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
 {
-  std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
+  ControlpointVector allControlPoints = GetAllControlPointsOfCase(caseID);
   if (allControlPoints.empty())
   {
     return false;
@@ -909,13 +839,16 @@ bool mitk::SemanticRelations::CheckContainingControlPoint(const SemanticTypes::C
 
   if (existingControlPoint != allControlPoints.end())
   {
-    // TODO
+    // case overwriting: control point already contained in the list of all existing control points
+    // -> duplicated control point found (regardless of the actual start point and end point)
+    return true;
   }
   else
   {
+    // case adding: control point not contained in the list of all existing control points
     for (const auto& existingControlPoint : allControlPoints)
     {
-      bool contained = ControlPointManager::InsideControlPoint(controlPoint, existingControlPoint);
+      bool contained = InsideControlPoint(controlPoint, existingControlPoint);
       if (contained)
       {
         return true;
@@ -924,4 +857,3 @@ bool mitk::SemanticRelations::CheckContainingControlPoint(const SemanticTypes::C
   }
   return false;
 }
-

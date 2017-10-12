@@ -93,6 +93,13 @@ public:
   void AddData2D(const std::map<double, double>& data2D, const std::string& label);
 
   /*!
+  * \brief Removes data from the widget, works for 1D and 2D Data
+  * \param label the name of the data that is also used as identifier.
+  * \note the data can be cleared with ClearDiagram()
+  */
+  void RemoveData(const std::string& label);
+
+  /*!
   * \brief sets the color of one data entry (identifier is previously assigned label)
   *  \details the color name can be "red" or a hex number (#FF0000).
   * Either define all data entries with a color or none. If a mixed approach is used, different data entries could have the same color.

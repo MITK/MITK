@@ -85,10 +85,6 @@ SliceNavigationController::SliceNavigationController( )
 
   m_Slice->SetUnitName( "mm" );
   m_Time->SetUnitName( "ms" );
-
-  m_Top = false;
-  m_FrontSide = false;
-  m_Rotated = false;
 }
 
 
@@ -247,10 +243,6 @@ SliceNavigationController::Update(
     Modified();
   }
   this->SetViewDirection( viewDirection );
-  this->SetTop( top );
-  this->SetFrontSide( frontside );
-  this->SetRotated( rotated );
-
   if ( m_LastUpdateTime < GetMTime() )
   {
     m_LastUpdateTime = GetMTime();

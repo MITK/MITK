@@ -138,8 +138,8 @@ public:
 
   /*!
   * \brief Displays the diagram in the widget
-  * \param showSubChart if a subchart is displayed inside the widget or not. 
-  * \details see http://c3js.org/samples/options_subchart.html
+  * \param showSubChart if a subchart is displayed inside the widget or not (see http://c3js.org/samples/options_subchart.html).
+  * \exception if no data has been provided (\sa AddData1D AddData2D)
   */
   void Show(bool showSubChart=false);
 

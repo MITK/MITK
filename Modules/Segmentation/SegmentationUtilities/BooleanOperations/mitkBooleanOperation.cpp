@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <exception>
+
 #include "mitkBooleanOperation.h"
 #include <mitkExceptionMacro.h>
 #include <mitkImageCast.h>
@@ -109,6 +111,7 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetDifference() const
   notFilter->SetInput(input2);
 
   auto andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
+
   andFilter->SetInput1(input1);
   andFilter->SetInput2(notFilter->GetOutput());
 
@@ -131,6 +134,7 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetIntersection() const
   auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
 
   auto andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
+
   andFilter->SetInput1(input1);
   andFilter->SetInput2(input2);
 
@@ -153,6 +157,7 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetUnion() const
   auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
 
   auto orFilter = itk::OrImageFilter<ImageType, ImageType>::New();
+
   orFilter->SetInput1(input1);
   orFilter->SetInput2(input2);
 

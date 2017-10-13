@@ -128,7 +128,9 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
     mitk::BooleanOperation booleanOperation(type, segmentationA, segmentationB, timeNavigationController->GetTime()->GetPos());
     result = booleanOperation.GetResult();
 
-    assert(result.IsNotNull());
+    if (!result.IsNotNull()){
+      return;
+    }
 
     auto dataSelectionWidget = m_Controls.dataSelectionWidget;
 
@@ -138,9 +140,9 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
       GetPrefix(type) + dataSelectionWidget->GetSelection(1)->GetName(),
       dataSelectionWidget->GetSelection(0));
   }
-  catch (const mitk::Exception& exception)
+  catch (const std::exception& exp)
   {
-    MITK_ERROR << "Boolean operation failed: " << exception.GetDescription();
-    QMessageBox::information(nullptr, "Boolean operation failed", exception.GetDescription());
+    MITK_ERROR << "Boolean operation failed: " << exp.what();
+    QMessageBox::information(nullptr, "Boolean operation failed", exp.what());
   }
 }

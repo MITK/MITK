@@ -38,6 +38,7 @@ private:
   std::string m_PathToBall;
   std::string m_PathToImage;
   std::string m_PathToLogo;
+  std::string m_PathToMitkLogo;
   std::string m_ReferenceImagePath;
 
 public:

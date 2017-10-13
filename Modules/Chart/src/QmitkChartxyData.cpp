@@ -16,11 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkChartxyData.h>
 
-QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data, const QVariant& label) : m_Color(""), m_LineStyleName("solid") {
-  SetData(data, label);
+QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data, const QVariant& label, const QVariant& chartType) : m_Label(label), m_ChartType(chartType), m_Color(""), m_LineStyleName("solid") {
+  SetData(data);
 }
 
-QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& label) : m_Color(""), m_LineStyleName("solid") {
+QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& label, const QVariant& chartType) : m_Label(label), m_ChartType(chartType), m_Color(""), m_LineStyleName("solid") {
   QMap<QVariant, QVariant> augmentedData;
   unsigned int count = 0;
   //just augment the 1D data
@@ -28,18 +28,17 @@ QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& 
     augmentedData[count] = ele;
     count++;
   }
-  SetData(augmentedData, label);
+  SetData(augmentedData);
 }
 
 
-void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data, const QVariant& label)
+void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data)
 {
 	for (const auto& entry : data.toStdMap())
 	{
 		m_XData.push_back(entry.first);
 		m_YData.push_back(entry.second);
 	}
-  m_Label = label;
 }
 
 void QmitkChartxyData::ClearData()

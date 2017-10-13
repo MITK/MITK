@@ -78,6 +78,7 @@ public:
   * \brief Adds 1D data to the widget
   * \details internally, the list is converted to a map with increasing integers keys starting at 0.
   * \param label the name of the data that is also used as identifier.
+  * \param type the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram()
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
@@ -87,6 +88,7 @@ public:
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
   * \details each entry represents a data point: key: value --> x-value: y-value.
   * \param label the name of the data that is also used as identifier.
+  * \param type the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram() 
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
@@ -122,8 +124,9 @@ public:
   std::string GetDiagramTitle() const;
 
   /*!
-  * \brief sets the diagram type
-  *  \note to also display the changes, call ChangeDiagramTypeAndReload()
+  * \brief sets the chart type for a data entry
+  * \details for available types, see ChartType
+  * If an unknown label is given, nothing happens.
   *  \sa DiagramType for available types
   */
   void SetChartType(const std::string& label, ChartType type);
@@ -137,7 +140,7 @@ public:
   void SetChartTypeForAllDataAndReload(ChartType type);
 
   /*!
-  * \brief Displays the diagram in the widget
+  * \brief Displays the chart in the widget
   * \param showSubChart if a subchart is displayed inside the widget or not (see http://c3js.org/samples/options_subchart.html).
   * \exception if no data has been provided (\sa AddData1D AddData2D)
   */

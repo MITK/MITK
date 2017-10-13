@@ -57,9 +57,6 @@ public:
   LegendPosition GetLegendPosition() const;
   std::string GetLegendPositionAsString() const;
 
-  void SetDiagramType(QmitkChartWidget::ChartType diagramType);
-  ChartType GetDiagramType() const;
-  std::string GetDiagramTypeAsString() const;
 
   void ClearJavaScriptChart();
   void InitializeJavaScriptChart();
@@ -269,11 +266,10 @@ void QmitkChartWidget::Impl::ClearData2D() {
   GetC3xyData()->clear(); 
 }
 
-QmitkChartWidget::QmitkChartWidget(ChartType type, QWidget* parent)
+QmitkChartWidget::QmitkChartWidget(QWidget* parent)
   : QWidget(parent),
   m_Impl(new Impl(this))
 {
-  SetChartType(type);
 }
 
 void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
@@ -360,14 +356,7 @@ std::string QmitkChartWidget::GetDiagramTitle() const
   return m_Impl->GetDiagramTitle();
 }
 
-void QmitkChartWidget::SetChartType(ChartType type)
 {
-	m_Impl->SetDiagramType(type);
-}
-
-QmitkChartWidget::ChartType QmitkChartWidget::GetChartType() const
-{
-  return m_Impl->GetDiagramType();
 }
 
 void QmitkChartWidget::SetLegendPosition(LegendPosition position)

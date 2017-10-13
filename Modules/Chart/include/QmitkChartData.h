@@ -32,7 +32,6 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_xAxisLabel READ GetXAxisLabel WRITE SetXAxisLabel NOTIFY SignalXAxisLabelChanged);
   Q_PROPERTY(QVariant m_yAxisLabel READ GetYAxisLabel WRITE SetYAxisLabel NOTIFY SignalYAxisLabelChanged);
   Q_PROPERTY(QVariant m_diagramTitle READ GetDiagramTitle WRITE SetDiagramTitle NOTIFY SignalDiagramTitleChanged);
-  Q_PROPERTY(QVariant m_DiagramTypeName READ GetDiagramType WRITE SetDiagramType NOTIFY SignalDiagramTypeChanged);
   Q_PROPERTY(QVariant m_LegendPosition READ GetLegendPosition WRITE SetLegendPosition NOTIFY SignalLegendPositionChanged);
   Q_PROPERTY(QVariant m_ShowSubchart READ GetShowSubchart WRITE SetShowSubchart NOTIFY SignalShowSubchartChanged);
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
@@ -40,7 +39,7 @@ class QmitkChartData : public QObject
 public:
   QmitkChartData();
 
-  void SetAppearance(const QVariant& diagramTypeName, bool showSubChart = true, bool usePercentageInPieChart = false);
+  void SetAppearance(bool showSubChart = true, bool usePercentageInPieChart = false);
 
   Q_INVOKABLE QList<QVariant> GetDataLabels() const { return m_dataLabels; };
   Q_INVOKABLE void SetDataLabels(const QList<QVariant>& dataLabels) { m_dataLabels = dataLabels; emit SignalDataLabelsChanged(dataLabels); };
@@ -53,9 +52,6 @@ public:
 
   Q_INVOKABLE QVariant GetDiagramTitle() const { return m_diagramTitle; };
   Q_INVOKABLE void SetDiagramTitle(const QVariant& title) { m_diagramTitle = title; emit SignalDiagramTitleChanged(title); };
-
-  Q_INVOKABLE QVariant GetDiagramType() const { return m_DiagramTypeName; };
-  Q_INVOKABLE void SetDiagramType(const QVariant& diagramTypeName) { m_DiagramTypeName = diagramTypeName; emit SignalDiagramTypeChanged(diagramTypeName); };
 
   Q_INVOKABLE QVariant GetLegendPosition() const { return m_LegendPosition; };
   Q_INVOKABLE void SetLegendPosition(const QVariant& legendPosition) { m_LegendPosition = legendPosition; emit SignalLegendPositionChanged(legendPosition); };
@@ -70,7 +66,6 @@ signals:
   void SignalDataLabelsChanged(const QList<QVariant> dataLabels);
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
-  void SignalDiagramTypeChanged(const QVariant chartType);
   void SignalLegendPositionChanged(const QVariant legendPosition);
   void SignalDiagramTitleChanged(const QVariant title);
   void SignalShowSubchartChanged(const QVariant showSubchart);
@@ -82,7 +77,6 @@ private:
   QVariant m_yAxisLabel;
   QVariant m_diagramTitle;
 
-  QVariant m_DiagramTypeName;
   QVariant m_LegendPosition;
   QVariant m_ShowSubchart;
   QVariant m_UsePercentageInPieChart;

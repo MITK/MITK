@@ -71,7 +71,7 @@ public:
     inset
   };
 
-  explicit QmitkChartWidget(ChartType type=ChartType::bar, QWidget* parent = nullptr);
+  explicit QmitkChartWidget(QWidget* parent = nullptr);
   virtual ~QmitkChartWidget();
 
   /*!
@@ -127,7 +127,6 @@ public:
   *  \sa DiagramType for available types
   */
   void SetChartType(ChartType type);
-  ChartType GetChartType() const;
 
   void SetLegendPosition(LegendPosition position);
   LegendPosition GetLegendPosition() const;

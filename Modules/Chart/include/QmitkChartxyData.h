@@ -34,10 +34,10 @@ class QmitkChartxyData : public QObject
   Q_PROPERTY(QVariant m_LineStyleName READ GetLineStyle WRITE SetLineStyle NOTIFY SignalLineStyleChanged);
 
 public:
-  explicit QmitkChartxyData(const QList<QVariant>& data, const QVariant& label); //Constructor for Data1D (y=1,5,6,...)
-  explicit QmitkChartxyData(const QMap<QVariant, QVariant>& data, const QVariant& label); //Constructor for Data2D (x:y=1:2, 2:6, 3:7)
+  explicit QmitkChartxyData(const QList<QVariant>& data, const QVariant& label, const QVariant& diagramType); //Constructor for Data1D (y=1,5,6,...)
+  explicit QmitkChartxyData(const QMap<QVariant, QVariant>& data, const QVariant& label, const QVariant& diagramType); //Constructor for Data2D (x:y=1:2, 2:6, 3:7)
 
-  void SetData(const QMap<QVariant, QVariant>& data, const QVariant& label);
+  void SetData(const QMap<QVariant, QVariant>& data);
 
   Q_INVOKABLE QList<QVariant> GetYData() const { return m_YData; };
   Q_INVOKABLE void SetYData(const QList<QVariant>& yData) { m_YData =yData; };

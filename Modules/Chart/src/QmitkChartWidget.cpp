@@ -152,16 +152,23 @@ void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const 
 }
 
 void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
-  std::vector<QmitkChartxyData*>::const_iterator iter_temp;
-  for (std::vector<QmitkChartxyData*>::const_iterator iter = GetC3xyData()->begin(); iter != GetC3xyData()->end(); ++iter)
+  std::vector<QmitkChartxyData*>::iterator iter_temp = GetC3xyData()->end();
+  for (std::vector<QmitkChartxyData*>::iterator iter = GetC3xyData()->begin(); iter != GetC3xyData()->end(); ++iter)
   {
     const auto &temp = *iter;
     if (temp->GetLabel().toString().toStdString() == label)
     {
       iter_temp = iter;
+      break;
     }
   }
-  GetC3xyData()->erase(iter_temp);
+  if (iter_temp == GetC3xyData()->end()) {
+    throw std::invalid_argument("Cannot Remove Data because the label does not exist.");
+  }
+  else
+  {
+    GetC3xyData()->erase(iter_temp);
+  }
 }
 
 void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label, QmitkChartWidget::ChartType type) {

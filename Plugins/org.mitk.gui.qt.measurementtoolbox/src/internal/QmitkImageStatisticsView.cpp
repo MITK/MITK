@@ -155,12 +155,12 @@ void QmitkImageStatisticsView::OnShowSubchartBoxChanged()
 
 void QmitkImageStatisticsView::OnBarRadioButtonSelected()
 {
-  this->m_Controls->m_JSHistogram->SetChartTypeAndReload(QmitkChartWidget::ChartType::bar);
+  this->m_Controls->m_JSHistogram->SetChartTypeForAllDataAndReload(QmitkChartWidget::ChartType::bar);
 }
 
 void QmitkImageStatisticsView::OnLineRadioButtonSelected()
 {
-  this->m_Controls->m_JSHistogram->SetChartTypeAndReload(QmitkChartWidget::ChartType::line);
+  this->m_Controls->m_JSHistogram->SetChartTypeForAllDataAndReload(QmitkChartWidget::ChartType::line);
 }
 
 void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer& )
@@ -218,14 +218,15 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 
       if (closedFigure)
       {
-        this->m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram), m_Controls->m_SelectedFeatureImageLabel->text().toStdString());
+        auto imageNameLabel = m_Controls->m_SelectedFeatureImageLabel->text().toStdString();
+        this->m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram), imageNameLabel);
         if (this->m_Controls->m_lineRadioButton->isChecked())
         {
-          this->m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::line);
+          this->m_Controls->m_JSHistogram->SetChartType(imageNameLabel, QmitkChartWidget::ChartType::line);
         }
         else
         {
-          this->m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::bar);
+          this->m_Controls->m_JSHistogram->SetChartType(imageNameLabel, QmitkChartWidget::ChartType::bar);
         }
         this->m_Controls->m_JSHistogram->SetXAxisLabel("Grey value");
         this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
@@ -926,8 +927,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         mitk::IntensityProfile::ConstPointer intensityProfile = (mitk::IntensityProfile::ConstPointer)mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
 
         auto intensityProfileList = ConvertIntensityProfileToVector(intensityProfile);
-        m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::line);
-        m_Controls->m_JSHistogram->AddData1D(intensityProfileList, "Intensity profile " + m_Controls->m_SelectedMaskLabel->text().toStdString());
+        auto lineDataLabel = "Intensity profile " + m_Controls->m_SelectedMaskLabel->text().toStdString();
+        m_Controls->m_JSHistogram->SetChartType(lineDataLabel, QmitkChartWidget::ChartType::line);
+        m_Controls->m_JSHistogram->AddData1D(intensityProfileList, lineDataLabel);
         m_Controls->m_JSHistogram->SetXAxisLabel("Distance");
         m_Controls->m_JSHistogram->SetYAxisLabel("Intensity");
         m_Controls->m_JSHistogram->Show(m_Controls->m_ShowSubchartCheckBox->isChecked());
@@ -976,8 +978,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_HistogramBinSizeSpinbox->setValue(this->m_CalculationThread->GetHistogramBinSize());
         auto histogram = this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer();
 
-        m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram), m_Controls->m_SelectedFeatureImageLabel->text().toStdString());
-        m_Controls->m_JSHistogram->SetChartType(QmitkChartWidget::ChartType::bar);
+        auto imageLabelName = m_Controls->m_SelectedFeatureImageLabel->text().toStdString();
+        m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram),imageLabelName);
+        m_Controls->m_JSHistogram->SetChartType(imageLabelName, QmitkChartWidget::ChartType::bar);
         this->m_Controls->m_JSHistogram->SetXAxisLabel("Gray value");
         this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
         m_Controls->m_UseDefaultBinSizeBox->setEnabled(true);

@@ -14,13 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <exception>
+#include <cassert>
+
+#include <QMessageBox>
+#include <QWidget>
+
 #include "QmitkBooleanOperationsWidget.h"
 #include "../../Common/QmitkDataSelectionWidget.h"
 #include <mitkException.h>
 #include <mitkSliceNavigationController.h>
-#include <cassert>
-#include <QMessageBox>
-#include <QWidget>
 
 static QString const HelpText = QWidget::tr("Select two different segmentations above");
 
@@ -128,7 +131,7 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
     mitk::BooleanOperation booleanOperation(type, segmentationA, segmentationB, timeNavigationController->GetTime()->GetPos());
     result = booleanOperation.GetResult();
 
-    if (!result.IsNotNull()){
+    if (result.IsNull()){
       return;
     }
 

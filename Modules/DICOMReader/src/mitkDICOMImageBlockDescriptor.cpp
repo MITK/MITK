@@ -328,8 +328,14 @@ void mitk::DICOMImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( ScalarTyp
     // fallback to "on detector" spacing
     if ( !DICOMStringToSpacing( imagerPixelSpacing, spacingX, spacingY ) )
     {
-      // last resort: invent something
-      spacingX = spacingY = 1.0;
+      // at this point we have no hints whether the spacing is correct
+      // do a quick sanity check and either trust in the input or set both to 1
+      // We assume neither spacing to be negative, zero or unexpectedly large for
+      // medical images
+      if (spacingX < mitk::eps || spacingX > 1000 || spacingY < mitk::eps || spacingY > 1000)
+      {
+        spacingX = spacingY = 1.0;
+      }
     }
   }
 }

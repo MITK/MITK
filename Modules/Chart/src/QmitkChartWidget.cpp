@@ -164,7 +164,7 @@ void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
   GetC3xyData()->erase(iter_temp);
 }
 
-void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label) {
+void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label, QmitkChartWidget::ChartType type) {
   QMap<QVariant, QVariant> data2DConverted;
   for (const auto& aValue : data2D) {
     data2DConverted.insert(aValue.first, aValue.second);

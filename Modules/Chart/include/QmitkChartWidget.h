@@ -81,7 +81,7 @@ public:
   * \note the data can be cleared with ClearDiagram()
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
-  void AddData1D(const std::vector<double>& data1D, const std::string& label);
+  void AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType type = ChartType::bar);
 
   /*!
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
@@ -90,7 +90,7 @@ public:
   * \note the data can be cleared with ClearDiagram() 
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
-  void AddData2D(const std::map<double, double>& data2D, const std::string& label);
+  void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType type = ChartType::bar);
 
   /*!
   * \brief sets the color of one data entry (identifier is previously assigned label)
@@ -126,15 +126,15 @@ public:
   *  \note to also display the changes, call ChangeDiagramTypeAndReload()
   *  \sa DiagramType for available types
   */
-  void SetChartType(ChartType type);
+  void SetChartType(const std::string& label, ChartType type);
 
   void SetLegendPosition(LegendPosition position);
   LegendPosition GetLegendPosition() const;
 
   /*!
-  * \brief Reloads the chart and changes the chart type
+  * \brief Changes the chart type for all data entries and reloads the chart
   */
-  void SetChartTypeAndReload(ChartType type);
+  void SetChartTypeForAllDataAndReload(ChartType type);
 
   /*!
   * \brief Displays the diagram in the widget

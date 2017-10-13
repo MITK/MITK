@@ -12,6 +12,7 @@ var xValues=[];
 var yValues=[];
 var xs = {};
 var dataColors = {};
+var chartTypes = {};
 var lineStyle = {};
 
 //Is executed when js is loaded first.
@@ -44,6 +45,7 @@ window.onload = function()
 			xValues[count] = xDataTemp
 			yValues[count] = yDataTemp
 			dataColors[dataLabelsTemp] = channel.objects[propertyName].m_Color
+			chartTypes[dataLabelsTemp] = channel.objects[propertyName].m_ChartType
 
 			if (channel.objects[propertyName].m_LineStyleName=="solid"){
 				lineStyle[dataLabelsTemp]= ''
@@ -154,7 +156,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
     data: {
         xs: {}, //use first "column" as x axis values
         columns: [],  //initialize empty. Data will be loaded in function setupChart(chartData)
-        type: chartType,
+        types: chartTypes,
         selection: {
           enabled: false,
           multiple: false,

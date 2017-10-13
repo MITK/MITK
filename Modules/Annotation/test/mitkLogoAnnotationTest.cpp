@@ -58,6 +58,7 @@ public:
     m_PathToBall = GetTestDataFilePath("ball.stl");
     m_PathToImage = GetTestDataFilePath("Pic3D.nrrd");
     m_PathToLogo = GetTestDataFilePath("RenderingTestData/texture.jpg");
+    m_PathToMitkLogo = GetTestDataFilePath("RenderingTestData/defaultWatermark.png");
     m_ReferenceImagePath = "RenderingTestData/ReferenceScreenshots/Annotation/";
 
     // Build a command line for the vtkTesting::Test method.
@@ -80,7 +81,7 @@ public:
     imagenode->SetData(mitk::IOUtil::Load(m_PathToImage)[0]);
     m_RenderingTestHelper.AddNodeToStorage(imagenode);
 
-    std::string refImagePath = GetTestDataFilePath(m_ReferenceImagePath + "LogoAnnotation_mbiLogo.png");
+    std::string refImagePath = GetTestDataFilePath(m_ReferenceImagePath + "LogoAnnotation_mitkLogo.png");
 
     // reference screenshot for this test
     m_CommandlineArgs.push_back(refImagePath);
@@ -90,7 +91,7 @@ public:
 
     mitk::LogoAnnotation::Pointer logoAnnotation = mitk::LogoAnnotation::New();
 
-    logoAnnotation->SetLogoImagePath("mbilogo");
+    logoAnnotation->SetLogoImagePath(m_PathToMitkLogo);
 
     mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(m_RenderingTestHelper.GetVtkRenderWindow());
     mitk::ManualPlacementAnnotationRenderer::AddAnnotation(logoAnnotation.GetPointer(), renderer);

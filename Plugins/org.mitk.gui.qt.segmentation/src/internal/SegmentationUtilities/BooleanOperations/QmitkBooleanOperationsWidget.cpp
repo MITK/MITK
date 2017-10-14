@@ -14,13 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <exception>
+#include <cassert>
+
+#include <QMessageBox>
+#include <QWidget>
+
 #include "QmitkBooleanOperationsWidget.h"
 #include "../../Common/QmitkDataSelectionWidget.h"
 #include <mitkException.h>
 #include <mitkSliceNavigationController.h>
-#include <cassert>
-#include <QMessageBox>
-#include <QWidget>
 
 static QString const HelpText = QWidget::tr("Select two different segmentations above");
 
@@ -128,7 +131,9 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
     mitk::BooleanOperation booleanOperation(type, segmentationA, segmentationB, timeNavigationController->GetTime()->GetPos());
     result = booleanOperation.GetResult();
 
-    assert(result.IsNotNull());
+    if (result.IsNull()){
+      return;
+    }
 
     auto dataSelectionWidget = m_Controls.dataSelectionWidget;
 
@@ -138,9 +143,9 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
       GetPrefix(type) + dataSelectionWidget->GetSelection(1)->GetName(),
       dataSelectionWidget->GetSelection(0));
   }
-  catch (const mitk::Exception& exception)
+  catch (const std::exception& exp)
   {
-    MITK_ERROR << "Boolean operation failed: " << exception.GetDescription();
-    QMessageBox::information(nullptr, "Boolean operation failed", exception.GetDescription());
+    MITK_ERROR << "Boolean operation failed: " << exp.what();
+    QMessageBox::information(nullptr, "Boolean operation failed", exp.what());
   }
 }

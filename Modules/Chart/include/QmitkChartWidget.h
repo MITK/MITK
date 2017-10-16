@@ -98,6 +98,7 @@ public:
   * \brief Removes data from the widget, works for 1D and 2D Data
   * \param label the name of the data that is also used as identifier.
   * \note the data can be cleared with ClearDiagram()
+  * \throws Invalid Argument Exception when the label cannot be found
   */
   void RemoveData(const std::string& label);
 

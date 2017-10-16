@@ -28,7 +28,6 @@ class QmitkChartData : public QObject
 {
   Q_OBJECT
 
-  Q_PROPERTY(QList<QVariant> m_dataLabels READ GetDataLabels WRITE SetDataLabels NOTIFY SignalDataLabelsChanged);
   Q_PROPERTY(QVariant m_xAxisLabel READ GetXAxisLabel WRITE SetXAxisLabel NOTIFY SignalXAxisLabelChanged);
   Q_PROPERTY(QVariant m_yAxisLabel READ GetYAxisLabel WRITE SetYAxisLabel NOTIFY SignalYAxisLabelChanged);
   Q_PROPERTY(QVariant m_diagramTitle READ GetDiagramTitle WRITE SetDiagramTitle NOTIFY SignalDiagramTitleChanged);
@@ -40,9 +39,6 @@ public:
   QmitkChartData();
 
   void SetAppearance(bool showSubChart = true, bool usePercentageInPieChart = false);
-
-  Q_INVOKABLE QList<QVariant> GetDataLabels() const { return m_dataLabels; };
-  Q_INVOKABLE void SetDataLabels(const QList<QVariant>& dataLabels) { m_dataLabels = dataLabels; emit SignalDataLabelsChanged(dataLabels); };
 
   Q_INVOKABLE QVariant GetXAxisLabel() const { return m_xAxisLabel; };
   Q_INVOKABLE void SetXAxisLabel(const QVariant& label) { m_xAxisLabel = label; emit SignalXAxisLabelChanged(label); };
@@ -63,7 +59,6 @@ public:
   Q_INVOKABLE void SetUsePercentageInPieChart(const QVariant& usePercentageInPieChart) { m_UsePercentageInPieChart = usePercentageInPieChart; emit SignalUsePercentageInPieChartChanged(usePercentageInPieChart); };
 
 signals:
-  void SignalDataLabelsChanged(const QList<QVariant> dataLabels);
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
   void SignalLegendPositionChanged(const QVariant legendPosition);
@@ -72,7 +67,6 @@ signals:
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
 
 private:
-  QList<QVariant> m_dataLabels;
   QVariant m_xAxisLabel;
   QVariant m_yAxisLabel;
   QVariant m_diagramTitle;

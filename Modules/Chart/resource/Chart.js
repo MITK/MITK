@@ -30,12 +30,7 @@ window.onload = function()
 			var dataLabelsTemp;
 			//add label to x array
 			xDataTemp.unshift('x'+count.toString())
-			if (count < chartData.m_dataLabels.length){
-				dataLabelsTemp = chartData.m_dataLabels[count]
-			}
-			else {
-				dataLabelsTemp = "data" + count.toString()
-			}
+			dataLabelsTemp = channel.objects[propertyName].m_Label
 
 			xs[dataLabelsTemp] = 'x'+count.toString()
 			

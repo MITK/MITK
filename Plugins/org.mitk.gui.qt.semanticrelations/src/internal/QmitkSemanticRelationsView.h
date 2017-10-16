@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
-#include <mitkSemanticRelationsManager.h>
 #include <mitkSemanticTypes.h>
 
 // semantic relations UI module
@@ -67,6 +66,9 @@ private Q_SLOTS:
 
   void OnCaseIDSelectionChanged(const QString&);
   void OnSelectPatientNodeButtonClicked();
+  /*
+  * @brief Generates a new, empty lesion to add to the semantic relations model for the current case ID.
+  */
   void OnAddLesionButtonClicked();
   void OnRemoveLesionButtonClicked();
   void OnLinkLesionButtonClicked();
@@ -89,8 +91,7 @@ private:
   QmitkSelectNodeDialog* m_SimpleDatamanagerNodeDialog;
 
   mitk::SemanticTypes::CaseID m_CaseID;
-  std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
-  std::unique_ptr<mitk::SemanticRelationsManager> m_SemanticRelationsManager;
+  std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 };
 
 #endif // QMITKSEMANTICRELATIONSVIEW_H

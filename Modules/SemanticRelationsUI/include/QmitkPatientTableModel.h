@@ -65,6 +65,13 @@ public:
   void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
   void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
   void SetPatientData();
+  /*
+  * @brief Updates the table model with the current control point data and information type data from the semantic relations model, 
+  *        if the 'caseID' is equal to the currently selected case ID of the table model.
+  *        This function can be called from an observer of SemanticRelations (e.g. a table view that uses this model)
+  *        in order to propagate the Update-request to this model.
+  */
+  void Update(const mitk::SemanticTypes::CaseID& caseID);
 
 Q_SIGNALS:
   void ModelUpdated();

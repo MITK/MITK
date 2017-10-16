@@ -6,6 +6,5 @@ set(CPP_FILES
   mitkNodePredicates.cpp
   mitkRelationStorage.cpp
   mitkSemanticRelations.cpp
-  mitkSemanticRelationsManager.cpp
   mitkUIDGeneratorBoost.cpp
 )

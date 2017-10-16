@@ -171,6 +171,15 @@ void QmitkPatientTableModel::SetPatientData()
   emit ModelUpdated();
 }
 
+void QmitkPatientTableModel::Update(const mitk::SemanticTypes::CaseID& caseID)
+{
+  // if the case ID of updated instance is equal to the currently active caseID
+  if (caseID == m_CaseID)
+  {
+    SetPatientData();
+  }
+}
+
 mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& index) const
 {
   mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(index.column());

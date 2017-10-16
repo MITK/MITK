@@ -72,12 +72,16 @@ void QmitkLesionInfoWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
     return;
   }
 
-  ClearLesionInfoWidget();
-  // create list widget entries with the current lesions
-  std::vector<mitk::SemanticTypes::Lesion> allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(caseID);
-  for (const auto& lesion : allLesionsOfCase)
+  // if the case ID of updated instance is equal to the currently active caseID
+  if (caseID == m_CaseID)
   {
-    m_Controls.lesionListWidget->addItem(QString::fromStdString(lesion.UID));
+    ClearLesionInfoWidget();
+    // create list widget entries with the current lesions
+    std::vector<mitk::SemanticTypes::Lesion> allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(caseID);
+    for (const auto& lesion : allLesionsOfCase)
+    {
+      m_Controls.lesionListWidget->addItem(QString::fromStdString(lesion.UID));
+    }
   }
 }
 

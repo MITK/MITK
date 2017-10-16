@@ -39,17 +39,16 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   m_Controls.setupUi(parent);
 
   // initialize the semantic relations
-  m_SemanticRelations = std::make_shared<mitk::SemanticRelations>(GetDataStorage());
-  m_SemanticRelationsManager = std::make_unique<mitk::SemanticRelationsManager>(GetDataStorage());
+  m_SemanticRelations = std::make_unique<mitk::SemanticRelations>(GetDataStorage());
 
   connect(m_Controls.caseIDComboBox, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnCaseIDSelectionChanged(const QString&)));
   connect(m_Controls.selectPatientNodePushButton, SIGNAL(clicked()), SLOT(OnSelectPatientNodeButtonClicked()));
 
   m_Controls.lesionInfoWidget->SetDataStorage(GetDataStorage());
-  m_SemanticRelationsManager->AddObserver(m_Controls.lesionInfoWidget);
+  m_SemanticRelations->AddObserver(m_Controls.lesionInfoWidget);
 
   m_PatientTableWidget = new QmitkPatientTableWidget(GetDataStorage());
-  m_SemanticRelationsManager->AddObserver(m_PatientTableWidget);
+  m_SemanticRelations->AddObserver(m_PatientTableWidget);
 
   m_SelectPatientNodeDialog = new QmitkSelectNodeDialog(parent);
   m_SelectPatientNodeDialog->setWindowTitle("Select patient image node");
@@ -77,7 +76,6 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
 void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)
 {
   m_CaseID = caseID.toStdString();
-  m_SemanticRelationsManager->SetCurrentCaseID(m_CaseID);
   m_Controls.lesionInfoWidget->SetCurrentCaseID(m_CaseID);
 }
 
@@ -110,7 +108,19 @@ void QmitkSemanticRelationsView::OnAddLesionButtonClicked()
     return;
   }
 
-  m_SemanticRelationsManager->GenerateNewLesion(m_CaseID);
+  mitk::SemanticTypes::Lesion newLesion;
+  newLesion.UID = mitk::UIDGeneratorBoost::GenerateUID();
+  newLesion.lesionClass = mitk::SemanticTypes::LesionClass();
+  newLesion.lesionClass.UID = mitk::UIDGeneratorBoost::GenerateUID();
+
+  try
+  {
+    m_SemanticRelations->AddLesion(m_CaseID, newLesion);
+  }
+  catch (mitk::SemanticRelationException& e)
+  {
+    MITK_INFO << "Could not add a new lesion. " << e;
+  }
 }
 
 void QmitkSemanticRelationsView::OnRemoveLesionButtonClicked()
@@ -125,7 +135,14 @@ void QmitkSemanticRelationsView::OnRemoveLesionButtonClicked()
   mitk::SemanticTypes::Lesion selectedLesion = m_Controls.lesionInfoWidget->GetSelectedLesion();
   if (!selectedLesion.UID.empty())
   {
-    m_SemanticRelationsManager->RemoveLesion(m_CaseID, selectedLesion);
+    try
+    {
+      m_SemanticRelations->RemoveLesion(m_CaseID, selectedLesion);
+    }
+    catch (mitk::SemanticRelationException& e)
+    {
+      MITK_INFO << "Could not remove the selected lesion. " << e;
+    }
   }
   else
   {
@@ -163,7 +180,7 @@ void QmitkSemanticRelationsView::OnLinkLesionButtonClicked()
 
       // get parent node of the current segmentation node with the node predicate
       mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = GetDataStorage()->GetSources(selectedDataNode, mitk::NodePredicates::GetImagePredicate(), false);
-      mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(parentNodes->front());
+      mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
 
       // check for already existing, identifying base properties
       mitk::BaseProperty* caseIDProperty = baseData->GetProperty("DICOM.0010.0010");
@@ -180,7 +197,16 @@ void QmitkSemanticRelationsView::OnLinkLesionButtonClicked()
         baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
       }
 
-      m_SemanticRelationsManager->AddAndLinkSegmentationInstance(selectedDataNode, parentNodes->front(), selectedLesion);
+      m_SemanticRelations->AddSegmentation(selectedDataNode, parentNodes->front());
+      try
+      {
+        m_SemanticRelations->LinkSegmentationToLesion(selectedDataNode, selectedLesion);
+      }
+      catch (mitk::SemanticRelationException& e)
+      {
+        MITK_INFO << "Could not link the selected segmentation to the selected lesion. " << e;
+      }
+
       AddToComboBox(caseID);
     }
     else
@@ -197,7 +223,7 @@ void QmitkSemanticRelationsView::OnUnlinkLesionButtonClicked()
   if (nullptr != selectedSegmentation)
   {
     // remove the segmentation from the semantic relations storage
-    m_SemanticRelationsManager->RemoveAndUnlinkSegmentationInstance(selectedSegmentation);
+    m_SemanticRelations->UnlinkSegmentationFromLesion(selectedSegmentation);
   }
   else
   {
@@ -218,11 +244,18 @@ void QmitkSemanticRelationsView::OnAddImageButtonClicked()
   {
     if (mitk::NodePredicates::GetImagePredicate()->CheckNode(selectedDataNode))
     {
-      // add the image to the semantic relations storage
-      m_SemanticRelationsManager->AddImageInstance(selectedDataNode);
-      m_PatientTableWidget->SetPixmapOfNode(selectedDataNode);
-      mitk::SemanticTypes::CaseID caseID = mitk::DICOMHelper::GetCaseIDFromDataNode(selectedDataNode);
-      AddToComboBox(caseID);
+      try
+      {
+        // add the image to the semantic relations storage
+        m_SemanticRelations->AddImage(selectedDataNode);
+        m_PatientTableWidget->SetPixmapOfNode(selectedDataNode);
+        mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(selectedDataNode);
+        AddToComboBox(caseID);
+      }
+      catch (mitk::Exception& e)
+      {
+        MITK_INFO << "Could not add the selected image. " << e;
+      }
     }
     else
     {
@@ -239,7 +272,7 @@ void QmitkSemanticRelationsView::OnRemoveImageButtonClicked()
   {
     // remove the image from the semantic relations storage
     m_PatientTableWidget->DeletePixmapOfNode(selectedImage);
-    m_SemanticRelationsManager->RemoveImageInstance(selectedImage);
+    m_SemanticRelations->RemoveImage(selectedImage);
   }
   else
   {

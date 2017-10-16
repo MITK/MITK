@@ -56,11 +56,11 @@ public:
   virtual ~QmitkPatientTableWidget();
 
   /*
-  * @brief Updates the model with the current control point data and information type data from the semantic relations model.
+  * @brief Propagates the 'Update'-call to the patient table model to update the patient data (control points and information types).
   *
   *       Overridden from 'ISemanticRelationsObserver'.
-  *       In order for Update-function to be called, this widget has to be added as a observer of the SemanticRelationsManager
-  *       (e.g. m_SemanticRelationsManager->AddObserver(m_LesionInfoWidget);)
+  *       In order for Update-function to be called, this widget has to be added as a observer of SemanticRelations
+  *       (e.g. m_SemanticRelations->AddObserver(m_LesionInfoWidget);)
   *
   * @par caseID    The current case ID to identify the currently active patient / case.
   */

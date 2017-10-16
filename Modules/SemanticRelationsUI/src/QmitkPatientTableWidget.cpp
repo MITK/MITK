@@ -81,7 +81,7 @@ void QmitkPatientTableWidget::SetUpConnections()
 
 void QmitkPatientTableWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
 {
-  m_PatientTableModel->SetCurrentCaseID(caseID);
+  m_PatientTableModel->Update(caseID);
 }
 
 void QmitkPatientTableWidget::SetPixmapOfNode(const mitk::DataNode* dataNode)

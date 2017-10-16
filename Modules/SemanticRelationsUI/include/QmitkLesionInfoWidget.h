@@ -58,8 +58,8 @@ public:
   * @brief Updates the 'lesionListWidget' of the GUI with the current lesion-data from the semantic relations model.
   *
   *       Overridden from 'ISemanticRelationsObserver'.
-  *       In order for Update-function to be called, this widget has to be added as a observer of the SemanticRelationsManager
-  *       (e.g. m_SemanticRelationsManager->AddObserver(m_LesionInfoWidget);)
+  *       In order for Update-function to be called, this widget has to be added as a observer of SemanticRelation
+  *       (e.g. m_SemanticRelations->AddObserver(m_LesionInfoWidget);)
   *
   * @par caseID    The current case ID to identify the currently active patient / case.
   */

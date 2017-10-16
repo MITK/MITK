@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include "mitkControlPointManager.h"
 #include "mitkDICOMHelper.h"
+#include "mitkISemanticRelationsObservable.h"
+#include "mitkISemanticRelationsObserver.h"
 #include "mitkRelationStorage.h"
 #include "mitkSemanticTypes.h"
 
@@ -45,18 +47,33 @@ namespace mitk
   *   In order for most functions to work the case ID has to be defined in the model. If not,
   *   the functions do nothing.
   */
-  class MITKSEMANTICRELATIONS_EXPORT SemanticRelations
+  class MITKSEMANTICRELATIONS_EXPORT SemanticRelations : public ISemanticRelationsObservable
   {
   public:
 
     SemanticRelations(mitk::DataStorage::Pointer dataStorage);
     ~SemanticRelations();
-    mitk::RelationStorage& mitk::SemanticRelations::GetRelationStorage();
 
     typedef std::vector<SemanticTypes::Lesion> LesionVector;
     typedef std::vector<SemanticTypes::ControlPoint> ControlpointVector;
     typedef std::vector<SemanticTypes::InformationType> InformationTypeVector;
     typedef std::vector<DataNode::Pointer> DataNodeVector;
+    /************************************************************************/
+    /* functions to implement the observer pattern                          */
+    /************************************************************************/
+    /*
+    * @brief Adds the given concrete observer to the vector that holds all currently registered observer.
+    *        If the observer is already registered, it will not be added to the observer vector.
+    *
+    * @par observer   The concrete observer to register.
+    */
+    virtual void AddObserver(ISemanticRelationsObserver* observer) override;
+    /*
+    * @brief Removes the given concrete observer from the vector that holds all currently registered observer.
+    *
+    * @par observer   The concrete observer to unregister.
+    */
+    virtual void RemoveObserver(ISemanticRelationsObserver* observer) override;
 
     /************************************************************************/
     /* functions to get instances / attributes                              */
@@ -283,6 +300,28 @@ namespace mitk
     /* functions to add / remove instances / attributes                     */
     /************************************************************************/
     /*
+    * @brief  Add the given image to the set of already existing images.
+    *         The date is extracted from the DICOM data of the image node and is compared to already existing control points in the semantic relations model.
+    *         The function tries to find a fitting control point or to extend an already existing control point, if the extracted control point is close to
+    *         any other, already existing control point.
+    *         Finally, the image is linked to the correct control point.
+    *
+    * @pre    The given image data node has to be valid (!nullptr).
+    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    *
+    * @par imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
+    */
+    void AddImage(const DataNode* imageNode);
+    /*
+    * @brief  Remove the given image from the set of already existing images.
+    *
+    * @pre    The given image data node has to be valid (!nullptr).
+    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    *
+    * @par imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
+    */
+    void RemoveImage(const DataNode* imageNode);
+    /*
     * @brief  Add a newly created lesion to the set of already existing lesions - with no connection to a specific image / segmentation of the case data.
     *
     * @pre    The UID of the lesion must not already exist for a lesion instance.
@@ -315,7 +354,27 @@ namespace mitk
     * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     * @par lesion             The lesion instance to add and link.
     */
-    void AddLesionAndLinkData(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
+    void AddLesionAndLinkSegmentation(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
+    /*
+    * @brief  Remove the given lesion from the set of already existing lesions.
+    *
+    * @pre    The UID of the lesion has to exist for a lesion instance.
+    * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
+    * @pre    The function needs to assure that no segmentation is still representing (linked to) this lesion.
+    * @throw  SemanticRelationException, if the lesion instance to remove is still linked to by any segmentation (this can be checked via 'GetAllSegmentationsOfLesion').
+    *
+    * @par caseID   The current case identifier is defined by the given string.
+    * @par lesion   The lesion instance to remove.
+    */
+    void RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
+    /*
+    * @brief  Add a segmentation instance to the set of already existing segmentations - with no connection to a specific lesion.
+    *
+    * @par segmentationNode   The current case identifier and node identifier is extracted from the given segmentation data node.
+    * @par parentNode         The node identifier of the parent node is extracted from the given parent data node.
+    * @par selectedLesion    The selected lesion that should be linked with the given segmentation.
+    */
+    void AddSegmentation(const DataNode* segmentationNode, const DataNode* parentNode);
     /*
     * @brief  Link the given segmentation instance to an an already existing lesion instance. If the segmentation is already linked to a lesion instance, the
     *         old linkage is overwritten (this can be checked via 'IsRepresentingALesion').
@@ -331,6 +390,7 @@ namespace mitk
     void LinkSegmentationToLesion(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
     /*
     * @brief  Unlink the given segmentation instance from the linked lesion instance.
+    *         The lesion may stay unlinked to any segmentation.
     *
     * @pre    The given segmentation data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
@@ -339,17 +399,14 @@ namespace mitk
     */
     void UnlinkSegmentationFromLesion(const DataNode* segmentationNode);
     /*
-    * @brief  Remove the given lesion from the set of already existing lesions.
+    * @brief  Remove the given segmentation from the set of already existing segmentations.
     *
-    * @pre    The UID of the lesion has to exist for a lesion instance.
-    * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
-    * @pre    The function needs to assure that no segmentation is still representing (linked to) this lesion.
-    * @throw  SemanticRelationException, if the lesion instance to remove is still linked to by any segmentation (this can be checked via 'GetAllSegmentationsOfLesion').
+    * @pre    The given segmentation data node has to be valid (!nullptr).
+    * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
     *
-    * @par caseID   The current case identifier is defined by the given string.
-    * @par lesion   The lesion instance to remove.
+    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     */
-    void RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
+    void RemoveSegmentation(const DataNode* segmentationNode);
     /*
     * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given data.
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.
@@ -441,6 +498,18 @@ namespace mitk
     // the relation storage serves as a storage accessor and can be sub-classed for custom demands
     std::shared_ptr<RelationStorage> m_RelationStorage;
     DataStorage::Pointer m_DataStorage;
+    /*
+    * @brief A vector that stores the currently registered observer of this observable subject.
+    */
+    std::vector<mitk::ISemanticRelationsObserver*> m_ObserverVector;
+    /*
+    * @brief The SemanticRelations, as an example of an observable subject, notifies (updates) the observer with a given case ID.
+    *        The view's caseID was set before in the GUI. The parts of the view that observe changes in the semantic relations are only updated,
+    *        if the given case ID is equal to the observer's current caseID and thus the observer currently shows the semantic information of the given case.
+    *
+    * @par  caseID    The caseID that identifies the currently active patient / case.
+    */
+    virtual void NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) const override;
     /*
     * @brief  Determine if the given control point contains images, which are connected to segmentations that represent the given lesion.
     *         If the lesion or the control point are not correctly stored, the function returns false.

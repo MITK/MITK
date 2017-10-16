@@ -38,9 +38,21 @@ mitk::SemanticRelations::~SemanticRelations()
   // nothing here
 }
 
-mitk::RelationStorage& mitk::SemanticRelations::GetRelationStorage()
+void mitk::SemanticRelations::AddObserver(ISemanticRelationsObserver* observer)
 {
-  return *m_RelationStorage;
+  std::vector<mitk::ISemanticRelationsObserver*>::iterator existingObserver = std::find(m_ObserverVector.begin(), m_ObserverVector.end(), observer);
+  if (existingObserver != m_ObserverVector.end())
+  {
+    // no need to add the already existing observer
+    return;
+  }
+
+  m_ObserverVector.push_back(observer);
+}
+
+void mitk::SemanticRelations::RemoveObserver(ISemanticRelationsObserver* observer)
+{
+  m_ObserverVector.erase(std::remove(m_ObserverVector.begin(), m_ObserverVector.end(), observer), m_ObserverVector.end());
 }
 
 /************************************************************************/
@@ -390,6 +402,109 @@ std::vector<mitk::SemanticTypes::CaseID> mitk::SemanticRelations::GetAllCaseIDs(
 /* functions to add / remove instances / attributes                     */
 /************************************************************************/
 
+void mitk::SemanticRelations::AddImage(const mitk::DataNode* imageNode)
+{
+  if (nullptr == imageNode)
+  {
+    mitkThrow() << "Not a valid data node.";
+  }
+
+  // continue with a valid data node
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::ID nodeID = GetIDFromDataNode(imageNode);
+
+  m_RelationStorage->AddCase(caseID);
+  m_RelationStorage->AddImage(caseID, nodeID);
+
+  AddInformationTypeToImage(imageNode, "unspecified");
+
+  // find the correct control point for this image
+  std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
+  if (allControlPoints.empty())
+  {
+    // no stored control point
+    // create a new control point for the image data
+    SemanticTypes::ControlPoint newControlPoint = GenerateControlPoint(imageNode);
+    try
+    {
+      AddControlPointAndLinkData(imageNode, newControlPoint);
+      NotifyObserver(caseID);
+    }
+    catch (mitk::Exception& e)
+    {
+      mitkReThrow(e);
+    }
+    return;
+  }
+
+  // some control points already exist - find a control point where the date of the data node fits in
+  SemanticTypes::ControlPoint fittingControlPoint = FindFittingControlPoint(imageNode, allControlPoints);
+  if (fittingControlPoint.UID.empty())
+  {
+    // did not find a fitting control point, although some control points already exist
+    // need to see if a close control point can be extended
+    SemanticTypes::ControlPoint extendedControlPoint = ExtendClosestControlPoint(imageNode, allControlPoints);
+    if (extendedControlPoint.UID.empty())
+    {
+      // closest control point can not be extended
+      // create a new control point for the image data
+      SemanticTypes::ControlPoint newControlPoint = GenerateControlPoint(imageNode);
+      try
+      {
+        AddControlPointAndLinkData(imageNode, newControlPoint);
+        NotifyObserver(caseID);
+      }
+      catch (mitk::Exception& e)
+      {
+        mitkReThrow(e);
+      }
+    }
+    else
+    {
+      try
+      {
+        // found a control point that was extended
+        OverwriteControlPointAndLinkData(imageNode, extendedControlPoint);
+        NotifyObserver(caseID);
+      }
+      catch (mitk::Exception& e)
+      {
+        mitkReThrow(e);
+      }
+    }
+  }
+  else
+  {
+    try
+    {
+      // found a fitting control point
+      LinkDataToControlPoint(imageNode, fittingControlPoint);
+      NotifyObserver(caseID);
+    }
+    catch (mitk::Exception& e)
+    {
+      mitkReThrow(e);
+    }
+  }
+}
+
+void mitk::SemanticRelations::RemoveImage(const mitk::DataNode* imageNode)
+{
+  if (nullptr == imageNode)
+  {
+    mitkThrow() << "Not a valid data node.";
+  }
+
+  // continue with a valid data node
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::ID nodeID = GetIDFromDataNode(imageNode);
+
+  RemoveInformationTypeFromImage(imageNode);
+  UnlinkDataFromControlPoint(imageNode);
+  m_RelationStorage->RemoveImage(caseID, nodeID);
+  NotifyObserver(caseID);
+}
+
 void mitk::SemanticRelations::AddLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
 {
   if (InstanceExists(caseID, lesion))
@@ -399,6 +514,7 @@ void mitk::SemanticRelations::AddLesion(const SemanticTypes::CaseID& caseID, con
   else
   {
     m_RelationStorage->AddLesion(caseID, lesion);
+    NotifyObserver(caseID);
   }
 }
 
@@ -407,6 +523,7 @@ void mitk::SemanticRelations::OverwriteLesion(const SemanticTypes::CaseID& caseI
   if (InstanceExists(caseID, lesion))
   {
     m_RelationStorage->OverwriteLesion(caseID, lesion);
+    NotifyObserver(caseID);
   }
   else
   {
@@ -414,7 +531,7 @@ void mitk::SemanticRelations::OverwriteLesion(const SemanticTypes::CaseID& caseI
   }
 }
 
-void mitk::SemanticRelations::AddLesionAndLinkData(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion)
+void mitk::SemanticRelations::AddLesionAndLinkSegmentation(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion)
 {
   if (nullptr == segmentationNode)
   {
@@ -439,6 +556,52 @@ void mitk::SemanticRelations::AddLesionAndLinkData(const DataNode* segmentationN
   {
     mitkReThrow(e);
   }
+  NotifyObserver(caseID);
+}
+
+void mitk::SemanticRelations::RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
+{
+  if (InstanceExists(caseID, lesion))
+  {
+    DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
+    if (allSegmentationsOfLesion.empty())
+    {
+      // no more segmentations are linked to the specific lesion
+      // the lesion can be removed from the storage
+      m_RelationStorage->RemoveLesion(caseID, lesion);
+      NotifyObserver(caseID);
+    }
+    else
+    {
+      mitkThrowException(SemanticRelationException) << "The lesion " << lesion.UID << " to remove is still referred to by a segmentation node. Lesion will not be removed.";
+    }
+  }
+  else
+  {
+    mitkThrowException(SemanticRelationException) << "The lesion " << lesion.UID << " to remove does not exist for the given case.";
+  }
+}
+
+void mitk::SemanticRelations::AddSegmentation(const mitk::DataNode* segmentationNode, const mitk::DataNode* parentNode)
+{
+  if (nullptr == segmentationNode)
+  {
+    mitkThrow() << "Not a valid segmentation data node.";
+  }
+
+  if (nullptr == parentNode)
+  {
+    mitkThrow() << "Not a valid parent data node.";
+  }
+
+  // continue with a valid data node
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::ID segmentationNodeID = GetIDFromDataNode(segmentationNode);
+  SemanticTypes::ID parentNodeID = GetIDFromDataNode(parentNode);
+
+  m_RelationStorage->AddCase(caseID);
+  m_RelationStorage->AddSegmentation(caseID, segmentationNodeID, parentNodeID);
+  NotifyObserver(caseID);
 }
 
 void mitk::SemanticRelations::LinkSegmentationToLesion(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion)
@@ -453,6 +616,7 @@ void mitk::SemanticRelations::LinkSegmentationToLesion(const DataNode* segmentat
   {
     SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
     m_RelationStorage->LinkSegmentationToLesion(caseID, segmentationID, lesion);
+    NotifyObserver(caseID);
   }
   else
   {
@@ -469,30 +633,22 @@ void mitk::SemanticRelations::UnlinkSegmentationFromLesion(const DataNode* segme
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
   SemanticTypes::ID segmentationID = GetIDFromDataNode(segmentationNode);
-  mitk::SemanticTypes::Lesion lesion = m_RelationStorage->GetRepresentedLesion(caseID, segmentationID);
   m_RelationStorage->UnlinkSegmentationFromLesion(caseID, segmentationID);
+  NotifyObserver(caseID);
 }
 
-void mitk::SemanticRelations::RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
+void mitk::SemanticRelations::RemoveSegmentation(const mitk::DataNode* segmentationNode)
 {
-  if (InstanceExists(caseID, lesion))
+  if (nullptr == segmentationNode)
   {
-    DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
-    if (allSegmentationsOfLesion.empty())
-    {
-      // no more segmentations are linked to the specific lesion
-      // the lesion can be removed from the storage
-      m_RelationStorage->RemoveLesion(caseID, lesion);
-    }
-    else
-    {
-      mitkThrowException(SemanticRelationException) << "The lesion " << lesion.UID << " to remove is still referred to by a segmentation node. Lesion will not be removed.";
-    }
+    mitkThrow() << "Not a valid segmentation data node.";
   }
-  else
-  {
-    mitkThrowException(SemanticRelationException) << "The lesion " << lesion.UID << " to remove does not exist for the given case.";
-  }
+
+  // continue with a valid data node
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
+  SemanticTypes::ID segmentationNodeID = GetIDFromDataNode(segmentationNode);
+  m_RelationStorage->RemoveSegmentation(caseID, segmentationNodeID);
+  NotifyObserver(caseID);
 }
 
 void mitk::SemanticRelations::AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence)
@@ -531,7 +687,7 @@ void mitk::SemanticRelations::AddControlPointAndLinkData(const DataNode* dataNod
   {
     LinkDataToControlPoint(dataNode, controlPoint, checkConsistence);
   }
-  catch (SemanticRelationException& e)
+  catch (mitk::Exception& e)
   {
     mitkReThrow(e);
   }
@@ -711,6 +867,14 @@ void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* ima
 /************************************************************************/
 /* private functions                                                    */
 /************************************************************************/
+void mitk::SemanticRelations::NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) const
+{
+  for (auto& observer : m_ObserverVector)
+  {
+    observer->Update(caseID);
+  }
+}
+
 bool mitk::SemanticRelations::ControlPointContainsLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion, const SemanticTypes::ControlPoint& controlPoint) const
 {
   DataNodeVector allDataOfLesion;

@@ -40,9 +40,6 @@ public:
 
   void ClearData();
 
-  void SetDataLabels(const std::vector<std::string>& labels);
-  std::vector<std::string> GetDataLabels() const;
-
   void SetColor(const std::string& label, const std::string& colorName);
   void SetLineStyle(const std::string& label, LineStyle style);
 
@@ -70,8 +67,9 @@ public:
   std::vector<QmitkChartxyData*>* GetC3xyData() const;
 
 private:
-  void AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label) const;
+  std::string GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const;
   QmitkChartxyData* GetElementByLabel(const std::vector<QmitkChartxyData*>* c3xyData, const std::string& label) const;
+  QList<QVariant> GetDataLabels(const std::vector<QmitkChartxyData*>* c3xyData) const;
 
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
@@ -127,7 +125,7 @@ QmitkChartWidget::Impl::~Impl()
 }
 
 
-void QmitkChartWidget::Impl::AddLabelIfNotAlreadyDefined(QList<QVariant>& labelList, const std::string& label) const
+std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const
 {
   QString currentLabel = QString::fromStdString(label);
   int counter = 0;
@@ -136,7 +134,7 @@ void QmitkChartWidget::Impl::AddLabelIfNotAlreadyDefined(QList<QVariant>& labelL
     currentLabel = QString::fromStdString(label + std::to_string(counter));
     counter++;
   }
-  labelList.append(currentLabel);
+  return currentLabel.toStdString();
 }
 
 void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType type) {
@@ -145,10 +143,10 @@ void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const 
     data1DConverted.append(aValue);
   }
   const std::string diagramTypeName(m_DiagramTypeToName.at(type));
-  GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted, QVariant(QString::fromStdString(label)), QVariant(QString::fromStdString(diagramTypeName))));
-  auto definedLabels = GetC3Data()->GetDataLabels();
-  AddLabelIfNotAlreadyDefined(definedLabels, label);
-  GetC3Data()->SetDataLabels(definedLabels);
+  auto definedLabels = GetDataLabels(GetC3xyData());
+  auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
+
+  GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(diagramTypeName))));
 }
 
 void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
@@ -170,19 +168,11 @@ void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, c
     data2DConverted.insert(aValue.first, aValue.second);
   }
   const std::string diagramTypeName(m_DiagramTypeToName.at(type));
-  GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(label)), QVariant(QString::fromStdString(diagramTypeName))));
-  auto definedLabels = GetC3Data()->GetDataLabels();
-  AddLabelIfNotAlreadyDefined(definedLabels, label);
-  GetC3Data()->SetDataLabels(definedLabels);
-}
 
-std::vector<std::string> QmitkChartWidget::Impl::GetDataLabels() const {
-  auto dataLabels = GetC3Data()->GetDataLabels();
-  std::vector<std::string> dataLabelsAsStringVector;
-  for (const auto& label : dataLabels) {
-    dataLabelsAsStringVector.push_back(label.toString().toStdString());
-  }
-  return dataLabelsAsStringVector;
+  auto definedLabels = GetDataLabels(GetC3xyData());
+  auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
+
+  GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(diagramTypeName))));
 }
 
 void QmitkChartWidget::Impl::SetColor(const std::string& label, const std::string& colorName)
@@ -211,6 +201,14 @@ QmitkChartxyData* QmitkChartWidget::Impl::GetElementByLabel(const std::vector<Qm
   }
   MITK_WARN << "label " << label << " not found in QmitkChartWidget";
   return nullptr;
+}
+
+QList<QVariant> QmitkChartWidget::Impl::GetDataLabels(const std::vector<QmitkChartxyData*>* c3xyData) const {
+  QList<QVariant> dataLabels;
+  for (auto element = c3xyData->begin(); element != c3xyData->end(); ++element) {
+    dataLabels.push_back((*element)->GetLabel());
+  }
+  return dataLabels;
 }
 
 void QmitkChartWidget::Impl::SetXAxisLabel(const std::string& label) { 
@@ -341,11 +339,6 @@ void QmitkChartWidget::RemoveData(const std::string& label)
   m_Impl->RemoveData(label);
 }
 
-std::vector<std::string> QmitkChartWidget::GetDataLabels() const
-{
-	return m_Impl->GetDataLabels();
-}
-
 void QmitkChartWidget::SetXAxisLabel(const std::string & label)
 {
 	m_Impl->SetXAxisLabel(label);
@@ -403,7 +396,6 @@ void QmitkChartWidget::Show(bool showSubChart)
 void QmitkChartWidget::Clear()
 {
 	m_Impl->ClearData();
-	//m_Impl->GetC3xyData()->clear();
 	m_Impl->ClearJavaScriptChart();
 }
 

@@ -277,6 +277,9 @@ std::vector<QmitkChartxyData*>* QmitkChartWidget::Impl::GetC3xyData() const {
 }
 
 void QmitkChartWidget::Impl::ClearData() {
+  for (auto& xyData : *m_C3xyData) {
+    m_WebChannel->deregisterObject(xyData);
+  }
   GetC3xyData()->clear(); 
 }
 

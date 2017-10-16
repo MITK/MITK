@@ -272,8 +272,8 @@ namespace Logger
         % boost::log::expressions::attr<std::string>("UserName")
         % boost::log::trivial::severity
         % boost::log::expressions::attr<std::string>("Source")
-        % boost::log::expressions::attr<std::string>("FullName")
-        % boost::log::expressions::attr<std::string>("Organization")
+        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageToUTF8, boost::log::expressions::attr<std::string>("FullName"))]
+        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageToUTF8, boost::log::expressions::attr<std::string>("Organization"))]
       );
 
       boost::log::core::get()->add_sink(sink2);

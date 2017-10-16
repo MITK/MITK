@@ -144,7 +144,7 @@ void QmitkPatientTableWidget::OnContextMenuSetControlPoint()
 {
   QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.patientTableView);
   inputDialog->setWindowTitle("Set control point");
-  inputDialog->SetCurrentDate(mitk::DICOMHelper::GetDateFromDataNode(m_SelectedDataNode));
+  inputDialog->SetCurrentDate(mitk::GetDICOMDateFromDataNode(m_SelectedDataNode));
 
   int dialogReturnValue = inputDialog->exec();
   if (QDialog::Rejected == dialogReturnValue)
@@ -169,7 +169,7 @@ void QmitkPatientTableWidget::OnContextMenuSetControlPoint()
   if (!allControlPoints.empty())
   {
     // need to check if an already existing control point fits/contains the user control point
-    mitk::SemanticTypes::ControlPoint fittingControlPoint = mitk::ControlPointManager::FindFittingControlPoint(date, allControlPoints);
+    mitk::SemanticTypes::ControlPoint fittingControlPoint = mitk::FindFittingControlPoint(date, allControlPoints);
     if (!fittingControlPoint.UID.empty())
     {
       try
@@ -196,7 +196,7 @@ void QmitkPatientTableWidget::OnContextMenuSetControlPoint()
 
     // did not find a fitting control point, although some control points already exist
     // need to check if a close control point can be found and extended
-    mitk::SemanticTypes::ControlPoint extendedControlPoint = mitk::ControlPointManager::ExtendClosestControlPoint(date, allControlPoints);
+    mitk::SemanticTypes::ControlPoint extendedControlPoint = mitk::ExtendClosestControlPoint(date, allControlPoints);
     if (!extendedControlPoint.UID.empty())
     {
       try
@@ -223,7 +223,7 @@ void QmitkPatientTableWidget::OnContextMenuSetControlPoint()
   }
 
   // generate a control point from the user-given date
-  mitk::SemanticTypes::ControlPoint controlPointFromUserDate = mitk::ControlPointManager::GenerateControlPoint(date);
+  mitk::SemanticTypes::ControlPoint controlPointFromUserDate = mitk::GenerateControlPoint(date);
   try
   {
     m_SemanticRelations->AddControlPointAndLinkData(m_SelectedDataNode, controlPointFromUserDate, false);

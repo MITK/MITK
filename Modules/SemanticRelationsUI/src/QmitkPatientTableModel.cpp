@@ -87,7 +87,7 @@ QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role /*=Qt::
   }
   else if (Qt::DecorationRole == role)
   {
-    auto it = m_PixmapMap.find(mitk::DICOMHelper::GetIDFromDataNode(dataNode));
+    auto it = m_PixmapMap.find(mitk::GetIDFromDataNode(dataNode));
     if (it != m_PixmapMap.end())
     {
       return QVariant(it->second);
@@ -104,7 +104,7 @@ QVariant QmitkPatientTableModel::headerData(int section, Qt::Orientation orienta
     {
       mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(section);
       // generate a string from the control point
-      std::string currentControlPointAsString = mitk::ControlPointManager::GetControlPointAsString(currentControlPoint);
+      std::string currentControlPointAsString = mitk::GetControlPointAsString(currentControlPoint);
       return QVariant(QString::fromStdString(currentControlPointAsString));
     }
   }
@@ -127,7 +127,7 @@ void QmitkPatientTableModel::SetCurrentCaseID(const mitk::SemanticTypes::CaseID&
 
 void QmitkPatientTableModel::SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage)
 {
-  mitk::SemanticTypes::ID nodeID = mitk::DICOMHelper::GetIDFromDataNode(dataNode);
+  mitk::SemanticTypes::ID nodeID = mitk::GetIDFromDataNode(dataNode);
   std::map<std::string, QPixmap>::iterator iter = m_PixmapMap.find(nodeID);
   if (iter != m_PixmapMap.end())
   {

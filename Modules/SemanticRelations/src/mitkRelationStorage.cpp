@@ -50,6 +50,7 @@ std::vector<mitk::SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfC
   mitk::VectorProperty<std::string>* vectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
   if (nullptr == vectorProperty)
   {
+    MITK_INFO << "Could not find any lesion in the storage.";
     return std::vector<SemanticTypes::Lesion>();
   }
 
@@ -156,6 +157,7 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   mitk::VectorProperty<std::string>* segmentationsProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("segmentations"));
   if (nullptr == segmentationsProperty)
   {
+    MITK_INFO << "Could not find any segmentation in the storage.";
     return std::vector<mitk::DataNode::Pointer>();
   }
 
@@ -168,8 +170,8 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   {
     DataNode* segmentationNode = it->Value();
     // find the corresponding segmentation node for the given segmentation ID
-    std::string nodeCaseID = DICOMHelper::GetCaseIDFromDataNode(segmentationNode);
-    std::string nodeSegmentationID = DICOMHelper::GetIDFromDataNode(segmentationNode);
+    std::string nodeCaseID = GetCaseIDFromDataNode(segmentationNode);
+    std::string nodeSegmentationID = GetIDFromDataNode(segmentationNode);
     if (nodeCaseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), nodeSegmentationID) != allSegmentationIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector
@@ -298,6 +300,7 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllCont
   mitk::VectorProperty<std::string>* vectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("controlpoints"));
   if (nullptr == vectorProperty)
   {
+    MITK_INFO << "Could not find any control points in the storage.";
     return std::vector<SemanticTypes::ControlPoint>();
   }
 
@@ -425,6 +428,7 @@ std::vector<mitk::SemanticTypes::InformationType> mitk::RelationStorage::GetAllI
   mitk::VectorProperty<std::string>* informationTypeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("informationtypes"));
   if (nullptr == informationTypeVectorProperty)
   {
+    MITK_INFO << "Could not find any information types in the storage.";
     return std::vector<SemanticTypes::InformationType>();
   }
 
@@ -448,8 +452,8 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllImagesOfCase(c
   {
     DataNode* imageNode = it->Value();
     // find the corresponding image node for the given segmentation ID
-    std::string nodeCaseID = DICOMHelper::GetCaseIDFromDataNode(imageNode);
-    std::string nodeImageID = DICOMHelper::GetIDFromDataNode(imageNode);
+    std::string nodeCaseID = GetCaseIDFromDataNode(imageNode);
+    std::string nodeImageID = GetIDFromDataNode(imageNode);
     if (nodeCaseID == caseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), nodeImageID) != allImageIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector

@@ -158,6 +158,11 @@ public:
 
   void setSelectionMode(bool selection);
 
+  void setAnnotationVisibility(std::vector<bool>& visibility);
+
+  typedef void (QmitkStdMultiWidget::*FunctionSet)(bool);
+  std::vector<FunctionSet> getFuncSetDisplayAnnotation();
+
 protected:
 
   bool m_displayMetaInfo;

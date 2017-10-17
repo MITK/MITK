@@ -1745,28 +1745,24 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       mainProp ? mainProp->GetValue() : 2
     };
 
-    bool imageIsFlat = image->GetDimension(2) < 2 && seriesNumber == "";
-
-    if (!imageIsFlat) {
-      for(int i = 0; i < 3; i++) {
-        if (m_displayPositionInfo) {
-          _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
-          if (timeSteps > 1) {
-            _infoStringStream[axisIndices[i]]<< "\nT: " << (timestep + 1) << "/" << timeSteps;
-          }
-          if (componentMax > 1) {
-            _infoStringStream[axisIndices[i]]<<"\nV: " <<(component + 1) << "/" << componentMax;
-          }
-          if (seriesNumber != "") {
-            _infoStringStream[axisIndices[i]] << "\nSe: " << seriesNumber;
-          }
-        } else {
-          _infoStringStream[axisIndices[i]].clear();
+    for (int i = 0; i < 3; i++) {
+      if (m_displayPositionInfo) {
+        _infoStringStream[axisIndices[i]] << "Im: " << (p[i] + 1) << "/" << bounds[(i * 2 + 1)];
+        if (timeSteps > 1) {
+          _infoStringStream[axisIndices[i]] << "\nT: " << (timestep + 1) << "/" << timeSteps;
         }
-        cornerimgtext[axisIndices[i]] = _infoStringStream[axisIndices[i]].str();
-        setCornerAnnotation(2, axisIndices[i], cornerimgtext[axisIndices[i]].c_str());
-        setViewDirectionAnnontation(image, p[i], axisIndices[i]);
+        if (componentMax > 1) {
+          _infoStringStream[axisIndices[i]] << "\nV: " << (component + 1) << "/" << componentMax;
+        }
+        if (seriesNumber != "") {
+          _infoStringStream[axisIndices[i]] << "\nSe: " << seriesNumber;
+        }
+      } else {
+        _infoStringStream[axisIndices[i]].clear();
       }
+      cornerimgtext[axisIndices[i]] = _infoStringStream[axisIndices[i]].str();
+      setCornerAnnotation(2, axisIndices[i], cornerimgtext[axisIndices[i]].c_str());
+      setViewDirectionAnnontation(image, p[i], axisIndices[i]);
     }
 
     unsigned long newImageMTime = image->GetMTime();
@@ -2400,4 +2396,47 @@ void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int sl
     setCornerAnnotation(vtkCornerAnnotation::LeftEdge, i, " ");
     break;
   }
+}
+
+std::vector<QmitkStdMultiWidget::FunctionSet> QmitkStdMultiWidget::getFuncSetDisplayAnnotation()
+{
+  std::vector<FunctionSet> functionsSetAnnotation;
+
+  functionsSetAnnotation.push_back(&QmitkStdMultiWidget::setDisplayMetaInfo);
+  functionsSetAnnotation.push_back(&QmitkStdMultiWidget::setDisplayMetaInfoEx);
+  functionsSetAnnotation.push_back(&QmitkStdMultiWidget::setDisplayPatientInfo);
+  functionsSetAnnotation.push_back(&QmitkStdMultiWidget::setDisplayPatientInfoEx);
+  functionsSetAnnotation.push_back(&QmitkStdMultiWidget::setDisplayPositionInfo);
+
+  return functionsSetAnnotation;
+}
+
+void QmitkStdMultiWidget::setAnnotationVisibility(std::vector<bool>& visibility)
+{
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
+
+  mitk::DataNode::Pointer node;
+  mitk::Image::Pointer image;
+  node = this->GetTopLayerNode(nodes);
+  if (node.IsNotNull()) {
+    image = dynamic_cast<mitk::Image*>(node->GetData());
+  }
+
+  std::string seriesNumber;
+  bool imageIsPictureOrNull = false;
+  if (image.IsNotNull()) {
+    image->GetPropertyList()->GetStringProperty("dicom.series.SeriesNumber", seriesNumber);
+    imageIsPictureOrNull = image->GetDimension(2) < 2 && seriesNumber == "";
+  } else {
+    imageIsPictureOrNull = true;
+  }
+
+  auto funcSetList = getFuncSetDisplayAnnotation();
+  auto size = funcSetList.size();
+  for (size_t i = 0; i < size; i++) {
+    (this->*funcSetList[i])(
+      (imageIsPictureOrNull || visibility.empty()) ? false : visibility[i]);
+  }
+  HandleCrosshairPositionEvent();
 }

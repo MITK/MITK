@@ -64,6 +64,10 @@ void mitk::ContourModelGLMapper2DBase::ApplyColorAndOpacityProperties(mitk::Base
   // check for opacity prop and use it for rendering if it exists
   GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
+  if (this->m_Context->GetPen() == nullptr)
+  {
+    return;
+  }
   this->m_Context->GetPen()->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
 }
 

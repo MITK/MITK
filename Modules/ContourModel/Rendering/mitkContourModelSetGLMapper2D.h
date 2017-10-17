@@ -56,8 +56,6 @@ namespace mitk
 
     virtual ~ContourModelSetGLMapper2D();
 
-    void InternalDrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer) override;
-
   private:
     /**
     * return a reference of the rendered data object

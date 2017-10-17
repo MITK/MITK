@@ -172,7 +172,8 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
     }
     m_Player->RegisterAsMicroservice();
     m_ToolStorage->SetName("NavigationDataPlayer Tool Storage");
-    m_ToolStorage->RegisterAsMicroservice(m_Player->GetMicroserviceID());
+    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID());
+    m_ToolStorage->RegisterAsMicroservice();
   } else {
     if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();
     m_ToolStorage = NULL;

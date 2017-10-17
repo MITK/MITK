@@ -138,6 +138,10 @@ void QmitkPolhemusTrackerWidget::on_m_GetHemisphere_clicked()
     label = "HemisphereTracking is ON for tool ";
     label.append(m_Controls->m_ToolSelection->currentText());
   }
+  else if (GetSelectedToolIndex() == -1)
+  {
+    label = "HemisphereTracking is OFF for at least one tool.";
+  }
   else
   {
     label = "HemisphereTracking is OFF for tool ";

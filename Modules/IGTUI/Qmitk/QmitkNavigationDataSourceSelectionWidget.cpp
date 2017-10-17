@@ -81,7 +81,6 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     // Get Source
     us::ModuleContext* context = us::GetModuleContext();
     m_CurrentSource = context->GetService<mitk::NavigationDataSource>(s);
-    std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
 
     // clear tool list before filling it
     m_Controls->m_ToolView->clear();
@@ -96,14 +95,21 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>();
     if (refs.empty()) return; //no storage was found
 
-    m_CurrentStorage = context->GetService(refs.front());
+    std::string StorageID = m_CurrentSource->GetMicroserviceID();
 
-    //find the right one in case there are more than one.
-    //TODO. How was this done before? How do we know which tool storage fits the navigation data source? The ID doesn't match (and more?).
-    if (refs.size()>1)
+    for (int i = 0; i < refs.size(); ++i)
     {
-      MITK_INFO << "There was more than one tool storage. Which one should be selected?";
+      m_CurrentStorage = context->GetService(refs.at(i));
+      if (StorageID.compare(m_CurrentStorage->GetSourceID()) == 0)
+      {
+        break;
+      }
+      else
+      {
+        m_CurrentStorage = nullptr;
+      }
     }
+
 
     if (m_CurrentStorage.IsNull())
       {

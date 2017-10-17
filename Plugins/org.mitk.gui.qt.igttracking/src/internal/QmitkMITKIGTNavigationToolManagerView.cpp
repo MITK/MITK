@@ -63,7 +63,7 @@ void QmitkMITKIGTNavigationToolManagerView::SetFocus()
 
 void QmitkMITKIGTNavigationToolManagerView::NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage, std::string storageName)
 {
-  storage->RegisterAsMicroservice(storageName);
+  storage->RegisterAsMicroservice();
   m_AllStoragesHandledByThisWidget.push_back(storage);
 }
 

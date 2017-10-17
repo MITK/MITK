@@ -247,7 +247,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //initialize tool storage
     m_toolStorage = mitk::NavigationToolStorage::New(GetDataStorage());
     m_toolStorage->SetName("TrackingToolbox Default Storage");
-    m_toolStorage->RegisterAsMicroservice("no tracking device");
+    m_toolStorage->RegisterAsMicroservice();
 
     //set home directory as default path for logfile
     m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(QDir::homePath()) + QDir::separator() + "logfile.csv");
@@ -1146,7 +1146,7 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
   //now: replace by the new one
   m_toolStorage = newStorage;
   m_toolStorage->SetName(newStorageName);
-  m_toolStorage->RegisterAsMicroservice("no tracking device");
+  m_toolStorage->RegisterAsMicroservice();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
@@ -1219,7 +1219,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
       m_toolStorage->UnRegisterMicroservice();
       m_toolStorage = myDeserializer->Deserialize(m_ToolStorageFilename.toStdString());
-      m_toolStorage->RegisterAsMicroservice("no tracking device");
+      m_toolStorage->RegisterAsMicroservice();
 
       //update label
       UpdateToolStorageLabel(m_ToolStorageFilename);

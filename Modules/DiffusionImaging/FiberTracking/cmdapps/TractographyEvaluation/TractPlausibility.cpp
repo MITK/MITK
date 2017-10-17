@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundle.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <fstream>
+#include <chrono>
 
 using namespace std;
 typedef itksys::SystemTools ist;
@@ -55,39 +56,63 @@ ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
 
 std::vector< MaskType > get_file_list(const std::string& path, int dropout, const std::string& skipped_path)
 {
-  std::srand(std::time(0));
+  std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
+  std::srand(ms.count());
 
   std::vector< MaskType > mask_list;
 
   itk::Directory::Pointer dir = itk::Directory::New();
 
+  int skipped = 0;
   if (dir->Load(path.c_str()))
   {
     int n = dir->GetNumberOfFiles();
+    int num_images = 0;
+
+    std::vector< int > im_indices;
     for (int r = 0; r < n; r++)
     {
       const char *filename = dir->GetFile(r);
-
-      if (dropout>1 && std::rand()%dropout==0 && ist::GetFilenameWithoutExtension(filename)!="CC")
-      {
-        MITK_INFO << "Skipping " << ist::GetFilenameWithoutExtension(filename);
-        ist::CopyAFile(path + '/' + filename, skipped_path + ist::GetFilenameName(filename));
-        continue;
-      }
-
       std::string ext = ist::GetFilenameExtension(filename);
       if (ext==".nii" || ext==".nii.gz" || ext==".nrrd")
       {
-        MITK_INFO << "Loading " << ist::GetFilenameWithoutExtension(filename);
-        streambuf *old = cout.rdbuf(); // <-- save
-        stringstream ss;
-        std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-
-        MaskType m(LoadItkMaskImage(path + '/' + filename), ist::GetFilenameWithoutExtension(filename));
-        mask_list.push_back(m);
-
-        std::cout.rdbuf (old);              // <-- restore
+        ++num_images;
+        im_indices.push_back(r);
       }
+    }
+
+    int skipping_num = 0;
+    if (dropout>1)
+      skipping_num = (float)num_images/dropout;
+    if (dropout>=num_images)
+      skipping_num = (float)num_images/2.0;
+
+    std::random_shuffle(im_indices.begin(), im_indices.end());
+    MITK_INFO << num_images;
+    MITK_INFO << dropout;
+    MITK_INFO << "Skipping " << skipping_num << " images";
+
+    int c = -1;
+    for (int r : im_indices)
+    {
+      c++;
+      const char *filename = dir->GetFile(r);
+
+      if (c<skipping_num && ist::GetFilenameWithoutExtension(filename)!="CC")
+      {
+        MITK_INFO << "Skipping " << ist::GetFilenameWithoutExtension(filename);
+        ist::CopyAFile(path + '/' + filename, skipped_path + ist::GetFilenameName(filename));
+        skipped++;
+        continue;
+      }
+
+      MITK_INFO << "Loading " << ist::GetFilenameWithoutExtension(filename);
+      streambuf *old = cout.rdbuf(); // <-- save
+      stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+      MaskType m(LoadItkMaskImage(path + '/' + filename), ist::GetFilenameName(filename));
+      mask_list.push_back(m);
+      std::cout.rdbuf (old);              // <-- restore
     }
   }
 
@@ -129,6 +154,7 @@ int main(int argc, char* argv[])
   parser.addArgument("reference_mask_folder", "m", mitkCommandLineParser::String, "Reference Mask Folder:", "reference masks of known bundles", false);
   parser.addArgument("gray_matter_mask", "gm", mitkCommandLineParser::String, "", "");
   parser.addArgument("dropout", "", mitkCommandLineParser::Int, "", "", false);
+  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "", "", false, 0.7);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -145,6 +171,10 @@ int main(int argc, char* argv[])
   int dropout = 1;
   if (parsedArgs.count("dropout"))
     dropout = us::any_cast<int>(parsedArgs["dropout"]);
+
+  float overlap = 0.7;
+  if (parsedArgs.count("overlap"))
+    overlap = us::any_cast<float>(parsedArgs["overlap"]);
 
   try
   {
@@ -182,7 +212,7 @@ int main(int argc, char* argv[])
     {
       ItkUcharImgType::Pointer mask_image = std::get<0>(mask);
       std::string mask_name = std::get<1>(mask);
-      mitk::FiberBundle::Pointer known_tract = inputTractogram->ExtractFiberSubset(mask_image, true, false, false, 0.7, false);
+      mitk::FiberBundle::Pointer known_tract = inputTractogram->ExtractFiberSubset(mask_image, true, false, false, overlap, false);
       mitk::IOUtil::Save(known_tract, out_folder + "/known_tracts/" + mask_name + ".trk");
 
       if (all_known_tracts.IsNull())
@@ -196,7 +226,6 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer remaining_tracts = inputTractogram->SubtractBundle(all_known_tracts);
     mitk::IOUtil::Save(remaining_tracts, out_folder + "/candidate_tracts/remaining_tracts.trk");
     mitk::IOUtil::Save(TransformToMRtrixSpace(remaining_tracts), out_folder + "/candidate_tracts/remaining_tracts_mrtrixspace.fib");
-    MITK_INFO << "step_size: " << minSpacing/5;
   }
   catch (itk::ExceptionObject e)
   {

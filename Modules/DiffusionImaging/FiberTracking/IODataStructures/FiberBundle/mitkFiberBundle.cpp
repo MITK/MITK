@@ -762,6 +762,54 @@ void mitk::FiberBundle::GenerateFiberIds()
 
 }
 
+float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask, bool do_resampling)
+{
+  vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
+  mitk::FiberBundle::Pointer fibCopy = this;
+  if (do_resampling)
+  {
+    float minSpacing = 1;
+    if(mask->GetSpacing()[0]<mask->GetSpacing()[1] && mask->GetSpacing()[0]<mask->GetSpacing()[2])
+      minSpacing = mask->GetSpacing()[0];
+    else if (mask->GetSpacing()[1] < mask->GetSpacing()[2])
+      minSpacing = mask->GetSpacing()[1];
+    else
+      minSpacing = mask->GetSpacing()[2];
+
+    fibCopy = this->GetDeepCopy();
+    fibCopy->ResampleLinear(minSpacing/5);
+    PolyData = fibCopy->GetFiberPolyData();
+  }
+
+  MITK_INFO << "Calculating overlap";
+  int inside = 0;
+  int outside = 0;
+  boost::progress_display disp(m_NumFibers);
+  for (int i=0; i<m_NumFibers; i++)
+  {
+    ++disp;
+    vtkCell* cell = PolyData->GetCell(i);
+    int numPoints = cell->GetNumberOfPoints();
+    vtkPoints* points = cell->GetPoints();
+
+    for (int j=0; j<numPoints; j++)
+    {
+      double* p = points->GetPoint(j);
+      itk::Point<float, 3> itkP;
+      itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+      itk::Index<3> idx;
+      mask->TransformPhysicalPointToIndex(itkP, idx);
+
+      if ( mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx) != 0 )
+        inside++;
+      else
+        outside++;
+    }
+  }
+
+  return (float)inside/(inside+outside);
+}
+
 mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction, bool do_resampling)
 {
   vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;

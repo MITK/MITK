@@ -55,6 +55,8 @@ public:
   itkGetMacro( Verbose, bool)
   itkSetMacro( DeepCopy, bool)
   itkGetMacro( DeepCopy, bool)
+  itkSetMacro( ResampleFibers, bool)
+  itkGetMacro( ResampleFibers, bool)
 
   itkGetMacro( Weights, vnl_vector<double>)
   itkGetMacro( FittedImage, PeakImgType::Pointer)
@@ -101,6 +103,7 @@ protected:
   double                                      m_MaxWeight;
   bool                                        m_Verbose;
   bool                                        m_DeepCopy;
+  bool                                        m_ResampleFibers;
   unsigned int                                m_NumUnknowns;
   unsigned int                                m_NumResiduals;
   unsigned int                                m_NumCoveredDirections;

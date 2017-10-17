@@ -21,6 +21,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_MaxWeight(1.0)
   , m_Verbose(true)
   , m_DeepCopy(true)
+  , m_ResampleFibers(true)
   , m_NumUnknowns(0)
   , m_NumResiduals(0)
   , m_NumCoveredDirections(0)
@@ -57,12 +58,17 @@ void FitFibersToImageFilter::GenerateData()
       m_NumUnknowns += m_Tractograms.at(bundle)->GetNumFibers();
   }
 
-  for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-  {
-    if (m_DeepCopy)
-      m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
-    m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
-  }
+  if (m_ResampleFibers)
+    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+    {
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());
+      if (m_DeepCopy)
+        m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
+      m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
+      std::cout.rdbuf (old);
+    }
 
   m_NumResiduals = num_voxels * sz_peaks;
 
@@ -242,6 +248,9 @@ void FitFibersToImageFilter::GenerateData()
   b *= FD/100.0;
 
   MITK_INFO << "Weighting fibers";
+  std::streambuf *old = cout.rdbuf(); // <-- save
+  std::stringstream ss;
+  std::cout.rdbuf (ss.rdbuf());
   if (m_FitIndividualFibers)
   {
     unsigned int fiber_count = 0;
@@ -265,6 +274,7 @@ void FitFibersToImageFilter::GenerateData()
       m_Tractograms.at(i)->ColorFibersByFiberWeights(false, true);
     }
   }
+  std::cout.rdbuf (old);
 
   MITK_INFO << "Generating output images ...";
 
@@ -378,8 +388,8 @@ void FitFibersToImageFilter::GenerateData()
   m_Coverage = m_Coverage/FD;
   m_Overshoot = m_Overshoot/FD;
 
-  MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << 100.0*m_Coverage << "%";
-  MITK_INFO << std::fixed << "Overshoot: " << setprecision(1) << 100.0*m_Overshoot << "%";
+  MITK_INFO << std::fixed << "Coverage: " << setprecision(2) << 100.0*m_Coverage << "%";
+  MITK_INFO << std::fixed << "Overshoot: " << setprecision(2) << 100.0*m_Overshoot << "%";
 }
 
 vnl_vector_fixed<float,3> FitFibersToImageFilter::GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w )

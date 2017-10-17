@@ -103,9 +103,7 @@ public:
     std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
     FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false, bool bothEnds=true, float fraction=0.0, bool do_resampling=true);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
-
-    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
-    void                            GenerateFiberIds(); // TODO: make protected
+    float                          GetOverlap(ItkUcharImgType* mask, bool do_resampling);
 
     // get/set data
     vtkSmartPointer<vtkFloatArray> GetFiberWeights() const { return m_FiberWeights; }
@@ -144,12 +142,11 @@ protected:
     FiberBundle( vtkPolyData* fiberPolyData = nullptr );
     virtual ~FiberBundle();
 
-    itk::Point<float, 3> GetItkPoint(double point[3]);
-
-    // calculate geometry from fiber extent
-    void UpdateFiberGeometry();
-
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> );
+    void                            GenerateFiberIds();
+    itk::Point<float, 3>            GetItkPoint(double point[3]);
+    void                            UpdateFiberGeometry();
+    virtual void                    PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
 private:
 

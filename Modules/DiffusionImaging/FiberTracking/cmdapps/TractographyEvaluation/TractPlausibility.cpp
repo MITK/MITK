@@ -40,8 +40,9 @@ void CreateFolderStructure(const std::string& path)
 
   ist::MakeDirectory(path);
   ist::MakeDirectory(path + "/known_tracts/");
-  ist::MakeDirectory(path + "/plausible_tracts/");
+  ist::MakeDirectory(path + "/candidate_tracts/");
   ist::MakeDirectory(path + "/implausible_tracts/");
+  ist::MakeDirectory(path + "/skipped_masks/");
 }
 
 ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
@@ -52,7 +53,7 @@ ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
   return itkMask;
 }
 
-std::vector< MaskType > get_file_list(const std::string& path, const std::string& skipped)
+std::vector< MaskType > get_file_list(const std::string& path, int dropout, const std::string& skipped_path)
 {
   std::srand(std::time(0));
 
@@ -60,8 +61,6 @@ std::vector< MaskType > get_file_list(const std::string& path, const std::string
 
   itk::Directory::Pointer dir = itk::Directory::New();
 
-  ofstream myfile;
-  myfile.open (skipped);
   if (dir->Load(path.c_str()))
   {
     int n = dir->GetNumberOfFiles();
@@ -69,10 +68,10 @@ std::vector< MaskType > get_file_list(const std::string& path, const std::string
     {
       const char *filename = dir->GetFile(r);
 
-      if (std::rand()%3==0 && ist::GetFilenameWithoutExtension(filename)!="CC")
+      if (dropout>1 && std::rand()%dropout==0 && ist::GetFilenameWithoutExtension(filename)!="CC")
       {
-        MITK_INFO << "Dismissing " << ist::GetFilenameWithoutExtension(filename);
-        myfile << ist::GetFilenameName(filename) << "\n";
+        MITK_INFO << "Skipping " << ist::GetFilenameWithoutExtension(filename);
+        ist::CopyAFile(path + '/' + filename, skipped_path + ist::GetFilenameName(filename));
         continue;
       }
 
@@ -91,7 +90,6 @@ std::vector< MaskType > get_file_list(const std::string& path, const std::string
       }
     }
   }
-  myfile.close();
 
   return mask_list;
 }
@@ -129,33 +127,44 @@ int main(int argc, char* argv[])
   parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output folder", us::Any(), false);
   parser.addArgument("reference_mask_folder", "m", mitkCommandLineParser::String, "Reference Mask Folder:", "reference masks of known bundles", false);
-  parser.addArgument("gray_matter_mask", "gm", mitkCommandLineParser::String, "", "", false);
+  parser.addArgument("gray_matter_mask", "gm", mitkCommandLineParser::String, "", "");
+  parser.addArgument("dropout", "", mitkCommandLineParser::Int, "", "", false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
   string fibFile = us::any_cast<string>(parsedArgs["input"]);
-  string gray_matter_mask = us::any_cast<string>(parsedArgs["gray_matter_mask"]);
   string reference_mask_folder = us::any_cast<string>(parsedArgs["reference_mask_folder"]);
   string out_folder = us::any_cast<string>(parsedArgs["out"]);
+
+  string gray_matter_mask = "";
+  if (parsedArgs.count("gray_matter_mask"))
+    gray_matter_mask = us::any_cast<string>(parsedArgs["gray_matter_mask"]);
+
+  int dropout = 1;
+  if (parsedArgs.count("dropout"))
+    dropout = us::any_cast<int>(parsedArgs["dropout"]);
 
   try
   {
     CreateFolderStructure(out_folder);
 
-    std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder, out_folder + "skipped_masks.txt");
+    std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder, dropout, out_folder + "/skipped_masks/");
     if (known_tract_masks.empty())
       return EXIT_FAILURE;
 
-    ItkUcharImgType::Pointer gm_image = LoadItkMaskImage(gray_matter_mask);
 
     mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
 
-    // filter gray matter fibers
-    mitk::FiberBundle::Pointer not_gm_fibers = inputTractogram->ExtractFiberSubset(gm_image, false, true, true);
-    mitk::IOUtil::Save(not_gm_fibers, out_folder + "/implausible_tracts/no_gm_endings.trk");
-    inputTractogram = inputTractogram->ExtractFiberSubset(gm_image, false, false, true);
+    if (gray_matter_mask.compare("")!=0)
+    {
+      ItkUcharImgType::Pointer gm_image = LoadItkMaskImage(gray_matter_mask);
+      // filter gray matter fibers
+      mitk::FiberBundle::Pointer not_gm_fibers = inputTractogram->ExtractFiberSubset(gm_image, false, true, true);
+      mitk::IOUtil::Save(not_gm_fibers, out_folder + "/implausible_tracts/no_gm_endings.trk");
+      inputTractogram = inputTractogram->ExtractFiberSubset(gm_image, false, false, true);
+    }
 
     // resample fibers
     float minSpacing = 1;
@@ -185,8 +194,8 @@ int main(int argc, char* argv[])
     mitk::IOUtil::Save(TransformToMRtrixSpace(all_known_tracts), out_folder + "/known_tracts/all_known_tracts_mrtrixspace.fib");
 
     mitk::FiberBundle::Pointer remaining_tracts = inputTractogram->SubtractBundle(all_known_tracts);
-    mitk::IOUtil::Save(remaining_tracts, out_folder + "/plausible_tracts/remaining_tracts.trk");
-    mitk::IOUtil::Save(TransformToMRtrixSpace(remaining_tracts), out_folder + "/plausible_tracts/remaining_tracts_mrtrixspace.fib");
+    mitk::IOUtil::Save(remaining_tracts, out_folder + "/candidate_tracts/remaining_tracts.trk");
+    mitk::IOUtil::Save(TransformToMRtrixSpace(remaining_tracts), out_folder + "/candidate_tracts/remaining_tracts_mrtrixspace.fib");
     MITK_INFO << "step_size: " << minSpacing/5;
   }
   catch (itk::ExceptionObject e)

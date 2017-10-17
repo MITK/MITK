@@ -56,6 +56,7 @@ class QmitkSemanticRelationsView : public QmitkAbstractView
 public:
 
   static const std::string VIEW_ID;
+  QmitkSemanticRelationsView();
 
 protected:
 
@@ -82,8 +83,6 @@ private:
   void AddToComboBox(const mitk::SemanticTypes::CaseID& caseID);
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
 
-  // the Qt parent of our GUI
-  QWidget* m_Parent;
   Ui::QmitkSemanticRelationsControls m_Controls;
   QmitkPatientTableWidget* m_PatientTableWidget;
   QmitkSimpleDatamanagerWidget* m_SimpleDatamanagerWidget;

@@ -28,6 +28,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkSemanticRelationsView::VIEW_ID = "org.mitk.views.semanticrelations";
 
+QmitkSemanticRelationsView::QmitkSemanticRelationsView()
+  : m_PatientTableWidget(nullptr)
+  , m_SimpleDatamanagerWidget(nullptr)
+  , m_SelectPatientNodeDialog(nullptr)
+  , m_SimpleDatamanagerNodeDialog(nullptr)
+  , m_SemanticRelations(nullptr)
+{
+  // nothing here
+}
+
 void QmitkSemanticRelationsView::SetFocus()
 {
   // nothing here

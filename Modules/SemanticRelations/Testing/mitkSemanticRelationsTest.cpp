@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSemanticRelations.h"
 #include "mitkSemanticRelationException.h"
-#include "mitkSemanticRelationsTestHelper.h"
 
 // mitk core
 #include <mitkIOUtil.h>

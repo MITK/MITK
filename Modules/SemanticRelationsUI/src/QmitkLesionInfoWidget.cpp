@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkLesionInfoWidget::QmitkLesionInfoWidget(QWidget* parent /*= nullptr*/)
   : QWidget(parent)
+  , m_DataStorage(nullptr)
 {
   // create GUI from the Qt Designer's .ui file
   m_Controls.setupUi(this);

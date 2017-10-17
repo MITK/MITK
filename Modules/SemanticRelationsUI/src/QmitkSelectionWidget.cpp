@@ -20,8 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkSelectionWidget::QmitkSelectionWidget(mitk::DataStorage* dataStorage, QWidget* parent /*=nullptr*/)
   : QWidget(parent)
   , m_DataStorage(dataStorage)
+  , m_SemanticRelations(std::make_shared<mitk::SemanticRelations>(dataStorage))
 {
-  m_SemanticRelations = std::make_shared<mitk::SemanticRelations>(m_DataStorage);
+  // nothing here
 }
 
 QmitkSelectionWidget::~QmitkSelectionWidget()

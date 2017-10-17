@@ -96,10 +96,7 @@ bool mitk::InsideControlPoint(const mitk::DataNode* dataNode, const SemanticType
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
+  return false;
 }
 
 bool mitk::InsideControlPoint(const SemanticTypes::Date& date, const SemanticTypes::ControlPoint& controlPoint)
@@ -108,10 +105,7 @@ bool mitk::InsideControlPoint(const SemanticTypes::Date& date, const SemanticTyp
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
+  return false;
 }
 
 bool mitk::InsideControlPoint(const SemanticTypes::ControlPoint& containedControlPoint, const SemanticTypes::ControlPoint& containingControlPoint)
@@ -120,10 +114,7 @@ bool mitk::InsideControlPoint(const SemanticTypes::ControlPoint& containedContro
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
+  return false;
 }
 
 bool mitk::CheckForOverlap(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ControlPoint& neighboringControlPoint)
@@ -132,10 +123,7 @@ bool mitk::CheckForOverlap(const SemanticTypes::ControlPoint& controlPoint, cons
   {
     return false;
   }
-  else
-  {
-    return true;
-  }
+  return true;
 }
 
 mitk::SemanticTypes::ControlPoint mitk::FindFittingControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
@@ -223,7 +211,7 @@ mitk::SemanticTypes::ControlPoint mitk::ExtendClosestControlPoint(const Semantic
   double distanceToPreviousTimePeriod = CalculateDistanceInDays(previousDate, date);
 
   SemanticTypes::ControlPoint closestControlPoint;
-  double closestDistanceInDays;
+  double closestDistanceInDays = 0.0;
   if (distanceToNextTimePeriod < distanceToPreviousTimePeriod)
   {
     // date is closer to the next control point
@@ -238,18 +226,15 @@ mitk::SemanticTypes::ControlPoint mitk::ExtendClosestControlPoint(const Semantic
   }
 
   // extend the control point or create a control point
-  // TODO: threshold distance
-  double THRESHOLD_DISTANCE_IN_DAYS = 30;
+  double THRESHOLD_DISTANCE_IN_DAYS = 30.0;
   if (std::abs(closestDistanceInDays) < THRESHOLD_DISTANCE_IN_DAYS)
   {
     // extend the closest control point
     ExtendControlPoint(closestControlPoint, date);
     return closestControlPoint;
   }
-  else
-  {
-    return SemanticTypes::ControlPoint();
-  }
+
+  return SemanticTypes::ControlPoint();
 }
 
 mitk::SemanticTypes::Date GetStartPoint(const std::vector<mitk::DataNode::Pointer>& dataNodes)

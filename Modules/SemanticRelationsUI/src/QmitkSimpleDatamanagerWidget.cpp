@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMHelper.h>
 #include <mitkSemanticRelationException.h>
 #include <mitkSemanticTypes.h>
-#include <mitkUIDGeneratorBoost.h>
 
 // mitk core
 #include "mitkNodePredicateData.h"

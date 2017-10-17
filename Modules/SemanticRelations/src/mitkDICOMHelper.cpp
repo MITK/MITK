@@ -47,7 +47,7 @@ mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* da
   mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0020).c_str());
   if (nullptr == dicomTag)
   {
-    mitkThrow() << "not a valid DICOM property.";
+    mitkThrow() << "Not a valid DICOM property.";
   }
 
   std::string dicomTagAsString = dicomTag->GetValueAsString();
@@ -70,9 +70,9 @@ mitk::SemanticTypes::ID mitk::GetIDFromDataNode(const mitk::DataNode* dataNode)
   // extract suitable DICOM tag to use as the data node id
   // DICOM tag "0x0020, 0x000e" is SeriesInstanceUID
   mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str());
-  if (nullptr != dicomTag)
+  if (nullptr == dicomTag)
   {
-    mitkThrow() << "not a valid DICOM property.";
+    mitkThrow() << "Not a valid DICOM property.";
   }
   std::string dicomTagAsString = dicomTag->GetValueAsString();
   return dicomTagAsString;
@@ -94,9 +94,9 @@ mitk::SemanticTypes::Date mitk::GetDICOMDateFromDataNode(const mitk::DataNode* d
   // extract suitable DICOM tag to use as the data node id
   // DICOM tag "0x0008, 0x0022" is AcquisitionDate
   mitk::BaseProperty* acquisitionDateProperty = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str());
-  if (nullptr != acquisitionDateProperty)
+  if (nullptr == acquisitionDateProperty)
   {
-    mitkThrow() << "not a valid DICOM property.";
+    mitkThrow() << "Not a valid DICOM property.";
   }
   std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
   return GetDateFromString(acquisitionDateAsString);

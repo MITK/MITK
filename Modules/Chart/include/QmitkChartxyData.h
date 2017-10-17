@@ -77,8 +77,8 @@ signals:
 private:
   QList<QVariant>  m_YData;
   QList<QVariant>  m_XData;
-  QVariant         m_ChartType;
   QVariant         m_Label;
+  QVariant         m_ChartType;
   QVariant         m_Color;
   QVariant         m_LineStyleName;
 };

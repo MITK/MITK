@@ -271,9 +271,10 @@ int main(int argc, char* argv[])
       double next_coverage = 0;
       double next_covered_directions = 1.0;
       mitk::FiberBundle::Pointer best_candidate = nullptr;
+      PeakImgType::Pointer best_candidate_peak_image = nullptr;
       if (greedy_add)
       {
-        for (auto fib : input_candidates)
+        for (int i=0; i<(int)input_candidates.size(); ++i)
         {
           // WHY NECESSARY AGAIN??
           itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
@@ -287,7 +288,7 @@ int main(int argc, char* argv[])
           fitter->SetResampleFibers(false);
           fitter->SetMaskImage(mask);
           // ******************************
-          fitter->SetTractograms({fib});
+          fitter->SetTractograms({input_candidates.at(i)});
 
           streambuf *old = cout.rdbuf(); // <-- save
           stringstream ss;
@@ -306,7 +307,7 @@ int main(int argc, char* argv[])
             if ((1.0-coverage) * next_coverage >= min_gain)
             {
               best_candidate = fitter->GetTractograms().at(0);
-              peak_image = fitter->GetUnderexplainedImage();
+              best_candidate_peak_image = fitter->GetUnderexplainedImage();
             }
           }
         }
@@ -357,6 +358,7 @@ int main(int argc, char* argv[])
         break;
 
       //      fitter->SetPeakImage(peak_image);
+      peak_image = best_candidate_peak_image;
 
       int i=0;
       std::vector< mitk::FiberBundle::Pointer > remaining_candidates;

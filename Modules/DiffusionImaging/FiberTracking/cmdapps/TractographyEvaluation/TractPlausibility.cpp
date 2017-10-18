@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransformPolyDataFilter.h>
 #include <fstream>
 #include <chrono>
+#include <boost/progress.hpp>
 
 using namespace std;
 typedef itksys::SystemTools ist;
@@ -88,8 +89,6 @@ std::vector< MaskType > get_file_list(const std::string& path, int dropout, cons
       skipping_num = (float)num_images/2.0;
 
     std::random_shuffle(im_indices.begin(), im_indices.end());
-    MITK_INFO << num_images;
-    MITK_INFO << dropout;
     MITK_INFO << "Skipping " << skipping_num << " images";
 
     int c = -1;
@@ -187,13 +186,23 @@ int main(int argc, char* argv[])
 
     mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
 
+    MITK_INFO << "Removing fibers not ending inside of GM";
+
     if (gray_matter_mask.compare("")!=0)
     {
+      streambuf *old = cout.rdbuf(); // <-- save
+      stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       ItkUcharImgType::Pointer gm_image = LoadItkMaskImage(gray_matter_mask);
-      // filter gray matter fibers
+      std::cout.rdbuf (old);              // <-- restore
+
       mitk::FiberBundle::Pointer not_gm_fibers = inputTractogram->ExtractFiberSubset(gm_image, false, true, true);
+
+      old = cout.rdbuf(); // <-- save
+      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       mitk::IOUtil::Save(not_gm_fibers, out_folder + "/implausible_tracts/no_gm_endings.trk");
       inputTractogram = inputTractogram->ExtractFiberSubset(gm_image, false, false, true);
+      std::cout.rdbuf (old);              // <-- restore
     }
 
     // resample fibers
@@ -206,10 +215,16 @@ int main(int argc, char* argv[])
       minSpacing = std::get<0>(known_tract_masks.at(0))->GetSpacing()[2];
     inputTractogram->ResampleLinear(minSpacing/5);
 
-    // find known tracts via overlap match
+    MITK_INFO << "Find known tracts via overlap match";
+    boost::progress_display disp(known_tract_masks.size());
     mitk::FiberBundle::Pointer all_known_tracts = nullptr;
     for ( MaskType mask : known_tract_masks )
     {
+      ++disp;
+      streambuf *old = cout.rdbuf(); // <-- save
+      stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+
       ItkUcharImgType::Pointer mask_image = std::get<0>(mask);
       std::string mask_name = std::get<1>(mask);
       mitk::FiberBundle::Pointer known_tract = inputTractogram->ExtractFiberSubset(mask_image, true, false, false, overlap, false);
@@ -219,6 +234,8 @@ int main(int argc, char* argv[])
         all_known_tracts = mitk::FiberBundle::New(known_tract->GetFiberPolyData());
       else
         all_known_tracts = all_known_tracts->AddBundle(known_tract);
+
+      std::cout.rdbuf (old);              // <-- restore
     }
     mitk::IOUtil::Save(all_known_tracts, out_folder + "/known_tracts/all_known_tracts.trk");
     mitk::IOUtil::Save(TransformToMRtrixSpace(all_known_tracts), out_folder + "/known_tracts/all_known_tracts_mrtrixspace.fib");

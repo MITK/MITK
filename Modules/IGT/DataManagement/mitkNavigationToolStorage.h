@@ -156,6 +156,8 @@ namespace mitk {
     /** Sets the name of this storage. The name should be understandable for the user.
     *  Something like "NDI Aurora Tool Storage". If a storage is loaded from the harddisk
     *  the name might be the filename.
+    *  @warning: if your microservice is already registered, you need to call UpdateMicroservice after changing the ID.
+    *  This can't be done inside this functions, as we might use different threads.
     */
     void SetSourceID(std::string);
 

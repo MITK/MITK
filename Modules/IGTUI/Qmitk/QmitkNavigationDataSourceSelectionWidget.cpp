@@ -92,24 +92,10 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     }
 
     // Get Storage
-    std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>();
+    std::string filter = "(" + mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + m_CurrentSource->GetMicroserviceID() + ")";
+    std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>(filter);
     if (refs.empty()) return; //no storage was found
-
-    std::string StorageID = m_CurrentSource->GetMicroserviceID();
-
-    for (int i = 0; i < refs.size(); ++i)
-    {
-      m_CurrentStorage = context->GetService(refs.at(i));
-      if (StorageID.compare(m_CurrentStorage->GetSourceID()) == 0)
-      {
-        break;
-      }
-      else
-      {
-        m_CurrentStorage = nullptr;
-      }
-    }
-
+    m_CurrentStorage = context->GetService(refs.front());
 
     if (m_CurrentStorage.IsNull())
       {

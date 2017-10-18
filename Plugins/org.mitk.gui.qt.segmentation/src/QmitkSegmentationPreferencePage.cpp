@@ -154,9 +154,9 @@ void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state
   if ( state != Qt::Unchecked )
   {
     QMessageBox::information(nullptr,
-                             "Memory warning",
-                             "Turning on volume rendering of segmentations will make the application more memory intensive (and potentially prone to crashes).\n\n"
-                             "If you encounter out-of-memory problems, try turning off volume rendering again.");
+                             tr("Memory warning"),
+                             tr("Turning on volume rendering of segmentations will make the application more memory intensive (and potentially prone to crashes).\n\n"
+                             "If you encounter out-of-memory problems, try turning off volume rendering again."));
   }
 }
 

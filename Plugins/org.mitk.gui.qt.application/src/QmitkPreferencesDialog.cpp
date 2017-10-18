@@ -57,7 +57,9 @@ namespace {
     , {"Properties",            QObject::tr("Properties")}
     , {"Segmentation",          QObject::tr("Segmentation")}
     , {"Segmentation Manager",  QObject::tr("Segmentation Manager")}
-    , {"Series Tags",           QObject::tr("Series Tags")} });
+    , {"Series Tags",           QObject::tr("Series Tags")} 
+    , {"Standard Multi Widget", QObject::tr("Standard Multi Widget") }  
+    , {"User Data",             QObject::tr("User Data") } });
   const QList<QString> mandatorySettings = QList<QString>(
     { "org.mitk.gui.qt.application.EnvironmentPreferencePage"
     , "org.mitk.gui.qt.application.LanguagePreferencePage"

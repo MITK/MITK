@@ -153,8 +153,6 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 {
   mitk::LocaleSwitch localeSwitch("C");
 
-  AUTOPLAN_INFO << "Loading MITK file: " << filename;
-
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if ( storage.IsNull() )

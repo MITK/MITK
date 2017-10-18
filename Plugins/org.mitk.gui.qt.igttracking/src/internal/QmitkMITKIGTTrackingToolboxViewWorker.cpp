@@ -153,7 +153,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     m_TrackingDeviceSource->Connect();
     //Microservice registration:
     m_TrackingDeviceSource->RegisterAsMicroservice();
-
+    m_NavigationToolStorage->SetSourceID(m_TrackingDeviceSource->GetMicroserviceID());
     m_NavigationToolStorage->LockStorage();
   }
   catch (...) //todo: change to mitk::IGTException

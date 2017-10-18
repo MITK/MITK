@@ -81,7 +81,6 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     // Get Source
     us::ModuleContext* context = us::GetModuleContext();
     m_CurrentSource = context->GetService<mitk::NavigationDataSource>(s);
-    std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
 
     // clear tool list before filling it
     m_Controls->m_ToolView->clear();
@@ -92,14 +91,12 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
       new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);
     }
 
-
-    // Create Filter for ToolStorage
-    std::string filter = "("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + ")";
-
     // Get Storage
+    std::string filter = "(" + mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + m_CurrentSource->GetMicroserviceID() + ")";
     std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>(filter);
     if (refs.empty()) return; //no storage was found
     m_CurrentStorage = context->GetService(refs.front());
+
     if (m_CurrentStorage.IsNull())
       {
       MITK_WARN << "Found an invalid storage object!";

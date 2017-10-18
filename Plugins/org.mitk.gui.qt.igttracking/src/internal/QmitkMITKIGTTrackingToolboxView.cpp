@@ -247,7 +247,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //initialize tool storage
     m_toolStorage = mitk::NavigationToolStorage::New(GetDataStorage());
     m_toolStorage->SetName("TrackingToolbox Default Storage");
-    m_toolStorage->RegisterAsMicroservice("no tracking device");
+    m_toolStorage->RegisterAsMicroservice();
 
     //set home directory as default path for logfile
     m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(QDir::homePath()) + QDir::separator() + "logfile.csv");
@@ -439,6 +439,11 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
   m_Controls->m_StartStopTrackingButton->setEnabled(true);
   m_Controls->m_StartTrackingSimpleMode->setEnabled(true);
   m_connected = true;
+
+  //During connection, thi sourceID of the tool storage changed. However, Microservice can't be updated on a different thread.
+  //UpdateMicroservice is necessary to use filter to get the right storage belonging to a source.
+  //Don't do it before m_connected is true, as we don't want to call content of OnToolStorageChanged.
+  m_toolStorage->UpdateMicroservice();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
@@ -1146,7 +1151,7 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
   //now: replace by the new one
   m_toolStorage = newStorage;
   m_toolStorage->SetName(newStorageName);
-  m_toolStorage->RegisterAsMicroservice("no tracking device");
+  m_toolStorage->RegisterAsMicroservice();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
@@ -1165,7 +1170,8 @@ void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
 
 void QmitkMITKIGTTrackingToolboxView::OnToolStorageChanged(const ctkServiceEvent event)
 {
-  if ((event.getType() == ctkServiceEvent::MODIFIED))
+  //don't listen to any changes during connection, toolStorage is locked anyway, so this are only changes of e.g. sourceID which are not relevant for the widget.
+  if (!m_connected && (event.getType() == ctkServiceEvent::MODIFIED))
   {
     m_Controls->m_configurationWidget->OnToolStorageChanged();
   }
@@ -1219,7 +1225,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
       m_toolStorage->UnRegisterMicroservice();
       m_toolStorage = myDeserializer->Deserialize(m_ToolStorageFilename.toStdString());
-      m_toolStorage->RegisterAsMicroservice("no tracking device");
+      m_toolStorage->RegisterAsMicroservice();
 
       //update label
       UpdateToolStorageLabel(m_ToolStorageFilename);

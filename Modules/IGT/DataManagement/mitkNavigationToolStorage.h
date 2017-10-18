@@ -57,7 +57,7 @@ namespace mitk {
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
     * To unregister, call UnregisterMicroservice(). Make sure to pass the id of the Device that this tool is connected to.
     */
-    virtual void RegisterAsMicroservice(std::string sourceID);
+    virtual void RegisterAsMicroservice();
 
     /**
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
@@ -73,9 +73,12 @@ namespace mitk {
     /**
     *\brief These constants are used in conjunction with Microservices
     */
-    static const std::string US_INTERFACE_NAME; // Name of the interface
-    static const std::string US_PROPKEY_SOURCE_ID; // ID of the device this ToolStorage is associated with
-    static const std::string US_PROPKEY_STORAGE_NAME; // name of the storage
+    // Name of the interface
+    static const std::string US_INTERFACE_NAME;
+    // ID of the NavigationDataSource this ToolStorage is associated with. Can be empty ("") and changed with SetSourceID().
+    static const std::string US_PROPKEY_SOURCE_ID;
+    // name of the storage
+    static const std::string US_PROPKEY_STORAGE_NAME;
 
 
     /**
@@ -150,6 +153,17 @@ namespace mitk {
     /** @return Returns the name of this storage. */
     std::string GetName() const;
 
+    /** Sets the name of this storage. The name should be understandable for the user.
+    *  Something like "NDI Aurora Tool Storage". If a storage is loaded from the harddisk
+    *  the name might be the filename.
+    *  @warning: if your microservice is already registered, you need to call UpdateMicroservice after changing the ID.
+    *  This can't be done inside this functions, as we might use different threads.
+    */
+    void SetSourceID(std::string);
+
+    /** @return Returns the name of this storage. */
+    std::string GetSourceID() const;
+
     /** Locks the storage. A logged storage may not be modified.
      *  If a method tries to modify the storage anyway a waring message is given.
      *  The storage is unlocked by default. A Storage might be locked when a
@@ -174,6 +188,7 @@ namespace mitk {
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;
     std::string m_Name;
+    std::string m_SourceID;
     bool m_storageLocked;
 
   private:

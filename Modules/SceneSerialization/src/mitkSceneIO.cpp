@@ -241,7 +241,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 }
 
 bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
-                              const std::string& filename, bool compress)
+                              const std::string& filename, bool compress, unsigned int progressSteps)
 {
   AUTOPLAN_INFO << "Saving MITK file: " << filename;
   if (!sceneNodes)
@@ -282,6 +282,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     //DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
     int compressSteps = sceneNodes->size() / 3;
+    unsigned int allSteps = sceneNodes->size() + compressSteps;
 
     if ( sceneNodes.IsNull() )
     {
@@ -303,10 +304,12 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         return false;
       }
 
-      ProgressBar::GetInstance()->AddStepsToDo( sceneNodes->size() );
-      if (compress)
-      {
-        ProgressBar::GetInstance()->AddStepsToDo(compressSteps);
+      // If progress steps are set, expected that progress bar steps is also set
+      if (progressSteps < 1) {
+        ProgressBar::GetInstance()->AddStepsToDo( sceneNodes->size() );
+        if (compress) {
+          ProgressBar::GetInstance()->AddStepsToDo(compressSteps);
+        }
       }
 
 
@@ -480,7 +483,13 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       for (auto node : sceneNodes->CastToSTLConstContainer())
       {
         serialize(node);
-        ProgressBar::GetInstance()->Progress();
+        if (progressSteps < 1) {
+          ProgressBar::GetInstance()->Progress();
+        }
+        else {
+          unsigned int intProgressValue = std::round(progressSteps / allSteps);
+          ProgressBar::GetInstance()->Progress(intProgressValue);
+        }
       } // end for all nodes
 
       if (Logger::Options::get().datastoragelog && Logger::Log::get().getDataBackend())
@@ -529,7 +538,12 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
             zipper.close();
           }
 
-          ProgressBar::GetInstance()->Progress(compressSteps);
+          if (progressSteps < 1) {
+            ProgressBar::GetInstance()->Progress(compressSteps);
+          } else {
+            unsigned int intProgressValue = std::round(((float)compressSteps / allSteps) * progressSteps);
+            ProgressBar::GetInstance()->Progress(intProgressValue);
+          }
         }
         else
         {

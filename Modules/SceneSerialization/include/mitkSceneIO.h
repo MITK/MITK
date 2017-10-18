@@ -75,7 +75,7 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
      * \param predicate defining which items of the datastorage to use and which not
      */
     virtual bool SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
-                            const std::string& filename, bool compress = true);
+                            const std::string& filename, bool compress = true, unsigned int progressSteps = 0);
 
     /**
      * \brief Get a list of nodes (BaseData containers) that failed to be read/written.

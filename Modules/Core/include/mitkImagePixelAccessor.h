@@ -69,14 +69,16 @@ protected:
     {
       if(image->GetDimension() != VDimension)
       {
-        mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and Image are not equal. They have to be equal if an entire image is requested";
+        //mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and Image are not equal. They have to be equal if an entire image is requested";
+        MITK_ERROR << "Invalid ImageAccessor: The Dimensions of ImageAccessor and Image are not equal. They have to be equal if an entire image is requested";
       }
     }
     else
     {
       if(m_ImageDataItem->GetDimension() != VDimension)
       {
-        mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
+        //mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
+        MITK_ERROR << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
       }
     }
 
@@ -84,7 +86,8 @@ protected:
     if(!(image->GetPixelType() ==  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()
          || image->GetPixelType() == mitk::MakePixelType< itk::VectorImage<TPixel, VDimension> >(image->GetPixelType().GetNumberOfComponents())) )
     {
-      mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
+      //mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
+      MITK_ERROR << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
     }
   }
 

@@ -59,6 +59,8 @@ public:
   itkGetMacro( ResampleFibers, bool)
 
   itkGetMacro( Weights, vnl_vector<double>)
+  itkGetMacro( RmsDiffPerBundle, vnl_vector<double>)
+  itkGetMacro( RmsDiffPerFiber, vnl_vector<double>)
   itkGetMacro( FittedImage, PeakImgType::Pointer)
   itkGetMacro( ResidualImage, PeakImgType::Pointer)
   itkGetMacro( OverexplainedImage, PeakImgType::Pointer)
@@ -109,7 +111,9 @@ protected:
   unsigned int                                m_NumCoveredDirections;
 
   // output
+  vnl_vector<double>                          m_RmsDiffPerBundle;
   vnl_vector<double>                          m_Weights;
+  vnl_vector<double>                          m_RmsDiffPerFiber;
   PeakImgType::Pointer                        m_UnderexplainedImage;
   PeakImgType::Pointer                        m_OverexplainedImage;
   PeakImgType::Pointer                        m_ResidualImage;

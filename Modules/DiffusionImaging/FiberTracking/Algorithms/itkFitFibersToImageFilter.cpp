@@ -235,7 +235,8 @@ void FitFibersToImageFilter::GenerateData()
   MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
   MITK_INFO << "Residual cost: " << minimizer.get_end_error();
-  MITK_INFO << "Final RMS: " << cost.S->get_rms_error(m_Weights);
+  double rms = cost.S->get_rms_error(m_Weights);
+  MITK_INFO << "Final RMS: " << rms;
 
   clock.Stop();
   int h = clock.GetTotal()/3600;
@@ -243,11 +244,9 @@ void FitFibersToImageFilter::GenerateData()
   int s = (int)clock.GetTotal()%60;
   MITK_INFO << "Optimization took " << h << "h, " << m << "m and " << s << "s";
 
-  // transform back for peak image creation
-  A *= FD/100.0;
-  b *= FD/100.0;
-
   MITK_INFO << "Weighting fibers";
+  m_RmsDiffPerFiber.set_size(m_Weights.size());
+  m_RmsDiffPerBundle.set_size(m_Tractograms.size());
   std::streambuf *old = cout.rdbuf(); // <-- save
   std::stringstream ss;
   std::cout.rdbuf (ss.rdbuf());
@@ -256,11 +255,22 @@ void FitFibersToImageFilter::GenerateData()
     unsigned int fiber_count = 0;
     for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
     {
+      double mean_d = 0;
       for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); i++)
       {
         m_Tractograms.at(bundle)->SetFiberWeight(i, m_Weights[fiber_count]);
+        double w = m_Weights[fiber_count];
+
+        m_Weights[fiber_count] = 0;
+        double d_rms = cost.S->get_rms_error(m_Weights) - rms;
+        m_RmsDiffPerFiber[fiber_count] = d_rms;
+        mean_d += d_rms;
+        m_Weights[fiber_count] = w;
+
         ++fiber_count;
       }
+      mean_d /= m_Tractograms.at(bundle)->GetNumFibers();
+      m_RmsDiffPerBundle[bundle] = mean_d;
       m_Tractograms.at(bundle)->Compress(0.1);
       m_Tractograms.at(bundle)->ColorFibersByFiberWeights(false, true);
     }
@@ -275,6 +285,10 @@ void FitFibersToImageFilter::GenerateData()
     }
   }
   std::cout.rdbuf (old);
+
+  // transform back for peak image creation
+  A *= FD/100.0;
+  b *= FD/100.0;
 
   MITK_INFO << "Generating output images ...";
 
@@ -396,7 +410,7 @@ vnl_vector_fixed<float,3> FitFibersToImageFilter::GetClosestPeak(itk::Index<4> i
 {
   int m_NumDirs = peak_image->GetLargestPossibleRegion().GetSize()[3]/3;
   vnl_vector_fixed<float,3> out_dir; out_dir.fill(0);
-  float angle = 0.8;
+  float angle = 0.9;
 
   for (int i=0; i<m_NumDirs; i++)
   {

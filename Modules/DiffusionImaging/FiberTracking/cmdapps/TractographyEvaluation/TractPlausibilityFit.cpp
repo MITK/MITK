@@ -93,9 +93,9 @@ int main(int argc, char* argv[])
   parser.addArgument("", "i1", mitkCommandLineParser::InputFile, "Input tractogram:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
   parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
   parser.addArgument("", "i3", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
-  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any());
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any(), false);
 
-  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
+  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "", "", us::Any());
   parser.addArgument("min_gain", "", mitkCommandLineParser::Float, "Min. gain:", "process stops if remaining bundles don't contribute enough", 0.05);
 
   parser.addArgument("reference_mask_folder", "", mitkCommandLineParser::String, "Reference Mask Folder:", "reference masks for accuracy evaluation", false);
@@ -168,6 +168,10 @@ int main(int argc, char* argv[])
       ist::RemoveADirectory(out_folder);
     ist::MakeDirectory(out_folder);
 
+    streambuf *old = cout.rdbuf(); // <-- save
+    stringstream ss;
+    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+
     ofstream logfile;
     logfile.open (out_folder + "log.txt");
 
@@ -221,6 +225,8 @@ int main(int argc, char* argv[])
     fib->ResampleLinear(minSpacing/10.0);
     input_reference.push_back(fib);
 
+    std::cout.rdbuf (old);              // <-- restore
+
     // Load all candidate tracts
     std::vector< mitk::FiberBundle::Pointer > input_candidates;
     std::vector< string > candidate_tract_files = get_file_list(candidate_folder);
@@ -264,6 +270,56 @@ int main(int argc, char* argv[])
     MITK_INFO << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "%";
     logfile << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "%\n\n";
     //    fitter->SetPeakImage(peak_image);
+
+
+    {
+      itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
+      fitter->SetFitIndividualFibers(single_fib);
+      fitter->SetMaxIterations(max_iter);
+      fitter->SetGradientTolerance(g_tol);
+      fitter->SetLambda(lambda);
+      fitter->SetFilterOutliers(filter_outliers);
+      fitter->SetVerbose(true);
+      fitter->SetPeakImage(peak_image);
+      fitter->SetResampleFibers(false);
+      fitter->SetMaskImage(mask);
+      fitter->SetTractograms(input_candidates);
+      fitter->Update();
+      MITK_INFO << "DONE";
+      vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
+
+      int c = 0;
+      for (auto fib : input_candidates)
+      {
+        fib->SetFiberWeight(c, rms_diff[c]);
+        mitk::IOUtil::Save(fib, out_folder + "RMS_DIFF_" + boost::lexical_cast<string>(rms_diff[c]) + "_" + name + ".fib");
+
+        float best_overlap = 0;
+        int best_overlap_index = -1;
+        int m_idx = 0;
+        for (auto ref_mask : reference_masks)
+        {
+          float overlap = fib->GetOverlap(ref_mask, false);
+          if (overlap>best_overlap)
+          {
+            best_overlap = overlap;
+            best_overlap_index = m_idx;
+          }
+          ++m_idx;
+        }
+
+        string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
+        logfile << "RMS_DIFF: " << rms_diff[c] << " " << bundle_name << "\n";
+        logfile << "Best overlap: " << best_overlap << " " << ist::GetFilenameWithoutExtension(reference_mask_filenames.at(best_overlap_index)) << "\n";
+
+        ++c;
+      }
+
+      logfile.close();
+      return EXIT_SUCCESS;
+    }
+
+
 
     // Iteratively add/subtract candidate bundles in a greedy manner
     while (!input_candidates.empty())

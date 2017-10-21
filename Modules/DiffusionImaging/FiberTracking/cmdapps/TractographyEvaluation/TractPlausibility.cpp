@@ -154,6 +154,7 @@ int main(int argc, char* argv[])
   parser.addArgument("gray_matter_mask", "gm", mitkCommandLineParser::String, "", "");
   parser.addArgument("dropout", "", mitkCommandLineParser::Int, "", "", false);
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "", "", false, 0.7);
+  parser.addArgument("subsample", "", mitkCommandLineParser::Float, "", "", false, 1.0);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -174,6 +175,10 @@ int main(int argc, char* argv[])
   float overlap = 0.7;
   if (parsedArgs.count("overlap"))
     overlap = us::any_cast<float>(parsedArgs["overlap"]);
+
+  float subsample = 1.0;
+  if (parsedArgs.count("subsample"))
+    subsample = us::any_cast<float>(parsedArgs["subsample"]);
 
   try
   {
@@ -204,6 +209,9 @@ int main(int argc, char* argv[])
       inputTractogram = inputTractogram->ExtractFiberSubset(gm_image, false, false, true);
       std::cout.rdbuf (old);              // <-- restore
     }
+
+    if (subsample<1.0)
+      inputTractogram = inputTractogram->SubsampleFibers(subsample);
 
     // resample fibers
     float minSpacing = 1;

@@ -162,7 +162,7 @@ short TrackVisFiberReader::read( mitk::FiberBundle* fib )
     fiberPolyData->SetPoints(vtkNewPoints);
     fiberPolyData->SetLines(vtkNewCells);
 
-    MITK_INFO << "Coordinate convention: " << m_Header.voxel_order;
+//    MITK_INFO << "Coordinate convention: " << m_Header.voxel_order;
 
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     vtkSmartPointer< vtkMatrix4x4 > matrix = vtkSmartPointer< vtkMatrix4x4 >::New();

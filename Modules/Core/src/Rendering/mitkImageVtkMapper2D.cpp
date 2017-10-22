@@ -815,8 +815,12 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
           //contrast.SetAuto( static_cast<mitk::Image*>(node->GetData()), false, true ); // we need this as a fallback
         }
 
-        contrast.SetLevelWindow( level, window, true );
-        node->SetProperty( "levelwindow", LevelWindowProperty::New( contrast ), renderer );
+        mitk::LevelWindowProperty::Pointer levelWindowProperty =
+          dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
+        if (levelWindowProperty.IsNull()) {
+          contrast.SetLevelWindow(level, window, true);
+          node->SetProperty("levelwindow", LevelWindowProperty::New(contrast), renderer);
+        }
       }
     }
     if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))

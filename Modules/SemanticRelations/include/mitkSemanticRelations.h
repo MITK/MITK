@@ -131,6 +131,18 @@ namespace mitk
     */
     bool IsRepresentingALesion(const DataNode* segmentationNode) const;
     /*
+    * @brief  Return a vector of all segmentations that are currently available for the given case.
+    *         The segmentations may be connected / not connected to a lesion of the case.
+    *         If no segmentations are stored for the current case, an empty vector is returned.
+    *
+    * @pre    The data storage member has to be valid (!nullptr).
+    * @throw  mitk::Exception if the data storage member is invalid (==nullptr).
+    *
+    * @par caseID    The current case identifier is defined by the given string.
+    * @return        A vector of data nodes representing segmentations.
+    */
+    mitk::SemanticRelations::DataNodeVector GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID) const;
+    /*
     * @brief  Return a vector of all segmentations that define the given lesion. These segmentations don't have to be linked to the same image.
     *         If the lesion is not referred to by any segmentation, an empty vector is returned.
     *
@@ -370,9 +382,8 @@ namespace mitk
     /*
     * @brief  Add a segmentation instance to the set of already existing segmentations - with no connection to a specific lesion.
     *
-    * @par segmentationNode   The current case identifier and node identifier is extracted from the given segmentation data node.
+    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     * @par parentNode         The node identifier of the parent node is extracted from the given parent data node.
-    * @par selectedLesion    The selected lesion that should be linked with the given segmentation.
     */
     void AddSegmentation(const DataNode* segmentationNode, const DataNode* parentNode);
     /*
@@ -501,7 +512,7 @@ namespace mitk
     /*
     * @brief A vector that stores the currently registered observer of this observable subject.
     */
-    std::vector<mitk::ISemanticRelationsObserver*> m_ObserverVector;
+    static std::vector<mitk::ISemanticRelationsObserver*> m_ObserverVector;
     /*
     * @brief The SemanticRelations, as an example of an observable subject, notifies (updates) the observer with a given case ID.
     *        The view's caseID was set before in the GUI. The parts of the view that observe changes in the semantic relations are only updated,

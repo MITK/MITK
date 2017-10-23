@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <algorithm>
 
+std::vector<mitk::ISemanticRelationsObserver*> mitk::SemanticRelations::m_ObserverVector;
+
 mitk::SemanticRelations::SemanticRelations(mitk::DataStorage::Pointer dataStorage)
   : m_DataStorage(dataStorage)
 {
@@ -82,23 +84,25 @@ mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsInIm
     mitkThrow() << "Not a valid image data node.";
   }
 
-  LesionVector allLesionsInImage;
-  if (m_DataStorage.IsNotNull())
+  if (m_DataStorage.IsNull())
   {
-    // get child nodes of the current node with the segmentation predicate
-    DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetDerivations(imageNode, NodePredicates::GetSegmentationPredicate(), false);
-    for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
+    mitkThrow() << "Not a valid data storage.";
+  }
+
+  LesionVector allLesionsInImage;
+  // get child nodes of the current node with the segmentation predicate
+  DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetDerivations(imageNode, NodePredicates::GetSegmentationPredicate(), false);
+  for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
+  {
+    DataNode* segmentationNode = it->Value();
+    try
     {
-      DataNode* segmentationNode = it->Value();
-      try
-      {
-        SemanticTypes::Lesion representedLesion = GetRepresentedLesion(segmentationNode);
-        allLesionsInImage.push_back(representedLesion);
-      }
-      catch (const SemanticRelationException&)
-      {
-        continue;
-      }
+      SemanticTypes::Lesion representedLesion = GetRepresentedLesion(segmentationNode);
+      allLesionsInImage.push_back(representedLesion);
+    }
+    catch (const SemanticRelationException&)
+    {
+      continue;
     }
   }
   return allLesionsInImage;
@@ -136,18 +140,28 @@ bool mitk::SemanticRelations::IsRepresentingALesion(const DataNode* segmentation
   {
     return false;
   }
-  catch (mitk::Exception& e)
+}
+
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID) const
+{
+  if (m_DataStorage.IsNull())
   {
-    mitkReThrow(e);
+    mitkThrow() << "Not a valid data storage.";
   }
+  return m_RelationStorage->GetAllSegmentationsOfCase(caseID);
 }
 
 mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
+  if (m_DataStorage.IsNull())
+  {
+    mitkThrow() << "Not a valid data storage.";
+  }
+
   if (InstanceExists(caseID, lesion))
   {
     // lesion exists, retrieve all case segmentations from the storage
-    DataNodeVector allSegmentationsOfLesion = m_RelationStorage->GetAllSegmentationsOfCase(caseID);
+    DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfCase(caseID);
 
     // filter all segmentations: check for semantic relation with the given lesion using a lambda function
     auto lambda = [&lesion, this](DataNode::Pointer segmentation)
@@ -599,7 +613,6 @@ void mitk::SemanticRelations::AddSegmentation(const mitk::DataNode* segmentation
   SemanticTypes::ID segmentationNodeID = GetIDFromDataNode(segmentationNode);
   SemanticTypes::ID parentNodeID = GetIDFromDataNode(parentNode);
 
-  m_RelationStorage->AddCase(caseID);
   m_RelationStorage->AddSegmentation(caseID, segmentationNodeID, parentNodeID);
   NotifyObserver(caseID);
 }

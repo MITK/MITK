@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations UI module
 #include "MitkSemanticRelationsUIExports.h"
 #include <ui_QmitkLesionInfoWidgetControls.h>
+#include <QmitkSimpleDatamanagerWidget.h>
+#include <QmitkSelectNodeDialog.h>
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -45,15 +47,14 @@ class MITKSEMANTICRELATIONSUI_EXPORT QmitkLesionInfoWidget : public QWidget, pub
   Q_OBJECT
 
 public:
+  static const QBrush DEFAULT_BACKGROUND_COLOR;
+  static const QBrush SELECTED_BACKGROUND_COLOR;
+  static const QBrush CONNECTED_BACKGROUND_COLOR;
 
-  QmitkLesionInfoWidget::QmitkLesionInfoWidget(QWidget* parent = nullptr);
+  QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   ~QmitkLesionInfoWidget();
 
-  void SetupConnections();
-
-  void SetDataStorage(mitk::DataStorage* dataStorage);
   void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
-
   /*
   * @brief Updates the 'lesionListWidget' of the GUI with the current lesion-data from the semantic relations model.
   *
@@ -69,13 +70,27 @@ public:
   const mitk::DataNode* GetSelectedSegmentation() const { return m_CurrentSegmentation; }
   const mitk::DataNode* GetSelectedImage() const { return m_CurrentImage; }
   /*
-  * @brief Removes all items from the lesion list widget, the segmentation list widget and the image list widget
+  * @brief Resets all items from the lesion list widget.
   */
-  void ClearLesionInfoWidget();
+  void ResetLesionListWidget();
   /*
-  * @brief Removes all items from the the segmentation list widget and the image list widget
+  * @brief Resets all items from the the segmentation list widget.
   */
-  void ClearSegmentationList();
+  void ResetSegmentationListWidget();
+  /*
+  * @brief Resets all items from the the segmentation list widget.
+  */
+  void ResetImageListWidget();
+  /*
+  * @brief Resets the background color of all items in each list widget.
+  */
+  void ResetBackgroundColors();
+
+  void DarkenBackgroundColors();
+
+Q_SIGNALS:
+  void JumpToPosition(const mitk::Point3D&);
+  void ImageRemoved(const mitk::DataNode*);
 
 private Q_SLOTS:
 
@@ -85,13 +100,28 @@ private Q_SLOTS:
   void OnSegmentationItemDoubleClicked(QListWidgetItem*);
   void OnCurrentImageItemChanged(QListWidgetItem*, QListWidgetItem*);
   void OnImageItemDoubleClicked(QListWidgetItem*);
+  void OnLesionListContextMenuRequested(const QPoint&);
+  void OnSegmentationListContextMenuRequested(const QPoint&);
+  void OnImageListContextMenuRequested(const QPoint&);
+  void OnLinkToSegmentation(const mitk::SemanticTypes::Lesion&);
+  void OnRemoveLesion(const mitk::SemanticTypes::Lesion&);
+  void OnSetLesionClass(const mitk::SemanticTypes::Lesion&);
+  void OnUnlinkFromLesion(const mitk::DataNode*);
+  void OnRemoveSegmentation(const mitk::DataNode*);
+  void OnRemoveImage(const mitk::DataNode*);
 
 private:
+
+  void Init();
+  void SetUpConnections();
 
   Ui::QmitkLesionInfoWidgetControls m_Controls;
   mitk::DataStorage* m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
+
+  QmitkSimpleDatamanagerWidget* m_SimpleDatamanagerWidget;
+  QmitkSelectNodeDialog* m_SimpleDatamanagerNodeDialog;
 
   mitk::SemanticTypes::Lesion m_CurrentLesion;
   mitk::DataNode::Pointer m_CurrentSegmentation;

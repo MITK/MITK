@@ -89,7 +89,6 @@ private:
   */
   mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
 
-  mitk::DataStorage::Pointer m_DataStorage;
   std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
 

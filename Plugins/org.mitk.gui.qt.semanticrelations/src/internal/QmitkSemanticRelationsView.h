@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSemanticTypes.h>
 
 // semantic relations UI module
+#include <QmitkLesionInfoWidget.h>
 #include <QmitkPatientTableWidget.h>
 #include <QmitkSimpleDatamanagerWidget.h>
 #include <QmitkSelectNodeDialog.h>
@@ -67,15 +68,14 @@ private Q_SLOTS:
 
   void OnCaseIDSelectionChanged(const QString&);
   void OnSelectPatientNodeButtonClicked();
+  void OnJumpToPosition(const mitk::Point3D&);
   /*
   * @brief Generates a new, empty lesion to add to the semantic relations model for the current case ID.
   */
   void OnAddLesionButtonClicked();
-  void OnRemoveLesionButtonClicked();
-  void OnLinkLesionButtonClicked();
-  void OnUnlinkLesionButtonClicked();
+  void OnAddSegmentationButtonClicked();
   void OnAddImageButtonClicked();
-  void OnRemoveImageButtonClicked();
+  void OnImageRemoved(const mitk::DataNode*);
 
 private:
 
@@ -84,6 +84,7 @@ private:
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
 
   Ui::QmitkSemanticRelationsControls m_Controls;
+  QmitkLesionInfoWidget* m_LesionInfoWidget;
   QmitkPatientTableWidget* m_PatientTableWidget;
   QmitkSimpleDatamanagerWidget* m_SimpleDatamanagerWidget;
   QmitkSelectNodeDialog* m_SelectPatientNodeDialog;

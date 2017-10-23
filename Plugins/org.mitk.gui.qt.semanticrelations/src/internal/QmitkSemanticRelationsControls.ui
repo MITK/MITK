@@ -30,9 +30,6 @@
    <item row="1" column="0" colspan="3">
     <widget class="QComboBox" name="caseIDComboBox"/>
    </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QLineEdit" name="selectedPatientNodeLineEdit"/>
-   </item>
    <item row="2" column="2">
     <widget class="QPushButton" name="selectPatientNodePushButton">
      <property name="text">
@@ -40,8 +37,22 @@
      </property>
     </widget>
    </item>
-      <item row="3" column="0" colspan="3">
-    <widget class="QmitkLesionInfoWidget" name="lesionInfoWidget" native="true"/>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="addSegmentationPushButton">
+     <property name="text">
+      <string>Add segmentation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QLineEdit" name="selectedPatientNodeLineEdit"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="addImagePushButton">
+     <property name="text">
+      <string>Add image</string>
+     </property>
+    </widget>
    </item>
    <item row="4" column="0">
     <widget class="QPushButton" name="addLesionPushButton">
@@ -50,50 +61,8 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QPushButton" name="removeLesionPushButton">
-     <property name="text">
-      <string>Remove lesion</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="linkLesionPushButton">
-     <property name="text">
-      <string>Link lesion</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QPushButton" name="unlinkLesionPushButton">
-     <property name="text">
-      <string>Unlink lesion</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="addImagePushButton">
-     <property name="text">
-      <string>Add Image</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QPushButton" name="removeImagePushButton">
-     <property name="text">
-      <string>Remove image</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QmitkLesionInfoWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkLesionInfoWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

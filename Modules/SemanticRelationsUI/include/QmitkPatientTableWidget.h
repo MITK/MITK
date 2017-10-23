@@ -34,7 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 
 /*
-* @brief The QmitkPatientTableWidget is a widget that shows the currently available data of the semantic relations model in a control point-information type matrix.
+* @brief The QmitkPatientTableWidget is a selection widget that shows the currently available data of the semantic relations model in a
+*        control point-information type matrix.
 *
 *   The QmitkPatientTableWidget has a model that presents the semantic relations data as a table, showing a QPixmap as thumbnail for the image data.
 *
@@ -55,6 +56,7 @@ public:
   QmitkPatientTableWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   virtual ~QmitkPatientTableWidget();
 
+  void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
   /*
   * @brief Propagates the 'Update'-call to the patient table model to update the patient data (control points and information types).
   *

@@ -14,10 +14,24 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="4">
+   <item row="0" column="0">
     <widget class="QLabel" name="lesionInfoWidgetLabel">
      <property name="text">
-      <string>Available lesion data</string>
+      <string>Available lesions:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="segmentationInfoWidgetLabel">
+     <property name="text">
+      <string>Available segmentations:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="imageInfoWidgetLabel">
+     <property name="text">
+      <string>Available images:</string>
      </property>
     </widget>
    </item>

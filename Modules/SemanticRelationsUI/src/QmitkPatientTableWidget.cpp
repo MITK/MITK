@@ -49,7 +49,7 @@ QmitkPatientTableWidget::QmitkPatientTableWidget(mitk::DataStorage* dataStorage,
 
 QmitkPatientTableWidget::~QmitkPatientTableWidget()
 {
-  // nothing here
+  m_SemanticRelations->RemoveObserver(this);
 }
 
 void QmitkPatientTableWidget::Init()
@@ -70,6 +70,8 @@ void QmitkPatientTableWidget::Init()
   m_ContextMenu = new QMenu(m_Controls.patientTableView);
 
   SetUpConnections();
+
+  m_SemanticRelations->AddObserver(this);
 }
 
 void QmitkPatientTableWidget::SetUpConnections()
@@ -77,6 +79,11 @@ void QmitkPatientTableWidget::SetUpConnections()
   connect(m_PatientTableModel.get(), SIGNAL(ModelUpdated()), SLOT(OnPatientTableModelUpdated()));
   connect(m_Controls.patientTableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnPatientTableViewContextMenuRequested(const QPoint&)));
   connect(m_Controls.patientTableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnPatientTableViewSelectionChanged(const QItemSelection&, const QItemSelection&)));
+}
+
+void QmitkPatientTableWidget::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
+{
+  m_PatientTableModel->SetCurrentCaseID(caseID);
 }
 
 void QmitkPatientTableWidget::Update(const mitk::SemanticTypes::CaseID& caseID)

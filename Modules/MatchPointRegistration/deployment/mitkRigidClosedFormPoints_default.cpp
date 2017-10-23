@@ -15,13 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mapDeploymentDLLHelper.h"
-#include "mapDiscreteElements.h"
-#include "mapITKLevelSetMotionMultiResRegistrationAlgorithm.h"
+#include "mapContinuousElements.h"
+#include "mapITKRigid3DClosedFormRegistrationAlgorithmTemplate.h"
 #include "mapConfigure.h"
 
-#include "MITK_LevelSetMotion_MultiRes_default_ProfileResource.h"
-typedef map::core::discrete::Elements<3>::InternalImageType ImageType;
-typedef map::algorithm::boxed::ITKLevelSetMotionMultiResRegistrationAlgorithm<ImageType, map::algorithm::MITK_LevelSetMotion_MultiRes_defaultUIDPolicy>
-AlgorithmType;
+#include "mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h"
 
-mapDeployAlgorithmMacro(AlgorithmType);
+typedef map::core::continuous::Elements<3>::InternalPointSetType PointSetType;
+
+mapDeployAlgorithmMacro(mitk::RigidClosedFormPointsDefaultRegistrationAlgorithm<PointSetType>);

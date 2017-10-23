@@ -14,15 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mapDeploymentDLLHelper.h"
-#include "mapContinuousElements.h"
+#ifndef mitkRigidClosedFormPointsDefaultRegistrationAlgorithm_h
+#define mitkRigidClosedFormPointsDefaultRegistrationAlgorithm_h
+
+#include "mapDiscreteElements.h"
 #include "mapITKRigid3DClosedFormRegistrationAlgorithmTemplate.h"
 #include "mapConfigure.h"
 
-#include "MITK_Rigid_closedform_points_default_ProfileResource.h"
+#include "mitkRigidClosedFormPointsDefaultRegistrationAlgorithm_ProfileResource.h"
 
-typedef map::core::continuous::Elements<3>::InternalPointSetType PointSetType;
-typedef map::algorithm::boxed::ITKRigid3DClosedFormRegistrationAlgorithmTemplate<PointSetType, ::map::algorithm::MITK_Rigid_closedform_points_defaultUIDPolicy>::Type
-AlgorithmType;
+namespace mitk
+{
+  template <typename TPointSetType>
+  using RigidClosedFormPointsDefaultRegistrationAlgorithm = typename map::algorithm::boxed::ITKRigid3DClosedFormRegistrationAlgorithmTemplate<TPointSetType, ::map::algorithm::mitkRigidClosedFormPointsDefaultRegistrationAlgorithmUIDPolicy>::Type;
+}
 
-mapDeployAlgorithmMacro(AlgorithmType);
+#endif

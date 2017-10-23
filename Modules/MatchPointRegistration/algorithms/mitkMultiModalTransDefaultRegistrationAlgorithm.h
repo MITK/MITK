@@ -14,28 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mapDeploymentDLLHelper.h"
+#ifndef mitkMultiModalTransDefaultRegistrationAlgorithm_h
+#define mitkMultiModalTransDefaultRegistrationAlgorithm_h
+
 #include "mapDiscreteElements.h"
 #include "mapITKTransMattesMIMultiResRegistrationAlgorithm.h"
 #include "mapConfigure.h"
 
-#include "MITK_MultiModal_translation_default_ProfileResource.h"
+#include "mitkMultiModalTransDefaultRegistrationAlgorithm_ProfileResource.h"
 
 namespace mitk
 {
-        typedef map::core::discrete::Elements<3>::InternalImageType ImageType;
-
         /** \class MultiModalTranslationDefaultRegistrationAlgorithm
         * Algorithm is used as default solution for multimodal 3-degrees of freedom (translation) problem statements in DIPP.
         * Uses 3 Resolution levels. By default initializes via image centers
         */
+        template<class TImageType>
         class MultiModalTranslationDefaultRegistrationAlgorithm :
-          public map::algorithm::boxed::ITKTransMattesMIMultiResRegistrationAlgorithm<ImageType, ImageType, ::map::algorithm::MITK_MultiModal_translation_defaultUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<ImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+          public map::algorithm::boxed::ITKTransMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalTransDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
         {
         public:
           typedef MultiModalTranslationDefaultRegistrationAlgorithm Self;
 
-          typedef ITKTransMattesMIMultiResRegistrationAlgorithm<ImageType, ImageType, ::map::algorithm::MITK_MultiModal_translation_defaultUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<ImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+          typedef ITKTransMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalTransDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
           Superclass;
 
           typedef ::itk::SmartPointer<Self>                                     Pointer;
@@ -106,4 +107,4 @@ namespace mitk
 
 }
 
-mapDeployAlgorithmMacro(  mitk::MultiModalTranslationDefaultRegistrationAlgorithm);
+#endif

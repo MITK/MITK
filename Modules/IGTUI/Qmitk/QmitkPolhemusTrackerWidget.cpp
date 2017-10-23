@@ -76,6 +76,7 @@ void QmitkPolhemusTrackerWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_GetHemisphere), SIGNAL(clicked()), this, SLOT(on_m_GetHemisphere_clicked()));
     connect((QObject*)(m_Controls->m_AdjustHemisphere), SIGNAL(clicked()), this, SLOT(on_m_AdjustHemisphere_clicked()));
     connect((QObject*)(m_Controls->m_AdvancedSettings), SIGNAL(clicked()), this, SLOT(on_m_AdvancedSettings_clicked()));
+    connect((QObject*)(m_Controls->m_ToggleToolTipCalibration), SIGNAL(clicked()), this, SLOT(on_m_ToggleToolTipCalibration_clicked()));
   }
 }
 
@@ -191,6 +192,27 @@ void QmitkPolhemusTrackerWidget::on_m_AdjustHemisphere_clicked()
   }
 }
 
+void QmitkPolhemusTrackerWidget::on_m_ToggleToolTipCalibration_clicked()
+{
+  if (m_Controls->m_ToolSelection->currentIndex() != 0)
+  {
+    mitk::PolhemusTool* _tool = dynamic_cast<mitk::PolhemusTool*> (this->m_TrackingDevice->GetToolByName(m_Controls->m_ToolSelection->currentText().toStdString()));
+    mitk::Point3D tip = _tool->GetToolTip().GetVectorFromOrigin()*(-1.);
+    mitk::Quaternion quat = _tool->GetToolTipOrientation().inverse();
+    _tool->SetToolTip(tip, quat);
+  }
+  else
+  {
+    for (int i = 0; i < m_TrackingDevice->GetToolCount(); ++i)
+    {
+      mitk::PolhemusTool* _tool = dynamic_cast<mitk::PolhemusTool*> (this->m_TrackingDevice->GetTool(i));
+      mitk::Point3D tip = _tool->GetToolTip().GetVectorFromOrigin()*(-1.);
+      mitk::Quaternion quat = _tool->GetToolTipOrientation().inverse();
+      _tool->SetToolTip(tip, quat);
+    }
+  }
+}
+
 void QmitkPolhemusTrackerWidget::OnConnected(bool _success)
 {
   if (!_success)
@@ -243,6 +265,7 @@ void QmitkPolhemusTrackerWidget::SetAdvancedSettingsEnabled(bool _enable)
   m_Controls->m_SetHemisphere->setEnabled(_enable);
   m_Controls->m_ToggleHemisphere->setEnabled(_enable);
   m_Controls->m_AdjustHemisphere->setEnabled(_enable);
+  m_Controls->m_ToggleToolTipCalibration->setEnabled(_enable);
 }
 
 void QmitkPolhemusTrackerWidget::on_m_AdvancedSettings_clicked()
@@ -258,6 +281,7 @@ void QmitkPolhemusTrackerWidget::on_m_AdvancedSettings_clicked()
   m_Controls->m_SetHemisphere->setVisible(_enable);
   m_Controls->m_ToggleHemisphere->setVisible(_enable);
   m_Controls->m_AdjustHemisphere->setVisible(_enable);
+  m_Controls->m_ToggleToolTipCalibration->setVisible(_enable);
   m_Controls->m_StatusLabelHemisphereTracking->setVisible(_enable);
 }
 

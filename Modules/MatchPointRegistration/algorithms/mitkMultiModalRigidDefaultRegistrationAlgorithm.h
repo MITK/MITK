@@ -36,7 +36,7 @@ namespace mitk
   public:
     typedef MultiModalRigidDefaultRegistrationAlgorithm Self;
 
-    typedef ITKEuler3DMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalRigidDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+    typedef map::algorithm::boxed::ITKEuler3DMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalRigidDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
       Superclass;
 
     typedef ::itk::SmartPointer<Self>                                     Pointer;
@@ -64,7 +64,7 @@ namespace mitk
       this->_useCenterOfGravity = false;
 
       //optimizer
-      ConcreteOptimizerType::ScalesType scales(6);
+      typename Superclass::ConcreteOptimizerType::ScalesType scales(6);
       scales[0] = 1.0;
       scales[1] = 1.0;
       scales[2] = 1.0;
@@ -93,20 +93,20 @@ namespace mitk
 
       if (this->getCurrentLevel() == 0)
       {
-        OptimizerBaseType::SVNLOptimizerBaseType::ScalesType scales(6);
+        typename Superclass::OptimizerBaseType::SVNLOptimizerBaseType::ScalesType scales(6);
         scales[0] = 10.0;
         scales[1] = 10.0;
         scales[2] = 10.0;
         scales[3] = 1.0 / 10000;
         scales[4] = 1.0 / 10000;
         scales[5] = 1.0 / 10000;
-        getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
+        this->getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
       }
       else
       {
-        getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
+        this->getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
 
-        OptimizerBaseType::SVNLOptimizerBaseType::ScalesType scales(6);
+        typename Superclass::OptimizerBaseType::SVNLOptimizerBaseType::ScalesType scales(6);
         scales[0] = 1.0;
         scales[1] = 1.0;
         scales[2] = 1.0;
@@ -114,12 +114,12 @@ namespace mitk
         scales[4] = 1.0 / 1000;
         scales[5] = 1.0 / 1000;
 
-        getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
+        this->getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
 
         unsigned int nrOfSmpl = ::itk::Math::Round<unsigned int, double>
           (this->getMovingImage()->GetLargestPossibleRegion().GetNumberOfPixels() * 0.15);
 
-        getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
+        this->getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
       }
     };
 

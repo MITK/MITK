@@ -36,7 +36,7 @@ namespace mitk
         public:
           typedef MultiModalTranslationDefaultRegistrationAlgorithm Self;
 
-          typedef ITKTransMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalTransDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+          typedef map::algorithm::boxed::ITKTransMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalTransDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
           Superclass;
 
           typedef ::itk::SmartPointer<Self>                                     Pointer;
@@ -64,7 +64,7 @@ namespace mitk
             this->_useCenterOfGravity = false;
 
             //optimizer
-            ConcreteOptimizerType::ScalesType scales(3);
+            typename Superclass::ConcreteOptimizerType::ScalesType scales(3);
             scales[0] = 1.0;
             scales[1] = 1.0;
             scales[2] = 1.0;
@@ -90,12 +90,12 @@ namespace mitk
 
             if (this->getCurrentLevel() != 0)
             {
-              getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
+              this->getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
 
               unsigned int nrOfSmpl = ::itk::Math::Round<unsigned int, double>
                                       (this->getMovingImage()->GetLargestPossibleRegion().GetNumberOfPixels() * 0.15);
 
-              getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
+              this->getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
             }
           };
 

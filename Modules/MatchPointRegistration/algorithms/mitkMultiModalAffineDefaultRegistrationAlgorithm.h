@@ -37,7 +37,7 @@ namespace mitk
   public:
     typedef MultiModalAffineDefaultRegistrationAlgorithm Self;
 
-    typedef ITKAffineMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalAffineDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+    typedef map::algorithm::boxed::ITKAffineMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalAffineDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
       Superclass;
 
     typedef ::itk::SmartPointer<Self>                                     Pointer;
@@ -85,7 +85,7 @@ namespace mitk
       //scale setting
       int dimCount = TImageType::ImageDimension*TImageType::ImageDimension + TImageType::ImageDimension;
       int matrixEnd = TImageType::ImageDimension*TImageType::ImageDimension;
-      Superclass::ConcreteOptimizerType::ScalesType scales(dimCount);
+      typename Superclass::ConcreteOptimizerType::ScalesType scales(dimCount);
       double matrixScale = 1.0;
       double transScale = 1.0;
 
@@ -113,17 +113,17 @@ namespace mitk
         }
       }
 
-      getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
+      this->getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
 
       //spatial samples setting
       if (this->getCurrentLevel() != 0)
       {
-        getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
+        this->getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
 
         unsigned int nrOfSmpl = ::itk::Math::Round<unsigned int, double>
           (this->getMovingImage()->GetLargestPossibleRegion().GetNumberOfPixels() * 0.30);
 
-        getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
+        this->getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
       }
     };
 

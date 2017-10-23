@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStdMultiWidget.h"
 #include "QmitkStdMultiWidgetEditor.h"
 #include "mitkLayoutAnnotationRenderer.h"
+#include "mitkCameraController.h"
 
 // scene serialization
 #include <mitkConvert2Dto3DImageFilter.h>
@@ -262,11 +263,7 @@ void USNavigationMarkerPlacement::OnTimeout()
     if (multiWidgetEditor)
     {
       m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
-      if (m_StdMultiWidget)
-      {
-        m_StdMultiWidget->DisableStandardLevelWindow();
-        m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown();
-      }
+      SetTwoWindowView();
     }
 
     this->CreateOverlays();
@@ -299,13 +296,30 @@ void USNavigationMarkerPlacement::OnEnableNavigationLayout()
   if (multiWidgetEditor)
   {
     m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
-    if (m_StdMultiWidget)
-    {
-      m_StdMultiWidget->DisableStandardLevelWindow();
-      m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown();
-      this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane")->SetVisibility(false);
-      this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->SetVisibility(false);
-    }
+    SetTwoWindowView();
+
+  }
+}
+
+void USNavigationMarkerPlacement::SetTwoWindowView()
+{
+  if (m_StdMultiWidget)
+  {
+    m_StdMultiWidget->DisableStandardLevelWindow();
+    m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown(1);
+
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToCranial();
+
+    ////Crosshair invisible in 3D view
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget2.plane")->
+      SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->
+      SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget2.plane")->
+      SetIntProperty("Crosshair.Gap Size", 0);
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->
+      SetIntProperty("Crosshair.Gap Size", 0);
+
   }
 }
 
@@ -314,6 +328,8 @@ void USNavigationMarkerPlacement::OnResetStandardLayout()
   //reset render windows
   mitk::DataNode::Pointer widget1 = this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane");
   if (widget1.IsNotNull()) { widget1->SetVisibility(true); }
+  mitk::DataNode::Pointer widget2 = this->GetDataStorage()->GetNamedNode("stdmulti.widget2.plane");
+  if (widget2.IsNotNull()) { widget2->SetVisibility(true); }
   mitk::DataNode::Pointer widget3 = this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane");
   if (widget3.IsNotNull()) { widget3->SetVisibility(true); }
   m_StdMultiWidget->changeLayoutToDefault();

@@ -1003,6 +1003,8 @@ float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask, bool do_resampling)
     }
   }
 
+  if (inside+outside==0)
+    outside = 1;
   return (float)inside/(inside+outside);
 }
 

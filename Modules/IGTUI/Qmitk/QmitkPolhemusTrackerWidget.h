@@ -49,6 +49,7 @@ signals:
     void on_m_GetHemisphere_clicked();
     void on_m_AdjustHemisphere_clicked();
     void on_m_AdvancedSettings_clicked();
+    void on_m_ToggleToolTipCalibration_clicked();
 
 private:
 

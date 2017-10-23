@@ -214,6 +214,7 @@ void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
   connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
+  connect(ui->m_RenderWindowSelection, SIGNAL(valueChanged(int)), this, SLOT(OnRenderWindowSelection()));
 
   connect(ui->navigationProcessWidget,
     SIGNAL(SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>)),
@@ -301,23 +302,48 @@ void USNavigationMarkerPlacement::OnEnableNavigationLayout()
   }
 }
 
+void USNavigationMarkerPlacement::OnRenderWindowSelection()
+{
+  SetTwoWindowView();
+}
+
 void USNavigationMarkerPlacement::SetTwoWindowView()
 {
   if (m_StdMultiWidget)
   {
     m_StdMultiWidget->DisableStandardLevelWindow();
-    m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown(1);
-
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToCranial();
-
+    int i, j, k;
+    switch (this->ui->m_RenderWindowSelection->value())
+    {
+    case 1:
+      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToCaudal();
+      i = 2; j = 3; //other windows
+      k=1;
+      break;
+    case 2:
+      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToDexter();
+      i = 1; j = 3;
+      k = 2;
+      break;
+    case 3:
+      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToPosterior();
+      i = 2; j = 1;
+      k = 3;
+      break;
+    default:
+      return;
+    }
+    m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown(k);
     ////Crosshair invisible in 3D view
-    this->GetDataStorage()->GetNamedNode("stdmulti.widget2.plane")->
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget"+std::to_string(i) +".plane")->
       SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-    this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")->
       SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-    this->GetDataStorage()->GetNamedNode("stdmulti.widget2.plane")->
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(k) + ".plane")->
+      SetBoolProperty("visible", true, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(i) + ".plane")->
       SetIntProperty("Crosshair.Gap Size", 0);
-    this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")->
       SetIntProperty("Crosshair.Gap Size", 0);
 
   }

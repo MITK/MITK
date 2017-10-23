@@ -121,6 +121,8 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
 
   void OnChangeAblationZone(int id, int newSize);
 
+  void OnRenderWindowSelection();
+
 public:
   static const char *DATANAME_TUMOUR;
   static const char *DATANAME_TARGETSURFACE;

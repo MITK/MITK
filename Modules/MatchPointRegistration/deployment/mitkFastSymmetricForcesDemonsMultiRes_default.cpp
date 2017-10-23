@@ -15,13 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mapDeploymentDLLHelper.h"
-#include "mapContinuousElements.h"
-#include "mapITKRigid3DICPRegistrationAlgorithmTemplate.h"
+#include "mapDiscreteElements.h"
 #include "mapConfigure.h"
 
-#include "MITK_Rigid_ICP_default_ProfileResource.h"
+#include "mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h"
 
-typedef map::core::continuous::Elements<3>::InternalPointSetType PointSetType;
-typedef map::algorithm::boxed::ITKRigid3DICPRegistrationAlgorithm<PointSetType, PointSetType, ::map::algorithm::MITK_Rigid_ICP_defaultUIDPolicy> AlgorithmType;
+typedef map::core::discrete::Elements<3>::InternalImageType ImageType;
 
-mapDeployAlgorithmMacro(AlgorithmType);
+mapDeployAlgorithmMacro(mitk::FastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm<ImageType>);

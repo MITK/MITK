@@ -14,28 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mapDeploymentDLLHelper.h"
+#ifndef mitkMultiModalAffineDefaultRegistrationAlgorithm_h
+#define mitkMultiModalAffineDefaultRegistrationAlgorithm_h
+
 #include "mapDiscreteElements.h"
 #include "mapITKAffineMattesMIMultiResRegistrationAlgorithmTemplate.h"
 #include "mapConfigure.h"
 
-#include "MITK_MultiModal_affine_default_ProfileResource.h"
+#include "mitkMultiModalAffineDefaultRegistrationAlgorithm_ProfileResource.h"
 
 namespace mitk
 {
-  typedef map::core::discrete::Elements<3>::InternalImageType ImageType;
 
   /** \class MultiModalAffineDefaultRegistrationAlgorithm
   * Algorithm is used as default solution for multimodal affine problem statements in DIPP.
   * Uses 3 Resolution levels. By default initializes via image centers
-  */
+  */ 
+  template <class TImageType>
   class MultiModalAffineDefaultRegistrationAlgorithm :
-    public map::algorithm::boxed::ITKAffineMattesMIMultiResRegistrationAlgorithm<ImageType, ImageType, ::map::algorithm::MITK_MultiModal_affine_defaultUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<ImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+    public map::algorithm::boxed::ITKAffineMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalAffineDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
   {
   public:
     typedef MultiModalAffineDefaultRegistrationAlgorithm Self;
 
-    typedef ITKAffineMattesMIMultiResRegistrationAlgorithm<ImageType, ImageType, ::map::algorithm::MITK_MultiModal_affine_defaultUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<ImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+    typedef map::algorithm::boxed::ITKAffineMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalAffineDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
       Superclass;
 
     typedef ::itk::SmartPointer<Self>                                     Pointer;
@@ -81,9 +83,9 @@ namespace mitk
       Superclass::doInterLevelSetup();
 
       //scale setting
-      int dimCount = ImageType::ImageDimension*ImageType::ImageDimension + ImageType::ImageDimension;
-      int matrixEnd = ImageType::ImageDimension*ImageType::ImageDimension;
-      Superclass::ConcreteOptimizerType::ScalesType scales(dimCount);
+      int dimCount = TImageType::ImageDimension*TImageType::ImageDimension + TImageType::ImageDimension;
+      int matrixEnd = TImageType::ImageDimension*TImageType::ImageDimension;
+      typename Superclass::ConcreteOptimizerType::ScalesType scales(dimCount);
       double matrixScale = 1.0;
       double transScale = 1.0;
 
@@ -111,17 +113,17 @@ namespace mitk
         }
       }
 
-      getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
+      this->getConcreteOptimizerControl()->getConcreteOptimizer()->SetScales(scales);
 
       //spatial samples setting
       if (this->getCurrentLevel() != 0)
       {
-        getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
+        this->getConcreteMetricControl()->getConcreteMetric()->SetUseAllPixels(false);
 
         unsigned int nrOfSmpl = ::itk::Math::Round<unsigned int, double>
           (this->getMovingImage()->GetLargestPossibleRegion().GetNumberOfPixels() * 0.30);
 
-        getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
+        this->getConcreteMetricControl()->getConcreteMetric()->SetNumberOfSpatialSamples(nrOfSmpl);
       }
     };
 
@@ -133,4 +135,4 @@ namespace mitk
 
 }
 
-mapDeployAlgorithmMacro(mitk::MultiModalAffineDefaultRegistrationAlgorithm);
+#endif

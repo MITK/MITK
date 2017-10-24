@@ -197,10 +197,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::AddBundles(std::vector< mitk::Fibe
 mitk::FiberBundle::Pointer mitk::FiberBundle::AddBundle(mitk::FiberBundle* fib)
 {
   if (fib==nullptr)
-  {
-    MITK_WARN << "trying to call AddBundle with nullptr argument";
-    return nullptr;
-  }
+    return this->GetDeepCopy();
+
   MITK_INFO << "Adding fibers";
 
   vtkSmartPointer<vtkPolyData> vNewPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -264,7 +262,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::AddBundle(mitk::FiberBundle* fib)
 }
 
 // Only retain fibers with a weight larger than the specified threshold
-mitk::FiberBundle::Pointer mitk::FiberBundle::FilterByWeights(float weight_thr)
+mitk::FiberBundle::Pointer mitk::FiberBundle::FilterByWeights(float weight_thr, bool invert)
 {
   vtkSmartPointer<vtkPolyData> vNewPolyData = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
@@ -274,7 +272,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::FilterByWeights(float weight_thr)
 
   for (int i=0; i<this->GetNumFibers(); i++)
   {
-    if (this->GetFiberWeight(i)<=weight_thr)
+    if ( (invert && this->GetFiberWeight(i)>weight_thr) || (!invert && this->GetFiberWeight(i)<=weight_thr))
       continue;
 
     vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -358,8 +356,10 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubsampleFibers(float factor)
 // subtract two fiber bundles
 mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* fib)
 {
-  MITK_INFO << "Subtracting fibers";
+  if (fib==nullptr)
+    return this->GetDeepCopy();
 
+  MITK_INFO << "Subtracting fibers";
   vtkSmartPointer<vtkPolyData> vNewPolyData = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -478,7 +478,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     vNewLines->InsertNextCell(container);
   }
   if(vNewLines->GetNumberOfCells()==0)
-    return nullptr;
+    return mitk::FiberBundle::New();
   // initialize PolyData
   vNewPolyData->SetPoints(vNewPoints);
   vNewPolyData->SetLines(vNewLines);

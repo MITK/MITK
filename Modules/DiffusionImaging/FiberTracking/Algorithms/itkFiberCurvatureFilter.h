@@ -36,7 +36,7 @@ using namespace std;
 namespace itk{
 
 /**
-* \brief Generates artificial fibers distributed in and interpolated between the input planar figures.   */
+* \brief    */
 
 class FiberCurvatureFilter : public ProcessObject
 {

@@ -82,7 +82,7 @@ public:
     void ResampleSpline(float pointDistance, double tension, double continuity, double bias );
     void ResampleLinear(double pointDistance=1);
 
-    mitk::FiberBundle::Pointer FilterByWeights(float weight_thr);
+    mitk::FiberBundle::Pointer FilterByWeights(float weight_thr, bool invert=false);
     bool RemoveShortFibers(float lengthInMM);
     bool RemoveLongFibers(float lengthInMM);
     bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);

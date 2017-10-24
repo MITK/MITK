@@ -92,21 +92,17 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i1", mitkCommandLineParser::InputFile, "Input tractogram:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+  parser.addArgument("", "i1", mitkCommandLineParser::InputFile, "Anchor tracts:", "anchor tracts in one tractogram file", us::Any(), false);
   parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
-  parser.addArgument("", "i3", mitkCommandLineParser::InputFile, "", "", us::Any(), false);
+  parser.addArgument("", "i3", mitkCommandLineParser::InputFile, "Candidate folder:", "folder containing all candidate tracts (separate files)", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any(), false);
-
-  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "", "", us::Any());
-  parser.addArgument("min_gain", "", mitkCommandLineParser::Float, "Min. gain:", "process stops if remaining bundles don't contribute enough", 0.05);
-
   parser.addArgument("reference_mask_folder", "", mitkCommandLineParser::String, "Reference Mask Folder:", "reference masks for accuracy evaluation", false);
 
-  parser.addArgument("subtract", "", mitkCommandLineParser::Bool, "", "", false);
+  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "", "", us::Any());
+
+  parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "", "", false);
   parser.addArgument("normalize_gain", "", mitkCommandLineParser::Bool, "", "", false);
-  parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
-  parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
-  parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. gradient:", "lower termination threshold for gradient magnitude", 1e-5);
+
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
 
@@ -119,25 +115,9 @@ int main(int argc, char* argv[])
   string candidate_folder = us::any_cast<string>(parsedArgs["i3"]);
   string out_folder = us::any_cast<string>(parsedArgs["o"]);
 
-  bool single_fib = true;
-  if (parsedArgs.count("bundle_based"))
-    single_fib = !us::any_cast<bool>(parsedArgs["bundle_based"]);
-
-  bool greedy_add = true;
-  if (parsedArgs.count("subtract"))
-    greedy_add = !us::any_cast<bool>(parsedArgs["subtract"]);
-
-  int max_iter = 20;
-  if (parsedArgs.count("max_iter"))
-    max_iter = us::any_cast<int>(parsedArgs["max_iter"]);
-
-  float g_tol = 1e-5;
-  if (parsedArgs.count("min_g"))
-    g_tol = us::any_cast<float>(parsedArgs["min_g"]);
-
-  float min_gain = 0.05;
-  if (parsedArgs.count("min_gain"))
-    min_gain = us::any_cast<float>(parsedArgs["min_gain"]);
+  bool greedy_add = false;
+  if (parsedArgs.count("greedy_add"))
+    greedy_add = us::any_cast<bool>(parsedArgs["greedy_add"]);
 
   float lambda = 0.1;
   if (parsedArgs.count("lambda"))
@@ -249,13 +229,7 @@ int main(int argc, char* argv[])
     MITK_INFO << "Fit anchor tracts";
     int iteration = 0;
     itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-    if (greedy_add)
-      fitter->SetTractograms(input_reference);
-    else
-      fitter->SetTractograms(CombineTractograms(input_reference, input_candidates));
-    fitter->SetFitIndividualFibers(single_fib);
-    fitter->SetMaxIterations(max_iter);
-    fitter->SetGradientTolerance(g_tol);
+    fitter->SetTractograms(input_reference);
     fitter->SetLambda(lambda);
     fitter->SetFilterOutliers(filter_outliers);
     fitter->SetPeakImage(peak_image);
@@ -267,21 +241,16 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer anchor_tracts = fitter->GetTractograms().at(0);
     anchor_tracts->SetFiberColors(255,255,255);
     mitk::IOUtil::Save(anchor_tracts, out_folder + "0_" + name + ".fib");
-    if (greedy_add)
-    {
-      peak_image = fitter->GetUnderexplainedImage();
-      peak_image_writer->SetInput(peak_image);
-      peak_image_writer->SetFileName(out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".nrrd");
-      peak_image_writer->Update();
-    }
 
+    peak_image = fitter->GetUnderexplainedImage();
+    peak_image_writer->SetInput(peak_image);
+    peak_image_writer->SetFileName(out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".nrrd");
+    peak_image_writer->Update();
 
+    if (!greedy_add)
     {
       MITK_INFO << "Fit candidate tracts";
       itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-      fitter->SetFitIndividualFibers(single_fib);
-      fitter->SetMaxIterations(max_iter);
-      fitter->SetGradientTolerance(g_tol);
       fitter->SetLambda(lambda);
       fitter->SetFilterOutliers(filter_outliers);
       fitter->SetVerbose(true);
@@ -290,7 +259,6 @@ int main(int argc, char* argv[])
       fitter->SetMaskImage(mask);
       fitter->SetTractograms(input_candidates);
       fitter->Update();
-      MITK_INFO << "DONE";
       vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
 
       vnl_vector<double> log_rms_diff = rms_diff-rms_diff.min_value() + 1;
@@ -360,33 +328,28 @@ int main(int argc, char* argv[])
       out_fib = out_fib->AddBundles(input_candidates);
       out_fib->ColorFibersByFiberWeights(false, true);
       mitk::IOUtil::Save(out_fib, out_folder + "AllCandidates.fib");
-
-      logfile.close();
-      return EXIT_SUCCESS;
     }
-
-    double coverage = fitter->GetCoverage();
-    MITK_INFO << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "%";
-    logfile << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "%\n\n";
-    //    fitter->SetPeakImage(peak_image);
-
-
-    // Iteratively add/subtract candidate bundles in a greedy manner
-    while (!input_candidates.empty())
+    else
     {
-      double next_coverage = 0;
-      double next_covered_directions = 1.0;
-      mitk::FiberBundle::Pointer best_candidate = nullptr;
-      PeakImgType::Pointer best_candidate_peak_image = nullptr;
-      if (greedy_add)
+
+      double coverage = fitter->GetCoverage();
+      MITK_INFO << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "%";
+      logfile << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "%\n\n";
+      //    fitter->SetPeakImage(peak_image);
+
+
+      // Iteratively add/subtract candidate bundles in a greedy manner
+      while (!input_candidates.empty())
       {
+        double next_coverage = 0;
+        double next_covered_directions = 1.0;
+        mitk::FiberBundle::Pointer best_candidate = nullptr;
+        PeakImgType::Pointer best_candidate_peak_image = nullptr;
+
         for (int i=0; i<(int)input_candidates.size(); ++i)
         {
           // WHY NECESSARY AGAIN??
           itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-          fitter->SetFitIndividualFibers(single_fib);
-          fitter->SetMaxIterations(max_iter);
-          fitter->SetGradientTolerance(g_tol);
           fitter->SetLambda(lambda);
           fitter->SetFilterOutliers(filter_outliers);
           fitter->SetVerbose(false);
@@ -410,129 +373,75 @@ int main(int argc, char* argv[])
           {
             next_covered_directions = fitter->GetNumCoveredDirections();
             next_coverage = candidate_coverage;
-            if ((1.0-coverage) * next_coverage >= min_gain)
-            {
-              best_candidate = fitter->GetTractograms().at(0);
-              best_candidate_peak_image = fitter->GetUnderexplainedImage();
-            }
+
+            best_candidate = fitter->GetTractograms().at(0);
+            best_candidate_peak_image = fitter->GetUnderexplainedImage();
           }
         }
-      }
-      else
-      {
-        next_coverage = 1.0;
-        for (unsigned int i=0; i<input_candidates.size(); ++i)
+
+        if (best_candidate.IsNull())
+          break;
+
+        //      fitter->SetPeakImage(peak_image);
+        peak_image = best_candidate_peak_image;
+
+        int i=0;
+        std::vector< mitk::FiberBundle::Pointer > remaining_candidates;
+        std::vector< string > remaining_candidate_files;
+        for (auto fib : input_candidates)
         {
-          // WHY NECESSARY AGAIN??
-          itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-          fitter->SetFitIndividualFibers(single_fib);
-          fitter->SetMaxIterations(max_iter);
-          fitter->SetGradientTolerance(g_tol);
-          fitter->SetLambda(lambda);
-          fitter->SetFilterOutliers(filter_outliers);
-          fitter->SetVerbose(false);
-          fitter->SetPeakImage(peak_image);
-          fitter->SetResampleFibers(false);
-          fitter->SetMaskImage(mask);
-          // ******************************
-          fitter->SetTractograms(CombineTractograms(input_reference, input_candidates, i));
-
-          streambuf *old = cout.rdbuf(); // <-- save
-          stringstream ss;
-          std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-          fitter->Update();
-          std::cout.rdbuf (old);              // <-- restore
-
-          double candidate_coverage = fitter->GetCoverage();
-          if (normalize_gain)
-            candidate_coverage /= fitter->GetNumCoveredDirections();
-
-          if (candidate_coverage<next_coverage)
+          if (fib!=best_candidate)
           {
-            //            MITK_INFO << "Coverage: " << candidate_coverage << " (" << ist::GetFilenameWithoutExtension(candidate_tract_files.at(i)) << ")";
-            next_covered_directions = fitter->GetNumCoveredDirections();
-            next_coverage = candidate_coverage;
-            //            if ((1.0-coverage) * next_coverage >= min_gain)
-            //            {
-            best_candidate = input_candidates.at(i);
-            //            }
+            remaining_candidates.push_back(fib);
+            remaining_candidate_files.push_back(candidate_tract_files.at(i));
           }
+          else
+            name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(i));
+          ++i;
         }
-      }
+        input_candidates = remaining_candidates;
+        candidate_tract_files = remaining_candidate_files;
 
-      if (best_candidate.IsNull())
-        break;
-
-      //      fitter->SetPeakImage(peak_image);
-      peak_image = best_candidate_peak_image;
-
-      int i=0;
-      std::vector< mitk::FiberBundle::Pointer > remaining_candidates;
-      std::vector< string > remaining_candidate_files;
-      for (auto fib : input_candidates)
-      {
-        if (fib!=best_candidate)
-        {
-          remaining_candidates.push_back(fib);
-          remaining_candidate_files.push_back(candidate_tract_files.at(i));
-        }
-        else
-          name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(i));
-        ++i;
-      }
-      input_candidates = remaining_candidates;
-      candidate_tract_files = remaining_candidate_files;
-
-      iteration++;
-      streambuf *old = cout.rdbuf(); // <-- save
-      stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      // Save winning candidate
-      mitk::IOUtil::Save(best_candidate, out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".fib");
-      if (greedy_add)
-      {
+        iteration++;
+        streambuf *old = cout.rdbuf(); // <-- save
+        stringstream ss;
+        std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+        // Save winning candidate
+        mitk::IOUtil::Save(best_candidate, out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".fib");
         peak_image_writer->SetInput(peak_image);
         peak_image_writer->SetFileName(out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".nrrd");
         peak_image_writer->Update();
-      }
 
-      // Calculate best overlap with reference masks for evaluation purposes
-      float best_overlap = 0;
-      int best_overlap_index = -1;
-      i = 0;
-      for (auto ref_mask : reference_masks)
-      {
-        float overlap = best_candidate->GetOverlap(ref_mask, false);
-        if (overlap>best_overlap)
+        // Calculate best overlap with reference masks for evaluation purposes
+        float best_overlap = 0;
+        int best_overlap_index = -1;
+        i = 0;
+        for (auto ref_mask : reference_masks)
         {
-          best_overlap = overlap;
-          best_overlap_index = i;
+          float overlap = best_candidate->GetOverlap(ref_mask, false);
+          if (overlap>best_overlap)
+          {
+            best_overlap = overlap;
+            best_overlap_index = i;
+          }
+          ++i;
         }
-        ++i;
-      }
-      std::cout.rdbuf (old);              // <-- restore
+        std::cout.rdbuf (old);              // <-- restore
 
-      if (normalize_gain)
-        next_coverage *= next_covered_directions;
-      if (greedy_add)
-      {
+        if (normalize_gain)
+          next_coverage *= next_covered_directions;
+
         MITK_INFO << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*(coverage + (1.0-coverage) * next_coverage) << "% (+" << 100*(1.0-coverage) * next_coverage << "%)";
         logfile << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*(coverage + (1.0-coverage) * next_coverage) << "% (+" << 100*(1.0-coverage) * next_coverage << "%)\n";
         coverage += (1.0-coverage) * next_coverage;
-      }
-      else
-      {
-        MITK_INFO << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "% (-" << 100*(coverage-next_coverage) << "%)";
-        logfile << "Iteration: " << iteration << " - " << std::fixed << "Coverage: " << setprecision(2) << 100.0*coverage << "% (-" << 100*(coverage-next_coverage) << "%)\n";
-        coverage = next_coverage;
-      }
 
-      if (best_overlap_index>=0)
-      {
-        MITK_INFO << "Best overlap: " << best_overlap << " - " << ist::GetFilenameWithoutExtension(reference_mask_filenames.at(best_overlap_index));
-        logfile << "Best overlap: " << best_overlap << " - " << ist::GetFilenameWithoutExtension(reference_mask_filenames.at(best_overlap_index)) << "\n";
+        if (best_overlap_index>=0)
+        {
+          MITK_INFO << "Best overlap: " << best_overlap << " - " << ist::GetFilenameWithoutExtension(reference_mask_filenames.at(best_overlap_index));
+          logfile << "Best overlap: " << best_overlap << " - " << ist::GetFilenameWithoutExtension(reference_mask_filenames.at(best_overlap_index)) << "\n";
+        }
+        logfile << "\n";
       }
-      logfile << "\n";
     }
 
     clock.Stop();

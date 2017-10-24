@@ -75,6 +75,8 @@ public:
    */
   void SetData(Object::Pointer d) override;
 
+  void SetBusy(bool busy) override;
+
 };
 
 }

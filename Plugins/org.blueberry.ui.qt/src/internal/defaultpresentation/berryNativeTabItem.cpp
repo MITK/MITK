@@ -125,4 +125,12 @@ void NativeTabItem::SetData(Object::Pointer d)
   this->data = d;
 }
 
+void NativeTabItem::SetBusy(bool busy)
+{
+  // disabled butoon looks same so hide it
+  // TODO: add icon for QIcon::Disabled and uncomment
+  //this->closeButton->setEnabled(!busy);
+  this->closeButton->setVisible(!busy);
+}
+
 }

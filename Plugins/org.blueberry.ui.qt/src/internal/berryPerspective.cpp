@@ -564,7 +564,6 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
 
   // Is the layout fixed
   fixed = layout->IsFixed();
-  showViewShortcuts = layout->GetShowViewShortcuts();
 
   // Create presentation.
   presentation = new PerspectiveHelper(page, container, this);

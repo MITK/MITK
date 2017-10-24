@@ -23,4 +23,9 @@ IFolderLayout::~IFolderLayout()
 {
 }
 
+std::map<QString, AbstractTabItem*> IFolderLayout::getPartTabItems()
+{
+  return PresentablePartFolder::partTabItems;
+}
+
 }

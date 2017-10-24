@@ -369,7 +369,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 
   short usedLines = (maxLine - minLine);
@@ -398,7 +398,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
       AddSample = (int)sqrt(
         pow(s_i, 2)
         +
-        pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
+        pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (((float)l_s - l_i)*m_Conf.Pitch*(float)m_Conf.TransducerElements) / inputL), 2)
       ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
       if (AddSample < inputS && AddSample >= 0) 
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
@@ -425,7 +425,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 
   float mult = 0;
@@ -496,7 +496,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
 
   float part = 0.07 * inputL;
   float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 
   float mult = 0;
@@ -505,11 +505,11 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
 
   //exact delay
 
-  l_i = line / outputL * inputL;
+  l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS / 2;
+    s_i = (float)sample / outputS * inputS / 2;
 
     part = part_multiplicator*s_i;
 
@@ -529,7 +529,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
       AddSample[l_s] = (short)sqrt(
         pow(s_i, 2)
         +
-        pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * ((minLine + l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
+        pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (((float)minLine + (float)l_s - l_i)*m_Conf.Pitch*(float)m_Conf.TransducerElements) / inputL), 2)
       ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
     }
 

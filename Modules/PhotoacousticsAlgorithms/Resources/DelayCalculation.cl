@@ -41,8 +41,7 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
 }
  
 __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
-                         __global unsigned short *usedLines, 
-                         __global unsigned int *memoryLocations,
+                         __global unsigned short *usedLines,
                          unsigned int inputL,
                          unsigned int inputS,
                          unsigned int outputL,

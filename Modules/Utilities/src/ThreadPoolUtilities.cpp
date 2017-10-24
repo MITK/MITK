@@ -146,16 +146,15 @@ namespace Utilities
       return;
     }
 
-    if (!isGuiThread()) {
+    if (isGuiThread()) {
+      for (auto count = m_count; !check(); count = m_count) {
+        while (count == m_count) {
+          QCoreApplication::processEvents();
+        }
+      }
+    } else {
       SharedLock lock(m_eventGuard);
       m_event.wait(lock, check);
-      return;
-    }
-
-    for (auto count = m_count; !check(); count = m_count) {
-      while (count == m_count) {
-        QCoreApplication::processEvents();
-      }
     }
   }
 

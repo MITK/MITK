@@ -169,13 +169,23 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
   {
     DataNode* segmentationNode = it->Value();
-    // find the corresponding segmentation node for the given segmentation ID
-    std::string nodeCaseID = GetCaseIDFromDataNode(segmentationNode);
-    std::string nodeSegmentationID = GetIDFromDataNode(segmentationNode);
-    if (nodeCaseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), nodeSegmentationID) != allSegmentationIDsOfCase.end()))
+    try
     {
-      // found current image node in the storage, add it to the return vector
-      allSegmentationsOfCase.push_back(segmentationNode);
+      // find the corresponding segmentation node for the given segmentation ID
+      std::string nodeCaseID = GetCaseIDFromDataNode(segmentationNode);
+      std::string nodeSegmentationID = GetIDFromDataNode(segmentationNode);
+      if (nodeCaseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), nodeSegmentationID) != allSegmentationIDsOfCase.end()))
+      {
+        // found current image node in the storage, add it to the return vector
+        allSegmentationsOfCase.push_back(segmentationNode);
+      }
+    }
+    catch (const std::exception&)
+    {
+      // found a segmentation node that is not stored in the semantic relations
+      // this segmentation node does not have any DICOM information --> exception thrown
+      // continue with the next segmentation to compare IDs
+      continue;
     }
   }
 

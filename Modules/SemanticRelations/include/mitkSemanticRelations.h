@@ -157,6 +157,16 @@ namespace mitk
     */
     DataNodeVector GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /*
+    * @brief  Return a vector of all images that are currently available for the given case.
+    *
+    * @pre    The data storage member has to be valid (!nullptr).
+    * @throw  mitk::Exception if the data storage member is invalid (==nullptr).
+    *
+    * @par caseID    The current case identifier is defined by the given string.
+    * @return        A vector of data nodes representing images.
+    */
+    DataNodeVector GetAllImagesOfCase(const SemanticTypes::CaseID& caseID) const;
+    /*
     * @brief Return a vector of all images that are connected to those segmentations that are linked to the given lesion.
     *         If the lesion is not referred to by any segmentation, an empty vector is returned.
     *

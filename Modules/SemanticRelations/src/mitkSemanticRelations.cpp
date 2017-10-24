@@ -186,37 +186,40 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSegmentat
   }
 }
 
-mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfCase(const SemanticTypes::CaseID& caseID) const
 {
-  DataNodeVector allDataOfLesion;
-  if (m_DataStorage.IsNotNull())
-  {
-    // 1. get all segmentations that define the lesion
-    // 2. retrieve the parent node (source) of the found segmentation node
-    try
-    {
-      DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
-      for (const auto& segmentationNode : allSegmentationsOfLesion)
-      {
-        // get parent node of the current segmentation node with the node predicate
-        DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
-        for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
-        {
-          DataNode::Pointer dataNode = it->Value();
-          allDataOfLesion.push_back(it->Value());
-        }
-      }
-      return allDataOfLesion;
-    }
-    catch (SemanticRelationException& e)
-    {
-      mitkReThrow(e);
-    }
-  }
-  else
+  if (m_DataStorage.IsNull())
   {
     mitkThrow() << "Not a valid data storage.";
   }
+  return m_RelationStorage->GetAllImagesOfCase(caseID);
+}
+
+mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
+{
+  if (m_DataStorage.IsNull())
+  {
+    mitkThrow() << "Not a valid data storage.";
+  }
+
+  DataNodeVector allImagesOfLesion;
+  // 1. get all segmentations that define the lesion
+  // 2. retrieve the parent node (source) of the found segmentation node
+  DataNodeVector allSegmentationsOfLesion = GetAllSegmentationsOfLesion(caseID, lesion);
+  for (const auto& segmentationNode : allSegmentationsOfLesion)
+  {
+    // get parent node of the current segmentation node with the node predicate
+    DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
+    for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
+    {
+      DataNode::Pointer dataNode = it->Value();
+      allImagesOfLesion.push_back(it->Value());
+    }
+  }
+
+  std::sort(allImagesOfLesion.begin(), allImagesOfLesion.end());
+  allImagesOfLesion.erase(std::unique(allImagesOfLesion.begin(), allImagesOfLesion.end()), allImagesOfLesion.end());
+  return allImagesOfLesion;
 }
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
@@ -281,7 +284,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllDataOfCon
   if (InstanceExists(caseID, controlPoint))
   {
     // control point exists, retrieve all images from the storage
-    DataNodeVector allDataOfControlPoint = m_RelationStorage->GetAllImagesOfCase(caseID);
+    DataNodeVector allDataOfControlPoint = GetAllImagesOfCase(caseID);
 
     // filter all images to remove the ones with a different control point using a lambda function
     auto lambda = [&controlPoint, this](DataNode::Pointer imageNode) { return controlPoint.UID != GetControlPointOfData(imageNode).UID; };
@@ -346,7 +349,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllDataOfInf
   if (InstanceExists(caseID, informationType))
   {
     // information type exists, retrieve all images from the storage
-    DataNodeVector allDataOfInformationType = m_RelationStorage->GetAllImagesOfCase(caseID);
+    DataNodeVector allDataOfInformationType = GetAllImagesOfCase(caseID);
 
     // filter all images to remove the ones with a different information type using a lambda function
     auto lambda = [&informationType, this](DataNode::Pointer imageNode) { return informationType != GetInformationTypeOfImage(imageNode); };
@@ -367,7 +370,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetFilteredData
     if (InstanceExists(caseID, informationType))
     {
       // control point exists, information type exists, retrieve all images from the storage
-      DataNodeVector allImagesOfCase = m_RelationStorage->GetAllImagesOfCase(caseID);
+      DataNodeVector allImagesOfCase = GetAllImagesOfCase(caseID);
       // filter all images to remove the ones with a different control point and information type using a lambda function
       auto lambda = [&controlPoint, &informationType, this](DataNode::Pointer imageNode)
       {
@@ -439,15 +442,8 @@ void mitk::SemanticRelations::AddImage(const mitk::DataNode* imageNode)
     // no stored control point
     // create a new control point for the image data
     SemanticTypes::ControlPoint newControlPoint = GenerateControlPoint(imageNode);
-    try
-    {
-      AddControlPointAndLinkData(imageNode, newControlPoint);
-      NotifyObserver(caseID);
-    }
-    catch (mitk::Exception& e)
-    {
-      mitkReThrow(e);
-    }
+    AddControlPointAndLinkData(imageNode, newControlPoint);
+    NotifyObserver(caseID);
     return;
   }
 
@@ -463,42 +459,21 @@ void mitk::SemanticRelations::AddImage(const mitk::DataNode* imageNode)
       // closest control point can not be extended
       // create a new control point for the image data
       SemanticTypes::ControlPoint newControlPoint = GenerateControlPoint(imageNode);
-      try
-      {
-        AddControlPointAndLinkData(imageNode, newControlPoint);
-        NotifyObserver(caseID);
-      }
-      catch (mitk::Exception& e)
-      {
-        mitkReThrow(e);
-      }
+      AddControlPointAndLinkData(imageNode, newControlPoint);
+      NotifyObserver(caseID);
     }
     else
     {
-      try
-      {
-        // found a control point that was extended
-        OverwriteControlPointAndLinkData(imageNode, extendedControlPoint);
-        NotifyObserver(caseID);
-      }
-      catch (mitk::Exception& e)
-      {
-        mitkReThrow(e);
-      }
+      // found a control point that was extended
+      OverwriteControlPointAndLinkData(imageNode, extendedControlPoint);
+      NotifyObserver(caseID);
     }
   }
   else
   {
-    try
-    {
-      // found a fitting control point
-      LinkDataToControlPoint(imageNode, fittingControlPoint);
-      NotifyObserver(caseID);
-    }
-    catch (mitk::Exception& e)
-    {
-      mitkReThrow(e);
-    }
+    // found a fitting control point
+    LinkDataToControlPoint(imageNode, fittingControlPoint);
+    NotifyObserver(caseID);
   }
 }
 
@@ -553,23 +528,8 @@ void mitk::SemanticRelations::AddLesionAndLinkSegmentation(const DataNode* segme
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
-  try
-  {
-    AddLesion(caseID, lesion);
-  }
-  catch (SemanticRelationException& e)
-  {
-    mitkReThrow(e);
-  }
-
-  try
-  {
-    LinkSegmentationToLesion(segmentationNode, lesion);
-  }
-  catch (SemanticRelationException& e)
-  {
-    mitkReThrow(e);
-  }
+  AddLesion(caseID, lesion);
+  LinkSegmentationToLesion(segmentationNode, lesion);
   NotifyObserver(caseID);
 }
 
@@ -696,14 +656,7 @@ void mitk::SemanticRelations::AddControlPointAndLinkData(const DataNode* dataNod
   }
   m_RelationStorage->AddControlPoint(caseID, controlPoint);
 
-  try
-  {
-    LinkDataToControlPoint(dataNode, controlPoint, checkConsistence);
-  }
-  catch (mitk::Exception& e)
-  {
-    mitkReThrow(e);
-  }
+  LinkDataToControlPoint(dataNode, controlPoint, checkConsistence);
 }
 
 void mitk::SemanticRelations::OverwriteControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence)
@@ -751,15 +704,7 @@ void mitk::SemanticRelations::OverwriteControlPointAndLinkData(const DataNode* d
     else
     {
       m_RelationStorage->OverwriteControlPoint(caseID, controlPoint);
-
-      try
-      {
-        LinkDataToControlPoint(dataNode, controlPoint, checkConsistence);
-      }
-      catch (SemanticRelationException& e)
-      {
-        mitkReThrow(e);
-      }
+      LinkDataToControlPoint(dataNode, controlPoint, checkConsistence);
     }
   }
   else
@@ -810,30 +755,23 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
   mitk::SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfData(caseID, dataID);
   m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
 
-  try
+  DataNodeVector allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
+  if (allDataOfControlPoint.empty())
   {
-    DataNodeVector allDataOfControlPoint = GetAllDataOfControlPoint(caseID, controlPoint);
-    if (allDataOfControlPoint.empty())
-    {
-      // no more data is linked to the specific control point
-      // the control point can be removed from the storage
-      m_RelationStorage->RemoveControlPointFromCase(caseID, controlPoint);
-    }
-    else
-    {
-      // some data is still linked to this control point
-      // the control point can not be removed, but has to be adjusted to fit the remaining data
-      SemanticTypes::ControlPoint adjustedControlPoint = GenerateControlPoint(allDataOfControlPoint);
-      // set the UIDs to be the same, so that all references still work
-      adjustedControlPoint.UID = controlPoint.UID;
-      adjustedControlPoint.startPoint.UID = controlPoint.startPoint.UID;
-      adjustedControlPoint.endPoint.UID = controlPoint.endPoint.UID;
-      m_RelationStorage->OverwriteControlPoint(caseID, adjustedControlPoint);
-    }
+    // no more data is linked to the specific control point
+    // the control point can be removed from the storage
+    m_RelationStorage->RemoveControlPointFromCase(caseID, controlPoint);
   }
-  catch (SemanticRelationException& e)
+  else
   {
-    mitkReThrow(e);
+    // some data is still linked to this control point
+    // the control point can not be removed, but has to be adjusted to fit the remaining data
+    SemanticTypes::ControlPoint adjustedControlPoint = GenerateControlPoint(allDataOfControlPoint);
+    // set the UIDs to be the same, so that all references still work
+    adjustedControlPoint.UID = controlPoint.UID;
+    adjustedControlPoint.startPoint.UID = controlPoint.startPoint.UID;
+    adjustedControlPoint.endPoint.UID = controlPoint.endPoint.UID;
+    m_RelationStorage->OverwriteControlPoint(caseID, adjustedControlPoint);
   }
 }
 

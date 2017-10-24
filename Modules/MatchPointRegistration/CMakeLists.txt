@@ -5,18 +5,18 @@ MITK_CREATE_MODULE(
    PUBLIC MatchPoint
 )
 
-SET(ALG_PROFILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/algorithms)
+if(TARGET ${MODULE_TARGET})
+  set(ALG_PROFILE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/algorithms)
 
-include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)
-file(GLOB ALG_PROFILE_FILES LIST_DIRECTORIES false RELATIVE ${ALG_PROFILE_DIR} "${ALG_PROFILE_DIR}/*.profile")
+  include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)
+  file(GLOB ALG_PROFILE_FILES LIST_DIRECTORIES false RELATIVE ${ALG_PROFILE_DIR} "${ALG_PROFILE_DIR}/*.profile")
 
-foreach(profile_file ${ALG_PROFILE_FILES})
-  get_filename_component(profile_name ${profile_file} NAME_WE)
-  MESSAGE(STATUS "... generate MDRA profile ${profile_name} (from ${profile_file})...")
-  CREATE_ALGORITHM_PROFILE(${profile_name} ${ALG_PROFILE_DIR}/${profile_file})
-endforeach(profile_file)
+  foreach(profile_file ${ALG_PROFILE_FILES})
+    get_filename_component(profile_name ${profile_file} NAME_WE)
+    MESSAGE(STATUS "... generate MDRA profile ${profile_name} (from ${profile_file})...")
+    CREATE_ALGORITHM_PROFILE(${profile_name} ${ALG_PROFILE_DIR}/${profile_file})
+  endforeach(profile_file)
 
-if( ${MITK_USE_MatchPoint} )
   ADD_SUBDIRECTORY(autoload/IO)
   ADD_SUBDIRECTORY(deployment)
   if(BUILD_TESTING)

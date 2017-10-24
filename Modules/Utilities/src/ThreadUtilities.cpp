@@ -18,7 +18,7 @@ namespace Utilities
   boost::tribool  isGuiThread()
   {
     auto core = QCoreApplication::instance();
-    return core ? QThread::currentThread() == core->thread() : boost::indeterminate;
+    return core ? boost::tribool(QThread::currentThread() == core->thread()) : boost::indeterminate;
   }
 
   void execInMainThreadAsync(const ExecuteProc& proc)

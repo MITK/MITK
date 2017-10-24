@@ -200,7 +200,7 @@ void mitk::PolhemusTrackingDevice::TrackTools()
 
       if (lastData.size() != m_AllTools.size())
       {
-        MITK_WARN << "Tool count is corrupt. Aborting!";
+        MITK_WARN << "Tool count is corrupt. Hardware gives " << lastData.size() << " tools, MITK expects " << m_AllTools.size() << " tools. Aborting!";
       }
       else
       {

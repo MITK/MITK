@@ -61,6 +61,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="m_RefreshView">
+       <property name="text">
+        <string>Refresh view</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

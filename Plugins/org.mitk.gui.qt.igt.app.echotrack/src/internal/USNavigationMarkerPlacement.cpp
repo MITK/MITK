@@ -100,13 +100,11 @@ USNavigationMarkerPlacement::USNavigationMarkerPlacement()
 
 USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 {
-
   // remove listener for ultrasound device changes
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
   {
     m_CombinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
   }
-
 
   // remove listener for ultrasound device changes
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
@@ -115,8 +113,6 @@ USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
   }
 
   delete ui;
-
-
 }
 
 void USNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
@@ -215,6 +211,7 @@ void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
   connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
   connect(ui->m_RenderWindowSelection, SIGNAL(valueChanged(int)), this, SLOT(OnRenderWindowSelection()));
+  connect(ui->m_RefreshView, SIGNAL(clicked()), this, SLOT(OnRefreshView()));
 
   connect(ui->navigationProcessWidget,
     SIGNAL(SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>)),
@@ -298,13 +295,33 @@ void USNavigationMarkerPlacement::OnEnableNavigationLayout()
   {
     m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
     SetTwoWindowView();
-
   }
 }
 
 void USNavigationMarkerPlacement::OnRenderWindowSelection()
 {
   SetTwoWindowView();
+}
+
+void USNavigationMarkerPlacement::OnRefreshView()
+{
+  if (!ui->m_enableNavigationLayout->isChecked())
+    OnResetStandardLayout();
+  else
+  {
+    //Reinit the US Image Stream (this might be broken if there was a global reinit somewhere...)
+    try
+    {
+      mitk::RenderingManager::GetInstance()->InitializeViews(//Reinit
+        this->GetDataStorage()//GetDataStorage
+        ->GetNamedNode("US Support Viewing Stream")->GetData()->GetTimeGeometry());//GetNode
+    }
+    catch (...)
+    {
+      MITK_DEBUG << "No reinit possible";
+    }
+    SetTwoWindowView();
+  }
 }
 
 void USNavigationMarkerPlacement::SetTwoWindowView()
@@ -318,7 +335,7 @@ void USNavigationMarkerPlacement::SetTwoWindowView()
     case 1:
       mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToCaudal();
       i = 2; j = 3; //other windows
-      k=1;
+      k = 1;
       break;
     case 2:
       mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToSinister();
@@ -335,7 +352,7 @@ void USNavigationMarkerPlacement::SetTwoWindowView()
     }
     m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown(k);
     ////Crosshair invisible in 3D view
-    this->GetDataStorage()->GetNamedNode("stdmulti.widget"+std::to_string(i) +".plane")->
+    this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(i) + ".plane")->
       SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
     this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")->
       SetBoolProperty("visible", false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
@@ -345,7 +362,6 @@ void USNavigationMarkerPlacement::SetTwoWindowView()
       SetIntProperty("Crosshair.Gap Size", 0);
     this->GetDataStorage()->GetNamedNode("stdmulti.widget" + std::to_string(j) + ".plane")->
       SetIntProperty("Crosshair.Gap Size", 0);
-
   }
 }
 
@@ -695,32 +711,29 @@ void USNavigationMarkerPlacement::OnActiveNavigationStepChanged(int index)
       << this->m_NavigationStepNames.at(index).toStdString()
       << "; duration until now: " << m_NavigationStepTimer->GetTotalDuration();
   }
+}
 
- }
+void USNavigationMarkerPlacement::OnNextNavigationStepInitialization(int index)
+{
+  MITK_DEBUG << "Next Step: " << m_NavigationSteps.at(index)->GetTitle().toStdString();
 
-  void USNavigationMarkerPlacement::OnNextNavigationStepInitialization(int index)
+  if (m_NavigationSteps.at(index)->GetTitle().toStdString() == "Computer-assisted Intervention")
   {
-
-    MITK_DEBUG << "Next Step: " << m_NavigationSteps.at(index)->GetTitle().toStdString();
-
-    if (m_NavigationSteps.at(index)->GetTitle().toStdString() == "Computer-assisted Intervention")
+    QmitkUSNavigationStepPunctuationIntervention* navigationStepPunctuationIntervention = static_cast<QmitkUSNavigationStepPunctuationIntervention*>(m_NavigationSteps.at(index));
+    if (navigationStepPunctuationIntervention != nullptr)
     {
-      QmitkUSNavigationStepPunctuationIntervention* navigationStepPunctuationIntervention = static_cast<QmitkUSNavigationStepPunctuationIntervention*>(m_NavigationSteps.at(index));
-      if (navigationStepPunctuationIntervention != nullptr)
+      if (m_CurrentStorage.IsNull()) { this->UpdateToolStorage(); }
+      if (m_CurrentStorage.IsNull() || (m_CurrentStorage->GetTool(m_NeedleIndex).IsNull()))
       {
-        if (m_CurrentStorage.IsNull()) { this->UpdateToolStorage(); }
-        if (m_CurrentStorage.IsNull() || (m_CurrentStorage->GetTool(m_NeedleIndex).IsNull()))
-        {
-          MITK_WARN << "Found null pointer when setting the tool axis, aborting";
-        }
-        else
-        {
-          navigationStepPunctuationIntervention->SetNeedleMetaData(m_CurrentStorage->GetTool(m_NeedleIndex));
-          MITK_DEBUG << "Needle axis vector: " << m_CurrentStorage->GetTool(m_NeedleIndex)->GetToolAxis();
-        }
+        MITK_WARN << "Found null pointer when setting the tool axis, aborting";
+      }
+      else
+      {
+        navigationStepPunctuationIntervention->SetNeedleMetaData(m_CurrentStorage->GetTool(m_NeedleIndex));
+        MITK_DEBUG << "Needle axis vector: " << m_CurrentStorage->GetTool(m_NeedleIndex)->GetToolAxis();
       }
     }
-
+  }
 }
 
 void USNavigationMarkerPlacement::OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode> resultsNode)

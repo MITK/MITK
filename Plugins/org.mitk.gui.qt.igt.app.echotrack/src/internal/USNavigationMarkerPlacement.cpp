@@ -321,12 +321,12 @@ void USNavigationMarkerPlacement::SetTwoWindowView()
       k=1;
       break;
     case 2:
-      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToDexter();
+      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToSinister();
       i = 1; j = 3;
       k = 2;
       break;
     case 3:
-      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToPosterior();
+      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToAnterior();
       i = 2; j = 1;
       k = 3;
       break;

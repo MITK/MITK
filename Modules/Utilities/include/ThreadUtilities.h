@@ -2,11 +2,13 @@
 
 #include <functional>
 
+#include <boost/logic/tribool.hpp>
+
 #include <MitkUtilitiesExports.h>
 
 namespace Utilities
 {
-  MITKUTILITIES_EXPORT bool isGuiThread();
+  MITKUTILITIES_EXPORT boost::tribool isGuiThread();
 
   typedef std::function<void()> ExecuteProc;
 

@@ -15,10 +15,10 @@ namespace
 
 namespace Utilities
 {
-  bool isGuiThread()
+  boost::tribool  isGuiThread()
   {
     auto core = QCoreApplication::instance();
-    return core ? QThread::currentThread() == core->thread() : false;
+    return core ? QThread::currentThread() == core->thread() : boost::indeterminate;
   }
 
   void execInMainThreadAsync(const ExecuteProc& proc)

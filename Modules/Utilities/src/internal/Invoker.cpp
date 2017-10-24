@@ -11,10 +11,10 @@ namespace Utilities
 
   void Invoker::ExecInMainThread(const ExecuteProc& proc, Qt::ConnectionType connType)
   {
-    if (isGuiThread()) {
-      proc();
-    } else {
+    if (!isGuiThread()) {
       QMetaObject::invokeMethod(this, "ExecProc", connType, Q_ARG(ExecuteProc, proc));
+    } else {
+      proc();
     }
   }
 

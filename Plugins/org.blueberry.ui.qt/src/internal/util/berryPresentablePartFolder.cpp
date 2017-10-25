@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
+std::map<QString, AbstractTabItem*> PresentablePartFolder::partTabItems;
+
 PresentablePartFolder::ShellListener::ShellListener(AbstractTabFolder* _folder) :
   folder(_folder)
 {
@@ -234,6 +236,9 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
   item = folder->Add(idx, style);
 
   item->SetData(part);
+
+  QString partTabName = part->GetName();
+  partTabItems[partTabName] = item;
 
   this->InitTab(item, part);
 

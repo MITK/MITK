@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berrySavePerspectiveDialog.h"
 #include "berryPerspectiveListModel.h"
 #include "internal/berryPerspectiveRegistry.h"
+#include "berryShell.h"
 
 #include "ui_berrySavePerspectiveDialog.h"
 

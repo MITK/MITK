@@ -107,6 +107,8 @@ protected:
 
 public:
 
+  static std::map<QString, AbstractTabItem*> partTabItems;
+
   /**
    * The PresentablePartFolder takes ownership of the AbstractTabFolder pointer.
    */

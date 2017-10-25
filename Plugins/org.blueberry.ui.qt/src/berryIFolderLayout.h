@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPlaceholderFolderLayout.h"
 
+#include "internal/util/berryAbstractTabItem.h"
+#include "internal/util/berryPresentablePartFolder.h"
+
 namespace berry {
 
 /**
@@ -50,6 +53,8 @@ struct BERRY_UI_QT IFolderLayout : public IPlaceholderFolderLayout
      * @param viewId the view id
      */
     virtual void AddView(const QString& viewId) = 0;
+
+  static std::map<QString, AbstractTabItem*> getPartTabItems();
 };
 
 }

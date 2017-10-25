@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryStickyViewDescriptor.h"
 
+#include "berryShell.h"
 #include "berryWorkbenchRegistryConstants.h"
 
 #include <berryIPageLayout.h>

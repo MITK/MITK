@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIFolderLayout.h"
 
+#include "berryShell.h"
 
 namespace berry {
 

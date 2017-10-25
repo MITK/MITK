@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPageLayout.h"
 
+#include "berryShell.h"
+
 namespace berry {
 
 const QString IPageLayout::ID_EDITOR_AREA = "org.blueberry.ui.editors";

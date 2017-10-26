@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Merge Duplicate Tracts");
+  parser.setTitle("Merge Overlapping Tracts");
   parser.setCategory("Fiber Tracking Evaluation");
   parser.setDescription("");
   parser.setContributor("MIC");
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input Folder:", "input folder", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "output folder", us::Any(), false);
-  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "", "", false, 0.8);
+  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Tracts with overlap larger than this threshold are merged", false, 0.8);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -102,6 +102,10 @@ int main(int argc, char* argv[])
     if (fib_files.empty())
       return EXIT_FAILURE;
 
+    streambuf *old = cout.rdbuf(); // <-- save
+    stringstream ss;
+    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+
     std::vector< mitk::FiberBundle::Pointer > fibs;
     for (string f : fib_files)
     {
@@ -118,11 +122,15 @@ int main(int argc, char* argv[])
     endings->Update();
     ItkUcharImgType::Pointer ref_image = endings->GetOutput();
 
-    int original_size = fibs.size();
+    std::cout.rdbuf (old);              // <-- restore
+
     for (int its = 0; its<3; its++)
     {
+      streambuf *old = cout.rdbuf(); // <-- save
+      stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+
       std::vector< ItkUcharImgType::Pointer > mask_images;
-      MITK_INFO << "Generating tract envelopes";
       for (auto fib : fibs)
       {
         itk::TractDensityImageFilter< ItkUcharImgType >::Pointer masks = itk::TractDensityImageFilter< ItkUcharImgType >::New();
@@ -134,16 +142,10 @@ int main(int argc, char* argv[])
         mask_images.push_back(masks->GetOutput());
       }
 
-      MITK_INFO << "Calculating overlaps";
       int r=0;
       vnl_matrix< int > mat; mat.set_size(mask_images.size(), mask_images.size()); mat.fill(0);
       for (auto m1 : mask_images)
       {
-        //      itk::ImageFileWriter<ItkUcharImgType>::Pointer writer = itk::ImageFileWriter<ItkUcharImgType>::New();
-        //      writer->SetInput(m1);
-        //      writer->SetFileName(out_folder + "/mask_" + boost::lexical_cast<string>(r) + ".nii.gz");
-        //      writer->Update();
-
         float max_overlap = overlap;
         int c = 0;
         for (auto m2 : mask_images)
@@ -172,9 +174,6 @@ int main(int argc, char* argv[])
             ++it2;
           }
 
-          //        MITK_INFO << "******************************";
-          //        MITK_INFO << r << "," << c;
-          //        MITK_INFO << intersect << "/" << c1+c2;
           if ( (float)intersect/c1>max_overlap )
           {
             max_overlap = (float)intersect/c1;
@@ -191,7 +190,6 @@ int main(int argc, char* argv[])
         ++r;
       }
 
-      MITK_INFO << "Merging tracts";
       std::vector< mitk::FiberBundle::Pointer > out_fibs;
       std::vector< bool > used;
       for (unsigned int i=0; i<fibs.size(); i++)
@@ -201,8 +199,6 @@ int main(int argc, char* argv[])
         if (used.at(r))
           continue;
 
-        MITK_INFO << "**********************";
-        MITK_INFO << r;
         mitk::FiberBundle::Pointer fib = fibs.at(r);
         for (unsigned int c=r+1; c<mask_images.size(); c++)
         {
@@ -216,18 +212,24 @@ int main(int argc, char* argv[])
 
         out_fibs.push_back(fib);
       }
+      std::cout.rdbuf (old);              // <-- restore
+
+      MITK_INFO << fibs.size() << " --> " << out_fibs.size();
 
       if (fibs.size()==out_fibs.size())
         break;
       fibs = out_fibs;
     }
-    int final_size = fibs.size();
 
-    MITK_INFO << original_size << " --> " << final_size;
     int c = 0;
     for (auto fib : fibs)
     {
+      streambuf *old = cout.rdbuf(); // <-- save
+      stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       mitk::IOUtil::Save(fib, out_folder + "/bundle_" + boost::lexical_cast<string>(c) + ".trk");
+      std::cout.rdbuf (old);              // <-- restore
+
       ++c;
     }
   }

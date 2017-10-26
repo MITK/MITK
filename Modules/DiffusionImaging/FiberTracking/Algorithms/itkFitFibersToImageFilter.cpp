@@ -14,6 +14,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_FiberSampling(10)
   , m_Coverage(0)
   , m_Overshoot(0)
+  , m_RMSE(0.0)
   , m_FilterOutliers(true)
   , m_MeanWeight(1.0)
   , m_MedianWeight(1.0)
@@ -235,8 +236,8 @@ void FitFibersToImageFilter::GenerateData()
   MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
   MITK_INFO << "Residual cost: " << minimizer.get_end_error();
-  double rms = cost.S->get_rms_error(m_Weights);
-  MITK_INFO << "Final RMS: " << rms;
+  m_RMSE = cost.S->get_rms_error(m_Weights);
+  MITK_INFO << "Final RMS: " << m_RMSE;
 
   clock.Stop();
   int h = clock.GetTotal()/3600;
@@ -255,7 +256,6 @@ void FitFibersToImageFilter::GenerateData()
     unsigned int fiber_count = 0;
     for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
     {
-//      double mean_d = 0;
       vnl_vector< double > temp_weights;
       temp_weights.set_size(m_Weights.size());
       temp_weights.copy_in(m_Weights.data_block());
@@ -264,18 +264,10 @@ void FitFibersToImageFilter::GenerateData()
       {
         m_Tractograms.at(bundle)->SetFiberWeight(i, m_Weights[fiber_count]);
         temp_weights[fiber_count] = 0;
-//        double w = m_Weights[fiber_count];
-//        m_Weights[fiber_count] = 0;
-//        double d_rms = cost.S->get_rms_error(m_Weights) - rms;
-//        m_RmsDiffPerFiber[fiber_count] = d_rms;
-//        mean_d += d_rms;
-//        m_Weights[fiber_count] = w;
 
         ++fiber_count;
       }
-      double d_rms = cost.S->get_rms_error(temp_weights) - rms;
-      MITK_INFO << d_rms;
-//      mean_d /= m_Tractograms.at(bundle)->GetNumFibers();
+      double d_rms = cost.S->get_rms_error(temp_weights) - m_RMSE;
       m_RmsDiffPerBundle[bundle] = d_rms;
       m_Tractograms.at(bundle)->Compress(0.1);
       m_Tractograms.at(bundle)->ColorFibersByFiberWeights(false, true);

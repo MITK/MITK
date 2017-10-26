@@ -104,8 +104,9 @@ int main(int argc, char* argv[])
   parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output folder", us::Any(), false);
   parser.addArgument("reference_mask_folder", "m", mitkCommandLineParser::String, "Reference Mask Folder:", "reference masks of known bundles", false);
-  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "", "", 0.7);
-  parser.addArgument("steps", "", mitkCommandLineParser::Int, "", "", 10);
+  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Overlap threshold used to identify true positives", 0.8);
+  parser.addArgument("steps", "", mitkCommandLineParser::Int, "Threshold steps:", "number of weight thresholds used to calculate the ROC curve", 100);
+  parser.addArgument("pre_filter_zeros", "", mitkCommandLineParser::Bool, "Remove zero weights:", "remove fibers with zero weights before starting the evaluation");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -115,13 +116,17 @@ int main(int argc, char* argv[])
   string reference_mask_folder = us::any_cast<string>(parsedArgs["reference_mask_folder"]);
   string out_folder = us::any_cast<string>(parsedArgs["out"]);
 
-  float overlap = 0.7;
+  float overlap = 0.8;
   if (parsedArgs.count("overlap"))
     overlap = us::any_cast<float>(parsedArgs["overlap"]);
 
   int steps = 10;
   if (parsedArgs.count("steps"))
     steps = us::any_cast<int>(parsedArgs["steps"]);
+
+  bool pre_filter_zeros = false;
+  if (parsedArgs.count("pre_filter_zeros"))
+    pre_filter_zeros = us::any_cast<bool>(parsedArgs["pre_filter_zeros"]);
 
   try
   {
@@ -146,16 +151,21 @@ int main(int argc, char* argv[])
       weights.push_back(inputTractogram->GetFiberWeight(i));
     std::sort(weights.begin(), weights.end());
 
-    inputTractogram = inputTractogram->FilterByWeights(0.0);
+    if (pre_filter_zeros)
+      inputTractogram = inputTractogram->FilterByWeights(0.0);
     mitk::FiberBundle::Pointer pred_positives = inputTractogram->GetDeepCopy();
     mitk::FiberBundle::Pointer pred_negatives = mitk::FiberBundle::New(nullptr);
 
     ofstream logfile;
     logfile.open (out_folder + "LiFE_ROC.txt");
 
+    float fpr = 1.0;
+    float tpr = 1.0;
     float step = weights.back()/steps;
     float w = 0;
-    while (pred_positives->GetNumFibers()>0)
+    if (!pre_filter_zeros)
+      w -= step;
+    while (pred_positives->GetNumFibers()>0 && fpr>0.001 && tpr>0.001)
     {
       w += step;
 
@@ -182,8 +192,8 @@ int main(int argc, char* argv[])
 
       float positives = tp_tracts->GetNumFibers() + fn_tracts->GetNumFibers();
       float negatives = tn_tracts->GetNumFibers() + fp_tracts->GetNumFibers();
-      float fpr = (float)fp_tracts->GetNumFibers() / negatives;
-      float tpr = (float)tp_tracts->GetNumFibers() / positives;
+      fpr = (float)fp_tracts->GetNumFibers() / negatives;
+      tpr = (float)tp_tracts->GetNumFibers() / positives;
 
       float accuracy = 1.0;
       if (pred_positives->GetNumFibers()>0)

@@ -67,6 +67,7 @@ public:
   itkGetMacro( UnderexplainedImage, PeakImgType::Pointer)
   itkGetMacro( Coverage, double)
   itkGetMacro( Overshoot, double)
+  itkGetMacro( RMSE, double)
   itkGetMacro( MeanWeight, double)
   itkGetMacro( MedianWeight, double)
   itkGetMacro( MinWeight, double)
@@ -98,6 +99,7 @@ protected:
   float                                       m_FiberSampling;
   double                                      m_Coverage;
   double                                      m_Overshoot;
+  double                                      m_RMSE;
   bool                                        m_FilterOutliers;
   double                                      m_MeanWeight;
   double                                      m_MedianWeight;

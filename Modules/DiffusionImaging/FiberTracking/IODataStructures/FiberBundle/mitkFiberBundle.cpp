@@ -1010,6 +1010,9 @@ float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask, bool do_resampling)
 
 mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction, bool do_resampling)
 {
+  if (m_NumFibers==0 || mask==nullptr)
+    return mitk::FiberBundle::New(nullptr);
+
   vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
   mitk::FiberBundle::Pointer fibCopy = this;
   if (anyPoint && do_resampling)
@@ -1194,11 +1197,12 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
   }
 
   if (vtkNewCells->GetNumberOfCells()<=0)
-    return nullptr;
+    return mitk::FiberBundle::New(nullptr);
 
   vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
   newPolyData->SetPoints(vtkNewPoints);
   newPolyData->SetLines(vtkNewCells);
+
   mitk::FiberBundle::Pointer newfib = mitk::FiberBundle::New(newPolyData);
   for (unsigned int i=0; i<new_weights.size(); i++)
     newfib->SetFiberWeight(i, new_weights.at(i));

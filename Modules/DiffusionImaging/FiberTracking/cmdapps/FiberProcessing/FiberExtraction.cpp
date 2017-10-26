@@ -30,8 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 /*!
 \brief Extract fibers from a tractogram using planar figure ROIs
 */
@@ -52,21 +50,21 @@ int main(int argc, char* argv[])
     parser.addArgument("operation", "op", mitkCommandLineParser::String, "Operation:", "logical operation (AND, OR, NOT)", us::Any());
 
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string inFib = us::any_cast<string>(parsedArgs["input"]);
-    string outFib = us::any_cast<string>(parsedArgs["out"]);
-    string pf1_path = us::any_cast<string>(parsedArgs["planfirgure1"]);
+    std::string inFib = us::any_cast<std::string>(parsedArgs["input"]);
+    std::string outFib = us::any_cast<std::string>(parsedArgs["out"]);
+    std::string pf1_path = us::any_cast<std::string>(parsedArgs["planfirgure1"]);
 
-    string operation("");
-    string pf2_path("");
+    std::string operation("");
+    std::string pf2_path("");
     if (parsedArgs.count("operation"))
     {
-        operation = us::any_cast<string>(parsedArgs["operation"]);
+        operation = us::any_cast<std::string>(parsedArgs["operation"]);
         if (parsedArgs.count("planfirgure2") && (operation=="AND" || operation=="OR"))
-            pf2_path = us::any_cast<string>(parsedArgs["planfirgure2"]);
+            pf2_path = us::any_cast<std::string>(parsedArgs["planfirgure2"]);
     }
 
     try

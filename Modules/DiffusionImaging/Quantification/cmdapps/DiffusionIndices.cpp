@@ -27,8 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMultiThreader.h>
 #include <mitkIOUtil.h>
 
-using namespace std;
-
 /**
  * Calculate indices derived from Odf or tensor images
  */
@@ -46,15 +44,15 @@ int main(int argc, char* argv[])
     parser.addArgument("index", "idx", mitkCommandLineParser::String, "Index:", "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
     parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string inFileName = us::any_cast<string>(parsedArgs["input"]);
-    string index = us::any_cast<string>(parsedArgs["index"]);
-    string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
+    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+    std::string index = us::any_cast<std::string>(parsedArgs["index"]);
+    std::string outFileName = us::any_cast<std::string>(parsedArgs["outFile"]);
 
-    string ext = itksys::SystemTools::GetFilenameLastExtension(outFileName);
+    std::string ext = itksys::SystemTools::GetFilenameLastExtension(outFileName);
     if (ext.empty())
         outFileName += ".nrrd";
 

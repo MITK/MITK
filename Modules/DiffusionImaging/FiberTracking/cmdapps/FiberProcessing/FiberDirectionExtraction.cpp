@@ -30,8 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 /*!
 \brief Extract principal fiber directions from a tractogram
 */
@@ -55,15 +53,15 @@ int main(int argc, char* argv[])
   parser.addArgument("normalization", "n", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum, 2=single vector, 3=voxel-wise maximum", 1);
   parser.addArgument("file_ending", "f", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz");
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  string fibFile = us::any_cast<string>(parsedArgs["input"]);
+  std::string fibFile = us::any_cast<std::string>(parsedArgs["input"]);
 
-  string maskImage("");
+  std::string maskImage("");
   if (parsedArgs.count("mask"))
-    maskImage = us::any_cast<string>(parsedArgs["mask"]);
+    maskImage = us::any_cast<std::string>(parsedArgs["mask"]);
 
   float peakThreshold = 0.2;
   if (parsedArgs.count("peakthresh"))
@@ -73,7 +71,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("athresh"))
     angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
 
-  string outRoot = us::any_cast<string>(parsedArgs["out"]);
+  std::string outRoot = us::any_cast<std::string>(parsedArgs["out"]);
 
   bool verbose = false;
   if (parsedArgs.count("verbose"))
@@ -136,7 +134,7 @@ int main(int argc, char* argv[])
       typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
       WriterType::Pointer writer = WriterType::New();
 
-      string outfilename = outRoot;
+      std::string outfilename = outRoot;
       outfilename.append("_DIRECTIONS");
       outfilename.append(file_ending);
 
@@ -152,7 +150,7 @@ int main(int argc, char* argv[])
       typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
       WriterType::Pointer writer = WriterType::New();
 
-      string outfilename = outRoot;
+      std::string outfilename = outRoot;
       outfilename.append("_NUM_DIRECTIONS");
       outfilename.append(file_ending);
 

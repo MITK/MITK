@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <string>
 
 #include <itkImageFileWriter.h>
 #include <itkMetaDataObject.h>
@@ -79,7 +78,7 @@ int main(int argc, char* argv[])
     parser.addArgument("translate-z", "tz", mitkCommandLineParser::Float, "Translate z-axis:", "Translate in direction of z-axis (in mm)");
 
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
@@ -148,8 +147,8 @@ int main(int argc, char* argv[])
         translateZ = us::any_cast<float>(parsedArgs["translate-z"]);
 
 
-    string inFileName = us::any_cast<string>(parsedArgs["input"]);
-    string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
+    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+    std::string outFileName = us::any_cast<std::string>(parsedArgs["outFile"]);
 
     try
     {

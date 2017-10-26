@@ -442,7 +442,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
   parameters.m_Misc.m_CheckOutputVolumeFractionsBox = m_Controls->m_VolumeFractionsBox->isChecked();
   parameters.m_Misc.m_AfterSimulationMessage = "";
 
-  string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
+  std::string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
   if (outputPath.compare("-")!=0)
   {
     parameters.m_Misc.m_OutputPath = outputPath;
@@ -673,7 +673,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
 
     else if ( ! parameters.m_Misc.m_MotionVolumesBox.empty() )
     {
-      stringstream stream( parameters.m_Misc.m_MotionVolumesBox );
+      std::stringstream stream( parameters.m_Misc.m_MotionVolumesBox );
       std::vector<int> numbers;
       int number = std::numeric_limits<int>::max();
       while( stream >> number )
@@ -2174,10 +2174,10 @@ void QmitkFiberfoxView::GenerateFibers()
     std::vector< mitk::DataNode::Pointer > childVector;
     for( mitk::DataStorage::SetOfObjects::const_iterator it = children->begin(); it != children->end(); ++it )
       childVector.push_back(*it);
-    sort(childVector.begin(), childVector.end(), CompareLayer);
+    std::sort(childVector.begin(), childVector.end(), CompareLayer);
 
-    vector< mitk::PlanarEllipse::Pointer > fib;
-    vector< unsigned int > flip;
+    std::vector< mitk::PlanarEllipse::Pointer > fib;
+    std::vector< unsigned int > flip;
     float radius = 1;
     int count = 0;
     for( std::vector< mitk::DataNode::Pointer >::const_iterator it = childVector.begin(); it != childVector.end(); ++it )
@@ -2234,7 +2234,7 @@ void QmitkFiberfoxView::GenerateFibers()
   itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
   filter->SetParameters(parameters.m_FiberGen);
   filter->Update();
-  vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
+  std::vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
 
   for (unsigned int i=0; i<fiberBundles.size(); i++)
   {
@@ -2432,7 +2432,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
 void QmitkFiberfoxView::ApplyTransform()
 {
-  vector< mitk::DataNode::Pointer > selectedBundles;
+  std::vector< mitk::DataNode::Pointer > selectedBundles;
   for(unsigned int i=0; i<m_SelectedImages.size(); i++ )
   {
     mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(m_SelectedImages.at(i));
@@ -2890,7 +2890,7 @@ void QmitkFiberfoxView::SetFocus()
 void QmitkFiberfoxView::SetOutputPath()
 {
   // SELECT FOLDER DIALOG
-  string outputPath;
+  std::string outputPath;
   outputPath = QFileDialog::getExistingDirectory(nullptr, "Save images to...", QString(outputPath.c_str())).toStdString();
 
   if (outputPath.empty())

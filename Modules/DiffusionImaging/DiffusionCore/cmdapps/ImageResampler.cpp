@@ -36,11 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkResampleImageFilter.h"
 #include "itkResampleDwiImageFilter.h"
 
-using namespace std;
-
 typedef itk::Image<double, 3> InputImageType;
 typedef itk::Image<unsigned char, 3> BinaryImageType;
-
 
 static mitk::Image::Pointer TransformToReference(mitk::Image *reference, mitk::Image *moving, bool sincInterpol = false, bool nn = false)
 {
@@ -327,7 +324,7 @@ int main( int argc, char* argv[] )
   parser.addArgument("nearest-neigh", "n", mitkCommandLineParser::Bool, "Nearest Neighbor:", "Use Nearest Neighbor interpolation instead of linear interpolation ",us::Any());
 
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   // Handle special arguments
   bool useSpacing = false;
@@ -353,15 +350,15 @@ int main( int argc, char* argv[] )
     }
   }
 
-  std::string outputFile = us::any_cast<string>(parsedArgs["output"]);
-  std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
+  std::string outputFile = us::any_cast<std::string>(parsedArgs["output"]);
+  std::string inputFile = us::any_cast<std::string>(parsedArgs["input"]);
 
   std::vector<std::string> spacings;
   float spacing[] = { 0.0f, 0.0f, 0.0f };
   if (parsedArgs.count("spacing"))
   {
 
-    std::string arg =  us::any_cast<string>(parsedArgs["spacing"]);
+    std::string arg =  us::any_cast<std::string>(parsedArgs["spacing"]);
     if (arg != "")
     {
       spacings = split(arg ,',');
@@ -375,7 +372,7 @@ int main( int argc, char* argv[] )
   std::string refImageFile = "";
   if (parsedArgs.count("reference"))
   {
-    refImageFile =  us::any_cast<string>(parsedArgs["reference"]);
+    refImageFile =  us::any_cast<std::string>(parsedArgs["reference"]);
   }
 
   if (refImageFile =="" && useSpacing == false)

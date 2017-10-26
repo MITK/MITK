@@ -43,8 +43,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 const int numOdfSamples = 200;
 typedef itk::Image< itk::Vector< float, numOdfSamples > , 3 > SampledShImageType;
 
@@ -106,13 +104,13 @@ int main(int argc, char* argv[])
   parser.addArgument("tend_g", "", mitkCommandLineParser::Float, "Weight g", "Weighting factor between input vector (g=0) and tensor deflection (g=1 equals TEND tracking)", 0.0);
 
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
   mitkCommandLineParser::StringContainerType input_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["input"]);
-  string outFile = us::any_cast<string>(parsedArgs["out"]);
-  string algorithm = us::any_cast<string>(parsedArgs["algorithm"]);
+  std::string outFile = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string algorithm = us::any_cast<std::string>(parsedArgs["algorithm"]);
 
   bool sharpen_odfs = false;
   if (parsedArgs.count("sharpen_odfs"))
@@ -168,25 +166,25 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("min_tract_length"))
     min_tract_length = us::any_cast<float>(parsedArgs["min_tract_length"]);
 
-  string forestFile;
+  std::string forestFile;
   if (parsedArgs.count("forest"))
-    forestFile = us::any_cast<string>(parsedArgs["forest"]);
+    forestFile = us::any_cast<std::string>(parsedArgs["forest"]);
 
-  string maskFile = "";
+  std::string maskFile = "";
   if (parsedArgs.count("tracking_mask"))
-    maskFile = us::any_cast<string>(parsedArgs["tracking_mask"]);
+    maskFile = us::any_cast<std::string>(parsedArgs["tracking_mask"]);
 
-  string seedFile = "";
+  std::string seedFile = "";
   if (parsedArgs.count("seed_mask"))
-    seedFile = us::any_cast<string>(parsedArgs["seed_mask"]);
+    seedFile = us::any_cast<std::string>(parsedArgs["seed_mask"]);
 
-  string stopFile = "";
+  std::string stopFile = "";
   if (parsedArgs.count("stop_mask"))
-    stopFile = us::any_cast<string>(parsedArgs["stop_mask"]);
+    stopFile = us::any_cast<std::string>(parsedArgs["stop_mask"]);
 
-  string tissueFile = "";
+  std::string tissueFile = "";
   if (parsedArgs.count("tissue_image"))
-    tissueFile = us::any_cast<string>(parsedArgs["tissue_image"]);
+    tissueFile = us::any_cast<std::string>(parsedArgs["tissue_image"]);
 
   float cutoff = 0.1;
   if (parsedArgs.count("cutoff"))

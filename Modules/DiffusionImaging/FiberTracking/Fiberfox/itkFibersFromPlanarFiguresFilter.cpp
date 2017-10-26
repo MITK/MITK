@@ -91,9 +91,9 @@ void FibersFromPlanarFiguresFilter::GenerateData()
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-        vector< mitk::PlanarEllipse::Pointer > bundle = m_Parameters.m_Fiducials.at(i);
+        std::vector< mitk::PlanarEllipse::Pointer > bundle = m_Parameters.m_Fiducials.at(i);
 
-        vector< unsigned int > fliplist;
+        std::vector< unsigned int > fliplist;
         if (i<m_Parameters.m_FlipList.size())
             fliplist = m_Parameters.m_FlipList.at(i);
         else

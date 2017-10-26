@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <string>
 
 #include <itkImage.h>
 #include <itkImageFileReader.h>
@@ -45,8 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 
-using namespace std;
-
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -64,17 +61,17 @@ int main(int argc, char* argv[])
   parser.addArgument("biexp", "B", mitkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);
   parser.addArgument("targetbvalue", "b", mitkCommandLineParser::String, "b Value:", "target bValue (mean, min, max)", us::Any(), false);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
   // mandatory arguments
-  string inName = us::any_cast<string>(parsedArgs["in"]);
-  string outName = us::any_cast<string>(parsedArgs["out"]);
+  std::string inName = us::any_cast<std::string>(parsedArgs["in"]);
+  std::string outName = us::any_cast<std::string>(parsedArgs["out"]);
   bool applyADC = us::any_cast<bool>(parsedArgs["adc"]);
   bool applyAKC = us::any_cast<bool>(parsedArgs["akc"]);
   bool applyBiExp = us::any_cast<bool>(parsedArgs["biexp"]);
-  string targetType = us::any_cast<string>(parsedArgs["targetbvalue"]);
+  std::string targetType = us::any_cast<std::string>(parsedArgs["targetbvalue"]);
 
   try
   {
@@ -173,7 +170,7 @@ int main(int argc, char* argv[])
         mitk::DiffusionPropertyHelper propertyHelper( outImage );
         propertyHelper.InitializeImage();
 
-        mitk::IOUtil::Save(outImage, (string(outName) + "_AKC.dwi").c_str());
+        mitk::IOUtil::Save(outImage, (std::string(outName) + "_AKC.dwi").c_str());
       }
       if(applyBiExp)
       {
@@ -196,7 +193,7 @@ int main(int argc, char* argv[])
         mitk::DiffusionPropertyHelper propertyHelper( outImage );
         propertyHelper.InitializeImage();
 
-        mitk::IOUtil::Save(outImage, (string(outName) + "_BiExp.dwi").c_str());
+        mitk::IOUtil::Save(outImage, (std::string(outName) + "_BiExp.dwi").c_str());
       }
     }
   }

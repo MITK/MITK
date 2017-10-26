@@ -33,8 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 /*!
 \brief Calculates the Tractometer evaluation metrics for tractograms (http://www.tractometer.org/)
 */
@@ -55,20 +53,20 @@ int main(int argc, char* argv[])
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output valid, invalid and no connections as fiber bundles");
     parser.addArgument("fileID", "id", mitkCommandLineParser::String, "ID:", "optional ID field");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     mitkCommandLineParser::StringContainerType labelpairs = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["labels"]);
 
-    string fibFile = us::any_cast<string>(parsedArgs["input"]);
-    string labelImageFile = us::any_cast<string>(parsedArgs["labelimage"]);
+    std::string fibFile = us::any_cast<std::string>(parsedArgs["input"]);
+    std::string labelImageFile = us::any_cast<std::string>(parsedArgs["labelimage"]);
 
-    string outRoot = us::any_cast<string>(parsedArgs["out"]);
+    std::string outRoot = us::any_cast<std::string>(parsedArgs["out"]);
 
-    string fileID = "";
+    std::string fileID = "";
     if (parsedArgs.count("fileID"))
-        fileID = us::any_cast<string>(parsedArgs["fileID"]);
+        fileID = us::any_cast<std::string>(parsedArgs["fileID"]);
 
     bool verbose = false;
     if (parsedArgs.count("verbose"))
@@ -89,7 +87,7 @@ int main(int argc, char* argv[])
         caster->Update();
         ItkShortImgType::Pointer labelImage = caster->GetOutput();
 
-        string path = itksys::SystemTools::GetFilenamePath(labelImageFile);
+        std::string path = itksys::SystemTools::GetFilenamePath(labelImageFile);
 
         std::vector< bool > detected;
         std::vector< std::pair< int, int > > labelsvector;
@@ -112,7 +110,7 @@ int main(int argc, char* argv[])
             detected.push_back(false);
 
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK.nrrd")[0].GetPointer());
+                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<std::string>(labelsvector.size())+"_MASK.nrrd")[0].GetPointer());
                 typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -122,7 +120,7 @@ int main(int argc, char* argv[])
             }
 
             {
-            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<string>(labelsvector.size())+"_MASK_COVERAGE.nrrd")[0].GetPointer());
+            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<std::string>(labelsvector.size())+"_MASK_COVERAGE.nrrd")[0].GetPointer());
                 typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -290,7 +288,7 @@ int main(int argc, char* argv[])
             noConnPolyData->SetLines(noConnCells);
             mitk::FiberBundle::Pointer noConnFib = mitk::FiberBundle::New(noConnPolyData);
 
-            string ncfilename = outRoot;
+            std::string ncfilename = outRoot;
             ncfilename.append("_NC.fib");
 
             mitk::IOUtil::Save(noConnFib.GetPointer(), ncfilename );
@@ -300,7 +298,7 @@ int main(int argc, char* argv[])
             invalidPolyData->SetLines(invalidCells);
             mitk::FiberBundle::Pointer invalidFib = mitk::FiberBundle::New(invalidPolyData);
 
-            string icfilename = outRoot;
+            std::string icfilename = outRoot;
             icfilename.append("_IC.fib");
 
             mitk::IOUtil::Save(invalidFib.GetPointer(), icfilename );
@@ -310,7 +308,7 @@ int main(int argc, char* argv[])
             validPolyData->SetLines(validCells);
             mitk::FiberBundle::Pointer validFib = mitk::FiberBundle::New(validPolyData);
 
-            string vcfilename = outRoot;
+            std::string vcfilename = outRoot;
             vcfilename.append("_VC.fib");
 
             mitk::IOUtil::Save(validFib.GetPointer(), vcfilename );
@@ -367,32 +365,32 @@ int main(int argc, char* argv[])
         std::cout << "IB: " << ib;
         std::cout << "ABC: " << abc;
 
-        string logFile = outRoot;
+        std::string logFile = outRoot;
         logFile.append("_TRACTOMETER.csv");
         ofstream file;
         file.open (logFile.c_str());
         {
-            string sens = itksys::SystemTools::GetFilenameWithoutLastExtension(fibFile);
+            std::string sens = itksys::SystemTools::GetFilenameWithoutLastExtension(fibFile);
             if (!fileID.empty())
                 sens = fileID;
             sens.append(",");
 
-            sens.append(boost::lexical_cast<string>(nc));
+            sens.append(boost::lexical_cast<std::string>(nc));
             sens.append(",");
 
-            sens.append(boost::lexical_cast<string>(vc));
+            sens.append(boost::lexical_cast<std::string>(vc));
             sens.append(",");
 
-            sens.append(boost::lexical_cast<string>(ic));
+            sens.append(boost::lexical_cast<std::string>(ic));
             sens.append(",");
 
-            sens.append(boost::lexical_cast<string>(validBundles));
+            sens.append(boost::lexical_cast<std::string>(validBundles));
             sens.append(",");
 
-            sens.append(boost::lexical_cast<string>(invalidBundles));
+            sens.append(boost::lexical_cast<std::string>(invalidBundles));
             sens.append(",");
 
-            sens.append(boost::lexical_cast<string>(abc));
+            sens.append(boost::lexical_cast<std::string>(abc));
             sens.append(";\n");
             file << sens;
         }

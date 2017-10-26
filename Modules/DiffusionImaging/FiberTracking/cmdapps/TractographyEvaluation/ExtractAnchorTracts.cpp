@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <chrono>
 #include <boost/progress.hpp>
 
-using namespace std;
 typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 typedef std::tuple< ItkUcharImgType::Pointer, std::string > MaskType;
@@ -107,8 +106,8 @@ std::vector< MaskType > get_file_list(const std::string& path, float anchor_frac
       }
 
       MITK_INFO << "Loading " << ist::GetFilenameWithoutExtension(filename);
-      streambuf *old = cout.rdbuf(); // <-- save
-      stringstream ss;
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       MaskType m(LoadItkMaskImage(path + '/' + filename), ist::GetFilenameName(filename));
       mask_list.push_back(m);
@@ -157,17 +156,17 @@ int main(int argc, char* argv[])
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Overlap threshold used to identify the anchor tracts", 0.8);
   parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Subsampling factor:", "Only use specified fraction of input fibers for the analysis", 1.0);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  string fibFile = us::any_cast<string>(parsedArgs["input"]);
-  string reference_mask_folder = us::any_cast<string>(parsedArgs["reference_mask_folder"]);
-  string out_folder = us::any_cast<string>(parsedArgs["out"]);
+  std::string fibFile = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string reference_mask_folder = us::any_cast<std::string>(parsedArgs["reference_mask_folder"]);
+  std::string out_folder = us::any_cast<std::string>(parsedArgs["out"]);
 
-  string gray_matter_mask = "";
+  std::string gray_matter_mask = "";
   if (parsedArgs.count("gray_matter_mask"))
-    gray_matter_mask = us::any_cast<string>(parsedArgs["gray_matter_mask"]);
+    gray_matter_mask = us::any_cast<std::string>(parsedArgs["gray_matter_mask"]);
 
   float anchor_fraction = 0.5;
   if (parsedArgs.count("anchor_fraction"))
@@ -190,8 +189,8 @@ int main(int argc, char* argv[])
     MITK_INFO << "Removing fibers not ending inside of GM";
     if (gray_matter_mask.compare("")!=0)
     {
-      streambuf *old = cout.rdbuf(); // <-- save
-      stringstream ss;
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       ItkUcharImgType::Pointer gm_image = LoadItkMaskImage(gray_matter_mask);
       std::cout.rdbuf (old);              // <-- restore
@@ -230,8 +229,8 @@ int main(int argc, char* argv[])
       for ( MaskType mask : known_tract_masks )
       {
         ++disp;
-        streambuf *old = cout.rdbuf(); // <-- save
-        stringstream ss;
+        std::streambuf *old = cout.rdbuf(); // <-- save
+        std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
 
         ItkUcharImgType::Pointer mask_image = std::get<0>(mask);

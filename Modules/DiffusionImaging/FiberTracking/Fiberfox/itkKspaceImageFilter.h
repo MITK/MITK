@@ -31,8 +31,6 @@ This file is based heavily on a corresponding ITK filter.
 #include <mitkFiberBundle.h>
 #include <mitkAcquisitionType.h>
 
-using namespace std;
-
 namespace itk{
 
 /**
@@ -107,9 +105,9 @@ namespace itk{
 
     DoubleVectorType                        m_CoilPosition;
     FiberfoxParameters<double>*             m_Parameters;
-    vector< double >                        m_T2;
-    vector< double >                        m_T1;
-    vector< InputImagePointerType >         m_CompartmentImages;
+    std::vector< double >                   m_T2;
+    std::vector< double >                   m_T1;
+    std::vector< InputImagePointerType >    m_CompartmentImages;
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
     double                                  m_Z;
     int                                     m_Zidx;

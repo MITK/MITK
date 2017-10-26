@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileReader.h>
 #include <mitkLog.h>
 #include <algorithm>
+#include <string>
 
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
@@ -186,7 +187,7 @@ void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionPrope
 }
 
 template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
+void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename)
 {
   if(filename.empty())
     return;
@@ -250,9 +251,9 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
   parameters.put("fiberfox.image.basic.numgradients", m_SignalGen.GetNumWeightedVolumes());
   for( unsigned int i=0; i<this->m_SignalGen.GetNumVolumes(); i++)
   {
-    parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".x", m_SignalGen.GetGradientDirection(i)[0]);
-    parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".y", m_SignalGen.GetGradientDirection(i)[1]);
-    parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".z", m_SignalGen.GetGradientDirection(i)[2]);
+    parameters.put("fiberfox.image.gradients."+boost::lexical_cast<std::string>(i)+".x", m_SignalGen.GetGradientDirection(i)[0]);
+    parameters.put("fiberfox.image.gradients."+boost::lexical_cast<std::string>(i)+".y", m_SignalGen.GetGradientDirection(i)[1]);
+    parameters.put("fiberfox.image.gradients."+boost::lexical_cast<std::string>(i)+".z", m_SignalGen.GetGradientDirection(i)[2]);
   }
 
   parameters.put("fiberfox.image.acquisitiontype", m_SignalGen.m_AcquisitionType);
@@ -318,90 +319,90 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     if (i<m_FiberModelList.size())
     {
       signalModel = m_FiberModelList.at(i);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".type", "fiber");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".type", "fiber");
     }
     else
     {
       signalModel = m_NonFiberModelList.at(i-m_FiberModelList.size());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".type", "non-fiber");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".type", "non-fiber");
     }
 
     if (dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel))
     {
       mitk::StickModel<ScalarType>* model = dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "stick");
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d", model->GetDiffusivity());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "stick");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d", model->GetDiffusivity());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
     }
     else  if (dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel))
     {
       mitk::TensorModel<ScalarType>* model = dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "tensor");
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d1", model->GetDiffusivity1());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d2", model->GetDiffusivity2());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d3", model->GetDiffusivity3());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "tensor");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d1", model->GetDiffusivity1());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d2", model->GetDiffusivity2());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d3", model->GetDiffusivity3());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
     }
     else  if (dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel))
     {
       mitk::RawShModel<ScalarType>* model = dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "prototype");
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".minFA", model->GetFaRange().first);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".maxFA", model->GetFaRange().second);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".minADC", model->GetAdcRange().first);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".maxADC", model->GetAdcRange().second);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".maxNumSamples", model->GetMaxNumKernels());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".numSamples", model->GetNumberOfKernels());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "prototype");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".minFA", model->GetFaRange().first);
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".maxFA", model->GetFaRange().second);
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".minADC", model->GetAdcRange().first);
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".maxADC", model->GetAdcRange().second);
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".maxNumSamples", model->GetMaxNumKernels());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".numSamples", model->GetNumberOfKernels());
       int shOrder = model->GetShOrder();
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".numCoeffs", (shOrder*shOrder + shOrder + 2)/2 + shOrder);
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".numCoeffs", (shOrder*shOrder + shOrder + 2)/2 + shOrder);
 
       for (unsigned int j=0; j<model->GetNumberOfKernels(); j++)
       {
         vnl_vector< double > coeffs = model->GetCoefficients(j);
         for (unsigned int k=0; k<coeffs.size(); k++)
-          parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".kernels."+boost::lexical_cast<string>(j)+".coeffs."+boost::lexical_cast<string>(k), coeffs[k]);
-        parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".kernels."+boost::lexical_cast<string>(j)+".B0", model->GetBaselineSignal(j));
+          parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".kernels."+boost::lexical_cast<std::string>(j)+".coeffs."+boost::lexical_cast<std::string>(k), coeffs[k]);
+        parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".kernels."+boost::lexical_cast<std::string>(j)+".B0", model->GetBaselineSignal(j));
       }
     }
     else  if (dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel))
     {
       mitk::BallModel<ScalarType>* model = dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "ball");
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d", model->GetDiffusivity());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "ball");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d", model->GetDiffusivity());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
     }
     else  if (dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel))
     {
       mitk::AstroStickModel<ScalarType>* model = dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "astrosticks");
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".d", model->GetDiffusivity());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".randomize", model->GetRandomizeSticks());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "astrosticks");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d", model->GetDiffusivity());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".randomize", model->GetRandomizeSticks());
     }
     else  if (dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel))
     {
       mitk::DotModel<ScalarType>* model = dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel);
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".model", "dot");
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t2", model->GetT2());
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".t1", model->GetT1());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "dot");
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
     }
 
     if (signalModel!=nullptr)
     {
-      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".ID", signalModel->m_CompartmentId);
+      parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".ID", signalModel->m_CompartmentId);
 
       if (signalModel->GetVolumeFractionImage().IsNotNull())
       {
         try{
           itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
-          writer->SetFileName(filename+"_VOLUME"+boost::lexical_cast<string>(signalModel->m_CompartmentId)+".nrrd");
+          writer->SetFileName(filename+"_VOLUME"+boost::lexical_cast<std::string>(signalModel->m_CompartmentId)+".nrrd");
           writer->SetInput(signalModel->GetVolumeFractionImage());
           writer->Update();
-          MITK_INFO << "Volume fraction image for compartment "+boost::lexical_cast<string>(signalModel->m_CompartmentId)+" saved.";
+          MITK_INFO << "Volume fraction image for compartment "+boost::lexical_cast<std::string>(signalModel->m_CompartmentId)+" saved.";
         }
         catch(...)
         {
@@ -463,7 +464,7 @@ ParameterType mitk::FiberfoxParameters< ScalarType >::ReadVal(boost::property_tr
 }
 
 template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
+void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename)
 {
   m_MissingTags = "";
   if(filename.empty()) { return; }
@@ -530,9 +531,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
     }
     else if ( v1.first == "image" )
     {
-      m_Misc.m_SignalModelString = ReadVal<string>(v1,"signalmodelstring", m_Misc.m_SignalModelString);
-      m_Misc.m_ArtifactModelString = ReadVal<string>(v1,"artifactmodelstring", m_Misc.m_ArtifactModelString);
-      m_Misc.m_OutputPath = ReadVal<string>(v1,"outpath", m_Misc.m_OutputPath);
+      m_Misc.m_SignalModelString = ReadVal<std::string>(v1,"signalmodelstring", m_Misc.m_SignalModelString);
+      m_Misc.m_ArtifactModelString = ReadVal<std::string>(v1,"artifactmodelstring", m_Misc.m_ArtifactModelString);
+      m_Misc.m_OutputPath = ReadVal<std::string>(v1,"outpath", m_Misc.m_OutputPath);
       m_Misc.m_CheckOutputVolumeFractionsBox = ReadVal<bool>(v1,"outputvolumefractions", m_Misc.m_CheckOutputVolumeFractionsBox);
       m_Misc.m_CheckAdvancedSignalOptionsBox = ReadVal<bool>(v1,"showadvanced", m_Misc.m_CheckAdvancedSignalOptionsBox);
       m_Misc.m_CheckAddDistortionsBox = ReadVal<bool>(v1,"artifacts.doAddDistortions", m_Misc.m_CheckAddDistortionsBox);
@@ -610,7 +611,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
       m_SignalGen.SetGradienDirections(gradients);
 
 
-      m_Misc.m_MotionVolumesBox = ReadVal<string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
+      m_Misc.m_MotionVolumesBox = ReadVal<std::string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
       m_SignalGen.m_MotionVolumes.clear();
 
       if ( m_Misc.m_MotionVolumesBox == "random" )
@@ -623,7 +624,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
       }
       else if ( ! m_Misc.m_MotionVolumesBox.empty() )
       {
-        stringstream stream( m_Misc.m_MotionVolumesBox );
+        std::stringstream stream( m_Misc.m_MotionVolumesBox );
         std::vector<int> numbers;
         int nummer = std::numeric_limits<int>::max();
         while( stream >> nummer )
@@ -680,7 +681,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
       try
       {
-        if (ReadVal<string>(v1,"artifacts.noisetype","")=="rice")
+        if (ReadVal<std::string>(v1,"artifacts.noisetype","")=="rice")
         {
           m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<ScalarType> >();
           m_NoiseModel->SetNoiseVariance(ReadVal<double>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
@@ -694,7 +695,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
       try
       {
-        if (ReadVal<string>(v1,"artifacts.noisetype","")=="chisquare")
+        if (ReadVal<std::string>(v1,"artifacts.noisetype","")=="chisquare")
         {
           m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<ScalarType> >();
           m_NoiseModel->SetNoiseVariance(ReadVal<double>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
@@ -720,9 +721,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
           model->SetBvalue(m_SignalGen.m_Bvalue);
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
-          if (ReadVal<string>(v2,"type","",true)=="fiber")
+          if (ReadVal<std::string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
-          else if (ReadVal<string>(v2,"type","",true)=="non-fiber")
+          else if (ReadVal<std::string>(v2,"type","",true)=="non-fiber")
             m_NonFiberModelList.push_back(model);
           signalModel = model;
         }
@@ -736,9 +737,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
           model->SetBvalue(m_SignalGen.m_Bvalue);
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
-          if (ReadVal<string>(v2,"type","",true)=="fiber")
+          if (ReadVal<std::string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
-          else if (ReadVal<string>(v2,"type","",true)=="non-fiber")
+          else if (ReadVal<std::string>(v2,"type","",true)=="non-fiber")
             m_NonFiberModelList.push_back(model);
           signalModel = model;
         }
@@ -750,9 +751,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
           model->SetBvalue(m_SignalGen.m_Bvalue);
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
-          if (ReadVal<string>(v2,"type","",true)=="fiber")
+          if (ReadVal<std::string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
-          else if (ReadVal<string>(v2,"type","",true)=="non-fiber")
+          else if (ReadVal<std::string>(v2,"type","",true)=="non-fiber")
             m_NonFiberModelList.push_back(model);
           signalModel = model;
         }
@@ -765,9 +766,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetBvalue(m_SignalGen.m_Bvalue);
           model->SetRandomizeSticks(ReadVal<bool>(v2,"randomize",model->GetRandomizeSticks()));
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
-          if (ReadVal<string>(v2,"type","",true)=="fiber")
+          if (ReadVal<std::string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
-          else if (ReadVal<string>(v2,"type","",true)=="non-fiber")
+          else if (ReadVal<std::string>(v2,"type","",true)=="non-fiber")
             m_NonFiberModelList.push_back(model);
           signalModel = model;
         }
@@ -777,9 +778,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
-          if (ReadVal<string>(v2,"type","",true)=="fiber")
+          if (ReadVal<std::string>(v2,"type","",true)=="fiber")
             m_FiberModelList.push_back(model);
-          else if (ReadVal<string>(v2,"type","",true)=="non-fiber")
+          else if (ReadVal<std::string>(v2,"type","",true)=="non-fiber")
             m_NonFiberModelList.push_back(model);
           signalModel = model;
         }
@@ -798,14 +799,14 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             vnl_vector< double > coeffs(numCoeffs);
             for (unsigned int k=0; k<numCoeffs; k++)
             {
-              coeffs[k] = ReadVal<double>(v2,"kernels."+boost::lexical_cast<string>(j)+".coeffs."+boost::lexical_cast<string>(k),0,true);
+              coeffs[k] = ReadVal<double>(v2,"kernels."+boost::lexical_cast<std::string>(j)+".coeffs."+boost::lexical_cast<std::string>(k),0,true);
             }
-            model->SetShCoefficients( coeffs, ReadVal<double>(v2,"kernels."+boost::lexical_cast<string>(j)+".B0",0,true) );
+            model->SetShCoefficients( coeffs, ReadVal<double>(v2,"kernels."+boost::lexical_cast<std::string>(j)+".B0",0,true) );
           }
 
-          if (ReadVal<string>(v2,"type","",true)=="fiber")
+          if (ReadVal<std::string>(v2,"type","",true)=="fiber")
           { m_FiberModelList.push_back(model); }
-          else if (ReadVal<string>(v2,"type","",true)=="non-fiber")
+          else if (ReadVal<std::string>(v2,"type","",true)=="non-fiber")
           { m_NonFiberModelList.push_back(model); }
           // else ?
           signalModel = model;
@@ -817,7 +818,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           try
           {
             itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
-            reader->SetFileName(filename+"_VOLUME"+ReadVal<string>(v2,"ID","")+".nrrd");
+            reader->SetFileName(filename+"_VOLUME"+ReadVal<std::string>(v2,"ID","")+".nrrd");
             reader->Update();
             signalModel->SetVolumeFractionImage(reader->GetOutput());
             MITK_INFO << "Volume fraction image loaded for compartment " << signalModel->m_CompartmentId;

@@ -37,6 +37,7 @@ struct BERRY_UI_QT AbstractTabItem {
 
     virtual void SetBusy(bool  /*busy*/) {}
     virtual void SetBold(bool  /*bold*/) {}
+    virtual void SetLock(bool  /*lock*/) {}
 
     virtual Object::Pointer GetData() = 0;
     virtual void SetData(Object::Pointer data) = 0;

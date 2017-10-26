@@ -74,7 +74,8 @@ int main(int argc, char* argv[])
   parser.addArgument("bundle_based", "", mitkCommandLineParser::Bool, "Bundle based fit:", "fit one weight per input tractogram/bundle, not for each fiber", false);
   parser.addArgument("min_g", "", mitkCommandLineParser::Float, "Min. g:", "lower termination threshold for gradient magnitude", 1e-5);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
-  parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Residuals:", "save residual images", false);
+  parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Save Residuals:", "save residual images", false);
+  parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
   parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -92,6 +93,10 @@ int main(int argc, char* argv[])
   bool save_residuals = false;
   if (parsedArgs.count("save_res"))
     save_residuals = us::any_cast<bool>(parsedArgs["save_res"]);
+
+  bool save_weights = false;
+  if (parsedArgs.count("save_weights"))
+    save_weights = us::any_cast<bool>(parsedArgs["save_weights"]);
 
   int max_iter = 20;
   if (parsedArgs.count("max_iter"))
@@ -182,6 +187,15 @@ int main(int argc, char* argv[])
       std::string name = fib_names.at(bundle);
       name = ist::GetFilenameWithoutExtension(name);
       mitk::IOUtil::Save(output_tracts.at(bundle), outRoot + name + "_fitted.fib");
+
+      if (save_weights)
+      {
+        ofstream logfile;
+        logfile.open (outRoot + name + "_weights.txt");
+        for (int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
+          logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
+        logfile.close();
+      }
     }
   }
   catch (itk::ExceptionObject e)

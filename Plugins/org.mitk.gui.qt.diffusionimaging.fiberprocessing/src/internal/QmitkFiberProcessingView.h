@@ -97,6 +97,7 @@ protected:
   void DoCurvatureColorCoding();    ///< color fibers by curvature
   void CompressSelectedBundles();   ///< remove points below certain error threshold
   void WeightFibers();
+  void ApplyWeightThreshold();
 
   void RemoveWithMask(bool removeInside);
   void RemoveDir();

@@ -55,14 +55,19 @@ public:
   itkGetMacro( Verbose, bool)
   itkSetMacro( DeepCopy, bool)
   itkGetMacro( DeepCopy, bool)
+  itkSetMacro( ResampleFibers, bool)
+  itkGetMacro( ResampleFibers, bool)
 
   itkGetMacro( Weights, vnl_vector<double>)
+  itkGetMacro( RmsDiffPerBundle, vnl_vector<double>)
+  itkGetMacro( RmsDiffPerFiber, vnl_vector<double>)
   itkGetMacro( FittedImage, PeakImgType::Pointer)
   itkGetMacro( ResidualImage, PeakImgType::Pointer)
   itkGetMacro( OverexplainedImage, PeakImgType::Pointer)
   itkGetMacro( UnderexplainedImage, PeakImgType::Pointer)
   itkGetMacro( Coverage, double)
   itkGetMacro( Overshoot, double)
+  itkGetMacro( RMSE, double)
   itkGetMacro( MeanWeight, double)
   itkGetMacro( MedianWeight, double)
   itkGetMacro( MinWeight, double)
@@ -94,6 +99,7 @@ protected:
   float                                       m_FiberSampling;
   double                                      m_Coverage;
   double                                      m_Overshoot;
+  double                                      m_RMSE;
   bool                                        m_FilterOutliers;
   double                                      m_MeanWeight;
   double                                      m_MedianWeight;
@@ -101,12 +107,15 @@ protected:
   double                                      m_MaxWeight;
   bool                                        m_Verbose;
   bool                                        m_DeepCopy;
+  bool                                        m_ResampleFibers;
   unsigned int                                m_NumUnknowns;
   unsigned int                                m_NumResiduals;
   unsigned int                                m_NumCoveredDirections;
 
   // output
+  vnl_vector<double>                          m_RmsDiffPerBundle;
   vnl_vector<double>                          m_Weights;
+  vnl_vector<double>                          m_RmsDiffPerFiber;
   PeakImgType::Pointer                        m_UnderexplainedImage;
   PeakImgType::Pointer                        m_OverexplainedImage;
   PeakImgType::Pointer                        m_ResidualImage;

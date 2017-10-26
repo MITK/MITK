@@ -59,6 +59,7 @@ public:
   itkSetMacro( DoFiberResampling, bool )
   itkSetMacro( WorkOnFiberCopy, bool )
   itkGetMacro( MaxDensity, OutPixelType)
+  itkGetMacro( NumCoveredVoxels, unsigned int)
 
   void GenerateData();
 
@@ -80,6 +81,7 @@ protected:
   bool                              m_DoFiberResampling;
   bool                              m_WorkOnFiberCopy;
   OutPixelType                      m_MaxDensity;
+  unsigned int                      m_NumCoveredVoxels;
 };
 
 }

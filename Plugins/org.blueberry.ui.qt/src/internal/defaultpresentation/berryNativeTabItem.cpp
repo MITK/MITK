@@ -130,7 +130,7 @@ void NativeTabItem::SetLock(bool lock)
   // disabled butoon looks same so hide it
   // TODO: add icon for QIcon::Disabled and uncomment
   //this->closeButton->setEnabled(!busy);
-  this->closeButton->setVisible(lock);
+  this->closeButton->setVisible(!lock);
 }
 
 }

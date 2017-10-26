@@ -174,7 +174,7 @@ public:
         return out;
     }
 
-    void StartSimulation(FiberfoxParameters<double> parameters, mitk::Image::Pointer refImage, string out)
+    void StartSimulation(FiberfoxParameters<double> parameters, mitk::Image::Pointer refImage, std::string out)
     {
         itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
         tractsToDwiFilter->SetUseConstantRandSeed(true);

@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
 
-using namespace std;
-
 namespace itk{
 
 /**

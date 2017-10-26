@@ -780,24 +780,24 @@ namespace itk
     if (m_mmRadius>0)
     {
       m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
-      stringstream stream;
-      stream << fixed << setprecision(2) << max_density * m_SegmentVolume;
-      string s = stream.str();
+      std::stringstream stream;
+      stream << std::fixed << setprecision(2) << max_density * m_SegmentVolume;
+      std::string s = stream.str();
       PrintToLog("\nMax. fiber volume: " + s + "mm².", false, true, true);
     }
     else
     {
-      stringstream stream;
-      stream << fixed << setprecision(2) << max_density * m_SegmentVolume;
-      string s = stream.str();
+      std::stringstream stream;
+      stream << std::fixed << setprecision(2) << max_density * m_SegmentVolume;
+      std::string s = stream.str();
       PrintToLog("\nMax. fiber volume: " + s + "mm² (before rescaling to voxel volume).", false, true, true);
     }
     float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
     float new_seg_vol = voxel_volume/max_density;
     float new_fib_radius = 1000*std::sqrt(new_seg_vol*volumeAccuracy/(minSpacing*M_PI));
-    stringstream stream;
-    stream << fixed << setprecision(2) << new_fib_radius;
-    string s = stream.str();
+    std::stringstream stream;
+    stream << std::fixed << setprecision(2) << new_fib_radius;
+    std::string s = stream.str();
     PrintToLog("\nA full fiber voxel corresponds to a fiber radius of ~" + s + "µm, given the current fiber configuration.", false, true, true);
 
     // a second fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
@@ -1265,7 +1265,7 @@ namespace itk
 
 
   template< class PixelType >
-  void TractsToDWIImageFilter< PixelType >::PrintToLog(string m, bool addTime, bool linebreak, bool stdOut)
+  void TractsToDWIImageFilter< PixelType >::PrintToLog(std::string m, bool addTime, bool linebreak, bool stdOut)
   {
     // timestamp
     if (addTime)

@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionEventObserver.h>
 // Qt
 #include <QObject>
-using namespace mitk;
-using namespace std;
 
 /**
  * @brief This handler returns either the pixelvalue or anatomical label of the current position of the crosshair inside a visible parcellation.

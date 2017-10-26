@@ -31,15 +31,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <itkTractDensityImageFilter.h>
 
-using namespace std;
 typedef itksys::SystemTools ist;
 typedef itk::Point<float, 4> PointType4;
 typedef itk::Image< float, 4 >  PeakImgType;
 typedef itk::Image< unsigned char, 3 >  ItkUcharImageType;
 
-std::vector< string > get_file_list(const std::string& path, std::vector< string > extensions={".fib", ".trk"})
+std::vector< std::string > get_file_list(const std::string& path, std::vector< std::string > extensions={".fib", ".trk"})
 {
-  std::vector< string > file_list;
+  std::vector< std::string > file_list;
   itk::Directory::Pointer dir = itk::Directory::New();
 
   if (dir->Load(path.c_str()))
@@ -103,14 +102,14 @@ int main(int argc, char* argv[])
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  string anchors_file = us::any_cast<string>(parsedArgs["i1"]);
-  string peak_file_name = us::any_cast<string>(parsedArgs["i2"]);
-  string candidate_folder = us::any_cast<string>(parsedArgs["i3"]);
-  string out_folder = us::any_cast<string>(parsedArgs["o"]);
+  std::string anchors_file = us::any_cast<std::string>(parsedArgs["i1"]);
+  std::string peak_file_name = us::any_cast<std::string>(parsedArgs["i2"]);
+  std::string candidate_folder = us::any_cast<std::string>(parsedArgs["i3"]);
+  std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
 
   bool greedy_add = false;
   if (parsedArgs.count("greedy_add"))
@@ -124,13 +123,13 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("dont_filter_outliers"))
     filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
 
-  string mask_file = "";
+  std::string mask_file = "";
   if (parsedArgs.count("mask"))
-    mask_file = us::any_cast<string>(parsedArgs["mask"]);
+    mask_file = us::any_cast<std::string>(parsedArgs["mask"]);
 
-  string reference_mask_folder = "";
+  std::string reference_mask_folder = "";
   if (parsedArgs.count("reference_mask_folder"))
-    reference_mask_folder = us::any_cast<string>(parsedArgs["reference_mask_folder"]);
+    reference_mask_folder = us::any_cast<std::string>(parsedArgs["reference_mask_folder"]);
 
   try
   {
@@ -144,8 +143,8 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "Loading data";
 
-    streambuf *old = cout.rdbuf(); // <-- save
-    stringstream ss;
+    std::streambuf *old = cout.rdbuf(); // <-- save
+    std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());       // <-- redirect
 
     ofstream logfile;
@@ -172,7 +171,7 @@ int main(int argc, char* argv[])
     }
 
     // Load masks covering the true positives for evaluation purposes
-    std::vector< string > reference_mask_filenames;
+    std::vector< std::string > reference_mask_filenames;
     std::vector< itk::FitFibersToImageFilter::UcharImgType::Pointer > reference_masks;
     if (reference_mask_folder.compare("")!=0)
     {
@@ -195,8 +194,8 @@ int main(int argc, char* argv[])
 
     // Load all candidate tracts
     std::vector< mitk::FiberBundle::Pointer > input_candidates;
-    std::vector< string > candidate_tract_files = get_file_list(candidate_folder);
-    for (string f : candidate_tract_files)
+    std::vector< std::string > candidate_tract_files = get_file_list(candidate_folder);
+    for (std::string f : candidate_tract_files)
     {
       mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
       if (fib.IsNull())
@@ -216,8 +215,8 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer anchor_tractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(anchors_file)[0].GetPointer());
     if ( !(anchor_tractogram.IsNull() || anchor_tractogram->GetNumFibers()==0) )
     {
-      streambuf *old = cout.rdbuf(); // <-- save
-      stringstream ss;
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       anchor_tractogram->ResampleLinear(minSpacing/10.0);
       std::cout.rdbuf (old);              // <-- restore
@@ -243,7 +242,7 @@ int main(int argc, char* argv[])
 
       peak_image = fitter->GetUnderexplainedImage();
       peak_image_writer->SetInput(peak_image);
-      peak_image_writer->SetFileName(out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".nrrd");
+      peak_image_writer->SetFileName(out_folder + boost::lexical_cast<std::string>(iteration) + "_" + name + ".nrrd");
       peak_image_writer->Update();
     }
 
@@ -270,12 +269,12 @@ int main(int argc, char* argv[])
         fib->SetFiberWeights( log_rms_diff[c] );
         fib->ColorFibersByFiberWeights(false, true);
 
-        string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
+        std::string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
 
-        streambuf *old = cout.rdbuf(); // <-- save
-        stringstream ss;
+        std::streambuf *old = cout.rdbuf(); // <-- save
+        std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-        mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<string>((int)(10000*rms_diff[c])) + "_" + bundle_name + ".fib");
+        mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(10000*rms_diff[c])) + "_" + bundle_name + ".fib");
 
         float best_overlap = 0;
         int best_overlap_index = -1;
@@ -344,8 +343,8 @@ int main(int argc, char* argv[])
           // ******************************
           fitter->SetTractograms({input_candidates.at(i)});
 
-          streambuf *old = cout.rdbuf(); // <-- save
-          stringstream ss;
+          std::streambuf *old = cout.rdbuf(); // <-- save
+          std::stringstream ss;
           std::cout.rdbuf (ss.rdbuf());       // <-- redirect
           fitter->Update();
           std::cout.rdbuf (old);              // <-- restore
@@ -369,7 +368,7 @@ int main(int argc, char* argv[])
 
         int i=0;
         std::vector< mitk::FiberBundle::Pointer > remaining_candidates;
-        std::vector< string > remaining_candidate_files;
+        std::vector< std::string > remaining_candidate_files;
         for (auto fib : input_candidates)
         {
           if (fib!=best_candidate)
@@ -385,13 +384,13 @@ int main(int argc, char* argv[])
         candidate_tract_files = remaining_candidate_files;
 
         iteration++;
-        streambuf *old = cout.rdbuf(); // <-- save
-        stringstream ss;
+        std::streambuf *old = cout.rdbuf(); // <-- save
+        std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
         // Save winning candidate
-        mitk::IOUtil::Save(best_candidate, out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".fib");
+        mitk::IOUtil::Save(best_candidate, out_folder + boost::lexical_cast<std::string>(iteration) + "_" + name + ".fib");
         peak_image_writer->SetInput(peak_image);
-        peak_image_writer->SetFileName(out_folder + boost::lexical_cast<string>(iteration) + "_" + name + ".nrrd");
+        peak_image_writer->SetFileName(out_folder + boost::lexical_cast<std::string>(iteration) + "_" + name + ".nrrd");
         peak_image_writer->Update();
 
         // Calculate best overlap with reference masks for evaluation purposes

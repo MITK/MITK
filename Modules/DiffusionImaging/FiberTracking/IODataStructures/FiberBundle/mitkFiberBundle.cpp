@@ -50,8 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const char* mitk::FiberBundle::FIBER_ID_ARRAY = "Fiber_IDs";
 
-using namespace std;
-
 mitk::FiberBundle::FiberBundle( vtkPolyData* fiberPolyData )
   : m_NumFibers(0)
 {
@@ -656,7 +654,7 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool, bool normalize)
   mitkLookup->SetVtkLookupTable(lookupTable);
   mitkLookup->SetType(mitk::LookupTable::JET);
 
-  vector< double > values;
+  std::vector< double > values;
   double min = 1;
   double max = 0;
   MITK_INFO << "Coloring fibers by curvature";

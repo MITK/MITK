@@ -405,31 +405,31 @@ bool GibbsTrackingFilter< ItkOdfImageType >::LoadParameters()
     hRoot = TiXmlHandle(pElem);
     pElem = hRoot.FirstChildElement("parameter_set").Element();
 
-    string iterations(pElem->Attribute("iterations"));
+    std::string iterations(pElem->Attribute("iterations"));
     m_Iterations = boost::lexical_cast<double>(iterations);
 
-    string particleLength(pElem->Attribute("particle_length"));
+    std::string particleLength(pElem->Attribute("particle_length"));
     m_ParticleLength = boost::lexical_cast<float>(particleLength);
 
-    string particleWidth(pElem->Attribute("particle_width"));
+    std::string particleWidth(pElem->Attribute("particle_width"));
     m_ParticleWidth = boost::lexical_cast<float>(particleWidth);
 
-    string partWeight(pElem->Attribute("particle_weight"));
+    std::string partWeight(pElem->Attribute("particle_weight"));
     m_ParticleWeight = boost::lexical_cast<float>(partWeight);
 
-    string startTemp(pElem->Attribute("temp_start"));
+    std::string startTemp(pElem->Attribute("temp_start"));
     m_StartTemperature = boost::lexical_cast<float>(startTemp);
 
-    string endTemp(pElem->Attribute("temp_end"));
+    std::string endTemp(pElem->Attribute("temp_end"));
     m_EndTemperature = boost::lexical_cast<float>(endTemp);
 
-    string inExBalance(pElem->Attribute("inexbalance"));
+    std::string inExBalance(pElem->Attribute("inexbalance"));
     m_InexBalance = boost::lexical_cast<float>(inExBalance);
 
-    string fiberLength(pElem->Attribute("fiber_length"));
+    std::string fiberLength(pElem->Attribute("fiber_length"));
     m_MinFiberLength = boost::lexical_cast<float>(fiberLength);
 
-    string curvThres(pElem->Attribute("curvature_threshold"));
+    std::string curvThres(pElem->Attribute("curvature_threshold"));
     m_CurvatureThreshold = cos(boost::lexical_cast<float>(curvThres)*M_PI/180);
     m_AbortTracking = false;
     MITK_INFO << "GibbsTrackingFilter: parameter file loaded successfully";
@@ -465,15 +465,15 @@ bool GibbsTrackingFilter< ItkOdfImageType >::SaveParameters()
     documentXML.LinkEndChild(mainXML);
 
     TiXmlElement* paramXML = new TiXmlElement("parameter_set");
-    paramXML->SetAttribute("iterations", boost::lexical_cast<string>(m_Iterations));
-    paramXML->SetAttribute("particle_length", boost::lexical_cast<string>(m_ParticleLength));
-    paramXML->SetAttribute("particle_width", boost::lexical_cast<string>(m_ParticleWidth));
-    paramXML->SetAttribute("particle_weight", boost::lexical_cast<string>(m_ParticleWeight));
-    paramXML->SetAttribute("temp_start", boost::lexical_cast<string>(m_StartTemperature));
-    paramXML->SetAttribute("temp_end", boost::lexical_cast<string>(m_EndTemperature));
-    paramXML->SetAttribute("inexbalance", boost::lexical_cast<string>(m_InexBalance));
-    paramXML->SetAttribute("fiber_length", boost::lexical_cast<string>(m_MinFiberLength));
-    paramXML->SetAttribute("curvature_threshold", boost::lexical_cast<string>(m_CurvatureThreshold));
+    paramXML->SetAttribute("iterations", boost::lexical_cast<std::string>(m_Iterations));
+    paramXML->SetAttribute("particle_length", boost::lexical_cast<std::string>(m_ParticleLength));
+    paramXML->SetAttribute("particle_width", boost::lexical_cast<std::string>(m_ParticleWidth));
+    paramXML->SetAttribute("particle_weight", boost::lexical_cast<std::string>(m_ParticleWeight));
+    paramXML->SetAttribute("temp_start", boost::lexical_cast<std::string>(m_StartTemperature));
+    paramXML->SetAttribute("temp_end", boost::lexical_cast<std::string>(m_EndTemperature));
+    paramXML->SetAttribute("inexbalance", boost::lexical_cast<std::string>(m_InexBalance));
+    paramXML->SetAttribute("fiber_length", boost::lexical_cast<std::string>(m_MinFiberLength));
+    paramXML->SetAttribute("curvature_threshold", boost::lexical_cast<std::string>(m_CurvatureThreshold));
     mainXML->LinkEndChild(paramXML);
 
     if(!boost::algorithm::ends_with(m_SaveParameterFile, ".gtp"))

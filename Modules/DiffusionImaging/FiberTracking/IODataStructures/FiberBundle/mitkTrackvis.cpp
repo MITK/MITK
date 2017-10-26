@@ -8,7 +8,7 @@ TrackVisFiberReader::~TrackVisFiberReader() { if (m_FilePointer) fclose( m_FileP
 
 // Create a TrackVis file and store standard metadata. The file is ready to append fibers.
 // ---------------------------------------------------------------------------------------
-short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib, bool lps)
+short TrackVisFiberReader::create(std::string filename , const mitk::FiberBundle *fib, bool lps)
 {
   // prepare the header
   for(int i=0; i<3 ;i++)
@@ -72,9 +72,9 @@ short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib
 // Open an existing TrackVis file and read metadata information.
 // The file pointer is positiond at the beginning of fibers data
 // -------------------------------------------------------------
-short TrackVisFiberReader::open( string filename )
+short TrackVisFiberReader::open( std::string filename )
 {
-  m_FilePointer = fopen(filename.c_str(), "rb");
+  m_FilePointer = std::fopen(filename.c_str(), "rb");
   if (m_FilePointer == nullptr)
   {
     printf("[ERROR] Unable to open file '%s'\n",filename.c_str());

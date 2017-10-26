@@ -47,18 +47,18 @@ int main(int argc, char* argv[])
   parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "Input tractogram or diffusion-weighted image.", us::Any(), false);
   parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "output volume fraction images etc.", us::Any());
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
   {
     return EXIT_FAILURE;
   }
-  string outName = us::any_cast<string>(parsedArgs["out"]);
-  string paramName = us::any_cast<string>(parsedArgs["parameters"]);
+  std::string outName = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string paramName = us::any_cast<std::string>(parsedArgs["parameters"]);
 
-  string input="";
+  std::string input="";
   if (parsedArgs.count("input"))
   {
-    input = us::any_cast<string>(parsedArgs["input"]);
+    input = us::any_cast<std::string>(parsedArgs["input"]);
   }
   bool verbose = false;
   if (parsedArgs.count("verbose"))
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   parameters.LoadParameters(paramName);
 
   // Test if /path/dir is an existing directory:
-  string file_extension = "";
+  std::string file_extension = "";
   if( itksys::SystemTools::FileIsDirectory( outName ) )
   {
     while( *(--(outName.cend())) == '/')
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer image = mitk::Image::New();
       image->InitializeByItk(volumeFractions.at(k).GetPointer());
       image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
-      mitk::IOUtil::Save(image, outName+"_Compartment"+boost::lexical_cast<string>(k+1)+".nrrd");
+      mitk::IOUtil::Save(image, outName+"_Compartment"+boost::lexical_cast<std::string>(k+1)+".nrrd");
     }
 
     if (tractsToDwiFilter->GetPhaseImage().IsNotNull())

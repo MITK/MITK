@@ -32,7 +32,7 @@ int mitkFiberGenerationTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(argc==6,"check for input data")
 
             try{
-              
+
         mitk::PlanarEllipse::Pointer pf1 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
         mitk::PlanarEllipse::Pointer pf2 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[2])[0].GetPointer());
         mitk::PlanarEllipse::Pointer pf3 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[3])[0].GetPointer());
@@ -40,8 +40,8 @@ int mitkFiberGenerationTest(int argc, char* argv[])
         mitk::FiberBundle::Pointer gaussian = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[5])[0].GetPointer());
 
         FiberGenerationParameters parameters;
-        vector< mitk::PlanarEllipse::Pointer > fid; fid.push_back(pf1); fid.push_back(pf2); fid.push_back(pf3);
-        vector< unsigned int > flip; flip.push_back(0); flip.push_back(0); flip.push_back(0);
+        std::vector< mitk::PlanarEllipse::Pointer > fid; fid.push_back(pf1); fid.push_back(pf2); fid.push_back(pf3);
+        std::vector< unsigned int > flip; flip.push_back(0); flip.push_back(0); flip.push_back(0);
         parameters.m_Fiducials.push_back(fid); parameters.m_FlipList.push_back(flip);
         parameters.m_Density = 50;
         parameters.m_Tension = 0;
@@ -56,7 +56,7 @@ int mitkFiberGenerationTest(int argc, char* argv[])
             parameters.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
             filter->SetParameters(parameters);
             filter->Update();
-            vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
+            std::vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
             MITK_TEST_CONDITION_REQUIRED(uniform->Equals(fiberBundles.at(0)),"check uniform bundle")
         }
 
@@ -67,7 +67,7 @@ int mitkFiberGenerationTest(int argc, char* argv[])
             filter->SetParameters(parameters);
             filter->SetParameters(parameters);
             filter->Update();
-            vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
+            std::vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
             MITK_TEST_CONDITION_REQUIRED(gaussian->Equals(fiberBundles.at(0)),"check gaussian bundle")
         }
     }

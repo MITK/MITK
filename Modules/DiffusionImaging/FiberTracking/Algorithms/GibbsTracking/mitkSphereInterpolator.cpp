@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static const std::string BaryCoordsFileName = "FiberTrackingLUTBaryCoords.bin";
 static const std::string IndicesFileName = "FiberTrackingLUTIndices.bin";
 
-SphereInterpolator::SphereInterpolator(const string& lutPath)
+SphereInterpolator::SphereInterpolator(const std::string& lutPath)
 {
   m_ValidState = true;
   if (lutPath.length()==0)
@@ -64,11 +64,11 @@ SphereInterpolator::~SphereInterpolator()
 
 }
 
-bool SphereInterpolator::LoadLookuptables(const string& lutPath)
+bool SphereInterpolator::LoadLookuptables(const std::string& lutPath)
 {
   MITK_INFO << "SphereInterpolator: loading lookuptables from custom path: " << lutPath;
 
-  string path = lutPath; path.append(BaryCoordsFileName);
+  std::string path = lutPath; path.append(BaryCoordsFileName);
   std::ifstream BaryCoordsStream;
   BaryCoordsStream.open(path.c_str(), ios::in | ios::binary);
   MITK_INFO << "SphereInterpolator: 1 " << path;

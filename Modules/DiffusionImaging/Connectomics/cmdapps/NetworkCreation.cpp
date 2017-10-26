@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 
-using namespace std;
-
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -44,7 +42,7 @@ int main(int argc, char* argv[])
   parser.addArgument("radius", "r", mitkCommandLineParser::Int, "Radius", "Search radius in mm", 15, true);
   parser.addArgument("noCenterOfMass", "com", mitkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
 
     // load fiber image
     std::vector<mitk::BaseData::Pointer> fiberInfile =
-      mitk::IOUtil::Load( fiberFilename);
+        mitk::IOUtil::Load( fiberFilename);
     if( fiberInfile.empty() )
     {
       std::string errorMessage = "Fiber Image at " + fiberFilename + " could not be read. Aborting.";
@@ -83,7 +81,7 @@ int main(int argc, char* argv[])
 
     // load parcellation
     std::vector<mitk::BaseData::Pointer> parcellationInFile =
-      mitk::IOUtil::Load( parcellationFilename);
+        mitk::IOUtil::Load( parcellationFilename);
     if( parcellationInFile.empty() )
     {
       std::string errorMessage = "Parcellation at " + parcellationFilename + " could not be read. Aborting.";

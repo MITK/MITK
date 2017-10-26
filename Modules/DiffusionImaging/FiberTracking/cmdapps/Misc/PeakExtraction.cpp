@@ -33,8 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 
-using namespace std;
-
 template<int shOrder>
 int StartPeakExtraction(int argc, char* argv[])
 {
@@ -47,7 +45,7 @@ int StartPeakExtraction(int argc, char* argv[])
     parser.addArgument("numpeaks", "p", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
     parser.addArgument("peakthres", "r", mitkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);
     parser.addArgument("abspeakthres", "a", mitkCommandLineParser::Float, "Absolute peak threshold", "absolute peak threshold weighted with local GFA value", 0.06, true);
-    parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
+    parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", std::string("MITK"), true);
     parser.addArgument("noFlip", "f", mitkCommandLineParser::Bool, "No flip", "do not flip input image to match MITK coordinate convention");
     parser.addArgument("clusterThres", "c", mitkCommandLineParser::Float, "Clustering threshold", "directions closer together than the specified angular threshold will be clustered (in rad)", 0.9);
     parser.addArgument("flipX", "fx", mitkCommandLineParser::Bool, "Flip X", "Flip peaks in x direction");
@@ -60,18 +58,18 @@ int StartPeakExtraction(int argc, char* argv[])
     parser.setDescription("");
     parser.setContributor("MIC");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     // mandatory arguments
-    string imageName = us::any_cast<string>(parsedArgs["image"]);
-    string outRoot = us::any_cast<string>(parsedArgs["outroot"]);
+    std::string imageName = us::any_cast<std::string>(parsedArgs["image"]);
+    std::string outRoot = us::any_cast<std::string>(parsedArgs["outroot"]);
 
     // optional arguments
-    string maskImageName("");
+    std::string maskImageName("");
     if (parsedArgs.count("mask"))
-        maskImageName = us::any_cast<string>(parsedArgs["mask"]);
+        maskImageName = us::any_cast<std::string>(parsedArgs["mask"]);
 
     int normalization = 1;
     if (parsedArgs.count("normalization"))
@@ -133,7 +131,7 @@ int StartPeakExtraction(int argc, char* argv[])
 
         if (parsedArgs.count("shConvention"))
         {
-            string convention = us::any_cast<string>(parsedArgs["shConvention"]).c_str();
+            std::string convention = us::any_cast<std::string>(parsedArgs["shConvention"]).c_str();
             if ( boost::algorithm::equals(convention, "FSL") )
             {
                 toolkitConvention = 1;
@@ -266,7 +264,7 @@ int StartPeakExtraction(int argc, char* argv[])
         // write direction image
         {
             typename MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
-            string outfilename = outRoot;
+            std::string outfilename = outRoot;
             outfilename.append("_PEAKS.nrrd");
 
             typedef itk::ImageFileWriter< typename MaximaExtractionFilterType::PeakImageType > WriterType;
@@ -286,7 +284,7 @@ int StartPeakExtraction(int argc, char* argv[])
                 numDirImage->SetOrigin(itkMaskImage->GetOrigin());
             }
 
-            string outfilename = outRoot.c_str();
+            std::string outfilename = outRoot.c_str();
             outfilename.append("_NUM_PEAKS.nrrd");
             typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
             WriterType::Pointer writer = WriterType::New();
@@ -328,7 +326,7 @@ int main(int argc, char* argv[])
     parser.addArgument("numpeaks", "p", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
     parser.addArgument("peakthres", "r", mitkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);
     parser.addArgument("abspeakthres", "a", mitkCommandLineParser::Float, "Absolute peak threshold", "absolute peak threshold weighted with local GFA value", 0.06, true);
-    parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
+    parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", std::string("MITK"), true);
     parser.addArgument("noFlip", "f", mitkCommandLineParser::Bool, "No flip", "do not flip input image to match MITK coordinate convention");
 
     parser.setCategory("Preprocessing Tools");
@@ -336,7 +334,7 @@ int main(int argc, char* argv[])
     parser.setDescription("Extract maxima in the input spherical harmonics image.");
     parser.setContributor("MIC");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 

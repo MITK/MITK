@@ -35,8 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkResampleImageFilter.h"
 #include "itkNrrdImageIO.h"
 
-using namespace std;
-
 typedef std::vector<std::string> FileListType;
 typedef itk::Image<double, 3> InputImageType;
 
@@ -239,7 +237,7 @@ int main( int argc, char* argv[] )
   parser.addArgument("sinc-int", "s", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   // Handle special arguments
   bool silent = false;
@@ -270,11 +268,11 @@ int main( int argc, char* argv[] )
   }
   std::string refPattern = "";
   bool useFirstMoving = false;
-  std::string movingImgPattern = us::any_cast<string>(parsedArgs["moving"]);
+  std::string movingImgPattern = us::any_cast<std::string>(parsedArgs["moving"]);
 
   if (parsedArgs.count("fixed"))
   {
-    refPattern = us::any_cast<string>(parsedArgs["fixed"]);
+    refPattern = us::any_cast<std::string>(parsedArgs["fixed"]);
   }
   else
   {
@@ -282,9 +280,9 @@ int main( int argc, char* argv[] )
     refPattern = movingImgPattern;
   }
 
-  std::string outputPath = us::any_cast<string>(parsedArgs["output"]);
+  std::string outputPath = us::any_cast<std::string>(parsedArgs["output"]);
 
-  std::string inputPath = us::any_cast<string>(parsedArgs["input"]);
+  std::string inputPath = us::any_cast<std::string>(parsedArgs["input"]);
   //QString resampleReference = parsedArgs["resample"].toString();
   //bool maskTumor = parsedArgs["usemask"].toBool();
 
@@ -293,7 +291,7 @@ int main( int argc, char* argv[] )
 
   if (parsedArgs.count("derived") || parsedArgs.count("d") )
   {
-    std::string arg =  us::any_cast<string>(parsedArgs["derived"]);
+    std::string arg =  us::any_cast<std::string>(parsedArgs["derived"]);
     derPatterns = split(arg ,',');
   }
 
@@ -303,7 +301,7 @@ int main( int argc, char* argv[] )
   bool doResampling = false;
   if (parsedArgs.count("resample") || parsedArgs.count("d") )
   {
-    std::string arg =  us::any_cast<string>(parsedArgs["resample"]);
+    std::string arg =  us::any_cast<std::string>(parsedArgs["resample"]);
     spacings = split(arg ,',');
     spacing[0] = atoi(spacings.at(0).c_str());
     spacing[1] = atoi(spacings.at(1).c_str());

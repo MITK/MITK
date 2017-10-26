@@ -34,14 +34,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <itkImageFileWriter.h>
 
-using namespace std;
 typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 typedef itk::Image<unsigned int, 3>    ItkUIntImgType;
 
-std::vector< string > get_file_list(const std::string& path, std::vector< string > extensions={".fib", ".trk"})
+std::vector< std::string > get_file_list(const std::string& path, std::vector< std::string > extensions={".fib", ".trk"})
 {
-  std::vector< string > file_list;
+  std::vector< std::string > file_list;
   itk::Directory::Pointer dir = itk::Directory::New();
 
   if (dir->Load(path.c_str()))
@@ -81,12 +80,12 @@ int main(int argc, char* argv[])
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "output folder", us::Any(), false);
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Tracts with overlap larger than this threshold are merged", false, 0.8);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  string input_folder = us::any_cast<string>(parsedArgs["in"]);
-  string out_folder = us::any_cast<string>(parsedArgs["out"]);
+  std::string input_folder = us::any_cast<std::string>(parsedArgs["in"]);
+  std::string out_folder = us::any_cast<std::string>(parsedArgs["out"]);
 
   float overlap = 0.8;
   if (parsedArgs.count("overlap"))
@@ -98,16 +97,16 @@ int main(int argc, char* argv[])
       ist::RemoveADirectory(out_folder);
     ist::MakeDirectory(out_folder);
 
-    std::vector< string > fib_files = get_file_list(input_folder, {".fib", ".trk", ".tck"});
+    std::vector< std::string > fib_files = get_file_list(input_folder, {".fib", ".trk", ".tck"});
     if (fib_files.empty())
       return EXIT_FAILURE;
 
-    streambuf *old = cout.rdbuf(); // <-- save
-    stringstream ss;
+    std::streambuf *old = cout.rdbuf(); // <-- save
+    std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());       // <-- redirect
 
     std::vector< mitk::FiberBundle::Pointer > fibs;
-    for (string f : fib_files)
+    for (std::string f : fib_files)
     {
       mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
       fibs.push_back(fib);
@@ -126,8 +125,8 @@ int main(int argc, char* argv[])
 
     for (int its = 0; its<3; its++)
     {
-      streambuf *old = cout.rdbuf(); // <-- save
-      stringstream ss;
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
 
       std::vector< ItkUcharImgType::Pointer > mask_images;
@@ -224,10 +223,10 @@ int main(int argc, char* argv[])
     int c = 0;
     for (auto fib : fibs)
     {
-      streambuf *old = cout.rdbuf(); // <-- save
-      stringstream ss;
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      mitk::IOUtil::Save(fib, out_folder + "/bundle_" + boost::lexical_cast<string>(c) + ".trk");
+      mitk::IOUtil::Save(fib, out_folder + "/bundle_" + boost::lexical_cast<std::string>(c) + ".trk");
       std::cout.rdbuf (old);              // <-- restore
 
       ++c;

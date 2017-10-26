@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 /*!
 \brief Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)
 */
@@ -52,18 +50,18 @@ int main(int argc, char* argv[])
     parser.setDescription("Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)");
     parser.setContributor("MIC");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     mitkCommandLineParser::StringContainerType testImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["test"]);
     mitkCommandLineParser::StringContainerType referenceImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["reference"]);
 
-    string maskImage("");
+    std::string maskImage("");
     if (parsedArgs.count("mask"))
-        maskImage = us::any_cast<string>(parsedArgs["mask"]);
+        maskImage = us::any_cast<std::string>(parsedArgs["mask"]);
 
-    string outRoot = us::any_cast<string>(parsedArgs["out"]);
+    std::string outRoot = us::any_cast<std::string>(parsedArgs["out"]);
 
     bool verbose = false;
     if (parsedArgs.count("verbose"))
@@ -147,7 +145,7 @@ int main(int argc, char* argv[])
             typedef itk::ImageFileWriter< EvaluationFilterType::OutputImageType > WriterType;
             WriterType::Pointer writer = WriterType::New();
 
-            string outfilename = outRoot;
+            std::string outfilename = outRoot;
             outfilename.append("_ERROR_IMAGE.nrrd");
 
             writer->SetFileName(outfilename.c_str());
@@ -155,35 +153,35 @@ int main(int argc, char* argv[])
             writer->Update();
         }
 
-        string logFile = outRoot;
+        std::string logFile = outRoot;
         logFile.append("_ANGULAR_ERROR.csv");
 
         ofstream file;
         file.open (logFile.c_str());
 
-        string sens = "Mean:";
+        std::string sens = "Mean:";
         sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMeanAngularError()));
+        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMeanAngularError()));
         sens.append(";\n");
 
         sens.append("Median:");
         sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMedianAngularError()));
+        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMedianAngularError()));
         sens.append(";\n");
 
         sens.append("Maximum:");
         sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMaxAngularError()));
+        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMaxAngularError()));
         sens.append(";\n");
 
         sens.append("Minimum:");
         sens.append(",");
-        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMinAngularError()));
+        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMinAngularError()));
         sens.append(";\n");
 
         sens.append("STDEV:");
         sens.append(",");
-        sens.append(boost::lexical_cast<string>(std::sqrt(evaluationFilter->GetVarAngularError())));
+        sens.append(boost::lexical_cast<std::string>(std::sqrt(evaluationFilter->GetVarAngularError())));
         sens.append(";\n");
 
         file << sens;

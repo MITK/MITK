@@ -34,22 +34,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 {
     omp_set_num_threads(1);
     MITK_TEST_BEGIN("mitkLocalFiberPlausibilityTest");
     MITK_TEST_CONDITION_REQUIRED(argc==8,"check for input data")
 
-            string fibFile = argv[1];
-    vector< string > referenceImages;
+    std::string fibFile = argv[1];
+    std::vector< std::string > referenceImages;
     referenceImages.push_back(argv[2]);
     referenceImages.push_back(argv[3]);
-    string LDFP_ERROR_IMAGE = argv[4];
-    string LDFP_NUM_DIRECTIONS = argv[5];
-    string LDFP_VECTOR_FIELD = argv[6];
-    string LDFP_ERROR_IMAGE_IGNORE = argv[7];
+    std::string LDFP_ERROR_IMAGE = argv[4];
+    std::string LDFP_NUM_DIRECTIONS = argv[5];
+    std::string LDFP_VECTOR_FIELD = argv[6];
+    std::string LDFP_ERROR_IMAGE_IGNORE = argv[7];
 
     float angularThreshold = 30;
 

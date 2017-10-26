@@ -29,8 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleRegistry.h>
 #include <usServiceProperties.h>
 #include <string>
-using namespace mitk;
-using namespace std;
 US_USE_NAMESPACE
 
 QmitkFreeSurferParcellationHandler::QmitkFreeSurferParcellationHandler() :
@@ -65,7 +63,7 @@ void QmitkFreeSurferParcellationHandler::Notify(InteractionEvent *interactionEve
         Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
         if( image.IsNotNull() && image->GetGeometry()->IsInside(worldposition) )
         {
-          string typeStr = image->GetPixelType().GetComponentTypeAsString();
+          std::string typeStr = image->GetPixelType().GetComponentTypeAsString();
           int value = 0;
           try
           {

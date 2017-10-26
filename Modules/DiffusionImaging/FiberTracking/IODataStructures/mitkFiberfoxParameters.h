@@ -37,8 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/property_tree/xml_parser.hpp>
 #include <limits>
 
-using namespace std;
-
 namespace mitk
 {
 
@@ -178,8 +176,8 @@ namespace mitk
       DISTRIBUTE_GAUSSIAN // distribute fibers using a 2D gaussian
     };
 
-    typedef vector< vector< mitk::PlanarEllipse::Pointer > >    FiducialListType;
-    typedef vector< vector< unsigned int > >                    FlipListType;
+    typedef std::vector< std::vector< mitk::PlanarEllipse::Pointer > >    FiducialListType;
+    typedef std::vector< std::vector< unsigned int > >                    FlipListType;
 
     FiberGenerationParameters()
       : m_Distribution(DISTRIBUTE_UNIFORM)
@@ -237,11 +235,11 @@ namespace mitk
 
     DataNode::Pointer   m_ResultNode;                       ///< Stores resulting image.
     DataNode::Pointer   m_ParentNode;                       ///< Parent node of result node.
-    string              m_SignalModelString;                ///< Appendet to the name of the result node
-    string              m_ArtifactModelString;              ///< Appendet to the name of the result node
-    string              m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
-    string              m_OutputPrefix;  /** Prefix for filename of output files and logfile. */
-    string              m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
+    std::string         m_SignalModelString;                ///< Appendet to the name of the result node
+    std::string         m_ArtifactModelString;              ///< Appendet to the name of the result node
+    std::string         m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
+    std::string         m_OutputPrefix;  /** Prefix for filename of output files and logfile. */
+    std::string         m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
 
     /** member variables that store the check-state of GUI checkboxes */
     // image generation
@@ -253,7 +251,7 @@ namespace mitk
     bool                m_CheckAddSpikesBox;
     bool                m_CheckAddEddyCurrentsBox;
     bool                m_CheckAddDistortionsBox;
-    string              m_MotionVolumesBox;
+    std::string         m_MotionVolumesBox;
     // fiber generation
     bool                m_CheckRealTimeFibersBox;
     bool                m_CheckAdvancedFiberOptionsBox;
@@ -340,8 +338,8 @@ namespace mitk
     std::shared_ptr< NoiseModelType >   m_NoiseModel;           ///< If != nullptr, noise is added to the image.
 
     void PrintSelf();                           ///< Print parameters to stdout.
-    void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.
-    void LoadParameters(string filename);       ///< Load image generation parameters from .ffp file.
+    void SaveParameters(std::string filename);  ///< Save image generation parameters to .ffp file.
+    void LoadParameters(std::string filename);  ///< Load image generation parameters from .ffp file.
     template< class ParameterType >
     ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
     std::string                         m_MissingTags;

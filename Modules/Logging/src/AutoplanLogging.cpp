@@ -221,7 +221,7 @@ namespace Logger
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
         ));
       sink->set_formatter(
-        boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\" severity=\"%6%\" host=\"%4%\" user=\"%5%\ source=\"%7%\ fullname=\"%8%\ organization=\"%9%\">%3%</record>")
+        boost::log::expressions::format("<record id=\"%1%\" timestamp=\"%2%\" severity=\"%6%\" host=\"%4%\" user=\"%5%\" source=\"%7%\" fullname=\"%8%\" organization=\"%9%\">%3%</record>")
         % boost::log::expressions::attr< unsigned int >("RecordID")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]

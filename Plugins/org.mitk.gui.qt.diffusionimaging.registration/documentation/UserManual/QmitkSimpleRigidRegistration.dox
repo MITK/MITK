@@ -1,0 +1,5 @@
+/**
+\page org_mitk_views_simplerigidregistrationview Rigid Registration
+
+This view enables the simple rigid registration of two images. The registered image will be displayed in transparent blue color overlayed over the fixed image. To regain normal coloring, right-click on the data node and adjust the corresponding settings.
+*/

@@ -80,7 +80,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkRemoveDwiChannelFilter.h>
 #include <itkExtractDwiChannelFilter.h>
-#include <mitkITKImageImport.h>
 #include <mitkBValueMapProperty.h>
 #include <mitkGradientDirectionsProperty.h>
 #include <mitkMeasurementFrameProperty.h>

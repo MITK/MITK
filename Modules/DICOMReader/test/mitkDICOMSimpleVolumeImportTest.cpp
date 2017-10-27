@@ -73,35 +73,38 @@ int mitkDICOMSimpleVolumeImportTest(int argc, char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED( simpleReader.IsNotNull(), "DICOMFileReaderSelector is able to create simple reader from XML");
 
-  mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
-
-  mitk::DICOMFileReaderTestHelper::TestInputFilenames( simpleReader );
-  mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( simpleReader );
-  mitk::DICOMFileReaderTestHelper::TestSingleBlockIsRead( simpleReader );
-
-  const mitk::DICOMImageBlockDescriptor block = simpleReader->GetOutput( 0 );
-  const mitk::DICOMImageFrameList& outputFiles = block.GetImageFrameList();
-  const mitk::Image::Pointer mitkImage = block.GetMitkImage();
-
-  ImageType::Pointer itkImage = mitk::ImageToItkImage<short,3>( mitkImage );
-
-  IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
-  bool success = true;
-  while ( !it.IsAtEnd() )
+  if ( argc > 1 )
   {
-    ImageType::PixelType val = it.Get();
-    ImageType::IndexType ind = it.GetIndex();
+    mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
 
-    if ( !val == ind[2] )
+    mitk::DICOMFileReaderTestHelper::TestInputFilenames( simpleReader );
+    mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( simpleReader );
+    mitk::DICOMFileReaderTestHelper::TestSingleBlockIsRead( simpleReader );
+
+    const mitk::DICOMImageBlockDescriptor block = simpleReader->GetOutput( 0 );
+    const mitk::DICOMImageFrameList& outputFiles = block.GetImageFrameList();
+    const mitk::Image::Pointer mitkImage = block.GetMitkImage();
+
+    ImageType::Pointer itkImage = mitk::ImageToItkImage<short,3>( mitkImage );
+
+    IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
+    bool success = true;
+    while ( !it.IsAtEnd() )
     {
-      success = false;
-      break;
+      ImageType::PixelType val = it.Get();
+      ImageType::IndexType ind = it.GetIndex();
+
+      if ( !val == ind[2] )
+      {
+        success = false;
+        break;
+      }
+
+      ++it;
     }
 
-    ++it;
+    MITK_TEST_CONDITION( success, "Single block image composed as expected.");
   }
-
-  MITK_TEST_CONDITION( success, "Single block image composed as expected.");
 
   MITK_TEST_END();
 }

@@ -9,4 +9,4 @@ file(GLOB_RECURSE sloppyDICOMfiles ${MITK_DATA_DIR}/SloppyDICOMFiles/1*)
 
 mitkAddCustomModuleTest(mitkDICOMFileReaderTest_Basics mitkDICOMFileReaderTest ${tinyCTSlices})
 mitkAddCustomModuleTest(mitkDICOMITKSeriesGDCMReaderBasicsTest_Basics mitkDICOMITKSeriesGDCMReaderBasicsTest ${tinyCTSlices})
-mitkAddCustomModuleTest(mitkDICOMSimpleVolumeImportTest mitkDICOMSimpleVolumeImportTest ${sloppyDICOMfiles})
+mitkAddCustomModuleTest(mitkDICOMSimpleVolumeImportTest_Basics mitkDICOMSimpleVolumeImportTest ${sloppyDICOMfiles})

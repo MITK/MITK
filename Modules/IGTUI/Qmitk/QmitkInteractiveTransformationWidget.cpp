@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkInteractiveTransformationWidget::VIEW_ID = "org.mitk.views.interactivetransformationwidget";
 
 QmitkInteractiveTransformationWidget::QmitkInteractiveTransformationWidget(QWidget* parent, Qt::WindowFlags f)
-: QWidget(parent, f), m_Geometry(nullptr), m_ResetGeometry(nullptr), m_Controls(nullptr)
+: QWidget(parent, f), m_Controls(nullptr), m_Geometry(nullptr), m_ResetGeometry(nullptr)
 {
   CreateQtPartControl(this);
   CreateConnections();
@@ -54,20 +54,30 @@ void QmitkInteractiveTransformationWidget::CreateConnections()
   if ( m_Controls )
   {
     // translations
-    connect( (QObject*)(m_Controls->m_XTransSlider), SIGNAL(valueChanged(int)), this, SLOT(OnXTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_XTransSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnXTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YTransSlider), SIGNAL(valueChanged(int)), this, SLOT(OnYTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YTransSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnYTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZTransSlider), SIGNAL(valueChanged(int)), this, SLOT(OnZTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZTransSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnZTranslationValueChanged(int)) );
+    connect(m_Controls->m_XTransSlider, &QSlider::valueChanged, m_Controls->m_XTransSpinBox, &QSpinBox::setValue);
+    connect(m_Controls->m_XTransSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_Controls->m_XTransSlider, &QSlider::setValue);
+    connect(m_Controls->m_XTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnXTranslationValueChanged);
+
+    connect(m_Controls->m_YTransSlider, &QSlider::valueChanged, m_Controls->m_YTransSpinBox, &QSpinBox::setValue);
+    connect(m_Controls->m_YTransSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_Controls->m_YTransSlider, &QSlider::setValue);
+    connect(m_Controls->m_YTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnYTranslationValueChanged);
+
+    connect(m_Controls->m_ZTransSlider, &QSlider::valueChanged, m_Controls->m_ZTransSpinBox, &QSpinBox::setValue);
+    connect(m_Controls->m_ZTransSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_Controls->m_ZTransSlider, &QSlider::setValue);
+    connect(m_Controls->m_ZTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnZTranslationValueChanged);
 
     // rotations
-    connect( (QObject*)(m_Controls->m_XRotSlider), SIGNAL(valueChanged(int)), this, SLOT(OnXRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_XRotSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnXRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YRotSlider), SIGNAL(valueChanged(int)), this, SLOT(OnYRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YRotSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnYRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZRotSlider), SIGNAL(valueChanged(int)), this, SLOT(OnZRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZRotSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnZRotationValueChanged(int)) );
+    connect(m_Controls->m_XRotSlider, &QSlider::valueChanged, m_Controls->m_XRotSpinBox, &QSpinBox::setValue);
+    connect(m_Controls->m_XRotSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_Controls->m_XRotSlider, &QSlider::setValue);
+    connect(m_Controls->m_XRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnXRotationValueChanged);
+
+    connect(m_Controls->m_YRotSlider, &QSlider::valueChanged, m_Controls->m_YRotSpinBox, &QSpinBox::setValue);
+    connect(m_Controls->m_YRotSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_Controls->m_YRotSlider, &QSlider::setValue);
+    connect(m_Controls->m_YRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnYRotationValueChanged);
+
+    connect(m_Controls->m_ZRotSlider, &QSlider::valueChanged, m_Controls->m_ZRotSpinBox, &QSpinBox::setValue);
+    connect(m_Controls->m_ZRotSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_Controls->m_ZRotSlider, &QSlider::setValue);
+    connect(m_Controls->m_ZRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnZRotationValueChanged);
 
     connect( (QObject*)(m_Controls->m_ResetPB), SIGNAL(clicked()), this, SLOT(OnResetGeometry()) );
     connect( (QObject*)(m_Controls->m_UseManipulatedToolTipPB), SIGNAL(clicked()), this, SLOT(OnApplyManipulatedToolTip()) );
@@ -129,14 +139,7 @@ void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged( int v )
   translationParams[0] = v;
   translationParams[1] = m_Controls->m_YTransSlider->value();
   translationParams[2] = m_Controls->m_ZTransSlider->value();
-  SetSliderX(v);
   this->Translate(translationParams);
-}
-
-void QmitkInteractiveTransformationWidget::SetSliderX(int v)
-{
-  m_Controls->m_XTransSlider->setValue(v);
-  m_Controls->m_XTransSpinBox->setValue(v);
 }
 
 void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged( int v )
@@ -145,14 +148,7 @@ void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged( int v )
   translationParams[0] = m_Controls->m_XTransSlider->value();
   translationParams[1] = v;
   translationParams[2] = m_Controls->m_ZTransSlider->value();
-  SetSliderY(v);
   this->Translate(translationParams);
-}
-
-void QmitkInteractiveTransformationWidget::SetSliderY(int v)
-{
-  m_Controls->m_YTransSlider->setValue(v);
-  m_Controls->m_YTransSpinBox->setValue(v);
 }
 
 void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged( int v )
@@ -161,14 +157,7 @@ void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged( int v )
   translationParams[0] = m_Controls->m_XTransSlider->value();
   translationParams[1] = m_Controls->m_YTransSlider->value();
   translationParams[2] = v;
-  SetSliderZ(v);
   this->Translate(translationParams);
-}
-
-void QmitkInteractiveTransformationWidget::SetSliderZ(int v)
-{
-  m_Controls->m_ZTransSlider->setValue(v);
-  m_Controls->m_ZTransSpinBox->setValue(v);
 }
 
 void QmitkInteractiveTransformationWidget::Translate( mitk::Vector3D translateVector)
@@ -197,9 +186,6 @@ void QmitkInteractiveTransformationWidget::OnXRotationValueChanged( int v )
   rotationParams[1] = m_Controls->m_YRotSlider->value();
   rotationParams[2] = m_Controls->m_ZRotSlider->value();
 
-  m_Controls->m_XRotSlider->setValue(v);
-  m_Controls->m_XRotSpinBox->setValue(v);
-
   this->Rotate(rotationParams);
 }
 
@@ -210,9 +196,6 @@ void QmitkInteractiveTransformationWidget::OnYRotationValueChanged( int v )
   rotationParams[1] = v;
   rotationParams[2] = m_Controls->m_ZRotSlider->value();
 
-  m_Controls->m_YRotSlider->setValue(v);
-  m_Controls->m_YRotSpinBox->setValue(v);
-
   this->Rotate(rotationParams);
 }
 
@@ -222,8 +205,6 @@ void QmitkInteractiveTransformationWidget::OnZRotationValueChanged( int v )
   rotationParams[0]=m_Controls->m_XRotSlider->value();
   rotationParams[1]=m_Controls->m_YRotSlider->value();
   rotationParams[2]=v;
-  m_Controls->m_ZRotSlider->setValue(v);
-  m_Controls->m_ZRotSpinBox->setValue(v);
 
   this->Rotate(rotationParams);
 }

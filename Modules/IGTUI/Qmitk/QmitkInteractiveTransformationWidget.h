@@ -71,10 +71,6 @@ signals:
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    void SetSliderX(int v);
-    void SetSliderY(int v);
-    void SetSliderZ(int v);
-
     /*! \brief Method performs the translation.
         \params translateVector New translation to be combine with geometry. */
     void Translate( mitk::Vector3D translateVector);

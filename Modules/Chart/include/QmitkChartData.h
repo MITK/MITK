@@ -34,6 +34,7 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_LegendPosition READ GetLegendPosition WRITE SetLegendPosition NOTIFY SignalLegendPositionChanged);
   Q_PROPERTY(QVariant m_ShowSubchart READ GetShowSubchart WRITE SetShowSubchart NOTIFY SignalShowSubchartChanged);
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
+  Q_PROPERTY(QVariant m_DataPointSize READ GetDataPointSize WRITE SetDataPointSize NOTIFY SignalDataPointSizeChanged);
 
 public:
   QmitkChartData();
@@ -58,6 +59,9 @@ public:
   Q_INVOKABLE QVariant GetUsePercentageInPieChart() const { return m_UsePercentageInPieChart; };
   Q_INVOKABLE void SetUsePercentageInPieChart(const QVariant& usePercentageInPieChart) { m_UsePercentageInPieChart = usePercentageInPieChart; emit SignalUsePercentageInPieChartChanged(usePercentageInPieChart); };
 
+  Q_INVOKABLE QVariant GetDataPointSize() const { return m_DataPointSize; };
+  Q_INVOKABLE void SetDataPointSize(const QVariant& showDataPoints) {if (showDataPoints > 0 ) { m_DataPointSize = 3; } else { m_DataPointSize = 0; } emit SignalDataPointSizeChanged(showDataPoints); };
+
 signals:
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
@@ -65,6 +69,7 @@ signals:
   void SignalDiagramTitleChanged(const QVariant title);
   void SignalShowSubchartChanged(const QVariant showSubchart);
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
+  void SignalDataPointSizeChanged(const QVariant showDataPoints);
 
 private:
   QVariant m_xAxisLabel;
@@ -75,6 +80,7 @@ private:
   QVariant m_ShowSubchart;
   QVariant m_UsePercentageInPieChart;
   QVariant m_numberDatasets;
+  QVariant m_DataPointSize = 0;
 };
 
 #endif  //QmitkC3Data_h

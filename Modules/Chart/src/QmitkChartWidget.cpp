@@ -56,6 +56,9 @@ public:
   LegendPosition GetLegendPosition() const;
   std::string GetLegendPositionAsString() const;
 
+  void SetShowDataPoints(bool showDataPoints = false);
+  bool GetShowDataPoints() const;
+
   void SetChartType(const std::string& label, QmitkChartWidget::ChartType diagramType);
   std::string ConvertChartTypeToString(QmitkChartWidget::ChartType diagramType) const;
 
@@ -260,6 +263,24 @@ std::string QmitkChartWidget::Impl::GetLegendPositionAsString() const {
   return GetC3Data()->GetLegendPosition().toString().toStdString();
 }
 
+void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints) {
+  if (showDataPoints == true) {
+    GetC3Data()->SetDataPointSize(3);
+  }
+  else {
+    GetC3Data()->SetDataPointSize(0);
+  }
+}
+
+bool QmitkChartWidget::Impl::GetShowDataPoints() const{
+  int value = GetC3Data()->GetDataPointSize().toInt();
+  if (value > 0) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 void QmitkChartWidget::Impl::SetChartType(const std::string& label, QmitkChartWidget::ChartType chartType) {
   auto element = GetElementByLabel(GetC3xyData(), label);
@@ -374,6 +395,15 @@ void QmitkChartWidget::SetDiagramTitle(const std::string & title)
 std::string QmitkChartWidget::GetDiagramTitle() const
 {
   return m_Impl->GetDiagramTitle();
+}
+
+void QmitkChartWidget::SetShowDataPoints(bool showDataPoints)
+{
+    m_Impl->SetShowDataPoints(showDataPoints);
+}
+bool QmitkChartWidget::GetShowDataPoints() const
+{
+  return m_Impl->GetShowDataPoints();
 }
 
 void QmitkChartWidget::SetChartType(const std::string& label, ChartType type)

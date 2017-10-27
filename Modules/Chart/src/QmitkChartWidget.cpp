@@ -43,6 +43,8 @@ public:
   void SetColor(const std::string& label, const std::string& colorName);
   void SetLineStyle(const std::string& label, LineStyle style);
 
+  void SetYAxisScale(AxisScale scale);
+
   void SetXAxisLabel(const std::string& label);
   std::string GetXAxisLabel() const;
 
@@ -79,6 +81,7 @@ private:
   std::map<QmitkChartWidget::ChartType, std::string> m_DiagramTypeToName;
   std::map<QmitkChartWidget::LegendPosition, std::string> m_LegendPositionToName;
   std::map<QmitkChartWidget::LineStyle, std::string> m_LineStyleToName;
+  std::map<QmitkChartWidget::AxisScale, std::string> m_AxisScaleToName;
 };
 
 QmitkChartWidget::Impl::Impl(QWidget* parent)
@@ -113,6 +116,9 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
 
   m_LineStyleToName.emplace(LineStyle::solid, "solid");
   m_LineStyleToName.emplace(LineStyle::dashed, "dashed");
+
+  m_AxisScaleToName.emplace(AxisScale::linear, "");
+  m_AxisScaleToName.emplace(AxisScale::log, "log");
 
   m_C3Data = new QmitkChartData();
   m_C3xyData = new std::vector<QmitkChartxyData*>();
@@ -197,6 +203,12 @@ void QmitkChartWidget::Impl::SetLineStyle(const std::string& label, LineStyle st
     const std::string lineStyleName(m_LineStyleToName.at(style));
     element->SetLineStyle(QVariant(QString::fromStdString(lineStyleName)));
   }
+}
+
+void QmitkChartWidget::Impl::SetYAxisScale(AxisScale scale)
+{
+  const std::string axisScaleName(m_AxisScaleToName.at(scale));
+  GetC3Data()->SetYAxisScale(QString::fromStdString(axisScaleName));
 }
 
 QmitkChartxyData* QmitkChartWidget::Impl::GetElementByLabel(const std::vector<QmitkChartxyData*>* c3xyData, const std::string& label) const
@@ -334,6 +346,11 @@ void QmitkChartWidget::SetColor(const std::string& label, const std::string& col
 void QmitkChartWidget::SetLineStyle(const std::string& label, LineStyle style)
 {
   m_Impl->SetLineStyle(label, style);
+}
+
+void QmitkChartWidget::SetYAxisScale(AxisScale scale)
+{
+  m_Impl->SetYAxisScale(scale);
 }
 
 void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType type)

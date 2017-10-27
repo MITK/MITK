@@ -60,6 +60,10 @@ public:
     solid,
     dashed
   };
+  enum class AxisScale {
+    linear,
+    log
+  };
 
   /*!
   * \brief enum of legend position. Supported are bottom, right, inset.
@@ -120,7 +124,7 @@ public:
   */
   void SetLineStyle(const std::string& label, LineStyle style);
 
-  std::vector<std::string> GetDataLabels() const;
+  void SetYAxisScale(AxisScale scale);
 
   void SetXAxisLabel(const std::string& label);
   std::string GetXAxisLabel() const;

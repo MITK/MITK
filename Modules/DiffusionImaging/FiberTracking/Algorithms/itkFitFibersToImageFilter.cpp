@@ -14,6 +14,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_FiberSampling(10)
   , m_Coverage(0)
   , m_Overshoot(0)
+  , m_RMSE(0.0)
   , m_FilterOutliers(true)
   , m_MeanWeight(1.0)
   , m_MedianWeight(1.0)
@@ -21,6 +22,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_MaxWeight(1.0)
   , m_Verbose(true)
   , m_DeepCopy(true)
+  , m_ResampleFibers(true)
   , m_NumUnknowns(0)
   , m_NumResiduals(0)
   , m_NumCoveredDirections(0)
@@ -57,12 +59,17 @@ void FitFibersToImageFilter::GenerateData()
       m_NumUnknowns += m_Tractograms.at(bundle)->GetNumFibers();
   }
 
-  for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-  {
-    if (m_DeepCopy)
-      m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
-    m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
-  }
+  if (m_ResampleFibers)
+    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+    {
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());
+      if (m_DeepCopy)
+        m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
+      m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
+      std::cout.rdbuf (old);
+    }
 
   m_NumResiduals = num_voxels * sz_peaks;
 
@@ -229,7 +236,8 @@ void FitFibersToImageFilter::GenerateData()
   MITK_INFO << "NumEvals: " << minimizer.get_num_evaluations();
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
   MITK_INFO << "Residual cost: " << minimizer.get_end_error();
-  MITK_INFO << "Final RMS: " << cost.S->get_rms_error(m_Weights);
+  m_RMSE = cost.S->get_rms_error(m_Weights);
+  MITK_INFO << "Final RMS: " << m_RMSE;
 
   clock.Stop();
   int h = clock.GetTotal()/3600;
@@ -237,21 +245,30 @@ void FitFibersToImageFilter::GenerateData()
   int s = (int)clock.GetTotal()%60;
   MITK_INFO << "Optimization took " << h << "h, " << m << "m and " << s << "s";
 
-  // transform back for peak image creation
-  A *= FD/100.0;
-  b *= FD/100.0;
-
   MITK_INFO << "Weighting fibers";
+  m_RmsDiffPerFiber.set_size(m_Weights.size());
+  m_RmsDiffPerBundle.set_size(m_Tractograms.size());
+  std::streambuf *old = cout.rdbuf(); // <-- save
+  std::stringstream ss;
+  std::cout.rdbuf (ss.rdbuf());
   if (m_FitIndividualFibers)
   {
     unsigned int fiber_count = 0;
     for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
     {
+      vnl_vector< double > temp_weights;
+      temp_weights.set_size(m_Weights.size());
+      temp_weights.copy_in(m_Weights.data_block());
+
       for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); i++)
       {
         m_Tractograms.at(bundle)->SetFiberWeight(i, m_Weights[fiber_count]);
+        temp_weights[fiber_count] = 0;
+
         ++fiber_count;
       }
+      double d_rms = cost.S->get_rms_error(temp_weights) - m_RMSE;
+      m_RmsDiffPerBundle[bundle] = d_rms;
       m_Tractograms.at(bundle)->Compress(0.1);
       m_Tractograms.at(bundle)->ColorFibersByFiberWeights(false, true);
     }
@@ -265,6 +282,11 @@ void FitFibersToImageFilter::GenerateData()
       m_Tractograms.at(i)->ColorFibersByFiberWeights(false, true);
     }
   }
+  std::cout.rdbuf (old);
+
+  // transform back for peak image creation
+  A *= FD/100.0;
+  b *= FD/100.0;
 
   MITK_INFO << "Generating output images ...";
 
@@ -378,15 +400,15 @@ void FitFibersToImageFilter::GenerateData()
   m_Coverage = m_Coverage/FD;
   m_Overshoot = m_Overshoot/FD;
 
-  MITK_INFO << std::fixed << "Coverage: " << setprecision(1) << 100.0*m_Coverage << "%";
-  MITK_INFO << std::fixed << "Overshoot: " << setprecision(1) << 100.0*m_Overshoot << "%";
+  MITK_INFO << std::fixed << "Coverage: " << setprecision(2) << 100.0*m_Coverage << "%";
+  MITK_INFO << std::fixed << "Overshoot: " << setprecision(2) << 100.0*m_Overshoot << "%";
 }
 
 vnl_vector_fixed<float,3> FitFibersToImageFilter::GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w )
 {
   int m_NumDirs = peak_image->GetLargestPossibleRegion().GetSize()[3]/3;
   vnl_vector_fixed<float,3> out_dir; out_dir.fill(0);
-  float angle = 0.8;
+  float angle = 0.9;
 
   for (int i=0; i<m_NumDirs; i++)
   {

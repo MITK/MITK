@@ -5,5 +5,5 @@ project(org_mitk_gui_qt_diffusionimaging_registration)
 mitk_create_plugin(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_REGISTRATION_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkDiffusionCore
+  MODULE_DEPENDS MitkDiffusionCore MitkMatchPointRegistration MitkMatchPointRegistrationUI
 )

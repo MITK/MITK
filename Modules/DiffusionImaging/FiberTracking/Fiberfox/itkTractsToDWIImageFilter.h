@@ -93,7 +93,7 @@ protected:
     double RoundToNearest(double num);
     std::string GetTime();
     bool PrepareLogFile();  /** Prepares the log file and returns true if successful or false if failed. */
-    void PrintToLog(string m, bool addTime=true, bool linebreak=true, bool stdOut=true);
+    void PrintToLog(std::string m, bool addTime=true, bool linebreak=true, bool stdOut=true);
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts/effects. */
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);

@@ -159,6 +159,13 @@ public:
   void Show(bool showSubChart=false);
 
   /*!
+  * \brief Displays the dataPoints or not
+  * \param showDataPoints if dataPoints are displayed inside the widget or not.
+  */
+  void SetShowDataPoints(bool showDataPoints);
+  bool GetShowDataPoints() const;
+
+  /*!
   * \brief Clears all data inside and resets the widget.
   */
   void Clear();

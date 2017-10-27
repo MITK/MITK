@@ -97,17 +97,17 @@ int main(int argc, char* argv[])
     parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or FSL/MRTrix SH-coefficient image)", us::Any(), false);
     parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameters:", "parameter file (.gtp)", us::Any(), false);
     parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask:", "binary mask image");
-    parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "SH coefficient:", "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
+    parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "SH coefficient:", "sh coefficient convention (FSL, MRtrix)", std::string("FSL"), true);
     parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
     parser.addArgument("noFlip", "f", mitkCommandLineParser::Bool, "No flip:", "do not flip input image to match MITK coordinate convention");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string inFileName = us::any_cast<string>(parsedArgs["input"]);
-    string paramFileName = us::any_cast<string>(parsedArgs["parameters"]);
-    string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
+    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+    std::string paramFileName = us::any_cast<std::string>(parsedArgs["parameters"]);
+    std::string outFileName = us::any_cast<std::string>(parsedArgs["outFile"]);
 
     bool noFlip = false;
     if (parsedArgs.count("noFlip"))
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
 
             if (parsedArgs.count("shConvention"))
             {
-                string convention = us::any_cast<string>(parsedArgs["shConvention"]).c_str();
+                std::string convention = us::any_cast<std::string>(parsedArgs["shConvention"]).c_str();
 
                 if ( boost::algorithm::equals(convention, "MRtrix") )
                 {
@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
         if (parsedArgs.count("mask"))
         {
             typedef itk::Image<float,3> MaskImgType;
-            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["mask"]))[0].GetPointer());
+            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<std::string>(parsedArgs["mask"]))[0].GetPointer());
             MaskImgType::Pointer itk_mask = MaskImgType::New();
             mitk::CastToItkImage(mitkMaskImage, itk_mask);
             gibbsTracker->SetMaskImage(itk_mask);

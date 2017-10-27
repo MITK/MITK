@@ -1,6 +1,6 @@
 
 # A list of plug-in targets which should be automatically enabled
-# (or be available in external projects) for this application.
+# (or be available in external projects) for this application
 
 set(target_libraries
   org_blueberry_ui_qt
@@ -21,6 +21,10 @@ set(target_libraries
   org_mitk_gui_qt_diffusionimaging_preprocessing
   org_mitk_gui_qt_diffusionimaging_reconstruction
   org_mitk_gui_qt_diffusionimaging_tractography
+  org_mitk_gui_qt_diffusionimaging_registration
+  org_mitk_gui_qt_matchpoint_algorithm_browser
+  org_mitk_gui_qt_matchpoint_algorithm_control
+  org_mitk_gui_qt_matchpoint_mapper
   org_mitk_gui_qt_imagenavigator
   org_mitk_gui_qt_moviemaker
   org_mitk_gui_qt_measurementtoolbox

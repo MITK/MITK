@@ -34,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMergeDiffusionImagesFilter.h"
 #include <mitkIOUtil.h>
 
-using namespace std;
-
 static mitk::StringList& GetInputFilenames()
 {
   static mitk::StringList inputs;
@@ -210,7 +208,7 @@ int main(int argc, char* argv[])
   parser.addArgument("dwprefix", "p", mitkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
   parser.addArgument("dryrun", "-s", mitkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
   {
     return EXIT_FAILURE;
@@ -316,3 +314,4 @@ int main(int argc, char* argv[])
 
   return 1;
 }
+

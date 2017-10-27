@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 
 #include "src/internal/QmitkDiffusionRegistrationView.h"
+#include "src/internal/QmitkSimpleRigidRegistrationView.h"
+#include "src/internal/QmitkDwiRegistrationPerspective.h"
 
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
@@ -29,6 +31,8 @@ ctkPluginContext* mitk::PluginActivator::GetContext()
 void mitk::PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionRegistrationView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkSimpleRigidRegistrationView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDwiRegistrationPerspective, context)
   m_Context = context;
 }
 

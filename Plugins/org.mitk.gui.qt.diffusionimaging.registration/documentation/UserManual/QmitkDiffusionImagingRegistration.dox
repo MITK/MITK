@@ -1,9 +1,7 @@
 /**
-\page org_mitk_views_diffusionregistrationview DWI Registration
+\page org_mitk_views_diffusionregistrationview Head-Motion Correction
 
-\section QmitkDiffusionImagingUserManualDWIRegistration DWI Registration
-
-The DWI registration view allows head-motion and eddy-current correction. First the b=0 images (if more than 1) are registered and averaged. The averaged image then serves as fixed image for the alignment of the remaining (weighted, b>0) images.
+This view provides head-motion and eddy-current correction methods. First the b=0 images (if more than 1) are registered and averaged. The averaged image then serves as fixed image for the alignment of the remaining (weighted, b>0) images.
 
 \imageMacro{registration_basic.png,"Basic DWI Registration Interface",8.00}
 

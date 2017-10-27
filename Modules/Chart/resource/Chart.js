@@ -83,7 +83,7 @@ function setupChart(chartData)
   window.onresize();
 
   GenerateChart(chartData.m_DiagramTypeName, chartData.m_ShowSubchart, chartData.m_UsePercentageInPieChart, 
-  chartData.m_xAxisLabel, chartData.m_yAxisLabel, chartData.m_diagramTitle, chartData.m_LegendPosition, chartData.m_YAxisScale)
+  chartData.m_xAxisLabel, chartData.m_yAxisLabel, chartData.m_diagramTitle, chartData.m_LegendPosition, chartData.m_DataPointSize, chartData.m_YAxisScale)
     
   chart.unload(); //unload data before loading new data
   
@@ -124,7 +124,7 @@ link = document.getElementsByTagName("link")[0];
 //chartType: either bar, line or pie
 //showSubchart: see http://c3js.org/samples/options_subchart.html
 //usePercentageInPieChart: percentage labels (only for pie chart)
-function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLabel, yAxisLabel, title, legendPosition, YAxisScale)
+function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLabel, yAxisLabel, title, legendPosition, dataPointSize, YAxisScale)
 {
 	//adaption for bar ratio indepenend of amount of data points
 	//otherwise, bars could be covered.
@@ -223,11 +223,11 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
 	},
     //Style data points in linegraph
     point: {
-        r: 0.2,
+        r: dataPointSize,
         focus: 
         {
           expand: {
-            r: 4
+            r: dataPointSize + 2
           }
         }
     },

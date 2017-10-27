@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkFiberBundle.h>
 
-using namespace mitk;
-using namespace std;
-
 /*!
 \brief Load image and save as specified file type.
 */
@@ -40,26 +37,26 @@ int main(int argc, char* argv[])
     parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
     parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     // mandatory arguments
-    string inName = us::any_cast<string>(parsedArgs["in"]);
-    string outName = us::any_cast<string>(parsedArgs["out"]);
+    std::string inName = us::any_cast<std::string>(parsedArgs["in"]);
+    std::string outName = us::any_cast<std::string>(parsedArgs["out"]);
 
     try
     {
         mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
         std::vector<mitk::BaseData::Pointer> baseData = mitk::IOUtil::Load(inName, &functor);
 
-        if ( baseData.size()>0 && dynamic_cast<Image*>(baseData[0].GetPointer()) )
+        if ( baseData.size()>0 && dynamic_cast<mitk::Image*>(baseData[0].GetPointer()) )
         {
-            mitk::IOUtil::Save(dynamic_cast<Image*>(baseData[0].GetPointer()), outName.c_str());
+            mitk::IOUtil::Save(dynamic_cast<mitk::Image*>(baseData[0].GetPointer()), outName.c_str());
         }
-        else if ( baseData.size()>0 && dynamic_cast<FiberBundle*>(baseData[0].GetPointer()) )
+        else if ( baseData.size()>0 && dynamic_cast<mitk::FiberBundle*>(baseData[0].GetPointer()) )
         {
-            mitk::IOUtil::Save(dynamic_cast<FiberBundle*>(baseData[0].GetPointer()) ,outName.c_str());
+            mitk::IOUtil::Save(dynamic_cast<mitk::FiberBundle*>(baseData[0].GetPointer()) ,outName.c_str());
         }
         else
             std::cout << "File type currently not supported!";

@@ -27,8 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkIOUtil.h>
 
-using namespace mitk;
-using namespace std;
 /**
  * Convert files from one ending to the other
  */
@@ -45,12 +43,12 @@ int main(int argc, char* argv[])
     parser.setDescription("");
     parser.setContributor("MIC");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
-    std::string outfilename = us::any_cast<string>(parsedArgs["outFile"]);
+    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+    std::string outfilename = us::any_cast<std::string>(parsedArgs["outFile"]);
     outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
     outfilename += ".dti";
 
@@ -60,7 +58,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        Image::Pointer dwi = dynamic_cast<mitk::Image*>(IOUtil::Load(inFileName)[0].GetPointer());
+        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inFileName)[0].GetPointer());
 
         mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
         mitk::CastToItkImage(dwi, itkVectorImagePointer);

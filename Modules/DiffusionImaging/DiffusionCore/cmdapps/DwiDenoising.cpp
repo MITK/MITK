@@ -27,8 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 
-using namespace std;
-
 typedef mitk::Image DiffusionImageType;
 typedef itk::Image<short, 3> ImageType;
 
@@ -58,16 +56,16 @@ int main(int argc, char* argv[])
 
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output:", "output image (DWI)", us::Any(), false);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
       return EXIT_FAILURE;
 
-  string inFileName = us::any_cast<string>(parsedArgs["input"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
   double variance = static_cast<double>(us::any_cast<float>(parsedArgs["variance"]));
-  string maskName;
+  std::string maskName;
   if (parsedArgs.count("mask"))
-    maskName = us::any_cast<string>(parsedArgs["mask"]);
-  string outFileName = us::any_cast<string>(parsedArgs["output"]);
+    maskName = us::any_cast<std::string>(parsedArgs["mask"]);
+  std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
 //  boost::algorithm::erase_all(outFileName, ".dwi");
   int search = 4;
   if (parsedArgs.count("search"))

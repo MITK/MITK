@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExceptionMacro.h>
 #include <mitkGeometry3D.h>
 
-using namespace std;
-
 namespace mitk
 {
 

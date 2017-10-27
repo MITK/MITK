@@ -235,6 +235,11 @@ void QmitkFiberProcessingView::Remove()
     RemoveWithMask(true);
     break;
   }
+  case 5:
+  {
+    ApplyWeightThreshold();
+    break;
+  }
   }
 }
 
@@ -287,6 +292,26 @@ void QmitkFiberProcessingView::PruneBundle()
     if (!fib->RemoveShortFibers(minLength))
       QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
     else if (!fib->RemoveLongFibers(maxLength))
+      QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
+  }
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberProcessingView::ApplyWeightThreshold()
+{
+  float thr = this->m_Controls->m_WeightThresholdBox->value();
+  std::vector< DataNode::Pointer > nodes = m_SelectedFB;
+  for (auto node : nodes)
+  {
+    mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+
+    mitk::FiberBundle::Pointer newFib = fib->FilterByWeights(thr);
+    if (newFib->GetNumFibers()>0)
+    {
+      newFib->ColorFibersByFiberWeights(false, true);
+      node->SetData(newFib);
+    }
+    else
       QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
   }
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -853,6 +878,7 @@ void QmitkFiberProcessingView::UpdateGui()
   m_Controls->m_RemoveDirectionFrame->setVisible(false);
   m_Controls->m_RemoveLengthFrame->setVisible(false);
   m_Controls->m_RemoveCurvatureFrame->setVisible(false);
+  m_Controls->m_RemoveByWeightFrame->setVisible(false);
   m_Controls->m_SmoothFibersFrame->setVisible(false);
   m_Controls->m_CompressFibersFrame->setVisible(false);
   m_Controls->m_ColorFibersFrame->setVisible(false);
@@ -897,6 +923,11 @@ void QmitkFiberProcessingView::UpdateGui()
   case 3:
     break;
   case 4:
+    break;
+  case 5:
+    m_Controls->m_RemoveByWeightFrame->setVisible(true);
+    if ( fibSelected )
+      m_Controls->m_RemoveButton->setEnabled(true);
     break;
   }
 

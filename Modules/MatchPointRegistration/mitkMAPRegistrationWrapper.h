@@ -145,7 +145,7 @@ public:
         MAPTargetPointType tempOutP;
         tempInP.CastFrom(inPoint);
 
-        typedef map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
+        typedef ::map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
         const CastedRegType* pCastedReg = dynamic_cast<const CastedRegType*>(m_spRegistration.GetPointer());
 
         if (!pCastedReg)
@@ -191,7 +191,7 @@ public:
       MAPMovingPointType tempOutP;
       tempInP.CastFrom(inPoint);
 
-      typedef map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
+      typedef ::map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
       const CastedRegType* pCastedReg = dynamic_cast<const CastedRegType*>(m_spRegistration.GetPointer());
 
       if (!pCastedReg)
@@ -246,10 +246,10 @@ public:
   */
   void PrecomputeInverseMapping();
 
-  map::core::RegistrationBase* GetRegistration();
-  const map::core::RegistrationBase* GetRegistration() const;
+  ::map::core::RegistrationBase* GetRegistration();
+  const ::map::core::RegistrationBase* GetRegistration() const;
 
-  void SetRegistration(map::core::RegistrationBase* pReg);
+  void SetRegistration(::map::core::RegistrationBase* pReg);
 
 protected:
     virtual void PrintSelf (std::ostream &os, itk::Indent indent) const;
@@ -257,7 +257,7 @@ protected:
     MAPRegistrationWrapper();
     virtual ~MAPRegistrationWrapper();
 
-    map::core::RegistrationBase::Pointer m_spRegistration;
+    ::map::core::RegistrationBase::Pointer m_spRegistration;
 
 private:
 

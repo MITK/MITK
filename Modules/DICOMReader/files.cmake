@@ -45,6 +45,7 @@ set(RESOURCE_FILES
   configurations/3D/instancenumber.xml
   configurations/3D/instancenumber_soft.xml
   configurations/3D/slicelocation.xml
+  configurations/3D/simpleinstancenumber_soft.xml
 
   configurations/3DnT/classicreader.xml
   configurations/3DnT/imageposition_byacquisition.xml

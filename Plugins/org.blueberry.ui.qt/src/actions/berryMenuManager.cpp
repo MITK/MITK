@@ -42,8 +42,8 @@ public:
   {
     switch (type)
     {
-    case MenuBar: menuBar = new QMenuBar(parent);
-    case Menu: menu = new QMenu(parent);
+    case MenuBar: menuBar = new QMenuBar(parent); break;
+    case Menu: menu = new QMenu(parent); break;
     }
   }
 

@@ -121,11 +121,16 @@ mitk::DICOMReaderConfigurator
     else
     if (classname == "DICOMITKSeriesGDCMReader")
     {
+      const char* simpleVolumeImportC = rootElement->Attribute("simpleVolumeImport");
+      bool simpleVolumeImport = simpleVolumeImportC ? true : false;
+
       mitk::DICOMITKSeriesGDCMReader::Pointer reader;
       if (useDecimalPlacesForOrientation)
-        reader = mitk::DICOMITKSeriesGDCMReader::New(decimalPlacesForOrientation);
+        reader = mitk::DICOMITKSeriesGDCMReader::New( decimalPlacesForOrientation, simpleVolumeImport );
       else
-        reader = mitk::DICOMITKSeriesGDCMReader::New();
+        reader = mitk::DICOMITKSeriesGDCMReader::New( mitk::DICOMITKSeriesGDCMReader::GetDefaultDecimalPlacesForOrientation(), simpleVolumeImport );
+
+      // simple volume import that ignores number of frames and inter slice distance
 
       return ConfigureDICOMITKSeriesGDCMReader(reader, rootElement).GetPointer();
     }

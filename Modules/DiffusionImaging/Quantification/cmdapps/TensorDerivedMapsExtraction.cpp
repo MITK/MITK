@@ -34,8 +34,6 @@
 #include <itkNrrdImageIO.h>
 #include <itkDiffusionTensor3D.h>
 
-using namespace std;
-
 typedef short DiffusionPixelType;
 typedef double TTensorPixelType;
 
@@ -115,7 +113,7 @@ int main(int argc, char* argv[])
   parser.setDescription("");
   parser.setContributor("MIC");
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
   {
     std::cout << parser.helpText();
@@ -123,8 +121,8 @@ int main(int argc, char* argv[])
   }
 
 
-  std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
-  std::string baseFileName = us::any_cast<string>(parsedArgs["out"]);
+  std::string inputFile = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string baseFileName = us::any_cast<std::string>(parsedArgs["out"]);
 
   std::string dtiFileName = "_dti.dti";
 

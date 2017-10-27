@@ -36,8 +36,6 @@ typedef short DiffusionPixelType;
 
 // Forward Qt class declarations
 
-using namespace std;
-
 class QmitkDiffusionRegistrationView;
 
 class QmitkRegistrationWorker : public QObject
@@ -67,7 +65,7 @@ class QmitkDiffusionRegistrationView : public QmitkAbstractView
 
 public:
 
-  static const string VIEW_ID;
+  static const std::string VIEW_ID;
 
   QmitkDiffusionRegistrationView();
   virtual ~QmitkDiffusionRegistrationView();

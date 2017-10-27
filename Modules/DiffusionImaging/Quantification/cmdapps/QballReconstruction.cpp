@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 
-using namespace mitk;
-using namespace std;
-
 /**
  * Perform Q-ball reconstruction using a spherical harmonics basis
  */
@@ -52,12 +49,12 @@ int main(int argc, char* argv[])
   parser.setDescription("");
   parser.setContributor("MIC");
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
-  std::string outfilename = us::any_cast<string>(parsedArgs["outFile"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string outfilename = us::any_cast<std::string>(parsedArgs["outFile"]);
   outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
 
   int threshold = 0;
@@ -89,7 +86,7 @@ int main(int argc, char* argv[])
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
     std::vector< mitk::BaseData::Pointer > infile = mitk::IOUtil::Load(inFileName, &functor);
 
-    Image::Pointer dwi = dynamic_cast<Image*>(infile.at(0).GetPointer());
+    mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
     mitk::DiffusionPropertyHelper propertyHelper(dwi);
     propertyHelper.AverageRedundantGradients(0.001);
     propertyHelper.InitializeImage();

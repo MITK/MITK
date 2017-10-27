@@ -33,8 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 /*!
 \brief Calculate angular error of a tractogram with respect to the input reference directions.
 */

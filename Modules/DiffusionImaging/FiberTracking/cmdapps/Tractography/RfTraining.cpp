@@ -34,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 /*!
 \brief Train random forest classifier for machine learning based streamline tractography
 */
@@ -68,7 +66,7 @@ int main(int argc, char* argv[])
     parser.addArgument("use_sh_features", "", mitkCommandLineParser::Bool, "Use SH features:", "use SH features", false);
     parser.addArgument("max_wm_samples", "", mitkCommandLineParser::Int, "Max. num. WM samples:", "upper limit for the number of WM samples");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
@@ -93,7 +91,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("masks"))
         maskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["masks"]);
 
-    string forestFile = us::any_cast<string>(parsedArgs["forest"]);
+    std::string forestFile = us::any_cast<std::string>(parsedArgs["forest"]);
 
     mitkCommandLineParser::StringContainerType tractogramFiles;
     if (parsedArgs.count("tractograms"))

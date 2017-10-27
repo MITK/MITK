@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_trace.h>
 
 using namespace boost::math;
-using namespace std;
 
 namespace itk {
 
@@ -85,7 +84,7 @@ std::vector<double> OdfMaximaExtractionFilter< TOdfPixelType >
 ::SolveCubic(const double& a, const double& b, const double& c, const double& d)
 {
     double A, B, p, q, r, D, offset, ee, tmp, root;
-    vector<double> roots;
+    std::vector<double> roots;
     double inv3 = 1.0/3.0;
 
     if (a!=0) // solve ax³ + bx² + cx + d = 0
@@ -301,7 +300,7 @@ std::vector< vnl_vector_fixed< double, 3 > > OdfMaximaExtractionFilter< TOdfPixe
     int npeaks = 0, nMin = 0;
     double dMin, dPos, dNeg, d;
     Vector3D u;
-    vector< Vector3D > v;
+    std::vector< Vector3D > v;
 
     // initialize container for vector clusters
     std::vector < std::vector< Vector3D > > clusters;
@@ -375,7 +374,7 @@ std::vector< vnl_vector_fixed< double, 3 > > OdfMaximaExtractionFilter< TOdfPixe
             }
         }
         v.clear();
-        vector< double > restVals;
+        std::vector< double > restVals;
         for (int i=0; i<npeaks; i++) // keep only peaks with high enough amplitude and convert back to cartesian coordinates
             if ( odfVals(i)>=m_PeakThreshold*maxVal )
             {
@@ -389,7 +388,7 @@ std::vector< vnl_vector_fixed< double, 3 > > OdfMaximaExtractionFilter< TOdfPixe
 
         if (npeaks>m_MaxNumPeaks) // if still too many peaks, keep only the m_MaxNumPeaks with maximum value
         {
-            vector< Vector3D > v2;
+            std::vector< Vector3D > v2;
             for (int i=0; i<m_MaxNumPeaks; i++)
             {
                 maxVal = itk::NumericTraits<double>::NonpositiveMin();  //Get the maximum ODF peak value and the corresponding peak index

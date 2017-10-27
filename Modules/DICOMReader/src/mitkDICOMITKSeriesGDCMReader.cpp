@@ -28,13 +28,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::MutexLock::New();
 
 
-mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation )
+mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation, bool simpleVolumeImport )
 : DICOMFileReader()
 , m_FixTiltByShearing( true )
+, m_SimpleVolumeReading( simpleVolumeImport )
 , m_DecimalPlacesForOrientation( decimalPlacesForOrientation )
 , m_ExternalCache(false)
 {
-  this->EnsureMandatorySortersArePresent( decimalPlacesForOrientation );
+  this->EnsureMandatorySortersArePresent( decimalPlacesForOrientation, simpleVolumeImport );
 }
 
 
@@ -271,11 +272,14 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
     timeStop( ss.str().c_str() );
   }
 
-  // a last extra-sorting step: ensure equidistant slices
-  timeStart( "EquiDistantBlocksSorter" );
-  m_SortingResultInProgress = this->InternalExecuteSortingStep(
-    sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress );
-  timeStop( "EquiDistantBlocksSorter" );
+  if ( !m_SimpleVolumeReading )
+  {
+    // a last extra-sorting step: ensure equidistant slices
+    timeStart( "EquiDistantBlocksSorter" );
+    m_SortingResultInProgress = this->InternalExecuteSortingStep(
+      sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress );
+    timeStop( "EquiDistantBlocksSorter" );
+  }
 
   timeStop( "Sorting frames" );
 
@@ -510,7 +514,7 @@ mitk::DICOMITKSeriesGDCMReader::ConstSorterList
 }
 
 void mitk::DICOMITKSeriesGDCMReader::EnsureMandatorySortersArePresent(
-  unsigned int decimalPlacesForOrientation )
+  unsigned int decimalPlacesForOrientation, bool simpleVolumeImport )
 {
   DICOMTagBasedSorter::Pointer splitter = DICOMTagBasedSorter::New();
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
@@ -519,7 +523,11 @@ void mitk::DICOMITKSeriesGDCMReader::EnsureMandatorySortersArePresent(
   splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
   splitter->AddDistinguishingTag( DICOMTag(0x0020, 0x0037), new mitk::DICOMTagBasedSorter::CutDecimalPlaces(decimalPlacesForOrientation) ); // Image Orientation (Patient)
   splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x0050) ); // Slice Thickness
-  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
+  if ( !simpleVolumeImport )
+  {
+    std::cout << "Simple volume reading: ignoring number of frames" << std::endl;
+    splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
+  }
   this->AddSortingElement( splitter, true ); // true = at front
 
   if ( m_EquiDistantBlocksSorter.IsNull() )

@@ -82,6 +82,7 @@ public:
     void ResampleSpline(float pointDistance, double tension, double continuity, double bias );
     void ResampleLinear(double pointDistance=1);
 
+    mitk::FiberBundle::Pointer FilterByWeights(float weight_thr, bool invert=false);
     bool RemoveShortFibers(float lengthInMM);
     bool RemoveLongFibers(float lengthInMM);
     bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);
@@ -96,6 +97,7 @@ public:
 
     // add/subtract fibers
     FiberBundle::Pointer AddBundle(FiberBundle* fib);
+    mitk::FiberBundle::Pointer AddBundles(std::vector< mitk::FiberBundle::Pointer > fibs);
     FiberBundle::Pointer SubtractBundle(FiberBundle* fib);
 
     // fiber subset extraction
@@ -103,9 +105,8 @@ public:
     std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
     FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false, bool bothEnds=true, float fraction=0.0, bool do_resampling=true);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
-
-    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
-    void                            GenerateFiberIds(); // TODO: make protected
+    float                          GetOverlap(ItkUcharImgType* mask, bool do_resampling);
+    mitk::FiberBundle::Pointer     SubsampleFibers(float factor);
 
     // get/set data
     vtkSmartPointer<vtkFloatArray> GetFiberWeights() const { return m_FiberWeights; }
@@ -144,12 +145,11 @@ protected:
     FiberBundle( vtkPolyData* fiberPolyData = nullptr );
     virtual ~FiberBundle();
 
-    itk::Point<float, 3> GetItkPoint(double point[3]);
-
-    // calculate geometry from fiber extent
-    void UpdateFiberGeometry();
-
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds(std::vector<long> fiberIds, vtkSmartPointer<vtkFloatArray> weights);
+    void                            GenerateFiberIds();
+    itk::Point<float, 3>            GetItkPoint(double point[3]);
+    void                            UpdateFiberGeometry();
+    virtual void                    PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
 private:
 

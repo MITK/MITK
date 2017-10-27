@@ -82,7 +82,6 @@ int mitkDICOMSimpleVolumeImportTest(int argc, char* argv[])
     mitk::DICOMFileReaderTestHelper::TestSingleBlockIsRead( simpleReader );
 
     const mitk::DICOMImageBlockDescriptor block = simpleReader->GetOutput( 0 );
-    const mitk::DICOMImageFrameList& outputFiles = block.GetImageFrameList();
     const mitk::Image::Pointer mitkImage = block.GetMitkImage();
 
     ImageType::Pointer itkImage = mitk::ImageToItkImage<short,3>( mitkImage );
@@ -94,7 +93,7 @@ int mitkDICOMSimpleVolumeImportTest(int argc, char* argv[])
       ImageType::PixelType val = it.Get();
       ImageType::IndexType ind = it.GetIndex();
 
-      if ( !val == ind[2] )
+      if ( !(val == ind[2]) )
       {
         success = false;
         break;

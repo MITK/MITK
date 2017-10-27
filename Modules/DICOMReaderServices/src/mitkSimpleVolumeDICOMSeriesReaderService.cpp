@@ -40,15 +40,6 @@ DICOMFileReader::Pointer SimpleVolumeDICOMSeriesReaderService::GetReader(const m
   us::ModuleResource resource = 
     us::ModuleRegistry::GetModule("MitkDICOMReader")->GetResource("configurations/3D/simpleinstancenumber_soft.xml");
 
-  /*us::ModuleResource resource = 
-    us::GetModuleContext()->GetModule()->GetResource("E:/BS-280417/MITK/Modules/DICOMReader/resource/configurations/3D/slicelocation_simple.xml");*/
-
-  /*const std::vector<us::ModuleResource> configs = 
-    us::GetModuleContext()->GetModule()->FindResources( "configurations/3D/slicelocation_simple.xml", "*.xml", false );
-  for ( auto iter = configs.cbegin(); iter != configs.cend(); ++iter )
-  {
-    us::ModuleResource resource = *iter;*/
-
   if ( resource.IsValid() )
   {
     us::ModuleResourceStream stream(resource);
@@ -60,7 +51,6 @@ DICOMFileReader::Pointer SimpleVolumeDICOMSeriesReaderService::GetReader(const m
     descr.assign((std::istreambuf_iterator<char>(stream)),
       std::istreambuf_iterator<char>());
   }
-  //}
 
   DICOMReaderConfigurator::Pointer configurator = DICOMReaderConfigurator::New();
   DICOMFileReader::Pointer reader = configurator->CreateFromUTF8ConfigString(descr);

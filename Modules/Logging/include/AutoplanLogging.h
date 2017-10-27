@@ -29,6 +29,8 @@
 
 #include <ThreadPoolUtilities.h>
 
+#include "StringUtilities.h"
+
 // TODO add call BOOST_CURRENT_FUNCTION after investigate it behavior on Apple system
 #ifdef __APPLE__
   #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info)

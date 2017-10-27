@@ -40,8 +40,6 @@
 
 #include <boost/phoenix/bind.hpp>
 
-#include "StringUtilities.h"
-
 struct ThrowAwayPattern _ = {};
 
 namespace

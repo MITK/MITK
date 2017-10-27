@@ -255,33 +255,21 @@ void QmitkNavigationToolManagementWidget::OnCreateStorage()
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
 {
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
+  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
   if (filename == "") return;
 
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
   try
   {
-    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-    std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
-    if (filename == "") return;
+    mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
 
-    QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
-
-    try
+    if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
+    else
     {
-      mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
-
-      if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
-      else
-      {
-        Poco::Path myPath = Poco::Path(filename.c_str());
-        tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
-        this->LoadStorage(tempStorage);
-        emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
-      }
-    }
-    catch (const mitk::Exception& exception)
-    {
-      MessageBox(exception.GetDescription());
+      Poco::Path myPath = Poco::Path(filename.c_str());
+      tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
+      this->LoadStorage(tempStorage);
+      emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
     }
   }
   catch (const mitk::Exception& exception)

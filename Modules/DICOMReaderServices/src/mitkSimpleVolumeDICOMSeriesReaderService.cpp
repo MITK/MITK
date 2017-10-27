@@ -35,6 +35,7 @@ namespace mitk {
 
 DICOMFileReader::Pointer SimpleVolumeDICOMSeriesReaderService::GetReader(const mitk::StringList& relevantFiles) const
 {
+  mitk::StringList files = relevantFiles;
   std::string descr;
 
   us::ModuleResource resource = 

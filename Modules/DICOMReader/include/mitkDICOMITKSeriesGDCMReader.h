@@ -272,7 +272,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     virtual DICOMTagPathList GetTagsOfInterest() const override;
 
-    static const int GetDefaultDecimalPlacesForOrientation()
+    static int GetDefaultDecimalPlacesForOrientation()
     {
       return m_DefaultDecimalPlacesForOrientation; 
     }

@@ -1,0 +1,10 @@
+/**
+\page org_mitk_views_fiberclustering Fiber Clustering
+
+Cluster fibers using an extended version of the QuickBundles method.
+
+[1] Garyfallidis, Eleftherios, Matthew Brett, Marta Morgado Correia, Guy B. Williams, and Ian Nimmo-Smith. “QuickBundles, a Method for Tractography Simplification.” Frontiers in Neuroscience 6 (2012).
+
+[2] Garyfallidis, Eleftherios, Marc-Alexandre Côté, François Rheault, and Maxime Descoteaux. “QuickBundlesX: Sequential Clustering of Millions of Streamlines in Multiple Levels of Detail at Record Execution Time.” ISMRM2016 (Singapore), 2016.
+
+*/

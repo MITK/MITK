@@ -81,6 +81,7 @@ public:
     void ResampleSpline(float pointDistance=1);
     void ResampleSpline(float pointDistance, double tension, double continuity, double bias );
     void ResampleLinear(double pointDistance=1);
+    void ResampleToNumPoints(unsigned int targetPoints);
 
     mitk::FiberBundle::Pointer FilterByWeights(float weight_thr, bool invert=false);
     bool RemoveShortFibers(float lengthInMM);
@@ -109,6 +110,7 @@ public:
     mitk::FiberBundle::Pointer     SubsampleFibers(float factor);
 
     // get/set data
+    float GetFiberLength(int index) const { return m_FiberLengths.at(index); }
     vtkSmartPointer<vtkFloatArray> GetFiberWeights() const { return m_FiberWeights; }
     float GetFiberWeight(unsigned int fiber) const;
     void SetFiberWeights(float newWeight);
@@ -140,12 +142,13 @@ public:
     itkSetMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
     itkGetConstMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
 
+    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds(std::vector<long> fiberIds, vtkSmartPointer<vtkFloatArray> weights);
+
 protected:
 
     FiberBundle( vtkPolyData* fiberPolyData = nullptr );
     virtual ~FiberBundle();
 
-    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds(std::vector<long> fiberIds, vtkSmartPointer<vtkFloatArray> weights);
     void                            GenerateFiberIds();
     itk::Point<float, 3>            GetItkPoint(double point[3]);
     void                            UpdateFiberGeometry();

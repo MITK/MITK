@@ -28,31 +28,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkNodePredicateProperty.h>
 #include <mitkImageCast.h>
-#include <mitkPointSet.h>
-#include <mitkPlanarCircle.h>
-#include <mitkPlanarPolygon.h>
-#include <mitkPlanarRectangle.h>
-#include <mitkPlanarFigureInteractor.h>
-#include <mitkImageAccessByItk.h>
-#include <mitkDataNodeObject.h>
-#include <mitkTensorImage.h>
 #include <mitkPeakImage.h>
 
 // ITK
-#include <itkResampleImageFilter.h>
-#include <itkGaussianInterpolateImageFunction.h>
-#include <itkImageRegionIteratorWithIndex.h>
-#include <itkTractsToFiberEndingsImageFilter.h>
 #include <itkTractDensityImageFilter.h>
-#include <itkImageRegion.h>
 #include <itkTractsToRgbaImageFilter.h>
 #include <itkTractsToVectorImageFilter.h>
+#include <itkTractsToFiberEndingsImageFilter.h>
 
 #include <math.h>
 #include <boost/lexical_cast.hpp>
 
 const std::string QmitkFiberQuantificationView::VIEW_ID = "org.mitk.views.fiberquantification";
-const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace mitk;
 
 QmitkFiberQuantificationView::QmitkFiberQuantificationView()
@@ -157,7 +144,6 @@ void QmitkFiberQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
 {
   //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
   m_SelectedFB.clear();
-  m_SelectedSurfaces.clear();
   m_SelectedImage = nullptr;
 
   for (mitk::DataNode::Pointer node: nodes)
@@ -168,10 +154,6 @@ void QmitkFiberQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
     }
     else if (dynamic_cast<mitk::Image*>(node->GetData()))
       m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
-    else if (dynamic_cast<mitk::Surface*>(node->GetData()))
-    {
-      m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
-    }
   }
   UpdateGui();
   GenerateStats();

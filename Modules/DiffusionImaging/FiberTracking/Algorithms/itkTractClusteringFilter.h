@@ -55,13 +55,15 @@ public:
   enum Metric
   {
     MDF,
-    MDF_VAR
+    MDF_VAR,
+    MAX_MDF
   };
 
   typedef TractClusteringFilter Self;
   typedef ProcessObject                                       Superclass;
   typedef SmartPointer< Self >                                Pointer;
   typedef SmartPointer< const Self >                          ConstPointer;
+  typedef itk::Image< float, 3 >                              FloatImageType;
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -73,8 +75,11 @@ public:
   itkGetMacro(MinClusterSize, unsigned int)
   itkSetMacro(MaxClusters, unsigned int)
   itkGetMacro(MaxClusters, unsigned int)
+  itkSetMacro(Scale, float)
+  itkGetMacro(Scale, float)
+
   itkSetMacro(Tractogram, mitk::FiberBundle::Pointer)
-  itkGetMacro(Tractogram, mitk::FiberBundle::Pointer)
+  itkSetMacro(ScalarMap, FloatImageType::Pointer)
 
   virtual void Update() override{
     this->GenerateData();
@@ -92,6 +97,7 @@ protected:
   std::vector< vnl_matrix<float> > ResampleFibers();
   float CalcMDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
   float CalcMDF_VAR(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
+  float CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
 
   std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);
 
@@ -108,6 +114,8 @@ protected:
   unsigned int                                m_MinClusterSize;
   unsigned int                                m_MaxClusters;
   Metric                                      m_Metric;
+  FloatImageType::Pointer                     m_ScalarMap;
+  float                                       m_Scale;
 };
 }
 

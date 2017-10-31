@@ -59,8 +59,14 @@ void QmitkFiberClusteringView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TractBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TractBox->SetPredicate(isFib);
 
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+    m_Controls->m_MapBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_MapBox->SetPredicate(isImage);
+    m_Controls->m_MapBox->SetZeroEntryText("--");
+
     FiberSelectionChanged();
   }
+
 }
 
 void QmitkFiberClusteringView::SetFocus()
@@ -107,7 +113,22 @@ void QmitkFiberClusteringView::StartClustering()
   case 1:
     clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_VAR);
     break;
+  case 2:
+    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MAX_MDF);
+    break;
   }
+
+  if (m_Controls->m_MapBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(m_Controls->m_MapBox->GetSelectedNode()->GetData());
+    if (mitk_map->GetDimension()==3)
+    {
+      FloatImageType::Pointer itk_map = FloatImageType::New();
+      mitk::CastToItkImage(mitk_map, itk_map);
+      clusterer->SetScalarMap(itk_map);
+    }
+  }
+  clusterer->SetScale(m_Controls->m_MapScaleBox->value());
   clusterer->SetNumPoints(m_Controls->m_FiberPointsBox->value());
   clusterer->SetMaxClusters(m_Controls->m_MaxClustersBox->value());
   clusterer->SetMinClusterSize(m_Controls->m_MinFibersBox->value());

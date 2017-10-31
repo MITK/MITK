@@ -26,6 +26,8 @@ TractClusteringFilter::TractClusteringFilter()
   , m_MinClusterSize(1)
   , m_MaxClusters(0)
   , m_Metric(Metric::MDF)
+  , m_ScalarMap(nullptr)
+  , m_Scale(0)
 {
 
 }
@@ -94,13 +96,42 @@ float TractClusteringFilter::CalcMDF_VAR(vnl_matrix<float>& s, vnl_matrix<float>
     d += dists_f.magnitude();
 
     flipped = true;
-    return d;
+    return d/2;
   }
 
   float d = d_direct/m_NumPoints;
   dists_d -= d;
   d += dists_d.magnitude();
 
+  flipped = false;
+  return d/2;
+}
+
+float TractClusteringFilter::CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool& flipped)
+{
+  float d_direct = 0;
+  float d_flipped = 0;
+
+  vnl_vector<float> dists_d; dists_d.set_size(m_NumPoints);
+  vnl_vector<float> dists_f; dists_f.set_size(m_NumPoints);
+
+  for (unsigned int i=0; i<m_NumPoints; ++i)
+  {
+    dists_d[i] = (s.get_column(i)-t.get_column(i)).magnitude();
+    d_direct += dists_d[i];
+
+    dists_f[i] = (s.get_column(i)-t.get_column(m_NumPoints-i-1)).magnitude();
+    d_flipped += dists_f[i];
+  }
+
+  if (d_direct>d_flipped)
+  {
+    float d = dists_f.max_value();
+    flipped = true;
+    return d;
+  }
+
+  float d = dists_d.max_value();
   flipped = false;
   return d;
 }
@@ -119,17 +150,36 @@ std::vector<vnl_matrix<float> > TractClusteringFilter::ResampleFibers()
     vtkPoints* points = cell->GetPoints();
 
     vnl_matrix<float> streamline;
-    streamline.set_size(3, m_NumPoints);
+    if (m_ScalarMap.IsNull())
+      streamline.set_size(3, m_NumPoints);
+    else
+      streamline.set_size(4, m_NumPoints);
     streamline.fill(0.0);
 
     for (int j=0; j<numPoints; j++)
     {
       double cand[3];
       points->GetPoint(j, cand);
-      vnl_vector_fixed< float, 3 > candV;
-      candV[0]=cand[0]; candV[1]=cand[1]; candV[2]=cand[2];
 
-      streamline.set_column(j, candV);
+      if (m_ScalarMap.IsNull())
+      {
+        vnl_vector_fixed< float, 3 > candV;
+        candV[0]=cand[0]; candV[1]=cand[1]; candV[2]=cand[2];
+        streamline.set_column(j, candV);
+      }
+      else
+      {
+        vnl_vector_fixed< float, 4 > candV;
+        candV[0]=cand[0]; candV[1]=cand[1]; candV[2]=cand[2]; candV[3]=0;
+        itk::Point<float,3> wp; wp[0]=cand[0]; wp[1]=cand[1]; wp[2]=cand[2];
+
+        itk::Index<3> idx;
+        m_ScalarMap->TransformPhysicalPointToIndex(wp, idx);
+        if (m_ScalarMap->GetLargestPossibleRegion().IsInside(idx))
+          candV[3]=m_ScalarMap->GetPixel(idx)*m_Scale;
+
+        streamline.set_column(j, candV);
+      }
     }
 
     out_fib.push_back(streamline);
@@ -172,6 +222,8 @@ std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::ClusterStep
         d = CalcMDF(t, v, f);
       else if (m_Metric==Metric::MDF_VAR)
         d = CalcMDF_VAR(t, v, f);
+      else if (m_Metric==Metric::MAX_MDF)
+        d = CalcMAX_MDF(t, v, f);
 
       if (d<min_cluster_distance)
       {
@@ -225,6 +277,9 @@ void TractClusteringFilter::AppendCluster(std::vector< Cluster >& a, std::vector
 void TractClusteringFilter::GenerateData()
 {
   m_OutTractograms.clear();
+
+  if (m_Scale==0)
+    m_Scale = m_Distances.at(0);
 
   T = ResampleFibers();
 

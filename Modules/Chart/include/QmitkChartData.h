@@ -82,8 +82,8 @@ private:
   QVariant m_diagramTitle;
 
   QVariant m_LegendPosition;
-  QVariant m_YAxisScale;
   QVariant m_ShowSubchart;
+  QVariant m_YAxisScale;
   QVariant m_UsePercentageInPieChart;
   QVariant m_numberDatasets;
   QVariant m_DataPointSize = 0;

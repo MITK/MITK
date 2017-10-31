@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFiberClusteringViewControls.h"
 #include <itkImage.h>
 
-
 /*!
 \brief Cluster fibers by shape and image properties
 
@@ -40,6 +39,8 @@ public:
   virtual ~QmitkFiberClusteringView();
 
   virtual void CreateQtPartControl(QWidget *parent) override;
+
+  typedef itk::Image< float, 3 > FloatImageType;
 
   ///
   /// Sets the focus to an internal widget.

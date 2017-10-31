@@ -26,6 +26,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_NumUnknowns(0)
   , m_NumResiduals(0)
   , m_NumCoveredDirections(0)
+  , m_SignalModel(nullptr)
 {
   this->SetNumberOfRequiredOutputs(3);
 }
@@ -35,11 +36,148 @@ FitFibersToImageFilter::~FitFibersToImageFilter()
 
 }
 
-void FitFibersToImageFilter::GenerateData()
+void FitFibersToImageFilter::CreateDiffSystem(unsigned int& fiber_count, int& sz_x, int& sz_y, int& sz_z, double& TD, double& FD)
 {
-  int sz_x = m_PeakImage->GetLargestPossibleRegion().GetSize(0);
-  int sz_y = m_PeakImage->GetLargestPossibleRegion().GetSize(1);
-  int sz_z = m_PeakImage->GetLargestPossibleRegion().GetSize(2);
+  sz_x = m_DiffImage->GetLargestPossibleRegion().GetSize(0);
+  sz_y = m_DiffImage->GetLargestPossibleRegion().GetSize(1);
+  sz_z = m_DiffImage->GetLargestPossibleRegion().GetSize(2);
+  int sz_gradients = m_DiffImage->GetVectorLength();
+  int num_voxels = sz_x*sz_y*sz_z;
+
+  float minSpacing = 1;
+  if(m_DiffImage->GetSpacing()[0]<m_DiffImage->GetSpacing()[1] && m_DiffImage->GetSpacing()[0]<m_DiffImage->GetSpacing()[2])
+    minSpacing = m_DiffImage->GetSpacing()[0];
+  else if (m_DiffImage->GetSpacing()[1] < m_DiffImage->GetSpacing()[2])
+    minSpacing = m_DiffImage->GetSpacing()[1];
+  else
+    minSpacing = m_DiffImage->GetSpacing()[2];
+
+  if (m_ResampleFibers)
+    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+    {
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());
+      if (m_DeepCopy)
+        m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
+      m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
+      std::cout.rdbuf (old);
+    }
+
+  m_NumResiduals = num_voxels * sz_gradients;
+
+  MITK_INFO << "Num. unknowns: " << m_NumUnknowns;
+  MITK_INFO << "Num. residuals: " << m_NumResiduals;
+  MITK_INFO << "Creating system ...";
+
+  A.set_size(m_NumResiduals, m_NumUnknowns);
+  b.set_size(m_NumResiduals); b.fill(0.0);
+
+  TD = 0;
+  FD = 0;
+  m_NumCoveredDirections = 0;
+  fiber_count = 0;
+  vnl_vector<int> voxel_indicator; voxel_indicator.set_size(sz_x*sz_y*sz_z); voxel_indicator.fill(0);
+
+  for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+  {
+    vtkSmartPointer<vtkPolyData> polydata = m_Tractograms.at(bundle)->GetFiberPolyData();
+
+    for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
+    {
+      vtkCell* cell = polydata->GetCell(i);
+      int numPoints = cell->GetNumberOfPoints();
+      vtkPoints* points = cell->GetPoints();
+
+      if (numPoints<2)
+        MITK_INFO << "FIBER WITH ONLY ONE POINT ENCOUNTERED!";
+
+      for (int j=0; j<numPoints-1; ++j)
+      {
+        double* p1 = points->GetPoint(j);
+        PointType3 p;
+        p[0]=p1[0];
+        p[1]=p1[1];
+        p[2]=p1[2];
+
+        itk::Index<3> idx3;
+        m_DiffImage->TransformPhysicalPointToIndex(p, idx3);
+        if (!m_DiffImage->GetLargestPossibleRegion().IsInside(idx3) || (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0))
+          continue;
+
+        double* p2 = points->GetPoint(j+1);
+        mitk::DiffusionSignalModel<>::GradientType fiber_dir;
+        fiber_dir[0] = p[0]-p2[0];
+        fiber_dir[1] = p[1]-p2[1];
+        fiber_dir[2] = p[2]-p2[2];
+        fiber_dir.Normalize();
+
+        int x = idx3[0];
+        int y = idx3[1];
+        int z = idx3[2];
+
+
+        m_SignalModel->SetFiberDirection(fiber_dir);
+        mitk::DiffusionSignalModel<>::PixelType simulated_pixel = m_SignalModel->SimulateMeasurement();
+        VectorImgType::PixelType measured_pixel = m_DiffImage->GetPixel(idx3);
+
+        double simulated_mean = 0;
+        double measured_mean = 0;
+        for (int g=0; g<sz_gradients; ++g)
+        {
+          simulated_mean += simulated_pixel[g];
+          measured_mean += (double)measured_pixel[g];
+        }
+        simulated_mean /= sz_gradients;
+        measured_mean /= sz_gradients;
+        simulated_pixel -= simulated_mean;
+        measured_pixel -= measured_mean;
+
+        if (voxel_indicator[x + sz_x*y + sz_x*sz_y*z]==0)
+          FD += measured_mean;
+        TD += simulated_mean;
+        voxel_indicator[x + sz_x*y + sz_x*sz_y*z] = 1;
+
+
+        for (int g=0; g<sz_gradients; ++g)
+        {
+          unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z + sz_x*sz_y*sz_z*g;
+
+          if (m_FitIndividualFibers)
+          {
+            b[linear_index] = (double)measured_pixel[g];
+            A.put(linear_index, fiber_count, A.get(linear_index, fiber_count) + simulated_pixel[g]);
+          }
+          else
+          {
+            b[linear_index] = (double)measured_pixel[g];
+            A.put(linear_index, bundle, A.get(linear_index, bundle) + simulated_pixel[g]);
+          }
+        }
+
+      }
+
+      ++fiber_count;
+    }
+  }
+
+  m_NumCoveredDirections = voxel_indicator.sum();
+  TD /= (m_NumCoveredDirections*fiber_count);
+  FD /= m_NumCoveredDirections;
+  A /= TD;
+  b *= 100.0/FD;  // times 100 because we want to avoid too small values for computational reasons
+}
+
+void FitFibersToImageFilter::SetSignalModel(mitk::DiffusionSignalModel<> *SignalModel)
+{
+  m_SignalModel = SignalModel;
+}
+
+void FitFibersToImageFilter::CreatePeakSystem(unsigned int& fiber_count, int& sz_x, int& sz_y, int& sz_z, double& TD, double& FD)
+{
+  sz_x = m_PeakImage->GetLargestPossibleRegion().GetSize(0);
+  sz_y = m_PeakImage->GetLargestPossibleRegion().GetSize(1);
+  sz_z = m_PeakImage->GetLargestPossibleRegion().GetSize(2);
   int sz_peaks = m_PeakImage->GetLargestPossibleRegion().GetSize(3)/3 + 1; // +1 for zero - peak
   int num_voxels = sz_x*sz_y*sz_z;
 
@@ -50,14 +188,6 @@ void FitFibersToImageFilter::GenerateData()
     minSpacing = m_PeakImage->GetSpacing()[1];
   else
     minSpacing = m_PeakImage->GetSpacing()[2];
-
-  m_NumUnknowns = m_Tractograms.size();
-  if (m_FitIndividualFibers)
-  {
-    m_NumUnknowns = 0;
-    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-      m_NumUnknowns += m_Tractograms.at(bundle)->GetNumFibers();
-  }
 
   if (m_ResampleFibers)
     for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
@@ -77,15 +207,13 @@ void FitFibersToImageFilter::GenerateData()
   MITK_INFO << "Num. residuals: " << m_NumResiduals;
   MITK_INFO << "Creating system ...";
 
-  vnl_sparse_matrix<double> A;
-  vnl_vector<double> b;
   A.set_size(m_NumResiduals, m_NumUnknowns);
   b.set_size(m_NumResiduals); b.fill(0.0);
 
-  double TD = 0;
-  double FD = 0;
+  TD = 0;
+  FD = 0;
   m_NumCoveredDirections = 0;
-  unsigned int fiber_count = 0;
+  fiber_count = 0;
 
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
   {
@@ -133,7 +261,7 @@ void FitFibersToImageFilter::GenerateData()
 
         unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z + sz_x*sz_y*sz_z*peak_id;
 
-        if (b[linear_index] == 0 && peak_id<3)
+        if (b[linear_index] == 0 && peak_id<sz_peaks-1)
         {
           m_NumCoveredDirections++;
           FD += peak_mag;
@@ -160,6 +288,29 @@ void FitFibersToImageFilter::GenerateData()
   FD /= m_NumCoveredDirections;
   A /= TD;
   b *= 100.0/FD;  // times 100 because we want to avoid too small values for computational reasons
+}
+
+void FitFibersToImageFilter::GenerateData()
+{
+  m_NumUnknowns = m_Tractograms.size();
+  if (m_FitIndividualFibers)
+  {
+    m_NumUnknowns = 0;
+    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+      m_NumUnknowns += m_Tractograms.at(bundle)->GetNumFibers();
+  }
+
+  int sz_x; int sz_y; int sz_z;
+  unsigned int fiber_count;
+  double TD;
+  double FD;
+
+  if (m_PeakImage.IsNotNull())
+    CreatePeakSystem(fiber_count, sz_x, sz_y, sz_z, TD, FD);
+  else if (m_DiffImage.IsNotNull())
+    CreateDiffSystem(fiber_count, sz_x, sz_y, sz_z, TD, FD);
+  else
+    mitkThrow() << "No input image set!";
 
   double init_lambda = fiber_count;  // initialization for lambda estimation
 
@@ -284,121 +435,121 @@ void FitFibersToImageFilter::GenerateData()
   }
   std::cout.rdbuf (old);
 
-  // transform back for peak image creation
+  // transform back
   A *= FD/100.0;
   b *= FD/100.0;
 
-  MITK_INFO << "Generating output images ...";
+//  MITK_INFO << "Generating output images ...";
 
-  itk::ImageDuplicator< PeakImgType >::Pointer duplicator = itk::ImageDuplicator< PeakImgType >::New();
-  duplicator->SetInputImage(m_PeakImage);
-  duplicator->Update();
-  m_UnderexplainedImage = duplicator->GetOutput();
-  m_UnderexplainedImage->FillBuffer(0.0);
+//  itk::ImageDuplicator< PeakImgType >::Pointer duplicator = itk::ImageDuplicator< PeakImgType >::New();
+//  duplicator->SetInputImage(m_PeakImage);
+//  duplicator->Update();
+//  m_UnderexplainedImage = duplicator->GetOutput();
+//  m_UnderexplainedImage->FillBuffer(0.0);
 
-  duplicator->SetInputImage(m_UnderexplainedImage);
-  duplicator->Update();
-  m_OverexplainedImage = duplicator->GetOutput();
-  m_OverexplainedImage->FillBuffer(0.0);
+//  duplicator->SetInputImage(m_UnderexplainedImage);
+//  duplicator->Update();
+//  m_OverexplainedImage = duplicator->GetOutput();
+//  m_OverexplainedImage->FillBuffer(0.0);
 
-  duplicator->SetInputImage(m_OverexplainedImage);
-  duplicator->Update();
-  m_ResidualImage = duplicator->GetOutput();
-  m_ResidualImage->FillBuffer(0.0);
+//  duplicator->SetInputImage(m_OverexplainedImage);
+//  duplicator->Update();
+//  m_ResidualImage = duplicator->GetOutput();
+//  m_ResidualImage->FillBuffer(0.0);
 
-  duplicator->SetInputImage(m_ResidualImage);
-  duplicator->Update();
-  m_FittedImage = duplicator->GetOutput();
-  m_FittedImage->FillBuffer(0.0);
+//  duplicator->SetInputImage(m_ResidualImage);
+//  duplicator->Update();
+//  m_FittedImage = duplicator->GetOutput();
+//  m_FittedImage->FillBuffer(0.0);
 
-  vnl_vector<double> fitted_b; fitted_b.set_size(b.size());
-  cost.S->multiply(m_Weights, fitted_b);
+//  vnl_vector<double> fitted_b; fitted_b.set_size(b.size());
+//  cost.S->multiply(m_Weights, fitted_b);
 
-  for (unsigned int r=0; r<b.size(); r++)
-  {
-    itk::Index<4> idx4;
-    unsigned int linear_index = r;
-    idx4[0] = linear_index % sz_x; linear_index /= sz_x;
-    idx4[1] = linear_index % sz_y; linear_index /= sz_y;
-    idx4[2] = linear_index % sz_z; linear_index /= sz_z;
-    int peak_id = linear_index % sz_peaks;
+//  for (unsigned int r=0; r<b.size(); r++)
+//  {
+//    itk::Index<4> idx4;
+//    unsigned int linear_index = r;
+//    idx4[0] = linear_index % sz_x; linear_index /= sz_x;
+//    idx4[1] = linear_index % sz_y; linear_index /= sz_y;
+//    idx4[2] = linear_index % sz_z; linear_index /= sz_z;
+//    int peak_id = linear_index % sz_peaks;
 
-    if (peak_id<sz_peaks-1)
-    {
-      vnl_vector_fixed<float,3> peak_dir;
+//    if (peak_id<sz_peaks-1)
+//    {
+//      vnl_vector_fixed<float,3> peak_dir;
 
-      idx4[3] = peak_id*3;
-      peak_dir[0] = m_PeakImage->GetPixel(idx4);
-      idx4[3] += 1;
-      peak_dir[1] = m_PeakImage->GetPixel(idx4);
-      idx4[3] += 1;
-      peak_dir[2] = m_PeakImage->GetPixel(idx4);
+//      idx4[3] = peak_id*3;
+//      peak_dir[0] = m_PeakImage->GetPixel(idx4);
+//      idx4[3] += 1;
+//      peak_dir[1] = m_PeakImage->GetPixel(idx4);
+//      idx4[3] += 1;
+//      peak_dir[2] = m_PeakImage->GetPixel(idx4);
 
-      peak_dir.normalize();
-      peak_dir *= fitted_b[r];
+//      peak_dir.normalize();
+//      peak_dir *= fitted_b[r];
 
-      idx4[3] = peak_id*3;
-      m_FittedImage->SetPixel(idx4, peak_dir[0]);
+//      idx4[3] = peak_id*3;
+//      m_FittedImage->SetPixel(idx4, peak_dir[0]);
 
-      idx4[3] += 1;
-      m_FittedImage->SetPixel(idx4, peak_dir[1]);
+//      idx4[3] += 1;
+//      m_FittedImage->SetPixel(idx4, peak_dir[1]);
 
-      idx4[3] += 1;
-      m_FittedImage->SetPixel(idx4, peak_dir[2]);
-    }
-  }
+//      idx4[3] += 1;
+//      m_FittedImage->SetPixel(idx4, peak_dir[2]);
+//    }
+//  }
 
-  FD = 0;
-  m_Coverage = 0;
-  m_Overshoot = 0;
+//  FD = 0;
+//  m_Coverage = 0;
+//  m_Overshoot = 0;
 
-  itk::Index<4> idx4;
-  for (idx4[0]=0; idx4[0]<sz_x; ++idx4[0])
-    for (idx4[1]=0; idx4[1]<sz_y; ++idx4[1])
-      for (idx4[2]=0; idx4[2]<sz_z; ++idx4[2])
-      {
-        itk::Index<3> idx3; idx3[0] = idx4[0]; idx3[1] = idx4[1]; idx3[2] = idx4[2];
-        if (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0)
-          continue;
+//  itk::Index<4> idx4;
+//  for (idx4[0]=0; idx4[0]<sz_x; ++idx4[0])
+//    for (idx4[1]=0; idx4[1]<sz_y; ++idx4[1])
+//      for (idx4[2]=0; idx4[2]<sz_z; ++idx4[2])
+//      {
+//        itk::Index<3> idx3; idx3[0] = idx4[0]; idx3[1] = idx4[1]; idx3[2] = idx4[2];
+//        if (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0)
+//          continue;
 
-        vnl_vector_fixed<float,3> peak_dir;
-        vnl_vector_fixed<float,3> fitted_dir;
-        vnl_vector_fixed<float,3> overshoot_dir;
-        for (idx4[3]=0; idx4[3]<(itk::IndexValueType)m_PeakImage->GetLargestPossibleRegion().GetSize(3); ++idx4[3])
-        {
-          peak_dir[idx4[3]%3] = m_PeakImage->GetPixel(idx4);
-          fitted_dir[idx4[3]%3] = m_FittedImage->GetPixel(idx4);
-          m_ResidualImage->SetPixel(idx4, m_PeakImage->GetPixel(idx4) - m_FittedImage->GetPixel(idx4));
+//        vnl_vector_fixed<float,3> peak_dir;
+//        vnl_vector_fixed<float,3> fitted_dir;
+//        vnl_vector_fixed<float,3> overshoot_dir;
+//        for (idx4[3]=0; idx4[3]<(itk::IndexValueType)m_PeakImage->GetLargestPossibleRegion().GetSize(3); ++idx4[3])
+//        {
+//          peak_dir[idx4[3]%3] = m_PeakImage->GetPixel(idx4);
+//          fitted_dir[idx4[3]%3] = m_FittedImage->GetPixel(idx4);
+//          m_ResidualImage->SetPixel(idx4, m_PeakImage->GetPixel(idx4) - m_FittedImage->GetPixel(idx4));
 
-          if (idx4[3]%3==2)
-          {
-            FD += peak_dir.magnitude();
+//          if (idx4[3]%3==2)
+//          {
+//            FD += peak_dir.magnitude();
 
-            itk::Index<4> tidx= idx4;
-            if (peak_dir.magnitude()>fitted_dir.magnitude())
-            {
-              m_Coverage += fitted_dir.magnitude();
-              m_UnderexplainedImage->SetPixel(tidx, peak_dir[2]-fitted_dir[2]); tidx[3]--;
-              m_UnderexplainedImage->SetPixel(tidx, peak_dir[1]-fitted_dir[1]); tidx[3]--;
-              m_UnderexplainedImage->SetPixel(tidx, peak_dir[0]-fitted_dir[0]);
-            }
-            else
-            {
-              overshoot_dir[0] = fitted_dir[0]-peak_dir[0];
-              overshoot_dir[1] = fitted_dir[1]-peak_dir[1];
-              overshoot_dir[2] = fitted_dir[2]-peak_dir[2];
-              m_Coverage += peak_dir.magnitude();
-              m_Overshoot += overshoot_dir.magnitude();
-              m_OverexplainedImage->SetPixel(tidx, overshoot_dir[2]); tidx[3]--;
-              m_OverexplainedImage->SetPixel(tidx, overshoot_dir[1]); tidx[3]--;
-              m_OverexplainedImage->SetPixel(tidx, overshoot_dir[0]);
-            }
-          }
-        }
-      }
+//            itk::Index<4> tidx= idx4;
+//            if (peak_dir.magnitude()>fitted_dir.magnitude())
+//            {
+//              m_Coverage += fitted_dir.magnitude();
+//              m_UnderexplainedImage->SetPixel(tidx, peak_dir[2]-fitted_dir[2]); tidx[3]--;
+//              m_UnderexplainedImage->SetPixel(tidx, peak_dir[1]-fitted_dir[1]); tidx[3]--;
+//              m_UnderexplainedImage->SetPixel(tidx, peak_dir[0]-fitted_dir[0]);
+//            }
+//            else
+//            {
+//              overshoot_dir[0] = fitted_dir[0]-peak_dir[0];
+//              overshoot_dir[1] = fitted_dir[1]-peak_dir[1];
+//              overshoot_dir[2] = fitted_dir[2]-peak_dir[2];
+//              m_Coverage += peak_dir.magnitude();
+//              m_Overshoot += overshoot_dir.magnitude();
+//              m_OverexplainedImage->SetPixel(tidx, overshoot_dir[2]); tidx[3]--;
+//              m_OverexplainedImage->SetPixel(tidx, overshoot_dir[1]); tidx[3]--;
+//              m_OverexplainedImage->SetPixel(tidx, overshoot_dir[0]);
+//            }
+//          }
+//        }
+//      }
 
-  m_Coverage = m_Coverage/FD;
-  m_Overshoot = m_Overshoot/FD;
+//  m_Coverage = m_Coverage/FD;
+//  m_Overshoot = m_Overshoot/FD;
 
   MITK_INFO << std::fixed << "Coverage: " << setprecision(2) << 100.0*m_Coverage << "%";
   MITK_INFO << std::fixed << "Overshoot: " << setprecision(2) << 100.0*m_Overshoot << "%";

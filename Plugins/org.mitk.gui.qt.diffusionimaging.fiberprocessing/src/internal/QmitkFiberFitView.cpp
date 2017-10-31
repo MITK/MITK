@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPeakImage.h>
 #include <mitkFiberBundle.h>
 #include <itkFitFibersToImageFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkTensorModel.h>
 
 const std::string QmitkFiberFitView::VIEW_ID = "org.mitk.views.fiberfit";
 using namespace mitk;
@@ -59,7 +61,7 @@ void QmitkFiberFitView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_TractBox, SIGNAL(currentIndexChanged(int)), this, SLOT(DataSelectionChanged()) );
 
     mitk::TNodePredicateDataType<mitk::FiberBundle>::Pointer isFib = mitk::TNodePredicateDataType<mitk::FiberBundle>::New();
-    mitk::TNodePredicateDataType<mitk::PeakImage>::Pointer isPeak = mitk::TNodePredicateDataType<mitk::PeakImage>::New();
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer isPeak = mitk::TNodePredicateDataType<mitk::Image>::New();
 
     m_Controls->m_TractBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TractBox->SetPredicate(isFib);
@@ -89,20 +91,39 @@ void QmitkFiberFitView::StartFit()
   if (m_Controls->m_TractBox->GetSelectedNode().IsNull() || m_Controls->m_ImageBox->GetSelectedNode().IsNull())
     return;
 
-  mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
-
-  mitk::PeakImage::Pointer mitk_peak_image = dynamic_cast<mitk::PeakImage*>(node->GetData());
-
-  typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
-  CasterType::Pointer caster = CasterType::New();
-  caster->SetInput(mitk_peak_image);
-  caster->Update();
-  mitk::PeakImage::ItkPeakImageType::Pointer peak_image = caster->GetOutput();
-
   mitk::FiberBundle::Pointer input_tracts = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_TractBox->GetSelectedNode()->GetData());
 
+  mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-  fitter->SetPeakImage(peak_image);
+
+  mitk::PeakImage::Pointer mitk_peak_image = dynamic_cast<mitk::PeakImage*>(node->GetData());
+  if (mitk_peak_image.IsNotNull())
+  {
+    typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput(mitk_peak_image);
+    caster->Update();
+    mitk::PeakImage::ItkPeakImageType::Pointer peak_image = caster->GetOutput();
+    fitter->SetPeakImage(peak_image);
+  }
+  else
+  {
+    mitk::Image::Pointer mitk_diff_image = dynamic_cast<mitk::Image*>(node->GetData());
+    if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_diff_image))
+    {
+      fitter->SetDiffImage(mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_diff_image));
+      mitk::TensorModel<>* model = new mitk::TensorModel<>();
+      model->SetBvalue(1000);
+      model->SetDiffusivity1(0.0010);
+      model->SetDiffusivity2(0.00015);
+      model->SetDiffusivity3(0.00015);
+      model->SetGradientList(mitk::DiffusionPropertyHelper::GetGradientContainer(mitk_diff_image));
+      fitter->SetSignalModel(model);
+    }
+    else
+      return;
+  }
+
   fitter->SetTractograms({input_tracts});
   fitter->SetFitIndividualFibers(true);
   fitter->SetMaxIterations(20);

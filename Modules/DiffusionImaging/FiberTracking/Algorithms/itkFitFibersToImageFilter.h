@@ -11,11 +11,14 @@
 #include <itkImageDuplicator.h>
 #include <itkTimeProbe.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkDiffusionSignalModel.h>
 
 namespace itk{
 
 /**
 * \brief Fits the tractogram to the input peak image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).  */
+
 
 class FitFibersToImageFilter : public ImageSource< mitk::PeakImage::ItkPeakImageType >
 {
@@ -27,9 +30,11 @@ public:
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
+  typedef itk::Point<float, 3> PointType3;
   typedef itk::Point<float, 4> PointType4;
-  typedef mitk::PeakImage::ItkPeakImageType       PeakImgType;
-  typedef itk::Image<unsigned char, 3>            UcharImgType;
+  typedef mitk::DiffusionPropertyHelper::ImageType  VectorImgType;
+  typedef mitk::PeakImage::ItkPeakImageType         PeakImgType;
+  typedef itk::Image<unsigned char, 3>              UcharImgType;
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -37,6 +42,8 @@ public:
 
   itkSetMacro( PeakImage, PeakImgType::Pointer)
   itkGetMacro( PeakImage, PeakImgType::Pointer)
+  itkSetMacro( DiffImage, VectorImgType::Pointer)
+  itkGetMacro( DiffImage, VectorImgType::Pointer)
   itkSetMacro( MaskImage, UcharImgType::Pointer)
   itkGetMacro( MaskImage, UcharImgType::Pointer)
   itkSetMacro( FitIndividualFibers, bool)
@@ -82,6 +89,8 @@ public:
 
   std::vector<mitk::FiberBundle::Pointer> GetTractograms() const;
 
+  void SetSignalModel(mitk::DiffusionSignalModel<> *SignalModel);
+
 protected:
 
   FitFibersToImageFilter();
@@ -89,8 +98,12 @@ protected:
 
   vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer m_PeakImage , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w );
 
+  void CreatePeakSystem(unsigned int& fiber_count, int& sz_x, int& sz_y, int& sz_z, double& TD, double& FD);
+  void CreateDiffSystem(unsigned int& fiber_count, int& sz_x, int& sz_y, int& sz_z, double& TD, double& FD);
+
   std::vector< mitk::FiberBundle::Pointer >   m_Tractograms;
   PeakImgType::Pointer                        m_PeakImage;
+  VectorImgType::Pointer                      m_DiffImage;
   UcharImgType::Pointer                       m_MaskImage;
   bool                                        m_FitIndividualFibers;
   double                                      m_GradientTolerance;
@@ -120,6 +133,10 @@ protected:
   PeakImgType::Pointer                        m_OverexplainedImage;
   PeakImgType::Pointer                        m_ResidualImage;
   PeakImgType::Pointer                        m_FittedImage;
+  mitk::DiffusionSignalModel<>*               m_SignalModel;
+
+  vnl_sparse_matrix<double>                   A;
+  vnl_vector<double>                          b;
 };
 
 }

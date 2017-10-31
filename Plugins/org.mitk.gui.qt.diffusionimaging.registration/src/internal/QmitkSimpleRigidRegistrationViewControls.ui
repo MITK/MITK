@@ -84,7 +84,7 @@
       <bool>false</bool>
      </property>
      <property name="toolTip">
-      <string>Start DWI registration/Head Motion Correction</string>
+      <string/>
      </property>
      <property name="text">
       <string>Start Registration</string>

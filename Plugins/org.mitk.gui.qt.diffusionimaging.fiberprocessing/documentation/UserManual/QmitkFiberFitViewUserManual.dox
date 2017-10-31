@@ -1,0 +1,10 @@
+/**
+\page org_mitk_views_fiberfit Fiber Fit
+
+Linearly fits the weight of each fiber in order to optimally explain the input peak image.
+
+[1] Smith, Robert E., Jacques-Donald Tournier, Fernando Calamante, and Alan Connelly. “SIFT2: Enabling Dense Quantitative Assessment of Brain White Matter Connectivity Using Streamlines Tractography.” NeuroImage 119, no. Supplement C (October 1, 2015): 338–51. https://doi.org/10.1016/j.neuroimage.2015.06.092.
+
+[2] Pestilli, Franco, Jason D. Yeatman, Ariel Rokem, Kendrick N. Kay, and Brian A. Wandell. “Evaluation and Statistical Inference for Human Connectomes.” Nature Methods 11, no. 10 (October 2014): 1058–63. https://doi.org/10.1038/nmeth.3098.
+
+*/

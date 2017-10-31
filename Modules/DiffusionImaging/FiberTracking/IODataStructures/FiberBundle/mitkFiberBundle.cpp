@@ -394,17 +394,17 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     points2.push_back( {start, end} );
   }
 
-//  int progress = 0;
+  //  int progress = 0;
   std::vector< int > ids;
 #pragma omp parallel for
   for (int i=0; i<(int)points1.size(); i++)
   {
-//#pragma omp critical
-//    {
-//      progress++;
-//      std::cout << (int)(100*(float)progress/points1.size()) << "%" << '\r';
-//      cout.flush();
-//    }
+    //#pragma omp critical
+    //    {
+    //      progress++;
+    //      std::cout << (int)(100*(float)progress/points1.size()) << "%" << '\r';
+    //      cout.flush();
+    //    }
 
     bool match = false;
     for (unsigned int j=0; j<points2.size(); j++)
@@ -2383,6 +2383,133 @@ void mitk::FiberBundle::Compress(float error)
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);
     this->SetFiberPolyData(m_FiberPolyData, true);
+  }
+}
+
+void mitk::FiberBundle::ResampleToNumPoints(unsigned int targetPoints)
+{
+  if (targetPoints<2)
+    mitkThrow() << "Minimum two points required for resampling!";
+
+  MITK_INFO << "Resampling fibers (number of points " << targetPoints << ")";
+
+  bool unequal_fibs = true;
+  while (unequal_fibs)
+  {
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+    vtkSmartPointer<vtkFloatArray> newFiberWeights = vtkSmartPointer<vtkFloatArray>::New();
+    newFiberWeights->SetName("FIBER_WEIGHTS");
+    newFiberWeights->SetNumberOfValues(m_NumFibers);
+
+    unequal_fibs = false;
+//#pragma omp parallel for
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    {
+
+      std::vector< vnl_vector_fixed< double, 3 > > vertices;
+      float weight = 1;
+
+      double seg_len = 0;
+
+//#pragma omp critical
+      {
+        weight = m_FiberWeights->GetValue(i);
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        if ((unsigned int)numPoints!=targetPoints)
+          seg_len = this->GetFiberLength(i)/(targetPoints-1);;
+        vtkPoints* points = cell->GetPoints();
+
+        for (int j=0; j<numPoints; j++)
+        {
+          double cand[3];
+          points->GetPoint(j, cand);
+          vnl_vector_fixed< double, 3 > candV;
+          candV[0]=cand[0]; candV[1]=cand[1]; candV[2]=cand[2];
+          vertices.push_back(candV);
+        }
+      }
+
+      vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+      vnl_vector_fixed< double, 3 > lastV = vertices.at(0);
+
+//#pragma omp critical
+      {
+        vtkIdType id = vtkNewPoints->InsertNextPoint(lastV.data_block());
+        container->GetPointIds()->InsertNextId(id);
+      }
+      for (unsigned int j=1; j<vertices.size(); j++)
+      {
+        vnl_vector_fixed< double, 3 > vec = vertices.at(j) - lastV;
+        double new_dist = vec.magnitude();
+
+        if (new_dist >= seg_len && seg_len>0)
+        {
+          vnl_vector_fixed< double, 3 > newV = lastV;
+          if ( new_dist-seg_len <= mitk::eps )
+          {
+            vec.normalize();
+            newV += vec * seg_len;
+          }
+          else
+          {
+            // intersection between sphere (radius 'pointDistance', center 'lastV') and line (direction 'd' and point 'p')
+            vnl_vector_fixed< double, 3 > p = vertices.at(j-1);
+            vnl_vector_fixed< double, 3 > d = vertices.at(j) - p;
+
+            double a = d[0]*d[0] + d[1]*d[1] + d[2]*d[2];
+            double b = 2 * (d[0] * (p[0] - lastV[0]) + d[1] * (p[1] - lastV[1]) + d[2] * (p[2] - lastV[2]));
+            double c = (p[0] - lastV[0])*(p[0] - lastV[0]) + (p[1] - lastV[1])*(p[1] - lastV[1]) + (p[2] - lastV[2])*(p[2] - lastV[2]) - seg_len*seg_len;
+
+            double v1 =(-b + std::sqrt(b*b-4*a*c))/(2*a);
+            double v2 =(-b - std::sqrt(b*b-4*a*c))/(2*a);
+
+            if (v1>0)
+              newV = p + d * v1;
+            else if (v2>0)
+              newV = p + d * v2;
+            else
+              MITK_INFO << "ERROR1 - linear resampling";
+
+            j--;
+          }
+
+//#pragma omp critical
+          {
+            vtkIdType id = vtkNewPoints->InsertNextPoint(newV.data_block());
+            container->GetPointIds()->InsertNextId(id);
+          }
+          lastV = newV;
+        }
+        else if ( (j==vertices.size()-1 && new_dist>0.0001) || seg_len==0)
+        {
+//#pragma omp critical
+          {
+            vtkIdType id = vtkNewPoints->InsertNextPoint(vertices.at(j).data_block());
+            container->GetPointIds()->InsertNextId(id);
+          }
+        }
+      }
+
+//#pragma omp critical
+      {
+        newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), weight);
+        vtkNewCells->InsertNextCell(container);
+        if (container->GetNumberOfPoints()!=targetPoints)
+          unequal_fibs = true;
+      }
+    }
+
+    if (vtkNewCells->GetNumberOfCells()>0)
+    {
+      SetFiberWeights(newFiberWeights);
+      m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+      m_FiberPolyData->SetPoints(vtkNewPoints);
+      m_FiberPolyData->SetLines(vtkNewCells);
+      this->SetFiberPolyData(m_FiberPolyData, true);
+    }
   }
 }
 

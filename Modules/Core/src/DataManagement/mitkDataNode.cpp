@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGenericProperty.h"
 #include "mitkImageSource.h"
 #include "mitkCoreObjectFactory.h"
+#include <ThreadUtilities.h>
 
 
 
@@ -58,9 +59,12 @@ void mitk::DataNode::SetData(mitk::BaseData* baseData)
 {
   if(m_Data != baseData)
   {
-    m_Mappers.clear();
-    m_Mappers.resize(10);
-
+    auto mappers = new decltype(m_Mappers);
+    mappers->resize(10);
+    std::swap(m_Mappers, *mappers);
+    Utilities::execInMainThreadAsync([mappers]{
+      delete mappers;
+    });
     if(m_Data.IsNotNull() && baseData != nullptr)
     {
       // Do previous and new data have same type? Keep existing properties.
@@ -106,7 +110,11 @@ mitk::DataNode::~DataNode()
   if(m_PropertyList.IsNotNull())
     m_PropertyList->RemoveObserver(m_PropertyListModifiedObserverTag);
 
-  m_Mappers.clear();
+  auto mappers = new decltype(m_Mappers);
+  std::swap(m_Mappers, *mappers);
+  Utilities::execInMainThreadAsync([mappers]{
+    delete mappers;
+  });
   m_Data = nullptr;
 }
 

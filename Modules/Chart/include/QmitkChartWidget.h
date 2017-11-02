@@ -132,8 +132,8 @@ public:
   void SetYAxisLabel(const std::string& label);
   std::string GetYAxisLabel() const;
 
-  void SetDiagramTitle(const std::string &title);
-  std::string GetDiagramTitle() const;
+  void SetTitle(const std::string &title);
+  std::string GetTitle() const;
 
   /*!
   * \brief sets the chart type for a data entry

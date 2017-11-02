@@ -53,6 +53,8 @@ bool mitk::PropertyAliases::AddAlias(const std::string& propertyName, const std:
   if (alias.empty())
     return false;
 
+  std::lock_guard<std::mutex> lock(m_mapChangeMutex);
+
   AliasesMap& aliases = m_Aliases[className];
   AliasesMapIterator iter = aliases.find(propertyName);
 
@@ -71,7 +73,7 @@ bool mitk::PropertyAliases::AddAlias(const std::string& propertyName, const std:
 
 std::vector<std::string> mitk::PropertyAliases::GetAliases(const std::string& propertyName, const std::string& className)
 {
-  if (!propertyName.empty())
+  if (!propertyName.empty() && m_Aliases.count(className))
   {
     AliasesMap& aliases = m_Aliases[className];
     AliasesMapConstIterator iter = aliases.find(propertyName);
@@ -85,7 +87,7 @@ std::vector<std::string> mitk::PropertyAliases::GetAliases(const std::string& pr
 
 std::string mitk::PropertyAliases::GetPropertyName(const std::string& alias, const std::string& className)
 {
-  if (!alias.empty())
+  if (!alias.empty() && m_Aliases.count(className))
   {
     AliasesMap& aliases = m_Aliases[className];
     AliasesMapConstIterator iter = std::find_if(aliases.begin(), aliases.end(), AliasEquals(alias));
@@ -99,17 +101,20 @@ std::string mitk::PropertyAliases::GetPropertyName(const std::string& alias, con
 
 bool mitk::PropertyAliases::HasAliases(const std::string& propertyName, const std::string& className)
 {
+  if (propertyName.empty() || !m_Aliases.count(className))
+    return false;
+
   const AliasesMap& aliases = m_Aliases[className];
 
-  return !propertyName.empty()
-    ? aliases.find(propertyName) != aliases.end()
-    : false;
+  return aliases.find(propertyName) != aliases.end();
 }
 
 void mitk::PropertyAliases::RemoveAlias(const std::string& propertyName, const std::string& alias, const std::string& className)
 {
   if (!propertyName.empty() && !alias.empty())
   {
+    std::lock_guard<std::mutex> lock(m_mapChangeMutex);
+
     AliasesMap& aliases = m_Aliases[className];
     AliasesMapIterator iter = aliases.find(propertyName);
 
@@ -132,6 +137,8 @@ void mitk::PropertyAliases::RemoveAliases(const std::string& propertyName, const
 {
   if (!propertyName.empty())
   {
+    std::lock_guard<std::mutex> lock(m_mapChangeMutex);
+
     AliasesMap& aliases = m_Aliases[className];
     aliases.erase(propertyName);
   }
@@ -139,6 +146,8 @@ void mitk::PropertyAliases::RemoveAliases(const std::string& propertyName, const
 
 void mitk::PropertyAliases::RemoveAllAliases(const std::string& className)
 {
+  std::lock_guard<std::mutex> lock(m_mapChangeMutex);
+
   AliasesMap& aliases = m_Aliases[className];
   aliases.clear();
 }

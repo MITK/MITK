@@ -7,6 +7,7 @@ namespace Utilities
   Invoker::Invoker()
   {
     qRegisterMetaType<Utilities::ExecuteProc>("Utilities::ExecuteProc");
+    qRegisterMetaType<Utilities::ExecuteProc>("ExecuteProc");
   }
 
   void Invoker::ExecInMainThread(const ExecuteProc& proc, Qt::ConnectionType connType)

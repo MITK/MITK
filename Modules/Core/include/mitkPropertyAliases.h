@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIPropertyAliases.h>
 #include <map>
+#include <mutex>
 
 namespace mitk
 {
@@ -45,6 +46,7 @@ namespace mitk
     PropertyAliases& operator=(const PropertyAliases&);
 
     std::map<std::string, AliasesMap> m_Aliases;
+    std::mutex m_mapChangeMutex;
   };
 }
 

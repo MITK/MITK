@@ -224,6 +224,18 @@ void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Poi
   m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
   m_Controls->m_SerialNumberEdit->setText(QString(DefaultTool->GetSerialNumber().c_str()));
   m_AdvancedWidget->SetDefaultTooltip(DefaultTool->GetToolTipTransform());
+  m_Controls->m_ToolAxisX->setValue(DefaultTool->GetToolAxis()[0]);
+  m_Controls->m_ToolAxisY->setValue(DefaultTool->GetToolAxis()[1]);
+  m_Controls->m_ToolAxisZ->setValue(DefaultTool->GetToolAxis()[2]);
+  QString _label = "(" +
+    QString::number(DefaultTool->GetToolTipPosition()[0], 'f', 0) + ", " +
+    QString::number(DefaultTool->GetToolTipPosition()[1], 'f', 0) + ", " +
+    QString::number(DefaultTool->GetToolTipPosition()[2], 'f', 0) + "), quat: [" +
+    QString::number(DefaultTool->GetToolTipOrientation()[0], 'f', 2) + ", " +
+    QString::number(DefaultTool->GetToolTipOrientation()[1], 'f', 2) + ", " +
+    QString::number(DefaultTool->GetToolTipOrientation()[2], 'f', 2) + ", " +
+    QString::number(DefaultTool->GetToolTipOrientation()[3], 'f', 2) + "]";
+  m_Controls->m_ToolTipLabel->setText(_label);
   int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(DefaultTool->GetTrackingDeviceType()));
 
   if (index >= 0)

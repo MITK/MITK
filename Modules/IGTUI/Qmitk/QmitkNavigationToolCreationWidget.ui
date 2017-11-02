@@ -51,8 +51,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>237</width>
-        <height>115</height>
+        <width>397</width>
+        <height>157</height>
        </rect>
       </property>
       <attribute name="label">
@@ -140,8 +140,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>303</width>
-        <height>98</height>
+        <width>397</width>
+        <height>157</height>
        </rect>
       </property>
       <attribute name="label">
@@ -250,8 +250,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>237</width>
-        <height>115</height>
+        <width>397</width>
+        <height>157</height>
        </rect>
       </property>
       <attribute name="label">
@@ -407,6 +407,13 @@
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Tooltip:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="m_ToolTipLabel">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>

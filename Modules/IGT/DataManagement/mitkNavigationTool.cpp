@@ -19,58 +19,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 #include "Poco/File.h"
 #include "mitkUnspecifiedTrackingTypeInformation.h"
+#include "mitkInternalTrackingTool.h"
 
 mitk::NavigationTool::NavigationTool() : m_Identifier("None"),
-                                         m_Type(mitk::NavigationTool::Unknown),
-                                         m_CalibrationFile("none"),
-                                         m_SerialNumber(""),
-                                         m_TrackingDeviceType(mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()),
-                                         m_ToolRegistrationLandmarks(mitk::PointSet::New()),
-                                         m_ToolCalibrationLandmarks(mitk::PointSet::New()),
-                                         m_ToolTipOrientation(mitk::Quaternion(0,0,0,1))
-  {
-    m_ToolTipPosition[0] = 0;
-    m_ToolTipPosition[1] = 0;
-    m_ToolTipPosition[2] = 0;
+m_Type(mitk::NavigationTool::Unknown),
+m_CalibrationFile("none"),
+m_SerialNumber(""),
+m_TrackingDeviceType(mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()),
+m_ToolRegistrationLandmarks(mitk::PointSet::New()),
+m_ToolCalibrationLandmarks(mitk::PointSet::New()),
+m_ToolTipOrientation(mitk::Quaternion(0, 0, 0, 1))
+{
+  m_ToolTipPosition[0] = 0;
+  m_ToolTipPosition[1] = 0;
+  m_ToolTipPosition[2] = 0;
 
-    m_ToolAxis[0] = 1;
-    m_ToolAxis[1] = 0;
-    m_ToolAxis[2] = 0;
-  }
+  m_ToolAxis[0] = 1;
+  m_ToolAxis[1] = 0;
+  m_ToolAxis[2] = 0;
+}
 
 mitk::NavigationTool::~NavigationTool()
-  {
-
-  }
+{
+}
 
 mitk::AffineTransform3D::Pointer mitk::NavigationTool::GetToolTipTransform()
- {
-   mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
-   returnValue->SetPosition(this->m_ToolTipPosition);
-   returnValue->SetOrientation(this->m_ToolTipOrientation);
-   return returnValue->GetAffineTransform3D();
- }
+{
+  mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
+  returnValue->SetPosition(this->m_ToolTipPosition);
+  returnValue->SetOrientation(this->m_ToolTipOrientation);
+  return returnValue->GetAffineTransform3D();
+}
 
-void mitk::NavigationTool::Graft( const DataObject *data )
+void mitk::NavigationTool::Graft(const DataObject *data)
 {
   // Attempt to cast data to an NavigationData
   const Self* nd;
   try
   {
-    nd = dynamic_cast<const Self *>( data );
+    nd = dynamic_cast<const Self *>(data);
   }
-  catch( ... )
+  catch (...)
   {
     mitkThrowException(mitk::IGTException) << "mitk::NavigationData::Graft cannot cast "
       << typeid(data).name() << " to "
-      << typeid(const Self *).name() ;
+      << typeid(const Self *).name();
   }
   if (!nd)
   {
     // pointer could not be cast back down
     mitkThrowException(mitk::IGTException) << "mitk::NavigationData::Graft cannot cast "
       << typeid(data).name() << " to "
-      << typeid(const Self *).name() ;
+      << typeid(const Self *).name();
   }
   // Now copy anything that is needed
   m_Identifier = nd->GetIdentifier();
@@ -87,48 +87,71 @@ void mitk::NavigationTool::Graft( const DataObject *data )
   m_ToolTipPosition = nd->GetToolTipPosition();
   m_ToolTipOrientation = nd->GetToolTipOrientation();
   m_ToolAxis = nd->GetToolAxis();
-
 }
 
 bool mitk::NavigationTool::IsToolTipSet()
-  {
-  if( (m_ToolTipPosition[0] == 0) &&
+{
+  if ((m_ToolTipPosition[0] == 0) &&
     (m_ToolTipPosition[1] == 0) &&
     (m_ToolTipPosition[2] == 0) &&
     (m_ToolTipOrientation.x() == 0) &&
     (m_ToolTipOrientation.y() == 0) &&
     (m_ToolTipOrientation.z() == 0) &&
     (m_ToolTipOrientation.r() == 1))
-  return false;
+    return false;
   else return true;
-  }
+}
 
 void mitk::NavigationTool::SetCalibrationFile(const std::string filename)
-  {
+{
   //check if file does exist:
-  if (filename=="")
-    {
+  if (filename == "")
+  {
     m_CalibrationFile = "none";
-    }
+  }
   else
-    {
+  {
     Poco::File myFile(filename);
     if (myFile.exists())
       m_CalibrationFile = filename;
     else
       m_CalibrationFile = "none";
-    }
   }
+}
 
 std::string mitk::NavigationTool::GetToolName()
-  {
-  if (this->m_DataNode.IsNull()) {return "";}
-  else {return m_DataNode->GetName();}
-  }
+{
+  if (this->m_DataNode.IsNull()) { return ""; }
+  else { return m_DataNode->GetName(); }
+}
 
 mitk::Surface::Pointer mitk::NavigationTool::GetToolSurface()
+{
+  if (this->m_DataNode.IsNull()) { return nullptr; }
+  else if (this->m_DataNode->GetData() == nullptr) { return nullptr; }
+  else { return dynamic_cast<mitk::Surface*>(m_DataNode->GetData()); }
+}
+
+std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
+{
+  std::stringstream _info;
+  _info << "Navigation Tool: \nIdentifier: " << this->m_Identifier << "\n"
+    << "NavigationToolType: " << m_Type << "\n"
+    << "Calibration file: " << m_CalibrationFile << "\n"
+    << "Serial number: " << m_SerialNumber << "\n"
+    << "TrackingDeviceType: " << m_TrackingDeviceType << "\n"
+    << "ToolTip Position: " << m_ToolTipPosition << "\n"
+    << "ToolTip Orientation: " << m_ToolTipOrientation << "\n"
+    << "ToolTip Axis: " << m_ToolAxis
+    << "\nTrackingTool: " << m_TrackingTool;
+
+  mitk::InternalTrackingTool* _trackingTool = dynamic_cast<mitk::InternalTrackingTool*>(m_TrackingTool.GetPointer());
+  if (_trackingTool)
   {
-  if (this->m_DataNode.IsNull()) {return nullptr;}
-  else if (this->m_DataNode->GetData() == nullptr) {return nullptr;}
-  else {return dynamic_cast<mitk::Surface*>(m_DataNode->GetData());}
+    _info << "\n \n TrackingTool: " << m_TrackingTool->GetToolName()
+      << "\n ToolTip Position:" << _trackingTool->GetToolTip()
+      << "\n ToolTip Orientation:" << _trackingTool->GetToolTipOrientation();
   }
+
+  return _info.str();
+}

@@ -117,6 +117,8 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_SaveTool), SIGNAL(clicked()), this, SLOT(OnSaveTool()));
     connect((QObject*)(m_Controls->m_CreateNewStorage), SIGNAL(clicked()), this, SLOT(OnCreateStorage()));
 
+    connect((QObject*)(m_Controls->m_ToolList), SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(OnToolSelected()));
+
     //widget page "add tool":
     connect((QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(Canceled()), this, SLOT(OnAddToolCancel()));
     connect((QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(NavigationToolFinished()), this, SLOT(OnAddToolSave()));
@@ -343,6 +345,11 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
 void QmitkNavigationToolManagementWidget::OnAddToolCancel()
 {
   m_Controls->m_MainWidgets->setCurrentIndex(0);
+}
+
+void QmitkNavigationToolManagementWidget::OnToolSelected()
+{
+  m_Controls->m_ToolInformation->setText(QString(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetStringWithAllToolInformation().c_str()));
 }
 
 //##################################################################################

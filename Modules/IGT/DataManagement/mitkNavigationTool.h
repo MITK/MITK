@@ -163,6 +163,12 @@ namespace mitk {
       * still maintained.
       */
     virtual void Graft(const DataObject *data) override;
+
+
+    /**
+    * Return all relevant information as string, e.g. to display all tool information
+    */
+    std::string GetStringWithAllToolInformation() const;
     //#######################
 
   protected:

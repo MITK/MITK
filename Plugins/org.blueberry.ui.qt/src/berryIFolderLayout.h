@@ -54,7 +54,7 @@ struct BERRY_UI_QT IFolderLayout : public IPlaceholderFolderLayout
      */
     virtual void AddView(const QString& viewId) = 0;
 
-  static std::map<QString, AbstractTabItem*> getPartTabItems();
+  static std::map<QString, TabLock> getPartTabItems();
 };
 
 }

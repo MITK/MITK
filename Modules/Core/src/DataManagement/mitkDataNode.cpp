@@ -118,11 +118,6 @@ mitk::DataNode::~DataNode()
   m_Data = nullptr;
 }
 
-bool mitk::DataNode::isEmpty() const
-{
-  return m_Data.IsNotNull() && m_PropertyList.IsNotNull();
-}
-
 mitk::DataNode& mitk::DataNode::operator=(const DataNode& right)
 {
   mitk::DataNode* node=mitk::DataNode::New();

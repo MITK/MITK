@@ -29,6 +29,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
+struct TabLock
+{
+  AbstractTabItem* m_AbstractTab;
+  bool m_Lock;
+
+  TabLock()
+  {
+    m_AbstractTab = nullptr;
+    m_Lock = false;
+  }
+};
+
 class PresentablePartFolder: public IPresentablePartList
 {
 private:
@@ -107,7 +119,7 @@ protected:
 
 public:
 
-  static std::map<QString, AbstractTabItem*> partTabItems;
+  static std::map<QString, TabLock> partTabItems;
 
   /**
    * The PresentablePartFolder takes ownership of the AbstractTabFolder pointer.

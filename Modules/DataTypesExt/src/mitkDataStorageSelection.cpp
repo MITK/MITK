@@ -206,12 +206,9 @@ namespace mitk
       return;
     }
 
-    if (!node->isEmpty())
-    {
-      mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
-      // add listener
-      this->RemoveListener(nonConstNode);
-    }
+    // ask Gavrilin
+    //if (!node->GetData())
+    this->RemoveListener(const_cast<mitk::DataNode*>(node));
 
     // remove node
     m_Nodes.erase(nodeIt);

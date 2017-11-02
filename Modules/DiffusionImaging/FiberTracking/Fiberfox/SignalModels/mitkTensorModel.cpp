@@ -56,10 +56,7 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
   tensor[3] = tensorMatrix[1][1]; tensor[4] = tensorMatrix[1][2]; tensor[5] = tensorMatrix[2][2];
 
   GradientType g = this->m_GradientList[dir];
-  float norm = g.GetNorm();
-  ScalarType bVal = norm*norm;
-
-  if (bVal>0.0001)
+  if (g.GetNorm()>0.0001)
   {
     // calc g^T * D * g
     itk::DiffusionTensor3D< ScalarType > S;
@@ -103,9 +100,7 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
   for( unsigned int i=0; i<this->m_GradientList.size(); i++)
   {
     GradientType g = this->m_GradientList[i];
-    ScalarType bVal = g.GetNorm(); bVal *= bVal;
-
-    if (bVal>0.0001)
+    if (g.GetNorm()>0.0001)
     {
       // calc g^T * D * g
       itk::DiffusionTensor3D< ScalarType > S;
@@ -122,7 +117,7 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
 
       // check for corrupted tensor and generate signal
       if (D_scalar>=0)
-        signal[i] = std::exp ( -m_BValue * D_scalar );// skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
+        signal[i] = std::exp ( -m_BValue * D_scalar ); // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
     }
     else
       signal[i] = 1;

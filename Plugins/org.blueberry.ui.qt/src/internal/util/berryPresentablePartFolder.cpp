@@ -241,17 +241,18 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
 
   if (partTabItems.count(partTabName))
   {
+    // keep existing lock
     partTabItems[partTabName].m_AbstractTab = item;
     if (partTabItems[partTabName].m_Lock)
     {
-      partTabItems[partTabName].m_AbstractTab->SetLock(true);
+      item->SetLock(true);
     }
   }
   else
   {
-    TabLock lock;
-    lock.m_AbstractTab = item;
-    partTabItems[partTabName] = lock;
+    TabLock tabLock;
+    tabLock.m_AbstractTab = item;
+    partTabItems[partTabName] = tabLock;
   }
 
   this->InitTab(item, part);

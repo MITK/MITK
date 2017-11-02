@@ -24,7 +24,7 @@ IFolderLayout::~IFolderLayout()
 {
 }
 
-std::map<QString, TabLock> IFolderLayout::getPartTabItems()
+std::map<QString, TabLock>& IFolderLayout::getPartTabItems()
 {
   return PresentablePartFolder::partTabItems;
 }

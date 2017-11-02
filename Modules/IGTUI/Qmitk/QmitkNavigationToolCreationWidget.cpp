@@ -50,7 +50,7 @@ QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* pa
   CreateQtPartControl(this);
   CreateConnections();
 
-RefreshTrackingDeviceCollection();
+  RefreshTrackingDeviceCollection();
 }
 
 QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
@@ -72,17 +72,17 @@ void QmitkNavigationToolCreationWidget::CreateQtPartControl(QWidget *parent)
 
 void QmitkNavigationToolCreationWidget::CreateConnections()
 {
-  if ( m_Controls )
+  if (m_Controls)
   {
-    connect( (QObject*)(m_Controls->m_cancel), SIGNAL(clicked()), this, SLOT(OnCancel()) );
-    connect( (QObject*)(m_Controls->m_finished), SIGNAL(clicked()), this, SLOT(OnFinished()) );
-    connect( (QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()) );
-    connect( (QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()) );
-    connect( (QObject*)(m_Controls->m_ShowAdvancedOptionsPB), SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedOptions(bool)) );
-    connect( (QObject*)(m_AdvancedWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessDialogCloseRequest()) );
-    connect( (QObject*)(m_AdvancedWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()) );
+    connect((QObject*)(m_Controls->m_cancel), SIGNAL(clicked()), this, SLOT(OnCancel()));
+    connect((QObject*)(m_Controls->m_finished), SIGNAL(clicked()), this, SLOT(OnFinished()));
+    connect((QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()));
+    connect((QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()));
+    connect((QObject*)(m_Controls->m_ShowAdvancedOptionsPB), SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedOptions(bool)));
+    connect((QObject*)(m_AdvancedWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessDialogCloseRequest()));
+    connect((QObject*)(m_AdvancedWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
 
-    connect( m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseOtherToggled(bool)));
+    connect(m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseOtherToggled(bool)));
   }
 }
 
@@ -116,7 +116,6 @@ void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDevi
   }
 }
 
-
 mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool()
 {
   return m_CreatedTool;
@@ -133,7 +132,7 @@ void QmitkNavigationToolCreationWidget::OnFinished()
 
   //create DataNode...
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-  if(m_Controls->m_Surface_Use_Sphere->isChecked())
+  if (m_Controls->m_Surface_Use_Sphere->isChecked())
   {
     //create small sphere and use it as surface
     mitk::Surface::Pointer mySphere = mitk::Surface::New();
@@ -161,13 +160,13 @@ void QmitkNavigationToolCreationWidget::OnFinished()
   m_CreatedTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toLatin1().data());
   m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toLatin1().data());
 
-//Tracking Device
-m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->currentText().toStdString());
+  //Tracking Device
+  m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->currentText().toStdString());
 
   //ToolType
-  if (m_Controls->m_ToolTypeChooser->currentText()=="Instrument") m_CreatedTool->SetType(mitk::NavigationTool::Instrument);
-  else if (m_Controls->m_ToolTypeChooser->currentText()=="Fiducial") m_CreatedTool->SetType(mitk::NavigationTool::Fiducial);
-  else if (m_Controls->m_ToolTypeChooser->currentText()=="Skinmarker") m_CreatedTool->SetType(mitk::NavigationTool::Skinmarker);
+  if (m_Controls->m_ToolTypeChooser->currentText() == "Instrument") m_CreatedTool->SetType(mitk::NavigationTool::Instrument);
+  else if (m_Controls->m_ToolTypeChooser->currentText() == "Fiducial") m_CreatedTool->SetType(mitk::NavigationTool::Fiducial);
+  else if (m_Controls->m_ToolTypeChooser->currentText() == "Skinmarker") m_CreatedTool->SetType(mitk::NavigationTool::Skinmarker);
   else m_CreatedTool->SetType(mitk::NavigationTool::Unknown);
 
   //Tool Tip
@@ -177,7 +176,7 @@ m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->cu
 
   //Tool Landmarks
   mitk::PointSet::Pointer toolCalLandmarks, toolRegLandmarks;
-  GetUIToolLandmarksLists(toolCalLandmarks,toolRegLandmarks);
+  GetUIToolLandmarksLists(toolCalLandmarks, toolRegLandmarks);
   m_CreatedTool->SetToolCalibrationLandmarks(toolCalLandmarks);
   m_CreatedTool->SetToolRegistrationLandmarks(toolRegLandmarks);
 
@@ -200,7 +199,7 @@ void QmitkNavigationToolCreationWidget::OnCancel()
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("STL (*.stl)")).toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Surface"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("STL (*.stl)")).toLatin1().data();
   QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
   try
   {
@@ -214,42 +213,41 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
+  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
   QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
   m_Controls->m_CalibrationFileName->setText(fileName);
 }
 
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
 {
-m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName().c_str()));
-m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
-m_Controls->m_SerialNumberEdit->setText(QString(DefaultTool->GetSerialNumber().c_str()));
-m_AdvancedWidget->SetDefaultTooltip( DefaultTool->GetToolTipTransform() );
-int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(DefaultTool->GetTrackingDeviceType()));
+  m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName().c_str()));
+  m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
+  m_Controls->m_SerialNumberEdit->setText(QString(DefaultTool->GetSerialNumber().c_str()));
+  m_AdvancedWidget->SetDefaultTooltip(DefaultTool->GetToolTipTransform());
+  int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(DefaultTool->GetTrackingDeviceType()));
 
-if (index >= 0)
-{
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
-}
+  if (index >= 0)
+  {
+    m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
+  }
 
-m_Controls->m_CalibrationFileName->setText(QString(DefaultTool->GetCalibrationFile().c_str()));
-m_Controls->m_Surface_Use_Other->setChecked(true);
-switch(DefaultTool->GetType())
-{
-case mitk::NavigationTool::Instrument:
-m_Controls->m_ToolTypeChooser->setCurrentIndex(0); break;
-case mitk::NavigationTool::Fiducial:
-m_Controls->m_ToolTypeChooser->setCurrentIndex(1); break;
-case mitk::NavigationTool::Skinmarker:
-m_Controls->m_ToolTypeChooser->setCurrentIndex(2); break;
-case mitk::NavigationTool::Unknown:
-m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
-}
+  m_Controls->m_CalibrationFileName->setText(QString(DefaultTool->GetCalibrationFile().c_str()));
+  m_Controls->m_Surface_Use_Other->setChecked(true);
+  switch (DefaultTool->GetType())
+  {
+  case mitk::NavigationTool::Instrument:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(0); break;
+  case mitk::NavigationTool::Fiducial:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(1); break;
+  case mitk::NavigationTool::Skinmarker:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(2); break;
+  case mitk::NavigationTool::Unknown:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
+  }
 
   m_Controls->m_SurfaceChooser->SetSelectedNode(DefaultTool->GetDataNode());
-  FillUIToolLandmarkLists(DefaultTool->GetToolCalibrationLandmarks(),DefaultTool->GetToolRegistrationLandmarks());
+  FillUIToolLandmarkLists(DefaultTool->GetToolCalibrationLandmarks(), DefaultTool->GetToolRegistrationLandmarks());
 }
-
 
 //##################################################################################
 //############################## internal help methods #############################
@@ -263,7 +261,7 @@ void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
 
 void QmitkNavigationToolCreationWidget::OnShowAdvancedOptions(bool state)
 {
-  if(state)
+  if (state)
   {
     m_AdvancedWidget->show();
     m_AdvancedWidget->SetDefaultTooltip(m_AdvancedWidget->GetManipulatedToolTip()); //use the last one, if there is one
@@ -288,14 +286,14 @@ void QmitkNavigationToolCreationWidget::OnProcessDialogCloseRequest()
 
 void QmitkNavigationToolCreationWidget::OnRetrieveDataForManualTooltipManipulation()
 {
-  if(m_Controls->m_Surface_Use_Sphere->isChecked())
+  if (m_Controls->m_Surface_Use_Sphere->isChecked())
   {
     m_AdvancedWidget->SetToolTipSurface(true);
   }
   else
   {
     m_AdvancedWidget->SetToolTipSurface(false,
-                                        dynamic_cast<mitk::DataNode*>(m_Controls->m_SurfaceChooser->GetSelectedNode().GetPointer()));
+      dynamic_cast<mitk::DataNode*>(m_Controls->m_SurfaceChooser->GetSelectedNode().GetPointer()));
   }
 }
 
@@ -322,7 +320,7 @@ void QmitkNavigationToolCreationWidget::InitializeUIToolLandmarkLists()
 {
   m_calLandmarkNode = mitk::DataNode::New();
   m_regLandmarkNode = mitk::DataNode::New();
-  FillUIToolLandmarkLists(mitk::PointSet::New(),mitk::PointSet::New());
+  FillUIToolLandmarkLists(mitk::PointSet::New(), mitk::PointSet::New());
 }
 
 void QmitkNavigationToolCreationWidget::RefreshTrackingDeviceCollection()

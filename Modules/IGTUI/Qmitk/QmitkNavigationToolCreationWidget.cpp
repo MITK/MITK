@@ -78,7 +78,7 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_finished), SIGNAL(clicked()), this, SLOT(OnFinished()));
     connect((QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()));
     connect((QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()));
-    connect((QObject*)(m_Controls->m_ShowAdvancedOptionsPB), SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedOptions(bool)));
+    connect((QObject*)(m_Controls->m_EditToolTip), SIGNAL(toggled(bool)), this, SLOT(OnShowEditToolTipOptions(bool)));
     connect((QObject*)(m_AdvancedWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessDialogCloseRequest()));
     connect((QObject*)(m_AdvancedWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
 
@@ -259,7 +259,7 @@ void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
   msgBox.exec();
 }
 
-void QmitkNavigationToolCreationWidget::OnShowAdvancedOptions(bool state)
+void QmitkNavigationToolCreationWidget::OnShowEditToolTipOptions(bool state)
 {
   if (state)
   {
@@ -281,7 +281,7 @@ void QmitkNavigationToolCreationWidget::OnShowAdvancedOptions(bool state)
 void QmitkNavigationToolCreationWidget::OnProcessDialogCloseRequest()
 {
   m_AdvancedWidget->hide();
-  m_Controls->m_ShowAdvancedOptionsPB->setChecked(false);
+  m_Controls->m_EditToolTip->setChecked(false);
 }
 
 void QmitkNavigationToolCreationWidget::OnRetrieveDataForManualTooltipManipulation()

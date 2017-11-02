@@ -86,7 +86,7 @@ class MITKIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     void OnFinished();
     void OnLoadSurface();
     void OnLoadCalibrationFile();
-    void OnShowAdvancedOptions(bool state);
+    void OnShowEditToolTipOptions(bool state);
     void OnProcessDialogCloseRequest();
     void OnRetrieveDataForManualTooltipManipulation();
     void OnSurfaceUseOtherToggled(bool checked);

@@ -349,7 +349,9 @@ void QmitkNavigationToolManagementWidget::OnAddToolCancel()
 
 void QmitkNavigationToolManagementWidget::OnToolSelected()
 {
-  m_Controls->m_ToolInformation->setText(QString(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetStringWithAllToolInformation().c_str()));
+  QString _label = "Information for tool " + m_Controls->m_ToolList->currentItem()->text() + "\n";
+  _label.append(QString(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetStringWithAllToolInformation().c_str()));
+  m_Controls->m_ToolInformation->setText(_label);
 }
 
 //##################################################################################

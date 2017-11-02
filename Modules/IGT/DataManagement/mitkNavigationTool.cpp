@@ -135,22 +135,22 @@ mitk::Surface::Pointer mitk::NavigationTool::GetToolSurface()
 std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
 {
   std::stringstream _info;
-  _info << "Navigation Tool: \nIdentifier: " << this->m_Identifier << "\n"
-    << "NavigationToolType: " << m_Type << "\n"
-    << "Calibration file: " << m_CalibrationFile << "\n"
-    << "Serial number: " << m_SerialNumber << "\n"
-    << "TrackingDeviceType: " << m_TrackingDeviceType << "\n"
-    << "ToolTip Position: " << m_ToolTipPosition << "\n"
-    << "ToolTip Orientation: " << m_ToolTipOrientation << "\n"
-    << "ToolTip Axis: " << m_ToolAxis
-    << "\nTrackingTool: " << m_TrackingTool;
+  _info << "Navigation Tool: \n  Identifier: " << this->m_Identifier << "\n"
+    << "  NavigationToolType: " << m_Type << "\n"
+    << "  Calibration file: " << m_CalibrationFile << "\n"
+    << "  Serial number: " << m_SerialNumber << "\n"
+    << "  TrackingDeviceType: " << m_TrackingDeviceType << "\n"
+    << "  ToolTip Position: " << m_ToolTipPosition << "\n"
+    << "  ToolTip Orientation: " << m_ToolTipOrientation << "\n"
+    << "  ToolTip Axis: " << m_ToolAxis
+    << "\n  TrackingTool: " << m_TrackingTool;
 
   mitk::InternalTrackingTool* _trackingTool = dynamic_cast<mitk::InternalTrackingTool*>(m_TrackingTool.GetPointer());
   if (_trackingTool)
   {
-    _info << "\n \n TrackingTool: " << m_TrackingTool->GetToolName()
-      << "\n ToolTip Position:" << _trackingTool->GetToolTip()
-      << "\n ToolTip Orientation:" << _trackingTool->GetToolTipOrientation();
+    _info << "\n \n     TrackingTool: " << m_TrackingTool->GetToolName()
+      << "\n     ToolTip Position:" << _trackingTool->GetToolTip()
+      << "\n     ToolTip Orientation:" << _trackingTool->GetToolTipOrientation();
   }
 
   return _info.str();

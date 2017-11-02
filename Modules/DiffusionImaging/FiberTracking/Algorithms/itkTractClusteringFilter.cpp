@@ -280,6 +280,7 @@ void TractClusteringFilter::GenerateData()
 
   if (m_Scale==0)
     m_Scale = m_Distances.at(0);
+  MITK_INFO << "Scalar map scaling: " << m_Scale;
 
   T = ResampleFibers();
 

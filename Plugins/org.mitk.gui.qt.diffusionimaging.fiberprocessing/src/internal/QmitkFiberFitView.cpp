@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFitFibersToImageFilter.h>
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkTensorModel.h>
+#include <mitkITKImageImport.h>
 
 const std::string QmitkFiberFitView::VIEW_ID = "org.mitk.views.fiberfit";
 using namespace mitk;
@@ -96,6 +97,7 @@ void QmitkFiberFitView::StartFit()
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
 
+  mitk::Image::Pointer mitk_diff_image = dynamic_cast<mitk::Image*>(node->GetData());
   mitk::PeakImage::Pointer mitk_peak_image = dynamic_cast<mitk::PeakImage*>(node->GetData());
   if (mitk_peak_image.IsNotNull())
   {
@@ -108,7 +110,6 @@ void QmitkFiberFitView::StartFit()
   }
   else
   {
-    mitk::Image::Pointer mitk_diff_image = dynamic_cast<mitk::Image*>(node->GetData());
     if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_diff_image))
     {
       fitter->SetDiffImage(mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_diff_image));
@@ -140,7 +141,7 @@ void QmitkFiberFitView::StartFit()
   this->GetDataStorage()->Add(new_node, node);
   m_Controls->m_TractBox->GetSelectedNode()->SetVisibility(false);
 
-  if (m_Controls->m_ResidualsBox->isChecked())
+  if (m_Controls->m_ResidualsBox->isChecked() && mitk_peak_image.IsNotNull())
   {
     {
       mitk::PeakImage::ItkPeakImageType::Pointer itk_image = fitter->GetFittedImage();
@@ -151,7 +152,7 @@ void QmitkFiberFitView::StartFit()
 
       mitk::DataNode::Pointer new_node = mitk::DataNode::New();
       new_node->SetData(mitk_image);
-      new_node->SetName("Explained");
+      new_node->SetName("Fitted");
       this->GetDataStorage()->Add(new_node, node);
     }
 
@@ -191,6 +192,32 @@ void QmitkFiberFitView::StartFit()
       mitk::DataNode::Pointer new_node = mitk::DataNode::New();
       new_node->SetData(mitk_image);
       new_node->SetName("Overexplained");
+      this->GetDataStorage()->Add(new_node, node);
+    }
+  }
+  else if (m_Controls->m_ResidualsBox->isChecked() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_diff_image))
+  {
+    {
+      mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetFittedImageDiff().GetPointer() );
+      mitk::DiffusionPropertyHelper::CopyProperties(mitk_diff_image, outImage, true);
+      mitk::DiffusionPropertyHelper propertyHelper( outImage );
+      propertyHelper.InitializeImage();
+
+      mitk::DataNode::Pointer new_node = mitk::DataNode::New();
+      new_node->SetData(outImage);
+      new_node->SetName("Fitted");
+      this->GetDataStorage()->Add(new_node, node);
+    }
+
+    {
+      mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetResidualImageDiff().GetPointer() );
+      mitk::DiffusionPropertyHelper::CopyProperties(mitk_diff_image, outImage, true);
+      mitk::DiffusionPropertyHelper propertyHelper( outImage );
+      propertyHelper.InitializeImage();
+
+      mitk::DataNode::Pointer new_node = mitk::DataNode::New();
+      new_node->SetData(outImage);
+      new_node->SetName("Residual");
       this->GetDataStorage()->Add(new_node, node);
     }
   }

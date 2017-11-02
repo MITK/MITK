@@ -369,7 +369,7 @@
           <item row="3" column="0">
            <widget class="QCheckBox" name="m_InteractiveBox">
             <property name="text">
-             <string>Interactive Extraction</string>
+             <string>Interactive Extraction </string>
             </property>
            </widget>
           </item>
@@ -915,6 +915,9 @@
             </property>
             <property name="decimals">
              <number>5</number>
+            </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>

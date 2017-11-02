@@ -107,21 +107,22 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
 
     if (bVal>0.0001)
     {
+      // calc g^T * D * g
       itk::DiffusionTensor3D< ScalarType > S;
-      S[0] = g[0]*g[0]/bVal;
-      S[1] = g[1]*g[0]/bVal;
-      S[2] = g[2]*g[0]/bVal;
-      S[3] = g[1]*g[1]/bVal;
-      S[4] = g[2]*g[1]/bVal;
-      S[5] = g[2]*g[2]/bVal;
+      S[0] = g[0]*g[0];
+      S[1] = g[1]*g[0];
+      S[2] = g[2]*g[0];
+      S[3] = g[1]*g[1];
+      S[4] = g[2]*g[1];
+      S[5] = g[2]*g[2];
 
-      ScalarType D = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
+      ScalarType D_scalar = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
                      tensor[1]*S[1] + tensor[3]*S[3] + tensor[4]*S[4] +
                      tensor[2]*S[2] + tensor[4]*S[4] + tensor[5]*S[5];
 
       // check for corrupted tensor and generate signal
-      if (D>=0)
-        signal[i] = std::exp ( -m_BValue * bVal * D );
+      if (D_scalar>=0)
+        signal[i] = std::exp ( -m_BValue * D_scalar );// skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
     }
     else
       signal[i] = 1;

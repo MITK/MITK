@@ -68,10 +68,6 @@ namespace mitk {
     itkGetConstMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
     itkSetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
 
-    //TrackingTool:
-    itkGetConstMacro(TrackingTool,mitk::TrackingTool::Pointer);
-    itkSetMacro(TrackingTool,mitk::TrackingTool::Pointer);
-
     //CalibrationFile:
     itkGetConstMacro(CalibrationFile,std::string);
     void SetCalibrationFile(const std::string filename);
@@ -183,8 +179,6 @@ namespace mitk {
     mitk::DataNode::Pointer m_DataNode;
     /** @brief This member variable holds a mathamatical description of the tool */
     itk::SpatialObject<3>::Pointer m_SpatialObject;
-    /** @brief This member variable holds a pointer to the corresponding tracking tool in the hardware. */
-    mitk::TrackingTool::Pointer m_TrackingTool;
     /** @brief The path to the calibration file of the tool. */
     std::string m_CalibrationFile;
     /** @brief A unique serial number of the tool which is needed to identify the tool correctly. This is very important

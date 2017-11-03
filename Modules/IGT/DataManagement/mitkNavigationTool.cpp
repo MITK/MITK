@@ -78,7 +78,6 @@ void mitk::NavigationTool::Graft(const DataObject *data)
   m_DataNode->SetName(nd->GetDataNode()->GetName());
   m_DataNode->SetData(nd->GetDataNode()->GetData());
   m_SpatialObject = nd->GetSpatialObject();
-  m_TrackingTool = nd->GetTrackingTool();
   m_CalibrationFile = nd->GetCalibrationFile();
   m_SerialNumber = nd->GetSerialNumber();
   m_TrackingDeviceType = nd->GetTrackingDeviceType();
@@ -143,21 +142,6 @@ std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
     << "  ToolTip Position: " << m_ToolTipPosition << "\n"
     << "  ToolTip Orientation: " << m_ToolTipOrientation << "\n"
     << "  ToolTip Axis: " << m_ToolAxis;
-  if (m_TrackingTool)
-  {
-    _info << "\n  TrackingTool: "<<m_TrackingTool->GetToolName();
-    mitk::InternalTrackingTool* _trackingTool = dynamic_cast<mitk::InternalTrackingTool*>(m_TrackingTool.GetPointer());
-    if (_trackingTool)
-    {
-      _info << "\n     ToolTip Position:" << _trackingTool->GetToolTip()
-            << "\n     ToolTip Orientation:" << _trackingTool->GetToolTipOrientation();
-    }
-  }
-  else
-  {
-    _info << "\n  TrackingTool: <null>";
-  }
-
 
   return _info.str();
 }

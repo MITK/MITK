@@ -59,6 +59,10 @@ void QmitkFiberClusteringView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TractBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TractBox->SetPredicate(isFib);
 
+    m_Controls->m_InCentroidsBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_InCentroidsBox->SetPredicate(isFib);
+    m_Controls->m_InCentroidsBox->SetZeroEntryText("--");
+
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
     m_Controls->m_MapBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_MapBox->SetPredicate(isImage);
@@ -105,6 +109,11 @@ void QmitkFiberClusteringView::StartClustering()
   itk::TractClusteringFilter::Pointer clusterer = itk::TractClusteringFilter::New();
   clusterer->SetDistances(distances);
   clusterer->SetTractogram(fib);
+  if (m_Controls->m_InCentroidsBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::FiberBundle::Pointer in_centroids = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_InCentroidsBox->GetSelectedNode()->GetData());
+    clusterer->SetInCentroids(in_centroids);
+  }
   switch (m_Controls->m_MetricBox->currentIndex())
   {
   case 0:

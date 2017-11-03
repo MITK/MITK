@@ -81,6 +81,7 @@ public:
   itkGetMacro(MergeDuplicateThreshold, float)
 
   itkSetMacro(Tractogram, mitk::FiberBundle::Pointer)
+  itkSetMacro(InCentroids, mitk::FiberBundle::Pointer)
   itkSetMacro(ScalarMap, FloatImageType::Pointer)
 
   virtual void Update() override{
@@ -95,17 +96,19 @@ public:
 
   std::vector<mitk::FiberBundle::Pointer> GetOutCentroids() const;
 
+  std::vector<Cluster> GetOutClusters() const;
+
 protected:
 
   void GenerateData() override;
-  std::vector< vnl_matrix<float> > ResampleFibers();
+  std::vector< vnl_matrix<float> > ResampleFibers(FiberBundle::Pointer tractogram);
   float CalcMDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
   float CalcMDF_VAR(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
   float CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
 
   std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);
   void MergeDuplicateClusters(std::vector< TractClusteringFilter::Cluster >& clusters);
-
+  std::vector< Cluster > AddToKnownClusters(std::vector< long > f_indices, std::vector<vnl_matrix<float> > &centroids);
   void AppendCluster(std::vector< Cluster >& a, std::vector< Cluster >&b);
 
   TractClusteringFilter();
@@ -114,6 +117,7 @@ protected:
   unsigned int                                m_NumPoints;
   std::vector< float >                        m_Distances;
   mitk::FiberBundle::Pointer                  m_Tractogram;
+  mitk::FiberBundle::Pointer                  m_InCentroids;
   std::vector< mitk::FiberBundle::Pointer >   m_OutTractograms;
   std::vector< mitk::FiberBundle::Pointer >   m_OutCentroids;
   std::vector<vnl_matrix<float> >             T;
@@ -123,6 +127,7 @@ protected:
   FloatImageType::Pointer                     m_ScalarMap;
   float                                       m_Scale;
   float                                       m_MergeDuplicateThreshold;
+  std::vector< Cluster >                      m_OutClusters;
 };
 }
 

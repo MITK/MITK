@@ -77,6 +77,8 @@ public:
   itkGetMacro(MaxClusters, unsigned int)
   itkSetMacro(Scale, float)
   itkGetMacro(Scale, float)
+  itkSetMacro(MergeDuplicateThreshold, float)
+  itkGetMacro(MergeDuplicateThreshold, float)
 
   itkSetMacro(Tractogram, mitk::FiberBundle::Pointer)
   itkSetMacro(ScalarMap, FloatImageType::Pointer)
@@ -91,6 +93,8 @@ public:
 
   void SetMetric(const Metric &Metric);
 
+  std::vector<mitk::FiberBundle::Pointer> GetOutCentroids() const;
+
 protected:
 
   void GenerateData() override;
@@ -100,6 +104,7 @@ protected:
   float CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
 
   std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);
+  void MergeDuplicateClusters(std::vector< TractClusteringFilter::Cluster >& clusters);
 
   void AppendCluster(std::vector< Cluster >& a, std::vector< Cluster >&b);
 
@@ -110,12 +115,14 @@ protected:
   std::vector< float >                        m_Distances;
   mitk::FiberBundle::Pointer                  m_Tractogram;
   std::vector< mitk::FiberBundle::Pointer >   m_OutTractograms;
+  std::vector< mitk::FiberBundle::Pointer >   m_OutCentroids;
   std::vector<vnl_matrix<float> >             T;
   unsigned int                                m_MinClusterSize;
   unsigned int                                m_MaxClusters;
   Metric                                      m_Metric;
   FloatImageType::Pointer                     m_ScalarMap;
   float                                       m_Scale;
+  float                                       m_MergeDuplicateThreshold;
 };
 }
 

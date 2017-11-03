@@ -142,16 +142,22 @@ std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
     << "  TrackingDeviceType: " << m_TrackingDeviceType << "\n"
     << "  ToolTip Position: " << m_ToolTipPosition << "\n"
     << "  ToolTip Orientation: " << m_ToolTipOrientation << "\n"
-    << "  ToolTip Axis: " << m_ToolAxis
-    << "\n  TrackingTool: " << m_TrackingTool;
-
-  mitk::InternalTrackingTool* _trackingTool = dynamic_cast<mitk::InternalTrackingTool*>(m_TrackingTool.GetPointer());
-  if (_trackingTool)
+    << "  ToolTip Axis: " << m_ToolAxis;
+  if (m_TrackingTool)
   {
-    _info << "\n \n     TrackingTool: " << m_TrackingTool->GetToolName()
-      << "\n     ToolTip Position:" << _trackingTool->GetToolTip()
-      << "\n     ToolTip Orientation:" << _trackingTool->GetToolTipOrientation();
+    _info << "\n  TrackingTool: "<<m_TrackingTool->GetToolName();
+    mitk::InternalTrackingTool* _trackingTool = dynamic_cast<mitk::InternalTrackingTool*>(m_TrackingTool.GetPointer());
+    if (_trackingTool)
+    {
+      _info << "\n     ToolTip Position:" << _trackingTool->GetToolTip()
+            << "\n     ToolTip Orientation:" << _trackingTool->GetToolTipOrientation();
+    }
   }
+  else
+  {
+    _info << "\n  TrackingTool: <null>";
+  }
+
 
   return _info.str();
 }

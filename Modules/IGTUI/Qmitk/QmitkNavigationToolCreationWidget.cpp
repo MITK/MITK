@@ -228,9 +228,9 @@ void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Poi
   m_Controls->m_ToolAxisY->setValue(DefaultTool->GetToolAxis()[1]);
   m_Controls->m_ToolAxisZ->setValue(DefaultTool->GetToolAxis()[2]);
   QString _label = "(" +
-    QString::number(DefaultTool->GetToolTipPosition()[0], 'f', 0) + ", " +
-    QString::number(DefaultTool->GetToolTipPosition()[1], 'f', 0) + ", " +
-    QString::number(DefaultTool->GetToolTipPosition()[2], 'f', 0) + "), quat: [" +
+    QString::number(DefaultTool->GetToolTipPosition()[0], 'f', 1) + ", " +
+    QString::number(DefaultTool->GetToolTipPosition()[1], 'f', 1) + ", " +
+    QString::number(DefaultTool->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
     QString::number(DefaultTool->GetToolTipOrientation()[0], 'f', 2) + ", " +
     QString::number(DefaultTool->GetToolTipOrientation()[1], 'f', 2) + ", " +
     QString::number(DefaultTool->GetToolTipOrientation()[2], 'f', 2) + ", " +
@@ -294,6 +294,19 @@ void QmitkNavigationToolCreationWidget::OnProcessDialogCloseRequest()
 {
   m_AdvancedWidget->hide();
   m_Controls->m_EditToolTip->setChecked(false);
+
+  //Update Label
+  mitk::AffineTransform3D::Pointer tooltip = m_AdvancedWidget->GetManipulatedToolTip();
+  mitk::NavigationData::Pointer transformConversionHelper = mitk::NavigationData::New(tooltip);
+  QString _label = "(" +
+    QString::number(tooltip->GetOffset()[0], 'f', 1) + ", " +
+    QString::number(tooltip->GetOffset()[1], 'f', 1) + ", " +
+    QString::number(tooltip->GetOffset()[2], 'f', 1) + "), quat: [" +
+    QString::number(transformConversionHelper->GetOrientation()[0], 'f', 2) + ", " +
+    QString::number(transformConversionHelper->GetOrientation()[1], 'f', 2) + ", " +
+    QString::number(transformConversionHelper->GetOrientation()[2], 'f', 2) + ", " +
+    QString::number(transformConversionHelper->GetOrientation()[3], 'f', 2) + "]";
+  m_Controls->m_ToolTipLabel->setText(_label);
 }
 
 void QmitkNavigationToolCreationWidget::OnRetrieveDataForManualTooltipManipulation()

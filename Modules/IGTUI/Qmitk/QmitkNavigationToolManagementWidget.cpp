@@ -340,6 +340,7 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
 
   m_Controls->m_MainWidgets->setCurrentIndex(0);
 
+  m_Controls->m_ToolInformation->setText("");
 }
 
 void QmitkNavigationToolManagementWidget::OnAddToolCancel()

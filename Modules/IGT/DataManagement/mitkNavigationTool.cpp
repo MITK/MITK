@@ -134,7 +134,7 @@ mitk::Surface::Pointer mitk::NavigationTool::GetToolSurface()
 std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
 {
   std::stringstream _info;
-  _info << "Navigation Tool: \n  Identifier: " << this->m_Identifier << "\n"
+  _info << "  Identifier: " << this->m_Identifier << "\n"
     << "  NavigationToolType: " << m_Type << "\n"
     << "  Calibration file: " << m_CalibrationFile << "\n"
     << "  Serial number: " << m_SerialNumber << "\n"

@@ -359,13 +359,12 @@ std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClu
   std::vector< Cluster > C;
   vnl_matrix<float> zero_h; zero_h.set_size(T.at(0).rows(), T.at(0).cols()); zero_h.fill(0.0);
   Cluster no_fit;
-  no_fit.n = 0;
   no_fit.h = zero_h;
   for (unsigned int i=0; i<centroids.size(); ++i)
   {
     Cluster c;
-    c.n = 0;
     c.h.set_size(T.at(0).rows(), T.at(0).cols()); c.h.fill(0.0);
+    c.f_id = i;
     C.push_back(c);
   }
 
@@ -433,13 +432,16 @@ void TractClusteringFilter::GenerateData()
   std::vector< long > f_indices;
   for (unsigned int i=0; i<T.size(); ++i)
     f_indices.push_back(i);
-//  std::random_shuffle(f_indices.begin(), f_indices.end());
+  //  std::random_shuffle(f_indices.begin(), f_indices.end());
 
-  Cluster no_match; no_match.n = 0;
+  Cluster no_match;
   std::vector< Cluster > clusters;
   if (m_InCentroids.IsNull())
   {
     clusters = ClusterStep(f_indices, m_Distances);
+    MITK_INFO << "Number of clusters: " << clusters.size();
+    MergeDuplicateClusters(clusters);
+    std::sort(clusters.begin(),clusters.end());
   }
   else
   {
@@ -447,10 +449,9 @@ void TractClusteringFilter::GenerateData()
     clusters = AddToKnownClusters(f_indices, centroids);
     no_match = clusters.back();
     clusters.pop_back();
+    MITK_INFO << "Number of clusters: " << clusters.size();
+    MergeDuplicateClusters(clusters);
   }
-  MITK_INFO << "Number of clusters: " << clusters.size();
-  MergeDuplicateClusters(clusters);
-  std::sort(clusters.begin(),clusters.end());
 
   MITK_INFO << "Clustering finished";
   int max = clusters.size()-1;
@@ -459,43 +460,40 @@ void TractClusteringFilter::GenerateData()
   for (int i=clusters.size()-1; i>=0; --i)
   {
     Cluster c = clusters.at(i);
-    if (c.n<(int)m_MinClusterSize)
-      break;
-
-    m_OutClusters.push_back(c);
-
-    vtkSmartPointer<vtkFloatArray> weights = vtkSmartPointer<vtkFloatArray>::New();
-    vtkSmartPointer<vtkPolyData> pTmp = m_Tractogram->GeneratePolyDataByIds(c.I, weights);
-    mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(pTmp);
-    if (max>0)
-      fib->SetFiberWeights((float)i/max);
-    m_OutTractograms.push_back(fib);
-
-    // create centroid
-    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
-    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-    vnl_matrix<float> centroid_points = c.h / c.n;
-    for (unsigned int j=0; j<centroid_points.cols(); j++)
+    if ( c.n>=(int)m_MinClusterSize && !(m_MaxClusters>0 && clusters.size()-i>=m_MaxClusters) )
     {
-      double p[3];
-      p[0] = centroid_points.get(0,j);
-      p[1] = centroid_points.get(1,j);
-      p[2] = centroid_points.get(2,j);
+      m_OutClusters.push_back(c);
 
-      vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-      container->GetPointIds()->InsertNextId(id);
+      vtkSmartPointer<vtkFloatArray> weights = vtkSmartPointer<vtkFloatArray>::New();
+      vtkSmartPointer<vtkPolyData> pTmp = m_Tractogram->GeneratePolyDataByIds(c.I, weights);
+      mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(pTmp);
+      if (max>0)
+        fib->SetFiberWeights((float)i/max);
+      m_OutTractograms.push_back(fib);
+
+      // create centroid
+      vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+      vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+      vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+      vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+      vnl_matrix<float> centroid_points = c.h / c.n;
+      for (unsigned int j=0; j<centroid_points.cols(); j++)
+      {
+        double p[3];
+        p[0] = centroid_points.get(0,j);
+        p[1] = centroid_points.get(1,j);
+        p[2] = centroid_points.get(2,j);
+
+        vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+        container->GetPointIds()->InsertNextId(id);
+      }
+      vtkNewCells->InsertNextCell(container);
+      polyData->SetPoints(vtkNewPoints);
+      polyData->SetLines(vtkNewCells);
+      mitk::FiberBundle::Pointer centroid = mitk::FiberBundle::New(polyData);
+      centroid->SetFiberColors(255, 255, 255);
+      m_OutCentroids.push_back(centroid);
     }
-    vtkNewCells->InsertNextCell(container);
-    polyData->SetPoints(vtkNewPoints);
-    polyData->SetLines(vtkNewCells);
-    mitk::FiberBundle::Pointer centroid = mitk::FiberBundle::New(polyData);
-    centroid->SetFiberColors(255, 255, 255);
-    m_OutCentroids.push_back(centroid);
-
-    if (m_MaxClusters>0 && clusters.size()-i>=m_MaxClusters)
-      break;
   }
   MITK_INFO << "Final number of clusters: " << m_OutTractograms.size();
 

@@ -152,7 +152,10 @@ void QmitkFiberClusteringView::StartClustering()
     mitk::DataNode::Pointer new_node = mitk::DataNode::New();
     new_node->SetData(f);
     new_node->SetName("Cluster_" + boost::lexical_cast<std::string>(c));
-    this->GetDataStorage()->Add(new_node, node);
+    if (m_Controls->m_InCentroidsBox->GetSelectedNode().IsNotNull())
+      this->GetDataStorage()->Add(new_node, m_Controls->m_InCentroidsBox->GetSelectedNode());
+    else
+      this->GetDataStorage()->Add(new_node, node);
     node->SetVisibility(false);
 
     if (m_Controls->m_CentroidsBox->isChecked())

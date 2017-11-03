@@ -42,9 +42,12 @@ public:
 
   struct Cluster
   {
+    Cluster() : n(0), f_id(-1) {}
+
     vnl_matrix<float> h;
     std::vector< long > I;
     int n;
+    int f_id;
 
     bool operator <(Cluster const& b) const
     {

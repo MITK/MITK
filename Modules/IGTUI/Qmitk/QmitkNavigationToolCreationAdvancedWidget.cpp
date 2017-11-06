@@ -200,6 +200,7 @@ mitk::AffineTransform3D::Pointer QmitkNavigationToolCreationAdvancedWidget::GetM
 {
   mitk::AffineTransform3D::Pointer returnValue = mitk::AffineTransform3D::New();
   if (m_ManipulatedToolTip.IsNotNull()) returnValue = m_ManipulatedToolTip->GetGeometry()->GetIndexToWorldTransform();
-  else returnValue->SetIdentity();
+  else if (m_DefaultToolTip.IsNotNull())returnValue = m_DefaultToolTip;
+    else returnValue->SetIdentity();
   return returnValue;
 }

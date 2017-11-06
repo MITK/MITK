@@ -80,6 +80,7 @@ signals:
   void OnLoadStorage();
   void OnSaveStorage();
   void OnCreateStorage();
+  void OnToolSelected();
 
   //widget page "add tool":
   void OnAddToolCancel();

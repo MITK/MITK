@@ -76,6 +76,7 @@ public:
   void OnSetNewToolTipPosButtonClicked();
   void OnGetPositions();
   void OnCalibrateToolAxis();
+  void OnToolAxisSpinboxChanged();
 
 protected:
 
@@ -133,8 +134,8 @@ protected:
 
   //members and helper methods for tool axis calibration 
   mitk::Vector3D m_CalibratedToolAxis;
-  mitk::Vector3D m_EndToolPosition;
-  mitk::Vector3D m_StartToolPosition;
+  mitk::NavigationData::Pointer  m_AxisCalibration_ToolToCalibrate;
+  mitk::NavigationData::Pointer  m_AxisCalibration_NavDataCalibratingTool;
 
 };
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>413</width>
-    <height>1222</height>
+    <height>1325</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -38,57 +38,7 @@
       <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Mask Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
-        <property name="toolTip">
-         <string>Fibers that enter a region defined in this image will stop immediately.</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
-        <property name="toolTip">
-         <string>Seed points are only placed inside the mask image. If no seed mask is selected, the whole image is seeded.</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Stop Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
+      <item row="6" column="1">
        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TissueImageBox">
         <property name="toolTip">
          <string>Tissue label image needed for gray matter seeding (WM=3, GM=1). Use e.g. MRtrix 5ttgen to generate such a label image.</string>
@@ -101,6 +51,46 @@
           <string>-</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Tissue Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="m_ForestLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Tractography Forest:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Seed Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="toolTip">
+         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
+        </property>
+        <property name="text">
+         <string>Input Image:</string>
+        </property>
        </widget>
       </item>
       <item row="2" column="1">
@@ -118,7 +108,22 @@
         </item>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="5" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
+        <property name="toolTip">
+         <string>Fibers that enter a region defined in this image will stop immediately.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="7" column="0">
        <widget class="QLabel" name="mFaImageLabel">
         <property name="toolTip">
          <string/>
@@ -128,7 +133,22 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="8" column="1">
+       <widget class="QmitkDataStorageComboBox" name="m_ForestBox">
+        <property name="toolTip">
+         <string>Random forest for machine learning based tractography.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="7" column="1">
        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
         <property name="toolTip">
          <string>If an image is selected, the stopping criterion is not calculated from the input image but instead the selected image is used.</string>
@@ -143,24 +163,39 @@
         </item>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_6">
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_9">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>Seed Image:</string>
+         <string>Stop Image:</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_10">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_7">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>Tissue Image:</string>
+         <string>Mask Image:</string>
         </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
+        <property name="toolTip">
+         <string>Seed points are only placed inside the mask image. If no seed mask is selected, the whole image is seeded.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="0" column="1">
@@ -176,30 +211,20 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="toolTip">
-         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
-        </property>
-        <property name="text">
-         <string>Input Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="m_ForestLabel">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_11">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>Tractography Forest:</string>
+         <string>Target Image:</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_ForestBox">
+      <item row="4" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TargetImageBox">
         <property name="toolTip">
-         <string>Random forest for machine learning based tractography.</string>
+         <string>Fibers that do not start and end in a region defined in this image will be discarded.</string>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
@@ -1044,14 +1069,14 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBoxWithSelectNone</class>
-   <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

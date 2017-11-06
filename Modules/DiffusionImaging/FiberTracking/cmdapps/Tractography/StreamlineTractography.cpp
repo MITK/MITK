@@ -65,6 +65,7 @@ int main(int argc, char* argv[])
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle/probability map", us::Any(), false);
 
   parser.addArgument("stop_mask", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
+  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "streamlines not starting and ending in one of the regions in this image are discarded", us::Any());
   parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
   parser.addArgument("seed_mask", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
   parser.addArgument("tissue_image", "", mitkCommandLineParser::String, "Tissue type image:", "image with tissue type labels (WM=3, GM=1)", us::Any());
@@ -178,6 +179,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("seed_mask"))
     seedFile = us::any_cast<std::string>(parsedArgs["seed_mask"]);
 
+  std::string targetFile = "";
+  if (parsedArgs.count("target_image"))
+    targetFile = us::any_cast<std::string>(parsedArgs["target_image"]);
+
   std::string stopFile = "";
   if (parsedArgs.count("stop_mask"))
     stopFile = us::any_cast<std::string>(parsedArgs["stop_mask"]);
@@ -233,6 +238,7 @@ int main(int argc, char* argv[])
     addFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["additional_images"]);
 
   typedef itk::Image<unsigned char, 3> ItkUcharImgType;
+  typedef itk::Image<unsigned int, 3> ItkUintImgType;
 
   MITK_INFO << "loading input";
   std::vector< mitk::Image::Pointer > input_images;
@@ -269,6 +275,14 @@ int main(int argc, char* argv[])
     mitk::CastToItkImage(img, stop);
   }
 
+  ItkUintImgType::Pointer target;
+  if (!targetFile.empty())
+  {
+    MITK_INFO << "loading target image";
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(targetFile)[0].GetPointer());
+    target = ItkUintImgType::New();
+    mitk::CastToItkImage(img, target);
+  }
 
   ItkUcharImgType::Pointer tissue;
   if (!tissueFile.empty())
@@ -421,6 +435,7 @@ int main(int argc, char* argv[])
   tracker->SetMaskImage(mask);
   tracker->SetSeedImage(seed);
   tracker->SetStoppingRegions(stop);
+  tracker->SetTargetRegions(target);
   tracker->SetSeedsPerVoxel(seeds);
   tracker->SetStepSize(stepsize);
   tracker->SetSamplingDistance(sampling_distance);

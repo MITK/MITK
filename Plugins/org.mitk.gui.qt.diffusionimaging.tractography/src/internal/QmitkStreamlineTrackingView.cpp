@@ -104,6 +104,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_FaImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_SeedImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_MaskImageBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_TargetImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_StopImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TissueImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ForestBox->SetDataStorage(this->GetDataStorage());
@@ -125,6 +126,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_MaskImageBox->SetZeroEntryText("--");
     m_Controls->m_StopImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
     m_Controls->m_StopImageBox->SetZeroEntryText("--");
+    m_Controls->m_TargetImageBox->SetPredicate( dimensionPredicate );
+    m_Controls->m_TargetImageBox->SetZeroEntryText("--");
     m_Controls->m_TissueImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
     m_Controls->m_TissueImageBox->SetZeroEntryText("--");
 
@@ -140,6 +143,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
 
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_TargetImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_MaskImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_ForestBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ForestSwitched()) );
@@ -814,6 +818,13 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_StopImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetStoppingRegions(mask);
+  }
+
+  if (m_Controls->m_TargetImageBox->GetSelectedNode().IsNotNull())
+  {
+    ItkUintImgType::Pointer mask = ItkUintImgType::New();
+    mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TargetImageBox->GetSelectedNode()->GetData()), mask);
+    m_Tracker->SetTargetRegions(mask);
   }
 
   if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())

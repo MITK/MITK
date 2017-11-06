@@ -59,6 +59,10 @@ void QmitkFiberClusteringView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TractBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TractBox->SetPredicate(isFib);
 
+    m_Controls->m_InCentroidsBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_InCentroidsBox->SetPredicate(isFib);
+    m_Controls->m_InCentroidsBox->SetZeroEntryText("--");
+
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
     m_Controls->m_MapBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_MapBox->SetPredicate(isImage);
@@ -105,13 +109,18 @@ void QmitkFiberClusteringView::StartClustering()
   itk::TractClusteringFilter::Pointer clusterer = itk::TractClusteringFilter::New();
   clusterer->SetDistances(distances);
   clusterer->SetTractogram(fib);
+  if (m_Controls->m_InCentroidsBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::FiberBundle::Pointer in_centroids = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_InCentroidsBox->GetSelectedNode()->GetData());
+    clusterer->SetInCentroids(in_centroids);
+  }
   switch (m_Controls->m_MetricBox->currentIndex())
   {
   case 0:
     clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF);
     break;
   case 1:
-    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_VAR);
+    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_STD);
     break;
   case 2:
     clusterer->SetMetric(itk::TractClusteringFilter::Metric::MAX_MDF);
@@ -128,12 +137,14 @@ void QmitkFiberClusteringView::StartClustering()
       clusterer->SetScalarMap(itk_map);
     }
   }
+  clusterer->SetMergeDuplicateThreshold(m_Controls->m_MergeDuplicatesBox->value());
   clusterer->SetScale(m_Controls->m_MapScaleBox->value());
   clusterer->SetNumPoints(m_Controls->m_FiberPointsBox->value());
   clusterer->SetMaxClusters(m_Controls->m_MaxClustersBox->value());
   clusterer->SetMinClusterSize(m_Controls->m_MinFibersBox->value());
   clusterer->Update();
   std::vector<mitk::FiberBundle::Pointer> tracts = clusterer->GetOutTractograms();
+  std::vector<mitk::FiberBundle::Pointer> centroids = clusterer->GetOutCentroids();
 
   unsigned int c = 0;
   for (auto f : tracts)
@@ -141,8 +152,19 @@ void QmitkFiberClusteringView::StartClustering()
     mitk::DataNode::Pointer new_node = mitk::DataNode::New();
     new_node->SetData(f);
     new_node->SetName("Cluster_" + boost::lexical_cast<std::string>(c));
-    this->GetDataStorage()->Add(new_node, node);
+    if (m_Controls->m_InCentroidsBox->GetSelectedNode().IsNotNull())
+      this->GetDataStorage()->Add(new_node, m_Controls->m_InCentroidsBox->GetSelectedNode());
+    else
+      this->GetDataStorage()->Add(new_node, node);
     node->SetVisibility(false);
+
+    if (m_Controls->m_CentroidsBox->isChecked())
+    {
+      mitk::DataNode::Pointer new_node2 = mitk::DataNode::New();
+      new_node2->SetData(centroids.at(c));
+      new_node2->SetName("Centroid_" + boost::lexical_cast<std::string>(c));
+      this->GetDataStorage()->Add(new_node2, new_node);
+    }
     ++c;
   }
 }

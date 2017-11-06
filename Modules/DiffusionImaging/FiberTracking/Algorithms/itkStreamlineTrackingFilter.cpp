@@ -166,6 +166,19 @@ void StreamlineTrackingFilter::BeforeTracking()
   else
     std::cout << "StreamlineTracking - Using stopping region image" << std::endl;
 
+  if (m_TargetRegions.IsNull())
+  {
+    m_TargetRegions = ItkUintImgType::New();
+    m_TargetRegions->SetSpacing( imageSpacing );
+    m_TargetRegions->SetOrigin( m_TrackingHandler->GetOrigin() );
+    m_TargetRegions->SetDirection( m_TrackingHandler->GetDirection() );
+    m_TargetRegions->SetRegions( m_TrackingHandler->GetLargestPossibleRegion() );
+    m_TargetRegions->Allocate();
+    m_TargetRegions->FillBuffer(1);
+  }
+  else
+    std::cout << "StreamlineTracking - Using target region image" << std::endl;
+
   if (m_SeedImage.IsNull())
   {
     m_SeedImage = ItkUcharImgType::New();
@@ -834,25 +847,32 @@ void StreamlineTrackingFilter::GenerateData()
       }
       counter = fib.size();
 
-#pragma omp critical
       if (tractLength>=m_MinTractLength && counter>=2)
       {
-        if (!m_StopTracking)
+        ItkUintImgType::IndexType idx_begin, idx_end;
+        m_TargetRegions->TransformPhysicalPointToIndex(fib.front(), idx_begin);
+        m_TargetRegions->TransformPhysicalPointToIndex(fib.back(), idx_end);
+        if (m_TargetRegions->GetPixel(idx_begin)>0 && m_TargetRegions->GetPixel(idx_end)==m_TargetRegions->GetPixel(idx_begin))
         {
-          if (!m_UseOutputProbabilityMap)
-            m_Tractogram.push_back(fib);
-          else
-            FiberToProbmap(&fib);
-          m_CurrentTracts++;
-        }
-        if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
-        {
+#pragma omp critical
           if (!m_StopTracking)
           {
-            std::cout << "                                                                                                     \r";
-            MITK_INFO << "Reconstructed maximum number of tracts (" << m_CurrentTracts << "). Stopping tractography.";
+            if (!m_UseOutputProbabilityMap)
+              m_Tractogram.push_back(fib);
+            else
+              FiberToProbmap(&fib);
+            m_CurrentTracts++;
           }
-          m_StopTracking = true;
+          if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
+          {
+#pragma omp critical
+            if (!m_StopTracking)
+            {
+              std::cout << "                                                                                                     \r";
+              MITK_INFO << "Reconstructed maximum number of tracts (" << m_CurrentTracts << "). Stopping tractography.";
+            }
+            m_StopTracking = true;
+          }
         }
       }
 

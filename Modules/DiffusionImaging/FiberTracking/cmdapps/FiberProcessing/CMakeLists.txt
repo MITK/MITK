@@ -19,6 +19,7 @@ if(BUILD_DiffusionFiberProcessingCmdApps OR MITK_BUILD_ALL_APPS)
     FitFibersToImage^^MitkFiberTracking
     FiberDirectionExtraction^^MitkFiberTracking
     FiberJoin^^MitkFiberTracking
+    FiberClustering^^MitkFiberTracking
     )
 
     foreach(diffusionFiberProcessingcmdapp ${diffusionFiberProcessingcmdapps})

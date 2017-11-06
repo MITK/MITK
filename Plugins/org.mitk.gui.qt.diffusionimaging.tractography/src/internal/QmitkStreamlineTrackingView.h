@@ -72,6 +72,7 @@ public:
 
   static const std::string VIEW_ID;
 
+  typedef itk::Image< unsigned int, 3 >   ItkUintImgType;
   typedef itk::Image< unsigned char, 3 >  ItkUCharImageType;
   typedef itk::Image< float, 3 >          ItkFloatImageType;
   typedef itk::StreamlineTrackingFilter   TrackerType;

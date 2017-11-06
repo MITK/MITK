@@ -38,113 +38,14 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Tractogram:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QSpinBox" name="m_FiberPointsBox">
-        <property name="toolTip">
-         <string>Fibers are resampled to the desired number of points for clustering. Smaller is faster but less accurate.</string>
-        </property>
-        <property name="minimum">
-         <number>2</number>
-        </property>
-        <property name="maximum">
-         <number>9999999</number>
-        </property>
-        <property name="value">
-         <number>12</number>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QSpinBox" name="m_MinFibersBox">
-        <property name="toolTip">
-         <string>Only output clusters with ate least the specified number of fibers.</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999999</number>
-        </property>
-        <property name="value">
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MapBox">
-        <property name="toolTip">
-         <string>If set, distance metrics include distance between scalar map values along the tract.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Min. fibers per cluster:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QSpinBox" name="m_MaxClustersBox">
-        <property name="toolTip">
-         <string>Only output the N largest clusters. Zero means no limit.</string>
-        </property>
-        <property name="maximum">
-         <number>99999999</number>
-        </property>
-        <property name="value">
-         <number>0</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QSpinBox" name="m_ClusterSizeBox">
-        <property name="toolTip">
-         <string>Cluster size in mm.</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999999</number>
-        </property>
-        <property name="value">
-         <number>20</number>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Max. clusters:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_TractBox"/>
-      </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="label_5">
+       <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>Cluster size:</string>
+         <string>Metric:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Scalar map:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0">
+      <item row="11" column="0">
        <widget class="QCommandLinkButton" name="m_StartButton">
         <property name="enabled">
          <bool>false</bool>
@@ -174,21 +75,36 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Fiber points:</string>
+      <item row="7" column="1">
+       <widget class="QSpinBox" name="m_MaxClustersBox">
+        <property name="toolTip">
+         <string>Only output the N largest clusters. Zero means no limit.</string>
+        </property>
+        <property name="maximum">
+         <number>99999999</number>
+        </property>
+        <property name="value">
+         <number>0</number>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Metric:</string>
+      <item row="5" column="1">
+       <widget class="QSpinBox" name="m_FiberPointsBox">
+        <property name="toolTip">
+         <string>Fibers are resampled to the desired number of points for clustering. Smaller is faster but less accurate.</string>
+        </property>
+        <property name="minimum">
+         <number>2</number>
+        </property>
+        <property name="maximum">
+         <number>9999999</number>
+        </property>
+        <property name="value">
+         <number>12</number>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QComboBox" name="m_MetricBox">
         <property name="currentIndex">
          <number>1</number>
@@ -200,7 +116,7 @@
         </item>
         <item>
          <property name="text">
-          <string>MDF_VAR</string>
+          <string>MDF_STD</string>
          </property>
         </item>
         <item>
@@ -210,20 +126,155 @@
         </item>
        </widget>
       </item>
-      <item row="7" column="0">
+      <item row="2" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MapBox">
+        <property name="toolTip">
+         <string>If set, distance metrics include distance between scalar map values along the tract.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Tractogram:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QDoubleSpinBox" name="m_MergeDuplicatesBox">
+        <property name="toolTip">
+         <string>Merge duplicate clusters withthe specified distance threshold. If threshold is &lt; 0, the threshold is set to the specified cluster size.</string>
+        </property>
+        <property name="minimum">
+         <double>-1.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>99999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>-1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QmitkDataStorageComboBox" name="m_TractBox"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Cluster size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
          <string>Map scale:</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="1">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Scalar map:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Min. fibers per cluster:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Output centroids:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Fiber points:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Mergde duplicate clusters:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="m_MinFibersBox">
+        <property name="toolTip">
+         <string>Only output clusters with ate least the specified number of fibers.</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999999</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Max. clusters:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QCheckBox" name="m_CentroidsBox">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="m_ClusterSizeBox">
+        <property name="toolTip">
+         <string>Cluster size in mm.</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999999</number>
+        </property>
+        <property name="value">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
        <widget class="QDoubleSpinBox" name="m_MapScaleBox">
         <property name="toolTip">
          <string>Scaling factor for the scalar map (0=auto).</string>
         </property>
         <property name="maximum">
          <double>99999.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Input centroids:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_InCentroidsBox">
+        <property name="toolTip">
+         <string>If set, the input tractogram is clustered around the input centroids and no new clusters are created.</string>
         </property>
        </widget>
       </item>

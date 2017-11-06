@@ -59,6 +59,7 @@ public:
   itkTypeMacro(MLBSTrackingFilter, ImageToImageFilter)
 
   typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
+  typedef itk::Image<unsigned int, 3>                 ItkUintImgType;
   typedef itk::Image<double, 3>                       ItkDoubleImgType;
   typedef itk::Image<float, 3>                        ItkFloatImgType;
   typedef vtkSmartPointer< vtkPolyData >              PolyDataType;
@@ -97,6 +98,7 @@ public:
   itkSetMacro( OnlyForwardSamples, bool )             ///< Don't use sampling points behind the current position in progression direction
   itkSetMacro( DeflectionMod, float )                 ///< Deflection distance modifier
   itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
+  itkSetMacro( TargetRegions, ItkUintImgType::Pointer)    ///< Only streamline starting and ending in this mask are retained
   itkSetMacro( DemoMode, bool )
   itkSetMacro( SeedOnlyGm, bool )                     ///< place seed points only in the gray matter
   itkSetMacro( ControlGmEndings, bool )               ///<
@@ -110,7 +112,7 @@ public:
   itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
   itkSetMacro( StopTracking, bool )
-  
+
   ///< Use manually defined points in physical space as seed points instead of seed image
   void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {
     m_SeedPoints = sP;
@@ -157,6 +159,7 @@ protected:
   BundleType                          m_GmStubs;
 
   ItkUcharImgType::Pointer            m_StoppingRegions;
+  ItkUintImgType::Pointer             m_TargetRegions;
   ItkUcharImgType::Pointer            m_SeedImage;
   ItkUcharImgType::Pointer            m_MaskImage;
   ItkUcharImgType::Pointer            m_TissueImage;

@@ -44,6 +44,7 @@ StreamlineTrackingFilter
   , m_Points(nullptr)
   , m_Cells(nullptr)
   , m_StoppingRegions(nullptr)
+  , m_TargetRegions(nullptr)
   , m_SeedImage(nullptr)
   , m_MaskImage(nullptr)
   , m_TissueImage(nullptr)
@@ -852,9 +853,11 @@ void StreamlineTrackingFilter::GenerateData()
         ItkUintImgType::IndexType idx_begin, idx_end;
         m_TargetRegions->TransformPhysicalPointToIndex(fib.front(), idx_begin);
         m_TargetRegions->TransformPhysicalPointToIndex(fib.back(), idx_end);
-        if (m_TargetRegions->GetPixel(idx_begin)>0 && m_TargetRegions->GetPixel(idx_end)==m_TargetRegions->GetPixel(idx_begin))
-        {
 #pragma omp critical
+        if ( !m_TargetRegions->GetLargestPossibleRegion().IsInside(idx_end) ||
+             !m_TargetRegions->GetLargestPossibleRegion().IsInside(idx_begin) ||
+             (m_TargetRegions->GetPixel(idx_begin)>0 && m_TargetRegions->GetPixel(idx_end)==m_TargetRegions->GetPixel(idx_begin)) )
+        {
           if (!m_StopTracking)
           {
             if (!m_UseOutputProbabilityMap)
@@ -865,7 +868,6 @@ void StreamlineTrackingFilter::GenerateData()
           }
           if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
           {
-#pragma omp critical
             if (!m_StopTracking)
             {
               std::cout << "                                                                                                     \r";

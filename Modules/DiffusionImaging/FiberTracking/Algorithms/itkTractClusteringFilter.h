@@ -58,7 +58,7 @@ public:
   enum Metric
   {
     MDF,
-    MDF_VAR,
+    MDF_STD,
     MAX_MDF
   };
 
@@ -106,7 +106,7 @@ protected:
   void GenerateData() override;
   std::vector< vnl_matrix<float> > ResampleFibers(FiberBundle::Pointer tractogram);
   float CalcMDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
-  float CalcMDF_VAR(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
+  float CalcMDF_STD(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
   float CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
 
   std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);

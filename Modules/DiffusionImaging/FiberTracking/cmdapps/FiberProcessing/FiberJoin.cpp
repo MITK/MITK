@@ -30,11 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
 {
-    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(filename);
-    if( fibInfile.empty() )
-        std::cout << "File " << filename << " could not be read!";
-    mitk::BaseData::Pointer baseData = fibInfile.at(0);
-    return dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
+  std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(filename);
+  if( fibInfile.empty() )
+    std::cout << "File " << filename << " could not be read!";
+  mitk::BaseData::Pointer baseData = fibInfile.at(0);
+  return dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
 }
 
 /*!
@@ -55,45 +55,46 @@ int main(int argc, char* argv[])
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
-      return EXIT_FAILURE;
+    return EXIT_FAILURE;
 
   mitkCommandLineParser::StringContainerType inFibs = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["input"]);
   std::string outFib = us::any_cast<std::string>(parsedArgs["out"]);
 
   if (inFibs.size()<=1)
   {
-      std::cout << "More than one input tractogram required!";
-      return EXIT_FAILURE;
+    std::cout << "More than one input tractogram required!";
+    return EXIT_FAILURE;
   }
 
   try
   {
-      mitk::FiberBundle::Pointer result = LoadFib(inFibs.at(0));
-      for (std::size_t i=1; i<inFibs.size(); ++i)
+    std::vector< mitk::FiberBundle::Pointer > tractograms;
+    mitk::FiberBundle::Pointer result = mitk::FiberBundle::New(nullptr);
+    for (std::size_t i=1; i<inFibs.size(); ++i)
+    {
+      try
       {
-          try
-          {
-              mitk::FiberBundle::Pointer inputTractogram = LoadFib(inFibs.at(i));
-              result = result->AddBundle(inputTractogram);
-          }
-          catch(...){ std::cout << "could not load: " << inFibs.at(i); }
+        tractograms.push_back(LoadFib(inFibs.at(i)));
       }
-      mitk::IOUtil::Save(result, outFib);
+      catch(...){ std::cout << "could not load: " << inFibs.at(i); }
+    }
+    result = result->AddBundles(tractograms);
+    mitk::IOUtil::Save(result, outFib);
   }
   catch (itk::ExceptionObject e)
   {
-      std::cout << e;
-      return EXIT_FAILURE;
+    std::cout << e;
+    return EXIT_FAILURE;
   }
   catch (std::exception e)
   {
-      std::cout << e.what();
-      return EXIT_FAILURE;
+    std::cout << e.what();
+    return EXIT_FAILURE;
   }
   catch (...)
   {
-      std::cout << "ERROR!?!";
-      return EXIT_FAILURE;
+    std::cout << "ERROR!?!";
+    return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }

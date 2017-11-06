@@ -84,7 +84,7 @@ float TractClusteringFilter::CalcMDF(vnl_matrix<float>& s, vnl_matrix<float>& t,
   return d_direct/m_NumPoints;
 }
 
-float TractClusteringFilter::CalcMDF_VAR(vnl_matrix<float>& s, vnl_matrix<float>& t, bool& flipped)
+float TractClusteringFilter::CalcMDF_STD(vnl_matrix<float>& s, vnl_matrix<float>& t, bool& flipped)
 {
   float d_direct = 0;
   float d_flipped = 0;
@@ -216,7 +216,6 @@ std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::ClusterStep
   if (f_indices.size()==1)
     return C;
 
-  MITK_INFO << "Clustering fibers with distance " << dist_thres;
   for (int i=1; i<N; ++i)
   {
     vnl_matrix<float> t = T.at(f_indices.at(i));
@@ -232,8 +231,8 @@ std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::ClusterStep
       float d = 0;
       if (m_Metric==Metric::MDF)
         d = CalcMDF(t, v, f);
-      else if (m_Metric==Metric::MDF_VAR)
-        d = CalcMDF_VAR(t, v, f);
+      else if (m_Metric==Metric::MDF_STD)
+        d = CalcMDF_STD(t, v, f);
       else if (m_Metric==Metric::MAX_MDF)
         d = CalcMAX_MDF(t, v, f);
 
@@ -295,8 +294,12 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
   MITK_INFO << "Merging duplicate clusters with distance threshold " << m_MergeDuplicateThreshold;
   while (found && m_MergeDuplicateThreshold>mitk::eps)
   {
+    std::cout << "                                                                                                     \r";
+    std::cout << "Number of clusters: " << clusters.size() << '\r';
+    cout.flush();
+
     found = false;
-    for (unsigned int k1=0; k1<clusters.size(); ++k1)
+    for (int k1=0; k1<(int)clusters.size(); ++k1)
     {
       Cluster c1 = clusters.at(k1);
       vnl_matrix<float> t = c1.h / c1.n;
@@ -305,28 +308,30 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
       float min_cluster_distance = 99999;
       bool flip = false;
 
-      for (unsigned int k2=0; k2<clusters.size(); ++k2)
+#pragma omp parallel for
+      for (int k2=0; k2<(int)clusters.size(); ++k2)
       {
-        if (k1==k2)
-          continue;
-
-        Cluster c2 = clusters.at(k2);
-        vnl_matrix<float> v = c2.h / c2.n;
-        bool f = false;
-        float d = 0;
-
-        if (m_Metric==Metric::MDF)
-          d = CalcMDF(t, v, f);
-        else if (m_Metric==Metric::MDF_VAR)
-          d = CalcMDF_VAR(t, v, f);
-        else if (m_Metric==Metric::MAX_MDF)
-          d = CalcMAX_MDF(t, v, f);
-
-        if (d<min_cluster_distance)
+        if (k1!=k2)
         {
-          min_cluster_distance = d;
-          min_cluster_index = k2;
-          flip = f;
+          Cluster c2 = clusters.at(k2);
+          vnl_matrix<float> v = c2.h / c2.n;
+          bool f = false;
+          float d = 0;
+
+          if (m_Metric==Metric::MDF)
+            d = CalcMDF(t, v, f);
+          else if (m_Metric==Metric::MDF_STD)
+            d = CalcMDF_STD(t, v, f);
+          else if (m_Metric==Metric::MAX_MDF)
+            d = CalcMAX_MDF(t, v, f);
+
+#pragma omp critical
+          if (d<min_cluster_distance)
+          {
+            min_cluster_distance = d;
+            min_cluster_index = k2;
+            flip = f;
+          }
         }
       }
 
@@ -348,7 +353,7 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
       }
     }
   }
-  MITK_INFO << "Number of clusters after merging duplicates: " << clusters.size();
+  MITK_INFO << "\nNumber of clusters after merging duplicates: " << clusters.size();
 }
 
 std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClusters(std::vector< long > f_indices, std::vector<vnl_matrix<float> >& centroids)
@@ -384,8 +389,8 @@ std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClu
 
       if (m_Metric==Metric::MDF)
         d = CalcMDF(t, centroid, f);
-      else if (m_Metric==Metric::MDF_VAR)
-        d = CalcMDF_VAR(t, centroid, f);
+      else if (m_Metric==Metric::MDF_STD)
+        d = CalcMDF_STD(t, centroid, f);
       else if (m_Metric==Metric::MAX_MDF)
         d = CalcMAX_MDF(t, centroid, f);
 
@@ -438,6 +443,7 @@ void TractClusteringFilter::GenerateData()
   std::vector< Cluster > clusters;
   if (m_InCentroids.IsNull())
   {
+    MITK_INFO << "Clustering fibers";
     clusters = ClusterStep(f_indices, m_Distances);
     MITK_INFO << "Number of clusters: " << clusters.size();
     MergeDuplicateClusters(clusters);
@@ -445,6 +451,7 @@ void TractClusteringFilter::GenerateData()
   }
   else
   {
+    MITK_INFO << "Clustering with input centroids";
     std::vector<vnl_matrix<float> > centroids = ResampleFibers(m_InCentroids);
     clusters = AddToKnownClusters(f_indices, centroids);
     no_match = clusters.back();

@@ -1407,20 +1407,20 @@ void QmitkFiberProcessingView::JoinBundles()
     return;
   }
 
-  mitk::FiberBundle::Pointer newBundle = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(0)->GetData());
   m_SelectedFB.at(0)->SetVisibility(false);
-  QString name("");
-  name += QString(m_SelectedFB.at(0)->GetName().c_str());
+  mitk::FiberBundle::Pointer newBundle = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(0)->GetData());
+
+  std::vector< mitk::FiberBundle::Pointer > tractograms;
   for (unsigned int i=1; i<m_SelectedFB.size(); i++)
   {
-    newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData()));
-    name += "+"+QString(m_SelectedFB.at(i)->GetName().c_str());
     m_SelectedFB.at(i)->SetVisibility(false);
+    tractograms.push_back(dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData()));
   }
+  newBundle = newBundle->AddBundles(tractograms);
 
   mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
   fbNode->SetData(newBundle);
-  fbNode->SetName(name.toStdString());
+  fbNode->SetName("Joined_Tractograms");
   fbNode->SetVisibility(true);
   GetDataStorage()->Add(fbNode);
   UpdateGui();

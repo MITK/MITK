@@ -120,7 +120,7 @@ void QmitkFiberClusteringView::StartClustering()
     clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF);
     break;
   case 1:
-    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_VAR);
+    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_STD);
     break;
   case 2:
     clusterer->SetMetric(itk::TractClusteringFilter::Metric::MAX_MDF);

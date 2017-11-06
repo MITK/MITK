@@ -121,6 +121,7 @@ private:
   void StartStopTrackingGui(bool start);
 
   std::vector< itk::Point<float> >        m_SeedPoints;
+  mitk::DataNode::Pointer                 m_ParentNode;
   mitk::DataNode::Pointer                 m_InteractiveNode;
   mitk::DataNode::Pointer                 m_InteractivePointSetNode;
 

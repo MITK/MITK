@@ -226,7 +226,7 @@ void QmitkStreamlineTrackingView::AfterThread()
     }
 
     mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
-    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
+    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_ParentNode->GetData())->GetGeometry());
     if (m_Controls->m_ResampleFibersBox->isChecked() && fiberBundle->GetNumberOfLines()>0)
       fib->Compress(m_Controls->m_FiberErrorBox->value());
     fib->ColorFibersByOrientation();
@@ -250,10 +250,10 @@ void QmitkStreamlineTrackingView::AfterThread()
       mitk::DataNode::Pointer node = mitk::DataNode::New();
       node->SetData(fib);
       QString name("FiberBundle_");
-      name += m_InputImageNodes.at(0)->GetName().c_str();
+      name += m_ParentNode->GetName().c_str();
       name += "_Streamline";
       node->SetName(name.toStdString());
-      GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+      GetDataStorage()->Add(node, m_ParentNode);
     }
   }
   else
@@ -289,7 +289,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       mitk::DataNode::Pointer node = mitk::DataNode::New();
       node->SetData(img);
       QString name("ProbabilityMap_");
-      name += m_InputImageNodes.at(0)->GetName().c_str();
+      name += m_ParentNode->GetName().c_str();
       node->SetName(name.toStdString());
 
       mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
@@ -299,7 +299,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       node->SetProperty("LookupTable", lut_prop);
       node->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
-      GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+      GetDataStorage()->Add(node, m_ParentNode);
     }
   }
   if (m_InteractivePointSetNode.IsNotNull())
@@ -849,5 +849,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   m_Tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
   m_Tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());
 
+  m_ParentNode = m_InputImageNodes.at(0);
   m_TrackingThread.start(QThread::LowestPriority);
 }

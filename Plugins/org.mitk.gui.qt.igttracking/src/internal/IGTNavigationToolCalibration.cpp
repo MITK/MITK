@@ -463,49 +463,41 @@ void IGTNavigationToolCalibration::OnProcessManualTooltipEditDialogCloseRequest(
 
 void IGTNavigationToolCalibration::OnGetPositions()
 {
-  //tool tip from tool to be calibrated 
-  mitk::NavigationData::Pointer StartTool = mitk::NavigationData::New();
-  StartTool->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDToolToCalibrate));
-  double startX = StartTool->GetPosition().GetVnlVector()[0];
-  double startY = StartTool->GetPosition().GetVnlVector()[1];
-  double startZ = StartTool->GetPosition().GetVnlVector()[2];
-  m_StartToolPosition.SetElement(0, startX);
-  m_StartToolPosition.SetElement(1, startY);
-  m_StartToolPosition.SetElement(2, startZ);
+  //Navigation Data from Tool which should be calibrated
+  if (!m_AxisCalibration_ToolToCalibrate)
+    m_AxisCalibration_ToolToCalibrate = mitk::NavigationData::New();
+  m_AxisCalibration_ToolToCalibrate->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDToolToCalibrate));
 
-  //tool end from calibration tool
-  mitk::NavigationData::Pointer EndTool = mitk::NavigationData::New();
-  EndTool->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDCalibrationPointer));
-  double endX = EndTool->GetPosition().GetVnlVector()[0];
-  double endY = EndTool->GetPosition().GetVnlVector()[1];
-  double endZ = EndTool->GetPosition().GetVnlVector()[2];
-  m_EndToolPosition.SetElement(0, endX);
-  m_EndToolPosition.SetElement(1, endY);
-  m_EndToolPosition.SetElement(2, endZ);
+  //Navigation Data from calibration pointer tool
+  if (!m_AxisCalibration_NavDataCalibratingTool)
+    m_AxisCalibration_NavDataCalibratingTool = mitk::NavigationData::New();
+  m_AxisCalibration_NavDataCalibratingTool->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDCalibrationPointer));
 
-  mitk::NavigationData::Pointer trackingToToolTransform = m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDToolToCalibrate)->GetInverse();
-  mitk::Vector3D trackingToToolPos;
-  trackingToToolPos.SetElement(0, trackingToToolTransform->GetPosition()[0]);
-  trackingToToolPos.SetElement(1, trackingToToolTransform->GetPosition()[1]);
-  trackingToToolPos.SetElement(2, trackingToToolTransform->GetPosition()[2]);
-
-  mitk::Vector3D startPosToolCoordinates = trackingToToolTransform->GetRotationMatrix() * (m_StartToolPosition)+trackingToToolPos;
-  mitk::Vector3D endPosToolCoordinates = trackingToToolTransform->GetRotationMatrix() * (m_EndToolPosition)+trackingToToolPos;
-  m_CalibratedToolAxis.SetElement(0, (-1 * endPosToolCoordinates[0] + startPosToolCoordinates[0]));
-  m_CalibratedToolAxis.SetElement(1, (-1 * endPosToolCoordinates[1] + startPosToolCoordinates[1]));
-  m_CalibratedToolAxis.SetElement(2, (-1 * endPosToolCoordinates[2] + startPosToolCoordinates[2]));
-  m_CalibratedToolAxis.Normalize();
+  MITK_INFO << "Positions for tool axis calibration:";
+  MITK_INFO << "    ToolTip: " << m_AxisCalibration_ToolToCalibrate->GetPosition() << ",";
+  MITK_INFO << "    Rotation: \n" << m_AxisCalibration_ToolToCalibrate->GetRotationMatrix();
+  MITK_INFO << "    End of the tool: " << m_AxisCalibration_NavDataCalibratingTool->GetPosition();
 }
 
 void IGTNavigationToolCalibration::OnCalibrateToolAxis()
 {
-  QString xString = QString::number(m_CalibratedToolAxis.GetElement(0),'g',3);
-  QString yString = QString::number(m_CalibratedToolAxis.GetElement(1), 'g', 3);
-  QString zString = QString::number(m_CalibratedToolAxis.GetElement(2),'g',3);
+  //Calculate the tool tip
+  //here is an explanation, what is happening here:
+  /*
+  The axis is equal to the (tool tip) minus the (end of the tool) in tool coordinates of the tool which should be calibrated.
+  The tool tip in tool coordinates is zero (definition of the tip).
+  The end of the tool is recorded by the calibration pointer's position and is transformed using the inverse of the tool which should be calibrated.
+  Normalize it.
+  */
+  m_CalibratedToolAxis = -m_AxisCalibration_ToolToCalibrate->GetInverse()->TransformPoint(m_AxisCalibration_NavDataCalibratingTool->GetPosition()).GetVectorFromOrigin();
+  MITK_INFO << "Tool Endpoint in Tool coordinates: " << m_CalibratedToolAxis;
+  m_CalibratedToolAxis.Normalize();
+  MITK_INFO << "Tool Axis: " << m_CalibratedToolAxis;
 
-  QString calibratedToolAxisString = xString + ", " + yString + ", " + zString;
+  QString calibratedToolAxisString = QString::number(m_CalibratedToolAxis.GetElement(0), 'g', 3) + ", " +
+    QString::number(m_CalibratedToolAxis.GetElement(1), 'g', 3) + ", " + QString::number(m_CalibratedToolAxis.GetElement(2), 'g', 3);
+
   m_Controls.m_ToolAxis->setText(calibratedToolAxisString);
-  MITK_INFO << m_CalibratedToolAxis;
 
   m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
 }

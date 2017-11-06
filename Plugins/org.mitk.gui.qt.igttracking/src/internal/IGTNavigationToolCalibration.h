@@ -76,6 +76,7 @@ public:
   void OnSetNewToolTipPosButtonClicked();
   void OnGetPositions();
   void OnCalibrateToolAxis();
+  void OnToolAxisSpinboxChanged();
 
 protected:
 

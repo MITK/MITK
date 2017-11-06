@@ -466,11 +466,7 @@ void IGTNavigationToolCalibration::OnProcessManualTooltipEditDialogCloseRequest(
 
 void IGTNavigationToolCalibration::OnGetPositions()
 {
-  if (!m_ToolToCalibrate || !m_IDCalibrationPointer)
-  {
-    MITK_ERROR << "No tool or calibration pointer selected.";
-    return;
-  }
+  if (!CheckInitialization(true)) { return; }
 
   //Navigation Data from Tool which should be calibrated
   if (!m_AxisCalibration_ToolToCalibrate)

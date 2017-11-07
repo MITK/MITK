@@ -36,63 +36,43 @@
     <number>9</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="gridGroupBox">
-     <property name="title">
-      <string>Denoisingfilter</string>
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
-       <number>9</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>9</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>9</number>
+       <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>9</number>
+       <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QComboBox" name="m_SelectFilterComboBox"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="m_InputData">
-     <property name="title">
-      <string>Input Data</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
        <widget class="QLabel" name="m_DwiLabel">
         <property name="text">
-         <string>DWI:</string>
+         <string>Input Image:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="m_InputImageLabel">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="m_BrainMaskLabel">
-        <property name="text">
-         <string>Mask:</string>
-        </property>
-       </widget>
+       <widget class="QmitkDataStorageComboBox" name="m_InputImageBox"/>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="m_InputBrainMaskLabel">
+       <widget class="QComboBox" name="m_SelectFilterComboBox"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_DwiLabel_2">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>Filter:</string>
         </property>
        </widget>
       </item>
@@ -100,87 +80,164 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="m_ParameterBox">
+    <widget class="QGroupBox" name="m_TvFrame">
      <property name="title">
       <string>Parameters</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="2" column="0">
-       <widget class="QLabel" name="m_LabelParameter_3">
+     <layout class="QGridLayout" name="gridLayout_5">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_LabelParameter_4">
         <property name="text">
-         <string>Parameter 3</string>
+         <string>Lambda:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="m_TvLambdaBox">
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.100000000000000</double>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="m_LabelParameter_2">
+       <widget class="QLabel" name="m_LabelParameter_5">
         <property name="text">
-         <string>Parameter 2</string>
+         <string>Iterations:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QCheckBox" name="m_JointInformationCheckbox">
-        <property name="text">
-         <string/>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_TvIterationsBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+        <property name="value">
+         <number>1</number>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="m_JointInformationLabel">
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_NlmFrame">
+     <property name="title">
+      <string>Parameters</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_LabelParameter_6">
         <property name="text">
-         <string>Use joint information:</string>
+         <string>Sampling Radius:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="m_RicianLabel">
-        <property name="text">
-         <string>Use rician adaption:</string>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_NlmNumPatchesBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+        <property name="value">
+         <number>10</number>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QCheckBox" name="m_RicianCheckbox">
-        <property name="text">
-         <string/>
+       <widget class="QSpinBox" name="m_NlmIterationsBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+        <property name="value">
+         <number>4</number>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QSpinBox" name="m_SpinBoxParameter1">
+       <widget class="QSpinBox" name="m_NlmSearchRadiusBox">
         <property name="minimum">
          <number>1</number>
         </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
         <property name="value">
-         <number>7</number>
+         <number>4</number>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="m_LabelParameter_1">
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_LabelParameter_11">
         <property name="text">
-         <string>Parameter 1</string>
+         <string>Num. Patches:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="m_DoubleSpinBoxParameter3">
-        <property name="minimum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>99999.990000000005239</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="m_SpinBoxParameter2">
+       <widget class="QSpinBox" name="m_NlmPatchSizeBox">
         <property name="minimum">
          <number>1</number>
         </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
         <property name="value">
-         <number>3</number>
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_LabelParameter_9">
+        <property name="text">
+         <string>Iterations:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_LabelParameter_7">
+        <property name="text">
+         <string>Patch Size:</string>
         </property>
        </widget>
       </item>
@@ -188,32 +245,54 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="m_GaussFrame">
      <property name="title">
-      <string/>
+      <string>Parameters</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_7">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="1">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QDoubleSpinBox" name="m_GaussVarianceBox">
+        <property name="minimum">
+         <double>1.000000000000000</double>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="maximum">
+         <double>99999.000000000000000</double>
         </property>
-       </spacer>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="m_ApplyButton">
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_LabelParameter_10">
         <property name="text">
-         <string>Apply</string>
+         <string>Variance:</string>
         </property>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCommandLinkButton" name="m_ApplyButton">
+     <property name="text">
+      <string>Start</string>
+     </property>
     </widget>
    </item>
    <item>
@@ -232,6 +311,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

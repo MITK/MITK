@@ -26,36 +26,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkImage.h>
 #include <mitkImage.h>
-#include <itkNonLocalMeansDenoisingFilter.h>
-#include <itkMaskImageFilter.h>
-#include <itkDiscreteGaussianImageFilter.h>
-#include <itkVectorImageToImageFilter.h>
-#include <itkComposeImageFilter.h>
 #include <QThread>
 #include <QTimer>
 
+
 /**
  * \class QmitkDenoisingView
- * \brief View displaying details to denoise diffusionweighted images.
+ * \brief View for denoising diffusion-weighted images.
  */
 class QmitkDenoisingView;
-
-class QmitkDenoisingWorker : public QObject
-{
-  Q_OBJECT
-
-public:
-
-  QmitkDenoisingWorker(QmitkDenoisingView* view);
-
-public slots:
-
-  void run();
-
-private:
-
-  QmitkDenoisingView* m_View;
-};
 
 
 class QmitkDenoisingView : public QmitkAbstractView
@@ -72,19 +51,11 @@ public:
   virtual ~QmitkDenoisingView();
 
   /** Typedefs */
-  typedef short                                                                                                         DiffusionPixelType;
-  typedef mitk::Image                                                                                                   MaskImageType;
-  typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType >                                                       NonLocalMeansDenoisingFilterType;
-  typedef itk::DiscreteGaussianImageFilter < itk::Image< DiffusionPixelType, 3>, itk::Image< DiffusionPixelType, 3> >   GaussianFilterType;
-  typedef itk::VectorImageToImageFilter < DiffusionPixelType >                                                          ExtractFilterType;
-  typedef itk::ComposeImageFilter < itk::Image<DiffusionPixelType, 3> >                                                 ComposeFilterType;
-  typedef itk::VectorImage<DiffusionPixelType, 3>
-    ITKDiffusionImageType;
+  typedef short                                                                         DiffusionPixelType;
+  typedef itk::VectorImage<DiffusionPixelType, 3>                                       DwiImageType;
+  typedef itk::Image<DiffusionPixelType, 3>                                             DwiVolumeType;
 
   virtual void CreateQtPartControl(QWidget *parent) override;
-
-  /// \brief Creation of the connections of main and control widget
-  virtual void CreateConnections();
 
   ///
   /// Sets the focus to an internal widget.
@@ -93,39 +64,23 @@ public:
 
 private slots:
 
-  void StartDenoising();                  //< prepares filter condition and starts thread for denoising
-  void SelectFilter(int filter);          //< updates which filter is selected
-  void BeforeThread();                    //< starts timer & disables all buttons while denoising
-  void AfterThread();                     //< stops timer & creates a new datanode of the denoised image
-  void UpdateProgress();                  //< updates the progressbar each timestep
+  void StartDenoising();
+  void UpdateGui(int filter);
 
 private:
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  void ResetParameterPanel();
-
-  Ui::QmitkDenoisingViewControls*  m_Controls;
-  mitk::DataNode::Pointer m_ImageNode;
-  mitk::DataNode::Pointer m_BrainMaskNode;
-  QmitkDenoisingWorker m_DenoisingWorker;
-  QThread m_DenoisingThread;
-  bool m_ThreadIsRunning;
-  bool m_CompletedCalculation;
-  NonLocalMeansDenoisingFilterType::Pointer m_NonLocalMeansFilter;
-  GaussianFilterType::Pointer m_GaussianFilter;
-  mitk::Image::Pointer m_InputImage;
-  MaskImageType::Pointer m_ImageMask;
-  QTimer* m_DenoisingTimer;
-  unsigned int m_LastProgressCount;
-  unsigned int m_MaxProgressCount;
+  Ui::QmitkDenoisingViewControls*             m_Controls;
+  mitk::DataNode::Pointer                     m_ImageNode;
 
   enum FilterType {
-    NOFILTERSELECTED,
+    TV,
+    GAUSS,
     NLM,
-    GAUSS
-  }m_SelectedFilter;
+    NLM_MORITZ
+  } m_SelectedFilter;
 
   friend class QmitkDenoisingWorker;
 };

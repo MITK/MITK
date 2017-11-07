@@ -47,6 +47,7 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging.reconstruction
   org.mitk.gui.qt.diffusionimaging.tractography
   org.mitk.gui.qt.diffusionimaging.registration
+  org.mitk.gui.qt.diffusionimaging.denoising
 #  org.mitk.gui.qt.matchpoint.algorithm.browser
 #  org.mitk.gui.qt.matchpoint.algorithm.control
 #  org.mitk.gui.qt.matchpoint.mapper

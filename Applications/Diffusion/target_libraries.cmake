@@ -22,6 +22,7 @@ set(target_libraries
   org_mitk_gui_qt_diffusionimaging_reconstruction
   org_mitk_gui_qt_diffusionimaging_tractography
   org_mitk_gui_qt_diffusionimaging_registration
+  org_mitk_gui_qt_diffusionimaging_denoising
   org_mitk_gui_qt_matchpoint_algorithm_browser
   org_mitk_gui_qt_matchpoint_algorithm_control
   org_mitk_gui_qt_matchpoint_mapper

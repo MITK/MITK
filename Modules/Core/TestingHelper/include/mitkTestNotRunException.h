@@ -37,7 +37,7 @@ namespace mitk
   class MITKTESTINGHELPER_EXPORT TestNotRunException : public mitk::Exception
   {
   public:
-    mitkExceptionClassMacro(mitk::TestNotRunException, mitk::Exception);
+    mitkExceptionClassMacro(TestNotRunException, mitk::Exception);
   };
 }
 

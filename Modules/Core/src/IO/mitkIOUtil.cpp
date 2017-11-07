@@ -956,7 +956,9 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
   int filesToWrite = saveInfos.size();
 
-  if (!mitk::ProgressBar::GetInstance()->IsProgressBarActive()) {
+  bool progressBarWasActive = mitk::ProgressBar::GetInstance()->IsProgressBarActive();
+
+  if (!progressBarWasActive) {
     mitk::ProgressBar::GetInstance()->AddStepsToDo(2 * filesToWrite);
   }
 
@@ -972,7 +974,7 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
     if (writers.empty())
     {
       errMsg += std::string("No writer available for ") + baseDataType + " data.\n";
-      if (!mitk::ProgressBar::GetInstance()->IsProgressBarActive()) {
+      if (!progressBarWasActive) {
         mitk::ProgressBar::GetInstance()->Progress(2 * filesToWrite);
       }
       continue;
@@ -1027,7 +1029,7 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
     {
       // Cancelation should not cause some Error
       //errMsg += "Writing operation(s) cancelled.";
-      if (!mitk::ProgressBar::GetInstance()->IsProgressBarActive()) {
+      if (!progressBarWasActive) {
         mitk::ProgressBar::GetInstance()->Progress(2 * filesToWrite);
       }
       break;
@@ -1037,7 +1039,7 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
     if (writer == NULL)
     {
       errMsg += "Unexpected NULL writer.";
-      if (!mitk::ProgressBar::GetInstance()->IsProgressBarActive()) {
+      if (!progressBarWasActive) {
         mitk::ProgressBar::GetInstance()->Progress(2 * filesToWrite);
       }
 
@@ -1054,7 +1056,7 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
     {
       errMsg += std::string("Exception occurred when writing to ") + saveInfo.m_Path + ":\n" + e.what() + "\n";
     }
-    if (!mitk::ProgressBar::GetInstance()->IsProgressBarActive()) {
+    if (!progressBarWasActive) {
       mitk::ProgressBar::GetInstance()->Progress(2);
     }
     --filesToWrite;

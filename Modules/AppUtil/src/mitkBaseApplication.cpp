@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QOpenGLContext>
 #include <QDebug>
+#include <QtGlobal>
 
 #include <iostream>
 
@@ -638,12 +639,16 @@ QCoreApplication* BaseApplication::getQApplication() const
 {
   QCoreApplication* qCoreApp = qApp;
 
-  // Needed to fix bug #18521, i.e. not responding GUI on Mac OS X with Qt5
 #ifdef Q_OS_OSX
   qCoreApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
+  qCoreApp->setAttribute(Qt::AA_UseDesktopOpenGL);
   qCoreApp->setAttribute(Qt::AA_ShareOpenGLContexts);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+  qCoreApp->setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
+#endif
 
   if (!qCoreApp)
   {

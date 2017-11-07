@@ -158,9 +158,9 @@ void QmitkDenoisingView::StartDenoising()
   }
   case NLM:
   {
-    typedef itk::Statistics::GaussianRandomSpatialNeighborSubsampler< typename NlmFilterType::PatchSampleType, typename DwiVolumeType::RegionType > SamplerType;
+    typedef itk::Statistics::GaussianRandomSpatialNeighborSubsampler< NlmFilterType::PatchSampleType, DwiVolumeType::RegionType > SamplerType;
     // sampling the image to find similar patches
-    typename SamplerType::Pointer sampler = SamplerType::New();
+    SamplerType::Pointer sampler = SamplerType::New();
     sampler->SetRadius( m_Controls->m_NlmSearchRadiusBox->value() );
     sampler->SetVariance( m_Controls->m_NlmSearchRadiusBox->value()*m_Controls->m_NlmSearchRadiusBox->value() );
     sampler->SetNumberOfResultsRequested( m_Controls->m_NlmNumPatchesBox->value() );

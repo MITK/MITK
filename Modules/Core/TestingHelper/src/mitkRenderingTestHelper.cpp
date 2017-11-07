@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingTestHelper.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkException.h>
+#include <mitkTestNotRunException.h>
+#include <mitkTestingMacros.h>
 
 // include gl to read out properties
 #include <vtkOpenGL.h>
@@ -71,6 +74,11 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRend
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
   this->SetMapperIDToRender2D();
   this->GetVtkRenderWindow()->SetSize(width, height);
+
+  if (!IsAdvancedOpenGL())
+  {
+    mitkThrowException(mitk::TestNotRunException) << "Insufficient OpenGL version";
+  }
 
 #ifdef RESIZE_WORKAROUND
 

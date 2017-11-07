@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkSmartPointerProperty.h>
 #include <mitkSurface.h>
+#include <mitkTestNotRunException.h>
 
 // VTK
 #include <mitkIOUtil.h>
@@ -38,6 +39,16 @@ int mitkSurfaceVtkMapper3DTest(int argc, char *argv[])
   // render the datastorage
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkSurfaceVtkMapper3DTest")
+
+  try
+  {
+    mitk::RenderingTestHelper openGlTest(640, 480);
+  }
+  catch (const mitk::TestNotRunException &e)
+  {
+    MITK_WARN << "Test not run: " << e.GetDescription();
+    return 77;
+  }
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 

@@ -16,6 +16,7 @@ function(mitkAddCustomModuleTest test_name test_function)
     string (REGEX REPLACE "\;" "\\\;" MITK_RUNTIME_PATH_RELEASE "${MITK_RUNTIME_PATH_RELEASE}")
     string (REGEX REPLACE "\;" "\\\;" MITK_RUNTIME_PATH_DEBUG "${MITK_RUNTIME_PATH_DEBUG}")
     set_property(TEST ${test_name} PROPERTY ENVIRONMENT "PATH=${MITK_RUNTIME_PATH_RELEASE}\;${MITK_RUNTIME_PATH_DEBUG}" APPEND)
+    set_property(TEST ${test_name} PROPERTY SKIP_RETURN_CODE 77)
   endif()
 
 endfunction()

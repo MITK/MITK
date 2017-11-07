@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkMacro.h>
 #include <mitkException.h>
+#include <mitkTestNotRunException.h>
 #include <mitkTestCaller.h>
 #include <mitkTestManager.h>
 
@@ -270,9 +271,19 @@ namespace mitk
 #define MITK_TEST_SUITE_REGISTRATION(TESTSUITE_NAME)                                                                   \
   int TESTSUITE_NAME##Test(int /*argc*/, char * /*argv*/ [])                                                           \
   {                                                                                                                    \
-    CppUnit::TextUi::TestRunner runner;                                                                                \
-    runner.addTest(TESTSUITE_NAME##TestSuite::suite());                                                                \
-    return runner.run() ? 0 : 1;                                                                                       \
+    int result = 0;                                                                                                    \
+    try                                                                                                                \
+    {                                                                                                                  \
+      CppUnit::TextUi::TestRunner runner;                                                                              \
+      runner.addTest(TESTSUITE_NAME##TestSuite::suite());                                                              \
+      result = runner.run() ? 0 : 1;                                                                                   \
+    }                                                                                                                  \
+    catch (const mitk::TestNotRunException& e)                                                                         \
+    {                                                                                                                  \
+      MITK_WARN << "Test not run: " << e.GetDescription();                                                             \
+      result = 77;                                                                                                     \
+    }                                                                                                                  \
+    return result;                                                                                                     \
   }
 
 /**

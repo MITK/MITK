@@ -343,6 +343,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   //  ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer()->GetName());
+  m_MouseModeSwitcher->AddRenderer(mitkWidget1->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget3->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget4->GetRenderer()->GetName());
@@ -350,20 +351,6 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
   mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
   mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
-
-  // setup the department logo rendering
-  /*
-  m_LogoRendering = mitk::LogoOverlay::New();
-  mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
-  m_LogoRendering->SetOpacity(0.5);
-  mitk::Point2D offset;
-  offset.Fill(0.03);
-  m_LogoRendering->SetOffsetVector(offset);
-  m_LogoRendering->SetRelativeSize(0.15);
-  m_LogoRendering->SetCornerPosition(1);
-  m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
-  */
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()

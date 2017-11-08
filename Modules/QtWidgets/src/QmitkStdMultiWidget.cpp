@@ -457,7 +457,7 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->RemoveRenderer( ren[1] );
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer( ren[2] );
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->RemoveRenderer( ren[3] );
-  
+
   for(int i = 0; i < 4; i++) {
     cornerText[i]->Delete();
     textProp[i]->Delete();
@@ -1578,9 +1578,9 @@ void QmitkStdMultiWidget::EnsureDisplayContainsPoint(
 
 void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
 {
-   mitkWidget1->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
-   mitkWidget2->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
-   mitkWidget3->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+  mitkWidget1->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+  mitkWidget2->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+  mitkWidget3->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
 
   m_RenderingManager->RequestUpdateAll();
 }
@@ -1725,7 +1725,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     auto secondaryProp = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty("autoplan.secondaryAxisIndex")));
     auto tertiaryProp = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty("autoplan.tertiaryAxisIndex")));
     auto mainProp = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(image->GetProperty("autoplan.mainAxisIndex")));
-    
+
     int axisIndices[3] = {
       secondaryProp ? secondaryProp->GetValue() : 0,
       tertiaryProp ? tertiaryProp->GetValue() : 1,
@@ -1895,7 +1895,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
           sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
           sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
           infoStringStream[1]
-            << "\n" << dd << "." << mm << "." << yy 
+            << "\n" << dd << "." << mm << "." << yy
             << " " << hh << ":" << mi << ":" << ss;
         }
       } else {
@@ -1910,14 +1910,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       };
       render_annotation(0, 3);
       render_annotation(1, 1);
-      mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->UpdateLayers();
-      mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->UpdateLayers();
-      mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->UpdateLayers();
-      mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->UpdateLayers();
-      this->GetRenderWindow1()->GetRenderer()->RequestUpdate();
-      this->GetRenderWindow2()->GetRenderer()->RequestUpdate();
-      this->GetRenderWindow3()->GetRenderer()->RequestUpdate();
-      this->GetRenderWindow4()->GetRenderer()->RequestUpdate();
     }
   }
 }

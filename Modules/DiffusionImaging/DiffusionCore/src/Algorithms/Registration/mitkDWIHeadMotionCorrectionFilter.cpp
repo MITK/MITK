@@ -25,293 +25,124 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageTimeSelector.h"
 
-#include "mitkPyramidImageRegistrationMethod.h"
-//#include "mitkRegistrationMethodITK4.h"
-#include <mitkDiffusionPropertyHelper.h>
+#include <itkExtractDwiChannelFilter.h>
+#include <mitkMultiModalAffineDefaultRegistrationAlgorithm.h>
+#include <mitkAlgorithmHelper.h>
+#include <mitkMaskedAlgorithmHelper.h>
+#include <mitkImageMappingHelper.h>
+#include <mitkRegistrationHelper.h>
+#include <mitkRegistrationWrapper.h>
+#include <mitkRegistrationWrapperMapper3D.h>
 
-#include "mitkDiffusionImageCorrectionFilter.h"
+#include <itkComposeImageFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkImageCast.h>
+#include <mitkDiffusionImageCorrectionFilter.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkProperties.h>
+#include <mitkBValueMapProperty.h>
 
 #include <vector>
 
 #include "mitkIOUtil.h"
 #include <itkImage.h>
 
+typedef mitk::DiffusionPropertyHelper DPH;
+typedef itk::ExtractDwiChannelFilter< short > ExtractorType;
+
 mitk::DWIHeadMotionCorrectionFilter::DWIHeadMotionCorrectionFilter()
-  : m_CurrentStep(0),
-    m_Steps(100),
-    m_IsInValidState(true),
-    m_AbortRegistration(false),
-    m_AverageUnweighted(true)
 {
 
 }
 
+mitk::Image::Pointer mitk::DWIHeadMotionCorrectionFilter::GetCorrectedImage() const
+{
+  return m_CorrectedImage;
+}
+
+void mitk::DWIHeadMotionCorrectionFilter::UpdateOutputInformation()
+{
+  Superclass::UpdateOutputInformation();
+}
 
 void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
 {
-  typedef itk::SplitDWImageFilter< DiffusionPixelType, DiffusionPixelType> SplitFilterType;
+  InputImageType::Pointer input = const_cast<InputImageType*>(this->GetInput(0));
 
-  InputImageType* input = const_cast<InputImageType*>(this->GetInput(0));
+  if (!DPH::IsDiffusionWeightedImage(input))
+    mitkThrow() << "Input is not a diffusion-weighted image!";
 
-  ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
-  mitk::CastToItkImage(input, itkVectorImagePointer);
+  ITKDiffusionImageType::Pointer itkVectorImagePointer = DPH::GetItkVectorImage(input);
+  int num_gradients = itkVectorImagePointer->GetVectorLength();
 
-  typedef mitk::PyramidImageRegistrationMethod RegistrationMethod;
-  // typedef mitk::RegistrationMethodITKV4 RegistrationMethod
-  unsigned int numberOfSteps = itkVectorImagePointer->GetNumberOfComponentsPerPixel () ;
-  m_Steps = numberOfSteps;
-  //
-  //  (1) Extract the b-zero images to a 3d+t image, register them by NCorr metric and
-  //     rigid registration : they will then be used are reference image for registering
-  //     the gradient images
-  //
-  typedef itk::B0ImageExtractionToSeparateImageFilter< DiffusionPixelType, DiffusionPixelType> B0ExtractorType;
-  B0ExtractorType::Pointer b0_extractor = B0ExtractorType::New();
-  b0_extractor->SetInput( itkVectorImagePointer );
-  b0_extractor->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( input->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-  b0_extractor->Update();
+  typedef itk::ComposeImageFilter < ITKDiffusionVolumeType > ComposeFilterType;
+  ComposeFilterType::Pointer composer = ComposeFilterType::New();
 
-  mitk::Image::Pointer b0Image = mitk::Image::New();
-  b0Image->InitializeByItk( b0_extractor->GetOutput() );
-  b0Image->SetImportChannel( b0_extractor->GetOutput()->GetBufferPointer(),
-                             mitk::Image::CopyMemory );
+  // Extract unweighted volumes
+  mitk::BValueMapProperty::BValueMap bval_map = DPH::GetBValueMap(input);
+  int first_unweighted_index = bval_map.at(0).front();
 
-  // (2.1) Use the extractor to access the extracted b0 volumes
-  mitk::ImageTimeSelector::Pointer t_selector =
-      mitk::ImageTimeSelector::New();
+  ExtractorType::Pointer filter = ExtractorType::New();
+  filter->SetInput( itkVectorImagePointer);
+  filter->SetChannelIndex(first_unweighted_index);
+  filter->Update();
 
-  t_selector->SetInput( b0Image );
-  t_selector->SetTimeNr(0);
-  t_selector->Update();
+  mitk::Image::Pointer fixedImage = mitk::Image::New();
+  fixedImage->InitializeByItk( filter->GetOutput() );
+  fixedImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
+  composer->SetInput(0, filter->GetOutput());
 
-  // first unweighted image as reference space for the registration
-  mitk::Image::Pointer b0referenceImage = t_selector->GetOutput();
-  const unsigned int numberOfb0Images = b0Image->GetTimeSteps();
+  mitk::MultiModalAffineDefaultRegistrationAlgorithm< ITKDiffusionVolumeType >::Pointer algo = mitk::MultiModalAffineDefaultRegistrationAlgorithm< ITKDiffusionVolumeType >::New();
+  mitk::MITKAlgorithmHelper helper(algo);
 
-  // register b-zeros only if the flag to average is set, use the first one otherwise
-  if( m_AverageUnweighted && numberOfb0Images > 1)
+  typedef vnl_matrix_fixed< double, 3, 3> TransformMatrixType;
+  std::vector< TransformMatrixType > estimated_transforms;
+  std::vector< ITKDiffusionVolumeType::Pointer > registered_itk_images;
+  for (int i=0; i<num_gradients; ++i)
   {
+    if (i==first_unweighted_index)
+      continue;
 
-    RegistrationMethod::Pointer registrationMethod = RegistrationMethod::New();
-    registrationMethod->SetFixedImage( b0referenceImage );
-    registrationMethod->SetTransformToRigid();
+    MITK_INFO << "Correcting volume " << i;
 
-    // the unweighted images are of same modality
-    registrationMethod->SetCrossModalityOff();
+    ExtractorType::Pointer filter = ExtractorType::New();
+    filter->SetInput( itkVectorImagePointer);
+    filter->SetChannelIndex(i);
+    filter->Update();
 
-    // use the advanced (windowed sinc) interpolation
-    registrationMethod->SetUseAdvancedInterpolation(true);
+    mitk::Image::Pointer movingImage = mitk::Image::New();
+    movingImage->InitializeByItk( filter->GetOutput() );
+    movingImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
 
-    // Initialize the temporary output image
-    mitk::Image::Pointer registeredB0Image = b0Image->Clone();
+    helper.SetData(movingImage, fixedImage);
+    mitk::MAPRegistrationWrapper::Pointer reg = helper.GetMITKRegistrationWrapper();
+    mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer affine = mitk::MITKRegistrationHelper::getAffineMatrix(reg, false);
+    estimated_transforms.push_back(affine->GetMatrix().GetVnlMatrix());
 
-    mitk::ImageTimeSelector::Pointer t_selector2 =
-          mitk::ImageTimeSelector::New();
-
-    t_selector2->SetInput( b0Image );
-
-    for( unsigned int i=1; i<numberOfb0Images; i++)
-      {
-
-        m_CurrentStep = i + 1;
-        if( m_AbortRegistration == true) {
-          m_IsInValidState = false;
-          mitkThrow() << "Stopped by user.";
-        };
-
-        t_selector2->SetTimeNr(i);
-        t_selector2->Update();
-
-        registrationMethod->SetMovingImage( t_selector2->GetOutput() );
-
-        try
-        {
-          MITK_INFO << " === (" << i <<"/"<< numberOfb0Images-1 << ") :: Starting registration";
-          registrationMethod->Update();
-        }
-        catch( const itk::ExceptionObject& e)
-        {
-          m_IsInValidState = false;
-          mitkThrow() << "Failed to register the b0 images, the PyramidRegistration threw an exception: \n" << e.what();
-        }
-
-      // import volume to the inter-results
-      mitk::ImageWriteAccessor imac(registrationMethod->GetResampledMovingImage());
-      registeredB0Image->SetImportVolume( imac.GetData(),
-        i, 0, mitk::Image::ReferenceMemory );
-      }
-
-    // use the accumulateImageFilter as provided by the ItkAccumulateFilter method in the header file
-    AccessFixedDimensionByItk_1(registeredB0Image, ItkAccumulateFilter, (4), b0referenceImage );
-
+    mitk::Image::Pointer registered_mitk_image = mitk::ImageMappingHelper::map(movingImage, reg, false, 0, nullptr, false, 0, mitk::ImageMappingInterpolator::WSinc_Hamming);
+    ITKDiffusionVolumeType::Pointer registered_itk_image = ITKDiffusionVolumeType::New();
+    mitk::CastToItkImage(registered_mitk_image, registered_itk_image);
+    registered_itk_images.push_back(registered_itk_image);
   }
 
-
-  //
-  // (2) Split the diffusion image into a 3d+t regular image, extract only the weighted images
-  //
-  SplitFilterType::Pointer split_filter = SplitFilterType::New();
-  split_filter->SetInput (itkVectorImagePointer );
-  split_filter->SetExtractAllAboveThreshold(8, static_cast<mitk::BValueMapProperty*>(input->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap() );
-
-  try
+  int i=1;
+  for (auto image : registered_itk_images)
   {
-    split_filter->Update();
+    composer->SetInput(i, image);
+    ++i;
   }
-  catch( const itk::ExceptionObject &e)
-  {
-    m_IsInValidState = false;
-    mitkThrow() << " Caught exception from SplitImageFilter : " << e.what();
-  }
+  composer->Update();
 
-  mitk::Image::Pointer splittedImage = mitk::Image::New();
-  splittedImage->InitializeByItk( split_filter->GetOutput() );
-  splittedImage->SetImportChannel( split_filter->GetOutput()->GetBufferPointer(),
-                                   mitk::Image::CopyMemory );
+  m_CorrectedImage = mitk::GrabItkImageMemory( composer->GetOutput() );
+  DPH::CopyProperties(input, m_CorrectedImage, true);
 
-
-  //
-  // (3) Use again the time-selector to access the components separately in order
-  //     to perform the registration of  Image -> unweighted reference
-  //
-
-  RegistrationMethod::Pointer weightedRegistrationMethod
-      = RegistrationMethod::New();
-
-  weightedRegistrationMethod->SetTransformToAffine();
-  weightedRegistrationMethod->SetCrossModalityOn();
-
-  //
-  //   - (3.1) Set the reference image
-  //      - a single b0 image
-  //      - average over the registered b0 images if multiple present
-  //
-  weightedRegistrationMethod->SetFixedImage( b0referenceImage );
-  // use the advanced (windowed sinc) interpolation
-  weightedRegistrationMethod->SetUseAdvancedInterpolation(true);
-  weightedRegistrationMethod->SetVerboseOff();
-
-  //
-  //   - (3.2) Register all timesteps in the splitted image onto the first reference
-  //
-  unsigned int maxImageIdx = splittedImage->GetTimeSteps();
-  mitk::TimeGeometry* tsg = splittedImage->GetTimeGeometry();
-  mitk::ProportionalTimeGeometry* ptg = dynamic_cast<ProportionalTimeGeometry*>(tsg);
-  ptg->Expand(maxImageIdx+1);
-  ptg->SetTimeStepGeometry( ptg->GetGeometryForTimeStep(0), maxImageIdx );
-
-
-  mitk::Image::Pointer registeredWeighted = mitk::Image::New();
-  registeredWeighted->Initialize( splittedImage->GetPixelType(0), *tsg );
-
-  // insert the first unweighted reference as the first volume
-  // in own scope to release the accessor asap after copy
-  {
-    mitk::ImageWriteAccessor imac(b0referenceImage);
-    registeredWeighted->SetImportVolume( imac.GetData(),
-      0,0, mitk::Image::CopyMemory );
-  }
-
-
-  // mitk::Image::Pointer registeredWeighted = splittedImage->Clone();
-  // this time start at 0, we have only gradient images in the 3d+t file
-  // the reference image comes form an other image
-  mitk::ImageTimeSelector::Pointer t_selector_w =
-      mitk::ImageTimeSelector::New();
-
-  t_selector_w->SetInput( splittedImage );
-
-  // store the rotation parts of the transformations in a vector
-  typedef RegistrationMethod::TransformMatrixType MatrixType;
-  std::vector< MatrixType > estimated_transforms;
-
-
-  for( unsigned int i=0; i<maxImageIdx; i++)
-  {
-    m_CurrentStep = numberOfb0Images + i + 1;
-    if( m_AbortRegistration == true) {
-      m_IsInValidState = false;
-      mitkThrow() << "Stopped by user.";
-    };
-
-    t_selector_w->SetTimeNr(i);
-    t_selector_w->Update();
-
-    weightedRegistrationMethod->SetMovingImage( t_selector_w->GetOutput() );
-
-    try
-    {
-      MITK_INFO << " === (" << i+1 <<"/"<< maxImageIdx << ") :: Starting registration";
-      weightedRegistrationMethod->Update();
-    }
-    catch( const itk::ExceptionObject& e)
-    {
-      m_IsInValidState = false;
-      mitkThrow() << "Failed to register the b0 images, the PyramidRegistration threw an exception: \n" << e.what();
-    }
-
-    // allow expansion
-    mitk::ImageWriteAccessor imac(weightedRegistrationMethod->GetResampledMovingImage());
-    registeredWeighted->SetImportVolume( imac.GetData(),
-      i+1, 0, mitk::Image::CopyMemory);
-
-    estimated_transforms.push_back( weightedRegistrationMethod->GetLastRotationMatrix() );
-  }
-
-
-  //
-  // (4) Cast the resulting image back to an diffusion weighted image
-  //
-  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType *gradients = static_cast<mitk::GradientDirectionsProperty*>( input->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradients_new =
-    mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::New();
-  mitk::DiffusionPropertyHelper::GradientDirectionType bzero_vector;
-  bzero_vector.fill(0);
-
-  // compose the direction vector
-  //  - no direction for the first image
-  //  - correct ordering of the directions based on the index list
-  gradients_new->push_back( bzero_vector );
-
-  SplitFilterType::IndexListType index_list = split_filter->GetIndexList();
-  SplitFilterType::IndexListType::const_iterator lIter = index_list.begin();
-
-  while( lIter != index_list.end() )
-  {
-    gradients_new->push_back( gradients->at( *lIter ) );
-    ++lIter;
-  }
-
-  registeredWeighted->GetPropertyList()->ReplaceProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradients_new.GetPointer() ));
-  registeredWeighted->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(input->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-
-  //
-  // (5) Adapt the gradient directions according to the estimated transforms
-  //
   typedef mitk::DiffusionImageCorrectionFilter CorrectionFilterType;
   CorrectionFilterType::Pointer corrector = CorrectionFilterType::New();
-
-  mitk::Image::Pointer output = registeredWeighted;
-  corrector->SetImage( output );
+  corrector->SetImage( m_CorrectedImage );
   corrector->CorrectDirections( estimated_transforms );
 
-  //
-  // (6) Pass the corrected image to the filters output port
-  //
-  m_CurrentStep += 1;
-
-  this->GetOutput()->Initialize( output );
-
-  mitk::DiffusionPropertyHelper::CopyProperties(output, this->GetOutput(), true);
-  this->GetOutput()->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( output->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
-  this->GetOutput()->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>( output->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );
-  this->GetOutput()->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(output->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-
-  mitk::DiffusionPropertyHelper propertyHelper( this->GetOutput() );
+  DPH propertyHelper( m_CorrectedImage );
   propertyHelper.InitializeImage();
-  this->GetOutput()->Modified();
 }
 
 #endif // MITKDWIHEADMOTIONCORRECTIONFILTER_CPP

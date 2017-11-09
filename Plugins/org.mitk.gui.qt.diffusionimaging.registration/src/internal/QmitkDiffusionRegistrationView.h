@@ -33,29 +33,6 @@ typedef short DiffusionPixelType;
 /*!
 \brief View for diffusion image registration / head motion correction
 */
-
-// Forward Qt class declarations
-
-class QmitkDiffusionRegistrationView;
-
-class QmitkRegistrationWorker : public QObject
-{
-  Q_OBJECT
-
-public:
-
-  QmitkRegistrationWorker(QmitkDiffusionRegistrationView* view);
-
-  public slots:
-
-    void run();
-
-private:
-
-  QmitkDiffusionRegistrationView* m_View;
-};
-
-
 class QmitkDiffusionRegistrationView : public QmitkAbstractView
 {
 
@@ -78,17 +55,7 @@ public:
 protected slots:
 
     void StartRegistration();
-    void StopRegistration();
-
-    void AfterThread();                       ///< update gui etc. after registrations has finished
-    void BeforeThread();                      ///< start timer etc.
-    void TimerUpdate();
-
-    void AddInputFolderName();
-    void AddOutputFolderName();
-    void StartBatch();
-
-    void AdvancedSettings();
+    void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
 
 
 protected:
@@ -98,33 +65,14 @@ protected:
 
   Ui::QmitkDiffusionRegistrationViewControls* m_Controls;
 
-  mitk::Image::Pointer m_DiffusionImage;
+  mitk::Image::Pointer      m_DiffusionImage;
   std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
 
 private:
 
   void UpdateRegistrationStatus();  ///< update textual status display of the Registration process
-  void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
-
-  /** flags etc. */
-  bool            m_IsBatch, m_IsAborted;
-  QStringList     m_BatchList;
-  bool            m_ThreadIsRunning;
-  QTimer*         m_RegistrationTimer;
-  QTime           m_RegistrationTime;
-  unsigned long   m_ElapsedTime;
-  unsigned long   m_Steps;
-  int             m_LastStep;
-  unsigned int    m_CurrentFile;
-  unsigned int    m_TotalFiles;
 
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
-
-  /** global Registerer and friends */
-  itk::SmartPointer<DWIHeadMotionCorrectionFilterType> m_GlobalRegisterer;
-  QmitkRegistrationWorker m_RegistrationWorker;
-  QThread m_RegistrationThread;
-  friend class QmitkRegistrationWorker;
 
 };

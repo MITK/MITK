@@ -34,7 +34,6 @@ set(mitk_modules
   Chart
   SegmentationUI
   Classification
-  DiffusionImaging
   GPGPU
   OpenIGTLink
   IGTBase
@@ -64,9 +63,10 @@ set(mitk_modules
   XNAT
   TubeGraph
   BiophotonicsHardware
-  TumorInvasionAnalysis
   MatchPointRegistration
   MatchPointRegistrationUI
+  DiffusionImaging
+  TumorInvasionAnalysis
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI

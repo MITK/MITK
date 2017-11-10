@@ -82,8 +82,8 @@ private:
 };
 
 QmitkChartWidget::Impl::Impl(QWidget* parent)
-  : m_WebChannel(new QWebChannel(parent)),
-  m_WebEngineView(new QWebEngineView(parent))
+  : m_WebChannel(new QWebChannel(parent))
+  , m_WebEngineView(new QWebEngineView(parent))
 {
   //disable context menu for QWebEngineView
   m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);
@@ -121,9 +121,10 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
 QmitkChartWidget::Impl::~Impl()
 {
   delete m_C3Data;
+  qDeleteAll(m_C3xyData);
+
   delete m_C3xyData;
 }
-
 
 std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const
 {
@@ -149,24 +150,20 @@ void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const 
   GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(diagramTypeName))));
 }
 
-void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
-  std::vector<QmitkChartxyData*>::iterator iter_temp = GetC3xyData()->end();
+void QmitkChartWidget::Impl::RemoveData(const std::string& label)
+{
   for (std::vector<QmitkChartxyData*>::iterator iter = GetC3xyData()->begin(); iter != GetC3xyData()->end(); ++iter)
   {
     const auto &temp = *iter;
     if (temp->GetLabel().toString().toStdString() == label)
     {
-      iter_temp = iter;
-      break;
+      delete temp;
+      GetC3xyData()->erase(iter);
+      return;
     }
   }
-  if (iter_temp == GetC3xyData()->end()) {
-    throw std::invalid_argument("Cannot Remove Data because the label does not exist.");
-  }
-  else
-  {
-    GetC3xyData()->erase(iter_temp);
-  }
+
+  throw std::invalid_argument("Cannot Remove Data because the label does not exist.");
 }
 
 void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label, QmitkChartWidget::ChartType type) {
@@ -260,7 +257,6 @@ std::string QmitkChartWidget::Impl::GetLegendPositionAsString() const {
   return GetC3Data()->GetLegendPosition().toString().toStdString();
 }
 
-
 void QmitkChartWidget::Impl::SetChartType(const std::string& label, QmitkChartWidget::ChartType chartType) {
   auto element = GetElementByLabel(GetC3xyData(), label);
   if (element) {
@@ -281,11 +277,16 @@ std::vector<QmitkChartxyData*>* QmitkChartWidget::Impl::GetC3xyData() const {
   return m_C3xyData; 
 }
 
-void QmitkChartWidget::Impl::ClearData() {
-  for (auto& xyData : *m_C3xyData) {
+void QmitkChartWidget::Impl::ClearData()
+{
+  for (auto& xyData : *GetC3xyData())
+  {
     m_WebChannel->deregisterObject(xyData);
+
+    delete xyData;
+    xyData = nullptr;
   }
-  GetC3xyData()->clear(); 
+  GetC3xyData()->clear();
 }
 
 QmitkChartWidget::QmitkChartWidget(QWidget* parent)

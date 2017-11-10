@@ -12,7 +12,6 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( diffusioncorecmdapps
-    DwiDenoising^^
     ImageResampler^^
     ExportShImage^^
     CopyGeometry^^
@@ -36,7 +35,7 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
         PACKAGE_DEPENDS ITK
       )
     endforeach()
-    
+
 endif()
 
 mitkFunctionCreateCommandLineApp(

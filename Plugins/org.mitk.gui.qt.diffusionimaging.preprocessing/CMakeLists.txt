@@ -5,5 +5,5 @@ project(org_mitk_gui_qt_diffusionimaging_preprocessing)
 mitk_create_plugin(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_PREPROCESSING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkDiffusionCore
+  MODULE_DEPENDS MitkDiffusionCore MitkPython MitkQtPython
 )

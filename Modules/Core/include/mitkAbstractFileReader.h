@@ -75,7 +75,7 @@ public:
    */
   virtual std::vector<itk::SmartPointer<BaseData> > Read() override = 0;
 
-  virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds) override;
+  virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds, volatile bool* interrupt = nullptr) override;
 
   virtual ConfidenceLevel GetConfidenceLevel() const override;
 

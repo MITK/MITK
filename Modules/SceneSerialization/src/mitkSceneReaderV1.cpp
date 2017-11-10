@@ -58,8 +58,12 @@ bool NodeSortByLayerIsLessThan(const NodesAndParentsPair& left, const NodesAndPa
 
 }
 
-bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage)
+bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, volatile bool* interrupt)
 {
+  if (interrupt != nullptr && *interrupt) {
+    return false;
+  }
+
   assert(storage);
   bool error(false);
 
@@ -87,7 +91,11 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
   for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
   {
     auto dataElement = element->FirstChildElement("data");
-    loadedThreads.push_back(std::async(std::launch::async, [this, dataElement, &workingDirectory, &error]{
+    loadedThreads.push_back(std::async(std::launch::async, [this, dataElement, &workingDirectory, &error, interrupt]{
+        if (interrupt != nullptr && *interrupt) {
+          return DataNode::Pointer();
+        }
+
         bool localError =false;
         auto result = LoadBaseDataFromDataTag(dataElement, workingDirectory, localError);
         if (localError) {
@@ -102,9 +110,17 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
       qApp->processEvents();
     }
 
+    if (interrupt != nullptr && *interrupt) {
+     continue;
+    }
+
     DataNodes.push_back(task.get());
 
     ProgressBar::GetInstance()->Progress();
+  }
+
+  if (interrupt != nullptr && *interrupt) {
+    return false;
   }
 
   struct DecorateResult
@@ -119,9 +135,14 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
   DataNodeVector::iterator nit = DataNodes.begin();
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
   {
-    decorateThreads.push_back(std::async(std::launch::async, [this, element, nit, &workingDirectory, &error]() -> DecorateResult {
+    decorateThreads.push_back(std::async(std::launch::async, [this, element, nit, &workingDirectory, &error, interrupt]() -> DecorateResult {
+        if (interrupt != nullptr && *interrupt) {
+          return DecorateResult();
+        }
+
         bool localError = false;
         DecorateResult result;
+
         mitk::DataNode::Pointer node = *nit;
         // in case dataXmlElement is valid test whether it containts the "properties" child tag
         // and process further if and only if yes
@@ -191,6 +212,10 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
       qApp->processEvents();
     }
 
+    if (interrupt != nullptr && *interrupt) {
+      continue;
+    }
+
     auto result = task.get();
     m_NodeForID[result.m_IDForNode] = result.m_NodeForID;
     m_IDForNode[result.m_NodeForID] = result.m_IDForNode;
@@ -198,6 +223,10 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
 
     ProgressBar::GetInstance()->Progress();
   } // end for all <node>
+
+  if (interrupt != nullptr && *interrupt) {
+    return false;
+  }
 
     // sort our nodes by their "layer" property
     // (to be inserted in that order)

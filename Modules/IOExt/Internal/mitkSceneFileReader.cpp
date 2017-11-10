@@ -37,12 +37,12 @@ SceneFileReader::SceneFileReader()
   this->RegisterService();
 }
 
-DataStorage::SetOfObjects::Pointer SceneFileReader::Read(DataStorage& ds)
+DataStorage::SetOfObjects::Pointer SceneFileReader::Read(DataStorage& ds, volatile bool* interrupt)
 {
   //const DataStorage::SetOfObjects::STLContainerType& oldNodes = ds.GetAll()->CastToSTLConstContainer();
   DataStorage::SetOfObjects::ConstPointer oldNodes = ds.GetAll();
   SceneIO::Pointer sceneIO = SceneIO::New();
-  sceneIO->LoadScene(this->GetLocalFileName(), &ds, false);
+  sceneIO->LoadScene(this->GetLocalFileName(), &ds, false, interrupt);
   DataStorage::SetOfObjects::ConstPointer newNodes = ds.GetAll();
 
   // Compute the difference

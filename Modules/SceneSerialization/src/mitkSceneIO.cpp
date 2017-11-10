@@ -149,7 +149,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadWorkspace( const std::string& work
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename,
                                                     DataStorage* pStorage,
-                                                    bool clearStorageFirst )
+                                                    bool clearStorageFirst,
+                                                    volatile bool* interrupt )
 {
   mitk::LocaleSwitch localeSwitch("C");
 
@@ -220,7 +221,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   }
 
   SceneReader::Pointer reader = SceneReader::New();
-  if ( !reader->LoadScene( document, defaultLocale_WorkingDirectory, storage ) )
+  if ( !reader->LoadScene( document, defaultLocale_WorkingDirectory, storage, interrupt ) && !(*interrupt) )
   {
     MITK_ERROR << "There were errors while loading scene file " << filename << ". Your data may be corrupted";
   }

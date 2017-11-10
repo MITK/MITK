@@ -109,12 +109,15 @@ public:
   static QList<mitk::BaseData::Pointer> Load(const QStringList& paths, QWidget* parent = NULL);
 
   static mitk::DataStorage::SetOfObjects::Pointer Load(const QStringList& paths, mitk::DataStorage& storage,
-                                                       QWidget* parent = NULL);
+                                                       QWidget* parent = NULL, volatile bool* interrupt = nullptr);
 
   static QList<mitk::BaseData::Pointer> Load(const QString& path, QWidget* parent = NULL);
 
   static mitk::DataStorage::SetOfObjects::Pointer Load(const QString& path, mitk::DataStorage& storage,
                                                        QWidget* parent = NULL);
+
+  static mitk::DataStorage::SetOfObjects::Pointer Load(const QString& path, mitk::DataStorage& storage,
+                                                      volatile bool* interrupt, QWidget* parent = NULL);
 
   using mitk::IOUtil::Load;
 

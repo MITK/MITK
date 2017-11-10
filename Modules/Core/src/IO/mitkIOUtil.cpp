@@ -651,7 +651,8 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string& path)
 
 std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
                          DataStorage::SetOfObjects* nodeResult, DataStorage* ds,
-                         ReaderOptionsFunctorBase* optionsCallback)
+                         ReaderOptionsFunctorBase* optionsCallback,
+                         volatile bool* interrupt)
 {
   if (loadInfos.empty())
   {
@@ -749,7 +750,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
       DataStorage::SetOfObjects::Pointer nodes;
       if (ds != NULL)
       {
-        nodes = reader->Read(*ds);
+        nodes = reader->Read(*ds, interrupt);
       }
       else
       {
@@ -787,7 +788,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
         }
       }
 
-      if (loadInfo.m_Output.empty() || (nodeResult && nodeResult->Size() == 0))
+      if ((loadInfo.m_Output.empty() || (nodeResult && nodeResult->Size() == 0)) && !(*interrupt))
       {
         errMsg += "Unknown read error occurred reading " + loadInfo.m_Path;
       }

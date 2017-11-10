@@ -87,8 +87,8 @@ private:
 };
 
 QmitkChartWidget::Impl::Impl(QWidget* parent)
-  : m_WebChannel(new QWebChannel(parent)),
-  m_WebEngineView(new QWebEngineView(parent))
+  : m_WebChannel(new QWebChannel(parent))
+  , m_WebEngineView(new QWebEngineView(parent))
 {
   //disable context menu for QWebEngineView
   m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);
@@ -129,6 +129,8 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
 QmitkChartWidget::Impl::~Impl()
 {
   delete m_C3Data;
+  qDeleteAll(m_C3xyData);
+
   delete m_C3xyData;
 }
 
@@ -157,29 +159,28 @@ void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, c
   GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
 }
 
-void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
-  std::vector<QmitkChartxyData*>::iterator iter_temp = GetC3xyData()->end();
+void QmitkChartWidget::Impl::RemoveData(const std::string& label)
+{
   for (std::vector<QmitkChartxyData*>::iterator iter = GetC3xyData()->begin(); iter != GetC3xyData()->end(); ++iter)
   {
     const auto &temp = *iter;
     if (temp->GetLabel().toString().toStdString() == label)
     {
-      iter_temp = iter;
-      break;
+      delete temp;
+      GetC3xyData()->erase(iter);
+      return;
     }
   }
-  if (iter_temp == GetC3xyData()->end()) {
-    throw std::invalid_argument("Cannot Remove Data because the label does not exist.");
-  }
-  else
-  {
-    GetC3xyData()->erase(iter_temp);
-  }
+
+  throw std::invalid_argument("Cannot Remove Data because the label does not exist.");
 }
 
 void QmitkChartWidget::Impl::ClearData() {
-  for (auto& xyData : *m_C3xyData) {
+  for (auto& xyData : *m_C3xyData)
+  {
     m_WebChannel->deregisterObject(xyData);
+    delete xyData;
+    xyData = nullptr;
   }
   GetC3xyData()->clear();
 }
@@ -414,8 +415,9 @@ std::string QmitkChartWidget::GetTitle() const
 
 void QmitkChartWidget::SetShowDataPoints(bool showDataPoints)
 {
-    m_Impl->SetShowDataPoints(showDataPoints);
+  m_Impl->SetShowDataPoints(showDataPoints);
 }
+
 bool QmitkChartWidget::GetShowDataPoints() const
 {
   return m_Impl->GetShowDataPoints();

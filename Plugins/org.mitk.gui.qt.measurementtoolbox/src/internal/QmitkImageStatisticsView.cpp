@@ -859,6 +859,7 @@ void QmitkImageStatisticsView::OnHistogramBinSizeBoxValueChanged()
         this->UpdateStatistics();
     }
 }
+
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
   m_Controls->m_JSHistogram->Clear();
@@ -872,16 +873,16 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
   m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
   m_Controls->m_InfoLabel->setText("");
 
-  if(m_DataNodeSelectionChanged)
+  if (m_DataNodeSelectionChanged)
   {
     this->m_StatisticsUpdatePending = false;
     this->RequestStatisticsUpdate();
     return;    // stop visualization of results and calculate statistics of new selection
   }
 
-  if ( this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
+  if (this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
   {
-    if ( this->m_CalculationThread->GetStatisticsChangedFlag() )
+    if (this->m_CalculationThread->GetStatisticsChangedFlag())
     {
       // Do not show any error messages
       m_Controls->m_ErrorMessageLabel->hide();
@@ -892,57 +893,57 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       //all statistics are now computed also on planar figures (lines, paths...)!
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
       if (m_SelectedPlanarFigure != nullptr) {
-      // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
-      bool outOfBounds = false;
-      if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == nullptr)
-      {
-        outOfBounds = true;
-        const QString message("<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>");
-        m_Controls->m_InfoLabel->setText(message);
-      }
-
-      // check whether PlanarFigure is initialized
-      const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
-
-      if ( !(planarFigurePlaneGeometry == nullptr || outOfBounds))
-      {
-        unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
-
-        mitk::Image::Pointer image;
-
-        if (this->m_CalculationThread->GetStatisticsImage()->GetDimension() == 4)
+        // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
+        bool outOfBounds = false;
+        if (m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == nullptr)
         {
-          mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-          timeSelector->SetInput(this->m_CalculationThread->GetStatisticsImage());
-          timeSelector->SetTimeNr(timeStep);
-          timeSelector->Update();
-
-          image = timeSelector->GetOutput();
-        }
-        else
-        {
-          image = this->m_CalculationThread->GetStatisticsImage();
+          outOfBounds = true;
+          const QString message("<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>");
+          m_Controls->m_InfoLabel->setText(message);
         }
 
-        mitk::IntensityProfile::ConstPointer intensityProfile = (mitk::IntensityProfile::ConstPointer)mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
+        // check whether PlanarFigure is initialized
+        const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
 
-        auto intensityProfileList = ConvertIntensityProfileToVector(intensityProfile);
-        auto lineDataLabel = "Intensity profile " + m_Controls->m_SelectedMaskLabel->text().toStdString();
-        m_Controls->m_JSHistogram->SetChartType(lineDataLabel, QmitkChartWidget::ChartType::line);
-        m_Controls->m_JSHistogram->AddData1D(intensityProfileList, lineDataLabel);
-        m_Controls->m_JSHistogram->SetXAxisLabel("Distance");
-        m_Controls->m_JSHistogram->SetYAxisLabel("Intensity");
-        m_Controls->m_JSHistogram->Show(m_Controls->m_ShowSubchartCheckBox->isChecked());
+        if (!(planarFigurePlaneGeometry == nullptr || outOfBounds))
+        {
+          unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
-        m_Controls->m_lineRadioButton->setChecked(true);
-        m_Controls->m_lineRadioButton->setEnabled(false);
-        m_Controls->m_barRadioButton->setEnabled(false);
-        m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
-        m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
+          mitk::Image::Pointer image;
+
+          if (this->m_CalculationThread->GetStatisticsImage()->GetDimension() == 4)
+          {
+            mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+            timeSelector->SetInput(this->m_CalculationThread->GetStatisticsImage());
+            timeSelector->SetTimeNr(timeStep);
+            timeSelector->Update();
+
+            image = timeSelector->GetOutput();
+          }
+          else
+          {
+            image = this->m_CalculationThread->GetStatisticsImage();
+          }
+
+          mitk::IntensityProfile::ConstPointer intensityProfile = (mitk::IntensityProfile::ConstPointer)mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
+
+          auto intensityProfileList = ConvertIntensityProfileToVector(intensityProfile);
+          auto lineDataLabel = "Intensity profile " + m_Controls->m_SelectedMaskLabel->text().toStdString();
+          m_Controls->m_JSHistogram->SetChartType(lineDataLabel, QmitkChartWidget::ChartType::line);
+          m_Controls->m_JSHistogram->AddData1D(intensityProfileList, lineDataLabel);
+          m_Controls->m_JSHistogram->SetXAxisLabel("Distance");
+          m_Controls->m_JSHistogram->SetYAxisLabel("Intensity");
+          m_Controls->m_JSHistogram->Show(m_Controls->m_ShowSubchartCheckBox->isChecked());
+
+          m_Controls->m_lineRadioButton->setChecked(true);
+          m_Controls->m_lineRadioButton->setEnabled(false);
+          m_Controls->m_barRadioButton->setEnabled(false);
+          m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
+          m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
           m_Controls->m_UseDefaultBinSizeBox->setEnabled(false);
 
-        //Reconnect OnLineRadioButtonSelected()
-        connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnLineRadioButtonSelected()));
+          //Reconnect OnLineRadioButtonSelected()
+          connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnLineRadioButtonSelected()));
           auto statisticsVector = this->m_CalculationThread->GetStatisticsData();
           //only one entry (current timestep)
           this->FillLinearProfileStatisticsTableView(statisticsVector.front().GetPointer(), this->m_CalculationThread->GetStatisticsImage());
@@ -952,34 +953,35 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
             message += "Only current timestep displayed!";
           }
           message += "</font>";
-        m_Controls->m_InfoLabel->setText(message);
-        m_CurrentStatisticsValid = true;
+          m_Controls->m_InfoLabel->setText(message);
+          m_CurrentStatisticsValid = true;
+        }
+        else
+        {
+          // Clear statistics, histogram, and GUI
+          this->InvalidateStatisticsTableView();
+          m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
+          m_CurrentStatisticsValid = false;
+          m_Controls->m_ErrorMessageLabel->hide();
+          m_Controls->m_SelectedMaskLabel->setText("None");
+          this->m_StatisticsUpdatePending = false;
+          m_Controls->m_lineRadioButton->setEnabled(true);
+          m_Controls->m_barRadioButton->setEnabled(true);
+          m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
+          m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
+          if (!outOfBounds)
+            m_Controls->m_InfoLabel->setText("");
+          return;
+        }
       }
       else
       {
-        // Clear statistics, histogram, and GUI
-        this->InvalidateStatisticsTableView();
-        m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-        m_CurrentStatisticsValid = false;
-        m_Controls->m_ErrorMessageLabel->hide();
-        m_Controls->m_SelectedMaskLabel->setText( "None" );
-        this->m_StatisticsUpdatePending = false;
-        m_Controls->m_lineRadioButton->setEnabled(true);
-        m_Controls->m_barRadioButton->setEnabled(true);
-        m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
-        m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-        if (!outOfBounds)
-          m_Controls->m_InfoLabel->setText("");
-        return;
-      }
-    }
-      else {
         m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
         m_Controls->m_HistogramBinSizeSpinbox->setValue(this->m_CalculationThread->GetHistogramBinSize());
         auto histogram = this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer();
 
         auto imageLabelName = m_Controls->m_SelectedFeatureImageLabel->text().toStdString();
-        m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram),imageLabelName);
+        m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram), imageLabelName);
         m_Controls->m_JSHistogram->SetChartType(imageLabelName, QmitkChartWidget::ChartType::bar);
         this->m_Controls->m_JSHistogram->SetXAxisLabel("Gray value");
         this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
@@ -988,7 +990,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         auto currentTime = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
         this->AdaptBinSizeCheckBoxMinMax((this->m_CalculationThread->GetStatisticsData()).at(currentTime).GetPointer(), this->m_CalculationThread->GetStatisticsImage()->GetPixelType().GetComponentType());
         this->FillStatisticsTableView(this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
-  }
+      }
       m_CurrentStatisticsValid = true;
     }
   }

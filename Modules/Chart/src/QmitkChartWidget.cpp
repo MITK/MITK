@@ -133,15 +133,15 @@ QmitkChartWidget::Impl::~Impl()
 }
 
 void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType type) {
-  QList<QVariant> data1DConverted;
-  for (const auto& aValue : data1D) {
-    data1DConverted.append(aValue);
+  std::map<double, double> transformedData2D;
+  unsigned int count = 0;
+  //transform the 1D data to 2D data
+  for (const auto& ele : data1D) {
+    transformedData2D[count] = ele;
+    count++;
   }
-  const std::string chartTypeName(m_ChartTypeToName.at(type));
-  auto definedLabels = GetDataLabels(GetC3xyData());
-  auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
 
-  GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
+  this->AddData2D(transformedData2D, label, type);
 }
 
 void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label, QmitkChartWidget::ChartType type) {

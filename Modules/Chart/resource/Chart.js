@@ -5,7 +5,7 @@ document.body.style.backgroundColor = 'rgb(240, 240, 240)';
 var minHeight = 255;
 
 var chart;
-GenerateChart('bar', false, false)
+GenerateChart()
 
 var chartData;
 var xValues=[];
@@ -82,8 +82,7 @@ function setupChart(chartData)
 {
   window.onresize();
 
-  GenerateChart(chartData.m_DiagramTypeName, chartData.m_ShowSubchart, chartData.m_UsePercentageInPieChart, 
-  chartData.m_xAxisLabel, chartData.m_yAxisLabel, chartData.m_diagramTitle, chartData.m_LegendPosition, chartData.m_DataPointSize, chartData.m_YAxisScale)
+  GenerateChart(chartData)
     
   chart.unload(); //unload data before loading new data
   
@@ -121,11 +120,12 @@ link = document.getElementsByTagName("link")[0];
 };
 
 //Here, the chart magic takes place. C3js is called
-//chartType: either bar, line or pie
-//showSubchart: see http://c3js.org/samples/options_subchart.html
-//usePercentageInPieChart: percentage labels (only for pie chart)
-function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLabel, yAxisLabel, title, legendPosition, dataPointSize, YAxisScale)
+function GenerateChart(chartData)
 {
+	if (chartData === undefined)
+	{
+		chartData = {}
+	}
 	//adaption for bar ratio indepenend of amount of data points
 	//otherwise, bars could be covered.
 	var barRatio;
@@ -136,7 +136,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
 		barRatio=0.42
 	}
 	var formatCharacter;
-	if (usePercentageInPieChart==true){
+	if (chartData.m_UsePercentageInPieChart==true){
 		formatCharacter = '%'
 	}
 	else{
@@ -144,7 +144,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
 	}
   chart = c3.generate({
 	title:{
-		text: title,
+		text: chartData.m_diagramTitle,
 		position: 'top-center'
 	},
     data: {
@@ -159,7 +159,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
 		regions: lineStyle,
     },
     legend: {
-        position: legendPosition,
+        position: chartData.m_LegendPosition,
 		show: true
     },
     grid: {
@@ -175,7 +175,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
 	pie:{
 		label: {
 		   format: function (value, ratio, id) {
-				if (usePercentageInPieChart==true){
+				if (chartData.m_UsePercentageInPieChart==true){
 					return d3.format('%') (ratio);
 				}
 				else{
@@ -188,7 +188,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
         enabled: true,
     },
     subchart: {
-        show: showSubchart  //Shows a subchart that shows the region the primary chart is zoomed in to by overlay.
+        show: chartData.m_ShowSubchart  //Shows a subchart that shows the region the primary chart is zoomed in to by overlay.
     }, 
     axis: {
         x: {
@@ -199,7 +199,7 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
 			format: d3.format(".1f"),
           },
 		  label: {
-			text: xAxisLabel,
+			text: chartData.m_xAxisLabel,
 			position: 'outer-center'
 		  }
         },
@@ -208,26 +208,26 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
             format: d3.format(formatCharacter)
           },
 		  label: {
-			text: yAxisLabel,
+			text: chartData.m_yAxisLabel,
 			position: 'outer-middle'
 		  },
 		  scale: {
-            name: YAxisScale
+            name: chartData.m_YAxisScale
           }
         }
     },
 	tooltip: {
 		format: {
-			title: function (x) { return xAxisLabel +  ': ' +  d3.format(".2f")(x)}
+			title: function (x) { return chartData.m_xAxisLabel +  ': ' +  d3.format(".2f")(x)}
 		},
 	},
     //Style data points in linegraph
     point: {
-        r: dataPointSize,
+        r: chartData.m_DataPointSize,
         focus: 
         {
           expand: {
-            r: dataPointSize + 2
+            r: chartData.m_DataPointSize + 2
           }
         }
     },

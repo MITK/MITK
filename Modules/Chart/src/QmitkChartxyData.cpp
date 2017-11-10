@@ -20,18 +20,6 @@ QmitkChartxyData::QmitkChartxyData(const QMap<QVariant, QVariant>& data, const Q
   SetData(data);
 }
 
-QmitkChartxyData::QmitkChartxyData(const QList<QVariant>& data, const QVariant& label, const QVariant& chartType) : m_Label(label), m_ChartType(chartType), m_Color(""), m_LineStyleName("solid") {
-  QMap<QVariant, QVariant> augmentedData;
-  unsigned int count = 0;
-  //just augment the 1D data
-  for (const auto& ele : data) {
-    augmentedData[count] = ele;
-    count++;
-  }
-  SetData(augmentedData);
-}
-
-
 void QmitkChartxyData::SetData(const QMap<QVariant, QVariant>& data)
 {
 	for (const auto& entry : data.toStdMap())

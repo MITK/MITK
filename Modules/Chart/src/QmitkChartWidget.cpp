@@ -33,7 +33,6 @@ public:
   Impl& operator=(const Impl&) = delete;
 
   void AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType chartType);
-
   void AddData2D(const std::map<double, double>& data2D, const std::string& label, QmitkChartWidget::ChartType chartType);
 
   void RemoveData(const std::string& label);
@@ -133,29 +132,29 @@ QmitkChartWidget::Impl::~Impl()
   delete m_C3xyData;
 }
 
-
-std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const
-{
-  QString currentLabel = QString::fromStdString(label);
-  int counter = 0;
-  while (labelList.contains(currentLabel))
-  {
-    currentLabel = QString::fromStdString(label + std::to_string(counter));
-    counter++;
+void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType type) {
+  std::map<double, double> transformedData2D;
+  unsigned int count = 0;
+  //transform the 1D data to 2D data
+  for (const auto& ele : data1D) {
+    transformedData2D[count] = ele;
+    count++;
   }
-  return currentLabel.toStdString();
+
+  this->AddData2D(transformedData2D, label, type);
 }
 
-void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType type) {
-  QList<QVariant> data1DConverted;
-  for (const auto& aValue : data1D) {
-    data1DConverted.append(aValue);
+void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label, QmitkChartWidget::ChartType type) {
+  QMap<QVariant, QVariant> data2DConverted;
+  for (const auto& aValue : data2D) {
+    data2DConverted.insert(aValue.first, aValue.second);
   }
   const std::string chartTypeName(m_ChartTypeToName.at(type));
+
   auto definedLabels = GetDataLabels(GetC3xyData());
   auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
 
-  GetC3xyData()->push_back(new QmitkChartxyData(data1DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
+  GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
 }
 
 void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
@@ -178,17 +177,11 @@ void QmitkChartWidget::Impl::RemoveData(const std::string& label) {
   }
 }
 
-void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, const std::string& label, QmitkChartWidget::ChartType type) {
-  QMap<QVariant, QVariant> data2DConverted;
-  for (const auto& aValue : data2D) {
-    data2DConverted.insert(aValue.first, aValue.second);
+void QmitkChartWidget::Impl::ClearData() {
+  for (auto& xyData : *m_C3xyData) {
+    m_WebChannel->deregisterObject(xyData);
   }
-  const std::string chartTypeName(m_ChartTypeToName.at(type));
-
-  auto definedLabels = GetDataLabels(GetC3xyData());
-  auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
-
-  GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
+  GetC3xyData()->clear();
 }
 
 void QmitkChartWidget::Impl::SetColor(const std::string& label, const std::string& colorName)
@@ -314,19 +307,6 @@ std::vector<QmitkChartxyData*>* QmitkChartWidget::Impl::GetC3xyData() const {
   return m_C3xyData; 
 }
 
-void QmitkChartWidget::Impl::ClearData() {
-  for (auto& xyData : *m_C3xyData) {
-    m_WebChannel->deregisterObject(xyData);
-  }
-  GetC3xyData()->clear(); 
-}
-
-QmitkChartWidget::QmitkChartWidget(QWidget* parent)
-  : QWidget(parent),
-  m_Impl(new Impl(this))
-{
-}
-
 void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
 {
   m_WebEngineView->page()->runJavaScript(command);
@@ -347,6 +327,24 @@ void QmitkChartWidget::Impl::InitializeJavaScriptChart()
 	  count++;
   }
   m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/QmitkChartWidget.html")));
+}
+
+std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const
+{
+  QString currentLabel = QString::fromStdString(label);
+  int counter = 0;
+  while (labelList.contains(currentLabel))
+  {
+    currentLabel = QString::fromStdString(label + std::to_string(counter));
+    counter++;
+  }
+  return currentLabel.toStdString();
+}
+
+QmitkChartWidget::QmitkChartWidget(QWidget* parent)
+  : QWidget(parent),
+  m_Impl(new Impl(this))
+{
 }
 
 QmitkChartWidget::~QmitkChartWidget()

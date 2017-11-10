@@ -25,6 +25,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 #include <QTime>
 
+#include <QByteArray>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+
+class QmitkBrainExtractionView;
+
+class FileDownloader : public QObject
+{
+  Q_OBJECT
+public:
+  explicit FileDownloader(QObject *parent = 0);
+
+  virtual ~FileDownloader();
+
+  QByteArray downloadedData() const;
+  void download(QUrl url);
+
+protected slots:
+
+  void Downloaded(QNetworkReply* reply);
+
+private:
+
+  QNetworkAccessManager m_WebCtrl;
+
+};
+
 /*!
 \brief View for diffusion image registration / head motion correction
 */
@@ -47,8 +75,8 @@ public:
 
 protected slots:
 
-    void StartBrainExtraction();
-    void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
+  void StartBrainExtraction();
+  void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
 
 
 protected:

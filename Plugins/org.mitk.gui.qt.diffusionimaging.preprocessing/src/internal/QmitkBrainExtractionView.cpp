@@ -52,6 +52,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+
+FileDownloader::FileDownloader(QObject *parent) : QObject(parent)
+{
+
+}
+
+void FileDownloader::download(QUrl url)
+{
+  connect(&m_WebCtrl, SIGNAL (finished(QNetworkReply*)), SLOT (Downloaded(QNetworkReply*)));
+
+  QNetworkRequest request(url);
+  m_WebCtrl.get(request);
+}
+
+void FileDownloader::Downloaded(QNetworkReply *reply)
+{
+  MITK_INFO << "FileDownloader::Downloaded TESTTEST";
+  QFile localFile("/home/neher/test_download.tar.gz");
+  if (!localFile.open(QIODevice::WriteOnly))
+    return;
+  localFile.write(reply->readAll());
+  localFile.close();
+  delete reply;
+
+  QMessageBox::information(nullptr, "FILE DOWNLOADED", "BLABL");
+}
+
+FileDownloader::~FileDownloader()
+{
+
+}
+
 const std::string QmitkBrainExtractionView::VIEW_ID = "org.mitk.views.brainextraction";
 
 QmitkBrainExtractionView::QmitkBrainExtractionView()
@@ -112,6 +144,9 @@ void QmitkBrainExtractionView::SetFocus()
 
 void QmitkBrainExtractionView::StartBrainExtraction()
 {
+//  FileDownloader dl;
+//  dl.download(QUrl("http://mitk.org/download/releases/MITK-2012.06/MITK-2012.06.0-src.tar.gz"));
+
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   mitk::Image::Pointer mitk_image = dynamic_cast<mitk::Image*>(node->GetData());
 

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include <mitkNavigationData.h>
-#include <QmitkNavigationToolCreationAdvancedWidget.h>
+
 
 #include "ui_IGTNavigationToolCalibrationControls.h"
 
@@ -110,7 +110,7 @@ protected:
 
   // members and helper methods for manual tool calibration
   void UpdateManualToolTipCalibrationView();
-  QmitkNavigationToolCreationAdvancedWidget* m_ManualToolTipEditWidget;
+  //QmitkNavigationToolCreationAdvancedWidget* m_ManualToolTipEditWidget;
 
   // members and helper methods for single reference tool calibration
   void LoginSingleRefToolNavigationData();

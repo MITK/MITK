@@ -112,11 +112,6 @@ void QmitkInteractiveTransformationWidget::SetValues(const mitk::AffineTransform
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-mitk::BaseGeometry::Pointer QmitkInteractiveTransformationWidget::GetGeometry()
-{
-  return m_Geometry;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Section to allow interactive positioning of the moving surface
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,5 +221,6 @@ void QmitkInteractiveTransformationWidget::OnRevertChanges()
 
 void QmitkInteractiveTransformationWidget::OnApplyManipulatedToolTip()
 {
-  emit ApplyManipulatedToolTip(m_Geometry);
+  mitk::AffineTransform3D::Pointer toolTip = m_Geometry->GetIndexToWorldTransform();
+  emit EditToolTipFinished(toolTip);
 }

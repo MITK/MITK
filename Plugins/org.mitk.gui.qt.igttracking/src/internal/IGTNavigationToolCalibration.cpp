@@ -81,11 +81,11 @@ void IGTNavigationToolCalibration::OnToolCalibrationMethodChanged(int index)
 void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
 {
   //initialize manual tool editing widget
-  m_ManualToolTipEditWidget = new QmitkNavigationToolCreationAdvancedWidget(parent);
-  m_ManualToolTipEditWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
-  m_ManualToolTipEditWidget->setWindowTitle("Edit Tool Tip Manually");
-  m_ManualToolTipEditWidget->setModal(false);
-  m_ManualToolTipEditWidget->SetDataStorage(this->GetDataStorage());
+  //m_ManualToolTipEditWidget = new QmitkNavigationToolCreationAdvancedWidget(parent);
+  //m_ManualToolTipEditWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
+  //m_ManualToolTipEditWidget->setWindowTitle("Edit Tool Tip Manually");
+  //m_ManualToolTipEditWidget->setModal(false);
+  //m_ManualToolTipEditWidget->SetDataStorage(this->GetDataStorage());
 
   m_TrackingTimer = new QTimer(this);
 
@@ -105,8 +105,8 @@ void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_ToolAxis_Y, SIGNAL(valueChanged(double)), this, SLOT(OnToolAxisSpinboxChanged()));
   connect(m_Controls.m_ToolAxis_Z, SIGNAL(valueChanged(double)), this, SLOT(OnToolAxisSpinboxChanged()));
   connect(m_Controls.m_CalibrateToolAxis, SIGNAL(clicked()), this, SLOT(OnCalibrateToolAxis()));
-  connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
-  connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessManualTooltipEditDialogCloseRequest()));
+  //connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
+  //connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessManualTooltipEditDialogCloseRequest()));
   connect(m_Controls.m_CalibrationMethodComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnToolCalibrationMethodChanged(int)));
 
   connect((QObject*)(m_Controls.m_RunCalibrationButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnRunSingleRefToolCalibrationClicked()));
@@ -272,7 +272,7 @@ void IGTNavigationToolCalibration::ClearOldPivot()
   mitk::NavigationData::Pointer tempND = mitk::NavigationData::New();
   this->ApplyToolTipTransform(tempND);
   UpdateManualToolTipCalibrationView();
-  m_ManualToolTipEditWidget->hide(); //TODO
+  //m_ManualToolTipEditWidget->hide(); //TODO
   this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
 }
 void IGTNavigationToolCalibration::OnAddPivotPose()
@@ -443,25 +443,25 @@ void IGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
 void IGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 {
   if (!CheckInitialization(false)) { return; }
-  m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolToCalibrate->GetDataNode());
-  m_ManualToolTipEditWidget->show(); //TODO
-  m_ManualToolTipEditWidget->SetDefaultTooltip(m_ToolToCalibrate->GetToolTipTransform());
-  m_ManualToolTipEditWidget->ReInitialize();
+  //m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolToCalibrate->GetDataNode());
+  //m_ManualToolTipEditWidget->show(); //TODO
+  //m_ManualToolTipEditWidget->SetDefaultTooltip(m_ToolToCalibrate->GetToolTipTransform());
+  //m_ManualToolTipEditWidget->ReInitialize();
 }
 
 void IGTNavigationToolCalibration::OnRetrieveDataForManualTooltipManipulation()
 {
   this->GetDataStorage()->Add(m_ToolSurfaceInToolCoordinatesDataNode);
-  m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolSurfaceInToolCoordinatesDataNode);
+  //m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolSurfaceInToolCoordinatesDataNode);
 }
 
 void IGTNavigationToolCalibration::OnProcessManualTooltipEditDialogCloseRequest()
 {
-  mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_ManualToolTipEditWidget->GetManipulatedToolTip());
-  this->ApplyToolTipTransform(tempND);
-  UpdateManualToolTipCalibrationView();
-  m_ManualToolTipEditWidget->hide(); //TODO
-  this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
+  //mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_ManualToolTipEditWidget->GetManipulatedToolTip());
+  //this->ApplyToolTipTransform(tempND);
+  //UpdateManualToolTipCalibrationView();
+  //m_ManualToolTipEditWidget->hide(); //TODO
+  //this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
 }
 
 void IGTNavigationToolCalibration::OnGetPositions()

@@ -23,12 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include "mitkTrackingDeviceTypeCollection.h"
 
+
 //qt headers
 #include <qfiledialog.h>
 #include <qmessagebox.h>
-#include <QDialog>
 #include <mitkIOUtil.h>
 #include <QmitkIGTCommonHelper.h>
+#include <QDialogButtonBox>
 
 //poco headers
 #include <Poco/Path.h>
@@ -42,20 +43,21 @@ const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.n
 QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
+  m_ToolToBeEdited = mitk::NavigationTool::New();
+  m_FinalTool = mitk::NavigationTool::New();
+  m_ToolTransformationWidget = new QmitkInteractiveTransformationWidget();
+
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
 
-  m_ToolToBeEdited = mitk::NavigationTool::New();
-  m_FinalTool = mitk::NavigationTool::New();
-
+  this->InitializeUIToolLandmarkLists();
   Initialize(nullptr, "");
 
   //Default values, which are not stored in tool
   m_Controls->m_CalibrationFileName->setText("none");
   m_Controls->m_Surface_Use_Sphere->setChecked(true);
 
-  this->InitializeUIToolLandmarkLists();
   m_Controls->m_CalibrationLandmarksList->EnableEditButton(false);
   m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
 
@@ -66,6 +68,7 @@ QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
 {
   m_Controls->m_CalibrationLandmarksList->SetPointSetNode(NULL);
   m_Controls->m_RegistrationLandmarksList->SetPointSetNode(NULL);
+  delete m_ToolTransformationWidget;
 }
 
 void QmitkNavigationToolCreationWidget::CreateQtPartControl(QWidget *parent)
@@ -97,6 +100,9 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()));
     connect((QObject*)(m_Controls->m_EditToolTip), SIGNAL(clicked()), this, SLOT(OnEditToolTip()));
 
+    connect((QObject*)(m_ToolTransformationWidget), SIGNAL(EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)), this, 
+      SLOT(OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)));
+
     connect((QObject*)(m_Controls->m_cancel), SIGNAL(clicked()), this, SLOT(OnCancel()));
     connect((QObject*)(m_Controls->m_finished), SIGNAL(clicked()), this, SLOT(OnFinished()));
   }
@@ -118,8 +124,17 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   //Create the default cone surface. Can be changed later on...
   //create DataNode...
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+  newNode->SetName(supposedName);
+  m_ToolToBeEdited->SetDataNode(newNode);//ToDo: Data storage ok?
 
-  //create small sphere and use it as surface
+  SetConeAsToolSurface();
+
+  this->SetDefaultData(m_ToolToBeEdited);
+}
+
+void QmitkNavigationToolCreationWidget::SetConeAsToolSurface()
+{
+  //create small cone and use it as surface
   mitk::Surface::Pointer mySphere = mitk::Surface::New();
   vtkConeSource *vtkData = vtkConeSource::New();
   vtkData->SetAngle(5.0);
@@ -130,19 +145,13 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   vtkData->Update();
   mySphere->SetVtkPolyData(vtkData->GetOutput());
   vtkData->Delete();
-  newNode->SetData(mySphere);
-
-  newNode->SetName(supposedName);
-
-  m_ToolToBeEdited->SetDataNode(newNode);//ToDo: Data storage ok?
-
-  this->SetDefaultData(m_ToolToBeEdited);
+  m_ToolToBeEdited->GetDataNode()->SetData(mySphere);
 }
 
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
 {
   //Set Members. This can either be the new initialized tool from call of Initialize() or a tool which already exists in the toolStorage
-  m_ToolToBeEdited = DefaultTool->Clone();//Todo implement clone function!!!!
+  //TODO m_ToolToBeEdited = DefaultTool->Clone();//Todo implement clone function!!!!
 
   //Set all gui variables
   SetGuiElements();
@@ -199,18 +208,35 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
   this->blockSignals(false);
 }
 
-void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
-{
-  m_ToolToBeEdited->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toLatin1().data());
-}
-
 void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled()
 {
-  //TODO
+  m_Controls->m_LoadSurface->setEnabled(m_Controls->m_Surface_Use_Other->isChecked());
+  if (m_Controls->m_Surface_Use_Sphere->isChecked())
+    SetConeAsToolSurface();
 }
+
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-  //TODO
+  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Surface"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("STL (*.stl)")).toLatin1().data();
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
+  try
+  {
+    mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
+  }
+  catch (mitk::Exception &e)
+  {
+    MITK_ERROR << "Exception occured: " << e.what();
+  }
+  //Todo: ist der neue Knoten automatisch der erste oder wie bekomme ich denß
+  m_ToolToBeEdited->GetDataNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
+}
+
+void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
+{
+  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
+  m_Controls->m_CalibrationFileName->setText(fileName);
+  m_ToolToBeEdited->SetCalibrationFile(fileName.toStdString());
 }
 void QmitkNavigationToolCreationWidget::GetValuesFromGuiElements()
 {
@@ -263,28 +289,22 @@ void QmitkNavigationToolCreationWidget::OnCancel()
   emit Canceled();
 }
 
-void QmitkNavigationToolCreationWidget::OnLoadSurface()
-{
-  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Surface"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("STL (*.stl)")).toLatin1().data();
-  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
-  try
-  {
-    mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
-  }
-  catch (mitk::Exception &e)
-  {
-    MITK_ERROR << "Exception occured: " << e.what();
-  }
-}
 
-void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
+void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable /*= true*/)
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
-  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
-  m_Controls->m_CalibrationFileName->setText(fileName);
-  m_ToolToBeEdited->SetCalibrationFile(fileName.toStdString());
-}
+  //Adapt Gui
+  int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(type));
 
+  if (index >= 0)
+  {
+    m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
+  }
+
+  m_Controls->m_TrackingDeviceTypeChooser->setEditable(changeable);
+
+  //Set data to member
+  m_ToolToBeEdited->SetTrackingDeviceType(type);
+}
 
 
 //##################################################################################
@@ -297,61 +317,38 @@ void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
   msgBox.exec();
 }
 
-void QmitkNavigationToolCreationWidget::OnShowEditToolTipOptions(bool state)
+void QmitkNavigationToolCreationWidget::OnEditToolTip()
 {
-  if (state)
-  {
-    if (!m_AdvancedWidget)
-    {
-      m_AdvancedWidget = new QmitkNavigationToolCreationAdvancedWidget(this);
-      m_AdvancedWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
-      m_AdvancedWidget->setWindowTitle("Tool Creation Advanced Options");
-      m_AdvancedWidget->setModal(false);
-    }
+  m_ToolTransformationWidget->SetGeometryPointer(m_ToolToBeEdited->GetDataNode()->GetData()->GetGeometry());
+  m_ToolTransformationWidget->SetValues(m_ToolToBeEdited->GetToolTipTransform());
 
-    m_AdvancedWidget->SetDefaultTooltip(m_ToolToBeEdited->GetToolTipTransform());
 
-    // reinit the views with the new nodes
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetAll();
-    mitk::TimeGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");    // initialize the views to the bounding geometry
-    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-  }
-  else
-  {
-    delete m_AdvancedWidget;
-  }
+
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->addWidget(m_ToolTransformationWidget);
+  m_ToolEditDialog.setLayout(mainLayout);
+  m_ToolEditDialog.setWindowTitle("Edit Tool Tip and Tool Orientation");
+  m_ToolEditDialog.open();
 }
 
-void QmitkNavigationToolCreationWidget::OnProcessDialogCloseRequest()
+void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
-  //This function is called, when the toolTipEdit view is closed. Either by cancle in the
-  delete m_AdvancedWidget;
+  m_ToolEditDialog.close();
+  //This function is called, when the toolTipEdit view is closed.
+  m_ToolToBeEdited->SetToolTipPosition(toolTip->GetOffset());
+  mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
+  m_ToolToBeEdited->SetToolTipOrientation(tempND->GetOrientation());
 
   //Update Label
-  mitk::AffineTransform3D::Pointer tooltip = m_AdvancedWidget->GetManipulatedToolTip();
-  mitk::NavigationData::Pointer transformConversionHelper = mitk::NavigationData::New(tooltip);
   QString _label = "(" +
-    QString::number(tooltip->GetOffset()[0], 'f', 1) + ", " +
-    QString::number(tooltip->GetOffset()[1], 'f', 1) + ", " +
-    QString::number(tooltip->GetOffset()[2], 'f', 1) + "), quat: [" +
-    QString::number(transformConversionHelper->GetOrientation()[0], 'f', 2) + ", " +
-    QString::number(transformConversionHelper->GetOrientation()[1], 'f', 2) + ", " +
-    QString::number(transformConversionHelper->GetOrientation()[2], 'f', 2) + ", " +
-    QString::number(transformConversionHelper->GetOrientation()[3], 'f', 2) + "]";
+    QString::number(m_ToolToBeEdited->GetToolTipPosition()[0], 'f', 1) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipPosition()[1], 'f', 1) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[0], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[1], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[2], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[3], 'f', 2) + "]";
   m_Controls->m_ToolTipLabel->setText(_label);
-}
-
-void QmitkNavigationToolCreationWidget::OnRetrieveDataForManualTooltipManipulation()
-{
-  if (m_Controls->m_Surface_Use_Sphere->isChecked())
-  {
-    m_AdvancedWidget->SetToolTipSurface(true);
-  }
-  else
-  {
-    m_AdvancedWidget->SetToolTipSurface(false,
-      dynamic_cast<mitk::DataNode*>(m_Controls->m_SurfaceChooser->GetSelectedNode().GetPointer()));
-  }
 }
 
 

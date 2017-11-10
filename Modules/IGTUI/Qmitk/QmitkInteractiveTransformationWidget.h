@@ -52,8 +52,6 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
 
     void SetValues(const mitk::AffineTransform3D::Pointer _defaultValues);
 
-    mitk::BaseGeometry::Pointer GetGeometry();
-
   protected slots:
     void OnZTranslationValueChanged( int v );
     void OnYTranslationValueChanged( int v );
@@ -66,7 +64,7 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     void OnApplyManipulatedToolTip();
 
 signals:
-    void ApplyManipulatedToolTip(mitk::BaseGeometry::Pointer geometry);
+    void EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip);
 
   protected:
 

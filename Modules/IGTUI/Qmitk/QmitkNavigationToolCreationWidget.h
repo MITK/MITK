@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationTool.h>
 #include <mitkNavigationToolStorage.h>
 #include <mitkNodePredicateDataType.h>
+#include "QmitkInteractiveTransformationWidget.h"
+
+#include <QDialog>
 
 //Microservices
 #include <usGetModuleContext.h>
@@ -83,6 +86,7 @@ signals:
   void OnSurfaceUseOtherToggled();
   void OnLoadSurface();
   void OnEditToolTip();
+  void OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip);
 
   void OnCancel();
   void OnFinished();
@@ -110,6 +114,8 @@ private:
 
   void SetGuiElements();
 
+  void SetConeAsToolSurface();
+
 protected:
   /// \brief Creation of the connections
   virtual void CreateConnections();
@@ -124,6 +130,9 @@ protected:
 
   /** @brief this pointer holds the tool which is created and returned */
   mitk::NavigationTool::Pointer m_FinalTool;
+
+  QDialog m_ToolEditDialog;
+  QmitkInteractiveTransformationWidget* m_ToolTransformationWidget;
 
   /** @brief holds the DataStorage */
   mitk::DataStorage* m_DataStorage;

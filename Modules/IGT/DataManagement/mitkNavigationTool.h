@@ -165,6 +165,7 @@ namespace mitk {
     * Return all relevant information as string, e.g. to display all tool information
     */
     std::string GetStringWithAllToolInformation() const;
+
     //#######################
 
   protected:

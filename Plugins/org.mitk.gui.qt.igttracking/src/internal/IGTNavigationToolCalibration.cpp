@@ -272,7 +272,7 @@ void IGTNavigationToolCalibration::ClearOldPivot()
   mitk::NavigationData::Pointer tempND = mitk::NavigationData::New();
   this->ApplyToolTipTransform(tempND);
   UpdateManualToolTipCalibrationView();
-  m_ManualToolTipEditWidget->hide();
+  m_ManualToolTipEditWidget->hide(); //TODO
   this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
 }
 void IGTNavigationToolCalibration::OnAddPivotPose()
@@ -444,7 +444,7 @@ void IGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 {
   if (!CheckInitialization(false)) { return; }
   m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolToCalibrate->GetDataNode());
-  m_ManualToolTipEditWidget->show();
+  m_ManualToolTipEditWidget->show(); //TODO
   m_ManualToolTipEditWidget->SetDefaultTooltip(m_ToolToCalibrate->GetToolTipTransform());
   m_ManualToolTipEditWidget->ReInitialize();
 }
@@ -460,7 +460,7 @@ void IGTNavigationToolCalibration::OnProcessManualTooltipEditDialogCloseRequest(
   mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_ManualToolTipEditWidget->GetManipulatedToolTip());
   this->ApplyToolTipTransform(tempND);
   UpdateManualToolTipCalibrationView();
-  m_ManualToolTipEditWidget->hide();
+  m_ManualToolTipEditWidget->hide(); //TODO
   this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
 }
 

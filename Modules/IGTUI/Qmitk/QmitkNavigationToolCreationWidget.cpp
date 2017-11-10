@@ -43,12 +43,21 @@ QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* pa
   : QWidget(parent, f)
 {
   m_Controls = NULL;
-  m_AdvancedWidget = new QmitkNavigationToolCreationAdvancedWidget(this);
-  m_AdvancedWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
-  m_AdvancedWidget->setWindowTitle("Tool Creation Advanced Options");
-  m_AdvancedWidget->setModal(false);
   CreateQtPartControl(this);
   CreateConnections();
+
+  m_ToolToBeEdited = mitk::NavigationTool::New();
+  m_FinalTool = mitk::NavigationTool::New();
+
+  Initialize(nullptr, "");
+
+  //Default values, which are not stored in tool
+  m_Controls->m_CalibrationFileName->setText("none");
+  m_Controls->m_Surface_Use_Sphere->setChecked(true);
+
+  this->InitializeUIToolLandmarkLists();
+  m_Controls->m_CalibrationLandmarksList->EnableEditButton(false);
+  m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
 
   RefreshTrackingDeviceCollection();
 }
@@ -57,7 +66,6 @@ QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
 {
   m_Controls->m_CalibrationLandmarksList->SetPointSetNode(NULL);
   m_Controls->m_RegistrationLandmarksList->SetPointSetNode(NULL);
-  delete m_AdvancedWidget;
 }
 
 void QmitkNavigationToolCreationWidget::CreateQtPartControl(QWidget *parent)
@@ -74,126 +82,184 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
 {
   if (m_Controls)
   {
+    connect((QObject*)(m_Controls->m_TrackingDeviceTypeChooser), SIGNAL(currentIndexChanged(int index)), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolNameEdit), SIGNAL(textChanged(const QString &text)), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolTypeChooser), SIGNAL(currentIndexChanged(int index)), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_IdentifierEdit), SIGNAL(textChanged(const QString &text)), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_SerialNumberEdit), SIGNAL(textChanged(const QString &text)), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolAxisX), SIGNAL(valueChanged()), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolAxisY), SIGNAL(valueChanged()), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolAxisZ), SIGNAL(valueChanged()), this, SLOT(GetGuiElements()));
+
+    //Buttons
+    connect((QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()));
+    connect(m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseOtherToggled()));
+    connect((QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()));
+    connect((QObject*)(m_Controls->m_EditToolTip), SIGNAL(clicked()), this, SLOT(OnEditToolTip()));
+
     connect((QObject*)(m_Controls->m_cancel), SIGNAL(clicked()), this, SLOT(OnCancel()));
     connect((QObject*)(m_Controls->m_finished), SIGNAL(clicked()), this, SLOT(OnFinished()));
-    connect((QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()));
-    connect((QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()));
-    connect((QObject*)(m_Controls->m_EditToolTip), SIGNAL(toggled(bool)), this, SLOT(OnShowEditToolTipOptions(bool)));
-    connect((QObject*)(m_AdvancedWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessDialogCloseRequest()));
-    connect((QObject*)(m_AdvancedWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
-
-    connect(m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseOtherToggled(bool)));
   }
 }
 
 void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorage, const std::string& supposedIdentifier, const std::string& supposedName)
 {
   m_DataStorage = dataStorage;
-
   //initialize UI components
   m_Controls->m_SurfaceChooser->SetDataStorage(m_DataStorage);
   m_Controls->m_SurfaceChooser->SetAutoSelectNewItems(true);
   m_Controls->m_SurfaceChooser->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
-  //set default data
-  m_Controls->m_ToolNameEdit->setText(supposedName.c_str());
-  m_Controls->m_CalibrationFileName->setText("none");
-  m_Controls->m_Surface_Use_Sphere->setChecked(true);
-  m_AdvancedWidget->SetDataStorage(m_DataStorage);
-  m_Controls->m_IdentifierEdit->setText(supposedIdentifier.c_str());
-  this->InitializeUIToolLandmarkLists();
-  m_Controls->m_CalibrationLandmarksList->EnableEditButton(false);
-  m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
+  //Create new tool, which should be edited/created
+  m_ToolToBeEdited = nullptr;//Reset
+  m_ToolToBeEdited = mitk::NavigationTool::New();//Reinitialize
+  m_ToolToBeEdited->SetIdentifier(supposedIdentifier);
+
+  //Create the default cone surface. Can be changed later on...
+  //create DataNode...
+  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+
+  //create small sphere and use it as surface
+  mitk::Surface::Pointer mySphere = mitk::Surface::New();
+  vtkConeSource *vtkData = vtkConeSource::New();
+  vtkData->SetAngle(5.0);
+  vtkData->SetResolution(50);
+  vtkData->SetHeight(6.0f);
+  vtkData->SetRadius(2.0f);
+  vtkData->SetCenter(0.0, 0.0, 0.0);
+  vtkData->Update();
+  mySphere->SetVtkPolyData(vtkData->GetOutput());
+  vtkData->Delete();
+  newNode->SetData(mySphere);
+
+  newNode->SetName(supposedName);
+
+  m_ToolToBeEdited->SetDataNode(newNode);//ToDo: Data storage ok?
+
+  this->SetDefaultData(m_ToolToBeEdited);
 }
 
-void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
+void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
 {
-  int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(type));
+  //Set Members. This can either be the new initialized tool from call of Initialize() or a tool which already exists in the toolStorage
+  m_ToolToBeEdited = DefaultTool->Clone();//Todo implement clone function!!!!
 
+  //Set all gui variables
+  SetGuiElements();
+}
+
+void QmitkNavigationToolCreationWidget::SetGuiElements()
+{
+  //Block signals, so that we don't call SetGuiElements again. This is undone at the end o this function!
+  this->blockSignals(true);
+
+  //DeviceType
+  int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(m_ToolToBeEdited->GetTrackingDeviceType()));
   if (index >= 0)
   {
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
   }
+
+  m_Controls->m_ToolNameEdit->setText(QString(m_ToolToBeEdited->GetDataNode()->GetName().c_str()));
+  m_Controls->m_CalibrationFileName->setText(QString(m_ToolToBeEdited->GetCalibrationFile().c_str()));
+
+
+  m_Controls->m_SurfaceChooser->SetSelectedNode(m_ToolToBeEdited->GetDataNode());
+  FillUIToolLandmarkLists(m_ToolToBeEdited->GetToolCalibrationLandmarks(), m_ToolToBeEdited->GetToolRegistrationLandmarks());
+
+  switch (m_ToolToBeEdited->GetType())
+  {
+  case mitk::NavigationTool::Instrument:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(0); break;
+  case mitk::NavigationTool::Fiducial:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(1); break;
+  case mitk::NavigationTool::Skinmarker:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(2); break;
+  case mitk::NavigationTool::Unknown:
+    m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
+  }
+
+  m_Controls->m_IdentifierEdit->setText(QString(m_ToolToBeEdited->GetIdentifier().c_str()));
+  m_Controls->m_SerialNumberEdit->setText(QString(m_ToolToBeEdited->GetSerialNumber().c_str()));
+
+  m_Controls->m_ToolAxisX->setValue(m_ToolToBeEdited->GetToolAxis()[0]);
+  m_Controls->m_ToolAxisY->setValue(m_ToolToBeEdited->GetToolAxis()[1]);
+  m_Controls->m_ToolAxisZ->setValue(m_ToolToBeEdited->GetToolAxis()[2]);
+  QString _label = "(" +
+    QString::number(m_ToolToBeEdited->GetToolTipPosition()[0], 'f', 1) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipPosition()[1], 'f', 1) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[0], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[1], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[2], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[3], 'f', 2) + "]";
+  m_Controls->m_ToolTipLabel->setText(_label);
+
+  //Undo block signals. Don't remove it, if signals are still blocked at the beginning of this function!
+  this->blockSignals(false);
 }
 
-mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool()
+void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 {
-  return m_CreatedTool;
+  m_ToolToBeEdited->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toLatin1().data());
 }
 
-//##################################################################################
-//############################## slots                  ############################
-//##################################################################################
-
-void QmitkNavigationToolCreationWidget::OnFinished()
+void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled()
 {
-  //here we create a new tool
-  m_CreatedTool = mitk::NavigationTool::New();
-
-  //create DataNode...
-  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-  if (m_Controls->m_Surface_Use_Sphere->isChecked())
-  {
-    //create small sphere and use it as surface
-    mitk::Surface::Pointer mySphere = mitk::Surface::New();
-    vtkConeSource *vtkData = vtkConeSource::New();
-    vtkData->SetAngle(5.0);
-    vtkData->SetResolution(50);
-    vtkData->SetHeight(6.0f);
-    vtkData->SetRadius(2.0f);
-    vtkData->SetCenter(0.0, 0.0, 0.0);
-    vtkData->Update();
-    mySphere->SetVtkPolyData(vtkData->GetOutput());
-    vtkData->Delete();
-    newNode->SetData(mySphere);
-  }
-  else
-  {
-    newNode->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
-  }
-  newNode->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
-
-  m_CreatedTool->SetDataNode(newNode);
-
-  //fill NavigationTool object
-  m_CreatedTool->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toLatin1().data());
-  m_CreatedTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toLatin1().data());
-  m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toLatin1().data());
+  //TODO
+}
+void QmitkNavigationToolCreationWidget::OnLoadSurface()
+{
+  //TODO
+}
+void QmitkNavigationToolCreationWidget::GetValuesFromGuiElements()
+{
 
   //Tracking Device
-  m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->currentText().toStdString());
-
-  //ToolType
-  if (m_Controls->m_ToolTypeChooser->currentText() == "Instrument") m_CreatedTool->SetType(mitk::NavigationTool::Instrument);
-  else if (m_Controls->m_ToolTypeChooser->currentText() == "Fiducial") m_CreatedTool->SetType(mitk::NavigationTool::Fiducial);
-  else if (m_Controls->m_ToolTypeChooser->currentText() == "Skinmarker") m_CreatedTool->SetType(mitk::NavigationTool::Skinmarker);
-  else m_CreatedTool->SetType(mitk::NavigationTool::Unknown);
-
-  //Tool Tip
-  mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_AdvancedWidget->GetManipulatedToolTip());
-  m_CreatedTool->SetToolTipOrientation(tempND->GetOrientation());
-  m_CreatedTool->SetToolTipPosition(tempND->GetPosition());
+  m_ToolToBeEdited->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->currentText().toStdString());
+  m_ToolToBeEdited->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toStdString());
 
   //Tool Landmarks
   mitk::PointSet::Pointer toolCalLandmarks, toolRegLandmarks;
   GetUIToolLandmarksLists(toolCalLandmarks, toolRegLandmarks);
-  m_CreatedTool->SetToolCalibrationLandmarks(toolCalLandmarks);
-  m_CreatedTool->SetToolRegistrationLandmarks(toolRegLandmarks);
+  m_ToolToBeEdited->SetToolCalibrationLandmarks(toolCalLandmarks);
+  m_ToolToBeEdited->SetToolRegistrationLandmarks(toolRegLandmarks);
+
+  //Advanced
+  if (m_Controls->m_ToolTypeChooser->currentText() == "Instrument") m_ToolToBeEdited->SetType(mitk::NavigationTool::Instrument);
+  else if (m_Controls->m_ToolTypeChooser->currentText() == "Fiducial") m_ToolToBeEdited->SetType(mitk::NavigationTool::Fiducial);
+  else if (m_Controls->m_ToolTypeChooser->currentText() == "Skinmarker") m_ToolToBeEdited->SetType(mitk::NavigationTool::Skinmarker);
+  else m_FinalTool->SetType(mitk::NavigationTool::Unknown);
+
+  m_ToolToBeEdited->SetIdentifier(m_Controls->m_IdentifierEdit->text().toLatin1().data());
+  m_ToolToBeEdited->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toLatin1().data());
 
   //Tool Axis
   mitk::Point3D toolAxis;
   toolAxis.SetElement(0, (m_Controls->m_ToolAxisX->value()));
   toolAxis.SetElement(1, (m_Controls->m_ToolAxisY->value()));
   toolAxis.SetElement(2, (m_Controls->m_ToolAxisZ->value()));
-  m_CreatedTool->SetToolAxis(toolAxis);
+  m_ToolToBeEdited->SetToolAxis(toolAxis);
+}
+
+mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool()
+{
+  return m_FinalTool;
+}
+
+
+void QmitkNavigationToolCreationWidget::OnFinished()
+{
+  //here we create a new tool
+  m_FinalTool = m_ToolToBeEdited->Clone();
+
 
   emit NavigationToolFinished();
 }
 
 void QmitkNavigationToolCreationWidget::OnCancel()
 {
-  m_CreatedTool = NULL;
-
+  Initialize(nullptr,"");//Reset everything to a fresh tool, like it was done in the constructor
   emit Canceled();
 }
 
@@ -216,50 +282,10 @@ void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
   QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
   QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
   m_Controls->m_CalibrationFileName->setText(fileName);
+  m_ToolToBeEdited->SetCalibrationFile(fileName.toStdString());
 }
 
-void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
-{
-  m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName().c_str()));
-  m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
-  m_Controls->m_SerialNumberEdit->setText(QString(DefaultTool->GetSerialNumber().c_str()));
-  m_AdvancedWidget->SetDefaultTooltip(DefaultTool->GetToolTipTransform());
-  m_Controls->m_ToolAxisX->setValue(DefaultTool->GetToolAxis()[0]);
-  m_Controls->m_ToolAxisY->setValue(DefaultTool->GetToolAxis()[1]);
-  m_Controls->m_ToolAxisZ->setValue(DefaultTool->GetToolAxis()[2]);
-  QString _label = "(" +
-    QString::number(DefaultTool->GetToolTipPosition()[0], 'f', 1) + ", " +
-    QString::number(DefaultTool->GetToolTipPosition()[1], 'f', 1) + ", " +
-    QString::number(DefaultTool->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
-    QString::number(DefaultTool->GetToolTipOrientation()[0], 'f', 2) + ", " +
-    QString::number(DefaultTool->GetToolTipOrientation()[1], 'f', 2) + ", " +
-    QString::number(DefaultTool->GetToolTipOrientation()[2], 'f', 2) + ", " +
-    QString::number(DefaultTool->GetToolTipOrientation()[3], 'f', 2) + "]";
-  m_Controls->m_ToolTipLabel->setText(_label);
-  int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(DefaultTool->GetTrackingDeviceType()));
 
-  if (index >= 0)
-  {
-    m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
-  }
-
-  m_Controls->m_CalibrationFileName->setText(QString(DefaultTool->GetCalibrationFile().c_str()));
-  m_Controls->m_Surface_Use_Other->setChecked(true);
-  switch (DefaultTool->GetType())
-  {
-  case mitk::NavigationTool::Instrument:
-    m_Controls->m_ToolTypeChooser->setCurrentIndex(0); break;
-  case mitk::NavigationTool::Fiducial:
-    m_Controls->m_ToolTypeChooser->setCurrentIndex(1); break;
-  case mitk::NavigationTool::Skinmarker:
-    m_Controls->m_ToolTypeChooser->setCurrentIndex(2); break;
-  case mitk::NavigationTool::Unknown:
-    m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
-  }
-
-  m_Controls->m_SurfaceChooser->SetSelectedNode(DefaultTool->GetDataNode());
-  FillUIToolLandmarkLists(DefaultTool->GetToolCalibrationLandmarks(), DefaultTool->GetToolRegistrationLandmarks());
-}
 
 //##################################################################################
 //############################## internal help methods #############################
@@ -275,9 +301,15 @@ void QmitkNavigationToolCreationWidget::OnShowEditToolTipOptions(bool state)
 {
   if (state)
   {
-    m_AdvancedWidget->show();
-    m_AdvancedWidget->SetDefaultTooltip(m_AdvancedWidget->GetManipulatedToolTip()); //use the last one, if there is one
-    m_AdvancedWidget->ReInitialize();
+    if (!m_AdvancedWidget)
+    {
+      m_AdvancedWidget = new QmitkNavigationToolCreationAdvancedWidget(this);
+      m_AdvancedWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
+      m_AdvancedWidget->setWindowTitle("Tool Creation Advanced Options");
+      m_AdvancedWidget->setModal(false);
+    }
+
+    m_AdvancedWidget->SetDefaultTooltip(m_ToolToBeEdited->GetToolTipTransform());
 
     // reinit the views with the new nodes
     mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetAll();
@@ -286,14 +318,14 @@ void QmitkNavigationToolCreationWidget::OnShowEditToolTipOptions(bool state)
   }
   else
   {
-    m_AdvancedWidget->hide();
+    delete m_AdvancedWidget;
   }
 }
 
 void QmitkNavigationToolCreationWidget::OnProcessDialogCloseRequest()
 {
-  m_AdvancedWidget->hide();
-  m_Controls->m_EditToolTip->setChecked(false);
+  //This function is called, when the toolTipEdit view is closed. Either by cancle in the
+  delete m_AdvancedWidget;
 
   //Update Label
   mitk::AffineTransform3D::Pointer tooltip = m_AdvancedWidget->GetManipulatedToolTip();
@@ -322,10 +354,6 @@ void QmitkNavigationToolCreationWidget::OnRetrieveDataForManualTooltipManipulati
   }
 }
 
-void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled(bool checked)
-{
-  m_Controls->m_LoadSurface->setEnabled(checked);
-}
 
 void QmitkNavigationToolCreationWidget::FillUIToolLandmarkLists(mitk::PointSet::Pointer calLandmarks, mitk::PointSet::Pointer regLandmarks)
 {

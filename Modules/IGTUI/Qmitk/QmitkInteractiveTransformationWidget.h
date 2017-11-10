@@ -48,7 +48,9 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
      *  provided by the second variable. These values will be applied to the geometry
      *  in the beginning and the UI will also hold these values.
      */
-    void SetGeometry(mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues = nullptr);
+    void SetGeometryPointer(mitk::BaseGeometry::Pointer geometry);
+
+    void SetValues(const mitk::AffineTransform3D::Pointer _defaultValues);
 
     mitk::BaseGeometry::Pointer GetGeometry();
 
@@ -59,21 +61,18 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     void OnZRotationValueChanged( int v );
     void OnYRotationValueChanged( int v );
     void OnXRotationValueChanged( int v );
-    void OnResetGeometry();
+    void OnResetGeometryToIdentity();
+    void OnRevertChanges();
     void OnApplyManipulatedToolTip();
 
 signals:
-    void ApplyManipulatedToolTip();
+    void ApplyManipulatedToolTip(mitk::BaseGeometry::Pointer geometry);
 
   protected:
 
     virtual void CreateConnections();
 
     virtual void CreateQtPartControl(QWidget *parent);
-
-    /*! \brief Method performs the translation.
-        \params translateVector New translation to be combine with geometry. */
-    void Translate( mitk::Vector3D translateVector);
 
     /*! \brief Method performs the rotation.
     \params rotateVector New rotation to be combined with geometry. */
@@ -82,9 +81,8 @@ signals:
     // Member variables
     Ui::QmitkInteractiveTransformationWidgetControls* m_Controls;
 
-    mitk::BaseGeometry::Pointer m_Geometry;         ///< \brief Initial geometry that is manipulated
-    mitk::BaseGeometry::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the initial geometry
-    mitk::Vector3D m_TranslationVector;           ///< \brief Accumulated translation vector
-    mitk::Vector3D m_RotateSliderPos;             ///< \brief Accumulated rotation vector (holds degree around x,y,z direction)
+    mitk::BaseGeometry::Pointer m_Geometry;         ///< \brief The geometry that is manipulated
+    mitk::BaseGeometry::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the original geometry
+
 };
 #endif // QmitkInteractiveTransformationWidget_H

@@ -437,7 +437,7 @@ public:
     typedef itk::Image<unsigned short, 3> ImageType;
 
     // set the seed of the rand function
-    srand((unsigned)time(0));
+    srand((unsigned)time(nullptr));
 
     /* setup a random orthogonal plane */
     int sliceindex = 17; // rand() % 32;

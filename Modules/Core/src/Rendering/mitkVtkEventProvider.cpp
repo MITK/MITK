@@ -68,7 +68,7 @@ mitk::vtkEventProvider::vtkEventProvider()
 
 mitk::vtkEventProvider::~vtkEventProvider()
 {
-  this->SetInteractor(0);
+  this->SetInteractor(nullptr);
 }
 
 void mitk::vtkEventProvider::SetMitkRenderWindow(mitk::RenderWindow *renWin)

@@ -164,7 +164,7 @@ void mitk::SetRegionTool::OnMouseReleased(StateMachineAction *, InteractionEvent
 
   LabelSetImage *labelImage = dynamic_cast<LabelSetImage *>(image);
   int activeColor = 1;
-  if (labelImage != 0)
+  if (labelImage != nullptr)
   {
     activeColor = labelImage->GetActiveLabel()->GetValue();
   }

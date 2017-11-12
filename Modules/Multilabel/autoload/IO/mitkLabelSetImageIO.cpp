@@ -398,7 +398,7 @@ namespace mitk
         doc.Parse(_xmlStr.c_str());
 
         TiXmlElement *labelElem = doc.FirstChildElement("Label");
-        if (labelElem == 0)
+        if (labelElem == nullptr)
           mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
 
         label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElem);

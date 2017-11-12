@@ -24,7 +24,7 @@ void mitk::PersistenceActivator::Load(us::ModuleContext *context)
 {
   MITK_DEBUG << "PersistenceActivator::Load";
 
-  mitk::IPersistenceService *persistenceService = 0;
+  mitk::IPersistenceService *persistenceService = nullptr;
   us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef =
     context->GetServiceReference<mitk::IPersistenceService>();
   if (persistenceServiceRef)
@@ -33,9 +33,9 @@ void mitk::PersistenceActivator::Load(us::ModuleContext *context)
       dynamic_cast<mitk::IPersistenceService *>(context->GetService<mitk::IPersistenceService>(persistenceServiceRef));
   }
 
-  bool instanceAlreadyAdded = persistenceService != 0;
+  bool instanceAlreadyAdded = persistenceService != nullptr;
   if (instanceAlreadyAdded)
-    instanceAlreadyAdded = dynamic_cast<mitk::PersistenceService *>(persistenceService) != 0;
+    instanceAlreadyAdded = dynamic_cast<mitk::PersistenceService *>(persistenceService) != nullptr;
 
   if (instanceAlreadyAdded == false)
   {

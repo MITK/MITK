@@ -69,7 +69,7 @@ mitk::SurfaceBasedInterpolationController *mitk::SurfaceBasedInterpolationContro
 {
   static mitk::SurfaceBasedInterpolationController *m_Instance;
 
-  if (m_Instance == 0)
+  if (m_Instance == nullptr)
   {
     m_Instance = new SurfaceBasedInterpolationController();
   }

@@ -79,7 +79,7 @@ public:
 ///
 struct ItkDeleteEventListener
 {
-  ItkDeleteEventListener(mitk::DataStorage *ds) : m_Node(0), m_DataStorage(ds), m_DeleteObserverTag(0) {}
+  ItkDeleteEventListener(mitk::DataStorage *ds) : m_Node(nullptr), m_DataStorage(ds), m_DeleteObserverTag(0) {}
   void SetNode(mitk::DataNode *_Node)
   {
     if (m_Node)
@@ -99,7 +99,7 @@ struct ItkDeleteEventListener
     m_DataStorage->Add(node);    // SHOULD NOT CAUSE A DEADLOCK!
     m_DataStorage->Remove(node); // tidy up: remove the empty node again
 
-    m_Node = 0;
+    m_Node = nullptr;
   }
 
 protected:
@@ -862,7 +862,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
       mitk::DataNode *pEmptyNode = emptyNode;
       listener.SetNode(emptyNode);
       standaloneDataStorage->Add(emptyNode);
-      emptyNode = 0;                             // emptyNode is still alive because standaloneDataStorage
+      emptyNode = nullptr;                             // emptyNode is still alive because standaloneDataStorage
                                                  // owns it
       standaloneDataStorage->Remove(pEmptyNode); // this should not freeze the whole thing
     }

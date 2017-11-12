@@ -30,8 +30,8 @@ vtkStandardNewMacro(vtkUnstructuredGridMapper);
 //----------------------------------------------------------------------------
 vtkUnstructuredGridMapper::vtkUnstructuredGridMapper()
 {
-  this->GeometryExtractor = 0;
-  this->PolyDataMapper = 0;
+  this->GeometryExtractor = nullptr;
+  this->PolyDataMapper = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
 
   // Need a lookup table
   //
-  if (this->LookupTable == 0)
+  if (this->LookupTable == nullptr)
   {
     this->CreateDefaultLookupTable();
   }
@@ -107,7 +107,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
 
   // Now can create appropriate mapper
   //
-  if (this->PolyDataMapper == 0)
+  if (this->PolyDataMapper == nullptr)
   {
     vtkGeometryFilter *gf = vtkGeometryFilter::New();
     vtkPolyDataMapper *pm = vtkPolyDataMapper::New();
@@ -127,7 +127,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   if (this->m_BoundingObject)
   {
     mitk::BoundingBox::BoundsArrayType bounds =
-      this->m_BoundingObject->GetGeometry()->CalculateBoundingBoxRelativeToTransform(0)->GetBounds();
+      this->m_BoundingObject->GetGeometry()->CalculateBoundingBoxRelativeToTransform(nullptr)->GetBounds();
     this->GeometryExtractor->SetExtent(bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
     this->GeometryExtractor->ExtentClippingOn();
   }

@@ -208,12 +208,12 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     DataNode *dn = renderer->GetCurrentWorldPlaneGeometryNode();
     if (dn)
     {
-      ResliceMethodProperty *resliceMethodEnumProperty = 0;
+      ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
 
       if (dn->GetProperty(resliceMethodEnumProperty, "reslice.thickslices", renderer) && resliceMethodEnumProperty)
         thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
-      IntProperty *intProperty = 0;
+      IntProperty *intProperty = nullptr;
       if (dn->GetProperty(intProperty, "reslice.thickslices.num", renderer) && intProperty)
       {
         thickSlicesNum = intProperty->GetValue();

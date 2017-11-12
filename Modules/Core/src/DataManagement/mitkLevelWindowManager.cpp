@@ -186,7 +186,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   typedef mitk::DataStorage::SetOfObjects NodeSetType;
   NodeSetType::ConstPointer nodes = m_DataStorage->GetAll();
   NodeSetType::ConstIterator it = nodes->Begin();
-  mitk::DataNode::Pointer propNode = 0;
+  mitk::DataNode::Pointer propNode = nullptr;
   while (it != nodes->End())
   {
     mitk::DataNode::Pointer node = it.Value();
@@ -519,7 +519,7 @@ void mitk::LevelWindowManager::ClearPropObserverLists()
   for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode.clear();
 
@@ -527,7 +527,7 @@ void mitk::LevelWindowManager::ClearPropObserverLists()
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode2.clear();
 
@@ -535,7 +535,7 @@ void mitk::LevelWindowManager::ClearPropObserverLists()
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode3.clear();
 
@@ -543,7 +543,7 @@ void mitk::LevelWindowManager::ClearPropObserverLists()
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode4.clear();
 
@@ -551,7 +551,7 @@ void mitk::LevelWindowManager::ClearPropObserverLists()
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode5.clear();
 }

@@ -36,8 +36,8 @@ namespace mitk
 {
   itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
 
-    RenderingManager::Pointer RenderingManager::s_Instance = 0;
-  RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
+    RenderingManager::Pointer RenderingManager::s_Instance = nullptr;
+  RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = nullptr;
 
   RenderingManager::RenderingManager()
     : m_UpdatePending(false),

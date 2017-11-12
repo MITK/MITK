@@ -190,7 +190,7 @@ int Cache::get_data(const int index, Qfloat **data, int len)
       lru_delete(old);
       free(old->data);
       size += old->len;
-      old->data = 0;
+      old->data = nullptr;
       old->len = 0;
     }
 
@@ -229,7 +229,7 @@ void Cache::swap_index(int i, int j)
         lru_delete(h);
         free(h->data);
         size += h->len;
-        h->data = 0;
+        h->data = nullptr;
         h->len = 0;
       }
     }
@@ -334,7 +334,7 @@ Kernel::Kernel(int l, svm_node * const * x_, const svm_parameter& param)
       x_square[i] = dot(x[i],x[i]);
   }
   else
-    x_square = 0;
+    x_square = nullptr;
 }
 
 Kernel::~Kernel()

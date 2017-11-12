@@ -39,7 +39,7 @@ mitk::FastMarchingTool::FastMarchingTool()
   : FeedbackContourTool("PressMoveReleaseAndPointSetting"),
     m_NeedUpdate(true),
     m_CurrentTimeStep(0),
-    m_PositionEvent(0),
+    m_PositionEvent(nullptr),
     m_LowerThreshold(0),
     m_UpperThreshold(200),
     m_StoppingValue(100),

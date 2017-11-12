@@ -52,7 +52,7 @@ class TestModuleA2Activator : public ModuleActivator
 {
 public:
 
-  TestModuleA2Activator() : s(0) {}
+  TestModuleA2Activator() : s(nullptr) {}
 
   ~TestModuleA2Activator() override { delete s; }
 

@@ -136,7 +136,7 @@ mitk::BaseGeometry::Pointer mitk::ArbitraryTimeGeometry::GetGeometryForTimeStep(
   }
   else
   {
-    return 0;
+    return nullptr;
   }
 }
 
@@ -150,7 +150,7 @@ mitk::BaseGeometry::Pointer
   }
   else
   {
-    return 0;
+    return nullptr;
   }
 }
 
@@ -158,7 +158,7 @@ mitk::BaseGeometry::Pointer
   mitk::ArbitraryTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep ) const
 {
   if ( timeStep >= m_GeometryVector.size() )
-    return 0;
+    return nullptr;
   return m_GeometryVector[timeStep]->Clone();
 }
 

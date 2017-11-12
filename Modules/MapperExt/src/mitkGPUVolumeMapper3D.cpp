@@ -133,7 +133,7 @@ void mitk::GPUVolumeMapper3D::DeinitCPU(mitk::BaseRenderer *renderer)
 
 mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
 {
-  m_Volumenullptr = 0;
+  m_Volumenullptr = nullptr;
   m_commonInitialized = false;
 }
 

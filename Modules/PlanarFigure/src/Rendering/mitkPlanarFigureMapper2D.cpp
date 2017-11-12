@@ -57,7 +57,7 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
 void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *)
 {
   this->m_Pen = vtkSmartPointer<vtkPen>::New();
-  vtkOpenGLContextDevice2D *device = NULL;
+  vtkOpenGLContextDevice2D *device = nullptr;
     device = vtkOpenGLContextDevice2D::New();
   if (device)
   {

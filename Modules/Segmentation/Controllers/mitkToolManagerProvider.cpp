@@ -56,6 +56,6 @@ mitk::ToolManagerProvider *mitk::ToolManagerProvider::GetInstance()
   else
   {
     // No SingletonOneService instance was registered yet.
-    return 0;
+    return nullptr;
   }
 }

@@ -131,8 +131,8 @@ namespace mitk
     if (!polyData)
       throw std::logic_error("Could not create polygon model");
 
-    polyData->SetVerts(0);
-    polyData->SetLines(0);
+    polyData->SetVerts(nullptr);
+    polyData->SetLines(nullptr);
 
     if (smooth || applyMedian || decimateMesh)
     {

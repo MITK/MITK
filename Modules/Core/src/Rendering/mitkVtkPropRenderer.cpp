@@ -555,7 +555,7 @@ int mitk::VtkPropRenderer::GetNumberOfPaths()
 
 vtkAssemblyPath *mitk::VtkPropRenderer::GetNextPath()
 {
-  return m_Paths ? m_Paths->GetNextItem() : 0;
+  return m_Paths ? m_Paths->GetNextItem() : nullptr;
 }
 
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow * /*renWin*/)

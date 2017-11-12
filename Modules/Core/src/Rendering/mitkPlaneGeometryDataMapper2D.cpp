@@ -372,7 +372,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       double thickSliceDistance = SlicedGeometry3D::CalculateSpacing(
         referenceGeometry ? referenceGeometry->GetSpacing() : inputPlaneGeometry->GetSpacing(), orthogonalVector);
 
-      IntProperty *intProperty = 0;
+      IntProperty *intProperty = nullptr;
       if (GetDataNode()->GetProperty(intProperty, "reslice.thickslices.num") && intProperty)
         thickSliceDistance *= intProperty->GetValue() + 0.5;
       else
@@ -582,11 +582,11 @@ int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode(DataNode *dn, int &
 {
   int thickSlicesMode = 0;
   // determine the state and the extend of the thick-slice mode
-  mitk::ResliceMethodProperty *resliceMethodEnumProperty = 0;
+  mitk::ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
   if (dn->GetProperty(resliceMethodEnumProperty, "reslice.thickslices") && resliceMethodEnumProperty)
     thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
-  IntProperty *intProperty = 0;
+  IntProperty *intProperty = nullptr;
   if (dn->GetProperty(intProperty, "reslice.thickslices.num") && intProperty)
   {
     thickSlicesNum = intProperty->GetValue();

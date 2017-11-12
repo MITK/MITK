@@ -42,7 +42,7 @@ class TestModuleImportedByBActivator : public ModuleActivator
 {
 public:
 
-  TestModuleImportedByBActivator() : s(0) {}
+  TestModuleImportedByBActivator() : s(nullptr) {}
   ~TestModuleImportedByBActivator() override { delete s; }
 
   void Load(ModuleContext* context) override

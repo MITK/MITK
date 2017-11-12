@@ -365,7 +365,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer *renderer, 
   }
   else
   {
-    ls->m_Actor->SetTexture(0);
+    ls->m_Actor->SetTexture(nullptr);
   }
 
   // deprecated settings
@@ -501,8 +501,8 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::
   mitk::Surface::Pointer surface = dynamic_cast<Surface *>(node->GetData());
   if (surface.IsNotNull())
   {
-    if ((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != nullptr) &&
-        (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
+    if ((surface->GetVtkPolyData() != nullptr) && (surface->GetVtkPolyData()->GetPointData() != nullptr) &&
+        (surface->GetVtkPolyData()->GetPointData()->GetScalars() != nullptr))
     {
       node->AddProperty("scalar visibility", mitk::BoolProperty::New(true), renderer, overwrite);
       node->AddProperty("color mode", mitk::BoolProperty::New(true), renderer, overwrite);

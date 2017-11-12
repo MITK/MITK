@@ -143,8 +143,8 @@ bool mitk::PersistenceService::Save(const std::string &fileName, bool appendChan
       {
         bool load = false;
         DataStorage::Pointer ds = m_SceneIO->LoadScene(theFile);
-        load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) &&
-               (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+        load = (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedNodes()->size() == 0) &&
+               (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedProperties()->IsEmpty());
         if (!load)
           return false;
 
@@ -240,8 +240,8 @@ bool mitk::PersistenceService::Load(const std::string &fileName, bool enforceRel
       m_SceneIO = mitk::SceneIO::New();
     }
     DataStorage::Pointer ds = m_SceneIO->LoadScene(theFile);
-    load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) &&
-           (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+    load = (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedNodes()->size() == 0) &&
+           (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedProperties()->IsEmpty());
     if (load)
     {
       this->RestorePropertyListsFromPersistentDataNodes(ds);

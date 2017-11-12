@@ -145,7 +145,7 @@ namespace mitk
     m_BackHedgeHog->Delete();
 
     for (ActorList::iterator it = m_ImageActors.begin(); it != m_ImageActors.end(); ++it)
-      it->second.m_Actor->ReleaseGraphicsResources(0);
+      it->second.m_Actor->ReleaseGraphicsResources(nullptr);
 
     // Delete entries in m_ImageActors list one by one
     m_ImageActors.clear();
@@ -307,7 +307,7 @@ namespace mitk
       Surface *surface = m_SurfaceCreator->GetOutput();
 
       // Check if there's something to display, otherwise return
-      if ((surface->GetVtkPolyData() == 0) || (surface->GetVtkPolyData()->GetNumberOfCells() == 0))
+      if ((surface->GetVtkPolyData() == nullptr) || (surface->GetVtkPolyData()->GetNumberOfCells() == 0))
       {
         m_ImageAssembly->VisibilityOff();
         return;
@@ -582,7 +582,7 @@ namespace mitk
     }
     if (m_Actor != nullptr)
     {
-      m_Actor->ReleaseGraphicsResources(0);
+      m_Actor->ReleaseGraphicsResources(nullptr);
       m_Actor->Delete();
     }
   }

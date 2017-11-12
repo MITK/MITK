@@ -91,10 +91,10 @@ void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   input->Update();
 
   if (m_VtkPointSet)
-    m_VtkPointSet->UnRegister(0);
+    m_VtkPointSet->UnRegister(nullptr);
   m_VtkPointSet = this->GetVtkPointSet(renderer, this->GetTimestep());
   assert(m_VtkPointSet);
-  m_VtkPointSet->Register(0);
+  m_VtkPointSet->Register(nullptr);
 
   if (m_ScalarVisibility->GetValue())
   {
@@ -105,27 +105,27 @@ void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     {
       mitk::TransferFunction::Pointer tf = transferFuncProp->GetValue();
       if (m_ScalarsToColors)
-        m_ScalarsToColors->UnRegister(0);
+        m_ScalarsToColors->UnRegister(nullptr);
       m_ScalarsToColors = static_cast<vtkScalarsToColors *>(tf->GetColorTransferFunction());
-      m_ScalarsToColors->Register(0);
+      m_ScalarsToColors->Register(nullptr);
 
       if (m_ScalarsToOpacity)
-        m_ScalarsToOpacity->UnRegister(0);
+        m_ScalarsToOpacity->UnRegister(nullptr);
       m_ScalarsToOpacity = tf->GetScalarOpacityFunction();
-      m_ScalarsToOpacity->Register(0);
+      m_ScalarsToOpacity->Register(nullptr);
     }
     else
     {
       if (m_ScalarsToColors)
-        m_ScalarsToColors->UnRegister(0);
+        m_ScalarsToColors->UnRegister(nullptr);
       m_ScalarsToColors = this->GetVtkLUT(renderer);
       assert(m_ScalarsToColors);
-      m_ScalarsToColors->Register(0);
+      m_ScalarsToColors->Register(nullptr);
 
       float opacity;
       node->GetOpacity(opacity, renderer);
       if (m_ScalarsToOpacity)
-        m_ScalarsToOpacity->UnRegister(0);
+        m_ScalarsToOpacity->UnRegister(nullptr);
       m_ScalarsToOpacity = vtkPiecewiseFunction::New();
       double range[2];
       m_VtkPointSet->GetScalarRange(range);
@@ -233,7 +233,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
 
   for (int i = 0; i < numberOfLines; ++i)
   {
-    vtkIdType *cell(0);
+    vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     vlines->GetNextCell(cellSize, cell);
@@ -307,7 +307,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
 
     for (int i = 0; i < numberOfPolys; ++i)
     {
-      vtkIdType *cell(0);
+      vtkIdType *cell(nullptr);
       vtkIdType cellSize(0);
 
       vpolys->GetNextCell(cellSize, cell);
@@ -370,7 +370,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       for (int i = 0; i < numberOfPolys; ++i)
       {
-        vtkIdType *cell(0);
+        vtkIdType *cell(nullptr);
         vtkIdType cellSize(0);
 
         vpolys->GetNextCell(cellSize, cell);
@@ -395,12 +395,12 @@ vtkAbstractMapper3D *mitk::UnstructuredGridMapper2D::GetVtkAbstractMapper3D(mitk
   // MITK_INFO << "GETVTKABSTRACTMAPPER3D\n";
   mitk::DataNode::ConstPointer node = this->GetDataNode();
   if (node.IsNull())
-    return 0;
+    return nullptr;
 
   mitk::VtkMapper::Pointer mitkMapper = dynamic_cast<mitk::VtkMapper *>(node->GetMapper(2));
   if (mitkMapper.IsNull())
   {
-    return 0;
+    return nullptr;
   }
 
   mitkMapper->Update(renderer);
@@ -410,7 +410,7 @@ vtkAbstractMapper3D *mitk::UnstructuredGridMapper2D::GetVtkAbstractMapper3D(mitk
   {
     vtkProp3DCollection *collection = assembly->GetParts();
     collection->InitTraversal();
-    vtkProp3D *prop3d = 0;
+    vtkProp3D *prop3d = nullptr;
     do
     {
       prop3d = collection->GetNextProp3D();
@@ -441,25 +441,25 @@ vtkAbstractMapper3D *mitk::UnstructuredGridMapper2D::GetVtkAbstractMapper3D(mitk
       return dynamic_cast<vtkAbstractMapper3D *>(volume->GetMapper());
     }
   }
-  return 0;
+  return nullptr;
 }
 
 vtkPointSet *mitk::UnstructuredGridMapper2D::GetVtkPointSet(mitk::BaseRenderer *renderer, int time)
 {
   // MITK_INFO << "GETVTKPOINTSET\n";
   vtkAbstractMapper3D *abstractMapper = GetVtkAbstractMapper3D(renderer);
-  if (abstractMapper == 0)
+  if (abstractMapper == nullptr)
   {
     // try to get data from the node
     mitk::DataNode::ConstPointer node = this->GetDataNode();
     if (node.IsNull())
-      return 0;
+      return nullptr;
     mitk::BaseData::Pointer data = node->GetData();
     mitk::UnstructuredGrid::Pointer grid = dynamic_cast<mitk::UnstructuredGrid *>(data.GetPointer());
     if (!grid.IsNull())
       return static_cast<vtkPointSet *>(grid->GetVtkUnstructuredGrid(time));
 
-    return 0;
+    return nullptr;
   }
   else
   {
@@ -475,7 +475,7 @@ vtkPointSet *mitk::UnstructuredGridMapper2D::GetVtkPointSet(mitk::BaseRenderer *
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 vtkScalarsToColors *mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer *renderer)
@@ -488,13 +488,13 @@ vtkScalarsToColors *mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
   {
     mitk::DataNode::ConstPointer node = this->GetDataNode();
     if (node.IsNull())
-      return 0;
+      return nullptr;
 
     mitk::VtkMapper::Pointer mitkMapper = dynamic_cast<mitk::VtkMapper *>(node->GetMapper(2));
     if (mitkMapper.IsNull())
     {
       // MITK_INFO << "mitkMapper is null\n";
-      return 0;
+      return nullptr;
     }
 
     mitkMapper->Update(renderer);
@@ -511,20 +511,20 @@ vtkScalarsToColors *mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
     {
       // MITK_INFO << "found assembly prop\n";
       mitk::TransferFunctionProperty::Pointer transferFuncProp;
-      node->GetProperty(transferFuncProp, "TransferFunction", 0);
+      node->GetProperty(transferFuncProp, "TransferFunction", nullptr);
       if (transferFuncProp.IsNotNull())
       {
         MITK_INFO << "return colortransferfunction\n";
         return static_cast<vtkScalarsToColors *>(transferFuncProp->GetValue()->GetColorTransferFunction());
       }
     }
-    return 0;
+    return nullptr;
   }
 }
 
 bool mitk::UnstructuredGridMapper2D::IsConvertibleToVtkPointSet(mitk::BaseRenderer *renderer)
 {
-  return (GetVtkPointSet(renderer, this->GetTimestep()) != 0);
+  return (GetVtkPointSet(renderer, this->GetTimestep()) != nullptr);
 }
 
 mitk::UnstructuredGridMapper2D::UnstructuredGridMapper2D()
@@ -534,9 +534,9 @@ mitk::UnstructuredGridMapper2D::UnstructuredGridMapper2D()
 
   m_Slicer->SetSlicePlane(m_Plane);
 
-  m_ScalarsToColors = 0;
-  m_ScalarsToOpacity = 0;
-  m_VtkPointSet = 0;
+  m_ScalarsToColors = nullptr;
+  m_ScalarsToOpacity = nullptr;
+  m_VtkPointSet = nullptr;
 
   // m_LUT = vtkLookupTable::New();
   // m_LUT->SetTableRange( 0, 255 );
@@ -550,10 +550,10 @@ mitk::UnstructuredGridMapper2D::~UnstructuredGridMapper2D()
   m_Slicer->Delete();
   m_Plane->Delete();
 
-  if (m_ScalarsToOpacity != 0)
-    m_ScalarsToOpacity->UnRegister(0);
-  if (m_ScalarsToColors != 0)
-    m_ScalarsToColors->UnRegister(0);
-  if (m_VtkPointSet != 0)
-    m_VtkPointSet->UnRegister(0);
+  if (m_ScalarsToOpacity != nullptr)
+    m_ScalarsToOpacity->UnRegister(nullptr);
+  if (m_ScalarsToColors != nullptr)
+    m_ScalarsToColors->UnRegister(nullptr);
+  if (m_VtkPointSet != nullptr)
+    m_VtkPointSet->UnRegister(nullptr);
 }

@@ -28,10 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-// offset which moves the planarfigures on top of the other content
-// the crosshair is rendered into the z = 1 layer.
-static const float PLANAR_OFFSET = 0.5f;
-
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false), m_Initialized(false)
 {

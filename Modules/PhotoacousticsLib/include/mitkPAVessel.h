@@ -84,7 +84,6 @@ namespace mitk {
 
       const double MINIMUM_VESSEL_RADIUS = 1;
       const double SCALING_FACTOR = 0.33;
-      const double VESSEL_BIFURCATION_VARIATION_SIGMA = 0.2;
       const double NEW_RADIUS_MINIMUM_RELATIVE_SIZE = 0.6;
       const double NEW_RADIUS_MAXIMUM_RELATIVE_SIZE = 0.8;
 

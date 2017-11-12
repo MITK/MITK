@@ -166,7 +166,7 @@ namespace itk
   protected:
     ContourExtractor2DImageFilter();
     virtual ~ContourExtractor2DImageFilter();
-    void PrintSelf(std::ostream &os, Indent indent) const;
+    void PrintSelf(std::ostream &os, Indent indent) const override;
 
     void GenerateData();
 

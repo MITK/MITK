@@ -204,8 +204,11 @@ void mitk::PickingTool::StartRegionGrowing(itk::Image<TPixel, VImageDimension> *
   regionGrower->SetInput(itkImage);
   regionGrower->AddSeed(seedIndex);
 
-  regionGrower->SetLower(1);
-  regionGrower->SetUpper(255);
+  // TODO: conversion added to silence warning and
+  // maintain existing behaviour, should be fixed
+  // since it's not correct e.g. for signed char
+  regionGrower->SetLower(static_cast<typename InputImageType::PixelType>(1));
+  regionGrower->SetUpper(static_cast<typename InputImageType::PixelType>(255));
 
   try
   {

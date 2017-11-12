@@ -44,7 +44,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_TestVector = mitk::pa::Vector::New();
     m_TestReturnVector = mitk::pa::Vector::New();
@@ -250,7 +250,7 @@ public:
     }
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_TestVector = nullptr;
     m_TestReturnVector = nullptr;

@@ -30,7 +30,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
   }
 
@@ -75,7 +75,7 @@ public:
     }
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 };

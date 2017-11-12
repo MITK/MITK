@@ -40,7 +40,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_SlicedVolumeGenerator = nullptr;
     m_DefaultParameters = mitk::pa::TissueGeneratorParameters::New();
@@ -178,7 +178,7 @@ public:
     AssertYSliceValue(slicedFluence, 2, m_DefaultParameters->GetBackgroundAbsorption());
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_SlicedVolumeGenerator = nullptr;
   }

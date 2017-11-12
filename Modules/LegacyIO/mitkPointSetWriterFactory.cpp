@@ -42,7 +42,7 @@ namespace mitk
 
   protected:
     CreatePointSetWriter() {}
-    ~CreatePointSetWriter() {}
+    ~CreatePointSetWriter() override {}
   private:
     CreatePointSetWriter(const Self &); // purposely not implemented
     void operator=(const Self &);       // purposely not implemented

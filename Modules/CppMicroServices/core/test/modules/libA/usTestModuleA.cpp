@@ -56,7 +56,7 @@ class TestModuleAActivator : public ModuleActivator
 public:
 
   TestModuleAActivator() : s(0) {}
-  ~TestModuleAActivator() { delete s; }
+  ~TestModuleAActivator() override { delete s; }
 
   void Load(ModuleContext* context) override
   {

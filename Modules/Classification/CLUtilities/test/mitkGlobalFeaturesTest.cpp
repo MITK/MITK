@@ -138,7 +138,7 @@ private:
 
 public:
 
-  void setUp(void)
+  void setUp(void) override
   {
     // Load Image Data
     m_Image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Pic3D.nrrd"))[0].GetPointer());

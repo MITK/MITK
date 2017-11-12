@@ -53,7 +53,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_LightSource = mitk::pa::LightSource::New();
     LoadXmlFile("pointsource.xml", &m_XmlProbePointSource);
@@ -228,7 +228,7 @@ public:
     }
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_XmlProbePointSource = "";
     m_XmlProbeCircleSource = "";

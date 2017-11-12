@@ -44,7 +44,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_TissueGeneratorParameters = mitk::pa::TissueGeneratorParameters::New();
     m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters);
@@ -338,7 +338,7 @@ public:
     CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 3) < mitk::eps);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_PhotoacousticVolume = nullptr;
   }

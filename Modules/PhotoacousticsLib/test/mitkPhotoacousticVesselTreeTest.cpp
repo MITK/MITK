@@ -40,7 +40,7 @@ public:
   Vessel::CalculateNewVesselPositionCallback m_StraightLine;
   InSilicoTissueVolume::Pointer m_TestInSilicoVolume;
 
-  void setUp()
+  void setUp() override
   {
     m_VesselProperties = VesselProperties::New();
     m_Tree = VesselTree::New(m_VesselProperties);
@@ -98,7 +98,7 @@ public:
     CPPUNIT_ASSERT(i < 999);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 };

@@ -34,7 +34,7 @@ public:
 
   mitk::pa::Volume::Pointer m_Volume;
 
-  void setUp()
+  void setUp() override
   {
   }
 
@@ -63,7 +63,7 @@ public:
       std::to_string((((double)negativecounter) / size) * 100) + "%)", negativecounter, 0);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 };

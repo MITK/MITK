@@ -40,7 +40,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
   }
 
@@ -215,7 +215,7 @@ public:
     AssertIndexException(18, 1, 222);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Photoacoustic3dVolume = nullptr;
   }

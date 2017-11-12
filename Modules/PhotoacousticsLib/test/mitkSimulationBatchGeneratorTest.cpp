@@ -35,7 +35,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_Parameters = mitk::pa::SimulationBatchGeneratorParameters::New();
     m_Parameters->SetBinaryPath("binary");
@@ -80,7 +80,7 @@ public:
       && itksys::SystemTools::FileIsDirectory(TEST_FOLDER_PATH + m_Parameters->GetTissueName() + "000"));
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Parameters = nullptr;
     CPPUNIT_ASSERT_MESSAGE("Resource leak of test files onto hard drive..", itksys::SystemTools::RemoveADirectory(TEST_FOLDER_PATH) == true);

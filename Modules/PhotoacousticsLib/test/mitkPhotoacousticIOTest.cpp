@@ -52,7 +52,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_VolumeProperties = createTestVolumeParameters();
     m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_VolumeProperties);
@@ -178,7 +178,7 @@ public:
     assertEqual(fcm4, map[mitk::pa::IOUtil::Position{ 1,1 }]);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     //CPPUNIT_ASSERT_MESSAGE("Resource leak of test files onto hard drive..", itksys::SystemTools::RemoveADirectory(TEST_FOLDER_PATH) == true);
   }

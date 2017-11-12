@@ -32,7 +32,7 @@ namespace mitk
     mitkClassMacro(ClippingPropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       if (const ClippingProperty *prop = dynamic_cast<const ClippingProperty *>(m_Property.GetPointer()))
       {
@@ -61,7 +61,7 @@ namespace mitk
         return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
@@ -119,7 +119,7 @@ namespace mitk
 
   protected:
     ClippingPropertySerializer() {}
-    virtual ~ClippingPropertySerializer() {}
+    ~ClippingPropertySerializer() override {}
   };
 } // namespace
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')

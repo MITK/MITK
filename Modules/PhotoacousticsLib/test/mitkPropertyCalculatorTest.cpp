@@ -29,7 +29,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_PropertyCalculator = mitk::pa::PropertyCalculator::New();
   }
@@ -70,7 +70,7 @@ public:
     }
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_PropertyCalculator = nullptr;
   }

@@ -41,7 +41,7 @@ namespace mitk
 
   protected:
     CreatePlanarFigureWriter() {}
-    ~CreatePlanarFigureWriter() {}
+    ~CreatePlanarFigureWriter() override {}
   private:
     CreatePlanarFigureWriter(const Self &); // purposely not implemented
     void operator=(const Self &);           // purposely not implemented

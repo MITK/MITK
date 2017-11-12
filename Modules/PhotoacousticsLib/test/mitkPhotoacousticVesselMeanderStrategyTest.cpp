@@ -37,7 +37,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_TestVector = mitk::pa::VesselMeanderStrategy::New();
     m_TestPostion = mitk::pa::Vector::New();
@@ -103,7 +103,7 @@ public:
     }
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_TestVector = nullptr;
     m_TestPostion = nullptr;

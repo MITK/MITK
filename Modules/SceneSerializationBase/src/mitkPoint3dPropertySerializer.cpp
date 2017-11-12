@@ -30,7 +30,7 @@ namespace mitk
     mitkClassMacro(Point3dPropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       if (const Point3dProperty *prop = dynamic_cast<const Point3dProperty *>(m_Property.GetPointer()))
       {
@@ -47,7 +47,7 @@ namespace mitk
         return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
@@ -76,7 +76,7 @@ namespace mitk
 
   protected:
     Point3dPropertySerializer() {}
-    virtual ~Point3dPropertySerializer() {}
+    ~Point3dPropertySerializer() override {}
   };
 
 } // namespace

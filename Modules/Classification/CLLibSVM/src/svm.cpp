@@ -254,13 +254,13 @@ public:
 class Kernel: public QMatrix {
 public:
   Kernel(int l, svm_node * const * x, const svm_parameter& param);
-  virtual ~Kernel();
+  ~Kernel() override;
 
   static double k_function(const svm_node *x, const svm_node *y,
                            const svm_parameter& param);
-  virtual Qfloat *get_Q(int column, int len) const = 0;
-  virtual double *get_QD() const = 0;
-  virtual void swap_index(int i, int j) const // no so const...
+  Qfloat *get_Q(int column, int len) const override = 0;
+  double *get_QD() const override = 0;
+  void swap_index(int i, int j) const override // no so const...
   {
     swap(x[i],x[j]);
     if(x_square) swap(x_square[i],x_square[j]);
@@ -1072,10 +1072,10 @@ public:
   }
 private:
   SolutionInfo *si;
-  int select_working_set(int &i, int &j);
-  double calculate_rho();
+  int select_working_set(int &i, int &j) override;
+  double calculate_rho() override;
   bool be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4);
-  void do_shrinking();
+  void do_shrinking() override;
 };
 
 // return 1 if already optimal, return 0 otherwise
@@ -1329,7 +1329,7 @@ public:
       QD[i] = (this->*kernel_function)(i,i);
   }
 
-  Qfloat *get_Q(int i, int len) const
+  Qfloat *get_Q(int i, int len) const override
   {
     Qfloat *data;
     int start, j;
@@ -1341,12 +1341,12 @@ public:
     return data;
   }
 
-  double *get_QD() const
+  double *get_QD() const override
   {
     return QD;
   }
 
-  void swap_index(int i, int j) const
+  void swap_index(int i, int j) const override
   {
     cache->swap_index(i,j);
     Kernel::swap_index(i,j);
@@ -1354,7 +1354,7 @@ public:
     swap(QD[i],QD[j]);
   }
 
-  ~SVC_Q()
+  ~SVC_Q() override
   {
     delete[] y;
     delete cache;
@@ -1378,7 +1378,7 @@ public:
       QD[i] = (this->*kernel_function)(i,i);
   }
 
-  Qfloat *get_Q(int i, int len) const
+  Qfloat *get_Q(int i, int len) const override
   {
     Qfloat *data;
     int start, j;
@@ -1390,19 +1390,19 @@ public:
     return data;
   }
 
-  double *get_QD() const
+  double *get_QD() const override
   {
     return QD;
   }
 
-  void swap_index(int i, int j) const
+  void swap_index(int i, int j) const override
   {
     cache->swap_index(i,j);
     Kernel::swap_index(i,j);
     swap(QD[i],QD[j]);
   }
 
-  ~ONE_CLASS_Q()
+  ~ONE_CLASS_Q() override
   {
     delete cache;
     delete[] QD;
@@ -1437,14 +1437,14 @@ public:
     next_buffer = 0;
   }
 
-  void swap_index(int i, int j) const
+  void swap_index(int i, int j) const override
   {
     swap(sign[i],sign[j]);
     swap(index[i],index[j]);
     swap(QD[i],QD[j]);
   }
 
-  Qfloat *get_Q(int i, int len) const
+  Qfloat *get_Q(int i, int len) const override
   {
     Qfloat *data;
     int j, real_i = index[i];
@@ -1463,12 +1463,12 @@ public:
     return buf;
   }
 
-  double *get_QD() const
+  double *get_QD() const override
   {
     return QD;
   }
 
-  ~SVR_Q()
+  ~SVR_Q() override
   {
     delete cache;
     delete[] sign;

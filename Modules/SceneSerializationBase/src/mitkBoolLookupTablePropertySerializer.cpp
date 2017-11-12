@@ -29,7 +29,7 @@ namespace mitk
     mitkClassMacro(BoolLookupTablePropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       const BoolLookupTableProperty *prop = dynamic_cast<const BoolLookupTableProperty *>(m_Property.GetPointer());
       if (prop == nullptr)
@@ -53,7 +53,7 @@ namespace mitk
       return element;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
@@ -74,7 +74,7 @@ namespace mitk
 
   protected:
     BoolLookupTablePropertySerializer() {}
-    virtual ~BoolLookupTablePropertySerializer() {}
+    ~BoolLookupTablePropertySerializer() override {}
   };
 } // namespace
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')

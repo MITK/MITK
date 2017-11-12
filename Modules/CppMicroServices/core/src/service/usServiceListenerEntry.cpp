@@ -43,7 +43,7 @@ public:
     }
   }
 
-  ~ServiceListenerEntryData()
+  ~ServiceListenerEntryData() override
   {
   }
 

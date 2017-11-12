@@ -43,7 +43,7 @@ public:
 
   }
 
-  ~ActivatorSL1()
+  ~ActivatorSL1() override
   {
     delete tracker;
   }

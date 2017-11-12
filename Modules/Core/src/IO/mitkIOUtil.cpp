@@ -285,7 +285,7 @@ namespace mitk
     struct FixedReaderOptionsFunctor : public ReaderOptionsFunctorBase
     {
       FixedReaderOptionsFunctor(const IFileReader::Options &options) : m_Options(options) {}
-      virtual bool operator()(LoadInfo &loadInfo) const override
+      bool operator()(LoadInfo &loadInfo) const override
       {
         IFileReader *reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
         if (reader)
@@ -302,7 +302,7 @@ namespace mitk
     struct FixedWriterOptionsFunctor : public WriterOptionsFunctorBase
     {
       FixedWriterOptionsFunctor(const IFileReader::Options &options) : m_Options(options) {}
-      virtual bool operator()(SaveInfo &saveInfo) const override
+      bool operator()(SaveInfo &saveInfo) const override
       {
         IFileWriter *writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
         if (writer)

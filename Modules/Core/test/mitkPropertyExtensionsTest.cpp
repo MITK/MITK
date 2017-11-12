@@ -28,7 +28,7 @@ public:
   std::string GetName() const { return m_Name; }
 private:
   explicit TestPropertyExtension(const std::string &name) : m_Name(name) {}
-  ~TestPropertyExtension() {}
+  ~TestPropertyExtension() override {}
   std::string m_Name;
 };
 

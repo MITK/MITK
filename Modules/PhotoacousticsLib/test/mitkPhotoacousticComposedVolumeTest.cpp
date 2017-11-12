@@ -39,7 +39,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_DefaultParameters = mitk::pa::TissueGeneratorParameters::New();
     m_DefaultParameters->SetXDim(5);
@@ -139,7 +139,7 @@ public:
     CPPUNIT_ASSERT(caughtException);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_ComposedVolume = nullptr;
   }

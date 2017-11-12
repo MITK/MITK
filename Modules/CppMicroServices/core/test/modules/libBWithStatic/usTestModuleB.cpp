@@ -43,7 +43,7 @@ class TestModuleBActivator : public ModuleActivator
 public:
 
   TestModuleBActivator() : s(0) {}
-  ~TestModuleBActivator() { delete s; }
+  ~TestModuleBActivator() override { delete s; }
 
   void Load(ModuleContext* context) override
   {

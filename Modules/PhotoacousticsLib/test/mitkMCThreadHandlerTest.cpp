@@ -46,7 +46,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
   }
 
@@ -72,7 +72,7 @@ public:
 
       //Assert that the time error is less than 10% in a 500ms sample size
       //This test might not be stable when on different machines.
-      CPPUNIT_ASSERT(abs((timeAfter - timeBefore) - m_NumberOrTime) <= 50);
+      CPPUNIT_ASSERT(std::abs((timeAfter - timeBefore) - m_NumberOrTime) <= 50);
     }
   }
 
@@ -115,7 +115,7 @@ public:
     CPPUNIT_ASSERT(numberOfPhotonsSimulated == m_NumberOrTime);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_MonteCarloThreadHandler = nullptr;
   }

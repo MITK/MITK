@@ -120,7 +120,7 @@ public:
     /** Run-time type information (and related methods). */
     itkTypeMacro(FixedNiftiImageIO, Superclass)
 
-      virtual bool SupportsDimension(unsigned long dim) override
+      bool SupportsDimension(unsigned long dim) override
   {
     return dim > 1 && dim < 5;
   }

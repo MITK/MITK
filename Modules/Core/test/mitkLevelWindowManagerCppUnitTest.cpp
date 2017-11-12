@@ -37,7 +37,7 @@ private:
   mitk::Image::Pointer m_mitkImageComponent2;
 
 public:
-  void setUp()
+  void setUp() override
   {
     typedef itk::Image<double, 3> ImageType;
     typedef itk::ImageRegionIterator<ImageType> ImageIteratorType;

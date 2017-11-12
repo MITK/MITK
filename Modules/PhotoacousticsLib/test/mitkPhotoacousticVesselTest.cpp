@@ -41,7 +41,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     auto params = mitk::pa::VesselProperties::New();
     m_TestVessel = mitk::pa::Vessel::New(params);
@@ -161,7 +161,7 @@ public:
     CPPUNIT_ASSERT(bifurcationVessel->CanBifurcate() == false);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 };

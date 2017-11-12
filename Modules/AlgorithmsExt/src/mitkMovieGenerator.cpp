@@ -77,7 +77,7 @@ bool mitk::MovieGenerator::WriteMovie()
     }
     int imgSize = 3 * m_width * m_height;
     printf("Video size = %i x %i\n", m_width, m_height);
-    GLbyte *data = new GLbyte[imgSize];
+    auto *data = new GLbyte[imgSize];
 
     // duplicate steps if pingPong option is switched to on.
     unsigned int numOfSteps = m_stepper->GetSteps();
@@ -116,7 +116,7 @@ bool mitk::MovieGenerator::WriteCurrentFrameToMovie()
       return false;
     }
     int imgSize = 3 * m_width * m_height;
-    GLbyte *data = new GLbyte[imgSize];
+    auto *data = new GLbyte[imgSize];
 
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
     glReadPixels(5, 5, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void *)data);

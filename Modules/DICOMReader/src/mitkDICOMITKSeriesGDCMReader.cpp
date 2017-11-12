@@ -79,7 +79,7 @@ mitk::DICOMITKSeriesGDCMReader& mitk::DICOMITKSeriesGDCMReader::
 
 bool mitk::DICOMITKSeriesGDCMReader::operator==( const DICOMFileReader& other ) const
 {
-  if ( const Self* otherSelf = dynamic_cast<const Self*>( &other ) )
+  if ( const auto* otherSelf = dynamic_cast<const Self*>( &other ) )
   {
     if ( this->m_FixTiltByShearing == otherSelf->m_FixTiltByShearing
          && *( this->m_EquiDistantBlocksSorter ) == *( otherSelf->m_EquiDistantBlocksSorter )

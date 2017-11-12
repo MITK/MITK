@@ -63,7 +63,7 @@ void
       double value = inputIter.GetPixel(i);
       value -=  offset;
       value /= delta;
-      int pos = (int)(value);
+      auto pos = (int)(value);
       pos = std::max(0, std::min(10, pos));
       iterVector[pos].SetCenterPixel(iterVector[pos].GetCenterPixel() + 1);
     }

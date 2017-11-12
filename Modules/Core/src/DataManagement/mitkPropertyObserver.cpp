@@ -49,7 +49,7 @@ namespace mitk
   {
     if (m_Property)
     {
-      mitk::BaseProperty *prop = const_cast<mitk::BaseProperty *>(m_Property);
+      auto *prop = const_cast<mitk::BaseProperty *>(m_Property);
       prop->RemoveObserver(m_ModifiedTag);
       prop->RemoveObserver(m_DeleteTag);
       m_Property = nullptr;
@@ -72,7 +72,7 @@ namespace mitk
     PropertyRemoved();
     if (m_Property)
     {
-      mitk::BaseProperty *prop = const_cast<mitk::BaseProperty *>(m_Property);
+      auto *prop = const_cast<mitk::BaseProperty *>(m_Property);
       prop->RemoveObserver(m_ModifiedTag);
       prop->RemoveObserver(m_DeleteTag);
       m_Property = nullptr;

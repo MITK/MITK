@@ -294,7 +294,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
   // slices through 3d cells usually do not generated
   // polygons with more than 6 vertices
   const int maxPolySize = 10;
-  Point2D *cachedPoints = new Point2D[maxPolySize * numberOfPolys];
+  auto *cachedPoints = new Point2D[maxPolySize * numberOfPolys];
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -405,7 +405,7 @@ vtkAbstractMapper3D *mitk::UnstructuredGridMapper2D::GetVtkAbstractMapper3D(mitk
 
   mitkMapper->Update(renderer);
 
-  vtkAssembly *assembly = dynamic_cast<vtkAssembly *>(mitkMapper->GetVtkProp(renderer));
+  auto *assembly = dynamic_cast<vtkAssembly *>(mitkMapper->GetVtkProp(renderer));
   if (assembly)
   {
     vtkProp3DCollection *collection = assembly->GetParts();
@@ -414,13 +414,13 @@ vtkAbstractMapper3D *mitk::UnstructuredGridMapper2D::GetVtkAbstractMapper3D(mitk
     do
     {
       prop3d = collection->GetNextProp3D();
-      vtkActor *actor = dynamic_cast<vtkActor *>(prop3d);
+      auto *actor = dynamic_cast<vtkActor *>(prop3d);
       if (actor)
       {
         return dynamic_cast<vtkAbstractMapper3D *>(actor->GetMapper());
       }
 
-      vtkVolume *volume = dynamic_cast<vtkVolume *>(prop3d);
+      auto *volume = dynamic_cast<vtkVolume *>(prop3d);
       if (volume)
       {
         return dynamic_cast<vtkAbstractMapper3D *>(volume->GetMapper());
@@ -429,13 +429,13 @@ vtkAbstractMapper3D *mitk::UnstructuredGridMapper2D::GetVtkAbstractMapper3D(mitk
   }
   else
   {
-    vtkActor *actor = dynamic_cast<vtkActor *>(mitkMapper->GetVtkProp(renderer));
+    auto *actor = dynamic_cast<vtkActor *>(mitkMapper->GetVtkProp(renderer));
     if (actor)
     {
       return dynamic_cast<vtkAbstractMapper3D *>(actor->GetMapper());
     }
 
-    vtkVolume *volume = dynamic_cast<vtkVolume *>(mitkMapper->GetVtkProp(renderer));
+    auto *volume = dynamic_cast<vtkVolume *>(mitkMapper->GetVtkProp(renderer));
     if (volume)
     {
       return dynamic_cast<vtkAbstractMapper3D *>(volume->GetMapper());
@@ -463,12 +463,12 @@ vtkPointSet *mitk::UnstructuredGridMapper2D::GetVtkPointSet(mitk::BaseRenderer *
   }
   else
   {
-    vtkMapper *mapper = dynamic_cast<vtkMapper *>(abstractMapper);
+    auto *mapper = dynamic_cast<vtkMapper *>(abstractMapper);
     if (mapper)
     {
       return dynamic_cast<vtkPointSet *>(mapper->GetInput());
     }
-    vtkAbstractVolumeMapper *volMapper = dynamic_cast<vtkAbstractVolumeMapper *>(abstractMapper);
+    auto *volMapper = dynamic_cast<vtkAbstractVolumeMapper *>(abstractMapper);
     if (volMapper)
     {
       return dynamic_cast<vtkPointSet *>(volMapper->GetDataSetInput());
@@ -481,7 +481,7 @@ vtkPointSet *mitk::UnstructuredGridMapper2D::GetVtkPointSet(mitk::BaseRenderer *
 vtkScalarsToColors *mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer *renderer)
 {
   // MITK_INFO << "GETVTKLUT\n";
-  vtkMapper *mapper = dynamic_cast<vtkMapper *>(GetVtkAbstractMapper3D(renderer));
+  auto *mapper = dynamic_cast<vtkMapper *>(GetVtkAbstractMapper3D(renderer));
   if (mapper)
     return mapper->GetLookupTable();
   else
@@ -499,14 +499,14 @@ vtkScalarsToColors *mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
 
     mitkMapper->Update(renderer);
 
-    vtkVolume *volume = dynamic_cast<vtkVolume *>(mitkMapper->GetVtkProp(renderer));
+    auto *volume = dynamic_cast<vtkVolume *>(mitkMapper->GetVtkProp(renderer));
     if (volume)
     {
       // MITK_INFO << "found volume prop\n";
       return static_cast<vtkScalarsToColors *>(volume->GetProperty()->GetRGBTransferFunction());
     }
 
-    vtkAssembly *assembly = dynamic_cast<vtkAssembly *>(mitkMapper->GetVtkProp(renderer));
+    auto *assembly = dynamic_cast<vtkAssembly *>(mitkMapper->GetVtkProp(renderer));
     if (assembly)
     {
       // MITK_INFO << "found assembly prop\n";

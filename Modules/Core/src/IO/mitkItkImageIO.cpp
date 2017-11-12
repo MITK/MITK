@@ -191,7 +191,7 @@ namespace mitk
    * If MetaData is not valid or cannot be converted an empty vector is returned.*/
   std::vector<TimePointType> ConvertMetaDataObjectToTimePointList(const itk::MetaDataObjectBase *data)
   {
-    const itk::MetaDataObject<std::string> *timeGeometryTimeData =
+    const auto *timeGeometryTimeData =
       dynamic_cast<const itk::MetaDataObject<std::string> *>(data);
     std::vector<TimePointType> result;
 
@@ -356,7 +356,7 @@ namespace mitk
         {
           ArbitraryTimeGeometry::Pointer arbitraryTimeGeometry = ArbitraryTimeGeometry::New();
           TimePointVector::const_iterator pos = timePoints.begin();
-          TimePointVector::const_iterator prePos = pos++;
+          auto prePos = pos++;
 
           for (; pos != timePoints.end(); ++prePos, ++pos)
           {
@@ -381,7 +381,7 @@ namespace mitk
     buffer = nullptr;
     MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents() << std::endl;
 
-    for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End(); iter != iterEnd;
+    for (auto iter = dictionary.Begin(), iterEnd = dictionary.End(); iter != iterEnd;
          ++iter)
     {
       if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
@@ -467,7 +467,7 @@ namespace mitk
 
   void ItkImageIO::Write()
   {
-    const mitk::Image *image = dynamic_cast<const mitk::Image *>(this->GetInput());
+    const auto *image = dynamic_cast<const mitk::Image *>(this->GetInput());
 
     if (image == nullptr)
     {
@@ -578,7 +578,7 @@ namespace mitk
       m_ImageIO->SetFileName(path);
 
       // Handle time geometry
-      const ArbitraryTimeGeometry *arbitraryTG = dynamic_cast<const ArbitraryTimeGeometry *>(image->GetTimeGeometry());
+      const auto *arbitraryTG = dynamic_cast<const ArbitraryTimeGeometry *>(image->GetTimeGeometry());
       if (arbitraryTG)
       {
         itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(),
@@ -634,7 +634,7 @@ namespace mitk
   AbstractFileIO::ConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
   {
     // Check if the image dimension is supported
-    const Image *image = dynamic_cast<const Image *>(this->GetInput());
+    const auto *image = dynamic_cast<const Image *>(this->GetInput());
     if (image == nullptr)
     {
       // We cannot write a null object, DUH!

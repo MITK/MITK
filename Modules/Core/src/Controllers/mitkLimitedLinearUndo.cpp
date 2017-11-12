@@ -41,7 +41,7 @@ void mitk::LimitedLinearUndo::ClearList(UndoContainer *list)
 
 bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem *stackItem)
 {
-  OperationEvent *operationEvent = dynamic_cast<OperationEvent *>(stackItem);
+  auto *operationEvent = dynamic_cast<OperationEvent *>(stackItem);
   if (!operationEvent)
     return false;
 
@@ -185,7 +185,7 @@ mitk::OperationEvent *mitk::LimitedLinearUndo::GetLastOfType(OperationActor *des
   // When/where is this function needed? In CoordinateSupplier...
   for (auto iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter)
   {
-    OperationEvent *opEvent = dynamic_cast<OperationEvent *>(*iter);
+    auto *opEvent = dynamic_cast<OperationEvent *>(*iter);
     if (!opEvent)
       continue;
 

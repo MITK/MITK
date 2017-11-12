@@ -32,10 +32,10 @@ mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::
     unsigned int zDim = parameters->GetZDim();
     m_TDim = 4;
     unsigned int size = xDim * yDim * zDim;
-    double* absorptionArray = new double[size];
-    double* scatteringArray = new double[size];
-    double* anisotropyArray = new double[size];
-    double* segmentationArray = new double[size];
+    auto* absorptionArray = new double[size];
+    auto* scatteringArray = new double[size];
+    auto* anisotropyArray = new double[size];
+    auto* segmentationArray = new double[size];
 
     for (unsigned int index = 0; index < size; index++)
     {
@@ -120,7 +120,7 @@ mitk::Image::Pointer mitk::pa::InSilicoTissueVolume::ConvertToMitkImage()
 {
   mitk::Image::Pointer resultImage = mitk::Image::New();
   mitk::PixelType TPixel = mitk::MakeScalarPixelType<double>();
-  unsigned int* dimensionsOfImage = new unsigned int[4];
+  auto* dimensionsOfImage = new unsigned int[4];
 
   // Copy dimensions
   dimensionsOfImage[0] = m_TissueParameters->GetYDim();

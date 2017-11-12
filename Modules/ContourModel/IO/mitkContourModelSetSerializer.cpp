@@ -31,7 +31,7 @@ mitk::ContourModelSetSerializer::~ContourModelSetSerializer()
 
 std::string mitk::ContourModelSetSerializer::Serialize()
 {
-  const ContourModelSet *contourSet = dynamic_cast<const ContourModelSet *>(m_Data.GetPointer());
+  const auto *contourSet = dynamic_cast<const ContourModelSet *>(m_Data.GetPointer());
   if (!contourSet)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data

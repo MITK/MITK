@@ -250,7 +250,7 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
   /// Although the double value returned by GetExtent() holds a round number,
   /// you need to add 0.5 to safely convert it to unsigned it. I have seen a
   /// case when the result was less by one without this.
-  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis) + 0.5);
+  auto slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis) + 0.5);
 
 #ifndef NDEBUG
   int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);
@@ -363,7 +363,7 @@ void mitk::SlicedGeometry3D::ReinitializePlanes(const Point3D &center, const Poi
   // new slice stack.
   double referencePointDistance = firstPlane->SignedDistanceFromPlane(referencePoint);
 
-  int referencePointSlice = static_cast<int>(referencePointDistance / spacing[2]);
+  auto referencePointSlice = static_cast<int>(referencePointDistance / spacing[2]);
 
   double alignmentValue = referencePointDistance / spacing[2] - referencePointSlice;
 
@@ -654,7 +654,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
           // Save first slice
           PlaneGeometry::Pointer geometry2D = m_PlaneGeometries[0];
 
-          RotationOperation *rotOp = dynamic_cast<RotationOperation *>(operation);
+          auto *rotOp = dynamic_cast<RotationOperation *>(operation);
 
           // Generate a RotationOperation using the dataset center instead of
           // the supplied rotation center. This is necessary so that the rotated
@@ -699,7 +699,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
             }
 
             // rotate overall geometry
-            RotationOperation *rotOp = dynamic_cast<RotationOperation *>(operation);
+            auto *rotOp = dynamic_cast<RotationOperation *>(operation);
             BaseGeometry::ExecuteOperation(rotOp);
           }
         }
@@ -718,7 +718,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
       if (m_EvenlySpaced)
       {
         // get operation data
-        PlaneOperation *planeOp = dynamic_cast<PlaneOperation *>(operation);
+        auto *planeOp = dynamic_cast<PlaneOperation *>(operation);
 
         // Get first slice
         PlaneGeometry::Pointer planeGeometry = m_PlaneGeometries[0];
@@ -856,7 +856,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
         // Save first slice
         PlaneGeometry::Pointer planeGeometry = m_PlaneGeometries[0];
 
-        RestorePlanePositionOperation *restorePlaneOp = dynamic_cast<RestorePlanePositionOperation *>(operation);
+        auto *restorePlaneOp = dynamic_cast<RestorePlanePositionOperation *>(operation);
 
         // Need a PlaneGeometry, a PlaneOperation and a reference frame to
         // carry out the re-orientation

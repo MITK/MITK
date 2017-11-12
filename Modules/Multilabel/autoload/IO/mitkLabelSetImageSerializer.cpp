@@ -33,7 +33,7 @@ mitk::LabelSetImageSerializer::~LabelSetImageSerializer()
 
 std::string mitk::LabelSetImageSerializer::Serialize()
 {
-  const LabelSetImage *image = dynamic_cast<const LabelSetImage *>(m_Data.GetPointer());
+  const auto *image = dynamic_cast<const LabelSetImage *>(m_Data.GetPointer());
   if (image == nullptr)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data

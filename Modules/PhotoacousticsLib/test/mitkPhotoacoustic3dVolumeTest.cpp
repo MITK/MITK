@@ -60,7 +60,7 @@ public:
 
   void TestCallingConstructorWithCorrectParameters()
   {
-    double* data = new double[1];
+    auto* data = new double[1];
     data[0] = 3;
     m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
     CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetData(0, 0, 0) == 3);
@@ -71,7 +71,7 @@ public:
 
   void TestModifyImage()
   {
-    double* data = new double[1];
+    auto* data = new double[1];
     data[0] = 3;
     m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_Photoacoustic3dVolume->GetData(0, 0, 0)), m_Photoacoustic3dVolume->GetData(0, 0, 0) == 3);
@@ -85,7 +85,7 @@ public:
     unsigned int yDim = 7;
     unsigned int zDim = 12;
     unsigned int length = xDim * yDim * zDim;
-    double* data = new double[length];
+    auto* data = new double[length];
     for (unsigned int i = 0; i < length; i++)
       data[i] = 5;
 
@@ -107,7 +107,7 @@ public:
     unsigned int yDim = 7;
     unsigned int zDim = 12;
     unsigned int length = xDim * yDim * zDim;
-    double* data = new double[length];
+    auto* data = new double[length];
     for (unsigned int i = 0; i < length; i++)
       data[i] = 0;
 
@@ -125,7 +125,7 @@ public:
 
   void TestConvertToMitkImage()
   {
-    double* data = new double[6];
+    auto* data = new double[6];
     data[0] = 3;
     data[1] = 3;
     data[2] = 3;
@@ -156,7 +156,7 @@ public:
     CPPUNIT_ASSERT(mitkImage->GetDimensions()[2] == 3);
 
     mitk::ImageReadAccessor readAccess(mitkImage, mitkImage->GetVolumeData());
-    double* copyData = (double*)readAccess.GetData();
+    auto* copyData = (double*)readAccess.GetData();
     CPPUNIT_ASSERT_MESSAGE(std::to_string(copyData[0]), copyData[0] == 17);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(copyData[1]), copyData[1] == 17);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(copyData[2]), copyData[2] == 3);
@@ -167,7 +167,7 @@ public:
 
   void TestDeepCopy()
   {
-    double* data = new double[1];
+    auto* data = new double[1];
     data[0] = 3;
     m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
     mitk::pa::Volume::Pointer copiedVolume = m_Photoacoustic3dVolume->DeepCopy();
@@ -205,7 +205,7 @@ public:
 
   void TestCatchException()
   {
-    double* data = new double[1];
+    auto* data = new double[1];
     data[0] = 3;
     m_Photoacoustic3dVolume = mitk::pa::Volume::New(data, 1, 1, 1);
 

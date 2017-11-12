@@ -94,7 +94,7 @@ vtkUnstructuredGrid *mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int
 
 void mitk::UnstructuredGrid::Graft(const DataObject *data)
 {
-  const UnstructuredGrid *grid = dynamic_cast<const UnstructuredGrid *>(data);
+  const auto *grid = dynamic_cast<const UnstructuredGrid *>(data);
 
   if (grid == nullptr)
     mitkThrow() << "Data object used to graft surface is not a mitk::Surface.";

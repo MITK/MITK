@@ -91,7 +91,7 @@ namespace mitk
     for (it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
       const IndexType &index = it.GetIndex();
-      unsigned int pixel = static_cast<unsigned int>(it.Get());
+      auto pixel = static_cast<unsigned int>(it.Get());
 
       if (m_VolumeVector.size() <= pixel)
       {

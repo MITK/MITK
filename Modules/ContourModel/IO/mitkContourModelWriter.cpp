@@ -181,8 +181,8 @@ void mitk::ContourModelWriter::WriteXML(const mitk::ContourModel *contourModel, 
     /*++++ <controlPoints> ++++*/
     WriteStartElement(XML_CONTROL_POINTS, out);
 
-    mitk::ContourModel::VertexIterator it = contourModel->IteratorBegin();
-    mitk::ContourModel::VertexIterator end = contourModel->IteratorEnd();
+    auto it = contourModel->IteratorBegin();
+    auto end = contourModel->IteratorEnd();
 
     while (it != end)
     {
@@ -280,10 +280,10 @@ void mitk::ContourModelWriter::WriteStartElementWithAttribut(const char *const t
 
   if (attributesSize == valuesSize)
   {
-    std::vector<std::string>::iterator attributesIt = attributes.begin();
-    std::vector<std::string>::iterator end = attributes.end();
+    auto attributesIt = attributes.begin();
+    auto end = attributes.end();
 
-    std::vector<std::string>::iterator valuesIt = values.begin();
+    auto valuesIt = values.begin();
 
     while (attributesIt != end)
     {

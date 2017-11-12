@@ -89,7 +89,7 @@ mitk::ScalarType *mitk::ExtractSliceFilter::GetOutputSpacing()
 
 void mitk::ExtractSliceFilter::GenerateData()
 {
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  auto *input = const_cast<mitk::Image *>(this->GetInput());
 
   if (!input)
   {
@@ -132,11 +132,11 @@ void mitk::ExtractSliceFilter::GenerateData()
   double widthInMM, heightInMM;
   Vector2D extent;
 
-  const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry);
+  const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(m_WorldGeometry);
   // Code for curved planes, mostly taken 1:1 from imageVtkMapper2D and not tested yet.
   // Do we have an AbstractTransformGeometry?
   // This is the case for AbstractTransformGeometry's (e.g. a ThinPlateSplineCurvedGeometry )
-  const mitk::AbstractTransformGeometry *abstractGeometry =
+  const auto *abstractGeometry =
     dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry);
 
   if (abstractGeometry != nullptr)

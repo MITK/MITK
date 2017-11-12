@@ -82,7 +82,7 @@ public:
       itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
     CPPUNIT_ASSERT_EQUAL(size_t(1), allSerializers.size());
 
-    mitk::BasePropertySerializer *serializer =
+    auto *serializer =
       dynamic_cast<mitk::BasePropertySerializer *>(allSerializers.begin()->GetPointer());
     CPPUNIT_ASSERT(serializer != nullptr);
     if (!serializer)

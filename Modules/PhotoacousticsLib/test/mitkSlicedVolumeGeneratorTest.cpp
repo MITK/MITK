@@ -57,7 +57,7 @@ public:
 
   mitk::pa::Volume::Pointer CreatePrecorrectionVolume()
   {
-    double* data = new double[27];
+    auto* data = new double[27];
     for (int i = 0; i < 27; ++i)
       data[i] = 0.5;
     return mitk::pa::Volume::New(data, 3, 3, 3);
@@ -74,7 +74,7 @@ public:
 
   mitk::pa::FluenceYOffsetPair::Pointer CreateValidationPair(double yOffset, int start)
   {
-    double* data = new double[27];
+    auto* data = new double[27];
     mitk::pa::Volume::Pointer fluenceVolume = mitk::pa::Volume::New(data, 3, 3, 3);
 
     FillYSliceWith(fluenceVolume, 0, start + 0);

@@ -114,7 +114,7 @@ std::vector<mitk::IFileReader *> mitk::FileReaderRegistry::GetReaders(const Mime
 
 void mitk::FileReaderRegistry::UngetReader(mitk::IFileReader *reader)
 {
-  std::map<mitk::IFileReader *, us::ServiceObjects<mitk::IFileReader>>::iterator readerIter =
+  auto readerIter =
     m_ServiceObjects.find(reader);
   if (readerIter != m_ServiceObjects.end())
   {

@@ -137,7 +137,7 @@ std::vector<mitk::IFileWriter *> mitk::FileWriterRegistry::GetWriters(const mitk
 
 void mitk::FileWriterRegistry::UngetWriter(mitk::IFileWriter *writer)
 {
-  std::map<mitk::IFileWriter *, us::ServiceObjects<mitk::IFileWriter>>::iterator writerIter =
+  auto writerIter =
     m_ServiceObjects.find(writer);
   if (writerIter != m_ServiceObjects.end())
   {

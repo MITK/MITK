@@ -94,8 +94,8 @@ std::pair<bool, mitk::TemporoSpatialStringProperty::ValueType> mitk::TemporoSpat
   std::string value = "";
   bool found = false;
 
-  TimeMapType::const_iterator timeIter = m_Values.find(timeStep);
-  TimeMapType::const_iterator timeEnd = m_Values.end();
+  auto timeIter = m_Values.find(timeStep);
+  auto timeEnd = m_Values.end();
   if (timeIter == timeEnd && allowCloseTime)
   { // search for closest time step (earlier preverd)
     timeIter = m_Values.upper_bound(timeStep);
@@ -109,8 +109,8 @@ std::pair<bool, mitk::TemporoSpatialStringProperty::ValueType> mitk::TemporoSpat
   {
     const SliceMapType &slices = timeIter->second;
 
-    SliceMapType::const_iterator sliceIter = slices.find(zSlice);
-    SliceMapType::const_iterator sliceEnd = slices.end();
+    auto sliceIter = slices.find(zSlice);
+    auto sliceEnd = slices.end();
     if (sliceIter == sliceEnd && allowCloseSlice)
     { // search for closest slice (earlier preverd)
       sliceIter = slices.upper_bound(zSlice);
@@ -178,8 +178,8 @@ std::vector<mitk::TemporoSpatialStringProperty::IndexValueType> mitk::TemporoSpa
 {
   std::vector<IndexValueType> result;
 
-  TimeMapType::const_iterator timeIter = m_Values.find(timeStep);
-  TimeMapType::const_iterator timeEnd = m_Values.end();
+  auto timeIter = m_Values.find(timeStep);
+  auto timeEnd = m_Values.end();
 
   if (timeIter != timeEnd)
   {
@@ -208,8 +208,8 @@ void mitk::TemporoSpatialStringProperty::SetValue(const TimeStepType &timeStep,
                                                   const IndexValueType &zSlice,
                                                   const ValueType &value)
 {
-  TimeMapType::iterator timeIter = m_Values.find(timeStep);
-  TimeMapType::iterator timeEnd = m_Values.end();
+  auto timeIter = m_Values.find(timeStep);
+  auto timeEnd = m_Values.end();
 
   if (timeIter == timeEnd)
   {
@@ -299,7 +299,7 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
   // by the writer, so e.g. it becomes "t":"2" instaed of "t":2
   // If this problem is fixed with boost, we shoud switch back to json_writer (and remove the custom
   // implementation of CreateJSONEscapes (see above)).
-  const mitk::TemporoSpatialStringProperty *tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty *>(prop);
+  const auto *tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty *>(prop);
 
   if (!tsProp)
   {

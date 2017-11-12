@@ -42,7 +42,7 @@ itk::SimpleFastMutexLock testMutex;
 ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
 {
   /* extract data pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)data;
+  auto *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)data;
 
   // some data validity checking
   if (pInfo == nullptr)
@@ -55,7 +55,7 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
   }
 
   // obtain user data for processing
-  ThreadData *threadData = (ThreadData *)pInfo->UserData;
+  auto *threadData = (ThreadData *)pInfo->UserData;
 
   srand(pInfo->ThreadID);
 
@@ -222,7 +222,7 @@ int mitkImageAccessorTest(int argc, char *argv[])
   itk::Barrier::Pointer barrier = itk::Barrier::New();
   barrier->Initialize(noOfThreads + 1); // add one for we stop the base thread when the worker threads are processing
 
-  ThreadData *threadData = new ThreadData;
+  auto *threadData = new ThreadData;
   threadData->m_Barrier = barrier;
   threadData->m_NoOfThreads = noOfThreads;
   threadData->data = image;

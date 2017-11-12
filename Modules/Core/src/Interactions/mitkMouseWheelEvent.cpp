@@ -64,7 +64,7 @@ mitk::MouseWheelEvent::~MouseWheelEvent()
 
 bool mitk::MouseWheelEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::MouseWheelEvent &mwe = static_cast<const MouseWheelEvent &>(interactionEvent);
+  const auto &mwe = static_cast<const MouseWheelEvent &>(interactionEvent);
   return ((this->GetWheelDelta() * mwe.GetWheelDelta() >=
            0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
           &&

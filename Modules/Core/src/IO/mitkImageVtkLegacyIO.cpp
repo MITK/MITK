@@ -78,7 +78,7 @@ namespace mitk
   {
     ValidateOutputLocation();
 
-    const Image *input = dynamic_cast<const Image *>(this->GetInput());
+    const auto *input = dynamic_cast<const Image *>(this->GetInput());
 
     vtkSmartPointer<vtkStructuredPointsWriter> writer = vtkSmartPointer<vtkStructuredPointsWriter>::New();
 
@@ -105,7 +105,7 @@ namespace mitk
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
-    const Image *input = static_cast<const Image *>(this->GetInput());
+    const auto *input = static_cast<const Image *>(this->GetInput());
     if (input->GetDimension() == 3)
       return Supported;
     else if (input->GetDimension() < 3)

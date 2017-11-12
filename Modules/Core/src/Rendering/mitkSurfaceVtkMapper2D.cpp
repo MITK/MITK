@@ -134,7 +134,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   if (!visible)
     return;
 
-  mitk::Surface *surface = static_cast<mitk::Surface *>(node->GetData());
+  auto *surface = static_cast<mitk::Surface *>(node->GetData());
   if (surface == nullptr)
     return;
 
@@ -176,7 +176,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
   const DataNode *node = GetDataNode();
-  Surface *surface = static_cast<Surface *>(node->GetData());
+  auto *surface = static_cast<Surface *>(node->GetData());
   const TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 

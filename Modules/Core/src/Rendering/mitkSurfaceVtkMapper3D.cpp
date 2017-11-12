@@ -454,7 +454,7 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty(mitk::BaseRenderer *rend
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  ClippingProperty *clippingProperty = dynamic_cast<ClippingProperty *>(property);
+  auto *clippingProperty = dynamic_cast<ClippingProperty *>(property);
 
   if ((clippingProperty != nullptr) && (clippingProperty->GetClippingEnabled()))
   {

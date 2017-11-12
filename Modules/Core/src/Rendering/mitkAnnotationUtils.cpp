@@ -82,7 +82,7 @@ namespace mitk
 
   void AnnotationUtils::RenderWindowCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
     if (!renderWindow)
       return;
     BaseRenderer *renderer = BaseRenderer::GetInstance(renderWindow);

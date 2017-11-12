@@ -181,7 +181,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
     plane, inputGeometry->GetSpacing()[2], output->GetSlicedGeometry()->GetSlices());
 
   mitk::TimeGeometry *timeSlicedGeometry = output->GetTimeGeometry();
-  mitk::ProportionalTimeGeometry *propTimeGeometry = dynamic_cast<ProportionalTimeGeometry *>(timeSlicedGeometry);
+  auto *propTimeGeometry = dynamic_cast<ProportionalTimeGeometry *>(timeSlicedGeometry);
   propTimeGeometry->Initialize(slicedGeometry, output->GetDimension(3));
 
   m_TimeOfHeaderInitialization.Modified();

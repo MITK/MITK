@@ -447,9 +447,9 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
   if (!needGenerateData)
   {
-    mitk::FloatProperty *pointSizeProp =
+    auto *pointSizeProp =
       dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
-    mitk::FloatProperty *contourSizeProp =
+    auto *contourSizeProp =
       dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
 
     bool useVertexRendering = false;

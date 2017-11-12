@@ -184,7 +184,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     if (m_TextCollection.size() > 0)
     {
       m_TextRenderer->SetViewport(this->GetVtkRenderer()->GetViewport());
-      for (TextMapType::iterator it = m_TextCollection.begin(); it != m_TextCollection.end(); ++it)
+      for (auto it = m_TextCollection.begin(); it != m_TextCollection.end(); ++it)
         m_TextRenderer->AddViewProp((*it).second);
       m_TextRenderer->Render();
     }
@@ -269,7 +269,7 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode *datatreenode)
       {
         mapper->Update(this);
         {
-          VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper.GetPointer());
+          auto *vtkmapper = dynamic_cast<VtkMapper *>(mapper.GetPointer());
           if (vtkmapper != nullptr)
           {
             vtkmapper->UpdateVtkTransform(this);
@@ -322,7 +322,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow *renderWindow)
 
 void mitk::VtkPropRenderer::RenderingCallback(vtkObject *caller, unsigned long, void *, void *)
 {
-  vtkRenderWindowInteractor *renderWindowInteractor = dynamic_cast<vtkRenderWindowInteractor *>(caller);
+  auto *renderWindowInteractor = dynamic_cast<vtkRenderWindowInteractor *>(caller);
   if (!renderWindowInteractor)
     return;
   mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(renderWindowInteractor->GetRenderWindow());
@@ -445,7 +445,7 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
     if (!pickable)
       continue;
 
-    VtkMapper *mapper = dynamic_cast<VtkMapper *>(node->GetMapper(m_MapperID));
+    auto *mapper = dynamic_cast<VtkMapper *>(node->GetMapper(m_MapperID));
     if (mapper == nullptr)
       continue;
 
@@ -481,7 +481,7 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
     if (mapper == nullptr)
       continue;
 
-    mitk::VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
+    auto *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
 
     if (vtkmapper)
     {
@@ -524,13 +524,13 @@ void mitk::VtkPropRenderer::UpdatePaths()
     m_Paths = vtkSmartPointer<vtkAssemblyPaths>::New();
 
     DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
-    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter)
+    for (auto iter = objects->begin(); iter != objects->end(); ++iter)
     {
       vtkSmartPointer<vtkAssemblyPath> onePath = vtkSmartPointer<vtkAssemblyPath>::New();
       Mapper *mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
       if (mapper)
       {
-        VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
+        auto *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
         {
           vtkProp *prop = vtkmapper->GetVtkProp(this);
           if (prop && prop->GetVisibility())
@@ -564,7 +564,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
     return;
 
   DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
-  for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin(); iter != allObjects->end(); ++iter)
+  for (auto iter = allObjects->begin(); iter != allObjects->end(); ++iter)
   {
     DataNode::Pointer node = *iter;
     if (node.IsNull())
@@ -574,7 +574,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
 
     if (mapper)
     {
-      VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
+      auto *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
 
       if (vtkmapper)
         vtkmapper->ReleaseGraphicsResources(this);

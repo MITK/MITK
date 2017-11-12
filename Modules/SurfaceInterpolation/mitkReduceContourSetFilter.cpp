@@ -62,7 +62,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
 
   for (unsigned int i = 0; i < numberOfInputs; i++)
   {
-    mitk::Surface *currentSurface = const_cast<mitk::Surface *>(this->GetInput(i));
+    auto *currentSurface = const_cast<mitk::Surface *>(this->GetInput(i));
     vtkSmartPointer<vtkPolyData> polyData = currentSurface->GetVtkPolyData();
 
     newPolyData = vtkSmartPointer<vtkPolyData>::New();

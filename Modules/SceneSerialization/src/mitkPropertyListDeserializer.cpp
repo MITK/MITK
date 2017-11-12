@@ -67,7 +67,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
 
   for (auto iter = readers.begin(); iter != readers.end(); ++iter)
   {
-    if (PropertyListDeserializer *reader = dynamic_cast<PropertyListDeserializer *>(iter->GetPointer()))
+    if (auto *reader = dynamic_cast<PropertyListDeserializer *>(iter->GetPointer()))
     {
       reader->SetFilename(m_Filename);
       bool success = reader->Deserialize();

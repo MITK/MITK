@@ -70,7 +70,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
 
     for (auto iter = readers.begin(); iter != readers.end(); ++iter)
     {
-      if (BasePropertySerializer *reader = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
+      if (auto *reader = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
       {
         BaseProperty::Pointer property = reader->Deserialize(propertyElement->FirstChildElement());
         if (property.IsNotNull())

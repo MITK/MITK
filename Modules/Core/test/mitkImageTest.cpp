@@ -538,7 +538,7 @@ int mitkImageTest(int argc, char *argv[])
   }
 
   // clone generated 3D image with one slice in z direction (cf. bug 11058)
-  unsigned int *threeDdim = new unsigned int[3];
+  auto *threeDdim = new unsigned int[3];
   threeDdim[0] = 100;
   threeDdim[1] = 200;
   threeDdim[2] = 1;

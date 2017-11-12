@@ -170,7 +170,7 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(
     return false;
 
   // Read the first point of the contour
-  ContourModel::VertexIterator contourIter = projectedContour->Begin();
+  auto contourIter = projectedContour->Begin();
   if (contourIter == projectedContour->End())
     return false;
   itk::Index<2> previousIndex;
@@ -183,7 +183,7 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(
   int countOfSegments = 1;
 
   bool firstSegment = true;
-  ContourModel::VertexIterator contourEnd = projectedContour->End();
+  auto contourEnd = projectedContour->End();
   for (; contourIter != contourEnd; ++contourIter)
   {
     // Get current point

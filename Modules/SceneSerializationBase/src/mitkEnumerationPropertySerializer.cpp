@@ -20,7 +20,7 @@ namespace mitk
 {
   TiXmlElement *EnumerationPropertySerializer::Serialize()
   {
-    if (const EnumerationProperty *prop = dynamic_cast<const EnumerationProperty *>(m_Property.GetPointer()))
+    if (const auto *prop = dynamic_cast<const EnumerationProperty *>(m_Property.GetPointer()))
     {
       auto element = new TiXmlElement("enum");
       element->SetAttribute("value", prop->GetValueAsString());

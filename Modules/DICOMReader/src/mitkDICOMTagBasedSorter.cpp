@@ -148,7 +148,7 @@ bool
 mitk::DICOMTagBasedSorter
 ::operator==(const DICOMDatasetSorter& other) const
 {
-  if (const DICOMTagBasedSorter* otherSelf = dynamic_cast<const DICOMTagBasedSorter*>(&other))
+  if (const auto* otherSelf = dynamic_cast<const DICOMTagBasedSorter*>(&other))
   {
     if (this->m_StrictSorting != otherSelf->m_StrictSorting) return false;
     if (this->m_ExpectDistanceOne != otherSelf->m_ExpectDistanceOne) return false;

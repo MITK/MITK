@@ -237,8 +237,8 @@ void mitk::PicFileReader::ConvertHandedness(mitkIpPicDescriptor *pic)
 
     for (v = 0; v < volumes; ++v)
     {
-      unsigned char *p_first = (unsigned char *)pic->data;
-      unsigned char *p_last = (unsigned char *)pic->data;
+      auto *p_first = (unsigned char *)pic->data;
+      auto *p_last = (unsigned char *)pic->data;
       p_first += v * volume_size;
       p_last += size * (pic->n[2] - 1) + v * volume_size;
 

@@ -38,7 +38,7 @@ mitk::DiffImageApplier::~DiffImageApplier()
 
 void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
 {
-  ApplyDiffImageOperation *imageOperation = dynamic_cast<ApplyDiffImageOperation *>(operation);
+  auto *imageOperation = dynamic_cast<ApplyDiffImageOperation *>(operation);
   if (imageOperation // we actually have the kind of operation that we can handle
       &&
       imageOperation->IsImageStillValid()) // AND the image is not yet deleted

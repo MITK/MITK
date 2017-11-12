@@ -120,7 +120,7 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
 
 bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarSubdivisionPolygon *otherSubDivPoly = dynamic_cast<const mitk::PlanarSubdivisionPolygon *>(&other);
+  const auto *otherSubDivPoly = dynamic_cast<const mitk::PlanarSubdivisionPolygon *>(&other);
   if (otherSubDivPoly)
   {
     if (this->m_SubdivisionRounds != otherSubDivPoly->m_SubdivisionRounds)
@@ -143,12 +143,12 @@ int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint(int indexOfP
     return -1;
 
   mitk::PlanarFigure::ControlPointListType::const_iterator elem;
-  mitk::PlanarFigure::ControlPointListType::const_iterator first = m_ControlPoints.cbegin();
-  mitk::PlanarFigure::ControlPointListType::const_iterator end = m_ControlPoints.cend();
+  auto first = m_ControlPoints.cbegin();
+  auto end = m_ControlPoints.cend();
 
   mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter;
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineEnd = polyLine.cend();
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineStart = polyLine.cbegin();
+  auto polyLineEnd = polyLine.cend();
+  auto polyLineStart = polyLine.cbegin();
   polyLineStart += indexOfPolylinePoint;
 
   for (polyLineIter = polyLineStart; polyLineIter != polyLineEnd; ++polyLineIter)

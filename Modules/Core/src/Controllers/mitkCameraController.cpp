@@ -141,7 +141,7 @@ void mitk::CameraController::SetViewToCaudal()
 
 void mitk::CameraController::SetStandardView(mitk::CameraController::StandardView view)
 {
-  const mitk::VtkPropRenderer *glRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(m_Renderer);
+  const auto *glRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(m_Renderer);
   if (glRenderer == nullptr)
     return;
   vtkRenderer *vtkRenderer = glRenderer->GetVtkRenderer();

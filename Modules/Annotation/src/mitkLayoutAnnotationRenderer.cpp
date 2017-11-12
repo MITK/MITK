@@ -79,7 +79,7 @@ namespace mitk
       if (!annotation)
         continue;
       BaseProperty *prop = annotation->GetProperty(PROP_LAYOUT_ALIGNMENT);
-      EnumerationProperty *enumProb = dynamic_cast<EnumerationProperty *>(prop);
+      auto *enumProb = dynamic_cast<EnumerationProperty *>(prop);
       Alignment currentAlignment = TopLeft;
       Point2D margin;
       margin.Fill(5);

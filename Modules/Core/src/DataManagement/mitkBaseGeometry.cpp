@@ -534,7 +534,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
       break;
     case OpMOVE:
     {
-      mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+      auto *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
       if (pointOp == nullptr)
       {
         MITK_ERROR << "Point move operation is null!";
@@ -550,7 +550,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
     }
     case OpSCALE:
     {
-      mitk::ScaleOperation *scaleOp = dynamic_cast<mitk::ScaleOperation *>(operation);
+      auto *scaleOp = dynamic_cast<mitk::ScaleOperation *>(operation);
       if (scaleOp == nullptr)
       {
         MITK_ERROR << "Scale operation is null!";
@@ -573,7 +573,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
     }
     case OpROTATE:
     {
-      mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
+      auto *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
       if (rotateOp == nullptr)
       {
         MITK_ERROR << "Rotation operation is null!";
@@ -601,7 +601,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
     }
     case OpAPPLYTRANSFORMMATRIX:
     {
-      ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast<ApplyTransformMatrixOperation *>(operation);
+      auto *applyMatrixOp = dynamic_cast<ApplyTransformMatrixOperation *>(operation);
       vtktransform->SetMatrix(applyMatrixOp->GetMatrix());
       break;
     }

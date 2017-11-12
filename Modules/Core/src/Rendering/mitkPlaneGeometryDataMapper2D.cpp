@@ -183,7 +183,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
   // (for the gap at the point where they intersect). A change in any of the
   // other PlaneGeometryData nodes could mean that we render ourself
   // differently, so we check for that here.
-  for (AllInstancesContainer::iterator it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
+  for (auto it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
   {
     bool generateDataRequired = ls->IsGenerateDataRequired(renderer, this, (*it)->GetDataNode());
     if (generateDataRequired)
@@ -195,7 +195,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
   // Collect all other PlaneGeometryDatas that are being mapped by this mapper
   m_OtherPlaneGeometries.clear();
 
-  for (AllInstancesContainer::iterator it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
+  for (auto it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
   {
     Self *otherInstance = *it;
 
@@ -211,11 +211,11 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
     if (!otherNode->IsVisible(renderer))
       continue;
 
-    PlaneGeometryData *otherData = dynamic_cast<PlaneGeometryData *>(otherNode->GetData());
+    auto *otherData = dynamic_cast<PlaneGeometryData *>(otherNode->GetData());
     if (!otherData)
       continue;
 
-    PlaneGeometry *otherGeometry = dynamic_cast<PlaneGeometry *>(otherData->GetPlaneGeometry());
+    auto *otherGeometry = dynamic_cast<PlaneGeometry *>(otherData->GetPlaneGeometry());
     if (otherGeometry && !dynamic_cast<AbstractTransformGeometry *>(otherData->GetPlaneGeometry()))
     {
       m_OtherPlaneGeometries.push_back(otherNode);
@@ -253,9 +253,9 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     return; // nothing to do in this case
   }
 
-  const PlaneGeometry *inputPlaneGeometry = dynamic_cast<const PlaneGeometry *>(input->GetPlaneGeometry());
+  const auto *inputPlaneGeometry = dynamic_cast<const PlaneGeometry *>(input->GetPlaneGeometry());
 
-  const PlaneGeometry *worldPlaneGeometry =
+  const auto *worldPlaneGeometry =
     dynamic_cast<const PlaneGeometry *>(rendererWorldPlaneGeometryData->GetPlaneGeometry());
 
   if (worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(worldPlaneGeometry) == nullptr &&
@@ -291,8 +291,8 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       // calculate the positions of intersection with the line to be
       // rendered; these positions will be stored in lineParams to form a
       // gap afterwards.
-      NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
-      NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
+      auto otherPlanesIt = m_OtherPlaneGeometries.begin();
+      auto otherPlanesEnd = m_OtherPlaneGeometries.end();
 
       int gapSize = 32;
       this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, nullptr);
@@ -315,7 +315,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
             continue;
           }
 
-          PlaneGeometry *otherPlaneGeometry = static_cast<PlaneGeometry *>(
+          auto *otherPlaneGeometry = static_cast<PlaneGeometry *>(
             static_cast<PlaneGeometryData *>((*otherPlanesIt)->GetData())->GetPlaneGeometry());
 
           if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)

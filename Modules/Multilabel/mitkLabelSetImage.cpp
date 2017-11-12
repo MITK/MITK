@@ -619,7 +619,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *
 
   while (!sourceIter.IsAtEnd())
   {
-    PixelType sourceValue = static_cast<PixelType>(sourceIter.Get());
+    auto sourceValue = static_cast<PixelType>(sourceIter.Get());
     targetIter.Set(sourceValue);
 
     if (!this->ExistLabel(sourceValue))

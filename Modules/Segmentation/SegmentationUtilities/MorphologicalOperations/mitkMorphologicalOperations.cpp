@@ -33,7 +33,7 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Closing...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -70,7 +70,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Erode...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -107,7 +107,7 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Dilate...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -144,7 +144,7 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Opening...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -179,7 +179,7 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
 {
   MITK_INFO << "Start FillHole...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {

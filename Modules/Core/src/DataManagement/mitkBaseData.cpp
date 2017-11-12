@@ -222,7 +222,7 @@ void mitk::BaseData::Graft(const itk::DataObject *)
 
 void mitk::BaseData::CopyInformation(const itk::DataObject *data)
 {
-  const Self *bd = dynamic_cast<const Self *>(data);
+  const auto *bd = dynamic_cast<const Self *>(data);
   if (bd != nullptr)
   {
     m_PropertyList = bd->GetPropertyList()->Clone();
@@ -281,7 +281,7 @@ void mitk::BaseData::PrintSelf(std::ostream &os, itk::Indent indent) const
     os << "Properties of BaseData:" << std::endl;
 
     const PropertyList::PropertyMap *map = propertyList->GetMap();
-    for (PropertyList::PropertyMap::const_iterator iter = map->begin(); iter != map->end(); ++iter)
+    for (auto iter = map->begin(); iter != map->end(); ++iter)
     {
       os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;
     }

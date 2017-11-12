@@ -66,7 +66,7 @@ int mitkRotatedSlice4DTest(int, char *argv[])
     rotationAxis.Normalize();
 
     // Create Rotation Operation
-    mitk::RotationOperation *op = new mitk::RotationOperation(mitk::OpROTATE, point, rotationAxis, angle);
+    auto *op = new mitk::RotationOperation(mitk::OpROTATE, point, rotationAxis, angle);
     plane->ExecuteOperation(op);
     delete op;
 

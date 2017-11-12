@@ -49,7 +49,7 @@ int mitkContourMapper2DTest(int /*argc*/, char * /*argv*/ [])
 
   contourMapper->SetDataNode(node);
   contourMapper->Update(nullptr);
-  mitk::Contour *testContour = (mitk::Contour *)contourMapper->GetInput();
+  auto *testContour = (mitk::Contour *)contourMapper->GetInput();
   std::cout << testContour << std::endl;
 
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();

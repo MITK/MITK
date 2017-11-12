@@ -38,10 +38,10 @@ static void TestContourModel(mitk::ContourModel *contour, std::string fileName)
   MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfVertices() == contour2->GetNumberOfVertices(),
                                "contours have the same number of vertices");
 
-  mitk::ContourModel::VertexIterator it = contour2->IteratorBegin();
-  mitk::ContourModel::VertexIterator end = contour2->IteratorEnd();
+  auto it = contour2->IteratorBegin();
+  auto end = contour2->IteratorEnd();
 
-  mitk::ContourModel::VertexIterator it2 = contour2->IteratorBegin();
+  auto it2 = contour2->IteratorBegin();
 
   bool areEqual = true;
 

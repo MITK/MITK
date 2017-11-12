@@ -296,7 +296,7 @@ void mitk::PlanarEllipse::PrintSelf(std::ostream &os, itk::Indent indent) const
 
 bool mitk::PlanarEllipse::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarEllipse *otherEllipse = dynamic_cast<const mitk::PlanarEllipse *>(&other);
+  const auto *otherEllipse = dynamic_cast<const mitk::PlanarEllipse *>(&other);
   if (otherEllipse)
   {
     if (this->m_TreatAsCircle != otherEllipse->m_TreatAsCircle)

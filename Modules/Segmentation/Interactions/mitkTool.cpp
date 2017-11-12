@@ -122,11 +122,11 @@ void mitk::Tool::Activated()
   m_DisplayInteractorConfigs.clear();
   std::vector<us::ServiceReference<InteractionEventObserver>> listEventObserver =
     us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-  for (std::vector<us::ServiceReference<InteractionEventObserver>>::iterator it = listEventObserver.begin();
+  for (auto it = listEventObserver.begin();
        it != listEventObserver.end();
        ++it)
   {
-    DisplayInteractor *displayInteractor =
+    auto *displayInteractor =
       dynamic_cast<DisplayInteractor *>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
     if (displayInteractor != nullptr)
     {
@@ -142,7 +142,7 @@ void mitk::Tool::Deactivated()
 {
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
-  for (std::map<us::ServiceReferenceU, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
+  for (auto it = m_DisplayInteractorConfigs.begin();
        it != m_DisplayInteractorConfigs.end();
        ++it)
   {
@@ -168,7 +168,7 @@ itk::Object::Pointer mitk::Tool::GetGUI(const std::string &toolkitPrefix, const 
   std::string guiClassname = toolkitPrefix + classname + toolkitPostfix;
 
   std::list<itk::LightObject::Pointer> allGUIs = itk::ObjectFactoryBase::CreateAllInstance(guiClassname.c_str());
-  for (std::list<itk::LightObject::Pointer>::iterator iter = allGUIs.begin(); iter != allGUIs.end(); ++iter)
+  for (auto iter = allGUIs.begin(); iter != allGUIs.end(); ++iter)
   {
     if (object.IsNull())
     {

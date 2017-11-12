@@ -438,7 +438,7 @@ mitk::ColorProperty::Pointer mitk::DataNodeFactory::DefaultColorForOrgan(const s
     lowercaseOrgan[i] = tolower(lowercaseOrgan[i]);
   }
 
-  std::map<std::string, std::string>::iterator iter = s_ColorMap.find(lowercaseOrgan);
+  auto iter = s_ColorMap.find(lowercaseOrgan);
   if (iter != s_ColorMap.end())
   {
     std::string hexColor = iter->second;

@@ -167,7 +167,7 @@ const mitk::DataNode::GroupTagList mitk::DataStorage::GetGroupTags() const
        nodeIt++) // for each node
   {
     mitk::PropertyList *pl = nodeIt.Value()->GetPropertyList();
-    for (mitk::PropertyList::PropertyMap::const_iterator propIt = pl->GetMap()->begin(); propIt != pl->GetMap()->end();
+    for (auto propIt = pl->GetMap()->begin(); propIt != pl->GetMap()->end();
          ++propIt)
       if (dynamic_cast<mitk::GroupTagProperty *>(propIt->second.GetPointer()) != nullptr)
         result.insert(propIt->first);
@@ -188,7 +188,7 @@ void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataNode *node)
 
 void mitk::DataStorage::OnNodeInteractorChanged(itk::Object *caller, const itk::EventObject &)
 {
-  const mitk::DataNode *_Node = dynamic_cast<const mitk::DataNode *>(caller);
+  const auto *_Node = dynamic_cast<const mitk::DataNode *>(caller);
   if (_Node)
   {
     InteractorChangedNodeEvent.Send(_Node);
@@ -200,10 +200,10 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted(const itk::Object *caller, const
   if (m_BlockNodeModifiedEvents)
     return;
 
-  const mitk::DataNode *_Node = dynamic_cast<const mitk::DataNode *>(caller);
+  const auto *_Node = dynamic_cast<const mitk::DataNode *>(caller);
   if (_Node)
   {
-    const itk::ModifiedEvent *modEvent = dynamic_cast<const itk::ModifiedEvent *>(&event);
+    const auto *modEvent = dynamic_cast<const itk::ModifiedEvent *>(&event);
     if (modEvent)
       ChangedNodeEvent.Send(_Node);
     else
@@ -215,7 +215,7 @@ void mitk::DataStorage::AddListeners(const mitk::DataNode *_Node)
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
   // node must not be 0 and must not be yet registered
-  mitk::DataNode *NonConstNode = const_cast<mitk::DataNode *>(_Node);
+  auto *NonConstNode = const_cast<mitk::DataNode *>(_Node);
   if (_Node && m_NodeModifiedObserverTags.find(NonConstNode) == m_NodeModifiedObserverTags.end())
   {
     itk::MemberCommand<mitk::DataStorage>::Pointer nodeModifiedCommand = itk::MemberCommand<mitk::DataStorage>::New();
@@ -240,7 +240,7 @@ void mitk::DataStorage::RemoveListeners(const mitk::DataNode *_Node)
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
   // node must not be 0 and must be registered
-  mitk::DataNode *NonConstNode = const_cast<mitk::DataNode *>(_Node);
+  auto *NonConstNode = const_cast<mitk::DataNode *>(_Node);
   if (_Node && m_NodeModifiedObserverTags.find(NonConstNode) != m_NodeModifiedObserverTags.end())
   {
     // const cast is bad! but sometimes it is necessary. removing an observer does not really

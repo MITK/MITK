@@ -47,7 +47,7 @@ void mitk::PlyFileWriterService::Write()
   writer->SetFileTypeToBinary();
   writer->SetFileName(GetOutputLocation().c_str());
 
-  const mitk::Surface *surface = static_cast<const mitk::Surface *>(this->GetInput());
+  const auto *surface = static_cast<const mitk::Surface *>(this->GetInput());
   writer->SetInputDataObject(surface->GetVtkPolyData());
 
   writer->Write();

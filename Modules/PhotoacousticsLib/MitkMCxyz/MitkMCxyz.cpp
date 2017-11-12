@@ -769,11 +769,11 @@ int main(int argc, char * argv[]) {
   allInput.LoadValues(inputFilename, yOffset, normalizationFilename, simulatePVFC);
 
   std::vector<ReturnValues> allValues(concurentThreadsSupported);
-  std::thread* threads = new std::thread[concurentThreadsSupported];
+  auto* threads = new std::thread[concurentThreadsSupported];
 
   for (long i = 0; i < concurentThreadsSupported; i++)
   {
-    ReturnValues* tmp = new ReturnValues();
+    auto* tmp = new ReturnValues();
     allValues.push_back(*tmp);
   }
 
@@ -825,7 +825,7 @@ int main(int argc, char * argv[]) {
   if (!simulatePVFC)
   {
     if (verbose) std::cout << "Allocating memory for normal simulation result ... ";
-    double* finalTotalFluence = (double *)malloc(allInput.totalNumberOfVoxels * sizeof(double));
+    auto* finalTotalFluence = (double *)malloc(allInput.totalNumberOfVoxels * sizeof(double));
     if (verbose) std::cout << "[OK]" << std::endl;
     if (verbose) std::cout << "Cleaning memory for normal simulation result ...";
     for (int i = 0; i < allInput.totalNumberOfVoxels; i++) {
@@ -860,7 +860,7 @@ int main(int argc, char * argv[]) {
 
     mitk::Image::Pointer resultImage = mitk::Image::New();
     mitk::PixelType TPixel = mitk::MakeScalarPixelType<double>();
-    unsigned int* dimensionsOfImage = new unsigned int[3];
+    auto* dimensionsOfImage = new unsigned int[3];
 
     // Copy dimensions
     dimensionsOfImage[0] = allInput.Ny;
@@ -942,7 +942,7 @@ int main(int argc, char * argv[]) {
     outputFilename = outputFileBase + "_p" + detectorname.str().c_str();
 
     mitk::Image::Pointer pvfcImage = mitk::Image::New();
-    unsigned int* dimensionsOfPvfcImage = new unsigned int[3];
+    auto* dimensionsOfPvfcImage = new unsigned int[3];
 
     // Copy dimensions
     dimensionsOfPvfcImage[0] = allInput.Ny;

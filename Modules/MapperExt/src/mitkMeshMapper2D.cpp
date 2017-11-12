@@ -280,7 +280,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
 
           // a line between 1(lastPoint) and 2(pt2d) has the Id 1, so look for the Id of lastPoint
           // since we only start, if we have more than one point in the cell, lastPointId is initiated with 0
-          Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
+          auto position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
           if (position != selectedLines.end())
           {
             lineSelected = true;
@@ -355,7 +355,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
           {
             lineSelected = false;
             Mesh::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
-            Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
+            auto position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
             if (position != selectedLines.end()) // found the index
             {
               glColor3f(selectedColor[0], selectedColor[1], selectedColor[2]); // red

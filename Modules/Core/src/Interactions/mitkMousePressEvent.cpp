@@ -65,7 +65,7 @@ mitk::MousePressEvent::~MousePressEvent()
 
 bool mitk::MousePressEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::MousePressEvent &mpe = static_cast<const mitk::MousePressEvent &>(interactionEvent);
+  const auto &mpe = static_cast<const mitk::MousePressEvent &>(interactionEvent);
   return (this->GetEventButton() == mpe.GetEventButton() && this->GetModifiers() == mpe.GetModifiers() &&
           this->GetButtonStates() == mpe.GetButtonStates() && Superclass::IsEqual(interactionEvent));
 }

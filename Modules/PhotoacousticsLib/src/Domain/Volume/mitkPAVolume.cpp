@@ -26,7 +26,7 @@ mitk::pa::Volume::Volume(double* data,
     mitkThrow() << "You may not initialize a mitk::Volume with a nullptr";
   m_InternalMitkImage = mitk::Image::New();
 
-  unsigned int* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
+  auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
   dimensions[0] = yDim;
   dimensions[1] = xDim;
   dimensions[2] = zDim;
@@ -63,7 +63,7 @@ mitk::Image::Pointer mitk::pa::Volume::AsMitkImage()
 mitk::pa::Volume::Pointer mitk::pa::Volume::DeepCopy()
 {
   long length = GetXDim()*GetYDim()*GetZDim();
-  double* data = new double[length];
+  auto* data = new double[length];
   memcpy(data, GetData(), length * sizeof(double));
 
   return mitk::pa::Volume::New(data, GetXDim(), GetYDim(), GetZDim());

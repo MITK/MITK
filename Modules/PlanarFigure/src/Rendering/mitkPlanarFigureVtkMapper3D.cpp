@@ -104,7 +104,7 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
   if (node == nullptr)
     return;
 
-  PlanarFigure *planarFigure = dynamic_cast<PlanarFigure *>(node->GetData());
+  auto *planarFigure = dynamic_cast<PlanarFigure *>(node->GetData());
 
   if (planarFigure == nullptr || !planarFigure->IsPlaced())
     return;
@@ -125,8 +125,8 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
   {
     localStorage->m_LastMTime = mTime;
 
-    const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(planarFigure->GetPlaneGeometry());
-    const AbstractTransformGeometry *abstractTransformGeometry =
+    const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(planarFigure->GetPlaneGeometry());
+    const auto *abstractTransformGeometry =
       dynamic_cast<const AbstractTransformGeometry *>(planarFigure->GetPlaneGeometry());
 
     if (planeGeometry == nullptr && abstractTransformGeometry == nullptr)
@@ -152,9 +152,9 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
       if (numPoints < 2)
         continue;
 
-      PolyLine::const_iterator polyLineEnd = polyLine.cend();
+      auto polyLineEnd = polyLine.cend();
 
-      for (PolyLine::const_iterator polyLineIt = polyLine.cbegin(); polyLineIt != polyLineEnd; ++polyLineIt)
+      for (auto polyLineIt = polyLine.cbegin(); polyLineIt != polyLineEnd; ++polyLineIt)
       {
         Point3D point;
         planeGeometry->Map(*polyLineIt, point);

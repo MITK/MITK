@@ -75,7 +75,7 @@ unsigned int mitk::ImageSource::SplitRequestedRegion(unsigned int i,
 
   // determine the actual number of pieces that will be generated
   SlicedData::SizeType::SizeValueType range = requestedRegionSize[splitAxis];
-  unsigned int valuesPerThread = itk::Math::Ceil<unsigned int>(range / (double)num);
+  auto valuesPerThread = itk::Math::Ceil<unsigned int>(range / (double)num);
   unsigned int maxThreadIdUsed = itk::Math::Ceil<unsigned int>(range / (double)valuesPerThread) - 1;
 
   // Split the region

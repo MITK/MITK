@@ -132,7 +132,7 @@ void mitk::ItkImageFileReader::GenerateData()
       matrix[i][j] = imageIO->GetDirection(j)[i];
 
   // re-initialize PlaneGeometry with origin and direction
-  PlaneGeometry *planeGeometry = static_cast<PlaneGeometry *>(image->GetSlicedGeometry(0)->GetPlaneGeometry(0));
+  auto *planeGeometry = static_cast<PlaneGeometry *>(image->GetSlicedGeometry(0)->GetPlaneGeometry(0));
   planeGeometry->SetOrigin(origin);
   planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
 

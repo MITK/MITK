@@ -285,7 +285,7 @@ int mitkSceneIOTest(int, char *argv[])
     if (failedNodes.IsNotNull() && !failedNodes->empty())
     {
       MITK_TEST_OUTPUT(<< "The following nodes could not be serialized:");
-      for (mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
+      for (auto iter = failedNodes->begin();
            iter != failedNodes->end();
            ++iter)
       {
@@ -309,7 +309,7 @@ int mitkSceneIOTest(int, char *argv[])
     {
       MITK_TEST_OUTPUT(<< "The following properties could not be serialized:");
       const mitk::PropertyList::PropertyMap *propmap = failedProperties->GetMap();
-      for (mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin(); iter != propmap->end(); ++iter)
+      for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
       {
         MITK_TEST_OUTPUT(<< " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'");
         // \TODO: should we fail the test case if failed properties exist?
@@ -332,7 +332,7 @@ int mitkSceneIOTest(int, char *argv[])
     if (failedNodes.IsNotNull() && !failedNodes->empty())
     {
       MITK_TEST_OUTPUT(<< "The following nodes could not be serialized:");
-      for (mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
+      for (auto iter = failedNodes->begin();
            iter != failedNodes->end();
            ++iter)
       {
@@ -356,7 +356,7 @@ int mitkSceneIOTest(int, char *argv[])
     {
       MITK_TEST_OUTPUT(<< "The following properties could not be serialized:");
       const mitk::PropertyList::PropertyMap *propmap = failedProperties->GetMap();
-      for (mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin(); iter != propmap->end(); ++iter)
+      for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
       {
         MITK_TEST_OUTPUT(<< " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'");
         // \TODO: should we fail the test case if failed properties exist?

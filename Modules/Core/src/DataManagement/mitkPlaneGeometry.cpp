@@ -798,7 +798,7 @@ namespace mitk
     {
       case OpORIENT:
       {
-        mitk::PlaneOperation *planeOp = dynamic_cast<mitk::PlaneOperation *>(operation);
+        auto *planeOp = dynamic_cast<mitk::PlaneOperation *>(operation);
         if (planeOp == nullptr)
         {
           return;
@@ -825,7 +825,7 @@ namespace mitk
       }
       case OpRESTOREPLANEPOSITION:
       {
-        RestorePlanePositionOperation *op = dynamic_cast<mitk::RestorePlanePositionOperation *>(operation);
+        auto *op = dynamic_cast<mitk::RestorePlanePositionOperation *>(operation);
         if (op == nullptr)
         {
           return;

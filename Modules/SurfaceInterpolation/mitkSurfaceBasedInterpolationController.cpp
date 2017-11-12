@@ -44,7 +44,7 @@ mitk::SurfaceBasedInterpolationController::SurfaceBasedInterpolationController()
 
 mitk::SurfaceBasedInterpolationController::~SurfaceBasedInterpolationController()
 {
-  ContourListMap::iterator it = m_MapOfContourLists.begin();
+  auto it = m_MapOfContourLists.begin();
   for (; it != m_MapOfContourLists.end(); it++)
   {
     for (unsigned int j = 0; j < m_MapOfContourLists[(*it).first].size(); ++j)
@@ -258,7 +258,7 @@ void mitk::SurfaceBasedInterpolationController::SetActiveLabel(int activeLabel)
 
   m_ActiveLabel = activeLabel;
 
-  ContourListMap::iterator it = m_MapOfContourLists.find(m_ActiveLabel);
+  auto it = m_MapOfContourLists.find(m_ActiveLabel);
 
   if (it == m_MapOfContourLists.end())
   {

@@ -82,8 +82,8 @@ void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing(itk::Image<TPixel
 
     while (!sourceIter.IsAtEnd())
     {
-      int sourceValue = static_cast<int>(sourceIter.Get());
-      int targetValue = static_cast<int>(targetIter.Get());
+      auto sourceValue = static_cast<int>(sourceIter.Get());
+      auto targetValue = static_cast<int>(targetIter.Get());
 
       if ((sourceValue != 0) &&
           (m_ForceOverwrite ||

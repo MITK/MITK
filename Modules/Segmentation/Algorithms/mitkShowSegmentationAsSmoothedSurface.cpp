@@ -275,7 +275,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   MITK_INFO << "Intelligent closing...";
 
-  unsigned int surfaceRatio = (unsigned int)((1.0f - closing) * 100.0f);
+  auto surfaceRatio = (unsigned int)((1.0f - closing) * 100.0f);
 
   typedef itk::IntelligentBinaryClosingFilter<CharImageType, ShortImageType> ClosingFilterType;
 
@@ -460,7 +460,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 
   if (wireframe)
   {
-    VtkRepresentationProperty *representation =
+    auto *representation =
       dynamic_cast<VtkRepresentationProperty *>(node->GetProperty("material.representation"));
 
     if (representation != nullptr)

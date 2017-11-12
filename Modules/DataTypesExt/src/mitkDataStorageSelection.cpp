@@ -135,7 +135,7 @@ namespace mitk
     if (std::find(m_Nodes.begin(), m_Nodes.end(), node) != m_Nodes.end())
       return;
 
-    mitk::DataNode *nonConstNode = const_cast<mitk::DataNode *>(node);
+    auto *nonConstNode = const_cast<mitk::DataNode *>(node);
     // add listener
     this->AddListener(nonConstNode);
 
@@ -156,7 +156,7 @@ namespace mitk
     if (nodeIt == m_Nodes.end())
       return;
 
-    mitk::DataNode *nonConstNode = const_cast<mitk::DataNode *>(node);
+    auto *nonConstNode = const_cast<mitk::DataNode *>(node);
     // add listener
     this->RemoveListener(nonConstNode);
 
@@ -192,7 +192,7 @@ namespace mitk
     */
     const mitk::BaseProperty *prop = nullptr;
     const mitk::PropertyList *propList = nullptr;
-    const mitk::DataNode *node = dynamic_cast<const mitk::DataNode *>(caller);
+    const auto *node = dynamic_cast<const mitk::DataNode *>(caller);
     if (!node)
     {
       if ((prop = dynamic_cast<const mitk::BaseProperty *>(caller)))

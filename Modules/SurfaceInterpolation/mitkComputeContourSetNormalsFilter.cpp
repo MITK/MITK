@@ -43,7 +43,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
   for (unsigned int i = 0; i < numberOfInputs; i++)
   {
     // Getting the inputs polydata and polygons
-    Surface *currentSurface = const_cast<Surface *>(this->GetInput(i));
+    auto *currentSurface = const_cast<Surface *>(this->GetInput(i));
     vtkPolyData *polyData = currentSurface->GetVtkPolyData();
 
     vtkSmartPointer<vtkCellArray> existingPolys = polyData->GetPolys();
@@ -260,7 +260,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
   for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); i++)
   {
-    Surface *currentSurface = const_cast<Surface *>(this->GetOutput(i));
+    auto *currentSurface = const_cast<Surface *>(this->GetOutput(i));
     vtkPolyData *polyData = currentSurface->GetVtkPolyData();
 
     vtkSmartPointer<vtkDoubleArray> currentCellNormals =

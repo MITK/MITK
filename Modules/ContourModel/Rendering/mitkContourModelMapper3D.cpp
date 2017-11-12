@@ -47,7 +47,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ContourModel *inputContour = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  auto *inputContour = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
 
   localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour);
 
@@ -76,7 +76,7 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  mitk::ContourModel *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
   if (data == nullptr)
   {
     return;
@@ -132,13 +132,13 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
   // iterate over the control points
-  mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
-  mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
+  auto current = inputContour->IteratorBegin(timestep);
+  auto next = inputContour->IteratorBegin(timestep);
   if (next != inputContour->IteratorEnd(timestep))
   {
     next++;
 
-    mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
+    auto end = inputContour->IteratorEnd(timestep);
 
     while (next != end)
     {

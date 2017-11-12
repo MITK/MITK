@@ -51,7 +51,7 @@ mitk::GetCurrentDICOMTagsOfInterest()
     MITK_WARN << "DICOM tag error: multiple service for DICOM tags of interest found. Using just one.";
   }
 
-  IDICOMTagsOfInterest* toiRegister = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
+  auto* toiRegister = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
   if (!toiRegister)
   {
     MITK_ERROR << "Service lookup error, cannot get DICOM tag of interest service ";

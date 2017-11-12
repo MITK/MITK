@@ -255,7 +255,7 @@ namespace mitk
           }
           else
           {
-            const SlicedGeometry3D *worldSlicedGeometry =
+            const auto *worldSlicedGeometry =
               dynamic_cast<const SlicedGeometry3D *>(currentGeometry.GetPointer());
 
           if ( worldSlicedGeometry != nullptr )
@@ -423,14 +423,14 @@ namespace mitk
       return;
     }
 
-    const SliceNavigationController::GeometryTimeEvent *timeEvent =
+    const auto *timeEvent =
       dynamic_cast< const SliceNavigationController::GeometryTimeEvent * >(&geometryTimeEvent);
     assert( timeEvent != nullptr );
 
     TimeGeometry *timeGeometry = timeEvent->GetTimeGeometry();
     assert( timeGeometry != nullptr );
 
-    int timeStep = (int)timeEvent->GetPos();
+    auto timeStep = (int)timeEvent->GetPos();
     ScalarType timeInMS;
     timeInMS = timeGeometry->TimeStepToTimePoint(timeStep);
     timeStep = m_CreatedWorldGeometry->TimePointToTimeStep(timeInMS);
@@ -439,7 +439,7 @@ namespace mitk
 
   void SliceNavigationController::SetGeometrySlice(const itk::EventObject &geometrySliceEvent)
   {
-    const SliceNavigationController::GeometrySliceEvent *sliceEvent =
+    const auto *sliceEvent =
       dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
     assert(sliceEvent!=nullptr);
 
@@ -552,7 +552,7 @@ namespace mitk
 
   const mitk::PlaneGeometry *SliceNavigationController::GetCurrentPlaneGeometry()
   {
-    const mitk::SlicedGeometry3D *slicedGeometry =
+    const auto *slicedGeometry =
       dynamic_cast<const mitk::SlicedGeometry3D *>(this->GetCurrentGeometry3D());
 
     if (slicedGeometry)
@@ -570,7 +570,7 @@ namespace mitk
   BaseRenderer *SliceNavigationController::GetRenderer() const { return m_Renderer; }
   void SliceNavigationController::AdjustSliceStepperRange()
   {
-    const mitk::SlicedGeometry3D *slicedGeometry =
+    const auto *slicedGeometry =
       dynamic_cast<const mitk::SlicedGeometry3D *>(this->GetCurrentGeometry3D());
 
     const Vector3D &direction = slicedGeometry->GetDirectionVector();
@@ -619,7 +619,7 @@ namespace mitk
         if (!m_SliceLocked) // do not move the cross position
         {
           // select a slice
-          PointOperation *po = dynamic_cast<PointOperation *>(operation);
+          auto *po = dynamic_cast<PointOperation *>(operation);
           if (po && po->GetIndex() == -1)
           {
             this->SelectSliceByPoint(po->GetPoint());

@@ -235,7 +235,7 @@ bool mitk::Surface::VerifyRequestedRegion()
 
 void mitk::Surface::SetRequestedRegion(const itk::DataObject *data)
 {
-  const mitk::Surface *surface = dynamic_cast<const mitk::Surface *>(data);
+  const auto *surface = dynamic_cast<const mitk::Surface *>(data);
 
   if (surface != nullptr)
     m_RequestedRegion = surface->GetRequestedRegion();
@@ -255,7 +255,7 @@ void mitk::Surface::CopyInformation(const itk::DataObject *data)
 {
   Superclass::CopyInformation(data);
 
-  const mitk::Surface *surface = dynamic_cast<const mitk::Surface *>(data);
+  const auto *surface = dynamic_cast<const mitk::Surface *>(data);
 
   if (surface == nullptr)
     mitkThrow() << "Data object used to get largest possible region is not a mitk::Surface.";
@@ -290,7 +290,7 @@ void mitk::Surface::ExecuteOperation(Operation *operation)
   {
     case OpSURFACECHANGED:
     {
-      mitk::SurfaceOperation *surfaceOperation = dynamic_cast<mitk::SurfaceOperation *>(operation);
+      auto *surfaceOperation = dynamic_cast<mitk::SurfaceOperation *>(operation);
 
       if (surfaceOperation == nullptr)
         break;
@@ -324,7 +324,7 @@ unsigned int mitk::Surface::GetSizeOfPolyDataSeries() const
 
 void mitk::Surface::Graft(const DataObject *data)
 {
-  const Surface *surface = dynamic_cast<const Surface *>(data);
+  const auto *surface = dynamic_cast<const Surface *>(data);
 
   if (surface == nullptr)
     mitkThrow() << "Data object used to graft surface is not a mitk::Surface.";

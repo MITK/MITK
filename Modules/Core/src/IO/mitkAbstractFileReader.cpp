@@ -106,7 +106,7 @@ namespace mitk
   {
     DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
     std::vector<BaseData::Pointer> data = this->Read();
-    for (std::vector<BaseData::Pointer>::iterator iter = data.begin(); iter != data.end(); ++iter)
+    for (auto iter = data.begin(); iter != data.end(); ++iter)
     {
       mitk::DataNode::Pointer node = mitk::DataNode::New();
       node->SetData(*iter);

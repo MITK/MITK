@@ -61,7 +61,7 @@ void mitk::ContourSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::Vt
 
     mitk::ContourSet::Pointer input = const_cast<mitk::ContourSet *>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
-    mitk::ContourSet::ContourIterator contourIt = contourVec.begin();
+    auto contourIt = contourVec.begin();
 
     while (contourIt != contourVec.end())
     {

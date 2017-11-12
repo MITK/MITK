@@ -66,7 +66,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DataNodeChanged()
 
 bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -84,7 +84,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const Interaction
 
 void mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -101,7 +101,7 @@ void mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction *
 
 void mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -118,7 +118,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction
 
 void mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -141,7 +141,7 @@ void mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineActio
 
 void mitk::SurfaceDeformationDataInteractor3D::DeformObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -221,7 +221,7 @@ void mitk::SurfaceDeformationDataInteractor3D::DeformObject(StateMachineAction *
 
 void mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  const MouseWheelEvent *wheelEvent = dynamic_cast<const MouseWheelEvent *>(interactionEvent);
+  const auto *wheelEvent = dynamic_cast<const MouseWheelEvent *>(interactionEvent);
   if (wheelEvent == nullptr)
     return;
 

@@ -100,7 +100,7 @@ mitk::DisplayInteractor::~DisplayInteractor()
 
 bool mitk::DisplayInteractor::CheckPositionEvent(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
   {
     return false;
@@ -131,7 +131,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
   - if no, then we have a situation where the mouse is near two other lines (e.g. crossing point) and don't want to
   rotate
   */
-  const InteractionPositionEvent *posEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *posEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (posEvent == nullptr)
     return false;
 
@@ -252,7 +252,7 @@ bool mitk::DisplayInteractor::CheckSwivelPossible(const mitk::InteractionEvent *
   // Decide between moving and rotation: if we're close to the crossing
   // point of the planes, moving mode is entered, otherwise
   // rotation/swivel mode
-  const InteractionPositionEvent *posEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *posEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
 
   BaseRenderer *renderer = interactionEvent->GetSender();
 
@@ -349,7 +349,7 @@ bool mitk::DisplayInteractor::CheckSwivelPossible(const mitk::InteractionEvent *
 
 void mitk::DisplayInteractor::Init(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_CurrentDisplayCoordinate = m_LastDisplayCoordinate;
@@ -360,7 +360,7 @@ void mitk::DisplayInteractor::Init(StateMachineAction *, InteractionEvent *inter
 void mitk::DisplayInteractor::Move(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   BaseRenderer *sender = interactionEvent->GetSender();
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
   float invertModifier = -1.0;
   if (m_InvertMoveDirection)
@@ -379,7 +379,7 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
 {
   const BaseRenderer::Pointer sender = interactionEvent->GetSender();
   auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
   Point3D pos = positionEvent->GetPositionInWorld();
 
   for (auto renWin : renWindows)
@@ -393,7 +393,7 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
 void mitk::DisplayInteractor::Zoom(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   const BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
   float factor = 1.0;
   float distance = 0;
@@ -434,7 +434,7 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction *, InteractionEvent *inter
 
 void mitk::DisplayInteractor::Scroll(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
   mitk::SliceNavigationController::Pointer sliceNaviController =
     interactionEvent->GetSender()->GetSliceNavigationController();
@@ -533,7 +533,7 @@ void mitk::DisplayInteractor::ScrollOneUp(StateMachineAction *, InteractionEvent
 void mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
@@ -606,7 +606,7 @@ void mitk::DisplayInteractor::EndRotation(mitk::StateMachineAction *, mitk::Inte
 
 void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::InteractionEvent *event)
 {
-  const InteractionPositionEvent *posEvent = dynamic_cast<const InteractionPositionEvent *>(event);
+  const auto *posEvent = dynamic_cast<const InteractionPositionEvent *>(event);
   if (posEvent == nullptr)
     return;
 
@@ -630,7 +630,7 @@ void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::Interacti
   RotationOperation rotationOperation(OpROTATE, m_CenterOfRotation, axisOfRotation, angle);
 
   // iterate the OTHER slice navigation controllers: these are filled in DoDecideBetweenRotationAndSliceSelection
-  for (SNCVector::iterator iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
+  for (auto iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
   {
     TimeGeometry *timeGeometry = (*iter)->GetCreatedWorldGeometry();
     if (!timeGeometry)
@@ -646,7 +646,7 @@ void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::Interacti
 
 void mitk::DisplayInteractor::Swivel(mitk::StateMachineAction *, mitk::InteractionEvent *event)
 {
-  const InteractionPositionEvent *posEvent = dynamic_cast<const InteractionPositionEvent *>(event);
+  const auto *posEvent = dynamic_cast<const InteractionPositionEvent *>(event);
 
   if (!posEvent)
     return;
@@ -709,7 +709,7 @@ void mitk::DisplayInteractor::Swivel(mitk::StateMachineAction *, mitk::Interacti
 
 void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::InteractionEvent *event)
 {
-  const InteractionPositionEvent *posEvent = dynamic_cast<const InteractionPositionEvent *>(event);
+  const auto *posEvent = dynamic_cast<const InteractionPositionEvent *>(event);
 
   if (!posEvent)
     return;

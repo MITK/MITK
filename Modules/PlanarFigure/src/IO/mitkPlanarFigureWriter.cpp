@@ -93,7 +93,7 @@ void mitk::PlanarFigureWriter::GenerateData()
         continue;
       }
 
-      mitk::BasePropertySerializer *serializer =
+      auto *serializer =
         dynamic_cast<mitk::BasePropertySerializer *>(allSerializers.begin()->GetPointer());
       if (serializer == nullptr)
       {
@@ -139,7 +139,7 @@ void mitk::PlanarFigureWriter::GenerateData()
       controlPointsElement->LinkEndChild(vElement);
     }
     auto geoElement = new TiXmlElement("Geometry");
-    const PlaneGeometry *planeGeo = dynamic_cast<const PlaneGeometry *>(pf->GetPlaneGeometry());
+    const auto *planeGeo = dynamic_cast<const PlaneGeometry *>(pf->GetPlaneGeometry());
     if (planeGeo != nullptr)
     {
       // Write parameters of IndexToWorldTransform of the PlaneGeometry

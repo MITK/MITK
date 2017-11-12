@@ -183,7 +183,7 @@ bool mitk::GPUVolumeMapper3D::IsRenderable(mitk::BaseRenderer *renderer)
   if (!value)
     return false;
 
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  auto *input = const_cast<mitk::Image *>(this->GetInput());
 
   if (!input || !input->IsInitialized())
     return false;
@@ -259,7 +259,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *render
   InitCommon();
   InitVtkMapper(renderer);
 
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  auto *input = const_cast<mitk::Image *>(this->GetInput());
   vtkImageData *inputData = input->GetVtkImageData(this->GetTimestep());
   m_UnitSpacingImageFilter->SetInputData(inputData);
 
@@ -382,7 +382,7 @@ void mitk::GPUVolumeMapper3D::UpdateTransferFunctions(mitk::BaseRenderer *render
   }
   else
   {
-    mitk::TransferFunctionProperty *transferFunctionProp =
+    auto *transferFunctionProp =
       dynamic_cast<mitk::TransferFunctionProperty *>(this->GetDataNode()->GetProperty("TransferFunction", renderer));
 
     if (transferFunctionProp)

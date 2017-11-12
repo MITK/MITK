@@ -230,7 +230,7 @@ void mitk::AffineBaseDataInteractor3D::ScaleGeometry(mitk::Point3D newScale, mit
   anchorPoint[1] = pointY;
   anchorPoint[2] = pointZ;
 
-  ScaleOperation *doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
+  auto *doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
   geometry->ExecuteOperation(doOp);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -253,7 +253,7 @@ void mitk::AffineBaseDataInteractor3D::RotateGeometry(mitk::ScalarType angle,
   pointOfRotation[1] = pointY;
   pointOfRotation[2] = pointZ;
 
-  mitk::RotationOperation *doOp = new mitk::RotationOperation(OpROTATE, pointOfRotation, rotationAxis, angle);
+  auto *doOp = new mitk::RotationOperation(OpROTATE, pointOfRotation, rotationAxis, angle);
 
   geometry->ExecuteOperation(doOp);
   delete doOp;
@@ -310,7 +310,7 @@ void mitk::AffineBaseDataInteractor3D::SetDataNode(DataNode *node)
 
 bool mitk::AffineBaseDataInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -371,7 +371,7 @@ void mitk::AffineBaseDataInteractor3D::InitRotate(StateMachineAction *, Interact
 
 bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -392,7 +392,7 @@ bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent *interaction
 
 void mitk::AffineBaseDataInteractor3D::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -416,7 +416,7 @@ void mitk::AffineBaseDataInteractor3D::TranslateObject(StateMachineAction *, Int
 
 void mitk::AffineBaseDataInteractor3D::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 

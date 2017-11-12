@@ -54,7 +54,7 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, cons
   {
     m_CurrentState = m_StateMachineContainer->GetStartState();
 
-    for (ConditionDelegatesMapType::iterator i = m_ConditionDelegatesMap.begin(); i != m_ConditionDelegatesMap.end();
+    for (auto i = m_ConditionDelegatesMap.begin(); i != m_ConditionDelegatesMap.end();
          ++i)
     {
       delete i->second;
@@ -62,14 +62,14 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, cons
     m_ConditionDelegatesMap.clear();
 
     // clear actions map ,and connect all actions as declared in sub-class
-    for (std::map<std::string, TActionFunctor *>::iterator i = m_ActionFunctionsMap.begin();
+    for (auto i = m_ActionFunctionsMap.begin();
          i != m_ActionFunctionsMap.end();
          ++i)
     {
       delete i->second;
     }
     m_ActionFunctionsMap.clear();
-    for (ActionDelegatesMapType::iterator i = m_ActionDelegatesMap.begin(); i != m_ActionDelegatesMap.end(); ++i)
+    for (auto i = m_ActionDelegatesMap.begin(); i != m_ActionDelegatesMap.end(); ++i)
     {
       delete i->second;
     }
@@ -99,7 +99,7 @@ void mitk::EventStateMachine::AddActionFunction(const std::string &action, mitk:
     return;
   // make sure double calls for same action won't cause memory leaks
   delete m_ActionFunctionsMap[action];
-  ActionDelegatesMapType::iterator i = m_ActionDelegatesMap.find(action);
+  auto i = m_ActionDelegatesMap.find(action);
   if (i != m_ActionDelegatesMap.end())
   {
     delete i->second;
@@ -110,7 +110,7 @@ void mitk::EventStateMachine::AddActionFunction(const std::string &action, mitk:
 
 void mitk::EventStateMachine::AddActionFunction(const std::string &action, const ActionFunctionDelegate &delegate)
 {
-  std::map<std::string, TActionFunctor *>::iterator i = m_ActionFunctionsMap.find(action);
+  auto i = m_ActionFunctionsMap.find(action);
   if (i != m_ActionFunctionsMap.end())
   {
     delete i->second;
@@ -148,7 +148,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent *event, DataNode *dat
 
     // iterate over all actions in this transition and execute them
     const ActionVectorType actions = transition->GetActions();
-    for (ActionVectorType::const_iterator it = actions.cbegin(); it != actions.cend(); ++it)
+    for (auto it = actions.cbegin(); it != actions.cend(); ++it)
     {
       try
       {

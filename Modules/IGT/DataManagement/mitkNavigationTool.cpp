@@ -39,6 +39,39 @@ m_ToolTipOrientation(mitk::Quaternion(0, 0, 0, 1))
   m_ToolAxis[2] = 0;
 }
 
+itk::LightObject::Pointer mitk::NavigationTool::InternalClone() const
+{
+  Self::Pointer tool = new Self(*this);
+  tool->UnRegister();
+  return tool.GetPointer();
+}
+
+mitk::NavigationTool::NavigationTool(const NavigationTool &other)
+  : Superclass()
+{
+  this->m_Identifier = other.m_Identifier;
+  this->m_Type = other.m_Type;
+  if (other.m_DataNode.IsNotNull())
+  {
+    this->m_DataNode = other.m_DataNode->Clone();
+    if (other.m_DataNode->GetData())
+      this->m_DataNode->SetData(other.m_DataNode->GetData());
+  }
+
+  if (other.m_SpatialObject.IsNotNull())
+    this->m_SpatialObject = other.m_SpatialObject->Clone();
+  this->m_CalibrationFile = other.m_CalibrationFile;
+  this->m_SerialNumber = other.m_SerialNumber;
+  this->m_TrackingDeviceType = other.m_TrackingDeviceType;
+  if (other.m_ToolRegistrationLandmarks.IsNotNull())
+    this->m_ToolRegistrationLandmarks = other.m_ToolRegistrationLandmarks->Clone();
+  if (other.m_ToolCalibrationLandmarks.IsNotNull())
+    this->m_ToolCalibrationLandmarks = other.m_ToolCalibrationLandmarks->Clone();
+  this->m_ToolTipPosition = other.m_ToolTipPosition;
+  this->m_ToolTipOrientation = other.m_ToolTipOrientation;
+  this->m_ToolAxis = other.m_ToolAxis;
+}
+
 mitk::NavigationTool::~NavigationTool()
 {
 }

@@ -171,7 +171,9 @@ namespace mitk {
   protected:
 
     NavigationTool();
+    NavigationTool(const NavigationTool &other);
     ~NavigationTool();
+    virtual itk::LightObject::Pointer InternalClone() const override;
 
     //## data structure of a navigation tool object ##
     std::string m_Identifier;

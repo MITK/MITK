@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include "mitkTrackingDeviceTypeCollection.h"
 
-
 //qt headers
 #include <qfiledialog.h>
 #include <qmessagebox.h>
@@ -85,14 +84,14 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
 {
   if (m_Controls)
   {
-    connect((QObject*)(m_Controls->m_TrackingDeviceTypeChooser), SIGNAL(currentIndexChanged(int index)), this, SLOT(GetGuiElements()));
-    connect((QObject*)(m_Controls->m_ToolNameEdit), SIGNAL(textChanged(const QString &text)), this, SLOT(GetGuiElements()));
-    connect((QObject*)(m_Controls->m_ToolTypeChooser), SIGNAL(currentIndexChanged(int index)), this, SLOT(GetGuiElements()));
-    connect((QObject*)(m_Controls->m_IdentifierEdit), SIGNAL(textChanged(const QString &text)), this, SLOT(GetGuiElements()));
-    connect((QObject*)(m_Controls->m_SerialNumberEdit), SIGNAL(textChanged(const QString &text)), this, SLOT(GetGuiElements()));
-    connect((QObject*)(m_Controls->m_ToolAxisX), SIGNAL(valueChanged()), this, SLOT(GetGuiElements()));
-    connect((QObject*)(m_Controls->m_ToolAxisY), SIGNAL(valueChanged()), this, SLOT(GetGuiElements()));
-    connect((QObject*)(m_Controls->m_ToolAxisZ), SIGNAL(valueChanged()), this, SLOT(GetGuiElements()));
+    connect((QObject*)(m_Controls->m_TrackingDeviceTypeChooser), SIGNAL(currentIndexChanged(int)), this, SLOT(GetValuesFromGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolNameEdit), SIGNAL(textChanged(const QString)), this, SLOT(GetValuesFromGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolTypeChooser), SIGNAL(currentIndexChanged(int)), this, SLOT(GetValuesFromGuiElements()));
+    connect((QObject*)(m_Controls->m_IdentifierEdit), SIGNAL(textChanged(const QString)), this, SLOT(GetValuesFromGuiElements()));
+    connect((QObject*)(m_Controls->m_SerialNumberEdit), SIGNAL(textChanged(const QString)), this, SLOT(GetValuesFromGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolAxisX), SIGNAL(valueChanged(int)), this, SLOT(GetValuesFromGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolAxisY), SIGNAL(valueChanged(int)), this, SLOT(GetValuesFromGuiElements()));
+    connect((QObject*)(m_Controls->m_ToolAxisZ), SIGNAL(valueChanged(int)), this, SLOT(GetValuesFromGuiElements()));
 
     //Buttons
     connect((QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()));
@@ -100,8 +99,8 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()));
     connect((QObject*)(m_Controls->m_EditToolTip), SIGNAL(clicked()), this, SLOT(OnEditToolTip()));
 
-    connect((QObject*)(m_ToolTransformationWidget), SIGNAL(EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)), this, 
-      SLOT(OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)));
+    connect((QObject*)(m_ToolTransformationWidget), SIGNAL(EditToolTipFinished(mitk::AffineTransform3D::Pointer)), this,
+      SLOT(OnEditToolTipFinished(mitk::AffineTransform3D::Pointer)));
 
     connect((QObject*)(m_Controls->m_cancel), SIGNAL(clicked()), this, SLOT(OnCancel()));
     connect((QObject*)(m_Controls->m_finished), SIGNAL(clicked()), this, SLOT(OnFinished()));
@@ -125,7 +124,7 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   //create DataNode...
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(supposedName);
-  m_ToolToBeEdited->SetDataNode(newNode);//ToDo: Data storage ok?
+  m_ToolToBeEdited->SetDataNode(newNode);
 
   SetConeAsToolSurface();
 
@@ -151,7 +150,7 @@ void QmitkNavigationToolCreationWidget::SetConeAsToolSurface()
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
 {
   //Set Members. This can either be the new initialized tool from call of Initialize() or a tool which already exists in the toolStorage
-  //TODO m_ToolToBeEdited = DefaultTool->Clone();//Todo implement clone function!!!!
+  m_ToolToBeEdited = DefaultTool->Clone();
 
   //Set all gui variables
   SetGuiElements();
@@ -171,7 +170,6 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
 
   m_Controls->m_ToolNameEdit->setText(QString(m_ToolToBeEdited->GetDataNode()->GetName().c_str()));
   m_Controls->m_CalibrationFileName->setText(QString(m_ToolToBeEdited->GetCalibrationFile().c_str()));
-
 
   m_Controls->m_SurfaceChooser->SetSelectedNode(m_ToolToBeEdited->GetDataNode());
   FillUIToolLandmarkLists(m_ToolToBeEdited->GetToolCalibrationLandmarks(), m_ToolToBeEdited->GetToolRegistrationLandmarks());
@@ -240,7 +238,6 @@ void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 }
 void QmitkNavigationToolCreationWidget::GetValuesFromGuiElements()
 {
-
   //Tracking Device
   m_ToolToBeEdited->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->currentText().toStdString());
   m_ToolToBeEdited->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toStdString());
@@ -273,22 +270,19 @@ mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool(
   return m_FinalTool;
 }
 
-
 void QmitkNavigationToolCreationWidget::OnFinished()
 {
   //here we create a new tool
   m_FinalTool = m_ToolToBeEdited->Clone();
-
 
   emit NavigationToolFinished();
 }
 
 void QmitkNavigationToolCreationWidget::OnCancel()
 {
-  Initialize(nullptr,"");//Reset everything to a fresh tool, like it was done in the constructor
+  Initialize(nullptr, "");//Reset everything to a fresh tool, like it was done in the constructor
   emit Canceled();
 }
-
 
 void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable /*= true*/)
 {
@@ -306,7 +300,6 @@ void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDevi
   m_ToolToBeEdited->SetTrackingDeviceType(type);
 }
 
-
 //##################################################################################
 //############################## internal help methods #############################
 //##################################################################################
@@ -322,12 +315,11 @@ void QmitkNavigationToolCreationWidget::OnEditToolTip()
   m_ToolTransformationWidget->SetGeometryPointer(m_ToolToBeEdited->GetDataNode()->GetData()->GetGeometry());
   m_ToolTransformationWidget->SetValues(m_ToolToBeEdited->GetToolTipTransform());
 
-
-
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_ToolTransformationWidget);
   m_ToolEditDialog.setLayout(mainLayout);
   m_ToolEditDialog.setWindowTitle("Edit Tool Tip and Tool Orientation");
+  m_ToolEditDialog.setProperty("minimumSizeHint", m_ToolTransformationWidget->size());
   m_ToolEditDialog.open();
 }
 
@@ -350,7 +342,6 @@ void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransf
     QString::number(m_ToolToBeEdited->GetToolTipOrientation()[3], 'f', 2) + "]";
   m_Controls->m_ToolTipLabel->setText(_label);
 }
-
 
 void QmitkNavigationToolCreationWidget::FillUIToolLandmarkLists(mitk::PointSet::Pointer calLandmarks, mitk::PointSet::Pointer regLandmarks)
 {

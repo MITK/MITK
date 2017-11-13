@@ -16,11 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <list>
 #include <set>
+#include <mutex>
 
 #include "mbilog.h"
 
 static std::list<mbilog::BackendBase*> backends;
 static std::set<mbilog::OutputType> disabledBackendTypes;
+static std::recursive_mutex backendsMutex;
 
 
 namespace mbilog {
@@ -29,11 +31,13 @@ static const std::string NA_STRING = "n/a";
 
 void mbilog::RegisterBackend(mbilog::BackendBase* backend)
 {
+  std::lock_guard<std::recursive_mutex> lock(backendsMutex);
   backends.push_back(backend);
 }
 
 void mbilog::UnregisterBackend(mbilog::BackendBase* backend)
 {
+  std::lock_guard<std::recursive_mutex> lock(backendsMutex);
   backends.remove(backend);
 }
 
@@ -48,6 +52,7 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
   //create dummy backend if there is no backend registered (so we have an output anyway)
   static mbilog::BackendCout* dummyBackend = nullptr;
 
+  std::lock_guard<std::recursive_mutex> lock(backendsMutex);
   if(backends.empty() && (dummyBackend == nullptr))
   {
     dummyBackend = new mbilog::BackendCout();

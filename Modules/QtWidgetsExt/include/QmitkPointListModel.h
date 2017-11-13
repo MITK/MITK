@@ -29,7 +29,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListModel : public QAbstractListModel
 
 public:
   QmitkPointListModel(mitk::DataNode * = nullptr, int t = 0, QObject *parent = 0);
-  ~QmitkPointListModel();
+  ~QmitkPointListModel() override;
 
   Qt::ItemFlags flags(const QModelIndex &) const override;
 

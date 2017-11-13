@@ -69,7 +69,7 @@ struct ExtensionTracker::Impl::HandlerWrapper : public IRegistryEventListener
     return handler == target.handler;
   }
 
-  virtual void Added(const QList<IExtension::Pointer>& extensions) override
+  void Added(const QList<IExtension::Pointer>& extensions) override
   {
     for (int i = 0; i < extensions.size(); ++i)
     {
@@ -77,7 +77,7 @@ struct ExtensionTracker::Impl::HandlerWrapper : public IRegistryEventListener
     }
   }
 
-  virtual void Removed(const QList<IExtension::Pointer>& extensions) override
+  void Removed(const QList<IExtension::Pointer>& extensions) override
   {
     QList<QList<Object::Pointer> > removedObjects;
     {
@@ -101,12 +101,12 @@ struct ExtensionTracker::Impl::HandlerWrapper : public IRegistryEventListener
     }
   }
 
-  virtual void Added(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/) override
+  void Added(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/) override
   {
     // do nothing
   }
 
-  virtual void Removed(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/) override
+  void Removed(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/) override
   {
     // do nothing
   }

@@ -46,13 +46,13 @@ public:
 
 protected:
 
-  virtual void PropertyChanged() override
+  void PropertyChanged() override
   {
     m_View->m_VolumeMode = m_BoolProperty->GetValue();
     m_View->UpdateEnablement();
   }
 
-  virtual void PropertyRemoved() override
+  void PropertyRemoved() override
   {
     m_View->m_VolumeMode = false;
     m_Property = 0;

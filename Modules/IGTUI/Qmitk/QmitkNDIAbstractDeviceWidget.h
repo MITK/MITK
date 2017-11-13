@@ -35,11 +35,11 @@ public:
   static const std::string VIEW_ID;
 
   QmitkNDIAbstractDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~QmitkNDIAbstractDeviceWidget();
+  ~QmitkNDIAbstractDeviceWidget() override;
 
-  virtual void Initialize() = 0;
+  void Initialize() override = 0;
 
-  virtual void AddOutput(std::string s) = 0;
+  void AddOutput(std::string s) override = 0;
 
 signals:
   void PortsScanned(int Port, QString result, int PortType);

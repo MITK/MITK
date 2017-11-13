@@ -30,7 +30,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkBoolPropertyWidget : public QCheckBox
 public:
   QmitkBoolPropertyWidget(QWidget *parent = nullptr);
   QmitkBoolPropertyWidget(const QString &text, QWidget *parent = nullptr);
-  virtual ~QmitkBoolPropertyWidget();
+  ~QmitkBoolPropertyWidget() override;
 
   void SetProperty(mitk::BoolProperty *property);
 

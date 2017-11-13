@@ -14,7 +14,7 @@ class QmitkConfirmSegmentationDialog : public QDialog
 
 public:
   explicit QmitkConfirmSegmentationDialog(QWidget *parent = nullptr);
-  ~QmitkConfirmSegmentationDialog();
+  ~QmitkConfirmSegmentationDialog() override;
 
   void SetSegmentationName(QString name);
 

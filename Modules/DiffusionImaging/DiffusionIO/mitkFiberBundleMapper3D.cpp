@@ -40,7 +40,7 @@ public:
   mitk::BaseRenderer *renderer;
   mitk::DataNode *node;
 
-  virtual void Execute(vtkObject *, unsigned long, void*cbo)
+  void Execute(vtkObject *, unsigned long, void*cbo) override
   {
     vtkOpenGLHelper *cellBO = reinterpret_cast<vtkOpenGLHelper*>(cbo);
 

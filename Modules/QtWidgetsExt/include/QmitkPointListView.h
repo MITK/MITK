@@ -43,7 +43,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListView : public QListView
 
 public:
   QmitkPointListView(QWidget *parent = 0);
-  ~QmitkPointListView();
+  ~QmitkPointListView() override;
 
   /// assign a point set for observation
   void SetPointSetNode(mitk::DataNode *pointSetNode);

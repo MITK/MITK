@@ -43,11 +43,11 @@ public:
   void SetTool(mitk::Tool *tool);
 
   // just make sure ITK won't take care of anything (especially not destruction)
-  virtual void Register() const override;
-  virtual void UnRegister() const ITK_NOEXCEPT ITK_OVERRIDE;
-  virtual void SetReferenceCount(int) override;
+  void Register() const override;
+  void UnRegister() const ITK_NOEXCEPT ITK_OVERRIDE;
+  void SetReferenceCount(int) override;
 
-  virtual ~QmitkToolGUI();
+  ~QmitkToolGUI() override;
 
 signals:
 

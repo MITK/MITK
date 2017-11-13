@@ -31,7 +31,7 @@ public:
     PropertyChanged();
   }
 
-  virtual ~_UGCombinedBoolPropEditor() {}
+  ~_UGCombinedBoolPropEditor() override {}
   bool IsEnabled() const { return enabled; }
   void SetEnabled(bool enable)
   {
@@ -41,7 +41,7 @@ public:
   }
 
 protected:
-  virtual void PropertyChanged() override
+  void PropertyChanged() override
   {
     if (m_BoolProperty)
       enabled = m_BoolProperty->GetValue();
@@ -51,7 +51,7 @@ protected:
     m_ComboBox->IsVolumeChanged(enabled);
   }
 
-  virtual void PropertyRemoved() override
+  void PropertyRemoved() override
   {
     m_Property = nullptr;
     m_BoolProperty = nullptr;
@@ -73,7 +73,7 @@ public:
   {
   }
 
-  ~_UGCombinedEnumPropEditor() { m_EnumerationProperty = nullptr; }
+  ~_UGCombinedEnumPropEditor() override { m_EnumerationProperty = nullptr; }
   void IndexChanged(int enumId)
   {
     this->BeginModifyProperty();
@@ -81,7 +81,7 @@ public:
     this->EndModifyProperty();
   }
 
-  virtual void PropertyChanged() override
+  void PropertyChanged() override
   {
     if (m_EnumerationProperty)
     {
@@ -96,7 +96,7 @@ public:
     }
   }
 
-  virtual void PropertyRemoved() override
+  void PropertyRemoved() override
   {
     m_Property = nullptr;
     m_EnumerationProperty = nullptr;

@@ -49,7 +49,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     store.SetBaseUri(mitk::RdfUri("http://mitk.org/wiki/MITK/data/instances.rdf#"));
     store.AddPrefix("dcterms", mitk::RdfUri("http://purl.org/dc/terms/"));
@@ -58,7 +58,7 @@ public:
       mitk::RdfNode(mitk::RdfUri("dcterms:title")), mitk::RdfNode("TestImage"));
   }
 
-  void tearDown()
+  void tearDown() override
   {
     store.CleanUp();
   }

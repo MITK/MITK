@@ -47,9 +47,9 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationJob : public QObject,
 
 public:
   QmitkRegistrationJob(::map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
-  ~QmitkRegistrationJob();
+  ~QmitkRegistrationJob() override;
 
-  void run();
+  void run() override;
 
 signals:
   void Finished();

@@ -37,7 +37,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkGnuplotWidget : public QWidget
 
 public:
   explicit QmitkGnuplotWidget(QWidget *parent = nullptr);
-  ~QmitkGnuplotWidget();
+  ~QmitkGnuplotWidget() override;
 
   QString GetGnuplotPath() const;
   void SetGnuplotPath(const QString &path);

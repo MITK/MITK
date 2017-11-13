@@ -22,7 +22,7 @@ class MITKXNAT_EXPORT QmitkXnatUploadFromDataStorageDialog : public QDialog
 
 public:
   explicit QmitkXnatUploadFromDataStorageDialog(QWidget *parent = 0);
-  ~QmitkXnatUploadFromDataStorageDialog();
+  ~QmitkXnatUploadFromDataStorageDialog() override;
 
   void SetDataStorage(mitk::DataStorage *ds);
   mitk::DataNode::Pointer GetSelectedNode();

@@ -86,7 +86,7 @@ namespace
   {
   public:
     explicit QmitkWebEnginePage(QmitkMitkWorkbenchIntroPart* introPart, QObject* parent = nullptr);
-    ~QmitkWebEnginePage();
+    ~QmitkWebEnginePage() override;
 
   private:
     bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;

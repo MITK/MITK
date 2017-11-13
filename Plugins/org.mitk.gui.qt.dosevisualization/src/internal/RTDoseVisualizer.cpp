@@ -70,10 +70,10 @@ namespace mitk
     mitkClassMacro(NodePredicateDose, NodePredicateBase);
     itkNewMacro(NodePredicateDose);
 
-    virtual ~NodePredicateDose()
+    ~NodePredicateDose() override
     {};
 
-    virtual bool CheckNode(const mitk::DataNode *node) const override
+    bool CheckNode(const mitk::DataNode *node) const override
     {
       if (!node) return false;
 

@@ -49,7 +49,7 @@ public:
   /*!
   \brief default destructor
   */
-  virtual ~QmitkToolDistanceWidget();
+  ~QmitkToolDistanceWidget() override;
 
   /*!
   \brief This method displays the matrix with the distances between the tracking source's outputs in a QGridLayout.

@@ -46,7 +46,7 @@ class MITKQTWIDGETS_EXPORT QmitkPropertyItemModel : public QAbstractItemModel
 
 public:
   explicit QmitkPropertyItemModel(QObject *parent = nullptr);
-  ~QmitkPropertyItemModel();
+  ~QmitkPropertyItemModel() override;
 
   int columnCount(const QModelIndex &parent = QModelIndex()) const override;
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;

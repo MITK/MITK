@@ -35,15 +35,15 @@ class MITKXNAT_EXPORT QmitkXnatTreeModel : public ctkXnatTreeModel
 public:
   QmitkXnatTreeModel();
 
-  virtual QVariant data(const QModelIndex &index, int role) const;
+  QVariant data(const QModelIndex &index, int role) const override;
 
-  virtual bool dropMimeData(
-    const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+  bool dropMimeData(
+    const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
 
   using QAbstractItemModel::supportedDropActions;
   virtual Qt::DropActions supportedDropActions();
 
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
 
   ctkXnatObject *GetXnatObjectFromUrl(const QString &);
 

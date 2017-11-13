@@ -45,7 +45,7 @@ signals:
   void PointSelectionChanged(); ///< this signal is emmitted, if the selection of a point in the pointset is changed
 public:
   QmitkPointListViewWidget(QWidget *parent = 0);
-  ~QmitkPointListViewWidget();
+  ~QmitkPointListViewWidget() override;
 
   /// assign a point set for observation
   void SetPointSet(mitk::PointSet *pointSet);

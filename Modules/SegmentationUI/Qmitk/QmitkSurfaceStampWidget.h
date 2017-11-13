@@ -41,7 +41,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceStampWidget : public QWidget
 
 public:
   QmitkSurfaceStampWidget(QWidget *parent = 0, const char *name = 0);
-  virtual ~QmitkSurfaceStampWidget();
+  ~QmitkSurfaceStampWidget() override;
 
   void SetDataStorage(mitk::DataStorage *storage);
 

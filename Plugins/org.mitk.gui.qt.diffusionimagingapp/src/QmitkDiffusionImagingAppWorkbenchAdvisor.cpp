@@ -43,7 +43,7 @@ public:
 
   }
 
-  void PostWindowOpen()
+  void PostWindowOpen() override
   {
     QmitkExtWorkbenchWindowAdvisor::PostWindowOpen();
     berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();

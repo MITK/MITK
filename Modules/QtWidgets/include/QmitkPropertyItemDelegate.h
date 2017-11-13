@@ -34,7 +34,7 @@ class QmitkColorWidget : public QWidget
 
 public:
   explicit QmitkColorWidget(QWidget *parent = nullptr);
-  ~QmitkColorWidget();
+  ~QmitkColorWidget() override;
 
   QColor GetColor() const;
   void SetColor(QColor color);
@@ -58,7 +58,7 @@ class QmitkComboBoxListView : public QListView
 
 public:
   explicit QmitkComboBoxListView(QComboBox *comboBox = nullptr);
-  ~QmitkComboBoxListView();
+  ~QmitkComboBoxListView() override;
 
 protected:
   void paintEvent(QPaintEvent *event) override;
@@ -75,7 +75,7 @@ class MITKQTWIDGETS_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegat
 
 public:
   explicit QmitkPropertyItemDelegate(QObject *parent = nullptr);
-  ~QmitkPropertyItemDelegate();
+  ~QmitkPropertyItemDelegate() override;
 
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
   void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;

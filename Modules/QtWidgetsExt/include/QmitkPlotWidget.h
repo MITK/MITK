@@ -90,7 +90,7 @@ public:
   /**
   * Virtual destructor
   */
-  virtual ~QmitkPlotWidget();
+  ~QmitkPlotWidget() override;
 
   /**
   * Returns the instance of the plot-widget. This may be used

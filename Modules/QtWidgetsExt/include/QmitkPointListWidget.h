@@ -55,7 +55,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListWidget : public QWidget
 
 public:
   QmitkPointListWidget(QWidget *parent = 0, int orientation = 0);
-  ~QmitkPointListWidget();
+  ~QmitkPointListWidget() override;
 
   void SetupConnections();
 

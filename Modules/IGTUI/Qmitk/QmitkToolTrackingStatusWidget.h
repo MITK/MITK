@@ -53,7 +53,7 @@ public:
   /*!
   \brief default destructor
   */
-  virtual ~QmitkToolTrackingStatusWidget();
+  ~QmitkToolTrackingStatusWidget() override;
 
   /*!
   \brief Sets up the labels in this widget's QGridLayout for showing the track status of the tracking tools

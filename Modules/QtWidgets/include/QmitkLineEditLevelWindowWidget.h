@@ -41,7 +41,7 @@ public:
   QmitkLineEditLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /// destructor
-  ~QmitkLineEditLevelWindowWidget();
+  ~QmitkLineEditLevelWindowWidget() override;
 
   /// inputfield for level value
   QLineEdit *m_LevelInput;

@@ -38,7 +38,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkUGCombinedRepresentationPropertyWidget : publ
 
 public:
   QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent = nullptr);
-  ~QmitkUGCombinedRepresentationPropertyWidget();
+  ~QmitkUGCombinedRepresentationPropertyWidget() override;
 
   void SetProperty(mitk::GridRepresentationProperty *gridRepresentation,
                    mitk::GridVolumeMapperProperty *volumeMapper,

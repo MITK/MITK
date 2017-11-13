@@ -42,7 +42,7 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     static const std::string VIEW_ID;
 
     QmitkInteractiveTransformationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
-    ~QmitkInteractiveTransformationWidget();
+    ~QmitkInteractiveTransformationWidget() override;
 
     /** Sets the geometry which will be modified by this widget. Default values may be
      *  provided by the second variable. These values will be applied to the geometry

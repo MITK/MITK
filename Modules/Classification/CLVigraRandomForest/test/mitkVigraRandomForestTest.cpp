@@ -78,7 +78,7 @@ public:
   // ------------------------------------------------------------------------------------------------------
   /*
   Train the classifier with an exampledataset of mattlab.
-  Note: The included data are gauﬂan normaldistributed.
+  Note: The included data are gauan normaldistributed.
   */
   void TrainThreadedDecisionForest_MatlabDataSet_shouldReturnTrue()
   {

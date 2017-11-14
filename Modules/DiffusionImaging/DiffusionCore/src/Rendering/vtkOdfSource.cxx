@@ -8,12 +8,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
-
+#include <vtkLookupTable.h>
 #include <limits>
 
 vtkStandardNewMacro(vtkOdfSource);
 
 vtkOdfSource::vtkOdfSource()
+  : ColorVal(-1)
 {
   Scale = 1;
   this->SetNumberOfInputPorts(0);
@@ -69,12 +70,19 @@ int vtkOdfSource::RequestData(
   while(polys->GetNextCell(npts,pts))
   {
     double val = 0;
-    for(int i=0; i<npts; i++)
+
+    if (ColorVal<0)
     {
-      vtkIdType pointId = pts[i];
-      val += colorOdf.GetElement(pointId);
+      for(int i=0; i<npts; i++)
+      {
+        vtkIdType pointId = pts[i];
+        val += colorOdf.GetElement(pointId);
+      }
+      val /= npts;
     }
-    val /= npts;
+    else
+      val = ColorVal;
+
     colors->SetComponent(0,cellId++, 1-val);
   }
 

@@ -288,14 +288,90 @@
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <item row="1" column="0">
-             <widget class="QCheckBox" name="m_ScalingCheckbox">
-              <property name="text">
-               <string>Scaling</string>
+            <item row="0" column="0">
+             <widget class="QFrame" name="m_NormalizationFrame">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
               </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_3">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item row="5" column="1">
+                <widget class="QComboBox" name="m_NormalizationDropdown">
+                 <property name="toolTip">
+                  <string>ODF normalization</string>
+                 </property>
+                 <property name="frame">
+                  <bool>false</bool>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Min-Max</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Max</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>None</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="m_NormalizationLabel">
+                 <property name="text">
+                  <string>ODF Normalization:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="1">
+                <widget class="QComboBox" name="m_OdfColorBox">
+                 <property name="toolTip">
+                  <string>ODF normalization</string>
+                 </property>
+                 <property name="frame">
+                  <bool>false</bool>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>ODF Value</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Principal Direction</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="7" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Color ODFs/Tensors by:</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item row="1" column="0">
              <widget class="QFrame" name="m_ScalingFrame">
               <property name="frameShape">
                <enum>QFrame::NoFrame</enum>
@@ -317,6 +393,13 @@
                 <number>0</number>
                </property>
                <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>ODF Scale:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QComboBox" name="m_AdditionalScaling">
                  <property name="frame">
                   <bool>false</bool>
@@ -328,12 +411,7 @@
                  </item>
                  <item>
                   <property name="text">
-                   <string>By GFA</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>By ASR</string>
+                   <string>FA/GFA</string>
                   </property>
                  </item>
                 </widget>
@@ -362,139 +440,6 @@
                  <property name="value">
                   <double>1.000000000000000</double>
                  </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QFrame" name="m_NormalizationFrame">
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_3">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item row="0" column="0" alignment="Qt::AlignLeft">
-                <widget class="QRadioButton" name="m_OdfViewRadioButton">
-                 <property name="text">
-                  <string>&amp;ODF View</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">buttonGroup_2</string>
-                 </attribute>
-                </widget>
-               </item>
-               <item row="6" column="0" alignment="Qt::AlignLeft">
-                <widget class="QRadioButton" name="m_colouriseRainbowRadioButton">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string>&amp;Rainbow colorization</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">buttonGroup</string>
-                 </attribute>
-                </widget>
-               </item>
-               <item row="0" column="1" alignment="Qt::AlignLeft">
-                <widget class="QRadioButton" name="m_EllipsoidViewRadioButton">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string>E&amp;llipsoid View </string>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">buttonGroup_2</string>
-                 </attribute>
-                </widget>
-               </item>
-               <item row="6" column="1" alignment="Qt::AlignLeft">
-                <widget class="QRadioButton" name="m_colouriseSimpleRadioButton">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>&amp;Simple colorization</string>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">buttonGroup</string>
-                 </attribute>
-                </widget>
-               </item>
-               <item row="3" column="0" colspan="2">
-                <widget class="QComboBox" name="m_NormalizationDropdown">
-                 <property name="toolTip">
-                  <string>ODF normalization</string>
-                 </property>
-                 <property name="frame">
-                  <bool>false</bool>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>Min-Max</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Max</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>None</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="7" column="0" alignment="Qt::AlignLeft">
-                <widget class="QRadioButton" name="m_randomModeRadioButton">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string>Random Placement</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">buttonGroup_3</string>
-                 </attribute>
-                </widget>
-               </item>
-               <item row="7" column="1" alignment="Qt::AlignLeft">
-                <widget class="QRadioButton" name="m_orderedModeRadioButton">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string>Orderer Placement</string>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">buttonGroup_3</string>
-                 </attribute>
                 </widget>
                </item>
               </layout>
@@ -940,7 +885,6 @@ p, li { white-space: pre-wrap; }
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

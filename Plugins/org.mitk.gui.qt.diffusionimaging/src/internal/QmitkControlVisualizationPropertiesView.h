@@ -67,7 +67,6 @@ protected slots:
   void NormalizationDropdownChanged(int);
   void ScalingFactorChanged(double);
   void AdditionalScaling(int);
-  void ScalingCheckbox();
   void OnThickSlicesModeSelected( QAction* action );
   void OnTSNumChanged(int num);
   void ResetColoring();
@@ -82,14 +81,8 @@ protected slots:
   void FlipPeaks();
   void Welcome();
 
-  /// \brief Slot function for switching tensor view between ODF and ellipsoids from tensors.
-  void OnTensorViewChanged();
-
   /// \brief Slot function for switching colourisation mode of glyphs.
   void OnColourisationModeChanged();
-
-  /// \brief Slot function for switching glyph placement mode.
-  void OnRandomModeChanged();
 
 protected:
 

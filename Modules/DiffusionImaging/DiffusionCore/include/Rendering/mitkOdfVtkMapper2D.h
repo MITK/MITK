@@ -114,9 +114,9 @@ protected:
 
     static void GlyphMethod(void *arg);
     bool IsPlaneRotated(mitk::BaseRenderer* renderer);
-    static bool m_toggleTensorEllipsoidView;
-    static bool m_toggleColourisationMode;
-    static bool m_toggleGlyphPlacementMode;
+    static bool m_ToggleTensorEllipsoidView;
+    static bool m_ToggleColourisationMode;
+    static bool m_ToggleGlyphPlacementMode;
 
     typedef vnl_matrix_fixed<double, 3, 3> DirectionsType;
 
@@ -125,26 +125,24 @@ private:
 
     mitk::Image* GetInput();
 
-    static vtkSmartPointer<vtkTransform> m_OdfTransform;
-    static vtkSmartPointer<vtkOdfSource> m_OdfSource;
-    static float    m_Scaling;
-    static int      m_Normalization;
-    static int      m_ScaleBy;
-    static float    m_IndexParam1;
-    static float    m_IndexParam2;
-    static vtkSmartPointer<vtkDoubleArray> m_colourScalars;
-
-    int             m_ShowMaxNumber;
-
+    static vtkSmartPointer<vtkTransform>              m_OdfTransform;
+    static vtkSmartPointer<vtkOdfSource>              m_OdfSource;
+    static float                                      m_Scaling;
+    static int                                        m_Normalization;
+    static int                                        m_ScaleBy;
+    static float                                      m_IndexParam1;
+    static float                                      m_IndexParam2;
+    static vtkSmartPointer<vtkDoubleArray>            m_ColourScalars;
+    int                                               m_ShowMaxNumber;
     std::vector< vtkSmartPointer<vtkPlane> >          m_Planes;
     std::vector< vtkSmartPointer<vtkCutter> >         m_Cutters;
     std::vector< vtkSmartPointer<vtkThickPlane> >     m_ThickPlanes1;
-    std::vector< vtkSmartPointer<vtkClipPolyData> >  m_Clippers1;
+    std::vector< vtkSmartPointer<vtkClipPolyData> >   m_Clippers1;
     std::vector< vtkSmartPointer<vtkThickPlane> >     m_ThickPlanes2;
-    std::vector< vtkSmartPointer<vtkClipPolyData> >  m_Clippers2;
-    vtkImageData*                   m_VtkImage ;
-    OdfDisplayGeometry              m_LastDisplayGeometry;
-    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+    std::vector< vtkSmartPointer<vtkClipPolyData> >   m_Clippers2;
+    vtkImageData*                                     m_VtkImage ;
+    std::vector< OdfDisplayGeometry >                 m_LastDisplayGeometry;
+    mitk::LocalStorageHandler<LocalStorage>           m_LSH;
 };
 
 } // namespace mitk

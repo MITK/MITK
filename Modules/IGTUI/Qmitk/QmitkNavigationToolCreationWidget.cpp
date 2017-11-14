@@ -313,7 +313,10 @@ void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
 void QmitkNavigationToolCreationWidget::OnEditToolTip()
 {
   m_ToolTransformationWidget->SetGeometryPointer(m_ToolToBeEdited->GetDataNode()->GetData()->GetGeometry());
-  m_ToolTransformationWidget->SetValues(m_ToolToBeEdited->GetToolTipTransform());
+  m_ToolTransformationWidget->SetGeometryDefaultValues(m_ToolToBeEdited->GetToolTipTransform());
+
+  //change color to red
+  m_ToolToBeEdited->GetToolSurface()->SetProperty("color", mitk::ColorProperty::New(1, 0, 0));//Todo falsche surface?!
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_ToolTransformationWidget);
@@ -326,21 +329,27 @@ void QmitkNavigationToolCreationWidget::OnEditToolTip()
 void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
   m_ToolEditDialog.close();
-  //This function is called, when the toolTipEdit view is closed.
-  m_ToolToBeEdited->SetToolTipPosition(toolTip->GetOffset());
-  mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
-  m_ToolToBeEdited->SetToolTipOrientation(tempND->GetOrientation());
+  m_ToolToBeEdited->GetToolSurface()->SetProperty("color", mitk::ColorProperty::New(1, 1, 1)); // Todo falsche surface ? !
 
-  //Update Label
-  QString _label = "(" +
-    QString::number(m_ToolToBeEdited->GetToolTipPosition()[0], 'f', 1) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipPosition()[1], 'f', 1) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[0], 'f', 2) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[1], 'f', 2) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[2], 'f', 2) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[3], 'f', 2) + "]";
-  m_Controls->m_ToolTipLabel->setText(_label);
+  //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
+  if (toolTip)
+  {
+    //This function is called, when the toolTipEdit view is closed.
+    m_ToolToBeEdited->SetToolTipPosition(toolTip->GetOffset());
+    mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
+    m_ToolToBeEdited->SetToolTipOrientation(tempND->GetOrientation());
+
+    //Update Label
+    QString _label = "(" +
+      QString::number(m_ToolToBeEdited->GetToolTipPosition()[0], 'f', 1) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolTipPosition()[1], 'f', 1) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
+      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[0], 'f', 2) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[1], 'f', 2) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[2], 'f', 2) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[3], 'f', 2) + "]";
+    m_Controls->m_ToolTipLabel->setText(_label);
+  }
 }
 
 void QmitkNavigationToolCreationWidget::FillUIToolLandmarkLists(mitk::PointSet::Pointer calLandmarks, mitk::PointSet::Pointer regLandmarks)

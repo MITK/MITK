@@ -6,22 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
-    <height>380</height>
+    <width>435</width>
+    <height>381</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
-   <item row="2" column="0">
-    <widget class="QPushButton" name="m_ResetPB">
-     <property name="text">
-      <string>Reset To Identity</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="4">
+   <item row="0" column="0" colspan="5">
     <widget class="QGroupBox" name="interactiveTranslationBox">
      <property name="title">
       <string>Interactive Translation</string>
@@ -75,7 +68,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="invertedAppearance">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="invertedControls">
              <bool>false</bool>
@@ -137,7 +130,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="invertedAppearance">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="tickPosition">
              <enum>QSlider::TicksAbove</enum>
@@ -202,7 +195,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="invertedAppearance">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="tickPosition">
              <enum>QSlider::TicksAbove</enum>
@@ -232,7 +225,7 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="4">
+   <item row="1" column="0" colspan="5">
     <widget class="QGroupBox" name="interactiveRotationBox">
      <property name="title">
       <string>Interactive Rotation</string>
@@ -416,21 +409,39 @@
         </item>
        </layout>
       </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="m_UseManipulatedToolTipPB">
+          <property name="text">
+           <string>Use Manipulated ToolTip</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_ResetPB">
+          <property name="text">
+           <string>Reset To Identity</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_RevertChanges">
+          <property name="text">
+           <string>Revert Changes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_Cancel">
+          <property name="text">
+           <string>Cancel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="m_RevertChanges">
-     <property name="text">
-      <string>Revert Changes</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="m_UseManipulatedToolTipPB">
-     <property name="text">
-      <string>Use Manipulated ToolTip</string>
-     </property>
     </widget>
    </item>
   </layout>

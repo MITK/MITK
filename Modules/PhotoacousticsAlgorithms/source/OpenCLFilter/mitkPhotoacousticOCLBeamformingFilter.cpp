@@ -99,7 +99,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
   if (BeamformingSettings::SettingsChangedOpenCL(m_Conf, m_ConfOld))
   {
     cl_int clErr = 0;
-    MITK_INFO << "Updating GPU Buffers for new configuration";
+    MITK_DEBUG << "Updating GPU Buffers for new configuration";
 
     // create the apodisation buffer
 

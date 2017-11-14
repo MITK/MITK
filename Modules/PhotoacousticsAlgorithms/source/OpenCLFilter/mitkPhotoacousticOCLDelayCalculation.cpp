@@ -74,9 +74,9 @@ void mitk::OCLDelayCalculation::Execute()
   }
 
   if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
-    m_DelayMultiplicatorRaw = pow(1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * m_Conf.Pitch * m_Conf.TransducerElements / m_Conf.inputDim[0], 2) / 2;
+    m_DelayMultiplicatorRaw = pow(1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * m_Conf.Pitch * (float)m_Conf.TransducerElements / (float)m_Conf.inputDim[0], 2) / 2;
   else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
-    m_DelayMultiplicatorRaw = 1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements);
+    m_DelayMultiplicatorRaw = 1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*(float)m_Conf.TransducerElements);
 
   m_IsPAImage = m_Conf.isPhotoacousticImage;
   

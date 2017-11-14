@@ -770,9 +770,10 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       // read the pixelvalues of the enveloped images at this position
 
       itk::Index<3> pixel = { {
-          (itk::Index<3>::IndexValueType)(m_RecordedImages.at(1)->GetDimension(0) / 2),
+          (itk::Index<3>::IndexValueType)(m_RecordedImages.at(0)->GetDimension(0) / 2),
           (itk::Index<3>::IndexValueType)(22.0 / 532.0*m_Device->GetScanMode().reconstructionSamplesPerLine), 
           0 } }; //22/532*2048 = 84
+
       GetPixelValues(pixel, m_PixelValues); // write the Pixelvalues to m_PixelValues
 
       // save the timestamps!
@@ -799,7 +800,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       settingsFile << "Speed of Sound [m/s] = " << sM.averageSpeedOfSound << "\n";
       settingsFile << "Excitation Frequency [MHz] = " << sM.transducerFrequencyHz/1000000 << "\n";
       settingsFile << "Voltage [V] = " << sM.voltageV << "\n";
-      settingsFile << "TGC min = " << (int)sM.tgcdB[0] << " max = " << (int)sM.tgcdB[6] << "\n";
+      settingsFile << "TGC min = " << (int)sM.tgcdB[0] << " max = " << (int)sM.tgcdB[7] << "\n";
 
       settingsFile << "[Beamforming Parameters]\n";
       settingsFile << "Reconstructed Lines = " << sM.reconstructionLines << "\n";
@@ -822,7 +823,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
 void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel, std::vector<float>& values)
 {
-  unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+  unsigned int events = 2;
   for (int index = 0; index < m_RecordedImages.size(); index += events)  // omit sound images
   {
     Image::Pointer image = m_RecordedImages.at(index);
@@ -836,6 +837,8 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
   unsigned int width  = 32;
   unsigned int height = 32;
   unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+  if (!raw)
+    events = 2; // the beamformed image array contains only the resulting image of multiple events
 
   if (raw)
   {
@@ -864,6 +867,7 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
   for (int index = 0; index < recordedList.size(); ++index)
   {
     mitk::ImageReadAccessor inputReadAccessor(recordedList.at(index));
+
     if (index % events == 0)
     {
       PAImage->SetSlice(inputReadAccessor.GetData(), index / events);

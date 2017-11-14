@@ -221,7 +221,7 @@ void QmitkODFDetailsView::UpdateOdf()
         overviewText += "Stdev: "+QString::number(stdev)+"\n";
         overviewText += "Min: "+QString::number(min)+"\n";
         overviewText += "Max: "+QString::number(max)+"\n";
-        vnl_vector_fixed<double, 3> pd = odf.GetDirection(odf.GetPrincipleDiffusionDirection());
+        vnl_vector_fixed<double, 3> pd = odf.GetDirection(odf.GetPrincipalDiffusionDirectionIndex());
         overviewText += "Main Diffusion:\n     "+QString::number(pd[0])+"\n     "+QString::number(pd[1])+"\n     "+QString::number(pd[2])+"\n";
 
         m_Controls->m_OdfValuesTextEdit->setText(values);

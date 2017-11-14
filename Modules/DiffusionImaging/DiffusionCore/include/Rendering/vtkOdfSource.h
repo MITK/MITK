@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class MITKDIFFUSIONCORE_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
 public:
+
   vtkTypeMacro(vtkOdfSource,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -49,6 +50,9 @@ public:
   vtkSetMacro(Odf,OdfType);
   vtkGetMacro(Odf,OdfType);
 
+  vtkGetMacro(ColorVal,double);
+  vtkSetMacro(ColorVal,double);
+
 protected:
   vtkOdfSource();
   ~vtkOdfSource() {}
@@ -60,6 +64,7 @@ protected:
   double  Scale;
   double  AdditionalScale;
   int     Normalization;
+  double  ColorVal;
 
 private:
   vtkOdfSource(const vtkOdfSource&);  // Not implemented.

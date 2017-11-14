@@ -53,12 +53,12 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     void SetGeometryDefaultValues(const mitk::AffineTransform3D::Pointer _defaultValues);
 
   protected slots:
-    void OnZTranslationValueChanged( int v );
-    void OnYTranslationValueChanged( int v );
-    void OnXTranslationValueChanged( int v );
-    void OnZRotationValueChanged( int v );
-    void OnYRotationValueChanged( int v );
-    void OnXRotationValueChanged( int v );
+    void OnZTranslationValueChanged( double v );
+    void OnYTranslationValueChanged(double v);
+    void OnXTranslationValueChanged(double v);
+    void OnZRotationValueChanged(double v);
+    void OnYRotationValueChanged(double v);
+    void OnXRotationValueChanged(double v);
     void OnResetGeometryToIdentity();
     void OnRevertChanges();
     void OnApplyManipulatedToolTip();

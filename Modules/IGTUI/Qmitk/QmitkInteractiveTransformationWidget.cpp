@@ -27,10 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkInteractiveTransformationWidget::VIEW_ID = "org.mitk.views.interactivetransformationwidget";
 
 QmitkInteractiveTransformationWidget::QmitkInteractiveTransformationWidget(QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_Controls(nullptr), m_Geometry(nullptr), m_ResetGeometry(nullptr)
+  : QWidget(parent, f), m_Controls(nullptr), m_Geometry(nullptr)
 {
   CreateQtPartControl(this);
   CreateConnections();
+
+  m_ResetGeometry = mitk::Geometry3D::New();
 }
 
 QmitkInteractiveTransformationWidget::~QmitkInteractiveTransformationWidget()
@@ -52,23 +54,23 @@ void QmitkInteractiveTransformationWidget::CreateConnections()
   if (m_Controls)
   {
     // translations
-    connect(m_Controls->m_XTransSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnXTranslationValueChanged);
+    connect(m_Controls->m_XTransSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnXTranslationValueChanged);
     connect(m_Controls->m_XTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnXTranslationValueChanged);
 
-    connect(m_Controls->m_YTransSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnYTranslationValueChanged);
+    connect(m_Controls->m_YTransSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnYTranslationValueChanged);
     connect(m_Controls->m_YTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnYTranslationValueChanged);
 
-    connect(m_Controls->m_ZTransSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnZTranslationValueChanged);
+    connect(m_Controls->m_ZTransSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnZTranslationValueChanged);
     connect(m_Controls->m_ZTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnZTranslationValueChanged);
 
     // rotations
-    connect(m_Controls->m_XRotSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnXRotationValueChanged);
+    connect(m_Controls->m_XRotSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnXRotationValueChanged);
     connect(m_Controls->m_XRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnXRotationValueChanged);
 
-    connect(m_Controls->m_YRotSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnYRotationValueChanged);
+    connect(m_Controls->m_YRotSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnYRotationValueChanged);
     connect(m_Controls->m_YRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnYRotationValueChanged);
 
-    connect(m_Controls->m_ZRotSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnZRotationValueChanged);
+    connect(m_Controls->m_ZRotSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnZRotationValueChanged);
     connect(m_Controls->m_ZRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnZRotationValueChanged);
 
     connect((QObject*)(m_Controls->m_ResetPB), SIGNAL(clicked()), this, SLOT(OnResetGeometryToIdentity()));
@@ -81,13 +83,15 @@ void QmitkInteractiveTransformationWidget::CreateConnections()
 void QmitkInteractiveTransformationWidget::SetGeometryPointer(mitk::BaseGeometry::Pointer geometry)
 {
   m_Geometry = geometry;
-  m_ResetGeometry = geometry->Clone(); //Remember the original values to be able to reset and abort everything
+  //For ResetGeometry, use the set-fuction via vtk matrix, 'cause this garantees a deep copy and not just sharing a pointer.
+  m_ResetGeometry->SetIndexToWorldTransformByVtkMatrix(geometry->GetVtkMatrix()); //Remember the original values to be able to reset and abort everything
 }
 
 void QmitkInteractiveTransformationWidget::SetGeometryDefaultValues(const mitk::AffineTransform3D::Pointer _defaultValues)
 {
   m_Geometry->SetIndexToWorldTransform(_defaultValues);
-  m_ResetGeometry->SetIndexToWorldTransform(_defaultValues); //Remember the original values to be able to reset and abort everything
+  //For ResetGeometry, use the set-fuction via vtk matrix, 'cause this garantees a deep copy and not just sharing a pointer.
+  m_ResetGeometry->SetIndexToWorldTransformByVtkMatrix(m_Geometry->GetVtkMatrix()); //Remember the original values to be able to reset and abort everything
   SetValuesToGUI(_defaultValues);
 }
 
@@ -117,7 +121,7 @@ void QmitkInteractiveTransformationWidget::SetValuesToGUI(const mitk::AffineTran
 // Section to allow interactive positioning of the moving surface
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged(int v)
+void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged(double v)
 {
   this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
 
@@ -135,7 +139,7 @@ void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged(int v)
   this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
-void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged(int v)
+void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged(double v)
 {
   this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
 
@@ -153,7 +157,7 @@ void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged(int v)
   this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
-void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged(int v)
+void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged(double v)
 {
   this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
 
@@ -171,7 +175,7 @@ void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged(int v)
   this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
-void QmitkInteractiveTransformationWidget::OnXRotationValueChanged(int v)
+void QmitkInteractiveTransformationWidget::OnXRotationValueChanged(double v)
 {
   this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
   mitk::Vector3D rotationParams;
@@ -187,7 +191,7 @@ void QmitkInteractiveTransformationWidget::OnXRotationValueChanged(int v)
   this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
-void QmitkInteractiveTransformationWidget::OnYRotationValueChanged(int v)
+void QmitkInteractiveTransformationWidget::OnYRotationValueChanged(double v)
 {
   this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
   mitk::Vector3D rotationParams;
@@ -203,7 +207,7 @@ void QmitkInteractiveTransformationWidget::OnYRotationValueChanged(int v)
   this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
-void QmitkInteractiveTransformationWidget::OnZRotationValueChanged(int v)
+void QmitkInteractiveTransformationWidget::OnZRotationValueChanged(double v)
 {
   this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
   mitk::Vector3D rotationParams;
@@ -252,7 +256,7 @@ void QmitkInteractiveTransformationWidget::OnResetGeometryToIdentity()
 void QmitkInteractiveTransformationWidget::OnRevertChanges()
 {
   // reset the input to its initial state.
-  m_Geometry->SetIndexToWorldTransform(m_ResetGeometry->GetIndexToWorldTransform());
+  m_Geometry->SetIndexToWorldTransformByVtkMatrix(m_ResetGeometry->GetVtkMatrix());
 
   //Update Sliders
   this->SetValuesToGUI(m_Geometry->GetIndexToWorldTransform());

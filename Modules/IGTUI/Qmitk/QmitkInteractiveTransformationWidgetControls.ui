@@ -82,12 +82,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_XTransSpinBox">
+           <widget class="QDoubleSpinBox" name="m_XTransSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-500</number>
+             <double>-500.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>500</number>
+             <double>500.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -141,15 +144,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_YTransSpinBox">
+           <widget class="QDoubleSpinBox" name="m_YTransSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-500</number>
+             <double>-500.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>500</number>
-            </property>
-            <property name="value">
-             <number>0</number>
+             <double>500.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -206,15 +209,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_ZTransSpinBox">
+           <widget class="QDoubleSpinBox" name="m_ZTransSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-500</number>
+             <double>-500.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>500</number>
-            </property>
-            <property name="singleStep">
-             <number>1</number>
+             <double>500.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -284,12 +287,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_XRotSpinBox">
+           <widget class="QDoubleSpinBox" name="m_XRotSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-180</number>
+             <double>-180.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <double>180.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -340,12 +346,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_YRotSpinBox">
+           <widget class="QDoubleSpinBox" name="m_YRotSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-180</number>
+             <double>-180.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <double>180.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -396,12 +405,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_ZRotSpinBox">
+           <widget class="QDoubleSpinBox" name="m_ZRotSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-180</number>
+             <double>-180.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <double>180.000000000000000</double>
             </property>
            </widget>
           </item>

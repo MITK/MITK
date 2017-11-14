@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>382</width>
-    <height>1217</height>
+    <height>1278</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -137,10 +137,16 @@
            <property name="text">
             <string>Do Resampling</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QComboBox" name="BModeMethod">
+           <property name="currentText">
+            <string>Envelope Detection</string>
+           </property>
            <item>
             <property name="text">
              <string>Absolute Filter</string>
@@ -174,6 +180,9 @@
                <pointsize>11</pointsize>
               </font>
              </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
              <property name="minimum">
               <double>0.010000000000000</double>
              </property>
@@ -184,7 +193,7 @@
               <double>0.010000000000000</double>
              </property>
              <property name="value">
-              <double>0.100000000000000</double>
+              <double>0.075000000000000</double>
              </property>
             </widget>
            </item>
@@ -339,7 +348,7 @@
             <double>5.000000000000000</double>
            </property>
            <property name="value">
-            <double>1480.000000000000000</double>
+            <double>1540.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -751,6 +760,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="currentText">
+          <string>Spherical Wave</string>
+         </property>
          <item>
           <property name="text">
            <string>Quad. Approx.</string>
@@ -843,7 +855,7 @@
           <double>5.000000000000000</double>
          </property>
          <property name="value">
-          <double>1480.000000000000000</double>
+          <double>1540.000000000000000</double>
          </property>
         </widget>
        </item>

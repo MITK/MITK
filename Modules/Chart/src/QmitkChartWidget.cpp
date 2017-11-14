@@ -121,7 +121,7 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
 QmitkChartWidget::Impl::~Impl()
 {
   delete m_C3Data;
-  qDeleteAll(m_C3xyData);
+  qDeleteAll(*m_C3xyData);
 
   delete m_C3xyData;
 }

@@ -309,10 +309,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
     config.CropBounds[0] = 0;
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
-  auto begin = std::chrono::high_resolution_clock::now();
   Image::Pointer processedImage = ApplyCropping(inputImage, config.upperCutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
-  auto end = std::chrono::high_resolution_clock::now();
-  MITK_INFO << "dddd " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
 
   config.inputDim[0] = processedImage->GetDimension(0);
   config.inputDim[1] = processedImage->GetDimension(1);

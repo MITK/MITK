@@ -467,7 +467,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
             mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * apodisation[(short)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(short)((l_s1 - minLine)*apod_mult)];
-            output[sample*(short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
+            output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
       }
@@ -542,7 +542,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
             mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * apodisation[(int)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(int)((l_s1 - minLine)*apod_mult)];
-            output[sample*(short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
+            output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
       }

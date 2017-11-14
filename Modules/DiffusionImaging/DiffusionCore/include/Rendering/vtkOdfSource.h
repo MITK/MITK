@@ -50,8 +50,12 @@ public:
   vtkSetMacro(Odf,OdfType);
   vtkGetMacro(Odf,OdfType);
 
-  vtkGetMacro(ColorVal,double);
-  vtkSetMacro(ColorVal,double);
+  void SetColor(int r, int g, int b)
+  {
+    this->r = r;
+    this->g = g;
+    this->b = b;
+  }
 
 protected:
   vtkOdfSource();
@@ -64,7 +68,9 @@ protected:
   double  Scale;
   double  AdditionalScale;
   int     Normalization;
-  double  ColorVal;
+  int r;
+  int g;
+  int b;
 
 private:
   vtkOdfSource(const vtkOdfSource&);  // Not implemented.

@@ -267,7 +267,6 @@ void  mitk::OdfVtkMapper2D<T,N>
   typedef itk::OrientationDistributionFunction<float,N> OdfType;
   OdfType odf;
 
-  double color_val = -1;
   if( odfvals->GetNumberOfComponents()==6 and not m_ToggleTensorEllipsoidView )
   {
     float tensorelems[6] = {
@@ -302,11 +301,11 @@ void  mitk::OdfVtkMapper2D<T,N>
 
   if (m_ToggleColourisationMode)
   {
-    vnl_vector_fixed<double, 3> x_dir; x_dir.fill(0.0); x_dir[0] = 1;
     vnl_vector_fixed<double,3> d = odf.GetPrincipalDiffusionDirection();
-    color_val = fabs(dot_product(x_dir,d));
+    m_OdfSource->SetColor(fabs(d[0])*255,fabs(d[1])*255,fabs(d[2])*255);
   }
-  m_OdfSource->SetColorVal(color_val);
+  else
+    m_OdfSource->SetColor(0,0,0);
 
   switch(m_ScaleBy)
   {
@@ -647,8 +646,15 @@ void  mitk::OdfVtkMapper2D<T,N>
       localStorage->m_OdfsPlanes[index]->Update();
     }
   }
-
   localStorage->m_OdfsMappers[index]->SetScalarModeToDefault();
+
+  if (m_ToggleColourisationMode)
+  {
+    localStorage->m_OdfsMappers[index]->ScalarVisibilityOn();
+    localStorage->m_OdfsMappers[index]->SetScalarModeToUsePointFieldData();
+    localStorage->m_OdfsMappers[index]->SelectColorArray("FIBER_COLORS");
+  }
+
   localStorage->m_PropAssemblies[index]->VisibilityOn();
   if(localStorage->m_PropAssemblies[index]->GetParts()->IsItemPresent(localStorage->m_OdfsActors[index]))
   {

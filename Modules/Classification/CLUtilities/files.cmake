@@ -14,11 +14,18 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFCooccurenceMatrix2.cpp
   GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
   GlobalImageFeatures/mitkGIFGrayLevelSizeZone.cpp
+  GlobalImageFeatures/mitkGIFImageDescriptionFeatures.cpp
   GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp
+  GlobalImageFeatures/mitkGIFFirstOrderHistogramStatistics.cpp
   GlobalImageFeatures/mitkGIFVolumetricStatistics.cpp
   GlobalImageFeatures/mitkGIFNeighbouringGreyLevelDependenceFeatures.cpp
   GlobalImageFeatures/mitkGIFNeighbourhoodGreyLevelDifference.cpp
   GlobalImageFeatures/mitkGIFGreyLevelSizeZone.cpp
+  GlobalImageFeatures/mitkGIFGreyLevelDistanceZone.cpp
+  GlobalImageFeatures/mitkGIFLocalIntensity.cpp
+  GlobalImageFeatures/mitkGIFVolumetricDensityStatistics.cpp
+  GlobalImageFeatures/mitkGIFIntensityVolumeHistogramFeatures.cpp
+  GlobalImageFeatures/mitkGIFNeighbourhoodGreyToneDifferenceFeatures.cpp
 
   MiniAppUtils/mitkGlobalImageFeaturesParameter.cpp
   MiniAppUtils/mitkSplitParameterToVector.cpp

@@ -35,7 +35,8 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
 {
   // Required Parameter
   parser.addArgument("image",   "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input image file", us::Any(), false);
-  parser.addArgument("mask",    "m", mitkCommandLineParser::InputImage, "Input Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any(), false);
+  parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any(), false);
+  parser.addArgument("morph-mask", "morph", mitkCommandLineParser::InputImage, "Morphological Image Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any());
   parser.addArgument("output",  "o", mitkCommandLineParser::OutputFile, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false);
 
   // Optional Parameter
@@ -46,6 +47,7 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
 
   parser.addArgument("header",            "head",    mitkCommandLineParser::Bool, "Add Header (Labels) to output", "", us::Any());
   parser.addArgument("first-line-header", "fl-head", mitkCommandLineParser::Bool, "Add Header (Labels) to first line of output", "", us::Any());
+  parser.addArgument("decimal-point", "decimal", mitkCommandLineParser::String, "Decima Point that is used in Conversion", "", us::Any());
 
   parser.addArgument("resample-mask",   "rm", mitkCommandLineParser::Bool,  "Bool",  "Resamples the mask to the resolution of the input image ", us::Any());
   parser.addArgument("same-space",      "sp", mitkCommandLineParser::Bool,  "Bool",  "Set the spacing of all images to equal. Otherwise an error will be thrown. ", us::Any());
@@ -54,6 +56,7 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   parser.addArgument("minimum-intensity", "minimum", mitkCommandLineParser::Float, "Float", "Minimum intensity. If set, it is overwritten by more specific intensity minima", us::Any());
   parser.addArgument("maximum-intensity", "maximum", mitkCommandLineParser::Float, "Float", "Maximum intensity. If set, it is overwritten by more specific intensity maxima", us::Any());
   parser.addArgument("bins", "bins", mitkCommandLineParser::Int, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
+  parser.addArgument("binsize", "binsize", mitkCommandLineParser::Float, "Int", "Size of bins that is used. If set, it is overwritten by more specific bin count", us::Any());
 
 }
 
@@ -80,6 +83,14 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseFileLocations(std::map<std::st
   imageName = itksys::SystemTools::GetFilenameName(imagePath);
   maskFolder = itksys::SystemTools::GetFilenamePath(maskPath);
   maskName = itksys::SystemTools::GetFilenameName(maskPath);
+
+  useMorphMask = false;
+  if (parsedArgs.count("morph-mask"))
+  {
+    useMorphMask = true;
+    morphPath = parsedArgs["morph-mask"].ToString();
+    morphName = itksys::SystemTools::GetFilenameName(morphPath);
+  }
 
 }
 
@@ -118,6 +129,16 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseAdditionalOutputs(std::map<std
       pngScrenshotFolderPath = pngScreenshotsPath;
     }
     itk::FileTools::CreateDirectory(pngScrenshotFolderPath.c_str());
+  }
+  useDecimalPoint = false;
+  if (parsedArgs.count("decimal-point"))
+  {
+    auto tmpDecimalPoint = us::any_cast<std::string>(parsedArgs["decimal-point"]);
+    if (tmpDecimalPoint.length() > 0)
+    {
+      useDecimalPoint = true;
+      decimalPoint = tmpDecimalPoint.at(0);
+    }
   }
 
 }

@@ -35,6 +35,8 @@ set(mitk_modules
   Chart
   QmlItems
   SegmentationUI
+  MatchPointRegistration
+  MatchPointRegistrationUI
   Classification
   DiffusionImaging
   GPGPU
@@ -68,8 +70,6 @@ set(mitk_modules
   TubeGraph
   BiophotonicsHardware
   TumorInvasionAnalysis
-  MatchPointRegistration
-  MatchPointRegistrationUI
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI

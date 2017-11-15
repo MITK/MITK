@@ -60,9 +60,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkShiftScaleImageFilter.h>
 
+// STD
+#include <cmath>
+
 
 // Convenient Definitions
-typedef itk::Image<short, 3>                                                            ImageType;
+typedef itk::Image<double, 3>                                                           ImageType;
 typedef itk::Image<unsigned char, 3>                                                    SegmentationImageType;
 typedef itk::Image<double, 3>                                                           DoubleImageType;
 typedef itk::Image<itk::Vector<float,3>, 3>                                             VectorImageType;
@@ -321,9 +324,9 @@ void QmitkPreprocessingResampling::StartButtonClicked()
       ImageType::SizeType output_size;
       ImageType::SpacingType output_spacing;
 
-      output_size[0] = input_size[0] * (input_spacing[0] / dparam1);
-      output_size[1] = input_size[1] * (input_spacing[1] / dparam2);
-      output_size[2] = input_size[2] * (input_spacing[2] / dparam3);
+      output_size[0] = std::ceil(input_size[0] * (input_spacing[0] / dparam1));
+      output_size[1] = std::ceil(input_size[1] * (input_spacing[1] / dparam2));
+      output_size[2] = std::ceil(input_size[2] * (input_spacing[2] / dparam3));
       output_spacing [0] = dparam1;
       output_spacing [1] = dparam2;
       output_spacing [2] = dparam3;

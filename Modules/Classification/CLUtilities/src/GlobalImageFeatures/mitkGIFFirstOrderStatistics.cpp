@@ -80,6 +80,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double count = labelStatisticsImageFilter->GetCount(1);
   //double std_dev = labelStatisticsImageFilter->GetSigma(1);
   double mean = labelStatisticsImageFilter->GetMean(1);
+  double median = labelStatisticsImageFilter->GetMedian(1);
   auto histogram = labelStatisticsImageFilter->GetHistogram(1);
   bool histogramIsCalculated = histogram;
 
@@ -92,6 +93,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double squared_sum = 0;
   double kurtosis = 0;
   double mean_absolut_deviation = 0;
+  double median_absolut_deviation = 0;
   double skewness = 0;
   double sum_prob = 0;
   double binWidth = 0;
@@ -151,6 +153,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 
       prob /= count;
       mean_absolut_deviation += prob* std::abs(voxelValue - mean);
+      median_absolut_deviation += prob* std::abs(voxelValue - median);
       variance += prob * (voxelValue - mean) * (voxelValue - mean);
 
       kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
@@ -169,55 +172,9 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double rms = std::sqrt(squared_sum / count);
   kurtosis = kurtosis / (variance * variance);
   skewness = skewness / (variance * uncorrected_std_dev);
-  //mean_absolut_deviation = mean_absolut_deviation;
   double coveredGrayValueRange = range / imageRange;
-
-  featureList.push_back(std::make_pair("FirstOrder Range",range));
-  featureList.push_back(std::make_pair("FirstOrder Uniformity",uniformity));
-  featureList.push_back(std::make_pair("FirstOrder Entropy",entropy));
-  featureList.push_back(std::make_pair("FirstOrder Energy",squared_sum));
-  featureList.push_back(std::make_pair("FirstOrder RMS",rms));
-  featureList.push_back(std::make_pair("FirstOrder Kurtosis", kurtosis));
-  featureList.push_back(std::make_pair("FirstOrder Excess Kurtosis", kurtosis-3));
-  featureList.push_back(std::make_pair("FirstOrder Skewness",skewness));
-  featureList.push_back(std::make_pair("FirstOrder Mean absolute deviation",mean_absolut_deviation));
-  featureList.push_back(std::make_pair("FirstOrder Covered Image Intensity Range",coveredGrayValueRange));
-
-  featureList.push_back(std::make_pair("FirstOrder Minimum",labelStatisticsImageFilter->GetMinimum(1)));
-  featureList.push_back(std::make_pair("FirstOrder Maximum",labelStatisticsImageFilter->GetMaximum(1)));
-  featureList.push_back(std::make_pair("FirstOrder Mean",labelStatisticsImageFilter->GetMean(1)));
-  featureList.push_back(std::make_pair("FirstOrder Unbiased Variance", labelStatisticsImageFilter->GetVariance(1))); //Siehe Definition von Unbiased Variance estimation. (Wird nicht durch n sondern durch n-1 normalisiert)
-  featureList.push_back(std::make_pair("FirstOrder Biased Variance", variance));
-  featureList.push_back(std::make_pair("FirstOrder Sum",labelStatisticsImageFilter->GetSum(1)));
-  featureList.push_back(std::make_pair("FirstOrder Median", labelStatisticsImageFilter->GetMedian(1)));
-  featureList.push_back(std::make_pair("FirstOrder Mode", mode_bin));
-  featureList.push_back(std::make_pair("FirstOrder Mode Probability", mode_value));
-  featureList.push_back(std::make_pair("FirstOrder Standard deviation",labelStatisticsImageFilter->GetSigma(1)));
-  featureList.push_back(std::make_pair("FirstOrder No. of Voxel",labelStatisticsImageFilter->GetCount(1)));
-
-  featureList.push_back(std::make_pair("FirstOrder 05th Percentile", p05th));
-  featureList.push_back(std::make_pair("FirstOrder 10th Percentile", p10th));
-  featureList.push_back(std::make_pair("FirstOrder 15th Percentile", p15th));
-  featureList.push_back(std::make_pair("FirstOrder 20th Percentile", p20th));
-  featureList.push_back(std::make_pair("FirstOrder 25th Percentile", p25th));
-  featureList.push_back(std::make_pair("FirstOrder 30th Percentile", p30th));
-  featureList.push_back(std::make_pair("FirstOrder 35th Percentile", p35th));
-  featureList.push_back(std::make_pair("FirstOrder 40th Percentile", p40th));
-  featureList.push_back(std::make_pair("FirstOrder 45th Percentile", p45th));
-  featureList.push_back(std::make_pair("FirstOrder 50th Percentile", p50th));
-  featureList.push_back(std::make_pair("FirstOrder 55th Percentile", p55th));
-  featureList.push_back(std::make_pair("FirstOrder 60th Percentile", p60th));
-  featureList.push_back(std::make_pair("FirstOrder 65th Percentile", p65th));
-  featureList.push_back(std::make_pair("FirstOrder 70th Percentile", p70th));
-  featureList.push_back(std::make_pair("FirstOrder 75th Percentile", p75th));
-  featureList.push_back(std::make_pair("FirstOrder 80th Percentile", p80th));
-  featureList.push_back(std::make_pair("FirstOrder 85th Percentile", p85th));
-  featureList.push_back(std::make_pair("FirstOrder 90th Percentile", p90th));
-  featureList.push_back(std::make_pair("FirstOrder 95th Percentile", p95th));
-  featureList.push_back(std::make_pair("FirstOrder Interquartile Range",(p75th - p25th)));
-  featureList.push_back(std::make_pair("FirstOrder Image Dimension", VImageDimension));
-  featureList.push_back(std::make_pair("FirstOrder Voxel Space", voxelSpace));
-  featureList.push_back(std::make_pair("FirstOrder Voxel Volume", voxelVolume));
+  double coefficient_of_variation = (mean == 0) ? 0 : std::sqrt(variance) / mean;
+  double quantile_coefficient_of_dispersion = (p75th - p25th) / (p75th + p25th);
 
   //Calculate the robust mean absolute deviation
   //First, set all frequencies to 0 that are <10th or >90th percentile
@@ -255,10 +212,68 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
     }
     robustMeanAbsoluteDeviation = robustMeanAbsoluteDeviation / histogram->GetTotalFrequency();
   }
-  featureList.push_back(std::make_pair("FirstOrder Robust Mean", meanRobust));
+
+  featureList.push_back(std::make_pair("FirstOrder Mean", labelStatisticsImageFilter->GetMean(1)));
+  featureList.push_back(std::make_pair("FirstOrder Unbiased Variance", labelStatisticsImageFilter->GetVariance(1))); //Siehe Definition von Unbiased Variance estimation. (Wird nicht durch n sondern durch n-1 normalisiert)
+  featureList.push_back(std::make_pair("FirstOrder Biased Variance", variance));
+  featureList.push_back(std::make_pair("FirstOrder Skewness", skewness));
+  featureList.push_back(std::make_pair("FirstOrder Kurtosis", kurtosis));
+  featureList.push_back(std::make_pair("FirstOrder Median", labelStatisticsImageFilter->GetMedian(1)));
+  featureList.push_back(std::make_pair("FirstOrder Minimum", labelStatisticsImageFilter->GetMinimum(1)));
+  featureList.push_back(std::make_pair("FirstOrder Maximum", labelStatisticsImageFilter->GetMaximum(1)));
+  featureList.push_back(std::make_pair("FirstOrder Range", range));
+  featureList.push_back(std::make_pair("FirstOrder Mean absolute deviation", mean_absolut_deviation));
   featureList.push_back(std::make_pair("FirstOrder Robust Mean Absolute Deviation", robustMeanAbsoluteDeviation));
+  featureList.push_back(std::make_pair("FirstOrder Median absolute deviation", median_absolut_deviation));
+  featureList.push_back(std::make_pair("FirstOrder Coefficient of variation", coefficient_of_variation));
+  featureList.push_back(std::make_pair("FirstOrder Quantile coefficient of dispersion", quantile_coefficient_of_dispersion));
+  featureList.push_back(std::make_pair("FirstOrder Energy", squared_sum));
+  featureList.push_back(std::make_pair("FirstOrder RMS", rms));
 
+  HistogramType::MeasurementVectorType mv(1);
+  mv[0] = 0;
+  HistogramType::IndexType resultingIndex;
+  histogram->GetIndex(mv, resultingIndex);
+  MITK_INFO << "aaa" << resultingIndex;
+  std::cout << "Instance identifier of index " << resultingIndex
+    << " is " << histogram->GetInstanceIdentifier(resultingIndex)
+    << std::endl;
+  featureList.push_back(std::make_pair("FirstOrder Minimum Bin", 0));
 
+  featureList.push_back(std::make_pair("FirstOrder Robust Mean", meanRobust));
+  featureList.push_back(std::make_pair("FirstOrder Uniformity", uniformity));
+  featureList.push_back(std::make_pair("FirstOrder Entropy", entropy));
+  featureList.push_back(std::make_pair("FirstOrder Excess Kurtosis", kurtosis - 3));
+  featureList.push_back(std::make_pair("FirstOrder Covered Image Intensity Range", coveredGrayValueRange));
+  featureList.push_back(std::make_pair("FirstOrder Sum", labelStatisticsImageFilter->GetSum(1)));
+  featureList.push_back(std::make_pair("FirstOrder Mode", mode_bin));
+  featureList.push_back(std::make_pair("FirstOrder Mode Probability", mode_value));
+  featureList.push_back(std::make_pair("FirstOrder Standard deviation", labelStatisticsImageFilter->GetSigma(1)));
+  featureList.push_back(std::make_pair("FirstOrder No. of Voxel", labelStatisticsImageFilter->GetCount(1)));
+
+  featureList.push_back(std::make_pair("FirstOrder 05th Percentile", p05th));
+  featureList.push_back(std::make_pair("FirstOrder 10th Percentile", p10th));
+  featureList.push_back(std::make_pair("FirstOrder 15th Percentile", p15th));
+  featureList.push_back(std::make_pair("FirstOrder 20th Percentile", p20th));
+  featureList.push_back(std::make_pair("FirstOrder 25th Percentile", p25th));
+  featureList.push_back(std::make_pair("FirstOrder 30th Percentile", p30th));
+  featureList.push_back(std::make_pair("FirstOrder 35th Percentile", p35th));
+  featureList.push_back(std::make_pair("FirstOrder 40th Percentile", p40th));
+  featureList.push_back(std::make_pair("FirstOrder 45th Percentile", p45th));
+  featureList.push_back(std::make_pair("FirstOrder 50th Percentile", p50th));
+  featureList.push_back(std::make_pair("FirstOrder 55th Percentile", p55th));
+  featureList.push_back(std::make_pair("FirstOrder 60th Percentile", p60th));
+  featureList.push_back(std::make_pair("FirstOrder 65th Percentile", p65th));
+  featureList.push_back(std::make_pair("FirstOrder 70th Percentile", p70th));
+  featureList.push_back(std::make_pair("FirstOrder 75th Percentile", p75th));
+  featureList.push_back(std::make_pair("FirstOrder 80th Percentile", p80th));
+  featureList.push_back(std::make_pair("FirstOrder 85th Percentile", p85th));
+  featureList.push_back(std::make_pair("FirstOrder 90th Percentile", p90th));
+  featureList.push_back(std::make_pair("FirstOrder 95th Percentile", p95th));
+  featureList.push_back(std::make_pair("FirstOrder Interquartile Range", (p75th - p25th)));
+  featureList.push_back(std::make_pair("FirstOrder Image Dimension", VImageDimension));
+  featureList.push_back(std::make_pair("FirstOrder Voxel Space", voxelSpace));
+  featureList.push_back(std::make_pair("FirstOrder Voxel Volume", voxelVolume));
 }
 
 mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics() :

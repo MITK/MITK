@@ -25,11 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommandLineParser.h>
 
+#include <mitkIntensityQuantifier.h>
+
+// STD Includes
 
 // Eigen
 #include <Eigen/Dense>
-
-// STD Includes
 
 // MITK includes
 #include <mitkConfigurationHolder.h>
@@ -70,6 +71,12 @@ public:
   itkGetConstMacro(ShortName, std::string);
   itkGetConstMacro(LongName, std::string);
   itkGetConstMacro(Parameter, ParameterTypes);
+
+  itkSetMacro(UseQuantifier, bool);
+  itkGetConstMacro(UseQuantifier, bool);
+  itkSetMacro(Quantifier, IntensityQuantifier::Pointer);
+  itkGetMacro(Quantifier, IntensityQuantifier::Pointer);
+
   itkGetConstMacro(Direction, int);
 
   itkSetMacro(MinimumIntensity, float);
@@ -80,6 +87,9 @@ public:
   itkGetConstMacro(UseMinimumIntensity, bool);
   itkGetConstMacro(MaximumIntensity, float);
   itkGetConstMacro(UseMaximumIntensity, bool);
+
+  itkSetMacro(MorphMask, mitk::Image::Pointer);
+  itkGetConstMacro(MorphMask, mitk::Image::Pointer);
 
   itkSetMacro(Bins, int);
   itkGetConstMacro(Bins, int);
@@ -94,6 +104,9 @@ public:
 
   virtual void AddArguments(mitkCommandLineParser &parser) = 0;
   std::vector<double> SplitDouble(std::string str, char delimiter);
+
+  void AddQuantifierArguments(mitkCommandLineParser &parser);
+  void InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList, unsigned int defaultBins = 256);
 
 public:
 
@@ -122,6 +135,9 @@ private:
   std::string m_LongName; // Long version of the name (For turning on)
   ParameterTypes m_Parameter; // Parameter setting
 
+  bool m_UseQuantifier = false;
+  IntensityQuantifier::Pointer m_Quantifier;
+
   double m_MinimumIntensity = 0;
   bool m_UseMinimumIntensity = false;
   double m_MaximumIntensity = 100;
@@ -131,6 +147,7 @@ private:
   int m_Bins = 256;
   int m_Direction = 0;
 
+  mitk::Image::Pointer m_MorphMask = nullptr;
 //#endif // Skip Doxygen
 
 };

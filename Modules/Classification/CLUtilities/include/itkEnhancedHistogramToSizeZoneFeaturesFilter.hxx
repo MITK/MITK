@@ -197,11 +197,11 @@ namespace itk {
 
         // measures from Dasarathy and Holder
         SmallZoneLowGreyLevelEmphasis += ((i2 * j2) > 0.0001) ? ( frequency / ( i2 * j2 ) ) : 0;
-        SmallZoneHighGreyLevelEmphasis += (j2 > 0.0001) ? ( frequency * i2 / j2 ) : 0;
-        LargeZoneLowGreyLevelEmphasis += (i2 = 0.0001) ? ( frequency * j2 / i2 ) : 0;
+        SmallZoneHighGreyLevelEmphasis += (j2 > 0.00001) ? ( frequency * i2 / j2 ) : 0;
+        LargeZoneLowGreyLevelEmphasis += (i2 > 0.00001) ? ( frequency * j2 / i2 ) : 0;
         LargeZoneHighGreyLevelEmphasis += ( frequency * i2 * j2 );
 
-        totNumOfVoxelsUsed += (count * frequency);
+        totNumOfVoxelsUsed += (frequency);
       }
       greyLevelNonuniformity =
         greyLevelNonuniformityVector.squared_magnitude();

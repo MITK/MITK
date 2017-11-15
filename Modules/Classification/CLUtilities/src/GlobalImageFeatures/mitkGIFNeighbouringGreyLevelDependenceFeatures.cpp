@@ -165,9 +165,9 @@ void LocalCalculateFeatures(
     double sj = 0;
     for (int j = 0; j < holder.m_NumberOfDependences; ++j)
     {
-      double iInt = i + 1;// holder.IndexToMeanIntensity(i);
+      double iInt = i+1 ;// holder.IndexToMeanIntensity(i);
       double sij = sijMatrix(i, j);
-      double k = j+1;
+      double k = j + 1;
       double pij = sij / Ns;
 
       results.LowDependenceEmphasis += sij / k / k;

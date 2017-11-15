@@ -173,7 +173,6 @@ namespace itk {
         double j = index[1] + 1;
         double i2 = i*i;
         double j2 = j*j;
-        MITK_INFO << i << " " << j;
 
         double p_ij = frequency / m_TotalNumberOfRuns;
 

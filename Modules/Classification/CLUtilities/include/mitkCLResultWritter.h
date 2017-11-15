@@ -35,6 +35,9 @@ namespace mitk
       FeatureResultWritter(std::string, int mode);
       ~FeatureResultWritter();
 
+      void SetDecimalPoint(char decimal);
+
+      void AddSubjectInformation(std::string value);
       void AddColumn(std::string value);
       void AddColumn(double value);
       void NewRow(std::string endName);
@@ -49,6 +52,10 @@ namespace mitk
       std::string m_Separator;
       std::ofstream m_Output;
       std::vector<std::string> m_List;
+      std::string m_SubjectInformation;
+      bool m_UsedSubjectInformation;
+      bool m_UseSpecialDecimalPoint;
+      char m_DecimalPoint;
     };
   }
 }

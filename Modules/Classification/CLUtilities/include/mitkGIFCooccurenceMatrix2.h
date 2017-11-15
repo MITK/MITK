@@ -125,6 +125,8 @@ namespace mitk
       itkSetMacro(Range, double);
       itkGetConstMacro(Bins, int);
       itkSetMacro(Bins, int);
+      itkGetConstMacro(Binsize, double);
+      itkSetMacro(Binsize, double);
 
     struct GIFCooccurenceMatrix2Configuration
     {
@@ -136,11 +138,13 @@ namespace mitk
       double MaximumIntensity;
       bool UseMaximumIntensity;
       int Bins;
+      double BinSize;
     };
 
     private:
       double m_Range;
       int m_Bins;
+      double m_Binsize;
   };
 
 }

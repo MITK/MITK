@@ -30,8 +30,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFCooccurenceMatrix2.h>
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
+#include <mitkGIFFirstOrderHistogramStatistics.h>
 #include <mitkGIFVolumetricStatistics.h>
+#include <mitkGIFVolumetricDensityStatistics.h>
 #include <mitkGIFGreyLevelSizeZone.h>
+#include <mitkGIFGreyLevelDistanceZone.h>
+#include <mitkGIFImageDescriptionFeatures.h>
+#include <mitkGIFLocalIntensity.h>
+#include <mitkGIFIntensityVolumeHistogramFeatures.h>
+#include <mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h>
 #include <mitkGIFNeighbouringGreyLevelDependenceFeatures.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -39,6 +46,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConvert2Dto3DImageFilter.h>
 
 #include <mitkCLResultWritter.h>
+#include <mitkVersion.h>
+
+#include <iostream>
+#include <locale>
 
 #include <itkImageDuplicator.h>
 #include <itkImageRegionIterator.h>
@@ -58,6 +69,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
+
+template <class charT>
+class punct_facet : public std::numpunct<charT> {
+public:
+  punct_facet(charT sep) :
+    m_Sep(sep)
+  {
+
+  }
+protected:
+  charT do_decimal_point() const { return m_Sep; }
+private:
+  charT m_Sep;
+};
 
 template<typename TPixel, unsigned int VImageDimension>
 void
@@ -153,11 +178,13 @@ ResampleMask(itk::Image<TPixel, VImageDimension>* itkMoving, mitk::Image::Pointe
 }
 
 static void
-ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, mitk::Image::Pointer maskNoNaN,
+ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask,
+                        mitk::Image::Pointer maskNoNaN, mitk::Image::Pointer morphMask,
                         int direction,
                         std::vector<mitk::Image::Pointer> &imageVector,
                         std::vector<mitk::Image::Pointer> &maskVector,
-                        std::vector<mitk::Image::Pointer> &maskNoNaNVector)
+                        std::vector<mitk::Image::Pointer> &maskNoNaNVector,
+                        std::vector<mitk::Image::Pointer> &morphMaskVector)
 {
   typedef itk::Image< double, 2 >                 FloatImage2DType;
   typedef itk::Image< unsigned char, 2 >          MaskImage2DType;
@@ -165,9 +192,11 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
   FloatImageType::Pointer itkFloat = FloatImageType::New();
   MaskImageType::Pointer itkMask = MaskImageType::New();
   MaskImageType::Pointer itkMaskNoNaN = MaskImageType::New();
+  MaskImageType::Pointer itkMorphMask = MaskImageType::New();
   mitk::CastToItkImage(mask, itkMask);
   mitk::CastToItkImage(maskNoNaN, itkMaskNoNaN);
   mitk::CastToItkImage(image, itkFloat);
+  mitk::CastToItkImage(morphMask, itkMorphMask);
 
   int idxA, idxB, idxC;
   switch (direction)
@@ -216,6 +245,11 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
     masnNoNaN2D->SetRegions(region);
     masnNoNaN2D->Allocate();
 
+    MaskImage2DType::Pointer morph2D = MaskImage2DType::New();
+    morph2D->SetRegions(region);
+    morph2D->Allocate();
+
+
     unsigned long voxelsInMask = 0;
 
     for (unsigned int a = 0; a < imageSize[idxA]; ++a)
@@ -230,6 +264,7 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
         image2D->SetPixel(index2D, itkFloat->GetPixel(index3D));
         mask2D->SetPixel(index2D, itkMask->GetPixel(index3D));
         masnNoNaN2D->SetPixel(index2D, itkMaskNoNaN->GetPixel(index3D));
+        morph2D->SetPixel(index2D, itkMorphMask->GetPixel(index3D));
         voxelsInMask += (itkMask->GetPixel(index3D) > 0) ? 1 : 0;
 
       }
@@ -238,6 +273,7 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
     image2D->SetSpacing(spacing2D);
     mask2D->SetSpacing(spacing2D);
     masnNoNaN2D->SetSpacing(spacing2D);
+    morph2D->SetSpacing(spacing2D);
 
     mitk::Image::Pointer tmpFloatImage = mitk::Image::New();
     tmpFloatImage->InitializeByItk(image2D.GetPointer());
@@ -251,11 +287,16 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
     tmpMaskNoNaNImage->InitializeByItk(masnNoNaN2D.GetPointer());
     mitk::GrabItkImageMemory(masnNoNaN2D, tmpMaskNoNaNImage);
 
+    mitk::Image::Pointer tmpMorphMaskImage = mitk::Image::New();
+    tmpMorphMaskImage->InitializeByItk(morph2D.GetPointer());
+    mitk::GrabItkImageMemory(morph2D, tmpMorphMaskImage);
+
     if (voxelsInMask > 0)
     {
       imageVector.push_back(tmpFloatImage);
       maskVector.push_back(tmpMaskImage);
       maskNoNaNVector.push_back(tmpMaskNoNaNImage);
+      morphMaskVector.push_back(tmpMorphMaskImage);
     }
   }
 }
@@ -321,23 +362,36 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
 
 int main(int argc, char* argv[])
 {
-
+  mitk::GIFImageDescriptionFeatures::Pointer ipCalculator = mitk::GIFImageDescriptionFeatures::New();
   mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New();
+  mitk::GIFFirstOrderHistogramStatistics::Pointer firstOrderHistoCalculator = mitk::GIFFirstOrderHistogramStatistics::New();
   mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();
+  mitk::GIFVolumetricDensityStatistics::Pointer voldenCalculator = mitk::GIFVolumetricDensityStatistics::New();
   mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
   mitk::GIFCooccurenceMatrix2::Pointer cooc2Calculator = mitk::GIFCooccurenceMatrix2::New();
   mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer ngldCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
   mitk::GIFGrayLevelRunLength::Pointer rlCalculator = mitk::GIFGrayLevelRunLength::New();
   mitk::GIFGreyLevelSizeZone::Pointer glszCalculator = mitk::GIFGreyLevelSizeZone::New();
+  mitk::GIFGreyLevelDistanceZone::Pointer gldzCalculator = mitk::GIFGreyLevelDistanceZone::New();
+  mitk::GIFLocalIntensity::Pointer lociCalculator = mitk::GIFLocalIntensity::New();
+  mitk::GIFIntensityVolumeHistogramFeatures::Pointer ivohCalculator = mitk::GIFIntensityVolumeHistogramFeatures::New();
+  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New();
 
   std::vector<mitk::AbstractGlobalImageFeature::Pointer> features;
-  features.push_back(firstOrderCalculator.GetPointer());
   features.push_back(volCalculator.GetPointer());
+  features.push_back(voldenCalculator.GetPointer());
+  features.push_back(firstOrderCalculator.GetPointer());
+  features.push_back(firstOrderHistoCalculator.GetPointer());
+  features.push_back(ivohCalculator.GetPointer());
+  features.push_back(lociCalculator.GetPointer());
   features.push_back(coocCalculator.GetPointer());
   features.push_back(cooc2Calculator.GetPointer());
   features.push_back(ngldCalculator.GetPointer());
   features.push_back(rlCalculator.GetPointer());
   features.push_back(glszCalculator.GetPointer());
+  features.push_back(gldzCalculator.GetPointer());
+  features.push_back(ipCalculator.GetPointer());
+  features.push_back(ngtdCalculator.GetPointer());
 
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
@@ -375,9 +429,9 @@ int main(int argc, char* argv[])
   }
 
   //bool savePNGofSlices = true;
-  std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
+  //std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
 
-  std::string version = "Version: 1.20";
+  std::string version = "Version: 1.21";
   MITK_INFO << version;
 
   std::ofstream log;
@@ -389,6 +443,12 @@ int main(int argc, char* argv[])
     log << "Mask: " << param.maskPath;
   }
 
+
+  if (param.useDecimalPoint)
+  {
+    std::cout.imbue(std::locale(std::cout.getloc(), new punct_facet<char>(param.decimalPoint)));
+  }
+
   mitk::Image::Pointer image;
   mitk::Image::Pointer mask;
 
@@ -396,6 +456,12 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer tmpMask = mitk::IOUtil::LoadImage(param.maskPath);
   image = tmpImage;
   mask = tmpMask;
+
+  mitk::Image::Pointer morphMask = mask;
+  if (param.useMorphMask)
+  {
+    morphMask = mitk::IOUtil::LoadImage(param.morphPath);
+  }
 
   if ((image->GetDimension() != mask->GetDimension()))
   {
@@ -490,6 +556,7 @@ int main(int argc, char* argv[])
   std::vector<mitk::Image::Pointer> floatVector;
   std::vector<mitk::Image::Pointer> maskVector;
   std::vector<mitk::Image::Pointer> maskNoNaNVector;
+  std::vector<mitk::Image::Pointer> morphMaskVector;
 
   if ((parsedArgs.count("slice-wise")) && image->GetDimension() > 2)
   {
@@ -497,7 +564,7 @@ int main(int argc, char* argv[])
     sliceWise = true;
     sliceDirection = mitk::cl::splitDouble(parsedArgs["slice-wise"].ToString(), ';')[0];
     MITK_INFO << sliceDirection;
-    ExtractSlicesFromImages(image, mask, maskNoNaN, sliceDirection, floatVector, maskVector, maskNoNaNVector);
+    ExtractSlicesFromImages(image, mask, maskNoNaN, morphMask, sliceDirection, floatVector, maskVector, maskNoNaNVector, morphMaskVector);
     MITK_INFO << "Slice";
   }
 
@@ -525,6 +592,11 @@ int main(int argc, char* argv[])
   bool addDescription = parsedArgs.count("description");
   mitk::cl::FeatureResultWritter writer(param.outputPath, writeDirection);
 
+  if (param.useDecimalPoint)
+  {
+    writer.SetDecimalPoint(param.decimalPoint);
+  }
+
   std::string description = "";
   if (addDescription)
   {
@@ -534,9 +606,11 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer cImage = image;
   mitk::Image::Pointer cMask = mask;
   mitk::Image::Pointer cMaskNoNaN = maskNoNaN;
+  mitk::Image::Pointer cMorphMask = morphMask;
 
   if (param.useHeader)
   {
+    writer.AddColumn("SoftwareVersion");
     writer.AddColumn("Patient");
     writer.AddColumn("Image");
     writer.AddColumn("Segmentation");
@@ -558,6 +632,7 @@ int main(int argc, char* argv[])
       cImage = floatVector[currentSlice];
       cMask = maskVector[currentSlice];
       cMaskNoNaN = maskNoNaNVector[currentSlice];
+      cMorphMask = morphMaskVector[currentSlice];
       imageToProcess = (floatVector.size()-1 > (currentSlice)) ? true : false ;
     }
     else
@@ -582,6 +657,7 @@ int main(int argc, char* argv[])
 
     for (auto cFeature : features)
     {
+      cFeature->SetMorphMask(cMorphMask);
       cFeature->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
     }
 
@@ -593,9 +669,10 @@ int main(int argc, char* argv[])
     writer.AddHeader(description, currentSlice, stats, param.useHeader, addDescription);
     if (true)
     {
-      writer.AddColumn(param.imageFolder);
-      writer.AddColumn(param.imageName);
-      writer.AddColumn(param.maskName);
+      writer.AddSubjectInformation(MITK_REVISION);
+      writer.AddSubjectInformation(param.imageFolder);
+      writer.AddSubjectInformation(param.imageName);
+      writer.AddSubjectInformation(param.maskName);
     }
     writer.AddResult(description, currentSlice, stats, param.useHeader, addDescription);
 
@@ -641,16 +718,18 @@ int main(int argc, char* argv[])
     }
     if (true)
     {
-      writer.AddColumn(param.imageFolder);
-      writer.AddColumn(param.imageName);
-      writer.AddColumn(param.maskName + " - Mean");
+      writer.AddSubjectInformation(MITK_REVISION);
+      writer.AddSubjectInformation(param.imageFolder);
+      writer.AddSubjectInformation(param.imageName);
+      writer.AddSubjectInformation(param.maskName + " - Mean");
     }
     writer.AddResult(description, currentSlice, statMean, param.useHeader, addDescription);
     if (true)
     {
-      writer.AddColumn(param.imageFolder);
-      writer.AddColumn(param.imageName);
-      writer.AddColumn(param.maskName + " - Var.");
+      writer.AddSubjectInformation(MITK_REVISION);
+      writer.AddSubjectInformation(param.imageFolder);
+      writer.AddSubjectInformation(param.imageName);
+      writer.AddSubjectInformation(param.maskName + " - Var.");
     }
     writer.AddResult(description, currentSlice, statStd, param.useHeader, addDescription);
   }

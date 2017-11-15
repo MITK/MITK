@@ -76,7 +76,6 @@ void
   typename ValueImageType::Pointer itkValueImage = ValueImageType::New();
   mitk::CastToItkImage(valueImage, itkValueImage);
 
-
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef typename ImageType::PointType PointType;
   typename ImageType::SizeType radius;
@@ -85,6 +84,21 @@ void
   itk::NeighborhoodIterator<ImageType> iterator(radius, mask, mask->GetRequestedRegion());
   itk::NeighborhoodIterator<ValueImageType> valueIter(radius, itkValueImage, itkValueImage->GetRequestedRegion());
   std::vector<PointType> borderPoints;
+
+  unsigned int maskDimensionX = mask->GetLargestPossibleRegion().GetSize()[0];
+  unsigned int maskDimensionY = mask->GetLargestPossibleRegion().GetSize()[1];
+  unsigned int maskDimensionZ = mask->GetLargestPossibleRegion().GetSize()[2];
+
+  double maskVoxelSpacingX = mask->GetSpacing()[0];
+  double maskVoxelSpacingY = mask->GetSpacing()[1];
+  double maskVoxelSpacingZ = mask->GetSpacing()[2];
+
+  unsigned int maskMinimumX = maskDimensionX;
+  unsigned int maskMaximumX = 0;
+  unsigned int maskMinimumY = maskDimensionY;
+  unsigned int maskMaximumY = 0;
+  unsigned int maskMinimumZ = maskDimensionZ;
+  unsigned int maskMaximumZ = 0;
 
   //
   //  Calculate surface in different directions
@@ -136,6 +150,13 @@ void
       ++valueIter;
       continue;
     }
+
+    maskMinimumX = (maskMinimumX > iterator.GetIndex()[0]) ? iterator.GetIndex()[0] : maskMinimumX;
+    maskMaximumX = (maskMaximumX < iterator.GetIndex()[0]) ? iterator.GetIndex()[0] : maskMaximumX;
+    maskMinimumY = (maskMinimumY > iterator.GetIndex()[1]) ? iterator.GetIndex()[1] : maskMinimumY;
+    maskMaximumY = (maskMaximumY < iterator.GetIndex()[1]) ? iterator.GetIndex()[1] : maskMaximumY;
+    maskMinimumZ = (maskMinimumZ > iterator.GetIndex()[2]) ? iterator.GetIndex()[2] : maskMinimumZ;
+    maskMaximumZ = (maskMaximumZ < iterator.GetIndex()[2]) ? iterator.GetIndex()[2] : maskMaximumZ;
 
     mask->TransformIndexToPhysicalPoint(iterator.GetIndex(), currentPoint);
 
@@ -191,10 +212,13 @@ void
     }
   }
 
+  double boundingBoxVolume = maskVoxelSpacingX* (maskMaximumX - maskMinimumX) * maskVoxelSpacingY* (maskMaximumY - maskMinimumY) * maskVoxelSpacingZ* (maskMaximumZ - maskMinimumZ);
+
   featureList.push_back(std::make_pair("Volumetric Features Maximum 3D diameter", longestDiameter));
   featureList.push_back(std::make_pair("Volumetric Features Surface (Voxel based)", surface));
   featureList.push_back(std::make_pair("Volumetric Features Centre of mass shift", differenceOfCenters));
   featureList.push_back(std::make_pair("Volumetric Features Centre of mass shift (Uncorrected)", differenceOfCentersUncorrected));
+  featureList.push_back(std::make_pair("Volumetric Features Bounding Box Volume", boundingBoxVolume));
 }
 
 mitk::GIFVolumetricStatistics::GIFVolumetricStatistics()
@@ -257,7 +281,6 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   double xd = mask->GetGeometry()->GetSpacing()[0];
   double yd = mask->GetGeometry()->GetSpacing()[1];
   double zd = mask->GetGeometry()->GetSpacing()[2];
-
 
   std::vector<cv::Point3d> pointsForPCA;
   std::vector<cv::Point3d> pointsForPCAUncorrected;
@@ -352,13 +375,13 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   double major = 4*sqrt(eigen_val[2]);
   double minor = 4*sqrt(eigen_val[1]);
   double least = 4*sqrt(eigen_val[0]);
-  double elongation = major == 0 ? 0 : sqrt(minor/major);
-  double flatness = major == 0 ? 0 : sqrt(least / major);
+  double elongation = (major == 0) ? 0 : sqrt(eigen_val[1] / eigen_val[2]);
+  double flatness = (major == 0) ? 0 : sqrt(eigen_val[0] / eigen_val[2]);
   double majorUC = 4*sqrt(eigen_valUC[2]);
   double minorUC = 4*sqrt(eigen_valUC[1]);
   double leastUC = 4*sqrt(eigen_valUC[0]);
-  double elongationUC = majorUC == 0 ? 0 : sqrt(minorUC / majorUC);
-  double flatnessUC = majorUC == 0 ? 0 : sqrt(leastUC / majorUC);
+  double elongationUC = majorUC == 0 ? 0 : sqrt(eigen_valUC[1] / eigen_valUC[2]);
+  double flatnessUC = majorUC == 0 ? 0 : sqrt(eigen_valUC[0] / eigen_valUC[2]);
 
 
   featureList.push_back(std::make_pair("Volumetric Features Volume (mesh based)",meshVolume));
@@ -395,17 +418,6 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
 mitk::GIFVolumetricStatistics::FeatureNameListType mitk::GIFVolumetricStatistics::GetFeatureNames()
 {
   FeatureNameListType featureList;
-  featureList.push_back("Volumetric Features Compactness 1");
-  featureList.push_back("Volumetric Features Compactness 2");
-  featureList.push_back("Volumetric Features Compactness 3");
-  featureList.push_back("Volumetric Features Sphericity");
-  featureList.push_back("Volumetric Features Asphericity");
-  featureList.push_back("Volumetric Features Surface to volume ratio");
-  featureList.push_back("Volumetric Features Surface area");
-  featureList.push_back("Volumetric Features Volume (mesh based)");
-  featureList.push_back("Volumetric Features Volume (pixel based)");
-  featureList.push_back("Volumetric Features Spherical disproportion");
-  featureList.push_back("Volumetric Features Maximum 3D diameter");
   return featureList;
 }
 

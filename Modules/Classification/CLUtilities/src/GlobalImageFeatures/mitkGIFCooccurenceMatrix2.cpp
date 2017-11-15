@@ -13,6 +13,7 @@
 
 // STL
 #include <sstream>
+#include <cmath>
 
 static
 void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
@@ -41,7 +42,8 @@ m_NumberOfBins(number)
 
 int mitk::CoocurenceMatrixHolder::IntensityToIndex(double intensity)
 {
-  return std::floor((intensity - m_MinimumRange) / m_Stepsize);
+  int index = std::floor((intensity - m_MinimumRange) / m_Stepsize);
+  return std::max(0, std::min(index, m_NumberOfBins - 1));
 }
 
 double mitk::CoocurenceMatrixHolder::IndexToMinIntensity(int index)
@@ -293,6 +295,13 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
 
   // Define Range
   int numberOfBins = config.Bins;
+  if (config.BinSize > 0)
+  {
+    numberOfBins = std::ceil((rangeMax - rangeMin) / config.BinSize);
+    rangeMax = rangeMin + config.BinSize * numberOfBins;
+  }
+
+  MITK_INFO << "Bins: " << numberOfBins << " , Min, Max: " << rangeMin << " -> " << rangeMax;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
@@ -527,7 +536,7 @@ void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
 }
 
 mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2():
-m_Range(1.0), m_Bins(128)
+m_Range(1.0), m_Bins(128), m_Binsize(-1)
 {
   SetShortName("cooc2");
   SetLongName("cooccurence2");
@@ -546,6 +555,7 @@ mitk::GIFCooccurenceMatrix2::FeatureListType mitk::GIFCooccurenceMatrix2::Calcul
   config.UseMinimumIntensity = GetUseMinimumIntensity();
   config.UseMaximumIntensity = GetUseMaximumIntensity();
   config.Bins = GetBins();
+  config.BinSize = GetBinsize();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -568,6 +578,8 @@ void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser)
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
   parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
   parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::String, "Cooc 2 Number of Bins", "Define the number of bins that is used ", us::Any());
+  parser.addArgument(name + "::binsize", name + "::binsize", mitkCommandLineParser::String, "Cooc 2 Number of Bins", "Define the number of bins that is used ", us::Any());
+
 }
 
 void
@@ -591,6 +603,11 @@ mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Point
     {
       auto bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';')[0];
       this->SetBins(bins);
+    }
+    if (parsedArgs.count(name + "::binsize"))
+    {
+      auto binsize = SplitDouble(parsedArgs[name + "::binsize"].ToString(), ';')[0];
+      this->SetBinsize(binsize);
     }
 
     for (std::size_t i = 0; i < ranges.size(); ++i)

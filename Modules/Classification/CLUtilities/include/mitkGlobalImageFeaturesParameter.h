@@ -40,6 +40,10 @@ namespace mitk
       std::string maskFolder;
       std::string outputPath;
 
+      std::string morphPath;
+      std::string morphName;
+      bool useMorphMask;
+
       bool useLogfile;
       std::string logfilePath;
       bool writeAnalysisImage;
@@ -63,6 +67,8 @@ namespace mitk
       double globalMaximumIntensity;
       bool defineGlobalNumberOfBins;
       int globalNumberOfBins;
+      bool useDecimalPoint;
+      char decimalPoint;
 
     private:
       void ParseFileLocations(std::map<std::string, us::Any> &parsedArgs);

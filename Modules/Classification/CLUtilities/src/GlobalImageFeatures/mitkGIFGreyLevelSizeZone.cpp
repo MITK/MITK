@@ -50,11 +50,11 @@ double mitk::GreyLevelSizeZoneMatrixHolder::IndexToMaxIntensity(int index)
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void
+int
 CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
                     itk::Image<unsigned char, VImageDimension>* mask,
                     std::vector<itk::Offset<VImageDimension> > offsets,
-                    int,
+                    bool estimateLargestRegion,
                     mitk::GreyLevelSizeZoneMatrixHolder &holder)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -77,6 +77,7 @@ CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
   visitedImage->Allocate();
   visitedImage->FillBuffer(0);
 
+  int largestRegion = 0;
 
   while (!maskIter.IsAtEnd())
   {
@@ -119,13 +120,18 @@ CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
       }
       if (steps > 0)
       {
+        largestRegion = std::max<int>(steps, largestRegion);
         steps = std::min<unsigned int>(steps, holder.m_MaximumSize);
-        holder.m_Matrix(startIntensityIndex, steps-1) += 1;
+        if (!estimateLargestRegion)
+        {
+          holder.m_Matrix(startIntensityIndex, steps - 1) += 1;
+        }
       }
     }
     ++imageIter;
     ++maskIter;
   }
+  return largestRegion;
 }
 
 void CalculateFeatures(
@@ -160,7 +166,7 @@ void CalculateFeatures(
   for (int j = 0; j < SzVector.size(); ++j)
   {
     results.SmallZoneEmphasis += SzVector(j) / (j + 1) / (j + 1);
-    results.LargeZoneEmphasis += SzVector(j) * (j + 1) * (j + 1);
+    results.LargeZoneEmphasis += SzVector(j) * (j + 1.0) * (j + 1.0);
     results.ZoneSizeNonUniformity += SzVector(j) * SzVector(j);
     results.ZoneSizeNoneUniformityNormalized += SzVector(j) * SzVector(j);
   }
@@ -279,9 +285,11 @@ CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage
   }
 
   std::vector<mitk::GreyLevelSizeZoneFeatures> resultVector;
-  mitk::GreyLevelSizeZoneMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins,100);
+  mitk::GreyLevelSizeZoneMatrixHolder tmpHolder(rangeMin, rangeMax, numberOfBins, 3);
+  int largestRegion = CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, offsetVector, true, tmpHolder);
+  mitk::GreyLevelSizeZoneMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins,largestRegion);
   mitk::GreyLevelSizeZoneFeatures overallFeature;
-  CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, offsetVector, config.range, holderOverall);
+  CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, offsetVector, false, holderOverall);
   CalculateFeatures(holderOverall, overallFeature);
 
   std::stringstream ss;

@@ -4,7 +4,6 @@ set( diffusion_module_dirs
       Connectomics
       Quantification
       DiffusionIO
-      DeepDiffusion
 )
 
 foreach(diffusion_module_dir ${diffusion_module_dirs})

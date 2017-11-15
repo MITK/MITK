@@ -83,6 +83,11 @@ void QmitkInteractiveTransformationWidget::CreateConnections()
 
 void QmitkInteractiveTransformationWidget::SetToolToEdit(const mitk::NavigationTool::Pointer _tool)
 {
+  //If there is already a tool, remove it's node first.
+  if (m_ToolToEdit)
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Remove(m_ToolToEdit->GetDataNode());
+
   m_ToolToEdit = _tool->Clone();
   mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
     ->Add(m_ToolToEdit->GetDataNode());

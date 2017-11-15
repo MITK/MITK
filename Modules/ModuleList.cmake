@@ -58,7 +58,6 @@ set(mitk_modules
   IGTUI
   DicomRT
   RTUI
-  IOExt
   XNAT
   TubeGraph
   BiophotonicsHardware

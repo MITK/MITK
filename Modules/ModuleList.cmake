@@ -7,7 +7,6 @@ set(mitk_modules
   AppUtil
   DCMTesting
   RDF
-  LegacyIO
   DataTypesExt
   Annotation
   LegacyGL

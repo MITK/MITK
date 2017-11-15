@@ -14,6 +14,7 @@ MITK Diffusion consists of multiple components with their own documentation:
 
 \subsection sub2 Preprocessing and Reconstruction
 \li \subpage org_mitk_views_diffusionpreprocessing
+\li \subpage org_mitk_views_simplerigidregistrationview
 \li \subpage org_mitk_views_diffusionregistrationview
 \li \subpage org_mitk_views_denoisingview
 \li \subpage org_mitk_views_tensorreconstruction
@@ -31,9 +32,10 @@ MITK Diffusion consists of multiple components with their own documentation:
 \li \subpage org_mitk_views_streamlinetracking
 \li \subpage org_mitk_views_gibbstracking
 \li \subpage org_mitk_views_mlbtview
-\li \subpage org_mitk_views_stochasticfibertracking
 \li \subpage org_mitk_views_fiberprocessing
 \li \subpage org_mitk_views_fiberquantification
+\li \subpage org_mitk_views_fiberfit
+\li \subpage org_mitk_views_fiberclustering
 
 \subsection sub5 Fiberfox dMRI Simulation
 \li \subpage org_mitk_views_fiberfoxview

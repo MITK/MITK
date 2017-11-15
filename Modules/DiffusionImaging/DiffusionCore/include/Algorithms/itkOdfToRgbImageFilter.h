@@ -106,7 +106,7 @@ protected:
       OdfType odf(x.GetDataPointer());
 
       vnl_vector_fixed<double,3> dir;
-      int pd = odf.GetPrincipleDiffusionDirection();
+      int pd = odf.GetPrincipalDiffusionDirectionIndex();
       if (pd==-1)
         dir.fill(0);
       else

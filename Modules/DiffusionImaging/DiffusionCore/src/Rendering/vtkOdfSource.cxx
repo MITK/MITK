@@ -8,12 +8,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
-
+#include <vtkLookupTable.h>
 #include <limits>
+#include <vtkPointData.h>
 
 vtkStandardNewMacro(vtkOdfSource);
 
 vtkOdfSource::vtkOdfSource()
+  : r(0)
+  , g(0)
+  , b(0)
 {
   Scale = 1;
   this->SetNumberOfInputPorts(0);
@@ -21,9 +25,9 @@ vtkOdfSource::vtkOdfSource()
 
 //----------------------------------------------------------------------------
 int vtkOdfSource::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+    vtkInformation *vtkNotUsed(request),
+    vtkInformationVector **vtkNotUsed(inputVector),
+    vtkInformationVector *outputVector)
 {
   vtkPolyData* TemplateOdf = OdfType::GetBaseMesh();
   // get the info object
@@ -31,7 +35,7 @@ int vtkOdfSource::RequestData(
 
   // get the ouptut
   vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+                          outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   OdfType colorOdf;
   switch(Normalization)
@@ -51,7 +55,6 @@ int vtkOdfSource::RequestData(
     Odf = Odf.MinMaxNormalize();
     colorOdf = Odf;
   }
-
 
   vtkIdType cellId = 0;
   vtkIdType npts; vtkIdType *pts;
@@ -89,6 +92,22 @@ int vtkOdfSource::RequestData(
   }
   output->SetPoints(newPoints);
   output->GetCellData()->SetScalars(colors);
+
+  vtkSmartPointer<vtkUnsignedCharArray> point_colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  point_colors->Allocate(output->GetNumberOfPoints() * 4);
+  point_colors->SetNumberOfComponents(4);
+  point_colors->SetName("FIBER_COLORS");
+  unsigned char rgba[4];
+  for(long i=0; i<output->GetNumberOfPoints(); ++i)
+  {
+    rgba[0] = (unsigned char)r;
+    rgba[1] = (unsigned char)g;
+    rgba[2] = (unsigned char)b;
+    rgba[3] = 255;
+    point_colors->InsertTypedTuple(i, rgba);
+  }
+  output->GetPointData()->AddArray(point_colors);
+
   colors->Delete();
   newPoints->Delete();
   return 1;
@@ -102,9 +121,9 @@ void vtkOdfSource::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 int vtkOdfSource::RequestInformation(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+    vtkInformation *vtkNotUsed(request),
+    vtkInformationVector **vtkNotUsed(inputVector),
+    vtkInformationVector *outputVector)
 {
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);

@@ -225,7 +225,7 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
   {
     MITK_ERROR << "Exception occured: " << e.what();
   }
-  //Todo: ist der neue Knoten automatisch der erste oder wie bekomme ich denß
+
   m_ToolToBeEdited->GetDataNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
 }
 
@@ -312,11 +312,9 @@ void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
 
 void QmitkNavigationToolCreationWidget::OnEditToolTip()
 {
-  m_ToolTransformationWidget->SetGeometryPointer(m_ToolToBeEdited->GetDataNode()->GetData()->GetGeometry());
-  m_ToolTransformationWidget->SetGeometryDefaultValues(m_ToolToBeEdited->GetToolTipTransform());
-
-  //change color to red
-  m_ToolToBeEdited->GetToolSurface()->SetProperty("color", mitk::ColorProperty::New(1, 0, 0));//Todo falsche surface?!
+  m_ToolTransformationWidget->SetToolToEdit(m_ToolToBeEdited);
+  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToBeEdited->GetToolTipOrientation());
+  m_ToolTransformationWidget->SetDefaultOffset(m_ToolToBeEdited->GetToolTipPosition());
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_ToolTransformationWidget);
@@ -328,13 +326,12 @@ void QmitkNavigationToolCreationWidget::OnEditToolTip()
 
 void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
+  //This function is called, when the toolTipEdit view is closed.
   m_ToolEditDialog.close();
-  m_ToolToBeEdited->GetToolSurface()->SetProperty("color", mitk::ColorProperty::New(1, 1, 1)); // Todo falsche surface ? !
 
   //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
   if (toolTip)
   {
-    //This function is called, when the toolTipEdit view is closed.
     m_ToolToBeEdited->SetToolTipPosition(toolTip->GetOffset());
     mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
     m_ToolToBeEdited->SetToolTipOrientation(tempND->GetOrientation());

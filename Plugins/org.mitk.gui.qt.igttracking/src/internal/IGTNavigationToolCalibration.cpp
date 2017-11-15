@@ -45,7 +45,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string IGTNavigationToolCalibration::VIEW_ID = "org.mitk.views.igtnavigationtoolcalibration";
 
 IGTNavigationToolCalibration::IGTNavigationToolCalibration()
-{}
+{
+  m_ToolTransformationWidget = new QmitkInteractiveTransformationWidget();
+}
 
 IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
 {
@@ -53,6 +55,7 @@ IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
   //If this is removed, MITK crashes when closing the view:
   m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(NULL);
   m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(NULL);
+  delete m_ToolTransformationWidget;
 }
 
 void IGTNavigationToolCalibration::SetFocus()
@@ -80,13 +83,6 @@ void IGTNavigationToolCalibration::OnToolCalibrationMethodChanged(int index)
 
 void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
 {
-  //initialize manual tool editing widget
-  //m_ManualToolTipEditWidget = new QmitkNavigationToolCreationAdvancedWidget(parent);
-  //m_ManualToolTipEditWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
-  //m_ManualToolTipEditWidget->setWindowTitle("Edit Tool Tip Manually");
-  //m_ManualToolTipEditWidget->setModal(false);
-  //m_ManualToolTipEditWidget->SetDataStorage(this->GetDataStorage());
-
   m_TrackingTimer = new QTimer(this);
 
   // create GUI widgets from the Qt Designer's .ui file
@@ -105,8 +101,8 @@ void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_ToolAxis_Y, SIGNAL(valueChanged(double)), this, SLOT(OnToolAxisSpinboxChanged()));
   connect(m_Controls.m_ToolAxis_Z, SIGNAL(valueChanged(double)), this, SLOT(OnToolAxisSpinboxChanged()));
   connect(m_Controls.m_CalibrateToolAxis, SIGNAL(clicked()), this, SLOT(OnCalibrateToolAxis()));
-  //connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
-  //connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessManualTooltipEditDialogCloseRequest()));
+  connect((QObject*)(m_ToolTransformationWidget), SIGNAL(EditToolTipFinished(mitk::AffineTransform3D::Pointer)), this,
+    SLOT(OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer)));
   connect(m_Controls.m_CalibrationMethodComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnToolCalibrationMethodChanged(int)));
 
   connect((QObject*)(m_Controls.m_RunCalibrationButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnRunSingleRefToolCalibrationClicked()));
@@ -443,25 +439,34 @@ void IGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
 void IGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 {
   if (!CheckInitialization(false)) { return; }
-  //m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolToCalibrate->GetDataNode());
-  //m_ManualToolTipEditWidget->show(); //TODO
-  //m_ManualToolTipEditWidget->SetDefaultTooltip(m_ToolToCalibrate->GetToolTipTransform());
-  //m_ManualToolTipEditWidget->ReInitialize();
+
+  m_ToolTransformationWidget->SetToolToEdit(m_ToolToCalibrate);
+  m_ToolTransformationWidget->SetDefaultOffset(m_ToolToCalibrate->GetToolTipPosition());
+  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToCalibrate->GetToolTipOrientation());
+
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->addWidget(m_ToolTransformationWidget);
+  m_ToolEditDialog.setLayout(mainLayout);
+  m_ToolEditDialog.setWindowTitle("Edit Tool Tip and Tool Orientation");
+  m_ToolEditDialog.setProperty("minimumSizeHint", m_ToolTransformationWidget->size());
+  m_ToolEditDialog.open();
 }
 
-void IGTNavigationToolCalibration::OnRetrieveDataForManualTooltipManipulation()
+void IGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
-  this->GetDataStorage()->Add(m_ToolSurfaceInToolCoordinatesDataNode);
-  //m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolSurfaceInToolCoordinatesDataNode);
-}
+  //This function is called, when the toolTipEdit view is closed.
+  m_ToolEditDialog.close();
 
-void IGTNavigationToolCalibration::OnProcessManualTooltipEditDialogCloseRequest()
-{
-  //mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_ManualToolTipEditWidget->GetManipulatedToolTip());
-  //this->ApplyToolTipTransform(tempND);
-  //UpdateManualToolTipCalibrationView();
-  //m_ManualToolTipEditWidget->hide(); //TODO
-  //this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
+  //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
+  if (toolTip)
+  {
+    mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
+    QString resultString = QString("Manual edited values are written to ") + m_ToolToCalibrate->GetToolName().c_str();
+    ApplyToolTipTransform(tempND, resultString.toStdString());
+    m_Controls.m_ResultText->setText(resultString);
+  }
+
+  UpdateManualToolTipCalibrationView();
 }
 
 void IGTNavigationToolCalibration::OnGetPositions()
@@ -569,6 +574,8 @@ void IGTNavigationToolCalibration::SetToolToCalibrate()
     m_Controls.m_ToolAxis_Y->setValue(m_CalibratedToolAxis[1]);
     m_Controls.m_ToolAxis_Z->setValue(m_CalibratedToolAxis[2]);
     m_Controls.m_ToolAxis_X->blockSignals(false); m_Controls.m_ToolAxis_Y->blockSignals(false); m_Controls.m_ToolAxis_Z->blockSignals(false);
+
+    UpdateManualToolTipCalibrationView();
 
     //start updating timer for status widgets, etc.
     if (!m_TrackingTimer->isActive()) m_TrackingTimer->start(100);

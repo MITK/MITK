@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNavigationData.h>
 
+#include "QmitkInteractiveTransformationWidget.h"
+
+#include <QDialog>
 
 #include "ui_IGTNavigationToolCalibrationControls.h"
 
@@ -69,14 +72,13 @@ public:
   void SaveCalibratedTool();
   void OnToolCalibrationMethodChanged(int index);
   void OnStartManualToolTipCalibration();
-  void OnRetrieveDataForManualTooltipManipulation();
-  void OnProcessManualTooltipEditDialogCloseRequest();
   void OnRunSingleRefToolCalibrationClicked();
   void OnLoginSingleRefToolNavigationDataClicked();
   void OnSetNewToolTipPosButtonClicked();
   void OnGetPositions();
   void OnCalibrateToolAxis();
   void OnToolAxisSpinboxChanged();
+  void OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip);
 
 protected:
 
@@ -110,7 +112,8 @@ protected:
 
   // members and helper methods for manual tool calibration
   void UpdateManualToolTipCalibrationView();
-  //QmitkNavigationToolCreationAdvancedWidget* m_ManualToolTipEditWidget;
+  QDialog m_ToolEditDialog;
+  QmitkInteractiveTransformationWidget* m_ToolTransformationWidget;
 
   // members and helper methods for single reference tool calibration
   void LoginSingleRefToolNavigationData();

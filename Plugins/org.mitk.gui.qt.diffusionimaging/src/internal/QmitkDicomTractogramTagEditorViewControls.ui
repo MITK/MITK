@@ -29,22 +29,6 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <item row="2" column="0">
-    <spacer name="spacer1">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>220</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="0" column="0">
     <widget class="QFrame" name="frame">
      <property name="frameShape">
@@ -129,6 +113,32 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <spacer name="spacer1">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>220</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCommandLinkButton" name="m_CopyPropsButton">
+     <property name="toolTip">
+      <string>Copies the DICOM properties of the tractogram selected in this view to the one selected in the datamanager.</string>
+     </property>
+     <property name="text">
+      <string>Copy Properties From Image</string>
+     </property>
     </widget>
    </item>
   </layout>

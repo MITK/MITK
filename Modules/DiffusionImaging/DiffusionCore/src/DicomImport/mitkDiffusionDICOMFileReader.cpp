@@ -166,6 +166,36 @@ bool mitk::DiffusionDICOMFileReader
 
 }
 
+std::vector<std::string> mitk::DiffusionDICOMFileReader::patient_ids() const
+{
+  return m_patient_ids;
+}
+
+std::vector<std::string> mitk::DiffusionDICOMFileReader::patient_names() const
+{
+  return m_patient_names;
+}
+
+std::vector<std::string> mitk::DiffusionDICOMFileReader::study_instance_uids() const
+{
+  return m_study_instance_uids;
+}
+
+std::vector<std::string> mitk::DiffusionDICOMFileReader::series_instance_uids() const
+{
+  return m_series_instance_uids;
+}
+
+std::vector<std::string> mitk::DiffusionDICOMFileReader::frame_of_reference_uids() const
+{
+  return m_frame_of_reference_uids;
+}
+
+std::vector<std::string> mitk::DiffusionDICOMFileReader::sop_instance_uids() const
+{
+  return m_sop_instance_uids;
+}
+
 void mitk::DiffusionDICOMFileReader
 ::AnalyzeInputFiles()
 {
@@ -201,6 +231,13 @@ void mitk::DiffusionDICOMFileReader
     bool isMosaic = false;
     gdcm::Scanner gdcmScanner;
 
+    gdcm::Tag t_sop_instance_uid(0x0008, 0x0018);
+    gdcm::Tag t_frame_of_reference_uid(0x0020, 0x0052);
+    gdcm::Tag t_series_instance_uid(0x0020, 0x000E);
+    gdcm::Tag t_study_instance_uid(0x0020, 0x000D);
+    gdcm::Tag t_patient_name(0x0010, 0x0010);
+    gdcm::Tag t_patient_id(0x0010, 0x0020);
+
     gdcm::Tag t_vendor(0x008, 0x0070);
     gdcm::Tag t_imagetype(0x0008, 0x0008);
     gdcm::Tag t_StudyDescription(0x0008, 0x1030);
@@ -212,12 +249,56 @@ void mitk::DiffusionDICOMFileReader
     gdcmScanner.AddTag( t_imagetype );
     gdcmScanner.AddTag( t_StudyDescription );
     gdcmScanner.AddTag( t_SeriesDescription );
+
+    gdcmScanner.AddTag( t_sop_instance_uid );
+    gdcmScanner.AddTag( t_frame_of_reference_uid );
+    gdcmScanner.AddTag( t_series_instance_uid );
+    gdcmScanner.AddTag( t_study_instance_uid );
+    gdcmScanner.AddTag( t_patient_name );
+    gdcmScanner.AddTag( t_patient_id );
+
     if( gdcmScanner.Scan( inputFilename ) )
     {
 
       // retrieve both vendor and image type
       const char* ch_vendor = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_vendor );
       const char* ch_image_type = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_imagetype );
+
+      const char* temp = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_sop_instance_uid );
+      if (temp!=nullptr)
+        m_sop_instance_uids.push_back(std::string(temp));
+      else
+        m_sop_instance_uids.push_back("-");
+
+      temp = nullptr; temp = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_frame_of_reference_uid );
+      if (temp!=nullptr)
+        m_frame_of_reference_uids.push_back(std::string(temp));
+      else
+        m_frame_of_reference_uids.push_back("-");
+
+      temp = nullptr; temp = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_series_instance_uid );
+      if (temp!=nullptr)
+        m_series_instance_uids.push_back(std::string(temp));
+      else
+        m_series_instance_uids.push_back("-");
+
+      temp = nullptr; temp = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_study_instance_uid );
+      if (temp!=nullptr)
+        m_study_instance_uids.push_back(std::string(temp));
+      else
+        m_study_instance_uids.push_back("-");
+
+      temp = nullptr; temp = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_patient_name );
+      if (temp!=nullptr)
+        m_patient_names.push_back(std::string(temp));
+      else
+        m_patient_names.push_back("-");
+
+      temp = nullptr; temp = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_patient_id );
+      if (temp!=nullptr)
+        m_patient_ids.push_back(std::string(temp));
+      else
+        m_patient_ids.push_back("-");
 
       if( ch_vendor == nullptr || ch_image_type == nullptr )
       {

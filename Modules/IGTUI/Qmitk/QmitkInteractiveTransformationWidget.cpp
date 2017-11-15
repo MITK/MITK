@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkRenderingManager.h"
+#include "mitkBaseRenderer.h"
 #include "mitkNavigationData.h"
 
 // vtk includes
@@ -80,19 +81,38 @@ void QmitkInteractiveTransformationWidget::CreateConnections()
   }
 }
 
-void QmitkInteractiveTransformationWidget::SetGeometryPointer(mitk::BaseGeometry::Pointer geometry)
+void QmitkInteractiveTransformationWidget::SetToolToEdit(const mitk::NavigationTool::Pointer _tool)
 {
-  m_Geometry = geometry;
-  //For ResetGeometry, use the set-fuction via vtk matrix, 'cause this garantees a deep copy and not just sharing a pointer.
-  m_ResetGeometry->SetIndexToWorldTransformByVtkMatrix(geometry->GetVtkMatrix()); //Remember the original values to be able to reset and abort everything
+  m_ToolToEdit = _tool->Clone();
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Add(m_ToolToEdit->GetDataNode());
+  m_ToolToEdit->GetDataNode()->SetName("Tool Tip to be edited");
+
+  //change color to red
+  m_ToolToEdit->GetDataNode()->SetProperty("color", mitk::ColorProperty::New(1, 0, 0));
+
+  //use the set-fuction via vtk matrix, 'cause this garantees a deep copy and not just sharing a pointer.
+  m_Geometry = m_ToolToEdit->GetDataNode()->GetData()->GetGeometry();
+  m_ResetGeometry->SetIndexToWorldTransformByVtkMatrix(m_Geometry->GetVtkMatrix()); //Remember the original values to be able to reset and abort everything
 }
 
-void QmitkInteractiveTransformationWidget::SetGeometryDefaultValues(const mitk::AffineTransform3D::Pointer _defaultValues)
+void QmitkInteractiveTransformationWidget::SetDefaultOffset(const mitk::Point3D _defaultValues)
 {
-  m_Geometry->SetIndexToWorldTransform(_defaultValues);
+  m_Geometry->SetOrigin(_defaultValues);
+  m_ResetGeometry->SetOrigin(_defaultValues); //Remember the original values to be able to reset and abort everything
+  SetValuesToGUI(m_Geometry->GetIndexToWorldTransform());
+}
+
+void QmitkInteractiveTransformationWidget::SetDefaultRotation(const mitk::Quaternion _defaultValues)
+{
+  // Conversion to navigation data / transform
+  mitk::NavigationData::Pointer rotationTransform = mitk::NavigationData::New(m_Geometry->GetIndexToWorldTransform());
+  rotationTransform->SetOrientation(_defaultValues);
+  m_Geometry->SetIndexToWorldTransform(rotationTransform->GetAffineTransform3D());
+
   //For ResetGeometry, use the set-fuction via vtk matrix, 'cause this garantees a deep copy and not just sharing a pointer.
   m_ResetGeometry->SetIndexToWorldTransformByVtkMatrix(m_Geometry->GetVtkMatrix()); //Remember the original values to be able to reset and abort everything
-  SetValuesToGUI(_defaultValues);
+  SetValuesToGUI(m_Geometry->GetIndexToWorldTransform());
 }
 
 void QmitkInteractiveTransformationWidget::SetValuesToGUI(const mitk::AffineTransform3D::Pointer _defaultValues)
@@ -266,11 +286,17 @@ void QmitkInteractiveTransformationWidget::OnRevertChanges()
 
 void QmitkInteractiveTransformationWidget::OnApplyManipulatedToolTip()
 {
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Remove(m_ToolToEdit->GetDataNode());
+
   mitk::AffineTransform3D::Pointer toolTip = m_Geometry->GetIndexToWorldTransform();
   emit EditToolTipFinished(toolTip);
 }
 
 void QmitkInteractiveTransformationWidget::OnCancel()
 {
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Remove(m_ToolToEdit->GetDataNode());
+
   emit EditToolTipFinished(nullptr);
 }

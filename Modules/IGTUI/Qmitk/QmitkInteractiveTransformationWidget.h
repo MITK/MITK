@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include "mitkVector.h"
 #include "mitkGeometry3D.h"
+#include "mitkNavigationTool.h"
 
 //ui header
 #include "ui_QmitkInteractiveTransformationWidgetControls.h"
@@ -44,13 +45,20 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     QmitkInteractiveTransformationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkInteractiveTransformationWidget();
 
-    /** Sets the geometry which will be modified by this widget. Default values may be
-     *  provided by the second variable. These values will be applied to the geometry
-     *  in the beginning and the UI will also hold these values.
+    /** This tool will be copied to m_ToolToEdit. It will not be changed.
+        To apply any changes made by this widget, you will need to connect to the signal
+        EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip) and set this transfrom
+        as calibrated tool tip.
+        We do not directly modify the tool to allow to cancel/exit this widget without doing
+        any harm.
      */
-    void SetGeometryPointer(mitk::BaseGeometry::Pointer geometry);
+    void SetToolToEdit(const mitk::NavigationTool::Pointer _tool);
 
-    void SetGeometryDefaultValues(const mitk::AffineTransform3D::Pointer _defaultValues);
+    /** The sliders and spinboxes will be set to these values.
+        When clicking "Revert Changes", sliders will be reseted to these values.
+    */
+    void SetDefaultOffset(const mitk::Point3D _defaultValues);
+    void SetDefaultRotation(const mitk::Quaternion _defaultValues);
 
   protected slots:
     void OnZTranslationValueChanged( double v );
@@ -80,6 +88,7 @@ signals:
     // Member variables
     Ui::QmitkInteractiveTransformationWidgetControls* m_Controls;
 
+    mitk::NavigationTool::Pointer m_ToolToEdit;     ///< \brief this mamber holds a copy of the tool that should be edited for visualization
     mitk::BaseGeometry::Pointer m_Geometry;         ///< \brief The geometry that is manipulated
     mitk::BaseGeometry::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the original geometry
 

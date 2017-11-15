@@ -55,7 +55,7 @@ mitk::NavigationTool::NavigationTool(const NavigationTool &other)
   {
     this->m_DataNode = other.m_DataNode->Clone();
     if (other.m_DataNode->GetData())
-      this->m_DataNode->SetData(other.m_DataNode->GetData());
+      this->m_DataNode->SetData(dynamic_cast<mitk::BaseData*>(other.m_DataNode->GetData()->Clone().GetPointer()));
   }
 
   if (other.m_SpatialObject.IsNotNull())

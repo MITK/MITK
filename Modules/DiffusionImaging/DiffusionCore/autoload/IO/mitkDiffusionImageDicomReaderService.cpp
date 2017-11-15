@@ -143,8 +143,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
 
           // test for prefix
           if( itksys::SystemTools::FileIsDirectory( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ).c_str() )
-              && itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() )
-              )
+              && itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() ) )
           {
             gdcm::Directory d;
             d.Load( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ) , false);
@@ -233,9 +232,6 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
       {
         mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(o).GetMitkImage();
 
-        std::stringstream ss;
-        ss << "ImportedData_" << o;
-
         StringProperty::Pointer nameProp;
         if (gdcmReader->GetSeriesName(o)!="-")
           nameProp = StringProperty::New(gdcmReader->GetSeriesName(o));
@@ -245,6 +241,44 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
           nameProp = StringProperty::New(folderName);
 
         loaded_image->SetProperty("name", nameProp);
+
+        std::string val = "-";
+
+        if (gdcmReader->patient_ids().size()>o)
+        {
+          val = gdcmReader->patient_ids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.patient_id",val.c_str());
+        }
+
+        if (gdcmReader->patient_names().size()>o)
+        {
+          val = gdcmReader->patient_names().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.patient_name",val.c_str());
+        }
+
+        if (gdcmReader->study_instance_uids().size()>o)
+        {
+          val = gdcmReader->study_instance_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.study_instance_uid",val.c_str());
+        }
+
+        if (gdcmReader->series_instance_uids().size()>o)
+        {
+          val = gdcmReader->series_instance_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.series_instance_uid",val.c_str());
+        }
+
+        if (gdcmReader->sop_instance_uids().size()>o)
+        {
+          val = gdcmReader->sop_instance_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.sop_instance_uid",val.c_str());
+        }
+
+        if (gdcmReader->frame_of_reference_uids().size()>o)
+        {
+          val = gdcmReader->frame_of_reference_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.frame_of_reference_uid",val.c_str());
+        }
 
         result_images.push_back(loaded_image.GetPointer());
       }

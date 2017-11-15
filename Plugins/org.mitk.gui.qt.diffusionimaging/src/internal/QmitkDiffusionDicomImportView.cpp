@@ -55,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMessageBox>
 #include <QTreeView>
+#include <mitkStringProperty.h>
 
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
 
@@ -496,23 +497,58 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       {
         mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(o).GetMitkImage();
 
-        std::stringstream ss;
-        ss << "ImportedData_" << o;
+        std::string outname;
+        if (gdcmReader->GetSeriesName(o)!="-")
+          outname = gdcmReader->GetSeriesName(o);
+        else if (gdcmReader->GetStudyName(o)!="-")
+          outname = gdcmReader->GetStudyName(o);
+        else
+          loaded_image->GetPropertyList()->GetStringProperty("diffusion.dicom.importname", outname );
+
+        std::string val = "-";
+
+        if (gdcmReader->patient_ids().size()>o)
+        {
+          val = gdcmReader->patient_ids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.patient_id",val.c_str());
+        }
+
+        if (gdcmReader->patient_names().size()>o)
+        {
+          val = gdcmReader->patient_names().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.patient_name",val.c_str());
+        }
+
+        if (gdcmReader->study_instance_uids().size()>o)
+        {
+          val = gdcmReader->study_instance_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.study_instance_uid",val.c_str());
+        }
+
+        if (gdcmReader->series_instance_uids().size()>o)
+        {
+          val = gdcmReader->series_instance_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.series_instance_uid",val.c_str());
+        }
+
+        if (gdcmReader->sop_instance_uids().size()>o)
+        {
+          val = gdcmReader->sop_instance_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.sop_instance_uid",val.c_str());
+        }
+
+        if (gdcmReader->frame_of_reference_uids().size()>o)
+        {
+          val = gdcmReader->frame_of_reference_uids().at(o);
+          loaded_image->GetPropertyList()->SetStringProperty("DICOM.frame_of_reference_uid",val.c_str());
+        }
 
         node = mitk::DataNode::New();
         node->SetData( loaded_image );
-        std::string outname;
-        loaded_image->GetPropertyList()->GetStringProperty("diffusion.dicom.importname", outname );
-
         node->SetName( outname.c_str() );
 
         GetDataStorage()->Add(node);
-        //SetDwiNodeProperties(node, ss.str() );
-        //Status(QString("Image %1 added to datastorage").arg(descr));
       }
-
-
-
     }
 
     Status("Timing information");

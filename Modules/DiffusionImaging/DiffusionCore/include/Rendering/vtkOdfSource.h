@@ -50,6 +50,9 @@ public:
   vtkSetMacro(Odf,OdfType);
   vtkGetMacro(Odf,OdfType);
 
+  vtkSetMacro(UseCustomColor,bool);
+  vtkGetMacro(UseCustomColor,bool);
+
   void SetColor(int r, int g, int b)
   {
     this->r = r;
@@ -71,6 +74,8 @@ protected:
   int r;
   int g;
   int b;
+  bool    UseCustomColor;
+  vtkSmartPointer<vtkLookupTable> lut;
 
 private:
   vtkOdfSource(const vtkOdfSource&);  // Not implemented.

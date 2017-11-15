@@ -301,11 +301,14 @@ void  mitk::OdfVtkMapper2D<T,N>
 
   if (m_ToggleColourisationMode)
   {
+    m_OdfSource->SetUseCustomColor(true);
     vnl_vector_fixed<double,3> d = odf.GetPrincipalDiffusionDirection();
     m_OdfSource->SetColor(fabs(d[0])*255,fabs(d[1])*255,fabs(d[2])*255);
   }
   else
-    m_OdfSource->SetColor(0,0,0);
+  {
+    m_OdfSource->SetUseCustomColor(false);
+  }
 
   switch(m_ScaleBy)
   {
@@ -646,14 +649,9 @@ void  mitk::OdfVtkMapper2D<T,N>
       localStorage->m_OdfsPlanes[index]->Update();
     }
   }
-  localStorage->m_OdfsMappers[index]->SetScalarModeToDefault();
-
-  if (m_ToggleColourisationMode)
-  {
-    localStorage->m_OdfsMappers[index]->ScalarVisibilityOn();
-    localStorage->m_OdfsMappers[index]->SetScalarModeToUsePointFieldData();
-    localStorage->m_OdfsMappers[index]->SelectColorArray("FIBER_COLORS");
-  }
+  localStorage->m_OdfsMappers[index]->ScalarVisibilityOn();
+  localStorage->m_OdfsMappers[index]->SetScalarModeToUsePointFieldData();
+  localStorage->m_OdfsMappers[index]->SelectColorArray("ODF_COLORS");
 
   localStorage->m_PropAssemblies[index]->VisibilityOn();
   if(localStorage->m_PropAssemblies[index]->GetParts()->IsItemPresent(localStorage->m_OdfsActors[index]))
@@ -916,7 +914,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   if (dynamic_cast<mitk::TensorImage*>(node->GetData()))
   {
     node->AddProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", mitk::BoolProperty::New( true ) );
-    node->SetProperty( "Scaling", mitk::FloatProperty::New( 2.0 ) );
+    node->SetProperty( "Scaling", mitk::FloatProperty::New( 3.0 ) );
   }
   else
   {

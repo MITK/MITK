@@ -175,7 +175,7 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
   }
 
-  m_Controls->m_ToolNameEdit->setText(QString(m_ToolToBeEdited->GetDataNode()->GetName().c_str()));
+  m_Controls->m_ToolNameEdit->setText(QString(m_ToolToBeEdited->GetToolName().c_str()));
   m_Controls->m_CalibrationFileName->setText(QString(m_ToolToBeEdited->GetCalibrationFile().c_str()));
 
   m_Controls->m_SurfaceChooser->SetSelectedNode(m_ToolToBeEdited->GetDataNode());

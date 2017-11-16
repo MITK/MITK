@@ -352,7 +352,7 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   if (m_NavigationToolStorage.IsNull()) return;
   for (int i = 0; i < m_NavigationToolStorage->GetToolCount(); i++)
   {
-    QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataNode()->GetName().c_str()) + " ";
+    QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetToolName().c_str()) + " ";
 
     currentTool += "(" + QString::fromStdString(m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType()) + "/";
 

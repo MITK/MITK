@@ -37,6 +37,12 @@ TrackingHandlerOdf::~TrackingHandlerOdf()
 {
 }
 
+bool TrackingHandlerOdf::WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index)
+{
+  m_OdfImage->TransformPhysicalPointToIndex(pos, index);
+  return m_OdfImage->GetLargestPossibleRegion().IsInside(index);
+}
+
 void TrackingHandlerOdf::InitForTracking()
 {
   MITK_INFO << "Initializing ODF tracker.";

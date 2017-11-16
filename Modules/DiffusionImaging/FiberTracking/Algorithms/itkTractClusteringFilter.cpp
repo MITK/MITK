@@ -304,9 +304,8 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
       Cluster c1 = clusters.at(k1);
       vnl_matrix<float> t = c1.h / c1.n;
 
-      int min_cluster_index = -1;
-      float min_cluster_distance = 99999;
-      bool flip = false;
+      std::vector< int > merge_indices;
+      std::vector< bool > flip_indices;
 
 #pragma omp parallel for
       for (int k2=0; k2<(int)clusters.size(); ++k2)
@@ -326,31 +325,36 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
             d = CalcMAX_MDF(t, v, f);
 
 #pragma omp critical
-          if (d<min_cluster_distance)
+          if (d<m_MergeDuplicateThreshold)
           {
-            min_cluster_distance = d;
-            min_cluster_index = k2;
-            flip = f;
+            merge_indices.push_back(k2);
+            flip_indices.push_back(f);
           }
         }
       }
 
-      if (min_cluster_index>=0 && min_cluster_distance<m_MergeDuplicateThreshold)
+      for (unsigned int i=0; i<merge_indices.size(); ++i)
       {
-        Cluster c2 = clusters.at(min_cluster_index);
+        Cluster c2 = clusters.at(merge_indices.at(i));
         for (int i=0; i<c2.n; ++i)
         {
           clusters[k1].I.push_back(c2.I.at(i));
           clusters[k1].n += 1;
         }
-        if (!flip)
+        if (!flip_indices.at(i))
           clusters[k1].h += c2.h;
         else
           clusters[k1].h += c2.h.fliplr();
-        clusters.erase (clusters.begin()+min_cluster_index);
-        found = true;
-        break;
       }
+
+      std::sort(merge_indices.begin(), merge_indices.end());
+      for (unsigned int i=0; i<merge_indices.size(); ++i)
+      {
+        clusters.erase (clusters.begin()+merge_indices.at(i));
+        found = true;
+      }
+      if (found)
+        break;
     }
   }
   MITK_INFO << "\nNumber of clusters after merging duplicates: " << clusters.size();

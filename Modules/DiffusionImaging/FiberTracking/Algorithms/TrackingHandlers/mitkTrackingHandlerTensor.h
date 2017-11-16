@@ -60,6 +60,7 @@ public:
     else
       mitkThrow() << "Tensor tracker is only implemented for deterministic mode.";
   }
+  int GetNumTensorImages() const { return m_TensorImages.size(); }
 
 
   ItkUcharImgType::SpacingType GetSpacing(){ return m_FaImage->GetSpacing(); }

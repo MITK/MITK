@@ -52,6 +52,12 @@ QmitkDicomTractogramTagEditorView::QmitkDicomTractogramTagEditorView()
               "DICOM.model_code.meaning",
               "DICOM.anatomy.value",
               "DICOM.anatomy.meaning"};
+  m_ImageTagList = {"DICOM.patient_id",
+               "DICOM.patient_name",
+               "DICOM.study_instance_uid",
+               "DICOM.series_instance_uid",
+               "DICOM.sop_instance_uid",
+               "DICOM.frame_of_reference_uid"};
 }
 
 // Destructor
@@ -101,7 +107,17 @@ void QmitkDicomTractogramTagEditorView::CopyProperties()
     return;
   if (m_Image.IsNull())
     return;
-  fib->SetPropertyList(m_Image->GetPropertyList()->Clone());
+
+  mitk::PropertyList* source_p_list = m_Image->GetPropertyList();
+  mitk::PropertyList* target_p_list = fib->GetPropertyList();
+
+  for (std::string tag : m_ImageTagList)
+  {
+    std::string val = "-";
+    source_p_list->GetStringProperty(tag.c_str(), val);
+    target_p_list->SetStringProperty(tag.c_str(), val.c_str());
+  }
+  UpdateGui();
 }
 
 void QmitkDicomTractogramTagEditorView::OnItemChanged(QTableWidgetItem* item)

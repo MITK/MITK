@@ -27,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkPointShell.h"
 #include <itkRescaleIntensityImageFilter.h>
 #include <boost/lexical_cast.hpp>
+#include <TrackingHandlers/mitkTrackingHandlerOdf.h>
+#include <TrackingHandlers/mitkTrackingHandlerPeaks.h>
+#include <TrackingHandlers/mitkTrackingHandlerTensor.h>
+#include <TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -1000,7 +1004,6 @@ void StreamlineTrackingFilter::BuildFibers(bool check)
   m_BuildFibersFinished = true;
 }
 
-
 void StreamlineTrackingFilter::AfterTracking()
 {
   if (m_Verbose)
@@ -1031,6 +1034,68 @@ void StreamlineTrackingFilter::AfterTracking()
   MITK_INFO << "Tracking took " << hh.count() << "h, " << mm.count() << "m and " << ss.count() << "s";
 
   m_SeedPoints.clear();
+}
+
+void StreamlineTrackingFilter::SetDicomProperties(mitk::FiberBundle::Pointer fib)
+{
+  std::string model_code_value = "-";
+  std::string model_code_meaning = "-";
+  std::string algo_code_value = "-";
+  std::string algo_code_meaning = "-";
+
+  if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::DETERMINISTIC && dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler) && !m_TrackingHandler->GetInterpolate())
+  {
+    algo_code_value = "sup181_ee04";
+    algo_code_meaning = "FACT";
+  }
+  else if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::DETERMINISTIC)
+  {
+    algo_code_value = "sup181_ee01";
+    algo_code_meaning = "Deterministic";
+  }
+  else if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::PROBABILISTIC)
+  {
+    algo_code_value = "sup181_ee02";
+    algo_code_meaning = "Probabilistic";
+  }
+
+  if (dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler) || (dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler) && dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->GetIsOdfFromTensor() ) )
+  {
+    if ( dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler) && dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->GetNumTensorImages()>1 )
+    {
+      model_code_value = "sup181_bb02";
+      model_code_meaning = "Multi Tensor";
+    }
+    else
+    {
+      model_code_value = "sup181_bb01";
+      model_code_meaning = "Single Tensor";
+    }
+  }
+  else if (dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler) || dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler))
+  {
+    model_code_value = "sup181_bb03";
+    model_code_meaning = "Model Free";
+  }
+  else if (dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler))
+  {
+    model_code_value = "-";
+    model_code_meaning = "ODF";
+  }
+  else if (dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingHandler))
+  {
+    model_code_value = "-";
+    model_code_meaning = "Peaks";
+  }
+
+  fib->SetProperty("DICOM.anatomy.value", mitk::StringProperty::New("T-A0095"));
+  fib->SetProperty("DICOM.anatomy.meaning", mitk::StringProperty::New("White matter of brain and spinal cord"));
+
+  fib->SetProperty("DICOM.algo_code.value", mitk::StringProperty::New(algo_code_value));
+  fib->SetProperty("DICOM.algo_code.meaning", mitk::StringProperty::New(algo_code_meaning));
+
+  fib->SetProperty("DICOM.model_code.value", mitk::StringProperty::New(model_code_value));
+  fib->SetProperty("DICOM.model_code.meaning", mitk::StringProperty::New(model_code_meaning));
 }
 
 }

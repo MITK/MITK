@@ -328,7 +328,6 @@ int main(int argc, char* argv[])
 
     input_images.clear();
     input_images.push_back(image);
-    algorithm = "ProbODF";
 
     sharpen_odfs = true;
     odf_cutoff = 0;
@@ -397,7 +396,7 @@ int main(int argc, char* argv[])
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaImage(addImages.at(0).at(0));
   }
-  else if (algorithm == "DetODF" || algorithm == "ProbODF")
+  else if (algorithm == "DetODF" || algorithm == "ProbODF" || algorithm == "ProbTensor")
   {
     handler = new mitk::TrackingHandlerOdf();
 
@@ -412,8 +411,10 @@ int main(int argc, char* argv[])
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfThreshold(odf_cutoff);
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetSharpenOdfs(sharpen_odfs);
 
-    if (algorithm == "ProbODF")
+    if (algorithm == "ProbODF" || algorithm == "ProbTensor")
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMode(mitk::TrackingHandlerOdf::MODE::PROBABILISTIC);
+    if (algorithm == "ProbTensor")
+      dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetIsOdfFromTensor(true);
 
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addImages.at(0).at(0));

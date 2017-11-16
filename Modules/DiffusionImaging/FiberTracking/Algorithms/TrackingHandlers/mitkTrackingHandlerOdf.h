@@ -61,6 +61,9 @@ public:
   int OdfPower() const;
   void SetNumProbSamples(int NumProbSamples);
 
+  bool GetIsOdfFromTensor() const;
+  void SetIsOdfFromTensor(bool OdfFromTensor);
+
 protected:
 
   int SampleOdf(vnl_vector< float >& probs, vnl_vector< float >& angles);
@@ -74,6 +77,7 @@ protected:
   std::vector< int >              m_OdfHemisphereIndices;
   vnl_matrix< float >             m_OdfFloatDirs;
   int                             m_NumProbSamples;
+  bool                            m_OdfFromTensor;
 };
 
 }

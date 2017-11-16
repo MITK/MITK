@@ -64,8 +64,10 @@ public:
     virtual void SetMode(MODE m) = 0;
     MODE GetMode(){ return m_Mode; }
 
-    void SetAngularThreshold( float a ){ m_AngularThreshold = a; }
     void SetInterpolate( bool interpolate ){ m_Interpolate = interpolate; }
+    bool GetInterpolate() const { return m_Interpolate; }
+
+    void SetAngularThreshold( float a ){ m_AngularThreshold = a; }
     void SetFlipX( bool f ){ m_FlipX = f; }
     void SetFlipY( bool f ){ m_FlipY = f; }
     void SetFlipZ( bool f ){ m_FlipZ = f; }

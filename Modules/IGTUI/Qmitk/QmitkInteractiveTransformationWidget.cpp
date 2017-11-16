@@ -142,110 +142,92 @@ void QmitkInteractiveTransformationWidget::SetValuesToGUI(const mitk::AffineTran
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Section to allow interactive positioning of the moving surface
-/////////////////////////////////////////////////////////////////////////////////////////////
+void QmitkInteractiveTransformationWidget::SetSynchronizedVauesToSliderAndSpinbox(QDoubleSpinBox* _spinbox, QSlider* _slider, double _value)
+{
+//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
+  _spinbox->blockSignals(true);
+  _slider->blockSignals(true);
+  _spinbox->setValue(_value);
+  _slider->setValue(_value);
+//unblock signals. See above, don't remove this line. Unblock at the end of the function!
+  _spinbox->blockSignals(false);//
+  _slider->blockSignals(false);//
+}
 
 void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged(double v)
 {
-  this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
-
   //Set values to member variable
   mitk::Point3D translationParams = m_Geometry->GetOrigin();
   translationParams[0] = v;
   m_Geometry->SetOrigin(translationParams);
 
-  //Update Gui (change may come either from spin box or from slider)
-  m_Controls->m_XTransSlider->setValue(v);
-  m_Controls->m_XTransSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_XTransSpinBox, m_Controls->m_XTransSlider, v);
 
   //Update view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
+
 }
 
 void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged(double v)
 {
-  this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
-
   //Set values to member variable
   mitk::Point3D translationParams = m_Geometry->GetOrigin();
   translationParams[1] = v;
   m_Geometry->SetOrigin(translationParams);
 
-  //Update Gui (change may come either from spin box or from slider)
-  m_Controls->m_YTransSlider->setValue(v);
-  m_Controls->m_YTransSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_YTransSpinBox, m_Controls->m_YTransSlider, v);
 
   //Update view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
 void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged(double v)
 {
-  this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
-
   //Set values to member variable
   mitk::Point3D translationParams = m_Geometry->GetOrigin();
   translationParams[2] = v;
   m_Geometry->SetOrigin(translationParams);
 
-  //Update Gui (change may come either from spin box or from slider)
-  m_Controls->m_ZTransSlider->setValue(v);
-  m_Controls->m_ZTransSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_ZTransSpinBox, m_Controls->m_ZTransSlider, v);
 
   //Update view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
 void QmitkInteractiveTransformationWidget::OnXRotationValueChanged(double v)
 {
-  this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
   mitk::Vector3D rotationParams;
   rotationParams[0] = v;
-  rotationParams[1] = m_Controls->m_YRotSlider->value();
-  rotationParams[2] = m_Controls->m_ZRotSlider->value();
+  rotationParams[1] = m_Controls->m_YRotSpinBox->value();
+  rotationParams[2] = m_Controls->m_ZRotSpinBox->value();
 
-  //Update Gui (change may come either from spin box or from slider)
-  m_Controls->m_XRotSlider->setValue(v);
-  m_Controls->m_XRotSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_XRotSpinBox, m_Controls->m_XRotSlider, v);
 
   this->Rotate(rotationParams);
-  this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
 void QmitkInteractiveTransformationWidget::OnYRotationValueChanged(double v)
 {
-  this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
   mitk::Vector3D rotationParams;
-  rotationParams[0] = m_Controls->m_XRotSlider->value();
+  rotationParams[0] = m_Controls->m_XRotSpinBox->value();
   rotationParams[1] = v;
-  rotationParams[2] = m_Controls->m_ZRotSlider->value();
+  rotationParams[2] = m_Controls->m_ZRotSpinBox->value();
 
-  //Update Gui (change may come either from spin box or from slider)
-  m_Controls->m_YRotSlider->setValue(v);
-  m_Controls->m_YRotSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_YRotSpinBox, m_Controls->m_YRotSlider, v);
 
   this->Rotate(rotationParams);
-  this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
 void QmitkInteractiveTransformationWidget::OnZRotationValueChanged(double v)
 {
-  this->blockSignals(true);//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
   mitk::Vector3D rotationParams;
-  rotationParams[0] = m_Controls->m_XRotSlider->value();
-  rotationParams[1] = m_Controls->m_YRotSlider->value();
+  rotationParams[0] = m_Controls->m_XRotSpinBox->value();
+  rotationParams[1] = m_Controls->m_YRotSpinBox->value();
   rotationParams[2] = v;
 
-  //Update Gui (change may come either from spin box or from slider)
-  m_Controls->m_ZRotSlider->setValue(v);
-  m_Controls->m_ZRotSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_ZRotSpinBox, m_Controls->m_ZRotSlider, v);
 
   this->Rotate(rotationParams);
-  this->blockSignals(false);//unblock signals. See above, don't remove this line. Unblock at the end of the function!
 }
 
 void QmitkInteractiveTransformationWidget::Rotate(mitk::Vector3D rotateVector)

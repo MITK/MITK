@@ -94,6 +94,7 @@ signals:
 
 private:
   void SetValuesToGUI(const mitk::AffineTransform3D::Pointer _defaultValues);
+  void SetSynchronizedVauesToSliderAndSpinbox(QDoubleSpinBox* _spinbox, QSlider* _slider, double _value);
 
 };
 #endif // QmitkInteractiveTransformationWidget_H

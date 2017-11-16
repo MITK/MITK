@@ -158,8 +158,15 @@ void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Poi
 
 void QmitkNavigationToolCreationWidget::SetGuiElements()
 {
-  //Block signals, so that we don't call SetGuiElements again. This is undone at the end o this function!
-  this->blockSignals(true);
+  //Block signals, so that we don't call SetGuiElements again. This is undone at the end of this function!
+  m_Controls->m_TrackingDeviceTypeChooser->blockSignals(true);
+  m_Controls->m_ToolNameEdit->blockSignals(true);
+  m_Controls->m_ToolTypeChooser->blockSignals(true);
+  m_Controls->m_IdentifierEdit->blockSignals(true);
+  m_Controls->m_SerialNumberEdit->blockSignals(true);
+  m_Controls->m_ToolAxisX->blockSignals(true);
+  m_Controls->m_ToolAxisY->blockSignals(true);
+  m_Controls->m_ToolAxisZ->blockSignals(true);
 
   //DeviceType
   int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(m_ToolToBeEdited->GetTrackingDeviceType()));
@@ -203,7 +210,14 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
   m_Controls->m_ToolTipLabel->setText(_label);
 
   //Undo block signals. Don't remove it, if signals are still blocked at the beginning of this function!
-  this->blockSignals(false);
+  m_Controls->m_TrackingDeviceTypeChooser->blockSignals(false);
+  m_Controls->m_ToolNameEdit->blockSignals(false);
+  m_Controls->m_ToolTypeChooser->blockSignals(false);
+  m_Controls->m_IdentifierEdit->blockSignals(false);
+  m_Controls->m_SerialNumberEdit->blockSignals(false);
+  m_Controls->m_ToolAxisX->blockSignals(false);
+  m_Controls->m_ToolAxisY->blockSignals(false);
+  m_Controls->m_ToolAxisZ->blockSignals(false);
 }
 
 void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled()

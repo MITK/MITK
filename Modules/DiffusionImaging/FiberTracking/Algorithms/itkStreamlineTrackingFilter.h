@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <chrono>
 #include <TrackingHandlers/mitkTrackingDataHandler.h>
 #include <MitkFiberTrackingExports.h>
+#include <mitkFiberBundle.h>
 
 namespace itk{
 
@@ -82,6 +83,8 @@ public:
   { m_AngularThresholdDeg = v; }
   void SetSamplingDistance(float v)   ///< Maximum distance of sampling points in voxels, default is 0.25 * voxel
   { m_SamplingDistanceVox = v; }
+
+  void SetDicomProperties(mitk::FiberBundle::Pointer fib);
 
   itkGetMacro( OutputProbabilityMap, ItkDoubleImgType::Pointer)    ///< Output probability map
   itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers

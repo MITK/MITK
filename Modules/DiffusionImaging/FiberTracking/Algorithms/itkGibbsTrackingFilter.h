@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkSphereInterpolator.h>
+#include <mitkFiberBundle.h>
 
 // ITK
 #include <itkProcessObject.h>
@@ -86,6 +87,8 @@ public:
     itkGetMacro( Iterations, double)
     itkGetMacro( IsInValidState, bool)
     FiberPolyDataType GetFiberBundle();             ///< Output fibers
+
+    void SetDicomProperties(mitk::FiberBundle::Pointer fib);
 
     /** Input images. */
     itkSetMacro(OdfImage, typename ItkOdfImageType::Pointer)

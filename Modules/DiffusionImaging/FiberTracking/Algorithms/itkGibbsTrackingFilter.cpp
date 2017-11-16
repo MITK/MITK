@@ -490,6 +490,25 @@ bool GibbsTrackingFilter< ItkOdfImageType >::SaveParameters()
   }
 }
 
+template< class ItkOdfImageType >
+void GibbsTrackingFilter< ItkOdfImageType >::SetDicomProperties(mitk::FiberBundle::Pointer fib)
+{
+  std::string model_code_value = "-";
+  std::string model_code_meaning = "-";
+  std::string algo_code_value = "sup181_ee03";
+  std::string algo_code_meaning = "Global";
+
+
+  fib->SetProperty("DICOM.anatomy.value", mitk::StringProperty::New("T-A0095"));
+  fib->SetProperty("DICOM.anatomy.meaning", mitk::StringProperty::New("White matter of brain and spinal cord"));
+
+  fib->SetProperty("DICOM.algo_code.value", mitk::StringProperty::New(algo_code_value));
+  fib->SetProperty("DICOM.algo_code.meaning", mitk::StringProperty::New(algo_code_meaning));
+
+  fib->SetProperty("DICOM.model_code.value", mitk::StringProperty::New(model_code_value));
+  fib->SetProperty("DICOM.model_code.meaning", mitk::StringProperty::New(model_code_meaning));
+}
+
 }
 
 

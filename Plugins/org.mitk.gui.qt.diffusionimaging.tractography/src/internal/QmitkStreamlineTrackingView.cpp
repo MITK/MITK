@@ -230,6 +230,7 @@ void QmitkStreamlineTrackingView::AfterThread()
     if (m_Controls->m_ResampleFibersBox->isChecked() && fiberBundle->GetNumberOfLines()>0)
       fib->Compress(m_Controls->m_FiberErrorBox->value());
     fib->ColorFibersByOrientation();
+    m_Tracker->SetDicomProperties(fib);
 
     if (m_Controls->m_InteractiveBox->isChecked())
     {
@@ -642,6 +643,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(0);
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetSharpenOdfs(true);
+      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetIsOdfFromTensor(true);
     }
     else
     {

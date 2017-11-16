@@ -29,6 +29,7 @@ TrackingHandlerOdf::TrackingHandlerOdf()
   , m_OdfThreshold(0.1)
   , m_SharpenOdfs(false)
   , m_NumProbSamples(1)
+  , m_OdfFromTensor(false)
 {
 
 }
@@ -111,6 +112,16 @@ int TrackingHandlerOdf::SampleOdf(vnl_vector< float >& probs, vnl_vector< float 
   }
 
   return max_sample_idx;
+}
+
+void TrackingHandlerOdf::SetIsOdfFromTensor(bool OdfFromTensor)
+{
+  m_OdfFromTensor = OdfFromTensor;
+}
+
+bool TrackingHandlerOdf::GetIsOdfFromTensor() const
+{
+  return m_OdfFromTensor;
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)

@@ -495,6 +495,8 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     GetDataStorage()->Remove(m_FiberBundleNode);
     m_FiberBundleNode = 0;
   }
+  m_GlobalTracker->SetDicomProperties(m_FiberBundle);
+
   m_FiberBundleNode = mitk::DataNode::New();
   m_FiberBundleNode->SetData(m_FiberBundle);
 

@@ -82,6 +82,8 @@ public:
   itkGetMacro(Scale, float)
   itkSetMacro(MergeDuplicateThreshold, float)
   itkGetMacro(MergeDuplicateThreshold, float)
+  itkSetMacro(DoResampling, bool)
+  itkGetMacro(DoResampling, bool)
 
   itkSetMacro(Tractogram, mitk::FiberBundle::Pointer)
   itkSetMacro(InCentroids, mitk::FiberBundle::Pointer)
@@ -131,6 +133,7 @@ protected:
   float                                       m_Scale;
   float                                       m_MergeDuplicateThreshold;
   std::vector< Cluster >                      m_OutClusters;
+  bool                                        m_DoResampling;
 };
 }
 

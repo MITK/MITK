@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Extract Anchor Tracts");
+  parser.setTitle("Extract Overlapping Tracts");
   parser.setCategory("Fiber Tracking Evaluation");
   parser.setDescription("");
   parser.setContributor("MIC");

@@ -30,6 +30,7 @@ TractClusteringFilter::TractClusteringFilter()
   , m_ScalarMap(nullptr)
   , m_Scale(0)
   , m_MergeDuplicateThreshold(-1)
+  , m_DoResampling(true)
 {
 
 }
@@ -151,7 +152,8 @@ float TractClusteringFilter::CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>
 std::vector<vnl_matrix<float> > TractClusteringFilter::ResampleFibers(mitk::FiberBundle::Pointer tractogram)
 {
   mitk::FiberBundle::Pointer temp_fib = tractogram->GetDeepCopy();
-  temp_fib->ResampleToNumPoints(m_NumPoints);
+  if (m_DoResampling)
+    temp_fib->ResampleToNumPoints(m_NumPoints);
 
   std::vector< vnl_matrix<float> > out_fib;
 
@@ -292,6 +294,7 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
   bool found = true;
 
   MITK_INFO << "Merging duplicate clusters with distance threshold " << m_MergeDuplicateThreshold;
+  int start = 0;
   while (found && m_MergeDuplicateThreshold>mitk::eps)
   {
     std::cout << "                                                                                                     \r";
@@ -299,7 +302,7 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
     cout.flush();
 
     found = false;
-    for (int k1=0; k1<(int)clusters.size(); ++k1)
+    for (int k1=start; k1<(int)clusters.size(); ++k1)
     {
       Cluster c1 = clusters.at(k1);
       vnl_matrix<float> t = c1.h / c1.n;
@@ -317,12 +320,12 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
           bool f = false;
           float d = 0;
 
-          if (m_Metric==Metric::MDF)
-            d = CalcMDF(t, v, f);
-          else if (m_Metric==Metric::MDF_STD)
-            d = CalcMDF_STD(t, v, f);
-          else if (m_Metric==Metric::MAX_MDF)
-            d = CalcMAX_MDF(t, v, f);
+          //          if (m_Metric==Metric::MDF)
+          //            d = CalcMDF(t, v, f);
+          //          else if (m_Metric==Metric::MDF_STD)
+          //            d = CalcMDF_STD(t, v, f);
+          //          else if (m_Metric==Metric::MAX_MDF)
+          d = CalcMAX_MDF(t, v, f);
 
 #pragma omp critical
           if (d<m_MergeDuplicateThreshold)
@@ -350,12 +353,13 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
       std::sort(merge_indices.begin(), merge_indices.end());
       for (unsigned int i=0; i<merge_indices.size(); ++i)
       {
-        clusters.erase (clusters.begin()+merge_indices.at(i));
+        clusters.erase (clusters.begin()+merge_indices.at(i)-i);
         found = true;
       }
       if (found)
         break;
     }
+    ++start;
   }
   MITK_INFO << "\nNumber of clusters after merging duplicates: " << clusters.size();
 }
@@ -377,6 +381,7 @@ std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClu
     C.push_back(c);
   }
 
+#pragma omp parallel for
   for (int i=0; i<N; ++i)
   {
     vnl_matrix<float> t = T.at(f_indices.at(i));
@@ -409,17 +414,23 @@ std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClu
 
     if (min_cluster_index>=0 && min_cluster_distance<dist_thres)
     {
-      C[min_cluster_index].I.push_back(f_indices.at(i));
-      if (!flip)
-        C[min_cluster_index].h += t;
-      else
-        C[min_cluster_index].h += t.fliplr();
-      C[min_cluster_index].n += 1;
+#pragma omp critical
+      {
+        C[min_cluster_index].I.push_back(f_indices.at(i));
+        if (!flip)
+          C[min_cluster_index].h += t;
+        else
+          C[min_cluster_index].h += t.fliplr();
+        C[min_cluster_index].n += 1;
+      }
     }
     else
     {
-      no_fit.I.push_back(f_indices.at(i));
-      no_fit.n++;
+#pragma omp critical
+      {
+        no_fit.I.push_back(f_indices.at(i));
+        no_fit.n++;
+      }
     }
   }
   C.push_back(no_fit);
@@ -455,8 +466,8 @@ void TractClusteringFilter::GenerateData()
   }
   else
   {
-    MITK_INFO << "Clustering with input centroids";
     std::vector<vnl_matrix<float> > centroids = ResampleFibers(m_InCentroids);
+    MITK_INFO << "Clustering with input centroids";
     clusters = AddToKnownClusters(f_indices, centroids);
     no_match = clusters.back();
     clusters.pop_back();

@@ -30,6 +30,12 @@ TrackingHandlerPeaks::~TrackingHandlerPeaks()
 {
 }
 
+bool TrackingHandlerPeaks::WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index)
+{
+  m_DummyImage->TransformPhysicalPointToIndex(pos, index);
+  return m_DummyImage->GetLargestPossibleRegion().IsInside(index);
+}
+
 void TrackingHandlerPeaks::InitForTracking()
 {
   MITK_INFO << "Initializing peak tracker.";

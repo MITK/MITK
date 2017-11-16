@@ -143,7 +143,7 @@ protected:
   void GetSeedPointsFromSeedImage();
   void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
   float FollowStreamline(itk::Point<float, 3> start_pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front);       ///< Start streamline in one direction.
-  bool IsValidPosition(const itk::Point<float, 3>& pos);   ///< Are we outside of the mask image?
+  bool IsInsideMask(const itk::Point<float, 3>& pos, ItkUcharImgType::Pointer mask);   ///< Are we outside of the mask image?
   bool IsInGm(const itk::Point<float, 3> &pos);
   vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 

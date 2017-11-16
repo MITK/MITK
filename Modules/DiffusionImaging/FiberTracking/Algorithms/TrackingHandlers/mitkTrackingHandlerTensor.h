@@ -33,55 +33,56 @@ class MITKFIBERTRACKING_EXPORT TrackingHandlerTensor : public TrackingDataHandle
 
 public:
 
-    TrackingHandlerTensor();
-    ~TrackingHandlerTensor();
+  TrackingHandlerTensor();
+  ~TrackingHandlerTensor();
 
-    typedef TensorImage::PixelType    TensorType;
-    typedef TensorImage::ItkTensorImageType ItkTensorImageType;
-    typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
-
-
-    void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
-
-    void SetF(float f){ m_F = f; }
-    void SetG(float g){ m_G = g; }
-    void SetFaThreshold(float FaThreshold){ m_FaThreshold = FaThreshold; }
-    void AddTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.push_back(img); DataModified(); }
-    void SetTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.clear(); m_TensorImages.push_back(img); DataModified(); }
-    void ClearTensorImages(){ m_TensorImages.clear(); DataModified(); }
-    void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; DataModified(); }
-    void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }
-    void SetMode( MODE m )
-    {
-        if (m==MODE::DETERMINISTIC)
-            m_Mode = m;
-        else
-            mitkThrow() << "Tensor tracker is only implemented for deterministic mode.";
-    }
+  typedef TensorImage::PixelType    TensorType;
+  typedef TensorImage::ItkTensorImageType ItkTensorImageType;
+  typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
 
 
-    ItkUcharImgType::SpacingType GetSpacing(){ return m_FaImage->GetSpacing(); }
-    itk::Point<float,3> GetOrigin(){ return m_FaImage->GetOrigin(); }
-    ItkUcharImgType::DirectionType GetDirection(){ return m_FaImage->GetDirection(); }
-    ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_FaImage->GetLargestPossibleRegion(); }
+  void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
+  vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
+  bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index);
+
+  void SetF(float f){ m_F = f; }
+  void SetG(float g){ m_G = g; }
+  void SetFaThreshold(float FaThreshold){ m_FaThreshold = FaThreshold; }
+  void AddTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.push_back(img); DataModified(); }
+  void SetTensorImage( ItkTensorImageType::ConstPointer img ){ m_TensorImages.clear(); m_TensorImages.push_back(img); DataModified(); }
+  void ClearTensorImages(){ m_TensorImages.clear(); DataModified(); }
+  void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; DataModified(); }
+  void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }
+  void SetMode( MODE m )
+  {
+    if (m==MODE::DETERMINISTIC)
+      m_Mode = m;
+    else
+      mitkThrow() << "Tensor tracker is only implemented for deterministic mode.";
+  }
+
+
+  ItkUcharImgType::SpacingType GetSpacing(){ return m_FaImage->GetSpacing(); }
+  itk::Point<float,3> GetOrigin(){ return m_FaImage->GetOrigin(); }
+  ItkUcharImgType::DirectionType GetDirection(){ return m_FaImage->GetDirection(); }
+  ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_FaImage->GetLargestPossibleRegion(); }
 
 protected:
 
-    vnl_vector_fixed<float,3> GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num);
-    vnl_vector_fixed<float,3> GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<float,3> oldDir, TensorType& tensor);
-    vnl_vector_fixed<float,3> GetLargestEigenvector(TensorType& tensor);
+  vnl_vector_fixed<float,3> GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num);
+  vnl_vector_fixed<float,3> GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<float,3> oldDir, TensorType& tensor);
+  vnl_vector_fixed<float,3> GetLargestEigenvector(TensorType& tensor);
 
-    float   m_FaThreshold;
-    float   m_F;
-    float   m_G;
+  float   m_FaThreshold;
+  float   m_F;
+  float   m_G;
 
-    std::vector< ItkDoubleImgType::Pointer >        m_EmaxImage;    ///< Stores largest eigenvalues per voxel (one for each tensor)
-    ItkFloatImgType::Pointer                        m_FaImage;      ///< FA image used to determine streamline termination.
-    std::vector< ItkPDImgType::Pointer >            m_PdImage;      ///< Stores principal direction of each tensor in each voxel.
-    std::vector< ItkTensorImageType::ConstPointer > m_TensorImages;   ///< Input tensor images. For multi tensor tracking provide multiple tensor images.
-    bool                                            m_InterpolateTensors;   ///< If false, then the peaks are interpolated. Otherwiese, The tensors are interpolated.
-    int                                             m_NumberOfInputs;
+  std::vector< ItkDoubleImgType::Pointer >        m_EmaxImage;    ///< Stores largest eigenvalues per voxel (one for each tensor)
+  ItkFloatImgType::Pointer                        m_FaImage;      ///< FA image used to determine streamline termination.
+  std::vector< ItkPDImgType::Pointer >            m_PdImage;      ///< Stores principal direction of each tensor in each voxel.
+  std::vector< ItkTensorImageType::ConstPointer > m_TensorImages;   ///< Input tensor images. For multi tensor tracking provide multiple tensor images.
+  bool                                            m_InterpolateTensors;   ///< If false, then the peaks are interpolated. Otherwiese, The tensors are interpolated.
+  int                                             m_NumberOfInputs;
 };
 
 }

@@ -168,6 +168,12 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index
   return out_dir;
 }
 
+bool TrackingHandlerTensor::WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index)
+{
+  m_TensorImages.at(0)->TransformPhysicalPointToIndex(pos, index);
+  return m_TensorImages.at(0)->GetLargestPossibleRegion().IsInside(index);
+}
+
 vnl_vector_fixed<float,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<float,3> oldDir, TensorType& tensor)
 {
   // transform physical point to index coordinates

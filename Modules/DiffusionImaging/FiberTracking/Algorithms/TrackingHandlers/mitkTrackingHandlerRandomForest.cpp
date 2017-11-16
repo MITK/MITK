@@ -67,6 +67,13 @@ TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::~TrackingHandler
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
+bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index)
+{
+  m_DwiFeatureImages.at(0)->TransformPhysicalPointToIndex(pos, index);
+  return m_DwiFeatureImages.at(0)->GetLargestPossibleRegion().IsInside(index);
+}
+
+template< int ShOrder, int NumberOfSignalFeatures >
 typename TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate)
 {
   // transform physical point to index coordinates

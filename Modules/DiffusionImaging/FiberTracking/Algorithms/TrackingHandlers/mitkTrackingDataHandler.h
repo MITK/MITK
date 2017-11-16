@@ -60,6 +60,7 @@ public:
     virtual itk::Point<float,3> GetOrigin() = 0;
     virtual itk::Matrix<double, 3, 3> GetDirection() = 0;
     virtual itk::ImageRegion<3> GetLargestPossibleRegion() = 0;
+    virtual bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) = 0;
     virtual void SetMode(MODE m) = 0;
     MODE GetMode(){ return m_Mode; }
 

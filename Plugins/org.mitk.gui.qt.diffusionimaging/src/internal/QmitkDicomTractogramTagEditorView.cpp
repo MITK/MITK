@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 // MITK
-#include <mitkFiberBundle.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
@@ -83,17 +82,26 @@ void QmitkDicomTractogramTagEditorView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TagTable->setHorizontalHeaderLabels(tableHeader);
     m_Controls->m_TagTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    connect( (QObject*)(m_Controls->m_TractogramBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
-             this, SLOT(OnTractSelectionChanged()) );
+    m_Controls->m_CopyPropsButton->setEnabled(false);
 
-
-    connect( (QObject*)(m_Controls->m_TagTable), SIGNAL(itemChanged(QTableWidgetItem*)),
-             this, SLOT(OnItemChanged(QTableWidgetItem*)) );
-
-
+    connect( (QObject*)(m_Controls->m_TractogramBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnTractSelectionChanged()) );
+    connect( (QObject*)(m_Controls->m_TagTable), SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnItemChanged(QTableWidgetItem*)) );
+    connect( m_Controls->m_CopyPropsButton, SIGNAL(clicked()), this, SLOT(CopyProperties()));
 
     UpdateGui();
   }
+}
+
+void QmitkDicomTractogramTagEditorView::CopyProperties()
+{
+  if (m_Controls->m_TractogramBox->GetSelectedNode()==nullptr)
+    return;
+  mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_TractogramBox->GetSelectedNode()->GetData());
+  if (fib.IsNull())
+    return;
+  if (m_Image.IsNull())
+    return;
+  fib->SetPropertyList(m_Image->GetPropertyList()->Clone());
 }
 
 void QmitkDicomTractogramTagEditorView::OnItemChanged(QTableWidgetItem* item)
@@ -113,7 +121,6 @@ void QmitkDicomTractogramTagEditorView::OnItemChanged(QTableWidgetItem* item)
     mitk::PropertyList* p_list = fib->GetPropertyList();
 
     p_list->SetStringProperty(tag.c_str(), item->text().toStdString().c_str());
-    MITK_INFO << tag.c_str();
   }
   UpdateGui();
 }
@@ -125,6 +132,7 @@ void QmitkDicomTractogramTagEditorView::OnTractSelectionChanged()
 
 void QmitkDicomTractogramTagEditorView::UpdateGui()
 {
+  m_Controls->m_CopyPropsButton->setEnabled(false);
   m_Controls->m_TagTable->blockSignals(true);
   if (m_Controls->m_TractogramBox->GetSelectedNode()==nullptr)
   {
@@ -151,12 +159,24 @@ void QmitkDicomTractogramTagEditorView::UpdateGui()
     m_Controls->m_TagTable->setItem(row, 1, new QTableWidgetItem(val.c_str()));
     ++row;
   }
+
+  if (m_Image.IsNotNull())
+    m_Controls->m_CopyPropsButton->setEnabled(true);
   m_Controls->m_TagTable->blockSignals(false);
 }
 
-void QmitkDicomTractogramTagEditorView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& )
+void QmitkDicomTractogramTagEditorView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes)
 {
-
+  m_Image = nullptr;
+  for (auto node : nodes)
+  {
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(node->GetData());
+    if (img.IsNotNull())
+    {
+      m_Image = img;
+    }
+  }
+  UpdateGui();
 }
 
 void QmitkDicomTractogramTagEditorView::SetFocus()

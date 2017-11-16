@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 #include "ui_QmitkDicomTractogramTagEditorViewControls.h"
-
+#include <mitkFiberBundle.h>
 
 /*!
 \brief View for tensor based deterministic streamline fiber tracking.
@@ -47,6 +47,7 @@ public:
 protected slots:
 
   void OnTractSelectionChanged();
+  void CopyProperties();
   void OnItemChanged(QTableWidgetItem * item);
 
 protected:
@@ -58,6 +59,7 @@ protected:
 
   Ui::QmitkDicomTractogramTagEditorViewControls* m_Controls;
   std::vector< std::string > m_TagList;
+  mitk::Image::Pointer m_Image;
 
 protected slots:
 

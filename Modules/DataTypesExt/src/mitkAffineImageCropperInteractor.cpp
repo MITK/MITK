@@ -70,9 +70,9 @@ bool mitk::AffineImageCropperInteractor::CheckOverObject(const InteractionEvent 
   mitk::DataNode::Pointer dn = this->GetDataNode();
   if (dn.IsNull())
     return false;
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
-  mitk::BoundingObject *object = dynamic_cast<mitk::BoundingObject *>(dn->GetData());
+  auto *object = dynamic_cast<mitk::BoundingObject *>(dn->GetData());
   object->GetGeometry()->WorldToIndex(currentPickedPoint, currentPickedPoint);
   return object && object->GetGeometry()->GetBoundingBox()->IsInside(currentPickedPoint);
 }
@@ -107,7 +107,7 @@ void mitk::AffineImageCropperInteractor::DeselectObject(StateMachineAction *, In
 
 void mitk::AffineImageCropperInteractor::ScaleRadius(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  const MouseWheelEvent *wheelEvent = dynamic_cast<const MouseWheelEvent *>(interactionEvent);
+  const auto *wheelEvent = dynamic_cast<const MouseWheelEvent *>(interactionEvent);
   if (wheelEvent == nullptr)
     return;
 
@@ -119,7 +119,7 @@ void mitk::AffineImageCropperInteractor::ScaleRadius(StateMachineAction *, Inter
   newScale[0] = newScale[1] = newScale[2] = scale;
 
   mitk::Point3D anchorPoint = wheelEvent->GetPositionInWorld();
-  ScaleOperation *doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
+  auto *doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
   m_SelectedNode->GetData()->GetGeometry()->ExecuteOperation(doOp);
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
@@ -129,7 +129,7 @@ void mitk::AffineImageCropperInteractor::InitTranslate(StateMachineAction *, Int
 {
   if (m_SelectedNode.IsNull())
     return;
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -143,7 +143,7 @@ void mitk::AffineImageCropperInteractor::InitTranslate(StateMachineAction *, Int
 
 void mitk::AffineImageCropperInteractor::InitRotate(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -157,7 +157,7 @@ void mitk::AffineImageCropperInteractor::InitRotate(StateMachineAction *, Intera
 
 void mitk::AffineImageCropperInteractor::InitDeformation(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -171,7 +171,7 @@ void mitk::AffineImageCropperInteractor::InitDeformation(StateMachineAction *, I
 
 void mitk::AffineImageCropperInteractor::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -192,7 +192,7 @@ void mitk::AffineImageCropperInteractor::TranslateObject(StateMachineAction *, I
 
 void mitk::AffineImageCropperInteractor::DeformObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -212,7 +212,7 @@ void mitk::AffineImageCropperInteractor::DeformObject(StateMachineAction *, Inte
 
   mitk::Point3D anchorPoint = surGeo->GetCenter();
 
-  ScaleOperation *doOp = new mitk::ScaleOperation(OpSCALE, scale, anchorPoint);
+  auto *doOp = new mitk::ScaleOperation(OpSCALE, scale, anchorPoint);
   surGeo->ExecuteOperation(doOp);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -220,7 +220,7 @@ void mitk::AffineImageCropperInteractor::DeformObject(StateMachineAction *, Inte
 
 void mitk::AffineImageCropperInteractor::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 

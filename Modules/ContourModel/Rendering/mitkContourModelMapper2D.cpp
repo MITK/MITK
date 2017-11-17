@@ -55,7 +55,7 @@ void mitk::ContourModelMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ContourModel *inputContour = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  auto *inputContour = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
 
   unsigned int timestep = renderer->GetTimeStep();
 
@@ -79,7 +79,7 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer *renderer)
     return;
 
   // check if there is something to be rendered
-  mitk::ContourModel *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
   if (data == nullptr)
   {
     return;
@@ -181,13 +181,13 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     }
 
     // iterate over all control points
-    mitk::ContourModel::VertexIterator current = renderingContour->IteratorBegin(timestep);
-    mitk::ContourModel::VertexIterator next = renderingContour->IteratorBegin(timestep);
+    auto current = renderingContour->IteratorBegin(timestep);
+    auto next = renderingContour->IteratorBegin(timestep);
     if (next != renderingContour->IteratorEnd(timestep))
     {
       next++;
 
-      mitk::ContourModel::VertexIterator end = renderingContour->IteratorEnd(timestep);
+      auto end = renderingContour->IteratorEnd(timestep);
 
       while (next != end)
       {

@@ -115,7 +115,7 @@ void mitk::RegionGrowingTool::GetNeighborhoodAverage(itk::Image<TPixel, imageDim
                                                      unsigned int neighborhood)
 {
   // maybe assert that image dimension is only 2 or 3?
-  int neighborhoodInt = (int)neighborhood;
+  auto neighborhoodInt = (int)neighborhood;
   TPixel averageValue(0);
   unsigned int numberOfPixels = (2 * neighborhood + 1) * (2 * neighborhood + 1);
   if (imageDimension == 3)
@@ -283,7 +283,7 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
 
 void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -406,7 +406,7 @@ void mitk::RegionGrowingTool::OnMousePressedInside()
 
 void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
   if (positionEvent)
   {
@@ -503,7 +503,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
     return;
   }
 
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
   if (m_ReferenceSlice.IsNotNull() && positionEvent)
   {
@@ -584,7 +584,7 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
     return;
   }
 
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
   if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour && positionEvent)
   {

@@ -42,13 +42,13 @@ private:
 
 public:
   /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
-  void setUp()
+  void setUp() override
   {
   m_DataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
   m_Deserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   m_DataStorage = nullptr;
   m_Deserializer = nullptr;

@@ -57,7 +57,7 @@ void mitk::PlanarFigureMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRender
 void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *)
 {
   this->m_Pen = vtkSmartPointer<vtkPen>::New();
-  vtkOpenGLContextDevice2D *device = NULL;
+  vtkOpenGLContextDevice2D *device = nullptr;
     device = vtkOpenGLContextDevice2D::New();
   if (device)
   {
@@ -88,7 +88,7 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
     return;
 
   // Get PlanarFigure from input
-  mitk::PlanarFigure *planarFigure =
+  auto *planarFigure =
     const_cast<mitk::PlanarFigure *>(static_cast<const mitk::PlanarFigure *>(GetDataNode()->GetData()));
 
   // Check if PlanarFigure has already been placed; otherwise, do nothing
@@ -223,7 +223,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(const mitk::PlanarFigure::PolyLin
 
   // now paint all the points in one run
 
-  float* points = new float[pointlist.size()*2];
+  auto* points = new float[pointlist.size()*2];
   for (unsigned int i = 0 ; i < pointlist.size() ; ++i)
   {
     points[i * 2] = pointlist[i][0];
@@ -329,7 +329,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(const mitk::Point2D &point,
       // Paint outline
       this->m_Context->GetPen()->SetColorF((double)lineColor[0], (double)lineColor[1], (double)lineColor[2], (double)lineOpacity);
 
-      float* outline = new float[8];
+      auto* outline = new float[8];
       outline[0] = displayPoint[0] - 4;
       outline[1] = displayPoint[1] - 4;
       outline[2] = outline[0];
@@ -657,7 +657,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints(const mitk::PlanarFigure *p
 
   PlanarFigureDisplayMode pointDisplayMode = PF_DEFAULT;
 
-  const unsigned int selectedControlPointsIdx = (unsigned int)planarFigure->GetSelectedControlPoint();
+  const auto selectedControlPointsIdx = (unsigned int)planarFigure->GetSelectedControlPoint();
   const unsigned int numberOfControlPoints = planarFigure->GetNumberOfControlPoints();
   // Draw markers at control points (selected control point will be colored)
   for (unsigned int i = 0; i < numberOfControlPoints; ++i)
@@ -856,7 +856,7 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
     const float opacity = m_OutlineOpacity[lineDisplayMode];
 
     // convert to a float array that also contains opacity, faster GL
-    float *colorVector = new float[4];
+    auto *colorVector = new float[4];
     colorVector[0] = color[0];
     colorVector[1] = color[1];
     colorVector[2] = color[2];
@@ -899,7 +899,7 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
       shadowOpacity = opacity - 0.2f;
 
     // convert to a float array that also contains opacity, faster GL
-    float *shadow = new float[4];
+    auto *shadow = new float[4];
     shadow[0] = 0;
     shadow[1] = 0;
     shadow[2] = 0;

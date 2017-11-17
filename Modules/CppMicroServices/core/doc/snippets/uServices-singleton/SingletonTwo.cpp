@@ -49,7 +49,7 @@ SingletonTwoService* SingletonTwoService::GetInstance()
   else
   {
     // No SingletonTwoService instance was registered yet.
-    return 0;
+    return nullptr;
   }
 }
 

@@ -38,7 +38,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolRoiDataSelectionBox : public QWidget
 
 public:
   QmitkToolRoiDataSelectionBox(QWidget *parent = 0, mitk::DataStorage *storage = 0);
-  virtual ~QmitkToolRoiDataSelectionBox();
+  ~QmitkToolRoiDataSelectionBox() override;
 
   mitk::DataStorage *GetDataStorage();
   void SetDataStorage(mitk::DataStorage &storage);

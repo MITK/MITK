@@ -46,7 +46,7 @@ mitk::pa::Probe::Probe(const char* fileStream, bool verbose) :
   m_Verbose(verbose)
 {
   TiXmlDocument xmlDoc;
-  const char* success = xmlDoc.Parse(fileStream, 0, TIXML_ENCODING_UTF8);
+  const char* success = xmlDoc.Parse(fileStream, nullptr, TIXML_ENCODING_UTF8);
   if (m_Verbose)
   {
     std::cout << "reading document was " << (success == nullptr ? "" : "not ") << "successful (" << (success == nullptr ? "NULL" : success) << ")" << std::endl;

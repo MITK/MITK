@@ -58,7 +58,7 @@ protected slots:
 
 protected:
   QmitkFastMarchingTool3DGUI();
-  virtual ~QmitkFastMarchingTool3DGUI();
+  ~QmitkFastMarchingTool3DGUI() override;
 
   void BusyStateChanged(bool) override;
 

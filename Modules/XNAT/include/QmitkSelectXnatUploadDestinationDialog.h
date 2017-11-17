@@ -21,7 +21,7 @@ class MITKXNAT_EXPORT QmitkSelectXnatUploadDestinationDialog : public QDialog
 
 public:
   explicit QmitkSelectXnatUploadDestinationDialog(ctkXnatSession *session, const QStringList &, QWidget *parent = 0);
-  ~QmitkSelectXnatUploadDestinationDialog();
+  ~QmitkSelectXnatUploadDestinationDialog() override;
 
   ctkXnatObject *GetUploadDestination();
   void SetXnatResourceFolderUrl(const QString &url);

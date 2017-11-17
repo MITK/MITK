@@ -265,7 +265,7 @@ void mitk::VtkLayerController::UpdateLayers()
   vtkSmartPointer<vtkRendererCollection> v = m_RenderWindow->GetRenderers();
   v->RemoveAllItems();
 
-  unsigned int numberOfLayers =
+  auto numberOfLayers =
     static_cast<unsigned int>(m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size());
   int currentLayerNumber;
   bool traverseUpwards;

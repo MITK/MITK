@@ -165,7 +165,7 @@ void SharedLibrary::Unload()
       throw std::runtime_error(errMsg);
     }
 #endif
-    d->m_Handle = 0;
+    d->m_Handle = nullptr;
   }
 }
 

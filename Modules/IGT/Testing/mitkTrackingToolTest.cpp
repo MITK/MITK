@@ -33,14 +33,14 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual void GetPosition(mitk::Point3D & /*position*/) const override {};
-  virtual void GetOrientation(mitk::Quaternion&  /*orientation*/) const override {};
-  virtual void SetToolTip(mitk::Point3D /*toolTipPosition*/, mitk::Quaternion /*orientation*/, mitk::ScalarType /*eps*/) override {};
-  virtual bool Enable() override {return true;}
-  virtual bool Disable() override {return true;}
-  virtual bool IsEnabled() const override {return true;}
-  virtual bool IsDataValid() const override {return true;}
-  virtual float GetTrackingError() const override {return 0.0;}
+  void GetPosition(mitk::Point3D & /*position*/) const override {};
+  void GetOrientation(mitk::Quaternion&  /*orientation*/) const override {};
+  void SetToolTip(mitk::Point3D /*toolTipPosition*/, mitk::Quaternion /*orientation*/, mitk::ScalarType /*eps*/) override {};
+  bool Enable() override {return true;}
+  bool Disable() override {return true;}
+  bool IsEnabled() const override {return true;}
+  bool IsDataValid() const override {return true;}
+  float GetTrackingError() const override {return 0.0;}
 
 };
 

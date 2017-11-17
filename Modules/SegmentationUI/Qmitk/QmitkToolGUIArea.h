@@ -36,7 +36,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolGUIArea : public QWidget
 
 public:
   QmitkToolGUIArea(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
-  virtual ~QmitkToolGUIArea();
+  ~QmitkToolGUIArea() override;
 
 signals:
 

@@ -41,7 +41,7 @@ public:
   void testNoiseGenerator()
   {
     int size = 1000 * 100 * 100;
-    double* volume = new double[size];
+    auto* volume = new double[size];
     for (int i = 0; i < size; i++)
     {
       volume[i] = 1;

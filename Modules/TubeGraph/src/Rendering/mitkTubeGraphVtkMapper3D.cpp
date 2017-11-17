@@ -94,7 +94,7 @@ void mitk::TubeGraphVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     TubeGraph::VertexDescriptorType root = tubeGraph->GetRootVertex();
     alreadyRenderedVertexList.push_back(root);
 
-    for (std::map<TubeGraph::TubeDescriptorType, vtkSmartPointer<vtkActor>>::iterator itTubes =
+    for (auto itTubes =
            ls->m_vtkTubesActorMap.begin();
          itTubes != ls->m_vtkTubesActorMap.end();
          itTubes++)
@@ -108,7 +108,7 @@ void mitk::TubeGraphVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
         if (std::find(alreadyRenderedVertexList.begin(), alreadyRenderedVertexList.end(), itTubes->first.first) ==
             alreadyRenderedVertexList.end())
         {
-          std::map<TubeGraph::VertexDescriptorType, vtkSmartPointer<vtkActor>>::iterator itSourceSphere =
+          auto itSourceSphere =
             ls->m_vtkSpheresActorMap.find(itTubes->first.first);
           if (itSourceSphere != ls->m_vtkSpheresActorMap.end())
             ls->m_vtkTubeGraphAssembly->AddPart(itSourceSphere->second);
@@ -117,7 +117,7 @@ void mitk::TubeGraphVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
         if (std::find(alreadyRenderedVertexList.begin(), alreadyRenderedVertexList.end(), itTubes->first.second) ==
             alreadyRenderedVertexList.end())
         {
-          std::map<TubeGraph::VertexDescriptorType, vtkSmartPointer<vtkActor>>::iterator itTargetSphere =
+          auto itTargetSphere =
             ls->m_vtkSpheresActorMap.find(itTubes->first.second);
           if (itTargetSphere != ls->m_vtkSpheresActorMap.end())
             ls->m_vtkTubeGraphAssembly->AddPart(itTargetSphere->second);
@@ -150,7 +150,7 @@ void mitk::TubeGraphVtkMapper3D::RenderTubeGraphPropertyInformation(mitk::BaseRe
   }
 
   std::vector<TubeGraphVertex> allVertices = tubeGraph->GetVectorOfAllVertices();
-  for (std::vector<TubeGraphVertex>::iterator vertex = allVertices.begin(); vertex != allVertices.end(); ++vertex)
+  for (auto vertex = allVertices.begin(); vertex != allVertices.end(); ++vertex)
   {
     TubeGraph::VertexDescriptorType vertexDesc = tubeGraph->GetVertexDescriptor(*vertex);
 
@@ -160,7 +160,7 @@ void mitk::TubeGraphVtkMapper3D::RenderTubeGraphPropertyInformation(mitk::BaseRe
 
     int numberOfVisibleEdges = 0;
     std::vector<TubeGraphEdge> allEdgesOfVertex = tubeGraph->GetAllEdgesOfAVertex(vertexDesc);
-    for (std::vector<TubeGraphEdge>::iterator edge = allEdgesOfVertex.begin(); edge != allEdgesOfVertex.end(); ++edge)
+    for (auto edge = allEdgesOfVertex.begin(); edge != allEdgesOfVertex.end(); ++edge)
     {
       // get edge descriptor
       EdgeDescriptorType edgeDesc = tubeGraph->GetEdgeDescriptor(*edge);
@@ -233,14 +233,14 @@ void mitk::TubeGraphVtkMapper3D::GenerateTubeGraphData(mitk::BaseRenderer *rende
 
   // render all edges as tubular structures using the vtkTubeFilter
   std::vector<TubeGraphEdge> allEdges = tubeGraph->GetVectorOfAllEdges();
-  for (std::vector<TubeGraphEdge>::iterator edge = allEdges.begin(); edge != allEdges.end(); ++edge)
+  for (auto edge = allEdges.begin(); edge != allEdges.end(); ++edge)
   {
     this->GeneratePolyDataForTube(*edge, tubeGraph, tubeGraphProperty, renderer);
   }
 
   // Generate all vertices as spheres
   std::vector<TubeGraphVertex> allVertices = tubeGraph->GetVectorOfAllVertices();
-  for (std::vector<TubeGraphVertex>::iterator vertex = allVertices.begin(); vertex != allVertices.end(); ++vertex)
+  for (auto vertex = allVertices.begin(); vertex != allVertices.end(); ++vertex)
   {
     this->GeneratePolyDataForFurcation(*vertex, tubeGraph, renderer);
     if (this->ClipStructures())
@@ -447,7 +447,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
   // generate for all edges/tubes cylinders. With this structure you can clip the sphere and the other tubes, so that no
   // fragments are shown in the tube.
   std::vector<TubeGraphEdge> allEdgesOfVertex = graph->GetAllEdgesOfAVertex(vertexDesc);
-  for (std::vector<TubeGraphEdge>::iterator edge = allEdgesOfVertex.begin(); edge != allEdgesOfVertex.end(); ++edge)
+  for (auto edge = allEdgesOfVertex.begin(); edge != allEdgesOfVertex.end(); ++edge)
   {
     // get edge descriptor
     EdgeDescriptorType edgeDesc = graph->GetEdgeDescriptor(*edge);
@@ -676,7 +676,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
   double sphereColorG = 0;
   double sphereColorB = 0;
 
-  for (std::map<TubeGraph::TubeDescriptorType, vtkSmartPointer<vtkImplicitBoolean>>::iterator itClipStructure =
+  for (auto itClipStructure =
          cylinderForClipping.begin();
        itClipStructure != cylinderForClipping.end();
        itClipStructure++)
@@ -703,7 +703,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
     sphereColorB += tubeColor[2];
 
     // than clip with all other tubes
-    for (std::map<TubeGraph::TubeDescriptorType, vtkSmartPointer<vtkImplicitBoolean>>::iterator itTobBeClipped =
+    for (auto itTobBeClipped =
            cylinderForClipping.begin();
          itTobBeClipped != cylinderForClipping.end();
          itTobBeClipped++)

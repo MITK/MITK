@@ -177,7 +177,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
     cellIds = vcell->GetPointIds();
 
     CellAutoPointerType cell;
-    TriangleCellType *triangleCell = new TriangleCellType;
+    auto *triangleCell = new TriangleCellType;
     PointIdentifierType k;
     for (k = 0; k < numberOfCellPoints; k++)
     {
@@ -203,7 +203,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
 
 void mitk::SurfaceStampImageFilter::SurfaceStampBinaryOutputProcessing(MeshType *mesh)
 {
-  mitk::Image *inputImage = const_cast<mitk::Image *>(this->GetInput());
+  auto *inputImage = const_cast<mitk::Image *>(this->GetInput());
 
   mitk::Image::Pointer outputImage = this->GetOutput();
 
@@ -272,8 +272,8 @@ void mitk::SurfaceStampImageFilter::SurfaceStampProcessing(itk::Image<TPixel, 3>
   typename ImageType::PixelType inputValue;
   unsigned char sourceValue;
 
-  typename ImageType::PixelType fgValue = static_cast<typename ImageType::PixelType>(m_ForegroundValue);
-  typename ImageType::PixelType bgValue = static_cast<typename ImageType::PixelType>(m_BackgroundValue);
+  auto fgValue = static_cast<typename ImageType::PixelType>(m_ForegroundValue);
+  auto bgValue = static_cast<typename ImageType::PixelType>(m_BackgroundValue);
 
   while (!sourceIter.IsAtEnd())
   {

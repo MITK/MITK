@@ -398,10 +398,10 @@ namespace mitk
     DICOMTagPath::
     DICOMTagPathesMatch(const DICOMTagPath& left, const DICOMTagPath& right)
   {
-    NodeInfoVectorType::const_iterator leftPos = left.GetNodes().cbegin();
-    NodeInfoVectorType::const_iterator rightPos = right.GetNodes().cbegin();
-    NodeInfoVectorType::const_iterator leftEnd = left.GetNodes().cend();
-    NodeInfoVectorType::const_iterator rightEnd = right.GetNodes().cend();
+    auto leftPos = left.GetNodes().cbegin();
+    auto rightPos = right.GetNodes().cbegin();
+    auto leftEnd = left.GetNodes().cend();
+    auto rightEnd = right.GetNodes().cend();
 
     while (leftPos != leftEnd && rightPos != rightEnd)
     {

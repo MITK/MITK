@@ -35,8 +35,8 @@ static void WriteEventXMLConfig(std::ofstream &stream)
 
   // write renderer config
   // for all registered 2D renderers write name and viewdirection.
-  mitk::BaseRenderer::BaseRendererMapType::iterator rendererIterator = mitk::BaseRenderer::baseRendererMap.begin();
-  mitk::BaseRenderer::BaseRendererMapType::iterator end = mitk::BaseRenderer::baseRendererMap.end();
+  auto rendererIterator = mitk::BaseRenderer::baseRendererMap.begin();
+  auto end = mitk::BaseRenderer::baseRendererMap.end();
 
   for (; rendererIterator != end; ++rendererIterator)
   {

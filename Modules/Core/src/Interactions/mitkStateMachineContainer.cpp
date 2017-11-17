@@ -87,7 +87,7 @@ mitk::StateMachineState::Pointer mitk::StateMachineContainer::GetStartState() co
  **/
 void mitk::StateMachineContainer::ConnectStates()
 {
-  for (StateMachineCollectionType::iterator it = m_States.begin(); it != m_States.end(); ++it)
+  for (auto it = m_States.begin(); it != m_States.end(); ++it)
   {
     if ((*it)->ConnectTransitions(&m_States) == false)
       m_errors = true;

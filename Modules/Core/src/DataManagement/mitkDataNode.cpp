@@ -265,7 +265,7 @@ mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
   GroupTagList groups;
   const PropertyList::PropertyMap *propertyMap = m_PropertyList->GetMap();
 
-  for (PropertyList::PropertyMap::const_iterator groupIter =
+  for (auto groupIter =
          propertyMap->begin(); // m_PropertyList is created in the constructor, so we don't check it here
        groupIter != propertyMap->end();
        ++groupIter)

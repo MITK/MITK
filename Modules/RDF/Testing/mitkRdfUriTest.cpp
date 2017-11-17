@@ -39,14 +39,14 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     // normal URI
     m_UriText = "http://mitk.org/wiki/MITK/data/BaseOntology.rdf#";
     m_Uri = mitk::RdfUri(m_UriText);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

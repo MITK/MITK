@@ -59,7 +59,7 @@ public:
   /*!
   \brief default deconstructor
   */
-  ~QmitkIGTPlayerWidget();
+  ~QmitkIGTPlayerWidget() override;
 
   /*!
   \brief Sets the real time player for this player widget

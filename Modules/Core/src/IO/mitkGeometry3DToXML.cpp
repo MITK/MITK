@@ -36,12 +36,12 @@ TiXmlElement *mitk::Geometry3DToXML::ToXML(const Geometry3D *geom3D)
 
   // create XML file
   // construct XML tree describing the geometry
-  TiXmlElement *geomElem = new TiXmlElement("Geometry3D");
+  auto *geomElem = new TiXmlElement("Geometry3D");
   geomElem->SetAttribute("ImageGeometry", isImageGeometry ? "true" : "false");
   geomElem->SetAttribute("FrameOfReferenceID", geom3D->GetFrameOfReferenceID());
 
   // coefficients are matrix[row][column]!
-  TiXmlElement *matrixElem = new TiXmlElement("IndexToWorld");
+  auto *matrixElem = new TiXmlElement("IndexToWorld");
   matrixElem->SetAttribute("type", "Matrix3x3");
   matrixElem->SetAttribute("m_0_0", boost::lexical_cast<std::string>(matrix[0][0]));
   matrixElem->SetAttribute("m_0_1", boost::lexical_cast<std::string>(matrix[0][1]));
@@ -54,21 +54,21 @@ TiXmlElement *mitk::Geometry3DToXML::ToXML(const Geometry3D *geom3D)
   matrixElem->SetAttribute("m_2_2", boost::lexical_cast<std::string>(matrix[2][2]));
   geomElem->LinkEndChild(matrixElem);
 
-  TiXmlElement *offsetElem = new TiXmlElement("Offset");
+  auto *offsetElem = new TiXmlElement("Offset");
   offsetElem->SetAttribute("type", "Vector3D");
   offsetElem->SetAttribute("x", boost::lexical_cast<std::string>(offset[0]));
   offsetElem->SetAttribute("y", boost::lexical_cast<std::string>(offset[1]));
   offsetElem->SetAttribute("z", boost::lexical_cast<std::string>(offset[2]));
   geomElem->LinkEndChild(offsetElem);
 
-  TiXmlElement *boundsElem = new TiXmlElement("Bounds");
-  TiXmlElement *boundsMinElem = new TiXmlElement("Min");
+  auto *boundsElem = new TiXmlElement("Bounds");
+  auto *boundsMinElem = new TiXmlElement("Min");
   boundsMinElem->SetAttribute("type", "Vector3D");
   boundsMinElem->SetAttribute("x", boost::lexical_cast<std::string>(bounds[0]));
   boundsMinElem->SetAttribute("y", boost::lexical_cast<std::string>(bounds[2]));
   boundsMinElem->SetAttribute("z", boost::lexical_cast<std::string>(bounds[4]));
   boundsElem->LinkEndChild(boundsMinElem);
-  TiXmlElement *boundsMaxElem = new TiXmlElement("Max");
+  auto *boundsMaxElem = new TiXmlElement("Max");
   boundsMaxElem->SetAttribute("type", "Vector3D");
   boundsMaxElem->SetAttribute("x", boost::lexical_cast<std::string>(bounds[1]));
   boundsMaxElem->SetAttribute("y", boost::lexical_cast<std::string>(bounds[3]));

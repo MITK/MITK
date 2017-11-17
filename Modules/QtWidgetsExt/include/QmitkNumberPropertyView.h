@@ -34,7 +34,7 @@ public:
   QmitkNumberPropertyView(const mitk::FloatProperty *, QWidget *parent);
   QmitkNumberPropertyView(const mitk::DoubleProperty *, QWidget *parent);
 
-  virtual ~QmitkNumberPropertyView();
+  ~QmitkNumberPropertyView() override;
 
   short decimalPlaces() const;
   void setDecimalPlaces(short);
@@ -48,8 +48,8 @@ public:
 protected:
   void initialize();
 
-  virtual void PropertyChanged() override;
-  virtual void PropertyRemoved() override;
+  void PropertyChanged() override;
+  void PropertyRemoved() override;
 
   void DisplayNumber();
 

@@ -115,11 +115,11 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure(mitk::PlanarFi
   if (!figureFound)
     return;
 
-  PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
+  auto whereIter = m_PlanarFigureList.begin();
   whereIter += indexOfFigure;
   m_PlanarFigureList.erase(whereIter);
 
-  SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+  auto surfaceIter = m_SurfaceList.begin();
   surfaceIter += indexOfFigure;
   m_SurfaceList.erase(surfaceIter);
 
@@ -147,7 +147,7 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure(mitk::PlanarFi
     InitializeFilters();
 
     // and add all existing surfaces
-    SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
+    auto surfaceIter = m_SurfaceList.begin();
     int index = 0;
     for (surfaceIter = m_SurfaceList.begin(); surfaceIter != m_SurfaceList.end(); surfaceIter++)
     {

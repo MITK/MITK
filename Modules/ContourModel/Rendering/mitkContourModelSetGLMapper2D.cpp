@@ -46,9 +46,9 @@ void mitk::ContourModelSetGLMapper2D::MitkRender(mitk::BaseRenderer *renderer, m
     mitk::ContourModelSet::Pointer input = this->GetInput();
 
     auto centerOfViewPointZ = renderer->GetCurrentWorldPlaneGeometry()->GetCenter()[2];
-    mitk::ContourModelSet::ContourModelSetIterator it = input->Begin();
+    auto it = input->Begin();
 
-    mitk::ContourModelSet::ContourModelSetIterator end = input->End();
+    auto end = input->End();
 
     while (it != end)
     {

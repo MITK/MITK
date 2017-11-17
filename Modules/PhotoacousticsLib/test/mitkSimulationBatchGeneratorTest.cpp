@@ -58,7 +58,7 @@ public:
     unsigned int yDim = 10;
     unsigned int zDim = 10;
     unsigned int length = xDim * yDim * zDim;
-    double* data = new double[length];
+    auto* data = new double[length];
     for (unsigned int i = 0; i < length; i++)
       data[i] = value;
 

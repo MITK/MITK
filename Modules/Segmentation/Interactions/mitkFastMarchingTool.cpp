@@ -39,7 +39,7 @@ mitk::FastMarchingTool::FastMarchingTool()
   : FeedbackContourTool("PressMoveReleaseAndPointSetting"),
     m_NeedUpdate(true),
     m_CurrentTimeStep(0),
-    m_PositionEvent(0),
+    m_PositionEvent(nullptr),
     m_LowerThreshold(0),
     m_UpperThreshold(200),
     m_StoppingValue(100),
@@ -333,7 +333,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 void mitk::FastMarchingTool::OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   // Add a new seed point for FastMarching algorithm
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   // const PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (positionEvent == nullptr)
     return;

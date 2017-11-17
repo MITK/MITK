@@ -63,11 +63,11 @@ void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
   // Clear the last error message
   dlerror();
 
-  void* selfHandle = 0;
+  void* selfHandle = nullptr;
   if (!sharedLibMode || moduleInfo.name == "main")
   {
     // Get the handle of the executable
-    selfHandle = dlopen(0, RTLD_LAZY);
+    selfHandle = dlopen(nullptr, RTLD_LAZY);
   }
   else
   {
@@ -92,7 +92,7 @@ void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
   {
     US_DEBUG << "GetSymbol_impl() dlopen() failed: " << dlerror();
   }
-  return 0;
+  return nullptr;
 }
 
 #elif _WIN32

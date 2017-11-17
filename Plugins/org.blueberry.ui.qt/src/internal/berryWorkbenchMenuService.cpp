@@ -101,7 +101,7 @@ public:
   /**
    * Dispose of this updater
    */
-  ~ContributionItemUpdater()
+  ~ContributionItemUpdater() override
   {
 //    if (identifier.IsNotNull())
 //      identifier->RemoveIdentifierListener(this);

@@ -65,7 +65,7 @@ public:
   ///
   /// \brief Standard Dtor. Nothing to do here.
   ///
-  ~QmitkDataStorageComboBox();
+  ~QmitkDataStorageComboBox() override;
 
   ///
   /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.

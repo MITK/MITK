@@ -129,7 +129,7 @@ public:
     mitk::BaseProperty::Pointer prop =
       mitk::PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty(refJSON);
 
-    mitk::TemporoSpatialStringProperty *tsProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(prop.GetPointer());
+    auto *tsProp = dynamic_cast<mitk::TemporoSpatialStringProperty *>(prop.GetPointer());
 
     CPPUNIT_ASSERT(
       tsProp->GetValue(0, 0) ==

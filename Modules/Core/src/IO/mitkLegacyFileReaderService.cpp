@@ -63,9 +63,9 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::LegacyFileReaderService::Re
   std::list<IOAdapterBase::Pointer> possibleIOAdapter;
   std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkIOAdapter");
 
-  for (std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin(); i != allobjects.end(); ++i)
+  for (auto i = allobjects.begin(); i != allobjects.end(); ++i)
   {
-    IOAdapterBase *io = dynamic_cast<IOAdapterBase *>(i->GetPointer());
+    auto *io = dynamic_cast<IOAdapterBase *>(i->GetPointer());
     if (io)
     {
       possibleIOAdapter.push_back(io);
@@ -77,7 +77,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::LegacyFileReaderService::Re
   }
 
   const std::string path = this->GetLocalFileName();
-  for (std::list<IOAdapterBase::Pointer>::iterator k = possibleIOAdapter.begin(); k != possibleIOAdapter.end(); ++k)
+  for (auto k = possibleIOAdapter.begin(); k != possibleIOAdapter.end(); ++k)
   {
     bool canReadFile = (*k)->CanReadFile(path, "", ""); // they could read the file
 
@@ -85,7 +85,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::LegacyFileReaderService::Re
     {
       BaseDataSource::Pointer ioObject = (*k)->CreateIOProcessObject(path, "", "");
       ioObject->Update();
-      int numberOfContents = static_cast<int>(ioObject->GetNumberOfOutputs());
+      auto numberOfContents = static_cast<int>(ioObject->GetNumberOfOutputs());
 
       if (numberOfContents > 0)
       {

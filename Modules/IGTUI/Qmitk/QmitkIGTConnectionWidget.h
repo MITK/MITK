@@ -51,7 +51,7 @@ class MITKIGTUI_EXPORT QmitkIGTConnectionWidget : public QWidget
     static const std::string VIEW_ID;
 
     QmitkIGTConnectionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkIGTConnectionWidget();
+    ~QmitkIGTConnectionWidget() override;
 
     /* @return Returns the preconfigured and connected TrackingDeviceSource ready to use in an IGT pipeline.
      */

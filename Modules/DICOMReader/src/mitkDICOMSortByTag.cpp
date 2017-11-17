@@ -53,7 +53,7 @@ bool
 mitk::DICOMSortByTag
 ::operator==(const DICOMSortCriterion& other) const
 {
-  if (const DICOMSortByTag* otherSelf = dynamic_cast<const DICOMSortByTag*>(&other))
+  if (const auto* otherSelf = dynamic_cast<const DICOMSortByTag*>(&other))
   {
     if (!(this->m_Tag == otherSelf->m_Tag)) return false;
 

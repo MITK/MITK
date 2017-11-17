@@ -107,7 +107,6 @@ mitk::ExtrudePlanarFigureFilter::~ExtrudePlanarFigureFilter()
 void mitk::ExtrudePlanarFigureFilter::GenerateData()
 {
   typedef PlanarFigure::PolyLineType PolyLine;
-  typedef PolyLine::const_iterator PolyLineConstIter;
 
   if (m_Length <= 0)
     mitkThrow() << "Length is not positive!";
@@ -118,7 +117,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
   if (m_BendAngle != 0 && m_BendDirection[0] == 0 && m_BendDirection[1] == 0)
     mitkThrow() << "Bend direction is zero-length vector!";
 
-  PlanarFigure *input = dynamic_cast<PlanarFigure *>(this->GetPrimaryInput());
+  auto *input = dynamic_cast<PlanarFigure *>(this->GetPrimaryInput());
 
   if (input == nullptr)
     mitkThrow() << "Primary input is not a planar figure!";
@@ -128,7 +127,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
   if (numPolyLines == 0)
     mitkThrow() << "Primary input does not contain any poly lines!";
 
-  const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetPlaneGeometry());
+  const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(input->GetPlaneGeometry());
 
   if (planeGeometry == nullptr)
     mitkThrow() << "Could not get plane geometry from primary input!";
@@ -164,9 +163,9 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
 
     std::vector<mitk::Point3D> crossSection;
 
-    PolyLineConstIter polyLineEnd = polyLine.end();
+    auto polyLineEnd = polyLine.end();
 
-    for (PolyLineConstIter polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
+    for (auto polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
     {
       Point3D point;
       planeGeometry->Map(*polyLineIter, point);
@@ -270,7 +269,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
 
   polyDataNormals->Update();
 
-  Surface *output = static_cast<Surface *>(this->GetPrimaryOutput());
+  auto *output = static_cast<Surface *>(this->GetPrimaryOutput());
   output->SetVtkPolyData(polyDataNormals->GetOutput());
 }
 

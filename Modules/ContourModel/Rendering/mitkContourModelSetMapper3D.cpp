@@ -49,7 +49,7 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  ContourModelSet *contourModelSet = dynamic_cast<ContourModelSet *>(this->GetDataNode()->GetData());
+  auto *contourModelSet = dynamic_cast<ContourModelSet *>(this->GetDataNode()->GetData());
 
   if (contourModelSet != nullptr)
   {
@@ -57,15 +57,15 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType baseIndex = 0;
 
-    ContourModelSet::ContourModelSetIterator it = contourModelSet->Begin();
-    ContourModelSet::ContourModelSetIterator end = contourModelSet->End();
+    auto it = contourModelSet->Begin();
+    auto end = contourModelSet->End();
 
     while (it != end)
     {
       ContourModel *contourModel = it->GetPointer();
 
-      ContourModel::VertexIterator vertIt = contourModel->Begin();
-      ContourModel::VertexIterator vertEnd = contourModel->End();
+      auto vertIt = contourModel->Begin();
+      auto vertEnd = contourModel->End();
 
       while (vertIt != vertEnd)
       {
@@ -112,7 +112,7 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  mitk::ContourModel *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
   if (data == nullptr)
   {
     return;

@@ -38,7 +38,7 @@ mitk::ToolManager::ToolManager(DataStorage *storage)
 
 mitk::ToolManager::~ToolManager()
 {
-  for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
+  for (auto dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
     (*dataIter)->RemoveObserver(m_WorkingDataObserverTags[(*dataIter)]);
 
   if (this->GetDataStorage() != nullptr)
@@ -55,7 +55,7 @@ mitk::ToolManager::~ToolManager()
 
     ActiveToolChanged.Send();
   }
-  for (NodeTagMapType::iterator observerTagMapIter = m_ReferenceDataObserverTags.begin();
+  for (auto observerTagMapIter = m_ReferenceDataObserverTags.begin();
        observerTagMapIter != m_ReferenceDataObserverTags.end();
        ++observerTagMapIter)
   {
@@ -81,11 +81,11 @@ void mitk::ToolManager::InitializeTools()
   std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
 
   // remember these tools
-  for (std::list<itk::LightObject::Pointer>::iterator iter = thingsThatClaimToBeATool.begin();
+  for (auto iter = thingsThatClaimToBeATool.begin();
        iter != thingsThatClaimToBeATool.end();
        ++iter)
   {
-    if (Tool *tool = dynamic_cast<Tool *>(iter->GetPointer()))
+    if (auto *tool = dynamic_cast<Tool *>(iter->GetPointer()))
     {
       tool->InitializeStateMachine();
       tool->SetToolManager(this); // important to call right after instantiation
@@ -111,7 +111,7 @@ const mitk::ToolManager::ToolVectorTypeConst mitk::ToolManager::GetTools()
 {
   ToolVectorTypeConst resultList;
 
-  for (ToolVectorType::iterator iter = m_Tools.begin(); iter != m_Tools.end(); ++iter)
+  for (auto iter = m_Tools.begin(); iter != m_Tools.end(); ++iter)
   {
     resultList.push_back(iter->GetPointer());
   }
@@ -188,9 +188,9 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
   if (data != m_ReferenceData)
   {
     // remove observers from old nodes
-    for (DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter)
+    for (auto dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter)
     {
-      NodeTagMapType::iterator searchIter = m_ReferenceDataObserverTags.find(*dataIter);
+      auto searchIter = m_ReferenceDataObserverTags.find(*dataIter);
       if (searchIter != m_ReferenceDataObserverTags.end())
       {
         (*dataIter)->RemoveObserver(searchIter->second);
@@ -202,7 +202,7 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
 
     // attach new observers
     m_ReferenceDataObserverTags.clear();
-    for (DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter)
+    for (auto dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter)
     {
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction(this, &ToolManager::OnOneOfTheReferenceDataDeleted);
@@ -224,7 +224,7 @@ void mitk::ToolManager::OnOneOfTheReferenceDataDeleted(itk::Object *caller, cons
 {
   DataVectorType v;
 
-  for (DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter)
+  for (auto dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter)
   {
     if ((void *)(*dataIter) != (void *)caller)
     {
@@ -253,9 +253,9 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
   if (data != m_WorkingData)
   {
     // remove observers from old nodes
-    for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
+    for (auto dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
     {
-      NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find(*dataIter);
+      auto searchIter = m_WorkingDataObserverTags.find(*dataIter);
       if (searchIter != m_WorkingDataObserverTags.end())
       {
         (*dataIter)->RemoveObserver(searchIter->second);
@@ -272,7 +272,7 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
 
     // attach new observers
     m_WorkingDataObserverTags.clear();
-    for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
+    for (auto dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
     {
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction(this, &ToolManager::OnOneOfTheWorkingDataDeleted);
@@ -294,7 +294,7 @@ void mitk::ToolManager::OnOneOfTheWorkingDataDeleted(itk::Object *caller, const 
 {
   DataVectorType v;
 
-  for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
+  for (auto dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
   {
     if ((void *)(*dataIter) != (void *)caller)
     {
@@ -325,9 +325,9 @@ void mitk::ToolManager::SetRoiData(DataVectorType data)
   if (data != m_RoiData)
   {
     // remove observers from old nodes
-    for (DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter)
+    for (auto dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter)
     {
-      NodeTagMapType::iterator searchIter = m_RoiDataObserverTags.find(*dataIter);
+      auto searchIter = m_RoiDataObserverTags.find(*dataIter);
       if (searchIter != m_RoiDataObserverTags.end())
       {
         (*dataIter)->RemoveObserver(searchIter->second);
@@ -339,7 +339,7 @@ void mitk::ToolManager::SetRoiData(DataVectorType data)
 
     // attach new observers
     m_RoiDataObserverTags.clear();
-    for (DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter)
+    for (auto dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter)
     {
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction(this, &ToolManager::OnOneOfTheRoiDataDeleted);
@@ -371,7 +371,7 @@ void mitk::ToolManager::OnOneOfTheRoiDataDeleted(itk::Object *caller, const itk:
 {
   DataVectorType v;
 
-  for (DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter)
+  for (auto dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter)
   {
     if ((void *)(*dataIter) != (void *)caller)
     {
@@ -495,7 +495,7 @@ void mitk::ToolManager::UnregisterClient()
 int mitk::ToolManager::GetToolID(const Tool *tool)
 {
   int id(0);
-  for (ToolVectorType::iterator iter = m_Tools.begin(); iter != m_Tools.end(); ++iter, ++id)
+  for (auto iter = m_Tools.begin(); iter != m_Tools.end(); ++iter, ++id)
   {
     if (tool == iter->GetPointer())
     {

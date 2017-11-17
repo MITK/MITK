@@ -98,7 +98,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
   mitk::PointSet::PointDataIterator pdIt;
 
   /* search removed points and delete the corresponding source/actor/mapper objects */
-  for (ActorMap::iterator it = m_PointActors.begin(); it != m_PointActors.end();)
+  for (auto it = m_PointActors.begin(); it != m_PointActors.end();)
   {
     PointIdentifier id = it->first;
     if (!points->IndexExists(id))
@@ -107,7 +107,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
       m_PropAssembly->GetParts()->RemoveItem(it->second.first); // remove from prop assembly
       if (it->second.first != nullptr)
         it->second.first->Delete(); // Delete actor, which deletes mapper too (reference count)
-      ActorMap::iterator er = it;   // save iterator for deleting
+      auto er = it;   // save iterator for deleting
       ++it;                         // advance iterator to next object
       m_PointActors.erase(
         er); // erase element from map. This invalidates er, therefore we had to advance it before deletion.
@@ -124,7 +124,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
 
     mitk::PointSet::PointDataType data = pdIt->Value();
 
-    ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
+    auto aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
 
     /* Create/Update sources for the point */
     vtkActor *a = nullptr;
@@ -173,7 +173,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
           source = m_SphereSources[pointID];
           break;
       }
-      vtkPolyDataMapper *m = dynamic_cast<vtkPolyDataMapper *>(a->GetMapper());
+      auto *m = dynamic_cast<vtkPolyDataMapper *>(a->GetMapper());
       assert(m != nullptr);
       m->SetInputConnection(source->GetOutputPort());
       aIt->second.second = data.pointSpec; // update point spec in actormap
@@ -207,7 +207,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
 
     mitk::PointSet::PointDataType data = pdIt->Value();
 
-    ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
+    auto aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
     assert(aIt != m_PointActors.end());                   // UpdateVtkObjects() must ensure that actor exists
 
     vtkActor *a = aIt->second.first;
@@ -220,7 +220,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
     bool pointVisibility = true;
     bool visValueFound = false;
     mitk::BaseProperty *visProp = n->GetProperty("visibility", renderer);
-    mitk::BoolLookupTableProperty *visLTProp = dynamic_cast<mitk::BoolLookupTableProperty *>(visProp);
+    auto *visLTProp = dynamic_cast<mitk::BoolLookupTableProperty *>(visProp);
     if (visLTProp != nullptr)
     {
       mitk::BoolLookupTable visLookupTable = visLTProp->GetValue();
@@ -246,7 +246,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
     float opacity = 1.0;
     bool opValueFound = false;
     mitk::BaseProperty *opProp = n->GetProperty("opacity", renderer);
-    mitk::FloatLookupTableProperty *opLTProp = dynamic_cast<mitk::FloatLookupTableProperty *>(opProp);
+    auto *opLTProp = dynamic_cast<mitk::FloatLookupTableProperty *>(opProp);
     if (opLTProp != nullptr)
     {
       mitk::FloatLookupTable opLookupTable = opLTProp->GetValue();
@@ -317,7 +317,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
     else
     {
       mitk::BaseProperty *a = n->GetProperty("colorLookupTable", renderer);
-      mitk::LookupTableProperty *b = dynamic_cast<mitk::LookupTableProperty *>(a);
+      auto *b = dynamic_cast<mitk::LookupTableProperty *>(a);
       if (b != nullptr)
       {
         mitk::LookupTable::Pointer c = b->GetLookupTable();
@@ -404,7 +404,7 @@ void mitk::EnhancedPointSetVtkMapper3D::DeleteVtkObject(vtkObject *o)
 
 void mitk::EnhancedPointSetVtkMapper3D::RemoveEntryFromSourceMaps(mitk::PointSet::PointIdentifier pointID)
 {
-  ActorMap::iterator aIt = m_PointActors.find(pointID);
+  auto aIt = m_PointActors.find(pointID);
   if (aIt == m_PointActors.end())
     return;
 

@@ -28,11 +28,11 @@ class MITKQTWIDGETSEXT_EXPORT QmitkColorPropertyView : public QLabel, public mit
 
 public:
   QmitkColorPropertyView(const mitk::ColorProperty *, QWidget *parent);
-  virtual ~QmitkColorPropertyView();
+  ~QmitkColorPropertyView() override;
 
 protected:
-  virtual void PropertyChanged() override;
-  virtual void PropertyRemoved() override;
+  void PropertyChanged() override;
+  void PropertyRemoved() override;
 
   void DisplayColor();
 

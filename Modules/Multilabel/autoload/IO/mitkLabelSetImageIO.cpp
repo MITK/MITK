@@ -46,7 +46,7 @@ namespace mitk
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
-    const LabelSetImage *input = static_cast<const LabelSetImage *>(this->GetInput());
+    const auto *input = static_cast<const LabelSetImage *>(this->GetInput());
     if (input)
       return Supported;
     else
@@ -192,14 +192,14 @@ namespace mitk
         itk::EncapsulateMetaData<std::string>(
           nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
 
-        mitk::LabelSet::LabelContainerConstIteratorType iter = input->GetLabelSet(layerIdx)->IteratorConstBegin();
+        auto iter = input->GetLabelSet(layerIdx)->IteratorConstBegin();
         unsigned int count(0);
         while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
         {
           std::unique_ptr<TiXmlDocument> document;
           document.reset(new TiXmlDocument());
 
-          TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
+          auto *decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
           document->LinkEndChild(decl);
           TiXmlElement *labelElem = mitk::LabelSetIOHelper::GetLabelAsTiXmlElement(iter->second);
           document->LinkEndChild(labelElem);
@@ -360,7 +360,7 @@ namespace mitk
     MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents() << std::endl;
 
     const itk::MetaDataDictionary &dictionary = nrrdImageIO->GetMetaDataDictionary();
-    for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End(); iter != iterEnd;
+    for (auto iter = dictionary.Begin(), iterEnd = dictionary.End(); iter != iterEnd;
          ++iter)
     {
       std::string key = std::string("meta.") + iter->first;
@@ -398,7 +398,7 @@ namespace mitk
         doc.Parse(_xmlStr.c_str());
 
         TiXmlElement *labelElem = doc.FirstChildElement("Label");
-        if (labelElem == 0)
+        if (labelElem == nullptr)
           mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
 
         label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElem);

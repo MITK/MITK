@@ -40,7 +40,7 @@ mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
 void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
-  mitk::Image *image = (mitk::Image *)GetInput();
+  auto *image = (mitk::Image *)GetInput();
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
   int tstart = outputRegion.GetIndex(3);
@@ -138,9 +138,9 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   MITK_INFO << "Updating Time Geometry to ensure right timely displaying";
   // Fixing wrong time geometry
   TimeGeometry *surfaceTG = surface->GetTimeGeometry();
-  ProportionalTimeGeometry *surfacePTG = dynamic_cast<ProportionalTimeGeometry *>(surfaceTG);
+  auto *surfacePTG = dynamic_cast<ProportionalTimeGeometry *>(surfaceTG);
   TimeGeometry *imageTG = image->GetTimeGeometry();
-  ProportionalTimeGeometry *imagePTG = dynamic_cast<ProportionalTimeGeometry *>(imageTG);
+  auto *imagePTG = dynamic_cast<ProportionalTimeGeometry *>(imageTG);
   // Requires ProportionalTimeGeometries to work. May not be available for all steps.
   assert(surfacePTG != nullptr);
   assert(imagePTG != nullptr);

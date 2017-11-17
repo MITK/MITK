@@ -144,8 +144,8 @@ namespace mitk
     m_BackNormalsActor->Delete();
     m_BackHedgeHog->Delete();
 
-    for (ActorList::iterator it = m_ImageActors.begin(); it != m_ImageActors.end(); ++it)
-      it->second.m_Actor->ReleaseGraphicsResources(0);
+    for (auto it = m_ImageActors.begin(); it != m_ImageActors.end(); ++it)
+      it->second.m_Actor->ReleaseGraphicsResources(nullptr);
 
     // Delete entries in m_ImageActors list one by one
     m_ImageActors.clear();
@@ -187,7 +187,7 @@ namespace mitk
 
   void PlaneGeometryDataVtkMapper3D::ImageMapperDeletedCallback(itk::Object *caller, const itk::EventObject & /*event*/)
   {
-    ImageVtkMapper2D *imageMapper = dynamic_cast<ImageVtkMapper2D *>(caller);
+    auto *imageMapper = dynamic_cast<ImageVtkMapper2D *>(caller);
     if ((imageMapper != nullptr))
     {
       if (m_ImageActors.count(imageMapper) > 0)
@@ -307,7 +307,7 @@ namespace mitk
       Surface *surface = m_SurfaceCreator->GetOutput();
 
       // Check if there's something to display, otherwise return
-      if ((surface->GetVtkPolyData() == 0) || (surface->GetVtkPolyData()->GetNumberOfCells() == 0))
+      if ((surface->GetVtkPolyData() == nullptr) || (surface->GetVtkPolyData()->GetNumberOfCells() == 0))
       {
         m_ImageAssembly->VisibilityOff();
         return;
@@ -447,7 +447,7 @@ namespace mitk
     if (node != nullptr)
     {
       // we need to get the information from the 2D mapper to render the texture on the 3D plane
-      ImageVtkMapper2D *imageMapper =
+      auto *imageMapper =
         dynamic_cast<ImageVtkMapper2D *>(node->GetMapper(1)); // GetMapper(1) provides the 2D mapper for the data node
 
       // if there is a 2D mapper, which is not the standard image mapper...
@@ -582,7 +582,7 @@ namespace mitk
     }
     if (m_Actor != nullptr)
     {
-      m_Actor->ReleaseGraphicsResources(0);
+      m_Actor->ReleaseGraphicsResources(nullptr);
       m_Actor->Delete();
     }
   }

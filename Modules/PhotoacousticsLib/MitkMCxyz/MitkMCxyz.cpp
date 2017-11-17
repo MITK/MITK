@@ -769,11 +769,11 @@ int main(int argc, char * argv[]) {
   allInput.LoadValues(inputFilename, yOffset, normalizationFilename, simulatePVFC);
 
   std::vector<ReturnValues> allValues(concurentThreadsSupported);
-  std::thread* threads = new std::thread[concurentThreadsSupported];
+  auto* threads = new std::thread[concurentThreadsSupported];
 
   for (long i = 0; i < concurentThreadsSupported; i++)
   {
-    ReturnValues* tmp = new ReturnValues();
+    auto* tmp = new ReturnValues();
     allValues.push_back(*tmp);
   }
 
@@ -825,7 +825,7 @@ int main(int argc, char * argv[]) {
   if (!simulatePVFC)
   {
     if (verbose) std::cout << "Allocating memory for normal simulation result ... ";
-    double* finalTotalFluence = (double *)malloc(allInput.totalNumberOfVoxels * sizeof(double));
+    auto* finalTotalFluence = (double *)malloc(allInput.totalNumberOfVoxels * sizeof(double));
     if (verbose) std::cout << "[OK]" << std::endl;
     if (verbose) std::cout << "Cleaning memory for normal simulation result ...";
     for (int i = 0; i < allInput.totalNumberOfVoxels; i++) {
@@ -860,7 +860,7 @@ int main(int argc, char * argv[]) {
 
     mitk::Image::Pointer resultImage = mitk::Image::New();
     mitk::PixelType TPixel = mitk::MakeScalarPixelType<double>();
-    unsigned int* dimensionsOfImage = new unsigned int[3];
+    auto* dimensionsOfImage = new unsigned int[3];
 
     // Copy dimensions
     dimensionsOfImage[0] = allInput.Ny;
@@ -942,7 +942,7 @@ int main(int argc, char * argv[]) {
     outputFilename = outputFileBase + "_p" + detectorname.str().c_str();
 
     mitk::Image::Pointer pvfcImage = mitk::Image::New();
-    unsigned int* dimensionsOfPvfcImage = new unsigned int[3];
+    auto* dimensionsOfPvfcImage = new unsigned int[3];
 
     // Copy dimensions
     dimensionsOfPvfcImage[0] = allInput.Ny;
@@ -1042,7 +1042,7 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
   /**** ======================== MAJOR CYCLE ============================ *****/
 
   auto duration = std::chrono::system_clock::now().time_since_epoch();
-  returnValue->RandomGen(0, (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() + thread) % 32000, NULL); /* initiate with seed = 1, or any long integer. */
+  returnValue->RandomGen(0, (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() + thread) % 32000, nullptr); /* initiate with seed = 1, or any long integer. */
   for (j = 0; j < inputValues->totalNumberOfVoxels; j++) returnValue->totalFluence[j] = 0; // ensure F[] starts empty.
 
   /**** RUN Launch N photons, initializing each one before progation. *****/
@@ -1084,14 +1084,14 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
         double rnd7 = -1;
         double rnd8 = -1;
 
-        while ((rnd1 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
-        while ((rnd2 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
-        while ((rnd3 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
-        while ((rnd4 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
-        while ((rnd5 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
-        while ((rnd6 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
-        while ((rnd7 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
-        while ((rnd8 = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+        while ((rnd1 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
+        while ((rnd2 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
+        while ((rnd3 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
+        while ((rnd4 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
+        while ((rnd5 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
+        while ((rnd6 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
+        while ((rnd7 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
+        while ((rnd8 = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
 
         mitk::pa::LightSource::PhotonInformation info = m_PhotoacousticProbe->GetNextPhoton(rnd1, rnd2, rnd3, rnd4, rnd5, rnd6, rnd7, rnd8);
         x = info.xPosition;
@@ -1120,17 +1120,17 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
           if (inputValues->mcflag == 0) // uniform beam
           {
             // set launch point and width of beam
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0); // avoids rnd = 0
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0); // avoids rnd = 0
             r = inputValues->radius*sqrt(rnd); // radius of beam at launch point
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0); // avoids rnd = 0
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0); // avoids rnd = 0
             phi = rnd*2.0*PI;
             x = inputValues->xs + r*cos(phi);
             y = inputValues->ys + r*sin(phi);
             z = inputValues->zs;
             // set trajectory toward focus
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0); // avoids rnd = 0
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0); // avoids rnd = 0
             r = inputValues->waist*sqrt(rnd); // radius of beam at focus
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0); // avoids rnd = 0
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0); // avoids rnd = 0
             phi = rnd*2.0*PI;
 
             // !!!!!!!!!!!!!!!!!!!!!!! setting input values will braek
@@ -1146,23 +1146,23 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
           else if (inputValues->mcflag == 5) // Multispectral DKFZ prototype
           {
             // set launch point and width of beam
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
 
             //offset in x direction in cm (random)
             x = (rnd*2.5) - 1.25;
 
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
             double b = ((rnd)-0.5);
             y = (b > 0 ? yOffset + 1.5 : yOffset - 1.5);
             z = 0.1;
             ux = 0;
 
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
 
             //Angle of beam in y direction
             uy = sin((rnd*0.42) - 0.21 + (b < 0 ? 1.0 : -1.0) * 0.436);
 
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
 
             // angle of beam in x direction
             ux = sin((rnd*0.42) - 0.21);
@@ -1171,32 +1171,32 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
           else if (inputValues->mcflag == 4) // Monospectral prototype DKFZ
           {
             // set launch point and width of beam
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
 
             //offset in x direction in cm (random)
             x = (rnd*2.5) - 1.25;
 
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
             double b = ((rnd)-0.5);
             y = (b > 0 ? yOffset + 0.83 : yOffset - 0.83);
             z = 0.1;
             ux = 0;
 
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
 
             //Angle of beam in y direction
             uy = sin((rnd*0.42) - 0.21 + (b < 0 ? 1.0 : -1.0) * 0.375);
 
-            while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+            while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
 
             // angle of beam in x direction
             ux = sin((rnd*0.42) - 0.21);
             uz = sqrt(1 - ux*ux - uy*uy);
           }
           else { // isotropic pt source
-            costheta = 1.0 - 2.0 * returnValue->RandomGen(1, 0, NULL);
+            costheta = 1.0 - 2.0 * returnValue->RandomGen(1, 0, nullptr);
             sintheta = sqrt(1.0 - costheta*costheta);
-            psi = 2.0 * PI * returnValue->RandomGen(1, 0, NULL);
+            psi = 2.0 * PI * returnValue->RandomGen(1, 0, nullptr);
             cospsi = cos(psi);
             if (psi < PI)
               sinpsi = sqrt(1.0 - cospsi*cospsi);
@@ -1244,7 +1244,7 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
       s = dimensionless stepsize
       x, uy, uz are cosines of current photon trajectory
       *****/
-        while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);   /* yields 0 < rnd <= 1 */
+        while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);   /* yields 0 < rnd <= 1 */
         sleft = -log(rnd);        /* dimensionless step */
         CNT += 1;
 
@@ -1410,7 +1410,7 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
        Convert theta and psi into cosines ux, uy, uz.
        *****/
        /* Sample for costheta */
-        while ((rnd = returnValue->RandomGen(1, 0, NULL)) <= 0.0);
+        while ((rnd = returnValue->RandomGen(1, 0, nullptr)) <= 0.0);
         if (inputValues->gVector[i] == 0.0)
         {
           costheta = 2.0 * rnd - 1.0;
@@ -1424,7 +1424,7 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
         sintheta = sqrt(1.0 - costheta*costheta); /* sqrt() is faster than sin(). */
 
         /* Sample psi. */
-        psi = 2.0*PI*returnValue->RandomGen(1, 0, NULL);
+        psi = 2.0*PI*returnValue->RandomGen(1, 0, nullptr);
         cospsi = cos(psi);
         if (psi < PI)
           sinpsi = sqrt(1.0 - cospsi*cospsi);     /* sqrt() is faster than sin(). */
@@ -1455,7 +1455,7 @@ void runMonteCarlo(InputValues* inputValues, ReturnValues* returnValue, int thre
       and 1-CHANCE probability of terminating.
       *****/
         if (W < THRESHOLD) {
-          if (returnValue->RandomGen(1, 0, NULL) <= CHANCE)
+          if (returnValue->RandomGen(1, 0, nullptr) <= CHANCE)
             W /= CHANCE;
           else photon_status = DEAD;
         }

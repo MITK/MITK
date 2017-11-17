@@ -40,7 +40,7 @@ public:
 
   QmitkXnatProjectWidget(QWidget *parent = nullptr);
   QmitkXnatProjectWidget(Mode mode, QWidget *parent = nullptr);
-  ~QmitkXnatProjectWidget();
+  ~QmitkXnatProjectWidget() override;
 
   void SetProject(ctkXnatProject *project);
   ctkXnatProject *GetProject() const;

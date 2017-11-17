@@ -54,7 +54,7 @@ class MITKIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
     static const std::string VIEW_ID;
 
     QmitkNavigationToolCreationAdvancedWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkNavigationToolCreationAdvancedWidget();
+    ~QmitkNavigationToolCreationAdvancedWidget() override;
 
     /** Initializes the view with the a data storage. This data storage is needed for the
      *  preview node during tooltip manipulation.

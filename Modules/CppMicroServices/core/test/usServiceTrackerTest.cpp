@@ -152,13 +152,13 @@ void TestServiceTracker()
   std::string s1("us::TestModuleSService");
   ServiceReferenceU servref = mc->GetServiceReference(s1 + "0");
 
-  US_TEST_CONDITION_REQUIRED(servref != 0, "Test if registered service of id us::TestModuleSService0");
+  US_TEST_CONDITION_REQUIRED(servref != nullptr, "Test if registered service of id us::TestModuleSService0");
 
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
-  US_TEST_CONDITION_REQUIRED(servCtrlRef != 0, "Test if constrol service was registered");
+  US_TEST_CONDITION_REQUIRED(servCtrlRef != nullptr, "Test if constrol service was registered");
 
   ServiceControlInterface* serviceController = mc->GetService(servCtrlRef);
-  US_TEST_CONDITION_REQUIRED(serviceController != 0, "Test valid service controller");
+  US_TEST_CONDITION_REQUIRED(serviceController != nullptr, "Test valid service controller");
 
   std::unique_ptr<ServiceTracker<void>> st1(new ServiceTracker<void>(mc, servref));
 

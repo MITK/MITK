@@ -87,7 +87,7 @@ namespace mitk
       this->m_Splashscreen = splashscreen;
     }
 
-    void run()
+    void run() override
     {
       this->m_Splashscreen->close();
     }

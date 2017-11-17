@@ -147,7 +147,7 @@ unsigned long mitk::PropertyList::GetMTime() const
 
 bool mitk::PropertyList::DeleteProperty(const std::string &propertyKey)
 {
-  PropertyMap::iterator it = m_Properties.find(propertyKey);
+  auto it = m_Properties.find(propertyKey);
 
   if (it != m_Properties.end())
   {

@@ -142,7 +142,7 @@ int mitkPointSetLocaleTest(int, char *[])
   mitk::IOUtil::Save(refPointSet, referenceFilePath);
 
   unsigned int numberOfTestedGermanLocales(0);
-  for (StringList::iterator iter = alllocales.begin(); iter != alllocales.end(); ++iter)
+  for (auto iter = alllocales.begin(); iter != alllocales.end(); ++iter)
   {
     if (ChangeLocale(*iter))
     {

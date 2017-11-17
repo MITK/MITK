@@ -51,7 +51,7 @@ private:
 };
 
 ServiceEvent::ServiceEvent()
-  : d(0)
+  : d(nullptr)
 {
 
 }

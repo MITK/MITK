@@ -65,7 +65,7 @@ public:
   void tearDown() override
   {
     // Delete LabelSetImage
-    m_LabelSetImage = 0;
+    m_LabelSetImage = nullptr;
   }
 
   // Reduce contours with nth point
@@ -382,7 +382,7 @@ public:
                            m_LabelSetImage->GetNumberOfLayers() == 0);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(0) == false);
     CPPUNIT_ASSERT_MESSAGE("Active layers is not nullptr although all layer have been removed",
-                           m_LabelSetImage->GetActiveLabelSet() == 0);
+                           m_LabelSetImage->GetActiveLabelSet() == nullptr);
   }
 
   void TestRemoveLabels()
@@ -422,7 +422,7 @@ public:
   void TestMergeLabel()
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"))[0].GetPointer());
-    m_LabelSetImage = 0;
+    m_LabelSetImage = nullptr;
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 

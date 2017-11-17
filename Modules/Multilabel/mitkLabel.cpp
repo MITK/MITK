@@ -66,7 +66,7 @@ mitk::Label::Label() : PropertyList()
 mitk::Label::Label(const Label &other) : PropertyList(other)
 // copyconstructer of property List handles the coping action
 {
-  mitk::PropertyList::PropertyMap *map = const_cast<mitk::PropertyList::PropertyMap *>(this->GetMap());
+  auto *map = const_cast<mitk::PropertyList::PropertyMap *>(this->GetMap());
   auto it = map->begin();
   auto end = map->end();
 

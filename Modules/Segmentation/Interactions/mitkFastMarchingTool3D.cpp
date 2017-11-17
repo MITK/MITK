@@ -58,7 +58,7 @@ bool mitk::FastMarchingTool3D::CanHandle(BaseData *referenceData) const
   if (referenceData == nullptr)
     return false;
 
-  Image *image = dynamic_cast<Image *>(referenceData);
+  auto *image = dynamic_cast<Image *>(referenceData);
 
   if (image == nullptr)
     return false;
@@ -244,7 +244,7 @@ void mitk::FastMarchingTool3D::Deactivated()
   for (unsigned int i = 0; i < numberOfPoints; ++i)
   {
     mitk::Point3D point = m_SeedsAsPointSet->GetPoint(i);
-    mitk::PointOperation *doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
+    auto *doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
     m_SeedsAsPointSet->ExecuteOperation(doOp);
   }
   // Deactivate Interaction

@@ -36,7 +36,7 @@ static void OverwriteObliquePlaneTest(mitk::Image *workingImage, mitk::Image *re
   /*==============TEST WITHOUT MITK CONVERTION=============================*/
 
   /* ============= setup plane ============*/
-  int sliceindex = (int)(ObliquePlaneTestVolumeSize / 2); // rand() % 32;
+  auto sliceindex = (int)(ObliquePlaneTestVolumeSize / 2); // rand() % 32;
   bool isFrontside = true;
   bool isRotated = false;
 

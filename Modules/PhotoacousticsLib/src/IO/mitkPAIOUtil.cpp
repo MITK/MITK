@@ -55,8 +55,8 @@ mitk::pa::Volume::Pointer mitk::pa::IOUtil::LoadNrrd(std::string filename, doubl
 
   mitk::ImageReadAccessor readAccess(inputImage, inputImage->GetVolumeData(0));
 
-  double* dataArray = new double[xDim*yDim*zDim];
-  const double* srcData = (const double*)readAccess.GetData();
+  auto* dataArray = new double[xDim*yDim*zDim];
+  const auto* srcData = (const double*)readAccess.GetData();
   memcpy(dataArray, srcData, xDim*yDim*zDim * sizeof(double));
 
   auto returnImage = mitk::pa::Volume::New(dataArray, xDim, yDim, zDim);
@@ -200,17 +200,17 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::IOUtil::LoadInSilicoTissueVolu
   mitk::PropertyList::Pointer propertyList = inputImage->GetPropertyList();
 
   mitk::ImageReadAccessor readAccess0(inputImage, inputImage->GetVolumeData(0));
-  double* m_AbsorptionArray = new double[xDim*yDim*zDim];
+  auto* m_AbsorptionArray = new double[xDim*yDim*zDim];
   memcpy(m_AbsorptionArray, readAccess0.GetData(), xDim*yDim*zDim * sizeof(double));
   auto absorptionVolume = Volume::New(m_AbsorptionArray, xDim, yDim, zDim);
 
   mitk::ImageReadAccessor readAccess1(inputImage, inputImage->GetVolumeData(1));
-  double*  m_ScatteringArray = new double[xDim*yDim*zDim];
+  auto*  m_ScatteringArray = new double[xDim*yDim*zDim];
   memcpy(m_ScatteringArray, readAccess1.GetData(), xDim*yDim*zDim * sizeof(double));
   auto scatteringVolume = Volume::New(m_ScatteringArray, xDim, yDim, zDim);
 
   mitk::ImageReadAccessor readAccess2(inputImage, inputImage->GetVolumeData(2));
-  double*  m_AnisotropyArray = new double[xDim*yDim*zDim];
+  auto*  m_AnisotropyArray = new double[xDim*yDim*zDim];
   memcpy(m_AnisotropyArray, readAccess2.GetData(), xDim*yDim*zDim * sizeof(double));
   auto anisotropyVolume = Volume::New(m_AnisotropyArray, xDim, yDim, zDim);
 
@@ -219,7 +219,7 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::IOUtil::LoadInSilicoTissueVolu
   if (inputImage->GetDimension() == 4)
   {
     mitk::ImageReadAccessor readAccess3(inputImage, inputImage->GetVolumeData(3));
-    double*  m_SegmentationArray = new double[xDim*yDim*zDim];
+    auto*  m_SegmentationArray = new double[xDim*yDim*zDim];
     memcpy(m_SegmentationArray, readAccess3.GetData(), xDim*yDim*zDim * sizeof(double));
     segmentationVolume = Volume::New(m_SegmentationArray, xDim, yDim, zDim);
   }
@@ -239,7 +239,7 @@ mitk::pa::FluenceYOffsetPair::Pointer mitk::pa::IOUtil::LoadFluenceSimulation(st
   unsigned int yDim = inputImage->GetDimensions()[0];
   unsigned int zDim = inputImage->GetDimensions()[2];
   int size = xDim*yDim*zDim;
-  double* fluenceArray = new double[size];
+  auto* fluenceArray = new double[size];
   memcpy(fluenceArray, readAccess0.GetData(), size * sizeof(double));
 
   auto yOffsetProperty = inputImage->GetProperty("y-offset");

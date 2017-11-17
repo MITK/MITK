@@ -725,7 +725,7 @@ namespace mitk
         {
           nodes = DataStorage::SetOfObjects::New();
           std::vector<mitk::BaseData::Pointer> baseData = reader->Read();
-          for (std::vector<mitk::BaseData::Pointer>::iterator iter = baseData.begin(); iter != baseData.end(); ++iter)
+          for (auto iter = baseData.begin(); iter != baseData.end(); ++iter)
           {
             if (iter->IsNotNull())
             {
@@ -926,7 +926,7 @@ namespace mitk
 
       // check if we already used a writer for this base data type
       // which should be re-used
-      std::set<SaveInfo>::const_iterator oldSaveInfoIter = usedSaveInfos.find(saveInfo);
+      auto oldSaveInfoIter = usedSaveInfos.find(saveInfo);
       if (oldSaveInfoIter != usedSaveInfos.end())
       {
         // we previously saved a base data object of the same data with the same mime-type,

@@ -46,7 +46,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedFluenceImage
   int xDim = composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetXDim();
   int zDim = composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetZDim();
 
-  double* imageArray = new double[xDim*zDim*fluenceComponents];
+  auto* imageArray = new double[xDim*zDim*fluenceComponents];
 
   for (int fluenceComponentIdx = 0; fluenceComponentIdx < fluenceComponents; fluenceComponentIdx++)
     for (int z = 0; z < zDim; z++)
@@ -80,7 +80,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedSignalImageF
   int xDim = composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetXDim();
   int zDim = composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetZDim();
 
-  double* imageArray = new double[xDim*zDim*fluenceComponents];
+  auto* imageArray = new double[xDim*zDim*fluenceComponents];
 
   for (int fluenceComponentIdx = 0; fluenceComponentIdx < fluenceComponents; fluenceComponentIdx++)
     for (int z = 0; z < zDim; z++)
@@ -103,7 +103,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedGroundTruthI
   int xDim = composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetXDim();
   int zDim = composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetZDim();
 
-  double* imageArray = new double[xDim*zDim*fluenceComponents];
+  auto* imageArray = new double[xDim*zDim*fluenceComponents];
 
   for (int fluenceComponentIdx = 0; fluenceComponentIdx < fluenceComponents; fluenceComponentIdx++)
     for (int z = 0; z < zDim; z++)

@@ -83,7 +83,7 @@ public:
     mitk::Image::Pointer testImage = m_PhotoacousticVolume->ConvertToMitkImage();
 
     mitk::ImageReadAccessor imgMemAcc(testImage);
-    double* imagePointer = (double*)imgMemAcc.GetData();
+    auto* imagePointer = (double*)imgMemAcc.GetData();
 
     for (int index = 0; index < dims*dims*dims; index++, imagePointer++)
     {
@@ -174,7 +174,7 @@ public:
 
   mitk::pa::Volume::Pointer createTestVolume(double value)
   {
-    double* data = new double[27];
+    auto* data = new double[27];
     for (int i = 0; i < 27; ++i)
       data[i] = value;
     return mitk::pa::Volume::New(data, 3, 3, 3);

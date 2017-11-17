@@ -147,7 +147,7 @@ public:
         slice->Initialize(mitk::MakeScalarPixelType<signed int>(), 2, dim);
         unsigned int i;
         mitk::ImageWriteAccessor accessor(slice);
-        signed int *p = (signed int *)accessor.GetData();
+        auto *p = (signed int *)accessor.GetData();
         unsigned int size = dim[0] * dim[1];
         for (i = 0; i < size; ++i, ++p)
           *p = (signed int)i;
@@ -184,7 +184,7 @@ public:
         slice->Initialize(mitk::MakeScalarPixelType<signed int>(), 2, dim);
         unsigned int i;
         mitk::ImageWriteAccessor accessor(slice);
-        signed int *p = (signed int *)accessor.GetData();
+        auto *p = (signed int *)accessor.GetData();
         unsigned int size = dim[0] * dim[1];
         for (i = 0; i < size; ++i, ++p)
           *p = (signed int)i;

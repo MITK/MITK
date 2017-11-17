@@ -69,7 +69,7 @@ const mitk::ContourModelToSurfaceFilter::InputType *mitk::ContourModelToSurfaceF
 void mitk::ContourModelToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
-  mitk::ContourModel *inputContour = (mitk::ContourModel *)GetInput();
+  auto *inputContour = (mitk::ContourModel *)GetInput();
 
   unsigned int numberOfTimeSteps = inputContour->GetTimeSteps();
   surface->Expand(numberOfTimeSteps);

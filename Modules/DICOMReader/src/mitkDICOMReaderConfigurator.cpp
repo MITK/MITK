@@ -490,17 +490,17 @@ mitk::DICOMReaderConfigurator
   // check possible sub-classes from the most-specific one up to the most generic one
   const DICOMFileReader* cPointer = reader;
   TiXmlElement* root;
-  if (const ClassicDICOMSeriesReader* specificReader = dynamic_cast<const ClassicDICOMSeriesReader*>(cPointer))
+  if (const auto* specificReader = dynamic_cast<const ClassicDICOMSeriesReader*>(cPointer))
   {
     root = this->CreateConfigStringFromReader(specificReader);
   }
   else
-  if (const ThreeDnTDICOMSeriesReader* specificReader = dynamic_cast<const ThreeDnTDICOMSeriesReader*>(cPointer))
+  if (const auto* specificReader = dynamic_cast<const ThreeDnTDICOMSeriesReader*>(cPointer))
   {
     root = this->CreateConfigStringFromReader(specificReader);
   }
   else
-  if (const DICOMITKSeriesGDCMReader* specificReader = dynamic_cast<const DICOMITKSeriesGDCMReader*>(cPointer))
+  if (const auto* specificReader = dynamic_cast<const DICOMITKSeriesGDCMReader*>(cPointer))
   {
     root = this->CreateConfigStringFromReader(specificReader);
   }
@@ -549,7 +549,7 @@ mitk::DICOMReaderConfigurator
       ++sorterIter)
   {
     const DICOMDatasetSorter* sorter = *sorterIter;
-    if (const DICOMTagBasedSorter* specificSorter = dynamic_cast<const DICOMTagBasedSorter*>(sorter))
+    if (const auto* specificSorter = dynamic_cast<const DICOMTagBasedSorter*>(sorter))
     {
       TiXmlElement* sorterTag = this->CreateConfigStringFromDICOMDatasetSorter(specificSorter);
       root->LinkEndChild(sorterTag);
@@ -586,7 +586,7 @@ mitk::DICOMReaderConfigurator
     distinguishingTagsElement->LinkEndChild(tag);
 
     const DICOMTagBasedSorter::TagValueProcessor* processor = sorter->GetTagValueProcessorForDistinguishingTag(*tagIter);
-    if (const DICOMTagBasedSorter::CutDecimalPlaces* specificProcessor = dynamic_cast<const DICOMTagBasedSorter::CutDecimalPlaces*>(processor))
+    if (const auto* specificProcessor = dynamic_cast<const DICOMTagBasedSorter::CutDecimalPlaces*>(processor))
     {
       tag->SetDoubleAttribute("cutDecimalPlaces", specificProcessor->GetPrecision());
     }

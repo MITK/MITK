@@ -53,7 +53,7 @@ public:
   double GetUpper() { return m_Upper; }
   void SetUpper(double upper) { this->m_Upper = upper; }
   void mousePressEvent(QMouseEvent *mouseEvent) override;
-  virtual void paintEvent(QPaintEvent *e) override;
+  void paintEvent(QPaintEvent *e) override;
   virtual void DoubleClickOnHandle(int handle) = 0;
 
   void mouseMoveEvent(QMouseEvent *mouseEvent) override;

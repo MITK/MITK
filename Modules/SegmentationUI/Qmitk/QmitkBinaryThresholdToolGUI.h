@@ -71,7 +71,7 @@ protected slots:
 
 protected:
   QmitkBinaryThresholdToolGUI();
-  virtual ~QmitkBinaryThresholdToolGUI();
+  ~QmitkBinaryThresholdToolGUI() override;
 
   /// \brief When Slider (int value) has changed, we need to convert it to a respective double value for the spinner
   double SliderIntToDouble(int val);

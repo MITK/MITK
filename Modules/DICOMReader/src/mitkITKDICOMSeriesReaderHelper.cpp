@@ -300,7 +300,7 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractDateTimeBoundsAndTriggerOfTimeStep
 
   triggerBounds = TimeBounds(0.0);
 
-  for (DICOMDatasetAccessingImageFrameList::const_iterator pos = frameList.cbegin(); pos != frameList.cend(); ++pos)
+  for (auto pos = frameList.cbegin(); pos != frameList.cend(); ++pos)
   {
     const std::string aqDateStr = (*pos)->GetTagValueAsString(AcquisitionDateTag).value;
     const std::string aqTimeStr = (*pos)->GetTagValueAsString(AcquisitionTimeTag).value;
@@ -381,7 +381,7 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
   // extract the timebounds
   DateTimeBounds baselineDateTimeBounds;
   TimeBounds triggerBounds;
-  StringContainerList::const_iterator pos = filenamesOfTimeSteps.cbegin();
+  auto pos = filenamesOfTimeSteps.cbegin();
   ExtractDateTimeBoundsAndTriggerOfTimeStep(*pos, baselineDateTimeBounds, triggerBounds);
   baseLine = baselineDateTimeBounds[0];
 

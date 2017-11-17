@@ -65,7 +65,7 @@ mitk::MouseReleaseEvent::~MouseReleaseEvent()
 
 bool mitk::MouseReleaseEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::MouseReleaseEvent &mre = static_cast<const mitk::MouseReleaseEvent &>(interactionEvent);
+  const auto &mre = static_cast<const mitk::MouseReleaseEvent &>(interactionEvent);
   return (this->GetEventButton() == mre.GetEventButton() && this->GetModifiers() == mre.GetModifiers() &&
           this->GetButtonStates() == mre.GetButtonStates() && Superclass::IsEqual(interactionEvent));
 }

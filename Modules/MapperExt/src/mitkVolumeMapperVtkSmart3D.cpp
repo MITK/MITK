@@ -113,7 +113,7 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
 
 vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
 {
-  mitk::Image *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
+  auto *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
   vtkImageData* img = input->GetVtkImageData(this->GetTimestep());
   img->SetSpacing(1,1,1);
 
@@ -164,7 +164,7 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
   }
   else
   {
-    mitk::TransferFunctionProperty *transferFunctionProp =
+    auto *transferFunctionProp =
       dynamic_cast<mitk::TransferFunctionProperty *>(this->GetDataNode()->GetProperty("TransferFunction", renderer));
 
     if (transferFunctionProp)

@@ -81,7 +81,7 @@ void ServiceRegistry::Clear()
   services.clear();
   serviceRegistrations.clear();
   classServices.clear();
-  core = 0;
+  core = nullptr;
 }
 
 ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,

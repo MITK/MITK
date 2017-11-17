@@ -68,7 +68,7 @@ private slots:
 
 protected:
   QmitkOtsuTool3DGUI();
-  virtual ~QmitkOtsuTool3DGUI();
+  ~QmitkOtsuTool3DGUI() override;
 
   mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
 

@@ -28,7 +28,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkFFmpegWriter : public QObject
 
 public:
   explicit QmitkFFmpegWriter(QObject *parent = nullptr);
-  ~QmitkFFmpegWriter();
+  ~QmitkFFmpegWriter() override;
 
   QString GetFFmpegPath() const;
   void SetFFmpegPath(const QString &path);

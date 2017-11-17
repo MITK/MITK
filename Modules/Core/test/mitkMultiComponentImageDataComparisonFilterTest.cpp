@@ -64,7 +64,7 @@ int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char *argv[])
 
   // now change some of the data and check if the response is correct
   mitk::ImageReadAccessor imgAcc(testImg2);
-  unsigned char *imgData = (unsigned char *)imgAcc.GetData();
+  auto *imgData = (unsigned char *)imgAcc.GetData();
   imgData[10] += 1;
   imgData[20] += 2;
   imgData[30] += 3;

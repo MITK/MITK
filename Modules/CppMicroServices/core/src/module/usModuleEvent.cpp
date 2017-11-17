@@ -51,7 +51,7 @@ private:
 };
 
 ModuleEvent::ModuleEvent()
-  : d(0)
+  : d(nullptr)
 {
 
 }

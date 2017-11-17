@@ -36,8 +36,8 @@ namespace mitk
 {
   itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
 
-    RenderingManager::Pointer RenderingManager::s_Instance = 0;
-  RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
+    RenderingManager::Pointer RenderingManager::s_Instance = nullptr;
+  RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = nullptr;
 
   RenderingManager::RenderingManager()
     : m_UpdatePending(false),
@@ -65,7 +65,7 @@ namespace mitk
     {
       (*it)->UnRegister(nullptr);
 
-      RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
+      auto callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
 
       if (callbacks_it != this->m_RenderWindowCallbacksList.end())
       {
@@ -164,7 +164,7 @@ namespace mitk
   {
     if (m_RenderWindowList.erase(renderWindow))
     {
-      RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
+      auto callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
       if (callbacks_it != this->m_RenderWindowCallbacksList.end())
       {
         renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
@@ -173,7 +173,7 @@ namespace mitk
         this->m_RenderWindowCallbacksList.erase(callbacks_it);
       }
 
-      RenderWindowVector::iterator rw_it =
+      auto rw_it =
         std::find(m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow);
 
       if (rw_it != m_AllRenderWindows.cend())
@@ -240,7 +240,7 @@ namespace mitk
       // prepare the camera etc. before rendering
       // Note: this is a very important step which should be called before the VTK render!
       // If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-      mitk::VtkPropRenderer *vPR = dynamic_cast<mitk::VtkPropRenderer *>(mitk::BaseRenderer::GetInstance(renderWindow));
+      auto *vPR = dynamic_cast<mitk::VtkPropRenderer *>(mitk::BaseRenderer::GetInstance(renderWindow));
       if (vPR)
         vPR->PrepareRender();
       // Execute rendering
@@ -536,7 +536,7 @@ namespace mitk
 
   void RenderingManager::RenderingStartCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
     mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
     RenderWindowList &renderWindowList = renman->m_RenderWindowList;
 
@@ -550,12 +550,12 @@ namespace mitk
 
   void RenderingManager::RenderingProgressCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
     mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
 
     if (renman->m_LODAbortMechanismEnabled)
     {
-      vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+      auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
       if (renderWindow)
       {
         BaseRenderer *renderer = BaseRenderer::GetInstance(renderWindow);
@@ -569,7 +569,7 @@ namespace mitk
 
   void RenderingManager::RenderingEndCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
 
     mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
 

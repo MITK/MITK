@@ -126,7 +126,7 @@ namespace mitk
             }
 
             std::string baseDataType = iter->GetProperty(IFileWriter::PROP_BASEDATA_TYPE()).ToString();
-            std::vector<std::string>::iterator idxIter =
+            auto idxIter =
               std::find(classHierarchy.begin(), classHierarchy.end(), baseDataType);
             std::size_t baseDataIndex = std::numeric_limits<std::size_t>::max();
             if (idxIter != classHierarchy.end())

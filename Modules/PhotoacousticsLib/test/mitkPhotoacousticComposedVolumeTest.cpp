@@ -51,7 +51,7 @@ public:
 
   mitk::pa::FluenceYOffsetPair::Pointer createFluenceYOffsetPair(double value, double yOffset)
   {
-    double* data = new double[125];
+    auto* data = new double[125];
     for (int i = 0; i < 125; ++i)
       data[i] = value;
     mitk::pa::Volume::Pointer volume = mitk::pa::Volume::New(data, 5, 5, 5);

@@ -54,7 +54,7 @@ public:
   ///
   /// Deletes all actions
   ///
-  virtual ~QmitkNodeDescriptor();
+  ~QmitkNodeDescriptor() override;
   ///
   /// Returns a name for this class of DataNodes (e.g. "Image", "Image Mask", etc.)
   ///

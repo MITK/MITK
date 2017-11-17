@@ -89,8 +89,8 @@ namespace mitk
   void HeightFieldSurfaceClipImageFilter::GenerateInputRequestedRegion()
   {
     Image *outputImage = this->GetOutput();
-    Image *inputImage = const_cast<Image *>(this->GetInput(0));
-    const Surface *inputSurface = dynamic_cast<const Surface *>(this->GetInput(1));
+    auto *inputImage = const_cast<Image *>(this->GetInput(0));
+    const auto *inputSurface = dynamic_cast<const Surface *>(this->GetInput(1));
 
     if (!outputImage->IsInitialized() || inputSurface == nullptr)
     {
@@ -216,7 +216,7 @@ namespace mitk
     // from the x/y plane.
     MITK_INFO << "Performing clipping..." << std::endl;
 
-    TPixel factor = static_cast<TPixel>(clipImageFilter->m_MultiplicationFactor);
+    auto factor = static_cast<TPixel>(clipImageFilter->m_MultiplicationFactor);
     TPixel clippingConstant = clipImageFilter->m_ClippingConstant;
 
     inputIt.SetFirstDirection(0);
@@ -256,8 +256,8 @@ namespace mitk
 
           else
           {
-            int x0 = (int)((double)(m_HeightFieldResolutionX) * (planeP0[0] - bounds[0]) / xWidth);
-            int y0 = (int)((double)(m_HeightFieldResolutionY) * (planeP0[1] - bounds[2]) / yWidth);
+            auto x0 = (int)((double)(m_HeightFieldResolutionX) * (planeP0[0] - bounds[0]) / xWidth);
+            auto y0 = (int)((double)(m_HeightFieldResolutionY) * (planeP0[1] - bounds[2]) / yWidth);
 
             bool clip;
 
@@ -360,7 +360,7 @@ namespace mitk
 
     for (unsigned int i = 1; i < this->GetNumberOfInputs(); ++i)
     {
-      Surface *inputSurface = const_cast<Surface *>(dynamic_cast<Surface *>(itk::ProcessObject::GetInput(i)));
+      auto *inputSurface = const_cast<Surface *>(dynamic_cast<Surface *>(itk::ProcessObject::GetInput(i)));
 
       if (!outputImage->IsInitialized() || inputSurface == nullptr)
         return;

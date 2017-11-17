@@ -80,7 +80,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode *node = this->GetDataNode();
-  mitk::LabelSetImage *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
   assert(image && image->IsInitialized());
 
   // check if there is a valid worldGeometry
@@ -199,7 +199,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_ReslicerVector[lidx]->UpdateLargestPossibleRegion();
     localStorage->m_ReslicedImageVector[lidx] = localStorage->m_ReslicerVector[lidx]->GetVtkOutput();
 
-    const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
+    const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
 
     double textureClippingBounds[6];
     for (auto &textureClippingBound : textureClippingBounds)
@@ -336,7 +336,7 @@ vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyDa
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); // the lines to connect the points
 
   // We take the pointer to the first pixel of the image
-  mitk::Label::PixelType *currentPixel = static_cast<mitk::Label::PixelType *>(image->GetScalarPointer());
+  auto *currentPixel = static_cast<mitk::Label::PixelType *>(image->GetScalarPointer());
 
   while (y <= yMax)
   {
@@ -491,7 +491,7 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity(mitk::BaseRenderer *renderer, 
 void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable(mitk::BaseRenderer *renderer, int layer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  mitk::LabelSetImage *input = dynamic_cast<mitk::LabelSetImage *>(this->GetDataNode()->GetData());
+  auto *input = dynamic_cast<mitk::LabelSetImage *>(this->GetDataNode()->GetData());
   localStorage->m_LevelWindowFilterVector[layer]->SetLookupTable(
     input->GetLabelSet(layer)->GetLookupTable()->GetVtkLookupTable());
 }
@@ -505,7 +505,7 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   if (!visible)
     return;
 
-  mitk::LabelSetImage *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
 
   if (image == nullptr || image->IsInitialized() == false)
     return;

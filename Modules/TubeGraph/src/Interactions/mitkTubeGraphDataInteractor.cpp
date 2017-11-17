@@ -72,11 +72,11 @@ void mitk::TubeGraphDataInteractor::DataNodeChanged()
 
 bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
-  TubeGraphPicker *picker = new mitk::TubeGraphPicker();
+  auto *picker = new mitk::TubeGraphPicker();
   picker->SetTubeGraph(m_TubeGraph);
 
   TubeGraph::TubeDescriptorType tubeDescriptor = picker->GetPickedTube(positionEvent->GetPositionInWorld()).first;

@@ -68,7 +68,7 @@ mitk::vtkEventProvider::vtkEventProvider()
 
 mitk::vtkEventProvider::~vtkEventProvider()
 {
-  this->SetInteractor(0);
+  this->SetInteractor(nullptr);
 }
 
 void mitk::vtkEventProvider::SetMitkRenderWindow(mitk::RenderWindow *renWin)
@@ -155,7 +155,7 @@ void mitk::vtkEventProvider::ProcessEvents(vtkObject *object,
                                            void *clientData,
                                            void *vtkNotUsed(callData))
 {
-  vtkEventProvider *self = reinterpret_cast<vtkEventProvider *>(clientData);
+  auto *self = reinterpret_cast<vtkEventProvider *>(clientData);
   vtkRenderWindowInteractor *rwi = static_cast<vtkInteractorStyle *>(object)->GetInteractor();
 
   // base renderer

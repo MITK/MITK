@@ -154,7 +154,7 @@ public:
     mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);
 
     // dereference itk image
-    itkImage = 0;
+    itkImage = nullptr;
 
     MITK_ASSERT_EQUAL(mitkImageAfterCast, testDataImage, "Cast with test data followed by import produces same images");
   }

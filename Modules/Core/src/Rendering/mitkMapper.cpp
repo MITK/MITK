@@ -98,7 +98,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 
   assert(node != nullptr);
 
-  mitk::BaseData *data = static_cast<mitk::BaseData *>(node->GetData());
+  auto *data = static_cast<mitk::BaseData *>(node->GetData());
 
   if (!data)
     return;

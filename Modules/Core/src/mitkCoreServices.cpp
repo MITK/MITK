@@ -102,11 +102,11 @@ namespace mitk
     bool success = false;
 
     itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
-    std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>>::iterator iter =
+    auto iter =
       s_ContextToServicesMap().find(context);
     if (iter != s_ContextToServicesMap().end())
     {
-      std::map<void *, us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
+      auto iter2 = iter->second.find(service);
       if (iter2 != iter->second.end())
       {
         us::ServiceReferenceU serviceRef = iter2->second;

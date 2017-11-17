@@ -54,7 +54,7 @@ const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::G
     timeSelector->SetTimeNr(t);
     timeSelector->UpdateLargestPossibleRegion();
 
-    mitk::HistogramGenerator *generator =
+    auto *generator =
       static_cast<mitk::HistogramGenerator *>(m_HistogramGeneratorObject.GetPointer());
     generator->SetImage(timeSelector->GetOutput());
     generator->ComputeHistogram();

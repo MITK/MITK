@@ -41,8 +41,8 @@ public:
 
   void tearDown() override
   {
-    regularImage = 0;
-    multilabelImage = 0;
+    regularImage = nullptr;
+    multilabelImage = nullptr;
   }
 
   void TestReadWrite3DLabelSetImage()

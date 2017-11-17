@@ -34,7 +34,7 @@ mitk::SliceBasedInterpolationController::InterpolatorMapType
 mitk::SliceBasedInterpolationController *mitk::SliceBasedInterpolationController::InterpolatorForImage(
   const Image *image)
 {
-  InterpolatorMapType::iterator iter = s_InterpolatorForImage.find(image);
+  auto iter = s_InterpolatorForImage.find(image);
   if (iter != s_InterpolatorForImage.end())
   {
     return iter->second;
@@ -53,7 +53,7 @@ mitk::SliceBasedInterpolationController::SliceBasedInterpolationController()
 mitk::SliceBasedInterpolationController::~SliceBasedInterpolationController()
 {
   // remove this from the list of interpolators
-  for (InterpolatorMapType::iterator iter = s_InterpolatorForImage.begin(); iter != s_InterpolatorForImage.end();
+  for (auto iter = s_InterpolatorForImage.begin(); iter != s_InterpolatorForImage.end();
        ++iter)
   {
     if (iter->second == this)
@@ -92,7 +92,7 @@ void mitk::SliceBasedInterpolationController::SetWorkingImage(LabelSetImage *new
   if (m_WorkingImage != newImage)
   {
     // delete the current working image from the list of interpolators
-    InterpolatorMapType::iterator iter = s_InterpolatorForImage.find(m_WorkingImage);
+    auto iter = s_InterpolatorForImage.find(m_WorkingImage);
     if (iter != s_InterpolatorForImage.end())
     {
       s_InterpolatorForImage.erase(iter);
@@ -228,7 +228,7 @@ void mitk::SliceBasedInterpolationController::ScanSliceITKProcessing(const itk::
   while (!iter.IsAtEnd())
   {
     index = iter.GetIndex();
-    int value = static_cast<int>(iter.Get());
+    auto value = static_cast<int>(iter.Get());
     ++m_LabelCountInSlice[timeStep][dim0][index[0]][value];
     ++m_LabelCountInSlice[timeStep][dim1][index[1]][value];
     ++numberOfPixels[value];

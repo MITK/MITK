@@ -91,7 +91,7 @@ void mitk::LabelAnnotation3D::UpdateVtkAnnotation(mitk::BaseRenderer *renderer)
   {
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 
-    size_t pointsetsize = (size_t)m_LabelCoordinates->GetSize();
+    auto pointsetsize = (size_t)m_LabelCoordinates->GetSize();
     ls->m_Labels->SetNumberOfValues(pointsetsize);
     ls->m_Sizes->SetNumberOfValues(pointsetsize);
 

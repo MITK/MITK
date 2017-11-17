@@ -34,11 +34,11 @@ class QmitkFileReaderOptionsDialog : public QDialog
 
 public:
   explicit QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo &loadInfo, QWidget *parent = 0);
-  ~QmitkFileReaderOptionsDialog();
+  ~QmitkFileReaderOptionsDialog() override;
 
   bool ReuseOptions() const;
 
-  virtual void accept() override;
+  void accept() override;
 
 private:
   Ui::QmitkFileReaderOptionsDialog *ui;

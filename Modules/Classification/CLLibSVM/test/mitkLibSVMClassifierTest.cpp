@@ -72,7 +72,7 @@ public:
     typename itk::CSVArray2DDataObject<T>::Pointer p = fr->GetOutput();
     unsigned int maxrowrange = p->GetMatrix().rows();
     unsigned int c = p->GetMatrix().cols();
-    unsigned int percentRange = (unsigned int)(maxrowrange*range);
+    auto percentRange = (unsigned int)(maxrowrange*range);
 
     if(isXMatrix == true)
     {

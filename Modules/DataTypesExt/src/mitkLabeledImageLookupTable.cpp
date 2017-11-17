@@ -70,7 +70,7 @@ mitk::LabeledImageLookupTable::~LabeledImageLookupTable()
 mitk::LabeledImageLookupTable &mitk::LabeledImageLookupTable::operator=(const mitk::LookupTable &other)
 {
   LookupTable::operator=(other);
-  if (const LabeledImageLookupTable *lut = dynamic_cast<const LabeledImageLookupTable *>(&other))
+  if (const auto *lut = dynamic_cast<const LabeledImageLookupTable *>(&other))
   {
     this->m_LevelWindow = lut->m_LevelWindow;
   }

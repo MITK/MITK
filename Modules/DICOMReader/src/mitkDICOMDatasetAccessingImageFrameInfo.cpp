@@ -67,7 +67,7 @@ mitk::ConvertToDICOMDatasetAccessingImageFrameList(const DICOMDatasetList& input
 
   for (auto& inputIter : input)
   {
-    DICOMDatasetAccessingImageFrameInfo* afi = dynamic_cast<DICOMDatasetAccessingImageFrameInfo*>(inputIter);
+    auto* afi = dynamic_cast<DICOMDatasetAccessingImageFrameInfo*>(inputIter);
     assert(afi);
     output.push_back(afi);
   }

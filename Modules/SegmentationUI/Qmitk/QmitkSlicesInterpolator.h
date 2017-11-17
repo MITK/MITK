@@ -91,7 +91,7 @@ public:
 
   void Uninitialize();
 
-  virtual ~QmitkSlicesInterpolator();
+  ~QmitkSlicesInterpolator() override;
 
   void SetDataStorage(mitk::DataStorage::Pointer storage);
   mitk::DataStorage *GetDataStorage();

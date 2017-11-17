@@ -186,7 +186,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   typedef mitk::DataStorage::SetOfObjects NodeSetType;
   NodeSetType::ConstPointer nodes = m_DataStorage->GetAll();
   NodeSetType::ConstIterator it = nodes->Begin();
-  mitk::DataNode::Pointer propNode = 0;
+  mitk::DataNode::Pointer propNode = nullptr;
   while (it != nodes->End())
   {
     mitk::DataNode::Pointer node = it.Value();
@@ -372,7 +372,7 @@ void mitk::LevelWindowManager::RecaluclateLevelWindowForSelectedComponent(const 
       mitk::LevelWindow selectedLevelWindow;
       node->GetLevelWindow(selectedLevelWindow); // node is an image node because of predicates
 
-      mitk::Image *image = dynamic_cast<mitk::Image *>(node->GetData());
+      auto *image = dynamic_cast<mitk::Image *>(node->GetData());
       int displayedComponent = 0;
       if (image && (node->GetIntProperty("Image.Displayed Component", displayedComponent)))
       { // we found a selected image with a displayed component
@@ -516,42 +516,42 @@ mitk::Image *mitk::LevelWindowManager::GetCurrentImage()
 
 void mitk::LevelWindowManager::ClearPropObserverLists()
 {
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); ++iter)
+  for (auto iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode.clear();
 
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode2.begin(); iter != m_PropObserverToNode2.end();
+  for (auto iter = m_PropObserverToNode2.begin(); iter != m_PropObserverToNode2.end();
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode2.clear();
 
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode3.begin(); iter != m_PropObserverToNode3.end();
+  for (auto iter = m_PropObserverToNode3.begin(); iter != m_PropObserverToNode3.end();
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode3.clear();
 
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode4.begin(); iter != m_PropObserverToNode4.end();
+  for (auto iter = m_PropObserverToNode4.begin(); iter != m_PropObserverToNode4.end();
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode4.clear();
 
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode5.begin(); iter != m_PropObserverToNode5.end();
+  for (auto iter = m_PropObserverToNode5.begin(); iter != m_PropObserverToNode5.end();
        ++iter)
   {
     (*iter).second->RemoveObserver((*iter).first.first);
-    (*iter).second = 0;
+    (*iter).second = nullptr;
   }
   m_PropObserverToNode5.clear();
 }

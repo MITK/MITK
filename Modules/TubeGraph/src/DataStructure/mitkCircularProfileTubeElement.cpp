@@ -58,7 +58,7 @@ bool mitk::CircularProfileTubeElement::operator==(const mitk::TubeElement &right
   // Check if given TubeElement is CircularProfileTubeElement
   if (dynamic_cast<const mitk::CircularProfileTubeElement *>(&right))
   {
-    const mitk::CircularProfileTubeElement *element = dynamic_cast<const mitk::CircularProfileTubeElement *>(&right);
+    const auto *element = dynamic_cast<const mitk::CircularProfileTubeElement *>(&right);
     return ((m_diameter == element->m_diameter) && (m_coordinates == element->m_coordinates));
   }
   else

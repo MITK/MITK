@@ -39,7 +39,7 @@ void PlanarFigureMaskGenerator::SetPlanarFigure(mitk::PlanarFigure::Pointer plan
       throw std::runtime_error( "Planar-Figure not yet initialized!" );
     }
 
-    const PlaneGeometry *planarFigureGeometry =
+    const auto *planarFigureGeometry =
       dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
     if ( planarFigureGeometry == nullptr )
     {
@@ -402,7 +402,7 @@ void PlanarFigureMaskGenerator::CalculateMask()
 
     m_InternalITKImageMask2D = nullptr;
     const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-    const PlaneGeometry *planarFigureGeometry = dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
+    const auto *planarFigureGeometry = dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
     //const BaseGeometry *imageGeometry = m_inputImage->GetGeometry();
 
     // Find principal direction of PlanarFigure in input image

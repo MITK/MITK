@@ -47,7 +47,7 @@ mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
 
 mitk::BaseRenderer *mitk::BaseRenderer::GetInstance(vtkRenderWindow *renWin)
 {
-  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
+  for (auto mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
   {
     if ((*mapit).first == renWin)
       return (*mapit).second;
@@ -68,14 +68,14 @@ void mitk::BaseRenderer::AddInstance(vtkRenderWindow *renWin, BaseRenderer *base
 
 void mitk::BaseRenderer::RemoveInstance(vtkRenderWindow *renWin)
 {
-  BaseRendererMapType::iterator mapit = baseRendererMap.find(renWin);
+  auto mapit = baseRendererMap.find(renWin);
   if (mapit != baseRendererMap.end())
     baseRendererMap.erase(mapit);
 }
 
 mitk::BaseRenderer *mitk::BaseRenderer::GetByName(const std::string &name)
 {
-  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
+  for (auto mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
   {
     if ((*mapit).second->m_Name == name)
       return (*mapit).second;
@@ -85,7 +85,7 @@ mitk::BaseRenderer *mitk::BaseRenderer::GetByName(const std::string &name)
 
 vtkRenderWindow *mitk::BaseRenderer::GetRenderWindowByName(const std::string &name)
 {
-  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
+  for (auto mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
   {
     if ((*mapit).second->m_Name == name)
       return (*mapit).first;
@@ -497,7 +497,7 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::BaseGeometry *geometry)
 
 void mitk::BaseRenderer::SetGeometry(const itk::EventObject &geometrySendEvent)
 {
-  const SliceNavigationController::GeometrySendEvent *sendEvent =
+  const auto *sendEvent =
     dynamic_cast<const SliceNavigationController::GeometrySendEvent *>(&geometrySendEvent);
 
   assert(sendEvent != nullptr);
@@ -506,7 +506,7 @@ void mitk::BaseRenderer::SetGeometry(const itk::EventObject &geometrySendEvent)
 
 void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject &geometryUpdateEvent)
 {
-  const SliceNavigationController::GeometryUpdateEvent *updateEvent =
+  const auto *updateEvent =
     dynamic_cast<const SliceNavigationController::GeometryUpdateEvent *>(&geometryUpdateEvent);
 
   if (updateEvent == nullptr)
@@ -514,7 +514,7 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject &geometryUpdateEv
 
   if (m_CurrentWorldGeometry.IsNotNull())
   {
-    SlicedGeometry3D *slicedWorldGeometry = dynamic_cast<SlicedGeometry3D *>(m_CurrentWorldGeometry.GetPointer());
+    auto *slicedWorldGeometry = dynamic_cast<SlicedGeometry3D *>(m_CurrentWorldGeometry.GetPointer());
     if (slicedWorldGeometry)
     {
       PlaneGeometry *geometry2D = slicedWorldGeometry->GetPlaneGeometry(m_Slice);
@@ -526,7 +526,7 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject &geometryUpdateEv
 
 void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject &geometrySliceEvent)
 {
-  const SliceNavigationController::GeometrySliceEvent *sliceEvent =
+  const auto *sliceEvent =
     dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
 
   assert(sliceEvent != nullptr);
@@ -535,7 +535,7 @@ void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject &geometrySliceE
 
 void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject &geometryTimeEvent)
 {
-  const SliceNavigationController::GeometryTimeEvent *timeEvent =
+  const auto *timeEvent =
     dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
 
   assert(timeEvent != nullptr);

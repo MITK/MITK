@@ -233,7 +233,7 @@ void mitk::SegmentationInterpolationController::SetChangedSlice(const Image *sli
   }
 
   mitk::ImageReadAccessor readAccess(sliceDiff);
-  unsigned char *rawSlice = (unsigned char *)readAccess.GetData();
+  auto *rawSlice = (unsigned char *)readAccess.GetData();
   if (!rawSlice)
     return;
 
@@ -247,7 +247,7 @@ template <typename DATATYPE>
 void mitk::SegmentationInterpolationController::ScanChangedSlice(const itk::Image<DATATYPE, 2> *,
                                                                  const SetChangedSliceOptions &options)
 {
-  DATATYPE *pixelData((DATATYPE *)options.pixelData);
+  auto *pixelData((DATATYPE *)options.pixelData);
 
   unsigned int timeStep(options.timeStep);
 
@@ -365,7 +365,7 @@ void mitk::SegmentationInterpolationController::ScanWholeVolume(const itk::Image
 
   for (unsigned int slice = 0; slice < volume->GetDimension(2); ++slice)
   {
-    const DATATYPE *rawVolume =
+    const auto *rawVolume =
       static_cast<const DATATYPE *>(readAccess.GetData()); // we again promise not to change anything, we'll just count
     const DATATYPE *rawSlice = rawVolume + (volume->GetDimension(0) * volume->GetDimension(1) * slice);
 

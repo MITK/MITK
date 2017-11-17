@@ -198,7 +198,7 @@ void mitk::BoundingShapeInteractor::SetDataNode(DataNode *node)
 
 bool mitk::BoundingShapeInteractor::CheckOverObject(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -247,7 +247,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
 {
   Point3D boundingBoxCenter;
   HandlePositionChanged(interactionEvent, boundingBoxCenter);
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -387,7 +387,7 @@ void mitk::BoundingShapeInteractor::InitInteraction(StateMachineAction *, Intera
 
 bool mitk::BoundingShapeInteractor::InitMembers(InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -401,7 +401,7 @@ bool mitk::BoundingShapeInteractor::InitMembers(InteractionEvent *interactionEve
 
 void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -434,7 +434,7 @@ void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction *, Intera
 
 void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -560,7 +560,7 @@ void mitk::BoundingShapeInteractor::EnableCrosshairNavigation()
   // enable the crosshair navigation
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
-  for (std::map<us::ServiceReferenceU, mitk::EventConfig>::iterator it = m_Impl->DisplayInteractorConfigs.begin();
+  for (auto it = m_Impl->DisplayInteractorConfigs.begin();
        it != m_Impl->DisplayInteractorConfigs.end();
        ++it)
   {
@@ -593,11 +593,11 @@ void mitk::BoundingShapeInteractor::DisableCrosshairNavigation()
   m_Impl->DisplayInteractorConfigs.clear();
   std::vector<us::ServiceReference<mitk::InteractionEventObserver>> listEventObserver =
     us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
-  for (std::vector<us::ServiceReference<mitk::InteractionEventObserver>>::iterator it = listEventObserver.begin();
+  for (auto it = listEventObserver.begin();
        it != listEventObserver.end();
        ++it)
   {
-    mitk::DisplayInteractor *displayInteractor =
+    auto *displayInteractor =
       dynamic_cast<mitk::DisplayInteractor *>(us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(*it));
     if (displayInteractor != nullptr)
     {

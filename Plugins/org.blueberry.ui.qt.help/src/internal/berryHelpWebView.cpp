@@ -79,7 +79,7 @@ class HelpDeviceReply final : public QIODevice
 {
 public:
   HelpDeviceReply(const QUrl& request, const QByteArray& fileData);
-  ~HelpDeviceReply();
+  ~HelpDeviceReply() override;
 
   qint64 bytesAvailable() const override;
   void close() override;
@@ -140,7 +140,7 @@ class HelpUrlSchemeHandler final : public QWebEngineUrlSchemeHandler
 {
 public:
   explicit HelpUrlSchemeHandler(QObject* parent = nullptr);
-  ~HelpUrlSchemeHandler();
+  ~HelpUrlSchemeHandler() override;
 
   void requestStarted(QWebEngineUrlRequestJob* job) override;
 };
@@ -220,7 +220,7 @@ class HelpPage final : public QWebEnginePage
 {
 public:
   explicit HelpPage(QObject* parent = nullptr);
-  ~HelpPage();
+  ~HelpPage() override;
 
 private:
   bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;

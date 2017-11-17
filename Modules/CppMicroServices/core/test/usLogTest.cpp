@@ -88,7 +88,7 @@ void logMsg(MsgType msgType, int logLevel)
 void testLogMessages()
 {
   // Use the default message handler
-  installMsgHandler(0);
+  installMsgHandler(nullptr);
   {
     US_DEBUG << "Msg";
     US_DEBUG(false) << "Msg";
@@ -132,7 +132,7 @@ void testLogMessages()
 
   // We cannot test US_ERROR since it will call abort().
 
-  installMsgHandler(0);
+  installMsgHandler(nullptr);
 
   {
     US_INFO << "Info msg";
@@ -162,7 +162,7 @@ void testLogLevels()
     logMsg(ErrorMsg, level);
   }
 
-  installMsgHandler(0);
+  installMsgHandler(nullptr);
   resetLastMsg();
 }
 

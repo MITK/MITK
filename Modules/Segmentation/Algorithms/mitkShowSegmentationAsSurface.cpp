@@ -131,8 +131,8 @@ namespace mitk
     if (!polyData)
       throw std::logic_error("Could not create polygon model");
 
-    polyData->SetVerts(0);
-    polyData->SetLines(0);
+    polyData->SetVerts(nullptr);
+    polyData->SetLines(nullptr);
 
     if (smooth || applyMedian || decimateMesh)
     {
@@ -163,7 +163,7 @@ namespace mitk
     GetParameter("Wireframe", wireframe);
     if (wireframe)
     {
-      VtkRepresentationProperty *np =
+      auto *np =
         dynamic_cast<VtkRepresentationProperty *>(m_Node->GetProperty("material.representation"));
       if (np)
         np->SetRepresentationToWireframe();

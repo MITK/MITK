@@ -239,7 +239,7 @@ mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::
          currentPoint = currentPoint->NextSiblingElement())
     {
       unsigned int id(0);
-      mitk::PointSpecificationType spec((mitk::PointSpecificationType)0);
+      auto spec((mitk::PointSpecificationType)0);
       double x(0.0);
       double y(0.0);
       double z(0.0);

@@ -82,7 +82,7 @@ namespace mitk
 
   MimeType MimeTypeProvider::GetMimeTypeForName(const std::string &name) const
   {
-    std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.find(name);
+    auto iter = m_NameToMimeType.find(name);
     if (iter != m_NameToMimeType.end())
       return iter->second;
     return MimeType();
@@ -157,7 +157,7 @@ namespace mitk
         {
           rank = us::any_cast<int>(rankProp);
         }
-        long id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
+        auto id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
         result = MimeType(*mimeType, rank, id);
       }
       catch (const us::BadAnyCastException &e)

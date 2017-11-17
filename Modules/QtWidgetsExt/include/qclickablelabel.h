@@ -38,7 +38,7 @@ class MITKQTWIDGETSEXT_EXPORT QClickableLabel : public QLabel
 public:
   QClickableLabel(QWidget *parent, Qt::WindowFlags f = nullptr);
   QClickableLabel(const QString &text, QWidget *parent, Qt::WindowFlags f = nullptr);
-  virtual ~QClickableLabel();
+  ~QClickableLabel() override;
 
   void AddHotspot(const QString &name, const QRect position);
 
@@ -54,8 +54,8 @@ signals:
   void mouseReleased(unsigned int hotspotIndex);
 
 protected:
-  virtual void mousePressEvent(QMouseEvent *e) override;
-  virtual void mouseReleaseEvent(QMouseEvent *e) override;
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
 
   /// returns index == m_Hotspots.size() if nothing is hit
   unsigned int matchingRect(const QPoint &p);

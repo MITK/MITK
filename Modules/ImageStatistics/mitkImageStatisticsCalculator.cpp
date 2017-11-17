@@ -180,7 +180,7 @@ namespace mitk
 
         m_StatisticsUpdateTimePerTimeStep[timeStep] = m_StatisticsByTimeStep[timeStep][m_StatisticsByTimeStep[timeStep].size()-1]->GetMTime();
 
-        for (std::vector<StatisticsContainer::Pointer>::iterator it = m_StatisticsByTimeStep[timeStep].begin(); it != m_StatisticsByTimeStep[timeStep].end(); ++it)
+        for (auto it = m_StatisticsByTimeStep[timeStep].begin(); it != m_StatisticsByTimeStep[timeStep].end(); ++it)
         {
             StatisticsContainer::Pointer statCont = *it;
             if (statCont->GetLabel() == label)
@@ -398,7 +398,7 @@ namespace mitk
         imageStatisticsFilter->Update();
 
         std::list<int> labels = imageStatisticsFilter->GetRelevantLabels();
-        std::list<int>::iterator it = labels.begin();
+        auto it = labels.begin();
         m_StatisticsByTimeStep[timeStep].resize(0);
 
         while(it != labels.end())

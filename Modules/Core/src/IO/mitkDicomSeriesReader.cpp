@@ -482,7 +482,7 @@ namespace mitk
     SliceGroupingAnalysisResult result;
 
     // we const_cast here, because I could not use a map.at(), which would make the code much more readable
-    gdcm::Scanner::MappingType &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(tagValueMappings_);
+    auto &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(tagValueMappings_);
     const gdcm::Tag tagImagePositionPatient(0x0020, 0x0032); // Image Position (Patient)
     const gdcm::Tag tagImageOrientation(0x0020, 0x0037);     // Image Orientation
     const gdcm::Tag tagGantryTilt(0x0018, 0x1120);           // gantry tilt
@@ -1376,7 +1376,7 @@ namespace mitk
     StringLookupTable instanceNumberForSlices;
     StringLookupTable SOPInstanceNumberForSlices;
 
-    gdcm::Scanner::MappingType &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(tagValueMappings_);
+    auto &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(tagValueMappings_);
 
     // DICOM tags which should be added to the image properties
     const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
@@ -1539,7 +1539,7 @@ namespace mitk
         ScanForSliceInformation(filenames, scanner);
 
         // need non-const access for map
-        gdcm::Scanner::MappingType &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(scanner.GetMappings());
+        auto &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(scanner.GetMappings());
 
         std::list<StringContainer> imageBlocks =
           SortIntoBlocksFor3DplusT(filenames, tagValueMappings, sort, canLoadAs4D);

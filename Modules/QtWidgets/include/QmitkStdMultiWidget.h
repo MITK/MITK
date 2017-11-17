@@ -59,7 +59,7 @@ public:
     mitk::RenderingManager *renderingManager = 0,
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
     const QString &name = "stdmulti");
-  virtual ~QmitkStdMultiWidget();
+  ~QmitkStdMultiWidget() override;
 
   mitk::SliceNavigationController *GetTimeNavigationController();
 

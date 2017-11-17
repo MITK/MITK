@@ -57,7 +57,7 @@ int mitkSurfaceTest(int /*argc*/, char * /*argv*/ [])
 
   surface->UpdateOutputInformation();
   surface->SetRequestedRegionToLargestPossibleRegion();
-  mitk::BoundingBox *bb = const_cast<mitk::BoundingBox *>(surface->GetGeometry()->GetBoundingBox());
+  auto *bb = const_cast<mitk::BoundingBox *>(surface->GetGeometry()->GetBoundingBox());
   mitk::BoundingBox::BoundsArrayType surfBounds = bb->GetBounds();
 
   bool passed = false;

@@ -64,7 +64,7 @@ void mitk::CameraRotationController::AcquireCamera()
 {
   BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(m_RenderWindow);
 
-  const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(renderer);
+  const auto *propRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(renderer);
   if (propRenderer)
   {
     // get vtk renderer

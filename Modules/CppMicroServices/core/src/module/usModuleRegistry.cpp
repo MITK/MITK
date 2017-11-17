@@ -78,17 +78,17 @@ void ModuleRegistry::Register(ModuleInfo* info)
   if (info->id > 0)
   {
     // The module was already registered
-    Module* module = 0;
+    Module* module = nullptr;
     {
       MutexLock lock(*modulesLock());
       module = modules()->operator[](info->name);
-      assert(module != 0);
+      assert(module != nullptr);
     }
     module->Start();
   }
   else
   {
-    Module* module = 0;
+    Module* module = nullptr;
     // check if the module is reloaded
     {
       MutexLock lock(*modulesLock());
@@ -132,11 +132,11 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
 {
   if (info->id > 1)
   {
-    Module* curr = 0;
+    Module* curr = nullptr;
     {
       MutexLock lock(*modulesLock());
       curr = modules()->operator[](info->name);
-      assert(curr != 0);
+      assert(curr != nullptr);
     }
     curr->Stop();
   }
@@ -155,7 +155,7 @@ Module* ModuleRegistry::GetModule(long id)
       return iter->second;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 Module* ModuleRegistry::GetModule(const std::string& name)
@@ -167,7 +167,7 @@ Module* ModuleRegistry::GetModule(const std::string& name)
   {
     return iter->second;
   }
-  return 0;
+  return nullptr;
 }
 
 std::vector<Module*> ModuleRegistry::GetModules()

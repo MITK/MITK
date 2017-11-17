@@ -47,7 +47,7 @@ bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData *referenceData) const
   if (referenceData == nullptr)
     return false;
 
-  Image *image = dynamic_cast<Image *>(referenceData);
+  auto *image = dynamic_cast<Image *>(referenceData);
 
   if (image == nullptr)
     return false;

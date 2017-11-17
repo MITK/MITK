@@ -66,7 +66,7 @@ public:
   {
     // we want to make sure that the following strings will be accepted and returned
     // by our conversion functions. This must not change in the future to ensure compatibility
-    DATATYPE nan = boost::lexical_cast<DATATYPE>("nan");
+    auto nan = boost::lexical_cast<DATATYPE>("nan");
     CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan == nan));
     nan = boost::lexical_cast<DATATYPE>("NAN");
     CPPUNIT_ASSERT_MESSAGE("NAN==NAN must be false", !(nan == nan));
@@ -92,7 +92,7 @@ public:
   void CheckRoundTrip(DATATYPE number, DATATYPE tolerance)
   {
     std::string s = boost::lexical_cast<std::string>(number);
-    DATATYPE number2 = boost::lexical_cast<DATATYPE>(s);
+    auto number2 = boost::lexical_cast<DATATYPE>(s);
 
     CPPUNIT_ASSERT_MESSAGE(std::string("Must not parse string ") + s + " as NaN", number2 == number2);
     if (tolerance == 0)
@@ -108,12 +108,12 @@ public:
   template <typename DATATYPE>
   void CheckRoundTrip(const std::string &input)
   {
-    DATATYPE number = boost::lexical_cast<DATATYPE>(input);
+    auto number = boost::lexical_cast<DATATYPE>(input);
     std::string result = boost::lexical_cast<std::string>(number);
 
     // There are normal imprecisions when converting to string
     // We do only compare if the numeric values match "close enough"
-    DATATYPE number2 = boost::lexical_cast<DATATYPE>(result);
+    auto number2 = boost::lexical_cast<DATATYPE>(result);
     CPPUNIT_ASSERT(mitk::Equal(number, number2));
   }
 

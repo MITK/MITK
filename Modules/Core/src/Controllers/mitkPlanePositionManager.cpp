@@ -30,7 +30,7 @@ unsigned int mitk::PlanePositionManagerService::AddNewPlanePosition(const PlaneG
 {
   for (unsigned int i = 0; i < m_PositionList.size(); ++i)
   {
-    if (m_PositionList[i] != 0)
+    if (m_PositionList[i] != nullptr)
     {
       bool isSameMatrix(true);
       bool isSameOffset(true);
@@ -94,7 +94,7 @@ mitk::RestorePlanePositionOperation *mitk::PlanePositionManagerService::GetPlane
   else
   {
     MITK_WARN << "GetPlanePosition returned nullptr!";
-    return 0;
+    return nullptr;
   }
 }
 

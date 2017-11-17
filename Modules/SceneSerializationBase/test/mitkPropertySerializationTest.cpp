@@ -220,7 +220,7 @@ void TestAllProperties(const mitk::PropertyList *propList)
   assert(propList);
 
   /* try to serialize each property in the list, then deserialize again and check for equality */
-  for (mitk::PropertyList::PropertyMap::const_iterator it = propList->GetMap()->begin();
+  for (auto it = propList->GetMap()->begin();
        it != propList->GetMap()->end();
        ++it)
   {
@@ -240,7 +240,7 @@ void TestAllProperties(const mitk::PropertyList *propList)
       MITK_TEST_OUTPUT(<< "Warning: " << allSerializers.size() << " serializers found for " << prop->GetNameOfClass()
                        << "testing only the first one.");
     }
-    mitk::BasePropertySerializer *serializer =
+    auto *serializer =
       dynamic_cast<mitk::BasePropertySerializer *>(allSerializers.begin()->GetPointer());
     MITK_TEST_CONDITION(serializer != nullptr, serializername + std::string(" is valid"));
     if (serializer != nullptr)

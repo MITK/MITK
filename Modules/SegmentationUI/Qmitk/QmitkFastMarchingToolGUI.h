@@ -58,7 +58,7 @@ protected slots:
 
 protected:
   QmitkFastMarchingToolGUI();
-  virtual ~QmitkFastMarchingToolGUI();
+  ~QmitkFastMarchingToolGUI() override;
 
   void Update();
 

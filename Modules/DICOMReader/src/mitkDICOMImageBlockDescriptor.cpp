@@ -802,7 +802,7 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     }
 
     // add property or properties with proper names
-    DICOMImageBlockDescriptor* thisInstance = const_cast<DICOMImageBlockDescriptor*>( this );
+    auto* thisInstance = const_cast<DICOMImageBlockDescriptor*>( this );
     thisInstance->SetProperty( "sliceLocationForSlices",
                                StringLookupTableProperty::New( sliceLocationForSlices ) );
 

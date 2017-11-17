@@ -39,7 +39,7 @@ mitk::InteractionKeyEvent::~InteractionKeyEvent()
 
 bool mitk::InteractionKeyEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::InteractionKeyEvent &keyEvent = static_cast<const Self &>(interactionEvent);
+  const auto &keyEvent = static_cast<const Self &>(interactionEvent);
   return (this->GetModifiers() == keyEvent.GetModifiers() && this->GetKey() == keyEvent.GetKey() &&
           Superclass::IsEqual(interactionEvent));
 }

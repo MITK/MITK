@@ -119,7 +119,7 @@ void mitk::VtkMapper::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
   vtkLinearTransform *vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
 
-  vtkProp3D *prop = dynamic_cast<vtkProp3D *>(GetVtkProp(renderer));
+  auto *prop = dynamic_cast<vtkProp3D *>(GetVtkProp(renderer));
   if (prop)
     prop->SetUserTransform(vtktransform);
 }

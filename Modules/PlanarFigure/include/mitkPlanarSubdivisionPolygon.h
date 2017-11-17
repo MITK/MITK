@@ -51,7 +51,7 @@ namespace mitk
     * \brief Returns the id of the control-point that corresponds to the given
     * polyline-point.
     */
-    int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const;
+    int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const override;
 
     /** \brief Parameter w_tension defines the tension.
      * the higher w_tension, the lower the "tension" on points.

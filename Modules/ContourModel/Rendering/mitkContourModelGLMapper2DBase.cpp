@@ -43,7 +43,7 @@ mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 
 void mitk::ContourModelGLMapper2DBase::Initialize(mitk::BaseRenderer *)
 {
-  vtkOpenGLContextDevice2D *device = NULL;
+  vtkOpenGLContextDevice2D *device = nullptr;
   device = vtkOpenGLContextDevice2D::New();
   if (device)
   {
@@ -168,7 +168,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
     bool projectmode = false;
     dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
 
-    mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
+    auto pointsIt = renderingContour->IteratorBegin(timestep);
 
     Point2D pt2d; // projected_p in display coordinates
     Point2D lastPt2d;
@@ -237,7 +237,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
                                                  selectedcolor->GetColor().GetGreen());
             this->m_Context->GetPen()->SetWidth(1);
             // a rectangle around the point with the selected color
-            float* rectPts = new float[8];
+            auto* rectPts = new float[8];
             tmp = pt2d - horz;
             rectPts[0] = tmp[0];
             rectPts[1] = tmp[1];
@@ -271,7 +271,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
           this->m_Context->GetPen()->SetColorF(0.0, 0.0, 0.0);
           this->m_Context->GetPen()->SetWidth(1);
           // a rectangle around the point with the selected color
-          float* rectPts = new float[8];
+          auto* rectPts = new float[8];
           tmp = pt2d - horz;
           rectPts[0] = tmp[0];
           rectPts[1] = tmp[1];
@@ -366,7 +366,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
         this->m_Context->GetPen()->SetColorF(0.0, 1.0, 0.0);
         this->m_Context->GetPen()->SetWidth(1);
         // a rectangle around the point with the selected color
-        float* rectPts = new float[8];
+        auto* rectPts = new float[8];
         // a diamond around the point
         // begin from upper left corner and paint clockwise
         rectPts[0] = pt2d[0] - pointsize;

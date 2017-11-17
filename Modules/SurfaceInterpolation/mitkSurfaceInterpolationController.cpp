@@ -626,7 +626,7 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surfa
 void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object *caller,
                                                                  const itk::EventObject & /*event*/)
 {
-  mitk::Image *tempImage = dynamic_cast<mitk::Image *>(const_cast<itk::Object *>(caller));
+  auto *tempImage = dynamic_cast<mitk::Image *>(const_cast<itk::Object *>(caller));
   if (tempImage)
   {
     if (m_SelectedSegmentation == tempImage)

@@ -90,8 +90,8 @@ public:
       mitk::ImageReadAccessor origImgAcc(image, image->GetVolumeData(timeStep));
       mitk::ImageReadAccessor unCompImgAcc(uncompressedImage, uncompressedImage->GetVolumeData(timeStep));
 
-      unsigned char *originalData((unsigned char *)origImgAcc.GetData());
-      unsigned char *uncompressedData((unsigned char *)unCompImgAcc.GetData());
+      auto *originalData((unsigned char *)origImgAcc.GetData());
+      auto *uncompressedData((unsigned char *)unCompImgAcc.GetData());
 
       unsigned long difference(0);
       for (unsigned long byte = 0; byte < oneTimeStepSizeInBytes; ++byte)

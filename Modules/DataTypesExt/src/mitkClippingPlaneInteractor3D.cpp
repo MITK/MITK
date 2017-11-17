@@ -63,7 +63,7 @@ void mitk::ClippingPlaneInteractor3D::DataNodeChanged()
 
 bool mitk::ClippingPlaneInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -107,7 +107,7 @@ void mitk::ClippingPlaneInteractor3D::DeselectObject(StateMachineAction *, Inter
 
 void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -132,7 +132,7 @@ void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, Intera
 
 void mitk::ClippingPlaneInteractor3D::InitRotate(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -155,7 +155,7 @@ void mitk::ClippingPlaneInteractor3D::InitRotate(StateMachineAction *, Interacti
 
 void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
@@ -209,7 +209,7 @@ void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, Inte
 
 void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 

@@ -57,7 +57,7 @@ protected slots:
 
 protected:
   QmitkPaintbrushToolGUI();
-  virtual ~QmitkPaintbrushToolGUI();
+  ~QmitkPaintbrushToolGUI() override;
 
   QSlider *m_Slider;
   QLabel *m_SizeLabel;

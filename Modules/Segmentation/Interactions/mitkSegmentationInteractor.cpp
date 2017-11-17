@@ -33,7 +33,7 @@ void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
   // MLI TODO
   // m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
@@ -45,7 +45,7 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, Inter
   DataNode *workingNode(toolManager->GetWorkingData(0));
   if (workingNode)
   {
-    mitk::LabelSetImage *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+    auto *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
     assert(workingImage);
 
     int timestep = positionEvent->GetSender()->GetTimeStep();

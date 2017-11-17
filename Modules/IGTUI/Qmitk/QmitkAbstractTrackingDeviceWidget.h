@@ -58,7 +58,7 @@ public:
 
   QmitkAbstractTrackingDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
 
-  virtual ~QmitkAbstractTrackingDeviceWidget();
+  ~QmitkAbstractTrackingDeviceWidget() override;
 
   /**
    * \brief Return pointer to copy of the object.

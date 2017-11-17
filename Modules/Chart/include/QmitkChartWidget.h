@@ -76,7 +76,7 @@ public:
   };
 
   explicit QmitkChartWidget(QWidget* parent = nullptr);
-  virtual ~QmitkChartWidget();
+  ~QmitkChartWidget() override;
 
   /*!
   * \brief Adds 1D data to the widget

@@ -32,11 +32,10 @@ int mitkPropertyAliasesTest(int, char *[])
   propertyAliases->AddAlias("propertyName2", "alias2b", "className");
 
   typedef std::vector<std::string> Aliases;
-  typedef Aliases::iterator AliasesIterator;
 
   Aliases aliases = propertyAliases->GetAliases("propertyName1");
-  AliasesIterator it1 = std::find(aliases.begin(), aliases.end(), "alias1a");
-  AliasesIterator it2 = std::find(aliases.begin(), aliases.end(), "alias1b");
+  auto it1 = std::find(aliases.begin(), aliases.end(), "alias1a");
+  auto it2 = std::find(aliases.begin(), aliases.end(), "alias1b");
 
   MITK_TEST_CONDITION(aliases.size() == 2 && it1 != aliases.end() && it2 != aliases.end(),
                       "Get aliases of \"propertyName1\"");

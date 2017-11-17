@@ -59,7 +59,7 @@ public:
   void tearDown() override
   {
     // Delete LabelSetImage
-    m_LabelSetImage = 0;
+    m_LabelSetImage = nullptr;
   }
 
   void Result_Match_Expectation()

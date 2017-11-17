@@ -187,8 +187,8 @@ mitk::InteractionTestHelper::~InteractionTestHelper()
   mitk::RenderingManager *rm = mitk::RenderingManager::GetInstance();
 
   // unregister renderers
-  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
-  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+  auto it = m_RenderWindowList.begin();
+  auto end = m_RenderWindowList.end();
 
   for (; it != end; ++it)
   {
@@ -218,8 +218,8 @@ void mitk::InteractionTestHelper::PlaybackInteraction()
   if (m_Events.empty())
     this->LoadInteraction();
 
-  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
-  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+  auto it = m_RenderWindowList.begin();
+  auto end = m_RenderWindowList.end();
   for (; it != end; ++it)
   {
     (*it)->GetRenderer()->PrepareRender();
@@ -277,8 +277,8 @@ void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
 
 mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByName(const std::string &name)
 {
-  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
-  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+  auto it = m_RenderWindowList.begin();
+  auto end = m_RenderWindowList.end();
 
   for (; it != end; ++it)
   {
@@ -292,8 +292,8 @@ mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByName(const std
 mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByDefaultViewDirection(
   mitk::SliceNavigationController::ViewDirection viewDirection)
 {
-  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
-  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+  auto it = m_RenderWindowList.begin();
+  auto end = m_RenderWindowList.end();
 
   for (; it != end; ++it)
   {

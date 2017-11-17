@@ -75,7 +75,7 @@ public:
     // todo I don't know if this image is always needed. There is no documentation of the filter. Use git blame and ask
     // the author.
     mitk::Image::Pointer additionalInputImage = mitk::Image::New();
-    unsigned int *dims = new unsigned int[3];
+    auto *dims = new unsigned int[3];
     dims[0] = 32;
     dims[1] = 32;
     dims[2] = 32;
@@ -136,7 +136,7 @@ public:
     mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
 
     mitk::Image::Pointer additionalInputImage = mitk::Image::New();
-    unsigned int *dims = new unsigned int[4];
+    auto *dims = new unsigned int[4];
     dims[0] = 32;
     dims[1] = 32;
     dims[2] = 32;

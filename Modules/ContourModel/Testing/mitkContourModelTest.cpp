@@ -389,7 +389,7 @@ static void TestContourModelAPI()
 
   MITK_TEST_CONDITION(contour1->GetIndex(vertex) == 1, "Get index");
 
-  mitk::ContourModel::VertexType *nonConstVertex = const_cast<mitk::ContourModel::VertexType *>(vertex);
+  auto *nonConstVertex = const_cast<mitk::ContourModel::VertexType *>(vertex);
 
   MITK_TEST_CONDITION(contour1->GetIndex(nonConstVertex) == 1, "Get index non-const");
 

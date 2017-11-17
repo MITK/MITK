@@ -72,7 +72,7 @@ void mitk::Dispatcher::AddDataInteractor(const DataNode *dataNode)
 
 void mitk::Dispatcher::RemoveDataInteractor(const DataNode *dataNode)
 {
-  for (ListInteractorType::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
+  for (auto it = m_Interactors.begin(); it != m_Interactors.end();)
   {
     if ((*it).IsNull() || (*it)->GetDataNode() == nullptr || (*it)->GetDataNode() == dataNode)
     {
@@ -103,7 +103,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
   InteractionEvent::Pointer p = event;
   bool eventIsHandled = false;
   /* Filter out and handle Internal Events separately */
-  InternalEvent *internalEvent = dynamic_cast<InternalEvent *>(event);
+  auto *internalEvent = dynamic_cast<InternalEvent *>(event);
   if (internalEvent != nullptr)
   {
     eventIsHandled = HandleInternalEvent(internalEvent);
@@ -191,7 +191,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
   /* Notify InteractionEventObserver  */
   const std::vector<us::ServiceReference<InteractionEventObserver>> listEventObserver =
     m_EventObserverTracker->GetServiceReferences();
-  for (std::vector<us::ServiceReference<InteractionEventObserver>>::const_iterator it = listEventObserver.cbegin();
+  for (auto it = listEventObserver.cbegin();
        it != listEventObserver.cend();
        ++it)
   {
@@ -221,7 +221,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
  */
 void mitk::Dispatcher::RemoveOrphanedInteractors()
 {
-  for (ListInteractorType::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
+  for (auto it = m_Interactors.begin(); it != m_Interactors.end();)
   {
     if ((*it).IsNull())
     {

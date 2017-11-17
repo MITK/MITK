@@ -77,7 +77,7 @@ void TestServiceFactoryModuleScope()
 #endif
 
   Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
-  US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
+  US_TEST_CONDITION_REQUIRED(moduleH != nullptr, "Test for existing module TestModuleH")
 
   std::vector<ServiceReferenceU> registeredRefs = moduleH->GetRegisteredServices();
   US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 2, "# of registered services")
@@ -132,7 +132,7 @@ void TestServiceFactoryPrototypeScope()
   }
 
   Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
-  US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
+  US_TEST_CONDITION_REQUIRED(moduleH != nullptr, "Test for existing module TestModuleH")
 #endif
 
   ModuleContext* mc = GetModuleContext();

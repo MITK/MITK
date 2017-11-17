@@ -33,7 +33,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStandardViews : public QWidget
 public:
   QmitkStandardViews(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
-  virtual ~QmitkStandardViews();
+  ~QmitkStandardViews() override;
 
   void SetCameraController(mitk::CameraController *controller);
   void SetCameraControllerFromRenderWindow(vtkRenderWindow *window);

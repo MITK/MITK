@@ -48,7 +48,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 public:
   QmitkNewSegmentationDialog(QWidget *parent = nullptr);
 
-  virtual ~QmitkNewSegmentationDialog();
+  ~QmitkNewSegmentationDialog() override;
 
   const QString GetSegmentationName();
   mitk::Color GetColor();

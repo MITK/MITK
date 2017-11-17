@@ -65,7 +65,7 @@ public:
   };
 
   QmitkToolWorkingDataSelectionBox(QWidget *parent = 0);
-  virtual ~QmitkToolWorkingDataSelectionBox();
+  ~QmitkToolWorkingDataSelectionBox() override;
 
   mitk::DataStorage *GetDataStorage();
   void SetDataStorage(mitk::DataStorage &storage);

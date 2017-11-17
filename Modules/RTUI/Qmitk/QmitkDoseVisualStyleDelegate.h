@@ -37,10 +37,10 @@ public:
   explicit QmitkDoseVisualStyleDelegate(QObject *parent = 0);
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option
-    , const QModelIndex &index) const;
+    , const QModelIndex &index) const override;
 
   bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
-    const QModelIndex &index);
+    const QModelIndex &index) override;
 
 };
 

@@ -125,7 +125,7 @@ TiXmlElement *mitk::PropertyListSerializer::SerializeOneProperty(const std::stri
 
   for (auto iter = allSerializers.begin(); iter != allSerializers.end(); ++iter)
   {
-    if (BasePropertySerializer *serializer = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
+    if (auto *serializer = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
     {
       serializer->SetProperty(property);
       try

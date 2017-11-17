@@ -53,7 +53,7 @@ void mitk::SegmentationsProcessingTool::ProcessAllObjects()
   ProgressBar::GetInstance()->AddStepsToDo(nodes.size() + 2);
 
   // for all selected nodes
-  for (ToolManager::DataVectorType::iterator nodeiter = nodes.begin(); nodeiter != nodes.end(); ++nodeiter)
+  for (auto nodeiter = nodes.begin(); nodeiter != nodes.end(); ++nodeiter)
   {
     DataNode::Pointer node = *nodeiter;
 

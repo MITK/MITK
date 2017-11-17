@@ -256,7 +256,7 @@ void MitkCoreActivator::RegisterItkReaderWriter()
 
   for (auto &allobject : allobjects)
   {
-    itk::ImageIOBase *io = dynamic_cast<itk::ImageIOBase *>(allobject.GetPointer());
+    auto *io = dynamic_cast<itk::ImageIOBase *>(allobject.GetPointer());
 
     // NiftiImageIO does not provide a correct "SupportsDimension()" methods
     // and the supported read/write extensions are not ordered correctly
@@ -299,7 +299,7 @@ void MitkCoreActivator::RegisterLegacyWriter()
 {
   std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
 
-  for (std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin(); i != allobjects.end(); ++i)
+  for (auto i = allobjects.begin(); i != allobjects.end(); ++i)
   {
     mitk::FileWriter::Pointer io = dynamic_cast<mitk::FileWriter *>(i->GetPointer());
     if (io)

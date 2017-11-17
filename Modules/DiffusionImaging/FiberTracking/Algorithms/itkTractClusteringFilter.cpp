@@ -31,6 +31,8 @@ TractClusteringFilter::TractClusteringFilter()
   , m_Scale(0)
   , m_MergeDuplicateThreshold(-1)
   , m_DoResampling(true)
+  , m_FilterMask(nullptr)
+  , m_OverlapThreshold(0.0)
 {
 
 }
@@ -63,6 +65,32 @@ std::vector<mitk::FiberBundle::Pointer> TractClusteringFilter::GetOutTractograms
 void TractClusteringFilter::SetDistances(const std::vector<float> &Distances)
 {
   m_Distances = Distances;
+}
+
+float TractClusteringFilter::CalcOverlap(vnl_matrix<float>& t)
+{
+  float overlap = 0;
+  if (m_FilterMask.IsNotNull())
+  {
+
+    for (unsigned int i=0; i<m_NumPoints; ++i)
+    {
+      vnl_vector<float> p = t.get_column(i);
+      itk::Point<float,3> point;
+      point[0] = p[0];
+      point[1] = p[1];
+      point[2] = p[2];
+      itk::Index<3> idx;
+      m_FilterMask->TransformPhysicalPointToIndex(point, idx);
+      if (m_FilterMask->GetLargestPossibleRegion().IsInside(idx) && m_FilterMask->GetPixel(idx)>0)
+        overlap += 1;
+    }
+    overlap /= m_NumPoints;
+  }
+  else
+    return 1.0;
+
+  return overlap;
 }
 
 float TractClusteringFilter::CalcMDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool& flipped)
@@ -373,6 +401,7 @@ std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClu
   vnl_matrix<float> zero_h; zero_h.set_size(T.at(0).rows(), T.at(0).cols()); zero_h.fill(0.0);
   Cluster no_fit;
   no_fit.h = zero_h;
+
   for (unsigned int i=0; i<centroids.size(); ++i)
   {
     Cluster c;
@@ -390,26 +419,29 @@ std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClu
     float min_cluster_distance = 99999;
     bool flip = false;
 
-    int c_idx = 0;
-    for (vnl_matrix<float> centroid : centroids)
+    if (CalcOverlap(t)>=m_OverlapThreshold)
     {
-      bool f = false;
-      float d = 0;
-
-      if (m_Metric==Metric::MDF)
-        d = CalcMDF(t, centroid, f);
-      else if (m_Metric==Metric::MDF_STD)
-        d = CalcMDF_STD(t, centroid, f);
-      else if (m_Metric==Metric::MAX_MDF)
-        d = CalcMAX_MDF(t, centroid, f);
-
-      if (d<min_cluster_distance)
+      int c_idx = 0;
+      for (vnl_matrix<float> centroid : centroids)
       {
-        min_cluster_distance = d;
-        min_cluster_index = c_idx;
-        flip = f;
+        bool f = false;
+        float d = 0;
+
+        if (m_Metric==Metric::MDF)
+          d = CalcMDF(t, centroid, f);
+        else if (m_Metric==Metric::MDF_STD)
+          d = CalcMDF_STD(t, centroid, f);
+        else if (m_Metric==Metric::MAX_MDF)
+          d = CalcMAX_MDF(t, centroid, f);
+
+        if (d<min_cluster_distance)
+        {
+          min_cluster_distance = d;
+          min_cluster_index = c_idx;
+          flip = f;
+        }
+        ++c_idx;
       }
-      ++c_idx;
     }
 
     if (min_cluster_index>=0 && min_cluster_distance<dist_thres)
@@ -445,9 +477,13 @@ void TractClusteringFilter::GenerateData()
 
   if (m_Scale==0)
     m_Scale = m_Distances.at(0);
-  MITK_INFO << "Scalar map scaling: " << m_Scale;
 
   T = ResampleFibers(m_Tractogram);
+  if (T.empty())
+  {
+    MITK_INFO << "No fibers in tractogram!";
+    return;
+  }
 
   std::vector< long > f_indices;
   for (unsigned int i=0; i<T.size(); ++i)
@@ -467,6 +503,11 @@ void TractClusteringFilter::GenerateData()
   else
   {
     std::vector<vnl_matrix<float> > centroids = ResampleFibers(m_InCentroids);
+    if (centroids.empty())
+    {
+      MITK_INFO << "No fibers in centroid tractogram!";
+      return;
+    }
     MITK_INFO << "Clustering with input centroids";
     clusters = AddToKnownClusters(f_indices, centroids);
     no_match = clusters.back();

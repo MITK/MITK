@@ -153,6 +153,13 @@ void QmitkNavigationToolManagementWidget::OnMoveToolUp()
 {
   if (m_NavigationToolStorage.IsNotNull())
   {
+    if( m_NavigationToolStorage->isLocked() )
+    {
+      MessageBox("The storage is locked and it cannot be modified. Maybe the tracking device which " \
+        "uses this storage is connected. If you want to modify the storage please " \
+        "disconnect the device first.");
+      return;
+    }
     int toolIndex = m_Controls->m_ToolList->currentIndex().row();
     if (toolIndex >= 0)
     {
@@ -173,6 +180,13 @@ void QmitkNavigationToolManagementWidget::OnMoveToolDown()
 {
   if (m_NavigationToolStorage.IsNotNull())
   {
+    if( m_NavigationToolStorage->isLocked() )
+    {
+      MessageBox("The storage is locked and it cannot be modified. Maybe the tracking device which " \
+        "uses this storage is connected. If you want to modify the storage please " \
+        "disconnect the device first.");
+      return;
+    }
     int toolIndex = m_Controls->m_ToolList->currentIndex().row();
     if (toolIndex >= 0)
     {
@@ -308,6 +322,14 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
 
 void QmitkNavigationToolManagementWidget::OnAddToolSave()
 {
+  if( m_NavigationToolStorage->isLocked() )
+  {
+    MessageBox( "The storage is locked and it cannot be modified. Maybe the tracking device which " \
+                "uses this storage is connected. If you want to modify the storage please " \
+                "disconnect the device first.");
+    return;
+  }
+
   mitk::NavigationTool::Pointer newTool = m_Controls->m_ToolCreationWidget->GetCreatedTool();
 
   if (m_edit) //here we edit a existing tool

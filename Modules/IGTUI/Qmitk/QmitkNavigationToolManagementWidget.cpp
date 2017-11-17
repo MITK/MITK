@@ -201,6 +201,7 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
   QString defaultIdentifier = "NavigationTool#" + QString::number(m_NavigationToolStorage->GetToolCount());
   QString defaultName = "NavigationTool" + QString::number(m_NavigationToolStorage->GetToolCount());
   m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage, defaultIdentifier.toStdString(), defaultName.toStdString());
+  m_Controls->m_ToolCreationWidget->ShowToolPreview("Tool preview");
   m_edit = false;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
 }
@@ -238,7 +239,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
   }
   mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
   m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
-  m_NavigationToolStorage->SetName("test");
+  m_Controls->m_ToolCreationWidget->ShowToolPreview("Tool preview");
   m_edit = true;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
 }
@@ -323,6 +324,9 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
   {
     m_NavigationToolStorage->AddTool(newTool);
   }
+
+  //Remove tool preview
+  m_DataStorage->Remove(m_DataStorage->GetNamedNode("Tool preview"));
 
   UpdateToolTable();
 

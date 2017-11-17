@@ -131,6 +131,18 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   this->SetDefaultData(m_ToolToBeEdited);
 }
 
+void QmitkNavigationToolCreationWidget::ShowToolPreview(std::string _name)
+{
+  m_DataStorage->Add(m_ToolToBeEdited->GetDataNode());
+  m_ToolToBeEdited->GetDataNode()->SetName(_name);
+
+  //change color to blue
+  m_ToolToBeEdited->GetDataNode()->SetProperty("color", mitk::ColorProperty::New(0, 0, 1));
+
+  //Global Reinit to show new tool
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+}
+
 void QmitkNavigationToolCreationWidget::SetConeAsToolSurface()
 {
   //create small cone and use it as surface
@@ -231,16 +243,21 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
   std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Surface"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("STL (*.stl)")).toLatin1().data();
   QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
+  mitk::Surface::Pointer surface;
   try
   {
-    mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
+    surface = mitk::IOUtil::LoadSurface(filename.c_str());
   }
   catch (mitk::Exception &e)
   {
     MITK_ERROR << "Exception occured: " << e.what();
+    return;
   }
 
-  m_ToolToBeEdited->GetDataNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
+  m_ToolToBeEdited->GetDataNode()->SetData(surface);
+
+  //Global Reinit to show tool surface (or preview)
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 }
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
@@ -288,6 +305,8 @@ void QmitkNavigationToolCreationWidget::OnFinished()
 {
   //here we create a new tool
   m_FinalTool = m_ToolToBeEdited->Clone();
+  //Set the correct name of data node, cause the m_ToolToBeEdited was called "Tool preview"
+  m_FinalTool->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toStdString());
 
   emit NavigationToolFinished();
 }

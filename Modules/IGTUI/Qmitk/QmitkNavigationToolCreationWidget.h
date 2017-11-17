@@ -59,6 +59,10 @@ public:
     */
   void Initialize(mitk::DataStorage* dataStorage, const std::string &supposedIdentifier, const std::string &supposedName = "NewTool");
 
+  /** @brief This Function will add a new node to the Data Manager with given name to enable a preview of the m_ToolToBeEdited
+  */
+  void ShowToolPreview(std::string _name);
+
   /** @brief Sets the default tracking device type. You may also define if it is changeable or not.*/
   void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true);
 

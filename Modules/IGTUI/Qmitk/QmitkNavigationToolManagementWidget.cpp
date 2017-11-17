@@ -117,6 +117,8 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_SaveTool), SIGNAL(clicked()), this, SLOT(OnSaveTool()));
     connect((QObject*)(m_Controls->m_CreateNewStorage), SIGNAL(clicked()), this, SLOT(OnCreateStorage()));
 
+    connect((QObject*)(m_Controls->m_ToolList), SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(OnToolSelected()));
+
     //widget page "add tool":
     connect((QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(Canceled()), this, SLOT(OnAddToolCancel()));
     connect((QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(NavigationToolFinished()), this, SLOT(OnAddToolSave()));
@@ -199,6 +201,7 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
   QString defaultIdentifier = "NavigationTool#" + QString::number(m_NavigationToolStorage->GetToolCount());
   QString defaultName = "NavigationTool" + QString::number(m_NavigationToolStorage->GetToolCount());
   m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage, defaultIdentifier.toStdString(), defaultName.toStdString());
+  m_Controls->m_ToolCreationWidget->ShowToolPreview("Tool preview");
   m_edit = false;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
 }
@@ -235,8 +238,9 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     return;
   }
   mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
+  m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage, "", ""); //Initialize once again, might be called here for the first time after autodetection
   m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
-  m_NavigationToolStorage->SetName("test");
+  m_Controls->m_ToolCreationWidget->ShowToolPreview("Tool preview");
   m_edit = true;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
 }
@@ -322,15 +326,28 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
     m_NavigationToolStorage->AddTool(newTool);
   }
 
+  //Remove tool preview
+  m_DataStorage->Remove(m_DataStorage->GetNamedNode("Tool preview"));
+
   UpdateToolTable();
 
   m_Controls->m_MainWidgets->setCurrentIndex(0);
 
+  m_Controls->m_ToolInformation->setText("");
 }
 
 void QmitkNavigationToolManagementWidget::OnAddToolCancel()
 {
   m_Controls->m_MainWidgets->setCurrentIndex(0);
+  //Remove tool preview
+  m_DataStorage->Remove(m_DataStorage->GetNamedNode("Tool preview"));
+}
+
+void QmitkNavigationToolManagementWidget::OnToolSelected()
+{
+  QString _label = "Information for tool " + m_Controls->m_ToolList->currentItem()->text() + "\n";
+  _label.append(QString(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetStringWithAllToolInformation().c_str()));
+  m_Controls->m_ToolInformation->setText(_label);
 }
 
 //##################################################################################
@@ -342,7 +359,7 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   if (m_NavigationToolStorage.IsNull()) return;
   for (int i = 0; i < m_NavigationToolStorage->GetToolCount(); i++)
   {
-    QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataNode()->GetName().c_str()) + " ";
+    QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetToolName().c_str()) + " ";
 
     currentTool += "(" + QString::fromStdString(m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType()) + "/";
 

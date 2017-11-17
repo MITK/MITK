@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
-    <height>380</height>
+    <width>435</width>
+    <height>381</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="0" colspan="5">
     <widget class="QGroupBox" name="interactiveTranslationBox">
      <property name="title">
       <string>Interactive Translation</string>
@@ -68,7 +68,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="invertedAppearance">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="invertedControls">
              <bool>false</bool>
@@ -82,12 +82,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_XTransSpinBox">
+           <widget class="QDoubleSpinBox" name="m_XTransSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-500</number>
+             <double>-500.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>500</number>
+             <double>500.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -130,7 +133,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="invertedAppearance">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="tickPosition">
              <enum>QSlider::TicksAbove</enum>
@@ -141,15 +144,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_YTransSpinBox">
+           <widget class="QDoubleSpinBox" name="m_YTransSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-500</number>
+             <double>-500.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>500</number>
-            </property>
-            <property name="value">
-             <number>0</number>
+             <double>500.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -195,7 +198,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="invertedAppearance">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="tickPosition">
              <enum>QSlider::TicksAbove</enum>
@@ -206,15 +209,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_ZTransSpinBox">
+           <widget class="QDoubleSpinBox" name="m_ZTransSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-500</number>
+             <double>-500.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>500</number>
-            </property>
-            <property name="singleStep">
-             <number>1</number>
+             <double>500.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -225,7 +228,7 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0" colspan="5">
     <widget class="QGroupBox" name="interactiveRotationBox">
      <property name="title">
       <string>Interactive Rotation</string>
@@ -284,12 +287,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_XRotSpinBox">
+           <widget class="QDoubleSpinBox" name="m_XRotSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-180</number>
+             <double>-180.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <double>180.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -340,12 +346,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_YRotSpinBox">
+           <widget class="QDoubleSpinBox" name="m_YRotSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-180</number>
+             <double>-180.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <double>180.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -396,12 +405,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="m_ZRotSpinBox">
+           <widget class="QDoubleSpinBox" name="m_ZRotSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="minimum">
-             <number>-180</number>
+             <double>-180.000000000000000</double>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <double>180.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -409,21 +421,39 @@
         </item>
        </layout>
       </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="m_UseManipulatedToolTipPB">
+          <property name="text">
+           <string>Use Manipulated ToolTip</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_ResetPB">
+          <property name="text">
+           <string>Reset To Identity</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_RevertChanges">
+          <property name="text">
+           <string>Revert Changes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_Cancel">
+          <property name="text">
+           <string>Cancel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="m_ResetPB">
-     <property name="text">
-      <string>Reset To Identity</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="m_UseManipulatedToolTipPB">
-     <property name="text">
-      <string>Use Manipulated ToolTip</string>
-     </property>
     </widget>
    </item>
   </layout>

@@ -23,7 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include <mitkNavigationData.h>
-#include <QmitkNavigationToolCreationAdvancedWidget.h>
+
+#include "QmitkInteractiveTransformationWidget.h"
+
+#include <QDialog>
 
 #include "ui_IGTNavigationToolCalibrationControls.h"
 
@@ -69,13 +72,13 @@ public:
   void SaveCalibratedTool();
   void OnToolCalibrationMethodChanged(int index);
   void OnStartManualToolTipCalibration();
-  void OnRetrieveDataForManualTooltipManipulation();
-  void OnProcessManualTooltipEditDialogCloseRequest();
   void OnRunSingleRefToolCalibrationClicked();
   void OnLoginSingleRefToolNavigationDataClicked();
   void OnSetNewToolTipPosButtonClicked();
   void OnGetPositions();
   void OnCalibrateToolAxis();
+  void OnToolAxisSpinboxChanged();
+  void OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip);
 
 protected:
 
@@ -109,7 +112,8 @@ protected:
 
   // members and helper methods for manual tool calibration
   void UpdateManualToolTipCalibrationView();
-  QmitkNavigationToolCreationAdvancedWidget* m_ManualToolTipEditWidget;
+  QDialog m_ToolEditDialog;
+  QmitkInteractiveTransformationWidget* m_ToolTransformationWidget;
 
   // members and helper methods for single reference tool calibration
   void LoginSingleRefToolNavigationData();
@@ -133,8 +137,8 @@ protected:
 
   //members and helper methods for tool axis calibration 
   mitk::Vector3D m_CalibratedToolAxis;
-  mitk::Vector3D m_EndToolPosition;
-  mitk::Vector3D m_StartToolPosition;
+  mitk::NavigationData::Pointer  m_AxisCalibration_ToolToCalibrate;
+  mitk::NavigationData::Pointer  m_AxisCalibration_NavDataCalibratingTool;
 
 };
 

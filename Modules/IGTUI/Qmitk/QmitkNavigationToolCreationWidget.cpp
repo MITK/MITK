@@ -237,6 +237,9 @@ void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled()
   m_Controls->m_LoadSurface->setEnabled(m_Controls->m_Surface_Use_Other->isChecked());
   if (m_Controls->m_Surface_Use_Sphere->isChecked())
     SetConeAsToolSurface();
+
+  //Global Reinit to show tool surface preview
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 }
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
@@ -256,7 +259,7 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
 
   m_ToolToBeEdited->GetDataNode()->SetData(surface);
 
-  //Global Reinit to show tool surface (or preview)
+  //Global Reinit to show tool surface or preview
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 }
 

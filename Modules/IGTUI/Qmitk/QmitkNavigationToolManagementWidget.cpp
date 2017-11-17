@@ -338,6 +338,8 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
 void QmitkNavigationToolManagementWidget::OnAddToolCancel()
 {
   m_Controls->m_MainWidgets->setCurrentIndex(0);
+  //Remove tool preview
+  m_DataStorage->Remove(m_DataStorage->GetNamedNode("Tool preview"));
 }
 
 void QmitkNavigationToolManagementWidget::OnToolSelected()

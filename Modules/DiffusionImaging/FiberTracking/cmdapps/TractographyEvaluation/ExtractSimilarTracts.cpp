@@ -119,6 +119,7 @@ int main(int argc, char* argv[])
     std::vector< float > distances;
     distances.push_back(distance);
 
+    mitk::FiberBundle::Pointer anchor_tractogram = mitk::FiberBundle::New(nullptr);
     unsigned int c = 0;
     for (auto ref_fib : ref_fibs)
     {
@@ -166,6 +167,7 @@ int main(int argc, char* argv[])
           clusters.pop_back();
           mitk::FiberBundle::Pointer result = mitk::FiberBundle::New(nullptr);
           result = result->AddBundles(clusters);
+          anchor_tractogram = anchor_tractogram->AddBundle(result);
           mitk::IOUtil::Save(result, out_root + "anchor_" + ist::GetFilenameName(ref_bundle_files.at(c)));
         }
       }
@@ -184,6 +186,9 @@ int main(int argc, char* argv[])
         break;
       ++c;
     }
+    MITK_INFO << "Streamlines in anchor tractogram: " << anchor_tractogram->GetNumFibers();
+    mitk::IOUtil::Save(anchor_tractogram, out_root + "anchor_tractogram.trk");
+
     MITK_INFO << "Streamlines remaining in candidate tractogram: " << fib->GetNumFibers();
     mitk::IOUtil::Save(fib, out_root + "candidate_tractogram.trk");
   }

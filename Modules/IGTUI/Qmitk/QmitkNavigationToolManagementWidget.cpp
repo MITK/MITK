@@ -238,6 +238,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     return;
   }
   mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
+  m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage, "", ""); //Initialize once again, might be called here for the first time after autodetection
   m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
   m_Controls->m_ToolCreationWidget->ShowToolPreview("Tool preview");
   m_edit = true;

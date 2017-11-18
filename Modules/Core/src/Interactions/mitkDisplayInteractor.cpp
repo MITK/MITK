@@ -925,34 +925,49 @@ bool mitk::DisplayInteractor::GetBoolProperty(mitk::PropertyList::Pointer proper
   }
 }
 
-mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,
-                                                                 mitk::Point3D worldposition,
+mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(DataStorage::SetOfObjects::ConstPointer nodes,
+                                                                 Point3D worldposition,
                                                                  BaseRenderer *ren)
 {
-  mitk::DataNode::Pointer node;
+  DataNode::Pointer topLayerNode;
 
-  if (nodes.IsNotNull())
+  if (nodes.IsNull())
+    return nullptr;
+
+  int maxLayer = std::numeric_limits<int>::min();
+
+  for (auto node : *nodes)
   {
-    int maxlayer = -32768;
-    bool isHelper(false);
-    for (unsigned int x = 0; x < nodes->size(); x++)
-    {
-      nodes->at(x)->GetBoolProperty("helper object", isHelper);
-      if (nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
-      {
-        int layer = 0;
-        if (!(nodes->at(x)->GetIntProperty("layer", layer)))
-          continue;
-        if (layer > maxlayer)
-        {
-          if (static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(ren))
-          {
-            node = nodes->at(x);
-            maxlayer = layer;
-          }
-        }
-      }
-    }
+    if (node.IsNull())
+      continue;
+
+    bool isHelperObject = false;
+    node->GetBoolProperty("helper object", isHelperObject);
+
+    if (isHelperObject)
+      continue;
+
+    auto data = node->GetData();
+
+    if (nullptr == data)
+      continue;
+
+    auto geometry = data->GetGeometry();
+
+    if (nullptr == geometry || !geometry->IsInside(worldposition))
+      continue;
+
+    int layer = 0;
+
+    if (!node->GetIntProperty("layer", layer))
+      continue;
+
+    if (layer <= maxLayer)
+      continue;
+
+    topLayerNode = node;
+    maxLayer = layer;
   }
-  return node;
+
+  return topLayerNode;
 }

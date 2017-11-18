@@ -61,9 +61,10 @@ QmitkSegmentationView::QmitkSegmentationView()
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
   mitk::NodePredicateDataType::Pointer isOdf = mitk::NodePredicateDataType::New("OdfImage");
+  auto isSegment = mitk::NodePredicateDataType::New("Segment");
 
   mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
-  validImages->AddPredicate(isImage);
+  validImages->AddPredicate(mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isSegment)));
   validImages->AddPredicate(isDwi);
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isOdf);

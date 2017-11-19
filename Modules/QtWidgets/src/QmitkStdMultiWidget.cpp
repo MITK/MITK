@@ -1818,7 +1818,6 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors(const mitk::Color &upper, 
 
 void QmitkStdMultiWidget::SetDepartmentLogo(const char *path)
 {
-  MITK_INFO << path;
   QImage* qimage = new QImage(path);
   vtkSmartPointer<vtkQImageToImageSource> qImageToVtk;
   qImageToVtk = vtkSmartPointer<vtkQImageToImageSource>::New();

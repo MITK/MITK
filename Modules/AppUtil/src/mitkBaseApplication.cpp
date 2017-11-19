@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTime>
 
 #include <iostream>
+#include <string>
 
 namespace mitk
 {
@@ -81,7 +82,7 @@ namespace mitk
 
   static void outputQtMessage(QtMsgType type, const QMessageLogContext &, const QString &msg)
   {
-    auto message = msg.toLatin1().constData();
+    auto message = msg.toStdString();
 
     switch (type)
     {

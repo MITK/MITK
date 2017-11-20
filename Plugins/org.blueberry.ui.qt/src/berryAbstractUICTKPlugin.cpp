@@ -301,7 +301,15 @@ QByteArray AbstractUICTKPlugin::ApplyTheme(const QByteArray &originalSVG)
     ? match.captured(1)
     : QStringLiteral("#000000");
 
+  re.setPattern(QStringLiteral("iconAccentColor\\s*[=:]\\s*(#[0-9a-f]{6})"));
+  match = re.match(styleSheet);
+
+  auto iconAccentColor = match.hasMatch()
+    ? match.captured(1)
+    : QStringLiteral("#000000");
+
   auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
+  themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
 
   return themedSVG.toLatin1();
 }

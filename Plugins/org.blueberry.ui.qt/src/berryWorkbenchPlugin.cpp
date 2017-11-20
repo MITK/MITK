@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/intro/berryEditorIntroAdapterPart.h"
 #include "internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h"
 
-#include "internal/berryQtStyleManager.h"
+#include "berryQtStyleManager.h"
 
 #include "berryExtensionFactory.h"
 #include "internal/berryQtWorkbenchTweaklet.h"

@@ -11,9 +11,9 @@
     <file>tab_close_grey.svg</file>
     <file>tab_close_grey_active.svg</file>
 
-    <file>defaultstyle.qss</file>
-    <file>defaultstyle-activetab.qss</file>
-    <file>defaultstyle-tab.qss</file>
+    <file>lightstyle.qss</file>
+    <file>lightstyle-activetab.qss</file>
+    <file>lightstyle-tab.qss</file>
 
     <file>dark/up_arrow_disabled.png</file>
     <file>dark/Hmovetoolbar.png</file>

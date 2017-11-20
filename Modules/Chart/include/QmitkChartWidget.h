@@ -53,8 +53,8 @@ public:
     area_spline /*!< area-spline chart, see http://c3js.org/samples/chart_area.html*/
   };
   enum class ChartStyle {
-    defaultstyle,
-    darkstyle
+    darkstyle,
+    lightstyle
   };
   enum class LineStyle {
     solid,

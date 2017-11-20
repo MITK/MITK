@@ -110,7 +110,7 @@ void QmitkImageStatisticsView::OnPageSuccessfullyLoaded()
   }
   else
   {
-    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ChartStyle::defaultstyle);
+    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ChartStyle::lightstyle);
   }
 }
 

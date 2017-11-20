@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/berryBundleUtility.h"
 #include "berryWorkbenchPlugin.h"
 
+#include "berryQtStyleManager.h"
 #include "berryPlatformUI.h"
 #include "berryIPreferencesService.h"
 #include "berryIPreferences.h"
@@ -26,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 #include <QIcon>
 #include <QImage>
-#include <QRegularExpression>
 #include <QString>
 
 namespace berry
@@ -273,7 +273,7 @@ QIcon AbstractUICTKPlugin::ImageDescriptorFromPlugin(
   QByteArray imgContent = plugin->getResource(imageFilePath);
 
   if (imageFilePath.endsWith(".svg", Qt::CaseInsensitive))
-    imgContent = ApplyTheme(imgContent);
+    return QtStyleManager::ThemeIcon(imgContent);
 
   QImage image = QImage::fromData(imgContent);
   QPixmap pixmap = QPixmap::fromImage(image);
@@ -283,35 +283,6 @@ QIcon AbstractUICTKPlugin::ImageDescriptorFromPlugin(
 QIcon AbstractUICTKPlugin::GetMissingIcon()
 {
   return QIcon(":/org.blueberry.ui.qt/icon_missing.png");
-}
-
-QByteArray AbstractUICTKPlugin::ApplyTheme(const QByteArray &originalSVG)
-{
-  auto styleSheet = qApp->styleSheet();
-
-  if (styleSheet.isEmpty())
-    return originalSVG;
-
-  QRegularExpression re;
-  re.setPattern(QStringLiteral("iconColor\\s*[=:]\\s*(#[0-9a-f]{6})"));
-  re.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-  auto match = re.match(styleSheet);
-
-  auto iconColor = match.hasMatch()
-    ? match.captured(1)
-    : QStringLiteral("#000000");
-
-  re.setPattern(QStringLiteral("iconAccentColor\\s*[=:]\\s*(#[0-9a-f]{6})"));
-  match = re.match(styleSheet);
-
-  auto iconAccentColor = match.hasMatch()
-    ? match.captured(1)
-    : QStringLiteral("#000000");
-
-  auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
-  themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
-
-  return themedSVG.toLatin1();
 }
 
 }

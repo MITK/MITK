@@ -480,7 +480,7 @@ void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
     command = QString("changeTheme('dark')");
   }
   else {
-    command = QString("changeTheme('default')");
+    command = QString("changeTheme('light')");
   }
   m_Impl->CallJavaScriptFuntion(command);
 }

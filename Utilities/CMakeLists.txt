@@ -12,7 +12,6 @@ include_directories(.)
 add_subdirectory(IpPic)
 add_subdirectory(IpFunc)
 add_subdirectory(IpSegmentation)
-add_subdirectory(KWStyle)
 
 set(MITK_MODULE_NAME_REGEX_MATCH )
 set(MITK_MODULE_NAME_REGEX_NOT_MATCH )

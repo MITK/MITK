@@ -30,15 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkToolTrackingStatusWidget.h>
 #include <mitkStaticIGTHelperFunctions.h>
 
-
-#include <mitkCone.h>
 #include <mitkIGTException.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <itkVector.h>
 
-#include <vtkConeSource.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkAppendPolyData.h>

@@ -1235,17 +1235,7 @@ mitk::NavigationToolStorage::Pointer mitk::NDITrackingDevice::AutoDetectTools()
       newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i))->GetSerialNumber());
       newTool->SetIdentifier(toolname.str());
       newTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
-      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      mitk::Surface::Pointer mySphere = mitk::Surface::New();
-      vtkSphereSource *vtkData = vtkSphereSource::New();
-      vtkData->SetRadius(3.0f);
-      vtkData->SetCenter(0.0, 0.0, 0.0);
-      vtkData->Update();
-      mySphere->SetVtkPolyData(vtkData->GetOutput());
-      vtkData->Delete();
-      newNode->SetData(mySphere);
-      newNode->SetName(toolname.str());
-      newTool->SetDataNode(newNode);
+      newTool->GetDataNode()->SetName(toolname.str());
       autoDetectedStorage->AddTool(newTool);
     }
     this->StopTracking();

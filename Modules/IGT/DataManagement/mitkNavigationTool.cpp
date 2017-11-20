@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 #include "mitkInternalTrackingTool.h"
 
+#include "vtkSphereSource.h"
+
 mitk::NavigationTool::NavigationTool() : m_Identifier("None"),
 m_Type(mitk::NavigationTool::Unknown),
 m_CalibrationFile("none"),
@@ -37,6 +39,8 @@ m_ToolTipOrientation(mitk::Quaternion(0, 0, 0, 1))
   m_ToolAxis[0] = 1;
   m_ToolAxis[1] = 0;
   m_ToolAxis[2] = 0;
+
+  SetDefaultSurface();
 }
 
 itk::LightObject::Pointer mitk::NavigationTool::InternalClone() const
@@ -165,6 +169,22 @@ mitk::Surface::Pointer mitk::NavigationTool::GetToolSurface()
   if (this->m_DataNode.IsNull()) { return nullptr; }
   else if (this->m_DataNode->GetData() == nullptr) { return nullptr; }
   else { return dynamic_cast<mitk::Surface*>(m_DataNode->GetData()); }
+}
+
+void mitk::NavigationTool::SetDefaultSurface()
+{
+  if (m_DataNode.IsNull())
+    m_DataNode = mitk::DataNode::New();
+
+  //create small cone and use it as surface
+  mitk::Surface::Pointer mySphere = mitk::Surface::New();
+  vtkSphereSource *vtkData = vtkSphereSource::New();
+  vtkData->SetRadius(2.0f);
+  vtkData->SetCenter(0.0, 0.0, 0.0);
+  vtkData->Update();
+  mySphere->SetVtkPolyData(vtkData->GetOutput());
+  vtkData->Delete();
+  this->GetDataNode()->SetData(mySphere);
 }
 
 std::string mitk::NavigationTool::GetStringWithAllToolInformation() const

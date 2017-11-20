@@ -1910,6 +1910,11 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       };
       render_annotation(0, 3);
       render_annotation(1, 1);
+
+      this->GetRenderWindow1()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow2()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow3()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow4()->GetRenderer()->RequestUpdate();
     }
   }
 }

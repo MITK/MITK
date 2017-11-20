@@ -352,19 +352,11 @@ void QmitkNavigationToolCreationWidget::OnEditToolTip()
   m_ToolTransformationWidget->SetDefaultRotation(m_ToolToBeEdited->GetToolTipOrientation());
   m_ToolTransformationWidget->SetDefaultOffset(m_ToolToBeEdited->GetToolTipPosition());
 
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(m_ToolTransformationWidget);
-  m_ToolEditDialog.setLayout(mainLayout);
-  m_ToolEditDialog.setWindowTitle("Edit Tool Tip and Tool Orientation");
-  m_ToolEditDialog.setProperty("minimumSizeHint", m_ToolTransformationWidget->size());
-  m_ToolEditDialog.open();
+  m_ToolTransformationWidget->open();
 }
 
 void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
-  //This function is called, when the toolTipEdit view is closed.
-  m_ToolEditDialog.close();
-
   //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
   if (toolTip)
   {

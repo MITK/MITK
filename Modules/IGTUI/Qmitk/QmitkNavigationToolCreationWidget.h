@@ -135,7 +135,6 @@ protected:
   /** @brief this pointer holds the tool which is created and returned */
   mitk::NavigationTool::Pointer m_FinalTool;
 
-  QDialog m_ToolEditDialog;
   QmitkInteractiveTransformationWidget* m_ToolTransformationWidget;
 
   /** @brief holds the DataStorage */

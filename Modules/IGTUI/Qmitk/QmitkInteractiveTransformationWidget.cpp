@@ -28,12 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkInteractiveTransformationWidget::VIEW_ID = "org.mitk.views.interactivetransformationwidget";
 
 QmitkInteractiveTransformationWidget::QmitkInteractiveTransformationWidget(QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_Controls(nullptr), m_Geometry(nullptr)
+  : QDialog(parent, f), m_Controls(nullptr), m_Geometry(nullptr)
 {
   CreateQtPartControl(this);
   CreateConnections();
 
   m_ResetGeometry = mitk::Geometry3D::New();
+
+
+  this->setWindowTitle("Edit Tool Tip and Tool Orientation");
 }
 
 QmitkInteractiveTransformationWidget::~QmitkInteractiveTransformationWidget()
@@ -278,10 +281,18 @@ void QmitkInteractiveTransformationWidget::OnApplyManipulatedToolTip()
 
   mitk::AffineTransform3D::Pointer toolTip = m_Geometry->GetIndexToWorldTransform();
   emit EditToolTipFinished(toolTip);
+  this->close();
+}
+
+void QmitkInteractiveTransformationWidget::reject()
+{
+  OnCancel();
 }
 
 void QmitkInteractiveTransformationWidget::OnCancel()
 {
+  QDialog::reject();
+
   mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
     ->Remove(m_ToolToEdit->GetDataNode());
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkInteractiveTransformationWidget_H
 
 //QT headers
-#include <QWidget>
+#include <QDialog>
 
 //Mitk headers
 #include "MitkIGTUIExports.h"
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup IGTUI
   */
-class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QDialog
 {
   Q_OBJECT
 
@@ -76,6 +76,8 @@ signals:
     void EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip);
 
   protected:
+
+    void reject();
 
     virtual void CreateConnections();
 

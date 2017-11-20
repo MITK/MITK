@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkInteractiveTransformationWidget.h"
 
-#include <QDialog>
 
 #include "ui_IGTNavigationToolCalibrationControls.h"
 
@@ -112,7 +111,6 @@ protected:
 
   // members and helper methods for manual tool calibration
   void UpdateManualToolTipCalibrationView();
-  QDialog m_ToolEditDialog;
   QmitkInteractiveTransformationWidget* m_ToolTransformationWidget;
 
   // members and helper methods for single reference tool calibration

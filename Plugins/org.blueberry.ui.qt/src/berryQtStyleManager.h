@@ -18,18 +18,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYQTSTYLEMANAGER_H_
 #define BERRYQTSTYLEMANAGER_H_
 
-#include "berryIQtStyleManager.h"
+#include <berryIQtStyleManager.h>
+#include <org_blueberry_ui_qt_Export.h>
 
 #include <QHash>
 
 namespace berry {
 
-class QtStyleManager : public QObject, public IQtStyleManager
+class BERRY_UI_QT QtStyleManager : public QObject, public IQtStyleManager
 {
   Q_OBJECT
   Q_INTERFACES(berry::IQtStyleManager)
 
 public:
+  static QIcon ThemeIcon(const QByteArray &originalSVG);
+  static QIcon ThemeIcon(const QString &resourcePath);
 
   QtStyleManager();
   ~QtStyleManager();
@@ -58,10 +61,6 @@ public:
   Style GetDefaultStyle() const override;
   void SetDefaultStyle() override;
 
-  void GetIconThemes(IconThemeList& iconThemes) const override;
-
-  void SetIconTheme(const QString& themeName) override;
-
   bool Contains(const QString& fileName) const override;
 
   bool IsA( const std::type_info& type ) const;
@@ -76,8 +75,6 @@ private:
 
   void SetStyle(const QString& fileName, bool update);
   void SetDefaultStyle(bool update);
-
-  void SetIconTheme(const QString& themeName, bool update);
 
   struct ExtStyle : public Style
   {

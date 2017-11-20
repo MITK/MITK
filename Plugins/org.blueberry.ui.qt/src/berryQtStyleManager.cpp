@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <QTextStream>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QDirIterator>
 #include <QFont>
@@ -37,6 +38,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
+
+static QString ParseColor(const QString &subject, const QString &pattern, const QString &fallback)
+{
+  QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
+  auto match = re.match(subject);
+
+  return match.hasMatch()
+    ? match.captured(1)
+    : fallback;
+}
+
+QIcon QtStyleManager::ThemeIcon(const QByteArray &originalSVG)
+{
+  auto styleSheet = qApp->styleSheet();
+
+  if (styleSheet.isEmpty())
+    return QPixmap::fromImage(QImage::fromData(originalSVG));
+
+  auto iconColor = ParseColor(styleSheet,
+    QStringLiteral("iconColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
+    QStringLiteral("#000000"));
+
+  auto iconAccentColor = ParseColor(styleSheet,
+    QStringLiteral("iconAccentColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
+    QStringLiteral("#ffffff"));
+
+  auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
+  themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
+
+  return QPixmap::fromImage(QImage::fromData(themedSVG.toLatin1()));
+}
+
+QIcon QtStyleManager::ThemeIcon(const QString &resourcePath)
+{
+  QFile resourceFile(resourcePath);
+
+  if (resourceFile.open(QIODevice::ReadOnly))
+  {
+    auto originalSVG = resourceFile.readAll();
+    return ThemeIcon(originalSVG);
+  }
+
+  BERRY_WARN << "Could not read " << resourcePath;
+  return QIcon();
+}
 
 QtStyleManager::QtStyleManager()
 {
@@ -277,33 +323,6 @@ void QtStyleManager::GetStyles(StyleList& styleNames) const
     styleNames.push_back(Style(i.value()->name, i.value()->fileName));
 }
 
-void QtStyleManager::GetIconThemes(IconThemeList& iconThemes) const
-{
-  iconThemes.clear();
-  iconThemes.push_back(IconTheme(QString( "<<default>>" )));
-
-  QStringList iconSearchPaths = QIcon::themeSearchPaths();
-
-  for(QStringList::Iterator pathIt = iconSearchPaths.begin(); pathIt != iconSearchPaths.end(); ++pathIt)
-  {
-    QDirIterator dirIt(*pathIt);
-    while (dirIt.hasNext())
-    {
-      QString current = dirIt.next();
-      QFileInfo info = dirIt.fileInfo();
-      if (info.isDir() && info.isReadable())
-      {
-        QFileInfo themeFile( info.filePath() + QString("/index.theme") );
-        if( themeFile.exists() && themeFile.isFile() && themeFile.isReadable() )
-        {
-          QString fileName = info.fileName();
-          iconThemes.push_back( IconTheme(fileName) );
-        }
-      }
-    }
-  }
-}
-
 void QtStyleManager::SetStyle(const QString& fileName)
 {
   SetStyle(fileName, true);
@@ -365,25 +384,6 @@ void QtStyleManager::UpdateWorkbenchFont()
   }
   qApp->setStyleSheet(currentStyle->stylesheet);
   PlatformUI::GetWorkbench()->UpdateTheme();
-}
-
-void QtStyleManager::SetIconTheme(const QString& themeName)
-{
-  if( themeName == QString( "<<default>>" ) )
-  {
-    SetIconTheme( QString("tango"), true);
-  }
-  else
-  {
-    SetIconTheme(themeName, true);
-  }
-}
-
-
-
-void QtStyleManager::SetIconTheme(const QString& themeName, bool /*update*/)
-{
-  QIcon::setThemeName( themeName );
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const

@@ -23,7 +23,6 @@ namespace berry {
 const QString QtPreferences::QT_STYLES_NODE = "qtstyles";
 const QString QtPreferences::QT_STYLE_NAME = "stylename";
 const QString QtPreferences::QT_STYLE_SEARCHPATHS = "searchpaths";
-const QString QtPreferences::QT_ICON_THEME = "icontheme";
 const QString QtPreferences::QT_FONT_NAME = "fontname";
 const QString QtPreferences::QT_FONT_SIZE = "fontsize";
 }

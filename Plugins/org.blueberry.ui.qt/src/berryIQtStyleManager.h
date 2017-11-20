@@ -52,29 +52,7 @@ struct BERRY_UI_QT IQtStyleManager
     { return name == s.name; }
   };
 
-  struct IconTheme {
-    QString name;
-
-    IconTheme() {}
-
-    IconTheme(const QString& name)
-    : name(name) {}
-
-    IconTheme& operator=(const IconTheme& s)
-    {
-      this->name = s.name;
-      return *this;
-    }
-
-    bool operator<(const IconTheme& s) const
-    { return name < s.name; }
-
-    bool operator==(const IconTheme& s) const
-    { return name == s.name; }
-  };
-
   typedef QList<Style> StyleList;
-  typedef QList<IconTheme> IconThemeList;
 
   virtual ~IQtStyleManager();
 
@@ -99,10 +77,6 @@ struct BERRY_UI_QT IQtStyleManager
 
   virtual Style GetDefaultStyle() const = 0;
   virtual void SetDefaultStyle() = 0;
-
-  virtual void GetIconThemes(IconThemeList& iconThemes) const = 0;
-
-  virtual void SetIconTheme(const QString& themeName) = 0;
 
   virtual bool Contains(const QString& fileName) const = 0;
 

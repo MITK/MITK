@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTime>
 
 #include <iostream>
+#include <string>
 
 namespace mitk
 {
@@ -78,6 +79,38 @@ namespace mitk
   QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
   QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
+
+  static void outputQtMessage(QtMsgType type, const QMessageLogContext &, const QString &msg)
+  {
+    auto message = msg.toStdString();
+
+    switch (type)
+    {
+      case QtDebugMsg:
+        MITK_DEBUG << message;
+        break;
+
+      case QtInfoMsg:
+        MITK_INFO << message;
+        break;
+
+      case QtWarningMsg:
+        MITK_WARN << message;
+        break;
+
+      case QtCriticalMsg:
+        MITK_ERROR << message;
+        break;
+
+      case QtFatalMsg:
+        MITK_ERROR << message;
+        abort();
+
+      default:
+        MITK_INFO << message;
+        break;
+    }
+  }
 
   class SplashCloserCallback : public QRunnable
   {
@@ -505,6 +538,8 @@ namespace mitk
     this->setApplicationName(appName);
     this->setOrganizationName(orgName);
     this->setOrganizationDomain(orgDomain);
+
+    qInstallMessageHandler(outputQtMessage);
   }
 
   void BaseApplication::initialize(Poco::Util::Application &self)

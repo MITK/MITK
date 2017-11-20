@@ -1,3 +1,8 @@
+/*
+  iconColor       = #000000 <- This line is parsed by MITK
+  iconAccentColor = #000000 <- This line is parsed by MITK
+*/
+
 berry--QCTabBar::tab {
     background: palette(window);
     min-height: 24px;

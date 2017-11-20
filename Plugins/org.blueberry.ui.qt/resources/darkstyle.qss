@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
   foregroundColor = #adb1b6
   iconColor       = #adb1b6 <- This line is parsed by MITK
+  iconAccentColor = #db7039 <- This line is parsed by MITK
   backgroundColor = #323231
   inactiveColor   = #1d1d1c
   highlightColor  = #3399cc

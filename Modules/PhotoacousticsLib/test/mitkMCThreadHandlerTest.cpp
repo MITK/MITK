@@ -72,7 +72,7 @@ public:
 
       //Assert that the time error is less than 10% in a 500ms sample size
       //This test might not be stable when on different machines.
-      CPPUNIT_ASSERT(std::abs((timeAfter - timeBefore) - m_NumberOrTime) <= 50);
+      CPPUNIT_ASSERT(std::labs((timeAfter - timeBefore) - m_NumberOrTime) <= 50);
     }
   }
 

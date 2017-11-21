@@ -146,7 +146,7 @@ void QmitkRemeshingView::EnableWidgets(bool enable)
   m_Controls.preserveEdgesCheckBox->setEnabled(enable);
   m_Controls.remeshPushButton->setEnabled(enable);
 
-  m_Controls.gradationLabel->setVisible(enable);
+  m_Controls.explanationLabel->setVisible(enable);
 }
 
 void QmitkRemeshingView::SetFocus()

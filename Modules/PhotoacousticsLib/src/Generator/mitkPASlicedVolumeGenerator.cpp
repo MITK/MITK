@@ -62,7 +62,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedFluenceImage
 
         if (m_Inverse)
         {
-          if (abs(imageArray[index] - 0) >= mitk::eps)
+          if (std::abs(imageArray[index] - 0) >= mitk::eps)
             imageArray[index] = 1 / imageArray[index];
           else
             imageArray[index] = INFINITY;

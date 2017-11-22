@@ -184,8 +184,8 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
 
   // maximum value in each direction for size
   InternalImageType::SizeType size;
-  size[0] = abs(startPoint[0] - endPoint[0]) + 1;
-  size[1] = abs(startPoint[1] - endPoint[1]) + 1;
+  size[0] = std::abs(startPoint[0] - endPoint[0]) + 1;
+  size[1] = std::abs(startPoint[1] - endPoint[1]) + 1;
 
   CostFunctionType::RegionType region;
   region.SetSize(size);

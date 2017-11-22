@@ -431,8 +431,8 @@ namespace mitk
             statisticsResult->SetMinIndex(minIndex);
             statisticsResult->SetMaxIndex(maxIndex);
 
-            assert(abs(minMaxFilter->GetMax(*it) - imageStatisticsFilter->GetMaximum(*it)) < mitk::eps);
-            assert(abs(minMaxFilter->GetMin(*it) - imageStatisticsFilter->GetMinimum(*it)) < mitk::eps);
+            assert(std::abs(minMaxFilter->GetMax(*it) - imageStatisticsFilter->GetMaximum(*it)) < mitk::eps);
+            assert(std::abs(minMaxFilter->GetMin(*it) - imageStatisticsFilter->GetMinimum(*it)) < mitk::eps);
 
 
             statisticsResult->SetN(imageStatisticsFilter->GetSum(*it) / (double) imageStatisticsFilter->GetMean(*it));

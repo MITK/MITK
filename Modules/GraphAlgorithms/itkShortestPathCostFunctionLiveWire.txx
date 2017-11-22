@@ -254,7 +254,7 @@ namespace itk
     nGradientAtP2[1] /= m_GradientMagnitudeImage->GetPixel(p2);
 
     double scalarProduct = (nGradientAtP1[0] * nGradientAtP2[0]) + (nGradientAtP1[1] * nGradientAtP2[1]);
-    if (abs(scalarProduct) >= 1.0)
+    if (std::abs(scalarProduct) >= 1.0)
     {
       // this should probably not happen; make sure the input for acos is valid
       scalarProduct = 0.999999999;

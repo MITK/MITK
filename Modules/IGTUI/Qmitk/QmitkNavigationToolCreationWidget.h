@@ -118,8 +118,6 @@ private:
 
   void SetGuiElements();
 
-  void SetConeAsToolSurface();
-
 protected:
   /// \brief Creation of the connections
   virtual void CreateConnections();

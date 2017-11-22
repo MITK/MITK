@@ -166,6 +166,9 @@ namespace mitk {
     */
     std::string GetStringWithAllToolInformation() const;
 
+
+    void SetDefaultSurface();
+
     //#######################
 
   protected:

@@ -120,13 +120,7 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   m_ToolToBeEdited = mitk::NavigationTool::New();//Reinitialize
   m_ToolToBeEdited->SetIdentifier(supposedIdentifier);
 
-  //Create the default cone surface. Can be changed later on...
-  //create DataNode...
-  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-  newNode->SetName(supposedName);
-  m_ToolToBeEdited->SetDataNode(newNode);
-
-  SetConeAsToolSurface();
+  m_ToolToBeEdited->GetDataNode()->SetName(supposedName);
 
   this->SetDefaultData(m_ToolToBeEdited);
 }
@@ -141,22 +135,6 @@ void QmitkNavigationToolCreationWidget::ShowToolPreview(std::string _name)
 
   //Global Reinit to show new tool
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
-}
-
-void QmitkNavigationToolCreationWidget::SetConeAsToolSurface()
-{
-  //create small cone and use it as surface
-  mitk::Surface::Pointer mySphere = mitk::Surface::New();
-  vtkConeSource *vtkData = vtkConeSource::New();
-  vtkData->SetAngle(5.0);
-  vtkData->SetResolution(50);
-  vtkData->SetHeight(6.0f);
-  vtkData->SetRadius(2.0f);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
-  vtkData->Update();
-  mySphere->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-  m_ToolToBeEdited->GetDataNode()->SetData(mySphere);
 }
 
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)
@@ -236,7 +214,7 @@ void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled()
 {
   m_Controls->m_LoadSurface->setEnabled(m_Controls->m_Surface_Use_Other->isChecked());
   if (m_Controls->m_Surface_Use_Sphere->isChecked())
-    SetConeAsToolSurface();
+    m_ToolToBeEdited->SetDefaultSurface();
 
   //Global Reinit to show tool surface preview
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);

@@ -153,6 +153,7 @@ void QmitkNavigationToolManagementWidget::OnMoveToolUp()
 {
   if (m_NavigationToolStorage.IsNotNull())
   {
+    //Proof, if the NavigationToolStorage is locked. If it is locked, show MessageBox to user.
     if( m_NavigationToolStorage->isLocked() )
     {
       MessageBox("The storage is locked and it cannot be modified. Maybe the tracking device which " \
@@ -180,6 +181,7 @@ void QmitkNavigationToolManagementWidget::OnMoveToolDown()
 {
   if (m_NavigationToolStorage.IsNotNull())
   {
+    //Proof, if the NavigationToolStorage is locked. If it is locked, show MessageBox to user.
     if( m_NavigationToolStorage->isLocked() )
     {
       MessageBox("The storage is locked and it cannot be modified. Maybe the tracking device which " \
@@ -322,6 +324,7 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
 
 void QmitkNavigationToolManagementWidget::OnAddToolSave()
 {
+  //Proof, if the NavigationToolStorage is locked. If it is locked, show MessageBox to user.
   if( m_NavigationToolStorage->isLocked() )
   {
     MessageBox( "The storage is locked and it cannot be modified. Maybe the tracking device which " \

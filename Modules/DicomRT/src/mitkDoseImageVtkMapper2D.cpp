@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPropertyNameHelper.h"
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkIsoDoseLevelSetProperty.h>
 #include <mitkIsoDoseLevelVectorProperty.h>
@@ -685,7 +686,10 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
   else
     node->AddProperty("reslice interpolation", mitk::VtkResliceInterpolationProperty::New());
   node->AddProperty("texture interpolation",
-                    mitk::BoolProperty::New(false)); // default value
+                    mitk::BoolProperty::New(mitk::DataNodeFactory::m_TextureInterpolationActive)); // set to user
+                                                                                                   // configurable
+                                                                                                   // default value (see
+                                                                                                   // global options)
   node->AddProperty("in plane resample extent by geometry", mitk::BoolProperty::New(false));
   node->AddProperty("bounding box", mitk::BoolProperty::New(false));
 

@@ -1,0 +1,15 @@
+/**
+  \defgroup MitkIOExtModule IOExt
+  \ingroup MITKModules
+
+  \brief Reader, writer, and mapper extensions for MITK
+
+  This module provides reader and writer implementations for
+  data types defined in the \ref MitkDataTypesExtModule module.
+  It also provides registration code for mappers define in the
+  \ref MitkMapperExtModule module.
+
+  The module does not provide any public API. It is loaded
+  automatically with the Mitk Core and registers the reader,
+  writer, and mapper classes.
+*/

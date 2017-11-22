@@ -7,6 +7,7 @@ set(mitk_modules
   AppUtil
   DCMTesting
   RDF
+  LegacyIO
   DataTypesExt
   Annotation
   LegacyGL
@@ -58,6 +59,7 @@ set(mitk_modules
   IGTUI
   DicomRT
   RTUI
+  IOExt
   XNAT
   TubeGraph
   BiophotonicsHardware

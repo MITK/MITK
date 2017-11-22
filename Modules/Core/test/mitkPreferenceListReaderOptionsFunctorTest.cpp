@@ -45,7 +45,7 @@ public:
   void setUp() override
   {
     m_ImagePath = GetTestDataFilePath("TinyCTAbdomen_DICOMReader/100");
-    
+
     preference = { "MITK DICOM Reader v2 (classic config)" };
     black = { "MITK DICOM Reader" };
     emptyList = {};
@@ -99,7 +99,7 @@ public:
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, black);
     CPPUNIT_ASSERT(true == functor(info));
-    CPPUNIT_ASSERT_EQUAL(std::string("MITK DICOM Reader v2 (autoselect)"), info.m_ReaderSelector.GetSelected().GetDescription());
+    CPPUNIT_ASSERT_EQUAL(std::string("MITK Simple Volume Importer"), info.m_ReaderSelector.GetSelected().GetDescription());
   }
 
   void UsePreferenceListWithInexistantReaders()

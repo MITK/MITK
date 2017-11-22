@@ -197,6 +197,12 @@ namespace mitk
     class MITKCORE_EXPORT BaseLocalStorage
     {
     public:
+      BaseLocalStorage() = default;
+      virtual ~BaseLocalStorage() = default;
+
+      BaseLocalStorage(const BaseLocalStorage &) = delete;
+      BaseLocalStorage & operator=(const BaseLocalStorage &) = delete;
+
       bool IsGenerateDataRequired(mitk::BaseRenderer *renderer, mitk::Mapper *mapper, mitk::DataNode *dataNode) const;
 
       inline void UpdateGenerateDataTime() { m_LastGenerateDataTime.Modified(); }

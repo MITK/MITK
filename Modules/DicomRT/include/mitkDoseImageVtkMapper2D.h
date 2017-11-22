@@ -146,7 +146,7 @@ namespace mitk {
     * internal helper class LocalStorage. This allows rendering n views with just
     * 1 mitkMapper using n vtkMapper.
     * */
-    class MITKCORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+    class MITKDICOMRT_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
       /** \brief Actor of a 2D render window. */

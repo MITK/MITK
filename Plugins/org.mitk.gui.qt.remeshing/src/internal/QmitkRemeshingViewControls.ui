@@ -192,7 +192,7 @@
      </property>
      <property name="icon">
       <iconset resource="../../resources/Remeshing.qrc">
-       <normaloff>:/Remeshing/RemeshingIcon.png</normaloff>:/Remeshing/RemeshingIcon.png</iconset>
+       <normaloff>:/Remeshing/RemeshingIcon.svg</normaloff>:/Remeshing/RemeshingIcon.svg</iconset>
      </property>
      <property name="iconSize">
       <size>

@@ -540,6 +540,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       diffusionImageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
       m_DescriptorActionList.push_back(std::make_pair(diffusionImageDataNodeDescriptor,m_TextureInterpolation));
   }
+  if (segmentDataNodeDescriptor != nullptr)
+  {
+    segmentDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
+    m_DescriptorActionList.push_back(std::make_pair(segmentDataNodeDescriptor, m_TextureInterpolation));
+  }
 
   m_ColormapAction = new QAction(tr("Colormap"), this);
   m_ColormapAction->setMenu(new QMenu);

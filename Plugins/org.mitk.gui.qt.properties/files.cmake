@@ -24,7 +24,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/icon.png
+  resources/property_list.svg
   plugin.xml
 )
 

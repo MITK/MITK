@@ -17,7 +17,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/pointset_interaction.png
+  resources/pointset_interaction.svg
   plugin.xml
 )
 

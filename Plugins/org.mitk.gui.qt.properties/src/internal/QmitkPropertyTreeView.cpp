@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPropertyItemSortFilterProxyModel.h"
 #include "QmitkPropertyTreeView.h"
 #include <berryIBerryPreferences.h>
+#include <berryQtStyleManager.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyPersistence.h>
@@ -75,7 +76,8 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.newButton->setEnabled(false);
 
-  m_Controls.description->hide();
+  this->HideAllIcons();
+  m_Controls.descriptionLabel->hide();
   m_Controls.propertyListLabel->hide();
   m_Controls.propertyListComboBox->hide();
   m_Controls.newButton->hide();
@@ -99,6 +101,17 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_Controls.treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
+
+  const int ICON_SIZE = 32;
+
+  auto icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tags.svg"));
+  m_Controls.tagsLabel->setPixmap(icon.pixmap(ICON_SIZE));
+
+  icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tag.svg"));
+  m_Controls.tagLabel->setPixmap(icon.pixmap(ICON_SIZE));
+
+  icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg"));
+  m_Controls.saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
   connect(m_Controls.filterLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnFilterTextChanged(const QString&)));
   connect(m_Controls.propertyListComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropertyListChanged(int)));
@@ -200,32 +213,20 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
         if (!description.isEmpty())
           customizedDescription += "<p>" + description + "</p>";
 
-        if (!aliases.empty() || isPersistent)
-        {
-          customizedDescription += "<div align=\"right\">";
+        m_Controls.tagsLabel->setVisible(!aliases.empty() && aliases.size() > 1);
+        m_Controls.tagLabel->setVisible(!aliases.empty() && aliases.size() == 1);
+        m_Controls.saveLabel->setVisible(isPersistent);
 
-          if (!aliases.empty())
-          {
-            customizedDescription += aliases.size() > 1
-              ? "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/tags.svg\"/>"
-              : "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/tag.svg\"/>";
-          }
-
-          if (isPersistent)
-            customizedDescription += "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg\"/>";
-
-          customizedDescription += "</div>";
-        }
-
-        m_Controls.description->setText(customizedDescription);
-        m_Controls.description->show();
+        m_Controls.descriptionLabel->setText(customizedDescription);
+        m_Controls.descriptionLabel->show();
 
         return;
       }
     }
   }
 
-  m_Controls.description->hide();
+  m_Controls.descriptionLabel->hide();
+  this->HideAllIcons();
 }
 
 void QmitkPropertyTreeView::OnFilterTextChanged(const QString& filter)
@@ -240,7 +241,8 @@ void QmitkPropertyTreeView::OnFilterTextChanged(const QString& filter)
 
 void QmitkPropertyTreeView::OnModelReset()
 {
-  m_Controls.description->hide();
+  m_Controls.descriptionLabel->hide();
+  this->HideAllIcons();
 }
 
 void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
@@ -448,4 +450,11 @@ void QmitkPropertyTreeView::OnAddNewProperty()
 
   if (dialog->exec() == QDialog::Accepted)
     this->m_Model->Update();
+}
+
+void QmitkPropertyTreeView::HideAllIcons()
+{
+  m_Controls.tagLabel->hide();
+  m_Controls.tagsLabel->hide();
+  m_Controls.saveLabel->hide();
 }

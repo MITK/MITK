@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg2"
+   viewBox="0 0 100 100"
+   height="100"
+   width="100">
+  <defs
+     id="defs4" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-952.36216)"
+     id="layer1">
+    <g
+       transform="matrix(0.04572542,0,0,0.04170649,6.274082,963.9693)"
+       id="g4145">
+      <g
+         transform="scale(0.9978249,1.0021798)"
+         style="font-style:normal;font-weight:normal;font-size:38.58873749px;line-height:92.00000167%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="text3338">
+        <path
+           style="stroke-width:4.57982969;stroke-miterlimit:4;stroke-dasharray:none"
+           d="m 1659.8015,1009.6794 0,-645.97364 q 0,-36.70317 -27.5862,-62.3953 -27.5863,-25.69212 -66.9955,-25.69212 l -693.60005,0 q -39.4091,0 -66.9956,-25.69212 -27.5861,-25.69212 -27.5861,-62.39505 l 0,-58.72502 q 0,-36.702931 -27.5866,-62.395042 -27.5862,-25.692133 -66.9952,-25.692133 l -315.2729,0 q -39.4091,0 -66.9956,25.692133 -27.5862,25.692111 -27.5862,62.395042 l 0,880.87325 q 0,36.7029 27.5862,62.395 27.5865,25.6921 66.9956,25.6921 l 1198.03645,0 q 39.4092,0 66.9955,-25.6921 27.5862,-25.6921 27.5862,-62.395 z m 126.1091,-645.97364 0,645.97364 q 0,84.4169 -65.0248,144.9769 -65.0251,60.5601 -155.666,60.5601 l -1198.03645,0 q -90.6409,0 -155.666,-60.5601 -65.0251,-60.56 -65.0251,-144.9769 l 0,-880.87325 q 0,-84.416899 65.0251,-144.976946 65.0251,-60.560035 155.666,-60.560035 l 315.2729,0 q 90.6406,0 155.6659,60.560035 65.0248,60.560047 65.0248,144.976946 l 0,29.36264 662.07285,0 q 90.6409,0 155.666,60.55979 65.0248,60.56003 65.0248,144.97718 z"
+           id="path4180" />
+        <text
+           transform="scale(0.95712492,1.0447957)"
+           id="text4152-8"
+           y="1846.9302"
+           x="23.886068"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:915.96606445px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:801.47021484px;line-height:125%;font-family:'Gill Sans MT';-inkscape-font-specification:'Gill Sans MT, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#00ff00;fill-opacity:1"
+             y="1846.9302"
+             x="23.886068"
+             id="tspan4154-0">DCM</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -5,7 +5,7 @@
       id="org.mitk.editors.dicomeditor"
       name="MITK DICOM Browser"
       class="QmitkDicomBrowser"
-      icon="resources/dcm-icon_32.png" >
+      icon="resources/dicom.svg">
     </editor>
   </extension>
 

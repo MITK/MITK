@@ -5,7 +5,7 @@
           name="Properties"
           category="Data handling"
           class="QmitkPropertyTreeView"
-          icon="resources/icon.png" >
+          icon="resources/property_list.svg" >
           <description>View, Set, and Change properties of DataNodes</description>
     </view>
   </extension>

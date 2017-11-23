@@ -6,14 +6,14 @@
     <view id="org.mitk.views.multilabelsegmentation"
       name="MultiLabel Segmentation"
       category="Segmentation"
-      icon="resources/multilabelsegmentation.png"
+      icon="resources/multilabelsegmentation.svg"
       class="QmitkMultiLabelSegmentationView" />
 
     <view id="org.mitk.views.multilabelsegmentationutilities"
       name="MultiLabel Segmentation Utilities"
       category="Segmentation"
       class="QmitkMultiLabelSegmentationUtilitiesView"
-      icon="resources/MultiLabelSegmentationUtilities_48x48.png" />
+      icon="resources/multilabelsegmentation_utilities.svg" />
 
   </extension>
 

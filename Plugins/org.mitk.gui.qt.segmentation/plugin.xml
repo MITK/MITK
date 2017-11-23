@@ -6,7 +6,7 @@
     <view id="org.mitk.views.segmentation"
       name="Segmentation"
       category="Segmentation"
-      icon="resources/segmentation.png"
+      icon="resources/segmentation.svg"
       class="QmitkSegmentationView" >
       <description>Allows the segmentation of images using different tools.</description>
       <keywordReference id="org.mitk.views.segmentation.ViewKeyword"/>
@@ -24,7 +24,7 @@
       name="Segmentation Utilities"
       category="Segmentation"
       class="QmitkSegmentationUtilitiesView"
-      icon="resources/SegmentationUtilities_48x48.png" >
+      icon="resources/segmentation_utilities.svg" >
       <description>Edit segmentations using standard operations. </description>
       <keywordReference id="org.mitk.views.segmentationutilities.ViewKeyword"/>
     </view>

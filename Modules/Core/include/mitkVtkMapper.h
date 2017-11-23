@@ -138,19 +138,10 @@ namespace mitk
     * by the parameter renderer. Should be overwritten in subclasses.
     */
     virtual void ReleaseGraphicsResources(mitk::BaseRenderer * /*renderer*/) {}
-    class VtkMapperLocalStorage : public mitk::Mapper::BaseLocalStorage
+
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
-    public:
-      itk::TimeStamp m_ModifiedTimeStamp;
-
-      VtkMapperLocalStorage()
-      {
-      }
-
-      ~VtkMapperLocalStorage() {}
     };
-
-    mitk::LocalStorageHandler<VtkMapperLocalStorage> m_VtkMapperLSH;
 
   protected:
     /** constructor */

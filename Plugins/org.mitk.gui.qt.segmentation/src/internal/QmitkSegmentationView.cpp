@@ -209,59 +209,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
        {
          // ask about the name and organ type of the new segmentation
          QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget
-
-         QString storedList = this->GetPreferences()->Get("Organ-Color-List", "");
-         QStringList organColors;
-         if (storedList.isEmpty())
-         {
-           organColors = mitk::OrganNamesHandling::GetDefaultOrganColorString();
-         }
-         else
-         {
-           /*
-           a couple of examples of how organ names are stored:
-
-           a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
-
-           items are stored separated by ';'
-           this makes it necessary to escape occurrences of ';' in name.
-           otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
-           but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
-
-           so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
-           and must be unescaped after loading
-
-           the following lines could be one split with Perl's negative lookbehind
-           */
-
-           // recover string list from BlueBerry view's preferences
-           QString storedString = this->GetPreferences()->Get("Organ-Color-List", "");
-           MITK_DEBUG << "storedString: " << storedString.toStdString();
-           // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-           QRegExp onePart("(?:[^;]|\\\\;)*");
-           MITK_DEBUG << "matching " << onePart.pattern().toStdString();
-           int count = 0;
-           int pos = 0;
-           while ((pos = onePart.indexIn(storedString, pos)) != -1)
-           {
-             ++count;
-             int length = onePart.matchedLength();
-             if (length == 0)
-             {
-               break;
-             }
-             QString matchedString = storedString.mid(pos, length);
-             MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
-             pos += length + 1; // skip separating ';'
-
-             // unescape possible occurrences of '\;' in the string
-             matchedString.replace("\\;", ";");
-
-             // add matched string part to output list
-             organColors << matchedString;
-           }
-           MITK_DEBUG << "Captured " << count << " organ name/colors";
-         }
+         QStringList organColors = mitk::OrganNamesHandling::GetDefaultOrganColorString();;
 
          dialog->SetSuggestionList(organColors);
 

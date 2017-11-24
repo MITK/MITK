@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidgetAction>
 #include <map>
 #include <mitkNodePredicateBase.h>
+#include <mitkWeakPointer.h>
 
 /**
  * \ingroup QmitkModule
@@ -51,10 +52,16 @@ public:
                       const QString &_PathToIcon,
                       mitk::NodePredicateBase *_Predicate,
                       QObject *parent);
+
+  QmitkNodeDescriptor(const QString &_ClassName,
+                      const QIcon &_Icon,
+                      mitk::NodePredicateBase *_Predicate,
+                      QObject *parent);
+
   ///
   /// Deletes all actions
   ///
-  ~QmitkNodeDescriptor() override;
+  virtual ~QmitkNodeDescriptor() override;
   ///
   /// Returns a name for this class of DataNodes (e.g. "Image", "Image Mask", etc.)
   ///
@@ -62,7 +69,7 @@ public:
   ///
   /// Returns an Icon for this class of DataNodes
   ///
-  virtual QIcon GetIcon() const;
+  virtual QIcon GetIcon(const mitk::DataNode *node) const;
   ///
   /// Returns an Icon for this class of DataNodes
   ///
@@ -95,7 +102,7 @@ public slots:
 
 protected:
   QString m_ClassName;
-  QString m_PathToIcon;
+  QIcon m_Icon;
   mitk::NodePredicateBase::Pointer m_Predicate;
   QList<QAction *> m_Actions;
   QList<QAction *> m_BatchActions;

@@ -343,7 +343,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   //  ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New(mitkWidget1->GetRenderer()->GetName());
-  m_MouseModeSwitcher->AddRenderer(mitkWidget1->GetRenderer()->GetName());
+  //m_MouseModeSwitcher->AddRenderer(mitkWidget1->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget2->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget3->GetRenderer()->GetName());
   m_MouseModeSwitcher->AddRenderer(mitkWidget4->GetRenderer()->GetName());

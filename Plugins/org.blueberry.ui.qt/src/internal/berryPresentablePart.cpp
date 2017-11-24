@@ -152,6 +152,11 @@ QString PresentablePart::GetName() const
   return name;
 }
 
+QString PresentablePart::GetId() const
+{
+  return this->GetPartReference()->GetId();
+}
+
 QString PresentablePart::GetTitle() const
 {
   return this->GetPartReference()->GetPartName();

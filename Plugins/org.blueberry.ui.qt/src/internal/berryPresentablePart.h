@@ -158,6 +158,11 @@ public:
   QString GetName() const override;
 
   /* (non-Javadoc)
+   * @see org.blueberry.ui.presentations.IPresentablePart#getId()
+   */
+  QString GetId() const override;
+
+  /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitle()
    */
   QString GetTitle() const override;

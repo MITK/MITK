@@ -234,16 +234,15 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
   }
 
   item = folder->Add(idx, style);
-
   item->SetData(part);
-
-  QString partTabName = part->GetName();
-
-  if (partTabItems.count(partTabName))
+  
+  QString partTabId = part->GetId();
+  
+  if (partTabItems.count(partTabId))
   {
     // keep existing lock
-    partTabItems[partTabName].m_AbstractTab = item;
-    if (partTabItems[partTabName].m_Lock)
+    partTabItems[partTabId].m_AbstractTab = item;
+    if (partTabItems[partTabId].m_Lock)
     {
       item->SetLock(true);
     }
@@ -252,7 +251,7 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
   {
     TabLock tabLock;
     tabLock.m_AbstractTab = item;
-    partTabItems[partTabName] = tabLock;
+    partTabItems[partTabId] = tabLock;
   }
 
   this->InitTab(item, part);

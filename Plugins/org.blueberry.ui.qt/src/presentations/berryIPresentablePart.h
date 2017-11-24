@@ -146,6 +146,12 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
     virtual QString GetName() const = 0;
 
     /**
+     * Returns the id of the part. 
+     * @return the id of the part (not null)
+     */
+    virtual QString GetId() const = 0;
+
+    /**
      * Returns the title of this workbench part. If this value changes
      * the part must fire a property listener event with
      * <code>PROP_TITLE</code>.

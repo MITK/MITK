@@ -221,7 +221,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   }
 
   SceneReader::Pointer reader = SceneReader::New();
-  if ( !reader->LoadScene( document, defaultLocale_WorkingDirectory, storage, interrupt ) && !(*interrupt) )
+  if ( !reader->LoadScene( document, defaultLocale_WorkingDirectory, storage, interrupt ) && interrupt && !*interrupt )
   {
     MITK_ERROR << "There were errors while loading scene file " << filename << ". Your data may be corrupted";
   }

@@ -788,7 +788,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
         }
       }
 
-      if ((loadInfo.m_Output.empty() || (nodeResult && nodeResult->Size() == 0)) && !(*interrupt))
+      if ((loadInfo.m_Output.empty() || (nodeResult && nodeResult->Size() == 0)) && interrupt && !*interrupt)
       {
         errMsg += "Unknown read error occurred reading " + loadInfo.m_Path;
       }

@@ -60,7 +60,8 @@ bool NodeSortByLayerIsLessThan(const NodesAndParentsPair& left, const NodesAndPa
 
 bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, volatile bool* interrupt)
 {
-  if (interrupt != nullptr && *interrupt) {
+  if (interrupt && *interrupt) {
+    ProgressBar::GetInstance()->Reset();
     return false;
   }
 
@@ -92,7 +93,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
   {
     auto dataElement = element->FirstChildElement("data");
     loadedThreads.push_back(std::async(std::launch::async, [this, dataElement, &workingDirectory, &error, interrupt]{
-        if (interrupt != nullptr && *interrupt) {
+        if (interrupt && *interrupt) {
+          ProgressBar::GetInstance()->Reset();
           return DataNode::Pointer();
         }
 
@@ -110,8 +112,9 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
       qApp->processEvents();
     }
 
-    if (interrupt != nullptr && *interrupt) {
-     continue;
+    if (interrupt && *interrupt) {
+      ProgressBar::GetInstance()->Reset();
+      continue;
     }
 
     DataNodes.push_back(task.get());
@@ -119,7 +122,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
     ProgressBar::GetInstance()->Progress();
   }
 
-  if (interrupt != nullptr && *interrupt) {
+  if (interrupt && *interrupt) {
+    ProgressBar::GetInstance()->Reset();
     return false;
   }
 
@@ -136,7 +140,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
   {
     decorateThreads.push_back(std::async(std::launch::async, [this, element, nit, &workingDirectory, &error, interrupt]() -> DecorateResult {
-        if (interrupt != nullptr && *interrupt) {
+        if (interrupt && *interrupt) {
+          ProgressBar::GetInstance()->Reset();
           return DecorateResult();
         }
 
@@ -212,7 +217,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
       qApp->processEvents();
     }
 
-    if (interrupt != nullptr && *interrupt) {
+    if (interrupt && *interrupt) {
+      ProgressBar::GetInstance()->Reset();
       continue;
     }
 
@@ -224,7 +230,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
     ProgressBar::GetInstance()->Progress();
   } // end for all <node>
 
-  if (interrupt != nullptr && *interrupt) {
+  if (interrupt && *interrupt) {
+    ProgressBar::GetInstance()->Reset();
     return false;
   }
 

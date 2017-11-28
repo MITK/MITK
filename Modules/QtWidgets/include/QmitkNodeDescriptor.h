@@ -31,22 +31,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  * \ingroup QmitkModule
- * \brief QmitkNodeQmitkNodeDescriptor is <i>Decorator</i> class for
- * the mitk::DataNode which enhances certain mitk::DataNode by additional
- * infos needed by the GUI (Icon, ...)
+ * \brief <i>Decorator</i> class for mitk::DataNode.
  *
- * Moreover, QmitkNodeQmitkNodeDescriptor stores a Menu for actions that can be taken
- * for a certain DataNode, e.g. for DataNodes containing images this menu
- * can be filled with Image Filter Actions, etc.
- *
- * \sa QmitkDataNodeQmitkNodeDescriptorManager
+ * \sa QmitkNodeDescriptorManager
  */
 class MITKQTWIDGETS_EXPORT QmitkNodeDescriptor : public QObject
 {
   Q_OBJECT
 public:
   ///
-  /// Creates a new QmitkNodeQmitkNodeDescriptor
+  /// Creates a new QmitkNodeDescriptor
   ///
   QmitkNodeDescriptor(const QString &_ClassName,
                       const QString &_PathToIcon,

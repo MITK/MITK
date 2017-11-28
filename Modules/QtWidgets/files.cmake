@@ -18,6 +18,7 @@ QmitkLineEditLevelWindowWidget.cpp
 QmitkMemoryUsageIndicatorView.cpp
 QmitkMimeTypes.cpp
 QmitkNodeDescriptor.cpp
+QmitkColoredNodeDescriptor.cpp
 QmitkNodeDescriptorManager.cpp
 QmitkRenderWindowMenu.cpp
 QmitkProgressBar.cpp
@@ -52,6 +53,7 @@ set(MOC_H_FILES
   include/QmitkLineEditLevelWindowWidget.h
   include/QmitkMemoryUsageIndicatorView.h
   include/QmitkNodeDescriptor.h
+  include/QmitkColoredNodeDescriptor.h
   include/QmitkNodeDescriptorManager.h
   include/QmitkRenderWindowMenu.h
   include/QmitkProgressBar.h

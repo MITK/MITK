@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef NEEDLEPROJECTIONFILTER_H_INCLUDED
 #define NEEDLEPROJECTIONFILTER_H_INCLUDED
 
-#include <MitkUSNavigationExports.h>
+#include "MitkIGTExports.h"
 
 // MITK
 #include <mitkNavigationDataPassThroughFilter.h>
@@ -44,7 +44,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MITKUSNAVIGATION_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
+  class MITKIGT_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
   {
   public:
     mitkClassMacro(NeedleProjectionFilter, NavigationDataPassThroughFilter);

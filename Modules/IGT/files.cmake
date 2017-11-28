@@ -6,6 +6,7 @@ set(CPP_FILES
   Algorithms/mitkNavigationDataDisplacementFilter.cpp
   Algorithms/mitkNavigationDataEvaluationFilter.cpp
   Algorithms/mitkNavigationDataLandmarkTransformFilter.cpp
+  Algorithms/mitkNavigationDataPassThroughFilter.cpp
   Algorithms/mitkNavigationDataReferenceTransformFilter.cpp
   Algorithms/mitkNavigationDataSmoothingFilter.cpp
   Algorithms/mitkNavigationDataToMessageFilter.cpp
@@ -14,6 +15,7 @@ set(CPP_FILES
   Algorithms/mitkNavigationDataTransformFilter.cpp
   Algorithms/mitkNavigationDataToIGTLMessageFilter.cpp
   Algorithms/mitkIGTLMessageToNavigationDataFilter.cpp
+  Algorithms/mitkNeedleProjectionFilter.cpp
   Algorithms/mitkPivotCalibration.cpp
 
   Common/mitkIGTTimeStamp.cpp

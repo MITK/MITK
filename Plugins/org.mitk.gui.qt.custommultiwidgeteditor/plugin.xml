@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.editors">
+    <editor id="org.mitk.editors.custommultiwidget"
+			name="Custom Multi Widget Editor"
+			class="QmitkCustomMultiWidgetEditor"
+			icon="resources/CustomMultiWidgetEditor.svg"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.CustomMultiWidgetEditorPreferencePage"
+		  name="Custom Multi Widget Editor"
+		  class="QmitkCustomMultiWidgetEditorPreferencePage"
+		  category="org.mitk.EditorsPreferencePage">
+      <keywordreference id="org.mitk.CustomMultiWidgetEditorPreferencePageKeywords"/>
+    </page>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.CustomMultiWidgetEditorPreferencePageKeywords" label="zooming panning contraint"/>
+    <keyword id="org.mitk.CustomMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
+    <keyword id="org.mitk.CustomMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
+    <keyword id="org.mitk.CustomMultiWidgetEditorPreferencePageKeywords" label="rendering mode standard multisampling enable antialiasing depth peeling"/>
+    <keyword id="org.mitk.CustomMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size background decoration color corner annotation"/>
+  </extension>
+</plugin>

@@ -117,7 +117,7 @@ std::vector<BaseData::Pointer> AbstractFileReader::Read()
   std::vector<BaseData::Pointer> result;
 
   DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
-  this->Read(*ds);
+  this->Read(*ds); 
   DataStorage::SetOfObjects::ConstPointer dataNodes = ds->GetAll();
   for (DataStorage::SetOfObjects::ConstIterator iter = dataNodes->Begin(),
        iterEnd = dataNodes->End(); iter != iterEnd; ++iter)
@@ -127,7 +127,7 @@ std::vector<BaseData::Pointer> AbstractFileReader::Read()
   return result;
 }
 
-DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(DataStorage& ds)
+DataStorage::SetOfObjects::Pointer AbstractFileReader::Read(DataStorage& ds, volatile bool* interrupt)
 {
   DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
   std::vector<BaseData::Pointer> data = this->Read();

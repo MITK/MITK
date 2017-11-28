@@ -55,7 +55,8 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
      */
     virtual DataStorage::Pointer LoadScene( const std::string& filename,
                                             DataStorage* storage = NULL,
-                                            bool clearStorageFirst = false );
+                                            bool clearStorageFirst = false,
+                                            volatile bool* interrupt = nullptr );
 
     virtual DataStorage::Pointer LoadWorkspace( const std::string& filename,
                                             DataStorage* storage = NULL,

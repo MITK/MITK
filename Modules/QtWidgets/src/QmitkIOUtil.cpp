@@ -395,7 +395,7 @@ QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths, QWidg
   return qResult;
 }
 
-mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList& paths, mitk::DataStorage& storage, QWidget* parent)
+mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList& paths, mitk::DataStorage& storage, QWidget* parent, volatile bool* interrupt)
 {
   std::vector<LoadInfo> loadInfos;
   foreach(const QString& file, paths)
@@ -405,7 +405,7 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList& pa
 
   mitk::DataStorage::SetOfObjects::Pointer nodeResult = mitk::DataStorage::SetOfObjects::New();
   Impl::ReaderOptionsDialogFunctor optionsCallback;
-  std::string errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback);
+  std::string errMsg = Load(loadInfos, nodeResult, &storage, &optionsCallback, interrupt);
   if (!errMsg.empty())
   {
     QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
@@ -427,6 +427,14 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QString& path, 
   QStringList paths;
   paths << path;
   return Load(paths, storage, parent);
+}
+
+mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QString& path, mitk::DataStorage& storage,
+                                                           volatile bool* interrupt, QWidget* parent)
+{
+  QStringList paths;
+  paths << path;
+  return Load(paths, storage, parent, interrupt);
 }
 
 QString QmitkIOUtil::Save(const mitk::BaseData* data, const QString& defaultBaseName,

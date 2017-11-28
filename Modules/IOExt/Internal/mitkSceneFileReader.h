@@ -31,7 +31,7 @@ public:
 
   using AbstractFileReader::Read;
   virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
-  virtual DataStorage::SetOfObjects::Pointer Read(DataStorage& ds) override;
+  virtual DataStorage::SetOfObjects::Pointer Read(DataStorage& ds, volatile bool* interrupt = nullptr) override;
 
 private:
 

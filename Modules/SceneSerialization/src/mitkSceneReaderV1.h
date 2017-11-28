@@ -27,7 +27,7 @@ class SceneReaderV1 : public SceneReader
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage ) override;
+    virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, volatile bool* interrupt = nullptr ) override;
 
   protected:
 

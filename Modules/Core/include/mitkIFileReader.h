@@ -118,7 +118,7 @@ struct MITKCORE_EXPORT IFileReader : public IFileIO
    *
    * \throws mitk::Exception
    */
-  virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds) = 0;
+  virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage& ds, volatile bool* interrupt = nullptr) = 0;
 
 };
 

@@ -436,7 +436,7 @@ protected:
   };
 
   static std::string Load(std::vector<LoadInfo>& loadInfos, DataStorage::SetOfObjects* nodeResult,
-                          DataStorage* ds, ReaderOptionsFunctorBase* optionsCallback);
+                          DataStorage* ds, ReaderOptionsFunctorBase* optionsCallback, volatile bool* interrupt = nullptr);
 
   static std::string Save(const BaseData* data, const std::string& mimeType, const std::string& path,
                           WriterOptionsFunctorBase* optionsCallback, bool addExtension);

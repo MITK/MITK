@@ -15,6 +15,7 @@ if(BUILD_DiffusionFiberProcessingCmdApps OR MITK_BUILD_ALL_APPS)
     TractDensity^^MitkFiberTracking
     Sift2WeightCopy^^MitkFiberTracking
     FiberExtraction^^MitkFiberTracking
+    FiberExtractionRoi^^MitkFiberTracking
     FiberProcessing^^MitkFiberTracking
     FitFibersToImage^^MitkFiberTracking
     FiberDirectionExtraction^^MitkFiberTracking

@@ -67,31 +67,37 @@ public:
   typedef SmartPointer< Self >                                Pointer;
   typedef SmartPointer< const Self >                          ConstPointer;
   typedef itk::Image< float, 3 >                              FloatImageType;
+  typedef itk::Image< unsigned char, 3 >                      UcharImageType;
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
   itkTypeMacro( TractClusteringFilter, ProcessObject )
 
-  itkSetMacro(NumPoints, unsigned int)
-  itkGetMacro(NumPoints, unsigned int)
-  itkSetMacro(MinClusterSize, unsigned int)
-  itkGetMacro(MinClusterSize, unsigned int)
-  itkSetMacro(MaxClusters, unsigned int)
-  itkGetMacro(MaxClusters, unsigned int)
-  itkSetMacro(Scale, float)
-  itkGetMacro(Scale, float)
-  itkSetMacro(MergeDuplicateThreshold, float)
-  itkGetMacro(MergeDuplicateThreshold, float)
+  itkSetMacro(NumPoints, unsigned int)  ///< Fibers are resampled to the specified number of points. If scalar maps are used, a larger number of points is recommended.
+  itkGetMacro(NumPoints, unsigned int)  ///< Fibers are resampled to the specified number of points. If scalar maps are used, a larger number of points is recommended.
+  itkSetMacro(MinClusterSize, unsigned int) ///< Clusters with too few fibers are discarded
+  itkGetMacro(MinClusterSize, unsigned int) ///< Clusters with too few fibers are discarded
+  itkSetMacro(MaxClusters, unsigned int) ///< Only the N largest clusters are kept
+  itkGetMacro(MaxClusters, unsigned int) ///< Only the N largest clusters are kept
+  itkSetMacro(Scale, float) ///< Scaling factor for scalar map. By default, the map is scaled by a factor corresponding to the cluster distance
+  itkGetMacro(Scale, float) ///< Scaling factor for scalar map. By default, the map is scaled by a factor corresponding to the cluster distance
+  itkSetMacro(MergeDuplicateThreshold, float) ///< Clusters with centroids very close to each other are merged. Set to 0 to avoid merging and to -1 to use the original cluster size.
+  itkGetMacro(MergeDuplicateThreshold, float) ///< Clusters with centroids very close to each other are merged. Set to 0 to avoid merging and to -1 to use the original cluster size.
+  itkSetMacro(DoResampling, bool) ///< Resample fibers to equal number of points. This is mandatory, but can be performed outside of the filter if desired.
+  itkGetMacro(DoResampling, bool) ///< Resample fibers to equal number of points. This is mandatory, but can be performed outside of the filter if desired.
+  itkSetMacro(OverlapThreshold, float)  ///< Overlap threshold used in conjunction with the filter mask when clustering around known centroids.
+  itkGetMacro(OverlapThreshold, float)  ///< Overlap threshold used in conjunction with the filter mask when clustering around known centroids.
 
-  itkSetMacro(Tractogram, mitk::FiberBundle::Pointer)
-  itkSetMacro(InCentroids, mitk::FiberBundle::Pointer)
-  itkSetMacro(ScalarMap, FloatImageType::Pointer)
+  itkSetMacro(Tractogram, mitk::FiberBundle::Pointer)   ///< The streamlines to be clustered
+  itkSetMacro(ScalarMap, FloatImageType::Pointer) ///< Scalar values along the streamlines are included into the distance calculation. If this feature is used, it is recommended to use a larger number of fiber sampling points.
+  itkSetMacro(InCentroids, mitk::FiberBundle::Pointer)  ///< If a tractogram containing known tract centroids is set, the input fibers are assigned to the closest centroid. If no centroid is found within the specified smallest clustering distance, the fiber is assigned to the no-fit cluster.
+  itkSetMacro(FilterMask, UcharImageType::Pointer)  ///< If fibers are clustered around the nearest input centroids (see SetInCentroids), the complete input tractogram can additionally be pre-filtered with this binary mask and a given overlap threshold (see SetOverlapThreshold).
 
   virtual void Update() override{
     this->GenerateData();
   }
 
-  void SetDistances(const std::vector<float> &Distances);
+  void SetDistances(const std::vector<float> &Distances); ///< Set clustering distances that are traversed recoursively. The distances have to be sorted in an ascending manner. The actual cluster size is determined by the smallest entry in the distance-list (index 0).
 
   std::vector<mitk::FiberBundle::Pointer> GetOutTractograms() const;
 
@@ -108,6 +114,7 @@ protected:
   float CalcMDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
   float CalcMDF_STD(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
   float CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
+  float CalcOverlap(vnl_matrix<float>& t);
 
   std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);
   void MergeDuplicateClusters(std::vector< TractClusteringFilter::Cluster >& clusters);
@@ -131,6 +138,9 @@ protected:
   float                                       m_Scale;
   float                                       m_MergeDuplicateThreshold;
   std::vector< Cluster >                      m_OutClusters;
+  bool                                        m_DoResampling;
+  UcharImageType::Pointer                     m_FilterMask;
+  float                                       m_OverlapThreshold;
 };
 }
 

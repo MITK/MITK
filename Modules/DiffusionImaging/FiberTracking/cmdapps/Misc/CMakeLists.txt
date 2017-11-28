@@ -14,6 +14,7 @@ if(BUILD_DiffusionMiscCmdApps OR MITK_BUILD_ALL_APPS)
     set( diffusionMisccmdapps
     PeakExtraction^^MitkFiberTracking
     FileFormatConverter^^MitkFiberTracking
+    FlipPeaks^^MitkFiberTracking
     )
 
     foreach(diffusionMisccmdapp ${diffusionMisccmdapps})

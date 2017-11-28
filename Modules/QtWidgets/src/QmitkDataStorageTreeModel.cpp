@@ -473,7 +473,7 @@ QVariant QmitkDataStorageTreeModel::data(const QModelIndex &index, int role) con
   else if (role == Qt::DecorationRole)
   {
     QmitkNodeDescriptor *nodeDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(dataNode);
-    return nodeDescriptor->GetIcon();
+    return nodeDescriptor->GetIcon(dataNode);
   }
   else if (role == Qt::CheckStateRole)
   {

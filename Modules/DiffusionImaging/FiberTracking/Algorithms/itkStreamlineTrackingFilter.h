@@ -115,6 +115,7 @@ public:
   itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
   itkSetMacro( StopTracking, bool )
+  itkSetMacro( InterpolateMask, bool )
 
   ///< Use manually defined points in physical space as seed points instead of seed image
   void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {
@@ -202,6 +203,7 @@ protected:
   unsigned int                        m_CurrentTracts;
   unsigned int                        m_Progress;
   bool                                m_StopTracking;
+  bool                                m_InterpolateMask;
 
   void BuildFibers(bool check);
   int CheckCurvature(FiberType* fib, bool front);

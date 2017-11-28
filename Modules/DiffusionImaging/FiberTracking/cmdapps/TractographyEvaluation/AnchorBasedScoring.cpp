@@ -274,7 +274,7 @@ int main(int argc, char* argv[])
         std::streambuf *old = cout.rdbuf(); // <-- save
         std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-        mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(10000*rms_diff[c])) + "_" + bundle_name + ".fib");
+        mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[c])) + "_" + bundle_name + ".fib");
 
         float best_overlap = 0;
         int best_overlap_index = -1;

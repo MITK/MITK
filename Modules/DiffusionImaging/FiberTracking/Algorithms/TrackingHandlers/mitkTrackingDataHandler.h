@@ -93,24 +93,6 @@ public:
       return m_RngItk->GetUniformVariate(a, b);
     }
 
-protected:
-
-    float               m_AngularThreshold;
-    bool                m_Interpolate;
-    bool                m_FlipX;
-    bool                m_FlipY;
-    bool                m_FlipZ;
-    MODE                m_Mode;
-    BoostRngType        m_Rng;
-    ItkRngType::Pointer m_RngItk;
-    bool                m_NeedsDataInit;
-    bool                m_Random;
-
-    void DataModified()
-    {
-      m_NeedsDataInit = true;
-    }
-
     template< class TPixelType >
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<float, 8>& interpWeights){
       // transform physical point to index coordinates
@@ -197,7 +179,7 @@ protected:
       return pix;
     }
 
-    template< class TPixelType >
+    template< class TPixelType, class TOutPixelType=TPixelType >
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate){
       // transform physical point to index coordinates
       itk::Index<3> idx;
@@ -205,10 +187,10 @@ protected:
       image->TransformPhysicalPointToIndex(itkP, idx);
       image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
-      TPixelType pix = 0.0;
+      TOutPixelType pix = 0.0;
       if ( image->GetLargestPossibleRegion().IsInside(idx) )
       {
-        pix = image->GetPixel(idx);
+        pix = (TOutPixelType)image->GetPixel(idx);
         if (!interpolate)
           return pix;
       }
@@ -256,25 +238,25 @@ protected:
         pix = image->GetPixel(idx) * interpWeights[0];
 
         typename itk::Image<TPixelType, 3>::IndexType tmpIdx = idx; tmpIdx[0]++;
-        pix +=  image->GetPixel(tmpIdx) * interpWeights[1];
+        pix +=  (TOutPixelType)image->GetPixel(tmpIdx) * interpWeights[1];
 
         tmpIdx = idx; tmpIdx[1]++;
-        pix +=  image->GetPixel(tmpIdx) * interpWeights[2];
+        pix +=  (TOutPixelType)image->GetPixel(tmpIdx) * interpWeights[2];
 
         tmpIdx = idx; tmpIdx[2]++;
-        pix +=  image->GetPixel(tmpIdx) * interpWeights[3];
+        pix +=  (TOutPixelType)image->GetPixel(tmpIdx) * interpWeights[3];
 
         tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
-        pix +=  image->GetPixel(tmpIdx) * interpWeights[4];
+        pix +=  (TOutPixelType)image->GetPixel(tmpIdx) * interpWeights[4];
 
         tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
-        pix +=  image->GetPixel(tmpIdx) * interpWeights[5];
+        pix +=  (TOutPixelType)image->GetPixel(tmpIdx) * interpWeights[5];
 
         tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
-        pix +=  image->GetPixel(tmpIdx) * interpWeights[6];
+        pix +=  (TOutPixelType)image->GetPixel(tmpIdx) * interpWeights[6];
 
         tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-        pix +=  image->GetPixel(tmpIdx) * interpWeights[7];
+        pix +=  (TOutPixelType)image->GetPixel(tmpIdx) * interpWeights[7];
       }
 
       if (pix!=pix)
@@ -373,6 +355,24 @@ protected:
       }
 
       return pix;
+    }
+
+protected:
+
+    float               m_AngularThreshold;
+    bool                m_Interpolate;
+    bool                m_FlipX;
+    bool                m_FlipY;
+    bool                m_FlipZ;
+    MODE                m_Mode;
+    BoostRngType        m_Rng;
+    ItkRngType::Pointer m_RngItk;
+    bool                m_NeedsDataInit;
+    bool                m_Random;
+
+    void DataModified()
+    {
+      m_NeedsDataInit = true;
     }
 
 };

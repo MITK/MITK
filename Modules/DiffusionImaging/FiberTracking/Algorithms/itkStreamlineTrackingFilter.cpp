@@ -83,6 +83,7 @@ StreamlineTrackingFilter
   , m_CurrentTracts(0)
   , m_Progress(0)
   , m_StopTracking(false)
+  , m_InterpolateMask(false)
 {
   this->SetNumberOfRequiredInputs(0);
 }
@@ -375,10 +376,16 @@ bool StreamlineTrackingFilter
   if (mask.IsNull())
     return true;
 
-  ItkUcharImgType::IndexType idx;
-  mask->TransformPhysicalPointToIndex(pos, idx);
-  if (!mask->GetLargestPossibleRegion().IsInside(idx) || mask->GetPixel(idx)==0)
-    return false;
+  if (m_InterpolateMask)
+  {
+    if (m_TrackingHandler->GetImageValue<unsigned char, double>(pos, mask, m_InterpolateMask)<0.5)
+      return false;
+  }
+  else
+  {
+    if (m_TrackingHandler->GetImageValue<unsigned char>(pos, mask, m_InterpolateMask)==0)
+      return false;
+  }
 
   return true;
 }

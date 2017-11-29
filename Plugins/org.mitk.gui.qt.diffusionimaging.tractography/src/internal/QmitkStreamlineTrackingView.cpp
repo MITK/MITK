@@ -164,6 +164,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_OutputProbMap, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_SharpenOdfsBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_InterpolationBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_MaskInterpolationBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_SeedGmBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FlipXBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FlipYBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
@@ -808,11 +809,13 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     m_Tracker->SetSeedImage(mask);
   }
 
+  m_Tracker->SetInterpolateMask(false);
   if (m_Controls->m_MaskImageBox->GetSelectedNode().IsNotNull())
   {
     ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_MaskImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetMaskImage(mask);
+    m_Tracker->SetInterpolateMask(m_Controls->m_MaskInterpolationBox->isChecked());
   }
 
   if (m_Controls->m_StopImageBox->GetSelectedNode().IsNotNull())

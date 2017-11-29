@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkFiberQuantificationView.h"
 #include "src/internal/QmitkFiberClusteringView.h"
 #include "src/internal/QmitkFiberFitView.h"
+#include "src/internal/QmitkTractometryView.h"
+
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 
@@ -38,6 +40,7 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberClusteringView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberFitView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkTractometryView, context)
   m_Context = context;
 }
 

@@ -10,6 +10,7 @@ set(INTERNAL_CPP_FILES
   QmitkFiberProcessingView.cpp
   QmitkFiberClusteringView.cpp
   QmitkFiberFitView.cpp
+  QmitkTractometryView.cpp
 
   Perspectives/QmitkFiberProcessingPerspective.cpp
 )
@@ -19,6 +20,7 @@ set(UI_FILES
   src/internal/QmitkFiberProcessingViewControls.ui
   src/internal/QmitkFiberClusteringViewControls.ui
   src/internal/QmitkFiberFitViewControls.ui
+  src/internal/QmitkTractometryViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -28,6 +30,7 @@ set(MOC_H_FILES
   src/internal/QmitkFiberProcessingView.h
   src/internal/QmitkFiberClusteringView.h
   src/internal/QmitkFiberFitView.h
+  src/internal/QmitkTractometryView.h
 
   src/internal/Perspectives/QmitkFiberProcessingPerspective.h
 )
@@ -39,6 +42,7 @@ set(CACHED_RESOURCE_FILES
   resources/FiberQuantification.png
   resources/FiberClustering.png
   resources/FiberFit.png
+  resources/Tractometry.png
   resources/circle.png
   resources/polygon.png
 )

@@ -36,6 +36,14 @@
     <keywordReference id="org.mitk.views.fiberfit.Keyword"/>
     </view>
 
+    <view id="org.mitk.views.tractometry"
+    name="Tractometry"
+    category="Fiber processing"
+    class="QmitkTractometryView"
+    icon="resources/Tractometry.png">
+    <keywordReference id="org.mitk.views.tractometry.Keyword"/>
+    </view>
+
   </extension>
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>413</width>
-    <height>1325</height>
+    <height>1356</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -789,7 +789,7 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QCheckBox" name="m_SeedGmBox">
            <property name="toolTip">
             <string>Requires tissue image.</string>
@@ -808,10 +808,23 @@
             <string>If false, nearest neighbor interpolation is used.</string>
            </property>
            <property name="text">
-            <string>Enable Trilinear Interpolation</string>
+            <string>Interpolate Tractography Data</string>
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="m_MaskInterpolationBox">
+           <property name="toolTip">
+            <string>The tractography mask is not interpolated by default.</string>
+           </property>
+           <property name="text">
+            <string>Interpolate Mask Image</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
            </property>
           </widget>
          </item>

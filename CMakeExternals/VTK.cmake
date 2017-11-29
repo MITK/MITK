@@ -87,6 +87,7 @@ if(NOT DEFINED VTK_DIR)
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK.patch
+	    COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkCornerAnnotation.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}

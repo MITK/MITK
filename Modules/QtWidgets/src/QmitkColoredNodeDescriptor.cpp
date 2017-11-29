@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkColoredNodeDescriptor.h>
 #include <mitkNodePredicateDataType.h>
+#include <QFile>
 
 static QString ConvertRGBTripletToHexColorCode(float rgbTriplet[3])
 {

@@ -108,7 +108,7 @@ namespace mitk
       return !*this;
     }
 
-    typename T::Pointer Lock() const noexcept
+    itk::SmartPointer<T> Lock() const
     {
       return m_RawPointer;
     }

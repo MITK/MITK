@@ -19,6 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <mitkIOUtil.h>
 #include <itkTractClusteringFilter.h>
+#include <mitkClusteringMetricEuclideanMean.h>
+#include <mitkClusteringMetricEuclideanMax.h>
+#include <mitkClusteringMetricEuclideanStd.h>
+#include <mitkClusteringMetricAnatomic.h>
+#include <mitkClusteringMetricScalarMap.h>
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
 {
@@ -50,10 +55,10 @@ int main(int argc, char* argv[])
   parser.addArgument("max_clusters", "", mitkCommandLineParser::Int, "Max. clusters:", "");
   parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "", -1.0);
   parser.addArgument("output_centroids", "", mitkCommandLineParser::Bool, "Output centroids:", "");
-  parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "");
+  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN, EU_STD, EU_MAX, ANAT, MAP");
   parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "");
   parser.addArgument("scalar_map", "", mitkCommandLineParser::String, "Scalar map:", "");
-  parser.addArgument("map_scale", "", mitkCommandLineParser::Float, "Map scale:", "", 0.0);
+  parser.addArgument("parcellation", "", mitkCommandLineParser::String, "Parcellation:", "");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -78,10 +83,6 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("max_clusters"))
     max_clusters = us::any_cast<int>(parsedArgs["max_clusters"]);
 
-  float map_scale = 0.0;
-  if (parsedArgs.count("map_scale"))
-    map_scale = us::any_cast<float>(parsedArgs["map_scale"]);
-
   float merge_clusters = -1.0;
   if (parsedArgs.count("merge_clusters"))
     merge_clusters = us::any_cast<float>(parsedArgs["merge_clusters"]);
@@ -90,9 +91,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("output_centroids"))
     output_centroids = us::any_cast<bool>(parsedArgs["output_centroids"]);
 
-  std::string metric = "MDF_STD";
-  if (parsedArgs.count("metric"))
-    metric = us::any_cast<std::string>(parsedArgs["metric"]);
+  std::vector< std::string > metric_strings = {"EUCL"};
+  if (parsedArgs.count("metrics"))
+    metric_strings = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["metrics"]);
 
   std::string input_centroids = "";
   if (parsedArgs.count("input_centroids"))
@@ -102,9 +103,14 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("scalar_map"))
     scalar_map = us::any_cast<std::string>(parsedArgs["scalar_map"]);
 
+  std::string parcellation = "";
+  if (parsedArgs.count("parcellation"))
+    parcellation = us::any_cast<std::string>(parsedArgs["parcellation"]);
+
   try
   {
     typedef itk::Image< float, 3 > FloatImageType;
+    typedef itk::Image< short, 3 > ShortImageType;
 
     mitk::FiberBundle::Pointer fib = LoadFib(inFileName);
 
@@ -129,25 +135,54 @@ int main(int argc, char* argv[])
       clusterer->SetInCentroids(in_centroids);
     }
 
-    if (metric=="MDF")
-      clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF);
-    else if (metric=="MDF_STD")
-      clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_STD);
-    else if (metric=="MAX_MDF")
-      clusterer->SetMetric(itk::TractClusteringFilter::Metric::MAX_MDF);
+    std::vector< mitk::ClusteringMetric* > metrics;
 
-    if (scalar_map!="")
+    for (auto m : metric_strings)
     {
-      mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(scalar_map)[0].GetPointer());
-      if (mitk_map->GetDimension()==3)
+      MITK_INFO << "Metric: " << m;
+      if (m=="EU_MEAN")
+        metrics.push_back({new mitk::ClusteringMetricEuclideanMean()});
+      else if (m=="EU_STD")
+        metrics.push_back({new mitk::ClusteringMetricEuclideanStd()});
+      else if (m=="EU_MAX")
+        metrics.push_back({new mitk::ClusteringMetricEuclideanMax()});
+      else if (m=="MAP" && scalar_map!="")
       {
-        FloatImageType::Pointer itk_map = FloatImageType::New();
-        mitk::CastToItkImage(mitk_map, itk_map);
-        clusterer->SetScalarMap(itk_map);
+        mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(scalar_map)[0].GetPointer());
+        if (mitk_map->GetDimension()==3)
+        {
+          FloatImageType::Pointer itk_map = FloatImageType::New();
+          mitk::CastToItkImage(mitk_map, itk_map);
+
+          mitk::ClusteringMetricScalarMap* metric = new mitk::ClusteringMetricScalarMap();
+          metric->SetImages({itk_map});
+          metric->SetScale(distances.at(0));
+          metrics.push_back(metric);
+        }
+      }
+      else if (m=="ANAT" && parcellation!="")
+      {
+        mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parcellation)[0].GetPointer());
+        if (mitk_map->GetDimension()==3)
+        {
+          ShortImageType::Pointer itk_map = ShortImageType::New();
+          mitk::CastToItkImage(mitk_map, itk_map);
+
+          mitk::ClusteringMetricAnatomic* metric = new mitk::ClusteringMetricAnatomic();
+          metric->SetParcellations({itk_map});
+          metrics.push_back(metric);
+        }
       }
     }
+
+    if (metrics.empty())
+    {
+      MITK_INFO << "No metric selected!";
+      return EXIT_FAILURE;
+    }
+
+    clusterer->SetMetrics(metrics);
     clusterer->SetMergeDuplicateThreshold(merge_clusters);
-    clusterer->SetScale(map_scale);
     clusterer->SetNumPoints(fiber_points);
     clusterer->SetMaxClusters(max_clusters);
     clusterer->SetMinClusterSize(min_fibers);

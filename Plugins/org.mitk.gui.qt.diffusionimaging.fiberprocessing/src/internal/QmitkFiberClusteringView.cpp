@@ -22,10 +22,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFiberClusteringView.h"
 
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
 #include <itkTractClusteringFilter.h>
 #include <mitkFiberBundle.h>
+#include <mitkClusteringMetricEuclideanMean.h>
+#include <mitkClusteringMetricEuclideanMax.h>
+#include <mitkClusteringMetricEuclideanStd.h>
+#include <mitkClusteringMetricAnatomic.h>
+#include <mitkClusteringMetricScalarMap.h>
+#include <QMessageBox>
 
 const std::string QmitkFiberClusteringView::VIEW_ID = "org.mitk.views.fiberclustering";
 using namespace mitk;
@@ -63,10 +71,17 @@ void QmitkFiberClusteringView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_InCentroidsBox->SetPredicate(isFib);
     m_Controls->m_InCentroidsBox->SetZeroEntryText("--");
 
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer imageP = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::NodePredicateDimension::Pointer dimP = mitk::NodePredicateDimension::New(3);
+
     m_Controls->m_MapBox->SetDataStorage(this->GetDataStorage());
-    m_Controls->m_MapBox->SetPredicate(isImage);
+    m_Controls->m_MapBox->SetPredicate(mitk::NodePredicateAnd::New(imageP, dimP));
     m_Controls->m_MapBox->SetZeroEntryText("--");
+
+    m_Controls->m_ParcellationBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_ParcellationBox->SetPredicate(mitk::NodePredicateAnd::New(imageP, dimP));
+    m_Controls->m_ParcellationBox->SetZeroEntryText("--");
 
     FiberSelectionChanged();
   }
@@ -114,31 +129,45 @@ void QmitkFiberClusteringView::StartClustering()
     mitk::FiberBundle::Pointer in_centroids = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_InCentroidsBox->GetSelectedNode()->GetData());
     clusterer->SetInCentroids(in_centroids);
   }
-  switch (m_Controls->m_MetricBox->currentIndex())
-  {
-  case 0:
-    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF);
-    break;
-  case 1:
-    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_STD);
-    break;
-  case 2:
-    clusterer->SetMetric(itk::TractClusteringFilter::Metric::MAX_MDF);
-    break;
-  }
 
-  if (m_Controls->m_MapBox->GetSelectedNode().IsNotNull())
+  std::vector< mitk::ClusteringMetric* > metrics;
+
+  if (m_Controls->m_MetricBox1->isChecked())
+    metrics.push_back(new mitk::ClusteringMetricEuclideanMean());
+  if (m_Controls->m_MetricBox2->isChecked())
+    metrics.push_back(new mitk::ClusteringMetricEuclideanStd());
+  if (m_Controls->m_MetricBox3->isChecked())
+    metrics.push_back(new mitk::ClusteringMetricEuclideanMax());
+  if (m_Controls->m_ParcellationBox->GetSelectedNode().IsNotNull() && m_Controls->m_MetricBox4->isChecked())
+  {
+    mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(m_Controls->m_ParcellationBox->GetSelectedNode()->GetData());
+
+    ShortImageType::Pointer itk_map = ShortImageType::New();
+    mitk::CastToItkImage(mitk_map, itk_map);
+    mitk::ClusteringMetricAnatomic* metric = new mitk::ClusteringMetricAnatomic();
+    metric->SetParcellations({itk_map});
+    metrics.push_back(metric);
+  }
+  if (m_Controls->m_MapBox->GetSelectedNode().IsNotNull() && m_Controls->m_MetricBox5->isChecked())
   {
     mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(m_Controls->m_MapBox->GetSelectedNode()->GetData());
-    if (mitk_map->GetDimension()==3)
-    {
-      FloatImageType::Pointer itk_map = FloatImageType::New();
-      mitk::CastToItkImage(mitk_map, itk_map);
-      clusterer->SetScalarMap(itk_map);
-    }
+
+    FloatImageType::Pointer itk_map = FloatImageType::New();
+    mitk::CastToItkImage(mitk_map, itk_map);
+    mitk::ClusteringMetricScalarMap* metric = new mitk::ClusteringMetricScalarMap();
+    metric->SetImages({itk_map});
+    metric->SetScale(distances.at(0));
+    metrics.push_back(metric);
   }
+
+  if (metrics.empty())
+  {
+    QMessageBox::warning(nullptr, "Warning", "No metric selected!");
+    return;
+  }
+
+  clusterer->SetMetrics(metrics);
   clusterer->SetMergeDuplicateThreshold(m_Controls->m_MergeDuplicatesBox->value());
-  clusterer->SetScale(m_Controls->m_MapScaleBox->value());
   clusterer->SetNumPoints(m_Controls->m_FiberPointsBox->value());
   clusterer->SetMaxClusters(m_Controls->m_MaxClustersBox->value());
   clusterer->SetMinClusterSize(m_Controls->m_MinFibersBox->value());

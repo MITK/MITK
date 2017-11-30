@@ -63,6 +63,14 @@ set(H_FILES
 
   Algorithms/itkStreamlineTrackingFilter.h
 
+  # Clustering
+  Algorithms/ClusteringMetrics/mitkClusteringMetric.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricEuclideanMean.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricEuclideanMax.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricEuclideanStd.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricAnatomic.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricScalarMap.h
+
   # Fiberfox
   Fiberfox/itkFibersFromPlanarFiguresFilter.h
   Fiberfox/itkTractsToDWIImageFilter.h

@@ -19,6 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <mitkIOUtil.h>
 #include <itkTractClusteringFilter.h>
+#include <mitkClusteringMetricEuclideanMean.h>
+#include <mitkClusteringMetricEuclideanMax.h>
+#include <mitkClusteringMetricEuclideanStd.h>
+#include <mitkClusteringMetricAnatomic.h>
+#include <mitkClusteringMetricScalarMap.h>
 
 typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
@@ -80,7 +85,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("distance"))
     distance = us::any_cast<int>(parsedArgs["distance"]);
 
-  std::string metric = "MDF_STD";
+  std::string metric = "EU_MEAN";
   if (parsedArgs.count("metric"))
     metric = us::any_cast<std::string>(parsedArgs["metric"]);
 
@@ -137,7 +142,7 @@ int main(int argc, char* argv[])
           itk::TractClusteringFilter::Pointer clusterer = itk::TractClusteringFilter::New();
           clusterer->SetDistances({10,20,30});
           clusterer->SetTractogram(ref_fib);
-          clusterer->SetMetric(itk::TractClusteringFilter::Metric::MDF_STD);
+          clusterer->SetMetrics({new mitk::ClusteringMetricEuclideanStd()});
           clusterer->Update();
           std::vector<mitk::FiberBundle::Pointer> tracts = clusterer->GetOutCentroids();
           ref_fib = mitk::FiberBundle::New(nullptr);
@@ -152,12 +157,12 @@ int main(int argc, char* argv[])
         segmenter->SetDistances(distances);
         segmenter->SetTractogram(fib);
         segmenter->SetDoResampling(false);
-        if (metric=="MDF")
-          segmenter->SetMetric(itk::TractClusteringFilter::Metric::MDF);
-        else if (metric=="MDF_STD")
-          segmenter->SetMetric(itk::TractClusteringFilter::Metric::MDF_STD);
-        else if (metric=="MAX_MDF")
-          segmenter->SetMetric(itk::TractClusteringFilter::Metric::MAX_MDF);
+        if (metric=="EU_MEAN")
+          segmenter->SetMetrics({new mitk::ClusteringMetricEuclideanMean()});
+        else if (metric=="EU_STD")
+          segmenter->SetMetrics({new mitk::ClusteringMetricEuclideanStd()});
+        else if (metric=="EU_MAX")
+          segmenter->SetMetrics({new mitk::ClusteringMetricEuclideanMax()});
         segmenter->Update();
 
         std::vector<mitk::FiberBundle::Pointer> clusters = segmenter->GetOutTractograms();

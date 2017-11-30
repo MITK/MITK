@@ -343,4 +343,58 @@ bool operator >=(const T *left, const mitk::WeakPointer<T> &right) noexcept
   return !(left < right);
 }
 
+template <class T>
+bool operator !=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return !(left == right);
+}
+
+template <class T>
+bool operator <=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return !(left < right);
+}
+
+template <class T>
+bool operator ==(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right == left;
+}
+
+template <class T>
+bool operator !=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right == left);
+}
+
+template <class T>
+bool operator <=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(left < right);
+}
+
 #endif

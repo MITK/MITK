@@ -373,21 +373,7 @@ void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<float, 3>& pos, v
 bool StreamlineTrackingFilter
 ::IsInsideMask(const itk::Point<float, 3> &pos, ItkUcharImgType::Pointer mask)
 {
-  if (mask.IsNull())
-    return true;
-
-  if (m_InterpolateMask)
-  {
-    if (m_TrackingHandler->GetImageValue<unsigned char, double>(pos, mask, m_InterpolateMask)<0.5)
-      return false;
-  }
-  else
-  {
-    if (m_TrackingHandler->GetImageValue<unsigned char>(pos, mask, m_InterpolateMask)==0)
-      return false;
-  }
-
-  return true;
+  return m_TrackingHandler->IsInsideMask(pos, mask, m_InterpolateMask);
 }
 
 bool StreamlineTrackingFilter

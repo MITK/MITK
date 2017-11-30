@@ -50,6 +50,7 @@ public:
 
   void OnPageSuccessfullyLoaded();
 
+
 protected slots:
 
 protected:
@@ -59,8 +60,10 @@ protected:
 
   Ui::QmitkTractometryViewControls* m_Controls;
 
-  bool Flip(vtkSmartPointer< vtkPolyData > polydata, int i);
+  bool Flip(vtkSmartPointer< vtkPolyData > polydata1, int i, vtkSmartPointer<vtkPolyData> ref_poly=nullptr);
   std::string RGBToHexString(double *rgb);
+
+  vtkSmartPointer< vtkPolyData > m_ReferencePolyData;
 };
 
 

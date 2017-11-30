@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarEllipse.h>
 #include <mitkFiberBundle.h>
 #include <mitkFiberfoxParameters.h>
+#include <mitkClusteringMetric.h>
 
 // ITK
 #include <itkProcessObject.h>
@@ -55,13 +56,6 @@ public:
     }
   };
 
-  enum Metric
-  {
-    MDF,
-    MDF_STD,
-    MAX_MDF
-  };
-
   typedef TractClusteringFilter Self;
   typedef ProcessObject                                       Superclass;
   typedef SmartPointer< Self >                                Pointer;
@@ -79,8 +73,6 @@ public:
   itkGetMacro(MinClusterSize, unsigned int) ///< Clusters with too few fibers are discarded
   itkSetMacro(MaxClusters, unsigned int) ///< Only the N largest clusters are kept
   itkGetMacro(MaxClusters, unsigned int) ///< Only the N largest clusters are kept
-  itkSetMacro(Scale, float) ///< Scaling factor for scalar map. By default, the map is scaled by a factor corresponding to the cluster distance
-  itkGetMacro(Scale, float) ///< Scaling factor for scalar map. By default, the map is scaled by a factor corresponding to the cluster distance
   itkSetMacro(MergeDuplicateThreshold, float) ///< Clusters with centroids very close to each other are merged. Set to 0 to avoid merging and to -1 to use the original cluster size.
   itkGetMacro(MergeDuplicateThreshold, float) ///< Clusters with centroids very close to each other are merged. Set to 0 to avoid merging and to -1 to use the original cluster size.
   itkSetMacro(DoResampling, bool) ///< Resample fibers to equal number of points. This is mandatory, but can be performed outside of the filter if desired.
@@ -89,7 +81,6 @@ public:
   itkGetMacro(OverlapThreshold, float)  ///< Overlap threshold used in conjunction with the filter mask when clustering around known centroids.
 
   itkSetMacro(Tractogram, mitk::FiberBundle::Pointer)   ///< The streamlines to be clustered
-  itkSetMacro(ScalarMap, FloatImageType::Pointer) ///< Scalar values along the streamlines are included into the distance calculation. If this feature is used, it is recommended to use a larger number of fiber sampling points.
   itkSetMacro(InCentroids, mitk::FiberBundle::Pointer)  ///< If a tractogram containing known tract centroids is set, the input fibers are assigned to the closest centroid. If no centroid is found within the specified smallest clustering distance, the fiber is assigned to the no-fit cluster.
   itkSetMacro(FilterMask, UcharImageType::Pointer)  ///< If fibers are clustered around the nearest input centroids (see SetInCentroids), the complete input tractogram can additionally be pre-filtered with this binary mask and a given overlap threshold (see SetOverlapThreshold).
 
@@ -100,23 +91,19 @@ public:
   void SetDistances(const std::vector<float> &Distances); ///< Set clustering distances that are traversed recoursively. The distances have to be sorted in an ascending manner. The actual cluster size is determined by the smallest entry in the distance-list (index 0).
 
   std::vector<mitk::FiberBundle::Pointer> GetOutTractograms() const;
-
-  void SetMetric(const Metric &Metric);
-
   std::vector<mitk::FiberBundle::Pointer> GetOutCentroids() const;
-
   std::vector<Cluster> GetOutClusters() const;
+
+  void SetMetrics(const std::vector<mitk::ClusteringMetric *> &Metrics);
 
 protected:
 
   void GenerateData() override;
   std::vector< vnl_matrix<float> > ResampleFibers(FiberBundle::Pointer tractogram);
-  float CalcMDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
-  float CalcMDF_STD(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
-  float CalcMAX_MDF(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped);
   float CalcOverlap(vnl_matrix<float>& t);
 
   std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);
+
   void MergeDuplicateClusters(std::vector< TractClusteringFilter::Cluster >& clusters);
   std::vector< Cluster > AddToKnownClusters(std::vector< long > f_indices, std::vector<vnl_matrix<float> > &centroids);
   void AppendCluster(std::vector< Cluster >& a, std::vector< Cluster >&b);
@@ -133,14 +120,12 @@ protected:
   std::vector<vnl_matrix<float> >             T;
   unsigned int                                m_MinClusterSize;
   unsigned int                                m_MaxClusters;
-  Metric                                      m_Metric;
-  FloatImageType::Pointer                     m_ScalarMap;
-  float                                       m_Scale;
   float                                       m_MergeDuplicateThreshold;
   std::vector< Cluster >                      m_OutClusters;
   bool                                        m_DoResampling;
   UcharImageType::Pointer                     m_FilterMask;
   float                                       m_OverlapThreshold;
+  std::vector< mitk::ClusteringMetric* >      m_Metrics;
 };
 }
 

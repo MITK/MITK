@@ -41,6 +41,7 @@ public:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   typedef itk::Image< float, 3 > FloatImageType;
+  typedef itk::Image< short, 3 > ShortImageType;
 
   ///
   /// Sets the focus to an internal widget.

@@ -3,7 +3,6 @@ message(STATUS "Configuring MITK Diffusion Release Build")
 # Enable non-optional external dependencies
 set(MITK_USE_Vigra ON CACHE BOOL "MITK Use Vigra Library" FORCE)
 set(MITK_USE_HDF5 ON CACHE BOOL "MITK Use HDF5 Library" FORCE)
-set(MITK_USE_DCMQI ON CACHE BOOL "" FORCE)
 set(MITK_USE_MatchPoint ON CACHE BOOL "" FORCE)
 
 # Disable all apps but MITK Diffusion

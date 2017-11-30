@@ -93,8 +93,27 @@ public:
       return m_RngItk->GetUniformVariate(a, b);
     }
 
+    static bool IsInsideMask(const itk::Point<float, 3> &pos, ItkUcharImgType::Pointer mask, bool interpolate)
+    {
+      if (mask.IsNull())
+        return true;
+
+      if (interpolate)
+      {
+        if ( mitk::TrackingDataHandler::GetImageValue<unsigned char, double>(pos, mask, true)<0.5)
+          return false;
+      }
+      else
+      {
+        if ( mitk::TrackingDataHandler::GetImageValue<unsigned char>(pos, mask, false)==0)
+          return false;
+      }
+
+      return true;
+    }
+
     template< class TPixelType >
-    TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<float, 8>& interpWeights){
+    static TPixelType GetImageValue(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<float, 8>& interpWeights){
       // transform physical point to index coordinates
       itk::Index<3> idx;
       itk::ContinuousIndex< float, 3> cIdx;
@@ -180,7 +199,7 @@ public:
     }
 
     template< class TPixelType, class TOutPixelType=TPixelType >
-    TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate){
+    static TPixelType GetImageValue(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, bool interpolate){
       // transform physical point to index coordinates
       itk::Index<3> idx;
       itk::ContinuousIndex< float, 3> cIdx;
@@ -269,7 +288,7 @@ public:
     }
 
     template< class TPixelType, int components >
-    itk::Vector< TPixelType, components > GetImageValue(itk::Point<float, 3> itkP, itk::Image<itk::Vector< TPixelType, components >, 3>* image, bool interpolate){
+    static itk::Vector< TPixelType, components > GetImageValue(const itk::Point<float, 3>& itkP, itk::Image<itk::Vector< TPixelType, components >, 3>* image, bool interpolate){
       // transform physical point to index coordinates
       itk::Index<3> idx;
       itk::ContinuousIndex< float, 3> cIdx;

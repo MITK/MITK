@@ -75,35 +75,37 @@ void QmitkTractometryView::CreateQtPartControl( QWidget *parent )
 
 void QmitkTractometryView::OnPageSuccessfullyLoaded()
 {
-//  berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
-//  berry::IPreferences::Pointer m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+  berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
+  berry::IPreferences::Pointer m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
 
-//  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
 
-//  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
-//  {
-//    this->m_Controls->m_ChartWidget->SetTheme(QmitkChartWidget::ChartStyle::darkstyle);
-//  }
-//  else
-//  {
-//    this->m_Controls->m_ChartWidget->SetTheme(QmitkChartWidget::ChartStyle::lightstyle);
-//  }
+  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
+  {
+    this->m_Controls->m_ChartWidget->SetTheme(QmitkChartWidget::ChartStyle::darkstyle);
+  }
+  else
+  {
+    this->m_Controls->m_ChartWidget->SetTheme(QmitkChartWidget::ChartStyle::lightstyle);
+  }
 }
 
 void QmitkTractometryView::SetFocus()
 {
 }
 
-bool QmitkTractometryView::Flip(vtkSmartPointer< vtkPolyData > polydata, int i)
+bool QmitkTractometryView::Flip(vtkSmartPointer< vtkPolyData > polydata1, int i, vtkSmartPointer< vtkPolyData > ref_poly)
 {
   float d_direct = 0;
   float d_flipped = 0;
 
-  vtkCell* cell1 = polydata->GetCell(0);
+  vtkCell* cell1 = polydata1->GetCell(0);
+  if (ref_poly!=nullptr)
+    cell1 = ref_poly->GetCell(0);
   int numPoints1 = cell1->GetNumberOfPoints();
   vtkPoints* points1 = cell1->GetPoints();
 
-  vtkCell* cell2 = polydata->GetCell(i);
+  vtkCell* cell2 = polydata1->GetCell(i);
   vtkPoints* points2 = cell2->GetPoints();
 
   for (int j=0; j<numPoints1; ++j)
@@ -149,6 +151,8 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
     bool flip = false;
     if (i>0)
       flip = Flip(polydata, i);
+    else if (m_ReferencePolyData!=nullptr)
+      flip = Flip(polydata, 0, m_ReferencePolyData);
 
     for (int j=0; j<numPoints; j++)
     {
@@ -175,6 +179,9 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
 
     all_values.push_back(fib_vals);
   }
+
+  if (m_ReferencePolyData==nullptr)
+    m_ReferencePolyData = polydata;
 
   std::vector< double > std_values1;
   std::vector< double > std_values2;
@@ -220,10 +227,11 @@ void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
   if(m_Controls->m_ImageBox->GetSelectedNode().IsNull())
     return;
 
+  m_ReferencePolyData = nullptr;
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData());
 
   vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  lookupTable->SetTableRange(0.0, 0.8);
+  lookupTable->SetTableRange(0.0, 1.0);
   lookupTable->Build();
 
   int num_tracts = 0;
@@ -274,4 +282,6 @@ void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
       ++c;
     }
   }
+
+  MITK_INFO << "OnSelectionChanged DONE";
 }

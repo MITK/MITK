@@ -43,12 +43,13 @@ namespace mitk
       this->AddDeleteEventObserver();
     }
 
-    // Because the observed object is keeping references to its observers,
-    // move semantics can't be implemented more effective than its alternative
-    // to simply copy and destruct. It would still be necessary to remove the
-    // old observer and to add the new one.
-    WeakPointer(WeakPointer &&) = delete;
-    WeakPointer & operator =(WeakPointer &&) = delete;
+    WeakPointer(WeakPointer &&other)
+      : m_RawPointer(other.m_RawPointer)
+    {
+      other.RemoveDeleteEventObserver();
+      other.m_RawPointer = nullptr;
+      this->AddDeleteEventObserver();
+    }
 
     ~WeakPointer() noexcept
     {
@@ -74,6 +75,19 @@ namespace mitk
         m_RawPointer = other.m_RawPointer;
         this->AddDeleteEventObserver();
       }
+
+      return *this;
+    }
+
+    WeakPointer & operator =(WeakPointer &&other)
+    {
+      // No check for self-assignment as it is allowed to assume that the
+      // parameter is a unique reference to this argument.
+
+      this->RemoveDeleteEventObserver();
+      m_RawPointer = other.m_RawPointer;
+      other.m_RawPointer = nullptr;
+      this->AddDeleteEventObserver();
 
       return *this;
     }

@@ -426,9 +426,9 @@ mitk::DataNode *mitk::ToolManager::GetRoiData(int idx)
 
 mitk::DataStorage *mitk::ToolManager::GetDataStorage()
 {
-  if (m_DataStorage.IsNotNull())
+  if (!m_DataStorage.IsExpired())
   {
-    return m_DataStorage;
+    return m_DataStorage.Lock();
   }
   else
   {

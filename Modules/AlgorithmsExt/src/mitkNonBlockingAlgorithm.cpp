@@ -30,7 +30,7 @@ namespace mitk
 
   NonBlockingAlgorithm::~NonBlockingAlgorithm() {}
   void mitk::NonBlockingAlgorithm::SetDataStorage(DataStorage &storage) { m_DataStorage = &storage; }
-  DataStorage *mitk::NonBlockingAlgorithm::GetDataStorage() { return m_DataStorage; }
+  DataStorage *mitk::NonBlockingAlgorithm::GetDataStorage() { return m_DataStorage.Lock(); }
   void NonBlockingAlgorithm::Initialize(const NonBlockingAlgorithm *itkNotUsed(other))
   {
     // define one input, one output basedata object

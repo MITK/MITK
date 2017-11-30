@@ -182,7 +182,7 @@ QModelIndex QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *prope
   if (property == nullptr)
     return QModelIndex();
 
-  auto propertyMap = m_PropertyList->GetMap();
+  auto propertyMap = m_PropertyList.Lock()->GetMap();
   auto it = std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
 
   if (it == propertyMap->end())
@@ -248,7 +248,7 @@ Qt::ItemFlags QmitkPropertyItemModel::flags(const QModelIndex &index) const
 
 mitk::PropertyList *QmitkPropertyItemModel::GetPropertyList() const
 {
-  return m_PropertyList.GetPointer();
+  return m_PropertyList.Lock().GetPointer();
 }
 
 QVariant QmitkPropertyItemModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -283,7 +283,7 @@ void QmitkPropertyItemModel::OnPreferencesChanged()
   {
     m_PropertyAliases = m_ShowAliases ? GetPropertyService<mitk::IPropertyAliases>() : nullptr;
 
-    resetPropertyList = m_PropertyList.IsNotNull();
+    resetPropertyList = !m_PropertyList.IsExpired();
   }
 
   if (updateFilters)
@@ -291,11 +291,11 @@ void QmitkPropertyItemModel::OnPreferencesChanged()
     m_PropertyFilters = m_FilterProperties ? GetPropertyService<mitk::IPropertyFilters>() : nullptr;
 
     if (!resetPropertyList)
-      resetPropertyList = m_PropertyList.IsNotNull();
+      resetPropertyList = !m_PropertyList.IsExpired();
   }
 
   if (resetPropertyList)
-    this->SetNewPropertyList(m_PropertyList.GetPointer());
+    this->SetNewPropertyList(m_PropertyList.Lock());
 }
 
 void QmitkPropertyItemModel::OnPropertyDeleted(const itk::Object * /*property*/, const itk::EventObject &)
@@ -390,8 +390,10 @@ bool QmitkPropertyItemModel::setData(const QModelIndex &index, const QVariant &v
     colorProperty->SetValue(QtToMitk(value.value<QColor>()));
   }
 
-  m_PropertyList->InvokeEvent(itk::ModifiedEvent());
-  m_PropertyList->Modified();
+  auto propertyList = m_PropertyList.Lock();
+
+  propertyList->InvokeEvent(itk::ModifiedEvent());
+  propertyList->Modified();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -404,7 +406,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
 
   this->beginResetModel();
 
-  if (m_PropertyList.IsNotNull())
+  if (!m_PropertyList.IsExpired())
   {
     mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> onPropertyListDeleted(
       this, &QmitkPropertyItemModel::OnPropertyListDeleted);
@@ -414,7 +416,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
       this, &QmitkPropertyItemModel::OnPropertyListModified);
     m_PropertyList.ObjectModified.RemoveListener(onPropertyListModified);
 
-    const PropertyMap *propertyMap = m_PropertyList->GetMap();
+    const PropertyMap *propertyMap = m_PropertyList.Lock()->GetMap();
 
     for (PropertyMap::const_iterator propertyIt = propertyMap->begin(); propertyIt != propertyMap->end(); ++propertyIt)
     {
@@ -435,7 +437,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
 
   m_PropertyList = propertyList;
 
-  if (m_PropertyList.IsNotNull())
+  if (!m_PropertyList.IsExpired())
   {
     mitk::MessageDelegate1<QmitkPropertyItemModel, const itk::Object *> onPropertyListModified(
       this, &QmitkPropertyItemModel::OnPropertyListModified);
@@ -452,7 +454,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
       itk::MemberCommand<QmitkPropertyItemModel>::New();
     modifiedCommand->SetCallbackFunction(this, &QmitkPropertyItemModel::OnPropertyModified);
 
-    const PropertyMap *propertyMap = m_PropertyList->GetMap();
+    const PropertyMap *propertyMap = m_PropertyList.Lock()->GetMap();
 
     for (PropertyMap::const_iterator it = propertyMap->begin(); it != propertyMap->end(); ++it)
       m_PropertyModifiedTags.insert(
@@ -469,7 +471,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
 
   this->CreateRootItem();
 
-  if (m_PropertyList != nullptr && !m_PropertyList->IsEmpty())
+  if (m_PropertyList != nullptr && !m_PropertyList.Lock()->IsEmpty())
   {
     mitk::PropertyList::PropertyMap filteredProperties;
     bool filterProperties = false;
@@ -477,12 +479,12 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
     if (m_PropertyFilters != nullptr &&
         (m_PropertyFilters->HasFilter() || m_PropertyFilters->HasFilter(m_ClassName.toStdString())))
     {
-      filteredProperties = m_PropertyFilters->ApplyFilter(*m_PropertyList->GetMap(), m_ClassName.toStdString());
+      filteredProperties = m_PropertyFilters->ApplyFilter(*m_PropertyList.Lock()->GetMap(), m_ClassName.toStdString());
       filterProperties = true;
     }
 
     const mitk::PropertyList::PropertyMap *propertyMap =
-      !filterProperties ? m_PropertyList->GetMap() : &filteredProperties;
+      !filterProperties ? m_PropertyList.Lock()->GetMap() : &filteredProperties;
 
     mitk::PropertyList::PropertyMap::const_iterator end = propertyMap->end();
 
@@ -526,7 +528,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *propertyList
 
 void QmitkPropertyItemModel::SetPropertyList(mitk::PropertyList *propertyList, const QString &className)
 {
-  if (m_PropertyList.GetPointer() != propertyList)
+  if (m_PropertyList != propertyList)
   {
     m_ClassName = className;
     this->SetNewPropertyList(propertyList);
@@ -535,5 +537,5 @@ void QmitkPropertyItemModel::SetPropertyList(mitk::PropertyList *propertyList, c
 
 void QmitkPropertyItemModel::Update()
 {
-  this->SetNewPropertyList(m_PropertyList);
+  this->SetNewPropertyList(m_PropertyList.Lock());
 }

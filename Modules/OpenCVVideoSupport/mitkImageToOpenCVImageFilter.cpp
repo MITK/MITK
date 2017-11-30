@@ -57,15 +57,16 @@ namespace mitk{
 
   IplImage* ImageToOpenCVImageFilter::GetOpenCVImage()
   {
+    auto image = m_Image.Lock();
 
-    if(!this->CheckImage( m_Image ))
+    if(!this->CheckImage(image))
       return nullptr;
 
     m_OpenCVImage = (nullptr);
 
     try
     {
-      AccessFixedTypeByItk(m_Image.GetPointer(), ItkImageProcessing,
+      AccessFixedTypeByItk(image.GetPointer(), ItkImageProcessing,
         MITK_ACCESSBYITK_PIXEL_TYPES_SEQ  // gray image
         (UCRGBPixelType)(USRGBPixelType)(FloatRGBPixelType)(DoubleRGBPixelType), // rgb image
         (2) // dimensions

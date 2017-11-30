@@ -272,11 +272,11 @@ QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
 
 std::string QmitkPropertyItemDelegate::GetPropertyName(const QModelIndex &index) const
 {
-  if (m_PropertyList.IsNotNull())
+  if (!m_PropertyList.IsExpired())
   {
     mitk::BaseProperty *property =
       reinterpret_cast<mitk::BaseProperty *>(index.data(mitk::PropertyRole).value<void *>());
-    const mitk::PropertyList::PropertyMap *propertyMap = m_PropertyList->GetMap();
+    const mitk::PropertyList::PropertyMap *propertyMap = m_PropertyList.Lock()->GetMap();
 
     mitk::PropertyList::PropertyMap::const_iterator it =
       std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
@@ -390,6 +390,6 @@ void QmitkPropertyItemDelegate::setModelData(QWidget *editor, QAbstractItemModel
 
 void QmitkPropertyItemDelegate::SetPropertyList(mitk::PropertyList *propertyList)
 {
-  if (m_PropertyList.GetPointer() != propertyList)
+  if (m_PropertyList != propertyList)
     m_PropertyList = propertyList;
 }

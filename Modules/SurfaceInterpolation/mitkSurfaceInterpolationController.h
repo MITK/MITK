@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-#include "mitkWeakPointer.h"
 
 #include "vtkAppendPolyData.h"
 #include "vtkCellArray.h"

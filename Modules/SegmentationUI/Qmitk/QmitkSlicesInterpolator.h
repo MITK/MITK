@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkToolManager.h"
-#include "mitkWeakPointer.h"
 #include <MitkSegmentationUIExports.h>
 
 #include "mitkFeatureBasedEdgeDetectionFilter.h"

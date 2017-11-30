@@ -71,9 +71,6 @@ namespace mitk
       if (this != &other)
       {
         this->RemoveDeleteEventObserver();
-
-        // m_RawPointer is guaranteed not to be nullptr as nullptr assignment
-        // is handled in a separate implementation of the assignment operator.
         m_RawPointer = other.m_RawPointer;
         this->AddDeleteEventObserver();
       }
@@ -85,6 +82,18 @@ namespace mitk
     {
       this->RemoveDeleteEventObserver();
       m_RawPointer = nullptr;
+
+      return *this;
+    }
+
+    WeakPointer & operator =(T *other)
+    {
+      if (m_RawPointer != other)
+      {
+        this->RemoveDeleteEventObserver();
+        m_RawPointer = other;
+        this->AddDeleteEventObserver();
+      }
 
       return *this;
     }

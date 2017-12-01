@@ -46,7 +46,6 @@ namespace mitk
     NodePredicateDataProperty(const char *propertyName,
                           mitk::BaseProperty *p = nullptr);
 
-    // mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
     mitk::BaseProperty::Pointer m_ValidProperty;
     // mitk::BaseProperty* m_ValidProperty;
     std::string m_ValidPropertyName;

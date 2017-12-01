@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseProperty.h"
 #include "mitkBaseRenderer.h"
 #include "mitkNodePredicateBase.h"
-#include "mitkWeakPointer.h"
 
 namespace mitk
 {
@@ -56,7 +55,6 @@ namespace mitk
                           mitk::BaseProperty *p = nullptr,
                           const mitk::BaseRenderer *renderer = nullptr);
 
-    // mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
     mitk::BaseProperty::Pointer m_ValidProperty;
     // mitk::BaseProperty* m_ValidProperty;
     std::string m_ValidPropertyName;

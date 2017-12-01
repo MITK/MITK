@@ -296,9 +296,9 @@ namespace mitk
 
       // If no reference geometry is available, clip with the current global
       // bounds
-      else if (m_DataStorage.IsNotNull())
+      else if (!m_DataStorage.IsExpired())
       {
-        m_SurfaceCreator->SetBoundingBox(m_DataStorage->ComputeVisibleBoundingBox(nullptr, "includeInBoundingBox"));
+        m_SurfaceCreator->SetBoundingBox(m_DataStorage.Lock()->ComputeVisibleBoundingBox(nullptr, "includeInBoundingBox"));
         tubeRadius = sqrt(m_SurfaceCreator->GetBoundingBox()->GetDiagonalLength2()) / 450.0;
       }
 
@@ -391,7 +391,7 @@ namespace mitk
       // use a predicate to get all data nodes which are "images" or inherit from mitk::Image
       mitk::TNodePredicateDataType<mitk::Image>::Pointer predicateAllImages =
         mitk::TNodePredicateDataType<mitk::Image>::New();
-      mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(predicateAllImages);
+      mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage.Lock()->GetSubset(predicateAllImages);
       // process all found images
       for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
       {

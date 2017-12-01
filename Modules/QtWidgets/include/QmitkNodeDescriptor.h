@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidgetAction>
 #include <map>
 #include <mitkNodePredicateBase.h>
-#include <mitkWeakPointer.h>
 
 /**
  * \ingroup QmitkModule

@@ -52,7 +52,7 @@ QmitkDataStorageTableModel::~QmitkDataStorageTableModel()
 //# Public GETTER
 const mitk::DataStorage::Pointer QmitkDataStorageTableModel::GetDataStorage() const
 {
-  return m_DataStorage.GetPointer();
+  return m_DataStorage.Lock();
 }
 
 mitk::NodePredicateBase::Pointer QmitkDataStorageTableModel::GetPredicate() const
@@ -198,32 +198,36 @@ void QmitkDataStorageTableModel::SetPredicate(mitk::NodePredicateBase *_Predicat
 void QmitkDataStorageTableModel::SetDataStorage(mitk::DataStorage::Pointer _DataStorage)
 {
   // only proceed if we have a new datastorage
-  if (m_DataStorage.GetPointer() != _DataStorage.GetPointer())
+  if (m_DataStorage != _DataStorage)
   {
     // if a data storage was set before remove old event listeners
-    if (m_DataStorage.IsNotNull())
+    if (!m_DataStorage.IsExpired())
     {
-      this->m_DataStorage->AddNodeEvent.RemoveListener(
+      auto dataStorage = m_DataStorage.Lock();
+
+      dataStorage->AddNodeEvent.RemoveListener(
         mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTableModel::AddNode));
 
-      this->m_DataStorage->RemoveNodeEvent.RemoveListener(
+      dataStorage->RemoveNodeEvent.RemoveListener(
         mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTableModel::RemoveNode));
     }
 
     // set new data storage
-    m_DataStorage = _DataStorage.GetPointer();
+    m_DataStorage = _DataStorage;
 
     // if new storage is not 0 subscribe for events
-    if (m_DataStorage.IsNotNull())
+    if (!m_DataStorage.IsExpired())
     {
+      auto dataStorage = m_DataStorage.Lock();
+
       // subscribe for node added/removed events
-      this->m_DataStorage->AddNodeEvent.AddListener(
+      dataStorage->AddNodeEvent.AddListener(
         mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTableModel::AddNode));
 
-      this->m_DataStorage->RemoveNodeEvent.AddListener(
+      dataStorage->RemoveNodeEvent.AddListener(
         mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTableModel::RemoveNode));
     }
@@ -415,15 +419,17 @@ void QmitkDataStorageTableModel::Reset()
   m_NodeSet.clear();
 
   // the whole reset depends on the fact if a data storage is set or not
-  if (m_DataStorage.IsNotNull())
+  if (!m_DataStorage.IsExpired())
   {
+    auto dataStorage = m_DataStorage.Lock();
+
     if (m_Predicate.IsNotNull())
       // get subset
-      _NodeSet = m_DataStorage->GetSubset(m_Predicate);
+      _NodeSet = dataStorage->GetSubset(m_Predicate);
     // if predicate is nullptr, select all nodes
     else
     {
-      _NodeSet = m_DataStorage->GetAll();
+      _NodeSet = dataStorage->GetAll();
       // remove ghost root node
     }
 

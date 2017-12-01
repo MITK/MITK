@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper.h"
 #include <MitkCoreExports.h>
-#include <mitkWeakPointer.h>
 #include <vtkSmartPointer.h>
 
 class vtkActor2D;

@@ -68,11 +68,10 @@ public:
 private:
   void CreateRootItem();
   QModelIndex FindProperty(const mitk::BaseProperty *property);
-  void OnPropertyListModified(const itk::Object *propertyList);
-  void OnPropertyListDeleted(const itk::Object *propertyList);
-  void OnPropertyDeleted(const itk::Object *property, const itk::EventObject &event);
+  void OnPropertyListModified();
+  void OnPropertyListDeleted();
   void OnPropertyModified(const itk::Object *property, const itk::EventObject &event);
-  void SetNewPropertyList(mitk::PropertyList *propertyList);
+  void SetNewPropertyList(mitk::PropertyList *newPropertyList);
 
   bool m_ShowAliases;
   bool m_FilterProperties;
@@ -83,6 +82,8 @@ private:
   std::unique_ptr<QmitkPropertyItem> m_RootItem;
   std::map<std::string, unsigned long> m_PropertyDeletedTags;
   std::map<std::string, unsigned long> m_PropertyModifiedTags;
+  unsigned long m_PropertyListDeletedTag;
+  unsigned long m_PropertyListModifiedTag;
 };
 
 #endif

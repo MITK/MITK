@@ -262,7 +262,7 @@ namespace mitk
     for (auto iter = cache.begin(); iter != cache.end(); iter++)
     {
       Element *e = *iter;
-      BaseData *p_tmp = e->baseData.GetPointer();
+      BaseData *p_tmp = e->baseData.Lock();
 
       if (p_tmp == p_BaseData)
       {

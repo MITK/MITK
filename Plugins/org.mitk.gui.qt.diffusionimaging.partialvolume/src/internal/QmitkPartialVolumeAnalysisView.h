@@ -39,7 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include "mitkPartialVolumeAnalysisHistogramCalculator.h"
 #include "mitkPlanarLine.h"
-#include <mitkWeakPointer.h>
 #include "mitkDataStorageSelection.h"
 #include <mitkVtkLayerController.h>
 

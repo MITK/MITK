@@ -114,9 +114,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     message(FATAL_ERROR "Apple Clang version must be at least 5.0")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # require at least Visual Studio 2013
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0.40629.0)
-    message(FATAL_ERROR "Microsoft Visual Studio 2013 Update 5 or newer required (MSVC 18.0.40629.0)")
+  # require at least Visual Studio 2015
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19)
+    message(FATAL_ERROR "Microsoft Visual Studio 2015 Update 3 or newer required")
   endif()
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")

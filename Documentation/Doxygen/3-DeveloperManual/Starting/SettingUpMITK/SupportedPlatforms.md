@@ -28,7 +28,7 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 | ----------------------------------- | --------------------------------------------------
 | Ubuntu Linux 14.04  (x64)           | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
 | Ubuntu Linux 16.04  (x64)           | GNU 4.9
-| Microsoft Windows 7 (x64)           | MSVC 2013 Community Update 5
+| Microsoft Windows 7 (x64)           | MSVC 2015 (latest update)
 
 Tier 2 Platforms
 ----------------
@@ -40,8 +40,8 @@ as well as in the current master branch.
 
 | Platform                           | Compilers
 | ---------------------------------- | --------------------------------------------------
-| Microsoft Windows 10 (x64)         | MSVC 2013 Community Update 5
-| Microsoft Windows 10 (x64)         | MSVC 2015 Community
+| Microsoft Windows 10 (x64)         | MSVC 2015 (latest update)
+| Microsoft Windows 10 (x64)         | MSVC 2017 (latest update)
 | Apple OS X 10.10 "Yosemite"        | Clang 6.0
 | Apple OS X 10.9 "Mavericks"        | Clang 5.0
 

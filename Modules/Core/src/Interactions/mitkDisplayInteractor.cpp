@@ -927,7 +927,7 @@ bool mitk::DisplayInteractor::GetBoolProperty(mitk::PropertyList::Pointer proper
 
 mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(DataStorage::SetOfObjects::ConstPointer nodes,
                                                                  Point3D worldposition,
-                                                                 BaseRenderer *ren)
+                                                                 BaseRenderer *)
 {
   DataNode::Pointer topLayerNode;
 

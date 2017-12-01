@@ -47,7 +47,7 @@ QString QmitkNodeDescriptor::GetNameOfClass() const
   return m_ClassName;
 }
 
-QIcon QmitkNodeDescriptor::GetIcon(const mitk::DataNode *node) const
+QIcon QmitkNodeDescriptor::GetIcon(const mitk::DataNode *) const
 {
   return m_Icon;
 }

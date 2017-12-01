@@ -66,10 +66,10 @@ public:
   int GetTimeStep() const;
 
   /// observer for point set "modified" events
-  void OnPointSetChanged(const itk::Object * /*obj*/);
+  void OnPointSetChanged();
 
   /// observer for point set "delete" events
-  void OnPointSetDeleted(const itk::Object * /*obj*/);
+  void OnPointSetDeleted();
 
 protected slots:
   ///
@@ -89,6 +89,10 @@ protected:
 
 protected:
   mitk::WeakPointer<mitk::PointSet> m_PointSet;
+
+  unsigned long m_PointSetDeletedTag;
+  unsigned long m_PointSetModifiedTag;
+
   int m_TimeStep;
 
   bool m_SelfCall;

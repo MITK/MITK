@@ -197,24 +197,22 @@ void QmitkPropertiesTableModel::SetPropertyList(mitk::PropertyList *_PropertyLis
   {
     // Remove delete listener if there was a propertylist before
     if (!m_PropertyList.IsExpired())
-    {
-      m_PropertyList.ObjectDelete.RemoveListener(mitk::MessageDelegate1<QmitkPropertiesTableModel, const itk::Object *>(
-        this, &QmitkPropertiesTableModel::PropertyListDelete));
-    }
+      m_PropertyList.Lock()->RemoveObserver(m_PropertyListDeleteObserverTag);
 
     // set new list
     m_PropertyList = _PropertyList;
 
     if (!m_PropertyList.IsExpired())
     {
-      m_PropertyList.ObjectDelete.AddListener(mitk::MessageDelegate1<QmitkPropertiesTableModel, const itk::Object *>(
-        this, &QmitkPropertiesTableModel::PropertyListDelete));
+      auto command = itk::SimpleMemberCommand<QmitkPropertiesTableModel>::New();
+      command->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyListDelete);
+      m_PropertyListDeleteObserverTag = m_PropertyList.Lock()->AddObserver(itk::DeleteEvent(), command);
     }
     this->Reset();
   }
 }
 
-void QmitkPropertiesTableModel::PropertyListDelete(const itk::Object * /*_PropertyList*/)
+void QmitkPropertiesTableModel::PropertyListDelete()
 {
   if (!m_BlockEvents)
   {

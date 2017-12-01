@@ -108,7 +108,7 @@ public:
   ///
   /// Notify that the DataStorage was deleted. The whole model will be resetted.
   ///
-  void SetDataStorageDeleted(const itk::Object *_DataStorage);
+  void SetDataStorageDeleted();
   ///
   /// Adds a node to this model.
   /// If a predicate is set (not null) the node will be checked against it.The node has to have a data object (no one
@@ -264,6 +264,8 @@ private:
   /// Checks if dicom properties patient name, study names and series name exists
   ///
   bool DicomPropertiesExists(const mitk::DataNode &) const;
+
+  unsigned long m_DataStorageDeletedTag;
 };
 
 #endif /* QMITKDATASTORAGETREEMODEL_H_ */

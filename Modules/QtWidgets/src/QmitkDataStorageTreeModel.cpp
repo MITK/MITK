@@ -546,8 +546,7 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
       auto dataStorage = m_DataStorage.Lock();
 
       // remove Listener for the data storage itself
-      m_DataStorage.ObjectDelete.RemoveListener(mitk::MessageDelegate1<QmitkDataStorageTreeModel, const itk::Object *>(
-        this, &QmitkDataStorageTreeModel::SetDataStorageDeleted));
+      dataStorage->RemoveObserver(m_DataStorageDeletedTag);
 
       // remove listeners for the nodes
       dataStorage->AddNodeEvent.RemoveListener(
@@ -580,8 +579,9 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
       auto dataStorage = m_DataStorage.Lock();
 
       // add Listener for the data storage itself
-      m_DataStorage.ObjectDelete.AddListener(mitk::MessageDelegate1<QmitkDataStorageTreeModel, const itk::Object *>(
-        this, &QmitkDataStorageTreeModel::SetDataStorageDeleted));
+      auto command = itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::New();
+      command->SetCallbackFunction(this, &QmitkDataStorageTreeModel::SetDataStorageDeleted);
+      m_DataStorageDeletedTag = dataStorage->AddObserver(itk::DeleteEvent(), command);
 
       // add listeners for the nodes
       dataStorage->AddNodeEvent.AddListener(mitk::MessageDelegate1<QmitkDataStorageTreeModel, const mitk::DataNode *>(
@@ -603,7 +603,7 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
   }
 }
 
-void QmitkDataStorageTreeModel::SetDataStorageDeleted(const itk::Object * /*_DataStorage*/)
+void QmitkDataStorageTreeModel::SetDataStorageDeleted()
 {
   this->SetDataStorage(0);
 }

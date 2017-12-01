@@ -96,7 +96,7 @@ public:
   ///
   /// \brief Gets called when the list is about to be deleted.
   ///
-  virtual void PropertyListDelete(const itk::Object *_PropertyList);
+  virtual void PropertyListDelete();
 
   ///
   /// \brief Called when a single property was changed. Send a model changed event to the Qt-outer world.
@@ -230,6 +230,8 @@ protected:
   /// \brief Holds all tags of Modified Event Listeners. We need it to remove them again.
   ///
   std::vector<unsigned long> m_PropertyDeleteObserverTags;
+
+  unsigned long m_PropertyListDeleteObserverTag;
 
   ///
   /// \brief Indicates if this class should neglect all incoming events because

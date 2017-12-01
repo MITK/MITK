@@ -49,20 +49,25 @@ void QmitkPointListViewWidget::SetPointSet(mitk::PointSet *pointSet)
 {
   if (!m_PointSet.IsExpired())
   {
-    m_PointSet.ObjectModified.RemoveListener(mitk::MessageDelegate1<QmitkPointListViewWidget, const itk::Object *>(
-      this, &QmitkPointListViewWidget::OnPointSetChanged));
-    m_PointSet.ObjectDelete.RemoveListener(mitk::MessageDelegate1<QmitkPointListViewWidget, const itk::Object *>(
-      this, &QmitkPointListViewWidget::OnPointSetDeleted));
+    auto pointSet = m_PointSet.Lock();
+
+    pointSet->RemoveObserver(m_PointSetModifiedTag);
+    pointSet->RemoveObserver(m_PointSetDeletedTag);
   }
 
   m_PointSet = pointSet;
 
   if (!m_PointSet.IsExpired())
   {
-    m_PointSet.ObjectModified.AddListener(mitk::MessageDelegate1<QmitkPointListViewWidget, const itk::Object *>(
-      this, &QmitkPointListViewWidget::OnPointSetChanged));
-    m_PointSet.ObjectDelete.AddListener(mitk::MessageDelegate1<QmitkPointListViewWidget, const itk::Object *>(
-      this, &QmitkPointListViewWidget::OnPointSetDeleted));
+    auto pointSet = m_PointSet.Lock();
+
+    auto onPointSetDeleted = itk::SimpleMemberCommand<QmitkPointListViewWidget>::New();
+    onPointSetDeleted->SetCallbackFunction(this, &QmitkPointListViewWidget::OnPointSetDeleted);
+    m_PointSetDeletedTag = pointSet->AddObserver(itk::DeleteEvent(), onPointSetDeleted);
+
+    auto onPointSetModified = itk::SimpleMemberCommand<QmitkPointListViewWidget>::New();
+    onPointSetModified->SetCallbackFunction(this, &QmitkPointListViewWidget::OnPointSetChanged);
+    m_PointSetModifiedTag = pointSet->AddObserver(itk::DeleteEvent(), onPointSetModified);
   }
 
   this->Update();
@@ -94,13 +99,13 @@ QmitkStdMultiWidget *QmitkPointListViewWidget::GetMultiWidget() const
   return m_MultiWidget;
 }
 
-void QmitkPointListViewWidget::OnPointSetChanged(const itk::Object *)
+void QmitkPointListViewWidget::OnPointSetChanged()
 {
   if (!m_SelfCall)
     this->Update();
 }
 
-void QmitkPointListViewWidget::OnPointSetDeleted(const itk::Object *)
+void QmitkPointListViewWidget::OnPointSetDeleted()
 {
   this->SetPointSet(0);
   this->Update();

@@ -44,7 +44,7 @@ public:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   template <typename TPixel>
-  void ImageValuesAlongTract(const mitk::PixelType, mitk::Image::Pointer image, mitk::FiberBundle::Pointer fib, std::vector< std::vector< double > >& data);
+  void ImageValuesAlongTract(const mitk::PixelType, mitk::Image::Pointer image, mitk::FiberBundle::Pointer fib, std::vector< std::vector< double > >& data, std::string& clipboard_string);
 
   virtual void SetFocus() override;
 
@@ -52,6 +52,8 @@ public:
 
 
 protected slots:
+
+  void UpdateGui();
 
 protected:
 
@@ -64,6 +66,7 @@ protected:
   std::string RGBToHexString(double *rgb);
 
   vtkSmartPointer< vtkPolyData > m_ReferencePolyData;
+  QList<mitk::DataNode::Pointer> m_CurrentSelection;
 };
 
 

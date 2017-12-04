@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryWorkbenchPlugin.h>
 #include <berryQtPreferences.h>
 #include <vtkLookupTable.h>
+#include <QClipboard>
+#include <boost/lexical_cast.hpp>
 
 const std::string QmitkTractometryView::VIEW_ID = "org.mitk.views.tractometry";
 using namespace mitk;
@@ -61,6 +63,9 @@ void QmitkTractometryView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkTractometryViewControls;
     m_Controls->setupUi( parent );
+
+    connect( m_Controls->m_SamplingPointsBox, SIGNAL(valueChanged(int)), this, SLOT(UpdateGui()) );
+    connect( m_Controls->m_StDevBox, SIGNAL(stateChanged(int)), this, SLOT(UpdateGui()) );
 
     mitk::TNodePredicateDataType<mitk::Image>::Pointer imageP = mitk::TNodePredicateDataType<mitk::Image>::New();
     mitk::NodePredicateDimension::Pointer dimP = mitk::NodePredicateDimension::New(3);
@@ -94,6 +99,12 @@ void QmitkTractometryView::SetFocus()
 {
 }
 
+void QmitkTractometryView::UpdateGui()
+{
+  berry::IWorkbenchPart::Pointer nullPart;
+  OnSelectionChanged(nullPart, QList<mitk::DataNode::Pointer>(m_CurrentSelection));
+}
+
 bool QmitkTractometryView::Flip(vtkSmartPointer< vtkPolyData > polydata1, int i, vtkSmartPointer< vtkPolyData > ref_poly)
 {
   float d_direct = 0;
@@ -124,9 +135,9 @@ bool QmitkTractometryView::Flip(vtkSmartPointer< vtkPolyData > polydata1, int i,
 }
 
 template <typename TPixel>
-void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Image::Pointer image, mitk::FiberBundle::Pointer fib, std::vector<std::vector<double> > &data)
+void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Image::Pointer image, mitk::FiberBundle::Pointer fib, std::vector<std::vector<double> > &data, std::string& clipboard_string)
 {
-  int num_points = 100;
+  int num_points = m_Controls->m_SamplingPointsBox->value();
   mitk::ImagePixelReadAccessor<TPixel,3> readimage(image, image->GetVolumeData(0));
   mitk::FiberBundle::Pointer working_fib = fib->GetDeepCopy();
   working_fib->ResampleToNumPoints(num_points);
@@ -200,7 +211,13 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
     stdev = std::sqrt(stdev);
     std_values1.push_back(mean_values.at(i) + stdev/2);
     std_values2.push_back(mean_values.at(i) - stdev/2);
+
+    clipboard_string += boost::lexical_cast<std::string>(mean_values.at(i));
+    clipboard_string += " ";
+    clipboard_string += boost::lexical_cast<std::string>(stdev);
+    clipboard_string += "\n";
   }
+  clipboard_string += "\n";
 
   data.push_back(mean_values);
   data.push_back(std_values1);
@@ -224,9 +241,12 @@ std::string QmitkTractometryView::RGBToHexString(double *rgb)
 
 void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
+  MITK_INFO << nodes.size();
+  m_CurrentSelection.clear();
   if(m_Controls->m_ImageBox->GetSelectedNode().IsNull())
     return;
 
+  std::string clipboardString = "";
   m_ReferencePolyData = nullptr;
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData());
 
@@ -245,10 +265,13 @@ void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
   {
     if ( dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
     {
+      clipboardString += node->GetName() + "\n";
+      clipboardString += "mean stdev\n";
       mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+      m_CurrentSelection.push_back(node);
 
       std::vector< std::vector< double > > data;
-      mitkPixelTypeMultiplex3( ImageValuesAlongTract, image->GetPixelType(), image, fib, data );
+      mitkPixelTypeMultiplex4( ImageValuesAlongTract, image->GetPixelType(), image, fib, data, clipboardString );
 
       m_Controls->m_ChartWidget->AddData1D(data.at(0), node->GetName() + " Mean", QmitkChartWidget::ChartType::line);
       if (m_Controls->m_StDevBox->isChecked())
@@ -283,5 +306,6 @@ void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
     }
   }
 
-  MITK_INFO << "OnSelectionChanged DONE";
+  QApplication::clipboard()->setText(clipboardString.c_str(), QClipboard::Clipboard);
+
 }

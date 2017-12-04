@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>503</width>
-    <height>747</height>
+    <height>812</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -32,6 +32,18 @@
       <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_5">
         <property name="toolTip">
@@ -1627,14 +1639,14 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBoxWithSelectNone</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBoxWithSelectNone.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

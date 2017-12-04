@@ -297,7 +297,6 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_QBallReconstructionMethodComboBox->removeItem(3);
 #endif
 
-    AdvancedCheckboxClicked();
   }
 
   m_SelListener.reset(new QbrSelListener(this));
@@ -310,7 +309,6 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
 
 void QmitkQBallReconstructionView::SetFocus()
 {
-  m_Controls->m_AdvancedCheckbox->setFocus();
 }
 
 void QmitkQBallReconstructionView::CreateConnections()
@@ -318,7 +316,6 @@ void QmitkQBallReconstructionView::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_ButtonStandard), SIGNAL(clicked()), this, SLOT(ReconstructStandard()) );
-    connect( (QObject*)(m_Controls->m_AdvancedCheckbox), SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
     connect( (QObject*)(m_Controls->m_QBallReconstructionMethodComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
     connect( (QObject*)(m_Controls->m_QBallReconstructionThreasholdEdit), SIGNAL(valueChanged(int)), this, SLOT(PreviewThreshold(int)) );
   }
@@ -481,23 +478,6 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   }
-}
-
-
-
-void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
-{
-  bool check = m_Controls->m_AdvancedCheckbox->isChecked();
-
-  m_Controls->m_QBallReconstructionMaxLLevelTextLabel_2->setVisible(check);
-  m_Controls->m_QBallReconstructionMaxLLevelComboBox->setVisible(check);
-  m_Controls->m_QBallReconstructionLambdaTextLabel_2->setVisible(check);
-  m_Controls->m_QBallReconstructionLambdaLineEdit->setVisible(check);
-
-  m_Controls->m_QBallReconstructionThresholdLabel_2->setVisible(check);
-  m_Controls->m_QBallReconstructionThreasholdEdit->setVisible(check);
-  m_Controls->label_2->setVisible(check);
-  m_Controls->frame_2->setVisible(check);
 }
 
 void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)

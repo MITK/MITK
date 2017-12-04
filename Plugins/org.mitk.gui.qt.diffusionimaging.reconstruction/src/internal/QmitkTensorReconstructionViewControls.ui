@@ -29,6 +29,18 @@
       <string>Please Select Input Data:</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="1">
        <widget class="QLabel" name="m_DiffusionImageLabel">
         <property name="toolTip">
@@ -58,9 +70,21 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Tensor reconstruction and colormap visualization</string>
+      <string>Tensor Reconstruction</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QCheckBox" name="m_Advanced1">
         <property name="text">
@@ -188,9 +212,24 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Estimate Diffusion Weighted Image from Tensors</string>
+      <string>Diffusion-weighted Image from Tensors</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QFrame" name="m_TensorsToDWIFrame">
         <property name="frameShape">
@@ -345,9 +384,24 @@
    <item>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
-      <string>Estimate ODF Image from Tensors</string>
+      <string>ODF Image from Tensors</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QCommandLinkButton" name="m_TensorsToOdfButton">
         <property name="enabled">
@@ -363,7 +417,7 @@
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Start ODF Estimation</string>
+         <string>Start</string>
         </property>
        </widget>
       </item>
@@ -373,7 +427,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="title">
-      <string>Estimate Residuals</string>
+      <string>Calculate Residuals</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -382,6 +436,21 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="horizontalSpacing">
+       <number>0</number>
+      </property>
       <item row="2" column="0">
        <widget class="QCheckBox" name="m_PercentagesOfOutliers">
         <property name="enabled">
@@ -395,7 +464,7 @@
       <item row="1" column="0">
        <widget class="QTabWidget" name="m_ResidualTab">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -534,12 +603,25 @@
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Residual Image Calculation</string>
+         <string>Start</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

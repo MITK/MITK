@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>413</width>
-    <height>1356</height>
+    <height>1385</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -38,6 +38,18 @@
       <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="6" column="1">
        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TissueImageBox">
         <property name="toolTip">
@@ -261,6 +273,18 @@
       <string>Interactive Tractography</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="3" column="1">
        <widget class="QSpinBox" name="m_NumSeedsBox">
         <property name="toolTip">
@@ -360,6 +384,18 @@
       <string>Parameters</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="m_FaThresholdLabel_3">
         <property name="toolTip">
@@ -529,6 +565,18 @@
       <string>Advanced Parameters</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="0" colspan="2">
        <widget class="QFrame" name="frame_2">
         <property name="frameShape">
@@ -846,6 +894,18 @@
       <string>Neighborhood Sampling</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="0">
        <widget class="QFrame" name="frame_4">
         <property name="frameShape">
@@ -976,6 +1036,18 @@
       <string>Output and Postprocessing</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_9">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item row="0" column="0">
        <widget class="QFrame" name="frame_5">
         <property name="frameShape">

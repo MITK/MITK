@@ -115,6 +115,9 @@ void QmitkTensorReconstructionView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ResidualButton), SIGNAL(clicked()), this, SLOT(ResidualCalculation()) );
         connect( (QObject*)(m_Controls->m_PerSliceView), SIGNAL(pointSelected(int, int)), this, SLOT(ResidualClicked(int, int)) );
         connect( (QObject*)(m_Controls->m_TensorReconstructionThreshold), SIGNAL(valueChanged(int)), this, SLOT(PreviewThreshold(int)) );
+
+        m_Controls->m_ResidualTab->setVisible(false);
+        m_Controls->m_PercentagesOfOutliers->setVisible(false);
     }
 }
 

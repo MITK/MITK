@@ -94,7 +94,6 @@ class QmitkQBallReconstructionView : public QmitkAbstractView, public mitk::ILif
 protected slots:
 
   void ReconstructStandard();
-  void AdvancedCheckboxClicked();
   void MethodChoosen(int method);
   void Reconstruct(int method, int normalization);
 

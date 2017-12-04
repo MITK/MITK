@@ -702,7 +702,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   {
     if ( m_Controls->m_ForestBox->GetSelectedNode().IsNull() )
     {
-      QMessageBox::information(nullptr, "Information", "Not random forest for machine learning based tractography selected.");
+      QMessageBox::information(nullptr, "Information", "Not random forest for machine learning based tractography (raw dMRI tractography) selected. Did you accidentally select the raw diffusion-weighted image in the datamanager?");
       StartStopTrackingGui(false);
       return;
     }

@@ -52,17 +52,27 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_SamplingPointsBox">
+        <property name="minimum">
+         <number>3</number>
+        </property>
+        <property name="maximum">
+         <number>99999</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Sampling Points:</string>
+        </property>
+       </widget>
+      </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QmitkChartWidget" name="m_ChartWidget" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
-     </property>
     </widget>
    </item>
    <item row="3" column="0">
@@ -78,6 +88,16 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="0">
+    <widget class="QmitkChartWidget" name="m_ChartWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QCheckBox" name="m_StDevBox">
      <property name="text">
@@ -92,14 +112,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkChartWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkChartWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkChartWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkChartWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

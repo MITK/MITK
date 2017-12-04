@@ -160,8 +160,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 {
   //Disable Buttons during calculation and initialize Progressbar
   this->EnableButtons(false);
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
-  mitk::ProgressBar::GetInstance()->Progress();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
 
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
 
@@ -181,8 +180,6 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   //Do Image-Masking
   if (m_Controls.rbMaskImage->isChecked())
   {
-    mitk::ProgressBar::GetInstance()->Progress();
-
     mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( maskingNode->GetData() );
 
     if(maskImage.IsNull() )
@@ -203,8 +200,6 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   //Do Surface-Masking
   else
   {
-    mitk::ProgressBar::GetInstance()->Progress();
-
     //1. convert surface to image
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*> ( maskingNode->GetData() );
 
@@ -235,7 +230,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
     MITK_ERROR << "Masking failed";
     QMessageBox::information( this, TR_IMAGE_SURF_MASKING, TR_MASKING_FAILED, QMessageBox::Ok );
     this->EnableButtons();
-    mitk::ProgressBar::GetInstance()->Progress(4);
+    mitk::ProgressBar::GetInstance()->Reset();
     return;
   }
 
@@ -255,6 +250,9 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
 {
   mitk::Image::Pointer resultImage(nullptr);
 
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
+  mitk::ProgressBar::GetInstance()->Progress();
+
   mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
   maskFilter->SetInput( referenceImage );
   maskFilter->SetMask( maskImage );
@@ -270,14 +268,18 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
     return nullptr;
   }
 
+  mitk::ProgressBar::GetInstance()->Progress(2);
+
   resultImage = maskFilter->GetOutput();
+
+  mitk::ProgressBar::GetInstance()->Progress();
 
   return resultImage;
 }
 
 mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )
 {
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
   mitk::ProgressBar::GetInstance()->Progress();
 
   mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
@@ -294,9 +296,12 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
     return nullptr;
   }
 
-  mitk::ProgressBar::GetInstance()->Progress();
+  mitk::ProgressBar::GetInstance()->Progress(2);
+
   mitk::Image::Pointer resultImage = mitk::Image::New();
   resultImage = surfaceToImageFilter->GetOutput();
+
+  mitk::ProgressBar::GetInstance()->Progress();
 
   return resultImage;
 }

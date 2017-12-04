@@ -95,6 +95,7 @@ void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int, const mitk::Dat
 void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
 {
   this->EnableButtons(false);
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
 
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( dataSelectionWidget->GetSelection(0)->GetData() );
@@ -111,11 +112,14 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   mitk::Image::Pointer resultImage(nullptr);
   resultImage = this->ConvertSurfaceToImage( image, surface );
 
+  mitk::ProgressBar::GetInstance()->Progress();
+
   if( resultImage.IsNull() )
   {
     MITK_ERROR << "Convert Surface to binary image failed";
     QMessageBox::information( this, TR_SURFACE_TO_IMAGE, TR_CONVERT_SURFACE, QMessageBox::Ok );
     this->EnableButtons();
+    mitk::ProgressBar::GetInstance()->Reset();
     return;
   }
 
@@ -133,11 +137,13 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   dataSelectionWidget->GetDataStorage()->Add(resultNode, dataSelectionWidget->GetSelection(0));
 
   this->EnableButtons();
+
+  mitk::ProgressBar::GetInstance()->Progress();
 }
 
 mitk::LabelSetImage::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )
 {
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
   mitk::ProgressBar::GetInstance()->Progress();
 
   mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
@@ -154,11 +160,13 @@ mitk::LabelSetImage::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( m
     return nullptr;
   }
 
-  mitk::ProgressBar::GetInstance()->Progress();
+  mitk::ProgressBar::GetInstance()->Progress(2);
 
   mitk::Image::Pointer resultImage = surfaceToImageFilter->GetOutput();
   mitk::LabelSetImage::Pointer multilabelImage = mitk::LabelSetImage::New();
   multilabelImage->InitializeByLabeledImage(resultImage);
+
+  mitk::ProgressBar::GetInstance()->Progress();
 
   return multilabelImage;
 }

@@ -39,6 +39,11 @@ namespace mitk{
     m_Image = _Image;
   }
 
+  Image* ImageToOpenCVImageFilter::GetImage()
+  {
+    return m_Image.Lock();
+  }
+
 
   bool ImageToOpenCVImageFilter::CheckImage( Image* image )
   {

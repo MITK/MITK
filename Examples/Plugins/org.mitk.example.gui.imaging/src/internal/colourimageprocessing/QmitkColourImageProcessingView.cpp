@@ -152,7 +152,7 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
   {
     RGBAImageResult =
       CImageProcessor.convertWithBinaryToRGBAImage(dynamic_cast<mitk::Image *>(selectedNode->GetData()),
-                                                   dynamic_cast<mitk::Image *>(selectedNode2.Lock()->GetData()),
+                                                   dynamic_cast<mitk::Image *>(m_SelectedNode2.Lock()->GetData()),
                                                    tf);
   }
   else

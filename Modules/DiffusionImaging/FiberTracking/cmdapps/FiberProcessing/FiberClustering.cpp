@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricEuclideanStd.h>
 #include <mitkClusteringMetricAnatomic.h>
 #include <mitkClusteringMetricScalarMap.h>
+#include <mitkClusteringMetricInnerAngles.h>
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
 {
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
   parser.addArgument("max_clusters", "", mitkCommandLineParser::Int, "Max. clusters:", "");
   parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "", -1.0);
   parser.addArgument("output_centroids", "", mitkCommandLineParser::Bool, "Output centroids:", "");
-  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN, EU_STD, EU_MAX, ANAT, MAP");
+  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN, EU_STD, EU_MAX, ANAT, MAP, ANGLES");
   parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "");
   parser.addArgument("scalar_map", "", mitkCommandLineParser::String, "Scalar map:", "");
   parser.addArgument("parcellation", "", mitkCommandLineParser::String, "Parcellation:", "");
@@ -146,6 +147,8 @@ int main(int argc, char* argv[])
         metrics.push_back({new mitk::ClusteringMetricEuclideanStd()});
       else if (m=="EU_MAX")
         metrics.push_back({new mitk::ClusteringMetricEuclideanMax()});
+      else if (m=="ANGLES")
+        metrics.push_back({new mitk::ClusteringMetricInnerAngles()});
       else if (m=="MAP" && scalar_map!="")
       {
         mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(scalar_map)[0].GetPointer());

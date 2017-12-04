@@ -49,7 +49,8 @@ public:
     vnl_vector<float> dists_d; dists_d.set_size(s.cols());
     vnl_vector<float> dists_f; dists_f.set_size(s.cols());
 
-    for (unsigned int i=0; i<s.cols(); ++i)
+    int inc = s.cols()/4;
+    for (unsigned int i=0; i<s.cols(); i += inc)
     {
       d_direct += (s.get_column(i)-t.get_column(i)).magnitude();
       d_flipped += (s.get_column(i)-t.get_column(s.cols()-i-1)).magnitude();

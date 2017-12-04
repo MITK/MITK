@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _ClusteringMetricMdfAnatomic
-#define _ClusteringMetricMdfAnatomic
+#ifndef _ClusteringMetricAnatomic
+#define _ClusteringMetricAnatomic
 
 #include <mitkClusteringMetric.h>
 #include <itkImage.h>

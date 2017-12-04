@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _ClusteringMetricMdf
-#define _ClusteringMetricMdf
+#ifndef _ClusteringMetricEuMean
+#define _ClusteringMetricEuMean
 
 #include <mitkClusteringMetric.h>
 

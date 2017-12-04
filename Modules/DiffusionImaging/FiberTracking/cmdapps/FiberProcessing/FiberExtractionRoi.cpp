@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Fiber Extraction");
+  parser.setTitle("Fiber Extraction With ROI Image");
   parser.setCategory("Fiber Tracking and Processing Methods");
   parser.setContributor("MIC");
   parser.setDescription("Extract fibers from a tractogram using binary image ROIs");

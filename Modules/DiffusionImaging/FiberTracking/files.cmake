@@ -70,6 +70,7 @@ set(H_FILES
   Algorithms/ClusteringMetrics/mitkClusteringMetricEuclideanStd.h
   Algorithms/ClusteringMetrics/mitkClusteringMetricAnatomic.h
   Algorithms/ClusteringMetrics/mitkClusteringMetricScalarMap.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricInnerAngles.h
 
   # Fiberfox
   Fiberfox/itkFibersFromPlanarFiguresFilter.h

@@ -239,7 +239,7 @@
      <property name="title">
       <string>Metrics</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QFormLayout" name="formLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -253,6 +253,22 @@
        <number>0</number>
       </property>
       <item row="0" column="0">
+       <widget class="QDoubleSpinBox" name="m_MetricWeight1">
+        <property name="toolTip">
+         <string>Weighting factor for metric values.</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
        <widget class="QCheckBox" name="m_MetricBox1">
         <property name="text">
          <string>Euclidean</string>
@@ -262,21 +278,28 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="m_MetricBox3">
-        <property name="text">
-         <string>Euclidean Maximum</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
+      <item row="1" column="1">
        <widget class="QCheckBox" name="m_MetricBox2">
         <property name="text">
          <string>Euclidean with STDEV</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="m_MetricBox3">
+        <property name="text">
+         <string>Euclidean Maximum</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="m_MetricBox6">
+        <property name="text">
+         <string>Inner Angles</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
        <widget class="QFrame" name="frame_2">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -300,7 +323,7 @@
          <property name="spacing">
           <number>6</number>
          </property>
-         <item row="0" column="0">
+         <item row="0" column="1">
           <widget class="QCheckBox" name="m_MetricBox4">
            <property name="toolTip">
             <string>Distance is based on the selected parcellation.</string>
@@ -310,14 +333,118 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_ParcellationBox">
+         <item row="0" column="2">
+          <widget class="QmitkDataStorageComboBox" name="m_ParcellationBox">
            <property name="toolTip">
             <string>Distance is based on the selected parcellation.</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QDoubleSpinBox" name="m_MetricWeight2">
+        <property name="toolTip">
+         <string>Weighting factor for metric values.</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QDoubleSpinBox" name="m_MetricWeight3">
+        <property name="toolTip">
+         <string>Weighting factor for metric values.</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QDoubleSpinBox" name="m_MetricWeight6">
+        <property name="toolTip">
+         <string>Weighting factor for metric values.</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QDoubleSpinBox" name="m_MetricWeight4">
+        <property name="toolTip">
+         <string>Weighting factor for metric values.</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QDoubleSpinBox" name="m_MetricWeight5">
+        <property name="toolTip">
+         <string>Weighting factor for metric values.</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>30.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
           <widget class="QCheckBox" name="m_MetricBox5">
            <property name="toolTip">
             <string>Distance is based on the scalar map values along the tract.</string>
@@ -327,8 +454,8 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MapBox">
+         <item row="0" column="1">
+          <widget class="QmitkDataStorageComboBox" name="m_MapBox">
            <property name="toolTip">
             <string>Distance is based on the scalar map values along the tract.</string>
            </property>

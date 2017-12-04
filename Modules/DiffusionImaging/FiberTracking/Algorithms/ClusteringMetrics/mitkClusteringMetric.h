@@ -37,7 +37,7 @@ public:
 
   virtual float CalculateDistance(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped) = 0;
 
-  float SetScale() const;
+  float GetScale() const;
   void SetScale(float Scale);
 
 protected:
@@ -46,7 +46,7 @@ protected:
 
 };
 
-float ClusteringMetric::SetScale() const
+float ClusteringMetric::GetScale() const
 {
   return m_Scale;
 }

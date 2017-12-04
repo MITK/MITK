@@ -21,6 +21,7 @@ if(BUILD_DiffusionFiberProcessingCmdApps OR MITK_BUILD_ALL_APPS)
     FiberDirectionExtraction^^MitkFiberTracking
     FiberJoin^^MitkFiberTracking
     FiberClustering^^MitkFiberTracking
+    GetOverlappingTracts^^MitkFiberTracking
     )
 
     foreach(diffusionFiberProcessingcmdapp ${diffusionFiberProcessingcmdapps})

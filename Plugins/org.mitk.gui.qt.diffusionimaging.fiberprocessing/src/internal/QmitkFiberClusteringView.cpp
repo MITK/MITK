@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricEuclideanStd.h>
 #include <mitkClusteringMetricAnatomic.h>
 #include <mitkClusteringMetricScalarMap.h>
+#include <mitkClusteringMetricInnerAngles.h>
 #include <QMessageBox>
 
 const std::string QmitkFiberClusteringView::VIEW_ID = "org.mitk.views.fiberclustering";
@@ -77,11 +78,12 @@ void QmitkFiberClusteringView::CreateQtPartControl( QWidget *parent )
 
     m_Controls->m_MapBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_MapBox->SetPredicate(mitk::NodePredicateAnd::New(imageP, dimP));
-    m_Controls->m_MapBox->SetZeroEntryText("--");
 
     m_Controls->m_ParcellationBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ParcellationBox->SetPredicate(mitk::NodePredicateAnd::New(imageP, dimP));
-    m_Controls->m_ParcellationBox->SetZeroEntryText("--");
+
+    m_Controls->m_MetricBox6->setVisible(false);
+    m_Controls->m_MetricWeight6->setVisible(false);
 
     FiberSelectionChanged();
   }
@@ -131,13 +133,30 @@ void QmitkFiberClusteringView::StartClustering()
   }
 
   std::vector< mitk::ClusteringMetric* > metrics;
-
   if (m_Controls->m_MetricBox1->isChecked())
-    metrics.push_back(new mitk::ClusteringMetricEuclideanMean());
+  {
+    mitk::ClusteringMetricEuclideanMean* metric = new mitk::ClusteringMetricEuclideanMean();
+    metric->SetScale(m_Controls->m_MetricWeight1->value());
+    metrics.push_back(metric);
+  }
   if (m_Controls->m_MetricBox2->isChecked())
-    metrics.push_back(new mitk::ClusteringMetricEuclideanStd());
+  {
+    mitk::ClusteringMetricEuclideanStd* metric = new mitk::ClusteringMetricEuclideanStd();
+    metric->SetScale(m_Controls->m_MetricWeight2->value());
+    metrics.push_back(metric);
+  }
   if (m_Controls->m_MetricBox3->isChecked())
-    metrics.push_back(new mitk::ClusteringMetricEuclideanMax());
+  {
+    mitk::ClusteringMetricEuclideanMax* metric = new mitk::ClusteringMetricEuclideanMax();
+    metric->SetScale(m_Controls->m_MetricWeight3->value());
+    metrics.push_back(metric);
+  }
+  if (m_Controls->m_MetricBox6->isChecked())
+  {
+    mitk::ClusteringMetricInnerAngles* metric = new mitk::ClusteringMetricInnerAngles();
+    metric->SetScale(m_Controls->m_MetricWeight6->value());
+    metrics.push_back(metric);
+  }
   if (m_Controls->m_ParcellationBox->GetSelectedNode().IsNotNull() && m_Controls->m_MetricBox4->isChecked())
   {
     mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(m_Controls->m_ParcellationBox->GetSelectedNode()->GetData());
@@ -146,6 +165,7 @@ void QmitkFiberClusteringView::StartClustering()
     mitk::CastToItkImage(mitk_map, itk_map);
     mitk::ClusteringMetricAnatomic* metric = new mitk::ClusteringMetricAnatomic();
     metric->SetParcellations({itk_map});
+    metric->SetScale(m_Controls->m_MetricWeight4->value());
     metrics.push_back(metric);
   }
   if (m_Controls->m_MapBox->GetSelectedNode().IsNotNull() && m_Controls->m_MetricBox5->isChecked())
@@ -156,7 +176,7 @@ void QmitkFiberClusteringView::StartClustering()
     mitk::CastToItkImage(mitk_map, itk_map);
     mitk::ClusteringMetricScalarMap* metric = new mitk::ClusteringMetricScalarMap();
     metric->SetImages({itk_map});
-    metric->SetScale(distances.at(0));
+    metric->SetScale(m_Controls->m_MetricWeight5->value());
     metrics.push_back(metric);
   }
 

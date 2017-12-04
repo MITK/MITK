@@ -2,6 +2,7 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 
 set(CPP_FILES
 QmitkApplicationCursor.cpp
+QmitkDataStorageAbstractView.cpp
 QmitkDataStorageComboBox.cpp
 QmitkDataStorageListModel.cpp
 QmitkDataStorageTableModel.cpp
@@ -40,6 +41,8 @@ QmitkPropertyItemModel.cpp
 )
 
 set(MOC_H_FILES
+  include/QmitkIDataStorageViewModel.h
+  include/QmitkDataStorageAbstractView.h
   include/QmitkDataStorageComboBox.h
   include/QmitkDataStorageTableModel.h
   include/QmitkFileReaderOptionsDialog.h

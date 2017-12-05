@@ -30,12 +30,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataToIGTLMessageFilter.h>
 #include <mitkIGTLServer.h>
 #include <mitkIGTLMessageProvider.h>
-#include <mitkNeedleProjectionFilter.h>
 
 //QT headers
 #include <QTimer>
 
 #include "QmitkMITKIGTTrackingToolboxViewWorker.h"
+
+//Forward declaration of MITK classes
+namespace mitk
+{
+  class NeedleProjectionFilter;
+}
 
 /*!
   \brief QmitkMITKIGTTrackingToolboxView

@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLog.h>
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
+#include <mitkNeedleProjectionFilter.h>
 
 //for exceptions
 #include <mitkIGTException.h>

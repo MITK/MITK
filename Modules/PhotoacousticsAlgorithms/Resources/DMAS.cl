@@ -56,14 +56,14 @@ __kernel void ckDMAS(
 
     for (short l_s1 = minLine; l_s1 < maxLine; ++l_s1)
     {
-      Delay1 = AddSamples[globalPosY * inputL + (int)(fabs(l_s1 - l_i))];
+      Delay1 = AddSamples[globalPosY * outputL + (int)(fabs(l_s1 - l_i)/(float)inputL * (float)outputL)];
       if (Delay1 < inputS && Delay1 >= 0) {
         s_1 = dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
         sign += s_1;
         
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
-          Delay2 = AddSamples[globalPosY * inputL + (int)(fabs(l_s2 - l_i))];
+          Delay2 = AddSamples[globalPosY * outputL + (int)(fabs(l_s2 - l_i)/(float)inputL * (float)outputL)];
           if (Delay2 < inputS && Delay2 >= 0) {
             s_2 = dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)];
             

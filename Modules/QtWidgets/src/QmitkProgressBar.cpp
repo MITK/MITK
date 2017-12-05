@@ -33,7 +33,7 @@ void QmitkProgressBar::Reset()
     QMetaObject::invokeMethod(m_Timer, "stop");
   }
 
-  QMetaObject::invokeMethod(this, "reset");
+  //QMetaObject::invokeMethod(this, "reset");
   QMetaObject::invokeMethod(this, "hide");
 
   m_TotalSteps = 0;

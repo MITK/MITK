@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCovarianceMatrixCalculator.h>
 #include <mitkAnisotropicRegistrationCommon.h>
 
+#include <PluginLocker.h>
+
 // vtk
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
@@ -366,6 +368,8 @@ void UIWorker::SetRegistrationData(AICPRegistrationViewData *data)
 
 void UIWorker::RegistrationThreadFunc()
 {
+  PluginLocker _pluginLockGuard(QmitkAICPRegistrationView::VIEW_ID);
+
   typedef itk::Matrix<double,3,3> Matrix3x3;
   typedef itk::Vector<double,3> TranslationVector;
   typedef std::vector<Matrix3x3> CovarianceMatrixList;

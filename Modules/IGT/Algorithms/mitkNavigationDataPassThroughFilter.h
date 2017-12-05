@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define NAVIGATIONDATAPASSTHROUGHFILTER_H
 
 #include "mitkNavigationDataToNavigationDataFilter.h"
-#include "MitkUSNavigationExports.h"
+#include "MitkIGTExports.h"
 
 namespace mitk {
 
@@ -29,7 +29,7 @@ namespace mitk {
  * method in their own GenerateData() implementation to pass through navigation data
  * from all inputs to the outputs.
  */
-class MITKUSNAVIGATION_EXPORT NavigationDataPassThroughFilter : public NavigationDataToNavigationDataFilter
+class MITKIGT_EXPORT NavigationDataPassThroughFilter : public NavigationDataToNavigationDataFilter
 {
 public:
   mitkClassMacro(NavigationDataPassThroughFilter, NavigationDataToNavigationDataFilter)

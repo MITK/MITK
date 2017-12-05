@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include "mitkNeedleProjectionFilter.h"
 #include <mitkPlaneGeometry.h>
-#include "mitkUSCombinedModality.h"
+// Vermutung - wird nicht benötigt: #include "mitkUSCombinedModality.h"
 
 // VTK
 #include <vtkPlane.h>

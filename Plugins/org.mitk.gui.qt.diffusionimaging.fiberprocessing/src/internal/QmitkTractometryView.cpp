@@ -241,7 +241,6 @@ std::string QmitkTractometryView::RGBToHexString(double *rgb)
 
 void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
-  MITK_INFO << nodes.size();
   m_CurrentSelection.clear();
   if(m_Controls->m_ImageBox->GetSelectedNode().IsNull())
     return;

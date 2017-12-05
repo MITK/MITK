@@ -301,15 +301,13 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   const vnl_matrix_fixed<ScalarType, 3, 3> &transform =
       image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
 
+  mitk::Vector3D s = image->GetGeometry()->GetSpacing();
+
   // ToDo: Check if this is a collumn or row vector from the matrix.
   // right now it works but not sure for rotated geometries
-  mitk::FillVector3D(xDirection, transform[0][0], transform[0][1], transform[0][2]);
-  mitk::FillVector3D(yDirection, transform[1][0], transform[1][1], transform[1][2]);
-  mitk::FillVector3D(zDirection, transform[2][0], transform[2][1], transform[2][2]);
-
-  xDirection.Normalize();
-  yDirection.Normalize();
-  zDirection.Normalize();
+  mitk::FillVector3D(xDirection, transform[0][0]/s[0], transform[0][1]/s[1], transform[0][2]/s[2]);
+  mitk::FillVector3D(yDirection, transform[1][0]/s[0], transform[1][1]/s[1], transform[1][2]/s[2]);
+  mitk::FillVector3D(zDirection, transform[2][0]/s[0], transform[2][1]/s[1], transform[2][2]/s[2]);
 
   // save the total number of elements here (since the numpy array is one dimensional)
   npy_intp* npy_dims = new npy_intp[1];

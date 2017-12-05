@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("output_centroids"))
     output_centroids = us::any_cast<bool>(parsedArgs["output_centroids"]);
 
-  std::vector< std::string > metric_strings = {"EUCL"};
+  std::vector< std::string > metric_strings = {"EU_MEAN"};
   if (parsedArgs.count("metrics"))
     metric_strings = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["metrics"]);
 

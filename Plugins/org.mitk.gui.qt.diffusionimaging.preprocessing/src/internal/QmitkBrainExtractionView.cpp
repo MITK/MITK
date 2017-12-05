@@ -150,35 +150,54 @@ void QmitkBrainExtractionView::StartBrainExtraction()
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   mitk::Image::Pointer mitk_image = dynamic_cast<mitk::Image*>(node->GetData());
 
-  us::ModuleContext* context = us::GetModuleContext();
-  us::ServiceReference<mitk::IPythonService> m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
-  mitk::IPythonService* m_PythonService = dynamic_cast<mitk::IPythonService*> ( context->GetService<mitk::IPythonService>(m_PythonServiceRef) );
-  mitk::IPythonService::ForceLoadModule();
-
-  m_PythonService->Execute("import SimpleITK as sitk");
-  m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
-  m_PythonService->Execute("import numpy");
-  m_PythonService->CopyToPythonAsSimpleItkImage( mitk_image, "in_image");
-  m_PythonService->Execute("model=\""+m_ModulePath+"/brain_extraction_model.model\"");
-  m_PythonService->ExecuteScript(m_ModulePath + "/brain_extraction_script.py");
-
+  if ( !itksys::SystemTools::FileExists(m_ModulePath + "/brain_extraction_script.py") )
   {
-    mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_mask");
-    mitk::DataNode::Pointer corrected_node = mitk::DataNode::New();
-    corrected_node->SetData( image );
-    QString name(node->GetName().c_str());
-    name += "_BrainMask";
-    corrected_node->SetName(name.toStdString());
-    GetDataStorage()->Add(corrected_node, node);
+    QMessageBox::warning(nullptr, "Error", ("Brain extraction script file missing:\n" + m_ModulePath + "/brain_extraction_script.py").c_str(), QMessageBox::Ok);
+    return;
   }
 
+  if ( !itksys::SystemTools::FileExists(m_ModulePath + "/brain_extraction_model.model") )
   {
-    mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_extracted");
-    mitk::DataNode::Pointer corrected_node = mitk::DataNode::New();
-    corrected_node->SetData( image );
-    QString name(node->GetName().c_str());
-    name += "_SkullStripped";
-    corrected_node->SetName(name.toStdString());
-    GetDataStorage()->Add(corrected_node, node);
+    QMessageBox::warning(nullptr, "Error", ("Brain extraction model file missing:\n" + m_ModulePath + "/brain_extraction_model.model").c_str(), QMessageBox::Ok);
+    return;
+  }
+
+  try
+  {
+    us::ModuleContext* context = us::GetModuleContext();
+    us::ServiceReference<mitk::IPythonService> m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
+    mitk::IPythonService* m_PythonService = dynamic_cast<mitk::IPythonService*> ( context->GetService<mitk::IPythonService>(m_PythonServiceRef) );
+    mitk::IPythonService::ForceLoadModule();
+
+    m_PythonService->Execute("import SimpleITK as sitk");
+    m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
+    m_PythonService->Execute("import numpy");
+    m_PythonService->CopyToPythonAsSimpleItkImage( mitk_image, "in_image");
+    m_PythonService->Execute("model=\""+m_ModulePath+"/brain_extraction_model.model\"");
+    m_PythonService->ExecuteScript(m_ModulePath + "/brain_extraction_script.py");
+
+    {
+      mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_mask");
+      mitk::DataNode::Pointer corrected_node = mitk::DataNode::New();
+      corrected_node->SetData( image );
+      QString name(node->GetName().c_str());
+      name += "_BrainMask";
+      corrected_node->SetName(name.toStdString());
+      GetDataStorage()->Add(corrected_node, node);
+    }
+
+    {
+      mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_extracted");
+      mitk::DataNode::Pointer corrected_node = mitk::DataNode::New();
+      corrected_node->SetData( image );
+      QString name(node->GetName().c_str());
+      name += "_SkullStripped";
+      corrected_node->SetName(name.toStdString());
+      GetDataStorage()->Add(corrected_node, node);
+    }
+  }
+  catch(...)
+  {
+    QMessageBox::warning(nullptr, "Error", "File could not be processed.\nIs pytorch installed on your system?\nDoes your script use the correct input and output variable names (in: in_image & model, out: brain_mask & brain_extracted)?", QMessageBox::Ok);
   }
 }

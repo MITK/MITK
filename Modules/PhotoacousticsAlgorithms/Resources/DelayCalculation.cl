@@ -28,15 +28,15 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
   uint globalPosY = get_global_id(1);
   uint globalPosZ = get_global_id(2);
 
-  if (globalPosX < inputL && globalPosY < outputS)
+  if (globalPosX < outputL && globalPosY < outputS)
   {
     float l_i = 0; // we calculate the delays relative to line zero
     float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;
 
-    float l_s = (float)globalPosX; // the currently calculated line
+    float l_s = (float)globalPosX / (float)outputL * (float)inputL; // the currently calculated line
 
     float delayMultiplicator = delayMultiplicatorRaw / s_i;
-    gDest[globalPosY * inputL + globalPosX] = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-isPAImage)*s_i;
+    gDest[globalPosY * outputL + globalPosX] = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-isPAImage)*s_i;
   }
 }
  
@@ -54,14 +54,14 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
   uint globalPosY = get_global_id(1);
   uint globalPosZ = get_global_id(2);
 
-  if (globalPosX < inputL && globalPosY < outputS)
+  if (globalPosX < outputL && globalPosY < outputS)
   {
     float l_i = 0; // we calculate the delays relative to line zero
     float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;
 
-    float l_s = (float)globalPosX; // the currently calculated line
+    float l_s = (float)globalPosX / (float)outputL * (float)inputL; // the currently calculated line
 
-    gDest[globalPosY * inputL + globalPosX] =
+    gDest[globalPosY * outputL + globalPosX] =
       sqrt(
         pow(s_i, 2)
         +

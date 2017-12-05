@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataToIGTLMessageFilter.h>
 #include <mitkIGTLServer.h>
 #include <mitkIGTLMessageProvider.h>
+#include <mitkNeedleProjectionFilter.h>
 
 //QT headers
 #include <QTimer>
@@ -79,6 +80,12 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     /** Freezes the device if it is not frozen / unfreezes the device if it is frozen. */
     void OnFreezeUnfreezeTracking();
+
+    /** @brief Shows or hides the tool projection of the standard tool axis. */
+    void OnShowHideToolProjectionClicked();
+
+    /** @brief Shows or hides the standard tool axis. */
+    void OnShowHideToolAxisClicked();
 
     /** @brief This slot connects to the device. In status "connected" configuration of the device is disabled. */
     void OnConnect();
@@ -175,6 +182,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     bool m_tracking;    ///> bool which is true if tracking is running, false if not
     bool m_connected;   ///> bool that is true when a tracking device is connected
     bool m_logging;     ///> bool which is true if logging is running, false if not
+    bool m_ShowHideToolProjection; ///> bool, which will be true, if the tool projection is visible during tracking
+    bool m_ShowHideToolAxis; ///> bool, which will be true, if the tool axis is visible during tracking
     int m_loggedFrames; ///> stores the current number of logged frames if logging is on
 
     mitk::NavigationToolStorage::Pointer m_toolStorage;  ///>stores the loaded tools
@@ -194,6 +203,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
    mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
    mitk::NavigationDataRecorder::Pointer m_loggingFilter; ///> holds the logging filter if logging is on (third filter of the IGT pipeline)
+   itk::SmartPointer<mitk::NeedleProjectionFilter> m_NeedleProjectionFilter; ///> Contains the needle projection filter which is used for displaying the tool projection and the tool axis during tracking (optional third filter of the IGT pipeline). The filter is updated in the method UpdateRenderTrackingTimer().
 
    //members for open IGT link server
    mitk::NavigationDataToIGTLMessageFilter::Pointer m_IGTLConversionFilter; ///> Converts the navigation data as open IGT link message and makes this filter available as microservice

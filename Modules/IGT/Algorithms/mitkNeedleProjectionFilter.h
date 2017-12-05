@@ -42,7 +42,7 @@ namespace mitk {
   * Projection will happen onto an extension of the plane as well - the filter does not regard boundaries
   * This Filter currently only supports projection of one needle. Extension to multiple needles / planes should be easy.
   *
-  * \ingroup US
+  * \ingroup IGT
   */
   class MITKIGT_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
   {

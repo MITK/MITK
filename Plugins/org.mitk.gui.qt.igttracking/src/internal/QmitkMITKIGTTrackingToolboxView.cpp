@@ -58,8 +58,11 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_tracking = false;
   m_connected = false;
   m_logging = false;
+  m_ShowHideToolProjection = false;
+  m_ShowHideToolAxis = false;
   m_loggedFrames = 0;
   m_SimpleModeEnabled = false;
+  m_NeedleProjectionFilter = mitk::NeedleProjectionFilter::New();
 
   //create filename for autosaving of tool storage
   QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
@@ -174,6 +177,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_DisableAllTimers, SIGNAL(stateChanged(int)), this, SLOT(EnableDisableTimerButtons(int)));
     connect(m_Controls->m_advancedUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
     connect(m_Controls->m_simpleUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
+    connect(m_Controls->showHideToolProjectionCheckBox, SIGNAL(clicked()), this, SLOT(OnShowHideToolProjectionClicked()));
+    connect(m_Controls->showHideToolAxisCheckBox, SIGNAL(clicked()), this, SLOT(OnShowHideToolAxisClicked()));
 
     //connections for the tracking device configuration widget
     connect(m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
@@ -357,6 +362,74 @@ void QmitkMITKIGTTrackingToolboxView::OnFreezeUnfreezeTracking()
   }
 }
 
+void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
+{
+  if( !m_ShowHideToolProjection )
+  {
+    //Activate and show the tool projection
+    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Tool Projection");
+    //If node does not exist, create the node for the Pointset
+    if( node.IsNull() )
+    {
+      node = mitk::DataNode::New();
+      node->SetName("Tool Projection");
+      node->SetData(m_NeedleProjectionFilter->GetProjection());
+      node->SetBoolProperty("show contour", true);
+      this->GetDataStorage()->Add(node);
+    }
+    else
+    {
+      node->SetBoolProperty("show contour", true);
+    }
+    //Enable the checkbox for displaying the (standard) tool axis
+    m_Controls->showHideToolAxisCheckBox->setEnabled(true);
+    m_ShowHideToolProjection = true;
+  }
+  else
+  {
+    //Deactivate and hide the tool projection
+    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Tool Projection");
+    if( !node.IsNull() )
+    {
+      this->GetDataStorage()->Remove(node);
+    }
+    m_Controls->showHideToolAxisCheckBox->setEnabled(false);
+    m_ShowHideToolProjection = false;
+  }
+  if( m_NeedleProjectionFilter.IsNotNull() )
+  {
+    m_NeedleProjectionFilter->Update();
+  }
+  //Refresh the view and the status widget
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_Controls->m_TrackingToolsStatusWidget->Refresh();
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnShowHideToolAxisClicked()
+{
+  if( !m_ShowHideToolAxis )
+  {
+    //Activate and show the tool axis
+    m_NeedleProjectionFilter->ShowToolAxis(true);
+    m_ShowHideToolAxis = true;
+  }
+  else
+  {
+    //Deactivate and hide the tool axis
+    m_NeedleProjectionFilter->ShowToolAxis(false);
+    m_NeedleProjectionFilter->GetProjection()->RemovePointIfExists(2);
+    m_ShowHideToolAxis = false;
+  }
+  //Update the filter
+  if( m_NeedleProjectionFilter.IsNotNull() )
+  {
+    m_NeedleProjectionFilter->Update();
+  }
+  //Refresh the view and the status widget
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_Controls->m_TrackingToolsStatusWidget->Refresh();
+}
+
 void QmitkMITKIGTTrackingToolboxView::OnConnectDisconnect()
 {
   if (m_connected) { OnDisconnect(); }
@@ -427,6 +500,13 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
   //get data from worker thread
   m_TrackingDeviceData = m_Worker->GetTrackingDeviceData();
   m_ToolVisualizationFilter = m_Worker->GetToolVisualizationFilter();
+  if( m_ToolVisualizationFilter.IsNotNull() )
+  {
+    //Connect the NeedleProjectionFilter to the ToolVisualizationFilter as third filter of the IGT pipeline
+    m_NeedleProjectionFilter->ConnectTo(m_ToolVisualizationFilter);
+    m_NeedleProjectionFilter->SelectInput(0);
+  }
+
   //! [Thread 6]
 
   //enable/disable Buttons
@@ -788,6 +868,12 @@ void QmitkMITKIGTTrackingToolboxView::UpdateRenderTrackingTimer()
     {
       this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_WARNING);
     }
+  }
+
+  //Update the NeedleProjectionFilter
+  if( m_NeedleProjectionFilter.IsNotNull() )
+  {
+    m_NeedleProjectionFilter->Update();
   }
 
   //refresh view and status widget

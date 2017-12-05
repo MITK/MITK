@@ -49,21 +49,30 @@ __kernel void ckDMAS(
 
     float output = 0;
     float mult = 0;
+    
+    float s_1 = 0;
+    float s_2 = 0;
+    float sign = 0;
 
     for (short l_s1 = minLine; l_s1 < maxLine; ++l_s1)
     {
-      Delay1 = AddSamples[globalPosY * inputL + (int)fabs(l_s1 - l_i)];
+      Delay1 = AddSamples[globalPosY * inputL + (int)(fabs(l_s1 - l_i))];
       if (Delay1 < inputS && Delay1 >= 0) {
+        s_1 = dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
+        sign += s_1;
+        
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
-          Delay2 = AddSamples[globalPosY * inputL + (int)fabs(l_s2 - l_i)];
+          Delay2 = AddSamples[globalPosY * inputL + (int)(fabs(l_s2 - l_i))];
           if (Delay2 < inputS && Delay2 >= 0) {
+            s_2 = dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)];
+            
             mult = apodArray[(int)((l_s2 - minLine)*apod_mult)] *
-              dSource[(int)(globalPosZ * inputL * inputS + Delay2 * inputL + l_s2)]
+              s_2
               * apodArray[(int)((l_s1 - minLine)*apod_mult)] *
-              dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
+              s_1;
               
-            output += sqrt(mult * ((float)(mult>0)-(float)(mult<0))) * ((mult > 0) - (mult < 0));
+            output += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
       }
@@ -71,6 +80,6 @@ __kernel void ckDMAS(
         --curUsedLines;
     }
 
-    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1));
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1)) * ((sign > 0) - (sign < 0));
   }
 }

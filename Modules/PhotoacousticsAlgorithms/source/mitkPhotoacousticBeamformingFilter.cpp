@@ -458,15 +458,25 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
       AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) + (1 - m_Conf.isPhotoacousticImage)*s_i;
     }
 
+    float s_1 = 0;
+    float s_2 = 0;
+    int sign = 0;
+
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
-      if (AddSample[l_s1 - minLine] < (short)inputS && AddSample[l_s1 - minLine] >= 0)
+      if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
       {
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
-            mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * apodisation[(short)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(short)((l_s1 - minLine)*apod_mult)];
+            s_2 = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL];
+            s_1 = input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL];
+
+            sign += ((s_1 > 0) - (s_1 < 0));
+            sign += ((s_2 > 0) - (s_2 < 0));
+
+            mult = s_2 * apodisation[(int)((l_s2 - minLine)*apod_mult)] * s_1 * apodisation[(int)((l_s1 - minLine)*apod_mult)];
             output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
@@ -475,7 +485,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
         --usedLines;
     }
 
-    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1)) * ((sign > 0) - (sign < 0));
 
     delete[] AddSample;
   }
@@ -533,6 +543,10 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
       ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
     }
 
+    float s_1 = 0;
+    float s_2 = 0;
+    int sign = 0;
+
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
       if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
@@ -541,7 +555,13 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
         {
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
-            mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * apodisation[(int)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(int)((l_s1 - minLine)*apod_mult)];
+            s_2 = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL];
+            s_1 = input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL];
+
+            sign += ((s_1 > 0) - (s_1 < 0));
+            sign += ((s_2 > 0) - (s_2 < 0));
+
+            mult = s_2 * apodisation[(int)((l_s2 - minLine)*apod_mult)] * s_1 * apodisation[(int)((l_s1 - minLine)*apod_mult)];
             output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
@@ -550,7 +570,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
         --usedLines;
     }
 
-    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1));
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1)) * ((sign > 0) - (sign < 0));
 
     delete[] AddSample;
   }

@@ -7,16 +7,19 @@ set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   
   QmitkPreprocessingView.cpp
+  QmitkBrainExtractionView.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkPreprocessingViewControls.ui
+  src/internal/QmitkBrainExtractionViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
 
   src/internal/QmitkPreprocessingView.h
+  src/internal/QmitkBrainExtractionView.h
 )
 
 set(CACHED_RESOURCE_FILES

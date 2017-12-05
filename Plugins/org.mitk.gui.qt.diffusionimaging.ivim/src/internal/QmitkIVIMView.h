@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionPropertyHelper.h>
 #include "itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h"
 #include "itkDiffusionKurtosisReconstructionImageFilter.h"
+#include <QmitkSliceNavigationListener.h>
 
 /*!
   \brief QmitkIVIMView
@@ -65,7 +66,6 @@ public:
   ///
   virtual void SetFocus() override;
 
-  void OnSliceChanged(const itk::EventObject& e);
   void OutputToDatastorage(const QList<mitk::DataNode::Pointer>& nodes);
   bool FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos);
 
@@ -75,6 +75,8 @@ public:
   void Hidden() override;
 
 protected slots:
+
+  void OnSliceChanged();
 
   /// \brief Called when the user clicks the GUI button
   void FittIVIMStart();
@@ -121,6 +123,7 @@ protected:
   bool m_Visible;
 
   bool m_HoldUpdate;
+  QmitkSliceNavigationListener  m_SliceChangeListener;
 
 };
 

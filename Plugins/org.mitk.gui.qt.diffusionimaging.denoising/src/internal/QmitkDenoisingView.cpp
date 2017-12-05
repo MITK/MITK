@@ -252,6 +252,10 @@ void QmitkDenoisingView::UpdateGui(int filter)
     m_Controls->m_NlmFrame->setVisible(true);
     break;
   }
+  default :
+  {
+    m_SelectedFilter = TV;
+  }
   }
 
   if (m_Controls->m_InputImageBox->GetSelectedNode().IsNotNull())

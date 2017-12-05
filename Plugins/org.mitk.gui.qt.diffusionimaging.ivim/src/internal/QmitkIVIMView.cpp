@@ -100,6 +100,10 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_OmitBZeroCB, SIGNAL( stateChanged(int) ), this, SLOT( OnKurtosisParamsChanged() ) );
     connect( m_Controls->m_KurtosisFitScale, SIGNAL( currentIndexChanged(int)), this, SLOT( OnKurtosisParamsChanged() ) );
     connect( m_Controls->m_UseKurtosisBoundsCB, SIGNAL(clicked() ), this, SLOT( OnKurtosisParamsChanged() ) );
+
+
+    m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+    connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
   }
 
   QString dstar = QString::number(m_Controls->m_DStarSlider->value()/1000.0);
@@ -144,8 +148,7 @@ void QmitkIVIMView::SetFocus()
 
 void QmitkIVIMView::Checkbox()
 {
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::MethodCombo(int val)
@@ -189,8 +192,7 @@ void QmitkIVIMView::MethodCombo(int val)
     break;
   }
 
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::DStarSlider (int val)
@@ -198,8 +200,7 @@ void QmitkIVIMView::DStarSlider (int val)
   QString sval = QString::number(val/1000.0);
   m_Controls->m_DStarLabel->setText(sval);
 
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::BThreshSlider (int val)
@@ -207,8 +208,7 @@ void QmitkIVIMView::BThreshSlider (int val)
   QString sval = QString::number(val*5.0);
   m_Controls->m_BThreshLabel->setText(sval);
 
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::S0ThreshSlider (int val)
@@ -216,8 +216,7 @@ void QmitkIVIMView::S0ThreshSlider (int val)
   QString sval = QString::number(val*0.5);
   m_Controls->m_S0ThreshLabel->setText(sval);
 
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::NumItsSlider (int val)
@@ -225,8 +224,7 @@ void QmitkIVIMView::NumItsSlider (int val)
   QString sval = QString::number(val);
   m_Controls->m_NumItsLabel->setText(sval);
 
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::LambdaSlider (int val)
@@ -234,8 +232,7 @@ void QmitkIVIMView::LambdaSlider (int val)
   QString sval = QString::number(val*.00001);
   m_Controls->m_LambdaLabel->setText(sval);
 
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
@@ -294,8 +291,7 @@ void QmitkIVIMView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, 
   m_Controls->m_ControlsFrame->setEnabled( foundOneDiffusionImage );
   m_Controls->m_BottomControlsFrame->setEnabled( foundOneDiffusionImage );
 
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
 void QmitkIVIMView::AutoThreshold()
@@ -494,15 +490,11 @@ void QmitkIVIMView::FittIVIMStart()
 
 void QmitkIVIMView::OnKurtosisParamsChanged()
 {
-  itk::StartEvent dummy;
-  OnSliceChanged(dummy);
+  OnSliceChanged();
 }
 
-void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
+void QmitkIVIMView::OnSliceChanged()
 {
-  if(!m_Visible)
-    return;
-
   if(m_HoldUpdate)
     return;
 
@@ -967,52 +959,9 @@ void QmitkIVIMView::Deactivated()
 void QmitkIVIMView::Visible()
 {
   m_Visible = true;
-  auto renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(this->GetRenderWindowPart());
-  if (renderWindowPart!=nullptr)
-  {
-    {
-      mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
-      command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-      m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
-      command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-      m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
-      itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
-      command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-      m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-    }
-  }
 }
 
 void QmitkIVIMView::Hidden()
 {
   m_Visible = false;
-  auto renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(this->GetRenderWindowPart());
-
-  if (renderWindowPart!=nullptr)
-  {
-    {
-      mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
-      slicer->RemoveObserver( m_SliceObserverTag1 );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
-      slicer->RemoveObserver( m_SliceObserverTag2 );
-    }
-
-    {
-      mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
-      slicer->RemoveObserver( m_SliceObserverTag3 );
-    }
-  }
 }

@@ -26,10 +26,11 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFVolumetricDensityStatistics.cpp
   GlobalImageFeatures/mitkGIFIntensityVolumeHistogramFeatures.cpp
   GlobalImageFeatures/mitkGIFNeighbourhoodGreyToneDifferenceFeatures.cpp
+  GlobalImageFeatures/mitkGIFCurvatureStatistic.cpp
 
   MiniAppUtils/mitkGlobalImageFeaturesParameter.cpp
   MiniAppUtils/mitkSplitParameterToVector.cpp
-  
+
   mitkCLUtil.cpp
 
 )

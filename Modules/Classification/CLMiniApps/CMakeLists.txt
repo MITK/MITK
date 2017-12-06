@@ -24,6 +24,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLStaple^^MitkCLUtilities
         CLVoxelFeatures^^MitkCLUtilities
         CLPolyToNrrd^^
+        CLPlanarFigureToNrrd^^MitkCore_MitkSegmentation_MitkMultilabel
         CLSimpleVoxelClassification^^MitkDataCollection_MitkCLVigraRandomForest
         CLVoxelClassification^^MitkDataCollection_MitkCLImportanceWeighting_MitkCLVigraRandomForest
         CLBrainMask^^MitkCLUtilities
@@ -31,6 +32,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLRandomSampling^^MitkCore_MitkCLUtilities
         CLRemoveEmptyVoxels^^MitkCore
         CLN4^^MitkCore
+        CLPointSetToSegmentation^^
         CLMultiForestPrediction^^MitkDataCollection_MitkCLVigraRandomForest
         CLNrrdToPoly^^MitkCore
         CL2Dto3DImage^^MitkCore

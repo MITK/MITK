@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFGreyLevelDistanceZone.h>
 #include <mitkGIFImageDescriptionFeatures.h>
 #include <mitkGIFLocalIntensity.h>
+#include <mitkGIFCurvatureStatistic.h>
 #include <mitkGIFIntensityVolumeHistogramFeatures.h>
 #include <mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h>
 #include <mitkGIFNeighbouringGreyLevelDependenceFeatures.h>
@@ -376,10 +377,12 @@ int main(int argc, char* argv[])
   mitk::GIFLocalIntensity::Pointer lociCalculator = mitk::GIFLocalIntensity::New();
   mitk::GIFIntensityVolumeHistogramFeatures::Pointer ivohCalculator = mitk::GIFIntensityVolumeHistogramFeatures::New();
   mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New();
+  mitk::GIFCurvatureStatistic::Pointer curvCalculator = mitk::GIFCurvatureStatistic::New();
 
   std::vector<mitk::AbstractGlobalImageFeature::Pointer> features;
   features.push_back(volCalculator.GetPointer());
   features.push_back(voldenCalculator.GetPointer());
+  features.push_back(curvCalculator.GetPointer());
   features.push_back(firstOrderCalculator.GetPointer());
   features.push_back(firstOrderHistoCalculator.GetPointer());
   features.push_back(ivohCalculator.GetPointer());
@@ -431,7 +434,7 @@ int main(int argc, char* argv[])
   //bool savePNGofSlices = true;
   //std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
 
-  std::string version = "Version: 1.21";
+  std::string version = "Version: 1.22";
   MITK_INFO << version;
 
   std::ofstream log;
@@ -615,7 +618,6 @@ int main(int argc, char* argv[])
     writer.AddColumn("Image");
     writer.AddColumn("Segmentation");
   }
-
 
   // Create a QTApplication and a Datastorage
   // This is necessary in order to save screenshots of

@@ -76,6 +76,8 @@ int main(int argc, char* argv[])
   parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Save Residuals:", "save residual images", false);
   parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
   parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
+  parser.addArgument("join_tracts", "", mitkCommandLineParser::Bool, "Join output tracts:", "outout tracts are merged into a single tractogram", false);
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "L1, MSM, MSE, LocalMSE (default), NONE");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -97,6 +99,14 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("save_weights"))
     save_weights = us::any_cast<bool>(parsedArgs["save_weights"]);
 
+  std::string regu = "LocalMSE";
+  if (parsedArgs.count("regu"))
+    regu = us::any_cast<std::string>(parsedArgs["regu"]);
+
+  bool join_tracts = false;
+  if (parsedArgs.count("join_tracts"))
+    join_tracts = us::any_cast<bool>(parsedArgs["join_tracts"]);
+
   int max_iter = 20;
   if (parsedArgs.count("max_iter"))
     max_iter = us::any_cast<int>(parsedArgs["max_iter"]);
@@ -115,6 +125,10 @@ int main(int argc, char* argv[])
 
   try
   {
+    MITK_INFO << "Loading data";
+    std::streambuf *old = cout.rdbuf(); // <-- save
+    std::stringstream ss;
+    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
     std::vector< mitk::FiberBundle::Pointer > input_tracts;
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
@@ -149,6 +163,7 @@ int main(int argc, char* argv[])
         fib_names.push_back(item);
       }
     }
+    std::cout.rdbuf (old);              // <-- restore
 
     itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
     fitter->SetPeakImage(peak_image);
@@ -158,6 +173,18 @@ int main(int argc, char* argv[])
     fitter->SetGradientTolerance(g_tol);
     fitter->SetLambda(lambda);
     fitter->SetFilterOutliers(filter_outliers);
+
+    if (regu=="L1")
+      fitter->SetRegularization(VnlCostFunction::REGU::L1);
+    else if (regu=="MSM")
+      fitter->SetRegularization(VnlCostFunction::REGU::MSM);
+    else if (regu=="MSE")
+      fitter->SetRegularization(VnlCostFunction::REGU::MSE);
+    else if (regu=="Local_MSE")
+      fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
+    else if (regu=="NONE")
+      fitter->SetRegularization(VnlCostFunction::REGU::NONE);
+
     fitter->Update();
 
     if (save_residuals)
@@ -181,18 +208,38 @@ int main(int argc, char* argv[])
     }
 
     std::vector< mitk::FiberBundle::Pointer > output_tracts = fitter->GetTractograms();
-    for (unsigned int bundle=0; bundle<output_tracts.size(); bundle++)
+
+    if (!join_tracts)
     {
-      std::string name = fib_names.at(bundle);
-      name = ist::GetFilenameWithoutExtension(name);
-      mitk::IOUtil::Save(output_tracts.at(bundle), outRoot + name + "_fitted.fib");
+      for (unsigned int bundle=0; bundle<output_tracts.size(); bundle++)
+      {
+        std::string name = fib_names.at(bundle);
+        name = ist::GetFilenameWithoutExtension(name);
+        mitk::IOUtil::Save(output_tracts.at(bundle), outRoot + name + "_fitted.fib");
+
+        if (save_weights)
+        {
+          ofstream logfile;
+          logfile.open (outRoot + name + "_weights.txt");
+          for (int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
+            logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
+          logfile.close();
+        }
+      }
+    }
+    else
+    {
+      mitk::FiberBundle::Pointer out = mitk::FiberBundle::New();
+      out = out->AddBundles(output_tracts);
+      out->ColorFibersByFiberWeights(false, true);
+      mitk::IOUtil::Save(out, outRoot + "_fitted.fib");
 
       if (save_weights)
       {
         ofstream logfile;
-        logfile.open (outRoot + name + "_weights.txt");
-        for (int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
-          logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
+        logfile.open (outRoot + "_weights.txt");
+        for (int f=0; f<out->GetNumFibers(); ++f)
+          logfile << out->GetFiberWeight(f) << "\n";
         logfile.close();
       }
     }

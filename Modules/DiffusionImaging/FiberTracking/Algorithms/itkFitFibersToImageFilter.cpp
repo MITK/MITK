@@ -33,6 +33,7 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , TD(0)
   , FD(0)
   , fiber_count(0)
+  , m_Regularization(VnlCostFunction::REGU::Local_MSE)
 {
   this->SetNumberOfRequiredOutputs(3);
 }
@@ -322,7 +323,7 @@ void FitFibersToImageFilter::GenerateData()
   clock.Start();
 
   cost = VnlCostFunction(m_NumUnknowns);
-  cost.SetProblem(A, b, init_lambda);
+  cost.SetProblem(A, b, init_lambda, m_Regularization);
   m_Weights.set_size(m_NumUnknowns); // m_Weights.fill( TD/100.0 * FD/2.0 );
   m_Weights.fill( 0.0 );
   vnl_lbfgsb minimizer(cost);
@@ -332,12 +333,13 @@ void FitFibersToImageFilter::GenerateData()
   minimizer.set_lower_bound(l);
   minimizer.set_projected_gradient_tolerance(m_GradientTolerance);
 
+  MITK_INFO << "Regularization type: " << m_Regularization;
   MITK_INFO << "Estimating regularization";
   minimizer.set_trace(false);
   minimizer.set_max_function_evals(2);
   minimizer.minimize(m_Weights);
   vnl_vector<double> dx; dx.set_size(m_NumUnknowns); dx.fill(0.0);
-  cost.grad_regu_localMSE(m_Weights, dx);
+  cost.calc_regularization_gradient(m_Weights, dx);
   double r = dx.magnitude()/m_Weights.magnitude();
   cost.m_Lambda *= m_Lambda*55.0/r;
   MITK_INFO << r << " - " << m_Lambda*55.0/r;
@@ -380,7 +382,11 @@ void FitFibersToImageFilter::GenerateData()
 
   MITK_INFO << "*************************";
   MITK_INFO << "Weight statistics";
+  MITK_INFO << "Sum: " << m_Weights.sum();
   MITK_INFO << "Mean: " << m_MeanWeight;
+  MITK_INFO << "1% quantile: " << weights.at(m_NumUnknowns*0.01);
+  MITK_INFO << "5% quantile: " << weights.at(m_NumUnknowns*0.05);
+  MITK_INFO << "25% quantile: " << weights.at(m_NumUnknowns*0.25);
   MITK_INFO << "Median: " << m_MedianWeight;
   MITK_INFO << "75% quantile: " << weights.at(m_NumUnknowns*0.75);
   MITK_INFO << "95% quantile: " << weights.at(m_NumUnknowns*0.95);
@@ -546,6 +552,16 @@ void FitFibersToImageFilter::GenerateOutputDiffImages()
     ++it4;
     ++it5;
   }
+}
+
+VnlCostFunction::REGU FitFibersToImageFilter::GetRegularization() const
+{
+  return m_Regularization;
+}
+
+void FitFibersToImageFilter::SetRegularization(const VnlCostFunction::REGU &Regularization)
+{
+  m_Regularization = Regularization;
 }
 
 void FitFibersToImageFilter::GenerateOutputPeakImages()

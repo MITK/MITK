@@ -388,17 +388,17 @@ void TractClusteringFilter::GenerateData()
   {
     MITK_INFO << "Clustering fibers";
     clusters = ClusterStep(f_indices, m_Distances);
-    while (clusters.size()>5000)
-    {
-      MITK_INFO << "Number of clusters: " << clusters.size();
-      MITK_INFO << "Increasing cluster size";
-      for (unsigned int i=0; i<m_Distances.size(); ++i)
-      {
-        m_Distances[i] *= 1.1;
-        MITK_INFO << m_Distances[i];
-      }
-      clusters = ClusterStep(f_indices, m_Distances);
-    }
+//    while (clusters.size()>5000)
+//    {
+//      MITK_INFO << "Number of clusters: " << clusters.size();
+//      MITK_INFO << "Increasing cluster size";
+//      for (unsigned int i=0; i<m_Distances.size(); ++i)
+//      {
+//        m_Distances[i] *= 1.1;
+//        MITK_INFO << m_Distances[i];
+//      }
+//      clusters = ClusterStep(f_indices, m_Distances);
+//    }
     MITK_INFO << "Number of clusters: " << clusters.size();
     MergeDuplicateClusters(clusters);
     std::sort(clusters.begin(),clusters.end());

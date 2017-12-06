@@ -18,6 +18,15 @@ class VnlCostFunction : public vnl_cost_function
 {
 public:
 
+  enum REGU
+  {
+    L1,
+    MSM,
+    MSE,
+    Local_MSE,
+    NONE
+  };
+
   vnl_sparse_matrix_linear_system< double >* S;
   vnl_sparse_matrix< double > m_A;
   vnl_sparse_matrix< double > m_A_Ones; // matrix indicating active weights with 1
@@ -26,8 +35,9 @@ public:
 
   vnl_vector<double> row_sums;  // number of active weights per row
   vnl_vector<double> local_weight_means;  // mean weight of each row
+  REGU regularization;
 
-  void SetProblem(vnl_sparse_matrix< double >& A, vnl_vector<double>& b, double lambda)
+  void SetProblem(vnl_sparse_matrix< double >& A, vnl_vector<double>& b, double lambda, REGU regu)
   {
     S = new vnl_sparse_matrix_linear_system<double>(A, b);
     m_A = A;
@@ -44,24 +54,34 @@ public:
     row_sums.set_size(N);
     m_A_Ones.mult(ones, row_sums);
     local_weight_means.set_size(N);
+    regularization = regu;
   }
 
   VnlCostFunction(const int NumVars=0) : vnl_cost_function(NumVars)
   {
   }
 
+  // Regularization: mean squared deaviation of weights from mean weight (enforce uniform weights)
   void regu_MSE(vnl_vector<double> const &x, double& cost)
   {
     double mean = x.mean();
     vnl_vector<double> tx = x-mean;
-    cost += m_Lambda*1e8*tx.squared_magnitude()/x.size();
+    cost += m_Lambda*tx.squared_magnitude()/dim;
   }
 
+  // Regularization: mean squared magnitude of weight vectors (small weights) L2
   void regu_MSM(vnl_vector<double> const &x, double& cost)
   {
-    cost += m_Lambda*1e8*x.squared_magnitude()/x.size();
+    cost += m_Lambda*x.squared_magnitude()/dim;
   }
 
+  // Regularization: mean squared magnitude of weight vectors (sparse small weights) L1
+  void regu_L1(vnl_vector<double> const &x, double& cost)
+  {
+    cost += m_Lambda*x.sum()/dim;
+  }
+
+  // Regularization: voxel-weise mean squared deaviation of weights from voxel-wise mean weight (enforce locally uniform weights)
   void regu_localMSE(vnl_vector<double> const &x, double& cost)
   {
     m_A_Ones.mult(x, local_weight_means);
@@ -81,6 +101,8 @@ public:
     cost += m_Lambda*regu/dim;
   }
 
+  // gradients of regularization functions
+
   void grad_regu_MSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     double mean = x.mean();
@@ -94,13 +116,20 @@ public:
       tx2[c] += dot_product(h,tx);
       h[c] = 1;
     }
-    dx += tx2*m_Lambda*1e8*2.0/(dim*dim);
+    dx += tx2*m_Lambda*2.0/(dim*dim);
 
   }
 
   void grad_regu_MSM(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
-    dx += m_Lambda*1e8*2.0*x/dim;
+    dx += m_Lambda*2.0*x/dim;
+  }
+
+  void grad_regu_L1(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  {
+    for (int i=0; i<dim; ++i)
+      if (x[i]>0)
+        dx[i] += m_Lambda/dim;
   }
 
   void grad_regu_localMSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
@@ -126,22 +155,50 @@ public:
     dx += tdx*2.0*m_Lambda/dim;
   }
 
+  void calc_regularization(vnl_vector<double> const &x, double& cost)
+  {
+    if (regularization==Local_MSE)
+      regu_localMSE(x, cost);
+    else if (regularization==MSE)
+      regu_MSE(x, cost);
+    else if (regularization==MSM)
+      regu_MSM(x, cost);
+    else if (regularization==L1)
+      regu_L1(x, cost);
+  }
 
+  void calc_regularization_gradient(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  {
+    if (regularization==Local_MSE)
+      grad_regu_localMSE(x,dx);
+    else if (regularization==MSE)
+      grad_regu_MSE(x,dx);
+    else if (regularization==MSM)
+      grad_regu_MSM(x,dx);
+    else if (regularization==L1)
+      grad_regu_L1(x,dx);
+  }
+
+  // cost function
   double f(vnl_vector<double> const &x)
   {
+    // RMS error
     double cost = S->get_rms_error(x);
     cost *= cost;
 
-    regu_localMSE(x, cost);
+    // regularize
+    calc_regularization(x, cost);
 
     return cost;
   }
 
+  // gradient of cost function
   void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     dx.fill(0.0);
     unsigned int N = m_b.size();
 
+    // calculate output difference d
     vnl_vector<double> d; d.set_size(N);
     S->multiply(x,d);
     d -= m_b;
@@ -149,14 +206,21 @@ public:
     S->transpose_multiply(d, dx);
     dx *= 2.0/N;
 
-    grad_regu_localMSE(x,dx);
+    if (regularization==Local_MSE)
+      grad_regu_localMSE(x,dx);
+    else if (regularization==MSE)
+      grad_regu_MSE(x,dx);
+    else if (regularization==MSM)
+      grad_regu_MSM(x,dx);
+    else if (regularization==L1)
+      grad_regu_L1(x,dx);
   }
 };
 
 namespace itk{
 
 /**
-* \brief Fits the tractogram to the input peak image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).  */
+* \brief Fits the tractogram to the input image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).  */
 
 
 class FitFibersToImageFilter : public ImageSource< mitk::PeakImage::ItkPeakImageType >
@@ -237,6 +301,9 @@ public:
 
   void SetSignalModel(mitk::DiffusionSignalModel<> *SignalModel);
 
+  VnlCostFunction::REGU GetRegularization() const;
+  void SetRegularization(const VnlCostFunction::REGU &GetRegularization);
+
 protected:
 
   FitFibersToImageFilter();
@@ -301,6 +368,8 @@ protected:
   double                                      TD;
   double                                      FD;
   unsigned int                                fiber_count;
+
+  VnlCostFunction::REGU                       m_Regularization;
 };
 
 }

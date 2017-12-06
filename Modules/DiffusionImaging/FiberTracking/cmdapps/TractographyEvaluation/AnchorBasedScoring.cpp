@@ -36,31 +36,6 @@ typedef itk::Point<float, 4> PointType4;
 typedef itk::Image< float, 4 >  PeakImgType;
 typedef itk::Image< unsigned char, 3 >  ItkUcharImageType;
 
-std::vector< std::string > get_file_list(const std::string& path, std::vector< std::string > extensions={".fib", ".trk"})
-{
-  std::vector< std::string > file_list;
-  itk::Directory::Pointer dir = itk::Directory::New();
-
-  if (dir->Load(path.c_str()))
-  {
-    int n = dir->GetNumberOfFiles();
-    for (int r = 0; r < n; r++)
-    {
-      const char *filename = dir->GetFile(r);
-      std::string ext = ist::GetFilenameExtension(filename);
-      for (auto e : extensions)
-      {
-        if (ext==e)
-        {
-          file_list.push_back(path + '/' + filename);
-          break;
-        }
-      }
-    }
-  }
-  return file_list;
-}
-
 std::vector< mitk::FiberBundle::Pointer > CombineTractograms(std::vector< mitk::FiberBundle::Pointer > reference, std::vector< mitk::FiberBundle::Pointer > candidates, int skip=-1)
 {
   std::vector< mitk::FiberBundle::Pointer > fib;
@@ -91,12 +66,12 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i1", mitkCommandLineParser::InputFile, "Anchor tractogram:", "anchor tracts in one tractogram file", us::Any(), false);
-  parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
-  parser.addArgument("", "i3", mitkCommandLineParser::InputFile, "Candidate folder:", "folder containing all candidate tracts (separate files)", us::Any(), false);
+  parser.addArgument("", "a", mitkCommandLineParser::InputFile, "Anchor tractogram:", "anchor tracts in one tractogram file", us::Any(), false);
+  parser.addArgument("", "p", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
+  parser.addArgument("", "c", mitkCommandLineParser::StringList, "Candidates:", "candidate tracts (separate files)", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any(), false);
 
-  parser.addArgument("reference_mask_folder", "", mitkCommandLineParser::String, "Reference Mask Folder:", "reference tract masks for accuracy evaluation");
+  parser.addArgument("anchor_masks", "", mitkCommandLineParser::StringList, "Reference Masks:", "reference tract masks for accuracy evaluation");
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "scoring is only performed inside the mask image");
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
@@ -106,9 +81,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string anchors_file = us::any_cast<std::string>(parsedArgs["i1"]);
-  std::string peak_file_name = us::any_cast<std::string>(parsedArgs["i2"]);
-  std::string candidate_folder = us::any_cast<std::string>(parsedArgs["i3"]);
+  std::string anchors_file = us::any_cast<std::string>(parsedArgs["a"]);
+  std::string peak_file_name = us::any_cast<std::string>(parsedArgs["p"]);
+  mitkCommandLineParser::StringContainerType candidate_tract_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["c"]);
   std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
 
   bool greedy_add = false;
@@ -127,22 +102,21 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("mask"))
     mask_file = us::any_cast<std::string>(parsedArgs["mask"]);
 
-  std::string reference_mask_folder = "";
-  if (parsedArgs.count("reference_mask_folder"))
-    reference_mask_folder = us::any_cast<std::string>(parsedArgs["reference_mask_folder"]);
+  mitkCommandLineParser::StringContainerType anchor_mask_files;
+  if (parsedArgs.count("anchor_masks"))
+    anchor_mask_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["anchor_masks"]);
 
   try
   {
     itk::TimeProbe clock;
     clock.Start();
 
-    MITK_INFO << "Creating directory structure";
+    MITK_INFO << "Creating output directory";
     if (ist::PathExists(out_folder))
       ist::RemoveADirectory(out_folder);
     ist::MakeDirectory(out_folder);
 
     MITK_INFO << "Loading data";
-
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());       // <-- redirect
@@ -171,18 +145,13 @@ int main(int argc, char* argv[])
     }
 
     // Load masks covering the true positives for evaluation purposes
-    std::vector< std::string > reference_mask_filenames;
     std::vector< itk::FitFibersToImageFilter::UcharImgType::Pointer > reference_masks;
-    if (reference_mask_folder.compare("")!=0)
+    for (auto filename : anchor_mask_files)
     {
-      reference_mask_filenames = get_file_list(reference_mask_folder, {".nii", ".nii.gz", ".nrrd"});
-      for (auto filename : reference_mask_filenames)
-      {
-        itk::FitFibersToImageFilter::UcharImgType::Pointer ref_mask = nullptr;
-        mitk::Image::Pointer ref_mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
-        mitk::CastToItkImage(ref_mitk_mask, ref_mask);
-        reference_masks.push_back(ref_mask);
-      }
+      itk::FitFibersToImageFilter::UcharImgType::Pointer ref_mask = nullptr;
+      mitk::Image::Pointer ref_mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+      mitk::CastToItkImage(ref_mitk_mask, ref_mask);
+      reference_masks.push_back(ref_mask);
     }
 
     // Load peak image
@@ -194,14 +163,13 @@ int main(int argc, char* argv[])
 
     // Load all candidate tracts
     std::vector< mitk::FiberBundle::Pointer > input_candidates;
-    std::vector< std::string > candidate_tract_files = get_file_list(candidate_folder);
     for (std::string f : candidate_tract_files)
     {
       mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
       if (fib.IsNull())
         continue;
       if (fib->GetNumFibers()<=0)
-        return 0;
+        continue;
       fib->ResampleLinear(minSpacing/10.0);
       input_candidates.push_back(fib);
     }
@@ -305,7 +273,7 @@ int main(int argc, char* argv[])
 
         logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[c] << " " << bundle_name << " " << num_voxels << "\n";
         if (best_overlap_index>=0)
-          logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(reference_mask_filenames.at(best_overlap_index)) << "\n";
+          logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(best_overlap_index)) << "\n";
         else
           logfile << "No_overlap\n";
 
@@ -411,7 +379,7 @@ int main(int argc, char* argv[])
 
         logfile << "RMSE: " << setprecision(5) << rmse << " " << name << " " << num_peaks << "\n";
         if (best_overlap_index>=0)
-          logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(reference_mask_filenames.at(best_overlap_index)) << "\n";
+          logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(best_overlap_index)) << "\n";
         else
           logfile << "No_overlap\n";
       }

@@ -74,8 +74,9 @@ int main(int argc, char* argv[])
   parser.addArgument("anchor_masks", "", mitkCommandLineParser::StringList, "Reference Masks:", "reference tract masks for accuracy evaluation");
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "scoring is only performed inside the mask image");
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
-  parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
+  parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 1.0);
   parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "L1, MSM, MSE, LocalMSE (default), NONE");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -90,7 +91,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("greedy_add"))
     greedy_add = us::any_cast<bool>(parsedArgs["greedy_add"]);
 
-  float lambda = 0.1;
+  float lambda = 1.0;
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
@@ -105,6 +106,10 @@ int main(int argc, char* argv[])
   mitkCommandLineParser::StringContainerType anchor_mask_files;
   if (parsedArgs.count("anchor_masks"))
     anchor_mask_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["anchor_masks"]);
+
+  std::string regu = "LocalMSE";
+  if (parsedArgs.count("regu"))
+    regu = us::any_cast<std::string>(parsedArgs["regu"]);
 
   try
   {
@@ -225,6 +230,17 @@ int main(int argc, char* argv[])
       fitter->SetResampleFibers(false);
       fitter->SetMaskImage(mask);
       fitter->SetTractograms(input_candidates);
+      fitter->SetFitIndividualFibers(true);
+
+      if (regu=="MSM")
+        fitter->SetRegularization(VnlCostFunction::REGU::MSM);
+      else if (regu=="MSE")
+        fitter->SetRegularization(VnlCostFunction::REGU::MSE);
+      else if (regu=="Local_MSE")
+        fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
+      else if (regu=="NONE")
+        fitter->SetRegularization(VnlCostFunction::REGU::NONE);
+
       fitter->Update();
       vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
 

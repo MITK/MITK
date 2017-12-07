@@ -92,7 +92,8 @@ int main(int argc, char* argv[])
   try
   {
     mitk::FiberBundle::Pointer fib = LoadFib(in_fib);
-    fib->ResampleToNumPoints(12);
+    mitk::FiberBundle::Pointer resampled_fib = fib->GetDeepCopy();
+    resampled_fib->ResampleToNumPoints(12);
 
     std::vector< mitk::FiberBundle::Pointer > ref_fibs;
     std::vector< ItkUcharImgType::Pointer > ref_masks;
@@ -130,32 +131,39 @@ int main(int argc, char* argv[])
     {
       MITK_INFO << "Extracting " << ist::GetFilenameName(ref_bundle_files.at(c));
 
-      std::streambuf *old = cout.rdbuf(); // <-- save
-      std::stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+//      std::streambuf *old = cout.rdbuf(); // <-- save
+//      std::stringstream ss;
+//      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       try
       {
         itk::TractClusteringFilter::Pointer segmenter = itk::TractClusteringFilter::New();
 
         // calculate centroids from reference bundle
         {
+          MITK_INFO << "TEST 1";
           itk::TractClusteringFilter::Pointer clusterer = itk::TractClusteringFilter::New();
           clusterer->SetDistances({10,20,30});
           clusterer->SetTractogram(ref_fib);
           clusterer->SetMetrics({new mitk::ClusteringMetricEuclideanStd()});
+          clusterer->SetMergeDuplicateThreshold(0.0);
+          MITK_INFO << "TEST 2";
           clusterer->Update();
+          MITK_INFO << "TEST 3";
           std::vector<mitk::FiberBundle::Pointer> tracts = clusterer->GetOutCentroids();
           ref_fib = mitk::FiberBundle::New(nullptr);
           ref_fib = ref_fib->AddBundles(tracts);
+          MITK_INFO << "TEST 4";
           mitk::IOUtil::Save(ref_fib, out_root + "centroids_" + ist::GetFilenameName(ref_bundle_files.at(c)));
           segmenter->SetInCentroids(ref_fib);
+          MITK_INFO << "TEST 5";
         }
 
         // segment tract
         segmenter->SetFilterMask(ref_masks.at(c));
         segmenter->SetOverlapThreshold(0.8);
         segmenter->SetDistances(distances);
-        segmenter->SetTractogram(fib);
+        segmenter->SetTractogram(resampled_fib);
+        segmenter->SetMergeDuplicateThreshold(0.0);
         segmenter->SetDoResampling(false);
         if (metric=="EU_MEAN")
           segmenter->SetMetrics({new mitk::ClusteringMetricEuclideanMean()});
@@ -165,15 +173,22 @@ int main(int argc, char* argv[])
           segmenter->SetMetrics({new mitk::ClusteringMetricEuclideanMax()});
         segmenter->Update();
 
-        std::vector<mitk::FiberBundle::Pointer> clusters = segmenter->GetOutTractograms();
+        std::vector< std::vector< long > > clusters = segmenter->GetOutFiberIndices();
         if (clusters.size()>0)
         {
-          fib = clusters.back();
-          clusters.pop_back();
+          vtkSmartPointer<vtkFloatArray> weights = vtkSmartPointer<vtkFloatArray>::New();
+
           mitk::FiberBundle::Pointer result = mitk::FiberBundle::New(nullptr);
-          result = result->AddBundles(clusters);
+          std::vector< mitk::FiberBundle::Pointer > result_fibs;
+          for (unsigned int cluster_index=0; cluster_index<clusters.size()-1; ++cluster_index)
+            result_fibs.push_back(mitk::FiberBundle::New(fib->GeneratePolyDataByIds(clusters.at(cluster_index), weights)));
+          result = result->AddBundles(result_fibs);
+
           anchor_tractogram = anchor_tractogram->AddBundle(result);
           mitk::IOUtil::Save(result, out_root + "anchor_" + ist::GetFilenameName(ref_bundle_files.at(c)));
+
+          fib = mitk::FiberBundle::New(fib->GeneratePolyDataByIds(clusters.back(), weights));
+          resampled_fib = mitk::FiberBundle::New(resampled_fib->GeneratePolyDataByIds(clusters.back(), weights));
         }
       }
       catch(itk::ExceptionObject& excpt)
@@ -186,7 +201,7 @@ int main(int argc, char* argv[])
         MITK_INFO << "Exception while processing " << ist::GetFilenameName(ref_bundle_files.at(c));
         MITK_INFO << excpt.what();
       }
-      std::cout.rdbuf (old);              // <-- restore
+//      std::cout.rdbuf (old);              // <-- restore
       if (fib->GetNumFibers()==0)
         break;
       ++c;

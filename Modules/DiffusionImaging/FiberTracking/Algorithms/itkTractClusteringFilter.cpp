@@ -41,6 +41,11 @@ TractClusteringFilter::~TractClusteringFilter()
     delete m;
 }
 
+std::vector<std::vector<long> > TractClusteringFilter::GetOutFiberIndices() const
+{
+  return m_OutFiberIndices;
+}
+
 void TractClusteringFilter::SetMetrics(const std::vector<mitk::ClusteringMetric *> &Metrics)
 {
   m_Metrics = Metrics;
@@ -436,6 +441,7 @@ void TractClusteringFilter::GenerateData()
       if (max>0)
         fib->SetFiberWeights((float)i/max);
       m_OutTractograms.push_back(fib);
+      m_OutFiberIndices.push_back(c.I);
 
       // create centroid
       vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -486,6 +492,7 @@ void TractClusteringFilter::GenerateData()
     vtkSmartPointer<vtkPolyData> pTmp = m_Tractogram->GeneratePolyDataByIds(no_match.I, weights);
     mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(pTmp);
     fib->SetFiberColors(0, 0, 0);
+    m_OutFiberIndices.push_back(no_match.I);
     m_OutTractograms.push_back(fib);
   }
 }

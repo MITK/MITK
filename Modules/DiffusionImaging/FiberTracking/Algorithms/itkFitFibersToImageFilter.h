@@ -20,7 +20,6 @@ public:
 
   enum REGU
   {
-    L1,
     MSM,
     MSE,
     Local_MSE,
@@ -66,19 +65,13 @@ public:
   {
     double mean = x.mean();
     vnl_vector<double> tx = x-mean;
-    cost += m_Lambda*tx.squared_magnitude()/dim;
+    cost += 10000.0*m_Lambda*tx.squared_magnitude()/dim;
   }
 
   // Regularization: mean squared magnitude of weight vectors (small weights) L2
   void regu_MSM(vnl_vector<double> const &x, double& cost)
   {
-    cost += m_Lambda*x.squared_magnitude()/dim;
-  }
-
-  // Regularization: mean squared magnitude of weight vectors (sparse small weights) L1
-  void regu_L1(vnl_vector<double> const &x, double& cost)
-  {
-    cost += m_Lambda*x.sum()/dim;
+    cost += 10000.0*m_Lambda*x.squared_magnitude()/dim;
   }
 
   // Regularization: voxel-weise mean squared deaviation of weights from voxel-wise mean weight (enforce locally uniform weights)
@@ -98,7 +91,7 @@ public:
         d = x[m_A_Ones.getcolumn()] - local_weight_means[m_A_Ones.getrow()];
       regu += d*d;
     }
-    cost += m_Lambda*regu/dim;
+    cost += 10.0*m_Lambda*regu/dim;
   }
 
   // gradients of regularization functions
@@ -106,30 +99,20 @@ public:
   void grad_regu_MSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     double mean = x.mean();
-    vnl_vector<double> tx = x-mean;
-
-    vnl_vector<double> tx2(dim, 0.0);
-    vnl_vector<double> h(dim, 1.0);
-    for (int c=0; c<dim; c++)
-    {
-      h[c] = dim-1;
-      tx2[c] += dot_product(h,tx);
-      h[c] = 1;
-    }
-    dx += tx2*m_Lambda*2.0/(dim*dim);
-
+    vnl_vector<double> tx = x-mean; // difference to mean
+    dx += 10000.0*tx*(2.0-2.0/dim)/dim;
   }
 
   void grad_regu_MSM(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
-    dx += m_Lambda*2.0*x/dim;
+    dx += 10000.0*m_Lambda*2.0*x/dim;
   }
 
   void grad_regu_L1(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     for (int i=0; i<dim; ++i)
       if (x[i]>0)
-        dx[i] += m_Lambda/dim;
+        dx[i] += 10000.0*m_Lambda/dim;
   }
 
   void grad_regu_localMSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
@@ -152,7 +135,7 @@ public:
       else
         tdx[c] += x[c] - local_weight_means[r];
     }
-    dx += tdx*2.0*m_Lambda/dim;
+    dx += 10.0*tdx*2.0*m_Lambda/dim;
   }
 
   void calc_regularization(vnl_vector<double> const &x, double& cost)
@@ -163,8 +146,6 @@ public:
       regu_MSE(x, cost);
     else if (regularization==MSM)
       regu_MSM(x, cost);
-    else if (regularization==L1)
-      regu_L1(x, cost);
   }
 
   void calc_regularization_gradient(vnl_vector<double> const &x, vnl_vector<double> &dx)
@@ -175,8 +156,6 @@ public:
       grad_regu_MSE(x,dx);
     else if (regularization==MSM)
       grad_regu_MSM(x,dx);
-    else if (regularization==L1)
-      grad_regu_L1(x,dx);
   }
 
   // cost function
@@ -212,8 +191,6 @@ public:
       grad_regu_MSE(x,dx);
     else if (regularization==MSM)
       grad_regu_MSM(x,dx);
-    else if (regularization==L1)
-      grad_regu_L1(x,dx);
   }
 };
 
@@ -270,7 +247,6 @@ public:
 
   itkGetMacro( Weights, vnl_vector<double>)
   itkGetMacro( RmsDiffPerBundle, vnl_vector<double>)
-  itkGetMacro( RmsDiffPerFiber, vnl_vector<double>)
 
   itkGetMacro( FittedImage, PeakImgType::Pointer)
   itkGetMacro( ResidualImage, PeakImgType::Pointer)
@@ -344,7 +320,6 @@ protected:
   // output
   vnl_vector<double>                          m_RmsDiffPerBundle;
   vnl_vector<double>                          m_Weights;
-  vnl_vector<double>                          m_RmsDiffPerFiber;
 
   PeakImgType::Pointer                        m_UnderexplainedImage;
   PeakImgType::Pointer                        m_OverexplainedImage;
@@ -365,8 +340,8 @@ protected:
   int                                         sz_y;
   int                                         sz_z;
   int                                         dim_four_size;
-  double                                      TD;
-  double                                      FD;
+  double                                      m_MeanTractDensity;
+  double                                      m_MeanSignal;
   unsigned int                                fiber_count;
 
   VnlCostFunction::REGU                       m_Regularization;

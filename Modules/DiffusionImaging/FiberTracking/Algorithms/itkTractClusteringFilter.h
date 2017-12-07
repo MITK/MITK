@@ -96,6 +96,8 @@ public:
 
   void SetMetrics(const std::vector<mitk::ClusteringMetric *> &Metrics);
 
+  std::vector<std::vector<long> > GetOutFiberIndices() const;
+
 protected:
 
   void GenerateData() override;
@@ -126,6 +128,7 @@ protected:
   UcharImageType::Pointer                     m_FilterMask;
   float                                       m_OverlapThreshold;
   std::vector< mitk::ClusteringMetric* >      m_Metrics;
+  std::vector< std::vector< long > >          m_OutFiberIndices;
 };
 }
 

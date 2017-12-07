@@ -40,6 +40,8 @@ public:
    * data and puts it into base data instances-*/
   virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
+  virtual IFileReader::ConfidenceLevel GetConfidenceLevel() const override;
+
 protected:
   /** Returns the list of all DCM files that are in the same directory
    * like this->GetLocalFileName().*/

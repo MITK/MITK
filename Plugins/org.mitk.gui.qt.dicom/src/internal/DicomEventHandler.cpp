@@ -54,6 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkIOUtil.h>
 
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
@@ -207,91 +208,35 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
       mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
-      //special handling of Philips 3D US DICOM.
-      //Copied from DICOMSeriesReaderService
-      if (!seriesToLoad.empty() && mitk::DicomSeriesReader::IsPhilips3DDicom(seriesToLoad.front()))
+      std::vector<mitk::BaseData::Pointer> baseDatas = mitk::IOUtil::Load(seriesToLoad.front());
+      for (const auto &data : baseDatas)
       {
-          MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
-          mitk::LocaleSwitch localeSwitch("C");
-          std::locale previousCppLocale(std::cin.getloc());
-          std::locale l("C");
-          std::cin.imbue(l);
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(data);
 
-          mitk::DataNode::Pointer node = mitk::DataNode::New();
-          mitk::DicomSeriesReader::StringContainer stringvec;
-          stringvec.push_back(seriesToLoad.front());
-          if (mitk::DicomSeriesReader::LoadDicomSeries(stringvec, *node))
+        std::string nodeName = "Unnamed Dicom";
+
+        std::string studyUID = "";
+        std::string seriesUID = "";
+
+        data->GetPropertyList()->GetStringProperty("DICOM.0020.000D", studyUID);
+        data->GetPropertyList()->GetStringProperty("DICOM.0020.000E", seriesUID);
+
+        if (!studyUID.empty())
+        {
+          nodeName = studyUID;
+        }
+
+        if (!seriesUID.empty())
+        {
+          if (!studyUID.empty())
           {
-              mitk::BaseData::Pointer data = node->GetData();
-              mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenameName(seriesToLoad.front()));
-              data->GetPropertyList()->SetProperty("name", nameProp);
-              node->SetProperty("name", nameProp);
-              dataStorage->Add(node);
+            nodeName += "/";
           }
-          std::cin.imbue(previousCppLocale);
-          return;
-      }
+          nodeName += seriesUID;
+        }
 
-      //Normal DICOM handling (It wasn't a Philips 3D US)
-      mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
-
-      selector->LoadBuiltIn3DConfigs();
-      selector->LoadBuiltIn3DnTConfigs();
-      selector->SetInputFiles(seriesToLoad);
-
-      mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
-      reader->SetAdditionalTagsOfInterest(mitk::GetCurrentDICOMTagsOfInterest());
-      reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
-      reader->SetInputFiles(seriesToLoad);
-
-      mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
-      scanner->AddTagPaths(reader->GetTagsOfInterest());
-      scanner->SetInputFiles(seriesToLoad);
-      scanner->Scan();
-
-      reader->SetTagCache(scanner->GetScanCache());
-      reader->AnalyzeInputFiles();
-      reader->LoadImages();
-
-      for (unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
-      {
-          const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(i);
-          mitk::BaseData::Pointer data = desc.GetMitkImage().GetPointer();
-
-          std::string nodeName = "Unnamed_DICOM";
-
-          std::string studyDescription = desc.GetPropertyAsString("studyDescription");
-          std::string seriesDescription = desc.GetPropertyAsString("seriesDescription");
-
-          if (!studyDescription.empty())
-          {
-              nodeName = studyDescription;
-          }
-
-          if (!seriesDescription.empty())
-          {
-              if (!studyDescription.empty())
-              {
-                  nodeName += "/";
-              }
-              nodeName += seriesDescription;
-          }
-
-          mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(nodeName);
-          data->SetProperty("name", nameProp);
-
-          mitk::DataNode::Pointer node = mitk::DataNode::New();
-          node->SetData(data);
-          nameProp = mitk::StringProperty::New(nodeName);
-          node->SetProperty("name", nameProp);
-
-          dataStorage->Add(node);
-      }
-
-      if (reader->GetNumberOfOutputs() < 1)
-      {
-          MITK_ERROR << "Error loading series: " << ctkEvent.getProperty("SeriesName").toString().toStdString()
-              << " id: " << ctkEvent.getProperty("SeriesUID").toString().toStdString();
+        dataStorage->Add(node);
       }
     }
   }

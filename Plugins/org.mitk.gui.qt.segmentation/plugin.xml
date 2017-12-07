@@ -11,14 +11,14 @@
       <description>Allows the segmentation of images using different tools.</description>
       <keywordReference id="org.mitk.views.segmentation.ViewKeyword"/>
     </view>
-     <view id="org.mitk.views.deformableclippingplane"
+     <!--<view id="org.mitk.views.deformableclippingplane"
        name="Clipping Plane"
        category="Segmentation"
        class="QmitkDeformableClippingPlaneView"
        icon="resources/deformablePlane.png" >
       <description>Allow the clipping of a volume using a deformable plane.</description>
       <keywordReference id="org.mitk.views.deformableclippingplane.ViewKeyword"/>
-    </view>
+    </view>-->
     <view
       id="org.mitk.views.segmentationutilities"
       name="Segmentation Utilities"

@@ -16,7 +16,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/RemeshingIcon.png
+  resources/RemeshingIcon.svg
   plugin.xml
 )
 

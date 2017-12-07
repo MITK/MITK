@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <QTextStream>
 
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkRequest>
+//#include <QtNetwork/QNetworkReply>
+//#include <QtNetwork/QNetworkRequest>
 
 #include <cctype>
 #include <cstdlib>
@@ -68,7 +68,7 @@ int compareVersions(const QString &v1, const QString &v2)
   return 0;
 }
 
-int checkUpdates(QTextStream &out)
+/*int checkUpdates(QTextStream &out)
 {
   out << "Checking for updates... ";
   out.flush();
@@ -130,7 +130,7 @@ int checkUpdates(QTextStream &out)
   out.flush();
 
   return EXIT_SUCCESS;
-}
+}*/
 
 bool readAnswer(char defaultAnswer)
 {
@@ -257,8 +257,8 @@ int main(int argc, char **argv)
   parser.addArgument("vendor", "v", QVariant::String, "  The vendor of the generated code", "DKFZ");
   parser.addArgument("quiet", "q", QVariant::Bool, "  Do not print additional information");
   parser.addArgument("confirm-all", "y", QVariant::Bool, "  Answer all questions with 'yes'");
-  parser.addArgument("check-update", "u", QVariant::Bool, "  Check for updates and exit");
-  parser.addArgument("no-networking", "n", QVariant::Bool, "  Disable all network requests");
+  //parser.addArgument("check-update", "u", QVariant::Bool, "  Check for updates and exit");
+  //parser.addArgument("no-networking", "n", QVariant::Bool, "  Disable all network requests");
 
   parser.beginGroup("Plug-in options");
   parser.addArgument("plugin-symbolic-name", "ps", QVariant::String, "* The plugin's symbolic name");
@@ -298,7 +298,7 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
   }
 
-  bool noNetwork = parsedArgs.contains("no-networking");
+  /*bool noNetwork = parsedArgs.contains("no-networking");
 
   if (parsedArgs.contains("check-update"))
   {
@@ -319,7 +319,7 @@ int main(int argc, char **argv)
     {
       checkUpdates(out);
     }
-  }
+  }*/
 
   // Check arguments
 

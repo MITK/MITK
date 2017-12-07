@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
+#include <usServiceEvent.h>
 
 #include "mitkDICOMSegmentationIO.h"
 
@@ -28,7 +29,7 @@ namespace mitk
   /**
   \brief Registers services for multilabel dicom module.
   */
-  class DICOMQIIOModulActivator : public us::ModuleActivator
+  class DICOMQIIOActivator : public us::ModuleActivator
   {
     std::vector<AbstractFileIO *> m_FileIOs;
 
@@ -59,4 +60,4 @@ namespace mitk
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(mitk::DICOMQIIOModulActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::DICOMQIIOActivator)

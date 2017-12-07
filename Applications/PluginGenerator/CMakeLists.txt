@@ -20,9 +20,7 @@ endif()
 # Prerequisites
 #-----------------------------------------------------------------------------
 
-set(QT_DONT_USE_QTGUI 1)
-set(QT_USE_QTNETWORK 1)
-find_package(Qt5Network REQUIRED)
+#find_package(Qt5Network REQUIRED)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/PluginGeneratorConfig.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/PluginGeneratorConfig.h" @ONLY)
@@ -43,7 +41,7 @@ qt5_add_resources(src_files plugin_template.qrc project_template.qrc)
 set(exec_target ${PROJECT_NAME})
 add_executable(${exec_target} ${src_files})
 
-target_link_libraries(${exec_target} Qt5::Network)
+#target_link_libraries(${exec_target} Qt5::Network)
 
 if(NOT standalone_build)
   # subproject support

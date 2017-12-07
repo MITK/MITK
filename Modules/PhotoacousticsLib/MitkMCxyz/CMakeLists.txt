@@ -1,4 +1,4 @@
-OPTION(BUILD_PhotoacousticSimulationMCxyz "Build MiniApp for Photoacoustic Simulation Module (mcxyz)" ON)
+OPTION(BUILD_PhotoacousticSimulationMCxyz "Build MiniApp for Photoacoustic Simulation Module (mcxyz)" OFF)
 
 IF(BUILD_PhotoacousticSimulationMCxyz)
   PROJECT( MitkMCxyz )

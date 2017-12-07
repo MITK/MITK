@@ -41,7 +41,7 @@ qt5_add_resources(src_files plugin_template.qrc project_template.qrc)
 set(exec_target ${PROJECT_NAME})
 add_executable(${exec_target} ${src_files})
 
-#target_link_libraries(${exec_target} Qt5::Network)
+target_link_libraries(${exec_target} Qt5::Core)
 
 if(NOT standalone_build)
   # subproject support

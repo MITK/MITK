@@ -17,15 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _ClusteringMetric
 #define _ClusteringMetric
 
-#include <MitkFiberTrackingExports.h>
-
 namespace mitk
 {
 
 /**
 * \brief Base class for fiber clustering metrics  */
 
-class MITKFIBERTRACKING_EXPORT ClusteringMetric
+class ClusteringMetric
 {
 
 public:

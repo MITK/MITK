@@ -25,7 +25,7 @@ namespace mitk
 /**
 * \brief Fiber clustering metric based on the euclidean distance between tracts and the corresponding standard deviation of the distances */
 
-class MITKFIBERTRACKING_EXPORT ClusteringMetricEuclideanStd : public ClusteringMetric
+class ClusteringMetricEuclideanStd : public ClusteringMetric
 {
 
 public:

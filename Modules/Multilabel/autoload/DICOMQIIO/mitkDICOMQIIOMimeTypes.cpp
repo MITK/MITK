@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMQIIOMimeTypes.h"
 #include "mitkIOMimeTypes.h"
-#include <mitkDICOMDCMTKTagScanner.h>
-#include <mitkDICOMFileReaderSelector.h>
 
 #include <mitkLogMacros.h>
 

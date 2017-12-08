@@ -28,8 +28,14 @@ namespace mitk
   {
     mitk::IDICOMTagsOfInterest *result = nullptr;
 
+    us::ModuleContext *context = us::GetModuleContext();
+    if (context == nullptr)
+    {
+      MITK_WARN << "No dicom context found.";
+      return result;
+    }
     std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest>> toiRegisters =
-      us::GetModuleContext()->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+      context->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
     if (!toiRegisters.empty())
     {
       if (toiRegisters.size() > 1)

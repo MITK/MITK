@@ -798,12 +798,14 @@ void PAImageProcessing::UpdateImageInfo()
       {
         m_Controls.ElementCount->setValue(image->GetDimension(0));
         m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
-        m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
-        m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
-        m_Controls.CutoffFirstSlice->setValue(0);
-        m_Controls.CutoffLastSlice->setValue(image->GetDimension(2) - 1);
-        m_Controls.CutoffLastSlice->setMaximum(image->GetDimension(2) - 1);
       }
+
+      m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
+      m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
+      m_Controls.CutoffFirstSlice->setValue(0);
+      m_Controls.CutoffLastSlice->setValue(image->GetDimension(2) - 1);
+      m_Controls.CutoffLastSlice->setMaximum(image->GetDimension(2) - 1);
+
       UpdateBFSettings(image);
 
       m_Controls.CutoffBeforeBF->setValue(0.000001 / BFconfig.TimeSpacing); // 1us standard offset for our transducer
@@ -913,7 +915,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.SamplesPerLine = m_Controls.Samples->value();
   BFconfig.ReconstructionLines = m_Controls.Lines->value();
   BFconfig.TransducerElements = m_Controls.ElementCount->value();
-  BFconfig.apodizationArraySize = m_Controls.ElementCount->value();
+  BFconfig.apodizationArraySize = m_Controls.Lines->value();
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
   BFconfig.UseGPU = m_Controls.UseGPUBf->isChecked();

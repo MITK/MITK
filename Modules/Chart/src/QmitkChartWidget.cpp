@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <regex>
+
 #include <QmitkChartWidget.h>
 #include <QGridLayout>
 #include <QWebChannel>
@@ -185,11 +187,26 @@ void QmitkChartWidget::Impl::ClearData() {
   GetC3xyData()->clear();
 }
 
+std::string CheckForCorrectHex(const std::string& colorName)
+{
+  std::regex rgx("([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})");
+  std::smatch match;
+
+  if (!colorName.empty() && colorName.at(0)!='#' && std::regex_search(colorName.begin(), colorName.end(), match, rgx))
+  {
+    return "#" + colorName;
+  }
+  else {
+    return colorName;
+  }
+}
+
 void QmitkChartWidget::Impl::SetColor(const std::string& label, const std::string& colorName)
 {
   auto element = GetDataElementByLabel(GetC3xyData(), label);
   if (element) {
-    element->SetColor(QVariant(QString::fromStdString(colorName)));
+    auto colorChecked = CheckForCorrectHex(colorName);
+    element->SetColor(QVariant(QString::fromStdString(colorChecked)));
   }
 }
 

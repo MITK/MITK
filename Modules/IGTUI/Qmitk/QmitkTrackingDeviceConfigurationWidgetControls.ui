@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
+    <width>522</width>
     <height>536</height>
    </rect>
   </property>
@@ -33,8 +33,8 @@
        <item>
         <layout class="QVBoxLayout" name="mainLayout">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item alignment="Qt::AlignLeft|Qt::AlignTop">
             <widget class="QLabel" name="widget_title_label">
              <property name="text">
               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -45,37 +45,7 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>128</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
+           <item alignment="Qt::AlignRight|Qt::AlignBottom">
             <widget class="QComboBox" name="m_TrackingDeviceChooser">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -94,7 +64,7 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item>
+         <item alignment="Qt::AlignTop">
           <widget class="QStackedWidget" name="m_TrackingSystemWidget">
            <property name="enabled">
             <bool>true</bool>
@@ -103,19 +73,6 @@ p, li { white-space: pre-wrap; }
             <number>-1</number>
            </property>
           </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_9">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>50</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </item>
@@ -157,8 +114,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>31</height>
+            <width>484</width>
+            <height>492</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -196,19 +153,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2"/>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_7">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

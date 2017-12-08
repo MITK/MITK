@@ -85,14 +85,29 @@ bool mitk::OclFilter::ExecuteKernelChunks( cl_kernel kernel, unsigned int workSi
   size_t offset[3] ={0, 0, 0};
   cl_int clErr = 0;
 
+  unsigned int currentChunk = 0;
+  cl_event* waitFor = new cl_event[16];
+
   if(workSizeDim == 2)
   {
     for(offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
     {
       for(offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
       {
-        clErr |= clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
-                                        offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
+        if (currentChunk % 16 == 0 && currentChunk != 0)
+        {
+          clWaitForEvents(16, &waitFor[0]);
+          clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+            offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[0]);
+        }
+        else
+        {
+          clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+            offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[currentChunk%16]);
+        }
+        currentChunk++;
+        //clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+         // offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
       }
     }
   }

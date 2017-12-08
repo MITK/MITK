@@ -20,7 +20,7 @@ endif()
 # Prerequisites
 #-----------------------------------------------------------------------------
 
-#find_package(Qt5Network REQUIRED)
+find_package(Qt5Core REQUIRED)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/PluginGeneratorConfig.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/PluginGeneratorConfig.h" @ONLY)

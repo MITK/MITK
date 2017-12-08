@@ -25,7 +25,7 @@ namespace mitk
 /**
 * \brief Fiber clustering metric based on the euclidean maximum distance between tracts */
 
-class MITKFIBERTRACKING_EXPORT ClusteringMetricEuclideanMax : public ClusteringMetric
+class ClusteringMetricEuclideanMax : public ClusteringMetric
 {
 
 public:

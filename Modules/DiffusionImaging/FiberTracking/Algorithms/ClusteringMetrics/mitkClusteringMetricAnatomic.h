@@ -28,7 +28,7 @@ namespace mitk
 /**
 * \brief Fiber clustering metric based on white matter parcellation histograms along the tracts (Siless et al. https://www.ncbi.nlm.nih.gov/pubmed/29100937) */
 
-class MITKFIBERTRACKING_EXPORT ClusteringMetricAnatomic : public ClusteringMetric
+class ClusteringMetricAnatomic : public ClusteringMetric
 {
 
 public:

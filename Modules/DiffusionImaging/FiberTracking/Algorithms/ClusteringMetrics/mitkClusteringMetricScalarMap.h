@@ -29,7 +29,7 @@ namespace mitk
 /**
 * \brief Fiber clustering metric based on the scalar image values along a tract */
 
-class MITKFIBERTRACKING_EXPORT ClusteringMetricScalarMap : public ClusteringMetric
+class ClusteringMetricScalarMap : public ClusteringMetric
 {
 
 public:

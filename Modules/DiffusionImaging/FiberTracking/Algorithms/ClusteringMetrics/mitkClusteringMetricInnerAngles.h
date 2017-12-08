@@ -25,7 +25,7 @@ namespace mitk
 /**
 * \brief Fiber clustering metric based on the angles between certain parts of the streamline */
 
-class MITKFIBERTRACKING_EXPORT ClusteringMetricInnerAngles : public ClusteringMetric
+class ClusteringMetricInnerAngles : public ClusteringMetric
 {
 
 public:

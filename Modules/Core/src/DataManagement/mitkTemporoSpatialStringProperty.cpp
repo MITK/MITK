@@ -303,7 +303,7 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
 
   if (!tsProp)
   {
-    return "";
+    mitkThrow() << "Cannot serialize properties of types other than TemporoSpatialStringProperty.";
   }
 
   std::ostringstream stream;

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkC3jsWidget_h
 
 #include <map>
+#include <memory>
 #include <QWidget>
 
 #include <MitkChartExports.h>
@@ -136,6 +137,10 @@ public:
   std::string GetTitle() const;
 
   /*!
+  * \brief Changes the chart type for all data entries and reloads the chart
+  */
+  void SetChartTypeForAllDataAndReload(ChartType type);
+  /*!
   * \brief sets the chart type for a data entry
   * \details for available types, see ChartType
   * If an unknown label is given, nothing happens.
@@ -145,11 +150,6 @@ public:
 
   void SetLegendPosition(LegendPosition position);
   LegendPosition GetLegendPosition() const;
-
-  /*!
-  * \brief Changes the chart type for all data entries and reloads the chart
-  */
-  void SetChartTypeForAllDataAndReload(ChartType type);
 
   /*!
   * \brief Displays the chart in the widget
@@ -184,7 +184,7 @@ public:
 
 private:
   class Impl;
-  Impl* m_Impl;
+  std::unique_ptr<Impl> m_Impl;
 
 public slots:
   void OnLoadFinished(bool isLoadSuccessfull);

@@ -59,27 +59,26 @@ public:
 
   void SetShowDataPoints(bool showDataPoints = false);
   bool GetShowDataPoints() const;
+  void Show(bool showSubChart);
 
-  void SetChartType(const std::string& label, QmitkChartWidget::ChartType chartType);
+  void SetChartType(QmitkChartWidget::ChartType chartType);
+  void SetChartTypeByLabel(const std::string& label, QmitkChartWidget::ChartType chartType);
   std::string ConvertChartTypeToString(QmitkChartWidget::ChartType chartType) const;
 
   void ClearJavaScriptChart();
   void InitializeJavaScriptChart();
   void CallJavaScriptFuntion(const QString& command);
 
-  QmitkChartData* GetC3Data() const;
-  std::vector<QmitkChartxyData*>* GetC3xyData() const;
-
 private:
   std::string GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const;
-  QmitkChartxyData* GetDataElementByLabel(const std::vector<QmitkChartxyData*>* c3xyData, const std::string& label) const;
-  QList<QVariant> GetDataLabels(const std::vector<QmitkChartxyData*>* c3xyData) const;
+  QmitkChartxyData* GetDataElementByLabel(const std::string& label) const;
+  QList<QVariant> GetDataLabels(const std::vector<std::unique_ptr<QmitkChartxyData>>& c3xyData) const;
 
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
 
-  QmitkChartData * m_C3Data;
-  std::vector<QmitkChartxyData*> * m_C3xyData;
+  QmitkChartData m_C3Data;
+  std::vector<std::unique_ptr<QmitkChartxyData>> m_C3xyData;
   std::map<QmitkChartWidget::ChartType, std::string> m_ChartTypeToName;
   std::map<QmitkChartWidget::LegendPosition, std::string> m_LegendPositionToName;
   std::map<QmitkChartWidget::LineStyle, std::string> m_LineStyleToName;
@@ -121,17 +120,10 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
 
   m_AxisScaleToName.emplace(AxisScale::linear, "");
   m_AxisScaleToName.emplace(AxisScale::log, "log");
-
-  m_C3Data = new QmitkChartData();
-  m_C3xyData = new std::vector<QmitkChartxyData*>();
 }
 
 QmitkChartWidget::Impl::~Impl()
 {
-  delete m_C3Data;
-  qDeleteAll(*m_C3xyData);
-
-  delete m_C3xyData;
 }
 
 void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType type) {
@@ -153,21 +145,19 @@ void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, c
   }
   const std::string chartTypeName(m_ChartTypeToName.at(type));
 
-  auto definedLabels = GetDataLabels(GetC3xyData());
+  auto definedLabels = GetDataLabels(m_C3xyData);
   auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
 
-  GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
+  m_C3xyData.push_back(std::make_unique<QmitkChartxyData>(data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
 }
 
 void QmitkChartWidget::Impl::RemoveData(const std::string& label)
 {
-  for (std::vector<QmitkChartxyData*>::iterator iter = GetC3xyData()->begin(); iter != GetC3xyData()->end(); ++iter)
+  for (std::vector<std::unique_ptr<QmitkChartxyData>>::iterator iter = m_C3xyData.begin(); iter != m_C3xyData.end(); ++iter)
   {
-    const auto &temp = *iter;
-    if (temp->GetLabel().toString().toStdString() == label)
+    if ((*iter)->GetLabel().toString().toStdString() == label)
     {
-      delete temp;
-      GetC3xyData()->erase(iter);
+      m_C3xyData.erase(iter);
       return;
     }
   }
@@ -176,27 +166,27 @@ void QmitkChartWidget::Impl::RemoveData(const std::string& label)
 }
 
 void QmitkChartWidget::Impl::ClearData() {
-  for (auto& xyData : *m_C3xyData)
+  for (auto& xyData : m_C3xyData)
   {
-    m_WebChannel->deregisterObject(xyData);
-    delete xyData;
-    xyData = nullptr;
+    m_WebChannel->deregisterObject(xyData.get());
   }
-  GetC3xyData()->clear();
+  m_C3xyData.clear();
 }
 
 void QmitkChartWidget::Impl::SetColor(const std::string& label, const std::string& colorName)
 {
-  auto element = GetDataElementByLabel(GetC3xyData(), label);
-  if (element) {
+  auto element = GetDataElementByLabel(label);
+  if (element)
+  {
     element->SetColor(QVariant(QString::fromStdString(colorName)));
   }
 }
 
 void QmitkChartWidget::Impl::SetLineStyle(const std::string& label, LineStyle style) {
-  auto element = GetDataElementByLabel(GetC3xyData(), label);
+  auto element = GetDataElementByLabel(label);
   //only has effect with chart type line
-  if (element && element->GetChartType()==QVariant(QString::fromStdString(ConvertChartTypeToString(ChartType::line)))) {
+  if (element && element->GetChartType()==QVariant(QString::fromStdString(ConvertChartTypeToString(ChartType::line))))
+  {
     const std::string lineStyleName(m_LineStyleToName.at(style));
     element->SetLineStyle(QVariant(QString::fromStdString(lineStyleName)));
   }
@@ -205,55 +195,56 @@ void QmitkChartWidget::Impl::SetLineStyle(const std::string& label, LineStyle st
 void QmitkChartWidget::Impl::SetYAxisScale(AxisScale scale)
 {
   const std::string axisScaleName(m_AxisScaleToName.at(scale));
-  GetC3Data()->SetYAxisScale(QString::fromStdString(axisScaleName));
+  m_C3Data.SetYAxisScale(QString::fromStdString(axisScaleName));
 }
 
-QmitkChartxyData* QmitkChartWidget::Impl::GetDataElementByLabel(const std::vector<QmitkChartxyData*>* c3xyData, const std::string& label) const
+QmitkChartxyData* QmitkChartWidget::Impl::GetDataElementByLabel(const std::string& label) const
 {
-  for (auto element = c3xyData->begin(); element != c3xyData->end(); ++element) {
-    if ((*element)->GetLabel().toString().toStdString() == label) {
-      return *element;
-    }
+  for (const auto &qmitkChartxyData : m_C3xyData)
+  {
+    if (qmitkChartxyData->GetLabel().toString() == label.c_str())
+      return qmitkChartxyData.get();
   }
+
   MITK_WARN << "label " << label << " not found in QmitkChartWidget";
   return nullptr;
 }
 
-QList<QVariant> QmitkChartWidget::Impl::GetDataLabels(const std::vector<QmitkChartxyData*>* c3xyData) const {
+QList<QVariant> QmitkChartWidget::Impl::GetDataLabels(const std::vector<std::unique_ptr<QmitkChartxyData>>& c3xyData) const {
   QList<QVariant> dataLabels;
-  for (auto element = c3xyData->begin(); element != c3xyData->end(); ++element) {
+  for (auto element = c3xyData.begin(); element != c3xyData.end(); ++element) {
     dataLabels.push_back((*element)->GetLabel());
   }
   return dataLabels;
 }
 
 void QmitkChartWidget::Impl::SetXAxisLabel(const std::string& label) { 
-  GetC3Data()->SetXAxisLabel(QString::fromStdString(label)); 
+  m_C3Data.SetXAxisLabel(QString::fromStdString(label));
 }
 
 std::string QmitkChartWidget::Impl::GetXAxisLabel() const { 
-  return GetC3Data()->GetXAxisLabel().toString().toStdString(); 
+  return m_C3Data.GetXAxisLabel().toString().toStdString();
 }
 
 void QmitkChartWidget::Impl::SetYAxisLabel(const std::string& label) {
-  GetC3Data()->SetYAxisLabel(QString::fromStdString(label)); 
+  m_C3Data.SetYAxisLabel(QString::fromStdString(label));
 }
 
 std::string QmitkChartWidget::Impl::GetYAxisLabel() const { 
-  return GetC3Data()->GetYAxisLabel().toString().toStdString(); 
+  return m_C3Data.GetYAxisLabel().toString().toStdString();
 }
 
 void QmitkChartWidget::Impl::SetTitle(const std::string& title) {
-  GetC3Data()->SetTitle(QString::fromStdString(title));
+  m_C3Data.SetTitle(QString::fromStdString(title));
 }
 
 std::string QmitkChartWidget::Impl::GetTitle() const {
-  return GetC3Data()->GetTitle().toString().toStdString();
+  return m_C3Data.GetTitle().toString().toStdString();
 }
 
 void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition legendPosition) {
   const std::string legendPositionName(m_LegendPositionToName.at(legendPosition));
-  GetC3Data()->SetLegendPosition(QString::fromStdString(legendPositionName));
+  m_C3Data.SetLegendPosition(QString::fromStdString(legendPositionName));
 }
 
 QmitkChartWidget::LegendPosition QmitkChartWidget::Impl::GetLegendPosition() const {
@@ -266,20 +257,20 @@ QmitkChartWidget::LegendPosition QmitkChartWidget::Impl::GetLegendPosition() con
 }
 
 std::string QmitkChartWidget::Impl::GetLegendPositionAsString() const {
-  return GetC3Data()->GetLegendPosition().toString().toStdString();
+  return m_C3Data.GetLegendPosition().toString().toStdString();
 }
 
 void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints) {
   if (showDataPoints == true) {
-    GetC3Data()->SetDataPointSize(3);
+    m_C3Data.SetDataPointSize(3);
   }
   else {
-    GetC3Data()->SetDataPointSize(0);
+    m_C3Data.SetDataPointSize(0);
   }
 }
 
 bool QmitkChartWidget::Impl::GetShowDataPoints() const{
-  int value = GetC3Data()->GetDataPointSize().toInt();
+  int value = m_C3Data.GetDataPointSize().toInt();
   if (value > 0) {
     return true;
   }
@@ -288,9 +279,33 @@ bool QmitkChartWidget::Impl::GetShowDataPoints() const{
   }
 }
 
-void QmitkChartWidget::Impl::SetChartType(const std::string& label, QmitkChartWidget::ChartType chartType) {
-  auto element = GetDataElementByLabel(GetC3xyData(), label);
-  if (element) {
+void QmitkChartWidget::Impl::Show(bool showSubChart)
+{
+  if (m_C3xyData.empty())
+  {
+    mitkThrow() << "no data available for display in chart";
+  }
+
+  m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
+  InitializeJavaScriptChart();
+}
+void QmitkChartWidget::Impl::SetChartType(QmitkChartWidget::ChartType chartType)
+{
+  for (auto iterator = m_C3xyData.begin(); iterator != m_C3xyData.end(); ++iterator)
+  {
+    SetChartTypeByLabel((*iterator)->GetLabel().toString().toStdString(), chartType);
+  }
+
+  auto chartTypeName = ConvertChartTypeToString(chartType);
+  const QString command = QString::fromStdString("transformView('" + chartTypeName + "')");
+  CallJavaScriptFuntion(command);
+}
+
+void QmitkChartWidget::Impl::SetChartTypeByLabel(const std::string& label, QmitkChartWidget::ChartType chartType)
+{
+  auto element = GetDataElementByLabel(label);
+  if (element)
+  {
     const std::string chartTypeName(m_ChartTypeToName.at(chartType));
     element->SetChartType(QVariant(QString::fromStdString(chartTypeName)));
   }
@@ -298,14 +313,6 @@ void QmitkChartWidget::Impl::SetChartType(const std::string& label, QmitkChartWi
 
 std::string QmitkChartWidget::Impl::ConvertChartTypeToString(QmitkChartWidget::ChartType chartType) const {
   return m_ChartTypeToName.at(chartType);
-}
-
-QmitkChartData* QmitkChartWidget::Impl::GetC3Data() const {
-  return m_C3Data; 
-}
-
-std::vector<QmitkChartxyData*>* QmitkChartWidget::Impl::GetC3xyData() const {
-  return m_C3xyData; 
 }
 
 void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
@@ -320,11 +327,12 @@ void QmitkChartWidget::Impl::ClearJavaScriptChart()
 
 void QmitkChartWidget::Impl::InitializeJavaScriptChart()
 {
-  m_WebChannel->registerObject(QStringLiteral("chartData"), m_C3Data);
+  m_WebChannel->registerObject(QStringLiteral("chartData"), &m_C3Data);
   unsigned count = 0;
-  for (auto& xyData : *m_C3xyData) {
-	  QString variableName = "xyData" + QString::number(count);
-	  m_WebChannel->registerObject(variableName, xyData);
+  for (auto& xyData : m_C3xyData)
+  {
+    QString variableName = "xyData" + QString::number(count);
+    m_WebChannel->registerObject(variableName, xyData.get());
 	  count++;
   }
   m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/QmitkChartWidget.html")));
@@ -343,14 +351,13 @@ std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& la
 }
 
 QmitkChartWidget::QmitkChartWidget(QWidget* parent)
-  : QWidget(parent),
-  m_Impl(new Impl(this))
+  : QWidget(parent)
+  , m_Impl(new Impl(this))
 {
 }
 
 QmitkChartWidget::~QmitkChartWidget()
 {
-  delete m_Impl;
 }
 
 void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType type)
@@ -423,9 +430,14 @@ bool QmitkChartWidget::GetShowDataPoints() const
   return m_Impl->GetShowDataPoints();
 }
 
+void QmitkChartWidget::SetChartTypeForAllDataAndReload(ChartType type)
+{
+  m_Impl->SetChartType(type);
+}
+
 void QmitkChartWidget::SetChartType(const std::string& label, ChartType type)
 {
-  m_Impl->SetChartType(label, type);
+  m_Impl->SetChartTypeByLabel(label, type);
 }
 
 void QmitkChartWidget::SetLegendPosition(LegendPosition position)
@@ -440,11 +452,7 @@ QmitkChartWidget::LegendPosition QmitkChartWidget::GetLegendPosition() const
 
 void QmitkChartWidget::Show(bool showSubChart)
 {
-  if (m_Impl->GetC3xyData()->empty()) {
-    mitkThrow() << "no data available for display in chart";
-  }
-  this->m_Impl->GetC3Data()->SetAppearance(showSubChart, m_Impl->GetC3xyData()->front()->GetChartType()== QVariant("pie"));
-  m_Impl->InitializeJavaScriptChart();
+  m_Impl->Show(showSubChart);
 }
 
 void QmitkChartWidget::Clear()
@@ -459,17 +467,6 @@ void QmitkChartWidget::OnLoadFinished(bool isLoadSuccessfull)
   {
     emit PageSuccessfullyLoaded();
   }
-}
-
-void QmitkChartWidget::SetChartTypeForAllDataAndReload(ChartType type)
-{
-  auto allData = this->m_Impl->GetC3xyData();
-  for (auto iterator = allData->begin(); iterator != allData->end(); ++iterator) {
-    SetChartType((*iterator)->GetLabel().toString().toStdString(), type);
-  }
-  auto chartTypeName = m_Impl->ConvertChartTypeToString(type);
-  const QString command = QString::fromStdString("transformView('" + chartTypeName + "')");
-  m_Impl->CallJavaScriptFuntion(command);
 }
 
 void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)

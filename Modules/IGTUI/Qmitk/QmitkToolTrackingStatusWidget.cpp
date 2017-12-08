@@ -188,8 +188,9 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
     m_StatusLabels->append(label);
-    if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(m_StatusLabels->at(i));
-    else m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),0,i);
+    if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) 
+      m_Controls->m_VerticalLayout->addWidget(m_StatusLabels->at(i));
+    else m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),i,0);
   }
 }
 

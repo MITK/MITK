@@ -171,18 +171,18 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_AddSingleTool, SIGNAL(clicked()), this, SLOT(OnAddSingleTool()));
     connect(m_Controls->m_NavigationToolCreationWidget, SIGNAL(NavigationToolFinished()), this, SLOT(OnAddSingleToolFinished()));
     connect(m_Controls->m_NavigationToolCreationWidget, SIGNAL(Canceled()), this, SLOT(OnAddSingleToolCanceled()));
-    connect(m_Controls->m_csvFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
-    connect(m_Controls->m_xmlFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
+    connect(m_Controls->m_CsvFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
+    connect(m_Controls->m_XmlFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
     connect(m_Controls->m_UseDifferentUpdateRates, SIGNAL(clicked()), this, SLOT(OnToggleDifferentUpdateRates()));
     connect(m_Controls->m_RenderUpdateRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangeRenderUpdateRate()));
     connect(m_Controls->m_DisableAllTimers, SIGNAL(stateChanged(int)), this, SLOT(EnableDisableTimerButtons(int)));
     connect(m_Controls->m_advancedUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
-    connect(m_Controls->m_simpleUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
+    connect(m_Controls->m_SimpleUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
     connect(m_Controls->showHideToolProjectionCheckBox, SIGNAL(clicked()), this, SLOT(OnShowHideToolProjectionClicked()));
     connect(m_Controls->showHideToolAxisCheckBox, SIGNAL(clicked()), this, SLOT(OnShowHideToolAxisClicked()));
 
     //connections for the tracking device configuration widget
-    connect(m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
+    connect(m_Controls->m_ConfigurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
 
 
     //! [Thread 3]
@@ -194,10 +194,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), this, SLOT(OnDisconnectFinished(bool, QString)));
     connect(m_WorkerThread, SIGNAL(started()), m_Worker, SLOT(ThreadFunc()));
 
-    connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnConnected(bool)));
-    connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnDisconnected(bool)));
-    connect(m_Worker, SIGNAL(StartTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStartTracking(bool)));
-    connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), m_Controls->m_configurationWidget, SLOT(OnStopTracking(bool)));
+    connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool, QString)), m_Controls->m_ConfigurationWidget, SLOT(OnConnected(bool)));
+    connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool, QString)), m_Controls->m_ConfigurationWidget, SLOT(OnDisconnected(bool)));
+    connect(m_Worker, SIGNAL(StartTrackingFinished(bool, QString)), m_Controls->m_ConfigurationWidget, SLOT(OnStartTracking(bool)));
+    connect(m_Worker, SIGNAL(StopTrackingFinished(bool, QString)), m_Controls->m_ConfigurationWidget, SLOT(OnStopTracking(bool)));
 
 
     //Add Listener, so that we know when the toolStorage changed.
@@ -228,21 +228,21 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
 
     //initialize warning labels
-    m_Controls->m_renderWarningLabel->setVisible(false);
+    m_Controls->m_RenderWarningLabel->setVisible(false);
     m_Controls->m_TrackingFrozenLabel->setVisible(false);
 
     //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles;
     if ((m_Controls == NULL) || //check all these stuff for NULL, latterly this causes crashes from time to time
-      (m_Controls->m_configurationWidget == NULL) ||
-      (m_Controls->m_configurationWidget->GetTrackingDevice().IsNull()))
+      (m_Controls->m_ConfigurationWidget == NULL) ||
+      (m_Controls->m_ConfigurationWidget->GetTrackingDevice().IsNull()))
     {
       MITK_ERROR << "Couldn't get current tracking device or an object is NULL, something went wrong!";
       return;
     }
     else
     {
-      Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+      Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(m_Controls->m_ConfigurationWidget->GetTrackingDevice()->GetType());
     }
     m_Controls->m_VolumeSelectionBox->clear();
     for (std::size_t i = 0; i < Compatibles.size(); i++)
@@ -332,7 +332,7 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
   this->ReplaceCurrentToolStorage(mitk::NavigationToolStorage::New(GetDataStorage()), "TrackingToolbox Default Storage");
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   QString toolLabel = QString("<none>");
-  m_Controls->m_toolLabel->setText(toolLabel);
+  m_Controls->m_ToolLabel->setText(toolLabel);
   m_ToolStorageFilename = "";
 }
 
@@ -463,7 +463,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //! [Thread 4]
   //initialize worker thread
   m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eConnectDevice);
-  m_Worker->SetTrackingDevice(this->m_Controls->m_configurationWidget->GetTrackingDevice());
+  m_Worker->SetTrackingDevice(this->m_Controls->m_ConfigurationWidget->GetTrackingDevice());
   m_Worker->SetInverseMode(m_Controls->m_InverseMode->isChecked());
   m_Worker->SetNavigationToolStorage(this->m_toolStorage);
   m_Worker->SetTrackingDeviceData(data);
@@ -479,7 +479,7 @@ void QmitkMITKIGTTrackingToolboxView::EnableDisableTimerButtons(int enable)
 {
   bool enableBool = enable;
   m_Controls->m_UpdateRateOptionsGroupBox->setEnabled(!enableBool);
-  m_Controls->m_renderWarningLabel->setVisible(enableBool);
+  m_Controls->m_RenderWarningLabel->setVisible(enableBool);
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString errorMessage)
@@ -698,9 +698,9 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
   mitk::TrackingDeviceType Type;
 
-  if (m_Controls->m_configurationWidget->GetTrackingDevice().IsNotNull())
+  if (m_Controls->m_ConfigurationWidget->GetTrackingDevice().IsNotNull())
   {
-    Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
+    Type = m_Controls->m_ConfigurationWidget->GetTrackingDevice()->GetType();
     //enable controls because device is valid
     m_Controls->m_TrackingToolsGoupBox->setEnabled(true);
     m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
@@ -715,7 +715,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
 
   // Code to enable/disable device specific buttons
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
+  if (m_Controls->m_ConfigurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
   {
     m_Controls->m_AutoDetectTools->setVisible(true);
   }
@@ -724,7 +724,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
     m_Controls->m_AutoDetectTools->setVisible(false);
   }
 
-  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_configurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
+  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_ConfigurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
 
   // Code to select appropriate tracking volume for current type
   std::vector<mitk::TrackingDeviceData> Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(Type);
@@ -775,11 +775,11 @@ void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
+  if (m_Controls->m_ConfigurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
   {
     DisableTrackingConfigurationButtons();
     m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eAutoDetectTools);
-    m_Worker->SetTrackingDevice(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
+    m_Worker->SetTrackingDevice(m_Controls->m_ConfigurationWidget->GetTrackingDevice().GetPointer());
     m_Worker->SetDataStorage(this->GetDataStorage());
     m_WorkerThread->start();
     m_TimeoutTimer->start(7000);
@@ -822,7 +822,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
   AutoSaveToolStorage();
   //update label
   QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools (Auto Detected)";
-  m_Controls->m_toolLabel->setText(toolLabel);
+  m_Controls->m_ToolLabel->setText(toolLabel);
   //update tool preview
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
@@ -929,7 +929,7 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
     currentPath = QDir::homePath();
   }
   // check if csv radio button is clicked
-  if (this->m_Controls->m_csvFormat->isChecked())
+  if (this->m_Controls->m_CsvFormat->isChecked())
   {
     // you needn't add a seperator to the input text when currentpath is the rootpath
     if (currentPath.isRoot())
@@ -943,7 +943,7 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
     }
   }
   // check if xml radio button is clicked
-  else if (this->m_Controls->m_xmlFormat->isChecked())
+  else if (this->m_Controls->m_XmlFormat->isChecked())
   {
     // you needn't add a seperator to the input text when currentpath is the rootpath
     if (currentPath.isRoot())
@@ -963,7 +963,7 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleAdvancedSimpleMode()
   {
     m_Controls->m_simpleWidget->setVisible(false);
     m_Controls->m_MainWidget->setVisible(true);
-    m_Controls->m_simpleUI->setChecked(false);
+    m_Controls->m_SimpleUI->setChecked(false);
     m_SimpleModeEnabled = false;
   }
   else
@@ -979,9 +979,9 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleDifferentUpdateRates()
   if (m_Controls->m_UseDifferentUpdateRates->isChecked())
   {
     if (m_Controls->m_RenderUpdateRate->value() == 0)
-      m_Controls->m_renderWarningLabel->setVisible(true);
+      m_Controls->m_RenderWarningLabel->setVisible(true);
     else
-      m_Controls->m_renderWarningLabel->setVisible(false);
+      m_Controls->m_RenderWarningLabel->setVisible(false);
 
     m_Controls->m_UpdateRate->setEnabled(false);
     m_Controls->m_OptionsUpdateRateLabel->setEnabled(false);
@@ -995,7 +995,7 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleDifferentUpdateRates()
 
   else
   {
-    m_Controls->m_renderWarningLabel->setVisible(false);
+    m_Controls->m_RenderWarningLabel->setVisible(false);
 
     m_Controls->m_UpdateRate->setEnabled(true);
     m_Controls->m_OptionsUpdateRateLabel->setEnabled(true);
@@ -1011,9 +1011,9 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleDifferentUpdateRates()
 void QmitkMITKIGTTrackingToolboxView::OnChangeRenderUpdateRate()
 {
   if (m_Controls->m_RenderUpdateRate->value() == 0)
-    m_Controls->m_renderWarningLabel->setVisible(true);
+    m_Controls->m_RenderWarningLabel->setVisible(true);
   else
-    m_Controls->m_renderWarningLabel->setVisible(false);
+    m_Controls->m_RenderWarningLabel->setVisible(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::StartLogging()
@@ -1069,11 +1069,11 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
     EnableLoggingButtons();
 
     //write the results to a file
-    if (m_Controls->m_csvFormat->isChecked())
+    if (m_Controls->m_CsvFormat->isChecked())
     {
       mitk::IOUtil::SaveBaseData(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
     }
-    else if (m_Controls->m_xmlFormat->isChecked())
+    else if (m_Controls->m_XmlFormat->isChecked())
     {
       mitk::IOUtil::SaveBaseData(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
     }
@@ -1093,7 +1093,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()
     Name += "0";
   }
   m_Controls->m_NavigationToolCreationWidget->Initialize(GetDataStorage(), Identifier.toStdString(), Name.toStdString());
-  m_Controls->m_NavigationToolCreationWidget->SetTrackingDeviceType(m_Controls->m_configurationWidget->GetTrackingDevice()->GetType(), false);
+  m_Controls->m_NavigationToolCreationWidget->SetTrackingDeviceType(m_Controls->m_ConfigurationWidget->GetTrackingDevice()->GetType(), false);
   m_Controls->m_TrackingToolsWidget->setCurrentIndex(1);
 
   //disable tracking volume during tool editing
@@ -1113,7 +1113,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
   }
   m_toolStorage->AddTool(m_Controls->m_NavigationToolCreationWidget->GetCreatedTool());
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
-  m_Controls->m_toolLabel->setText("<manually added>");
+  m_Controls->m_ToolLabel->setText("<manually added>");
 
   //auto save current storage for persistence
   MITK_INFO << "Auto saving manually added tools for persistence.";
@@ -1153,8 +1153,8 @@ void QmitkMITKIGTTrackingToolboxView::DisableLoggingButtons()
   m_Controls->m_ChooseFile->setEnabled(false);
   m_Controls->m_LoggingLimit->setEnabled(false);
   m_Controls->m_LoggedFramesLimit->setEnabled(false);
-  m_Controls->m_csvFormat->setEnabled(false);
-  m_Controls->m_xmlFormat->setEnabled(false);
+  m_Controls->m_CsvFormat->setEnabled(false);
+  m_Controls->m_XmlFormat->setEnabled(false);
   m_Controls->m_SkipInvalidData->setEnabled(false);
   m_Controls->m_StopLogging->setEnabled(true);
 }
@@ -1166,8 +1166,8 @@ void QmitkMITKIGTTrackingToolboxView::EnableLoggingButtons()
   m_Controls->m_ChooseFile->setEnabled(true);
   m_Controls->m_LoggingLimit->setEnabled(true);
   m_Controls->m_LoggedFramesLimit->setEnabled(true);
-  m_Controls->m_csvFormat->setEnabled(true);
-  m_Controls->m_xmlFormat->setEnabled(true);
+  m_Controls->m_CsvFormat->setEnabled(true);
+  m_Controls->m_XmlFormat->setEnabled(true);
   m_Controls->m_SkipInvalidData->setEnabled(true);
   m_Controls->m_StopLogging->setEnabled(false);
 }
@@ -1212,7 +1212,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(true);
-  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_configurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
+  m_Controls->m_AddSingleTool->setEnabled(this->m_Controls->m_ConfigurationWidget->GetTrackingDevice()->AddSingleToolIsAvailable());
   m_Controls->m_LoadTools->setEnabled(true);
   m_Controls->m_ResetTools->setEnabled(true);
 }
@@ -1260,7 +1260,7 @@ void QmitkMITKIGTTrackingToolboxView::OnToolStorageChanged(const ctkServiceEvent
   //don't listen to any changes during connection, toolStorage is locked anyway, so this are only changes of e.g. sourceID which are not relevant for the widget.
   if (!m_connected && (event.getType() == ctkServiceEvent::MODIFIED))
   {
-    m_Controls->m_configurationWidget->OnToolStorageChanged();
+    m_Controls->m_ConfigurationWidget->OnToolStorageChanged();
   }
 }
 
@@ -1339,7 +1339,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateToolStorageLabel(QString pathOfLoade
     toolLabel.resize(40);
     toolLabel += "[...]";
   }
-  m_Controls->m_toolLabel->setText(toolLabel);
+  m_Controls->m_ToolLabel->setText(toolLabel);
 }
 
 void QmitkMITKIGTTrackingToolboxView::AutoSaveToolStorage()

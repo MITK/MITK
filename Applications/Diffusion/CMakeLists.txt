@@ -1,3 +1,5 @@
+if(MITK_USE_Python)
+
 project(MitkDiffusion)
 
 set(DIFFUSIONAPP_NAME MitkDiffusion)
@@ -95,4 +97,6 @@ endif()
 # Add a build time dependency to legacy BlueBerry bundles.
 if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(${DIFFUSIONAPP_NAME} ${MITK_MODULES_ENABLED_PLUGINS})
+endif()
+
 endif()

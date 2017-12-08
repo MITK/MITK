@@ -209,8 +209,8 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
     }
     stdev /= all_values.size();
     stdev = std::sqrt(stdev);
-    std_values1.push_back(mean_values.at(i) + stdev/2);
-    std_values2.push_back(mean_values.at(i) - stdev/2);
+    std_values1.push_back(mean_values.at(i) + stdev);
+    std_values2.push_back(mean_values.at(i) - stdev);
 
     clipboard_string += boost::lexical_cast<std::string>(mean_values.at(i));
     clipboard_string += " ";

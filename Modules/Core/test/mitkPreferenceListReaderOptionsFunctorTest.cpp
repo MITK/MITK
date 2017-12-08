@@ -70,7 +70,7 @@ public:
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(emptyList, emptyList);
     CPPUNIT_ASSERT(true == functor(info));
-    CPPUNIT_ASSERT_EQUAL(std::string("MITK DICOM Reader"), info.m_ReaderSelector.GetSelected().GetDescription());
+    CPPUNIT_ASSERT_EQUAL(std::string("MITK DICOM Reader v2 (autoselect)"), info.m_ReaderSelector.GetSelected().GetDescription());
   }
 
   void UseBlackList()
@@ -96,6 +96,7 @@ public:
     mitk::IOUtil::LoadInfo info(m_ImagePath);
 
     black.push_back("MITK DICOM Reader v2 (classic config)");
+    black.push_back("MITK DICOM Reader v2 (autoselect)");
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, black);
     CPPUNIT_ASSERT(true == functor(info));

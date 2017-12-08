@@ -339,6 +339,9 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
 mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty(
   const std::string &value)
 {
+  if (value.empty())
+    return nullptr;
+
   mitk::TemporoSpatialStringProperty::Pointer prop = mitk::TemporoSpatialStringProperty::New();
 
   boost::property_tree::ptree root;

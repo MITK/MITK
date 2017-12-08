@@ -115,6 +115,13 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
       }
       else
       {
+          const unsigned int ntotalfiles = relevantFiles.size();
+
+          for( unsigned int i=0; i< ntotalfiles; i++)
+          {
+            m_ReadFiles.push_back( relevantFiles.at(i) );
+          }
+
           reader->SetAdditionalTagsOfInterest(mitk::GetCurrentDICOMTagsOfInterest());
           reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
           reader->SetInputFiles(relevantFiles);

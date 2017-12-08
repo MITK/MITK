@@ -27,6 +27,10 @@ mitk::OCLDelayCalculation::OCLDelayCalculation()
   this->AddSourceFile("DelayCalculation.cl");
   this->m_FilterID = "DelayCalculation";
 
+  m_ChunkSize[0] = 128;
+  m_ChunkSize[1] = 128;
+  m_ChunkSize[2] = 8;
+
   this->Initialize();
 }
 
@@ -60,7 +64,7 @@ void mitk::OCLDelayCalculation::Execute()
 {
   cl_int clErr = 0;
   
-  unsigned int gridDim[3] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, 1 };
+  unsigned int gridDim[3] = { m_Conf.ReconstructionLines / 2, m_Conf.SamplesPerLine, 1 };
   m_BufferSize = gridDim[0] * gridDim[1] * 1;
 
   try
@@ -89,14 +93,10 @@ void mitk::OCLDelayCalculation::Execute()
   clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
   
   CHECK_OCL_ERR(clErr);
-  size_t ChunkSize[3];
-
-  ChunkSize[0] = 128;
-  ChunkSize[1] = 128;
-  ChunkSize[2] = 8;
 
   // execute the filter on a 3D NDRange
-  this->ExecuteKernelChunks(m_PixelCalculation, 2, ChunkSize);
+  if (!this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize))
+    mitkThrow() << "openCL Error when executing Kernel";
 
   // signalize the GPU-side data changed
   m_Output->Modified(GPU_DATA);

@@ -4,6 +4,8 @@ message(STATUS "Configuring MITK Diffusion Release Build")
 set(MITK_USE_Vigra ON CACHE BOOL "MITK Use Vigra Library" FORCE)
 set(MITK_USE_HDF5 ON CACHE BOOL "MITK Use HDF5 Library" FORCE)
 set(MITK_USE_MatchPoint ON CACHE BOOL "" FORCE)
+set(MITK_USE_Python ON CACHE BOOL "" FORCE)
+set(MITK_USE_SYSTEM_PYTHON ON CACHE BOOL "" FORCE)
 
 # Disable all apps but MITK Diffusion
 set(MITK_BUILD_ALL_APPS OFF CACHE BOOL "Build all MITK applications" FORCE)

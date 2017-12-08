@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 #include <mitkInteractionTestHelper.h>
+#include <mitkRenderingTestHelper.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarFigureReader.h>
 #include <mitkPlanarFigureWriter.h>
@@ -61,6 +62,8 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
 public:
   void setUp()
   {
+    // check whether sufficient openGL is available
+    mitk::RenderingTestHelper openGlTest(640, 480);
     /// \todo Fix leaks of vtkObjects. Bug 18095.
     vtkDebugLeaks::SetExitError(0);
   }

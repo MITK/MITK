@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 
 #include "mitkInteractionTestHelper.h"
+#include <mitkRenderingTestHelper.h>
 #include <mitkIOUtil.h>
 #include <mitkPointSet.h>
 #include <mitkPointSetDataInteractor.h>
@@ -45,6 +46,9 @@ private:
 public:
   void setUp()
   {
+    // check whether sufficient openGL is available
+    mitk::RenderingTestHelper openGlTest(640, 480);
+
     // Create DataNode as a container for our PointSet to be tested
     m_TestPointSetNode = mitk::DataNode::New();
 

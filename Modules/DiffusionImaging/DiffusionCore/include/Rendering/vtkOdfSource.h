@@ -62,7 +62,7 @@ public:
 
 protected:
   vtkOdfSource();
-  ~vtkOdfSource() {}
+  ~vtkOdfSource();
 
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;

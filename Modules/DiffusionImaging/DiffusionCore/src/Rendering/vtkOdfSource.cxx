@@ -27,6 +27,11 @@ vtkOdfSource::vtkOdfSource()
   this->SetNumberOfInputPorts(0);
 }
 
+vtkOdfSource::~vtkOdfSource()
+{
+  lut->Delete();
+}
+
 //----------------------------------------------------------------------------
 int vtkOdfSource::RequestData(
     vtkInformation *vtkNotUsed(request),
@@ -103,6 +108,7 @@ int vtkOdfSource::RequestData(
   output->SetPoints(newPoints);
   output->GetPointData()->AddArray(point_colors);
   newPoints->Delete();
+  point_colors->Delete();
   return 1;
 }
 

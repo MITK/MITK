@@ -116,7 +116,7 @@ public:
         for (unsigned int z = 0; z < first->GetZDim(); ++z)
         {
           std::string message = "Expected " + std::to_string(first->GetData(x, y, z)) + " but was " + std::to_string(second->GetData(x, y, z));
-          CPPUNIT_ASSERT_MESSAGE(message, abs(first->GetData(x, y, z) - second->GetData(x, y, z)) < 1e-6);
+          CPPUNIT_ASSERT_MESSAGE(message, std::abs(first->GetData(x, y, z) - second->GetData(x, y, z)) < 1e-6);
         }
   }
 

@@ -66,7 +66,7 @@ public:
       {
         for (int z = 0; z < dims; z++)
         {
-          CPPUNIT_ASSERT_EQUAL_MESSAGE("Every field should be initialized with 0.", abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(x, y, z)) < mitk::eps, true);
+          CPPUNIT_ASSERT_EQUAL_MESSAGE("Every field should be initialized with 0.", std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(x, y, z)) < mitk::eps, true);
         }
       }
     }
@@ -87,7 +87,7 @@ public:
 
     for (int index = 0; index < dims*dims*dims; index++, imagePointer++)
     {
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Every voxel in image should be 0.1 or 0.0001.", true, abs(*imagePointer - 0.1) <= mitk::eps || abs(*imagePointer - 0.0001) <= mitk::eps);
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Every voxel in image should be 0.1 or 0.0001.", true, std::abs(*imagePointer - 0.1) <= mitk::eps || std::abs(*imagePointer - 0.0001) <= mitk::eps);
     }
   }
 
@@ -188,7 +188,7 @@ public:
     for (unsigned int x = 0; x < first->GetXDim(); ++x)
       for (unsigned int y = 0; y < first->GetYDim(); ++y)
         for (unsigned int z = 0; z < first->GetZDim(); ++z)
-          CPPUNIT_ASSERT(abs(first->GetData(x, y, z) - second->GetData(x, y, z)) < mitk::eps);
+          CPPUNIT_ASSERT(std::abs(first->GetData(x, y, z) - second->GetData(x, y, z)) < mitk::eps);
   }
 
   void testSecondConstructor()
@@ -229,15 +229,15 @@ public:
 
     m_PhotoacousticVolume->FinalizeVolume();
 
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 2) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 1) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 4) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 2) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 2) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 6) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 3) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 3) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 2) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 1) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 4) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 2) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 2) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 6) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 3) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 3) < mitk::eps);
   }
 
   void testRandomizeCoefficients()
@@ -260,15 +260,15 @@ public:
 
     m_PhotoacousticVolume->FinalizeVolume();
 
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 1) < 0.1);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 1) < 0.1);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 1) < 0.1);
   }
 
   void testCompleteAirAndSkinVoxelInclusion()
@@ -295,15 +295,15 @@ public:
 
     m_PhotoacousticVolume->FinalizeVolume();
 
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 2) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 4) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 4) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 8) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 2) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 6) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 12) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 3) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 2) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 4) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 4) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 8) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 2) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 6) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 12) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 3) < mitk::eps);
   }
 
   void testHalfAirVoxelInclusion()
@@ -327,15 +327,15 @@ public:
 
     m_PhotoacousticVolume->FinalizeVolume();
 
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 2) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 1.5) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 4) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 3) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 2) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 6) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 4.5) < mitk::eps);
-    CPPUNIT_ASSERT(abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 3) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(0, 0, 0) - 2) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 1) - 1.5) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(1, 1, 2) - 1) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(0, 0, 0) - 4) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 1) - 3) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetScatteringVolume()->GetData(1, 1, 2) - 2) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(0, 0, 0) - 6) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 1) - 4.5) < mitk::eps);
+    CPPUNIT_ASSERT(std::abs(m_PhotoacousticVolume->GetAnisotropyVolume()->GetData(1, 1, 2) - 3) < mitk::eps);
   }
 
   void tearDown() override

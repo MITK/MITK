@@ -97,7 +97,7 @@ public:
         {
           CPPUNIT_ASSERT(m_Photoacoustic3dVolume->GetData(x, y, z) == 5);
           m_Photoacoustic3dVolume->SetData((x + y)*(z + 1), x, y, z);
-          CPPUNIT_ASSERT(abs(m_Photoacoustic3dVolume->GetData(x, y, z) - (x + y)*(z + 1)) < mitk::eps);
+          CPPUNIT_ASSERT(std::abs(m_Photoacoustic3dVolume->GetData(x, y, z) - (x + y)*(z + 1)) < mitk::eps);
         }
   }
 

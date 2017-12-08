@@ -90,7 +90,7 @@ public:
       for (unsigned int z = 0; z < fluenceVolume->GetZDim(); ++z)
       {
         std::string msg = "Expected: " + std::to_string(value) + " actual: " + std::to_string(fluenceVolume->GetData(x, ySlice, z));
-        CPPUNIT_ASSERT_MESSAGE(msg, abs(fluenceVolume->GetData(x, ySlice, z) - value) < mitk::eps);
+        CPPUNIT_ASSERT_MESSAGE(msg, std::abs(fluenceVolume->GetData(x, ySlice, z) - value) < mitk::eps);
       }
   }
 

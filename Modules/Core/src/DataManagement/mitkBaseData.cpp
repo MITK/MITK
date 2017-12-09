@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 #include <mitkGeometry3D.h>
 #include <mitkProportionalTimeGeometry.h>
+#include <mitkStringProperty.h>
 
 mitk::BaseData::BaseData() : m_SourceOutputIndexDuplicate(0), m_Initialized(true)
 {
@@ -286,4 +287,13 @@ void mitk::BaseData::PrintSelf(std::ostream &os, itk::Indent indent) const
       os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;
     }
   }
+}
+
+mitk::IIdentifiable::UIDType mitk::BaseData::GetUID() const
+{
+  auto uidProperty = dynamic_cast<StringProperty *>(this->GetProperty("uid").GetPointer());
+
+  return nullptr != uidProperty
+    ? uidProperty->GetValue()
+    : "";
 }

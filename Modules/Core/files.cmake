@@ -70,6 +70,7 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkGroupTagProperty.cpp
+  DataManagement/mitkIIdentifiable.cpp
   DataManagement/mitkImageAccessorBase.cpp
   DataManagement/mitkImageCaster.cpp
   DataManagement/mitkImageCastPart1.cpp

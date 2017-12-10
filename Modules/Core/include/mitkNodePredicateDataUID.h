@@ -23,6 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+   * \brief Predicate that compares the data UID of the given DataNode to a specific UID.
+   *
+   * \ingroup DataStorage
+   */
   class MITKCORE_EXPORT NodePredicateDataUID : public NodePredicateBase
   {
   public:

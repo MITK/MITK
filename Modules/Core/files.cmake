@@ -112,6 +112,7 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateCompositeBase.cpp
   DataManagement/mitkNodePredicateData.cpp
   DataManagement/mitkNodePredicateDataType.cpp
+  DataManagement/mitkNodePredicateDataUID.cpp
   DataManagement/mitkNodePredicateDimension.cpp
   DataManagement/mitkNodePredicateFirstLevel.cpp
   DataManagement/mitkNodePredicateGeometry.cpp
@@ -120,6 +121,7 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateDataProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
+  DataManagement/mitkNodePredicateUID.cpp
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkPlaneGeometry.cpp
   DataManagement/mitkPlaneGeometryData.cpp

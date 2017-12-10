@@ -79,6 +79,7 @@ set(MODULE_TESTS
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp
   mitkNodePredicateDataPropertyTest.cpp
+  mitkNodePredicateFunctionTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   mitkExceptionTest.cpp

@@ -92,6 +92,7 @@ set(CPP_FILES
   DataManagement/mitkIPropertyDescriptions.cpp
   DataManagement/mitkIPropertyExtensions.cpp
   DataManagement/mitkIPropertyFilters.cpp
+  DataManagement/mitkIPropertyOwner.cpp
   DataManagement/mitkIPropertyPersistence.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp

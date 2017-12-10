@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDataObject.h>
 
 #include "mitkBaseProcess.h"
+#include "mitkIIdentifiable.h"
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
 #include "mitkTimeGeometry.h"
@@ -36,7 +37,7 @@ namespace mitk
   //## from itk::DataObject and thus can be included in a pipeline.
   //## Inherits also from OperationActor and can be used as a destination for Undo
   //## @ingroup Data
-  class MITKCORE_EXPORT BaseData : public itk::DataObject, public OperationActor
+  class MITKCORE_EXPORT BaseData : public itk::DataObject, public OperationActor, public IIdentifiable
   {
   public:
     mitkClassMacroItkParent(BaseData, itk::DataObject)
@@ -353,6 +354,8 @@ namespace mitk
      * \sa itk::ProcessObject::Graft
      */
     virtual void Graft(const DataObject *) override;
+
+    virtual UIDType GetUID() const override;
 
   protected:
     BaseData();

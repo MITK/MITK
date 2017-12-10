@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageSource.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkRenderingManager.h"
+#include <mitkUIDGenerator.h>
 
 mitk::Mapper *mitk::DataNode::GetMapper(MapperSlotId id) const
 {
@@ -82,11 +83,14 @@ void mitk::DataNode::SetData(mitk::BaseData *baseData)
   }
 }
 
-mitk::DataNode::DataNode() : m_PropertyListModifiedObserverTag(0)
+mitk::DataNode::DataNode()
+  : m_PropertyListModifiedObserverTag(0),
+    m_PropertyList(PropertyList::New())
 {
   m_Mappers.resize(10);
 
-  m_PropertyList = PropertyList::New();
+  UIDGenerator generator;
+  this->SetProperty("uid", StringProperty::New(generator.GetUID()));
 
   // subscribe for modified event
   itk::MemberCommand<mitk::DataNode>::Pointer _PropertyListModifiedCommand = itk::MemberCommand<mitk::DataNode>::New();
@@ -596,4 +600,13 @@ mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const
 void mitk::DataNode::PropertyListModified(const itk::Object * /*caller*/, const itk::EventObject &)
 {
   Modified();
+}
+
+mitk::IIdentifiable::UIDType mitk::DataNode::GetUID() const
+{
+  auto uidProperty = dynamic_cast<StringProperty *>(this->GetProperty("uid"));
+
+  return nullptr != uidProperty
+    ? uidProperty->GetValue()
+    : "";
 }

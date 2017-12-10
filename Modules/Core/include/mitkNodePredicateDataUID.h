@@ -1,0 +1,43 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#ifndef mitkNodePredicateDataUID_h
+#define mitkNodePredicateDataUID_h
+
+#include <mitkIIdentifiable.h>
+#include <mitkNodePredicateBase.h>
+#include <MitkCoreExports.h>
+
+namespace mitk
+{
+  class MITKCORE_EXPORT NodePredicateDataUID : public NodePredicateBase
+  {
+  public:
+    mitkClassMacro(NodePredicateDataUID, NodePredicateBase)
+    mitkNewMacro1Param(NodePredicateDataUID, const IIdentifiable::UIDType &)
+
+    virtual ~NodePredicateDataUID();
+
+    virtual bool CheckNode(const mitk::DataNode *node) const override;
+
+  protected:
+    explicit NodePredicateDataUID(const IIdentifiable::UIDType &uid);
+
+    IIdentifiable::UIDType m_UID;
+  };
+}
+
+#endif

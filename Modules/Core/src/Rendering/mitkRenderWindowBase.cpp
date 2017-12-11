@@ -80,7 +80,6 @@ bool mitk::RenderWindowBase::HandleEvent(InteractionEvent *interactionEvent)
 void mitk::RenderWindowBase::Destroy()
 {
   m_Renderer->GetRenderingManager()->RemoveRenderWindow(GetVtkRenderWindow());
-  mitk::BaseRenderer::RemoveInstance(GetVtkRenderWindow());
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();
 }

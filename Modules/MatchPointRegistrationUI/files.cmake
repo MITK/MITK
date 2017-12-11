@@ -9,6 +9,7 @@ set(CPP_FILES
   Qmitk/QmitkMapPropertyDelegate.cpp
   Qmitk/QmitkMapperSettingsWidget.cpp
   Qmitk/QmitkRegEvalSettingsWidget.cpp
+  Qmitk/QmitkRegistrationManipulationWidget.cpp
 )
 
 set(H_FILES
@@ -23,6 +24,7 @@ set(UI_FILES
   Qmitk/QmitkAlgorithmSettingsConfig.ui
   Qmitk/QmitkMapperSettingsWidget.ui
   Qmitk/QmitkRegEvalSettingsWidget.ui
+  Qmitk/QmitkRegistrationManipulationWidget.ui
 )
 
 set(MOC_H_FILES
@@ -36,4 +38,5 @@ set(MOC_H_FILES
   Qmitk/QmitkMapPropertyDelegate.h
   Qmitk/QmitkMapperSettingsWidget.h
   Qmitk/QmitkRegEvalSettingsWidget.h
+  Qmitk/QmitkRegistrationManipulationWidget.h
 )

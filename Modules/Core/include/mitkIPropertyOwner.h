@@ -39,7 +39,7 @@ namespace mitk
     *
     * \return Found property, nullptr otherwise.
     */
-    virtual BaseProperty * GetProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) = 0;
+    virtual BaseProperty * GetNonConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) = 0;
 
     /**
     * \brief Add new or change existent property.

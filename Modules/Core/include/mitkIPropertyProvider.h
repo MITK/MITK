@@ -39,7 +39,7 @@ namespace mitk
     *
     * \return Found property, nullptr otherwise.
     */
-    virtual BaseProperty::ConstPointer GetProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const = 0;
+    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const = 0;
 
     /**
     * \brief Query names of existing properties.

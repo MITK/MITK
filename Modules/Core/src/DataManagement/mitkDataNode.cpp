@@ -610,3 +610,116 @@ mitk::IIdentifiable::UIDType mitk::DataNode::GetUID() const
     ? uidProperty->GetValue()
     : "";
 }
+
+mitk::BaseProperty::ConstPointer mitk::DataNode::GetConstProperty(const std::string &propertyName, const std::string &contextName, bool fallBackOnDefaultContext) const
+{
+  if (propertyName.empty())
+    return nullptr;
+
+  if (contextName.empty())
+    return m_PropertyList->GetProperty(propertyName);
+
+  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+  if (m_MapOfPropertyLists.end() != propertyListIter)
+  {
+    BaseProperty::ConstPointer property = propertyListIter->second->GetProperty(propertyName);
+
+    if (property.IsNull() && fallBackOnDefaultContext)
+      return m_PropertyList->GetProperty(propertyName);
+
+    return property;
+  }
+
+  return nullptr;
+}
+
+mitk::BaseProperty * mitk::DataNode::GetNonConstProperty(const std::string &propertyName, const std::string &contextName, bool fallBackOnDefaultContext)
+{
+  if (propertyName.empty())
+    return nullptr;
+
+  if (contextName.empty())
+    return m_PropertyList->GetProperty(propertyName);
+
+  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+  if (m_MapOfPropertyLists.end() != propertyListIter)
+  {
+    auto property = propertyListIter->second->GetProperty(propertyName);
+
+    if (nullptr == property && fallBackOnDefaultContext)
+      return m_PropertyList->GetProperty(propertyName);
+
+    return property;
+  }
+
+  return nullptr;
+}
+
+void mitk::DataNode::SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName, bool fallBackOnDefaultContext)
+{
+  if (propertyName.empty())
+    return;
+
+  if (contextName.empty())
+  {
+    m_PropertyList->SetProperty(propertyName, property);
+    return;
+  }
+
+  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+  if (m_MapOfPropertyLists.end() != propertyListIter)
+  {
+    propertyListIter->second->SetProperty(propertyName, property);
+    return;
+  }
+
+  if (fallBackOnDefaultContext)
+  {
+    m_PropertyList->SetProperty(propertyName, property);
+    return;
+  }
+
+  mitkThrow() << "Unknown property context.";
+}
+
+std::vector<std::string> mitk::DataNode::GetPropertyNames(const std::string &contextName, bool includeDefaultContext) const
+{
+  std::vector<std::string> propertyNames;
+
+  if (contextName.empty())
+  {
+    for (auto property : *m_PropertyList->GetMap())
+      propertyNames.push_back(property.first);
+
+    return propertyNames;
+  }
+
+  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+  if (m_MapOfPropertyLists.end() != propertyListIter)
+  {
+    for (auto property : *propertyListIter->second->GetMap())
+      propertyNames.push_back(property.first);
+  }
+
+  if (includeDefaultContext)
+  {
+    for (auto property : *m_PropertyList->GetMap())
+    {
+      auto propertyNameIter = std::find(propertyNames.begin(), propertyNames.end(), property.first);
+
+      if (propertyNames.end() == propertyNameIter)
+        propertyNames.push_back(property.first);
+    }
+  }
+
+  return propertyNames;
+}
+
+std::vector<std::string> mitk::DataNode::GetPropertyContextNames() const
+{
+  return this->GetPropertyListNames();
+}

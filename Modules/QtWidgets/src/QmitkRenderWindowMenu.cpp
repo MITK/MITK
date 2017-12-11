@@ -71,7 +71,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
     m_MultiWidget(mw),
     m_Parent(parent)
 {
-  MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
+  MITK_DEBUG << "creating renderwindow menu on baserenderer " << b << ", flags=" << f;
 
   // Create Menu Widget
   this->CreateMenuWidget();

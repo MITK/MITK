@@ -14,18 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkIPropertyOwner_h
-#define mitkIPropertyOwner_h
+#ifndef mitkIPropertyProvider_h
+#define mitkIPropertyProvider_h
 
-#include <mitkIPropertyProvider.h>
+#include <mitkBaseProperty.h>
 #include <MitkCoreExports.h>
 
 namespace mitk
 {
-  class MITKCORE_EXPORT IPropertyOwner : public IPropertyProvider
+  class MITKCORE_EXPORT IPropertyProvider
   {
   public:
-    virtual ~IPropertyOwner();
+    virtual ~IPropertyProvider();
 
     /**
     * \brief Get property by its name.
@@ -39,20 +39,26 @@ namespace mitk
     *
     * \return Found property, nullptr otherwise.
     */
-    virtual BaseProperty * GetProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) = 0;
+    virtual BaseProperty::ConstPointer GetProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const = 0;
 
     /**
-    * \brief Add new or change existent property.
+    * \brief Query names of existing properties.
     *
-    * \param[in] propertyName Name of property.
-    * \param[in] property The actual property.
     * \param[in] contextName Optional, default is empty string (default
-                 context). Context in which the property is set.
-    * \param[in] fallBackOnDefaultContext Optional, default is false. Set
-    *            property in default context if given context does not
-    *            exist.
+    *            context). Search in specified context.
+    * \param[in] includeDefaultContext Optional, default is false. Include
+    *            default context.
+    *
+    * \return List of property names.
     */
-    virtual void SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) = 0;
+    virtual std::vector<std::string> GetPropertyNames(const std::string &contextName = "", bool includeDefaultContext = false) const = 0;
+
+    /**
+    * \brief Query names of existing contexts.
+    *
+    * \return List of context names.
+    */
+    virtual std::vector<std::string> GetPropertyContextNames() const = 0;
   };
 }
 

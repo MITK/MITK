@@ -93,8 +93,6 @@ protected:
   void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
   void showEvent(QShowEvent *event) override;
-  // overloaded paint handler
-  void paintEvent(QPaintEvent *event) override;
   // overloaded mouse press handler
   void mousePressEvent(QMouseEvent *event) override;
   // overloaded mouse double-click handler
@@ -109,6 +107,9 @@ protected:
   void enterEvent(QEvent *) override;
   // overloaded leave handler
   void leaveEvent(QEvent *) override;
+
+  // overloaded resize handler
+  void resizeGL(int w, int h) Q_DECL_OVERRIDE;
 
   /// \brief Simply says we accept the event type.
   void dragEnterEvent(QDragEnterEvent *event) override;

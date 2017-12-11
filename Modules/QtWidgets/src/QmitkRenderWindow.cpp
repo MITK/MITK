@@ -216,10 +216,11 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
   QVTKOpenGLWidget::leaveEvent(e);
 }
 
-void QmitkRenderWindow::paintEvent(QPaintEvent * /*event*/)
+//-----------------------------------------------------------------------------
+void QmitkRenderWindow::resizeGL(int w, int h)
 {
-  // We are using our own interaction and thus have to call the rendering manually.
-  this->GetRenderer()->GetRenderingManager()->RequestUpdate(GetRenderWindow());
+  this->GetRenderer()->GetRenderingManager()->ForceImmediateUpdate(GetRenderWindow());
+  QVTKOpenGLWidget::resizeGL(w, h);
 }
 
 void QmitkRenderWindow::moveEvent(QMoveEvent *event)

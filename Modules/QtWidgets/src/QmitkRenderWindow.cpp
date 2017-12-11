@@ -47,8 +47,6 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
   this->SetRenderWindow(m_InternalRenderWindow);
 
-  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
-
   if (renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
   {
     GetRenderWindow()->SetMultiSamples(0);
@@ -62,6 +60,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   {
     GetRenderWindow()->SetMultiSamples(0);
   }
+
+  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);

@@ -20,21 +20,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 #include <mitkGeometry3D.h>
 #include <mitkProportionalTimeGeometry.h>
+#include <mitkStringProperty.h>
+#include <mitkUIDGenerator.h>
 
-mitk::BaseData::BaseData() : m_SourceOutputIndexDuplicate(0), m_Initialized(true)
+mitk::BaseData::BaseData()
+  : m_SourceOutputIndexDuplicate(0),
+    m_Initialized(true),
+    m_PropertyList(PropertyList::New()),
+    m_TimeGeometry(ProportionalTimeGeometry::New())
 {
-  m_TimeGeometry = mitk::ProportionalTimeGeometry::New();
-  m_PropertyList = PropertyList::New();
+  UIDGenerator generator;
+  this->SetProperty("uid", StringProperty::New(generator.GetUID()));
 }
 
 mitk::BaseData::BaseData(const BaseData &other)
   : itk::DataObject(),
     mitk::OperationActor(),
     m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
-    m_Initialized(other.m_Initialized)
+    m_Initialized(other.m_Initialized),
+    m_PropertyList(other.m_PropertyList->Clone()),
+    m_TimeGeometry(other.m_TimeGeometry->Clone())
 {
-  m_TimeGeometry = dynamic_cast<TimeGeometry *>(other.m_TimeGeometry->Clone().GetPointer());
-  m_PropertyList = other.m_PropertyList->Clone();
 }
 
 mitk::BaseData::~BaseData()
@@ -286,4 +292,13 @@ void mitk::BaseData::PrintSelf(std::ostream &os, itk::Indent indent) const
       os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;
     }
   }
+}
+
+mitk::IIdentifiable::UIDType mitk::BaseData::GetUID() const
+{
+  auto uidProperty = dynamic_cast<StringProperty *>(this->GetProperty("uid").GetPointer());
+
+  return nullptr != uidProperty
+    ? uidProperty->GetValue()
+    : "";
 }

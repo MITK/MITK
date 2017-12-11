@@ -108,7 +108,8 @@ protected:
   // overloaded leave handler
   void leaveEvent(QEvent *) override;
 
-  // overloaded resize handler
+  // Overloaded resize handler, see decs in QVTKOpenGLWidget.
+  // Basically, we have to ensure the VTK rendering is updated for each change in window size.
   void resizeGL(int w, int h) Q_DECL_OVERRIDE;
 
   /// \brief Simply says we accept the event type.

@@ -46,9 +46,6 @@ private:
 public:
   void setUp()
   {
-    // check whether sufficient openGL is available
-    mitk::RenderingTestHelper openGlTest(640, 480);
-
     // Create DataNode as a container for our PointSet to be tested
     m_TestPointSetNode = mitk::DataNode::New();
 
@@ -69,7 +66,10 @@ public:
   void tearDown()
   {
     // destroy all objects
-    m_TestPointSetNode->SetDataInteractor(nullptr);
+    if (m_TestPointSetNode != nullptr)
+    {
+      m_TestPointSetNode->SetDataInteractor(nullptr);
+    }
     m_TestPointSetNode = nullptr;
     m_TestPointSet = nullptr;
     m_DataInteractor = nullptr;
@@ -197,6 +197,11 @@ public:
     // They are not stored in a file and therefore not equal.
     CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
   }
+
+  // this is only for the OpenGL check
+  mitkPointSetDataInteractorTestSuite() : m_RenderingTestHelper(300, 300) {}
+  private:
+    mitk::RenderingTestHelper m_RenderingTestHelper;
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPointSetDataInteractor)

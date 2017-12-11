@@ -62,8 +62,6 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
 public:
   void setUp()
   {
-    // check whether sufficient openGL is available
-    mitk::RenderingTestHelper openGlTest(640, 480);
     /// \todo Fix leaks of vtkObjects. Bug 18095.
     vtkDebugLeaks::SetExitError(0);
   }
@@ -198,6 +196,11 @@ public:
     figure = mitk::PlanarRectangle::New();
     RunTest(figure, "InteractionTestData/Interactions/Rectangle.xml", "InteractionTestData/ReferenceData/Rectangle.pf");
   }
+
+  // this is only for the OpenGL check
+  mitkPlanarFigureInteractionTestSuite() : m_RenderingTestHelper(300, 300) {}
+  private:
+    mitk::RenderingTestHelper m_RenderingTestHelper;
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPlanarFigureInteraction)

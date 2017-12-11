@@ -19,10 +19,11 @@
 
 #include "mitkRenderWindowBase.h"
 
-#include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
 #include <MitkQtWidgetsExports.h>
+
 #include <vtkGenericOpenGLRenderWindow.h>
+#include <QVTKOpenGLWidget.h>
 
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
@@ -36,7 +37,7 @@ class QInputEvent;
  * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
  */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindow : public QVTKWidget, public mitk::RenderWindowBase
+class MITKQTWIDGETS_EXPORT QmitkRenderWindow : public QVTKOpenGLWidget, public mitk::RenderWindowBase
 {
   Q_OBJECT
 
@@ -162,6 +163,8 @@ private:
   bool m_MenuWidgetActivated;
 
   unsigned int m_LayoutIndex;
+
+  vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_InternalRenderWindow;
 };
 
 #endif

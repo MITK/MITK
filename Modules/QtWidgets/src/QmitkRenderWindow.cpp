@@ -42,17 +42,12 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
                                      mitk::VtkPropRenderer * /*renderer*/,
                                      mitk::RenderingManager *renderingManager,
                                      mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(nullptr), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+  : QVTKOpenGLWidget(parent), m_ResendQtEvents(true), m_MenuWidget(nullptr), m_MenuWidgetActivated(false), m_LayoutIndex(0)
 {
-  // Needed if QVTKWidget2 is used instead of QVTKWidget
-  // this will be fixed in VTK source if change 18864 is accepted
-  /*QGLFormat newform = this->format();
-  newform.setSamples(8);
-  this->setFormat(newform);*/
+  m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+  this->SetRenderWindow(m_InternalRenderWindow);
 
-  QSurfaceFormat surfaceFormat = windowHandle()->format();
-  surfaceFormat.setStencilBufferSize(8);
-  windowHandle()->setFormat(surfaceFormat);
+  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
 
   if (renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
   {
@@ -67,8 +62,6 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   {
     GetRenderWindow()->SetMultiSamples(0);
   }
-
-  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
@@ -115,7 +108,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   {
-    QVTKWidget::mousePressEvent(me);
+    QVTKOpenGLWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -130,7 +123,7 @@ void QmitkRenderWindow::mouseDoubleClickEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   {
-    QVTKWidget::mousePressEvent(me);
+    QVTKOpenGLWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -145,7 +138,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mReleaseEvent.GetPointer()))
   {
-    QVTKWidget::mouseReleaseEvent(me);
+    QVTKOpenGLWidget::mouseReleaseEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -163,7 +156,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
   {
-    QVTKWidget::mouseMoveEvent(me);
+    QVTKOpenGLWidget::mouseMoveEvent(me);
   }
 }
 
@@ -175,7 +168,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 
   if (!this->HandleEvent(mWheelEvent.GetPointer()))
   {
-    QVTKWidget::wheelEvent(we);
+    QVTKOpenGLWidget::wheelEvent(we);
   }
 
   if (m_ResendQtEvents)
@@ -190,7 +183,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
   if (!this->HandleEvent(keyEvent.GetPointer()))
   {
-    QVTKWidget::keyPressEvent(ke);
+    QVTKOpenGLWidget::keyPressEvent(ke);
   }
 
   if (m_ResendQtEvents)
@@ -200,7 +193,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
   // TODO implement new event
-  QVTKWidget::enterEvent(e);
+  QVTKOpenGLWidget::enterEvent(e);
 }
 
 void QmitkRenderWindow::DeferredHideMenu()
@@ -220,7 +213,7 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
   if (m_MenuWidget)
     m_MenuWidget->smoothHide();
 
-  QVTKWidget::leaveEvent(e);
+  QVTKOpenGLWidget::leaveEvent(e);
 }
 
 void QmitkRenderWindow::paintEvent(QPaintEvent * /*event*/)
@@ -231,7 +224,7 @@ void QmitkRenderWindow::paintEvent(QPaintEvent * /*event*/)
 
 void QmitkRenderWindow::moveEvent(QMoveEvent *event)
 {
-  QVTKWidget::moveEvent(event);
+  QVTKOpenGLWidget::moveEvent(event);
 
   // after a move the overlays need to be positioned
   emit moved();
@@ -239,7 +232,7 @@ void QmitkRenderWindow::moveEvent(QMoveEvent *event)
 
 void QmitkRenderWindow::showEvent(QShowEvent *event)
 {
-  QVTKWidget::showEvent(event);
+  QVTKOpenGLWidget::showEvent(event);
 
   // this singleshot is necessary to have the overlays positioned correctly after initial show
   // simple call of moved() is no use here!!

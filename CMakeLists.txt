@@ -768,6 +768,13 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
 set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_PACKAGE_DEPENDS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMake/PackageDepends)
+  if(EXISTS ${MITK_PACKAGE_DEPENDS_EXTENSION_DIR})
+    list(APPEND MODULES_PACKAGE_DEPENDS_DIRS ${MITK_PACKAGE_DEPENDS_EXTENSION_DIR})
+  endif()
+endforeach()
+
 if(NOT MITK_USE_SYSTEM_Boost)
   set(Boost_NO_SYSTEM_PATHS 1)
 endif()
@@ -1047,18 +1054,23 @@ add_subdirectory(Utilities)
 
 add_subdirectory(Modules)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/ModuleList.cmake")
+mitkFunctionWhitelistModules(MITK MITK_MODULES)
+
 foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
   set(MITK_MODULES_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Modules)
-  if(EXISTS ${MITK_MODULES_EXTENSION_DIR})
-    add_subdirectory(${MITK_MODULES_EXTENSION_DIR} Modules)
+  if(EXISTS ${MITK_MODULES_EXTENSION_DIR}/ModuleList.cmake)
+    set(MITK_MODULES "")
+    include(${MITK_MODULES_EXTENSION_DIR}/ModuleList.cmake)
+    foreach(mitk_module ${MITK_MODULES})
+      add_subdirectory(${MITK_MODULES_EXTENSION_DIR}/${mitk_module} Modules/${mitk_module})
+    endforeach()
   endif()
 endforeach()
 
 if(MITK_USE_BLUEBERRY)
 
   set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
-
-  set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
   # Plug-in testing (needs some work to be enabled again)
   if(BUILD_TESTING)

@@ -552,7 +552,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
 
   if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
   {
-    m_CurrentPlane = const_cast<PlaneGeometry *>(planeGeometry);
+    m_CurrentPlane = planeGeometry;
     m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
     m_WorkingNode->ReplaceProperty("color", workingNode->GetProperty("color"));
     m_WorkingNode->SetData(m_WorkingSlice);
@@ -570,7 +570,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
       m_CurrentPlane = nullptr;
       m_WorkingSlice = nullptr;
       m_WorkingNode = nullptr;
-      m_CurrentPlane = const_cast<PlaneGeometry *>(planeGeometry);
+      m_CurrentPlane = planeGeometry;
       m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
 
       m_WorkingNode = mitk::DataNode::New();

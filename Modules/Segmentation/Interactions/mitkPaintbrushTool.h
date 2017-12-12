@@ -97,7 +97,7 @@ namespace mitk
     int m_LastContourSize;
 
     Image::Pointer m_WorkingSlice;
-    PlaneGeometry::Pointer m_CurrentPlane;
+    PlaneGeometry::ConstPointer m_CurrentPlane;
     DataNode::Pointer m_WorkingNode;
     mitk::Point3D m_LastPosition;
   };

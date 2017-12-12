@@ -52,7 +52,7 @@ std::string mitk::ContourModelSerializer::Serialize()
   {
     ContourModelWriter writer;
     writer.SetOutputLocation(fullname);
-    writer.SetInput(const_cast<ContourModel *>(contour));
+    writer.SetInput(contour);
     writer.Write();
   }
   catch (std::exception &e)

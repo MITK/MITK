@@ -55,7 +55,7 @@ void ConvertBackToCorrectPixelType(
 
 void mitk::CorrectorAlgorithm::GenerateData()
 {
-  Image::Pointer inputImage = const_cast<Image *>(ImageToImageFilter::GetInput(0));
+  Image::Pointer inputImage = ImageToImageFilter::GetInput(0);
 
   if (inputImage.IsNull() || inputImage->GetDimension() != 2)
   {

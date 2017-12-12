@@ -97,8 +97,7 @@ void mitk::ImageToImageFilter::GenerateInputRequestedRegion()
   {
     if (this->GetInput(idx))
     {
-      mitk::ImageToImageFilter::InputImagePointer input =
-        const_cast<mitk::ImageToImageFilter::InputImageType *>(this->GetInput(idx));
+      mitk::ImageToImageFilter::InputImagePointer input = this->GetInput(idx);
 
       // Use the function object RegionCopier to copy the output region
       // to the input.  The default region copier has default implementations

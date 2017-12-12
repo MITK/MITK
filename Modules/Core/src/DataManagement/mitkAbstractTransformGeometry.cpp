@@ -123,7 +123,7 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &atPt3d_mm,
       pt3d_units[i] += GetIndexToWorldTransform()->GetInverseMatrix()[i][j] * temp[j];
   }
 
-  return const_cast<BoundingBox *>(this->GetBoundingBox())->IsInside(pt3d_units);
+  return this->GetBoundingBox()->IsInside(pt3d_units);
 }
 
 bool mitk::AbstractTransformGeometry::Project(const mitk::Vector3D & /*vec3d_mm*/,

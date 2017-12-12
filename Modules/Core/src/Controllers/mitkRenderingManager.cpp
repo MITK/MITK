@@ -325,7 +325,7 @@ namespace mitk
     vtkObject::GlobalWarningDisplayOff();
 
     if ((timeGeometry.IsNotNull()) &&
-        (const_cast<mitk::BoundingBox *>(timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps))
+        (timeGeometry->GetBoundingBoxInWorld()->GetDiagonalLength2() > mitk::eps))
     {
       boundingBoxInitialized = true;
     }
@@ -435,7 +435,7 @@ namespace mitk
     vtkObject::GlobalWarningDisplayOff();
 
     if ((geometry != nullptr) &&
-        (const_cast<mitk::BoundingBox *>(geometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps))
+        (geometry->GetBoundingBoxInWorld()->GetDiagonalLength2() > mitk::eps))
     {
       boundingBoxInitialized = true;
     }

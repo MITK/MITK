@@ -60,7 +60,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     return;
   }
 
-  auto *input = const_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
+  auto *input = dynamic_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
   input->Update();
 
   if (input == nullptr)

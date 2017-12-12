@@ -57,7 +57,7 @@ std::string mitk::TensorImageSerializer::Serialize()
   {
     NrrdTensorImageWriter writer;
     writer.SetOutputLocation(fullname);
-    writer.SetInput(const_cast<TensorImage*>(image));
+    writer.SetInput(image);
     writer.Write();
   }
   catch (std::exception& e)

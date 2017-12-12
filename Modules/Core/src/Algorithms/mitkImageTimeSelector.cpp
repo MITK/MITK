@@ -87,8 +87,7 @@ void mitk::ImageTimeSelector::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  ImageToImageFilter::InputImagePointer input =
-    const_cast<mitk::ImageToImageFilter::InputImageType *>(this->GetInput());
+  ImageToImageFilter::InputImagePointer input = this->GetInput();
   Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;

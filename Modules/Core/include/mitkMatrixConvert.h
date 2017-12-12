@@ -77,12 +77,11 @@ namespace mitk
     destTransform->SetOffset(offset);
 
     typename TTransformType1::MatrixType::InternalMatrixType &sourceVnlMatrix =
-      const_cast<typename TTransformType1::MatrixType::InternalMatrixType &>(
-        sourceTransform->GetMatrix().GetVnlMatrix());
+        sourceTransform->GetMatrix().GetVnlMatrix();
 
     // transfer matrix
     typename TTransformType2::MatrixType::InternalMatrixType &destVnlMatrix =
-      const_cast<typename TTransformType2::MatrixType::InternalMatrixType &>(destTransform->GetMatrix().GetVnlMatrix());
+      destTransform->GetMatrix().GetVnlMatrix();
 
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j)
@@ -98,12 +97,11 @@ namespace mitk
   void GetRotation(const mitk::BaseGeometry *geometry, TMatrixType &itkmatrix)
   {
     const mitk::Vector3D &spacing = geometry->GetSpacing();
-    typename mitk::BaseGeometry::TransformType::MatrixType::InternalMatrixType &geometryVnlMatrix =
-      const_cast<typename mitk::BaseGeometry::TransformType::MatrixType::InternalMatrixType &>(
-        geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix());
+    typename const mitk::BaseGeometry::TransformType::MatrixType::InternalMatrixType &geometryVnlMatrix =
+        geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
 
     typename TMatrixType::InternalMatrixType &outputVnlMatrix =
-      const_cast<typename TMatrixType::InternalMatrixType &>(itkmatrix.GetVnlMatrix());
+      itkmatrix.GetVnlMatrix();
 
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j)
@@ -141,7 +139,7 @@ namespace mitk
 
     // copy in destination itkTransform
     typename TTransformType::MatrixType::InternalMatrixType &destVnlMatrix =
-      const_cast<typename TTransformType::MatrixType::InternalMatrixType &>(itkTransform->GetMatrix().GetVnlMatrix());
+      itkTransform->GetMatrix().GetVnlMatrix();
 
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j)

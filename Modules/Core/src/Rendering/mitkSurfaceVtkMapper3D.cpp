@@ -71,7 +71,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   //
   // set the input-object at time t for the mapper
   //
-  mitk::Surface::Pointer input = const_cast<mitk::Surface *>(this->GetInput());
+  mitk::Surface::ConstPointer input = this->GetInput();
   vtkSmartPointer<vtkPolyData> polydata = input->GetVtkPolyData(this->GetTimestep());
   if (polydata == nullptr)
   {

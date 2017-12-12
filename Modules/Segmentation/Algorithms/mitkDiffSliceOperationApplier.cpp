@@ -49,7 +49,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation(Operation *operation)
 
     mitk::Image::Pointer slice = imageOperation->GetSlice();
     // Set the slice as 'input'
-    reslice->SetInputSlice(const_cast<vtkImageData *>(slice->GetVtkImageData()));
+    reslice->SetInputSlice(slice->GetVtkImageData());
 
     // set overwrite mode to true to write back to the image volume
     reslice->SetOverwriteMode(true);

@@ -376,7 +376,7 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   // Create undo operation by caching the not yet modified slices
   mitk::Image::Pointer originalSlice = GetAffectedImageSliceAs2DImage(sliceInfo.plane, image, sliceInfo.timestep);
   auto *undoOperation =
-    new DiffSliceOperation(const_cast<mitk::Image *>(image),
+    new DiffSliceOperation(image,
                            originalSlice,
                            dynamic_cast<SlicedGeometry3D *>(originalSlice->GetGeometry()),
                            sliceInfo.timestep,

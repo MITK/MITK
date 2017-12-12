@@ -342,7 +342,6 @@ mitk::EquiDistantBlocksSorter
   // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
   SliceGroupingAnalysisResult result;
 
-  // we const_cast here, because I could not use a map.at(), which would make the code much more readable
   const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)
   const DICOMTag    tagImageOrientation = DICOMTag(0x0020, 0x0037); // Image Orientation
 

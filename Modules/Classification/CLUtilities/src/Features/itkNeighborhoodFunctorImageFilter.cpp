@@ -46,7 +46,7 @@ NeighborhoodFunctorImageFilter< TInputImage, TFeatureImageType, FunctorType >
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  auto * inputPtr = const_cast< TInputImage * >( this->GetInput() );
+  TInputImage * inputPtr = this->GetInput();
 
   if ( !inputPtr )
   {

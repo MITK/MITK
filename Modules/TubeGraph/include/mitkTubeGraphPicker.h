@@ -40,7 +40,7 @@ namespace mitk
 
   protected:
     Point3D m_WorldPosition;
-    TubeGraph::Pointer m_TubeGraph;
+    TubeGraph::ConstPointer m_TubeGraph;
     TubeGraphProperty::Pointer m_TubeGraphProperty;
   };
 

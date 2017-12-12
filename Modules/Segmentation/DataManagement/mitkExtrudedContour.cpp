@@ -116,7 +116,7 @@ bool mitk::ExtrudedContour::IsInside(const Point3D &worldPoint) const
       this->m_Polygon->PointInPolygon(x,
                                       m_Polygon->Points->GetNumberOfPoints(),
                                       ((vtkDoubleArray *)this->m_Polygon->Points->GetData())->GetPointer(0),
-                                      (double *)const_cast<mitk::ExtrudedContour *>(this)->m_ProjectedContourBounds,
+                                      (double *)this->m_ProjectedContourBounds,
                                       polygonNormal) == 1)
     return true;
   else

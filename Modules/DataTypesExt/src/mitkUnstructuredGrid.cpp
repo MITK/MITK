@@ -128,7 +128,7 @@ mitk::UnstructuredGrid::UnstructuredGrid(const mitk::UnstructuredGrid &other)
     m_GridSeries = other.m_GridSeries;
     m_Initialized = other.m_Initialized;
   }
-  this->SetRequestedRegion(const_cast<mitk::UnstructuredGrid *>(&other));
+  this->SetRequestedRegion(&other);
 }
 
 mitk::UnstructuredGrid::~UnstructuredGrid()
@@ -181,7 +181,7 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   }
   timeGeometry->Update();
 
-  mitk::BoundingBox::Pointer bb = const_cast<mitk::BoundingBox *>(timeGeometry->GetBoundingBoxInWorld());
+  mitk::BoundingBox::Pointer bb = timeGeometry->GetBoundingBoxInWorld();
   itkDebugMacro(<< "boundingbox min: " << bb->GetMinimum());
   itkDebugMacro(<< "boundingbox max: " << bb->GetMaximum());
   m_CalculateBoundingBox = false;

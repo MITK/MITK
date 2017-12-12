@@ -153,14 +153,14 @@ mitk::Image::Pointer mitk::PicFileReader::CreateImage()
 
   std::string fileName = this->GetLocalFileName();
 
-  mitkIpPicDescriptor *header = mitkIpPicGetHeader(const_cast<char *>(fileName.c_str()), nullptr);
+  mitkIpPicDescriptor *header = mitkIpPicGetHeader(fileName.c_str(), nullptr);
 
   if (!header)
   {
     mitkThrow() << "File could not be read.";
   }
 
-  header = mitkIpPicGetTags(const_cast<char *>(fileName.c_str()), header);
+  header = mitkIpPicGetTags(fileName.c_str(), header);
 
   int channels = 1;
 
@@ -263,7 +263,7 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
 {
   mitkIpPicDescriptor *outputPic = mitkIpPicNew();
   outputPic = CastToIpPicDescriptor(output, nullptr, outputPic);
-  mitkIpPicDescriptor *pic = mitkIpPicGet(const_cast<char *>(this->GetLocalFileName().c_str()), outputPic);
+  mitkIpPicDescriptor *pic = mitkIpPicGet(this->GetLocalFileName().c_str(), outputPic);
   // comes upside-down (in MITK coordinates) from PIC file
   ConvertHandedness(pic);
 

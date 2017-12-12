@@ -242,7 +242,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     return;
   }
 
-  PlaneGeometryData::Pointer input = const_cast<PlaneGeometryData *>(this->GetInput());
+  PlaneGeometryData::ConstPointer input = this->GetInput();
   mitk::DataNode *geometryDataNode = renderer->GetCurrentWorldPlaneGeometryNode();
   const PlaneGeometryData *rendererWorldPlaneGeometryData =
     dynamic_cast<PlaneGeometryData *>(geometryDataNode->GetData());

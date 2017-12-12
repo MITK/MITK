@@ -136,7 +136,7 @@ bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const
   if (!IsInitialized())
     return false;
 
-  vtkPolyData *polyData = const_cast<Surface *>(this)->GetVtkPolyData(t);
+  vtkPolyData *polyData = this->GetVtkPolyData(t);
 
   return polyData == nullptr || (polyData->GetNumberOfLines() == 0 && polyData->GetNumberOfPolys() == 0 &&
                                  polyData->GetNumberOfStrips() == 0 && polyData->GetNumberOfVerts() == 0);
@@ -335,7 +335,7 @@ void mitk::Surface::Graft(const DataObject *data)
   for (unsigned int i = 0; i < surface->GetSizeOfPolyDataSeries(); ++i)
   {
     m_PolyDatas.push_back(vtkSmartPointer<vtkPolyData>::New());
-    m_PolyDatas.back()->DeepCopy(const_cast<mitk::Surface *>(surface)->GetVtkPolyData(i));
+    m_PolyDatas.back()->DeepCopy(surface->GetVtkPolyData(i));
   }
 }
 

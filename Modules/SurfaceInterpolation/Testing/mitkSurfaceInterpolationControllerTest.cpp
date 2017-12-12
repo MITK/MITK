@@ -410,9 +410,9 @@ public:
     m_Controller->AddNewContour(surf_6);
 
     // Check if all contours are there
-    mitk::Surface *contour_4 = const_cast<mitk::Surface *>(m_Controller->GetContour(contourInfo4));
-    mitk::Surface *contour_5 = const_cast<mitk::Surface *>(m_Controller->GetContour(contourInfo5));
-    mitk::Surface *contour_6 = const_cast<mitk::Surface *>(m_Controller->GetContour(contourInfo6));
+    auto contour_4 = m_Controller->GetContour(contourInfo4);
+    auto contour_5 = m_Controller->GetContour(contourInfo5);
+    auto contour_6 = m_Controller->GetContour(contourInfo6);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 3);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_4->GetVtkPolyData()), *(contour_4->GetVtkPolyData()), 0.000001, true));
@@ -433,15 +433,15 @@ public:
     surf_7->SetVtkPolyData(poly_7);
 
     m_Controller->AddNewContour(surf_7);
-    mitk::Surface *contour_7 = const_cast<mitk::Surface *>(m_Controller->GetContour(contourInfo5));
+    auto contour_7 = m_Controller->GetContour(contourInfo5);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_7->GetVtkPolyData()), *(contour_7->GetVtkPolyData()), 0.000001, true));
 
     // Change session and test if all contours are available
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    mitk::Surface *contour_8 = const_cast<mitk::Surface *>(m_Controller->GetContour(contourInfo1));
-    mitk::Surface *contour_9 = const_cast<mitk::Surface *>(m_Controller->GetContour(contourInfo2));
-    mitk::Surface *contour_10 = const_cast<mitk::Surface *>(m_Controller->GetContour(contourInfo3));
+    auto contour_8 = m_Controller->GetContour(contourInfo1);
+    auto contour_9 = m_Controller->GetContour(contourInfo2);
+    auto contour_10 = m_Controller->GetContour(contourInfo3);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 3);
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!",
                            mitk::Equal(*(surf_1->GetVtkPolyData()), *(contour_8->GetVtkPolyData()), 0.000001, true));

@@ -174,7 +174,7 @@ namespace mitk
       (m_Geometry->GetTimeGeometry()->CountTimeSteps() == 0))
       return;
 
-    GenerateTimeInInputRegion(output, const_cast<mitk::Image *>(this->GetInput()));
+    GenerateTimeInInputRegion(output, this->GetInput());
   }
 
   void BoundingShapeCropper::GenerateOutputInformation()
@@ -184,7 +184,7 @@ namespace mitk
     if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
       return;
 
-    mitk::Image::Pointer input = const_cast<mitk::Image *>(this->GetInput());
+    mitk::Image::Pointer input = this->GetInput();
 
     if (input.IsNull())
     {

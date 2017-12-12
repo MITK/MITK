@@ -197,7 +197,7 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometr
   // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
   // SetIndexToWorldTransform(transform);
 
-  this->SetIndexToWorldTransform(const_cast<AffineTransform3D *>(geometry2D->GetIndexToWorldTransform()));
+  this->SetIndexToWorldTransform(geometry2D->GetIndexToWorldTransform());
 
   mitk::Vector3D spacing;
   FillVector3D(spacing, geometry2D->GetExtentInMM(0) / bounds[1], geometry2D->GetExtentInMM(1) / bounds[3], zSpacing);

@@ -52,7 +52,7 @@ std::string mitk::LabelSetImageSerializer::Serialize()
 
   try
   {
-    mitk::IOUtil::Save(const_cast<LabelSetImage *>(image), fullname);
+    mitk::IOUtil::Save(image, fullname);
     //    LabelSetImageWriter::Pointer writer = LabelSetImageWriter::New();
     //    writer->SetFileName(fullname);
     //    writer->SetInput(const_cast<LabelSetImage*>(image));

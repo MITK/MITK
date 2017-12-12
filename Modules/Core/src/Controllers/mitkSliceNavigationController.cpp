@@ -90,7 +90,7 @@ namespace mitk
   {
   if ( geometry != nullptr )
     {
-      if (const_cast<BoundingBox *>(geometry->GetBoundingBox())->GetDiagonalLength2() < eps)
+      if (geometry->GetBoundingBox()->GetDiagonalLength2() < eps)
       {
         itkWarningMacro("setting an empty bounding-box");
       geometry = nullptr;
@@ -108,7 +108,7 @@ namespace mitk
   {
   if ( geometry != nullptr )
     {
-      if (const_cast<BoundingBox *>(geometry->GetBoundingBoxInWorld())->GetDiagonalLength2() < eps)
+      if (geometry->GetBoundingBoxInWorld()->GetDiagonalLength2() < eps)
       {
         itkWarningMacro("setting an empty bounding-box");
         geometry = nullptr;

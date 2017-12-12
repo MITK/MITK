@@ -61,12 +61,12 @@ mitk::Image::Pointer mitk::DWIHeadMotionCorrectionFilter::GetCorrectedImage() co
 }
 
 void mitk::DWIHeadMotionCorrectionFilter::UpdateOutputInformation()
-{
+  {
   Superclass::UpdateOutputInformation();
-}
+        }
 
 void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
-{
+  {
   InputImageType::Pointer input = const_cast<InputImageType*>(this->GetInput(0));
 
   if (!DPH::IsDiffusionWeightedImage(input))
@@ -123,7 +123,7 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
     ITKDiffusionVolumeType::Pointer registered_itk_image = ITKDiffusionVolumeType::New();
     mitk::CastToItkImage(registered_mitk_image, registered_itk_image);
     registered_itk_images.push_back(registered_itk_image);
-  }
+    }
 
   int i=1;
   for (auto image : registered_itk_images)

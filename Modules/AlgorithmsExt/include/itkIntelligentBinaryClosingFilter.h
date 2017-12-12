@@ -75,7 +75,7 @@ namespace itk
     {
       // processObject is not const-correct so a const_cast is needed here
       this->ProcessObject::SetNthInput(0, const_cast<InputImageType *>(input));
-      m_DilateImageFilter->SetInput(const_cast<InputImageType *>(input));
+      m_DilateImageFilter->SetInput(input);
     }
 
     using Superclass::SetInput;

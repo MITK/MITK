@@ -163,7 +163,7 @@ void QmitkSliceWidget::InitWidget(mitk::SliceNavigationController::ViewDirection
       timeGeometry->SetStepDuration(1.0);
     }
 
-    if (const_cast<mitk::BoundingBox *>(timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2() >= mitk::eps)
+    if (timeGeometry->GetBoundingBoxInWorld()->GetDiagonalLength2() >= mitk::eps)
     {
       controller->SetInputWorldTimeGeometry(timeGeometry);
       controller->Update();

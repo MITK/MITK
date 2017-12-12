@@ -89,8 +89,8 @@ namespace mitk
   void HeightFieldSurfaceClipImageFilter::GenerateInputRequestedRegion()
   {
     Image *outputImage = this->GetOutput();
-    auto *inputImage = const_cast<Image *>(this->GetInput(0));
-    const auto *inputSurface = dynamic_cast<const Surface *>(this->GetInput(1));
+    Image *inputImage = this->GetInput(0);
+    const Surface *inputSurface = dynamic_cast<const Surface *>(this->GetInput(1));
 
     if (!outputImage->IsInitialized() || inputSurface == nullptr)
     {
@@ -360,7 +360,7 @@ namespace mitk
 
     for (unsigned int i = 1; i < this->GetNumberOfInputs(); ++i)
     {
-      auto *inputSurface = const_cast<Surface *>(dynamic_cast<Surface *>(itk::ProcessObject::GetInput(i)));
+      Surface *inputSurface = dynamic_cast<Surface *>(itk::ProcessObject::GetInput(i));
 
       if (!outputImage->IsInitialized() || inputSurface == nullptr)
         return;

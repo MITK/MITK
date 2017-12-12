@@ -78,7 +78,7 @@ void mitk::ExtractSliceFilter::GenerateInputRequestedRegion()
   // This is needed because an oblique plane has a larger extent then the image
   // and the in pipeline it is checked via PropagateResquestedRegion(). But the
   // extent of the slice is actually fitting because it is oblique within the image.
-  ImageToImageFilter::InputImagePointer input = const_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
+  ImageToImageFilter::InputImagePointer input = this->GetInput();
   input->SetRequestedRegionToLargestPossibleRegion();
 }
 
@@ -89,7 +89,7 @@ mitk::ScalarType *mitk::ExtractSliceFilter::GetOutputSpacing()
 
 void mitk::ExtractSliceFilter::GenerateData()
 {
-  auto *input = const_cast<mitk::Image *>(this->GetInput());
+  mitk::Image *input = this->GetInput();
 
   if (!input)
   {

@@ -255,7 +255,7 @@ void mitk::ImageWriter::GenerateData()
   remove(m_FileName.c_str());
 
   // Creating clone of input image, since i might change the geometry
-  mitk::Image::Pointer input = const_cast<mitk::Image *>(this->GetInput())->Clone();
+  mitk::Image::Pointer input = this->GetInput()->Clone();
 
   // Check if geometry information will be lost
   if (input->GetDimension() == 2)

@@ -68,7 +68,7 @@ void mitk::MRNormTwoRegionsBasedFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  auto* input = const_cast< mitk::Image * > ( this->GetInput() );
+  mitk::Image* input = this->GetInput();
 
   input->SetRequestedRegionToLargestPossibleRegion();
 }

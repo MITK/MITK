@@ -158,7 +158,7 @@ vtkActor *mitk::SplineVtkMapper3D::GetSplinesActor()
 
 void mitk::SplineVtkMapper3D::UpdateSpline()
 {
-  mitk::PointSet::Pointer input = const_cast<mitk::PointSet *>(this->GetInput());
+  auto input = this->GetInput();
   //  input->Update();//already done in superclass
 
   // Number of points on the spline

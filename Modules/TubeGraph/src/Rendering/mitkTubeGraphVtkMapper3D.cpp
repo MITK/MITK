@@ -139,7 +139,7 @@ void mitk::TubeGraphVtkMapper3D::RenderTubeGraphPropertyInformation(mitk::BaseRe
 {
   MITK_INFO << "Render tube graph property information!";
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-  TubeGraph::Pointer tubeGraph = const_cast<mitk::TubeGraph *>(this->GetInput());
+  TubeGraph::ConstPointer tubeGraph = this->GetInput();
   TubeGraphProperty::Pointer tubeGraphProperty =
     dynamic_cast<TubeGraphProperty *>(tubeGraph->GetProperty("Tube Graph.Visualization Information").GetPointer());
 

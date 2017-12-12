@@ -214,6 +214,6 @@ m_MaximumNumberOfPoints = 80*80*80;
 */
 mitk::Image* mitk::VectorImageVtkGlyphMapper3D::GetInput()
 {
-  return const_cast<mitk::Image*>( dynamic_cast<mitk::Image*>( GetDataNode()->GetData() ) );
+  return dynamic_cast<mitk::Image*>( GetDataNode()->GetData() );
 }
 

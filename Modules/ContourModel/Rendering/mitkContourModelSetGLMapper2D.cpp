@@ -70,7 +70,7 @@ void mitk::ContourModelSetGLMapper2D::MitkRender(mitk::BaseRenderer *renderer, m
 
 mitk::ContourModelSet *mitk::ContourModelSetGLMapper2D::GetInput(void)
 {
-  return const_cast<mitk::ContourModelSet *>(static_cast<const mitk::ContourModelSet *>(GetDataNode()->GetData()));
+  return static_cast<mitk::ContourModelSet *>(GetDataNode()->GetData());
 }
 
 void mitk::ContourModelSetGLMapper2D::SetDefaultProperties(mitk::DataNode *node,

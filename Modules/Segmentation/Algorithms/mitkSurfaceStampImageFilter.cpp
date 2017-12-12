@@ -44,7 +44,7 @@ void mitk::SurfaceStampImageFilter::GenerateInputRequestedRegion()
   if ((outputImage->IsInitialized() == false))
     return;
 
-  GenerateTimeInInputRegion(outputImage, const_cast<mitk::Image *>(this->GetInput()));
+  GenerateTimeInInputRegion(outputImage, this->GetInput());
 }
 
 void mitk::SurfaceStampImageFilter::GenerateOutputInformation()
@@ -203,7 +203,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
 
 void mitk::SurfaceStampImageFilter::SurfaceStampBinaryOutputProcessing(MeshType *mesh)
 {
-  auto *inputImage = const_cast<mitk::Image *>(this->GetInput());
+  auto *inputImage = this->GetInput();
 
   mitk::Image::Pointer outputImage = this->GetOutput();
 

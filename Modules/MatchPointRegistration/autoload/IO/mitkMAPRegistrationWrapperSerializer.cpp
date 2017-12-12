@@ -59,7 +59,7 @@ std::string mitk::MAPRegistrationWrapperSerializer::Serialize()
   {
     MAPRegistrationWrapperIO writer;
     writer.SetOutputLocation(fullname);
-    writer.AbstractFileWriter::SetInput( const_cast<mitk::MAPRegistrationWrapper*>( wrapper ) );
+    writer.AbstractFileWriter::SetInput( dynamic_cast<const mitk::MAPRegistrationWrapper*>( wrapper ) );
     writer.Write();
   }
   catch (std::exception& e)

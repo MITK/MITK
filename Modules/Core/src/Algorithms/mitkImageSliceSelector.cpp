@@ -58,8 +58,7 @@ void mitk::ImageSliceSelector::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::ImageToImageFilter::InputImagePointer input =
-    const_cast<mitk::ImageToImageFilter::InputImageType *>(this->GetInput());
+  mitk::ImageToImageFilter::InputImagePointer input =this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;

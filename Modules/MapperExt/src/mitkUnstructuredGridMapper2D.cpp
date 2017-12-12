@@ -85,7 +85,7 @@ void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
       m_LineWidth = mitk::IntProperty::New(1);
     }
   }
-  mitk::BaseData::Pointer input = const_cast<mitk::BaseData *>(GetDataNode()->GetData());
+  mitk::BaseData::Pointer input = GetDataNode()->GetData();
   assert(input);
 
   input->Update();
@@ -168,7 +168,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
     if (worldAbstractGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
-      point = const_cast<mitk::BoundingBox *>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
+      point = worldAbstractGeometry->GetParametricBoundingBox()->GetMinimum();
       FillVector3D(normal, 0, 0, 1);
       m_Plane->SetTransform(worldAbstractGeometry->GetVtkAbstractTransform()->GetInverse());
     }

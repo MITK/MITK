@@ -57,7 +57,7 @@ std::string mitk::OdfImageSerializer::Serialize()
   {
     NrrdOdfImageWriter writer;
     writer.SetOutputLocation(fullname);
-    writer.SetInput(const_cast<OdfImage*>(image));
+    writer.SetInput(image);
     writer.Write();
   }
   catch (std::exception& e)

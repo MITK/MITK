@@ -79,7 +79,7 @@ void mitk::GeometryClipImageFilter::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   mitk::Image *output = this->GetOutput();
-  auto *input = const_cast<mitk::Image *>(this->GetInput());
+  mitk::Image *input = this->GetInput();
   if ((output->IsInitialized() == false) || (m_ClippingGeometry.IsNull()))
     return;
 

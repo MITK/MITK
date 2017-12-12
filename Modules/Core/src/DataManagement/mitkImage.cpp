@@ -78,14 +78,14 @@ mitk::Image::Image(const Image &other)
 
     for (unsigned int i = 0u; i < time_steps; ++i)
     {
-      ImageDataItemPointer volume = const_cast<Image &>(other).GetVolumeData(i);
+      ImageDataItemPointer volume = other.GetVolumeData(i);
 
       this->SetVolume(volume->GetData(), i);
     }
   }
   else
   {
-    ImageDataItemPointer volume = const_cast<Image &>(other).GetVolumeData(0);
+    ImageDataItemPointer volume = other.GetVolumeData(0);
 
     this->SetVolume(volume->GetData(), 0);
   }

@@ -27,7 +27,7 @@ mitk::TubeGraphPicker::~TubeGraphPicker()
 
 void mitk::TubeGraphPicker::SetTubeGraph(const mitk::TubeGraph *tubeGraph)
 {
-  m_TubeGraph = const_cast<mitk::TubeGraph *>(tubeGraph);
+  m_TubeGraph = tubeGraph;
   m_TubeGraphProperty =
     dynamic_cast<TubeGraphProperty *>(m_TubeGraph->GetProperty("Tube Graph.Visualization Information").GetPointer());
 }

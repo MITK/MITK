@@ -234,7 +234,7 @@ namespace mitk
     this->GetDataNode()->GetBoolProperty("draw edges", drawEdges, renderer);
     m_EdgeActor->SetVisibility(drawEdges);
 
-    PlaneGeometryData::Pointer input = const_cast<PlaneGeometryData *>(this->GetInput());
+    PlaneGeometryData::ConstPointer input = this->GetInput();
 
     if (input.IsNotNull() && (input->GetPlaneGeometry() != nullptr))
     {

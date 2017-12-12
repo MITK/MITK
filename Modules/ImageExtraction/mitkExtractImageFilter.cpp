@@ -169,7 +169,7 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  ImageToImageFilter::InputImagePointer input = const_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
+  ImageToImageFilter::InputImagePointer input = dynamic_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
   Image::Pointer output = this->GetOutput();
 
   if (input->GetDimension() == 2)

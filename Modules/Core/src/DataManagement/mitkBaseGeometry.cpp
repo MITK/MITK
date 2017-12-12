@@ -474,7 +474,7 @@ void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/,
 
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
 {
-  return const_cast<Self *>(this)->GetOrigin().GetVnlVector();
+  return GetOrigin().GetVnlVector();
 }
 
 vtkLinearTransform *mitk::BaseGeometry::GetVtkTransform() const

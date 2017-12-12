@@ -28,16 +28,15 @@ if(MITK_USE_DCMTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20160216.tar.gz
-      URL_MD5 273c8a544b9fe09b8a4fb4eb51df8e52
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMTK.patch COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMTK-msvc-std11.patch
+      GIT_REPOSITORY "git@github.com:samsmu/dcmtk.git"
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}
          ${additional_args}
          "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} ${DCMTK_C_FLAGS}"
-         -DDCMTK_USE_CXX11_STL:BOOL=OFF
+         -DDCMTK_ENABLE_CXX11:BOOL=ON
+         -DDCMTK_ENABLE_STL:BOOL=ON
          -DDCMTK_WITH_DOXYGEN:BOOL=OFF
          -DDCMTK_WITH_ZLIB:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_OPENSSL:BOOL=OFF # see bug #9894

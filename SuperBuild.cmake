@@ -216,7 +216,17 @@ set(mitk_depends )
 # Include external projects
 include(CMakeExternals/MITKData.cmake)
 foreach(p ${external_projects})
-  include(CMakeExternals/${p}.cmake)
+  if(EXISTS CMakeExternals/${p}.cmake)
+    include(CMakeExternals/${p}.cmake)
+  else()
+    foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+      set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMakeExternals)
+      if(EXISTS ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake)
+        include(${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake)
+        break()
+      endif()
+    endforeach()
+  endif()
 
   list(APPEND mitk_superbuild_ep_args
        -DMITK_USE_${p}:BOOL=${MITK_USE_${p}}
@@ -382,6 +392,7 @@ ExternalProject_Add(${proj}
     -DMITK_WHITELIST:STRING=${MITK_WHITELIST}
     -DMITK_WHITELISTS_EXTERNAL_PATH:STRING=${MITK_WHITELISTS_EXTERNAL_PATH}
     -DMITK_WHITELISTS_INTERNAL_PATH:STRING=${MITK_WHITELISTS_INTERNAL_PATH}
+    -DMITK_EXTENSION_DIRS:STRING=${MITK_EXTENSION_DIRS}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}

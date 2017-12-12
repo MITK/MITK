@@ -172,11 +172,16 @@ void FitFibersToImageFilter::CreateDiffSystem()
 
   m_NumCoveredDirections = voxel_indicator.sum();
 
-  m_MeanTractDensity /= m_NumCoveredDirections;
+  m_MeanTractDensity /= (m_NumCoveredDirections*fiber_count);
   m_MeanSignal /= m_NumCoveredDirections;
+  A /= m_MeanTractDensity;
+  b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
 
-  b /= m_MeanSignal;
-  b *= m_MeanTractDensity;
+  // NEW FIT
+//  m_MeanTractDensity /= m_NumCoveredDirections;
+//  m_MeanSignal /= m_NumCoveredDirections;
+//  b /= m_MeanSignal;
+//  b *= m_MeanTractDensity;
 }
 
 void FitFibersToImageFilter::CreatePeakSystem()
@@ -289,11 +294,16 @@ void FitFibersToImageFilter::CreatePeakSystem()
       ++fiber_count;
     }
   }
-  m_MeanTractDensity /= m_NumCoveredDirections;
+  m_MeanTractDensity /= (m_NumCoveredDirections*fiber_count);
   m_MeanSignal /= m_NumCoveredDirections;
+  A /= m_MeanTractDensity;
+  b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
 
-  b /= m_MeanSignal;
-  b *= m_MeanTractDensity;
+  // NEW FIT
+//  m_MeanTractDensity /= m_NumCoveredDirections;
+//  m_MeanSignal /= m_NumCoveredDirections;
+//  b /= m_MeanSignal;
+//  b *= m_MeanTractDensity;
 }
 
 void FitFibersToImageFilter::GenerateData()
@@ -329,7 +339,7 @@ void FitFibersToImageFilter::GenerateData()
   cost = VnlCostFunction(m_NumUnknowns);
   cost.SetProblem(A, b, init_lambda, m_Regularization);
   m_Weights.set_size(m_NumUnknowns);
-  m_Weights.fill( 1.0 );
+  m_Weights.fill( 0.0 );
   vnl_lbfgsb minimizer(cost);
   vnl_vector<double> l; l.set_size(m_NumUnknowns); l.fill(0);
   vnl_vector<long> bound_selection; bound_selection.set_size(m_NumUnknowns); bound_selection.fill(1);
@@ -338,21 +348,23 @@ void FitFibersToImageFilter::GenerateData()
   minimizer.set_projected_gradient_tolerance(m_GradientTolerance);
 
   MITK_INFO << "Regularization type: " << m_Regularization;
-//  MITK_INFO << "Estimating regularization";
-//  minimizer.set_trace(false);
-//  minimizer.set_max_function_evals(2);
-//  minimizer.minimize(m_Weights);
-//  vnl_vector<double> dx; dx.set_size(m_NumUnknowns); dx.fill(0.0);
-//  cost.calc_regularization_gradient(m_Weights, dx);
-//  double r = dx.magnitude()/m_Weights.magnitude();
-//  cost.m_Lambda *= m_Lambda*55.0/r;
-//  MITK_INFO << r << " - " << m_Lambda*55.0/r;
-//  if (cost.m_Lambda>10e7)
-//  {
-//    MITK_INFO << "Regularization estimation failed. Using default value.";
-//    cost.m_Lambda = fiber_count;
-//  }
-  cost.m_Lambda = m_Lambda;
+  if (m_Regularization!=VnlCostFunction::REGU::NONE)  // REMOVE FOR NEW FIT AND SET cost.m_Lambda = m_Lambda
+  {
+    MITK_INFO << "Estimating regularization";
+    minimizer.set_trace(false);
+    minimizer.set_max_function_evals(2);
+    minimizer.minimize(m_Weights);
+    vnl_vector<double> dx; dx.set_size(m_NumUnknowns); dx.fill(0.0);
+    cost.calc_regularization_gradient(m_Weights, dx);
+    double r = dx.magnitude()/m_Weights.magnitude();  // wtf???
+    cost.m_Lambda *= m_Lambda*55.0/r;
+    MITK_INFO << r << " - " << m_Lambda*55.0/r;
+    if (cost.m_Lambda>10e7)
+    {
+      MITK_INFO << "Regularization estimation failed. Using default value.";
+      cost.m_Lambda = fiber_count;
+    }
+  }
   MITK_INFO << "Using regularization factor of " << cost.m_Lambda << " (λ: " << m_Lambda << ")";
 
   MITK_INFO << "Fitting fibers";
@@ -457,10 +469,8 @@ void FitFibersToImageFilter::GenerateData()
   std::cout.rdbuf (old);
 
   // transform back
-  A *= m_MeanSignal;
-  A /= m_MeanTractDensity;
-  b *= m_MeanSignal;
-  b /= m_MeanTractDensity;
+  A *= m_MeanSignal/100.0;
+  b *= m_MeanSignal/100.0;
 
   MITK_INFO << "Generating output images ...";
   if (m_PeakImage.IsNotNull())

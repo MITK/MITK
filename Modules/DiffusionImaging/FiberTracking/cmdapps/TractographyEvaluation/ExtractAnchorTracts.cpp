@@ -54,7 +54,7 @@ ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
   return itkMask;
 }
 
-std::vector< MaskType > get_file_list(const std::string& path, float anchor_fraction, const std::string& skipped_path)
+std::vector< MaskType > get_file_list(const std::string& path, float anchor_fraction, const std::string& skipped_path, int random_seed)
 {
   if (anchor_fraction<0)
     anchor_fraction = 0;
@@ -62,7 +62,11 @@ std::vector< MaskType > get_file_list(const std::string& path, float anchor_frac
     anchor_fraction = 1.0;
 
   std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
-  std::srand(ms.count());
+  if (random_seed<0)
+    std::srand(ms.count());
+  else
+    std::srand(random_seed);
+  MITK_INFO << "random_seed: " << random_seed;
 
   std::vector< MaskType > mask_list;
 
@@ -155,6 +159,7 @@ int main(int argc, char* argv[])
   parser.addArgument("anchor_fraction", "", mitkCommandLineParser::Float, "Anchor fraction:", "Fraction of tracts used as anchors", 0.5);
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Overlap threshold used to identify the anchor tracts", 0.8);
   parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Subsampling factor:", "Only use specified fraction of input fibers for the analysis", 1.0);
+  parser.addArgument("random_seed", "", mitkCommandLineParser::Int, ":", "", -1);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -172,6 +177,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("anchor_fraction"))
     anchor_fraction = us::any_cast<float>(parsedArgs["anchor_fraction"]);
 
+  int random_seed = -1;
+  if (parsedArgs.count("random_seed"))
+    random_seed = us::any_cast<int>(parsedArgs["random_seed"]);
+
   float overlap = 0.8;
   if (parsedArgs.count("overlap"))
     overlap = us::any_cast<float>(parsedArgs["overlap"]);
@@ -183,7 +192,7 @@ int main(int argc, char* argv[])
   try
   {
     CreateFolderStructure(out_folder);
-    std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder, anchor_fraction, out_folder + "/skipped_masks/");
+    std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder, anchor_fraction, out_folder + "/skipped_masks/", random_seed);
     mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
 
     MITK_INFO << "Removing fibers not ending inside of GM";

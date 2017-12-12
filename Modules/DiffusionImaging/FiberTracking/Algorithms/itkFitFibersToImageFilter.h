@@ -91,7 +91,7 @@ public:
         d = x[m_A_Ones.getcolumn()] - local_weight_means[m_A_Ones.getrow()];
       regu += d*d;
     }
-    cost += 10.0*m_Lambda*regu/dim;
+    cost += m_Lambda*regu/dim;
   }
 
   // gradients of regularization functions
@@ -135,7 +135,7 @@ public:
       else
         tdx[c] += x[c] - local_weight_means[r];
     }
-    dx += 10.0*tdx*2.0*m_Lambda/dim;
+    dx += tdx*2.0*m_Lambda/dim;
   }
 
   void calc_regularization(vnl_vector<double> const &x, double& cost)

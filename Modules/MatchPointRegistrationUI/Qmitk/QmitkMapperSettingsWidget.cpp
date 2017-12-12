@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkMappingJob.h>
 
-QmitkMapperSettingsWidget::QmitkMapperSettingsWidget(QWidget *) : m_MaskMode(false), m_allowSampling(true)
+QmitkMapperSettingsWidget::QmitkMapperSettingsWidget(QWidget *parent) : QWidget(parent), m_MaskMode(false), m_allowSampling(true)
 {
   this->setupUi(this);
 

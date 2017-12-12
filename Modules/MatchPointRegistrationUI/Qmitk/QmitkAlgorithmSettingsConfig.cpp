@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mapConvert.h>
 #include <mapMetaPropertyAccessor.h>
 
-QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget *)
+QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget *parent) : QWidget(parent)
 {
   this->setupUi(this);
 

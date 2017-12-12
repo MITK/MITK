@@ -32,8 +32,8 @@ void QmitkRegEvalSettingsWidget::SetNode(mitk::DataNode *node)
   }
 };
 
-QmitkRegEvalSettingsWidget::QmitkRegEvalSettingsWidget(QWidget *)
-  : m_internalBlendUpdate(false), m_internalUpdate(false)
+QmitkRegEvalSettingsWidget::QmitkRegEvalSettingsWidget(QWidget *parent)
+  : QWidget(parent), m_internalBlendUpdate(false), m_internalUpdate(false)
 {
   this->setupUi(this);
 

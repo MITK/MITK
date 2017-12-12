@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mapAlgorithmProfileHelper.h>
 #include <mapConvert.h>
 
-QmitkAlgorithmProfileViewer::QmitkAlgorithmProfileViewer(QWidget *)
+QmitkAlgorithmProfileViewer::QmitkAlgorithmProfileViewer(QWidget *parent) : QWidget(parent)
 {
   this->setupUi(this);
 }

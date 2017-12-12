@@ -510,7 +510,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       short offset = m_Device->GetScanMode().accumulation * 2048;
 
       short* noOffset = new short[channelDataChannelsPerDataset*channelDataSamplesPerChannel*channelDataTotalDatasets];
-      for (unsigned char set = 0; set < channelDataTotalDatasets; ++set)
+      for (unsigned char set = 0; set < 1; ++set)// channelDataTotalDatasets; ++set) // we ignore the raw US images for now
       {
         for (unsigned short sam = 0; sam < channelDataSamplesPerChannel; ++sam)
         {
@@ -523,7 +523,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       }
 
       // save the raw images when recording
-      for (unsigned char i = 0; i < channelDataTotalDatasets; ++i)
+      for (unsigned char i = 0; i < 1; ++i)// channelDataTotalDatasets; ++i) // we ignore the raw US images for now
       {
         mitk::Image::Pointer rawImage = mitk::Image::New();
         rawImage->Initialize(mitk::MakeScalarPixelType<short>(), 3, dim);
@@ -763,7 +763,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       if (m_SavingSettings.saveRaw)
       {
         OrderImagesInterleaved(PAImageRaw, USImageRaw, m_RawRecordedImages, true);
-        mitk::IOUtil::Save(USImageRaw, pathUSRaw);
+        // mitk::IOUtil::Save(USImageRaw, pathUSRaw);
         mitk::IOUtil::Save(PAImageRaw, pathPARaw);
       }
 
@@ -874,7 +874,8 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
     }
     else
     {
-      USImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events)-1);
+      if(!raw)
+        USImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events)-1);
     }
   }
 }

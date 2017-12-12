@@ -590,7 +590,7 @@ void mitk::DataNode::PropertyListModified(const itk::Object * /*caller*/, const 
 
 mitk::IIdentifiable::UIDType mitk::DataNode::GetUID() const
 {
-  auto uidProperty = dynamic_cast<StringProperty *>(this->GetProperty("uid"));
+  auto uidProperty = dynamic_cast<StringProperty *>(this->GetProperty("uid", nullptr, false));
 
   return nullptr != uidProperty
     ? uidProperty->GetValue()

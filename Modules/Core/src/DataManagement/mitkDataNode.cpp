@@ -224,44 +224,30 @@ void mitk::DataNode::ConcatenatePropertyList(PropertyList *pList, bool replace)
   m_PropertyList->ConcatenatePropertyList(pList, replace);
 }
 
-mitk::BaseProperty *mitk::DataNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer) const
+mitk::BaseProperty *mitk::DataNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer, bool fallBackOnDataProperties) const
 {
-  if (propertyKey == nullptr)
+  if (nullptr == propertyKey)
     return nullptr;
 
-  // renderer specified?
-  if (renderer)
+  if (nullptr != renderer)
   {
-    std::string rendererName = renderer->GetName();
+    auto it = m_MapOfPropertyLists.find(renderer->GetName());
 
-    MapOfPropertyLists::const_iterator it;
-    // check for the renderer specific property
-    it = m_MapOfPropertyLists.find(rendererName);
-    if (it != m_MapOfPropertyLists.end()) // found
+    if (m_MapOfPropertyLists.end() != it)
     {
-      mitk::BaseProperty::Pointer property;
-      property = it->second->GetProperty(propertyKey);
-      if (property.IsNotNull()) // found an enabled property in the render specific list
+      auto property = it->second->GetProperty(propertyKey);
+
+      if (nullptr != property)
         return property;
-      else                                               // found a renderer specific list, but not the desired property
-        return m_PropertyList->GetProperty(propertyKey); // return renderer unspecific property
     }
-    else // didn't find the property list of the given renderer
-    {
-      // return the renderer unspecific property if there is one
-      return m_PropertyList->GetProperty(propertyKey);
-    }
-  }
-  else // no specific renderer given; use the renderer independent one
-  {
-    mitk::BaseProperty::Pointer property;
-    property = m_PropertyList->GetProperty(propertyKey);
-    if (property.IsNotNull())
-      return property;
   }
 
-  // only to satisfy compiler!
-  return nullptr;
+  auto property = m_PropertyList->GetProperty(propertyKey);
+
+  if (nullptr == property && fallBackOnDataProperties && m_Data.IsNotNull())
+    property = m_Data->GetProperty(propertyKey);
+
+  return property;
 }
 
 mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
@@ -616,21 +602,28 @@ mitk::BaseProperty::ConstPointer mitk::DataNode::GetConstProperty(const std::str
   if (propertyName.empty())
     return nullptr;
 
-  if (contextName.empty())
-    return m_PropertyList->GetProperty(propertyName);
-
-  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
-
-  if (m_MapOfPropertyLists.end() != propertyListIter)
+  if (!contextName.empty())
   {
-    BaseProperty::ConstPointer property = propertyListIter->second->GetProperty(propertyName);
+    auto propertyListIter = m_MapOfPropertyLists.find(contextName);
 
-    if (property.IsNotNull())
-      return property;
+    if (m_MapOfPropertyLists.end() != propertyListIter)
+    {
+      BaseProperty::ConstPointer property = propertyListIter->second->GetProperty(propertyName);
+
+      if (property.IsNotNull())
+        return property;
+    }
   }
 
-  if (fallBackOnDefaultContext)
-    return m_PropertyList->GetProperty(propertyName);
+  if (contextName.empty() || fallBackOnDefaultContext)
+  {
+    BaseProperty::ConstPointer property = m_PropertyList->GetProperty(propertyName);
+
+    if (property.IsNull() && m_Data.IsNull())
+      property = m_Data->GetProperty(propertyName.c_str());
+
+    return property;
+  }
 
   return nullptr;
 }
@@ -640,21 +633,28 @@ mitk::BaseProperty * mitk::DataNode::GetNonConstProperty(const std::string &prop
   if (propertyName.empty())
     return nullptr;
 
-  if (contextName.empty())
-    return m_PropertyList->GetProperty(propertyName);
-
-  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
-
-  if (m_MapOfPropertyLists.end() != propertyListIter)
+  if (!contextName.empty())
   {
-    auto property = propertyListIter->second->GetProperty(propertyName);
+    auto propertyListIter = m_MapOfPropertyLists.find(contextName);
 
-    if (nullptr != property)
-      return property;
+    if (m_MapOfPropertyLists.end() != propertyListIter)
+    {
+      auto property = propertyListIter->second->GetProperty(propertyName);
+
+      if (nullptr != property)
+        return property;
+    }
   }
 
-  if (fallBackOnDefaultContext)
-    return m_PropertyList->GetProperty(propertyName);
+  if (contextName.empty() || fallBackOnDefaultContext)
+  {
+    auto property = m_PropertyList->GetProperty(propertyName);
+
+    if (nullptr == property && m_Data.IsNull())
+      property = m_Data->GetProperty(propertyName.c_str());
+
+    return property;
+  }
 
   return nullptr;
 }
@@ -664,21 +664,18 @@ void mitk::DataNode::SetProperty(const std::string &propertyName, BaseProperty *
   if (propertyName.empty())
     mitkThrow() << "Property name is empty.";
 
-  if (contextName.empty())
+  if (!contextName.empty())
   {
-    m_PropertyList->SetProperty(propertyName, property);
-    return;
+    auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+    if (m_MapOfPropertyLists.end() != propertyListIter)
+    {
+      propertyListIter->second->SetProperty(propertyName, property);
+      return;
+    }
   }
 
-  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
-
-  if (m_MapOfPropertyLists.end() != propertyListIter)
-  {
-    propertyListIter->second->SetProperty(propertyName, property);
-    return;
-  }
-
-  if (fallBackOnDefaultContext)
+  if (contextName.empty() || fallBackOnDefaultContext)
   {
     m_PropertyList->SetProperty(propertyName, property);
     return;

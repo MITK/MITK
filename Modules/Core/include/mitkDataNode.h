@@ -235,11 +235,14 @@ namespace mitk
      * If \a renderer is \a nullptr or the \a propertyKey cannot be found
      * in the PropertyList specific to \a renderer or is disabled there, the BaseRenderer-independent
      * PropertyList of this DataNode is queried.
+     *
+     * If \a fallBackOnDataProperties is true, the data property list is queried as a last resort.
+     *
      * \sa GetPropertyList
      * \sa m_PropertyList
      * \sa m_MapOfPropertyLists
      */
-    mitk::BaseProperty *GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer = nullptr) const;
+    mitk::BaseProperty *GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer = nullptr, bool fallBackOnDataProperties = true) const;
 
     /**
      * \brief Get the property of type T with key \a propertyKey from the PropertyList

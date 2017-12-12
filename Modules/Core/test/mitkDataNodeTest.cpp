@@ -201,6 +201,22 @@ public:
                         "Testing if the propertylist has changed during the last tests")
   }
 
+  static void TestDataPropertiesFallback(mitk::DataNode::Pointer dataNode)
+  {
+    const std::string name = "Catch Me If You Can";
+
+    auto image = mitk::Image::New();
+    image->SetProperty(name, mitk::StringProperty::New("Don't tase me, bro!"));
+
+    dataNode->SetData(image);
+
+    auto property = dataNode->GetProperty(name.c_str());
+    MITK_TEST_CONDITION(nullptr != property, "Testing GetProperty data property fallback (new behavior)");
+
+    property = dataNode->GetProperty(name.c_str(), nullptr, false);
+    MITK_TEST_CONDITION(nullptr == property, "Testing GetProperty data property fallback (old behavior)");
+  }
+
   static void TestSelected(mitk::DataNode::Pointer dataNode)
   {
     vtkRenderWindow *renderWindow = vtkRenderWindow::New();
@@ -305,6 +321,7 @@ int mitkDataNodeTest(int /* argc */, char * /*argv*/ [])
   // note, that no data is set to the dataNode
   mitkDataNodeTestClass::TestInteractorSetting(myDataNode);
   mitkDataNodeTestClass::TestPropertyList(myDataNode);
+  mitkDataNodeTestClass::TestDataPropertiesFallback(myDataNode);
   mitkDataNodeTestClass::TestSelected(myDataNode);
   mitkDataNodeTestClass::TestGetMTime(myDataNode);
   mitkDataNodeTestClass::TestSetDataUnderPropertyChange();

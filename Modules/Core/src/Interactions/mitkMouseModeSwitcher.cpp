@@ -106,7 +106,7 @@ void mitk::MouseModeSwitcher::SetSelectionMode(bool selection)
 
 void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
 {
-  if (m_ActiveInteractionScheme != PACS)
+  if (m_ActiveInteractionScheme != MITK)
     return;
 
   std::string eventConfig;
@@ -114,7 +114,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
   {
   case MousePointer:
   {
-    eventConfig = "DisplayConfigPACS.xml";
+    eventConfig = "DisplayConfigMITK.xml";
     break;
   } // case 0
   case Scroll:

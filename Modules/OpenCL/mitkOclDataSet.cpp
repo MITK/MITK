@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <fstream>
 
+//#define SHOW_MEM_INFO
+
 mitk::OclDataSet::OclDataSet() : m_gpuBuffer(nullptr), m_context(nullptr), m_bufferSize(0), m_gpuModified(false), m_cpuModified(false),
   m_Data(nullptr), m_BpE(1)
 {
@@ -50,7 +52,9 @@ cl_mem mitk::OclDataSet::CreateGPUBuffer()
 
   m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE, m_bufferSize * (size_t)m_BpE, nullptr, &clErr);
 
-  MITK_DEBUG << "Created GPU Buffer Object of size: " << (size_t)m_BpE * m_bufferSize << " Bytes";
+  #ifdef SHOW_MEM_INFO
+  MITK_INFO << "Created GPU Buffer Object of size: " << (size_t)m_BpE * m_bufferSize << " Bytes";
+  #endif
 
   CHECK_OCL_ERR(clErr);
 
@@ -114,20 +118,18 @@ int mitk::OclDataSet::TransferDataToGPU(cl_command_queue gpuComQueue)
 
 cl_mem mitk::OclDataSet::GetGPUBuffer()
 {
-  // clGetMemObjectInfo()
-  cl_mem_object_type memInfo;
-
   // query image object info only if already initialized
   if( this->m_gpuBuffer )
   {
-    #ifdef MBILOG_ENABLE_DEBUG
+    #ifdef SHOW_MEM_INFO
     cl_int clErr = 0;
+    // clGetMemObjectInfo()
+    cl_mem_object_type memInfo;
     clErr = clGetMemObjectInfo(this->m_gpuBuffer, CL_MEM_TYPE, sizeof(cl_mem_object_type), &memInfo, nullptr );
     CHECK_OCL_ERR(clErr);
+    MITK_DEBUG << "Querying info for object, recieving: " << memInfo;
     #endif
   }
-
-  MITK_DEBUG << "Querying info for object, recieving: " << memInfo;
 
   return m_gpuBuffer;
 }
@@ -146,7 +148,7 @@ void* mitk::OclDataSet::TransferDataToCPU(cl_command_queue gpuComQueue)
   char* data = new char[m_bufferSize * (size_t)m_BpE];
 
   // debug info
-  #ifdef MBILOG_ENABLE_DEBUG
+  #ifdef SHOW_MEM_INFO
   oclPrintMemObjectInfo( m_gpuBuffer );
   #endif
 

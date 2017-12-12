@@ -156,12 +156,12 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
   // execute the filter on a 3D NDRange
   if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)
   {
-    if(!this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize))
+    if(!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
       mitkThrow() << "openCL Error when executing Kernel";
   }
   else
   {
-    if(!this->ExecuteKernelChunks(m_PixelCalculation, 3, m_ChunkSize))
+    if(!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 3, m_ChunkSize, 16, 50))
       mitkThrow() << "openCL Error when executing Kernel";
   }
 

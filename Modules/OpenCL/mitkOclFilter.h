@@ -112,6 +112,10 @@ protected:
       */
   bool ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim );
 
+  /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes, but divide it into chunks of dimension chunksDim and wait between 
+    * batches of batchSize chunks a time of waitTimems milliseconds
+  */
+  bool ExecuteKernelChunksInBatches(cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim, size_t batchSize, int waitTimems);
   /**
       * \brief Initialize all necessary parts of the filter
       *

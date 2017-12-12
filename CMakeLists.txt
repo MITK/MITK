@@ -13,6 +13,13 @@ foreach(policy ${project_policies})
 endforeach()
 
 #-----------------------------------------------------------------------------
+# MITK Extension Feature
+#-----------------------------------------------------------------------------
+
+set(MITK_EXTENSION_DIRS "" CACHE STRING "")
+mark_as_advanced(MITK_EXTENSION_DIRS)
+
+#-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
 
@@ -28,14 +35,18 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
-#------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 set(MITK_CMAKE_DIR ${MITK_SOURCE_DIR}/CMake)
 
-set(CMAKE_MODULE_PATH
-  ${MITK_CMAKE_DIR}
-  ${CMAKE_MODULE_PATH}
-  )
+set(CMAKE_MODULE_PATH ${MITK_CMAKE_DIR})
+
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_CMAKE_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMake)
+  if(EXISTS ${MITK_CMAKE_EXTENSION_DIR})
+    list(APPEND CMAKE_MODULE_PATH ${MITK_CMAKE_EXTENSION_DIR})
+  endif()
+endforeach()
 
 #-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)
@@ -1036,6 +1047,13 @@ add_subdirectory(Utilities)
 
 add_subdirectory(Modules)
 
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_MODULES_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Modules)
+  if(EXISTS ${MITK_MODULES_EXTENSION_DIR})
+    add_subdirectory(${MITK_MODULES_EXTENSION_DIR} Modules)
+  endif()
+endforeach()
+
 if(MITK_USE_BLUEBERRY)
 
   set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
@@ -1060,6 +1078,17 @@ if(MITK_USE_BLUEBERRY)
   set(mitk_plugins_fullpath "")
   foreach(mitk_plugin ${MITK_PLUGINS})
     list(APPEND mitk_plugins_fullpath Plugins/${mitk_plugin})
+  endforeach()
+
+  foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+    set(MITK_PLUGINS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Plugins)
+    if(EXISTS ${MITK_PLUGINS_EXTENSION_DIR}/PluginList.cmake)
+      set(MITK_PLUGINS "")
+      include(${MITK_PLUGINS_EXTENSION_DIR}/PluginList.cmake)
+      foreach(mitk_plugin ${MITK_PLUGINS})
+        list(APPEND mitk_plugins_fullpath ${MITK_PLUGINS_EXTENSION_DIR}/${mitk_plugin})
+      endforeach()
+    endif()
   endforeach()
 
   if(EXISTS ${MITK_PRIVATE_MODULES}/PluginList.cmake)

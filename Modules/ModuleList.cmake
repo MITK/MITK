@@ -1,7 +1,7 @@
 # The entries in the mitk_modules list must be
 # ordered according to their dependencies.
 
-set(mitk_modules
+set(MITK_MODULES
   Core
   CommandLine
   AppUtil
@@ -74,5 +74,5 @@ set(mitk_modules
 )
 
 if(MITK_ENABLE_PIC_READER)
-  list(APPEND mitk_modules IpPicSupportIO)
+  list(APPEND MITK_MODULES IpPicSupportIO)
 endif()

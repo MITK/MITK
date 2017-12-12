@@ -147,7 +147,7 @@ bool
 mitk::EquiDistantBlocksSorter
 ::operator==(const DICOMDatasetSorter& other) const
 {
-  if (const EquiDistantBlocksSorter* otherSelf = dynamic_cast<const EquiDistantBlocksSorter*>(&other))
+  if (const auto* otherSelf = dynamic_cast<const EquiDistantBlocksSorter*>(&other))
   {
     return this->m_AcceptTilt == otherSelf->m_AcceptTilt
         && this->m_ToleratedOriginOffsetIsAbsolute == otherSelf->m_ToleratedOriginOffsetIsAbsolute

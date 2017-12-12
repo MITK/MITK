@@ -65,7 +65,7 @@ public:
   };
 
   QmitkToolWorkingDataSelectionBox(QWidget *parent = 0);
-  virtual ~QmitkToolWorkingDataSelectionBox();
+  ~QmitkToolWorkingDataSelectionBox() override;
 
   mitk::DataStorage *GetDataStorage();
   void SetDataStorage(mitk::DataStorage &storage);
@@ -83,7 +83,7 @@ public:
   /**
   \brief Tell this object to listen to another ToolManager.
   */
-  void SetToolManager(mitk::ToolManager &); // no NULL pointer allowed here, a manager is required
+  void SetToolManager(mitk::ToolManager &); // no nullptr pointer allowed here, a manager is required
 
   /**
   * \brief A list of all displayed DataNode objects.

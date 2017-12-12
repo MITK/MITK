@@ -18,7 +18,7 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  resources/icon.xpm
+  resources/volume_visualization.svg
 )
 
 set(QRC_FILES

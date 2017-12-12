@@ -29,21 +29,21 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::DiffusionMultiShellQballReconstructionImageFilter() :
   m_ReconstructionType(Mode_Standard1Shell),
   m_Interpolation_Flag(false),
-  m_Interpolation_SHT1_inv(NULL),
-  m_Interpolation_SHT2_inv(NULL),
-  m_Interpolation_SHT3_inv(NULL),
-  m_TARGET_SH_shell1(NULL),
-  m_TARGET_SH_shell2(NULL),
-  m_TARGET_SH_shell3(NULL),
+  m_Interpolation_SHT1_inv(nullptr),
+  m_Interpolation_SHT2_inv(nullptr),
+  m_Interpolation_SHT3_inv(nullptr),
+  m_TARGET_SH_shell1(nullptr),
+  m_TARGET_SH_shell2(nullptr),
+  m_TARGET_SH_shell3(nullptr),
   m_MaxDirections(0),
-  m_CoeffReconstructionMatrix(NULL),
-  m_ODFSphericalHarmonicBasisMatrix(NULL),
-  m_GradientDirectionContainer(NULL),
+  m_CoeffReconstructionMatrix(nullptr),
+  m_ODFSphericalHarmonicBasisMatrix(nullptr),
+  m_GradientDirectionContainer(nullptr),
   m_NumberOfGradientDirections(0),
   m_NumberOfBaselineImages(0),
   m_Threshold(0),
-  m_BZeroImage(NULL),
-  m_CoefficientImage(NULL),
+  m_BZeroImage(nullptr),
+  m_CoefficientImage(nullptr),
   m_BValue(1.0),
   m_Lambda(0.0),
   m_IsHemisphericalArrangementOfGradientDirections(false),
@@ -79,6 +79,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     for( gdcit = m_GradientDirectionContainer->Begin(); gdcit != m_GradientDirectionContainer->End(); ++gdcit)
     {
       double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+      MITK_INFO << bValueKey;
       m_BValueMap[bValueKey].push_back(gdcit.Index());
     }
 
@@ -688,7 +689,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread)
+::NumericalNShellReconstruction(const OutputImageRegionType& /*outputRegionForThread*/)
 {
 
   /* itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();

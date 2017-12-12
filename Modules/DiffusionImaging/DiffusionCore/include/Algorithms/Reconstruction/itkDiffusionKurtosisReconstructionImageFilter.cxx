@@ -123,11 +123,10 @@ itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelTyp
 ::DiffusionKurtosisReconstructionImageFilter()
   : m_ReferenceBValue(-1),
     m_OmitBZero(false),
-    m_MaskImage(nullptr),
     m_ApplyPriorSmoothing(false),
     m_SmoothingSigma(1.5),
-    m_MaxFitBValue( 3000 ),
     m_UseKBounds( false ),
+    m_MaxFitBValue( 3000 ),
     m_ScaleForFitting( STRAIGHT )
 {
   this->m_InitialPosition = vnl_vector<double>(3, 0);
@@ -406,8 +405,7 @@ template< class TInputPixelType, class TOutputPixelType>
 void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::SetInitialSolution(const vnl_vector<double>& x0 )
 {
-  unsigned int param_size = 2 + static_cast<int>( this->m_OmitBZero );
-  assert( x0.size() == param_size );
+  assert( x0.size() == (2 + static_cast<int>( this->m_OmitBZero )) );
 
   this->m_InitialPosition = x0;
 }

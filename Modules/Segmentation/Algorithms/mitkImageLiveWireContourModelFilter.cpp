@@ -68,7 +68,7 @@ void mitk::ImageLiveWireContourModelFilter::SetInput(unsigned int idx,
 const mitk::ImageLiveWireContourModelFilter::InputType *mitk::ImageLiveWireContourModelFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType *>(this->ProcessObject::GetInput(0));
 }
 
@@ -76,7 +76,7 @@ const mitk::ImageLiveWireContourModelFilter::InputType *mitk::ImageLiveWireConto
   unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType *>(this->ProcessObject::GetInput(idx));
 }
 
@@ -159,7 +159,7 @@ void mitk::ImageLiveWireContourModelFilter::SetRepulsivePoints(const ShortestPat
 {
   m_CostFunction->ClearRepulsivePoints();
 
-  ShortestPathType::const_iterator iter = points.begin();
+  auto iter = points.begin();
   for (; iter != points.end(); iter++)
   {
     m_CostFunction->AddRepulsivePoint((*iter));
@@ -184,8 +184,8 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
 
   // maximum value in each direction for size
   InternalImageType::SizeType size;
-  size[0] = abs(startPoint[0] - endPoint[0]) + 1;
-  size[1] = abs(startPoint[1] - endPoint[1]) + 1;
+  size[0] = std::abs(startPoint[0] - endPoint[0]) + 1;
+  size[1] = std::abs(startPoint[1] - endPoint[1]) + 1;
 
   CostFunctionType::RegionType region;
   region.SetSize(size);
@@ -278,10 +278,10 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
   std::vector<itk::Index<VImageDimension>> shortestPath;
 
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image *>(this->GetInput());
-  if (path == NULL)
+  if (path == nullptr)
   {
     OutputType::Pointer output = this->GetOutput();
-    mitk::ContourModel::VertexIterator it = output->IteratorBegin();
+    auto it = output->IteratorBegin();
     while (it != output->IteratorEnd())
     {
       itk::Index<VImageDimension> cur;
@@ -296,7 +296,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
   }
   else
   {
-    mitk::ContourModel::VertexIterator it = path->IteratorBegin();
+    auto it = path->IteratorBegin();
     while (it != path->IteratorEnd())
     {
       itk::Index<VImageDimension> cur;
@@ -321,7 +321,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
   // get the path
 
   // iterator of path
-  typename std::vector<itk::Index<VImageDimension>>::iterator pathIterator = shortestPath.begin();
+  auto pathIterator = shortestPath.begin();
 
   std::map<int, int> histogram;
 
@@ -344,7 +344,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
 
     // get max of histogramm
     int currentMaxValue = 0;
-    std::map<int, int>::iterator it = histogram.begin();
+    auto it = histogram.begin();
     while (it != histogram.end())
     {
       if ((*it).second > currentMaxValue)
@@ -358,8 +358,8 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
     std::map<int, int>::key_type keyOfMax = itMAX->first;
 
     // compute the to max of gaussian summation
-    std::map<int, int>::iterator end = histogram.end();
-    std::map<int, int>::iterator last = --(histogram.end());
+    auto end = histogram.end();
+    auto last = --(histogram.end());
 
     std::map<int, int>::iterator left2;
     std::map<int, int>::iterator left1;
@@ -374,7 +374,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
     }
     else //( right1 <= last )
     {
-      std::map<int, int>::iterator temp = right1;
+      auto temp = right1;
       right2 = ++right1; // rght1 + 1
       right1 = temp;
     }
@@ -386,14 +386,14 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
     }
     else if (right1 == (++(histogram.begin())))
     {
-      std::map<int, int>::iterator temp = right1;
+      auto temp = right1;
       left1 = --right1; // rght1 - 1
       right1 = temp;
       left2 = end;
     }
     else
     {
-      std::map<int, int>::iterator temp = right1;
+      auto temp = right1;
       left1 = --right1; // rght1 - 1
       left2 = --right1; // rght1 - 2
       right1 = temp;

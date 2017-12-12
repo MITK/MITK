@@ -61,7 +61,7 @@ namespace mitk
       {
         //todo error handling
         errorMessage->append("Can't add tool, is the toolfile valid?");
-        return NULL;
+        return nullptr;
       }
     }
     returnValue->SetTrackingDevice(thisDevice);

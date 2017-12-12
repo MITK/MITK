@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
-  : m_Image(image) /*, m_TimeSelectorForExtremaObject(NULL)*/
+  : m_Image(image) /*, m_TimeSelectorForExtremaObject(nullptr)*/
 {
   m_CountOfMinValuedVoxels.resize(1, 0);
   m_CountOfMaxValuedVoxels.resize(1, 0);
@@ -41,8 +41,8 @@ mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
 mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 {
   m_HistogramGeneratorObject = nullptr;
-  // m_TimeSelectorForExtremaObject = NULL;
-  // m_Image = NULL;
+  // m_TimeSelectorForExtremaObject = nullptr;
+  // m_Image = nullptr;
 }
 
 const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::GetScalarHistogram(
@@ -54,7 +54,7 @@ const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::G
     timeSelector->SetTimeNr(t);
     timeSelector->UpdateLargestPossibleRegion();
 
-    mitk::HistogramGenerator *generator =
+    auto *generator =
       static_cast<mitk::HistogramGenerator *>(m_HistogramGeneratorObject.GetPointer());
     generator->SetImage(timeSelector->GetOutput());
     generator->ComputeHistogram();
@@ -313,9 +313,9 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
       m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max())
     return; // Values already calculated before...
 
-  // used to avoid statistics calculation on qball images. property will be replaced as soons as bug 17928 is merged and
+  // used to avoid statistics calculation on Odf images. property will be replaced as soons as bug 17928 is merged and
   // the diffusion image refactoring is complete.
-  mitk::BoolProperty *isqball = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsQballImage").GetPointer());
+  mitk::BoolProperty *isOdf = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsOdfImage").GetPointer());
   const mitk::PixelType pType = m_Image->GetPixelType(0);
   if (pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::ImageIOBase::UNKNOWNPIXELTYPE) &&
       (pType.GetPixelType() != itk::ImageIOBase::VECTOR))
@@ -331,7 +331,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
     }
   }
   else if (pType.GetPixelType() == itk::ImageIOBase::VECTOR &&
-           (!isqball || !isqball->GetValue())) // we have a vector image
+           (!isOdf || !isOdf->GetValue())) // we have a vector image
   {
     // recompute
     mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();

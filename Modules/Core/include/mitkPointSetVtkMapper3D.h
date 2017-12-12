@@ -105,7 +105,7 @@ namespace mitk
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /*
     * \deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead

@@ -55,7 +55,7 @@ public:
 
 protected:
   QmitkWatershedToolGUI();
-  virtual ~QmitkWatershedToolGUI();
+  ~QmitkWatershedToolGUI() override;
 
   QSlider *m_SliderThreshold;
   QSlider *m_SliderLevel;

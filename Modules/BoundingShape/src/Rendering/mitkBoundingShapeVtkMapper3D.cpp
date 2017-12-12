@@ -149,7 +149,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     }
 
     // set the input-object at time t for the mapper
-    GeometryData *geometryData = dynamic_cast<GeometryData *>(dataNode->GetData());
+    auto *geometryData = dynamic_cast<GeometryData *>(dataNode->GetData());
     if (geometryData == nullptr)
       return;
 

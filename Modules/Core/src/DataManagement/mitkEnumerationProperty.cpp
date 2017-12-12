@@ -132,14 +132,14 @@ mitk::EnumerationProperty::IdType mitk::EnumerationProperty::GetEnumId(const std
 
 bool mitk::EnumerationProperty::IsEqual(const BaseProperty &property) const
 {
-  const Self &other = static_cast<const Self &>(property);
+  const auto &other = static_cast<const Self &>(property);
   return this->Size() == other.Size() && this->GetValueAsId() == other.GetValueAsId() &&
          std::equal(this->Begin(), this->End(), other.Begin());
 }
 
 bool mitk::EnumerationProperty::Assign(const BaseProperty &property)
 {
-  const Self &other = static_cast<const Self &>(property);
+  const auto &other = static_cast<const Self &>(property);
   this->GetEnumIds() = other.GetEnumIds();
   this->GetEnumStrings() = other.GetEnumStrings();
   this->m_CurrentValue = other.m_CurrentValue;

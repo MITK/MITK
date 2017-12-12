@@ -38,7 +38,7 @@ struct org_blueberry_core_runtime_EXPORT RegistryConstants
   static const QString PROP_CHECK_CONFIG; // = "osgi.checkConfiguration";
   static const QString PROP_NO_REGISTRY_CACHE; // = "BlueBerry.noRegistryCache";
   static const QString PROP_DEFAULT_REGISTRY; // = "BlueBerry.createRegistry";
-  static const QString PROP_REGISTRY_NULL_USER_TOKEN; // = "BlueBerry.registry.nulltoken";
+  static const QString PROP_REGISTRY_nullptr_USER_TOKEN; // = "BlueBerry.registry.nulltoken";
   static const QString PROP_REGISTRY_MULTI_LANGUAGE; // = "BlueBerry.registry.MultiLanguage";
 
   /**

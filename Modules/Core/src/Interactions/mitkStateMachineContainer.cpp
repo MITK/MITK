@@ -62,7 +62,7 @@ mitk::StateMachineContainer::~StateMachineContainer()
  **/
 bool mitk::StateMachineContainer::LoadBehavior(const std::string &fileName, const us::Module *module)
 {
-  if (module == NULL)
+  if (module == nullptr)
   {
     module = us::GetModuleContext()->GetModule();
   }
@@ -87,7 +87,7 @@ mitk::StateMachineState::Pointer mitk::StateMachineContainer::GetStartState() co
  **/
 void mitk::StateMachineContainer::ConnectStates()
 {
-  for (StateMachineCollectionType::iterator it = m_States.begin(); it != m_States.end(); ++it)
+  for (auto it = m_States.begin(); it != m_States.end(); ++it)
   {
     if ((*it)->ConnectTransitions(&m_States) == false)
       m_errors = true;
@@ -194,7 +194,7 @@ void mitk::StateMachineContainer::EndElement(const char *elementName)
   }
   else if (name == TRANSITION)
   {
-    m_CurrTransition = NULL;
+    m_CurrTransition = nullptr;
   }
   else if (name == ACTION)
   {
@@ -207,7 +207,7 @@ void mitk::StateMachineContainer::EndElement(const char *elementName)
   else if (name == STATE)
   {
     m_States.push_back(m_CurrState);
-    m_CurrState = NULL;
+    m_CurrState = nullptr;
   }
 }
 

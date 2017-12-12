@@ -9,7 +9,7 @@ set(mitk_modules
   RDF
   LegacyIO
   DataTypesExt
-  Overlays
+  Annotation
   LegacyGL
   AlgorithmsExt
   MapperExt
@@ -20,7 +20,6 @@ set(mitk_modules
   PlanarFigure
   ImageDenoising
   ImageExtraction
-  LegacyAdaptors
   SceneSerialization
   Gizmo
   GraphAlgorithms
@@ -30,50 +29,48 @@ set(mitk_modules
   SurfaceInterpolation
   Segmentation
   PlanarFigureSegmentation
-  OpenViewCore
   QtWidgets
   QtWidgetsExt
-  C3js
-  QmlItems
+  Chart
   SegmentationUI
-  DiffusionImaging
+  Classification
   GPGPU
   OpenIGTLink
   IGTBase
   IGT
   CameraCalibration
-  RigidRegistration
-  RigidRegistrationUI
-  DeformableRegistration
-  DeformableRegistrationUI
   OpenCL
   OpenCVVideoSupport
   QtOverlays
   ToFHardware
   ToFProcessing
   ToFUI
+  PhotoacousticsHardware
+  PhotoacousticsAlgorithms
+  PhotoacousticsLib
   US
   USUI
   DicomUI
-  Simulation
   Remeshing
   Python
   QtPython
   Persistence
   OpenIGTLinkUI
   IGTUI
-  VtkShaders
   DicomRT
   RTUI
   IOExt
   XNAT
   TubeGraph
   BiophotonicsHardware
-  Classification
-  TumorInvasionAnalysis
   MatchPointRegistration
   MatchPointRegistrationUI
+  DiffusionImaging
+  TumorInvasionAnalysis
   BoundingShape
+  RenderWindowManager
+  RenderWindowManagerUI
+  CEST
 )
 
 if(MITK_ENABLE_PIC_READER)

@@ -53,7 +53,7 @@ mitk::OrganTypeProperty::~OrganTypeProperty()
 
 void mitk::OrganTypeProperty::AddEnumerationTypes()
 {
-  IdType newId = static_cast<IdType>(EnumerationProperty::Size());
+  auto newId = static_cast<IdType>(EnumerationProperty::Size());
 
   // On changes, please also change mitk::DataNodeFactory::DefaultColorForOrgan()
 

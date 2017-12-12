@@ -44,7 +44,7 @@ public:
   /**
   * @brief Default Destructor
   **/
-  virtual ~QmitkScalarBarOverlay();
+  ~QmitkScalarBarOverlay() override;
 
   /**
   * \brief Setup the QLabel with overlay specific information
@@ -55,7 +55,7 @@ public:
   * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay
   * will show an empty string!
   */
-  virtual void GenerateData(mitk::PropertyList::Pointer) override;
+  void GenerateData(mitk::PropertyList::Pointer) override;
 
   QSize GetNeededSize() override;
 

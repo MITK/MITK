@@ -62,27 +62,27 @@ static std::string GetButtonState(mitk::InteractionEvent *event)
   std::string strButtonState = "";
   if (eventClass == "MOUSEPRESSEVENT")
   {
-    mitk::MousePressEvent *mme = dynamic_cast<mitk::MousePressEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MousePressEvent *>(event);
     buttonState = mme->GetButtonStates();
   }
   if (eventClass == "MOUSERELEASEEVENT")
   {
-    mitk::MouseReleaseEvent *mme = dynamic_cast<mitk::MouseReleaseEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseReleaseEvent *>(event);
     buttonState = mme->GetButtonStates();
   }
   if (eventClass == "MOUSEDOUBLECLICKEVENT")
   {
-    mitk::MouseDoubleClickEvent *mme = dynamic_cast<mitk::MouseDoubleClickEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseDoubleClickEvent *>(event);
     buttonState = mme->GetButtonStates();
   }
   if (eventClass == "MOUSEMOVEEVENT")
   {
-    mitk::MouseMoveEvent *mme = dynamic_cast<mitk::MouseMoveEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseMoveEvent *>(event);
     buttonState = mme->GetButtonStates();
   }
   if (eventClass == "MOUSEWHEELEVENT")
   {
-    mitk::MouseWheelEvent *mme = dynamic_cast<mitk::MouseWheelEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseWheelEvent *>(event);
     buttonState = mme->GetButtonStates();
   }
 
@@ -121,27 +121,27 @@ static std::string GetModifierState(mitk::InteractionEvent *event)
   // TODO Add InteractionKey
   if (eventClass == "MOUSEPRESSEVENT")
   {
-    mitk::MousePressEvent *mme = dynamic_cast<mitk::MousePressEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MousePressEvent *>(event);
     modifierKeys = mme->GetModifiers();
   }
   if (eventClass == "MOUSERELEASEEVENT")
   {
-    mitk::MouseReleaseEvent *mme = dynamic_cast<mitk::MouseReleaseEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseReleaseEvent *>(event);
     modifierKeys = mme->GetModifiers();
   }
   if (eventClass == "MOUSEDOUBLECLICKEVENT")
   {
-    mitk::MouseDoubleClickEvent *mme = dynamic_cast<mitk::MouseDoubleClickEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseDoubleClickEvent *>(event);
     modifierKeys = mme->GetModifiers();
   }
   if (eventClass == "MOUSEMOVEEVENT")
   {
-    mitk::MouseMoveEvent *mme = dynamic_cast<mitk::MouseMoveEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseMoveEvent *>(event);
     modifierKeys = mme->GetModifiers();
   }
   if (eventClass == "MOUSEWHEELEVENT")
   {
-    mitk::MouseWheelEvent *mme = dynamic_cast<mitk::MouseWheelEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseWheelEvent *>(event);
     modifierKeys = mme->GetModifiers();
   }
 
@@ -180,17 +180,17 @@ static std::string GetEventButton(mitk::InteractionEvent *event)
   // TODO Add InteractionKey
   if (eventClass == "MOUSEPRESSEVENT")
   {
-    mitk::MousePressEvent *mme = dynamic_cast<mitk::MousePressEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MousePressEvent *>(event);
     button = mme->GetEventButton();
   }
   if (eventClass == "MOUSERELEASEEVENT")
   {
-    mitk::MouseReleaseEvent *mme = dynamic_cast<mitk::MouseReleaseEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseReleaseEvent *>(event);
     button = mme->GetEventButton();
   }
   if (eventClass == "MOUSEDOUBLECLICKEVENT")
   {
-    mitk::MouseDoubleClickEvent *mme = dynamic_cast<mitk::MouseDoubleClickEvent *>(event);
+    auto *mme = dynamic_cast<mitk::MouseDoubleClickEvent *>(event);
     button = mme->GetEventButton();
   }
 
@@ -217,8 +217,8 @@ static std::string GetEventButton(mitk::InteractionEvent *event)
 static std::string GetPositionInWorld(mitk::InteractionEvent *event)
 {
   std::stringstream ss;
-  mitk::InteractionPositionEvent *pe = dynamic_cast<mitk::InteractionPositionEvent *>(event);
-  if (pe != NULL)
+  auto *pe = dynamic_cast<mitk::InteractionPositionEvent *>(event);
+  if (pe != nullptr)
   {
     mitk::Point3D p = pe->GetPositionInWorld();
     ss << p[0] << "," << p[1] << "," << p[2];
@@ -234,8 +234,8 @@ static std::string GetPositionInWorld(mitk::InteractionEvent *event)
 static std::string GetPositionOnScreen(mitk::InteractionEvent *event)
 {
   std::stringstream ss;
-  mitk::InteractionPositionEvent *pe = dynamic_cast<mitk::InteractionPositionEvent *>(event);
-  if (pe != NULL)
+  auto *pe = dynamic_cast<mitk::InteractionPositionEvent *>(event);
+  if (pe != nullptr)
   {
     mitk::Point2D p = pe->GetPointerPositionOnScreen();
     ss << p[0] << "," << p[1];
@@ -287,7 +287,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     const std::vector<std::string> coords = split(strWorld, ',');
     int i = 0;
-    for (std::vector<std::string>::const_iterator it = coords.cbegin(); it != coords.cend(); ++it, ++i)
+    for (auto it = coords.cbegin(); it != coords.cend(); ++it, ++i)
     {
       worldPos[i] = atof((*it).c_str());
     }
@@ -297,7 +297,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyModifier().c_str(), strModifiers))
   {
     std::vector<std::string> mods = split(strModifiers, ',');
-    for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
+    for (auto it = mods.begin(); it != mods.end(); ++it)
     {
       std::transform((*it).cbegin(), (*it).cend(), (*it).begin(), ::toupper);
       if (*it == "CTRL")
@@ -345,7 +345,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyButtonState().c_str(), strButtonState))
   {
     std::vector<std::string> mods = split(strButtonState, ',');
-    for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
+    for (auto it = mods.begin(); it != mods.end(); ++it)
     {
       std::transform((*it).cbegin(), (*it).cend(), (*it).begin(), ::toupper);
       if (*it == "MIDDLEMOUSEBUTTON")
@@ -397,7 +397,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   list->GetStringProperty(InteractionEventConst::xmlEventPropertySignalName().c_str(), strSignalName);
 
   // Get BaseRenderer by name
-  mitk::BaseRenderer *renderer = NULL;
+  mitk::BaseRenderer *renderer = nullptr;
   std::string strRenderer;
 
   // only search for a renderer if there is at least one renderer registered
@@ -410,7 +410,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
 
     // if not found always use first registered renderer
-    if (renderer == NULL)
+    if (renderer == nullptr)
       renderer = (*(mitk::BaseRenderer::baseRendererMap.cbegin())).second;
   }
 
@@ -454,7 +454,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "INTERNALEVENT")
   {
-    event = InternalEvent::New(renderer, NULL, strSignalName);
+    event = InternalEvent::New(renderer, nullptr, strSignalName);
   }
   else if (eventClass == "INTERACTIONEVENT")
   {
@@ -465,15 +465,15 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     MITK_WARN << "Event couldn't be constructed. Please check your StateMachine patterns and config files\n for the "
                  "following event class, which is not valid: "
               << eventClass;
-    return NULL;
+    return nullptr;
   }
   return event;
 }
 
 std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
 {
-  InternalEvent *ie = dynamic_cast<InternalEvent *>(event);
-  if (ie != NULL)
+  auto *ie = dynamic_cast<InternalEvent *>(event);
+  if (ie != nullptr)
     return "";
 
   std::string eventClass = event->GetNameOfClass();
@@ -532,7 +532,7 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
   }
   else if (eventClass == "INTERACTIONKEYEVENT")
   {
-    mitk::InteractionKeyEvent *ke = dynamic_cast<mitk::InteractionKeyEvent *>(event);
+    auto *ke = dynamic_cast<mitk::InteractionKeyEvent *>(event);
 
     // key
     eventXML += " <" + InteractionEventConst::xmlTagAttribute() + " " + InteractionEventConst::xmlParameterName() +
@@ -547,7 +547,7 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
   }
   if (eventClass == "MOUSEWHEELEVENT")
   {
-    MouseWheelEvent *we = dynamic_cast<MouseWheelEvent *>(event);
+    auto *we = dynamic_cast<MouseWheelEvent *>(event);
     int delta = we->GetWheelDelta();
 
     std::stringstream ss;

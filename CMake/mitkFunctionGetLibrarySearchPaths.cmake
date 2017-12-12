@@ -74,14 +74,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   # the *_DIR variables. Instead, we should rely on package
   # specific "LIBRARY_DIRS" variables, if they exist.
   if(WIN32)
-    if(SOFA_DIR)
-      list(APPEND _dir_candidates "${SOFA_DIR}/bin")
-    endif()
     list(APPEND _dir_candidates "${ITK_DIR}/bin")
-  else()
-    if(SOFA_DIR)
-      list(APPEND _dir_candidates "${SOFA_DIR}/lib")
-    endif()
   endif()
 
   if(MITK_USE_MatchPoint)

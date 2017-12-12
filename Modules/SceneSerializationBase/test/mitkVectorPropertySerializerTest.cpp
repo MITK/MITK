@@ -57,9 +57,9 @@ public:
   {
     typename mitk::VectorProperty<DATATYPE>::Pointer vectorProperty = mitk::VectorProperty<DATATYPE>::New();
     std::vector<DATATYPE> data;
-    data.push_back(-918273674.6172838);
+    data.push_back(static_cast<DATATYPE>(-918273674.6172838));
     data.push_back(0);
-    data.push_back(+6172838.918273674);
+    data.push_back(static_cast<DATATYPE>(+6172838.918273674));
     data.push_back(sqrt(2));
     if (std::numeric_limits<DATATYPE>::has_infinity)
     {
@@ -82,7 +82,7 @@ public:
       itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
     CPPUNIT_ASSERT_EQUAL(size_t(1), allSerializers.size());
 
-    mitk::BasePropertySerializer *serializer =
+    auto *serializer =
       dynamic_cast<mitk::BasePropertySerializer *>(allSerializers.begin()->GetPointer());
     CPPUNIT_ASSERT(serializer != nullptr);
     if (!serializer)

@@ -53,7 +53,7 @@ public:
 
 protected:
   QmitkPickingToolGUI();
-  virtual ~QmitkPickingToolGUI();
+  ~QmitkPickingToolGUI() override;
 
   Ui::QmitkPickingToolGUIControls m_Controls;
 

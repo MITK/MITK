@@ -38,7 +38,7 @@ mitk::FiberBundleSerializer::~FiberBundleSerializer()
 std::string mitk::FiberBundleSerializer::Serialize()
 {
   const FiberBundle* fb = dynamic_cast<const FiberBundle*>( m_Data.GetPointer() );
-  if (fb == NULL)
+  if (fb == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::FiberBundle. Cannot serialize as FiberBundle.";

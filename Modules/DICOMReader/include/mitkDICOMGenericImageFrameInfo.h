@@ -47,7 +47,7 @@ namespace mitk
 
       /** Sets the value for a passed tag path. If the tag path is already set, it will be overwritten
        with the new value.
-      @pre Path must be explicit. No wildcards are allowd.
+      @pre Path must be explicit. No wildcards are allowed.
       @post The passed value is set for the passed path.
       */
       void SetTagValue(const DICOMTagPath& path, const std::string& value);
@@ -56,7 +56,7 @@ namespace mitk
       typedef std::map<DICOMTagPath, std::string> ValueMapType;
       ValueMapType m_Values;
 
-      DICOMGenericImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
+      explicit DICOMGenericImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
       DICOMGenericImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
 
     private:

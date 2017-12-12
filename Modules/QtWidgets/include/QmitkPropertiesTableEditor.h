@@ -49,7 +49,7 @@ public:
 
   ///
   /// Standard dtor. Nothing to do here.
-  virtual ~QmitkPropertiesTableEditor();
+  ~QmitkPropertiesTableEditor() override;
 
   ///
   /// Convenience method. Sets the property list in the model.

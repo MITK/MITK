@@ -40,14 +40,14 @@ class MITKQTPYTHON_EXPORT QmitkCtkPythonShell : public ctkPythonConsole
 
 public:
   QmitkCtkPythonShell(QWidget* parent = 0);
-  ~QmitkCtkPythonShell();
+  ~QmitkCtkPythonShell() override;
 public slots:
   void Paste( const QString& command );
 protected:
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dropEvent(QDropEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
   bool canInsertFromMimeData( const QMimeData *source ) const;
-  void executeCommand(const QString& command);
+  void executeCommand(const QString& command) override;
 
 private:
   QmitkCtkPythonShellData* d;

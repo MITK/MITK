@@ -53,7 +53,7 @@ class DummyTestClass : public mitk::BaseGeometry
 public:
   DummyTestClass(){};
   DummyTestClass(const DummyTestClass &other) : BaseGeometry(other){};
-  ~DummyTestClass(){};
+  ~DummyTestClass() override{};
 
   mitkClassMacro(DummyTestClass, mitk::BaseGeometry);
   itkNewMacro(Self);
@@ -67,7 +67,7 @@ public:
   }
 
 protected:
-  virtual void PrintSelf(std::ostream & /*os*/, itk::Indent /*indent*/) const override{};
+  void PrintSelf(std::ostream & /*os*/, itk::Indent /*indent*/) const override{};
   //##Documentation
   //## @brief Pre- and Post-functions are empty in BaseGeometry
   //##
@@ -75,7 +75,7 @@ protected:
   //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
   //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example:
   // SlicedGeometry3D class
-  virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override{};
+  void PreSetSpacing(const mitk::Vector3D &/*aSpacing*/) override{};
 };
 
 class mitkBaseGeometryTestSuite : public mitk::TestFixture

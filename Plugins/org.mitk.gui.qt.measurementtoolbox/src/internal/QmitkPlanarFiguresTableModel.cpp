@@ -85,7 +85,7 @@ QVariant QmitkPlanarFiguresTableModel::data( const QModelIndex &index, int role 
     {
       QmitkNodeDescriptor* nodeDescriptor
         = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node);
-      data = nodeDescriptor->GetIcon();
+      data = nodeDescriptor->GetIcon(node);
     }
   }
   else if(index.column() == 1)

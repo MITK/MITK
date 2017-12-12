@@ -124,6 +124,10 @@ private:
   itk::TimeStamp m_selectedNodeTime;
   itk::TimeStamp m_currentPositionTime;
 
+  bool m_activeManipulation;
+  bool m_autoMoving;
+  bool m_autoTarget;
+
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;
   /** @brief indicates if the currently selected position is valid for the currently selected fit.
@@ -141,12 +145,8 @@ private:
   using MAPRegistrationType = map::core::Registration<3, 3>;
   MAPRegistrationType::Pointer m_SelectedPreReg;
 
-  bool m_autoTarget;
-  bool m_autoMoving;
-  bool m_activeManipulation;
-
   bool m_internalUpdate;
-  const std::string HelperNodeName;
+  static const std::string HelperNodeName;
 };
 
 #endif // MatchPoint_h

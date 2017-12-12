@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_trace.h>
 
 using namespace boost::math;
-using namespace std;
 
 namespace itk {
 
@@ -42,10 +41,10 @@ OdfMaximaExtractionFilter< TOdfPixelType >::OdfMaximaExtractionFilter():
     m_NormalizationMethod(MAX_VEC_NORM),
     m_PeakThreshold(0.2),
     m_MaxNumPeaks(10),
-    m_ShCoeffImage(NULL),
-    m_OutputFiberBundle(NULL),
-    m_NumDirectionsImage(NULL),
-    m_DirectionImageContainer(NULL)
+    m_ShCoeffImage(nullptr),
+    m_OutputFiberBundle(nullptr),
+    m_NumDirectionsImage(nullptr),
+    m_DirectionImageContainer(nullptr)
 {
 
 }
@@ -63,8 +62,8 @@ bool OdfMaximaExtractionFilter<TOdfPixelType>::ReconstructQballImage()
     cout << "Starting qball reconstruction\n";
     try {
         QballReconstructionFilterType::Pointer filter = QballReconstructionFilterType::New();
-        filter->SetGradientImage( m_DiffusionGradients, m_DiffusionImage );
         filter->SetBValue(m_Bvalue);
+        filter->SetGradientImage( m_DiffusionGradients, m_DiffusionImage );
         filter->SetLambda(0.006);
         filter->SetNormalizationMethod(QballReconstructionFilterType::QBAR_SOLID_ANGLE);
         filter->Update();
@@ -85,7 +84,7 @@ std::vector<double> OdfMaximaExtractionFilter< TOdfPixelType >
 ::SolveCubic(const double& a, const double& b, const double& c, const double& d)
 {
     double A, B, p, q, r, D, offset, ee, tmp, root;
-    vector<double> roots;
+    std::vector<double> roots;
     double inv3 = 1.0/3.0;
 
     if (a!=0) // solve ax³ + bx² + cx + d = 0
@@ -123,8 +122,11 @@ std::vector<double> OdfMaximaExtractionFilter< TOdfPixelType >
             tmp=-B;
             tmp=cbrt(tmp);
             root=2*tmp-offset;      roots.push_back(root);
+            // TODO: check if this is correct (see history)
             if (A!=0 || B!=0)
+            {
                 root=-tmp-offset;   roots.push_back(root);
+            }
         }
     }
     else if (b!=0) // solve bx² + cx + d = 0
@@ -136,12 +138,17 @@ std::vector<double> OdfMaximaExtractionFilter< TOdfPixelType >
             root = (-c+tmp)/(2.0*b); roots.push_back(root);
             root = (-c-tmp)/(2.0*b); roots.push_back(root);
         }
+        // TODO: check if this is correct (see history)
         else if (D==0)
+        {
             root = -c/(2.0*b); roots.push_back(root);
+        }
     }
+    // TODO: check if this is correct (see history)
     else if (c!=0) // solve cx + d = 0
+    {
         root = -d/c; roots.push_back(root);
-
+    }
     return roots;
 }
 
@@ -293,7 +300,7 @@ std::vector< vnl_vector_fixed< double, 3 > > OdfMaximaExtractionFilter< TOdfPixe
     int npeaks = 0, nMin = 0;
     double dMin, dPos, dNeg, d;
     Vector3D u;
-    vector< Vector3D > v;
+    std::vector< Vector3D > v;
 
     // initialize container for vector clusters
     std::vector < std::vector< Vector3D > > clusters;
@@ -367,7 +374,7 @@ std::vector< vnl_vector_fixed< double, 3 > > OdfMaximaExtractionFilter< TOdfPixe
             }
         }
         v.clear();
-        vector< double > restVals;
+        std::vector< double > restVals;
         for (int i=0; i<npeaks; i++) // keep only peaks with high enough amplitude and convert back to cartesian coordinates
             if ( odfVals(i)>=m_PeakThreshold*maxVal )
             {
@@ -381,7 +388,7 @@ std::vector< vnl_vector_fixed< double, 3 > > OdfMaximaExtractionFilter< TOdfPixe
 
         if (npeaks>m_MaxNumPeaks) // if still too many peaks, keep only the m_MaxNumPeaks with maximum value
         {
-            vector< Vector3D > v2;
+            std::vector< Vector3D > v2;
             for (int i=0; i<m_MaxNumPeaks; i++)
             {
                 maxVal = itk::NumericTraits<double>::NonpositiveMin();  //Get the maximum ODF peak value and the corresponding peak index

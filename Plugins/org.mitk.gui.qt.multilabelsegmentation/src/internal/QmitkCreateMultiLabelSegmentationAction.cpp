@@ -45,19 +45,22 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
     return;
   }
 
-  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
+  for ( auto referenceNode : selectedNodes )
   {
     if (referenceNode.IsNotNull())
     {
-
       mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
-      assert(referenceImage);
+      if (nullptr == referenceImage)
+      {
+        MITK_WARN << "Could not create multi label segmentation for non-image node - skipping action.";
+        continue;
+      }
 
       QString newName = QString::fromStdString(referenceNode->GetName());
       newName.append("-labels");
 
       bool ok = false;
-      newName = QInputDialog::getText(NULL, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
+      newName = QInputDialog::getText(nullptr, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
       if(!ok) return;
 
       mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();
@@ -105,17 +108,17 @@ void QmitkCreateMultiLabelSegmentationAction::SetDataStorage(mitk::DataStorage* 
   m_DataStorage = dataStorage;
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
+void QmitkCreateMultiLabelSegmentationAction::SetFunctionality(berry::QtViewPart*)
 {
   //not needed
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetSmoothed(bool smoothed)
+void QmitkCreateMultiLabelSegmentationAction::SetSmoothed(bool)
 {
   //not needed
 }
 
-void QmitkCreateMultiLabelSegmentationAction::SetDecimated(bool decimated)
+void QmitkCreateMultiLabelSegmentationAction::SetDecimated(bool)
 {
   //not needed
 }

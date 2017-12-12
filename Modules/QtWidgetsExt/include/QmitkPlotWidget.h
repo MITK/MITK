@@ -90,7 +90,7 @@ public:
   /**
   * Virtual destructor
   */
-  virtual ~QmitkPlotWidget();
+  ~QmitkPlotWidget() override;
 
   /**
   * Returns the instance of the plot-widget. This may be used
@@ -246,7 +246,7 @@ public:
   /**
   * Set a curve's legend attribute
   * @param curveId the id of the curve
-  * @param attribute the öegend attribute to be set
+  * @param attribute the legend attribute to be set
   */
   void SetLegendAttribute(unsigned int curveId, const QwtPlotCurve::LegendAttribute &attribute);
 

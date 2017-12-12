@@ -28,10 +28,10 @@ class MITKQTPYTHON_EXPORT QmitkPythonScriptEditorHighlighter : public QSyntaxHig
 
 public:
   QmitkPythonScriptEditorHighlighter(QTextDocument *parent);
-  virtual ~QmitkPythonScriptEditorHighlighter();
+  ~QmitkPythonScriptEditorHighlighter() override;
 
 protected:
-  void highlightBlock(const QString &text);
+  void highlightBlock(const QString &text) override;
   void highlightComments(const QString &text);
 
 private:

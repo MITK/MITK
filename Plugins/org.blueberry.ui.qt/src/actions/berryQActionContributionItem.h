@@ -270,11 +270,6 @@ private:
   //static const QString ellipsis = "...";
 
   /**
-   * Stores the result of the action. False when the action returned failure.
-   */
-  bool result; // = null;
-
-  /**
    * The presentation mode.
    */
   Modes mode; // = 0;

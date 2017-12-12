@@ -44,7 +44,7 @@ int SetUpBeforeTest()
     us::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
   m_Service = us::GetModuleContext()->GetService(serviceRef);
 
-  if (m_Service == 0)
+  if (m_Service == nullptr)
     return EXIT_FAILURE;
 
   // Creating different Geometries
@@ -104,7 +104,7 @@ int testAddPlanePosition()
 {
   MITK_TEST_OUTPUT(<< "Starting Test: ######### A d d P l a n e P o s i t i o n #########");
 
-  MITK_TEST_CONDITION(m_Service != NULL, "Testing getting of PlanePositionManagerService");
+  MITK_TEST_CONDITION(m_Service != nullptr, "Testing getting of PlanePositionManagerService");
 
   unsigned int currentID(m_Service->AddNewPlanePosition(m_Geometries.at(0), 0));
 
@@ -194,12 +194,12 @@ int testGetPlanePosition()
   }
 
   // Testing for not existing planepositions
-  error = (m_Service->GetPlanePosition(100000000) != 0 || m_Service->GetPlanePosition(-1) != 0);
+  error = (m_Service->GetPlanePosition(100000000) != nullptr || m_Service->GetPlanePosition(-1) != nullptr);
 
   if (error)
   {
-    MITK_TEST_CONDITION(m_Service->GetPlanePosition(100000000) == 0, "Trying to get non existing pos");
-    MITK_TEST_CONDITION(m_Service->GetPlanePosition(-1) == 0, "Trying to get non existing pos");
+    MITK_TEST_CONDITION(m_Service->GetPlanePosition(100000000) == nullptr, "Trying to get non existing pos");
+    MITK_TEST_CONDITION(m_Service->GetPlanePosition(-1) == nullptr, "Trying to get non existing pos");
     return EXIT_FAILURE;
   }
 
@@ -251,12 +251,12 @@ int testRemoveAll()
 
   bool error(true);
 
-  error = (m_Service->GetNumberOfPlanePositions() != 0 || m_Service->GetPlanePosition(60) != 0);
+  error = (m_Service->GetNumberOfPlanePositions() != 0 || m_Service->GetPlanePosition(60) != nullptr);
 
   if (error)
   {
     MITK_TEST_CONDITION(m_Service->GetNumberOfPlanePositions() == 0, "Testing remove all pos");
-    MITK_TEST_CONDITION(m_Service->GetPlanePosition(60) == 0, "Testing remove all pos");
+    MITK_TEST_CONDITION(m_Service->GetPlanePosition(60) == nullptr, "Testing remove all pos");
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

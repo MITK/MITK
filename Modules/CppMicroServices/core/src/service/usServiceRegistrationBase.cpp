@@ -33,7 +33,7 @@
 US_BEGIN_NAMESPACE
 
 ServiceRegistrationBase::ServiceRegistrationBase()
-  : d(0)
+  : d(nullptr)
 {
 
 }
@@ -59,7 +59,7 @@ ServiceRegistrationBase::ServiceRegistrationBase(ModulePrivate* module, const In
 
 ServiceRegistrationBase::operator bool_type() const
 {
-  return d != NULL ? &ServiceRegistrationBase::d : NULL;
+  return d != nullptr ? &ServiceRegistrationBase::d : nullptr;
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(int null)
@@ -70,7 +70,7 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(int null)
     {
       delete d;
     }
-    d = 0;
+    d = nullptr;
   }
   return *this;
 }
@@ -230,7 +230,7 @@ void ServiceRegistrationBase::Unregister()
           }
         }
       }
-      d->module = 0;
+      d->module = nullptr;
       d->dependents.clear();
       d->service.clear();
       d->prototypeServiceInstances.clear();

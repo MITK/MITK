@@ -32,7 +32,7 @@ namespace mitk
   class MITKTOFHARDWARE_EXPORT ToFImageRecorderFilter : public ImageToImageFilter
   {
   public:
-    mitkClassMacro( ToFImageRecorderFilter , ImageToImageFilter );
+    mitkClassMacro(ToFImageRecorderFilter, ImageToImageFilter);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -66,18 +66,19 @@ namespace mitk
     */
     void StopRecording();
 
+    using itk::ProcessObject::SetInput;
 
     /*!
     \brief sets the input of this filter
     \param input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput( Image* input);
+    virtual void SetInput( const InputImageType* input) override;
     /*!
     \brief sets the input of this filter at idx
     \param idx number of the current input
     \param input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput(unsigned int idx,  Image* input);
+    virtual void SetInput(unsigned int idx,  const InputImageType* input) override;
     /*!
     \brief returns the input of this filter
     */
@@ -110,8 +111,8 @@ namespace mitk
     */
     void CreateOutputsForAllInputs();
 
-    ToFImageWriter::Pointer m_ToFImageWriter; ///< image writer used for streaming input data to file
     bool m_RecordingStarted; ///< flag indicating if filter is currently recording
+    ToFImageWriter::Pointer m_ToFImageWriter; ///< image writer used for streaming input data to file
     std::string m_FileExtension;
   };
 } //END mitk namespace

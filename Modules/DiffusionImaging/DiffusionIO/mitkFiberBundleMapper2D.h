@@ -26,11 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundle.h>
 #include <vtkSmartPointer.h>
 
+#define MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER vtkOpenGLPolyDataMapper
 
 class vtkActor;
 //class vtkPropAssembly; //lets see if we need it
 class mitkBaseRenderer;
-class vtkPolyDataMapper;
+class MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER;
 class vtkCutter;
 class vtkPlane;
 class vtkPolyData;
@@ -55,7 +56,7 @@ public:
     virtual void Update(mitk::BaseRenderer * renderer) override;
 
 
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
 
 
     //### methods of MITK-VTK rendering pipeline
@@ -69,7 +70,7 @@ public:
         /** \brief Point Actor of a 2D render window. */
         vtkSmartPointer<vtkActor> m_PointActor;
         /** \brief Point Mapper of a 2D render window. */
-        vtkSmartPointer<vtkPolyDataMapper> m_FiberMapper;
+        vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER> m_FiberMapper;
         vtkSmartPointer<vtkPlane> m_SlicingPlane;  //needed later when optimized 2D mapper
         vtkSmartPointer<vtkPolyData> m_SlicedResult; //might be depricated in optimized 2D mapper
 

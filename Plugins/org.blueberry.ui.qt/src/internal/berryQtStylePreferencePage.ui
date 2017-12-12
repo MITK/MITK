@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>499</width>
     <height>348</height>
    </rect>
   </property>
@@ -50,28 +50,41 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="m_IconThemeFrame">
+    <widget class="QFrame" name="m_FontFrame">
      <property name="frameShape">
       <enum>QFrame::Panel</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QLabel" name="m_IconThemeLabel">
+       <widget class="QLabel" name="m_FontLabel">
         <property name="text">
-         <string>Active Icon Theme</string>
+         <string>Active Font</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="m_IconThemeComboBox">
+       <widget class="QComboBox" name="m_FontComboBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="m_FontSizeSpinBox">
+        <property name="minimum">
+         <number>7</number>
+        </property>
+        <property name="maximum">
+         <number>40</number>
+        </property>
+        <property name="value">
+         <number>10</number>
         </property>
        </widget>
       </item>

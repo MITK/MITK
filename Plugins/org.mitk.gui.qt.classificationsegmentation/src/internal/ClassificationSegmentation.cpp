@@ -339,7 +339,6 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
   typedef itk::ConstNeighborhoodIterator<DoubleImageType> NeighborhoodType; // Neighborhood iterator to access image
   typedef itk::Functor::NeighborhoodFirstOrderStatistics<NeighborhoodType, double> FunctorType;
   typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
-  typedef FOSFilerType::MaskImageType MaskImageType;
 
   m_FeatureImageVector.clear();
 
@@ -671,7 +670,7 @@ void ClassificationSegmentation::SampleClassMaskByPointSet(const mitk::Image::Po
 
 //  if (cb_image == nullptr || cb_classifier == nullptr || cb_maskimage == nullptr)
 //  {
-//    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
+//    QMessageBox::information( nullptr, "Template", "Please load and select an image before starting image processing.");
 //    return;
 //  }
 
@@ -821,8 +820,6 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::PostProcessingCall
   mitk::Image::Pointer LES_PMap = m_ResultImageVector[2]->Clone();
   mitk::Image::Pointer BRA_PMap = m_ResultImageVector[3]->Clone();
   mitk::Image::Pointer mask = m_ResultImageVector[0]->Clone();
-
-  typedef itk::Image<double, 3> TImageType;
 
   MITK_INFO("PostProcessingCallback") << "ProbabilityMap merg strat ...";
 

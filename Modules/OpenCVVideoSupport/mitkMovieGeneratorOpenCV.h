@@ -46,7 +46,7 @@ public:
     m_FourCCCodec = codec;
   }
 
-  virtual void SetFrameRate(int rate);
+  virtual void SetFrameRate(unsigned int rate);
 
   ///
   /// if true the movie will be cutted by a 10 pixel margin

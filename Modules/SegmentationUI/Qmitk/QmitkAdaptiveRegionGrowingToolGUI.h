@@ -173,7 +173,7 @@ protected:
   mitk::AdaptiveRegionGrowingTool::Pointer m_RegionGrow3DTool;
 
   /** \brief Destructor. */
-  virtual ~QmitkAdaptiveRegionGrowingToolGUI();
+  ~QmitkAdaptiveRegionGrowingToolGUI() override;
 
   // Pointer to the main widget to be able to reach the renderer
   QmitkStdMultiWidget *m_MultiWidget;

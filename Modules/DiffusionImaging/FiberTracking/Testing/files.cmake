@@ -1,8 +1,7 @@
 SET(MODULE_CUSTOM_TESTS
   mitkFiberBundleReaderWriterTest.cpp
   mitkGibbsTrackingTest.cpp
-  mitkStreamlineTrackingTest.cpp
-  mitkPeakExtractionTest.cpp
+  mitkStreamlineTractographyTest.cpp
   mitkLocalFiberPlausibilityTest.cpp
   mitkFiberTransformationTest.cpp
   mitkFiberExtractionTest.cpp

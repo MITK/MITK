@@ -170,7 +170,7 @@ InternalJob::Pointer InternalJob::Remove()
 }
 
 
-void InternalJob::SetAboutToRunCanceled(bool value) throw (JobRuntimeException)
+void InternalJob::SetAboutToRunCanceled(bool value)
 {
   flags = value ? flags | M_ABOUT_TO_RUN_CANCELED : flags
       & ~M_ABOUT_TO_RUN_CANCELED;
@@ -385,18 +385,18 @@ void InternalJob::SetProgressGroup(IProgressMonitor::Pointer group, int ticks)
 //InternalJob
 //::SetProperty(QualifiedName key, Object value) {
 //    // thread safety: (Concurrency001 - copy on write)
-//    if (value == NULL) {
-//      if (properties == NULL)
+//    if (value == nullptr) {
+//      if (properties == nullptr)
 //        return;
 //      ObjectMap temp = (ObjectMap) properties.Clone();
 //      temp.Remove(key);
 //      if (temp.isEmpty())
-//        properties = NULL;
+//        properties = nullptr;
 //      else
 //        properties = temp;
 //    } else {
 //      ObjectMap temp = properties;
-//      if (temp == NULL)
+//      if (temp == nullptr)
 //        temp = new ObjectMap(5);
 //      else
 //        temp = (ObjectMap) properties.Clone();

@@ -34,7 +34,7 @@ namespace mitk
   {
   public:
     TestOperation(OperationType operationType) : Operation(operationType) { g_GlobalCounter++; };
-    virtual ~TestOperation() { g_GlobalCounter--; };
+    ~TestOperation() override { g_GlobalCounter--; };
   };
 } // namespace
 

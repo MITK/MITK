@@ -77,7 +77,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     float intersection = -1;
     for ( vtkIdType n = 0; n < numberOfPoints; n++ )
     {
-      colors->InsertNextTupleValue(&intersection);
+      colors->InsertNextTuple1(intersection);
     }
 
     if ( numberOfPoints > 0 )
@@ -96,7 +96,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     float intersection = 0;
     for ( vtkIdType n = 0; n < numberOfPoints; n++ )
     {
-      colors->InsertNextTupleValue(&intersection);
+      colors->InsertNextTuple1(intersection);
     }
 
     if ( numberOfPoints > 0 )
@@ -146,7 +146,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     for ( unsigned int n = 0; n < numberOfPoints; n++ )
     {
       vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-      if ( cellLocator->IntersectWithLine(point1, targetSurfaceVtkTransformed->GetPoint(n), points, NULL) != 0 )
+      if ( cellLocator->IntersectWithLine(point1, targetSurfaceVtkTransformed->GetPoint(n), points, nullptr) != 0 )
       {
         occlusion.at(n) = true;
       }
@@ -159,7 +159,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     float one = 1.0f; float zero = 0.0f;
     for ( std::vector<bool>::iterator it = occlusion.begin(); it != occlusion.end(); ++it )
     {
-      colors->InsertNextTupleValue(*it ? &one : &zero);
+      colors->InsertNextTuple1(*it ? one : zero);
     }
 
     targetSurfaceVtk->GetPointData()->AddArray(colors);
@@ -172,21 +172,21 @@ vtkSmartPointer<vtkPolyData> mitk::USNavigationTargetOcclusionFilter::GetVtkPoly
   if ( m_TargetStructure.IsNull() )
   {
     MITK_WARN("USNavigationTargetOcclusionFilter") << "Target structure must not be null.";
-    return NULL;
+    return nullptr;
   }
 
   mitk::Surface::Pointer targetSurface = dynamic_cast<mitk::Surface*>(m_TargetStructure->GetData());
   if ( targetSurface.IsNull() )
   {
     MITK_WARN("USNavigationTargetOcclusionFilter") << "A mitk::Surface has to be set to the data node.";
-    return NULL;
+    return nullptr;
   }
 
   vtkSmartPointer<vtkPolyData> targetSurfaceVtk = targetSurface->GetVtkPolyData();
   if( targetSurfaceVtk == 0 )
   {
     MITK_WARN("USNavigationTargetOcclusionFilter") << "VtkPolyData of the mitk::Surface of the data node must not be null.";
-    return NULL;
+    return nullptr;
   }
 
   return targetSurfaceVtk;

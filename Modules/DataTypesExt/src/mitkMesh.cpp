@@ -204,10 +204,8 @@ int mitk::Mesh::SearchSelectedCell(int t)
 // closed
 bool mitk::Mesh::GetPointIds(unsigned long cellId, unsigned long lineId, int &idA, int &idB, int t)
 {
-  bool ok = false;
-  bool found = false;
   CellAutoPointer cellAutoPointer;
-  ok = m_PointSetSeries[t]->GetCell(cellId, cellAutoPointer);
+  bool ok = m_PointSetSeries[t]->GetCell(cellId, cellAutoPointer);
   if (ok)
   {
     CellType *cell = cellAutoPointer.GetPointer();
@@ -220,6 +218,7 @@ bool mitk::Mesh::GetPointIds(unsigned long cellId, unsigned long lineId, int &id
     PointIdIterator pointIdIt = cell->PointIdsBegin();
     PointIdIterator pointIdEnd = cell->PointIdsEnd();
     unsigned int counter = 0;
+    bool found = false;
     while (pointIdIt != pointIdEnd)
     {
       if (counter == lineId)
@@ -263,7 +262,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpNEWCELL:
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
 
       // if no lineoperation, then call superclass pointSet
       if (lineOp == nullptr)
@@ -292,7 +291,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpDELETECELL:
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       if (lineOp == nullptr) // if no lineoperation, then call superclass pointSet
       {
         Superclass::ExecuteOperation(operation);
@@ -305,7 +304,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
     case OpCLOSECELL:
       // sets the bolean flag closed from a specified cell to true.
       {
-        mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+        auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
         if (lineOp == nullptr) // if no lineoperation, then call superclass pointSet
         {
           // then search the selected cell!//TODO
@@ -335,7 +334,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpOPENCELL:
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       if (lineOp == nullptr) // if no lineoperation, then call superclass pointSet
       {
         Superclass::ExecuteOperation(operation);
@@ -359,7 +358,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
       // inserts the ID of the selected point into the indexes of lines in the
       // selected cell afterwars the added line is selected
       {
-        mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+        auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
 
         int cellId = -1;
         int pId = -1;
@@ -392,7 +391,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
           CellType *cell = cellAutoPointer.GetPointer();
           if (cell->GetType() == CellType::POLYGON_CELL)
           {
-            PolygonType *polygon = static_cast<PolygonType *>(cell);
+            auto *polygon = static_cast<PolygonType *>(cell);
             // add the pointId to the Cell. filling the empty cell with
             // one id doesn't mean to add a line, it means, that the
             // initilal PointId is set. The next addition of a pointId adds
@@ -421,7 +420,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
     {
       // deleted the last line through removing the index PIdA
       // (if set to -1, use the last point) in the given cellId
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       int cellId = -1;
       int pId = -1;
 
@@ -448,7 +447,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
         CellType *cell = cellAutoPointer.GetPointer();
         if (cell->GetType() == CellType::POLYGON_CELL)
         {
-          PolygonType *oldPolygon = static_cast<PolygonType *>(cell);
+          auto *oldPolygon = static_cast<PolygonType *>(cell);
 
           auto newPolygonCell = new PolygonType;
           CellAutoPointer newCell;
@@ -482,7 +481,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
       // Remove the given Index in the given cell through copying everything
       // into a new cell accept the one that has to be deleted.
       {
-        mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+        auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
         if (lineOp == nullptr) // if no lineoperation, then call superclass pointSet
         {
           Superclass::ExecuteOperation(operation);
@@ -498,7 +497,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
         CellType *cell = cellAutoPointer.GetPointer();
         CellAutoPointer newCellAutoPointer;
         newCellAutoPointer.TakeOwnership(new PolygonType);
-        PolygonType *newPolygon = static_cast<PolygonType *>(cell);
+        auto *newPolygon = static_cast<PolygonType *>(cell);
 
         PointIdIterator it = cell->PointIdsBegin();
         PointIdIterator end = cell->PointIdsEnd();
@@ -535,7 +534,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
       ////the cell has to exist!
       //{
       // mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
-      //  if (lineOp == NULL)//if no lineoperation, then call superclass pointSet
+      //  if (lineOp == nullptr)//if no lineoperation, then call superclass pointSet
       // {
       //    Superclass::ExecuteOperation(operation);
       //  }
@@ -601,7 +600,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpMOVELINE: //(moves two points)
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
 
       if (lineOp == nullptr)
       {
@@ -637,7 +636,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpSELECTLINE: //(select the given line)
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       if (lineOp == nullptr) // if no lineoperation, then call superclass pointSet
       {
         Superclass::ExecuteOperation(operation);
@@ -663,7 +662,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpDESELECTLINE: //(deselect the given line)
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       if (lineOp == nullptr)
       {
         Superclass::ExecuteOperation(operation);
@@ -689,7 +688,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpSELECTCELL: //(select the given cell)
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       if (lineOp == nullptr) // if no lineoperation, then call superclass pointSet
       {
         Superclass::ExecuteOperation(operation);
@@ -712,7 +711,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
 
     case OpDESELECTCELL: //(deselect the given cell)
     {
-      mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
+      auto *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       if (lineOp == nullptr) // if no lineoperation, then call superclass pointSet
       {
         Superclass::ExecuteOperation(operation);
@@ -733,7 +732,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
     case OpMOVECELL:
       // moves all Points of one cell according to the given vector
       {
-        mitk::CellOperation *lineOp = dynamic_cast<mitk::CellOperation *>(operation);
+        auto *lineOp = dynamic_cast<mitk::CellOperation *>(operation);
         if (lineOp == nullptr) // if no celloperation, then call superclass pointSet
         {
           Superclass::ExecuteOperation(operation);

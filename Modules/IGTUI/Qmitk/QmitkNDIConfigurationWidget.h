@@ -45,7 +45,7 @@ class MITKIGTUI_EXPORT QmitkNDIConfigurationWidget : public QWidget
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public:
   QmitkNDIConfigurationWidget(QWidget* parent);
-  virtual ~QmitkNDIConfigurationWidget();
+  ~QmitkNDIConfigurationWidget() override;
 
   DEPRECATED(std::string GetDeviceName() const);
   DEPRECATED(mitk::NDITrackingDevice* GetTracker() const);
@@ -60,7 +60,7 @@ public:
 
   DEPRECATED(const QString GetToolType(unsigned int index) const);
   DEPRECATED(const QString GetToolName(unsigned int index) const);
-  DEPRECATED(QMap<QString, unsigned int> GetToolAndTypes() const);
+  QMap<QString, unsigned int> GetToolAndTypes() const;
   DEPRECATED(QList<unsigned int> GetToolsByToolType(QString toolType) const);
   DEPRECATED(mitk::DataNode* GetNode(unsigned int index) const);
 

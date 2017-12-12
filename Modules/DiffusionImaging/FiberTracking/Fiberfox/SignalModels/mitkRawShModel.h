@@ -57,7 +57,7 @@ public:
     typedef itk::Image< double, 3 >                                         ItkDoubleImageType;
     typedef itk::Image< unsigned char, 3 >                                  ItkUcharImageType;
     typedef itk::Image< itk::DiffusionTensor3D< double >, 3 >               TensorImageType;
-    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,2,QBALL_ODFSIZE> QballFilterType;
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,2,ODF_SAMPLING_SIZE> QballFilterType;
     typedef typename DiffusionSignalModel< ScalarType >::PixelType          PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType       GradientType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
@@ -69,7 +69,6 @@ public:
 
     bool SetShCoefficients(vnl_vector< double > shCoefficients, double b0);
     void SetFiberDirection(GradientType fiberDirection);
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
     void SetFaRange(double min, double max){ m_FaRange.first = min; m_FaRange.second = max; }
     void SetAdcRange(double min, double max){ m_AdcRange.first = min; m_AdcRange.second = max; }
     void SetMaxNumKernels(unsigned int max){ m_MaxNumKernels = max; }
@@ -88,7 +87,7 @@ public:
     double GetBaselineSignal(int index){ return m_B0Signal.at(index); }
     vnl_vector< double > GetCoefficients(int listIndex){ return m_ShCoefficients.at(listIndex); }
 
-    bool SampleKernels(Image::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage=NULL, QballFilterType::CoefficientImageType::Pointer coeffImage=NULL, ItkDoubleImageType::Pointer adcImage=NULL);
+    bool SampleKernels(Image::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage=nullptr, QballFilterType::CoefficientImageType::Pointer coeffImage=nullptr, ItkDoubleImageType::Pointer adcImage=nullptr);
 
 protected:
 

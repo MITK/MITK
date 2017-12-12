@@ -28,11 +28,11 @@ class MITKQTWIDGETSEXT_EXPORT QmitkBasePropertyView : public QLabel, public mitk
 
 public:
   QmitkBasePropertyView(const mitk::BaseProperty *, QWidget *parent);
-  virtual ~QmitkBasePropertyView();
+  ~QmitkBasePropertyView() override;
 
 protected:
-  virtual void PropertyChanged() override;
-  virtual void PropertyRemoved() override;
+  void PropertyChanged() override;
+  void PropertyRemoved() override;
 
 private:
 };

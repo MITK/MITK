@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 
 mitk::TrackingDeviceSource::TrackingDeviceSource()
-  : mitk::NavigationDataSource(), m_TrackingDevice(NULL)
+  : mitk::NavigationDataSource(), m_TrackingDevice(nullptr)
 {
 }
 
@@ -39,7 +39,7 @@ mitk::TrackingDeviceSource::~TrackingDeviceSource()
     {
       this->Disconnect();
     }
-    m_TrackingDevice = NULL;
+    m_TrackingDevice = nullptr;
   }
 }
 
@@ -126,7 +126,7 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
   MITK_DEBUG << "Number of outputs at start of method CreateOutputs(): " << numberOfOutputs;
   for (unsigned int idx = 0; idx < m_TrackingDevice->GetToolCount(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       static_cast<mitk::NavigationData*>(newOutput.GetPointer())->SetName(m_TrackingDevice->GetTool(idx)->GetToolName()); // set NavigationData name to ToolName

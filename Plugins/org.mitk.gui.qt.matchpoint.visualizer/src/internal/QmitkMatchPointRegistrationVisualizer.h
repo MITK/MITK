@@ -60,7 +60,7 @@ public:
     virtual void CreateQtPartControl(QWidget* parent);
 
     /** Returns the registration currently handled by the plugin.
-     * May return NULL, if no registration is selected/handled by
+     * May return nullptr, if no registration is selected/handled by
      * the plugin*/
     mitk::MAPRegistrationWrapper* GetCurrentRegistration();
 
@@ -100,20 +100,20 @@ private:
 
     /** Function returns the first data node containing a registration wrapper
      * in the current selection of the data manager. If nothing is selected or
-     * no registration wrapper is selected it return NULL.*/
+     * no registration wrapper is selected it return nullptr.*/
     mitk::DataNode::Pointer GetSelectedRegNode() const;
 
     /** If a registration node is set, this function determines the relevant referenced node.
      * The reference node is the node of the target or moving data (depending on the selected directions)
      * used to determine the* registration object.
      * @return Pointer to the reference node (moving or target data of the registration algorithm run).
-     * Function may return NULL if the referenced node cannot be found or is not defined
+     * Function may return nullptr if the referenced node cannot be found or is not defined
      * by the registration.*/
     mitk::DataNode::Pointer GetRefNodeOfReg(bool target) const;
 
     /** Methods returns the first node selected in the data manager that does
      * NOT contain a registration wrapper and has a data pointer with a geometry.
-     * Returned pointer may be NULL if nothing is selected or no appropriate data
+     * Returned pointer may be nullptr if nothing is selected or no appropriate data
      * node is selected.*/
     mitk::DataNode::Pointer GetSelectedDataNode();
 

@@ -32,7 +32,7 @@ template< class PixelType, int ShOrder >
 ShCoefficientImageImporter< PixelType, ShOrder >::ShCoefficientImageImporter()
     : m_Toolkit(FSL)
 {
-    m_ShBasis.set_size(QBALL_ODFSIZE, (ShOrder+1)*(ShOrder+2)/2);
+    m_ShBasis.set_size(ODF_SAMPLING_SIZE, (ShOrder+1)*(ShOrder+2)/2);
 }
 
 template< class PixelType, int ShOrder >
@@ -62,14 +62,14 @@ void ShCoefficientImageImporter< PixelType, ShOrder >
     imageRegion3.SetSize(1, imageRegion4.GetSize()[1]);
     imageRegion3.SetSize(2, imageRegion4.GetSize()[2]);
 
-    m_QballImage = QballImageType::New();
-    m_QballImage->SetSpacing( spacing3 );
-    m_QballImage->SetOrigin( origin3 );
-    m_QballImage->SetDirection( direction3 );
-    m_QballImage->SetRegions( imageRegion3 );
-    m_QballImage->Allocate();
-    Vector< PixelType, QBALL_ODFSIZE > nullVec1; nullVec1.Fill(0.0);
-    m_QballImage->FillBuffer(nullVec1);
+    m_OdfImage = OdfImageType::New();
+    m_OdfImage->SetSpacing( spacing3 );
+    m_OdfImage->SetOrigin( origin3 );
+    m_OdfImage->SetDirection( direction3 );
+    m_OdfImage->SetRegions( imageRegion3 );
+    m_OdfImage->Allocate();
+    Vector< PixelType, ODF_SAMPLING_SIZE > nullVec1; nullVec1.Fill(0.0);
+    m_OdfImage->FillBuffer(nullVec1);
 
     m_CoefficientImage = CoefficientImageType::New();
     m_CoefficientImage->SetSpacing( spacing3 );
@@ -80,7 +80,6 @@ void ShCoefficientImageImporter< PixelType, ShOrder >
     Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder > nullVec2; nullVec2.Fill(0.0);
     m_CoefficientImage->FillBuffer(nullVec2);
 
-    typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     int x = imageRegion4.GetSize(0);
     int y = imageRegion4.GetSize(1);
     int z = imageRegion4.GetSize(2);
@@ -109,12 +108,12 @@ void ShCoefficientImageImporter< PixelType, ShOrder >
                 index2.SetElement(2,c);
                 m_CoefficientImage->SetPixel(index2, pix);
 
-                typename QballImageType::PixelType pix2;
+                typename OdfImageType::PixelType pix2;
                 vnl_matrix<double> odf = m_ShBasis*coeffs;
-                for (int d=0; d<QBALL_ODFSIZE; d++)
-                    pix2[d] = odf(d,0)*M_PI*4/QBALL_ODFSIZE;
+                for (int d=0; d<ODF_SAMPLING_SIZE; d++)
+                    pix2[d] = odf(d,0);
 
-                m_QballImage->SetPixel(index2,pix2);
+                m_OdfImage->SetPixel(index2,pix2);
             }
 }
 
@@ -123,10 +122,10 @@ template< class PixelType, int ShOrder >
 void ShCoefficientImageImporter< PixelType, ShOrder >
 ::CalcShBasis()
 {
-    vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> sphCoords = GetSphericalOdfDirections();
+    vnl_matrix_fixed<double, 2, ODF_SAMPLING_SIZE> sphCoords = GetSphericalOdfDirections();
     int j, m; double mag, plm;
 
-    for (int p=0; p<QBALL_ODFSIZE; p++)
+    for (int p=0; p<ODF_SAMPLING_SIZE; p++)
     {
         j=0;
         for (int l=0; l<=ShOrder; l=l+2)
@@ -163,14 +162,14 @@ void ShCoefficientImageImporter< PixelType, ShOrder >
 
 // convert cartesian to spherical coordinates
 template< class PixelType, int ShOrder >
-vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> ShCoefficientImageImporter< PixelType, ShOrder >
+vnl_matrix_fixed<double, 2, ODF_SAMPLING_SIZE> ShCoefficientImageImporter< PixelType, ShOrder >
 ::GetSphericalOdfDirections()
 {
-    itk::OrientationDistributionFunction< PixelType, QBALL_ODFSIZE > odf;
-    vnl_matrix_fixed<double, 3, QBALL_ODFSIZE>* dir = odf.GetDirections();
-    vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> sphCoords;
+    itk::OrientationDistributionFunction< PixelType, ODF_SAMPLING_SIZE > odf;
+    vnl_matrix_fixed<double, 3, ODF_SAMPLING_SIZE>* dir = odf.GetDirections();
+    vnl_matrix_fixed<double, 2, ODF_SAMPLING_SIZE> sphCoords;
 
-    for (int i=0; i<QBALL_ODFSIZE; i++)
+    for (int i=0; i<ODF_SAMPLING_SIZE; i++)
     {
         double mag = dir->get_column(i).magnitude();
 

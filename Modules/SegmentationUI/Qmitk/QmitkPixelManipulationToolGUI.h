@@ -40,7 +40,7 @@ public:
 
 protected:
   QmitkPixelManipulationToolGUI();
-  virtual ~QmitkPixelManipulationToolGUI();
+  ~QmitkPixelManipulationToolGUI() override;
 
   mitk::PixelManipulationTool::Pointer m_PixelManipulationTool;
   QSlider *m_Slider;

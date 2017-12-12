@@ -28,6 +28,7 @@
 #! \param PACKAGE_DEPENDS (optional) A list of external packages this plug-in depends on.
 #! \param DOXYGEN_TAGFILES (optional) Which external tag files should be available for the plugin documentation
 #! \param MOC_OPTIONS (optional) Additional options to pass to the Qt MOC compiler
+#! \param WARNINGS_NO_ERRORS (optional) Do not handle compiler warnings as errors
 function(mitk_create_plugin)
 
   # options
@@ -35,6 +36,7 @@ function(mitk_create_plugin)
     TEST_PLUGIN # Mark this plug-in as a testing plug-in
     NO_INSTALL  # Don't install this plug-in
     NO_QHP_TRANSFORM
+    WARNINGS_NO_ERRORS
   )
 
   # single value arguments
@@ -197,6 +199,32 @@ function(mitk_create_plugin)
 
   set_property(TARGET ${PLUGIN_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${PLUGIN_TARGET})
   set_property(TARGET ${PLUGIN_TARGET} PROPERTY US_MODULE_NAME ${PLUGIN_TARGET})
+
+  set(plugin_c_flags)
+  set(plugin_cxx_flags)
+
+  if(NOT _PLUGIN_WARNINGS_NO_ERRORS)
+    if(MSVC_VERSION)
+      mitkFunctionCheckCAndCXXCompilerFlags("/WX" plugin_c_flags plugin_cxx_flags)
+    else()
+      mitkFunctionCheckCAndCXXCompilerFlags(-Werror plugin_c_flags plugin_cxx_flags)
+      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" plugin_c_flags plugin_cxx_flags)
+      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" plugin_c_flags plugin_cxx_flags)
+      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" plugin_c_flags plugin_cxx_flags)
+      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" plugin_c_flags plugin_cxx_flags)
+      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" plugin_c_flags plugin_cxx_flags)
+    endif()
+  endif()
+
+  if(plugin_c_flags)
+    string(REPLACE " " ";" plugin_c_flags "${plugin_c_flags}")
+    target_compile_options(${PLUGIN_TARGET} PRIVATE ${plugin_c_flags})
+  endif()
+
+  if(plugin_cxx_flags)
+    string(REPLACE " " ";" plugin_cxx_flags "${plugin_cxx_flags}")
+    target_compile_options(${PLUGIN_TARGET} PRIVATE ${plugin_cxx_flags})
+  endif()
 
   if(MITK_DEFAULT_SUBPROJECTS AND NOT MY_SUBPROJECTS)
     set(MY_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})

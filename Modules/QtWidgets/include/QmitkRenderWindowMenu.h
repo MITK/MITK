@@ -61,14 +61,14 @@ public:
                         Qt::WindowFlags f = 0,
                         mitk::BaseRenderer *b = 0,
                         QmitkStdMultiWidget *mw = 0);
-  virtual ~QmitkRenderWindowMenu();
+  ~QmitkRenderWindowMenu() override;
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes
   layout direction (axial, coronal .. ) and layout design (standard layout, 2D images top,
   3D bottom ... ). */
   bool GetSettingsMenuVisibilty()
   {
-    if (m_Settings == NULL)
+    if (m_Settings == nullptr)
       return false;
     else
       return m_Settings->isVisible();
@@ -105,7 +105,7 @@ protected:
   void CreateSettingsWidget();
 
   /*! Reimplemented from QWidget. The paint event is a request to repaint all or part of a widget.*/
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 
   /*! Update list of layout direction (axial, coronal, sagital or threeD). Set action of currect layout direction
   to disable and all other to enable. Normaly the user can switch here between the different layout direction, but

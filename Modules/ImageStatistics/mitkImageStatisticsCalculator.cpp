@@ -180,7 +180,7 @@ namespace mitk
 
         m_StatisticsUpdateTimePerTimeStep[timeStep] = m_StatisticsByTimeStep[timeStep][m_StatisticsByTimeStep[timeStep].size()-1]->GetMTime();
 
-        for (std::vector<StatisticsContainer::Pointer>::iterator it = m_StatisticsByTimeStep[timeStep].begin(); it != m_StatisticsByTimeStep[timeStep].end(); ++it)
+        for (auto it = m_StatisticsByTimeStep[timeStep].begin(); it != m_StatisticsByTimeStep[timeStep].end(); ++it)
         {
             StatisticsContainer::Pointer statCont = *it;
             if (statCont->GetLabel() == label)
@@ -312,7 +312,7 @@ namespace mitk
             // try to access the pixel values directly (no copying or casting). Only works if mask pixels are of pixelType unsigned short
             maskImage = ImageToItkImage< MaskPixelType, VImageDimension >(m_InternalMask);
         }
-        catch (itk::ExceptionObject & e)
+        catch (const itk::ExceptionObject &)
 
         {
             // if the pixel type of the mask is not short, then we have to make a copy of m_InternalMask (and cast the values)
@@ -398,7 +398,7 @@ namespace mitk
         imageStatisticsFilter->Update();
 
         std::list<int> labels = imageStatisticsFilter->GetRelevantLabels();
-        std::list<int>::iterator it = labels.begin();
+        auto it = labels.begin();
         m_StatisticsByTimeStep[timeStep].resize(0);
 
         while(it != labels.end())
@@ -418,19 +418,12 @@ namespace mitk
             m_Image->GetGeometry()->WorldToIndex(worldCoordinateMin, indexCoordinateMin);
             m_Image->GetGeometry()->WorldToIndex(worldCoordinateMax, indexCoordinateMax);
 
-            //typename ImageType::IndexType tmpMinIndex = minMaxFilter->GetMinIndex(*it);
-            //typename ImageType::IndexType tmpMaxIndex = minMaxFilter->GetMaxIndex(*it);
-
-            //minIndex.set_size(tmpMaxIndex.GetIndexDimension());
-            //maxIndex.set_size(tmpMaxIndex.GetIndexDimension());
             minIndex.set_size(3);
             maxIndex.set_size(3);
 
             //for (unsigned int i=0; i < tmpMaxIndex.GetIndexDimension(); i++)
             for (unsigned int i=0; i < 3; i++)
             {
-                //minIndex[i] = tmpMinIndex[i] + (maskImage->GetOrigin()[i] - image->GetOrigin()[i]) / (double) maskImage->GetSpacing()[i];
-                //maxIndex[i] = tmpMaxIndex[i] + (maskImage->GetOrigin()[i] - image->GetOrigin()[i]) / (double) maskImage->GetSpacing()[i];
                 minIndex[i] = indexCoordinateMin[i];
                 maxIndex[i] = indexCoordinateMax[i];
             }
@@ -438,14 +431,8 @@ namespace mitk
             statisticsResult->SetMinIndex(minIndex);
             statisticsResult->SetMaxIndex(maxIndex);
 
-            // just debug
-            TPixel min_Filter = minMaxFilter->GetMin(*it);
-            TPixel max_Filter = minMaxFilter->GetMax(*it);
-            TPixel min_Itk = imageStatisticsFilter->GetMinimum(*it);
-            TPixel max_Itk = imageStatisticsFilter->GetMaximum(*it);
-
-            assert(abs(minMaxFilter->GetMax(*it) - imageStatisticsFilter->GetMaximum(*it)) < mitk::eps);
-            assert(abs(minMaxFilter->GetMin(*it) - imageStatisticsFilter->GetMinimum(*it)) < mitk::eps);
+            assert(std::abs(minMaxFilter->GetMax(*it) - imageStatisticsFilter->GetMaximum(*it)) < mitk::eps);
+            assert(std::abs(minMaxFilter->GetMin(*it) - imageStatisticsFilter->GetMinimum(*it)) < mitk::eps);
 
 
             statisticsResult->SetN(imageStatisticsFilter->GetSum(*it) / (double) imageStatisticsFilter->GetMean(*it));
@@ -517,7 +504,7 @@ namespace mitk
 
 
     ImageStatisticsCalculator::StatisticsContainer::StatisticsContainer():
-        m_N(nan("")),
+        m_N(0),
         m_Mean(nan("")),
         m_Min(nan("")),
         m_Max(nan("")),
@@ -562,7 +549,7 @@ namespace mitk
 
     void ImageStatisticsCalculator::StatisticsContainer::Reset()
     {
-        m_N = nan("");
+        m_N = 0;
         m_Mean = nan("");
         m_Min = nan("");
         m_Max = nan("");

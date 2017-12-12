@@ -188,6 +188,7 @@ void QmitkDataStorageComboBoxWithSelectNone::Reset()
 void QmitkDataStorageComboBoxWithSelectNone::SetZeroEntryText(const QString& zeroEntryString)
 {
   this->setItemText(0, zeroEntryString);
+  this->setCurrentIndex(0);
 }
 
 

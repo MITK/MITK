@@ -47,7 +47,7 @@ public:
   /*!
   \brief default destructor
   */
-  virtual ~QmitkUpdateTimerWidget();
+  ~QmitkUpdateTimerWidget() override;
 
   /*!
   \brief This method returns the timer's timeout interval in msec.

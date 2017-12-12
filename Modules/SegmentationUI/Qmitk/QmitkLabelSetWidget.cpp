@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <berryIPreferencesService.h>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
-  : QWidget(parent), m_ToolManager(NULL), m_DataStorage(NULL), m_Completer(NULL)
+  : QWidget(parent), m_DataStorage(nullptr), m_Completer(nullptr), m_ToolManager(nullptr)
 {
   m_Controls.setupUi(this);
 
@@ -91,15 +91,9 @@ QmitkLabelSetWidget::~QmitkLabelSetWidget()
 {
 }
 
-void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint &pos)
+void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint& /*pos*/)
 {
-  QTableWidgetItem *itemAt = m_Controls.m_LabelSetTableWidget->itemAt(pos);
-
-  // OnItemClicked(itemAt);
-
-  if (!itemAt)
-    return;
-  int pixelValue = itemAt->data(Qt::UserRole).toInt();
+  int pixelValue = GetPixelValueOfSelectedItem();
   QMenu *menu = new QMenu(m_Controls.m_LabelSetTableWidget);
 
   if (m_Controls.m_LabelSetTableWidget->selectedItems().size() > 1)
@@ -258,14 +252,12 @@ void QmitkLabelSetWidget::OnLockAllLabels(bool /*value*/)
 void QmitkLabelSetWidget::OnSetAllLabelsVisible(bool /*value*/)
 {
   GetWorkingImage()->GetActiveLabelSet()->SetAllLabelsVisible(true);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   UpdateAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnSetAllLabelsInvisible(bool /*value*/)
 {
   GetWorkingImage()->GetActiveLabelSet()->SetAllLabelsVisible(false);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   UpdateAllTableWidgetItems();
 }
 
@@ -300,24 +292,23 @@ void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
   if (dialogReturnValue == QDialog::Rejected)
     return;
 
-  int pixelValue = -1;
+  int sourcePixelValue = -1;
   for (int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); i++)
   {
     if (dialog.GetLabelSetWidgetTableCompleteWord() == QString(m_Controls.m_LabelSetTableWidget->item(i, 0)->text()))
-      pixelValue = m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
+      sourcePixelValue = m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
   }
 
-  if (pixelValue == -1)
+  if (sourcePixelValue == -1)
   {
     MITK_INFO << "unknown label";
-    ;
     return;
   }
 
-  GetWorkingImage()->MergeLabel(pixelValue, GetWorkingImage()->GetActiveLayer());
+  int pixelValue = GetPixelValueOfSelectedItem();
+  GetWorkingImage()->MergeLabel(pixelValue, sourcePixelValue, GetWorkingImage()->GetActiveLayer());
 
   UpdateAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnEraseLabel(bool /*value*/)
@@ -357,29 +348,32 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
     this->WaitCursorOff();
   }
 
-  this->ResetAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  ResetAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
 {
+  int pixelValue = GetPixelValueOfSelectedItem();
   QmitkNewSegmentationDialog dialog(this);
   dialog.setWindowTitle("Rename Label");
   dialog.SetSuggestionList(m_OrganColors);
-  // MLI TODO
-  // dialog.SetColor(GetWorkingImage()->GetActiveLabel()->GetColor());
-  // dialog.SetSegmentationName(GetWorkingImage()->GetActiveLabel()->GetName());
+  dialog.SetColor(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetColor());
+  dialog.SetSegmentationName(QString::fromStdString(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetName()));
 
   if (dialog.exec() == QDialog::Rejected)
+  {
     return;
-  int pixelValue = GetWorkingImage()->GetActiveLabel(GetWorkingImage()->GetActiveLayer())->GetValue();
+  }
+  QString segmentationName = dialog.GetSegmentationName();
+  if (segmentationName.isEmpty())
+  {
+    segmentationName = "Unnamed";
+  }
 
-  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(dialog.GetColor());
-  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetName(dialog.GetSegmentationName().toStdString());
+  GetWorkingImage()->GetActiveLabelSet()->RenameLabel(pixelValue, segmentationName.toStdString(), dialog.GetColor());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 
-  this->ResetAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  UpdateAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnCombineAndCreateMask(bool /*value*/)
@@ -454,7 +448,6 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
   }
 
   ResetAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
@@ -475,21 +468,17 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
       return;
     }
 
-    std::vector<mitk::Label::PixelType> VectorOfLablePixelValues;
+    std::vector<mitk::Label::PixelType> vectorOfSourcePixelValues;
     foreach(QTableWidgetSelectionRange a, ranges)
     {
       for (int i = a.topRow(); i <= a.bottomRow(); ++i)
       {
-        VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
+        vectorOfSourcePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
       }
     }
 
     this->WaitCursorOn();
-    int pixelValue = m_Controls.m_LabelSetTableWidget->item(m_Controls.m_LabelSetTableWidget->currentRow(), 0)
-                       ->data(Qt::UserRole)
-                       .toInt();
-
-    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues, pixelValue, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->MergeLabels(pixelValue, vectorOfSourcePixelValues, GetWorkingImage()->GetActiveLayer());
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -498,7 +487,7 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
 
 void QmitkLabelSetWidget::OnLockedButtonClicked()
 {
-  int row;
+  int row = -1;
   for(int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); ++i)
   {
     if (sender() == m_Controls.m_LabelSetTableWidget->cellWidget(i, LOCKED_COL))
@@ -515,7 +504,7 @@ void QmitkLabelSetWidget::OnLockedButtonClicked()
 
 void QmitkLabelSetWidget::OnVisibleButtonClicked()
 {
-  int row;
+  int row = -1;
   for(int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); ++i)
   {
     if (sender() == m_Controls.m_LabelSetTableWidget->cellWidget(i, VISIBLE_COL))
@@ -528,17 +517,15 @@ void QmitkLabelSetWidget::OnVisibleButtonClicked()
   if (row >= 0 && row < m_Controls.m_LabelSetTableWidget->rowCount())
   {
     QTableWidgetItem *item = m_Controls.m_LabelSetTableWidget->item(row, 0);
-    OnItemClicked(item);
     int pixelValue = item->data(Qt::UserRole).toInt();
     GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetVisible(!GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetVisible());
     GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
 void QmitkLabelSetWidget::OnColorButtonClicked()
 {
-  int row;
+  int row = -1;
   for(int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); ++i)
   {
     if (sender() == m_Controls.m_LabelSetTableWidget->cellWidget(i, COLOR_COL))
@@ -780,8 +767,6 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
 
   const mitk::Color &color = label->GetColor();
 
-  QTableWidget *tableWidget = m_Controls.m_LabelSetTableWidget;
-
   QString styleSheet = "background-color:rgb(";
   styleSheet.append(QString::number(color[0] * 255));
   styleSheet.append(",");
@@ -790,7 +775,7 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
   styleSheet.append(QString::number(color[2] * 255));
   styleSheet.append(")");
 
-  // Update text Label tableWdget->item(row,0)
+  QTableWidget *tableWidget = m_Controls.m_LabelSetTableWidget;
   int colWidth = (tableWidget->columnWidth(NAME_COL) < 180) ? 180 : tableWidget->columnWidth(NAME_COL) - 2;
   QString text = fontMetrics().elidedText(label->GetName().c_str(), Qt::ElideMiddle, colWidth);
   item->setText(text);
@@ -805,7 +790,9 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
   pbVisible->setChecked(!label->GetVisible());
 
   if (item->row() == 0)
+  {
     tableWidget->hideRow(item->row()); // hide exterior label
+  }
 }
 
 void QmitkLabelSetWidget::ResetAllTableWidgetItems()
@@ -831,7 +818,7 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   while (it != end)
   {
     InsertTableWidgetItem(it->second);
-    if (GetWorkingImage()->GetActiveLabel() == it->second) // get active
+    if (workingImage->GetActiveLabel() == it->second) // get active
       pixelValue = it->first;
     m_LabelStringList.append(QString(it->second->GetName().c_str()));
     it++;
@@ -842,7 +829,7 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   OnLabelListModified(m_LabelStringList);
 
   std::stringstream captionText;
-  captionText << "Number of labels: " << workingImage->GetNumberOfLabels() - 1;
+  captionText << "Number of labels: " << workingImage->GetNumberOfLabels(workingImage->GetActiveLayer()) - 1;
   m_Controls.m_lblCaption->setText(captionText.str().c_str());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -920,7 +907,7 @@ void QmitkLabelSetWidget::InitializeTableWidget()
 
 void QmitkLabelSetWidget::OnOpacityChanged(int value)
 {
-  int pixelValue = m_Controls.m_LabelSetTableWidget->currentItem()->data(Qt::UserRole).toInt();
+  int pixelValue = GetPixelValueOfSelectedItem();
   float opacity = static_cast<float>(value) / 100.0f;
   GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetOpacity(opacity);
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
@@ -1231,7 +1218,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
     try
     {
       this->WaitCursorOn();
-      mitk::Image::Pointer image = mitk::IOUtil::LoadImage( fileNames.front().toStdString() );
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( fileNames.front().toStdString() )[0].GetPointer());
       if (image.IsNull())
       {
         this->WaitCursorOff();

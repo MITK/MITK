@@ -7,8 +7,8 @@ US_END_NAMESPACE
 US_USE_NAMESPACE
 
 // This is just for illustration purposes in code snippets
-extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule1() { return 0; }
-extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule2() { return 0; }
+extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule1() { return nullptr; }
+extern "C" ModuleActivator* _us_module_activator_instance_MyStaticModule2() { return nullptr; }
 extern "C" void _us_import_module_initializer_MyStaticModule1() {}
 extern "C" void _us_import_module_initializer_MyStaticModule2() {}
 

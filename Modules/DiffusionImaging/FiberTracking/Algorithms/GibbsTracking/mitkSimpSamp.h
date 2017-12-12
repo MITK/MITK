@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkParticle.h>
 #include <stdlib.h>
 
-using namespace std;
-
 namespace mitk
 {
 

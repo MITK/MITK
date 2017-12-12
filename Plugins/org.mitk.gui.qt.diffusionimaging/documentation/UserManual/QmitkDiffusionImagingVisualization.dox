@@ -1,0 +1,22 @@
+/**
+\page org_mitk_views_controlvisualizationpropertiesview Visualization Control Panel
+
+\section QmitkDiffusionImagingVisualizationSettings ODF Visualization
+
+In this small view, the visualization of ODFs and diffusion images can be configured. Depending on the selected image in the data storage, different options are shown here.
+
+For tensor or ODF images, the visibility of glyphs in the different render windows (T)ransversal, (S)agittal, and (C)oronal can be configured here. The maximal number of glyphs to display can also be configured here for. This is usefull to keep the system response time during rendering feasible. The other options configure normalization and scaling of the glyphs.
+
+This is how a visualization with activated glyphs should look like:
+
+\imageMacro{Data_CSD.png,"ODF image with glyph visibility toggled ON",1}
+
+\imageMacro{Data_Tensors.png,"Tensor image with glyph visibility toggled ON",1}
+
+\section QmitkDiffusionImagingTractVisualizationSettings Tractogram Visualization
+
+If a tractogram is selected in the data manager, this view enables to visualize the fibers as tubes or thick lines as well as to play with the 2D and 3D clipping of the fiber visualization. The 3D clipping works per tractogram individually, which enables nice visualization of e.g. a CST tract extending upwards out of the bottom half of a whole brain tractogram.
+
+\imageMacro{tract_visualization.png,"CST tube visualization with sagittal 3D clipping of the whole-brain tractogram.",1}
+
+*/

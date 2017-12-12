@@ -113,12 +113,12 @@ namespace mitk
 
     if (! moving)
     {
-      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Moving data pointer is NULL.");
+      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Moving data pointer is nullptr.");
     }
 
     if (! target)
     {
-      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Target data pointer is NULL.");
+      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Target data pointer is nullptr.");
     }
 
     bool result = false;
@@ -198,12 +198,12 @@ namespace mitk
 
     if (! moving)
     {
-      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Moving data pointer is NULL.");
+      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Moving data pointer is nullptr.");
     }
 
     if (! target)
     {
-      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Target data pointer is NULL.");
+      mapDefaultExceptionStaticMacro( << "Error, cannot check data. Target data pointer is nullptr.");
     }
 
     unsigned int movingDim = m_AlgorithmBase->getMovingDimensions();
@@ -328,8 +328,8 @@ namespace mitk
 
   template<typename TPixelType1, unsigned int VImageDimension1,
            typename TPixelType2, unsigned int VImageDimension2>
-  void MITKAlgorithmHelper::DoCheckImages(const itk::Image<TPixelType1, VImageDimension1>* moving,
-                                          const itk::Image<TPixelType2, VImageDimension2>* target) const
+  void MITKAlgorithmHelper::DoCheckImages(const itk::Image<TPixelType1, VImageDimension1>* /*moving*/,
+                                          const itk::Image<TPixelType2, VImageDimension2>* /*target*/) const
   {
     typedef itk::Image<TPixelType1, VImageDimension1> MovingImageType;
     typedef itk::Image<TPixelType2, VImageDimension2> TargetImageType;

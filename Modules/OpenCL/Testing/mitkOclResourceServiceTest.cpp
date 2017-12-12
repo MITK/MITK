@@ -32,13 +32,13 @@ int mitkOclResourceServiceTest( int /*argc*/, char* /*argv*/[] )
   MITK_TEST_BEGIN("mitkOclResourceServiceTest");
 
   us::ServiceReference<OclResourceService> ref = us::GetModuleContext()->GetServiceReference<OclResourceService>();
-  MITK_TEST_CONDITION_REQUIRED( ref != NULL, "Resource service available." );
+  MITK_TEST_CONDITION_REQUIRED( ref != nullptr, "Resource service available." );
 
   OclResourceService* resources = us::GetModuleContext()->GetService<OclResourceService>(ref);
-  MITK_TEST_CONDITION_REQUIRED( resources != NULL, "Resource service available." );
+  MITK_TEST_CONDITION_REQUIRED( resources != nullptr, "Resource service available." );
 
   cl_context first = resources->GetContext();
-  MITK_TEST_CONDITION_REQUIRED(first != NULL, "Got not-null OpenCL context.");
+  MITK_TEST_CONDITION_REQUIRED(first != nullptr, "Got not-null OpenCL context.");
 
   OclResourceService* resources_2 = us::GetModuleContext()->GetService<OclResourceService>(ref);
   MITK_TEST_CONDITION_REQUIRED( resources == resources_2, "Same resource reference the second time." );
@@ -69,7 +69,7 @@ int mitkOclResourceServiceTest( int /*argc*/, char* /*argv*/[] )
 
   MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program loaded succesfully.");
 
-  err = clBuildProgram(testProgram, 0, NULL, NULL, NULL, NULL);
+  err = clBuildProgram(testProgram, 0, nullptr, nullptr, nullptr, nullptr);
   MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program built succesfully.");
 
   resources->InsertProgram( testProgram, "test_program", true);
@@ -90,7 +90,7 @@ int mitkOclResourceServiceTest( int /*argc*/, char* /*argv*/[] )
   // the error in the source code has no influence on loading the program
   MITK_TEST_CONDITION_REQUIRED( err == CL_SUCCESS, "Test program 2 loaded succesfully.");
 
-  err = clBuildProgram(notComp_testProgram, 0, NULL, NULL, NULL, NULL);
+  err = clBuildProgram(notComp_testProgram, 0, nullptr, nullptr, nullptr, nullptr);
   MITK_TEST_CONDITION_REQUIRED( err == CL_BUILD_PROGRAM_FAILURE, "Test program 2 failed to build.");
   std::cout << " --> The (expected) OpenCL Build Error occured : ";// << GetOclErrorString(err);
 

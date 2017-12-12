@@ -6,7 +6,7 @@
     <view id="org.mitk.views.imagenavigator"
           name="Image Navigator"
           class="QmitkImageNavigatorView"
-          icon="resources/Slider.png" />
+          icon="resources/image_navigator.svg" />
   </extension>
 
   <extension point="org.blueberry.ui.commands">

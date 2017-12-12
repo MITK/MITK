@@ -26,12 +26,6 @@ mitk::VtkMapper::~VtkMapper()
 
 void mitk::VtkMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
-  VtkMapperLocalStorage *ls = m_VtkMapperLSH.GetLocalStorage(renderer);
-  if (ls->m_ShaderProgram)
-  {
-    ls->m_ShaderProgram->Activate();
-  }
-
   switch (type)
   {
     case mitk::VtkPropRenderer::Opaque:
@@ -46,11 +40,6 @@ void mitk::VtkMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRend
     case mitk::VtkPropRenderer::Volumetric:
       this->MitkRenderVolumetricGeometry(renderer);
       break;
-  }
-
-  if (ls->m_ShaderProgram)
-  {
-    ls->m_ShaderProgram->Deactivate();
   }
 }
 
@@ -99,16 +88,6 @@ void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer *renderer)
   }
 }
 
-void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer *renderer)
-{
-  IShaderRepository *shaderRepo = CoreServices::GetShaderRepository();
-  if (shaderRepo)
-  {
-    VtkMapperLocalStorage *ls = m_VtkMapperLSH.GetLocalStorage(renderer);
-    shaderRepo->UpdateShaderProgram(ls->m_ShaderProgram, this->GetDataNode(), renderer);
-  }
-}
-
 void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer *renderer)
 {
   bool visible = true;
@@ -140,7 +119,7 @@ void mitk::VtkMapper::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
   vtkLinearTransform *vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
 
-  vtkProp3D *prop = dynamic_cast<vtkProp3D *>(GetVtkProp(renderer));
+  auto *prop = dynamic_cast<vtkProp3D *>(GetVtkProp(renderer));
   if (prop)
     prop->SetUserTransform(vtktransform);
 }

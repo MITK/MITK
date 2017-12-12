@@ -55,7 +55,7 @@ private:
 
 public:
   /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
-  void setUp()
+  void setUp() override
   {
   try {
       m_FileName1 = mitk::IOUtil::CreateTemporaryFile();
@@ -73,10 +73,10 @@ public:
   m_Deserializer = mitk::NavigationToolStorageDeserializer::New(DataStorage);
   }
 
-  void tearDown()
+  void tearDown() override
   {
-  m_Serializer = NULL;
-  m_Deserializer = NULL;
+  m_Serializer = nullptr;
+  m_Deserializer = nullptr;
   try
     {
       std::remove(m_FileName1.c_str());

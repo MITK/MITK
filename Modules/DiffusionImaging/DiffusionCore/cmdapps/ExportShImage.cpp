@@ -32,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 /*!
 \brief Convert MITK spherical harmonics image type to MRtrix spherical harmonics image
 */
@@ -45,19 +43,19 @@ int StartShConversion(int argc, char* argv[])
     parser.setTitle("Export SH Image");
     parser.setCategory("Preprocessing Tools");
     parser.setDescription("Convert MITK spherical harmonics image type to MRtrix spherical harmonics image");
-    parser.setContributor("MBI");
+    parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "MITK SH image", us::Any(), false);
     parser.addArgument("output", "o", mitkCommandLineParser::InputFile, "Output", "MRtrix SH image", us::Any(), false);
     parser.addArgument("shOrder", "sh", mitkCommandLineParser::Int, "SH order:", "spherical harmonics order");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string inFile = us::any_cast<string>(parsedArgs["input"]);
-    string outFile = us::any_cast<string>(parsedArgs["output"]);
+    std::string inFile = us::any_cast<std::string>(parsedArgs["input"]);
+    std::string outFile = us::any_cast<std::string>(parsedArgs["output"]);
 
     try
     {
@@ -112,9 +110,9 @@ int main(int argc, char* argv[])
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Export SH Image");
     parser.setDescription(" ");
-    parser.setContributor("MBI");
+    parser.setContributor("MIC");
 
-    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 

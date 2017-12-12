@@ -169,16 +169,16 @@ ITK_THREAD_RETURN_TYPE KinectDevice::Acquire(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
   KinectDevice* toFCameraDevice = (KinectDevice*)pInfo->UserData;
-  if (toFCameraDevice!=NULL)
+  if (toFCameraDevice!=nullptr)
   {
     mitk::RealTimeClock::Pointer realTimeClock;
     realTimeClock = mitk::RealTimeClock::New();
@@ -227,7 +227,7 @@ ITK_THREAD_RETURN_TYPE KinectDevice::Acquire(void* pInfoStruct)
   return ITK_THREAD_RETURN_VALUE;
 }
 
-void KinectDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
+void KinectDevice::GetAmplitudes(float*, int& imageSequence)
 {
   m_ImageMutex->Lock();
   if (m_CameraActive)
@@ -246,7 +246,7 @@ void KinectDevice::GetIntensities(float *, int &)
 {
 }
 
-void KinectDevice::GetDistances(float* distanceArray, int& imageSequence)
+void KinectDevice::GetDistances(float*, int& imageSequence)
 {
   m_ImageMutex->Lock();
   if (m_CameraActive)

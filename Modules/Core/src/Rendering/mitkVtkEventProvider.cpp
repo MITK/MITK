@@ -68,7 +68,7 @@ mitk::vtkEventProvider::vtkEventProvider()
 
 mitk::vtkEventProvider::~vtkEventProvider()
 {
-  this->SetInteractor(0);
+  this->SetInteractor(nullptr);
 }
 
 void mitk::vtkEventProvider::SetMitkRenderWindow(mitk::RenderWindow *renWin)
@@ -110,7 +110,7 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
       i->GetInteractorStyle()->AddObserver((vtkCommand::EventIds)(*it), this->EventCallbackCommand, this->Priority);
     }
 
-    this->InvokeEvent(vtkCommand::EnableEvent, NULL);
+    this->InvokeEvent(vtkCommand::EnableEvent, nullptr);
   }
 
   else // disabling-----------------------------------------------------------
@@ -128,7 +128,7 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
     this->Interactor->RemoveObserver(this->EventCallbackCommand);
     // this->Interactor->HandleEventLoop = 0;
 
-    this->InvokeEvent(vtkCommand::DisableEvent, NULL);
+    this->InvokeEvent(vtkCommand::DisableEvent, nullptr);
   }
 }
 
@@ -155,7 +155,7 @@ void mitk::vtkEventProvider::ProcessEvents(vtkObject *object,
                                            void *clientData,
                                            void *vtkNotUsed(callData))
 {
-  vtkEventProvider *self = reinterpret_cast<vtkEventProvider *>(clientData);
+  auto *self = reinterpret_cast<vtkEventProvider *>(clientData);
   vtkRenderWindowInteractor *rwi = static_cast<vtkInteractorStyle *>(object)->GetInteractor();
 
   // base renderer

@@ -32,12 +32,12 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCallbackFromGUIThread : public QObject,
 
 public:
   /// Change the current application cursor
-  virtual void CallThisFromGUIThread(itk::Command *, itk::EventObject *) override;
+  void CallThisFromGUIThread(itk::Command *, itk::EventObject *) override;
 
   QmitkCallbackFromGUIThread();
-  virtual ~QmitkCallbackFromGUIThread();
+  ~QmitkCallbackFromGUIThread() override;
 
-  virtual bool event(QEvent *e) override;
+  bool event(QEvent *e) override;
 
 protected:
 private:

@@ -29,7 +29,7 @@ namespace mitk
     mitkClassMacro(GroupTagPropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       if (dynamic_cast<const GroupTagProperty *>(m_Property.GetPointer()) != nullptr)
       {
@@ -40,16 +40,16 @@ namespace mitk
         return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *) override
     {
       // if (!element)
-      //  return NULL;
+      //  return nullptr;
       return GroupTagProperty::New().GetPointer();
     }
 
   protected:
     GroupTagPropertySerializer() {}
-    virtual ~GroupTagPropertySerializer() {}
+    ~GroupTagPropertySerializer() override {}
   };
 
 } // namespace

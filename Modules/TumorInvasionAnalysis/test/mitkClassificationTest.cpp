@@ -13,7 +13,9 @@
  See LICENSE.txt or http://www.mitk.org for details.
 
  ===================================================================*/
-#pragma warning(disable : 4996)
+#ifdef _MSC_VER
+#  pragma warning(disable : 4996)
+#endif
 
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
@@ -21,17 +23,17 @@
 #include "mitkCompareImageDataFilter.h"
 #include "mitkIOUtil.h"
 
-#include "mitkCollectionReader.h"
-#include "mitkCollectionWriter.h"
 #include "mitkDataCollection.h"
-
 #include "mitkTumorInvasionClassification.h"
+#include "mitkDiffusionCollectionReader.h"
+#include "mitkDiffusionCollectionWriter.h"
+
 #include <vtkSmartPointer.h>
 
 /**
  * @brief mitkClassificationTestSuite
  *
- * Tests mitkDecisionForest, mitkClassifyProgression, mitkDataCollection, mitkCollectionReader
+ * Tests mitkDecisionForest, mitkClassifyProgression, mitkDataCollection, mitkDiffusionCollectionReader
  * \warn Reference is compared to results computed based on random forests, which might be a source of random test fails
  * such sporadic fails do represent total fails, as the result is no longer consitently under the provided margin.
  *
@@ -47,8 +49,8 @@ public:
    * @brief Setup - Always call this method before each Test-case to ensure correct and new intialization of the used
    * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp() {}
-  void tearDown() {}
+  void setUp() override {}
+  void tearDown() override {}
   void TestClassification()
   {
     size_t forestSize = 10;
@@ -62,7 +64,7 @@ public:
     modalities.push_back("MOD0");
     modalities.push_back("MOD1");
 
-    mitk::CollectionReader colReader;
+    mitk::DiffusionCollectionReader colReader;
     mitk::DataCollection::Pointer collection = colReader.LoadCollection(train);
     colReader.Clear();
     // read evaluation collection
@@ -80,8 +82,8 @@ public:
 
     progression.PredictInvasion(evaluation, modalities);
 
-    mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(
-      GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/TESTING_RESULT.nrrd"));
+    mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(
+      GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/TESTING_RESULT.nrrd"))[0].GetPointer());
 
     mitk::DataCollection *patCol = dynamic_cast<mitk::DataCollection *>(evaluation->GetData(0).GetPointer());
     mitk::DataCollection *subCol = dynamic_cast<mitk::DataCollection *>(patCol->GetData(0).GetPointer());

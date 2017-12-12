@@ -67,7 +67,6 @@ public:
     double GetDiffusivity3() { return m_KernelTensorMatrix[2][2]; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
     GradientType GetKernelDirection(){ return m_KernelDirection; }
     vnl_matrix_fixed<double, 3, 3> GetKernelTensorMatrix(){ return m_KernelTensorMatrix; }
 

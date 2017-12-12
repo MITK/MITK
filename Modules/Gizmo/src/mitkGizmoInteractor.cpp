@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkInternalEvent.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkOperationEvent.h>
 #include <mitkRotationOperation.h>
 #include <mitkScaleOperation.h>
@@ -41,6 +42,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::GizmoInteractor::GizmoInteractor()
 {
+    m_ColorForHighlight[0] = 1.0;
+    m_ColorForHighlight[1] = 0.5;
+    m_ColorForHighlight[2] = 0.0;
+    m_ColorForHighlight[3] = 1.0;
+
+    // TODO if we want to get this configurable, the this is the recipe:
+    // - make the 2D mapper add corresponding properties to control "enabled" and "color"
+    // - make the interactor evaluate those properties
+    // - in an ideal world, modify the state machine on the fly and skip mouse move handling
 }
 
 mitk::GizmoInteractor::~GizmoInteractor()
@@ -80,24 +90,10 @@ void mitk::GizmoInteractor::SetManipulatedObjectNode(DataNode *node)
 bool mitk::GizmoInteractor::HasPickedHandle(const InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
-  {
-    return false;
-  }
-
-  DataNode::Pointer gizmoNode = this->GetDataNode();
-
-  if (m_Gizmo.IsNull())
-  {
-    return false;
-  }
-
-  if (m_ManipulatedObjectGeometry.IsNull())
-  {
-    return false;
-  }
-
-  if (interactionEvent->GetSender()->GetRenderWindow()->GetNeverRendered())
+  if (positionEvent == nullptr ||
+      m_Gizmo.IsNull() ||
+      m_ManipulatedObjectGeometry.IsNull() ||
+      interactionEvent->GetSender()->GetRenderWindow()->GetNeverRendered())
   {
     return false;
   }
@@ -111,80 +107,78 @@ bool mitk::GizmoInteractor::HasPickedHandle(const InteractionEvent *interactionE
     m_PickedHandle = PickFrom3D(positionEvent);
   }
 
-  if (m_PickedHandle != Gizmo::NoHandle)
-  {
-    // if something relevant was picked, we calculate a number of
-    // important points and axes for the upcoming geometry manipulations
+  UpdateHandleHighlight();
 
-    // note initial state
-    m_InitialClickPosition2D = positionEvent->GetPointerPositionOnScreen();
-    m_InitialClickPosition3D = positionEvent->GetPositionInWorld();
-
-    auto renderer = positionEvent->GetSender()->GetVtkRenderer();
-    renderer->SetWorldPoint(m_InitialClickPosition3D[0], m_InitialClickPosition3D[1], m_InitialClickPosition3D[2], 0);
-    renderer->WorldToDisplay();
-    m_InitialClickPosition2DZ = renderer->GetDisplayPoint()[2];
-
-    m_InitialGizmoCenter3D = m_Gizmo->GetCenter();
-    positionEvent->GetSender()->WorldToDisplay(m_InitialGizmoCenter3D, m_InitialGizmoCenter2D);
-
-    m_InitialManipulatedObjectGeometry = m_ManipulatedObjectGeometry->Clone();
-
-    switch (m_PickedHandle)
-    {
-      case Gizmo::MoveAlongAxisX:
-      case Gizmo::RotateAroundAxisX:
-      case Gizmo::ScaleX:
-        m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(0);
-        break;
-      case Gizmo::MoveAlongAxisY:
-      case Gizmo::RotateAroundAxisY:
-      case Gizmo::ScaleY:
-        m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(1);
-        break;
-      case Gizmo::MoveAlongAxisZ:
-      case Gizmo::RotateAroundAxisZ:
-      case Gizmo::ScaleZ:
-        m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(2);
-        break;
-      default:
-        break;
-    }
-    m_AxisOfMovement.Normalize();
-    m_AxisOfRotation = m_AxisOfMovement;
-
-    // for translation: test whether the user clicked into the "object's real" axis direction
-    //                  or into the other one
-    Vector3D intendedAxis = m_InitialClickPosition3D - m_InitialGizmoCenter3D;
-
-    if (intendedAxis * m_AxisOfMovement < 0)
-    {
-      m_AxisOfMovement *= -1.0;
-    }
-
-    // for rotation: test whether the axis of rotation is more looking in the direction
-    //               of the camera or in the opposite
-    vtkCamera *camera = renderer->GetActiveCamera();
-    vtkVector3d cameraDirection(camera->GetDirectionOfProjection());
-
-    double angle_rad = vtkMath::AngleBetweenVectors(cameraDirection.GetData(), m_AxisOfRotation.GetDataPointer());
-
-    if (angle_rad < vtkMath::Pi() / 2.0)
-    {
-      m_AxisOfRotation *= -1.0;
-    }
-
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return m_PickedHandle != Gizmo::NoHandle;
 }
 
 void mitk::GizmoInteractor::DecideInteraction(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   assert(m_PickedHandle != Gizmo::NoHandle);
+
+  auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  if (positionEvent == nullptr)
+  {
+    return;
+  }
+
+  // if something relevant was picked, we calculate a number of
+  // important points and axes for the upcoming geometry manipulations
+
+  // note initial state
+  m_InitialClickPosition2D = positionEvent->GetPointerPositionOnScreen();
+  m_InitialClickPosition3D = positionEvent->GetPositionInWorld();
+
+  auto renderer = positionEvent->GetSender()->GetVtkRenderer();
+  renderer->SetWorldPoint(m_InitialClickPosition3D[0], m_InitialClickPosition3D[1], m_InitialClickPosition3D[2], 0);
+  renderer->WorldToDisplay();
+  m_InitialClickPosition2DZ = renderer->GetDisplayPoint()[2];
+
+  m_InitialGizmoCenter3D = m_Gizmo->GetCenter();
+  positionEvent->GetSender()->WorldToDisplay(m_InitialGizmoCenter3D, m_InitialGizmoCenter2D);
+
+  m_InitialManipulatedObjectGeometry = m_ManipulatedObjectGeometry->Clone();
+
+  switch ( m_PickedHandle ) {
+  case Gizmo::MoveAlongAxisX:
+  case Gizmo::RotateAroundAxisX:
+  case Gizmo::ScaleX:
+      m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(0);
+      break;
+  case Gizmo::MoveAlongAxisY:
+  case Gizmo::RotateAroundAxisY:
+  case Gizmo::ScaleY:
+      m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(1);
+      break;
+  case Gizmo::MoveAlongAxisZ:
+  case Gizmo::RotateAroundAxisZ:
+  case Gizmo::ScaleZ:
+      m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(2);
+      break;
+  default:
+      break;
+  }
+  m_AxisOfMovement.Normalize();
+  m_AxisOfRotation = m_AxisOfMovement;
+
+  // for translation: test whether the user clicked into the "object's real" axis direction
+  //                  or into the other one
+  Vector3D intendedAxis = m_InitialClickPosition3D - m_InitialGizmoCenter3D;
+
+  if ( intendedAxis * m_AxisOfMovement < 0 ) {
+      m_AxisOfMovement *= -1.0;
+  }
+
+  // for rotation: test whether the axis of rotation is more looking in the direction
+  //               of the camera or in the opposite
+  vtkCamera *camera = renderer->GetActiveCamera();
+  vtkVector3d cameraDirection(camera->GetDirectionOfProjection());
+
+  double angle_rad = vtkMath::AngleBetweenVectors(cameraDirection.GetData(), m_AxisOfRotation.GetDataPointer());
+
+  if ( angle_rad < vtkMath::Pi() / 2.0 ) {
+      m_AxisOfRotation *= -1.0;
+  }
 
   InternalEvent::Pointer decision;
   switch (m_PickedHandle)
@@ -217,7 +211,7 @@ void mitk::GizmoInteractor::DecideInteraction(StateMachineAction *, InteractionE
 void mitk::GizmoInteractor::MoveAlongAxis(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }
@@ -237,7 +231,7 @@ void mitk::GizmoInteractor::MoveAlongAxis(StateMachineAction *, InteractionEvent
 void mitk::GizmoInteractor::RotateAroundAxis(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }
@@ -257,7 +251,7 @@ void mitk::GizmoInteractor::RotateAroundAxis(StateMachineAction *, InteractionEv
 void mitk::GizmoInteractor::MoveFreely(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }
@@ -279,7 +273,7 @@ void mitk::GizmoInteractor::MoveFreely(StateMachineAction *, InteractionEvent *i
 void mitk::GizmoInteractor::ScaleEqually(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
   {
     return;
   }
@@ -424,4 +418,44 @@ mitk::Gizmo::HandleType mitk::GizmoInteractor::PickFrom3D(const InteractionPosit
 
   // _something_ picked
   return m_Gizmo->GetHandleFromPointID(pickedPointID);
+}
+
+void mitk::GizmoInteractor::UpdateHandleHighlight()
+{
+  if (m_HighlightedHandle != m_PickedHandle) {
+
+    auto node = GetDataNode();
+    if (node == nullptr) return;
+
+    auto base_prop = node->GetProperty("LookupTable");
+    if (base_prop == nullptr) return;
+
+    auto lut_prop = dynamic_cast<LookupTableProperty*>(base_prop);
+    if (lut_prop == nullptr) return;
+
+    auto lut = lut_prop->GetLookupTable();
+    if (lut == nullptr) return;
+
+    // Table size is expected to constructed as one entry per gizmo-part enum value
+    assert(lut->GetVtkLookupTable()->GetNumberOfTableValues() > std::max(m_PickedHandle, m_HighlightedHandle));
+
+    // Reset previously overwritten color
+    if (m_HighlightedHandle != Gizmo::NoHandle)
+    {
+        lut->SetTableValue(m_HighlightedHandle, m_ColorReplacedByHighlight);
+    }
+
+    // Overwrite currently highlighted color
+    if (m_PickedHandle != Gizmo::NoHandle)
+    {
+      lut->GetTableValue(m_PickedHandle, m_ColorReplacedByHighlight);
+      lut->SetTableValue(m_PickedHandle, m_ColorForHighlight);
+    }
+
+    // Mark node modified to allow repaint
+    node->Modified();
+    RenderingManager::GetInstance()->RequestUpdateAll(RenderingManager::REQUEST_UPDATE_ALL);
+
+    m_HighlightedHandle = m_PickedHandle;
+  }
 }

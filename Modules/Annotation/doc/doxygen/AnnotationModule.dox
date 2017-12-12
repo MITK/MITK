@@ -1,0 +1,61 @@
+/**
+\page AnnotationModulePage Annotation Module
+
+\tableofcontents
+
+\section AnnotationModulePage_Introduction Annotations
+
+The annotations in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Annotation represents an arbitrary
+2D or 3D object that can be rendered as an Annotation. This can for example be used for the annotation of 3D points or to Annotation despriptions in the window corners.
+Instances of the MicroService mitk::AbstractAnnotationRenderer are used to add the annotations to the renderwindows, updating them and depending on their implementation, organize them in a layout.
+This module contains implementations for mitk::AbstractAnnotationRenderer as well as mitk::Annotation. Currently, the following features are realized within the Annotation module.
+<ol>
+  <li>2D and 3D textelements are already defined in the Annotation module and are using VTK to create custom annotations.
+  <li>2D and 3D annotations can be placed freely by providing a display position
+  <li>2D annotations can be placed in a layout, which organizes the annotations in the display corners.
+</ol>
+
+\section AnnotationModulePage_UsageSection Usage of Predefined Annotations
+
+\subsection AnnotationModulePage_TextWidget2DUsageSubsection mitkTextAnnotation2D
+This exemplary Annotation can render text as a 2D Annotation which can be placed with the LayoutAnnotationRenderer
+\snippet AnnotationExample.cpp TextAnnotation2D
+
+\subsection AnnotationModulePage_TextWidget3DUsageSubsection mitkTextAnnotation3D
+This Annotation displays labels in 3D coordinates. The labels always face the camera.
+
+\snippet AnnotationExample.cpp TextAnnotation3D
+
+\section AnnotationModulePage_CustomAnnotationSection Implement a Custom Annotation
+
+A new custom Annotation should derive from mitkAnnotation or one of the later mentioned subclasses VtkAnnotation2D oder VtkAnnotation3D. There should always be an implementation for the methods
+AddToBaseRenderer, AddToRenderer, RemoveFromBaseRenderer RemoveFromRenderer and Update.
+UpdateAnnotation is the procedure that is called when the Annotation properties have changed. If the Annotation is rendered by VTK, this method only applies the properties to the representation.
+If the custom Annotation requires additional properties, they should be made accessible by getters and setters for a better usability:
+\code
+void mitk::VtkAnnotation3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+{
+  mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
+  SetProperty("Position3D", position3dProperty,renderer);
+}
+
+mitk::Point3D mitk::VtkAnnotation3D::GetPosition3D(mitk::BaseRenderer *renderer)
+{
+  mitk::Point3D position3D;
+  GetPropertyValue<mitk::Point3D>("Position3D", position3D, renderer);
+  return position3D;
+}
+\endcode
+
+\subsection AnnotationModulePage_CustomVTK2DAnnotationSubsection VTK 2D Annotation
+
+VTK based Annotations which are meant to be displayed in 2D over the render window should derive from the mitk::VtkAnnotation2D.
+The mitk::VtkAnnotation2D is a subclass of Vtk::Annotation, that uses VTK to render the Annotation. This class creates the Annotation representation as a vtkActor2D, and is very easy to implement
+because only UpdateVtkAnnotation2D and GetVtkActor2D have to be implemented. The add, update and remove methods are implemented in the superclasses.
+UpdateVtkAnnotation2D only needs to apply the specific properties and GetVtkActor2D simply returns the created vtkActor.
+
+\subsection AnnotationModulePage_CustomVTK3DAnnotationSubsection VTK 3D Annotation
+
+The mitkVtkAnnotation3D works just like mitkVtkAnnotation2D, but it is designed for arbitrary 3D objects which derive from vtkProp,
+
+*/

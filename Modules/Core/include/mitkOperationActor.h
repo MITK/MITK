@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
                                                                                                                        \
   OperationType *newOperationName = dynamic_cast<OperationType *>(operation);                                          \
                                                                                                                        \
-  if (newOperationName == NULL)                                                                                        \
+  if (newOperationName == nullptr)                                                                                        \
                                                                                                                        \
   {                                                                                                                    \
     itkWarningMacro("Recieved wrong type of operation!");                                                              \

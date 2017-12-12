@@ -57,7 +57,8 @@ private:
   QString GetPropertyNameOrAlias(const QModelIndex& index);
   void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
   void OnPropertyNameChanged(const itk::EventObject& event);
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void HideAllIcons();
 
 private slots:
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);

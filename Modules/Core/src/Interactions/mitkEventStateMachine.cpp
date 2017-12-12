@@ -26,9 +26,9 @@
 
 mitk::EventStateMachine::EventStateMachine()
   : m_IsActive(true),
-    m_UndoController(NULL),
-    m_StateMachineContainer(NULL),
-    m_CurrentState(NULL),
+    m_UndoController(nullptr),
+    m_StateMachineContainer(nullptr),
+    m_CurrentState(nullptr),
     m_MouseCursorSet(false)
 {
   if (!m_UndoController)
@@ -44,7 +44,7 @@ mitk::EventStateMachine::EventStateMachine()
 
 bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, const us::Module *module)
 {
-  if (m_StateMachineContainer != NULL)
+  if (m_StateMachineContainer != nullptr)
   {
     m_StateMachineContainer->Delete();
   }
@@ -54,7 +54,7 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, cons
   {
     m_CurrentState = m_StateMachineContainer->GetStartState();
 
-    for (ConditionDelegatesMapType::iterator i = m_ConditionDelegatesMap.begin(); i != m_ConditionDelegatesMap.end();
+    for (auto i = m_ConditionDelegatesMap.begin(); i != m_ConditionDelegatesMap.end();
          ++i)
     {
       delete i->second;
@@ -62,14 +62,14 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, cons
     m_ConditionDelegatesMap.clear();
 
     // clear actions map ,and connect all actions as declared in sub-class
-    for (std::map<std::string, TActionFunctor *>::iterator i = m_ActionFunctionsMap.begin();
+    for (auto i = m_ActionFunctionsMap.begin();
          i != m_ActionFunctionsMap.end();
          ++i)
     {
       delete i->second;
     }
     m_ActionFunctionsMap.clear();
-    for (ActionDelegatesMapType::iterator i = m_ActionDelegatesMap.begin(); i != m_ActionDelegatesMap.end(); ++i)
+    for (auto i = m_ActionDelegatesMap.begin(); i != m_ActionDelegatesMap.end(); ++i)
     {
       delete i->second;
     }
@@ -87,7 +87,7 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, cons
 
 mitk::EventStateMachine::~EventStateMachine()
 {
-  if (m_StateMachineContainer != NULL)
+  if (m_StateMachineContainer != nullptr)
   {
     m_StateMachineContainer->Delete();
   }
@@ -99,7 +99,7 @@ void mitk::EventStateMachine::AddActionFunction(const std::string &action, mitk:
     return;
   // make sure double calls for same action won't cause memory leaks
   delete m_ActionFunctionsMap[action];
-  ActionDelegatesMapType::iterator i = m_ActionDelegatesMap.find(action);
+  auto i = m_ActionDelegatesMap.find(action);
   if (i != m_ActionDelegatesMap.end())
   {
     delete i->second;
@@ -110,7 +110,7 @@ void mitk::EventStateMachine::AddActionFunction(const std::string &action, mitk:
 
 void mitk::EventStateMachine::AddActionFunction(const std::string &action, const ActionFunctionDelegate &delegate)
 {
-  std::map<std::string, TActionFunctor *>::iterator i = m_ActionFunctionsMap.find(action);
+  auto i = m_ActionFunctionsMap.find(action);
   if (i != m_ActionFunctionsMap.end())
   {
     delete i->second;
@@ -148,7 +148,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent *event, DataNode *dat
 
     // iterate over all actions in this transition and execute them
     const ActionVectorType actions = transition->GetActions();
-    for (ActionVectorType::const_iterator it = actions.cbegin(); it != actions.cend(); ++it)
+    for (auto it = actions.cbegin(); it != actions.cend(); ++it)
     {
       try
       {
@@ -195,7 +195,7 @@ bool mitk::EventStateMachine::CheckCondition(const StateMachineCondition &condit
 
 void mitk::EventStateMachine::ExecuteAction(StateMachineAction *action, InteractionEvent *event)
 {
-  if (action == NULL)
+  if (action == nullptr)
   {
     return;
   }
@@ -229,7 +229,7 @@ mitk::StateMachineState *mitk::EventStateMachine::GetCurrentState() const
 
 bool mitk::EventStateMachine::FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode)
 {
-  if (dataNode == NULL)
+  if (dataNode == nullptr)
   {
     MITK_WARN << "EventStateMachine: Empty DataNode received along with this Event " << interactionEvent;
     return false;
@@ -252,10 +252,10 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
   const mitk::StateMachineState::TransitionVector transitionList =
     m_CurrentState->GetTransitionList(event->GetNameOfClass(), MapToEventVariant(event));
 
-  // if there are not transitions, we can return NULL here.
+  // if there are not transitions, we can return nullptr here.
   if (transitionList.empty())
   {
-    return NULL;
+    return nullptr;
   }
 
   StateMachineState::TransitionVector::const_iterator transitionIter;
@@ -318,8 +318,8 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
     }
   }
 
-  // We have found no transition that can be executed, return NULL
-  return NULL;
+  // We have found no transition that can be executed, return nullptr
+  return nullptr;
 }
 
 void mitk::EventStateMachine::ResetToStartState()

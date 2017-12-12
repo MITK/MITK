@@ -96,7 +96,7 @@ float mitk::ImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer *renderer)
   int layer = 0;
   GetDataNode()->GetIntProperty("layer", layer, renderer);
   // add the layer property for each image to render images with a higher layer on top of the others
-  depth += layer * 10; //*10: keep some room for each image (e.g. for QBalls in between)
+  depth += layer * 10; //*10: keep some room for each image (e.g. for ODFs in between)
   if (depth > 0.0f)
   {
     depth = 0.0f;
@@ -122,7 +122,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 
   SetVtkMapperImmediateModeRendering(localStorage->m_Mapper);
 
-  mitk::Image *image = const_cast<mitk::Image *>(this->GetInput());
+  auto *image = const_cast<mitk::Image *>(this->GetInput());
   mitk::DataNode *datanode = this->GetDataNode();
   if (nullptr == image || !image->IsInitialized())
   {
@@ -142,10 +142,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   // and the geometry of the image that is to be rendered.
   if (!RenderingGeometryIntersectsImage(worldGeometry, image->GetSlicedGeometry()))
   {
-    // set image to NULL, to clear the texture in 3D, because
+    // set image to nullptr, to clear the texture in 3D, because
     // the latest image is used there if the plane is out of the geometry
     // see bug-13275
-    localStorage->m_ReslicedImage = NULL;
+    localStorage->m_ReslicedImage = nullptr;
     localStorage->m_Mapper->SetInputData(localStorage->m_EmptyPolyData);
     return;
   }
@@ -172,7 +172,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     datanode->GetProperty(resliceInterpolationProperty, "reslice interpolation", renderer);
 
     int interpolationMode = VTK_RESLICE_NEAREST;
-    if (resliceInterpolationProperty != NULL)
+    if (resliceInterpolationProperty != nullptr)
     {
       interpolationMode = resliceInterpolationProperty->GetInterpolation();
     }
@@ -208,12 +208,12 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     DataNode *dn = renderer->GetCurrentWorldPlaneGeometryNode();
     if (dn)
     {
-      ResliceMethodProperty *resliceMethodEnumProperty = 0;
+      ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
 
       if (dn->GetProperty(resliceMethodEnumProperty, "reslice.thickslices", renderer) && resliceMethodEnumProperty)
         thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
-      IntProperty *intProperty = 0;
+      IntProperty *intProperty = nullptr;
       if (dn->GetProperty(intProperty, "reslice.thickslices.num", renderer) && intProperty)
       {
         thickSlicesNum = intProperty->GetValue();
@@ -227,7 +227,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     }
   }
 
-  const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
+  const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
 
   if (thickSlicesMode > 0)
   {
@@ -235,13 +235,13 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 
     Vector3D normInIndex, normal;
 
-    const mitk::AbstractTransformGeometry *abstractGeometry =
+    const auto *abstractGeometry =
       dynamic_cast<const AbstractTransformGeometry *>(worldGeometry);
-    if (abstractGeometry != NULL)
+    if (abstractGeometry != nullptr)
       normal = abstractGeometry->GetPlane()->GetNormal();
     else
     {
-      if (planeGeometry != NULL)
+      if (planeGeometry != nullptr)
       {
         normal = planeGeometry->GetNormal();
       }
@@ -407,7 +407,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 
   this->TransformActor(renderer);
 
-  vtkActor *contourShadowActor = dynamic_cast<vtkActor *>(localStorage->m_Actors->GetParts()->GetItemAsObject(0));
+  auto *contourShadowActor = dynamic_cast<vtkActor *>(localStorage->m_Actors->GetParts()->GetItemAsObject(0));
 
   if (binary && binaryOutline) // connect the mapper with the polyData which contains the lines
   {
@@ -649,8 +649,8 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
     return;
   }
 
-  mitk::Image *data = const_cast<mitk::Image *>(this->GetInput());
-  if (data == NULL)
+  auto *data = const_cast<mitk::Image *>(this->GetInput());
+  if (data == nullptr)
   {
     return;
   }
@@ -660,7 +660,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
     return;
@@ -772,7 +772,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
   }
 
   std::string className = image->GetNameOfClass();
-  if (className != "TensorImage" && className != "QBallImage")
+  if (className != "TensorImage" && className != "OdfImage")
   {
     PixelType pixelType = image->GetPixelType();
     size_t numComponents = pixelType.GetNumberOfComponents();
@@ -806,7 +806,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
 
   if (image.IsNotNull() && image->IsInitialized())
   {
-    if ((overwrite) || (node->GetProperty("levelwindow", renderer) == NULL))
+    if ((overwrite) || (node->GetProperty("levelwindow", renderer) == nullptr))
     {
       /* initialize level/window from DICOM tags */
       std::string sLevel = "";
@@ -850,7 +850,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
         node->SetProperty("levelwindow", LevelWindowProperty::New(contrast), renderer);
       }
     }
-    if (((overwrite) || (node->GetProperty("opaclevelwindow", renderer) == NULL)) &&
+    if (((overwrite) || (node->GetProperty("opaclevelwindow", renderer) == nullptr)) &&
         (image->GetPixelType().GetPixelType() == itk::ImageIOBase::RGBA) &&
         (image->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR))
     {
@@ -893,7 +893,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); // the lines to connect the points
 
   // We take the pointer to the first pixel of the image
-  TPixel* currentPixel = static_cast<TPixel*>(localStorage->m_ReslicedImage->GetScalarPointer());
+  auto* currentPixel = static_cast<TPixel*>(localStorage->m_ReslicedImage->GetScalarPointer());
 
   while (y <= yMax)
   {
@@ -1042,7 +1042,7 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer *renderer)
 
   if (localStorage->m_Actors->GetNumberOfPaths() > 1)
   {
-    vtkActor *secondaryActor = dynamic_cast<vtkActor *>(localStorage->m_Actors->GetParts()->GetItemAsObject(0));
+    auto *secondaryActor = dynamic_cast<vtkActor *>(localStorage->m_Actors->GetParts()->GetItemAsObject(0));
     secondaryActor->SetUserTransform(trans);
     secondaryActor->SetPosition(-0.5 * localStorage->m_mmPerPixel[0], -0.5 * localStorage->m_mmPerPixel[1], 0.0);
   }
@@ -1051,9 +1051,9 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer *renderer)
 bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry,
                                                               SlicedGeometry3D *imageGeometry)
 {
-  // if either one of the two geometries is NULL we return true
+  // if either one of the two geometries is nullptr we return true
   // for safety reasons
-  if (renderingGeometry == NULL || imageGeometry == NULL)
+  if (renderingGeometry == nullptr || imageGeometry == nullptr)
     return true;
 
   // get the distance for the first cornerpoint

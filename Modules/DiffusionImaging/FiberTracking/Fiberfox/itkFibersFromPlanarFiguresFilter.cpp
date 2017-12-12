@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <itkOrientationDistributionFunction.h>
-#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <itkDiffusionOdfGeneralizedFaImageFilter.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkFiberBuilder.h>
 #include <mitkMetropolisHastingsSampler.h>
-#include <itkTensorImageToQBallImageFilter.h>
+#include <itkTensorImageToOdfImageFilter.h>
 #include <mitkGibbsEnergyComputer.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
@@ -56,7 +56,7 @@ void FibersFromPlanarFiguresFilter::GeneratePoints()
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     randGen->SetSeed((unsigned int)0);
     m_2DPoints.clear();
-    int count = 0;
+    unsigned int count = 0;
 
     while (count < m_Parameters.m_Density)
     {
@@ -91,9 +91,9 @@ void FibersFromPlanarFiguresFilter::GenerateData()
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-        vector< mitk::PlanarEllipse::Pointer > bundle = m_Parameters.m_Fiducials.at(i);
+        std::vector< mitk::PlanarEllipse::Pointer > bundle = m_Parameters.m_Fiducials.at(i);
 
-        vector< unsigned int > fliplist;
+        std::vector< unsigned int > fliplist;
         if (i<m_Parameters.m_FlipList.size())
             fliplist = m_Parameters.m_FlipList.at(i);
         else
@@ -102,7 +102,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             fliplist.resize(bundle.size(), 0);
 
         GeneratePoints();
-        for (int j=0; j<m_Parameters.m_Density; j++)
+        for (unsigned int j = 0; j < m_Parameters.m_Density; ++j)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 

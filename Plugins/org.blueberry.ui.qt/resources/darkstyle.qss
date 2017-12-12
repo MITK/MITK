@@ -1,0 +1,1475 @@
+/*===================================================================
+
+BlueBerry Platform
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) <2013-2014> <Colin Duquesnoy>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+/*
+  foregroundColor = #adb1b6
+  iconColor       = #adb1b6 <- This line is parsed by MITK
+  iconAccentColor = #db7039 <- This line is parsed by MITK
+  backgroundColor = #323231
+  inactiveColor   = #1d1d1c
+  highlightColor  = #3399cc
+  popupColor      = #027c90
+  warningColor    = #ffb400
+  borderColor     = #1d1d1c
+*/
+
+QToolTip
+{
+  border: 1px solid #1d1d1c;
+  background-color: #323231;
+  color: #adb1b6;
+  padding: 3px;
+  opacity: 200;
+}
+
+QWidget
+{
+  color: #adb1b6;
+  background-color: #323231;
+  selection-background-color: #3399cc;
+  selection-color: #1d1d1c;
+  background-clip: border;
+  border-image: none;
+  border: 0px transparent #1d1d1c;
+  outline: 0;
+}
+
+QWidget:item:hover
+{
+  background-color: #3399cc;
+  color: #adb1b6;
+}
+
+QWidget:item:selected
+{
+  background-color: #3399cc;
+}
+
+QCheckBox
+{
+  spacing: 5px;
+  outline: none;
+  color: #adb1b6;
+  margin-bottom: 2px;
+}
+
+QCheckBox:disabled
+{
+  color: #1d1d1c;
+}
+
+QCheckBox::indicator,
+QGroupBox::indicator
+{
+  width: 18px;
+  height: 30px;
+}
+QGroupBox::indicator
+{
+  margin-left: 0px;
+}
+
+QCheckBox::indicator:unchecked
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_unchecked.png);
+}
+
+QCheckBox::indicator:unchecked:hover,
+QCheckBox::indicator:unchecked:focus,
+QCheckBox::indicator:unchecked:pressed,
+QGroupBox::indicator:unchecked:hover,
+QGroupBox::indicator:unchecked:focus,
+QGroupBox::indicator:unchecked:pressed
+{
+  border: none;
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_unchecked_focus.png);
+}
+
+QCheckBox::indicator:checked
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_checked.png);
+}
+
+QCheckBox::indicator:checked:hover,
+QCheckBox::indicator:checked:focus,
+QCheckBox::indicator:checked:pressed,
+QGroupBox::indicator:checked:hover,
+QGroupBox::indicator:checked:focus,
+QGroupBox::indicator:checked:pressed
+{
+  border: none;
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_checked_focus.png);
+}
+
+
+QCheckBox::indicator:indeterminate
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_indeterminate.png);
+}
+
+QCheckBox::indicator:indeterminate:focus,
+QCheckBox::indicator:indeterminate:hover,
+QCheckBox::indicator:indeterminate:pressed
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_indeterminate_focus.png);
+}
+
+QCheckBox::indicator:checked:disabled,
+QGroupBox::indicator:checked:disabled
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_checked_disabled.png);
+}
+
+QCheckBox::indicator:unchecked:disabled,
+QGroupBox::indicator:unchecked:disabled
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_unchecked_disabled.png);
+}
+
+QRadioButton
+{
+  spacing: 5px;
+  outline: none;
+  color: #adb1b6;
+  margin-bottom: 2px;
+}
+
+QRadioButton:disabled
+{
+  color: #1d1d1c;
+}
+QRadioButton::indicator
+{
+  width: 21px;
+  height: 21px;
+}
+
+QRadioButton::indicator:unchecked
+{
+  image: url(:/org.blueberry.ui.qt/dark/radio_unchecked.png);
+}
+
+QRadioButton::indicator:unchecked:hover,
+QRadioButton::indicator:unchecked:focus,
+QRadioButton::indicator:unchecked:pressed
+{
+  border: none;
+  outline: none;
+  image: url(:/org.blueberry.ui.qt/dark/radio_unchecked_focus.png);
+}
+
+QRadioButton::indicator:checked
+{
+  border: none;
+  outline: none;
+  image: url(:/org.blueberry.ui.qt/dark/radio_checked.png);
+}
+
+QRadioButton::indicator:checked:hover,
+QRadioButton::indicator:checked:focus,
+QRadioButton::indicator:checked:pressed
+{
+  border: none;
+  outline: none;
+  image: url(:/org.blueberry.ui.qt/dark/radio_checked_focus.png);
+}
+
+QRadioButton::indicator:checked:disabled
+{
+  outline: none;
+  image: url(:/org.blueberry.ui.qt/dark/radio_checked_disabled.png);
+}
+
+QRadioButton::indicator:unchecked:disabled
+{
+  image: url(:/org.blueberry.ui.qt/dark/radio_unchecked_disabled.png);
+}
+
+QMenuBar
+{
+  background-color: #323231;
+  color: #adb1b6;
+}
+
+QMenuBar::item
+{
+  background: transparent;
+}
+
+QMenuBar::item:selected
+{
+  background: transparent;
+  border: 1px solid #1d1d1c;
+}
+
+QMenuBar::item:pressed
+{
+  border: 1px solid #1d1d1c;
+  background-color: #3399cc;
+  color: #adb1b6;
+  margin-bottom:-1px;
+  padding-bottom:1px;
+}
+
+QMenu
+{
+  border: 1px solid #1d1d1c;
+  color: #adb1b6;
+  margin: 2px;
+}
+
+QMenu::icon
+{
+  margin: 5px;
+}
+
+QMenu::item
+{
+  padding: 5px 30px 5px 30px;
+  margin-left: 5px;
+  border: 1px solid transparent; /* leave some space for selection border */
+}
+
+QMenu::item:selected
+{
+  color: #adb1b6;
+}
+
+QMenu::separator
+{
+  height: 2px;
+  background: #3399cc;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+
+QMenu::indicator
+{
+  width: 18px;
+  height: 18px;
+}
+
+/* non-exclusive indicator = check box style indicator
+   (see QActionGroup::setExclusive) */
+QMenu::indicator:non-exclusive:unchecked
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_unchecked.png);
+}
+
+QMenu::indicator:non-exclusive:unchecked:selected
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_unchecked_disabled.png);
+}
+
+QMenu::indicator:non-exclusive:checked
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_checked.png);
+}
+
+QMenu::indicator:non-exclusive:checked:selected
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_checked_disabled.png);
+}
+
+/* exclusive indicator = radio button style indicator (see QActionGroup::setExclusive) */
+QMenu::indicator:exclusive:unchecked {
+  image: url(:/org.blueberry.ui.qt/dark/radio_unchecked.png);
+}
+
+QMenu::indicator:exclusive:unchecked:selected {
+  image: url(:/org.blueberry.ui.qt/dark/radio_unchecked_disabled.png);
+}
+
+QMenu::indicator:exclusive:checked
+{
+  image: url(:/org.blueberry.ui.qt/dark/radio_checked.png);
+}
+
+QMenu::indicator:exclusive:checked:selected
+{
+  image: url(:/org.blueberry.ui.qt/dark/radio_checked_disabled.png);
+}
+
+QMenu::right-arrow
+{
+  margin: 5px;
+  image: url(:/org.blueberry.ui.qt/dark/right_arrow.png)
+}
+
+QWidget:disabled
+{
+  color: #1d1d1c;
+  background-color: #323231;
+}
+
+QAbstractItemView
+{
+  alternate-background-color: #323231;
+  color: #adb1b6;
+  border: 1px solid 3A3939;
+  border-radius: 0px;
+}
+
+QWidget:focus,
+QMenuBar:focus
+{
+  border: 1px solid #3399cc;
+}
+
+QTabWidget:focus,
+QCheckBox:focus,
+QRadioButton:focus,
+QSlider:focus
+{
+  border: none;
+}
+
+QLineEdit
+{
+  background-color: #1d1d1c;
+  padding: 2px;
+  border-style: solid;
+  border: 1px solid #1d1d1c;
+  border-radius: 0px;
+  color: #adb1b6;
+}
+
+QGroupBox
+{
+  border:1px solid #323231;
+  border-radius: 0px;
+  padding-top: 24px;
+  font-weight: bold;
+}
+
+QGroupBox::title
+{
+  border:1px solid #323231;
+  border-right:0px;
+  border-bottom:0px;
+  subcontrol-position: top left;
+  subcontrol-origin: margin;
+  padding: 1px;
+}
+
+QAbstractScrollArea
+{
+  border-radius: 0px;
+  border: 1px solid #1d1d1c;
+  background-color: #323231;
+}
+
+QScrollBar:horizontal
+{
+  height: 15px;
+  margin: 3px 15px 3px 15px;
+  border: 1px transparent #1d1d1c;
+  border-radius: 0px;
+  background-color: #1d1d1c;
+}
+
+QScrollBar::handle:horizontal
+{
+  background-color: #323231;
+  border: 2px solid #1d1d1c;
+  min-width: 5px;
+  border-radius: 0px;
+}
+
+QScrollBar::add-line:horizontal
+{
+  margin: 0px 3px 0px 3px;
+  border-image: url(:/org.blueberry.ui.qt/dark/right_arrow_disabled.png);
+  width: 10px;
+  height: 10px;
+  subcontrol-position: right;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal
+{
+  margin: 0px 3px 0px 3px;
+  border-image: url(:/org.blueberry.ui.qt/dark/left_arrow_disabled.png);
+  height: 10px;
+  width: 10px;
+  subcontrol-position: left;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:horizontal:hover,
+QScrollBar::add-line:horizontal:on
+{
+  border-image: url(:/org.blueberry.ui.qt/dark/right_arrow.png);
+  height: 10px;
+  width: 10px;
+  subcontrol-position: right;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal:hover,
+QScrollBar::sub-line:horizontal:on
+{
+  border-image: url(:/org.blueberry.ui.qt/dark/left_arrow.png);
+  height: 10px;
+  width: 10px;
+  subcontrol-position: left;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::up-arrow:horizontal,
+QScrollBar::down-arrow:horizontal
+{
+  background: none;
+}
+
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal
+{
+  background: none;
+}
+
+QScrollBar:vertical
+{
+  background-color: #1d1d1c;
+  width: 15px;
+  margin: 15px 2px 15px 2px;
+  border: 1px transparent #1d1d1c;
+  border-radius: 0px;
+}
+
+QScrollBar::handle:vertical
+{
+  background-color: #323231;
+  border: 2px solid #1d1d1c;
+  min-height: 5px;
+  border-radius: 0px;
+}
+
+QScrollBar::sub-line:vertical
+{
+  margin: 3px 0px 3px 0px;
+  border-image: url(:/org.blueberry.ui.qt/dark/up_arrow_disabled.png);
+  height: 10px;
+  width: 10px;
+  subcontrol-position: top;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:vertical
+{
+  margin: 3px 0px 3px 0px;
+  border-image: url(:/org.blueberry.ui.qt/dark/down_arrow_disabled.png);
+  height: 10px;
+  width: 10px;
+  subcontrol-position: bottom;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical:hover,
+QScrollBar::sub-line:vertical:on
+{
+  border-image: url(:/org.blueberry.ui.qt/dark/up_arrow.png);
+  height: 10px;
+  width: 10px;
+  subcontrol-position: top;
+  subcontrol-origin: margin;
+}
+
+
+QScrollBar::add-line:vertical:hover,
+QScrollBar::add-line:vertical:on
+{
+  border-image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
+  height: 10px;
+  width: 10px;
+  subcontrol-position: bottom;
+  subcontrol-origin: margin;
+}
+
+QScrollBar::up-arrow:vertical,
+QScrollBar::down-arrow:vertical
+{
+  background: none;
+}
+
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical
+{
+  background: none;
+}
+
+QTextEdit
+{
+  background-color: #1d1d1c;
+  color: #adb1b6;
+  border: 1px solid #1d1d1c;
+}
+
+QPlainTextEdit
+{
+  background-color: #1d1d1c;;
+  color: #adb1b6;
+  border-radius: 0px;
+  border: 1px solid #1d1d1c;
+}
+
+QHeaderView::section
+{
+  background-color: #1d1d1c;
+  color: #adb1b6;
+  padding: 5px;
+  border: 1px solid #1d1d1c;
+}
+
+QSizeGrip
+{
+  image: url(:/org.blueberry.ui.qt/dark/sizegrip.png);
+  width: 12px;
+  height: 12px;
+}
+
+
+QMainWindow::separator
+{
+  background-color: #323231;
+  color: #adb1b6;
+  padding-left: 4px;
+  spacing: 2px;
+  border: 1px dashed #1d1d1c;
+}
+
+QMainWindow::separator:hover
+{
+  background-color: #adb1b6;
+  color: #adb1b6;
+  padding-left: 4px;
+  border: 1px solid #1d1d1c;
+  spacing: 2px;
+}
+
+
+QMenu::separator
+{
+  height: 1px;
+  background-color: #1d1d1c;
+  color: #adb1b6;
+  padding-left: 4px;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+
+
+QFrame
+{
+  border-radius: 0px;
+  border: 1px solid #1d1d1c;
+}
+
+QFrame[frameShape="0"]
+{
+  border-radius: 0px;
+  border: 1px transparent #1d1d1c;
+}
+
+QStackedWidget
+{
+  border: 1px transparent #1d1d1c;
+}
+
+QToolBar
+{
+  border: 1px transparent #393838;
+  background: 1px solid #323231;
+  font-weight: bold;
+}
+
+/* this fixes the size of the plugin icons in the toolbar */
+QToolBar QToolButton
+{
+  background-color: #323231;
+  border: 1px solid #323231;
+  border-radius: 0px;
+  min-width: 30px;
+  min-height: 30px;
+  margin: 0px;
+  padding: 0px;
+}
+
+QToolBar::handle:horizontal
+{
+  image: url(:/org.blueberry.ui.qt/dark/Hmovetoolbar.png);
+}
+QToolBar::handle:vertical
+{
+  image: url(:/org.blueberry.ui.qt/dark/Vmovetoolbar.png);
+}
+QToolBar::separator:horizontal
+{
+  image: url(:/org.blueberry.ui.qt/dark/Hsepartoolbar.png);
+}
+QToolBar::separator:vertical
+{
+  image: url(:/org.blueberry.ui.qt/dark/Vsepartoolbar.png);
+}
+
+QToolButton
+{
+  background-color: #323231;
+  border: 1px solid #323231;
+  border-radius: 0px;
+  min-width: 12px;
+  min-height: 12px;
+  margin: 0px;
+  padding: 0px;
+}
+
+/* only for MenuButtonPopup */
+QToolButton[popupMode="1"]
+{
+  border: 0px solid #1d1d1c;
+}
+
+/* only for InstantPopup */
+QToolButton[popupMode="2"]
+{
+  border: 0px solid #1d1d1c;
+}
+
+/* this fixes the size of the standard icons in the toolbar */
+QToolButton:hover,
+QToolButton::menu-button:hover
+{
+  background-color: #3399cc;
+  border: 1px solid #3399cc;
+  min-width: 30px;
+  min-height: 30px;
+  margin: 0px;
+  padding: 0px;
+}
+
+QToolButton#qt_toolbar_ext_button,
+QToolBarExtension
+{
+  qproperty-icon: url(:/org.blueberry.ui.qt/dark/right_arrows.svg);
+  min-width: 10px;
+}
+
+QPushButton
+{
+  color: #adb1b6;
+  background-color: #323231;
+  min-width: 68px;
+  border-width: 1px;
+  border-color: #1d1d1c;
+  border-style: solid;
+  padding: 3px;
+  border-radius: 0px;
+  outline: none;
+}
+
+QPushButton:disabled
+{
+  background-color: #1d1d1c;
+  color: #323231;
+}
+
+QPushButton:focus
+{
+  color: #3399cc;
+  border-color: #3399cc;
+  border-style: solid;
+  border-width: 1px;
+}
+
+QPushButton:pressed
+{
+  background-color: #3399cc;
+  color: #1d1d1c;
+  padding-top: -15px;
+  padding-bottom: -17px;
+  border-width: 1px;
+  border-color: #1d1d1c;
+}
+
+QComboBox
+{
+  selection-background-color: #3399cc;
+  selection-color: #1d1d1c;
+  border: 1px solid #1d1d1c;
+  border-radius: 0px;
+  padding: 3px;
+  min-width: 75px;
+}
+
+QPushButton:checked{
+  background-color: #1d1d1c;
+  border-color: #adb1b6;
+}
+
+QComboBox:hover,
+QAbstractSpinBox:hover,
+QLineEdit:hover,
+QTextEdit:hover,
+QPlainTextEdit:hover,
+QAbstractView:hover
+{
+  border: 1px solid #3399cc;
+  color: #adb1b6;
+}
+
+QPushButton:hover,QTreeView:hover
+{
+  border: 1px solid #1d1d1c;
+  color: #3399cc;
+}
+
+QComboBox QAbstractItemView
+{
+  background-color: #323231;
+  border-radius: 0px;
+  border: 1px solid #1d1d1c;
+  selection-background-color: #3399cc;
+  selection-color: #adb1b6;
+}
+
+QComboBox:on
+{
+  padding-top: 3px;
+  padding-left: 3px;
+  selection-background-color: #3399cc;
+  color: #adb1b6;
+  selection-color: #adb1b6;
+}
+
+QComboBox::drop-down
+{
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  min-width: 15px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+QComboBox::down-arrow
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow_disabled.png);
+}
+
+QComboBox::down-arrow:on,
+QComboBox::down-arrow:hover,
+QComboBox::down-arrow:focus
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
+}
+
+QAbstractSpinBox
+{
+  border: 1px solid #1d1d1c;
+  background-color: #1d1d1c;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  color: #adb1b6;
+  border-radius: 0px;
+  min-width: 50px;
+}
+
+QAbstractSpinBox:up-button
+{
+  border: 2px transparent #1d1d1c;
+  background-color: #323231;
+  subcontrol-origin: border;
+  subcontrol-position: top right;
+  padding-top: 1px;
+  margin-bottom: 1px;
+  margin-top: 2px;
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+QAbstractSpinBox:down-button
+{
+  border: 2px transparent #1d1d1c;
+  background-color: #323231;
+  subcontrol-origin: border;
+  subcontrol-position: bottom right;
+  padding-bottom: 0px;
+  margin-bottom: 2px;
+  margin-top: 1px;
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+QAbstractSpinBox::up-arrow,QAbstractSpinBox::up-arrow:disabled,QAbstractSpinBox::up-arrow:off
+{
+  image: url(:/org.blueberry.ui.qt/dark/up_arrow_disabled.png);
+  width: 10px;
+  height: 10px;
+}
+
+QAbstractSpinBox::up-arrow:hover
+{
+  image: url(:/org.blueberry.ui.qt/dark/up_arrow.png);
+}
+
+QAbstractSpinBox::down-arrow,QAbstractSpinBox::down-arrow:disabled,QAbstractSpinBox::down-arrow:off
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow_disabled.png);
+  width: 10px;
+  height: 10px;
+}
+
+QAbstractSpinBox::down-arrow:hover
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
+}
+
+QLabel
+{
+  border: 0px solid #1d1d1c;
+}
+
+QTabWidget{
+  border: 1px transparent #1d1d1c;
+}
+
+QTabWidget::pane
+{
+  border: 1px solid #1d1d1c;
+  padding: 2px;
+  margin: 0px;
+}
+
+/* TABS IN GENERAL */
+QTabBar
+{
+  qproperty-drawBase: 0;
+  left: 0px;
+  border-radius: 0px;
+  border: 1px trasparent #1d1d1c;
+}
+
+QTabBar:focus
+{
+  border: 1px solid #1d1d1c;
+}
+
+QTabBar::close-button
+{
+  image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
+  background: transparent;
+}
+
+QTabBar::close-button:hover
+{
+  image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
+  background: transparent;
+}
+
+QTabBar::close-button:pressed {
+  image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
+  background: transparent;
+}
+
+QTabBar::tab:right:!selected:hover
+{
+  color: #3399cc;
+}
+
+QTabBar QToolButton::right-arrow:enabled
+{
+  image: url(:/org.blueberry.ui.qt/dark/right_arrow.png);
+}
+
+QTabBar QToolButton::left-arrow:enabled
+{
+  image: url(:/org.blueberry.ui.qt/dark/left_arrow.png);
+}
+
+QTabBar QToolButton::right-arrow:disabled
+{
+  image: url(:/org.blueberry.ui.qt/dark/right_arrow_disabled.png);
+}
+
+QTabBar QToolButton::left-arrow:disabled
+{
+  image: url(:/org.blueberry.ui.qt/dark/left_arrow_disabled.png);
+}
+
+QTabBar::scroller
+{
+  margin: 0px;
+  padding: 0px;
+}
+
+/* TOP TABS */
+QTabBar::tab:top
+{
+  font-weight: bold;
+  color: #adb1b6;
+  border: 0px solid #1d1d1c;
+  background-color: #1d1d1c;
+  padding: 5px;
+  min-width: 50px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+QTabBar::tab:top:!selected
+{
+  color: #adb1b6;
+  font-weight: normal;
+  background-color: #323231;
+  border: 0px solid #1d1d1c;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+QTabBar::tab:top:!selected:hover
+{
+  color: #3399cc;
+}
+
+/* BOTTOM TABS */
+QTabBar::tab:bottom
+{
+  font-weight: bold;
+  color: #adb1b6;
+  border: 0px solid #1d1d1c;
+  background-color: #1d1d1c;
+  padding: 5px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  min-width: 50px;
+}
+
+QTabBar::tab:bottom:!selected
+{
+  color: #adb1b6;
+  font-weight: normal;
+  background-color: #323231;
+  border: 0px solid #1d1d1c;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+QTabBar::tab:bottom:!selected:hover
+{
+  color: #3399cc;
+}
+
+/* LEFT TABS */
+QTabBar::tab:left
+{
+  color: #adb1b6;
+  font-weight: bold;
+  border: 0px solid #1d1d1c;
+  background-color: #1d1d1c;
+  padding: 5px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  min-height: 50px;
+}
+
+QTabBar::tab:left:!selected
+{
+  color: #adb1b6;
+  font-weight: normal;
+  background-color: #323231;
+  border: 0px solid #1d1d1c;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+QTabBar::tab:left:!selected:hover
+{
+  color: #3399cc;
+}
+
+/* RIGHT TABS */
+QTabBar::tab:right
+{
+  color: #adb1b6;
+  font-weight: bold;
+  border: 0px solid #1d1d1c;
+  background-color: #1d1d1c;
+  padding: 5px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  min-height: 50px;
+}
+
+QTabBar::tab:right:!selected
+{
+  color: #adb1b6;
+  font-weight: normal;
+  background-color: #323231;
+  border: 0px solid #1d1d1c;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+/* TODO check if #403F3F is nice */
+QDockWidget
+{
+  background: #323231;
+  border: 1px solid #403F3F;
+  titlebar-close-icon: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
+  titlebar-normal-icon: url(:/org.blueberry.ui.qt/dark/undock.png);
+}
+
+QDockWidget::close-button, QDockWidget::float-button
+{
+  border: 1px solid transparent;
+  border-radius: 0px;
+  background: transparent;
+}
+
+/* TODO check if rgba(255, 255, 255, 10) is nice */
+QDockWidget::close-button:hover,
+QDockWidget::float-button:hover
+{
+  background: rgba(255, 255, 255, 10);
+}
+
+QDockWidget::close-button:pressed,
+QDockWidget::float-button:pressed
+{
+  padding: 1px -1px -1px 1px;
+  background: rgba(255, 255, 255, 10);
+}
+
+QTreeView, QListView
+{
+  border: 1px solid #1d1d1c;
+  background-color: #1d1d1c;
+}
+
+QTreeView::indicator:unchecked
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_big_unchecked.png);
+}
+
+QTreeView::indicator:checked,
+QTreeView::indicator:indeterminate
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_big_checked.png);
+}
+
+QTreeView::indicator:unchecked:selected
+{
+    image: url(:/org.blueberry.ui.qt/dark/checkbox_big_unchecked_disabled.png);
+}
+
+QTreeView::indicator:indeterminate:selected,
+QTreeView::indicator:checked:selected
+{
+  image: url(:/org.blueberry.ui.qt/dark/checkbox_big_checked_disabled.png);
+}
+
+QTreeView:branch:selected,
+QTreeView:branch:hover
+{
+  background: url(:/org.blueberry.ui.qt/dark/transparent.png);
+}
+
+QTreeView::branch:has-siblings:!adjoins-item
+{
+  border-image: url(:/org.blueberry.ui.qt/dark/transparent.png);
+}
+
+QTreeView::branch:has-siblings:adjoins-item
+{
+  border-image: url(:/org.blueberry.ui.qt/dark/transparent.png);
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item
+{
+  border-image: url(:/org.blueberry.ui.qt/dark/transparent.png);
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings
+{
+  image: url(:/org.blueberry.ui.qt/dark/branch_closed.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings
+{
+  image: url(:/org.blueberry.ui.qt/dark/branch_open.png);
+}
+
+QTreeView::branch:has-children:!has-siblings:closed:hover,
+QTreeView::branch:closed:has-children:has-siblings:hover
+{
+  image: url(:/org.blueberry.ui.qt/dark/branch_closed-on.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings:hover,
+QTreeView::branch:open:has-children:has-siblings:hover
+{
+  image: url(:/org.blueberry.ui.qt/dark/branch_open-on.png);
+}
+
+QListView::item:!selected:hover,
+QTreeView::item:!selected:hover
+{
+  background: #323231;
+  outline: 0;
+  color: #adb1b6
+}
+
+QListView::item:selected:hover,
+QTreeView::item:selected:hover
+{
+  background: #3399cc;
+  color: #adb1b6;
+}
+
+QSlider::groove:horizontal
+{
+  border: 1px solid #1d1d1c;
+  height: 3px;
+  background: #1d1d1c;
+  margin: 0px;
+  border-radius: 0px;
+}
+
+QSlider::handle:horizontal
+{
+  background: #adb1b6;
+  border: 1px solid #1d1d1c;
+  width: 7px;
+  height: 16px;
+  margin: -8px 0;
+  border-radius: 0px;
+}
+
+QSlider::groove:vertical
+{
+  border: 1px solid #1d1d1c;
+  width: 3px;
+  background: #1d1d1c;
+  margin: 0px;
+  border-radius: 0px;
+}
+
+QSlider::handle:vertical
+{
+  background: #adb1b6;
+  border: 1px solid #1d1d1c;
+  width: 16px;
+  height: 7px;
+  margin: 0 -8px;
+  border-radius: 0px;
+}
+
+QmitkRenderWindowMenu
+{
+  background-color: transparent;
+}
+
+/* this fixes the size of the icons in the stdMultiWidget */
+QmitkRenderWindowMenu QToolButton,
+QmitkRenderWindowMenu QToolButton::menu-button {
+  background-color: transparent;
+  border: 0px solid #1d1d1c;
+  border-radius: 0px;
+  width: 15px;
+  height: 15px;
+  margin: 1px;
+  padding: 0px;
+}
+
+QmitkRenderWindowMenu QToolButton:hover,
+QmitkRenderWindowMenu QToolButton::menu-button:hover
+{
+  background-color: #adb1b6;
+  border: 0px solid #3399cc;
+  width: 15px;
+  height: 15px;
+  margin: 1px;
+  padding: 0px;
+}
+
+QToolButton:checked,
+QToolButton:pressed,
+QToolButton::menu-button:pressed
+{
+  color: #3399cc;
+  border: 1px solid #3399cc;
+  padding: 0px;
+}
+
+/* the subcontrol below is used only in the InstantPopup or DelayedPopup mode */
+QToolButton::menu-indicator
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
+  top: -7px; left: -2px; /* shift it a bit */
+}
+
+/* the subcontrols below are used only in the MenuButtonPopup mode */
+QToolButton::menu-button
+{
+  border: 1px transparent #1d1d1c;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  /* 16px width + 4px for border = 20px allocated above */
+  width: 16px;
+  outline: none;
+}
+
+QToolButton::menu-arrow
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
+}
+
+QToolButton::menu-arrow:open
+{
+  border: 1px solid #1d1d1c;
+}
+
+QPushButton::menu-indicator
+{
+  subcontrol-origin: padding;
+  subcontrol-position: bottom right;
+  left: 8px;
+}
+
+QTableView
+{
+  border: 1px solid #1d1d1c;
+  gridline-color: #323231;
+  background-color: #1d1d1c;
+}
+
+
+QTableView, QHeaderView
+{
+  border-radius: 0px;
+}
+
+QTableView::item:pressed, QListView::item:pressed, QTreeView::item:pressed
+{
+  background: #3399cc;
+  color: #1d1d1c;
+}
+
+QTableView::item:selected:active, QTreeView::item:selected:active, QListView::item:selected:active
+{
+  background: #3399cc;
+  color: #1d1d1c;
+}
+
+
+QHeaderView
+{
+  background-color: #323231;
+  border: 1px transparent;
+  border-radius: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+QHeaderView::section
+{
+  background-color: #323231;
+  color: #adb1b6;
+  padding: 5px;
+  border: 1px solid #1d1d1c;
+  border-radius: 0px;
+  text-align: left;
+}
+
+QHeaderView::section::vertical::first, QHeaderView::section::vertical::only-one
+{
+  border-top: 1px solid #1d1d1c;
+}
+
+QHeaderView::section::vertical
+{
+  border-top: transparent;
+}
+
+QHeaderView::section::horizontal::first, QHeaderView::section::horizontal::only-one
+{
+  border-left: 1px solid #1d1d1c;
+}
+
+QHeaderView::section::horizontal
+{
+  border-left: transparent;
+}
+
+QHeaderView::section:checked
+{
+  color: #adb1b6;
+  background-color: #323231;
+}
+
+/* sort indicator */
+QHeaderView::down-arrow
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
+}
+
+QHeaderView::up-arrow
+{
+  image: url(:/org.blueberry.ui.qt/dark/up_arrow.png);
+}
+
+
+QTableCornerButton::section
+{
+  background-color: #323231;
+  border: 1px transparent #1d1d1c;
+  border-radius: 0px;
+}
+
+QToolBox
+{
+  color: #adb1b6;
+  background-color: #323231;
+  padding: 5px;
+  border: 1px transparent #1d1d1c;
+}
+
+QToolBox::tab
+{
+  color: #adb1b6;
+  background-color: #323231;
+  border: 1px solid #1d1d1c;
+  border-bottom: 1px transparent #323231;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+QToolBox::tab:selected
+{
+  background-color: #323231;
+  border-color: #3399cc;
+}
+
+QStatusBar::item
+{
+  border: 0px transparent #1d1d1c;
+}
+
+QSplitter::handle
+{
+  border: 1px dashed #1d1d1c;
+}
+
+QSplitter::handle:hover
+{
+  background-color: #adb1b6;
+  border: 1px solid #1d1d1c;
+}
+
+QSplitter::handle:horizontal
+{
+  width: 1px;
+}
+
+QSplitter::handle:vertical
+{
+  height: 1px;
+}
+
+QProgressBar
+{
+  border: 1px solid #1d1d1c;
+  border-radius: 0px;
+  text-align: center;
+}
+
+QProgressBar::chunk
+{
+  background-color: #3399cc;
+}
+
+QDateEdit
+{
+  selection-background-color: #3399cc;
+  selection-color: #1d1d1c;
+  border: 1px solid #1d1d1c;
+  border-radius: 0px;
+  padding: 1px;
+  min-width: 75px;
+}
+
+QDateEdit:on
+{
+  padding-top: 3px;
+  padding-left: 4px;
+}
+
+QDateEdit QAbstractItemView
+{
+  background-color: #1d1d1c;
+  border-radius: 0px;
+  border: 1px solid #1d1d1c;
+  selection-background-color: #3399cc;
+  selection-color: #1d1d1c;
+}
+
+QDateEdit::drop-down
+{
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  width: 15px;
+  border-left-width: 0px;
+  border-left-color: darkgray;
+  border-left-style: solid;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+QDateEdit::down-arrow
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow_disabled.png);
+}
+
+QDateEdit::down-arrow:on, QDateEdit::down-arrow:hover,
+QDateEdit::down-arrow:focus
+{
+  image: url(:/org.blueberry.ui.qt/dark/down_arrow.png);
+}

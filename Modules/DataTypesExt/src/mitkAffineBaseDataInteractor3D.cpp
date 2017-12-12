@@ -230,7 +230,7 @@ void mitk::AffineBaseDataInteractor3D::ScaleGeometry(mitk::Point3D newScale, mit
   anchorPoint[1] = pointY;
   anchorPoint[2] = pointZ;
 
-  ScaleOperation *doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
+  auto *doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
   geometry->ExecuteOperation(doOp);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -253,7 +253,7 @@ void mitk::AffineBaseDataInteractor3D::RotateGeometry(mitk::ScalarType angle,
   pointOfRotation[1] = pointY;
   pointOfRotation[2] = pointZ;
 
-  mitk::RotationOperation *doOp = new mitk::RotationOperation(OpROTATE, pointOfRotation, rotationAxis, angle);
+  auto *doOp = new mitk::RotationOperation(OpROTATE, pointOfRotation, rotationAxis, angle);
 
   geometry->ExecuteOperation(doOp);
   delete doOp;
@@ -272,8 +272,8 @@ mitk::BaseGeometry *mitk::AffineBaseDataInteractor3D::GetUpdatedTimeGeometry(mit
   // Get the correct time geometry to support 3D + t
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   BaseGeometry *geometry = this->GetDataNode()->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
-  if (geometry == NULL)
-    MITK_ERROR << "Geometry is NULL. Cannot modify it.";
+  if (geometry == nullptr)
+    MITK_ERROR << "Geometry is nullptr. Cannot modify it.";
   return geometry;
 }
 
@@ -310,8 +310,8 @@ void mitk::AffineBaseDataInteractor3D::SetDataNode(DataNode *node)
 
 bool mitk::AffineBaseDataInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  if (positionEvent == nullptr)
     return false;
 
   Point3D currentWorldPoint;
@@ -371,8 +371,8 @@ void mitk::AffineBaseDataInteractor3D::InitRotate(StateMachineAction *, Interact
 
 bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  if (positionEvent == nullptr)
     return false;
 
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
@@ -380,7 +380,7 @@ bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent *interaction
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;
-  if ((interactionEvent->GetSender()) != NULL)
+  if ((interactionEvent->GetSender()) != nullptr)
     timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
@@ -392,8 +392,8 @@ bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent *interaction
 
 void mitk::AffineBaseDataInteractor3D::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  if (positionEvent == nullptr)
     return;
 
   Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
@@ -416,17 +416,17 @@ void mitk::AffineBaseDataInteractor3D::TranslateObject(StateMachineAction *, Int
 
 void mitk::AffineBaseDataInteractor3D::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  auto *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
+  if (positionEvent == nullptr)
     return;
 
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
   Point3D currentWorldPoint = positionEvent->GetPositionInWorld();
 
-  vtkCamera *camera = NULL;
-  vtkRenderer *currentVtkRenderer = NULL;
+  vtkCamera *camera = nullptr;
+  vtkRenderer *currentVtkRenderer = nullptr;
 
-  if ((interactionEvent->GetSender()) != NULL)
+  if ((interactionEvent->GetSender()) != nullptr)
   {
     camera = interactionEvent->GetSender()->GetVtkRenderer()->GetActiveCamera();
     currentVtkRenderer = interactionEvent->GetSender()->GetVtkRenderer();
@@ -464,7 +464,7 @@ void mitk::AffineBaseDataInteractor3D::RotateObject(StateMachineAction *, Intera
     Point3D rotationCenter = m_OriginalGeometry->GetCenter();
 
     int timeStep = 0;
-    if ((interactionEvent->GetSender()) != NULL)
+    if ((interactionEvent->GetSender()) != nullptr)
       timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
     // Reset current Geometry3D to original state (pre-interaction) and

@@ -37,10 +37,9 @@ private:
   mitk::Image::Pointer m_mitkImageComponent2;
 
 public:
-  void setUp()
+  void setUp() override
   {
     typedef itk::Image<double, 3> ImageType;
-    typedef itk::VectorImage<double, 3> VectorImageType;
     typedef itk::ImageRegionIterator<ImageType> ImageIteratorType;
     typedef itk::ImageDuplicator<ImageType> DuplicatorType;
     typedef itk::ComposeImageFilter<ImageType> CompositeFilterType;

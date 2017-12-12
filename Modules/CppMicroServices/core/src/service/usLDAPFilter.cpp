@@ -48,12 +48,12 @@ public:
 };
 
 LDAPFilter::LDAPFilter()
-  : d(0)
+  : d(nullptr)
 {
 }
 
 LDAPFilter::LDAPFilter(const std::string& filter)
-  : d(0)
+  : d(nullptr)
 {
   try
   {
@@ -76,7 +76,7 @@ LDAPFilter::~LDAPFilter()
 
 LDAPFilter::operator bool_type() const
 {
-  return d.ConstData() != 0 ? &LDAPFilter::d : NULL;
+  return d.ConstData() != nullptr ? &LDAPFilter::d : nullptr;
 }
 
 bool LDAPFilter::Match(const ServiceReferenceBase& reference) const

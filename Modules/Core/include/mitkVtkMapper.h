@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
-#include "mitkIShaderRepository.h"
 #include "mitkLocalStorageHandler.h"
 #include "mitkMapper.h"
 #include "mitkVtkPropRenderer.h"
@@ -121,9 +120,9 @@ namespace mitk
     }
 
     /**
-    * \brief SHADERTODO
+    * \deprecatedSince{2017_08}
     */
-    void ApplyShaderProperties(mitk::BaseRenderer *renderer);
+    DEPRECATED(void ApplyShaderProperties(mitk::BaseRenderer *)){}
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.
@@ -139,25 +138,10 @@ namespace mitk
     * by the parameter renderer. Should be overwritten in subclasses.
     */
     virtual void ReleaseGraphicsResources(mitk::BaseRenderer * /*renderer*/) {}
-    class VtkMapperLocalStorage : public mitk::Mapper::BaseLocalStorage
+
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
-    public:
-      mitk::IShaderRepository::ShaderProgram::Pointer m_ShaderProgram;
-      itk::TimeStamp m_ModifiedTimeStamp;
-
-      VtkMapperLocalStorage()
-      {
-        IShaderRepository *shaderRepo = CoreServices::GetShaderRepository();
-        if (shaderRepo)
-        {
-          m_ShaderProgram = shaderRepo->CreateShaderProgram();
-        }
-      }
-
-      ~VtkMapperLocalStorage() {}
     };
-
-    mitk::LocalStorageHandler<VtkMapperLocalStorage> m_VtkMapperLSH;
 
   protected:
     /** constructor */

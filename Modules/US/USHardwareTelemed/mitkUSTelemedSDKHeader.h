@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
   * Release the given COM object pointer and set the pointer to null.
   */
-#define SAFE_RELEASE(x) { if (x) x->Release(); x = NULL; }
+#define SAFE_RELEASE(x) { if (x) x->Release(); x = nullptr; }
 
 /**
   * Get the current value from the given COM object and return it as double.
@@ -111,7 +111,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   * in the Telemed API documentation regarding CreateUsgControl().
   */
 #define CREATE_TelemedControl(control, dataView, iidType, type, scanMode) { \
-  IUnknown* tmp_obj = NULL; \
+  IUnknown* tmp_obj = nullptr; \
   mitk::telemed::CreateUsgControl( dataView, iidType, scanMode, 0, (void**)&tmp_obj ); \
   if ( ! tmp_obj ) { mitkThrow() << "Could not create telemed control " << control << ")."; } \
   \

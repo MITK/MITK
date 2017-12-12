@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ArbitraryTimeGeometry_h
 #define ArbitraryTimeGeometry_h
 
-// MITK
-#include <MitkCoreExports.h>
-#include <mitkCommon.h>
+//MITK
 #include <mitkTimeGeometry.h>
+#include <mitkCommon.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -34,8 +34,8 @@ namespace mitk
   * geometries are different for each time step it is not possible
   * to set the same geometry to different time steps. Instead
   * copies should be used.
-  * @remark The lower time bound of a succeeding time step may not be smaller or equal
-  * to the lower time bound of its predecessor. Thus the list of time points is
+  * @remark The lower time bound of a succeeding time step may not be smaller
+  * than the upper time bound of its predecessor. Thus the list of time points is
   * always sorted by its lower time bounds.
   * @remark For the conversion between time step and time point the following assumption
   * is used.:\n
@@ -52,7 +52,8 @@ namespace mitk
 
     ArbitraryTimeGeometry();
     typedef ArbitraryTimeGeometry self;
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
       /**
       * \brief Returns the number of time steps.
@@ -62,14 +63,14 @@ namespace mitk
       * is also the upper bound of the time steps. The
       * minimum time steps is always 0.
       */
-      virtual TimeStepType CountTimeSteps() const;
+      virtual TimeStepType CountTimeSteps() const override;
     /**
     * \brief Returns the first time point for which the time geometry instance is valid.
     *
     * Returns the first valid time point for this geometry. It is the lower time bound of
     * the first step. The time point is given in ms.
     */
-    virtual TimePointType GetMinimumTimePoint() const;
+    virtual TimePointType GetMinimumTimePoint() const override;
     /**
     * \brief Returns the last time point for which the time geometry instance is valid
     *
@@ -77,7 +78,7 @@ namespace mitk
     * this time geometry. It is the upper time bound of the last step.
     * The time point is given in ms.
     */
-    virtual TimePointType GetMaximumTimePoint() const;
+    virtual TimePointType GetMaximumTimePoint() const override;
 
     /**
     * \brief Returns the first time point for which the time geometry instance is valid.
@@ -85,24 +86,24 @@ namespace mitk
     * Returns the first valid time point for the given TimeStep. The time point
     * is given in ms.
     */
-    virtual TimePointType GetMinimumTimePoint(TimeStepType step) const;
+    virtual TimePointType GetMinimumTimePoint(TimeStepType step) const override;
     /**
     * \brief Returns the last time point for which the time geometry instance is valid
     *
     * Gives the last time point for the Geometry specified by the given TimeStep. The time point is given in ms.
     */
-    virtual TimePointType GetMaximumTimePoint(TimeStepType step) const;
+    virtual TimePointType GetMaximumTimePoint(TimeStepType step) const override;
 
     /**
     * \brief Get the time bounds (in ms)
     * it returns GetMinimumTimePoint() and GetMaximumTimePoint() results as bounds.
     */
-    virtual TimeBounds GetTimeBounds() const;
+    virtual TimeBounds GetTimeBounds() const override;
 
     /**
     * \brief Get the time bounds for the given TimeStep (in ms)
     */
-    virtual TimeBounds GetTimeBounds(TimeStepType step) const;
+    virtual TimeBounds GetTimeBounds(TimeStepType step) const override;
 
     /**
     * \brief Tests if a given time point is covered by this time geometry instance
@@ -111,7 +112,7 @@ namespace mitk
     * point (so it is within GetTimeBounds() and fails if not.
     * The time point must be given in ms.
     */
-    virtual bool IsValidTimePoint(TimePointType timePoint) const;
+    virtual bool IsValidTimePoint(TimePointType timePoint) const override;
     /**
     * \brief Test for the given time step if a geometry is availible
     *
@@ -119,7 +120,7 @@ namespace mitk
     * Otherwise false is returned.
     * The time step is defined as positiv number.
     */
-    virtual bool IsValidTimeStep(TimeStepType timeStep) const;
+    virtual bool IsValidTimeStep(TimeStepType timeStep) const override;
     /**
     * \brief Converts a time step to a time point
     *
@@ -129,7 +130,7 @@ namespace mitk
     * a time point is calculated that also does not point to a valid
     * geometry, but no exception is raised.
     */
-    virtual TimePointType TimeStepToTimePoint(TimeStepType timeStep) const;
+    virtual TimePointType TimeStepToTimePoint(TimeStepType timeStep) const override;
     /**
   * \brief Converts a time point to the corresponding time step
   *
@@ -141,14 +142,14 @@ namespace mitk
   * returned. If an positive invalid time step is given an invalid
   * time step will be returned.
   */
-    virtual TimeStepType TimePointToTimeStep(TimePointType timePoint) const;
+    virtual TimeStepType TimePointToTimeStep(TimePointType timePoint) const override;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     *
     * Returns a clone of the geometry which defines the given time step. If
     * the given time step is invalid an null-pointer is returned.
     */
-    virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep(TimeStepType timeStep) const;
+    virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep(TimeStepType timeStep) const override;
 
     /**
     * \brief Returns the geometry which corresponds to the given time point
@@ -218,18 +219,18 @@ namespace mitk
     void ClearAllGeometries();
 
     /** Append the passed geometry to the time geometry.
-     * @remark if it is not the first time step the passed minimum time point is ignored, so the existing time "grid"
-     * stays untouched.
      * @pre The passed geometry pointer must be valid.
-     * @pre The maximumTimePoint must be larger then the maximum time point of the currently last time step.*/
-    void AppendTimeStep(BaseGeometry *geometry, TimePointType maximumTimePoint, TimePointType minimumTimePoint = 0);
+     * @pre The minimumTimePoint must not be smaller than the maximum time point of the currently last time step.
+     * Therefore time steps must not be overlapping in time.
+     * @pre minimumTimePoint must not be larger then maximumTimePoint.*/
+    void AppendNewTimeStep(BaseGeometry *geometry, TimePointType minimumTimePoint, TimePointType maximumTimePoint);
 
-    /** Same than AppendTimeStep. But clones geometry before adding it.*/
-    void AppendTimeStepClone(const BaseGeometry *geometry,
-                             TimePointType maximumTimePoint,
-                             TimePointType minimumTimePoint = 0);
+    /** Same than AppendNewTimeStep. But clones geometry before adding it.*/
+    void AppendNewTimeStepClone(const BaseGeometry* geometry,
+                              TimePointType minimumTimePoint,
+                              TimePointType maximumTimePoint );
 
-    void ReserveSpaceForGeometries(TimeStepType numberOfGeometries);
+    void ReserveSpaceForGeometries( TimeStepType numberOfGeometries );
 
     virtual void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
@@ -237,8 +238,8 @@ namespace mitk
     virtual ~ArbitraryTimeGeometry();
 
     std::vector<BaseGeometry::Pointer> m_GeometryVector;
+    std::vector<TimePointType> m_MinimumTimePoints;
     std::vector<TimePointType> m_MaximumTimePoints;
-    TimePointType m_MinimumTimePoint;
 
   }; // end class ArbitraryTimeGeometry
 

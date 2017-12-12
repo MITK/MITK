@@ -39,7 +39,7 @@ void mitk::NavigationDataToNavigationDataFilter::SetInput( const NavigationData*
 
 void mitk::NavigationDataToNavigationDataFilter::SetInput( unsigned int idx, const NavigationData* nd )
 {
-  if ( nd == NULL ) // if an input is set to NULL, remove it
+  if ( nd == nullptr ) // if an input is set to nullptr, remove it
     this->RemoveInput(idx);
   else
     this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));   // ProcessObject is not const-correct so a const_cast is required here
@@ -50,7 +50,7 @@ void mitk::NavigationDataToNavigationDataFilter::SetInput( unsigned int idx, con
 const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( void ) const
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
 }
@@ -59,7 +59,7 @@ const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput
 const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( unsigned int idx ) const
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
 }
@@ -71,7 +71,7 @@ const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput
   for (DataObjectPointerArray::const_iterator it = inputs.begin(); it != inputs.end(); ++it)
     if (std::string(navDataName) == (static_cast<NavigationData*>(it->GetPointer()))->GetName())
       return static_cast<NavigationData*>(it->GetPointer());
-  return NULL;
+  return nullptr;
 }
 
 
@@ -98,7 +98,7 @@ void mitk::NavigationDataToNavigationDataFilter::CreateOutputsForAllInputs()
   this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());  // create outputs for all inputs
   bool isModified = false;
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx){
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       mitk::NavigationData::Pointer newOutput = mitk::NavigationData::New();
       this->SetNthOutput(idx, newOutput);

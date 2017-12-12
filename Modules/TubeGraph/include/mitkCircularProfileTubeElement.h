@@ -51,7 +51,7 @@ namespace mitk
     /**
     * Returns the diameter of the circle.
     */
-    const float GetDiameter() const;
+    float GetDiameter() const;
 
     /**
     * Comparison operation between this object and the given object.

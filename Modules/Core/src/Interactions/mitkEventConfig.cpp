@@ -127,7 +127,7 @@ mitk::EventConfigPrivate::EventConfigPrivate(const EventConfigPrivate &other)
 
 void mitk::EventConfigPrivate::InsertMapping(const EventMapping &mapping)
 {
-  for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
+  for (auto it = m_EventList.begin(); it != m_EventList.end(); ++it)
   {
     if (*(it->interactionEvent) == *mapping.interactionEvent)
     {
@@ -244,7 +244,7 @@ mitk::EventConfig::EventConfig(const EventConfig &other) : d(other.d)
 
 mitk::EventConfig::EventConfig(const std::string &filename, const us::Module *module) : d(new EventConfigPrivate)
 {
-  if (module == NULL)
+  if (module == nullptr)
   {
     module = us::GetModuleContext()->GetModule();
   }
@@ -279,8 +279,8 @@ mitk::EventConfig::EventConfig(std::istream &inputStream) : d(new EventConfigPri
 
 mitk::EventConfig::EventConfig(const std::vector<PropertyList::Pointer> &configDescription) : d(new EventConfigPrivate)
 {
-  std::vector<PropertyList::Pointer>::const_iterator it_end = configDescription.end();
-  for (std::vector<PropertyList::Pointer>::const_iterator it = configDescription.begin(); it != it_end; ++it)
+  auto it_end = configDescription.end();
+  for (auto it = configDescription.begin(); it != it_end; ++it)
   {
     std::string typeVariant;
     (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant().c_str(), typeVariant);
@@ -331,7 +331,7 @@ bool mitk::EventConfig::IsValid() const
 
 bool mitk::EventConfig::AddConfig(const std::string &fileName, const us::Module *module)
 {
-  if (module == NULL)
+  if (module == nullptr)
   {
     module = us::GetModuleContext()->GetModule();
   }
@@ -377,11 +377,11 @@ std::string mitk::EventConfig::GetMappedEvent(const EventType &interactionEvent)
   // internal events are excluded from mapping
   if (std::strcmp(interactionEvent->GetNameOfClass(), "InternalEvent") == 0)
   {
-    InternalEvent *internalEvent = dynamic_cast<InternalEvent *>(interactionEvent.GetPointer());
+    auto *internalEvent = dynamic_cast<InternalEvent *>(interactionEvent.GetPointer());
     return internalEvent->GetSignalName();
   }
 
-  for (EventConfigPrivate::EventListType::const_iterator it = d->m_EventList.begin(); it != d->m_EventList.end(); ++it)
+  for (auto it = d->m_EventList.begin(); it != d->m_EventList.end(); ++it)
   {
     if (*(it->interactionEvent) == *interactionEvent)
     {
@@ -393,7 +393,7 @@ std::string mitk::EventConfig::GetMappedEvent(const EventType &interactionEvent)
   // so "A" will be returned as "StdA"
   if (std::strcmp(interactionEvent->GetNameOfClass(), "InteractionKeyEvent") == 0)
   {
-    InteractionKeyEvent *keyEvent = dynamic_cast<InteractionKeyEvent *>(interactionEvent.GetPointer());
+    auto *keyEvent = dynamic_cast<InteractionKeyEvent *>(interactionEvent.GetPointer());
     return ("Std" + keyEvent->GetKey());
   }
   return "";
@@ -404,7 +404,7 @@ void mitk::EventConfig::ClearConfig()
   d->m_PropertyList->Clear();
   d->m_EventPropertyList->Clear();
   d->m_CurrEventMapping.variantName.clear();
-  d->m_CurrEventMapping.interactionEvent = NULL;
+  d->m_CurrEventMapping.interactionEvent = nullptr;
   d->m_EventList.clear();
   d->m_Errors = false;
 }

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <vnl/vnl_vector_fixed.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 namespace mitk {
 
@@ -47,15 +48,31 @@ public:
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator          ItkRandGenType;
+    typedef mitk::DiffusionPropertyHelper           DPH;
 
     /** Realizes actual signal generation. Has to be implemented in subclass. **/
     virtual PixelType SimulateMeasurement() = 0;
     virtual ScalarType SimulateMeasurement(unsigned int dir) = 0;
 
+
     virtual void SetFiberDirection(GradientType fiberDirection) = 0;
     GradientType GetFiberDirection(){ return m_FiberDirection; }
 
-    virtual void SetGradientList(GradientListType gradientList) = 0;
+    void SetGradientList(DPH::GradientDirectionsContainerType* gradients)
+    {
+      m_GradientList.clear();
+      for ( unsigned int i=0; i<gradients->Size(); ++i )
+      {
+        DPH::GradientDirectionType g_vnl = gradients->GetElement(i);
+        GradientType g_itk;
+        g_itk[0] = g_vnl[0];
+        g_itk[1] = g_vnl[1];
+        g_itk[2] = g_vnl[2];
+        m_GradientList.push_back(g_itk);
+      }
+    }
+
+    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
     GradientListType GetGradientList(){ return m_GradientList; }
     GradientType GetGradientDirection(int i) { return m_GradientList.at(i); }
 

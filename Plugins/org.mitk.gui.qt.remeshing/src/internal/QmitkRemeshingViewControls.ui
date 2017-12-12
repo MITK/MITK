@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>260</width>
-    <height>423</height>
+    <width>253</width>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,64 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QGridLayout" name="essentialLayout">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="3" column="1" colspan="2">
+      <widget class="QComboBox" name="qualityComboBox">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>Medium (fast)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>High (slow)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Maximum (very slow)</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QSpinBox" name="densitySpinBox">
+       <property name="suffix">
+        <string>%</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1" colspan="2">
+      <widget class="QCheckBox" name="preserveEdgesCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Preserve Edges</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="surfaceLabel">
        <property name="sizePolicy">
@@ -46,7 +103,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="numVerticesLabel">
+      <widget class="QLabel" name="densityLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -54,50 +111,37 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Vertices</string>
+        <string>Density</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSlider" name="numVerticesSlider">
+      <widget class="QSlider" name="densitySlider">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="maximum">
-        <number>10000</number>
+       <property name="minimum">
+        <number>1</number>
        </property>
-       <property name="pageStep">
+       <property name="maximum">
         <number>100</number>
        </property>
+       <property name="pageStep">
+        <number>10</number>
+       </property>
        <property name="value">
-        <number>0</number>
+        <number>100</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QSpinBox" name="numVerticesSpinBox">
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="maximum">
-        <number>10000</number>
-       </property>
-       <property name="singleStep">
-        <number>100</number>
-       </property>
-       <property name="value">
-        <number>0</number>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="gradationLabel">
+      <widget class="QLabel" name="remeshingLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -105,221 +149,26 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Gradation</string>
+        <string>Remeshing</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="ctkDoubleSlider" name="gradationSlider">
-       <property name="value">
-        <double>1.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-       <property name="pageStep">
-        <double>1.000000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>10.000000000000000</double>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QDoubleSpinBox" name="gradationSpinBox">
-       <property name="decimals">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <double>10.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-       <property name="value">
-        <double>1.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="ctkExpandButton" name="advancedSettingsButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Advanced settings</string>
-     </property>
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextBesideIcon</enum>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="mirrorOnExpand">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="advancedLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="maxNumVerticesLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Max. # of vertices</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" colspan="2">
-      <widget class="QLineEdit" name="maxNumVerticesLineEdit">
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="maxLength">
-        <number>10</number>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="subsamplingLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Subsampling</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QSlider" name="subsamplingSlider">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximum">
-        <number>500</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>50</number>
-       </property>
-       <property name="value">
-        <number>50</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QSpinBox" name="subsamplingSpinBox">
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="maximum">
-        <number>500</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="value">
-        <number>50</number>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1" colspan="2">
-      <widget class="QCheckBox" name="forceManifoldCheckBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Force manifold</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1" colspan="2">
-      <widget class="QCheckBox" name="boundaryFixingCheckBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Boundary fixing</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QSpinBox" name="optimizationLevelSpinBox">
-       <property name="maximum">
-        <number>10</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
+     <item row="2" column="1" colspan="2">
+      <widget class="QComboBox" name="remeshingComboBox">
+       <item>
+        <property name="text">
+         <string>Adaptive</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Regular</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="optimizationLevelLabel">
-       <property name="text">
-        <string>Optimization Level</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSlider" name="optimizationLevelSlider">
-       <property name="maximum">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>1</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="edgeSplittingLabel">
+      <widget class="QLabel" name="qualityLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -327,42 +176,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Edge splitting</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="ctkDoubleSlider" name="edgeSplittingSlider">
-       <property name="value">
-        <double>0.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.010000000000000</double>
-       </property>
-       <property name="pageStep">
-        <double>1.000000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>10.000000000000000</double>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QDoubleSpinBox" name="edgeSplittingSpinBox">
-       <property name="decimals">
-        <number>2</number>
-       </property>
-       <property name="maximum">
-        <double>10.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.100000000000000</double>
-       </property>
-       <property name="value">
-        <double>0.000000000000000</double>
+        <string>Quality</string>
        </property>
       </widget>
      </item>
@@ -378,13 +192,23 @@
      </property>
      <property name="icon">
       <iconset resource="../../resources/Remeshing.qrc">
-       <normaloff>:/Remeshing/RemeshingIcon.png</normaloff>:/Remeshing/RemeshingIcon.png</iconset>
+       <normaloff>:/Remeshing/RemeshingIcon.svg</normaloff>:/Remeshing/RemeshingIcon.svg</iconset>
      </property>
      <property name="iconSize">
       <size>
        <width>24</width>
        <height>24</height>
       </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="explanationLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Density:&lt;/span&gt; The density of the resulting surface compared to the input surface. For example, a density of 50% will effectively halve the number of vertices. It's not uncommen to choose values as low as 10% for overly dense input surfaces. The minimum number of output vertices is at least 100, though.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remeshing:&lt;/span&gt; Adaptive remeshing results in higher density in curvy areas and less density in flat areas. This remeshing strategy can preserve fine shape details even when the overall density is heavily reduced. Regular remeshing evenly distributes the density regardless of the local shape of the surface.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Quality&lt;/span&gt;: While medium quality is sufficient for the vast majority of use cases, you can increase this setting to further optimize the mesh quality in terms of uniformly shaped triangles. However, computation time and memory consumption increase dramatically compared to very small improvements.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Preserve Edges:&lt;/span&gt; If the input surface contains holes or edges, they will be preserved very accurately by default at the cost of less uniform triangles at their direct neighborhood.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -405,16 +229,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ctkDoubleSlider</class>
-   <extends>QWidget</extends>
-   <header>ctkDoubleSlider.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ctkExpandButton</class>
-   <extends>QToolButton</extends>
-   <header>ctkExpandButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">QmitkDataStorageComboBox.h</header>
@@ -422,15 +236,8 @@
  </customwidgets>
  <tabstops>
   <tabstop>surfaceComboBox</tabstop>
-  <tabstop>numVerticesSpinBox</tabstop>
-  <tabstop>gradationSpinBox</tabstop>
-  <tabstop>advancedSettingsButton</tabstop>
-  <tabstop>maxNumVerticesLineEdit</tabstop>
-  <tabstop>edgeSplittingSpinBox</tabstop>
-  <tabstop>subsamplingSpinBox</tabstop>
-  <tabstop>optimizationLevelSpinBox</tabstop>
-  <tabstop>forceManifoldCheckBox</tabstop>
-  <tabstop>boundaryFixingCheckBox</tabstop>
+  <tabstop>densitySpinBox</tabstop>
+  <tabstop>preserveEdgesCheckBox</tabstop>
   <tabstop>remeshPushButton</tabstop>
  </tabstops>
  <resources>

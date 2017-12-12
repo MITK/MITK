@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-#include "mitkWeakPointer.h"
 
 #include "vtkAppendPolyData.h"
 #include "vtkCellArray.h"
@@ -110,7 +109,7 @@ namespace mitk
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
     * @param ontourInfo the contour which should be returned
-    * @return the contour as an mitk::Surface. If no contour is available at the give position NULL is returned
+    * @return the contour as an mitk::Surface. If no contour is available at the give position nullptr is returned
     */
     const mitk::Surface *GetContour(ContourPositionInformation contourInfo);
 

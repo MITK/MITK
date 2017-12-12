@@ -27,25 +27,37 @@ http://www.commontk.org/
 
 http://dicom.offis.de/dcmtk.php.en
 
+\par Eigen
+
+http://eigen.tuxfamily.org/index.php?title=Main_Page
+
 \par GDCM
 
 http://gdcm.sourceforge.net/
-
-\par GLEW
-
-http://glew.sourceforge.net/
 
 \par GLUT
 
 https://www.opengl.org/resources/libraries/glut/
 
+\par HDF5
+
+https://support.hdfgroup.org/HDF5/
+
 \par ITK
 
 http://www.itk.org/
 
+\par MatchPoint
+
+https://www.dkfz.de/en/sidt/projects/matchpoint/info.html
+
 \par NumPy
 
 http://www.numpy.org/
+
+\par OpenCL
+
+https://www.khronos.org/opencl/
 
 \par OpenCV
 
@@ -75,6 +87,14 @@ http://www.qt.io/
 
 http://qwt.sourceforge.net/
 
+\par Rasqal
+
+http://librdf.org/rasqal/
+
+\par Raptor2
+
+http://librdf.org/raptor/
+
 \par Redland
 
 http://librdf.org/
@@ -82,10 +102,6 @@ http://librdf.org/
 \par SimpleITK
 
 http://www.simpleitk.org/
-
-\par SOFA
-
-http://www.sofa-framework.org/
 
 \par SWIG
 

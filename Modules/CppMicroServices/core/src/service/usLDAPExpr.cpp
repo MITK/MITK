@@ -49,7 +49,7 @@ static const std::string& WILDCARD_STRING()
   return s;
 }
 
-static const std::string& NULLQ()
+static const std::string& nullptrQ()
 {
   static std::string s = "Null query";
   return s;
@@ -453,7 +453,7 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
     else if (objType == typeid(float))
     {
       errno = 0;
-      char* endptr = 0;
+      char* endptr = nullptr;
       double sFloat = strtod(s.c_str(), &endptr);
       if ((errno == ERANGE && (sFloat == 0 || sFloat == HUGE_VAL || sFloat == -HUGE_VAL)) ||
           (errno != 0 && sFloat == 0) || endptr == s.c_str())
@@ -477,7 +477,7 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
     else if (objType == typeid(double))
     {
       errno = 0;
-      char* endptr = 0;
+      char* endptr = nullptr;
       double sDouble = strtod(s.c_str(), &endptr);
       if ((errno == ERANGE && (sDouble == 0 || sDouble == HUGE_VAL || sDouble == -HUGE_VAL)) ||
           (errno != 0 && sDouble == 0) || endptr == s.c_str())
@@ -520,7 +520,7 @@ template<typename T>
 bool LDAPExpr::CompareIntegralType(const Any& obj, const int op, const std::string& s) const
 {
   errno = 0;
-  char* endptr = 0;
+  char* endptr = nullptr;
   long longInt = strtol(s.c_str(), &endptr, 10);
   if ((errno == ERANGE && (longInt == std::numeric_limits<long>::max() || longInt == std::numeric_limits<long>::min())) ||
        (errno != 0 && longInt == 0) || endptr == s.c_str())
@@ -743,7 +743,7 @@ LDAPExpr::ParseState::ParseState( const std::string& str )
 {
   if (str.empty())
   {
-    error(LDAPExprConstants::NULLQ());
+    error(LDAPExprConstants::nullptrQ());
   }
 
   m_str = str;

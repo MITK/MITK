@@ -1,18 +1,73 @@
 <!DOCTYPE RCC><RCC version="1.0">
- <qresource prefix="/org.blueberry.ui.qt">
-     <file>cursor_bottom.xpm</file>
-     <file>cursor_center.xpm</file>
-     <file>cursor_left.xpm</file>
-     <file>cursor_offscreen.xpm</file>
-     <file>cursor_right.xpm</file>
-     <file>cursor_top.xpm</file>
-     <file>dialog-error.svg</file>
-     <file>icon_missing.png</file>
-     <file>tab_close_icon.png</file>
-     <file>tab_close_icon-active.png</file>
-     
-     <file>defaultstyle.qss</file>
-     <file>defaultstyle-activetab.qss</file>
-     <file>defaultstyle-tab.qss</file>
- </qresource>
- </RCC>
+  <qresource prefix="/org.blueberry.ui.qt">
+    <file>cursor_bottom.xpm</file>
+    <file>cursor_center.xpm</file>
+    <file>cursor_left.xpm</file>
+    <file>cursor_offscreen.xpm</file>
+    <file>cursor_right.xpm</file>
+    <file>cursor_top.xpm</file>
+    <file>dialog-error.svg</file>
+    <file>icon_missing.png</file>
+    <file>tab_close_grey.svg</file>
+    <file>tab_close_grey_active.svg</file>
+
+    <file>lightstyle.qss</file>
+    <file>lightstyle-activetab.qss</file>
+    <file>lightstyle-tab.qss</file>
+
+    <file>dark/up_arrow_disabled.png</file>
+    <file>dark/Hmovetoolbar.png</file>
+    <file>dark/stylesheet-branch-end.png</file>
+    <file>dark/branch_closed-on.png</file>
+    <file>dark/stylesheet-vline.png</file>
+    <file>dark/branch_closed.png</file>
+    <file>dark/branch_open-on.png</file>
+    <file>dark/transparent.png</file>
+    <file>dark/right_arrow_disabled.png</file>
+    <file>dark/right_arrows.svg</file>
+    <file>dark/sizegrip.png</file>
+    <file>dark/tab_close_grey.svg</file>
+    <file>dark/tab_close_grey_active.svg</file>
+    <file>dark/down_arrow.png</file>
+    <file>dark/Vmovetoolbar.png</file>
+    <file>dark/left_arrow.png</file>
+    <file>dark/stylesheet-branch-more.png</file>
+    <file>dark/up_arrow.png</file>
+    <file>dark/right_arrow.png</file>
+    <file>dark/left_arrow_disabled.png</file>
+    <file>dark/Hsepartoolbar.png</file>
+    <file>dark/branch_open.png</file>
+    <file>dark/Vsepartoolbar.png</file>
+    <file>dark/down_arrow_disabled.png</file>
+    <file>dark/undock.png</file>
+    <file>dark/checkbox_checked_disabled.png</file>
+    <file>dark/checkbox_checked_focus.png</file>
+    <file>dark/checkbox_checked.png</file>
+    <file>dark/checkbox_indeterminate_disabled.png</file>
+    <file>dark/checkbox_indeterminate_focus.png</file>
+    <file>dark/checkbox_indeterminate.png</file>
+    <file>dark/checkbox_unchecked_disabled.png</file>
+    <file>dark/checkbox_unchecked_focus.png</file>
+    <file>dark/checkbox_unchecked.png</file>
+    <file>dark/checkbox_big_checked_disabled.png</file>
+    <file>dark/checkbox_big_checked.png</file>
+    <file>dark/checkbox_big_unchecked_disabled.png</file>
+    <file>dark/checkbox_big_unchecked.png</file>
+    <file>dark/radio_checked_disabled.png</file>
+    <file>dark/radio_checked_focus.png</file>
+    <file>dark/radio_checked.png</file>
+    <file>dark/radio_unchecked_disabled.png</file>
+    <file>dark/radio_unchecked_focus.png</file>
+    <file>dark/radio_unchecked.png</file>
+
+    <file>darkstyle.qss</file>
+    <file>darkstyle-tab.qss</file>
+    <file>darkstyle-activetab.qss</file>
+
+    <file>fonts/FiraSans/FiraSans.ttf</file>
+    <file>fonts/LightFiraSans/LightFiraSans.ttf</file>
+    <file>fonts/Roboto/Roboto.ttf</file>
+    <file>fonts/OpenSans/OpenSans-Regular.ttf</file>
+    <file>fonts/xkcd/xkcd.ttf</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,7 @@
+project(org_mitk_gui_qt_igt_app_hummelprotocolmeasurements)
+
+mitk_create_plugin(
+  EXPORT_DIRECTIVE IGTTRACKINGSEMIAUTOMATICMEASUREMENT_EXPORT
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDS MitkIGT MitkIGTUI MitkCameraCalibration
+)

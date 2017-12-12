@@ -44,12 +44,10 @@ ScalarType StickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     this->m_FiberDirection.Normalize();
 
     GradientType g = this->m_GradientList[dir];
-    ScalarType bVal = g.GetNorm(); bVal *= bVal;
-
-    if (bVal>0.0001)
+    if (g.GetNorm()>0.0001)
     {
         ScalarType dot = this->m_FiberDirection*g;
-        signal = std::exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
+        signal = std::exp( -m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
     }
     else
         signal = 1;
@@ -67,12 +65,10 @@ typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateM
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        ScalarType bVal = g.GetNorm(); bVal *= bVal;
-
-        if (bVal>0.0001)
+        if (g.GetNorm()>0.0001)
         {
             ScalarType dot = this->m_FiberDirection*g;
-            signal[i] = std::exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
+            signal[i] = std::exp( -m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
         }
         else
             signal[i] = 1;

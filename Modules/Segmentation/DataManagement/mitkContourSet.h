@@ -102,7 +102,6 @@ namespace mitk
 
     ContourVectorType m_ContourVector;
 
-    unsigned int m_NumberOfContours;
   };
 
 } // namespace mitk

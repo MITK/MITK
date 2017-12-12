@@ -48,10 +48,10 @@ public:
   static const std::string VIEW_ID;
 
   QmitkTrackingDeviceConfigurationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~QmitkTrackingDeviceConfigurationWidget();
+  ~QmitkTrackingDeviceConfigurationWidget() override;
 
   /* @return Returns the current configurated tracking device. If the user didn't finished the
-   *         configuration process or if there is an error during configuration NULL is returned.
+   *         configuration process or if there is an error during configuration nullptr is returned.
    */
   mitk::TrackingDevice::Pointer GetTrackingDevice();
 

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGLMapper.h"
 #include "mitkVtkMapper.h"
-#include "mitkQBallImage.h"
+#include "mitkOdfImage.h"
 #include "mitkImageVtkMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
@@ -100,9 +100,9 @@ namespace mitk {
       m_OdfMapper->ReleaseGraphicsResources(renderer);
     }
 
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false )
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false )
     {
-      mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node, renderer, overwrite);
+      mitk::OdfVtkMapper2D<float,ODF_SAMPLING_SIZE>::SetDefaultProperties(node, renderer, overwrite);
       mitk::CopyImageMapper2D::SetDefaultProperties(node, renderer, overwrite);
 
       mitk::LevelWindow opaclevwin;
@@ -148,7 +148,7 @@ namespace mitk {
 
   private:
 
-    mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::Pointer m_OdfMapper;
+    mitk::OdfVtkMapper2D<float,ODF_SAMPLING_SIZE>::Pointer m_OdfMapper;
     mitk::CopyImageMapper2D::Pointer m_ImgMapper;
 
   };

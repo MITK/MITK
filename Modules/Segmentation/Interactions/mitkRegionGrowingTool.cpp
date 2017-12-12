@@ -42,6 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkNeighborhoodIterator.h>
 
+#include <itkImageDuplicator.h>
+
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, RegionGrowingTool, "Region growing tool");
@@ -54,7 +56,6 @@ mitk::RegionGrowingTool::RegionGrowingTool()
     m_SeedValue(0),
     m_ScreenYDifference(0),
     m_ScreenXDifference(0),
-    m_VisibleWindow(0),
     m_MouseDistanceScaleFactor(0.5),
     m_FillFeedbackContour(true),
     m_ConnectedComponentValue(1)
@@ -114,7 +115,7 @@ void mitk::RegionGrowingTool::GetNeighborhoodAverage(itk::Image<TPixel, imageDim
                                                      unsigned int neighborhood)
 {
   // maybe assert that image dimension is only 2 or 3?
-  int neighborhoodInt = (int)neighborhood;
+  auto neighborhoodInt = (int)neighborhood;
   TPixel averageValue(0);
   unsigned int numberOfPixels = (2 * neighborhood + 1) * (2 * neighborhood + 1);
   if (imageDimension == 3)
@@ -225,7 +226,14 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
   typename NeighborhoodIteratorType::RadiusType radius;
   radius.Fill(2); // for now, maybe make this something the user can adjust in the preferences?
 
-  NeighborhoodIteratorType neighborhoodIterator(radius, resultImage, resultImage->GetRequestedRegion());
+  typedef itk::ImageDuplicator< OutputImageType > DuplicatorType;
+  typename DuplicatorType::Pointer duplicator = DuplicatorType::New();
+  duplicator->SetInputImage(resultImage);
+  duplicator->Update();
+
+  typename OutputImageType::Pointer resultDup = duplicator->GetOutput();
+
+  NeighborhoodIteratorType neighborhoodIterator(radius, resultDup, resultDup->GetRequestedRegion());
   ImageIteratorType imageIterator(resultImage, resultImage->GetRequestedRegion());
 
   for (neighborhoodIterator.GoToBegin(), imageIterator.GoToBegin(); !neighborhoodIterator.IsAtEnd();
@@ -275,7 +283,7 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
 
 void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -339,10 +347,10 @@ void mitk::RegionGrowingTool::OnMousePressedInside()
   //    // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
   //    // apply the skeletonization-and-cut algorithm
   //    // generate contour to remove
-  //    // set m_ReferenceSlice = NULL so nothing will happen during mouse move
+  //    // set m_ReferenceSlice = nullptr so nothing will happen during mouse move
   //    // remember to fill the contour with 0 in mouserelease
   //    mitkIpPicDescriptor* segmentationHistory = ipMITKSegmentationCreateGrowerHistory( workingPicSlice,
-  //    m_LastWorkingSeed, NULL ); // free again
+  //    m_LastWorkingSeed, nullptr ); // free again
   //    if (segmentationHistory)
   //    {
   //        tCutResult cutContour = ipMITKSegmentationGetCutPoints( workingPicSlice, segmentationHistory,
@@ -391,14 +399,14 @@ void mitk::RegionGrowingTool::OnMousePressedInside()
   //        m_FillFeedbackContour = false;
   //    }
 
-  //    m_ReferenceSlice = NULL;
+  //    m_ReferenceSlice = nullptr;
 
   //    return true;
 }
 
 void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
   if (positionEvent)
   {
@@ -446,9 +454,11 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, Intera
     // Extract contour
     if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
     {
+      float isoOffset = 0.33;
+
       mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
       contourExtractor->SetInput(resultImage);
-      contourExtractor->SetContourValue(m_ConnectedComponentValue - 0.5);
+      contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
       contourExtractor->Update();
       ContourModel::Pointer resultContour = ContourModel::New();
       resultContour = contourExtractor->GetOutput();
@@ -493,7 +503,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
     return;
   }
 
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
   if (m_ReferenceSlice.IsNotNull() && positionEvent)
   {
@@ -525,9 +535,11 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
     // Update the contour
     if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
     {
+      float isoOffset = 0.33;
+
       mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
       contourExtractor->SetInput(resultImage);
-      contourExtractor->SetContourValue(m_ConnectedComponentValue - 0.5);
+      contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
       contourExtractor->Update();
       ContourModel::Pointer resultContour = ContourModel::New();
       resultContour = contourExtractor->GetOutput();
@@ -572,7 +584,7 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
     return;
   }
 
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
   if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour && positionEvent)
   {
@@ -607,15 +619,13 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
     {
       // Get working data to pass to following method so we don't overwrite locked labels in a LabelSetImage
       mitk::DataNode *workingNode(m_ToolManager->GetWorkingData(0));
-      mitk::LabelSetImage *labelImage;
-      if (workingNode)
-      {
-        labelImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-      }
+      mitk::LabelSetImage *labelImage = workingNode != nullptr
+        ? dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())
+        : nullptr;
 
       MITK_DEBUG << "Filling Segmentation";
 
-      if (labelImage)
+      if (labelImage != nullptr)
       {
         // m_PaintingPixelValue only decides whether to paint or not
         // For LabelSetImages we want to paint with the active label value
@@ -637,5 +647,8 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
       this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
       FeedbackContourTool::SetFeedbackContourVisible(false);
     }
+
+    m_ScreenYDifference = 0;
+    m_ScreenXDifference = 0;
   }
 }

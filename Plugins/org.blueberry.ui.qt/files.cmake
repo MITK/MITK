@@ -89,6 +89,7 @@ set(SRC_CPP_FILES
   berryQtIntroPart.cpp
   berryQtPreferences.cpp
   berryQtSelectionProvider.cpp
+  berryQtStyleManager.cpp
   berryQtViewPart.cpp
   berrySameShellProvider.cpp
   berrySaveable.cpp
@@ -102,6 +103,7 @@ set(SRC_CPP_FILES
   berryWindow.cpp
   berryWorkbenchActionConstants.cpp
   berryWorkbenchPart.cpp
+  berryWorkbenchPlugin.cpp
   berryWorkbenchPreferenceConstants.cpp
   berryXMLMemento.cpp
 
@@ -354,7 +356,6 @@ set(INTERNAL_CPP_FILES
   berryQtShowPerspectiveDialog.cpp
   berryQtShowViewAction.cpp
   berryQtShowViewDialog.cpp
-  berryQtStyleManager.cpp
   berryQtStylePreferencePage.cpp
   berryQtTracker.cpp
   berryQtWidgetController.cpp
@@ -401,7 +402,6 @@ set(INTERNAL_CPP_FILES
   berryWorkbenchMenuService.cpp
   berryWorkbenchPagePartList.cpp
   berryWorkbenchPartReference.cpp
-  berryWorkbenchPlugin.cpp
   berryWorkbenchRegistryConstants.cpp
   berryWorkbenchServiceRegistry.cpp
   berryWorkbenchSourceProvider.cpp
@@ -420,8 +420,10 @@ set(MOC_H_FILES
   src/berryEditorPart.h
   src/berryExtensionFactory.h
   src/berryQtSelectionProvider.h
+  src/berryQtStyleManager.h
   src/berryViewPart.h
   src/berryWorkbenchPart.h
+  src/berryWorkbenchPlugin.h
 
   src/actions/berryCommandContributionItem.h
   src/actions/berryMenuManager.h
@@ -447,7 +449,6 @@ set(MOC_H_FILES
   src/internal/berryQtShowPerspectiveDialog.h
   src/internal/berryQtShowViewAction.h
   src/internal/berryQtShowViewDialog.h
-  src/internal/berryQtStyleManager.h
   src/internal/berryQtStylePreferencePage.h
   src/internal/berryQtTracker.h
   src/internal/berryQtWidgetsTweaklet.h
@@ -457,7 +458,6 @@ set(MOC_H_FILES
   src/internal/berryReopenEditorMenu.h
   src/internal/berryShowViewMenu.h
   src/internal/berrySwitchToWindowMenu.h
-  src/internal/berryWorkbenchPlugin.h
   src/internal/berryWorkbenchSourceProvider.h
 
   src/internal/defaultpresentation/berryNativeTabFolder.h

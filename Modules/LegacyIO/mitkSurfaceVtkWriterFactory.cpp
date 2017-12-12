@@ -43,7 +43,7 @@ namespace mitk
 
   protected:
     CreateSurfaceWriter() {}
-    ~CreateSurfaceWriter() {}
+    ~CreateSurfaceWriter() override {}
   private:
     CreateSurfaceWriter(const Self &); // purposely not implemented
     void operator=(const Self &);      // purposely not implemented

@@ -26,14 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
 * The mitkRotatedSlice4DTest loads a 4D image and extracts a specifically rotated slice in each time step's volume.
 */
-int mitkRotatedSlice4DTest(int argc, char *argv[])
+int mitkRotatedSlice4DTest(int, char *argv[])
 {
   MITK_TEST_BEGIN("mitkRotatedSlice4DTest");
 
   std::string filename = argv[1];
 
   // load 4D image
-  mitk::Image::Pointer image4D = mitk::IOUtil::LoadImage(filename);
+  mitk::Image::Pointer image4D = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
   // check inputs
   if (image4D.IsNull())
   {
@@ -66,7 +66,7 @@ int mitkRotatedSlice4DTest(int argc, char *argv[])
     rotationAxis.Normalize();
 
     // Create Rotation Operation
-    mitk::RotationOperation *op = new mitk::RotationOperation(mitk::OpROTATE, point, rotationAxis, angle);
+    auto *op = new mitk::RotationOperation(mitk::OpROTATE, point, rotationAxis, angle);
     plane->ExecuteOperation(op);
     delete op;
 

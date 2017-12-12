@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <fstream>
 
-mitk::OclImage::OclImage() : m_gpuImage(NULL), m_context(NULL), m_bufferSize(0), m_gpuModified(false), m_cpuModified(false),
-  m_Image(NULL), m_dim(0), m_Dims(NULL), m_BpE(1), m_formatSupported(false)
+mitk::OclImage::OclImage() : m_gpuImage(nullptr), m_context(nullptr), m_bufferSize(0), m_gpuModified(false), m_cpuModified(false),
+  m_Image(nullptr), m_dim(0), m_Dims(nullptr), m_BpE(1), m_formatSupported(false)
 {
 }
 
@@ -62,7 +62,7 @@ cl_mem mitk::OclImage::CreateGPUImage(unsigned int _wi, unsigned int _he, unsign
   cl_context gpuContext = resources->GetContext();
 
   int clErr;
-  m_gpuImage = clCreateBuffer( gpuContext, CL_MEM_READ_WRITE, m_bufferSize * m_BpE, NULL, &clErr);
+  m_gpuImage = clCreateBuffer( gpuContext, CL_MEM_READ_WRITE, m_bufferSize * m_BpE, nullptr, &clErr);
 
   CHECK_OCL_ERR(clErr);
 
@@ -75,7 +75,7 @@ void mitk::OclImage::InitializeByMitkImage(mitk::Image::Pointer _image)
   this->m_cpuModified = true;
   this->m_gpuModified = false;
 
-  this->m_gpuImage = NULL;
+  this->m_gpuImage = nullptr;
 
   // compute the size of the GMEM buffer
   this->m_dim = this->m_Image->GetDimension();
@@ -120,7 +120,7 @@ int mitk::OclImage::TransferDataToGPU(cl_command_queue gpuComQueue)
   if (m_cpuModified)
   {
     //check the buffer
-    if(m_gpuImage == NULL)
+    if(m_gpuImage == nullptr)
     {
       clErr = this->AllocateGPUImage();
     }
@@ -134,7 +134,7 @@ int mitk::OclImage::TransferDataToGPU(cl_command_queue gpuComQueue)
       if( this->m_formatSupported )
       {
         mitk::ImageReadAccessor accessor(m_Image);
-        clErr = clEnqueueWriteImage( gpuComQueue, m_gpuImage, CL_TRUE, origin, region, 0, 0, accessor.GetData(), 0, NULL, NULL);
+        clErr = clEnqueueWriteImage( gpuComQueue, m_gpuImage, CL_TRUE, origin, region, 0, 0, accessor.GetData(), 0, nullptr, nullptr);
       }
       else
       {
@@ -171,17 +171,31 @@ cl_int mitk::OclImage::AllocateGPUImage()
     mitkThrowException(mitk::ImageTypeIsNotSupportedByGPU) << "Original format not supported on the installed graphics card.";
   }
 
+
+  _cl_image_desc imageDescriptor;
+
+  imageDescriptor.image_width = *(m_Dims);
+  imageDescriptor.image_height = *(m_Dims + 1);
+  imageDescriptor.image_depth = *(m_Dims + 2);
+  imageDescriptor.image_array_size = 0;
+  imageDescriptor.image_row_pitch = 0;
+  imageDescriptor.image_slice_pitch = 0;
+  imageDescriptor.num_mip_levels = 0;
+  imageDescriptor.num_samples = 0;
+  imageDescriptor.buffer = nullptr;
   // create new buffer
   if( this->m_dim > 2)
   {
     //Create a 3D Image
-    m_gpuImage = clCreateImage3D(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat, *(m_Dims), *(m_Dims+1), *(m_Dims+2), 0, 0, NULL, &clErr);
-  }
+    imageDescriptor.image_type = CL_MEM_OBJECT_IMAGE3D;
+   }
   else
   {
     //Create a 2D Image
-    m_gpuImage = clCreateImage2D(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat,  *(m_Dims), *(m_Dims+1), 0, NULL, &clErr);
+    imageDescriptor.image_type = CL_MEM_OBJECT_IMAGE2D;
   }
+  m_gpuImage = clCreateImage(gpuContext, CL_MEM_READ_ONLY, &m_supportedFormat, &imageDescriptor, nullptr, &clErr);
+
   CHECK_OCL_ERR(clErr);
 
   return clErr;
@@ -196,7 +210,7 @@ cl_mem mitk::OclImage::GetGPUImage(cl_command_queue gpuComQueue)
   // query image object info only if already initialized
   if( this->m_gpuImage )
   {
-    clErr = clGetMemObjectInfo(this->m_gpuImage, CL_MEM_TYPE, sizeof(cl_mem_object_type), &memInfo, NULL );
+    clErr = clGetMemObjectInfo(this->m_gpuImage, CL_MEM_TYPE, sizeof(cl_mem_object_type), &memInfo, nullptr );
     CHECK_OCL_ERR(clErr);
   }
 
@@ -219,7 +233,7 @@ cl_mem mitk::OclImage::GetGPUImage(cl_command_queue gpuComQueue)
     this->m_dim = 3;
 
     //copy last data to the image data
-    clErr = clEnqueueCopyBufferToImage( gpuComQueue, tempBuffer, m_gpuImage, 0, origin, region, 0, NULL, NULL);
+    clErr = clEnqueueCopyBufferToImage( gpuComQueue, tempBuffer, m_gpuImage, 0, origin, region, 0, nullptr, nullptr);
     CHECK_OCL_ERR(clErr);
 
     //release pointer
@@ -250,7 +264,7 @@ void* mitk::OclImage::TransferDataToCPU(cl_command_queue gpuComQueue)
   // debug info
   oclPrintMemObjectInfo( m_gpuImage );
 
-  clErr = clEnqueueReadBuffer( gpuComQueue, m_gpuImage, CL_FALSE, 0, m_bufferSize * m_BpE, data ,0, NULL, NULL);
+  clErr = clEnqueueReadBuffer( gpuComQueue, m_gpuImage, CL_FALSE, 0, m_bufferSize * m_BpE, data ,0, nullptr, nullptr);
   CHECK_OCL_ERR(clErr);
 
   clFlush( gpuComQueue );

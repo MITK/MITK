@@ -39,7 +39,7 @@ class MITKQTWIDGETS_EXPORT QmitkMouseModeSwitcher : public QToolBar
 
 public:
   QmitkMouseModeSwitcher(QWidget *parent = 0);
-  virtual ~QmitkMouseModeSwitcher();
+  ~QmitkMouseModeSwitcher() override;
 
   typedef mitk::MouseModeSwitcher::MouseMode MouseMode;
 

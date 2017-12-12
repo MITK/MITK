@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+
+    <view id="org.mitk.views.fiberquantification"
+    name="Fiber Quantification"
+    category="Fiber processing"
+    class="QmitkFiberQuantificationView"
+    icon="resources/FiberQuantification.png">
+    <keywordReference id="org.mitk.views.fiberquantification.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.fiberprocessing"
+    name="Fiber Processing"
+    category="Fiber processing"
+    class="QmitkFiberProcessingView"
+    icon="resources/FiberBundleOperations.png">
+    <keywordReference id="org.mitk.views.fiberprocessing.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.fiberclustering"
+    name="Fiber Clustering"
+    category="Fiber processing"
+    class="QmitkFiberClusteringView"
+    icon="resources/FiberClustering.png">
+    <keywordReference id="org.mitk.views.fiberclustering.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.fiberfit"
+    name="Fiber Fit"
+    category="Fiber processing"
+    class="QmitkFiberFitView"
+    icon="resources/FiberFit.png">
+    <keywordReference id="org.mitk.views.fiberfit.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.tractometry"
+    name="Tractometry"
+    category="Fiber processing"
+    class="QmitkTractometryView"
+    icon="resources/Tractometry.png">
+    <keywordReference id="org.mitk.views.tractometry.Keyword"/>
+    </view>
+
+  </extension>
+
+
+  <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.fiberprocessings"
+    name="Fiber Processing"
+    class="QmitkFiberProcessingPerspective"
+    icon="resources/FiberBundleOperations.png">
+    <description>This perspective contains all views necessary to post process fibers.</description>
+    <keywordReference id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+    </perspective>
+
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+
+  <keyword label="cluster" id="org.mitk.views.fiberclustering.Keyword"/>
+  <keyword label="fiber" id="org.mitk.views.fiberclustering.Keyword"/>
+  <keyword label="quickbundles" id="org.mitk.views.fiberclustering.Keyword"/>
+  <keyword label="clustering" id="org.mitk.views.fiberclustering.Keyword"/>
+
+  <keyword label="fit" id="org.mitk.views.fiberfit.Keyword"/>
+  <keyword label="sift" id="org.mitk.views.fiberfit.Keyword"/>
+  <keyword label="life" id="org.mitk.views.fiberfit.Keyword"/>
+  <keyword label="fiber" id="org.mitk.views.fiberfit.Keyword"/>
+
+  <keyword label="processing" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="extract" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="remove" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="fiber" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="bundle" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="color" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="mirror" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="threshold" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="prune" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="select" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="segment" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="dissect" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="modify" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="join" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="merge" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="add" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="subtract" id="org.mitk.views.fiberprocessing.Keyword"/>
+  <keyword label="difference" id="org.mitk.views.fiberprocessing.Keyword"/>
+
+  <keyword label="fiber" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="quantification" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="statistics" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="length" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="number" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="principal" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="direction" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="peak" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="main" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="tract" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="density" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="image" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="TDI" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="envelope" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="hull" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="endpoints" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="end" id="org.mitk.views.fiberquantification.Keyword"/>
+  <keyword label="endings" id="org.mitk.views.fiberquantification.Keyword"/>
+
+
+  <keyword label="cluster" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="fiber" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="quickbundles" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="clustering" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+
+  <keyword label="fit" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="sift" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="life" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="fiber" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+
+  <keyword label="processing" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="extract" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="remove" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="fiber" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="bundle" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="color" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="mirror" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="threshold" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="prune" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="select" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="segment" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="dissect" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="modify" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="join" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="merge" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="add" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="subtract" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="difference" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+
+  <keyword label="fiber" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="quantification" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="statistics" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="length" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="number" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="principal" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="direction" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="peak" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="main" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="tract" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="density" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="image" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="TDI" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="envelope" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="hull" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="endpoints" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="end" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+  <keyword label="endings" id="org.mitk.perspectives.fiberprocessings.Keyword"/>
+
+  </extension>
+
+</plugin>

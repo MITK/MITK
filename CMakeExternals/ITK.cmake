@@ -56,10 +56,10 @@ if(NOT DEFINED ITK_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.9.0.tar.xz
-     URL_MD5 0ce83c0f3c08f8ee992675fca4401572
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.12.2.tar.xz
+     URL_MD5 cee6436c1341db3813a85955c281e6a9
      # work with external GDCM
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.9.0.patch
+     # PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.11.0.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
@@ -67,6 +67,8 @@ if(NOT DEFINED ITK_DIR)
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
+       -DITK_USE_SYSTEM_HDF5:BOOL=ON
+       -DHDF5_DIR:PATH=${HDF5_DIR}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}
      CMAKE_CACHE_DEFAULT_ARGS

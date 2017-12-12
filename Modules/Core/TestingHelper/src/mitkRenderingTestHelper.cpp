@@ -27,10 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingTestHelper.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkException.h>
+#include <mitkTestNotRunException.h>
+#include <mitkTestingMacros.h>
 
 // include gl to read out properties
 #include <vtkOpenGL.h>
-#include <vtkOpenGLExtensionManager.h>
 #include <vtksys/SystemTools.hxx>
 
 #if defined _MSC_VER
@@ -64,13 +66,19 @@ mitk::RenderingTestHelper::RenderingTestHelper(
 
 void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
 {
-  m_RenderWindow = mitk::RenderWindow::New(NULL, "unnamed renderer", NULL, renderingMode);
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_", 8);
+  m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str(), nullptr, renderingMode);
 
   m_DataStorage = mitk::StandaloneDataStorage::New();
 
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
   this->SetMapperIDToRender2D();
   this->GetVtkRenderWindow()->SetSize(width, height);
+
+  if (!IsAdvancedOpenGL())
+  {
+    mitkThrowException(mitk::TestNotRunException) << "Insufficient OpenGL version";
+  }
 
 #ifdef RESIZE_WORKAROUND
 
@@ -140,12 +148,12 @@ void mitk::RenderingTestHelper::PrintGLInfo()
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
   ;
 
-  MITK_INFO << "OpenGL Render Context Information: \n"
-            << "- GL_VENDOR: " << glGetString(GL_VENDOR) << "\n"
-            << "- GL_RENDERER: " << glGetString(GL_RENDERER) << "\n"
-            << "- GL_VERSION: " << glGetString(GL_VERSION) << "\n"
-            << "- GL_MAX_TEXTURE_SIZE: " << maxTextureSize << "\n"
-            << "- GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS);
+  //MITK_INFO << "OpenGL Render Context Information: \n"
+  //          << "- GL_VENDOR: " << glGetString(GL_VENDOR) << "\n"
+  //          << "- GL_RENDERER: " << glGetString(GL_RENDERER) << "\n"
+  //          << "- GL_VERSION: " << glGetString(GL_VERSION) << "\n"
+  //          << "- GL_MAX_TEXTURE_SIZE: " << maxTextureSize << "\n"
+  //          << "- GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS);
 }
 
 void mitk::RenderingTestHelper::SetMapperID(mitk::BaseRenderer::StandardMapperSlot id)

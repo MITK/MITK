@@ -31,7 +31,7 @@ mitk::ContourModelSetMapper3D::~ContourModelSetMapper3D()
 
 const mitk::ContourModelSet *mitk::ContourModelSetMapper3D::GetInput(void)
 {
-  // convient way to get the data from the dataNode
+  // convenient way to get the data from the dataNode
   return static_cast<const mitk::ContourModelSet *>(GetDataNode()->GetData());
 }
 
@@ -49,23 +49,23 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  ContourModelSet *contourModelSet = dynamic_cast<ContourModelSet *>(this->GetDataNode()->GetData());
+  auto *contourModelSet = dynamic_cast<ContourModelSet *>(this->GetDataNode()->GetData());
 
-  if (contourModelSet != NULL)
+  if (contourModelSet != nullptr)
   {
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType baseIndex = 0;
 
-    ContourModelSet::ContourModelSetIterator it = contourModelSet->Begin();
-    ContourModelSet::ContourModelSetIterator end = contourModelSet->End();
+    auto it = contourModelSet->Begin();
+    auto end = contourModelSet->End();
 
     while (it != end)
     {
       ContourModel *contourModel = it->GetPointer();
 
-      ContourModel::VertexIterator vertIt = contourModel->Begin();
-      ContourModel::VertexIterator vertEnd = contourModel->End();
+      auto vertIt = contourModel->Begin();
+      auto vertEnd = contourModel->End();
 
       while (vertIt != vertEnd)
       {
@@ -112,8 +112,8 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  mitk::ContourModel *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
-  if (data == NULL)
+  auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  if (data == nullptr)
   {
     return;
   }
@@ -173,7 +173,7 @@ void mitk::ContourModelSetMapper3D::ApplyContourModelSetProperties(BaseRenderer 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   DataNode *dataNode = this->GetDataNode();
 
-  if (dataNode != NULL)
+  if (dataNode != nullptr)
   {
     float lineWidth = 1;
     dataNode->GetFloatProperty("contour.3D.width", lineWidth, renderer);

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /** @brief Predicate that evaluates if the data of a given DataNode has a specific property.
-   If the second parameter is NULL, it will only be checked whether there is a property with the specified name
+   If the second parameter is nullptr, it will only be checked whether there is a property with the specified name
    for the data instance of the node.*/
   class MITKCORE_EXPORT NodePredicateDataProperty : public NodePredicateBase
   {
@@ -46,7 +46,6 @@ namespace mitk
     NodePredicateDataProperty(const char *propertyName,
                           mitk::BaseProperty *p = nullptr);
 
-    // mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
     mitk::BaseProperty::Pointer m_ValidProperty;
     // mitk::BaseProperty* m_ValidProperty;
     std::string m_ValidPropertyName;

@@ -55,7 +55,7 @@ protected slots:
 
 protected:
   QmitkBinaryThresholdULToolGUI();
-  virtual ~QmitkBinaryThresholdULToolGUI();
+  ~QmitkBinaryThresholdULToolGUI() override;
 
   ctkRangeWidget *m_DoubleThresholdSlider;
 

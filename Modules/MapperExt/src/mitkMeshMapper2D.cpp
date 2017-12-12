@@ -71,7 +71,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
 
     // Get the TimeGeometry of the input object
     const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
-    if ((inputTimeGeometry == NULL) || (inputTimeGeometry->CountTimeSteps() == 0))
+    if ((inputTimeGeometry == nullptr) || (inputTimeGeometry->CountTimeSteps() == 0))
     {
       return;
     }
@@ -94,7 +94,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
 
     mitk::Mesh::MeshType::Pointer itkMesh = input->GetMesh(timeStep);
 
-    if (itkMesh.GetPointer() == NULL)
+    if (itkMesh.GetPointer() == nullptr)
     {
       return;
     }
@@ -151,7 +151,6 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
           switch (dataIt->Value().pointSpec)
           {
             case PTSTART:
-            {
               // a quad
               glBegin(GL_LINE_LOOP);
               tmp = pt2d - horz + vert;
@@ -163,10 +162,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d - horz - vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
-            break;
+              break;
             case PTUNDEFINED:
-            {
               // a diamond around the point
               glBegin(GL_LINE_LOOP);
               tmp = pt2d - horz;
@@ -178,8 +175,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d - vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
-            break;
+              break;
             default:
               break;
           } // switch
@@ -196,7 +192,6 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
           switch (dataIt->Value().pointSpec)
           {
             case PTSTART:
-            {
               // a quad
               glBegin(GL_LINE_LOOP);
               tmp = pt2d - horz + vert;
@@ -208,9 +203,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d - horz - vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
+              break;
             case PTUNDEFINED:
-            {
               // drawing crosses
               glBegin(GL_LINES);
               tmp = pt2d - horz;
@@ -222,7 +216,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
               tmp = pt2d + vert;
               glVertex2dv(&tmp[0]);
               glEnd();
-            }
+              break;
             default:
             {
               break;
@@ -237,8 +231,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
     // now connect the lines inbetween
     mitk::Mesh::PointType thisPoint;
     thisPoint.Fill(0);
-    Point2D *firstOfCell = NULL;
-    Point2D *lastPoint = NULL;
+    Point2D *firstOfCell = nullptr;
+    Point2D *lastPoint = nullptr;
     unsigned int lastPointId = 0;
     bool lineSelected = false;
 
@@ -286,7 +280,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
 
           // a line between 1(lastPoint) and 2(pt2d) has the Id 1, so look for the Id of lastPoint
           // since we only start, if we have more than one point in the cell, lastPointId is initiated with 0
-          Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
+          auto position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
           if (position != selectedLines.end())
           {
             lineSelected = true;
@@ -304,7 +298,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
             Point2D pt2d, tmp;
             renderer->WorldToDisplay(p, pt2d);
 
-            if (lastPoint == NULL)
+            if (lastPoint == nullptr)
             {
               // set the first point in the cell. This point in needed to close the polygon
               firstOfCell = new Point2D;
@@ -341,7 +335,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
           }   // if <4.0
 
           // fill off-plane polygon part 1
-          if ((!first) && (worldplanegeometry != NULL))
+          if ((!first) && (worldplanegeometry != nullptr))
           {
             line.SetPoints(lastPoint3D, thisPoint);
             if (worldplanegeometry->IntersectionPointParam(line, t) && ((t >= 0) && (t <= 1)))
@@ -357,11 +351,11 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
         if (cellDataIt->Value().closed)
         {
           // close the polygon if needed
-          if (firstOfCell != NULL)
+          if (firstOfCell != nullptr)
           {
             lineSelected = false;
             Mesh::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
-            Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
+            auto position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
             if (position != selectedLines.end()) // found the index
             {
               glColor3f(selectedColor[0], selectedColor[1], selectedColor[2]); // red
@@ -384,7 +378,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
 
         // Axis-aligned bounding box(AABB) around the cell if selected and set in Property
         bool showBoundingBox;
-        if (dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox")) == NULL)
+        if (dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox")) == nullptr)
           showBoundingBox = false;
         else
           showBoundingBox =
@@ -434,7 +428,7 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
         }       // show bounding-box
 
         // fill off-plane polygon part 2
-        if (worldplanegeometry != NULL)
+        if (worldplanegeometry != nullptr)
         {
           // consider line from last to first
           line.SetPoints(thisPoint, firstOfCell3D);
@@ -472,8 +466,8 @@ void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
       }   // if numOfPointsInCell>1
       delete firstOfCell;
       delete lastPoint;
-      lastPoint = NULL;
-      firstOfCell = NULL;
+      lastPoint = nullptr;
+      firstOfCell = nullptr;
       lastPointId = 0;
       ++cellIt;
       ++cellDataIt;

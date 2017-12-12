@@ -30,7 +30,7 @@ mitk::SurfaceSerializer::~SurfaceSerializer()
 
 std::string mitk::SurfaceSerializer::Serialize()
 {
-  const Surface *surface = dynamic_cast<const Surface *>(m_Data.GetPointer());
+  const auto *surface = dynamic_cast<const Surface *>(m_Data.GetPointer());
   if (!surface)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data

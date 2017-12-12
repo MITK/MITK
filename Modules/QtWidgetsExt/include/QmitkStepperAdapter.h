@@ -40,7 +40,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStepperAdapter : public QObject
   Q_OBJECT
 public:
   QmitkStepperAdapter(QObject *navigator, mitk::Stepper *stepper, const char *name);
-  virtual ~QmitkStepperAdapter();
+  ~QmitkStepperAdapter() override;
 
   void SetStepper(mitk::Stepper *stepper)
   {
@@ -56,8 +56,8 @@ public:
       : m_Receiver(receiver){
 
         };
-    virtual void Execute(itk::Object *, const itk::EventObject &) override { emit m_Receiver->Refetch(); };
-    virtual void Execute(const itk::Object *, const itk::EventObject &) override { emit m_Receiver->Refetch(); };
+    void Execute(itk::Object *, const itk::EventObject &) override { emit m_Receiver->Refetch(); };
+    void Execute(const itk::Object *, const itk::EventObject &) override { emit m_Receiver->Refetch(); };
   protected:
     QmitkStepperAdapter *m_Receiver;
   };

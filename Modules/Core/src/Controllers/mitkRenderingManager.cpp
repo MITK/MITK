@@ -36,8 +36,8 @@ namespace mitk
 {
   itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
 
-    RenderingManager::Pointer RenderingManager::s_Instance = 0;
-  RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
+    RenderingManager::Pointer RenderingManager::s_Instance = nullptr;
+  RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = nullptr;
 
   RenderingManager::RenderingManager()
     : m_UpdatePending(false),
@@ -46,7 +46,7 @@ namespace mitk
       m_LODAbortMechanismEnabled(false),
       m_ClippingPlaneEnabled(false),
       m_TimeNavigationController(SliceNavigationController::New()),
-      m_DataStorage(NULL),
+      m_DataStorage(nullptr),
       m_ConstrainedPanningZooming(true),
       m_FocusedRenderWindow(nullptr)
   {
@@ -63,9 +63,9 @@ namespace mitk
     RenderWindowVector::iterator it;
     for (it = m_AllRenderWindows.begin(); it != m_AllRenderWindows.end(); ++it)
     {
-      (*it)->UnRegister(NULL);
+      (*it)->UnRegister(nullptr);
 
-      RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
+      auto callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
 
       if (callbacks_it != this->m_RenderWindowCallbacksList.end())
       {
@@ -93,8 +93,8 @@ namespace mitk
   RenderingManager::Pointer RenderingManager::New()
   {
     const RenderingManagerFactory *factory = GetFactory();
-    if (factory == NULL)
-      return NULL;
+    if (factory == nullptr)
+      return nullptr;
     return factory->CreateRenderingManager();
   }
 
@@ -130,7 +130,7 @@ namespace mitk
         mitk::BaseRenderer::GetInstance(renderWindow)->SetDataStorage(m_DataStorage.GetPointer());
 
       // Register vtkRenderWindow instance
-      renderWindow->Register(NULL);
+      renderWindow->Register(nullptr);
 
       // Add callbacks for rendering abort mechanism
       // BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
@@ -164,7 +164,7 @@ namespace mitk
   {
     if (m_RenderWindowList.erase(renderWindow))
     {
-      RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
+      auto callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
       if (callbacks_it != this->m_RenderWindowCallbacksList.end())
       {
         renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
@@ -173,13 +173,13 @@ namespace mitk
         this->m_RenderWindowCallbacksList.erase(callbacks_it);
       }
 
-      RenderWindowVector::iterator rw_it =
+      auto rw_it =
         std::find(m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow);
 
       if (rw_it != m_AllRenderWindows.cend())
       {
         // Decrease reference count for proper destruction
-        (*rw_it)->UnRegister(NULL);
+        (*rw_it)->UnRegister(nullptr);
         m_AllRenderWindows.erase(rw_it);
       }
     }
@@ -240,7 +240,7 @@ namespace mitk
       // prepare the camera etc. before rendering
       // Note: this is a very important step which should be called before the VTK render!
       // If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-      mitk::VtkPropRenderer *vPR = dynamic_cast<mitk::VtkPropRenderer *>(mitk::BaseRenderer::GetInstance(renderWindow));
+      auto *vPR = dynamic_cast<mitk::VtkPropRenderer *>(mitk::BaseRenderer::GetInstance(renderWindow));
       if (vPR)
         vPR->PrepareRender();
       // Execute rendering
@@ -315,8 +315,8 @@ namespace mitk
     bool boundingBoxInitialized = false;
 
     TimeGeometry::ConstPointer timeGeometry = dataGeometry;
-    TimeGeometry::Pointer modifiedGeometry = NULL;
-    if (dataGeometry != NULL)
+    TimeGeometry::Pointer modifiedGeometry = nullptr;
+    if (dataGeometry != nullptr)
     {
       modifiedGeometry = dataGeometry->Clone();
     }
@@ -434,7 +434,7 @@ namespace mitk
     int warningLevel = vtkObject::GetGlobalWarningDisplay();
     vtkObject::GlobalWarningDisplayOff();
 
-    if ((geometry != NULL) &&
+    if ((geometry != nullptr) &&
         (const_cast<mitk::BoundingBox *>(geometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps))
     {
       boundingBoxInitialized = true;
@@ -536,7 +536,7 @@ namespace mitk
 
   void RenderingManager::RenderingStartCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
     mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
     RenderWindowList &renderWindowList = renman->m_RenderWindowList;
 
@@ -550,12 +550,12 @@ namespace mitk
 
   void RenderingManager::RenderingProgressCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
     mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
 
     if (renman->m_LODAbortMechanismEnabled)
     {
-      vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+      auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
       if (renderWindow)
       {
         BaseRenderer *renderer = BaseRenderer::GetInstance(renderWindow);
@@ -569,7 +569,7 @@ namespace mitk
 
   void RenderingManager::RenderingEndCallback(vtkObject *caller, unsigned long, void *, void *)
   {
-    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    auto *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
 
     mitk::RenderingManager *renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
 
@@ -624,7 +624,7 @@ namespace mitk
 
   int RenderingManager::GetNextLOD(BaseRenderer *renderer)
   {
-    if (renderer != NULL)
+    if (renderer != nullptr)
     {
       return m_NextLODMap[renderer];
     }
@@ -711,7 +711,7 @@ namespace mitk
 
   void RenderingManager::SetDataStorage(DataStorage *storage)
   {
-    if (storage != NULL)
+    if (storage != nullptr)
     {
       m_DataStorage = storage;
 

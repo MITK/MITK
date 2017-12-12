@@ -127,9 +127,6 @@ template <typename TPixel, unsigned int VImageDimension>
 void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting(itk::Image<TPixel, VImageDimension> *input3D)
 {
   typedef itk::Image<TPixel, VImageDimension - 1> SliceImageType;
-  typedef itk::Image<TPixel, VImageDimension> VolumeImageType;
-
-  typedef itk::ImageSliceIteratorWithIndex<VolumeImageType> OutputSliceIteratorType;
   typedef itk::ImageRegionConstIterator<SliceImageType> SliceIteratorType;
 
   typename SliceImageType::Pointer sliceImage = SliceImageType::New();

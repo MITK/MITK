@@ -88,7 +88,7 @@ namespace itk
       itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter)
 
       // Display
-      void PrintSelf(std::ostream &os, Indent indent) const;
+      void PrintSelf(std::ostream &os, Indent indent) const override;
 
     // Compare function for A_STAR
     struct CompareNodeStar
@@ -202,7 +202,7 @@ namespace itk
     void MakeOutputs();
 
     // \brief Generate Data
-    void GenerateData();
+    void GenerateData() override;
 
     // \brief gets the estimate costs from pixel a to target.
     double getEstimatedCostsToTarget(const IndexType &a);

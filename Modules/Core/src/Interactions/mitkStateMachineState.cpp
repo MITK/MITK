@@ -33,7 +33,7 @@ mitk::StateMachineState::~StateMachineState()
 
 bool mitk::StateMachineState::AddTransition(StateMachineTransition::Pointer transition)
 {
-  for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
+  for (auto it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
   {
     if (transition.GetPointer() == (*it).GetPointer())
       return false;
@@ -55,7 +55,7 @@ mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(con
 
   if (transitions.empty())
   {
-    return NULL;
+    return nullptr;
   }
   else
   {
@@ -68,7 +68,7 @@ mitk::StateMachineState::TransitionVector mitk::StateMachineState::GetTransition
 {
   TransitionVector transitions;
   mitk::StateMachineTransition::Pointer t = mitk::StateMachineTransition::New("", eventClass, eventVariant);
-  for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
+  for (auto it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
   {
     if (**it == *t) // do not switch it and t, order matters, see  mitk::StateMachineTransition == operator
       transitions.push_back(*it);
@@ -87,10 +87,10 @@ std::string mitk::StateMachineState::GetName() const
 
 bool mitk::StateMachineState::ConnectTransitions(StateMap *allStates)
 {
-  for (TransitionVector::iterator transIt = m_Transitions.begin(); transIt != m_Transitions.end(); ++transIt)
+  for (auto transIt = m_Transitions.begin(); transIt != m_Transitions.end(); ++transIt)
   {
     bool found = false;
-    for (StateMap::iterator stateIt = allStates->begin(); stateIt != allStates->end(); ++stateIt)
+    for (auto stateIt = allStates->begin(); stateIt != allStates->end(); ++stateIt)
     {
       if ((*stateIt)->GetName() == (*transIt)->GetNextStateName())
       {

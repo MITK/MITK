@@ -18,11 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkRegionGrowingTool_h_Included
 
 #include "mitkFeedbackContourTool.h"
-#include "mitkLegacyAdaptors.h"
 #include <MitkSegmentationExports.h>
 #include <array>
-
-struct mitkIpPicDescriptor;
 
 namespace us
 {
@@ -148,7 +145,6 @@ namespace mitk
     int m_ScreenXDifference;
 
   private:
-    ScalarType m_VisibleWindow;
     ScalarType m_MouseDistanceScaleFactor;
     int m_PaintingPixelValue;
     bool m_FillFeedbackContour;

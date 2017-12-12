@@ -41,7 +41,7 @@ class MITKIGTUI_EXPORT QmitkFiducialRegistrationWidget : public QWidget
 public:
 
   QmitkFiducialRegistrationWidget(QWidget* parent);
-  virtual ~QmitkFiducialRegistrationWidget();
+  ~QmitkFiducialRegistrationWidget() override;
 
   /** Adds the image node which is transformed after "register" is clicked. */
   void setImageNode(mitk::DataNode::Pointer i);

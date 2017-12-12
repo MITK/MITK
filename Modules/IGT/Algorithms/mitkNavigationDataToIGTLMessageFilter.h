@@ -164,6 +164,9 @@ namespace mitk {
     unsigned int m_CurrentTimeStep; ///< Indicates the current timestamp
     //    unsigned int m_NumberForMean;   ///< Number of Navigation Data, which should be averaged
 
+    /** Converts a mitk::IGTTimestamp (double, milliseconds) to an OpenIGTLink timestamp */
+    igtl::TimeStamp::Pointer ConvertToIGTLTimeStamp(double IGTTimeStamp);
+
     /** Measurement class to calculate latency and frame count */
   };
 } // namespace mitk

@@ -41,7 +41,7 @@ static std::map<std::string, std::map<gdcm::Tag, std::string>> GetTagInformation
   scanner.Scan(files);
 
   //  return const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
-  gdcm::Scanner::MappingType &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(scanner.GetMappings());
+  auto &tagValueMappings = const_cast<gdcm::Scanner::MappingType &>(scanner.GetMappings());
 
   for (std::vector<std::string>::const_iterator fIter = files.begin(); fIter != files.end(); ++fIter)
   {

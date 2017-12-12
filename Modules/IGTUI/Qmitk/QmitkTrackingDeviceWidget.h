@@ -26,7 +26,7 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget //MITKIGTUI_EX
 
   public:
     QmitkTrackingDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
-    ~QmitkTrackingDeviceWidget();
+    ~QmitkTrackingDeviceWidget() override;
 
 
 };

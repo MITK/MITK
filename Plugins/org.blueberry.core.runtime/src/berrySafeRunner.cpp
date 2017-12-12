@@ -63,7 +63,7 @@ void SafeRunner::HandleException(ISafeRunnable::Pointer code,
                                  const ctkException& e)
 {
   try {
-    dynamic_cast<const OperationCanceledException&>(e);
+    Q_UNUSED(dynamic_cast<const OperationCanceledException&>(e))
   }
   catch (const std::bad_cast& )
   {

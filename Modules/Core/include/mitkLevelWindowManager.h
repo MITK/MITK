@@ -59,7 +59,7 @@ namespace mitk
     /** @brief (Re-)Initializes the LevelWindowManager by setting the topmost image.
      *         Use the removedNode parameter if a node was removed...
      *  @param autoTopMost true: sets the topmost layer image to be affected by changes
-     *  @param removedNode != NULL a node was removed from DataStorage */
+     *  @param removedNode != nullptr a node was removed from DataStorage */
     void SetAutoTopMostImage(bool autoTopMost, const DataNode *removedNode = nullptr);
 
     void RecaluclateLevelWindowForSelectedComponent(const itk::EventObject &);
@@ -147,7 +147,7 @@ namespace mitk
     void ClearPropObserverLists();              ///< internal help method to clear both lists/maps.
     void CreatePropObserverLists();             ///< internal help method to create both lists/maps.
     const mitk::DataNode *m_NodeMarkedToDelete; ///< this variable holds a data node which will be deleted from the
-                                                /// datastorage immedeately (if there is one, NULL otherways)
+                                                /// datastorage immedeately (if there is one, nullptr otherways)
 
     bool m_AutoTopMost;
     unsigned long m_ObserverTag;

@@ -46,10 +46,10 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationJob : public QObject,
   Q_OBJECT
 
 public:
-  QmitkRegistrationJob(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
-  ~QmitkRegistrationJob();
+  QmitkRegistrationJob(::map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
+  ~QmitkRegistrationJob() override;
 
-  void run();
+  void run() override;
 
 signals:
   void Finished();
@@ -79,21 +79,21 @@ public:
   mitk::NodeUIDType m_TargetMaskDataUID;
   mitk::NodeUIDType m_MovingMaskDataUID;
 
-  const map::algorithm::RegistrationAlgorithmBase *GetLoadedAlgorithm() const;
+  const ::map::algorithm::RegistrationAlgorithmBase *GetLoadedAlgorithm() const;
 
 protected:
-  typedef map::algorithm::facet::IterativeAlgorithmInterface IIterativeAlgorithm;
-  typedef map::algorithm::facet::MultiResRegistrationAlgorithmInterface IMultiResAlgorithm;
+  typedef ::map::algorithm::facet::IterativeAlgorithmInterface IIterativeAlgorithm;
+  typedef ::map::algorithm::facet::MultiResRegistrationAlgorithmInterface IMultiResAlgorithm;
 
   // Result registration.
-  map::core::RegistrationBase::Pointer m_spResultRegistration;
+  ::map::core::RegistrationBase::Pointer m_spResultRegistration;
   mitk::DataNode::Pointer m_spRegNode;
   // mapped image. May be null if m_MapEntity is false.
   mitk::DataNode::Pointer m_spMappedImageNode;
 
   ::itk::MemberCommand<QmitkRegistrationJob>::Pointer m_spCommand;
   unsigned long m_ObserverID;
-  map::algorithm::RegistrationAlgorithmBase::Pointer m_spLoadedAlgorithm;
+  ::map::algorithm::RegistrationAlgorithmBase::Pointer m_spLoadedAlgorithm;
 
   // Helper functions
   const mitk::Image *GetTargetDataAsImage() const;

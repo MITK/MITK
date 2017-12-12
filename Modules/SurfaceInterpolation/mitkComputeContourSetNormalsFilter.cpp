@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImagePixelReadAccessor.h"
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
-  : m_SegmentationBinaryImage(NULL),
+  : m_SegmentationBinaryImage(nullptr),
     m_MaxSpacing(5),
     m_NegativeNormalCounter(0),
     m_PositiveNormalCounter(0),
@@ -43,7 +43,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
   for (unsigned int i = 0; i < numberOfInputs; i++)
   {
     // Getting the inputs polydata and polygons
-    Surface *currentSurface = const_cast<Surface *>(this->GetInput(i));
+    auto *currentSurface = const_cast<Surface *>(this->GetInput(i));
     vtkPolyData *polyData = currentSurface->GetVtkPolyData();
 
     vtkSmartPointer<vtkCellArray> existingPolys = polyData->GetPolys();
@@ -52,7 +52,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
     existingPolys->InitTraversal();
 
-    vtkIdType *cell(NULL);
+    vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     // The array that contains all the vertex normals of the current polygon
@@ -260,7 +260,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
   for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); i++)
   {
-    Surface *currentSurface = const_cast<Surface *>(this->GetOutput(i));
+    auto *currentSurface = const_cast<Surface *>(this->GetOutput(i));
     vtkPolyData *polyData = currentSurface->GetVtkPolyData();
 
     vtkSmartPointer<vtkDoubleArray> currentCellNormals =
@@ -272,7 +272,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
     existingPolys->InitTraversal();
 
-    vtkIdType *cell(NULL);
+    vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     for (existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)

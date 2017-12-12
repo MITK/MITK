@@ -61,7 +61,7 @@ namespace
   {
   public:
     explicit QmitkDiffusionWebEnginePage(QmitkDiffusionImagingAppIntroPart* introPart, QObject* parent = nullptr);
-    ~QmitkDiffusionWebEnginePage();
+    ~QmitkDiffusionWebEnginePage() override;
 
   private:
     bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;
@@ -131,7 +131,7 @@ namespace
 }
 
 QmitkDiffusionImagingAppIntroPart::QmitkDiffusionImagingAppIntroPart()
-  : m_Controls(NULL)
+  : m_Controls(nullptr)
 {
   berry::IPreferences::Pointer workbenchPrefs = QmitkDiffusionApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);

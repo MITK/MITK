@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 
 #include <fstream>
 #include <exception>
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static const std::string BaryCoordsFileName = "FiberTrackingLUTBaryCoords.bin";
 static const std::string IndicesFileName = "FiberTrackingLUTIndices.bin";
 
-SphereInterpolator::SphereInterpolator(const string& lutPath)
+SphereInterpolator::SphereInterpolator(const std::string& lutPath)
 {
   m_ValidState = true;
   if (lutPath.length()==0)
@@ -52,7 +52,7 @@ SphereInterpolator::SphereInterpolator(const string& lutPath)
 
   size = 301;
   sN = (size-1)/2;
-  nverts = QBALL_ODFSIZE;
+  nverts = ODF_SAMPLING_SIZE;
   beta = 0.5;
 
   inva = (sqrt(1+beta)-sqrt(beta));
@@ -64,11 +64,11 @@ SphereInterpolator::~SphereInterpolator()
 
 }
 
-bool SphereInterpolator::LoadLookuptables(const string& lutPath)
+bool SphereInterpolator::LoadLookuptables(const std::string& lutPath)
 {
   MITK_INFO << "SphereInterpolator: loading lookuptables from custom path: " << lutPath;
 
-  string path = lutPath; path.append(BaryCoordsFileName);
+  std::string path = lutPath; path.append(BaryCoordsFileName);
   std::ifstream BaryCoordsStream;
   BaryCoordsStream.open(path.c_str(), ios::in | ios::binary);
   MITK_INFO << "SphereInterpolator: 1 " << path;

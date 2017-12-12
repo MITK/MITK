@@ -229,17 +229,17 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
 
   MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
 
-  m_TestImage = mitk::IOUtil::LoadImage(filename);
+  m_TestImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_TestImage.IsNotNull(), "Loaded an mitk::Image" );
 
   m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
   MITK_TEST_CONDITION_REQUIRED( m_Geometry.IsNotNull(), "Getting image geometry" );
 
-  m_Pic3DImage = mitk::IOUtil::LoadImage(Pic3DFile);
+  m_Pic3DImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(Pic3DFile)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DImage.IsNotNull(), "Loaded Pic3D" );
-  m_Pic3DImageMask = mitk::IOUtil::LoadImage(Pic3DImageMaskFile);
+  m_Pic3DImageMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(Pic3DImageMaskFile)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DImageMask.IsNotNull(), "Loaded Pic3D image mask" );
-  m_Pic3DImageMask2 = mitk::IOUtil::LoadImage(Pic3DImageMaskFile2);
+  m_Pic3DImageMask2 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(Pic3DImageMaskFile2)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DImageMask2.IsNotNull(), "Loaded Pic3D image secondary mask" );
   m_Pic3DPlanarFigureAxial = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(Pic3DAxialPlanarFigureFile)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureAxial.IsNotNull(), "Loaded Pic3D axial planarFigure" );
@@ -248,11 +248,11 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
   m_Pic3DPlanarFigureCoronal = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(Pic3DCoronalPlanarFigureFile)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureCoronal.IsNotNull(), "Loaded Pic3D coronal planarFigure" );
 
-  m_US4DImage = mitk::IOUtil::LoadImage(US4DFile);
+  m_US4DImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(US4DFile)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_US4DImage.IsNotNull(), "Loaded US4D" );
-  m_US4DImageMask = mitk::IOUtil::LoadImage(US4DImageMaskFile);
+  m_US4DImageMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(US4DImageMaskFile)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_US4DImageMask.IsNotNull(), "Loaded US4D image mask" );
-  m_US4DImageMask2 = mitk::IOUtil::LoadImage(US4DImageMaskFile2);
+  m_US4DImageMask2 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(US4DImageMaskFile2)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_US4DImageMask2.IsNotNull(), "Loaded US4D image mask2" );
   m_US4DPlanarFigureAxial = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(US4DAxialPlanarFigureFile)[0].GetPointer());
   MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureAxial.IsNotNull(), "Loaded US4D axial planarFigure" );
@@ -599,7 +599,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
   this->VerifyStatistics( statisticsCalculator->GetStatistics(), -21474836.480, -21474836.480, -21474836.480);
 
   // activate voxel in the mask image
-  itk::Index<3U> test_index = {11, 8, 0};
+  itk::Index<3U> test_index = {{11, 8, 0}};
   mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
   writeAccess.SetPixelByIndex( test_index, 1);
 

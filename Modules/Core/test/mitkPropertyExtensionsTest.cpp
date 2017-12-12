@@ -28,7 +28,7 @@ public:
   std::string GetName() const { return m_Name; }
 private:
   explicit TestPropertyExtension(const std::string &name) : m_Name(name) {}
-  ~TestPropertyExtension() {}
+  ~TestPropertyExtension() override {}
   std::string m_Name;
 };
 
@@ -37,7 +37,7 @@ int mitkPropertyExtensionsTest(int, char *[])
   MITK_TEST_BEGIN("mitkPropertyExtensionsTest");
 
   mitk::IPropertyExtensions *propertyExtensions = mitk::CoreServices::GetPropertyExtensions();
-  MITK_TEST_CONDITION_REQUIRED(propertyExtensions != NULL, "Get property extensions service");
+  MITK_TEST_CONDITION_REQUIRED(propertyExtensions != nullptr, "Get property extensions service");
 
   propertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1a").GetPointer());
   propertyExtensions->AddExtension("propertyName1", TestPropertyExtension::New("extension1b").GetPointer());

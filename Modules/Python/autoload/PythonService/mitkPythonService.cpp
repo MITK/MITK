@@ -25,7 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
+
 #include <mitkExceptionMacro.h>
 
 #ifndef WIN32
@@ -34,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const QString mitk::PythonService::m_TmpDataFileName("temp_mitk_data_file");
 #ifdef USE_MITK_BUILTIN_PYTHON
-static char* pHome = NULL;
+static char* pHome = nullptr;
 #endif
 
 mitk::PythonService::PythonService()
@@ -120,10 +123,10 @@ mitk::PythonService::PythonService()
 #ifdef USE_MITK_BUILTIN_PYTHON
       PyObject* dict = PyDict_New();
       // Import builtin modules
-      if (PyDict_GetItemString(dict, "__builtins__") == NULL)
+      if (PyDict_GetItemString(dict, "__builtins__") == nullptr)
       {
         PyObject* builtinMod = PyImport_ImportModule("__builtin__");
-        if (builtinMod == NULL ||
+        if (builtinMod == nullptr ||
             PyDict_SetItemString(dict, "__builtins__", builtinMod) != 0)
         {
           Py_DECREF(dict);
@@ -288,7 +291,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   const mitk::Point3D origin = image->GetGeometry()->GetOrigin();
   mitk::PixelType pixelType = image->GetPixelType();
   itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
-  PyObject* npyArray = NULL;
+  PyObject* npyArray = nullptr;
   mitk::ImageReadAccessor racc(image);
   void* array = (void*) racc.GetData();
 
@@ -298,15 +301,13 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   const vnl_matrix_fixed<ScalarType, 3, 3> &transform =
       image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
 
+  mitk::Vector3D s = image->GetGeometry()->GetSpacing();
+
   // ToDo: Check if this is a collumn or row vector from the matrix.
   // right now it works but not sure for rotated geometries
-  mitk::FillVector3D(xDirection, transform[0][0], transform[0][1], transform[0][2]);
-  mitk::FillVector3D(yDirection, transform[1][0], transform[1][1], transform[1][2]);
-  mitk::FillVector3D(zDirection, transform[2][0], transform[2][1], transform[2][2]);
-
-  xDirection.Normalize();
-  yDirection.Normalize();
-  zDirection.Normalize();
+  mitk::FillVector3D(xDirection, transform[0][0]/s[0], transform[0][1]/s[1], transform[0][2]/s[2]);
+  mitk::FillVector3D(yDirection, transform[1][0]/s[0], transform[1][1]/s[1], transform[1][2]/s[2]);
+  mitk::FillVector3D(zDirection, transform[2][0]/s[0], transform[2][1]/s[1], transform[2][2]/s[2]);
 
   // save the total number of elements here (since the numpy array is one dimensional)
   npy_intp* npy_dims = new npy_intp[1];
@@ -563,7 +564,7 @@ mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrCom
 
 mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std::string &stdvarName)
 {
-  double*ds = NULL;
+  double*ds = nullptr;
   // access python module
   PyObject *pyMod = PyImport_AddModule((char*)"__main__");
   // global dictionarry
@@ -595,9 +596,9 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
   PyArrayObject* py_nrComponents = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_nrComponents").arg(varName).toStdString().c_str() );
 
-  unsigned int nr_Components = *((unsigned int*) py_nrComponents->data);
+  unsigned int nr_Components = *(reinterpret_cast<unsigned int*>(PyArray_DATA(py_nrComponents)));
 
-  unsigned int nr_dimensions = py_data->nd;
+  unsigned int nr_dimensions = PyArray_NDIM(py_data);
   if (nr_Components > 1) // for VectorImages the last dimension in the numpy array are the vector components.
   {
     --nr_dimensions;
@@ -609,16 +610,16 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   // fill backwards , nd data saves dimensions in opposite direction
   for( unsigned i = 0; i < nr_dimensions; ++i )
   {
-    dimensions[i] = py_data->dimensions[nr_dimensions - 1 - i];
+    dimensions[i] = PyArray_DIMS(py_data)[nr_dimensions - 1 - i];
   }
 
   mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
 
 
-  mitkImage->SetChannel(py_data->data);
+  mitkImage->SetChannel(PyArray_DATA(py_data));
 
 
-  ds = (double*)py_spacing->data;
+  ds = reinterpret_cast<double*>(PyArray_DATA(py_spacing));
   spacing[0] = ds[0];
   spacing[1] = ds[1];
   spacing[2] = ds[2];
@@ -626,7 +627,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   mitkImage->GetGeometry()->SetSpacing(spacing);
 
 
-  ds = (double*)py_origin->data;
+  ds = reinterpret_cast<double*>(PyArray_DATA(py_origin));
   origin[0] = ds[0];
   origin[1] = ds[1];
   origin[2] = ds[2];
@@ -635,7 +636,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
   itk::Matrix<double,3,3> py_transform;
 
-  ds = (double*)py_direction->data;
+  ds = reinterpret_cast<double*>(PyArray_DATA(py_direction));
   py_transform[0][0] = ds[0];
   py_transform[0][1] = ds[1];
   py_transform[0][2] = ds[2];
@@ -688,7 +689,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
   // global dictionary
   PyObject *pyDict = PyModule_GetDict(pyMod);
   mitk::PixelType pixelType = image->GetPixelType();
-  PyObject* npyArray = NULL;
+  PyObject* npyArray = nullptr;
   mitk::ImageReadAccessor racc(image);
   void* array = (void*) racc.GetData();
 
@@ -805,7 +806,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_np_array").arg(varName).toStdString().c_str() );
   PyArrayObject* shape = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_shape").arg(varName).toStdString().c_str() );
 
-  size_t* d = (size_t*)shape->data;
+  size_t* d = reinterpret_cast<size_t*>(PyArray_DATA(shape));
 
   unsigned int dimensions[3];
   dimensions[0] = d[1];
@@ -825,7 +826,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   {
     mitk::ImageWriteAccessor ra(mitkImage);
     char* data = (char*)(ra.GetData());
-    memcpy(data, (void*)py_data->data, dimensions[0] * dimensions[1] * pixelType.GetSize());
+    memcpy(data, PyArray_DATA(py_data), dimensions[0] * dimensions[1] * pixelType.GetSize());
   }
 
   command.clear();
@@ -852,7 +853,7 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
   // global dictionarry
   PyObject *pyDict = PyModule_GetDict(pyMod);
   // python memory address
-  PyObject *pyAddr = NULL;
+  PyObject *pyAddr = nullptr;
   // cpp address
   size_t addr = 0;
   mitk::Surface::Pointer surface = mitk::Surface::New();

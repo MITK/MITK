@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFiberBundle.h"
 #include "mitkFiberBundleMapper3D.h"
 #include "mitkFiberBundleMapper2D.h"
+#include <mitkPeakImageMapper2D.h>
 
 //#include "mitkFiberBundleThreadMonitorMapper3D.h"
 //#include "mitkFiberBundleThreadMonitor.h"

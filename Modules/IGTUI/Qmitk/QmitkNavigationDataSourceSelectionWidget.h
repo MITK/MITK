@@ -41,7 +41,7 @@ class MITKIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
     static const std::string VIEW_ID;
 
     QmitkNavigationDataSourceSelectionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkNavigationDataSourceSelectionWidget();
+    ~QmitkNavigationDataSourceSelectionWidget() override;
 
     /** @return Returns the currently selected NavigationDataSource. Returns null if no source is selected at the moment. */
     mitk::NavigationDataSource::Pointer GetSelectedNavigationDataSource();
@@ -51,12 +51,12 @@ class MITKIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
       */
     int GetSelectedToolID();
 
-    /** @return Returns the NavigationTool of the current selected tool if a NavigationToolStorage is available. Returns NULL if
+    /** @return Returns the NavigationTool of the current selected tool if a NavigationToolStorage is available. Returns nullptr if
       *         there is no storage available or if no tool is selected.
       */
     mitk::NavigationTool::Pointer GetSelectedNavigationTool();
 
-    /** @return Returns the NavigationToolStorage of the currently selected NavigationDataSource. Returns NULL if there is no
+    /** @return Returns the NavigationToolStorage of the currently selected NavigationDataSource. Returns nullptr if there is no
       *         source selected or if the source has no NavigationToolStorage assigned.
       */
     mitk::NavigationToolStorage::Pointer GetNavigationToolStorageOfSource();

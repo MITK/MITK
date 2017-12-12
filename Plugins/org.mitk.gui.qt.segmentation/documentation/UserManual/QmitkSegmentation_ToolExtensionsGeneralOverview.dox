@@ -41,7 +41,7 @@ how to build such external extensions.
 
 The extension concept assumes that you want to create one or several new
 interactive segmentation tools for Segmentation or another MITK
-functionality that uses the tools infrastructure. In the result you
+view that uses the tools infrastructure. In the result you
 will create a shared object (DLL), which contains several tools and their GUI
 counterparts, plus optional code that your extension requires. The following
 sections shortly describe each of these parts.

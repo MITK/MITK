@@ -60,7 +60,6 @@ public:
 
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
     void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; } ///< Random stick configuration in each voxel
     bool GetRandomizeSticks() { return m_RandomizeSticks; }

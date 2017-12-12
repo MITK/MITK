@@ -34,9 +34,9 @@ public:
   static const std::string VIEW_ID;
 
   QmitkOpenIGTLinkWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~QmitkOpenIGTLinkWidget();
+  ~QmitkOpenIGTLinkWidget() override;
 
-  virtual void Initialize();
+  void Initialize() override;
 
 signals:
 
@@ -45,10 +45,10 @@ signals:
 private:
   void CreateQtPartControl(QWidget *parent);
 protected:
-  virtual QmitkOpenIGTLinkWidget* Clone(QWidget* parent) const;
+  QmitkOpenIGTLinkWidget* Clone(QWidget* parent) const override;
 
   Ui::QmitkOpenIGTLinkWidget* m_Controls;
 public:
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  mitk::TrackingDevice::Pointer ConstructTrackingDevice() override;
 };
 #endif

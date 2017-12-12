@@ -129,14 +129,12 @@ public:
   template <unsigned int VMovingDim, unsigned int VTargetDim>
   bool MapPoint(const ::itk::Point<mitk::ScalarType,VMovingDim>& inPoint, ::itk::Point<mitk::ScalarType,VTargetDim>& outPoint) const
   {
-    typedef ::itk::Point<mitk::ScalarType,VMovingDim> MITKMovingPointType;
-    typedef ::itk::Point<mitk::ScalarType,VTargetDim> MITKTargetPointType;
     typedef typename ::map::core::continuous::Elements<VMovingDim>::PointType MAPMovingPointType;
     typedef typename ::map::core::continuous::Elements<VTargetDim>::PointType MAPTargetPointType;
 
     if (m_spRegistration.IsNull())
     {
-        mapDefaultExceptionMacro(<< "Error. Cannot map point. Wrapper points to invalid registration (NULL). Point: " << inPoint);
+        mapDefaultExceptionMacro(<< "Error. Cannot map point. Wrapper points to invalid registration (nullptr). Point: " << inPoint);
     }
 
     bool result = false;
@@ -147,7 +145,7 @@ public:
         MAPTargetPointType tempOutP;
         tempInP.CastFrom(inPoint);
 
-        typedef map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
+        typedef ::map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
         const CastedRegType* pCastedReg = dynamic_cast<const CastedRegType*>(m_spRegistration.GetPointer());
 
         if (!pCastedReg)
@@ -177,14 +175,12 @@ public:
   template <unsigned int VMovingDim, unsigned int VTargetDim>
   bool MapPointInverse(const ::itk::Point<mitk::ScalarType,VTargetDim> & inPoint, ::itk::Point<mitk::ScalarType,VMovingDim> & outPoint) const
 {
-  typedef ::itk::Point<mitk::ScalarType,VMovingDim> MITKMovingPointType;
-  typedef ::itk::Point<mitk::ScalarType,VTargetDim> MITKTargetPointType;
   typedef typename ::map::core::continuous::Elements<VMovingDim>::PointType MAPMovingPointType;
   typedef typename ::map::core::continuous::Elements<VTargetDim>::PointType MAPTargetPointType;
 
   if (m_spRegistration.IsNull())
   {
-      mapDefaultExceptionMacro(<< "Error. Cannot map point. Wrapper points to invalid registration (NULL). Point: " << inPoint);
+      mapDefaultExceptionMacro(<< "Error. Cannot map point. Wrapper points to invalid registration (nullptr). Point: " << inPoint);
   }
 
   bool result = false;
@@ -195,7 +191,7 @@ public:
       MAPMovingPointType tempOutP;
       tempInP.CastFrom(inPoint);
 
-      typedef map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
+      typedef ::map::core::Registration<VMovingDim,VTargetDim> CastedRegType;
       const CastedRegType* pCastedReg = dynamic_cast<const CastedRegType*>(m_spRegistration.GetPointer());
 
       if (!pCastedReg)
@@ -220,8 +216,8 @@ public:
   @pre valid registration instance must be set.
   @return smart pointer to a FieldRepresentationDescriptor for the supported registration space in the moving domain.
   May be null if the direct registration kernel is global and thus not limited.
-  If there is a limitation, the retun value is not NULL.
-  @retval NULL no field representation set/requested by the creating registration algorithm.
+  If there is a limitation, the retun value is not nullptr.
+  @retval nullptr no field representation set/requested by the creating registration algorithm.
   */
   mitk::Geometry3D GetDirectFieldRepresentation() const;
 
@@ -231,8 +227,8 @@ public:
   @pre valid registration instance must be set.
   @return a const FieldRepresentationDescriptor for the supported registration space in the target domain.
   May be null if the inverse registration kernel is global and thus not limited.
-  If there is a limitation, the retun value is not NULL.
-  @retval NULL no field representation set/requested by the creating registration algorithm.
+  If there is a limitation, the retun value is not nullptr.
+  @retval nullptr no field representation set/requested by the creating registration algorithm.
   */
   mitk::Geometry3D GetInverseFieldRepresentation() const;
 
@@ -250,10 +246,10 @@ public:
   */
   void PrecomputeInverseMapping();
 
-  map::core::RegistrationBase* GetRegistration();
-  const map::core::RegistrationBase* GetRegistration() const;
+  ::map::core::RegistrationBase* GetRegistration();
+  const ::map::core::RegistrationBase* GetRegistration() const;
 
-  void SetRegistration(map::core::RegistrationBase* pReg);
+  void SetRegistration(::map::core::RegistrationBase* pReg);
 
 protected:
     virtual void PrintSelf (std::ostream &os, itk::Indent indent) const;
@@ -261,7 +257,7 @@ protected:
     MAPRegistrationWrapper();
     virtual ~MAPRegistrationWrapper();
 
-    map::core::RegistrationBase::Pointer m_spRegistration;
+    ::map::core::RegistrationBase::Pointer m_spRegistration;
 
 private:
 

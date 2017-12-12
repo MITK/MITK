@@ -86,14 +86,14 @@ bool mitk::PlanarFigureInteractor::CheckFigurePlaced(const InteractionEvent * /*
 
 void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
   bool isEditable = true;
   GetDataNode()->GetBoolProperty("planarfigure.iseditable", isEditable);
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   const mitk::AbstractTransformGeometry *abstractTransformGeometry =
@@ -133,7 +133,7 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction *, Intera
 
 void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   planarFigure->Modified();
   planarFigure->DeselectControlPoint();
@@ -152,7 +152,7 @@ void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, Interact
 
 void mitk::PlanarFigureInteractor::EndInteraction(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
   planarFigure->Modified();
   planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
@@ -171,7 +171,7 @@ bool mitk::PlanarFigureInteractor::FilterEvents(InteractionEvent *interactionEve
 
 void mitk::PlanarFigureInteractor::EndHovering(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->ResetPreviewContolPoint();
 
   // Invoke end-hover event once the mouse is exiting the figure area
@@ -186,7 +186,7 @@ void mitk::PlanarFigureInteractor::EndHovering(StateMachineAction *, Interaction
 
 void mitk::PlanarFigureInteractor::DeleteFigure(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->RemoveAllObservers();
   GetDataNode()->RemoveAllObservers();
 
@@ -196,7 +196,7 @@ void mitk::PlanarFigureInteractor::DeleteFigure(StateMachineAction *, Interactio
 
 void mitk::PlanarFigureInteractor::PerformPointResetOnSelect(StateMachineAction *, InteractionEvent *)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->ResetOnPointSelect();
 }
 
@@ -238,7 +238,7 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsEditable(const InteractionEvent 
 
 void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction *, InteractionEvent * /*interactionEvent*/)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   const bool wasSelected = planarFigure->DeselectControlPoint();
   if (wasSelected)
@@ -297,7 +297,7 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction *, InteractionEve
     return;
   }
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(data.GetPointer());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(data.GetPointer());
 
   // We can't derive a new control point from a polyline of a Bezier curve
   // as all control points contribute to each polyline point.
@@ -371,9 +371,9 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, Interac
   if (positionEvent == nullptr)
     return;
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
-  mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast<PlaneGeometry *>(planarFigure->GetGeometry(0));
+  auto *planarFigureGeometry = dynamic_cast<PlaneGeometry *>(planarFigure->GetGeometry(0));
   const mitk::AbstractTransformGeometry *abstractTransformGeometry =
     dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
 
@@ -381,7 +381,7 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction *, Interac
   planarFigure->InvokeEvent(StartPlacementPlanarFigureEvent());
 
   // Use PlaneGeometry of the renderer clicked on for this PlanarFigure
-  mitk::PlaneGeometry *planeGeometry = const_cast<mitk::PlaneGeometry *>(
+  auto *planeGeometry = const_cast<mitk::PlaneGeometry *>(
     dynamic_cast<const mitk::PlaneGeometry *>(renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry()));
   if (planeGeometry != nullptr && abstractTransformGeometry == nullptr)
   {
@@ -425,7 +425,7 @@ void mitk::PlanarFigureInteractor::StartHovering(StateMachineAction *, Interacti
   if (positionEvent == nullptr)
     return;
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
 
   if (!m_IsHovering)
@@ -448,7 +448,7 @@ void mitk::PlanarFigureInteractor::SetPreviewPointPosition(StateMachineAction *,
   if (positionEvent == nullptr)
     return;
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
 
   planarFigure->DeselectControlPoint();
@@ -478,7 +478,7 @@ void mitk::PlanarFigureInteractor::HideControlPoints(StateMachineAction *, Inter
 
 void mitk::PlanarFigureInteractor::HidePreviewPoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->ResetPreviewContolPoint();
 
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
@@ -487,15 +487,15 @@ void mitk::PlanarFigureInteractor::HidePreviewPoint(StateMachineAction *, Intera
 
 bool mitk::PlanarFigureInteractor::CheckFigureHovering(const InteractionEvent *interactionEvent)
 {
-  const mitk::InteractionPositionEvent *positionEvent =
+  const auto *positionEvent =
     dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
-  mitk::AbstractTransformGeometry *abstractTransformGeometry =
+  auto *abstractTransformGeometry =
     dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
@@ -522,7 +522,7 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering(const InteractionEvent *i
 
 bool mitk::PlanarFigureInteractor::CheckControlPointHovering(const InteractionEvent *interactionEvent)
 {
-  const mitk::InteractionPositionEvent *positionEvent =
+  const auto *positionEvent =
     dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
@@ -561,7 +561,7 @@ bool mitk::PlanarFigureInteractor::CheckSelection(const InteractionEvent * /*int
 
 void mitk::PlanarFigureInteractor::SelectFigure(StateMachineAction *, InteractionEvent * /*interactionEvent*/)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   planarFigure->InvokeEvent(SelectPlanarFigureEvent());
 }
 
@@ -572,7 +572,7 @@ void mitk::PlanarFigureInteractor::SelectPoint(StateMachineAction *, Interaction
   if (positionEvent == nullptr)
     return;
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast<PlaneGeometry *>(planarFigure->GetGeometry(0));
   const mitk::AbstractTransformGeometry *abstractTransformGeometry =
@@ -602,7 +602,7 @@ bool mitk::PlanarFigureInteractor::CheckPointValidity(const InteractionEvent *in
   // is sufficient (if a previous point exists)
 
   // Extract display position
-  const mitk::InteractionPositionEvent *positionEvent =
+  const auto *positionEvent =
     dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
@@ -615,7 +615,7 @@ bool mitk::PlanarFigureInteractor::CheckPointValidity(const InteractionEvent *in
 
 void mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
 
   const int selectedControlPoint = planarFigure->GetSelectedControlPoint();
@@ -634,7 +634,7 @@ void mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction *, Int
 
 void mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction *, InteractionEvent * /*interactionEvent*/)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   bool selected = false;
   GetDataNode()->GetBoolProperty("selected", selected);
@@ -650,7 +650,7 @@ void mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction *, Inte
 
 bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect(const InteractionEvent * /*interactionEvent*/)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+  auto *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   bool isEditable = true;
   GetDataNode()->GetBoolProperty("planarfigure.iseditable", isEditable);
@@ -661,7 +661,7 @@ bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect(const InteractionEven
 
 bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry(const InteractionEvent *interactionEvent)
 {
-  const mitk::InteractionPositionEvent *posEvent =
+  const auto *posEvent =
     dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
 
   if (posEvent == nullptr)
@@ -788,7 +788,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(const InteractionPosition
     const VertexContainerType polyLine = planarFigure->GetPolyLine(loop);
 
     bool firstPoint(true);
-    for (VertexContainerType::const_iterator it = polyLine.begin(); it != polyLine.end(); ++it)
+    for (auto it = polyLine.begin(); it != polyLine.end(); ++it)
     {
       // Get plane coordinates of this point of polyline (if possible)
       if (!this->TransformObjectToDisplay(

@@ -57,6 +57,7 @@ class QmitkUSNavigationStepPunctuationIntervention : public QmitkUSAbstractNavig
 
 public:
   explicit QmitkUSNavigationStepPunctuationIntervention(QWidget *parent = 0);
+  explicit QmitkUSNavigationStepPunctuationIntervention(mitk::Point3D toolAxis, QWidget *parent = 0);
   ~QmitkUSNavigationStepPunctuationIntervention();
 
   virtual bool OnStartStep();
@@ -96,12 +97,16 @@ protected:
   /** Checks if the given line intersects the given sphere. */
   bool CheckSphereLineIntersection(mitk::Point3D& sphereOrigin, float& sphereRadius, mitk::Point3D& lineStart, mitk::Point3D& lineEnd);
 
+private:
+  Ui::QmitkUSNavigationStepPunctuationIntervention *m_Ui;
+
   mitk::DataStorage::SetOfObjects::ConstPointer m_ZoneNodes;
 
     /**
    * \brief Creates a Pointset that projects the needle's path
    */
   itk::SmartPointer<mitk::NeedleProjectionFilter> m_NeedleProjectionFilter;
+  mitk::Point3D m_ToolAxis;
 
   std::map<mitk::DataNode::Pointer,mitk::Color> m_OldColors; //stores the original color of the critical structrue nodes
 
@@ -109,9 +114,6 @@ protected:
   vtkSmartPointer<vtkSphereSource> m_SphereSource;
   vtkSmartPointer<vtkOBBTree> m_OBBTree;
   vtkSmartPointer<vtkPoints> m_IntersectPoints;
-
-private:
-  Ui::QmitkUSNavigationStepPunctuationIntervention *ui;
 };
 
 #endif // QMITKUSNAVIGATIONSTEPPUNCTUATIONINTERVENTION_H

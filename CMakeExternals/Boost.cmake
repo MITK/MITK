@@ -17,7 +17,7 @@ set(Boost_DEPENDS ${proj})
 
 if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
-  set(_boost_version 1_60)
+  set(_boost_version 1_65_1)
   set(_boost_install_include_dir include/boost)
   if(WIN32)
     set(_boost_install_include_dir include/boost-${_boost_version}/boost)
@@ -49,7 +49,10 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     if(MSVC)
       mitkFunctionGetMSVCVersion()
       set(_boost_with_toolset "vc${VISUAL_STUDIO_VERSION_MAJOR}")
-      set(_boost_toolset "msvc-${VISUAL_STUDIO_VERSION_MAJOR}.0")
+      if(${VISUAL_STUDIO_VERSION_MINOR})
+        set(_boost_with_toolset "${_boost_with_toolset}${VISUAL_STUDIO_VERSION_MINOR}")
+      endif()
+      set(_boost_toolset "msvc-${VISUAL_STUDIO_VERSION_MAJOR}.${VISUAL_STUDIO_VERSION_MINOR}")
     endif()
     set(_install_lib_dir "--libdir=<INSTALL_DIR>/bin")
     set(WIN32_CMAKE_SCRIPT ${ep_prefix}/src/${proj}-cmake/MoveBoostLibsToLibDirForWindows.cmake)
@@ -97,8 +100,8 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     set(_boost_link static)
   endif()
   set(_boost_cxxflags )
-  if(CMAKE_CXX_FLAGS OR MITK_CXX11_FLAG)
-    set(_boost_cxxflags "cxxflags=${MITK_CXX11_FLAG} ${CMAKE_CXX_FLAGS}")
+  if(CMAKE_CXX_FLAGS OR MITK_CXX14_FLAG)
+    set(_boost_cxxflags "cxxflags=${MITK_CXX14_FLAG} ${CMAKE_CXX_FLAGS}")
   endif()
   set(_boost_linkflags )
   if(BUILD_SHARED_LIBS AND _install_rpath_linkflag)
@@ -128,34 +131,36 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   )
 
   if(MITK_USE_Boost_LIBRARIES)
-    set(_boost_build_cmd BUILD_COMMAND ${_build_cmd})
-    set(_install_cmd ${_build_cmd} install ${_macos_change_install_name_cmd} ${_windows_move_libs_cmd})
+    set(_boost_build_cmd BUILD_COMMAND ${_build_cmd} install ${_macos_change_install_name_cmd} ${_windows_move_libs_cmd})
   else()
-    set(_boost_build_cmd BUILD_COMMAND ${CMAKE_COMMAND} -E echo "no binary libraries")
-    set(_install_cmd ${CMAKE_COMMAND} -E echo "copying Boost header..."
-           COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
+    set(_boost_build_cmd BUILD_COMMAND
+      ${CMAKE_COMMAND} -E echo "copying Boost headers..."
+      COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
   endif()
 
-  ExternalProject_Add(${proj}-download
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
-      URL_MD5 7ce7f5a4e396484da8da6b60d4ed7661
-      CONFIGURE_COMMAND ""
-      BUILD_COMMAND ""
-      INSTALL_COMMAND ""
-    )
+  set(_boost_patch_cmd )
+
+  if(WIN32)
+    if(MSVC)
+      if(NOT (VISUAL_STUDIO_VERSION_MAJOR LESS 14))
+        set(_boost_patch_cmd PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch)
+      endif()
+    endif()
+  endif()
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    SOURCE_DIR "${ep_prefix}/src/${proj}-download"
-    BINARY_DIR "${ep_prefix}/src/${proj}-download"
-    DOWNLOAD_COMMAND ""
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}.7z
+    URL_MD5 72ab92cb936f93d33b8b313aee2dd47a
+    BINARY_DIR "${ep_prefix}/src/${proj}"
+    ${_boost_patch_cmd}
     CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
       --with-toolset=${_boost_with_toolset}
       --with-libraries=${_boost_libs}
       "--prefix=<INSTALL_DIR>"
     ${_boost_build_cmd}
-    INSTALL_COMMAND ${_install_cmd}
-    DEPENDS ${proj}-download ${proj_DEPENDENCIES}
+    INSTALL_COMMAND "" # done in BUILD_COMMAND
+    DEPENDS ${proj_DEPENDENCIES}
     )
 
   ExternalProject_Get_Property(${proj} install_dir)

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper.h"
 #include <MitkCoreExports.h>
-#include <mitkWeakPointer.h>
 #include <vtkSmartPointer.h>
 
 class vtkActor2D;
@@ -66,7 +65,7 @@ namespace mitk
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     /** \brief set the default properties for this mapper */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage

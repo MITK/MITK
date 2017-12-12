@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/QmitkImageNavigatorView">
-     <file>Slider.png</file>
+     <file>image_navigator.svg</file>
  </qresource>
  </RCC>

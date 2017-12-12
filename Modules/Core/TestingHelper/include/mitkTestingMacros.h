@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkMacro.h>
 #include <mitkException.h>
+#include <mitkTestNotRunException.h>
 #include <mitkTestCaller.h>
 #include <mitkTestManager.h>
 
@@ -206,33 +207,15 @@ namespace mitk
  * comparisons and will give verbose output on the dashboard/console.
  * Feel free to implement mitk::Equal for your own datatype or purpose.
  *
- * @deprecatedSince{2013_09} Use MITK_ASSERT_EQUAL instead.
- *
- * @param OBJ1 First object.
- * @param OBJ2 Second object.
- * @param MSG Message to appear with the test.
- */
-#define MITK_TEST_EQUAL(OBJ1, OBJ2, MSG)                                                                               \
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(OBJ1, OBJ2, mitk::eps, true) == true, MSG)
-
-/**
- * @brief Testing macro to test if two objects are equal.
- *
- * @ingroup MITKTestingAPI
- *
- * This macro uses mitk::eps and the corresponding mitk::Equal methods for all
- * comparisons and will give verbose output on the dashboard/console.
- * Feel free to implement mitk::Equal for your own datatype or purpose.
- *
  * @param EXPECTED First object.
  * @param ACTUAL Second object.
  * @param MSG Message to appear with the test.
- * @throw Throws mitkException if a NULL pointer is given as input.
+ * @throw Throws mitkException if a nullptr pointer is given as input.
  */
 #define MITK_ASSERT_EQUAL(EXPECTED, ACTUAL, MSG)                                                                       \
   if (((EXPECTED).IsNull()) || ((ACTUAL).IsNull()))                                                                    \
   {                                                                                                                    \
-    mitkThrow() << "mitk::Equal does not work with NULL pointer input.";                                               \
+    mitkThrow() << "mitk::Equal does not work with nullptr pointer input.";                                               \
   }                                                                                                                    \
   CPPUNIT_ASSERT_MESSAGE(MSG, mitk::Equal(*(EXPECTED), *(ACTUAL), mitk::eps, true))
 
@@ -266,14 +249,14 @@ namespace mitk
  * @param OBJ1 First object.
  * @param OBJ2 Second object.
  * @param MSG Message to appear with the test.
- * @throw Throws mitkException if a NULL pointer is given as input.
+ * @throw Throws mitkException if a nullptr pointer is given as input.
  *
  * \sa MITK_ASSERT_EQUAL
  */
 #define MITK_ASSERT_NOT_EQUAL(OBJ1, OBJ2, MSG)                                                                         \
   if (((OBJ1).IsNull()) || ((OBJ2).IsNull()))                                                                          \
   {                                                                                                                    \
-    mitkThrow() << "mitk::Equal does not work with NULL pointer input.";                                               \
+    mitkThrow() << "mitk::Equal does not work with nullptr pointer input.";                                               \
   }                                                                                                                    \
   CPPUNIT_ASSERT_MESSAGE(MSG, !mitk::Equal(*(OBJ1), *(OBJ2), mitk::eps, true))
 
@@ -288,9 +271,19 @@ namespace mitk
 #define MITK_TEST_SUITE_REGISTRATION(TESTSUITE_NAME)                                                                   \
   int TESTSUITE_NAME##Test(int /*argc*/, char * /*argv*/ [])                                                           \
   {                                                                                                                    \
-    CppUnit::TextUi::TestRunner runner;                                                                                \
-    runner.addTest(TESTSUITE_NAME##TestSuite::suite());                                                                \
-    return runner.run() ? 0 : 1;                                                                                       \
+    int result = 0;                                                                                                    \
+    try                                                                                                                \
+    {                                                                                                                  \
+      CppUnit::TextUi::TestRunner runner;                                                                              \
+      runner.addTest(TESTSUITE_NAME##TestSuite::suite());                                                              \
+      result = runner.run() ? 0 : 1;                                                                                   \
+    }                                                                                                                  \
+    catch (const mitk::TestNotRunException& e)                                                                         \
+    {                                                                                                                  \
+      MITK_WARN << "Test not run: " << e.GetDescription();                                                             \
+      result = 77;                                                                                                     \
+    }                                                                                                                  \
+    return result;                                                                                                     \
   }
 
 /**

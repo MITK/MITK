@@ -69,6 +69,7 @@ public:
   static bool canOpenPage(const QString &url);
   static bool isLocalUrl(const QUrl &url);
   static bool launchWithExternalApp(const QUrl &url);
+  static const QString m_MissingContextMessage;
   static const QString m_PageNotFoundMessage;
 
 public Q_SLOTS:

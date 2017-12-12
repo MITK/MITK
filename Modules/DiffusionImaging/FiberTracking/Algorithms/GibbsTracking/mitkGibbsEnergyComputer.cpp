@@ -8,11 +8,11 @@
 
 using namespace mitk;
 
-GibbsEnergyComputer::GibbsEnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen)
+GibbsEnergyComputer::GibbsEnergyComputer(ItkOdfImgType* OdfImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen)
 :EnergyComputer(mask, particleGrid, interpolator, randGen)
 
 {
-  m_Image = qballImage;
+  m_Image = OdfImage;
 }
 
 GibbsEnergyComputer::~GibbsEnergyComputer()
@@ -40,7 +40,7 @@ float GibbsEnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vect
 
         if (!m_UseTrilinearInterpolation)   // image has not enough slices to use trilinear interpolation
         {
-            ItkQBallImgType::IndexType index;
+            ItkOdfImgType::IndexType index;
             index[0] = floor(pos[0]/m_Spacing[0]);
             index[1] = floor(pos[1]/m_Spacing[1]);
             index[2] = floor(pos[2]/m_Spacing[2]);
@@ -67,7 +67,7 @@ float GibbsEnergyComputer::EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vect
                 float yfrac = Ry-yint;
                 float zfrac = Rz-zint;
 
-                ItkQBallImgType::IndexType index;
+                ItkOdfImgType::IndexType index;
                 float weight;
 
                 weight = (1-xfrac)*(1-yfrac)*(1-zfrac);
@@ -139,17 +139,19 @@ float GibbsEnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, 
         if (dp != neighbour)                        // don't evaluate against itself
         {
             // see Reisert et al. "Global Reconstruction of Neuronal Fibers", MICCAI 2009
-            float dot = fabs(dot_product(N,neighbour->GetDir()));
-            float bw = mbesseli0(dot);
+            float dot = fabs( dot_product(N,neighbour->GetDir()) );
+            float I_0 = CalcI0(dot) + m_ParticleChemicalPotential;
+
             float dpos = (neighbour->GetPos()-R).squared_magnitude();
-            float w = mexp(dpos*gamma_s);
-            modelVal += w*(bw+m_ParticleChemicalPotential);
-            w = mexp(dpos*gamma_reg_s);
+            float pos_w = exp(-dpos*m_SigmaInv);
+
+            modelVal += pos_w*I_0;
         }
         neighbour =  m_ParticleGrid->GetNextNeighbor();
     }
+    modelVal += CalcI0(1.0)+m_ParticleChemicalPotential;
 
-    float energy = 2*(odfVal/m_ParticleWeight-modelVal) - (mbesseli0(1.0)+m_ParticleChemicalPotential);
+    float energy = 2*odfVal/m_ParticleWeight - modelVal;
     return energy*m_ExtStrength;
 }
 

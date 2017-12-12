@@ -35,7 +35,7 @@ namespace mitk
 {
   struct FileWriterSelector::Item::Impl : us::SharedData
   {
-    Impl() : m_FileWriter(NULL), m_ConfidenceLevel(IFileWriter::Unsupported), m_BaseDataIndex(0), m_Id(-1) {}
+    Impl() : m_FileWriter(nullptr), m_ConfidenceLevel(IFileWriter::Unsupported), m_BaseDataIndex(0), m_Id(-1) {}
     us::ServiceReference<IFileWriter> m_FileWriterRef;
     IFileWriter *m_FileWriter;
     IFileWriter::ConfidenceLevel m_ConfidenceLevel;
@@ -114,7 +114,7 @@ namespace mitk
           // of this writer for writing the given base data object.
 
           IFileWriter *writer = m_Data->m_WriterRegistry.GetWriter(*iter);
-          if (writer == NULL)
+          if (writer == nullptr)
             continue;
           try
           {
@@ -126,7 +126,7 @@ namespace mitk
             }
 
             std::string baseDataType = iter->GetProperty(IFileWriter::PROP_BASEDATA_TYPE()).ToString();
-            std::vector<std::string>::iterator idxIter =
+            auto idxIter =
               std::find(classHierarchy.begin(), classHierarchy.end(), baseDataType);
             std::size_t baseDataIndex = std::numeric_limits<std::size_t>::max();
             if (idxIter != classHierarchy.end())

@@ -34,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMergeDiffusionImagesFilter.h"
 #include <mitkIOUtil.h>
 
-using namespace std;
-
 static mitk::StringList& GetInputFilenames()
 {
   static mitk::StringList inputs;
@@ -74,7 +72,7 @@ void SetInputFileNames( std::string input_directory )
 }
 
 
-mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, std::string output_file )
+static mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, const std::string &)
 {
   mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
   //mitk::ClassicDICOMSeriesReader::Pointer gdcmReader = mitk::ClassicDICOMSeriesReader::New();
@@ -203,14 +201,14 @@ int main(int argc, char* argv[])
   parser.setTitle("Diffusion Dicom Loader");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("Loads Diffusion Dicom files.");
-  parser.setContributor("MBI");
+  parser.setContributor("MIC");
 
   parser.addArgument("inputdir", "i", mitkCommandLineParser::InputDirectory, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output File Name", "output file", us::Any(), false);
   parser.addArgument("dwprefix", "p", mitkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
   parser.addArgument("dryrun", "-s", mitkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
   {
     return EXIT_FAILURE;
@@ -289,9 +287,9 @@ int main(int argc, char* argv[])
       vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
 
       image = mitk::GrabItkImageMemory( filter->GetOutput() );
-      image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
-      image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
-      image->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
+      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
+      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
+      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
       mitk::DiffusionPropertyHelper propertyHelper( image );
       propertyHelper.InitializeImage();
     }
@@ -316,3 +314,4 @@ int main(int argc, char* argv[])
 
   return 1;
 }
+

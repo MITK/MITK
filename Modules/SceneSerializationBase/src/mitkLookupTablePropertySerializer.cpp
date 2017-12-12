@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 TiXmlElement *mitk::LookupTablePropertySerializer::Serialize()
 {
-  if (const LookupTableProperty *prop = dynamic_cast<const LookupTableProperty *>(m_Property.GetPointer()))
+  if (const auto *prop = dynamic_cast<const LookupTableProperty *>(m_Property.GetPointer()))
   {
     LocaleSwitch localeSwitch("C");
 

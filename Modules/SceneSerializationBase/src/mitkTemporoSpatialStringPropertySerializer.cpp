@@ -29,7 +29,7 @@ namespace mitk
     mitkClassMacro(TemporoSpatialStringPropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       if (const TemporoSpatialStringProperty *prop =
             dynamic_cast<const TemporoSpatialStringProperty *>(m_Property.GetPointer()))
@@ -44,7 +44,7 @@ namespace mitk
         return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
@@ -55,7 +55,7 @@ namespace mitk
 
   protected:
     TemporoSpatialStringPropertySerializer() {}
-    virtual ~TemporoSpatialStringPropertySerializer() {}
+    ~TemporoSpatialStringPropertySerializer() override {}
   };
 
 } // namespace

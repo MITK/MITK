@@ -48,7 +48,7 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSourceSelectionWidget : public QWi
     static const std::string VIEW_ID;
 
     QmitkIGTLDeviceSourceSelectionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkIGTLDeviceSourceSelectionWidget();
+    ~QmitkIGTLDeviceSourceSelectionWidget() override;
 
     /** @return Returns the currently selected OpenIGTLink device source.
      * Returns null if no source is selected at the moment. */

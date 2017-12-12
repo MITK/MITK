@@ -1,0 +1,18 @@
+/**
+\page org_mitk_gui_qt_igttrackingsemiautomaticmeasurement IGT Tracking Semi Automatic Measurement
+
+\imageMacro{icon.png,"Icon of IGT Tracking Semi Automatic Measurement",2.00}
+
+\tableofcontents
+
+\section Overview
+Dieses PlugIn dient zur semiautomatischen Aufzeichnung von Messreihen mit Trackingsystemen. Entsprechend konfiguriert ist es auch für das Hummel-Protokoll einsetzbar. Zentrale Komponente des PlugIns ist eine IGT Pipeline zur Messdatenaufzeichnung, wie in Abbildung 1 dargestellt.
+
+\imageMacro{pipeline.png,"Icon of IGT Tracking Semi Automatic Measurement",10.00}
+
+Ein Screenshot der Benutzeroberfläche des PlugIns ist in Abbildung 2 zu sehen. Das Initialisieren und Starten des Trackingsystems erfolgt dabei im nicht dargestellten Tab "Tracking Initialization", der im Wesentlichen aus dem TrackingDeviceConfigurationWidget besteht. Zur Durchführung der Messungen unterstützt das PlugIn das Laden einer Liste mit Dateinamen für die Messungen, wie im oberen Teil des Screenshots zu sehen. Diese Liste wird abgearbeitet, wobei mit dem Button "Start Next Measurement" jeweils die nächste Messung gestartet wird. Die während der Messung aufgezeichneten Daten werden in eine Datei das Ausgabeverzeichnis geschrieben. Dabei entspricht der Dateiname dem aktuellen Namen aus der Liste. Die Anzahl der aufzuzeichnenden Messwerte pro Messung kann in den Einstellungen angegeben werden. Gab es bei einer Messung einen Fehler kann die Messung durch Auswahl des entsprechenden Buttons auch wiederholt werden.
+
+\imageMacro{screenshot.png,"Icon of IGT Tracking Semi Automatic Measurement",10.00}
+
+Das PlugIn unterstützt außerdem die Ansteuerung eines zweiten Trackingsystems. Dieses System soll einen am Phantom angebrachtes Tool (Reference Sensor) tracken und so sicherstellen, dass sich das Phantom während der Messung nicht bewegt. Wurde eine Bewegung des Phantoms festgestellt wird im unteren Teil des PlugIns "NOT OK" angezeigt und die Messung muss ggf. wiederholt werden.
+*/

@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_reconstruction org.mitk.gui.qt.diffusionimaging.reconstruction
+  \ingroup MITKPlugins
+
+  \brief This is the diffusionimaging.reconstruction plugin. 
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_reconstruction_internal Internal
+  \ingroup org_mitk_gui_qt_diffusionimaging_reconstruction
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.diffusionimaging.reconstruction plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

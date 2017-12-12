@@ -80,12 +80,12 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   mitk::DataNode *node = this->GetDataNode();
-  mitk::LabelSetImage *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
   assert(image && image->IsInitialized());
 
   // check if there is a valid worldGeometry
   const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  if ((worldGeometry == NULL) || (!worldGeometry->IsValid()) || (!worldGeometry->HasReferenceGeometry()))
+  if ((worldGeometry == nullptr) || (!worldGeometry->IsValid()) || (!worldGeometry->HasReferenceGeometry()))
     return;
 
   image->Update();
@@ -134,12 +134,12 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
   // and the geometry of the image that is to be rendered.
   if (!RenderingGeometryIntersectsImage(worldGeometry, image->GetSlicedGeometry()))
   {
-    // set image to NULL, to clear the texture in 3D, because
+    // set image to nullptr, to clear the texture in 3D, because
     // the latest image is used there if the plane is out of the geometry
     // see bug-13275
     for (int lidx = 0; lidx < numberOfLayers; ++lidx)
     {
-      localStorage->m_ReslicedImageVector[lidx] = NULL;
+      localStorage->m_ReslicedImageVector[lidx] = nullptr;
       localStorage->m_LayerMapperVector[lidx]->SetInputData(localStorage->m_EmptyPolyData);
       localStorage->m_OutlineActor->SetVisibility(false);
       localStorage->m_OutlineShadowActor->SetVisibility(false);
@@ -149,7 +149,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 
   for (int lidx = 0; lidx < numberOfLayers; ++lidx)
   {
-    mitk::Image *layerImage = NULL;
+    mitk::Image *layerImage = nullptr;
 
     // set main input for ExtractSliceFilter
     if (lidx == activeLayer)
@@ -199,7 +199,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
     localStorage->m_ReslicerVector[lidx]->UpdateLargestPossibleRegion();
     localStorage->m_ReslicedImageVector[lidx] = localStorage->m_ReslicerVector[lidx]->GetVtkOutput();
 
-    const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
+    const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
 
     double textureClippingBounds[6];
     for (auto &textureClippingBound : textureClippingBounds)
@@ -285,9 +285,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
 bool mitk::LabelSetImageVtkMapper2D::RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry,
                                                                       SlicedGeometry3D *imageGeometry)
 {
-  // if either one of the two geometries is NULL we return true
+  // if either one of the two geometries is nullptr we return true
   // for safety reasons
-  if (renderingGeometry == NULL || imageGeometry == NULL)
+  if (renderingGeometry == nullptr || imageGeometry == nullptr)
     return true;
 
   // get the distance for the first cornerpoint
@@ -336,7 +336,7 @@ vtkSmartPointer<vtkPolyData> mitk::LabelSetImageVtkMapper2D::CreateOutlinePolyDa
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); // the lines to connect the points
 
   // We take the pointer to the first pixel of the image
-  mitk::Label::PixelType *currentPixel = static_cast<mitk::Label::PixelType *>(image->GetScalarPointer());
+  auto *currentPixel = static_cast<mitk::Label::PixelType *>(image->GetScalarPointer());
 
   while (y <= yMax)
   {
@@ -491,7 +491,7 @@ void mitk::LabelSetImageVtkMapper2D::ApplyOpacity(mitk::BaseRenderer *renderer, 
 void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable(mitk::BaseRenderer *renderer, int layer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  mitk::LabelSetImage *input = dynamic_cast<mitk::LabelSetImage *>(this->GetDataNode()->GetData());
+  auto *input = dynamic_cast<mitk::LabelSetImage *>(this->GetDataNode()->GetData());
   localStorage->m_LevelWindowFilterVector[layer]->SetLookupTable(
     input->GetLabelSet(layer)->GetLookupTable()->GetVtkLookupTable());
 }
@@ -505,9 +505,9 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   if (!visible)
     return;
 
-  mitk::LabelSetImage *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
+  auto *image = dynamic_cast<mitk::LabelSetImage *>(node->GetData());
 
-  if (image == NULL || image->IsInitialized() == false)
+  if (image == nullptr || image->IsInitialized() == false)
     return;
 
   // Calculate time step of the image data for the specified renderer (integer value)
@@ -515,7 +515,7 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = image->GetTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
     return;
@@ -566,7 +566,7 @@ float mitk::LabelSetImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer *re
   int layer = 0;
   GetDataNode()->GetIntProperty("layer", layer, renderer);
   // add the layer property for each image to render images with a higher layer on top of the others
-  depth += layer * 10; //*10: keep some room for each image (e.g. for QBalls in between)
+  depth += layer * 10; //*10: keep some room for each image (e.g. for ODFs in between)
   if (depth > 0.0f)
   {
     depth = 0.0f;

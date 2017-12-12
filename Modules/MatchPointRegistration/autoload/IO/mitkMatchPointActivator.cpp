@@ -29,12 +29,12 @@ class MatchPointActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(us::ModuleContext* context)
+  void Load(us::ModuleContext* ) override
   {
     m_MAPRegistrationWrapperIO = new MAPRegistrationWrapperIO();
   }
 
-  void Unload(us::ModuleContext* )
+  void Unload(us::ModuleContext* ) override
   {
     delete m_MAPRegistrationWrapperIO;
   }

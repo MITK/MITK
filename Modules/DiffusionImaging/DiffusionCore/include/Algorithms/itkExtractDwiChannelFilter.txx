@@ -64,8 +64,6 @@ void ExtractDwiChannelFilter< TInPixelType>::ThreadedGenerateData(const OutputIm
         ++oit;
         ++git;
     }
-
-    std::cout << "One Thread finished calculation" << std::endl;
 }
 
 }

@@ -35,7 +35,7 @@ namespace mitk
     void SetImage(itk::Image<TPixel, VImageDimension> *);
 
     /** \brief Counts all voxels with the chosen value in the set region*/
-    int VoxelWithValue(int value);
+    int VoxelWithValue(TPixel value);
     /** \brief Gives back the percentage of the number of voxels with the chosen value in comparison to the number of voxels with other values (except zero)*/
     double PercentageVoxelWithValueZeroExcluded(int value);
 

@@ -28,7 +28,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkColorTransferFunctionCanvas : public QmitkTra
 
 public:
   QmitkColorTransferFunctionCanvas(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
-  virtual void paintEvent(QPaintEvent *e) override;
+  void paintEvent(QPaintEvent *e) override;
   int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 32) override;
   void SetTitle(const QString &title);
 

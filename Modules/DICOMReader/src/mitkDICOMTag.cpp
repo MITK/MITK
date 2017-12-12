@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/algorithm/string.hpp>
 
 #include "mitkLogMacros.h"
-#include "ofstd.h"
+#include "dcmtk/ofstd/ofstd.h"
 
 mitk::DICOMTag
 ::DICOMTag(unsigned int group, unsigned int element)

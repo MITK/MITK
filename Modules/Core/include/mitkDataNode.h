@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseData.h"
 //#include "mitkMapper.h"
 #include "mitkDataInteractor.h"
+#include "mitkIIdentifiable.h"
+#include "mitkIPropertyOwner.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
 #define MBI_STD
@@ -63,7 +65,7 @@ namespace mitk
    * \warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
    *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
    */
-  class MITKCORE_EXPORT DataNode : public itk::DataObject
+  class MITKCORE_EXPORT DataNode : public itk::DataObject, public IIdentifiable, public IPropertyOwner
   {
   public:
     typedef mitk::Geometry3D::Pointer Geometry3DPointer;
@@ -76,13 +78,24 @@ namespace mitk
      * \brief Definition of an itk::Event that is invoked when
      * a DataInteractor is set on this DataNode.
      */
-    itkEventMacro(InteractorChangedEvent, itk::AnyEvent);
+    itkEventMacro(InteractorChangedEvent, itk::AnyEvent)
+    mitkClassMacroItkParent(DataNode, itk::DataObject)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-    mitkClassMacroItkParent(DataNode, itk::DataObject);
+    // IIdentifiable
+    virtual UIDType GetUID() const override;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    // IPropertyProvider
+    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
+    virtual std::vector<std::string> GetPropertyNames(const std::string &contextName = "", bool includeDefaultContext = false) const override;
+    virtual std::vector<std::string> GetPropertyContextNames() const override;
 
-      mitk::Mapper *GetMapper(MapperSlotId id) const;
+    // IPropertyOwner
+    virtual BaseProperty * GetNonConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
+    virtual void SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
+
+    mitk::Mapper *GetMapper(MapperSlotId id) const;
 
     /**
      * \brief Get the data object (instance of BaseData, e.g., an Image)
@@ -143,7 +156,7 @@ namespace mitk
 
     /**
      * \brief Set the property (instance of BaseProperty) with key \a propertyKey in the PropertyList
-     * of the \a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-value.
+     * of the \a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-value.
      *
      * \warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
      *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
@@ -156,9 +169,9 @@ namespace mitk
 
     /**
      * \brief Replace the property (instance of BaseProperty) with key \a propertyKey in the PropertyList
-     * of the \a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-reference.
+     * of the \a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-reference.
      *
-     * If \a renderer is \a NULL the property is set in the BaseRenderer-independent
+     * If \a renderer is \a nullptr the property is set in the BaseRenderer-independent
      * PropertyList of this DataNode.
      * \sa GetProperty
      * \sa m_PropertyList
@@ -170,7 +183,7 @@ namespace mitk
      * \brief Add the property (instance of BaseProperty) if it does
      * not exist (or always if\a overwrite is\a true)
      * with key \a propertyKey in the PropertyList
-     * of the \a renderer (if NULL, use BaseRenderer-independent
+     * of the \a renderer (if nullptr, use BaseRenderer-independent
      * PropertyList). This is set-by-value.
      *
      * For\a overwrite ==\a false the property is\em not changed
@@ -189,7 +202,7 @@ namespace mitk
 
     /**
      * \brief Get the PropertyList of the \a renderer. If \a renderer is \a
-     * NULL, the BaseRenderer-independent PropertyList of this DataNode
+     * nullptr, the BaseRenderer-independent PropertyList of this DataNode
      * is returned.
      * \sa GetProperty
      * \sa m_PropertyList
@@ -219,20 +232,23 @@ namespace mitk
      * \brief Get the property (instance of BaseProperty) with key \a propertyKey from the PropertyList
      * of the \a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
      *
-     * If \a renderer is \a NULL or the \a propertyKey cannot be found
+     * If \a renderer is \a nullptr or the \a propertyKey cannot be found
      * in the PropertyList specific to \a renderer or is disabled there, the BaseRenderer-independent
      * PropertyList of this DataNode is queried.
+     *
+     * If \a fallBackOnDataProperties is true, the data property list is queried as a last resort.
+     *
      * \sa GetPropertyList
      * \sa m_PropertyList
      * \sa m_MapOfPropertyLists
      */
-    mitk::BaseProperty *GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer = nullptr) const;
+    mitk::BaseProperty *GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer = nullptr, bool fallBackOnDataProperties = true) const;
 
     /**
      * \brief Get the property of type T with key \a propertyKey from the PropertyList
      * of the \a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
      *
-     * If \a renderer is \a NULL or the \a propertyKey cannot be found
+     * If \a renderer is \a nullptr or the \a propertyKey cannot be found
      * in the PropertyList specific to \a renderer or is disabled there, the BaseRenderer-independent
      * PropertyList of this DataNode is queried.
      * \sa GetPropertyList
@@ -252,7 +268,7 @@ namespace mitk
      * \brief Get the property of type T with key \a propertyKey from the PropertyList
      * of the \a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
      *
-     * If \a renderer is \a NULL or the \a propertyKey cannot be found
+     * If \a renderer is \a nullptr or the \a propertyKey cannot be found
      * in the PropertyList specific to \a renderer or is disabled there, the BaseRenderer-independent
      * PropertyList of this DataNode is queried.
      * \sa GetPropertyList
@@ -275,7 +291,7 @@ namespace mitk
     bool GetPropertyValue(const char *propertyKey, T &value, const mitk::BaseRenderer *renderer = nullptr) const
     {
       GenericProperty<T> *gp = dynamic_cast<GenericProperty<T> *>(GetProperty(propertyKey, renderer));
-      if (gp != NULL)
+      if (gp != nullptr)
       {
         value = gp->GetValue();
         return true;
@@ -545,6 +561,7 @@ namespace mitk
      * BaseData.
      */
     unsigned long GetDataReferenceChangedTime() const { return m_DataReferenceChangedTime.GetMTime(); }
+
   protected:
     DataNode();
 

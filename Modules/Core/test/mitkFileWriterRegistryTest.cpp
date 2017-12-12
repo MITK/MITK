@@ -227,7 +227,7 @@ int mitkFileWriterRegistryTest(int /*argc*/, char * /*argv*/ [])
 
   optionFilter.push_back("canFly");
   returned = writerRegistry->GetWriter("", "test", optionFilter);
-  MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching Writer was found");
+  MITK_TEST_CONDITION_REQUIRED(returned == nullptr, "Testing correct return of 0 value when no matching Writer was found");
 
   // Onward to test the retrieval of multiple Writers
 

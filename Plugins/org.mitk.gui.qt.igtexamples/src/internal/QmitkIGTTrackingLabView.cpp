@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkIGTTrackingLabView.h"
-#include "QmitkStdMultiWidget.h"
 
 #include <QmitkNDIConfigurationWidget.h>
 #include <QmitkFiducialRegistrationWidget.h>
@@ -57,17 +56,17 @@ const std::string QmitkIGTTrackingLabView::VIEW_ID = "org.mitk.views.igttracking
 
 QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 : QmitkAbstractView()
-,m_Source(NULL)
-,m_PermanentRegistrationFilter(NULL)
-,m_Visualizer(NULL)
-,m_VirtualView(NULL)
-,m_PSRecordingPointSet(NULL)
+,m_Source(nullptr)
+,m_PermanentRegistrationFilter(nullptr)
+,m_Visualizer(nullptr)
+,m_VirtualView(nullptr)
+,m_PSRecordingPointSet(nullptr)
 ,m_PointSetRecording(false)
 ,m_PermanentRegistration(false)
 ,m_CameraView(false)
-,m_ImageFiducialsDataNode(NULL)
-,m_TrackerFiducialsDataNode(NULL)
-,m_PermanentRegistrationSourcePoints(NULL)
+,m_ImageFiducialsDataNode(nullptr)
+,m_TrackerFiducialsDataNode(nullptr)
+,m_PermanentRegistrationSourcePoints(nullptr)
 {
 }
 
@@ -120,9 +119,9 @@ void QmitkIGTTrackingLabView::OnSetupNavigation()
 
   mitk::DataStorage* ds = this->GetDataStorage();
 
-  if(ds == NULL)
+  if(ds == nullptr)
   {
-    MITK_WARN << "IGTSurfaceTracker: Error", "can not access DataStorage. Navigation not possible";
+    MITK_WARN << "IGTSurfaceTracker: Error. Cannot access DataStorage. Navigation not possible";
     return;
   }
 
@@ -201,8 +200,6 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
   //Check for initialization
   if (!CheckRegistrationInitialization()) return;
 
-  /* retrieve fiducials from data storage */
-  mitk::DataStorage* ds = this->GetDataStorage();
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
 
@@ -301,20 +298,20 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     return;
   }
 
-  if(m_TrackerFiducialsDataNode.IsNotNull() && m_TrackerFiducialsDataNode->GetData() != NULL)
+  if(m_TrackerFiducialsDataNode.IsNotNull() && m_TrackerFiducialsDataNode->GetData() != nullptr)
   {
     mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
     ps->InsertPoint(ps->GetSize(), nd->GetPosition());
   }
   else
-    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access Tracker Fiducials. Adding fiducial not possible!");
+    QMessageBox::warning(nullptr, "IGTSurfaceTracker: Error", "Can not access Tracker Fiducials. Adding fiducial not possible!");
 }
 
 
 void QmitkIGTTrackingLabView::InitializeRegistration()
 {
   mitk::DataStorage* ds = this->GetDataStorage();
-  if( ds == NULL )
+  if( ds == nullptr )
     return;
 
   // let the registration widget know about the slice navigation controllers
@@ -446,7 +443,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     if(m_T_ImageReg.IsNotNull()) {this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageReg);}
 
     //delete filter
-    m_PermanentRegistrationFilter = NULL;
+    m_PermanentRegistrationFilter = nullptr;
     }
 }
 
@@ -464,7 +461,7 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
   {
     if (m_Controls.m_PointSetRecordingToolSelectionWidget->GetSelectedToolID() == -1)
       {
-      QMessageBox::warning(NULL, "Error", "No tool selected for point set recording!");
+      QMessageBox::warning(nullptr, "Error", "No tool selected for point set recording!");
       m_Controls.m_PointSetRecordCheckBox->setChecked(false);
       return;
       }
@@ -474,7 +471,7 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     mitk::DataNode::Pointer psRecND = ds->GetNamedNode("Recorded Points");
     if(m_PSRecordingPointSet.IsNull() || psRecND.IsNull())
     {
-      m_PSRecordingPointSet = NULL;
+      m_PSRecordingPointSet = nullptr;
       m_PSRecordingPointSet = mitk::PointSet::New();
       mitk::DataNode::Pointer dn = mitk::DataNode::New();
       dn->SetName("Recorded Points");
@@ -506,7 +503,7 @@ void QmitkIGTTrackingLabView::OnVirtualCamera(bool on)
 if (m_Controls.m_CameraViewSelection->GetSelectedToolID() == -1)
     {
     m_Controls.m_ActivateNeedleView->setChecked(false);
-    QMessageBox::warning(NULL, "Error", "No tool selected for camera view!");
+    QMessageBox::warning(nullptr, "Error", "No tool selected for camera view!");
     return;
     }
 
@@ -543,7 +540,7 @@ if(on)
   }
 else
   {
-  m_VirtualView = NULL;
+  m_VirtualView = nullptr;
   m_CameraView = false;
   m_Controls.m_CameraViewSelection->GetSelectedNavigationTool()->GetDataNode()->SetBoolProperty("visible",true);
 
@@ -568,12 +565,12 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  this->CreateBundleWidgets( parent );
+  this->CreateBundleWidgets();
   this->CreateConnections();
 }
 
 
-void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
+void QmitkIGTTrackingLabView::CreateBundleWidgets()
 {
   //initialize registration widget
   m_Controls.m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
@@ -630,11 +627,11 @@ void QmitkIGTTrackingLabView::DestroyIGTPipeline()
   {
     m_Source->StopTracking();
     m_Source->Disconnect();
-    m_Source = NULL;
+    m_Source = nullptr;
   }
-  m_PermanentRegistrationFilter = NULL;
-  m_Visualizer = NULL;
-  m_VirtualView = NULL;
+  m_PermanentRegistrationFilter = nullptr;
+  m_Visualizer = nullptr;
+  m_VirtualView = nullptr;
 }
 
 bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
@@ -649,7 +646,7 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
   {
     warningMessage = "Initialization not finished!";
     MITK_WARN << warningMessage;
-    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
+    QMessageBox::warning(nullptr, "Registration not possible", warningMessage.c_str());
     return false;
   }
   else
@@ -686,7 +683,7 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
   if(initializationErrorDetected)
   {
     MITK_WARN << warningMessage;
-    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
+    QMessageBox::warning(nullptr, "Registration not possible", warningMessage.c_str());
     return false;
   }
   //if no error was detected simply return true

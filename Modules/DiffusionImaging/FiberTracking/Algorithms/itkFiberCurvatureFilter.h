@@ -31,12 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
 
-using namespace std;
-
 namespace itk{
 
 /**
-* \brief Generates artificial fibers distributed in and interpolated between the input planar figures.   */
+* \brief    */
 
 class FiberCurvatureFilter : public ProcessObject
 {

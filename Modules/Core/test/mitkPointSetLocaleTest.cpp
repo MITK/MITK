@@ -27,7 +27,7 @@ bool ChangeLocale(const std::string &locale)
 {
   try
   {
-    MITK_TEST_OUTPUT(<< "\n** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'");
+    MITK_TEST_OUTPUT(<< "\n** Changing locale from " << setlocale(LC_ALL, nullptr) << " to '" << locale << "'");
     setlocale(LC_ALL, locale.c_str());
 
     std::locale l(locale.c_str());
@@ -47,7 +47,7 @@ void ReaderLocaleTest(mitk::Point3D &refPoint, std::string filename)
 {
   MITK_TEST_OUTPUT(<< "---- Reader Test ---- ");
 
-  mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(filename);
+  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename)[0].GetPointer());
 
   mitk::Point3D point;
   if (pointSet->GetPointIfExists(0, &point))
@@ -142,7 +142,7 @@ int mitkPointSetLocaleTest(int, char *[])
   mitk::IOUtil::Save(refPointSet, referenceFilePath);
 
   unsigned int numberOfTestedGermanLocales(0);
-  for (StringList::iterator iter = alllocales.begin(); iter != alllocales.end(); ++iter)
+  for (auto iter = alllocales.begin(); iter != alllocales.end(); ++iter)
   {
     if (ChangeLocale(*iter))
     {

@@ -98,7 +98,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   myFilter->SetPrecompose(false);
 
   output = myFilter->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
+  MITK_TEST_CONDITION_REQUIRED(output != nullptr, "Testing GetOutput()");
 
   output->Update(); // execute filter
 
@@ -157,7 +157,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   myFilter2->SetRigid3DTransform(transform2);
 
   mitk::NavigationData* output2 = myFilter2->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(output2 != NULL, "Testing GetOutput()");
+  MITK_TEST_CONDITION_REQUIRED(output2 != nullptr, "Testing GetOutput()");
 
   output2->Update(); // execute filter
 
@@ -227,7 +227,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   nd2->SetPositionAccuracy(initialError);
   nd2->SetDataValid(initialValid);
 
-  myFilter = NULL;
+  myFilter = nullptr;
   myFilter = mitk::NavigationDataTransformFilter::New();
   myFilter->SetRigid3DTransform(transform2);
   myFilter->SetInput(0, nd1);
@@ -235,12 +235,12 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION(((myFilter->GetInput(0) == nd1)
     && (myFilter->GetInput(1) == nd2)), "Testing Set-/GetInput(index, data)");
-  output = NULL;
-  output2 = NULL;
+  output = nullptr;
+  output2 = nullptr;
   output = myFilter->GetOutput();
   output2 = myFilter->GetOutput(1);
   output2->Update(); // execute filter pipeline. this should update both outputs!
-  MITK_TEST_CONDITION_REQUIRED(((output != NULL) && (output2 != NULL)), "Testing GetOutput(index)");
+  MITK_TEST_CONDITION_REQUIRED(((output != nullptr) && (output2 != nullptr)), "Testing GetOutput(index)");
 
   MITK_TEST_CONDITION(mitk::Equal(output->GetPosition(), resultPos, 0.00001), "Testing if position rotation was calculated correct [output 0]");
   MITK_TEST_CONDITION(mitk::Equal(output->GetOrientation(), resultOri, 0.00001),"Testing if orientation rotation was calculated correct [output 0]");

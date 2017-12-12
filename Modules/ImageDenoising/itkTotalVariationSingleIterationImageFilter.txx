@@ -55,8 +55,7 @@ namespace itk
  * generate requested region
  */
   template <class TInputImage, class TOutputImage>
-  void TotalVariationSingleIterationImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion() throw(
-    InvalidRequestedRegionError)
+  void TotalVariationSingleIterationImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   {
     // call the superclass' implementation of this method
     Superclass::GenerateInputRequestedRegion();
@@ -113,7 +112,7 @@ namespace itk
 
     // Find the data-set boundary "faces"
     itk::Size<InputImageDimension> size;
-    for (int i = 0; i < InputImageDimension; i++)
+    for (unsigned int i = 0; i < InputImageDimension; i++)
       size[i] = 1;
 
     NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType> bC;
@@ -151,7 +150,7 @@ namespace itk
       typename ConstShapedNeighborhoodIterator<InputImageType>::OffsetType offset;
       input_image_neighbors_it.OverrideBoundaryCondition(&nbc);
       input_image_neighbors_it.ClearActiveList();
-      for (int i = 0; i < InputImageDimension; i++)
+      for (unsigned int i = 0; i < InputImageDimension; i++)
       {
         offset.Fill(0);
         offset[i] = -1;
@@ -166,7 +165,7 @@ namespace itk
         size, m_LocalVariation, *lv_fit);
       loc_var_image_neighbors_it.OverrideBoundaryCondition(&lv_nbc);
       loc_var_image_neighbors_it.ClearActiveList();
-      for (int i = 0; i < InputImageDimension; i++)
+      for (unsigned int i = 0; i < InputImageDimension; i++)
       {
         offset.Fill(0);
         offset[i] = -1;

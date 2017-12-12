@@ -25,7 +25,6 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
 {
     m_ParticleGrid = particleGrid;
     m_RandGen = randGen;
-    //m_Image = qballImage;
     m_SphereInterpolator = interpolator;
     m_Mask = mask;
 
@@ -58,7 +57,7 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
     }
     m_RotationMatrix = directionMatrix;
 
-    if (QBALL_ODFSIZE != m_SphereInterpolator->nverts)
+    if (ODF_SAMPLING_SIZE != m_SphereInterpolator->nverts)
         fprintf(stderr,"EnergyComputer: error during init: data does not match with interpolation scheme\n");
 
     int totsz = m_Size[0]*m_Size[1]*m_Size[2];
@@ -101,8 +100,7 @@ void EnergyComputer::SetParameters(float particleWeight, float particleWidth, fl
     m_CurvatureThreshold = curvThres;
 
     float sigma_s = particleWidth;
-    gamma_s = 1/(sigma_s*sigma_s);
-    gamma_reg_s =1/(m_SquaredParticleLength/4);
+    m_SigmaInv = 1/(2*sigma_s*sigma_s);
 }
 
 // draw random position from active voxels
@@ -146,7 +144,7 @@ float EnergyComputer::SpatProb(vnl_vector_fixed<float, 3> pos)
         return 0;
 }
 
-float EnergyComputer::mbesseli0(float x)
+float EnergyComputer::CalcI0(float x)
 {
     //    BESSEL_APPROXCOEFF[0] = -0.1714;
     //    BESSEL_APPROXCOEFF[1] = 0.5332;

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 template <typename TScalarType>
 int testExpectedIndexBoundingBox(mitk::BaseGeometry *geometry, TScalarType expectedIndexBounds[6])
 {
-  mitk::BoundingBox *bb = const_cast<mitk::BoundingBox *>(geometry->GetBoundingBox());
+  auto *bb = const_cast<mitk::BoundingBox *>(geometry->GetBoundingBox());
   mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
 
   int i;
@@ -64,7 +64,6 @@ int testExpectedAxisParallelBoundingBox(mitk::BaseGeometry *geometry, TScalarTyp
 
 int testSurfaceBoundingBoxConsistency(mitk::Surface *surface, bool expectIdentityTransform)
 {
-  int result;
   std::cout << "  Testing surface contents: ";
   if ((surface == nullptr) || (surface->GetVtkPolyData() == nullptr) ||
       (surface->GetVtkPolyData()->GetNumberOfPoints() == 0))

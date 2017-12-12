@@ -90,7 +90,7 @@ protected:
     NeighborhoodFunctorImageFilter()
     {
         m_Size.Fill(0);
-        m_MaskImage = NULL;
+        m_MaskImage = nullptr;
         m_BoundsCondition = static_cast< ImageBoundaryConditionPointerType >( &m_DefaultBoundaryCondition );
         this->SetNumberOfIndexedOutputs(FunctorType::OutputCount);
     }
@@ -109,7 +109,7 @@ protected:
        * execution model.
        *
        * \sa ProcessObject::GenerateInputRequestedRegion() */
-    virtual void GenerateInputRequestedRegion() throw ( InvalidRequestedRegionError );
+    void GenerateInputRequestedRegion() override;
 
 
 private:

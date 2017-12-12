@@ -29,7 +29,7 @@ mitk::BoundingObjectToSegmentationFilter::~BoundingObjectToSegmentationFilter()
 
 void mitk::BoundingObjectToSegmentationFilter::SetBoundingObject(mitk::BoundingObject::Pointer boundingObject)
 {
-  mitk::BoundingObjectGroup *testgroup = dynamic_cast<mitk::BoundingObjectGroup *>(boundingObject.GetPointer());
+  auto *testgroup = dynamic_cast<mitk::BoundingObjectGroup *>(boundingObject.GetPointer());
   if (testgroup)
     m_boundingObjectGroup = testgroup;
   else

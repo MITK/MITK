@@ -29,11 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //for the use of abs()
 #include <cstdlib>
 
-//Better Random Function xrand (extended range)
-#define XRAND_MAX (RAND_MAX*(RAND_MAX + 2))
-unsigned int xrand (void)
+template <typename TPixel, unsigned int VImageDimension>
+mitk::RandomParcellationGenerator<TPixel, VImageDimension>::RandomParcellationGenerator()
+  : m_RandGen(ItkRngType::New())
 {
-  return rand () * (RAND_MAX + 1) + rand ();
+
 }
 
 //Definition of the Set-Functions
@@ -144,7 +144,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::SmallestValue (s
   int distancemin;
   distancemin = distance[0];
 
-  for (int i = 1; i < distance.size(); i++)
+  for (std::size_t i = 1; i < distance.size(); i++)
   {
     if (distance[i] < distancemin)
     {
@@ -160,7 +160,7 @@ double mitk::RandomParcellationGenerator<TPixel, VImageDimension>::SmallestValue
   double distancemin;
   distancemin = distance[0];
 
-  for (int i = 1; i < distance.size(); i++)
+  for (std::size_t i = 1; i < distance.size(); i++)
   {
     if (distance[i] < distancemin)
     {
@@ -205,7 +205,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::SetAppropriateV
     return;
   }
 
-  std::vector< unsigned int > histogram;
+  std::vector< std::size_t > histogram;
   histogram.resize( range + 1, 0 );
 
   for(it_image.GoToBegin(); !it_image.IsAtEnd(); ++it_image)
@@ -289,7 +289,7 @@ typename itk::Image< TPixel, VImageDimension >::RegionType mitk::RandomParcellat
   for (int i = 0; i < 3; i++)
   {
     //Overlapping (start of ChosenRegion before start of SmallestRegion)
-    if ((startChosenRegion[i] + sizeChosenRegion[i] > startSmallestRegion[i]) &&
+    if ((startChosenRegion[i] + (itk::IndexValueType)sizeChosenRegion[i] > startSmallestRegion[i]) &&
       (startChosenRegion[i] <= startSmallestRegion[i]))
     {
       //Not integrated
@@ -305,7 +305,7 @@ typename itk::Image< TPixel, VImageDimension >::RegionType mitk::RandomParcellat
     }
 
     //Overlapping (start of SmallestRegion before start of ChosenRegion)
-    if ((startSmallestRegion[i] + sizeSmallestRegion[i] > startChosenRegion[i]) &&
+    if ((startSmallestRegion[i] + (itk::IndexValueType)sizeSmallestRegion[i] > startChosenRegion[i]) &&
       (startChosenRegion[i] >= startSmallestRegion[i]))
     {
       //Not integrated
@@ -321,21 +321,21 @@ typename itk::Image< TPixel, VImageDimension >::RegionType mitk::RandomParcellat
     }
 
     //No overlapping (right next to each other)
-    if ((startChosenRegion[i] + sizeChosenRegion[i] == startSmallestRegion[i]) ||
-      (startSmallestRegion[i] + sizeSmallestRegion[i] == startChosenRegion[i]))
+    if ((startChosenRegion[i] + (itk::IndexValueType)sizeChosenRegion[i] == startSmallestRegion[i]) ||
+      (startSmallestRegion[i] + (itk::IndexValueType)sizeSmallestRegion[i] == startChosenRegion[i]))
     {
       size[i] = sizeChosenRegion[i] + sizeSmallestRegion[i];
     }
 
     //Isolated
-    if ((startChosenRegion[i] + sizeChosenRegion[i] < startSmallestRegion[i]) ||
-      (startSmallestRegion[i] + sizeSmallestRegion[i] < startChosenRegion[i]))
+    if ((startChosenRegion[i] + (itk::IndexValueType)sizeChosenRegion[i] < startSmallestRegion[i]) ||
+      (startSmallestRegion[i] + (itk::IndexValueType)sizeSmallestRegion[i] < startChosenRegion[i]))
     {
-      if(startChosenRegion[i] + sizeChosenRegion[i] < startSmallestRegion[i])
+      if(startChosenRegion[i] + (itk::IndexValueType)sizeChosenRegion[i] < startSmallestRegion[i])
       {
         size[i] = abs(startChosenRegion[i] - startSmallestRegion[i]) +1;
       }
-      if(startSmallestRegion[i] + sizeSmallestRegion[i] < startChosenRegion[i])
+      if(startSmallestRegion[i] + (itk::IndexValueType)sizeSmallestRegion[i] < startChosenRegion[i])
       {
         size[i] = abs(startChosenRegion[i] - startSmallestRegion[i]) + sizeChosenRegion[i];
       }
@@ -358,7 +358,7 @@ typename itk::Image< TPixel, VImageDimension >::RegionType mitk::RandomParcellat
 template < typename TPixel, unsigned int VImageDimension >
 bool mitk::RandomParcellationGenerator<TPixel, VImageDimension>::IsUnique (int number, std::vector<int> vec)
 {
-  for (int i = 0; i < vec.size(); i++)
+  for (std::size_t i = 0; i < vec.size(); i++)
   {
     if (vec[i] == number)
     {
@@ -387,8 +387,8 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::GetRandomSeedVo
   //for-loop to get (m_NumberNodes) randomly chosen seed-points
   for (int j = 0; j < m_NumberNodes; j++)
   {
-    //xrand() is the same as rand() but with an extended range
-    randomnumber = xrand() % numberVoxels +1;
+    //m_RandGen->GetIntegerVariate() is the same as rand() but with an extended range
+    randomnumber = m_RandGen->GetIntegerVariate() % numberVoxels +1;
 
     //Bool-function (IsUnique)
     if (this->IsUnique(randomnumber, randomvector))
@@ -417,7 +417,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::GetRandomSeedVo
   itk::ImageRegionIterator<ImageType> it_image(m_Image, m_Image->GetLargestPossibleRegion());
 
 
-  for (it_image.GoToBegin(); !it_image.IsAtEnd(), regionNumber < m_NumberNodes; ++it_image)
+  for (it_image.GoToBegin(); !it_image.IsAtEnd() && regionNumber < m_NumberNodes; ++it_image)
   {
     if (it_image.Value() >= 1)
     {
@@ -462,7 +462,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::ParcelGrowthOve
   int numberAvailableVoxels(0);
   bool validVoxelNotYetFound;
   bool checkRegionsOfOddSize(true);
-  std::vector<std::pair<RegionType,int> > * possibleRegions;
+  std::vector<std::pair<RegionType,int> > * possibleRegions = nullptr;
   int costValue;
 
 
@@ -484,7 +484,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::ParcelGrowthOve
 
     //All our smallest regions are contained in possibleRegions, choose one randomly and check whether we can expand it
 
-    thisRegion = xrand() % possibleRegions->size();
+    thisRegion = m_RandGen->GetIntegerVariate() % possibleRegions->size();
     chosenRegion = (*possibleRegions)[thisRegion];
 
     //Calculate Center of mass (COM)
@@ -528,7 +528,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::ParcelGrowthOve
         possibleNeighbor.clear();
         //Find the possible neighbors with the smallest distance to the COM of the region
 
-        for (int i = 0; i < distance.size(); i++)
+        for (std::size_t i = 0; i < distance.size(); i++)
         {
           if (distance[i] == this->SmallestValue(distance))
           {
@@ -538,7 +538,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::ParcelGrowthOve
 
         //Choose a random voxel and check if it is valid
         //Get the index of this voxel
-        thisNeighbor = xrand() % possibleNeighbor.size();
+        thisNeighbor = m_RandGen->GetIntegerVariate() % possibleNeighbor.size();
         indexChosenVoxel = indexNewVoxelVector[possibleNeighbor[thisNeighbor]];
 
         //Check if we now have to expand the region due to the possible new voxel
@@ -664,7 +664,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::FillOverEdgeOrV
         {
           if (it_neighborhood.GetPixel(k) > 2)
           {
-            for (int i = 0; i < m_InvalidRegions.size(); i++)
+            for (std::size_t i = 0; i < m_InvalidRegions.size(); i++)
             {
               if (it_neighborhood.GetPixel(k) == m_InvalidRegions[i].second)
               {
@@ -683,7 +683,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::FillOverEdgeOrV
         //Minimal distance
         if (distance.size() != 0)
         {
-          for (int i = 0; i < distance.size(); i++)
+          for (std::size_t i = 0; i < distance.size(); i++)
           {
             if (distance[i] == this->SmallestValue(distance))
             {
@@ -694,7 +694,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::FillOverEdgeOrV
 
           //Check the Size of the Regions and get the smallest one!
           //First get the regions with the same distance to COM
-          for (int i = 0; i < possibleNeighbor.size(); i++)
+          for (std::size_t i = 0; i < possibleNeighbor.size(); i++)
           {
             sizeOfPossibleRegions.push_back(m_SizeOfRegions[possibleNeighbor[i]]);
             valueOfPossibleRegions.push_back(valueOfRegions[possibleNeighbor[i]]);
@@ -703,7 +703,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::FillOverEdgeOrV
           possibleNeighbor.clear();
           indexInvalidRegions.clear();
 
-          for (int i = 0; i < sizeOfPossibleRegions.size(); i++)
+          for (std::size_t i = 0; i < sizeOfPossibleRegions.size(); i++)
           {
             if (sizeOfPossibleRegions[i] == this->SmallestValue(sizeOfPossibleRegions))
             {
@@ -712,7 +712,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::FillOverEdgeOrV
           }
           sizeOfPossibleRegions.clear();
 
-          thisNeighbor = xrand() % possibleNeighbor.size();
+          thisNeighbor = m_RandGen->GetIntegerVariate() % possibleNeighbor.size();
 
           it_neighborhood.SetCenterPixel(valueOfPossibleRegions[thisNeighbor]);
           valueOfPossibleRegions.clear();
@@ -764,7 +764,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::AllocateIsolate
     m_SizeOfRegions.clear();
 
     //Calculate all center of mass
-    for (int i = 0; i < m_InvalidRegions.size(); i++)
+    for (std::size_t i = 0; i < m_InvalidRegions.size(); i++)
     {
       valueOfRegions.push_back(m_InvalidRegions[i].second);
       itk::ImageRegionIterator<IntegerImageType> it_region(m_Image, m_InvalidRegions[i].first);
@@ -782,7 +782,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::AllocateIsolate
         indexNewVoxel = it_region.GetIndex();
 
         //distance calculation
-        for (int j = 0; j < m_InvalidRegions.size(); j++)
+        for (std::size_t j = 0; j < m_InvalidRegions.size(); j++)
         {
           distance.push_back(this->GetDistance(comOfRegions[j], indexNewVoxel));
           indexInvalidRegions.push_back(j);
@@ -792,7 +792,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::AllocateIsolate
         //Minimal distance
         if (distance.size() != 0)
         {
-          for (int i = 0; i < distance.size(); i++)
+          for (std::size_t i = 0; i < distance.size(); i++)
           {
             if (distance[i] == this->SmallestValue(distance))
             {
@@ -803,7 +803,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::AllocateIsolate
 
           //Check the Size of the Regions and get the smallest one!
           //First get the regions with the same distance to COM
-          for (int i = 0; i < possibleNeighbor.size(); i++)
+          for (std::size_t i = 0; i < possibleNeighbor.size(); i++)
           {
             sizeOfPossibleRegions.push_back(m_SizeOfRegions[possibleNeighbor[i]]);
             valueOfPossibleRegions.push_back(valueOfRegions[possibleNeighbor[i]]);
@@ -812,7 +812,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::AllocateIsolate
           possibleNeighbor.clear();
           indexInvalidRegions.clear();
 
-          for (int i = 0; i < sizeOfPossibleRegions.size(); i++)
+          for (std::size_t i = 0; i < sizeOfPossibleRegions.size(); i++)
           {
             if (sizeOfPossibleRegions[i] == this->SmallestValue(sizeOfPossibleRegions))
             {
@@ -821,7 +821,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::AllocateIsolate
           }
           sizeOfPossibleRegions.clear();
 
-          thisNeighbor = xrand() % possibleNeighbor.size();
+          thisNeighbor = m_RandGen->GetIntegerVariate() % possibleNeighbor.size();
 
           it_region.Value() = valueOfPossibleRegions[thisNeighbor];
           valueOfPossibleRegions.clear();
@@ -861,7 +861,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
 
   std::vector<int> smallRegions;
   std::vector<int> indexSmallRegions;
-  int thisIndex;
+  int thisIndex = 0;
   int thisSmallRegion;
   bool mergingStillPossible(true);
   std::vector<int> smallDistances;
@@ -888,7 +888,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
     smallestRegions.clear();
 
     //Find all small Regions
-    for (int i = 0; i < m_SizeOfRegions.size(); i++)
+    for (std::size_t i = 0; i < m_SizeOfRegions.size(); i++)
     {
       if (m_SizeOfRegions[i] < m_GivenSizeOfSmallestRegion)
       {
@@ -898,7 +898,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
     }
 
     //Find one of the smallest regions
-    for (int i = 0; i < sizeSmallRegions.size(); i++)
+    for (std::size_t i = 0; i < sizeSmallRegions.size(); i++)
     {
       if (sizeSmallRegions[i] == this->SmallestValue(sizeSmallRegions))
       {
@@ -926,7 +926,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
             && it_neighborhood.GetPixel(k) != m_InvalidRegions[smallestRegions[thisSmallRegion]].second)
           {
             hasNeighbors = true;
-            for (int i = 0; i < smallRegions.size(); i++)
+            for (std::size_t i = 0; i < smallRegions.size(); i++)
             {
               if (it_neighborhood.GetPixel(k) == m_InvalidRegions[smallRegions[i]].second) //The value belongs to a small region
               {
@@ -950,9 +950,9 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
           indexSmallRegions.clear();
 
           //Get the values of the possible regions!
-          for (int i = 0; i < valueOfPossibleRegions.size() ; i++)
+          for (std::size_t i = 0; i < valueOfPossibleRegions.size() ; i++)
           {
-            for (int j = 0; j < m_InvalidRegions.size(); j++)
+            for (std::size_t j = 0; j < m_InvalidRegions.size(); j++)
             {
               if (valueOfPossibleRegions[i] == m_InvalidRegions[j].second)
               {
@@ -971,7 +971,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
 
           distance.clear();
 
-          for (int i = 0; i < indexSmallRegions.size(); i++)
+          for (std::size_t i = 0; i < indexSmallRegions.size(); i++)
           {
             itk::ImageRegionIterator<IntegerImageType> it_region(m_Image, m_InvalidRegions[indexSmallRegions[i]].first);
             centerOfMassPossibleRegion = this->GetCenterOfMass(it_region, m_InvalidRegions[indexSmallRegions[i]].second, false);
@@ -982,7 +982,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
           if (m_MergingWithSmallestParcel && m_JustMergeSmallParcels)
           {
             //If there are small Regions with equal distance btw the COMs choose a random one
-            for (int i = 0; i < distance.size(); i++)
+            for (std::size_t i = 0; i < distance.size(); i++)
             {
               if (distance[i] == this->SmallestValue(distance))
               {
@@ -998,7 +998,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
           {
             costFunctionValue.clear();
 
-            for (int i = 0; i < indexSmallRegions.size(); i++)
+            for (std::size_t i = 0; i < indexSmallRegions.size(); i++)
             {
               if (distance[i] == 0)
               {
@@ -1010,7 +1010,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
             }
             smallestCostFunctionValues.clear();
 
-            for (int i = 0; i < indexSmallRegions.size(); i++)
+            for (std::size_t i = 0; i < indexSmallRegions.size(); i++)
             {
               if (costFunctionValue[i] == this->SmallestValue(costFunctionValue))
               {
@@ -1067,7 +1067,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
       {
         comOfRegions.clear();
         //Calculate the center of mass of all small regions
-        for (int i = 0; i < smallRegions.size(); i++)
+        for (std::size_t i = 0; i < smallRegions.size(); i++)
         {
           itk::ImageRegionIterator<IntegerImageType> it_region(m_Image, m_InvalidRegions[smallRegions[i]].first);
 
@@ -1081,7 +1081,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
 
         distance.clear();
 
-        for (int i = 0; i < smallRegions.size(); i++)
+        for (std::size_t i = 0; i < smallRegions.size(); i++)
         {
           itk::ImageRegionIterator<IntegerImageType> it_region(m_Image, m_InvalidRegions[smallRegions[i]].first);
           centerOfMassPossibleRegion = this->GetCenterOfMass(it_region, m_InvalidRegions[smallRegions[i]].second, false);
@@ -1089,7 +1089,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
         }
         smallDistances.clear();
         std::vector<double> distanceWithoutZero = distance;
-        for (int i = 0; i < distanceWithoutZero.size(); i++)
+        for (std::size_t i = 0; i < distanceWithoutZero.size(); i++)
         {
           if (distanceWithoutZero[i] == 0)
           {
@@ -1101,7 +1101,7 @@ int mitk::RandomParcellationGenerator<TPixel, VImageDimension>::MergeParcels()
         if (distanceWithoutZero.size() > 0)
         {
           //If there are small Regions with equal distance btw the COM's choose a random one
-          for (int i = 0; i < distance.size(); i++)
+          for (std::size_t i = 0; i < distance.size(); i++)
           {
             if (distance[i] == this->SmallestValue(distanceWithoutZero))
             {
@@ -1166,7 +1166,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::GetSizeOfRegion
   m_SizeOfRegions.clear();
   RegionVoxelCounter<int, VImageDimension> voxelCounter;
   voxelCounter.SetImage(m_Image);
-  for (int i = 0; i < m_InvalidRegions.size(); i++)
+  for (std::size_t i = 0; i < m_InvalidRegions.size(); i++)
   {
     voxelCounter.SetRegion(m_InvalidRegions[i].first);
     m_SizeOfRegions.push_back(voxelCounter.VoxelWithValue(m_InvalidRegions[i].second));
@@ -1179,7 +1179,7 @@ void mitk::RandomParcellationGenerator<TPixel, VImageDimension>::ShowSizeOfRegio
   RegionVoxelCounter<int, VImageDimension> voxelCounter;
   voxelCounter.SetImage(m_Image);
   std::stringstream message;
-  for (int i = 0; i < m_InvalidRegions.size(); i++)
+  for (std::size_t i = 0; i < m_InvalidRegions.size(); i++)
   {
     voxelCounter.SetRegion(m_InvalidRegions[i].first);
     m_SizeOfRegions.push_back(voxelCounter.VoxelWithValue(m_InvalidRegions[i].second));

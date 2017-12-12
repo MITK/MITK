@@ -91,7 +91,7 @@ QModelIndexList QmitkXnatTreeModel::match(
               result.append(idx);
             break;
           case Qt::MatchFixedString:
-            if (!t.compare(text, cs) == 0)
+            if (t.compare(text, cs) != 0)
               result.append(idx);
             break;
           case Qt::MatchContains:

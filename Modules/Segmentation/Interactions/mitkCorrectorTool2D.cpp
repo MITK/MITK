@@ -91,7 +91,7 @@ void mitk::CorrectorTool2D::Deactivated()
 
 void mitk::CorrectorTool2D::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -111,7 +111,7 @@ void mitk::CorrectorTool2D::OnMousePressed(StateMachineAction *, InteractionEven
 
 void mitk::CorrectorTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -130,7 +130,7 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
   // working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   // const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent)
     return;
@@ -142,12 +142,12 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
   if (!workingNode)
     return;
 
-  Image *image = dynamic_cast<Image *>(workingNode->GetData());
+  auto *image = dynamic_cast<Image *>(workingNode->GetData());
   const PlaneGeometry *planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
   if (!image || !planeGeometry)
     return;
 
-  const AbstractTransformGeometry *abstractTransformGeometry(
+  const auto *abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
   if (!image || abstractTransformGeometry)
     return;
@@ -164,8 +164,8 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
   int timestep = positionEvent->GetSender()->GetTimeStep();
   mitk::ContourModel::Pointer singleTimestepContour = mitk::ContourModel::New();
 
-  mitk::ContourModel::VertexIterator it = FeedbackContourTool::GetFeedbackContour()->Begin(timestep);
-  mitk::ContourModel::VertexIterator end = FeedbackContourTool::GetFeedbackContour()->End(timestep);
+  auto it = FeedbackContourTool::GetFeedbackContour()->Begin(timestep);
+  auto end = FeedbackContourTool::GetFeedbackContour()->End(timestep);
 
   while (it != end)
   {

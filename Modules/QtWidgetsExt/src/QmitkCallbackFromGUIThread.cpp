@@ -24,7 +24,7 @@ class QmitkCallbackEvent : public QEvent
 {
 public:
   QmitkCallbackEvent(itk::Command *cmd, itk::EventObject *e) : QEvent(QEvent::User), m_Command(cmd), m_Event(e) {}
-  ~QmitkCallbackEvent() { delete m_Event; }
+  ~QmitkCallbackEvent() override { delete m_Event; }
   itk::Command *command() { return m_Command; }
   itk::EventObject *itkevent() { return m_Event; }
 protected:

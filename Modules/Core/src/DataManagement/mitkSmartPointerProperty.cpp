@@ -129,7 +129,7 @@ std::string mitk::SmartPointerProperty::GetValueAsString() const
   if (m_SmartPointer.IsNotNull())
     return m_ReferencesUID[m_SmartPointer.GetPointer()];
   else
-    return std::string("NULL");
+    return std::string("nullptr");
 }
 
 itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const

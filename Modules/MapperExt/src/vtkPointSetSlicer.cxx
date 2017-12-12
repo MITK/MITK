@@ -45,7 +45,7 @@ vtkPointSetSlicer::vtkPointSetSlicer(vtkPlane *cf)
 {
   this->SlicePlane = cf;
   this->GenerateCutScalars = 0;
-  this->Locator = 0;
+  this->Locator = nullptr;
 
   this->Cutter = vtkCutter::New();
   this->Cutter->GenerateValues(1, 0, 1);
@@ -53,11 +53,11 @@ vtkPointSetSlicer::vtkPointSetSlicer(vtkPlane *cf)
 
 vtkPointSetSlicer::~vtkPointSetSlicer()
 {
-  this->SetSlicePlane(0);
+  this->SetSlicePlane(nullptr);
   if (this->Locator)
   {
     this->Locator->UnRegister(this);
-    this->Locator = NULL;
+    this->Locator = nullptr;
   }
 
   this->Cutter->Delete();
@@ -72,7 +72,7 @@ void vtkPointSetSlicer::SetSlicePlane(vtkPlane *plane)
   if (this->SlicePlane)
   {
     this->SlicePlane->UnRegister(this);
-    this->SlicePlane = 0;
+    this->SlicePlane = nullptr;
   }
   if (plane)
   {
@@ -85,18 +85,18 @@ void vtkPointSetSlicer::SetSlicePlane(vtkPlane *plane)
 
 // Overload standard modified time function. If cut functions is modified,
 // or contour values modified, then this object is modified as well.
-unsigned long vtkPointSetSlicer::GetMTime()
+vtkMTimeType vtkPointSetSlicer::GetMTime()
 {
-  unsigned long mTime = this->Superclass::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime = this->Superclass::GetMTime();
+  vtkMTimeType time;
 
-  if (this->SlicePlane != 0)
+  if (this->SlicePlane != nullptr)
   {
     time = this->SlicePlane->GetMTime();
     mTime = (time > mTime ? time : mTime);
   }
 
-  if (this->Locator != 0)
+  if (this->Locator != nullptr)
   {
     time = this->Locator->GetMTime();
     mTime = (time > mTime ? time : mTime);
@@ -237,7 +237,7 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
   outCD->CopyAllocate(inCD, estimatedSize, estimatedSize / 2);
 
   // locator used to merge potentially duplicate points
-  if (this->Locator == NULL)
+  if (this->Locator == nullptr)
   {
     this->CreateDefaultLocator();
   }
@@ -508,7 +508,7 @@ void vtkPointSetSlicer::SetLocator(vtkPointLocator *locator)
   if (this->Locator)
   {
     this->Locator->UnRegister(this);
-    this->Locator = 0;
+    this->Locator = nullptr;
   }
   if (locator)
   {
@@ -520,7 +520,7 @@ void vtkPointSetSlicer::SetLocator(vtkPointLocator *locator)
 
 void vtkPointSetSlicer::CreateDefaultLocator()
 {
-  if (this->Locator == 0)
+  if (this->Locator == nullptr)
   {
     this->Locator = vtkMergePoints::New();
     this->Locator->Register(this);

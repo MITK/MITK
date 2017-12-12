@@ -45,7 +45,7 @@ namespace mitk
     reader->SetFileName(fileName.c_str());
     reader->Update();
 
-    if (reader->GetOutput() != NULL)
+    if (reader->GetOutput() != nullptr)
     {
       mitk::Image::Pointer output = mitk::Image::New();
       output->Initialize(reader->GetOutput());
@@ -78,7 +78,7 @@ namespace mitk
   {
     ValidateOutputLocation();
 
-    const Image *input = dynamic_cast<const Image *>(this->GetInput());
+    const auto *input = dynamic_cast<const Image *>(this->GetInput());
 
     vtkSmartPointer<vtkStructuredPointsWriter> writer = vtkSmartPointer<vtkStructuredPointsWriter>::New();
 
@@ -91,7 +91,7 @@ namespace mitk
       writer->SetFileTypeToBinary();
     }
 
-    ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
+    ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), nullptr, input->GetVtkImageData());
     writer->SetInputData(const_cast<vtkImageData *>(vtkReadAccessor.GetVtkImageData()));
 
     if (writer->Write() == 0 || writer->GetErrorCode() != 0)
@@ -105,7 +105,7 @@ namespace mitk
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
-    const Image *input = static_cast<const Image *>(this->GetInput());
+    const auto *input = static_cast<const Image *>(this->GetInput());
     if (input->GetDimension() == 3)
       return Supported;
     else if (input->GetDimension() < 3)

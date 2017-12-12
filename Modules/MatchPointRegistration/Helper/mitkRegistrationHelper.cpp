@@ -27,7 +27,7 @@ namespace mitk
   MITKRegistrationHelper::
   getAffineMatrix(const mitk::MAPRegistrationWrapper* wrapper, bool inverseKernel)
   {
-    Affine3DTransformType::Pointer result = NULL;
+    Affine3DTransformType::Pointer result = nullptr;
 
     if (wrapper)
       {
@@ -40,7 +40,7 @@ namespace mitk
   MITKRegistrationHelper::
   getAffineMatrix(const RegistrationBaseType* registration, bool inverseKernel)
   {
-    Affine3DTransformType::Pointer result = NULL;
+    Affine3DTransformType::Pointer result = nullptr;
 
     if (registration && is3D(registration))
       {
@@ -63,7 +63,7 @@ namespace mitk
 
   MITKRegistrationHelper::Affine3DTransformType::Pointer MITKRegistrationHelper::getAffineMatrix(const RegistrationKernel3DBase& kernel)
   {
-    Affine3DTransformType::Pointer result = NULL;
+    Affine3DTransformType::Pointer result = nullptr;
 
     typedef ::map::core::RegistrationKernel<3,3> KernelType;
 
@@ -128,7 +128,7 @@ namespace mitk
 
     mitk::BaseData* data = node->GetData();
 
-    if (data != NULL)
+    if (data != nullptr)
     {
       return std::string("MAPRegistrationWrapper").compare(data->GetNameOfClass()) == 0;
     }

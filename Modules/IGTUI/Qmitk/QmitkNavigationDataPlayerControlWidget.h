@@ -45,7 +45,7 @@ protected slots:
 
 public:
   explicit QmitkNavigationDataPlayerControlWidget(QWidget *parent = 0);
-  ~QmitkNavigationDataPlayerControlWidget();
+  ~QmitkNavigationDataPlayerControlWidget() override;
 
   void SetPlayer(mitk::NavigationDataPlayer::Pointer player);
 

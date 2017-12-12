@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::CompositeMapper::CompositeMapper()
 {
-  m_OdfMapper = mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::New();
+  m_OdfMapper = mitk::OdfVtkMapper2D<float,ODF_SAMPLING_SIZE>::New();
   m_ImgMapper = mitk::CopyImageMapper2D::New();
 }
 

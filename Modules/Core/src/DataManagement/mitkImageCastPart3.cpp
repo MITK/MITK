@@ -84,7 +84,7 @@ namespace mitk
   // CAST_HUNDRED_VECS(300)
 
   // allow for fixed-size vectors of specific length
-  // (inspired by itkPointshell.cpp, precompiled q-ball configs)
+  // (inspired by itkPointshell.cpp, precompiled ODF configs)
 
   // CAST_TEN_VECS(0)
   // CAST_N_VEC(11)

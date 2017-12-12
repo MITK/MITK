@@ -34,11 +34,11 @@ class QmitkFileWriterOptionsDialog : public QDialog
 
 public:
   explicit QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInfo &saveInfo, QWidget *parent = 0);
-  ~QmitkFileWriterOptionsDialog();
+  ~QmitkFileWriterOptionsDialog() override;
 
   bool ReuseOptions() const;
 
-  virtual void accept() override;
+  void accept() override;
 
 private:
   Ui::QmitkFileWriterOptionsDialog *ui;

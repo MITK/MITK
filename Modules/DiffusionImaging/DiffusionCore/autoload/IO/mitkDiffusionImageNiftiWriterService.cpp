@@ -54,7 +54,7 @@ void mitk::DiffusionImageNiftiWriterService::Write()
 
   if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to DiffusionImageNiftiWriterService is NULL!";
+    MITK_ERROR <<"Sorry, input to DiffusionImageNiftiWriterService is nullptr!";
     return;
   }
   if ( this->GetOutputLocation().empty() )
@@ -106,159 +106,13 @@ void mitk::DiffusionImageNiftiWriterService::Write()
   std::string ext = this->GetMimeType()->GetExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
 
-  // default extension is .nii
+  // default extension is .nii.gz
   if( ext == "")
   {
-    ext = ".nii";
+    ext = ".nii.gz";
     this->SetOutputLocation(this->GetOutputLocation() + ext);
   }
-  if (ext == ".fsl" || ext == ".fslgz")
-  {
-    MITK_INFO << "Writing Nifti-Image for FSL";
-
-    typedef itk::Image<short,4> ImageType4D;
-    ImageType4D::Pointer img4 = ImageType4D::New();
-
-    ImageType::SpacingType spacing = itkImg->GetSpacing();
-    ImageType4D::SpacingType spacing4;
-    for(int i=0; i<3; i++)
-      spacing4[i] = spacing[i];
-    spacing4[3] = 1;
-    img4->SetSpacing( spacing4 );   // Set the image spacing
-
-    ImageType::PointType origin = itkImg->GetOrigin();
-    ImageType4D::PointType origin4;
-    for(int i=0; i<3; i++)
-      origin4[i] = origin[i];
-    origin4[3] = 0;
-    img4->SetOrigin( origin4 );     // Set the image origin
-
-    ImageType::DirectionType direction = itkImg->GetDirection();
-    ImageType4D::DirectionType direction4;
-    for(int i=0; i<3; i++)
-      for(int j=0; j<3; j++)
-        direction4[i][j] = direction[i][j];
-    for(int i=0; i<4; i++)
-      direction4[i][3] = 0;
-    for(int i=0; i<4; i++)
-      direction4[3][i] = 0;
-    direction4[3][3] = 1;
-    img4->SetDirection( direction4 );  // Set the image direction
-
-    ImageType::RegionType region = itkImg->GetLargestPossibleRegion();
-    ImageType4D::RegionType region4;
-
-    ImageType::RegionType::SizeType size = region.GetSize();
-    ImageType4D::RegionType::SizeType size4;
-
-    for(int i=0; i<3; i++)
-      size4[i] = size[i];
-    size4[3] = itkImg->GetVectorLength();
-
-    ImageType::RegionType::IndexType index = region.GetIndex();
-    ImageType4D::RegionType::IndexType index4;
-    for(int i=0; i<3; i++)
-      index4[i] = index[i];
-    index4[3] = 0;
-
-    region4.SetSize(size4);
-    region4.SetIndex(index4);
-    img4->SetRegions( region4 );
-
-    img4->Allocate();
-
-    itk::ImageRegionIterator<ImageType>   it (itkImg, itkImg->GetLargestPossibleRegion() );
-    typedef ImageType::PixelType VecPixType;
-
-    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
-    {
-      VecPixType vec = it.Get();
-      ImageType::IndexType currentIndex = it.GetIndex();
-      for(unsigned int ind=0; ind<vec.Size(); ind++)
-      {
-
-        for(int i=0; i<3; i++)
-          index4[i] = currentIndex[i];
-        index4[3] = ind;
-        img4->SetPixel(index4, vec[ind]);
-      }
-    }
-
-    // create copy of file with correct ending for mitk
-    std::string fname3 = this->GetOutputLocation();
-    std::string::iterator itend = fname3.end();
-    if (ext == ".fsl")
-      fname3.replace( itend-3, itend, "nii");
-    else
-      fname3.replace( itend-5, itend, "nii.gz");
-
-    itk::NiftiImageIO::Pointer io4 = itk::NiftiImageIO::New();
-
-    typedef itk::ImageFileWriter<ImageType4D> WriterType4;
-    WriterType4::Pointer nrrdWriter4 = WriterType4::New();
-    nrrdWriter4->UseInputMetaDataDictionaryOn();
-    nrrdWriter4->SetInput( img4 );
-    nrrdWriter4->SetFileName(fname3);
-    nrrdWriter4->UseCompressionOn();
-    nrrdWriter4->SetImageIO(io4);
-    try
-    {
-      nrrdWriter4->Update();
-    }
-    catch (itk::ExceptionObject e)
-    {
-      std::cout << e << std::endl;
-      throw;
-    }
-
-    itksys::SystemTools::CopyAFile(fname3.c_str(), this->GetOutputLocation().c_str());
-
-    if(mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size())
-    {
-      std::ofstream myfile;
-      std::string fname = this->GetOutputLocation();
-      fname += ".bvals";
-      myfile.open (fname.c_str());
-      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
-      {
-        double twonorm = mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).two_norm();
-        myfile << mitk::DiffusionPropertyHelper::GetReferenceBValue(input)*twonorm*twonorm << " ";
-      }
-      myfile.close();
-
-      std::ofstream myfile2;
-      std::string fname2 = this->GetOutputLocation();
-      fname2 += ".bvecs";
-      myfile2.open (fname2.c_str());
-      for(int j=0; j<3; j++)
-      {
-        for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
-        {
-          //need to modify the length
-          GradientDirectionContainerType::Pointer grads = mitk::DiffusionPropertyHelper::GetGradientContainer(input);
-          GradientDirectionType direction = grads->ElementAt(i);
-          direction.normalize();
-          myfile2 << direction.get(j) << " ";
-          //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
-        }
-        myfile2 << std::endl;
-      }
-
-      std::ofstream myfile3;
-      std::string fname4 = this->GetOutputLocation();
-      fname4 += ".ttk";
-      myfile3.open (fname4.c_str());
-      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
-      {
-        for(int j=0; j<3; j++)
-        {
-          myfile3 << mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(j) << " ";
-        }
-        myfile3 << std::endl;
-      }
-    }
-  }
-  else if (ext == ".nii" || ext == ".nii.gz")
+  if (ext == ".nii" || ext == ".nii.gz")
   {
     MITK_INFO << "Writing Nifti-Image";
 
@@ -349,9 +203,49 @@ void mitk::DiffusionImageNiftiWriterService::Write()
       throw;
     }
 
-
-    if(mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size())
+    if(mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->Size())
     {
+      MITK_INFO << "Saving original gradient directions";
+      std::ofstream myfile;
+
+      std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetOutputLocation());
+      std::string fname = this->GetMimeType()->GetFilenameWithoutExtension(this->GetOutputLocation());
+      MITK_INFO << this->GetOutputLocation();
+      if (!base_path.empty())
+          fname = base_path + "/" + fname;
+
+      fname += ".bvals";
+      myfile.open (fname.c_str());
+      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->Size(); i++)
+      {
+        double twonorm = mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->ElementAt(i).two_norm();
+        myfile << mitk::DiffusionPropertyHelper::GetReferenceBValue(input)*twonorm*twonorm << " ";
+      }
+      myfile.close();
+
+      std::ofstream myfile2;
+      std::string fname2 = this->GetMimeType()->GetFilenameWithoutExtension(this->GetOutputLocation());
+      if (!base_path.empty())
+          fname2 = base_path + "/" + fname2;
+      fname2 += ".bvecs";
+      myfile2.open (fname2.c_str());
+      for(int j=0; j<3; j++)
+      {
+        for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->Size(); i++)
+        {
+          //need to modify the length
+          GradientDirectionContainerType::Pointer grads = mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input);
+          GradientDirectionType direction = grads->ElementAt(i);
+          direction.normalize();
+          myfile2 << direction.get(j) << " ";
+          //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
+        }
+        myfile2 << std::endl;
+      }
+    }
+    else if(mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size())
+    {
+      MITK_INFO << "Original gradient directions not found. Saving modified gradient directions";
       std::ofstream myfile;
       std::string fname = itksys::SystemTools::GetFilenamePath( this->GetOutputLocation() ) + "/"
         + this->GetMimeType()->GetFilenameWithoutExtension( this->GetOutputLocation() );
@@ -381,20 +275,6 @@ void mitk::DiffusionImageNiftiWriterService::Write()
           //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
         }
         myfile2 << std::endl;
-      }
-
-      std::ofstream myfile3;
-      std::string fname4 = itksys::SystemTools::GetFilenamePath( this->GetOutputLocation() ) + "/"
-        + this->GetMimeType()->GetFilenameWithoutExtension( this->GetOutputLocation() );
-      fname4 += ".ttk";
-      myfile3.open (fname4.c_str());
-      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
-      {
-        for(int j=0; j<3; j++)
-        {
-          myfile3 << mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(j) << " ";
-        }
-        myfile3 << std::endl;
       }
     }
   }

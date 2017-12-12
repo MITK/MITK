@@ -46,7 +46,7 @@ namespace mitk
 
   protected:
     CreateUnstructuredGridWriter() {}
-    ~CreateUnstructuredGridWriter() {}
+    ~CreateUnstructuredGridWriter() override {}
   private:
     CreateUnstructuredGridWriter(const Self &); // purposely not implemented
     void operator=(const Self &);               // purposely not implemented

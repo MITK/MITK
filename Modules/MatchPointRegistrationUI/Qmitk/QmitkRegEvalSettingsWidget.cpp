@@ -71,7 +71,7 @@ void QmitkRegEvalSettingsWidget::ConfigureControls()
 
   if (this->m_selectedEvalNode.IsNotNull())
   {
-    mitk::RegEvalStyleProperty *evalProp = NULL;
+    mitk::RegEvalStyleProperty *evalProp = nullptr;
 
     if (this->m_selectedEvalNode->GetProperty(evalProp, mitk::nodeProp_RegEvalStyle))
     {

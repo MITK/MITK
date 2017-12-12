@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkImageDataItem.h"
-#include "mitkLegacyAdaptors.h"
 
 #include <mitkContourModelUtils.h>
 
@@ -38,7 +37,7 @@ mitk::CorrectorAlgorithm::~CorrectorAlgorithm()
 
 template <typename TPixel, unsigned int VDimensions>
 void ConvertBackToCorrectPixelType(
-  itk::Image<TPixel, VDimensions> *reference,
+  itk::Image<TPixel, VDimensions> *,
   mitk::Image::Pointer target,
   itk::Image<mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2>::Pointer segmentationPixelTypeImage)
 {
@@ -71,7 +70,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   // copy the input (since m_WorkingImage will be changed later)
   m_WorkingImage = inputImage;
 
-  TimeGeometry::Pointer originalGeometry = NULL;
+  TimeGeometry::Pointer originalGeometry = nullptr;
 
   if (inputImage->GetTimeGeometry())
   {
@@ -167,15 +166,11 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(
   ContourModel::Pointer projectedContour =
     mitk::ContourModelUtils::ProjectContourTo2DSlice(m_WorkingImage, m_Contour, true, false);
 
-  bool firstPointIsFillingColor = false;
-
   if (projectedContour.IsNull() || projectedContour->GetNumberOfVertices() < 2)
-  {
     return false;
-  }
 
   // Read the first point of the contour
-  ContourModel::VertexIterator contourIter = projectedContour->Begin();
+  auto contourIter = projectedContour->Begin();
   if (contourIter == projectedContour->End())
     return false;
   itk::Index<2> previousIndex;
@@ -184,12 +179,11 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(
   ++contourIter;
 
   int currentColor = (pic->GetPixel(previousIndex) == m_FillColor);
-  firstPointIsFillingColor = currentColor;
   TSegData currentSegment;
   int countOfSegments = 1;
 
   bool firstSegment = true;
-  ContourModel::VertexIterator contourEnd = projectedContour->End();
+  auto contourEnd = projectedContour->End();
   for (; contourIter != contourEnd; ++contourIter)
   {
     // Get current point
@@ -304,7 +298,6 @@ std::vector<itk::Index<2>> mitk::CorrectorAlgorithm::FindSeedPoints(
   const mitk::CorrectorAlgorithm::TSegData &segment,
   itk::Image<mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2>::Pointer pic)
 {
-  typedef itk::Image<mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2> ItkImageType;
   typedef itk::Image<mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2>::Pointer ItkImagePointerType;
 
   std::vector<itk::Index<2>> seedPoints;

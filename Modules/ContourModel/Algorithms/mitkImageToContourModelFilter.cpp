@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConstantPadImageFilter.h>
 #include <itkContourExtractor2DImageFilter.h>
 
+
 mitk::ImageToContourModelFilter::ImageToContourModelFilter() : m_SliceGeometry(nullptr), m_ContourValue(0.5)
 {
 }

@@ -54,12 +54,12 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/segmentation.png
+  resources/segmentation.svg
   resources/deformablePlane.png
   resources/clipping_plane_translate_48x48.png
   resources/clipping_plane_rotate48x48.png
   resources/clipping_plane_deform48x48.png
-  resources/SegmentationUtilities_48x48.png
+  resources/segmentation_utilities.svg
   plugin.xml
 )
 

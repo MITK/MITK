@@ -42,7 +42,7 @@ mitk::MRNormLinearStatisticBasedFilter::~MRNormLinearStatisticBasedFilter()
 void mitk::MRNormLinearStatisticBasedFilter::SetMask( const mitk::Image* mask )
 {
   // Process object is not const-correct so the const_cast is required here
-  Image* nonconstMask = const_cast< mitk::Image * >( mask );
+  auto* nonconstMask = const_cast< mitk::Image * >( mask );
   this->SetNthInput(1, nonconstMask );
 }
 
@@ -55,7 +55,7 @@ void mitk::MRNormLinearStatisticBasedFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
+  auto* input = const_cast< mitk::Image * > ( this->GetInput() );
 
   input->SetRequestedRegionToLargestPossibleRegion();
 }

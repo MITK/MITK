@@ -72,7 +72,7 @@ struct ModuleSettingsPrivate : public MultiThreaded<>
     autoLoadPaths.insert(ModuleSettings::CURRENT_MODULE_PATH());
 
     char* envPaths = getenv("US_AUTOLOAD_PATHS");
-    if (envPaths != NULL)
+    if (envPaths != nullptr)
     {
       std::stringstream ss(envPaths);
       std::string envPath;

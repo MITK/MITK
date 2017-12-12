@@ -24,7 +24,10 @@ namespace
 {
   struct cmp
   {
-    bool operator()(mitk::DataInteractor *d1, mitk::DataInteractor *d2) { return (d1->GetLayer() > d2->GetLayer()); }
+    bool operator()(mitk::WeakPointer<mitk::DataInteractor> d1, mitk::WeakPointer<mitk::DataInteractor> d2)
+    {
+      return (d1.Lock()->GetLayer() > d2.Lock()->GetLayer());
+    }
   };
 }
 
@@ -72,9 +75,9 @@ void mitk::Dispatcher::AddDataInteractor(const DataNode *dataNode)
 
 void mitk::Dispatcher::RemoveDataInteractor(const DataNode *dataNode)
 {
-  for (ListInteractorType::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
+  for (auto it = m_Interactors.begin(); it != m_Interactors.end();)
   {
-    if ((*it).IsNull() || (*it)->GetDataNode() == nullptr || (*it)->GetDataNode() == dataNode)
+    if ((*it).IsExpired() || (*it).Lock()->GetDataNode() == nullptr || (*it).Lock()->GetDataNode() == dataNode)
     {
       it = m_Interactors.erase(it);
     }
@@ -103,7 +106,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
   InteractionEvent::Pointer p = event;
   bool eventIsHandled = false;
   /* Filter out and handle Internal Events separately */
-  InternalEvent *internalEvent = dynamic_cast<InternalEvent *>(event);
+  auto *internalEvent = dynamic_cast<InternalEvent *>(event);
   if (internalEvent != nullptr)
   {
     eventIsHandled = HandleInternalEvent(internalEvent);
@@ -121,31 +124,31 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
       {
         m_ProcessingMode = REGULAR;
 
-        if (m_SelectedInteractor.IsNotNull())
-          eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
+        if (!m_SelectedInteractor.IsExpired())
+          eventIsHandled = m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode());
 
         m_SelectedInteractor = nullptr;
       }
       // give event to selected interactor
-      if (eventIsHandled == false && m_SelectedInteractor.IsNotNull())
-        eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
+      if (eventIsHandled == false && !m_SelectedInteractor.IsExpired())
+        eventIsHandled = m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode());
 
       break;
 
     case GRABINPUT:
-      if (m_SelectedInteractor.IsNotNull())
+      if (!m_SelectedInteractor.IsExpired())
       {
-        eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
-        SetEventProcessingMode(m_SelectedInteractor);
+        eventIsHandled = m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode());
+        SetEventProcessingMode(m_SelectedInteractor.Lock());
       }
 
       break;
 
     case PREFERINPUT:
-      if (m_SelectedInteractor.IsNotNull() &&
-          m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode()) == true)
+      if (!m_SelectedInteractor.IsExpired() &&
+          m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode()) == true)
       {
-        SetEventProcessingMode(m_SelectedInteractor);
+        SetEventProcessingMode(m_SelectedInteractor.Lock());
         eventIsHandled = true;
       }
 
@@ -168,14 +171,14 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
     ListInteractorType::const_iterator it;
     for (it = tmpInteractorList.cbegin(); it != tmpInteractorList.cend(); ++it)
     {
-      if ((*it).IsNotNull() && (*it)->HandleEvent(event, (*it)->GetDataNode()))
+      if (!(*it).IsExpired() && (*it).Lock()->HandleEvent(event, (*it).Lock()->GetDataNode()))
       {
         // Interactor can be deleted during HandleEvent(), so check it again
-        if ((*it).IsNotNull())
+        if (!(*it).IsExpired())
         {
           // if an event is handled several properties are checked, in order to determine the processing mode of the
           // dispatcher
-          SetEventProcessingMode(*it);
+          SetEventProcessingMode((*it).Lock());
         }
         if (std::strcmp(p->GetNameOfClass(), "MousePressEvent") == 0 && m_ProcessingMode == REGULAR)
         {
@@ -191,7 +194,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
   /* Notify InteractionEventObserver  */
   const std::vector<us::ServiceReference<InteractionEventObserver>> listEventObserver =
     m_EventObserverTracker->GetServiceReferences();
-  for (std::vector<us::ServiceReference<InteractionEventObserver>>::const_iterator it = listEventObserver.cbegin();
+  for (auto it = listEventObserver.cbegin();
        it != listEventObserver.cend();
        ++it)
   {
@@ -221,15 +224,15 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
  */
 void mitk::Dispatcher::RemoveOrphanedInteractors()
 {
-  for (ListInteractorType::iterator it = m_Interactors.begin(); it != m_Interactors.end();)
+  for (auto it = m_Interactors.begin(); it != m_Interactors.end();)
   {
-    if ((*it).IsNull())
+    if ((*it).IsExpired())
     {
       it = m_Interactors.erase(it);
     }
     else
     {
-      DataNode::Pointer node = (*it)->GetDataNode();
+      DataNode::Pointer node = (*it).Lock()->GetDataNode();
 
       if (node.IsNull())
       {
@@ -239,7 +242,7 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
       {
         DataInteractor::Pointer interactor = node->GetDataInteractor();
 
-        if (interactor != it->GetPointer())
+        if (interactor != it->Lock().GetPointer())
         {
           it = m_Interactors.erase(it);
         }

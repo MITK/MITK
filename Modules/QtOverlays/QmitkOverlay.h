@@ -76,7 +76,7 @@ public:
   /**
   * @brief Default Destructor
   **/
-  virtual ~QmitkOverlay();
+  ~QmitkOverlay() override;
 
   /** \brief setter for the display-position  */
   virtual void SetPosition(DisplayPosition);

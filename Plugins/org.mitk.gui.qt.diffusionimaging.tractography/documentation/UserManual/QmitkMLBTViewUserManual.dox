@@ -1,0 +1,22 @@
+/**
+\page org_mitk_views_mlbtview Machine Learning Based Streamline Tractography
+
+This view provides a user interface to train random-forest classifiers used for machine learning based tractography tractography [1]. The corresponding command line application is named "MitkRfTraining".
+Tractography with the trained classifier can be performed using the "Streamline Tractography View".
+
+\section MlbstUserManualTraining Training
+
+Parameters:
+
+\li Num. Trees: Number of trees that constitute the random forest. The default of 30 works well for most cases.
+\li Max. Depth: Maximum tree depth.
+\li Sample Fraction: Fraction of randomly drawn samples used to train each tree.
+\li Non-WM Sampling Points: Number of randomly placed sampling points in each non-white-matter voxel. These sampling points are needed to train the classifier for non-fiber tissue.
+\li Fiber Sampling: The fibers are resampled equidistantly. This influences the number of white-matter sampling ponts. Defaul is 0.5*min. voxel size.
+
+
+\section MlbstUserManualReferences References
+
+[1] Neher, Peter F., Marc-Alexandre Côté, Jean-Christophe Houde, Maxime Descoteaux, and Klaus H. Maier-Hein. “Fiber Tractography Using Machine Learning.” NeuroImage. Accessed July 17, 2017. doi:10.1016/j.neuroimage.2017.07.028.
+
+*/

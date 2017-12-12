@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 
 class QDialog;
-class QmitkStdMultiWidget;
 
 /** \deprecatedSince{2013_09} The interaction for the Otsu image filter was revised and moved to the segmentation plugin view. */
 class DEPRECATED() MITK_QT_SEGMENTATION QmitkOtsuAction : public QObject, public mitk::IContextMenuAction
@@ -46,7 +45,7 @@ public:
   // IContextMenuAction
   void Run(const QList<mitk::DataNode::Pointer> &selectedNodes);
   void SetDataStorage(mitk::DataStorage *dataStorage);
-  void SetFunctionality(berry::QtViewPart *functionality);
+  void SetFunctionality(berry::QtViewPart* view);
   void SetSmoothed(bool smoothed){}
   void SetDecimated(bool decimated){}
 

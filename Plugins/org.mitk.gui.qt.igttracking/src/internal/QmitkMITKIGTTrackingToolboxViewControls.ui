@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>370</width>
-    <height>1009</height>
+    <height>723</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -572,6 +572,56 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Open IGT Link</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <widget class="QCheckBox" name="m_EnableOpenIGTLinkMicroService">
+            <property name="text">
+             <string>Enable Open IGT Link MicroService</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Select Open IGT Link Data Format:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="m_OpenIGTLinkDataFormat">
+            <item>
+             <property name="text">
+              <string>TRANSFORM</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>QTDATA</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>TDATA</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>POSITION</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="m_OtherOptionsGroupBox">
          <property name="title">
           <string>Other Options</string>
@@ -585,12 +635,9 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="m_EnableOpenIGTLinkMicroService">
+           <widget class="QCheckBox" name="m_simpleUI">
             <property name="text">
-             <string>Enable Open IGT Link MicroService</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Simple UI</string>
             </property>
            </widget>
           </item>
@@ -707,6 +754,13 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="m_SkipInvalidData">
+         <property name="text">
+          <string>Skip invalid data</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string>Logging Status</string>
@@ -776,6 +830,83 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="m_simpleWidget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_25">
+        <item>
+         <widget class="QPushButton" name="m_ConnectSimpleMode">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Connect</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_StartTrackingSimpleMode">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Start
+Tracking</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_21">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_advancedUI">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Advanced
+Mode</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

@@ -63,7 +63,7 @@ namespace mitk
     //## of source objects, that were used to create this object. The new object will have
     //## a 'was created from' relation to its source objects.
     //## the addition of a new object will fire the notification mechanism.
-    //## If the node parameter is NULL or if the DataNode has already been added,
+    //## If the node parameter is nullptr or if the DataNode has already been added,
     //## an exception will be thrown.
     virtual void Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents = nullptr) = 0;
 
@@ -158,10 +158,10 @@ namespace mitk
     DataType *GetNamedObject(const char *name) const
     {
       if (name == nullptr)
-        return NULL;
+        return nullptr;
       mitk::DataNode *n = this->GetNamedNode(name);
       if (n == nullptr)
-        return NULL;
+        return nullptr;
       else
         return dynamic_cast<DataType *>(n->GetData());
     }
@@ -184,10 +184,10 @@ namespace mitk
                                     bool onlyDirectDerivations = true) const
     {
       if (name == nullptr)
-        return NULL;
+        return nullptr;
       mitk::DataNode *n = this->GetNamedDerivedNode(name, sourceNode, onlyDirectDerivations);
       if (n == nullptr)
-        return NULL;
+        return nullptr;
       else
         return dynamic_cast<DataType *>(n->GetData());
     }
@@ -272,7 +272,7 @@ namespace mitk
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the input objects
     //##
-    //## Throws std::invalid_argument exception if input is NULL
+    //## Throws std::invalid_argument exception if input is nullptr
     //## @param input set of objects of the DataStorage to be included in the bounding geometry
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.

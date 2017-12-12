@@ -3,13 +3,10 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <category
-      id="org.mitk.views.general"
-      name="MITK General"/>
     <view id="org.mitk.views.measurement"
           name="Measurement"
           category="Quantification"
-          icon="resources/measurement.png"
+          icon="resources/measurement.svg"
           class="QmitkMeasurementView" >
       <description>Measure distance and areas in the image</description>
       <keywordReference id="org.mitk.views.measurement.Keyword"/>
@@ -21,7 +18,7 @@
           name="Statistics"
           category="Quantification"
           class="QmitkImageStatisticsView"
-          icon="resources/ImageStatistic_24.png" >
+          icon="resources/bar-chart.svg" >
       <description>Calculate the statistic of image regions</description>
       <keywordReference id="org.mitk.views.imagestatistics.Keyword"/>
     </view>
@@ -34,12 +31,12 @@
     <keyword label="Line" id="org.mitk.views.measurement.Keyword"/>
     <keyword label="Length" id="org.mitk.views.measurement.Keyword"/>
     <keyword label="Area" id="org.mitk.views.measurement.Keyword"/>
-    
+
     <keyword label="Mean" id="org.mitk.views.imagestatistics.Keyword"/>
     <keyword label="Statistic" id="org.mitk.views.imagestatistics.Keyword"/>
     <keyword label="Grey Value" id="org.mitk.views.imagestatistics.Keyword"/>
     <keyword label="Variance" id="org.mitk.views.imagestatistics.Keyword"/>
     <keyword label="Std Dev" id="org.mitk.views.imagestatistics.Keyword"/>
-  </extension>  
-  
+  </extension>
+
 </plugin>

@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QProgressDialog>
 #include "QVTKWidget.h"
 #include "QmitkRegisterClasses.h"
+#include <QList>
 
 #include "itkCommand.h"
 #include <itkImage.h>
@@ -47,8 +48,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_ImageCropperControls.h"
 
 #include "usServiceRegistration.h"
-
-
 
 /*!
 @brief QmitkImageCropperView
@@ -76,6 +75,8 @@ public:
   static const std::string VIEW_ID;
 
   virtual void CreateQtPartControl(QWidget *parent);
+
+  virtual void SetFocus() override;
 
   /*!
   @brief Creates the Qt connections needed
@@ -112,11 +113,14 @@ public:
 
 protected:
 
-  virtual void SetFocus();
   /*!
  @brief called by QmitkFunctionality when DataManager's selection has changed
   */
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  /*!
+  @brief called by QmitkFunctionality when DataNode is removed from DataManager
+  */
+  void NodeRemoved(const mitk::DataNode* node) override;
   /*!
   @brief Sets the selected bounding object as current bounding object and set up interactor
   */
@@ -129,6 +133,7 @@ protected:
   void CreateBoundingShapeInteractor(bool rotationEnabled);
 
 private:
+
   /*!
   * The parent QWidget
   */
@@ -154,6 +159,15 @@ private:
 
   void ProcessImage(bool crop);
 
+  QList<QString> m_BoundingObjectNames;
+
+  /*!
+  * @brief Resets GUI to default
+  */
+  void setDefaultGUI();
+
+  QString getAdaptedBoundingObjectName(const QString& name) const;
+
   // cropping parameter
   mitk::ScalarType m_CropOutsideValue;
   bool m_Advanced;
@@ -162,6 +176,5 @@ private:
 
   Ui::ImageCropperControls m_Controls;
 };
-
 
 #endif // QmitkImageCropper_h

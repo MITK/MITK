@@ -45,8 +45,8 @@ class MITKQTWIDGETS_EXPORT QmitkPropertyItemModel : public QAbstractItemModel
   Q_OBJECT
 
 public:
-  explicit QmitkPropertyItemModel(QObject *parent = NULL);
-  ~QmitkPropertyItemModel();
+  explicit QmitkPropertyItemModel(QObject *parent = nullptr);
+  ~QmitkPropertyItemModel() override;
 
   int columnCount(const QModelIndex &parent = QModelIndex()) const override;
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -68,10 +68,10 @@ public:
 private:
   void CreateRootItem();
   QModelIndex FindProperty(const mitk::BaseProperty *property);
-  void OnPropertyDeleted(const itk::Object *property, const itk::EventObject &event);
-  void OnPropertyListDeleted(const itk::Object *propertyList);
+  void OnPropertyListModified();
+  void OnPropertyListDeleted();
   void OnPropertyModified(const itk::Object *property, const itk::EventObject &event);
-  void SetNewPropertyList(mitk::PropertyList *propertyList);
+  void SetNewPropertyList(mitk::PropertyList *newPropertyList);
 
   bool m_ShowAliases;
   bool m_FilterProperties;
@@ -82,6 +82,8 @@ private:
   std::unique_ptr<QmitkPropertyItem> m_RootItem;
   std::map<std::string, unsigned long> m_PropertyDeletedTags;
   std::map<std::string, unsigned long> m_PropertyModifiedTags;
+  unsigned long m_PropertyListDeletedTag;
+  unsigned long m_PropertyListModifiedTag;
 };
 
 #endif

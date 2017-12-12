@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkRTUIExports.h"
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable:4251)
+#endif
+
 namespace mitk
 {
 struct MITKRTUI_EXPORT RTUIConstants
@@ -80,5 +85,9 @@ struct MITKRTUI_EXPORT RTCTKEventConstants
 };
 
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #endif

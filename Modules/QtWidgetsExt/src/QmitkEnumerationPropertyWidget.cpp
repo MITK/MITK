@@ -30,7 +30,7 @@ public:
   {
   }
 
-  ~_EnumPropEditorImpl() { m_EnumerationProperty = nullptr; }
+  ~_EnumPropEditorImpl() override { m_EnumerationProperty = nullptr; }
   void IndexChanged(int enumId)
   {
     this->BeginModifyProperty();
@@ -38,7 +38,7 @@ public:
     this->EndModifyProperty();
   }
 
-  virtual void PropertyChanged() override
+  void PropertyChanged() override
   {
     if (m_EnumerationProperty)
     {
@@ -46,7 +46,7 @@ public:
     }
   }
 
-  virtual void PropertyRemoved() override
+  void PropertyRemoved() override
   {
     m_Property = nullptr;
     m_EnumerationProperty = nullptr;

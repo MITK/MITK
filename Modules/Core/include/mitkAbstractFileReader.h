@@ -61,7 +61,7 @@ namespace mitk
      *
      * This method must be implemented for each specific reader. Call
      * GetInputStream() first and check for a non-null stream to read from.
-     * If the input stream is \c NULL, use GetInputLocation() to read from a local
+     * If the input stream is \c nullptr, use GetInputLocation() to read from a local
      * file-system path.
      *
      * If the reader cannot use streams directly, use GetLocalFileName() instead.
@@ -104,6 +104,11 @@ namespace mitk
      */
     us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext *context = us::GetModuleContext());
     void UnregisterService();
+
+    /**
+     * @return A list of files that were loaded during the last call of Read. Has to be filled by the actual reader class.
+     */
+    std::vector< std::string > GetReadFiles();
 
   protected:
     /**
@@ -160,7 +165,7 @@ namespace mitk
      *
      * @param context
      * @return
-     * @throws std::invalid_argument if \c context is NULL.
+     * @throws std::invalid_argument if \c context is nullptr.
      */
     virtual us::ServiceRegistration<CustomMimeType> RegisterMimeType(us::ModuleContext *context);
 
@@ -214,6 +219,8 @@ namespace mitk
     std::string GetLocalFileName() const;
 
     virtual void SetDefaultDataNodeProperties(DataNode *node, const std::string &filePath);
+
+    std::vector< std::string > m_ReadFiles;
 
   private:
     AbstractFileReader &operator=(const AbstractFileReader &other);

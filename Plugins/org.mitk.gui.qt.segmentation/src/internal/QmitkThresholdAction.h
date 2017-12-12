@@ -41,7 +41,7 @@ public:
   void SetDataStorage(mitk::DataStorage *dataStorage) override;
   void SetSmoothed(bool smoothed) override;
   void SetDecimated(bool decimated) override;
-  void SetFunctionality(berry::QtViewPart *functionality) override;
+  void SetFunctionality(berry::QtViewPart* view) override;
 
   void OnThresholdingToolManagerToolModified();
 

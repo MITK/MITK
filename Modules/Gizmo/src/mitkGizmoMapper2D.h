@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVtkMapper.h>
 
-#include <vtkPainterPolyDataMapper.h>
+#include <vtkPolyDataMapper.h>
 
 namespace mitk
 {
@@ -80,7 +80,7 @@ namespace mitk
 
       //! The mapper of the resulting vtkPolyData
       //! (3D polygons for 3D mapper, 2D contours for 2D mapper)
-      vtkSmartPointer<vtkPainterPolyDataMapper> m_VtkPolyDataMapper;
+      vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
 
       //! Last time this storage has been updated.
       itk::TimeStamp m_LastUpdateTime;

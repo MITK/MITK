@@ -60,7 +60,7 @@ public:
   // ------------------------------------------------------------------------------------------------------
 
 
-  void setUp()
+  void setUp() override
   {
     FeatureData_Cancer = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixBreastcancer.csv"),';',0.5,true);
     LabelData_Cancer = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixBreastcancer.csv"),';',0.5,false);
@@ -69,7 +69,7 @@ public:
     classifier = mitk::VigraRandomForestClassifier::New();
   }
 
-  void tearDown()
+  void tearDown() override
   {
     classifier = nullptr;
   }
@@ -78,7 +78,7 @@ public:
   // ------------------------------------------------------------------------------------------------------
   /*
   Train the classifier with an exampledataset of mattlab.
-  Note: The included data are gauﬂan normaldistributed.
+  Note: The included data are gauan normaldistributed.
   */
   void TrainThreadedDecisionForest_MatlabDataSet_shouldReturnTrue()
   {
@@ -130,12 +130,10 @@ public:
     /* Testing the matching between the calculated colunmvector and the result of the RandomForest */
     unsigned int maxrows = classes.rows();
 
-    bool isYPredictVector = false;
     int count = 0;
 
     for(unsigned int i= 0; i < maxrows; i++){
       if(classes(i,0) == Labels_Testing(i,0)){
-        isYPredictVector = true;
         count++;
       }
     }

@@ -44,7 +44,7 @@ static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
   if (widgetKey == "Time")
     return new QmitkTimeSliceAnimationItem;
 
-  return NULL;
+  return nullptr;
 }
 
 QString QmitkMovieMakerView::GetFFmpegPath() const
@@ -58,8 +58,8 @@ QString QmitkMovieMakerView::GetFFmpegPath() const
 
 static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)
 {
-  if (renderWindow == NULL)
-    return NULL;
+  if (renderWindow == nullptr)
+    return nullptr;
 
   unsigned char* frame = new unsigned char[width * height * 3];
 
@@ -72,12 +72,12 @@ static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, in
 const std::string QmitkMovieMakerView::VIEW_ID = "org.mitk.views.moviemaker";
 
 QmitkMovieMakerView::QmitkMovieMakerView()
-  : m_FFmpegWriter(NULL),
+  : m_FFmpegWriter(nullptr),
     m_Ui(new Ui::QmitkMovieMakerView),
-    m_AnimationModel(NULL),
-    m_AddAnimationMenu(NULL),
-    m_RecordMenu(NULL),
-    m_Timer(NULL),
+    m_AnimationModel(nullptr),
+    m_AddAnimationMenu(nullptr),
+    m_RecordMenu(nullptr),
+    m_Timer(nullptr),
     m_TotalDuration(0.0),
     m_NumFrames(0),
     m_CurrentFrame(0)
@@ -110,7 +110,7 @@ void QmitkMovieMakerView::InitializeAnimationWidgets()
 
   Q_FOREACH(QWidget* widget, m_AnimationWidgets.values())
   {
-    if (widget != NULL)
+    if (widget != nullptr)
     {
       widget->setVisible(false);
       m_Ui->animationWidgetGroupBoxLayout->addWidget(widget);
@@ -279,7 +279,7 @@ void QmitkMovieMakerView::OnAddAnimationButtonClicked()
 {
   QAction* action = m_AddAnimationMenu->exec(QCursor::pos());
 
-  if (action != NULL)
+  if (action != nullptr)
   {
     const QString widgetKey = action->text();
 
@@ -324,7 +324,7 @@ void QmitkMovieMakerView::OnRecordButtonClicked() // TODO: Refactor
 
   if (ffmpegPath.isEmpty())
   {
-    QMessageBox::information(NULL, "Movie Maker",
+    QMessageBox::information(nullptr, "Movie Maker",
       "<p>Set path to FFmpeg<sup>1</sup> or Libav<sup>2</sup> (avconv) in preferences (Window -> Preferences... (Ctrl+P) -> External Programs) to be able to record your movies to video files.</p>"
       "<p>If you are using Linux, chances are good that either FFmpeg or Libav is included in the official package repositories.</p>"
       "<p>[1] <a href=\"https://www.ffmpeg.org/download.html\">Download FFmpeg from ffmpeg.org</a><br/>"
@@ -336,12 +336,12 @@ void QmitkMovieMakerView::OnRecordButtonClicked() // TODO: Refactor
 
   QAction* action = m_RecordMenu->exec(QCursor::pos());
 
-  if (action == NULL)
+  if (action == nullptr)
     return;
 
   vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName(action->data().toString().toStdString());
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
     return;
 
   const int border = 3;
@@ -362,7 +362,7 @@ void QmitkMovieMakerView::OnRecordButtonClicked() // TODO: Refactor
   m_FFmpegWriter->SetSize(width, height);
   m_FFmpegWriter->SetFramerate(m_Ui->fpsSpinBox->value());
 
-  QString saveFileName = QFileDialog::getSaveFileName(NULL, "Specify a filename", "", "Movie (*.mp4)");
+  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.mp4)");
 
   if (saveFileName.isEmpty())
     return;
@@ -396,7 +396,7 @@ void QmitkMovieMakerView::OnRecordButtonClicked() // TODO: Refactor
     m_CurrentFrame = 0;
     this->RenderCurrentFrame();
 
-    QMessageBox::critical(NULL, "Movie Maker", exception.GetDescription());
+    QMessageBox::critical(nullptr, "Movie Maker", exception.GetDescription());
   }
 }
 
@@ -432,7 +432,7 @@ void QmitkMovieMakerView::OnStartComboBoxCurrentIndexChanged(int index)
 {
   QmitkAnimationItem* item = this->GetSelectedAnimationItem();
 
-  if (item != NULL)
+  if (item != nullptr)
   {
     item->SetStartWithPrevious(index);
     this->RedrawTimeline();
@@ -444,7 +444,7 @@ void QmitkMovieMakerView::OnDurationSpinBoxValueChanged(double value)
 {
   QmitkAnimationItem* item = this->GetSelectedAnimationItem();
 
-  if (item != NULL)
+  if (item != nullptr)
   {
     item->SetDuration(value);
     this->RedrawTimeline();
@@ -456,7 +456,7 @@ void QmitkMovieMakerView::OnDelaySpinBoxValueChanged(double value)
 {
   QmitkAnimationItem* item = this->GetSelectedAnimationItem();
 
-  if (item != NULL)
+  if (item != nullptr)
   {
     item->SetDelay(value);
     this->RedrawTimeline();
@@ -549,7 +549,7 @@ void QmitkMovieMakerView::UpdateAnimationWidgets()
 {
   QmitkAnimationItem* item = this->GetSelectedAnimationItem();
 
-  if (item != NULL)
+  if (item != nullptr)
   {
     m_Ui->startComboBox->setCurrentIndex(item->GetStartWithPrevious());
     m_Ui->durationSpinBox->setValue(item->GetDuration());
@@ -580,17 +580,17 @@ void QmitkMovieMakerView::ShowAnimationWidget(QmitkAnimationItem* animationItem)
 {
   this->HideCurrentAnimationWidget();
 
-  if (animationItem == NULL)
+  if (animationItem == nullptr)
     return;
 
   const QString widgetKey = animationItem->GetWidgetKey();
-  QmitkAnimationWidget* animationWidget = NULL;
+  QmitkAnimationWidget* animationWidget = nullptr;
 
   if (m_AnimationWidgets.contains(widgetKey))
   {
     animationWidget = m_AnimationWidgets[widgetKey];
 
-    if (animationWidget != NULL)
+    if (animationWidget != nullptr)
     {
       m_Ui->animationWidgetGroupBox->setTitle(widgetKey);
       animationWidget->SetAnimationItem(animationItem);
@@ -598,7 +598,7 @@ void QmitkMovieMakerView::ShowAnimationWidget(QmitkAnimationItem* animationItem)
     }
   }
 
-  m_Ui->animationWidgetGroupBox->setVisible(animationWidget != NULL);
+  m_Ui->animationWidgetGroupBox->setVisible(animationWidget != nullptr);
 }
 
 void QmitkMovieMakerView::RedrawTimeline()
@@ -617,7 +617,7 @@ QmitkAnimationItem* QmitkMovieMakerView::GetSelectedAnimationItem() const
 
   return !selection.isEmpty()
     ? dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(selection[0].top(), 1))
-    : NULL;
+    : nullptr;
 }
 
 void QmitkMovieMakerView::CalculateTotalDuration()
@@ -631,7 +631,7 @@ void QmitkMovieMakerView::CalculateTotalDuration()
   {
     QmitkAnimationItem* item = dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(i, 1));
 
-    if (item == NULL)
+    if (item == nullptr)
       continue;
 
     if (item->GetStartWithPrevious())
@@ -662,7 +662,7 @@ QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMakerView::GetActiveAnima
   {
     QmitkAnimationItem* item = dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(i, 1));
 
-    if (item == NULL)
+    if (item == nullptr)
       continue;
 
     if (item->GetDuration() > 0.0)

@@ -21,7 +21,7 @@
 
 namespace itk{
 /** \class ShCoefficientImageExporter
-  Converts FSL reconstructions of diffusionweighted images (4D images containing the sh coefficients) to qball images or 3D sh-coefficient images.
+  Converts FSL reconstructions of diffusionweighted images (4D images containing the sh coefficients) to Odf images or 3D sh-coefficient images.
 */
 
 template< class PixelType, int ShOrder >

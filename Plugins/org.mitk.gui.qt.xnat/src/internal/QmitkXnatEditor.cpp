@@ -189,7 +189,7 @@ void QmitkXnatEditor::UpdateList()
   if (xoPtr.IsNull())
     return;
   ctkXnatObject* inputObject = xoPtr->GetXnatObject();
-  if (inputObject == NULL)
+  if (inputObject == nullptr)
     return;
 
   m_Controls.treeView->setModel(m_ListModel);
@@ -211,7 +211,7 @@ void QmitkXnatEditor::UpdateList()
     child->widget()->setVisible(false);
   }
 
-  ctkXnatObject* parent = NULL;
+  ctkXnatObject* parent = nullptr;
   for (int i = m_ParentCount * 2; i >= 0; i--)
   {
     if (i > 12)
@@ -224,7 +224,7 @@ void QmitkXnatEditor::UpdateList()
       m_Controls.breadcrumbHorizontalLayout->itemAt(i - 1)->widget()->setVisible(true);
       m_Controls.breadcrumbDescriptionLayout->itemAt(i - 1)->widget()->setVisible(true);
     }
-    if (parent == NULL)
+    if (parent == nullptr)
     {
       parent = inputObject;
     }
@@ -262,7 +262,7 @@ void QmitkXnatEditor::SelectionChanged(const berry::IWorkbenchPart::Pointer& sou
         ctkXnatObject* object = objectPointer->GetQModelIndex().data(Qt::UserRole).value<ctkXnatObject*>();
 
         // if a file is selected, don't change the input and list view
-        if (dynamic_cast<ctkXnatFile*>(object) == NULL)
+        if (dynamic_cast<ctkXnatFile*>(object) == nullptr)
         {
           QmitkXnatObjectEditorInput::Pointer oPtr(new QmitkXnatObjectEditorInput(object));
           berry::IEditorInput::Pointer editorInput(oPtr);
@@ -286,7 +286,7 @@ void QmitkXnatEditor::DownloadResource()
   if (variant.isValid())
   {
     ctkXnatObject* resource = variant.value<ctkXnatObject*>();
-    if (dynamic_cast<ctkXnatFile*>(resource) == NULL)
+    if (dynamic_cast<ctkXnatFile*>(resource) == nullptr)
     {
       MITK_INFO << "Download started ...";
       MITK_INFO << "...";
@@ -323,7 +323,7 @@ void QmitkXnatEditor::DownloadFile()
 void QmitkXnatEditor::ToHigherLevel()
 {
   ctkXnatObject* parent = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->parent();
-  if (parent == NULL)
+  if (parent == nullptr)
   {
     return;
   }
@@ -338,15 +338,15 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
   if (!index.isValid()) return;
 
   ctkXnatObject* child = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->children().at(index.row());
-  if (child != NULL)
+  if (child != nullptr)
   {
     ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(child);
-    if (file != NULL)
+    if (file != nullptr)
     {
       // Download file and put into datamanager
       InternalFileDownload(index);
       mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-      if (dsService != NULL)
+      if (dsService != nullptr)
       {
         QString name = file->property("Name");
         QString filePath = m_DownloadPath + name;
@@ -397,7 +397,7 @@ void QmitkXnatEditor::InternalFileDownload(const QModelIndex& index)
   if (variant.isValid())
   {
     ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
-    if (file != NULL)
+    if (file != nullptr)
     {
       // Testing if the file exists
       QDir downDir(m_DownloadPath);
@@ -454,7 +454,7 @@ void QmitkXnatEditor::InternalFileDownload(const QModelIndex& index)
 int QmitkXnatEditor::ParentChecker(ctkXnatObject* child)
 {
   int sum;
-  if (child->parent() == NULL)
+  if (child->parent() == nullptr)
   {
     return 0;
   }
@@ -560,14 +560,14 @@ void QmitkXnatEditor::itemSelected(const QModelIndex &index)
 {
   ctkXnatObject* xnatObject = m_ListModel->data(index, Qt::UserRole).value<ctkXnatObject*>();
   bool downloadable = false;
-  downloadable |= dynamic_cast<ctkXnatFile*>(xnatObject) != NULL;
-  downloadable |= dynamic_cast<ctkXnatScan*>(xnatObject) != NULL;
-  downloadable |= dynamic_cast<ctkXnatScanFolder*>(xnatObject) != NULL;
-  downloadable |= dynamic_cast<ctkXnatAssessor*>(xnatObject) != NULL;
-  downloadable |= dynamic_cast<ctkXnatAssessorFolder*>(xnatObject) != NULL;
-  downloadable |= dynamic_cast<ctkXnatResource*>(xnatObject) != NULL;
-  downloadable |= dynamic_cast<ctkXnatReconstruction*>(xnatObject) != NULL;
-  downloadable |= dynamic_cast<ctkXnatReconstructionFolder*>(xnatObject) != NULL;
+  downloadable |= dynamic_cast<ctkXnatFile*>(xnatObject) != nullptr;
+  downloadable |= dynamic_cast<ctkXnatScan*>(xnatObject) != nullptr;
+  downloadable |= dynamic_cast<ctkXnatScanFolder*>(xnatObject) != nullptr;
+  downloadable |= dynamic_cast<ctkXnatAssessor*>(xnatObject) != nullptr;
+  downloadable |= dynamic_cast<ctkXnatAssessorFolder*>(xnatObject) != nullptr;
+  downloadable |= dynamic_cast<ctkXnatResource*>(xnatObject) != nullptr;
+  downloadable |= dynamic_cast<ctkXnatReconstruction*>(xnatObject) != nullptr;
+  downloadable |= dynamic_cast<ctkXnatReconstructionFolder*>(xnatObject) != nullptr;
   m_Controls.buttonDownload->setEnabled(downloadable);
   m_Controls.labelDownload->setVisible(!downloadable);
 }

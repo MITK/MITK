@@ -50,7 +50,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         ///
         /// \brief get the input MITK image
         ///
-        itkGetMacro(Image, mitk::Image*);
+        mitk::Image* GetImage();
 
         ///
         /// \brief get the input MITK image

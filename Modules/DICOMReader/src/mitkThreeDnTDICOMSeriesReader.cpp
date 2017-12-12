@@ -52,7 +52,7 @@ bool
 mitk::ThreeDnTDICOMSeriesReader
 ::operator==(const DICOMFileReader& other) const
 {
-  if (const Self* otherSelf = dynamic_cast<const Self*>(&other))
+  if (const auto* otherSelf = dynamic_cast<const Self*>(&other))
   {
     return
        DICOMITKSeriesGDCMReader::operator==(other)

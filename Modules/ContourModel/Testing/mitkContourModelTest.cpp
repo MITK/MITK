@@ -236,7 +236,7 @@ static void TestSelectVertexAtWrongPosition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  MITK_TEST_CONDITION_REQUIRED(contour->GetSelectedVertex() == nullptr, "selected vertex is NULL");
+  MITK_TEST_CONDITION_REQUIRED(contour->GetSelectedVertex() == nullptr, "selected vertex is nullptr");
   mitk::Point3D p;
   p[0] = p[1] = p[2] = 0;
 
@@ -337,7 +337,7 @@ static void TestSetVertices()
 
   contour->SetVertexAt(0, newCoordinates);
 
-  MITK_TEST_EQUAL(contour->GetVertexAt(0)->Coordinates, newCoordinates, "set coordinates");
+  MITK_TEST_CONDITION(mitk::Equal(contour->GetVertexAt(0)->Coordinates, newCoordinates), "set coordinates");
 
   mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
 
@@ -359,8 +359,8 @@ static void TestSetVertices()
 
   contour->SetVertexAt(1, contour2->GetVertexAt(1));
 
-  MITK_TEST_EQUAL(
-    contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates, "Use setter and getter combination");
+  MITK_TEST_CONDITION(
+    mitk::Equal(contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates), "Use setter and getter combination");
 }
 
 static void TestContourModelAPI()
@@ -389,7 +389,7 @@ static void TestContourModelAPI()
 
   MITK_TEST_CONDITION(contour1->GetIndex(vertex) == 1, "Get index");
 
-  mitk::ContourModel::VertexType *nonConstVertex = const_cast<mitk::ContourModel::VertexType *>(vertex);
+  auto *nonConstVertex = const_cast<mitk::ContourModel::VertexType *>(vertex);
 
   MITK_TEST_CONDITION(contour1->GetIndex(nonConstVertex) == 1, "Get index non-const");
 

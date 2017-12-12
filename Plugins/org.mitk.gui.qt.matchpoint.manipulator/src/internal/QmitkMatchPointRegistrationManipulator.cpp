@@ -321,20 +321,19 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   { //init to map the image centers
     auto movingCenter = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
     auto targetCenter = m_SelectedTargetNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
-    m_Controls.manipulationWidget->Initialize(movingCenter, targetCenter);
+    this->m_Controls.manipulationWidget->Initialize(movingCenter, targetCenter);
   }
   else
   { //use selected pre registration as baseline
     m_Controls.manipulationWidget->Initialize(m_SelectedPreReg);
   }
 
-  m_Controls.comboCenter->setCurrentIndex(0);
-  m_Controls.manipulationWidget->SetCenterOfRotationIsRelativeToTarget(false);
-
   this->m_CurrentRegistrationWrapper = mitk::MAPRegistrationWrapper::New();
-  m_CurrentRegistration = m_Controls.manipulationWidget->GetInterimRegistration();
-
+  this->m_CurrentRegistration = m_Controls.manipulationWidget->GetInterimRegistration();
   this->m_CurrentRegistrationWrapper->SetRegistration(m_CurrentRegistration);
+
+  this->m_Controls.comboCenter->setCurrentIndex(0);
+  this->OnCenterTypeChanged(0);
 
   //reinit view
   mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -431,7 +430,11 @@ void QmitkMatchPointRegistrationManipulator::OnCancelBtnPushed()
 
   this->CheckInputs();
   this->ConfigureControls();
-  this->GetRenderWindowPart()->RequestUpdate();
+  if (this->GetRenderWindowPart())
+  {
+    this->GetRenderWindowPart()->RequestUpdate();
+  }
+
 }
 
 void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()

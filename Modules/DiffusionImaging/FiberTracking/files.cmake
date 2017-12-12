@@ -42,6 +42,7 @@ set(H_FILES
   Algorithms/itkFiberCurvatureFilter.h
   Algorithms/itkFitFibersToImageFilter.h
   Algorithms/itkTractClusteringFilter.h
+  Algorithms/itkFiberExtractionFilter.h
 
   # Tractography
   Algorithms/TrackingHandlers/mitkTrackingDataHandler.h

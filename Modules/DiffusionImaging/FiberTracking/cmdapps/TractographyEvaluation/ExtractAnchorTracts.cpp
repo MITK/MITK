@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <chrono>
 #include <boost/progress.hpp>
+#include <itkFiberExtractionFilter.h>
 
 typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
@@ -204,58 +205,60 @@ int main(int argc, char* argv[])
       ItkUcharImgType::Pointer gm_image = LoadItkMaskImage(gray_matter_mask);
       std::cout.rdbuf (old);              // <-- restore
 
-      mitk::FiberBundle::Pointer not_gm_fibers = inputTractogram->ExtractFiberSubset(gm_image, false, true, true);
+      itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+      extractor->SetInputFiberBundle(inputTractogram);
+      extractor->SetMasks({gm_image});
+      extractor->SetBothEnds(true);
+      extractor->SetMode(itk::FiberExtractionFilter::MODE::ENDPOINTS);
+      extractor->Update();
+
+      mitk::FiberBundle::Pointer not_gm_fibers = extractor->GetNegatives().at(0);
 
       old = cout.rdbuf(); // <-- save
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       mitk::IOUtil::Save(not_gm_fibers, out_folder + "/implausible_tracts/no_gm_endings.trk");
-      inputTractogram = inputTractogram->ExtractFiberSubset(gm_image, false, false, true);
+      inputTractogram = extractor->GetPositives().at(0);
       std::cout.rdbuf (old);              // <-- restore
     }
 
     if (subsample<1.0)
       inputTractogram = inputTractogram->SubsampleFibers(subsample);
 
-
-    // resample fibers
-    float minSpacing = 1;
-    if (!known_tract_masks.empty())
-    {
-      if(std::get<0>(known_tract_masks.at(0))->GetSpacing()[0]<std::get<0>(known_tract_masks.at(0))->GetSpacing()[1] && std::get<0>(known_tract_masks.at(0))->GetSpacing()[0]<std::get<0>(known_tract_masks.at(0))->GetSpacing()[2])
-        minSpacing = std::get<0>(known_tract_masks.at(0))->GetSpacing()[0];
-      else if (std::get<0>(known_tract_masks.at(0))->GetSpacing()[1] < std::get<0>(known_tract_masks.at(0))->GetSpacing()[2])
-        minSpacing = std::get<0>(known_tract_masks.at(0))->GetSpacing()[1];
-      else
-        minSpacing = std::get<0>(known_tract_masks.at(0))->GetSpacing()[2];
-    }
-    inputTractogram->ResampleLinear(minSpacing/5);
-
-    mitk::FiberBundle::Pointer all_anchor_tracts = mitk::FiberBundle::New(nullptr);
+    mitk::FiberBundle::Pointer anchor_tractogram = mitk::FiberBundle::New(nullptr);
+    mitk::FiberBundle::Pointer candidate_tractogram = mitk::FiberBundle::New(nullptr);
     if (!known_tract_masks.empty())
     {
       MITK_INFO << "Find known tracts via overlap match";
-      boost::progress_display disp(known_tract_masks.size());
-      for ( MaskType mask : known_tract_masks )
+      std::vector< ItkUcharImgType::Pointer > mask_images;
+      for (auto mask : known_tract_masks)
+        mask_images.push_back(std::get<0>(mask));
+
+      itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+      extractor->SetInputFiberBundle(inputTractogram);
+      extractor->SetMasks(mask_images);
+      extractor->SetOverlapFraction(overlap);
+      extractor->SetMode(itk::FiberExtractionFilter::MODE::OVERLAP);
+      extractor->Update();
+      std::vector< mitk::FiberBundle::Pointer > positives = extractor->GetPositives();
+      candidate_tractogram = extractor->GetNegatives().at(0);
+
+      for ( unsigned int i=0; i<known_tract_masks.size(); ++i )
       {
-        ++disp;
         std::streambuf *old = cout.rdbuf(); // <-- save
         std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
 
-        ItkUcharImgType::Pointer mask_image = std::get<0>(mask);
-        std::string mask_name = std::get<1>(mask);
-        mitk::FiberBundle::Pointer known_tract = inputTractogram->ExtractFiberSubset(mask_image, true, false, false, overlap, false);
-        mitk::IOUtil::Save(known_tract, out_folder + "/anchor_tracts/" + mask_name + ".trk");
-
-        all_anchor_tracts = all_anchor_tracts->AddBundle(known_tract);
+        std::string mask_name = std::get<1>(known_tract_masks.at(i));
+        mitk::IOUtil::Save(positives.at(i), out_folder + "/anchor_tracts/" + mask_name + ".trk");
 
         std::cout.rdbuf (old);              // <-- restore
       }
+      anchor_tractogram = anchor_tractogram->AddBundles(positives);
+      MITK_INFO << anchor_tractogram->GetNumFibers() << " - " << positives.size();
     }
 
-    mitk::IOUtil::Save(all_anchor_tracts, out_folder + "/anchor_tracts/anchor_tractogram.trk");
-    mitk::FiberBundle::Pointer remaining_tracts = inputTractogram->SubtractBundle(all_anchor_tracts);
-    mitk::IOUtil::Save(remaining_tracts, out_folder + "/candidate_tracts/candidate_tractogram.trk");
+    mitk::IOUtil::Save(anchor_tractogram, out_folder + "/anchor_tracts/anchor_tractogram.trk");
+    mitk::IOUtil::Save(candidate_tractogram, out_folder + "/candidate_tracts/candidate_tractogram.trk");
     mitk::IOUtil::Save(inputTractogram, out_folder + "/filtered_tractogram.trk");
   }
   catch (itk::ExceptionObject e)

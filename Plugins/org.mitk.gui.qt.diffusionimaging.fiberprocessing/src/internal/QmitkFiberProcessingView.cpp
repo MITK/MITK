@@ -54,6 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractDensityImageFilter.h>
 #include <itkImageRegion.h>
 #include <itkTractsToRgbaImageFilter.h>
+#include <itkFiberExtractionFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -394,8 +395,28 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
 
     itkUCharImageType::Pointer mask = itkUCharImageType::New();
     mitk::CastToItkImage(mitkMask, mask);
-    mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked(), m_Controls->m_FiberExtractionFractionBox->value());
-    if (newFib->GetNumFibers()<=0)
+
+//    mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked(), m_Controls->m_FiberExtractionFractionBox->value());
+    itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+    extractor->SetInputFiberBundle(fib);
+    extractor->SetMasks({mask});
+    extractor->SetOverlapFraction(m_Controls->m_FiberExtractionFractionBox->value());
+    extractor->SetBothEnds(m_Controls->m_BothEnds->isChecked());
+    if (invert)
+      extractor->SetNoPositives(true);
+    else
+      extractor->SetNoNegatives(true);
+    if (onlyEnds)
+      extractor->SetMode(itk::FiberExtractionFilter::MODE::ENDPOINTS);
+    extractor->Update();
+
+    mitk::FiberBundle::Pointer newFib;
+    if (invert)
+      newFib = extractor->GetNegatives().at(0);
+    else
+      newFib = extractor->GetPositives().at(0);
+
+    if (newFib.IsNull() || newFib->GetNumFibers()<=0)
     {
       QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
       continue;

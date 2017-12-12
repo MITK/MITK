@@ -317,6 +317,11 @@ void FitFibersToImageFilter::GenerateData()
   }
   else
     m_FilterOutliers = false;
+  if (m_NumUnknowns<1)
+  {
+    MITK_INFO << "No fibers in tractogram.";
+    return;
+  }
 
   fiber_count = 0;
   sz_x = 0;

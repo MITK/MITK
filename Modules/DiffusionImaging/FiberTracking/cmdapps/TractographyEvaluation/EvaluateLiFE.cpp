@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <chrono>
 #include <boost/progress.hpp>
+#include <itkFiberExtractionFilter.h>
 
 typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
@@ -174,14 +175,35 @@ int main(int argc, char* argv[])
 
       mitk::FiberBundle::Pointer tp_tracts = mitk::FiberBundle::New(nullptr);
       mitk::FiberBundle::Pointer fn_tracts = mitk::FiberBundle::New(nullptr);
+
       for ( MaskType mask : known_tract_masks )
       {
         ItkUcharImgType::Pointer mask_image = std::get<0>(mask);
 
-        mitk::FiberBundle::Pointer a = pred_positives->ExtractFiberSubset(mask_image, true, false, false, overlap, false);
+        mitk::FiberBundle::Pointer a;
+        {
+          itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+          extractor->SetInputFiberBundle(pred_positives);
+          extractor->SetMasks({mask_image});
+          extractor->SetOverlapFraction(overlap);
+          extractor->SetDontResampleFibers(true);
+          extractor->SetMode(itk::FiberExtractionFilter::MODE::OVERLAP);
+          extractor->Update();
+          a = extractor->GetPositives().at(0);
+        }
         tp_tracts = tp_tracts->AddBundle(a);
 
-        mitk::FiberBundle::Pointer b = pred_negatives->ExtractFiberSubset(mask_image, true, false, false, overlap, false);
+        mitk::FiberBundle::Pointer b;
+        {
+          itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+          extractor->SetInputFiberBundle(pred_negatives);
+          extractor->SetMasks({mask_image});
+          extractor->SetOverlapFraction(overlap);
+          extractor->SetDontResampleFibers(true);
+          extractor->SetMode(itk::FiberExtractionFilter::MODE::OVERLAP);
+          extractor->Update();
+          b = extractor->GetPositives().at(0);
+        }
         fn_tracts = fn_tracts->AddBundle(b);
       }
       mitk::FiberBundle::Pointer fp_tracts = pred_positives->SubtractBundle(tp_tracts);

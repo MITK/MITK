@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("anchor_masks"))
     anchor_mask_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["anchor_masks"]);
 
-  std::string regu = "LocalMSE";
+  std::string regu = "NONE";
   if (parsedArgs.count("regu"))
     regu = us::any_cast<std::string>(parsedArgs["regu"]);
 

@@ -625,11 +625,12 @@ mitk::BaseProperty::ConstPointer mitk::DataNode::GetConstProperty(const std::str
   {
     BaseProperty::ConstPointer property = propertyListIter->second->GetProperty(propertyName);
 
-    if (property.IsNull() && fallBackOnDefaultContext)
-      return m_PropertyList->GetProperty(propertyName);
-
-    return property;
+    if (property.IsNotNull())
+      return property;
   }
+
+  if (fallBackOnDefaultContext)
+    return m_PropertyList->GetProperty(propertyName);
 
   return nullptr;
 }
@@ -648,11 +649,12 @@ mitk::BaseProperty * mitk::DataNode::GetNonConstProperty(const std::string &prop
   {
     auto property = propertyListIter->second->GetProperty(propertyName);
 
-    if (nullptr == property && fallBackOnDefaultContext)
-      return m_PropertyList->GetProperty(propertyName);
-
-    return property;
+    if (nullptr != property)
+      return property;
   }
+
+  if (fallBackOnDefaultContext)
+    return m_PropertyList->GetProperty(propertyName);
 
   return nullptr;
 }
@@ -660,7 +662,7 @@ mitk::BaseProperty * mitk::DataNode::GetNonConstProperty(const std::string &prop
 void mitk::DataNode::SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName, bool fallBackOnDefaultContext)
 {
   if (propertyName.empty())
-    return;
+    mitkThrow() << "Property name is empty.";
 
   if (contextName.empty())
   {

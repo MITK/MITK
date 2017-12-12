@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseProcess.h"
 #include "mitkIIdentifiable.h"
+#include "mitkIPropertyOwner.h"
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
 #include "mitkTimeGeometry.h"
@@ -37,20 +38,33 @@ namespace mitk
   //## from itk::DataObject and thus can be included in a pipeline.
   //## Inherits also from OperationActor and can be used as a destination for Undo
   //## @ingroup Data
-  class MITKCORE_EXPORT BaseData : public itk::DataObject, public OperationActor, public IIdentifiable
+  class MITKCORE_EXPORT BaseData
+    : public itk::DataObject, public OperationActor, public IIdentifiable, public IPropertyOwner
   {
   public:
     mitkClassMacroItkParent(BaseData, itk::DataObject)
 
-      /**
-      * \brief Return the TimeGeometry of the data as const pointer.
-      *
-      * \warning No update will be called. Use GetUpdatedGeometry() if you cannot
-      * be sure that the geometry is up-to-date.
-      *
-      * Normally used in GenerateOutputInformation of subclasses of BaseProcess.
-      */
-      const mitk::TimeGeometry *GetTimeGeometry() const
+    // IIdentifiable
+    virtual UIDType GetUID() const override;
+
+    // IPropertyProvider
+    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
+    virtual std::vector<std::string> GetPropertyNames(const std::string &contextName = "", bool includeDefaultContext = false) const override;
+    virtual std::vector<std::string> GetPropertyContextNames() const override;
+
+    // IPropertyOwner
+    virtual BaseProperty * GetNonConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
+    virtual void SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
+
+    /**
+    * \brief Return the TimeGeometry of the data as const pointer.
+    *
+    * \warning No update will be called. Use GetUpdatedGeometry() if you cannot
+    * be sure that the geometry is up-to-date.
+    *
+    * Normally used in GenerateOutputInformation of subclasses of BaseProcess.
+    */
+    const mitk::TimeGeometry *GetTimeGeometry() const
     {
       return m_TimeGeometry.GetPointer();
     }
@@ -354,8 +368,6 @@ namespace mitk
      * \sa itk::ProcessObject::Graft
      */
     virtual void Graft(const DataObject *) override;
-
-    virtual UIDType GetUID() const override;
 
   protected:
     BaseData();

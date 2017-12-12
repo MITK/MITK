@@ -84,8 +84,8 @@ void mitk::DataNode::SetData(mitk::BaseData *baseData)
 }
 
 mitk::DataNode::DataNode()
-  : m_PropertyListModifiedObserverTag(0),
-    m_PropertyList(PropertyList::New())
+  : m_PropertyList(PropertyList::New()),
+    m_PropertyListModifiedObserverTag(0)
 {
   m_Mappers.resize(10);
 

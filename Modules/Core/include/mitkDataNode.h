@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseData.h"
 //#include "mitkMapper.h"
 #include "mitkDataInteractor.h"
+#include "mitkIIdentifiable.h"
+#include "mitkIPropertyOwner.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
 #define MBI_STD
@@ -63,7 +65,7 @@ namespace mitk
    * \warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
    *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
    */
-  class MITKCORE_EXPORT DataNode : public itk::DataObject
+  class MITKCORE_EXPORT DataNode : public itk::DataObject, public IIdentifiable, public IPropertyOwner
   {
   public:
     typedef mitk::Geometry3D::Pointer Geometry3DPointer;
@@ -76,13 +78,24 @@ namespace mitk
      * \brief Definition of an itk::Event that is invoked when
      * a DataInteractor is set on this DataNode.
      */
-    itkEventMacro(InteractorChangedEvent, itk::AnyEvent);
+    itkEventMacro(InteractorChangedEvent, itk::AnyEvent)
+    mitkClassMacroItkParent(DataNode, itk::DataObject)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-    mitkClassMacroItkParent(DataNode, itk::DataObject);
+    // IIdentifiable
+    virtual UIDType GetUID() const override;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    // IPropertyProvider
+    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
+    virtual std::vector<std::string> GetPropertyNames(const std::string &contextName = "", bool includeDefaultContext = false) const override;
+    virtual std::vector<std::string> GetPropertyContextNames() const override;
 
-      mitk::Mapper *GetMapper(MapperSlotId id) const;
+    // IPropertyOwner
+    virtual BaseProperty * GetNonConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
+    virtual void SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
+
+    mitk::Mapper *GetMapper(MapperSlotId id) const;
 
     /**
      * \brief Get the data object (instance of BaseData, e.g., an Image)
@@ -545,6 +558,7 @@ namespace mitk
      * BaseData.
      */
     unsigned long GetDataReferenceChangedTime() const { return m_DataReferenceChangedTime.GetMTime(); }
+
   protected:
     DataNode();
 

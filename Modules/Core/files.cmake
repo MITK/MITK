@@ -70,6 +70,7 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkGroupTagProperty.cpp
+  DataManagement/mitkIIdentifiable.cpp
   DataManagement/mitkImageAccessorBase.cpp
   DataManagement/mitkImageCaster.cpp
   DataManagement/mitkImageCastPart1.cpp
@@ -91,7 +92,9 @@ set(CPP_FILES
   DataManagement/mitkIPropertyDescriptions.cpp
   DataManagement/mitkIPropertyExtensions.cpp
   DataManagement/mitkIPropertyFilters.cpp
+  DataManagement/mitkIPropertyOwner.cpp
   DataManagement/mitkIPropertyPersistence.cpp
+  DataManagement/mitkIPropertyProvider.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLevelWindow.cpp
@@ -111,6 +114,7 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateCompositeBase.cpp
   DataManagement/mitkNodePredicateData.cpp
   DataManagement/mitkNodePredicateDataType.cpp
+  DataManagement/mitkNodePredicateDataUID.cpp
   DataManagement/mitkNodePredicateDimension.cpp
   DataManagement/mitkNodePredicateFirstLevel.cpp
   DataManagement/mitkNodePredicateFunction.cpp
@@ -120,6 +124,7 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateDataProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
+  DataManagement/mitkNodePredicateUID.cpp
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkPlaneGeometry.cpp
   DataManagement/mitkPlaneGeometryData.cpp

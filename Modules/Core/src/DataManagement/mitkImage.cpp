@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FILL_C_ARRAY( _arr, _size, _value) for(unsigned int i=0u; i<_size; i++) \
 { _arr[i] = _value; }
 
-mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
+mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray() const
 {
   if (m_MetaDataDictionaryArray.size()) {
     return m_MetaDataDictionaryArray;
@@ -54,7 +54,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
   int numberSlices = GetLargestPossibleRegion().GetSize()[2];
   int timeSteps = GetTimeSteps();
   int numberOfComponents = GetPixelType().GetNumberOfComponents();
-  
+
   //mitk::ReaderType::DictionaryArrayType outputArray;
   m_MetaDataDictionaryArray.resize(numberSlices * timeSteps * numberOfComponents);
 
@@ -120,7 +120,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
           std::string spacing = boost::str(boost::format("%d\\%d\\%d")
           %spacingVector[0] %spacingVector[1] %spacingVector[2]
           );
-          
+
           if (tagkey == TAG_IMAGE_ORIENTATION)
           {
             itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imageOrientation);
@@ -152,7 +152,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
 void  mitk::Image::SetMetaDataDictionary(ReaderType::DictionaryArrayType metaData)
 {
   int numberSlices = GetLargestPossibleRegion().GetSize()[2];
-  
+
   // Setup slices
   mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
   for (int i = 0; i < metaData.size(); i++) {
@@ -164,7 +164,7 @@ void  mitk::Image::SetMetaDataDictionary(ReaderType::DictionaryArrayType metaDat
       if (tagKey == TAG_SOP_CLASS_UID || tagKey == TAG_SOP_INST_UID) {
         continue;
       }
-      
+
       // Slice specific tags
       if (tagKey == TAG_IMAGE_POSITION || tagKey == TAG_PIXEL_SPACING) {
         mitk::PlaneGeometry* planegeometry = slicedGeometry->GetPlaneGeometry(i);

@@ -120,8 +120,8 @@ public:
   //## Class is only for internal usage to allow convenient access to all slices over iterators;
   //## See documentation of ImageDataItem for details.
   typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
-  
-  ReaderType::DictionaryArrayType GetMetaDataDictionaryArray();
+
+  ReaderType::DictionaryArrayType GetMetaDataDictionaryArray() const;
   void SetMetaDataDictionary(ReaderType::DictionaryArrayType metaData);
   void SetMetaDataDictionary(DicomTagToValueList& array);
 
@@ -689,7 +689,7 @@ private:
   /** A mutex, which needs to be locked to manage m_VtkReaders */
   itk::SimpleFastMutexLock m_VtkReadersLock;
 
-  mitk::ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
+  mutable mitk::ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
 };
 
  /**

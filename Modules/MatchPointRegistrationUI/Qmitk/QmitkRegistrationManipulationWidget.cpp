@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/math/constants/constants.hpp>
 
 QmitkRegistrationManipulationWidget::QmitkRegistrationManipulationWidget(QWidget *parent)
-  : QWidget(parent), m_internalUpdate(false), m_CenterOfRotationIsRelativeToTarget(false)
+  : QWidget(parent), m_CenterOfRotationIsRelativeToTarget(false), m_internalUpdate(false)
 {
   this->setupUi(this);
 

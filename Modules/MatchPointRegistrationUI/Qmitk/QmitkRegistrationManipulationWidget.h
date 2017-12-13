@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPoint.h>
 
-#include <QWidget.h>
+#include <QWidget>
 
 #include <MitkMatchPointRegistrationUIExports.h>
 

@@ -55,6 +55,11 @@ IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
   //If this is removed, MITK crashes when closing the view:
   m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(NULL);
   m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(NULL);
+
+  //clean up data storage
+  this->GetDataStorage()->Remove(m_ToolTipPointPreview);
+
+
   delete m_ToolTransformationWidget;
 }
 
@@ -206,7 +211,13 @@ void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
 
 void IGTNavigationToolCalibration::OnLoginSingleRefToolNavigationDataClicked()
 {
+
   if (!CheckInitialization()) { return; }
+
+  //reset old data
+  m_LoggedNavigationDataOffsets.clear();
+  m_LoggedNavigationDataDifferences.clear();
+
   m_OnLoginSingleRefToolNavigationDataClicked = true;
   m_Controls.m_CollectNavigationDataButton->setEnabled(false);
   m_NumberOfNavigationData = m_Controls.m_NumberOfNavigationDataToCollect->value();
@@ -274,7 +285,7 @@ void IGTNavigationToolCalibration::ClearOldPivot()
 void IGTNavigationToolCalibration::OnAddPivotPose()
 {
   ClearOldPivot();
-  //When the collect Poses Button is Clicked 
+  //When the collect Poses Button is Clicked
   m_OnAddPivotPoseClicked = true;
   m_NumberOfNavigationData = m_Controls.m_PosesToCollect->value();
 
@@ -282,7 +293,7 @@ void IGTNavigationToolCalibration::OnAddPivotPose()
 
 void IGTNavigationToolCalibration::AddPivotPose()
 {
-  //Save the poses to be used in computation 
+  //Save the poses to be used in computation
   if (PivotCount < m_NumberOfNavigationData)
   {
     mitk::NavigationData::Pointer currentPose = mitk::NavigationData::New();
@@ -395,21 +406,25 @@ void IGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationData::P
 
 void IGTNavigationToolCalibration::ShowToolTipPreview(mitk::NavigationData::Pointer ToolTipInTrackingCoordinates)
 {
-  mitk::DataNode::Pointer m_ToolTipPointPreview = mitk::DataNode::New();
-  m_ToolTipPointPreview->SetName("Modified Tool Tip Preview");
-  mitk::Color blue;
-  blue.SetBlue(1);
-  m_ToolTipPointPreview->SetColor(blue);
-  mitk::Surface::Pointer mySphere = mitk::Surface::New();
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(3.0f);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
-  vtkData->Update();
-  mySphere->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-  m_ToolTipPointPreview->SetData(mySphere);
+  if(m_ToolTipPointPreview.IsNull())
+  {
+    m_ToolTipPointPreview = mitk::DataNode::New();
+    m_ToolTipPointPreview->SetName("Modified Tool Tip Preview");
+    mitk::Color blue;
+    blue.SetBlue(1);
+    m_ToolTipPointPreview->SetColor(blue);
+    mitk::Surface::Pointer mySphere = mitk::Surface::New();
+    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkData->SetRadius(3.0f);
+    vtkData->SetCenter(0.0, 0.0, 0.0);
+    vtkData->Update();
+    mySphere->SetVtkPolyData(vtkData->GetOutput());
+    vtkData->Delete();
+    m_ToolTipPointPreview->SetData(mySphere);
+
+    this->GetDataStorage()->Add(m_ToolTipPointPreview);
+  }
   m_ToolTipPointPreview->GetData()->GetGeometry()->SetIndexToWorldTransform(ToolTipInTrackingCoordinates->GetAffineTransform3D());
-  this->GetDataStorage()->Add(m_ToolTipPointPreview);
 }
 
 void IGTNavigationToolCalibration::RemoveToolTipPreview()

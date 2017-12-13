@@ -221,6 +221,7 @@ int main(int argc, char* argv[])
       std::cout.rdbuf (old);              // <-- restore
     }
 
+    std::srand(0);
     if (subsample<1.0)
       inputTractogram = inputTractogram->SubsampleFibers(subsample);
 
@@ -254,7 +255,6 @@ int main(int argc, char* argv[])
         std::cout.rdbuf (old);              // <-- restore
       }
       anchor_tractogram = anchor_tractogram->AddBundles(positives);
-      MITK_INFO << anchor_tractogram->GetNumFibers() << " - " << positives.size();
     }
 
     mitk::IOUtil::Save(anchor_tractogram, out_folder + "/anchor_tracts/anchor_tractogram.trk");

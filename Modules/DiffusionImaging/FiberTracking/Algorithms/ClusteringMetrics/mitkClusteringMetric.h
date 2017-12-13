@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _ClusteringMetric
 
 #include <MitkFiberTrackingExports.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace mitk
 {

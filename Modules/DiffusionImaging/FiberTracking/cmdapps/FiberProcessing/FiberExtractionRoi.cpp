@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
   parser.addArgument("both_ends", "", mitkCommandLineParser::Bool, "Both ends:", "Fibers are extracted if both endpoints are located in the ROI.", false);
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1);
   parser.addArgument("invert", "", mitkCommandLineParser::Bool, "Invert:", "get streamlines not positive for any of the mask images", false);
+  parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate mask images", false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -88,6 +89,10 @@ int main(int argc, char* argv[])
   if (overlap_fraction>=0)
     any_point = true;
 
+  bool interpolate = false;
+  if (parsedArgs.count("interpolate"))
+    interpolate = us::any_cast<bool>(parsedArgs["interpolate"]);
+
   try
   {
     // load fiber bundle
@@ -102,6 +107,7 @@ int main(int argc, char* argv[])
     extractor->SetMasks(mask_images);
     extractor->SetOverlapFraction(overlap_fraction);
     extractor->SetBothEnds(both_ends);
+    extractor->SetInterpolate(interpolate);
     if (invert)
       extractor->SetNoPositives(true);
     else

@@ -106,7 +106,7 @@ public:
     int c = 0;
     for (auto map : m_ScalarMaps)
     {
-      vals[c] = mitk::TrackingDataHandler::GetImageValue<float>(itkP, map, true);
+      vals[c] = mitk::imv::GetImageValue<float>(itkP, map, true);
       ++c;
     }
     return vals;

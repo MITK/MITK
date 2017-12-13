@@ -108,7 +108,6 @@ protected:
     ItkDoubleImgType::Pointer NormalizeInsideMask(ItkDoubleImgType::Pointer image);
     void InitializeData();
     void InitializeFiberData();
-    double InterpolateValue(itk::Point<float, 3> itkP, ItkDoubleImgType::Pointer img);
 
     // input
     mitk::FiberfoxParameters<double>            m_Parameters;

@@ -74,83 +74,6 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::WorldToInde
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-typename TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate)
-{
-  // transform physical point to index coordinates
-  itk::Index<3> idx;
-  itk::ContinuousIndex< float, 3> cIdx;
-  image->TransformPhysicalPointToIndex(itkP, idx);
-  image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
-
-  typename DwiFeatureImageType::PixelType pix; pix.Fill(0.0);
-  if ( image->GetLargestPossibleRegion().IsInside(idx) )
-  {
-    pix = image->GetPixel(idx);
-    if (!interpolate)
-      return pix;
-  }
-  else
-    return pix;
-
-  float frac_x = cIdx[0] - idx[0];
-  float frac_y = cIdx[1] - idx[1];
-  float frac_z = cIdx[2] - idx[2];
-  if (frac_x<0)
-  {
-    idx[0] -= 1;
-    frac_x += 1;
-  }
-  if (frac_y<0)
-  {
-    idx[1] -= 1;
-    frac_y += 1;
-  }
-  if (frac_z<0)
-  {
-    idx[2] -= 1;
-    frac_z += 1;
-  }
-  frac_x = 1-frac_x;
-  frac_y = 1-frac_y;
-  frac_z = 1-frac_z;
-
-  // int coordinates inside image?
-  if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(0) - 1) &&
-      idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(1) - 1) &&
-      idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(2) - 1))
-  {
-    // trilinear interpolation
-    vnl_vector_fixed<float, 8> interpWeights;
-    interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
-    interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
-    interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
-    interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
-    interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
-    interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
-    interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
-    interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
-
-    pix = image->GetPixel(idx) * interpWeights[0];
-    typename DwiFeatureImageType::IndexType tmpIdx = idx; tmpIdx[0]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[1];
-    tmpIdx = idx; tmpIdx[1]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[2];
-    tmpIdx = idx; tmpIdx[2]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[3];
-    tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[4];
-    tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[5];
-    tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[6];
-    tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[7];
-  }
-
-  return pix;
-}
-
-template< int ShOrder, int NumberOfSignalFeatures >
 void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InputDataValidForTracking()
 {
   if (m_InputDwis.empty())
@@ -259,7 +182,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
   // store feature pixel values in a vigra data type
   vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->GetNumFeatures()) );
-  typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0), m_Interpolate);
+  typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_DwiFeatureImages.at(0), m_Interpolate);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
 
@@ -305,7 +228,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     int c = 0;
     for (auto img : m_AdditionalFeatureImages.at(0))
     {
-      float v = GetImageValue<float>(pos, img, false);
+      float v = mitk::imv::GetImageValue<float>(pos, img, false);
       featureData(0,NumberOfSignalFeatures+m_NumPreviousDirections*3+c) = v;
       c++;
     }
@@ -762,7 +685,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
           {
             itk::Point<float, 3> itkP;
             image->TransformIndexToPhysicalPoint(it.GetIndex(), itkP);
-            float v = GetImageValue<float>(itkP, img, false);
+            float v = mitk::imv::GetImageValue<float>(itkP, img, false);
             m_FeatureData(sampleCounter,NumberOfSignalFeatures+m_NumPreviousDirections*3+add_feat_c) = v;
             add_feat_c++;
           }
@@ -887,10 +810,10 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
               dir *= -1;
 
             // image features
-            float volume_mod = GetImageValue<float>(itkP1, fiber_folume, false);
+            float volume_mod = mitk::imv::GetImageValue<float>(itkP1, fiber_folume, false);
 
             // diffusion signal features
-            typename DwiFeatureImageType::PixelType pix = GetDwiFeaturesAtPosition(itkP1, image, m_Interpolate);
+            typename DwiFeatureImageType::PixelType pix = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(itkP1, image, m_Interpolate);
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
               m_FeatureData(sampleCounter,f) = pix[f];
 
@@ -898,7 +821,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
             int add_feat_c = 0;
             for (auto img : m_AdditionalFeatureImages.at(t))
             {
-              float v = GetImageValue<float>(itkP1, img, false);
+              float v = mitk::imv::GetImageValue<float>(itkP1, img, false);
               add_feat_c++;
               m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
             }

@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
   parser.addArgument("distance", "", mitkCommandLineParser::Int, "Distance:", "", 10);
   parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "");
+  parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Subsampling factor:", "Only use specified fraction of input fibers", 1.0);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -89,9 +90,18 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("metric"))
     metric = us::any_cast<std::string>(parsedArgs["metric"]);
 
+  float subsample = 1.0;
+  if (parsedArgs.count("subsample"))
+    subsample = us::any_cast<float>(parsedArgs["subsample"]);
+
   try
   {
     mitk::FiberBundle::Pointer fib = LoadFib(in_fib);
+
+    std::srand(0);
+    if (subsample<1.0)
+      fib = fib->SubsampleFibers(subsample);
+
     mitk::FiberBundle::Pointer resampled_fib = fib->GetDeepCopy();
     resampled_fib->ResampleToNumPoints(12);
 
@@ -140,17 +150,21 @@ int main(int argc, char* argv[])
 
         // calculate centroids from reference bundle
         {
+          MITK_INFO << "TEST 1";
           itk::TractClusteringFilter::Pointer clusterer = itk::TractClusteringFilter::New();
           clusterer->SetDistances({10,20,30});
           clusterer->SetTractogram(ref_fib);
           clusterer->SetMetrics({new mitk::ClusteringMetricEuclideanStd()});
           clusterer->SetMergeDuplicateThreshold(0.0);
           clusterer->Update();
+          MITK_INFO << "TEST 2";
           std::vector<mitk::FiberBundle::Pointer> tracts = clusterer->GetOutCentroids();
           ref_fib = mitk::FiberBundle::New(nullptr);
           ref_fib = ref_fib->AddBundles(tracts);
+          MITK_INFO << "TEST 3";
           mitk::IOUtil::Save(ref_fib, out_root + "centroids_" + ist::GetFilenameName(ref_bundle_files.at(c)));
           segmenter->SetInCentroids(ref_fib);
+          MITK_INFO << "TEST 4";
         }
 
         // segment tract

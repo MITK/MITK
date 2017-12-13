@@ -419,6 +419,7 @@ public:
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());
 
+    mitk::IOUtil::Save(img, mitk::IOUtil::GetTempPath()+"Test_Odf6.nrrd");
     CheckImageResult("Test_Odf6.nrrd", img);
 
     delete handler;

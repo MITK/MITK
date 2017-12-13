@@ -302,7 +302,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
     itk::Index<3> index;
     m_TensorImages.at(0)->TransformPhysicalPointToIndex(pos, index);
 
-    float fa = GetImageValue<float>(pos, m_FaImage, m_Interpolate);
+    float fa = mitk::imv::GetImageValue<float>(pos, m_FaImage, m_Interpolate);
     if (fa<m_FaThreshold)
       return output_direction;
 

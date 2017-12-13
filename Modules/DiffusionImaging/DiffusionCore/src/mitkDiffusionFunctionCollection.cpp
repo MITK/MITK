@@ -117,7 +117,7 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMa
       bool directionExist = false;
       while(containerIt != directioncontainer.end())
       {
-        if (fabs(dot(refGradientsContainer->ElementAt(*containerIt), refGradientsContainer->ElementAt(wntIndex)))  > 0.9998)
+        if (fabs(dot_product(refGradientsContainer->ElementAt(*containerIt), refGradientsContainer->ElementAt(wntIndex)))  > 0.9998)
         {
           directionExist = true;
           break;
@@ -155,19 +155,11 @@ bool mitk::gradients::CheckForDifferingShellDirections(const BValueMap & refBVal
       IndiciesVector currentShell = mapIterator->second;
       IndiciesVector testShell = mapIterator_2->second;
       for (unsigned int i = 0; i< currentShell.size(); i++)
-        if (fabs(dot(refGradientsContainer->ElementAt(currentShell[i]), refGradientsContainer->ElementAt(testShell[i])))  <= 0.9998) { return true; }
+        if (fabs(dot_product(refGradientsContainer->ElementAt(currentShell[i]), refGradientsContainer->ElementAt(testShell[i])))  <= 0.9998) { return true; }
 
     }
   }
   return false;
-}
-
-
-template<typename type>
-double mitk::gradients::dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 )
-{
-  double result = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) / (v1.two_norm() * v2.two_norm());
-  return result ;
 }
 
 vnl_matrix<double> mitk::gradients::ComputeSphericalFromCartesian(const IndiciesVector & refShell, const GradientDirectionContainerType * refGradientsContainer)
@@ -234,7 +226,7 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::Create
       bool directionExist = false;
       while(containerIt != directioncontainer->End())
       {
-        if (fabs(dot(containerIt.Value(), origninalGradentcontainer->ElementAt(wntIndex)))  > 0.9998)
+        if (fabs(dot_product(containerIt.Value(), origninalGradentcontainer->ElementAt(wntIndex)))  > 0.9998)
         {
           directionExist = true;
           break;

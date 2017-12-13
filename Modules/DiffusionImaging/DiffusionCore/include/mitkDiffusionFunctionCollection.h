@@ -19,11 +19,71 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <MitkDiffusionCoreExports.h>
-#include "vnl/vnl_vector.h"
-#include "vnl/vnl_vector_fixed.h"
-#include "itkVectorContainer.h"
+#include <vnl/vnl_vector.h>
+#include <vnl/vnl_vector_fixed.h>
+#include <itkVectorContainer.h>
+#include <itkImage.h>
+#include <itkLinearInterpolateImageFunction.h>
+#include <mitkImage.h>
 
 namespace mitk{
+
+class imv
+{
+public:
+
+  template< class TPixelType, class TOutPixelType=TPixelType >
+  static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, bool interpolate)
+  {
+    itk::ContinuousIndex< float, 3> cIdx;
+    image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+
+    typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator = itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::New();
+    interpolator->SetInputImage(image);
+
+    if (interpolator->IsInsideBuffer(cIdx))
+    {
+      if (interpolate)
+        return interpolator->EvaluateAtContinuousIndex(cIdx);
+      else
+      {
+        itk::Index<3> idx;
+        image->TransformPhysicalPointToIndex(itkP, idx);
+        return image->GetPixel(idx);
+      }
+    }
+    else
+      return 0.0;
+  }
+
+  template< class TPixelType=unsigned char >
+  static bool IsInsideMask(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, bool interpolate)
+  {
+    itk::ContinuousIndex< float, 3> cIdx;
+    image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+
+    typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator = itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::New();
+    interpolator->SetInputImage(image);
+
+    if (interpolator->IsInsideBuffer(cIdx))
+    {
+      double value = 0.0;
+      if (interpolate)
+        value = interpolator->EvaluateAtContinuousIndex(cIdx);
+      else
+      {
+        itk::Index<3> idx;
+        image->TransformPhysicalPointToIndex(itkP, idx);
+        value = image->GetPixel(idx);
+      }
+
+      if (value>=0.5)
+        return true;
+    }
+    return false;
+  }
+
+};
 
 class MITKDIFFUSIONCORE_EXPORT sh
 {
@@ -50,11 +110,6 @@ public:
   static vnl_matrix<double> ComputeSphericalHarmonicsBasis(const vnl_matrix<double> & QBallReference, const unsigned int & LOrder);
   static vnl_matrix<double> ComputeSphericalFromCartesian(const IndiciesVector  & refShell, const GradientDirectionContainerType * refGradientsContainer);
   static mitk::gradients::GradientDirectionContainerType::Pointer CreateNormalizedUniqueGradientDirectionContainer(const BValueMap &bValueMap, const GradientDirectionContainerType * origninalGradentcontainer);
-
-
-  template<typename type>
-  static double dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 );
-
 };
 
 }

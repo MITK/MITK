@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <TrackingHandlers/mitkTrackingHandlerRandomForest.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -369,13 +370,6 @@ void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<float, 3>& pos, v
   pos[2] += dir[2]*m_StepSize;
 }
 
-
-bool StreamlineTrackingFilter
-::IsInsideMask(const itk::Point<float, 3> &pos, ItkUcharImgType::Pointer mask)
-{
-  return m_TrackingHandler->IsInsideMask(pos, mask, m_InterpolateMask);
-}
-
 bool StreamlineTrackingFilter
 ::IsInGm(const itk::Point<float, 3> &pos)
 {
@@ -440,7 +434,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
   }
   vnl_vector_fixed<float,3> direction; direction.fill(0);
 
-  if (IsInsideMask(pos, m_MaskImage) && !IsInsideMask(pos, m_StoppingRegions))
+  if (mitk::imv::IsInsideMask<unsigned char>(pos, m_MaskImage, m_InterpolateMask) && !mitk::imv::IsInsideMask<unsigned char>(pos, m_StoppingRegions, m_InterpolateMask))
     direction = m_TrackingHandler->ProposeDirection(pos, olddirs, oldIndex); // get direction proposal at current streamline position
   else
     return direction;
@@ -482,7 +476,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
     sample_pos[2] = pos[2] + d[2];
 
     vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
-    if (IsInsideMask(sample_pos, m_MaskImage))
+    if (mitk::imv::IsInsideMask<unsigned char>(sample_pos, m_MaskImage, m_InterpolateMask))
       tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
     if (tempDir.magnitude()>mitk::eps)
     {
@@ -510,7 +504,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
       sample_pos[2] = pos[2] + d[2];
       alternatives++;
       vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
-      if (IsInsideMask(sample_pos, m_MaskImage))
+      if (mitk::imv::IsInsideMask<unsigned char>(sample_pos, m_MaskImage, m_InterpolateMask))
         tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
 
       if (tempDir.magnitude()>mitk::eps)  // are we back in the white matter?
@@ -719,7 +713,7 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
         itk::Point<float> worldPos;
         m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
 
-        if (IsInsideMask(worldPos, m_MaskImage) && (!m_SeedOnlyGm || IsInGm(worldPos)))
+        if (mitk::imv::IsInsideMask<unsigned char>(worldPos, m_MaskImage, m_InterpolateMask) && (!m_SeedOnlyGm || IsInGm(worldPos)))
         {
           m_SeedPoints.push_back(worldPos);
           for (int s = 1; s < m_SeedsPerVoxel; s++)
@@ -807,7 +801,7 @@ void StreamlineTrackingFilter::GenerateData()
       olddirs.push_back(gm_start_dir);
     }
 
-    if (IsInsideMask(worldPos, m_MaskImage))
+    if (mitk::imv::IsInsideMask<unsigned char>(worldPos, m_MaskImage, m_InterpolateMask))
       dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex);
 
     if (dir.magnitude()>0.0001)

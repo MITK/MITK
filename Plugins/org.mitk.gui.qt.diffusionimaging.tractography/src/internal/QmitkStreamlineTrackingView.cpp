@@ -106,7 +106,6 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_MaskImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TargetImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_StopImageBox->SetDataStorage(this->GetDataStorage());
-    m_Controls->m_TissueImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ForestBox->SetDataStorage(this->GetDataStorage());
 
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -120,22 +119,19 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_ForestBox->SetPredicate(isTractographyForest);
     m_Controls->m_FaImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
     m_Controls->m_FaImageBox->SetZeroEntryText("--");
-    m_Controls->m_SeedImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
+    m_Controls->m_SeedImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_SeedImageBox->SetZeroEntryText("--");
-    m_Controls->m_MaskImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
+    m_Controls->m_MaskImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_MaskImageBox->SetZeroEntryText("--");
-    m_Controls->m_StopImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
+    m_Controls->m_StopImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_StopImageBox->SetZeroEntryText("--");
-    m_Controls->m_TargetImageBox->SetPredicate( dimensionPredicate );
+    m_Controls->m_TargetImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_TargetImageBox->SetZeroEntryText("--");
-    m_Controls->m_TissueImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
-    m_Controls->m_TissueImageBox->SetZeroEntryText("--");
 
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
     connect( m_Controls->commandLinkButton_2, SIGNAL(clicked()), this, SLOT(StopTractography()) );
     connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
     connect( m_Controls->m_InteractiveBox, SIGNAL(stateChanged(int)), this, SLOT(ToggleInteractive()) );
-    connect( m_Controls->m_TissueImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()) );
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()) );
     connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(DeleteTrackingHandler()) );
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(DeleteTrackingHandler()) );
@@ -165,7 +161,6 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_SharpenOdfsBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_InterpolationBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_MaskInterpolationBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_SeedGmBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FlipXBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FlipYBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
@@ -360,11 +355,8 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 
   m_Controls->m_SeedsPerVoxelBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
   m_Controls->m_SeedsPerVoxelLabel->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
-  m_Controls->m_SeedGmBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
   m_Controls->m_SeedImageBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
   m_Controls->label_6->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
-  m_Controls->m_TissueImageBox->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
-  m_Controls->label_10->setEnabled(!m_Controls->m_InteractiveBox->isChecked());
 
   if ( m_Controls->m_InteractiveBox->isChecked() )
   {
@@ -526,11 +518,6 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->m_ForestBox->setEnabled(false);
   m_Controls->m_ForestLabel->setEnabled(false);
   m_Controls->commandLinkButton->setEnabled(false);
-
-  if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
-    m_Controls->m_SeedGmBox->setEnabled(true);
-  else
-    m_Controls->m_SeedGmBox->setEnabled(false);
 
   if(!m_InputImageNodes.empty())
   {
@@ -804,7 +791,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   }
   else if (m_Controls->m_SeedImageBox->GetSelectedNode().IsNotNull())
   {
-    ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+    ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_SeedImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetSeedImage(mask);
   }
@@ -812,7 +799,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   m_Tracker->SetInterpolateMask(false);
   if (m_Controls->m_MaskImageBox->GetSelectedNode().IsNotNull())
   {
-    ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+    ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_MaskImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetMaskImage(mask);
     m_Tracker->SetInterpolateMask(m_Controls->m_MaskInterpolationBox->isChecked());
@@ -820,24 +807,16 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   if (m_Controls->m_StopImageBox->GetSelectedNode().IsNotNull())
   {
-    ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+    ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_StopImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetStoppingRegions(mask);
   }
 
   if (m_Controls->m_TargetImageBox->GetSelectedNode().IsNotNull())
   {
-    ItkUintImgType::Pointer mask = ItkUintImgType::New();
+    ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TargetImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetTargetRegions(mask);
-  }
-
-  if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
-  {
-    ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-    mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TissueImageBox->GetSelectedNode()->GetData()), mask);
-    m_Tracker->SetTissueImage(mask);
-    m_Tracker->SetSeedOnlyGm(m_Controls->m_SeedGmBox->isChecked());
   }
 
   m_Tracker->SetVerbose(!m_Controls->m_InteractiveBox->isChecked());

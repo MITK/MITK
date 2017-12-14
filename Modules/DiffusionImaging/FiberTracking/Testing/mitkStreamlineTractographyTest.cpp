@@ -58,14 +58,13 @@ public:
 
   /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
 
-  typedef itk::Image<unsigned char, 3> ItkUcharImgType;
   typedef itk::Image<float, 3> ItkFloatImgType;
 
   mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itk_odf_image;
   mitk::TrackingHandlerTensor::ItkTensorImageType::ConstPointer itk_tensor_image;
   mitk::TrackingHandlerPeaks::PeakImgType::Pointer itk_peak_image;
-  ItkUcharImgType::Pointer itk_seed_image;
-  ItkUcharImgType::Pointer itk_mask_image;
+  ItkFloatImgType::Pointer itk_seed_image;
+  ItkFloatImgType::Pointer itk_mask_image;
   ItkFloatImgType::Pointer itk_gfa_image;
 
   float gfa_threshold;
@@ -116,10 +115,10 @@ public:
     itk_gfa_image = ItkFloatImgType::New();
     mitk::CastToItkImage(gfa_image, itk_gfa_image);
 
-    itk_seed_image = ItkUcharImgType::New();
+    itk_seed_image = ItkFloatImgType::New();
     mitk::CastToItkImage(seed_image, itk_seed_image);
 
-    itk_mask_image = ItkUcharImgType::New();
+    itk_mask_image = ItkFloatImgType::New();
     mitk::CastToItkImage(mask_image, itk_mask_image);
   }
 
@@ -150,6 +149,7 @@ public:
   {
     tracker = itk::StreamlineTrackingFilter::New();
     tracker->SetRandom(false);
+    tracker->SetInterpolateMask(false);
     tracker->SetNumberOfSamples(0);
     tracker->SetAngularThreshold(-1);
     tracker->SetMaskImage(itk_mask_image);
@@ -161,9 +161,6 @@ public:
     tracker->SetUseStopVotes(true);
     tracker->SetOnlyForwardSamples(true);
     tracker->SetAposterioriCurvCheck(false);
-    tracker->SetTissueImage(nullptr);
-    tracker->SetSeedOnlyGm(false);
-    tracker->SetControlGmEndings(false);
     tracker->SetMinTractLength(20);
     tracker->SetMaxNumTracts(-1);
     tracker->SetTrackingHandler(handler);

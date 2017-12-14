@@ -36,7 +36,7 @@ class mitkMachineLearningTrackingTestSuite : public mitk::TestFixture
     MITK_TEST(Track1);
     CPPUNIT_TEST_SUITE_END();
 
-    typedef itk::Image<unsigned char, 3> ItkUcharImgType;
+    typedef itk::Image<float, 3> ItkFloatImgType;
 
 private:
 
@@ -44,7 +44,7 @@ private:
     mitk::FiberBundle::Pointer ref;
     mitk::TrackingHandlerRandomForest<6, 100>* tfh;
     mitk::Image::Pointer dwi;
-    ItkUcharImgType::Pointer seed;
+    ItkFloatImgType::Pointer seed;
 
 public:
 
@@ -61,7 +61,7 @@ public:
 
 
         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/seed.nrrd"))[0].GetPointer());
-        seed = ItkUcharImgType::New();
+        seed = ItkFloatImgType::New();
         mitk::CastToItkImage(img, seed);
 
         mitk::TractographyForest::Pointer forest = dynamic_cast<mitk::TractographyForest*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"))[0].GetPointer());
@@ -82,6 +82,7 @@ public:
         typedef itk::StreamlineTrackingFilter TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetDemoMode(false);
+        tracker->SetInterpolateMask(false);
         tracker->SetSeedImage(seed);
         tracker->SetSeedsPerVoxel(1);
         tracker->SetStepSize(-1);

@@ -26,7 +26,7 @@ TrackingHandlerTensor::TrackingHandlerTensor()
   , m_InterpolateTensors(true)
   , m_NumberOfInputs(0)
 {
-
+  m_FaInterpolator = itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::New();
 }
 
 TrackingHandlerTensor::~TrackingHandlerTensor()
@@ -118,6 +118,8 @@ void TrackingHandlerTensor::InitForTracking()
     m_F /= temp;
     m_G /= temp;
   }
+
+  m_FaInterpolator->SetInputImage(m_FaImage);
 
   std::cout << "TrackingHandlerTensor - FA threshold: " << m_FaThreshold << std::endl;
   std::cout << "TrackingHandlerTensor - f: " << m_F << std::endl;
@@ -302,7 +304,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
     itk::Index<3> index;
     m_TensorImages.at(0)->TransformPhysicalPointToIndex(pos, index);
 
-    float fa = mitk::imv::GetImageValue<float>(pos, m_FaImage, m_Interpolate);
+    float fa = mitk::imv::GetImageValue<float>(pos, m_Interpolate, m_FaInterpolator);
     if (fa<m_FaThreshold)
       return output_direction;
 

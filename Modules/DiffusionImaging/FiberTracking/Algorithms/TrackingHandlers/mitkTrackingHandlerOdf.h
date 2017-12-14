@@ -78,6 +78,9 @@ protected:
   vnl_matrix< float >             m_OdfFloatDirs;
   int                             m_NumProbSamples;
   bool                            m_OdfFromTensor;
+
+  itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::Pointer   m_GfaInterpolator;
+  itk::LinearInterpolateImageFunction< itk::Image< ItkOdfImageType::PixelType, 3 >, float >::Pointer   m_OdfInterpolator;
 };
 
 }

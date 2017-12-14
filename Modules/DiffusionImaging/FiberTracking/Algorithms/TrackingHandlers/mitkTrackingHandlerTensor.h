@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include <MitkFiberTrackingExports.h>
 #include <mitkTensorImage.h>
+#include <itkLinearInterpolateImageFunction.h>
 
 namespace mitk
 {
@@ -84,6 +85,8 @@ protected:
   std::vector< ItkTensorImageType::ConstPointer > m_TensorImages;   ///< Input tensor images. For multi tensor tracking provide multiple tensor images.
   bool                                            m_InterpolateTensors;   ///< If false, then the peaks are interpolated. Otherwiese, The tensors are interpolated.
   int                                             m_NumberOfInputs;
+
+  itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::Pointer   m_FaInterpolator;
 };
 
 }

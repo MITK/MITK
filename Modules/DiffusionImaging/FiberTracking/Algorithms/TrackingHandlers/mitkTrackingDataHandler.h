@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <mitkDiffusionFunctionCollection.h>
+#include <itkLinearInterpolateImageFunction.h>
 
 namespace mitk
 {

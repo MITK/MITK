@@ -155,6 +155,24 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrac
     InputDataValidForTracking();
     m_DwiFeatureImages.clear();
     InitDwiImageFeatures<>(m_InputDwis.at(0));
+
+    // initialize interpolators
+    m_DwiFeatureImageInterpolator = DwiFeatureImageInterpolatorType::New();
+    m_DwiFeatureImageInterpolator->SetInputImage(m_DwiFeatureImages.at(0));
+
+    m_AdditionalFeatureImageInterpolators.clear();
+    for (auto afi_vec : m_AdditionalFeatureImages)
+    {
+      std::vector< FloatImageInterpolatorType::Pointer > v;
+      for (auto img : afi_vec)
+      {
+        FloatImageInterpolatorType::Pointer interp = FloatImageInterpolatorType::New();
+        interp->SetInputImage(img);
+        v.push_back(interp);
+      }
+      m_AdditionalFeatureImageInterpolators.push_back(v);
+    }
+
     m_NeedsDataInit = false;
   }
 }
@@ -182,7 +200,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
   // store feature pixel values in a vigra data type
   vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->GetNumFeatures()) );
-  typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_DwiFeatureImages.at(0), m_Interpolate);
+  typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_Interpolate, m_DwiFeatureImageInterpolator);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
 
@@ -226,9 +244,9 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   if (m_AdditionalFeatureImages.size()>0)
   {
     int c = 0;
-    for (auto img : m_AdditionalFeatureImages.at(0))
+    for (auto interpolator : m_AdditionalFeatureImageInterpolators.at(0))
     {
-      float v = mitk::imv::GetImageValue<float>(pos, img, false);
+      float v = mitk::imv::GetImageValue<float>(pos, false, interpolator);
       featureData(0,NumberOfSignalFeatures+m_NumPreviousDirections*3+c) = v;
       c++;
     }
@@ -495,6 +513,20 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrai
     }
   }
 
+  // initialize interpolators
+  m_AdditionalFeatureImageInterpolators.clear();
+  for (auto afi_vec : m_AdditionalFeatureImages)
+  {
+    std::vector< FloatImageInterpolatorType::Pointer > v;
+    for (auto img : afi_vec)
+    {
+      FloatImageInterpolatorType::Pointer interp = FloatImageInterpolatorType::New();
+      interp->SetInputImage(img);
+      v.push_back(interp);
+    }
+    m_AdditionalFeatureImageInterpolators.push_back(v);
+  }
+
   MITK_INFO << "Resampling fibers and calculating number of samples ...";
   m_NumberOfSamples = 0;
   m_SampleUsage.clear();
@@ -630,7 +662,12 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
   for (unsigned int t=0; t<m_Tractograms.size(); t++)
   {
     ItkFloatImgType::Pointer fiber_folume = m_FiberVolumeModImages.at(t);
+    FloatImageInterpolatorType::Pointer volume_interpolator = FloatImageInterpolatorType::New();
+    volume_interpolator->SetInputImage(fiber_folume);
     typename DwiFeatureImageType::Pointer image = m_DwiFeatureImages.at(t);
+    typename DwiFeatureImageInterpolatorType::Pointer dwi_interp = DwiFeatureImageInterpolatorType::New();
+    dwi_interp->SetInputImage(image);
+
     ItkUcharImgType::Pointer wmMask = m_WhiteMatterImages.at(t);
     ItkUcharImgType::Pointer mask;
     if (t<m_MaskImages.size())
@@ -681,11 +718,11 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
 
           // additional feature images
           int add_feat_c = 0;
-          for (auto img : m_AdditionalFeatureImages.at(t))
+          for (auto interpolator : m_AdditionalFeatureImageInterpolators.at(t))
           {
             itk::Point<float, 3> itkP;
             image->TransformIndexToPhysicalPoint(it.GetIndex(), itkP);
-            float v = mitk::imv::GetImageValue<float>(itkP, img, false);
+            float v = mitk::imv::GetImageValue<float>(itkP, false, interpolator);
             m_FeatureData(sampleCounter,NumberOfSignalFeatures+m_NumPreviousDirections*3+add_feat_c) = v;
             add_feat_c++;
           }
@@ -810,18 +847,18 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
               dir *= -1;
 
             // image features
-            float volume_mod = mitk::imv::GetImageValue<float>(itkP1, fiber_folume, false);
+            float volume_mod = mitk::imv::GetImageValue<float>(itkP1, false, volume_interpolator);
 
             // diffusion signal features
-            typename DwiFeatureImageType::PixelType pix = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(itkP1, image, m_Interpolate);
+            typename DwiFeatureImageType::PixelType pix = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(itkP1, m_Interpolate, dwi_interp);
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
               m_FeatureData(sampleCounter,f) = pix[f];
 
             // additional feature images
             int add_feat_c = 0;
-            for (auto img : m_AdditionalFeatureImages.at(t))
+            for (auto interpolator : m_AdditionalFeatureImageInterpolators.at(t))
             {
-              float v = mitk::imv::GetImageValue<float>(itkP1, img, false);
+              float v = mitk::imv::GetImageValue<float>(itkP1, false, interpolator);
               add_feat_c++;
               m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
             }

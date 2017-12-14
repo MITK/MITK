@@ -44,8 +44,8 @@ namespace itk {
     , m_IsBaseline(true)
   {
     m_DiffusionGradientDirection.Fill(0.0);
-
     m_CoilPosition.Fill(0.0);
+    m_FmapInterpolator = itk::LinearInterpolateImageFunction< itk::Image< double, 3 >, float >::New();
   }
 
   template< class TPixelType >
@@ -126,6 +126,8 @@ namespace itk {
     }
 
     m_ReadoutScheme->AdjustEchoTime();
+
+    m_FmapInterpolator->SetInputImage(m_Parameters->m_SignalGen.m_FrequencyMap);
   }
 
   template< class TPixelType >
@@ -293,7 +295,7 @@ namespace itk {
               point3D = m_FiberBundle->TransformPoint( point3D.GetVnlVector(),
                                                        -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
                                                        -m_Translation[0], -m_Translation[1], -m_Translation[2] );
-              omega += mitk::imv::GetImageValue<double>(point3D, m_Parameters->m_SignalGen.m_FrequencyMap, true);
+              omega += mitk::imv::GetImageValue<double>(point3D, true, m_FmapInterpolator);
             }
             else
             {

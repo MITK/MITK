@@ -64,7 +64,8 @@ int main(int argc, char* argv[])
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1);
   parser.addArgument("invert", "", mitkCommandLineParser::Bool, "Invert:", "get streamlines not positive for any of the ROI images", false);
   parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate ROI images", false);
-  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image > threshold", false, 0.5);
+  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", false, 0.5);
+  parser.addArgument("labels", "", mitkCommandLineParser::StringList, "Labels:", "positive means roi image value in labels vector", false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -98,6 +99,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("threshold"))
     threshold = us::any_cast<float>(parsedArgs["threshold"]);
 
+  mitkCommandLineParser::StringContainerType labels;
+  if (parsedArgs.count("labels"))
+    labels = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["labels"]);
+
   try
   {
     // load fiber bundle
@@ -111,6 +116,10 @@ int main(int argc, char* argv[])
     for (auto roi : roi_images)
       roi_images2.push_back(roi);
 
+    std::vector< unsigned short > short_labels;
+    for (auto l : labels)
+      short_labels.push_back(boost::lexical_cast<unsigned short>(l));
+
     itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();
     extractor->SetInputFiberBundle(inputTractogram);
     extractor->SetRoiImages(roi_images2);
@@ -118,12 +127,15 @@ int main(int argc, char* argv[])
     extractor->SetBothEnds(both_ends);
     extractor->SetInterpolate(interpolate);
     extractor->SetThreshold(threshold);
+    extractor->SetLabels(short_labels);
     if (invert)
       extractor->SetNoPositives(true);
     else
       extractor->SetNoNegatives(true);
     if (!any_point)
       extractor->SetMode(itk::FiberExtractionFilter<float>::MODE::ENDPOINTS);
+    if (short_labels.size()>0)
+      extractor->SetInputType(itk::FiberExtractionFilter<float>::INPUT::LABEL_MAP);
     extractor->Update();
 
     mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(nullptr);

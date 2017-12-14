@@ -214,6 +214,9 @@ protected:
   std::chrono::time_point<std::chrono::system_clock> m_StartTime;
   std::chrono::time_point<std::chrono::system_clock> m_EndTime;
 
+  itk::LinearInterpolateImageFunction< itk::Image< unsigned char, 3 >, float >::Pointer   m_MaskInterpolator;
+  itk::LinearInterpolateImageFunction< itk::Image< unsigned char, 3 >, float >::Pointer   m_StopInterpolator;
+
 private:
 
 };

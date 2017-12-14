@@ -65,6 +65,7 @@ namespace itk
     , m_RandGen(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
   {
     m_RandGen->SetSeed();
+    m_DoubleInterpolator = itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::New();
   }
 
   template< class PixelType >
@@ -1089,7 +1090,8 @@ namespace itk
             double fact2 = fact;
             if ( m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage()!=nullptr && iAxVolume>0.0001 )
             {
-              double val = mitk::imv::GetImageValue<double>(point, m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage(), true);
+              m_DoubleInterpolator->SetInputImage(m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage());
+              double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
               if (val<0)
                 mitkThrow() << "Volume fraction image (index 1) contains negative values (intra-axonal compartment)!";
               fact2 = m_VoxelVolume*val/iAxVolume;
@@ -1478,7 +1480,8 @@ namespace itk
           double weight = 0;
           if (numNonFiberCompartments>1)
           {
-            double val = mitk::imv::GetImageValue<double>(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage(), true);
+            m_DoubleInterpolator->SetInputImage(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
             if (val<0)
                 mitkThrow() << "Volume fraction image (index " << i << ") contains values less than zero!";
             else
@@ -1548,7 +1551,8 @@ namespace itk
 
           if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage()!=nullptr)
           {
-            double val = mitk::imv::GetImageValue<double>(point, m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage(), true);
+            m_DoubleInterpolator->SetInputImage(m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage());
+            double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
             if (val<0)
               mitkThrow() << "Volume fraction image (index " << i+1 << ") contains negative values!";
             else
@@ -1571,7 +1575,8 @@ namespace itk
           DoubleDwiType::PixelType pix = m_CompartmentImages.at(i+numFiberCompartments)->GetPixel(index);
           if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()!=nullptr)
           {
-            double val = mitk::imv::GetImageValue<double>(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage(), true);
+            m_DoubleInterpolator->SetInputImage(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
             if (val<0)
               mitkThrow() << "Volume fraction image (index " << numFiberCompartments+i+1 << ") contains negative values (non-fiber compartment)!";
             else

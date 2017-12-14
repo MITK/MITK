@@ -52,10 +52,13 @@ class TrackingHandlerRandomForest : public TrackingDataHandler
 
 public:
 
+
   TrackingHandlerRandomForest();
   ~TrackingHandlerRandomForest();
 
   typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures > , 3 >      DwiFeatureImageType;
+  typedef itk::LinearInterpolateImageFunction< DwiFeatureImageType, float >   DwiFeatureImageInterpolatorType;
+  typedef itk::LinearInterpolateImageFunction< ItkFloatImgType, float >       FloatImageInterpolatorType;
 
   typedef mitk::ThresholdSplit<mitk::LinearSplitting< mitk::ImpurityLoss<> >,int,vigra::ClassificationTag> DefaultSplitType;
 
@@ -151,6 +154,9 @@ protected:
 
   vnl_matrix_fixed<float,3,3>                                 m_ImageDirection;
   vnl_matrix_fixed<float,3,3>                                 m_ImageDirectionInverse;
+
+  typename DwiFeatureImageInterpolatorType::Pointer           m_DwiFeatureImageInterpolator;
+  std::vector< std::vector< FloatImageInterpolatorType::Pointer > >   m_AdditionalFeatureImageInterpolators;
 };
 
 }

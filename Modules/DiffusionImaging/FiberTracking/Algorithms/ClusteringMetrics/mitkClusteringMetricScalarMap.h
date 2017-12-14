@@ -37,7 +37,9 @@ public:
   typedef itk::Image<float, 3>  ItkFloatImgType;
 
   ClusteringMetricScalarMap()
-  {}
+  {
+    m_Interpolator = itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::New();
+  }
   virtual ~ClusteringMetricScalarMap(){}
 
   float CalculateDistance(vnl_matrix<float>& s, vnl_matrix<float>& t, bool &flipped)
@@ -106,7 +108,8 @@ public:
     int c = 0;
     for (auto map : m_ScalarMaps)
     {
-      vals[c] = mitk::imv::GetImageValue<float>(itkP, map, true);
+      m_Interpolator->SetInputImage(map);
+      vals[c] = mitk::imv::GetImageValue<float>(itkP, true, m_Interpolator);
       ++c;
     }
     return vals;
@@ -120,6 +123,7 @@ public:
 protected:
 
   std::vector< ItkFloatImgType::Pointer > m_ScalarMaps;
+  itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_Interpolator;
 };
 
 }

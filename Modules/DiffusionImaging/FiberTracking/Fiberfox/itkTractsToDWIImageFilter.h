@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRawShModel.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 #include <mitkPointSet.h>
+#include <itkLinearInterpolateImageFunction.h>
 
 namespace itk
 {
@@ -152,6 +153,7 @@ protected:
     int                                         m_NumMotionVolumes;
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+    itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::Pointer   m_DoubleInterpolator;
 };
 }
 

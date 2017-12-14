@@ -31,7 +31,8 @@ TrackingHandlerOdf::TrackingHandlerOdf()
   , m_NumProbSamples(1)
   , m_OdfFromTensor(false)
 {
-
+  m_GfaInterpolator = itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::New();
+  m_OdfInterpolator = itk::LinearInterpolateImageFunction< itk::Image< ItkOdfImageType::PixelType, 3 >, float >::New();
 }
 
 TrackingHandlerOdf::~TrackingHandlerOdf()
@@ -79,6 +80,9 @@ void TrackingHandlerOdf::InitForTracking()
 
     m_NeedsDataInit = false;
   }
+
+  m_GfaInterpolator->SetInputImage(m_GfaImage);
+  m_OdfInterpolator->SetInputImage(m_OdfImage);
 
   std::cout << "TrackingHandlerOdf - GFA threshold: " << m_GfaThreshold << std::endl;
   std::cout << "TrackingHandlerOdf - ODF threshold: " << m_OdfThreshold << std::endl;
@@ -136,7 +140,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
     return output_direction;
 
   // check GFA threshold for termination
-  float gfa = mitk::imv::GetImageValue<float>(pos, m_GfaImage, m_Interpolate);
+  float gfa = mitk::imv::GetImageValue<float>(pos, m_Interpolate, m_GfaInterpolator);
   if (gfa<m_GfaThreshold)
     return output_direction;
 
@@ -147,7 +151,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(const itk::Point<
   if (!m_Interpolate && oldIndex==idx)
     return last_dir;
 
-  ItkOdfImageType::PixelType odf_values = mitk::imv::GetImageValue<ItkOdfImageType::PixelType>(pos, m_OdfImage, m_Interpolate);
+  ItkOdfImageType::PixelType odf_values = mitk::imv::GetImageValue<ItkOdfImageType::PixelType>(pos, m_Interpolate, m_OdfInterpolator);
   vnl_vector< float > probs; probs.set_size(m_OdfHemisphereIndices.size());
   vnl_vector< float > angles; angles.set_size(m_OdfHemisphereIndices.size()); angles.fill(1.0);
 

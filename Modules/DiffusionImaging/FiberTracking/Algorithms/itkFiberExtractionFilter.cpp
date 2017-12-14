@@ -40,7 +40,7 @@ FiberExtractionFilter< PixelType >::FiberExtractionFilter()
   , m_Threshold(0.5)
   , m_Labels({1})
 {
-
+  m_Interpolator = itk::LinearInterpolateImageFunction< itk::Image< PixelType, 3 >, float >::New();
 }
 
 template< class PixelType >
@@ -50,7 +50,7 @@ FiberExtractionFilter< PixelType >::~FiberExtractionFilter()
 }
 
 template< class PixelType >
-void FiberExtractionFilter< PixelType >::SetRoiImages(const std::vector<ItkInputImgType *> &rois)
+void FiberExtractionFilter< PixelType >::SetRoiImages(const std::vector<ItkInputImgType*> &rois)
 {
   for (auto roi : rois)
   {
@@ -76,11 +76,12 @@ mitk::FiberBundle::Pointer FiberExtractionFilter< PixelType >::CreateFib(std::ve
 template< class PixelType >
 bool FiberExtractionFilter< PixelType >::IsPositive(const itk::Point<float, 3>& itkP, itk::Image<PixelType, 3>* image)
 {
+  m_Interpolator->SetInputImage(image);
   if( m_InputType == INPUT::SCALAR_MAP )
-    return mitk::imv::IsInsideMask<PixelType>(itkP, image, m_Interpolate, m_Threshold);
+    return mitk::imv::IsInsideMask<PixelType>(itkP, m_Interpolate, m_Interpolator, m_Threshold);
   else if( m_InputType == INPUT::LABEL_MAP )
   {
-    auto val = mitk::imv::GetImageValue<PixelType>(itkP, image, m_Interpolate);
+    auto val = mitk::imv::GetImageValue<PixelType>(itkP, m_Interpolate, m_Interpolator);
     for (auto l : m_Labels)
       if (l==val)
         return true;

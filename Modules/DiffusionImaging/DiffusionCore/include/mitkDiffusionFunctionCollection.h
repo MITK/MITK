@@ -33,13 +33,13 @@ class imv
 public:
 
   template< class TPixelType, class TOutPixelType=TPixelType >
-  static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, bool interpolate)
+  static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, bool interpolate, typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator)
   {
-    itk::ContinuousIndex< float, 3> cIdx;
-    image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+    if (interpolator==nullptr)
+      return 0.0;
 
-    typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator = itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::New();
-    interpolator->SetInputImage(image);
+    itk::ContinuousIndex< float, 3> cIdx;
+    interpolator->ConvertPointToContinuousIndex(itkP, cIdx);
 
     if (interpolator->IsInsideBuffer(cIdx))
     {
@@ -48,8 +48,8 @@ public:
       else
       {
         itk::Index<3> idx;
-        image->TransformPhysicalPointToIndex(itkP, idx);
-        return image->GetPixel(idx);
+        interpolator->ConvertContinuousIndexToNearestIndex(cIdx, idx);
+        return interpolator->EvaluateAtIndex(idx);
       }
     }
     else
@@ -57,13 +57,13 @@ public:
   }
 
   template< class TPixelType=unsigned char >
-  static bool IsInsideMask(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, bool interpolate, float threshold=0.5)
+  static bool IsInsideMask(const itk::Point<float, 3>& itkP, bool interpolate, typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator, float threshold=0.5)
   {
-    itk::ContinuousIndex< float, 3> cIdx;
-    image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+    if (interpolator==nullptr)
+      return false;
 
-    typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator = itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::New();
-    interpolator->SetInputImage(image);
+    itk::ContinuousIndex< float, 3> cIdx;
+    interpolator->ConvertPointToContinuousIndex(itkP, cIdx);
 
     if (interpolator->IsInsideBuffer(cIdx))
     {
@@ -73,8 +73,8 @@ public:
       else
       {
         itk::Index<3> idx;
-        image->TransformPhysicalPointToIndex(itkP, idx);
-        value = image->GetPixel(idx);
+        interpolator->ConvertContinuousIndexToNearestIndex(cIdx, idx);
+        value = interpolator->EvaluateAtIndex(idx);
       }
 
       if (value>=threshold)

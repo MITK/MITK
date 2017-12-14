@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkProcessObject.h>
+#include <itkLinearInterpolateImageFunction.h>
 
 namespace itk{
 
@@ -38,8 +39,8 @@ public:
   };
 
   enum INPUT {
-    SCALAR_MAP,  ///< In this case, positive means roi image > threshold
-    LABEL_MAP    ///< In this case, positive means roi image in labels vector
+    SCALAR_MAP,  ///< In this case, positive means roi image vlaue > threshold
+    LABEL_MAP    ///< In this case, positive means roi image value in labels vector
   };
 
   typedef FiberExtractionFilter Self;
@@ -100,6 +101,7 @@ protected:
   bool                                        m_Interpolate;
   float                                       m_Threshold;
   std::vector< unsigned short >               m_Labels;
+  typename itk::LinearInterpolateImageFunction< itk::Image< PixelType, 3 >, float >::Pointer   m_Interpolator;
 };
 }
 

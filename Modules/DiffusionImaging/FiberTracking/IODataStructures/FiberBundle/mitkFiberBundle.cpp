@@ -1006,207 +1006,6 @@ float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask, bool do_resampling)
   return (float)inside/(inside+outside);
 }
 
-mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction, bool do_resampling)
-{
-  if (m_NumFibers==0 || mask==nullptr)
-    return mitk::FiberBundle::New(nullptr);
-
-  vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
-  mitk::FiberBundle::Pointer fibCopy = this;
-  if (anyPoint && do_resampling)
-  {
-    float minSpacing = 1;
-    if(mask->GetSpacing()[0]<mask->GetSpacing()[1] && mask->GetSpacing()[0]<mask->GetSpacing()[2])
-      minSpacing = mask->GetSpacing()[0];
-    else if (mask->GetSpacing()[1] < mask->GetSpacing()[2])
-      minSpacing = mask->GetSpacing()[1];
-    else
-      minSpacing = mask->GetSpacing()[2];
-
-    fibCopy = this->GetDeepCopy();
-    fibCopy->ResampleLinear(minSpacing/5);
-    PolyData = fibCopy->GetFiberPolyData();
-  }
-  vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
-  vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
-
-  std::vector< float > new_weights;
-
-  MITK_INFO << "Extracting fibers with mask image";
-  boost::progress_display disp(m_NumFibers);
-  for (int i=0; i<m_NumFibers; i++)
-  {
-    ++disp;
-
-    vtkCell* cell = PolyData->GetCell(i);
-    int numPoints = cell->GetNumberOfPoints();
-    vtkPoints* points = cell->GetPoints();
-
-    vtkCell* cellOriginal = m_FiberPolyData->GetCell(i);
-    int numPointsOriginal = cellOriginal->GetNumberOfPoints();
-    vtkPoints* pointsOriginal = cellOriginal->GetPoints();
-
-    vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-
-    if (numPoints>1 && numPointsOriginal)
-    {
-      if (anyPoint)
-      {
-        int inside = 0;
-        int outside = 0;
-        if (!invert)
-        {
-          for (int j=0; j<numPoints; j++)
-          {
-            double* p = points->GetPoint(j);
-
-            itk::Point<float, 3> itkP;
-            itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
-            itk::Index<3> idx;
-            mask->TransformPhysicalPointToIndex(itkP, idx);
-
-            if ( mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx) != 0 )
-            {
-              inside++;
-              if (fraction==0)
-                break;
-            }
-            else
-              outside++;
-          }
-
-          float current_fraction = 0.0;
-          if (inside+outside>0)
-            current_fraction = (float)inside/(inside+outside);
-
-          if (current_fraction>fraction)
-          {
-            for (int k=0; k<numPoints; k++)
-            {
-              double* p = points->GetPoint(k);
-              vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-              container->GetPointIds()->InsertNextId(id);
-            }
-          }
-        }
-        else
-        {
-          bool includeFiber = true;
-          for (int j=0; j<numPoints; j++)
-          {
-            double* p = points->GetPoint(j);
-
-            itk::Point<float, 3> itkP;
-            itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
-            itk::Index<3> idx;
-            mask->TransformPhysicalPointToIndex(itkP, idx);
-
-            if ( mask->GetPixel(idx) != 0 && mask->GetLargestPossibleRegion().IsInside(idx) )
-            {
-              inside++;
-              includeFiber = false;
-              break;
-            }
-            else
-              outside++;
-          }
-          if (includeFiber)
-          {
-
-            for (int k=0; k<numPoints; k++)
-            {
-              double* p = points->GetPoint(k);
-              vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-              container->GetPointIds()->InsertNextId(id);
-            }
-          }
-        }
-      }
-      else
-      {
-        double* start = pointsOriginal->GetPoint(0);
-        itk::Point<float, 3> itkStart;
-        itkStart[0] = start[0]; itkStart[1] = start[1]; itkStart[2] = start[2];
-        itk::Index<3> idxStart;
-        mask->TransformPhysicalPointToIndex(itkStart, idxStart);
-
-        double* end = pointsOriginal->GetPoint(numPointsOriginal-1);
-        itk::Point<float, 3> itkEnd;
-        itkEnd[0] = end[0]; itkEnd[1] = end[1]; itkEnd[2] = end[2];
-        itk::Index<3> idxEnd;
-        mask->TransformPhysicalPointToIndex(itkEnd, idxEnd);
-
-        if (invert)
-        {
-          if (bothEnds)
-          {
-            if ( mask->GetPixel(idxStart) == 0 && mask->GetPixel(idxEnd) == 0 )
-            {
-              for (int j=0; j<numPointsOriginal; j++)
-              {
-                double* p = pointsOriginal->GetPoint(j);
-                vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-                container->GetPointIds()->InsertNextId(id);
-              }
-            }
-          }
-          else if ( mask->GetPixel(idxStart) == 0 || mask->GetPixel(idxEnd) == 0 )
-          {
-            for (int j=0; j<numPointsOriginal; j++)
-            {
-              double* p = pointsOriginal->GetPoint(j);
-              vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-              container->GetPointIds()->InsertNextId(id);
-            }
-          }
-        }
-        else
-        {
-          if (bothEnds)
-          {
-            if ( mask->GetPixel(idxStart) != 0 && mask->GetPixel(idxEnd) != 0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
-            {
-              for (int j=0; j<numPointsOriginal; j++)
-              {
-                double* p = pointsOriginal->GetPoint(j);
-                vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-                container->GetPointIds()->InsertNextId(id);
-              }
-            }
-          }
-          else if ( (mask->GetPixel(idxStart) != 0 && mask->GetLargestPossibleRegion().IsInside(idxStart)) || (mask->GetPixel(idxEnd) != 0 && mask->GetLargestPossibleRegion().IsInside(idxEnd)) )
-          {
-            for (int j=0; j<numPointsOriginal; j++)
-            {
-              double* p = pointsOriginal->GetPoint(j);
-              vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-              container->GetPointIds()->InsertNextId(id);
-            }
-          }
-        }
-      }
-    }
-
-    if (container->GetNumberOfPoints()>0)
-    {
-      new_weights.push_back(fibCopy->GetFiberWeight(i));
-      vtkNewCells->InsertNextCell(container);
-    }
-  }
-
-  if (vtkNewCells->GetNumberOfCells()<=0)
-    return mitk::FiberBundle::New(nullptr);
-
-  vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
-  newPolyData->SetPoints(vtkNewPoints);
-  newPolyData->SetLines(vtkNewCells);
-
-  mitk::FiberBundle::Pointer newfib = mitk::FiberBundle::New(newPolyData);
-  for (unsigned int i=0; i<new_weights.size(); i++)
-    newfib->SetFiberWeight(i, new_weights.at(i));
-  return newfib;
-}
-
 mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgType* mask, bool invert)
 {
   float minSpacing = 1;
@@ -2162,12 +1961,14 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
 
   //in vtkcells all polylines are stored, actually all id's of them are stored
   vtkSmartPointer<vtkCellArray> vtkSmoothCells = vtkSmartPointer<vtkCellArray>::New(); //cellcontainer for smoothed lines
-  vtkIdType pointHelperCnt = 0;
 
   MITK_INFO << "Smoothing fibers";
   vtkSmartPointer<vtkFloatArray> newFiberWeights = vtkSmartPointer<vtkFloatArray>::New();
   newFiberWeights->SetName("FIBER_WEIGHTS");
   newFiberWeights->SetNumberOfValues(m_NumFibers);
+
+  std::vector< vtkSmartPointer<vtkPolyLine> > resampled_streamlines;
+  resampled_streamlines.resize(m_NumFibers);
 
   boost::progress_display disp(m_NumFibers);
 #pragma omp parallel for
@@ -2175,11 +1976,9 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
   {
     vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
     float length = 0;
-    float weight = 1;
 #pragma omp critical
     {
       length = m_FiberLengths.at(i);
-      weight = m_FiberWeights->GetValue(i);
       ++disp;
       vtkCell* cell = m_FiberPolyData->GetCell(i);
       int numPoints = cell->GetNumberOfPoints();
@@ -2214,23 +2013,24 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
     vtkPoints* tmpSmoothPnts = outputFunction->GetPoints(); //smoothPoints of current fiber
 
     vtkSmartPointer<vtkPolyLine> smoothLine = vtkSmartPointer<vtkPolyLine>::New();
-    smoothLine->GetPointIds()->SetNumberOfIds(tmpSmoothPnts->GetNumberOfPoints());
 
 #pragma omp critical
     {
-      for (int j=0; j<smoothLine->GetNumberOfPoints(); j++)
+      for (int j=0; j<tmpSmoothPnts->GetNumberOfPoints(); j++)
       {
-        smoothLine->GetPointIds()->SetId(j, j+pointHelperCnt);
-        vtkSmoothPoints->InsertNextPoint(tmpSmoothPnts->GetPoint(j));
+        vtkIdType id = vtkSmoothPoints->InsertNextPoint(tmpSmoothPnts->GetPoint(j));
+        smoothLine->GetPointIds()->InsertNextId(id);
       }
 
-      newFiberWeights->SetValue(vtkSmoothCells->GetNumberOfCells(), weight);
-      vtkSmoothCells->InsertNextCell(smoothLine);
-      pointHelperCnt += tmpSmoothPnts->GetNumberOfPoints();
+      resampled_streamlines[i] = smoothLine;
     }
   }
 
-  SetFiberWeights(newFiberWeights);
+  for (auto container : resampled_streamlines)
+  {
+    vtkSmoothCells->InsertNextCell(container);
+  }
+
   m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
   m_FiberPolyData->SetPoints(vtkSmoothPoints);
   m_FiberPolyData->SetLines(vtkSmoothCells);
@@ -2524,17 +2324,18 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
   newFiberWeights->SetName("FIBER_WEIGHTS");
   newFiberWeights->SetNumberOfValues(m_NumFibers);
 
+  std::vector< vtkSmartPointer<vtkPolyLine> > resampled_streamlines;
+  resampled_streamlines.resize(m_FiberPolyData->GetNumberOfCells());
+
 #pragma omp parallel for
   for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
   {
 
     std::vector< vnl_vector_fixed< double, 3 > > vertices;
-    float weight = 1;
 
 #pragma omp critical
     {
       ++disp;
-      weight = m_FiberWeights->GetValue(i);
       vtkCell* cell = m_FiberPolyData->GetCell(i);
       int numPoints = cell->GetNumberOfPoints();
       vtkPoints* points = cell->GetPoints();
@@ -2612,14 +2413,17 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
 
 #pragma omp critical
     {
-      newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), weight);
-      vtkNewCells->InsertNextCell(container);
+      resampled_streamlines[i] = container;
     }
+  }
+
+  for (auto container : resampled_streamlines)
+  {
+    vtkNewCells->InsertNextCell(container);
   }
 
   if (vtkNewCells->GetNumberOfCells()>0)
   {
-    SetFiberWeights(newFiberWeights);
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     m_FiberPolyData->SetPoints(vtkNewPoints);
     m_FiberPolyData->SetLines(vtkNewCells);

@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _ClusteringMetric
 #define _ClusteringMetric
 
+#include <mitkDiffusionFunctionCollection.h>
+
 namespace mitk
 {
 

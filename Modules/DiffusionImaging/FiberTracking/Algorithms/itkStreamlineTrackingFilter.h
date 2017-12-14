@@ -90,9 +90,8 @@ public:
   itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers
   itkGetMacro( UseOutputProbabilityMap, bool)
 
-  itkSetMacro( SeedImage, ItkUcharImgType::Pointer)   ///< Seeds are only placed inside of this mask.
-  itkSetMacro( MaskImage, ItkUcharImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
-  itkSetMacro( TissueImage, ItkUcharImgType::Pointer) ///<
+  itkSetMacro( SeedImage, ItkFloatImgType::Pointer)   ///< Seeds are only placed inside of this mask.
+  itkSetMacro( MaskImage, ItkFloatImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
   itkSetMacro( SeedsPerVoxel, int)                    ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
   itkSetMacro( MinTractLength, float )                ///< Shorter tracts are discarded.
   itkSetMacro( MaxTractLength, float )                ///< Streamline progression stops if tract is longer than specified.
@@ -100,11 +99,9 @@ public:
   itkSetMacro( UseStopVotes, bool )                   ///< Frontal sampling points can vote for stopping the streamline even if the remaining sampling points keep pushing
   itkSetMacro( OnlyForwardSamples, bool )             ///< Don't use sampling points behind the current position in progression direction
   itkSetMacro( DeflectionMod, float )                 ///< Deflection distance modifier
-  itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
-  itkSetMacro( TargetRegions, ItkUintImgType::Pointer)    ///< Only streamline starting and ending in this mask are retained
+  itkSetMacro( StoppingRegions, ItkFloatImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
+  itkSetMacro( TargetRegions, ItkFloatImgType::Pointer)    ///< Only streamline starting and ending in this mask are retained
   itkSetMacro( DemoMode, bool )
-  itkSetMacro( SeedOnlyGm, bool )                     ///< place seed points only in the gray matter
-  itkSetMacro( ControlGmEndings, bool )               ///<
   itkSetMacro( NumberOfSamples, unsigned int )        ///< Number of neighborhood sampling points
   itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
   itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
@@ -140,15 +137,11 @@ protected:
   StreamlineTrackingFilter();
   ~StreamlineTrackingFilter() {}
 
-  void InitGrayMatterEndings();
-  void CheckFiberForGmEnding(FiberType* fib);
+  bool IsValidFiber(FiberType* fib);  ///< Check endpoints
   void FiberToProbmap(FiberType* fib);
-
   void GetSeedPointsFromSeedImage();
   void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
   float FollowStreamline(itk::Point<float, 3> start_pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front);       ///< Start streamline in one direction.
-  bool IsInsideMask(const itk::Point<float, 3>& pos, ItkUcharImgType::Pointer mask);   ///< Are we outside of the mask image?
-  bool IsInGm(const itk::Point<float, 3> &pos);
   vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
   std::vector< vnl_vector_fixed<float,3> > CreateDirections(int NPoints);
@@ -162,11 +155,10 @@ protected:
   BundleType                          m_Tractogram;
   BundleType                          m_GmStubs;
 
-  ItkUcharImgType::Pointer            m_StoppingRegions;
-  ItkUintImgType::Pointer             m_TargetRegions;
-  ItkUcharImgType::Pointer            m_SeedImage;
-  ItkUcharImgType::Pointer            m_MaskImage;
-  ItkUcharImgType::Pointer            m_TissueImage;
+  ItkFloatImgType::Pointer            m_StoppingRegions;
+  ItkFloatImgType::Pointer            m_TargetRegions;
+  ItkFloatImgType::Pointer            m_SeedImage;
+  ItkFloatImgType::Pointer            m_MaskImage;
   ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
 
   float                               m_AngularThresholdDeg;
@@ -188,10 +180,6 @@ protected:
   unsigned int                        m_NumberOfSamples;
 
   unsigned int                        m_NumPreviousDirections;
-  int                                 m_WmLabel;
-  int                                 m_GmLabel;
-  bool                                m_SeedOnlyGm;
-  bool                                m_ControlGmEndings;
   int                                 m_MaxNumTracts;
 
   bool                                m_Verbose;
@@ -214,6 +202,13 @@ protected:
 
   std::chrono::time_point<std::chrono::system_clock> m_StartTime;
   std::chrono::time_point<std::chrono::system_clock> m_EndTime;
+
+  itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_MaskInterpolator;
+  itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_StopInterpolator;
+  itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_TargetInterpolator;
+  itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_SeedInterpolator;
+  bool                                                                     m_SeedImageSet;
+  bool                                                                     m_TargetImageSet;
 
 private:
 

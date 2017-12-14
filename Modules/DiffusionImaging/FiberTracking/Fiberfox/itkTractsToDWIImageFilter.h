@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRawShModel.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 #include <mitkPointSet.h>
+#include <itkLinearInterpolateImageFunction.h>
 
 namespace itk
 {
@@ -108,7 +109,6 @@ protected:
     ItkDoubleImgType::Pointer NormalizeInsideMask(ItkDoubleImgType::Pointer image);
     void InitializeData();
     void InitializeFiberData();
-    double InterpolateValue(itk::Point<float, 3> itkP, ItkDoubleImgType::Pointer img);
 
     // input
     mitk::FiberfoxParameters<double>            m_Parameters;
@@ -153,6 +153,7 @@ protected:
     int                                         m_NumMotionVolumes;
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+    itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::Pointer   m_DoubleInterpolator;
 };
 }
 

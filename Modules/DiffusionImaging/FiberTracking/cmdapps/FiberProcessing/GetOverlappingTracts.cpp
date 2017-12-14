@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 
 typedef itksys::SystemTools ist;
-typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
+typedef itk::Image<unsigned char, 3>    ItkFloatImgType;
 
 /*!
 \brief Extract fibers from a tractogram using binary image ROIs
@@ -71,11 +71,11 @@ int main(int argc, char* argv[])
 
   try
   {
-    itk::TractDensityImageFilter< ItkUcharImgType >::Pointer filter = itk::TractDensityImageFilter< ItkUcharImgType >::New();
+    itk::TractDensityImageFilter< ItkFloatImgType >::Pointer filter = itk::TractDensityImageFilter< ItkFloatImgType >::New();
     filter->SetDoFiberResampling(true);
     filter->SetUpsamplingFactor(0.25);
     filter->SetBinaryOutput(true);
-    std::vector< ItkUcharImgType::Pointer > masks;
+    std::vector< ItkFloatImgType::Pointer > masks;
     for (auto f : reference)
     {
       mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());

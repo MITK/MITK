@@ -52,10 +52,13 @@ class TrackingHandlerRandomForest : public TrackingDataHandler
 
 public:
 
+
   TrackingHandlerRandomForest();
   ~TrackingHandlerRandomForest();
 
   typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures > , 3 >      DwiFeatureImageType;
+  typedef itk::LinearInterpolateImageFunction< DwiFeatureImageType, float >   DwiFeatureImageInterpolatorType;
+  typedef itk::LinearInterpolateImageFunction< ItkFloatImgType, float >       FloatImageInterpolatorType;
 
   typedef mitk::ThresholdSplit<mitk::LinearSplitting< mitk::ImpurityLoss<> >,int,vigra::ClassificationTag> DefaultSplitType;
 
@@ -113,8 +116,6 @@ protected:
   void InputDataValidForTraining();       ///< Check if everything is tehere for training (raw datasets, fiber tracts)
   void InitForTraining();  ///< Generate masks if necessary, resample fibers, spherically interpolate raw DWIs
   void CalculateTrainingSamples();    ///< Calculate GM and WM features using the interpolated raw data, the WM masks and the fibers
-  typename DwiFeatureImageType::PixelType GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate);   ///< get trilinearly interpolated raw image values at given world position
-
 
   std::vector< Image::Pointer >                               m_InputDwis;                ///< original input DWI data
   mitk::TractographyForest::Pointer                           m_Forest;                   ///< random forest classifier
@@ -153,6 +154,9 @@ protected:
 
   vnl_matrix_fixed<float,3,3>                                 m_ImageDirection;
   vnl_matrix_fixed<float,3,3>                                 m_ImageDirectionInverse;
+
+  typename DwiFeatureImageInterpolatorType::Pointer           m_DwiFeatureImageInterpolator;
+  std::vector< std::vector< FloatImageInterpolatorType::Pointer > >   m_AdditionalFeatureImageInterpolators;
 };
 
 }

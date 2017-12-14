@@ -65,6 +65,7 @@ namespace itk
     , m_RandGen(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
   {
     m_RandGen->SetSeed();
+    m_DoubleInterpolator = itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::New();
   }
 
   template< class PixelType >
@@ -1089,7 +1090,8 @@ namespace itk
             double fact2 = fact;
             if ( m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage()!=nullptr && iAxVolume>0.0001 )
             {
-              double val = InterpolateValue(point, m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage());
+              m_DoubleInterpolator->SetInputImage(m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage());
+              double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
               if (val<0)
                 mitkThrow() << "Volume fraction image (index 1) contains negative values (intra-axonal compartment)!";
               fact2 = m_VoxelVolume*val/iAxVolume;
@@ -1478,7 +1480,8 @@ namespace itk
           double weight = 0;
           if (numNonFiberCompartments>1)
           {
-            double val = InterpolateValue(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            m_DoubleInterpolator->SetInputImage(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
             if (val<0)
                 mitkThrow() << "Volume fraction image (index " << i << ") contains values less than zero!";
             else
@@ -1548,7 +1551,8 @@ namespace itk
 
           if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage()!=nullptr)
           {
-            double val = InterpolateValue(point, m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage());
+            m_DoubleInterpolator->SetInputImage(m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage());
+            double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
             if (val<0)
               mitkThrow() << "Volume fraction image (index " << i+1 << ") contains negative values!";
             else
@@ -1571,7 +1575,8 @@ namespace itk
           DoubleDwiType::PixelType pix = m_CompartmentImages.at(i+numFiberCompartments)->GetPixel(index);
           if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()!=nullptr)
           {
-            double val = InterpolateValue(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            m_DoubleInterpolator->SetInputImage(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            double val = mitk::imv::GetImageValue<double>(point, true, m_DoubleInterpolator);
             if (val<0)
               mitkThrow() << "Volume fraction image (index " << numFiberCompartments+i+1 << ") contains negative values (non-fiber compartment)!";
             else
@@ -1595,78 +1600,6 @@ namespace itk
           MITK_ERROR << "Compartments do not sum to 1 in voxel " << index << " (" << compartmentSum/m_VoxelVolume << ")";
       }
     }
-  }
-
-  template< class PixelType >
-  double TractsToDWIImageFilter< PixelType >::
-  InterpolateValue(itk::Point<float, 3> itkP, ItkDoubleImgType::Pointer img)
-  {
-    itk::Index<3> idx;
-    itk::ContinuousIndex< double, 3> cIdx;
-    img->TransformPhysicalPointToIndex(itkP, idx);
-    img->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
-
-    double pix = 0;
-    if ( img->GetLargestPossibleRegion().IsInside(idx) )
-      pix = img->GetPixel(idx);
-    else
-      return pix;
-
-    double frac_x = cIdx[0] - idx[0];
-    double frac_y = cIdx[1] - idx[1];
-    double frac_z = cIdx[2] - idx[2];
-    if (frac_x<0)
-    {
-      idx[0] -= 1;
-      frac_x += 1;
-    }
-    if (frac_y<0)
-    {
-      idx[1] -= 1;
-      frac_y += 1;
-    }
-    if (frac_z<0)
-    {
-      idx[2] -= 1;
-      frac_z += 1;
-    }
-    frac_x = 1-frac_x;
-    frac_y = 1-frac_y;
-    frac_z = 1-frac_z;
-
-    // int coordinates inside image?
-    if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(img->GetLargestPossibleRegion().GetSize(0) - 1) &&
-        idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(img->GetLargestPossibleRegion().GetSize(1) - 1) &&
-        idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(img->GetLargestPossibleRegion().GetSize(2) - 1))
-    {
-      vnl_vector_fixed<double, 8> interpWeights;
-      interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
-      interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
-      interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
-      interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
-      interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
-      interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
-      interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
-      interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
-
-      pix = img->GetPixel(idx) * interpWeights[0];
-      ItkDoubleImgType::IndexType tmpIdx = idx; tmpIdx[0]++;
-      pix +=  img->GetPixel(tmpIdx) * interpWeights[1];
-      tmpIdx = idx; tmpIdx[1]++;
-      pix +=  img->GetPixel(tmpIdx) * interpWeights[2];
-      tmpIdx = idx; tmpIdx[2]++;
-      pix +=  img->GetPixel(tmpIdx) * interpWeights[3];
-      tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
-      pix +=  img->GetPixel(tmpIdx) * interpWeights[4];
-      tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
-      pix +=  img->GetPixel(tmpIdx) * interpWeights[5];
-      tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
-      pix +=  img->GetPixel(tmpIdx) * interpWeights[6];
-      tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-      pix +=  img->GetPixel(tmpIdx) * interpWeights[7];
-    }
-
-    return pix;
   }
 
   template< class PixelType >

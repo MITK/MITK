@@ -68,7 +68,6 @@ int main(int argc, char* argv[])
   parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "streamlines not starting and ending in one of the regions in this image are discarded", us::Any());
   parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
   parser.addArgument("seed_mask", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
-  parser.addArgument("tissue_image", "", mitkCommandLineParser::String, "Tissue type image:", "image with tissue type labels (WM=3, GM=1)", us::Any());
 
   parser.addArgument("sharpen_odfs", "", mitkCommandLineParser::Bool, "SHarpen ODFs:", "if you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). this is not necessary for CSD fODFs, since they are narurally much sharper.");
   parser.addArgument("cutoff", "", mitkCommandLineParser::Float, "Cutoff:", "set the FA, GFA or Peak amplitude cutoff for terminating tracks", 0.1);
@@ -77,8 +76,6 @@ int main(int argc, char* argv[])
   parser.addArgument("angular_threshold", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold between two successive steps, (default: 90° * step_size)");
   parser.addArgument("min_tract_length", "", mitkCommandLineParser::Float, "Min. tract length:", "minimum fiber length (in mm)", 20);
   parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
-  parser.addArgument("seed_gm", "", mitkCommandLineParser::Bool, "Seed only GM:", "Seed only in gray matter (requires tissue type image --tissue_image)");
-  parser.addArgument("control_gm_endings", "", mitkCommandLineParser::Bool, "Control GM endings:", "Seed perpendicular to gray matter and enforce endings inside of the gray matter (requires tissue type image --tissue_image)");
   parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded.", -1);
 
   parser.addArgument("num_samples", "", mitkCommandLineParser::Int, "Num. neighborhood samples:", "number of neighborhood samples that are use to determine the next progression direction", 0);
@@ -124,14 +121,6 @@ int main(int argc, char* argv[])
   bool use_sh_features = false;
   if (parsedArgs.count("use_sh_features"))
     use_sh_features = us::any_cast<bool>(parsedArgs["use_sh_features"]);
-
-  bool seed_gm = false;
-  if (parsedArgs.count("seed_gm"))
-    seed_gm = us::any_cast<bool>(parsedArgs["seed_gm"]);
-
-  bool control_gm_endings = false;
-  if (parsedArgs.count("control_gm_endings"))
-    control_gm_endings = us::any_cast<bool>(parsedArgs["control_gm_endings"]);
 
   bool use_stop_votes = false;
   if (parsedArgs.count("use_stop_votes"))
@@ -187,10 +176,6 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("stop_mask"))
     stopFile = us::any_cast<std::string>(parsedArgs["stop_mask"]);
 
-  std::string tissueFile = "";
-  if (parsedArgs.count("tissue_image"))
-    tissueFile = us::any_cast<std::string>(parsedArgs["tissue_image"]);
-
   float cutoff = 0.1;
   if (parsedArgs.count("cutoff"))
     cutoff = us::any_cast<float>(parsedArgs["cutoff"]);
@@ -237,8 +222,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("additional_images"))
     addFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["additional_images"]);
 
-  typedef itk::Image<unsigned char, 3> ItkUcharImgType;
-  typedef itk::Image<unsigned int, 3> ItkUintImgType;
+  typedef itk::Image<float, 3> ItkFloatImgType;
 
   MITK_INFO << "loading input";
   std::vector< mitk::Image::Pointer > input_images;
@@ -248,53 +232,43 @@ int main(int argc, char* argv[])
     input_images.push_back(mitkImage);
   }
 
-  ItkUcharImgType::Pointer mask;
+  ItkFloatImgType::Pointer mask;
   if (!maskFile.empty())
   {
     MITK_INFO << "loading mask image";
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFile)[0].GetPointer());
-    mask = ItkUcharImgType::New();
+    mask = ItkFloatImgType::New();
     mitk::CastToItkImage(img, mask);
   }
 
-  ItkUcharImgType::Pointer seed;
+  ItkFloatImgType::Pointer seed;
   if (!seedFile.empty())
   {
     MITK_INFO << "loading seed image";
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(seedFile)[0].GetPointer());
-    seed = ItkUcharImgType::New();
+    seed = ItkFloatImgType::New();
     mitk::CastToItkImage(img, seed);
   }
 
-  ItkUcharImgType::Pointer stop;
+  ItkFloatImgType::Pointer stop;
   if (!stopFile.empty())
   {
     MITK_INFO << "loading stop image";
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(stopFile)[0].GetPointer());
-    stop = ItkUcharImgType::New();
+    stop = ItkFloatImgType::New();
     mitk::CastToItkImage(img, stop);
   }
 
-  ItkUintImgType::Pointer target;
+  ItkFloatImgType::Pointer target;
   if (!targetFile.empty())
   {
     MITK_INFO << "loading target image";
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(targetFile)[0].GetPointer());
-    target = ItkUintImgType::New();
+    target = ItkFloatImgType::New();
     mitk::CastToItkImage(img, target);
   }
 
-  ItkUcharImgType::Pointer tissue;
-  if (!tissueFile.empty())
-  {
-    MITK_INFO << "loading tissue image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(tissueFile)[0].GetPointer());
-    tissue = ItkUcharImgType::New();
-    mitk::CastToItkImage(img, tissue);
-  }
-
   MITK_INFO << "loading additional images";
-  typedef itk::Image<float, 3> ItkFloatImgType;
   std::vector< std::vector< ItkFloatImgType::Pointer > > addImages;
   addImages.push_back(std::vector< ItkFloatImgType::Pointer >());
   for (auto file : addFiles)
@@ -443,9 +417,6 @@ int main(int argc, char* argv[])
   tracker->SetUseStopVotes(use_stop_votes);
   tracker->SetOnlyForwardSamples(use_only_forward_samples);
   tracker->SetAposterioriCurvCheck(false);
-  tracker->SetTissueImage(tissue);
-  tracker->SetSeedOnlyGm(seed_gm);
-  tracker->SetControlGmEndings(control_gm_endings);
   tracker->SetMaxNumTracts(max_tracts);
   tracker->SetTrackingHandler(handler);
   tracker->SetUseOutputProbabilityMap(output_prob_map);

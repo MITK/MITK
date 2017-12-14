@@ -27,19 +27,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkStandaloneDataStorage.h>
 #include <itksys/SystemTools.hxx>
+#include <itkFiberExtractionFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 typedef itksys::SystemTools ist;
-typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
+typedef itk::Image<float, 3>    ItkFloatImgType;
 
-ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
+ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
   mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
-  ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
-  mitk::CastToItkImage(img, itkMask);
-  return itkMask;
+  ItkFloatImgType::Pointer itk_image = ItkFloatImgType::New();
+  mitk::CastToItkImage(img, itk_image);
+  return itk_image;
 }
 
 /*!
@@ -59,9 +60,12 @@ int main(int argc, char* argv[])
   parser.addArgument("out", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
   parser.addArgument("rois", "", mitkCommandLineParser::StringList, "ROI images:", "Images with binary ROIs", us::Any(), false);
 
-  parser.addArgument("both_ends", "", mitkCommandLineParser::Bool, "Both ends:", "Fibers are extracted if both endpoints are located in the ROI.", false, false);
-  parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1, false);
-  parser.addArgument("invert", "", mitkCommandLineParser::Bool, "Invert:", "invert mask image", false, false);
+  parser.addArgument("both_ends", "", mitkCommandLineParser::Bool, "Both ends:", "Fibers are extracted if both endpoints are located in the ROI.", false);
+  parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1);
+  parser.addArgument("invert", "", mitkCommandLineParser::Bool, "Invert:", "get streamlines not positive for any of the ROI images", false);
+  parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate ROI images", false);
+  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", false, 0.5);
+  parser.addArgument("labels", "", mitkCommandLineParser::StringList, "Labels:", "positive means roi image value in labels vector", false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -87,24 +91,60 @@ int main(int argc, char* argv[])
   if (overlap_fraction>=0)
     any_point = true;
 
+  bool interpolate = false;
+  if (parsedArgs.count("interpolate"))
+    interpolate = us::any_cast<bool>(parsedArgs["interpolate"]);
+
+  float threshold = 0.5;
+  if (parsedArgs.count("threshold"))
+    threshold = us::any_cast<float>(parsedArgs["threshold"]);
+
+  mitkCommandLineParser::StringContainerType labels;
+  if (parsedArgs.count("labels"))
+    labels = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["labels"]);
+
   try
   {
     // load fiber bundle
     mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(inFib)[0].GetPointer());
 
+    std::vector< ItkFloatImgType::Pointer > roi_images;
     for (std::size_t i=0; i<roi_files.size(); ++i)
+      roi_images.push_back( LoadItkImage(roi_files.at(i)) );
+
+    std::vector< ItkFloatImgType* > roi_images2;
+    for (auto roi : roi_images)
+      roi_images2.push_back(roi);
+
+    std::vector< unsigned short > short_labels;
+    for (auto l : labels)
+      short_labels.push_back(boost::lexical_cast<unsigned short>(l));
+
+    itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();
+    extractor->SetInputFiberBundle(inputTractogram);
+    extractor->SetRoiImages(roi_images2);
+    extractor->SetOverlapFraction(overlap_fraction);
+    extractor->SetBothEnds(both_ends);
+    extractor->SetInterpolate(interpolate);
+    extractor->SetThreshold(threshold);
+    extractor->SetLabels(short_labels);
+    if (invert)
+      extractor->SetNoPositives(true);
+    else
+      extractor->SetNoNegatives(true);
+    if (!any_point)
+      extractor->SetMode(itk::FiberExtractionFilter<float>::MODE::ENDPOINTS);
+    if (short_labels.size()>0)
+      extractor->SetInputType(itk::FiberExtractionFilter<float>::INPUT::LABEL_MAP);
+    extractor->Update();
+
+    mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(nullptr);
+    if (invert)
+      mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib);
+    else
     {
-      try
-      {
-        ItkUcharImgType::Pointer mask = LoadItkMaskImage(roi_files.at(i));
-        mitk::FiberBundle::Pointer result = inputTractogram->ExtractFiberSubset(mask, any_point, invert, both_ends, overlap_fraction);
-        mitk::IOUtil::Save(result, outFib);
-      }
-      catch(...)
-      {
-        std::cout << "could not load: " << roi_files.at(i);
-        return EXIT_FAILURE;
-      }
+      newFib = newFib->AddBundles(extractor->GetPositives());
+      mitk::IOUtil::Save(newFib, outFib);
     }
   }
   catch (itk::ExceptionObject e)

@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 
 typedef itksys::SystemTools ist;
-typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
+typedef itk::Image<unsigned char, 3>    ItkFloatImgType;
 typedef itk::Image<unsigned int, 3>    ItkUIntImgType;
 
 std::vector< std::string > get_file_list(const std::string& path, std::vector< std::string > extensions={".fib", ".trk"})
@@ -115,11 +115,11 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer combined = mitk::FiberBundle::New();
     combined = combined->AddBundles(fibs);
 
-    itk::TractsToFiberEndingsImageFilter< ItkUcharImgType >::Pointer endings = itk::TractsToFiberEndingsImageFilter< ItkUcharImgType >::New();
+    itk::TractsToFiberEndingsImageFilter< ItkFloatImgType >::Pointer endings = itk::TractsToFiberEndingsImageFilter< ItkFloatImgType >::New();
     endings->SetFiberBundle(combined);
     endings->SetUpsamplingFactor(0.25);
     endings->Update();
-    ItkUcharImgType::Pointer ref_image = endings->GetOutput();
+    ItkFloatImgType::Pointer ref_image = endings->GetOutput();
 
     std::cout.rdbuf (old);              // <-- restore
 
@@ -129,10 +129,10 @@ int main(int argc, char* argv[])
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
 
-      std::vector< ItkUcharImgType::Pointer > mask_images;
+      std::vector< ItkFloatImgType::Pointer > mask_images;
       for (auto fib : fibs)
       {
-        itk::TractDensityImageFilter< ItkUcharImgType >::Pointer masks = itk::TractDensityImageFilter< ItkUcharImgType >::New();
+        itk::TractDensityImageFilter< ItkFloatImgType >::Pointer masks = itk::TractDensityImageFilter< ItkFloatImgType >::New();
         masks->SetInputImage(ref_image);
         masks->SetBinaryOutput(true);
         masks->SetFiberBundle(fib);
@@ -155,8 +155,8 @@ int main(int argc, char* argv[])
             continue;
           }
 
-          itk::ImageRegionConstIterator<ItkUcharImgType> it1(m1, m1->GetLargestPossibleRegion());
-          itk::ImageRegionConstIterator<ItkUcharImgType> it2(m2, m2->GetLargestPossibleRegion());
+          itk::ImageRegionConstIterator<ItkFloatImgType> it1(m1, m1->GetLargestPossibleRegion());
+          itk::ImageRegionConstIterator<ItkFloatImgType> it2(m2, m2->GetLargestPossibleRegion());
 
           unsigned int c1 = 0;
           unsigned int c2 = 0;

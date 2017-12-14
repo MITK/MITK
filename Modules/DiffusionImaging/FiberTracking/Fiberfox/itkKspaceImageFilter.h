@@ -101,7 +101,6 @@ namespace itk{
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID);
     void AfterThreadedGenerateData();
-    double InterpolateFmapValue(itk::Point<float, 3> itkP);
 
     DoubleVectorType                        m_CoilPosition;
     FiberfoxParameters<double>*             m_Parameters;
@@ -128,6 +127,8 @@ namespace itk{
     typename InputImageType::Pointer        m_TimeFromEchoImage;
     typename InputImageType::Pointer        m_ReadoutTimeImage;
     AcquisitionType*                        m_ReadoutScheme;
+
+    itk::LinearInterpolateImageFunction< itk::Image< double, 3 >, float >::Pointer   m_FmapInterpolator;
 
   private:
 

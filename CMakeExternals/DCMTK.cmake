@@ -25,6 +25,12 @@ if(MITK_USE_DCMTK)
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
     endif()
+    if(WIN32)
+      list(APPEND additional_args
+        "-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS:BOOL=ON"
+        "-DDCMTK_WIDE_CHAR_MAIN_FUNCTION:BOOL=ON"
+      )
+    endif()
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}

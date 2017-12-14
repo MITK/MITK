@@ -103,15 +103,15 @@ int mitkFiberExtractionTest(int argc, char* argv[])
 
     {
       testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[9]).front().GetPointer());
-      itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+      itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
       mitk::FiberBundle::Pointer test = groundTruthFibs->GetDeepCopy();
       test->ResampleLinear(0.2);
       extractor->SetInputFiberBundle(test);
-      extractor->SetMasks({itkRoiImage});
+      extractor->SetRoiImages({itkRoiImage});
       extractor->SetOverlapFraction(0.0);
       extractor->SetBothEnds(true);
       extractor->SetDontResampleFibers(true);
-      extractor->SetMode(itk::FiberExtractionFilter::MODE::OVERLAP);
+      extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::OVERLAP);
       extractor->Update();
       mitk::FiberBundle::Pointer passing = extractor->GetPositives().at(0);
       MITK_TEST_CONDITION_REQUIRED(passing->Equals(testFibs),"check passing mask extraction");
@@ -119,12 +119,12 @@ int mitkFiberExtractionTest(int argc, char* argv[])
 
     {
       testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[10]).front().GetPointer());
-      itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+      itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
       extractor->SetInputFiberBundle(groundTruthFibs);
-      extractor->SetMasks({itkRoiImage});
+      extractor->SetRoiImages({itkRoiImage});
       extractor->SetOverlapFraction(0.0);
       extractor->SetBothEnds(true);
-      extractor->SetMode(itk::FiberExtractionFilter::MODE::ENDPOINTS);
+      extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::ENDPOINTS);
       extractor->Update();
       mitk::FiberBundle::Pointer ending = extractor->GetPositives().at(0);
       MITK_TEST_CONDITION_REQUIRED(ending->Equals(testFibs),"check ending in mask extraction");

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricScalarMap.h>
 
 typedef itksys::SystemTools ist;
-typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
+typedef itk::Image<unsigned char, 3>    ItkFloatImgType;
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
 {
@@ -37,10 +37,10 @@ mitk::FiberBundle::Pointer LoadFib(std::string filename)
   return dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
 }
 
-ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
+ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
   mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
-  ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
+  ItkFloatImgType::Pointer itkMask = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itkMask);
   return itkMask;
 }
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
     resampled_fib->ResampleToNumPoints(12);
 
     std::vector< mitk::FiberBundle::Pointer > ref_fibs;
-    std::vector< ItkUcharImgType::Pointer > ref_masks;
+    std::vector< ItkFloatImgType::Pointer > ref_masks;
     for (std::size_t i=0; i<ref_bundle_files.size(); ++i)
     {
       MITK_INFO << "Loading " << ist::GetFilenameName(ref_bundle_files.at(i));
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
       {
         ref_fibs.push_back(LoadFib(ref_bundle_files.at(i)));
         if (i<ref_mask_files.size())
-          ref_masks.push_back(LoadItkMaskImage(ref_mask_files.at(i)));
+          ref_masks.push_back(LoadItkImage(ref_mask_files.at(i)));
         else
           ref_masks.push_back(nullptr);
         std::cout.rdbuf (old);              // <-- restore

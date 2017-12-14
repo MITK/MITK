@@ -32,8 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFiberExtractionFilter.h>
 
 typedef itksys::SystemTools ist;
-typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
-typedef std::tuple< ItkUcharImgType::Pointer, std::string > MaskType;
+typedef itk::Image<unsigned char, 3>    ItkFloatImgType;
+typedef std::tuple< ItkFloatImgType::Pointer, std::string > MaskType;
 
 void CreateFolderStructure(const std::string& path)
 {
@@ -47,10 +47,10 @@ void CreateFolderStructure(const std::string& path)
   ist::MakeDirectory(path + "/skipped_masks/");
 }
 
-ItkUcharImgType::Pointer LoadItkMaskImage(const std::string& filename)
+ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
   mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
-  ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
+  ItkFloatImgType::Pointer itkMask = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itkMask);
   return itkMask;
 }
@@ -114,7 +114,7 @@ std::vector< MaskType > get_file_list(const std::string& path, float anchor_frac
       std::streambuf *old = cout.rdbuf(); // <-- save
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      MaskType m(LoadItkMaskImage(path + '/' + filename), ist::GetFilenameName(filename));
+      MaskType m(LoadItkImage(path + '/' + filename), ist::GetFilenameName(filename));
       mask_list.push_back(m);
       std::cout.rdbuf (old);              // <-- restore
     }
@@ -202,14 +202,14 @@ int main(int argc, char* argv[])
       std::streambuf *old = cout.rdbuf(); // <-- save
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      ItkUcharImgType::Pointer gm_image = LoadItkMaskImage(gray_matter_mask);
+      ItkFloatImgType::Pointer gm_image = LoadItkImage(gray_matter_mask);
       std::cout.rdbuf (old);              // <-- restore
 
-      itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+      itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
       extractor->SetInputFiberBundle(inputTractogram);
-      extractor->SetMasks({gm_image});
+      extractor->SetRoiImages({gm_image});
       extractor->SetBothEnds(true);
-      extractor->SetMode(itk::FiberExtractionFilter::MODE::ENDPOINTS);
+      extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::ENDPOINTS);
       extractor->Update();
 
       mitk::FiberBundle::Pointer not_gm_fibers = extractor->GetNegatives().at(0);
@@ -230,15 +230,19 @@ int main(int argc, char* argv[])
     if (!known_tract_masks.empty())
     {
       MITK_INFO << "Find known tracts via overlap match";
-      std::vector< ItkUcharImgType::Pointer > mask_images;
+      std::vector< ItkFloatImgType::Pointer > mask_images;
       for (auto mask : known_tract_masks)
         mask_images.push_back(std::get<0>(mask));
 
-      itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+      std::vector< ItkFloatImgType* > roi_images2;
+      for (auto roi : mask_images)
+        roi_images2.push_back(roi);
+
+      itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
       extractor->SetInputFiberBundle(inputTractogram);
-      extractor->SetMasks(mask_images);
+      extractor->SetRoiImages(roi_images2);
       extractor->SetOverlapFraction(overlap);
-      extractor->SetMode(itk::FiberExtractionFilter::MODE::OVERLAP);
+      extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::OVERLAP);
       extractor->Update();
       std::vector< mitk::FiberBundle::Pointer > positives = extractor->GetPositives();
       candidate_tractogram = extractor->GetNegatives().at(0);

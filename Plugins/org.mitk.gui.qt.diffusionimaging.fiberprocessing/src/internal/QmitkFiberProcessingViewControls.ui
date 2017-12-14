@@ -27,8 +27,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>367</width>
-        <height>382</height>
+        <width>353</width>
+        <height>411</height>
        </rect>
       </property>
       <attribute name="label">
@@ -391,7 +391,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Extract using binary ROI image</string>
+           <string>Extract using ROI image</string>
           </property>
          </item>
         </widget>
@@ -417,13 +417,20 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QCheckBox" name="m_BothEnds">
             <property name="text">
              <string>Both ends</string>
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Extract fibers:</string>
             </property>
            </widget>
           </item>
@@ -437,10 +444,10 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_16">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_17">
             <property name="text">
-             <string>Extract fibers:</string>
+             <string>Min. overlap:</string>
             </property>
            </widget>
           </item>
@@ -454,30 +461,33 @@
             </property>
             <item>
              <property name="text">
-              <string>Ending in mask</string>
+              <string>Ending in ROI</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Not ending in mask</string>
+              <string>Not ending in ROI</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Passing mask</string>
+              <string>Passing ROI</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Not passing mask</string>
+              <string>Not passing ROI</string>
              </property>
             </item>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_17">
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="m_InterpolateRoiBox">
             <property name="text">
-             <string>Min. overlap:</string>
+             <string>Interpolate ROI</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

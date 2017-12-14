@@ -129,7 +129,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
 
 void QmitkFiberProcessingView::OnMaskExtractionChanged()
 {
-  if (m_Controls->m_ExtractionBoxMask->currentIndex() == 2)
+  if (m_Controls->m_ExtractionBoxMask->currentIndex() == 2 || m_Controls->m_ExtractionBoxMask->currentIndex() == 3)
   {
     m_Controls->label_17->setVisible(true);
     m_Controls->m_FiberExtractionFractionBox->setVisible(true);
@@ -361,15 +361,15 @@ void QmitkFiberProcessingView::RemoveDir()
 
 void QmitkFiberProcessingView::RemoveWithMask(bool removeInside)
 {
-  if (m_MaskImageNode.IsNull())
+  if (m_RoiImageNode.IsNull())
     return;
 
-  mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+  mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_RoiImageNode->GetData());
   for (auto node : m_SelectedFB)
   {
     mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
 
-    itkUCharImageType::Pointer mask = itkUCharImageType::New();
+    ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
     mitk::CastToItkImage(mitkMask, mask);
     mitk::FiberBundle::Pointer newFib = fib->RemoveFibersOutside(mask, removeInside);
     if (newFib->GetNumFibers()<=0)
@@ -384,30 +384,30 @@ void QmitkFiberProcessingView::RemoveWithMask(bool removeInside)
 
 void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
 {
-  if (m_MaskImageNode.IsNull())
+  if (m_RoiImageNode.IsNull())
     return;
 
-  mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+  mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_RoiImageNode->GetData());
   for (auto node : m_SelectedFB)
   {
     mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
     QString name(node->GetName().c_str());
 
-    itkUCharImageType::Pointer mask = itkUCharImageType::New();
+    ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(mitkMask, mask);
 
-//    mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked(), m_Controls->m_FiberExtractionFractionBox->value());
-    itk::FiberExtractionFilter::Pointer extractor = itk::FiberExtractionFilter::New();
+    itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();
     extractor->SetInputFiberBundle(fib);
-    extractor->SetMasks({mask});
+    extractor->SetRoiImages({mask});
     extractor->SetOverlapFraction(m_Controls->m_FiberExtractionFractionBox->value());
     extractor->SetBothEnds(m_Controls->m_BothEnds->isChecked());
+    extractor->SetInterpolate(m_Controls->m_InterpolateRoiBox->isChecked());
     if (invert)
       extractor->SetNoPositives(true);
     else
       extractor->SetNoNegatives(true);
     if (onlyEnds)
-      extractor->SetMode(itk::FiberExtractionFilter::MODE::ENDPOINTS);
+      extractor->SetMode(itk::FiberExtractionFilter<float>::MODE::ENDPOINTS);
     extractor->Update();
 
     mitk::FiberBundle::Pointer newFib;
@@ -482,7 +482,7 @@ void QmitkFiberProcessingView::GenerateRoiImage()
   imageRegion.SetSize(1, geometry->GetExtent(1)*m_UpsamplingFactor);
   imageRegion.SetSize(2, geometry->GetExtent(2)*m_UpsamplingFactor);
 
-  m_PlanarFigureImage = itkUCharImageType::New();
+  m_PlanarFigureImage = ItkUCharImageType::New();
   m_PlanarFigureImage->SetSpacing( spacing );   // Set the image spacing
   m_PlanarFigureImage->SetOrigin( newOrigin );     // Set the image origin
   m_PlanarFigureImage->SetDirection( direction );  // Set the image direction
@@ -625,11 +625,11 @@ template < typename TPixel, unsigned int VImageDimension >
 void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
-  typedef itk::CastImageFilter< ImageType, itkUCharImageType > CastFilterType;
+  typedef itk::CastImageFilter< ImageType, ItkUCharImageType > CastFilterType;
 
   // Generate mask image as new image with same header as input image and
   // initialize with "1".
-  itkUCharImageType::Pointer newMaskImage = itkUCharImageType::New();
+  ItkUCharImageType::Pointer newMaskImage = ItkUCharImageType::New();
   newMaskImage->SetSpacing( image->GetSpacing() );   // Set the image spacing
   newMaskImage->SetOrigin( image->GetOrigin() );     // Set the image origin
   newMaskImage->SetDirection( image->GetDirection() );  // Set the image direction
@@ -736,8 +736,8 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image
   polyDataToImageStencil->SetInputConnection( extrudeFilter->GetOutputPort() );
 
   // Export from ITK to VTK (to use a VTK filter)
-  typedef itk::VTKImageImport< itkUCharImageType > ImageImportType;
-  typedef itk::VTKImageExport< itkUCharImageType > ImageExportType;
+  typedef itk::VTKImageImport< ItkUCharImageType > ImageImportType;
+  typedef itk::VTKImageExport< ItkUCharImageType > ImageExportType;
 
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( newMaskImage );
@@ -767,7 +767,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image
   m_InternalImageMask3D = itkImporter->GetOutput();
   m_InternalImageMask3D->SetDirection(image->GetDirection());
 
-  itk::ImageRegionConstIterator<itkUCharImageType>
+  itk::ImageRegionConstIterator<ItkUCharImageType>
       itmask(m_InternalImageMask3D, m_InternalImageMask3D->GetLargestPossibleRegion());
   itk::ImageRegionIterator<ImageType>
       itimage(image, image->GetLargestPossibleRegion());
@@ -815,7 +815,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image
   itk::ImageRegion<3> cropRegion = itk::ImageRegion<3>(index, size);
 
   // crop internal mask
-  typedef itk::RegionOfInterestImageFilter< itkUCharImageType, itkUCharImageType > ROIMaskFilterType;
+  typedef itk::RegionOfInterestImageFilter< ItkUCharImageType, ItkUCharImageType > ROIMaskFilterType;
   typename ROIMaskFilterType::Pointer roi2 = ROIMaskFilterType::New();
   roi2->SetRegionOfInterest(cropRegion);
   roi2->SetInput(m_InternalImageMask3D);
@@ -832,7 +832,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image
 
   const BaseGeometry *intImageGeometry3D = tmpImage->GetGeometry( 0 );
 
-  typedef itk::ImageRegionIteratorWithIndex<itkUCharImageType> IteratorType;
+  typedef itk::ImageRegionIteratorWithIndex<ItkUCharImageType> IteratorType;
   IteratorType imageIterator (m_InternalImageMask3D, m_InternalImageMask3D->GetRequestedRegion());
   imageIterator.GoToBegin();
   while ( !imageIterator.IsAtEnd() )
@@ -910,7 +910,7 @@ void QmitkFiberProcessingView::UpdateGui()
   bool pfSelected = !m_SelectedPF.empty();
   bool fibSelected = !m_SelectedFB.empty();
   bool multipleFibsSelected = (m_SelectedFB.size()>1);
-  bool maskSelected = m_MaskImageNode.IsNotNull();
+  bool maskSelected = m_RoiImageNode.IsNotNull();
   bool imageSelected = m_SelectedImage.IsNotNull();
 
   // toggle visibility of elements according to selected method
@@ -1011,14 +1011,14 @@ void QmitkFiberProcessingView::UpdateGui()
     if (maskSelected && m_Controls->m_ExtractionMethodBox->currentIndex()==1)
     {
       m_Controls->m_InputData->setTitle("Input Data");
-      m_Controls->m_PfLabel->setText(QString(m_MaskImageNode->GetName().c_str()));
+      m_Controls->m_PfLabel->setText(QString(m_RoiImageNode->GetName().c_str()));
       m_Controls->m_ExtractFibersButton->setEnabled(true);
     }
 
     if (maskSelected && (m_Controls->m_RemovalMethodBox->currentIndex()==3 || m_Controls->m_RemovalMethodBox->currentIndex()==4) )
     {
       m_Controls->m_InputData->setTitle("Input Data");
-      m_Controls->m_PfLabel->setText(QString(m_MaskImageNode->GetName().c_str()));
+      m_Controls->m_PfLabel->setText(QString(m_RoiImageNode->GetName().c_str()));
       m_Controls->m_RemoveButton->setEnabled(true);
     }
   }
@@ -1113,7 +1113,7 @@ void QmitkFiberProcessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer
   m_SelectedPF.clear();
   m_SelectedSurfaces.clear();
   m_SelectedImage = nullptr;
-  m_MaskImageNode = nullptr;
+  m_RoiImageNode = nullptr;
 
   for (auto node: nodes)
   {
@@ -1124,10 +1124,8 @@ void QmitkFiberProcessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer
     else if (dynamic_cast<mitk::Image*>(node->GetData()))
     {
       m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
-      bool isBinary = false;
-      node->GetPropertyValue<bool>("binary", isBinary);
-      if (isBinary)
-        m_MaskImageNode = node;
+      if (m_SelectedImage->GetDimension()==3)
+        m_RoiImageNode = node;
     }
     else if (dynamic_cast<mitk::Surface*>(node->GetData()))
       m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));

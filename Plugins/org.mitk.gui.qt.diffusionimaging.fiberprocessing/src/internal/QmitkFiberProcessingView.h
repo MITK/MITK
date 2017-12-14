@@ -52,7 +52,8 @@ class QmitkFiberProcessingView : public QmitkAbstractView
 
 public:
 
-  typedef itk::Image< unsigned char, 3 >    itkUCharImageType;
+  typedef itk::Image< unsigned char, 3 >    ItkUCharImageType;
+  typedef itk::Image< float, 3 >            ItkFloatImageType;
 
   static const std::string VIEW_ID;
 
@@ -171,10 +172,10 @@ protected:
   mitk::Image::Pointer                  m_SelectedImage;
   mitk::Image::Pointer                  m_InternalImage;
   mitk::PlanarFigure::Pointer           m_PlanarFigure;
-  itkUCharImageType::Pointer            m_InternalImageMask3D;
-  itkUCharImageType::Pointer            m_PlanarFigureImage;
+  ItkUCharImageType::Pointer            m_InternalImageMask3D;
+  ItkUCharImageType::Pointer            m_PlanarFigureImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
-  mitk::DataNode::Pointer               m_MaskImageNode;
+  mitk::DataNode::Pointer               m_RoiImageNode;
 
   unsigned int                          m_StartInteractionObserverTag;
   unsigned int                          m_EndInteractionObserverTag;

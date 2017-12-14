@@ -57,7 +57,7 @@ public:
   }
 
   template< class TPixelType=unsigned char >
-  static bool IsInsideMask(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, bool interpolate)
+  static bool IsInsideMask(const itk::Point<float, 3>& itkP, itk::Image<TPixelType, 3>* image, bool interpolate, float threshold=0.5)
   {
     itk::ContinuousIndex< float, 3> cIdx;
     image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
@@ -77,7 +77,7 @@ public:
         value = image->GetPixel(idx);
       }
 
-      if (value>=0.5)
+      if (value>=threshold)
         return true;
     }
     return false;

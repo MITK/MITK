@@ -16,4 +16,5 @@ set(RESOURCE_FILES
   DelayCalculation.cl
   DMAS.cl
   DAS.cl
+  sDMAS.cl
 )

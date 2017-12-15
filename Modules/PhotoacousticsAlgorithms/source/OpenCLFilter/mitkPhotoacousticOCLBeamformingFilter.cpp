@@ -24,6 +24,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
 {
   this->AddSourceFile("DAS.cl");
   this->AddSourceFile("DMAS.cl");
+  this->AddSourceFile("sDMAS.cl");
   this->m_FilterID = "OpenCLBeamformingFilter";
 
   this->Initialize();
@@ -191,6 +192,11 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
       case BeamformingSettings::BeamformingAlgorithm::DMAS:
       {
         this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDMAS", &clErr);
+        break;
+      }
+      case BeamformingSettings::BeamformingAlgorithm::sDMAS:
+      {
+        this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "cksDMAS", &clErr);
         break;
       }
       default:

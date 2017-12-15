@@ -100,7 +100,7 @@ namespace mitk {
     * - DAS (Delay and sum).
     * - DMAS (Delay multiply and sum).
     */
-    enum BeamformingAlgorithm { DMAS, DAS };
+    enum BeamformingAlgorithm { DMAS, DAS, sDMAS};
     /** \brief Sets the used beamforming algorithm.
     */
     BeamformingAlgorithm Algorithm = DAS;

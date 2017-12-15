@@ -884,6 +884,8 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
     BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
     BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DMAS;
+  else if ("sDMAS" == m_Controls.BFAlgorithm->currentText())
+    BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
 
   if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {

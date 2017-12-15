@@ -110,6 +110,12 @@ namespace mitk {
     /** \brief Function to perform beamforming on CPU for a single line, using DMAS and spherical delay
     */
     void DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
+    /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and quadratic delay
+    */
+    void sDMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
+    /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and spherical delay
+    */
+    void sDMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
 
     float* m_OutputData;
     float* m_InputData;

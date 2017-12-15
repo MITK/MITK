@@ -206,6 +206,23 @@ void mitk::BeamformingFilter::GenerateData()
           }
         }
       }
+      else if (m_Conf.Algorithm == BeamformingSettings::BeamformingAlgorithm::sDMAS)
+      {
+        if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
+        {
+          for (short line = 0; line < outputDim[0]; ++line)
+          {
+            threads[line] = std::thread(&BeamformingFilter::sDMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, m_Conf.apodizationArraySize);
+          }
+        }
+        else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
+        {
+          for (short line = 0; line < outputDim[0]; ++line)
+          {
+            threads[line] = std::thread(&BeamformingFilter::sDMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, m_Conf.apodizationArraySize);
+          }
+        }
+      }
       // wait for all lines to finish
       for (short line = 0; line < outputDim[0]; ++line)
       {
@@ -409,6 +426,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
   }
 }
 
+
 void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
   float& inputS = inputDim[1];
@@ -460,7 +478,6 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
 
     float s_1 = 0;
     float s_2 = 0;
-    int sign = 0;
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
@@ -473,9 +490,6 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
             s_2 = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL];
             s_1 = input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL];
 
-            sign += ((s_1 > 0) - (s_1 < 0));
-            sign += ((s_2 > 0) - (s_2 < 0));
-
             mult = s_2 * apodisation[(int)((l_s2 - minLine)*apod_mult)] * s_1 * apodisation[(int)((l_s1 - minLine)*apod_mult)];
             output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
           }
@@ -485,7 +499,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
         --usedLines;
     }
 
-    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1)) * ((sign > 0) - (sign < 0));
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1));
 
     delete[] AddSample;
   }
@@ -545,7 +559,6 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
 
     float s_1 = 0;
     float s_2 = 0;
-    int sign = 0;
 
     for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
@@ -558,8 +571,170 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
             s_2 = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL];
             s_1 = input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL];
 
-            sign += ((s_1 > 0) - (s_1 < 0));
-            sign += ((s_2 > 0) - (s_2 < 0));
+            mult = s_2 * apodisation[(int)((l_s2 - minLine)*apod_mult)] * s_1 * apodisation[(int)((l_s1 - minLine)*apod_mult)];
+            output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
+          }
+        }
+      }
+      else
+        --usedLines;
+    }
+
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1));
+
+    delete[] AddSample;
+  }
+}
+
+void mitk::BeamformingFilter::sDMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
+{
+  float& inputS = inputDim[1];
+  float& inputL = inputDim[0];
+
+  float& outputS = outputDim[1];
+  float& outputL = outputDim[0];
+
+  short maxLine = 0;
+  short minLine = 0;
+  float delayMultiplicator = 0;
+  float l_i = 0;
+  float s_i = 0;
+
+  float part = 0.07 * inputL;
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
+  float apod_mult = 1;
+
+  float mult = 0;
+  short usedLines = (maxLine - minLine);
+
+  //quadratic delay
+  l_i = line / outputL * inputL;
+
+  for (short sample = 0; sample < outputS; ++sample)
+  {
+    s_i = sample / outputS * inputS / 2;
+
+    part = part_multiplicator*s_i;
+
+    if (part < 1)
+      part = 1;
+
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0f);
+    usedLines = (maxLine - minLine);
+
+    apod_mult = (float)apodArraySize / (float)usedLines;
+
+    delayMultiplicator = pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
+
+    //calculate the AddSamples beforehand to save some time
+    short* AddSample = new short[maxLine - minLine];
+    for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
+    {
+      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i) + (1 - m_Conf.isPhotoacousticImage)*s_i;
+    }
+
+    float s_1 = 0;
+    float s_2 = 0;
+    float sign = 0;
+
+    for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+    {
+      if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
+      {
+        s_1 = input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL];
+        sign += s_1;
+
+        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
+        {
+          if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
+          {
+            s_2 = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL];
+
+            mult = s_2 * apodisation[(int)((l_s2 - minLine)*apod_mult)] * s_1 * apodisation[(int)((l_s1 - minLine)*apod_mult)];
+            output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));
+          }
+        }
+      }
+      else
+        --usedLines;
+    }
+
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / (float)(pow(usedLines, 2) - (usedLines - 1)) * ((sign > 0) - (sign < 0));
+
+    delete[] AddSample;
+  }
+}
+
+void mitk::BeamformingFilter::sDMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
+{
+  float& inputS = inputDim[1];
+  float& inputL = inputDim[0];
+
+  float& outputS = outputDim[1];
+  float& outputL = outputDim[0];
+
+  short maxLine = 0;
+  short minLine = 0;
+  float l_i = 0;
+  float s_i = 0;
+
+  float part = 0.07 * inputL;
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
+  float apod_mult = 1;
+
+  float mult = 0;
+
+  short usedLines = (maxLine - minLine);
+
+  //exact delay
+
+  l_i = (float)line / outputL * inputL;
+
+  for (short sample = 0; sample < outputS; ++sample)
+  {
+    s_i = (float)sample / outputS * inputS / 2;
+
+    part = part_multiplicator*s_i;
+
+    if (part < 1)
+      part = 1;
+
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0f);
+    usedLines = (maxLine - minLine);
+
+    apod_mult = (float)apodArraySize / (float)usedLines;
+
+    //calculate the AddSamples beforehand to save some time
+    short* AddSample = new short[maxLine - minLine];
+    for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
+    {
+      AddSample[l_s] = (short)sqrt(
+        pow(s_i, 2)
+        +
+        pow((1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (((float)minLine + (float)l_s - l_i)*m_Conf.Pitch*(float)m_Conf.TransducerElements) / inputL), 2)
+      ) + (1 - m_Conf.isPhotoacousticImage)*s_i;
+    }
+
+    float s_1 = 0;
+    float s_2 = 0;
+    float sign = 0;
+
+    for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+    {
+      if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
+      {
+        s_1 = input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL];
+        sign += s_1;
+
+        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
+        {
+          if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
+          {
+            s_2 = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL];
 
             mult = s_2 * apodisation[(int)((l_s2 - minLine)*apod_mult)] * s_1 * apodisation[(int)((l_s1 - minLine)*apod_mult)];
             output[sample*(short)outputL + line] += sqrt(fabs(mult)) * ((mult > 0) - (mult < 0));

@@ -721,6 +721,11 @@
            <string>DMAS</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>sDMAS</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="4" column="0">

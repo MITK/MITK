@@ -28,7 +28,7 @@
         <x>0</x>
         <y>0</y>
         <width>353</width>
-        <height>411</height>
+        <height>443</height>
        </rect>
       </property>
       <attribute name="label">
@@ -417,13 +417,10 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="m_BothEnds">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_17">
             <property name="text">
-             <string>Both ends</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Min. overlap:</string>
             </property>
            </widget>
           </item>
@@ -434,6 +431,16 @@
             </property>
            </widget>
           </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="m_BothEnds">
+            <property name="text">
+             <string>Both ends</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="m_FiberExtractionFractionBox">
             <property name="maximum">
@@ -441,13 +448,6 @@
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>Min. overlap:</string>
             </property>
            </widget>
           </item>
@@ -481,13 +481,36 @@
             </item>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QCheckBox" name="m_InterpolateRoiBox">
             <property name="text">
              <string>Interpolate ROI</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>Threshold:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QDoubleSpinBox" name="m_FiberExtractionThresholdBox">
+            <property name="toolTip">
+             <string>Threshold on ROI image for positions to be considered as positive.</string>
+            </property>
+            <property name="maximum">
+             <double>9999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>

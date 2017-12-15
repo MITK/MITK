@@ -72,6 +72,11 @@ void QmitkFreeSurferParcellationHandler::Notify(InteractionEvent *interactionEve
               ImagePixelReadAccessor<int, 3> readAccess( image );
               value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
             }
+            else if( typeStr == "unsigned_int" )
+            {
+              ImagePixelReadAccessor<unsigned int, 3> readAccess( image );
+              value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
+            }
             else if( typeStr == "unsigned_char" )
             {
               ImagePixelReadAccessor<unsigned char, 3> readAccess( image );
@@ -85,6 +90,16 @@ void QmitkFreeSurferParcellationHandler::Notify(InteractionEvent *interactionEve
             else if( typeStr == "float" )
             {
               ImagePixelReadAccessor<float, 3> readAccess( image );
+              value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
+            }
+            else if( typeStr == "double" )
+            {
+              ImagePixelReadAccessor<double, 3> readAccess( image );
+              value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
+            }
+            else if( typeStr == "unsigned_short" )
+            {
+              ImagePixelReadAccessor<unsigned short, 3> readAccess( image );
               value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
             }
             else

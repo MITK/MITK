@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk/.tck/.dcm)", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
-  parser.addArgument("rois", "", mitkCommandLineParser::StringList, "ROI images:", "Images with binary ROIs", us::Any(), false);
+  parser.addArgument("rois", "", mitkCommandLineParser::StringList, "ROI images:", "ROI images", us::Any(), false);
 
   parser.addArgument("both_ends", "", mitkCommandLineParser::Bool, "Both ends:", "Fibers are extracted if both endpoints are located in the ROI.", false);
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1);
@@ -66,6 +66,9 @@ int main(int argc, char* argv[])
   parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate ROI images", false);
   parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", false, 0.5);
   parser.addArgument("labels", "", mitkCommandLineParser::StringList, "Labels:", "positive means roi image value in labels vector", false);
+  parser.addArgument("split_labels", "", mitkCommandLineParser::Bool, "Split labels:", "output a separate tractogram for each label-->label tract", false);
+  parser.addArgument("skip_self_connections", "", mitkCommandLineParser::Bool, "Skip self connections:", "ignore streamlines between two identical labels", false);
+  parser.addArgument("min_fibers", "", mitkCommandLineParser::Int, "Min. num. fibers:", "discard positive tracts with less fibers", 0);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -82,6 +85,18 @@ int main(int argc, char* argv[])
   bool invert = false;
   if (parsedArgs.count("invert"))
     invert = us::any_cast<bool>(parsedArgs["invert"]);
+
+  unsigned int min_fibers = 0;
+  if (parsedArgs.count("min_fibers"))
+    min_fibers = us::any_cast<int>(parsedArgs["min_fibers"]);
+
+  bool split_labels = false;
+  if (parsedArgs.count("split_labels"))
+    split_labels = us::any_cast<bool>(parsedArgs["split_labels"]);
+
+  bool skip_self_connections = false;
+  if (parsedArgs.count("skip_self_connections"))
+    skip_self_connections = us::any_cast<bool>(parsedArgs["skip_self_connections"]);
 
   float overlap_fraction = -1;
   if (parsedArgs.count("overlap_fraction"))
@@ -128,6 +143,9 @@ int main(int argc, char* argv[])
     extractor->SetInterpolate(interpolate);
     extractor->SetThreshold(threshold);
     extractor->SetLabels(short_labels);
+    extractor->SetSplitLabels(split_labels);
+    extractor->SetMinFibersPerTract(min_fibers);
+    extractor->SetSkipSelfConnections(skip_self_connections);
     if (invert)
       extractor->SetNoPositives(true);
     else
@@ -143,8 +161,22 @@ int main(int argc, char* argv[])
       mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib);
     else
     {
-      newFib = newFib->AddBundles(extractor->GetPositives());
-      mitk::IOUtil::Save(newFib, outFib);
+      if (!split_labels)
+      {
+        newFib = newFib->AddBundles(extractor->GetPositives());
+        mitk::IOUtil::Save(newFib, outFib);
+      }
+      else
+      {
+        int c = 0;
+        std::vector< std::pair< unsigned int, unsigned int > > positive_labels = extractor->GetPositiveLabels();
+        for (auto fib : extractor->GetPositives())
+        {
+          std::pair< unsigned int, unsigned int > l = positive_labels.at(c);
+          mitk::IOUtil::Save(fib, outFib + "_" + boost::lexical_cast<std::string>(l.first) + "-" + boost::lexical_cast<std::string>(l.second) + ".trk");
+          ++c;
+        }
+      }
     }
   }
   catch (itk::ExceptionObject e)

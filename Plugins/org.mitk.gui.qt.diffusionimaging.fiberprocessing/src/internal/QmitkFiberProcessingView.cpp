@@ -399,6 +399,7 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
     itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();
     extractor->SetInputFiberBundle(fib);
     extractor->SetRoiImages({mask});
+    extractor->SetThreshold(m_Controls->m_FiberExtractionThresholdBox->value());
     extractor->SetOverlapFraction(m_Controls->m_FiberExtractionFractionBox->value());
     extractor->SetBothEnds(m_Controls->m_BothEnds->isChecked());
     extractor->SetInterpolate(m_Controls->m_InterpolateRoiBox->isChecked());

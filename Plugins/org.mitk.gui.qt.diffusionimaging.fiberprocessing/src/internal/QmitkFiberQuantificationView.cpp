@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkImageCast.h>
 #include <mitkPeakImage.h>
+#include <mitkLabelSetImage.h>
+#include <mitkDICOMSegmentationConstants.h>
+#include <mitkDICOMSegmentationPropertyHelper.cpp>
 
 // ITK
 #include <itkTractDensityImageFilter.h>
@@ -397,8 +400,34 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());
 
-    // init data node
-    node->SetData(img);
+
+    if (m_SelectedImage.IsNotNull())
+    {
+      mitk::LabelSetImage::Pointer multilabelImage = mitk::LabelSetImage::New();
+      multilabelImage->InitializeByLabeledImage(img);
+
+
+
+      mitk::Label::Pointer label = multilabelImage->GetActiveLabel();
+      label->SetName("Tractogram");
+//      label->SetColor(color);
+      label->SetValue(1);
+//      multilabelImage->GetActiveLabelSet()->AddLabel(label);
+      multilabelImage->GetActiveLabelSet()->SetActiveLabel(1);
+
+      PropertyList::Pointer dicomSegPropertyList = mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(m_SelectedImage->GetPropertyList());
+
+      multilabelImage->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
+      mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(multilabelImage->GetActiveLabel(multilabelImage->GetActiveLayer()));
+      // init data node
+      node->SetData(multilabelImage);
+    }
+    else
+    {
+      // init data node
+      node->SetData(img);
+    }
+
   }
   else
   {

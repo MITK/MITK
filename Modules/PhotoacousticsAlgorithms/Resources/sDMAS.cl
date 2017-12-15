@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-__kernel void ckDMAS(
+__kernel void cksDMAS(
   __global float* dSource, // input image
   __global float* dDest, // output buffer
   __global unsigned short* usedLines,
@@ -52,6 +52,7 @@ __kernel void ckDMAS(
     
     float s_1 = 0;
     float s_2 = 0;
+    float sign = 0;
     float apod_1 = 0;
 
     for (short l_s1 = minLine; l_s1 < maxLine; ++l_s1)
@@ -61,6 +62,7 @@ __kernel void ckDMAS(
       {
         s_1 = dSource[(int)(globalPosZ * inputL * inputS + Delay1 * inputL + l_s1)];
         apod_1 = apodArray[(int)((l_s1 - minLine)*apod_mult)];
+        sign += s_1;
         
         for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
@@ -80,6 +82,6 @@ __kernel void ckDMAS(
         --curUsedLines;
     }
 
-    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1));
+    dDest[ globalPosZ * outputL * outputS + globalPosY * outputL + globalPosX ] = output / (float)(curUsedLines * curUsedLines - (curUsedLines - 1)) * ((sign > 0) - (sign < 0));
   }
 }

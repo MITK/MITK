@@ -24,6 +24,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
 {
   this->AddSourceFile("DAS.cl");
   this->AddSourceFile("DMAS.cl");
+  this->AddSourceFile("sDMAS.cl");
   this->m_FilterID = "OpenCLBeamformingFilter";
 
   this->Initialize();
@@ -156,12 +157,12 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
   // execute the filter on a 3D NDRange
   if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)
   {
-    if(!this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize))
+    if(!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
       mitkThrow() << "openCL Error when executing Kernel";
   }
   else
   {
-    if(!this->ExecuteKernelChunks(m_PixelCalculation, 3, m_ChunkSize))
+    if(!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 3, m_ChunkSize, 16, 50))
       mitkThrow() << "openCL Error when executing Kernel";
   }
 
@@ -191,6 +192,11 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
       case BeamformingSettings::BeamformingAlgorithm::DMAS:
       {
         this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckDMAS", &clErr);
+        break;
+      }
+      case BeamformingSettings::BeamformingAlgorithm::sDMAS:
+      {
+        this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "cksDMAS", &clErr);
         break;
       }
       default:

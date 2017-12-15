@@ -552,7 +552,7 @@ void PAImageProcessing::StartCropThread()
       connect(thread, &CropThread::result, this, &PAImageProcessing::HandleCropResults);
       connect(thread, &CropThread::finished, thread, &QObject::deleteLater);
 
-      thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), m_Controls.CutoffFirstSlice->value(), m_Controls.CutoffLastSlice->value());
+      thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, image->GetDimension(2) - 1);
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 
@@ -798,12 +798,11 @@ void PAImageProcessing::UpdateImageInfo()
       {
         m_Controls.ElementCount->setValue(image->GetDimension(0));
         m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
-        m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
-        m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
-        m_Controls.CutoffFirstSlice->setValue(0);
-        m_Controls.CutoffLastSlice->setValue(image->GetDimension(2) - 1);
-        m_Controls.CutoffLastSlice->setMaximum(image->GetDimension(2) - 1);
       }
+
+      m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
+      m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
+
       UpdateBFSettings(image);
 
       m_Controls.CutoffBeforeBF->setValue(0.000001 / BFconfig.TimeSpacing); // 1us standard offset for our transducer
@@ -885,6 +884,8 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
     BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
     BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DMAS;
+  else if ("sDMAS" == m_Controls.BFAlgorithm->currentText())
+    BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
 
   if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {
@@ -913,7 +914,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig.SamplesPerLine = m_Controls.Samples->value();
   BFconfig.ReconstructionLines = m_Controls.Lines->value();
   BFconfig.TransducerElements = m_Controls.ElementCount->value();
-  BFconfig.apodizationArraySize = m_Controls.ElementCount->value();
+  BFconfig.apodizationArraySize = m_Controls.Lines->value();
   BFconfig.Angle = m_Controls.Angle->value(); // [deg]
   BFconfig.UseBP = m_Controls.UseBP->isChecked();
   BFconfig.UseGPU = m_Controls.UseGPUBf->isChecked();
@@ -947,9 +948,18 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
 
 void PAImageProcessing::EnableControls()
 {
+  m_Controls.BatchProcessing->setEnabled(true);
+  m_Controls.StepBeamforming->setEnabled(true);
+  m_Controls.StepBandpass->setEnabled(true);
+  m_Controls.StepCropping->setEnabled(true);
+  m_Controls.StepBMode->setEnabled(true);
+
+  UpdateSaveBoxes();
+
   m_Controls.DoResampling->setEnabled(true);
   UseResampling();
   m_Controls.Logfilter->setEnabled(true);
+  m_Controls.BModeMethod->setEnabled(true);
   m_Controls.buttonApplyBModeFilter->setEnabled(true);
 
   m_Controls.CutoffAbove->setEnabled(true);
@@ -989,9 +999,20 @@ void PAImageProcessing::EnableControls()
 
 void PAImageProcessing::DisableControls()
 {
+  m_Controls.BatchProcessing->setEnabled(false);
+  m_Controls.StepBeamforming->setEnabled(false);
+  m_Controls.StepBandpass->setEnabled(false);
+  m_Controls.StepCropping->setEnabled(false);
+  m_Controls.StepBMode->setEnabled(false);
+  m_Controls.SaveBeamforming->setEnabled(false);
+  m_Controls.SaveBandpass->setEnabled(false);
+  m_Controls.SaveCropping->setEnabled(false);
+  m_Controls.SaveBMode->setEnabled(false);
+
   m_Controls.DoResampling->setEnabled(false);
   m_Controls.ResamplingValue->setEnabled(false);
   m_Controls.Logfilter->setEnabled(false);
+  m_Controls.BModeMethod->setEnabled(false);
   m_Controls.buttonApplyBModeFilter->setEnabled(false);
 
   m_Controls.CutoffAbove->setEnabled(false);

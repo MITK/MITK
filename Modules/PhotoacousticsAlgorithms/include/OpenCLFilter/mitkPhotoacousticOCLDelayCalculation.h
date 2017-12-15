@@ -92,6 +92,7 @@ namespace mitk
     unsigned int m_BufferSize;
     float m_DelayMultiplicatorRaw;
     char m_IsPAImage;
+    size_t m_ChunkSize[3];
   };
 }
 #endif

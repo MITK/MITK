@@ -28,7 +28,7 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
   uint globalPosY = get_global_id(1);
   uint globalPosZ = get_global_id(2);
 
-  if (globalPosX < outputL && globalPosY < outputS)
+  if (globalPosX * 2 < outputL && globalPosY < outputS)
   {
     float l_i = 0; // we calculate the delays relative to line zero
     float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;
@@ -54,7 +54,7 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
   uint globalPosY = get_global_id(1);
   uint globalPosZ = get_global_id(2);
 
-  if (globalPosX < outputL && globalPosY < outputS)
+  if (globalPosX * 2< outputL && globalPosY < outputS)
   {
     float l_i = 0; // we calculate the delays relative to line zero
     float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;

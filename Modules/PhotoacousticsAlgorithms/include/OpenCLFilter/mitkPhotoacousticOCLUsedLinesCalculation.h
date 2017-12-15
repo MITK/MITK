@@ -83,6 +83,7 @@ namespace mitk
 
     BeamformingSettings m_Conf;
     float m_part;
+    size_t m_ChunkSize[3];
   };
 }
 #endif

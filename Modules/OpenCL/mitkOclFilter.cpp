@@ -80,6 +80,8 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
   return ( clErr == CL_SUCCESS );
 }
 
+#include <thread>
+
 bool mitk::OclFilter::ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim )
 {
   size_t offset[3] ={0, 0, 0};
@@ -91,8 +93,8 @@ bool mitk::OclFilter::ExecuteKernelChunks( cl_kernel kernel, unsigned int workSi
     {
       for(offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
       {
-        clErr |= clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
-                                        offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
+        clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+          offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
       }
     }
   }
@@ -114,6 +116,67 @@ bool mitk::OclFilter::ExecuteKernelChunks( cl_kernel kernel, unsigned int workSi
   CHECK_OCL_ERR(clErr);
 
   return ( clErr == CL_SUCCESS );
+}
+
+bool mitk::OclFilter::ExecuteKernelChunksInBatches(cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim, size_t batchSize, int waitTimems)
+{
+  size_t offset[3] = { 0, 0, 0 };
+  cl_int clErr = 0;
+
+  unsigned int currentChunk = 0;
+  cl_event* waitFor = new cl_event[batchSize];
+
+  if (workSizeDim == 2)
+  {
+    for (offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for (offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        if (currentChunk % batchSize == 0 && currentChunk != 0)
+        {
+          clWaitForEvents(batchSize, &waitFor[0]);
+          std::this_thread::sleep_for(std::chrono::milliseconds(waitTimems));
+          clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+            offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[0]);
+        }
+        else
+        {
+          clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+            offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[currentChunk % batchSize]);
+        }
+        currentChunk++;
+      }
+    }
+  }
+  else if (workSizeDim == 3)
+  {
+    for (offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for (offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        for (offset[2] = 0; offset[2] < m_GlobalWorkSize[2]; offset[2] += chunksDim[2])
+        {
+          if (currentChunk % batchSize == 0 && currentChunk != 0)
+          {
+            clWaitForEvents(batchSize, &waitFor[0]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(waitTimems));
+            clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+              offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[0]);
+          }
+          else
+          {
+            clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+              offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[currentChunk % batchSize]);
+          }
+          currentChunk++;
+        }
+      }
+    }
+  }
+
+  CHECK_OCL_ERR(clErr);
+
+  return (clErr == CL_SUCCESS);
 }
 
 

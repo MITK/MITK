@@ -27,6 +27,10 @@ mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation()
   this->AddSourceFile("UsedLinesCalculation.cl");
   this->m_FilterID = "UsedLinesCalculation";
 
+  m_ChunkSize[0] = 128;
+  m_ChunkSize[1] = 128;
+  m_ChunkSize[2] = 8;
+
   this->Initialize();
 }
 
@@ -78,11 +82,22 @@ void mitk::OCLUsedLinesCalculation::Execute()
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
 
   CHECK_OCL_ERR(clErr);
 
-  // execute the filter on a 3D NDRange
-  this->ExecuteKernel(m_PixelCalculation, 2);
+  // execute the filter on a 2D NDRange
+  if (m_Conf.inputDim[2] > 2)
+  {
+    if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
+      mitkThrow() << "openCL Error when executing Kernel";
+  }
+  else
+  {
+    if (!this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize))
+      mitkThrow() << "openCL Error when executing Kernel";
+  }
 
   // signalize the GPU-side data changed
   m_Output->Modified(GPU_DATA);

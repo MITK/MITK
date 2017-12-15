@@ -18,15 +18,17 @@ __kernel void ckUsedLines(
   __global unsigned short* dDest, // output buffer
   float partMult,
   unsigned int inputL,
-  unsigned int inputS
+  unsigned int inputS,
+  unsigned int outputL,
+  unsigned int outputS
 )
 {
   // get thread identifier
   unsigned int globalPosX = get_global_id(0);
   unsigned int globalPosY = get_global_id(1);
   
-  unsigned short outputS = get_global_size(1);
-  unsigned short outputL = get_global_size(0);
+  //unsigned short outputS = get_global_size(1);
+  //unsigned short outputL = get_global_size(0);
   
   // terminate non-valid threads
   if ( globalPosX < outputL && globalPosY < outputS)

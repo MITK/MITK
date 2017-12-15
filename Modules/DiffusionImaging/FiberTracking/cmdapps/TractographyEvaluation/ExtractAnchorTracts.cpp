@@ -196,9 +196,9 @@ int main(int argc, char* argv[])
     std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder, anchor_fraction, out_folder + "/skipped_masks/", random_seed);
     mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
 
-    MITK_INFO << "Removing fibers not ending inside of GM";
     if (gray_matter_mask.compare("")!=0)
     {
+      MITK_INFO << "Removing fibers not ending inside of GM";
       std::streambuf *old = cout.rdbuf(); // <-- save
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect

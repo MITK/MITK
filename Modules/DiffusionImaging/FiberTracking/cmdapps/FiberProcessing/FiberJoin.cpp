@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   try
   {
     std::vector< mitk::FiberBundle::Pointer > tractograms;
-    mitk::FiberBundle::Pointer result = mitk::FiberBundle::New(nullptr);
+    mitk::FiberBundle::Pointer result = LoadFib(inFibs.at(0));
     for (std::size_t i=1; i<inFibs.size(); ++i)
     {
       try

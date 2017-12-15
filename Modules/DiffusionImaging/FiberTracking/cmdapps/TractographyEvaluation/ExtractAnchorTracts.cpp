@@ -242,7 +242,6 @@ int main(int argc, char* argv[])
       extractor->SetInputFiberBundle(inputTractogram);
       extractor->SetRoiImages(roi_images2);
       extractor->SetOverlapFraction(overlap);
-      extractor->SetDontResampleFibers(true);
       extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::OVERLAP);
       extractor->Update();
       std::vector< mitk::FiberBundle::Pointer > positives = extractor->GetPositives();

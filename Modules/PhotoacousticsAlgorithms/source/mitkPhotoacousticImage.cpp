@@ -303,7 +303,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, std::string& message, std::function<void(int, std::string)> progressHandle)
 {
   config.RecordTime = config.RecordTime - (float)(config.upperCutoff) / (float)inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
-  progressHandle(0, "cropping image");
+  progressHandle(0, "converting image");
   if (!config.partial)
   {
     config.CropBounds[0] = 0;

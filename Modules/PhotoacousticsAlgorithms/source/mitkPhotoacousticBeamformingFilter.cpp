@@ -251,15 +251,48 @@ void mitk::BeamformingFilter::GenerateData()
         return;
       }
 
-      m_ProgressHandle(50, "performing reconstruction");
+      unsigned int batchSize = 16;
+      unsigned int batches = (unsigned int)((float)input->GetDimension(2)/batchSize) + (input->GetDimension(2)%batchSize > 0);
 
-      m_BeamformingOclFilter->SetApodisation(ApodWindow, m_Conf.apodizationArraySize);
-      m_BeamformingOclFilter->SetConfig(m_Conf);
-      m_BeamformingOclFilter->SetInput(input);
-      m_BeamformingOclFilter->Update();
+      unsigned int batchDim[] = {input->GetDimension(0), input->GetDimension(1), batchSize};
+      unsigned int batchDimLast[] = {input->GetDimension(0), input->GetDimension(1), input->GetDimension(2)%batchSize};
 
-      void* out = m_BeamformingOclFilter->GetOutput();
-      output->SetImportVolume(out, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
+      mitk::ImageReadAccessor copy(input);
+
+      for(unsigned int i = 0; i < batches; ++i)
+      {
+        m_ProgressHandle(input->GetDimension(2)/batches * i, "performing reconstruction");
+
+        mitk::Image::Pointer inputBatch = mitk::Image::New();
+        if(i == batches - 1 && (input->GetDimension(2)%batchSize > 0))
+        {
+          inputBatch->Initialize(mitk::MakeScalarPixelType<float>(), 3, batchDimLast);
+          m_Conf.inputDim[2] = batchDimLast[2];
+        }
+        else
+        {
+          inputBatch->Initialize(mitk::MakeScalarPixelType<float>(), 3, batchDim);
+          m_Conf.inputDim[2] = batchDim[2];
+        }
+
+        inputBatch->SetSpacing(input->GetGeometry()->GetSpacing());
+
+        inputBatch->SetImportVolume(&(((float*)copy.GetData())[input->GetDimension(0) * input->GetDimension(1) * batchSize * i]));
+
+        m_BeamformingOclFilter->SetApodisation(ApodWindow, m_Conf.apodizationArraySize);
+        m_BeamformingOclFilter->SetConfig(m_Conf);
+        m_BeamformingOclFilter->SetInput(inputBatch);
+        m_BeamformingOclFilter->Update();
+
+        void* out = m_BeamformingOclFilter->GetOutput();
+
+        for(unsigned int slice = 0; slice < m_Conf.inputDim[2]; ++slice)
+        {
+          output->SetImportSlice(
+                &(((float*)out)[m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * slice]),
+              batchSize * i + slice, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
+        }
+      }
     }
     catch (mitk::Exception &e)
     {

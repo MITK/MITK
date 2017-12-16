@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkDataNode.h>
 
-mitk::NodePredicateDataUID::NodePredicateDataUID(const IIdentifiable::UIDType &uid)
+mitk::NodePredicateDataUID::NodePredicateDataUID(const Identifiable::UIDType &uid)
   : m_UID(uid)
 {
 }

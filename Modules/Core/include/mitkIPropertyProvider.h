@@ -28,9 +28,9 @@ namespace mitk
     virtual ~IPropertyProvider();
 
     /**
-    * \brief Get property by its name.
+    * \brief Get property by its key.
     *
-    * \param[in] propertyName Name of property.
+    * \param[in] propertyKey Key of property.
     * \param[in] contextName Optional, default is empty string (default
     *            context). Search in specified context.
     * \param[in] fallBackOnDefaultContext Optional, default is true. Also
@@ -39,19 +39,19 @@ namespace mitk
     *
     * \return Found property, nullptr otherwise.
     */
-    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const = 0;
+    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const = 0;
 
     /**
-    * \brief Query names of existing properties.
+    * \brief Query keys of existing properties.
     *
     * \param[in] contextName Optional, default is empty string (default
     *            context). Search in specified context.
     * \param[in] includeDefaultContext Optional, default is false. Include
     *            default context.
     *
-    * \return List of property names.
+    * \return List of property keys.
     */
-    virtual std::vector<std::string> GetPropertyNames(const std::string &contextName = "", bool includeDefaultContext = false) const = 0;
+    virtual std::vector<std::string> GetPropertyKeys(const std::string &contextName = "", bool includeDefaultContext = false) const = 0;
 
     /**
     * \brief Query names of existing contexts.

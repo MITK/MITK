@@ -28,9 +28,9 @@ namespace mitk
     virtual ~IPropertyOwner();
 
     /**
-    * \brief Get property by its name.
+    * \brief Get property by its key.
     *
-    * \param[in] propertyName Name of property.
+    * \param[in] propertyKey Key of property.
     * \param[in] contextName Optional, default is empty string (default
     *            context). Search in specified context.
     * \param[in] fallBackOnDefaultContext Optional, default is true. Also
@@ -39,12 +39,12 @@ namespace mitk
     *
     * \return Found property, nullptr otherwise.
     */
-    virtual BaseProperty * GetNonConstProperty(const std::string &propertyName, const std::string &contextName = "", bool fallBackOnDefaultContext = true) = 0;
+    virtual BaseProperty * GetNonConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) = 0;
 
     /**
     * \brief Add new or change existent property.
     *
-    * \param[in] propertyName Name of property.
+    * \param[in] propertyKey Key of property.
     * \param[in] property The actual property.
     * \param[in] contextName Optional, default is empty string (default
                  context). Context in which the property is set.
@@ -52,7 +52,7 @@ namespace mitk
     *            property in default context if given context does not
     *            exist.
     */
-    virtual void SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) = 0;
+    virtual void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) = 0;
   };
 }
 

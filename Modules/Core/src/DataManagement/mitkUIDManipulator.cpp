@@ -14,8 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkIIdentifiable.h>
+#include <mitkUIDManipulator.h>
+#include <mitkExceptionMacro.h>
+#include <mitkIdentifiable.h>
 
-mitk::IIdentifiable::~IIdentifiable()
+mitk::UIDManipulator::UIDManipulator(Identifiable *identifiable)
+  : m_Identifiable(identifiable)
 {
+  if (nullptr == m_Identifiable)
+    mitkThrow() << "Invalid identifiable object.";
+}
+
+mitk::UIDManipulator::~UIDManipulator()
+{
+}
+
+void mitk::UIDManipulator::SetUID(const Identifiable::UIDType &uid)
+{
+  m_Identifiable->SetUID(uid);
 }

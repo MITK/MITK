@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkNodePredicateDataUID_h
 #define mitkNodePredicateDataUID_h
 
-#include <mitkIIdentifiable.h>
+#include <mitkIdentifiable.h>
 #include <mitkNodePredicateBase.h>
 #include <MitkCoreExports.h>
 
@@ -32,16 +32,16 @@ namespace mitk
   {
   public:
     mitkClassMacro(NodePredicateDataUID, NodePredicateBase)
-    mitkNewMacro1Param(NodePredicateDataUID, const IIdentifiable::UIDType &)
+    mitkNewMacro1Param(NodePredicateDataUID, const Identifiable::UIDType &)
 
     virtual ~NodePredicateDataUID();
 
     virtual bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
-    explicit NodePredicateDataUID(const IIdentifiable::UIDType &uid);
+    explicit NodePredicateDataUID(const Identifiable::UIDType &uid);
 
-    IIdentifiable::UIDType m_UID;
+    Identifiable::UIDType m_UID;
   };
 }
 

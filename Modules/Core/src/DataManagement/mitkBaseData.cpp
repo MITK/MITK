@@ -32,7 +32,8 @@ mitk::BaseData::BaseData()
 
 mitk::BaseData::BaseData(const BaseData &other)
   : itk::DataObject(),
-    mitk::OperationActor(),
+    OperationActor(),
+    Identifiable(),
     m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
     m_Initialized(other.m_Initialized),
     m_PropertyList(other.m_PropertyList->Clone()),

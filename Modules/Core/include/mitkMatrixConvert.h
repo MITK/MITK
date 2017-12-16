@@ -97,8 +97,7 @@ namespace mitk
   void GetRotation(const mitk::BaseGeometry *geometry, TMatrixType &itkmatrix)
   {
     const mitk::Vector3D &spacing = geometry->GetSpacing();
-    typename const mitk::BaseGeometry::TransformType::MatrixType::InternalMatrixType &geometryVnlMatrix =
-        geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+    auto &geometryVnlMatrix = geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
 
     typename TMatrixType::InternalMatrixType &outputVnlMatrix =
       itkmatrix.GetVnlMatrix();

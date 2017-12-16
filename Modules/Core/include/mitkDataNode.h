@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseData.h"
 //#include "mitkMapper.h"
 #include "mitkDataInteractor.h"
-#include "mitkIIdentifiable.h"
+#include "mitkIdentifiable.h"
 #include "mitkIPropertyOwner.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
@@ -65,7 +65,7 @@ namespace mitk
    * \warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
    *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
    */
-  class MITKCORE_EXPORT DataNode : public itk::DataObject, public IIdentifiable, public IPropertyOwner
+  class MITKCORE_EXPORT DataNode : public itk::DataObject, public Identifiable, public IPropertyOwner
   {
   public:
     typedef mitk::Geometry3D::Pointer Geometry3DPointer;
@@ -82,9 +82,6 @@ namespace mitk
     mitkClassMacroItkParent(DataNode, itk::DataObject)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-
-    // IIdentifiable
-    virtual UIDType GetUID() const override;
 
     // IPropertyProvider
     virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;

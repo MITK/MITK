@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageSource.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkRenderingManager.h"
-#include <mitkUIDGenerator.h>
 
 mitk::Mapper *mitk::DataNode::GetMapper(MapperSlotId id) const
 {
@@ -88,9 +87,6 @@ mitk::DataNode::DataNode()
     m_PropertyListModifiedObserverTag(0)
 {
   m_Mappers.resize(10);
-
-  UIDGenerator generator;
-  this->SetProperty("uid", StringProperty::New(generator.GetUID()));
 
   // subscribe for modified event
   itk::MemberCommand<mitk::DataNode>::Pointer _PropertyListModifiedCommand = itk::MemberCommand<mitk::DataNode>::New();
@@ -586,15 +582,6 @@ mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const
 void mitk::DataNode::PropertyListModified(const itk::Object * /*caller*/, const itk::EventObject &)
 {
   Modified();
-}
-
-mitk::IIdentifiable::UIDType mitk::DataNode::GetUID() const
-{
-  auto uidProperty = dynamic_cast<StringProperty *>(this->GetProperty("uid", nullptr, false));
-
-  return nullptr != uidProperty
-    ? uidProperty->GetValue()
-    : "";
 }
 
 mitk::BaseProperty::ConstPointer mitk::DataNode::GetConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext) const

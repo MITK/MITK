@@ -70,7 +70,7 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkGroupTagProperty.cpp
-  DataManagement/mitkIIdentifiable.cpp
+  DataManagement/mitkIdentifiable.cpp
   DataManagement/mitkImageAccessorBase.cpp
   DataManagement/mitkImageCaster.cpp
   DataManagement/mitkImageCastPart1.cpp
@@ -165,6 +165,7 @@ set(CPP_FILES
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTemporoSpatialStringProperty.cpp
+  DataManagement/mitkUIDManipulator.cpp
   DataManagement/mitkVector.cpp
   DataManagement/mitkVectorProperty.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp

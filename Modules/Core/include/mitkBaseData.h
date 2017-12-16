@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDataObject.h>
 
 #include "mitkBaseProcess.h"
-#include "mitkIIdentifiable.h"
+#include "mitkIdentifiable.h"
 #include "mitkIPropertyOwner.h"
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
@@ -39,13 +39,10 @@ namespace mitk
   //## Inherits also from OperationActor and can be used as a destination for Undo
   //## @ingroup Data
   class MITKCORE_EXPORT BaseData
-    : public itk::DataObject, public OperationActor, public IIdentifiable, public IPropertyOwner
+    : public itk::DataObject, public OperationActor, public Identifiable, public IPropertyOwner
   {
   public:
     mitkClassMacroItkParent(BaseData, itk::DataObject)
-
-    // IIdentifiable
-    virtual UIDType GetUID() const override;
 
     // IPropertyProvider
     virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;

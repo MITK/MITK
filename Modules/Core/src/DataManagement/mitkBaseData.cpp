@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGeometry3D.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkStringProperty.h>
-#include <mitkUIDGenerator.h>
 
 mitk::BaseData::BaseData()
   : m_SourceOutputIndexDuplicate(0),
@@ -29,8 +28,6 @@ mitk::BaseData::BaseData()
     m_PropertyList(PropertyList::New()),
     m_TimeGeometry(ProportionalTimeGeometry::New())
 {
-  UIDGenerator generator;
-  this->SetProperty("uid", StringProperty::New(generator.GetUID()));
 }
 
 mitk::BaseData::BaseData(const BaseData &other)
@@ -292,15 +289,6 @@ void mitk::BaseData::PrintSelf(std::ostream &os, itk::Indent indent) const
       os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;
     }
   }
-}
-
-mitk::IIdentifiable::UIDType mitk::BaseData::GetUID() const
-{
-  auto uidProperty = dynamic_cast<StringProperty *>(this->GetProperty("uid").GetPointer());
-
-  return nullptr != uidProperty
-    ? uidProperty->GetValue()
-    : "";
 }
 
 mitk::BaseProperty::ConstPointer mitk::BaseData::GetConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext) const

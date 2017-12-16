@@ -303,53 +303,53 @@ mitk::IIdentifiable::UIDType mitk::BaseData::GetUID() const
     : "";
 }
 
-mitk::BaseProperty::ConstPointer mitk::BaseData::GetConstProperty(const std::string &propertyName, const std::string &contextName, bool fallBackOnDefaultContext) const
+mitk::BaseProperty::ConstPointer mitk::BaseData::GetConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext) const
 {
-  if (propertyName.empty())
+  if (propertyKey.empty())
     return nullptr;
 
   if (contextName.empty() || fallBackOnDefaultContext)
-    return m_PropertyList->GetProperty(propertyName);
+    return m_PropertyList->GetProperty(propertyKey);
 
   return nullptr;
 }
 
-mitk::BaseProperty * mitk::BaseData::GetNonConstProperty(const std::string &propertyName, const std::string &contextName, bool fallBackOnDefaultContext)
+mitk::BaseProperty * mitk::BaseData::GetNonConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext)
 {
-  if (propertyName.empty())
+  if (propertyKey.empty())
     return nullptr;
 
   if (contextName.empty() || fallBackOnDefaultContext)
-    return m_PropertyList->GetProperty(propertyName);
+    return m_PropertyList->GetProperty(propertyKey);
 
   return nullptr;
 }
 
-void mitk::BaseData::SetProperty(const std::string &propertyName, BaseProperty *property, const std::string &contextName, bool fallBackOnDefaultContext)
+void mitk::BaseData::SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName, bool fallBackOnDefaultContext)
 {
-  if (propertyName.empty())
-    mitkThrow() << "Property name is empty.";
+  if (propertyKey.empty())
+    mitkThrow() << "Property key is empty.";
 
   if (contextName.empty() || fallBackOnDefaultContext)
   {
-    m_PropertyList->SetProperty(propertyName, property);
+    m_PropertyList->SetProperty(propertyKey, property);
     return;
   }
 
   mitkThrow() << "Unknown property context.";
 }
 
-std::vector<std::string> mitk::BaseData::GetPropertyNames(const std::string &contextName, bool includeDefaultContext) const
+std::vector<std::string> mitk::BaseData::GetPropertyKeys(const std::string &contextName, bool includeDefaultContext) const
 {
-  std::vector<std::string> propertyNames;
+  std::vector<std::string> propertyKeys;
 
   if (contextName.empty() || includeDefaultContext)
   {
     for (auto property : *m_PropertyList->GetMap())
-      propertyNames.push_back(property.first);
+      propertyKeys.push_back(property.first);
   }
 
-  return propertyNames;
+  return propertyKeys;
 }
 
 std::vector<std::string> mitk::BaseData::GetPropertyContextNames() const

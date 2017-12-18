@@ -842,7 +842,7 @@ public:
         {
           if (npts != 3)
             continue; // skip non-triangles;
-          unsigned long pointIds[3];
+          itk::IdentifierType pointIds[3];
           pointIds[0] = (unsigned long)pts[0];
           pointIds[1] = (unsigned long)pts[1];
           pointIds[2] = (unsigned long)pts[2];
@@ -858,7 +858,7 @@ public:
         {
           if (npts != 4)
             continue; // skip non-quadrilateral
-          unsigned long pointIds[3];
+          itk::IdentifierType pointIds[3];
 
           pointIds[0] = (unsigned long)pts[0];
           pointIds[1] = (unsigned long)pts[1];
@@ -886,7 +886,7 @@ public:
             MITK_ERROR << "Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
             continue;
           }
-          unsigned long pointIds[3];
+          itk::IdentifierType pointIds[3];
           pointIds[0] = (unsigned long)pts[0];
           pointIds[1] = (unsigned long)pts[1];
           pointIds[2] = (unsigned long)pts[2];
@@ -907,7 +907,7 @@ public:
         {
           if (npts != 4)
             continue; // skip non-quadrilateral
-          unsigned long pointIds[3];
+          itk::IdentifierType pointIds[3];
           for (unsigned int idx = 0; idx <= 1; idx++)
           {
             pointIds[0] = (unsigned long)pts[idx];
@@ -959,7 +959,7 @@ public:
         stripId++;
 
         unsigned int numberOfTrianglesInStrip = npts - 2;
-        unsigned long pointIds[3];
+        itk::IdentifierType pointIds[3];
         pointIds[0] = (unsigned long)pts[0];
         pointIds[1] = (unsigned long)pts[1];
         pointIds[2] = (unsigned long)pts[2];

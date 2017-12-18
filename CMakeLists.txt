@@ -13,6 +13,13 @@ foreach(policy ${project_policies})
 endforeach()
 
 #-----------------------------------------------------------------------------
+# MITK Extension Feature
+#-----------------------------------------------------------------------------
+
+set(MITK_EXTENSION_DIRS "" CACHE STRING "")
+mark_as_advanced(MITK_EXTENSION_DIRS)
+
+#-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #-----------------------------------------------------------------------------
 
@@ -24,18 +31,24 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
   project(MITK VERSION 2016.11.99)
+  include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
-#------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 
 set(MITK_CMAKE_DIR ${MITK_SOURCE_DIR}/CMake)
 
-set(CMAKE_MODULE_PATH
-  ${MITK_CMAKE_DIR}
-  ${CMAKE_MODULE_PATH}
-  )
+set(CMAKE_MODULE_PATH ${MITK_CMAKE_DIR})
+
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_CMAKE_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMake)
+  get_filename_component(MITK_CMAKE_EXTENSION_DIR ${MITK_CMAKE_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_CMAKE_EXTENSION_DIR})
+    list(APPEND CMAKE_MODULE_PATH ${MITK_CMAKE_EXTENSION_DIR})
+  endif()
+endforeach()
 
 #-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)
@@ -220,64 +233,17 @@ elseif(MITK_USE_Qt5_WebEngine)
   set(MITK_USE_Qt5_WebEngine OFF)
 endif()
 
-# ------------------------------------------------------------------------
-# Register external projects which can be build with the MITK superbuild
-# system. Each mitkFunctionAddExternalProject() call registers an external
-# project for which a CMakeExternals/<project>.cmake file must exist. The
-# call also creates a MITK_USE_<project> variable (appearing in the CMake
-# UI if the NO_CACHE option is *not* given).
-
-
-# -----------------------------------------
-# Optional external projects with no
-# inter-dependencies
-
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
-mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Net Util XML Zip)
-mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
-mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
+include(CMakeExternals/ExternalProjectList.cmake)
 
-mitkFunctionAddExternalProject(NAME tinyxml     ON  ADVANCED)
-mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)
-mitkFunctionAddExternalProject(NAME GLUT        OFF ADVANCED)
-mitkFunctionAddExternalProject(NAME Raptor2     OFF ADVANCED)
-mitkFunctionAddExternalProject(NAME Eigen       ON  ADVANCED DOC "Use the Eigen library")
-mitkFunctionAddExternalProject(NAME ANN         ON  ADVANCED DOC "Use Approximate Nearest Neighbor Library")
-mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit for unit tests")
-
-mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
-mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
-
-mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
-
-# -----------------------------------------
-# The following external projects must be
-# ordered according to their
-# inter-dependencies
-
-mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PCRE)
-mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
-mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
-mitkFunctionAddExternalProject(NAME OpenCV    OFF)
-mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
-
-# These are "hard" dependencies and always set to ON
-mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE DEPENDS HDF5)
-mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
-mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
-
-mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
-mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
-mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
-mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
-mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
-mitkFunctionAddExternalProject(NAME DCMQI     OFF          DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
-mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
-
-if(MITK_USE_Qt5)
-  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS Qt5)
-endif()
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMakeExternals)
+  get_filename_component(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/ExternalProjectList.cmake)
+    include(${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/ExternalProjectList.cmake)
+  endif()
+endforeach()
 
 # -----------------------------------------
 # Other MITK_USE_* options not related to
@@ -757,6 +723,14 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
 set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_PACKAGE_DEPENDS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMake/PackageDepends)
+  get_filename_component(MITK_PACKAGE_DEPENDS_EXTENSION_DIR ${MITK_PACKAGE_DEPENDS_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_PACKAGE_DEPENDS_EXTENSION_DIR})
+    list(APPEND MODULES_PACKAGE_DEPENDS_DIRS ${MITK_PACKAGE_DEPENDS_EXTENSION_DIR})
+  endif()
+endforeach()
+
 if(NOT MITK_USE_SYSTEM_Boost)
   set(Boost_NO_SYSTEM_PATHS 1)
 endif()
@@ -1036,11 +1010,24 @@ add_subdirectory(Utilities)
 
 add_subdirectory(Modules)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/ModuleList.cmake")
+mitkFunctionWhitelistModules(MITK MITK_MODULES)
+
+foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+  set(MITK_MODULES_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Modules)
+  get_filename_component(MITK_MODULES_EXTENSION_DIR ${MITK_MODULES_EXTENSION_DIR} ABSOLUTE)
+  if(EXISTS ${MITK_MODULES_EXTENSION_DIR}/ModuleList.cmake)
+    set(MITK_MODULES "")
+    include(${MITK_MODULES_EXTENSION_DIR}/ModuleList.cmake)
+    foreach(mitk_module ${MITK_MODULES})
+      add_subdirectory(${MITK_MODULES_EXTENSION_DIR}/${mitk_module} Modules/${mitk_module})
+    endforeach()
+  endif()
+endforeach()
+
 if(MITK_USE_BLUEBERRY)
 
   set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
-
-  set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
   # Plug-in testing (needs some work to be enabled again)
   if(BUILD_TESTING)
@@ -1060,6 +1047,18 @@ if(MITK_USE_BLUEBERRY)
   set(mitk_plugins_fullpath "")
   foreach(mitk_plugin ${MITK_PLUGINS})
     list(APPEND mitk_plugins_fullpath Plugins/${mitk_plugin})
+  endforeach()
+
+  foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+    set(MITK_PLUGINS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Plugins)
+    get_filename_component(MITK_PLUGINS_EXTENSION_DIR ${MITK_PLUGINS_EXTENSION_DIR} ABSOLUTE)
+    if(EXISTS ${MITK_PLUGINS_EXTENSION_DIR}/PluginList.cmake)
+      set(MITK_PLUGINS "")
+      include(${MITK_PLUGINS_EXTENSION_DIR}/PluginList.cmake)
+      foreach(mitk_plugin ${MITK_PLUGINS})
+        list(APPEND mitk_plugins_fullpath ${MITK_PLUGINS_EXTENSION_DIR}/${mitk_plugin})
+      endforeach()
+    endif()
   endforeach()
 
   if(EXISTS ${MITK_PRIVATE_MODULES}/PluginList.cmake)
@@ -1347,4 +1346,3 @@ feature_summary(
   DESCRIPTION "------- FEATURE SUMMARY FOR ${PROJECT_NAME} -------"
   WHAT ALL
 )
-

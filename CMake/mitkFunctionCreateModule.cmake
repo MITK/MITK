@@ -190,6 +190,8 @@ function(mitk_create_module)
   if(NOT MODULE_SUBPROJECTS)
     if(MITK_DEFAULT_SUBPROJECTS)
       set(MODULE_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
+    else()
+      set(MODULE_SUBPROJECTS MITK-Modules)
     endif()
   endif()
 

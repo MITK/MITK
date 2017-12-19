@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKQTWIDGETS_EXPORT QmitkIDataStorageViewModel : public QAbstractItemModel
 {
-  Q_OBJECT
 
 public:
   /*
@@ -56,7 +55,7 @@ public:
   *
   * @par nodePredicate    A pointer to node predicate.
   */
-  virtual void SetNodePredicate(mitk::NodePredicateBase::Pointer nodePredicate) = 0;
+  virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate) = 0;
 };
 
 #endif // QMITKIDATASTORAGEVIEWMODEL_H

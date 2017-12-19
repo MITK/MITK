@@ -58,7 +58,7 @@ QmitkDataStorageAbstractView::~QmitkDataStorageAbstractView()
 
 void QmitkDataStorageAbstractView::SetDataStorage(mitk::DataStorage* dataStorage)
 {
-  if (m_DataStorage == dataStorage || nullptr == dataStorage)
+  if (m_DataStorage == dataStorage)
   {
     return;
   }
@@ -76,24 +76,32 @@ void QmitkDataStorageAbstractView::SetDataStorage(mitk::DataStorage* dataStorage
 
   m_DataStorage = dataStorage;
 
-  // add listener for new data storage
-  m_DataStorage->AddNodeEvent.AddListener(
-    mitk::MessageDelegate1<QmitkDataStorageAbstractView, const mitk::DataNode*>(this, &QmitkDataStorageAbstractView::NodeAdded));
-  m_DataStorage->RemoveNodeEvent.AddListener(
-    mitk::MessageDelegate1<QmitkDataStorageAbstractView, const mitk::DataNode*>(this, &QmitkDataStorageAbstractView::NodeRemoved));
-  m_DataStorage->ChangedNodeEvent.AddListener(
-    mitk::MessageDelegate1<QmitkDataStorageAbstractView, const mitk::DataNode*>(this, &QmitkDataStorageAbstractView::NodeChanged));
+  if (nullptr != dataStorage)
+  {
+    // add listener for new data storage
+    m_DataStorage->AddNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkDataStorageAbstractView, const mitk::DataNode*>(this, &QmitkDataStorageAbstractView::NodeAdded));
+    m_DataStorage->RemoveNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkDataStorageAbstractView, const mitk::DataNode*>(this, &QmitkDataStorageAbstractView::NodeRemoved));
+    m_DataStorage->ChangedNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkDataStorageAbstractView, const mitk::DataNode*>(this, &QmitkDataStorageAbstractView::NodeChanged));
 
+  }
   // update model if the data storage has been changed
   DataStorageChanged();
 }
 
 void QmitkDataStorageAbstractView::DataStorageChanged()
 {
+  if (nullptr == m_Model)
+  {
+    return;
+  }
+
   m_Model->SetDataStorage(m_DataStorage);
 }
 
-void QmitkDataStorageAbstractView::SetNodePredicate(mitk::NodePredicateBase::Pointer nodePredicate)
+void QmitkDataStorageAbstractView::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate == nodePredicate)
   {
@@ -143,21 +151,22 @@ void QmitkDataStorageAbstractView::SetCurrentSelection(QList<mitk::DataNode::Poi
     // this will keep the selection of the original nodes that are not presented by the current view unmodified, but allows to change the selection of the filtered nodes
     // later, the nodes of the 'm_NonVisibleSelection' member have to be added again to the list of selected (filtered) nodes, if a selection is sent from the current view (see 'ModelSelectionChanged')
     auto lambda = [&filteredNodes](mitk::DataNode::Pointer original) { return filteredNodes.contains(original); };
-    m_NonVisibleSelection.erase(std::remove_if(m_NonVisibleSelection.begin(), m_NonVisibleSelection.end(), lambda));
+    m_NonVisibleSelection.erase(std::remove_if(m_NonVisibleSelection.begin(), m_NonVisibleSelection.end(), lambda),
+                                m_NonVisibleSelection.end());
   }
 
   // create new selection by retrieving the corresponding indices of the (filtered) nodes
   QItemSelection newCurrentSelection;
   for (const auto& node : filteredNodes)
   {
-    QModelIndexList matched = m_Model->match(m_Model->index(0, 0), QmitkDataNodeRawPointerRole, QVariant::fromValue<mitk::DataNode*>(node), 1, Qt::MatchRecursive);
+    QModelIndexList matched = m_Model->match(m_Model->index(0, 0), QmitkDataNodeRole, QVariant::fromValue<mitk::DataNode::Pointer>(node), 1, Qt::MatchRecursive);
     if (!matched.empty())
     {
       newCurrentSelection.select(matched.front(), matched.front());
     }
   }
 
-  m_View->selectionModel()->select(newCurrentSelection, QItemSelectionModel::Select);
+  m_View->selectionModel()->select(newCurrentSelection, QItemSelectionModel::ClearAndSelect);
 }
 
 void QmitkDataStorageAbstractView::ModelSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
@@ -175,6 +184,7 @@ void QmitkDataStorageAbstractView::ModelSelectionChanged(const QItemSelection& /
 void QmitkDataStorageAbstractView::SetModel(QmitkIDataStorageViewModel* model)
 {
   m_Model = model;
+  DataStorageChanged();
 }
 
 void QmitkDataStorageAbstractView::SetView(QAbstractItemView* view)
@@ -225,7 +235,7 @@ QList<mitk::DataNode::Pointer> QmitkDataStorageAbstractView::FilterNodeList(cons
     return QList<mitk::DataNode::Pointer>();
   }
 
-  if (m_NodePredicate.IsNull())
+  if (nullptr == m_NodePredicate)
   {
     // no filter set
     return nodes;

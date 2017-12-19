@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkNodePredicateBase.h>
 
-// qtwidgets
+// qt widgets module
 #include <QmitkIDataStorageViewModel.h>
 
 // qt
@@ -68,7 +68,7 @@ public:
   *
   * @par nodePredicate    A pointer to node predicate.
   */
-  void SetNodePredicate(mitk::NodePredicateBase::Pointer nodePredicate);
+  void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
   /*
   * @brief Set the widget to change the current selection according to the filter.
   *
@@ -141,7 +141,7 @@ protected:
   QmitkDataStorageAbstractView(QWidget* parent = nullptr);
   QmitkDataStorageAbstractView(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   mitk::DataStorage* m_DataStorage;
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  mitk::NodePredicateBase* m_NodePredicate;
 
   bool m_SelectOnlyVisibleNodes;
 

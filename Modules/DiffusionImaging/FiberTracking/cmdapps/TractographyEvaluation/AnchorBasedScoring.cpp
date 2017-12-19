@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
       for (auto fib : input_candidates)
       {
         fib->SetFiberWeights( log_rms_diff[c] );
-        fib->ColorFibersByFiberWeights(false, true);
+//        fib->ColorFibersByFiberWeights(false, true);
 
         std::string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
 
@@ -308,7 +308,7 @@ int main(int argc, char* argv[])
 
       mitk::FiberBundle::Pointer out_fib = mitk::FiberBundle::New();
       out_fib = out_fib->AddBundles(input_candidates);
-      out_fib->ColorFibersByFiberWeights(false, true);
+//      out_fib->ColorFibersByFiberWeights(false, true);
       mitk::IOUtil::Save(out_fib, out_folder + "AllCandidates.fib");
     }
     else

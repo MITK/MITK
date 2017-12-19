@@ -329,11 +329,18 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 
 void QmitkMITKIGTTrackingToolboxView::OnResetTools()
 {
+  //remove data nodes of surfaces from data storage to clean up
+  for (int i = 0; i < m_toolStorage->GetToolCount(); i++)
+  {
+    this->GetDataStorage()->Remove(m_toolStorage->GetTool(i)->GetDataNode());
+  }
   this->ReplaceCurrentToolStorage(mitk::NavigationToolStorage::New(GetDataStorage()), "TrackingToolbox Default Storage");
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   QString toolLabel = QString("<none>");
   m_Controls->m_ToolLabel->setText(toolLabel);
   m_ToolStorageFilename = "";
+
+
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartStopTracking()

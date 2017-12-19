@@ -253,9 +253,9 @@ public:
     mitk::ConnectomicsNetwork::VertexDescriptorType x = refNetwork->AddVertex( 1 );
     mitk::ConnectomicsNetwork::VertexDescriptorType y = refNetwork->AddVertex( 2 );
     mitk::ConnectomicsNetwork::VertexDescriptorType z = refNetwork->AddVertex( 3 );
-    refNetwork->AddEdge(x,y);
-    refNetwork->AddEdge(x,z);
-    refNetwork->AddEdge(y,z);
+    refNetwork->AddEdge(x,y,1);
+    refNetwork->AddEdge(x,z,1);
+    refNetwork->AddEdge(y,z,1);
     CPPUNIT_ASSERT_MESSAGE( "Comparing created and reference network.", mitk::Equal( network.GetPointer(), refNetwork, mitk::eps, true) );
 
     // check sample parcels for other methods

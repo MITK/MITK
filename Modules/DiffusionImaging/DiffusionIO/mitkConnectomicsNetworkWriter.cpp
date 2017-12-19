@@ -129,7 +129,7 @@ void mitk::ConnectomicsNetworkWriter::Write()
           edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID , index );
           edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID , edgeVector[ index ].second.sourceId );
           edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID , edgeVector[ index ].second.targetId );
-          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID , edgeVector[ index ].second.weight );
+          edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_FIBERCOUNT_ID , edgeVector[ index ].second.fiber_count );
           edgeXML->SetDoubleAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_DOUBLE_WEIGHT_ID , edgeVector[ index ].second.edge_weight );
           edgesXML->LinkEndChild(edgeXML);
         }

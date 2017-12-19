@@ -714,7 +714,7 @@ double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector(std::vector<do
       vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
     for (int index(0); index < end; index++)
     {
-      parameterVector->at(index) = vectorOfEdges[index].second.weight;
+      parameterVector->at(index) = vectorOfEdges[index].second.fiber_count;
     }
     maximum = *std::max_element(parameterVector->begin(), parameterVector->end());
   }
@@ -806,7 +806,7 @@ void mitk::ConnectomicsNetworkMapper3D::FillEdgeFilterBoolVector(std::vector<boo
 
     for (int index(0); index < end; index++)
     {
-      parameterVector.at(index) = vectorOfEdges[index].second.weight;
+      parameterVector.at(index) = vectorOfEdges[index].second.fiber_count;
     }
   }
 

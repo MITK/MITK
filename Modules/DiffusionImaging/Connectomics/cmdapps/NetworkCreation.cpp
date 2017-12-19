@@ -35,41 +35,32 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("fiberImage", "f", mitkCommandLineParser::InputFile, "Input image", "input fiber image (.fib)", us::Any(), false);
-  parser.addArgument("parcellation", "p", mitkCommandLineParser::InputFile, "Parcellation image", "parcellation image", us::Any(), false);
-  parser.addArgument("outputNetwork", "o", mitkCommandLineParser::String, "Output network", "where to save the output (.cnf)", us::Any(), false);
+  parser.addArgument("", "f", mitkCommandLineParser::InputFile, "Input Tractogram", "input tractogram (.fib)", us::Any(), false);
+  parser.addArgument("", "p", mitkCommandLineParser::InputFile, "Parcellation", "parcellation image", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output network", "where to save the output (.cnf, .mat)", us::Any(), false);
 
-  parser.addArgument("radius", "r", mitkCommandLineParser::Int, "Radius", "Search radius in mm", 15, true);
-  parser.addArgument("noCenterOfMass", "com", mitkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
+  parser.addArgument("noCenterOfMass", "", mitkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
   //default values
-  int searchRadius( 15 );
   bool noCenterOfMass( false );
 
   // parse command line arguments
-  std::string fiberFilename = us::any_cast<std::string>(parsedArgs["fiberImage"]);
-  std::string parcellationFilename = us::any_cast<std::string>(parsedArgs["parcellation"]);
-  std::string outputFilename = us::any_cast<std::string>(parsedArgs["outputNetwork"]);
-
-  if (parsedArgs.count("radius"))
-    searchRadius = us::any_cast<int>(parsedArgs["radius"]);
-
+  std::string fiberFilename = us::any_cast<std::string>(parsedArgs["f"]);
+  std::string parcellationFilename = us::any_cast<std::string>(parsedArgs["p"]);
+  std::string outputFilename = us::any_cast<std::string>(parsedArgs["o"]);
 
   if (parsedArgs.count("noCenterOfMass"))
     noCenterOfMass = us::any_cast<bool>(parsedArgs["noCenterOfMass"]);
 
   try
   {
-
-    const std::string s1="", s2="";
-
     // load fiber image
-    std::vector<mitk::BaseData::Pointer> fiberInfile =
-        mitk::IOUtil::Load( fiberFilename);
+    std::vector<mitk::BaseData::Pointer> fiberInfile = mitk::IOUtil::Load( fiberFilename);
+
     if( fiberInfile.empty() )
     {
       std::string errorMessage = "Fiber Image at " + fiberFilename + " could not be read. Aborting.";
@@ -91,8 +82,6 @@ int main(int argc, char* argv[])
     mitk::BaseData* parcellationBaseData = parcellationInFile.at(0);
     mitk::Image* parcellationImage = dynamic_cast<mitk::Image*>( parcellationBaseData );
 
-
-
     // do creation
     mitk::ConnectomicsNetworkCreator::Pointer connectomicsNetworkCreator = mitk::ConnectomicsNetworkCreator::New();
     connectomicsNetworkCreator->SetSegmentation( parcellationImage );
@@ -101,14 +90,11 @@ int main(int argc, char* argv[])
     {
       connectomicsNetworkCreator->CalculateCenterOfMass();
     }
-    connectomicsNetworkCreator->SetEndPointSearchRadius( searchRadius );
+    connectomicsNetworkCreator->SetMappingStrategy(mitk::ConnectomicsNetworkCreator::MappingStrategy::EndElementPosition);
     connectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
 
 
     mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
-
-    std::cout << "searching writer";
-
     mitk::IOUtil::Save(network.GetPointer(), outputFilename );
 
     return EXIT_SUCCESS;

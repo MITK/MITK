@@ -114,7 +114,7 @@ void mitk::ConnectomicsNetworkMatrixWriter::Write()
       {
         if( input->EdgeExists(nodes[i], nodes[j]))
         {
-        body << (input->GetEdge(nodes[i], nodes[j])).edge_weight;
+        body << (input->GetEdge(nodes[i], nodes[j])).fiber_count;
         }
         else
         {

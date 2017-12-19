@@ -316,11 +316,13 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType::AppliesTo(const std:
 
   mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
   mitk::DICOMTag ImageTypeTag(0x0008, 0x0008);
+  mitk::DICOMTag SeriesDescriptionTag(0x0008, 0x103E);
 
   mitk::StringList relevantFiles;
   relevantFiles.push_back(path);
 
   scanner->AddTag(ImageTypeTag);
+  scanner->AddTag(SeriesDescriptionTag);
   scanner->SetInputFiles(relevantFiles);
   scanner->Scan();
   mitk::DICOMTagCache::Pointer tagCache = scanner->GetScanCache();
@@ -329,17 +331,17 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageDicomMimeType::AppliesTo(const std:
   mitk::DICOMImageFrameInfo *firstFrame = imageFrameList.begin()->GetPointer();
 
   std::string byteString = tagCache->GetTagValue(firstFrame, ImageTypeTag).value;
+  if (byteString.empty())
+    return false;
 
-  if (byteString.empty()) {
+  std::string byteString2 = tagCache->GetTagValue(firstFrame, SeriesDescriptionTag).value;
+  if (byteString2.empty())
     return false;
-  }
 
-  std::size_t found = byteString.find("DIFFUSION");
-  if (found==std::string::npos)
+  if (byteString.find("DIFFUSION")==std::string::npos && byteString2.find("diff")==std::string::npos)
     return false;
-  found = byteString.find("NONE");
-  if (found==std::string::npos)
-    return false;
+//  if (byteString.find("NONE")==std::string::npos)
+//    return false;
 
   return canRead;
 }

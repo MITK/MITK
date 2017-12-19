@@ -43,7 +43,6 @@ void CreateFolderStructure(const std::string& path)
   ist::MakeDirectory(path);
   ist::MakeDirectory(path + "/anchor_tracts/");
   ist::MakeDirectory(path + "/candidate_tracts/");
-  ist::MakeDirectory(path + "/implausible_tracts/");
   ist::MakeDirectory(path + "/skipped_masks/");
 }
 
@@ -209,16 +208,10 @@ int main(int argc, char* argv[])
       extractor->SetInputFiberBundle(inputTractogram);
       extractor->SetRoiImages({gm_image});
       extractor->SetBothEnds(true);
+      extractor->SetNoNegatives(true);
       extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::ENDPOINTS);
       extractor->Update();
-
-      mitk::FiberBundle::Pointer not_gm_fibers = extractor->GetNegatives().at(0);
-
-      old = cout.rdbuf(); // <-- save
-      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      mitk::IOUtil::Save(not_gm_fibers, out_folder + "/implausible_tracts/no_gm_endings.trk");
       inputTractogram = extractor->GetPositives().at(0);
-      std::cout.rdbuf (old);              // <-- restore
     }
 
     std::srand(0);

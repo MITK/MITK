@@ -69,6 +69,7 @@ public:
   itkSetMacro( Interpolate, bool )          ///< Interpolate input ROI image
   itkSetMacro( Threshold, float )           ///< Threshold on input ROI image value to determine positives/negatives
   itkSetMacro( SkipSelfConnections, bool )  ///< Ignore streamlines between two identical labels
+  itkSetMacro( OnlySelfConnections, bool )  ///< Only keep streamlines between two identical labels
   itkSetMacro( SplitLabels, bool )          ///< Output a separate tractogram for each label-->label tract
   itkSetMacro( MinFibersPerTract, unsigned int )  ///< Discard positives with less fibers
 
@@ -107,6 +108,7 @@ protected:
   float                                       m_Threshold;
   std::vector< unsigned short >               m_Labels;
   bool                                        m_SkipSelfConnections;
+  bool                                        m_OnlySelfConnections;
   bool                                        m_SplitLabels;
   unsigned int                                m_MinFibersPerTract;
   std::vector< std::pair< unsigned int, unsigned int > >  m_PositiveLabels;

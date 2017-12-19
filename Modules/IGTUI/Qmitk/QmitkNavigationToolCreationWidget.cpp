@@ -33,10 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //poco headers
 #include <Poco/Path.h>
 
-// vtk
-#include <vtkSphereSource.h>
-#include <vtkConeSource.h>
-
 const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.navigationtoolcreationwizardwidget";
 
 QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* parent, Qt::WindowFlags f)
@@ -61,6 +57,8 @@ QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* pa
   m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
 
   RefreshTrackingDeviceCollection();
+
+  OnSurfaceUseToggled();
 }
 
 QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
@@ -95,7 +93,8 @@ void QmitkNavigationToolCreationWidget::CreateConnections()
 
     //Buttons
     connect((QObject*)(m_Controls->m_LoadCalibrationFile), SIGNAL(clicked()), this, SLOT(OnLoadCalibrationFile()));
-    connect(m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseOtherToggled()));
+    connect(m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseToggled()));
+    connect(m_Controls->m_Surface_Load_File, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceUseToggled()));
     connect((QObject*)(m_Controls->m_LoadSurface), SIGNAL(clicked()), this, SLOT(OnLoadSurface()));
     connect((QObject*)(m_Controls->m_EditToolTip), SIGNAL(clicked()), this, SLOT(OnEditToolTip()));
 
@@ -168,7 +167,6 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
   m_Controls->m_ToolNameEdit->setText(QString(m_ToolToBeEdited->GetToolName().c_str()));
   m_Controls->m_CalibrationFileName->setText(QString(m_ToolToBeEdited->GetCalibrationFile().c_str()));
 
-  m_Controls->m_SurfaceChooser->SetSelectedNode(m_ToolToBeEdited->GetDataNode());
   FillUIToolLandmarkLists(m_ToolToBeEdited->GetToolCalibrationLandmarks(), m_ToolToBeEdited->GetToolRegistrationLandmarks());
 
   switch (m_ToolToBeEdited->GetType())
@@ -210,11 +208,11 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
   m_Controls->m_ToolAxisZ->blockSignals(false);
 }
 
-void QmitkNavigationToolCreationWidget::OnSurfaceUseOtherToggled()
+void QmitkNavigationToolCreationWidget::OnSurfaceUseToggled()
 {
-  m_Controls->m_LoadSurface->setEnabled(m_Controls->m_Surface_Use_Other->isChecked());
-  if (m_Controls->m_Surface_Use_Sphere->isChecked())
-    m_ToolToBeEdited->SetDefaultSurface();
+  if (m_Controls->m_Surface_Use_Sphere->isChecked()) m_ToolToBeEdited->SetDefaultSurface();
+  m_Controls->m_SurfaceChooser->setEnabled(m_Controls->m_Surface_Use_Other->isChecked());
+  m_Controls->m_LoadSurface->setEnabled(m_Controls->m_Surface_Load_File->isChecked());
 
   //Global Reinit to show tool surface preview
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
@@ -284,6 +282,9 @@ mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool(
 
 void QmitkNavigationToolCreationWidget::OnFinished()
 {
+  if (m_Controls->m_Surface_Use_Other->isChecked())
+    m_ToolToBeEdited->GetDataNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
+
   //here we create a new tool
   m_FinalTool = m_ToolToBeEdited->Clone();
   //Set the correct name of data node, cause the m_ToolToBeEdited was called "Tool preview"

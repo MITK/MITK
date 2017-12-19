@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk::pa;
 
-TissueGeneratorParameters::Pointer CreateMultivessel_06_10_17_Parameters()
+TissueGeneratorParameters::Pointer CreateMultivessel_19_10_17_Parameters()
 {
   auto returnParameters = TissueGeneratorParameters::New();
   returnParameters->SetAirThicknessInMillimeters(12);
@@ -57,7 +57,41 @@ TissueGeneratorParameters::Pointer CreateMultivessel_06_10_17_Parameters()
   returnParameters->SetVoxelSpacingInCentimeters(0.03);
   returnParameters->SetXDim(140);
   returnParameters->SetYDim(200);
-  returnParameters->SetZDim(140);
+  returnParameters->SetZDim(180);
+  return returnParameters;
+}
+
+TissueGeneratorParameters::Pointer CreateSinglevessel_19_10_17_Parameters()
+{
+  auto returnParameters = TissueGeneratorParameters::New();
+  returnParameters->SetAirThicknessInMillimeters(12);
+  returnParameters->SetBackgroundAbsorption(0.1);
+  returnParameters->SetBackgroundAnisotropy(0.9);
+  returnParameters->SetBackgroundScattering(15);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetDoPartialVolume(true);
+  returnParameters->SetMinNumberOfVessels(1);
+  returnParameters->SetMaxNumberOfVessels(1);
+  returnParameters->SetMinVesselAbsorption(2);
+  returnParameters->SetMaxVesselAbsorption(8);
+  returnParameters->SetMinVesselAnisotropy(0.9);
+  returnParameters->SetMaxVesselAnisotropy(0.9);
+  returnParameters->SetMinVesselBending(0.1);
+  returnParameters->SetMaxVesselBending(0.3);
+  returnParameters->SetMinVesselRadiusInMillimeters(0.5);
+  returnParameters->SetMaxVesselRadiusInMillimeters(4);
+  returnParameters->SetMinVesselScattering(15);
+  returnParameters->SetMaxVesselScattering(15);
+  returnParameters->SetMinVesselZOrigin(2.2);
+  returnParameters->SetMaxVesselZOrigin(4);
+  returnParameters->SetVesselBifurcationFrequency(5000);
+  returnParameters->SetRandomizePhysicalProperties(false);
+  returnParameters->SetSkinThicknessInMillimeters(0);
+  returnParameters->SetUseRngSeed(false);
+  returnParameters->SetVoxelSpacingInCentimeters(0.03);
+  returnParameters->SetXDim(140);
+  returnParameters->SetYDim(200);
+  returnParameters->SetZDim(180);
   return returnParameters;
 }
 
@@ -162,7 +196,7 @@ int main(int argc, char * argv[])
 
   while (true)
   {
-    auto parameters = CreateMultivessel_06_10_17_Parameters();
+    auto parameters = CreateSinglevessel_19_10_17_Parameters();
     MITK_INFO(input.verbose) << "Generating tissue..";
     auto resultTissue = InSilicoTissueGenerator::GenerateInSilicoData(parameters);
     MITK_INFO(input.verbose) << "Generating tissue..[Done]";
@@ -183,8 +217,8 @@ int main(int argc, char * argv[])
     std::string outputPath = input.saveFolderPath + "output/Fluence_MultiVessel_" + input.identifyer + "_" + std::to_string(iterationNumber) + ".nrrd";
 
     MITK_INFO(input.verbose) << "Simulating fluence..";
-    std::system(std::string(input.exePath + " -i " + savePath + " -o " + outputPath + " -p " + input.probePath + " -n 100000000").c_str());
-    MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
+    int result = std::system(std::string(input.exePath + " -i " + savePath + " -o " + outputPath + " -p " + input.probePath + " -n 100000000").c_str());
+    MITK_INFO(input.verbose) << "Simulating fluence"<< result <<"..[Done]";
     iterationNumber++;
   }
 }

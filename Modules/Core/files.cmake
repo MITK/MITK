@@ -140,6 +140,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyExtensions.cpp
   DataManagement/mitkPropertyFilter.cpp
   DataManagement/mitkPropertyFilters.cpp
+  DataManagement/mitkPropertyKeyPath.cpp
   DataManagement/mitkPropertyList.cpp
   DataManagement/mitkPropertyListReplacedObserver.cpp
   DataManagement/mitkPropertyNameHelper.cpp

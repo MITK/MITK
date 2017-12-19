@@ -94,6 +94,7 @@ set(MODULE_TESTS
   mitkPropertyDescriptionsTest.cpp
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
+  mitkPropertyKeyPathTest.cpp
   mitkTinyXMLTest.cpp
   mitkRawImageFileReaderTest.cpp
   mitkInteractionEventTest.cpp

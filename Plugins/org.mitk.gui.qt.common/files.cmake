@@ -2,6 +2,7 @@ set(SRC_CPP_FILES
   QmitkAbstractRenderEditor.cpp
   QmitkAbstractView.cpp
   QmitkDataNodeSelectionProvider.cpp
+  QmitkDataStorageSelectionConnector.cpp
   QmitkDnDFrameWidget.cpp
   QmitkSliceNavigationListener.cpp
 )
@@ -15,6 +16,7 @@ set(INTERNAL_CPP_FILES
 
 set(MOC_H_FILES
   src/QmitkAbstractRenderEditor.h
+  src/QmitkDataStorageSelectionConnector.h
   src/QmitkDnDFrameWidget.h
   src/QmitkSliceNavigationListener.h
 

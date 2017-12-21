@@ -112,7 +112,7 @@ void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference:
   {
     if (m_ActiveRenderWindowPart == renderPart)
     {
-      RenderWindowPartDeactivated(renderPart);
+      this->RenderWindowPartDeactivated(renderPart);
       m_ActiveRenderWindowPart = nullptr;
       m_VisibleRenderWindowPart = nullptr;
     }

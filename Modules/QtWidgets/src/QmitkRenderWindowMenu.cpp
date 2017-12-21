@@ -71,8 +71,6 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
     m_MultiWidget(mw),
     m_Parent(parent)
 {
-  MITK_DEBUG << "creating renderwindow menu on baserenderer " << b << ", flags=" << static_cast<int>(f);
-
   // Create Menu Widget
   this->CreateMenuWidget();
   this->setMinimumWidth(61); // DIRTY.. If you add or remove a button, you need to change the size.

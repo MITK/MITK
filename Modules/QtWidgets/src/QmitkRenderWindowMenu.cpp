@@ -185,11 +185,11 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_Widget3LayoutAction = new QAction("Coronal plane", m_Settings);
   m_Widget3LayoutAction->setDisabled(false);
 
-  m_RowWidget3And4LayoutAction = new QAction("Coronal top, 3D bottom", m_Settings);
-  m_RowWidget3And4LayoutAction->setDisabled(false);
-
-  m_ColumnWidget3And4LayoutAction = new QAction("Coronal left, 3D right", m_Settings);
+  m_ColumnWidget3And4LayoutAction = new QAction("Coronal top, 3D bottom", m_Settings);
   m_ColumnWidget3And4LayoutAction->setDisabled(false);
+
+  m_RowWidget3And4LayoutAction = new QAction("Coronal left, 3D right", m_Settings);
+  m_RowWidget3And4LayoutAction->setDisabled(false);
 
   m_SmallUpperWidget2Big3and4LayoutAction = new QAction("Sagittal top, Coronal n 3D bottom", m_Settings);
   m_SmallUpperWidget2Big3and4LayoutAction->setDisabled(false);
@@ -207,8 +207,8 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_Settings->addAction(m_Widget1LayoutAction);
   m_Settings->addAction(m_Widget2LayoutAction);
   m_Settings->addAction(m_Widget3LayoutAction);
-  m_Settings->addAction(m_RowWidget3And4LayoutAction);
   m_Settings->addAction(m_ColumnWidget3And4LayoutAction);
+  m_Settings->addAction(m_RowWidget3And4LayoutAction);
   m_Settings->addAction(m_SmallUpperWidget2Big3and4LayoutAction);
   m_Settings->addAction(m_2x2Dand3DWidgetLayoutAction);
   m_Settings->addAction(m_Left2Dand3DRight2DLayoutAction);

@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iomanip>
 
-#ifndef _WIN32
+#ifdef _WIN32
+#include <direct.h>
+#else
 #include <sys/types.h>
 #include <sys/stat.h>
-#else
-#include <direct.h>
 #endif
 
 mitk::pa::SimulationBatchGenerator::SimulationBatchGenerator()
@@ -74,12 +74,12 @@ void mitk::pa::SimulationBatchGenerator::WriteBatchFileAndSaveTissueVolume(
   mitk::IOUtil::Save(tissueVolume, savePath);
 
   std::string filenameAllSimulation = "simulate_all";
-#ifndef _WIN32
-  mkdir(outputFolderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  filenameAllSimulation += ".sh";
-#else
+#ifdef _WIN32
   mkdir(outputFolderName.c_str());
   filenameAllSimulation += ".bat";
+#else
+  mkdir(outputFolderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  filenameAllSimulation += ".sh";
 #endif
 
   std::ofstream fileAllSimulation(parameters->GetNrrdFilePath() + "/" + filenameAllSimulation, std::ios_base::app);

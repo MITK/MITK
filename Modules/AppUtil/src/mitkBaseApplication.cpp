@@ -43,6 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <string>
 
+#include <QVTKOpenGLWidget.h>
+#include <vtkGenericOpenGLRenderWindow.h>
+
 namespace mitk
 {
   QString BaseApplication::ARG_NEWINSTANCE = "BlueBerry.newInstance";
@@ -656,6 +659,9 @@ namespace mitk
 
   QCoreApplication *BaseApplication::getQApplication() const
   {
+    vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
+    QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
+
     QCoreApplication *qCoreApp = qApp;
 
 // Needed to fix bug #18521, i.e. not responding GUI on Mac OS X with Qt5

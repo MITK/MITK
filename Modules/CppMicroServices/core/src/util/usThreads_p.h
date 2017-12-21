@@ -30,9 +30,9 @@
   // Atomic compiler intrinsics
 
   #if defined(US_PLATFORM_APPLE)
-    // OSAtomic.h optimizations only used in 10.5 and later
+    // OSAtomic.h optimizations only used in 10.5 and later, deprecated in 10.12
     #include <AvailabilityMacros.h>
-    #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
+    #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050 && MAC_OS_X_VERSION_MAX_ALLOWED < 101200
       #include <libkern/OSAtomic.h>
       #define US_ATOMIC_OPTIMIZATION_APPLE
     #endif

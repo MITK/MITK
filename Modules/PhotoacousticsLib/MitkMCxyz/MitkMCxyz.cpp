@@ -51,11 +51,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPALightSource.h>
 #include <mitkPAMonteCarloThreadHandler.h>
 
-#ifdef __linux__
+#ifdef _WIN32
+#include <direct.h>
+#else
 #include <sys/types.h>
 #include <sys/stat.h>
-#else
-#include <direct.h>
 #endif
 
 #define ls          1.0E-7      /* Moving photon a little bit off the voxel face */

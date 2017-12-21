@@ -19,10 +19,11 @@
 
 #include "mitkRenderWindowBase.h"
 
-#include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
 #include <MitkQtWidgetsExports.h>
+
 #include <vtkGenericOpenGLRenderWindow.h>
+#include <QVTKOpenGLWidget.h>
 
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
@@ -36,7 +37,7 @@ class QInputEvent;
  * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
  */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindow : public QVTKWidget, public mitk::RenderWindowBase
+class MITKQTWIDGETS_EXPORT QmitkRenderWindow : public QVTKOpenGLWidget, public mitk::RenderWindowBase
 {
   Q_OBJECT
 
@@ -92,8 +93,6 @@ protected:
   void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
   void showEvent(QShowEvent *event) override;
-  // overloaded paint handler
-  void paintEvent(QPaintEvent *event) override;
   // overloaded mouse press handler
   void mousePressEvent(QMouseEvent *event) override;
   // overloaded mouse double-click handler
@@ -108,6 +107,10 @@ protected:
   void enterEvent(QEvent *) override;
   // overloaded leave handler
   void leaveEvent(QEvent *) override;
+
+  // Overloaded resize handler, see decs in QVTKOpenGLWidget.
+  // Basically, we have to ensure the VTK rendering is updated for each change in window size.
+  void resizeGL(int w, int h) Q_DECL_OVERRIDE;
 
   /// \brief Simply says we accept the event type.
   void dragEnterEvent(QDragEnterEvent *event) override;
@@ -162,6 +165,8 @@ private:
   bool m_MenuWidgetActivated;
 
   unsigned int m_LayoutIndex;
+
+  vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_InternalRenderWindow;
 };
 
 #endif

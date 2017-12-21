@@ -250,7 +250,7 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElemen
   if (dataElement)
   {
     const char *filename = dataElement->Attribute("file");
-    if (filename)
+    if (filename && strlen(filename) != 0)
     {
       try
       {

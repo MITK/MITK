@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseApplication.h"
 #include "mitkLogMacros.h"
+#include "mitkExceptionMacro.h"
 
 #include "QmitkSafeApplication.h"
 #include "QmitkSingleApplication.h"
@@ -874,23 +875,22 @@ namespace mitk
 
   bool BaseApplication::isRunning()
   {
-    QmitkSingleApplication* qCoreApp =
-      dynamic_cast<QmitkSingleApplication*>( this->getQApplication() );
-    if (qCoreApp != nullptr)
-    {
-      return qCoreApp->isRunning();
-    }
-    return false;
+    auto app = dynamic_cast<QtSingleApplication*>(this->getQApplication());
+
+    if (nullptr != app)
+      app->isRunning();
+
+    mitkThrow() << "Method not implemented.";
   }
 
   void BaseApplication::sendMessage(const QByteArray msg)
   {
-    QmitkSingleApplication* qCoreApp =
-      dynamic_cast<QmitkSingleApplication*>(this->getQApplication());
-    if (qCoreApp != nullptr)
-    {
-      qCoreApp->sendMessage(msg);
-    }
+    auto app = dynamic_cast<QtSingleApplication*>(this->getQApplication());
+
+    if (nullptr != app)
+      app->sendMessage(msg);
+
+    mitkThrow() << "Method not implemented.";
   }
 
 }

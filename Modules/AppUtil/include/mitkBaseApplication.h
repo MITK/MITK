@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QString>
+#include <QTranslator>
 
 class QCoreApplication;
 
@@ -226,6 +227,12 @@ namespace mitk
 
     void setProperty(const QString &property, const QVariant &value);
     QVariant getProperty(const QString &property) const;
+
+    void installTranslator(QTranslator*);
+
+    bool isRunning();
+
+    void sendMessage(const QByteArray);
 
   protected:
     void initialize(Poco::Util::Application &self) override;

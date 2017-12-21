@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseApplication.h"
 #include "mitkLogMacros.h"
+#include "mitkExceptionMacro.h"
 
 #include "QmitkSafeApplication.h"
 #include "QmitkSingleApplication.h"
@@ -866,4 +867,30 @@ namespace mitk
 
   void BaseApplication::setProperty(const QString &property, const QVariant &value) { d->m_FWProps[property] = value; }
   QVariant BaseApplication::getProperty(const QString &property) const { return d->getProperty(property); }
+
+  void BaseApplication::installTranslator(QTranslator* translator)
+  {
+    this->getQApplication()->installTranslator(translator);
+  }
+
+  bool BaseApplication::isRunning()
+  {
+    auto app = dynamic_cast<QtSingleApplication*>(this->getQApplication());
+
+    if (nullptr != app)
+      app->isRunning();
+
+    mitkThrow() << "Method not implemented.";
+  }
+
+  void BaseApplication::sendMessage(const QByteArray msg)
+  {
+    auto app = dynamic_cast<QtSingleApplication*>(this->getQApplication());
+
+    if (nullptr != app)
+      app->sendMessage(msg);
+
+    mitkThrow() << "Method not implemented.";
+  }
+
 }

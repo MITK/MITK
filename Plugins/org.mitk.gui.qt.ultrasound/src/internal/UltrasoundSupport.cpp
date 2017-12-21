@@ -509,7 +509,7 @@ void UltrasoundSupport::CreateControlWidgets()
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
   if (pluginContext)
   {
-    std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
+    std::string filter = "(org.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
 
     QString interfaceName = QString::fromStdString(us_service_interface_iid<QmitkUSAbstractCustomWidget>());
     m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));

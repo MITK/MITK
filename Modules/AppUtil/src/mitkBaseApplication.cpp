@@ -866,4 +866,31 @@ namespace mitk
 
   void BaseApplication::setProperty(const QString &property, const QVariant &value) { d->m_FWProps[property] = value; }
   QVariant BaseApplication::getProperty(const QString &property) const { return d->getProperty(property); }
+
+  void BaseApplication::installTranslator(QTranslator* translator)
+  {
+    this->getQApplication()->installTranslator(translator);
+  }
+
+  bool BaseApplication::isRunning()
+  {
+    QmitkSingleApplication* qCoreApp =
+      dynamic_cast<QmitkSingleApplication*>( this->getQApplication() );
+    if (qCoreApp != nullptr)
+    {
+      return qCoreApp->isRunning();
+    }
+    return false;
+  }
+
+  void BaseApplication::sendMessage(const QByteArray msg)
+  {
+    QmitkSingleApplication* qCoreApp =
+      dynamic_cast<QmitkSingleApplication*>(this->getQApplication());
+    if (qCoreApp != nullptr)
+    {
+      qCoreApp->sendMessage(msg);
+    }
+  }
+
 }

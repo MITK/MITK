@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iomanip>
 
-#ifdef __linux__
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/stat.h>
 #else
@@ -74,7 +74,7 @@ void mitk::pa::SimulationBatchGenerator::WriteBatchFileAndSaveTissueVolume(
   mitk::IOUtil::Save(tissueVolume, savePath);
 
   std::string filenameAllSimulation = "simulate_all";
-#ifdef __linux__
+#ifndef _WIN32
   mkdir(outputFolderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   filenameAllSimulation += ".sh";
 #else

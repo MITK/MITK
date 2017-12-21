@@ -97,9 +97,9 @@ namespace mitk
     const Image *GetLastDifferenceImage() { return m_SliceDifferenceImage.GetPointer(); }
   protected:
     OverwriteSliceImageFilter(); // purposely hidden
-    virtual ~OverwriteSliceImageFilter();
+    ~OverwriteSliceImageFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void ItkImageSwitch(itk::Image<TPixel, VImageDimension> *image);

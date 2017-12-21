@@ -445,7 +445,7 @@ public:
    */
   WorkbenchPage(WorkbenchWindow* w, IAdaptable* input);
 
-  ~WorkbenchPage();
+  ~WorkbenchPage() override;
 
   /**
    * Activates a part. The part will be brought to the front and given focus.

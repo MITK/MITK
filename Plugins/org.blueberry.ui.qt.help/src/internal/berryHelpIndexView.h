@@ -79,7 +79,7 @@ class HelpIndexView : public QtViewPart
 public:
 
   HelpIndexView();
-  ~HelpIndexView();
+  ~HelpIndexView() override;
 
   void SetFocus() override;
 

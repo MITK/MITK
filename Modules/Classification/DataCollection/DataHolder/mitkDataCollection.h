@@ -64,11 +64,11 @@ namespace mitk
       itkCloneMacro(Self)
 
       // Needed methods from Basedata
-      virtual void UpdateOutputInformation();
-    virtual void SetRequestedRegionToLargestPossibleRegion();
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject *);
+      void UpdateOutputInformation() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool VerifyRequestedRegion() override;
+    void SetRequestedRegion(const itk::DataObject *) override;
 
     void Init(std::string name);
 
@@ -246,7 +246,7 @@ namespace mitk
     /**
     * @brief Clear - clears the data collection
     */
-    void Clear();
+    void Clear() override;
 
     /**
     * @brief GetDataNode - returns data node containing data at index
@@ -272,7 +272,7 @@ namespace mitk
   protected:
 
     DataCollection();
-    virtual ~DataCollection();
+    ~DataCollection() override;
 
   private:
     // DATA

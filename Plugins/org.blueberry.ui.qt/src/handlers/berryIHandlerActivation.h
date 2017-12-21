@@ -46,7 +46,7 @@ struct BERRY_UI_QT IHandlerActivation : public virtual IEvaluationResultCache
 
   berryObjectMacro(berry::IHandlerActivation)
 
-  ~IHandlerActivation();
+  ~IHandlerActivation() override;
 
   /**
    * The depth at which the root exists.

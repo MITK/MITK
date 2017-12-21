@@ -39,12 +39,12 @@ namespace mitk
       Note:
         Only DiffSliceOperation is supported.
     */
-    virtual void ExecuteOperation(Operation *op) override;
+    void ExecuteOperation(Operation *op) override;
 
   protected:
     DiffSliceOperationApplier();
 
-    virtual ~DiffSliceOperationApplier();
+    ~DiffSliceOperationApplier() override;
   };
 }
 #endif

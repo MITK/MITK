@@ -33,7 +33,7 @@ struct BERRY_UI_QT ILayoutContainer : virtual public Object {
 
   berryObjectMacro(ILayoutContainer)
 
-  ~ILayoutContainer();
+  ~ILayoutContainer() override;
 
   typedef QList<LayoutPart::Pointer> ChildrenType;
 

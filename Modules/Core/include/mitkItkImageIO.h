@@ -40,14 +40,14 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
-    virtual void Write() override;
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
+    void Write() override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   protected:
     virtual std::vector<std::string> FixUpImageIOExtensions(const std::string &imageIOName);

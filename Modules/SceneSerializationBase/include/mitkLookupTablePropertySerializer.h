@@ -45,13 +45,13 @@ namespace mitk
 
         This should be overwritten by specific sub-classes.
        */
-      virtual TiXmlElement *Serialize() override;
+      TiXmlElement *Serialize() override;
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
 
   protected:
     LookupTablePropertySerializer(){};
-    virtual ~LookupTablePropertySerializer(){};
+    ~LookupTablePropertySerializer() override{};
   };
 }
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')

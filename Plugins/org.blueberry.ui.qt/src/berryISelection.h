@@ -38,7 +38,7 @@ struct BERRY_UI_QT ISelection : public Object
 {
   berryObjectMacro(berry::ISelection)
 
-  ~ISelection();
+  ~ISelection() override;
 
   /**
    * Returns whether this selection is empty.

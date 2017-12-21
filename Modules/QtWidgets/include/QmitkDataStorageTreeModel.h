@@ -44,7 +44,7 @@ public:
   //# CTORS,DTOR
 public:
   QmitkDataStorageTreeModel(mitk::DataStorage *_DataStorage, bool _PlaceNewNodesOnTop = false, QObject *parent = 0);
-  ~QmitkDataStorageTreeModel();
+  ~QmitkDataStorageTreeModel() override;
 
   //# GETTER
 public:

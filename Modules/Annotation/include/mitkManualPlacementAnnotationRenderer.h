@@ -38,7 +38,7 @@ namespace mitk
   {
   public:
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~ManualPlacementAnnotationRenderer();
+    ~ManualPlacementAnnotationRenderer() override;
 
     static ManualPlacementAnnotationRenderer *GetAnnotationRenderer(const std::string &rendererID);
 

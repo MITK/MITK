@@ -35,7 +35,7 @@ namespace mbilog
   {
   public:
     BackendCout();
-    virtual ~BackendCout();
+    ~BackendCout() override;
 
     /** \brief This method is called by the mbi logging mechanism if the object is registered in
      *         the mbi logging mechanism and a logging message is emitted. The method formats the
@@ -43,7 +43,7 @@ namespace mbilog
      *
      *  \param logMessage Logging message.
      */
-    virtual void ProcessMessage(const mbilog::LogMessage &l) override;
+    void ProcessMessage(const mbilog::LogMessage &l) override;
 
     /** \brief Sets the formatting mode. If true long messages will be displayed. Default is false (short/smart
      * messages).
@@ -51,7 +51,7 @@ namespace mbilog
      */
     void SetFull(bool full);
 
-    virtual OutputType GetOutputType() const override;
+    OutputType GetOutputType() const override;
 
   private:
     /** \brief The formatting mode of this backend. True is full/long message formatting mode. False is short/smart

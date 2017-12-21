@@ -93,8 +93,8 @@ namespace mitk
     void SetTolerance(double eps) { m_Tolerance = eps; }
   protected:
     CompareImageDataFilter();
-    virtual ~CompareImageDataFilter() {}
-    virtual void GenerateData() override;
+    ~CompareImageDataFilter() override {}
+    void GenerateData() override;
 
     /*! \brief Method resets the compare detail memeber struct to its initial state */
     void ResetCompareResultsToInitial();

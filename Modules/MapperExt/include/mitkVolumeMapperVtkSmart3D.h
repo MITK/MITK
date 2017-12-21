@@ -46,16 +46,16 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
+    void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
     
   protected:
     VolumeMapperVtkSmart3D();
-    virtual ~VolumeMapperVtkSmart3D();
+    ~VolumeMapperVtkSmart3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     void createMapper(vtkImageData*);
     void createVolume();

@@ -88,7 +88,7 @@ namespace mitk
 
     virtual const mitk::Surface *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     virtual void ApplyAllProperties(mitk::BaseRenderer *renderer, vtkActor *actor);
 
@@ -97,11 +97,11 @@ namespace mitk
   protected:
     SurfaceVtkMapper3D();
 
-    virtual ~SurfaceVtkMapper3D();
+    ~SurfaceVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    virtual void ResetMapper(mitk::BaseRenderer *renderer) override;
+    void ResetMapper(mitk::BaseRenderer *renderer) override;
 
     /** Checks whether the specified property is a ClippingProperty and if yes,
      * adds it to m_ClippingPlaneCollection (internal method). */
@@ -132,7 +132,7 @@ namespace mitk
         m_DepthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
       }
 
-      ~LocalStorage() {}
+      ~LocalStorage() override {}
     };
 
     mitk::LocalStorageHandler<LocalStorage> m_LSH;

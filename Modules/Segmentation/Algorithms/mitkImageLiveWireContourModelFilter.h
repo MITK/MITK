@@ -120,7 +120,7 @@ namespace mitk
   protected:
     ImageLiveWireContourModelFilter();
 
-    virtual ~ImageLiveWireContourModelFilter();
+    ~ImageLiveWireContourModelFilter() override;
 
     void GenerateOutputInformation() override{};
 

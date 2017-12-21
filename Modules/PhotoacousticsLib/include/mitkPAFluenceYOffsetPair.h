@@ -52,7 +52,7 @@ namespace mitk
     private:
       FluenceYOffsetPair(mitk::pa::Volume::Pointer fluenceValue, double yOffset);
 
-      ~FluenceYOffsetPair();
+      ~FluenceYOffsetPair() override;
 
       mitk::pa::Volume::Pointer m_FluenceValue;
       double m_YOffsetInCentimeters;

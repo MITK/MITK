@@ -57,12 +57,12 @@ namespace mitk
 
   protected:
     PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
-    virtual ~PaintbrushTool();
+    ~PaintbrushTool() override;
 
     void ConnectActionsAndFunctions() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *);
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *);

@@ -100,7 +100,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    *
    * @return the active page, or <code>null</code> if none
    */
-  virtual SmartPointer<IWorkbenchPage> GetActivePage() const override = 0;
+  SmartPointer<IWorkbenchPage> GetActivePage() const override = 0;
 
   /**
    * Sets or clears the currently active page for this workbench window.
@@ -213,7 +213,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
   //virtual void SetViewExcludeList(const QStringList& v) = 0;
   //virtual QStringList GetViewExcludeList() const = 0;
 
-  virtual ~IWorkbenchWindow();
+  ~IWorkbenchWindow() override;
 
 };
 

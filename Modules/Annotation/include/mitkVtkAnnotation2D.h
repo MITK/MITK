@@ -34,8 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(VtkAnnotation2D, VtkAnnotation);
-    virtual Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
-    virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
+    Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
+    void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
 
     void SetPosition2D(const Point2D &position2D);
 
@@ -46,8 +46,8 @@ namespace mitk
     Point2D GetOffsetVector() const;
 
   protected:
-    virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
-    virtual void UpdateVtkAnnotation(BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
+    void UpdateVtkAnnotation(BaseRenderer *renderer) override;
     virtual void UpdateVtkAnnotation2D(BaseRenderer *renderer) = 0;
     virtual vtkActor2D *GetVtkActor2D(BaseRenderer *renderer) const = 0;
 
@@ -55,7 +55,7 @@ namespace mitk
     explicit VtkAnnotation2D();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~VtkAnnotation2D();
+    ~VtkAnnotation2D() override;
 
   private:
     /** \brief copy constructor */

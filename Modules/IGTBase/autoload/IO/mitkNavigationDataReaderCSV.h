@@ -34,13 +34,13 @@ namespace mitk {
   public:
 
     NavigationDataReaderCSV();
-    virtual ~NavigationDataReaderCSV();
+    ~NavigationDataReaderCSV() override;
 
     /** @return Returns the NavigationDataSet of the first tool in the given file.
      *          Returns an empty NavigationDataSet if the file could not be read.
      */
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
 
@@ -76,7 +76,7 @@ namespace mitk {
 
     NavigationDataReaderCSV(const NavigationDataReaderCSV& other);
 
-    virtual mitk::NavigationDataReaderCSV* Clone() const override;
+    mitk::NavigationDataReaderCSV* Clone() const override;
 
   };
 }

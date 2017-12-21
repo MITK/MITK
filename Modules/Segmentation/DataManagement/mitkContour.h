@@ -115,36 +115,36 @@ namespace mitk
     /**
     * intherited from parent
     */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     /**
     * intherited from parent
     */
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
     * intherited from parent
     */
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
     * intherited from parent
     */
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
     /**
     * intherited from parent
     */
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
   protected:
     mitkCloneMacro(Self);
 
     Contour();
     Contour(const Contour &other);
-    virtual ~Contour();
+    ~Contour() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   private:
     /**

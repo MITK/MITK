@@ -60,7 +60,7 @@ struct BERRY_UI_QT IWorkbenchPartDescriptor : public virtual Object
    */
   virtual QString GetLabel() const = 0;
 
-  virtual ~IWorkbenchPartDescriptor();
+  ~IWorkbenchPartDescriptor() override;
 };
 
 } // namespace berry

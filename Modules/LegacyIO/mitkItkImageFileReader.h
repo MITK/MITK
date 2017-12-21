@@ -47,11 +47,11 @@ namespace mitk
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     ItkImageFileReader();
 
-    ~ItkImageFileReader();
+    ~ItkImageFileReader() override;
 
     std::string m_FileName;
 

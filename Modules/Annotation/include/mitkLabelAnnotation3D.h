@@ -79,14 +79,14 @@ namespace mitk
     /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
     mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-    virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
+    vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
     void UpdateVtkAnnotation(mitk::BaseRenderer *renderer) override;
 
     /** \brief explicit constructor which disallows implicit conversions */
     explicit LabelAnnotation3D();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~LabelAnnotation3D();
+    ~LabelAnnotation3D() override;
 
   private:
     /** \brief The char arrays in this vector are displayed at the corresponding coordinates.*/

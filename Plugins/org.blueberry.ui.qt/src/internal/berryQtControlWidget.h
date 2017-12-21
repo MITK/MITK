@@ -33,7 +33,7 @@ public:
 
   QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f = 0);
 
-  ~QtControlWidget();
+  ~QtControlWidget() override;
 
   void FireActivateEvent();
 

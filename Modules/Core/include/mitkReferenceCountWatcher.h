@@ -73,7 +73,7 @@ namespace mitk
     }
     //##Documentation
     //## @brief Destructor: remove observer
-    ~ReferenceCountWatcher()
+    ~ReferenceCountWatcher() override
     {
       if ((m_Deleted == false) && (m_Object != nullptr))
       {

@@ -43,7 +43,7 @@ namespace mitk
 
     CellOperation(OperationType operationType, int cellId);
 
-    virtual ~CellOperation(){};
+    ~CellOperation() override{};
 
     int GetCellId() { return m_CellId; };
     Vector3D GetVector() { return m_Vector; };

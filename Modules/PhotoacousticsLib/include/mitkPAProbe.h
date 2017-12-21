@@ -53,7 +53,7 @@ namespace mitk {
 
       Probe(std::string xmlFile, bool verbose);
       Probe(const char* fileStream, bool verbose);
-      virtual ~Probe();
+      ~Probe() override;
 
     protected:
 

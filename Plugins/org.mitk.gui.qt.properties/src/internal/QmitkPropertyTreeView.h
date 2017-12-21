@@ -43,7 +43,7 @@ public:
   berryObjectMacro(QmitkPropertyTreeView);
 
   QmitkPropertyTreeView();
-  ~QmitkPropertyTreeView();
+  ~QmitkPropertyTreeView() override;
 
   void SetFocus() override;
 
@@ -57,7 +57,7 @@ private:
   QString GetPropertyNameOrAlias(const QModelIndex& index);
   void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
   void OnPropertyNameChanged(const itk::EventObject& event);
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   void HideAllIcons();
 
 private slots:

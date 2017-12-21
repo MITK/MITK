@@ -76,7 +76,7 @@ struct BERRY_UI_QT IViewPart : public virtual IWorkbenchPart
 
   berryObjectMacro(berry::IViewPart, IWorkbenchPart)
 
-  virtual ~IViewPart();
+  ~IViewPart() override;
 
     /**
      * Returns the site for this view.

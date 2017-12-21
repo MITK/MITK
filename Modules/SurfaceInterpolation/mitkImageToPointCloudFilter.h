@@ -63,16 +63,16 @@ namespace mitk
         protected :
 
       /** This method is called by Update(). */
-      virtual void GenerateData();
+      void GenerateData() override;
 
     /** Initializes the output information */
-    virtual void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
     /** Constructor */
     ImageToPointCloudFilter();
 
     /** Destructor */
-    virtual ~ImageToPointCloudFilter();
+    ~ImageToPointCloudFilter() override;
 
   private:
     /** Uses the laplace filter to create an image and extracts a pixel as point

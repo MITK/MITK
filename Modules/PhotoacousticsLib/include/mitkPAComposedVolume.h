@@ -77,7 +77,7 @@ namespace mitk {
 
     protected:
       ComposedVolume(InSilicoTissueVolume::Pointer groundTruthVolume);
-      ~ComposedVolume();
+      ~ComposedVolume() override;
 
     private:
       int m_FluenceComponents;

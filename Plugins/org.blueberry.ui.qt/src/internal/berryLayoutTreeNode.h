@@ -51,7 +51,7 @@ public:
      */
     public: LayoutTreeNode(LayoutPartSash::Pointer sash);
 
-    public: ~LayoutTreeNode();
+    public: ~LayoutTreeNode() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutTree#flushChildren()

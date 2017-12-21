@@ -35,11 +35,11 @@ namespace mitk
       itkFactorylessNewMacro( DICOMGenericTagCache );
       itkCloneMacro(Self);
 
-      virtual DICOMDatasetFinding GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const override;
+      DICOMDatasetFinding GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const override;
 
-      virtual FindingsListType GetTagValue(DICOMImageFrameInfo* frame, const DICOMTagPath& path) const override;
+      FindingsListType GetTagValue(DICOMImageFrameInfo* frame, const DICOMTagPath& path) const override;
 
-      virtual DICOMDatasetAccessingImageFrameList GetFrameInfoList() const override;
+      DICOMDatasetAccessingImageFrameList GetFrameInfoList() const override;
 
       void AddFrameInfo(DICOMDatasetAccessingImageFrameInfo* info);
       void Reset();
@@ -47,7 +47,7 @@ namespace mitk
   protected:
 
       DICOMGenericTagCache();
-      virtual ~DICOMGenericTagCache();
+      ~DICOMGenericTagCache() override;
 
       DICOMDatasetAccessingImageFrameList m_ScanResult;
 

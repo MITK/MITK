@@ -46,7 +46,7 @@ class QtPlatformLogModel : public QAbstractTableModel
 public:
 
   QtPlatformLogModel(QObject* parent = nullptr);
-  ~QtPlatformLogModel();
+  ~QtPlatformLogModel() override;
 
   void SetShowAdvancedFiels( bool showAdvancedFiels );
   void SetShowCategory( bool showCategory );
@@ -166,7 +166,7 @@ private:
         BERRY_INFO << "BlueBerry mbilog backend registered";
       }
 
-      ~QtLogBackend()
+      ~QtLogBackend() override
       {
         mbilog::UnregisterBackend(this);
       }

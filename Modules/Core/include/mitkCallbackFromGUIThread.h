@@ -34,10 +34,10 @@ namespace mitk
     typedef itk::AnyEvent Superclass;
 
     CallbackEventOneParameter(const T t) : m_Data(t) {}
-    virtual ~CallbackEventOneParameter() {}
-    virtual const char *GetEventName() const override { return "CallbackEventOneParameter"; }
-    virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-    virtual ::itk::EventObject *MakeObject() const override { return new Self(m_Data); }
+    ~CallbackEventOneParameter() override {}
+    const char *GetEventName() const override { return "CallbackEventOneParameter"; }
+    bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+    ::itk::EventObject *MakeObject() const override { return new Self(m_Data); }
     const T GetData() const { return m_Data; }
     CallbackEventOneParameter(const Self &s) : itk::AnyEvent(s), m_Data(s.m_Data){};
 

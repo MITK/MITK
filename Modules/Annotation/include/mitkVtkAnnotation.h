@@ -61,7 +61,7 @@ namespace mitk
     explicit VtkAnnotation();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~VtkAnnotation();
+    ~VtkAnnotation() override;
 
   private:
     /** \brief copy constructor */

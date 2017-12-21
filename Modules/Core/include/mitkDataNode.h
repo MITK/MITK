@@ -84,13 +84,13 @@ namespace mitk
     itkCloneMacro(Self)
 
     // IPropertyProvider
-    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
-    virtual std::vector<std::string> GetPropertyKeys(const std::string &contextName = "", bool includeDefaultContext = false) const override;
-    virtual std::vector<std::string> GetPropertyContextNames() const override;
+    BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
+    std::vector<std::string> GetPropertyKeys(const std::string &contextName = "", bool includeDefaultContext = false) const override;
+    std::vector<std::string> GetPropertyContextNames() const override;
 
     // IPropertyOwner
-    virtual BaseProperty * GetNonConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
-    virtual void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
+    BaseProperty * GetNonConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
+    void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
 
     mitk::Mapper *GetMapper(MapperSlotId id) const;
 
@@ -131,17 +131,17 @@ namespace mitk
 
     mitk::DataNode &operator=(BaseData *right);
     virtual void SetMapper(MapperSlotId id, mitk::Mapper *mapper);
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
-    virtual void CopyInformation(const itk::DataObject *data) override;
+    void CopyInformation(const itk::DataObject *data) override;
 
     /**
      * \brief The "names" used for (renderer-specific) PropertyLists in GetPropertyList(string).
@@ -551,7 +551,7 @@ namespace mitk
      * \brief Get the timestamp of the last change of the contents of this node or
      * the referenced BaseData.
      */
-    virtual unsigned long GetMTime() const override;
+    unsigned long GetMTime() const override;
 
     /**
      * \brief Get the timestamp of the last change of the reference to the
@@ -562,7 +562,7 @@ namespace mitk
   protected:
     DataNode();
 
-    virtual ~DataNode();
+    ~DataNode() override;
 
     /// Invoked when the property list was modified. Calls Modified() of the DataNode
     virtual void PropertyListModified(const itk::Object *caller, const itk::EventObject &event);

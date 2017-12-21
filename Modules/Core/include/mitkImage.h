@@ -174,15 +174,15 @@ namespace mitk
 
     //##Documentation
     //## @brief Check whether slice @a s at time @a t in channel @a n is set
-    virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
+    bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
 
     //##Documentation
     //## @brief Check whether volume at time @a t in channel @a n is set
-    virtual bool IsVolumeSet(int t = 0, int n = 0) const override;
+    bool IsVolumeSet(int t = 0, int n = 0) const override;
 
     //##Documentation
     //## @brief Check whether the channel @a n is set
-    virtual bool IsChannelSet(int n = 0) const override;
+    bool IsChannelSet(int n = 0) const override;
 
     //##Documentation
     //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
@@ -531,7 +531,7 @@ namespace mitk
     ChannelDescriptor GetChannelDescriptor(int id = 0) const { return m_ImageDescriptor->GetChannelDescriptor(id); }
     /** \brief Sets a geometry to an image.
       */
-    virtual void SetGeometry(BaseGeometry *aGeometry3D) override;
+    void SetGeometry(BaseGeometry *aGeometry3D) override;
 
     /**
     * @warning for internal use only
@@ -659,7 +659,7 @@ namespace mitk
 
     virtual bool IsValidTimeStep(int t) const;
 
-    virtual void Expand(unsigned int timeSteps) override;
+    void Expand(unsigned int timeSteps) override;
 
     virtual ImageDataItemPointer AllocateSliceData(
       int s = 0,
@@ -678,14 +678,14 @@ namespace mitk
 
     Image(const Image &other);
 
-    virtual ~Image();
+    ~Image() override;
 
-    virtual void Clear() override;
+    void Clear() override;
 
     //## @warning Has to be called by every Initialize method!
-    virtual void Initialize() override;
+    void Initialize() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     mutable ImageDataItemPointerArray m_Channels;
     mutable ImageDataItemPointerArray m_Volumes;

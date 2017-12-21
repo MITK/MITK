@@ -41,7 +41,7 @@ namespace mitk
     mitkClassMacro(AffineBaseDataInteractor3D, DataInteractor);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual void SetDataNode(DataNode *node);
+      void SetDataNode(DataNode *node) override;
     void TranslateGeometry(mitk::Vector3D translate, mitk::BaseGeometry *geometry);
     void RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry *geometry);
     void ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry *geometry);
@@ -49,16 +49,16 @@ namespace mitk
 
   protected:
     AffineBaseDataInteractor3D();
-    virtual ~AffineBaseDataInteractor3D();
+    ~AffineBaseDataInteractor3D() override;
     /**
       * Here actions strings from the loaded state machine pattern are mapped to functions of
       * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
       */
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
     /**
       * This function is called when a DataNode has been set/changed.
       */
-    virtual void DataNodeChanged() override;
+    void DataNodeChanged() override;
 
     /**
       * Initializes the movement, stores starting position.

@@ -75,7 +75,7 @@ namespace mitk {
       * @param verbose
       */
       MonteCarloThreadHandler(long timInMilliseconsOrNumberofPhotons, bool simulateOnTimeBasis, bool verbose);
-      virtual ~MonteCarloThreadHandler();
+      ~MonteCarloThreadHandler() override;
     };
 
     /**

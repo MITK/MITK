@@ -41,10 +41,10 @@ namespace mitk
       itkCloneMacro(Self)
 
       /** This method is called by Update(). */
-      virtual void GenerateData() override;
+      void GenerateData() override;
 
     /** Initializes the output information */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     /** Returns a const reference to the input image */
     const mitk::Image *GetInput(void) const;
@@ -72,7 +72,7 @@ namespace mitk
       ImageToUnstructuredGridFilter();
 
     /** Destructor */
-    virtual ~ImageToUnstructuredGridFilter();
+    ~ImageToUnstructuredGridFilter() override;
 
     /**
      * Access method for extracting the points from the input image

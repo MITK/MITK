@@ -33,7 +33,7 @@ namespace mitk
     PersistenceActivator();
     void Load(us::ModuleContext *context) override;
     void Unload(us::ModuleContext *context) override;
-    virtual ~PersistenceActivator();
+    ~PersistenceActivator() override;
 
   private:
     itk::SmartPointer<mitk::PersistenceService> m_PersistenceService;

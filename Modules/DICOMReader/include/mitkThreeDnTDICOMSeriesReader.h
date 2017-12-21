@@ -57,14 +57,14 @@ class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGD
 
     // void AllocateOutputImages();
     /// \brief Load via multiple calls to itk::ImageSeriesReader.
-    virtual bool LoadImages() override;
+    bool LoadImages() override;
 
-    virtual bool operator==(const DICOMFileReader& other) const override;
+    bool operator==(const DICOMFileReader& other) const override;
 
   protected:
 
     ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation = 5);
-    virtual ~ThreeDnTDICOMSeriesReader();
+    ~ThreeDnTDICOMSeriesReader() override;
 
     ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other);
     ThreeDnTDICOMSeriesReader& operator=(const ThreeDnTDICOMSeriesReader& other);
@@ -74,7 +74,7 @@ class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGD
       This method tests whether some blocks are at the same spatial position and groups
       them into single blocks.
     */
-    virtual SortingBlockList Condense3DBlocks(SortingBlockList&) override;
+    SortingBlockList Condense3DBlocks(SortingBlockList&) override;
 
     bool LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const override;
 

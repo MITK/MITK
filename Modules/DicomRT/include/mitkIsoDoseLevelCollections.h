@@ -62,7 +62,7 @@ protected:
   IsoDoseLevelSet() {};
   explicit IsoDoseLevelSet(const IsoDoseLevelSet & other);
 
-  virtual ~IsoDoseLevelSet() {};
+  ~IsoDoseLevelSet() override {};
 
   mitkCloneMacro(IsoDoseLevelSet);
 

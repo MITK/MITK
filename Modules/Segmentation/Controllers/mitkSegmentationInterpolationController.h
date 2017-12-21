@@ -188,7 +188,7 @@ namespace mitk
     typedef std::map<const Image *, SegmentationInterpolationController *> InterpolatorMapType;
 
     SegmentationInterpolationController(); // purposely hidden
-    virtual ~SegmentationInterpolationController();
+    ~SegmentationInterpolationController() override;
 
     /// internal scan of a single slice
     template <typename DATATYPE>

@@ -33,7 +33,7 @@ class QtPerspectiveSwitcher : public QToolBar
 public:
 
   QtPerspectiveSwitcher(IWorkbenchWindow::Pointer window);
-  ~QtPerspectiveSwitcher();
+  ~QtPerspectiveSwitcher() override;
 
 private:
 

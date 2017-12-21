@@ -47,9 +47,9 @@ namespace mitk
     itkSetMacro(CheckPrecision, mitk::ScalarType);
     itkGetMacro(CheckPrecision, mitk::ScalarType);
 
-    virtual ~NodePredicateGeometry();
+    ~NodePredicateGeometry() override;
 
-    virtual bool CheckNode(const mitk::DataNode *node) const override;
+    bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
 

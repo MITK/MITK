@@ -106,7 +106,7 @@ class MITKDICOMREADER_EXPORT DICOMReaderConfigurator : public itk::LightObject
   protected:
 
     DICOMReaderConfigurator();
-    virtual ~DICOMReaderConfigurator();
+    ~DICOMReaderConfigurator() override;
 
   private:
 

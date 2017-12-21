@@ -324,7 +324,7 @@ public:
   /**
    * Returns a string representation of this object.
    */
-  virtual QString ToString() const override;
+  QString ToString() const override;
 
   /**
    * Creates SWT controls owned by the LayoutTree (ie: the sashes). Does not affect the

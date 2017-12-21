@@ -42,7 +42,7 @@ struct BERRY_UI_QT IPlaceholderFolderLayout : public Object
 
   berryObjectMacro(berry::IPlaceholderFolderLayout)
 
-  virtual ~IPlaceholderFolderLayout();
+  ~IPlaceholderFolderLayout() override;
 
     /**
      * Adds a view placeholder to this folder.

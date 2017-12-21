@@ -29,12 +29,12 @@ namespace mitk
 
   protected:
     SegmentationSink(); // use smart pointers
-    virtual ~SegmentationSink();
+    ~SegmentationSink() override;
 
-    virtual void Initialize(const NonBlockingAlgorithm *other = nullptr) override;
-    virtual bool ReadyToRun() override;
+    void Initialize(const NonBlockingAlgorithm *other = nullptr) override;
+    bool ReadyToRun() override;
 
-    virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
+    bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
     void InsertBelowGroupNode(mitk::DataNode *node);
     DataNode *LookForPointerTargetBelowGroupNode(const char *name);

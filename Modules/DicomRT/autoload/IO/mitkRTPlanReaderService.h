@@ -51,9 +51,9 @@ namespace mitk
       \note No image information is in RTPLAN.
       \sa mitk::GetDefaultDICOMTagsOfInterest() for tags that are read
     */
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
-    virtual ~RTPlanReaderService();
+    ~RTPlanReaderService() override;
 
   private:
     RTPlanReaderService* Clone() const override;

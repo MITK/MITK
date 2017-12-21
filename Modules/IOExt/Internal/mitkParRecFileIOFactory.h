@@ -39,8 +39,8 @@ namespace mitk
     typedef itk::SmartPointer<const Self> ConstPointer;
 
     /** Class methods used to interface with the registered factories. */
-    virtual const char *GetITKSourceVersion(void) const override;
-    virtual const char *GetDescription(void) const override;
+    const char *GetITKSourceVersion(void) const override;
+    const char *GetDescription(void) const override;
 
     /** Method for class instantiation. */
     itkFactorylessNewMacro(Self);
@@ -60,7 +60,7 @@ namespace mitk
 
   protected:
     ParRecFileIOFactory();
-    ~ParRecFileIOFactory();
+    ~ParRecFileIOFactory() override;
 
   private:
     ParRecFileIOFactory(const Self &); // purposely not implemented

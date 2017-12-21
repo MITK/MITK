@@ -53,19 +53,19 @@ namespace mitk
 
     typedef PointSetType::PointType PointType;
 
-    virtual int InitializeParser() override;
-    virtual int CleanupParser() override;
+    int InitializeParser() override;
+    int CleanupParser() override;
     /**
      * Handler function which is called, when a new xml start-tag
      * has been parsed.
      */
-    virtual void StartElement(const char *name, const char **atts) override;
+    void StartElement(const char *name, const char **atts) override;
 
     /**
      * Handler function which is called, when a xml end-tag
      * has been parsed.
      */
-    virtual void EndElement(const char *name) override;
+    void EndElement(const char *name) override;
 
     /**
      * Handler function which is called, if characted data has been
@@ -73,7 +73,7 @@ namespace mitk
      * @param inData a char array containing the parsed string data
      * @param inLength the length of the parsed data string.
      */
-    virtual void CharacterDataHandler(const char *inData, int inLength) override;
+    void CharacterDataHandler(const char *inData, int inLength) override;
 
     /**
      * Converts the given data to mitk::ScalarType.
@@ -93,7 +93,7 @@ namespace mitk
 
   protected:
     vtkPointSetXMLParser();
-    virtual ~vtkPointSetXMLParser();
+    ~vtkPointSetXMLParser() override;
 
     /**
      * A stack containing the parsed start-tags.

@@ -36,7 +36,7 @@ public:
 class BinaryValueToIndexMapper : public virtual ValueToIndexMapper
 {
 public:
-  unsigned char operator() (unsigned char value) const
+  unsigned char operator() (unsigned char value) const override
   {
     return value;
   }
@@ -45,7 +45,7 @@ public:
 class MultiClassValueToIndexMapper : public virtual ValueToIndexMapper
 {
 public:
-  unsigned char operator() (unsigned char value) const
+  unsigned char operator() (unsigned char value) const override
   {
     if (value == 1 || value == 5)
       return 0;
@@ -57,7 +57,7 @@ public:
 class ProgressionValueToIndexMapper : public virtual ValueToIndexMapper
 {
 public:
-  unsigned char operator() (unsigned char value) const
+  unsigned char operator() (unsigned char value) const override
   {
     if (value == 1 || value == 0)
       return 0;

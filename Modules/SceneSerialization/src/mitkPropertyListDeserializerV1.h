@@ -35,11 +35,11 @@ namespace mitk
         \brief Reads a propertylist from file. Get result via GetOutput()
         \return success of deserialization
         */
-      virtual bool Deserialize() override;
+      bool Deserialize() override;
 
   protected:
     PropertyListDeserializerV1();
-    virtual ~PropertyListDeserializerV1();
+    ~PropertyListDeserializerV1() override;
   };
 
 } // namespace

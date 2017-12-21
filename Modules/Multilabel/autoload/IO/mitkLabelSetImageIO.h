@@ -43,13 +43,13 @@ namespace mitk
     * @return a vector of mitk::LabelSetImages
     * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
     */
-    virtual std::vector<BaseData::Pointer> Read() override;
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
+    std::vector<BaseData::Pointer> Read() override;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
-    virtual void Write() override;
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
+    void Write() override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
     // -------------- LabelSetImageIO specific functions -------------
 

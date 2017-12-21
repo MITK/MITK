@@ -37,22 +37,22 @@ namespace mitk
 
     VigraRandomForestClassifier();
 
-    ~VigraRandomForestClassifier();
+    ~VigraRandomForestClassifier() override;
 
-    void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
+    void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y) override;
     void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
-    Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
+    Eigen::MatrixXi Predict(const Eigen::MatrixXd &X) override;
     Eigen::MatrixXi PredictWeighted(const Eigen::MatrixXd &X);
 
 
-    bool SupportsPointWiseWeight();
-    bool SupportsPointWiseProbability();
+    bool SupportsPointWiseWeight() override;
+    bool SupportsPointWiseProbability() override;
     void ConvertParameter();
 
     void SetRandomForest(const vigra::RandomForest<int> & rf);
     const vigra::RandomForest<int> & GetRandomForest() const;
 
-    void UsePointWiseWeight(bool);
+    void UsePointWiseWeight(bool) override;
     void SetMaximumTreeDepth(int);
     void SetMinimumSplitNodeSize(int);
     void SetPrecision(double);

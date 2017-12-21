@@ -60,7 +60,7 @@ namespace mitk
       StringList m_InputFilenames;
       DICOMTagCache();
       DICOMTagCache(const DICOMTagCache&);
-      virtual ~DICOMTagCache();
+      ~DICOMTagCache() override;
   };
 }
 

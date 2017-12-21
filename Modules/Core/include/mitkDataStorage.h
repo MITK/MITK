@@ -425,7 +425,7 @@ namespace mitk
     DataStorage();
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~DataStorage();
+    ~DataStorage() override;
 
     //##Documentation
     //## @brief Filters a SetOfObjects by the condition. If no condition is provided, the original set is returned
@@ -433,7 +433,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Prints the contents of the DataStorage to os. Do not call directly, call ->Print() instead
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
   };
 } // namespace mitk
 

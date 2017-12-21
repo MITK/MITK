@@ -117,7 +117,7 @@ public:
    * Detach this PresentablePart from the real part. No further methods should
    * be invoked on this object.
    */
-  ~PresentablePart();
+  ~PresentablePart() override;
 
   //    void firePropertyChange(int propertyId) {
   //        for (int i = 0; i < listeners.size(); i++) {

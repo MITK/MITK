@@ -42,7 +42,7 @@ public:
    */
   QActionContributionItem(QAction* action, const QString& id);
 
-  ~QActionContributionItem();
+  ~QActionContributionItem() override;
 
   /**
    * Compares this action contribution item with another object. Two action

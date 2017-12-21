@@ -32,25 +32,25 @@ public:
   {
   public:
     RTDoseMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
+    bool AppliesTo(const std::string &path) const override;
 
-    virtual RTDoseMimeType* Clone() const override;
+    RTDoseMimeType* Clone() const override;
   };
   
   class  RTStructMimeType : public CustomMimeType
   {
   public:
     RTStructMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual RTStructMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    RTStructMimeType* Clone() const override;
   };
 
   class  RTPlanMimeType : public CustomMimeType
   {
   public:
     RTPlanMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual RTPlanMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    RTPlanMimeType* Clone() const override;
   };
   // Get all DicomRT Mime Types
   static std::vector<CustomMimeType*> Get();

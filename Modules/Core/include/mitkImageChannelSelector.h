@@ -41,13 +41,13 @@ namespace mitk
   protected:
     ImageChannelSelector();
 
-    virtual ~ImageChannelSelector();
+    ~ImageChannelSelector() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     int m_ChannelNr;
   };

@@ -45,7 +45,7 @@ namespace mitk
   {
   public:
     AccessByItkException(const std::string &msg) : std::runtime_error(msg) {}
-    ~AccessByItkException() throw() {}
+    ~AccessByItkException() throw() override {}
   };
 }
 

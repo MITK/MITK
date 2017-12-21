@@ -50,7 +50,7 @@ namespace mitk {
 struct MITK_GUI_COMMON_PLUGIN IZombieViewPart : public virtual ILifecycleAwarePart
 {
 
-  ~IZombieViewPart();
+  ~IZombieViewPart() override;
 
   /**
    * Called when another Zombie View was activated. This usually means that this part

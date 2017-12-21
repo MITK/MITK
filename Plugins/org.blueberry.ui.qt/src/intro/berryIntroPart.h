@@ -142,7 +142,7 @@ public:
    * <code>IIntroPart</code> method disposes the title image loaded by
    * <code>setInitializationData</code>. Subclasses may extend.
    */
-  ~IntroPart();
+  ~IntroPart() override;
 
   /**
    * This implementation of the method declared by <code>IAdaptable</code>

@@ -72,9 +72,9 @@ namespace mitk
   protected:
     MultiComponentImageDataComparisonFilter();
 
-    ~MultiComponentImageDataComparisonFilter();
+    ~MultiComponentImageDataComparisonFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     template <typename TPixel>
     void CompareMultiComponentImage(const Image *testImage, const Image *validImage);

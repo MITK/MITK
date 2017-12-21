@@ -139,14 +139,14 @@ namespace mitk {
       * SmartPointers to the same NavigationData object since separate DataObjects are
       * still maintained.
       */
-      virtual void Graft(const DataObject *data) override;
+      void Graft(const DataObject *data) override;
 
       /**
       * \brief copy meta data of a NavigationData object
       *
       * copies all meta data from NavigationData data to this object
       */
-      virtual void CopyInformation(const DataObject* data) override;
+      void CopyInformation(const DataObject* data) override;
 
       /**
       * \brief Prints the object information to the given stream os.
@@ -227,7 +227,7 @@ namespace mitk {
        */
       NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D, const bool checkForRotationMatrix = true);
 
-      virtual ~NavigationData();
+      ~NavigationData() override;
 
       /**
       * \brief holds the position part of the tracking data

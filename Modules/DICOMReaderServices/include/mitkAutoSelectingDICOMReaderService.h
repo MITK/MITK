@@ -33,11 +33,11 @@ public:
 protected:
   /** Returns the reader instance that should be used. The descission may be based
   * one the passed relevant file list.*/
-  virtual mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
+  mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
 
 private:
 
-  virtual AutoSelectingDICOMReaderService* Clone() const override;
+  AutoSelectingDICOMReaderService* Clone() const override;
 };
 
 }

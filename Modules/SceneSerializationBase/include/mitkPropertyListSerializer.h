@@ -55,7 +55,7 @@ namespace mitk
 
   protected:
     PropertyListSerializer();
-    virtual ~PropertyListSerializer();
+    ~PropertyListSerializer() override;
 
     TiXmlElement *SerializeOneProperty(const std::string &key, const BaseProperty *property);
 

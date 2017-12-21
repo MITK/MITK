@@ -42,14 +42,14 @@ namespace mitk
     mitkClassMacro(SinglePointDataInteractor, PointSetDataInteractor) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       protected : SinglePointDataInteractor();
-    virtual ~SinglePointDataInteractor();
+    ~SinglePointDataInteractor() override;
 
     /** Adds a point at the given coordinates.
      *  This function overwrites the behavior of PointSetDataInteractor such that instead of adding new points
      *  the first points position is updated. All other interaction (move,delete) is still handled by
      * PointSetDataInteractor.
      */
-    virtual void AddPoint(StateMachineAction *, InteractionEvent *event) override;
+    void AddPoint(StateMachineAction *, InteractionEvent *event) override;
 
     /**
      * @brief SetMaxPoints Sets the maximal number of points for the pointset
@@ -57,7 +57,7 @@ namespace mitk
      * @param maxNumber
      */
     virtual void SetMaxPoints(unsigned int /*maxNumber*/ = 0) {}
-    virtual void DataNodeChanged() override;
+    void DataNodeChanged() override;
   };
 }
 #endif

@@ -31,12 +31,12 @@ namespace mitk
     mitkClassMacro(Cone, BoundingObject);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual mitk::ScalarType GetVolume() override;
-    virtual bool IsInside(const Point3D &p) const override;
+      mitk::ScalarType GetVolume() override;
+    bool IsInside(const Point3D &p) const override;
     // virtual void UpdateOutputInformation();
   protected:
     Cone();
-    virtual ~Cone();
+    ~Cone() override;
   };
 }
 #endif /* MITKCONE_H_HEADER_INCLUDED */

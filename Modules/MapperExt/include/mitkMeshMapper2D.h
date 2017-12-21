@@ -42,12 +42,12 @@ namespace mitk
       /** @brief Get the Mesh to map */
       const mitk::Mesh *GetInput(void);
 
-    virtual void Paint(mitk::BaseRenderer *renderer) override;
+    void Paint(mitk::BaseRenderer *renderer) override;
 
   protected:
     MeshMapper2D();
 
-    virtual ~MeshMapper2D();
+    ~MeshMapper2D() override;
   };
 
 } // namespace mitk

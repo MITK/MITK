@@ -44,7 +44,7 @@ namespace mitk
 
     SubImageSelector();
 
-    virtual ~SubImageSelector();
+    ~SubImageSelector() override;
 
   protected:
     mitk::Image::ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0);

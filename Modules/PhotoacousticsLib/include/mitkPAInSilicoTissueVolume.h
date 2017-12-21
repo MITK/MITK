@@ -113,7 +113,7 @@ namespace mitk {
         Volume::Pointer segmentationVolume,
         TissueGeneratorParameters::Pointer tissueParameters,
         mitk::PropertyList::Pointer propertyList);
-      virtual ~InSilicoTissueVolume();
+      ~InSilicoTissueVolume() override;
 
       mitk::pa::Volume::Pointer m_AbsorptionVolume;
       mitk::pa::Volume::Pointer m_ScatteringVolume;

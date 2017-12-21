@@ -57,22 +57,22 @@ namespace mitk
     mitkClassMacro(TextAnnotation2D, mitk::VtkAnnotation2D);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
-    virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
+      Annotation::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
+    void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
 
   protected:
     /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
     mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
     vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
-    virtual vtkActor2D *GetVtkActor2D(BaseRenderer *renderer) const override;
+    vtkActor2D *GetVtkActor2D(BaseRenderer *renderer) const override;
     void UpdateVtkAnnotation2D(mitk::BaseRenderer *renderer) override;
 
     /** \brief explicit constructor which disallows implicit conversions */
     explicit TextAnnotation2D();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~TextAnnotation2D();
+    ~TextAnnotation2D() override;
 
   private:
     /** \brief copy constructor */

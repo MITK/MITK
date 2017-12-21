@@ -50,7 +50,7 @@ namespace mitk
 
   protected:
     MultiStepper();
-    virtual ~MultiStepper();
+    ~MultiStepper() override;
     typedef std::set<Stepper::Pointer> StepperSet;
     typedef std::map<Stepper::Pointer, unsigned int> ScaleFactorMap;
     StepperSet m_SubSteppers;

@@ -303,22 +303,22 @@ private:
       : _held(value)
     { }
 
-    virtual std::string ToString() const override
+    std::string ToString() const override
     {
       return any_value_to_string(_held);
     }
 
-    virtual std::string ToJSON() const override
+    std::string ToJSON() const override
     {
       return any_value_to_json(_held);
     }
 
-    virtual const std::type_info& Type() const override
+    const std::type_info& Type() const override
     {
       return typeid(ValueType);
     }
 
-    virtual Placeholder* Clone() const override
+    Placeholder* Clone() const override
     {
       return new Holder(_held);
     }
@@ -347,9 +347,9 @@ public:
     : std::bad_cast(), _msg(msg)
   {}
 
-  ~BadAnyCastException() throw() {}
+  ~BadAnyCastException() throw() override {}
 
-  virtual const char * what() const throw() override
+  const char * what() const throw() override
   {
     if (_msg.empty())
       return "US_PREPEND_NAMESPACE(BadAnyCastException): "

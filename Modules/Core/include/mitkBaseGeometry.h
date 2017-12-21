@@ -249,7 +249,7 @@ namespace mitk
 
     //##Documentation
     //##@brief executes affine operations (translate, rotate, scale)
-    virtual void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation *operation) override;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
@@ -541,7 +541,7 @@ namespace mitk
     // ********************************** Constructor **********************************
     BaseGeometry();
     BaseGeometry(const BaseGeometry &other);
-    virtual ~BaseGeometry();
+    ~BaseGeometry() override;
 
     //##Documentation
     //## @brief clones the geometry
@@ -553,9 +553,9 @@ namespace mitk
     //##  newGeometry->UnRegister();
     //##  return newGeometry.GetPointer();
     //## \endcode
-    virtual itk::LightObject::Pointer InternalClone() const override = 0;
+    itk::LightObject::Pointer InternalClone() const override = 0;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     static const std::string GetTransformAsString(TransformType *transformType);
 

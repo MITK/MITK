@@ -26,7 +26,7 @@ namespace mitk
   {
   public:
     PropertyExtensions();
-    ~PropertyExtensions();
+    ~PropertyExtensions() override;
 
     bool AddExtension(const std::string &propertyName,
                       PropertyExtension::Pointer extension,

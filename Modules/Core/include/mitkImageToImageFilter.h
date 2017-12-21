@@ -54,9 +54,9 @@ namespace mitk
 
   protected:
     ImageToImageFilter();
-    virtual ~ImageToImageFilter();
+    ~ImageToImageFilter() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     /** What is the input requested region that is required to produce the
     * output requested region? The base assumption for image processing
@@ -72,7 +72,7 @@ namespace mitk
     *
     * \sa ProcessObject::GenerateInputRequestedRegion(),
     *     ImageSource::GenerateInputRequestedRegion() */
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
   private:
     void operator=(const Self &); // purposely not implemented

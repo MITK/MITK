@@ -41,13 +41,13 @@ namespace mitk
        * Must be implemented in sub-classes.
        */
       // virtual void Initialize();
-      virtual void PlaceFigure(const Point2D &point) override;
+      void PlaceFigure(const Point2D &point) override;
 
     /** \brief Polygon has 2 control points per definition. */
-    virtual unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
+    unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
     /** \brief Polygon maximum number of control points is principally not limited. */
-    virtual unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
-    virtual bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
+    unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
+    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
 
   protected:
     PlanarRectangle();
@@ -55,20 +55,20 @@ namespace mitk
     mitkCloneMacro(Self);
 
     /** \brief Generates the poly-line representation of the planar figure. */
-    virtual void GeneratePolyLine() override;
+    void GeneratePolyLine() override;
 
     /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
+    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
     /** \brief Calculates feature quantities of the planar figure. */
-    virtual void EvaluateFeaturesInternal() override;
+    void EvaluateFeaturesInternal() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     const unsigned int FEATURE_ID_CIRCUMFERENCE;
     const unsigned int FEATURE_ID_AREA;
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   private:
   };

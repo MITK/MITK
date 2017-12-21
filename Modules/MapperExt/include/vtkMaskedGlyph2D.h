@@ -91,9 +91,9 @@ public:
 
 protected:
   vtkMaskedGlyph2D();
-  ~vtkMaskedGlyph2D();
+  ~vtkMaskedGlyph2D() override;
 
-  virtual int RequestData(vtkInformation *info,
+  int RequestData(vtkInformation *info,
                           vtkInformationVector **inInfoVec,
                           vtkInformationVector *outInfoVec) override;
 

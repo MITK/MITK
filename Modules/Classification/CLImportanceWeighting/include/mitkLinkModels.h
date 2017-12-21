@@ -33,9 +33,9 @@ namespace mitk
   {
   public:
     LogItLinking();
-    double Link(double mu);
-    double DLink(double mu);
-    double InverseLink(double eta);
+    double Link(double mu) override;
+    double DLink(double mu) override;
+    double InverseLink(double eta) override;
   private:
     double lowerBound;
     double upperBound;

@@ -142,9 +142,9 @@ namespace mitk
 
     IdxToLabelMapType m_IdxToLabels;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     virtual void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface *surface, LabelType label);
 
@@ -152,7 +152,7 @@ namespace mitk
 
     LabeledImageToSurfaceFilter();
 
-    virtual ~LabeledImageToSurfaceFilter();
+    ~LabeledImageToSurfaceFilter() override;
 
   private:
     virtual void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface *surface, const ScalarType threshold);

@@ -77,7 +77,7 @@ namespace mitk
     SlicesCoordinator();
 
     /** clear list of controllers */
-    virtual ~SlicesCoordinator();
+    ~SlicesCoordinator() override;
 
     /** \brief Sets the specified mouse cursor.
      *

@@ -47,7 +47,7 @@ public:
 
     typedef IsoDoseLevelVector ValueType;
 
-    virtual ~IsoDoseLevelVectorProperty();
+    ~IsoDoseLevelVectorProperty() override;
 
     const IsoDoseLevelVector * GetIsoDoseLevelVector() const;
     const IsoDoseLevelVector * GetValue() const;
@@ -58,7 +58,7 @@ public:
     void SetIsoDoseLevelVector(IsoDoseLevelVector* levelVector);
     void SetValue(IsoDoseLevelVector* levelVector);
 
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
@@ -66,8 +66,8 @@ private:
 
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const override;
-    virtual bool Assign(const BaseProperty& property) override;
+    bool IsEqual(const BaseProperty& property) const override;
+    bool Assign(const BaseProperty& property) override;
 
 };
 

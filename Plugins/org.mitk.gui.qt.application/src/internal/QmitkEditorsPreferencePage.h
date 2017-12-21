@@ -53,17 +53,17 @@ public:
   /**
   * @see berry::IPreferencePage::PerformOk()
   */
-  virtual bool PerformOk() override;
+  bool PerformOk() override;
 
   /**
   * @see berry::IPreferencePage::PerformCancel()
   */
-  virtual void PerformCancel() override;
+  void PerformCancel() override;
 
    /**
   * @see berry::IPreferencePage::Update()
   */
-  virtual void Update() override;
+  void Update() override;
 
 protected:
 

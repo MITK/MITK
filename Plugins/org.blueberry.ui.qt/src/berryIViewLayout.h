@@ -39,7 +39,7 @@ struct BERRY_UI_QT IViewLayout : public Object
 
   berryObjectMacro(berry::IViewLayout)
 
-  virtual  ~IViewLayout();
+   ~IViewLayout() override;
 
     /**
      * Returns whether the view is closeable.

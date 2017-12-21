@@ -70,9 +70,9 @@ namespace mitk
       }
     };
 
-    virtual ~TestingRenderingManagerFactory(){};
+    ~TestingRenderingManagerFactory() override{};
 
-    virtual mitk::RenderingManager::Pointer CreateRenderingManager() const override
+    mitk::RenderingManager::Pointer CreateRenderingManager() const override
     {
       TestingRenderingManager::Pointer specificSmartPtr = TestingRenderingManager::New();
       RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();

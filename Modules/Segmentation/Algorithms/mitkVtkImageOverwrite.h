@@ -71,12 +71,12 @@ public:
 
 protected:
   mitkVtkImageOverwrite();
-  virtual ~mitkVtkImageOverwrite();
+  ~mitkVtkImageOverwrite() override;
 
   bool m_Overwrite_Mode;
 
   /** Overridden from vtkImageReslice. \sa vtkImageReslice::ThreadedRequestData */
-  virtual void ThreadedRequestData(vtkInformation *vtkNotUsed(request),
+  void ThreadedRequestData(vtkInformation *vtkNotUsed(request),
                                    vtkInformationVector **vtkNotUsed(inputVector),
                                    vtkInformationVector *vtkNotUsed(outputVector),
                                    vtkImageData ***inData,

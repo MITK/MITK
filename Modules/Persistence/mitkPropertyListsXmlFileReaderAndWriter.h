@@ -40,7 +40,7 @@ namespace mitk
 
   protected:
     PropertyListsXmlFileReaderAndWriter();
-    virtual ~PropertyListsXmlFileReaderAndWriter();
+    ~PropertyListsXmlFileReaderAndWriter() override;
 
     bool PropertyFromXmlElem(std::string &name, mitk::BaseProperty::Pointer &prop, TiXmlElement *elem) const;
     bool PropertyToXmlElem(const std::string &name, const mitk::BaseProperty *prop, TiXmlElement *elem) const;

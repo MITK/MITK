@@ -38,7 +38,7 @@ struct BERRY_UI_QT IViewSite : public virtual IWorkbenchPartSite
 
   berryObjectMacro(berry::IViewSite)
 
-  virtual ~IViewSite();
+  ~IViewSite() override;
 
     /**
      * Returns the action bars for this part site.

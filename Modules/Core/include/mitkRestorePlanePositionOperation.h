@@ -47,7 +47,7 @@ namespace mitk
                                   Vector3D direction,
                                   AffineTransform3D::Pointer transform);
 
-    virtual ~RestorePlanePositionOperation();
+    ~RestorePlanePositionOperation() override;
 
     Vector3D GetDirectionVector();
 

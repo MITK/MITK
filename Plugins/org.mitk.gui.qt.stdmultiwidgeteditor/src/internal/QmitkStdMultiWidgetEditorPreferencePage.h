@@ -35,7 +35,7 @@ class QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQ
 
 public:
   QmitkStdMultiWidgetEditorPreferencePage();
-  ~QmitkStdMultiWidgetEditorPreferencePage();
+  ~QmitkStdMultiWidgetEditorPreferencePage() override;
 
   void CreateQtControl(QWidget* parent) override;
   QWidget* GetQtControl() const override;

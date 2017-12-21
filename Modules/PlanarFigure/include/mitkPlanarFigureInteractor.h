@@ -71,9 +71,9 @@ namespace mitk
 
   protected:
     PlanarFigureInteractor();
-    virtual ~PlanarFigureInteractor();
+    ~PlanarFigureInteractor() override;
 
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
 
     ////////  Conditions ////////
     bool CheckFigurePlaced(const InteractionEvent *interactionEvent);
@@ -183,7 +183,7 @@ namespace mitk
 
     void LogPrintPlanarFigureQuantities(const PlanarFigure *planarFigure);
 
-    virtual void ConfigurationChanged() override;
+    void ConfigurationChanged() override;
 
   private:
     /** \brief to store the value of precision to pick a point */

@@ -53,7 +53,7 @@ namespace mitk
     unsigned int GetMaximumNumberOfControlPoints() const override { return 1000; }
     std::vector<mitk::Point2D> CheckForLineIntersection(const Point2D &p1, const Point2D &p2) const;
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarPolygon();
@@ -61,13 +61,13 @@ namespace mitk
     mitkCloneMacro(Self);
 
     /** \brief Generates the poly-line representation of the planar figure. */
-    virtual void GeneratePolyLine() override;
+    void GeneratePolyLine() override;
 
     /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
+    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
     /** \brief Calculates feature quantities of the planar figure. */
-    virtual void EvaluateFeaturesInternal() override;
+    void EvaluateFeaturesInternal() override;
 
     bool CheckForLineIntersection(const mitk::Point2D &p1,
                                   const mitk::Point2D &p2,
@@ -79,7 +79,7 @@ namespace mitk
                                   const mitk::Point2D &p3,
                                   const mitk::Point2D &p4) const;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     const unsigned int FEATURE_ID_CIRCUMFERENCE;
     const unsigned int FEATURE_ID_AREA;

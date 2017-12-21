@@ -201,19 +201,19 @@ namespace mitk
     virtual void EvaluateFeatures();
 
     /** \brief Intherited from parent */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     /** \brief Intherited from parent */
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
     /** \brief Intherited from parent */
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /** \brief Intherited from parent */
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
     /** \brief Intherited from parent */
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
     /** \brief  Returns the current number of polylines  */
     virtual unsigned short GetPolyLinesSize();
@@ -294,7 +294,7 @@ namespace mitk
     /** \brief Initializes the TimeGeometry describing the (time-resolved)
      * geometry of this figure. Note that each time step holds one PlaneGeometry.
      */
-    virtual void InitializeTimeGeometry(unsigned int timeSteps = 1) override;
+    void InitializeTimeGeometry(unsigned int timeSteps = 1) override;
 
     /** \brief defines the number of PolyLines that will be available */
     void SetNumberOfPolyLines(unsigned int numberOfPolyLines);
@@ -314,7 +314,7 @@ namespace mitk
     /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
     void ClearHelperPolyLines();
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     ControlPointListType m_ControlPoints;
     unsigned int m_NumberOfControlPoints;
@@ -351,7 +351,7 @@ namespace mitk
       bool Visible;
     };
 
-    virtual itk::LightObject::Pointer InternalClone() const override = 0;
+    itk::LightObject::Pointer InternalClone() const override = 0;
 
     PlaneGeometry *m_PlaneGeometry;
 

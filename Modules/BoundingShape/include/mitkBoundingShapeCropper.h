@@ -76,16 +76,16 @@ namespace mitk
 
   protected:
     BoundingShapeCropper();
-    virtual ~BoundingShapeCropper();
+    ~BoundingShapeCropper() override;
 
     virtual const PixelType GetOutputPixelType();
 
     /**
     * @brief Reimplemented from ImageToImageFilter
     */
-    virtual void GenerateInputRequestedRegion() override;
-    virtual void GenerateOutputInformation() override;
-    virtual void GenerateData() override;
+    void GenerateInputRequestedRegion() override;
+    void GenerateOutputInformation() override;
+    void GenerateData() override;
 
     /**
     * @brief Template Function for cropping and masking images with scalar pixel type

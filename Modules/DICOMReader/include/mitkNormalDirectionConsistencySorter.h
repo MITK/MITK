@@ -46,22 +46,22 @@ class MITKDICOMREADER_EXPORT NormalDirectionConsistencySorter : public DICOMData
     mitkClassMacro( NormalDirectionConsistencySorter, DICOMDatasetSorter )
     itkNewMacro( NormalDirectionConsistencySorter )
 
-    virtual DICOMTagList GetTagsOfInterest() override;
+    DICOMTagList GetTagsOfInterest() override;
 
     /// See class description.
-    virtual void Sort() override;
+    void Sort() override;
 
     /// See class description and DICOMITKSeriesGDCMReader.
     GantryTiltInformation GetTiltInformation() const;
 
-    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const override;
+    void PrintConfiguration(std::ostream& os, const std::string& indent = "") const override;
 
-    virtual bool operator==(const DICOMDatasetSorter& other) const override;
+    bool operator==(const DICOMDatasetSorter& other) const override;
 
   protected:
 
     NormalDirectionConsistencySorter();
-    virtual ~NormalDirectionConsistencySorter();
+    ~NormalDirectionConsistencySorter() override;
 
     NormalDirectionConsistencySorter(const NormalDirectionConsistencySorter& other);
     NormalDirectionConsistencySorter& operator=(const NormalDirectionConsistencySorter& other);

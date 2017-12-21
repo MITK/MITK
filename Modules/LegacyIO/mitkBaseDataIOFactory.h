@@ -53,7 +53,7 @@ namespace mitk
 
   protected:
     BaseDataIO();
-    ~BaseDataIO();
+    ~BaseDataIO() override;
 
   private:
     BaseDataIO(const Self &);     // purposely not implemented

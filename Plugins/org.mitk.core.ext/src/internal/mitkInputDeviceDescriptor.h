@@ -49,7 +49,7 @@ public:
   /**
     * Default destructor
     */
-  ~InputDeviceDescriptor();
+  ~InputDeviceDescriptor() override;
 
   /**
    * @see mitk::IInputDeviceDescriptor::CreateInputDevice()

@@ -41,10 +41,10 @@ namespace mitk
 
     ContourModelSetReader();
 
-    virtual ~ContourModelSetReader();
+    ~ContourModelSetReader() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
   private:

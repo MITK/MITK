@@ -44,12 +44,12 @@ namespace mitk
     void SetResolution(const int xR, const int yR);
     void GetResolution(int &xR, int &yR) const;
 
-    virtual mitk::ScalarType GetVolume() override;
-    virtual bool IsInside(const Point3D &p) const override;
+    mitk::ScalarType GetVolume() override;
+    bool IsInside(const Point3D &p) const override;
 
   protected:
     Plane();
-    virtual ~Plane();
+    ~Plane() override;
 
     vtkPlaneSource *m_PlaneSource;
 

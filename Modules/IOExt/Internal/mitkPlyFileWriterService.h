@@ -33,15 +33,15 @@ namespace mitk
   {
   public:
     PlyFileWriterService();
-    virtual ~PlyFileWriterService();
+    ~PlyFileWriterService() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   private:
     PlyFileWriterService(const PlyFileWriterService &other);
 
-    virtual mitk::PlyFileWriterService *Clone() const override;
+    mitk::PlyFileWriterService *Clone() const override;
   };
 }
 

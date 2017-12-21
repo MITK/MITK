@@ -40,9 +40,9 @@ namespace mitk
     mitkClassMacro(NodePredicateFunction, NodePredicateBase)
     mitkNewMacro1Param(NodePredicateFunction, const FunctionType &)
 
-    virtual ~NodePredicateFunction();
+    ~NodePredicateFunction() override;
 
-    virtual bool CheckNode(const mitk::DataNode *node) const override;
+    bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
     explicit NodePredicateFunction(const FunctionType &function);

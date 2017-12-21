@@ -39,7 +39,7 @@ namespace mitk
     AbstractAnnotationRenderer(const std::string &rendererID, const std::string &arID);
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~AbstractAnnotationRenderer();
+    ~AbstractAnnotationRenderer() override;
 
     const std::string GetID() const;
     const std::string GetRendererID() const;

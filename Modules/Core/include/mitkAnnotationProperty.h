@@ -50,7 +50,7 @@ namespace mitk
     const Point3D &GetPosition() const;
     void SetPosition(const Point3D &position);
 
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
     virtual BaseProperty &operator=(const BaseProperty &other) { return Superclass::operator=(other); }
     using BaseProperty::operator=;
 
@@ -72,8 +72,8 @@ namespace mitk
 
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty &property) const override;
-    virtual bool Assign(const BaseProperty &property) override;
+    bool IsEqual(const BaseProperty &property) const override;
+    bool Assign(const BaseProperty &property) override;
   };
 
 } // namespace mitk

@@ -47,7 +47,7 @@ namespace mitk
   {
     using ListType = std::vector<std::string>;
 
-    virtual bool operator()(IOUtil::LoadInfo &loadInfo) const override;
+    bool operator()(IOUtil::LoadInfo &loadInfo) const override;
 
     PreferenceListReaderOptionsFunctor();
     PreferenceListReaderOptionsFunctor(const ListType& preference, const ListType& black);

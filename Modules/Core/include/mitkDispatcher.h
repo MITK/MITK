@@ -93,7 +93,7 @@ namespace mitk
 
   protected:
     Dispatcher(const std::string &rendererName);
-    virtual ~Dispatcher();
+    ~Dispatcher() override;
 
   private:
     ListInteractorType m_Interactors;

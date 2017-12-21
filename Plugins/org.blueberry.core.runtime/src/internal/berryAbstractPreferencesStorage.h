@@ -45,7 +45,7 @@ struct IPreferences;
     ///
     /// Pure virtual (abstract class)
     ///
-    virtual ~AbstractPreferencesStorage();
+    ~AbstractPreferencesStorage() override;
 
     ///
     /// Flushes the given (or all) prefs persistently

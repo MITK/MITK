@@ -135,7 +135,7 @@ public:
      * for the part widgets. This is passed to
      * IWorkbenchPart::CreatePartControl(QWidget*)
      */
-    public: virtual void CreateControl(QWidget* parent) override;
+    public: void CreateControl(QWidget* parent) override;
 
     //public: virtual void SetControlEnabled(bool enabled) = 0;
 
@@ -147,7 +147,7 @@ public:
     /**
      * @private:
      */
-    public: virtual ~PartPane();
+    public: ~PartPane() override;
 
     /**
      * User has requested to close the pane.
@@ -192,7 +192,7 @@ public:
      * Shows the receiver if <code>visible</code> is true otherwise hide it.
      */
     public: void SetVisible(bool makeVisible) override;
-    public: virtual bool GetVisible() override;
+    public: bool GetVisible() override;
 
     /**
      * Sets focus to this part.

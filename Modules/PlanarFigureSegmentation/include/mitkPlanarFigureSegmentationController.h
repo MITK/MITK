@@ -53,7 +53,7 @@ namespace mitk
       PlanarFigureSegmentationController) /// specify the segmentation image that should be interpolated
       itkCloneMacro(Self)
 
-        virtual ~PlanarFigureSegmentationController();
+        ~PlanarFigureSegmentationController() override;
 
     typedef std::vector<PlanarFigure::Pointer> PlanarFigureListType;
     typedef std::vector<Surface::Pointer> SurfaceListType;

@@ -91,17 +91,17 @@ namespace mitk
     /**
      * Virtual destructor
      */
-    virtual ~PlanarFigureReader();
+    ~PlanarFigureReader() override;
 
     /**
      * Actually reads the point sets from the given file
      */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
      * Does nothing in the current implementation
      */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     /**
      * Resizes the output-objects according to the given number.

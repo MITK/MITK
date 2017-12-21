@@ -31,7 +31,7 @@ namespace mitk
     CircularProfileTubeElement();
     CircularProfileTubeElement(float x, float y, float z, float d = 0.0f);
     CircularProfileTubeElement(const Point3D, float d = 0.0f);
-    ~CircularProfileTubeElement();
+    ~CircularProfileTubeElement() override;
 
     /**
     * Set the 3D position of the element.

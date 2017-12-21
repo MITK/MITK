@@ -33,15 +33,15 @@ public:
 
   // Description:
   // Satisfy the superclasses' API.
-  virtual void BuildRepresentation() override;
+  void BuildRepresentation() override;
 
   void SetCornerPosition(int corner) { cornerPosition = corner; }
 protected:
   mitkVtkLogoRepresentation();
-  ~mitkVtkLogoRepresentation();
+  ~mitkVtkLogoRepresentation() override;
 
   // Helper methods
-  void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]);
+  void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]) override;
 
   int cornerPosition;
 

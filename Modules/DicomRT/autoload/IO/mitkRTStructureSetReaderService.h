@@ -53,7 +53,7 @@ namespace mitk
     RTStructureSetReaderService();
     RTStructureSetReaderService(const RTStructureSetReaderService& other);
 
-    virtual ~RTStructureSetReaderService();
+    ~RTStructureSetReaderService() override;
 
     /**
     * @brief Reading a RT StructureSet from the DICOM file and returns the ROIs
@@ -62,7 +62,7 @@ namespace mitk
     * single structures.
     */
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
     RTStructureSetReaderService* Clone() const override;

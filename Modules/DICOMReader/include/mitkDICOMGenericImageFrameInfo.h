@@ -37,11 +37,11 @@ namespace mitk
       mitkNewMacro2Param( DICOMGenericImageFrameInfo, const std::string&, unsigned int );
       mitkNewMacro1Param( DICOMGenericImageFrameInfo, const DICOMImageFrameInfo::Pointer& );
 
-      virtual ~DICOMGenericImageFrameInfo();
+      ~DICOMGenericImageFrameInfo() override;
 
-      virtual DICOMDatasetFinding GetTagValueAsString(const DICOMTag&) const override;
+      DICOMDatasetFinding GetTagValueAsString(const DICOMTag&) const override;
 
-      virtual FindingsListType GetTagValueAsString(const DICOMTagPath& path) const override;
+      FindingsListType GetTagValueAsString(const DICOMTagPath& path) const override;
 
       std::string GetFilenameIfAvailable() const override;
 

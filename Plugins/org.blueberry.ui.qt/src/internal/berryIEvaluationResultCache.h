@@ -45,7 +45,7 @@ struct BERRY_UI_QT IEvaluationResultCache : public virtual Object
 
   berryObjectMacro(berry::IEvaluationResultCache)
 
-  ~IEvaluationResultCache();
+  ~IEvaluationResultCache() override;
 
   /**
    * Clears the cached computation of the <code>evaluate</code> method, if

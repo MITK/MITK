@@ -75,7 +75,7 @@ public:
                         const QString& iconPath, const Flags& flags, int cardinality,
                         ApplicationContainer* appContainer);
 
-  ~ApplicationDescriptor();
+  ~ApplicationDescriptor() override;
 
   QString getApplicationId() const override;
 

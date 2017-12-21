@@ -30,11 +30,11 @@ namespace mitk
     mitkClassMacro(ImageSerializer, BaseDataSerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual std::string Serialize() override;
+      std::string Serialize() override;
 
   protected:
     ImageSerializer();
-    virtual ~ImageSerializer();
+    ~ImageSerializer() override;
   };
 
 } // namespace

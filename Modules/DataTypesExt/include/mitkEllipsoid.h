@@ -31,12 +31,12 @@ namespace mitk
     mitkClassMacro(Ellipsoid, BoundingObject);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual mitk::ScalarType GetVolume() override;
-    virtual bool IsInside(const Point3D &p) const override;
+      mitk::ScalarType GetVolume() override;
+    bool IsInside(const Point3D &p) const override;
 
   protected:
     Ellipsoid();
-    virtual ~Ellipsoid();
+    ~Ellipsoid() override;
   };
 }
 #endif /* MITKELLIPSEDATA_H_HEADER_INCLUDED */

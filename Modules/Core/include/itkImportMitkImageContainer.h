@@ -66,7 +66,7 @@ namespace itk
 
   protected:
     ImportMitkImageContainer();
-    virtual ~ImportMitkImageContainer();
+    ~ImportMitkImageContainer() override;
 
     /** PrintSelf routine. Normally this is a protected internal method. It is
      * made public here so that Image can call this method.  Users should not

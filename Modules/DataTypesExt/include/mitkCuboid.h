@@ -31,12 +31,12 @@ namespace mitk
     mitkClassMacro(Cuboid, BoundingObject);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual mitk::ScalarType GetVolume() override;
-    virtual bool IsInside(const Point3D &p) const override;
+      mitk::ScalarType GetVolume() override;
+    bool IsInside(const Point3D &p) const override;
 
   protected:
     Cuboid();
-    virtual ~Cuboid();
+    ~Cuboid() override;
   };
 }
 #endif /* MITCUBOID_H_HEADER_INCLUDED */

@@ -51,7 +51,7 @@ namespace mitk
        * @param idx the index of the output for which an object should be created
        * @returns the new object
        */
-      virtual itk::DataObject::Pointer
+      itk::DataObject::Pointer
       MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
@@ -60,12 +60,12 @@ namespace mitk
      * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
      * virtual.
      */
-    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
+    itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
   protected:
     PointSetSource();
 
-    virtual ~PointSetSource();
+    ~PointSetSource() override;
   };
 }
 #endif // #define _MITK_POINT_SET_SOURCE_H

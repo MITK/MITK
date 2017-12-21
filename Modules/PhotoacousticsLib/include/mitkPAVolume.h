@@ -124,7 +124,7 @@ namespace mitk
        * @param zDim z dimension of the data
        */
       Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim);
-      virtual ~Volume();
+      ~Volume() override;
 
       const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
 

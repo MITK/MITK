@@ -94,7 +94,7 @@ struct IMenuManager : public virtual IContributionManager, public IContributionI
    * @return <code>true</code> if enabled, and
    *   <code>false</code> if disabled
    */
-  virtual bool IsEnabled() const = 0;
+  bool IsEnabled() const override = 0;
 
   /**
    * Removes the given menu listener from this menu.

@@ -205,16 +205,16 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
       \brief Runs the sorting / splitting process described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
       Method required by DICOMFileReader.
     */
-    virtual void AnalyzeInputFiles() override;
+    void AnalyzeInputFiles() override;
 
     // void AllocateOutputImages();
     /**
       \brief Loads images using itk::ImageSeriesReader, potentially applies shearing to correct gantry tilt.
     */
-    virtual bool LoadImages() override;
+    bool LoadImages() override;
 
     // re-implemented from super-class
-    virtual bool CanHandleFile(const std::string& filename) override;
+    bool CanHandleFile(const std::string& filename) override;
 
     /**
       \brief Add an element to the sorting procedure described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
@@ -268,9 +268,9 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     double GetDecimalPlacesForOrientation() const;
 
-    virtual bool operator==(const DICOMFileReader& other) const override;
+    bool operator==(const DICOMFileReader& other) const override;
 
-    virtual DICOMTagPathList GetTagsOfInterest() const override;
+    DICOMTagPathList GetTagsOfInterest() const override;
 
     static int GetDefaultDecimalPlacesForOrientation()
     {
@@ -279,7 +279,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
   protected:
 
-    virtual void InternalPrintConfiguration(std::ostream& os) const override;
+    void InternalPrintConfiguration(std::ostream& os) const override;
 
     /// \brief Return active C locale
   static std::string GetActiveLocale();
@@ -297,7 +297,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     const static int m_DefaultDecimalPlacesForOrientation = 5;
 
     DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = m_DefaultDecimalPlacesForOrientation, bool simpleVolumeImport = false);
-    virtual ~DICOMITKSeriesGDCMReader();
+    ~DICOMITKSeriesGDCMReader() override;
 
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);

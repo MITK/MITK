@@ -52,14 +52,14 @@ namespace mitk
     OrganTypeProperty(const IdType &value);
     OrganTypeProperty(const std::string &value);
 
-    virtual ~OrganTypeProperty();
+    ~OrganTypeProperty() override;
     virtual void AddEnumerationTypes();
 
   private:
     // purposely not implemented
     OrganTypeProperty &operator=(const OrganTypeProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

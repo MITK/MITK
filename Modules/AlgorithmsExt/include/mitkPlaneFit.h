@@ -70,9 +70,9 @@ namespace mitk
     typedef mitk::PointSet::PointDataType PointDataType;
     typedef mitk::PointSet::PointDataIterator PointDataIterator;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /*!Getter for point set.
      *
@@ -102,7 +102,7 @@ namespace mitk
 
   protected:
     PlaneFit();
-    virtual ~PlaneFit();
+    ~PlaneFit() override;
 
     /*! Calculates the centroid of the point set.
      * the center of gravity is calculated  through the mean value of the whole point set

@@ -111,7 +111,7 @@ struct BERRY_UI_QT IWorkbenchPart : public virtual Object { // public IAdaptable
 
   berryObjectMacro(berry::IWorkbenchPart, Object)
 
-  virtual ~IWorkbenchPart();
+  ~IWorkbenchPart() override;
 
     /**
      * The property id for <code>getTitle</code>, <code>getTitleImage</code>

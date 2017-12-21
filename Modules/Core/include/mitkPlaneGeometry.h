@@ -442,10 +442,10 @@ namespace mitk
     */
     Point3D ProjectPointOntoPlane(const Point3D &pt) const;
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
     /** Implements operation to re-orient the plane */
-    virtual void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation *operation) override;
 
     /**
     * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D
@@ -560,9 +560,9 @@ namespace mitk
 
     PlaneGeometry(const PlaneGeometry &other);
 
-    virtual ~PlaneGeometry();
+    ~PlaneGeometry() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     const mitk::BaseGeometry *m_ReferenceGeometry;
 
@@ -572,7 +572,7 @@ namespace mitk
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
+    void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
     //##Documentation
     //## @brief CheckBounds
     //##
@@ -581,7 +581,7 @@ namespace mitk
     //## have an implementation of CheckBounds
     //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as
     // well!)
-    virtual void CheckBounds(const BoundsArrayType &bounds) override;
+    void CheckBounds(const BoundsArrayType &bounds) override;
 
     //##Documentation
     //## @brief CheckIndexToWorldTransform
@@ -589,7 +589,7 @@ namespace mitk
     //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see
     // PlaneGeometry.cpp).
     //## In Subclasses of BaseGeometry, implement own conditions or call Superclass::CheckBounds(bounds);.
-    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D *transform) override;
+    void CheckIndexToWorldTransform(mitk::AffineTransform3D *transform) override;
 
   private:
     /**

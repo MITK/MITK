@@ -67,7 +67,7 @@ public:
   /**
   * @brief Default Destructor
   **/
-  virtual ~QmitkTextOverlay();
+  ~QmitkTextOverlay() override;
 
   /**
   * \brief Setup the QLabel with overlay specific information

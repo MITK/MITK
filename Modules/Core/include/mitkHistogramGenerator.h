@@ -47,7 +47,7 @@ namespace mitk
   protected:
     HistogramGenerator();
 
-    virtual ~HistogramGenerator();
+    ~HistogramGenerator() override;
 
     mitk::Image::ConstPointer m_Image;
     int m_Size;

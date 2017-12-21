@@ -71,7 +71,7 @@ namespace mitk
 
   protected:
     StateMachineContainer();
-    virtual ~StateMachineContainer();
+    ~StateMachineContainer() override;
 
     /**
     * @brief Derived from XMLReader

@@ -96,9 +96,9 @@ namespace itk
 
   protected:
     ConnectedAdaptiveThresholdImageFilter();
-    ~ConnectedAdaptiveThresholdImageFilter(){};
+    ~ConnectedAdaptiveThresholdImageFilter() override{};
 
-    void GenerateData();
+    void GenerateData() override;
 
     TOutputImage *m_IteratorMaskForFineSegmentation;
 

@@ -25,14 +25,14 @@ namespace mitk
     mitkClassMacro(TransferFunctionPropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override;
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
+      TiXmlElement *Serialize() override;
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
 
     static bool SerializeTransferFunction(const char *filename, TransferFunction::Pointer tf);
     static TransferFunction::Pointer DeserializeTransferFunction(const char *filePath);
 
   protected:
     TransferFunctionPropertySerializer();
-    virtual ~TransferFunctionPropertySerializer();
+    ~TransferFunctionPropertySerializer() override;
   };
 } // namespace

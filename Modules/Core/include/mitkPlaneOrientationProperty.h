@@ -101,7 +101,7 @@ namespace mitk
      * this function is overridden as protected, so that the user may not add
      * additional invalid types.
      */
-    virtual bool AddEnum(const std::string &name, const IdType &id) override;
+    bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
      * Adds the standard enumeration types with corresponding strings.
@@ -112,7 +112,7 @@ namespace mitk
     // purposely not implemented
     PlaneOrientationProperty &operator=(const PlaneOrientationProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

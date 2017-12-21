@@ -47,7 +47,7 @@ struct BERRY_UI_QT IFileEditorMapping : public Object
 
   berryObjectMacro(berry::IFileEditorMapping)
 
-  virtual ~IFileEditorMapping();
+  ~IFileEditorMapping() override;
 
     /**
      * Returns the default editor registered for this type mapping.

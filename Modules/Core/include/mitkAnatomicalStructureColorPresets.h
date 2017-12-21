@@ -70,7 +70,7 @@ public:
 
 protected:
   AnatomicalStructureColorPresets() = default;
-  ~AnatomicalStructureColorPresets() = default;
+  ~AnatomicalStructureColorPresets() override = default;
 
 private:
   //##Documentation

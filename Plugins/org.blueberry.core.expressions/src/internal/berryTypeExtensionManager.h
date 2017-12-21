@@ -88,7 +88,7 @@ public:
   static bool DEBUG;
 
   TypeExtensionManager(const QString& extensionPoint);
-  ~TypeExtensionManager();
+  ~TypeExtensionManager() override;
 
   Property::Pointer GetProperty(Object::ConstPointer receiver,
                                 const QString& namespaze, const QString& method);
@@ -116,10 +116,10 @@ private:
 
   /*synchronized*/void InitializeCaches();
 
-  virtual void Added(const QList<SmartPointer<IExtension> >& extensions) override;
-  virtual void Removed(const QList<SmartPointer<IExtension> >& extensions) override;
-  virtual void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
-  virtual void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
+  void Added(const QList<SmartPointer<IExtension> >& extensions) override;
+  void Removed(const QList<SmartPointer<IExtension> >& extensions) override;
+  void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
+  void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
 };
 
 }

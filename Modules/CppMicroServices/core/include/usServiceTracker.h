@@ -241,7 +241,7 @@ public:
 
   typedef std::map<ServiceReference<S>,T> TrackingMap;
 
-  ~ServiceTracker();
+  ~ServiceTracker() override;
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -535,7 +535,7 @@ protected:
    *         <code>ServiceTracker</code>.
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
-  T AddingService(const ServiceReferenceType& reference);
+  T AddingService(const ServiceReferenceType& reference) override;
 
   /**
    * Default implementation of the
@@ -552,7 +552,7 @@ protected:
    * @param service The service object for the modified service.
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, T)
    */
-  void ModifiedService(const ServiceReferenceType& reference, T service);
+  void ModifiedService(const ServiceReferenceType& reference, T service) override;
 
   /**
    * Default implementation of the
@@ -575,7 +575,7 @@ protected:
    * @param service The service object for the removed service.
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, T)
    */
-  void RemovedService(const ServiceReferenceType& reference, T service);
+  void RemovedService(const ServiceReferenceType& reference, T service) override;
 
 private:
 

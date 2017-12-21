@@ -164,11 +164,11 @@ namespace mitk
 
   protected:
     ExtractSliceFilter(vtkImageReslice *reslicer = nullptr);
-    virtual ~ExtractSliceFilter();
+    ~ExtractSliceFilter() override;
 
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
+    void GenerateInputRequestedRegion() override;
 
     const PlaneGeometry *m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;

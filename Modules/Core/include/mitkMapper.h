@@ -158,7 +158,7 @@ namespace mitk
     explicit Mapper();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~Mapper();
+    ~Mapper() override;
 
     /** \brief Generate the data needed for rendering (independent of a specific renderer)
      *  \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead.

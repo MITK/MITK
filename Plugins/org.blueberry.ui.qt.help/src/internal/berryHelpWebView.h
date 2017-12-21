@@ -38,7 +38,7 @@ class HelpWebView : public QWebEngineView
 
 public:
   explicit HelpWebView(IEditorSite::Pointer editorSite, QWidget *parent, qreal zoom = 0.0);
-  ~HelpWebView();
+  ~HelpWebView() override;
 
   QFont viewerFont() const;
   void setViewerFont(const QFont &font);
@@ -89,7 +89,7 @@ Q_SIGNALS:
   void sourceChanged(const QUrl &);
 
 protected:
-  virtual void wheelEvent(QWheelEvent *) override;
+  void wheelEvent(QWheelEvent *) override;
 
 private Q_SLOTS:
   void actionChanged();

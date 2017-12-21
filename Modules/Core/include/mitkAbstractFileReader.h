@@ -46,13 +46,13 @@ namespace mitk
   class MITKCORE_EXPORT AbstractFileReader : public mitk::IFileReader
   {
   public:
-    virtual void SetInput(const std::string &location) override;
+    void SetInput(const std::string &location) override;
 
-    virtual void SetInput(const std::string &location, std::istream *is) override;
+    void SetInput(const std::string &location, std::istream *is) override;
 
-    virtual std::string GetInputLocation() const override;
+    std::string GetInputLocation() const override;
 
-    virtual std::istream *GetInputStream() const override;
+    std::istream *GetInputStream() const override;
 
     MimeType GetRegisteredMimeType() const;
 
@@ -72,21 +72,21 @@ namespace mitk
      * @see GetLocalFileName()
      * @see IFileReader::Read()
      */
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override = 0;
+    std::vector<itk::SmartPointer<BaseData>> Read() override = 0;
 
-    virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage &ds) override;
+    DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage &ds) override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
-    virtual Options GetOptions() const override;
-    virtual us::Any GetOption(const std::string &name) const override;
+    Options GetOptions() const override;
+    us::Any GetOption(const std::string &name) const override;
 
-    virtual void SetOptions(const Options &options) override;
-    virtual void SetOption(const std::string &name, const us::Any &value) override;
+    void SetOptions(const Options &options) override;
+    void SetOption(const std::string &name, const us::Any &value) override;
 
-    virtual void AddProgressCallback(const ProgressCallback &callback) override;
+    void AddProgressCallback(const ProgressCallback &callback) override;
 
-    virtual void RemoveProgressCallback(const ProgressCallback &callback) override;
+    void RemoveProgressCallback(const ProgressCallback &callback) override;
 
     /**
      * Associate this reader with the MIME type returned by the current IMimeTypeProvider
@@ -108,7 +108,7 @@ namespace mitk
     /**
      * @return A list of files that were loaded during the last call of Read. Has to be filled by the actual reader class.
      */
-    std::vector< std::string > GetReadFiles();
+    std::vector< std::string > GetReadFiles() override;
 
   protected:
     /**
@@ -123,14 +123,14 @@ namespace mitk
     {
     public:
       InputStream(IFileReader *writer, std::ios_base::openmode mode = std::ios_base::in);
-      ~InputStream();
+      ~InputStream() override;
 
     private:
       std::istream *m_Stream;
     };
 
     AbstractFileReader();
-    ~AbstractFileReader();
+    ~AbstractFileReader() override;
 
     AbstractFileReader(const AbstractFileReader &other);
 

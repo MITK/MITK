@@ -35,7 +35,7 @@ namespace mitk
             RTDoseReaderService(const RTDoseReaderService& other);
             RTDoseReaderService();
 
-            virtual ~RTDoseReaderService();
+            ~RTDoseReaderService() override;
 
             using AbstractFileReader::Read;
             /**
@@ -47,7 +47,7 @@ namespace mitk
             * relative to a PrescriptionDose defined in the RT-Plan. If there is no
             * RT-Plan file PrescriptionDose is set to 80% of the maximum dose.
             */
-            virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+            std::vector<itk::SmartPointer<BaseData> > Read() override;
 
     private:
       RTDoseReaderService* Clone() const override;

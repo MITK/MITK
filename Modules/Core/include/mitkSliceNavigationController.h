@@ -295,10 +295,10 @@ namespace mitk
       typedef itk::AnyEvent Superclass;
 
       TimeGeometryEvent(TimeGeometry *aTimeGeometry, unsigned int aPos) : m_TimeGeometry(aTimeGeometry), m_Pos(aPos) {}
-      virtual ~TimeGeometryEvent() {}
-      virtual const char *GetEventName() const override { return "TimeGeometryEvent"; }
-      virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-      virtual ::itk::EventObject *MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
+      ~TimeGeometryEvent() override {}
+      const char *GetEventName() const override { return "TimeGeometryEvent"; }
+      bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+      ::itk::EventObject *MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
       TimeGeometry *GetTimeGeometry() const { return m_TimeGeometry; }
       unsigned int GetPos() const { return m_Pos; }
     private:
@@ -473,7 +473,7 @@ namespace mitk
 
   protected:
     SliceNavigationController();
-    virtual ~SliceNavigationController();
+    ~SliceNavigationController() override;
 
     mitk::BaseGeometry::ConstPointer m_InputWorldGeometry3D;
     mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;

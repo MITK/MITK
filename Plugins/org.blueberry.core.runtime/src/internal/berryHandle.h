@@ -41,7 +41,7 @@ public:
   explicit Handle(const SmartPointer<const IObjectManager>& objectManager, int value);
   explicit Handle(const IObjectManager* objectManager, int value);
 
-  ~Handle();
+  ~Handle() override;
 
   /**
    * Return the actual object corresponding to this handle.

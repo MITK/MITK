@@ -66,7 +66,7 @@ namespace mitk
     const Gizmo *GetInput();
 
     //! Update the vtkProp, i.e. the contours of a slice through our RawMesh_C.
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     //! Apply visual properties
     void ApplyVisualProperties(BaseRenderer *renderer);

@@ -53,7 +53,7 @@ namespace mitk {
 
     protected:
       PropertyCalculator();
-      virtual ~PropertyCalculator();
+      ~PropertyCalculator() override;
 
       bool m_Valid = false;
 

@@ -42,10 +42,10 @@ namespace mitk
     mitkNewMacro4Param(
       Self, vtkRenderWindow *, const char *, mitk::RenderingManager *, mitk::BaseRenderer::RenderingMode::Type);
 
-    virtual ~RenderWindow();
+    ~RenderWindow() override;
 
-    virtual vtkRenderWindow *GetVtkRenderWindow() override;
-    virtual vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override;
+    vtkRenderWindow *GetVtkRenderWindow() override;
+    vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override;
 
     // Set Layout Index to define the Layout Type
     void SetLayoutIndex(unsigned int layoutIndex);

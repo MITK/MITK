@@ -50,12 +50,12 @@ namespace mitk
 
   protected:
     SetRegionTool(int paintingPixelValue = 1); // purposely hidden
-    virtual ~SetRegionTool();
+    ~SetRegionTool() override;
 
     void ConnectActionsAndFunctions() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *);
     virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *);

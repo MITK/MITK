@@ -37,7 +37,7 @@ struct BERRY_UI_QT IViewCategory : public virtual Object
   virtual QStringList GetPath() const = 0;
   virtual QList<IViewDescriptor::Pointer> GetViews() const = 0;
 
-  virtual ~IViewCategory();
+  ~IViewCategory() override;
 };
 
 }

@@ -131,7 +131,7 @@ namespace mitk
        * Updates the output information of the current object by calling
        * updateOutputInformation of the data objects source object.
        */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     /**
        * Sets the requested Region to the largest possible region.
@@ -139,29 +139,29 @@ namespace mitk
        * behaviour of the itk pipeline and we do not support the
        * requested-region mechanism for lookup-tables
        */
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
        * Checks, if the requested region lies outside of the buffered region by
        * calling verifyRequestedRegion().
        */
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
        * Checks if the requested region is completely contained in
        * the buffered region. Since we always want to process the lookup
        * table as a whole, this method always returns true
        */
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
     /**
        * This method has no effect for lookup tables, since we do
        * not support the region-mechanism
        */
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
     LookupTable();
-    virtual ~LookupTable();
+    ~LookupTable() override;
     /**
        * \deprecatedSince{2014_03} Please use CreateColorTransferFunction() instead
        */
@@ -258,7 +258,7 @@ namespace mitk
     LookupTableType m_type;
 
   private:
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 } // namespace mitk
 

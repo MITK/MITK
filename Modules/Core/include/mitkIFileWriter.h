@@ -59,7 +59,7 @@ namespace mitk
    */
   struct MITKCORE_EXPORT IFileWriter : public IFileIO
   {
-    virtual ~IFileWriter();
+    ~IFileWriter() override;
 
     /**
      * @brief Set the input data for writing.

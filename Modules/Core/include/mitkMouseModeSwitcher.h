@@ -107,7 +107,7 @@ namespace mitk
 
   protected:
     MouseModeSwitcher();
-    virtual ~MouseModeSwitcher();
+    ~MouseModeSwitcher() override;
 
   private:
     /**

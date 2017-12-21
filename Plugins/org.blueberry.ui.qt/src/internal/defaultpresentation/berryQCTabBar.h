@@ -44,7 +44,7 @@ protected:
 public:
 
   QCTabBar(QWidget* parent = nullptr);
-  ~QCTabBar();
+  ~QCTabBar() override;
 
   AbstractTabItem* getTab(int index) const;
 

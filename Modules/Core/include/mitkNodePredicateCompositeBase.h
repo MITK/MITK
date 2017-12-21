@@ -38,7 +38,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Pure virtual (but implemented) Destructor makes NodePredicateCompositeBase an abstract class
-    virtual ~NodePredicateCompositeBase() = 0;
+    ~NodePredicateCompositeBase() override = 0;
 
     //##Documentation
     //## @brief Adds a child predicate

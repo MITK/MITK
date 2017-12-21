@@ -67,7 +67,7 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
 
   public:
     QmitkSliceNavigationListener();
-    virtual ~QmitkSliceNavigationListener();
+    ~QmitkSliceNavigationListener() override;
 
   signals:
     void SliceChanged();

@@ -75,7 +75,7 @@ namespace mitk
     BaseProperty();
     BaseProperty(const BaseProperty &other);
 
-    virtual ~BaseProperty();
+    ~BaseProperty() override;
 
   private:
     /*!

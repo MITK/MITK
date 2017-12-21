@@ -116,7 +116,7 @@ namespace mitk
      * Returns the string representation of the current enumeration value. If it
      * was not yet set, the return value is unspecified
      */
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
     /**
      * Clears all possible enumeration values and the current enumeration value.
@@ -193,8 +193,8 @@ namespace mitk
 
     EnumerationProperty(const EnumerationProperty &);
 
-    virtual bool IsEqual(const BaseProperty &property) const override;
-    virtual bool Assign(const BaseProperty &property) override;
+    bool IsEqual(const BaseProperty &property) const override;
+    bool Assign(const BaseProperty &property) override;
 
     itk::LightObject::Pointer InternalClone() const override;
 

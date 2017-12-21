@@ -55,13 +55,13 @@ namespace mitk
     typedef std::map<Alignment, AnnotationRankedMap> AnnotationLayouterContainerMap;
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~LayoutAnnotationRenderer();
+    ~LayoutAnnotationRenderer() override;
 
     const std::string GetID() const;
 
     static LayoutAnnotationRenderer *GetAnnotationRenderer(const std::string &rendererID);
 
-    void OnRenderWindowModified();
+    void OnRenderWindowModified() override;
 
     static void AddAnnotation(Annotation *annotation,
                               const std::string &rendererID,
@@ -95,7 +95,7 @@ namespace mitk
 
     static double GetHeight(AnnotationRankedMap &annotations, BaseRenderer *renderer);
 
-    virtual void OnAnnotationRenderersChanged();
+    void OnAnnotationRenderersChanged() override;
     static const std::string ANNOTATIONRENDERER_ID;
     AnnotationLayouterContainerMap m_AnnotationContainerMap;
     static void SetMargin2D(Annotation *annotation, const Point2D &OffsetVector);

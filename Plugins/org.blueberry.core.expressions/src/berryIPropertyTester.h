@@ -44,7 +44,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object
 
   berryObjectMacro(berry::IPropertyTester)
 
-  virtual ~IPropertyTester();
+  ~IPropertyTester() override;
 
   /**
    * Returns whether the property tester can handle the given

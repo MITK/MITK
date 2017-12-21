@@ -36,17 +36,17 @@ namespace mitk
 
   protected:
     SegmentationsProcessingTool(); // purposely hidden
-    virtual ~SegmentationsProcessingTool();
+    ~SegmentationsProcessingTool() override;
 
-    virtual const char *GetGroup() const override;
+    const char *GetGroup() const override;
 
     /**
      \brief Called when the tool gets activated
 
      Will just call ProcessAllObjects and then deactivate this tool again.
     */
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     /**
      \brief Loop over all working data items

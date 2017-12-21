@@ -51,7 +51,7 @@ public:
      * The <code>GroupMarker</code> implementation of this method
      * returns <code>false</code> since group markers are always invisible.
      */
-    virtual bool IsVisible() const override;
+    bool IsVisible() const override;
 };
 
 }

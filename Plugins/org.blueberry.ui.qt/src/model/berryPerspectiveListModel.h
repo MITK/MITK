@@ -41,7 +41,7 @@ public:
   };
 
   PerspectiveListModel(IPerspectiveRegistry& perspReg, bool markDefault = true, QObject* parent = nullptr);
-  ~PerspectiveListModel();
+  ~PerspectiveListModel() override;
 
   int rowCount(const QModelIndex &parent = QModelIndex()) const override;
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;

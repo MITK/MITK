@@ -35,7 +35,7 @@ public:
   static QIcon ThemeIcon(const QString &resourcePath);
 
   QtStyleManager();
-  ~QtStyleManager();
+  ~QtStyleManager() override;
 
   Style GetStyle() const override;
   QString GetStylesheet() const override;

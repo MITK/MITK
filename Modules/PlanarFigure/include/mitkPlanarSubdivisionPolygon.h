@@ -65,7 +65,7 @@ namespace mitk
     void IncreaseSubdivisions();
     void DecreaseSubdivisions();
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarSubdivisionPolygon();
@@ -73,7 +73,7 @@ namespace mitk
     mitkCloneMacro(Self);
 
     /** \brief Generates the poly-line representation of the planar figure. */
-    virtual void GeneratePolyLine() override;
+    void GeneratePolyLine() override;
 
     float m_TensionParameter;
     int m_SubdivisionRounds;

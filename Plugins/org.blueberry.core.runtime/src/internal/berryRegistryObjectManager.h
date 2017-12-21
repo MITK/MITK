@@ -56,7 +56,7 @@ public:
   };
 
   RegistryObjectManager(ExtensionRegistry* registry);
-  ~RegistryObjectManager();
+  ~RegistryObjectManager() override;
 
   void Add(const SmartPointer<RegistryObject>& registryObject, bool hold);
 

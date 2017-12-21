@@ -46,13 +46,13 @@ namespace mitk
 
       virtual const mitk::Contour *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
   protected:
     ContourVtkMapper3D();
-    virtual ~ContourVtkMapper3D();
+    ~ContourVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
     vtkSmartPointer<vtkTubeFilter> m_TubeFilter;

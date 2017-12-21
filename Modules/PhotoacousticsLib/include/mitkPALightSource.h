@@ -88,7 +88,7 @@ namespace mitk {
 
       LightSource(TiXmlElement* element, bool verbose);
       LightSource();
-      virtual ~LightSource();
+      ~LightSource() override;
 
       void ParseAngle(TiXmlElement* direction, std::string angle);
 

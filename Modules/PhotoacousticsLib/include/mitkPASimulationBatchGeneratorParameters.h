@@ -52,7 +52,7 @@ namespace mitk {
 
     protected:
       SimulationBatchGeneratorParameters();
-      virtual ~SimulationBatchGeneratorParameters();
+      ~SimulationBatchGeneratorParameters() override;
 
     private:
 

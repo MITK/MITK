@@ -126,7 +126,7 @@ namespace mitk
     /** \brief Apply color and opacity properties read from the PropertyList.
     * The actor is not used in the GLMappers. Called by mapper subclasses.
     */
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = nullptr) override;
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = nullptr) override;
 
   protected:
     enum PlanarFigureDisplayMode
@@ -140,7 +140,7 @@ namespace mitk
 
     PlanarFigureMapper2D();
 
-    virtual ~PlanarFigureMapper2D();
+    ~PlanarFigureMapper2D() override;
 
     /**
     * \brief Renders all the lines defined by the PlanarFigure.

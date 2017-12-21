@@ -225,9 +225,9 @@ namespace mitk
 
     Tool();             // purposely hidden
     Tool(const char *); // purposely hidden
-    virtual ~Tool();
+    ~Tool() override;
 
-    virtual void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
+    void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
 
     bool FilterEvents(InteractionEvent *, DataNode *) override;
 

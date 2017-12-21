@@ -32,7 +32,7 @@ namespace mitk
   {
   public:
     virtual ConfidenceLevel GetReaderConfidenceLevel() const { return AbstractFileReader::GetConfidenceLevel(); }
-    virtual ConfidenceLevel GetConfidenceLevel() const override { return this->GetReaderConfidenceLevel(); }
+    ConfidenceLevel GetConfidenceLevel() const override { return this->GetReaderConfidenceLevel(); }
   protected:
     AbstractFileIOReader() {}
     AbstractFileIOReader(const CustomMimeType &mimeType, const std::string &description)
@@ -48,7 +48,7 @@ namespace mitk
   struct AbstractFileIOWriter : public AbstractFileWriter
   {
     virtual ConfidenceLevel GetWriterConfidenceLevel() const { return AbstractFileWriter::GetConfidenceLevel(); }
-    virtual ConfidenceLevel GetConfidenceLevel() const override { return this->GetWriterConfidenceLevel(); }
+    ConfidenceLevel GetConfidenceLevel() const override { return this->GetWriterConfidenceLevel(); }
   protected:
     AbstractFileIOWriter(const std::string &baseDataType) : AbstractFileWriter(baseDataType) {}
     AbstractFileIOWriter(const std::string &baseDataType,
@@ -85,9 +85,9 @@ namespace mitk
     void SetWriterOptions(const Options &options);
     void SetWriterOption(const std::string &name, const us::Any &value);
 
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
 
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
     std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileWriter>> RegisterService(
       us::ModuleContext *context = us::GetModuleContext());
@@ -154,8 +154,8 @@ namespace mitk
 
     virtual AbstractFileIO *IOClone() const = 0;
 
-    virtual IFileReader *ReaderClone() const override;
-    virtual IFileWriter *WriterClone() const override;
+    IFileReader *ReaderClone() const override;
+    IFileWriter *WriterClone() const override;
   };
 }
 

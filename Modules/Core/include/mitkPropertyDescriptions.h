@@ -26,7 +26,7 @@ namespace mitk
   {
   public:
     PropertyDescriptions();
-    ~PropertyDescriptions();
+    ~PropertyDescriptions() override;
 
     bool AddDescription(const std::string &propertyName,
                         const std::string &description,

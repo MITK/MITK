@@ -138,7 +138,7 @@ public:
   /**
    * Disconnects all standard event listeners
    */
-  virtual ~QmitkAbstractView();
+  ~QmitkAbstractView() override;
 
 protected:
 

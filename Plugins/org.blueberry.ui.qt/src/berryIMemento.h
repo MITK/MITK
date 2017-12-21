@@ -242,7 +242,7 @@ struct BERRY_UI_QT IMemento: public Object
    */
   virtual void PutTextData(const QString& data) = 0;
 
-  virtual ~IMemento();
+  ~IMemento() override;
 };
 
 } // namespace berry

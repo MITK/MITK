@@ -46,7 +46,7 @@ namespace mitk
     */
     virtual bool UnRegisterInputDevice() = 0;
 
-    virtual ~IInputDevice() {}
+    ~IInputDevice() override {}
 
   }; // end struct IInputDevice
 } // end namespace mitk

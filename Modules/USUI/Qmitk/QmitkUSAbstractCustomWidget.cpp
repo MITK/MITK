@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 std::string QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS()
 {
-  static std::string s = "ork.mitk.services.UltrasoundCustomWidget.deviceClass";
+  static std::string s = "org.mitk.services.UltrasoundCustomWidget.deviceClass";
   return s;
 }
 

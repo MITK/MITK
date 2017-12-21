@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
-                                             Qt::WindowFlags f,
+                                             Qt::WindowFlags,
                                              mitk::BaseRenderer *b,
                                              QmitkStdMultiWidget *mw)
   : QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint),

@@ -874,6 +874,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
 
   double doseValue = level->GetDoseValue()*pref;
   mitk::IsoDoseLevel::ColorType isoColor = level->GetColor();
+
   unsigned char colorLine[3] = {static_cast<unsigned char>(isoColor.GetRed()*255),
                                 static_cast<unsigned char>(isoColor.GetGreen()*255),
                                 static_cast<unsigned char>(isoColor.GetBlue()*255)};
@@ -904,7 +905,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
 
       //if   vvvvv  not the last line vvvvv
@@ -915,7 +916,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
 
       //if   vvvvv  not the first pixel vvvvv
@@ -926,7 +927,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
 
       //if   vvvvv  not the last pixel vvvvv
@@ -937,7 +938,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
 
       /*  now consider pixels at the edge of the image  */
@@ -950,7 +951,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
 
       //if   vvvvv  right edge of image vvvvv
@@ -961,7 +962,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
 
       //if   vvvvv  bottom edge of image vvvvv
@@ -972,7 +973,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
 
       //if   vvvvv  top edge of image vvvvv
@@ -983,7 +984,7 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
         lines->InsertNextCell(2);
         lines->InsertCellPoint(p1);
         lines->InsertCellPoint(p2);
-        colors->InsertNextTupleValue(colorLine);
+        colors->InsertNextTypedTuple(colorLine);
       }
     }//end if currentpixel is set
 

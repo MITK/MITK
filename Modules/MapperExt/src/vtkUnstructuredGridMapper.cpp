@@ -196,10 +196,10 @@ void vtkUnstructuredGridMapper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkUnstructuredGridMapper::GetMTime()
+vtkMTimeType vtkUnstructuredGridMapper::GetMTime()
 {
-  unsigned long mTime=this->vtkMapper::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime=this->vtkMapper::GetMTime();
+  vtkMTimeType time;
 
   if ( this->LookupTable != NULL )
     {

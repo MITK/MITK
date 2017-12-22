@@ -42,9 +42,9 @@ namespace mitk
       /**
        * reimplemented from Baseclass
        */
-      void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type);
+      void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
-    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor=nullptr);
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor=nullptr) override;
 
     /**
      * return a refernce of the rendered data object
@@ -54,7 +54,7 @@ namespace mitk
   protected:
     ContourMapper2D();
 
-    virtual ~ContourMapper2D();
+    ~ContourMapper2D() override;
   };
 
 } // namespace mitk

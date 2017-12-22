@@ -41,9 +41,9 @@ namespace mitk
       itkCloneMacro(Self)
 
       /** \brief returns the a prop assembly */
-      virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+      vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
@@ -53,19 +53,19 @@ namespace mitk
       LocalStorage();
 
       /* destructor */
-      ~LocalStorage();
+      ~LocalStorage() override;
       vtkSmartPointer<vtkGLMapperProp> m_GLMapperProp;
     };
 
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
 
     void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
-    virtual void Update(BaseRenderer *renderer) override;
+    void Update(BaseRenderer *renderer) override;
 
-    virtual void SetDataNode(DataNode *node) override;
+    void SetDataNode(DataNode *node) override;
 
-    virtual DataNode *GetDataNode() const override;
+    DataNode *GetDataNode() const override;
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;
@@ -76,7 +76,7 @@ namespace mitk
     VtkGLMapperWrapper(GLMapper::Pointer mitkGLMapper);
 
     /* destructor */
-    virtual ~VtkGLMapperWrapper();
+    ~VtkGLMapperWrapper() override;
     void Enable2DOpenGL(mitk::BaseRenderer *);
     void Disable2DOpenGL();
   };

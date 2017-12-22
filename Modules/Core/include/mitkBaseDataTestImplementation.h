@@ -34,7 +34,7 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual void InitializeTimeGeometry(unsigned int timeSteps /* = 1 */) override
+      void InitializeTimeGeometry(unsigned int timeSteps /* = 1 */) override
     {
       Superclass::InitializeTimeGeometry(timeSteps);
     }
@@ -42,13 +42,13 @@ namespace mitk
   protected:
     mitkCloneMacro(Self);
 
-    virtual bool VerifyRequestedRegion() override { return false; };
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; };
-    virtual void SetRequestedRegionToLargestPossibleRegion() override{};
-    virtual void SetRequestedRegion(const itk::DataObject * /*data*/) override{};
+    bool VerifyRequestedRegion() override { return false; };
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; };
+    void SetRequestedRegionToLargestPossibleRegion() override{};
+    void SetRequestedRegion(const itk::DataObject * /*data*/) override{};
 
     BaseDataTestImplementation(){};
-    virtual ~BaseDataTestImplementation(){};
+    ~BaseDataTestImplementation() override{};
   };
 
 } // namespace

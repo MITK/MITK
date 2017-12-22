@@ -90,9 +90,9 @@ namespace mitk
     const Image *GetLastDifferenceImage() { return m_SliceDifferenceImage.GetPointer(); }
   protected:
     OverwriteDirectedPlaneImageFilter(); // purposely hidden
-    virtual ~OverwriteDirectedPlaneImageFilter();
+    ~OverwriteDirectedPlaneImageFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void ItkSliceOverwriting(itk::Image<TPixel, VImageDimension> *input3D);

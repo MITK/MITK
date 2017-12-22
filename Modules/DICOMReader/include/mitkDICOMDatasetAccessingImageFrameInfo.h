@@ -39,7 +39,7 @@ namespace mitk
 
   protected:
       DICOMDatasetAccessingImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
-      virtual ~DICOMDatasetAccessingImageFrameInfo();
+      ~DICOMDatasetAccessingImageFrameInfo() override;
 
     private:
       DICOMDatasetAccessingImageFrameInfo(const DICOMDatasetAccessingImageFrameInfo::Pointer& frameinfo);

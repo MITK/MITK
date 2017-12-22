@@ -45,14 +45,14 @@ namespace mitk
   public:
     typedef DICOMCachedValueLookupTable Self;
     typedef GenericLookupTable< DICOMCachedValueInfo >   Superclass;
-    virtual const char *GetNameOfClass() const
+    const char *GetNameOfClass() const override
     {
       return "DICOMCachedValueLookupTable";
     }
 
     DICOMCachedValueLookupTable() {}
-    virtual Superclass& operator=(const Superclass& other) { return Superclass::operator=(other); }
-    virtual ~DICOMCachedValueLookupTable() {}
+    Superclass& operator=(const Superclass& other) override { return Superclass::operator=(other); }
+    ~DICOMCachedValueLookupTable() override {}
   };
 
   /**

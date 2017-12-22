@@ -67,7 +67,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
     */
     XMLMemento(Poco::XML::Document* document, Poco::XML::Element* elem);
 
-    ~XMLMemento();
+    ~XMLMemento() override;
 
     /**
      * Creates a <code>Document</code> from the <code>Reader</code>
@@ -118,7 +118,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param type the type
      * @return a new child memento with the given type
     */
-    virtual IMemento::Pointer CreateChild(const QString& type) override;
+    IMemento::Pointer CreateChild(const QString& type) override;
 
     /**
      * Creates a new child of this memento with the given type and id.
@@ -134,7 +134,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @return a new child memento with the given type and id
      * @see #getID
      */
-    virtual IMemento::Pointer CreateChild(const QString& type, const QString& id) override;
+    IMemento::Pointer CreateChild(const QString& type, const QString& id) override;
 
     /**
      * Returns the first child with the given type id.
@@ -142,7 +142,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param type the type id
      * @return the first child with the given type
      */
-    virtual IMemento::Pointer GetChild(const QString& type) const override;
+    IMemento::Pointer GetChild(const QString& type) const override;
 
     /**
      * Returns all children with the given type id.
@@ -150,37 +150,37 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param type the type id
      * @return an array of children with the given type
      */
-    virtual QList< IMemento::Pointer > GetChildren(const QString& type) const override;
+    QList< IMemento::Pointer > GetChildren(const QString& type) const override;
 
     /**
      * Returns the Type of this memento
     */
-    virtual QString GetType() const override;
+    QString GetType() const override;
 
     /**
      * Returns the ID of this memento
      */
-    virtual QString GetID() const override;
+    QString GetID() const override;
 
     /**
      * @see IMemento#GetInteger
      */
-    virtual bool GetInteger(const QString& key, int& value) const override;
+    bool GetInteger(const QString& key, int& value) const override;
 
     /**
      * @see IMemento#GetFloat
      */
-    virtual bool GetFloat(const QString& key, double& value) const override;
+    bool GetFloat(const QString& key, double& value) const override;
 
     /**
      * @see IMemento#GetString
      */
-    virtual bool GetString(const QString& key, QString& value) const override;
+    bool GetString(const QString& key, QString& value) const override;
 
     /**
      * @see IMemento#GetString
      */
-    virtual bool GetBoolean(const QString& key, bool& value) const override;
+    bool GetBoolean(const QString& key, bool& value) const override;
 
     /**
      * Returns the data of the Text node of the memento. Each memento is allowed
@@ -189,7 +189,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @return the data of the Text node of the memento, or <code>null</code>
      * if the memento has no Text node.
      */
-    virtual QString GetTextData() const override;
+    QString GetTextData() const override;
 
     /**
      * Returns an array of all the attribute keys of the memento. This will not
@@ -197,7 +197,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * be returned.
      * @return an vector with all the attribute keys of the memento
      */
-    virtual QList< QString > GetAttributeKeys() const override;
+    QList< QString > GetAttributeKeys() const override;
 
     /**
      * Puts a float in this memento
@@ -205,7 +205,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param key the key
      * @param value the value
      */
-    virtual void PutFloat(const QString& key, double value) override;
+    void PutFloat(const QString& key, double value) override;
 
     /**
      * Puts a integer in this memento
@@ -213,7 +213,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param key the key
      * @param value the value
      */
-    virtual void PutInteger(const QString& key, int value) override;
+    void PutInteger(const QString& key, int value) override;
 
     /**
      * Puts another memento in this memento as a child
@@ -221,7 +221,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param key the key
      * @param value the value
      */
-    virtual void PutMemento(IMemento::Pointer memento) override;
+    void PutMemento(IMemento::Pointer memento) override;
 
     /**
      * Puts a string in this memento
@@ -229,7 +229,7 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param key the key
      * @param value the value
      */
-    virtual void PutString(const QString& key, const QString& value) override;
+    void PutString(const QString& key, const QString& value) override;
 
     /**
      * Puts a boolean in this memento
@@ -237,14 +237,14 @@ class BERRY_UI_QT XMLMemento : public IMemento
      * @param key the key
      * @param value the value
      */
-    virtual void PutBoolean(const QString& key, bool value) override;
+    void PutBoolean(const QString& key, bool value) override;
 
     /**
      * Puts a text in this memento
      *
      * @param data the text
      */
-    virtual void PutTextData(const QString& data) override;
+    void PutTextData(const QString& data) override;
 
     /**
      * Saves this memento's document current values to the

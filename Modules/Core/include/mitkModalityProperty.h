@@ -47,14 +47,14 @@ namespace mitk
     ModalityProperty(const IdType &value);
     ModalityProperty(const std::string &value);
 
-    virtual ~ModalityProperty();
+    ~ModalityProperty() override;
     virtual void AddEnumerationTypes();
 
   private:
     // purposely not implemented
     const ModalityProperty &operator=(const ModalityProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

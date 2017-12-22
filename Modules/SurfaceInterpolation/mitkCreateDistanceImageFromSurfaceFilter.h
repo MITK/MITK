@@ -126,9 +126,9 @@ namespace mitk
 
   protected:
     CreateDistanceImageFromSurfaceFilter();
-    virtual ~CreateDistanceImageFromSurfaceFilter();
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    ~CreateDistanceImageFromSurfaceFilter() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
   private:
     void CreateSolutionMatrixAndFunctionValues();

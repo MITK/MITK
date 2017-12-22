@@ -45,7 +45,7 @@ namespace mitk
       /**
       * reimplemented from Baseclass
       */
-      virtual void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
+      void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
@@ -54,7 +54,7 @@ namespace mitk
   protected:
     ContourModelSetGLMapper2D();
 
-    virtual ~ContourModelSetGLMapper2D();
+    ~ContourModelSetGLMapper2D() override;
 
   private:
     /**

@@ -32,7 +32,7 @@ class HelpSearchView : public QtViewPart
 public:
 
   HelpSearchView();
-  ~HelpSearchView();
+  ~HelpSearchView() override;
 
   void SetFocus() override;
 

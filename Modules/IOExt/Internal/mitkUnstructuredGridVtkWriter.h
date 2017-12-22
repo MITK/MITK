@@ -103,15 +103,15 @@ namespace mitk
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions() override;
+    std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const override { return UnstructuredGrid::GetStaticNameOfClass(); }
+    std::string GetSupportedBaseData() const override { return UnstructuredGrid::GetStaticNameOfClass(); }
     // FileWriterWithInformation methods
-    virtual const char *GetDefaultFilename() override;
-    virtual const char *GetFileDialogPattern() override;
-    virtual const char *GetDefaultExtension() override;
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override;
-    virtual void DoWrite(BaseData::Pointer data) override;
+    const char *GetDefaultFilename() override;
+    const char *GetFileDialogPattern() override;
+    const char *GetDefaultExtension() override;
+    bool CanWriteBaseDataType(BaseData::Pointer data) override;
+    void DoWrite(BaseData::Pointer data) override;
 
   protected:
     /**
@@ -122,11 +122,11 @@ namespace mitk
     /**
      * Virtual destructor.
      */
-    virtual ~UnstructuredGridVtkWriter();
+    ~UnstructuredGridVtkWriter() override;
 
     void ExecuteWrite(VTKWRITER *vtkWriter);
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     std::string m_FileName;
 

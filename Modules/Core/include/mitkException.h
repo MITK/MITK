@@ -54,7 +54,7 @@ namespace mitk
     {
     }
 
-    virtual ~Exception() throw() {}
+    ~Exception() throw() override {}
     itkTypeMacro(ClassName, SuperClassName);
 
     /** \brief Adds rethrow data to this exception. */

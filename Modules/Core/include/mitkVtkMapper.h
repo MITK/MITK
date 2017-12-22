@@ -128,7 +128,7 @@ namespace mitk
     * \brief Apply color and opacity properties read from the PropertyList.
     * Called by mapper subclasses.
     */
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
 
     /**
     * \brief  Release vtk-based graphics resources that are being consumed by this mapper.
@@ -148,7 +148,7 @@ namespace mitk
     VtkMapper();
 
     /** virtual destructor in order to derive from this class */
-    virtual ~VtkMapper();
+    ~VtkMapper() override;
 
   private:
     /** copy constructor */

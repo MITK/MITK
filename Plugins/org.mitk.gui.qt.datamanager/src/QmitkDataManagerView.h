@@ -70,7 +70,7 @@ public:
   ///
   /// \brief Standard dtor.
   ///
-  virtual ~QmitkDataManagerView();
+  ~QmitkDataManagerView() override;
 
 public slots:
   ///
@@ -178,7 +178,7 @@ protected:
   ///
   /// \brief Create the view here.
   ///
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
   void SetFocus() override;
 
@@ -190,7 +190,7 @@ protected:
   ///
   /// React to node changes. Overridden from QmitkAbstractView.
   ///
-  virtual void NodeChanged(const mitk::DataNode* /*node*/) override;
+  void NodeChanged(const mitk::DataNode* /*node*/) override;
 protected:
 
   QWidget* m_Parent;

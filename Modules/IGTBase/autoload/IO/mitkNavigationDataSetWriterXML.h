@@ -28,17 +28,17 @@ namespace mitk {
   public:
 
     NavigationDataSetWriterXML();
-    virtual ~NavigationDataSetWriterXML();
+    ~NavigationDataSetWriterXML() override;
 
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   protected:
 
     NavigationDataSetWriterXML(const NavigationDataSetWriterXML& other);
 
-    virtual mitk::NavigationDataSetWriterXML* Clone() const override;
+    mitk::NavigationDataSetWriterXML* Clone() const override;
 
     virtual void StreamHeader (std::ostream* stream, mitk::NavigationDataSet::ConstPointer data);
     virtual void StreamData (std::ostream* stream, mitk::NavigationDataSet::ConstPointer data);

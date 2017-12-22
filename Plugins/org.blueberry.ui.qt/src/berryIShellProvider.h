@@ -38,7 +38,7 @@ struct BERRY_UI_QT IShellProvider : public virtual Object
 
   berryObjectMacro(berry::IShellProvider, Object)
 
-  ~IShellProvider();
+  ~IShellProvider() override;
 
     /**
      * Returns the current shell (or null if none). This return value may

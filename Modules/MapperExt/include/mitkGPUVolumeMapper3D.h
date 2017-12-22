@@ -57,24 +57,24 @@ namespace mitk
 
       virtual const mitk::Image *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
+    void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
      * ProgressEvent on BaseRenderer. */
-    virtual bool IsLODEnabled(BaseRenderer *renderer = nullptr) const override;
+    bool IsLODEnabled(BaseRenderer *renderer = nullptr) const override;
     bool IsMIPEnabled(BaseRenderer *renderer = nullptr);
     bool IsGPUEnabled(BaseRenderer *renderer = nullptr);
     bool IsRAYEnabled(BaseRenderer *renderer = nullptr);
 
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer) override;
+    void MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer) override;
 
   protected:
     GPUVolumeMapper3D();
-    virtual ~GPUVolumeMapper3D();
+    ~GPUVolumeMapper3D() override;
 
     bool IsRenderable(mitk::BaseRenderer *renderer);
 
@@ -95,7 +95,7 @@ namespace mitk
 
     void InitVtkMapper(mitk::BaseRenderer *renderer);
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     void CreateDefaultTransferFunctions();
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
@@ -146,7 +146,7 @@ namespace mitk
         m_raySupported = true; // assume initially gpu raycasting is supported
       }
 
-      ~LocalStorage()
+      ~LocalStorage() override
       {
         if (m_cpuInitialized && m_MapperCPU && m_VtkRenderWindow)
           m_MapperCPU->ReleaseGraphicsResources(m_VtkRenderWindow);

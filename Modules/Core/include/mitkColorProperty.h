@@ -85,10 +85,10 @@ namespace mitk
     // purposely not implemented
     ColorProperty &operator=(const ColorProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty &property) const override;
-    virtual bool Assign(const BaseProperty &property) override;
+    bool IsEqual(const BaseProperty &property) const override;
+    bool Assign(const BaseProperty &property) override;
   };
 
 #ifdef _MSC_VER

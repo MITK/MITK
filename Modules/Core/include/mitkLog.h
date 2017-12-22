@@ -95,7 +95,7 @@ namespace mitk
      */
     static void CatchLogFileCommandLineParameter(int &argc, char **argv);
 
-    virtual mbilog::OutputType GetOutputType() const override;
+    mbilog::OutputType GetOutputType() const override;
 
   protected:
     /** Checks if a file exists.

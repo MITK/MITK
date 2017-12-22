@@ -56,7 +56,7 @@ namespace mitk
   protected:
     ImageToContourModelFilter();
 
-    virtual ~ImageToContourModelFilter();
+    ~ImageToContourModelFilter() override;
 
     void GenerateData() override;
 

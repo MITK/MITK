@@ -56,7 +56,7 @@ public:
 
   ///
   /// Standard dtor. Nothing to do here.
-  virtual ~QmitkPropertiesTableModel();
+  ~QmitkPropertiesTableModel() override;
 
   //# PUBLIC GETTER
 public:

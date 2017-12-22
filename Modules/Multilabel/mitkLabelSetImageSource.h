@@ -45,17 +45,17 @@ namespace mitk
        * @param idx the index of the output for which an object should be created
        * @returns the new object
        */
-      virtual itk::DataObject::Pointer
+      itk::DataObject::Pointer
       MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
      */
-    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
+    itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
   protected:
     LabelSetImageSource();
 
-    virtual ~LabelSetImageSource();
+    ~LabelSetImageSource() override;
   };
 
 } // namespace mitk

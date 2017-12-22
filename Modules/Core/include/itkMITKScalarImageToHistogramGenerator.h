@@ -74,7 +74,7 @@ namespace itk
 
     protected:
       MITKScalarImageToHistogramGenerator();
-      virtual ~MITKScalarImageToHistogramGenerator(){};
+      ~MITKScalarImageToHistogramGenerator() override{};
       void PrintSelf(std::ostream &os, Indent indent) const override;
 
     private:

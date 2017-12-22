@@ -124,7 +124,7 @@ namespace berry
   {
     berryObjectMacro(berry::IPreferences)
 
-    virtual ~IPreferences();
+    ~IPreferences() override;
 
     /**
      * Associates the specified value with the specified key in this node.

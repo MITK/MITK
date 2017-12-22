@@ -69,13 +69,13 @@ namespace itk
     typedef itk::ImageRegion<2> RegionType;
 
     /** \brief calculates the costs for going from p1 to p2*/
-    virtual double GetCost(IndexType p1, IndexType p2) override;
+    double GetCost(IndexType p1, IndexType p2) override;
 
     /** \brief returns the minimal costs possible (needed for A*)*/
-    virtual double GetMinCost() override;
+    double GetMinCost() override;
 
     /** \brief Initialize the metric*/
-    virtual void Initialize() override;
+    void Initialize() override;
 
     /** \brief Add void pixel in cost map*/
     virtual void AddRepulsivePoint(const IndexType &index);
@@ -93,7 +93,7 @@ namespace itk
     itkSetMacro(UseApproximateGradient, bool);
     itkGetMacro(UseApproximateGradient, bool);
 
-    virtual void SetImage(const TInputImageType *_arg) override;
+    void SetImage(const TInputImageType *_arg) override;
 
     void SetDynamicCostMap(std::map<int, int> &costMap)
     {
@@ -131,7 +131,7 @@ namespace itk
   protected:
     ShortestPathCostFunctionLiveWire();
 
-    virtual ~ShortestPathCostFunctionLiveWire(){};
+    ~ShortestPathCostFunctionLiveWire() override{};
 
     FloatImageType::Pointer m_GradientMagnitudeImage;
     FloatImageType::Pointer m_EdgeImage;

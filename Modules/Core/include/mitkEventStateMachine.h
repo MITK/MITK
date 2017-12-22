@@ -155,7 +155,7 @@ namespace mitk
     void EnableInteraction(bool enable) { m_IsActive = enable; }
   protected:
     EventStateMachine();
-    virtual ~EventStateMachine();
+    ~EventStateMachine() override;
 
     typedef MessageAbstractDelegate2<StateMachineAction *, InteractionEvent *, void> ActionFunctionDelegate;
     typedef MessageAbstractDelegate1<const InteractionEvent *, bool> ConditionFunctionDelegate;

@@ -54,7 +54,7 @@ class MITKIMAGESTATISTICS_EXPORT MaskUtilities: public itk::Object
     protected:
         MaskUtilities(){}
 
-        ~MaskUtilities(){}
+        ~MaskUtilities() override{}
 
     private:
         itk::Image<TPixel, VImageDimension>* m_Image;

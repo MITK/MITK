@@ -43,13 +43,13 @@ namespace mitk
     //##
     itkGetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
 
-    virtual void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer *targetLandmarks) override;
+    void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer *targetLandmarks) override;
 
   protected:
     PlaneLandmarkProjector();
-    virtual ~PlaneLandmarkProjector();
+    ~PlaneLandmarkProjector() override;
 
-    virtual void ComputeCompleteAbstractTransform() override;
+    void ComputeCompleteAbstractTransform() override;
 
     mitk::PlaneGeometry::ConstPointer m_ProjectionPlane;
   };

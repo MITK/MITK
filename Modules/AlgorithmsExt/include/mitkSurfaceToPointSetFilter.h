@@ -45,10 +45,10 @@ namespace mitk
 
   protected:
     SurfaceToPointSetFilter();
-    ~SurfaceToPointSetFilter();
+    ~SurfaceToPointSetFilter() override;
 
     /** @brief method generating the output of this filter. Called in the updated process of the pipeline. */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     //############### members ########################
     mitk::Surface::Pointer m_InputSurface;

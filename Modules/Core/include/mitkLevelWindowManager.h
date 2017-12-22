@@ -122,7 +122,7 @@ namespace mitk
 
   protected:
     LevelWindowManager();
-    ~LevelWindowManager();
+    ~LevelWindowManager() override;
 
     DataStorage::Pointer m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image

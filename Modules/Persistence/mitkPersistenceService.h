@@ -39,7 +39,7 @@ namespace mitk
 
     PersistenceService();
 
-    ~PersistenceService();
+    ~PersistenceService() override;
 
     std::string GetDefaultPersistenceFile() override;
 

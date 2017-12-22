@@ -133,7 +133,7 @@ namespace mitk
 
   protected:
     FileWriter();
-    virtual ~FileWriter();
+    ~FileWriter() override;
 
     bool m_CanWriteToMemory;
     bool m_WriteToMemory;

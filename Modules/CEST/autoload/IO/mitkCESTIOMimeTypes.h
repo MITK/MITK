@@ -36,8 +36,8 @@ namespace mitk
     {
     public:
       MitkCESTDicomMimeType();
-      virtual bool AppliesTo(const std::string &path) const override;
-      virtual MitkCESTDicomMimeType *Clone() const override;
+      bool AppliesTo(const std::string &path) const override;
+      MitkCESTDicomMimeType *Clone() const override;
     };
 
     static MitkCESTDicomMimeType CEST_DICOM_MIMETYPE();

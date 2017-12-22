@@ -55,16 +55,16 @@ namespace mitk
        * producing (n-1)-cells.
        * @param renderer the render to render in.
        */
-      virtual void Paint(mitk::BaseRenderer *renderer) override;
+      void Paint(mitk::BaseRenderer *renderer) override;
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
   protected:
     UnstructuredGridMapper2D();
 
-    virtual ~UnstructuredGridMapper2D();
+    ~UnstructuredGridMapper2D() override;
 
-    virtual void GenerateDataForRenderer(BaseRenderer *) override;
+    void GenerateDataForRenderer(BaseRenderer *) override;
 
     /**
      * Determines, if the associated BaseData is mapped three-dimensionally (mapper-slot id 2)

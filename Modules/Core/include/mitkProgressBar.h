@@ -71,7 +71,7 @@ namespace mitk
 
     ProgressBar();
 
-    virtual ~ProgressBar();
+    ~ProgressBar() override;
 
     ProgressBarImplementationsList m_Implementations;
 

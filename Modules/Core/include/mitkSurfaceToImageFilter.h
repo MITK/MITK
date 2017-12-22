@@ -67,11 +67,11 @@ namespace mitk
     itkGetConstMacro(Tolerance, double);
     itkSetMacro(Tolerance, double);
 
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     const mitk::Surface *GetInput(void);
 
@@ -85,7 +85,7 @@ namespace mitk
   protected:
     SurfaceToImageFilter();
 
-    virtual ~SurfaceToImageFilter();
+    ~SurfaceToImageFilter() override;
 
     void Stencil3DImage(int time = 0);
 

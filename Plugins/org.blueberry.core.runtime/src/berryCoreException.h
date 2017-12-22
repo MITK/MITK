@@ -47,7 +47,7 @@ public:
    */
   CoreException(const SmartPointer<IStatus>& status);
 
-  ~CoreException() throw();
+  ~CoreException() throw() override;
 
   const char* name() const throw() override;
 

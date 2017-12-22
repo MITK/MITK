@@ -63,7 +63,7 @@ struct BERRY_UI_QT IPerspectiveDescriptor : public virtual Object
 
   berryObjectMacro(berry::IPerspectiveDescriptor)
 
-  virtual ~IPerspectiveDescriptor();
+  ~IPerspectiveDescriptor() override;
 
     /**
      * Returns the description of this perspective.

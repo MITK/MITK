@@ -76,8 +76,8 @@ namespace mitk
     bool CanHandle(BaseData *referenceData) const override;
 
     /* icon stuff */
-    virtual const char **GetXPM() const override;
-    virtual const char *GetName() const override;
+    const char **GetXPM() const override;
+    const char *GetName() const override;
     us::ModuleResource GetIconResource() const override;
 
     /// \brief Set parameter used in Threshold filter.
@@ -112,10 +112,10 @@ namespace mitk
 
   protected:
     FastMarchingTool3D();
-    virtual ~FastMarchingTool3D();
+    ~FastMarchingTool3D() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
     virtual void Initialize();
 
     /// \brief Add point action of StateMachine pattern

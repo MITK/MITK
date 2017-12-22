@@ -28,7 +28,7 @@ struct IObjectManager : public Object
 {
   berryObjectMacro(berry::IObjectManager)
 
-  virtual ~IObjectManager();
+  ~IObjectManager() override;
 
   virtual SmartPointer<Handle> GetHandle(int id, short type) const = 0;
 

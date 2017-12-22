@@ -32,7 +32,7 @@ namespace mitk
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       protected : PropertyExtension();
-    virtual ~PropertyExtension();
+    ~PropertyExtension() override;
 
   private:
     PropertyExtension(const Self &other);

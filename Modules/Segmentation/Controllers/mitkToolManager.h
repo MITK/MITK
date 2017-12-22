@@ -258,7 +258,7 @@ namespace mitk
       oldERISstuff".
     */
     ToolManager(DataStorage *storage); // purposely hidden
-    virtual ~ToolManager();
+    ~ToolManager() override;
 
     ToolVectorType m_Tools;
 

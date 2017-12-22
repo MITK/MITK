@@ -36,7 +36,7 @@ struct BERRY_UI_QT IReusableEditor : public virtual IEditorPart
 
   berryObjectMacro(berry::IReusableEditor)
 
-  virtual ~IReusableEditor();
+  ~IReusableEditor() override;
 
     /**
      * Sets the input to this editor.

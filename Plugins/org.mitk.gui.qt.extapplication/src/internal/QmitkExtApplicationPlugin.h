@@ -31,7 +31,7 @@ class QmitkExtApplicationPlugin : public berry::AbstractUICTKPlugin
 public:
 
   QmitkExtApplicationPlugin();
-  ~QmitkExtApplicationPlugin();
+  ~QmitkExtApplicationPlugin() override;
 
   static QmitkExtApplicationPlugin* GetDefault();
 

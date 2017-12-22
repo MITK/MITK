@@ -67,7 +67,7 @@ public:
 
   void Initialize(IServiceLocator* locator) override;
 
-  ~WorkbenchSourceProvider();
+  ~WorkbenchSourceProvider() override;
 
   QList<QString> GetProvidedSourceNames() const override;
 

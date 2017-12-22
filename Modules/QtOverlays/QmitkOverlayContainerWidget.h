@@ -40,13 +40,13 @@ public:
   /**
   * @brief Default Destructor
   **/
-  virtual ~QmitkOverlayContainerWidget();
+  ~QmitkOverlayContainerWidget() override;
 
 protected:
   /**
   * @brief overridden version of paintEvent that correctly clears its canvas before painting.
   **/
-  virtual void paintEvent(QPaintEvent *event) override;
+  void paintEvent(QPaintEvent *event) override;
 };
 
 #endif /* QmitkOverlayContainerWidget_H_HEADER_INCLUDED_C10DC4EB */

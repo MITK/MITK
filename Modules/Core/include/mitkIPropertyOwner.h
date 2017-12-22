@@ -25,7 +25,7 @@ namespace mitk
   class MITKCORE_EXPORT IPropertyOwner : public IPropertyProvider
   {
   public:
-    virtual ~IPropertyOwner();
+    ~IPropertyOwner() override;
 
     /**
     * \brief Get property by its key.

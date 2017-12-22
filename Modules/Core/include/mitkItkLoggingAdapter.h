@@ -47,11 +47,11 @@ namespace mitk
         */
       static void Initialize();
 
-    virtual void DisplayText(const char *s) override;
+    void DisplayText(const char *s) override;
 
   protected:
     ItkLoggingAdapter();
-    virtual ~ItkLoggingAdapter();
+    ~ItkLoggingAdapter() override;
 
   private:
     ItkLoggingAdapter(const Self &); // purposely not implemented

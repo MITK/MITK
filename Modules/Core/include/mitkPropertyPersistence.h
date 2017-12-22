@@ -26,7 +26,7 @@ namespace mitk
   {
   public:
     PropertyPersistence();
-    ~PropertyPersistence();
+    ~PropertyPersistence() override;
 
     typedef IPropertyPersistence::InfoResultType InfoResultType;
 

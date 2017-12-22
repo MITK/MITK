@@ -30,11 +30,11 @@ namespace mitk
   public:
     SimpleUnstructuredGridHistogram();
 
-    virtual double GetMin() const override;
-    virtual double GetMax() const override;
+    double GetMin() const override;
+    double GetMax() const override;
 
-    virtual void ComputeFromBaseData(BaseData *source) override;
-    virtual float GetRelativeBin(double start, double end) const override;
+    void ComputeFromBaseData(BaseData *source) override;
+    float GetRelativeBin(double start, double end) const override;
 
   private:
     typedef double MeasurementType;

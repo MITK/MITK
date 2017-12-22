@@ -98,7 +98,7 @@ namespace mitk
     ImageDescriptor();
 
     /** Protected desctructor */
-    ~ImageDescriptor(){};
+    ~ImageDescriptor() override{};
 
   private:
     /** A std::vector holding a pointer to a ChannelDescriptor for each active channel of the image */

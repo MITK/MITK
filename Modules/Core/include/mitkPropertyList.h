@@ -227,7 +227,7 @@ namespace mitk
      * @brief Get the timestamp of the last change of the map or the last change of one of
      * the properties store in the list (whichever is later).
      */
-    virtual unsigned long GetMTime() const override;
+    unsigned long GetMTime() const override;
 
     /**
      * @brief Remove a property from the list/map.
@@ -242,7 +242,7 @@ namespace mitk
     PropertyList();
     PropertyList(const PropertyList &other);
 
-    virtual ~PropertyList();
+    ~PropertyList() override;
 
     /**
      * @brief Map of properties.
@@ -250,7 +250,7 @@ namespace mitk
     PropertyMap m_Properties;
 
   private:
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 } // namespace mitk

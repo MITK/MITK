@@ -132,7 +132,7 @@ public:
   HandlerAuthority(ICommandService* commandService,
                    IServiceLocator* locator);
 
-  ~HandlerAuthority();
+  ~HandlerAuthority() override;
 
   /**
    * Activates a handler on the workbench. This will add it to a master list.

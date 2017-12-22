@@ -37,7 +37,7 @@ namespace mitk
     {
     public:
       LocalStorage();
-      ~LocalStorage();
+      ~LocalStorage() override;
 
       bool IsUpdateRequired(mitk::BaseRenderer *renderer, mitk::Mapper *mapper, mitk::DataNode *dataNode);
 
@@ -70,7 +70,7 @@ namespace mitk
 
   private:
     BoundingShapeVtkMapper2D();
-    ~BoundingShapeVtkMapper2D();
+    ~BoundingShapeVtkMapper2D() override;
 
     BoundingShapeVtkMapper2D(const Self &);
     Self &operator=(const Self &);

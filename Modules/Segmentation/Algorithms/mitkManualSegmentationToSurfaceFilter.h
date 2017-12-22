@@ -57,7 +57,7 @@ namespace mitk
      * This method calls CreateSurface from mitkImageToSurfaceFilter and
      * does not need a manual call since we use Update().
      */
-    virtual void GenerateData() override;
+    void GenerateData() override;
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       /**
@@ -150,7 +150,7 @@ namespace mitk
 
   protected:
     ManualSegmentationToSurfaceFilter();
-    virtual ~ManualSegmentationToSurfaceFilter();
+    ~ManualSegmentationToSurfaceFilter() override;
 
     bool m_MedianFilter3D;
     int m_MedianKernelSizeX, m_MedianKernelSizeY, m_MedianKernelSizeZ;

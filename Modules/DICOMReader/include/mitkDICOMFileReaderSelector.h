@@ -85,7 +85,7 @@ class MITKDICOMREADER_EXPORT DICOMFileReaderSelector : public itk::LightObject
   protected:
 
     DICOMFileReaderSelector();
-    virtual ~DICOMFileReaderSelector();
+    ~DICOMFileReaderSelector() override;
 
     void AddConfigsFromResources(const std::string& path);
     void AddConfigFromResource(const std::string& resourcename);

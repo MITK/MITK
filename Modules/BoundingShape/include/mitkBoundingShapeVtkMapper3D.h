@@ -43,7 +43,7 @@ namespace mitk
 
   private:
     BoundingShapeVtkMapper3D();
-    ~BoundingShapeVtkMapper3D();
+    ~BoundingShapeVtkMapper3D() override;
 
     BoundingShapeVtkMapper3D(const Self &);
     Self &operator=(const Self &);

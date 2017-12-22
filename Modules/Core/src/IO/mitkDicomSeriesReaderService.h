@@ -27,10 +27,10 @@ namespace mitk
     DicomSeriesReaderService();
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   private:
-    virtual DicomSeriesReaderService *Clone() const override;
+    DicomSeriesReaderService *Clone() const override;
   };
 }
 

@@ -28,15 +28,15 @@ namespace mitk {
   {
   public:
     NavigationDataSetWriterCSV();
-    virtual~NavigationDataSetWriterCSV();
+    ~NavigationDataSetWriterCSV() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   protected:
     NavigationDataSetWriterCSV(const NavigationDataSetWriterCSV& other);
 
-    virtual mitk::NavigationDataSetWriterCSV* Clone() const override;
+    mitk::NavigationDataSetWriterCSV* Clone() const override;
   };
 }
 

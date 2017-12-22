@@ -110,7 +110,7 @@ namespace mitk
 
   protected:
     InteractionEventHandler();
-    virtual ~InteractionEventHandler();
+    ~InteractionEventHandler() override;
 
     /**
      * Returns a PropertyList in which the parameters defined in the config file are listed.

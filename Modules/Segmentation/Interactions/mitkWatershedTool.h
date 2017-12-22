@@ -75,10 +75,10 @@ namespace mitk
 
   protected:
     WatershedTool(); // purposely hidden
-    virtual ~WatershedTool();
+    ~WatershedTool() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
     double m_Threshold;

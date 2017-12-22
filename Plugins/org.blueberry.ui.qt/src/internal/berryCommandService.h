@@ -88,7 +88,7 @@ public:
    */
   CommandService( CommandManager* commandManager);
 
-  ~CommandService();
+  ~CommandService() override;
 
   void AddExecutionListener(IExecutionListener* listener) override;
 

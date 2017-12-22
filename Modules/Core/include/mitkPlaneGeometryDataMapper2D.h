@@ -57,12 +57,12 @@ namespace mitk
       virtual const mitk::PlaneGeometryData *GetInput() const;
 
     /** \brief returns the a prop assembly */
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     /** Applies properties specific to this mapper */
     virtual void ApplyAllProperties(BaseRenderer *renderer);
 
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     /** \brief set the default properties for this mapper */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
@@ -75,7 +75,7 @@ namespace mitk
       LocalStorage();
 
       /* destructor */
-      ~LocalStorage();
+      ~LocalStorage() override;
 
       // actor
       vtkSmartPointer<vtkActor2D> m_CrosshairActor;
@@ -95,10 +95,10 @@ namespace mitk
     PlaneGeometryDataMapper2D();
 
     /* destructor */
-    virtual ~PlaneGeometryDataMapper2D();
+    ~PlaneGeometryDataMapper2D() override;
 
     /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     void CreateVtkCrosshair(BaseRenderer *renderer);
 

@@ -40,7 +40,7 @@ class BERRY_UI_QT ExtensionFactory : public QObject, public IExecutableExtension
 
 public:
 
-  ~ExtensionFactory();
+  ~ExtensionFactory() override;
 
   /**
    * Factory ID for the Appearance preference page.

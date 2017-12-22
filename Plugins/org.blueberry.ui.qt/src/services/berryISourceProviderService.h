@@ -53,7 +53,7 @@ struct BERRY_UI_QT ISourceProviderService : public virtual Object
 
   berryObjectMacro(berry::ISourceProviderService)
 
-  virtual ~ISourceProviderService();
+  ~ISourceProviderService() override;
 
   /**
    * Retrieves a source provider providing the given source. This is used by

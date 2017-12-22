@@ -161,7 +161,7 @@ public:
   PartSashContainer(const QString& id, WorkbenchPage*  page,
       QWidget* parentWidget);
 
-  ~PartSashContainer();
+  ~PartSashContainer() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.ILayoutContainer#obscuredByZoom(org.blueberry.ui.internal.LayoutPart)
@@ -197,7 +197,7 @@ public:
   /**
    * Add a part.
    */
-  virtual void Add(LayoutPart::Pointer child) override;
+  void Add(LayoutPart::Pointer child) override;
 
   virtual void AddPart(LayoutPart::Pointer child);
 
@@ -308,7 +308,7 @@ protected:
    * @see LayoutPart#dispose
    */
 public:
-  virtual void Dispose() override;
+  void Dispose() override;
 
   /**
    * Subclasses override this method to dispose
@@ -417,7 +417,7 @@ private:
    * @return returns a new point where point.x is <= availableWidth and point.y is <= availableHeight
    */
 public:
-  virtual int ComputePreferredSize(bool width, int availableParallel,
+  int ComputePreferredSize(bool width, int availableParallel,
       int availablePerpendicular, int preferredParallel) override;
 
 public:

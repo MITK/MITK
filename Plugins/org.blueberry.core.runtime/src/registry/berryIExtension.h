@@ -60,7 +60,7 @@ struct org_blueberry_core_runtime_EXPORT IExtension : public virtual Object
 {
   berryObjectMacro(berry::IExtension)
 
-  virtual ~IExtension();
+  ~IExtension() override;
 
   /**
    * Returns all configuration elements declared by this extension.

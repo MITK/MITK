@@ -80,7 +80,7 @@ namespace mitk
     void ComputeOrthonormalCoordinateSystem(
       const int index, Vertex normal, CovarianceMatrix &principalComponents, Vertex variances, Vertex curVertex);
     CovarianceMatrixCalculator();
-    ~CovarianceMatrixCalculator();
+    ~CovarianceMatrixCalculator() override;
 
   public:
     mitkClassMacroItkParent(CovarianceMatrixCalculator, itk::Object) itkFactorylessNewMacro(Self) itkCloneMacro(Self)

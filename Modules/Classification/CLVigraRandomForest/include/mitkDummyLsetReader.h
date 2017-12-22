@@ -32,13 +32,13 @@ public:
 
     DummyLsetFileReader();
     DummyLsetFileReader(const mitk::DummyLsetFileReader& other);
-    virtual ~DummyLsetFileReader();
+    ~DummyLsetFileReader() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
-    virtual DummyLsetFileReader * Clone() const;
+    DummyLsetFileReader * Clone() const override;
 
 
 };

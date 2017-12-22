@@ -107,7 +107,7 @@ public:
 
   void AddListener(IStateListener* listener) override;
 
-  ~CommandStateProxy();
+  ~CommandStateProxy() override;
 
   Object::Pointer GetValue() const override;
 

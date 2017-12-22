@@ -59,7 +59,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
 
   berryObjectMacro(berry::IHandlerService)
 
-  ~IHandlerService();
+  ~IHandlerService() override;
 
   /**
    * <p>

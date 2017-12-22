@@ -117,7 +117,7 @@ public:
    */
   WorkbenchPlugin();
 
-  ~WorkbenchPlugin();
+  ~WorkbenchPlugin() override;
 
 
   /*

@@ -79,7 +79,7 @@ struct BERRY_UI_QT IStructuredSelection : public ISelection {
    * for gcc < 4.5 to correctly mark the type_info object of this class
    * as visible (we have default visibility 'hidden') so that dynamic_cast calls work.
    */
-  virtual ~IStructuredSelection();
+  ~IStructuredSelection() override;
 
 };
 

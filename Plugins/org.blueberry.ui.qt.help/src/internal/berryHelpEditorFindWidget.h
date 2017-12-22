@@ -34,7 +34,7 @@ class HelpEditorFindWidget : public QWidget
 public:
 
   HelpEditorFindWidget(QWidget *parent = nullptr);
-  ~HelpEditorFindWidget();
+  ~HelpEditorFindWidget() override;
 
   void show();
   void showAndClear();

@@ -55,7 +55,7 @@ namespace mitk {
 
     protected:
       VesselMeanderStrategy();
-      virtual ~VesselMeanderStrategy();
+      ~VesselMeanderStrategy() override;
 
       const double RANDOMIZATION_PERCENTAGE = 0.4;
     };

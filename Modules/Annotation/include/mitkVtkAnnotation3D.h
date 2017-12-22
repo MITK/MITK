@@ -41,13 +41,13 @@ namespace mitk
     mitkClassMacro(VtkAnnotation3D, VtkAnnotation);
 
   protected:
-    virtual void UpdateVtkAnnotation(BaseRenderer *renderer) override = 0;
+    void UpdateVtkAnnotation(BaseRenderer *renderer) override = 0;
 
     /** \brief explicit constructor which disallows implicit conversions */
     explicit VtkAnnotation3D();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~VtkAnnotation3D();
+    ~VtkAnnotation3D() override;
 
   private:
     /** \brief copy constructor */

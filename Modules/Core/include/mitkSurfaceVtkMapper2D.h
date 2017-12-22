@@ -67,7 +67,7 @@ namespace mitk
       virtual const mitk::Surface *GetInput() const;
 
     /** \brief returns the prop assembly */
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     /** \brief set the default properties for this mapper */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
@@ -145,7 +145,7 @@ namespace mitk
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default deconstructor of the local storage. */
-      ~LocalStorage();
+      ~LocalStorage() override;
     };
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -171,13 +171,13 @@ namespace mitk
     /**
        * @brief ~SurfaceVtkMapper2D default destructor.
        */
-    virtual ~SurfaceVtkMapper2D();
+    ~SurfaceVtkMapper2D() override;
 
     /**
        * @brief GenerateDataForRenderer produces all the data.
        * @param renderer The respective renderer of the mitkRenderWindow.
        */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /**
        * @brief ResetMapper Called in mitk::Mapper::Update to hide objects.
@@ -186,7 +186,7 @@ namespace mitk
        *
        * @param renderer The respective renderer of the mitkRenderWindow.
        */
-    virtual void ResetMapper(BaseRenderer *renderer) override;
+    void ResetMapper(BaseRenderer *renderer) override;
 
     /**
      * @brief Updates legacy properties to current behavior/interpretation.

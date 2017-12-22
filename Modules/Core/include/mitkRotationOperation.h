@@ -40,7 +40,7 @@ namespace mitk
                       Point3D pointOfRotation,
                       Vector3D vectorOfRotation,
                       ScalarType angleOfRotation);
-    virtual ~RotationOperation(void);
+    ~RotationOperation(void) override;
 
     /**
      * @brief GetAngleOfRotation getter for rotation angle.

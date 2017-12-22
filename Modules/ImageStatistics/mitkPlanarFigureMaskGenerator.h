@@ -37,17 +37,17 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
      * @brief GetMask Computes and returns the mask
      * @return mitk::Image::Pointer of the generated mask
      */
-    mitk::Image::Pointer GetMask();
+    mitk::Image::Pointer GetMask() override;
 
     void SetPlanarFigure(mitk::PlanarFigure::Pointer planarFigure);
 
-    mitk::Image::Pointer GetReferenceImage();
+    mitk::Image::Pointer GetReferenceImage() override;
 
     /**
      * @brief SetTimeStep is used to set the time step for which the mask is to be generated
      * @param timeStep
      */
-    void SetTimeStep(unsigned int timeStep);
+    void SetTimeStep(unsigned int timeStep) override;
 
 
     protected:

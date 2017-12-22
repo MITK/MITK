@@ -124,7 +124,7 @@ namespace mitk
     static QString PROP_TESTAPPLICATION;
 
     BaseApplication(int argc, char **argv);
-    ~BaseApplication();
+    ~BaseApplication() override;
 
     /**
      * Initialize the Qt library such that a QCoreApplication

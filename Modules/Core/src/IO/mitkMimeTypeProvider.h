@@ -40,22 +40,22 @@ namespace mitk
   {
   public:
     MimeTypeProvider();
-    ~MimeTypeProvider();
+    ~MimeTypeProvider() override;
 
     void Start();
     void Stop();
 
-    virtual std::vector<MimeType> GetMimeTypes() const override;
-    virtual std::vector<MimeType> GetMimeTypesForFile(const std::string &filePath) const override;
-    virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string &category) const override;
-    virtual MimeType GetMimeTypeForName(const std::string &name) const override;
+    std::vector<MimeType> GetMimeTypes() const override;
+    std::vector<MimeType> GetMimeTypesForFile(const std::string &filePath) const override;
+    std::vector<MimeType> GetMimeTypesForCategory(const std::string &category) const override;
+    MimeType GetMimeTypeForName(const std::string &name) const override;
 
-    virtual std::vector<std::string> GetCategories() const override;
+    std::vector<std::string> GetCategories() const override;
 
   private:
-    virtual TrackedType AddingService(const ServiceReferenceType &reference) override;
-    virtual void ModifiedService(const ServiceReferenceType &reference, TrackedType service) override;
-    virtual void RemovedService(const ServiceReferenceType &reference, TrackedType service) override;
+    TrackedType AddingService(const ServiceReferenceType &reference) override;
+    void ModifiedService(const ServiceReferenceType &reference, TrackedType service) override;
+    void RemovedService(const ServiceReferenceType &reference, TrackedType service) override;
 
     MimeType GetMimeType(const ServiceReferenceType &reference) const;
 

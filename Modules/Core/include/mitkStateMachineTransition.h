@@ -79,7 +79,7 @@ namespace mitk
     StateMachineTransition(const std::string &nextStateName,
                            const std::string &eventClass,
                            const std::string &eventVariant);
-    virtual ~StateMachineTransition();
+    ~StateMachineTransition() override;
 
     // Triggering Event
     std::string m_EventClass;

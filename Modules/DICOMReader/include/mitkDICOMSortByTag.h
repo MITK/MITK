@@ -42,19 +42,19 @@ class MITKDICOMREADER_EXPORT DICOMSortByTag : public DICOMSortCriterion
     mitkNewMacro1Param( DICOMSortByTag, const DICOMTag& );
     mitkNewMacro2Param( DICOMSortByTag, const DICOMTag&, DICOMSortCriterion::Pointer );
 
-    virtual DICOMTagList GetTagsOfInterest() const override;
-    virtual bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const override;
+    DICOMTagList GetTagsOfInterest() const override;
+    bool IsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const override;
 
-    virtual double NumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to) const override;
+    double NumericDistance(const mitk::DICOMDatasetAccess* from, const mitk::DICOMDatasetAccess* to) const override;
 
-    virtual void Print(std::ostream& os) const override;
+    void Print(std::ostream& os) const override;
 
-    virtual bool operator==(const DICOMSortCriterion& other) const override;
+    bool operator==(const DICOMSortCriterion& other) const override;
 
   protected:
 
     DICOMSortByTag( const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion = nullptr );
-    virtual ~DICOMSortByTag();
+    ~DICOMSortByTag() override;
 
     DICOMSortByTag(const DICOMSortByTag& other);
     DICOMSortByTag& operator=(const DICOMSortByTag& other);

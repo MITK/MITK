@@ -90,10 +90,10 @@ namespace mitk
 
   protected:
     ExtractDirectedPlaneImageFilter(); // purposely hidden
-    virtual ~ExtractDirectedPlaneImageFilter();
+    ~ExtractDirectedPlaneImageFilter() override;
 
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
     bool CalculateClippedPlaneBounds(const BaseGeometry *boundingGeometry,
                                      const PlaneGeometry *planeGeometry,

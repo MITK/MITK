@@ -196,7 +196,7 @@ namespace itk
 
     ShortestPathImageFilter();
 
-    ~ShortestPathImageFilter();
+    ~ShortestPathImageFilter() override;
 
     // \brief Create all the outputs
     void MakeOutputs();

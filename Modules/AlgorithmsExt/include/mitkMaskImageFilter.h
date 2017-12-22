@@ -82,13 +82,13 @@ namespace mitk
   protected:
     MaskImageFilter();
 
-    ~MaskImageFilter();
+    ~MaskImageFilter() override;
 
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void InternalComputeMask(itk::Image<TPixel, VImageDimension> *itkImage);

@@ -34,7 +34,7 @@ public:
   static const QString DEVELOPER_MODE;
 
   QmitkPropertiesPreferencePage();
-  ~QmitkPropertiesPreferencePage();
+  ~QmitkPropertiesPreferencePage() override;
 
   void CreateQtControl(QWidget* parent) override;
   QWidget* GetQtControl() const override;

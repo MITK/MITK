@@ -85,7 +85,7 @@ namespace mitk
 
   protected:
     StatusBar();
-    virtual ~StatusBar();
+    ~StatusBar() override;
 
     static StatusBarImplementation *m_Implementation;
     static StatusBar *m_Instance;

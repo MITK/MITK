@@ -129,7 +129,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#dispose()
      */
-    ~TabbedStackPresentation();
+    ~TabbedStackPresentation() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#setActive(int)

@@ -32,9 +32,9 @@ namespace mitk
   class MITKCLIMPORTANCEWEIGHTING_EXPORT DistSimpleBinominal : AbstractDistribution
   {
   public:
-    virtual double SqrtVariance(double mu);
-    virtual double Devariation(double mu, double y);
-    virtual double Init(double y);
+    double SqrtVariance(double mu) override;
+    double Devariation(double mu, double y) override;
+    double Init(double y) override;
   };
 }
 

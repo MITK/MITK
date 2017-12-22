@@ -34,8 +34,8 @@ namespace mitk
   public:
     mitkClassMacro(CoreObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(CoreObjectFactory)
 
-      virtual Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
-    virtual void SetDefaultProperties(mitk::DataNode *node) override;
+      Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    void SetDefaultProperties(mitk::DataNode *node) override;
 
     virtual void MapEvent(const mitk::Event *event, const int eventID);
 
@@ -44,7 +44,7 @@ namespace mitk
 
     static Pointer GetInstance();
 
-    ~CoreObjectFactory();
+    ~CoreObjectFactory() override;
 
     /**
      * @brief This method gets the supported (open) file extensions as string.
@@ -80,7 +80,7 @@ namespace mitk
      * @return the defined (save) file extension map
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    virtual MultimapType GetSaveFileExtensionsMap() override;
+    MultimapType GetSaveFileExtensionsMap() override;
 
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry

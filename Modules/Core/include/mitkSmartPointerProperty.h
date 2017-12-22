@@ -51,7 +51,7 @@ namespace mitk
     void SetValue(const ValueType &);
 
     /// mainly for XML output
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
     static void PostProcessXMLReading();
 
@@ -74,8 +74,8 @@ namespace mitk
 
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty &) const override;
-    virtual bool Assign(const BaseProperty &) override;
+    bool IsEqual(const BaseProperty &) const override;
+    bool Assign(const BaseProperty &) override;
 
     typedef std::map<itk::Object *, unsigned int> ReferenceCountMapType;
     typedef std::map<itk::Object *, std::string> ReferencesUIDMapType;

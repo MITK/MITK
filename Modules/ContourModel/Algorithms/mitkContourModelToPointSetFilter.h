@@ -45,7 +45,7 @@ namespace mitk
   protected:
     ContourModelToPointSetFilter();
 
-    virtual ~ContourModelToPointSetFilter();
+    ~ContourModelToPointSetFilter() override;
 
     void GenerateOutputInformation() override {}
     void GenerateData() override;

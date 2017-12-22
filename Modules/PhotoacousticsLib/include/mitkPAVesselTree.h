@@ -58,7 +58,7 @@ namespace mitk {
 
     protected:
       VesselTree(VesselProperties::Pointer initialProperties);
-      virtual ~VesselTree();
+      ~VesselTree() override;
 
     private:
       std::vector<Vessel::Pointer>* m_CurrentSubvessels;

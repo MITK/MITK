@@ -49,7 +49,7 @@ namespace mitk
 
       virtual const mitk::UnstructuredGrid *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
@@ -60,10 +60,10 @@ namespace mitk
   protected:
     UnstructuredGridVtkMapper3D();
 
-    virtual ~UnstructuredGridVtkMapper3D();
+    ~UnstructuredGridVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
-    virtual void ResetMapper(BaseRenderer * /*renderer*/) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void ResetMapper(BaseRenderer * /*renderer*/) override;
 
     void SetProperties(mitk::BaseRenderer *renderer);
 

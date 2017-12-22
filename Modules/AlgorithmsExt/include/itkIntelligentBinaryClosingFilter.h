@@ -67,11 +67,11 @@ namespace itk
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       /** Standard process object method.  This filter is not multithreaded. */
-      void GenerateData();
+      void GenerateData() override;
 
     /** Overloaded to link the input to this filter with the input of the
         mini-pipeline */
-    void SetInput(const InputImageType *input)
+    void SetInput(const InputImageType *input) override
     {
       // processObject is not const-correct so a const_cast is needed here
       this->ProcessObject::SetNthInput(0, const_cast<InputImageType *>(input));
@@ -79,7 +79,7 @@ namespace itk
     }
 
     using Superclass::SetInput;
-    virtual void SetInput(unsigned int i, const TInputImage *image)
+    void SetInput(unsigned int i, const TInputImage *image) override
     {
       if (i != 0)
       {
@@ -99,10 +99,10 @@ namespace itk
 
   protected:
     IntelligentBinaryClosingFilter();
-    virtual ~IntelligentBinaryClosingFilter() {}
+    ~IntelligentBinaryClosingFilter() override {}
     IntelligentBinaryClosingFilter(const Self &) {}
     void operator=(const Self &) {}
-    void PrintSelf(std::ostream &os, Indent indent) const;
+    void PrintSelf(std::ostream &os, Indent indent) const override;
 
   private:
     typedef typename InputImageType::PixelType InputPixelType;

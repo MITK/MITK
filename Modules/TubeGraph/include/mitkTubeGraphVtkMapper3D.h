@@ -53,16 +53,16 @@ namespace mitk
     * case, a mitk::Graph< TubeGraphVertex, TubeGraphEdge > is returned.
     */
     virtual const TubeGraph *GetInput();
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
   protected:
     TubeGraphVtkMapper3D();
-    virtual ~TubeGraphVtkMapper3D();
+    ~TubeGraphVtkMapper3D() override;
 
     /**
     * This method is called, each time a specific renderer is updated.
     */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /**
     * Generate vtkPolyData containing the tube centerlines and
@@ -110,7 +110,7 @@ namespace mitk
       itk::TimeStamp m_lastRenderDataTime;
 
       LocalStorage() { m_vtkTubeGraphAssembly = vtkSmartPointer<vtkAssembly>::New(); }
-      ~LocalStorage() {}
+      ~LocalStorage() override {}
     };
 
     LocalStorageHandler<LocalStorage> m_LSH;

@@ -36,22 +36,22 @@ namespace mitk
     */
     int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const override;
 
-    virtual unsigned int GetMaximumNumberOfControlPoints() const override;
-    virtual unsigned int GetMinimumNumberOfControlPoints() const override;
-    virtual bool IsHelperToBePainted(unsigned int index) const override;
+    unsigned int GetMaximumNumberOfControlPoints() const override;
+    unsigned int GetMinimumNumberOfControlPoints() const override;
+    bool IsHelperToBePainted(unsigned int index) const override;
 
     const unsigned int FEATURE_ID_LENGTH;
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarBezierCurve();
 
     mitkCloneMacro(Self)
 
-      virtual void EvaluateFeaturesInternal() override;
-    virtual void GenerateHelperPolyLine(double, unsigned int) override;
-    virtual void GeneratePolyLine() override;
+      void EvaluateFeaturesInternal() override;
+    void GenerateHelperPolyLine(double, unsigned int) override;
+    void GeneratePolyLine() override;
 
   private:
     Point2D ComputeDeCasteljauPoint(ScalarType t);

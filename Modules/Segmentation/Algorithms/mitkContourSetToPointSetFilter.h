@@ -44,9 +44,9 @@ namespace mitk
 
     itkGetMacro(Frequency, unsigned int);
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     const mitk::ContourSet *GetInput(void);
 
@@ -56,7 +56,7 @@ namespace mitk
   protected:
     ContourSetToPointSetFilter();
 
-    virtual ~ContourSetToPointSetFilter();
+    ~ContourSetToPointSetFilter() override;
 
   protected:
     unsigned int m_Frequency;

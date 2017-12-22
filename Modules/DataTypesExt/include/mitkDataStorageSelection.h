@@ -51,7 +51,7 @@ namespace mitk
     DataStorageSelection(mitk::DataStorage *_DataStorage, mitk::NodePredicateBase *_Predicate, bool _AutoAddNodes);
 
   public:
-    virtual ~DataStorageSelection();
+    ~DataStorageSelection() override;
 
     ///
     /// Get the DataStorage.

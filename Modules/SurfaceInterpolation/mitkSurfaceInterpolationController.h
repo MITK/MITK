@@ -214,7 +214,7 @@ namespace mitk
   protected:
     SurfaceInterpolationController();
 
-    ~SurfaceInterpolationController();
+    ~SurfaceInterpolationController() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void GetImageBase(itk::Image<TPixel, VImageDimension> *input, itk::ImageBase<3>::Pointer &result);

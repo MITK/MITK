@@ -45,7 +45,7 @@ public:
 
   berryObjectMacro(berry::ISafeRunnableRunner)
 
-  ~ISafeRunnableRunner();
+  ~ISafeRunnableRunner() override;
 
   /**
    * Runs the runnable.  All <code>ISafeRunnableRunners</code> must catch any exception

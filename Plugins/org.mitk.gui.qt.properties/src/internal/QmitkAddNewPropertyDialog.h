@@ -30,7 +30,7 @@ class QmitkAddNewPropertyDialog : public QDialog
 public:
   explicit QmitkAddNewPropertyDialog(mitk::BaseData::Pointer baseData, QWidget* parent = nullptr);
   explicit QmitkAddNewPropertyDialog(mitk::DataNode::Pointer dataNode, mitk::BaseRenderer::Pointer renderer = nullptr, QWidget* parent = nullptr);
-  ~QmitkAddNewPropertyDialog();
+  ~QmitkAddNewPropertyDialog() override;
 
 private slots:
   void AddNewProperty();

@@ -70,10 +70,10 @@ namespace mitk
 
   private:
     GizmoInteractor();
-    virtual ~GizmoInteractor();
+    ~GizmoInteractor() override;
 
     //! Setup the relation between the XML state machine and this object's methods.
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
 
     //! State machine condition: successful gizmo picking
     //! \return true when any part of the gizmo has been picked.

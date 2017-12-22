@@ -59,7 +59,7 @@ protected: ILayoutContainer* container;
      */
     public: LayoutPart(const QString& id);
 
-    public: virtual ~LayoutPart();
+    public: ~LayoutPart() override;
 
     /**
      * When a layout part closes, focus will return to a previously active part.
@@ -138,14 +138,14 @@ protected: ILayoutContainer* container;
      *
      * @since 3.1
      */
-    public: virtual int GetSizeFlags(bool horizontal) override;
+    public: int GetSizeFlags(bool horizontal) override;
 
     /**
      * @see org.blueberry.ui.presentations.StackPresentation#computePreferredSize(boolean, int, int, int)
      *
      * @since 3.1
      */
-    public: virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel) override;
+    public: int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel) override;
 
     public: virtual IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const QPoint& displayCoordinates);
 
@@ -295,7 +295,7 @@ protected: ILayoutContainer* container;
      */
     public: virtual void TestInvariants();
 
-    public: virtual QString ToString() const override;
+    public: QString ToString() const override;
 };
 
 }

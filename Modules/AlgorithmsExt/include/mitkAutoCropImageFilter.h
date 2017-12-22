@@ -82,7 +82,7 @@ namespace mitk
     AutoCropImageFilter();
 
     // default destructor
-    virtual ~AutoCropImageFilter();
+    ~AutoCropImageFilter() override;
 
     // This method calculates the actual smallest box
     void ComputeNewImageBounds();
@@ -92,13 +92,13 @@ namespace mitk
     void ITKCrop3DImage(itk::Image<TPixel, VImageDimension> *inputItkImage, unsigned int timestep);
 
     // Here, the output image is initialized by the input and the newly calculated region
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     // Purposely not implemented
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
     // Crops the image on all time steps
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     float m_BackgroundValue;
 

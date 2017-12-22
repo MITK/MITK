@@ -76,15 +76,15 @@ namespace mitk
   protected:
     ITKImageImport();
 
-    virtual ~ITKImageImport();
+    ~ITKImageImport() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
-    virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output) override;
+    void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output) override;
 
     /** Typedef for the region copier function object that converts an
      * output region to an input region. */

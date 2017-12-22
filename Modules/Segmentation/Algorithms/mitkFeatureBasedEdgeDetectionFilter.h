@@ -44,16 +44,16 @@ namespace mitk
 
   protected:
     /** This method is called by Update(). */
-    virtual void GenerateData();
+    void GenerateData() override;
 
     /** Initializes the output information */
-    virtual void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
     /** Constructor */
     FeatureBasedEdgeDetectionFilter();
 
     /** Destructor */
-    virtual ~FeatureBasedEdgeDetectionFilter();
+    ~FeatureBasedEdgeDetectionFilter() override;
 
     /** Execute a thresholding filter with the given lower and upper bound */
     template <typename TPixel, unsigned int VImageDimension>

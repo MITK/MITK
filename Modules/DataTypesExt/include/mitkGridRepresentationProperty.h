@@ -97,7 +97,7 @@ namespace mitk
      * this function is overridden as protected, so that the user may not add
      * additional invalid representation types.
      */
-    virtual bool AddEnum(const std::string &name, const IdType &id) override;
+    bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
      * Adds the enumeration types as defined by vtk to the list of known
@@ -106,7 +106,7 @@ namespace mitk
     virtual void AddRepresentationTypes();
 
   private:
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 } // end of namespace mitk
 #endif // _MITK_GRID_REPRESENTATION_PROPERTY__H_

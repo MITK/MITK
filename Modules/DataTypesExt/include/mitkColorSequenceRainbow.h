@@ -25,17 +25,17 @@ namespace mitk
   {
   public:
     ColorSequenceRainbow();
-    virtual ~ColorSequenceRainbow();
+    ~ColorSequenceRainbow() override;
 
     /*!
     \brief method to return another color
     */
-    virtual Color GetNextColor() override;
+    Color GetNextColor() override;
 
     /*!
     \brief method to set the color-index to begin again
     */
-    virtual void GoToBegin() override;
+    void GoToBegin() override;
 
   private:
     /*!

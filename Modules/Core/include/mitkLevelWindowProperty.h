@@ -56,7 +56,7 @@ namespace mitk
 
     typedef LevelWindow ValueType;
 
-    virtual ~LevelWindowProperty();
+    ~LevelWindowProperty() override;
 
     const mitk::LevelWindow &GetLevelWindow() const;
     const mitk::LevelWindow &GetValue() const;
@@ -64,7 +64,7 @@ namespace mitk
     void SetLevelWindow(const LevelWindow &levWin);
     void SetValue(const ValueType &levWin);
 
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
@@ -74,8 +74,8 @@ namespace mitk
 
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty &property) const override;
-    virtual bool Assign(const BaseProperty &property) override;
+    bool IsEqual(const BaseProperty &property) const override;
+    bool Assign(const BaseProperty &property) override;
   };
 
 #ifdef _MSC_VER

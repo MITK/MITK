@@ -49,7 +49,7 @@ namespace mitk
 
     ContourModelGLMapper2DBase();
 
-    virtual ~ContourModelGLMapper2DBase();
+    ~ContourModelGLMapper2DBase() override;
 
     void DrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer);
 

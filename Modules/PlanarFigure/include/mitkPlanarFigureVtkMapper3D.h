@@ -52,7 +52,7 @@ namespace mitk
 
   private:
     PlanarFigureVtkMapper3D();
-    ~PlanarFigureVtkMapper3D();
+    ~PlanarFigureVtkMapper3D() override;
 
     PlanarFigureVtkMapper3D(const Self &);
     Self &operator=(const Self &);

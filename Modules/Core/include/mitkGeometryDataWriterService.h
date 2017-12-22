@@ -44,15 +44,15 @@ namespace mitk
   {
   public:
     GeometryDataWriterService();
-    virtual ~GeometryDataWriterService();
+    ~GeometryDataWriterService() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   private:
     GeometryDataWriterService(const GeometryDataWriterService &other);
 
-    virtual mitk::GeometryDataWriterService *Clone() const override;
+    mitk::GeometryDataWriterService *Clone() const override;
   };
 }
 

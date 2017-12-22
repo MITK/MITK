@@ -92,7 +92,7 @@ namespace mitk
     /**
      * Virtual destructor
      */
-    virtual ~LabeledImageLookupTable();
+    ~LabeledImageLookupTable() override;
 
     /**
      * Generates a random rgb color value. Values for rgb are in the range

@@ -76,9 +76,9 @@ namespace mitk
 
   protected:
     ImageToContourFilter();
-    virtual ~ImageToContourFilter();
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    ~ImageToContourFilter() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
   private:
     const BaseGeometry *m_SliceGeometry;

@@ -44,7 +44,7 @@ namespace mitk
     mitkClassMacro(LimitedLinearUndo, UndoModel);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual bool SetOperationEvent(UndoStackItem *stackItem) override;
+      bool SetOperationEvent(UndoStackItem *stackItem) override;
 
     //##Documentation
     //## @brief Undoes the last changes
@@ -53,8 +53,8 @@ namespace mitk
     //##  executes the operation,
     //##  swaps the OperationEvent-Undo with the Operation
     //##  and sets it to Redo-Stack
-    virtual bool Undo() override;
-    virtual bool Undo(bool) override;
+    bool Undo() override;
+    bool Undo(bool) override;
 
     //##Documentation
     //## @brief Undoes all changes until ObjectEventID oeid
@@ -67,8 +67,8 @@ namespace mitk
     //## executes the operation,
     //## swaps the OperationEvent-Operation with the Undo-Operation
     //## and sets it to Undo-Stack
-    virtual bool Redo() override;
-    virtual bool Redo(bool) override;
+    bool Redo() override;
+    bool Redo(bool) override;
 
     //##Documentation
     //## @brief Redoes all changes until ObjectEventID oeid
@@ -76,30 +76,30 @@ namespace mitk
 
     //##Documentation
     //## @brief Clears UndoList and RedoList
-    virtual void Clear() override;
+    void Clear() override;
 
     //##Documentation
     //## @brief Clears the RedoList
-    virtual void ClearRedoList() override;
+    void ClearRedoList() override;
 
     //##Documentation
     //## @brief True, if RedoList is empty
-    virtual bool RedoListEmpty() override;
+    bool RedoListEmpty() override;
 
     //##Documentation
     //## @brief Returns the ObjectEventId of the
     //## top element in the OperationHistory
-    virtual int GetLastObjectEventIdInList() override;
+    int GetLastObjectEventIdInList() override;
 
     //##Documentation
     //## @brief Returns the GroupEventId of the
     //## top element in the OperationHistory
-    virtual int GetLastGroupEventIdInList() override;
+    int GetLastGroupEventIdInList() override;
 
     //##Documentation
     //## @brief Returns the last specified OperationEvent in Undo-list
     //## corresponding to the given values; if nothing found, then returns nullptr
-    virtual OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
+    OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
 
   protected:
     //##Documentation
@@ -108,7 +108,7 @@ namespace mitk
 
     //##Documentation
     //## Destructor
-    virtual ~LimitedLinearUndo();
+    ~LimitedLinearUndo() override;
 
     //## @brief Convenience method to free the memory of
     //## elements in the list and to clear the list

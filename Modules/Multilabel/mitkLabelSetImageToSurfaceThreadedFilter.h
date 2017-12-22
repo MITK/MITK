@@ -31,14 +31,14 @@ namespace mitk
 
   protected:
     LabelSetImageToSurfaceThreadedFilter(); // use smart pointers
-    virtual ~LabelSetImageToSurfaceThreadedFilter();
+    ~LabelSetImageToSurfaceThreadedFilter() override;
 
-    virtual void Initialize(const NonBlockingAlgorithm *other = nullptr) override;
-    virtual bool ReadyToRun() override;
+    void Initialize(const NonBlockingAlgorithm *other = nullptr) override;
+    bool ReadyToRun() override;
 
-    virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
+    bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
-    virtual void ThreadedUpdateSuccessful() override; // will be called from a thread after calling StartAlgorithm
+    void ThreadedUpdateSuccessful() override; // will be called from a thread after calling StartAlgorithm
 
   private:
     int m_RequestedLabel;

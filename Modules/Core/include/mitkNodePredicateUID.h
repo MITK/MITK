@@ -34,9 +34,9 @@ namespace mitk
     mitkClassMacro(NodePredicateUID, NodePredicateBase)
     mitkNewMacro1Param(NodePredicateUID, const Identifiable::UIDType &)
 
-    virtual ~NodePredicateUID();
+    ~NodePredicateUID() override;
 
-    virtual bool CheckNode(const mitk::DataNode *node) const override;
+    bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
     explicit NodePredicateUID(const Identifiable::UIDType &uid);

@@ -421,7 +421,7 @@ namespace mitk
     Annotation();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~Annotation();
+    ~Annotation() override;
 
     /**
     * @brief BaseRenderer-independent PropertyList

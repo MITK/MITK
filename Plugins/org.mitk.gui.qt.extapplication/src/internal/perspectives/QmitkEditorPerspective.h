@@ -28,7 +28,7 @@ class QmitkEditorPerspective : public QObject, public berry::IPerspectiveFactory
 public:
 
   QmitkEditorPerspective() {}
-  ~QmitkEditorPerspective() {}
+  ~QmitkEditorPerspective() override {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/) override;
 };

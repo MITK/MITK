@@ -195,7 +195,7 @@ public:
 
 protected:
   vtkMitkGPUVolumeRayCastMapper();
-  ~vtkMitkGPUVolumeRayCastMapper();
+  ~vtkMitkGPUVolumeRayCastMapper() override;
 
   // Check to see that the render will be OK
   int ValidateRender(vtkRenderer *, vtkVolume *);

@@ -69,7 +69,7 @@ struct BERRY_UI_QT ISaveablesSource : public virtual Object
 
   berryObjectMacro(berry::ISaveablesSource)
 
-  ~ISaveablesSource();
+  ~ISaveablesSource() override;
 
   /**
    * Returns the saveables presented by the workbench part. If the return

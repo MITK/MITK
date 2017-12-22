@@ -59,7 +59,7 @@ namespace mitk
 
   protected:
     BaseDataSerializer();
-    virtual ~BaseDataSerializer();
+    ~BaseDataSerializer() override;
 
     std::string GetUniqueFilenameInWorkingDirectory();
 

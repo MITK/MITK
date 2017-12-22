@@ -37,7 +37,7 @@ public:
 
   EvaluationService();
 
-  ~EvaluationService();
+  ~EvaluationService() override;
 
   /*
    * @see IEvaluationService#AddEvaluationListener(Expression, IPropertyChangeListener, QString)

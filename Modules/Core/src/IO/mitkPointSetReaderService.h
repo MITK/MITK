@@ -43,10 +43,10 @@ namespace mitk
   {
   public:
     PointSetReaderService();
-    virtual ~PointSetReaderService();
+    ~PointSetReaderService() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   private:
     PointSetReaderService(const PointSetReaderService &other);
@@ -57,7 +57,7 @@ namespace mitk
                                        TiXmlElement *currentTimeSeries,
                                        unsigned int currentTimeStep);
 
-    virtual PointSetReaderService *Clone() const override;
+    PointSetReaderService *Clone() const override;
   };
 }
 

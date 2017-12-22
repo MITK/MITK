@@ -49,7 +49,7 @@ struct BERRY_UI_QT IEditorDescriptor : public IWorkbenchPartDescriptor
 
   berryObjectMacro(berry::IEditorDescriptor)
 
-  virtual ~IEditorDescriptor();
+  ~IEditorDescriptor() override;
 
   /**
    * Returns the editor id.
@@ -61,7 +61,7 @@ struct BERRY_UI_QT IEditorDescriptor : public IWorkbenchPartDescriptor
    *
    * @return the id of the editor
    */
-  virtual QString GetId() const = 0;
+  QString GetId() const override = 0;
 
   /**
    * Returns the descriptor of the image for this editor.
@@ -75,7 +75,7 @@ struct BERRY_UI_QT IEditorDescriptor : public IWorkbenchPartDescriptor
    *
    * @return the editor label
    */
-  virtual QString GetLabel() const = 0;
+  QString GetLabel() const override = 0;
 
   /**
    * Returns whether this editor descriptor will open a regular editor

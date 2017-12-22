@@ -38,7 +38,7 @@ struct BERRY_UI_QT IEditorMatchingStrategy : public Object
 
   berryObjectMacro(berry::IEditorMatchingStrategy)
 
-  ~IEditorMatchingStrategy();
+  ~IEditorMatchingStrategy() override;
 
   /**
    * Returns whether the editor represented by the given editor reference

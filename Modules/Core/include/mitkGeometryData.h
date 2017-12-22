@@ -34,22 +34,22 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual void UpdateOutputInformation() override;
+      void UpdateOutputInformation() override;
 
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
-    virtual void CopyInformation(const itk::DataObject *data) override;
+    void CopyInformation(const itk::DataObject *data) override;
 
   protected:
     GeometryData();
 
-    virtual ~GeometryData();
+    ~GeometryData() override;
   };
 
   /**

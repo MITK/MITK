@@ -27,7 +27,7 @@ public:
 
   berryObjectMacro(berry::KeyedElement)
 
-  ~KeyedElement();
+  ~KeyedElement() override;
 
   bool operator==(const KeyedElement& other) const;
 

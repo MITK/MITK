@@ -62,7 +62,7 @@ struct BERRY_UI_QT IWorkbenchSite : public IServiceLocator { // IAdaptable, IShe
 
   berryObjectMacro(berry::IWorkbenchSite, IServiceLocator)
 
-  virtual ~IWorkbenchSite();
+  ~IWorkbenchSite() override;
 
   /**
    * Returns the page containing this workbench site.

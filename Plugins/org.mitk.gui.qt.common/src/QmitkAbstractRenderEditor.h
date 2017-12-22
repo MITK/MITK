@@ -69,7 +69,7 @@ public:
   berryObjectMacro(QmitkAbstractRenderEditor, QtEditorPart, mitk::IRenderWindowPart)
 
   QmitkAbstractRenderEditor();
-  ~QmitkAbstractRenderEditor();
+  ~QmitkAbstractRenderEditor() override;
 
 protected:
 

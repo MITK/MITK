@@ -42,23 +42,23 @@ namespace mitk
     itkCloneMacro(Self);
 
     // Create a mapper for given node
-    virtual mitk::Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    mitk::Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
 
     // Assign default properties to given node
-    virtual void SetDefaultProperties(mitk::DataNode *node) override;
+    void SetDefaultProperties(mitk::DataNode *node) override;
 
     // Deprecated but required!
-    virtual const char *GetFileExtensions() override { return ""; }
+    const char *GetFileExtensions() override { return ""; }
     // Deprecated but required!
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override
+    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override
     {
       return CoreObjectFactoryBase::MultimapType();
     }
 
     // Deprecated but required!
-    virtual const char *GetSaveFileExtensions() override { return ""; }
+    const char *GetSaveFileExtensions() override { return ""; }
     // Deprecated but required!
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override
+    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override
     {
       return CoreObjectFactoryBase::MultimapType();
     }

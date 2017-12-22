@@ -28,7 +28,7 @@ class QmitkVisualizationPerspective : public QObject, public berry::IPerspective
 public:
 
   QmitkVisualizationPerspective() {}
-  ~QmitkVisualizationPerspective() {}
+  ~QmitkVisualizationPerspective() override {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };

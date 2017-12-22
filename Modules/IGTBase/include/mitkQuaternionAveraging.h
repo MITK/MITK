@@ -49,7 +49,7 @@ namespace mitk {
 
     protected:
       QuaternionAveraging();
-      virtual ~QuaternionAveraging();
+      ~QuaternionAveraging() override;
 
     };
 } // Ende Namespace

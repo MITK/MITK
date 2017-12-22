@@ -50,7 +50,7 @@ namespace berry
       QString GetNewValue() const;
     };
 
-    virtual ~IBerryPreferences();
+    ~IBerryPreferences() override;
 
     /**
      * Invoked when this node was changed, that is when a property

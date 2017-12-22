@@ -129,12 +129,12 @@ namespace mitk
     /**
      * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
      */
-    virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override = 0;
+    DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override = 0;
 
     /**
      * @sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
      */
-    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override = 0;
+    DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override = 0;
 
     /**
      * @brief Access itk::ProcessObject::m_Updating
@@ -147,7 +147,7 @@ namespace mitk
 
   protected:
     BaseDataSource();
-    virtual ~BaseDataSource();
+    ~BaseDataSource() override;
 
     // purposely not implemented
     static Pointer New();

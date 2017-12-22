@@ -421,7 +421,7 @@ namespace mitk
     DEPRECATED(virtual Point3D Map2DRendererPositionTo3DWorldPosition(const Point2D &mousePosition) const);
 
   protected:
-    virtual ~BaseRenderer();
+    ~BaseRenderer() override;
 
     //##Documentation
     //## @brief Call update of all mappers. To be implemented in subclasses.
@@ -515,7 +515,7 @@ namespace mitk
     bool m_KeepDisplayedRegion;
 
   protected:
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     //##Documentation
     //## Data object containing the m_CurrentWorldPlaneGeometry defined above.

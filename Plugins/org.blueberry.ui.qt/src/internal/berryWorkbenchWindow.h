@@ -79,7 +79,7 @@ public:
 
   WorkbenchWindow(int number);
 
-  ~WorkbenchWindow();
+  ~WorkbenchWindow() override;
 
   Object* GetService(const QString& key) override;
 

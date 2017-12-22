@@ -136,19 +136,19 @@ namespace itk
 
     ExtendedStatisticsImageFilter();
 
-    virtual ~ExtendedStatisticsImageFilter(){};
+    ~ExtendedStatisticsImageFilter() override{};
 
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
     /** Multi-thread version GenerateData. */
     void  ThreadedGenerateData(const typename StatisticsImageFilter<TInputImage>::RegionType &
                                outputRegionForThread,
-                               ThreadIdType threadId);
+                               ThreadIdType threadId) override;
 
     /**
     * brief Calls AfterThreadedGenerateData() of the superclass and the main methods
     */
-    void AfterThreadedGenerateData();
+    void AfterThreadedGenerateData() override;
 
 
     RealObjectType* GetSkewnessOutput();
@@ -180,7 +180,7 @@ namespace itk
     const RealObjectType* GetMedianOutput() const;
 
     using Superclass::MakeOutput;
-    virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx ) override;
+    DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx ) override;
 
 private:
     Array< RealType >       m_ThreadSum;

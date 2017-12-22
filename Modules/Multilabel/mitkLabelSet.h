@@ -199,7 +199,7 @@ namespace mitk
 
     mitkCloneMacro(Self)
 
-      virtual ~LabelSet();
+      ~LabelSet() override;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

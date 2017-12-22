@@ -44,7 +44,7 @@ struct BERRY_UI_QT IWorkbenchConfigurer : public Object
 
   berryObjectMacro(berry::IWorkbenchConfigurer)
 
-  ~IWorkbenchConfigurer();
+  ~IWorkbenchConfigurer() override;
 
     /**
      * Restore status code indicating that the saved state

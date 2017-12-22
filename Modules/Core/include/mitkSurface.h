@@ -38,37 +38,37 @@ namespace mitk
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       void CalculateBoundingBox();
-    virtual void CopyInformation(const itk::DataObject *data) override;
-    virtual void ExecuteOperation(Operation *operation) override;
-    virtual void Expand(unsigned int timeSteps = 1) override;
+    void CopyInformation(const itk::DataObject *data) override;
+    void ExecuteOperation(Operation *operation) override;
+    void Expand(unsigned int timeSteps = 1) override;
     const RegionType &GetLargestPossibleRegion() const;
     virtual const RegionType &GetRequestedRegion() const;
     unsigned int GetSizeOfPolyDataSeries() const;
     virtual vtkPolyData *GetVtkPolyData(unsigned int t = 0) const;
-    virtual void Graft(const DataObject *data) override;
-    virtual bool IsEmptyTimeStep(unsigned int t) const override;
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void Graft(const DataObject *data) override;
+    bool IsEmptyTimeStep(unsigned int t) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
     virtual void SetRequestedRegion(Surface::RegionType *region);
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
     virtual void SetVtkPolyData(vtkPolyData *polydata, unsigned int t = 0);
     virtual void Swap(Surface &other);
-    virtual void Update() override;
-    virtual void UpdateOutputInformation() override;
-    virtual bool VerifyRequestedRegion() override;
+    void Update() override;
+    void UpdateOutputInformation() override;
+    bool VerifyRequestedRegion() override;
 
   protected:
     mitkCloneMacro(Self);
 
     Surface();
-    virtual ~Surface();
+    ~Surface() override;
 
     Surface(const Surface &other);
     Surface &operator=(Surface other);
 
-    virtual void ClearData() override;
-    virtual void InitializeEmpty() override;
+    void ClearData() override;
+    void InitializeEmpty() override;
 
   private:
     std::vector<vtkSmartPointer<vtkPolyData>> m_PolyDatas;

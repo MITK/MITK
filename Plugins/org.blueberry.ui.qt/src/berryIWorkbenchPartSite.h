@@ -38,7 +38,7 @@ struct BERRY_UI_QT IWorkbenchPartSite : public IWorkbenchSite
 
   berryObjectMacro(berry::IWorkbenchPartSite, IWorkbenchSite)
 
-  ~IWorkbenchPartSite();
+  ~IWorkbenchPartSite() override;
 
   /**
    * Returns the part registry extension id for this workbench site's part.

@@ -43,7 +43,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~NodePredicateBase();
+    ~NodePredicateBase() override;
 
     //##Documentation
     //## @brief This method will be used to evaluate the node. Has to be overwritten in subclasses

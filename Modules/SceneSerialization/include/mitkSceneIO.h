@@ -97,7 +97,7 @@ namespace mitk
 
   protected:
     SceneIO();
-    virtual ~SceneIO();
+    ~SceneIO() override;
 
     std::string CreateEmptyTempDirectory();
 

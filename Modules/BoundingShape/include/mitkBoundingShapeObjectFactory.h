@@ -27,17 +27,17 @@ namespace mitk
   public:
     mitkClassMacro(BoundingShapeObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) override;
-    virtual void SetDefaultProperties(DataNode *node) override;
-    virtual const char *GetFileExtensions() override;
-    virtual CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    virtual const char *GetSaveFileExtensions() override;
-    virtual CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
-    virtual const char *GetDescription() const override;
+      Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) override;
+    void SetDefaultProperties(DataNode *node) override;
+    const char *GetFileExtensions() override;
+    CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
+    const char *GetSaveFileExtensions() override;
+    CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+    const char *GetDescription() const override;
 
   protected:
     BoundingShapeObjectFactory();
-    virtual ~BoundingShapeObjectFactory();
+    ~BoundingShapeObjectFactory() override;
 
     void CreateFileExtensionsMap();
 

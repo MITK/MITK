@@ -40,7 +40,7 @@ public:
 
   QtWidgetController(Shell* shell);
 
-  ~QtWidgetController();
+  ~QtWidgetController() override;
 
   void AddControlListener(GuiTk::IControlListener::Pointer listener);
   void RemoveControlListener(GuiTk::IControlListener::Pointer listener);

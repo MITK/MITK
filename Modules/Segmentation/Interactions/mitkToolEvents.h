@@ -93,10 +93,10 @@ class MyTool : public Tool
 
     ParameterToolEvent(const T parameter) : m_Parameter(parameter) {}
     ParameterToolEvent(const Self &s) : ToolEvent(s), m_Parameter(s.m_Parameter) {}
-    virtual ~ParameterToolEvent() {}
-    virtual const char *GetEventName() const override { return "ParameterToolEvent"; }
-    virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-    virtual ::itk::EventObject *MakeObject() const override { return new Self(m_Parameter); }
+    ~ParameterToolEvent() override {}
+    const char *GetEventName() const override { return "ParameterToolEvent"; }
+    bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+    ::itk::EventObject *MakeObject() const override { return new Self(m_Parameter); }
     const T GetParameter() const { return m_Parameter; }
   protected:
     const T m_Parameter;
@@ -148,10 +148,10 @@ class MyTool : public Tool
     }
 
     TwoParameterToolEvent(const Self &s) : ToolEvent(s), m_Parameter1(s.m_Parameter1), m_Parameter2(s.m_Parameter2) {}
-    virtual ~TwoParameterToolEvent() {}
-    virtual const char *GetEventName() const override { return "TwoParameterToolEvent"; }
-    virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-    virtual ::itk::EventObject *MakeObject() const override { return new Self(m_Parameter1, m_Parameter2); }
+    ~TwoParameterToolEvent() override {}
+    const char *GetEventName() const override { return "TwoParameterToolEvent"; }
+    bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+    ::itk::EventObject *MakeObject() const override { return new Self(m_Parameter1, m_Parameter2); }
     const T GetParameter1() const { return m_Parameter1; }
     const T GetParameter2() const { return m_Parameter2; }
   protected:

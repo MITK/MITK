@@ -92,7 +92,7 @@ public:
 
 public:
 
-  ~ActionBarAdvisor();
+  ~ActionBarAdvisor() override;
 
   /**
    * Creates a new action bar advisor to configure a workbench

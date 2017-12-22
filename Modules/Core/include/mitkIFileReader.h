@@ -63,7 +63,7 @@ namespace mitk
    */
   struct MITKCORE_EXPORT IFileReader : public IFileIO
   {
-    virtual ~IFileReader();
+    ~IFileReader() override;
 
     /**
      * \brief Set the input location.

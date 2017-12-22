@@ -49,7 +49,7 @@ struct BERRY_UI_QT IPreferencePage: virtual public Object
 
   berryObjectMacro(berry::IPreferencePage)
 
-  ~IPreferencePage();
+  ~IPreferencePage() override;
 
   /**
      * Initializes this preference page for the given workbench.

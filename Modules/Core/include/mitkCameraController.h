@@ -95,7 +95,7 @@ namespace mitk
     /**
     * @brief Default Destructor
     **/
-    virtual ~CameraController();
+    ~CameraController() override;
     const BaseRenderer *m_Renderer;
 
     ScalarType ComputeMaxParallelScale();

@@ -82,7 +82,7 @@ namespace mitk
      * this function is overridden as protected, so that the user may not add
      * additional invalid rendering types.
      */
-    virtual bool AddEnum(const std::string &name, const IdType &id) override;
+    bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
      * Adds the enumeration types as defined by vtk to the list of known

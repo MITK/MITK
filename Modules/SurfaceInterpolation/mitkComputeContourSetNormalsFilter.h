@@ -84,9 +84,9 @@ namespace mitk
     void SetSegmentationBinaryImage(mitk::Image *segmentationImage) { m_SegmentationBinaryImage = segmentationImage; }
   protected:
     ComputeContourSetNormalsFilter();
-    virtual ~ComputeContourSetNormalsFilter();
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    ~ComputeContourSetNormalsFilter() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
   private:
     // The segmentation out of which the contours were extracted. Can be used to determine the direction of the normals

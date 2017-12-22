@@ -30,11 +30,11 @@ namespace mitk
     mitkClassMacro(SurfaceSerializer, BaseDataSerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual std::string Serialize() override;
+      std::string Serialize() override;
 
   protected:
     SurfaceSerializer();
-    virtual ~SurfaceSerializer();
+    ~SurfaceSerializer() override;
   };
 
 } // namespace

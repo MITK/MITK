@@ -38,11 +38,11 @@ namespace mitk
 
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~NodePredicateDataType();
+    ~NodePredicateDataType() override;
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type
-    virtual bool CheckNode(const mitk::DataNode *node) const override;
+    bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
     //##Documentation
@@ -67,10 +67,10 @@ namespace mitk
     mitkClassMacro(TNodePredicateDataType, NodePredicateBase);
     itkFactorylessNewMacro(TNodePredicateDataType);
 
-    virtual ~TNodePredicateDataType() {}
+    ~TNodePredicateDataType() override {}
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type (casts)
-    virtual bool CheckNode(const mitk::DataNode *node) const override
+    bool CheckNode(const mitk::DataNode *node) const override
     {
       return node && node->GetData() && dynamic_cast<T *>(node->GetData());
     }

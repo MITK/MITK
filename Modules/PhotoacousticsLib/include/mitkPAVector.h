@@ -109,9 +109,9 @@ namespace mitk {
 
     protected:
       Vector();
-      virtual ~Vector();
+      ~Vector() override;
 
-      virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
+      void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     private:
       mitk::Vector3D m_Vector;

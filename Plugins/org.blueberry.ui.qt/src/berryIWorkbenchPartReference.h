@@ -42,7 +42,7 @@ struct BERRY_UI_QT IWorkbenchPartReference : public Object
 
   berryObjectMacro(berry::IWorkbenchPartReference)
 
-  ~IWorkbenchPartReference();
+  ~IWorkbenchPartReference() override;
 
   /**
    * Returns the IWorkbenchPart referenced by this object.

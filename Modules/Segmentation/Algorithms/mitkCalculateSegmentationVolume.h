@@ -30,11 +30,11 @@ namespace mitk
 
   protected:
     CalculateSegmentationVolume(); // use smart pointers
-    virtual ~CalculateSegmentationVolume();
+    ~CalculateSegmentationVolume() override;
 
-    virtual bool ReadyToRun() override;
+    bool ReadyToRun() override;
 
-    virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
+    bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
     template <typename TPixel, unsigned int VImageDimension>
     void ItkImageProcessing(itk::Image<TPixel, VImageDimension> *itkImage, TPixel *dummy = nullptr);

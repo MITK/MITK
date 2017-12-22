@@ -39,11 +39,11 @@ namespace mitk
 
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~NodePredicateSource();
+    ~NodePredicateSource() override;
 
     //##Documentation
     //## @brief Checks, if m_BaseNode is a source node of childNode  (e.g. if childNode "was created from" m_BaseNode)
-    virtual bool CheckNode(const mitk::DataNode *childNode) const override;
+    bool CheckNode(const mitk::DataNode *childNode) const override;
 
   protected:
     //##Documentation

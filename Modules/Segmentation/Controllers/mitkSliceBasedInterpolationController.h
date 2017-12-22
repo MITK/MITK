@@ -177,7 +177,7 @@ namespace mitk
     typedef std::map<const Image *, SliceBasedInterpolationController *> InterpolatorMapType;
 
     SliceBasedInterpolationController(); // purposely hidden
-    virtual ~SliceBasedInterpolationController();
+    ~SliceBasedInterpolationController() override;
 
     /// internal scan of a single slice
     template <typename PixelType>

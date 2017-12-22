@@ -73,9 +73,9 @@ namespace mitk
   protected:
     RawImageFileReader();
 
-    ~RawImageFileReader();
+    ~RawImageFileReader() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimensions>
     void TypedGenerateData();

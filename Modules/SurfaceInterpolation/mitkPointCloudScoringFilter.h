@@ -54,16 +54,16 @@ namespace mitk
         protected :
 
       /** is called by the Update() method */
-      virtual void GenerateData() override;
+      void GenerateData() override;
 
     /** Defines the output */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     /** Constructor */
     PointCloudScoringFilter();
 
     /** Destructor */
-    virtual ~PointCloudScoringFilter();
+    ~PointCloudScoringFilter() override;
 
   private:
     /** The Point IDs and their distance to their neighbours */

@@ -107,8 +107,8 @@ namespace mitk
       * transformed after generation of poly data, but before (vertex coordinates
       * only)
       */
-      virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+      vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     /**
     *  \brief Get the PlaneGeometryData to map
@@ -129,9 +129,9 @@ namespace mitk
 
     PlaneGeometryDataVtkMapper3D();
 
-    virtual ~PlaneGeometryDataVtkMapper3D();
+    ~PlaneGeometryDataVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(BaseRenderer *renderer) override;
 
     void ProcessNode(DataNode *node, BaseRenderer *renderer, Surface *surface, LayerSortedActorList &layerSortedActors);
 

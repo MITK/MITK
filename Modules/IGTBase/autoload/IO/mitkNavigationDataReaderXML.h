@@ -35,15 +35,15 @@ namespace mitk {
   {
   public:
     NavigationDataReaderXML();
-    virtual ~NavigationDataReaderXML();
+    ~NavigationDataReaderXML() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
 
     NavigationDataReaderXML(const NavigationDataReaderXML& other);
-    virtual mitk::NavigationDataReaderXML* Clone() const override;
+    mitk::NavigationDataReaderXML* Clone() const override;
 
     NavigationDataSet::Pointer ReadNavigationDataSet();
 

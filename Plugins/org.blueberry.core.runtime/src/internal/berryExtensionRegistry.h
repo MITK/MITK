@@ -322,7 +322,7 @@ public:
 
   ExtensionRegistry(RegistryStrategy* registryStrategy, QObject* masterToken, QObject* userToken);
 
-  ~ExtensionRegistry();
+  ~ExtensionRegistry() override;
 
   /**
    * Stops the registry. Registry has to be stopped to properly

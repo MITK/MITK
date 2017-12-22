@@ -82,7 +82,7 @@ public:
 
   NativeTabFolder(QWidget* parent);
 
-  ~NativeTabFolder();
+  ~NativeTabFolder() override;
 
   void UpdateColors();
 

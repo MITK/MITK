@@ -39,14 +39,14 @@ private:
 
   bool bOpen;
 
-  virtual TrackedType AddingService(const ServiceReferenceType& reference) override;
-  virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service) override;
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service) override;
+  TrackedType AddingService(const ServiceReferenceType& reference) override;
+  void ModifiedService(const ServiceReferenceType& reference, TrackedType service) override;
+  void RemovedService(const ServiceReferenceType& reference, TrackedType service) override;
 
 public:
 
   ServiceHooks(CoreModuleContext* coreCtx);
-  ~ServiceHooks();
+  ~ServiceHooks() override;
 
   void Open();
 

@@ -72,8 +72,8 @@ namespace mitk
 
   protected:
     OtsuSegmentationFilter();
-    virtual ~OtsuSegmentationFilter();
-    virtual void GenerateData() override;
+    ~OtsuSegmentationFilter() override;
+    void GenerateData() override;
     // virtual void GenerateOutputInformation();
 
   private:

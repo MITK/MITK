@@ -39,11 +39,11 @@ namespace mitk
 
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~NodePredicateDimension();
+    ~NodePredicateDimension() override;
 
     //##Documentation
     //## @brief Checks if the nodes data object is of the specified dimension
-    virtual bool CheckNode(const mitk::DataNode *node) const override;
+    bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
     //##Documentation

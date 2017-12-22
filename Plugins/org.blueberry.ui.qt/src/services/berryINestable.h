@@ -58,7 +58,7 @@ struct BERRY_UI_QT INestable : public virtual Object
 
   berryObjectMacro(berry::INestable)
 
-  ~INestable();
+  ~INestable() override;
 
   /**
    * Notifies this service that the component within which it exists has

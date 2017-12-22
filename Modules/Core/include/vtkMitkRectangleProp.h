@@ -51,7 +51,7 @@ public:
 
 protected:
   vtkMitkRectangleProp();
-  virtual ~vtkMitkRectangleProp();
+  ~vtkMitkRectangleProp() override;
 
   int m_Height;
   int m_Width;

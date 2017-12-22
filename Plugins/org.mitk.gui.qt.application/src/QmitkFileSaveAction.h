@@ -40,7 +40,7 @@ public:
   QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
   QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow* window);
 
-  ~QmitkFileSaveAction();
+  ~QmitkFileSaveAction() override;
 
 protected slots:
 

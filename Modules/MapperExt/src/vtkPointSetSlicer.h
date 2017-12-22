@@ -77,11 +77,11 @@ public:
 
 protected:
   vtkPointSetSlicer(vtkPlane *cf = 0);
-  ~vtkPointSetSlicer();
+  ~vtkPointSetSlicer() override;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  virtual int FillInputPortInformation(int port, vtkInformation *info) override;
+  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int FillInputPortInformation(int port, vtkInformation *info) override;
 
   void UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output);
 

@@ -28,11 +28,11 @@ namespace mitk
   public:
     mitkClassMacro(EnumerationPropertySerializer, BasePropertySerializer);
 
-    virtual TiXmlElement *Serialize() override;
+    TiXmlElement *Serialize() override;
 
   protected:
     EnumerationPropertySerializer();
-    virtual ~EnumerationPropertySerializer();
+    ~EnumerationPropertySerializer() override;
   };
 
 } // namespace

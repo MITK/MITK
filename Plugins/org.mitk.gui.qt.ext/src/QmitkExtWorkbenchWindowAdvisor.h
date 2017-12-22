@@ -41,7 +41,7 @@ public:
     QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
         berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-    ~QmitkExtWorkbenchWindowAdvisor();
+    ~QmitkExtWorkbenchWindowAdvisor() override;
 
     berry::SmartPointer<berry::ActionBarAdvisor> CreateActionBarAdvisor(
         berry::SmartPointer<berry::IActionBarConfigurer> configurer) override;

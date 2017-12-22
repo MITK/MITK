@@ -69,7 +69,7 @@ namespace mitk
     mitkClassMacroItkParent(ImageDataItem, itk::LightObject);
 
     itkCloneMacro(ImageDataItem);
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
     ImageDataItem(const ImageDataItem &aParent,
                   const mitk::ImageDescriptor::Pointer desc,
@@ -79,7 +79,7 @@ namespace mitk
                   bool manageMemory = false,
                   size_t offset = 0);
 
-    ~ImageDataItem();
+    ~ImageDataItem() override;
 
     ImageDataItem(const mitk::ImageDescriptor::Pointer desc, int timestep, void *data, bool manageMemory);
 

@@ -338,7 +338,7 @@ protected:
   /**
    * Detaches the registry change listener from the registry.
    */
-  virtual ~RegistryPersistence();
+  ~RegistryPersistence() override;
 
   enum RegistryChangeType {
     OBJECTS_ADDED,

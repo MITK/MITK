@@ -85,14 +85,14 @@ namespace mitk
     /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
     mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-    virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
-    virtual void UpdateVtkAnnotation(BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
+    void UpdateVtkAnnotation(BaseRenderer *renderer) override;
 
     /** \brief explicit constructor which disallows implicit conversions */
     explicit ScaleLegendAnnotation();
 
     /** \brief virtual destructor in order to derive from this class */
-    virtual ~ScaleLegendAnnotation();
+    ~ScaleLegendAnnotation() override;
 
   private:
     /** \brief copy constructor */

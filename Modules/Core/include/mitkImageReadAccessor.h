@@ -58,10 +58,10 @@ namespace mitk
     ImageReadAccessor(const Image *image, const ImageDataItem *iDI = nullptr);
 
     /** Destructor informs Image to unlock memory. */
-    virtual ~ImageReadAccessor();
+    ~ImageReadAccessor() override;
 
   protected:
-    virtual const Image *GetImage() const override;
+    const Image *GetImage() const override;
 
   private:
     /** \brief manages a consistent read access and locks the ordered image part */

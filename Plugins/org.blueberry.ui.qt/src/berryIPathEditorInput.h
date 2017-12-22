@@ -48,7 +48,7 @@ struct BERRY_UI_QT IPathEditorInput : public IEditorInput {
 
   berryObjectMacro(berry::IPathEditorInput)
 
-  virtual ~IPathEditorInput();
+  ~IPathEditorInput() override;
 
     /**
      * Returns the local file system path of the file underlying this editor input.

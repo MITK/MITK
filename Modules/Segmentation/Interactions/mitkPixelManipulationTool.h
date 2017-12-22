@@ -37,17 +37,17 @@ namespace mitk
     void SetFixedValue(int value);
     int GetFixedValue();
 
-    virtual const char *GetName() const override;
-    virtual const char **GetXPM() const override;
+    const char *GetName() const override;
+    const char **GetXPM() const override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     virtual void CalculateImage();
 
   protected:
     PixelManipulationTool();
-    virtual ~PixelManipulationTool();
+    ~PixelManipulationTool() override;
 
     virtual void OnRoiDataChanged();
     void AddImageToDataStorage(itk::SmartPointer<mitk::Image> image);

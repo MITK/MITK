@@ -78,7 +78,7 @@ namespace mitk {
 
     protected:
       Vessel(VesselProperties::Pointer parameters);
-      virtual ~Vessel();
+      ~Vessel() override;
 
     private:
 

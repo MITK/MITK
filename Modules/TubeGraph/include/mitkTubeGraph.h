@@ -110,7 +110,7 @@ namespace mitk
   protected:
     TubeGraph();
     TubeGraph(const TubeGraph &graph);
-    virtual ~TubeGraph();
+    ~TubeGraph() override;
 
     TubeGraph &operator=(const TubeGraph &rhs);
 

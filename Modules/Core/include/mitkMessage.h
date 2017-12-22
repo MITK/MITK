@@ -152,14 +152,14 @@ namespace mitk
     {
     }
 
-    virtual ~MessageDelegate() {}
+    ~MessageDelegate() override {}
     // override function "Call"
-    virtual A Execute() const
+    A Execute() const override
     {
       return (m_Object->*m_MemberFunctionPointer)(); // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate<A> *c) const
+    bool operator==(const MessageAbstractDelegate<A> *c) const override
     {
       const MessageDelegate<R, A> *cmd = dynamic_cast<const MessageDelegate<R, A> *>(c);
       if (!cmd)
@@ -172,7 +172,7 @@ namespace mitk
       return true;
     }
 
-    MessageAbstractDelegate<A> *Clone() const { return new MessageDelegate(m_Object, m_MemberFunctionPointer); }
+    MessageAbstractDelegate<A> *Clone() const override { return new MessageDelegate(m_Object, m_MemberFunctionPointer); }
   private:
     R *m_Object;                       // pointer to object
     A (R::*m_MemberFunctionPointer)(); // pointer to member function
@@ -200,14 +200,14 @@ namespace mitk
     {
     }
 
-    virtual ~MessageDelegate1() {}
+    ~MessageDelegate1() override {}
     // override function "Call"
-    virtual A Execute(T t) const
+    A Execute(T t) const override
     {
       return (m_Object->*m_MemberFunctionPointer)(t); // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate1<T, A> *c) const
+    bool operator==(const MessageAbstractDelegate1<T, A> *c) const override
     {
       const MessageDelegate1<R, T, A> *cmd = dynamic_cast<const MessageDelegate1<R, T, A> *>(c);
       if (!cmd)
@@ -220,7 +220,7 @@ namespace mitk
       return true;
     }
 
-    MessageAbstractDelegate1<T, A> *Clone() const { return new MessageDelegate1(m_Object, m_MemberFunctionPointer); }
+    MessageAbstractDelegate1<T, A> *Clone() const override { return new MessageDelegate1(m_Object, m_MemberFunctionPointer); }
   private:
     R *m_Object;                        // pointer to object
     A (R::*m_MemberFunctionPointer)(T); // pointer to member function
@@ -237,14 +237,14 @@ namespace mitk
     {
     }
 
-    virtual ~MessageDelegate2() {}
+    ~MessageDelegate2() override {}
     // override function "Call"
-    virtual A Execute(T t, U u) const
+    A Execute(T t, U u) const override
     {
       return (m_Object->*m_MemberFunctionPointer)(t, u); // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate2<T, U, A> *c) const
+    bool operator==(const MessageAbstractDelegate2<T, U, A> *c) const override
     {
       const MessageDelegate2<R, T, U, A> *cmd = dynamic_cast<const MessageDelegate2<R, T, U, A> *>(c);
       if (!cmd)
@@ -257,7 +257,7 @@ namespace mitk
       return true;
     }
 
-    MessageAbstractDelegate2<T, U, A> *Clone() const { return new MessageDelegate2(m_Object, m_MemberFunctionPointer); }
+    MessageAbstractDelegate2<T, U, A> *Clone() const override { return new MessageDelegate2(m_Object, m_MemberFunctionPointer); }
   private:
     R *m_Object;                           // pointer to object
     A (R::*m_MemberFunctionPointer)(T, U); // pointer to member function
@@ -274,14 +274,14 @@ namespace mitk
     {
     }
 
-    virtual ~MessageDelegate3() {}
+    ~MessageDelegate3() override {}
     // override function "Call"
-    virtual A Execute(T t, U u, V v) const
+    A Execute(T t, U u, V v) const override
     {
       return (m_Object->*m_MemberFunctionPointer)(t, u, v); // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate3<T, U, V, A> *c) const
+    bool operator==(const MessageAbstractDelegate3<T, U, V, A> *c) const override
     {
       const MessageDelegate3<R, T, U, V, A> *cmd = dynamic_cast<const MessageDelegate3<R, T, U, V, A> *>(c);
       if (!cmd)
@@ -294,7 +294,7 @@ namespace mitk
       return true;
     }
 
-    MessageAbstractDelegate3<T, U, V, A> *Clone() const
+    MessageAbstractDelegate3<T, U, V, A> *Clone() const override
     {
       return new MessageDelegate3(m_Object, m_MemberFunctionPointer);
     }

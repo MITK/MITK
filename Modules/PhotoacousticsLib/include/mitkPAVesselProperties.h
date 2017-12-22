@@ -53,7 +53,7 @@ namespace mitk {
     protected:
       VesselProperties();
       VesselProperties(Self::Pointer other);
-      virtual ~VesselProperties();
+      ~VesselProperties() override;
 
     private:
       Vector::Pointer m_PositionVector;

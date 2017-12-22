@@ -81,7 +81,7 @@ namespace mitk
 
   protected:
     UndoModel(){};
-    virtual ~UndoModel(){};
+    ~UndoModel() override{};
   };
 
 } // namespace mitk

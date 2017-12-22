@@ -51,7 +51,7 @@ struct IDisposable : public virtual Object
 
   berryObjectMacro(berry::IDisposable)
 
-  ~IDisposable();
+  ~IDisposable() override;
 
   /**
    * Disposes of this service. All resources must be freed. All listeners must

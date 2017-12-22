@@ -57,7 +57,7 @@ namespace mitk
      * @param image the image which is used for initializing the mitk::LabelSetImage
      */
     using mitk::Image::Initialize;
-    virtual void Initialize(const mitk::Image *image) override;
+    void Initialize(const mitk::Image *image) override;
 
     /**
       * \brief  */
@@ -271,7 +271,7 @@ namespace mitk
 
       LabelSetImage();
     LabelSetImage(const LabelSetImage &other);
-    virtual ~LabelSetImage();
+    ~LabelSetImage() override;
 
     template <typename ImageType1, typename ImageType2>
     void ChangeLayerProcessing(ImageType1 *source, ImageType2 *target);

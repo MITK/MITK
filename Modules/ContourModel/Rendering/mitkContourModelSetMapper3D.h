@@ -50,10 +50,10 @@ namespace mitk
 
     /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
-    virtual void Update(mitk::BaseRenderer *renderer) override;
+    void Update(mitk::BaseRenderer *renderer) override;
 
     /*+++ methods of MITK-VTK rendering pipeline +++*/
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
@@ -71,7 +71,7 @@ namespace mitk
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default deconstructor of the local storage. */
-      ~LocalStorage() {}
+      ~LocalStorage() override {}
     };
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -85,7 +85,7 @@ namespace mitk
 
   protected:
     ContourModelSetMapper3D();
-    virtual ~ContourModelSetMapper3D();
+    ~ContourModelSetMapper3D() override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 

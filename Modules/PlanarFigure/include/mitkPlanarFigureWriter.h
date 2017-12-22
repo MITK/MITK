@@ -105,43 +105,43 @@ namespace mitk
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions() override;
+    std::vector<std::string> GetPossibleFileExtensions() override;
 
     /**
     * @brief Return the extension to be added to the filename.
     */
-    virtual std::string GetFileExtension() override;
+    std::string GetFileExtension() override;
 
     /**
     * @brief Check if the Writer can write the Content of the
     */
-    virtual bool CanWriteDataType(DataNode *) override;
+    bool CanWriteDataType(DataNode *) override;
 
     /**
     * @brief Return the MimeType of the saved File.
     */
-    virtual std::string GetWritenMIMEType() override;
+    std::string GetWritenMIMEType() override;
 
     /**
     * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
     */
     virtual void SetInput(DataNode *);
 
-    virtual std::string GetSupportedBaseData() const override;
+    std::string GetSupportedBaseData() const override;
 
     /**
     * @returns whether the last write attempt was successful or not.
     */
     itkGetConstMacro(Success, bool);
 
-    virtual const char *GetDefaultFilename() override { return "PlanarFigure.pf"; }
-    virtual const char *GetFileDialogPattern() override { return "Planar Figure Files (*.pf)"; }
-    virtual const char *GetDefaultExtension() override { return ".pf"; }
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override
+    const char *GetDefaultFilename() override { return "PlanarFigure.pf"; }
+    const char *GetFileDialogPattern() override { return "Planar Figure Files (*.pf)"; }
+    const char *GetDefaultExtension() override { return ".pf"; }
+    bool CanWriteBaseDataType(BaseData::Pointer data) override
     {
       return dynamic_cast<mitk::PlanarFigure *>(data.GetPointer());
     }
-    virtual void DoWrite(BaseData::Pointer data) override
+    void DoWrite(BaseData::Pointer data) override
     {
       if (CanWriteBaseDataType(data))
       {
@@ -154,7 +154,7 @@ namespace mitk
     @brief CAUTION: It's up to the user to call this function to release the
     memory buffer after use in case the file writer has written to its memory array.
     See mitkFileWriter base class. */
-    virtual void ReleaseMemory() override;
+    void ReleaseMemory() override;
 
   protected:
     /**
@@ -165,12 +165,12 @@ namespace mitk
     /**
     * Virtual destructor.
     */
-    virtual ~PlanarFigureWriter();
+    ~PlanarFigureWriter() override;
 
     /**
     * Writes the a .pf file in xml format that contains all input planar figures
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
     * Resizes the number of inputs of the writer.

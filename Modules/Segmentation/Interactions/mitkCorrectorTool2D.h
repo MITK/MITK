@@ -59,20 +59,20 @@ namespace mitk
     mitkClassMacro(CorrectorTool2D, FeedbackContourTool);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char **GetXPM() const override;
-    virtual us::ModuleResource GetCursorIconResource() const override;
+      const char **GetXPM() const override;
+    us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
-    virtual const char *GetName() const override;
+    const char *GetName() const override;
 
   protected:
     CorrectorTool2D(int paintingPixelValue = 1); // purposely hidden
-    virtual ~CorrectorTool2D();
+    ~CorrectorTool2D() override;
 
     void ConnectActionsAndFunctions() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *);
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *);

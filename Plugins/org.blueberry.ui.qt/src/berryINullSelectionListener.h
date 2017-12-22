@@ -41,7 +41,7 @@ namespace berry
  */
 struct BERRY_UI_QT INullSelectionListener : public ISelectionListener
 {
-  ~INullSelectionListener();
+  ~INullSelectionListener() override;
 };
 
 /**

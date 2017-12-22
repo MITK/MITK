@@ -44,7 +44,7 @@ namespace mitk
   protected:
     FileSeriesReader();
 
-    virtual ~FileSeriesReader();
+    ~FileSeriesReader() override;
 
     virtual bool GenerateFileList();
 

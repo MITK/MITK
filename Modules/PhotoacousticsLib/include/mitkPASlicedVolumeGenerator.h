@@ -48,7 +48,7 @@ namespace mitk {
     protected:
       SlicedVolumeGenerator(int centralYSlice, bool precorrect,
         mitk::pa::Volume::Pointer precorrectionVolume, bool inverse);
-      virtual ~SlicedVolumeGenerator();
+      ~SlicedVolumeGenerator() override;
 
       int m_CentralYSlice;
       bool m_Precorrect;

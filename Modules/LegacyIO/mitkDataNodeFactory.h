@@ -103,7 +103,7 @@ namespace mitk
     /**
     * Virtual destructor.
     */
-    virtual ~DataNodeFactory();
+    ~DataNodeFactory() override;
 
     bool m_Serie;
 
@@ -111,7 +111,7 @@ namespace mitk
     * Determines of which file type a given file is and calls the
     * appropriate reader function.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
     * Resizes the number of outputs of the factory.

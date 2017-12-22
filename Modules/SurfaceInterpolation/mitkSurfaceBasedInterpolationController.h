@@ -102,7 +102,7 @@ namespace mitk
   protected:
     SurfaceBasedInterpolationController();
 
-    ~SurfaceBasedInterpolationController();
+    ~SurfaceBasedInterpolationController() override;
 
     void Initialize();
 

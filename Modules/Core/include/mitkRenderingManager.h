@@ -196,7 +196,7 @@ namespace mitk
      * time-slicing. */
     SliceNavigationController *GetTimeNavigationController();
 
-    virtual ~RenderingManager();
+    ~RenderingManager() override;
 
     /** Executes all pending requests. This method has to be called by the
      * system whenever a RenderingManager induced request event occurs in
@@ -389,7 +389,7 @@ namespace mitk
     mitkClassMacro(TestingRenderingManager, RenderingManager);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      protected : virtual void GenerateRenderingRequestEvent() override{
+      protected : void GenerateRenderingRequestEvent() override{
                     // ForceImmediateUpdateAll();
                   };
   };

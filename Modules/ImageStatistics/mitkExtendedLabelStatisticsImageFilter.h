@@ -301,17 +301,17 @@ namespace itk
         m_NumBins.set_size(1);
     }
 
-    virtual ~ExtendedLabelStatisticsImageFilter(){}
+    ~ExtendedLabelStatisticsImageFilter() override{}
 
-    void AfterThreadedGenerateData();
+    void AfterThreadedGenerateData() override;
 
     /** Initialize some accumulators before the threads run. */
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
     /** Multi-thread version GenerateData. */
     void  ThreadedGenerateData(const typename TInputImage::RegionType &
                                outputRegionForThread,
-                               ThreadIdType threadId);
+                               ThreadIdType threadId) override;
 
     /** Does the specified label exist? Can only be called after a call
      * a call to Update(). */

@@ -51,17 +51,17 @@ namespace mitk
     /*!
     \brief standard destructor
     */
-    ~CESTImageNormalizationFilter();
+    ~CESTImageNormalizationFilter() override;
     /*!
     \brief Method generating the output information of this filter (e.g. image dimension, image type, etc.).
     The interface ImageToImageFilter requires this implementation. Everything is taken from the input image.
     */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
     /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the normalized output image.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /** Internal templated method that normalizes across timesteps
     */

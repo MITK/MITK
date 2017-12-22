@@ -35,7 +35,7 @@ namespace mitk
     {
     public:
       LocalStorage();
-      ~LocalStorage();
+      ~LocalStorage() override;
 
       LocalStorage(const LocalStorage &) = delete;
       LocalStorage &operator=(const LocalStorage &) = delete;

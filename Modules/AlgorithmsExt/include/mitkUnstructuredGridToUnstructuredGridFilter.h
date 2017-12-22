@@ -34,7 +34,7 @@ namespace mitk
       itkCloneMacro(Self)
 
       /** Initializes the output information */
-      virtual void GenerateOutputInformation() override;
+      void GenerateOutputInformation() override;
 
     /** Returns a const reference to the input image */
     const mitk::UnstructuredGrid *GetInput(void);
@@ -54,7 +54,7 @@ namespace mitk
     UnstructuredGridToUnstructuredGridFilter();
 
     /** Destructor */
-    virtual ~UnstructuredGridToUnstructuredGridFilter();
+    ~UnstructuredGridToUnstructuredGridFilter() override;
 
   private:
     /** The output of the filter */

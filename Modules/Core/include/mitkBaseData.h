@@ -45,13 +45,13 @@ namespace mitk
     mitkClassMacroItkParent(BaseData, itk::DataObject)
 
     // IPropertyProvider
-    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
-    virtual std::vector<std::string> GetPropertyKeys(const std::string &contextName = "", bool includeDefaultContext = false) const override;
-    virtual std::vector<std::string> GetPropertyContextNames() const override;
+    BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
+    std::vector<std::string> GetPropertyKeys(const std::string &contextName = "", bool includeDefaultContext = false) const override;
+    std::vector<std::string> GetPropertyContextNames() const override;
 
     // IPropertyOwner
-    virtual BaseProperty * GetNonConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
-    virtual void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
+    BaseProperty * GetNonConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
+    void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
 
     /**
     * \brief Return the TimeGeometry of the data as const pointer.
@@ -167,7 +167,7 @@ namespace mitk
     //##
     //## This forces a filter to produce all of the output in one execution
     //## (i.e. not streaming) on the next call to Update().
-    virtual void SetRequestedRegionToLargestPossibleRegion() override = 0;
+    void SetRequestedRegionToLargestPossibleRegion() override = 0;
 
     //##Documentation
     //## @brief Determine whether the RequestedRegion is outside of the BufferedRegion.
@@ -180,7 +180,7 @@ namespace mitk
     //## inside the BufferedRegion from the previous execution (and the
     //## current filter is up to date), then a given filter does not need
     //## to re-execute
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override = 0;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override = 0;
 
     //##Documentation
     //## @brief Verify that the RequestedRegion is within the LargestPossibleRegion.
@@ -193,7 +193,7 @@ namespace mitk
     //## PropagateRequestedRegion().  PropagateRequestedRegion() throws a
     //## InvalidRequestedRegionError exception if the requested region is
     //## not within the LargestPossibleRegion.
-    virtual bool VerifyRequestedRegion() override = 0;
+    bool VerifyRequestedRegion() override = 0;
 
     //##Documentation
     //## @brief Copy information from the specified data set.
@@ -248,7 +248,7 @@ namespace mitk
     //## region of the data object passed in as a parameter.
     //##
     //## This method is implemented in the concrete subclasses of BaseData.
-    virtual void SetRequestedRegion(const itk::DataObject *data) override = 0;
+    void SetRequestedRegion(const itk::DataObject *data) override = 0;
 
     //##Documentation
     //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
@@ -359,17 +359,17 @@ namespace mitk
     //##Documentation
     //## @brief Get the modified time of the last change of the contents
     //## this data object or its geometry.
-    virtual unsigned long GetMTime() const override;
+    unsigned long GetMTime() const override;
 
     /**
      * \sa itk::ProcessObject::Graft
      */
-    virtual void Graft(const DataObject *) override;
+    void Graft(const DataObject *) override;
 
   protected:
     BaseData();
     BaseData(const BaseData &other);
-    ~BaseData();
+    ~BaseData() override;
 
     //##Documentation
     //## \brief Initialize the TimeGeometry for a number of time steps.
@@ -398,7 +398,7 @@ namespace mitk
     //## valid state. Should at least create one empty object and call
     //## Superclass::InitializeTimeGeometry() to ensure an existing valid geometry
     virtual void InitializeEmpty() {}
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 

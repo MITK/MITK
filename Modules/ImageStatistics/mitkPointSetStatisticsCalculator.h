@@ -89,7 +89,7 @@ protected:
 
   PointSetStatisticsCalculator();
   PointSetStatisticsCalculator(mitk::PointSet::Pointer);
-  virtual ~PointSetStatisticsCalculator();
+  ~PointSetStatisticsCalculator() override;
 
   // TODO: Remove the std::vector<mitk::Point3D> data structure and use mitk::PointSet everywhere
 

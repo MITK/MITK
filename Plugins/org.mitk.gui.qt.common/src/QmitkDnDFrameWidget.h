@@ -47,7 +47,7 @@ class MITK_QT_COMMON QmitkDnDFrameWidget : public QWidget
 
 public:
   QmitkDnDFrameWidget(QWidget *parent);
-  virtual ~QmitkDnDFrameWidget();
+  ~QmitkDnDFrameWidget() override;
 
 private:
   void dragEnterEvent( QDragEnterEvent *event ) override;

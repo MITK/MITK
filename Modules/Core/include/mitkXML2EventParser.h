@@ -68,7 +68,7 @@ namespace mitk
     typedef std::vector<mitk::InteractionEvent::Pointer> EventContainerType;
 
     EventContainerType GetInteractions() { return m_InteractionList; }
-    ~XML2EventParser(){};
+    ~XML2EventParser() override{};
 
   protected:
     /**

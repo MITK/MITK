@@ -112,7 +112,7 @@ public:
    */
   PresentablePartFolder(AbstractTabFolder* folder);
 
-  ~PresentablePartFolder();
+  ~PresentablePartFolder() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.IPresentablePartList#getPartList()

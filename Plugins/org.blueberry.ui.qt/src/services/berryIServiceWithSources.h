@@ -39,7 +39,7 @@ struct IServiceWithSources : public IDisposable {
 
   berryObjectMacro(berry::IServiceWithSources)
 
-  ~IServiceWithSources();
+  ~IServiceWithSources() override;
 
   /**
    * Adds a source provider to this service. A source provider will notify the

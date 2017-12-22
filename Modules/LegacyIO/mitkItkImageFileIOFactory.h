@@ -42,8 +42,8 @@ namespace mitk
     typedef itk::SmartPointer<const Self> ConstPointer;
 
     /** Class methods used to interface with the registered factories. */
-    virtual const char *GetITKSourceVersion(void) const override;
-    virtual const char *GetDescription(void) const override;
+    const char *GetITKSourceVersion(void) const override;
+    const char *GetDescription(void) const override;
 
     /** Method for class instantiation. */
     itkFactorylessNewMacro(Self);
@@ -63,7 +63,7 @@ namespace mitk
 
   protected:
     ItkImageFileIOFactory();
-    ~ItkImageFileIOFactory();
+    ~ItkImageFileIOFactory() override;
 
   private:
     ItkImageFileIOFactory(const Self &); // purposely not implemented

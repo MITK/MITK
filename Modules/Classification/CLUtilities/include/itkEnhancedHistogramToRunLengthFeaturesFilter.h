@@ -189,15 +189,15 @@ namespace itk {
 
     protected:
       EnhancedHistogramToRunLengthFeaturesFilter();
-      ~EnhancedHistogramToRunLengthFeaturesFilter() {};
-      virtual void PrintSelf(std::ostream& os, Indent indent) const ITK_OVERRIDE;
+      ~EnhancedHistogramToRunLengthFeaturesFilter() override {};
+      void PrintSelf(std::ostream& os, Indent indent) const ITK_OVERRIDE;
 
       /** Make a DataObject to be used for output output. */
       typedef ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
       using Superclass::MakeOutput;
-      virtual DataObjectPointer MakeOutput( DataObjectPointerArraySizeType ) ITK_OVERRIDE;
+      DataObjectPointer MakeOutput( DataObjectPointerArraySizeType ) ITK_OVERRIDE;
 
-      virtual void GenerateData() ITK_OVERRIDE;
+      void GenerateData() ITK_OVERRIDE;
 
     private:
       EnhancedHistogramToRunLengthFeaturesFilter(const Self&); //purposely not implemented

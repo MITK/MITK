@@ -102,8 +102,8 @@ namespace mitk
 
     // overwritten from VtkMapper3D to be able to return a
     // m_PointsAssembly which is much faster than a vtkAssembly
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
@@ -119,10 +119,10 @@ namespace mitk
   protected:
     PointSetVtkMapper3D();
 
-    virtual ~PointSetVtkMapper3D();
+    ~PointSetVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
-    virtual void ResetMapper(BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void ResetMapper(BaseRenderer *renderer) override;
     virtual void ApplyAllProperties(mitk::BaseRenderer *renderer, vtkActor *actor);
     virtual void CreateContour(vtkPoints *points, vtkCellArray *connections);
     virtual void CreateVTKRenderObjects();

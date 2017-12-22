@@ -50,7 +50,7 @@ namespace mitk
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
+    DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -58,7 +58,7 @@ namespace mitk
      * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
      * virtual.
      */
-    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
+    DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
 
     OutputType *GetOutput();
     const OutputType *GetOutput() const;
@@ -68,7 +68,7 @@ namespace mitk
   protected:
     DataNodeSource();
 
-    virtual ~DataNodeSource();
+    ~DataNodeSource() override;
   };
 }
 #endif // #define _MITK_BASE_DATA_SOURCE_H

@@ -69,7 +69,7 @@ namespace mitk
     // virtual void SetInput(unsigned int index, mitk::Image * image);
     // virtual void SetInput(unsigned int index, const mitk::Image * image);
 
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     itkGetMacro(Channel, int);
     itkSetMacro(Channel, int);
@@ -87,12 +87,12 @@ namespace mitk
     const mitk::Image *GetInput() const;
 
     ImageToItk() : m_CopyMemFlag(false), m_Channel(0), m_Options(mitk::ImageAccessorBase::DefaultBehavior) {}
-    virtual ~ImageToItk() {}
+    ~ImageToItk() override {}
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
   private:
     bool m_CopyMemFlag;

@@ -42,16 +42,16 @@ public:
   /**
   * \brief Called when scrolling forwards with the mouse-wheel.
   */
-  virtual void OnMouseWheelForward() override;
+  void OnMouseWheelForward() override;
 
   /**
   * \brief Called when scrolling backwards with the mouse-wheel.
   */
-  virtual void OnMouseWheelBackward() override;
+  void OnMouseWheelBackward() override;
 
 protected:
   mitkVtkInteractorStyle();
-  ~mitkVtkInteractorStyle();
+  ~mitkVtkInteractorStyle() override;
 
 private:
   mitkVtkInteractorStyle(const mitkVtkInteractorStyle &); // Not implemented.

@@ -1,17 +1,35 @@
 /**
-\page org_mitk_gui_qt_photoacoustics_imageprocessing The Imageprocessing
+\page org_mitk_gui_qt_photoacoustics_imageprocessing The Photoacoustics Imageprocessing Plugin
 
 \imageMacro{icon.png,"Icon of Imageprocessing",2.00}
 
 \tableofcontents
 
 \section org_mitk_gui_qt_photoacoustics_imageprocessingOverview Overview
-Describe the features of your awesome plugin here
+This plugin offers an interface to perform image processing on photoacoustic, as well as ultrasound images, i.e. to use beamforming and post-processing filters. 
+For convenience, image processing can be done automatically for a whole batch of files containing PA or US data.
+\section org_mitk_gui_qt_photoacoustics_imageprocessingPrerequisites  Prerequisites
+To use the much faster openCL filters which run on the graphics card, MITK has to be able to use openCL, so it is necessary to install the openCL implementation provided by your graphics card vendor.
+\section org_mitk_gui_qt_photoacoustics_imageprocessingFiltering Using the filters
+To perform image processing, simply load an image into MITK and select it in the Data manager. Only the selected image will be processed by the filters.
+\imageMacro{QmikPhotoacousticsImageProcessing_DataManager.png,"Select the image to be processed",7.62}
+before performing reconstruction or using other filters those can be configured using the plugin's settings panel.
+\imageMacro{QmikPhotoacousticsImageProcessing_Settings.png,"The plugin's GUI",7.62}
+\subsection org_mitk_gui_qt_photoacoustics_imageprocessingBeamforming The Beamforming Settings
+For beamforming, three beamforming algorithms are available:
 <ul>
-<li>Increases productivity
-<li>Creates beautiful images
-<li>Generates PhD thesis
-<li>Brings world peace
+<li>DAS (Delay And Sum)
+<li>DMAS (Delay Multiply And Sum)
+<li>sDMAS (signed Delay Multiply And Sum)
 </ul>
-
+Each of those can be coupled with either spherical delay calculation or a quadratic approximation for the delays.
+Other Standard beamforming parameters are available. The Plugin is able to calculate the used scan depth as well as the transducer pitch from the selected image if the time-axis spacing is in microseconds, and the horizontal spacing in mm.
+\subsection org_mitk_gui_qt_photoacoustics_imageprocessingBandpass The Bandpass Settings
+\subsection org_mitk_gui_qt_photoacoustics_imageprocessingCrop The Crop Filter Settings
+\subsection org_mitk_gui_qt_photoacoustics_imageprocessingBMode The BMode Filter Settings
+\subsection org_mitk_gui_qt_photoacoustics_imageprocessingBatch Batch Processing
+When processing large amounts of data, an option is available to automatically process multiple images by applying all filters in order to them and saving the resulting images. 
+In the first row of the Batch Processing Panel one can select which filters should be applied to the image; in the second row one can select whether the resulting image after the filter should be saved.
+After pressing the "Start Batch Processing" button, one can choose first the images to be processed, and then the folder where they will be saved.
 */
+

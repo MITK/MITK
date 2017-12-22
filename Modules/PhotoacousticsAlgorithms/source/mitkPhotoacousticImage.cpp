@@ -302,6 +302,17 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, std::string& message, std::function<void(int, std::string)> progressHandle)
 {
+  Image::Pointer processedImage = inputImage;
+  if (inputImage->GetDimension() != 3)
+  {
+    processedImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, inputImage->GetDimensions());
+    processedImage->SetSpacing(inputImage->GetGeometry()->GetSpacing());
+
+    mitk::ImageReadAccessor copy(inputImage);
+
+    processedImage->SetImportVolume(copy.GetData());
+  }
+
   config.RecordTime = config.RecordTime - (float)(config.upperCutoff) / (float)inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "converting image");
   if (!config.partial)
@@ -309,7 +320,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
     config.CropBounds[0] = 0;
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
-  Image::Pointer processedImage = ApplyCropping(inputImage, config.upperCutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
+  processedImage = ApplyCropping(inputImage, config.upperCutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
 
   config.inputDim[0] = processedImage->GetDimension(0);
   config.inputDim[1] = processedImage->GetDimension(1);

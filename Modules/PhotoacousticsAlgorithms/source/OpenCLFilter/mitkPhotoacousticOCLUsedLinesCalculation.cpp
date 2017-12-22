@@ -88,16 +88,8 @@ void mitk::OCLUsedLinesCalculation::Execute()
   CHECK_OCL_ERR(clErr);
 
   // execute the filter on a 2D NDRange
-  if (m_Conf.inputDim[2] > 2)
-  {
-    if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
-      mitkThrow() << "openCL Error when executing Kernel";
-  }
-  else
-  {
-    if (!this->ExecuteKernelChunks(m_PixelCalculation, 2, m_ChunkSize))
-      mitkThrow() << "openCL Error when executing Kernel";
-  }
+  if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
+    mitkThrow() << "openCL Error when executing Kernel";
 
   // signalize the GPU-side data changed
   m_Output->Modified(GPU_DATA);

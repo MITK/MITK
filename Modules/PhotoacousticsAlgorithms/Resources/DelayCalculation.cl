@@ -26,7 +26,6 @@ __kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
 {
   uint globalPosX = get_global_id(0);
   uint globalPosY = get_global_id(1);
-  uint globalPosZ = get_global_id(2);
 
   if (globalPosX * 2 < outputL && globalPosY < outputS)
   {
@@ -52,7 +51,6 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
 {
   uint globalPosX = get_global_id(0);
   uint globalPosY = get_global_id(1);
-  uint globalPosZ = get_global_id(2);
 
   if (globalPosX * 2< outputL && globalPosY < outputS)
   {

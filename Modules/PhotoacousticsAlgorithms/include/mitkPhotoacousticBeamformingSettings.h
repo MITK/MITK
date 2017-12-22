@@ -116,7 +116,7 @@ namespace mitk {
     float BPLowPass = 50;
     
     /** \brief function for mitk::PhotoacousticOCLBeamformingFilter to check whether buffers need to be updated
-    * this method ignores changes in BPLow/BPHigh/cropBounds/Algorithm/some more, as those are insignifiant in all current situations
+    * this method only checks parameters relevant for the openCL implementation
     */
     static bool SettingsChangedOpenCL(const BeamformingSettings& lhs, const BeamformingSettings& rhs)
     {

@@ -966,7 +966,7 @@ void PAImageProcessing::EnableControls()
   m_Controls.CutoffBelow->setEnabled(true);
   m_Controls.CutoffBeforeBF->setEnabled(true);
   m_Controls.buttonApplyCropFilter->setEnabled(true);
-
+  m_Controls.BPSpeedOfSound->setEnabled(true);
   m_Controls.buttonApplyBandpass->setEnabled(true);
 
   m_Controls.Partial->setEnabled(true);
@@ -1019,7 +1019,7 @@ void PAImageProcessing::DisableControls()
   m_Controls.CutoffBelow->setEnabled(false);
   m_Controls.CutoffBeforeBF->setEnabled(false);
   m_Controls.buttonApplyCropFilter->setEnabled(false);
-
+  m_Controls.BPSpeedOfSound->setEnabled(false);
   m_Controls.buttonApplyBandpass->setEnabled(false);
 
   m_Controls.Partial->setEnabled(false);

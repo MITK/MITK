@@ -82,6 +82,7 @@ void mitk::RenderWindowBase::Destroy()
   m_Renderer->GetRenderingManager()->RemoveRenderWindow(GetVtkRenderWindow());
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();
+  BaseRenderer::RemoveInstance(this->GetVtkRenderWindow());
 }
 
 mitk::RenderWindowBase::~RenderWindowBase()

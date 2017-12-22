@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataStorageAbstractView.h"
 
-// qtwidgets
+// qtwidgets module
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
 
@@ -127,20 +127,11 @@ void QmitkDataStorageAbstractView::SetCurrentSelection(QList<mitk::DataNode::Poi
 {
   // filter input nodes and return the modified input node list
   QList<mitk::DataNode::Pointer> filteredNodes = FilterNodeList(selectedNodes);
-  // get the currently selected nodes from the model
-  QList<mitk::DataNode::Pointer> currentlySelectedNodes = GetSelectedNodes();
 
-  // compare currently selected nodes with filtered input node list
-  if (currentlySelectedNodes.size() == filteredNodes.size())
+  bool equal = IsEqualToCurrentSelection(filteredNodes);
+  if (equal)
   {
-    // lambda to compare node pointer inside both lists
-    auto lambda = [](mitk::DataNode::Pointer lhs, mitk::DataNode::Pointer rhs) { return lhs == rhs; };
-    bool equal = std::equal(filteredNodes.begin(), filteredNodes.end(), currentlySelectedNodes.begin(), currentlySelectedNodes.end(), lambda);
-    if (equal)
-    {
-      // node lists are equal, no need to update the selection model
-      return;
-    }
+    return;
   }
 
   if (!m_SelectOnlyVisibleNodes)
@@ -169,7 +160,7 @@ void QmitkDataStorageAbstractView::SetCurrentSelection(QList<mitk::DataNode::Poi
   m_View->selectionModel()->select(newCurrentSelection, QItemSelectionModel::ClearAndSelect);
 }
 
-void QmitkDataStorageAbstractView::ModelSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
+void QmitkDataStorageAbstractView::ChangeModelSelection(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
   QList<mitk::DataNode::Pointer> nodes = GetSelectedNodes();
 
@@ -184,18 +175,19 @@ void QmitkDataStorageAbstractView::ModelSelectionChanged(const QItemSelection& /
 void QmitkDataStorageAbstractView::SetModel(QmitkIDataStorageViewModel* model)
 {
   m_Model = model;
-  DataStorageChanged();
+  m_Model->SetDataStorage(m_DataStorage);
+  m_Model->SetNodePredicate(m_NodePredicate);
 }
 
 void QmitkDataStorageAbstractView::SetView(QAbstractItemView* view)
 {
   if (nullptr != m_View)
   {
-    disconnect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(ModelSelectionChanged(const QItemSelection&, const QItemSelection&)));
+    disconnect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   }
 
   m_View = view;
-  connect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ModelSelectionChanged(const QItemSelection&, const QItemSelection&)));
+  connect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
 }
 
 void QmitkDataStorageAbstractView::NodeAdded(const mitk::DataNode* node)
@@ -251,4 +243,20 @@ QList<mitk::DataNode::Pointer> QmitkDataStorageAbstractView::FilterNodeList(cons
   }
 
   return result;
+}
+
+bool QmitkDataStorageAbstractView::IsEqualToCurrentSelection(QList<mitk::DataNode::Pointer>& selectedNodes)
+{
+  // get the currently selected nodes from the model
+  QList<mitk::DataNode::Pointer> currentlySelectedNodes = GetSelectedNodes();
+
+  if (currentlySelectedNodes.size() == selectedNodes.size())
+  {
+    // lambda to compare node pointer inside both lists
+    auto lambda = [](mitk::DataNode::Pointer lhs, mitk::DataNode::Pointer rhs) { return lhs == rhs; };
+    //bool equal = std::equal(filteredNodes.begin(), filteredNodes.end(), currentlySelectedNodes.begin(), currentlySelectedNodes.end(), lambda);
+    return std::is_permutation(selectedNodes.begin(), selectedNodes.end(), currentlySelectedNodes.begin(), currentlySelectedNodes.end(), lambda);
+  }
+
+  return false;
 }

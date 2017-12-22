@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkNodePredicateBase.h>
 
-// qt widgets module
+// qtwidgets module
 #include <QmitkIDataStorageViewModel.h>
 
 // qt
@@ -92,8 +92,8 @@ Q_SIGNALS:
 
   public Q_SLOTS:
   /*
-  * @brief Transform a data node list into a model selection and set this as a new selection of the selection model of
-  *        the private member view.
+  * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
+  *        selection model of the private member view.
   *
   *   The function filters the given list of nodes according to the 'm_SelectOnlyVisibleNodes' member variable. If
   *   necessary, the non-visible nodes are stored. This is done if 'm_SelectOnlyVisibleNodes' is false: In this case
@@ -108,7 +108,7 @@ Q_SIGNALS:
   private Q_SLOTS:
   /*
   * @brief Transform a model selection into a data node list and emit the
-  *        "CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)"-signal.
+  *        "CurrentSelectionChanged"-signal.
   *
   *   The function adds the selected nodes from the original selection that could not be modified, if
   *   'm_SelectOnlyVisibleNodes' is false.
@@ -117,7 +117,7 @@ Q_SIGNALS:
   * @par	selected	The newly selected items.
   * @par	deselected	The newly deselected items.
   */
-  void ModelSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  void ChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected);
 
 protected:
   /*
@@ -184,6 +184,8 @@ private:
   QList<mitk::DataNode::Pointer> GetSelectedNodes() const;
 
   QList<mitk::DataNode::Pointer> FilterNodeList(const QList<mitk::DataNode::Pointer>& nodes) const;
+
+  bool IsEqualToCurrentSelection(QList<mitk::DataNode::Pointer>& selectedNodes);
 
 };
 

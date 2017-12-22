@@ -416,7 +416,9 @@ void mitk::BaseGeometry::WorldToIndex(const mitk::Vector3D &vec_mm, mitk::Vector
     }
     if (!this->GetIndexToWorldTransform()->GetInverse(m_InvertedTransform.GetPointer()))
     {
-      itkExceptionMacro("Internal ITK matrix inversion error, cannot proceed.");
+      //Do not crash on inversion erron
+      //itkExceptionMacro("Internal ITK matrix inversion error, cannot proceed.");
+      MITK_WARN("Internal ITK matrix inversion error.");
     }
     m_IndexToWorldTransformLastModified = this->GetIndexToWorldTransform()->GetMTime();
   }
@@ -425,9 +427,11 @@ void mitk::BaseGeometry::WorldToIndex(const mitk::Vector3D &vec_mm, mitk::Vector
   const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
   if (inverse.GetVnlMatrix().has_nans())
   {
-    itkExceptionMacro("Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
-      << this->GetIndexToWorldTransform()->GetMatrix() << "Suggested inverted matrix is:" << std::endl
-      << inverse);
+    //Do not crash on inversion erron
+    //itkExceptionMacro("Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
+    //  << this->GetIndexToWorldTransform()->GetMatrix() << "Suggested inverted matrix is:" << std::endl
+    //  << inverse);
+    MITK_WARN("Internal ITK matrix inversion error.");
   }
 
   vec_units = inverse * vec_mm;

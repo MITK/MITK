@@ -280,7 +280,8 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
   /// The standard plane must be parallel to the 'world plane'. The normal of the standard plane
   /// must point against the world plane if and only if 'top' is 'false'. The length of the
   /// standard plane normal must be equal to the slice thickness.
-  assert((standardPlaneNormal - (top ? 1.0 : -1.0) * worldPlaneNormal).GetSquaredNorm() < 0.000001);
+  // (but we should not crash if plane is not parallel)
+  //assert((standardPlaneNormal - (top ? 1.0 : -1.0) * worldPlaneNormal).GetSquaredNorm() < 0.000001);
 #endif
 
   this->InitializeEvenlySpaced(planeGeometry, viewSpacing, slices);

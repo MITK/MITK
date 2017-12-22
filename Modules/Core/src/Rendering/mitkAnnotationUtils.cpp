@@ -86,9 +86,11 @@ namespace mitk
     if (!renderWindow)
       return;
     BaseRenderer *renderer = BaseRenderer::GetInstance(renderWindow);
-    for (AbstractAnnotationRenderer *annotationRenderer : GetAnnotationRenderer(renderer->GetName()))
+
+    if (nullptr != renderer)
     {
-      annotationRenderer->OnRenderWindowModified();
+      for (AbstractAnnotationRenderer *annotationRenderer : GetAnnotationRenderer(renderer->GetName()))
+        annotationRenderer->OnRenderWindowModified();
     }
   }
 

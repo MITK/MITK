@@ -79,8 +79,8 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL http://www.vtk.org/files/release/7.1/VTK-7.1.1.tar.gz)
-  set(VTK_URL_MD5 daee43460f4e95547f0635240ffbc9cb)
+  set(VTK_URL http://www.vtk.org/files/release/8.0/VTK-8.0.1.tar.gz)
+  set(VTK_URL_MD5 692d09ae8fadc97b59d35cab429b261a)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}

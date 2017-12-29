@@ -1,3 +1,17 @@
+// needs for "crossplatform" way ot get screen resolution
+// TODO: there is no case for MacOS (and wayland) at the moment
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <X11/Xlib.h>
+#include <X11/X.h>
+#include <X11/Xutil.h>
+// None define from X11 breaks other stuff
+// in X.h it's 0L
+#undef None
+#endif
+
 #include "mitkClassicRegionGrowingTool.h"
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
@@ -35,7 +49,7 @@ mitk::ClassicRegionGrowingTool::ClassicRegionGrowingTool()
   m_SeedPointMemoryOffset(0),
   m_VisibleWindow(0),
   m_DefaultWindow(0),
-  m_MouseDistanceScaleFactor(-0.5),
+  m_MouseDistanceScaleFactor(-0.25),
   m_LastWorkingSeed(-1),
   m_FillFeedbackContour(true)
 {
@@ -282,7 +296,25 @@ void mitk::ClassicRegionGrowingTool::OnMousePressedOutside(StateMachineAction*, 
     MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 
     // 3.2.1 Remember Y cursor position and initial seed point
+#ifdef _WIN32
+    //screen height
+    const int height = GetSystemMetrics(SM_CYSCREEN);
+
+    //cursor position
+    POINT p;
+    if (GetCursorPos(&p))
+    {
+      m_LastScreenPosition[0] = p.x;
+      m_LastScreenPosition[1] = p.y;
+    }
+    else
+    {
+      // but why
+      MITK_WARN("Failed to get cursor position");
+    }
+#else
     m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+#endif
     m_ScreenYDifference = 0;
 
     m_SeedPointMemoryOffset = projectedPointIn2D[1] * m_OriginalPicSlice->n[0] + projectedPointIn2D[0];
@@ -333,8 +365,89 @@ void mitk::ClassicRegionGrowingTool::OnMouseMoved(StateMachineAction*, Interacti
     //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (positionEvent)
     {
-      m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
-      m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+      // Calculate screen borders and cursor position
+      int y = 1; // 0 will cause conflict with border logic
+      int x = 0;
+
+#ifdef _WIN32
+      const int height = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+      const int top = height - GetSystemMetrics(SM_CYSCREEN);
+
+      //cursor position
+      POINT p;
+      if (GetCursorPos(&p))
+      {
+          x = p.x;
+          y = p.y;
+      }
+      else
+      {
+          // but why
+          MITK_WARN("Failed to get cursor position");
+          return;
+      }
+#else
+      Display* disp = XOpenDisplay(NULL);
+      if (!disp)
+      {
+          // it happens!
+          MITK_WARN("Failed to open Display");
+          return;
+      }
+
+      //screen height
+      Screen* scrn = DefaultScreenOfDisplay(disp);
+      Window root_window = DefaultRootWindow(disp);
+      const int top = 0;
+      const int height = scrn->height;
+
+      //cursor position
+      Window root, child;
+      int winX, winY;
+      unsigned int mask;
+      XQueryPointer( disp, root_window, &root, &child
+                   , &x, &y, &winX, &winY, &mask);
+#endif
+
+      bool atTop = y == top;
+      bool atBottom = y == (height - 1);
+
+      auto setCursorPosition = [=](int x, int y)
+      {
+#ifdef _WIN32
+          SetCursorPos(x, y);
+#else
+          XSelectInput(disp, root_window, KeyReleaseMask);
+          XWarpPointer(disp, 0L, root_window, 0, 0, 0, 0, x, y);
+          XFlush(disp);
+#endif
+      };
+
+      m_ScreenYDifference += m_LastScreenPosition[1] - y;
+
+      if (atTop || atBottom)
+      {
+          //translate cursor to the next srcreen
+          mitk::Point2D newBeginning;
+          newBeginning[0] = x;
+          if (atTop)
+          {
+              newBeginning[1] = (height - 2);
+              m_LastScreenPosition = newBeginning;
+          }
+          else
+          {
+              // atBottom
+              newBeginning[1] = top + 1;
+              m_LastScreenPosition = newBeginning;
+          }
+          setCursorPosition(newBeginning[0], newBeginning[1]);
+      }
+      else
+      {
+          m_LastScreenPosition[0] = x;
+          m_LastScreenPosition[1] = y;
+      }
 
       m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
       m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);

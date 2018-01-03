@@ -21,53 +21,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkEnums.h"
 
 QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent)
-  : m_DataStorage(nullptr)
-  , m_NodePredicate(nullptr)
 {
   // nothing here
 }
 
-void QmitkDataStorageDefaultListModel::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkDataStorageDefaultListModel::DataStorageChanged()
 {
-  /* TEMPORARY
-  if (m_DataStorage == dataStorage)
-  {
-    return;
-  }
-  */
-  m_DataStorage = dataStorage;
-
-  mitk::DataStorage::SetOfObjects::ConstPointer dataNodes;
-  if (m_DataStorage != nullptr)
-  {
-    if (m_NodePredicate != nullptr)
-    {
-      dataNodes = m_DataStorage->GetSubset(m_NodePredicate);
-    }
-    else
-    {
-      dataNodes = m_DataStorage->GetAll();
-    }
-  }
-
-  // update the model, so that it will be filled with the nodes of the new data storage
-  beginResetModel();
-  m_DataNodes.clear();
-
-  // add all (filtered) nodes to the vector of nodes
-  if (dataNodes != nullptr)
-  {
-    for (auto& node : *dataNodes)
-    {
-      m_DataNodes.push_back(node);
-    }
-  }
-  endResetModel();
+  UpdateModelData();
 }
 
-void QmitkDataStorageDefaultListModel::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkDataStorageDefaultListModel::NodePredicateChanged()
 {
-  m_NodePredicate = nodePredicate;
+  UpdateModelData();
+}
+
+void QmitkDataStorageDefaultListModel::NodeAdded(const mitk::DataNode* node)
+{
+  UpdateModelData();
+}
+
+void QmitkDataStorageDefaultListModel::NodeChanged(const mitk::DataNode* node)
+{
+  // nothing here, since the "'NodeChanged'-event is currently sent far too often
+  //UpdateModelData();
+}
+
+void QmitkDataStorageDefaultListModel::NodeRemoved(const mitk::DataNode* node)
+{
+  UpdateModelData();
 }
 
 QModelIndex QmitkDataStorageDefaultListModel::index(int row, int column, const QModelIndex &parent) const
@@ -144,4 +125,34 @@ Qt::ItemFlags QmitkDataStorageDefaultListModel::flags(const QModelIndex &index) 
   }
 
   return Qt::NoItemFlags;
+}
+
+void QmitkDataStorageDefaultListModel::UpdateModelData()
+{
+  mitk::DataStorage::SetOfObjects::ConstPointer dataNodes;
+  if (m_DataStorage != nullptr)
+  {
+    if (m_NodePredicate != nullptr)
+    {
+      dataNodes = m_DataStorage->GetSubset(m_NodePredicate);
+    }
+    else
+    {
+      dataNodes = m_DataStorage->GetAll();
+    }
+  }
+
+  // update the model, so that it will be filled with the nodes of the new data storage
+  beginResetModel();
+  m_DataNodes.clear();
+
+  // add all (filtered) nodes to the vector of nodes
+  if (dataNodes != nullptr)
+  {
+    for (auto& node : *dataNodes)
+    {
+      m_DataNodes.push_back(node);
+    }
+  }
+  endResetModel();
 }

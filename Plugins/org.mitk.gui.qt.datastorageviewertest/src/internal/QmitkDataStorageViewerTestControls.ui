@@ -20,11 +20,11 @@
    <string>Data storage viewer test</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-  <item row="0" column="0">
-    <widget class="QmitkDataStorageDefaultView" name="dataStorageDefaultView"/>
+   <item row="0" column="0">
+    <widget class="QListView" name="selectionListView"/>
    </item>
    <item row="0" column="1">
-    <widget class="QmitkDataStorageDefaultView" name="dataStorageDefaultView2"/>
+    <widget class="QListView" name="selectionListView2"/>
    </item>
    <item row="1" column="0">
     <widget class="QCheckBox" name="selectionProviderCheckBox">
@@ -42,16 +42,7 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QmitkDataStorageDefaultView</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkDataStorageDefaultView.h</header>
-  </customwidget>
- </customwidgets>
- <includes>
-  <include location="global">QmitkDataStorageDefaultView.h</include>
- </includes>
+ <includes/>
  <resources/>
  <connections/>
 </ui>

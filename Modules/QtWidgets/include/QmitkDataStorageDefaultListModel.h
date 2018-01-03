@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkQtWidgetsExports.h>
 
 // qt widgets module
-#include <QmitkIDataStorageViewModel.h>
+#include <QmitkAbstractDataStorageModel.h>
 
 // qt
 #include <QAbstractListModel>
@@ -29,25 +29,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @brief The 'QmitkDataStorageDefaultListModel' is a basic list model, that implements the 'QmitkIDataStorageViewModel'.
 *        It provides functions to accept a data storage and a node predicate in order to customize the model data nodes.
 *        Furthermore it overrides the functions of 'QAbstractItemModel' to create a simple qt list model.
-*        This model can be used inside a concrete implementation of the 'QmitkDataStorageAbstractView' and therefore be
-*        connected to the data storage and the signals and slots of a concrete data storage viewer.
+*        This model can be used inside a 'QmitkDataStorageSelectionConnector'.
 */
-class MITKQTWIDGETS_EXPORT QmitkDataStorageDefaultListModel : public QmitkIDataStorageViewModel
+class MITKQTWIDGETS_EXPORT QmitkDataStorageDefaultListModel : public QmitkAbstractDataStorageModel
 {
 
 public:
 
   QmitkDataStorageDefaultListModel(QObject *parent);
 
-  // override from 'QmitkIDataStorageViewModel'
+  // override from 'QmitkAbstractDataStorageModel'
   /*
-  * @brief See 'QmitkIDataStorageViewModel'
+  * @brief See 'QmitkAbstractDataStorageModel'
   */
-  void SetDataStorage(mitk::DataStorage* dataStorage) override;
+  void DataStorageChanged() override;
   /*
-  * @brief See 'QmitkIDataStorageViewModel'
+  * @brief See 'QmitkAbstractDataStorageModel'
   */
-  void SetNodePredicate(mitk::NodePredicateBase* nodePredicate) override;
+  void NodePredicateChanged() override;
+  /*
+  * @brief See 'QmitkAbstractDataStorageModel'
+  */
+  void NodeAdded(const mitk::DataNode* node) override;
+  /*
+  * @brief See 'QmitkAbstractDataStorageModel'
+  */
+  void NodeChanged(const mitk::DataNode* node) override;
+  /*
+  * @brief See 'QmitkAbstractDataStorageModel'
+  */
+  void NodeRemoved(const mitk::DataNode* node) override;
 
   // override pure virtual from 'QAbstractItemModel'
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -64,10 +75,9 @@ public:
 
 private:
 
-  mitk::DataStorage::Pointer m_DataStorage;
-  std::vector<mitk::DataNode::Pointer> m_DataNodes;
+  void UpdateModelData();
 
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  std::vector<mitk::DataNode::Pointer> m_DataNodes;
 
 };
 

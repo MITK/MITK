@@ -72,7 +72,7 @@ namespace mitk
     static const char* XML_EDGE_ID;
     static const char* XML_EDGE_SOURCE_ID;
     static const char* XML_EDGE_TARGET_ID;
-    static const char* XML_EDGE_WEIGHT_ID;
+    static const char* XML_EDGE_FIBERCOUNT_ID;
     static const char* XML_EDGE_DOUBLE_WEIGHT_ID;
 
   private:

@@ -120,7 +120,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
       AddConnectionToNetwork(
         ReturnAssociatedVertexPairForLabelPair(
         ReturnLabelForFiberTract( singleTract, m_MappingStrategy )
-        )
+        ), m_FiberBundle->GetFiberWeight(fiberID)
         );
       m_AbortConnection = false;
     }
@@ -137,7 +137,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   MBI_INFO << mitk::ConnectomicsConstantsManager::CONNECTOMICS_WARNING_INFO_NETWORK_CREATED;
 }
 
-void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType newConnection)
+void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType newConnection, double fiber_count)
 {
   if( m_AbortConnection )
   {
@@ -154,11 +154,11 @@ void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType new
     // If the connection already exists, increment weight, else create connection
     if ( m_ConNetwork->EdgeExists( vertexA, vertexB ) )
     {
-      m_ConNetwork->IncreaseEdgeWeight( vertexA, vertexB );
+      m_ConNetwork->IncreaseEdgeWeight( vertexA, vertexB, fiber_count );
     }
     else
     {
-      m_ConNetwork->AddEdge( vertexA, vertexB );
+      m_ConNetwork->AddEdge( vertexA, vertexB, fiber_count );
     }
   }
 }

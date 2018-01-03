@@ -31,6 +31,9 @@ static bool GetTagFromHierarchy( std::vector< gdcm::Tag > hierarchy, const gdcm:
   const gdcm::DataElement& de = dataset.GetDataElement( hierarchy.at(0) );
   const auto seq = de.GetValueAsSQ();
 
+  if (seq==nullptr)
+    return false;
+
   // last level of hierarchy, retrieve the first apperance
   if( hierarchy.size() == 1 )
   {

@@ -119,7 +119,7 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
     mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer affine = mitk::MITKRegistrationHelper::getAffineMatrix(reg, false);
     estimated_transforms.push_back(affine->GetMatrix().GetVnlMatrix());
 
-    mitk::Image::Pointer registered_mitk_image = mitk::ImageMappingHelper::map(movingImage, reg, false, 0, nullptr, false, 0, mitk::ImageMappingInterpolator::WSinc_Hamming);
+    mitk::Image::Pointer registered_mitk_image = mitk::ImageMappingHelper::map(movingImage, reg, false, 0, nullptr, false, 0, mitk::ImageMappingInterpolator::BSpline_3);
     ITKDiffusionVolumeType::Pointer registered_itk_image = ITKDiffusionVolumeType::New();
     mitk::CastToItkImage(registered_mitk_image, registered_itk_image);
     registered_itk_images.push_back(registered_itk_image);

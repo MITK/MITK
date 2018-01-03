@@ -107,7 +107,7 @@ namespace mitk
     ~ConnectomicsNetworkCreator();
 
     /** Add a connection to the network */
-    void AddConnectionToNetwork(ConnectionType newConnection);
+    void AddConnectionToNetwork(ConnectionType newConnection, double fiber_count);
 
     /** Determine if a label is already identified with a vertex, otherwise create a new one */
     VertexType ReturnAssociatedVertexForLabel( ImageLabelType label );

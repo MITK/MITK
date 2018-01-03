@@ -61,5 +61,5 @@ const char* mitk::ConnectomicsNetworkDefinitions::XML_VERTEX_Z = "v_z";
 const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID = "e_id";
 const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID = "e_s_id";
 const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID = "e_t_id";
-const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID = "e_weight";
+const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_FIBERCOUNT_ID = "e_weight";
 const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_DOUBLE_WEIGHT_ID = "e_double_weight";

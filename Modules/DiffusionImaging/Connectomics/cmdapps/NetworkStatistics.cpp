@@ -469,7 +469,7 @@ int main(int argc, char* argv[])
                         numberConnections++;
                         summedFiberCount += thresholdedNetwork->GetEdge(
                           labelToIdMap.find(regionLabelsVector.at(loop))->second,
-                          labelToIdMap.find(loopLabelsVector.at(innerLoop))->second).weight;
+                          labelToIdMap.find(loopLabelsVector.at(innerLoop))->second).fiber_count;
                       }
                     }
                     else

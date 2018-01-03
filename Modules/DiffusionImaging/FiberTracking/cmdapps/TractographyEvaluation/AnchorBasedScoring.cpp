@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
       for (auto fib : input_candidates)
       {
         fib->SetFiberWeights( log_rms_diff[c] );
-        fib->ColorFibersByFiberWeights(false, true);
+        fib->ColorFibersByOrientation();
 
         std::string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
 

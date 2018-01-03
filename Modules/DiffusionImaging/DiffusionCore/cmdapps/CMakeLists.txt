@@ -13,11 +13,12 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     # they are added after a "^^" and separated by "_"
     set( diffusioncorecmdapps
     ImageResampler^^
-    ExportShImage^^
     CopyGeometry^^
     Registration^^
     DiffusionDICOMLoader^^
     ResampleGradients^^
+    DImp^^
+    DReg^^
     )
 
     foreach(diffusioncorecmdapp ${diffusioncorecmdapps})

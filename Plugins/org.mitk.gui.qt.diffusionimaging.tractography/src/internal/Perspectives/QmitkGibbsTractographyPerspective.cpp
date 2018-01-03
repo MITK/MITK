@@ -35,7 +35,7 @@ void QmitkGibbsTractographyPerspective::CreateInitialLayout(berry::IPageLayout::
 
     berry::IFolderLayout::Pointer left =
             layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
-                                 berry::IPageLayout::BOTTOM, 0.1f, "org.mitk.views.controlvisualizationpropertiesview");
+                                 berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
 
     layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
                                          berry::IPageLayout::BOTTOM, .7f, "org.mbi.diffusionimaginginternal.leftcontrols", false);

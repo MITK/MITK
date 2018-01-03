@@ -248,6 +248,7 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
 
         "varying vec3 N;\n"
         "varying vec4 v;\n"
+        "out vec4 out_Color;\n"
 
         "void main(void)\n"
         "{\n"
@@ -270,11 +271,11 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
         "     float Ispec = specular * pow(max(dot(R,E),0.0),0.3);\n"
         "     Ispec = clamp(Ispec, 0.0, 1.0);\n"
 
-        "     gl_FragColor = vec4(colorVertex.xyz, fiberOpacity)*(1-intensity) + vec4(colorVertex.xyz * (ambient + Idiff + Ispec) * intensity, fiberOpacity);\n"
+        "     out_Color = vec4(colorVertex.xyz, fiberOpacity)*(1-intensity) + vec4(colorVertex.xyz * (ambient + Idiff + Ispec) * intensity, fiberOpacity);\n"
         "   }\n"
         "   else\n"
         "   {\n"
-        "     gl_FragColor = vec4(colorVertex.xyz, fiberOpacity);\n"
+        "     out_Color = vec4(colorVertex.xyz, fiberOpacity);\n"
         "   }\n"
 
         "}\n"

@@ -216,6 +216,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
         "varying vec4 positionWorld;\n"
         "varying vec4 colorVertex;\n"
+        "out vec4 out_Color;\n"
 
         "void main(void)\n"
         "{\n"
@@ -228,10 +229,10 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
         "  {\n"
         "    float x = (r1 + fiberThickness) / (fiberThickness*2.0);\n"
         "    x = 1.0 - x;\n"
-        "    gl_FragColor = vec4(colorVertex.xyz*x, fiberOpacity);\n"
+        "    out_Color = vec4(colorVertex.xyz*x, fiberOpacity);\n"
         "  }\n"
         "  else{\n"
-        "    gl_FragColor = vec4(colorVertex.xyz,fiberOpacity);\n"
+        "    out_Color = vec4(colorVertex.xyz,fiberOpacity);\n"
         "  }\n"
         "}\n"
         );

@@ -48,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkThresholdImageFilter.h>
 #include <itksys/SystemTools.hxx>
+#include <itkB0ImageExtractionToSeparateImageFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -114,13 +115,15 @@ void QmitkBrainExtractionView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::NodePredicateDimension::Pointer dimPred = mitk::NodePredicateDimension::New(3);
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
-    m_Controls->m_ImageBox->SetPredicate(mitk::NodePredicateAnd::New(isImagePredicate,dimPred));
+//    m_Controls->m_ImageBox->SetPredicate(mitk::NodePredicateAnd::New(isImagePredicate,dimPred));
+    m_Controls->m_ImageBox->SetPredicate(isImagePredicate);
 
     UpdateGUI();
 
     std::string module_library_full_path = us::GetModuleContext()->GetModule()->GetLocation();
     std::string library_file;
     itksys::SystemTools::SplitProgramPath(module_library_full_path, m_ModulePath, library_file);
+    m_ModulePath += "/BET";
   }
 }
 
@@ -150,15 +153,29 @@ void QmitkBrainExtractionView::StartBrainExtraction()
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   mitk::Image::Pointer mitk_image = dynamic_cast<mitk::Image*>(node->GetData());
 
+  bool missing_file = false;
+  std::string missing_file_string = "";
   if ( !itksys::SystemTools::FileExists(m_ModulePath + "/brain_extraction_script.py") )
   {
-    QMessageBox::warning(nullptr, "Error", ("Brain extraction script file missing:\n" + m_ModulePath + "/brain_extraction_script.py").c_str(), QMessageBox::Ok);
-    return;
+    missing_file_string += "Brain extraction script file missing:\n" + m_ModulePath + "/brain_extraction_script.py\n\n";
+    missing_file = true;
   }
 
   if ( !itksys::SystemTools::FileExists(m_ModulePath + "/brain_extraction_model.model") )
   {
-    QMessageBox::warning(nullptr, "Error", ("Brain extraction model file missing:\n" + m_ModulePath + "/brain_extraction_model.model").c_str(), QMessageBox::Ok);
+    missing_file_string += "Brain extraction model file missing:\n" + m_ModulePath + "/brain_extraction_model.model\n\n";
+    missing_file = true;
+  }
+
+  if ( !itksys::SystemTools::FileExists(m_ModulePath + "/basic_config_just_like_braintumor.py") )
+  {
+    missing_file_string += "Config file missing:\n" + m_ModulePath + "/basic_config_just_like_braintumor.py\n\n";
+    missing_file = true;
+  }
+
+  if (missing_file)
+  {
+    QMessageBox::warning(nullptr, "Error", (missing_file_string).c_str(), QMessageBox::Ok);
     return;
   }
 
@@ -173,7 +190,8 @@ void QmitkBrainExtractionView::StartBrainExtraction()
     m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
     m_PythonService->Execute("import numpy");
     m_PythonService->CopyToPythonAsSimpleItkImage( mitk_image, "in_image");
-    m_PythonService->Execute("model=\""+m_ModulePath+"/brain_extraction_model.model\"");
+    m_PythonService->Execute("model_file=\""+m_ModulePath+"/brain_extraction_model.model\"");
+    m_PythonService->Execute("config_file=\""+m_ModulePath+"/basic_config_just_like_braintumor.py\"");
     m_PythonService->ExecuteScript(m_ModulePath + "/brain_extraction_script.py");
 
     {
@@ -188,6 +206,14 @@ void QmitkBrainExtractionView::StartBrainExtraction()
 
     {
       mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_extracted");
+
+      if(mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
+      {
+        mitk::DiffusionPropertyHelper propertyHelper(image);
+        mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, image, true);
+        propertyHelper.InitializeImage();
+      }
+
       mitk::DataNode::Pointer corrected_node = mitk::DataNode::New();
       corrected_node->SetData( image );
       QString name(node->GetName().c_str());

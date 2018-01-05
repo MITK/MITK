@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <mitkDiffusionPropertyHelper.h>
 
 class QmitkBrainExtractionView;
 
@@ -66,6 +67,9 @@ class QmitkBrainExtractionView : public QmitkAbstractView
 public:
 
   static const std::string VIEW_ID;
+
+  typedef itk::VectorImage< short, 3 >        ItkDwiType;
+  typedef mitk::GradientDirectionsProperty    GradProp;
 
   QmitkBrainExtractionView();
   virtual ~QmitkBrainExtractionView();

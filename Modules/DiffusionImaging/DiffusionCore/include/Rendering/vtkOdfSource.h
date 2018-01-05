@@ -38,20 +38,20 @@ public:
   // and Theta directions. Theta ranges from (0,360) and phi (0,180) degrees.
   static vtkOdfSource *New();
 
-  vtkSetMacro(Scale,double);
-  vtkGetMacro(Scale,double);
+  vtkSetMacro(Scale,double)
+  vtkGetMacro(Scale,double)
 
-  vtkSetMacro(AdditionalScale,double);
-  vtkGetMacro(AdditionalScale,double);
+  vtkSetMacro(AdditionalScale,double)
+  vtkGetMacro(AdditionalScale,double)
 
-  vtkSetMacro(Normalization,int);
-  vtkGetMacro(Normalization,int);
+  vtkSetMacro(Normalization,int)
+  vtkGetMacro(Normalization,int)
 
-  vtkSetMacro(Odf,OdfType);
-  vtkGetMacro(Odf,OdfType);
+  vtkSetMacro(Odf,OdfType)
+  vtkGetMacro(Odf,OdfType)
 
-  vtkSetMacro(UseCustomColor,bool);
-  vtkGetMacro(UseCustomColor,bool);
+  vtkSetMacro(UseCustomColor,bool)
+  vtkGetMacro(UseCustomColor,bool)
 
   void SetColor(int r, int g, int b)
   {

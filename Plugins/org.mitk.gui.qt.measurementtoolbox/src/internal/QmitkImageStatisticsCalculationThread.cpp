@@ -33,9 +33,6 @@ QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread()
   , m_HistogramBinSize(10.0)
   , m_StatisticChanged(false)
   , m_CalculationSuccessful(false)
-  , m_UseDefaultNBins(true)
-  , m_nBinsForHistogramStatistics(100)
-  , m_prioritizeNBinsOverBinSize(true)
 {
 }
 
@@ -62,11 +59,6 @@ void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer ima
     this->m_BinaryMask = binaryImage->Clone();
   if(planarFig.IsNotNull())
     this->m_PlanarFigureMask = planarFig->Clone();
-}
-
-void QmitkImageStatisticsCalculationThread::SetUseDefaultNBins(bool useDefault)
-{
-    m_UseDefaultNBins = useDefault;
 }
 
 void QmitkImageStatisticsCalculationThread::SetTimeStep( int times )
@@ -102,23 +94,11 @@ bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
 void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(double size)
 {
   this->m_HistogramBinSize = size;
-  this->m_prioritizeNBinsOverBinSize = false;
 }
 
 double QmitkImageStatisticsCalculationThread::GetHistogramBinSize() const
 {
   return this->m_HistogramBinSize;
-}
-
-void QmitkImageStatisticsCalculationThread::SetHistogramNBins(double size)
-{
-  this->m_nBinsForHistogramStatistics = size;
-  this->m_prioritizeNBinsOverBinSize = true;
-}
-
-double QmitkImageStatisticsCalculationThread::GetHistogramNBins() const
-{
-  return this->m_nBinsForHistogramStatistics;
 }
 
 std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
@@ -213,21 +193,7 @@ void QmitkImageStatisticsCalculationThread::run()
       calculator->SetSecondaryMask(nullptr);
   }
 
-  if (m_UseDefaultNBins)
-  {
-      calculator->SetNBinsForHistogramStatistics(100);
-  }
-  else
-  {
-      if (!m_prioritizeNBinsOverBinSize)
-      {
-          calculator->SetBinSizeForHistogramStatistics(m_HistogramBinSize);
-      }
-      else
-      {
-          calculator->SetNBinsForHistogramStatistics(100);
-      }
-  }
+  calculator->SetBinSizeForHistogramStatistics(m_HistogramBinSize);
 
   //calculator->SetHistogramBinSize( m_HistogramBinSize );
   //calculator->SetUseDefaultBinSize( m_UseDefaultBinSize );

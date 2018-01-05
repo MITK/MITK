@@ -140,7 +140,6 @@ void QmitkImageStatisticsView::OnDefaultBinSizeBoxChanged()
 
 if (m_CalculationThread != nullptr){
   m_Controls->m_HistogramBinSizeSpinbox->setValue(m_CalculationThread->GetHistogramBinSize());
-  m_CalculationThread->SetUseDefaultNBins(m_Controls->m_UseDefaultBinSizeBox->isChecked());
 }
 this->UpdateStatistics();
 
@@ -977,6 +976,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       else
       {
         m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
+
         m_Controls->m_HistogramBinSizeSpinbox->setValue(this->m_CalculationThread->GetHistogramBinSize());
         auto histogram = this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer();
 

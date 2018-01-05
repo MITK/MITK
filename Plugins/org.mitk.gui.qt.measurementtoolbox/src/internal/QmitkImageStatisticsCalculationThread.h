@@ -51,9 +51,7 @@ public:
   /*!
   /brief standard destructor. */
   ~QmitkImageStatisticsCalculationThread();
-  /*!
-   *\brief Automatically calculate bin size to obtain 200 bins. */
-  void SetUseDefaultNBins(bool useDefault);
+
   /*!
   /brief Initializes the object with necessary data. */
   void Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig );
@@ -81,12 +79,6 @@ public:
   /*!
   /brief Get bin size for histogram resolution.*/
   double GetHistogramBinSize() const;
-  /*!
-  /brief Set bin size for histogram resolution.*/
-  void SetHistogramNBins( double size);
-  /*!
-  /brief Get bin size for histogram resolution.*/
-  double GetHistogramNBins() const;
   /*!
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram(unsigned int t = 0);
@@ -116,8 +108,5 @@ private:
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
   std::vector<HistogramType::Pointer> m_HistogramVector;          ///< member holds the histograms of all time steps.
   std::string m_message;
-  bool m_UseDefaultNBins;
-  unsigned int m_nBinsForHistogramStatistics;
-  bool m_prioritizeNBinsOverBinSize;
 };
 #endif // QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED

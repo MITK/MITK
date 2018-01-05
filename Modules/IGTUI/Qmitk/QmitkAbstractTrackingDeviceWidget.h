@@ -139,28 +139,28 @@ public:
   * \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
   * Can e.g. be used to activate options of a tracking device only when it is connected.
   */
-  virtual void OnConnected(bool _success) {};
+  virtual void OnConnected(bool) {}
   /**
   * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
   * Can e.g. be used to activate/disactivate options of a tracking device.
   */
-  virtual void OnDisconnected(bool _success) {};
+  virtual void OnDisconnected(bool) {}
 
   /**
   * \brief This function is called, when in the TrackingToolboxView "Start Tracking" was clicked and the device successfully started tracking.
   * Can e.g. be used to activate options of a tracking device only when tracking is started.
   */
-  virtual void OnStartTracking(bool _success){};
+  virtual void OnStartTracking(bool) {}
   /**
   * \brief This function is called, when in the TrackingToolboxView "Stop Tracking" was clicked and the device successful stopped tracking.
   * Can e.g. be used to activate/disactivate options when device is not tracking.
   */
-  virtual void OnStopTracking(bool _success) {};
+  virtual void OnStopTracking(bool) {}
   /**
   * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
   * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
   */
-  virtual void OnToolStorageChanged() {};
+  virtual void OnToolStorageChanged() {}
 
 
   std::string m_ErrorMessage; ///< current problem description

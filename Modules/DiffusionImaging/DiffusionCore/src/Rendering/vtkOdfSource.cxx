@@ -21,7 +21,7 @@ vtkOdfSource::vtkOdfSource()
   , UseCustomColor(false)
 {
   Scale = 1;
-  lut = vtkLookupTable::New();
+  lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetRange(0,1);
   lut->Build();
   this->SetNumberOfInputPorts(0);
@@ -29,7 +29,7 @@ vtkOdfSource::vtkOdfSource()
 
 vtkOdfSource::~vtkOdfSource()
 {
-  lut->Delete();
+
 }
 
 //----------------------------------------------------------------------------
@@ -63,11 +63,10 @@ int vtkOdfSource::RequestData(
     colorOdf = Odf;
   }
 
-  vtkPoints *newPoints;
   vtkCellArray* polys = TemplateOdf->GetPolys();
   output->SetPolys(polys);
   polys->InitTraversal();
-  newPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
   int numPoints = TemplateOdf->GetPoints()->GetNumberOfPoints();
   newPoints->Allocate(numPoints);
 
@@ -107,8 +106,6 @@ int vtkOdfSource::RequestData(
   }
   output->SetPoints(newPoints);
   output->GetPointData()->AddArray(point_colors);
-  newPoints->Delete();
-  point_colors->Delete();
   return 1;
 }
 

@@ -111,9 +111,33 @@ void mitk::IntensityQuantifier::InitializeByImage(mitk::Image::Pointer image, un
   InitializeByMinimumMaximum(minimum, maximum, bins);
 }
 
+void mitk::IntensityQuantifier::InitializeByImageAndMinimum(mitk::Image::Pointer image, double minimum, unsigned int bins) {
+  double tmp, maximum;
+  AccessByItk_2(image, CalculateImageMinMax, tmp, maximum);
+  InitializeByMinimumMaximum(minimum, maximum, bins);
+}
+
+void mitk::IntensityQuantifier::InitializeByImageAndMaximum(mitk::Image::Pointer image, double maximum, unsigned int bins) {
+  double minimum, tmp;
+  AccessByItk_2(image, CalculateImageMinMax, minimum, tmp);
+  InitializeByMinimumMaximum(minimum, maximum, bins);
+}
+
 void mitk::IntensityQuantifier::InitializeByImageRegion(mitk::Image::Pointer image, mitk::Image::Pointer mask, unsigned int bins) {
   double minimum, maximum;
   AccessByItk_3(image, CalculateImageRegionMinMax, mask, minimum, maximum);
+  InitializeByMinimumMaximum(minimum, maximum, bins);
+}
+
+void mitk::IntensityQuantifier::InitializeByImageRegionAndMinimum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double minimum, unsigned int bins) {
+  double tmp, maximum;
+  AccessByItk_3(image, CalculateImageRegionMinMax, mask, tmp, maximum);
+  InitializeByMinimumMaximum(minimum, maximum, bins);
+}
+
+void mitk::IntensityQuantifier::InitializeByImageRegionAndMaximum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double maximum, unsigned int bins) {
+  double minimum, tmp;
+  AccessByItk_3(image, CalculateImageRegionMinMax, mask, minimum, tmp);
   InitializeByMinimumMaximum(minimum, maximum, bins);
 }
 
@@ -123,9 +147,33 @@ void mitk::IntensityQuantifier::InitializeByImageAndBinsize(mitk::Image::Pointer
   InitializeByBinsizeAndMaximum(minimum, maximum, binsize);
 }
 
+void mitk::IntensityQuantifier::InitializeByImageAndBinsizeAndMinimum(mitk::Image::Pointer image, double minimum, double binsize) {
+  double tmp, maximum;
+  AccessByItk_2(image, CalculateImageMinMax, tmp, maximum);
+  InitializeByBinsizeAndMaximum(minimum, maximum, binsize);
+}
+
+void mitk::IntensityQuantifier::InitializeByImageAndBinsizeAndMaximum(mitk::Image::Pointer image, double maximum, double binsize) {
+  double minimum, tmp;
+  AccessByItk_2(image, CalculateImageMinMax, minimum, tmp);
+  InitializeByBinsizeAndMaximum(minimum, maximum, binsize);
+}
+
 void mitk::IntensityQuantifier::InitializeByImageRegionAndBinsize(mitk::Image::Pointer image, mitk::Image::Pointer mask, double binsize) {
   double minimum, maximum;
   AccessByItk_3(image, CalculateImageRegionMinMax, mask, minimum, maximum);
+  InitializeByBinsizeAndMaximum(minimum, maximum, binsize);
+}
+
+void mitk::IntensityQuantifier::InitializeByImageRegionAndBinsizeAndMinimum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double minimum, double binsize) {
+  double tmp, maximum;
+  AccessByItk_3(image, CalculateImageRegionMinMax, mask, tmp, maximum);
+  InitializeByBinsizeAndMaximum(minimum, maximum, binsize);
+}
+
+void mitk::IntensityQuantifier::InitializeByImageRegionAndBinsizeAndMaximum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double maximum, double binsize) {
+  double minimum, tmp;
+  AccessByItk_3(image, CalculateImageRegionMinMax, mask, minimum, tmp);
   InitializeByBinsizeAndMaximum(minimum, maximum, binsize);
 }
 

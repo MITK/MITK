@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMinimumMaximumImageCalculator.h>
 
 mitk::MRNormLinearStatisticBasedFilter::MRNormLinearStatisticBasedFilter() :
-  m_CenterMode(MRNormLinearStatisticBasedFilter::MEDIAN)
+m_CenterMode(MRNormLinearStatisticBasedFilter::MEDIAN), m_TargetValue(0), m_TargetWidth(1)
 {
   this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfRequiredInputs(1);
@@ -142,8 +142,8 @@ void mitk::MRNormLinearStatisticBasedFilter::InternalComputeMask(itk::Image<TPix
     value0=modulo0; break;
   }
 
-  double offset = value0;
-  double scaling = stddev;
+  double offset = value0+m_TargetValue;
+  double scaling = stddev*m_TargetWidth;
   if (scaling < 0.0001)
     return;
 

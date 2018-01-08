@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFCooccurenceMatrix2.h>
-#include <mitkGIFGrayLevelRunLength.h>
+#include <mitkGIFGreyLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFFirstOrderHistogramStatistics.h>
 #include <mitkGIFVolumetricStatistics.h>
@@ -69,7 +69,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 typedef itk::Image< double, 3 >                 FloatImageType;
-typedef itk::Image< unsigned char, 3 >          MaskImageType;
+typedef itk::Image< unsigned short, 3 >          MaskImageType;
 
 template <class charT>
 class punct_facet : public std::numpunct<charT> {
@@ -119,7 +119,7 @@ static void
 CreateNoNaNMask(itk::Image<TPixel, VImageDimension>* itkValue, mitk::Image::Pointer mask, mitk::Image::Pointer& newMask)
 {
   typedef itk::Image< TPixel, VImageDimension>                 LFloatImageType;
-  typedef itk::Image< unsigned char, VImageDimension>          LMaskImageType;
+  typedef itk::Image< unsigned short, VImageDimension>          LMaskImageType;
   typename LMaskImageType::Pointer itkMask = LMaskImageType::New();
 
   mitk::CastToItkImage(mask, itkMask);
@@ -188,7 +188,7 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask,
                         std::vector<mitk::Image::Pointer> &morphMaskVector)
 {
   typedef itk::Image< double, 2 >                 FloatImage2DType;
-  typedef itk::Image< unsigned char, 2 >          MaskImage2DType;
+  typedef itk::Image< unsigned short, 2 >          MaskImage2DType;
 
   FloatImageType::Pointer itkFloat = FloatImageType::New();
   MaskImageType::Pointer itkMask = MaskImageType::New();
@@ -363,20 +363,20 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
 
 int main(int argc, char* argv[])
 {
-  mitk::GIFImageDescriptionFeatures::Pointer ipCalculator = mitk::GIFImageDescriptionFeatures::New();
-  mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New();
-  mitk::GIFFirstOrderHistogramStatistics::Pointer firstOrderHistoCalculator = mitk::GIFFirstOrderHistogramStatistics::New();
-  mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();
-  mitk::GIFVolumetricDensityStatistics::Pointer voldenCalculator = mitk::GIFVolumetricDensityStatistics::New();
-  mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
-  mitk::GIFCooccurenceMatrix2::Pointer cooc2Calculator = mitk::GIFCooccurenceMatrix2::New();
+  mitk::GIFImageDescriptionFeatures::Pointer ipCalculator = mitk::GIFImageDescriptionFeatures::New(); // Commented
+  mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New(); //Commented
+  mitk::GIFFirstOrderHistogramStatistics::Pointer firstOrderHistoCalculator = mitk::GIFFirstOrderHistogramStatistics::New(); // Commented
+  mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();   // Commented
+  mitk::GIFVolumetricDensityStatistics::Pointer voldenCalculator = mitk::GIFVolumetricDensityStatistics::New(); // Commented
+  mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New(); // Commented
+  mitk::GIFCooccurenceMatrix2::Pointer cooc2Calculator = mitk::GIFCooccurenceMatrix2::New(); //Commented
   mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer ngldCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
-  mitk::GIFGrayLevelRunLength::Pointer rlCalculator = mitk::GIFGrayLevelRunLength::New();
-  mitk::GIFGreyLevelSizeZone::Pointer glszCalculator = mitk::GIFGreyLevelSizeZone::New();
-  mitk::GIFGreyLevelDistanceZone::Pointer gldzCalculator = mitk::GIFGreyLevelDistanceZone::New();
-  mitk::GIFLocalIntensity::Pointer lociCalculator = mitk::GIFLocalIntensity::New();
-  mitk::GIFIntensityVolumeHistogramFeatures::Pointer ivohCalculator = mitk::GIFIntensityVolumeHistogramFeatures::New();
-  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New();
+  mitk::GIFGreyLevelRunLength::Pointer rlCalculator = mitk::GIFGreyLevelRunLength::New();
+  mitk::GIFGreyLevelSizeZone::Pointer glszCalculator = mitk::GIFGreyLevelSizeZone::New(); // Commented
+  mitk::GIFGreyLevelDistanceZone::Pointer gldzCalculator = mitk::GIFGreyLevelDistanceZone::New(); //Commented
+  mitk::GIFLocalIntensity::Pointer lociCalculator = mitk::GIFLocalIntensity::New(); //Commented
+  mitk::GIFIntensityVolumeHistogramFeatures::Pointer ivohCalculator = mitk::GIFIntensityVolumeHistogramFeatures::New(); // Commented
+  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New(); //Commented
   mitk::GIFCurvatureStatistic::Pointer curvCalculator = mitk::GIFCurvatureStatistic::New();
 
   std::vector<mitk::AbstractGlobalImageFeature::Pointer> features;

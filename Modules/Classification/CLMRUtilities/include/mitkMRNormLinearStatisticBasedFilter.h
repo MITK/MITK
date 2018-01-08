@@ -53,6 +53,12 @@ namespace mitk {
     itkGetConstMacro(IgnoreOutlier, bool);
     itkSetMacro(IgnoreOutlier, bool);
 
+    itkGetConstMacro(TargetValue, double);
+    itkSetMacro(TargetValue, double);
+
+    itkGetConstMacro(TargetWidth, double);
+    itkSetMacro(TargetWidth, double);
+
   protected:
     MRNormLinearStatisticBasedFilter();
 
@@ -69,6 +75,10 @@ namespace mitk {
 
     NormalizationBase m_CenterMode;
     bool m_IgnoreOutlier;
+  private:
+    double m_TargetValue;
+    double m_TargetWidth;
+
   };
 } // namespace mitk
 

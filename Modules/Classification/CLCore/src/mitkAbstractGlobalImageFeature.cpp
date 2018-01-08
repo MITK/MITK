@@ -38,79 +38,136 @@ void  mitk::AbstractGlobalImageFeature::AddQuantifierArguments(mitkCommandLinePa
   parser.addArgument(name + "::maximum", name + "::max", mitkCommandLineParser::Float, "Maximum Intensity for Quantification", "Defines the maximum Intensity used for Quantification", us::Any());
   parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::Int, "Number of Bins", "Define the number of bins that is used ", us::Any());
   parser.addArgument(name + "::binsize", name + "::binsize", mitkCommandLineParser::Float, "Binsize", "Define the size of the used bins", us::Any());
+  parser.addArgument(name + "::ignore-global-histogram", name + "::ignore-global-histogram", mitkCommandLineParser::Bool, "Ignore the global histogram Parameters", "Ignores the global histogram parameters", us::Any());
+  parser.addArgument(name + "::ignore-mask-for-histogram", name + "::ignore-mask", mitkCommandLineParser::Bool, "Ignore the global histogram Parameters", "Ignores the global histogram parameters", us::Any());
 
 }
-void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList, unsigned int defaultBins)
+
+void  mitk::AbstractGlobalImageFeature::InitializeQuantifierFromParameters(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins)
 {
-  bool useBins = false;
   unsigned int bins = 0;
-
-  bool useBinsize = false;
   double binsize = 0;
-
-  bool useMinimum = false;
   double minimum = 0;
-
-  bool useMaximum = false;
   double maximum = 0;
 
   auto parsedArgs = GetParameter();
   std::string name = GetOptionPrefix();
 
-  if (parsedArgs.count("bins"))
+  bool useGlobal = true;
+  if (parsedArgs.count(name + "::ignore-global-histogram"))
   {
-    bins = us::any_cast<int>(parsedArgs["bins"]);
-    useBins = true;
+    useGlobal = false;
+    SetUseMinimumIntensity(false);
+    SetUseMaximumIntensity(false);
+    SetUseBinsize(false);
+    SetUseBins(false);
   }
-  if (parsedArgs.count(name + "::bins"))
+
+  if (useGlobal)
   {
-    bins = us::any_cast<int>(parsedArgs[name + "::bins"]);
-    useBins = true;
+    if (parsedArgs.count("ignore-mask-for-histogram"))
+    {
+      bool tmp = us::any_cast<bool>(parsedArgs["ignore-mask-for-histogram"]);
+      SetIgnoreMask(tmp);
+    }
+    if (parsedArgs.count("minimum-intensity"))
+    {
+      minimum = us::any_cast<float>(parsedArgs["minimum-intensity"]);
+      SetMinimumIntensity(minimum);
+      SetUseMinimumIntensity(true);
+    }
+    if (parsedArgs.count("maximum-intensity"))
+    {
+      maximum = us::any_cast<float>(parsedArgs["maximum-intensity"]);
+      SetMaximumIntensity(maximum);
+      SetUseMaximumIntensity(true);
+    }
+    if (parsedArgs.count("bins"))
+    {
+      bins = us::any_cast<int>(parsedArgs["bins"]);
+      SetBins(bins);
+      SetUseBins(true);
+    }
+    if (parsedArgs.count("binsize"))
+    {
+      binsize = us::any_cast<float>(parsedArgs["binsize"]);
+      SetBinsize(binsize);
+      SetUseBinsize(true);
+    }
   }
-  if (parsedArgs.count("binsize"))
+  if (parsedArgs.count(name+"::ignore-mask-for-histogram"))
   {
-    binsize = us::any_cast<float>(parsedArgs["binsize"]);
-    useBinsize = true;
-  }
-  if (parsedArgs.count(name + "::binsize"))
-  {
-    binsize = us::any_cast<float>(parsedArgs[name + "::binsize"]);
-    useBinsize = true;
-  }
-  if (parsedArgs.count("minimum-intensity"))
-  {
-    minimum = us::any_cast<float>(parsedArgs["minimum-intensity"]);
-    useMinimum = true;
+    bool tmp = us::any_cast<bool>(parsedArgs[name+"::ignore-mask-for-histogram"]);
+    SetIgnoreMask(tmp);
   }
   if (parsedArgs.count(name + "::minimum"))
   {
     minimum = us::any_cast<float>(parsedArgs[name + "::minimum"]);
-    useMinimum = true;
-  }
-  if (parsedArgs.count("maximum-intensity"))
-  {
-    maximum = us::any_cast<float>(parsedArgs["maximum-intensity"]);
-    useMaximum = true;
+    SetMinimumIntensity(minimum);
+    SetUseMinimumIntensity(true);
   }
   if (parsedArgs.count(name + "::maximum"))
   {
     maximum = us::any_cast<float>(parsedArgs[name + "::maximum"]);
-    useMaximum = true;
+    SetMaximumIntensity(maximum);
+    SetUseMaximumIntensity(true);
   }
+  if (parsedArgs.count(name + "::bins"))
+  {
+    bins = us::any_cast<int>(parsedArgs[name + "::bins"]);
+    SetBins(bins);
+  }
+  if (parsedArgs.count(name + "::binsize"))
+  {
+    binsize = us::any_cast<float>(parsedArgs[name + "::binsize"]);
+    SetBinsize(binsize);
+    SetUseBinsize(true);
+  }
+  InitializeQuantifier(feature, mask, defaultBins);
+}
 
-  MITK_INFO << useMinimum << " " << useMaximum << " " << useBins << " " << useBinsize;
+void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins)
+{
+  MITK_INFO << GetUseMinimumIntensity() << " " << GetUseMaximumIntensity() << " " << GetUseBins() << " " << GetUseBinsize();
 
   m_Quantifier = IntensityQuantifier::New();
-  if (useMinimum && useMaximum && useBinsize)
-    m_Quantifier->InitializeByBinsizeAndMaximum(minimum, maximum, binsize);
-  else if (useMinimum && useBins && useBinsize)
-    m_Quantifier->InitializeByBinsizeAndBins(minimum, bins, binsize);
-  else if (useMinimum && useMaximum && useBins)
-    m_Quantifier->InitializeByMinimumMaximum(minimum, maximum, bins);
-  else if (useBinsize)
-    m_Quantifier->InitializeByImageRegionAndBinsize(feature, mask, binsize);
-  else if (useBins)
-    m_Quantifier->InitializeByImageRegion(feature, mask, bins);
+  if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBinsize())
+    m_Quantifier->InitializeByBinsizeAndMaximum(GetMinimumIntensity(), GetMaximumIntensity(), GetBinsize());
+  else if (GetUseMinimumIntensity() && GetUseBins() && GetUseBinsize())
+    m_Quantifier->InitializeByBinsizeAndBins(GetMinimumIntensity(), GetBins(), GetBinsize());
+  else if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBins())
+    m_Quantifier->InitializeByMinimumMaximum(GetMinimumIntensity(), GetMaximumIntensity(), GetBins());
+  // Intialize from Image and Binsize
+  else if (GetUseBinsize() && GetIgnoreMask() && GetUseMinimumIntensity())
+    m_Quantifier->InitializeByImageAndBinsizeAndMinimum(feature, GetMinimumIntensity(), GetBinsize());
+  else if (GetUseBinsize() && GetIgnoreMask() && GetUseMaximumIntensity())
+    m_Quantifier->InitializeByImageAndBinsizeAndMaximum(feature, GetMaximumIntensity(), GetBinsize());
+  else if (GetUseBinsize() && GetIgnoreMask())
+    m_Quantifier->InitializeByImageAndBinsize(feature, GetBinsize());
+  // Initialize form Image, Mask and Binsize
+  else if (GetUseBinsize() && GetUseMinimumIntensity())
+    m_Quantifier->InitializeByImageRegionAndBinsizeAndMinimum(feature, mask, GetMinimumIntensity(), GetBinsize());
+  else if (GetUseBinsize() && GetUseMaximumIntensity())
+    m_Quantifier->InitializeByImageRegionAndBinsizeAndMaximum(feature, mask, GetMaximumIntensity(), GetBinsize());
+  else if (GetUseBinsize())
+    m_Quantifier->InitializeByImageRegionAndBinsize(feature, mask, GetBinsize());
+  // Intialize from Image and Bins
+  else if (GetUseBins() && GetIgnoreMask() && GetUseMinimumIntensity())
+    m_Quantifier->InitializeByImageAndMinimum(feature, GetMinimumIntensity(), GetBins());
+  else if (GetUseBins() && GetIgnoreMask() && GetUseMaximumIntensity())
+    m_Quantifier->InitializeByImageAndMaximum(feature, GetMaximumIntensity(), GetBins());
+  else if (GetUseBins())
+    m_Quantifier->InitializeByImage(feature, GetBins());
+  // Intialize from Image, Mask and Bins
+  else if (GetUseBins() && GetUseMinimumIntensity())
+    m_Quantifier->InitializeByImageRegionAndMinimum(feature, mask, GetMinimumIntensity(), GetBins());
+  else if (GetUseBins() && GetUseMaximumIntensity())
+    m_Quantifier->InitializeByImageRegionAndMaximum(feature, mask, GetMaximumIntensity(), GetBins());
+  else if (GetUseBins())
+    m_Quantifier->InitializeByImageRegion(feature, mask, GetBins());
+  // Default
+  else if (GetIgnoreMask())
+    m_Quantifier->InitializeByImage(feature, GetBins());
   else
-    m_Quantifier->InitializeByImage(feature, defaultBins);
+    m_Quantifier->InitializeByImageRegion(feature, mask, defaultBins);
 }

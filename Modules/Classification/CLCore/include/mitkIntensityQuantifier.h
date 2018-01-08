@@ -38,9 +38,17 @@ public:
   void InitializeByBinsizeAndBins(double minimum, unsigned int bins, double binsize);
   void InitializeByBinsizeAndMaximum(double minimum, double maximum, double binsize);
   void InitializeByImage(mitk::Image::Pointer image, unsigned int bins);
+  void InitializeByImageAndMaximum(mitk::Image::Pointer image, double maximum, unsigned int bins);
+  void InitializeByImageAndMinimum(mitk::Image::Pointer image, double minimum, unsigned int bins);
   void InitializeByImageRegion(mitk::Image::Pointer image, mitk::Image::Pointer mask, unsigned int bins);
+  void InitializeByImageRegionAndMinimum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double minimum, unsigned int bins);
+  void InitializeByImageRegionAndMaximum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double maximum, unsigned int bins);
   void InitializeByImageAndBinsize(mitk::Image::Pointer image, double binsize);
+  void InitializeByImageAndBinsizeAndMinimum(mitk::Image::Pointer image, double minimum, double binsize);
+  void InitializeByImageAndBinsizeAndMaximum(mitk::Image::Pointer image, double maximum, double binsize);
   void InitializeByImageRegionAndBinsize(mitk::Image::Pointer image, mitk::Image::Pointer mask, double binsize);
+  void InitializeByImageRegionAndBinsizeAndMinimum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double minimum, double binsize);
+  void InitializeByImageRegionAndBinsizeAndMaximum(mitk::Image::Pointer image, mitk::Image::Pointer mask, double maximum, double binsize);
 
   unsigned int IntensityToIndex(double intensity);
   double IndexToMinimumIntensity(unsigned int index);

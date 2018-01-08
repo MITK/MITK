@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkPixelTypeMultiplex.h>
-#include <mitkImagePixelReadAccessor.h>
 
 // ITK
 #include <itkImageRegionIteratorWithIndex.h>
@@ -38,7 +37,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
 {
   int bins = 1000;
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<int, VImageDimension> MaskType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
   typename MaskType::Pointer itkMask = MaskType::New();
   mitk::CastToItkImage(mask, itkMask);
@@ -102,13 +101,13 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   unsigned int index010 = std::ceil(quantifier->GetBins() * 0.1);
   unsigned int index090 = std::floor(quantifier->GetBins() * 0.9);
 
-  featureList.push_back(std::make_pair("Intensity Volume Histogram Volume fration at 0.10 intensity", hist[index010]));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram Volume fration at 0.90 intensity", hist[index090]));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram Intensity at 0.10 volume", intensity010));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram Intensity at 0.90 volume", intensity090));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram Difference intensity at 0.10 and 0.90 volume", std::abs<double>(hist[index010] - hist[index090])));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram Area under IVH curve", auc));
+  featureList.push_back(std::make_pair("Intensity Volume Histogram::Volume fration at 0.10 intensity", hist[index010]));
+  featureList.push_back(std::make_pair("Intensity Volume Histogram::Volume fration at 0.90 intensity", hist[index090]));
+  featureList.push_back(std::make_pair("Intensity Volume Histogram::Intensity at 0.10 volume", intensity010));
+  featureList.push_back(std::make_pair("Intensity Volume Histogram::Intensity at 0.90 volume", intensity090));
+  featureList.push_back(std::make_pair("Intensity Volume Histogram::Difference volume fration at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
+  featureList.push_back(std::make_pair("Intensity Volume Histogram::Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
+  featureList.push_back(std::make_pair("Intensity Volume Histogram::Area under IVH curve", auc));
   //featureList.push_back(std::make_pair("Local Intensity Global Intensity Peak", globalPeakValue));
 }
 
@@ -121,6 +120,7 @@ mitk::GIFIntensityVolumeHistogramFeatures::GIFIntensityVolumeHistogramFeatures()
 
 mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
+  InitializeQuantifier(image, mask, 1000);
   FeatureListType featureList;
   AccessByItk_3(image, CalculateIntensityPeak, mask, GetQuantifier(), featureList);
   return featureList;
@@ -137,15 +137,14 @@ void mitk::GIFIntensityVolumeHistogramFeatures::AddArguments(mitkCommandLinePars
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Local Intensity", "calculates local intensity based features", us::Any());
-
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Local Intensity", "calculates local intensity based features", us::Any());
   AddQuantifierArguments(parser);
 }
 
 void
 mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNaN, FeatureListType &featureList)
 {
-  InitializeQuantifier(feature, mask, maskNoNaN, featureList,1000);
+  InitializeQuantifierFromParameters(feature, mask, 1000);
 
   auto parsedArgs = GetParameter();
   if (parsedArgs.count(GetLongName()))

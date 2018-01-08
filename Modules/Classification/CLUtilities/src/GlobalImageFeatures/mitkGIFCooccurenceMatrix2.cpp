@@ -7,7 +7,6 @@
 
 // ITK
 #include <itkEnhancedScalarImageToTextureFeaturesFilter.h>
-#include <itkMinimumMaximumImageCalculator.h>
 #include <itkShapedNeighborhoodIterator.h>
 #include <itkImageRegionConstIterator.h>
 
@@ -62,13 +61,13 @@ double mitk::CoocurenceMatrixHolder::IndexToMaxIntensity(int index)
 template<typename TPixel, unsigned int VImageDimension>
 void
 CalculateCoOcMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
-                    itk::Image<unsigned char, VImageDimension>* mask,
+                    itk::Image<unsigned short, VImageDimension>* mask,
                     itk::Offset<VImageDimension> offset,
                     int range,
                     mitk::CoocurenceMatrixHolder &holder)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> MaskImageType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskImageType;
   typedef itk::ShapedNeighborhoodIterator<ImageType> ShapeIterType;
   typedef itk::ShapedNeighborhoodIterator<MaskImageType> ShapeMaskIterType;
   typedef itk::ImageRegionConstIterator<ImageType> ConstIterType;
@@ -274,34 +273,14 @@ void
 CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFCooccurenceMatrix2::FeatureListType & featureList, mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2Configuration config)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> MaskType;
-  typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
   typedef itk::Offset<VImageDimension> OffsetType;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
-
-  typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
-  minMaxComputer->SetImage(itkImage);
-  minMaxComputer->Compute();
-
-  double rangeMin = -0.5 + minMaxComputer->GetMinimum();
-  double rangeMax = 0.5 + minMaxComputer->GetMaximum();
-
-  if (config.UseMinimumIntensity)
-    rangeMin = config.MinimumIntensity;
-  if (config.UseMaximumIntensity)
-    rangeMax = config.MaximumIntensity;
-
-  // Define Range
+  double rangeMin = config.MinimumIntensity;
+  double rangeMax = config.MaximumIntensity;
   int numberOfBins = config.Bins;
-  if (config.BinSize > 0)
-  {
-    numberOfBins = std::ceil((rangeMax - rangeMin) / config.BinSize);
-    rangeMax = rangeMin + config.BinSize * numberOfBins;
-  }
-
-  MITK_INFO << "Bins: " << numberOfBins << " , Min, Max: " << rangeMin << " -> " << rangeMax;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
@@ -371,9 +350,9 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   ss << config.range;
   std::string strRange = ss.str();
 
-  MatrixFeaturesTo(overallFeature, "co-occ. 2 (" + strRange + ") overall", featureList);
-  MatrixFeaturesTo(featureMean, "co-occ. 2 (" + strRange + ") mean", featureList);
-  MatrixFeaturesTo(featureStd, "co-occ. 2 (" + strRange + ") std.dev.", featureList);
+  MatrixFeaturesTo(overallFeature, "Co-occurenced Based Features (" + strRange + ")::Overall", featureList);
+  MatrixFeaturesTo(featureMean, "Co-occurenced Based Features (" + strRange + ")::Mean", featureList);
+  MatrixFeaturesTo(featureStd, "Co-occurenced Based Features (" + strRange + ")::Std.Dev.", featureList);
 
 
 }
@@ -536,7 +515,7 @@ void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
 }
 
 mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2():
-m_Range(1.0), m_Bins(128), m_Binsize(-1)
+m_Range(1.0)
 {
   SetShortName("cooc2");
   SetLongName("cooccurence2");
@@ -544,18 +523,17 @@ m_Range(1.0), m_Bins(128), m_Binsize(-1)
 
 mitk::GIFCooccurenceMatrix2::FeatureListType mitk::GIFCooccurenceMatrix2::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
+  InitializeQuantifier(image, mask);
+
   FeatureListType featureList;
 
   GIFCooccurenceMatrix2Configuration config;
   config.direction = GetDirection();
   config.range = m_Range;
 
-  config.MinimumIntensity = GetMinimumIntensity();
-  config.MaximumIntensity = GetMaximumIntensity();
-  config.UseMinimumIntensity = GetUseMinimumIntensity();
-  config.UseMaximumIntensity = GetUseMaximumIntensity();
-  config.Bins = GetBins();
-  config.BinSize = GetBinsize();
+  config.MinimumIntensity = GetQuantifier()->GetMinimum();
+  config.MaximumIntensity = GetQuantifier()->GetMaximum();
+  config.Bins = GetQuantifier()->GetBins();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -575,11 +553,9 @@ void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser)
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
   parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::String, "Cooc 2 Number of Bins", "Define the number of bins that is used ", us::Any());
-  parser.addArgument(name + "::binsize", name + "::binsize", mitkCommandLineParser::String, "Cooc 2 Number of Bins", "Define the number of bins that is used ", us::Any());
-
+  AddQuantifierArguments(parser);
 }
 
 void
@@ -590,7 +566,9 @@ mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Point
 
   if (parsedArgs.count(GetLongName()))
   {
+    InitializeQuantifierFromParameters(feature, maskNoNAN);
     std::vector<double> ranges;
+
     if (parsedArgs.count(name + "::range"))
     {
       ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
@@ -598,16 +576,6 @@ mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Point
     else
     {
       ranges.push_back(1);
-    }
-    if (parsedArgs.count(name + "::bins"))
-    {
-      auto bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';')[0];
-      this->SetBins(bins);
-    }
-    if (parsedArgs.count(name + "::binsize"))
-    {
-      auto binsize = SplitDouble(parsedArgs[name + "::binsize"].ToString(), ';')[0];
-      this->SetBinsize(binsize);
     }
 
     for (std::size_t i = 0; i < ranges.size(); ++i)
@@ -619,6 +587,5 @@ mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Point
       MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
     }
   }
-
 }
 

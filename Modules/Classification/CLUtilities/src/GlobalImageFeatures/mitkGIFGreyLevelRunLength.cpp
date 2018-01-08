@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkGIFGrayLevelRunLength.h>
+#include <mitkGIFGreyLevelRunLength.h>
 
 // MITK
 #include <mitkITKImageImport.h>
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGrayLevelRunLength::FeatureListType & featureList, mitk::GIFGrayLevelRunLength::ParameterStruct params)
+  CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGreyLevelRunLength::FeatureListType & featureList, mitk::GIFGreyLevelRunLength::ParameterStruct params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<TPixel, VImageDimension> MaskType;
@@ -243,14 +243,14 @@ void
   }
 }
 
-mitk::GIFGrayLevelRunLength::GIFGrayLevelRunLength():
+mitk::GIFGreyLevelRunLength::GIFGreyLevelRunLength():
 m_Range(1.0), m_UseCtRange(false)
 {
   SetShortName("rl");
   SetLongName("run-length");
 }
 
-mitk::GIFGrayLevelRunLength::FeatureListType mitk::GIFGrayLevelRunLength::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
+mitk::GIFGreyLevelRunLength::FeatureListType mitk::GIFGreyLevelRunLength::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
   FeatureListType featureList;
 
@@ -277,7 +277,7 @@ mitk::GIFGrayLevelRunLength::FeatureListType mitk::GIFGrayLevelRunLength::Calcul
   return featureList;
 }
 
-mitk::GIFGrayLevelRunLength::FeatureNameListType mitk::GIFGrayLevelRunLength::GetFeatureNames()
+mitk::GIFGreyLevelRunLength::FeatureNameListType mitk::GIFGreyLevelRunLength::GetFeatureNames()
 {
   FeatureNameListType featureList;
   featureList.push_back("RunLength. ShortRunEmphasis Means");
@@ -302,7 +302,7 @@ mitk::GIFGrayLevelRunLength::FeatureNameListType mitk::GIFGrayLevelRunLength::Ge
 }
 
 
-void mitk::GIFGrayLevelRunLength::AddArguments(mitkCommandLineParser &parser)
+void mitk::GIFGreyLevelRunLength::AddArguments(mitkCommandLineParser &parser)
 {
   std::string name = GetOptionPrefix();
 
@@ -311,7 +311,7 @@ void mitk::GIFGrayLevelRunLength::AddArguments(mitkCommandLineParser &parser)
 }
 
 void
-mitk::GIFGrayLevelRunLength::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::GIFGreyLevelRunLength::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
 {
   auto parsedArgs = GetParameter();
   std::string name = GetOptionPrefix();

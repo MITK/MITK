@@ -31,13 +31,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkImageMarchingCubes.h>
 #include <vtkMassProperties.h>
+#include <vtkDoubleArray.h>
+#include <vtkPCAStatistics.h>
+#include <vtkTable.h>
 
 // STL
-#include <sstream>
 #include <vnl/vnl_math.h>
-
-// OpenCV
-#include <opencv2/opencv.hpp>
 
 template<typename TPixel, unsigned int VImageDimension>
 void
@@ -63,8 +62,8 @@ void
     voxelVolume *= itkImage->GetSpacing()[i];
   }
 
-  featureList.push_back(std::make_pair("Volumetric Features Volume (pixel based)", volume));
-  featureList.push_back(std::make_pair("Volumetric Features Voxel Volume", voxelVolume));
+  featureList.push_back(std::make_pair("Volumetric Features::Voxel Volume", voxelVolume));
+  featureList.push_back(std::make_pair("Volumetric Features::Volume (voxel based)", volume));
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -214,11 +213,11 @@ void
 
   double boundingBoxVolume = maskVoxelSpacingX* (maskMaximumX - maskMinimumX) * maskVoxelSpacingY* (maskMaximumY - maskMinimumY) * maskVoxelSpacingZ* (maskMaximumZ - maskMinimumZ);
 
-  featureList.push_back(std::make_pair("Volumetric Features Maximum 3D diameter", longestDiameter));
-  featureList.push_back(std::make_pair("Volumetric Features Surface (Voxel based)", surface));
-  featureList.push_back(std::make_pair("Volumetric Features Centre of mass shift", differenceOfCenters));
-  featureList.push_back(std::make_pair("Volumetric Features Centre of mass shift (Uncorrected)", differenceOfCentersUncorrected));
-  featureList.push_back(std::make_pair("Volumetric Features Bounding Box Volume", boundingBoxVolume));
+  featureList.push_back(std::make_pair("Volumetric Features::Maximum 3D diameter", longestDiameter));
+  featureList.push_back(std::make_pair("Volumetric Features::Surface (voxel based)", surface));
+  featureList.push_back(std::make_pair("Volumetric Features::Centre of mass shift", differenceOfCenters));
+  featureList.push_back(std::make_pair("Volumetric Features::Centre of mass shift (uncorrected)", differenceOfCentersUncorrected));
+  featureList.push_back(std::make_pair("Volumetric Features::Bounding Box Volume", boundingBoxVolume));
 }
 
 mitk::GIFVolumetricStatistics::GIFVolumetricStatistics()
@@ -253,7 +252,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   double pixelVolume = featureList[0].second;
   double pixelSurface = featureList[3].second;
 
-  MITK_INFO << "Surf: " << pixelSurface << " Vol " << pixelVolume;
+  MITK_INFO << "Surface: " << pixelSurface << " Volume: " << pixelVolume;
 
   double compactness1 = pixelVolume / (std::sqrt(pi) * std::pow(meshSurf, 2.0 / 3.0));
   double compactness1Pixel = pixelVolume / (std::sqrt(pi) * std::pow(pixelSurface, 2.0 / 3.0));
@@ -282,8 +281,25 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   double yd = mask->GetGeometry()->GetSpacing()[1];
   double zd = mask->GetGeometry()->GetSpacing()[2];
 
-  std::vector<cv::Point3d> pointsForPCA;
-  std::vector<cv::Point3d> pointsForPCAUncorrected;
+  vtkSmartPointer<vtkDoubleArray> dataset1Arr = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset2Arr = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset3Arr = vtkSmartPointer<vtkDoubleArray>::New();
+  dataset1Arr->SetNumberOfComponents(1);
+  dataset2Arr->SetNumberOfComponents(1);
+  dataset3Arr->SetNumberOfComponents(1);
+  dataset1Arr->SetName("M1");
+  dataset2Arr->SetName("M2");
+  dataset3Arr->SetName("M3");
+
+  vtkSmartPointer<vtkDoubleArray> dataset1ArrU = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset2ArrU = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset3ArrU = vtkSmartPointer<vtkDoubleArray>::New();
+  dataset1ArrU->SetNumberOfComponents(1);
+  dataset2ArrU->SetNumberOfComponents(1);
+  dataset3ArrU->SetNumberOfComponents(1);
+  dataset1ArrU->SetName("M1");
+  dataset2ArrU->SetName("M2");
+  dataset3ArrU->SetName("M3");
 
   for (int x = 0; x < xx; x++)
   {
@@ -321,57 +337,57 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
         //Check if voxel is contained in segmentation
         if (pxMask > 0)
         {
-          cv::Point3d tmp;
-          tmp.x = x * xd;
-          tmp.y = y * yd;
-          tmp.z = z * zd;
-          pointsForPCAUncorrected.push_back(tmp);
+          dataset1ArrU->InsertNextValue(x*xd);
+          dataset2ArrU->InsertNextValue(y*yd);
+          dataset3ArrU->InsertNextValue(z*zd);
 
           if (pxImage == pxImage)
           {
-            pointsForPCA.push_back(tmp);
+            dataset1Arr->InsertNextValue(x*xd);
+            dataset2Arr->InsertNextValue(y*yd);
+            dataset3Arr->InsertNextValue(z*zd);
           }
         }
       }
     }
   }
 
+  vtkSmartPointer<vtkTable> datasetTable = vtkSmartPointer<vtkTable>::New();
+  datasetTable->AddColumn(dataset1Arr);
+  datasetTable->AddColumn(dataset2Arr);
+  datasetTable->AddColumn(dataset3Arr);
 
-  //Calculate PCA Features
-  int sz = pointsForPCA.size();
-  cv::Mat data_pts = cv::Mat(sz, 3, CV_64FC1);
-  for (int i = 0; i < data_pts.rows; ++i)
-  {
-      data_pts.at<double>(i, 0) = pointsForPCA[i].x;
-      data_pts.at<double>(i, 1) = pointsForPCA[i].y;
-      data_pts.at<double>(i, 2) = pointsForPCA[i].z;
-  }
+  vtkSmartPointer<vtkTable> datasetTableU = vtkSmartPointer<vtkTable>::New();
+  datasetTableU->AddColumn(dataset1ArrU);
+  datasetTableU->AddColumn(dataset2ArrU);
+  datasetTableU->AddColumn(dataset3ArrU);
 
-  //Calculate PCA Features
-  int szUC = pointsForPCAUncorrected.size();
-  cv::Mat data_ptsUC = cv::Mat(szUC, 3, CV_64FC1);
-  for (int i = 0; i < data_ptsUC.rows; ++i)
-  {
-    data_ptsUC.at<double>(i, 0) = pointsForPCAUncorrected[i].x;
-    data_ptsUC.at<double>(i, 1) = pointsForPCAUncorrected[i].y;
-    data_ptsUC.at<double>(i, 2) = pointsForPCAUncorrected[i].z;
-  }
+  vtkSmartPointer<vtkPCAStatistics> pcaStatistics = vtkSmartPointer<vtkPCAStatistics>::New();
+  pcaStatistics->SetInputData(vtkStatisticsAlgorithm::INPUT_DATA, datasetTable);
+  pcaStatistics->SetColumnStatus("M1", 1);
+  pcaStatistics->SetColumnStatus("M2", 1);
+  pcaStatistics->SetColumnStatus("M3", 1);
+  pcaStatistics->RequestSelectedColumns();
+  pcaStatistics->SetDeriveOption(true);
+  pcaStatistics->Update();
 
-  //Perform PCA analysis
-  cv::PCA pca_analysis(data_pts, cv::Mat(), CV_PCA_DATA_AS_ROW);
-  cv::PCA pca_analysisUC(data_ptsUC, cv::Mat(), CV_PCA_DATA_AS_ROW);
+  vtkSmartPointer<vtkDoubleArray> eigenvalues = vtkSmartPointer<vtkDoubleArray>::New();
+  pcaStatistics->GetEigenvalues(eigenvalues);
 
-  //Store the eigenvalues
+  pcaStatistics->SetInputData(vtkStatisticsAlgorithm::INPUT_DATA, datasetTableU);
+  pcaStatistics->Update();
+  vtkSmartPointer<vtkDoubleArray> eigenvaluesU = vtkSmartPointer<vtkDoubleArray>::New();
+  pcaStatistics->GetEigenvalues(eigenvaluesU);
+
   std::vector<double> eigen_val(3);
   std::vector<double> eigen_valUC(3);
-  for (int i = 0; i < 3; ++i)
-  {
-    eigen_val[i] = pca_analysis.eigenvalues.at<double>(0, i);
-    eigen_valUC[i] = pca_analysisUC.eigenvalues.at<double>(0, i);
-  }
+  eigen_val[2] = eigenvalues->GetValue(0);
+  eigen_val[1] = eigenvalues->GetValue(1);
+  eigen_val[0] = eigenvalues->GetValue(2);
+  eigen_valUC[2] = eigenvaluesU->GetValue(0);
+  eigen_valUC[1] = eigenvaluesU->GetValue(1);
+  eigen_valUC[0] = eigenvaluesU->GetValue(2);
 
-  std::sort(eigen_val.begin(), eigen_val.end());
-  std::sort(eigen_valUC.begin(), eigen_valUC.end());
   double major = 4*sqrt(eigen_val[2]);
   double minor = 4*sqrt(eigen_val[1]);
   double least = 4*sqrt(eigen_val[0]);
@@ -383,34 +399,32 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   double elongationUC = majorUC == 0 ? 0 : sqrt(eigen_valUC[1] / eigen_valUC[2]);
   double flatnessUC = majorUC == 0 ? 0 : sqrt(eigen_valUC[0] / eigen_valUC[2]);
 
-
-  featureList.push_back(std::make_pair("Volumetric Features Volume (mesh based)",meshVolume));
-  featureList.push_back(std::make_pair("Volumetric Features Surface area",meshSurf));
-  featureList.push_back(std::make_pair("Volumetric Features Surface to volume ratio",surfaceToVolume));
-  featureList.push_back(std::make_pair("Volumetric Features Sphericity",sphericity));
-  featureList.push_back(std::make_pair("Volumetric Features Asphericity",asphericity));
-  featureList.push_back(std::make_pair("Volumetric Features Compactness 1",compactness1));
-  featureList.push_back(std::make_pair("Volumetric Features Compactness 2",compactness2));
-  featureList.push_back(std::make_pair("Volumetric Features Compactness 3",compactness3));
-  featureList.push_back(std::make_pair("Volumetric Features Spherical disproportion", sphericalDisproportion));
-  featureList.push_back(std::make_pair("Volumetric Features Surface to volume ratio (Voxel based)", surfaceToVolumePixel));
-  featureList.push_back(std::make_pair("Volumetric Features Sphericity (Voxel based)", sphericityPixel));
-  featureList.push_back(std::make_pair("Volumetric Features Asphericity (Voxel based)", asphericityPixel));
-  featureList.push_back(std::make_pair("Volumetric Features Compactness 1 (Voxel based)", compactness1Pixel));
-  featureList.push_back(std::make_pair("Volumetric Features Compactness 2 (Voxel based)", compactness2Pixel));
-  featureList.push_back(std::make_pair("Volumetric Features Compactness 3 (Voxel based)", compactness3Pixel));
-  featureList.push_back(std::make_pair("Volumetric Features Spherical disproportion (Voxel based)", sphericalDisproportionPixel));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Major Axis",major));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Minor Axis",minor));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Least Axis",least));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Elongation",elongation));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Flatness",flatness));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Major Axis (Uncorrected)", majorUC));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Minor Axis (Uncorrected)", minorUC));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Least Axis (Uncorrected)", leastUC));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Elongation (Uncorrected)", elongationUC));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Flatness (Uncorrected)", flatnessUC));
-
+  featureList.push_back(std::make_pair("Volumetric Features::Volume (mesh based)",meshVolume));
+  featureList.push_back(std::make_pair("Volumetric Features::Surface (mesh based)",meshSurf));
+  featureList.push_back(std::make_pair("Volumetric Features::Surface to volume ratio (mesh based)",surfaceToVolume));
+  featureList.push_back(std::make_pair("Volumetric Features::Sphericity (mesh based)",sphericity));
+  featureList.push_back(std::make_pair("Volumetric Features::Asphericity (mesh based)", asphericity));
+  featureList.push_back(std::make_pair("Volumetric Features::Compactness 1 (mesh based)", compactness3));
+  featureList.push_back(std::make_pair("Volumetric Features::Compactness 1 old (mesh based)" ,compactness1));
+  featureList.push_back(std::make_pair("Volumetric Features::Compactness 2 (mesh based)",compactness2));
+  featureList.push_back(std::make_pair("Volumetric Features::Spherical disproportion (mesh based)", sphericalDisproportion));
+  featureList.push_back(std::make_pair("Volumetric Features::Surface to volume ratio (voxel based)", surfaceToVolumePixel));
+  featureList.push_back(std::make_pair("Volumetric Features::Sphericity (voxel based)", sphericityPixel));
+  featureList.push_back(std::make_pair("Volumetric Features::Asphericity (voxel based)", asphericityPixel));
+  featureList.push_back(std::make_pair("Volumetric Features::Compactness 1 (voxel based)", compactness3Pixel));
+  featureList.push_back(std::make_pair("Volumetric Features::Compactness 1 old (voxel based)", compactness1Pixel));
+  featureList.push_back(std::make_pair("Volumetric Features::Compactness 2 (voxel based)", compactness2Pixel));
+  featureList.push_back(std::make_pair("Volumetric Features::Spherical disproportion (voxel based)", sphericalDisproportionPixel));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Major axis length",major));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Minor axis length",minor));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Least axis length",least));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Elongation",elongation));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Flatness",flatness));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Major axis length (uncorrected)", majorUC));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Minor axis length (uncorrected)", minorUC));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Least axis length (uncorrected)", leastUC));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Elongation (uncorrected)", elongationUC));
+  featureList.push_back(std::make_pair("Volumetric Features::PCA Flatness (uncorrected)", flatnessUC));
 
   return featureList;
 }
@@ -426,7 +440,7 @@ void mitk::GIFVolumetricStatistics::AddArguments(mitkCommandLineParser &parser)
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Volume-Statistic", "calculates volume based features", us::Any());
 }
 
 void
@@ -435,7 +449,7 @@ mitk::GIFVolumetricStatistics::CalculateFeaturesUsingParameters(const Image::Poi
   auto parsedArgs = GetParameter();
   if (parsedArgs.count(GetLongName()))
   {
-    MITK_INFO << "Start calculating volumetric features ....";
+    MITK_INFO << "Start calculating Volumetric Features::....";
     auto localResults = this->CalculateFeatures(feature, mask);
     featureList.insert(featureList.end(), localResults.begin(), localResults.end());
     MITK_INFO << "Finished calculating volumetric features....";

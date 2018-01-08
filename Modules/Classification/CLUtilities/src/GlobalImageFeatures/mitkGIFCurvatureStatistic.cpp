@@ -37,9 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include <limits>
 
-// OpenCV
-#include <opencv2/opencv.hpp>
-
 static void calculateLocalStatistic(vtkDataArray* scalars, std::string name, mitk::GIFCurvatureStatistic::FeatureListType & featureList)
 {
   int size = scalars->GetNumberOfTuples();
@@ -126,13 +123,10 @@ mitk::GIFCurvatureStatistic::FeatureListType mitk::GIFCurvatureStatistic::Calcul
     return featureList;
   }
 
-
   //AccessByItk_2(image, CalculateVolumeStatistic, mask, featureList);
-  //AccessByItk_2(mask, CalculateLargestDiameter, image, featureList);
 
   vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
   vtkSmartPointer<vtkCurvatures> curvator = vtkSmartPointer<vtkCurvatures>::New();
-//  vtkSmartPointer<vtkMassProperties> stats = vtkSmartPointer<vtkMassProperties>::New();
   mesher->SetInputData(mask->GetVtkImageData());
   mesher->SetValue(0, 0.5);
   curvator->SetInputConnection(mesher->GetOutputPort());
@@ -155,20 +149,6 @@ mitk::GIFCurvatureStatistic::FeatureListType mitk::GIFCurvatureStatistic::Calcul
   curvator->Update();
   scalars = curvator->GetOutput()->GetPointData()->GetScalars();
   calculateLocalStatistic(scalars, "Maximum", featureList);
-
-
-
-
-
-  //double meshVolume = stats->GetVolume();
-  //double meshSurf = stats->GetSurfaceArea();
-  //double pixelVolume = featureList[0].second;
-  //double pixelSurface = featureList[3].second;
-  //MITK_INFO << "Surf: " << pixelSurface << " Vol " << pixelVolume;
-
-  //featureList.push_back(std::make_pair("Volumetric Features Volume (mesh based)",meshVolume));
-  //featureList.push_back(std::make_pair("Volumetric Features Surface area",meshSurf));
-
 
   return featureList;
 }

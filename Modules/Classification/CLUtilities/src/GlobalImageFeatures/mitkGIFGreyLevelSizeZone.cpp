@@ -6,12 +6,9 @@
 #include <mitkImageAccessByItk.h>
 
 // ITK
-
-#include <itkMinimumMaximumImageCalculator.h>
 #include <itkImageRegionIteratorWithIndex.h>
 
 // STL
-#include <sstream>
 
 static
 void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
@@ -50,15 +47,15 @@ double mitk::GreyLevelSizeZoneMatrixHolder::IndexToMaxIntensity(int index)
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-int
+static int
 CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
-                    itk::Image<unsigned char, VImageDimension>* mask,
+                    itk::Image<unsigned short, VImageDimension>* mask,
                     std::vector<itk::Offset<VImageDimension> > offsets,
                     bool estimateLargestRegion,
                     mitk::GreyLevelSizeZoneMatrixHolder &holder)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> MaskImageType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskImageType;
   typedef typename ImageType::IndexType IndexType;
 
   typedef itk::ImageRegionIteratorWithIndex<ImageType> ConstIterType;
@@ -134,7 +131,7 @@ CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
   return largestRegion;
 }
 
-void CalculateFeatures(
+static void CalculateFeatures(
   mitk::GreyLevelSizeZoneMatrixHolder &holder,
   mitk::GreyLevelSizeZoneFeatures & results
   )
@@ -222,30 +219,17 @@ void CalculateFeatures(
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void
+static void
 CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGreyLevelSizeZone::FeatureListType & featureList, mitk::GIFGreyLevelSizeZone::GIFGreyLevelSizeZoneConfiguration config)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> MaskType;
-  typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
   typedef itk::Offset<VImageDimension> OffsetType;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
-
-  typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
-  minMaxComputer->SetImage(itkImage);
-  minMaxComputer->Compute();
-
-  double rangeMin = -0.5 + minMaxComputer->GetMinimum();
-  double rangeMax = 0.5 + minMaxComputer->GetMaximum();
-
-  if (config.UseMinimumIntensity)
-    rangeMin = config.MinimumIntensity;
-  if (config.UseMaximumIntensity)
-    rangeMax = config.MaximumIntensity;
-
-  // Define Range
+  double rangeMin = config.MinimumIntensity;
+  double rangeMax = config.MaximumIntensity;
   int numberOfBins = config.Bins;
 
   typename MaskType::Pointer maskImage = MaskType::New();
@@ -263,7 +247,6 @@ CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage
     bool useOffset = true;
     for (unsigned int i = 0; i < VImageDimension; ++i)
     {
-      offset[i] *= config.range;
       if ((config.direction == i + 2) && offset[i] != 0)
       {
         useOffset = false;
@@ -292,10 +275,7 @@ CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage
   CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, offsetVector, false, holderOverall);
   CalculateFeatures(holderOverall, overallFeature);
 
-  std::stringstream ss;
-  ss << config.range;
-  std::string strRange = ss.str();
-  MatrixFeaturesTo(overallFeature, "Grey Level Size Zone (" + strRange + ")", featureList);
+  MatrixFeaturesTo(overallFeature, "Grey Level Size Zone::", featureList);
 }
 
 
@@ -304,46 +284,44 @@ void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
                       std::string prefix,
                       mitk::GIFGreyLevelSizeZone::FeatureListType &featureList)
 {
-  featureList.push_back(std::make_pair(prefix + " Small Zone Emphasis", features.SmallZoneEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Large Zone Emphasis", features.LargeZoneEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Low Grey Level Emphasis", features.LowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " High Grey Level Emphasis", features.HighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Small Zone Low Grey LEvel Emphasis", features.SmallZoneLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Small Zone High Grey LEvel Emphasis", features.SmallZoneHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Large Zone Low Grey Level Emphasis", features.LargeZoneLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Large Zone High Grey Level Emphasis", features.LargeZoneHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
-  featureList.push_back(std::make_pair(prefix + " Grey Level Non-Uniformity Normalized", features.GreyLevelNonUniformityNormalized));
-  featureList.push_back(std::make_pair(prefix + " Zone Size Non-Uniformity", features.ZoneSizeNonUniformity));
-  featureList.push_back(std::make_pair(prefix + " Zone Size Non-Uniformity Normalized", features.ZoneSizeNoneUniformityNormalized));
-  featureList.push_back(std::make_pair(prefix + " Zone Percentage", features.ZonePercentage));
-  featureList.push_back(std::make_pair(prefix + " Grey Level Mean", features.GreyLevelMean));
-  featureList.push_back(std::make_pair(prefix + " Grey Level Variance", features.GreyLevelVariance));
-  featureList.push_back(std::make_pair(prefix + " Zone Size Mean", features.ZoneSizeMean));
-  featureList.push_back(std::make_pair(prefix + " Zone Size Variance", features.ZoneSizeVariance));
-  featureList.push_back(std::make_pair(prefix + " Zone Size Entropy", features.ZoneSizeEntropy));
+  featureList.push_back(std::make_pair(prefix + "Small Zone Emphasis", features.SmallZoneEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Large Zone Emphasis", features.LargeZoneEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Low Grey Level Emphasis", features.LowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "High Grey Level Emphasis", features.HighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Small Zone Low Grey Level Emphasis", features.SmallZoneLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Small Zone High Grey Level Emphasis", features.SmallZoneHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Large Zone Low Grey Level Emphasis", features.LargeZoneLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Large Zone High Grey Level Emphasis", features.LargeZoneHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity Normalized", features.GreyLevelNonUniformityNormalized));
+  featureList.push_back(std::make_pair(prefix + "Zone Size Non-Uniformity", features.ZoneSizeNonUniformity));
+  featureList.push_back(std::make_pair(prefix + "Zone Size Non-Uniformity Normalized", features.ZoneSizeNoneUniformityNormalized));
+  featureList.push_back(std::make_pair(prefix + "Zone Percentage", features.ZonePercentage));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Mean", features.GreyLevelMean));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Variance", features.GreyLevelVariance));
+  featureList.push_back(std::make_pair(prefix + "Zone Size Mean", features.ZoneSizeMean));
+  featureList.push_back(std::make_pair(prefix + "Zone Size Variance", features.ZoneSizeVariance));
+  featureList.push_back(std::make_pair(prefix + "Zone Size Entropy", features.ZoneSizeEntropy));
 }
 
-  mitk::GIFGreyLevelSizeZone::GIFGreyLevelSizeZone() :
-        m_Range(1.0), m_Bins(128)
+  mitk::GIFGreyLevelSizeZone::GIFGreyLevelSizeZone()
 {
   SetShortName("glsz");
-  SetLongName("sizezone");
+  SetLongName("grey-level-sizezone");
 }
 
 mitk::GIFGreyLevelSizeZone::FeatureListType mitk::GIFGreyLevelSizeZone::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
+  InitializeQuantifier(image, mask);
+
   FeatureListType featureList;
 
   GIFGreyLevelSizeZoneConfiguration config;
   config.direction = GetDirection();
-  config.range = m_Range;
 
-  config.MinimumIntensity = GetMinimumIntensity();
-  config.MaximumIntensity = GetMaximumIntensity();
-  config.UseMinimumIntensity = GetUseMinimumIntensity();
-  config.UseMaximumIntensity = GetUseMaximumIntensity();
-  config.Bins = GetBins();
+  config.MinimumIntensity = GetQuantifier()->GetMinimum();
+  config.MaximumIntensity = GetQuantifier()->GetMaximum();
+  config.Bins = GetQuantifier()->GetBins();
 
   AccessByItk_3(image, CalculateGreyLevelSizeZoneFeatures, mask, featureList, config);
 
@@ -363,9 +341,8 @@ void mitk::GIFGreyLevelSizeZone::AddArguments(mitkCommandLineParser &parser)
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Grey Level Size Zone", "Calculates the size zone based features.", us::Any());
-  parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::String, "Cooc 2 Number of Bins", "Define the number of bins that is used ", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Grey Level Size Zone", "Calculates the size zone based features.", us::Any());
+  AddQuantifierArguments(parser);
 }
 
 void
@@ -376,29 +353,12 @@ mitk::GIFGreyLevelSizeZone::CalculateFeaturesUsingParameters(const Image::Pointe
 
   if (parsedArgs.count(GetLongName()))
   {
-    std::vector<double> ranges;
-    if (parsedArgs.count(name + "::range"))
-    {
-      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
-    }
-    else
-    {
-      ranges.push_back(1);
-    }
-    if (parsedArgs.count(name + "::bins"))
-    {
-      auto bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';')[0];
-      this->SetBins(bins);
-    }
+    InitializeQuantifierFromParameters(feature, maskNoNAN);
 
-    for (std::size_t i = 0; i < ranges.size(); ++i)
-    {
-      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
-      this->SetRange(ranges[i]);
-      auto localResults = this->CalculateFeatures(feature, maskNoNAN);
-      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
-    }
+    MITK_INFO << "Start calculating  Grey leve size zone ...";
+    auto localResults = this->CalculateFeatures(feature, maskNoNAN);
+    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+    MITK_INFO << "Finished calculating Grey level size zone ...";
   }
 
 }

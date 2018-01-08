@@ -32,24 +32,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixel, unsigned int VImageDimension>
 static void
-CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::IntensityQuantifier::Pointer quantifier,  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::FeatureListType & featureList)
+CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::NGTDFeatures params, mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::FeatureListType & featureList)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<int, VImageDimension> MaskType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
   typename MaskType::Pointer itkMask = MaskType::New();
   mitk::CastToItkImage(mask, itkMask);
 
   ImageType::SizeType regionSize;
-  regionSize.Fill(1);
+  regionSize.Fill(params.Range);
 
   itk::NeighborhoodIterator<ImageType> iter(regionSize, itkImage, itkImage->GetLargestPossibleRegion());
   itk::NeighborhoodIterator<MaskType> iterMask(regionSize, itkMask, itkMask->GetLargestPossibleRegion());
 
   std::vector<double> pVector;
   std::vector<double> sVector;
-  pVector.resize(quantifier->GetBins(), 0);
-  sVector.resize(quantifier->GetBins(), 0);
+  pVector.resize(params.quantifier->GetBins(), 0);
+  sVector.resize(params.quantifier->GetBins(), 0);
 
   int count = 0;
   while (!iter.IsAtEnd())
@@ -58,7 +58,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
     {
       int localCount = 0;
       double localMean = 0;
-      unsigned int localIndex = quantifier->IntensityToIndex(iter.GetCenterPixel());
+      unsigned int localIndex = params.quantifier->IntensityToIndex(iter.GetCenterPixel());
       for (int i = 0; i < iter.Size(); ++i)
       {
         if (i == (iter.Size() / 2))
@@ -66,7 +66,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
         if (iterMask.GetPixel(i) > 0)
         {
           ++localCount;
-          localMean += quantifier->IntensityToIndex(iter.GetPixel(i))+1;
+          localMean += params.quantifier->IntensityToIndex(iter.GetPixel(i)) + 1;
         }
       }
       if (localCount > 0)
@@ -86,7 +86,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   }
 
   unsigned int Ngp = 0;
-  for (unsigned int i = 0; i < quantifier->GetBins(); ++i)
+  for (unsigned int i = 0; i < params.quantifier->GetBins(); ++i)
   {
     if (pVector[i] > 0.1)
     {
@@ -102,11 +102,11 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   double busynessA = 0;
   double complexity = 0;
   double strengthA = 0;
-  for (unsigned int i = 0; i < quantifier->GetBins(); ++i)
+  for (unsigned int i = 0; i < params.quantifier->GetBins(); ++i)
   {
     sumS += sVector[i];
     sumStimesP += pVector[i] * sVector[i];
-    for (unsigned int j = 0; j < quantifier->GetBins(); ++j)
+    for (unsigned int j = 0; j < params.quantifier->GetBins(); ++j)
     {
       double iMinusj = 1.0*i - 1.0*j;
       contrastA += pVector[i] * pVector[j] * iMinusj*iMinusj;
@@ -133,15 +133,16 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
     strength = strengthA / sumS;
   }
 
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference Coarsness", coarsness));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference Contrast", contrast));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference Busyness", busyness));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference Complexity", complexity));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference Strength", strength));
+  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Coarsness", coarsness));
+  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Contrast", contrast));
+  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Busyness", busyness));
+  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Complexity", complexity));
+  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Strength", strength));
 }
 
 
-mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::GIFNeighbourhoodGreyToneDifferenceFeatures()
+mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::GIFNeighbourhoodGreyToneDifferenceFeatures() :
+m_Range(1)
 {
   SetLongName("neighbourhood-grey-tone-difference");
   SetShortName("ngtd");
@@ -150,11 +151,14 @@ mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::GIFNeighbourhoodGreyToneDiffer
 mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::FeatureListType mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
   FeatureListType featureList;
-  //if (image->GetDimension() < 3)
-  //{
-  //  return featureList;
-  //}
-  AccessByItk_3(image, CalculateIntensityPeak, mask, GetQuantifier(), featureList);
+
+  InitializeQuantifierFromParameters(image, mask);
+
+  NGTDFeatures params;
+  params.Range = GetRange();
+  params.quantifier = GetQuantifier();
+
+  AccessByItk_3(image, CalculateIntensityPeak, mask, params, featureList);
   return featureList;
 }
 
@@ -170,21 +174,29 @@ void mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::AddArguments(mitkCommandL
   AddQuantifierArguments(parser);
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Local Intensity", "calculates local intensity based features", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Neighbourhood Grey Tone Difference", "calculates Neighborhood Grey Tone based features", us::Any());
+  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::Int, "Range for the local intensity", "Give the range that should be used for the local intensity in mm", us::Any());
+
 }
 
 void
 mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNaN, FeatureListType &featureList)
 {
-  InitializeQuantifier(feature, mask, maskNoNaN, featureList);
+  InitializeQuantifierFromParameters(feature, mask);
+  std::string name = GetOptionPrefix();
 
   auto parsedArgs = GetParameter();
   if (parsedArgs.count(GetLongName()))
   {
-    MITK_INFO << "Start calculating local intensity features ....";
+    MITK_INFO << "Start calculating Neighbourhood Grey Tone Difference features ....";
+    if (parsedArgs.count(name + "::range"))
+    {
+      int range = us::any_cast<int>(parsedArgs[name + "::range"]);
+      this->SetRange(range);
+    }
     auto localResults = this->CalculateFeatures(feature, mask);
     featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-    MITK_INFO << "Finished calculating local intensity features....";
+    MITK_INFO << "Finished calculating Neighbourhood Grey Tone Difference features....";
   }
 }
 

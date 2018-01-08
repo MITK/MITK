@@ -25,9 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include "mitkCommandLineParser.h"
 
-#include <mitkGIFCooccurenceMatrix.h>
-#include <mitkGIFGrayLevelRunLength.h>
-
 #include "itkDiscreteGaussianImageFilter.h"
 #include <itkLaplacianRecursiveGaussianImageFilter.h>
 #include "itkHessianRecursiveGaussianImageFilter.h"

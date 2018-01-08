@@ -61,6 +61,7 @@ namespace mitk
       bool resampleToFixIsotropic;
       double resampleResolution;
 
+      bool ignoreMaskForHistogram;
       bool defineGlobalMinimumIntensity;
       double globalMinimumIntensity;
       bool defineGlobalMaximumIntensity;

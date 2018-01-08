@@ -242,8 +242,8 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
 mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
 m_Range(1.0)
 {
-  SetShortName("cooc");
-  SetLongName("cooccurence");
+  SetShortName("deprecated-cooc");
+  SetLongName("deprecated-cooccurence");
 }
 
 mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -333,7 +333,7 @@ void mitk::GIFCooccurenceMatrix::AddArguments(mitkCommandLineParser &parser)
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
 }
 

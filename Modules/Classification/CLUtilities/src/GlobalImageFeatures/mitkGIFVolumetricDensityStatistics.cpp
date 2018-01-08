@@ -34,21 +34,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageMarchingCubes.h>
 #include <vtkMassProperties.h>
 #include <vtkDelaunay3D.h>
-#include <vtkOBBTree.h>
-#include <vtkTessellatorFilter.h>
-#include <vtkTriangleFilter.h>
-
-#include <vtkXMLPolyDataWriter.h>
-#include <vtkSTLWriter.h>
-
 #include <vtkGeometryFilter.h>
+#include <vtkDoubleArray.h>
+#include <vtkPCAStatistics.h>
+#include <vtkTable.h>
 
 // STL
-#include <sstream>
+#include <limits>
 #include <vnl/vnl_math.h>
-
-// OpenCV
-#include <opencv2/opencv.hpp>
 
 // Eigen
 #include <Eigen/Dense>
@@ -58,7 +51,7 @@ void
   CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, double volume, mitk::GIFVolumetricDensityStatistics::FeatureListType & featureList)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<int, VImageDimension> MaskType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::LabelGeometryImageFilter<MaskType, ImageType> FilterType;
 
   typename MaskType::Pointer maskImage = MaskType::New();
@@ -125,15 +118,15 @@ void
     ++maskA;
   }
 
-  featureList.push_back(std::make_pair("Morphological Density Volume Integrated Intensity", volume* mean));
-  featureList.push_back(std::make_pair("Morphological Density Volume Moran's I Index", Nv / w_ij * moranA / moranB));
-  featureList.push_back(std::make_pair("Morphological Density Volume Geary's C measure", ( Nv -1 ) / 2 / w_ij * geary/ moranB));
+  featureList.push_back(std::make_pair("Morphological Density::Volume integrated intensity", volume* mean));
+  featureList.push_back(std::make_pair("Morphological Density::Volume Moran's I index", Nv / w_ij * moranA / moranB));
+  featureList.push_back(std::make_pair("Morphological Density::Volume Geary's C measure", ( Nv -1 ) / 2 / w_ij * geary/ moranB));
 }
 
 void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
 {
   auto cell = pointset->GetCell(0);
-  volume = 10000000000000000000;
+  volume = std::numeric_limits<double>::max();
 
   for (int cellID = 0; cellID < pointset->GetNumberOfCells(); ++cellID)
   {
@@ -169,12 +162,12 @@ void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
       double p0[3];
       pointset->GetPoint(edge->GetPointId(0), p0);
 
-      double curMinX = 1000000000000000;
-      double curMaxX = -10000000000000000;
-      double curMinY = 1000000000000000;
-      double curMaxY = -10000000000000000;
-      double curMinZ = 1000000000000000;
-      double curMaxZ = -10000000000000000;
+      double curMinX = std::numeric_limits<double>::max();
+      double curMaxX = std::numeric_limits<double>::lowest();
+      double curMinY = std::numeric_limits<double>::max();
+      double curMaxY = std::numeric_limits<double>::lowest();
+      double curMinZ = std::numeric_limits<double>::max();
+      double curMaxZ = std::numeric_limits<double>::lowest();
       for (int pointID = 0; pointID < pointset->GetNumberOfPoints(); ++pointID)
       {
         double p[3];
@@ -295,9 +288,6 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
     return featureList;
   }
 
-
-  //AccessByItk_2(mask, CalculateLargestDiameter, image, featureList);
-
   vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
   vtkSmartPointer<vtkMassProperties> stats = vtkSmartPointer<vtkMassProperties>::New();
   vtkSmartPointer<vtkMassProperties> stats2 = vtkSmartPointer<vtkMassProperties>::New();
@@ -309,7 +299,6 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
   vtkSmartPointer<vtkDelaunay3D> delaunay =
     vtkSmartPointer< vtkDelaunay3D >::New();
   delaunay->SetInputConnection(mesher->GetOutputPort());
-  //delaunay->SetInputData(mask->GetVtkImageData());
   delaunay->SetAlpha(0);
   delaunay->Update();
   vtkSmartPointer<vtkGeometryFilter> geometryFilter =
@@ -334,7 +323,6 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
   double meshVolume = stats->GetVolume();
   double meshSurf = stats->GetSurfaceArea();
 
-
   AccessByItk_3(image, CalculateVolumeDensityStatistic, mask, meshVolume, featureList);
 
   //Calculate center of mass shift
@@ -346,15 +334,32 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
   double yd = mask->GetGeometry()->GetSpacing()[1];
   double zd = mask->GetGeometry()->GetSpacing()[2];
 
-  std::vector<cv::Point3d> pointsForPCA;
-  std::vector<cv::Point3d> pointsForPCAUncorrected;
-
   int minimumX=xx;
   int maximumX=0;
   int minimumY=yy;
   int maximumY=0;
   int minimumZ=zz;
   int maximumZ=0;
+
+  vtkSmartPointer<vtkDoubleArray> dataset1Arr = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset2Arr = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset3Arr = vtkSmartPointer<vtkDoubleArray>::New();
+  dataset1Arr->SetNumberOfComponents(1);
+  dataset2Arr->SetNumberOfComponents(1);
+  dataset3Arr->SetNumberOfComponents(1);
+  dataset1Arr->SetName("M1");
+  dataset2Arr->SetName("M2");
+  dataset3Arr->SetName("M3");
+
+  vtkSmartPointer<vtkDoubleArray> dataset1ArrU = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset2ArrU = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkDoubleArray> dataset3ArrU = vtkSmartPointer<vtkDoubleArray>::New();
+  dataset1ArrU->SetNumberOfComponents(1);
+  dataset2ArrU->SetNumberOfComponents(1);
+  dataset3ArrU->SetNumberOfComponents(1);
+  dataset1ArrU->SetName("M1");
+  dataset2ArrU->SetName("M2");
+  dataset3ArrU->SetName("M3");
 
   vtkSmartPointer<vtkPoints> points =
     vtkSmartPointer< vtkPoints >::New();
@@ -402,57 +407,39 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
           maximumY = std::max<int>(y, maximumY);
           maximumZ = std::max<int>(z, maximumZ);
           points->InsertNextPoint(x*xd, y*yd, z*zd);
-          cv::Point3d tmp;
-          tmp.x = x * xd;
-          tmp.y = y * yd;
-          tmp.z = z * zd;
-          pointsForPCAUncorrected.push_back(tmp);
 
           if (pxImage == pxImage)
           {
-            pointsForPCA.push_back(tmp);
+            dataset1Arr->InsertNextValue(x*xd);
+            dataset2Arr->InsertNextValue(y*yd);
+            dataset3Arr->InsertNextValue(z*zd);
           }
         }
       }
     }
   }
 
+  vtkSmartPointer<vtkTable> datasetTable = vtkSmartPointer<vtkTable>::New();
+  datasetTable->AddColumn(dataset1Arr);
+  datasetTable->AddColumn(dataset2Arr);
+  datasetTable->AddColumn(dataset3Arr);
 
-  //Calculate PCA Features
-  int sz = pointsForPCA.size();
-  cv::Mat data_pts = cv::Mat(sz, 3, CV_64FC1);
-  for (int i = 0; i < data_pts.rows; ++i)
-  {
-      data_pts.at<double>(i, 0) = pointsForPCA[i].x;
-      data_pts.at<double>(i, 1) = pointsForPCA[i].y;
-      data_pts.at<double>(i, 2) = pointsForPCA[i].z;
-  }
+  vtkSmartPointer<vtkPCAStatistics> pcaStatistics = vtkSmartPointer<vtkPCAStatistics>::New();
+  pcaStatistics->SetInputData(vtkStatisticsAlgorithm::INPUT_DATA, datasetTable);
+  pcaStatistics->SetColumnStatus("M1", 1);
+  pcaStatistics->SetColumnStatus("M2", 1);
+  pcaStatistics->SetColumnStatus("M3", 1);
+  pcaStatistics->RequestSelectedColumns();
+  pcaStatistics->SetDeriveOption(true);
+  pcaStatistics->Update();
 
-  //Calculate PCA Features
-  int szUC = pointsForPCAUncorrected.size();
-  cv::Mat data_ptsUC = cv::Mat(szUC, 3, CV_64FC1);
-  for (int i = 0; i < data_ptsUC.rows; ++i)
-  {
-    data_ptsUC.at<double>(i, 0) = pointsForPCAUncorrected[i].x;
-    data_ptsUC.at<double>(i, 1) = pointsForPCAUncorrected[i].y;
-    data_ptsUC.at<double>(i, 2) = pointsForPCAUncorrected[i].z;
-  }
+  vtkSmartPointer<vtkDoubleArray> eigenvalues = vtkSmartPointer<vtkDoubleArray>::New();
+  pcaStatistics->GetEigenvalues(eigenvalues);
 
-  //Perform PCA analysis
-  cv::PCA pca_analysis(data_pts, cv::Mat(), CV_PCA_DATA_AS_ROW);
-  cv::PCA pca_analysisUC(data_ptsUC, cv::Mat(), CV_PCA_DATA_AS_ROW);
-
-  //Store the eigenvalues
   std::vector<double> eigen_val(3);
-  std::vector<double> eigen_valUC(3);
-  for (int i = 0; i < 3; ++i)
-  {
-    eigen_val[i] = pca_analysis.eigenvalues.at<double>(0, i);
-    eigen_valUC[i] = pca_analysisUC.eigenvalues.at<double>(0, i);
-  }
-
-  std::sort(eigen_val.begin(), eigen_val.end());
-  std::sort(eigen_valUC.begin(), eigen_valUC.end());
+  eigen_val[2] = eigenvalues->GetValue(0);
+  eigen_val[1] = eigenvalues->GetValue(1);
+  eigen_val[0] = eigenvalues->GetValue(2);
 
   double major = 2*sqrt(eigen_val[2]);
   double minor = 2*sqrt(eigen_val[1]);
@@ -479,16 +466,16 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
   double vd_ch = meshVolume / stats2->GetVolume();
   double ad_ch = meshSurf / stats2->GetSurfaceArea();
 
-  featureList.push_back(std::make_pair("Morphological Density Volume Density axis-aligned bounding box", vd_aabb));
-  featureList.push_back(std::make_pair("Morphological Density Surface Density axis-aligned bounding box", ad_aabb));
-  featureList.push_back(std::make_pair("Morphological Density Volume Density oriented bounding box", meshVolume / vol_mobb));
-  featureList.push_back(std::make_pair("Morphological Density Surface Density oriented bounding box", meshSurf / surf_mobb));
-  featureList.push_back(std::make_pair("Morphological Density Volume Density Approx. enclosing ellipsoid", vd_aee));
-  featureList.push_back(std::make_pair("Morphological Density Surface Density Approx. enclosing ellipsoid", ad_aee));
-  featureList.push_back(std::make_pair("Morphological Density Volume Density Approx. minimum enclosing ellipsoid", meshVolume / vol_mvee));
-  featureList.push_back(std::make_pair("Morphological Density Surface Density Approx. minimum enclosing ellipsoid", meshSurf / surf_mvee));
-  featureList.push_back(std::make_pair("Morphological Density Volume Density Convex Hull", vd_ch));
-  featureList.push_back(std::make_pair("Morphological Density Surface Density Convex Hull", ad_ch));
+  featureList.push_back(std::make_pair("Morphological Density::Volume density axis-aligned bounding box", vd_aabb));
+  featureList.push_back(std::make_pair("Morphological Density::Surface density axis-aligned bounding box", ad_aabb));
+  featureList.push_back(std::make_pair("Morphological Density::Volume density oriented minimum bounding box", meshVolume / vol_mobb));
+  featureList.push_back(std::make_pair("Morphological Density::Surface density oriented minimum bounding box", meshSurf / surf_mobb));
+  featureList.push_back(std::make_pair("Morphological Density::Volume density approx. enclosing ellipsoid", vd_aee));
+  featureList.push_back(std::make_pair("Morphological Density::Surface density approx. enclosing ellipsoid", ad_aee));
+  featureList.push_back(std::make_pair("Morphological Density::Volume density approx. minimum volume enclosing ellipsoid", meshVolume / vol_mvee));
+  featureList.push_back(std::make_pair("Morphological Density::Surface density approx. minimum volume enclosing ellipsoid", meshSurf / surf_mvee));
+  featureList.push_back(std::make_pair("Morphological Density::Volume density convex hull", vd_ch));
+  featureList.push_back(std::make_pair("Morphological Density::Surface density convex hull", ad_ch));
 
   return featureList;
 }
@@ -510,7 +497,7 @@ void mitk::GIFVolumetricDensityStatistics::AddArguments(mitkCommandLineParser &p
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Volume-Density Statistic", "calculates volume density based features", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Volume-Density Statistic", "calculates volume density based features", us::Any());
 }
 
 void

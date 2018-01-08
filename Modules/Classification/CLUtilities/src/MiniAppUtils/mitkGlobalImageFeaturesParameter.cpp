@@ -57,6 +57,7 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   parser.addArgument("maximum-intensity", "maximum", mitkCommandLineParser::Float, "Float", "Maximum intensity. If set, it is overwritten by more specific intensity maxima", us::Any());
   parser.addArgument("bins", "bins", mitkCommandLineParser::Int, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
   parser.addArgument("binsize", "binsize", mitkCommandLineParser::Float, "Int", "Size of bins that is used. If set, it is overwritten by more specific bin count", us::Any());
+  parser.addArgument("ignore-mask-for-histogram", "ignore-mask", mitkCommandLineParser::Bool, "Bool", "If the whole image is used to calculate the histogram. ", us::Any());
 
 }
 

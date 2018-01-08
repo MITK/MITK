@@ -12,8 +12,7 @@ set(CPP_FILES
 
   GlobalImageFeatures/mitkGIFCooccurenceMatrix.cpp
   GlobalImageFeatures/mitkGIFCooccurenceMatrix2.cpp
-  GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
-  GlobalImageFeatures/mitkGIFGrayLevelSizeZone.cpp
+  GlobalImageFeatures/mitkGIFGreyLevelRunLength.cpp
   GlobalImageFeatures/mitkGIFImageDescriptionFeatures.cpp
   GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp
   GlobalImageFeatures/mitkGIFFirstOrderHistogramStatistics.cpp

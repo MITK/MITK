@@ -32,6 +32,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLRandomSampling^^MitkCore_MitkCLUtilities
         CLRemoveEmptyVoxels^^MitkCore
         CLN4^^MitkCore
+        CLSkullMask^^MitkCore
         CLPointSetToSegmentation^^
         CLMultiForestPrediction^^MitkDataCollection_MitkCLVigraRandomForest
         CLNrrdToPoly^^MitkCore

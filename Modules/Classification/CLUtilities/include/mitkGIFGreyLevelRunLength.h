@@ -1,5 +1,5 @@
-#ifndef mitkGIFGrayLevelSizeZone_h
-#define mitkGIFGrayLevelSizeZone_h
+#ifndef mitkGIFGreyLevelRunLength_h
+#define mitkGIFGreyLevelRunLength_h
 
 #include <mitkAbstractGlobalImageFeature.h>
 #include <mitkBaseData.h>
@@ -7,14 +7,14 @@
 
 namespace mitk
 {
-  class MITKCLUTILITIES_EXPORT GIFGrayLevelSizeZone : public AbstractGlobalImageFeature
+  class MITKCLUTILITIES_EXPORT GIFGreyLevelRunLength : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFGrayLevelSizeZone,AbstractGlobalImageFeature)
+    mitkClassMacro(GIFGreyLevelRunLength,AbstractGlobalImageFeature)
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      GIFGrayLevelSizeZone();
+      GIFGreyLevelRunLength();
 
     /**
     * \brief Calculates the Cooccurence-Matrix based features for this class.
@@ -41,6 +41,12 @@ namespace mitk
       bool  m_UseCtRange;
       double m_Range;
       unsigned int m_Direction;
+
+      double MinimumIntensity;
+      bool UseMinimumIntensity;
+      double MaximumIntensity;
+      bool UseMaximumIntensity;
+      int Bins;
     };
 
   private:
@@ -48,4 +54,4 @@ namespace mitk
     bool m_UseCtRange;
   };
 }
-#endif //mitkGIFGrayLevelSizeZone_h
+#endif //mitkGIFGreyLevelRunLength_h

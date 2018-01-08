@@ -30,11 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 
 template<typename TPixel, unsigned int VImageDimension>
-void
-CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFImageDescriptionFeatures::FeatureListType & featureList, mitk::GIFImageDescriptionFeatures::ParameterStruct params)
+static void
+CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFImageDescriptionFeatures::FeatureListType & featureList)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<int, VImageDimension> MaskType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
   typedef typename FilterType::HistogramType HistogramType;
   typedef typename HistogramType::IndexType HIndexType;
@@ -116,28 +116,27 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair("Diagnostic (Image)::Spacing X", imageVoxelSpacingX));
   featureList.push_back(std::make_pair("Diagnostic (Image)::Spacing Y", imageVoxelSpacingY));
   featureList.push_back(std::make_pair("Diagnostic (Image)::Spacing Z", imageVoxelSpacingZ));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Mean Intensity", imageMean));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Minimum Intensity", imageMinimum));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Maximum Intensity", imageMaximum));
+  featureList.push_back(std::make_pair("Diagnostic (Image)::Mean intensity", imageMean));
+  featureList.push_back(std::make_pair("Diagnostic (Image)::Minimum intensity", imageMinimum));
+  featureList.push_back(std::make_pair("Diagnostic (Image)::Maximum intensity", imageMaximum));
 
   featureList.push_back(std::make_pair("Diagnostic (Mask)::Dimension X", maskDimensionX));
   featureList.push_back(std::make_pair("Diagnostic (Mask)::Dimension Y", maskDimensionY));
   featureList.push_back(std::make_pair("Diagnostic (Mask)::Dimension Z", maskDimensionZ));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask Bounding Box X", maskMaximumX - maskMinimumX + 1));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask Bounding Box Y", maskMaximumY - maskMinimumY + 1));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask Bounding Box Z", maskMaximumZ - maskMinimumZ + 1));
+  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask bounding box X", maskMaximumX - maskMinimumX + 1));
+  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask bounding box Y", maskMaximumY - maskMinimumY + 1));
+  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask bounding box Z", maskMaximumZ - maskMinimumZ + 1));
   featureList.push_back(std::make_pair("Diagnostic (Mask)::Spacing X", maskVoxelSpacingX));
   featureList.push_back(std::make_pair("Diagnostic (Mask)::Spacing Y", maskVoxelSpacingY));
   featureList.push_back(std::make_pair("Diagnostic (Mask)::Spacing Z", maskVoxelSpacingZ));
   featureList.push_back(std::make_pair("Diagnostic (Mask)::Voxel Count ", maskVoxelCount));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mean Intensity", maskMean));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Minimum Intensity", maskMinimum));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Maximum Intensity", maskMaximum));
+  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mean intensity", maskMean));
+  featureList.push_back(std::make_pair("Diagnostic (Mask)::Minimum intensity", maskMinimum));
+  featureList.push_back(std::make_pair("Diagnostic (Mask)::Maximum intensity", maskMaximum));
 
 }
 
-mitk::GIFImageDescriptionFeatures::GIFImageDescriptionFeatures() :
-m_HistogramSize(256), m_UseCtRange(false)
+mitk::GIFImageDescriptionFeatures::GIFImageDescriptionFeatures()
 {
   SetShortName("id");
   SetLongName("image-diagnostic");
@@ -146,18 +145,7 @@ m_HistogramSize(256), m_UseCtRange(false)
 mitk::GIFImageDescriptionFeatures::FeatureListType mitk::GIFImageDescriptionFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
   FeatureListType featureList;
-
-  ParameterStruct params;
-  params.m_HistogramSize = this->m_HistogramSize;
-  params.m_UseCtRange = this->m_UseCtRange;
-
-  params.MinimumIntensity = GetMinimumIntensity();
-  params.MaximumIntensity = GetMaximumIntensity();
-  params.UseMinimumIntensity = GetUseMinimumIntensity();
-  params.UseMaximumIntensity = GetUseMaximumIntensity();
-  params.Bins = GetBins();
-
-  AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, params);
+  AccessByItk_2(image, CalculateFirstOrderStatistics, mask, featureList);
 
   return featureList;
 }
@@ -172,7 +160,7 @@ mitk::GIFImageDescriptionFeatures::FeatureNameListType mitk::GIFImageDescription
 void mitk::GIFImageDescriptionFeatures::AddArguments(mitkCommandLineParser &parser)
 {
   std::string name = GetOptionPrefix();
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Image Description", "calculates image description features", us::Any());
 }
 
 void
@@ -181,10 +169,10 @@ mitk::GIFImageDescriptionFeatures::CalculateFeaturesUsingParameters(const Image:
   auto parsedArgs = GetParameter();
   if (parsedArgs.count(GetLongName()))
   {
-    MITK_INFO << "Start calculating first order features ....";
+    MITK_INFO << "Start calculating image description features....";
     auto localResults = this->CalculateFeatures(feature, maskNoNAN);
     featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-    MITK_INFO << "Finished calculating first order features....";
+    MITK_INFO << "Finished calculating image description features....";
   }
 }
 

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFCooccurenceMatrix.h>
-#include <mitkGIFGrayLevelRunLength.h>
+#include <mitkGIFGreyLevelRunLength.h>
 #include <math.h>
 
 #include <mitkImageGenerator.h>
@@ -182,8 +182,8 @@ public:
   void FirstOrder_SinglePoint()
   {
     mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
-    calculator->SetHistogramSize(4096);
-    calculator->SetUseCtRange(true);
+    //calculator->SetHistogramSize(4096);
+    //calculator->SetUseCtRange(true);
     auto features = calculator->CalculateFeatures(m_Image, m_Mask);
 
     std::map<std::string, double> results;
@@ -216,8 +216,8 @@ public:
   void FirstOrder_QubicArea()
   {
     mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
-    calculator->SetHistogramSize(4096);
-    calculator->SetUseCtRange(true);
+    //calculator->SetHistogramSize(4096);
+    //calculator->SetUseCtRange(true);
     auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
 
     std::map<std::string, double> results;
@@ -248,7 +248,7 @@ public:
 
   void RunLenght_QubicArea()
   {
-    mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
+    mitk::GIFGreyLevelRunLength::Pointer calculator = mitk::GIFGreyLevelRunLength::New();
     //calculator->SetHistogramSize(4096);
     calculator->SetUseCtRange(true);
     calculator->SetRange(981);

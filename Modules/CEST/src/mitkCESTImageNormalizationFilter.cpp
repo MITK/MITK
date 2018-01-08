@@ -159,8 +159,15 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
 
       while (!sourceIterator.IsAtEnd())
       {
-        targetIterator.Set(double(sourceIterator.Get()) /
-          (weight * lowerMZeroIterator.Get() + (1.0 - weight) * upperMZeroIterator.Get()));
+        double normalizationFactor = weight * lowerMZeroIterator.Get() + (1.0 - weight) * upperMZeroIterator.Get();
+        if (mitk::Equal(normalizationFactor, 0))
+        {
+          targetIterator.Set(0);
+        }
+        else
+        {
+          targetIterator.Set(double(sourceIterator.Get()) / normalizationFactor);
+        }
 
         ++lowerMZeroIterator;
         ++upperMZeroIterator;

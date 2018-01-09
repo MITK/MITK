@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  bool KinectV2Device::m_PrintFrameRate = false;
 
   KinectV2Device::KinectV2Device():
     m_DistanceDataBuffer(nullptr),
@@ -228,22 +229,26 @@ namespace mitk
         {
           overflow = true;
         }
-        if (toFCameraDevice->m_ImageSequence % n == 0)
-        {
-          printStatus = true;
-        }
+
         if (overflow)
         {
           overflow = false;
         }
 
-        // print current framerate
-        if (printStatus)
+        if(m_PrintFrameRate)
         {
-          t2 = realTimeClock->GetCurrentStamp() - t1;
-          MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
-          t1 = realTimeClock->GetCurrentStamp();
-          printStatus = false;
+          if (toFCameraDevice->m_ImageSequence % n == 0)
+          {
+             printStatus = true;
+          }
+          // print current framerate
+          if (printStatus)
+          {
+            t2 = realTimeClock->GetCurrentStamp() - t1;
+            MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
+            t1 = realTimeClock->GetCurrentStamp();
+            printStatus = false;
+          }
         }
       }  // end of while loop
     }
@@ -319,14 +324,12 @@ namespace mitk
       memcpy(distanceArray, this->m_DistanceDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(amplitudeArray, this->m_AmplitudeDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBBufferSize);
-      vtkSmartPointer<vtkPolyData> deepCopyOfPoly = vtkSmartPointer<vtkPolyData>::New();
-      deepCopyOfPoly->DeepCopy(this->m_PolyData);
       m_ImageMutex->Unlock();
 
       //Since the standard method GetAllImages does not allow transfering a surface,
       //we use a property to pass the surface to the workbench.
       mitk::Surface::Pointer surface = mitk::Surface::New();
-      surface->SetVtkPolyData( deepCopyOfPoly );
+      surface->SetVtkPolyData(this->m_PolyData);
       this->SetProperty("ToFSurface", mitk::SmartPointerProperty::New( surface ));
 
       this->Modified();

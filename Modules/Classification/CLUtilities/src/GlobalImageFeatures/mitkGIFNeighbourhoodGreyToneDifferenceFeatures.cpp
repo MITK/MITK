@@ -40,7 +40,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   typename MaskType::Pointer itkMask = MaskType::New();
   mitk::CastToItkImage(mask, itkMask);
 
-  ImageType::SizeType regionSize;
+  typename ImageType::SizeType regionSize;
   regionSize.Fill(params.Range);
 
   itk::NeighborhoodIterator<ImageType> iter(regionSize, itkImage, itkImage->GetLargestPossibleRegion());
@@ -59,7 +59,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
       int localCount = 0;
       double localMean = 0;
       unsigned int localIndex = params.quantifier->IntensityToIndex(iter.GetCenterPixel());
-      for (int i = 0; i < iter.Size(); ++i)
+      for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
       {
         if (i == (iter.Size() / 2))
           continue;
@@ -180,7 +180,7 @@ void mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::AddArguments(mitkCommandL
 }
 
 void
-mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNaN, FeatureListType &featureList)
+mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &, FeatureListType &featureList)
 {
   InitializeQuantifierFromParameters(feature, mask);
   std::string name = GetOptionPrefix();

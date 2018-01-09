@@ -314,9 +314,7 @@ template<typename TPixel, unsigned int VImageDimension>
 static void
 CalculateGreyLevelDistanceZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGreyLevelDistanceZone::FeatureListType & featureList, mitk::GIFGreyLevelDistanceZone::GIFGreyLevelDistanceZoneConfiguration config)
 {
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
-  typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
   typedef itk::Offset<VImageDimension> OffsetType;
 

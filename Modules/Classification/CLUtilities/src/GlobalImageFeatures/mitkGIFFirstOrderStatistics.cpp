@@ -220,9 +220,9 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair("First Order::Energy", squared_sum));
   featureList.push_back(std::make_pair("First Order::Root Mean Square", rms));
 
-  HistogramType::MeasurementVectorType mv(1);
+  typename HistogramType::MeasurementVectorType mv(1);
   mv[0] = 0;
-  HistogramType::IndexType resultingIndex;
+  typename HistogramType::IndexType resultingIndex;
   histogram->GetIndex(mv, resultingIndex);
   featureList.push_back(std::make_pair("First Order::Robust Mean", meanRobust));
   featureList.push_back(std::make_pair("First Order::Uniformity", uniformity));

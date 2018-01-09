@@ -272,7 +272,6 @@ template<typename TPixel, unsigned int VImageDimension>
 void
 CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFCooccurenceMatrix2::FeatureListType & featureList, mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2Configuration config)
 {
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
   typedef itk::Offset<VImageDimension> OffsetType;

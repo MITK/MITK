@@ -42,19 +42,19 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
 
   double minimumSpacing = std::numeric_limits<double>::max();
   itkImage->GetSpacing();
-  for (int i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     minimumSpacing = (minimumSpacing < itkImage->GetSpacing()[i]) ? minimumSpacing : itkImage->GetSpacing()[i];
   }
-  ImageType::SizeType regionSize;
+  typename ImageType::SizeType regionSize;
   int offset = std::ceil(range / minimumSpacing);
   regionSize.Fill(offset);
 
   itk::NeighborhoodIterator<ImageType> iter(regionSize, itkImage, itkImage->GetLargestPossibleRegion());
   itk::NeighborhoodIterator<MaskType> iterMask(regionSize, itkMask, itkMask->GetLargestPossibleRegion());
 
-  ImageType::PointType origin;
-  ImageType::PointType localPoint;
+  typename ImageType::PointType origin;
+  typename ImageType::PointType localPoint;
   itk::Index<VImageDimension> index;
 
   double tmpPeakValue;
@@ -71,7 +71,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
       count = 0;
       index = iter.GetIndex();
       itkImage->TransformIndexToPhysicalPoint(index, origin);
-      for (int i = 0; i < iter.Size(); ++i)
+      for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
       {
         itkImage->TransformIndexToPhysicalPoint(iter.GetIndex(i), localPoint);
         double dist = origin.EuclideanDistanceTo(localPoint);

@@ -45,7 +45,6 @@ CalculateFirstOrderHistogramStatistics(itk::Image<TPixel, VImageDimension>* itkI
   typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
   typedef typename FilterType::HistogramType HistogramType;
   typedef typename HistogramType::IndexType HIndexType;
-  typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
@@ -58,9 +57,9 @@ CalculateFirstOrderHistogramStatistics(itk::Image<TPixel, VImageDimension>* itkI
 
   labelStatisticsImageFilter->Update();
 
-  HistogramType::MeasurementVectorType mv(1);
+  typename HistogramType::MeasurementVectorType mv(1);
   mv[0] = 4.1;
-  HistogramType::IndexType resultingIndex;
+  typename HistogramType::IndexType resultingIndex;
 
   auto histogram = labelStatisticsImageFilter->GetHistogram(1);
   double meanValue = 0; // labelStatisticsImageFilter->GetMean(1);

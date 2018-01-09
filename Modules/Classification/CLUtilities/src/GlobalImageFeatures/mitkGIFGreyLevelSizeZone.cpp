@@ -222,7 +222,6 @@ template<typename TPixel, unsigned int VImageDimension>
 static void
 CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGreyLevelSizeZone::FeatureListType & featureList, mitk::GIFGreyLevelSizeZone::GIFGreyLevelSizeZoneConfiguration config)
 {
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
   typedef itk::Offset<VImageDimension> OffsetType;

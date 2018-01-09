@@ -35,7 +35,6 @@ template<typename TPixel, unsigned int VImageDimension>
 static void
 CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::IntensityQuantifier::Pointer quantifier, mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType & featureList)
 {
-  int bins = 1000;
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
@@ -142,7 +141,7 @@ void mitk::GIFIntensityVolumeHistogramFeatures::AddArguments(mitkCommandLinePars
 }
 
 void
-mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNaN, FeatureListType &featureList)
+mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &, FeatureListType &featureList)
 {
   InitializeQuantifierFromParameters(feature, mask, 1000);
 

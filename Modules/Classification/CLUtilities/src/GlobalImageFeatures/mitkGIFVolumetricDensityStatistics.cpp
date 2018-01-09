@@ -52,7 +52,6 @@ void
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
-  typedef itk::LabelGeometryImageFilter<MaskType, ImageType> FilterType;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
@@ -69,8 +68,8 @@ void
   double w_ij = 0;
   double mean = 0;
 
-  ImageType::PointType pointA;
-  ImageType::PointType pointB;
+  typename ImageType::PointType pointA;
+  typename ImageType::PointType pointB;
 
   while (!imgA.IsAtEnd())
   {
@@ -125,7 +124,6 @@ void
 
 void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
 {
-  auto cell = pointset->GetCell(0);
   volume = std::numeric_limits<double>::max();
 
   for (int cellID = 0; cellID < pointset->GetNumberOfCells(); ++cellID)
@@ -307,8 +305,6 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
   geometryFilter->Update();
   stats2->SetInputConnection(geometryFilter->GetOutputPort());
   stats2->Update();
-
-  auto data = mesher->GetOutput()->GetPointData();
 
   double vol_mvee;
   double surf_mvee;

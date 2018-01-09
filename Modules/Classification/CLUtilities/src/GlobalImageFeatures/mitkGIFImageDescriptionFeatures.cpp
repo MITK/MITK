@@ -35,9 +35,6 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
-  typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
-  typedef typename FilterType::HistogramType HistogramType;
-  typedef typename HistogramType::IndexType HIndexType;
   typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
 
   typename MaskType::Pointer maskImage = MaskType::New();

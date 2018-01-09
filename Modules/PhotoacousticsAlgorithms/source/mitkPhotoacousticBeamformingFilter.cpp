@@ -261,11 +261,11 @@ void mitk::BeamformingFilter::GenerateData()
 
       // the following safeguard is probably only needed for absurdly small GPU memory
       for (batchSize = 16; 
-        batchDim[0] * batchDim[1] * 4 + // Input image (float)
-        m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * 4 // Output image (float)
+        (long)(batchDim[0] * batchDim[1]) * 4 + // Input image (float)
+        (long)(m_Conf.ReconstructionLines * m_Conf.SamplesPerLine) * 4 // Output image (float)
         > availableMemory - 
-        m_Conf.ReconstructionLines / 2 * m_Conf.SamplesPerLine * 2 - // Delays buffer (unsigned short)
-        m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * 3 * 2 - // UsedLines buffer (unsigned short)
+        (long)(m_Conf.ReconstructionLines / 2 * m_Conf.SamplesPerLine) * 2 - // Delays buffer (unsigned short)
+        (long)(m_Conf.ReconstructionLines * m_Conf.SamplesPerLine) * 3 * 2 - // UsedLines buffer (unsigned short)
         100 * 1024; // 100 MB buffer for local data, system purposes etc
         --batchSize)
       {}
@@ -275,7 +275,6 @@ void mitk::BeamformingFilter::GenerateData()
         return;
       }
 
-      MITK_INFO << batchSize;
       mitk::ImageReadAccessor copy(input);
 
       for(unsigned int i = 0; i < batches; ++i)

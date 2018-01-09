@@ -66,14 +66,11 @@ mitk::NavigationToolStorage::~NavigationToolStorage()
   }
 }
 
-void mitk::NavigationToolStorage::RegisterAsMicroservice(std::string sourceID){
-  if (sourceID.empty()) mitkThrow() << "Empty or null string passed to NavigationToolStorage::registerAsMicroservice().";
-
+void mitk::NavigationToolStorage::RegisterAsMicroservice(){
   // Get Context
   us::ModuleContext* context = us::GetModuleContext();
 
   // Define ServiceProps
-  m_props[US_PROPKEY_SOURCE_ID] = sourceID;
   m_ServiceRegistration = context->RegisterService(this, m_props);
   //Tell all widgets, that there is a new toolStorage registered, e.g. the old one might have changed.
   UpdateMicroservice();
@@ -227,4 +224,16 @@ bool mitk::NavigationToolStorage::AssignToolNumber(std::string identifier1, int 
   this->UpdateMicroservice();
 
   return true;
+}
+
+void mitk::NavigationToolStorage::SetSourceID(std::string _id)
+{
+  m_SourceID = _id;
+  m_props[US_PROPKEY_SOURCE_ID] = m_SourceID;
+}
+
+/** @return Returns the name of this storage. */
+std::string mitk::NavigationToolStorage::GetSourceID() const
+{
+  return m_SourceID;
 }

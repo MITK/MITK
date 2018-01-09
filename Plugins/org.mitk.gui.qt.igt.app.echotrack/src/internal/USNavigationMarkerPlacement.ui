@@ -40,14 +40,35 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="m_enableNavigationLayout">
-     <property name="text">
-      <string>Enable Navigation Render Window Layout</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="m_enableNavigationLayout">
+       <property name="text">
+        <string>Enable Navigation Render Window Layout with RenderWindow</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_RenderWindowSelection">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>3</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_RefreshView">
+       <property name="text">
+        <string>Refresh view</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

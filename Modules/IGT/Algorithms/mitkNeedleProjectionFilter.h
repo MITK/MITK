@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef NEEDLEPROJECTIONFILTER_H_INCLUDED
 #define NEEDLEPROJECTIONFILTER_H_INCLUDED
 
-#include <MitkUSNavigationExports.h>
+#include "MitkIGTExports.h"
 
 // MITK
 #include <mitkNavigationDataPassThroughFilter.h>
@@ -42,9 +42,9 @@ namespace mitk {
   * Projection will happen onto an extension of the plane as well - the filter does not regard boundaries
   * This Filter currently only supports projection of one needle. Extension to multiple needles / planes should be easy.
   *
-  * \ingroup US
+  * \ingroup IGT
   */
-  class MITKUSNAVIGATION_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
+  class MITKIGT_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
   {
   public:
     mitkClassMacro(NeedleProjectionFilter, NavigationDataPassThroughFilter);

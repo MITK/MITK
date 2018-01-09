@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextStream>
 #include <QSettings>
 
+#include "mitkBaseRenderer.h"
+
 QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
   m_LastCalibrationFilename(""),
@@ -190,6 +192,16 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreateNewButtonCli
 void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreationExit()
 {
   this->SetCombinedModalityCreateWidgetEnabled(false);
+  try
+  {
+    mitk::RenderingManager::GetInstance()->InitializeViews(//Reinit
+      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()//GetDataStorage
+      ->GetNamedNode("US Support Viewing Stream")->GetData()->GetTimeGeometry());//GetNode
+  }
+  catch (...)
+  {
+    MITK_DEBUG << "No reinit possible";
+  }
 }
 
 void QmitkUSNavigationStepCombinedModality::OnCombinedModalityEditExit()

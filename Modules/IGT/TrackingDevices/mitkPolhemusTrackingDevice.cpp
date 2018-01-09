@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <itkMutexLockHolder.h>
 #include "mitkPolhemusTrackerTypeInformation.h"
-#include <vtkConeSource.h>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -200,7 +199,7 @@ void mitk::PolhemusTrackingDevice::TrackTools()
 
       if (lastData.size() != m_AllTools.size())
       {
-        MITK_WARN << "Tool count is corrupt. Aborting!";
+        MITK_WARN << "Tool count is corrupt. Hardware gives " << lastData.size() << " tools, MITK expects " << m_AllTools.size() << " tools. Aborting!";
       }
       else
       {
@@ -259,25 +258,11 @@ mitk::NavigationToolStorage::Pointer mitk::PolhemusTrackingDevice::AutoDetectToo
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
   for each (mitk::PolhemusInterface::trackingData t in singeFrameData)
   {
-    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
+
     std::stringstream name;
     name << "Sensor-" << ((int)t.id);
-    newNode->SetName(name.str());
-
-    mitk::Surface::Pointer myCone = mitk::Surface::New();
-    vtkConeSource *vtkData = vtkConeSource::New();
-    vtkData->SetAngle(5.0);
-    vtkData->SetResolution(50);
-    vtkData->SetHeight(6.0f);
-    vtkData->SetRadius(2.0f);
-    vtkData->SetCenter(0.0, 0.0, 0.0);
-    vtkData->Update();
-    myCone->SetVtkPolyData(vtkData->GetOutput());
-    vtkData->Delete();
-    newNode->SetData(myCone);
-
-    mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
-    newTool->SetDataNode(newNode);
+    newTool->GetDataNode()->SetName(name.str());
 
     //The identifier defines, which plug is used (e.g. "Sens 2" --> 2).
     std::stringstream identifier;

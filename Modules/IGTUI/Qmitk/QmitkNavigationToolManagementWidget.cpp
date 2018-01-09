@@ -117,6 +117,8 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
     connect((QObject*)(m_Controls->m_SaveTool), SIGNAL(clicked()), this, SLOT(OnSaveTool()));
     connect((QObject*)(m_Controls->m_CreateNewStorage), SIGNAL(clicked()), this, SLOT(OnCreateStorage()));
 
+    connect((QObject*)(m_Controls->m_ToolList), SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(OnToolSelected()));
+
     //widget page "add tool":
     connect((QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(Canceled()), this, SLOT(OnAddToolCancel()));
     connect((QObject*)(m_Controls->m_ToolCreationWidget), SIGNAL(NavigationToolFinished()), this, SLOT(OnAddToolSave()));
@@ -153,6 +155,14 @@ void QmitkNavigationToolManagementWidget::OnMoveToolUp()
 {
   if (m_NavigationToolStorage.IsNotNull())
   {
+    //Proof, if the NavigationToolStorage is locked. If it is locked, show MessageBox to user.
+    if( m_NavigationToolStorage->isLocked() )
+    {
+      MessageBox("The storage is locked and it cannot be modified. Maybe the tracking device which " \
+        "uses this storage is connected. If you want to modify the storage please " \
+        "disconnect the device first.");
+      return;
+    }
     int toolIndex = m_Controls->m_ToolList->currentIndex().row();
     if (toolIndex >= 0)
     {
@@ -173,6 +183,14 @@ void QmitkNavigationToolManagementWidget::OnMoveToolDown()
 {
   if (m_NavigationToolStorage.IsNotNull())
   {
+    //Proof, if the NavigationToolStorage is locked. If it is locked, show MessageBox to user.
+    if( m_NavigationToolStorage->isLocked() )
+    {
+      MessageBox("The storage is locked and it cannot be modified. Maybe the tracking device which " \
+        "uses this storage is connected. If you want to modify the storage please " \
+        "disconnect the device first.");
+      return;
+    }
     int toolIndex = m_Controls->m_ToolList->currentIndex().row();
     if (toolIndex >= 0)
     {
@@ -199,6 +217,7 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
   QString defaultIdentifier = "NavigationTool#" + QString::number(m_NavigationToolStorage->GetToolCount());
   QString defaultName = "NavigationTool" + QString::number(m_NavigationToolStorage->GetToolCount());
   m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage, defaultIdentifier.toStdString(), defaultName.toStdString());
+  m_Controls->m_ToolCreationWidget->ShowToolPreview("Tool preview");
   m_edit = false;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
 }
@@ -235,8 +254,9 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     return;
   }
   mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
+  m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage, "", ""); //Initialize once again, might be called here for the first time after autodetection
   m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
-  m_NavigationToolStorage->SetName("test");
+  m_Controls->m_ToolCreationWidget->ShowToolPreview("Tool preview");
   m_edit = true;
   m_Controls->m_MainWidgets->setCurrentIndex(1);
 }
@@ -255,33 +275,21 @@ void QmitkNavigationToolManagementWidget::OnCreateStorage()
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
 {
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Open Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
+  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Open Navigation Tool Storage"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
   if (filename == "") return;
 
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
   try
   {
-    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-    std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
-    if (filename == "") return;
+    mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
 
-    QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
-
-    try
+    if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
+    else
     {
-      mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
-
-      if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
-      else
-      {
-        Poco::Path myPath = Poco::Path(filename.c_str());
-        tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
-        this->LoadStorage(tempStorage);
-        emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
-      }
-    }
-    catch (const mitk::Exception& exception)
-    {
-      MessageBox(exception.GetDescription());
+      Poco::Path myPath = Poco::Path(filename.c_str());
+      tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
+      this->LoadStorage(tempStorage);
+      emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
     }
   }
   catch (const mitk::Exception& exception)
@@ -320,6 +328,15 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
 
 void QmitkNavigationToolManagementWidget::OnAddToolSave()
 {
+  //Proof, if the NavigationToolStorage is locked. If it is locked, show MessageBox to user.
+  if( m_NavigationToolStorage->isLocked() )
+  {
+    MessageBox( "The storage is locked and it cannot be modified. Maybe the tracking device which " \
+                "uses this storage is connected. If you want to modify the storage please " \
+                "disconnect the device first.");
+    return;
+  }
+
   mitk::NavigationTool::Pointer newTool = m_Controls->m_ToolCreationWidget->GetCreatedTool();
 
   if (m_edit) //here we edit a existing tool
@@ -334,15 +351,28 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
     m_NavigationToolStorage->AddTool(newTool);
   }
 
+  //Remove tool preview
+  m_DataStorage->Remove(m_DataStorage->GetNamedNode("Tool preview"));
+
   UpdateToolTable();
 
   m_Controls->m_MainWidgets->setCurrentIndex(0);
 
+  m_Controls->m_ToolInformation->setText("");
 }
 
 void QmitkNavigationToolManagementWidget::OnAddToolCancel()
 {
   m_Controls->m_MainWidgets->setCurrentIndex(0);
+  //Remove tool preview
+  m_DataStorage->Remove(m_DataStorage->GetNamedNode("Tool preview"));
+}
+
+void QmitkNavigationToolManagementWidget::OnToolSelected()
+{
+  QString _label = "Information for tool " + m_Controls->m_ToolList->currentItem()->text() + "\n";
+  _label.append(QString(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetStringWithAllToolInformation().c_str()));
+  m_Controls->m_ToolInformation->setText(_label);
 }
 
 //##################################################################################
@@ -354,7 +384,7 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   if (m_NavigationToolStorage.IsNull()) return;
   for (int i = 0; i < m_NavigationToolStorage->GetToolCount(); i++)
   {
-    QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataNode()->GetName().c_str()) + " ";
+    QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetToolName().c_str()) + " ";
 
     currentTool += "(" + QString::fromStdString(m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType()) + "/";
 

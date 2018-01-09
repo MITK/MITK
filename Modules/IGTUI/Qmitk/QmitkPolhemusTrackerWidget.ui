@@ -145,6 +145,13 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="m_ToggleToolTipCalibration">
+       <property name="text">
+        <string>Toggle Tool Tip Calibration</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

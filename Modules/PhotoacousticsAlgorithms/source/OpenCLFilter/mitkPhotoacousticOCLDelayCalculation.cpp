@@ -97,7 +97,6 @@ void mitk::OCLDelayCalculation::Execute()
   // execute the filter on a 3D NDRange
   if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
     mitkThrow() << "openCL Error when executing Kernel";
-
   // signalize the GPU-side data changed
   m_Output->Modified(GPU_DATA);
 }

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclUtils.h"
 #include "mitkOpenCLActivator.h"
 
+
 //Mitk
 #include <mitkLogMacros.h>
 #include <mitkConfig.h>
@@ -31,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+
+//standard library
+#include <thread>
 
 mitk::OclFilter::OclFilter()
   : m_ClCompilerFlags(""),
@@ -79,8 +83,6 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
 
   return ( clErr == CL_SUCCESS );
 }
-
-#include <thread>
 
 bool mitk::OclFilter::ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim )
 {
@@ -173,7 +175,6 @@ bool mitk::OclFilter::ExecuteKernelChunksInBatches(cl_kernel kernel, unsigned in
       }
     }
   }
-
   CHECK_OCL_ERR(clErr);
 
   return (clErr == CL_SUCCESS);

@@ -51,7 +51,7 @@ __kernel void ckDAS(
     
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      Delay = delays[globalPosY * outputL + (int)(fabs(l_s - l_i)/(float)inputL * (float)outputL)];
+      Delay = delays[globalPosY * (outputL / 2) + (int)(fabs(l_s - l_i)/(float)inputL * (float)outputL)];
       if (Delay < inputS && Delay >= 0) {
         output += apodArray[(int)((l_s - minLine)*apod_mult)] * dSource[(int)(globalPosZ * inputL * inputS + Delay * inputL + l_s)];
       }

@@ -558,26 +558,52 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
 
   mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage, 0 );
 
-  std::vector< itk::Index<3U> > activated_indices;
-  itk::Index<3U> index = {{10, 8, 0}};
-  activated_indices.push_back( index );
-
-  index[0] = 9;  index[1] = 8; index[2] =  0;
-  activated_indices.push_back( index );
-
-  index[0] = 9;  index[1] = 7; index[2] =  0;
-  activated_indices.push_back( index );
-
-  index[0] = 10;  index[1] = 7; index[2] =  0;
-  activated_indices.push_back( index );
-
-  std::vector< itk::Index<3U> >::const_iterator indexIter = activated_indices.begin();
-
   // activate voxel in the mask image
-  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
-  while( indexIter != activated_indices.end() )
+  if (mask_image->GetDimension() == 3)
   {
-    writeAccess.SetPixelByIndex( (*indexIter++), 1);
+    std::vector< itk::Index<3U> > activated_indices;
+    itk::Index<3U> index = { { 10, 8, 0 } };
+    activated_indices.push_back(index);
+
+    index[0] = 9;  index[1] = 8; index[2] = 0;
+    activated_indices.push_back(index);
+
+    index[0] = 9;  index[1] = 7; index[2] = 0;
+    activated_indices.push_back(index);
+
+    index[0] = 10;  index[1] = 7; index[2] = 0;
+    activated_indices.push_back(index);
+
+    std::vector< itk::Index<3U> >::const_iterator indexIter = activated_indices.begin();
+
+    mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess(mask_image);
+    while (indexIter != activated_indices.end())
+    {
+      writeAccess.SetPixelByIndex((*indexIter++), 1);
+    }
+  }
+  if (mask_image->GetDimension() == 4)
+  {
+    std::vector< itk::Index<4U> > activated_indices;
+    itk::Index<4U> index = { { 10, 8, 0, 0 } };
+    activated_indices.push_back(index);
+
+    index[0] = 9;  index[1] = 8; index[2] = 0; index[3] = 0;
+    activated_indices.push_back(index);
+
+    index[0] = 9;  index[1] = 7; index[2] = 0; index[3] = 0;
+    activated_indices.push_back(index);
+
+    index[0] = 10;  index[1] = 7; index[2] = 0; index[3] = 0;
+    activated_indices.push_back(index);
+
+    std::vector< itk::Index<4U> >::const_iterator indexIter = activated_indices.begin();
+
+    mitk::ImagePixelWriteAccessor< unsigned char, 4> writeAccess(mask_image);
+    while (indexIter != activated_indices.end())
+    {
+      writeAccess.SetPixelByIndex((*indexIter++), 1);
+    }
   }
 
   this->VerifyStatistics( ComputeStatistics( m_TestImage, mask_image ), 127.5, 127.5, 12.750);
@@ -599,9 +625,19 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
   this->VerifyStatistics( statisticsCalculator->GetStatistics(), -21474836.480, -21474836.480, -21474836.480);
 
   // activate voxel in the mask image
-  itk::Index<3U> test_index = {{11, 8, 0}};
-  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
-  writeAccess.SetPixelByIndex( test_index, 1);
+  if (mask_image->GetDimension() == 3)
+  {
+    itk::Index<3U> test_index = { { 11, 8, 0 } };
+    mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess(mask_image);
+    writeAccess.SetPixelByIndex(test_index, 1);
+  }
+  if (mask_image->GetDimension() == 4)
+  {
+    itk::Index<4U> test_index = { { 11, 8, 0, 0 } };
+    mitk::ImagePixelWriteAccessor< unsigned char, 4> writeAccess(mask_image);
+    writeAccess.SetPixelByIndex(test_index, 1);
+  }
+
 
   mask_image->Modified();
 

@@ -105,7 +105,24 @@ int main(int argc, char* argv[])
   for (int i = 0; i < 3; ++i)
     maxOutputIndexInWorld[i] = std::max(minInputIndexInWorld[i], maxInputIndexInWorld[i]);
 
-  mitk::Vector3D outputExtent = maxOutputIndexInWorld - minOutputIndexInWorld + 1;
+  mitk::Vector3D spacing = inputGeometry->GetSpacing();
+  auto transform = inputGeometry->GetIndexToWorldTransform()->Clone();
+  auto matrix = transform->GetMatrix();
+
+  for (int i = 0; i < 3; ++i)
+  {
+    for (int j = 0; j < 3; ++j)
+    {
+      matrix[i][j] = std::abs(matrix[i][j]) / spacing[j];
+    }
+  }
+
+  transform->SetMatrix(matrix);
+  spacing = transform->TransformVector(spacing);
+
+  mitk::Vector3D outputExtent = (maxOutputIndexInWorld - minOutputIndexInWorld + spacing);
+  for (int i = 0; i < 3; ++i)
+    outputExtent[i] /= spacing[i];
 
   mitk::Point3D origin = minOutputIndexInWorld;
 
@@ -114,9 +131,6 @@ int main(int argc, char* argv[])
 
   mitk::Vector3D down;
   mitk::FillVector3D(down, 0.0, outputExtent[1], 0.0);
-
-  mitk::Vector3D spacing;
-  mitk::FillVector3D(spacing, 1.0, 1.0, 1.0);
 
   auto planeGeometry = mitk::PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane(right, down, &spacing);

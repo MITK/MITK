@@ -1,5 +1,5 @@
 set(SRC_CPP_FILES
-
+    internal/QmitkMITKIGTTrackingToolboxViewWorker.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -23,6 +23,7 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkMITKIGTNavigationToolManagerView.h
   src/internal/QmitkMITKIGTTrackingToolboxView.h
+  src/internal/QmitkMITKIGTTrackingToolboxViewWorker.h
   src/internal/QmitkNavigationDataPlayerView.h
   src/internal/IGTNavigationToolCalibration.h
   src/internal/IGTFiducialRegistration.h

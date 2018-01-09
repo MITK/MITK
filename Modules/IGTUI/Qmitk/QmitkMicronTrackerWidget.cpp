@@ -78,7 +78,7 @@ void QmitkMicronTrackerWidget::AddOutput(std::string s)
   m_Controls->m_outputTextMicronTracker->verticalScrollBar()->setValue(m_Controls->m_outputTextMicronTracker->verticalScrollBar()->maximum());
 }
 
-mitk::TrackingDevice::Pointer QmitkMicronTrackerWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkMicronTrackerWidget::GetTrackingDevice()
 {
   mitk::ClaronTrackingDevice::Pointer newDevice = mitk::ClaronTrackingDevice::New();
   if (this->m_MTCalibrationFile.empty()) //if configuration file for MicronTracker is empty: load default

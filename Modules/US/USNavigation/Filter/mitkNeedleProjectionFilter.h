@@ -55,7 +55,12 @@ namespace mitk {
     itkGetMacro(TargetPlane, mitk::AffineTransform3D::Pointer);
     itkSetMacro(TargetPlane, mitk::AffineTransform3D::Pointer);
     itkGetMacro(Projection,  mitk::PointSet::Pointer);
+    /** Sets the tool axis for this filter. The default tool axis is along the x-axis in
+     *  tool coordinates. */
     void SetToolAxisForFilter(mitk::Point3D point);
+    /** Sets whether the tool axis should be visualized. This is required if no surface is available.
+     *  If disabled only the projection and not the axis is shown. It's disabled by default. */
+    void ShowToolAxis(bool enabled);
 
   protected:
     NeedleProjectionFilter();
@@ -67,8 +72,14 @@ namespace mitk {
 
     mitk::PointSet::Pointer          m_Projection;
     mitk::PointSet::Pointer          m_OriginalPoints;
+    bool                             m_ShowToolAxis;
+    mitk::Point3D                    m_ToolAxis;
 
     int                              m_SelectedInput;
+
+    /** Internal method for initialization of the projection / tool axis representation
+     *  by the point set m_OriginalPoints. */
+    void InitializeOriginalPoints(mitk::Point3D toolAxis, bool showToolAxis);
 
 
     /**

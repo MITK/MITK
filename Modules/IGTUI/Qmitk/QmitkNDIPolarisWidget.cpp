@@ -82,7 +82,7 @@ void QmitkNDIPolarisWidget::AddOutput(std::string s)
   m_Controls->m_outputTextPolaris->verticalScrollBar()->setValue(m_Controls->m_outputTextPolaris->verticalScrollBar()->maximum());
 }
 
-mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::GetTrackingDevice()
 {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
 

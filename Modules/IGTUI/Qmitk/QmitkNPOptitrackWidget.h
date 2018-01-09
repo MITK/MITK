@@ -61,7 +61,7 @@ protected:
 public:
   void ResetOutput() override;
   void AddOutput(std::string s) override;
-  mitk::TrackingDevice::Pointer ConstructTrackingDevice() override;
+  mitk::TrackingDevice::Pointer GetTrackingDevice() override;
 
   bool IsDeviceInstalled() override;
 };

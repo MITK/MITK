@@ -23,3 +23,13 @@ mitk::PolhemusTool::PolhemusTool() :InternalTrackingTool()
 mitk::PolhemusTool::~PolhemusTool(void)
 {
 }
+
+void mitk::PolhemusTool::SetToolPort(int _ToolPort)
+{
+  this->m_ToolPort = _ToolPort;
+}
+
+int mitk::PolhemusTool::GetToolPort()
+{
+  return this->m_ToolPort;
+}

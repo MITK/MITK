@@ -133,14 +133,12 @@ namespace mitk
       }
     }
 
-    //delete all tools from the tool storage
-    navigationTools->DeleteAllTools();
-
-    //and add only the detected tools in the right order
+    //And resort them (this was done in TrackingToolBoxWorker before).
     for (int i = 0; i < newToolStorageInRightOrder->GetToolCount(); i++)
     {
-      navigationTools->AddTool(newToolStorageInRightOrder->GetTool(i));
+      navigationTools->AssignToolNumber(newToolStorageInRightOrder->GetTool(i)->GetIdentifier(), i);
     }
+
     returnValue->SetTrackingDevice(thisDevice);
     MITK_DEBUG << "Number of tools of created tracking device: " << thisDevice->GetToolCount();
     MITK_DEBUG << "Number of outputs of created source: " << returnValue->GetNumberOfOutputs();

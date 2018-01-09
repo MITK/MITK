@@ -148,7 +148,7 @@ namespace mitk {
     void SetName(std::string);
 
     /** @return Returns the name of this storage. */
-    itkGetConstMacro(Name,std::string);
+    std::string GetName() const;
 
     /** Locks the storage. A logged storage may not be modified.
      *  If a method tries to modify the storage anyway a waring message is given.

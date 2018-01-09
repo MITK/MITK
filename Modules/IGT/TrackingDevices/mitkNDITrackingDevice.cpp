@@ -32,13 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
-
 const unsigned char CR = 0xD; // == '\r' - carriage return
 const unsigned char LF = 0xA; // == '\n' - line feed
 
-
 mitk::NDITrackingDevice::NDITrackingDevice() :
-TrackingDevice(),m_DeviceName(""), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
+TrackingDevice(), m_DeviceName(""), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
 m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunication::None), m_StopBits(mitk::SerialCommunication::StopBits1),
 m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff),
 m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_ToolsMutex(nullptr),
@@ -56,7 +54,6 @@ m_MultiThreader(nullptr), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_Mark
   m_MarkerPointsMutex = itk::FastMutexLock::New();
   m_MarkerPoints.reserve(50);   // a maximum of 50 marker positions can be reported by the tracking device
 }
-
 
 bool mitk::NDITrackingDevice::UpdateTool(mitk::TrackingTool* tool)
 {
@@ -123,7 +120,6 @@ mitk::NDITrackingDevice::~NDITrackingDevice()
   }
 }
 
-
 void mitk::NDITrackingDevice::SetPortNumber(const PortNumber _arg)
 {
   if (this->GetState() != Setup)
@@ -135,7 +131,6 @@ void mitk::NDITrackingDevice::SetPortNumber(const PortNumber _arg)
     this->Modified();
   }
 }
-
 
 void mitk::NDITrackingDevice::SetDeviceName(std::string _arg)
 {
@@ -149,7 +144,6 @@ void mitk::NDITrackingDevice::SetDeviceName(std::string _arg)
   }
 }
 
-
 void mitk::NDITrackingDevice::SetBaudRate(const BaudRate _arg)
 {
   if (this->GetState() != Setup)
@@ -161,7 +155,6 @@ void mitk::NDITrackingDevice::SetBaudRate(const BaudRate _arg)
     this->Modified();
   }
 }
-
 
 void mitk::NDITrackingDevice::SetDataBits(const DataBits _arg)
 {
@@ -175,7 +168,6 @@ void mitk::NDITrackingDevice::SetDataBits(const DataBits _arg)
   }
 }
 
-
 void mitk::NDITrackingDevice::SetParity(const Parity _arg)
 {
   if (this->GetState() != Setup)
@@ -187,7 +179,6 @@ void mitk::NDITrackingDevice::SetParity(const Parity _arg)
     this->Modified();
   }
 }
-
 
 void mitk::NDITrackingDevice::SetStopBits(const StopBits _arg)
 {
@@ -201,7 +192,6 @@ void mitk::NDITrackingDevice::SetStopBits(const StopBits _arg)
   }
 }
 
-
 void mitk::NDITrackingDevice::SetHardwareHandshake(const HardwareHandshake _arg)
 {
   if (this->GetState() != Setup)
@@ -213,7 +203,6 @@ void mitk::NDITrackingDevice::SetHardwareHandshake(const HardwareHandshake _arg)
     this->Modified();
   }
 }
-
 
 void mitk::NDITrackingDevice::SetIlluminationActivationRate(const IlluminationActivationRate _arg)
 {
@@ -229,7 +218,6 @@ void mitk::NDITrackingDevice::SetIlluminationActivationRate(const IlluminationAc
   }
 }
 
-
 void mitk::NDITrackingDevice::SetDataTransferMode(const DataTransferMode _arg)
 {
   itkDebugMacro("setting DataTransferMode to " << _arg);
@@ -239,7 +227,6 @@ void mitk::NDITrackingDevice::SetDataTransferMode(const DataTransferMode _arg)
     this->Modified();
   }
 }
-
 
 mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool addCRC)
 {
@@ -267,7 +254,6 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool 
     return NDIOKAY;
 }
 
-
 mitk::NDIErrorCode mitk::NDITrackingDevice::Receive(std::string* answer, unsigned int numberOfBytes)
 {
   if (answer == nullptr)
@@ -282,7 +268,6 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Receive(std::string* answer, unsigne
     return NDIOKAY;
 }
 
-
 mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveByte(char* answer)
 {
   if (answer == nullptr)
@@ -294,13 +279,12 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveByte(char* answer)
 
   long returnvalue = m_SerialCommunication->Receive(m, 1);
 
-  if ((returnvalue == 0) ||(m.size() != 1))
+  if ((returnvalue == 0) || (m.size() != 1))
     return SERIALRECEIVEERROR;
 
   *answer = m.at(0);
   return NDIOKAY;
 }
-
 
 mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveLine(std::string* answer)
 {
@@ -314,13 +298,12 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveLine(std::string* answer)
   do
   {
     long returnvalue = m_SerialCommunication->Receive(m, 1);
-    if ((returnvalue == 0) ||(m.size() != 1))
+    if ((returnvalue == 0) || (m.size() != 1))
       return SERIALRECEIVEERROR;
     *answer += m;
   } while (m.at(0) != LF);
   return NDIOKAY;
 }
-
 
 void mitk::NDITrackingDevice::ClearSendBuffer()
 {
@@ -328,28 +311,25 @@ void mitk::NDITrackingDevice::ClearSendBuffer()
   m_SerialCommunication->ClearSendBuffer();
 }
 
-
 void mitk::NDITrackingDevice::ClearReceiveBuffer()
 {
   MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
   m_SerialCommunication->ClearReceiveBuffer();
 }
 
-
 const std::string mitk::NDITrackingDevice::CalcCRC(const std::string* input)
 {
-
   if (input == nullptr)
     return "";
   /* the crc16 calculation code is taken from the NDI API guide example code section */
-  static int oddparity[16] = {0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0};
+  static int oddparity[16] = { 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 };
   unsigned int data;  // copy of the input string's current character
   unsigned int crcValue = 0;  // the crc value is stored here
   unsigned int* puCRC16 = &crcValue;  // the algorithm uses a pointer to crcValue, so it's easier to provide that than to change the algorithm
   for (unsigned int i = 0; i < input->length(); i++)
   {
     data = (*input)[i];
-    data = (data ^ (*(puCRC16) & 0xff)) & 0xff;
+    data = (data ^ (*(puCRC16)& 0xff)) & 0xff;
     *puCRC16 >>= 8;
     if (oddparity[data & 0x0f] ^ oddparity[data >> 4])
     {
@@ -362,16 +342,17 @@ const std::string mitk::NDITrackingDevice::CalcCRC(const std::string* input)
   }
   // crcValue contains now the CRC16 value. Convert it to a string and return it
   char returnvalue[13];
-  sprintf(returnvalue,"%04X", crcValue);  // 4 hexadecimal digit with uppercase format
+  sprintf(returnvalue, "%04X", crcValue);  // 4 hexadecimal digit with uppercase format
   return std::string(returnvalue);
 }
 
 bool mitk::NDITrackingDevice::OpenConnection()
 {
-
   //this->m_ModeMutex->Lock();
   if (this->GetState() != Setup)
-    {mitkThrowException(mitk::IGTException) << "Can only try to open the connection if in setup mode";}
+  {
+    mitkThrowException(mitk::IGTException) << "Can only try to open the connection if in setup mode";
+  }
 
   m_SerialCommunication = mitk::SerialCommunication::New();
 
@@ -419,7 +400,9 @@ bool mitk::NDITrackingDevice::OpenConnection()
   returnvalue = m_DeviceProtocol->COMM(m_BaudRate, m_DataBits, m_Parity, m_StopBits, m_HardwareHandshake);
 
   if (returnvalue != NDIOKAY)
-    {mitkThrowException(mitk::IGTHardwareException) << "Could not set comm settings in trackingdevice";}
+  {
+    mitkThrowException(mitk::IGTHardwareException) << "Could not set comm settings in trackingdevice";
+  }
 
   //after changing COMM wait at least 100ms according to NDI Api documentation page 31
   itksys::SystemTools::Delay(500);
@@ -435,18 +418,21 @@ bool mitk::NDITrackingDevice::OpenConnection()
   m_SerialCommunication->SetReceiveTimeout(5000);
   m_SerialCommunication->OpenConnection();
 
-
   /* initialize the tracking device */
   returnvalue = m_DeviceProtocol->INIT();
   if (returnvalue != NDIOKAY)
-    {mitkThrowException(mitk::IGTHardwareException) << "Could not initialize the tracking device";}
+  {
+    mitkThrowException(mitk::IGTHardwareException) << "Could not initialize the tracking device";
+  }
 
   if (this->GetType() == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName())  // if the type of tracking device is not specified, try to query the connected device
   {
     mitk::TrackingDeviceType deviceType;
     returnvalue = m_DeviceProtocol->VER(deviceType);
     if ((returnvalue != NDIOKAY) || (deviceType == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
-      {mitkThrowException(mitk::IGTHardwareException) << "Could not determine tracking device type. Please set manually and try again.";}
+    {
+      mitkThrowException(mitk::IGTHardwareException) << "Could not determine tracking device type. Please set manually and try again.";
+    }
     this->SetType(deviceType);
   }
 
@@ -500,11 +486,10 @@ bool mitk::NDITrackingDevice::OpenConnection()
   * POLARIS: initialize the tools that were added manually
   **/
   {
-
     MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
     std::string portHandle;
     auto endIt = m_6DTools.end();
-    for(auto it = m_6DTools.begin(); it != endIt; ++it)
+    for (auto it = m_6DTools.begin(); it != endIt; ++it)
     {
       /* get a port handle for the tool */
       returnvalue = m_DeviceProtocol->PHRQ(&portHandle);
@@ -512,15 +497,19 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         (*it)->SetPortHandle(portHandle.c_str());
         /* now write the SROM file of the tool to the tracking system using PVWR */
-    if (this->m_Data.Line == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName())
+        if (this->m_Data.Line == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName())
         {
           returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)
-            {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + (*it)->GetToolName() + std::string("' to tracking device")).c_str();}
+          {
+            mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + (*it)->GetToolName() + std::string("' to tracking device")).c_str();
+          }
 
           returnvalue = m_DeviceProtocol->PINIT(&portHandle);
           if (returnvalue != NDIOKAY)
-            {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize tool '") + (*it)->GetToolName()).c_str();}
+          {
+            mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize tool '") + (*it)->GetToolName()).c_str();
+          }
 
           if ((*it)->IsEnabled() == true)
           {
@@ -528,7 +517,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
             if (returnvalue != NDIOKAY)
             {
               mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + portHandle +
-                std::string("' for tool '")+ (*it)->GetToolName() + std::string("'")).c_str();
+                std::string("' for tool '") + (*it)->GetToolName() + std::string("'")).c_str();
             }
           }
         }
@@ -540,13 +529,14 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (this->DiscoverWiredTools() == false)  // query the tracking device for wired tools and add them to our tool list
     return false; // \TODO: could we continue anyways?
 
-
   /*POLARIS: set the illuminator activation rate */
   if (this->m_Data.Line == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName())
   {
     returnvalue = m_DeviceProtocol->IRATE(this->m_IlluminationActivationRate);
     if (returnvalue != NDIOKAY)
-      {mitkThrowException(mitk::IGTHardwareException) << "Could not set the illuminator activation rate";}
+    {
+      mitkThrowException(mitk::IGTHardwareException) << "Could not set the illuminator activation rate";
+    }
   }
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
   this->SetState(Ready);
@@ -556,7 +546,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   }
   catch (mitk::IGTHardwareException e)
   {
-    MITK_WARN<<e.GetDescription();
+    MITK_WARN << e.GetDescription();
   }
 
   return true;
@@ -569,7 +559,9 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
   returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
 
   if (returnvalue != NDIOKAY)
-    {mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected";}
+  {
+    mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected";
+  }
 
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
@@ -578,7 +570,7 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
   {
     ph = portHandle.substr(i, 2);
     mitk::NDIPassiveTool* pt = this->GetInternalTool(ph);
-    if ( pt == nullptr) // if we don't have a tool, something is wrong. Tools should be discovered first by calling DiscoverWiredTools()
+    if (pt == nullptr) // if we don't have a tool, something is wrong. Tools should be discovered first by calling DiscoverWiredTools()
       continue;
 
     if (pt->GetSROMData() == nullptr)
@@ -586,11 +578,15 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
 
     returnvalue = m_DeviceProtocol->PVWR(&ph, pt->GetSROMData(), pt->GetSROMDataLength());
     if (returnvalue != NDIOKAY)
-      {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + pt->GetToolName() + std::string("' to tracking device")).c_str();}
+    {
+      mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + pt->GetToolName() + std::string("' to tracking device")).c_str();
+    }
 
     returnvalue = m_DeviceProtocol->PINIT(&ph);
     if (returnvalue != NDIOKAY)
-      {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize tool '") + pt->GetToolName()).c_str();}
+    {
+      mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize tool '") + pt->GetToolName()).c_str();
+    }
 
     if (pt->IsEnabled() == true)
     {
@@ -598,13 +594,12 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
       if (returnvalue != NDIOKAY)
       {
         mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + portHandle +
-          std::string("' for tool '")+ pt->GetToolName() + std::string("'")).c_str();
+          std::string("' for tool '") + pt->GetToolName() + std::string("'")).c_str();
       }
     }
   }
   return true;
 }
-
 
 mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 {
@@ -663,18 +658,16 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
   //  return mitk::TrackingSystemNotSpecified;
   //}
 
-
-    mitk::TrackingDeviceType deviceType;
-    returnvalue = m_DeviceProtocol->VER(deviceType);
-    if ((returnvalue != NDIOKAY) || (deviceType == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
-    {
-      m_SerialCommunication = nullptr;
-      return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
-    }
+  mitk::TrackingDeviceType deviceType;
+  returnvalue = m_DeviceProtocol->VER(deviceType);
+  if ((returnvalue != NDIOKAY) || (deviceType == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
+  {
     m_SerialCommunication = nullptr;
-    return deviceType;
+    return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
+  }
+  m_SerialCommunication = nullptr;
+  return deviceType;
 }
-
 
 bool mitk::NDITrackingDevice::CloseConnection()
 {
@@ -692,7 +685,6 @@ bool mitk::NDITrackingDevice::CloseConnection()
   }
   return true;
 }
-
 
 ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoStruct)
 {
@@ -724,7 +716,6 @@ ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoS
   return ITK_THREAD_RETURN_VALUE;
 }
 
-
 bool mitk::NDITrackingDevice::StartTracking()
 {
   if (this->GetState() != Ready)
@@ -740,7 +731,6 @@ bool mitk::NDITrackingDevice::StartTracking()
   return true;
 }
 
-
 void mitk::NDITrackingDevice::TrackTools()
 {
   /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
@@ -753,8 +743,6 @@ void mitk::NDITrackingDevice::TrackTools()
   returnvalue = m_DeviceProtocol->TSTART();
   if (returnvalue != NDIOKAY)
     return;
-
-
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -783,11 +771,12 @@ void mitk::NDITrackingDevice::TrackTools()
 
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
-    {mitkThrowException(mitk::IGTHardwareException) << "An error occured while tracking tools.";}
+  {
+    mitkThrowException(mitk::IGTHardwareException) << "An error occured while tracking tools.";
+  }
 
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread and transfer control back to main thread by releasing trackingFinishedLockHolder
 }
-
 
 void mitk::NDITrackingDevice::TrackMarkerPositions()
 {
@@ -834,10 +823,8 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread
 }
 
-
 void mitk::NDITrackingDevice::TrackToolsAndMarkers()
 {
-
   MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
   if (m_OperationMode != HybridTracking)
     return;
@@ -876,7 +863,6 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread
 }
 
-
 mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) const
 {
   MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
@@ -884,7 +870,6 @@ mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) co
     return m_6DTools.at(toolNumber);
   return nullptr;
 }
-
 
 mitk::TrackingTool* mitk::NDITrackingDevice::GetToolByName(std::string name) const
 {
@@ -896,7 +881,6 @@ mitk::TrackingTool* mitk::NDITrackingDevice::GetToolByName(std::string name) con
   return nullptr;
 }
 
-
 mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string portHandle)
 {
   MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
@@ -907,13 +891,11 @@ mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string portH
   return nullptr;
 }
 
-
 unsigned int mitk::NDITrackingDevice::GetToolCount() const
 {
   MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   return m_6DTools.size();
 }
-
 
 bool mitk::NDITrackingDevice::Beep(unsigned char count)
 {
@@ -927,7 +909,7 @@ bool mitk::NDITrackingDevice::Beep(unsigned char count)
   }
 }
 
-mitk::TrackingTool* mitk::NDITrackingDevice::AddTool( const char* toolName, const char* fileName, TrackingPriority p /*= NDIPassiveTool::Dynamic*/ )
+mitk::TrackingTool* mitk::NDITrackingDevice::AddTool(const char* toolName, const char* fileName, TrackingPriority p /*= NDIPassiveTool::Dynamic*/)
 {
   mitk::NDIPassiveTool::Pointer t = mitk::NDIPassiveTool::New();
   if (t->LoadSROMFile(fileName) == false)
@@ -938,7 +920,6 @@ mitk::TrackingTool* mitk::NDITrackingDevice::AddTool( const char* toolName, cons
     return nullptr;
   return t.GetPointer();
 }
-
 
 bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
 {
@@ -958,14 +939,16 @@ bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
       /* now write the SROM file of the tool to the tracking system using PVWR */
       returnvalue = m_DeviceProtocol->PVWR(&newPortHandle, p->GetSROMData(), p->GetSROMDataLength());
       if (returnvalue != NDIOKAY)
-        {mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + p->GetToolName() + std::string("' to tracking device")).c_str();}
+      {
+        mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not write SROM file for tool '") + p->GetToolName() + std::string("' to tracking device")).c_str();
+      }
       /* initialize the port handle */
       returnvalue = m_DeviceProtocol->PINIT(&newPortHandle);
       if (returnvalue != NDIOKAY)
-        {
-          mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize port '") + newPortHandle +
-          std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str();
-        }
+      {
+        mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize port '") + newPortHandle +
+          std::string("' for tool '") + p->GetToolName() + std::string("'")).c_str();
+      }
       /* enable the port handle */
       if (p->IsEnabled() == true)
       {
@@ -973,7 +956,7 @@ bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
         if (returnvalue != NDIOKAY)
         {
           mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + newPortHandle +
-            std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str();
+            std::string("' for tool '") + p->GetToolName() + std::string("'")).c_str();
         }
       }
     }
@@ -996,7 +979,6 @@ bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
   else  // in Tracking mode, no tools can be added
     return false;
 }
-
 
 bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
 {
@@ -1046,7 +1028,6 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
   return false;
 }
 
-
 void mitk::NDITrackingDevice::InvalidateAll()
 {
   MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
@@ -1054,7 +1035,6 @@ void mitk::NDITrackingDevice::InvalidateAll()
   for (auto iterator = m_6DTools.begin(); iterator != end; ++iterator)
     (*iterator)->SetDataValid(false);
 }
-
 
 bool mitk::NDITrackingDevice::SetOperationMode(OperationMode mode)
 {
@@ -1065,21 +1045,18 @@ bool mitk::NDITrackingDevice::SetOperationMode(OperationMode mode)
   return true;
 }
 
-
 mitk::OperationMode mitk::NDITrackingDevice::GetOperationMode()
 {
   return m_OperationMode;
 }
-
 
 bool mitk::NDITrackingDevice::GetMarkerPositions(MarkerPointContainerType* markerpositions)
 {
   m_MarkerPointsMutex->Lock();
   *markerpositions = m_MarkerPoints;  // copy the internal vector to the one provided
   m_MarkerPointsMutex->Unlock();
-  return (markerpositions->size() != 0)  ;
+  return (markerpositions->size() != 0);
 }
-
 
 bool mitk::NDITrackingDevice::DiscoverWiredTools()
 {
@@ -1092,7 +1069,9 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
 
   if (returnvalue != NDIOKAY)
-    {mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected";}
+  {
+    mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected";
+  }
 
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
@@ -1121,36 +1100,36 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
       if (returnvalue != NDIOKAY)
       {
         mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize port '") + ph +
-          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str();
+          std::string("' for tool '") + newTool->GetToolName() + std::string("'")).c_str();
       }
       /* enable the port handle */
       returnvalue = m_DeviceProtocol->PENA(&ph, newTool->GetTrackingPriority()); // Enable tool
       if (returnvalue != NDIOKAY)
       {
         mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + ph +
-          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str();
+          std::string("' for tool '") + newTool->GetToolName() + std::string("'")).c_str();
       }
     }
     //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool()
     if (this->InternalAddTool(newTool) == false)
-      {mitkThrowException(mitk::IGTException) << "Error while adding new tool";}
+    {
+      mitkThrowException(mitk::IGTException) << "Error while adding new tool";
+    }
     else occupiedPorts.push_back(i);
   }
 
-
   // after initialization readout serial numbers of automatically detected tools
   for (unsigned int i = 0; i < occupiedPorts.size(); i++)
-    {
+  {
     ph = portHandle.substr(occupiedPorts.at(i), 2);
     std::string portInfo;
     NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
-    if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i+numberOfToolsAtStart))->SetSerialNumber(portInfo.substr(23,8));
+    if ((returnvaluePort == NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i + numberOfToolsAtStart))->SetSerialNumber(portInfo.substr(23, 8));
     itksys::SystemTools::Delay(10);
-    }
+  }
 
   return true;
 }
-
 
 mitk::NDIErrorCode mitk::NDITrackingDevice::FreePortHandles()
 {
@@ -1159,7 +1138,9 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::FreePortHandles()
   std::string portHandle;
   returnvalue = m_DeviceProtocol->PHSR(FREED, &portHandle);
   if (returnvalue != NDIOKAY)
-    {mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that need to be freed";}
+  {
+    mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that need to be freed";
+  }
 
   /* if there are port handles that need to be freed, free them */
   if (portHandle.empty() == true)
@@ -1181,23 +1162,24 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::FreePortHandles()
       returnvalue = m_DeviceProtocol->PHF(&ph);  // free it there
       // What to do if port handle could not be freed? This seems to be a non critical error
       if (returnvalue != NDIOKAY)
-        {mitkThrowException(mitk::IGTHardwareException) << "Could not free all port handles";}
+      {
+        mitkThrowException(mitk::IGTHardwareException) << "Could not free all port handles";
+      }
     }
   }
   return returnvalue;
 }
 
-
 int mitk::NDITrackingDevice::GetMajorFirmwareRevisionNumber()
 {
   std::string revision;
-  if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9) )
+  if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9))
   {
     MITK_ERROR << "Could not receive firmware revision number!";
     return 0;
   }
 
-  const std::string majrevno = revision.substr(2,3); //cut out "004" from "D.004.001"
+  const std::string majrevno = revision.substr(2, 3); //cut out "004" from "D.004.001"
 
   return std::atoi(majrevno.c_str());
 }
@@ -1205,7 +1187,7 @@ int mitk::NDITrackingDevice::GetMajorFirmwareRevisionNumber()
 const char* mitk::NDITrackingDevice::GetFirmwareRevisionNumber()
 {
   static std::string revision;
-  if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9) )
+  if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9))
   {
     MITK_ERROR << "Could not receive firmware revision number!";
     revision = "";
@@ -1218,6 +1200,14 @@ bool mitk::NDITrackingDevice::AutoDetectToolsAvailable()
 {
   if (this->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) { return true; }
   else { return false; }
+}
+
+bool mitk::NDITrackingDevice::AddSingleToolIsAvailable()
+{
+  //For Aurora, only AutoDetecion or loading of toolStorage should be used. It is not possible to add a single tool.
+  if (this->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) { return false; }
+  //For Polaris, a single tool can be added, there is no autoDetection.
+  else { return true; }
 }
 
 mitk::NavigationToolStorage::Pointer mitk::NDITrackingDevice::AutoDetectTools()
@@ -1279,19 +1269,19 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
   /*info contains the following:
   <HEX:number of volumes> (+n times:) <HEX:shape type> <shape parameters D1-D10> <HEX:reserved / number of wavelength supported> <metal resistant / supported wavelength>
   */
-  (*numberOfVolumes) = (unsigned int) std::atoi(info.substr(0,1).c_str());
+  (*numberOfVolumes) = (unsigned int)std::atoi(info.substr(0, 1).c_str());
 
-  for (unsigned int i=0; i<(*numberOfVolumes); i++)
+  for (unsigned int i = 0; i < (*numberOfVolumes); i++)
   {
     //e.g. for cube:  "9-025000+025000-025000+025000-055000-005000+000000+000000+000000+00000011"
     //for dome:       "A+005000+048000+005000+066000+000000+000000+000000+000000+000000+00000011"
 
     std::string::size_type offset, end;
-    offset = (i*73)+1;
-    end = 73+(i*73);
+    offset = (i * 73) + 1;
+    end = 73 + (i * 73);
     std::string currentVolume = info.substr(offset, end);//i=0: from 1 to 73 characters; i=1: from 75 to 148 char;
     // if i>0 then we have a return statement <LF> infront
-    if (i>0)
+    if (i > 0)
       currentVolume = currentVolume.substr(1, currentVolume.size());
     if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetDeviceDataPolarisOldModel().HardwareCode) == 0)
       volumes->push_back(NDIPolarisTypeInformation::GetDeviceDataPolarisOldModel().Model);
@@ -1299,7 +1289,7 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
       volumes->push_back(NDIPolarisTypeInformation::GetDeviceDataPolarisSpectra().Model);
     if (currentVolume.compare(1, 3, NDIPolarisTypeInformation::GetDeviceDataSpectraExtendedPyramid().HardwareCode) == 0)
     {
-      currentVolume = currentVolume.substr(1,currentVolume.size());
+      currentVolume = currentVolume.substr(1, currentVolume.size());
       volumes->push_back(NDIPolarisTypeInformation::GetDeviceDataSpectraExtendedPyramid().Model);
     }
     if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetDeviceDataPolarisVicra().HardwareCode) == 0)
@@ -1313,8 +1303,8 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
     for (unsigned int index = 0; index < 10; index++)
     {
       std::string::size_type offD, endD;
-      offD = 1+(index*7); //7 digits per dimension and the first is the type of volume
-      endD = offD+7;
+      offD = 1 + (index * 7); //7 digits per dimension and the first is the type of volume
+      endD = offD + 7;
       int dimension = std::atoi(currentVolume.substr(offD, endD).c_str());
       dimension /= 100; //given in mm. 7 digits are xxxx.xx according to NDI //strange, the last two digits (11) also for the metal flag get read also...
       volumesDimensions->push_back(dimension);
@@ -1332,4 +1322,3 @@ bool mitk::NDITrackingDevice::SetVolume(mitk::TrackingDeviceData volume)
   }
   return true;
 }
-

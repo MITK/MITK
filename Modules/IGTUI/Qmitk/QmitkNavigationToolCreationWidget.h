@@ -87,7 +87,7 @@ signals:
 
 
   void OnLoadCalibrationFile();
-  void OnSurfaceUseOtherToggled();
+  void OnSurfaceUseToggled();
   void OnLoadSurface();
   void OnEditToolTip();
   void OnEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip);

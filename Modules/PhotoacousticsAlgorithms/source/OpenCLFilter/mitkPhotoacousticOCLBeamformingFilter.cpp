@@ -128,7 +128,6 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
     m_UsedLinesBuffer = m_UsedLinesCalculation->GetGPUOutput()->GetGPUBuffer();
 
     // calculate the Delays
-
     m_DelayCalculation->SetConfig(m_Conf);
     m_DelayCalculation->SetInputs(m_UsedLinesBuffer);
     m_DelayCalculation->Update();

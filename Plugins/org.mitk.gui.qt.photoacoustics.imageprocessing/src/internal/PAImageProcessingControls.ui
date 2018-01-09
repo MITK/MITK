@@ -145,7 +145,7 @@
          <item>
           <widget class="QComboBox" name="BModeMethod">
            <property name="currentText">
-            <string>Envelope Detection</string>
+            <string>Absolute Filter</string>
            </property>
            <item>
             <property name="text">
@@ -329,7 +329,7 @@
          <item row="2" column="1">
           <widget class="QLabel" name="label_13">
            <property name="text">
-            <string>Thukey window alpha</string>
+            <string>Tukey window alpha</string>
            </property>
           </widget>
          </item>
@@ -746,7 +746,7 @@
           </sizepolicy>
          </property>
          <property name="currentText">
-          <string>Spherical Wave</string>
+          <string>Quad. Approx.</string>
          </property>
          <item>
           <property name="text">

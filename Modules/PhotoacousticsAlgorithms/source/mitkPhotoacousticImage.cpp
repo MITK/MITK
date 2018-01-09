@@ -423,23 +423,31 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
   {
       imageData[reference->GetDimension(0)*n] = 0;
   }
-
-  for (int n = 0; n < width; ++n)
+  if (alpha < 0.00001)
   {
-    if (n <= (alpha*(width - 1)) / 2)
+    for (int n = 0; n < width; ++n)
     {
-      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+      if (n <= (alpha*(width - 1)) / 2)
+      {
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+      }
+      else if (n >= (width - 1)*(1 - alpha / 2))
+      {
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+      }
+      else
+      {
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = 1;
+      }
     }
-    else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
-    {
-      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
-    }
-    else
+  }
+  else
+  {
+    for (int n = 0; n < width; ++n)
     {
       imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = 1;
     }
   }
-
   // Butterworth-Filter
   /*
   // first, write the HighPass

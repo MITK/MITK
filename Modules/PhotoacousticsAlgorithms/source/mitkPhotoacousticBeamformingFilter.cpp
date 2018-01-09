@@ -251,12 +251,31 @@ void mitk::BeamformingFilter::GenerateData()
         return;
       }
 
+      long availableMemory = m_BeamformingOclFilter->GetDeviceMemory();
+
       unsigned int batchSize = 16;
       unsigned int batches = (unsigned int)((float)input->GetDimension(2)/batchSize) + (input->GetDimension(2)%batchSize > 0);
 
-      unsigned int batchDim[] = {input->GetDimension(0), input->GetDimension(1), batchSize};
-      unsigned int batchDimLast[] = {input->GetDimension(0), input->GetDimension(1), input->GetDimension(2)%batchSize};
+      unsigned int batchDim[] = { input->GetDimension(0), input->GetDimension(1), batchSize };
+      unsigned int batchDimLast[] = { input->GetDimension(0), input->GetDimension(1), input->GetDimension(2) % batchSize };
 
+      // the following safeguard is probably only needed for absurdly small GPU memory
+      for (batchSize = 16; 
+        batchDim[0] * batchDim[1] * 4 + // Input image (float)
+        m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * 4 // Output image (float)
+        > availableMemory - 
+        m_Conf.ReconstructionLines / 2 * m_Conf.SamplesPerLine * 2 - // Delays buffer (unsigned short)
+        m_Conf.ReconstructionLines * m_Conf.SamplesPerLine * 3 * 2 - // UsedLines buffer (unsigned short)
+        100 * 1024; // 100 MB buffer for local data, system purposes etc
+        --batchSize)
+      {}
+      if (batchSize < 1)
+      {
+        MITK_ERROR << "device memory too small for GPU beamforming";
+        return;
+      }
+
+      MITK_INFO << batchSize;
       mitk::ImageReadAccessor copy(input);
 
       for(unsigned int i = 0; i < batches; ++i)

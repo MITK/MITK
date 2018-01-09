@@ -58,6 +58,11 @@ public:
     */
   virtual bool IsInitialized();
 
+  /**
+    * @brief Returns the amount of global memory of the used device in bytes
+    */
+  virtual long GetDeviceMemory();
+
   /** @brief Destructor */
   virtual ~OclFilter();
 

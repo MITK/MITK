@@ -44,8 +44,16 @@ The "smoothness" of the tukey window can be chosen by using the "Tukey window al
 The filtered frequencies can be set by defining the High and Low pass frequencies.
 
 \subsection org_mitk_gui_qt_photoacoustics_imageprocessingCrop The Crop Filter Settings
+The crop filter cuts off parts of the image at the top and the bottom. The amount of pixels cut off can be configured using the "Cut Top" and "Cut Bottom" parameters.
 
 \subsection org_mitk_gui_qt_photoacoustics_imageprocessingBMode The BMode Filter Settings
+The B-mode filters available are:
+<ul>
+<li>An absolute filter
+<li>An envelope detection filter
+</ul>
+If desired, the filter can also resample the image to a given spacing; to do this, check the "Do Resampling" box and set the desired spacing in mm.
+Afterwards a logarithmic filter can be applied, if "Add Logfilter" is checked.
 
 \subsection org_mitk_gui_qt_photoacoustics_imageprocessingBatch Batch Processing
 When processing large amounts of data, an option is available to automatically process multiple images by applying all filters in order to them and saving the resulting images. 

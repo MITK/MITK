@@ -88,6 +88,7 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.UseImageSpacing->setToolTipDuration(5000);
   m_Controls.ProgressInfo->setVisible(false);
   m_Controls.UseBP->hide();
+  m_Controls.UseGPUBmode->hide();
 
   #ifndef PHOTOACOUSTICS_USE_GPU
     m_Controls.UseGPUBf->setEnabled(false);

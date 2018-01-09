@@ -54,6 +54,9 @@ class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QWidget
 private:
 
   bool m_drawTextInStatusBar;
+  QTimer m_ResizeTimer;
+
+  void UpdateAnnotationFonts();
 
 public:
   QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti");
@@ -183,6 +186,7 @@ protected:
   vtkRenderer* ren[4];
 
   void setCornerAnnotation(int corner, int i, const char* text);
+  void setCornerAnnotationMaxText(int corner, int i, const char* text);
 
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
@@ -238,6 +242,10 @@ public slots:
   void mousePressEvent(QMouseEvent * e) override;
 
   void moveEvent( QMoveEvent* e ) override;
+  
+  void OnWindowResized();
+
+  void OnResizeStoped();
 
   void EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D&p);
 

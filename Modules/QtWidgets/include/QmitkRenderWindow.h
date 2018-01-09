@@ -140,6 +140,8 @@ signals:
   void SignalLayoutDesignChanged(int layoutDesignIndex);
 
   void moved();
+  
+  void resized();
 
   /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode*> nodes);
@@ -153,6 +155,8 @@ protected slots:
   void DeferredHideMenu();
 
   void OnFullScreenModeChanged(bool fullscreen);
+  void resizeEvent(QResizeEvent* e) override;
+
 private:
 
   // Helper Functions to Convert Qt-Events to Mitk-Events

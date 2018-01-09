@@ -4,6 +4,7 @@
 set(MITK_MODULES
   Core
   CommandLine
+  RectifyImage
   AppUtil
   DCMTesting
   RDF

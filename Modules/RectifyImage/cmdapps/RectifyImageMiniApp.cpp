@@ -19,6 +19,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkIOUtil.h>
 
+template <typename TPixelType>
+void RectifyImage(mitk::Image::Pointer inputImage, mitk::Image::Pointer outputImage)
+{
+  mitk::ImagePixelReadAccessor<TPixelType, 3> pixelReadAccess(inputImage);
+  mitk::ImagePixelWriteAccessor<TPixelType, 3> pixelWriteAccess(outputImage);
+
+  const auto DEPTH = static_cast<itk::IndexValueType>(outputImage->GetDimension(2));
+  const auto HEIGHT = static_cast<itk::IndexValueType>(outputImage->GetDimension(1));
+  const auto WIDTH = static_cast<itk::IndexValueType>(outputImage->GetDimension(0));
+
+  auto geometry = outputImage->GetGeometry();
+  itk::Index<3> index;
+  mitk::Point3D worldCoords;
+
+  for (index[2] = 0; index[2] < DEPTH; ++index[2])
+  {
+    for (index[1] = 0; index[1] < HEIGHT; ++index[1])
+    {
+      for (index[0] = 0; index[0] < WIDTH; ++index[0])
+      {
+        geometry->IndexToWorld(index, worldCoords);
+        pixelWriteAccess.SetPixelByIndex(index, pixelReadAccess.GetPixelByWorldCoordinates(worldCoords));
+      }
+    }
+  }
+}
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -46,6 +73,12 @@ int main(int argc, char* argv[])
   }
   catch (const mitk::Exception&)
   {
+    return EXIT_FAILURE;
+  }
+
+  if (3 != inputImage->GetDimension())
+  {
+    MITK_ERROR << "Only 3-d images are supported.";
     return EXIT_FAILURE;
   }
 
@@ -97,37 +130,33 @@ int main(int argc, char* argv[])
   outputGeometry->SetTimeStepGeometry(slicedGeometry, 0);
 
   auto pixelType = inputImage->GetPixelType();
-  const std::size_t PIXEL_TYPE_SIZE = pixelType.GetSize();
 
   auto outputImage = mitk::Image::New();
   outputImage->Initialize(pixelType, *outputGeometry);
 
-  std::size_t outputImageBufferSize = PIXEL_TYPE_SIZE;
-  for (int i = 0; i < 3; ++i)
-    outputImageBufferSize *= outputImage->GetDimension(i);
-
   try
   {
-    mitk::ImagePixelReadAccessor<unsigned short, 3> pixelReadAccess(inputImage);
-    mitk::ImagePixelWriteAccessor<unsigned short, 3> pixelWriteAccess(outputImage);
-
-    const auto OUTPUT_DEPTH = static_cast<itk::IndexValueType>(outputImage->GetDimension(2));
-    const auto OUTPUT_HEIGHT = static_cast<itk::IndexValueType>(outputImage->GetDimension(1));
-    const auto OUTPUT_WIDTH = static_cast<itk::IndexValueType>(outputImage->GetDimension(0));
-
-    itk::Index<3> outputIndex;
-    mitk::Point3D worldCoords;
-
-    for (outputIndex[2] = 0; outputIndex[2] < OUTPUT_DEPTH; ++outputIndex[2])
+    switch (pixelType.GetComponentType())
     {
-      for (outputIndex[1] = 0; outputIndex[1] < OUTPUT_HEIGHT; ++outputIndex[1])
-      {
-        for (outputIndex[0] = 0; outputIndex[0] < OUTPUT_WIDTH; ++outputIndex[0])
-        {
-          slicedGeometry->IndexToWorld(outputIndex, worldCoords);
-          pixelWriteAccess.SetPixelByIndex(outputIndex, pixelReadAccess.GetPixelByWorldCoordinates(worldCoords));
-        }
-      }
+      case itk::ImageIOBase::CHAR:
+        RectifyImage<char>(inputImage, outputImage);
+        break;
+
+      case itk::ImageIOBase::UCHAR:
+        RectifyImage<unsigned char>(inputImage, outputImage);
+        break;
+
+      case itk::ImageIOBase::SHORT:
+        RectifyImage<short>(inputImage, outputImage);
+        break;
+
+      case itk::ImageIOBase::USHORT:
+        RectifyImage<unsigned short>(inputImage, outputImage);
+        break;
+
+      default:
+        MITK_ERROR << "Pixel type is not supported.";
+        return EXIT_FAILURE;
     }
   }
   catch (const mitk::Exception &e)

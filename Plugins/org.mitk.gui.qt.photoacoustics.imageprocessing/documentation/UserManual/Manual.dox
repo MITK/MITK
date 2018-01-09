@@ -56,8 +56,7 @@ If desired, the filter can also resample the image to a given spacing; to do thi
 Afterwards a logarithmic filter can be applied, if "Add Logfilter" is checked.
 
 \subsection org_mitk_gui_qt_photoacoustics_imageprocessingBatch Batch Processing
-When processing large amounts of data, an option is available to automatically process multiple images by applying all filters in order to them and saving the resulting images. 
-In the first row of the Batch Processing Panel one can select which filters should be applied to the image; in the second row one can select whether the resulting image after the filter should be saved.
+When processing large amounts of data, an option is available to automatically process multiple images by applying all filters in order to those images and saving the resulting images. 
+In the first row of the Batch Processing Panel one can select which filters should be applied to the image; in the second row one can select whether the resulting image from the filter should be saved.
 After pressing the "Start Batch Processing" button, one can choose first the images to be processed, and then the folder where they will be saved.
 */
-

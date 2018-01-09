@@ -131,6 +131,23 @@
         </widget>
        </item>
        <item>
+        <widget class="QComboBox" name="BModeMethod">
+         <property name="currentText">
+          <string>Absolute Filter</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Absolute Filter</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Envelope Detection</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <widget class="QCheckBox" name="DoResampling">
@@ -140,23 +157,6 @@
            <property name="checked">
             <bool>true</bool>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="BModeMethod">
-           <property name="currentText">
-            <string>Absolute Filter</string>
-           </property>
-           <item>
-            <property name="text">
-             <string>Absolute Filter</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Envelope Detection</string>
-            </property>
-           </item>
           </widget>
          </item>
          <item>
@@ -200,7 +200,7 @@
            <item>
             <widget class="QLabel" name="ResamplingLabel">
              <property name="text">
-              <string>[mm] Depth Spacing </string>
+              <string>[mm] Resampled Depth Spacing </string>
              </property>
             </widget>
            </item>

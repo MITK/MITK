@@ -73,10 +73,11 @@ void mitk::OCLUsedLinesCalculation::Execute()
   }
   catch (const mitk::Exception& e)
   {
-    MITK_ERROR << "Caught exception while initializing filter: " << e.what();
+    MITK_ERROR << "Caught exception while initializing UsedLines filter: " << e.what();
     return;
   }
 
+  // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
   m_part = (tan(m_Conf.Angle / 360 * 2 * M_PI) * ((m_Conf.SpeedOfSound * m_Conf.TimeSpacing)) / (m_Conf.Pitch * m_Conf.TransducerElements)) * m_Conf.inputDim[0];
   
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));

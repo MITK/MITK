@@ -73,15 +73,17 @@ void mitk::OCLDelayCalculation::Execute()
   }
   catch (const mitk::Exception& e)
   {
-    MITK_ERROR << "Caught exception while initializing filter: " << e.what();
+    MITK_ERROR << "Caught exception while initializing Delay Calculation filter: " << e.what();
     return;
   }
 
+  // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
   if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::QuadApprox)
     m_DelayMultiplicatorRaw = pow(1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * m_Conf.Pitch * (float)m_Conf.TransducerElements / (float)m_Conf.inputDim[0], 2) / 2;
   else if (m_Conf.DelayCalculationMethod == BeamformingSettings::DelayCalc::Spherical)
     m_DelayMultiplicatorRaw = 1 / (m_Conf.TimeSpacing*m_Conf.SpeedOfSound) * (m_Conf.Pitch*(float)m_Conf.TransducerElements);
 
+  // as openCL does not support bool as a kernel argument, we need to buffer this value in a char...
   m_IsPAImage = m_Conf.isPhotoacousticImage;
   
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &(this->m_UsedLines));

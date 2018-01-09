@@ -276,11 +276,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
   }
 }
 
-void QmitkMITKIGTTrackingToolboxView::SetFocus()
-{
-  m_Controls->m_configurationWidget->setFocus();
-}
-
 void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 {
   //read in filename
@@ -1071,13 +1066,17 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
     //write the results to a file
     if (m_Controls->m_CsvFormat->isChecked())
     {
-      mitk::IOUtil::SaveBaseData(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
+      mitk::IOUtil::Save(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
     }
     else if (m_Controls->m_XmlFormat->isChecked())
     {
-      mitk::IOUtil::SaveBaseData(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
+      mitk::IOUtil::Save(m_loggingFilter->GetNavigationDataSet(), this->m_Controls->m_LoggingFileName->text().toStdString());
     }
   }
+}
+
+void QmitkMITKIGTTrackingToolboxView::SetFocus()
+{
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnAddSingleTool()

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef mitkPhotoacousticImage_H_HEADER_INCLUDED
 #define mitkPhotoacousticImage_H_HEADER_INCLUDED
 
@@ -22,10 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include <functional>
-#include "mitkOclImageToImageFilter.h"
 
 #include "mitkPhotoacousticBeamformingFilter.h"
-
 #include "MitkPhotoacousticsAlgorithmsExports.h"
 
 namespace mitk {
@@ -36,10 +33,10 @@ namespace mitk {
       mitkClassMacroItkParent(mitk::PhotoacousticImage, itk::Object);
       itkFactorylessNewMacro(Self);
       enum BModeMethod { ShapeDetection, Abs };
-      mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method = BModeMethod::Abs, bool UseLogFilter = false, float resampleSpacing = 0.15);
+      mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method = BModeMethod::Abs, bool UseGPU = false, bool UseLogFilter = false, float resampleSpacing = 0.15);
 //      mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
       mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[2]);
-      mitk::Image::Pointer ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
+      mitk::Image::Pointer ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
       mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice);
       mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha);
     protected:

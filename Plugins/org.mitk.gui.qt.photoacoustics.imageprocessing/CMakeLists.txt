@@ -5,3 +5,7 @@ mitk_create_plugin(
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkQtWidgetsExt MitkPhotoacousticsAlgorithms
 )
+
+IF(MITK_USE_OpenCL)
+  add_definitions(-DPHOTOACOUSTICS_USE_GPU)
+ENDIF(MITK_USE_OpenCL)

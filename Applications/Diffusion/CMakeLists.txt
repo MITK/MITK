@@ -1,5 +1,3 @@
-if(MITK_USE_Python)
-
 project(MitkDiffusion)
 
 set(DIFFUSIONAPP_NAME MitkDiffusion)
@@ -34,7 +32,6 @@ set(_plugins
   org.mitk.gui.qt.diffusionimagingapp
   org.mitk.gui.qt.common
   org.mitk.gui.qt.stdmultiwidgeteditor
-  org.mitk.gui.qt.common.legacy
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.measurementtoolbox
   org.mitk.gui.qt.segmentation
@@ -97,6 +94,4 @@ endif()
 # Add a build time dependency to legacy BlueBerry bundles.
 if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(${DIFFUSIONAPP_NAME} ${MITK_MODULES_ENABLED_PLUGINS})
-endif()
-
 endif()

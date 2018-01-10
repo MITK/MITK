@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDataSet.h>
 #include <vtkTransform.h>
 #include <vtkFloatArray.h>
-
+#include <itkScalableAffineTransform.h>
 
 namespace mitk {
 
@@ -92,6 +92,7 @@ public:
     void TranslateFibers(double x, double y, double z);
     void ScaleFibers(double x, double y, double z, bool subtractCenter=true);
     void TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz);
+    void TransformFibers(itk::ScalableAffineTransform< mitk::ScalarType >::Pointer transform);
     void RemoveDir(vnl_vector_fixed<double,3> dir, double threshold);
     itk::Point<float, 3> TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz);
     itk::Matrix< double, 3, 3 > TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz);

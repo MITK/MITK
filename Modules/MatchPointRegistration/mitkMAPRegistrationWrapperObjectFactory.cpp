@@ -32,8 +32,6 @@ mitk::MAPRegistrationWrapperObjectFactory::MAPRegistrationWrapperObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "MAPRegistrationWrapperObjectFactory c'tor" << std::endl;
-
     alreadyDone = true;
   }
 

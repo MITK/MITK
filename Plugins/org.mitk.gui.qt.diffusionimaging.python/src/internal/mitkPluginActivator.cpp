@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPluginActivator.h"
 
-#include "src/internal/QmitkPreprocessingView.h"
+#include "src/internal/QmitkBrainExtractionView.h"
 #include <usModuleInitialization.h>
 
 
@@ -31,7 +31,7 @@ ctkPluginContext* mitk::PluginActivator::GetContext()
 
 void mitk::PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPreprocessingView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkBrainExtractionView, context)
   m_Context = context;
 }
 

@@ -4,12 +4,12 @@
 
   <extension point="org.blueberry.ui.views">
 
-    <view id="org.mitk.views.diffusionpreprocessing"
-    name="Preprocessing"
+    <view id="org.mitk.views.brainextraction"
+    name="Brain Extraction"
     category="Preprocessing"
-    class="QmitkPreprocessingView"
+    class="QmitkBrainExtractionView"
     icon="resources/dwi2.png">
-    <keywordReference id="org.mitk.views.diffusionpreprocessing.Keyword"/>
+    <keywordReference id="org.mitk.views.brainextraction.Keyword"/>
     </view>
 
   </extension>

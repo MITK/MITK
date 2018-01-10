@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   : m_Projection(mitk::PointSet::New()),
   m_OriginalPoints(mitk::PointSet::New()),
-  m_SelectedInput(-1),
-  m_ShowToolAxis(false)
+  m_ShowToolAxis(false),
+  m_SelectedInput(-1)
 {
   // Tool Coordinates:x axis is chosen as default axis when no axis is specified
 

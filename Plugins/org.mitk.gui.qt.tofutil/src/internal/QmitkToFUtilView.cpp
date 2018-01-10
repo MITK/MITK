@@ -55,6 +55,7 @@ const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 QmitkToFUtilView::QmitkToFUtilView()
   : QmitkAbstractView()
   , m_Controls(nullptr)
+  , m_Framerateoutput(false)
   , m_MitkDistanceImage(nullptr), m_MitkAmplitudeImage(nullptr), m_MitkIntensityImage(nullptr), m_Surface(nullptr)
   , m_DistanceImageNode(nullptr), m_AmplitudeImageNode(nullptr), m_IntensityImageNode(nullptr), m_RGBImageNode(nullptr), m_SurfaceNode(nullptr)
   , m_ToFImageRecorder(nullptr), m_ToFImageGrabber(nullptr), m_ToFDistanceImageToSurfaceFilter(nullptr), m_ToFCompositeFilter(nullptr)
@@ -64,7 +65,6 @@ QmitkToFUtilView::QmitkToFUtilView()
   , m_2DTimeBefore(0.0)
   , m_2DTimeAfter(0.0)
   , m_CameraIntrinsics(nullptr)
-  , m_Framerateoutput(false)
 {
   this->m_Frametimer = new QTimer(this);
 

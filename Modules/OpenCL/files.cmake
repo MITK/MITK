@@ -10,9 +10,12 @@ set(CPP_FILES
 # base data and filter objects
   mitkOclBaseData.cpp
   mitkOclImage.cpp
+  mitkOclDataSet.cpp
   mitkOclFilter.cpp
   mitkOclImageFilter.cpp
+  mitkOclDataSetFilter.cpp
   mitkOclImageToImageFilter.cpp
+  mitkOclDataSetToDataSetFilter.cpp
 
 # own filter implementations
   mitkOclBinaryThresholdImageFilter.cpp

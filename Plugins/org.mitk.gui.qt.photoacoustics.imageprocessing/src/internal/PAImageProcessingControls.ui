@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>382</width>
-    <height>1217</height>
+    <height>1278</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -131,26 +131,32 @@
         </widget>
        </item>
        <item>
+        <widget class="QComboBox" name="BModeMethod">
+         <property name="currentText">
+          <string>Absolute Filter</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>Absolute Filter</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Envelope Detection</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <widget class="QCheckBox" name="DoResampling">
            <property name="text">
             <string>Do Resampling</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="BModeMethod">
-           <item>
-            <property name="text">
-             <string>Absolute Filter</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Envelope Detection</string>
-            </property>
-           </item>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
@@ -174,6 +180,9 @@
                <pointsize>11</pointsize>
               </font>
              </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
              <property name="minimum">
               <double>0.010000000000000</double>
              </property>
@@ -184,14 +193,14 @@
               <double>0.010000000000000</double>
              </property>
              <property name="value">
-              <double>0.100000000000000</double>
+              <double>0.075000000000000</double>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QLabel" name="ResamplingLabel">
              <property name="text">
-              <string>[mm] Depth Spacing </string>
+              <string>[mm] Resampled Depth Spacing </string>
              </property>
             </widget>
            </item>
@@ -203,6 +212,13 @@
         <widget class="QCheckBox" name="Logfilter">
          <property name="text">
           <string>Add Logfilter</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="UseGPUBmode">
+         <property name="text">
+          <string>Use GPU</string>
          </property>
         </widget>
        </item>
@@ -313,7 +329,7 @@
          <item row="2" column="1">
           <widget class="QLabel" name="label_13">
            <property name="text">
-            <string>Thukey window alpha</string>
+            <string>Tukey window alpha</string>
            </property>
           </widget>
          </item>
@@ -332,7 +348,7 @@
             <double>5.000000000000000</double>
            </property>
            <property name="value">
-            <double>1480.000000000000000</double>
+            <double>1540.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -394,28 +410,8 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QSpinBox" name="CutoffAbove">
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-           <property name="value">
-            <number>165</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_20">
-           <property name="text">
-            <string>Cut Top</string>
-           </property>
-          </widget>
-         </item>
-         <item>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="2">
           <widget class="QSpinBox" name="CutoffBelow">
            <property name="maximum">
             <number>99999</number>
@@ -425,10 +421,30 @@
            </property>
           </widget>
          </item>
-         <item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_203">
+           <property name="text">
+            <string>Cut Top</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
           <widget class="QLabel" name="label_21">
            <property name="text">
             <string>Cut Bottom</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QSpinBox" name="CutoffAbove">
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="singleStep">
+            <number>5</number>
+           </property>
+           <property name="value">
+            <number>165</number>
            </property>
           </widget>
          </item>
@@ -526,7 +542,7 @@
           </sizepolicy>
          </property>
          <property name="decimals">
-          <number>2</number>
+          <number>3</number>
          </property>
          <property name="minimum">
           <double>0.010000000000000</double>
@@ -678,7 +694,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QSpinBox" name="Cutoff">
+        <widget class="QSpinBox" name="CutoffBeforeBF">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -693,13 +709,6 @@
          </property>
          <property name="value">
           <number>0</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_12">
-         <property name="text">
-          <string>Cutoff Upper Voxels</string>
          </property>
         </widget>
        </item>
@@ -721,6 +730,11 @@
            <string>DMAS</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>sDMAS</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="4" column="0">
@@ -730,6 +744,9 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="currentText">
+          <string>Quad. Approx.</string>
          </property>
          <item>
           <property name="text">
@@ -823,7 +840,7 @@
           <double>5.000000000000000</double>
          </property>
          <property name="value">
-          <double>1480.000000000000000</double>
+          <double>1540.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -900,7 +917,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QCheckBox" name="UseGPU">
+        <widget class="QCheckBox" name="UseGPUBf">
          <property name="text">
           <string>Compute On GPU</string>
          </property>
@@ -945,6 +962,20 @@
         <widget class="QLabel" name="label_9">
          <property name="text">
           <string>[°] Element Angle</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Cutoff Upper Voxels</string>
+         </property>
+        </widget>
+       </item>
+       <item row="28" column="1">
+        <widget class="QLabel" name="labelWarning4">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;Please select an image!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>

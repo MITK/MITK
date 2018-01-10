@@ -157,7 +157,7 @@ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
   // get image size once
   const unsigned int uiImageWidth  = dimensions[0];
   const unsigned int uiImageHeight = dimensions[1];
-  const unsigned int uiImageDepth  = dimensions[2];
+  const unsigned int uiImageDepth  = dimensions[2]+1;
 
   // compute work sizes
   this->SetWorkingSize( 8, uiImageWidth, 8, uiImageHeight , 8, uiImageDepth );

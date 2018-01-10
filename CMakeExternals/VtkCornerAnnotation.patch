@@ -4,7 +4,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.h b/Rendering/Annotation/v
 @@ -194,6 +194,9 @@
    vtkGetMacro(ShowSliceAndImage, int);
    //@}
-
+ 
 +  void SetMaximumLengthText(int i, const char* text);
 +  void QueueFontUpdate();
 +
@@ -14,7 +14,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.h b/Rendering/Annotation/v
 @@ -219,6 +222,12 @@
    int MinimumFontSize;
    int MaximumFontSize;
-
+ 
 +  char** MaximumLengthText;
 +  char** TextBuffer;
 +  bool UpdateFontSize;
@@ -23,13 +23,15 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.h b/Rendering/Annotation/v
 +
    double LinearFontScaleFactor;
    double NonlinearFontScaleFactor;
+ 
+
 diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation/vtkCornerAnnotation.cxx
 --- a/Rendering/Annotation/vtkCornerAnnotation.cxx
 +++ b/Rendering/Annotation/vtkCornerAnnotation.cxx
 @@ -43,9 +43,13 @@
    this->LastSize[0] = 0;
    this->LastSize[1] = 0;
-
+ 
 +  this->UpdateFontSize = false;
 +
    this->MaximumLineHeight = 1.0;
@@ -46,7 +48,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
      this->TextActor[i]->SetMapper(this->TextMapper[i]);
 +    this->MaximumLengthText[i] = "";
    }
-
+ 
    this->ImageActor = NULL;
 @@ -79,6 +84,7 @@
    for (int i = 0; i < NumTextPositions; i++)
@@ -70,7 +72,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
        // different aligment/size but they share the other this->TextProperty
        // attributes.
 -      fontSize = this->TextMapper[0]->GetTextProperty()->GetFontSize();
-
+ 
        if (tprop_has_changed)
        {
          for (int i = 0; i < NumTextPositions; i++)
@@ -83,7 +85,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
 @@ -483,12 +488,12 @@
            +---------+
        */
-
+ 
 -      int tempi[2*NumTextPositions];
 +      int tempi[2 * NumTextPositions];
        int allZeros = 1;
@@ -98,7 +100,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
 @@ -499,113 +504,12 @@
          return 0;
        }
-
+ 
 -      int height_02 = tempi[1] + tempi[5];  // total height of text in left top/bottom corners
 -      int height_13 = tempi[3] + tempi[7];  // total height of text in right top/bottom corners
 -      int height_47 = tempi[9] + tempi[15]; // total height of text at center of top/bottom edges
@@ -207,33 +209,33 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
 -        this->TextMapper[i]->GetTextProperty()->SetFontSize(fontSize);
 -      }
 -
-+
++      
        // Now set the position of the TextActors
 -
        this->SetTextActorsPosition(vSize);
-
+ 
        for (int i = 0; i < NumTextPositions; i++)
 @@ -630,6 +534,100 @@
    return 1;
  }
-
+ 
 +int* vtkCornerAnnotation::GetBestFitFont(vtkViewport* viewport)
 +{
 +  int *vSize = viewport->GetSize();
-+
++  
 +  // Get previous fonts sizes
 +  int* fonts = new int[NumTextPositions];
 +  for (int i = 0; i < NumTextPositions; i++)
 +    {
 +    fonts[i] = this->TextMapper[i]->GetTextProperty()->GetFontSize();
 +    }
-+
-+  // Set target size to a little bit less of half a vieport size.
++  
++  // Set target size to a little bit less of half a vieport size. 
 +  int tSize[2];
 +  tSize[0] = (int)(0.45*vSize[0]);
 +  tSize[1] = (int)(0.45*vSize[1]);
 +  int annSize[2] = { 0, 0 };
-+
++  
 +  // For each corener annotation find best font size
 +  for (int i = 0; i < NumTextPositions; i++)
 +  {
@@ -247,7 +249,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
 +      this->TextMapper[i]->GetTextProperty()->SetFontSize(fonts[i]);
 +      this->TextMapper[i]->GetSize(viewport, annSize);
 +    }
-+
++    
 +    // Decrease font size until fit
 +    while ((annSize[0] > tSize[0] ||
 +      annSize[1] > tSize[1]) &&
@@ -258,7 +260,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
 +      this->TextMapper[i]->GetSize(viewport, annSize);
 +    }
 +  }
-+
++  
 +  return fonts;
 +}
 +
@@ -267,7 +269,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
 +  // Replace current text with max size text
 +  for (int i = 0; i < NumTextPositions; i++)
 +  {
-+    char* text = CornerText[i] ? CornerText[i] : "";
++    const char* text = CornerText[i] ? CornerText[i] : "";
 +    this->TextBuffer[i] = new char [strlen(text)+1];
 +    strcpy(TextBuffer[i], text);
 +    SetText(i, MaximumLengthText[i]);

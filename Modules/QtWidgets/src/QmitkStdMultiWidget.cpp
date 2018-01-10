@@ -1527,7 +1527,7 @@ void QmitkStdMultiWidget::OnResizeStoped()
   for (int i = 0; i < 4; i++) {
     m_CornerAnnotations[i]->Modified();
   }
-  ForceImmediateUpdate();
+  RequestUpdate();
 }
 
 

@@ -52,13 +52,13 @@ When "Update on Parameter Change" is checked, each parameter change causes an in
 \li Enable Trilinear Interpolation: By default the image values are interpolated. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
 \li Enable Gray Matter Seeding: Seeds are onyl placed inside of the gray matter. Needs tissue label image.
 
-\section StrTrackUserManualAdvancedParameters Neighbourhood Sampling (for details see [1])
+\section StrTrackUserManualNeighbourhoodSampling Neighbourhood Sampling (for details see [1])
 \li Neighborhood Samples: Number of neighborhood samples that are used to determine the next fiber progression direction.
 \li Sampling Distance: Distance of the sampling positions from the current streamline position (in voxels).
 \li Use Only Frontal Samples: Only neighborhood samples in front of the current streamline position are considered.
 \li Use Stop-Votes: If checked, the majority of sampling points has to place a stop-vote for the streamline to terminate. If not checked, all sampling positions have to vote for a streamline termination.
 
-\section StrTrackUserManualAdvancedParameters Output and Postprocessing
+\section StrTrackUserManualPostprocessing Output and Postprocessing
 \li Compress Fibers: Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
 \li Output Probability Map: No streamline are generated. Instead, the tractography outputs a probability map that indicates the probability of a fiber to reach a voxel from the selected seed region. For this measure to be sensible, the number of seeds per voxel needs to be rather large.
 

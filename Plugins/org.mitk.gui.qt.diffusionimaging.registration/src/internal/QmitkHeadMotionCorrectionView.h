@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIStructuredSelection.h>
 
 #include <QmitkAbstractView.h>
-#include "ui_QmitkDiffusionRegistrationViewControls.h"
+#include "ui_QmitkHeadMotionCorrectionViewControls.h"
 
 #include <mitkImage.h>
 #include <mitkDWIHeadMotionCorrectionFilter.h>
@@ -33,7 +33,7 @@ typedef short DiffusionPixelType;
 /*!
 \brief View for diffusion image registration / head motion correction
 */
-class QmitkDiffusionRegistrationView : public QmitkAbstractView
+class QmitkHeadMotionCorrectionView : public QmitkAbstractView
 {
 
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -44,8 +44,8 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkDiffusionRegistrationView();
-  virtual ~QmitkDiffusionRegistrationView();
+  QmitkHeadMotionCorrectionView();
+  virtual ~QmitkHeadMotionCorrectionView();
 
   virtual void CreateQtPartControl(QWidget *parent) override;
   void SetFocus() override;
@@ -63,7 +63,7 @@ protected:
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  Ui::QmitkDiffusionRegistrationViewControls* m_Controls;
+  Ui::QmitkHeadMotionCorrectionViewControls* m_Controls;
 
   mitk::Image::Pointer      m_DiffusionImage;
   std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;

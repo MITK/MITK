@@ -161,10 +161,8 @@ int main(int argc, char* argv[])
           std::vector<mitk::FiberBundle::Pointer> tracts = clusterer->GetOutCentroids();
           ref_fib = mitk::FiberBundle::New(nullptr);
           ref_fib = ref_fib->AddBundles(tracts);
-          MITK_INFO << "TEST 3";
           mitk::IOUtil::Save(ref_fib, out_root + "centroids_" + ist::GetFilenameName(ref_bundle_files.at(c)));
           segmenter->SetInCentroids(ref_fib);
-          MITK_INFO << "TEST 4";
         }
 
         // segment tract

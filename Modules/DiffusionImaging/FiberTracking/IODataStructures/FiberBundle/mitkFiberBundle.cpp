@@ -1482,6 +1482,35 @@ itk::Point<float, 3> mitk::FiberBundle::TransformPoint(vnl_vector_fixed< double,
   return out;
 }
 
+
+void mitk::FiberBundle::TransformFibers(itk::ScalableAffineTransform< mitk::ScalarType >::Pointer transform)
+{
+  vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+  for (int i=0; i<m_NumFibers; i++)
+  {
+    vtkCell* cell = m_FiberPolyData->GetCell(i);
+    int numPoints = cell->GetNumberOfPoints();
+    vtkPoints* points = cell->GetPoints();
+
+    vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+    for (int j=0; j<numPoints; j++)
+    {
+      itk::Point<float, 3> p = GetItkPoint(points->GetPoint(j));
+      p = transform->TransformPoint(p);
+      vtkIdType id = vtkNewPoints->InsertNextPoint(p.GetDataPointer());
+      container->GetPointIds()->InsertNextId(id);
+    }
+    vtkNewCells->InsertNextCell(container);
+  }
+
+  m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+  m_FiberPolyData->SetPoints(vtkNewPoints);
+  m_FiberPolyData->SetLines(vtkNewCells);
+  this->SetFiberPolyData(m_FiberPolyData, true);
+}
+
 void mitk::FiberBundle::TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz)
 {
   rx = rx*M_PI/180;

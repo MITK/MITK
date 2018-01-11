@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "QmitkSimpleRigidRegistrationView.h"
+#include "QmitkSimpleRegistrationView.h"
 
 // MITK
 #include <mitkNodePredicateDataType.h>
@@ -32,6 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>
 #include <itkExtractDwiChannelFilter.h>
+#include <mitkMultiModalRigidDefaultRegistrationAlgorithm.h>
+#include <mitkMultiModalAffineDefaultRegistrationAlgorithm.h>
+#include <itkComposeImageFilter.h>
+#include <mitkFiberBundle.h>
+#include <mitkRegistrationHelper.h>
 
 // Qt
 #include <QThreadPool>
@@ -39,27 +44,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-const std::string QmitkSimpleRigidRegistrationView::VIEW_ID = "org.mitk.views.simplerigidregistrationview";
+const std::string QmitkSimpleRegistrationView::VIEW_ID = "org.mitk.views.simpleregistrationview";
 
-QmitkSimpleRigidRegistrationView::QmitkSimpleRigidRegistrationView()
+QmitkSimpleRegistrationView::QmitkSimpleRegistrationView()
   : QmitkAbstractView()
   , m_Controls( 0 )
+  , m_RegistrationType(0)
 {
 
 }
 
 // Destructor
-QmitkSimpleRigidRegistrationView::~QmitkSimpleRigidRegistrationView()
+QmitkSimpleRegistrationView::~QmitkSimpleRegistrationView()
 {
 
 }
 
-void QmitkSimpleRigidRegistrationView::StartRegistration()
+void QmitkSimpleRegistrationView::StartRegistration()
 {
-  typedef itk::Image< float, 3 > ItkFloatImageType;
-  mitk::MultiModalRigidDefaultRegistrationAlgorithm< ItkFloatImageType >::Pointer algo = mitk::MultiModalRigidDefaultRegistrationAlgorithm< ItkFloatImageType >::New();
+  QmitkRegistrationJob* pJob;
 
-  QmitkRegistrationJob* pJob = new QmitkRegistrationJob(algo);
+  if (m_Controls->m_RegBox->currentIndex()==0)
+  {
+    mitk::MultiModalRigidDefaultRegistrationAlgorithm< ItkFloatImageType >::Pointer algo = mitk::MultiModalRigidDefaultRegistrationAlgorithm< ItkFloatImageType >::New();
+    pJob = new QmitkRegistrationJob(algo);
+    m_RegistrationType = 0;
+  }
+  else
+  {
+    mitk::MultiModalAffineDefaultRegistrationAlgorithm< ItkFloatImageType >::Pointer algo = mitk::MultiModalAffineDefaultRegistrationAlgorithm< ItkFloatImageType >::New();
+    pJob = new QmitkRegistrationJob(algo);
+    m_RegistrationType = 1;
+  }
+
   pJob->setAutoDelete(true);
 
   m_MovingImageNode = m_Controls->m_MovingImageBox->GetSelectedNode();
@@ -111,11 +128,6 @@ void QmitkSimpleRigidRegistrationView::StartRegistration()
           SLOT(OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer, const QmitkRegistrationJob*)),
           Qt::BlockingQueuedConnection);
 
-//  connect(pJob, SIGNAL(AlgorithmInfo(QString)), this, SLOT(OnAlgorithmInfo(QString)));
-//  connect(pJob, SIGNAL(AlgorithmStatusChanged(QString)), this, SLOT(OnAlgorithmStatusChanged(QString)));
-//  connect(pJob, SIGNAL(AlgorithmIterated(QString, bool, unsigned long)), this, SLOT(OnAlgorithmIterated(QString, bool, unsigned long)));
-//  connect(pJob, SIGNAL(LevelChanged(QString, bool, unsigned long)), this, SLOT(OnLevelChanged(QString, bool, unsigned long)));
-
   QThreadPool* threadPool = QThreadPool::globalInstance();
   threadPool->start(pJob);
 
@@ -123,10 +135,51 @@ void QmitkSimpleRigidRegistrationView::StartRegistration()
   m_Controls->m_RegistrationStartButton->setText("Registration in progress ...");
 }
 
-void QmitkSimpleRigidRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer spResultRegistration, const QmitkRegistrationJob* )
+void QmitkSimpleRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer spResultRegistration, const QmitkRegistrationJob* job)
 {
   mitk::Image::Pointer movingImage = dynamic_cast<mitk::Image*>(m_MovingImageNode->GetData());
-  mitk::Image::Pointer image = mitk::ImageMappingHelper::refineGeometry(movingImage, spResultRegistration, true);
+  mitk::Image::Pointer image;
+
+  if (m_RegistrationType==0)
+  {
+    image = mitk::ImageMappingHelper::refineGeometry(movingImage, spResultRegistration, true);
+  }
+  else
+  {
+    if (!mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(movingImage))
+    {
+      image = mitk::ImageMappingHelper::map(movingImage, spResultRegistration, false, 0, job->m_spTargetData->GetGeometry(), false, 0, mitk::ImageMappingInterpolator::BSpline_3);
+    }
+    else
+    {
+      typedef itk::ComposeImageFilter < ITKDiffusionVolumeType > ComposeFilterType;
+      ComposeFilterType::Pointer composer = ComposeFilterType::New();
+
+      ItkDwiType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(movingImage);
+      for (unsigned int i=0; i<itkVectorImagePointer->GetVectorLength(); ++i)
+      {
+        itk::ExtractDwiChannelFilter< short >::Pointer filter = itk::ExtractDwiChannelFilter< short >::New();
+        filter->SetInput( itkVectorImagePointer);
+        filter->SetChannelIndex(i);
+        filter->Update();
+
+        mitk::Image::Pointer gradientVolume = mitk::Image::New();
+        gradientVolume->InitializeByItk( filter->GetOutput() );
+        gradientVolume->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
+
+        mitk::Image::Pointer registered_mitk_image = mitk::ImageMappingHelper::map(gradientVolume, spResultRegistration, false, 0, job->m_spTargetData->GetGeometry(), false, 0, mitk::ImageMappingInterpolator::BSpline_3);
+
+        ITKDiffusionVolumeType::Pointer registered_itk_image = ITKDiffusionVolumeType::New();
+        mitk::CastToItkImage(registered_mitk_image, registered_itk_image);
+        composer->SetInput(i, registered_itk_image);
+      }
+
+      composer->Update();
+
+      image = mitk::GrabItkImageMemory( composer->GetOutput() );
+      mitk::DiffusionPropertyHelper::CopyProperties(movingImage, image, true);
+    }
+  }
 
   if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image))
   {
@@ -141,14 +194,32 @@ void QmitkSimpleRigidRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrat
   {
     m_MovingImageNode->SetVisibility(false);
     QString name = m_MovingImageNode->GetName().c_str();
-    resultNode->SetName((name+"_registered").toStdString().c_str());
+    if (m_RegistrationType==0)
+      resultNode->SetName((name+"_registered (rigid)").toStdString().c_str());
+    else
+      resultNode->SetName((name+"_registered (affine)").toStdString().c_str());
   }
   else
-    resultNode->SetName("Registered");
+  {
+    if (m_RegistrationType==0)
+      resultNode->SetName("Registered (rigid)");
+    else
+      resultNode->SetName("Registered (affine)");
+  }
   resultNode->SetOpacity(0.6);
   resultNode->SetColor(0.0, 0.0, 1.0);
-
   GetDataStorage()->Add(resultNode);
+
+  if (m_Controls->m_RegOutputBox->isChecked())
+  {
+    mitk::DataNode::Pointer registration_node = mitk::DataNode::New();
+    registration_node->SetData(spResultRegistration);
+    if (m_RegistrationType==0)
+      registration_node->SetName("Registration Object (rigid)");
+    else
+      registration_node->SetName("Registration Object (affine)");
+    GetDataStorage()->Add(registration_node, resultNode);
+  }
 
   this->GetRenderWindowPart()->RequestUpdate();
 
@@ -156,15 +227,17 @@ void QmitkSimpleRigidRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrat
   m_Controls->m_RegistrationStartButton->setText("Start Registration");
 
   m_MovingImageNode = nullptr;
+
+  TractoChanged();
 }
 
-void QmitkSimpleRigidRegistrationView::CreateQtPartControl( QWidget *parent )
+void QmitkSimpleRegistrationView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
   if ( !m_Controls )
   {
     // create GUI widgets from the Qt Designer's .ui file
-    m_Controls = new Ui::QmitkSimpleRigidRegistrationViewControls;
+    m_Controls = new Ui::QmitkSimpleRegistrationViewControls;
     m_Controls->setupUi( parent );
 
     m_Controls->m_FixedImageBox->SetDataStorage(this->GetDataStorage());
@@ -174,16 +247,55 @@ void QmitkSimpleRigidRegistrationView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_FixedImageBox->SetPredicate(isImagePredicate);
     m_Controls->m_MovingImageBox->SetPredicate(isImagePredicate);
 
+    mitk::TNodePredicateDataType<mitk::FiberBundle>::Pointer isFib = mitk::TNodePredicateDataType<mitk::FiberBundle>::New();
+    mitk::TNodePredicateDataType<mitk::MAPRegistrationWrapper>::Pointer isReg = mitk::TNodePredicateDataType<mitk::MAPRegistrationWrapper>::New();
+
+    m_Controls->m_TractoBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_RegObjectBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_TractoBox->SetPredicate(isFib);
+    m_Controls->m_RegObjectBox->SetPredicate(isReg);
+
     connect( m_Controls->m_FixedImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(FixedImageChanged()) );
     connect( m_Controls->m_MovingImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(MovingImageChanged()) );
+
+    connect( m_Controls->m_TractoBox, SIGNAL(currentIndexChanged(int)), this, SLOT(TractoChanged()) );
+    connect( m_Controls->m_RegObjectBox, SIGNAL(currentIndexChanged(int)), this, SLOT(TractoChanged()) );
+
     connect( m_Controls->m_RegistrationStartButton, SIGNAL(clicked()), this, SLOT(StartRegistration()) );
+    connect( m_Controls->m_TractoRegistrationStartButton, SIGNAL(clicked()), this, SLOT(StartTractoRegistration()) );
 
     FixedImageChanged();
     MovingImageChanged();
+    TractoChanged();
   }
 }
 
-void QmitkSimpleRigidRegistrationView::FixedImageChanged()
+void QmitkSimpleRegistrationView::StartTractoRegistration()
+{
+  mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_Controls->m_TractoBox->GetSelectedNode()->GetData());
+  mitk::MAPRegistrationWrapper::Pointer reg = dynamic_cast<mitk::MAPRegistrationWrapper*>(m_Controls->m_RegObjectBox->GetSelectedNode()->GetData());
+
+  mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer affine = mitk::MITKRegistrationHelper::getAffineMatrix(reg, false);
+
+  mitk::FiberBundle::Pointer fib_copy = fib->GetDeepCopy();
+  fib_copy->TransformFibers(affine);
+
+  mitk::DataNode::Pointer registration_node = mitk::DataNode::New();
+  registration_node->SetData(fib_copy);
+  QString name = m_Controls->m_TractoBox->GetSelectedNode()->GetName().c_str();
+  registration_node->SetName((name+"_registered").toStdString().c_str());
+  GetDataStorage()->Add(registration_node, m_Controls->m_TractoBox->GetSelectedNode());
+}
+
+void QmitkSimpleRegistrationView::TractoChanged()
+{
+  if (m_Controls->m_RegObjectBox->GetSelectedNode().IsNotNull() && m_Controls->m_TractoBox->GetSelectedNode().IsNotNull())
+    m_Controls->m_TractoRegistrationStartButton->setEnabled(true);
+  else
+    m_Controls->m_TractoRegistrationStartButton->setEnabled(false);
+}
+
+void QmitkSimpleRegistrationView::FixedImageChanged()
 {
   if (m_Controls->m_FixedImageBox->GetSelectedNode().IsNotNull())
   {
@@ -221,7 +333,7 @@ void QmitkSimpleRigidRegistrationView::FixedImageChanged()
   }
 }
 
-void QmitkSimpleRigidRegistrationView::MovingImageChanged()
+void QmitkSimpleRegistrationView::MovingImageChanged()
 {
   if (m_Controls->m_MovingImageBox->GetSelectedNode().IsNotNull())
   {
@@ -259,14 +371,15 @@ void QmitkSimpleRigidRegistrationView::MovingImageChanged()
   }
 }
 
-void QmitkSimpleRigidRegistrationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& )
+void QmitkSimpleRegistrationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& )
 {
   FixedImageChanged();
   MovingImageChanged();
+  TractoChanged();
 }
 
 
-void QmitkSimpleRigidRegistrationView::SetFocus()
+void QmitkSimpleRegistrationView::SetFocus()
 {
   m_Controls->m_RegistrationStartButton->setFocus();
   FixedImageChanged();

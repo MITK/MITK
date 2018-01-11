@@ -4,20 +4,20 @@
 
   <extension point="org.blueberry.ui.views">
 
-    <view id="org.mitk.views.diffusionregistrationview"
+    <view id="org.mitk.views.headmotioncorrectionview"
     name="Head-Motion Correction"
     category="Registration"
-    class="QmitkDiffusionRegistrationView"
+    class="QmitkHeadMotionCorrectionView"
     icon="resources/diffusionregistration.png">
-    <keywordReference id="org.mitk.views.diffusionregistrationview.Keyword"/>
+    <keywordReference id="org.mitk.views.headmotioncorrectionview.Keyword"/>
     </view>
 
-    <view id="org.mitk.views.simplerigidregistrationview"
-    name="Rigid Registration"
+    <view id="org.mitk.views.simpleregistrationview"
+    name="Registration"
     category="Registration"
-    class="QmitkSimpleRigidRegistrationView"
+    class="QmitkSimpleRegistrationView"
     icon="resources/diffusionregistration.png">
-    <keywordReference id="org.mitk.views.simplerigidregistrationview.Keyword"/>
+    <keywordReference id="org.mitk.views.simpleregistrationview.Keyword"/>
     </view>
 
   </extension>
@@ -36,16 +36,16 @@
 
   <extension point="org.blueberry.ui.keywords">
 
-  <keyword label="registration" id="org.mitk.views.simplerigidregistrationview.Keyword"/>
-  <keyword label="registration" id="org.mitk.views.diffusionregistrationview.Keyword"/>
-  <keyword label="motion" id="org.mitk.views.simplerigidregistrationview.Keyword"/>
-  <keyword label="motion" id="org.mitk.views.diffusionregistrationview.Keyword"/>
-  <keyword label="head" id="org.mitk.views.simplerigidregistrationview.Keyword"/>
-  <keyword label="head" id="org.mitk.views.diffusionregistrationview.Keyword"/>
-  <keyword label="align" id="org.mitk.views.simplerigidregistrationview.Keyword"/>
-  <keyword label="align" id="org.mitk.views.diffusionregistrationview.Keyword"/>
+  <keyword label="registration" id="org.mitk.views.simpleregistrationview.Keyword"/>
+  <keyword label="registration" id="org.mitk.views.headmotioncorrectionview.Keyword"/>
+  <keyword label="motion" id="org.mitk.views.simpleregistrationview.Keyword"/>
+  <keyword label="motion" id="org.mitk.views.headmotioncorrectionview.Keyword"/>
+  <keyword label="head" id="org.mitk.views.simpleregistrationview.Keyword"/>
+  <keyword label="head" id="org.mitk.views.headmotioncorrectionview.Keyword"/>
+  <keyword label="align" id="org.mitk.views.simpleregistrationview.Keyword"/>
+  <keyword label="align" id="org.mitk.views.headmotioncorrectionview.Keyword"/>
   <keyword label="register" id="org.mitk.views.simplerigidregistrationview.Keyword"/>
-  <keyword label="register" id="org.mitk.views.diffusionregistrationview.Keyword"/>
+  <keyword label="register" id="org.mitk.views.headmotioncorrectionview.Keyword"/>
 
   </extension>
 

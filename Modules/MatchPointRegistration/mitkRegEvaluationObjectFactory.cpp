@@ -30,8 +30,6 @@ mitk::RegEvaluationObjectFactory::RegEvaluationObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "RegEvaluationObjectFactory c'tor" << std::endl;
-
     alreadyDone = true;
   }
 

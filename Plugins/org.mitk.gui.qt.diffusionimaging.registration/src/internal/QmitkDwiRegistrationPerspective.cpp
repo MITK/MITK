@@ -44,6 +44,6 @@ void  QmitkDwiRegistrationPerspective::CreateInitialLayout(berry::IPageLayout::P
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
-    left->AddView("org.mitk.views.simplerigidregistrationview");
-    left->AddView("org.mitk.views.diffusionregistrationview");
+    left->AddView("org.mitk.views.simpleregistrationview");
+    left->AddView("org.mitk.views.headmotioncorrectionview");
 }

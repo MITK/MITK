@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "QmitkDiffusionRegistrationView.h"
+#include "QmitkHeadMotionCorrectionView.h"
 
 // MITK
 #include <mitkDiffusionPropertyHelper.h>
@@ -41,9 +41,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-const std::string QmitkDiffusionRegistrationView::VIEW_ID = "org.mitk.views.diffusionregistrationview";
+const std::string QmitkHeadMotionCorrectionView::VIEW_ID = "org.mitk.views.headmotioncorrectionview";
 
-QmitkDiffusionRegistrationView::QmitkDiffusionRegistrationView()
+QmitkHeadMotionCorrectionView::QmitkHeadMotionCorrectionView()
   : QmitkAbstractView()
   , m_Controls( 0 )
   , m_DiffusionImage( nullptr )
@@ -52,17 +52,17 @@ QmitkDiffusionRegistrationView::QmitkDiffusionRegistrationView()
 }
 
 // Destructor
-QmitkDiffusionRegistrationView::~QmitkDiffusionRegistrationView()
+QmitkHeadMotionCorrectionView::~QmitkHeadMotionCorrectionView()
 {
 }
 
-void QmitkDiffusionRegistrationView::CreateQtPartControl( QWidget *parent )
+void QmitkHeadMotionCorrectionView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
   if ( !m_Controls )
   {
     // create GUI widgets from the Qt Designer's .ui file
-    m_Controls = new Ui::QmitkDiffusionRegistrationViewControls;
+    m_Controls = new Ui::QmitkHeadMotionCorrectionViewControls;
     m_Controls->setupUi( parent );
     connect( m_Controls->m_ImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()) );
     connect( m_Controls->m_RegistrationStartButton, SIGNAL(clicked()), this, SLOT(StartRegistration()) );
@@ -75,12 +75,12 @@ void QmitkDiffusionRegistrationView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-void QmitkDiffusionRegistrationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& )
+void QmitkHeadMotionCorrectionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& )
 {
 
 }
 
-void QmitkDiffusionRegistrationView::UpdateGUI()
+void QmitkHeadMotionCorrectionView::UpdateGUI()
 {
   if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull())
   {
@@ -94,13 +94,13 @@ void QmitkDiffusionRegistrationView::UpdateGUI()
   }
 }
 
-void QmitkDiffusionRegistrationView::SetFocus()
+void QmitkHeadMotionCorrectionView::SetFocus()
 {
   UpdateGUI();
   m_Controls->m_RegistrationStartButton->setFocus();
 }
 
-void QmitkDiffusionRegistrationView::StartRegistration()
+void QmitkHeadMotionCorrectionView::StartRegistration()
 {
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   mitk::Image::Pointer inImage = dynamic_cast<mitk::Image*>(node->GetData());

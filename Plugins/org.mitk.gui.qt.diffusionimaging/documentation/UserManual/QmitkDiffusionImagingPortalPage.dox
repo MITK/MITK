@@ -14,8 +14,8 @@ MITK Diffusion consists of multiple components with their own documentation:
 
 \subsection sub2 Preprocessing and Reconstruction
 \li \subpage org_mitk_views_diffusionpreprocessing
-\li \subpage org_mitk_views_simplerigidregistrationview
-\li \subpage org_mitk_views_diffusionregistrationview
+\li \subpage org_mitk_views_simpleregistrationview
+\li \subpage org_mitk_views_headmotioncorrectionview
 \li \subpage org_mitk_views_denoisingview
 \li \subpage org_mitk_views_tensorreconstruction
 \li \subpage org_mitk_views_qballreconstruction

@@ -449,6 +449,13 @@ void mitk::ClassicRegionGrowingTool::OnMouseMoved(StateMachineAction*, Interacti
           m_LastScreenPosition[1] = y;
       }
 
+#ifndef _WIN32
+      if (disp)
+      {
+        XCloseDisplay(disp);
+      }
+#endif
+
       m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
       m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
 

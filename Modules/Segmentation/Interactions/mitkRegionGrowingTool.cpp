@@ -571,6 +571,13 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
             m_LastScreenPosition[1] = y;
         }
 
+#ifndef _WIN32
+        if (disp)
+        {
+          XCloseDisplay(disp);
+        }
+#endif
+
         // Moving the mouse up and down adjusts the width of the threshold window, moving it left and right shifts the threshold window
         m_Thresholds[0] = std::min<ScalarType>(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
         m_Thresholds[1] = std::max<ScalarType>(m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);

@@ -134,19 +134,21 @@ private:
 };
 }
 #else
-class PhotoacousticOCLBeamformingFilter : public itk::Object
+namespace mitk
 {
-public:
-  mitkClassMacroItkParent(mitk::PhotoacousticOCLBeamformingFilter, itk::Object);
-  itkNewMacro(Self);
+  class PhotoacousticOCLBeamformingFilter : public itk::Object
+  {
+  public:
+    mitkClassMacroItkParent(mitk::PhotoacousticOCLBeamformingFilter, itk::Object);
+    itkNewMacro(Self);
 
-protected:
-  /** Constructor */
-  PhotoacousticOCLBeamformingFilter() {}
+  protected:
+    /** Constructor */
+    PhotoacousticOCLBeamformingFilter() {}
 
-  /** Destructor */
-  virtual ~PhotoacousticOCLBeamformingFilter() {}
-};
+    /** Destructor */
+    virtual ~PhotoacousticOCLBeamformingFilter() {}
+  };
 }
 #endif
 #endif

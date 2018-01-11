@@ -113,17 +113,20 @@ void mitk::VolumeMapperVtkSmart3D::SetDefaultProperties(mitk::DataNode *node, mi
 
 vtkImageData* mitk::VolumeMapperVtkSmart3D::GetInputImage()
 {
-  auto *input = const_cast<mitk::Image *>(static_cast<const mitk::Image *>(this->GetDataNode()->GetData()));
-  vtkImageData* img = input->GetVtkImageData(this->GetTimestep());
-  img->SetSpacing(1,1,1);
-
-  return img;
+  auto input = dynamic_cast<mitk::Image*>(this->GetDataNode()->GetData());
+  return input->GetVtkImageData(this->GetTimestep());
 }
 
 void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
 {
+  Vector3D spacing;
+  FillVector3D(spacing, 1.0, 1.0, 1.0);
+
+  m_ImageChangeInformation->SetInputData(imageData);
+  m_ImageChangeInformation->SetOutputSpacing(spacing.GetDataPointer());
+
   m_SmartVolumeMapper->SetBlendModeToComposite();
-  m_SmartVolumeMapper->SetInputData(imageData);
+  m_SmartVolumeMapper->SetInputConnection(m_ImageChangeInformation->GetOutputPort());
 }
 
 void mitk::VolumeMapperVtkSmart3D::createVolume()
@@ -243,6 +246,7 @@ mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
 
   m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   m_SmartVolumeMapper->SetBlendModeToComposite();
+  m_ImageChangeInformation = vtkSmartPointer<vtkImageChangeInformation>::New();
   m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
   m_Volume = vtkSmartPointer<vtkVolume>::New();
 }

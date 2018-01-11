@@ -283,6 +283,11 @@ void QmitkRenderWindow::OnFullScreenModeChanged(bool fullscreen)
   m_FullScreenMode = fullscreen;
 }
 
+void QmitkRenderWindow::resizeEvent(QResizeEvent * e)
+{
+  emit resized();
+}
+
 void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint& /*pos*/)
 {
   if (m_MenuWidget)

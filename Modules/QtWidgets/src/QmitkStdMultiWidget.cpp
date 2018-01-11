@@ -55,6 +55,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <PathUtilities.h>
 
+void QmitkStdMultiWidget::UpdateAnnotationFonts()
+{
+  for (int i = 0; i < 4; i++) {
+    m_CornerAnnotations[i]->QueueFontUpdate();
+  }
+}
+
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& name)
   : QWidget(parent, f),
   mitkWidget1(NULL),
@@ -236,6 +243,13 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
 
   //Activate Widget Menu
   this->ActivateMenuWidget( true );
+
+  m_ResizeTimer.setSingleShot(true);
+  connect(&m_ResizeTimer, &QTimer::timeout, this, &QmitkStdMultiWidget::OnResizeStoped);
+  connect(mitkWidget1, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
+  connect(mitkWidget2, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
+  connect(mitkWidget3, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
+  connect(mitkWidget4, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
 }
 
 void QmitkStdMultiWidget::InitializeWidget()
@@ -1502,6 +1516,20 @@ void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
   emit Moved();
 }
 
+void QmitkStdMultiWidget::OnWindowResized()
+{
+  m_ResizeTimer.start(100);
+}
+
+void QmitkStdMultiWidget::OnResizeStoped()
+{
+  UpdateAnnotationFonts();
+  for (int i = 0; i < 4; i++) {
+    m_CornerAnnotations[i]->Modified();
+  }
+  RequestUpdate();
+}
+
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
 {
@@ -1648,33 +1676,43 @@ void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* tex
   cornerText[i]->SetTextProperty(textProp[i]);
 }
 
+void QmitkStdMultiWidget::setCornerAnnotationMaxText(int corner, int i, const char* text)
+{
+  cornerText[i]->SetMaximumLengthText(corner, text);
+}
+
 void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
 {
   m_displayMetaInfo = metainfo;
+  UpdateAnnotationFonts();
   m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayMetaInfoEx(bool metainfo)
 {
   m_displayMetaInfoEx = metainfo;
+  UpdateAnnotationFonts();
   m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPatientInfo(bool patientinfo)
 {
   m_displayPatientInfo = patientinfo;
+  UpdateAnnotationFonts();
   m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPatientInfoEx(bool patientinfo)
 {
   m_displayPatientInfoEx = patientinfo;
+  UpdateAnnotationFonts();
   m_ImageMTime = -1;
 }
 
 void QmitkStdMultiWidget::setDisplayPositionInfo(bool positioninfo)
 {
   m_displayPositionInfo = positioninfo;
+  UpdateAnnotationFonts();
   m_ImageMTime = -1;
 }
 
@@ -1749,6 +1787,20 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       }
       cornerimgtext[axisIndices[i]] = _infoStringStream[axisIndices[i]].str();
       setCornerAnnotation(2, axisIndices[i], cornerimgtext[axisIndices[i]].c_str());
+
+      std::string maxPosText = "";
+      maxPosText += "Im: " + std::to_string(bounds[(i * 2 + 1)]) + "/" + std::to_string(bounds[(i * 2 + 1)]);
+      if (timeSteps > 1) {
+        maxPosText += "\nT: " + std::to_string(timeSteps) + "/" + std::to_string(timeSteps);
+      }
+      if (componentMax > 1) {
+        maxPosText += "\nV: " + std::to_string(componentMax) + "/" + std::to_string(componentMax);
+      }
+      if (seriesNumber != "") {
+        maxPosText += "\nSe: " + seriesNumber;
+      }
+
+      setCornerAnnotationMaxText(2, axisIndices[i], maxPosText.c_str());
       setViewDirectionAnnontation(image, p[i], axisIndices[i]);
     }
 
@@ -1906,6 +1958,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         const std::string infoString = infoStringStream[j].str();
         for(int i = 0; i < 4; i++) {
           setCornerAnnotation(corner, i, infoString.c_str());
+          setCornerAnnotationMaxText(corner, i, infoString.c_str());
         }
       };
       render_annotation(0, 3);

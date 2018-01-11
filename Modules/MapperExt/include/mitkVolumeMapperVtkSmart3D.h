@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkVolumeProperty.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkImageData.h>
+#include <vtkImageChangeInformation.h>
 
 namespace mitk
 {
@@ -63,6 +64,7 @@ namespace mitk
     vtkImageData* GetInputImage();
 
     vtkSmartPointer<vtkVolume> m_Volume;
+    vtkSmartPointer<vtkImageChangeInformation> m_ImageChangeInformation;
     vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
     vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
     

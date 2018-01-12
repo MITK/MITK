@@ -75,10 +75,10 @@ public:
   bool GetIgnoreZeroValueVoxel();
   /*!
   /brief Set bin size for histogram resolution.*/
-  void SetHistogramBinSize( double size);
+  void SetHistogramNBins( unsigned int nbins);
   /*!
   /brief Get bin size for histogram resolution.*/
-  double GetHistogramBinSize() const;
+  unsigned int GetHistogramNBins() const;
   /*!
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram(unsigned int t = 0);
@@ -103,7 +103,7 @@ private:
   std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> m_StatisticsVector; ///< member variable holds the result structs.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
-  double m_HistogramBinSize;                                      ///< member variable holds the bin size for histogram resolution.
+  unsigned int m_HistogramNBins;                                      ///< member variable holds the bin size for histogram resolution.
   bool m_StatisticChanged;                                        ///< flag set if statistics have changed
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
   std::vector<HistogramType::Pointer> m_HistogramVector;          ///< member holds the histograms of all time steps.

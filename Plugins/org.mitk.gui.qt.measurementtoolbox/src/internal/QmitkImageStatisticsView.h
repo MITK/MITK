@@ -61,8 +61,6 @@ private:
 
   QString GetFormattedIndex(const vnl_vector<int>& vector) const;
   QString GetFormattedString(double value, unsigned int decimals) const;
-  void AdaptBinSizeCheckboxStepsize(mitk::Image::ConstPointer image);
-  void AdaptBinSizeCheckBoxMinMax(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, int componentType);
 public:
 
   /*!
@@ -89,7 +87,7 @@ public:
   void OnThreadedStatisticsCalculationEnds();
 
   /** \brief Update bin size for histogram resolution. */
-  void OnHistogramBinSizeBoxValueChanged();
+  void OnHistogramNBinsCheckBoxValueChanged();
 
   protected slots:
   /** \brief  Saves the histogram to the clipboard */
@@ -103,7 +101,7 @@ public:
   /** \brief Jump to coordinates stored in the double clicked cell */
   void JumpToCoordinates(int row, int col);
   /** \brief Toogle GUI elements if histogram default bin size checkbox value changed. */
-  void OnDefaultBinSizeBoxChanged();
+  void OnDefaultNBinsSpinBoxChanged();
 
   void OnShowSubchartBoxChanged();
 
@@ -185,7 +183,7 @@ protected:
   bool m_DataNodeSelectionChanged;
   bool m_Visible;
 
-  double m_HistogramBinSize;
+  unsigned int m_HistogramNBins;
 
   std::vector<mitk::Point3D>     m_WorldMinList;
   std::vector<mitk::Point3D>     m_WorldMaxList;

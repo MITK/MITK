@@ -30,7 +30,7 @@ QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread()
   , m_PlanarFigureMask(nullptr)
   , m_TimeStep(0)
   , m_IgnoreZeros(false)
-  , m_HistogramBinSize(10.0)
+  , m_HistogramNBins(100)
   , m_StatisticChanged(false)
   , m_CalculationSuccessful(false)
 {
@@ -91,14 +91,14 @@ bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
   return this->m_IgnoreZeros;
 }
 
-void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(double size)
+void QmitkImageStatisticsCalculationThread::SetHistogramNBins(unsigned int nbins)
 {
-  this->m_HistogramBinSize = size;
+  this->m_HistogramNBins = nbins;
 }
 
-double QmitkImageStatisticsCalculationThread::GetHistogramBinSize() const
+unsigned int QmitkImageStatisticsCalculationThread::GetHistogramNBins() const
 {
-  return this->m_HistogramBinSize;
+  return this->m_HistogramNBins;
 }
 
 std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
@@ -193,10 +193,7 @@ void QmitkImageStatisticsCalculationThread::run()
       calculator->SetSecondaryMask(nullptr);
   }
 
-  calculator->SetBinSizeForHistogramStatistics(m_HistogramBinSize);
-
-  //calculator->SetHistogramBinSize( m_HistogramBinSize );
-  //calculator->SetUseDefaultBinSize( m_UseDefaultBinSize );
+  calculator->SetNBinsForHistogramStatistics(m_HistogramNBins);
 
   for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
   {

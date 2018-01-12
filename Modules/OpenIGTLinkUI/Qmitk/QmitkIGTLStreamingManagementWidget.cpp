@@ -373,4 +373,11 @@ void QmitkIGTLStreamingManagementWidget::SelectSourceAndAdaptGUI()
   mitk::IGTLMessageSource::Pointer curSelSrc =
     m_Controls->messageSourceSelectionWidget->AutoSelectFirstIGTLMessageSource();
   SourceSelected(curSelSrc);
+
+  if( curSelSrc.IsNotNull() )
+  {
+    //automatically start streaming for better support and handling when using
+    //e.g. the US-module.
+    this->OnStartStreaming();
+  }
 }

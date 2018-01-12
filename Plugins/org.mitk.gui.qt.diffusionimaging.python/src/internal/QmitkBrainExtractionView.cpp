@@ -205,6 +205,10 @@ void QmitkBrainExtractionView::StartBrainExtraction()
       name += "_SkullStripped";
       corrected_node->SetName(name.toStdString());
       GetDataStorage()->Add(corrected_node, node);
+
+      mitk::RenderingManager::GetInstance()->InitializeViews( corrected_node->GetData()->GetTimeGeometry(),
+                                                              mitk::RenderingManager::REQUEST_UPDATE_ALL,
+                                                              true);
     }
   }
   catch(...)

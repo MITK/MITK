@@ -46,7 +46,7 @@ diff --git a/Rendering/Annotation/vtkCornerAnnotation.cxx b/Rendering/Annotation
      this->TextMapper[i] = vtkTextMapper::New();
      this->TextActor[i] = vtkActor2D::New();
      this->TextActor[i]->SetMapper(this->TextMapper[i]);
-+    this->MaximumLengthText[i] = "";
++    this->MaximumLengthText[i] = NULL;
    }
  
    this->ImageActor = NULL;

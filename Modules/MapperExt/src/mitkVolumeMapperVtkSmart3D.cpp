@@ -241,8 +241,11 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
 
 mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
 {
-  vtkObjectFactory::RegisterFactory(vtkRenderingOpenGL2ObjectFactory::New());
-  vtkObjectFactory::RegisterFactory(vtkRenderingVolumeOpenGL2ObjectFactory::New());
+  m_RenderingOpenGL2ObjectFactory = vtkSmartPointer<vtkRenderingOpenGL2ObjectFactory>::New();
+  m_RenderingVolumeOpenGL2ObjectFactory = vtkSmartPointer<vtkRenderingVolumeOpenGL2ObjectFactory>::New();
+
+  vtkObjectFactory::RegisterFactory(m_RenderingOpenGL2ObjectFactory);
+  vtkObjectFactory::RegisterFactory(m_RenderingVolumeOpenGL2ObjectFactory);
 
   m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   m_SmartVolumeMapper->SetBlendModeToComposite();

@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkLogoAnnotation.h"
+#include <mitkIOUtil.h>
 #include "vtkUnicodeString.h"
 #include <vtkImageData.h>
 #include <vtkImageData.h>
@@ -30,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkLogoRepresentation.h>
 #include <vtkImageImport.h>
 #include <vtkProperty2D.h>
+#include <vtkImageFlip.h>
+#include <vtkNew.h>
 
 mitk::LogoAnnotation::LogoAnnotation()
 {
@@ -95,6 +98,26 @@ void mitk::LogoAnnotation::SetLogoImagePath(std::string path)
 {
   SetStringProperty("Annotation.LogoImagePath", path.c_str());
   Modified();
+}
+
+void mitk::LogoAnnotation::LoadLogoImageFromPath()
+{
+  auto imageNodeVector = mitk::IOUtil::Load(this->GetLogoImagePath());
+
+  if (imageNodeVector.size() == 1)
+  {
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(imageNodeVector.front().GetPointer());
+
+    if (image.IsNotNull())
+    {
+      vtkNew<vtkImageFlip> flip;
+      flip->SetInputData(image->GetVtkImageData());
+      flip->SetFilteredAxis(1);
+      flip->Update();
+      m_UpdatedLogoImage->DeepCopy(flip->GetOutput());
+      Modified();
+    }
+  }
 }
 
 void mitk::LogoAnnotation::SetLogoImage(vtkSmartPointer<vtkImageData> logo)

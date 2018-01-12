@@ -14,6 +14,7 @@ set(CPP_FILES
   Algorithms/mitkConvert2Dto3DImageFilter.cpp
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkExtractSliceFilter.cpp
+  Algorithms/mitkExtractSliceFilter2.cpp
   Algorithms/mitkHistogramGenerator.cpp
   Algorithms/mitkImageChannelSelector.cpp
   Algorithms/mitkImageSliceSelector.cpp

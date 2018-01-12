@@ -106,6 +106,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="m_TvLambdaBox">
+        <property name="decimals">
+         <number>4</number>
+        </property>
         <property name="minimum">
          <double>0.000000000000000</double>
         </property>
@@ -264,6 +267,9 @@
       </property>
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="m_GaussVarianceBox">
+        <property name="decimals">
+         <number>4</number>
+        </property>
         <property name="minimum">
          <double>1.000000000000000</double>
         </property>

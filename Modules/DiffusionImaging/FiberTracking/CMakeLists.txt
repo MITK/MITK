@@ -10,7 +10,6 @@ if(NOT _missing_deps)
 
   set(lut_url http://mitk.org/download/data/FibertrackingLUT.tar.gz)
   set(lut_tarball ${CMAKE_CURRENT_BINARY_DIR}/FibertrackingLUT.tar.gz)
-  #message("Downloading FiberTracking LUT ${lut_url}...")
   file(DOWNLOAD ${lut_url} ${lut_tarball}
        EXPECTED_MD5 38ecb6d4a826c9ebb0f4965eb9aeee44
        TIMEOUT 60
@@ -26,7 +25,6 @@ if(NOT _missing_deps)
   endif()
 
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Resources)
-  #message("Unpacking FiberTracking LUT tarball...")
   execute_process(COMMAND ${CMAKE_COMMAND} -E  tar xzf ../FibertrackingLUT.tar.gz
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Resources
                   RESULT_VARIABLE result

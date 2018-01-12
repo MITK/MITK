@@ -8,7 +8,7 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_PREPROCESSING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkDiffusionCore MitkPython MitkQtPython
-  PACKAGE_DEPENDS Qt5|Network
+  PACKAGE_DEPENDS Qt5|Network BetData
 )
 
 endif()

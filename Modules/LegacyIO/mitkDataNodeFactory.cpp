@@ -98,7 +98,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProgressBar.h"
 #include <mitkDicomSeriesReader.h>
 
-bool mitk::DataNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
+bool mitk::DataNodeFactory::m_TextureInterpolationActive = true;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
 mitk::DataNodeFactory::DataNodeFactory()
 {

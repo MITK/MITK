@@ -136,6 +136,7 @@ public:
   virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
   //### end of methods of MITK-VTK rendering pipeline
 
+  static bool m_TextureInterpolationActive;
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
   /**

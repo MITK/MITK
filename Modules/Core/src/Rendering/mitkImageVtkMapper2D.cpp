@@ -60,6 +60,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDicomTagsList.h"
 #include "mitkStringProperty.h"
 
+bool mitk::ImageVtkMapper2D::m_TextureInterpolationActive = true; // default texture interpolation (same as in LegacyIO Module)
+
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
 }
@@ -666,7 +668,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "outline shadow width", mitk::FloatProperty::New( 1.5 ), renderer, overwrite );
   if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
   else node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
-  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( false ) );
+  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::ImageVtkMapper2D::m_TextureInterpolationActive ) );
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 

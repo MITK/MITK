@@ -30,7 +30,7 @@ namespace mitk
     {
       NearestNeighbor,
       Linear,
-      WindowedSinc_Lanczos_3
+      BSpline
     };
 
     mitkClassMacro(ExtractSliceFilter2, ImageToImageFilter)

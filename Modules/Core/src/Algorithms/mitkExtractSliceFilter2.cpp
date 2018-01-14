@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 
 #include <itkImportImageFilter.h>
+#include <itkBSplineInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
-#include <itkWindowedSincInterpolateImageFunction.h>
 
 #include <array>
 #include <limits>
@@ -40,8 +40,12 @@ namespace
     case mitk::ExtractSliceFilter2::Interpolator::Linear:
       return itk::LinearInterpolateImageFunction<TInputImage>::New().GetPointer();
 
-    case mitk::ExtractSliceFilter2::Interpolator::WindowedSinc_Lanczos_3:
-      return itk::WindowedSincInterpolateImageFunction<TInputImage, 3, itk::Function::LanczosWindowFunction<3>>::New().GetPointer();
+    case mitk::ExtractSliceFilter2::Interpolator::BSpline:
+    {
+      auto interpolateImageFunction = itk::BSplineInterpolateImageFunction<TInputImage>::New();
+      interpolateImageFunction->SetSplineOrder(2);
+      return interpolateImageFunction.GetPointer();
+    }
 
     default:
       mitkThrow() << "Interplator is unknown.";

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkResampleImageFilter.h>
 
 #include <array>
 #include <limits>
@@ -37,10 +38,10 @@ namespace
     case mitk::ExtractSliceFilter2::Interpolator::NearestNeighbor:
       return itk::NearestNeighborInterpolateImageFunction<TInputImage>::New().GetPointer();
 
-    case mitk::ExtractSliceFilter2::Interpolator::Linear:
+    case mitk::ExtractSliceFilter2::Interpolator::Bilinear:
       return itk::LinearInterpolateImageFunction<TInputImage>::New().GetPointer();
 
-    case mitk::ExtractSliceFilter2::Interpolator::BSpline:
+    case mitk::ExtractSliceFilter2::Interpolator::Bicubic:
     {
       auto interpolateImageFunction = itk::BSplineInterpolateImageFunction<TInputImage>::New();
       interpolateImageFunction->SetSplineOrder(2);
@@ -79,8 +80,6 @@ namespace
     const SizeValue NUMBER_OF_PIXELS = size[0] * size[1] * size[2];
     TPixel* buffer = new TPixel[NUMBER_OF_PIXELS];
 
-    auto origin = outputGeometry->GetOrigin();
-
     std::array<mitk::Vector3D, 3> direction =
     {
       outputGeometry->GetAxisVector(0),
@@ -110,11 +109,9 @@ namespace
       direction[1] * spacing[1]
     };
 
-    std::array<mitk::Vector3D, 2> halfSpacingAlongDirection =
-    {
-      spacingAlongDirection[0] * 0.5,
-      spacingAlongDirection[1] * 0.5
-    };
+    auto origin = outputGeometry->GetOrigin();
+    origin -= spacingAlongDirection[0] * 0.5;
+    origin -= spacingAlongDirection[1] * 0.5;
 
     mitk::Point3D point;
     mitk::Point3D yComponent;
@@ -122,11 +119,11 @@ namespace
 
     for (SizeValue y = 0; y < size[1]; ++y)
     {
-      yComponent = origin + spacingAlongDirection[1] * y - halfSpacingAlongDirection[1];
+      yComponent = origin + spacingAlongDirection[1] * y;
 
       for (SizeValue x = 0; x < size[0]; ++x)
       {
-        point = yComponent + spacingAlongDirection[0] * x - halfSpacingAlongDirection[0];
+        point = yComponent + spacingAlongDirection[0] * x;
 
         buffer[size[1] * y + x] = inputImage->TransformPhysicalPointToContinuousIndex(point, continuousIndex)
           ? interpolateImageFunction->EvaluateAtContinuousIndex(continuousIndex)
@@ -210,11 +207,6 @@ void mitk::ExtractSliceFilter2::GenerateData()
   AccessFixedDimensionByItk_n(this->GetInput(), ::GenerateData, 3, (this->GetOutput(), m_Impl->OutputGeometry, m_Impl->Interpolator));
 }
 
-void mitk::ExtractSliceFilter2::GenerateInputRequestedRegion()
-{
-  itk::ProcessObject::GenerateInputRequestedRegion();
-}
-
 const mitk::PlaneGeometry* mitk::ExtractSliceFilter2::GetOutputGeometry() const
 {
   return m_Impl->OutputGeometry;
@@ -222,7 +214,11 @@ const mitk::PlaneGeometry* mitk::ExtractSliceFilter2::GetOutputGeometry() const
 
 void mitk::ExtractSliceFilter2::SetOutputGeometry(PlaneGeometry::Pointer outputGeometry)
 {
-  m_Impl->OutputGeometry = outputGeometry;
+  if (m_Impl->OutputGeometry != outputGeometry)
+  {
+    m_Impl->OutputGeometry = outputGeometry;
+    this->Modified();
+  }
 }
 
 mitk::ExtractSliceFilter2::Interpolator mitk::ExtractSliceFilter2::GetInterpolator() const
@@ -232,7 +228,11 @@ mitk::ExtractSliceFilter2::Interpolator mitk::ExtractSliceFilter2::GetInterpolat
 
 void mitk::ExtractSliceFilter2::SetInterpolator(Interpolator interpolator)
 {
-  m_Impl->Interpolator = interpolator;
+  if (m_Impl->Interpolator != interpolator)
+  {
+    m_Impl->Interpolator = interpolator;
+    this->Modified();
+  }
 }
 
 void mitk::ExtractSliceFilter2::VerifyInputInformation()

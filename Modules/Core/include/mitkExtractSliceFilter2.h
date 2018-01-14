@@ -29,8 +29,8 @@ namespace mitk
     enum class Interpolator
     {
       NearestNeighbor,
-      Linear,
-      BSpline
+      Bilinear,
+      Bicubic
     };
 
     mitkClassMacro(ExtractSliceFilter2, ImageToImageFilter)
@@ -47,7 +47,6 @@ namespace mitk
     ~ExtractSliceFilter2() override;
 
     void GenerateData() override;
-    void GenerateInputRequestedRegion() override;
     void VerifyInputInformation() override;
 
     struct Impl;

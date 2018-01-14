@@ -35,13 +35,13 @@ namespace
   {
     switch (interpolator)
     {
-    case mitk::ExtractSliceFilter2::Interpolator::NearestNeighbor:
+    case mitk::ExtractSliceFilter2::NearestNeighbor:
       return itk::NearestNeighborInterpolateImageFunction<TInputImage>::New().GetPointer();
 
-    case mitk::ExtractSliceFilter2::Interpolator::Bilinear:
+    case mitk::ExtractSliceFilter2::Linear:
       return itk::LinearInterpolateImageFunction<TInputImage>::New().GetPointer();
 
-    case mitk::ExtractSliceFilter2::Interpolator::Bicubic:
+    case mitk::ExtractSliceFilter2::Cubic:
     {
       auto interpolateImageFunction = itk::BSplineInterpolateImageFunction<TInputImage>::New();
       interpolateImageFunction->SetSplineOrder(2);
@@ -184,7 +184,7 @@ struct mitk::ExtractSliceFilter2::Impl
 };
 
 mitk::ExtractSliceFilter2::Impl::Impl()
-  : Interpolator(Interpolator::NearestNeighbor)
+  : Interpolator(NearestNeighbor)
 {
 }
 

@@ -26,11 +26,11 @@ namespace mitk
   class MITKCORE_EXPORT ExtractSliceFilter2 final : public ImageToImageFilter
   {
   public:
-    enum class Interpolator
+    enum Interpolator
     {
       NearestNeighbor,
-      Bilinear,
-      Bicubic
+      Linear,
+      Cubic
     };
 
     mitkClassMacro(ExtractSliceFilter2, ImageToImageFilter)

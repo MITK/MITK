@@ -42,7 +42,7 @@ set(MITK_PLUGINS
   #Testing/org.blueberry.osgi.tests:ON
 
   org.mitk.gui.qt.overlaymanager:ON
-  org.mitk.gui.qt.segmentation:ON
+  #org.mitk.gui.qt.segmentation:ON
   org.mitk.gui.qt.viewnavigator:ON
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.toftutorial:OFF

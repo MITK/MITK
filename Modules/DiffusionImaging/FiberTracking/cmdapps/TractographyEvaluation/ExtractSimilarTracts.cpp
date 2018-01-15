@@ -141,23 +141,21 @@ int main(int argc, char* argv[])
     {
       MITK_INFO << "Extracting " << ist::GetFilenameName(ref_bundle_files.at(c));
 
-//      std::streambuf *old = cout.rdbuf(); // <-- save
-//      std::stringstream ss;
-//      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+      std::streambuf *old = cout.rdbuf(); // <-- save
+      std::stringstream ss;
+      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       try
       {
         itk::TractClusteringFilter::Pointer segmenter = itk::TractClusteringFilter::New();
 
         // calculate centroids from reference bundle
         {
-          MITK_INFO << "TEST 1";
           itk::TractClusteringFilter::Pointer clusterer = itk::TractClusteringFilter::New();
           clusterer->SetDistances({10,20,30});
           clusterer->SetTractogram(ref_fib);
           clusterer->SetMetrics({new mitk::ClusteringMetricEuclideanStd()});
           clusterer->SetMergeDuplicateThreshold(0.0);
           clusterer->Update();
-          MITK_INFO << "TEST 2";
           std::vector<mitk::FiberBundle::Pointer> tracts = clusterer->GetOutCentroids();
           ref_fib = mitk::FiberBundle::New(nullptr);
           ref_fib = ref_fib->AddBundles(tracts);
@@ -208,7 +206,7 @@ int main(int argc, char* argv[])
         MITK_INFO << "Exception while processing " << ist::GetFilenameName(ref_bundle_files.at(c));
         MITK_INFO << excpt.what();
       }
-//      std::cout.rdbuf (old);              // <-- restore
+      std::cout.rdbuf (old);              // <-- restore
       if (fib->GetNumFibers()==0)
         break;
       ++c;

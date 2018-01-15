@@ -210,6 +210,10 @@ void QmitkSimpleRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWr
   resultNode->SetColor(0.0, 0.0, 1.0);
   GetDataStorage()->Add(resultNode);
 
+  mitk::RenderingManager::GetInstance()->InitializeViews( resultNode->GetData()->GetTimeGeometry(),
+                                                          mitk::RenderingManager::REQUEST_UPDATE_ALL,
+                                                          true);
+
   if (m_Controls->m_RegOutputBox->isChecked())
   {
     mitk::DataNode::Pointer registration_node = mitk::DataNode::New();

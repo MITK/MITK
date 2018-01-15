@@ -201,8 +201,8 @@ void QmitkPreprocessingView::DoAlignImages()
   mitk::Image::Pointer target_image = dynamic_cast<mitk::Image*>(target_node->GetData());
   if ( target_image == nullptr ) { return; }
 
-  target_image->SetOrigin(image->GetGeometry()->GetOrigin());
-  mitk::RenderingManager::GetInstance()->InitializeViews( target_image->GetTimeGeometry(),
+  image->SetOrigin(target_image->GetGeometry()->GetOrigin());
+  mitk::RenderingManager::GetInstance()->InitializeViews( image->GetTimeGeometry(),
                                                           mitk::RenderingManager::REQUEST_UPDATE_ALL,
                                                           true );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -57,6 +57,7 @@ namespace mitk
 
     void SetLogoImagePath(std::string text);
     std::string GetLogoImagePath() const;
+    void LoadLogoImageFromPath();
 
     /** \brief The relative offset to the corner position */
     void SetOffsetVector(const Point2D &OffsetVector);

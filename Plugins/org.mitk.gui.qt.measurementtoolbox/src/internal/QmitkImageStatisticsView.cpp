@@ -340,24 +340,7 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
         endT = statistics.size();
     }
     QVector< QVector<QString> > statisticsTable;
-    QStringList headline;
-
-    // Create Headline
-    headline << " "
-             << "Mean"
-             << "Median"
-             << "StdDev"
-             << "RMS"
-             << "Max"
-             << "Min"
-             << "NumberOfVoxels"
-             << "Skewness"
-             << "Kurtosis"
-             << "Uniformity"
-             << "Entropy"
-             << "MPP"
-             << "UPP"
-             << "V [mm³]";
+    QStringList headline{ "", "Mean", "Median", "StdDev", "RMS", "Max", "Min", "NumberOfVoxels", "Skewness", "Kurtosis", "Uniformity", "Entropy", "MPP", "UPP", "V [mm³]" };
 
     for(int i=0;i<headline.size();i++)
     {

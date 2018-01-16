@@ -102,7 +102,7 @@ namespace
     origin -= spacingAlongYDirection * 0.5;
 
     const std::size_t pixelSize = outputImage->GetPixelType().GetSize();
-    const std::size_t height = outputGeometry->GetExtent(1);
+    const std::size_t width = outputGeometry->GetExtent(0);
     const std::size_t xBegin = outputRegion.GetIndex(0);
     const std::size_t yBegin = outputRegion.GetIndex(1);
     const std::size_t xEnd = xBegin + outputRegion.GetSize(0);
@@ -129,11 +129,11 @@ namespace
         if (inputImage->TransformPhysicalPointToContinuousIndex(point, index))
         {
           pixel = interpolator->EvaluateAtContinuousIndex(index);
-          memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&pixel), pixelSize);
+          memcpy(static_cast<void*>(data + pixelSize * (width * y + x)), static_cast<const void*>(&pixel), pixelSize);
         }
         else
         {
-          memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&backgroundPixel), pixelSize);
+          memcpy(static_cast<void*>(data + pixelSize * (width * y + x)), static_cast<const void*>(&backgroundPixel), pixelSize);
         }
       }
     }

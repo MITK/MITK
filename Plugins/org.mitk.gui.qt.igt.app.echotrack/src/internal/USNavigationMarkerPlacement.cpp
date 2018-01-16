@@ -65,22 +65,34 @@ const char *USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS = "Reached Tar
 
 USNavigationMarkerPlacement::USNavigationMarkerPlacement()
   : m_Parent(nullptr),
+  m_NavigationSteps(),
   m_UpdateTimer(new QTimer(this)),
   m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
   m_StdMultiWidget(nullptr),
+  m_CombinedModality(nullptr),
   m_ReinitAlreadyDone(false),
   m_IsExperimentRunning(false),
+  m_CurrentApplicationName(),
   m_NavigationStepTimer(mitk::USNavigationStepTimer::New()),
   m_ExperimentLogging(mitk::USNavigationExperimentLogging::New()),
-  m_AblationZonesDisplacementFilter(mitk::NodeDisplacementFilter::New()),
   m_IconRunning(QPixmap(":/USNavigation/record.png")),
   m_IconNotRunning(QPixmap(":/USNavigation/record-gray.png")),
+  m_ResultsDirectory(),
+  m_ExperimentName(),
+  m_ExperimentResultsSubDirectory(),
+  m_NavigationStepNames(),
+  m_LoggingBackend(),
   m_USImageLoggingFilter(mitk::USImageLoggingFilter::New()),
   m_NavigationDataRecorder(mitk::NavigationDataRecorder::New()),
-  m_SceneNumber(1),
-  m_WarnOverlay(mitk::TextAnnotation2D::New()),
+  m_TargetNodeDisplacementFilter(nullptr),
+  m_AblationZonesDisplacementFilter(mitk::NodeDisplacementFilter::New()),
+  m_AblationZonesVector(),
   m_NeedleIndex(0),
   m_MarkerIndex(1),
+  m_SceneNumber(1),
+  m_WarnOverlay(mitk::TextAnnotation2D::New()),
+  m_NavigationDataSource(nullptr),
+  m_CurrentStorage(nullptr),
   m_ListenerDeviceChanged(this, &USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged),
   ui(new Ui::USNavigationMarkerPlacement)
 {
@@ -527,7 +539,7 @@ void USNavigationMarkerPlacement::OnFinishExperiment()
   m_IsExperimentRunning = false;
 
   m_ImageAndNavigationDataLoggingTimer->stop();
-  m_CombinedModality = 0;
+  m_CombinedModality = nullptr;
 
   // reset scene number for next experiment
   m_SceneNumber = 1;

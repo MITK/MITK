@@ -38,7 +38,7 @@ struct mitk::ExtractSliceFilter2::Impl
 
 mitk::ExtractSliceFilter2::Impl::Impl()
   : OutputImage(nullptr),
-  Interpolator(NearestNeighbor)
+    Interpolator(NearestNeighbor)
 {
 }
 
@@ -208,7 +208,7 @@ void mitk::ExtractSliceFilter2::AllocateOutputs()
 
 void mitk::ExtractSliceFilter2::BeforeThreadedGenerateData()
 {
-  if (nullptr != m_Impl->InterpolateImageFunction)
+  if (nullptr != m_Impl->InterpolateImageFunction && this->GetInput()->GetMTime() < this->GetMTime())
     return;
 
   const auto* inputImage = this->GetInput();

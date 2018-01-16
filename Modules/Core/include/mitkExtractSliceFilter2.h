@@ -23,6 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** \brief Extract an arbitrarily oriented 2-d image from a 3-d image.
+   *
+   * Use ExtractSliceFilter2::SetOutputGeometry to specify the orientation of
+   * the 2-d output image.
+   *
+   * If a pixel of the 2-d output image isn't located within the bounds of the
+   * 3-d input image, it is set to the lowest possible pixel value.
+   *
+   * Cubic interpolation is considerably slow on the first update for a newly
+   * set input image. Subsequent filter updates with cubic interpolation are
+   * faster by several orders of magnitude as long as the input image was
+   * neither changed nor modified.
+   *
+   * This filter is completely based on ITK compared to the VTK-based
+   * mitk::ExtractSliceFilter. It is more robust, easy to use, and produces
+   * an mitk::Image with valid geometry. Generally it is not as fast as
+   * mitk::ExtractSliceFilter, though.
+   */
   class MITKCORE_EXPORT ExtractSliceFilter2 final : public ImageToImageFilter
   {
   public:

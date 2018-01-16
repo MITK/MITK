@@ -36,6 +36,9 @@ namespace mitk
     mitkClassMacro(ExtractSliceFilter2, ImageToImageFilter)
     itkFactorylessNewMacro(Self)
 
+    void SetInput(const InputImageType* image) override;
+    void SetInput(unsigned int index, const InputImageType* image) override;
+
     const PlaneGeometry* GetOutputGeometry() const;
     void SetOutputGeometry(PlaneGeometry::Pointer outputGeometry);
 
@@ -46,7 +49,9 @@ namespace mitk
     ExtractSliceFilter2();
     ~ExtractSliceFilter2() override;
 
-    void GenerateData() override;
+    void AllocateOutputs() override;
+    void BeforeThreadedGenerateData() override;
+    void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, itk::ThreadIdType threadId) override;
     void VerifyInputInformation() override;
 
     struct Impl;

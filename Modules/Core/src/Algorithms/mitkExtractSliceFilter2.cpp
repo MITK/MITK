@@ -17,129 +17,120 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExtractSliceFilter2.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImageAccessByItk.h>
-#include <mitkITKImageImport.h>
 
-#include <itkImportImageFilter.h>
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
-#include <itkResampleImageFilter.h>
 
-#include <array>
 #include <limits>
 
 namespace
 {
-  template <typename TInputImage>
-  typename itk::InterpolateImageFunction<TInputImage>::Pointer CreateInterpolator(mitk::ExtractSliceFilter2::Interpolator interpolator)
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4996)
+#endif
+
+  char* GetData(mitk::Image* image)
   {
-    switch (interpolator)
-    {
-    case mitk::ExtractSliceFilter2::NearestNeighbor:
-      return itk::NearestNeighborInterpolateImageFunction<TInputImage>::New().GetPointer();
+    return static_cast<char*>(image->GetData());
+  }
 
-    case mitk::ExtractSliceFilter2::Linear:
-      return itk::LinearInterpolateImageFunction<TInputImage>::New().GetPointer();
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
-    case mitk::ExtractSliceFilter2::Cubic:
+  template <typename TInputImage>
+  void CreateInterpolateImageFunction(const TInputImage* inputImage, mitk::ExtractSliceFilter2::Impl* impl)
+  {
+    itk::InterpolateImageFunction<TInputImage>::Pointer interpolateImageFunction;
+
+    switch (impl->Interpolator)
     {
-      auto interpolateImageFunction = itk::BSplineInterpolateImageFunction<TInputImage>::New();
-      interpolateImageFunction->SetSplineOrder(2);
-      return interpolateImageFunction.GetPointer();
+      case mitk::ExtractSliceFilter2::NearestNeighbor:
+        interpolateImageFunction = itk::NearestNeighborInterpolateImageFunction<TInputImage>::New().GetPointer();
+        break;
+
+      case mitk::ExtractSliceFilter2::Linear:
+        interpolateImageFunction = itk::LinearInterpolateImageFunction<TInputImage>::New().GetPointer();
+        break;
+
+      case mitk::ExtractSliceFilter2::Cubic:
+      {
+        auto bSplineInterpolateImageFunction = itk::BSplineInterpolateImageFunction<TInputImage>::New();
+        bSplineInterpolateImageFunction->SetSplineOrder(2);
+        interpolateImageFunction = bSplineInterpolateImageFunction.GetPointer();
+        break;
+      }
+
+      default:
+        mitkThrow() << "Interplator is unknown.";
     }
 
-    default:
-      mitkThrow() << "Interplator is unknown.";
-    }
+    interpolateImageFunction->SetInputImage(inputImage);
+
+    impl->InterpolateImageFunction = interpolateImageFunction.GetPointer();
   }
 
   template <typename TPixel, unsigned int VImageDimension>
-  void GenerateData(itk::Image<TPixel, VImageDimension>* inputImage, mitk::Image* outputImage, mitk::PlaneGeometry* outputGeometry, mitk::ExtractSliceFilter2::Interpolator interpolator)
+  void GenerateData(const itk::Image<TPixel, VImageDimension>* inputImage, const mitk::ExtractSliceFilter2::Impl* impl, const mitk::ExtractSliceFilter2::OutputImageRegionType& outputRegion)
   {
-    typedef typename itk::ImportImageFilter<TPixel, VImageDimension> ImportImageFilter;
-    typedef typename ImportImageFilter::IndexType Index;
-    typedef typename ImportImageFilter::SizeType Size;
-    typedef typename ImportImageFilter::RegionType Region;
-    typedef typename Size::SizeValueType SizeValue;
+    typedef itk::Image<TPixel, VImageDimension> TInputImage;
+    typedef itk::InterpolateImageFunction<TInputImage> TInterpolateImageFunction;
 
-    Index index;
-    index.Fill(0);
-
-    Size size;
-    size[0] = outputGeometry->GetExtent(0);
-    size[1] = outputGeometry->GetExtent(1);
-    size[2] = 1;
-
-    Region region;
-    region.SetIndex(index);
-    region.SetSize(size);
-
-    auto interpolateImageFunction = CreateInterpolator<itk::Image<TPixel, VImageDimension>>(interpolator);
-    interpolateImageFunction->SetInputImage(inputImage);
-
-    const SizeValue NUMBER_OF_PIXELS = size[0] * size[1] * size[2];
-    TPixel* buffer = new TPixel[NUMBER_OF_PIXELS];
-
-    std::array<mitk::Vector3D, 3> direction =
-    {
-      outputGeometry->GetAxisVector(0),
-      outputGeometry->GetAxisVector(1),
-      outputGeometry->GetNormal()
-    };
-
-    direction[0].Normalize();
-    direction[1].Normalize();
-    direction[2].Normalize();
-
-    mitk::Matrix3D directionMatrix;
-
-    for (int j = 0; j < 3; ++j)
-    {
-      for (int i = 0; i < 3; ++i)
-      {
-        directionMatrix(i, j) = direction[j][i];
-      }
-    }
-
-    auto spacing = outputGeometry->GetSpacing();
-
-    std::array<mitk::Vector3D, 2> spacingAlongDirection =
-    {
-      direction[0] * spacing[0],
-      direction[1] * spacing[1]
-    };
+    auto outputImage = impl->OutputImage;
+    auto outputGeometry = impl->OutputGeometry;
+    auto interpolateImageFunction = static_cast<TInterpolateImageFunction*>(impl->InterpolateImageFunction.GetPointer());
 
     auto origin = outputGeometry->GetOrigin();
-    origin -= spacingAlongDirection[0] * 0.5;
-    origin -= spacingAlongDirection[1] * 0.5;
+    auto spacing = outputGeometry->GetSpacing();
+    auto xDirection = outputGeometry->GetAxisVector(0);
+    auto yDirection = outputGeometry->GetAxisVector(1);
 
+    xDirection.Normalize();
+    yDirection.Normalize();
+
+    auto spacingAlongXDirection = xDirection * spacing[0];
+    auto spacingAlongYDirection = yDirection * spacing[1];
+
+    origin -= spacingAlongXDirection * 0.5;
+    origin -= spacingAlongYDirection * 0.5;
+
+    const std::size_t pixelSize = outputImage->GetPixelType().GetSize();
+    const std::size_t height = outputGeometry->GetExtent(1);
+    const std::size_t xBegin = outputRegion.GetIndex(0);
+    const std::size_t yBegin = outputRegion.GetIndex(1);
+    const std::size_t xEnd = xBegin + outputRegion.GetSize(0);
+    const std::size_t yEnd = yBegin + outputRegion.GetSize(1);
+
+    auto data = GetData(outputImage);
+
+    const TPixel backgroundPixel = std::numeric_limits<TPixel>::lowest();
+    TPixel pixel;
+
+    itk::ContinuousIndex<mitk::ScalarType, 3> index;
+    mitk::Point3D yPoint;
     mitk::Point3D point;
-    mitk::Point3D yComponent;
-    itk::ContinuousIndex<mitk::ScalarType, 3> continuousIndex;
 
-    for (SizeValue y = 0; y < size[1]; ++y)
+    for (std::size_t y = yBegin; y < yEnd; ++y)
     {
-      yComponent = origin + spacingAlongDirection[1] * y;
+      yPoint = origin + spacingAlongYDirection * y;
 
-      for (SizeValue x = 0; x < size[0]; ++x)
+      for (std::size_t x = xBegin; x < xEnd; ++x)
       {
-        point = yComponent + spacingAlongDirection[0] * x;
+        point = yPoint + spacingAlongXDirection * x;
 
-        buffer[size[1] * y + x] = inputImage->TransformPhysicalPointToContinuousIndex(point, continuousIndex)
-          ? interpolateImageFunction->EvaluateAtContinuousIndex(continuousIndex)
-          : std::numeric_limits<TPixel>::lowest();
+        if (inputImage->TransformPhysicalPointToContinuousIndex(point, index))
+        {
+          pixel = interpolateImageFunction->EvaluateAtContinuousIndex(index);
+          memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&pixel), pixelSize);
+        }
+        else
+        {
+          memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&backgroundPixel), pixelSize);
+        }
       }
     }
-
-    auto importImageFilter = ImportImageFilter::New();
-    importImageFilter->SetRegion(region);
-    importImageFilter->SetOrigin(outputGeometry->GetOrigin());
-    importImageFilter->SetSpacing(outputGeometry->GetSpacing());
-    importImageFilter->SetDirection(directionMatrix);
-    importImageFilter->SetImportPointer(buffer, NUMBER_OF_PIXELS, true);
-    importImageFilter->Update();
-
-    mitk::GrabItkImageMemory(importImageFilter->GetOutput(), outputImage);
   }
 
   void VerifyInputImage(const mitk::Image* inputImage)
@@ -179,12 +170,15 @@ struct mitk::ExtractSliceFilter2::Impl
   Impl();
   ~Impl();
 
+  mitk::Image* OutputImage;
   PlaneGeometry::Pointer OutputGeometry;
   Interpolator Interpolator;
+  itk::Object::Pointer InterpolateImageFunction;
 };
 
 mitk::ExtractSliceFilter2::Impl::Impl()
-  : Interpolator(NearestNeighbor)
+  : OutputImage(nullptr),
+    Interpolator(NearestNeighbor)
 {
 }
 
@@ -202,9 +196,60 @@ mitk::ExtractSliceFilter2::~ExtractSliceFilter2()
   delete m_Impl;
 }
 
-void mitk::ExtractSliceFilter2::GenerateData()
+void mitk::ExtractSliceFilter2::AllocateOutputs()
 {
-  AccessFixedDimensionByItk_n(this->GetInput(), ::GenerateData, 3, (this->GetOutput(), m_Impl->OutputGeometry, m_Impl->Interpolator));
+  const auto* inputImage = this->GetInput();
+  const auto* outputGeometry = this->GetOutputGeometry();
+  auto outputImage = this->GetOutput();
+  auto pixelType = inputImage->GetPixelType();
+
+  outputImage->Initialize(pixelType, 1, *outputGeometry);
+
+  auto data = new char[pixelType.GetSize() * outputGeometry->GetExtent(0) * outputGeometry->GetExtent(1)];
+
+  try
+  {
+    if (!outputImage->SetImportVolume(data, 0, 0, mitk::Image::ReferenceMemory))
+      throw;
+  }
+  catch (...)
+  {
+    delete[] data;
+  }
+}
+
+void mitk::ExtractSliceFilter2::BeforeThreadedGenerateData()
+{
+  if (nullptr != m_Impl->InterpolateImageFunction)
+    return;
+
+  const auto* inputImage = this->GetInput();
+  AccessFixedDimensionByItk_1(inputImage, CreateInterpolateImageFunction, 3, m_Impl);
+}
+
+void mitk::ExtractSliceFilter2::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, itk::ThreadIdType threadId)
+{
+  m_Impl->OutputImage = this->GetOutput();
+
+  const auto* inputImage = this->GetInput();
+  AccessFixedDimensionByItk_2(inputImage, ::GenerateData, 3, m_Impl, outputRegionForThread);
+}
+
+void mitk::ExtractSliceFilter2::SetInput(const InputImageType* image)
+{
+  if (this->GetInput() == image)
+    return;
+
+  Superclass::SetInput(image);
+  m_Impl->InterpolateImageFunction = nullptr;
+}
+
+void mitk::ExtractSliceFilter2::SetInput(unsigned int index, const InputImageType* image)
+{
+  if (0 != index)
+    mitkThrow() << "Input index " << index << " is invalid.";
+
+  this->SetInput(image);
 }
 
 const mitk::PlaneGeometry* mitk::ExtractSliceFilter2::GetOutputGeometry() const
@@ -231,6 +276,7 @@ void mitk::ExtractSliceFilter2::SetInterpolator(Interpolator interpolator)
   if (m_Impl->Interpolator != interpolator)
   {
     m_Impl->Interpolator = interpolator;
+    m_Impl->InterpolateImageFunction = nullptr;
     this->Modified();
   }
 }

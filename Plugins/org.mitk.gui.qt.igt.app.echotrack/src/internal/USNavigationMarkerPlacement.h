@@ -207,24 +207,6 @@ protected:
   mitk::NavigationDataSource::Pointer m_NavigationDataSource;
   mitk::NavigationToolStorage::Pointer m_CurrentStorage;
 
-  QWidget *m_Parent;
-  QTimer *m_UpdateTimer;
-  QTimer *m_ImageAndNavigationDataLoggingTimer;
-  QmitkStdMultiWidget *m_StdMultiWidget;
-  bool m_ReinitAlreadyDone;
-  bool m_IsExperimentRunning;
-  itk::SmartPointer<mitk::USNavigationStepTimer> m_NavigationStepTimer;
-  itk::SmartPointer<mitk::USNavigationExperimentLogging> m_ExperimentLogging;
-  mitk::NodeDisplacementFilter::Pointer m_AblationZonesDisplacementFilter;
-  QPixmap m_IconRunning;
-  QPixmap m_IconNotRunning;
-  mitk::USImageLoggingFilter::Pointer m_USImageLoggingFilter;
-  mitk::NavigationDataRecorder::Pointer m_NavigationDataRecorder; // records navigation data files
-  int m_SceneNumber;
-  itk::SmartPointer<mitk::TextAnnotation2D> m_WarnOverlay;
-  int m_NeedleIndex;
-  int m_MarkerIndex;
-
 private:
   mitk::MessageDelegate2<USNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;
 

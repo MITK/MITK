@@ -139,7 +139,7 @@ void QmitkImageStatisticsView::OnDefaultNBinsSpinBoxChanged()
   }
   m_Controls->m_BinSizeFrame->setEnabled(!m_Controls->m_UseDefaultNBinsCheckBox->isChecked());
 
-this->UpdateStatistics();
+  this->UpdateStatistics();
 
 }
 
@@ -215,6 +215,7 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 
       if (closedFigure)
       {
+
         auto imageNameLabel = m_Controls->m_SelectedFeatureImageLabel->text().toStdString();
         this->m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram), imageNameLabel);
         if (this->m_Controls->m_lineRadioButton->isChecked())
@@ -439,21 +440,12 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   this->ReinitData();
   if (selectedNodes.isEmpty())
   {
-    m_Controls->m_lineRadioButton->setEnabled(true);
-    m_Controls->m_barRadioButton->setEnabled(true);
-    m_Controls->m_HistogramNBinsSpinbox->setEnabled(true);
-    m_Controls->m_HistogramNBinsCaptionLabel->setEnabled(true);
-    m_Controls->m_UseDefaultNBinsCheckBox->setEnabled(true);
-
-    m_Controls->m_InfoLabel->setText("");
-    m_Controls->groupBox->setEnabled(false);
-    m_Controls->groupBox_3->setEnabled(false);
+    DisableHistogramGUIElements();
   }
   else
   {
-    m_Controls->groupBox->setEnabled(true);
-    m_Controls->groupBox_3->setEnabled(true);
-    m_Controls->m_barRadioButton->setChecked(true);
+    EnableHistogramGUIElements();
+    ResetHistogramGUIElementsToDefault();
   }
   if(selectedNodes.size() == 1 || selectedNodes.size() == 2)
   {
@@ -463,11 +455,7 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     isBinary |= isLabelSet->CheckNode(selectedNodes.value(0));
     if(isBinary)
     {
-      m_Controls->m_lineRadioButton->setEnabled(true);
-      m_Controls->m_barRadioButton->setEnabled(true);
-      m_Controls->m_HistogramNBinsSpinbox->setEnabled(true);
-      m_Controls->m_HistogramNBinsCaptionLabel->setEnabled(true);
-      m_Controls->m_UseDefaultNBinsCheckBox->setEnabled(true);
+      EnableHistogramGUIElements();
       m_Controls->m_InfoLabel->setText("");
     }
     for (int i= 0; i< selectedNodes.size(); ++i)
@@ -483,6 +471,34 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   {
     this->m_DataNodeSelectionChanged = false;
   }
+}
+
+void QmitkImageStatisticsView::DisableHistogramGUIElements()
+{
+  m_Controls->m_InfoLabel->setText("");
+  m_Controls->groupBox_histogram->setEnabled(false);
+  m_Controls->groupBox_statistics->setEnabled(false);
+}
+
+void QmitkImageStatisticsView::ResetHistogramGUIElementsToDefault()
+{
+  m_Controls->m_barRadioButton->setChecked(true);
+  m_Controls->m_HistogramNBinsSpinbox->setValue(100);
+  m_HistogramNBins = m_Controls->m_HistogramNBinsSpinbox->value();
+  m_Controls->m_UseDefaultNBinsCheckBox->setChecked(true);
+  m_Controls->m_ShowSubchartCheckBox->setChecked(true);
+  m_Controls->m_BinSizeFrame->setEnabled(false);
+  m_Controls->m_barRadioButton->setEnabled(true);
+  m_Controls->m_lineRadioButton->setEnabled(true);
+  m_Controls->m_HistogramNBinsSpinbox->setEnabled(true);
+  this->m_CalculationThread->SetHistogramNBins(m_Controls->m_HistogramNBinsSpinbox->value());
+}
+
+void QmitkImageStatisticsView::EnableHistogramGUIElements()
+{
+  m_Controls->groupBox_histogram->setEnabled(true);
+  m_Controls->groupBox_plot->setEnabled(true);
+  m_Controls->groupBox_statistics->setEnabled(true);
 }
 
 void QmitkImageStatisticsView::ReinitData()
@@ -648,11 +664,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
       m_CurrentStatisticsValid = false;
       this->m_StatisticsUpdatePending = false;
-      m_Controls->m_lineRadioButton->setEnabled(true);
-      m_Controls->m_barRadioButton->setEnabled(true);
-      m_Controls->m_HistogramNBinsSpinbox->setEnabled(true);
-      m_Controls->m_HistogramNBinsCaptionLabel->setEnabled(true);
-      m_Controls->m_UseDefaultNBinsCheckBox->setEnabled(true);
+      this->DisableHistogramGUIElements();
       m_Controls->m_InfoLabel->setText("");
       return;
     }
@@ -820,10 +832,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
   //Disconnect OnLineRadioButtonSelected() to prevent reloading chart when radiobutton is checked programmatically
   disconnect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), 0, 0);
   connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnPageSuccessfullyLoaded()));
-  m_Controls->m_lineRadioButton->setEnabled(true);
-  m_Controls->m_barRadioButton->setEnabled(true);
-  m_Controls->m_HistogramNBinsSpinbox->setEnabled(true);
-  m_Controls->m_HistogramNBinsCaptionLabel->setEnabled(true);
   m_Controls->m_InfoLabel->setText("");
 
   if (m_DataNodeSelectionChanged)
@@ -892,7 +900,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
           m_Controls->m_lineRadioButton->setEnabled(false);
           m_Controls->m_barRadioButton->setEnabled(false);
           m_Controls->m_HistogramNBinsSpinbox->setEnabled(false);
-          m_Controls->m_HistogramNBinsCaptionLabel->setEnabled(false);
+          m_Controls->m_BinSizeFrame->setEnabled(false);
           m_Controls->m_UseDefaultNBinsCheckBox->setEnabled(false);
 
           //Reconnect OnLineRadioButtonSelected()
@@ -918,10 +926,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
           m_Controls->m_ErrorMessageLabel->hide();
           m_Controls->m_SelectedMaskLabel->setText("None");
           this->m_StatisticsUpdatePending = false;
-          m_Controls->m_lineRadioButton->setEnabled(true);
-          m_Controls->m_barRadioButton->setEnabled(true);
-          m_Controls->m_HistogramNBinsSpinbox->setEnabled(true);
-          m_Controls->m_HistogramNBinsCaptionLabel->setEnabled(true);
           if (!outOfBounds)
             m_Controls->m_InfoLabel->setText("");
           return;

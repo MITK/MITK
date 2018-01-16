@@ -135,6 +135,13 @@ protected:
   void SelectedDataModified();
   /** \brief  Method called when the data manager selection changes */
   void SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes);
+
+  void DisableHistogramGUIElements();
+
+  void ResetHistogramGUIElementsToDefault();
+
+  void EnableHistogramGUIElements();
+
   /** \brief  Method called to remove old selection when a new selection is present */
   void ReinitData();
   /** \brief  writes the statistics to the gui*/

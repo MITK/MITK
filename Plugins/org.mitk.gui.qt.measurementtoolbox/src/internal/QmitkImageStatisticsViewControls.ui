@@ -521,6 +521,9 @@
             </item>
             <item row="1" column="1">
              <widget class="QSpinBox" name="m_HistogramNBinsSpinbox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="toolTip">
                <string>Press enter to recalculate statistics with new bin size.</string>
               </property>

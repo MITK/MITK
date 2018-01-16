@@ -817,7 +817,7 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
 
 void QmitkImageStatisticsView::OnHistogramNBinsCheckBoxValueChanged()
 {
-    if (m_Controls->m_HistogramNBinsSpinbox->value() != m_HistogramNBins)
+    if (static_cast<unsigned int>(m_Controls->m_HistogramNBinsSpinbox->value()) != m_HistogramNBins)
     {
       m_HistogramNBins = m_Controls->m_HistogramNBinsSpinbox->value();
         this->m_CalculationThread->SetHistogramNBins(m_Controls->m_HistogramNBinsSpinbox->value());
@@ -944,7 +944,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
         m_Controls->m_UseDefaultNBinsCheckBox->setEnabled(true);
         m_Controls->m_JSHistogram->Show(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
-        auto currentTime = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
         this->FillStatisticsTableView(this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
       }
       m_CurrentStatisticsValid = true;

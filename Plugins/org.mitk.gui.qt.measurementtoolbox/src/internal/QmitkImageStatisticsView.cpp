@@ -48,7 +48,6 @@ const int QmitkImageStatisticsView::STAT_TABLE_BASE_HEIGHT = 180;
 
 QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const char* /*name*/)
 : m_Controls( nullptr ),
-  m_TimeStepperAdapter( nullptr ),
   m_SelectedImage( nullptr ),
   m_SelectedImageMask( nullptr ),
   m_SelectedPlanarFigure( nullptr ),

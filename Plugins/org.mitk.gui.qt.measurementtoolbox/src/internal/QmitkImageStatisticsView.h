@@ -35,8 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
 are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
-of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the
-gui accessable during calculation.
+of an image and a Planar Figure. The statistics calculation is realized in a separate thread to keep the
+gui accessible during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
@@ -45,13 +45,8 @@ class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecyc
   Q_OBJECT
 
 private:
-
   /*!
   \  Convenient typedefs */
-  typedef mitk::DataStorage::SetOfObjects  ConstVector;
-  typedef ConstVector::ConstPointer        ConstVectorPointer;
-  typedef ConstVector::ConstIterator       ConstVectorIterator;
-  typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer > ImageStatisticsMapType;
   typedef QList<mitk::DataNode*> SelectedDataNodeVectorType;
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
 
@@ -160,10 +155,6 @@ protected:
   std::vector<QString> m_PlanarFigureStatistics;
   QmitkImageStatisticsCalculationThread* m_CalculationThread;
 
-  QmitkStepperAdapter*      m_TimeStepperAdapter;
-  unsigned int              m_CurrentTime;
-  QString                   m_Clipboard;
-
   // Image and mask data
   mitk::Image* m_SelectedImage;
   mitk::Image* m_SelectedImageMask;
@@ -179,7 +170,6 @@ protected:
 
   bool m_CurrentStatisticsValid;
   bool m_StatisticsUpdatePending;
-  bool m_StatisticsIntegrationPending;
   bool m_DataNodeSelectionChanged;
   bool m_Visible;
 

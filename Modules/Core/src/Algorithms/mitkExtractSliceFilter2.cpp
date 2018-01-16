@@ -46,102 +46,102 @@ mitk::ExtractSliceFilter2::Impl::~Impl()
 {
 }
 
+template <typename TInputImage>
+void CreateInterpolateImageFunction(const TInputImage* inputImage, mitk::ExtractSliceFilter2::Impl* impl)
+{
+  typename itk::InterpolateImageFunction<TInputImage>::Pointer interpolateImageFunction;
+
+  switch (impl->Interpolator)
+  {
+    case mitk::ExtractSliceFilter2::NearestNeighbor:
+      interpolateImageFunction = itk::NearestNeighborInterpolateImageFunction<TInputImage>::New().GetPointer();
+      break;
+
+    case mitk::ExtractSliceFilter2::Linear:
+      interpolateImageFunction = itk::LinearInterpolateImageFunction<TInputImage>::New().GetPointer();
+      break;
+
+    case mitk::ExtractSliceFilter2::Cubic:
+    {
+      auto bSplineInterpolateImageFunction = itk::BSplineInterpolateImageFunction<TInputImage>::New();
+      bSplineInterpolateImageFunction->SetSplineOrder(2);
+      interpolateImageFunction = bSplineInterpolateImageFunction.GetPointer();
+      break;
+    }
+
+    default:
+      mitkThrow() << "Interplator is unknown.";
+  }
+
+  interpolateImageFunction->SetInputImage(inputImage);
+
+  impl->InterpolateImageFunction = interpolateImageFunction.GetPointer();
+}
+
+template <typename TPixel, unsigned int VImageDimension>
+void GenerateData(const itk::Image<TPixel, VImageDimension>* inputImage, const mitk::ExtractSliceFilter2::Impl* impl, const mitk::ExtractSliceFilter2::OutputImageRegionType& outputRegion)
+{
+  typedef itk::Image<TPixel, VImageDimension> TInputImage;
+  typedef itk::InterpolateImageFunction<TInputImage> TInterpolateImageFunction;
+
+  auto outputImage = impl->OutputImage;
+  auto outputGeometry = impl->OutputGeometry;
+  auto interpolateImageFunction = static_cast<TInterpolateImageFunction*>(impl->InterpolateImageFunction.GetPointer());
+
+  auto origin = outputGeometry->GetOrigin();
+  auto spacing = outputGeometry->GetSpacing();
+  auto xDirection = outputGeometry->GetAxisVector(0);
+  auto yDirection = outputGeometry->GetAxisVector(1);
+
+  xDirection.Normalize();
+  yDirection.Normalize();
+
+  auto spacingAlongXDirection = xDirection * spacing[0];
+  auto spacingAlongYDirection = yDirection * spacing[1];
+
+  origin -= spacingAlongXDirection * 0.5;
+  origin -= spacingAlongYDirection * 0.5;
+
+  const std::size_t pixelSize = outputImage->GetPixelType().GetSize();
+  const std::size_t height = outputGeometry->GetExtent(1);
+  const std::size_t xBegin = outputRegion.GetIndex(0);
+  const std::size_t yBegin = outputRegion.GetIndex(1);
+  const std::size_t xEnd = xBegin + outputRegion.GetSize(0);
+  const std::size_t yEnd = yBegin + outputRegion.GetSize(1);
+
+  mitk::ImageWriteAccessor writeAccess(outputImage, nullptr, mitk::ImageAccessorBase::IgnoreLock);
+  auto data = static_cast<char*>(writeAccess.GetData());;
+
+  const TPixel backgroundPixel = std::numeric_limits<TPixel>::lowest();
+  TPixel pixel;
+
+  itk::ContinuousIndex<mitk::ScalarType, 3> index;
+  mitk::Point3D yPoint;
+  mitk::Point3D point;
+
+  for (std::size_t y = yBegin; y < yEnd; ++y)
+  {
+    yPoint = origin + spacingAlongYDirection * y;
+
+    for (std::size_t x = xBegin; x < xEnd; ++x)
+    {
+      point = yPoint + spacingAlongXDirection * x;
+
+      if (inputImage->TransformPhysicalPointToContinuousIndex(point, index))
+      {
+        pixel = interpolateImageFunction->EvaluateAtContinuousIndex(index);
+        memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&pixel), pixelSize);
+      }
+      else
+      {
+        memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&backgroundPixel), pixelSize);
+      }
+    }
+  }
+}
+
 namespace
 {
-  template <typename TInputImage>
-  void CreateInterpolateImageFunction(const TInputImage* inputImage, mitk::ExtractSliceFilter2::Impl* impl)
-  {
-    typename itk::InterpolateImageFunction<TInputImage>::Pointer interpolateImageFunction;
-
-    switch (impl->Interpolator)
-    {
-      case mitk::ExtractSliceFilter2::NearestNeighbor:
-        interpolateImageFunction = itk::NearestNeighborInterpolateImageFunction<TInputImage>::New().GetPointer();
-        break;
-
-      case mitk::ExtractSliceFilter2::Linear:
-        interpolateImageFunction = itk::LinearInterpolateImageFunction<TInputImage>::New().GetPointer();
-        break;
-
-      case mitk::ExtractSliceFilter2::Cubic:
-      {
-        auto bSplineInterpolateImageFunction = itk::BSplineInterpolateImageFunction<TInputImage>::New();
-        bSplineInterpolateImageFunction->SetSplineOrder(2);
-        interpolateImageFunction = bSplineInterpolateImageFunction.GetPointer();
-        break;
-      }
-
-      default:
-        mitkThrow() << "Interplator is unknown.";
-    }
-
-    interpolateImageFunction->SetInputImage(inputImage);
-
-    impl->InterpolateImageFunction = interpolateImageFunction.GetPointer();
-  }
-
-  template <typename TPixel, unsigned int VImageDimension>
-  void GenerateData(const itk::Image<TPixel, VImageDimension>* inputImage, const mitk::ExtractSliceFilter2::Impl* impl, const mitk::ExtractSliceFilter2::OutputImageRegionType& outputRegion)
-  {
-    typedef itk::Image<TPixel, VImageDimension> TInputImage;
-    typedef itk::InterpolateImageFunction<TInputImage> TInterpolateImageFunction;
-
-    auto outputImage = impl->OutputImage;
-    auto outputGeometry = impl->OutputGeometry;
-    auto interpolateImageFunction = static_cast<TInterpolateImageFunction*>(impl->InterpolateImageFunction.GetPointer());
-
-    auto origin = outputGeometry->GetOrigin();
-    auto spacing = outputGeometry->GetSpacing();
-    auto xDirection = outputGeometry->GetAxisVector(0);
-    auto yDirection = outputGeometry->GetAxisVector(1);
-
-    xDirection.Normalize();
-    yDirection.Normalize();
-
-    auto spacingAlongXDirection = xDirection * spacing[0];
-    auto spacingAlongYDirection = yDirection * spacing[1];
-
-    origin -= spacingAlongXDirection * 0.5;
-    origin -= spacingAlongYDirection * 0.5;
-
-    const std::size_t pixelSize = outputImage->GetPixelType().GetSize();
-    const std::size_t height = outputGeometry->GetExtent(1);
-    const std::size_t xBegin = outputRegion.GetIndex(0);
-    const std::size_t yBegin = outputRegion.GetIndex(1);
-    const std::size_t xEnd = xBegin + outputRegion.GetSize(0);
-    const std::size_t yEnd = yBegin + outputRegion.GetSize(1);
-
-    mitk::ImageWriteAccessor writeAccess(outputImage, nullptr, mitk::ImageAccessorBase::IgnoreLock);
-    auto data = static_cast<char*>(writeAccess.GetData());;
-
-    const TPixel backgroundPixel = std::numeric_limits<TPixel>::lowest();
-    TPixel pixel;
-
-    itk::ContinuousIndex<mitk::ScalarType, 3> index;
-    mitk::Point3D yPoint;
-    mitk::Point3D point;
-
-    for (std::size_t y = yBegin; y < yEnd; ++y)
-    {
-      yPoint = origin + spacingAlongYDirection * y;
-
-      for (std::size_t x = xBegin; x < xEnd; ++x)
-      {
-        point = yPoint + spacingAlongXDirection * x;
-
-        if (inputImage->TransformPhysicalPointToContinuousIndex(point, index))
-        {
-          pixel = interpolateImageFunction->EvaluateAtContinuousIndex(index);
-          memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&pixel), pixelSize);
-        }
-        else
-        {
-          memcpy(static_cast<void*>(data + pixelSize * (height * y + x)), static_cast<const void*>(&backgroundPixel), pixelSize);
-        }
-      }
-    }
-  }
-
   void VerifyInputImage(const mitk::Image* inputImage)
   {
     auto dimension = inputImage->GetDimension();

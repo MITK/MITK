@@ -25,18 +25,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 
 // mitk includes
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkPlanarFigureInteractor.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkPlanarFigureInteractor.h>
+#include <mitkImageTimeSelector.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkChartWidget.h>
+#include <mitkImageCast.h>
 
 // itk includes
 #include "itksys/SystemTools.hxx"
-
-#include <mitkImageCast.h>
-
 #include "itkImageRegionConstIteratorWithIndex.h"
 
 #include <limits>

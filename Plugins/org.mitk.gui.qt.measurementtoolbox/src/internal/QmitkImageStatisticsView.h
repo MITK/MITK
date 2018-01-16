@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk includes
 #include <QmitkAbstractView.h>
-#include "QmitkStepperAdapter.h"
+#include <QmitkStepperAdapter.h>
 #include "QmitkImageStatisticsCalculationThread.h"
 #include <berryIPartListener.h>
 
 // mitk includes
-#include "mitkILifecycleAwarePart.h"
-#include "mitkPlanarLine.h"
+#include <mitkILifecycleAwarePart.h>
+#include <mitkPlanarLine.h>
 #include <mitkIntensityProfile.h>
 
 #include <berryIPreferences.h>

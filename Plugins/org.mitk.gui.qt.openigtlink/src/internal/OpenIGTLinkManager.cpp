@@ -55,9 +55,6 @@ void OpenIGTLinkManager::CreateQtPartControl( QWidget *parent )
            SIGNAL(IGTLDeviceSourceSelected(mitk::IGTLDeviceSource::Pointer)),
            this,
            SLOT(SourceSelected(mitk::IGTLDeviceSource::Pointer)) );
-  connect(m_Controls.checkBoxLogMessages, SIGNAL(clicked()), this, SLOT(LogMessagesClicked()));
-
-  logMessages = m_Controls.checkBoxLogMessages->isChecked();
 }
 
 
@@ -66,15 +63,6 @@ void OpenIGTLinkManager::NewSourceByWidget(
 {
   source->RegisterAsMicroservice(/*sourceName*/);
   m_AllSourcesHandledByThisWidget.push_back(source);
-}
-
-void OpenIGTLinkManager::LogMessagesClicked()
-{
-  logMessages = m_Controls.checkBoxLogMessages->isChecked();
-  if(m_CurrentIGTLDevice.IsNotNull())
-    m_CurrentIGTLDevice->SetLogMessages(logMessages);
-  else
-    MITK_WARN << "Logging information not passed down to Message Provider.";
 }
 
 void OpenIGTLinkManager::SourceSelected(
@@ -87,7 +75,6 @@ void OpenIGTLinkManager::SourceSelected(
   }
 
   m_CurrentIGTLDevice = source->GetIGTLDevice();
-  m_CurrentIGTLDevice->SetLogMessages(logMessages);
   this->m_Controls.m_SourceManagerWidget->LoadSource(source);
 
   //check if the current selected source is also a message provider

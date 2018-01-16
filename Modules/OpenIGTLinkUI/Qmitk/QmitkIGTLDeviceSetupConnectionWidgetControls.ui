@@ -104,15 +104,15 @@
    <item row="5" column="0">
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
-      <widget class="QCheckBox" name="logIncomingMsg">
+      <widget class="QCheckBox" name="logMessageDetailsCheckBox">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>Enable this checkbox to log the send and receive message events</string>
+        <string>Enable/Disable the logging of incoming and outgoing messages in detail</string>
        </property>
        <property name="text">
-        <string>Log Incoming Messages</string>
+        <string>Log Message Details</string>
        </property>
       </widget>
      </item>
@@ -141,12 +141,15 @@
       </layout>
      </item>
      <item row="0" column="1">
-      <widget class="QCheckBox" name="logOutgoingMsg">
+      <widget class="QCheckBox" name="logMessageStatusCheckBox">
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>Enable/Disable the logging of short status messages (i.e.: Sent/received message).</string>
+       </property>
        <property name="text">
-        <string>Log Outgoing Messages</string>
+        <string>Log Short Status Messages</string>
        </property>
       </widget>
      </item>

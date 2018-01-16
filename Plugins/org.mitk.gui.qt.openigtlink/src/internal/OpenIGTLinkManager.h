@@ -50,7 +50,6 @@ class OpenIGTLinkManager : public QmitkAbstractView
   public slots:
     void NewSourceByWidget(mitk::IGTLDeviceSource::Pointer source, std::string);
     void SourceSelected(mitk::IGTLDeviceSource::Pointer source);
-    void LogMessagesClicked();
 
   protected:
 
@@ -67,8 +66,6 @@ class OpenIGTLinkManager : public QmitkAbstractView
      * objects will be lost although they are listed as microservice.
      */
     std::vector<mitk::IGTLDeviceSource::Pointer> m_AllSourcesHandledByThisWidget;
-
-    bool logMessages;
 
     mitk::IGTLDevice::Pointer m_CurrentIGTLDevice;
 };

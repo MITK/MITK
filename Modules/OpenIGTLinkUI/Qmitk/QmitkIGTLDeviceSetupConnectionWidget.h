@@ -106,6 +106,11 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWi
     void OnUpdateFPSLabel();
 
     /**
+    * \brief Enables/Disables the detailed logging of incoming/outgoing messages
+    */
+    void OnLogMessageDetailsCheckBoxClicked();
+
+    /**
     * \brief Enables/Disables the buffering of incoming messages
     */
     void OnBufferIncomingMessages(int state);

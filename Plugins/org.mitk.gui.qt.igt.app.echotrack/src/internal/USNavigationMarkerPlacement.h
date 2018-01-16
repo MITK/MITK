@@ -152,15 +152,11 @@ protected:
   * \brief Helper function which performs a reinit on the ultrasound image.
   */
   void ReinitOnImage();
+
   /**
   * \brief Sets the multiwidget to two windows, axial on top and 3D render window on the bottom.
   */
   virtual void SetTwoWindowView();
-
-  /**
-  * \brief Helper function for being able to serialize the 2d ultrasound image.
-  */
-  void Convert2DImagesTo3D(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
   /**
   * \brief Helper function for being able to serialize the 2d ultrasound image.

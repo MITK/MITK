@@ -46,6 +46,8 @@ namespace mitk
     void SetInterpolator(Interpolator interpolator);
 
   private:
+    using Superclass::SetInput;
+
     ExtractSliceFilter2();
     ~ExtractSliceFilter2() override;
 

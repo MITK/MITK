@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExtractSliceFilter2.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImageAccessByItk.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
@@ -24,26 +25,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 
+struct mitk::ExtractSliceFilter2::Impl
+{
+  Impl();
+  ~Impl();
+
+  mitk::Image* OutputImage;
+  PlaneGeometry::Pointer OutputGeometry;
+  mitk::ExtractSliceFilter2::Interpolator Interpolator;
+  itk::Object::Pointer InterpolateImageFunction;
+};
+
+mitk::ExtractSliceFilter2::Impl::Impl()
+  : OutputImage(nullptr),
+  Interpolator(NearestNeighbor)
+{
+}
+
+mitk::ExtractSliceFilter2::Impl::~Impl()
+{
+}
+
 namespace
 {
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable: 4996)
-#endif
-
-  char* GetData(mitk::Image* image)
-  {
-    return static_cast<char*>(image->GetData());
-  }
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
-
   template <typename TInputImage>
   void CreateInterpolateImageFunction(const TInputImage* inputImage, mitk::ExtractSliceFilter2::Impl* impl)
   {
-    itk::InterpolateImageFunction<TInputImage>::Pointer interpolateImageFunction;
+    typename itk::InterpolateImageFunction<TInputImage>::Pointer interpolateImageFunction;
 
     switch (impl->Interpolator)
     {
@@ -103,7 +111,8 @@ namespace
     const std::size_t xEnd = xBegin + outputRegion.GetSize(0);
     const std::size_t yEnd = yBegin + outputRegion.GetSize(1);
 
-    auto data = GetData(outputImage);
+    mitk::ImageWriteAccessor writeAccess(outputImage, nullptr, mitk::ImageAccessorBase::IgnoreLock);
+    auto data = static_cast<char*>(writeAccess.GetData());;
 
     const TPixel backgroundPixel = std::numeric_limits<TPixel>::lowest();
     TPixel pixel;
@@ -165,27 +174,6 @@ namespace
   }
 }
 
-struct mitk::ExtractSliceFilter2::Impl
-{
-  Impl();
-  ~Impl();
-
-  mitk::Image* OutputImage;
-  PlaneGeometry::Pointer OutputGeometry;
-  Interpolator Interpolator;
-  itk::Object::Pointer InterpolateImageFunction;
-};
-
-mitk::ExtractSliceFilter2::Impl::Impl()
-  : OutputImage(nullptr),
-    Interpolator(NearestNeighbor)
-{
-}
-
-mitk::ExtractSliceFilter2::Impl::~Impl()
-{
-}
-
 mitk::ExtractSliceFilter2::ExtractSliceFilter2()
   : m_Impl(new Impl)
 {
@@ -205,7 +193,7 @@ void mitk::ExtractSliceFilter2::AllocateOutputs()
 
   outputImage->Initialize(pixelType, 1, *outputGeometry);
 
-  auto data = new char[pixelType.GetSize() * outputGeometry->GetExtent(0) * outputGeometry->GetExtent(1)];
+  auto data = new char[static_cast<std::size_t>(pixelType.GetSize() * outputGeometry->GetExtent(0) * outputGeometry->GetExtent(1))];
 
   try
   {
@@ -227,7 +215,7 @@ void mitk::ExtractSliceFilter2::BeforeThreadedGenerateData()
   AccessFixedDimensionByItk_1(inputImage, CreateInterpolateImageFunction, 3, m_Impl);
 }
 
-void mitk::ExtractSliceFilter2::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, itk::ThreadIdType threadId)
+void mitk::ExtractSliceFilter2::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, itk::ThreadIdType)
 {
   m_Impl->OutputImage = this->GetOutput();
 

@@ -518,9 +518,7 @@ void QmitkImageStatisticsView::ReinitData()
 
 void QmitkImageStatisticsView::OnThreadedStatisticsCalculationEnds()
 {
-  std::stringstream message;
-  message << "";
-  m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+  m_Controls->m_ErrorMessageLabel->setText("");
   m_Controls->m_ErrorMessageLabel->hide();
   this->WriteStatisticsToGUI();
 }
@@ -594,9 +592,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     }
     else
     {
-      std::stringstream message;
-      message << "<font color='red'>" << "Invalid data node type!" << "</font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText("<font color='red'>Invalid data node type!</font>");
       m_Controls->m_ErrorMessageLabel->show();
     }
   }
@@ -645,9 +641,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     // cannot be calculated currently.
     if ( m_SelectedImage->GetPixelType().GetNumberOfComponents() > 1 )
     {
-      std::stringstream message;
-      message << "<font color='red'>Multi-component images not supported.</font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText( "<font color='red'>Multi-component images not supported.</font>" );
       m_Controls->m_ErrorMessageLabel->show();
 
       this->InvalidateStatisticsTableView();
@@ -721,9 +715,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
       if ( empty )
       {
-        std::stringstream message;
-        message << "<font color='red'>Empty segmentation mask selected...</font>";
-        m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+        m_Controls->m_ErrorMessageLabel->setText( "<font color='red'>Empty segmentation mask selected...</font>" );
         m_Controls->m_ErrorMessageLabel->show();
 
         return;
@@ -735,9 +727,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     this->m_CalculationThread->Initialize( m_SelectedImage, m_SelectedImageMask, m_SelectedPlanarFigure );
     this->m_CalculationThread->SetTimeStep( timeStep );
 
-    std::stringstream message;
-    message << "<font color='red'>Calculating statistics...</font>";
-    m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+    m_Controls->m_ErrorMessageLabel->setText("<font color='red'>Calculating statistics...</font>");
     m_Controls->m_ErrorMessageLabel->show();
 
     try
@@ -747,18 +737,14 @@ void QmitkImageStatisticsView::UpdateStatistics()
     }
     catch ( const mitk::Exception& e)
     {
-      std::stringstream message;
-      message << "<font color='red'>" << e.GetDescription() << "</font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText("<font color='red'>" + QString(e.GetDescription()) + "</font>");
       m_Controls->m_ErrorMessageLabel->show();
       this->m_StatisticsUpdatePending = false;
     }
     catch ( const std::runtime_error &e )
     {
       // In case of exception, print error message on GUI
-      std::stringstream message;
-      message << "<font color='red'>" << e.what() << "</font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText("<font color='red'>" + QString(e.what()) + "</font>");
       m_Controls->m_ErrorMessageLabel->show();
       this->m_StatisticsUpdatePending = false;
     }
@@ -767,9 +753,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       MITK_ERROR << "Caught exception: " << e.what();
 
       // In case of exception, print error message on GUI
-      std::stringstream message;
-      message << "<font color='red'>Error! Unequal Dimensions of Image and Segmentation. No recompute possible </font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText("<font color='red'>" + QString(e.what()) + "</font>");
       m_Controls->m_ErrorMessageLabel->show();
       this->m_StatisticsUpdatePending = false;
     }

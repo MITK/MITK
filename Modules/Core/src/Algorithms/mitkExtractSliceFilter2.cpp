@@ -98,9 +98,6 @@ namespace
     auto spacingAlongXDirection = xDirection * spacing[0];
     auto spacingAlongYDirection = yDirection * spacing[1];
 
-    origin -= spacingAlongXDirection * 0.5;
-    origin -= spacingAlongYDirection * 0.5;
-
     const std::size_t pixelSize = outputImage->GetPixelType().GetSize();
     const std::size_t width = outputGeometry->GetExtent(0);
     const std::size_t xBegin = outputRegion.GetIndex(0);

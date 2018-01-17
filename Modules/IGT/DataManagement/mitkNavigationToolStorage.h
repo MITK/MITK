@@ -131,7 +131,7 @@ namespace mitk {
     /**
      * @return Returns the number of tools stored in the storage.
      */
-    int GetToolCount();
+    unsigned int GetToolCount();
 
     /**
      * @return Returns true if the storage is empty, false if not.

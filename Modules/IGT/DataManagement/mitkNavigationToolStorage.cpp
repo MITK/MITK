@@ -156,17 +156,17 @@ mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(int number)
 
 mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(std::string identifier)
 {
-  for (int i = 0; i < GetToolCount(); i++) if ((GetTool(i)->GetIdentifier()) == identifier) return GetTool(i);
+  for (unsigned int i = 0; i < GetToolCount(); i++) if ((GetTool(i)->GetIdentifier()) == identifier) return GetTool(i);
   return nullptr;
 }
 
 mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetToolByName(std::string name)
 {
-  for (int i = 0; i < GetToolCount(); i++) if ((GetTool(i)->GetToolName()) == name) return GetTool(i);
+  for (unsigned int i = 0; i < GetToolCount(); i++) if ((GetTool(i)->GetToolName()) == name) return GetTool(i);
   return nullptr;
 }
 
-int mitk::NavigationToolStorage::GetToolCount()
+unsigned int mitk::NavigationToolStorage::GetToolCount()
 {
   return m_ToolCollection.size();
 }

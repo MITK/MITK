@@ -38,7 +38,7 @@ mitk::TrackingDeviceSourceConfigurator::TrackingDeviceSourceConfigurator(mitk::N
 if (NavigationTools.IsNotNull())
   {
   m_NavigationTools = mitk::NavigationToolStorage::New();
-  for (int i=0; i<NavigationTools->GetToolCount(); i++)
+  for (unsigned int i=0; i<NavigationTools->GetToolCount(); i++)
       {
       m_NavigationTools->AddTool(NavigationTools->GetTool(i));
       }
@@ -73,7 +73,7 @@ else if (m_TrackingDevice.IsNull())
   }
 else
   {
-  for (int i=0; i<m_NavigationTools->GetToolCount(); i++)
+  for (unsigned int i=0; i<m_NavigationTools->GetToolCount(); i++)
     {
     if (m_NavigationTools->GetTool(i)->GetTrackingDeviceType() != m_TrackingDevice->GetType())
       {

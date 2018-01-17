@@ -90,7 +90,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
   try
   {
     mitk::NavigationToolStorage::Pointer tempStorage = m_TrackingDevice->AutoDetectTools();
-    for (int i = 0; i < tempStorage->GetToolCount(); i++) { autoDetectedStorage->AddTool(tempStorage->GetTool(i)); }
+    for (unsigned int i = 0; i < tempStorage->GetToolCount(); i++) { autoDetectedStorage->AddTool(tempStorage->GetTool(i)); }
   }
   catch (mitk::Exception& e)
   {
@@ -185,7 +185,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
   }
   //remember the original colors of the tools
   m_OriginalColors = std::map<mitk::DataNode::Pointer, mitk::Color>();
-  for (int i = 0; i < this->m_NavigationToolStorage->GetToolCount(); i++)
+  for (unsigned int i = 0; i < this->m_NavigationToolStorage->GetToolCount(); i++)
   {
     mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
     float c[3];
@@ -213,7 +213,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
   }
 
   //restore the original colors of the tools
-  for (int i = 0; i < this->m_NavigationToolStorage->GetToolCount(); i++)
+  for (unsigned int i = 0; i < this->m_NavigationToolStorage->GetToolCount(); i++)
   {
     mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
     if (m_OriginalColors.find(currentToolNode) == m_OriginalColors.end())

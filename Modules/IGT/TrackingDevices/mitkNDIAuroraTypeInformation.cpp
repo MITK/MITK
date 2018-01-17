@@ -95,19 +95,25 @@ namespace mitk
 
     //now search for automatically detected tools in the tool storage and save them
     mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();
-    std::vector<int> alreadyFoundTools = std::vector<int>();
+    std::vector<unsigned int> alreadyFoundTools = std::vector<unsigned int>();
     *toolCorrespondencesInToolStorage = std::vector<int>();
     for (unsigned int i = 0; i < thisDevice->GetToolCount(); i++)
     {
       bool toolFound = false;
-      for (int j = 0; j < navigationTools->GetToolCount(); j++)
+      for (unsigned int j = 0; j < navigationTools->GetToolCount(); j++)
       {
         //check if the serial number is the same to identify the tool
         if ((dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i)))->GetSerialNumber() == navigationTools->GetTool(j)->GetSerialNumber())
         {
           //check if this tool was already added to make sure that every tool is only added once (in case of same serial numbers)
           bool toolAlreadyAdded = false;
-          for (unsigned int k = 0; k < alreadyFoundTools.size(); k++) if (alreadyFoundTools.at(k) == j) toolAlreadyAdded = true;
+          for (unsigned int k = 0; k < alreadyFoundTools.size(); k++)
+          {
+            if (alreadyFoundTools.at(k) == j)
+            {
+              toolAlreadyAdded = true;
+            }
+          }
 
           if (!toolAlreadyAdded)
           {
@@ -134,7 +140,7 @@ namespace mitk
     }
 
     //And resort them (this was done in TrackingToolBoxWorker before).
-    for (int i = 0; i < newToolStorageInRightOrder->GetToolCount(); i++)
+    for (unsigned int i = 0; i < newToolStorageInRightOrder->GetToolCount(); i++)
     {
       navigationTools->AssignToolNumber(newToolStorageInRightOrder->GetTool(i)->GetIdentifier(), i);
     }

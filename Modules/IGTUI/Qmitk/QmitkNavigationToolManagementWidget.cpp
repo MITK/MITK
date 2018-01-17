@@ -198,7 +198,7 @@ void QmitkNavigationToolManagementWidget::OnMoveToolDown()
       if (currentNavigationTool.IsNotNull())
       {
         std::string currentIdentifier = currentNavigationTool->GetIdentifier();
-        int NewNumber = m_Controls->m_ToolList->currentIndex().row() + 1;
+        unsigned int NewNumber = m_Controls->m_ToolList->currentIndex().row() + 1;
         if (NewNumber >= m_NavigationToolStorage->GetToolCount()) { MITK_WARN << "Cannot move tool down because it is the last tool in this storage!"; }
         else { m_NavigationToolStorage->AssignToolNumber(currentIdentifier, NewNumber); }
         UpdateToolTable();
@@ -382,7 +382,7 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
 {
   m_Controls->m_ToolList->clear();
   if (m_NavigationToolStorage.IsNull()) return;
-  for (int i = 0; i < m_NavigationToolStorage->GetToolCount(); i++)
+  for (unsigned int i = 0; i < m_NavigationToolStorage->GetToolCount(); i++)
   {
     QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetToolName().c_str()) + " ";
 

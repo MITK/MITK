@@ -59,6 +59,9 @@ public:
   LegendPosition GetLegendPosition() const;
   std::string GetLegendPositionAsString() const;
 
+  void SetShowLegend(bool show);
+  bool GetShowLegend() const;
+
   void SetShowDataPoints(bool showDataPoints = false);
   bool GetShowDataPoints() const;
 
@@ -286,6 +289,14 @@ std::string QmitkChartWidget::Impl::GetLegendPositionAsString() const {
   return GetC3Data()->GetLegendPosition().toString().toStdString();
 }
 
+void QmitkChartWidget::Impl::SetShowLegend(bool show) {
+  GetC3Data()->SetShowLegend(show);
+}
+
+bool QmitkChartWidget::Impl::GetShowLegend() const {
+  return GetC3Data()->GetShowLegend().toBool();
+}
+
 void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints) {
   if (showDataPoints == true) {
     GetC3Data()->SetDataPointSize(3);
@@ -453,6 +464,16 @@ void QmitkChartWidget::SetLegendPosition(LegendPosition position)
 QmitkChartWidget::LegendPosition QmitkChartWidget::GetLegendPosition() const
 {
   return m_Impl->GetLegendPosition();
+}
+
+void QmitkChartWidget::SetShowLegend(bool show)
+{
+  m_Impl->SetShowLegend(show);
+}
+
+bool QmitkChartWidget::GetShowLegend() const
+{
+  return m_Impl->GetShowLegend();
 }
 
 void QmitkChartWidget::Show(bool showSubChart)

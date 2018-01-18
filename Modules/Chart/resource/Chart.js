@@ -160,7 +160,7 @@ function GenerateChart(chartData)
     },
     legend: {
         position: chartData.m_LegendPosition,
-		show: true
+		show: chartData.m_ShowLegend
     },
     grid: {
       y: {

@@ -146,6 +146,9 @@ public:
   void SetLegendPosition(LegendPosition position);
   LegendPosition GetLegendPosition() const;
 
+  void SetShowLegend(bool show);
+  bool GetShowLegend() const;
+
   /*!
   * \brief Changes the chart type for all data entries and reloads the chart
   */

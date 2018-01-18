@@ -137,6 +137,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(DeleteTrackingHandler()) );
     connect( m_Controls->m_OutputProbMap, SIGNAL(stateChanged(int)), this, SLOT(OutputStyleSwitched()) );
 
+    connect( m_Controls->m_SeedImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_TargetImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
@@ -166,8 +167,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FrontalSamplesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_LoopCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_LoopCheckBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
 
     StartStopTrackingGui(false);
   }
@@ -240,6 +241,7 @@ void QmitkStreamlineTrackingView::AfterThread()
         GetDataStorage()->Add(m_InteractiveNode);
       }
       m_InteractiveNode->SetData(fib);
+      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
 
       if (auto renderWindowPart = this->GetRenderWindowPart())
           renderWindowPart->RequestUpdate();
@@ -252,6 +254,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       name += m_ParentNode->GetName().c_str();
       name += "_Streamline";
       node->SetName(name.toStdString());
+      node->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
       GetDataStorage()->Add(node, m_ParentNode);
     }
   }
@@ -279,6 +282,7 @@ void QmitkStreamlineTrackingView::AfterThread()
       lut_prop->SetLookupTable(lut);
       m_InteractiveNode->SetProperty("LookupTable", lut_prop);
       m_InteractiveNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+      m_InteractiveNode->SetFloatProperty("Fiber2DSliceThickness", m_Tracker->GetMinVoxelSize()/2);
 
       if (auto renderWindowPart = this->GetRenderWindowPart())
           renderWindowPart->RequestUpdate();
@@ -347,6 +351,7 @@ void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 
 void QmitkStreamlineTrackingView::OnParameterChanged()
 {
+  MITK_INFO << "UPDATE";
   if (m_Controls->m_InteractiveBox->isChecked() && m_Controls->m_ParamUpdateBox->isChecked())
     DoFiberTracking();
 }

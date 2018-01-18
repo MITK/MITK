@@ -507,9 +507,9 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
 
 float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool front)
 {
-  if (fib->size()<3)
+  if (fib->size()<8)
     return 0;
-  float m_Distance = m_MinVoxelSize*4;
+  float m_Distance = std::max(m_MinVoxelSize*4, m_StepSize*8);
   float dist = 0;
 
   std::vector< vnl_vector_fixed< float, 3 > > vectors;
@@ -544,11 +544,9 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
 
   for (unsigned int c=0; c<vectors.size(); c++)
   {
-    float angle = dot_product(meanV, vectors.at(c));
+    float angle = std::fabs(dot_product(meanV, vectors.at(c)));
     if (angle>1.0)
       angle = 1.0;
-    if (angle<-1.0)
-      angle = -1.0;
     dev += acos(angle)*180/M_PI;
   }
   if (vectors.size()>0)

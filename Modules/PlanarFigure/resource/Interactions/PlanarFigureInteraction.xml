@@ -60,6 +60,13 @@
   </state>
 
   <state name="PlaceFigure">
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Start" >
+      <condition name="figure_is_single_point" />
+      <condition name="figure_is_editable" />
+      <action name="add_initial_point" ID="11" />
+      <action name="finalize_figure" />
+    </transition>
+  
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" >
       <condition name="figure_is_editable" />
       <action name="add_initial_point" ID="11" /> <!-- AcADD -->

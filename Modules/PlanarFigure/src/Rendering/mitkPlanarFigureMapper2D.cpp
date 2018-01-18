@@ -275,6 +275,13 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
   const mitk::BaseRenderer * renderer)
 {
   const auto numberOfPolyLines = figure->GetPolyLinesSize();
+
+  // In case there is no polylines, anchor point should be set to the first point
+  if (numberOfPolyLines < 1 && figure->GetNumberOfControlPoints() > 0) {
+    this->TransformObjectToDisplay( figure->GetControlPoint(0), anchorPoint,
+      planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
+  }
+
   for ( auto loop=0; loop<numberOfPolyLines ; ++loop )
   {
     const auto polyline = figure->GetPolyLine(loop);

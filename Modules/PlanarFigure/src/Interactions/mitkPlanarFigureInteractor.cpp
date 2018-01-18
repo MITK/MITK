@@ -59,6 +59,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("points_can_be_added_or_removed", CheckFigureIsExtendable);
   CONNECT_CONDITION("figure_can_be_deleted", CheckFigureIsDeletable);
   CONNECT_CONDITION("figure_is_editable", CheckFigureIsEditable);
+  CONNECT_CONDITION("figure_is_single_point", CheckFigureIsSinglePoint);
 
 
   CONNECT_FUNCTION( "finalize_figure", FinalizeFigure);
@@ -248,6 +249,10 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsEditable(const InteractionEvent*
   return isEditable;
 }
 
+bool mitk::PlanarFigureInteractor::CheckFigureIsSinglePoint(const InteractionEvent* /*interactionEvent*/) {
+  const mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure*>(GetDataNode()->GetData());
+  return planarFigure->GetNumberOfControlPoints() < 2;
+}
 
 void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {

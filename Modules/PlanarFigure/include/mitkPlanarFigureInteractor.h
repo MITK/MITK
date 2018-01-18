@@ -105,6 +105,8 @@ protected:
 
   bool CheckFigureIsEditable( const InteractionEvent* interactionEvent );
 
+  bool CheckFigureIsSinglePoint(const InteractionEvent* interactionEvent);
+
 
   ////////  Actions ////////
 

@@ -102,7 +102,7 @@ namespace mitk {
     /**
     * \brief Setter for mouse mode
     */
-    void SelectMouseMode( MouseMode mode );
+    void SelectMouseMode( MouseMode mode, const std::string& button = "Left");
 
     /**
     * \brief Returns the current mouse mode

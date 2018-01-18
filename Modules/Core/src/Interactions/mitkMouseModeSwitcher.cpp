@@ -104,7 +104,7 @@ void mitk::MouseModeSwitcher::SetSelectionMode(bool selection)
   }
 }
 
-void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
+void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode, const std::string& button)
 {
   if (m_ActiveInteractionScheme != MITK)
     return;
@@ -114,30 +114,35 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
   {
   case MousePointer:
   {
-    eventConfig = "DisplayConfigMITK.xml";
+    eventConfig = "DisplayConfigMITK";
     break;
   } // case 0
   case Scroll:
   {
-    eventConfig = "DisplayConfigPACSScroll.xml";
+    eventConfig = "DisplayConfigScroll";
     break;
   }
   case LevelWindow:
   {
-    eventConfig = "DisplayConfigPACSLevelWindow.xml";
+    eventConfig = "DisplayConfigLevelWindow";
     break;
   }
   case Zoom:
   {
-    eventConfig = "DisplayConfigPACSZoom.xml";
+    eventConfig = "DisplayConfigZoom";
     break;
   }
   case Pan:
   {
-    eventConfig = "DisplayConfigPACSPan.xml";
+    eventConfig = "DisplayConfigPan";
     break;
   }
   } // end switch (mode)
+
+  if (eventConfig != "DisplayConfigMITK") {
+    eventConfig = eventConfig + button;
+  }
+  eventConfig = eventConfig + ".xml";
 
   if (!eventConfig.empty()) {
     for (auto observer : m_Observers) {

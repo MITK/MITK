@@ -115,6 +115,7 @@ public:
   itkSetMacro( StopTracking, bool )
   itkSetMacro( InterpolateMask, bool )
   itkSetMacro( TrialsPerSeed, unsigned int )          ///< When using probabilistic tractography, each seed point is used N times until a valid streamline that is compliant with all thresholds etc. is found
+  itkGetMacro( MinVoxelSize, float)
 
   ///< Use manually defined points in physical space as seed points instead of seed image
   void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {

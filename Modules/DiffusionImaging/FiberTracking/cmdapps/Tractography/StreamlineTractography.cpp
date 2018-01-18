@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle/probability map", us::Any(), false);
 
   parser.addArgument("stop_image", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
-  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "streamlines not starting and ending in one of the regions in this image are discarded", us::Any());
+  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "a streamline is only considered valid if it starts and ends in the target and seed region region. without seed region, both endpoints need to be located in the target region", us::Any());
   parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
   parser.addArgument("seed_image", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
 
@@ -76,8 +76,8 @@ int main(int argc, char* argv[])
   parser.addArgument("angular_threshold", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold between two successive steps, (default: 90° * step_size)");
   parser.addArgument("min_tract_length", "", mitkCommandLineParser::Float, "Min. tract length:", "minimum fiber length (in mm)", 20);
   parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
-  parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded.", -1);
-  parser.addArgument("trials_per_seed", "", mitkCommandLineParser::Int, "Max. trials per seed:", "Try each seed N times until a valid streamline is obtained (only for probabilistic).", 10);
+  parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded", -1);
+  parser.addArgument("trials_per_seed", "", mitkCommandLineParser::Int, "Max. trials per seed:", "try each seed N times until a valid streamline is obtained (only for probabilistic)", 10);
   parser.addArgument("loop_check", "", mitkCommandLineParser::Float, "Check for loops:", "threshold on angular stdev over the last 4 voxel lengths", -1);
 
   parser.addArgument("num_samples", "", mitkCommandLineParser::Int, "Num. neighborhood samples:", "number of neighborhood samples that are use to determine the next progression direction", 0);

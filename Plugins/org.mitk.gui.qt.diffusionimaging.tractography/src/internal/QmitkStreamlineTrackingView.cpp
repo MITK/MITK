@@ -166,6 +166,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FrontalSamplesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_LoopCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
 
     StartStopTrackingGui(false);
   }
@@ -518,6 +520,15 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->m_ForestBox->setEnabled(false);
   m_Controls->m_ForestLabel->setEnabled(false);
   m_Controls->commandLinkButton->setEnabled(false);
+  m_Controls->m_TrialsPerSeedBox->setEnabled(false);
+  m_Controls->m_TrialsPerSeedLabel->setEnabled(false);
+
+  // trials per seed are only important for probabilistic tractography
+  if (m_Controls->m_ModeBox->currentIndex()==1)
+  {
+    m_Controls->m_TrialsPerSeedBox->setEnabled(true);
+    m_Controls->m_TrialsPerSeedLabel->setEnabled(true);
+  }
 
   if(!m_InputImageNodes.empty())
   {
@@ -825,10 +836,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   m_Tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
   m_Tracker->SetUseStopVotes(m_Controls->m_StopVotesBox->isChecked());
   m_Tracker->SetOnlyForwardSamples(m_Controls->m_FrontalSamplesBox->isChecked());
-  m_Tracker->SetAposterioriCurvCheck(false);
+  m_Tracker->SetTrialsPerSeed(m_Controls->m_TrialsPerSeedBox->value());
   m_Tracker->SetMaxNumTracts(m_Controls->m_NumFibersBox->value());
   m_Tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
   m_Tracker->SetTrackingHandler(m_TrackingHandler);
+  m_Tracker->SetLoopCheck(m_Controls->m_LoopCheckBox->value());
   m_Tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
   m_Tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
   m_Tracker->SetUseOutputProbabilityMap(m_Controls->m_OutputProbMap->isChecked());

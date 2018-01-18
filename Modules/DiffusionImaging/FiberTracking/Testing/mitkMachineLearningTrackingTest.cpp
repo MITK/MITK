@@ -90,7 +90,6 @@ public:
         tracker->SetMinTractLength(20);
         tracker->SetMaxTractLength(400);
         tracker->SetTrackingHandler(tfh);
-        tracker->SetAposterioriCurvCheck(false);
         tracker->SetAvoidStop(true);
         tracker->SetSamplingDistance(0.5);
         tracker->SetRandomSampling(false);

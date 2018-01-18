@@ -22,10 +22,10 @@ Select the data you want to track on in the datamanager. Supported file types ar
 
 Optional Input:
 
-\li Binary mask used to define the seed voxels. If no seed mask is specified, the whole image volume is seeded.
-\li Binary mask used to constrain the generated streamlines. Streamlines can not leave the mask area.
+\li Mask used to define the seed voxels. If no seed mask is specified, the whole image volume is seeded.
+\li Mask used to constrain the generated streamlines. Streamlines can not leave the mask area.
+\li Mask to define the target region. A streamline is only considered valid if it starts and ends in the target and seed region region. Without seed region, both endpoints need to be located in the target region.
 \li Binary mask used to define stopping regions. Streamlines that enter the mask area are stopped immediately.
-\li Tissue label image needed for gray matter seeding (WM=3, GM=1). Use e.g. MRtrix 5ttgen to generate such a label image.
 \li FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
 \li Tractography Forest: Needed for machine learning based tractography [1].
 
@@ -47,6 +47,8 @@ When "Update on Parameter Change" is checked, each parameter change causes an in
 \li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
 \li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 \li Min. Tract Length: Shorter fibers are discarded.
+\li Loop Check: Stop streamline if the threshold on the angular stdev over the last 4 voxel lengths is exceeded. -1 = no loop check.
+\li Trials Per Seed: Try each seed N times until a valid streamline is obtained (only for probabilistic tractography).
 \li f and g values to balance between FACT [2] and TEND [3,4] tracking (only for tensor based tractography). For further information please refer to [2,3]
 \li Flip directions: Internally flips progression directions. This might be necessary depending on the input data.
 \li Enable Trilinear Interpolation: By default the image values are interpolated. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.

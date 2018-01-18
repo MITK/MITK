@@ -45,7 +45,6 @@ QmitkDenoisingView::QmitkDenoisingView()
   : QmitkAbstractView()
   , m_Controls( 0 )
   , m_ImageNode(nullptr)
-  , m_SelectedFilter(TV)
 {
 }
 
@@ -63,22 +62,16 @@ void QmitkDenoisingView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkDenoisingViewControls;
     m_Controls->setupUi( parent );
 
-    m_Controls->m_SelectFilterComboBox->clear();
-    m_Controls->m_SelectFilterComboBox->insertItem(TV, "Total-variation filter");
-    m_Controls->m_SelectFilterComboBox->insertItem(GAUSS, "Discrete gaussian filter");
-    m_Controls->m_SelectFilterComboBox->insertItem(NLM, "Non-local means filter");
-//    m_Controls->m_SelectFilterComboBox->insertItem(NLM_MORITZ, "Non-local means filter");
-
     connect( (QObject*)(m_Controls->m_ApplyButton), SIGNAL(clicked()), this, SLOT(StartDenoising()));
-    connect( (QObject*)(m_Controls->m_SelectFilterComboBox), SIGNAL(activated(int)), this, SLOT(UpdateGui(int)));
-    connect( (QObject*)(m_Controls->m_InputImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui(int)));
+    connect( (QObject*)(m_Controls->m_SelectFilterComboBox), SIGNAL(activated(int)), this, SLOT(UpdateGui()));
+    connect( (QObject*)(m_Controls->m_InputImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
 
 
     m_Controls->m_InputImageBox->SetDataStorage(this->GetDataStorage());
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
     m_Controls->m_InputImageBox->SetPredicate( isImagePredicate );
 
-    UpdateGui(0);
+    UpdateGui();
   }
 }
 
@@ -112,9 +105,9 @@ void QmitkDenoisingView::StartDenoising()
   mitk::Image::Pointer denoised_image = nullptr;
   mitk::DataNode::Pointer denoised_image_node = mitk::DataNode::New();
 
-  switch (m_SelectedFilter)
+  switch (m_Controls->m_SelectFilterComboBox->currentIndex())
   {
-  case TV:
+  case 0:
   {
     ComposeFilterType::Pointer composer = ComposeFilterType::New();
     for (unsigned int i=0; i<itkVectorImagePointer->GetVectorLength(); ++i)
@@ -136,7 +129,7 @@ void QmitkDenoisingView::StartDenoising()
     denoised_image_node->SetName( "TotalVariation" );
     break;
   }
-  case GAUSS:
+  case 1:
   {
     ExtractFilterType::Pointer extractor = ExtractFilterType::New();
     extractor->SetInput( itkVectorImagePointer );
@@ -156,7 +149,7 @@ void QmitkDenoisingView::StartDenoising()
     denoised_image_node->SetName( "Gauss" );
     break;
   }
-  case NLM:
+  case 2:
   {
     typedef itk::Statistics::GaussianRandomSpatialNeighborSubsampler< NlmFilterType::PatchSampleType, DwiVolumeType::RegionType > SamplerType;
     // sampling the image to find similar patches
@@ -194,20 +187,6 @@ void QmitkDenoisingView::StartDenoising()
     denoised_image_node->SetName( "NLM" );
     break;
   }
-  case NLM_MORITZ:
-  {
-    NlmRicianFilterType::Pointer nlmFilter = NlmRicianFilterType::New();
-    nlmFilter->SetInputImage( itkVectorImagePointer );
-//    nlmFilter->SetUseRicianAdaption(m_Controls->m_RicianCheckbox->isChecked());
-//    nlmFilter->SetUseJointInformation(m_Controls->m_JointInformationCheckbox->isChecked());
-    nlmFilter->SetSearchRadius(m_Controls->m_NlmSearchRadiusBox->value());
-    nlmFilter->SetComparisonRadius(m_Controls->m_NlmPatchSizeBox->value());
-//    nlmFilter->SetVariance(m_Controls->m_NlmVarianceBox->value());
-    nlmFilter->Update();
-    denoised_image = mitk::GrabItkImageMemory(nlmFilter->GetOutput());
-    denoised_image_node->SetName( "NLM-Rician" );
-    break;
-  }
   }
 
   denoised_image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( input_image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
@@ -219,42 +198,29 @@ void QmitkDenoisingView::StartDenoising()
   GetDataStorage()->Add(denoised_image_node, m_ImageNode);
 }
 
-void QmitkDenoisingView::UpdateGui(int filter)
+void QmitkDenoisingView::UpdateGui()
 {
   m_Controls->m_ApplyButton->setEnabled(false);
   m_Controls->m_TvFrame->setVisible(false);
   m_Controls->m_NlmFrame->setVisible(false);
   m_Controls->m_GaussFrame->setVisible(false);
 
-  switch (filter)
+  switch (m_Controls->m_SelectFilterComboBox->currentIndex())
   {
   case 0:
   {
-    m_SelectedFilter = TV;
     m_Controls->m_TvFrame->setVisible(true);
     break;
   }
   case 1:
   {
-    m_SelectedFilter = GAUSS;
     m_Controls->m_GaussFrame->setVisible(true);
     break;
   }
   case 2:
   {
-    m_SelectedFilter = NLM;
     m_Controls->m_NlmFrame->setVisible(true);
     break;
-  }
-  case 3:
-  {
-    m_SelectedFilter = NLM_MORITZ;
-    m_Controls->m_NlmFrame->setVisible(true);
-    break;
-  }
-  default :
-  {
-    m_SelectedFilter = TV;
   }
   }
 

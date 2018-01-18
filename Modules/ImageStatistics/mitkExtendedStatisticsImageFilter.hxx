@@ -74,18 +74,15 @@ namespace itk
     case 12:
       {
         return RealObjectType::New().GetPointer();
-        break;
       }
     case 13:
     {
       return RealObjectType::New().GetPointer();
-      break;
     }
     default:
       {
         // might as well make an image
         return Superclass::MakeOutput( output );
-        break;
       }
     }
   }

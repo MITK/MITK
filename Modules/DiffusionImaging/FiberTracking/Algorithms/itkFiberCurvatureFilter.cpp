@@ -25,8 +25,9 @@ namespace itk{
 
 FiberCurvatureFilter::FiberCurvatureFilter()
     : m_AngularDeviation(30)
-    , m_Distance(5.0)
+    , m_Distance(10.0)
     , m_RemoveFibers(false)
+    , m_UseMedian(false)
 {
 
 }
@@ -84,8 +85,10 @@ void FiberCurvatureFilter::GenerateData()
                 dist += v.magnitude();
                 v.normalize();
                 vectors.push_back(v);
-                if (c==j)
+                if (m_UseMedian && c==j)
                     meanV += v;
+                else if (!m_UseMedian)
+                  meanV += v;
                 c--;
             }
             c = j;
@@ -99,8 +102,10 @@ void FiberCurvatureFilter::GenerateData()
                 dist += v.magnitude();
                 v.normalize();
                 vectors.push_back(v);
-                if (c==j)
+                if (m_UseMedian && c==j)
                     meanV += v;
+                else if (!m_UseMedian)
+                  meanV += v;
                 c++;
             }
             meanV.normalize();

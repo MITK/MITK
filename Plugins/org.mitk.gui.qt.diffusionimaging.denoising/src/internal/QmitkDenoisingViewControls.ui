@@ -67,7 +67,23 @@
        <widget class="QmitkDataStorageComboBox" name="m_InputImageBox"/>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="m_SelectFilterComboBox"/>
+       <widget class="QComboBox" name="m_SelectFilterComboBox">
+        <item>
+         <property name="text">
+          <string>Total-variation</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Discrete Gaussian</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Non-local means</string>
+         </property>
+        </item>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="m_DwiLabel_2">

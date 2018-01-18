@@ -113,6 +113,7 @@ public:
         filter->SetAngularDeviation(30);
         filter->SetDistance(5);
         filter->SetRemoveFibers(false);
+        filter->SetUseMedian(true);
         filter->Update();
         mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/remove_curvature1.fib")).front().GetPointer());
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(filter->GetOutputFiberBundle()));
@@ -128,6 +129,7 @@ public:
         filter->SetAngularDeviation(30);
         filter->SetDistance(5);
         filter->SetRemoveFibers(true);
+        filter->SetUseMedian(true);
         filter->Update();
         mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/remove_curvature2.fib")).front().GetPointer());
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(filter->GetOutputFiberBundle()));

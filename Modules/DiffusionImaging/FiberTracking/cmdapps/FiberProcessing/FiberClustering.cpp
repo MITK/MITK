@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
   parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "");
   parser.addArgument("scalar_map", "", mitkCommandLineParser::String, "Scalar map:", "");
   parser.addArgument("parcellation", "", mitkCommandLineParser::String, "Parcellation:", "");
+  parser.addArgument("file_ending", "", mitkCommandLineParser::String, "File ending:", "");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -107,6 +108,10 @@ int main(int argc, char* argv[])
   std::string parcellation = "";
   if (parsedArgs.count("parcellation"))
     parcellation = us::any_cast<std::string>(parsedArgs["parcellation"]);
+
+  std::string file_ending = ".fib";
+  if (parsedArgs.count("file_ending"))
+    file_ending = us::any_cast<std::string>(parsedArgs["file_ending"]);
 
   try
   {
@@ -200,10 +205,10 @@ int main(int argc, char* argv[])
     unsigned int c = 0;
     for (auto f : tracts)
     {
-      mitk::IOUtil::Save(f, out_root + "Cluster_" + boost::lexical_cast<std::string>(c) + ".fib");
+      mitk::IOUtil::Save(f, out_root + "Cluster_" + boost::lexical_cast<std::string>(c) + file_ending);
 
       if (output_centroids)
-        mitk::IOUtil::Save(centroids.at(c), out_root + "Centroid_" + boost::lexical_cast<std::string>(c) + ".fib");
+        mitk::IOUtil::Save(centroids.at(c), out_root + "Centroid_" + boost::lexical_cast<std::string>(c) + file_ending);
       ++c;
     }
     std::cout.rdbuf (old);              // <-- restore

@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkPointShell.h"
 #include <itkRescaleIntensityImageFilter.h>
 #include <boost/lexical_cast.hpp>
+#include <TrackingHandlers/mitkTrackingDataHandler.h>
 #include <TrackingHandlers/mitkTrackingHandlerOdf.h>
 #include <TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <TrackingHandlers/mitkTrackingHandlerTensor.h>
@@ -53,6 +54,7 @@ StreamlineTrackingFilter
   , m_SeedImage(nullptr)
   , m_MaskImage(nullptr)
   , m_OutputProbabilityMap(nullptr)
+  , m_MinVoxelSize(-1)
   , m_AngularThresholdDeg(-1)
   , m_StepSizeVox(-1)
   , m_SamplingDistanceVox(-1)
@@ -72,7 +74,7 @@ StreamlineTrackingFilter
   , m_NumPreviousDirections(1)
   , m_MaxNumTracts(-1)
   , m_Verbose(true)
-  , m_AposterioriCurvCheck(false)
+  , m_LoopCheck(-1)
   , m_DemoMode(false)
   , m_Random(true)
   , m_UseOutputProbabilityMap(false)
@@ -80,6 +82,7 @@ StreamlineTrackingFilter
   , m_Progress(0)
   , m_StopTracking(false)
   , m_InterpolateMask(true)
+  , m_TrialsPerSeed(10)
 {
   this->SetNumberOfRequiredInputs(0);
 }
@@ -108,34 +111,33 @@ void StreamlineTrackingFilter::BeforeTracking()
 
   itk::Vector< double, 3 > imageSpacing = m_TrackingHandler->GetSpacing();
 
-  float minSpacing;
   if(imageSpacing[0]<imageSpacing[1] && imageSpacing[0]<imageSpacing[2])
-    minSpacing = imageSpacing[0];
+    m_MinVoxelSize = imageSpacing[0];
   else if (imageSpacing[1] < imageSpacing[2])
-    minSpacing = imageSpacing[1];
+    m_MinVoxelSize = imageSpacing[1];
   else
-    minSpacing = imageSpacing[2];
+    m_MinVoxelSize = imageSpacing[2];
 
   if (m_StepSizeVox<mitk::eps)
-    m_StepSize = 0.5*minSpacing;
+    m_StepSize = 0.5*m_MinVoxelSize;
   else
-    m_StepSize = m_StepSizeVox*minSpacing;
+    m_StepSize = m_StepSizeVox*m_MinVoxelSize;
 
   if (m_AngularThresholdDeg<0)
   {
-    if  (m_StepSize/minSpacing<=1.0)
-      m_AngularThreshold = std::cos( 0.5 * M_PI * m_StepSize/minSpacing );
+    if  (m_StepSize/m_MinVoxelSize<=0.966)  // minimum 15° for automatic estimation
+      m_AngularThreshold = std::cos( 0.5 * M_PI * m_StepSize/m_MinVoxelSize );
     else
-      m_AngularThreshold = std::cos( 0.5 * M_PI );
+      m_AngularThreshold = std::cos( 0.5 * M_PI * 0.966 );
   }
   else
     m_AngularThreshold = std::cos( m_AngularThresholdDeg*M_PI/180.0 );
   m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
 
   if (m_SamplingDistanceVox<mitk::eps)
-    m_SamplingDistance = minSpacing*0.25;
+    m_SamplingDistance = m_MinVoxelSize*0.25;
   else
-    m_SamplingDistance = m_SamplingDistanceVox * minSpacing;
+    m_SamplingDistance = m_SamplingDistanceVox * m_MinVoxelSize;
 
   m_PolyDataContainer.clear();
   for (unsigned int i=0; i<this->GetNumberOfThreads(); i++)
@@ -242,19 +244,23 @@ void StreamlineTrackingFilter::BeforeTracking()
   if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::MODE::DETERMINISTIC)
     std::cout << "StreamlineTracking - Mode: deterministic" << std::endl;
   else if(m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::MODE::PROBABILISTIC)
+  {
     std::cout << "StreamlineTracking - Mode: probabilistic" << std::endl;
+    std::cout << "StreamlineTracking - Trials per seed: " << m_TrialsPerSeed << std::endl;
+  }
   else
     std::cout << "StreamlineTracking - Mode: ???" << std::endl;
 
   std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/M_PI << "°)" << std::endl;
-  std::cout << "StreamlineTracking - Stepsize: " << m_StepSize << "mm (" << m_StepSize/minSpacing << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Stepsize: " << m_StepSize << "mm (" << m_StepSize/m_MinVoxelSize << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
   std::cout << "StreamlineTracking - Max. tract length: " << m_MaxTractLength << "mm" << std::endl;
   std::cout << "StreamlineTracking - Min. tract length: " << m_MinTractLength << "mm" << std::endl;
   std::cout << "StreamlineTracking - Max. num. tracts: " << m_MaxNumTracts << std::endl;
+  std::cout << "StreamlineTracking - Loop check: " << m_LoopCheck << "°" << std::endl;
 
   std::cout << "StreamlineTracking - Num. neighborhood samples: " << m_NumberOfSamples << std::endl;
-  std::cout << "StreamlineTracking - Max. sampling distance: " << m_SamplingDistance << "mm (" << m_SamplingDistance/minSpacing << "*vox)" << std::endl;
+  std::cout << "StreamlineTracking - Max. sampling distance: " << m_SamplingDistance << "mm (" << m_SamplingDistance/m_MinVoxelSize << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Deflection modifier: " << m_DeflectionMod << std::endl;
 
   std::cout << "StreamlineTracking - Use stop votes: " << m_UseStopVotes << std::endl;
@@ -432,7 +438,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
 }
 
 
-float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front)
+float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, DirectionContainer* container, float tractLength, bool front)
 {
   vnl_vector_fixed<float,3> zero_dir; zero_dir.fill(0.0);
   std::deque< vnl_vector_fixed<float,3> > last_dirs;
@@ -449,38 +455,27 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
 
     // is new position inside of image and mask
     if (m_AbortTracking)   // if not end streamline
-    {
       return tractLength;
-    }
-    else    // if yes, add new point to streamline
+
+    // if yes, add new point to streamline
+    dir.normalize();
+    if (front)
     {
-      tractLength +=  m_StepSize;
-      if (front)
-        fib->push_front(pos);
-      else
-        fib->push_back(pos);
-
-      if (m_AposterioriCurvCheck)
-      {
-        int curv = CheckCurvature(fib, front);
-        if (curv>0)
-        {
-          tractLength -= m_StepSize*curv;
-          while (curv>0)
-          {
-            if (front)
-              fib->pop_front();
-            else
-              fib->pop_back();
-            curv--;
-          }
-          return tractLength;
-        }
-      }
-
-      if (tractLength>m_MaxTractLength)
-        return tractLength;
+      fib->push_front(pos);
+      container->push_front(dir);
     }
+    else
+    {
+      fib->push_back(pos);
+      container->push_back(dir);
+    }
+    tractLength +=  m_StepSize;
+
+    if (m_LoopCheck>=0 && CheckCurvature(container, front)>m_LoopCheck)
+      return tractLength;
+
+    if (tractLength>m_MaxTractLength)
+      return tractLength;
 
     if (m_DemoMode && !m_UseOutputProbabilityMap) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
     {
@@ -496,7 +491,6 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
       }
     }
 
-    dir.normalize();
     last_dirs.push_back(dir);
     if (last_dirs.size()>m_NumPreviousDirections)
       last_dirs.pop_front();
@@ -511,54 +505,38 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
 }
 
 
-int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
+float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool front)
 {
-  float m_Distance = 5;
   if (fib->size()<3)
     return 0;
-
+  float m_Distance = m_MinVoxelSize*4;
   float dist = 0;
+
   std::vector< vnl_vector_fixed< float, 3 > > vectors;
   vnl_vector_fixed< float, 3 > meanV; meanV.fill(0);
   float dev = 0;
 
   if (front)
   {
-    int c=0;
+    int c = 0;
     while(dist<m_Distance && c<(int)fib->size()-1)
     {
-      itk::Point<float> p1 = fib->at(c);
-      itk::Point<float> p2 = fib->at(c+1);
-
-      vnl_vector_fixed< float, 3 > v;
-      v[0] = p2[0]-p1[0];
-      v[1] = p2[1]-p1[1];
-      v[2] = p2[2]-p1[2];
-      dist += v.magnitude();
-      v.normalize();
+      dist += m_StepSize;
+      vnl_vector_fixed< float, 3 > v = fib->at(c);
       vectors.push_back(v);
-      if (c==0)
-        meanV += v;
+      meanV += v;
       c++;
     }
   }
   else
   {
-    int c=fib->size()-1;
-    while(dist<m_Distance && c>0)
+    int c = fib->size()-1;
+    while(dist<m_Distance && c>=0)
     {
-      itk::Point<float> p1 = fib->at(c);
-      itk::Point<float> p2 = fib->at(c-1);
-
-      vnl_vector_fixed< float, 3 > v;
-      v[0] = p2[0]-p1[0];
-      v[1] = p2[1]-p1[1];
-      v[2] = p2[2]-p1[2];
-      dist += v.magnitude();
-      v.normalize();
+      dist += m_StepSize;
+      vnl_vector_fixed< float, 3 > v = fib->at(c);
       vectors.push_back(v);
-      if (c==(int)fib->size()-1)
-        meanV += v;
+      meanV += v;
       c--;
     }
   }
@@ -576,10 +554,7 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
   if (vectors.size()>0)
     dev /= vectors.size();
 
-  if (dev<30)
-    return 0;
-  else
-    return vectors.size();
+  return dev;
 }
 
 void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
@@ -640,8 +615,6 @@ void StreamlineTrackingFilter::GenerateData()
 #pragma omp parallel
   while (i<num_seeds && !m_StopTracking)
   {
-
-
     int temp_i = 0;
 #pragma omp critical
     {
@@ -664,77 +637,88 @@ void StreamlineTrackingFilter::GenerateData()
     }
 
     const itk::Point<float> worldPos = m_SeedPoints.at(temp_i);
-    FiberType fib;
-    float tractLength = 0;
-    unsigned int counter = 0;
 
-    // get starting direction
-    vnl_vector_fixed<float,3> dir; dir.fill(0.0);
-    std::deque< vnl_vector_fixed<float,3> > olddirs;
-    while (olddirs.size()<m_NumPreviousDirections)
-      olddirs.push_back(dir); // start without old directions (only zero directions)
-
-    /// START DIR
-    //    vnl_vector_fixed< float, 3 > gm_start_dir;
-    //    if (m_ControlGmEndings)
-    //    {
-    //      gm_start_dir[0] = m_GmStubs[temp_i][1][0] - m_GmStubs[temp_i][0][0];
-    //      gm_start_dir[1] = m_GmStubs[temp_i][1][1] - m_GmStubs[temp_i][0][1];
-    //      gm_start_dir[2] = m_GmStubs[temp_i][1][2] - m_GmStubs[temp_i][0][2];
-    //      gm_start_dir.normalize();
-    //      olddirs.pop_back();
-    //      olddirs.push_back(gm_start_dir);
-    //    }
-
-    if (mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMask, m_MaskInterpolator))
-      dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex);
-
-    if (dir.magnitude()>0.0001)
+    for (unsigned int trials=0; trials<m_TrialsPerSeed; ++trials)
     {
+      FiberType fib;
+      DirectionContainer direction_container;
+      float tractLength = 0;
+      unsigned int counter = 0;
+
+      // get starting direction
+      vnl_vector_fixed<float,3> dir; dir.fill(0.0);
+      std::deque< vnl_vector_fixed<float,3> > olddirs;
+      while (olddirs.size()<m_NumPreviousDirections)
+        olddirs.push_back(dir); // start without old directions (only zero directions)
+
       /// START DIR
-      //      if (m_ControlGmEndings)
-      //      {
-      //        float a = dot_product(gm_start_dir, dir);
-      //        if (a<0)
-      //          dir = -dir;
-      //      }
+      //    vnl_vector_fixed< float, 3 > gm_start_dir;
+      //    if (m_ControlGmEndings)
+      //    {
+      //      gm_start_dir[0] = m_GmStubs[temp_i][1][0] - m_GmStubs[temp_i][0][0];
+      //      gm_start_dir[1] = m_GmStubs[temp_i][1][1] - m_GmStubs[temp_i][0][1];
+      //      gm_start_dir[2] = m_GmStubs[temp_i][1][2] - m_GmStubs[temp_i][0][2];
+      //      gm_start_dir.normalize();
+      //      olddirs.pop_back();
+      //      olddirs.push_back(gm_start_dir);
+      //    }
 
-      // forward tracking
-      tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
-      fib.push_front(worldPos);
+      if (mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMask, m_MaskInterpolator))
+        dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex);
 
-      // backward tracking (only if we don't explicitely start in the GM)
-      tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
-
-      counter = fib.size();
-
-      if (tractLength>=m_MinTractLength && counter>=2)
+      bool success = false;
+      if (dir.magnitude()>0.0001)
       {
-#pragma omp critical
-        if ( IsValidFiber(&fib) )
+        /// START DIR
+        //      if (m_ControlGmEndings)
+        //      {
+        //        float a = dot_product(gm_start_dir, dir);
+        //        if (a<0)
+        //          dir = -dir;
+        //      }
+
+        // forward tracking
+        tractLength = FollowStreamline(worldPos, dir, &fib, &direction_container, 0, false);
+        fib.push_front(worldPos);
+
+        // backward tracking (only if we don't explicitely start in the GM)
+        tractLength = FollowStreamline(worldPos, -dir, &fib, &direction_container, tractLength, true);
+
+        counter = fib.size();
+
+        if (tractLength>=m_MinTractLength && counter>=2)
         {
-          if (!m_StopTracking)
-          {
-            if (!m_UseOutputProbabilityMap)
-              m_Tractogram.push_back(fib);
-            else
-              FiberToProbmap(&fib);
-            m_CurrentTracts++;
-          }
-          if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
+#pragma omp critical
+          if ( IsValidFiber(&fib) )
           {
             if (!m_StopTracking)
             {
-              std::cout << "                                                                                                     \r";
-              MITK_INFO << "Reconstructed maximum number of tracts (" << m_CurrentTracts << "). Stopping tractography.";
+              if (!m_UseOutputProbabilityMap)
+                m_Tractogram.push_back(fib);
+              else
+                FiberToProbmap(&fib);
+              m_CurrentTracts++;
+              success = true;
             }
-            m_StopTracking = true;
+            if (m_MaxNumTracts > 0 && m_CurrentTracts>=static_cast<unsigned int>(m_MaxNumTracts))
+            {
+              if (!m_StopTracking)
+              {
+                std::cout << "                                                                                                     \r";
+                MITK_INFO << "Reconstructed maximum number of tracts (" << m_CurrentTracts << "). Stopping tractography.";
+              }
+              m_StopTracking = true;
+            }
           }
         }
       }
 
-    }
-  }
+      if (success || m_TrackingHandler->GetMode()!=mitk::TrackingDataHandler::PROBABILISTIC)
+        break;  // we only try one seed point multiple times if we use a probabilistic tracker and have not found a valid streamline yet
+
+    }// trials per seed
+
+  }// seed points
 
   this->AfterTracking();
 }

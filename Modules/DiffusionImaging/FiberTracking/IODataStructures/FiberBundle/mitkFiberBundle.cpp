@@ -687,8 +687,7 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool, bool normalize)
         dist += v.magnitude();
         v.normalize();
         vectors.push_back(v);
-        if (c==j)
-          meanV += v;
+        meanV += v;
         c--;
       }
       c = j;
@@ -707,8 +706,7 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool, bool normalize)
         dist += v.magnitude();
         v.normalize();
         vectors.push_back(v);
-        if (c==j)
-          meanV += v;
+        meanV += v;
         c++;
       }
       meanV.normalize();

@@ -416,6 +416,7 @@ void TractClusteringFilter::GenerateData()
   int max = clusters.size()-1;
   if (m_MaxClusters>0 && clusters.size()-1>m_MaxClusters)
     max = m_MaxClusters;
+  int skipped = 0;
   for (int i=clusters.size()-1; i>=0; --i)
   {
     Cluster c = clusters.at(i);
@@ -454,8 +455,12 @@ void TractClusteringFilter::GenerateData()
       centroid->SetFiberColors(255, 255, 255);
       m_OutCentroids.push_back(centroid);
     }
+    else
+    {
+      skipped++;
+    }
   }
-  MITK_INFO << "Final number of clusters: " << m_OutTractograms.size();
+  MITK_INFO << "Final number of clusters: " << m_OutTractograms.size() << " (discarded " << skipped << " clusters)";
 
   int w = 0;
   for (auto fib : m_OutTractograms)

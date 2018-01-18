@@ -825,7 +825,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   m_Tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
   m_Tracker->SetUseStopVotes(m_Controls->m_StopVotesBox->isChecked());
   m_Tracker->SetOnlyForwardSamples(m_Controls->m_FrontalSamplesBox->isChecked());
-  m_Tracker->SetAposterioriCurvCheck(false);
+  m_Tracker->SetTrialsPerSeed(m_Controls->m_TrialsPerSeedBox->value());
   m_Tracker->SetMaxNumTracts(m_Controls->m_NumFibersBox->value());
   m_Tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
   m_Tracker->SetTrackingHandler(m_TrackingHandler);

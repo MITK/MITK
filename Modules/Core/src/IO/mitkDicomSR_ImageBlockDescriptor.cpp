@@ -186,7 +186,12 @@ void DicomSeriesReader::ImageBlockDescriptor::SetPixelSpacingInformation(const s
   m_ImagerPixelSpacing = imagerPixelSpacing;
 }
 
-void DicomSeriesReader::ImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY) const
+void DicomSeriesReader::ImageBlockDescriptor::SetSliceThickness(const std::string& sliceThickness)
+{
+  m_SliceThickness = sliceThickness;
+}
+
+void DicomSeriesReader::ImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY, ScalarType& spacingZ) const
 {
   // preference for "in patient" pixel spacing
   if ( !DICOMStringToSpacing( m_PixelSpacing, spacingX, spacingY ) )
@@ -197,6 +202,9 @@ void DicomSeriesReader::ImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( S
       // last resort: invent something
       spacingX = spacingY = 1.0;
     }
+  }
+  if (!m_SliceThickness.empty()) {
+    spacingZ = atof( m_SliceThickness.c_str() );
   }
 }
 

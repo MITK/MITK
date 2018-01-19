@@ -249,7 +249,8 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsEditable(const InteractionEvent*
   return isEditable;
 }
 
-bool mitk::PlanarFigureInteractor::CheckFigureIsSinglePoint(const InteractionEvent* /*interactionEvent*/) {
+bool mitk::PlanarFigureInteractor::CheckFigureIsSinglePoint(const InteractionEvent* /*interactionEvent*/) 
+{
   const mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure*>(GetDataNode()->GetData());
   return planarFigure->GetNumberOfControlPoints() < 2;
 }

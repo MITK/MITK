@@ -185,6 +185,7 @@ protected:
   std::vector<mitk::Point3D>     m_WorldMinList;
   std::vector<mitk::Point3D>     m_WorldMaxList;
 
+  std::vector<double> m_IntensityProfileList;
   berry::IPreferences::Pointer m_StylePref;
 };
 #endif // QmitkImageStatisticsView_H__INCLUDED

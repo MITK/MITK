@@ -269,49 +269,41 @@ void QmitkImageStatisticsView::OnIgnoreZerosCheckboxClicked()
 
 void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
 {
-  if ( m_CurrentStatisticsValid && !( m_SelectedPlanarFigure != nullptr))
+  if (!m_CurrentStatisticsValid)
+  {
+    QApplication::clipboard()->clear();
+  }
+
+  if (m_SelectedPlanarFigure == nullptr)
   {
     const unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
     typedef mitk::ImageStatisticsCalculator::HistogramType HistogramType;
     const HistogramType *histogram = this->m_CalculationThread->GetTimeStepHistogram(t).GetPointer();
 
-    QString clipboard( "Measurement \t Frequency\n" );
-    for ( HistogramType::ConstIterator it = histogram->Begin();
-        it != histogram->End();
-        ++it )
+    QString clipboard("Measurement \t Frequency\n");
+    for (HistogramType::ConstIterator it = histogram->Begin();
+      it != histogram->End();
+      ++it)
     {
-      clipboard = clipboard.append( "%L1 \t %L2\n" )
-                    .arg( it.GetMeasurementVector()[0], 0, 'f', 2 )
-                    .arg( it.GetFrequency() );
+      clipboard = clipboard.append("%L1 \t %L2\n")
+        .arg(it.GetMeasurementVector()[0], 0, 'f', 2)
+        .arg(it.GetFrequency());
     }
 
     QApplication::clipboard()->setText(
-        clipboard, QClipboard::Clipboard );
+      clipboard, QClipboard::Clipboard);
   }
-  // If a (non-closed) PlanarFigure is selected, display a line profile widget
-  else if ( m_CurrentStatisticsValid && (m_SelectedPlanarFigure != nullptr ))
+  //If a (non-closed) PlanarFigure is selected, display a line profile widget
+  else if (m_SelectedPlanarFigure != nullptr)
   {
-    /*auto intensity = m_Controls->m_JSHistogram->GetFrequency();
-    auto pixel = m_Controls->m_JSHistogram->GetMeasurement();
-    QString clipboard( "Pixel \t Intensity\n" );
-    auto j = pixel.begin();
-    for (auto i = intensity.begin(); i < intensity.end(); i++)
+    QString clipboard("Pixel \t Intensity\n");
+    for (auto i = 0; i < m_IntensityProfileList.size(); i++)
     {
-      assert(j != pixel.end());
-      clipboard = clipboard.append( "%L1 \t %L2\n" )
-                        .arg( (*j).toString())
-                        .arg( (*i).toString());
-      j++;
+      clipboard =
+        clipboard.append("%L1 \t %L2\n").arg(QString::number(i)).arg(QString::number(m_IntensityProfileList.at(i)));
     }
-
-    QApplication::clipboard()->setText(
-        clipboard, QClipboard::Clipboard );
-    */
-  }
-  else
-  {
-    QApplication::clipboard()->clear();
+    QApplication::clipboard()->setText(clipboard, QClipboard::Clipboard);
   }
 }
 
@@ -828,7 +820,7 @@ void QmitkImageStatisticsView::OnHistogramNBinsCheckBoxValueChanged()
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
   m_Controls->m_JSHistogram->Clear();
-
+  m_IntensityProfileList.clear();
   //Disconnect OnLineRadioButtonSelected() to prevent reloading chart when radiobutton is checked programmatically
   disconnect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), 0, 0);
   connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnPageSuccessfullyLoaded()));
@@ -888,10 +880,10 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 
           mitk::IntensityProfile::ConstPointer intensityProfile = (mitk::IntensityProfile::ConstPointer)mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
 
-          auto intensityProfileList = ConvertIntensityProfileToVector(intensityProfile);
+          m_IntensityProfileList = ConvertIntensityProfileToVector(intensityProfile);
           auto lineDataLabel = "Intensity profile " + m_Controls->m_SelectedMaskLabel->text().toStdString();
           m_Controls->m_JSHistogram->SetChartType(lineDataLabel, QmitkChartWidget::ChartType::line);
-          m_Controls->m_JSHistogram->AddData1D(intensityProfileList, lineDataLabel);
+          m_Controls->m_JSHistogram->AddData1D(m_IntensityProfileList, lineDataLabel);
           m_Controls->m_JSHistogram->SetXAxisLabel("Distance");
           m_Controls->m_JSHistogram->SetYAxisLabel("Intensity");
           m_Controls->m_JSHistogram->Show(m_Controls->m_ShowSubchartCheckBox->isChecked());

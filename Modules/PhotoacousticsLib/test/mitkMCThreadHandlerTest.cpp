@@ -36,7 +36,6 @@ class mitkMCThreadHandlerTestSuite : public mitk::TestFixture
   MITK_TEST(testCorrectNumberOfPhotons);
   MITK_TEST(testCorrectNumberOfPhotonsWithUnevenPackageSize);
   MITK_TEST(testCorrectNumberOfPhotonsWithTooLargePackageSize);
-  MITK_TEST(testCorrectTimeMeasure);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -56,24 +55,6 @@ public:
     auto threadHandler2 = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, true);
 
     CPPUNIT_ASSERT(mitk::pa::Equal(threadHandler1, threadHandler2, 1e-6, true));
-  }
-
-  void testCorrectTimeMeasure()
-  {
-    for (int i = 0; i < 10; i++)
-    {
-      m_MonteCarloThreadHandler = mitk::pa::MonteCarloThreadHandler::New(m_NumberOrTime, true, false);
-      auto timeBefore = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-      long nextWorkPackage = 0;
-      while ((nextWorkPackage = m_MonteCarloThreadHandler->GetNextWorkPackage()) > 0)
-      {//Do nothing
-      }
-      auto timeAfter = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-
-      //Assert that the time error is less than 10% in a 500ms sample size
-      //This test might not be stable when on different machines.
-      CPPUNIT_ASSERT(std::labs((timeAfter - timeBefore) - m_NumberOrTime) <= 50);
-    }
   }
 
   void testCorrectNumberOfPhotons()

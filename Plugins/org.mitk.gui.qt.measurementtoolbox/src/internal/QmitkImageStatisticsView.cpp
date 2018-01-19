@@ -308,7 +308,7 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
   else if (m_SelectedPlanarFigure != nullptr)
   {
     QString clipboard("Pixel \t Intensity\n");
-    for (auto i = 0; i < m_IntensityProfileList.size(); i++)
+    for (unsigned int i = 0; i < m_IntensityProfileList.size(); i++)
     {
       clipboard =
         clipboard.append("%L1 \t %L2\n").arg(QString::number(i)).arg(QString::number(m_IntensityProfileList.at(i)));
@@ -1237,18 +1237,18 @@ std::map<double, double> QmitkImageStatisticsView::ConvertHistogramToMap(itk::St
 {
   std::map<double, double> histogramMap;
 
-	auto endIt = histogram->End();
-	auto it = histogram->Begin();
+  auto endIt = histogram->End();
+  auto it = histogram->Begin();
 
-	// generating Lists of measurement and frequencies
+  // generating Lists of measurement and frequencies
   for (; it != endIt; ++it)
-	{
+  {
     double frequency = it.GetFrequency();
     double measurement = it.GetMeasurementVector()[0];
     histogramMap.emplace(measurement, frequency);
-	}
+  }
 
-	return histogramMap;
+  return histogramMap;
 }
 
 std::vector<double> QmitkImageStatisticsView::ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const
@@ -1256,11 +1256,11 @@ std::vector<double> QmitkImageStatisticsView::ConvertIntensityProfileToVector(mi
   std::vector<double> intensityProfileList;
   auto end = intensityProfile->End();
 
-	for (auto it = intensityProfile->Begin(); it != end; ++it)
-	{
+  for (auto it = intensityProfile->Begin(); it != end; ++it)
+  {
     intensityProfileList.push_back(it.GetMeasurementVector()[0]);
-	}
-	return intensityProfileList;
+  }
+  return intensityProfileList;
 }
 
 QString QmitkImageStatisticsView::GetFormattedString(double value, unsigned int decimals) const

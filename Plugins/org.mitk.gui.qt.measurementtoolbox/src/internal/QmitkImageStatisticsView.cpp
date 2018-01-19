@@ -91,6 +91,16 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
     m_Controls->m_BinSizeFrame->setEnabled(false);
+    #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+      m_Controls->m_StatisticsWidgetStack->setVisible(false);
+      m_Controls->label_HistogramIsInvisibleWarning->setEnabled(true);
+      m_Controls->label_HistogramIsInvisibleWarning->setVisible(true);
+      m_Controls->label_HistogramIsInvisibleWarning->setText("<font color='red'>Histogram is not visible because Qt 5.10 is required. You can use the button <i>Copy to Clipboard</i> below to retrieve values.</font>");
+      m_Controls->groupBox_plot->setVisible(false);
+    #else
+      m_Controls->label_HistogramIsInvisibleWarning->setVisible(false);
+    #endif
+
   }
 }
 

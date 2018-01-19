@@ -85,3 +85,22 @@ mitk::IGTLMessageSource::Pointer QmitkIGTLMessageSourceSelectionWidget::GetSelec
 {
   return this->m_CurrentIGTLMessageSource;
 }
+
+mitk::IGTLMessageSource::Pointer QmitkIGTLMessageSourceSelectionWidget::AutoSelectFirstIGTLMessageSource()
+{
+  if( m_Controls->m_ServiceListWidget->GetAllServiceReferences().size() != 0 )
+  {
+    us::ModuleContext* context = us::GetModuleContext();
+    this->m_CurrentIGTLMessageSource =
+      context->GetService<mitk::IGTLMessageSource>(
+        m_Controls->m_ServiceListWidget->GetAllServiceReferences().at(0) );
+  }
+  else
+  {
+    this->m_CurrentIGTLMessageSource = nullptr;
+    MITK_WARN("CurrentIGTLMessageSource") << "There was no OpenIGTLink message source to select."
+    << "The OpenIGTLink message source must be selected manually.";
+  }
+
+  return this->m_CurrentIGTLMessageSource;
+}

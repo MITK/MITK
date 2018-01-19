@@ -368,8 +368,16 @@ void QmitkIGTLStreamingManagementWidget::OnStreamingTimerTimeout()
 
 void QmitkIGTLStreamingManagementWidget::SelectSourceAndAdaptGUI()
 {
-  //get the current selection and call SourceSelected which will call AdaptGUI
+  //get the current selection (the auto-selected message source) and call
+  //SourceSelected which will call AdaptGUI
   mitk::IGTLMessageSource::Pointer curSelSrc =
-    m_Controls->messageSourceSelectionWidget->GetSelectedIGTLMessageSource();
+    m_Controls->messageSourceSelectionWidget->AutoSelectFirstIGTLMessageSource();
   SourceSelected(curSelSrc);
+
+  if( curSelSrc.IsNotNull() )
+  {
+    //automatically start streaming for better support and handling when using
+    //e.g. the US-module.
+    this->OnStartStreaming();
+  }
 }

@@ -70,6 +70,7 @@ public:
   void ForceImmediateUpdate();
 
   mitk::MouseModeSwitcher* GetMouseModeSwitcher();
+  void setMouseMode(mitk::MouseModeSwitcher::MouseMode mode, const std::string& button);
 
   QmitkRenderWindow* GetRenderWindow1() const;
 

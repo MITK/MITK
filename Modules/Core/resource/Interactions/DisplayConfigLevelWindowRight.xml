@@ -1,0 +1,11 @@
+<config>
+   <event_variant class="MousePressEvent" name="StartAdjustLevelWindow">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndLevelWindow">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="adjustlevelwindow">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </event_variant>
+</config>

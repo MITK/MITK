@@ -1,0 +1,11 @@
+<config>
+   <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Moving">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </event_variant>
+</config>

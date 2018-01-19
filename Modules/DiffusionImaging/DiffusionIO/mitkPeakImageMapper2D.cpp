@@ -187,6 +187,7 @@ void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *render
         "uniform float peakOpacity;\n"
         "varying vec4 positionWorld;\n"
         "varying vec4 colorVertex;\n"
+        "out vec4 out_Color;\n"
 
         "void main(void)\n"
         "{\n"
@@ -194,7 +195,7 @@ void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *render
 
         "  if (abs(r1) >= clippingPlaneThickness)\n"
         "    discard;\n"
-        "  gl_FragColor = vec4(colorVertex.xyz,peakOpacity);\n"
+        "  out_Color = vec4(colorVertex.xyz,peakOpacity);\n"
         "}\n"
         );
 

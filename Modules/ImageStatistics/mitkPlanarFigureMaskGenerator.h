@@ -55,6 +55,7 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
         m_InternalMaskUpdateTime = 0;
         m_InternalMask = mitk::Image::New();
         m_ReferenceImage = nullptr;
+        m_PlanarFigureAxis = 0;
     }
 
 

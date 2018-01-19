@@ -295,6 +295,7 @@ namespace itk
   protected:
     ExtendedLabelStatisticsImageFilter():
         m_GlobalHistogramParametersSet(false),
+        m_MaskNonEmpty(false),
         m_LabelHistogramParametersSet(false),
         m_PreferGlobalHistogramParameters(false)
     {

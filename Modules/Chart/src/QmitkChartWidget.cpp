@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <QWebChannel>
 #include <QWebEngineView>
-#include <QWebEngineSettings>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+  #include <QWebEngineSettings>
+#endif
 
 #include <QmitkChartData.h>
 #include <QmitkChartxyData.h>
@@ -99,7 +101,9 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
   //Set the webengineview to an initial empty page. The actual chart will be loaded once the data is calculated.
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
   m_WebEngineView->page()->setWebChannel(m_WebChannel);
-  m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+  #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+    m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+  #endif
 
   connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
 
@@ -330,14 +334,12 @@ std::vector<QmitkChartxyData*>* QmitkChartWidget::Impl::GetC3xyData() const {
 void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
 {
   m_WebEngineView->page()->runJavaScript(command);
-  m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
 }
 
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
 {
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
   m_WebEngineView->setEnabled(false);
-  m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
 }
 
 void QmitkChartWidget::Impl::InitializeJavaScriptChart()
@@ -350,7 +352,6 @@ void QmitkChartWidget::Impl::InitializeJavaScriptChart()
 	  count++;
   }
   m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/QmitkChartWidget.html")));
-  m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
 }
 
 std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const

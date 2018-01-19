@@ -251,7 +251,7 @@ void mitk::BeamformingFilter::GenerateData()
         return;
       }
 
-      long availableMemory = m_BeamformingOclFilter->GetDeviceMemory();
+      unsigned long availableMemory = m_BeamformingOclFilter->GetDeviceMemory();
 
       unsigned int batchSize = 16;
       unsigned int batches = (unsigned int)((float)input->GetDimension(2)/batchSize) + (input->GetDimension(2)%batchSize > 0);
@@ -261,12 +261,13 @@ void mitk::BeamformingFilter::GenerateData()
 
       // the following safeguard is probably only needed for absurdly small GPU memory
       for (batchSize = 16; 
-        (long)(batchDim[0] * batchDim[1]) * 4 + // Input image (float)
-        (long)(m_Conf.ReconstructionLines * m_Conf.SamplesPerLine) * 4 // Output image (float)
-        > availableMemory - 
-        (long)(m_Conf.ReconstructionLines / 2 * m_Conf.SamplesPerLine) * 2 - // Delays buffer (unsigned short)
-        (long)(m_Conf.ReconstructionLines * m_Conf.SamplesPerLine) * 3 * 2 - // UsedLines buffer (unsigned short)
-        100 * 1024; // 100 MB buffer for local data, system purposes etc
+        (unsigned long)batchSize *
+        ((unsigned long)(batchDim[0] * batchDim[1]) * 4 + // single input image (float)
+        (unsigned long)(m_Conf.ReconstructionLines * m_Conf.SamplesPerLine) * 4) // single output image (float)
+        > availableMemory -
+        (unsigned long)(m_Conf.ReconstructionLines / 2 * m_Conf.SamplesPerLine) * 2 - // Delays buffer (unsigned short)
+        (unsigned long)(m_Conf.ReconstructionLines * m_Conf.SamplesPerLine) * 3 * 2 - // UsedLines buffer (unsigned short)
+        50 * 1024 * 1024; // 50 MB buffer for local data, system purposes etc
         --batchSize)
       {}
       if (batchSize < 1)

@@ -347,7 +347,7 @@ bool mitk::OclFilter::IsInitialized()
   return m_Initialized;
 }
 
-long mitk::OclFilter::GetDeviceMemory()
+unsigned long mitk::OclFilter::GetDeviceMemory()
 {
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(GetModuleContext()->GetServiceReference<OclResourceService>());
   auto device = resources->GetCurrentDevice();

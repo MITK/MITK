@@ -18,6 +18,10 @@ To perform image processing, simply load an image into MITK and select it in the
 Before performing reconstruction or using other filters those can be configured using the plugin's settings panel.
 \imageMacro{QmikPhotoacousticsImageProcessing_Settings.png,"The plugin's GUI",7.62}
 
+\subsection org_mitk_gui_qt_photoacoustics_imageprocessingImageDetails
+To create the .nrrd images necessary for the plugin from raw data, one can use e.g. <a href="https://github.com/mhe/pynrrd">pynrrd</a>, a python package for very straightforward creation of .nrrd images.
+The Beamforming Filter is also able to read certain paramters, as the scan depth and the transducer pitch from the selected image. To this end, the image must have a time-axis spacing in µs and a horizontal spacing in mm.
+
 \subsection org_mitk_gui_qt_photoacoustics_imageprocessingBeamforming The Beamforming Settings
 For beamforming, three beamforming algorithms are available:
 <ul>
@@ -32,7 +36,7 @@ Each of those can be coupled with either spherical delay calculation or a quadra
 <li>Von Hann
 </ul>
 Other Standard beamforming parameters are available, which have to be chosen depending on the source image to attain a correctly reconstructed image.
-The Plugin is able to calculate the used scan depth as well as the transducer pitch from the selected image if the time-axis spacing is in microseconds, and the horizontal spacing in mm. If such a spacing is given, 
+As mentioned above, Plugin is able to calculate the used scan depth as well as the transducer pitch from the selected image if the time-axis spacing is in microseconds, and the horizontal spacing in mm. If such a spacing is given, 
 check the box "Auto Get Depth" to make the plugin read those values by itself.
 If the US source or the laser used for imaging is not located at the top of the image, an option is given to cut off pixels at the top of the image until the source. This value should be calibrated by the user 
 to match the used hardware.

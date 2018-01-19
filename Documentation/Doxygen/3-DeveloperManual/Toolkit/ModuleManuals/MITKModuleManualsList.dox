@@ -13,6 +13,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage GeneratingDeviceModulesPage
   \li \subpage mitkPython_Overview
   \li \subpage USModulePage
+  \li \subpage PAModulePage
   \li \subpage AnnotationModulePage
   \li \subpage ChartModule
 

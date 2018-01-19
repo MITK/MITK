@@ -517,7 +517,8 @@ namespace mitk
         m_Median(nan("")),
         m_Uniformity(nan("")),
         m_UPP(nan("")),
-        m_Entropy(nan(""))
+        m_Entropy(nan("")),
+        m_Label(0)
     {
         m_minIndex.set_size(0);
         m_maxIndex.set_size(0);

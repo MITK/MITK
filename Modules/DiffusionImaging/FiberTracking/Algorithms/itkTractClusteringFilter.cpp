@@ -194,7 +194,7 @@ std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::ClusterStep
   if (!distances.empty())
   {
     std::vector< Cluster > outC;
-#pragma omp parallel for
+//#pragma omp parallel for
     for (int c=0; c<(int)C.size(); c++)
     {
 
@@ -245,7 +245,6 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
           vnl_matrix<float> v = c2.h / c2.n;
           bool f = false;
 
-//          d = m_Metric->CalculateDistance(t, v, f);  // alwayse use MDF?
           float d = 0;
           for (auto m : m_Metrics)
             d += m->CalculateDistance(t, v, f);
@@ -393,17 +392,6 @@ void TractClusteringFilter::GenerateData()
   {
     MITK_INFO << "Clustering fibers";
     clusters = ClusterStep(f_indices, m_Distances);
-//    while (clusters.size()>5000)
-//    {
-//      MITK_INFO << "Number of clusters: " << clusters.size();
-//      MITK_INFO << "Increasing cluster size";
-//      for (unsigned int i=0; i<m_Distances.size(); ++i)
-//      {
-//        m_Distances[i] *= 1.1;
-//        MITK_INFO << m_Distances[i];
-//      }
-//      clusters = ClusterStep(f_indices, m_Distances);
-//    }
     MITK_INFO << "Number of clusters: " << clusters.size();
     MergeDuplicateClusters(clusters);
     std::sort(clusters.begin(),clusters.end());
@@ -428,6 +416,7 @@ void TractClusteringFilter::GenerateData()
   int max = clusters.size()-1;
   if (m_MaxClusters>0 && clusters.size()-1>m_MaxClusters)
     max = m_MaxClusters;
+  int skipped = 0;
   for (int i=clusters.size()-1; i>=0; --i)
   {
     Cluster c = clusters.at(i);
@@ -466,8 +455,12 @@ void TractClusteringFilter::GenerateData()
       centroid->SetFiberColors(255, 255, 255);
       m_OutCentroids.push_back(centroid);
     }
+    else
+    {
+      skipped++;
+    }
   }
-  MITK_INFO << "Final number of clusters: " << m_OutTractograms.size();
+  MITK_INFO << "Final number of clusters: " << m_OutTractograms.size() << " (discarded " << skipped << " clusters)";
 
   int w = 0;
   for (auto fib : m_OutTractograms)

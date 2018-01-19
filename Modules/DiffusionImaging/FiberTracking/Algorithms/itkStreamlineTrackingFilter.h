@@ -65,6 +65,7 @@ public:
   typedef itk::Image<float, 3>                        ItkFloatImgType;
   typedef vtkSmartPointer< vtkPolyData >              PolyDataType;
 
+  typedef std::deque< vnl_vector_fixed<float,3> > DirectionContainer;
   typedef std::deque< itk::Point<float> > FiberType;
   typedef std::vector< FiberType > BundleType;
 
@@ -103,7 +104,7 @@ public:
   itkSetMacro( TargetRegions, ItkFloatImgType::Pointer)    ///< Only streamline starting and ending in this mask are retained
   itkSetMacro( DemoMode, bool )
   itkSetMacro( NumberOfSamples, unsigned int )        ///< Number of neighborhood sampling points
-  itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
+  itkSetMacro( LoopCheck, float )                     ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
   itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
   itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
   itkSetMacro( NumPreviousDirections, unsigned int )  ///< How many "old" steps do we want to consider in our decision where to go next?
@@ -113,6 +114,8 @@ public:
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
   itkSetMacro( StopTracking, bool )
   itkSetMacro( InterpolateMask, bool )
+  itkSetMacro( TrialsPerSeed, unsigned int )          ///< When using probabilistic tractography, each seed point is used N times until a valid streamline that is compliant with all thresholds etc. is found
+  itkGetMacro( MinVoxelSize, float)
 
   ///< Use manually defined points in physical space as seed points instead of seed image
   void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {
@@ -141,7 +144,7 @@ protected:
   void FiberToProbmap(FiberType* fib);
   void GetSeedPointsFromSeedImage();
   void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
-  float FollowStreamline(itk::Point<float, 3> start_pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front);       ///< Start streamline in one direction.
+  float FollowStreamline(itk::Point<float, 3> start_pos, vnl_vector_fixed<float,3> dir, FiberType* fib, DirectionContainer* container, float tractLength, bool front);       ///< Start streamline in one direction.
   vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
   std::vector< vnl_vector_fixed<float,3> > CreateDirections(int NPoints);
@@ -161,6 +164,7 @@ protected:
   ItkFloatImgType::Pointer            m_MaskImage;
   ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
 
+  float                               m_MinVoxelSize;
   float                               m_AngularThresholdDeg;
   float                               m_StepSizeVox;
   float                               m_SamplingDistanceVox;
@@ -183,7 +187,7 @@ protected:
   int                                 m_MaxNumTracts;
 
   bool                                m_Verbose;
-  bool                                m_AposterioriCurvCheck;
+  float                               m_LoopCheck;
   bool                                m_DemoMode;
   bool                                m_Random;
   bool                                m_UseOutputProbabilityMap;
@@ -192,9 +196,10 @@ protected:
   unsigned int                        m_Progress;
   bool                                m_StopTracking;
   bool                                m_InterpolateMask;
+  unsigned int                        m_TrialsPerSeed;
 
   void BuildFibers(bool check);
-  int CheckCurvature(FiberType* fib, bool front);
+  float CheckCurvature(DirectionContainer *fib, bool front);
 
   // decision forest
   mitk::TrackingDataHandler*          m_TrackingHandler;

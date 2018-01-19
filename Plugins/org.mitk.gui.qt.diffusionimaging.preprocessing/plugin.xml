@@ -12,14 +12,6 @@
     <keywordReference id="org.mitk.views.diffusionpreprocessing.Keyword"/>
     </view>
 
-    <view id="org.mitk.views.brainextraction"
-    name="Brain Extraction"
-    category="Preprocessing"
-    class="QmitkBrainExtractionView"
-    icon="resources/dwi2.png">
-    <keywordReference id="org.mitk.views.brainextraction.Keyword"/>
-    </view>
-
   </extension>
 
 </plugin>

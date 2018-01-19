@@ -34,9 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \class QmitkDenoisingView
  * \brief View for denoising diffusion-weighted images.
  */
-class QmitkDenoisingView;
-
-
 class QmitkDenoisingView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -65,7 +62,7 @@ public:
 private slots:
 
   void StartDenoising();
-  void UpdateGui(int filter);
+  void UpdateGui();
 
 private:
 
@@ -74,15 +71,6 @@ private:
 
   Ui::QmitkDenoisingViewControls*             m_Controls;
   mitk::DataNode::Pointer                     m_ImageNode;
-
-  enum FilterType {
-    TV,
-    GAUSS,
-    NLM,
-    NLM_MORITZ
-  } m_SelectedFilter;
-
-  friend class QmitkDenoisingWorker;
 };
 
 

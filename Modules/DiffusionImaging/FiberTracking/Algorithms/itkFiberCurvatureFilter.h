@@ -56,6 +56,7 @@ public:
     itkSetMacro( Distance, double )
     itkSetMacro( AngularDeviation, double )
     itkSetMacro( RemoveFibers, bool )
+    itkSetMacro( UseMedian, bool )
     itkSetMacro( InputFiberBundle, FiberBundle::Pointer )
     itkGetMacro( OutputFiberBundle, FiberBundle::Pointer )
 
@@ -71,6 +72,7 @@ protected:
     double  m_AngularDeviation;
     double  m_Distance;
     bool    m_RemoveFibers;
+    bool    m_UseMedian;
 };
 }
 

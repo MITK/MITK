@@ -160,7 +160,6 @@ public:
     tracker->SetSamplingDistance(0.25);
     tracker->SetUseStopVotes(true);
     tracker->SetOnlyForwardSamples(true);
-    tracker->SetAposterioriCurvCheck(false);
     tracker->SetMinTractLength(20);
     tracker->SetMaxNumTracts(-1);
     tracker->SetTrackingHandler(handler);

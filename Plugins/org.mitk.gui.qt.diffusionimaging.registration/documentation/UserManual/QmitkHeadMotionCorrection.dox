@@ -1,0 +1,5 @@
+/**
+\page org_mitk_views_headmotioncorrectionview Head-Motion Correction
+
+This view allows head-motion and eddy-current correction by affinely registering all volumes to the first unweighted volume of the complete diffusion-weighted image. The individual gradient directions are roated accordingly.
+*/

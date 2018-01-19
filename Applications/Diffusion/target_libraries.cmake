@@ -7,7 +7,6 @@ set(target_libraries
   org_blueberry_ui_qt_help
   org_mitk_planarfigure
   org_mitk_gui_qt_diffusionimagingapp
-  org_mitk_gui_qt_common_legacy
   org_mitk_gui_qt_ext
   org_mitk_gui_qt_datamanager
   org_mitk_gui_qt_segmentation
@@ -22,10 +21,11 @@ set(target_libraries
   org_mitk_gui_qt_diffusionimaging_reconstruction
   org_mitk_gui_qt_diffusionimaging_tractography
   org_mitk_gui_qt_diffusionimaging_registration
+  org_mitk_gui_qt_diffusionimaging_python
   org_mitk_gui_qt_diffusionimaging_denoising
-  org_mitk_gui_qt_matchpoint_algorithm_browser
-  org_mitk_gui_qt_matchpoint_algorithm_control
-  org_mitk_gui_qt_matchpoint_mapper
+#  org_mitk_gui_qt_matchpoint_algorithm_browser
+#  org_mitk_gui_qt_matchpoint_algorithm_control
+#  org_mitk_gui_qt_matchpoint_mapper
   org_mitk_gui_qt_imagenavigator
   org_mitk_gui_qt_moviemaker
   org_mitk_gui_qt_measurementtoolbox

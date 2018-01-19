@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "mitkPhotoacousticImage.h"
-#include "itkBModeImageFilter.h"
-#include "itkPhotoacousticBModeImageFilter.h"
+#include "ITKFilter/ITKUltrasound/itkBModeImageFilter.h"
+#include "ITKFilter/itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkPhotoacousticBeamformingFilter.h"
 #include <chrono>
 #include <mitkAutoCropImageFilter.h>
-#include <mitkPhotoacousticBModeFilter.h>
+#include "./OpenCLFilter/mitkPhotoacousticBModeFilter.h"
 
 
 // itk dependencies
@@ -45,8 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiplyImageFilter.h"
 #include "itkComplexToModulusImageFilter.h"
 #include <itkAddImageFilter.h>
-#include "itkFFT1DComplexConjugateToRealImageFilter.h"
-#include "itkFFT1DRealToComplexConjugateImageFilter.h"
+#include "ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
+#include "ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
 
 mitk::PhotoacousticImage::PhotoacousticImage()
 {
@@ -58,7 +58,7 @@ mitk::PhotoacousticImage::~PhotoacousticImage()
   MITK_INFO << "[PhotoacousticImage Debug] destroyed that image";
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseLogFilter, float resampleSpacing)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseGPU, bool UseLogFilter, float resampleSpacing)
 {
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
   typedef itk::Image< float, 3 > itkFloatImageType;
@@ -66,16 +66,39 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
 
   if (method == BModeMethod::Abs)
   {
-    auto input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, inputImage->GetDimension(2) - 1);
-    PhotoacousticBModeFilter::Pointer filter = PhotoacousticBModeFilter::New();
-    filter->SetParameters(UseLogFilter);
-    filter->SetInput(input);
-    filter->Update();
+    mitk::Image::Pointer input;
+    mitk::Image::Pointer out;
+    if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
+      input = inputImage;
+    else
+      input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, inputImage->GetDimension(2) - 1);
 
-    auto out = filter->GetOutput();
+    if (!UseGPU)
+    {
+      PhotoacousticBModeFilter::Pointer filter = PhotoacousticBModeFilter::New();
+      filter->SetParameters(UseLogFilter);
+      filter->SetInput(input);
+      filter->Update();
 
-    if(resampleSpacing == 0)
-      return out;
+      out = filter->GetOutput();
+
+      if (resampleSpacing == 0)
+        return out;
+    }
+    #ifdef PHOTOACOUSTICS_USE_GPU
+    else
+    {
+      PhotoacousticOCLBModeFilter::Pointer filter = PhotoacousticOCLBModeFilter::New();
+      filter->SetParameters(UseLogFilter);
+      filter->SetInput(input);
+      filter->Update();
+
+      out = filter->GetOutput();
+
+      if (resampleSpacing == 0)
+        return out;
+    }
+    #endif
 
     typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
     ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
@@ -277,17 +300,9 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   return output;
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
-  // crop the image
-  // set the Maximum Size of the image to 4096
-  unsigned short lowerCutoff = 0;
-  if (((unsigned int)(4096 + cutoff)) < inputImage->GetDimension(1))
-  {
-    lowerCutoff = (unsigned short)(inputImage->GetDimension(1) - 4096);
-  }
-
-  config.RecordTime = config.RecordTime - (cutoff + lowerCutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  config.RecordTime = config.RecordTime - (cutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "cropping image");
   if (!config.partial)
   {
@@ -295,18 +310,10 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Poi
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
 
-  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, lowerCutoff, 0, 0, config.CropBounds[0], config.CropBounds[1]);
-
-  // resample the image in horizontal direction
-  if (inputImage->GetDimension(0) != config.ReconstructionLines)
-  {
-    progressHandle(0, "resampling image");
-    auto begin = std::chrono::high_resolution_clock::now();
-    unsigned int dim[2] = { config.ReconstructionLines, processedImage->GetDimension(1) };
-    processedImage = ApplyResampling(processedImage, dim);
-    auto end = std::chrono::high_resolution_clock::now();
-    MITK_DEBUG << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
-  }
+  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
+  config.inputDim[0] = processedImage->GetDimension(0);
+  config.inputDim[1] = processedImage->GetDimension(1);
+  config.inputDim[2] = processedImage->GetDimension(2);
 
   // perform the beamforming
   BeamformingFilter::Pointer Beamformer = BeamformingFilter::New();
@@ -513,129 +520,3 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
 
   return image;
 }
-
-
-/*
-mitk::CropFilter::CropFilter()
-  : m_PixelCalculation(NULL)
-{
-  this->AddSourceFile("CropFilter.cl");
-
-  this->m_FilterID = "CropFilter";
-}
-
-mitk::CropFilter::~CropFilter()
-{
-  if (this->m_PixelCalculation)
-  {
-    clReleaseKernel(m_PixelCalculation);
-  }
-}
-
-void mitk::CropFilter::Update()
-{
-  //Check if context & program available
-  if (!this->Initialize())
-  {
-    us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
-    OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-
-    // clean-up also the resources
-    resources->InvalidateStorage();
-    mitkThrow() << "Filter is not initialized. Cannot update.";
-  }
-  else {
-    // Execute
-    this->Execute();
-  }
-}
-
-void mitk::CropFilter::Execute()
-{
-  cl_int clErr = 0;
-
-  try
-  {
-    this->InitExec(this->m_PixelCalculation);
-  }
-  catch (const mitk::Exception& e)
-  {
-    MITK_ERROR << "Catched exception while initializing filter: " << e.what();
-    return;
-  }
-
-  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
-  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-  cl_context gpuContext = resources->GetContext();
-
-  unsigned int size = m_OutputDim[0] * m_OutputDim[1] * m_OutputDim[2] * m_Images;
-
-  cl_mem cl_input = clCreateBuffer(gpuContext, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(float) * size, m_Data, &clErr);
-  CHECK_OCL_ERR(clErr);
-
-  // set kernel arguments
-  clErr = clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &cl_input);
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_ushort), &(this->m_Images));
-
-  CHECK_OCL_ERR(clErr);
-
-  // execute the filter on a 3D NDRange
-  this->ExecuteKernel(m_PixelCalculation, 3);
-
-  // signalize the GPU-side data changed
-  m_Output->Modified(GPU_DATA);
-}
-
-us::Module *mitk::CropFilter::GetModule()
-{
-  return us::GetModuleContext()->GetModule();
-}
-
-bool mitk::CropFilter::Initialize()
-{
-  bool buildErr = true;
-  cl_int clErr = 0;
-
-  if (OclFilter::Initialize())
-  {
-    this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckCrop", &clErr);
-    buildErr |= CHECK_OCL_ERR(clErr);
-  }
-  return (OclFilter::IsInitialized() && buildErr);
-}
-
-void mitk::CropFilter::SetInput(mitk::Image::Pointer image)
-{
-  if (image->GetDimension() != 3)
-  {
-    mitkThrowException(mitk::Exception) << "Input for " << this->GetNameOfClass() <<
-      " is not 3D. The filter only supports 3D. Please change your input.";
-  }
-  OclImageToImageFilter::SetInput(image);
-}
-
-mitk::Image::Pointer mitk::CropFilter::GetOutput()
-{
-  if (m_Output->IsModified(GPU_DATA))
-  {
-    void* pData = m_Output->TransferDataToCPU(m_CommandQue);
-
-    const unsigned int dimension = 3;
-    unsigned int* dimensions = m_OutputDim;
-
-    const mitk::SlicedGeometry3D::Pointer p_slg = m_Input->GetMITKImage()->GetSlicedGeometry();
-
-    MITK_DEBUG << "Creating new MITK Image.";
-
-    m_Output->GetMITKImage()->Initialize(this->GetOutputType(), dimension, dimensions);
-    m_Output->GetMITKImage()->SetSpacing(p_slg->GetSpacing());
-    m_Output->GetMITKImage()->SetGeometry(m_Input->GetMITKImage()->GetGeometry());
-    m_Output->GetMITKImage()->SetImportVolume(pData, 0, 0, mitk::Image::ReferenceMemory);
-  }
-
-  MITK_DEBUG << "Image Initialized.";
-
-  return m_Output->GetMITKImage();
-}
-
-*/

@@ -687,8 +687,7 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool, bool normalize)
         dist += v.magnitude();
         v.normalize();
         vectors.push_back(v);
-        if (c==j)
-          meanV += v;
+        meanV += v;
         c--;
       }
       c = j;
@@ -707,8 +706,7 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool, bool normalize)
         dist += v.magnitude();
         v.normalize();
         vectors.push_back(v);
-        if (c==j)
-          meanV += v;
+        meanV += v;
         c++;
       }
       meanV.normalize();
@@ -1480,6 +1478,35 @@ itk::Point<float, 3> mitk::FiberBundle::TransformPoint(vnl_vector_fixed< double,
   point[2] += center[2]+tz;
   itk::Point<float, 3> out; out[0] = point[0]; out[1] = point[1]; out[2] = point[2];
   return out;
+}
+
+
+void mitk::FiberBundle::TransformFibers(itk::ScalableAffineTransform< mitk::ScalarType >::Pointer transform)
+{
+  vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+  for (int i=0; i<m_NumFibers; i++)
+  {
+    vtkCell* cell = m_FiberPolyData->GetCell(i);
+    int numPoints = cell->GetNumberOfPoints();
+    vtkPoints* points = cell->GetPoints();
+
+    vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+    for (int j=0; j<numPoints; j++)
+    {
+      itk::Point<float, 3> p = GetItkPoint(points->GetPoint(j));
+      p = transform->TransformPoint(p);
+      vtkIdType id = vtkNewPoints->InsertNextPoint(p.GetDataPointer());
+      container->GetPointIds()->InsertNextId(id);
+    }
+    vtkNewCells->InsertNextCell(container);
+  }
+
+  m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+  m_FiberPolyData->SetPoints(vtkNewPoints);
+  m_FiberPolyData->SetLines(vtkNewCells);
+  this->SetFiberPolyData(m_FiberPolyData, true);
 }
 
 void mitk::FiberBundle::TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz)

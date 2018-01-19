@@ -184,6 +184,10 @@ void oclPrintDeviceInfo(cl_device_id device)
   clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(mem_size), &mem_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_LOCAL_MEM_SIZE:\t\t"<<  (unsigned int)(mem_size / (1024)) <<"KByte\n";
 
+  // CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE
+  clGetDeviceInfo(device, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, sizeof(mem_size), &mem_size, nullptr);
+  MITK_INFO("ocl.log") << "  CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:\t\t" << (unsigned int)(mem_size / (1024)) << "KByte";
+
   //check for image support properties
   clGetDeviceInfo(device, CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(workgroup_size), &workgroup_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_IMAGE2D_MAX_WIDTH:\t" << workgroup_size;
@@ -209,6 +213,13 @@ void oclPrintDeviceInfo(cl_device_id device)
   if( queue_properties & CL_QUEUE_PROFILING_ENABLE )
     MITK_INFO("ocl.log")<<"  CL_DEVICE_QUEUE_PROPERTIES:\t\t"<< "CL_QUEUE_PROFILING_ENABLE";
 
+}
+
+cl_ulong oclGetGlobalMemSize(cl_device_id device)
+{
+  cl_ulong mem_size;
+  clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(mem_size), &mem_size, nullptr);
+  return mem_size;
 }
 
 std::string GetOclErrorAsString( int _clErr )

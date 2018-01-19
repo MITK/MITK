@@ -159,7 +159,6 @@ namespace mitk
         itk::Image<unsigned short, 3>::Pointer m_internalMask3D;
         double m_HotspotRadiusinMM;
         bool m_HotspotMustBeCompletelyInsideImage;
-        bool m_HotspotParamsChanged;
         unsigned short m_Label;
         vnl_vector<int> m_ConvolutionImageMinIndex, m_ConvolutionImageMaxIndex;
         unsigned long m_InternalMaskUpdateTime;

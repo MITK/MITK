@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk includes
 #include <QmitkAbstractView.h>
-#include "QmitkStepperAdapter.h"
+#include <QmitkStepperAdapter.h>
 #include "QmitkImageStatisticsCalculationThread.h"
 #include <berryIPartListener.h>
 
 // mitk includes
-#include "mitkILifecycleAwarePart.h"
-#include "mitkPlanarLine.h"
+#include <mitkILifecycleAwarePart.h>
+#include <mitkPlanarLine.h>
 #include <mitkIntensityProfile.h>
 
 #include <berryIPreferences.h>
@@ -35,8 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
 are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
-of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the
-gui accessable during calculation.
+of an image and a Planar Figure. The statistics calculation is realized in a separate thread to keep the
+gui accessible during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
@@ -45,13 +45,8 @@ class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecyc
   Q_OBJECT
 
 private:
-
   /*!
   \  Convenient typedefs */
-  typedef mitk::DataStorage::SetOfObjects  ConstVector;
-  typedef ConstVector::ConstPointer        ConstVectorPointer;
-  typedef ConstVector::ConstIterator       ConstVectorIterator;
-  typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer > ImageStatisticsMapType;
   typedef QList<mitk::DataNode*> SelectedDataNodeVectorType;
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
 
@@ -61,8 +56,6 @@ private:
 
   QString GetFormattedIndex(const vnl_vector<int>& vector) const;
   QString GetFormattedString(double value, unsigned int decimals) const;
-  void AdaptBinSizeCheckboxStepsize(mitk::Image::ConstPointer image);
-  void AdaptBinSizeCheckBoxMinMax(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, int componentType);
 public:
 
   /*!
@@ -89,7 +82,7 @@ public:
   void OnThreadedStatisticsCalculationEnds();
 
   /** \brief Update bin size for histogram resolution. */
-  void OnHistogramBinSizeBoxValueChanged();
+  void OnHistogramNBinsCheckBoxValueChanged();
 
   protected slots:
   /** \brief  Saves the histogram to the clipboard */
@@ -103,7 +96,7 @@ public:
   /** \brief Jump to coordinates stored in the double clicked cell */
   void JumpToCoordinates(int row, int col);
   /** \brief Toogle GUI elements if histogram default bin size checkbox value changed. */
-  void OnDefaultBinSizeBoxChanged();
+  void OnDefaultNBinsSpinBoxChanged();
 
   void OnShowSubchartBoxChanged();
 
@@ -142,6 +135,13 @@ protected:
   void SelectedDataModified();
   /** \brief  Method called when the data manager selection changes */
   void SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes);
+
+  void DisableHistogramGUIElements();
+
+  void ResetHistogramGUIElementsToDefault();
+
+  void EnableHistogramGUIElements();
+
   /** \brief  Method called to remove old selection when a new selection is present */
   void ReinitData();
   /** \brief  writes the statistics to the gui*/
@@ -162,10 +162,6 @@ protected:
   std::vector<QString> m_PlanarFigureStatistics;
   QmitkImageStatisticsCalculationThread* m_CalculationThread;
 
-  QmitkStepperAdapter*      m_TimeStepperAdapter;
-  unsigned int              m_CurrentTime;
-  QString                   m_Clipboard;
-
   // Image and mask data
   mitk::Image* m_SelectedImage;
   mitk::Image* m_SelectedImageMask;
@@ -181,11 +177,10 @@ protected:
 
   bool m_CurrentStatisticsValid;
   bool m_StatisticsUpdatePending;
-  bool m_StatisticsIntegrationPending;
   bool m_DataNodeSelectionChanged;
   bool m_Visible;
 
-  double m_HistogramBinSize;
+  unsigned int m_HistogramNBins;
 
   std::vector<mitk::Point3D>     m_WorldMinList;
   std::vector<mitk::Point3D>     m_WorldMaxList;

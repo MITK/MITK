@@ -14,6 +14,7 @@ mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
+mitkFunctionAddExternalProject(NAME BetData     OFF ADVANCED)
 
 # -----------------------------------------
 # The following external projects must be

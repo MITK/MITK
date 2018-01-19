@@ -64,10 +64,10 @@ int main(int argc, char* argv[])
   parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, DetTensor, ProbTensor, DetODF, ProbODF, DetRF, ProbRF)", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle/probability map", us::Any(), false);
 
-  parser.addArgument("stop_mask", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
-  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "streamlines not starting and ending in one of the regions in this image are discarded", us::Any());
+  parser.addArgument("stop_image", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
+  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "a streamline is only considered valid if it starts and ends in the target and seed region region. without seed region, both endpoints need to be located in the target region", us::Any());
   parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
-  parser.addArgument("seed_mask", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
+  parser.addArgument("seed_image", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
 
   parser.addArgument("sharpen_odfs", "", mitkCommandLineParser::Bool, "SHarpen ODFs:", "if you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). this is not necessary for CSD fODFs, since they are narurally much sharper.");
   parser.addArgument("cutoff", "", mitkCommandLineParser::Float, "Cutoff:", "set the FA, GFA or Peak amplitude cutoff for terminating tracks", 0.1);
@@ -76,13 +76,14 @@ int main(int argc, char* argv[])
   parser.addArgument("angular_threshold", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold between two successive steps, (default: 90° * step_size)");
   parser.addArgument("min_tract_length", "", mitkCommandLineParser::Float, "Min. tract length:", "minimum fiber length (in mm)", 20);
   parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
-  parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded.", -1);
+  parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded", -1);
+  parser.addArgument("trials_per_seed", "", mitkCommandLineParser::Int, "Max. trials per seed:", "try each seed N times until a valid streamline is obtained (only for probabilistic)", 10);
+  parser.addArgument("loop_check", "", mitkCommandLineParser::Float, "Check for loops:", "threshold on angular stdev over the last 4 voxel lengths", -1);
 
   parser.addArgument("num_samples", "", mitkCommandLineParser::Int, "Num. neighborhood samples:", "number of neighborhood samples that are use to determine the next progression direction", 0);
   parser.addArgument("sampling_distance", "", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", 0.25);
   parser.addArgument("use_stop_votes", "", mitkCommandLineParser::Bool, "Use stop votes:", "use stop votes");
   parser.addArgument("use_only_forward_samples", "", mitkCommandLineParser::Bool, "Use only forward samples:", "use only forward samples");
-  parser.addArgument("output_prob_map", "", mitkCommandLineParser::Bool, "Output probability map:", "output probability map instead of tractogram");
 
   parser.addArgument("no_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate:", "don't interpolate image values");
   parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1");
@@ -130,10 +131,6 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("use_only_forward_samples"))
     use_only_forward_samples = us::any_cast<bool>(parsedArgs["use_only_forward_samples"]);
 
-  bool output_prob_map = false;
-  if (parsedArgs.count("output_prob_map"))
-    output_prob_map = us::any_cast<bool>(parsedArgs["output_prob_map"]);
-
   bool flip_x = false;
   if (parsedArgs.count("flip_x"))
     flip_x = us::any_cast<bool>(parsedArgs["flip_x"]);
@@ -156,6 +153,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("min_tract_length"))
     min_tract_length = us::any_cast<float>(parsedArgs["min_tract_length"]);
 
+  float loop_check = -1;
+  if (parsedArgs.count("loop_check"))
+    loop_check = us::any_cast<float>(parsedArgs["loop_check"]);
+
   std::string forestFile;
   if (parsedArgs.count("forest"))
     forestFile = us::any_cast<std::string>(parsedArgs["forest"]);
@@ -165,16 +166,16 @@ int main(int argc, char* argv[])
     maskFile = us::any_cast<std::string>(parsedArgs["tracking_mask"]);
 
   std::string seedFile = "";
-  if (parsedArgs.count("seed_mask"))
-    seedFile = us::any_cast<std::string>(parsedArgs["seed_mask"]);
+  if (parsedArgs.count("seed_image"))
+    seedFile = us::any_cast<std::string>(parsedArgs["seed_image"]);
 
   std::string targetFile = "";
   if (parsedArgs.count("target_image"))
     targetFile = us::any_cast<std::string>(parsedArgs["target_image"]);
 
   std::string stopFile = "";
-  if (parsedArgs.count("stop_mask"))
-    stopFile = us::any_cast<std::string>(parsedArgs["stop_mask"]);
+  if (parsedArgs.count("stop_image"))
+    stopFile = us::any_cast<std::string>(parsedArgs["stop_image"]);
 
   float cutoff = 0.1;
   if (parsedArgs.count("cutoff"))
@@ -200,6 +201,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("seeds"))
     seeds = us::any_cast<int>(parsedArgs["seeds"]);
 
+  unsigned int trials_per_seed = 10;
+  if (parsedArgs.count("trials_per_seed"))
+    trials_per_seed = us::any_cast<int>(parsedArgs["trials_per_seed"]);
+
   float tend_f = 1;
   if (parsedArgs.count("tend_f"))
     tend_f = us::any_cast<float>(parsedArgs["tend_f"]);
@@ -216,8 +221,15 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("max_tracts"))
     max_tracts = us::any_cast<int>(parsedArgs["max_tracts"]);
 
-  // LOAD DATASETS
 
+  std::string ext = itksys::SystemTools::GetFilenameExtension(outFile);
+  if (ext != ".fib" && ext != ".trk")
+  {
+    MITK_INFO << "Output file format not supported. Use one of .fib, .trk, .nii, .nii.gz, .nrrd";
+    return EXIT_FAILURE;
+  }
+
+  // LOAD DATASETS
   mitkCommandLineParser::StringContainerType addFiles;
   if (parsedArgs.count("additional_images"))
     addFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["additional_images"]);
@@ -404,7 +416,6 @@ int main(int argc, char* argv[])
   handler->SetFlipZ(flip_z);
 
   MITK_INFO << "Tractography algorithm: " << algorithm;
-
   tracker->SetNumberOfSamples(num_samples);
   tracker->SetAngularThreshold(angular_threshold);
   tracker->SetMaskImage(mask);
@@ -416,25 +427,21 @@ int main(int argc, char* argv[])
   tracker->SetSamplingDistance(sampling_distance);
   tracker->SetUseStopVotes(use_stop_votes);
   tracker->SetOnlyForwardSamples(use_only_forward_samples);
-  tracker->SetAposterioriCurvCheck(false);
+  tracker->SetLoopCheck(loop_check);
   tracker->SetMaxNumTracts(max_tracts);
+  tracker->SetTrialsPerSeed(trials_per_seed);
   tracker->SetTrackingHandler(handler);
-  tracker->SetUseOutputProbabilityMap(output_prob_map);
+  if (ext != ".fib" && ext != ".trk")
+    tracker->SetUseOutputProbabilityMap(true);
   tracker->SetMinTractLength(min_tract_length);
   tracker->Update();
 
-  std::string ext = itksys::SystemTools::GetFilenameExtension(outFile);
-
-  if (!output_prob_map)
+  if (ext == ".fib" || ext == ".trk")
   {
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
     if (compress > 0)
       outFib->Compress(compress);
-
-    if (ext != ".fib" && ext != ".trk" && ext != ".tck")
-      outFile += ".fib";
-
     mitk::IOUtil::Save(outFib, outFile);
   }
   else

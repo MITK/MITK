@@ -51,6 +51,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.diffusionimaging.registration:OFF
   org.mitk.gui.qt.diffusionimaging.tbss:OFF
   org.mitk.gui.qt.diffusionimaging.tractography:OFF
+  org.mitk.gui.qt.diffusionimaging.python:OFF
   org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF

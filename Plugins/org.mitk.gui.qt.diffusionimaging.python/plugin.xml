@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+
+    <view id="org.mitk.views.brainextraction"
+    name="Brain Extraction"
+    category="Preprocessing"
+    class="QmitkBrainExtractionView"
+    icon="resources/dwi2.png">
+    <keywordReference id="org.mitk.views.brainextraction.Keyword"/>
+    </view>
+
+  </extension>
+
+</plugin>

@@ -191,3 +191,9 @@ if(MITK_USE_MatchPoint)
             DESTINATION "bin"
             FILES_MATCHING PATTERN "MAPAlgorithms*")
 endif()
+
+if(MITK_USE_BetData)
+  install(DIRECTORY "${BetData_DIR}"
+            DESTINATION "bin"
+            FILES_MATCHING PATTERN "*")
+endif()

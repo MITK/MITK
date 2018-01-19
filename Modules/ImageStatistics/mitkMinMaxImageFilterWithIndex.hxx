@@ -33,7 +33,10 @@ void MinMaxImageFilterWithIndex< TInputImage >::ThreadedGenerateData(const Regio
   PixelType value;
 
   PixelType threadMin, threadMax;
-  IndexType threadMinIndex, threadMaxIndex;
+  IndexType threadMinIndex;
+  IndexType threadMaxIndex;
+  threadMinIndex.Fill(0);
+  threadMaxIndex.Fill(0);
 
   threadMin = std::numeric_limits<PixelType>::max();
   threadMax = std::numeric_limits<PixelType>::min();

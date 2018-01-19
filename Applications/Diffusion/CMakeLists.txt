@@ -34,7 +34,6 @@ set(_plugins
   org.mitk.gui.qt.diffusionimagingapp
   org.mitk.gui.qt.common
   org.mitk.gui.qt.stdmultiwidgeteditor
-  org.mitk.gui.qt.common.legacy
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.measurementtoolbox
   org.mitk.gui.qt.segmentation
@@ -49,6 +48,7 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging.reconstruction
   org.mitk.gui.qt.diffusionimaging.tractography
   org.mitk.gui.qt.diffusionimaging.registration
+  org.mitk.gui.qt.diffusionimaging.python
   org.mitk.gui.qt.diffusionimaging.denoising
 #  org.mitk.gui.qt.matchpoint.algorithm.browser
 #  org.mitk.gui.qt.matchpoint.algorithm.control
@@ -99,4 +99,4 @@ if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(${DIFFUSIONAPP_NAME} ${MITK_MODULES_ENABLED_PLUGINS})
 endif()
 
-endif()
+endif() # MITK_USE_PYTHON

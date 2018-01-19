@@ -68,6 +68,7 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
                  << " to a property with different type " << property->GetNameOfClass() << "."
                  << " Use ReplaceProperty() instead."
                  << std::endl;
+      assert(false);
     }
     return;
   }

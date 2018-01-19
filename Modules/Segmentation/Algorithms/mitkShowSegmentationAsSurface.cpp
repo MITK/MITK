@@ -55,6 +55,7 @@ void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm* other)
   SetParameter("Decimation rate", 0.2f );
   SetParameter("Wireframe", false );
   SetParameter("Creation type", 0u );
+  SetParameter("Model Opacity", 1.0f);
 }
 
 
@@ -177,7 +178,10 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
       np->SetRepresentationToWireframe();
   }
 
-  m_Node->SetProperty("opacity", FloatProperty::New(1.0) );
+  float opacity;
+  GetParameter("Model Opacity", opacity);
+
+  m_Node->SetProperty("opacity", FloatProperty::New(opacity) );
   m_Node->SetProperty("line width", IntProperty::New(1) );
   m_Node->SetProperty("scalar visibility", BoolProperty::New(false) );
 

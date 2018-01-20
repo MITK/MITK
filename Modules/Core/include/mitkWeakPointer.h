@@ -26,6 +26,8 @@ namespace mitk
   class WeakPointer final
   {
   public:
+    using DeleteEventCallbackType = std::function<void ()>;
+
     WeakPointer() noexcept
       : m_RawPointer(nullptr)
     {
@@ -127,6 +129,11 @@ namespace mitk
       return m_RawPointer;
     }
 
+    void SetDeleteEventCallback(const DeleteEventCallbackType &callback)
+    {
+      m_DeleteEventCallback = callback;
+    }
+
   private:
     void AddDeleteEventObserver()
     {
@@ -146,10 +153,13 @@ namespace mitk
 
     void OnDeleteEvent() noexcept
     {
-      m_RawPointer = nullptr;
-
       // Don't remove any observers from the observed object as it is about to
       // die and can't handle this operation anymore.
+
+      m_RawPointer = nullptr;
+
+      if (m_DeleteEventCallback)
+        m_DeleteEventCallback();
     }
 
     // The following comparison operators need access to class internals.
@@ -202,6 +212,8 @@ namespace mitk
     // AddDeleteEventObserver() and RemoveDeleteEventObserver(). There
     // isn't any need to initialize or use it at all outside of these methods.
     unsigned long m_ObserverTag;
+
+    DeleteEventCallbackType m_DeleteEventCallback;
   };
 }
 

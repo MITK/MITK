@@ -23,7 +23,15 @@ int mitkWeakPointerTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("WeakPointer")
 
+  int deleteEventCallbackCalled = 0;
+
   mitk::WeakPointer<itk::Object> weakPointer;
+
+  weakPointer.SetDeleteEventCallback([&deleteEventCallbackCalled]()
+  {
+    ++deleteEventCallbackCalled;
+  });
+
   mitk::WeakPointer<itk::Object> weakPointer2;
 
   // Testing constructors and reference counting
@@ -45,7 +53,8 @@ int mitkWeakPointerTest(int /*argc*/, char * /*argv*/ [])
   MITK_TEST_CONDITION_REQUIRED(weakPointer.IsExpired(), "Testing expired weak pointer (smart pointer assignment)");
   MITK_TEST_CONDITION_REQUIRED(weakPointer2.IsExpired(), "Testing expired weak pointer (weak pointer assignment)");
   MITK_TEST_CONDITION_REQUIRED(weakPointer3.IsExpired(), "Testing expired weak pointer (smart pointer constructor)");
-  MITK_TEST_CONDITION_REQUIRED(weakPointer4.IsExpired(), "Testing expired weak pointer (copy constructor)")
+  MITK_TEST_CONDITION_REQUIRED(weakPointer4.IsExpired(), "Testing expired weak pointer (copy constructor)");
+  MITK_TEST_CONDITION_REQUIRED(1 == deleteEventCallbackCalled, "Testing call of delete event callback");
 
   MITK_TEST_END()
 }

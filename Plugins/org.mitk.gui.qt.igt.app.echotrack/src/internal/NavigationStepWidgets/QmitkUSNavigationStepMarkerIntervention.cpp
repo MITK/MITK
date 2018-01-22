@@ -123,62 +123,6 @@ QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention
   m_TargetUpdateFilter->SetScalarArrayIdentifier("USNavigation::ReachedTargetScores");
 }
 
-QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention(mitk::Point3D toolAxis, QWidget *parent)
-  : QmitkUSAbstractNavigationStep(parent),
-  m_NumberOfTargets(0),
-  m_TargetProgressBar(0),
-  m_PlannedTargetProgressBar(0),
-  m_CurrentTargetIndex(0),
-  m_CurrentTargetReached(false),
-  m_ShowPlanningColors(false),
-  m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
-  m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
-  m_TargetUpdateFilter(mitk::USNavigationTargetUpdateFilter::New()),
-  m_TargetOcclusionFilter(mitk::USNavigationTargetOcclusionFilter::New()),
-  m_TargetIntersectionFilter(mitk::USNavigationTargetIntersectionFilter::New()),
-  m_PlacementQualityCalculator(mitk::USTargetPlacementQualityCalculator::New()),
-  m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
-  m_TargetStructureWarnOverlay(mitk::TextAnnotation2D::New()),
-  m_ReferenceSensorIndex(1),
-  m_NeedleSensorIndex(0),
-  ui(new Ui::QmitkUSNavigationStepMarkerIntervention)
-{
-  m_ActiveTargetColor[0] = 1;
-  m_ActiveTargetColor[1] = 1;
-  m_ActiveTargetColor[2] = 0;
-  m_InactiveTargetColor[0] = 1;
-  m_InactiveTargetColor[1] = 1;
-  m_InactiveTargetColor[2] = 0.5;
-  m_ReachedTargetColor[0] = 0.6;
-  m_ReachedTargetColor[1] = 1;
-  m_ReachedTargetColor[2] = 0.6;
-
-  ui->setupUi(this);
-
-  m_NeedleProjectionFilter->SetToolAxisForFilter(toolAxis);
-
-  connect(ui->freezeImageButton, SIGNAL(SignalFreezed(bool)), this, SLOT(OnFreeze(bool)));
-  connect(ui->backToLastTargetButton, SIGNAL(clicked()), this, SLOT(OnBackToLastTargetClicked()));
-  connect(ui->targetReachedButton, SIGNAL(clicked()), this, SLOT(OnTargetLeft()));
-  connect(this, SIGNAL(TargetReached(int)), this, SLOT(OnTargetReached()));
-  connect(this, SIGNAL(TargetLeft(int)), this, SLOT(OnTargetLeft()));
-  connect(ui->riskStructuresRangeWidget,
-    SIGNAL(SignalZoneViolated(const mitk::DataNode *, mitk::Point3D)),
-    this,
-    SLOT(OnRiskZoneViolated(const mitk::DataNode *, mitk::Point3D)));
-
-  m_PointMarkInteractor = mitk::USPointMarkInteractor::New();
-  m_PointMarkInteractor->CoordinatesChangedEvent.AddListener(m_ListenerTargetCoordinatesChanged);
-
-  this->GenerateTargetColorLookupTable();
-
-  m_TargetProgressBar = new QmitkZoneProgressBar(QString::fromStdString("Target: %1 mm"), 200, 0, this);
-  m_TargetProgressBar->SetTextFormatInvalid("Target is not on Needle Path");
-  ui->targetStructuresRangeLayout->addWidget(m_TargetProgressBar);
-
-  m_TargetUpdateFilter->SetScalarArrayIdentifier("USNavigation::ReachedTargetScores");
-}
-
 QmitkUSNavigationStepMarkerIntervention::~QmitkUSNavigationStepMarkerIntervention()
 {
   mitk::DataStorage::Pointer dataStorage = this->GetDataStorage(false);

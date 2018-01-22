@@ -63,7 +63,6 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationStepMarkerIntervention(QWidget *parent = 0);
-  QmitkUSNavigationStepMarkerIntervention(mitk::Point3D toolAxis, QWidget *parent = 0);
   ~QmitkUSNavigationStepMarkerIntervention();
 
   virtual bool OnStartStep();

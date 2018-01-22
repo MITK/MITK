@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <QWebChannel>
 #include <QWebEngineView>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+  #include <QWebEngineSettings>
+#endif
 
 #include <QmitkChartData.h>
 #include <QmitkChartxyData.h>
@@ -101,6 +104,9 @@ QmitkChartWidget::Impl::Impl(QWidget* parent)
   //Set the webengineview to an initial empty page. The actual chart will be loaded once the data is calculated.
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
   m_WebEngineView->page()->setWebChannel(m_WebChannel);
+  #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+    m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+  #endif
 
   connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
 
@@ -344,6 +350,7 @@ void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
 {
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+  m_WebEngineView->setEnabled(false);
 }
 
 void QmitkChartWidget::Impl::InitializeJavaScriptChart()

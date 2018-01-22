@@ -68,8 +68,6 @@ QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention
     m_ReachedTargetsNodes(),
     m_TargetProgressBar(new QmitkZoneProgressBar(QString::fromStdString("Target: %1 mm"), 200, 0, this)),
     m_PlannedTargetProgressBar(nullptr),
-    m_TargetProgressBar(0),
-    m_PlannedTargetProgressBar(0),
     m_CurrentTargetIndex(0),
     m_CurrentTargetReached(false),
     m_ShowPlanningColors(false),
@@ -135,15 +133,6 @@ QmitkUSNavigationStepMarkerIntervention::~QmitkUSNavigationStepMarkerInterventio
     {
       dataStorage->Remove(node);
     }
-  }
-
-  if (m_SegmentationNode.IsNotNull())
-  {
-    this->GetDataStorage()->Remove(m_SegmentationNode);
-  }
-  if (m_ForegroundModelPointsNode.IsNotNull())
-  {
-    this->GetDataStorage()->Remove(m_ForegroundModelPointsNode);
   }
 
   delete ui;
@@ -929,7 +918,7 @@ void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
   ui->centersOfMassValue->setText(QString::number(centersOfMassDistance, 103, 2) + " mm");
 
   double meanAnglesDifference = m_PlacementQualityCalculator->GetMeanAngleDifference();
-  ui->angleDifferenceValue->setText(QString::number(meanAnglesDifference, 103, 2) + QString::fromLatin1(" °"));
+  ui->angleDifferenceValue->setText(QString::number(meanAnglesDifference, 103, 2) + QString::fromLatin1(" Â°"));
 
   // create an intermediate result of the placement quality
   mitk::DataNode::Pointer placementQualityResult = mitk::DataNode::New();

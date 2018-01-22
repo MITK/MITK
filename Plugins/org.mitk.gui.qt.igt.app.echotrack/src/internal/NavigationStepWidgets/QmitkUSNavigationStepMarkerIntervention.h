@@ -124,9 +124,6 @@ protected:
   QVector<itk::SmartPointer<mitk::DataNode>> m_PlannedTargetsNodes;
   QVector<itk::SmartPointer<mitk::DataNode>> m_ReachedTargetsNodes;
 
-  itk::SmartPointer<mitk::DataNode> m_SegmentationNode;
-  itk::SmartPointer<mitk::DataNode> m_ForegroundModelPointsNode;
-
   QmitkZoneProgressBar *m_TargetProgressBar;
   QmitkZoneProgressBar *m_PlannedTargetProgressBar;
 

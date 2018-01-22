@@ -215,7 +215,10 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
       this->m_SelectedImage->GetTimeSteps() > 1)
   {
     // display histogram for selected timestep
-    this->m_Controls->m_JSHistogram->Clear();
+    //bug in Qt thats leads to crash in debug builds. Fixed in Qt 5.10
+    #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+      m_Controls->m_JSHistogram->Clear();
+    #endif
     QmitkImageStatisticsCalculationThread::HistogramType::ConstPointer histogram =
         (QmitkImageStatisticsCalculationThread::HistogramType::ConstPointer)this->m_CalculationThread->GetTimeStepHistogram(timestep);
 
@@ -421,7 +424,10 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
 void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
   //Clear Histogram if data node is deselected
-  m_Controls->m_JSHistogram->Clear();
+  //bug in Qt thats leads to crash in debug builds. Fixed in Qt 5.10
+  #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    m_Controls->m_JSHistogram->Clear();
+  #endif
 
   if( this->m_StatisticsUpdatePending )
   {
@@ -837,7 +843,10 @@ void QmitkImageStatisticsView::OnHistogramNBinsCheckBoxValueChanged()
 
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
-  m_Controls->m_JSHistogram->Clear();
+  //bug in Qt thats leads to crash in debug builds. Fixed in Qt 5.10
+  #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    m_Controls->m_JSHistogram->Clear();
+  #endif
 
   //Disconnect OnLineRadioButtonSelected() to prevent reloading chart when radiobutton is checked programmatically
   disconnect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), 0, 0);

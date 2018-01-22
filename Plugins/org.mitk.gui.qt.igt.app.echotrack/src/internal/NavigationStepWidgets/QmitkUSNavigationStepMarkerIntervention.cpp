@@ -64,11 +64,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention(QWidget *parent)
   : QmitkUSAbstractNavigationStep(parent),
     m_NumberOfTargets(0),
+    m_PlannedTargetsNodes(),
+    m_ReachedTargetsNodes(),
+    m_TargetProgressBar(new QmitkZoneProgressBar(QString::fromStdString("Target: %1 mm"), 200, 0, this)),
+    m_PlannedTargetProgressBar(nullptr),
     m_TargetProgressBar(0),
     m_PlannedTargetProgressBar(0),
     m_CurrentTargetIndex(0),
     m_CurrentTargetReached(false),
     m_ShowPlanningColors(false),
+    m_PointMarkInteractor(mitk::USPointMarkInteractor::New()),
+    m_TargetNode(nullptr),
+    m_TargetColorLookupTableProperty(nullptr),
+    m_TargetSurface(nullptr),
     m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
     m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
     m_TargetUpdateFilter(mitk::USNavigationTargetUpdateFilter::New()),
@@ -76,6 +84,8 @@ QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention
     m_TargetIntersectionFilter(mitk::USNavigationTargetIntersectionFilter::New()),
     m_PlacementQualityCalculator(mitk::USTargetPlacementQualityCalculator::New()),
     m_TargetStructureWarnOverlay(mitk::TextAnnotation2D::New()),
+    m_ReferenceSensorName(),
+    m_NeedleSensorName(),
     m_ReferenceSensorIndex(1),
     m_NeedleSensorIndex(0),
     m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
@@ -103,12 +113,10 @@ QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention
           this,
           SLOT(OnRiskZoneViolated(const mitk::DataNode *, mitk::Point3D)));
 
-  m_PointMarkInteractor = mitk::USPointMarkInteractor::New();
   m_PointMarkInteractor->CoordinatesChangedEvent.AddListener(m_ListenerTargetCoordinatesChanged);
 
   this->GenerateTargetColorLookupTable();
 
-  m_TargetProgressBar = new QmitkZoneProgressBar(QString::fromStdString("Target: %1 mm"), 200, 0, this);
   m_TargetProgressBar->SetTextFormatInvalid("Target is not on Needle Path");
   ui->targetStructuresRangeLayout->addWidget(m_TargetProgressBar);
 

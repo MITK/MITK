@@ -121,7 +121,6 @@ protected:
 
   unsigned int m_NumberOfTargets;
 
-  QVector<itk::SmartPointer<mitk::DataNode>> m_ZoneNodes;
   QVector<itk::SmartPointer<mitk::DataNode>> m_PlannedTargetsNodes;
   QVector<itk::SmartPointer<mitk::DataNode>> m_ReachedTargetsNodes;
 

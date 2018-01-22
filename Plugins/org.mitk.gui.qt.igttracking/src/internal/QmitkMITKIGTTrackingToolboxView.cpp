@@ -318,7 +318,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 void QmitkMITKIGTTrackingToolboxView::OnResetTools()
 {
   //remove data nodes of surfaces from data storage to clean up
-  for (int i = 0; i < m_toolStorage->GetToolCount(); i++)
+  for (unsigned int i = 0; i < m_toolStorage->GetToolCount(); i++)
   {
     this->GetDataStorage()->Remove(m_toolStorage->GetTool(i)->GetDataNode());
   }

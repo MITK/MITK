@@ -63,7 +63,6 @@ protected slots:
 
 public:
   explicit QmitkUSNavigationStepMarkerIntervention(QWidget *parent = 0);
-  QmitkUSNavigationStepMarkerIntervention(mitk::Point3D toolAxis, QWidget *parent = 0);
   ~QmitkUSNavigationStepMarkerIntervention();
 
   virtual bool OnStartStep();
@@ -122,12 +121,8 @@ protected:
 
   unsigned int m_NumberOfTargets;
 
-  QVector<itk::SmartPointer<mitk::DataNode>> m_ZoneNodes;
   QVector<itk::SmartPointer<mitk::DataNode>> m_PlannedTargetsNodes;
   QVector<itk::SmartPointer<mitk::DataNode>> m_ReachedTargetsNodes;
-
-  itk::SmartPointer<mitk::DataNode> m_SegmentationNode;
-  itk::SmartPointer<mitk::DataNode> m_ForegroundModelPointsNode;
 
   QmitkZoneProgressBar *m_TargetProgressBar;
   QmitkZoneProgressBar *m_PlannedTargetProgressBar;

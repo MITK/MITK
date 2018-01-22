@@ -29,11 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIntervention(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
   m_Ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
+  m_ZoneNodes(nullptr),
   m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
+  m_NeedleNavigationTool(mitk::NavigationTool::New()),
+  m_OldColors(),
   m_SphereSource(vtkSmartPointer<vtkSphereSource>::New()),
   m_OBBTree(vtkSmartPointer<vtkOBBTree>::New()),
-  m_IntersectPoints(vtkSmartPointer<vtkPoints>::New()),
-  m_NeedleNavigationTool(mitk::NavigationTool::New())
+  m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
 {
   m_Ui->setupUi(this);
   connect(m_Ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));

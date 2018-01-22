@@ -55,7 +55,7 @@ namespace mitk
     thisDevice->OpenConnection();
 
     //add the tools to the tracking device
-    for (int i = 0; i < navigationTools->GetToolCount(); i++)
+    for (unsigned int i = 0; i < navigationTools->GetToolCount(); i++)
     {
       mitk::NavigationTool::Pointer thisNavigationTool = navigationTools->GetTool(i);
       toolCorrespondencesInToolStorage->push_back(i);

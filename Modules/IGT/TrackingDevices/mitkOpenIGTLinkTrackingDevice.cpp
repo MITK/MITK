@@ -269,7 +269,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
 
   mitk::NavigationToolStorage::Pointer foundTools = this->DiscoverToolsAndConvertToNavigationTools(type);
   if (foundTools.IsNull() || (foundTools->GetToolCount() == 0)) { return false; }
-  for (int i = 0; i < foundTools->GetToolCount(); i++) { AddNewToolForName(foundTools->GetTool(i)->GetToolName(), i); }
+  for (unsigned int i = 0; i < foundTools->GetToolCount(); i++) { AddNewToolForName(foundTools->GetTool(i)->GetToolName(), i); }
   MITK_INFO << "Found tools: " << foundTools->GetToolCount();
   return true;
 }

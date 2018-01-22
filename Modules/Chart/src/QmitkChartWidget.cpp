@@ -494,10 +494,7 @@ void QmitkChartWidget::Show(bool showSubChart)
 
 void QmitkChartWidget::Clear()
 {
-  //bug in Qt thats leads to crash in debug builds. Fixed in Qt 5.10
-  #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    m_Impl->ClearData();
-  #endif
+  m_Impl->ClearData();
 	m_Impl->ClearJavaScriptChart();
 }
 

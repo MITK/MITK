@@ -29,17 +29,8 @@ QmitkModelViewSelectionConnector::QmitkModelViewSelectionConnector()
   : m_Model(nullptr)
   , m_View(nullptr)
   , m_SelectOnlyVisibleNodes(false)
-  , m_SelectionService(nullptr)
-  , m_SelectionProvider(nullptr)
 {
-  m_DataNodeItemModel = std::make_shared<QmitkDataNodeItemModel>();
-  m_DataNodeSelectionModel = std::make_shared<QItemSelectionModel>(m_DataNodeItemModel.get());
-}
-
-QmitkModelViewSelectionConnector::~QmitkModelViewSelectionConnector()
-{
-  RemovePostSelectionListener();
-  RemoveAsSelectionProvider();
+  // nothing here
 }
 
 void QmitkModelViewSelectionConnector::SetModel(QmitkAbstractDataStorageModel* model)
@@ -59,42 +50,6 @@ void QmitkModelViewSelectionConnector::SetView(QAbstractItemView* view)
   {
     connect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   }
-}
-
-void QmitkModelViewSelectionConnector::AddPostSelectionListener(berry::ISelectionService* selectionService)
-{
-  if (nullptr == selectionService
-    || nullptr == m_Model
-    || nullptr == m_View)
-  {
-    return;
-  }
-
-  m_SelectionService = selectionService;
-  m_BerrySelectionListener.reset(new berry::NullSelectionChangedAdapter<QmitkModelViewSelectionConnector>(this, &QmitkModelViewSelectionConnector::GlobalSelectionChanged));
-  m_SelectionService->AddPostSelectionListener(m_BerrySelectionListener.get());
-}
-
-void QmitkModelViewSelectionConnector::RemovePostSelectionListener()
-{
-  if (nullptr == m_SelectionService)
-  {
-    return;
-  }
-
-  m_SelectionService->RemovePostSelectionListener(m_BerrySelectionListener.get());
-  m_SelectionService = nullptr;
-}
-
-void QmitkModelViewSelectionConnector::SetAsSelectionProvider(QmitkDataNodeSelectionProvider* selectionProvider)
-{
-  m_SelectionProvider = selectionProvider;
-  connect(this, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), SLOT(FireGlobalSelectionChanged(QList<mitk::DataNode::Pointer>)));
-}
-
-void QmitkModelViewSelectionConnector::RemoveAsSelectionProvider()
-{
-  disconnect(this, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(FireGlobalSelectionChanged(QList<mitk::DataNode::Pointer>)));
 }
 
 void QmitkModelViewSelectionConnector::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
@@ -153,63 +108,6 @@ void QmitkModelViewSelectionConnector::ChangeModelSelection(const QItemSelection
     nodes.append(m_NonVisibleSelection);
   }
   emit CurrentSelectionChanged(nodes);
-}
-
-void QmitkModelViewSelectionConnector::FireGlobalSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
-{
-  if (nullptr == m_SelectionProvider)
-  {
-    return;
-  }
-
-  m_SelectionProvider->SetItemSelectionModel(m_DataNodeSelectionModel.get());
-
-  if (nodes.empty())
-  {
-    m_DataNodeSelectionModel->clearSelection();
-    m_DataNodeItemModel->clear();
-  }
-  else
-  {
-    m_DataNodeItemModel->clear();
-    // fill the temporary helper data node item model with the nodes to select
-    for (const auto& node : nodes)
-    {
-      m_DataNodeItemModel->AddDataNode(node);
-    }
-
-    m_DataNodeSelectionModel->select(QItemSelection(m_DataNodeItemModel->index(0, 0), m_DataNodeItemModel->index(nodes.size() - 1, 0)), QItemSelectionModel::ClearAndSelect);
-  }
-}
-
-void QmitkModelViewSelectionConnector::GlobalSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcePart, const berry::ISelection::ConstPointer& selection)
-{
-  if (sourcePart.IsNull())
-  {
-    return;
-  }
-
-  QList<mitk::DataNode::Pointer> nodes;
-  if (selection.IsNull())
-  {
-    // propagate an empty list
-    nodes = QList<mitk::DataNode::Pointer>();
-  }
-
-  // transform valid selection to DataNodeSelection, which allows to retrieve the selected nodes
-  mitk::DataNodeSelection::ConstPointer dataNodeSelection = selection.Cast<const mitk::DataNodeSelection>();
-  if (dataNodeSelection.IsNull())
-  {
-    // propagate an empty list
-    nodes = QList<mitk::DataNode::Pointer>();
-  }
-  else
-  {
-    nodes = QList<mitk::DataNode::Pointer>::fromStdList(dataNodeSelection->GetSelectedDataNodes());
-  }
-
-  // set new (possibly empty) selection in the given data storage view
-  SetCurrentSelection(nodes);
 }
 
 QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::GetSelectedNodes() const

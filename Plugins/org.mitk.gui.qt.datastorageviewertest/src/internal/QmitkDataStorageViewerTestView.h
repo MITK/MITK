@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 #include "QmitkModelViewSelectionConnector.h"
+#include "QmitkSelectionServiceConnector.h"
 
 // data storage viewer test plugin
 #include "ui_QmitkDataStorageViewerTestControls.h"
@@ -56,7 +57,9 @@ private:
   QmitkDataStorageDefaultListModel* m_DataStorageDefaultListModel2;
 
   std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
   std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector2;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector2;
 };
 
 #endif // QMITKDATASTORAGEVIEWERTESTVIEW_H

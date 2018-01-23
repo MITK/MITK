@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
   parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk/.tck/.dcm)", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
 
-  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", 0.05, false);
-  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap:", "positive means ROI image value threshold", 0.5, false);
+  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", 0.05);
+  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap:", "positive means ROI image value threshold", 0.5);
   parser.addArgument("min_fibers", "", mitkCommandLineParser::Int, "Min. num. fibers:", "discard positive tracts with less fibers", 0);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
   float overlap = 0.5;
   if (parsedArgs.count("overlap"))
-    overlap = us::any_cast<float>(parsedArgs["overlap_fraction"]);
+    overlap = us::any_cast<float>(parsedArgs["overlap"]);
 
   float threshold = 0.05;
   if (parsedArgs.count("threshold"))

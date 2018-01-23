@@ -443,6 +443,9 @@
           </item>
           <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="m_FiberExtractionFractionBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="maximum">
              <double>1.000000000000000</double>
             </property>
@@ -502,6 +505,9 @@
            <widget class="QDoubleSpinBox" name="m_FiberExtractionThresholdBox">
             <property name="toolTip">
              <string>Threshold on ROI image for positions to be considered as positive.</string>
+            </property>
+            <property name="decimals">
+             <number>3</number>
             </property>
             <property name="maximum">
              <double>9999.000000000000000</double>

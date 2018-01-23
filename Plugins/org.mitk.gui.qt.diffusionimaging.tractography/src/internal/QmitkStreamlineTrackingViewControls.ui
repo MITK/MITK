@@ -50,7 +50,17 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="7" column="1">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="toolTip">
+         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
+        </property>
+        <property name="text">
+         <string>Input Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
        <widget class="QmitkDataStorageComboBox" name="m_ForestBox">
         <property name="toolTip">
          <string>Random forest for machine learning based tractography.</string>
@@ -65,105 +75,7 @@
         </item>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Stop Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
-        <property name="toolTip">
-         <string>Fibers that enter a region defined in this image will stop immediately.</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="m_TensorImageLabel">
-        <property name="toolTip">
-         <string>Input Image. ODF, tensor, peak, and, in case of ML tractography, raw diffusion-weighted images are currently supported.</string>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskImageBox">
-        <property name="toolTip">
-         <string>Tractography is only performed inside the mask image. Fibers that leave the mask image are stopped.</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Mask Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="toolTip">
-         <string>Input Image. ODF, tensor and peak images are currently supported.</string>
-        </property>
-        <property name="text">
-         <string>Input Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
-        <property name="toolTip">
-         <string>If an image is selected, the stopping criterion is not calculated from the input image but instead the selected image is used.</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_11">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Target Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="mFaImageLabel">
         <property name="toolTip">
          <string/>
@@ -171,21 +83,6 @@
         <property name="text">
          <string>FA/GFA Image:</string>
         </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TargetImageBox">
-        <property name="toolTip">
-         <string>Fibers that do not start and end in a region defined in this image or the seed image will be discarded.</string>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item row="1" column="0">
@@ -213,7 +110,95 @@
         </item>
        </widget>
       </item>
-      <item row="7" column="0">
+      <item row="3" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
+        <property name="toolTip">
+         <string>Fibers that enter a region defined in this image will stop immediately.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TargetImageBox">
+        <property name="toolTip">
+         <string>Fibers that do not start and end in a region defined in this image or the seed image will be discarded.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Mask Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="m_TensorImageLabel">
+        <property name="toolTip">
+         <string>Input Image. ODF, tensor, peak, and, in case of ML tractography, raw diffusion-weighted images are currently supported.</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="m_TargetImageLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Target Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskImageBox">
+        <property name="toolTip">
+         <string>Tractography is only performed inside the mask image. Fibers that leave the mask image are stopped.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Stop Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
        <widget class="QLabel" name="m_ForestLabel">
         <property name="toolTip">
          <string/>
@@ -221,6 +206,76 @@
         <property name="text">
          <string>Tractography Forest:</string>
         </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
+        <property name="toolTip">
+         <string>If an image is selected, the stopping criterion is not calculated from the input image but instead the selected image is used.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Endpoint Constraints:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="m_EpConstraintsBox">
+        <property name="toolTip">
+         <string>Fibers that enter a region defined in this image will stop immediately.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>No Constraints on EP locations</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Both EPs in Target Image</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Both EPs in Target Image But Different Label</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>One EP in Seed Image and One EP in Target Image</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>At Least One EP in Target Image</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Exactly One EP in Target Image</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>No EP in Target Image</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

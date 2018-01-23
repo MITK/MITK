@@ -83,6 +83,7 @@ StreamlineTrackingFilter
   , m_StopTracking(false)
   , m_InterpolateMask(true)
   , m_TrialsPerSeed(10)
+  , m_EndpointConstraint(EndpointConstraints::NONE)
 {
   this->SetNumberOfRequiredInputs(0);
 }
@@ -227,6 +228,23 @@ void StreamlineTrackingFilter::BeforeTracking()
     std::cout << "StreamlineTracking - Using mask image" << std::endl;
   m_MaskInterpolator->SetInputImage(m_MaskImage);
 
+  // Autosettings for endpoint constraints
+  if (m_EndpointConstraint==EndpointConstraints::NONE && m_TargetImageSet && m_SeedImageSet)
+  {
+    MITK_INFO << "No endpoint constraint chosen but seed and target image set --> setting constraint to EPS_IN_SEED_AND_TARGET";
+    m_EndpointConstraint = EndpointConstraints::EPS_IN_SEED_AND_TARGET;
+  }
+  else if (m_EndpointConstraint==EndpointConstraints::NONE && m_TargetImageSet)
+  {
+    MITK_INFO << "No endpoint constraint chosen but target image set --> setting constraint to EPS_IN_TARGET";
+    m_EndpointConstraint = EndpointConstraints::EPS_IN_TARGET;
+  }
+
+  // Check if endpoint constraints are valid
+  FiberType test_fib; itk::Point<float> p; p.Fill(0);
+  test_fib.push_back(p); test_fib.push_back(p);
+  IsValidFiber(&test_fib);
+
   if (m_SeedPoints.empty())
     GetSeedPointsFromSeedImage();
 
@@ -250,6 +268,21 @@ void StreamlineTrackingFilter::BeforeTracking()
   }
   else
     std::cout << "StreamlineTracking - Mode: ???" << std::endl;
+
+  if (m_EndpointConstraint==EndpointConstraints::NONE)
+    std::cout << "StreamlineTracking - Endpoint constraint: NONE" << std::endl;
+  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET)
+    std::cout << "StreamlineTracking - Endpoint constraint: EPS_IN_TARGET" << std::endl;
+  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET_LABELDIFF)
+    std::cout << "StreamlineTracking - Endpoint constraint: EPS_IN_TARGET_LABELDIFF" << std::endl;
+  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_SEED_AND_TARGET)
+    std::cout << "StreamlineTracking - Endpoint constraint: EPS_IN_SEED_AND_TARGET" << std::endl;
+  else if (m_EndpointConstraint==EndpointConstraints::MIN_ONE_EP_IN_TARGET)
+    std::cout << "StreamlineTracking - Endpoint constraint: MIN_ONE_EP_IN_TARGET" << std::endl;
+  else if (m_EndpointConstraint==EndpointConstraints::ONE_EP_IN_TARGET)
+    std::cout << "StreamlineTracking - Endpoint constraint: ONE_EP_IN_TARGET" << std::endl;
+  else if (m_EndpointConstraint==EndpointConstraints::NO_EP_IN_TARGET)
+    std::cout << "StreamlineTracking - Endpoint constraint: NO_EP_IN_TARGET" << std::endl;
 
   std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/M_PI << "°)" << std::endl;
   std::cout << "StreamlineTracking - Stepsize: " << m_StepSize << "mm (" << m_StepSize/m_MinVoxelSize << "*vox)" << std::endl;
@@ -723,23 +756,90 @@ void StreamlineTrackingFilter::GenerateData()
 
 bool StreamlineTrackingFilter::IsValidFiber(FiberType* fib)
 {
-  if (m_TargetImageSet && m_SeedImageSet)
+  if (m_EndpointConstraint==EndpointConstraints::NONE)
   {
-    if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_SeedInterpolator)
-         && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
-      return true;
-    if ( mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_SeedInterpolator)
-         && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator) )
-      return true;
-    return false;
+    return true;
   }
-  else if (m_TargetImageSet)
+  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET)
   {
-    if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
-         && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
-      return true;
-    return false;
+    if (m_TargetImageSet)
+    {
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+        return true;
+      return false;
+    }
+    else
+      mitkThrow() << "No target image set but endpoint constraint EPS_IN_TARGET chosen!";
   }
+  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_TARGET_LABELDIFF)
+  {
+    if (m_TargetImageSet)
+    {
+      float v1 = mitk::imv::GetImageValue<float>(fib->front(), false, m_TargetInterpolator);
+      float v2 = mitk::imv::GetImageValue<float>(fib->back(), false, m_TargetInterpolator);
+      if ( v1>0.0 && v2>0.0 && v1!=v2  )
+        return true;
+      return false;
+    }
+    else
+      mitkThrow() << "No target image set but endpoint constraint EPS_IN_TARGET_LABELDIFF chosen!";
+  }
+  else if (m_EndpointConstraint==EndpointConstraints::EPS_IN_SEED_AND_TARGET)
+  {
+    if (m_TargetImageSet && m_SeedImageSet)
+    {
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_SeedInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+        return true;
+      if ( mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_SeedInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator) )
+        return true;
+      return false;
+    }
+    else
+      mitkThrow() << "No target or seed image set but endpoint constraint EPS_IN_SEED_AND_TARGET chosen!";
+  }
+  else if (m_EndpointConstraint==EndpointConstraints::MIN_ONE_EP_IN_TARGET)
+  {
+    if (m_TargetImageSet)
+    {
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
+           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+        return true;
+      return false;
+    }
+    else
+      mitkThrow() << "No target image set but endpoint constraint MIN_ONE_EP_IN_TARGET chosen!";
+  }
+  else if (m_EndpointConstraint==EndpointConstraints::ONE_EP_IN_TARGET)
+  {
+    if (m_TargetImageSet)
+    {
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
+           && !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+        return true;
+      if ( !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator) )
+        return true;
+      return false;
+    }
+    else
+      mitkThrow() << "No target image set but endpoint constraint ONE_EP_IN_TARGET chosen!";
+  }
+  else if (m_EndpointConstraint==EndpointConstraints::NO_EP_IN_TARGET)
+  {
+    if (m_TargetImageSet)
+    {
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
+           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+        return false;
+      return true;
+    }
+    else
+      mitkThrow() << "No target image set but endpoint constraint NO_EP_IN_TARGET chosen!";
+  }
+
   return true;
 }
 

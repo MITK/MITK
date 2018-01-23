@@ -47,6 +47,16 @@ class MITKFIBERTRACKING_EXPORT StreamlineTrackingFilter : public ProcessObject
 
 public:
 
+  enum EndpointConstraints {
+    NONE,                     ///< No constraints on endpoint locations
+    EPS_IN_TARGET,            ///< Both EPs are required to be located in the target image
+    EPS_IN_TARGET_LABELDIFF,  ///< Both EPs are required to be located in the target image and the image values at the respective position needs to be distinct
+    EPS_IN_SEED_AND_TARGET,   ///< One EP is required to be located in the seed image and one in the target image
+    MIN_ONE_EP_IN_TARGET,     ///< At least one EP is required to be located in the target image
+    ONE_EP_IN_TARGET,         ///< Exactly one EP is required to be located in the target image
+    NO_EP_IN_TARGET           ///< No EP is allowed to be located in the target image
+  };
+
   typedef StreamlineTrackingFilter Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
@@ -88,14 +98,17 @@ public:
   void SetDicomProperties(mitk::FiberBundle::Pointer fib);
 
   itkGetMacro( OutputProbabilityMap, ItkDoubleImgType::Pointer)    ///< Output probability map
-  itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers
+  itkGetMacro( FiberPolyData, PolyDataType )            ///< Output fibers
   itkGetMacro( UseOutputProbabilityMap, bool)
+  itkGetMacro( MinVoxelSize, float)
+  itkGetMacro( EndpointConstraint, EndpointConstraints)
 
-  itkSetMacro( SeedImage, ItkFloatImgType::Pointer)   ///< Seeds are only placed inside of this mask.
-  itkSetMacro( MaskImage, ItkFloatImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
-  itkSetMacro( SeedsPerVoxel, int)                    ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
-  itkSetMacro( MinTractLength, float )                ///< Shorter tracts are discarded.
-  itkSetMacro( MaxTractLength, float )                ///< Streamline progression stops if tract is longer than specified.
+  itkSetMacro( SeedImage, ItkFloatImgType::Pointer)     ///< Seeds are only placed inside of this mask.
+  itkSetMacro( MaskImage, ItkFloatImgType::Pointer)     ///< Tracking is only performed inside of this mask image.
+  itkSetMacro( SeedsPerVoxel, int)                      ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
+  itkSetMacro( MinTractLength, float )                  ///< Shorter tracts are discarded.
+  itkSetMacro( MaxTractLength, float )                  ///< Streamline progression stops if tract is longer than specified.
+  itkSetMacro( EndpointConstraint, EndpointConstraints) ///< Determines what fibers are accepted based on their endpoint location
 
   itkSetMacro( UseStopVotes, bool )                   ///< Frontal sampling points can vote for stopping the streamline even if the remaining sampling points keep pushing
   itkSetMacro( OnlyForwardSamples, bool )             ///< Don't use sampling points behind the current position in progression direction
@@ -115,7 +128,7 @@ public:
   itkSetMacro( StopTracking, bool )
   itkSetMacro( InterpolateMask, bool )
   itkSetMacro( TrialsPerSeed, unsigned int )          ///< When using probabilistic tractography, each seed point is used N times until a valid streamline that is compliant with all thresholds etc. is found
-  itkGetMacro( MinVoxelSize, float)
+
 
   ///< Use manually defined points in physical space as seed points instead of seed image
   void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {
@@ -197,6 +210,7 @@ protected:
   bool                                m_StopTracking;
   bool                                m_InterpolateMask;
   unsigned int                        m_TrialsPerSeed;
+  EndpointConstraints                 m_EndpointConstraint;
 
   void BuildFibers(bool check);
   float CheckCurvature(DirectionContainer *fib, bool front);

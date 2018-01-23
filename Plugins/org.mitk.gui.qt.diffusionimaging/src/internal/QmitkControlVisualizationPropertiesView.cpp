@@ -669,6 +669,8 @@ void QmitkControlVisualizationPropertiesView::FlipPeaks()
   if (m_SelectedNode.IsNull() || dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr)
     return;
 
+  std::string name = m_SelectedNode->GetName();
+
   mitk::Image::Pointer image = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
 
   typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
@@ -688,6 +690,7 @@ void QmitkControlVisualizationPropertiesView::FlipPeaks()
   mitk::CastToMitkImage(flipper->GetOutput(), resultImage);
   resultImage->SetVolume(flipper->GetOutput()->GetBufferPointer());
   m_SelectedNode->SetData(resultImage);
+  m_SelectedNode->SetName(name);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

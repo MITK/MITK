@@ -22,12 +22,20 @@ Select the data you want to track on in the datamanager. Supported file types ar
 
 Optional Input:
 
-\li Mask used to define the seed voxels. If no seed mask is specified, the whole image volume is seeded.
-\li Mask used to constrain the generated streamlines. Streamlines can not leave the mask area.
-\li Mask to define the target region. A streamline is only considered valid if it starts and ends in the target and seed region region. Without seed region, both endpoints need to be located in the target region.
-\li Binary mask used to define stopping regions. Streamlines that enter the mask area are stopped immediately.
-\li FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
-\li Tractography Forest: Needed for machine learning based tractography [1].
+- Mask used to define the seed voxels. If no seed mask is specified, the whole image volume is seeded.
+- Mask used to constrain the generated streamlines. Streamlines can not leave the mask area.
+- Binary mask used to define stopping regions. Streamlines that enter the mask area are stopped immediately.
+- Endpoint Constraints: Determines what fibers are accepted based on their endpoint location. Options are:
+  - No constraints on endpoint locations (command line option NONE)
+  - Both EPs are required to be located in the target image (command line option EPS_IN_TARGET)
+  - Both EPs are required to be located in the target image and the image values at the respective position needs to be distinct (command line option EPS_IN_TARGET_LABELDIFF)
+  - One EP is required to be located in the seed image and one in the target image (command line option EPS_IN_SEED_AND_TARGET)
+  - At least one EP is required to be located in the target image (command line option MIN_ONE_EP_IN_TARGET)
+  - Exactly one EP is required to be located in the target image (command line option ONE_EP_IN_TARGET)
+  - No EP is allowed to be located in the target image (command line option NO_EP_IN_TARGET)
+- Mask to define the target region needed for endpoint constraints.
+- FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
+- Tractography Forest: Needed for machine learning based tractography [1].
 
 \section StrTrackUserManualInteractive Interactive Tractography
 

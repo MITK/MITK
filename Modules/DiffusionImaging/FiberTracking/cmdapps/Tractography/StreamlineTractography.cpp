@@ -65,9 +65,10 @@ int main(int argc, char* argv[])
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle/probability map", us::Any(), false);
 
   parser.addArgument("stop_image", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
-  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "a streamline is only considered valid if it starts and ends in the target and seed region region. without seed region, both endpoints need to be located in the target region", us::Any());
   parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
   parser.addArgument("seed_image", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
+  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "effact depends on the chosen endpoint constraint (option ep_constraint)", us::Any());
+  parser.addArgument("ep_constraint", "", mitkCommandLineParser::String, "Endpoint constraint:", "Determines what fibers are accepted based on their endpoint location. Options are NONE, EPS_IN_TARGET, EPS_IN_TARGET_LABELDIFF, EPS_IN_SEED_AND_TARGET, MIN_ONE_EP_IN_TARGET, ONE_EP_IN_TARGET and NO_EP_IN_TARGET.", us::Any());
 
   parser.addArgument("sharpen_odfs", "", mitkCommandLineParser::Bool, "SHarpen ODFs:", "if you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). this is not necessary for CSD fODFs, since they are narurally much sharper.");
   parser.addArgument("cutoff", "", mitkCommandLineParser::Float, "Cutoff:", "set the FA, GFA or Peak amplitude cutoff for terminating tracks", 0.1);
@@ -176,6 +177,10 @@ int main(int argc, char* argv[])
   std::string stopFile = "";
   if (parsedArgs.count("stop_image"))
     stopFile = us::any_cast<std::string>(parsedArgs["stop_image"]);
+
+  std::string ep_constraint = "NONE";
+  if (parsedArgs.count("ep_constraint"))
+    ep_constraint = us::any_cast<std::string>(parsedArgs["ep_constraint"]);
 
   float cutoff = 0.1;
   if (parsedArgs.count("cutoff"))
@@ -414,6 +419,21 @@ int main(int argc, char* argv[])
   handler->SetFlipX(flip_x);
   handler->SetFlipY(flip_y);
   handler->SetFlipZ(flip_z);
+
+  if (ep_constraint=="NONE")
+    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NONE);
+  else if (ep_constraint=="EPS_IN_TARGET")
+    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET);
+  else if (ep_constraint=="EPS_IN_TARGET_LABELDIFF")
+    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF);
+  else if (ep_constraint=="EPS_IN_SEED_AND_TARGET")
+    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET);
+  else if (ep_constraint=="MIN_ONE_EP_IN_TARGET")
+    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET);
+  else if (ep_constraint=="ONE_EP_IN_TARGET")
+    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET);
+  else if (ep_constraint=="NO_EP_IN_TARGET")
+    tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET);
 
   MITK_INFO << "Tractography algorithm: " << algorithm;
   tracker->SetNumberOfSamples(num_samples);

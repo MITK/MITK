@@ -169,6 +169,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_LoopCheckBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_EpConstraintsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
 
     StartStopTrackingGui(false);
   }
@@ -351,7 +352,7 @@ void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 
 void QmitkStreamlineTrackingView::OnParameterChanged()
 {
-  MITK_INFO << "UPDATE";
+  UpdateGui();
   if (m_Controls->m_InteractiveBox->isChecked() && m_Controls->m_ParamUpdateBox->isChecked())
     DoFiberTracking();
 }
@@ -527,6 +528,14 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->commandLinkButton->setEnabled(false);
   m_Controls->m_TrialsPerSeedBox->setEnabled(false);
   m_Controls->m_TrialsPerSeedLabel->setEnabled(false);
+  m_Controls->m_TargetImageBox->setEnabled(false);
+  m_Controls->m_TargetImageLabel->setEnabled(false);
+
+  if (m_Controls->m_EpConstraintsBox->currentIndex()>0)
+  {
+    m_Controls->m_TargetImageBox->setEnabled(true);
+    m_Controls->m_TargetImageLabel->setEnabled(true);
+  }
 
   // trials per seed are only important for probabilistic tractography
   if (m_Controls->m_ModeBox->currentIndex()==1)
@@ -833,6 +842,47 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TargetImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetTargetRegions(mask);
+  }
+
+  // Endpoint constraints
+  switch (m_Controls->m_EpConstraintsBox->currentIndex())
+  {
+  case 0:
+    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NONE);
+    m_Tracker->SetTargetRegions(nullptr);
+    break;
+  case 1:
+    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET);
+    break;
+  case 2:
+    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_TARGET_LABELDIFF);
+    break;
+  case 3:
+    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET);
+    break;
+  case 4:
+    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::MIN_ONE_EP_IN_TARGET);
+    break;
+  case 5:
+    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::ONE_EP_IN_TARGET);
+    break;
+  case 6:
+    m_Tracker->SetEndpointConstraint(itk::StreamlineTrackingFilter::EndpointConstraints::NO_EP_IN_TARGET);
+    break;
+  }
+
+  if (m_Tracker->GetEndpointConstraint()!=itk::StreamlineTrackingFilter::EndpointConstraints::NONE && m_Controls->m_TargetImageBox->GetSelectedNode().IsNull())
+  {
+    QMessageBox::information(nullptr, "Error", "Endpoint constraints are used but no target image is set!");
+    StartStopTrackingGui(false);
+    return;
+  }
+  else if (m_Tracker->GetEndpointConstraint()==itk::StreamlineTrackingFilter::EndpointConstraints::EPS_IN_SEED_AND_TARGET
+           && (m_Controls->m_SeedImageBox->GetSelectedNode().IsNull()|| m_Controls->m_TargetImageBox->GetSelectedNode().IsNull()) )
+  {
+    QMessageBox::information(nullptr, "Error", "Endpoint constraint EPS_IN_SEED_AND_TARGET is used but no target or no seed image is set!");
+    StartStopTrackingGui(false);
+    return;
   }
 
   m_Tracker->SetVerbose(!m_Controls->m_InteractiveBox->isChecked());

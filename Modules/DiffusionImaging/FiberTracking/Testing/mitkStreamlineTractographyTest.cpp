@@ -149,7 +149,7 @@ public:
   {
     tracker = itk::StreamlineTrackingFilter::New();
     tracker->SetRandom(false);
-    tracker->SetInterpolateMask(false);
+    tracker->SetInterpolateMasks(false);
     tracker->SetNumberOfSamples(0);
     tracker->SetAngularThreshold(-1);
     tracker->SetMaskImage(itk_mask_image);

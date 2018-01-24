@@ -81,7 +81,7 @@ StreamlineTrackingFilter
   , m_CurrentTracts(0)
   , m_Progress(0)
   , m_StopTracking(false)
-  , m_InterpolateMask(true)
+  , m_InterpolateMasks(true)
   , m_TrialsPerSeed(10)
   , m_EndpointConstraint(EndpointConstraints::NONE)
 {
@@ -365,7 +365,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
   }
   vnl_vector_fixed<float,3> direction; direction.fill(0);
 
-  if (mitk::imv::IsInsideMask<float>(pos, m_InterpolateMask, m_MaskInterpolator) && !mitk::imv::IsInsideMask<float>(pos, m_InterpolateMask, m_StopInterpolator))
+  if (mitk::imv::IsInsideMask<float>(pos, m_InterpolateMasks, m_MaskInterpolator) && !mitk::imv::IsInsideMask<float>(pos, m_InterpolateMasks, m_StopInterpolator))
     direction = m_TrackingHandler->ProposeDirection(pos, olddirs, oldIndex); // get direction proposal at current streamline position
   else
     return direction;
@@ -407,7 +407,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
     sample_pos[2] = pos[2] + d[2];
 
     vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
-    if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMask, m_MaskInterpolator))
+    if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMasks, m_MaskInterpolator))
       tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
     if (tempDir.magnitude()>mitk::eps)
     {
@@ -435,7 +435,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
       sample_pos[2] = pos[2] + d[2];
       alternatives++;
       vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
-      if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMask, m_MaskInterpolator))
+      if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMasks, m_MaskInterpolator))
         tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
 
       if (tempDir.magnitude()>mitk::eps)  // are we back in the white matter?
@@ -609,7 +609,7 @@ void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
       itk::Point<float> worldPos;
       m_SeedImage->TransformContinuousIndexToPhysicalPoint(start, worldPos);
 
-      if ( mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMask, m_MaskInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_MaskInterpolator) )
       {
         m_SeedPoints.push_back(worldPos);
         for (int s = 1; s < m_SeedsPerVoxel; s++)
@@ -694,7 +694,7 @@ void StreamlineTrackingFilter::GenerateData()
       //      olddirs.push_back(gm_start_dir);
       //    }
 
-      if (mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMask, m_MaskInterpolator))
+      if (mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_MaskInterpolator))
         dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex);
 
       bool success = false;
@@ -764,8 +764,8 @@ bool StreamlineTrackingFilter::IsValidFiber(FiberType* fib)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
         return true;
       return false;
     }
@@ -789,11 +789,11 @@ bool StreamlineTrackingFilter::IsValidFiber(FiberType* fib)
   {
     if (m_TargetImageSet && m_SeedImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_SeedInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_SeedInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
         return true;
-      if ( mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_SeedInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_SeedInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator) )
         return true;
       return false;
     }
@@ -804,8 +804,8 @@ bool StreamlineTrackingFilter::IsValidFiber(FiberType* fib)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
-           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
+           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
         return true;
       return false;
     }
@@ -816,11 +816,11 @@ bool StreamlineTrackingFilter::IsValidFiber(FiberType* fib)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
-           && !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
+           && !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
         return true;
-      if ( !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator)
-           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator) )
+      if ( !mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator)
+           && mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator) )
         return true;
       return false;
     }
@@ -831,8 +831,8 @@ bool StreamlineTrackingFilter::IsValidFiber(FiberType* fib)
   {
     if (m_TargetImageSet)
     {
-      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMask, m_TargetInterpolator)
-           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMask, m_TargetInterpolator) )
+      if ( mitk::imv::IsInsideMask<float>(fib->front(), m_InterpolateMasks, m_TargetInterpolator)
+           || mitk::imv::IsInsideMask<float>(fib->back(), m_InterpolateMasks, m_TargetInterpolator) )
         return false;
       return true;
     }

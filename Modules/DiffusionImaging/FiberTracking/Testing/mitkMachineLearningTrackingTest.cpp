@@ -82,7 +82,7 @@ public:
         typedef itk::StreamlineTrackingFilter TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetDemoMode(false);
-        tracker->SetInterpolateMask(false);
+        tracker->SetInterpolateMasks(false);
         tracker->SetSeedImage(seed);
         tracker->SetSeedsPerVoxel(1);
         tracker->SetStepSize(-1);

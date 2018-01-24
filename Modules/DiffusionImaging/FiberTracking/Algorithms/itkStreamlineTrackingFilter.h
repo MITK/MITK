@@ -126,7 +126,7 @@ public:
   itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
   itkSetMacro( UseOutputProbabilityMap, bool)         ///< If true, no tractogram but a probability map is created as output.
   itkSetMacro( StopTracking, bool )
-  itkSetMacro( InterpolateMask, bool )
+  itkSetMacro( InterpolateMasks, bool )
   itkSetMacro( TrialsPerSeed, unsigned int )          ///< When using probabilistic tractography, each seed point is used N times until a valid streamline that is compliant with all thresholds etc. is found
 
 
@@ -208,7 +208,7 @@ protected:
   unsigned int                        m_CurrentTracts;
   unsigned int                        m_Progress;
   bool                                m_StopTracking;
-  bool                                m_InterpolateMask;
+  bool                                m_InterpolateMasks;
   unsigned int                        m_TrialsPerSeed;
   EndpointConstraints                 m_EndpointConstraint;
 

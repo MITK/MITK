@@ -821,13 +821,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     m_Tracker->SetSeedImage(mask);
   }
 
-  m_Tracker->SetInterpolateMask(false);
   if (m_Controls->m_MaskImageBox->GetSelectedNode().IsNotNull())
   {
     ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_MaskImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetMaskImage(mask);
-    m_Tracker->SetInterpolateMask(m_Controls->m_MaskInterpolationBox->isChecked());
   }
 
   if (m_Controls->m_StopImageBox->GetSelectedNode().IsNotNull())
@@ -885,6 +883,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     return;
   }
 
+  m_Tracker->SetInterpolateMasks(m_Controls->m_MaskInterpolationBox->isChecked());
   m_Tracker->SetVerbose(!m_Controls->m_InteractiveBox->isChecked());
   m_Tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelBox->value());
   m_Tracker->SetStepSize(m_Controls->m_StepSizeBox->value());

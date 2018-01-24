@@ -18,7 +18,7 @@ To perform image processing, simply load an image into MITK and select it in the
 Before performing reconstruction or using other filters those can be configured using the plugin's settings panel.
 \imageMacro{QmikPhotoacousticsImageProcessing_Settings.png,"The plugin's GUI",7.62}
 
-\subsection org_mitk_gui_qt_photoacoustics_imageprocessingImageDetails
+\subsection org_mitk_gui_qt_photoacoustics_imageprocessingImageDetails Image Details
 To create the .nrrd images necessary for the plugin from raw data, one can use e.g. <a href="https://github.com/mhe/pynrrd">pynrrd</a>, a python package for very straightforward creation of .nrrd images.
 The Beamforming Filter is also able to read certain paramters, as the scan depth and the transducer pitch from the selected image. To this end, the image must have a time-axis spacing in µs and a horizontal spacing in mm.
 

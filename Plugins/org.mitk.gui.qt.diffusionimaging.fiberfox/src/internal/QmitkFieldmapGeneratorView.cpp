@@ -54,6 +54,9 @@ void QmitkFieldmapGeneratorView::CreateQtPartControl( QWidget *parent )
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
     m_Controls->m_SelectedImageBox->SetPredicate(isMitkImage);
 
+    m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+    connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+
     connect((QObject*) m_Controls->m_GenerateFieldmap, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFieldmap()));
     connect((QObject*) m_Controls->m_PlaceFieldSource, SIGNAL(clicked()), (QObject*) this, SLOT(PlaceFieldSource()));
     connect((QObject*) m_Controls->m_SourceVarianceBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnVarianceChanged(double)));
@@ -199,53 +202,18 @@ void QmitkFieldmapGeneratorView::GenerateFieldmap()
 
 void QmitkFieldmapGeneratorView::Visible()
 {
-  MITK_INFO << "BLABLA";
-  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
 
-  {
-    mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
-    command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
-    m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
-    command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
-    m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
-    itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
-    command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
-    m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-  }
 }
 
 void QmitkFieldmapGeneratorView::Hidden()
 {
-  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
 
-  {
-    mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag1 );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag2 );
-  }
-
-  {
-    mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
-    slicer->RemoveObserver( m_SliceObserverTag3 );
-  }
 }
 
 void QmitkFieldmapGeneratorView::Activated()
 {
+  m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
 }
 
 void QmitkFieldmapGeneratorView::Deactivated()
@@ -277,15 +245,11 @@ void QmitkFieldmapGeneratorView::OnSelectionChanged(berry::IWorkbenchPart::Point
 
   if (m_Controls->m_SelectedImageBox->GetSelectedNode().IsNotNull())
   {
-    itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
-    command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
-    m_PropertyObserverTag = m_Controls->m_SelectedImageBox->GetSelectedNode()->AddObserver( itk::ModifiedEvent(), command );
-
     m_Controls->m_InputData->setTitle("Reference Image");
   }
 }
 
-void QmitkFieldmapGeneratorView::OnSliceChanged(const itk::EventObject& /*e*/)
+void QmitkFieldmapGeneratorView::OnSliceChanged()
 {
   if (m_Controls->m_SelectedImageBox->GetSelectedNode().IsNull() || !this->GetRenderWindowPart())
   {

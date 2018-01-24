@@ -55,8 +55,6 @@ QmitkODFDetailsView::QmitkODFDetailsView()
 
 QmitkODFDetailsView::~QmitkODFDetailsView()
 {
-  if (m_ImageNode.IsNotNull())
-    m_ImageNode->RemoveObserver( m_PropertyObserverTag );
 }
 
 void QmitkODFDetailsView::Activated()
@@ -101,9 +99,6 @@ void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )
 
 void QmitkODFDetailsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
-  if (m_ImageNode.IsNotNull())
-    m_ImageNode->RemoveObserver( m_PropertyObserverTag );
-
   m_Controls->m_InputData->setTitle("Please Select Input Data");
   m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
 

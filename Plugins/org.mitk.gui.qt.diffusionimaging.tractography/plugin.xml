@@ -8,7 +8,7 @@
     name="Global Gibbs Tractography"
     category="Fiber Tractography"
     class="QmitkGibbsTrackingView"
-    icon="resources/GibbsTracking.png">
+    icon="resources/tractogram.png">
     <keywordReference id="org.mitk.views.gibbstracking.Keyword"/>
     </view>
 
@@ -16,7 +16,7 @@
     name="Streamline Tractography"
     category="Fiber Tractography"
     class="QmitkStreamlineTrackingView"
-    icon="resources/fiberTracking1.png">
+    icon="resources/tract.png">
     <keywordReference id="org.mitk.views.streamlinetracking.Keyword"/>
     </view>
 
@@ -74,7 +74,7 @@
     name="Global Gibbs Tractography"
     category="Fiber Tractography"
     class="QmitkGibbsTractographyPerspective"
-    icon="resources/tractography.png">
+    icon="resources/tractogram.png">
     <keywordReference id="org.mitk.perspectives.tractography1.Keyword"/>
     </perspective>
 
@@ -82,7 +82,7 @@
     name="Streamline Tractography"
     category="Fiber Tractography"
     class="QmitkStreamlineTractographyPerspective"
-    icon="resources/fiberTracking1.png">
+    icon="resources/tract.png">
     <keywordReference id="org.mitk.perspectives.tractography2.Keyword"/>
     </perspective>
 

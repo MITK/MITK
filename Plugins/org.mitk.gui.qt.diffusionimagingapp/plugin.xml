@@ -24,7 +24,7 @@
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome"
       name="Data Display"
       class="QmitkWelcomePerspective"
-      icon="resources/perspectives/icon_home.png"/>
+      icon="resources/icon_home.png"/>
   </extension>
 
 

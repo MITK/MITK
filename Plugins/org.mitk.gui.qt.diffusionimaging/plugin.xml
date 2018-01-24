@@ -18,6 +18,16 @@
 
   </extension>
 
+  <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.segmentation"
+    name="Image Segmentation"
+    class="QmitkSegmentationPerspective"
+    icon="resources/segmentation.svg">
+    <description>This perspective contains views to perform manual image segmentation.</description>
+    </perspective>
+
+  </extension>
 
   <extension point="org.blueberry.ui.views">
 

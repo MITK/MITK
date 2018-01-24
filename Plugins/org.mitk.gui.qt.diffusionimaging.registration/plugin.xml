@@ -22,18 +22,6 @@
 
   </extension>
 
-  <extension point="org.blueberry.ui.perspectives">
-
-    <perspective id="org.mitk.perspectives.dwiregistration"
-    name="Registration"
-    class="QmitkDwiRegistrationPerspective"
-    icon="resources/diffusionregistration.png">
-    <description>This perspective contains views for rigid image registration and head motion correction.</description>
-    <keywordReference id="org.mitk.perspectives.dwiregistration.Keyword"/>
-    </perspective>
-
-  </extension>
-
   <extension point="org.blueberry.ui.keywords">
 
   <keyword label="registration" id="org.mitk.views.simpleregistrationview.Keyword"/>

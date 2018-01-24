@@ -22,8 +22,11 @@
   <property name="windowTitle">
    <string>QmitkTensorReconstructionViewControls</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_11">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_5">
+   <property name="verticalSpacing">
+    <number>25</number>
+   </property>
+   <item row="0" column="0">
     <widget class="QGroupBox" name="m_InputData">
      <property name="title">
       <string>Please Select Input Data:</string>
@@ -67,12 +70,12 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Tensor Reconstruction</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QGridLayout" name="gridLayout_7">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -85,7 +88,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0">
        <widget class="QCheckBox" name="m_Advanced1">
         <property name="text">
          <string>Advanced Settings</string>
@@ -95,7 +98,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -187,7 +190,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QCommandLinkButton" name="m_StartReconstruction">
         <property name="enabled">
          <bool>false</bool>
@@ -209,15 +212,12 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Diffusion-weighted Image from Tensors</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_6">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -230,7 +230,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0">
        <widget class="QFrame" name="m_TensorsToDWIFrame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -359,7 +359,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QCommandLinkButton" name="m_TensorsToDWIButton">
         <property name="enabled">
          <bool>false</bool>
@@ -381,15 +381,12 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
       <string>ODF Image from Tensors</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_8">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -402,7 +399,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0">
        <widget class="QCommandLinkButton" name="m_TensorsToOdfButton">
         <property name="enabled">
          <bool>false</bool>
@@ -424,7 +421,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="4" column="0">
     <widget class="QGroupBox" name="groupBox_5">
      <property name="title">
       <string>Calculate Residuals</string>
@@ -449,7 +446,7 @@
        <number>0</number>
       </property>
       <property name="horizontalSpacing">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="2" column="0">
        <widget class="QCheckBox" name="m_PercentagesOfOutliers">
@@ -610,7 +607,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="5" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

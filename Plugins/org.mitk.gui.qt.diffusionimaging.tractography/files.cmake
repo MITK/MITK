@@ -39,10 +39,8 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   plugin.xml
 
-  resources/tractography.png
-  resources/fiberTracking1.png
-  resources/StreamlineTracking.png
-  resources/GibbsTracking.png
+  resources/tract.png
+  resources/tractogram.png
   resources/ml_tractography.png
 )
 

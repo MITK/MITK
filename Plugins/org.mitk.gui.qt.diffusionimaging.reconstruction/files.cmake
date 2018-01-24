@@ -44,8 +44,6 @@ set(CACHED_RESOURCE_FILES
 
   resources/quantification.png
   resources/OdfDetails.png
-  resources/reconodf.png
-  resources/recontensor.png
   resources/tensor.png
   resources/odf.png
 )

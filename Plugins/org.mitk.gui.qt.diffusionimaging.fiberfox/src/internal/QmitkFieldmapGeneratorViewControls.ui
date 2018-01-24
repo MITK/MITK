@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>348</width>
-    <height>511</height>
+    <width>358</width>
+    <height>536</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,10 +19,7 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="spacing">
-    <number>6</number>
-   </property>
+  <layout class="QGridLayout" name="gridLayout_5">
    <property name="leftMargin">
     <number>9</number>
    </property>
@@ -35,39 +32,18 @@
    <property name="bottomMargin">
     <number>9</number>
    </property>
-   <item>
-    <widget class="QGroupBox" name="m_InputData">
-     <property name="title">
-      <string>Please Select Reference Image</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QmitkDataStorageComboBox" name="m_SelectedImageBox"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame">
+   <property name="verticalSpacing">
+    <number>25</number>
+   </property>
+   <item row="3" column="0">
+    <widget class="QFrame" name="frame_2">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout_6">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -80,52 +56,100 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+      <item row="2" column="0">
+       <widget class="QCommandLinkButton" name="m_PlaceFieldSource">
         <property name="text">
-         <string>World Coordinates:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="m_WorldPosLabel">
-        <property name="text">
-         <string>-</string>
+         <string>Place Field Source</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>World Coordinates:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="m_WorldPosLabel">
+           <property name="text">
+            <string>-</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Index:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="m_IndexLabel">
+           <property name="text">
+            <string>-</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCommandLinkButton" name="m_GenerateFieldmap">
         <property name="text">
-         <string>Index:</string>
+         <string>Generate Fieldmap</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="m_IndexLabel">
-        <property name="text">
-         <string>-</string>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="m_InputData">
+        <property name="title">
+         <string>Please Select Reference Image</string>
         </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QmitkDataStorageComboBox" name="m_SelectedImageBox"/>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QCommandLinkButton" name="m_PlaceFieldSource">
-     <property name="text">
-      <string>Place Field Source</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCommandLinkButton" name="m_GenerateFieldmap">
-     <property name="text">
-      <string>Generate Fieldmap</string>
-     </property>
-    </widget>
-   </item>
-   <item>
+   <item row="4" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Add Gradient</string>
@@ -259,7 +283,23 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="6" column="0">
+    <spacer name="spacer1">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>220</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Edit Selected Source</string>
@@ -321,22 +361,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <spacer name="spacer1">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>220</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

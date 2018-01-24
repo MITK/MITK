@@ -87,12 +87,6 @@ protected:
 
   Ui::QmitkODFDetailsViewControls*  m_Controls;
 
-  /** observer flags */
-  int m_SliceObserverTag1;
-  int m_SliceObserverTag2;
-  int m_SliceObserverTag3;
-  int m_PropertyObserverTag;
-
   /** ODF related variables like mesh structure, values etc. */
   vtkPolyData*                      m_TemplateOdf;  ///< spherical base mesh
   vtkSmartPointer<vtkTransform>     m_OdfTransform;

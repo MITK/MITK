@@ -8,6 +8,7 @@ set(INTERNAL_CPP_FILES
   QmitkDicomTractogramTagEditorView.cpp
 
   Perspectives/QmitkDiffusionDefaultPerspective.cpp
+  Perspectives/QmitkSegmentationPerspective.cpp
 )
 
 set(UI_FILES
@@ -23,6 +24,7 @@ set(MOC_H_FILES
   src/internal/QmitkDicomTractogramTagEditorView.h
 
   src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h
+  src/internal/Perspectives/QmitkSegmentationPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -42,6 +44,7 @@ set(CACHED_RESOURCE_FILES
   resources/odf_peaks.png
   resources/ml_tractogram.png
   resources/refresh.xpm
+  resources/segmentation.svg
  )
 
 set(QRC_FILES

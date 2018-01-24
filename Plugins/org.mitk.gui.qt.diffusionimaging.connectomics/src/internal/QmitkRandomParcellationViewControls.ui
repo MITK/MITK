@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>249</width>
-    <height>517</height>
+    <width>327</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -22,8 +22,11 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="verticalSpacing">
+    <number>25</number>
+   </property>
+   <item row="0" column="0">
     <widget class="QLabel" name="labelWarning">
      <property name="styleSheet">
       <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
@@ -33,7 +36,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <widget class="QGroupBox" name="groupBoxNumberNodes">
      <property name="enabled">
       <bool>true</bool>
@@ -44,8 +47,20 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="enabled">
          <bool>true</bool>
@@ -55,7 +70,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QSpinBox" name="spinBoxNumberNodes">
         <property name="minimum">
          <number>2</number>
@@ -68,7 +83,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QGroupBox" name="groupBoxMerging">
      <property name="enabled">
       <bool>true</bool>
@@ -76,34 +91,58 @@
      <property name="title">
       <string>Merging</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
        <widget class="QCheckBox" name="checkBoxMerging">
         <property name="text">
          <string>Merging on</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QFrame" name="frameMerging">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
+         <enum>QFrame::NoFrame</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
-         <item>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
           <widget class="QRadioButton" name="radioButtonNumberParcels">
            <property name="text">
             <string>According to the number of parcels</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="1" column="0">
           <widget class="QFrame" name="frameNumberParcels">
            <property name="enabled">
             <bool>false</bool>
@@ -114,15 +153,24 @@
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
                <string>Number of Parcels:</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="1" column="0">
              <widget class="QSpinBox" name="spinBoxNumberParcels">
               <property name="minimum">
                <number>1</number>
@@ -135,14 +183,14 @@
            </layout>
           </widget>
          </item>
-         <item>
+         <item row="2" column="0">
           <widget class="QRadioButton" name="radioButtonSmallestParcel">
            <property name="text">
             <string>According to the size of parcels</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="3" column="0">
           <widget class="QFrame" name="frameSmallestParcel">
            <property name="enabled">
             <bool>false</bool>
@@ -153,15 +201,24 @@
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
              <widget class="QLabel" name="label_2">
               <property name="text">
                <string>Size of the smallest parcel:</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="1" column="0">
              <widget class="QSpinBox" name="spinBoxSmallestParcel">
               <property name="minimum">
                <number>2</number>
@@ -171,7 +228,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="2" column="0">
              <widget class="QCheckBox" name="checkBoxJustMergeSmallParcels">
               <property name="text">
                <string>Just merge small parcels</string>
@@ -187,7 +244,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0">
     <widget class="QPushButton" name="buttonSelectRandomNodes">
      <property name="enabled">
       <bool>false</bool>
@@ -200,7 +257,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="4" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -213,20 +270,32 @@
      </property>
     </spacer>
    </item>
-   <item>
+   <item row="5" column="0">
     <widget class="QGroupBox" name="groupBoxCounting">
      <property name="title">
       <string>Counting</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
        <widget class="QLabel" name="labelNumberVoxels">
         <property name="text">
          <string>Number of voxels with value 1:</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QLabel" name="labelNumberNodes">
         <property name="text">
          <string>Number of nodes:</string>

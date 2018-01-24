@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <itkImage.h>
 #include "mitkILifecycleAwarePart.h"
+#include <QmitkSliceNavigationListener.h>
 
 /*!
   \brief Generate float image with artificial frequency maps used by Fiberfox. Simulates additional frequencies at (possibly multiple) positions based on 3D gaussians with the specified variance and amplitude and/or as a linear gradient in the image.
@@ -52,7 +53,6 @@ public:
   virtual void Visible() override;
   virtual void Hidden() override;
 
-  void OnSliceChanged(const itk::EventObject& e);
 
 protected slots:
 
@@ -60,6 +60,7 @@ protected slots:
   void PlaceFieldSource();
   void OnVarianceChanged(double value);
   void OnHeightChanged(double value);
+  void OnSliceChanged();
 
 protected:
 
@@ -74,8 +75,9 @@ protected:
   int m_SliceObserverTag3;
   int m_PropertyObserverTag;
 
-  mitk::Point3D               m_WorldPoint;
-  mitk::DataNode::Pointer     m_SelectedSource;
+  mitk::Point3D                 m_WorldPoint;
+  mitk::DataNode::Pointer       m_SelectedSource;
+  QmitkSliceNavigationListener  m_SliceChangeListener;
 };
 
 

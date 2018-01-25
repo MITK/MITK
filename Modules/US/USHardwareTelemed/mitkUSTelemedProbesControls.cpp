@@ -205,7 +205,7 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
   // initialize probes set with new vector
   m_ProbesSet = std::vector<mitk::USTelemedProbe::Pointer>(probes_count, 0);
 
-  for (unsigned int n = 0; n < probes_count; ++n)
+  for (LONG n = 0; n < probes_count; ++n)
   {
     // get the probe item from the API collection
     IUnknown* tmp_obj = nullptr;

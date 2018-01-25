@@ -39,21 +39,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 *   The 'QmitkSelectionServiceConnector' offers a public slot and signal that can be used to propagate the selected
 *   nodes from or to the global selection bus:
-*   The 'FireGlobalSelectionChanged'-slot transforms the given list of selected nodes into a QItemSelection of a temporary 
+*   The 'ChangeServiceSelection'-slot transforms the given list of selected nodes into a QItemSelection of a temporary
 *   data node selection model. This data node selection model is set as the item selection model of the member selection provider.
 *   So by temporary adding a new data node selection model and changing its selection the selection provider sends a new selection
 *   that can be received at any place in the workbench.
 *
-*   The 'GlobalSelectionChanged'-signal sends a list of selected nodes to it's environment.
-*   The 'GlobalSelectionChanged'-signal is emitted by the 'GlobalSelectionChanged'-function, which transforms the
-*   berry selection of the selection  into a data node list. The 'GlobalSelectionChanged'-function is called whenever
+*   The 'ServiceSelectionChanged'-signal sends a list of selected nodes to it's local environment (e.g. containing widget).
+*   The 'ServiceSelectionChanged'-signal is emitted by the 'ServiceSelectionChanged'-function, which transforms the
+*   berry selection of the selection  into a data node list. The 'ServiceSelectionChanged'-function is called whenever
 *   the selection service sends a selection changed event.
 *
 *   In order to connect the 'QmitkSelectionServiceConnector' with a model-view pair, a 'QmitkModelViewSelectionConnector' needs to be used:
 *   The 'QmitkModelViewSelectionConnector' offers a 'SetCurrentSelection'-slot that can be connected with the
-*   'GlobalSelectionChanged'-signal of this class.
+*   'ServiceSelectionChanged'-signal of this class.
 *   The 'QmitkModelViewSelectionConnector' offers a 'CurrentSelectionChanged'-signal that can be connected with the
-*   'FireGlobalSelectionChanged'-slot of this class.
+*   'ChangeServiceSelection'-slot of this class.
 */
 class MITK_QT_COMMON QmitkSelectionServiceConnector : public QObject
 {
@@ -66,8 +66,9 @@ public:
 
   /*
   * @brief 	Create a selection listener and add it to the list of selection listener of the given selection service.
-  *         The selection listener is connected with the 'GlobalSelectionChanged' member function, which is
-  *         called if a berry selection is changed in the workbench.
+  *
+  *   The selection listener is connected to the 'ServiceSelectionChanged' member function, which is
+  *   called if a berry selection is changed in the workbench.
   */
   void AddPostSelectionListener(berry::ISelectionService* selectionService);
   /*
@@ -75,35 +76,37 @@ public:
   */
   void RemovePostSelectionListener();
   /*
-  * @brief 	Connect the local 'CurrentSelectionChanged'-slot with the private 'FireSelectionChanged'-function of this class.
-  *         The 'FireSelectionChanged'-function transforms the list of selected nodes and propagates the changed selection.
+  * @brief  Store the given selection provider as a private member.
+  *         In order to use the public slot 'ChangeServiceSelection'-function, the selection provider member had to be
+  *         previously set.
   */
   void SetAsSelectionProvider(QmitkDataNodeSelectionProvider* selectionProvider);
   /*
-  * @brief 	Disconnect the local 'CurrentSelectionChanged'-slot from the private 'FireSelectionChanged'-function of this class.
+  * @brief  Set the selection provider member to a nullptr. This will prevent the public slot
+  *         'ChangeServiceSelection'-function from working.
   */
   void RemoveAsSelectionProvider();
 
 Q_SIGNALS:
   /*
-  * @brief A signal that will be emitted by the private 'GlobalSelectionChanged'-function. This happens if a selection is changed
-  *   via the selection bus.
+  * @brief A signal that will be emitted by the private 'ServiceSelectionChanged'-function. This happens if a selection is changed
+  *        via the selection service.
   *
   * @par	nodes		A list of data nodes that are newly selected.
   */
-  void GlobalSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void ServiceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
 public Q_SLOTS:
   /*
-  * @brief 	Send global selections to the selection provider.
+  * @brief  Send new selections to the selection service via the private selection provider member.
   *
-  *   This slot-function is called whenever a local selection is changed in the workbench and a selection provider was set.
-  *   The newly selected data nodes are added temporary to the 'QmitkDataNodeItemModel', which is then used to define
+  *   This slot-function is called whenever a local selection is changed in the surrounding widget and a selection provider was set.
+  *   The newly selected data nodes are added temporary to a 'QmitkDataNodeItemModel', which is then used to define
   *   the indices to select.
-  *   The 'QItemSelectionModel' is set as the item selection model of the selection provider and its items are selected
-  *   by the indices previously defined by the 'QmitkDataNodeItemModel'.
+  *   The 'QItemSelectionModel' is set as the item selection model of the selection provider member and its items are
+  *   selected by the indices previously defined by the 'QmitkDataNodeItemModel'.
   */
-  void FireGlobalSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void ChangeServiceSelection(QList<mitk::DataNode::Pointer> nodes);
 
 private:
 
@@ -114,16 +117,16 @@ private:
   std::shared_ptr<QItemSelectionModel> m_DataNodeSelectionModel;
 
   /*
-  * @brief 	Handle a global selection received from the selection service.
+  * @brief  Handle a selection received from the selection service.
   *
-  *   This function is called whenever a global berry selection is changed in the workbench.
+  *   This function is called whenever a berry selection of the selection service is changed in the workbench.
   *   The new selection is transformed into a data node selection and the contained data nodes are propagated
   *   as the new current selection of the item view member.
   *
   * @par  sourcePart  The workbench part containing the selection.
   * @par  selection   The current selection.
   */
-  void GlobalSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcePart, const berry::ISelection::ConstPointer& selection);
+  void ServiceSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcePart, const berry::ISelection::ConstPointer& selection);
 
 };
 

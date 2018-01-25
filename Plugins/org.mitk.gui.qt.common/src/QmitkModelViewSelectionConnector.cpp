@@ -33,11 +33,6 @@ QmitkModelViewSelectionConnector::QmitkModelViewSelectionConnector()
   // nothing here
 }
 
-void QmitkModelViewSelectionConnector::SetModel(QmitkAbstractDataStorageModel* model)
-{
-  m_Model = model;
-}
-
 void QmitkModelViewSelectionConnector::SetView(QAbstractItemView* view)
 {
   if (nullptr != m_View)
@@ -45,10 +40,17 @@ void QmitkModelViewSelectionConnector::SetView(QAbstractItemView* view)
     disconnect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   }
 
-  m_View = view;
-  if (nullptr != m_View)
+  if (nullptr != view && nullptr != dynamic_cast<QmitkAbstractDataStorageModel*>(view->model()))
   {
+    m_View = view;
+    m_Model = dynamic_cast<QmitkAbstractDataStorageModel*>(m_View->model());
     connect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
+  }
+  else
+  {
+    m_View = nullptr;
+    m_Model = nullptr;
+    mitkThrow() << "Invalid item view or data model.";
   }
 }
 
@@ -170,7 +172,6 @@ bool QmitkModelViewSelectionConnector::IsEqualToCurrentSelection(QList<mitk::Dat
   {
     // lambda to compare node pointer inside both lists
     auto lambda = [](mitk::DataNode::Pointer lhs, mitk::DataNode::Pointer rhs) { return lhs == rhs; };
-    //bool equal = std::equal(filteredNodes.begin(), filteredNodes.end(), currentlySelectedNodes.begin(), currentlySelectedNodes.end(), lambda);
     return std::is_permutation(selectedNodes.begin(), selectedNodes.end(), currentlySelectedNodes.begin(), currentlySelectedNodes.end(), lambda);
   }
 

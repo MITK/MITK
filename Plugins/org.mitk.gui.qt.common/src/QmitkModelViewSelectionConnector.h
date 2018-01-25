@@ -52,18 +52,14 @@ class MITK_QT_COMMON QmitkModelViewSelectionConnector : public QObject
 public:
 
   QmitkModelViewSelectionConnector();
-
   /*
-  * @brief Set the model that should be used to transform selected nodes into model indexes and vice versa.
+  * @brief Set the view whose selection model is used to propagate or receive selection changes. Use the view's data model
+  *        to transform selected nodes into model indexes and vice versa.
   *
-  *		 This model must return mitk::DataNode::Pointer objects for model indexes
-  *		 if the role is QmitkDataNodeRole.
-  *
-  * @par	model	The model to set.
-  */
-  void SetModel(QmitkAbstractDataStorageModel* model);
-  /*
-  * @brief Set the view whose selection model is used to propagate or receive selection changes.
+  * @pre    The view's data model needs to be a 'QmitkAbstractDataStorageModel'. If so, the data model is received from
+  *         the view and stored as a private member.
+  *         The data model must return 'mitk::DataNode::Pointer' objects for model indexes if the role is 'QmitkDataNodeRole'.
+  * @throw  mitk::Exception, if the view is invalid or the view's data model is not a valid 'QmitkAbstractDataStorageModel'.
   *
   * @par	view	The view to set.
   */
@@ -130,13 +126,21 @@ private:
   * @brief 	Retrieve the currently selected nodes from the selection model of the private member item view by
   *         transforming the selection indexes into a data node list.
   *
-  *         In order to transform the indices into data nodes, the private data storage model must return
-  *         mitk::DataNode::Pointer objects for model indexes if the role is QmitkDataNodeRole.
+  *   In order to transform the indices into data nodes, the private data storage model must return
+  *   'mitk::DataNode::Pointer' objects for model indexes if the role is QmitkDataNodeRole.
   */
   QList<mitk::DataNode::Pointer> GetSelectedNodes() const;
-
+  /*
+  * @brief Filter the list of given nodes such that only those nodes are used that are valid
+  *        when using the data storage model's node predicate.
+  *        If no node predicate was set or the data storage model is invalid, the input list
+  *        of given nodes is returned.
+  */
   QList<mitk::DataNode::Pointer> FilterNodeList(const QList<mitk::DataNode::Pointer>& nodes) const;
-
+  /*
+  * @brief Return true, if the nodes in the list of given selected nodes are equal to the
+  *        currently selected nodes from the selection model of the private member item view.
+  */
   bool IsEqualToCurrentSelection(QList<mitk::DataNode::Pointer>& selectedNodes) const;
 
 };

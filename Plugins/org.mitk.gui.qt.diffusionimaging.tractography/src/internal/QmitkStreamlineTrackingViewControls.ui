@@ -195,8 +195,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>435</width>
-        <height>297</height>
+        <width>421</width>
+        <height>267</height>
        </rect>
       </property>
       <attribute name="label">
@@ -485,7 +485,7 @@
           <string>Dynamically pick a seed location by click into image.</string>
          </property>
          <property name="text">
-          <string>Enable Interactive Tractography</string>
+          <string>Enable Interactive Tractography </string>
          </property>
         </widget>
        </item>
@@ -510,7 +510,7 @@
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>297</height>
+        <height>255</height>
        </rect>
       </property>
       <attribute name="label">
@@ -520,17 +520,27 @@
        <string>Specify various ROI and mask images to constrain the tractography process.</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="m_TargetImageLabel">
          <property name="toolTip">
           <string/>
          </property>
          <property name="text">
-          <string>Target Image:</string>
+          <string>Target ROI Image:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Mask Image:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
         <widget class="QComboBox" name="m_EpConstraintsBox">
          <property name="toolTip">
           <string>Select which fibers should be accepted or rejected based on the location of their endpoints.</string>
@@ -575,27 +585,7 @@
          </item>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Stop Image:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Mask Image:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TargetImageBox">
          <property name="toolTip">
           <string>The target image is used for the endpoint constraint strategy defined above.</string>
@@ -610,7 +600,17 @@
          </item>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Stop ROI Image:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
         <widget class="QLabel" name="label_10">
          <property name="toolTip">
           <string/>
@@ -650,7 +650,7 @@
          </item>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <spacer name="verticalSpacer_6">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -663,9 +663,42 @@
          </property>
         </spacer>
        </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Exclusion ROI Image:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_ExclusionImageBox">
+         <property name="toolTip">
+          <string>Fibers that enter a region defined in this image will be discarded.</string>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+         </property>
+         <item>
+          <property name="text">
+           <string>-</string>
+          </property>
+         </item>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_trackingparam">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>421</width>
+        <height>359</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Tractography Parameters</string>
       </attribute>
@@ -999,6 +1032,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_neighborhood">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>435</width>
+        <height>255</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Neighborhood Sampling</string>
       </attribute>
@@ -1121,6 +1162,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_data">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>435</width>
+        <height>255</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Data Handling</string>
       </attribute>
@@ -1282,6 +1331,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_output">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>435</width>
+        <height>255</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Output and Postprocessing</string>
       </attribute>

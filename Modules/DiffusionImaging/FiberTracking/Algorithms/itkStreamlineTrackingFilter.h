@@ -105,6 +105,7 @@ public:
 
   itkSetMacro( SeedImage, ItkFloatImgType::Pointer)     ///< Seeds are only placed inside of this mask.
   itkSetMacro( MaskImage, ItkFloatImgType::Pointer)     ///< Tracking is only performed inside of this mask image.
+  itkSetMacro( ExclusionRegions, ItkFloatImgType::Pointer)///< Fibers passing any of the ROIs in this image are discarded.
   itkSetMacro( SeedsPerVoxel, int)                      ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
   itkSetMacro( MinTractLength, float )                  ///< Shorter tracts are discarded.
   itkSetMacro( MaxTractLength, float )                  ///< Streamline progression stops if tract is longer than specified.
@@ -157,7 +158,7 @@ protected:
   void FiberToProbmap(FiberType* fib);
   void GetSeedPointsFromSeedImage();
   void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
-  float FollowStreamline(itk::Point<float, 3> start_pos, vnl_vector_fixed<float,3> dir, FiberType* fib, DirectionContainer* container, float tractLength, bool front);       ///< Start streamline in one direction.
+  float FollowStreamline(itk::Point<float, 3> start_pos, vnl_vector_fixed<float,3> dir, FiberType* fib, DirectionContainer* container, float tractLength, bool front, bool& exclude);       ///< Start streamline in one direction.
   vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
   std::vector< vnl_vector_fixed<float,3> > CreateDirections(int NPoints);
@@ -175,6 +176,7 @@ protected:
   ItkFloatImgType::Pointer            m_TargetRegions;
   ItkFloatImgType::Pointer            m_SeedImage;
   ItkFloatImgType::Pointer            m_MaskImage;
+  ItkFloatImgType::Pointer            m_ExclusionRegions;
   ItkDoubleImgType::Pointer           m_OutputProbabilityMap;
 
   float                               m_MinVoxelSize;
@@ -226,6 +228,7 @@ protected:
   itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_StopInterpolator;
   itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_TargetInterpolator;
   itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_SeedInterpolator;
+  itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_ExclusionInterpolator;
   bool                                                                     m_SeedImageSet;
   bool                                                                     m_TargetImageSet;
 

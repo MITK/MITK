@@ -76,9 +76,10 @@ int main(int argc, char* argv[])
 
   parser.beginGroup("3. Tractography constraints:");
   parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "streamlines leaving the mask will stop immediately", us::Any());
-  parser.addArgument("stop_image", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the mask will stop immediately", us::Any());
-  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target image:", "effact depends on the chosen endpoint constraint (option ep_constraint)", us::Any());
+  parser.addArgument("stop_image", "", mitkCommandLineParser::String, "Stop ROI image:", "streamlines entering the mask will stop immediately", us::Any());
+  parser.addArgument("exclusion_image", "", mitkCommandLineParser::String, "Exclusion ROI image:", "streamlines entering the mask will be discarded", us::Any());
   parser.addArgument("ep_constraint", "", mitkCommandLineParser::String, "Endpoint constraint:", "determines which fibers are accepted based on their endpoint location - options are NONE, EPS_IN_TARGET, EPS_IN_TARGET_LABELDIFF, EPS_IN_SEED_AND_TARGET, MIN_ONE_EP_IN_TARGET, ONE_EP_IN_TARGET and NO_EP_IN_TARGET", us::Any());
+  parser.addArgument("target_image", "", mitkCommandLineParser::String, "Target ROI image:", "effact depends on the chosen endpoint constraint (option ep_constraint)", us::Any());
   parser.endGroup();
 
   parser.beginGroup("4. Streamline integration parameters:");
@@ -195,6 +196,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("target_image"))
     targetFile = us::any_cast<std::string>(parsedArgs["target_image"]);
 
+  std::string exclusionFile = "";
+  if (parsedArgs.count("exclusion_image"))
+    exclusionFile = us::any_cast<std::string>(parsedArgs["exclusion_image"]);
+
   std::string stopFile = "";
   if (parsedArgs.count("stop_image"))
     stopFile = us::any_cast<std::string>(parsedArgs["stop_image"]);
@@ -223,9 +228,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("num_samples"))
     num_samples = us::any_cast<int>(parsedArgs["num_samples"]);
 
-  int seeds = 1;
+  int num_seeds = 1;
   if (parsedArgs.count("seeds"))
-    seeds = us::any_cast<int>(parsedArgs["seeds"]);
+    num_seeds = us::any_cast<int>(parsedArgs["seeds"]);
 
   unsigned int trials_per_seed = 10;
   if (parsedArgs.count("trials_per_seed"))
@@ -270,7 +275,7 @@ int main(int argc, char* argv[])
     input_images.push_back(mitkImage);
   }
 
-  ItkFloatImgType::Pointer mask;
+  ItkFloatImgType::Pointer mask = nullptr;
   if (!maskFile.empty())
   {
     MITK_INFO << "loading mask image";
@@ -279,31 +284,40 @@ int main(int argc, char* argv[])
     mitk::CastToItkImage(img, mask);
   }
 
-  ItkFloatImgType::Pointer seed;
+  ItkFloatImgType::Pointer seed = nullptr;
   if (!seedFile.empty())
   {
-    MITK_INFO << "loading seed image";
+    MITK_INFO << "loading seed ROI image";
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(seedFile)[0].GetPointer());
     seed = ItkFloatImgType::New();
     mitk::CastToItkImage(img, seed);
   }
 
-  ItkFloatImgType::Pointer stop;
+  ItkFloatImgType::Pointer stop = nullptr;
   if (!stopFile.empty())
   {
-    MITK_INFO << "loading stop image";
+    MITK_INFO << "loading stop ROI image";
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(stopFile)[0].GetPointer());
     stop = ItkFloatImgType::New();
     mitk::CastToItkImage(img, stop);
   }
 
-  ItkFloatImgType::Pointer target;
+  ItkFloatImgType::Pointer target = nullptr;
   if (!targetFile.empty())
   {
-    MITK_INFO << "loading target image";
+    MITK_INFO << "loading target ROI image";
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(targetFile)[0].GetPointer());
     target = ItkFloatImgType::New();
     mitk::CastToItkImage(img, target);
+  }
+
+  ItkFloatImgType::Pointer exclusion = nullptr;
+  if (!exclusionFile.empty())
+  {
+    MITK_INFO << "loading exclusion ROI image";
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(exclusionFile)[0].GetPointer());
+    exclusion = ItkFloatImgType::New();
+    mitk::CastToItkImage(img, exclusion);
   }
 
   MITK_INFO << "loading additional images";
@@ -464,7 +478,8 @@ int main(int argc, char* argv[])
   tracker->SetSeedImage(seed);
   tracker->SetStoppingRegions(stop);
   tracker->SetTargetRegions(target);
-  tracker->SetSeedsPerVoxel(seeds);
+  tracker->SetExclusionRegions(exclusion);
+  tracker->SetSeedsPerVoxel(num_seeds);
   tracker->SetStepSize(stepsize);
   tracker->SetSamplingDistance(sampling_distance);
   tracker->SetUseStopVotes(use_stop_votes);

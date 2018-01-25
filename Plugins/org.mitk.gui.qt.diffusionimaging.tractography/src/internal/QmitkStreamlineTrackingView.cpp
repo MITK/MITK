@@ -107,6 +107,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TargetImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_StopImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ForestBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_ExclusionImageBox->SetDataStorage(this->GetDataStorage());
 
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
     mitk::TNodePredicateDataType<mitk::TractographyForest>::Pointer isTractographyForest = mitk::TNodePredicateDataType<mitk::TractographyForest>::New();
@@ -127,6 +128,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopImageBox->SetZeroEntryText("--");
     m_Controls->m_TargetImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_TargetImageBox->SetZeroEntryText("--");
+    m_Controls->m_ExclusionImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
+    m_Controls->m_ExclusionImageBox->SetZeroEntryText("--");
 
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()) );
     connect( m_Controls->commandLinkButton_2, SIGNAL(clicked()), this, SLOT(StopTractography()) );
@@ -141,6 +144,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_TargetImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_ExclusionImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_MaskImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_ForestBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ForestSwitched()) );
@@ -846,6 +850,13 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TargetImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetTargetRegions(mask);
+  }
+
+  if (m_Controls->m_ExclusionImageBox->GetSelectedNode().IsNotNull())
+  {
+    ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
+    mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_ExclusionImageBox->GetSelectedNode()->GetData()), mask);
+    m_Tracker->SetExclusionRegions(mask);
   }
 
   // Endpoint constraints

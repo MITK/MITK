@@ -53,6 +53,7 @@ StreamlineTrackingFilter
   , m_TargetRegions(nullptr)
   , m_SeedImage(nullptr)
   , m_MaskImage(nullptr)
+  , m_ExclusionRegions(nullptr)
   , m_OutputProbabilityMap(nullptr)
   , m_MinVoxelSize(-1)
   , m_AngularThresholdDeg(-1)
@@ -162,6 +163,7 @@ void StreamlineTrackingFilter::BeforeTracking()
   m_StopInterpolator = itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::New();
   m_SeedInterpolator = itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::New();
   m_TargetInterpolator = itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::New();
+  m_ExclusionInterpolator = itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::New();
 
   if (m_StoppingRegions.IsNull())
   {
@@ -176,6 +178,12 @@ void StreamlineTrackingFilter::BeforeTracking()
   else
     std::cout << "StreamlineTracking - Using stopping region image" << std::endl;
   m_StopInterpolator->SetInputImage(m_StoppingRegions);
+
+  if (m_ExclusionRegions.IsNotNull())
+  {
+    std::cout << "StreamlineTracking - Using exclusion region image" << std::endl;
+    m_ExclusionInterpolator->SetInputImage(m_ExclusionRegions);
+  }
 
   if (m_TargetRegions.IsNull())
   {
@@ -471,7 +479,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
 }
 
 
-float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, DirectionContainer* container, float tractLength, bool front)
+float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, DirectionContainer* container, float tractLength, bool front, bool &exclude)
 {
   vnl_vector_fixed<float,3> zero_dir; zero_dir.fill(0.0);
   std::deque< vnl_vector_fixed<float,3> > last_dirs;
@@ -486,8 +494,13 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
     // get new position
     CalculateNewPosition(pos, dir);
 
-    // is new position inside of image and mask
-    if (m_AbortTracking)   // if not end streamline
+    if (m_ExclusionRegions.IsNotNull() && mitk::imv::IsInsideMask<float>(pos, m_InterpolateMasks, m_ExclusionInterpolator))
+    {
+      exclude = true;
+      return tractLength;
+    }
+
+    if (m_AbortTracking)
       return tractLength;
 
     // if yes, add new point to streamline
@@ -682,42 +695,27 @@ void StreamlineTrackingFilter::GenerateData()
       while (olddirs.size()<m_NumPreviousDirections)
         olddirs.push_back(dir); // start without old directions (only zero directions)
 
-      /// START DIR
-      //    vnl_vector_fixed< float, 3 > gm_start_dir;
-      //    if (m_ControlGmEndings)
-      //    {
-      //      gm_start_dir[0] = m_GmStubs[temp_i][1][0] - m_GmStubs[temp_i][0][0];
-      //      gm_start_dir[1] = m_GmStubs[temp_i][1][1] - m_GmStubs[temp_i][0][1];
-      //      gm_start_dir[2] = m_GmStubs[temp_i][1][2] - m_GmStubs[temp_i][0][2];
-      //      gm_start_dir.normalize();
-      //      olddirs.pop_back();
-      //      olddirs.push_back(gm_start_dir);
-      //    }
-
       if (mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_MaskInterpolator))
         dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex);
 
-      bool success = false;
-      if (dir.magnitude()>0.0001)
-      {
-        /// START DIR
-        //      if (m_ControlGmEndings)
-        //      {
-        //        float a = dot_product(gm_start_dir, dir);
-        //        if (a<0)
-        //          dir = -dir;
-        //      }
+      bool exclude = false;
+      if (m_ExclusionRegions.IsNotNull() && mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_ExclusionInterpolator))
+        exclude = true;
 
+      bool success = false;
+      if (dir.magnitude()>0.0001 && !exclude)
+      {
         // forward tracking
-        tractLength = FollowStreamline(worldPos, dir, &fib, &direction_container, 0, false);
+        tractLength = FollowStreamline(worldPos, dir, &fib, &direction_container, 0, false, exclude);
         fib.push_front(worldPos);
 
-        // backward tracking (only if we don't explicitely start in the GM)
-        tractLength = FollowStreamline(worldPos, -dir, &fib, &direction_container, tractLength, true);
+        // backward tracking
+        if (!exclude)
+          tractLength = FollowStreamline(worldPos, -dir, &fib, &direction_container, tractLength, true, exclude);
 
         counter = fib.size();
 
-        if (tractLength>=m_MinTractLength && counter>=2)
+        if (tractLength>=m_MinTractLength && counter>=2 && !exclude)
         {
 #pragma omp critical
           if ( IsValidFiber(&fib) )

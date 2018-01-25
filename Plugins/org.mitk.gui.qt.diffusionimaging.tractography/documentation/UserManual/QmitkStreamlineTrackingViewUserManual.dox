@@ -44,7 +44,8 @@ Parameters for both seeding modes:
 Specify various ROI and mask images to constrain the tractography process.
 
 - Mask Image: ROI image used to constrain the generated streamlines, typically a brain mask. Streamlines that leave the regions defined in this image will stop immediately.
-- Stop Image: ROI image used to define stopping regions. Streamlines that enter the regions defined in this image will stop immediately.
+- Stop ROI Image: ROI image used to define stopping regions. Streamlines that enter the regions defined in this image will stop immediately.
+- Exclusion ROI Image: Fibers that enter a region defined in this image will be discarded.
 - Endpoint Constraints: Determines which fibers are accepted based on their endpoint location. Options are:
   - No constraints on endpoint locations (command line option NONE)
   - Both EPs are required to be located in the target image (command line option EPS_IN_TARGET)

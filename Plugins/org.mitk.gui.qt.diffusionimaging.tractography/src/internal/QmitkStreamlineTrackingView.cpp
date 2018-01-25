@@ -368,11 +368,11 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 
   if ( m_Controls->m_InteractiveBox->isChecked() )
   {
-    if (m_FirstInteractiveRun)
-    {
-      QMessageBox::information(nullptr, "Information", "Place and move a spherical seed region anywhere in the image by left-clicking and dragging. If the seed region is colored red, tracking is in progress. If the seed region is colored white, tracking is finished.\nPlacing the seed region for the first time in a newly selected dataset might cause a short delay, since the tracker needs to be initialized.");
-      m_FirstInteractiveRun = false;
-    }
+//    if (m_FirstInteractiveRun)
+//    {
+//      QMessageBox::information(nullptr, "Information", "Place and move a spherical seed region anywhere in the image by left-clicking and dragging. If the seed region is colored red, tracking is in progress. If the seed region is colored white, tracking is finished.\nPlacing the seed region for the first time in a newly selected dataset might cause a short delay, since the tracker needs to be initialized.");
+//      m_FirstInteractiveRun = false;
+//    }
 
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     QApplication::processEvents();
@@ -514,12 +514,12 @@ void QmitkStreamlineTrackingView::UpdateGui()
 {
   m_Controls->m_TensorImageLabel->setText("<font color='red'>select in data-manager</font>");
 
-  m_Controls->m_fBox->setVisible(false);
-  m_Controls->m_fLabel->setVisible(false);
-  m_Controls->m_gBox->setVisible(false);
-  m_Controls->m_gLabel->setVisible(false);
-  m_Controls->m_FaImageBox->setEnabled(false);
-  m_Controls->mFaImageLabel->setEnabled(false);
+  m_Controls->m_fBox->setEnabled(false);
+  m_Controls->m_fLabel->setEnabled(false);
+  m_Controls->m_gBox->setEnabled(false);
+  m_Controls->m_gLabel->setEnabled(false);
+  m_Controls->m_FaImageBox->setEnabled(true);
+  m_Controls->mFaImageLabel->setEnabled(true);
   m_Controls->m_OdfCutoffBox->setEnabled(false);
   m_Controls->m_OdfCutoffLabel->setEnabled(false);
   m_Controls->m_SharpenOdfsBox->setEnabled(false);
@@ -542,8 +542,8 @@ void QmitkStreamlineTrackingView::UpdateGui()
   {
     m_Controls->m_InteractiveSeedingFrame->setVisible(false);
     m_Controls->m_StaticSeedingFrame->setVisible(true);
-    m_Controls->commandLinkButton_2->setVisible(true);
-    m_Controls->commandLinkButton->setVisible(true);
+    m_Controls->commandLinkButton_2->setVisible(m_ThreadIsRunning);
+    m_Controls->commandLinkButton->setVisible(!m_ThreadIsRunning);
   }
 
   if (m_Controls->m_EpConstraintsBox->currentIndex()>0)
@@ -572,18 +572,13 @@ void QmitkStreamlineTrackingView::UpdateGui()
 
     if ( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
-      m_Controls->m_fBox->setVisible(true);
-      m_Controls->m_fLabel->setVisible(true);
-      m_Controls->m_gBox->setVisible(true);
-      m_Controls->m_gLabel->setVisible(true);
-      m_Controls->mFaImageLabel->setEnabled(true);
-      m_Controls->m_FaImageBox->setEnabled(true);
+      m_Controls->m_fBox->setEnabled(true);
+      m_Controls->m_fLabel->setEnabled(true);
+      m_Controls->m_gBox->setEnabled(true);
+      m_Controls->m_gLabel->setEnabled(true);
     }
     else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
-      m_Controls->mFaImageLabel->setEnabled(true);
-      m_Controls->m_FaImageBox->setEnabled(true);
-
       m_Controls->m_OdfCutoffBox->setEnabled(true);
       m_Controls->m_OdfCutoffLabel->setEnabled(true);
       m_Controls->m_SharpenOdfsBox->setEnabled(true);
@@ -594,11 +589,6 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->m_ForestLabel->setVisible(true);
       m_Controls->m_ScalarThresholdBox->setEnabled(false);
       m_Controls->m_FaThresholdLabel->setEnabled(false);
-    }
-    else
-    {
-      m_Controls->mFaImageLabel->setEnabled(true);
-      m_Controls->m_FaImageBox->setEnabled(true);
     }
   }
 }

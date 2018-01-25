@@ -15,22 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkMachineLearningTractographyPerspective_H_
-#define QmitkMachineLearningTractographyPerspective_H_
+#ifndef QmitkQuantificationPerspective_H_
+#define QmitkQuantificationPerspective_H_
 
 #include <berryIPerspectiveFactory.h>
 
-class QmitkMachineLearningTractographyPerspective : public QObject, public berry::IPerspectiveFactory
+class QmitkQuantificationPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
 
-  QmitkMachineLearningTractographyPerspective() {}
-  ~QmitkMachineLearningTractographyPerspective() {}
+  QmitkQuantificationPerspective() {}
+  ~QmitkQuantificationPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
-#endif /* QmitkMachineLearningTractographyPerspective_H_ */
+#endif /* QmitkQuantificationPerspective_H_ */

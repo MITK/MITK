@@ -17,7 +17,7 @@
   <extension point="org.blueberry.ui.perspectives">
 
     <perspective id="org.mitk.perspectives.dwipreprocessing"
-    name="DWI Preprocessing"
+    name="Preprocessing"
     class="QmitkDwiPreprocessingPerspective"
     icon="resources/dwi2.png">
     <description>This perspective contains views for diffusion-weighted image preprocessing such as head motion correction, registration, denoising and gradient manipulation.</description>

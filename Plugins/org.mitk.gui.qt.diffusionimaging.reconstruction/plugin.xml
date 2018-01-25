@@ -10,7 +10,7 @@
     icon="resources/odf.png"
     class="QmitkQBallReconstructionView">
     <description>Q-Ball reconstruction view</description>
-    <keywordReference id="org.mitk.views.qballreconstruction.Keyword"/>
+    <keywordReference id="org.mitk.views.reconstruction.Keyword"/>
     </view>
 
     <view id="org.mitk.views.diffusionquantification"
@@ -27,7 +27,7 @@
     category="Signal modeling"
     icon="resources/tensor.png"
     class="QmitkTensorReconstructionView">
-    <keywordReference id="org.mitk.views.tensorreconstruction.Keyword"/>
+    <keywordReference id="org.mitk.views.reconstruction.Keyword"/>
     </view>
 
     <view id="org.mitk.views.odfdetails"
@@ -42,25 +42,25 @@
 
   <extension point="org.blueberry.ui.keywords">
 
-  <keyword label="signal" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="reconstruction" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="ball" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="qball" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="q-ball" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="propagator" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="modeling" id="org.mitk.views.qballreconstruction.Keyword"/>
+  <keyword label="signal" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="reconstruction" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="ball" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="diffusion" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="qball" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="q-ball" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="propagator" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="modeling" id="org.mitk.views.reconstruction.Keyword"/>
   <keyword label="ODF" id="org.mitk.views.diffusionquantification.Keyword"/>
   <keyword label="dODF" id="org.mitk.views.diffusionquantification.Keyword"/>
 
-  <keyword label="signal" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="reconstruction" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="tensor" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="second order" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="propagator" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="modeling" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="DTI" id="org.mitk.views.tensorreconstruction.Keyword"/>
+  <keyword label="signal" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="reconstruction" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="tensor" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="diffusion" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="second order" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="propagator" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="modeling" id="org.mitk.views.reconstruction.Keyword"/>
+  <keyword label="DTI" id="org.mitk.views.reconstruction.Keyword"/>
 
   <keyword label="ADC" id="org.mitk.views.diffusionquantification.Keyword"/>
   <keyword label="GFA" id="org.mitk.views.diffusionquantification.Keyword"/>
@@ -93,12 +93,19 @@
 
   <extension point="org.blueberry.ui.perspectives">
 
-    <perspective id="org.mitk.perspectives.reconstruction1"
-    name="ODF Reconstruction/Signal Modelling"
-    class="QmitkReconstructionPerspective"
-    icon="resources/odf.png">
-    <keywordReference id="org.mitk.perspectives.reconstruction1.Keyword"/>
-    </perspective>
+  <perspective id="org.mitk.perspectives.reconstruction1"
+  name="ODF Reconstruction/Signal Modelling"
+  class="QmitkReconstructionPerspective"
+  icon="resources/odf.png">
+  <keywordReference id="org.mitk.views.reconstruction.Keyword"/>
+  </perspective>
+
+  <perspective id="org.mitk.perspectives.quantification"
+  name="Diffusion Indices"
+  class="QmitkQuantificationPerspective"
+  icon="resources/quantification.png">
+  <keywordReference id="org.mitk.views.diffusionquantification.Keyword"/>
+  </perspective>
 
   </extension>
 

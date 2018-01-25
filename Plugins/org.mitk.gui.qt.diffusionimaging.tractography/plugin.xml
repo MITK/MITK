@@ -75,7 +75,7 @@
     category="Fiber Tractography"
     class="QmitkGibbsTractographyPerspective"
     icon="resources/tractogram.png">
-    <keywordReference id="org.mitk.perspectives.tractography1.Keyword"/>
+    <keywordReference id="org.mitk.views.gibbstracking.Keyword"/>
     </perspective>
 
     <perspective id="org.mitk.perspectives.tractography2"
@@ -83,15 +83,7 @@
     category="Fiber Tractography"
     class="QmitkStreamlineTractographyPerspective"
     icon="resources/tract.png">
-    <keywordReference id="org.mitk.perspectives.tractography2.Keyword"/>
-    </perspective>
-
-    <perspective id="org.mitk.perspectives.tractography4"
-    name="ML-Based Tractography Training"
-    category="Fiber Tractography"
-    class="QmitkMachineLearningTractographyPerspective"
-    icon="resources/ml_tractography.png">
-    <keywordReference id="org.mitk.perspectives.tractography4.Keyword"/>
+    <keywordReference id="org.mitk.views.streamlinetracking.Keyword"/>
     </perspective>
 
   </extension>

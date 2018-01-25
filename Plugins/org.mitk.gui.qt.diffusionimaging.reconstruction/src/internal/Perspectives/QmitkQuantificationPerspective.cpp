@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkDIAppSyntheticDataGenerationPerspective.h"
+#include "QmitkQuantificationPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkQuantificationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   /////////////////////////////////////////////////////
   // all di-app perspectives should have the following:
@@ -44,6 +44,7 @@ void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IP
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.fiberfoxview");
-  left->AddView("org.mitk.views.fieldmapgenerator");
+  left->AddView("org.mitk.views.diffusionquantification");
+  left->AddView("org.mitk.views.imagestatistics");
+  left->AddView("org.mitk.views.segmentation");
 }

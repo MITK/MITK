@@ -7,7 +7,6 @@ set(INTERNAL_CPP_FILES
   QmitkStreamlineTrackingView.cpp
   QmitkMLBTView.cpp
 
-  Perspectives/QmitkMachineLearningTractographyPerspective.cpp
   Perspectives/QmitkGibbsTractographyPerspective.cpp
   Perspectives/QmitkStreamlineTractographyPerspective.cpp
 
@@ -31,7 +30,6 @@ set(MOC_H_FILES
 
   src/QmitkMlbstTrainingDataWidget.h
 
-  src/internal/Perspectives/QmitkMachineLearningTractographyPerspective.h
   src/internal/Perspectives/QmitkGibbsTractographyPerspective.h
   src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h
 )

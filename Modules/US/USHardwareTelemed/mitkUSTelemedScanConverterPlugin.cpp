@@ -69,7 +69,7 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
   // initialize mitk::Image with given image size on the first time
   if ( ! m_OutputImage->IsInitialized() )
   {
-    unsigned int dim[]={(nOutX2 - nOutX1), (nOutY2 - nOutY1)}; // image dimensions
+    unsigned int dim[]={static_cast<unsigned int>(abs(nOutX2 - nOutX1)), static_cast<unsigned int>(abs(nOutY2 - nOutY1))}; // image dimensions
 
     m_OutputImage->Initialize(mitk::MakeScalarPixelType<BYTE>(), 2, dim);
   }

@@ -5,8 +5,9 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  
+
   QmitkPreprocessingView.cpp
+  QmitkDwiPreprocessingPerspective.cpp
 )
 
 set(UI_FILES
@@ -17,12 +18,12 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
 
   src/internal/QmitkPreprocessingView.h
+  src/internal/QmitkDwiPreprocessingPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  
-  resources/preprocessing.png
+
   resources/dwi2.png
 )
 

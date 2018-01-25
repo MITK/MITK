@@ -88,7 +88,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 
 const std::string QmitkPreprocessingView::VIEW_ID =
-    "org.mitk.views.preprocessing";
+    "org.mitk.views.diffusionpreprocessing";
 
 #define DI_INFO MITK_INFO("DiffusionImaging")
 

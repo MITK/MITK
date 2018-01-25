@@ -5,20 +5,20 @@
   <extension point="org.blueberry.ui.views">
 
     <view id="org.mitk.views.denoisingview"
-    name="DWI Denoising"
+    name="Denoising"
     category="Preprocessing"
     class="QmitkDenoisingView"
     icon="resources/denoisingicon.png">
     <keywordReference id="org.mitk.views.denoisingview.Keyword"/>
     </view>
-    
+
   </extension>
-     
+
 
   <extension point="org.blueberry.ui.keywords">
 
 
-  
-  </extension>  
-  
+
+  </extension>
+
 </plugin>

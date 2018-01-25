@@ -26,26 +26,7 @@ set(CACHED_RESOURCE_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
   plugin.xml
-  resources/icon_dicom.xpm
-  resources/diffusionimaging.png
-  resources/preprocessing.png
-  resources/Measurement_48.png
-  resources/volvis.png
-  resources/perspectives/diffusionimaging.png
-  resources/perspectives/icon_home.png
-  resources/perspectives/connectomics.png
-  resources/perspectives/dicomimport.png
-  resources/perspectives/preprocessingreconstruction.png
-  resources/perspectives/quantification.png
-  resources/perspectives/tbss.png
-  resources/perspectives/utilities.png
-  resources/perspectives/imageProcessing.png
-  resources/perspectives/registration.png
-  resources/perspectives/phantomData2.png
-  resources/perspectives/eye.png
-  resources/perspectives/registration.xpm
-  resources/perspectives/chart.png
-  resources/perspectives/preprocessing.png
+  resources/icon_home.png
 )
 
 set(QRC_FILES

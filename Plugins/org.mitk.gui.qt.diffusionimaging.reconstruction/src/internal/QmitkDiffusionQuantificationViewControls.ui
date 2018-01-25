@@ -19,8 +19,11 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <property name="verticalSpacing">
+    <number>25</number>
+   </property>
+   <item row="0" column="0">
     <widget class="QGroupBox" name="m_InputData">
      <property name="title">
       <string>Please Select Input Data</string>
@@ -75,15 +78,12 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string>Raw diffusion-weighted image</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_5">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -96,7 +96,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0">
        <widget class="QCommandLinkButton" name="m_AdcDwiButton">
         <property name="enabled">
          <bool>false</bool>
@@ -106,7 +106,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QCommandLinkButton" name="m_MdDwiButton">
         <property name="enabled">
          <bool>false</bool>
@@ -116,7 +116,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QCommandLinkButton" name="m_BallStickButton">
         <property name="enabled">
          <bool>false</bool>
@@ -126,7 +126,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QCommandLinkButton" name="m_MultiTensorButton">
         <property name="enabled">
          <bool>false</bool>
@@ -139,15 +139,12 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>ODF image</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -160,7 +157,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0">
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -249,7 +246,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QCommandLinkButton" name="m_GFAButton">
         <property name="enabled">
          <bool>false</bool>
@@ -259,7 +256,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QFrame" name="frame_3">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -303,7 +300,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QCommandLinkButton" name="m_CurvatureButton">
         <property name="enabled">
          <bool>false</bool>
@@ -316,15 +313,12 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Tensor image</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+     <layout class="QGridLayout" name="gridLayout_4">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -337,7 +331,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="0" column="0">
        <widget class="QCommandLinkButton" name="m_FAButton">
         <property name="enabled">
          <bool>false</bool>
@@ -347,7 +341,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QCommandLinkButton" name="m_RAButton">
         <property name="enabled">
          <bool>false</bool>
@@ -357,7 +351,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QCommandLinkButton" name="m_ADButton">
         <property name="enabled">
          <bool>false</bool>
@@ -367,7 +361,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QCommandLinkButton" name="m_RDButton">
         <property name="enabled">
          <bool>false</bool>
@@ -377,7 +371,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="4" column="0">
        <widget class="QCommandLinkButton" name="m_MDButton">
         <property name="enabled">
          <bool>false</bool>
@@ -387,7 +381,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="5" column="0">
        <widget class="QCommandLinkButton" name="m_ClusteringAnisotropy">
         <property name="enabled">
          <bool>false</bool>
@@ -400,7 +394,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="4" column="0">
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

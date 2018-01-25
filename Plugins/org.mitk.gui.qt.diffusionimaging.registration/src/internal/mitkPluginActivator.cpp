@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "src/internal/QmitkHeadMotionCorrectionView.h"
 #include "src/internal/QmitkSimpleRegistrationView.h"
-#include "src/internal/QmitkDwiRegistrationPerspective.h"
 
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
@@ -32,7 +31,6 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkHeadMotionCorrectionView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSimpleRegistrationView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDwiRegistrationPerspective, context)
   m_Context = context;
 }
 

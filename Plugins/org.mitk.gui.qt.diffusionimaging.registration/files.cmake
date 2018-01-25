@@ -8,7 +8,6 @@ set(INTERNAL_CPP_FILES
 
   QmitkHeadMotionCorrectionView.cpp
   QmitkSimpleRegistrationView.cpp
-  QmitkDwiRegistrationPerspective.cpp
 )
 
 set(UI_FILES
@@ -21,7 +20,6 @@ set(MOC_H_FILES
 
   src/internal/QmitkHeadMotionCorrectionView.h
   src/internal/QmitkSimpleRegistrationView.h
-  src/internal/QmitkDwiRegistrationPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES

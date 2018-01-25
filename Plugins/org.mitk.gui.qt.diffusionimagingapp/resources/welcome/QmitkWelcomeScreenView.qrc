@@ -16,8 +16,6 @@
         <file>pics/03quantification.png</file>
         <file>pics/04atractography.png</file>
         <file>pics/04tractography.png</file>
-        <file>pics/05atbss.png</file>
-        <file>pics/05tbss.png</file>
         <file>pics/06aconnectomics.png</file>
         <file>pics/06connectomics.png</file>
         <file>pics/07aivim.png</file>
@@ -32,5 +30,7 @@
         <file>pics/13utilities.png</file>
         <file>pics/10softwarephantoms.png</file>
         <file>pics/10asoftwarephantoms.png</file>
+        <file>pics/05afiberprocessing.png</file>
+        <file>pics/05fiberprocessing.png</file>
     </qresource>
 </RCC>

@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkDwiRegistrationPerspective.h"
+#include "QmitkDwiPreprocessingPerspective.h"
 #include "berryIViewLayout.h"
 
-void  QmitkDwiRegistrationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void  QmitkDwiPreprocessingPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
     /////////////////////////////////////////////////////
     // all di-app perspectives should have the following:
@@ -44,6 +44,8 @@ void  QmitkDwiRegistrationPerspective::CreateInitialLayout(berry::IPageLayout::P
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
+    left->AddView("org.mitk.views.diffusionpreprocessing");
+    left->AddView("org.mitk.views.denoisingview");
     left->AddView("org.mitk.views.simpleregistrationview");
     left->AddView("org.mitk.views.headmotioncorrectionview");
 }

@@ -5,7 +5,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  
+
   QmitkBrainExtractionView.cpp
 )
 
@@ -21,8 +21,7 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  
-  resources/preprocessing.png
+
   resources/dwi2.png
 )
 

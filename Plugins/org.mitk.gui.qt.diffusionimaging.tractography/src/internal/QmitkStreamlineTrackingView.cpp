@@ -368,11 +368,11 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 
   if ( m_Controls->m_InteractiveBox->isChecked() )
   {
-    if (m_FirstInteractiveRun)
-    {
-      QMessageBox::information(nullptr, "Information", "Place and move a spherical seed region anywhere in the image by left-clicking and dragging. If the seed region is colored red, tracking is in progress. If the seed region is colored white, tracking is finished.\nPlacing the seed region for the first time in a newly selected dataset might cause a short delay, since the tracker needs to be initialized.");
-      m_FirstInteractiveRun = false;
-    }
+//    if (m_FirstInteractiveRun)
+//    {
+//      QMessageBox::information(nullptr, "Information", "Place and move a spherical seed region anywhere in the image by left-clicking and dragging. If the seed region is colored red, tracking is in progress. If the seed region is colored white, tracking is finished.\nPlacing the seed region for the first time in a newly selected dataset might cause a short delay, since the tracker needs to be initialized.");
+//      m_FirstInteractiveRun = false;
+//    }
 
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     QApplication::processEvents();
@@ -512,29 +512,44 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
 
 void QmitkStreamlineTrackingView::UpdateGui()
 {
-  m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
+  m_Controls->m_TensorImageLabel->setText("<font color='red'>select in data-manager</font>");
 
   m_Controls->m_fBox->setEnabled(false);
   m_Controls->m_fLabel->setEnabled(false);
   m_Controls->m_gBox->setEnabled(false);
   m_Controls->m_gLabel->setEnabled(false);
-  m_Controls->m_FaImageBox->setEnabled(false);
-  m_Controls->mFaImageLabel->setEnabled(false);
+  m_Controls->m_FaImageBox->setEnabled(true);
+  m_Controls->mFaImageLabel->setEnabled(true);
   m_Controls->m_OdfCutoffBox->setEnabled(false);
   m_Controls->m_OdfCutoffLabel->setEnabled(false);
   m_Controls->m_SharpenOdfsBox->setEnabled(false);
-  m_Controls->m_ForestBox->setEnabled(false);
-  m_Controls->m_ForestLabel->setEnabled(false);
+  m_Controls->m_ForestBox->setVisible(false);
+  m_Controls->m_ForestLabel->setVisible(false);
   m_Controls->commandLinkButton->setEnabled(false);
   m_Controls->m_TrialsPerSeedBox->setEnabled(false);
   m_Controls->m_TrialsPerSeedLabel->setEnabled(false);
-  m_Controls->m_TargetImageBox->setEnabled(false);
-  m_Controls->m_TargetImageLabel->setEnabled(false);
+  m_Controls->m_TargetImageBox->setVisible(false);
+  m_Controls->m_TargetImageLabel->setVisible(false);
+
+  if (m_Controls->m_InteractiveBox->isChecked())
+  {
+    m_Controls->m_InteractiveSeedingFrame->setVisible(true);
+    m_Controls->m_StaticSeedingFrame->setVisible(false);
+    m_Controls->commandLinkButton_2->setVisible(false);
+    m_Controls->commandLinkButton->setVisible(false);
+  }
+  else
+  {
+    m_Controls->m_InteractiveSeedingFrame->setVisible(false);
+    m_Controls->m_StaticSeedingFrame->setVisible(true);
+    m_Controls->commandLinkButton_2->setVisible(m_ThreadIsRunning);
+    m_Controls->commandLinkButton->setVisible(!m_ThreadIsRunning);
+  }
 
   if (m_Controls->m_EpConstraintsBox->currentIndex()>0)
   {
-    m_Controls->m_TargetImageBox->setEnabled(true);
-    m_Controls->m_TargetImageLabel->setEnabled(true);
+    m_Controls->m_TargetImageBox->setVisible(true);
+    m_Controls->m_TargetImageLabel->setVisible(true);
   }
 
   // trials per seed are only important for probabilistic tractography
@@ -550,7 +565,6 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->m_TensorImageLabel->setText( ( std::to_string(m_InputImageNodes.size()) + " images selected").c_str() );
     else
       m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.at(0)->GetName().c_str());
-    m_Controls->m_InputData->setTitle("Input Data");
     m_Controls->commandLinkButton->setEnabled(!m_Controls->m_InteractiveBox->isChecked() && !m_ThreadIsRunning);
 
     m_Controls->m_ScalarThresholdBox->setEnabled(true);
@@ -562,29 +576,21 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->m_fLabel->setEnabled(true);
       m_Controls->m_gBox->setEnabled(true);
       m_Controls->m_gLabel->setEnabled(true);
-      m_Controls->mFaImageLabel->setEnabled(true);
-      m_Controls->m_FaImageBox->setEnabled(true);
     }
     else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
-      m_Controls->mFaImageLabel->setEnabled(true);
-      m_Controls->m_FaImageBox->setEnabled(true);
-
       m_Controls->m_OdfCutoffBox->setEnabled(true);
       m_Controls->m_OdfCutoffLabel->setEnabled(true);
       m_Controls->m_SharpenOdfsBox->setEnabled(true);
     }
     else if (  mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_InputImageNodes.at(0)->GetData())) )
     {
-      m_Controls->m_ForestBox->setEnabled(true);
-      m_Controls->m_ForestLabel->setEnabled(true);
+      m_Controls->m_ForestBox->setVisible(true);
+      m_Controls->m_ForestLabel->setVisible(true);
       m_Controls->m_ScalarThresholdBox->setEnabled(false);
       m_Controls->m_FaThresholdLabel->setEnabled(false);
     }
   }
-  else
-    m_Controls->m_InputData->setTitle("Please Select Input Data");
-
 }
 
 void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
@@ -625,11 +631,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         return;
       }
 
-      if (m_FirstTensorProbRun)
-      {
-        QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. ODFs are sharpened (min-max normalized and raised to the power of 4). TEND parameters are ignored.");
-        m_FirstTensorProbRun = false;
-      }
+//      if (m_FirstTensorProbRun)
+//      {
+//        QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. ODFs are sharpened (min-max normalized and raised to the power of 4). TEND parameters are ignored.");
+//        m_FirstTensorProbRun = false;
+//      }
 
       if (m_TrackingHandler==nullptr)
       {

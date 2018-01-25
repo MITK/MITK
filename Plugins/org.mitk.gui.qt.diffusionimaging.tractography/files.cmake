@@ -7,7 +7,6 @@ set(INTERNAL_CPP_FILES
   QmitkStreamlineTrackingView.cpp
   QmitkMLBTView.cpp
 
-  Perspectives/QmitkMachineLearningTractographyPerspective.cpp
   Perspectives/QmitkGibbsTractographyPerspective.cpp
   Perspectives/QmitkStreamlineTractographyPerspective.cpp
 
@@ -31,7 +30,6 @@ set(MOC_H_FILES
 
   src/QmitkMlbstTrainingDataWidget.h
 
-  src/internal/Perspectives/QmitkMachineLearningTractographyPerspective.h
   src/internal/Perspectives/QmitkGibbsTractographyPerspective.h
   src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h
 )
@@ -39,10 +37,8 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   plugin.xml
 
-  resources/tractography.png
-  resources/fiberTracking1.png
-  resources/StreamlineTracking.png
-  resources/GibbsTracking.png
+  resources/tract.png
+  resources/tractogram.png
   resources/ml_tractography.png
 )
 

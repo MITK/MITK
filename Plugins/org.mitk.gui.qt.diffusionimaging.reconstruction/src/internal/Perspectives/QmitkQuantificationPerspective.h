@@ -15,22 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkDwiRegistrationPerspective_H_
-#define QmitkDwiRegistrationPerspective_H_
+#ifndef QmitkQuantificationPerspective_H_
+#define QmitkQuantificationPerspective_H_
 
 #include <berryIPerspectiveFactory.h>
 
-class QmitkDwiRegistrationPerspective : public QObject, public berry::IPerspectiveFactory
+class QmitkQuantificationPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
 
-  QmitkDwiRegistrationPerspective() {}
-  ~QmitkDwiRegistrationPerspective() {}
+  QmitkQuantificationPerspective() {}
+  ~QmitkQuantificationPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
-#endif /* QmitkFiberProcessingPerspective_H_ */
+#endif /* QmitkQuantificationPerspective_H_ */

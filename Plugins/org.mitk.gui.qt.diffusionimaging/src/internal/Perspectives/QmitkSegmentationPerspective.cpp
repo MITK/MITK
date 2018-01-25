@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkMachineLearningTractographyPerspective.h"
+#include "QmitkSegmentationPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkMachineLearningTractographyPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkSegmentationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
     /////////////////////////////////////////////////////
     // all di-app perspectives should have the following:
@@ -44,7 +44,6 @@ void QmitkMachineLearningTractographyPerspective::CreateInitialLayout(berry::IPa
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
 
-    left->AddView("org.mitk.views.mlbtview");
     left->AddView("org.mitk.views.segmentation");
-    left->AddView("org.mitk.views.diffusionpreprocessing");
+    left->AddView("org.mitk.views.segmentationutilities");
 }

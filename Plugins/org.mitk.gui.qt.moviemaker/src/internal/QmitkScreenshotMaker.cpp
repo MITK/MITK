@@ -100,11 +100,13 @@ void QmitkScreenshotMaker::GenerateScreenshot()
         m_LastFile = fileName;
 
     auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+
     mitk::BaseRenderer* renderer = renderWindowPart->GetActiveQmitkRenderWindow()->GetRenderer();
+    renderer = nullptr; // WORKAROUND FOR T23702
 
     if (renderer == nullptr)
     {
-       renderer = renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer();
+       renderer = renderWindowPart->GetQmitkRenderWindow(m_Controls->m_DirectionBox->currentText())->GetRenderer();
        if (renderer == nullptr)
           return;
     }

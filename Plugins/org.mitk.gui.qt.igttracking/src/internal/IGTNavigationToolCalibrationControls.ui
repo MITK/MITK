@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
+    <width>557</width>
     <height>958</height>
    </rect>
   </property>
@@ -70,6 +70,7 @@ p, li { white-space: pre-wrap; }
           <height>30</height>
          </size>
         </property>
+        <zorder>tabWidget</zorder>
        </widget>
       </item>
      </layout>
@@ -946,6 +947,127 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>Tool Axis Calibration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_13">
+       <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <item row="1" column="1">
+          <widget class="QLabel" name="m_ToolAxisPositionLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_19">
+           <property name="text">
+            <string>Tool axis:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="m_GetPositions">
+           <property name="text">
+            <string>Get Positions</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="m_CalibrateToolAxis">
+           <property name="text">
+            <string>Calibrate Tool Axis</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
+           <item>
+            <widget class="QDoubleSpinBox" name="m_ToolAxis_X">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="minimum">
+              <double>-1000.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>1000.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="m_ToolAxis_Y">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="minimum">
+              <double>-1000.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>1000.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="m_ToolAxis_Z">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="minimum">
+              <double>-1000.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>1000.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="m_ToolAxisCalibrationLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>Calibrate the tool axis:
+1. Make sure, tool tips of both tools are calibrated
+2. Hold pointer at the end of the needle
+3. Get Position
+4. Calibrate tool axis
+
+Alternative: Manually edit the axis using the spinboxes.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>497</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+      <zorder>gridLayoutWidget_2</zorder>
+      <zorder>label_18</zorder>
+      <zorder>verticalSpacer_5</zorder>
+     </widget>
     </widget>
    </item>
    <item>
@@ -981,6 +1103,12 @@ p, li { white-space: pre-wrap; }
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>QmitkPointListWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkPointListWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QmitkNavigationDataSourceSelectionWidget</class>
    <extends>QWidget</extends>
    <header>QmitkNavigationDataSourceSelectionWidget.h</header>
@@ -990,12 +1118,6 @@ p, li { white-space: pre-wrap; }
    <class>QmitkToolTrackingStatusWidget</class>
    <extends>QWidget</extends>
    <header>QmitkToolTrackingStatusWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkPointListWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkPointListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

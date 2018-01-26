@@ -165,14 +165,14 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
       std::stringstream name;
       name << "Virtual Tool " << i;
       dummyTool->SetToolName(name.str());
-      currentDummyTool->SetTrackingTool(dummyTool.GetPointer());
       currentDummyTool->SetDataNode(m_RenderingNodes.at(i));
       currentDummyTool->SetIdentifier(name.str());
       m_ToolStorage->AddTool(currentDummyTool);
     }
     m_Player->RegisterAsMicroservice();
     m_ToolStorage->SetName("NavigationDataPlayer Tool Storage");
-    m_ToolStorage->RegisterAsMicroservice(m_Player->GetMicroserviceID());
+    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID());
+    m_ToolStorage->RegisterAsMicroservice();
   } else {
     if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();
     m_ToolStorage = nullptr;

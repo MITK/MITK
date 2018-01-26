@@ -293,6 +293,13 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </item>
+   <item>
+    <widget class="QLabel" name="m_ToolInformation">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

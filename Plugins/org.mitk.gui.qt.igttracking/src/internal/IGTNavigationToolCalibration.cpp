@@ -45,7 +45,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string IGTNavigationToolCalibration::VIEW_ID = "org.mitk.views.igtnavigationtoolcalibration";
 
 IGTNavigationToolCalibration::IGTNavigationToolCalibration()
-{}
+{
+  m_ToolTransformationWidget = new QmitkInteractiveTransformationWidget();
+}
 
 IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
 {
@@ -53,6 +55,12 @@ IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
 //If this is removed, MITK crashes when closing the view:
 m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(nullptr);
 m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(nullptr);
+
+  //clean up data storage
+  this->GetDataStorage()->Remove(m_ToolTipPointPreview);
+
+
+  delete m_ToolTransformationWidget;
 }
 
 void IGTNavigationToolCalibration::SetFocus()
@@ -80,13 +88,6 @@ void IGTNavigationToolCalibration::OnToolCalibrationMethodChanged(int index)
 
 void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
 {
-  //initialize manual tool editing widget
-  m_ManualToolTipEditWidget = new QmitkNavigationToolCreationAdvancedWidget(parent);
-  m_ManualToolTipEditWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
-  m_ManualToolTipEditWidget->setWindowTitle("Edit Tool Tip Manually");
-  m_ManualToolTipEditWidget->setModal(false);
-  m_ManualToolTipEditWidget->SetDataStorage(this->GetDataStorage());
-
   m_TrackingTimer = new QTimer(this);
 
   // create GUI widgets from the Qt Designer's .ui file
@@ -100,8 +101,13 @@ void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_ComputePivot, SIGNAL(clicked()), this, SLOT(OnComputePivot()));
   connect(m_Controls.m_UseComputedPivotPoint, SIGNAL(clicked()), this, SLOT(OnUseComputedPivotPoint()));
   connect(m_Controls.m_StartEditTooltipManually, SIGNAL(clicked()), this, SLOT(OnStartManualToolTipCalibration()));
-  connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(RetrieveDataForManualToolTipManipulation()), this, SLOT(OnRetrieveDataForManualTooltipManipulation()));
-  connect((QObject*)(m_ManualToolTipEditWidget), SIGNAL(DialogCloseRequested()), this, SLOT(OnProcessManualTooltipEditDialogCloseRequest()));
+  connect(m_Controls.m_GetPositions, SIGNAL(clicked()), this, SLOT(OnGetPositions()));
+  connect(m_Controls.m_ToolAxis_X, SIGNAL(valueChanged(double)), this, SLOT(OnToolAxisSpinboxChanged()));
+  connect(m_Controls.m_ToolAxis_Y, SIGNAL(valueChanged(double)), this, SLOT(OnToolAxisSpinboxChanged()));
+  connect(m_Controls.m_ToolAxis_Z, SIGNAL(valueChanged(double)), this, SLOT(OnToolAxisSpinboxChanged()));
+  connect(m_Controls.m_CalibrateToolAxis, SIGNAL(clicked()), this, SLOT(OnCalibrateToolAxis()));
+  connect((QObject*)(m_ToolTransformationWidget), SIGNAL(EditToolTipFinished(mitk::AffineTransform3D::Pointer)), this,
+    SLOT(OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer)));
   connect(m_Controls.m_CalibrationMethodComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnToolCalibrationMethodChanged(int)));
 
   connect((QObject*)(m_Controls.m_RunCalibrationButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnRunSingleRefToolCalibrationClicked()));
@@ -204,7 +210,13 @@ void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
 
 void IGTNavigationToolCalibration::OnLoginSingleRefToolNavigationDataClicked()
 {
+
   if (!CheckInitialization()) { return; }
+
+  //reset old data
+  m_LoggedNavigationDataOffsets.clear();
+  m_LoggedNavigationDataDifferences.clear();
+
   m_OnLoginSingleRefToolNavigationDataClicked = true;
   m_Controls.m_CollectNavigationDataButton->setEnabled(false);
   m_NumberOfNavigationData = m_Controls.m_NumberOfNavigationDataToCollect->value();
@@ -266,7 +278,7 @@ void IGTNavigationToolCalibration::ClearOldPivot()
   mitk::NavigationData::Pointer tempND = mitk::NavigationData::New();
   this->ApplyToolTipTransform(tempND);
   UpdateManualToolTipCalibrationView();
-  m_ManualToolTipEditWidget->hide();
+  //m_ManualToolTipEditWidget->hide(); //TODO
   this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
 }
 void IGTNavigationToolCalibration::OnAddPivotPose()
@@ -393,21 +405,25 @@ void IGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationData::P
 
 void IGTNavigationToolCalibration::ShowToolTipPreview(mitk::NavigationData::Pointer ToolTipInTrackingCoordinates)
 {
-  mitk::DataNode::Pointer m_ToolTipPointPreview = mitk::DataNode::New();
-  m_ToolTipPointPreview->SetName("Modified Tool Tip Preview");
-  mitk::Color blue;
-  blue.SetBlue(1);
-  m_ToolTipPointPreview->SetColor(blue);
-  mitk::Surface::Pointer mySphere = mitk::Surface::New();
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(3.0f);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
-  vtkData->Update();
-  mySphere->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-  m_ToolTipPointPreview->SetData(mySphere);
+  if(m_ToolTipPointPreview.IsNull())
+  {
+    m_ToolTipPointPreview = mitk::DataNode::New();
+    m_ToolTipPointPreview->SetName("Modified Tool Tip Preview");
+    mitk::Color blue;
+    blue.SetBlue(1);
+    m_ToolTipPointPreview->SetColor(blue);
+    mitk::Surface::Pointer mySphere = mitk::Surface::New();
+    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkData->SetRadius(3.0f);
+    vtkData->SetCenter(0.0, 0.0, 0.0);
+    vtkData->Update();
+    mySphere->SetVtkPolyData(vtkData->GetOutput());
+    vtkData->Delete();
+    m_ToolTipPointPreview->SetData(mySphere);
+
+    this->GetDataStorage()->Add(m_ToolTipPointPreview);
+  }
   m_ToolTipPointPreview->GetData()->GetGeometry()->SetIndexToWorldTransform(ToolTipInTrackingCoordinates->GetAffineTransform3D());
-  this->GetDataStorage()->Add(m_ToolTipPointPreview);
 }
 
 void IGTNavigationToolCalibration::RemoveToolTipPreview()
@@ -437,31 +453,102 @@ void IGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
 void IGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 {
   if (!CheckInitialization(false)) { return; }
-  m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolToCalibrate->GetDataNode());
-  m_ManualToolTipEditWidget->show();
-  m_ManualToolTipEditWidget->SetDefaultTooltip(m_ToolToCalibrate->GetToolTipTransform());
-  m_ManualToolTipEditWidget->ReInitialize();
+
+  m_ToolTransformationWidget->SetToolToEdit(m_ToolToCalibrate);
+  m_ToolTransformationWidget->SetDefaultOffset(m_ToolToCalibrate->GetToolTipPosition());
+  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToCalibrate->GetToolTipOrientation());
+
+  m_ToolTransformationWidget->open();
 }
 
-void IGTNavigationToolCalibration::OnRetrieveDataForManualTooltipManipulation()
+void IGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
-  this->GetDataStorage()->Add(m_ToolSurfaceInToolCoordinatesDataNode);
-  m_ManualToolTipEditWidget->SetToolTipSurface(false, m_ToolSurfaceInToolCoordinatesDataNode);
-}
+  //This function is called, when the toolTipEdit view is closed.
+  //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
+  if (toolTip)
+  {
+    mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
+    QString resultString = QString("Manual edited values are written to ") + m_ToolToCalibrate->GetToolName().c_str();
+    ApplyToolTipTransform(tempND, resultString.toStdString());
+    m_Controls.m_ResultText->setText(resultString);
+  }
 
-void IGTNavigationToolCalibration::OnProcessManualTooltipEditDialogCloseRequest()
-{
-  mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(m_ManualToolTipEditWidget->GetManipulatedToolTip());
-  this->ApplyToolTipTransform(tempND);
   UpdateManualToolTipCalibrationView();
-  m_ManualToolTipEditWidget->hide();
-  this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
+}
+
+void IGTNavigationToolCalibration::OnGetPositions()
+{
+  if (!CheckInitialization(true)) { return; }
+
+  //Navigation Data from Tool which should be calibrated
+  if (!m_AxisCalibration_ToolToCalibrate)
+    m_AxisCalibration_ToolToCalibrate = mitk::NavigationData::New();
+  m_AxisCalibration_ToolToCalibrate->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDToolToCalibrate));
+
+  //Navigation Data from calibration pointer tool
+  if (!m_AxisCalibration_NavDataCalibratingTool)
+    m_AxisCalibration_NavDataCalibratingTool = mitk::NavigationData::New();
+  m_AxisCalibration_NavDataCalibratingTool->Graft(m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_IDCalibrationPointer));
+
+  MITK_DEBUG << "Positions for tool axis calibration:";
+  MITK_DEBUG << "    ToolTip: " << m_AxisCalibration_ToolToCalibrate->GetPosition() << ",";
+  MITK_DEBUG << "    Rotation: \n" << m_AxisCalibration_ToolToCalibrate->GetRotationMatrix();
+  MITK_DEBUG << "    End of the tool: " << m_AxisCalibration_NavDataCalibratingTool->GetPosition();
+
+  QString _label = "Position recorded: " + QString::number(m_AxisCalibration_NavDataCalibratingTool->GetPosition()[0], 'f', 1) + ", "
+    + QString::number(m_AxisCalibration_NavDataCalibratingTool->GetPosition()[1], 'f', 1) + ", "
+    + QString::number(m_AxisCalibration_NavDataCalibratingTool->GetPosition()[2], 'f', 1);
+  m_Controls.m_ToolAxisPositionLabel->setText(_label);
+}
+
+void IGTNavigationToolCalibration::OnCalibrateToolAxis()
+{
+  if (!m_AxisCalibration_ToolToCalibrate || !m_AxisCalibration_NavDataCalibratingTool)
+  {
+    MITK_ERROR << "Please record position first.";
+    return;
+  }
+
+  //Calculate the tool tip
+  //here is an explanation, what is happening here:
+  /*
+  The axis is equal to the (tool tip) minus the (end of the tool) in tool coordinates of the tool which should be calibrated.
+  The tool tip in tool coordinates is zero (definition of the tip).
+  The end of the tool is recorded by the calibration pointer's position and is transformed using the inverse of the tool which should be calibrated.
+  Normalize it.
+  */
+  m_CalibratedToolAxis = -m_AxisCalibration_ToolToCalibrate->GetInverse()->TransformPoint(m_AxisCalibration_NavDataCalibratingTool->GetPosition()).GetVectorFromOrigin();
+  MITK_DEBUG << "Tool Endpoint in Tool coordinates: " << m_CalibratedToolAxis;
+  m_CalibratedToolAxis.Normalize();
+  MITK_DEBUG << "Tool Axis: " << m_CalibratedToolAxis;
+
+  m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
+
+  //Update GUI
+  QString calibratedToolAxisString = "Tool Axis: " + QString::number(m_CalibratedToolAxis.GetElement(0), 'f', 3) + ", " +
+    QString::number(m_CalibratedToolAxis.GetElement(1), 'f', 3) + ", " + QString::number(m_CalibratedToolAxis.GetElement(2), 'f', 3);
+  m_Controls.m_ToolAxisCalibrationLabel->setText(calibratedToolAxisString);
+
+  //Block QT signals, we don't want to emit SpinboxChanged on the first value to overwrite the next ones
+  m_Controls.m_ToolAxis_X->blockSignals(true); m_Controls.m_ToolAxis_Y->blockSignals(true); m_Controls.m_ToolAxis_Z->blockSignals(true);
+  m_Controls.m_ToolAxis_X->setValue(m_CalibratedToolAxis[0]);
+  m_Controls.m_ToolAxis_Y->setValue(m_CalibratedToolAxis[1]);
+  m_Controls.m_ToolAxis_Z->setValue(m_CalibratedToolAxis[2]);
+  m_Controls.m_ToolAxis_X->blockSignals(false); m_Controls.m_ToolAxis_Y->blockSignals(false); m_Controls.m_ToolAxis_Z->blockSignals(false);
+}
+
+void IGTNavigationToolCalibration::OnToolAxisSpinboxChanged()
+{
+  m_CalibratedToolAxis.SetElement(0, m_Controls.m_ToolAxis_X->value());
+  m_CalibratedToolAxis.SetElement(1, m_Controls.m_ToolAxis_Y->value());
+  m_CalibratedToolAxis.SetElement(2, m_Controls.m_ToolAxis_Z->value());
+  m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
+  MITK_INFO << "Tool axis changed to " << m_CalibratedToolAxis;
 }
 
 void IGTNavigationToolCalibration::SetToolToCalibrate()
 {
   m_IDToolToCalibrate = m_Controls.m_SelectionWidget->GetSelectedToolID();
-  m_ToolToCalibrate = m_Controls.m_SelectionWidget->GetSelectedNavigationTool();
   if (m_IDToolToCalibrate == -1) //no valid tool to calibrate
   {
     m_Controls.m_CalToolLabel->setText("<none>");
@@ -470,6 +557,7 @@ void IGTNavigationToolCalibration::SetToolToCalibrate()
   }
   else
   {
+    m_ToolToCalibrate = m_Controls.m_SelectionWidget->GetSelectedNavigationTool();
     m_NavigationDataSourceOfToolToCalibrate = m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource();
     m_Controls.m_CalToolLabel->setText(m_NavigationDataSourceOfToolToCalibrate->GetOutput(m_IDToolToCalibrate)->GetName());
     //initialize widget
@@ -484,6 +572,18 @@ void IGTNavigationToolCalibration::SetToolToCalibrate()
     mitk::Surface::Pointer ToolSurface = dynamic_cast<mitk::Surface*>(m_ToolToCalibrate->GetDataNode()->GetData())->Clone();
     m_ToolSurfaceInToolCoordinatesDataNode->SetData(ToolSurface);
     m_ToolSurfaceInToolCoordinatesDataNode->GetData()->GetGeometry()->SetIdentity();
+
+    //Set the default needle axis
+    m_CalibratedToolAxis = m_ToolToCalibrate->GetToolAxis().GetVectorFromOrigin();
+    //Block QT signals, we don't want to emit SpinboxChanged on the first value to overwrite the next ones
+    m_Controls.m_ToolAxis_X->blockSignals(true); m_Controls.m_ToolAxis_Y->blockSignals(true); m_Controls.m_ToolAxis_Z->blockSignals(true);
+    m_Controls.m_ToolAxis_X->setValue(m_CalibratedToolAxis[0]);
+    m_Controls.m_ToolAxis_Y->setValue(m_CalibratedToolAxis[1]);
+    m_Controls.m_ToolAxis_Z->setValue(m_CalibratedToolAxis[2]);
+    m_Controls.m_ToolAxis_X->blockSignals(false); m_Controls.m_ToolAxis_Y->blockSignals(false); m_Controls.m_ToolAxis_Z->blockSignals(false);
+
+    UpdateManualToolTipCalibrationView();
+
     //start updating timer for status widgets, etc.
     if (!m_TrackingTimer->isActive()) m_TrackingTimer->start(100);
   }
@@ -492,7 +592,6 @@ void IGTNavigationToolCalibration::SetToolToCalibrate()
 void IGTNavigationToolCalibration::SetCalibrationPointer()
 {
   m_IDCalibrationPointer = m_Controls.m_SelectionWidget->GetSelectedToolID();
-  m_NavigationDataSourceOfCalibrationPointer = m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource();
   if (m_IDCalibrationPointer == -1)
   {
     m_Controls.m_PointerLabel->setText("<none>");
@@ -501,6 +600,7 @@ void IGTNavigationToolCalibration::SetCalibrationPointer()
   }
   else
   {
+    m_NavigationDataSourceOfCalibrationPointer = m_Controls.m_SelectionWidget->GetSelectedNavigationDataSource();
     m_Controls.m_PointerLabel->setText(m_NavigationDataSourceOfCalibrationPointer->GetOutput(m_IDCalibrationPointer)->GetName());
     //initialize widget
     m_Controls.m_StatusWidgetCalibrationPointer->RemoveStatusLabels();

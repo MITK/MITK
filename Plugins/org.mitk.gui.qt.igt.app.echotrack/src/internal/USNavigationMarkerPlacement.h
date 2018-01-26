@@ -47,6 +47,7 @@ namespace Ui
 }
 
 class QmitkUSAbstractNavigationStep;
+class QmitkUSNavigationStepPunctuationIntervention;
 class QmitkStdMultiWidget;
 class QTimer;
 class QSignalMapper;
@@ -102,6 +103,9 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
   */
   void OnActiveNavigationStepChanged(int);
 
+  /** Initializes the next navigation step */
+  void OnNextNavigationStepInitialization(int);
+
   /**
   * \brief The data node is given to the experiment logging and scene is saved to the file system.
   */
@@ -116,6 +120,10 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
   void OnChangeLayoutClicked();
 
   void OnChangeAblationZone(int id, int newSize);
+
+  void OnRenderWindowSelection();
+
+  void OnRefreshView();
 
 public:
   static const char *DATANAME_TUMOUR;
@@ -133,11 +141,6 @@ public:
   static const std::string VIEW_ID;
 
   void OnCombinedModalityPropertyChanged(const std::string &, const std::string &);
-  /**
-  * \returns the point defining the needle axis in the tool storage
-  */
-  void SetToolAxisMarkerPlacement();
-  mitk::Point3D m_ToolAxis;
 
 protected:
   /**
@@ -151,43 +154,58 @@ protected:
   void ReinitOnImage();
 
   /**
+  * \brief Sets the multiwidget to two windows, axial on top and 3D render window on the bottom.
+  */
+  virtual void SetTwoWindowView();
+
+  /**
   * \brief Helper function for being able to serialize the 2d ultrasound image.
   */
   void Convert2DImagesTo3D(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
+  void UpdateToolStorage();
+
   void CreateOverlays();
 
-  QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
-  itk::SmartPointer<mitk::USCombinedModality> m_CombinedModality;
-  std::string m_CurrentApplicationName;
-  QString m_ResultsDirectory;
-  QString m_ExperimentName;
-  QString m_ExperimentResultsSubDirectory;
-  std::vector<QString> m_NavigationStepNames; // stores the names of the navigation steps which are currently used (for logging purposes)
-  mitk::USNavigationLoggingBackend m_LoggingBackend;
-  mitk::NodeDisplacementFilter::Pointer m_TargetNodeDisplacementFilter;
-  std::vector<mitk::DataNode::Pointer> m_AblationZonesVector;
-  //To get tool storage
-  mitk::NavigationDataSource::Pointer m_NavigationDataSource;
-  mitk::NavigationToolStorage::Pointer m_CurrentStorage;
-
   QWidget *m_Parent;
+  QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
   QTimer *m_UpdateTimer;
   QTimer *m_ImageAndNavigationDataLoggingTimer;
   QmitkStdMultiWidget *m_StdMultiWidget;
+  itk::SmartPointer<mitk::USCombinedModality> m_CombinedModality;
   bool m_ReinitAlreadyDone;
   bool m_IsExperimentRunning;
+  std::string m_CurrentApplicationName;
+
   itk::SmartPointer<mitk::USNavigationStepTimer> m_NavigationStepTimer;
   itk::SmartPointer<mitk::USNavigationExperimentLogging> m_ExperimentLogging;
-  mitk::NodeDisplacementFilter::Pointer m_AblationZonesDisplacementFilter;
+
   QPixmap m_IconRunning;
   QPixmap m_IconNotRunning;
+
+  QString m_ResultsDirectory;
+  QString m_ExperimentName;
+  QString m_ExperimentResultsSubDirectory;
+  std::vector<QString>
+    m_NavigationStepNames; // stores the names of the navigation steps which are currently used (for logging purposes)
+
+  mitk::USNavigationLoggingBackend m_LoggingBackend;
   mitk::USImageLoggingFilter::Pointer m_USImageLoggingFilter;
   mitk::NavigationDataRecorder::Pointer m_NavigationDataRecorder; // records navigation data files
-  int m_SceneNumber;
-  itk::SmartPointer<mitk::TextAnnotation2D> m_WarnOverlay;
+  mitk::NodeDisplacementFilter::Pointer m_TargetNodeDisplacementFilter;
+  mitk::NodeDisplacementFilter::Pointer m_AblationZonesDisplacementFilter;
+  std::vector<mitk::DataNode::Pointer> m_AblationZonesVector;
+
   int m_NeedleIndex;
   int m_MarkerIndex;
+
+  int m_SceneNumber;
+
+  itk::SmartPointer<mitk::TextAnnotation2D> m_WarnOverlay;
+
+  //To get tool storage
+  mitk::NavigationDataSource::Pointer m_NavigationDataSource;
+  mitk::NavigationToolStorage::Pointer m_CurrentStorage;
 
 private:
   mitk::MessageDelegate2<USNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;

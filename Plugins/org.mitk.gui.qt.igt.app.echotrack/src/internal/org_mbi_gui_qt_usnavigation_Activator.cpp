@@ -38,7 +38,7 @@ namespace mitk {
       BERRY_REGISTER_EXTENSION_CLASS(USNavigationMarkerPlacement, context)
       BERRY_REGISTER_EXTENSION_CLASS(QmitkUSNavigationPerspective, context)
 
-      // create a combined modality persitence object for loading and storing
+      // create a combined modality persistence object for loading and storing
       // combined modality objects persistently
       m_USCombinedModalityPersistence = mitk::USNavigationCombinedModalityPersistence::New();
   }

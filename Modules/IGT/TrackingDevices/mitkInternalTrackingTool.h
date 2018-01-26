@@ -60,6 +60,8 @@ namespace mitk {
     virtual void SetDataValid(bool _arg);                       ///< sets if the tracking data (position & Orientation) is valid
     virtual void SetErrorMessage(const char* _arg);             ///< sets the error message
     virtual void SetToolTip(Point3D toolTipPosition, Quaternion orientation = Quaternion(0,0,0,1), ScalarType eps=0.0) override; ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
+    Point3D GetToolTip() const; //Returns the tool tip in tool coordinates, which where set by SetToolTip
+    Quaternion GetToolTipOrientation() const;//Returns the tool tip orientation in tool coordinates, which where set by SetToolTip
 
   protected:
     itkFactorylessNewMacro(Self)

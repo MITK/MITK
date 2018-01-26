@@ -55,7 +55,7 @@ namespace mitk
     {
       mitk::NavigationTool::Pointer thisNavigationTool = navigationTools->GetTool(i);
       toolCorrespondencesInToolStorage->push_back(i);
-      bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str());
+      bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str(), std::stoi(thisNavigationTool->GetIdentifier()));
       if (!toolAddSuccess)
       {
         //todo error handling

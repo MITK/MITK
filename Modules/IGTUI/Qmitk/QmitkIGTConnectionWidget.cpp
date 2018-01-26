@@ -162,7 +162,7 @@ bool QmitkIGTConnectionWidget::LoadToolfile(QString qFilename)
       return false;
     }
     //check if all tools are from the same device
-    for (int i=1; i<tempStorage->GetToolCount(); i++)
+    for (unsigned int i=1; i<tempStorage->GetToolCount(); i++)
     {
       if (lastDevice!=tempStorage->GetTool(i)->GetTrackingDeviceType())
       {
@@ -189,7 +189,7 @@ bool QmitkIGTConnectionWidget::LoadToolfile(QString qFilename)
 
 void QmitkIGTConnectionWidget::RemoveToolNodes()
 {
-  for (int i=0; i<m_NavigationToolStorage->GetToolCount(); i++)
+  for (unsigned int i=0; i<m_NavigationToolStorage->GetToolCount(); i++)
   {
     mitk::DataNode::Pointer currentNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
     if (currentNode.IsNotNull())

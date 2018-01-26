@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>370</width>
-    <height>723</height>
+    <width>680</width>
+    <height>1147</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -33,7 +33,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_3">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -47,21 +47,22 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>280</height>
+           <height>220</height>
           </size>
          </property>
          <property name="title">
           <string/>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <widget class="QmitkTrackingDeviceConfigurationWidget" name="m_configurationWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0">
+          <item alignment="Qt::AlignTop">
+           <widget class="QmitkTrackingDeviceConfigurationWidget" name="m_ConfigurationWidget" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <layout class="QVBoxLayout" name="verticalLayout_18"/>
            </widget>
           </item>
          </layout>
@@ -111,7 +112,7 @@ p, li { white-space: pre-wrap; }
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="m_toolLabel">
+                 <widget class="QLabel" name="m_ToolLabel">
                   <property name="text">
                    <string>&lt;none&gt;</string>
                   </property>
@@ -137,7 +138,7 @@ p, li { white-space: pre-wrap; }
                 <property name="minimumSize">
                  <size>
                   <width>200</width>
-                  <height>80</height>
+                  <height>0</height>
                  </size>
                 </property>
                </widget>
@@ -356,19 +357,6 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_2">
@@ -386,7 +374,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="m_renderWarningLabel">
+          <widget class="QLabel" name="m_RenderWarningLabel">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -635,7 +623,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="m_simpleUI">
+           <widget class="QCheckBox" name="m_SimpleUI">
             <property name="text">
              <string>Simple UI</string>
             </property>
@@ -652,6 +640,35 @@ p, li { white-space: pre-wrap; }
            <widget class="QCheckBox" name="m_InverseMode">
             <property name="text">
              <string>Inverse mode (Quaternions are stored inverse)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Tool Visualization Options</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_17">
+          <item>
+           <widget class="QCheckBox" name="showHideToolProjectionCheckBox">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>Show Tool Projection</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showHideToolAxisCheckBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Show Tool Axis</string>
             </property>
            </widget>
           </item>
@@ -737,7 +754,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <widget class="QRadioButton" name="m_csvFormat">
+        <widget class="QRadioButton" name="m_CsvFormat">
          <property name="text">
           <string>CSV format</string>
          </property>
@@ -747,7 +764,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="m_xmlFormat">
+        <widget class="QRadioButton" name="m_XmlFormat">
          <property name="text">
           <string>XML format</string>
          </property>
@@ -913,15 +930,15 @@ Mode</string>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkTrackingDeviceConfigurationWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkTrackingDeviceConfigurationWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QmitkToolTrackingStatusWidget</class>
    <extends>QWidget</extends>
    <header>QmitkToolTrackingStatusWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkTrackingDeviceConfigurationWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkTrackingDeviceConfigurationWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

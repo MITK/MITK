@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>317</width>
-    <height>393</height>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,6 +64,13 @@
        <widget class="QmitkUSNavigationZoneDistancesWidget" name="riskStructuresRangeWidget" native="true"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="m_ShowToolAxisN">
+     <property name="text">
+      <string>Show Tool Axis</string>
+     </property>
     </widget>
    </item>
    <item>

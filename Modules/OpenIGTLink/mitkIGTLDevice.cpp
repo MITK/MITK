@@ -40,6 +40,7 @@ m_Name("Unspecified Device"),
 m_StopCommunication(false),
 m_Hostname("127.0.0.1"),
 m_PortNumber(-1),
+m_LogMessages(false),
 m_MultiThreader(nullptr), m_SendThreadID(0), m_ReceiveThreadID(0), m_ConnectThreadID(0)
 {
   m_ReadFully = ReadFully;

@@ -49,6 +49,12 @@ namespace mitk
     mitkClassMacro( KinectV2Device , ToFCameraDevice );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
+    /** Prints the framerate to the console every 100 frames.
+     *  Mainly for debugging, deactivated by default.
+     *  Refers to a static variable, means it is acivated/deactivated
+     *  for all instances.
+     */
+    itkSetMacro(PrintFrameRate, bool);
 
     /*!
     \brief opens a connection to the ToF camera
@@ -132,12 +138,15 @@ namespace mitk
     \brief Thread method continuously acquiring images from the ToF hardware
     */
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+    static bool m_PrintFrameRate; ///< prints the framerate to the console every 100 frames, deactivated by default
 
     KinectV2Controller::Pointer m_Controller; ///< corresponding CameraController
 
     float** m_DistanceDataBuffer; ///< buffer holding the last distance images
     float** m_AmplitudeDataBuffer; ///< buffer holding the last amplitude images
     unsigned char** m_RGBDataBuffer; ///< buffer holding the last RGB image
+
+
 
     size_t m_DepthBufferSize; ///< Size of depth buffer (i.e. memory size of depth and infrared image)
     size_t m_RGBBufferSize; ///< Size of RGB buffer (i.e. memory size of RGB image)

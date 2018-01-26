@@ -290,7 +290,7 @@ void QmitkUSNavigationProcessWidget::OnPreviousButtonClicked()
 
 void QmitkUSNavigationProcessWidget::OnRestartStepButtonClicked()
 {
-  MITK_INFO("QmitkUSNavigationProcessWidget") << "Restarting step "
+  MITK_DEBUG("QmitkUSNavigationProcessWidget") << "Restarting step "
     << m_CurrentTabIndex << " (" << m_NavigationSteps.at(m_CurrentTabIndex)->GetTitle().toStdString() << ").";
 
   m_NavigationSteps.at(ui->stepsToolBox->currentIndex())->RestartStep();
@@ -299,6 +299,7 @@ void QmitkUSNavigationProcessWidget::OnRestartStepButtonClicked()
 
 void QmitkUSNavigationProcessWidget::OnTabChanged(int index)
 {
+  emit SignalActiveNavigationStepChangeRequested(index);
   if ( index < 0 || index >= static_cast<int>(m_NavigationSteps.size()) )
   {
     return;
@@ -310,7 +311,7 @@ void QmitkUSNavigationProcessWidget::OnTabChanged(int index)
     return;
   }
 
-  MITK_INFO("QmitkUSNavigationProcessWidget") << "Activating navigation step "
+  MITK_DEBUG("QmitkUSNavigationProcessWidget") << "Activating navigation step "
     << index << " (" << m_NavigationSteps.at(index)->GetTitle().toStdString() <<").";
 
   if (index > m_CurrentTabIndex)

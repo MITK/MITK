@@ -61,7 +61,6 @@ public:
   QmitkToFUtilView();
   ~QmitkToFUtilView();
 
-
   virtual void CreateQtPartControl(QWidget *parent) override;
   /// \brief Called when the view gets activated.
   virtual void Activated() override;
@@ -115,6 +114,8 @@ protected:
   void UseToFVisibilitySettings(bool useToF);
 
   Ui::QmitkToFUtilViewControls* m_Controls;
+
+  bool m_Framerateoutput; ///< defines if the framerate is computed condinously
 
   QTimer* m_Frametimer; ///< Timer used to continuously update the images
 

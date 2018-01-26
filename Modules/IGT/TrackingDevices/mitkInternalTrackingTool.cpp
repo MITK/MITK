@@ -168,6 +168,15 @@ void mitk::InternalTrackingTool::SetToolTip(mitk::Point3D toolTipPosition,
   }
 }
 
+mitk::Point3D mitk::InternalTrackingTool::GetToolTip() const
+{
+  return m_ToolTip;
+}
+mitk::Quaternion mitk::InternalTrackingTool::GetToolTipOrientation() const
+{
+  return m_ToolTipRotation;
+}
+
 void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 {
   itkDebugMacro("setting  m_Orientation to " << orientation);

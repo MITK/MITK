@@ -29,35 +29,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIntervention(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
   m_Ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
+  m_ZoneNodes(nullptr),
   m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
+  m_NeedleNavigationTool(mitk::NavigationTool::New()),
+  m_OldColors(),
   m_SphereSource(vtkSmartPointer<vtkSphereSource>::New()),
   m_OBBTree(vtkSmartPointer<vtkOBBTree>::New()),
   m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
 {
   m_Ui->setupUi(this);
   connect(m_Ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
+  connect(m_Ui->m_ShowToolAxisN, SIGNAL(stateChanged(int)), this, SLOT(OnShowToolAxisEnabled(int)));
   connect(m_Ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
   connect(m_Ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
   m_Ui->m_AblationZonesBox->setVisible(false);
 }
 
-QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIntervention(mitk::Point3D toolAxis, QWidget *parent) :
-QmitkUSAbstractNavigationStep(parent),
-  m_Ui(new Ui::QmitkUSNavigationStepPunctuationIntervention),
-  m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
-  m_SphereSource(vtkSmartPointer<vtkSphereSource>::New()),
-  m_OBBTree(vtkSmartPointer<vtkOBBTree>::New()),
-  m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
+void QmitkUSNavigationStepPunctuationIntervention::SetNeedleMetaData(mitk::NavigationTool::Pointer needleNavigationTool)
+
 {
-  m_ToolAxis.SetElement(0, (toolAxis.GetElement(0)));
-  m_ToolAxis.SetElement(1, (toolAxis.GetElement(1)));
-  m_ToolAxis.SetElement(2, (toolAxis.GetElement(2)));
-  m_NeedleProjectionFilter->SetToolAxisForFilter(m_ToolAxis);
-  m_Ui->setupUi(this);
-  connect(m_Ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
-  connect(m_Ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
-  connect(m_Ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
-  m_Ui->m_AblationZonesBox->setVisible(false);
+  this->m_NeedleNavigationTool = needleNavigationTool;
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnEnableAblationZoneMarkingClicked()
@@ -102,7 +93,7 @@ bool QmitkUSNavigationStepPunctuationIntervention::OnStartStep()
       ("Needle Path", QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   node->SetData(m_NeedleProjectionFilter->GetProjection());
   node->SetBoolProperty("show contour", true);
-
+  m_NeedleProjectionFilter->SetToolAxisForFilter(m_NeedleNavigationTool->GetToolAxis());
   return true;
 }
 
@@ -150,6 +141,12 @@ bool QmitkUSNavigationStepPunctuationIntervention::OnActivateStep()
   m_NeedleProjectionFilter->SelectInput(0);
 
   return true;
+}
+
+void QmitkUSNavigationStepPunctuationIntervention::OnShowToolAxisEnabled(int enabled)
+{
+  if (enabled == 0) { m_NeedleProjectionFilter->ShowToolAxis(false); }
+  else { m_NeedleProjectionFilter->ShowToolAxis(true); }
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnUpdate()

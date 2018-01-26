@@ -55,6 +55,7 @@ const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 QmitkToFUtilView::QmitkToFUtilView()
   : QmitkAbstractView()
   , m_Controls(nullptr)
+  , m_Framerateoutput(false)
   , m_MitkDistanceImage(nullptr), m_MitkAmplitudeImage(nullptr), m_MitkIntensityImage(nullptr), m_Surface(nullptr)
   , m_DistanceImageNode(nullptr), m_AmplitudeImageNode(nullptr), m_IntensityImageNode(nullptr), m_RGBImageNode(nullptr), m_SurfaceNode(nullptr)
   , m_ToFImageRecorder(nullptr), m_ToFImageGrabber(nullptr), m_ToFDistanceImageToSurfaceFilter(nullptr), m_ToFCompositeFilter(nullptr)
@@ -382,7 +383,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
     // set distance image to measurement widget
     m_Controls->m_ToFMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 
-    this->m_Frametimer->start(0);
+    this->m_Frametimer->start(50);
 
     m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
     m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
@@ -409,13 +410,17 @@ void QmitkToFUtilView::OnUpdateCamera()
 
   this->RequestRenderWindowUpdate();
 
-  this->m_2DDisplayCount++;
-  if ((this->m_2DDisplayCount % this->m_StepsForFramerate) == 0)
+  if (m_Framerateoutput)
   {
-    this->m_2DTimeAfter = this->m_RealTimeClock->GetCurrentStamp() - this->m_2DTimeBefore;
-    MITK_INFO << " 2D-Display-framerate (fps): " << this->m_StepsForFramerate / (this->m_2DTimeAfter/1000);
-    this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
+    this->m_2DDisplayCount++;
+    if ((this->m_2DDisplayCount % this->m_StepsForFramerate) == 0)
+    {
+      this->m_2DTimeAfter = this->m_RealTimeClock->GetCurrentStamp() - this->m_2DTimeBefore;
+      MITK_INFO << " 2D-Display-framerate (fps): " << this->m_StepsForFramerate / (this->m_2DTimeAfter / 1000);
+      this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
+    }
   }
+
 }
 
 void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)

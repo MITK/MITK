@@ -269,7 +269,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
 
   mitk::NavigationToolStorage::Pointer foundTools = this->DiscoverToolsAndConvertToNavigationTools(type);
   if (foundTools.IsNull() || (foundTools->GetToolCount() == 0)) { return false; }
-  for (int i = 0; i < foundTools->GetToolCount(); i++) { AddNewToolForName(foundTools->GetTool(i)->GetToolName(), i); }
+  for (unsigned int i = 0; i < foundTools->GetToolCount(); i++) { AddNewToolForName(foundTools->GetTool(i)->GetToolName(), i); }
   MITK_INFO << "Found tools: " << foundTools->GetToolCount();
   return true;
 }
@@ -321,24 +321,8 @@ void mitk::OpenIGTLinkTrackingDevice::AddNewToolForName(std::string name, int i)
 
 mitk::NavigationTool::Pointer mitk::OpenIGTLinkTrackingDevice::ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier)
 {
-  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-
-  newNode->SetName(name);
-
-  mitk::Surface::Pointer myCone = mitk::Surface::New();
-  vtkConeSource *vtkData = vtkConeSource::New();
-  vtkData->SetAngle(5.0);
-  vtkData->SetResolution(50);
-  vtkData->SetHeight(6.0f);
-  vtkData->SetRadius(2.0f);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
-  vtkData->Update();
-  myCone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-  newNode->SetData(myCone);
-
   mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
-  newTool->SetDataNode(newNode);
+  newTool->GetDataNode()->SetName(name);
   newTool->SetIdentifier(identifier);
 
   newTool->SetTrackingDeviceType(mitk::OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection().Line);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>255</width>
-    <height>309</height>
+    <width>357</width>
+    <height>405</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,8 +51,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>236</width>
-        <height>90</height>
+        <width>339</width>
+        <height>211</height>
        </rect>
       </property>
       <attribute name="label">
@@ -140,8 +140,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>310</width>
-        <height>113</height>
+        <width>339</width>
+        <height>211</height>
        </rect>
       </property>
       <attribute name="label">
@@ -151,7 +151,7 @@
        <item>
         <widget class="QRadioButton" name="m_Surface_Use_Sphere">
          <property name="text">
-          <string>Use Simple Cone</string>
+          <string>Default representation (shows tool coordinates)</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -161,28 +161,12 @@
        <item>
         <widget class="QRadioButton" name="m_Surface_Use_Other">
          <property name="text">
-          <string>Use Surface:</string>
+          <string>Use surface from data storage</string>
          </property>
         </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>25</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
          <item>
           <widget class="QmitkDataStorageComboBox" name="m_SurfaceChooser">
            <property name="minimumSize">
@@ -199,6 +183,30 @@
            </property>
           </widget>
          </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_Surface_Load_File">
+         <property name="text">
+          <string>Load surface from file</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
           <widget class="QPushButton" name="m_LoadSurface">
            <property name="enabled">
@@ -250,8 +258,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>157</width>
-        <height>84</height>
+        <width>145</width>
+        <height>73</height>
        </rect>
       </property>
       <attribute name="label">
@@ -292,8 +300,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>286</width>
-        <height>183</height>
+        <width>276</width>
+        <height>161</height>
        </rect>
       </property>
       <attribute name="label">
@@ -411,6 +419,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="m_ToolTipLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -424,7 +439,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_ShowAdvancedOptionsPB">
+          <widget class="QPushButton" name="m_EditToolTip">
            <property name="text">
             <string>Edit Tooltip</string>
            </property>

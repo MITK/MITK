@@ -56,6 +56,6 @@ protected:
   Ui::QmitkVirtualTrackerWidget* m_Controls;
 
 public:
-  mitk::TrackingDevice::Pointer ConstructTrackingDevice() override;
+  virtual mitk::TrackingDevice::Pointer GetTrackingDevice() override;
 };
 #endif

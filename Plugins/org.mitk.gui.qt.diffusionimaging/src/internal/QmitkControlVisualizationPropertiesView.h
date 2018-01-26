@@ -82,6 +82,7 @@ protected slots:
   void FlipPeaks();
   void Welcome();
   void OnSliceChanged();
+  void SetColor();
 
   /// \brief Slot function for switching colourisation mode of glyphs.
   void OnColourisationModeChanged();

@@ -259,6 +259,23 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
       m_SliceChangeListener.RenderWindowPartActivated(renderWindow);
       connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
     }
+
+    connect(m_Controls->m_SetColor1, SIGNAL(clicked()), this, SLOT(SetColor()));
+    connect(m_Controls->m_SetColor2, SIGNAL(clicked()), this, SLOT(SetColor()));
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::SetColor()
+{
+  if(m_SelectedNode)
+  {
+    QColor c = QColorDialog::getColor();
+    float rgb[3];
+    rgb[0] = c.redF();
+    rgb[1] = c.greenF();
+    rgb[2] = c.blueF();
+    m_SelectedNode->SetColor(rgb);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

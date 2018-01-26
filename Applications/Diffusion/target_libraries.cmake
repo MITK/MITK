@@ -10,6 +10,7 @@ set(target_libraries
   org_mitk_gui_qt_ext
   org_mitk_gui_qt_datamanager
   org_mitk_gui_qt_segmentation
+  org_mitk_gui_qt_multilabelsegmentation
   org_mitk_gui_qt_volumevisualization
   org_mitk_gui_qt_diffusionimaging
   org_mitk_gui_qt_diffusionimaging_connectomics

@@ -14,38 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// ####### Blueberry includes #######
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
-
-// ####### Qmitk includes #######
 #include "QmitkConnectomicsStatisticsView.h"
-
-// ####### Qt includes #######
 #include <QMessageBox>
 #include <QStringList>
-
-// ####### ITK includes #######
 #include <itkRGBAPixel.h>
-
-// ####### MITK includes #######
 #include <mbilog.h>
 #include <mitkConnectomicsConstantsManager.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 #include <mitkConnectomicsRenderingProperties.h>
-
-// Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageAccessByItk.h"
-
+#include <mitkNodePredicateDataType.h>
 #include <string>
 
 const std::string QmitkConnectomicsStatisticsView::VIEW_ID = "org.mitk.views.connectomicsstatistics";
 
 QmitkConnectomicsStatisticsView::QmitkConnectomicsStatisticsView()
-: QmitkAbstractView()
-, m_Controls( nullptr )
+  : QmitkAbstractView()
+  , m_Controls( nullptr )
 {
 }
 
@@ -62,6 +51,12 @@ void QmitkConnectomicsStatisticsView::CreateQtPartControl( QWidget *parent )
     m_Controls-> setupUi( parent );
     connect( m_Controls-> networkBalloonsNodeLabelsComboBox, SIGNAL( currentIndexChanged( int ) ),
              this, SLOT( OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( ) ) );
+
+
+    m_Controls->m_NetworkBox->SetDataStorage(this->GetDataStorage());
+    mitk::TNodePredicateDataType<mitk::ConnectomicsNetwork>::Pointer isNetwork = mitk::TNodePredicateDataType<mitk::ConnectomicsNetwork>::New();
+    m_Controls->m_NetworkBox->SetPredicate( isNetwork );
+    connect( (QObject*)(m_Controls->m_NetworkBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
   }
   this-> WipeDisplay();
 }
@@ -73,9 +68,6 @@ void QmitkConnectomicsStatisticsView::SetFocus()
 
 void QmitkConnectomicsStatisticsView::WipeDisplay()
 {
-  m_Controls->lblWarning->setVisible( true );
-  m_Controls->inputImageOneNameLabel->setText( mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_DASH );
-  m_Controls->inputImageOneNameLabel->setVisible( false );
   m_Controls->inputImageOneLabel->setVisible( false );
   m_Controls->networkStatisticsPlainTextEdit->clear();
   m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(  nullptr );
@@ -103,14 +95,14 @@ void QmitkConnectomicsStatisticsView::OnNetworkBalloonsNodeLabelsComboBoxCurrent
   mitk::DataNode::Pointer node = *nodes.begin();
 
   if( node.IsNotNull() )
-    {
+  {
     mitk::ConnectomicsNetwork* network =
-      dynamic_cast< mitk::ConnectomicsNetwork* >( node-> GetData() );
+        dynamic_cast< mitk::ConnectomicsNetwork* >( node-> GetData() );
 
     if( network )
-      {
+    {
       std::string tempCurrentText = m_Controls-> networkBalloonsNodeLabelsComboBox->
-        QComboBox::currentText().toStdString(); // get text of currently selected item.
+                                    QComboBox::currentText().toStdString(); // get text of currently selected item.
 
       if( tempCurrentText.size() > 3 && tempCurrentText.rfind( ":" ) != tempCurrentText.npos )
       { // update chosenNode property.
@@ -148,109 +140,73 @@ void QmitkConnectomicsStatisticsView::OnNetworkBalloonsNodeLabelsComboBoxCurrent
   return;
 }
 
-void QmitkConnectomicsStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkConnectomicsStatisticsView::UpdateGui()
 {
   this->WipeDisplay();
 
-  // Valid options are either
-  // 1 image (parcellation)
-  //
-  // 1 image (parcellation)
-  // 1 fiber bundle
-  //
-  // 1 network
-  if( nodes.size() > 2 )
-  {
-    return;
-  }
-
-  bool currentFormatUnknown(true);
-
   // iterate all selected objects, adjust warning visibility
-  for (mitk::DataNode::Pointer node: nodes)
+  if (m_Controls->m_NetworkBox->GetSelectedNode().IsNotNull())
   {
-    currentFormatUnknown = true;
+    mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( m_Controls->m_NetworkBox->GetSelectedNode()->GetData() );
 
-    if( node.IsNotNull()  )
-    { // network section
-      mitk::ConnectomicsNetwork* network = dynamic_cast<mitk::ConnectomicsNetwork*>( node->GetData() );
-      if( network )
-      {
-        currentFormatUnknown = false;
-        if( nodes.size() != 1 )
-        {
-          // only valid option is a single network
-          this->WipeDisplay();
-          return;
-        }
+    m_Controls->inputImageOneLabel->setVisible( true );
 
-        m_Controls->lblWarning->setVisible( false );
-        m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
-        m_Controls->inputImageOneNameLabel->setVisible( true );
-        m_Controls->inputImageOneLabel->setVisible( true );
+    std::stringstream statisticsStream;
 
-        {
-          std::stringstream statisticsStream;
+    mitk::ConnectomicsStatisticsCalculator::Pointer calculator = mitk::ConnectomicsStatisticsCalculator::New();
 
-          mitk::ConnectomicsStatisticsCalculator::Pointer calculator = mitk::ConnectomicsStatisticsCalculator::New();
+    calculator->SetNetwork( network );
+    calculator->Update();
 
-          calculator->SetNetwork( network );
-          calculator->Update();
+    statisticsStream << "# Vertices: " << calculator->GetNumberOfVertices() << "\n";
+    statisticsStream << "# Edges: " << calculator->GetNumberOfEdges() << "\n";
+    statisticsStream << "Average Degree: " << calculator->GetAverageDegree() << "\n";
+    statisticsStream << "Density: " << calculator->GetConnectionDensity() << "\n";
+    statisticsStream << "Small Worldness: " << calculator->GetSmallWorldness() << "\n";
+    statisticsStream << "Average Path Length: " << calculator->GetAveragePathLength() << "\n";
+    statisticsStream << "Efficiency: " << (1 / calculator->GetAveragePathLength() ) << "\n";
+    statisticsStream << "# Connected Components: " << calculator->GetNumberOfConnectedComponents() << "\n";
+    statisticsStream << "Average Component Size: " << calculator->GetAverageComponentSize() << "\n";
+    statisticsStream << "Largest Component Size: " << calculator->GetLargestComponentSize() << "\n";
+    statisticsStream << "Average Clustering Coefficient: " << calculator->GetAverageClusteringCoefficientsC() << "\n";
+    statisticsStream << "Average Vertex Betweenness Centrality: " << calculator->GetAverageVertexBetweennessCentrality() << "\n";
+    statisticsStream << "Average Edge Betweenness Centrality: " << calculator->GetAverageEdgeBetweennessCentrality() << "\n";
+    statisticsStream << "# Isolated Points: " << calculator->GetNumberOfIsolatedPoints() << "\n";
+    statisticsStream << "# End Points: " << calculator->GetNumberOfEndPoints() << "\n";
+    statisticsStream << "Diameter: " << calculator->GetDiameter() << "\n";
+    statisticsStream << "Radius: " << calculator->GetRadius() << "\n";
+    statisticsStream << "Average Eccentricity: " << calculator->GetAverageEccentricity() << "\n";
+    statisticsStream << "# Central Points: " << calculator->GetNumberOfCentralPoints() << "\n";
 
-          statisticsStream << "# Vertices: " << calculator->GetNumberOfVertices() << "\n";
-          statisticsStream << "# Edges: " << calculator->GetNumberOfEdges() << "\n";
-          statisticsStream << "Average Degree: " << calculator->GetAverageDegree() << "\n";
-          statisticsStream << "Density: " << calculator->GetConnectionDensity() << "\n";
-          statisticsStream << "Small Worldness: " << calculator->GetSmallWorldness() << "\n";
-          statisticsStream << "Average Path Length: " << calculator->GetAveragePathLength() << "\n";
-          statisticsStream << "Efficiency: " << (1 / calculator->GetAveragePathLength() ) << "\n";
-          statisticsStream << "# Connected Components: " << calculator->GetNumberOfConnectedComponents() << "\n";
-          statisticsStream << "Average Component Size: " << calculator->GetAverageComponentSize() << "\n";
-          statisticsStream << "Largest Component Size: " << calculator->GetLargestComponentSize() << "\n";
-          statisticsStream << "Average Clustering Coefficient: " << calculator->GetAverageClusteringCoefficientsC() << "\n";
-          statisticsStream << "Average Vertex Betweenness Centrality: " << calculator->GetAverageVertexBetweennessCentrality() << "\n";
-          statisticsStream << "Average Edge Betweenness Centrality: " << calculator->GetAverageEdgeBetweennessCentrality() << "\n";
-          statisticsStream << "# Isolated Points: " << calculator->GetNumberOfIsolatedPoints() << "\n";
-          statisticsStream << "# End Points: " << calculator->GetNumberOfEndPoints() << "\n";
-          statisticsStream << "Diameter: " << calculator->GetDiameter() << "\n";
-          statisticsStream << "Radius: " << calculator->GetRadius() << "\n";
-          statisticsStream << "Average Eccentricity: " << calculator->GetAverageEccentricity() << "\n";
-          statisticsStream << "# Central Points: " << calculator->GetNumberOfCentralPoints() << "\n";
+    QString statisticsString( statisticsStream.str().c_str() );
+    m_Controls-> networkStatisticsPlainTextEdit-> setPlainText( statisticsString );
 
-          QString statisticsString( statisticsStream.str().c_str() );
-          m_Controls-> networkStatisticsPlainTextEdit-> setPlainText( statisticsString );
-        }
-
-        mitk::ConnectomicsNetwork::Pointer connectomicsNetwork( network );
-        mitk::ConnectomicsHistogramsContainer *histogramContainer = histogramCache[ connectomicsNetwork ];
-        if(histogramContainer)
-        {
-          m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(  histogramContainer->GetBetweennessHistogram() );
-          m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       histogramContainer->GetDegreeHistogram() );
-          m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( histogramContainer->GetShortestPathHistogram() );
-          m_Controls->betweennessNetworkHistogramCanvas->DrawProfiles();
-          m_Controls->degreeNetworkHistogramCanvas->DrawProfiles();
-          m_Controls->shortestPathNetworkHistogramCanvas->DrawProfiles();
-        }
-
-        // For the balloon overlay:
-        if( node-> GetProperty( mitk::connectomicsRenderingBalloonAllNodeLabelsName.c_str() ) != nullptr )
-          { // QComboBox with node label names and numbers.
-            QString allNodesLabel = node->
-                GetProperty( mitk::connectomicsRenderingBalloonAllNodeLabelsName.c_str() )->
-                GetValueAsString().c_str();
-            QStringList allNodesLabelList = allNodesLabel.simplified().split( "," );
-            allNodesLabelList.sort( Qt::CaseInsensitive );
-            m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItem( "no node chosen: -1" );
-            m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItems( allNodesLabelList );
-          }
-      }
-    } // end network section
-
-    if ( currentFormatUnknown )
+    mitk::ConnectomicsNetwork::Pointer connectomicsNetwork( network );
+    mitk::ConnectomicsHistogramsContainer *histogramContainer = histogramCache[ connectomicsNetwork ];
+    if(histogramContainer)
     {
-      this->WipeDisplay();
-      return;
+      m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(  histogramContainer->GetBetweennessHistogram() );
+      m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       histogramContainer->GetDegreeHistogram() );
+      m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( histogramContainer->GetShortestPathHistogram() );
+      m_Controls->betweennessNetworkHistogramCanvas->DrawProfiles();
+      m_Controls->degreeNetworkHistogramCanvas->DrawProfiles();
+      m_Controls->shortestPathNetworkHistogramCanvas->DrawProfiles();
     }
-  } // end for loop
+
+    // For the balloon overlay:
+    if( m_Controls->m_NetworkBox->GetSelectedNode()->GetProperty( mitk::connectomicsRenderingBalloonAllNodeLabelsName.c_str() ) != nullptr )
+    { // QComboBox with node label names and numbers.
+      QString allNodesLabel = m_Controls->m_NetworkBox->GetSelectedNode()->
+                              GetProperty( mitk::connectomicsRenderingBalloonAllNodeLabelsName.c_str() )->
+                              GetValueAsString().c_str();
+      QStringList allNodesLabelList = allNodesLabel.simplified().split( "," );
+      allNodesLabelList.sort( Qt::CaseInsensitive );
+      m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItem( "no node chosen: -1" );
+      m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItems( allNodesLabelList );
+    }
+  }
+}
+
+void QmitkConnectomicsStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& )
+{
 }

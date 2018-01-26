@@ -76,6 +76,7 @@ QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
   , m_TrackingHandler(nullptr)
   , m_ThreadIsRunning(false)
   , m_DeleteTrackingHandler(false)
+  , m_Visible(false)
 {
   m_TrackingWorker.moveToThread(&m_TrackingThread);
   connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -320,7 +321,7 @@ void QmitkStreamlineTrackingView::AfterThread()
 
 void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 {
-  if (m_ThreadIsRunning)
+  if (m_ThreadIsRunning || !m_Visible)
     return;
   if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()))
     return;
@@ -372,11 +373,11 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
 
   if ( m_Controls->m_InteractiveBox->isChecked() )
   {
-//    if (m_FirstInteractiveRun)
-//    {
-//      QMessageBox::information(nullptr, "Information", "Place and move a spherical seed region anywhere in the image by left-clicking and dragging. If the seed region is colored red, tracking is in progress. If the seed region is colored white, tracking is finished.\nPlacing the seed region for the first time in a newly selected dataset might cause a short delay, since the tracker needs to be initialized.");
-//      m_FirstInteractiveRun = false;
-//    }
+    if (m_FirstInteractiveRun)
+    {
+      QMessageBox::information(nullptr, "Information", "Place and move a spherical seed region anywhere in the image by left-clicking and dragging. If the seed region is colored red, tracking is in progress. If the seed region is colored white, tracking is finished.\nPlacing the seed region for the first time in a newly selected dataset might cause a short delay, since the tracker needs to be initialized.");
+      m_FirstInteractiveRun = false;
+    }
 
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     QApplication::processEvents();
@@ -404,6 +405,31 @@ void QmitkStreamlineTrackingView::ToggleInteractive()
     m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
     disconnect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
   }
+}
+
+void QmitkStreamlineTrackingView::Activated()
+{
+
+}
+
+void QmitkStreamlineTrackingView::Deactivated()
+{
+
+}
+
+void QmitkStreamlineTrackingView::Visible()
+{
+  m_Visible = true;
+  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
+  berry::IWorkbenchPart::Pointer nullPart;
+  OnSelectionChanged(nullPart, selection);
+}
+
+void QmitkStreamlineTrackingView::Hidden()
+{
+  m_Visible = false;
+  m_Controls->m_InteractiveBox->setChecked(false);
+  ToggleInteractive();
 }
 
 void QmitkStreamlineTrackingView::OnSliceChanged()
@@ -443,6 +469,9 @@ void QmitkStreamlineTrackingView::OutputStyleSwitched()
 
 void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes )
 {
+  if (!m_Visible)
+    return;
+
   std::vector< mitk::DataNode::Pointer > last_nodes = m_InputImageNodes;
   m_InputImageNodes.clear();
   m_InputImages.clear();

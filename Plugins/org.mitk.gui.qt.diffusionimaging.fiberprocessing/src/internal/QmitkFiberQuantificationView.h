@@ -23,12 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundle.h>
 #include <mitkPointSet.h>
 #include <itkCastImageFilter.h>
+#include <mitkILifecycleAwarePart.h>
 
 /*!
 \brief Generation of images from fiber bundles (TDI, envelopes, endpoint distribution) and extraction of principal fiber directions from tractograms.
 
 */
-class QmitkFiberQuantificationView : public QmitkAbstractView
+class QmitkFiberQuantificationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -49,6 +50,11 @@ public:
   /// Sets the focus to an internal widget.
   ///
   virtual void SetFocus() override;
+
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
 protected slots:
 
@@ -73,6 +79,7 @@ protected:
   mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundle::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundle::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundle::Pointer fib);
+  bool  m_Visible;
 };
 
 

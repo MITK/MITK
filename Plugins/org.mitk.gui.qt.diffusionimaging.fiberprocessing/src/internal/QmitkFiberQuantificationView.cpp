@@ -51,6 +51,7 @@ QmitkFiberQuantificationView::QmitkFiberQuantificationView()
   : QmitkAbstractView()
   , m_Controls( 0 )
   , m_UpsamplingFactor(5)
+  , m_Visible(false)
 {
 
 }
@@ -86,6 +87,29 @@ void QmitkFiberQuantificationView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_TractBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
     connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
   }
+}
+
+void QmitkFiberQuantificationView::Activated()
+{
+
+}
+
+void QmitkFiberQuantificationView::Deactivated()
+{
+
+}
+
+void QmitkFiberQuantificationView::Visible()
+{
+  m_Visible = true;
+  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
+  berry::IWorkbenchPart::Pointer nullPart;
+  OnSelectionChanged(nullPart, selection);
+}
+
+void QmitkFiberQuantificationView::Hidden()
+{
+  m_Visible = false;
 }
 
 void QmitkFiberQuantificationView::SetFocus()
@@ -164,17 +188,18 @@ void QmitkFiberQuantificationView::UpdateGui()
 
   m_Controls->m_ProcessFiberBundleButton->setEnabled(!m_SelectedFB.empty());
   m_Controls->m_ExtractFiberPeaks->setEnabled(!m_SelectedFB.empty());
+
+  GenerateStats();
 }
 
 void QmitkFiberQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& )
 {
   UpdateGui();
-  GenerateStats();
 }
 
 void QmitkFiberQuantificationView::GenerateStats()
 {
-  if ( m_SelectedFB.empty() )
+  if ( m_SelectedFB.empty() || !m_Visible )
     return;
 
   QString stats("");

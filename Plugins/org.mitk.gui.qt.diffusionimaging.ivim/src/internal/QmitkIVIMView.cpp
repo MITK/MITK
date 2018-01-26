@@ -468,7 +468,7 @@ void QmitkIVIMView::OnKurtosisParamsChanged()
 
 void QmitkIVIMView::OnSliceChanged()
 {
-  if(m_HoldUpdate)
+  if(m_HoldUpdate || !m_Visible)
     return;
 
   m_Controls->m_Warning->setVisible(false);
@@ -920,6 +920,10 @@ void QmitkIVIMView::Deactivated()
 void QmitkIVIMView::Visible()
 {
   m_Visible = true;
+
+  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
+  berry::IWorkbenchPart::Pointer nullPart;
+  OnSelectionChanged(nullPart, selection);
 }
 
 void QmitkIVIMView::Hidden()

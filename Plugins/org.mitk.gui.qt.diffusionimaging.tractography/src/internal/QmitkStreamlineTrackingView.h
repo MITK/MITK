@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTimer>
 #include <QmitkStdMultiWidget.h>
 #include <QmitkSliceNavigationListener.h>
+#include <mitkILifecycleAwarePart.h>
 
 class QmitkStreamlineTrackingView;
 
@@ -62,7 +63,7 @@ private:
 /*!
 \brief View for tensor based deterministic streamline fiber tracking.
 */
-class QmitkStreamlineTrackingView : public QmitkAbstractView
+class QmitkStreamlineTrackingView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -90,6 +91,11 @@ public:
   TrackerType::Pointer              m_Tracker;
   QmitkStreamlineTrackingWorker     m_TrackingWorker;
   QThread                           m_TrackingThread;
+
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
 protected slots:
 
@@ -136,7 +142,7 @@ private:
   QTimer*                                 m_TrackingTimer;
   bool                                    m_DeleteTrackingHandler;
   QmitkSliceNavigationListener            m_SliceChangeListener;
-
+  bool                                    m_Visible;
 };
 
 

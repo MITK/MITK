@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <QClipboard>
 #include <boost/lexical_cast.hpp>
+#include <QmitkChartWidget.h>
 
 const std::string QmitkTractometryView::VIEW_ID = "org.mitk.views.tractometry";
 using namespace mitk;
@@ -45,6 +46,7 @@ using namespace mitk;
 QmitkTractometryView::QmitkTractometryView()
   : QmitkAbstractView()
   , m_Controls( nullptr )
+  , m_Visible(false)
 {
 
 }
@@ -73,8 +75,9 @@ void QmitkTractometryView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ImageBox->SetPredicate(mitk::NodePredicateAnd::New(imageP, dimP));
 
-    this->m_Controls->m_ChartWidget->SetXAxisLabel("Tract position");
-    this->m_Controls->m_ChartWidget->SetYAxisLabel("Image Value");
+    m_Controls->m_ChartWidget->SetXAxisLabel("Tract position");
+    m_Controls->m_ChartWidget->SetYAxisLabel("Image Value");
+
   }
 }
 
@@ -228,6 +231,29 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
   MITK_INFO << "Mean: " << mean/working_fib->GetNumberOfPoints();
 }
 
+void QmitkTractometryView::Activated()
+{
+
+}
+
+void QmitkTractometryView::Deactivated()
+{
+
+}
+
+void QmitkTractometryView::Visible()
+{
+  m_Visible = true;
+  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
+  berry::IWorkbenchPart::Pointer nullPart;
+  OnSelectionChanged(nullPart, selection);
+}
+
+void QmitkTractometryView::Hidden()
+{
+  m_Visible = false;
+}
+
 std::string QmitkTractometryView::RGBToHexString(double *rgb)
 {
   std::ostringstream os;
@@ -241,6 +267,9 @@ std::string QmitkTractometryView::RGBToHexString(double *rgb)
 
 void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
+  if (!m_Visible)
+    return;
+
   m_CurrentSelection.clear();
   if(m_Controls->m_ImageBox->GetSelectedNode().IsNull())
     return;
@@ -292,9 +321,9 @@ void QmitkTractometryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
 
       if (m_Controls->m_StDevBox->isChecked())
       {
-        color[0] *= 0.8;
-        color[1] *= 0.8;
-        color[2] *= 0.8;
+        color[0] *= 0.5;
+        color[1] *= 0.5;
+        color[2] *= 0.5;
         this->m_Controls->m_ChartWidget->SetColor(node->GetName() + " +STDEV", RGBToHexString(color));
         this->m_Controls->m_ChartWidget->SetColor(node->GetName() + " -STDEV", RGBToHexString(color));
       }

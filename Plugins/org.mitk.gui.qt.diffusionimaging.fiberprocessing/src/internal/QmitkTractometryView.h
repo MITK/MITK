@@ -23,12 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkPixelType.h>
 #include <mitkFiberBundle.h>
+#include <mitkILifecycleAwarePart.h>
 
 /*!
 \brief Weight fibers by linearly fitting them to the image data.
 
 */
-class QmitkTractometryView : public QmitkAbstractView
+class QmitkTractometryView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -50,6 +51,10 @@ public:
 
   void OnPageSuccessfullyLoaded();
 
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
 protected slots:
 
@@ -67,6 +72,7 @@ protected:
 
   vtkSmartPointer< vtkPolyData > m_ReferencePolyData;
   QList<mitk::DataNode::Pointer> m_CurrentSelection;
+  bool  m_Visible;
 };
 
 

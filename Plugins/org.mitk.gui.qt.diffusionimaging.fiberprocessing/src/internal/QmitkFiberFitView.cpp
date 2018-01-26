@@ -62,7 +62,7 @@ void QmitkFiberFitView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_TractBox, SIGNAL(currentIndexChanged(int)), this, SLOT(DataSelectionChanged()) );
 
     mitk::TNodePredicateDataType<mitk::FiberBundle>::Pointer isFib = mitk::TNodePredicateDataType<mitk::FiberBundle>::New();
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isPeak = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::TNodePredicateDataType<mitk::PeakImage>::Pointer isPeak = mitk::TNodePredicateDataType<mitk::PeakImage>::New();
 
     m_Controls->m_TractBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TractBox->SetPredicate(isFib);

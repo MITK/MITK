@@ -807,8 +807,8 @@
          <string>Save Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc">
-          <normaloff>:/QtWidgetsExt/btnMoveDown.png</normaloff>:/QtWidgetsExt/btnMoveDown.png</iconset>
+         <iconset resource="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/general_icons/download.ico</normaloff>:/QmitkDiffusionImaging/general_icons/download.ico</iconset>
         </property>
        </widget>
       </item>
@@ -827,8 +827,8 @@
          <string>Load Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc">
-          <normaloff>:/QtWidgetsExt/btnMoveUp.png</normaloff>:/QtWidgetsExt/btnMoveUp.png</iconset>
+         <iconset resource="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/general_icons/upload.ico</normaloff>:/QmitkDiffusionImaging/general_icons/upload.ico</iconset>
         </property>
        </widget>
       </item>
@@ -860,7 +860,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Please Select Input Data</string>
+      <string>Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
@@ -878,26 +878,13 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
          <string>ODF/Tensor Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="m_OdfImageLabel">
-        <property name="toolTip">
-         <string>Mandatory input</string>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -908,16 +895,23 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <widget class="QmitkDataStorageComboBox" name="m_InputImageBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="m_MaskImageLabel">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;White matter probability mask image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskImageBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -1149,8 +1143,21 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc"/>
+  <include location="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc"/>
   <include location="../../../org.mitk.gui.qt.diffusionimaging/resources/QmitkDiffusionImaging.qrc"/>
  </resources>
  <connections/>

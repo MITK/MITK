@@ -46,18 +46,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <boost/lexical_cast.hpp>
 
+#include <mitkNodePredicateIsDWI.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateOr.h>
+
 
 const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.diffusionquantification";
 
 
 
 QmitkDiffusionQuantificationView::QmitkDiffusionQuantificationView()
-    : QmitkAbstractView(),
-      m_Controls(nullptr)
+  : QmitkAbstractView(),
+    m_Controls(nullptr)
 {
-    m_OdfImages = mitk::DataStorage::SetOfObjects::New();
-    m_TensorImages = mitk::DataStorage::SetOfObjects::New();
-    m_DwImages = mitk::DataStorage::SetOfObjects::New();
+
 }
 
 QmitkDiffusionQuantificationView::~QmitkDiffusionQuantificationView()
@@ -67,43 +69,51 @@ QmitkDiffusionQuantificationView::~QmitkDiffusionQuantificationView()
 
 void QmitkDiffusionQuantificationView::CreateQtPartControl(QWidget *parent)
 {
-    if (!m_Controls)
-    {
-        // create GUI widgets
-        m_Controls = new Ui::QmitkDiffusionQuantificationViewControls;
-        m_Controls->setupUi(parent);
-        this->CreateConnections();
-        GFACheckboxClicked();
+  if (!m_Controls)
+  {
+    // create GUI widgets
+    m_Controls = new Ui::QmitkDiffusionQuantificationViewControls;
+    m_Controls->setupUi(parent);
+    this->CreateConnections();
+    GFACheckboxClicked();
 
 #ifndef DIFFUSION_IMAGING_EXTENDED
-        m_Controls->m_StandardGFACheckbox->setVisible(false);
-        m_Controls->frame_3->setVisible(false);
-        m_Controls->m_CurvatureButton->setVisible(false);
+    m_Controls->m_StandardGFACheckbox->setVisible(false);
+    m_Controls->frame_3->setVisible(false);
+    m_Controls->m_CurvatureButton->setVisible(false);
 #endif
 
-        m_Controls->m_BallStickButton->setVisible(false);
-        m_Controls->m_MultiTensorButton->setVisible(false);
-    }
+    m_Controls->m_BallStickButton->setVisible(false);
+    m_Controls->m_MultiTensorButton->setVisible(false);
+  }
 }
 
 void QmitkDiffusionQuantificationView::CreateConnections()
 {
-    if ( m_Controls )
-    {
-        connect( (QObject*)(m_Controls->m_StandardGFACheckbox), SIGNAL(clicked()), this, SLOT(GFACheckboxClicked()) );
-        connect( (QObject*)(m_Controls->m_GFAButton), SIGNAL(clicked()), this, SLOT(GFA()) );
-        connect( (QObject*)(m_Controls->m_CurvatureButton), SIGNAL(clicked()), this, SLOT(Curvature()) );
-        connect( (QObject*)(m_Controls->m_FAButton), SIGNAL(clicked()), this, SLOT(FA()) );
-        connect( (QObject*)(m_Controls->m_RAButton), SIGNAL(clicked()), this, SLOT(RA()) );
-        connect( (QObject*)(m_Controls->m_ADButton), SIGNAL(clicked()), this, SLOT(AD()) );
-        connect( (QObject*)(m_Controls->m_RDButton), SIGNAL(clicked()), this, SLOT(RD()) );
-        connect( (QObject*)(m_Controls->m_MDButton), SIGNAL(clicked()), this, SLOT(MD()) );
-        connect( (QObject*)(m_Controls->m_MdDwiButton), SIGNAL(clicked()), this, SLOT(MD_DWI()) );
-        connect( (QObject*)(m_Controls->m_AdcDwiButton), SIGNAL(clicked()), this, SLOT(ADC_DWI()) );
-        connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
-        connect( (QObject*)(m_Controls->m_BallStickButton), SIGNAL(clicked()), this, SLOT(DoBallStickCalculation()) );
-        connect( (QObject*)(m_Controls->m_MultiTensorButton), SIGNAL(clicked()), this, SLOT(DoMultiTensorCalculation()) );
-    }
+  if ( m_Controls )
+  {
+    connect( (QObject*)(m_Controls->m_StandardGFACheckbox), SIGNAL(clicked()), this, SLOT(GFACheckboxClicked()) );
+    connect( (QObject*)(m_Controls->m_GFAButton), SIGNAL(clicked()), this, SLOT(GFA()) );
+    connect( (QObject*)(m_Controls->m_CurvatureButton), SIGNAL(clicked()), this, SLOT(Curvature()) );
+    connect( (QObject*)(m_Controls->m_FAButton), SIGNAL(clicked()), this, SLOT(FA()) );
+    connect( (QObject*)(m_Controls->m_RAButton), SIGNAL(clicked()), this, SLOT(RA()) );
+    connect( (QObject*)(m_Controls->m_ADButton), SIGNAL(clicked()), this, SLOT(AD()) );
+    connect( (QObject*)(m_Controls->m_RDButton), SIGNAL(clicked()), this, SLOT(RD()) );
+    connect( (QObject*)(m_Controls->m_MDButton), SIGNAL(clicked()), this, SLOT(MD()) );
+    connect( (QObject*)(m_Controls->m_MdDwiButton), SIGNAL(clicked()), this, SLOT(MD_DWI()) );
+    connect( (QObject*)(m_Controls->m_AdcDwiButton), SIGNAL(clicked()), this, SLOT(ADC_DWI()) );
+    connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
+    connect( (QObject*)(m_Controls->m_BallStickButton), SIGNAL(clicked()), this, SLOT(DoBallStickCalculation()) );
+    connect( (QObject*)(m_Controls->m_MultiTensorButton), SIGNAL(clicked()), this, SLOT(DoMultiTensorCalculation()) );
+
+    m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
+    mitk::TNodePredicateDataType<mitk::TensorImage>::Pointer isDti = mitk::TNodePredicateDataType<mitk::TensorImage>::New();
+    mitk::TNodePredicateDataType<mitk::OdfImage>::Pointer isOdf = mitk::TNodePredicateDataType<mitk::OdfImage>::New();
+    mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New();
+    m_Controls->m_ImageBox->SetPredicate( mitk::NodePredicateOr::New(isDti, mitk::NodePredicateOr::New(isOdf, isDwi)) );
+
+    connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+  }
 }
 
 void QmitkDiffusionQuantificationView::SetFocus()
@@ -111,648 +121,553 @@ void QmitkDiffusionQuantificationView::SetFocus()
   m_Controls->m_ScaleImageValuesBox->setFocus();
 }
 
-void QmitkDiffusionQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkDiffusionQuantificationView::UpdateGui()
 {
-    m_OdfImages = mitk::DataStorage::SetOfObjects::New();
-    m_TensorImages = mitk::DataStorage::SetOfObjects::New();
-    m_DwImages = mitk::DataStorage::SetOfObjects::New();
-    bool foundOdfVolume = false;
-    bool foundTensorVolume = false;
-    bool foundDwVolume = false;
-    mitk::DataNode::Pointer  selNode = nullptr;
+  bool foundOdfVolume = false;
+  bool foundTensorVolume = false;
+  bool foundDwVolume = false;
+  mitk::DataNode::Pointer  selNode = m_Controls->m_ImageBox->GetSelectedNode();
 
-    int c=0;
-    for (mitk::DataNode::Pointer node: nodes)
-    {
-        if( node.IsNotNull() && dynamic_cast<mitk::OdfImage*>(node->GetData()) )
-        {
-            foundOdfVolume = true;
-            m_OdfImages->push_back(node);
-            selNode = node;
-            c++;
-        }
-        else if( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
-        {
-            foundTensorVolume = true;
-            m_TensorImages->push_back(node);
-            selNode = node;
-            c++;
-        }
-        else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(dynamic_cast<mitk::Image*>(node->GetData())) )
-        {
-            foundDwVolume = true;
-            m_DwImages->push_back(node);
-            selNode = node;
-            c++;
-        }
-    }
+  if( selNode.IsNotNull() && dynamic_cast<mitk::OdfImage*>(selNode->GetData()) )
+    foundOdfVolume = true;
+  else if( selNode.IsNotNull() && dynamic_cast<mitk::TensorImage*>(selNode->GetData()) )
+    foundTensorVolume = true;
+  else if( selNode.IsNotNull())
+    foundDwVolume = true;
 
-    m_Controls->m_GFAButton->setEnabled(foundOdfVolume);
-    m_Controls->m_CurvatureButton->setEnabled(foundOdfVolume);
+  m_Controls->m_GFAButton->setEnabled(foundOdfVolume);
+  m_Controls->m_CurvatureButton->setEnabled(foundOdfVolume);
 
-    if (c>0)
-    {
-        m_Controls->m_InputData->setTitle("Input Data");
-        m_Controls->m_InputImageLabel->setText(selNode->GetName().c_str());
-    }
-    else
-    {
-        m_Controls->m_InputData->setTitle("Please Select Input Data");
-        m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
-    }
+  m_Controls->m_FAButton->setEnabled(foundTensorVolume);
+  m_Controls->m_RAButton->setEnabled(foundTensorVolume);
+  m_Controls->m_ADButton->setEnabled(foundTensorVolume);
+  m_Controls->m_RDButton->setEnabled(foundTensorVolume);
+  m_Controls->m_MDButton->setEnabled(foundTensorVolume);
+  m_Controls->m_ClusteringAnisotropy->setEnabled(foundTensorVolume);
+  m_Controls->m_AdcDwiButton->setEnabled(foundDwVolume);
+  m_Controls->m_MdDwiButton->setEnabled(foundDwVolume);
+  m_Controls->m_BallStickButton->setEnabled(foundDwVolume);
+  m_Controls->m_MultiTensorButton->setEnabled(foundDwVolume);
+}
 
-    m_Controls->m_FAButton->setEnabled(foundTensorVolume);
-    m_Controls->m_RAButton->setEnabled(foundTensorVolume);
-    m_Controls->m_ADButton->setEnabled(foundTensorVolume);
-    m_Controls->m_RDButton->setEnabled(foundTensorVolume);
-    m_Controls->m_MDButton->setEnabled(foundTensorVolume);
-    m_Controls->m_ClusteringAnisotropy->setEnabled(foundTensorVolume);
-    m_Controls->m_AdcDwiButton->setEnabled(foundDwVolume);
-    m_Controls->m_MdDwiButton->setEnabled(foundDwVolume);
-    m_Controls->m_BallStickButton->setEnabled(foundDwVolume);
-    m_Controls->m_MultiTensorButton->setEnabled(foundDwVolume);
+void QmitkDiffusionQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& )
+{
+  UpdateGui();
 }
 
 void QmitkDiffusionQuantificationView::ADC_DWI()
 {
-    DoAdcCalculation(true);
+  DoAdcCalculation(true);
 }
 
 void QmitkDiffusionQuantificationView::MD_DWI()
 {
-    DoAdcCalculation(false);
+  DoAdcCalculation(false);
 }
 
 void QmitkDiffusionQuantificationView::DoBallStickCalculation()
 {
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_DwImages->end() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_DwImages->begin() );
+  if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::DataNode* node = m_Controls->m_ImageBox->GetSelectedNode();
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
-    while ( itemiter != itemiterend ) // for all items
+    typedef itk::BallAndSticksImageFilter< short, double > FilterType;
+
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(image, itkVectorImagePointer);
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( itkVectorImagePointer );
+
+    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
+                                   ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+                                   ->GetGradientDirectionsContainer() );
+
+    filter->SetB_value( static_cast<mitk::FloatProperty*>
+                        (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
+                        ->GetValue() );
+
+    filter->Update();
+
+    mitk::Image::Pointer newImage = mitk::Image::New();
+    newImage->InitializeByItk( filter->GetOutput() );
+    newImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( newImage );
+    QString name = node->GetName().c_str();
+
+    imageNode->SetName((name+"_f").toStdString().c_str());
+    GetDataStorage()->Add(imageNode, node);
+
     {
-        mitk::DataNode* node = *itemiter;
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+      FilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
+      mitk::Image::Pointer newImage = mitk::Image::New();
+      CastToMitkImage(itkImg, newImage);
 
-        typedef itk::BallAndSticksImageFilter< short, double > FilterType;
+      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+      imageNode->SetData( newImage );
+      QString name = node->GetName().c_str();
 
-        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-        mitk::CastToItkImage(image, itkVectorImagePointer);
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput( itkVectorImagePointer );
-
-        filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-          ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-            ->GetGradientDirectionsContainer() );
-
-        filter->SetB_value( static_cast<mitk::FloatProperty*>
-          (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-            ->GetValue() );
-
-        filter->Update();
-
-        mitk::Image::Pointer newImage = mitk::Image::New();
-        newImage->InitializeByItk( filter->GetOutput() );
-        newImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-        imageNode->SetData( newImage );
-        QString name = node->GetName().c_str();
-
-        imageNode->SetName((name+"_f").toStdString().c_str());
-        GetDataStorage()->Add(imageNode, node);
-
-        {
-          FilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
-          mitk::Image::Pointer newImage = mitk::Image::New();
-          CastToMitkImage(itkImg, newImage);
-
-          mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-          imageNode->SetData( newImage );
-          QString name = node->GetName().c_str();
-
-          imageNode->SetName((name+"_Sticks").toStdString().c_str());
-          GetDataStorage()->Add(imageNode, node);
-        }
-
-        {
-          mitk::Image::Pointer dOut = mitk::GrabItkImageMemory( filter->GetOutDwi().GetPointer() );
-
-          dOut->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
-          dOut->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() );
-          mitk::DiffusionPropertyHelper propertyHelper( dOut );
-          propertyHelper.InitializeImage();
-
-          mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-          imageNode->SetData( dOut );
-          QString name = node->GetName().c_str();
-          imageNode->SetName((name+"_Estimated-DWI").toStdString().c_str());
-          GetDataStorage()->Add(imageNode, node);
-        }
-
-        ++itemiter;
+      imageNode->SetName((name+"_Sticks").toStdString().c_str());
+      GetDataStorage()->Add(imageNode, node);
     }
+
+    {
+      mitk::Image::Pointer dOut = mitk::GrabItkImageMemory( filter->GetOutDwi().GetPointer() );
+
+      dOut->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
+      dOut->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() );
+      mitk::DiffusionPropertyHelper propertyHelper( dOut );
+      propertyHelper.InitializeImage();
+
+      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+      imageNode->SetData( dOut );
+      QString name = node->GetName().c_str();
+      imageNode->SetName((name+"_Estimated-DWI").toStdString().c_str());
+      GetDataStorage()->Add(imageNode, node);
+    }
+  }
 }
 
 void QmitkDiffusionQuantificationView::DoMultiTensorCalculation()
 {
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_DwImages->end() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_DwImages->begin() );
+  if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull()) // for all items
+  {
+    mitk::DataNode* node = m_Controls->m_ImageBox->GetSelectedNode();
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
-    while ( itemiter != itemiterend ) // for all items
+    typedef itk::MultiTensorImageFilter< short, double > FilterType;
+
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(image, itkVectorImagePointer);
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( itkVectorImagePointer );
+
+    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
+                                   ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+                                   ->GetGradientDirectionsContainer() );
+
+    filter->SetB_value( static_cast<mitk::FloatProperty*>
+                        (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
+                        ->GetValue() );
+
+    filter->Update();
+
+    typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
+    for (int i=0; i<NUM_TENSORS; i++)
     {
-        mitk::DataNode* node = *itemiter;
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+      TensorImageType::Pointer tensorImage = filter->GetTensorImages().at(i);
+      mitk::TensorImage::Pointer image = mitk::TensorImage::New();
+      image->InitializeByItk( tensorImage.GetPointer() );
+      image->SetVolume( tensorImage->GetBufferPointer() );
 
-        typedef itk::MultiTensorImageFilter< short, double > FilterType;
-
-        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-        mitk::CastToItkImage(image, itkVectorImagePointer);
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput( itkVectorImagePointer );
-
-        filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-          ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-            ->GetGradientDirectionsContainer() );
-
-        filter->SetB_value( static_cast<mitk::FloatProperty*>
-          (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-            ->GetValue() );
-
-        filter->Update();
-
-        typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
-        for (int i=0; i<NUM_TENSORS; i++)
-        {
-          TensorImageType::Pointer tensorImage = filter->GetTensorImages().at(i);
-          mitk::TensorImage::Pointer image = mitk::TensorImage::New();
-          image->InitializeByItk( tensorImage.GetPointer() );
-          image->SetVolume( tensorImage->GetBufferPointer() );
-
-          mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-          imageNode->SetData( image );
-          QString name = node->GetName().c_str();
-          name.append("_Tensor");
-          name.append(boost::lexical_cast<std::string>(i).c_str());
-          imageNode->SetName(name.toStdString().c_str());
-          GetDataStorage()->Add(imageNode, node);
-        }
-
-        ++itemiter;
+      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+      imageNode->SetData( image );
+      QString name = node->GetName().c_str();
+      name.append("_Tensor");
+      name.append(boost::lexical_cast<std::string>(i).c_str());
+      imageNode->SetName(name.toStdString().c_str());
+      GetDataStorage()->Add(imageNode, node);
     }
+  }
 }
 
 void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)
 {
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_DwImages->end() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_DwImages->begin() );
+  if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::DataNode* node = m_Controls->m_ImageBox->GetSelectedNode();
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
-    while ( itemiter != itemiterend ) // for all items
-    {
-        mitk::DataNode* node = *itemiter;
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+    typedef itk::AdcImageFilter< short, double > FilterType;
 
-        typedef itk::AdcImageFilter< short, double > FilterType;
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+    mitk::CastToItkImage(image, itkVectorImagePointer);
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( itkVectorImagePointer );
 
-        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-        mitk::CastToItkImage(image, itkVectorImagePointer);
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput( itkVectorImagePointer );
+    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
+                                   ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+                                   ->GetGradientDirectionsContainer() );
 
-        filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-          ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-            ->GetGradientDirectionsContainer() );
+    filter->SetB_value( static_cast<mitk::FloatProperty*>
+                        (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
+                        ->GetValue() );
 
-        filter->SetB_value( static_cast<mitk::FloatProperty*>
-          (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-            ->GetValue() );
+    filter->SetFitSignal(fit);
+    filter->Update();
 
-        filter->SetFitSignal(fit);
-        filter->Update();
+    typedef itk::ShiftScaleImageFilter<itk::AdcImageFilter< short, double >::OutputImageType, itk::AdcImageFilter< short, double >::OutputImageType> ShiftScaleFilterType;
+    ShiftScaleFilterType::Pointer multi = ShiftScaleFilterType::New();
+    multi->SetShift(0.0);
+    multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());
+    multi->SetInput(filter->GetOutput());
+    multi->Update();
 
-        typedef itk::ShiftScaleImageFilter<itk::AdcImageFilter< short, double >::OutputImageType, itk::AdcImageFilter< short, double >::OutputImageType> ShiftScaleFilterType;
-        ShiftScaleFilterType::Pointer multi = ShiftScaleFilterType::New();
-        multi->SetShift(0.0);
-        multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());
-        multi->SetInput(filter->GetOutput());
-        multi->Update();
+    mitk::Image::Pointer newImage = mitk::Image::New();
+    newImage->InitializeByItk( multi->GetOutput() );
+    newImage->SetVolume( multi->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( newImage );
+    QString name = node->GetName().c_str();
 
-        mitk::Image::Pointer newImage = mitk::Image::New();
-        newImage->InitializeByItk( multi->GetOutput() );
-        newImage->SetVolume( multi->GetOutput()->GetBufferPointer() );
-        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-        imageNode->SetData( newImage );
-        QString name = node->GetName().c_str();
+    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+    lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
+    mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+    lut_prop->SetLookupTable( lut );
 
-        mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-        lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
-        mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
-        lut_prop->SetLookupTable( lut );
-
-        imageNode->SetProperty("LookupTable", lut_prop );
-        if (fit)
-            imageNode->SetName((name+"_ADC").toStdString().c_str());
-        else
-            imageNode->SetName((name+"_MD").toStdString().c_str());
-        GetDataStorage()->Add(imageNode, node);
-
-        ++itemiter;
-    }
+    imageNode->SetProperty("LookupTable", lut_prop );
+    if (fit)
+      imageNode->SetName((name+"_ADC").toStdString().c_str());
+    else
+      imageNode->SetName((name+"_MD").toStdString().c_str());
+    GetDataStorage()->Add(imageNode, node);
+  }
 }
 
 void QmitkDiffusionQuantificationView::GFACheckboxClicked()
 {
-    m_Controls->frame_2->setVisible(m_Controls->m_StandardGFACheckbox->isChecked());
+  m_Controls->frame_2->setVisible(m_Controls->m_StandardGFACheckbox->isChecked());
 }
 
 void QmitkDiffusionQuantificationView::GFA()
 {
-    if(m_Controls->m_StandardGFACheckbox->isChecked())
-    {
-        OdfQuantify(13);
-    }
-    else
-    {
-        OdfQuantify(0);
-    }
+  if(m_Controls->m_StandardGFACheckbox->isChecked())
+  {
+    OdfQuantify(13);
+  }
+  else
+  {
+    OdfQuantify(0);
+  }
 }
 
 void QmitkDiffusionQuantificationView::Curvature()
 {
-    OdfQuantify(12);
+  OdfQuantify(12);
 }
 
 void QmitkDiffusionQuantificationView::FA()
 {
-    TensorQuantify(0);
+  TensorQuantify(0);
 }
 
 void QmitkDiffusionQuantificationView::RA()
 {
-    TensorQuantify(1);
+  TensorQuantify(1);
 }
 
 void QmitkDiffusionQuantificationView::AD()
 {
-    TensorQuantify(2);
+  TensorQuantify(2);
 }
 
 void QmitkDiffusionQuantificationView::RD()
 {
-    TensorQuantify(3);
+  TensorQuantify(3);
 }
 
 void QmitkDiffusionQuantificationView::ClusterAnisotropy()
 {
-    TensorQuantify(4);
+  TensorQuantify(4);
 }
 
 void QmitkDiffusionQuantificationView::MD()
 {
-    TensorQuantify(5);
+  TensorQuantify(5);
 }
 
 void QmitkDiffusionQuantificationView::OdfQuantify(int method)
 {
-    OdfQuantification(m_OdfImages, method);
+  OdfQuantification(method);
 }
 
 void QmitkDiffusionQuantificationView::TensorQuantify(int method)
 {
-    TensorQuantification(m_TensorImages, method);
+  TensorQuantification(method);
 }
 
-void QmitkDiffusionQuantificationView::OdfQuantification(
-        mitk::DataStorage::SetOfObjects::Pointer inImages, int method)
+void QmitkDiffusionQuantificationView::OdfQuantification(int method)
 {
-    itk::TimeProbe clock;
-    QString status;
+  QString status;
 
-    int nrFiles = inImages->size();
-    if (!nrFiles) return;
+  if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::DataNode* node = m_Controls->m_ImageBox->GetSelectedNode();
 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
+    typedef float TOdfPixelType;
+    typedef itk::Vector<TOdfPixelType,ODF_SAMPLING_SIZE> OdfVectorType;
+    typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
+    mitk::Image* vol = static_cast<mitk::Image*>(node->GetData());
+    OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
+    mitk::CastToItkImage(vol, itkvol);
 
-    std::vector<mitk::DataNode::Pointer> nodes;
-    while ( itemiter != itemiterend ) // for all items
+    std::string nodename = node->GetName();
+
+    float p1 = m_Controls->m_ParamKEdit->text().toFloat();
+    float p2 = m_Controls->m_ParamPEdit->text().toFloat();
+
+    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Computing GFA for %s", nodename.c_str()).toLatin1());
+    typedef itk::DiffusionOdfGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,ODF_SAMPLING_SIZE> GfaFilterType;
+    GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
+    gfaFilter->SetInput(itkvol);
+
+    std::string newname;
+    newname.append(nodename);
+    switch(method)
     {
+    case 0:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
+      newname.append("GFA");
+      break;
+    }
+    case 1:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILES_HIGH_LOW);
+      newname.append("01");
+      break;
+    }
+    case 2:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILE_HIGH);
+      newname.append("02");
+      break;
+    }
+    case 3:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_MAX_ODF_VALUE);
+      newname.append("03");
+      break;
+    }
+    case 4:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_DECONVOLUTION_COEFFS);
+      newname.append("04");
+      break;
+    }
+    case 5:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_MIN_MAX_NORMALIZED_STANDARD);
+      newname.append("05");
+      break;
+    }
+    case 6:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_NORMALIZED_ENTROPY);
+      newname.append("06");
+      break;
+    }
+    case 7:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_NEMATIC_ORDER_PARAMETER);
+      newname.append("07");
+      break;
+    }
+    case 8:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILES_LOW_HIGH);
+      newname.append("08");
+      break;
+    }
+    case 9:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILE_LOW);
+      newname.append("09");
+      break;
+    }
+    case 10:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_MIN_ODF_VALUE);
+      newname.append("10");
+      break;
+    }
+    case 11:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_STD_BY_MAX);
+      newname.append("11");
+      break;
+    }
+    case 12:
+    {
+      p1 = m_Controls->MinAngle->text().toFloat();
+      p2 = m_Controls->MaxAngle->text().toFloat();
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_PRINCIPLE_CURVATURE);
+      QString paramString;
+      paramString = paramString.append("PC%1-%2").arg(p1).arg(p2);
+      newname.append(paramString.toLatin1());
+      gfaFilter->SetParam1(p1);
+      gfaFilter->SetParam2(p2);
+      break;
+    }
+    case 13:
+    {
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_GENERALIZED_GFA);
+      QString paramString;
+      paramString = paramString.append("GFAK%1P%2").arg(p1).arg(p2);
+      newname.append(paramString.toLatin1());
+      gfaFilter->SetParam1(p1);
+      gfaFilter->SetParam2(p2);
+      break;
+    }
+    default:
+    {
+      newname.append("0");
+      gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
+    }
+    }
+    gfaFilter->Update();
 
-        typedef float TOdfPixelType;
-        const int odfsize = ODF_SAMPLING_SIZE;
-        typedef itk::Vector<TOdfPixelType,odfsize> OdfVectorType;
-        typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-        mitk::Image* vol =
-                static_cast<mitk::Image*>((*itemiter)->GetData());
-        OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
-        mitk::CastToItkImage(vol, itkvol);
+    typedef itk::Image<TOdfPixelType, 3> ImgType;
+    ImgType::Pointer img = ImgType::New();
+    img->SetSpacing( gfaFilter->GetOutput()->GetSpacing() );   // Set the image spacing
+    img->SetOrigin( gfaFilter->GetOutput()->GetOrigin() );     // Set the image origin
+    img->SetDirection( gfaFilter->GetOutput()->GetDirection() );  // Set the image direction
+    img->SetLargestPossibleRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion());
+    img->SetBufferedRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion() );
+    img->Allocate();
+    itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
+    ot.GoToBegin();
+    itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
+        (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
 
-        std::string nodename;
-        (*itemiter)->GetStringProperty("name", nodename);
-
-        float p1 = m_Controls->m_ParamKEdit->text().toFloat();
-        float p2 = m_Controls->m_ParamPEdit->text().toFloat();
-
-        // COMPUTE RA
-        clock.Start();
-        MBI_INFO << "Computing GFA ";
-        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
-                                                        "Computing GFA for %s", nodename.c_str()).toLatin1());
-        typedef itk::DiffusionOdfGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,odfsize>
-                GfaFilterType;
-        GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
-        gfaFilter->SetInput(itkvol);
-
-        std::string newname;
-        newname.append(nodename);
-        switch(method)
-        {
-        case 0:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
-            newname.append("GFA");
-            break;
-        }
-        case 1:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILES_HIGH_LOW);
-            newname.append("01");
-            break;
-        }
-        case 2:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILE_HIGH);
-            newname.append("02");
-            break;
-        }
-        case 3:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_MAX_ODF_VALUE);
-            newname.append("03");
-            break;
-        }
-        case 4:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_DECONVOLUTION_COEFFS);
-            newname.append("04");
-            break;
-        }
-        case 5:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_MIN_MAX_NORMALIZED_STANDARD);
-            newname.append("05");
-            break;
-        }
-        case 6:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_NORMALIZED_ENTROPY);
-            newname.append("06");
-            break;
-        }
-        case 7:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_NEMATIC_ORDER_PARAMETER);
-            newname.append("07");
-            break;
-        }
-        case 8:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILES_LOW_HIGH);
-            newname.append("08");
-            break;
-        }
-        case 9:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_QUANTILE_LOW);
-            newname.append("09");
-            break;
-        }
-        case 10:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_MIN_ODF_VALUE);
-            newname.append("10");
-            break;
-        }
-        case 11:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_STD_BY_MAX);
-            newname.append("11");
-            break;
-        }
-        case 12:
-        {
-            p1 = m_Controls->MinAngle->text().toFloat();
-            p2 = m_Controls->MaxAngle->text().toFloat();
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_PRINCIPLE_CURVATURE);
-            QString paramString;
-            paramString = paramString.append("PC%1-%2").arg(p1).arg(p2);
-            newname.append(paramString.toLatin1());
-            gfaFilter->SetParam1(p1);
-            gfaFilter->SetParam2(p2);
-            break;
-        }
-        case 13:
-        {
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_GENERALIZED_GFA);
-            QString paramString;
-            paramString = paramString.append("GFAK%1P%2").arg(p1).arg(p2);
-            newname.append(paramString.toLatin1());
-            gfaFilter->SetParam1(p1);
-            gfaFilter->SetParam2(p2);
-            break;
-        }
-        default:
-        {
-            newname.append("0");
-            gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
-        }
-        }
-        gfaFilter->Update();
-        clock.Stop();
-
-        typedef itk::Image<TOdfPixelType, 3> ImgType;
-        ImgType::Pointer img = ImgType::New();
-        img->SetSpacing( gfaFilter->GetOutput()->GetSpacing() );   // Set the image spacing
-        img->SetOrigin( gfaFilter->GetOutput()->GetOrigin() );     // Set the image origin
-        img->SetDirection( gfaFilter->GetOutput()->GetDirection() );  // Set the image direction
-        img->SetLargestPossibleRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion());
-        img->SetBufferedRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion() );
-        img->Allocate();
-        itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
-        ot.GoToBegin();
-        itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
-                (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
-
-        for (it.GoToBegin(); !it.IsAtEnd(); ++it)
-        {
-            GfaFilterType::OutputImageType::PixelType val = it.Get();
-            ot.Set(val * m_Controls->m_ScaleImageValuesBox->value());
-            ++ot;
-        }
-
-
-        // GFA TO DATATREE
-        mitk::Image::Pointer image = mitk::Image::New();
-        image->InitializeByItk( img.GetPointer() );
-        image->SetVolume( img->GetBufferPointer() );
-        mitk::DataNode::Pointer node=mitk::DataNode::New();
-        node->SetData( image );
-        node->SetProperty( "name", mitk::StringProperty::New(newname) );
-
-        mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-        lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
-        mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
-        lut_prop->SetLookupTable( lut );
-        node->SetProperty("LookupTable", lut_prop );
-
-        GetDataStorage()->Add(node, *itemiter);
-
-        mitk::StatusBar::GetInstance()->DisplayText("Computation complete.");
-
-        ++itemiter;
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+    {
+      GfaFilterType::OutputImageType::PixelType val = it.Get();
+      ot.Set(val * m_Controls->m_ScaleImageValuesBox->value());
+      ++ot;
     }
 
-    this->GetRenderWindowPart()->RequestUpdate();
+
+    // GFA TO DATATREE
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( img.GetPointer() );
+    image->SetVolume( img->GetBufferPointer() );
+    mitk::DataNode::Pointer new_node=mitk::DataNode::New();
+    new_node->SetData( image );
+    new_node->SetProperty( "name", mitk::StringProperty::New(newname) );
+
+    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+    lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
+    mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+    lut_prop->SetLookupTable( lut );
+    new_node->SetProperty("LookupTable", lut_prop );
+
+    GetDataStorage()->Add(new_node, node);
+
+    mitk::StatusBar::GetInstance()->DisplayText("Computation complete.");
+  }
+
+  this->GetRenderWindowPart()->RequestUpdate();
 
 }
 
-void QmitkDiffusionQuantificationView::TensorQuantification(
-        mitk::DataStorage::SetOfObjects::Pointer inImages, int method)
+void QmitkDiffusionQuantificationView::TensorQuantification(int method)
 {
-    itk::TimeProbe clock;
-    QString status;
+  QString status;
 
-    int nrFiles = inImages->size();
-    if (!nrFiles) return;
+  if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::DataNode* node = m_Controls->m_ImageBox->GetSelectedNode();
 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
+    typedef mitk::TensorImage::ScalarPixelType    TTensorPixelType;
+    typedef mitk::TensorImage::PixelType          TensorPixelType;
+    typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
-    std::vector<mitk::DataNode::Pointer> nodes;
-    while ( itemiter != itemiterend ) // for all items
+    mitk::Image* vol = static_cast<mitk::Image*>(node->GetData());
+    TensorImageType::Pointer itkvol = TensorImageType::New();
+    mitk::CastToItkImage(vol, itkvol);
+
+    std::string nodename = node->GetName();
+
+    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Computing FA for %s", nodename.c_str()).toLatin1());
+    typedef itk::Image< TTensorPixelType, 3 > FAImageType;
+
+    typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType> ShiftScaleFilterType;
+    ShiftScaleFilterType::Pointer multi = ShiftScaleFilterType::New();
+    multi->SetShift(0.0);
+    multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());
+
+    typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
+
+    if(method == 0) //FA
     {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::FA);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_FA").toStdString();
 
-        typedef mitk::TensorImage::ScalarPixelType    TTensorPixelType;
-        typedef mitk::TensorImage::PixelType          TensorPixelType;
-        typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
+    }
+    else if(method == 1) //RA
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::RA);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_RA").toStdString();
 
-        mitk::Image* vol =
-                static_cast<mitk::Image*>((*itemiter)->GetData());
-        TensorImageType::Pointer itkvol = TensorImageType::New();
-        mitk::CastToItkImage(vol, itkvol);
-
-        std::string nodename;
-        (*itemiter)->GetStringProperty("name", nodename);
-
-        // COMPUTE FA
-        clock.Start();
-        MBI_INFO << "Computing FA ";
-        mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
-                                                        "Computing FA for %s", nodename.c_str()).toLatin1());
-        typedef itk::Image< TTensorPixelType, 3 >              FAImageType;
-
-        typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType> ShiftScaleFilterType;
-        ShiftScaleFilterType::Pointer multi = ShiftScaleFilterType::New();
-        multi->SetShift(0.0);
-        multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());
-
-        typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
-
-        if(method == 0) //FA
-        {
-            /* typedef itk::TensorFractionalAnisotropyImageFilter<
-        TensorImageType, FAImageType >                       FilterType;
-      FilterType::Pointer anisotropyFilter = FilterType::New();
-      anisotropyFilter->SetInput( itkvol.GetPointer() );
-      anisotropyFilter->Update();
-      multi->SetInput(anisotropyFilter->GetOutput());
-      nodename = QString(nodename.c_str()).append("_FA").toStdString();*/
-
-
-            MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
-            measurementsCalculator->SetInput(itkvol.GetPointer() );
-            measurementsCalculator->SetMeasure(MeasurementsType::FA);
-            measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput());
-            nodename = QString(nodename.c_str()).append("_FA").toStdString();
-
-        }
-        else if(method == 1) //RA
-        {
-            /*typedef itk::TensorRelativeAnisotropyImageFilter<
-        TensorImageType, FAImageType >                       FilterType;
-      FilterType::Pointer anisotropyFilter = FilterType::New();
-      anisotropyFilter->SetInput( itkvol.GetPointer() );
-      anisotropyFilter->Update();
-      multi->SetInput(anisotropyFilter->GetOutput());
-      nodename = QString(nodename.c_str()).append("_RA").toStdString();*/
-
-            MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
-            measurementsCalculator->SetInput(itkvol.GetPointer() );
-            measurementsCalculator->SetMeasure(MeasurementsType::RA);
-            measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput());
-            nodename = QString(nodename.c_str()).append("_RA").toStdString();
-
-        }
-        else if(method == 2) // AD (Axial diffusivity)
-        {
-            MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
-            measurementsCalculator->SetInput(itkvol.GetPointer() );
-            measurementsCalculator->SetMeasure(MeasurementsType::AD);
-            measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput());
-            nodename = QString(nodename.c_str()).append("_AD").toStdString();
-        }
-        else if(method == 3) // RD (Radial diffusivity, (Lambda2+Lambda3)/2
-        {
-            MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
-            measurementsCalculator->SetInput(itkvol.GetPointer() );
-            measurementsCalculator->SetMeasure(MeasurementsType::RD);
-            measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput());
-            nodename = QString(nodename.c_str()).append("_RD").toStdString();
-        }
-        else if(method == 4) // 1-(Lambda2+Lambda3)/(2*Lambda1)
-        {
-            MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
-            measurementsCalculator->SetInput(itkvol.GetPointer() );
-            measurementsCalculator->SetMeasure(MeasurementsType::CA);
-            measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput());
-            nodename = QString(nodename.c_str()).append("_CA").toStdString();
-        }
-        else if(method == 5) // MD (Mean Diffusivity, (Lambda1+Lambda2+Lambda3)/3 )
-        {
-            MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
-            measurementsCalculator->SetInput(itkvol.GetPointer() );
-            measurementsCalculator->SetMeasure(MeasurementsType::MD);
-            measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput());
-            nodename = QString(nodename.c_str()).append("_MD").toStdString();
-        }
-
-        multi->Update();
-        clock.Stop();
-
-        // FA TO DATATREE
-        mitk::Image::Pointer image = mitk::Image::New();
-        image->InitializeByItk( multi->GetOutput() );
-        image->SetVolume( multi->GetOutput()->GetBufferPointer() );
-        mitk::DataNode::Pointer node=mitk::DataNode::New();
-        node->SetData( image );
-        node->SetProperty( "name", mitk::StringProperty::New(nodename) );
-
-        mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-        lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
-        mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
-        lut_prop->SetLookupTable( lut );
-        node->SetProperty("LookupTable", lut_prop );
-
-        GetDataStorage()->Add(node, *itemiter);
-        ++itemiter;
-
-        mitk::StatusBar::GetInstance()->DisplayText("Computation complete.");
+    }
+    else if(method == 2) // AD (Axial diffusivity)
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::AD);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_AD").toStdString();
+    }
+    else if(method == 3) // RD (Radial diffusivity, (Lambda2+Lambda3)/2
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::RD);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_RD").toStdString();
+    }
+    else if(method == 4) // 1-(Lambda2+Lambda3)/(2*Lambda1)
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::CA);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_CA").toStdString();
+    }
+    else if(method == 5) // MD (Mean Diffusivity, (Lambda1+Lambda2+Lambda3)/3 )
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::MD);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_MD").toStdString();
     }
 
-    this->GetRenderWindowPart()->RequestUpdate();
+    multi->Update();
+
+    // FA TO DATATREE
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( multi->GetOutput() );
+    image->SetVolume( multi->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer new_node=mitk::DataNode::New();
+    new_node->SetData( image );
+    new_node->SetProperty( "name", mitk::StringProperty::New(nodename) );
+
+    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+    lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
+    mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+    lut_prop->SetLookupTable( lut );
+    new_node->SetProperty("LookupTable", lut_prop );
+
+    GetDataStorage()->Add(new_node, node);
+
+    mitk::StatusBar::GetInstance()->DisplayText("Computation complete.");
+  }
+
+  this->GetRenderWindowPart()->RequestUpdate();
 
 }

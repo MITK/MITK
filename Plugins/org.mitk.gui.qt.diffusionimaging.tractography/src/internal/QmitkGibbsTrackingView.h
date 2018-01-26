@@ -98,7 +98,6 @@ protected slots:
   void AfterThread();                       ///< update gui etc. after tracking has finished
   void BeforeThread();                      ///< start timer etc.
   void TimerUpdate();
-  void SetMask();
   void AdvancedSettings();                  ///< show/hide advanced tracking options
   void SaveTrackingParameters();            ///< save tracking parameters to xml file
   void LoadTrackingParameters();            ///< load tracking parameters from xml file
@@ -114,12 +113,12 @@ protected slots:
   void SetCurvatureThreshold(int value);
   void SetRandomSeed(int value);
   void SetOutputFile();
+  void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
 
 private:
 
   // Visualization & GUI
   void GenerateFiberBundle();   ///< generate fiber bundle from tracking output and add to datanode
-  void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
   void UpdateTrackingStatus();  ///< update textual status display of the tracking process
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed

@@ -26,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 // MITK
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkImageCast.h>
 #include <mitkPeakImage.h>
 #include <mitkLabelSetImage.h>
@@ -70,6 +72,19 @@ void QmitkFiberQuantificationView::CreateQtPartControl( QWidget *parent )
 
     connect( m_Controls->m_ProcessFiberBundleButton, SIGNAL(clicked()), this, SLOT(ProcessSelectedBundles()) );
     connect( m_Controls->m_ExtractFiberPeaks, SIGNAL(clicked()), this, SLOT(CalculateFiberDirections()) );
+
+    m_Controls->m_TractBox->SetDataStorage(this->GetDataStorage());
+    mitk::TNodePredicateDataType<mitk::FiberBundle>::Pointer isFib = mitk::TNodePredicateDataType<mitk::FiberBundle>::New();
+    m_Controls->m_TractBox->SetPredicate( isFib );
+
+    m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_ImageBox->SetZeroEntryText("--");
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::NodePredicateDimension::Pointer is3D = mitk::NodePredicateDimension::New(3);
+    m_Controls->m_ImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, is3D) );
+
+    connect( (QObject*)(m_Controls->m_TractBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+    connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
   }
 }
 
@@ -139,25 +154,20 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
 
 void QmitkFiberQuantificationView::UpdateGui()
 {
+  m_SelectedFB.clear();
+  if (m_Controls->m_TractBox->GetSelectedNode().IsNotNull())
+    m_SelectedFB.push_back(m_Controls->m_TractBox->GetSelectedNode());
+
+  m_SelectedImage = nullptr;
+  if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull())
+    m_SelectedImage = dynamic_cast<mitk::Image*>(m_Controls->m_ImageBox->GetSelectedNode()->GetData());
+
   m_Controls->m_ProcessFiberBundleButton->setEnabled(!m_SelectedFB.empty());
   m_Controls->m_ExtractFiberPeaks->setEnabled(!m_SelectedFB.empty());
 }
 
-void QmitkFiberQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkFiberQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& )
 {
-  //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
-  m_SelectedFB.clear();
-  m_SelectedImage = nullptr;
-
-  for (mitk::DataNode::Pointer node: nodes)
-  {
-    if ( dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
-    {
-      m_SelectedFB.push_back(node);
-    }
-    else if (dynamic_cast<mitk::Image*>(node->GetData()))
-      m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
-  }
   UpdateGui();
   GenerateStats();
 }

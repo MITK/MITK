@@ -54,6 +54,7 @@ protected slots:
 
   void ProcessSelectedBundles();    ///< start selected operation on fiber bundle (e.g. tract density image generation)
   void CalculateFiberDirections();  ///< Calculate main fiber directions from tractogram
+  void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
 protected:
 
@@ -63,7 +64,6 @@ protected:
   Ui::QmitkFiberQuantificationViewControls* m_Controls;
 
   void GenerateStats(); ///< generate statistics of selected fiber bundles
-  void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
   std::vector<mitk::DataNode::Pointer>  m_SelectedFB;       ///< selected fiber bundle nodes
   mitk::Image::Pointer                  m_SelectedImage;

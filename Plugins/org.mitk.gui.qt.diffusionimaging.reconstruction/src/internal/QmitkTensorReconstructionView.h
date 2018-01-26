@@ -86,9 +86,10 @@ class QmitkTensorReconstructionView : public QmitkAbstractView, public mitk::ILi
 
 protected slots:
 
+  void UpdateGui();
   void TensorsToOdf();
   void TensorsToDWI();
-  void DoTensorsToDWI(mitk::DataStorage::SetOfObjects::Pointer inImages);
+  void DoTensorsToDWI();
   void Advanced1CheckboxClicked();
   void Reconstruct();
   void ResidualCalculation();
@@ -101,9 +102,9 @@ protected slots:
 
 protected:
 
-  void ItkTensorReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages);
-  void TeemTensorReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages);
-  void TensorReconstructionWithCorr(mitk::DataStorage::SetOfObjects::Pointer inImages);
+  void ItkTensorReconstruction();
+  void TeemTensorReconstruction();
+  void TensorReconstructionWithCorr();
 
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
@@ -114,13 +115,6 @@ protected:
   template<int L>
   void TemplatedAnalyticalTensorReconstruction(mitk::Image* vols,
     float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
-
-  void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-
-  mitk::DataNode::Pointer m_DiffusionImage;
-  mitk::DataNode::Pointer m_TensorImage;
-  mitk::DataStorage::SetOfObjects::Pointer m_DiffusionImages;
-  mitk::DataStorage::SetOfObjects::Pointer m_TensorImages;
 };
 
 

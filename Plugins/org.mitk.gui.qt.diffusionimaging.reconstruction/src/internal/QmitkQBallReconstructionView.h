@@ -24,10 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkQBallReconstructionViewControls.h"
 
-#include <berryIPartListener.h>
-#include <berryISelectionListener.h>
-#include <berryIStructuredSelection.h>
-
 #include <mitkImage.h>
 #include <mitkDiffusionPropertyHelper.h>
 #include <itkVectorImage.h>
@@ -93,13 +89,14 @@ class QmitkQBallReconstructionView : public QmitkAbstractView, public mitk::ILif
 
 protected slots:
 
+  void UpdateGui();
   void ReconstructStandard();
   void MethodChoosen(int method);
   void Reconstruct(int method, int normalization);
 
-  void NumericalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
-  void AnalyticalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
-  void MultiQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages);
+  void NumericalQBallReconstruction(mitk::DataNode::Pointer node, int normalization);
+  void AnalyticalQBallReconstruction(mitk::DataNode::Pointer node, int normalization);
+  void MultiQBallReconstruction(mitk::DataNode::Pointer node);
 
 
   /**
@@ -123,17 +120,10 @@ protected:
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
-  //void Create
-
-  QScopedPointer<berry::ISelectionListener> m_SelListener;
-  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
-  mitk::DataStorage::SetOfObjects::Pointer m_DiffusionImages;
-
 private:
 
   std::map< const mitk::DataNode *, QbrShellSelection * > m_ShellSelectorMap;
-  void GenerateShellSelectionUI(mitk::DataStorage::SetOfObjects::Pointer set);
+  void GenerateShellSelectionUI(mitk::DataNode::Pointer node);
 };
 
 

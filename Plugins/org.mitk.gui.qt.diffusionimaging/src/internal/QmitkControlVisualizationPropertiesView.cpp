@@ -254,29 +254,10 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_Crosshair->setVisible(false);
 
     mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-
     if (renderWindow)
     {
-      {
-        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("axial"))->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnAxialChanged );
-        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-      }
-
-      {
-        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("sagittal"))->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnSagittalChanged );
-        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-      }
-
-      {
-        mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString("coronal"))->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-        command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::OnCoronalChanged );
-        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
-      }
+      m_SliceChangeListener.RenderWindowPartActivated(renderWindow);
+      connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
     }
   }
 }
@@ -648,7 +629,12 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
 
 void QmitkControlVisualizationPropertiesView::Visible()
 {
-
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  if (renderWindow)
+  {
+    m_SliceChangeListener.RenderWindowPartActivated(renderWindow);
+    connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+  }
 }
 
 void QmitkControlVisualizationPropertiesView::Hidden()
@@ -658,6 +644,12 @@ void QmitkControlVisualizationPropertiesView::Hidden()
 
 void QmitkControlVisualizationPropertiesView::Activated()
 {
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  if (renderWindow)
+  {
+    m_SliceChangeListener.RenderWindowPartActivated(renderWindow);
+    connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+  }
 }
 
 void QmitkControlVisualizationPropertiesView::Deactivated()
@@ -724,8 +716,7 @@ void QmitkControlVisualizationPropertiesView::Toggle3DClipping(bool enabled)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-
-void QmitkControlVisualizationPropertiesView::OnAxialChanged(const itk::EventObject& )
+void QmitkControlVisualizationPropertiesView::OnSliceChanged()
 {
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetAll();
   for (unsigned int i=0; i<nodes->Size(); ++i)
@@ -733,36 +724,13 @@ void QmitkControlVisualizationPropertiesView::OnAxialChanged(const itk::EventObj
     mitk::DataNode::Pointer node = nodes->GetElement(i);
     int plane_id = -1;
     node->GetIntProperty("Fiber3DClippingPlaneId", plane_id);
+
     if (plane_id==1)
       Set3DClippingPlane(false, node, "axial");
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkControlVisualizationPropertiesView::OnCoronalChanged(const itk::EventObject& )
-{
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetAll();
-  for (unsigned int i=0; i<nodes->Size(); ++i)
-  {
-    mitk::DataNode::Pointer node = nodes->GetElement(i);
-    int plane_id = -1;
-    node->GetIntProperty("Fiber3DClippingPlaneId", plane_id);
-    if (plane_id==3)
-      Set3DClippingPlane(false, node, "coronal");
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkControlVisualizationPropertiesView::OnSagittalChanged(const itk::EventObject& )
-{
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetAll();
-  for (unsigned int i=0; i<nodes->Size(); ++i)
-  {
-    mitk::DataNode::Pointer node = nodes->GetElement(i);
-    int plane_id = -1;
-    node->GetIntProperty("Fiber3DClippingPlaneId", plane_id);
-    if (plane_id==2)
+    else if (plane_id==2)
       Set3DClippingPlane(false, node, "sagittal");
+    else if (plane_id==3)
+      Set3DClippingPlane(false, node, "coronal");
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

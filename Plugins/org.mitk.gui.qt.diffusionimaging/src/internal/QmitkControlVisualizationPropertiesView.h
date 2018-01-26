@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEnumerationProperty.h"
 #include <mitkILifecycleAwarePart.h>
+#include <QmitkSliceNavigationListener.h>
 
 /*!
  * \ingroup org_mitk_gui_qt_diffusionquantification_internal
@@ -80,6 +81,7 @@ protected slots:
   void Toggle3DClipping(bool enabled=true);
   void FlipPeaks();
   void Welcome();
+  void OnSliceChanged();
 
   /// \brief Slot function for switching colourisation mode of glyphs.
   void OnColourisationModeChanged();
@@ -102,11 +104,6 @@ protected:
   bool IsPlaneRotated();
 
   void SliceRotation(const itk::EventObject&);
-
-  void OnAxialChanged(const itk::EventObject& e);
-  void OnCoronalChanged(const itk::EventObject& e);
-  void OnSagittalChanged(const itk::EventObject& e);
-
   void Set3DClippingPlane(bool disable, mitk::DataNode *node, std::string plane);
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
@@ -143,9 +140,7 @@ protected:
   mitk::ColorProperty::Pointer m_Color;
   mitk::FloatProperty::Pointer m_Opacity;
 
-  int m_SliceObserverTag1;
-  int m_SliceObserverTag2;
-  int m_SliceObserverTag3;
+  QmitkSliceNavigationListener  m_SliceChangeListener;
 };
 
 

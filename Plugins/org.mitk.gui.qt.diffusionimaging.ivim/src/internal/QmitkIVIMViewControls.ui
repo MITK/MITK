@@ -59,7 +59,7 @@
    <item row="1" column="0">
     <widget class="QGroupBox" name="m_InputData">
      <property name="title">
-      <string>Please Select Input Data</string>
+      <string>Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
@@ -84,29 +84,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="m_DiffusionImageLabel">
-        <property name="toolTip">
-         <string>DWI to analyze</string>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="m_MaskImageLabel">
-        <property name="toolTip">
-         <string>Optional ROI image</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_7">
         <property name="toolTip">
@@ -116,6 +93,12 @@
          <string>Raw DWI:</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QmitkDataStorageComboBox" name="m_DwiBox"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskBox"/>
       </item>
      </layout>
     </widget>
@@ -1161,6 +1144,16 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
+  </customwidget>
   <customwidget>
    <class>QmitkIVIMWidget</class>
    <extends>QWidget</extends>

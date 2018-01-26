@@ -33,6 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
 
 // ITK
 #include <itkGibbsTrackingFilter.h>
@@ -213,6 +218,21 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_CurvatureThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(SetCurvatureThreshold(int)) );
     connect( m_Controls->m_RandomSeedSlider, SIGNAL(valueChanged(int)), this, SLOT(SetRandomSeed(int)) );
     connect( m_Controls->m_OutputFileButton, SIGNAL(clicked()), this, SLOT(SetOutputFile()) );
+
+    m_Controls->m_InputImageBox->SetDataStorage(this->GetDataStorage());
+    mitk::TNodePredicateDataType<mitk::OdfImage>::Pointer isOdfImagePredicate = mitk::TNodePredicateDataType<mitk::OdfImage>::New();
+    mitk::TNodePredicateDataType<mitk::TensorImage>::Pointer isTensorImagePredicate = mitk::TNodePredicateDataType<mitk::TensorImage>::New();
+    m_Controls->m_InputImageBox->SetPredicate( mitk::NodePredicateOr::New(isOdfImagePredicate, isTensorImagePredicate) );
+
+    m_Controls->m_MaskImageBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_MaskImageBox->SetZeroEntryText("--");
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    mitk::NodePredicateDimension::Pointer is3D = mitk::NodePredicateDimension::New(3);
+    m_Controls->m_MaskImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, mitk::NodePredicateAnd::New(isImagePredicate, is3D)) );
+
+    connect( (QObject*)(m_Controls->m_MaskImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()));
+    connect( (QObject*)(m_Controls->m_InputImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()));
   }
 }
 
@@ -279,29 +299,8 @@ void QmitkGibbsTrackingView::SetCurvatureThreshold(int value)
 }
 
 // called if datamanager selection changes
-void QmitkGibbsTrackingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkGibbsTrackingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& )
 {
-  if (m_ThreadIsRunning)
-    return;
-
-  m_ImageNode = nullptr;
-  m_MaskImageNode = nullptr;
-
-  // iterate all selected objects
-  for (mitk::DataNode::Pointer node: nodes)
-  {
-    if( node.IsNotNull() && dynamic_cast<mitk::OdfImage*>(node->GetData()) )
-      m_ImageNode = node;
-    else if( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
-      m_ImageNode = node;
-    else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-    {
-      mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(node->GetData());
-      if (img->GetPixelType().GetPixelType()==itk::ImageIOBase::SCALAR)
-        m_MaskImageNode = node;
-    }
-  }
-
   UpdateGUI();
 }
 
@@ -341,22 +340,7 @@ void QmitkGibbsTrackingView::UpdateTrackingStatus()
 // update gui elements (enable/disable elements and set tooltips)
 void QmitkGibbsTrackingView::UpdateGUI()
 {
-  if (m_ImageNode.IsNotNull())
-  {
-    m_Controls->m_OdfImageLabel->setText(m_ImageNode->GetName().c_str());
-    m_Controls->m_DataFrame->setTitle("Input Data");
-  }
-  else
-  {
-    m_Controls->m_OdfImageLabel->setText("<font color='red'>mandatory</font>");
-    m_Controls->m_DataFrame->setTitle("Please Select Input Data");
-  }
-  if (m_MaskImageNode.IsNotNull())
-    m_Controls->m_MaskImageLabel->setText(m_MaskImageNode->GetName().c_str());
-  else
-    m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
-
-  if (!m_ThreadIsRunning && m_ImageNode.IsNotNull())
+  if (!m_ThreadIsRunning && m_Controls->m_InputImageBox->GetSelectedNode().IsNotNull())
   {
     m_Controls->m_TrackingStop->setEnabled(false);
     m_Controls->m_TrackingStart->setEnabled(true);
@@ -366,6 +350,8 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStop->setText("Stop Tractography");
     m_Controls->m_TrackingStart->setToolTip("Start tractography. No further change of parameters possible.");
     m_Controls->m_TrackingStop->setToolTip("");
+    m_Controls->m_MaskImageBox->setEnabled(true);
+    m_Controls->m_InputImageBox->setEnabled(true);
   }
   else if (!m_ThreadIsRunning)
   {
@@ -377,6 +363,8 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_TrackingStop->setText("Stop Tractography");
     m_Controls->m_TrackingStart->setToolTip("No ODF image selected.");
     m_Controls->m_TrackingStop->setToolTip("");
+    m_Controls->m_MaskImageBox->setEnabled(true);
+    m_Controls->m_InputImageBox->setEnabled(true);
   }
   else
   {
@@ -389,6 +377,8 @@ void QmitkGibbsTrackingView::UpdateGUI()
     m_Controls->m_AdvancedSettingsCheckbox->setChecked(false);
     m_Controls->m_TrackingStart->setToolTip("Tracking in progress.");
     m_Controls->m_TrackingStop->setToolTip("Stop tracking and display results.");
+    m_Controls->m_MaskImageBox->setEnabled(false);
+    m_Controls->m_InputImageBox->setEnabled(false);
   }
 }
 
@@ -396,28 +386,6 @@ void QmitkGibbsTrackingView::UpdateGUI()
 void QmitkGibbsTrackingView::AdvancedSettings()
 {
   m_Controls->m_AdvancedFrame->setVisible(m_Controls->m_AdvancedSettingsCheckbox->isChecked());
-}
-
-// set mask image data node
-void QmitkGibbsTrackingView::SetMask()
-{
-  QList<mitk::DataNode::Pointer> nodes = GetDataManagerSelection();
-  if (nodes.empty())
-  {
-    m_MaskImageNode = nullptr;
-    m_Controls->m_MaskImageLabel->setText("-");
-    return;
-  }
-
-  for (auto node: nodes)
-  {
-    if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
-    {
-      m_MaskImageNode = node;
-      m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
-      return;
-    }
-  }
 }
 
 // check for mask and odf and start tracking thread
@@ -430,11 +398,13 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   }
   m_GlobalTracker = nullptr;
 
-  if (m_ImageNode.IsNull())
+
+  if (m_Controls->m_InputImageBox->GetSelectedNode().IsNull())
   {
     QMessageBox::information( nullptr, "Warning", "Please load and select a Odf image before starting image processing.");
     return;
   }
+  m_ImageNode = m_Controls->m_InputImageBox->GetSelectedNode();
 
   if (dynamic_cast<mitk::OdfImage*>(m_ImageNode->GetData()))
     m_OdfImage = dynamic_cast<mitk::OdfImage*>(m_ImageNode->GetData());
@@ -464,8 +434,9 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
   // mask image found?
   // catch exceptions thrown by the itkAccess macros
   try{
-    if(m_MaskImageNode.IsNotNull())
+    if(m_Controls->m_MaskImageBox->GetSelectedNode().IsNotNull())
     {
+      m_MaskImageNode = m_Controls->m_MaskImageBox->GetSelectedNode();
       if (dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()))
         mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData()), m_MaskImage);
     }

@@ -73,15 +73,14 @@ protected slots:
   void MD_DWI();
 
   void OdfQuantify(int method);
-  void OdfQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
-    int method) ;
+  void OdfQuantification(int method) ;
 
   void TensorQuantify(int method);
-  void TensorQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages,
-    int method) ;
+  void TensorQuantification(int method) ;
 
   void DoBallStickCalculation();
   void DoMultiTensorCalculation();
+  void UpdateGui();
 
 protected:
 
@@ -91,11 +90,6 @@ protected:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkDiffusionQuantificationViewControls* m_Controls;
-
-  mitk::DataStorage::SetOfObjects::Pointer m_OdfImages;
-  mitk::DataStorage::SetOfObjects::Pointer m_TensorImages;
-  mitk::DataStorage::SetOfObjects::Pointer m_DwImages;
-
   static const float m_ScaleDAIValues;
 };
 

@@ -66,7 +66,7 @@ public:
   ///
   virtual void SetFocus() override;
 
-  void OutputToDatastorage(const QList<mitk::DataNode::Pointer>& nodes);
+  void OutputToDatastorage(mitk::DataNode::Pointer node);
   bool FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos);
 
   void Activated() override;
@@ -95,6 +95,7 @@ protected slots:
   void ClipboardCurveButtonClicked();
 
   void OnKurtosisParamsChanged();
+  void UpdateGui();
 
 protected:
 
@@ -105,19 +106,12 @@ protected:
 
   Ui::QmitkIVIMViewControls* m_Controls;
 
-  int m_SliceObserverTag1;
-  int m_SliceObserverTag2;
-  int m_SliceObserverTag3;
-
   OutImgType::Pointer m_DStarMap;
   OutImgType::Pointer m_DMap;
   OutImgType::Pointer m_fMap;
 
   IVIMFilterType::IVIMSnapshot m_Snap;
   KurtosisFilterType::KurtosisSnapshot m_KurtosisSnap;
-
-  mitk::DataNode::Pointer m_DiffusionImageNode;
-  mitk::DataNode::Pointer m_MaskImageNode;
 
   bool m_Active;
   bool m_Visible;

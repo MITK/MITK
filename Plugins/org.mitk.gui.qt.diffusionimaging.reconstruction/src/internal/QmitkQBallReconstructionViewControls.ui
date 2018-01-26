@@ -29,7 +29,7 @@
    <item row="0" column="0">
     <widget class="QGroupBox" name="m_InputData">
      <property name="title">
-      <string>Please Select Input Data</string>
+      <string>Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
@@ -55,17 +55,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="m_DiffusionImageLabel">
-        <property name="toolTip">
-         <string>Input for Q-Ball reconstruction.</string>
-        </property>
-        <property name="text">
-         <string>&lt;font color='red'&gt;mandatory&lt;/font&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <widget class="QmitkDataStorageComboBox" name="m_ImageBox"/>
       </item>
      </layout>
     </widget>
@@ -341,6 +331,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

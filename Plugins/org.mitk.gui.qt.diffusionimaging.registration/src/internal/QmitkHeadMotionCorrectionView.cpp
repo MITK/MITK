@@ -107,7 +107,7 @@ void QmitkHeadMotionCorrectionView::StartRegistration()
 
   if (!mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inImage))
   {
-    QMessageBox::warning(nullptr, "Warning", "Input node is not a diffusion-weighted image!");
+    QMessageBox::warning(nullptr, "Image not processed", "Input is not a diffusion-weighted image!");
     return;
   }
 

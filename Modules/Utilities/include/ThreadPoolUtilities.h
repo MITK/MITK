@@ -3,9 +3,9 @@
 #include <queue>
 #include <map>
 #include <set>
-#include <thread>
 
 #include <boost/noncopyable.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -30,7 +30,7 @@ namespace Utilities
   class MITKUTILITIES_EXPORT ThreadPool : private boost::noncopyable
   {
   public:
-    ThreadPool(unsigned int size = std::thread::hardware_concurrency()); ///< \param size - number of threads in the pool
+    ThreadPool();
     ~ThreadPool();
 
     size_t Enqueue(const Task& task, TaskPriority priority = TaskPriority::NORMAL);
@@ -59,7 +59,7 @@ namespace Utilities
 
     boost::asio::io_service m_service;
     boost::optional<boost::asio::io_service::work> m_work;
-    std::vector<std::thread> m_pool;
+    boost::thread_group m_pool;
     boost::system::error_code m_error;
 
     boost::shared_mutex m_queueGuard;

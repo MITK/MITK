@@ -14,24 +14,21 @@ namespace
 
 namespace Utilities
 {
-  ThreadPool::ThreadPool(unsigned int size)
+  ThreadPool::ThreadPool()
     : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
     , m_id(0)
     , m_count(0)
   {
-    for (size_t i = 0; i < size; ++i) {
-      m_pool.emplace_back(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)));
+    const auto count = boost::thread::hardware_concurrency();
+    for (size_t i = 0; i < count; ++i) {
+      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)))->get_id();
     }
   }
 
   ThreadPool::~ThreadPool()
   {
     m_work = boost::none;
-    for (auto& thread : m_pool) {
-      if (thread.joinable()) {
-        thread.join();
-      }
-    }
+    m_pool.join_all();
   }
 
   ThreadPool& ThreadPool::Instance()
@@ -142,14 +139,11 @@ namespace Utilities
   template <typename TCheck>
   void ThreadPool::Wait(const TCheck& check)
   {
-    auto thisId = std::this_thread::get_id();
-    for (const auto& thread: m_pool) {
-      if (thread.get_id() == thisId) {
-        while (!check()) {
-          DoTask();
-        }
-        return;
+    if (m_pool.is_this_thread_in()) {
+      while (!check()) {
+        DoTask();
       }
+      return;
     }
 
     if (isGuiThread()) {

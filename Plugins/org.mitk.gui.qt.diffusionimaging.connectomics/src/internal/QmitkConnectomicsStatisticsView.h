@@ -56,6 +56,7 @@ public:
 protected slots:
 
   void OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged(  );
+  void UpdateGui();
 
 protected:
 

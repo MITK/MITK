@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>231</width>
+    <width>286</width>
     <height>639</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
    <item row="0" column="0">
     <widget class="QGroupBox" name="inputDataGroupBox">
      <property name="title">
-      <string>Data</string>
+      <string>Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <property name="leftMargin">
@@ -128,13 +128,6 @@
       <item row="0" column="0">
        <widget class="QComboBox" name="mappingStrategyComboBox"/>
       </item>
-      <item row="3" column="0">
-       <widget class="QPushButton" name="syntheticNetworkCreationPushButton">
-        <property name="text">
-         <string>Create Synthetic Networks</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -159,31 +152,10 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QComboBox" name="syntheticNetworkComboBox"/>
       </item>
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="parameterOneLabel">
-          <property name="text">
-           <string>Parameter 1</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="parameterOneSpinBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>9999</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="parameterTwoLabel">
@@ -206,6 +178,34 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="2" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="parameterOneLabel">
+          <property name="text">
+           <string>Parameter 1</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="parameterOneSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>9999</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="syntheticNetworkCreationPushButton">
+        <property name="text">
+         <string>Create Synthetic Networks</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

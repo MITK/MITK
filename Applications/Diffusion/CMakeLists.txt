@@ -37,6 +37,7 @@ set(_plugins
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.measurementtoolbox
   org.mitk.gui.qt.segmentation
+  org.mitk.gui_qt.multilabelsegmentation
   org.mitk.gui.qt.volumevisualization
   org.mitk.gui.qt.diffusionimaging
   org.mitk.gui.qt.diffusionimaging.connectomics

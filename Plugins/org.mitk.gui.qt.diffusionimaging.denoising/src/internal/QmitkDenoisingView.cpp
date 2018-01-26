@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkComposeImageFilter.h>
 #include <itkGaussianRandomSpatialNeighborSubsampler.h>
 #include <itkSpatialNeighborSubsampler.h>
+#include <QMessageBox>
+#include <mitkNodePredicateIsDWI.h>
 
 const std::string QmitkDenoisingView::VIEW_ID = "org.mitk.views.denoisingview";
 
@@ -68,7 +70,7 @@ void QmitkDenoisingView::CreateQtPartControl( QWidget *parent )
 
 
     m_Controls->m_InputImageBox->SetDataStorage(this->GetDataStorage());
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::NodePredicateIsDWI::Pointer isImagePredicate = mitk::NodePredicateIsDWI::New();
     m_Controls->m_InputImageBox->SetPredicate( isImagePredicate );
 
     UpdateGui();
@@ -98,7 +100,10 @@ void QmitkDenoisingView::StartDenoising()
   mitk::Image::Pointer input_image = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
 
   if (!mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(input_image))
+  {
+    QMessageBox::warning(nullptr, "Image not processed", "Input is not a diffusion-weighted image!");
     return;
+  }
 
   DwiImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(input_image);
 

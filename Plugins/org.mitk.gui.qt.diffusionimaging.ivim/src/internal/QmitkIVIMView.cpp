@@ -44,15 +44,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkRegularizedIVIMReconstructionFilter.h"
 #include "mitkImageCast.h"
 #include <mitkImageStatisticsHolder.h>
+#include <mitkNodePredicateIsDWI.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataType.h>
 
 const std::string QmitkIVIMView::VIEW_ID = "org.mitk.views.ivim";
 
 QmitkIVIMView::QmitkIVIMView()
   : QmitkAbstractView()
   , m_Controls( 0 )
-  , m_SliceObserverTag1(0), m_SliceObserverTag2(0), m_SliceObserverTag3(0)
-  , m_DiffusionImageNode(nullptr)
-  , m_MaskImageNode(nullptr)
   , m_Active(false)
   , m_Visible(false)
   , m_HoldUpdate(false)
@@ -101,9 +103,25 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_KurtosisFitScale, SIGNAL( currentIndexChanged(int)), this, SLOT( OnKurtosisParamsChanged() ) );
     connect( m_Controls->m_UseKurtosisBoundsCB, SIGNAL(clicked() ), this, SLOT( OnKurtosisParamsChanged() ) );
 
-
     m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
     connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+
+
+    m_Controls->m_DwiBox->SetDataStorage(this->GetDataStorage());
+    mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New();
+    m_Controls->m_DwiBox->SetPredicate( isDwi );
+    connect( (QObject*)(m_Controls->m_DwiBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+
+    m_Controls->m_MaskBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_MaskBox->SetZeroEntryText("--");
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    mitk::NodePredicateDimension::Pointer is3D = mitk::NodePredicateDimension::New(3);
+    m_Controls->m_MaskBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, mitk::NodePredicateAnd::New(isImagePredicate, is3D)) );
+    connect( (QObject*)(m_Controls->m_MaskBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+
+    connect( (QObject*)(m_Controls->m_ModelTabSelectionWidget), SIGNAL(currentChanged(int)), this, SLOT(UpdateGui()));
+
   }
 
   QString dstar = QString::number(m_Controls->m_DStarSlider->value()/1000.0);
@@ -235,46 +253,12 @@ void QmitkIVIMView::LambdaSlider (int val)
   OnSliceChanged();
 }
 
-void QmitkIVIMView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkIVIMView::UpdateGui()
 {
-  bool foundOneDiffusionImage = false;
-  m_Controls->m_InputData->setTitle("Please Select Input Data");
-  m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
-  m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
-  m_MaskImageNode = nullptr;
-  m_DiffusionImageNode = nullptr;
-
-  // iterate all selected objects, adjust warning visibility
-  for (auto node: nodes)
-  {
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-    {
-      bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
-
-      if( isDiffusionImage )
-      {
-        m_DiffusionImageNode = node;
-        foundOneDiffusionImage = true;
-        m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
-      }
-      else
-      {
-        bool isBinary = false;
-        node->GetPropertyValue<bool>("binary", isBinary);
-        if (isBinary)
-        {
-          m_MaskImageNode = node;
-          m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
-        }
-      }
-    }
-  }
-
-  if (m_DiffusionImageNode.IsNotNull())
+  if (m_Controls->m_DwiBox->GetSelectedNode().IsNotNull())
   {
     m_Controls->m_VisualizeResultsWidget->setVisible(true);
     m_Controls->m_KurtosisVisualizationWidget->setVisible(true);
-    m_Controls->m_InputData->setTitle("Input Data");
 
     m_HoldUpdate = false;
   }
@@ -282,31 +266,32 @@ void QmitkIVIMView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, 
   {
     m_Controls->m_VisualizeResultsWidget->setVisible(false);
     m_Controls->m_KurtosisVisualizationWidget->setVisible(false);
-    m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
   }
 
-  m_Controls->m_ButtonStart->setEnabled( foundOneDiffusionImage );
-  m_Controls->m_ButtonAutoThres->setEnabled( foundOneDiffusionImage );
+  m_Controls->m_ButtonStart->setEnabled( m_Controls->m_DwiBox->GetSelectedNode().IsNotNull() );
+  m_Controls->m_ButtonAutoThres->setEnabled( m_Controls->m_DwiBox->GetSelectedNode().IsNotNull() );
 
-  m_Controls->m_ControlsFrame->setEnabled( foundOneDiffusionImage );
-  m_Controls->m_BottomControlsFrame->setEnabled( foundOneDiffusionImage );
+  m_Controls->m_ControlsFrame->setEnabled( m_Controls->m_DwiBox->GetSelectedNode().IsNotNull() );
+  m_Controls->m_BottomControlsFrame->setEnabled( m_Controls->m_DwiBox->GetSelectedNode().IsNotNull() );
 
   OnSliceChanged();
 }
 
+void QmitkIVIMView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& )
+{
+  UpdateGui();
+}
+
 void QmitkIVIMView::AutoThreshold()
 {
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-
-  if (!nodes.front())
+  if (m_Controls->m_DwiBox->GetSelectedNode().IsNull())
   {
     // Nothing selected. Inform the user and return
     QMessageBox::information( nullptr, "Template", "Please load and select a diffusion image before starting image processing.");
     return;
   }
 
-  mitk::Image* dimg = dynamic_cast<mitk::Image*>(nodes.front()->GetData());
+  mitk::Image* dimg = dynamic_cast<mitk::Image*>(m_Controls->m_DwiBox->GetSelectedNode()->GetData());
 
   if (!dimg)
   {
@@ -386,24 +371,12 @@ void QmitkIVIMView::AutoThreshold()
 
 void QmitkIVIMView::FittIVIMStart()
 {
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-
-  mitk::Image* img = 0;
-  for ( int i=0; i<nodes.size(); i++ )
-  {
-    img = dynamic_cast<mitk::Image*>(nodes.at(i)->GetData());
-
-    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(nodes.at(i)->GetData())) );
-
-    if (img && isDiffusionImage)
-      break;
-  }
-
-  if (!img)
+  if (m_Controls->m_DwiBox->GetSelectedNode().IsNull())
   {
     QMessageBox::information( nullptr, "Template", "No valid diffusion-weighted image selected.");
     return;
   }
+  mitk::Image* img = dynamic_cast<mitk::Image*>(m_Controls->m_DwiBox->GetSelectedNode()->GetData());
 
 
   VecImgType::Pointer vecimg = VecImgType::New();
@@ -425,9 +398,9 @@ void QmitkIVIMView::FittIVIMStart()
 
     filter->SetFittingScale( static_cast<itk::FitScale>(this->m_Controls->m_KurtosisFitScale->currentIndex() ) );
 
-    if( m_MaskImageNode.IsNotNull() )
+    if( m_Controls->m_MaskBox->GetSelectedNode().IsNotNull() )
     {
-      mitk::Image::Pointer maskImg = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+      mitk::Image::Pointer maskImg = dynamic_cast<mitk::Image*>(m_Controls->m_MaskBox->GetSelectedNode()->GetData());
       typedef itk::Image<short, 3> MaskImgType;
 
       MaskImgType::Pointer maskItk;
@@ -463,7 +436,7 @@ void QmitkIVIMView::FittIVIMStart()
       dnode->SetData( dimage );
       dnode->SetName(new_dname.toLatin1());
       dnode->SetProperty("LookupTable", kurt_lut_prop );
-      GetDataStorage()->Add(dnode, nodes.front());
+      GetDataStorage()->Add(dnode, m_Controls->m_DwiBox->GetSelectedNode());
     }
 
     if( this->m_Controls->m_CheckKurtK->isChecked() )
@@ -472,7 +445,7 @@ void QmitkIVIMView::FittIVIMStart()
       knode->SetData( kimage );
       knode->SetName(new_kname.toLatin1());
       knode->SetProperty("LookupTable", kurt_lut_prop );
-      GetDataStorage()->Add(knode, nodes.front());
+      GetDataStorage()->Add(knode, m_Controls->m_DwiBox->GetSelectedNode());
     }
 
   }
@@ -484,7 +457,7 @@ void QmitkIVIMView::FittIVIMStart()
              true,
              dummy);
 
-    OutputToDatastorage(nodes);
+    OutputToDatastorage(m_Controls->m_DwiBox->GetSelectedNode());
   }
 }
 
@@ -499,16 +472,16 @@ void QmitkIVIMView::OnSliceChanged()
     return;
 
   m_Controls->m_Warning->setVisible(false);
-  if(!m_Controls || m_DiffusionImageNode.IsNull())
+  if(!m_Controls || m_Controls->m_DwiBox->GetSelectedNode().IsNull())
     return;
 
   m_Controls->m_VisualizeResultsWidget->setVisible(false);
   m_Controls->m_KurtosisVisualizationWidget->setVisible(false);
 
-  mitk::Image::Pointer diffusionImg = dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData());
+  mitk::Image::Pointer diffusionImg = dynamic_cast<mitk::Image*>(m_Controls->m_DwiBox->GetSelectedNode()->GetData());
   mitk::Image::Pointer maskImg = nullptr;
-  if (m_MaskImageNode.IsNotNull())
-    maskImg = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+  if (m_Controls->m_MaskBox->GetSelectedNode().IsNotNull())
+    maskImg = dynamic_cast<mitk::Image*>(m_Controls->m_MaskBox->GetSelectedNode()->GetData());
 
   if (!this->GetRenderWindowPart()) return;
 
@@ -785,11 +758,8 @@ bool QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType
   return true;
 }
 
-void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkIVIMView::OutputToDatastorage(mitk::DataNode::Pointer node)
 {
-  // Outputs to Datastorage
-  QString basename(nodes.front()->GetName().c_str());
-
   if(m_Controls->m_CheckDStar->isChecked())
   {
     mitk::Image::Pointer dstarimage = mitk::Image::New();
@@ -799,7 +769,7 @@ void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& no
     mitk::DataNode::Pointer node2=mitk::DataNode::New();
     node2->SetData( dstarimage );
     node2->SetName(newname2.toLatin1());
-    GetDataStorage()->Add(node2, nodes.front());
+    GetDataStorage()->Add(node2, node);
   }
 
   if(m_Controls->m_CheckD->isChecked())
@@ -811,7 +781,7 @@ void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& no
     mitk::DataNode::Pointer node1=mitk::DataNode::New();
     node1->SetData( dimage );
     node1->SetName(newname1.toLatin1());
-    GetDataStorage()->Add(node1, nodes.front());
+    GetDataStorage()->Add(node1, node);
   }
 
   if(m_Controls->m_Checkf->isChecked())
@@ -820,22 +790,13 @@ void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& no
     image->InitializeByItk(m_fMap.GetPointer());
     image->SetVolume(m_fMap->GetBufferPointer());
     QString newname0 = ""; newname0 = newname0.append("IVIM_fMap_Method-%1").arg(m_Controls->m_MethodCombo->currentText());
-    mitk::DataNode::Pointer node=mitk::DataNode::New();
-    node->SetData( image );
-    node->SetName(newname0.toLatin1());
-    GetDataStorage()->Add(node, nodes.front());
+    mitk::DataNode::Pointer node3=mitk::DataNode::New();
+    node3->SetData( image );
+    node3->SetName(newname0.toLatin1());
+    GetDataStorage()->Add(node3, node);
   }
 
   this->GetRenderWindowPart()->RequestUpdate();
-
-  // reset the data node labels, the selection in DataManager is lost after adding
-  // a new node -> we cannot directly proceed twice, the DWI ( and MASK) image have to be selected again
-  m_Controls->m_InputData->setTitle("Please Select Input Data");
-  m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
-  m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
-  m_MaskImageNode = nullptr;
-  m_DiffusionImageNode = nullptr;
-
 }
 
 void QmitkIVIMView::ChooseMethod()

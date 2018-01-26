@@ -192,15 +192,16 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreateNewButtonCli
 void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreationExit()
 {
   this->SetCombinedModalityCreateWidgetEnabled(false);
-  try
+  mitk::DataNode::Pointer usNode = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()//GetDataStorage
+    ->GetNamedNode("US Viewing Stream - Image 0");
+  if (usNode.IsNotNull())
   {
     mitk::RenderingManager::GetInstance()->InitializeViews(//Reinit
-      mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()//GetDataStorage
-      ->GetNamedNode("US Support Viewing Stream")->GetData()->GetTimeGeometry());//GetNode
+      usNode->GetData()->GetTimeGeometry());//GetNode
   }
-  catch (...)
+  else
   {
-    MITK_DEBUG << "No reinit possible";
+    mitkThrow()<< "No reinit possible";
   }
 }
 

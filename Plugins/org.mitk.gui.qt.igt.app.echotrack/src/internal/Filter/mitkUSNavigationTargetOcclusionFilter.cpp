@@ -143,7 +143,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
     cellLocator->BuildLocator();
 
     // test for intersection with every point on the surface
-    for ( unsigned int n = 0; n < numberOfPoints; n++ )
+    for ( vtkIdType n = 0; n < numberOfPoints; n++ )
     {
       vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
       if ( cellLocator->IntersectWithLine(point1, targetSurfaceVtkTransformed->GetPoint(n), points, nullptr) != 0 )

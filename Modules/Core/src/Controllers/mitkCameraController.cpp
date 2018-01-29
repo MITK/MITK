@@ -266,9 +266,12 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
     const PlaneGeometry *planeGeometry = this->GetRenderer()->GetCurrentWorldPlaneGeometry();
     if (planeGeometry != NULL)
     {
-      this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 1, 0); //set the view-up for the camera
-      this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(_planePoint[0], _planePoint[1], 900000);
-      this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(_planePoint[0], _planePoint[1], 0);
+      vtkCamera* camera = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
+
+      camera->SetViewUp(0, 1, 0); //set the view-up for the camera
+      camera->SetPosition(_planePoint[0], _planePoint[1], 900000);
+      camera->SetFocalPoint(_planePoint[0], _planePoint[1], 0);
+
       //Transform the camera to the current position (transversal, coronal and sagittal plane).
       //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
       //(Without not all three planes would be visible).
@@ -305,7 +308,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
 
       trans->SetMatrix(matrix);
       //Transform the camera to the current position (transversal, coronal and sagittal plane).
-      this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
+      camera->ApplyTransform(trans);
     }
   }
 }

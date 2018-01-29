@@ -654,8 +654,8 @@ void mitk::VtkPropRenderer::PrepareRender()
   if (this->GetMapperID() != m_CameraInitializedForMapperID)
   {
     Initialize2DvtkCamera(); //Set parallel projection etc.
+    GetCameraController()->AdjustCameraToPlane();
   }
-  GetCameraController()->AdjustCameraToPlane();
 }
 
 bool mitk::VtkPropRenderer::Initialize2DvtkCamera()

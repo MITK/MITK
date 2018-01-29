@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
+#include <mitkDisplayInteractor.h>
+
 #include <QColorDialog>
 
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
@@ -104,6 +106,9 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   m_Preferences->PutBool("Selection on 3D View", m_Ui->m_SelectionMode->isChecked());
   m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
+  int rotationStep = m_Ui->m_RotationStep->value();
+  m_Preferences->PutInt("Rotation Step", rotationStep);
+  mitk::DisplayInteractor::SetClockRotationSpeed(rotationStep);
 
   return true;
 }
@@ -147,6 +152,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   int mode= m_Preferences->GetInt("Rendering Mode",0);
   m_Ui->m_RenderingMode->setCurrentIndex(mode);
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
+  m_Ui->m_RotationStep->setValue(m_Preferences->GetInt("Rotation Step", 90));
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ColorChooserButtonClicked()

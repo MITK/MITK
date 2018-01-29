@@ -443,11 +443,9 @@ public:
 
       void SetPixelSpacingInformation(const std::string& pixelSpacing, const std::string& imagerPixelSpacing);
 
-      void SetSliceThickness(const std::string& sliceThickness);
-
       void SetHasMultipleTimePoints(bool);
 
-      void GetDesiredMITKImagePixelSpacing(ScalarType& spacingX, ScalarType& spacingY, ScalarType& spacingZ) const;
+      void GetDesiredMITKImagePixelSpacing(ScalarType& spacingX, ScalarType& spacingY) const;
 
       void SetOrientation(std::string orientation);
 
@@ -462,7 +460,6 @@ public:
       std::string m_SOPClassUID;
       bool m_HasGantryTiltCorrected;
       std::string m_PixelSpacing;
-      std::string m_SliceThickness;
       std::string m_ImagerPixelSpacing;
       bool m_HasMultipleTimePoints;
       bool m_IsMultiFrameImage;

@@ -468,7 +468,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
       fileFitsIntoPattern = false;
       continue; // no files anymore
 
-    }
+    } 
     else if (!lastOriginInitialized && !result.GetBlockFilenames().empty())
     {
       // We have a file with position but result already contains files without it
@@ -746,7 +746,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
     if (!seriesInstanceUid) {
       continue;
     }
-
+    
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
     // doing the same thing with find would make the code less readable. Since we forget the Scanner results
@@ -764,7 +764,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
     try
     {
       auto sortedFilenames = SortSeriesSlices(groupIter->second.GetFilenames(), scanner.GetMappings()); // sort each slice group spatially
-      result[groupIter->first] = ImageBlockDescriptor(sortedFilenames);
+      result[groupIter->first] = ImageBlockDescriptor(sortedFilenames); 
     } catch(...)
     {
        MITK_ERROR << "Caught something.";
@@ -813,7 +813,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
       thisBlock.SetModality( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagModality ) ) );
       thisBlock.SetPixelSpacingInformation( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagPixelSpacing ) ),
                                             DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagImagerPixelSpacing ) ) );
-      thisBlock.SetSliceThickness(DicomSeriesReader::ConstCharStarToString(scanner.GetValue(firstFileInBlock.c_str(), tagSliceThickness)));
       thisBlock.SetHasMultipleTimePoints( false );
       thisBlock.SetOrientation(DicomSeriesReader::ConstCharStarToString(scanner.GetValue(firstFileInBlock.c_str(), tagImageOrientation)));
       thisBlock.SetBadSlicingDistance(analysisResult.ContainsBadSlicingDistance());
@@ -1201,7 +1200,7 @@ DicomSeriesReader::GdcmSortFunction(
         if (temporalIndex1 != temporalIndex2)
         {
           return temporalIndex1 < temporalIndex2;
-        }
+        } 
       }
     }
   }
@@ -1356,20 +1355,17 @@ void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBl
   Vector3D imageSpacing = image->GetGeometry()->GetSpacing();
   ScalarType imageSpacingX = imageSpacing[0];
   ScalarType imageSpacingY = imageSpacing[1];
-  ScalarType imageSpacingZ = imageSpacing[2];
 
   // spacing as desired by MITK (preference for "in patient", else "on detector", or "1.0/1.0")
   ScalarType desiredSpacingX = imageSpacingX;
   ScalarType desiredSpacingY = imageSpacingY;
-  ScalarType desiredSpacingZ = imageSpacingZ;
-  imageBlockDescriptor.GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY, desiredSpacingZ );
+  imageBlockDescriptor.GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY );
 
-  MITK_DEBUG << "Loaded spacing: " << imageSpacingX << "/" << imageSpacingY << "/" << imageSpacingZ;
-  MITK_DEBUG << "Corrected spacing: " << desiredSpacingX << "/" << desiredSpacingY << "/" << desiredSpacingZ;
+  MITK_DEBUG << "Loaded spacing: " << imageSpacingX << "/" << imageSpacingY;
+  MITK_DEBUG << "Corrected spacing: " << desiredSpacingX << "/" << desiredSpacingY;
 
   imageSpacing[0] = desiredSpacingX;
   imageSpacing[1] = desiredSpacingY;
-  imageSpacing[2] = desiredSpacingZ;
   image->GetGeometry()->SetSpacing( imageSpacing );
 }
 
@@ -1388,7 +1384,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   const gdcm::Tag tagSOPClassUID(0x0008, 0x0016); // SOP class UID
   const gdcm::Tag tagModality(0x0008, 0x0060); // modality
   const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
-  const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
   const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // imager pixel spacing
   const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
 
@@ -1426,7 +1421,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       imageBlockDescriptor.SetNumberOfFrames( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagNumberOfFrames ) ) );
       imageBlockDescriptor.SetPixelSpacingInformation( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagPixelSpacing ) ),
                                                        ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagImagerPixelSpacing ) ) );
-      imageBlockDescriptor.SetSliceThickness( ConstCharStarToString( scanner.GetValue( filenames.front().c_str(), tagSliceThickness ) ) );
 
       GantryTiltInformation tiltInfo;
 
@@ -1551,9 +1545,6 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
   const gdcm::Tag tagImagerPixelSpacing(0x0018, 0x1164); // Imager Pixel Spacing
   scanner.AddTag( tagImagerPixelSpacing );
 
-  const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
-  scanner.AddTag( tagSliceThickness );
-
   const gdcm::Tag tagModality(0x0008, 0x0060); // Modality
   scanner.AddTag( tagModality );
 
@@ -1561,7 +1552,7 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
   scanner.AddTag( tagSOPClassUID );
 
   const gdcm::Tag tagNumberOfFrames(0x0028, 0x0008); // number of frames
-  scanner.AddTag( tagNumberOfFrames );
+    scanner.AddTag( tagNumberOfFrames );
 
   scanner.Scan(filenames); // make available image information for each file
 }

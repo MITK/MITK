@@ -50,6 +50,14 @@ namespace mitk
 
     void SetSelectionMode(bool selection);
 
+    static void RotateCamera(BaseRenderer* renderer, bool clockwise);
+
+    /**
+    * \brief Change Clock rotation spead for ctrl+arrow rotation
+    */
+    static double GetClockRotationSpeed();
+    static void SetClockRotationSpeed(double newRotationSpeed);
+
   protected:
     DisplayInteractor();
     virtual ~DisplayInteractor();
@@ -164,12 +172,6 @@ namespace mitk
      * \brief Updates the Statusbar information with the information about the clicked position
      */
     virtual void UpdateStatusbar(StateMachineAction*, InteractionEvent* event);
-
-    /**
-    * \brief Change Clock rotation spead for ctrl+arrow rotation
-    */
-    double GetClockRotationSpeed();
-    void SetClockRotationSpeed(double newRotationSpeed);
 
     /**
     * \brief Method to retrieve bool-value for given property from string-property
@@ -297,7 +299,7 @@ namespace mitk
      /**
      * Clock rotation spead for ctrl+arrow rotation
      */
-    double m_ClockRotationSpeed;
+    static double m_ClockRotationSpeed;
     /**
     * 3D view selection mode
     */

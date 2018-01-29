@@ -14,11 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//Poco headers
-#include <Poco/Zip/Compress.h>
-#include <Poco/Path.h>
-#include <Poco/File.h>
-
 #include "mitkNavigationToolStorageSerializer.h"
 #include "mitkNavigationToolWriter.h"
 #include "mitkIGTException.h"
@@ -27,23 +22,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSceneIO.h>
 #include <mitkIOUtil.h>
 
+// Poco
+#include <Poco/Zip/Compress.h>
+
+//ITKsys
+#include <itksys/SystemTools.hxx>
+
 #include <sstream>
-
-
 
 mitk::NavigationToolStorageSerializer::NavigationToolStorageSerializer()
 {
   //create temp directory
-  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory("NavigationToolStorageSerializerTmp_XXXXXX",mitk::IOUtil::GetProgramPath());
+  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory("NavigationToolStorageSerializerTmp_XXXXXX");
 }
 
 mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()
 {
  //remove temp directory
- Poco::File myFile(m_tempDirectory);
+
  try
   {
-  if (myFile.exists()) myFile.remove(true);
+    if (itksys::SystemTools::FileExists(m_tempDirectory.c_str())) std::remove(m_tempDirectory.c_str());
   }
  catch(...)
   {
@@ -57,7 +56,7 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
   mitk::NavigationToolWriter::Pointer myToolWriter = mitk::NavigationToolWriter::New();
   for(unsigned int i=0; i<storage->GetToolCount();i++)
   {
-    std::string tempFileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+    std::string tempFileName = m_tempDirectory + mitk::IOUtil::GetDirectorySeparator() + "NavigationTool" + convertIntToString(i) + ".tool";
     if (!myToolWriter->DoWrite(tempFileName,storage->GetTool(i)))
       {
         mitkThrowException(mitk::IGTIOException) << "Could not write tool to tempory directory: " << tempFileName;
@@ -70,7 +69,7 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
     //first: clean up
     for (unsigned int i=0; i<storage->GetToolCount();i++)
     {
-      std::string tempFileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+      std::string tempFileName = m_tempDirectory + mitk::IOUtil::GetDirectorySeparator() + "NavigationTool" + convertIntToString(i) + ".tool";
       std::remove(tempFileName.c_str());
     }
     //then: throw an exception
@@ -79,8 +78,8 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
   Poco::Zip::Compress zipper( file, true );
   for (unsigned int i=0; i<storage->GetToolCount();i++)
   {
-    std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
-    zipper.addFile(fileName,myToolWriter->GetFileWithoutPath(fileName));
+    std::string fileName = m_tempDirectory + mitk::IOUtil::GetDirectorySeparator() + "NavigationTool" + convertIntToString(i) + ".tool";
+    zipper.addFile(fileName, myToolWriter->GetFileWithoutPath(fileName));
     std::remove(fileName.c_str()); //delete file
   }
  zipper.close();

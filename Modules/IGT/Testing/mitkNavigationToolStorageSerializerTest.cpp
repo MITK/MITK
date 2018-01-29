@@ -70,7 +70,7 @@ public:
     }
     catch(...)
     {
-      MITK_ERROR << "Warning: Error occured when deleting test file!";
+      MITK_ERROR << "Warning: Error occured while deleting test file!";
     }
   }
 

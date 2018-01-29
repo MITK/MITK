@@ -40,18 +40,23 @@ void QmitkModelViewSelectionConnector::SetView(QAbstractItemView* view)
     disconnect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
   }
 
-  if (nullptr != view && nullptr != dynamic_cast<QmitkAbstractDataStorageModel*>(view->model()))
+  // reset model-view pair and check for valid function argument
+  m_View = nullptr;
+  m_Model = nullptr;
+  if (nullptr == view)
   {
-    m_View = view;
-    m_Model = dynamic_cast<QmitkAbstractDataStorageModel*>(m_View->model());
-    connect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
+    mitkThrow() << "Invalid item view. To use the model-view selection connector please specify a valid 'QAbstractItemView'.";
   }
-  else
+
+  if (nullptr == dynamic_cast<QmitkAbstractDataStorageModel*>(view->model()))
   {
-    m_View = nullptr;
-    m_Model = nullptr;
-    mitkThrow() << "Invalid item view or data model.";
+    mitkThrow() << "Invalid data model. To use the model-view selection connector please set a valid 'QmitkAbstractDataStorageModel' for the given item view.";
   }
+
+  // a valid item view and a valid data model was found
+  m_View = view;
+  m_Model = dynamic_cast<QmitkAbstractDataStorageModel*>(m_View->model());
+  connect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
 }
 
 void QmitkModelViewSelectionConnector::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)

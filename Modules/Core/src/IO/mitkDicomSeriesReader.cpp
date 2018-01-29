@@ -1105,6 +1105,15 @@ DicomSeriesReader::GdcmSortFunction(
      - slice thickness
      - number of rows/columns
   */
+  auto stodNoException = [](const std::string& s)
+  {
+    try {
+      return std::stod(s);
+    } catch (std::exception&) {
+      return 0.0;
+    }
+  };
+
   static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
   static const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
@@ -1166,8 +1175,8 @@ DicomSeriesReader::GdcmSortFunction(
     double acquisition_number1 = 0.0;
     double acquisition_number2 = 0.0;
     if (ds1.second.find(tagAcquisitionNumber) != ds1.second.end() && ds2.second.find(tagAcquisitionNumber) != ds2.second.end()) {
-      acquisition_number1 = std::stod(ds1.second.at(tagAcquisitionNumber)); // Acquisition number
-      acquisition_number2 = std::stod(ds2.second.at(tagAcquisitionNumber));
+      acquisition_number1 = stodNoException(ds1.second.at(tagAcquisitionNumber)); // Acquisition number
+      acquisition_number2 = stodNoException(ds2.second.at(tagAcquisitionNumber));
     }
 
     if (acquisition_number1 != acquisition_number2) {
@@ -1185,8 +1194,8 @@ DicomSeriesReader::GdcmSortFunction(
         double temporalIndex2 = 0.0;
         if (ds1.second.find(tagTemporalIndex) != ds1.second.end() && ds2.second.find(tagTemporalIndex) != ds2.second.end())
         {
-          temporalIndex1 = std::stod(ds1.second.at(tagTemporalIndex));
-          temporalIndex2 = std::stod(ds2.second.at(tagTemporalIndex));
+          temporalIndex1 = stodNoException(ds1.second.at(tagTemporalIndex));
+          temporalIndex2 = stodNoException(ds2.second.at(tagTemporalIndex));
         }
 
         if (temporalIndex1 != temporalIndex2)

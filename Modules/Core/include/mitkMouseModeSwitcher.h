@@ -91,7 +91,8 @@ namespace mitk {
       Scroll,
       LevelWindow,
       Zoom,
-      Pan
+      Pan,
+      CrossHair
     };
 
     /**

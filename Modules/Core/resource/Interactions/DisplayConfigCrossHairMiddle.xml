@@ -1,0 +1,11 @@
+<config>
+   <event_variant class="MousePressEvent" name="SetCrosshair">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoveCrosshair">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MoveCrosshair">
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </event_variant>
+</config>

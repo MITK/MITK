@@ -285,6 +285,7 @@ void QmitkRenderWindow::OnFullScreenModeChanged(bool fullscreen)
 
 void QmitkRenderWindow::resizeEvent(QResizeEvent * e)
 {
+  QVTKWidget::resizeEvent(e);
   emit resized();
 }
 

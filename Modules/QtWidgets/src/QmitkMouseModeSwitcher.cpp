@@ -88,7 +88,8 @@ void QmitkMouseModeSwitcher::modeSelectedByUser()
 
     if (m_MouseModeSwitcher)
     {
-      m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::PACS);
+      //Deleted mouse mode "PACS"
+      m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK/*PACS*/);
       m_MouseModeSwitcher->SelectMouseMode( id );
     }
     emit MouseModeSelected( id );

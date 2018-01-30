@@ -303,7 +303,9 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
     QFileDialog *fileDialog = new QFileDialog;
     fileDialog->setDefaultSuffix("IGTToolStorage");
     QString suffix = "IGT Tool Storage (*.IGTToolStorage)";
-    QString filename  = fileDialog->getSaveFileName(nullptr, tr("Save Navigation Tool Storage"), QmitkIGTCommonHelper::GetLastFileSavePath(), suffix, &suffix);
+    // Set default file name to LastFileSavePath + storage name
+    QString defaultFileName = QmitkIGTCommonHelper::GetLastFileSavePath() + "/" + QString::fromStdString(m_NavigationToolStorage->GetName());
+    QString filename  = fileDialog->getSaveFileName(nullptr, tr("Save Navigation Tool Storage"), defaultFileName, suffix, &suffix);
 
     if (filename.isEmpty()) return; //canceled by the user
 

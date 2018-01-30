@@ -1,0 +1,57 @@
+--- Modules/IO/ImageBase/include/itkImageSeriesReader.hxx	2017-12-29 12:33:01.314411129 +0400
++++ Modules/IO/ImageBase/include/itkImageSeriesReader1.hxx	2018-01-30 16:39:45.316780980 +0400
+@@ -95,6 +95,7 @@
+ 
+   Array< float > position1(TOutputImage::ImageDimension); position1.Fill(0.0f);
+   Array< float > position2(TOutputImage::ImageDimension); position2.Fill(0.0f);
++  Array< float > positionx(TOutputImage::ImageDimension); positionx.Fill(0.0f);
+ 
+   ImageRegionType largestRegion;
+   typename TOutputImage::SpacingType spacing;
+@@ -123,7 +124,7 @@
+     }
+ 
+   const int numberOfFiles = static_cast< int >( m_FileNames.size() );
+-  for ( int i = 0; i < 2 && i < numberOfFiles; ++i )
++  for ( int i = 0; i < 5 && i < numberOfFiles; ++i )
+     {
+     const int iFileName = ( m_ReverseOrder ? numberOfFiles - i - 1 : i );
+ 
+@@ -232,6 +233,37 @@
+       // set interslice spacing
+       spacing[this->m_NumberOfDimensionsInImage] = interSliceSpacing;
+       }
++    // if spacingZ is not default (1.0f) test another 4 slices
++    else if ( spacing[this->m_NumberOfDimensionsInImage] != 1.0f && i < 5 )
++      {
++      unsigned int j = 0;
++      if (i > 5) {
++        // increment previous position on i > 0
++        position2 = positionx;
++      }
++      for ( j = 0; j < TOutputImage::ImageDimension; j++ )
++        {
++        positionx[j] = static_cast< float >( readerOutput->GetOrigin()[j] );
++        }
++      // Override the position if there is an ITK_ImageOrigin
++      ExposeMetaData< Array< float > >(reader->GetImageIO()->GetMetaDataDictionary(), key, positionx);
++
++      // Compute the inter slice spacing by computing the distance
++      // between two consective slices
++      float interSliceSpacing = 0.0f;
++      for ( j = 0; j < position2.size(); ++j )
++        {
++        interSliceSpacing += vnl_math_sqr(positionx[j] - position2[j]);
++        }
++      interSliceSpacing = static_cast< float >( std::sqrt(interSliceSpacing) );
++
++      if ( interSliceSpacing != 0.0f )
++        {
++        spacing[this->m_NumberOfDimensionsInImage] =
++            vnl_math_min(interSliceSpacing, spacing[this->m_NumberOfDimensionsInImage]);
++        }
++      }
++    else break;
+     }
+ 
+   output->SetOrigin(origin);       // Set the image origin

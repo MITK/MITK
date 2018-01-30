@@ -226,6 +226,9 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
     }
   }
 
+  // clear map m_OriginalColors
+  m_OriginalColors.clear();
+
   //emit signal
   emit StopTrackingFinished(true, "");
 }

@@ -44,19 +44,6 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QCheckBox" name="m_PACSLikeMouseMode">
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-     <property name="text">
-      <string>Use PACS like mouse interaction (select left mouse button action)</string>
-     </property>
-     <property name="tristate">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
    <item row="3" column="0" colspan="3">
     <widget class="QCheckBox" name="m_DisplayMetaInfo">
      <property name="layoutDirection">

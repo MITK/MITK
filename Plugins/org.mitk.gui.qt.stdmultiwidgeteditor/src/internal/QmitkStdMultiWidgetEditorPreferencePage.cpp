@@ -104,7 +104,8 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
   m_Preferences->PutBool("Display metainfo", m_Ui->m_DisplayMetaInfo->isChecked());
   m_Preferences->PutBool("Selection on 3D View", m_Ui->m_SelectionMode->isChecked());
-  m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
+  // deleted mouse mode "PACS"
+  //m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
   int rotationStep = m_Ui->m_RotationStep->value();
   m_Preferences->PutInt("Rotation Step", rotationStep);
@@ -148,7 +149,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
   m_Ui->m_DisplayMetaInfo->setChecked(m_Preferences->GetBool("Display metainfo", true));
   m_Ui->m_SelectionMode->setChecked(m_Preferences->GetBool("Selection on 3D View", false));
-  m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
+  //m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
   int mode= m_Preferences->GetInt("Rendering Mode",0);
   m_Ui->m_RenderingMode->setCurrentIndex(mode);
   m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));

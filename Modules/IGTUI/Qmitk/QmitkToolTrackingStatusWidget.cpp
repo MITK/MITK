@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)
-  : QWidget(parent), m_Controls(nullptr), m_StatusLabels(nullptr), m_NavigationDatas(nullptr), m_NavDatasNewFlag(false)
+  : QWidget(parent), m_Controls(nullptr), m_StatusLabels(nullptr), m_NavigationDatas(nullptr), m_NavDatasNewFlag(false), m_previewToolStorage(nullptr)
 {
   m_ShowPositions = false;
   m_ShowQuaternions = false;
@@ -64,6 +64,7 @@ void QmitkToolTrackingStatusWidget::SetTextAlignment(Qt::AlignmentFlag alignment
 
 QmitkToolTrackingStatusWidget::~QmitkToolTrackingStatusWidget()
 {
+  m_Context->RemoveServiceListener(this, &QmitkToolTrackingStatusWidget::OnServiceEvent);
   //m_Controls = nullptr;
   if (m_StatusLabels!=nullptr) {delete m_StatusLabels;}
   if (m_NavigationDatas != nullptr)
@@ -72,7 +73,7 @@ QmitkToolTrackingStatusWidget::~QmitkToolTrackingStatusWidget()
     if (m_NavDatasNewFlag)
     {
       delete m_NavigationDatas;
-}
+    }
   }
 }
 

@@ -109,7 +109,6 @@ void mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filenam
   catch(Poco::IllegalStateException e) //temporary solution: replace this by defined exception handling later!
     {
     m_ErrorMessage = "Error: wrong file format! \n (please only load tool storage files)";
-    MITK_ERROR << m_ErrorMessage;
     mitkThrowException(mitk::IGTException) << m_ErrorMessage;
     }
 

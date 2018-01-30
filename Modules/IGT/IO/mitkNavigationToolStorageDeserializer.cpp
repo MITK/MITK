@@ -55,8 +55,8 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
   {
-  //decomress zip file into temporary directory
-  decomressFiles(filename,m_tempDirectory);
+  //decompress zip file into temporary directory
+  decompressFiles(filename,m_tempDirectory);
 
   //now read all files and convert them to navigation tools
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New(m_DataStorage);
@@ -90,7 +90,7 @@ s = out.str();
 return s;
 }
 
-void mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filename,std::string path)
+void mitk::NavigationToolStorageDeserializer::decompressFiles(std::string filename,std::string path)
 {
   std::ifstream file( filename.c_str(), std::ios::binary );
   if (!file.good())
@@ -109,7 +109,6 @@ void mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filenam
   catch(Poco::IllegalStateException e) //temporary solution: replace this by defined exception handling later!
     {
     m_ErrorMessage = "Error: wrong file format! \n (please only load tool storage files)";
-    MITK_ERROR << m_ErrorMessage;
     mitkThrowException(mitk::IGTException) << m_ErrorMessage;
     }
 

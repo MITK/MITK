@@ -293,9 +293,6 @@ QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(
 
 void QmitkUSNewVideoDeviceWidget::ChangeUIEditingUSVideoDevice()
 {
-  //deactivate the group box containing Videosource options because they should not be changed
-  m_Controls->m_GroupBoxVideoSource->setEnabled(false);
-
   //activate the groupbox contaning the options to edit the probes of the device and fill it with information
   m_Controls->m_GroupBoxEditProbes->setEnabled(true);
   std::vector<mitk::USProbe::Pointer> probes = m_TargetDevice->GetAllProbes();

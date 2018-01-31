@@ -71,6 +71,7 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGeometryTransformHolder.cpp
   DataManagement/mitkGroupTagProperty.cpp
+  DataManagement/mitkGenericIDRelationRule.cpp
   DataManagement/mitkIdentifiable.cpp
   DataManagement/mitkImageAccessorBase.cpp
   DataManagement/mitkImageCaster.cpp
@@ -148,6 +149,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkPropertyPersistence.cpp
   DataManagement/mitkPropertyPersistenceInfo.cpp
+  DataManagement/mitkPropertyRelationRuleBase.cpp
   DataManagement/mitkProportionalTimeGeometry.cpp
   DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp

@@ -91,6 +91,7 @@ namespace mitk
     // IPropertyOwner
     BaseProperty * GetNonConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) override;
     void SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
+    virtual void RemoveProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = false) override;
 
     mitk::Mapper *GetMapper(MapperSlotId id) const;
 

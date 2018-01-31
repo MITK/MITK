@@ -325,7 +325,21 @@ void mitk::BaseData::SetProperty(const std::string &propertyKey, BaseProperty *p
     return;
   }
 
-  mitkThrow() << "Unknown property context.";
+  mitkThrow() << "Unknown or unsupported non-default property context.";
+}
+
+void mitk::BaseData::RemoveProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext)
+{
+  if (propertyKey.empty())
+    mitkThrow() << "Property key is empty.";
+
+  if (contextName.empty() || fallBackOnDefaultContext)
+  {
+    m_PropertyList->RemoveProperty(propertyKey);
+    return;
+  }
+
+  mitkThrow() << "Unknown or unsupported non-default property context.";
 }
 
 std::vector<std::string> mitk::BaseData::GetPropertyKeys(const std::string &contextName, bool includeDefaultContext) const

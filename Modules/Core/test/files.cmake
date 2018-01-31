@@ -61,6 +61,7 @@ set(MODULE_TESTS
   mitkPropertyListTest.cpp
   mitkPropertyPersistenceTest.cpp
   mitkPropertyPersistenceInfoTest.cpp
+  mitkPropertyRelationRuleBaseTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkSurfaceTest.cpp
@@ -118,6 +119,7 @@ set(MODULE_TESTS
   mitkPropertyNameHelperTest.cpp
   mitkNodePredicateGeometryTest.cpp
   mitkPreferenceListReaderOptionsFunctorTest.cpp
+  mitkGenericIDRelationRuleTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

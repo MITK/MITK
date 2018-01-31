@@ -1,5 +1,5 @@
---- Modules/IO/ImageBase/include/itkImageSeriesReader.hxx	2017-12-29 12:33:01.314411129 +0400
-+++ Modules/IO/ImageBase/include/itkImageSeriesReader1.hxx	2018-01-30 16:39:45.316780980 +0400
+--- a/Modules/IO/ImageBase/include/itkImageSeriesReader.hxx	2017-12-29 12:33:01.314411129 +0400
++++ n/Modules/IO/ImageBase/include/itkImageSeriesReader.hxx	2018-01-30 16:39:45.316780980 +0400
 @@ -95,6 +95,7 @@
  
    Array< float > position1(TOutputImage::ImageDimension); position1.Fill(0.0f);

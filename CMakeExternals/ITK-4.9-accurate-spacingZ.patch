@@ -48,7 +48,7 @@
 +      if ( interSliceSpacing != 0.0f )
 +        {
 +        spacing[this->m_NumberOfDimensionsInImage] =
-+            vnl_math_min(interSliceSpacing, spacing[this->m_NumberOfDimensionsInImage]);
++            vnl_math_min(interSliceSpacing, static_cast< float >(spacing[this->m_NumberOfDimensionsInImage]));
 +        }
 +      }
 +    else break;

@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlImageMessage.h>
 #include <itkByteSwapper.h>
 
+#include <vtkSmartPointer.h>
+
 void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   mitk::Image::Pointer& img)
 {
@@ -114,7 +116,7 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 
   float matF[4][4];
   msg->GetMatrix(matF);
-  vtkMatrix4x4* vtkMatrix = vtkMatrix4x4::New();
+  vtkSmartPointer<vtkMatrix4x4> vtkMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
 
   for (size_t i = 0; i < 4; ++i)
     for (size_t j = 0; j < 4; ++j)
@@ -153,7 +155,6 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   img->SetVolume(output->GetBufferPointer());
   //img->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(vtkMatrix);
   m_previousImage = img;
-  vtkMatrix->Delete();
 
   float iorigin[3];
   msg->GetOrigin(iorigin);

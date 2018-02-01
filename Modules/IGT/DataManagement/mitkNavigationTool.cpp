@@ -188,16 +188,16 @@ void mitk::NavigationTool::SetDefaultSurface()
 
   double axisLength = 5.;
 
-  vtkSphereSource *vtkSphere = vtkSphereSource::New();
-  vtkConeSource *vtkCone = vtkConeSource::New();
-  vtkCylinderSource *vtkCylinder = vtkCylinderSource::New();
-  vtkPolyData* axis = vtkPolyData::New();
-  vtkLineSource *vtkLine = vtkLineSource::New();
-  vtkLineSource *vtkLine2 = vtkLineSource::New();
-  vtkLineSource *vtkLine3 = vtkLineSource::New();
+  vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSmartPointer<vtkConeSource> vtkCone = vtkSmartPointer<vtkConeSource>::New();
+  vtkSmartPointer<vtkCylinderSource> vtkCylinder = vtkSmartPointer<vtkCylinderSource>::New();
+  vtkSmartPointer<vtkPolyData> axis = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkLineSource> vtkLine = vtkSmartPointer<vtkLineSource>::New();
+  vtkSmartPointer<vtkLineSource> vtkLine2 = vtkSmartPointer<vtkLineSource>::New();
+  vtkSmartPointer<vtkLineSource> vtkLine3 = vtkSmartPointer<vtkLineSource>::New();
 
-  vtkAppendPolyData* appendPolyData = vtkAppendPolyData::New();
-  vtkPolyData* surface = vtkPolyData::New();
+  vtkSmartPointer<vtkAppendPolyData> appendPolyData = vtkSmartPointer<vtkAppendPolyData>::New();
+  vtkSmartPointer<vtkPolyData> surface = vtkSmartPointer<vtkPolyData>::New();
 
   //Y-Axis (start with y, cause cylinder is oriented in y by vtk default...)
   vtkCone->SetDirection(0, 1, 0);
@@ -233,9 +233,9 @@ void mitk::NavigationTool::SetDefaultSurface()
   surface->DeepCopy(appendPolyData->GetOutput());
 
   //X-axis
-  vtkTransform *XTransform = vtkTransform::New();
+  vtkSmartPointer<vtkTransform> XTransform = vtkSmartPointer<vtkTransform>::New();
   XTransform->RotateZ(-90);
-  vtkTransformPolyDataFilter *TrafoFilter = vtkTransformPolyDataFilter::New();
+  vtkSmartPointer<vtkTransformPolyDataFilter> TrafoFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   TrafoFilter->SetTransform(XTransform);
   TrafoFilter->SetInputData(axis);
   TrafoFilter->Update();
@@ -257,7 +257,7 @@ void mitk::NavigationTool::SetDefaultSurface()
   surface->DeepCopy(appendPolyData->GetOutput());
 
   //Z-axis
-  vtkTransform *ZTransform = vtkTransform::New();
+  vtkSmartPointer<vtkTransform> ZTransform = vtkSmartPointer<vtkTransform>::New();
   ZTransform->RotateX(90);
   TrafoFilter->SetTransform(ZTransform);
   TrafoFilter->SetInputData(axis);
@@ -295,7 +295,7 @@ void mitk::NavigationTool::SetDefaultSurface()
   surface->DeepCopy(appendPolyData->GetOutput());
 
   //Scale
-  vtkTransform *ScaleTransform = vtkTransform::New();
+  vtkSmartPointer<vtkTransform> ScaleTransform = vtkSmartPointer<vtkTransform>::New();
   ScaleTransform->Scale(20., 20., 20.);
 
   TrafoFilter->SetTransform(ScaleTransform);
@@ -304,18 +304,18 @@ void mitk::NavigationTool::SetDefaultSurface()
 
   mySphere->SetVtkPolyData(TrafoFilter->GetOutput());
 
-  vtkCone->Delete();
-  vtkSphere->Delete();
-  vtkLine->Delete();
-  vtkLine2->Delete();
-  vtkLine3->Delete();
-  vtkCylinder->Delete();
-  ZTransform->Delete();
-  XTransform->Delete();
-  ScaleTransform->Delete();
-  TrafoFilter->Delete();
-  appendPolyData->Delete();
-  surface->Delete();
+  //vtkCone->Delete();
+  //vtkSphere->Delete();
+  //vtkLine->Delete();
+  //vtkLine2->Delete();
+  //vtkLine3->Delete();
+  //vtkCylinder->Delete();
+  //ZTransform->Delete();
+  //XTransform->Delete();
+  //ScaleTransform->Delete();
+  //TrafoFilter->Delete();
+  //appendPolyData->Delete();
+  //surface->Delete();
 
   this->GetDataNode()->SetData(mySphere);
 }

@@ -413,12 +413,11 @@ void IGTNavigationToolCalibration::ShowToolTipPreview(mitk::NavigationData::Poin
     blue.SetBlue(1);
     m_ToolTipPointPreview->SetColor(blue);
     mitk::Surface::Pointer mySphere = mitk::Surface::New();
-    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkSmartPointer<vtkSphereSource> vtkData = vtkSmartPointer<vtkSphereSource>::New();
     vtkData->SetRadius(3.0f);
     vtkData->SetCenter(0.0, 0.0, 0.0);
     vtkData->Update();
     mySphere->SetVtkPolyData(vtkData->GetOutput());
-    vtkData->Delete();
     m_ToolTipPointPreview->SetData(mySphere);
 
     this->GetDataStorage()->Add(m_ToolTipPointPreview);

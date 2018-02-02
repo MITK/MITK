@@ -927,7 +927,7 @@ bool mitk::DisplayInteractor::GetBoolProperty(mitk::PropertyList::Pointer proper
 
 mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(DataStorage::SetOfObjects::ConstPointer nodes,
                                                                  Point3D worldposition,
-                                                                 BaseRenderer *)
+                                                                 BaseRenderer* baseRender)
 {
   DataNode::Pointer topLayerNode;
 
@@ -963,6 +963,9 @@ mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(DataStorage::Se
       continue;
 
     if (layer <= maxLayer)
+      continue;
+
+    if (!node->IsVisible(baseRender))
       continue;
 
     topLayerNode = node;

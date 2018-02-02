@@ -31,7 +31,11 @@ namespace Utilities
   {
   public:
     ThreadPool();
+    explicit ThreadPool(size_t count);
+
     ~ThreadPool();
+
+    void AddThreads(size_t count);
 
     size_t Enqueue(const Task& task, TaskPriority priority = TaskPriority::NORMAL);
 
@@ -95,6 +99,7 @@ namespace Utilities
   private:
     typedef boost::recursive_mutex::scoped_lock Lock;
 
+    mutable boost::shared_mutex m_poolMutex;
     ThreadPool& m_pool;
 
     mutable boost::recursive_mutex m_mutex;

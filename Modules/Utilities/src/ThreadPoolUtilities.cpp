@@ -1,5 +1,7 @@
 #include "ThreadPoolUtilities.h"
 
+#include <memory>
+
 #include <boost/bind.hpp>
 #include <boost/utility/typed_in_place_factory.hpp>
 
@@ -9,7 +11,7 @@
 
 namespace
 {
-  Utilities::ThreadPool s_instance;
+  std::unique_ptr<Utilities::ThreadPool> s_instance;
 }
 
 namespace Utilities
@@ -19,10 +21,15 @@ namespace Utilities
     , m_id(0)
     , m_count(0)
   {
-    const auto count = boost::thread::hardware_concurrency();
-    for (size_t i = 0; i < count; ++i) {
-      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)))->get_id();
-    }
+    AddThreads(boost::thread::hardware_concurrency());
+  }
+
+  ThreadPool::ThreadPool(size_t count)
+    : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
+    , m_id(0)
+    , m_count(0)
+  {
+    AddThreads(count);
   }
 
   ThreadPool::~ThreadPool()
@@ -33,7 +40,19 @@ namespace Utilities
 
   ThreadPool& ThreadPool::Instance()
   {
-    return s_instance;
+    if (!s_instance) {
+      s_instance.reset(new ThreadPool());
+    }
+    return *s_instance;
+  }
+
+  void ThreadPool::AddThreads(size_t count)
+  {
+    const boost::unique_lock<boost::shared_mutex> lock(m_guard);
+
+    for (size_t i = 0; i < count; ++i) {
+      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)));
+    }
   }
 
   size_t ThreadPool::Enqueue(const Task& task, TaskPriority priority)
@@ -139,7 +158,11 @@ namespace Utilities
   template <typename TCheck>
   void ThreadPool::Wait(const TCheck& check)
   {
-    if (m_pool.is_this_thread_in()) {
+    boost::shared_lock<boost::shared_mutex> lock(m_guard);
+    const bool isInPool = m_pool.is_this_thread_in();
+    lock.unlock();
+
+    if (isInPool) {
       while (!check()) {
         DoTask();
       }

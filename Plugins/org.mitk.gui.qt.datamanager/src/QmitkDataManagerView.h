@@ -170,6 +170,8 @@ public slots:
   /// Whenever the selection changes set the "selected" property respectively
   void NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
 
+  void OnNodeVisibilityChanged();
+
   /// Opens the editor with the given id using the current data storage
   void ShowIn(const QString& editorId);
 
@@ -253,6 +255,7 @@ protected:
 
   /// if true, GlobalReinit() is called if a node is deleted
   bool  m_GlobalReinitOnNodeDelete;
+  bool m_GlobalReinitOnNodeVisibilityChanged;
 
   QmitkDataManagerItemDelegate* m_ItemDelegate;
 

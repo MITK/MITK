@@ -35,6 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// \ingroup QmitkModule
 class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeModel : public QAbstractItemModel
 {
+  Q_OBJECT
+
   //# CONSTANTS,TYPEDEFS
 public:
   static const std::string COLUMN_NAME;
@@ -131,6 +133,10 @@ public:
 
   /// Set whether to allow hierarchy changes by dragging and dropping
   void SetAllowHierarchyChange(bool allowHierarchyChange);
+
+signals:
+
+ void nodeVisibilityChanged();
 
   //# MISC
 protected:

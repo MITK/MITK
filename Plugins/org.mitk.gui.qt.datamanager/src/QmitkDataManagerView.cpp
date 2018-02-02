@@ -93,8 +93,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 const QString QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
 QmitkDataManagerView::QmitkDataManagerView()
-    : m_GlobalReinitOnNodeDelete(true),
-      m_ItemDelegate(nullptr)
+  : m_GlobalReinitOnNodeDelete(true)
+  , m_GlobalReinitOnNodeVisibilityChanged(false)
+  , m_ItemDelegate(nullptr)
 {
 }
 
@@ -157,16 +158,17 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_ItemDelegate = new QmitkDataManagerItemDelegate(m_NodeTreeView);
   m_NodeTreeView->setItemDelegate(m_ItemDelegate);
 
-  QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
+  connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
-  QObject::connect( m_NodeTreeModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))
+  connect( m_NodeTreeModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))
     , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex&, int, int )) );
-  QObject::connect( m_NodeTreeModel, SIGNAL(rowsRemoved (const QModelIndex&, int, int))
+  connect( m_NodeTreeModel, SIGNAL(rowsRemoved (const QModelIndex&, int, int))
     , this, SLOT(NodeTreeViewRowsRemoved( const QModelIndex&, int, int )) );
-  QObject::connect( m_NodeTreeView->selectionModel()
+  connect( m_NodeTreeView->selectionModel()
     , SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) )
     , this
     , SLOT( NodeSelectionChanged ( const QItemSelection &, const QItemSelection & ) ) );
+  connect(m_NodeTreeModel, &QmitkDataStorageTreeModel::nodeVisibilityChanged, this, &QmitkDataManagerView::OnNodeVisibilityChanged);
 
   //# m_NodeMenu
   m_NodeMenu = new QMenu(m_NodeTreeView);
@@ -649,47 +651,47 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
 
 void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
-    m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
+  if (m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() != prefs->GetBool("Place new nodes on top", true))
+  {
+    m_NodeTreeModel->SetPlaceNewNodesOnTop(!m_NodeTreeModel->GetPlaceNewNodesOnTopFlag());
+  }
 
   bool hideHelperObjects = !prefs->GetBool("Show helper objects", false);
   if (m_FilterModel->HasFilterPredicate(m_HelperObjectFilterPredicate) != hideHelperObjects)
   {
     if (hideHelperObjects)
     {
-        m_FilterModel->AddFilterPredicate(m_HelperObjectFilterPredicate);
+      m_FilterModel->AddFilterPredicate(m_HelperObjectFilterPredicate);
     }
     else
     {
-        m_FilterModel->RemoveFilterPredicate(m_HelperObjectFilterPredicate);
+      m_FilterModel->RemoveFilterPredicate(m_HelperObjectFilterPredicate);
     }
   }
-  bool hideNodesWithNoData = !prefs->GetBool("Show nodes containing no data", false);
 
+  bool hideNodesWithNoData = !prefs->GetBool("Show nodes containing no data", false);
   if (m_FilterModel->HasFilterPredicate(m_NodeWithNoDataFilterPredicate) != hideNodesWithNoData)
   {
     if (hideNodesWithNoData)
     {
-        m_FilterModel->AddFilterPredicate(m_NodeWithNoDataFilterPredicate);
+      m_FilterModel->AddFilterPredicate(m_NodeWithNoDataFilterPredicate);
     }
     else
     {
-        m_FilterModel->RemoveFilterPredicate(m_NodeWithNoDataFilterPredicate);
+      m_FilterModel->RemoveFilterPredicate(m_NodeWithNoDataFilterPredicate);
     }
   }
 
   m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
+  m_GlobalReinitOnNodeVisibilityChanged = prefs->GetBool("Call global reinit if node visibility is changed", false);
 
   m_NodeTreeView->expandAll();
 
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
 
-  m_NodeTreeModel->SetAllowHierarchyChange(
-    prefs->GetBool("Allow changing of parent node", false));
+  m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", false));
 
   this->GlobalReinit();
-
-
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
@@ -1177,6 +1179,18 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
   }
   //changing the selection does NOT require any rendering processes!
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkDataManagerView::OnNodeVisibilityChanged()
+{
+  if (m_GlobalReinitOnNodeVisibilityChanged)
+  {
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkDataManagerView::ShowIn(const QString &editorId)

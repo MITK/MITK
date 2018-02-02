@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * * bar chart: http://c3js.org/samples/chart_bar.html
 * * spline chart: http://c3js.org/samples/chart_spline.html
 * * pie chart: http://c3js.org/samples/chart_pie.html
+* * scatter chart: http://c3js.org/samples/chart_scatter.html
 * \n Technical details: The javascript code is embedded in a QWebEngineView. The actual js code is implemented in resource\Chart.js.
 * \sa http://c3js.org for further information about the used javaScript library.
 * \warning Pie is significantly different than the other types. Here, the data given by AddData1D is summed. Each entry represents a different category.
@@ -128,13 +129,10 @@ public:
   void SetYAxisScale(AxisScale scale);
 
   void SetXAxisLabel(const std::string& label);
-  std::string GetXAxisLabel() const;
 
   void SetYAxisLabel(const std::string& label);
-  std::string GetYAxisLabel() const;
 
   void SetTitle(const std::string &title);
-  std::string GetTitle() const;
 
   /*!
   * \brief sets the chart type for a data entry
@@ -145,10 +143,8 @@ public:
   void SetChartType(const std::string& label, ChartType type);
 
   void SetLegendPosition(LegendPosition position);
-  LegendPosition GetLegendPosition() const;
 
   void SetShowLegend(bool show);
-  bool GetShowLegend() const;
 
   /*!
   * \brief Changes the chart type for all data entries and reloads the chart
@@ -167,7 +163,6 @@ public:
   * \param showDataPoints if dataPoints are displayed inside the widget or not.
   */
   void SetShowDataPoints(bool showDataPoints);
-  bool GetShowDataPoints() const;
 
   /*!
   * \brief Clears all data inside and resets the widget.

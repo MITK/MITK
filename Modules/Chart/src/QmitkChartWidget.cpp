@@ -50,25 +50,19 @@ public:
   void SetYAxisScale(AxisScale scale);
 
   void SetXAxisLabel(const std::string& label);
-  std::string GetXAxisLabel() const;
 
   void SetYAxisLabel(const std::string& label);
-  std::string GetYAxisLabel() const;
 
   void SetTitle(const std::string &title);
-  std::string GetTitle() const;
 
   void SetLegendPosition(LegendPosition position);
-  LegendPosition GetLegendPosition() const;
-  std::string GetLegendPositionAsString() const;
 
   void SetShowLegend(bool show);
-  bool GetShowLegend() const;
 
   void SetShowDataPoints(bool showDataPoints = false);
-  bool GetShowDataPoints() const;
 
   void SetChartType(const std::string& label, QmitkChartWidget::ChartType chartType);
+
   std::string ConvertChartTypeToString(QmitkChartWidget::ChartType chartType) const;
 
   void ClearJavaScriptChart();
@@ -263,24 +257,12 @@ void QmitkChartWidget::Impl::SetXAxisLabel(const std::string& label) {
   GetC3Data()->SetXAxisLabel(QString::fromStdString(label)); 
 }
 
-std::string QmitkChartWidget::Impl::GetXAxisLabel() const { 
-  return GetC3Data()->GetXAxisLabel().toString().toStdString(); 
-}
-
 void QmitkChartWidget::Impl::SetYAxisLabel(const std::string& label) {
   GetC3Data()->SetYAxisLabel(QString::fromStdString(label)); 
 }
 
-std::string QmitkChartWidget::Impl::GetYAxisLabel() const { 
-  return GetC3Data()->GetYAxisLabel().toString().toStdString(); 
-}
-
 void QmitkChartWidget::Impl::SetTitle(const std::string& title) {
   GetC3Data()->SetTitle(QString::fromStdString(title));
-}
-
-std::string QmitkChartWidget::Impl::GetTitle() const {
-  return GetC3Data()->GetTitle().toString().toStdString();
 }
 
 void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition legendPosition) {
@@ -288,25 +270,8 @@ void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition 
   GetC3Data()->SetLegendPosition(QString::fromStdString(legendPositionName));
 }
 
-QmitkChartWidget::LegendPosition QmitkChartWidget::Impl::GetLegendPosition() const {
-  for (const auto& aLegendPosition : m_LegendPositionToName) {
-    if (aLegendPosition.second == GetLegendPositionAsString()) {
-      return aLegendPosition.first;
-    }
-  }
-  mitkThrow() << "can't find legend position!";
-}
-
-std::string QmitkChartWidget::Impl::GetLegendPositionAsString() const {
-  return GetC3Data()->GetLegendPosition().toString().toStdString();
-}
-
 void QmitkChartWidget::Impl::SetShowLegend(bool show) {
   GetC3Data()->SetShowLegend(show);
-}
-
-bool QmitkChartWidget::Impl::GetShowLegend() const {
-  return GetC3Data()->GetShowLegend().toBool();
 }
 
 void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints) {
@@ -315,16 +280,6 @@ void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints) {
   }
   else {
     GetC3Data()->SetDataPointSize(0);
-  }
-}
-
-bool QmitkChartWidget::Impl::GetShowDataPoints() const{
-  int value = GetC3Data()->GetDataPointSize().toInt();
-  if (value > 0) {
-    return true;
-  }
-  else {
-    return false;
   }
 }
 
@@ -433,19 +388,9 @@ void QmitkChartWidget::SetXAxisLabel(const std::string & label)
 	m_Impl->SetXAxisLabel(label);
 }
 
-std::string QmitkChartWidget::GetXAxisLabel() const
-{
-	return m_Impl->GetXAxisLabel();
-}
-
 void QmitkChartWidget::SetYAxisLabel(const std::string & label)
 {
 	m_Impl->SetYAxisLabel(label);
-}
-
-std::string QmitkChartWidget::GetYAxisLabel() const
-{
-	return m_Impl->GetYAxisLabel();
 }
 
 void QmitkChartWidget::SetTitle(const std::string & title)
@@ -453,19 +398,9 @@ void QmitkChartWidget::SetTitle(const std::string & title)
   m_Impl->SetTitle(title);
 }
 
-std::string QmitkChartWidget::GetTitle() const
-{
-  return m_Impl->GetTitle();
-}
-
 void QmitkChartWidget::SetShowDataPoints(bool showDataPoints)
 {
   m_Impl->SetShowDataPoints(showDataPoints);
-}
-
-bool QmitkChartWidget::GetShowDataPoints() const
-{
-  return m_Impl->GetShowDataPoints();
 }
 
 void QmitkChartWidget::SetChartType(const std::string& label, ChartType type)
@@ -478,19 +413,9 @@ void QmitkChartWidget::SetLegendPosition(LegendPosition position)
   m_Impl->SetLegendPosition(position);
 }
 
-QmitkChartWidget::LegendPosition QmitkChartWidget::GetLegendPosition() const
-{
-  return m_Impl->GetLegendPosition();
-}
-
 void QmitkChartWidget::SetShowLegend(bool show)
 {
   m_Impl->SetShowLegend(show);
-}
-
-bool QmitkChartWidget::GetShowLegend() const
-{
-  return m_Impl->GetShowLegend();
 }
 
 void QmitkChartWidget::Show(bool showSubChart)

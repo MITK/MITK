@@ -93,7 +93,7 @@ protected:
   ImageToItk()
   : m_CopyMemFlag(false)
   , m_Channel(0)
-  , m_Options(mitk::ImageAccessorBase::DefaultBehavior)
+  , m_Options(mitk::ImageAccessorBase::IgnoreLock)
   {
   }
 

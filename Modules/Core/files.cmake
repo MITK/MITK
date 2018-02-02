@@ -178,6 +178,8 @@ set(CPP_FILES
   DataManagement/mitkVtkScalarModeProperty.cpp
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
+  DataManagement/mitkIPropertyRelations.cpp
+  DataManagement/mitkPropertyRelations.cpp
 
   Interactions/mitkAction.cpp
   Interactions/mitkBindDispatcherInteractor.cpp

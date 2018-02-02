@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
+#include <mitkIPropertyRelations.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -90,6 +91,11 @@ namespace mitk
   IPropertyPersistence *CoreServices::GetPropertyPersistence(us::ModuleContext *context)
   {
     return GetCoreService<IPropertyPersistence>(context);
+  }
+
+  IPropertyRelations *CoreServices::GetPropertyRelations(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyRelations>(context);
   }
 
   IMimeTypeProvider *CoreServices::GetMimeTypeProvider(us::ModuleContext *context)

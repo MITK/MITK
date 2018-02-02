@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
 #include <mitkPropertyPersistence.h>
+#include <mitkPropertyRelations.h>
 
 // Micro Services
 #include <usModuleActivator.h>
@@ -64,6 +65,7 @@ private:
   std::unique_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::unique_ptr<mitk::PropertyFilters> m_PropertyFilters;
   std::unique_ptr<mitk::PropertyPersistence> m_PropertyPersistence;
+  std::unique_ptr<mitk::PropertyRelations> m_PropertyRelations;
   std::unique_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
 
   // File IO

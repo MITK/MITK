@@ -62,6 +62,7 @@ set(MODULE_TESTS
   mitkPropertyPersistenceTest.cpp
   mitkPropertyPersistenceInfoTest.cpp
   mitkPropertyRelationRuleBaseTest.cpp
+  mitkPropertyRelationsTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkSurfaceTest.cpp

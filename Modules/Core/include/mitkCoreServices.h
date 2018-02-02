@@ -37,6 +37,7 @@ namespace mitk
   class IPropertyExtensions;
   class IPropertyFilters;
   class IPropertyPersistence;
+  class IPropertyRelations;
 
   /**
    * @brief Access MITK core services.
@@ -94,6 +95,13 @@ namespace mitk
     * @return A non-nullptr IPropertyPersistence instance.
     */
     static IPropertyPersistence *GetPropertyPersistence(us::ModuleContext *context = us::GetModuleContext());
+
+    /**
+    * @brief Get an IPropertyRelations instance.
+    * @param context The module context of the module getting the service.
+    * @return A non-nullptr IPropertyRelations instance.
+    */
+    static IPropertyRelations *GetPropertyRelations(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * @brief Get an IMimeTypeProvider instance.

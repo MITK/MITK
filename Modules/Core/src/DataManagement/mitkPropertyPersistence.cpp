@@ -223,7 +223,6 @@ bool mitk::PropertyPersistence::HasInfo(const std::string &propertyName, bool al
 void mitk::PropertyPersistence::RemoveAllInfo()
 {
   m_InfoMap.clear();
-  m_InfoMap.clear();
 }
 
 void mitk::PropertyPersistence::RemoveInfo(const std::string &propertyName)

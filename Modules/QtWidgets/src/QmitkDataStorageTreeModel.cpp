@@ -783,7 +783,7 @@ bool QmitkDataStorageTreeModel::setData(const QModelIndex &index, const QVariant
     int checkstate = qcheckstate.toInt();
     bool isVisible = bool(checkstate);
     dataNode->SetVisibility(!isVisible);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    emit nodeVisibilityChanged();
   }
   // inform listeners about changes
   emit dataChanged(index, index);

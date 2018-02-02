@@ -63,6 +63,7 @@ namespace Utilities
 
     boost::asio::io_service m_service;
     boost::optional<boost::asio::io_service::work> m_work;
+    mutable boost::shared_mutex m_guard;
     boost::thread_group m_pool;
     boost::system::error_code m_error;
 
@@ -99,7 +100,6 @@ namespace Utilities
   private:
     typedef boost::recursive_mutex::scoped_lock Lock;
 
-    mutable boost::shared_mutex m_poolMutex;
     ThreadPool& m_pool;
 
     mutable boost::recursive_mutex m_mutex;

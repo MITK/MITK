@@ -351,7 +351,6 @@ void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
 {
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
-  m_WebEngineView->setEnabled(false);
 }
 
 void QmitkChartWidget::Impl::InitializeJavaScriptChart()

@@ -167,6 +167,11 @@ void QmitkChartWidget::Impl::AddData2D(const std::map<double, double>& data2D, c
 
   auto definedLabels = GetDataLabels(GetC3xyData());
   auto uniqueLabel = GetUniqueLabelName(definedLabels, label);
+  if (type == ChartType::scatter)
+  {
+    SetShowDataPoints(true);
+    MITK_INFO << "Enabling data points for all because of scatter plot";
+  }
 
   GetC3xyData()->push_back(new QmitkChartxyData(data2DConverted, QVariant(QString::fromStdString(uniqueLabel)), QVariant(QString::fromStdString(chartTypeName))));
 }
@@ -326,6 +331,11 @@ bool QmitkChartWidget::Impl::GetShowDataPoints() const{
 void QmitkChartWidget::Impl::SetChartType(const std::string& label, QmitkChartWidget::ChartType chartType) {
   auto element = GetDataElementByLabel(GetC3xyData(), label);
   if (element) {
+    if (chartType == ChartType::scatter)
+    {
+      SetShowDataPoints(true);
+      MITK_INFO << "Enabling data points for all because of scatter plot";
+    }
     const std::string chartTypeName(m_ChartTypeToName.at(chartType));
     element->SetChartType(QVariant(QString::fromStdString(chartTypeName)));
   }

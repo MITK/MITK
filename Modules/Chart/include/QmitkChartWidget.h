@@ -50,7 +50,8 @@ public:
     spline, /*!< spline chart (smoothed line chart), see http://c3js.org/samples/chart_spline.html */
     pie, /*!< pie chart, see http://c3js.org/samples/chart_pie.html*/
     area, /*!< area chart, see http://c3js.org/samples/chart_area.html*/
-    area_spline /*!< area-spline chart, see http://c3js.org/samples/chart_area.html*/
+    area_spline, /*!< area-spline chart, see http://c3js.org/samples/chart_area.html*/
+    scatter /*!< scatter chart, see http://c3js.org/samples/chart_scatter.html*/
   };
   enum class ChartStyle {
     darkstyle,

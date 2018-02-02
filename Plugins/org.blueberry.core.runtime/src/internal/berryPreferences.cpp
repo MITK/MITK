@@ -358,8 +358,8 @@ namespace berry
 
   void Preferences::PutByteArray(const QString& key, const QByteArray& value)
   {
-    QMutexLocker scopedMutex(&m_Mutex);
-    AssertValid_unlocked();
+    //QMutexLocker scopedMutex(&m_Mutex);
+    //AssertValid_unlocked();
     this->Put(key, value.toBase64().data());
   }
 

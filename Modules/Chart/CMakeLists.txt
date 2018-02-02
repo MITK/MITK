@@ -5,5 +5,7 @@ ENDIF()
 
 MITK_CREATE_MODULE(
   DEPENDS MitkCore
-  PACKAGE_DEPENDS PRIVATE Qt5|WebEngineWidgets
+  PACKAGE_DEPENDS PUBLIC Qt5|WebEngineWidgets
 )
+
+add_subdirectory(test)

@@ -1263,7 +1263,7 @@ namespace mitk
 
     while( !itmask.IsAtEnd() )
     {
-      if(m_IgnorePixelValue == itimage.Get())
+      if (itk::Math::AlmostEquals<double>(m_IgnorePixelValue, static_cast<double>(itimage.Get())))
       {
         itmask.Set(0);
       }

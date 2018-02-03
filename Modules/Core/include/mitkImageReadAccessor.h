@@ -50,13 +50,13 @@ public:
   ImageReadAccessor(
       ImageConstPointer image,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::DefaultBehavior
+      int OptionFlags = ImageAccessorBase::IgnoreLock
       );
 
   ImageReadAccessor(
       ImagePointer image,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::DefaultBehavior
+      int OptionFlags = ImageAccessorBase::IgnoreLock
       );
 
   ImageReadAccessor(const Image* image, const ImageDataItem* iDI = nullptr);

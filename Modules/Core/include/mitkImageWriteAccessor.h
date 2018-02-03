@@ -46,7 +46,7 @@ public:
   ImageWriteAccessor(
       ImagePointer image,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::DefaultBehavior
+      int OptionFlags = ImageAccessorBase::IgnoreLock
       );
 
   /** \brief Gives full data access. */

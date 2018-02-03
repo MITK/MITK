@@ -31,7 +31,11 @@ namespace Utilities
   {
   public:
     ThreadPool();
+    explicit ThreadPool(size_t count);
+
     ~ThreadPool();
+
+    void AddThreads(size_t count);
 
     size_t Enqueue(const Task& task, TaskPriority priority = TaskPriority::NORMAL);
 
@@ -59,6 +63,7 @@ namespace Utilities
 
     boost::asio::io_service m_service;
     boost::optional<boost::asio::io_service::work> m_work;
+    mutable boost::shared_mutex m_guard;
     boost::thread_group m_pool;
     boost::system::error_code m_error;
 

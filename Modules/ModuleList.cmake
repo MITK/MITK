@@ -5,7 +5,6 @@ set(MITK_MODULES
   Core
   CommandLine
   AppUtil
-  DCMTesting
   RDF
   LegacyIO
   DataTypesExt

@@ -61,6 +61,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION( "check_position_event", CheckPositionEvent );
   CONNECT_CONDITION( "check_can_rotate", CheckRotationPossible );
   CONNECT_CONDITION( "check_can_swivel", CheckSwivelPossible );
+  CONNECT_CONDITION("check_is_in_mouse_rotation_mode", IsInMouseRotationMode);
   CONNECT_CONDITION( "isOverObject", IsOverObject);
 
   CONNECT_FUNCTION("init", Init);
@@ -90,10 +91,15 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotateBackClock", RotateBackClock);
   CONNECT_FUNCTION("selectObject", SelectObject);
   CONNECT_FUNCTION("deSelectObject", DeSelectObject);
+
+  CONNECT_FUNCTION("startMouseCameraRotation", StartMouseRotation);
+  CONNECT_FUNCTION("mouseRotateCamera", MouseRotateCamera);
+  CONNECT_FUNCTION("stopMouseCameraRotation", StopMouseRotation);
 }
 
-
 double mitk::DisplayInteractor::m_ClockRotationSpeed = 90.;
+bool mitk::DisplayInteractor::m_MouseRotationMode = false;
+std::function<void()> mitk::DisplayInteractor::m_CurrentCallbackFunction = nullptr;
 
 mitk::DisplayInteractor::DisplayInteractor()
   : m_Selector(true)
@@ -127,6 +133,18 @@ bool mitk::DisplayInteractor::CheckPositionEvent( const InteractionEvent* intera
 void mitk::DisplayInteractor::SetSelectionMode(bool selection)
 {
   m_SelectionMode = selection;
+}
+
+void mitk::DisplayInteractor::SetMouseRotationMode(bool active,  std::function<void()> globalCallback)
+{
+  m_MouseRotationMode = active;
+  m_CurrentCallbackFunction = globalCallback;
+  globalCallback();
+}
+
+bool mitk::DisplayInteractor::GetMouseRotationMode()
+{
+  return m_MouseRotationMode;
 }
 
 bool mitk::DisplayInteractor::IsOverObject(const InteractionEvent* interactionEvent)
@@ -193,6 +211,11 @@ void mitk::DisplayInteractor::DeSelectObject(StateMachineAction*, InteractionEve
     }
     m_SelectedNode = nullptr;
   }
+}
+
+bool mitk::DisplayInteractor::IsInMouseRotationMode(const InteractionEvent * interactionEvent)
+{
+  return m_MouseRotationMode;
 }
 
 bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent *interactionEvent)
@@ -712,6 +735,32 @@ void mitk::DisplayInteractor::EndRotation(mitk::StateMachineAction *, mitk::Inte
   this->ResetMouseCursor();
 }
 
+void mitk::DisplayInteractor::StartMouseRotation(StateMachineAction* state, InteractionEvent* e)
+{
+  StartRotation(state, e);
+}
+
+void mitk::DisplayInteractor::MouseRotateCamera(StateMachineAction*, InteractionEvent* e)
+{
+  const InteractionPositionEvent* posEvent = dynamic_cast<const InteractionPositionEvent*>(e);
+  if (posEvent == nullptr) {
+    return;
+  }
+
+  Point2D cursor = posEvent->GetPointerPositionOnScreen();
+  Vector2D movementVector = cursor - m_LastDisplayCoordinate;
+  m_LastDisplayCoordinate = cursor;
+
+  RotateCameraImpl(e->GetSender(), movementVector[0]);
+}
+
+void mitk::DisplayInteractor::StopMouseRotation(StateMachineAction* state, InteractionEvent* e)
+{
+  EndRotation(state, e);
+  m_MouseRotationMode = false;
+  m_CurrentCallbackFunction();
+}
+
 void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::InteractionEvent * event)
 {
   const InteractionPositionEvent* posEvent = dynamic_cast<const InteractionPositionEvent*>(event);
@@ -967,7 +1016,12 @@ void mitk::DisplayInteractor::RotateCamera(BaseRenderer* renderer, bool clockwis
     return;
   }
 
-  renderer->GetCameraRotationController()->RotateToAngle((clockwise * 2 - 1) * (-m_ClockRotationSpeed));
+  RotateCameraImpl(renderer, (clockwise * 2 - 1) * (-m_ClockRotationSpeed));
+}
+
+void mitk::DisplayInteractor::RotateCameraImpl(BaseRenderer* renderer, double value)
+{
+  renderer->GetCameraRotationController()->RotateToAngle(value);
   renderer->GetRenderingManager()->RequestUpdateAll();
 }
 

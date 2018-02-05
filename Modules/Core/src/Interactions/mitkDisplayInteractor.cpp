@@ -1016,7 +1016,7 @@ void mitk::DisplayInteractor::RotateCamera(BaseRenderer* renderer, bool clockwis
     return;
   }
 
-  RotateCameraImpl(renderer, (clockwise * 2 - 1) * (-m_ClockRotationSpeed));
+  RotateCameraImpl(renderer, m_ClockRotationSpeed * (clockwise ? -1 : 1));
 }
 
 void mitk::DisplayInteractor::RotateCameraImpl(BaseRenderer* renderer, double value)

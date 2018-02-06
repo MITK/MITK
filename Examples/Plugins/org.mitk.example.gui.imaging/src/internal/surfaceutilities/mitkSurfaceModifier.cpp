@@ -76,7 +76,7 @@ bool mitk::SurfaceModifier::TransformSurface(mitk::Surface::Pointer surface,
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->ShallowCopy(surface->GetVtkPolyData()->GetPoints());
 
-  for (unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+  for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
   {
     double p[3];
     points->GetPoint(i, p);
@@ -143,7 +143,7 @@ bool mitk::SurfaceModifier::AddOutlierToSurface(
 {
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->ShallowCopy(surface->GetVtkPolyData()->GetPoints());
-  for (unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+  for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
   {
     double p[3];
     points->GetPoint(i, p);
@@ -167,7 +167,7 @@ bool mitk::SurfaceModifier::PerturbeSurface(
 {
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->ShallowCopy(surface->GetVtkPolyData()->GetPoints());
-  for (unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+  for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
   {
     double p[3];
     points->GetPoint(i, p);

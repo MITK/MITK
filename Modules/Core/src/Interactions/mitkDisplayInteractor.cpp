@@ -30,6 +30,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 #include <vtkInteractorObserver.h>
+#include <vtkCamera.h>
 
 #include "mitkLine.h"
 
@@ -1017,6 +1018,30 @@ void mitk::DisplayInteractor::RotateCamera(BaseRenderer* renderer, bool clockwis
   }
 
   RotateCameraImpl(renderer, m_ClockRotationSpeed * (clockwise ? -1 : 1));
+}
+
+void mitk::DisplayInteractor::MirrorCamera(BaseRenderer* renderer, bool horizontal)
+{
+  if (renderer == nullptr) {
+    return;
+  }
+
+  vtkCamera* camera = renderer->GetVtkRenderer()->GetActiveCamera();
+  camera->Azimuth(180);
+  if (horizontal) {
+    camera->Roll(180);
+  }
+  renderer->RequestUpdate();
+}
+
+void mitk::DisplayInteractor::ResetCamera(BaseRenderer * renderer)
+{
+  if (renderer == nullptr) {
+    return;
+  }
+
+  renderer->GetCameraController()->AdjustCameraToPlane();
+  renderer->RequestUpdate();
 }
 
 void mitk::DisplayInteractor::RotateCameraImpl(BaseRenderer* renderer, double value)

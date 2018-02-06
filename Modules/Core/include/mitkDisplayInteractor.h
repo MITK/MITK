@@ -53,7 +53,8 @@ namespace mitk
     static bool GetMouseRotationMode();
 
     static void RotateCamera(BaseRenderer* renderer, bool clockwise);
-    
+    static void MirrorCamera(BaseRenderer* renderer, bool horizontal);
+    static void ResetCamera(BaseRenderer* renderer);
 
     /**
     * \brief Change Clock rotation spead for ctrl+arrow rotation

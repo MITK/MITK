@@ -445,12 +445,12 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
 
   m_ShadowWidthFactor = 1.2;
   m_LineWidth = 1.0;
-  m_OutlineWidth = 4.0;
+  m_OutlineWidth = 3.0;
   m_HelperlineWidth = 2.0;
 
   m_DevicePixelRatio = 1.0;
 
-  m_ControlPointShape = PlanarFigureControlPointStyleProperty::Square;
+  m_ControlPointShape = PlanarFigureControlPointStyleProperty::Circle;
 
   m_AnnotationSize = 12;
   m_AnnotationFontFamily = "Arial";

@@ -49,8 +49,11 @@ namespace mitk
     virtual void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
 
     void SetSelectionMode(bool selection);
+    static void SetMouseRotationMode(bool active, std::function<void()> globalCallback);
+    static bool GetMouseRotationMode();
 
     static void RotateCamera(BaseRenderer* renderer, bool clockwise);
+    
 
     /**
     * \brief Change Clock rotation spead for ctrl+arrow rotation
@@ -94,9 +97,13 @@ namespace mitk
 
     virtual bool CheckSwivelPossible( const InteractionEvent* interactionEvent );
 
+    bool IsInMouseRotationMode(const InteractionEvent* interactionEvent);
+
     bool IsOverObject(const InteractionEvent* interactionEvent);
     void SelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
     void DeSelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
+
+    static void RotateCameraImpl(BaseRenderer* renderer, double value);
 
     /**
      * \brief Initializes an interaction, saves the pointers start position for further reference.
@@ -150,6 +157,10 @@ namespace mitk
      * \brief Ends crosshair rotation
      */
     virtual void EndRotation(StateMachineAction*, InteractionEvent*);
+
+    virtual void StartMouseRotation(StateMachineAction*, InteractionEvent*);
+    virtual void MouseRotateCamera(StateMachineAction*, InteractionEvent*);
+    virtual void StopMouseRotation(StateMachineAction*, InteractionEvent*);
 
     /**
      * \brief
@@ -303,6 +314,8 @@ namespace mitk
     /**
     * 3D view selection mode
     */
+    static bool m_MouseRotationMode;
+    static std::function<void()> m_CurrentCallbackFunction;
     bool m_SelectionMode;
     /// <summary>
     /// TODO: select world point on multiwidget

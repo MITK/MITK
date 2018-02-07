@@ -102,7 +102,7 @@ bool QmitkCustomMultiWidgetEditorPreferencePage::PerformOk()
 void QmitkCustomMultiWidgetEditorPreferencePage::Update()
 {
   //Note: there should be default preferences already defined in the
-  //QmitkStdMultiWidgetEditor::InitializePreferences(). Therefore,
+  //QmitkCustomMultiWidgetEditor::InitializePreferences(). Therefore,
   //all default values here are not relevant.
   //gradient background colors
   m_WidgetBackgroundColor1[0] = m_Preferences->Get("widget1 first background color", "#000000");

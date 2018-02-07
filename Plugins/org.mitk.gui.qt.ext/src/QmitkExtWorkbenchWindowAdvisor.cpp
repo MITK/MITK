@@ -59,6 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
 #include <QmitkOpenDicomEditorAction.h>
+#include <QmitkOpenCustomMultiWidgetEditorAction.h>
 
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
@@ -304,6 +305,11 @@ public:
       {
         windowAdvisor->openDicomEditorAction->setEnabled(true);
       }
+      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+      {
+        windowAdvisor->openCustomMultiWidgetEditorAction->setEnabled(true);
+      }
+
       windowAdvisor->fileSaveProjectAction->setEnabled(true);
       windowAdvisor->closeProjectAction->setEnabled(true);
       windowAdvisor->undoAction->setEnabled(true);
@@ -345,6 +351,11 @@ public:
       {
         windowAdvisor->openDicomEditorAction->setEnabled(false);
       }
+      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+      {
+        windowAdvisor->openDicomEditorAction->setEnabled(false);
+      }
+
       windowAdvisor->fileSaveProjectAction->setEnabled(false);
       windowAdvisor->closeProjectAction->setEnabled(false);
       windowAdvisor->undoAction->setEnabled(false);
@@ -736,9 +747,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", nullptr);
   bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
 
-  if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
   {
-    openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
+    openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"), window);
+  }
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+  {
+    openCustomMultiWidgetEditorAction = new QmitkOpenCustomMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"), window);
   }
 
   if (imageNavigatorViewFound)
@@ -792,6 +807,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   {
     mainActionsToolBar->addAction(openDicomEditorAction);
   }
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
+  {
+    mainActionsToolBar->addAction(openCustomMultiWidgetEditorAction);
+  }
+
   if (imageNavigatorViewFound)
   {
     mainActionsToolBar->addAction(imageNavigatorAction);

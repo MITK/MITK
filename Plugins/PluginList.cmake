@@ -29,7 +29,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.extapplication:OFF
   org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
-  org.mitk.gui.qt.custommultiwidgeteditor:ON
+  org.mitk.gui.qt.custommultiwidgeteditor:OFF
   org.mitk.gui.qt.common.legacy:OFF
   org.mitk.gui.qt.cmdlinemodules:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF

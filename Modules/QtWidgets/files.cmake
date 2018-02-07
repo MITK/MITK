@@ -20,7 +20,7 @@ set(CPP_FILES
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp
   QmitkNodeDescriptor.cpp
-QmitkColoredNodeDescriptor.cpp
+  QmitkColoredNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
   QmitkRenderWindowMenu.cpp
   QmitkProgressBar.cpp
@@ -40,6 +40,9 @@ QmitkColoredNodeDescriptor.cpp
   QmitkPropertyItem.cpp
   QmitkPropertyItemDelegate.cpp
   QmitkPropertyItemModel.cpp
+  QmitkAbstractDataStorageViewWidget.cpp
+  QmitkDataStorageListViewWidget.cpp
+  QmitkModelViewSelectionConnector.cpp
 )
 
 set(MOC_H_FILES
@@ -72,6 +75,9 @@ set(MOC_H_FILES
   include/QmitkDataStorageComboBoxWithSelectNone.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
+  include/QmitkDataStorageListViewWidget.h
+  include/QmitkAbstractDataStorageViewWidget.h
+  include/QmitkModelViewSelectionConnector.h
 )
 
 set(UI_FILES
@@ -82,6 +88,7 @@ set(UI_FILES
   src/QmitkLevelWindowRangeChange.ui
   src/QmitkMemoryUsageIndicator.ui
   src/QmitkServiceListWidgetControls.ui
+  src/QmitkDataStorageListViewWidget.ui
 )
 
 set(QRC_FILES

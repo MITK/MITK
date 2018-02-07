@@ -3,7 +3,6 @@ set(SRC_CPP_FILES
   QmitkAbstractView.cpp
   QmitkDataNodeSelectionProvider.cpp
   QmitkDnDFrameWidget.cpp
-  QmitkModelViewSelectionConnector.cpp
   QmitkSelectionServiceConnector.cpp
   QmitkSliceNavigationListener.cpp
 )
@@ -18,7 +17,6 @@ set(INTERNAL_CPP_FILES
 set(MOC_H_FILES
   src/QmitkAbstractRenderEditor.h
   src/QmitkDnDFrameWidget.h
-  src/QmitkModelViewSelectionConnector.h
   src/QmitkSelectionServiceConnector.h
   src/QmitkSliceNavigationListener.h
 

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKMODELVIEWSELECTIONCONNECTOR_H
 #define QMITKMODELVIEWSELECTIONCONNECTOR_H
 
-#include <org_mitk_gui_qt_common_Export.h>
+#include <MitkQtWidgetsExports.h>
 
 // qt widgets module
 #include <QmitkAbstractDataStorageModel.h>
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  // qt
 #include <QAbstractItemView>
 
-/*
+/**
 * @brief The 'QmitkModelViewSelectionConnector' is used to handle the selections of a model-view-pair.
 *
 *   The class accepts a view and a model, which are used to react to selection changes. This class is able to propagate selection changes
@@ -45,14 +45,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 *   selection into a data node list. The 'ChangeModelSelection'-function is called whenever the selection of the item view's
 *   selection model changes.
 */
-class MITK_QT_COMMON QmitkModelViewSelectionConnector : public QObject
+class MITKQTWIDGETS_EXPORT QmitkModelViewSelectionConnector : public QObject
 {
   Q_OBJECT
 
 public:
 
   QmitkModelViewSelectionConnector();
-  /*
+  /**
   * @brief Set the view whose selection model is used to propagate or receive selection changes. Use the view's data model
   *        to transform selected nodes into model indexes and vice versa.
   *
@@ -65,8 +65,15 @@ public:
   */
   void SetView(QAbstractItemView* view);
 
+  /**
+  * @brief 	Retrieve the currently selected nodes (equals the last CurrentSelectionChanged values).
+  */
+  QList<mitk::DataNode::Pointer> GetSelectedNodes() const;
+
+  bool GetSelectOnlyVisibleNodes() const;
+
 Q_SIGNALS:
-  /*
+  /**
   * @brief A signal that will be emitted by the 'ChangeModelSelection'-function. This happens if the selection model
   *   of the private member item view has changed.
   *
@@ -75,7 +82,7 @@ Q_SIGNALS:
   void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
 public Q_SLOTS:
-  /*
+  /**
   * @brief Change the selection modus of the item view's selection model.
   *
   *   If true, an incoming selection will be filtered (reduced) to only those nodes that are visible by the current view.
@@ -87,7 +94,8 @@ public Q_SLOTS:
   * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
-  /*
+  
+  /**
   * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
   *        selection model of the private member item view.
   *
@@ -102,7 +110,7 @@ public Q_SLOTS:
   void SetCurrentSelection(QList<mitk::DataNode::Pointer> selectedNodes);
 
 private Q_SLOTS:
-  /*
+  /**
   * @brief Transform a model selection into a data node list and emit the 'CurrentSelectionChanged'-signal.
   *
   *   The function adds the selected nodes from the original selection that could not be modified, if
@@ -129,7 +137,7 @@ private:
   *   In order to transform the indices into data nodes, the private data storage model must return
   *   'mitk::DataNode::Pointer' objects for model indexes if the role is QmitkDataNodeRole.
   */
-  QList<mitk::DataNode::Pointer> GetSelectedNodes() const;
+  QList<mitk::DataNode::Pointer> GetInternalSelectedNodes() const;
   /*
   * @brief Filter the list of given nodes such that only those nodes are used that are valid
   *        when using the data storage model's node predicate.

@@ -16,14 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk gui qt common plugin
 #include "QmitkModelViewSelectionConnector.h"
-#include "internal/QmitkDataNodeSelection.h"
 
 // qt widgets module
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
-
-// blueberry ui qt plugin
-#include <berryINullSelectionListener.h>
 
 QmitkModelViewSelectionConnector::QmitkModelViewSelectionConnector()
   : m_Model(nullptr)
@@ -107,17 +103,28 @@ void QmitkModelViewSelectionConnector::SetCurrentSelection(QList<mitk::DataNode:
 
 void QmitkModelViewSelectionConnector::ChangeModelSelection(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
-  QList<mitk::DataNode::Pointer> nodes = GetSelectedNodes();
+  emit CurrentSelectionChanged(GetSelectedNodes());
+}
+
+bool QmitkModelViewSelectionConnector::GetSelectOnlyVisibleNodes() const
+{
+  return m_SelectOnlyVisibleNodes;
+}
+
+QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::GetSelectedNodes() const
+{
+  auto nodes = GetInternalSelectedNodes();
 
   if (!m_SelectOnlyVisibleNodes)
   {
     // add the non-visible nodes from the original selection
     nodes.append(m_NonVisibleSelection);
   }
-  emit CurrentSelectionChanged(nodes);
+  
+  return nodes;
 }
 
-QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::GetSelectedNodes() const
+QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::GetInternalSelectedNodes() const
 {
   if (nullptr == m_Model || nullptr == m_View)
   {
@@ -171,7 +178,7 @@ QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::FilterNodeList(
 bool QmitkModelViewSelectionConnector::IsEqualToCurrentSelection(QList<mitk::DataNode::Pointer>& selectedNodes) const
 {
   // get the currently selected nodes from the model
-  QList<mitk::DataNode::Pointer> currentlySelectedNodes = GetSelectedNodes();
+  QList<mitk::DataNode::Pointer> currentlySelectedNodes = GetInternalSelectedNodes();
 
   if (currentlySelectedNodes.size() == selectedNodes.size())
   {

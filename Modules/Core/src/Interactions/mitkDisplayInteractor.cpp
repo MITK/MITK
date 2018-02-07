@@ -752,7 +752,7 @@ void mitk::DisplayInteractor::MouseRotateCamera(StateMachineAction*, Interaction
   Vector2D movementVector = cursor - m_LastDisplayCoordinate;
   m_LastDisplayCoordinate = cursor;
 
-  RotateCameraImpl(e->GetSender(), movementVector[0]);
+  RotateCameraImpl(e->GetSender(), -movementVector[0]);
 }
 
 void mitk::DisplayInteractor::StopMouseRotation(StateMachineAction* state, InteractionEvent* e)

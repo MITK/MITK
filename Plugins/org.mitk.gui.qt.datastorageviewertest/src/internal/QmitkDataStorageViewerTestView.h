@@ -49,6 +49,8 @@ private Q_SLOTS:
 
   void SetAsSelectionProvider1(bool checked);
   void SetAsSelectionProvider2(bool checked);
+  void SetAsSelectionListener1(bool checked);
+  void SetAsSelectionListener2(bool checked);
 
 private:
 

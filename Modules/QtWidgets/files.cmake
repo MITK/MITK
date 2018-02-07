@@ -56,7 +56,7 @@ set(MOC_H_FILES
   include/QmitkNodeDescriptor.h
   include/QmitkNodeDescriptorManager.h
   include/QmitkRenderWindowMenu.h
-  include/QmitkRenderWindowWidget.  
+  include/QmitkRenderWindowWidget.h
   include/QmitkProgressBar.h
   include/QmitkPropertiesTableEditor.h
   include/QmitkPropertyDelegate.h

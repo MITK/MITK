@@ -24,11 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
-#include <mitkMouseModeSwitcher.h>
 
 // qt
-#include <QFrame>
-#include <qsplitter.h>
 #include <qwidget.h>
 
 class QHBoxLayout;
@@ -44,7 +41,7 @@ namespace mitk
   class RenderingManager;
 }
 
-/*
+/**
 * @brief The 'QmitkCustomMultiWidget' is a 'QWidget' that is used to display multiple render windows at once.
 *
 *     Render windows can dynamically be added and removed to change the layout of the multi widget.
@@ -55,46 +52,36 @@ class MITKQTWIDGETS_EXPORT QmitkCustomMultiWidget : public QWidget
 
 public:
 
-  QmitkCustomMultiWidget(QWidget *parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager *renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "custommulti");
-  virtual ~QmitkCustomMultiWidget();
+  QmitkCustomMultiWidget(QWidget* parent = 0,
+                         Qt::WindowFlags f = 0,
+                         mitk::RenderingManager* renderingManager = nullptr,
+                         mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
+                         const QString& multiWidgetName = "custommulti");
 
+  virtual ~QmitkCustomMultiWidget();
+  
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  mitk::MouseModeSwitcher* GetMouseModeSwitcher();
-
-  std::map<std::string, QmitkRenderWindowWidget*> GetRenderWindowWidgets() const;
-  QmitkRenderWindowWidget* GetRenderWindowWidget(unsigned int id) const;
+  std::map<QString, QmitkRenderWindowWidget*> GetRenderWindowWidgets() const;
+  QmitkRenderWindowWidget* GetRenderWindowWidget(unsigned int widgetNumber) const;
   QmitkRenderWindowWidget* GetActiveRenderWindowWidget() const;
   QmitkRenderWindowWidget* GetFirstRenderWindowWidget() const;
   QmitkRenderWindowWidget* GetLastRenderWindowWidget() const;
   
   unsigned int GetNumberOfRenderWindowWidgets() const;
 
-  const mitk::Point3D GetCrossPosition() const;
-
-  void RequestUpdate(unsigned int id);
+  void RequestUpdate(unsigned int widgetNumber);
   void RequestUpdateAll();
-  void ForceImmediateUpdate(unsigned int id);
+  void ForceImmediateUpdate(unsigned int widgetNumber);
   void ForceImmediateUpdateAll();
 
-  // color and style settings
-
-  /** \brief Listener to the CrosshairPositionEvent
-
-    Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
-  */
-  void HandleCrosshairPositionEvent();
-
-protected:
-
-  mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
+  const mitk::Point3D GetCrossPosition(unsigned int widgetNumber) const;
 
 public slots:
 
   void ShowLevelWindowWidget(unsigned int widgetNumber, bool show);
   void ShowAllLevelWindowWidgets(bool show);
-
-  /*
+  /**
   * @brief Set a background color gradient for a specific render window.
   *
   *   If two different input colors are used, a gradient background is generated.
@@ -104,7 +91,7 @@ public slots:
   * @param widgetNumber   The widget identifier.
   */
   void SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower, unsigned int widgetNumber);
-  /*
+  /**
   * @brief Set a background color gradient for all available render windows.
   *
   *   If two different input colors are used, a gradient background is generated.
@@ -117,7 +104,7 @@ public slots:
   void FillAllBackgroundColorGradientsWithBlack();
   void ShowBackgroundColorGradient(unsigned int widgetNumber, bool show);
   void ShowAllBackgroundColorGradients(bool show);
-  /*
+  /**
   * @rief Return a render window (widget) specific background color gradient
   *
   * @param widgetNumber   The widget identifier.
@@ -146,70 +133,39 @@ public slots:
   void SetCornerAnnotationText(unsigned int widgetNumber, const std::string& cornerAnnotation);
   std::string GetCornerAnnotationText(unsigned int widgetNumber) const;
 
-  void ActivateRenderWindowMenu(unsigned int widgetNumber, bool state);
-  void ActivateAllRenderWindowMenus(bool state);
-  bool IsRenderWindowMenuActivated(unsigned int widgetNumber) const;
-
-  void ShowGeometryPlanes(unsigned int widgetNumber, bool state);
-  void ShowAllGeometryPlanes(bool state);
-  mitk::DataNode::Pointer GetGeometryPlane(unsigned int widgetNumber, unsigned int planeNumber) const;
-
-
-
-
-  /// Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
+  /**
+  * @brief Listener to the CrosshairPositionEvent
+  *
+  *   Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
+  */
+  void HandleCrosshairPositionEvent();
+  /**
+  * @brief Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
+  *
+  */
   void HandleCrosshairPositionEventDelayed();
 
   void Fit();
 
+  void EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p);
+
+  void MoveCrossToPosition(unsigned int widgetNumber, const mitk::Point3D& newPosition);
+
+  void ResetCrosshair();
+
+  // mouse events
   void wheelEvent(QWheelEvent *e) override;
 
   void mousePressEvent(QMouseEvent *e) override;
 
   void moveEvent(QMoveEvent *e) override;
 
-  void EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p);
-
-  void MoveCrossToPosition(const mitk::Point3D &newPosition);
-
-  void SetWidgetPlanesLocked(bool locked);
-
-  void SetWidgetPlanesRotationLocked(bool locked);
-
-  void SetWidgetPlanesRotationLinked(bool link);
-
-  void SetWidgetPlaneMode(int mode);
-
-  void SetWidgetPlaneModeToSlicing(bool activate);
-
-  void SetWidgetPlaneModeToRotation(bool activate);
-
-  void SetWidgetPlaneModeToSwivel(bool activate);
-
-  void ResetCrosshair();
-
 signals:
 
-  void LeftMouseClicked(mitk::Point3D pointValue);
   void WheelMoved(QWheelEvent *);
-  void WidgetPlanesRotationLinked(bool);
-  void WidgetPlanesRotationEnabled(bool);
-  void ViewsInitialized();
-  void WidgetPlaneModeSlicing(bool);
-  void WidgetPlaneModeRotation(bool);
-  void WidgetPlaneModeSwivel(bool);
-  void WidgetPlaneModeChange(int);
-  void WidgetNotifyNewCrossHairMode(int);
   void Moved();
 
 public:
-
-  enum
-  {
-    PLANE_MODE_SLICING = 0,
-    PLANE_MODE_ROTATION,
-    PLANE_MODE_SWIVEL
-  };
 
   enum
   {
@@ -222,11 +178,14 @@ public:
 private:
 
   void InitializeGUI();
-  void AddRenderWindowWidget();
   void InitializeWidget();
+  void AddRenderWindowWidget();
+  
+  // #TODO: see T24173
+  mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
   QGridLayout* m_CustomMultiWidgetLayout;
-  std::map<std::string, QmitkRenderWindowWidget*> m_RenderWindowWidgets;
+  std::map<QString, QmitkRenderWindowWidget*> m_RenderWindowWidgets;
 
   QmitkRenderWindowWidget* m_ActiveRenderWindowWidget;
 
@@ -236,7 +195,7 @@ private:
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
   QString m_MultiWidgetName;
 
-  mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
+  //mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
   mitk::SliceNavigationController *m_TimeNavigationController;
 
   mitk::DataStorage::Pointer m_DataStorage;

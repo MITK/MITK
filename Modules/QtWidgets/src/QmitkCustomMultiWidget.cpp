@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#define SMW_INFO MITK_INFO("widget.custommulti")
-
 #include "QmitkCustomMultiWidget.h"
 
 #include <QList>
@@ -48,13 +46,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QGridLayout>
 
-QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& multWidgetName)
+QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
+                                               Qt::WindowFlags f/* = 0*/,
+                                               mitk::RenderingManager* renderingManager/* = nullptr*/,
+                                               mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/,
+                                               const QString& multiWidgetName/* = "custommulti"*/)
   : QWidget(parent, f)
   , m_CustomMultiWidgetLayout(nullptr)
-  , m_PlaneMode(PLANE_MODE_SLICING)
   , m_RenderingManager(renderingManager)
   , m_RenderingMode(renderingMode)
-  , m_MultiWidgetName(multWidgetName)
+  , m_MultiWidgetName(multiWidgetName)
   , m_TimeNavigationController(nullptr)
   , m_PendingCrosshairPositionEvent(false)
   , m_CrosshairNavigationEnabled(false)
@@ -74,7 +75,6 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent, Qt::WindowFlags 
   resize(QSize(364, 477).expandedTo(minimumSizeHint()));
 
   InitializeWidget();
-  ActivateAllRenderWindowMenus(true);
 }
 
 QmitkCustomMultiWidget::~QmitkCustomMultiWidget()
@@ -99,14 +99,14 @@ void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
-std::map<std::string, QmitkRenderWindowWidget*> QmitkCustomMultiWidget::GetRenderWindowWidgets() const
+std::map<QString, QmitkRenderWindowWidget*> QmitkCustomMultiWidget::GetRenderWindowWidgets() const
 {
   return m_RenderWindowWidgets;
 }
 
-QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetRenderWindowWidget(unsigned int id) const
+QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetRenderWindowWidget(unsigned int widgetNumber) const
 {
-  return m_RenderWindowWidgets.find(std::to_string(id))->second;
+  return m_RenderWindowWidgets.find(QString::number(widgetNumber))->second;
 }
 
 QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetActiveRenderWindowWidget() const
@@ -127,55 +127,6 @@ QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetLastRenderWindowWidget() con
 unsigned int QmitkCustomMultiWidget::GetNumberOfRenderWindowWidgets() const
 {
   return m_RenderWindowWidgets.size();
-}
-
-void QmitkCustomMultiWidget::InitializeWidget()
-{
-  // #TODO: some things have to be handled globally (hold for all render window (widgets)
-  // analyse those things and design a controlling mechanism
-
-  // Set plane mode (slicing/rotation behavior) to slicing (default)
-  m_PlaneMode = PLANE_MODE_SLICING;
-
-  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
-
-  // setup the department logo rendering
-  /*
-  m_LogoRendering = mitk::LogoOverlay::New();
-  mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
-  m_LogoRendering->SetOpacity(0.5);
-  mitk::Point2D offset;
-  offset.Fill(0.03);
-  m_LogoRendering->SetOffsetVector(offset);
-  m_LogoRendering->SetRelativeSize(0.15);
-  m_LogoRendering->SetCornerPosition(1);
-  m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(), renderer4);
-  */
-}
-
-const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition() const
-{
-  /*
-  const mitk::PlaneGeometry *plane1 = mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-  const mitk::PlaneGeometry *plane2 = mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-  const mitk::PlaneGeometry *plane3 = mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
-
-  mitk::Line3D line;
-  if ((plane1 != NULL) && (plane2 != NULL) && (plane1->IntersectionLine(plane2, line)))
-  {
-    mitk::Point3D point;
-    if ((plane3 != NULL) && (plane3->IntersectionPoint(line, point)))
-    {
-      return point;
-    }
-  }
-  // TODO BUG POSITIONTRACKER;
-  mitk::Point3D p;
-  return p;
-  // return m_LastLeftClickPositionSupplier->GetCurrentPoint();
-  */
-  return mitk::Point3D();
 }
 
 void QmitkCustomMultiWidget::RequestUpdate(unsigned int widgetNumber)
@@ -210,179 +161,28 @@ void QmitkCustomMultiWidget::ForceImmediateUpdateAll()
   }
 }
 
-void QmitkCustomMultiWidget::EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p)
+const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(unsigned int widgetNumber) const
 {
-  mitk::Point2D pointOnDisplay;
-  renderer->WorldToDisplay(p, pointOnDisplay);
+  /*
+  const mitk::PlaneGeometry *plane1 = mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  const mitk::PlaneGeometry *plane2 = mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  const mitk::PlaneGeometry *plane3 = mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
-  if (pointOnDisplay[0] < renderer->GetVtkRenderer()->GetOrigin()[0] ||
-      pointOnDisplay[1] < renderer->GetVtkRenderer()->GetOrigin()[1] ||
-      pointOnDisplay[0] > renderer->GetVtkRenderer()->GetOrigin()[0] + renderer->GetViewportSize()[0] ||
-      pointOnDisplay[1] > renderer->GetVtkRenderer()->GetOrigin()[1] + renderer->GetViewportSize()[1])
+  mitk::Line3D line;
+  if ((plane1 != NULL) && (plane2 != NULL) && (plane1->IntersectionLine(plane2, line)))
   {
-    mitk::Point2D pointOnPlane;
-    renderer->GetCurrentWorldPlaneGeometry()->Map(p, pointOnPlane);
-    renderer->GetCameraController()->MoveCameraToPoint(pointOnPlane);
-  }
-}
-
-void QmitkCustomMultiWidget::MoveCrossToPosition(const mitk::Point3D &newPosition)
-{
-  GetRenderWindow()->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
-
-  m_RenderingManager->RequestUpdateAll();
-}
-
-void QmitkCustomMultiWidget::HandleCrosshairPositionEvent()
-{
-  if (!m_PendingCrosshairPositionEvent)
+  mitk::Point3D point;
+  if ((plane3 != NULL) && (plane3->IntersectionPoint(line, point)))
   {
-    m_PendingCrosshairPositionEvent = true;
-    QTimer::singleShot(0, this, SLOT(HandleCrosshairPositionEventDelayed()));
+  return point;
   }
-}
-
-mitk::DataNode::Pointer QmitkCustomMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)
-{
-  mitk::Point3D crosshairPos = GetCrossPosition();
-  mitk::DataNode::Pointer node;
-  int maxlayer = -32768;
-
-  if (nodes.IsNotNull())
-  {
-    mitk::BaseRenderer *baseRenderer = GetRenderWindow()->GetSliceNavigationController()->GetRenderer();
-    // find node with largest layer, that is the node shown on top in the render window
-    for (unsigned int x = 0; x < nodes->size(); x++)
-    {
-      if ((nodes->at(x)->GetData()->GetGeometry() != NULL) &&
-           nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos))
-      {
-        int layer = 0;
-        if (!(nodes->at(x)->GetIntProperty("layer", layer)))
-        {
-          continue;
-        }
-        if (layer > maxlayer)
-        {
-          if (static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(baseRenderer))
-          {
-            node = nodes->at(x);
-            maxlayer = layer;
-          }
-        }
-      }
-    }
   }
-  return node;
-}
-
-void QmitkCustomMultiWidget::HandleCrosshairPositionEventDelayed()
-{
-  m_PendingCrosshairPositionEvent = false;
-
-  // find image with highest layer
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
-
-  mitk::DataNode::Pointer node;
-  mitk::DataNode::Pointer topSourceNode;
-  mitk::Image::Pointer image;
-  bool isBinary = false;
-  node = this->GetTopLayerNode(nodes);
-  int component = 0;
-  if (node.IsNotNull())
-  {
-    node->GetBoolProperty("binary", isBinary);
-    if (isBinary)
-    {
-      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
-      if (!sourcenodes->empty())
-      {
-        topSourceNode = this->GetTopLayerNode(sourcenodes);
-      }
-      if (topSourceNode.IsNotNull())
-      {
-        image = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
-        topSourceNode->GetIntProperty("Image.Displayed Component", component);
-      }
-      else
-      {
-        image = dynamic_cast<mitk::Image *>(node->GetData());
-        node->GetIntProperty("Image.Displayed Component", component);
-      }
-    }
-    else
-    {
-      image = dynamic_cast<mitk::Image *>(node->GetData());
-      node->GetIntProperty("Image.Displayed Component", component);
-    }
-  }
-
-  mitk::Point3D crosshairPos = this->GetCrossPosition();
-  std::string statusText;
-  std::stringstream stream;
-  itk::Index<3> p;
-  mitk::BaseRenderer *baseRenderer = GetRenderWindow()->GetSliceNavigationController()->GetRenderer();
-  unsigned int timestep = baseRenderer->GetTimeStep();
-
-  if (image.IsNotNull() && (image->GetTimeSteps() > timestep))
-  {
-    image->GetGeometry()->WorldToIndex(crosshairPos, p);
-    stream.precision(2);
-    stream << "Position: <" << std::fixed << crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", "
-           << std::fixed << crosshairPos[2] << "> mm";
-    stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
-
-    mitk::ScalarType pixelValue;
-
-    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
-                            image->GetChannelDescriptor().GetPixelType(),
-                            image,
-                            image->GetVolumeData(baseRenderer->GetTimeStep()),
-                            p,
-                            pixelValue,
-                            component);
-
-    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
-    {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
-    }
-    else
-    {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
-    }
-  }
-  else
-  {
-    stream << "No image information at this position!";
-  }
-
-  statusText = stream.str();
-  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-}
-
-void QmitkCustomMultiWidget::Fit()
-{
-  vtkSmartPointer<vtkRenderer> vtkrenderer;
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
-  {
-    vtkRenderer* renderer = GetRenderWindow(widgetNumber)->GetRenderer()->GetVtkRenderer();
-    mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(GetRenderWindow(i)->GetRenderWindow());
-    vtkrenderer = baseRenderer->GetVtkRenderer();
-    if (nullptr != vtkrenderer)
-    {
-      vtkrenderer->ResetCamera();
-    }
-
-    baseRenderer->GetCameraController()->Fit();
-  }
-
-
-
-  int w = vtkObject::GetGlobalWarningDisplay();
-  vtkObject::GlobalWarningDisplayOff();
-  vtkObject::SetGlobalWarningDisplay(w);
+  // TODO BUG POSITIONTRACKER;
+  mitk::Point3D p;
+  return p;
+  // return m_LastLeftClickPositionSupplier->GetCurrentPoint();
+  */
+  return mitk::Point3D();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -630,38 +430,151 @@ bool QmitkCustomMultiWidget::IsCornerAnnotationVisible(unsigned int widgetNumber
   return GetRenderWindowWidget(widgetNumber)->IsCornerAnnotationVisible();
 }
 
-void QmitkCustomMultiWidget::ActivateRenderWindowMenu(unsigned int widgetNumber, bool state)
+void QmitkCustomMultiWidget::HandleCrosshairPositionEvent()
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  /*
+  if (!m_PendingCrosshairPositionEvent)
   {
-    MITK_ERROR << "Level window widget can not be shown for an unknown widget.";
-    return;
+    m_PendingCrosshairPositionEvent = true;
+    QTimer::singleShot(0, this, SLOT(HandleCrosshairPositionEventDelayed()));
   }
-
-  GetRenderWindowWidget(widgetNumber)->ActivateMenuWidget(state, this);
+  */
 }
 
-void QmitkCustomMultiWidget::ActivateAllRenderWindowMenus(bool state)
+void QmitkCustomMultiWidget::HandleCrosshairPositionEventDelayed()
 {
+  /*
+  m_PendingCrosshairPositionEvent = false;
+
+  // find image with highest layer
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
+
+  mitk::DataNode::Pointer node;
+  mitk::DataNode::Pointer topSourceNode;
+  mitk::Image::Pointer image;
+  bool isBinary = false;
+  node = this->GetTopLayerNode(nodes);
+  int component = 0;
+  if (node.IsNotNull())
+  {
+    node->GetBoolProperty("binary", isBinary);
+    if (isBinary)
+    {
+      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
+      if (!sourcenodes->empty())
+      {
+        topSourceNode = this->GetTopLayerNode(sourcenodes);
+      }
+      if (topSourceNode.IsNotNull())
+      {
+        image = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
+        topSourceNode->GetIntProperty("Image.Displayed Component", component);
+      }
+      else
+      {
+        image = dynamic_cast<mitk::Image *>(node->GetData());
+        node->GetIntProperty("Image.Displayed Component", component);
+      }
+    }
+    else
+    {
+      image = dynamic_cast<mitk::Image *>(node->GetData());
+      node->GetIntProperty("Image.Displayed Component", component);
+    }
+  }
+
+  mitk::Point3D crosshairPos = this->GetCrossPosition();
+  std::string statusText;
+  std::stringstream stream;
+  itk::Index<3> p;
+  mitk::BaseRenderer *baseRenderer = GetRenderWindow()->GetSliceNavigationController()->GetRenderer();
+  unsigned int timestep = baseRenderer->GetTimeStep();
+
+  if (image.IsNotNull() && (image->GetTimeSteps() > timestep))
+  {
+    image->GetGeometry()->WorldToIndex(crosshairPos, p);
+    stream.precision(2);
+    stream << "Position: <" << std::fixed << crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", "
+      << std::fixed << crosshairPos[2] << "> mm";
+    stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
+
+    mitk::ScalarType pixelValue;
+
+    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
+      image->GetChannelDescriptor().GetPixelType(),
+      image,
+      image->GetVolumeData(baseRenderer->GetTimeStep()),
+      p,
+      pixelValue,
+      component);
+
+    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+    {
+      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
+    }
+    else
+    {
+      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
+    }
+  }
+  else
+  {
+    stream << "No image information at this position!";
+  }
+
+  statusText = stream.str();
+  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+  */
+}
+
+void QmitkCustomMultiWidget::Fit()
+{
+  // #TODO: what is this function's purpose?
+
+  /*
+  vtkSmartPointer<vtkRenderer> vtkrenderer;
   size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
   for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
   {
-    ActivateRenderWindowMenu(i, state);
-  }
-}
-
-bool QmitkCustomMultiWidget::IsRenderWindowMenuActivated(unsigned int widgetNumber) const
-{
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  vtkRenderer* renderer = GetRenderWindow(widgetNumber)->GetRenderer()->GetVtkRenderer();
+  mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(GetRenderWindow(i)->GetRenderWindow());
+  vtkrenderer = baseRenderer->GetVtkRenderer();
+  if (nullptr != vtkrenderer)
   {
-    MITK_ERROR << "Render window menu activation status can not be retrieved for an unknown widget. Returning 'false'.";
-    return false;
+  vtkrenderer->ResetCamera();
   }
 
-  return GetRenderWindowWidget(widgetNumber)->IsRenderWindowMenuActivated();
+  baseRenderer->GetCameraController()->Fit();
+  }
+
+  int w = vtkObject::GetGlobalWarningDisplay();
+  vtkObject::GlobalWarningDisplayOff();
+  vtkObject::SetGlobalWarningDisplay(w);
+  */
 }
 
-void QmitkCustomMultiWidget::ShowGeometryPlanes(unsigned int widgetNumber, bool state)
+void QmitkCustomMultiWidget::EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p)
+{
+  // #TODO: what is this function's purpose?
+
+  /*
+  mitk::Point2D pointOnDisplay;
+  renderer->WorldToDisplay(p, pointOnDisplay);
+
+  if (pointOnDisplay[0] < renderer->GetVtkRenderer()->GetOrigin()[0] ||
+  pointOnDisplay[1] < renderer->GetVtkRenderer()->GetOrigin()[1] ||
+  pointOnDisplay[0] > renderer->GetVtkRenderer()->GetOrigin()[0] + renderer->GetViewportSize()[0] ||
+  pointOnDisplay[1] > renderer->GetVtkRenderer()->GetOrigin()[1] + renderer->GetViewportSize()[1])
+  {
+  mitk::Point2D pointOnPlane;
+  renderer->GetCurrentWorldPlaneGeometry()->Map(p, pointOnPlane);
+  renderer->GetCameraController()->MoveCameraToPoint(pointOnPlane);
+  }
+  */
+}
+
+void QmitkCustomMultiWidget::MoveCrossToPosition(unsigned int widgetNumber, const mitk::Point3D& newPosition)
 {
   if (widgetNumber > m_RenderWindowWidgets.size())
   {
@@ -669,31 +582,28 @@ void QmitkCustomMultiWidget::ShowGeometryPlanes(unsigned int widgetNumber, bool 
     return;
   }
 
-  return GetRenderWindowWidget(widgetNumber)->ShowGeometryPlanes(state);
+  GetRenderWindowWidget(widgetNumber)->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+  GetRenderWindowWidget(widgetNumber)->RequestUpdate();
 }
 
-void QmitkCustomMultiWidget::ShowAllGeometryPlanes(bool state)
+void QmitkCustomMultiWidget::ResetCrosshair()
 {
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  // #TODO: new concept: we do not want to initialize all views;
+  //        we do not want to rely on the geometry planes
+  /*
+  if (m_DataStorage.IsNotNull())
   {
-    ShowGeometryPlanes(i, state);
+    m_RenderingManager->InitializeViewsByBoundingObjects(m_DataStorage);
+    // m_RenderingManager->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
+    // reset interactor to normal slicing
+    SetWidgetPlaneMode(PLANE_MODE_SLICING);
   }
+  */
 }
 
-mitk::DataNode::Pointer QmitkCustomMultiWidget::GetGeometryPlane(unsigned int widgetNumber, unsigned int planeNumber) const
-{
-  if (widgetNumber > m_RenderWindowWidgets.size())
-  {
-    MITK_ERROR << "Geometry plane can not be received for an unknown widget.";
-    return nullptr;
-  }
-
-  return GetRenderWindowWidget(widgetNumber)->GetGeometryPlane(planeNumber);
-}
-
-
-
+//////////////////////////////////////////////////////////////////////////
+// MOUSE EVENTS
+//////////////////////////////////////////////////////////////////////////
 void QmitkCustomMultiWidget::wheelEvent(QWheelEvent *e)
 {
   emit WheelMoved(e);
@@ -712,91 +622,35 @@ void QmitkCustomMultiWidget::moveEvent(QMoveEvent *e)
   emit Moved();
 }
 
-void QmitkCustomMultiWidget::SetWidgetPlanesLocked(bool locked)
-{
-  GetRenderWindow()->GetSliceNavigationController()->SetSliceLocked(locked);
-}
 
-void QmitkCustomMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
-{
-  GetRenderWindow()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
-}
-
-void QmitkCustomMultiWidget::SetWidgetPlanesRotationLinked(bool link)
-{
-  emit WidgetPlanesRotationLinked(link);
-}
-
-void QmitkCustomMultiWidget::SetWidgetPlaneMode(int userMode)
-{
-  MITK_DEBUG << "Changing crosshair mode to " << userMode;
-
-  emit WidgetNotifyNewCrossHairMode(userMode);
-  // Convert user interface mode to actual mode
-  {
-    switch (userMode)
-    {
-    case 0:
-      m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
-      break;
-    case 1:
-      m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::ROTATION);
-      break;
-    case 2:
-      m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::ROTATIONLINKED);
-      break;
-    case 3:
-      m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::SWIVEL);
-      break;
-    }
-  }
-}
-
-void QmitkCustomMultiWidget::SetWidgetPlaneModeToSlicing(bool activate)
-{
-  if (activate)
-  {
-    SetWidgetPlaneMode(PLANE_MODE_SLICING);
-  }
-}
-
-void QmitkCustomMultiWidget::SetWidgetPlaneModeToRotation(bool activate)
-{
-  if (activate)
-  {
-    SetWidgetPlaneMode(PLANE_MODE_ROTATION);
-  }
-}
-
-void QmitkCustomMultiWidget::SetWidgetPlaneModeToSwivel(bool activate)
-{
-  if (activate)
-  {
-    SetWidgetPlaneMode(PLANE_MODE_SWIVEL);
-  }
-}
-
-void QmitkCustomMultiWidget::ResetCrosshair()
-{
-  if (m_DataStorage.IsNotNull())
-  {
-    m_RenderingManager->InitializeViewsByBoundingObjects(m_DataStorage);
-    // m_RenderingManager->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
-    // reset interactor to normal slicing
-    SetWidgetPlaneMode(PLANE_MODE_SLICING);
-  }
-}
-
-mitk::MouseModeSwitcher* QmitkCustomMultiWidget::GetMouseModeSwitcher()
-{
-  return m_MouseModeSwitcher;
-}
-
+//////////////////////////////////////////////////////////////////////////
+// PRIVATE
+//////////////////////////////////////////////////////////////////////////
 void QmitkCustomMultiWidget::InitializeGUI()
 {
   m_CustomMultiWidgetLayout = new QGridLayout(this);
   m_CustomMultiWidgetLayout->setContentsMargins(0, 0, 0, 0);
   setLayout(m_CustomMultiWidgetLayout);
+}
+
+void QmitkCustomMultiWidget::InitializeWidget()
+{
+  // #TODO: some things have to be handled globally (hold for all render window (widgets)
+  // analyse those things and design a controlling mechanism
+
+  // setup the department logo rendering
+  /*
+  m_LogoRendering = mitk::LogoOverlay::New();
+  mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
+  m_LogoRendering->SetOpacity(0.5);
+  mitk::Point2D offset;
+  offset.Fill(0.03);
+  m_LogoRendering->SetOffsetVector(offset);
+  m_LogoRendering->SetRelativeSize(0.15);
+  m_LogoRendering->SetCornerPosition(1);
+  m_LogoRendering->SetLogoImagePath("DefaultLogo");
+  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(), renderer4);
+  */
 }
 
 void QmitkCustomMultiWidget::AddRenderWindowWidget()
@@ -805,16 +659,15 @@ void QmitkCustomMultiWidget::AddRenderWindowWidget()
   // #TODO: include technique, to set the image to level-slide on using the render window manager
 
   // create the render window widget and connect signals / slots
-  std::string UID = "UID";
+  QString UID = m_MultiWidgetName + "UID";
   QmitkRenderWindowWidget* renderWindowWidget = new QmitkRenderWindowWidget(this, UID, m_DataStorage);
 
   // create connections
   connect(renderWindowWidget, SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
   connect(renderWindowWidget, SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
-  connect(this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), renderWindowWidget, SLOT(OnWidgetPlaneModeChanged(int)));
 
   // store the newly created render window widget with the UID
-  m_RenderWindowWidgets.insert(std::pair<std::string, QmitkRenderWindowWidget*>(UID, renderWindowWidget));
+  m_RenderWindowWidgets.insert(std::pair<QString, QmitkRenderWindowWidget*>(UID, renderWindowWidget));
 
   mitk::SliceNavigationController* sliceNavigationController = renderWindowWidget->GetSliceNavigationController();
   if (nullptr != sliceNavigationController)
@@ -826,4 +679,10 @@ void QmitkCustomMultiWidget::AddRenderWindowWidget()
   // #TODO: define the grid cell to add the new render window widget
   // add the newly created render window widget to this multi widget
   m_CustomMultiWidgetLayout->addWidget(renderWindowWidget);
+}
+
+mitk::DataNode::Pointer QmitkCustomMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)
+{
+  // #TODO: see T24173
+  return nodes->front();
 }

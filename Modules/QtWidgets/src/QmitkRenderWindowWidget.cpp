@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRenderWindowWidget.h"
 
-// mitk core
-#include <mitkPlaneGeometryDataMapper2D.h>
-
 // vtk
 #include <vtkTextProperty.h>
 
-QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/, const std::string& UID/* = ""*/, mitk::DataStorage* dataStorage/* = nullptr*/)
+// qt widgets module
+#include <QmitkCustomMultiWidget.h>
+
+QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/, const QString& UID/* = ""*/, mitk::DataStorage* dataStorage/* = nullptr*/)
   : QWidget(parent)
   , m_UID(UID)
   , m_DataStorage(dataStorage)
@@ -48,7 +48,7 @@ void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   m_DataStorage = dataStorage;
   if (nullptr != m_RenderWindow)
   {
-    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(ds);
+    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(dataStorage);
   }
 }
 
@@ -127,8 +127,6 @@ void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
   m_DecorationColor = color;
   m_RectangleProp->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
   m_CornerAnnotation->GetTextProperty()->SetColor(color[0], color[1], color[2]);
-
-  // #TODO: change color of geometry planes
 }
 
 void QmitkRenderWindowWidget::ShowColoredRectangle(bool show)
@@ -161,77 +159,9 @@ std::string QmitkRenderWindowWidget::GetCornerAnnotationText() const
   return std::string(m_CornerAnnotation->GetText(0));
 }
 
-void QmitkRenderWindowWidget::ActivateMenuWidget(bool state, QmitkCustomMultiWidget* multiWidget)
-{
-  // TODO: need to define an interface for multi widgets
-  //m_RenderWindow->ActivateMenuWidget(state, multiWidget);
-}
-
 bool QmitkRenderWindowWidget::IsRenderWindowMenuActivated() const
 {
   return m_RenderWindow->GetActivateMenuWidgetFlag();
-}
-
-void QmitkRenderWindowWidget::ShowGeometryPlanes(bool show)
-{
-  if (m_GeometryPlane1.IsNotNull())
-  {
-    m_GeometryPlane1->SetVisibility(show); // TODO: parameter renderer?
-  }
-  if (m_GeometryPlane2.IsNotNull())
-  {
-    m_GeometryPlane2->SetVisibility(show);
-  }
-  if (m_GeometryPlane3.IsNotNull())
-  {
-    m_GeometryPlane3->SetVisibility(show);
-  }
-  m_RenderingManager->RequestUpdate(m_RenderWindow->GetRenderWindow());
-}
-
-mitk::DataNode::Pointer QmitkRenderWindowWidget::GetGeometryPlane(unsigned int planeNumber) const
-{
-  switch (planeNumber)
-  {
-  case 1:
-    return m_GeometryPlane1;
-  case 2:
-    return m_GeometryPlane2;
-  case 3:
-    return m_GeometryPlane3;
-  default:
-    return nullptr;
-  }
-}
-
-void QmitkRenderWindowWidget::AddGeometryPlanesToDataStorage()
-{
-  if (m_GeometryPlane1.IsNotNull() && m_GeometryPlane2.IsNotNull() && m_GeometryPlane3.IsNotNull() &&
-      m_GeometryPlanes.IsNotNull())
-  {
-    if (nullptr != m_DataStorage)
-    {
-      m_DataStorage->Add(m_GeometryPlanes);
-      m_DataStorage->Add(m_GeometryPlane1, m_GeometryPlanes);
-      m_DataStorage->Add(m_GeometryPlane2, m_GeometryPlanes);
-      m_DataStorage->Add(m_GeometryPlane3, m_GeometryPlanes);
-    }
-  }
-}
-
-void QmitkRenderWindowWidget::RemoveGeometryPlanesFromDataStorage()
-{
-  if (m_GeometryPlane1.IsNotNull() && m_GeometryPlane2.IsNotNull() && m_GeometryPlane3.IsNotNull() &&
-      m_GeometryPlanes.IsNotNull())
-  {
-    if (nullptr != m_DataStorage)
-    {
-      m_DataStorage->Remove(m_GeometryPlane1);
-      m_DataStorage->Remove(m_GeometryPlane2);
-      m_DataStorage->Remove(m_GeometryPlane3);
-      m_DataStorage->Remove(m_GeometryPlanes);
-    }
-  }
 }
 
 void QmitkRenderWindowWidget::InitializeGUI()
@@ -261,64 +191,20 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_Layout->addWidget(m_RenderWindow);
   m_Layout->addWidget(m_LevelWindowWidget);
 
-  // add geometry planes
-  InitializeGeometryPlanes();
   // set colors, add logo etc.
   InitializeDecorations();
+
+  if (m_RenderingManager == nullptr)
+  {
+    m_RenderingManager = mitk::RenderingManager::GetInstance();
+  }
+  m_TimeNavigationController = m_RenderingManager->GetTimeNavigationController();
 
   // connect to the "time navigation controller": send time via sliceNavigationControllers
   m_TimeNavigationController->ConnectGeometryTimeEvent(GetRenderWindow()->GetSliceNavigationController(), false);
 
   // reverse connection between sliceNavigationControllers and m_TimeNavigationController
   GetRenderWindow()->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-}
-
-void QmitkRenderWindowWidget::InitializeGeometryPlanes()
-{
-  // #TODO: all have same geometry plane / all have same color
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow());
-  if (nullptr == renderer)
-  {
-    return;
-  }
-
-  mitk::PlaneGeometryDataMapper2D::Pointer mapper;
-
-  m_GeometryPlane1 = renderer->GetCurrentWorldPlaneGeometryNode();
-  m_GeometryPlane1->SetColor(m_DecorationColor);
-  m_GeometryPlane1->SetProperty("layer", mitk::IntProperty::New(1000));
-  m_GeometryPlane1->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_GeometryPlane1->SetProperty("name", mitk::StringProperty::New(std::string(renderer->GetName()) + ".plane"));
-  m_GeometryPlane1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_GeometryPlane1->SetProperty("helper object", mitk::BoolProperty::New(true));
-  mapper = mitk::PlaneGeometryDataMapper2D::New();
-  m_GeometryPlane1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
-
-  m_GeometryPlane2 = renderer->GetCurrentWorldPlaneGeometryNode();
-  m_GeometryPlane2->SetColor(m_DecorationColor);
-  m_GeometryPlane2->SetProperty("layer", mitk::IntProperty::New(1000));
-  m_GeometryPlane2->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_GeometryPlane2->SetProperty("name", mitk::StringProperty::New(std::string(renderer->GetName()) + ".plane"));
-  m_GeometryPlane2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_GeometryPlane2->SetProperty("helper object", mitk::BoolProperty::New(true));
-  mapper = mitk::PlaneGeometryDataMapper2D::New();
-  m_GeometryPlane2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
-
-  m_GeometryPlane3 = renderer->GetCurrentWorldPlaneGeometryNode();
-  m_GeometryPlane3->SetColor(m_DecorationColor);
-  m_GeometryPlane3->SetProperty("layer", mitk::IntProperty::New(1000));
-  m_GeometryPlane3->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_GeometryPlane3->SetProperty("name", mitk::StringProperty::New(std::string(renderer->GetName()) + ".plane"));
-  m_GeometryPlane3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_GeometryPlane3->SetProperty("helper object", mitk::BoolProperty::New(true));
-  mapper = mitk::PlaneGeometryDataMapper2D::New();
-  m_GeometryPlane2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
-
-  // the parent node
-  m_ParentNodeForGeometryPlanes = mitk::DataNode::New();
-  m_ParentNodeForGeometryPlanes->SetProperty("layer", mitk::IntProperty::New(1000));
-  m_ParentNodeForGeometryPlanes->SetProperty("name", mitk::StringProperty::New("Widgets"));
-  m_ParentNodeForGeometryPlanes->SetProperty("helper object", mitk::BoolProperty::New(true));
 }
 
 void QmitkRenderWindowWidget::InitializeDecorations()

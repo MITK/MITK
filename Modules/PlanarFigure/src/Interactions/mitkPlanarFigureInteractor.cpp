@@ -717,12 +717,14 @@ bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry( const Interac
   if ( abstractTransformGeometry != nullptr)
     return false;
 
+  // Distance check was disabled due to disabling camera movement each frame, being not important and it works wrong by checking extent only for third axis
+  /*
   const double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
   if ( planarFigurePlaneGeometry->Distance( worldPoint3D ) > planeThickness )
   {
     // don't react, when interaction is too far away
     return false;
-  }
+  }*/
   return true;
 }
 

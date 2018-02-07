@@ -35,6 +35,8 @@ namespace Utilities
 
     ~ThreadPool();
 
+    void Stop();
+
     void AddThreads(size_t count);
 
     size_t Enqueue(const Task& task, TaskPriority priority = TaskPriority::NORMAL);

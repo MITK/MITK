@@ -11,6 +11,7 @@
 
 namespace
 {
+  boost::shared_mutex s_guard;
   std::unique_ptr<Utilities::ThreadPool> s_instance;
 }
 
@@ -34,16 +35,28 @@ namespace Utilities
 
   ThreadPool::~ThreadPool()
   {
-    m_work = boost::none;
-    m_pool.join_all();
+    Stop();
   }
 
   ThreadPool& ThreadPool::Instance()
   {
+    boost::upgrade_lock<boost::shared_mutex> lock(s_guard);
     if (!s_instance) {
-      s_instance.reset(new ThreadPool());
+      const boost::upgrade_to_unique_lock<boost::shared_mutex> guard(lock);
+      if (!s_instance) {
+        s_instance.reset(new ThreadPool());
+      }
     }
     return *s_instance;
+  }
+
+  void ThreadPool::Stop()
+  {
+    if (!m_work) {
+      return;
+    }
+    m_work = boost::none;
+    m_pool.join_all();
   }
 
   void ThreadPool::AddThreads(size_t count)
@@ -57,6 +70,10 @@ namespace Utilities
 
   size_t ThreadPool::Enqueue(const Task& task, TaskPriority priority)
   {
+    if (!m_work) {
+      return 0;
+    }
+
     UniqueLock lockTask(m_taskGuard);
     const auto taskId = m_id++;
     m_task.emplace(taskId, task);

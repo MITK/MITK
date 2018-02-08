@@ -126,7 +126,7 @@ private:
   * @par  sourcePart  The workbench part containing the selection.
   * @par  selection   The current selection.
   */
-  void ServiceSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcePart, const berry::ISelection::ConstPointer& selection);
+  void OnServiceSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcePart, const berry::ISelection::ConstPointer& selection);
 
 };
 

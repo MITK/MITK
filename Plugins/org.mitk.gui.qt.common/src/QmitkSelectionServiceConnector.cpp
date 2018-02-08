@@ -47,7 +47,7 @@ void QmitkSelectionServiceConnector::AddPostSelectionListener(berry::ISelectionS
   }
 
   m_SelectionService = selectionService;
-  m_BerrySelectionListener.reset(new berry::NullSelectionChangedAdapter<QmitkSelectionServiceConnector>(this, &QmitkSelectionServiceConnector::ServiceSelectionChanged));
+  m_BerrySelectionListener.reset(new berry::NullSelectionChangedAdapter<QmitkSelectionServiceConnector>(this, &QmitkSelectionServiceConnector::OnServiceSelectionChanged));
   m_SelectionService->AddPostSelectionListener(m_BerrySelectionListener.get());
 }
 
@@ -99,7 +99,7 @@ void QmitkSelectionServiceConnector::ChangeServiceSelection(QList<mitk::DataNode
   }
 }
 
-void QmitkSelectionServiceConnector::ServiceSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcePart, const berry::ISelection::ConstPointer& selection)
+void QmitkSelectionServiceConnector::OnServiceSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcePart, const berry::ISelection::ConstPointer& selection)
 {
   if (sourcePart.IsNull())
   {

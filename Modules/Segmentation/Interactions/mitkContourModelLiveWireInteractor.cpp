@@ -70,7 +70,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( const InteractionE
 
   // Check distance to any vertex.
   // Transition YES if click close to a vertex
-  mitk::Point3D click = positionEvent->GetPositionInWorld();
+  mitk::Point3D click = positionEvent->GetPlanePositionInWorld();
 
   if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
@@ -208,7 +208,7 @@ void mitk::ContourModelLiveWireInteractor::OnMovePoint(StateMachineAction*, Inte
   if (!positionEvent) return;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
-  mitk::Point3D currentPosition = positionEvent->GetPositionInWorld();
+  mitk::Point3D currentPosition = positionEvent->GetPlanePositionInWorld();
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( this->GetDataNode()->GetData() );
   if (contour == nullptr)
@@ -323,7 +323,7 @@ bool mitk::ContourModelLiveWireInteractor::IsHovering(const InteractionEvent* in
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( this->GetDataNode()->GetData() );
 
-  mitk::Point3D currentPosition = positionEvent->GetPositionInWorld();
+  mitk::Point3D currentPosition = positionEvent->GetPlanePositionInWorld();
 
 
   bool isHover = false;

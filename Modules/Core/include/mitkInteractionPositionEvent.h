@@ -47,6 +47,7 @@ namespace mitk
 
     Point2D GetPointerPositionOnScreen() const;
     Point3D GetPositionInWorld() const;
+    Point3D GetPlanePositionInWorld() const;
 
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
 

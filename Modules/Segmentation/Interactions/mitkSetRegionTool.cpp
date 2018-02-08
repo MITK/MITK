@@ -70,7 +70,7 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   // if click was outside the image, don't continue
   const BaseGeometry* sliceGeometry = workingSlice->GetGeometry();
   itk::Index<3> projectedPointIn2D;
-  sliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), projectedPointIn2D );
+  sliceGeometry->WorldToIndex( positionEvent->GetPlanePositionInWorld(), projectedPointIn2D );
   if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) )
   {
     MITK_ERROR << "point apparently not inside segmentation slice" << std::endl;
@@ -84,7 +84,7 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 
   // convert world coordinates to image indices
   IndexType seedIndex;
-  sliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), seedIndex);
+  sliceGeometry->WorldToIndex( positionEvent->GetPlanePositionInWorld(), seedIndex);
 
   //perform region growing in desired segmented region
   InputImageType::Pointer itkImage = InputImageType::New();

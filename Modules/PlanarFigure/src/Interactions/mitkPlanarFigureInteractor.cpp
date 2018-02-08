@@ -700,7 +700,7 @@ bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry( const Interac
   if ( posEvent == nullptr )
     return false;
 
-  const mitk::Point3D worldPoint3D = posEvent->GetPositionInWorld();
+  const mitk::Point3D worldPoint3D = posEvent->GetPlanePositionInWorld();
   const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     GetDataNode()->GetData() );
 
@@ -717,14 +717,12 @@ bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry( const Interac
   if ( abstractTransformGeometry != nullptr)
     return false;
 
-  // Distance check was disabled due to disabling camera movement each frame, being not important and it works wrong by checking extent only for third axis
-  /*
   const double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
   if ( planarFigurePlaneGeometry->Distance( worldPoint3D ) > planeThickness )
   {
     // don't react, when interaction is too far away
     return false;
-  }*/
+  }
   return true;
 }
 
@@ -744,7 +742,7 @@ bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D( const Intera
                                                                     const PlaneGeometry *planarFigureGeometry,
                                                                     Point2D &point2D )
 {
-  const mitk::Point3D worldPoint3D = positionEvent->GetPositionInWorld();
+  const mitk::Point3D worldPoint3D = positionEvent->GetPlanePositionInWorld();
 
   // TODO: proper handling of distance tolerance
   /*

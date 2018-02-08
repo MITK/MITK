@@ -59,13 +59,13 @@ void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachin
       itkPoint[1] = pt[1];
       itkPoint[2] = pt[2];
 
-      doOp = new mitk::PointOperation(OpMOVE,timeInMs,positionEvent->GetPositionInWorld(), 0);
+      doOp = new mitk::PointOperation(OpMOVE,timeInMs,positionEvent->GetPlanePositionInWorld(), 0);
       undoOp = new mitk::PointOperation(OpMOVE,timeInMs,itkPoint, 0);
     }
     else
     {
-      doOp = new mitk::PointOperation(OpINSERT,timeInMs,positionEvent->GetPositionInWorld(), 0);
-      undoOp = new mitk::PointOperation(OpREMOVE,timeInMs,positionEvent->GetPositionInWorld(), 0);
+      doOp = new mitk::PointOperation(OpINSERT,timeInMs,positionEvent->GetPlanePositionInWorld(), 0);
+      undoOp = new mitk::PointOperation(OpREMOVE,timeInMs,positionEvent->GetPlanePositionInWorld(), 0);
     }
 
 

@@ -57,7 +57,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
+    mitk::Point3D itkPoint = positionEvent->GetPlanePositionInWorld();
 
     this->UnselectAll( timeStep, timeInMs);
 
@@ -121,7 +121,7 @@ void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    Point3D point = positionEvent->GetPositionInWorld();
+    Point3D point = positionEvent->GetPlanePositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
     int index = GetPointIndexByPosition(point, timeStep);
     if (index != -1)
@@ -168,7 +168,7 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
+    mitk::Point3D itkPoint = positionEvent->GetPlanePositionInWorld();
 
     //search the point in the list
     int position = m_PointSet->SearchPoint( itkPoint , m_SelectionAccuracy, timeStep);
@@ -213,7 +213,7 @@ void mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction*, Interact
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    Point3D point = positionEvent->GetPositionInWorld();
+    Point3D point = positionEvent->GetPlanePositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
     if (GetPointIndexByPosition(point, timeStep) != -1 && m_PointSet->GetSize(timeStep) >= 3)
     {
@@ -232,7 +232,7 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAct
   {
     IsClosedContour(stateMachineAction, interactionEvent);
     mitk::Point3D newPoint, resultPoint;
-    newPoint = positionEvent->GetPositionInWorld();
+    newPoint = positionEvent->GetPlanePositionInWorld();
 
     // search the elements in the list that are selected then calculate the
     // vector, because only with the vector we can move several elements in
@@ -285,7 +285,7 @@ void mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction*, 
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    Point3D point = positionEvent->GetPositionInWorld();
+    Point3D point = positionEvent->GetPlanePositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
     int index = GetPointIndexByPosition(point, timeStep);
     // here it is ensured that we don't switch from one point being selected to another one being selected,
@@ -319,7 +319,7 @@ void mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk:
   if (positionEvent != NULL)
   {
 
-    Point3D positioninWorld = positionEvent->GetPositionInWorld();
+    Point3D positioninWorld = positionEvent->GetPlanePositionInWorld();
     PointSet::PointsContainer::Iterator it, end;
 
 
@@ -421,7 +421,7 @@ void mitk::PointSetDataInteractor::InitMove(StateMachineAction*, InteractionEven
 
   // start of the Movement is stored to calculate the undoKoordinate
   // in FinishMovement
-  m_LastPoint = positionEvent->GetPositionInWorld();
+  m_LastPoint = positionEvent->GetPlanePositionInWorld();
 
   // initialize a value to calculate the movement through all
   // MouseMoveEvents from MouseClick to MouseRelease
@@ -544,7 +544,7 @@ bool mitk::PointSetDataInteractor::CheckSelection(const mitk::InteractionEvent *
   if (positionEvent != NULL)
   {
     int timeStep = positionEvent->GetSender()->GetTimeStep();
-    Point3D point = positionEvent->GetPositionInWorld();
+    Point3D point = positionEvent->GetPlanePositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
     int index = GetPointIndexByPosition(point, timeStep);
     if (index != -1)

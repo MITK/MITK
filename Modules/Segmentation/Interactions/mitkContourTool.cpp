@@ -78,7 +78,8 @@ void mitk::ContourTool::OnMousePressed( StateMachineAction*, InteractionEvent* i
   //draw as a closed contour
   contour->SetClosed(true,timestep);
   //add first mouse position
-  mitk::Point3D point = positionEvent->GetPositionInWorld();
+
+  mitk::Point3D point = positionEvent->GetPlanePositionInWorld();
   contour->AddVertex( point, timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
@@ -97,7 +98,7 @@ void mitk::ContourTool::OnMouseMoved( StateMachineAction*, InteractionEvent* int
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  mitk::Point3D point = positionEvent->GetPositionInWorld();
+  mitk::Point3D point = positionEvent->GetPlanePositionInWorld();
   contour->AddVertex( point, timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );

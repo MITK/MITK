@@ -333,7 +333,7 @@ void mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
 
   mitk::Point3D clickInIndex;
 
-  m_ReferenceImageSlice->GetGeometry()->WorldToIndex(m_PositionEvent->GetPositionInWorld(), clickInIndex);
+  m_ReferenceImageSlice->GetGeometry()->WorldToIndex(m_PositionEvent->GetPlanePositionInWorld(), clickInIndex);
   itk::Index<2> seedPosition;
   seedPosition[0] = clickInIndex[0];
   seedPosition[1] = clickInIndex[1];
@@ -345,7 +345,7 @@ void mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
   this->m_SeedContainer->InsertElement(this->m_SeedContainer->Size(), node);
   m_FastMarchingFilter->Modified();
 
-  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), m_PositionEvent->GetPositionInWorld());
+  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), m_PositionEvent->GetPlanePositionInWorld());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

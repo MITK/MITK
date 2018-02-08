@@ -49,7 +49,7 @@ namespace mitk
     virtual void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
 
     void SetSelectionMode(bool selection);
-    static void SetMouseRotationMode(bool active, std::function<void()> globalCallback);
+    static void SetMouseRotationMode(bool active, std::function<void(std::string)> globalCallback);
     static bool GetMouseRotationMode();
 
     static void RotateCamera(BaseRenderer* renderer, bool clockwise);
@@ -316,7 +316,7 @@ namespace mitk
     * 3D view selection mode
     */
     static bool m_MouseRotationMode;
-    static std::function<void()> m_CurrentCallbackFunction;
+    static std::function<void(std::string)> m_CurrentCallbackFunction;
     bool m_SelectionMode;
     /// <summary>
     /// TODO: select world point on multiwidget

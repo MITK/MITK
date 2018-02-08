@@ -36,6 +36,17 @@ mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld() const
   return worldPos;
 }
 
+mitk::Point3D mitk::InteractionPositionEvent::GetPlanePositionInWorld() const
+{
+  const PlaneGeometry* planeGeometry = GetSender()->GetCurrentWorldPlaneGeometry();
+  mitk::Point2D position;
+  planeGeometry->Map(GetPositionInWorld(), position);
+  mitk::Point3D point;
+  planeGeometry->Map(position, point);
+
+  return point;
+}
+
 bool mitk::InteractionPositionEvent::IsEqual(const InteractionEvent& other) const
 {
   return Superclass::IsEqual(other);

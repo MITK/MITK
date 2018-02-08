@@ -100,7 +100,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 
 double mitk::DisplayInteractor::m_ClockRotationSpeed = 90.;
 bool mitk::DisplayInteractor::m_MouseRotationMode = false;
-std::function<void()> mitk::DisplayInteractor::m_CurrentCallbackFunction = nullptr;
+std::function<void(std::string) > mitk::DisplayInteractor::m_CurrentCallbackFunction = nullptr;
 
 mitk::DisplayInteractor::DisplayInteractor()
   : m_Selector(true)
@@ -136,11 +136,11 @@ void mitk::DisplayInteractor::SetSelectionMode(bool selection)
   m_SelectionMode = selection;
 }
 
-void mitk::DisplayInteractor::SetMouseRotationMode(bool active,  std::function<void()> globalCallback)
+void mitk::DisplayInteractor::SetMouseRotationMode(bool active, std::function<void(std::string) > globalCallback)
 {
   m_MouseRotationMode = active;
   m_CurrentCallbackFunction = globalCallback;
-  globalCallback();
+  globalCallback("MouseCameraRotation");
 }
 
 bool mitk::DisplayInteractor::GetMouseRotationMode()
@@ -759,7 +759,7 @@ void mitk::DisplayInteractor::StopMouseRotation(StateMachineAction* state, Inter
 {
   EndRotation(state, e);
   m_MouseRotationMode = false;
-  m_CurrentCallbackFunction();
+  m_CurrentCallbackFunction("MouseCameraRotation");
 }
 
 void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::InteractionEvent * event)

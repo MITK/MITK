@@ -77,7 +77,7 @@ bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent* intera
   TubeGraphPicker* picker = new mitk::TubeGraphPicker();
   picker->SetTubeGraph(m_TubeGraph);
 
-  TubeGraph::TubeDescriptorType tubeDescriptor = picker->GetPickedTube(positionEvent->GetPositionInWorld()).first;
+  TubeGraph::TubeDescriptorType tubeDescriptor = picker->GetPickedTube(positionEvent->GetPlanePositionInWorld()).first;
 
   if(tubeDescriptor != TubeGraph::ErrorId )
   {

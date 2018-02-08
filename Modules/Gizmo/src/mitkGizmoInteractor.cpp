@@ -119,7 +119,7 @@ bool mitk::GizmoInteractor::HasPickedHandle(const InteractionEvent* interactionE
 
     // note initial state
     m_InitialClickPosition2D = positionEvent->GetPointerPositionOnScreen();
-    m_InitialClickPosition3D = positionEvent->GetPositionInWorld();
+    m_InitialClickPosition3D = positionEvent->GetPlanePositionInWorld();
 
     auto renderer = positionEvent->GetSender()->GetVtkRenderer();
     renderer->SetWorldPoint(m_InitialClickPosition3D[0],

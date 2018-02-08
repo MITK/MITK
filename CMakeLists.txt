@@ -1045,6 +1045,7 @@ if(MITK_USE_BLUEBERRY)
     list(APPEND mitk_plugins_fullpath Plugins/${mitk_plugin})
   endforeach()
 
+  set(MITK_PLUGIN_REGEX_LIST "")
   foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
     set(MITK_PLUGINS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Plugins)
     get_filename_component(MITK_PLUGINS_EXTENSION_DIR ${MITK_PLUGINS_EXTENSION_DIR} ABSOLUTE)
@@ -1080,7 +1081,7 @@ if(MITK_USE_BLUEBERRY)
     set(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
     set(_tmp_list)
     list(APPEND _tmp_list ${all_target_libraries})
-    ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb OUTPUT_VARIABLE ${varname})
+    ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb MITK_PLUGIN_REGEX_LIST OUTPUT_VARIABLE ${varname})
   endmacro()
 
   # Get infos about application directories and build options

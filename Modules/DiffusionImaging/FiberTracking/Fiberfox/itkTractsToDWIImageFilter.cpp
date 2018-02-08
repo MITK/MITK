@@ -513,6 +513,12 @@ namespace itk
     temp.Fill(0.0);
     m_OutputImage->FillBuffer(temp);
 
+    MITK_INFO << "Output image parameters:";
+    MITK_INFO << "Size:" << m_Parameters.m_SignalGen.m_CroppedRegion;
+    MITK_INFO << "Spacing:" << m_Parameters.m_SignalGen.m_ImageSpacing;
+    MITK_INFO << "Origin:" << shiftedOrigin;
+    MITK_INFO << "Matrix:" << m_Parameters.m_SignalGen.m_ImageDirection;
+
     // Apply in-plane upsampling for Gibbs ringing artifact
     double upsampling = 1;
     if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)

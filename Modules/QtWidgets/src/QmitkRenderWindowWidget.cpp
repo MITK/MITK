@@ -174,7 +174,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   // create render window for this render window widget
   m_RenderingManager = mitk::RenderingManager::GetInstance(); // TODO: do not always use the standard global rendering manager
   m_RenderingMode = mitk::BaseRenderer::RenderingMode::Standard; // TODO: do not always use the standard rendering mode
-  m_RenderWindow = new QmitkRenderWindow(this, "widget - " + m_UID, nullptr, m_RenderingManager, m_RenderingMode);
+  m_RenderWindow = new QmitkRenderWindow(this, m_UID, nullptr, m_RenderingManager, m_RenderingMode);
   m_RenderWindow->SetLayoutIndex(QmitkCustomMultiWidget::SAGITTAL); // TODO: allow to change layout type later
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
 

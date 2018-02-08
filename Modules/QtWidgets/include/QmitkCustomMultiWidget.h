@@ -62,24 +62,29 @@ public:
   
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  std::map<QString, QmitkRenderWindowWidget*> GetRenderWindowWidgets() const;
-  QmitkRenderWindowWidget* GetRenderWindowWidget(unsigned int widgetNumber) const;
+  using RenderWindowWidgetMap = std::map<QString, QmitkRenderWindowWidget*>;
+  using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
+  RenderWindowWidgetMap GetRenderWindowWidgets() const;
+  QmitkRenderWindowWidget* GetRenderWindowWidget(const QString& widgetID) const;
+
+  QmitkRenderWindow* GetRenderWindow(const QString& widgetID) const;
+
   QmitkRenderWindowWidget* GetActiveRenderWindowWidget() const;
   QmitkRenderWindowWidget* GetFirstRenderWindowWidget() const;
   QmitkRenderWindowWidget* GetLastRenderWindowWidget() const;
   
   unsigned int GetNumberOfRenderWindowWidgets() const;
 
-  void RequestUpdate(unsigned int widgetNumber);
+  void RequestUpdate(const QString& widgetID);
   void RequestUpdateAll();
-  void ForceImmediateUpdate(unsigned int widgetNumber);
+  void ForceImmediateUpdate(const QString& widgetID);
   void ForceImmediateUpdateAll();
 
-  const mitk::Point3D GetCrossPosition(unsigned int widgetNumber) const;
+  const mitk::Point3D GetCrossPosition(const QString& widgetID) const;
 
 public slots:
 
-  void ShowLevelWindowWidget(unsigned int widgetNumber, bool show);
+  void ShowLevelWindowWidget(const QString& widgetID, bool show);
   void ShowAllLevelWindowWidgets(bool show);
   /**
   * @brief Set a background color gradient for a specific render window.
@@ -88,9 +93,9 @@ public slots:
   *
   * @param upper          The color of the gradient background.
   * @param lower          The color of the gradient background.
-  * @param widgetNumber   The widget identifier.
+  * @param widgetID   The widget identifier.
   */
-  void SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower, unsigned int widgetNumber);
+  void SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower, const QString& widgetID);
   /**
   * @brief Set a background color gradient for all available render windows.
   *
@@ -102,36 +107,36 @@ public slots:
   // #TODO: 'backgroundgradientcolor'
   void SetAllBackgroundColorGradients(const mitk::Color& upper, const mitk::Color& lower);
   void FillAllBackgroundColorGradientsWithBlack();
-  void ShowBackgroundColorGradient(unsigned int widgetNumber, bool show);
+  void ShowBackgroundColorGradient(const QString& widgetID, bool show);
   void ShowAllBackgroundColorGradients(bool show);
   /**
   * @rief Return a render window (widget) specific background color gradient
   *
-  * @param widgetNumber   The widget identifier.
+  * @param widgetID   The widget identifier.
   *
   * @return               A color gradient as a pair of colors.
   *                       First entry: upper color value
   *                       Second entry: lower color value
   */
-  std::pair<mitk::Color, mitk::Color> GetBackgroundColorGradient(unsigned int widgetNumber) const;
-  bool GetBackgroundColorGradientFlag(unsigned int widgetNumber) const;
+  std::pair<mitk::Color, mitk::Color> GetBackgroundColorGradient(const QString& widgetID) const;
+  bool GetBackgroundColorGradientFlag(const QString& widgetID) const;
 
   void SetDepartmentLogoPath(const char* path);
-  void ShowDepartmentLogo(unsigned int widgetNumber, bool show);
+  void ShowDepartmentLogo(const QString& widgetID, bool show);
   void ShowAllDepartmentLogos(bool show);
 
-  void SetDecorationColor(unsigned int widgetNumber, const mitk::Color& color);
-  mitk::Color GetDecorationColor(unsigned int widgetNumber) const;
+  void SetDecorationColor(const QString& widgetID, const mitk::Color& color);
+  mitk::Color GetDecorationColor(const QString& widgetID) const;
 
-  void ShowColoredRectangle(unsigned int widgetNumber, bool show);
+  void ShowColoredRectangle(const QString& widgetID, bool show);
   void ShowAllColoredRectangles(bool show);
-  bool IsColoredRectangleVisible(unsigned int widgetNumber) const;
+  bool IsColoredRectangleVisible(const QString& widgetID) const;
 
-  void ShowCornerAnnotation(unsigned int widgetNumber, bool show);
+  void ShowCornerAnnotation(const QString& widgetID, bool show);
   void ShowAllCornerAnnotations(bool show);
-  bool IsCornerAnnotationVisible(unsigned int widgetNumber) const;
-  void SetCornerAnnotationText(unsigned int widgetNumber, const std::string& cornerAnnotation);
-  std::string GetCornerAnnotationText(unsigned int widgetNumber) const;
+  bool IsCornerAnnotationVisible(const QString& widgetID) const;
+  void SetCornerAnnotationText(const QString& widgetID, const std::string& cornerAnnotation);
+  std::string GetCornerAnnotationText(const QString& widgetID) const;
 
   /**
   * @brief Listener to the CrosshairPositionEvent
@@ -149,16 +154,16 @@ public slots:
 
   void EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p);
 
-  void MoveCrossToPosition(unsigned int widgetNumber, const mitk::Point3D& newPosition);
+  void MoveCrossToPosition(const QString& widgetID, const mitk::Point3D& newPosition);
 
   void ResetCrosshair();
 
   // mouse events
-  void wheelEvent(QWheelEvent *e) override;
+  void wheelEvent(QWheelEvent* e) override;
 
-  void mousePressEvent(QMouseEvent *e) override;
+  void mousePressEvent(QMouseEvent* e) override;
 
-  void moveEvent(QMoveEvent *e) override;
+  void moveEvent(QMoveEvent* e) override;
 
 signals:
 
@@ -185,7 +190,7 @@ private:
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
   QGridLayout* m_CustomMultiWidgetLayout;
-  std::map<QString, QmitkRenderWindowWidget*> m_RenderWindowWidgets;
+  RenderWindowWidgetMap m_RenderWindowWidgets;
 
   QmitkRenderWindowWidget* m_ActiveRenderWindowWidget;
 

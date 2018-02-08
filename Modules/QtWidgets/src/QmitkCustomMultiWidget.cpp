@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include <mitkUIDGenerator.h>
+
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
 #include <mitkManualPlacementAnnotationRenderer.h>
@@ -79,9 +81,9 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
 
 QmitkCustomMultiWidget::~QmitkCustomMultiWidget()
 {
-  for (const auto& mapEntry : m_RenderWindowWidgets)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    m_TimeNavigationController->Disconnect(mapEntry.second->GetRenderWindow()->GetSliceNavigationController());
+    m_TimeNavigationController->Disconnect(renderWindowWidget.second->GetRenderWindow()->GetSliceNavigationController());
   }
 }
 
@@ -99,19 +101,37 @@ void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
-std::map<QString, QmitkRenderWindowWidget*> QmitkCustomMultiWidget::GetRenderWindowWidgets() const
+QmitkCustomMultiWidget::RenderWindowWidgetMap QmitkCustomMultiWidget::GetRenderWindowWidgets() const
 {
   return m_RenderWindowWidgets;
 }
 
-QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetRenderWindowWidget(unsigned int widgetNumber) const
+QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetRenderWindowWidget(const QString& widgetID) const
 {
-  return m_RenderWindowWidgets.find(QString::number(widgetNumber))->second;
+  RenderWindowWidgetMap::const_iterator it = m_RenderWindowWidgets.find(widgetID);
+  if (it == m_RenderWindowWidgets.end())
+  {
+    return nullptr;
+  }
+
+  return it->second;
+}
+
+QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(const QString& widgetID) const
+{
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
+  {
+    return renderWindowWidget->GetRenderWindow();
+  }
+
+  return nullptr;
 }
 
 QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetActiveRenderWindowWidget() const
 {
-  return m_ActiveRenderWindowWidget;
+  //return m_ActiveRenderWindowWidget;
+  return m_RenderWindowWidgets.begin()->second;
 }
 
 QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetFirstRenderWindowWidget() const
@@ -129,39 +149,45 @@ unsigned int QmitkCustomMultiWidget::GetNumberOfRenderWindowWidgets() const
   return m_RenderWindowWidgets.size();
 }
 
-void QmitkCustomMultiWidget::RequestUpdate(unsigned int widgetNumber)
+void QmitkCustomMultiWidget::RequestUpdate(const QString& widgetID)
 {
-  GetRenderWindowWidget(widgetNumber)->RequestUpdate();
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
+  {
+    return renderWindowWidget->RequestUpdate();
+  }
 }
 
 void QmitkCustomMultiWidget::RequestUpdateAll()
 {
   // #TODO: Update only render windows that show the same image?
   // #TODO: Update only type specific render windows (2D / 3D)?
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    RequestUpdate(i);
+    renderWindowWidget.second->RequestUpdate();
   }
 }
 
-void QmitkCustomMultiWidget::ForceImmediateUpdate(unsigned int widgetNumber)
+void QmitkCustomMultiWidget::ForceImmediateUpdate(const QString& widgetID)
 {
-  GetRenderWindowWidget(widgetNumber)->ForceImmediateUpdate();
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
+  {
+    renderWindowWidget->ForceImmediateUpdate();
+  }
 }
 
 void QmitkCustomMultiWidget::ForceImmediateUpdateAll()
 {
   // #TODO: Update only render windows that show the same image?
   // #TODO: Update only type specific render windows (2D / 3D)?
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    ForceImmediateUpdate(i);
+    renderWindowWidget.second->ForceImmediateUpdate();
   }
 }
 
-const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(unsigned int widgetNumber) const
+const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(const QString& widgetID) const
 {
   /*
   const mitk::PlaneGeometry *plane1 = mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -188,45 +214,43 @@ const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(unsigned int widget
 //////////////////////////////////////////////////////////////////////////
 // PUBLIC SLOTS
 //////////////////////////////////////////////////////////////////////////
-// TODO: Use widget directly instead of number?
-void QmitkCustomMultiWidget::ShowLevelWindowWidget(unsigned int widgetNumber, bool show)
+void QmitkCustomMultiWidget::ShowLevelWindowWidget(const QString& widgetID, bool show)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Level window widget can not be shown for an unknown widget.";
+    renderWindowWidget->ShowLevelWindowWidget(show);
     return;
   }
 
-  GetRenderWindowWidget(widgetNumber)->ShowLevelWindowWidget(show);
+  MITK_ERROR << "Level window widget can not be shown for an unknown widget.";
 }
 
-// TODO: Use foreach on widgets map instead of iterator i and "widget number"?
 void QmitkCustomMultiWidget::ShowAllLevelWindowWidgets(bool show)
 {
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    ShowLevelWindowWidget(i, show);
+    renderWindowWidget.second->ShowLevelWindowWidget(show);
   }
 }
 
-void QmitkCustomMultiWidget::SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower, unsigned int widgetNumber)
+void QmitkCustomMultiWidget::SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower, const QString& widgetID)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Background color gradient can not be set for an unknown widget.";
+    renderWindowWidget->SetBackgroundColorGradient(upper, lower);
     return;
   }
 
-  GetRenderWindowWidget(widgetNumber)->SetBackgroundColorGradient(upper, lower);
+  MITK_ERROR << "Background color gradient can not be set for an unknown widget.";
 }
 
 void QmitkCustomMultiWidget::SetAllBackgroundColorGradients(const mitk::Color& upper, const mitk::Color& lower)
 {
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    SetBackgroundColorGradient(upper, lower, i);
+    renderWindowWidget.second->SetBackgroundColorGradient(upper, lower);
   }
 }
 
@@ -236,47 +260,49 @@ void QmitkCustomMultiWidget::FillAllBackgroundColorGradientsWithBlack()
   SetAllBackgroundColorGradients(black, black);
 }
 
-void QmitkCustomMultiWidget::ShowBackgroundColorGradient(unsigned int widgetNumber, bool show)
+void QmitkCustomMultiWidget::ShowBackgroundColorGradient(const QString& widgetID, bool show)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Background color gradient can not be shown for an unknown widget.";
+    renderWindowWidget->ShowBackgroundColorGradient(show);
     return;
   }
 
-  GetRenderWindowWidget(widgetNumber)->ShowBackgroundColorGradient(show);
+  MITK_ERROR << "Background color gradient can not be shown for an unknown widget.";
 }
 
 void QmitkCustomMultiWidget::ShowAllBackgroundColorGradients(bool show)
 {
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    ShowBackgroundColorGradient(i, show);
+    renderWindowWidget.second->ShowBackgroundColorGradient(show);
   }
 }
 
-std::pair<mitk::Color, mitk::Color> QmitkCustomMultiWidget::GetBackgroundColorGradient(unsigned int widgetNumber) const
+std::pair<mitk::Color, mitk::Color> QmitkCustomMultiWidget::GetBackgroundColorGradient(const QString& widgetID) const
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Background color gradient can not be retrieved for an unknown widget. Returning black color pair.";
-    float black[3] = { 0.0f, 0.0f, 0.0f };
-    return std::make_pair(mitk::Color(black), mitk::Color(black));
+    return renderWindowWidget->GetRendererBackgroundColorGradient();
   }
 
-  return GetRenderWindowWidget(widgetNumber)->GetRendererBackgroundColorGradient();
+  MITK_ERROR << "Background color gradient can not be retrieved for an unknown widget. Returning black color pair.";
+  float black[3] = { 0.0f, 0.0f, 0.0f };
+  return std::make_pair(mitk::Color(black), mitk::Color(black));
 }
 
-bool QmitkCustomMultiWidget::GetBackgroundColorGradientFlag(unsigned int widgetNumber) const
+bool QmitkCustomMultiWidget::GetBackgroundColorGradientFlag(const QString& widgetID) const
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Background color gradient flag can not be retrieved for an unknown widget. Returning 'false'.";
-    return false;
+    return renderWindowWidget->GetBackgroundColorGradientFlag();
   }
 
-  return GetRenderWindowWidget(widgetNumber)->GetBackgroundColorGradientFlag();
+  MITK_ERROR << "Background color gradient flag can not be retrieved for an unknown widget. Returning 'false'.";
+  return false;
 }
 
 void QmitkCustomMultiWidget::SetDepartmentLogoPath(const char* path)
@@ -302,132 +328,134 @@ void QmitkCustomMultiWidget::SetDepartmentLogoPath(const char* path)
   */
 }
 
-void QmitkCustomMultiWidget::ShowDepartmentLogo(unsigned int widgetNumber, bool show)
+void QmitkCustomMultiWidget::ShowDepartmentLogo(const QString& widgetID, bool show)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Department logo can not be shown for an unknown widget.";
-    return;
+    GetRenderWindowWidget(widgetID)->ShowDepartmentLogo(show);
+    RequestUpdate(widgetID);
   }
 
-  GetRenderWindowWidget(widgetNumber)->ShowDepartmentLogo(show);
-  RequestUpdate(widgetNumber);
+  MITK_ERROR << "Department logo can not be shown for an unknown widget.";
+  return;
 }
 
 void QmitkCustomMultiWidget::ShowAllDepartmentLogos(bool show)
 {
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    ShowDepartmentLogo(i, show);
+    renderWindowWidget.second->ShowDepartmentLogo(show);
   }
 }
 
-void QmitkCustomMultiWidget::SetDecorationColor(unsigned int widgetNumber, const mitk::Color& color)
+void QmitkCustomMultiWidget::SetDecorationColor(const QString& widgetID, const mitk::Color& color)
 {
-  // #TODO: change specific plane color of a render window widget (parameter: unsigned int planeNumber)?
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Decoration color can not be set for an unknown widget.";
-    return;
+    renderWindowWidget->SetDecorationColor(color);
   }
-  GetRenderWindowWidget(widgetNumber)->SetDecorationColor(color);
+
+  MITK_ERROR << "Decoration color can not be set for an unknown widget.";
 }
 
-mitk::Color QmitkCustomMultiWidget::GetDecorationColor(unsigned int widgetNumber) const
+mitk::Color QmitkCustomMultiWidget::GetDecorationColor(const QString& widgetID) const
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Decoration color can not be retrieved for an unknown widget. Returning black color!";
-    float black[3] = { 0.0f, 0.0f, 0.0f };
-    return mitk::Color(black);
+    renderWindowWidget->GetDecorationColor();
   }
 
-  return GetRenderWindowWidget(widgetNumber)->GetDecorationColor();
+  MITK_ERROR << "Decoration color can not be retrieved for an unknown widget. Returning black color!";
+  float black[3] = { 0.0f, 0.0f, 0.0f };
+  return mitk::Color(black);
 }
 
-void QmitkCustomMultiWidget::ShowColoredRectangle(unsigned int widgetNumber, bool show)
+void QmitkCustomMultiWidget::ShowColoredRectangle(const QString& widgetID, bool show)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Colored rectangle can not be set for an unknown widget.";
-    return;
+    renderWindowWidget->ShowColoredRectangle(show);
   }
 
-  GetRenderWindowWidget(widgetNumber)->ShowColoredRectangle(show);
+  MITK_ERROR << "Colored rectangle can not be set for an unknown widget.";
 }
 
 void QmitkCustomMultiWidget::ShowAllColoredRectangles(bool show)
 {
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    ShowColoredRectangle(i, show);
+    renderWindowWidget.second->ShowColoredRectangle(show);
   }
 }
 
-bool QmitkCustomMultiWidget::IsColoredRectangleVisible(unsigned int widgetNumber) const
+bool QmitkCustomMultiWidget::IsColoredRectangleVisible(const QString& widgetID) const
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Colored rectangle visibility can not be retrieved for an unknown widget. Returning 'false'.";
-    return false;
+    renderWindowWidget->IsColoredRectangleVisible();
   }
 
-  return GetRenderWindowWidget(widgetNumber)->IsColoredRectangleVisible();
+  MITK_ERROR << "Colored rectangle visibility can not be retrieved for an unknown widget. Returning 'false'.";
+  return false;
 }
 
-void QmitkCustomMultiWidget::SetCornerAnnotationText(unsigned int widgetNumber, const std::string& cornerAnnotation)
+void QmitkCustomMultiWidget::SetCornerAnnotationText(const QString& widgetID, const std::string& cornerAnnotation)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Corner annotation text can not be retrieved for an unknown widget.";
-    return;
+    renderWindowWidget->SetCornerAnnotationText(cornerAnnotation);
   }
 
-  GetRenderWindowWidget(widgetNumber)->SetCornerAnnotationText(cornerAnnotation);
+  MITK_ERROR << "Corner annotation text can not be retrieved for an unknown widget.";
 }
 
-std::string QmitkCustomMultiWidget::GetCornerAnnotationText(unsigned int widgetNumber) const
+std::string QmitkCustomMultiWidget::GetCornerAnnotationText(const QString& widgetID) const
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Corner annotation text can not be retrieved for an unknown widget.";
-    return "";
+    renderWindowWidget->GetCornerAnnotationText();
   }
 
-  return GetRenderWindowWidget(widgetNumber)->GetCornerAnnotationText();
+  MITK_ERROR << "Corner annotation text can not be retrieved for an unknown widget.";
+  return "";
 }
 
-void QmitkCustomMultiWidget::ShowCornerAnnotation(unsigned int widgetNumber, bool show)
+void QmitkCustomMultiWidget::ShowCornerAnnotation(const QString& widgetID, bool show)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Corner annotation can not be set for an unknown widget.";
-    return;
+    renderWindowWidget->ShowCornerAnnotation(show);
   }
 
-  GetRenderWindowWidget(widgetNumber)->ShowCornerAnnotation(show);
+  MITK_ERROR << "Corner annotation can not be set for an unknown widget.";
 }
 
 void QmitkCustomMultiWidget::ShowAllCornerAnnotations(bool show)
 {
-  size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
-  for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
   {
-    ShowCornerAnnotation(i, show);
+    renderWindowWidget.second->ShowCornerAnnotation(show);
   }
 }
 
-bool QmitkCustomMultiWidget::IsCornerAnnotationVisible(unsigned int widgetNumber) const
+bool QmitkCustomMultiWidget::IsCornerAnnotationVisible(const QString& widgetID) const
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Corner annotation visibility can not be retrieved for an unknown widget. Returning 'false'.";
-    return false;
+    renderWindowWidget->IsCornerAnnotationVisible();
   }
 
-  return GetRenderWindowWidget(widgetNumber)->IsCornerAnnotationVisible();
+  MITK_ERROR << "Corner annotation visibility can not be retrieved for an unknown widget. Returning 'false'.";
+  return false;
 }
 
 void QmitkCustomMultiWidget::HandleCrosshairPositionEvent()
@@ -537,7 +565,7 @@ void QmitkCustomMultiWidget::Fit()
   size_t numberOfRenderWindowWidgets = m_RenderWindowWidgets.size();
   for (size_t i = 0; i < numberOfRenderWindowWidgets; ++i)
   {
-  vtkRenderer* renderer = GetRenderWindow(widgetNumber)->GetRenderer()->GetVtkRenderer();
+  vtkRenderer* renderer = GetRenderWindow(widgetID)->GetRenderer()->GetVtkRenderer();
   mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(GetRenderWindow(i)->GetRenderWindow());
   vtkrenderer = baseRenderer->GetVtkRenderer();
   if (nullptr != vtkrenderer)
@@ -574,16 +602,17 @@ void QmitkCustomMultiWidget::EnsureDisplayContainsPoint(mitk::BaseRenderer *rend
   */
 }
 
-void QmitkCustomMultiWidget::MoveCrossToPosition(unsigned int widgetNumber, const mitk::Point3D& newPosition)
+void QmitkCustomMultiWidget::MoveCrossToPosition(const QString& widgetID, const mitk::Point3D& newPosition)
 {
-  if (widgetNumber > m_RenderWindowWidgets.size())
+  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
   {
-    MITK_ERROR << "Geometry plane can not be shown for an unknown widget.";
-    return;
+    GetRenderWindowWidget(widgetID)->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+    GetRenderWindowWidget(widgetID)->RequestUpdate();
   }
 
-  GetRenderWindowWidget(widgetNumber)->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
-  GetRenderWindowWidget(widgetNumber)->RequestUpdate();
+  MITK_ERROR << "Geometry plane can not be shown for an unknown widget.";
+
 }
 
 void QmitkCustomMultiWidget::ResetCrosshair()
@@ -604,16 +633,16 @@ void QmitkCustomMultiWidget::ResetCrosshair()
 //////////////////////////////////////////////////////////////////////////
 // MOUSE EVENTS
 //////////////////////////////////////////////////////////////////////////
-void QmitkCustomMultiWidget::wheelEvent(QWheelEvent *e)
+void QmitkCustomMultiWidget::wheelEvent(QWheelEvent* e)
 {
   emit WheelMoved(e);
 }
 
-void QmitkCustomMultiWidget::mousePressEvent(QMouseEvent *e)
+void QmitkCustomMultiWidget::mousePressEvent(QMouseEvent* e)
 {
 }
 
-void QmitkCustomMultiWidget::moveEvent(QMoveEvent *e)
+void QmitkCustomMultiWidget::moveEvent(QMoveEvent* e)
 {
   QWidget::moveEvent(e);
 
@@ -659,7 +688,9 @@ void QmitkCustomMultiWidget::AddRenderWindowWidget()
   // #TODO: include technique, to set the image to level-slide on using the render window manager
 
   // create the render window widget and connect signals / slots
-  QString UID = m_MultiWidgetName + "UID";
+  mitk::UIDGenerator generator;
+  std::string renderWindowUID = generator.GetUID();
+  QString UID = m_MultiWidgetName + "_" + QString::fromStdString(renderWindowUID);
   QmitkRenderWindowWidget* renderWindowWidget = new QmitkRenderWindowWidget(this, UID, m_DataStorage);
 
   // create connections

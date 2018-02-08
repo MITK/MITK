@@ -58,10 +58,7 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   {
     mitkReThrow(e) << "Cannot connect the model-view pair signals and slots.";
   }
-
   m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
-  m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
-  connect(m_SelectionServiceConnector.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_ModelViewSelectionConnector.get(), SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
 
   m_ModelViewSelectionConnector2 = std::make_unique<QmitkModelViewSelectionConnector>();
   try
@@ -72,13 +69,19 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   {
     mitkReThrow(e) << "Cannot connect the model-view pair signals and slots.";
   }
-
   m_SelectionServiceConnector2 = std::make_unique<QmitkSelectionServiceConnector>();
-  m_SelectionServiceConnector2->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
-  connect(m_SelectionServiceConnector2.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_ModelViewSelectionConnector2.get(), SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+
+  m_SelectionServiceConnector3 = std::make_unique<QmitkSelectionServiceConnector>();
 
   connect(m_Controls.selectionProviderCheckBox, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider1(bool)));
   connect(m_Controls.selectionProviderCheckBox2, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider2(bool)));
+
+  connect(m_Controls.selectionListenerCheckBox, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionListener1(bool)));
+  connect(m_Controls.selectionListenerCheckBox2, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionListener2(bool)));
+
+  connect(m_Controls.selectionProviderCheckBox3, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider3(bool)));
+  connect(m_Controls.selectionListenerCheckBox3, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionListener3(bool)));
+
 }
 
 void QmitkDataStorageViewerTestView::SetAsSelectionProvider1(bool checked)
@@ -95,6 +98,21 @@ void QmitkDataStorageViewerTestView::SetAsSelectionProvider1(bool checked)
   }
 }
 
+void QmitkDataStorageViewerTestView::SetAsSelectionListener1(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+    connect(m_SelectionServiceConnector.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_ModelViewSelectionConnector.get(), SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+  }
+  else
+  {
+    m_SelectionServiceConnector->RemovePostSelectionListener();
+    disconnect(m_SelectionServiceConnector.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_ModelViewSelectionConnector.get(), SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+
+  }
+}
+
 void QmitkDataStorageViewerTestView::SetAsSelectionProvider2(bool checked)
 {
   if (checked)
@@ -106,5 +124,47 @@ void QmitkDataStorageViewerTestView::SetAsSelectionProvider2(bool checked)
   {
     m_SelectionServiceConnector2->RemoveAsSelectionProvider();
     disconnect(m_ModelViewSelectionConnector2.get(), SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector2.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+  }
+}
+
+void QmitkDataStorageViewerTestView::SetAsSelectionListener2(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector2->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+    connect(m_SelectionServiceConnector2.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_ModelViewSelectionConnector2.get(), SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+  }
+  else
+  {
+    m_SelectionServiceConnector2->RemovePostSelectionListener();
+    disconnect(m_SelectionServiceConnector2.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_ModelViewSelectionConnector2.get(), SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+  }
+}
+
+void QmitkDataStorageViewerTestView::SetAsSelectionProvider3(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector3->SetAsSelectionProvider(GetSite()->GetSelectionProvider().Cast<QmitkDataNodeSelectionProvider>().GetPointer());
+    connect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+  }
+  else
+  {
+    m_SelectionServiceConnector3->RemoveAsSelectionProvider();
+    disconnect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+  }
+}
+
+void QmitkDataStorageViewerTestView::SetAsSelectionListener3(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector3->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+    connect(m_SelectionServiceConnector3.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_Controls.singleSlot, SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+  }
+  else
+  {
+    m_SelectionServiceConnector3->RemovePostSelectionListener();
+    disconnect(m_SelectionServiceConnector3.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_Controls.singleSlot, SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
   }
 }

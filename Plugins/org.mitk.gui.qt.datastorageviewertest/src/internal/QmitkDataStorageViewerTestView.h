@@ -49,6 +49,10 @@ private Q_SLOTS:
 
   void SetAsSelectionProvider1(bool checked);
   void SetAsSelectionProvider2(bool checked);
+  void SetAsSelectionProvider3(bool checked);
+  void SetAsSelectionListener1(bool checked);
+  void SetAsSelectionListener2(bool checked);
+  void SetAsSelectionListener3(bool checked);
 
 private:
 
@@ -60,6 +64,8 @@ private:
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
   std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector2;
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector2;
+
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector3;
 };
 
 #endif // QMITKDATASTORAGEVIEWERTESTVIEW_H

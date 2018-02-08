@@ -855,6 +855,10 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
     reader->SetFileName(filename+"_MASK.nrrd");
     reader->Update();
     m_SignalGen.m_MaskImage = reader->GetOutput();
+    m_SignalGen.m_ImageRegion = m_SignalGen.m_MaskImage->GetLargestPossibleRegion();
+    m_SignalGen.m_ImageSpacing = m_SignalGen.m_MaskImage->GetSpacing();
+    m_SignalGen.m_ImageOrigin = m_SignalGen.m_MaskImage->GetOrigin();
+    m_SignalGen.m_ImageDirection = m_SignalGen.m_MaskImage->GetDirection();
     MITK_INFO << "Mask image loaded.";
   }
   catch(...)

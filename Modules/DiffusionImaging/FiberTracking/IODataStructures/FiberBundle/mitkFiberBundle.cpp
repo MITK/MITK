@@ -2518,6 +2518,11 @@ void mitk::FiberBundle::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << indent << "Median fiber length: " << this->GetMedianFiberLength() << std::endl;
   os << indent << "STDEV fiber length: " << this->GetLengthStDev() << std::endl;
   os << indent << "Number of points: " << this->GetNumberOfPoints() << std::endl;
+
+  os << indent << "Extent x: " << this->GetGeometry()->GetExtentInMM(0) << "mm" << std::endl;
+  os << indent << "Extent y: " << this->GetGeometry()->GetExtentInMM(1) << "mm" << std::endl;
+  os << indent << "Extent z: " << this->GetGeometry()->GetExtentInMM(2) << "mm" << std::endl;
+  os << indent << "Diagonal: " << this->GetGeometry()->GetDiagonalLength()  << "mm" << std::endl;
   Superclass::PrintSelf(os, indent);
 }
 

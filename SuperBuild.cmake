@@ -254,7 +254,6 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_EXAMPLES
 
   MITK_USE_Qt5
-  MITK_USE_Qt5_WebEngine
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL

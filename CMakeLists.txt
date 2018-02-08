@@ -582,7 +582,8 @@ mitkMacroConfigureItkPixelTypes()
 # Configure module naming conventions
 set(MITK_MODULE_NAME_REGEX_MATCH "^[A-Z].*$")
 set(MITK_MODULE_NAME_REGEX_NOT_MATCH "^[Mm][Ii][Tt][Kk].*$")
-set(MITK_MODULE_NAME_PREFIX "Mitk")
+set(MITK_DEFAULT_MODULE_NAME_PREFIX "Mitk")
+set(MITK_MODULE_NAME_PREFIX ${MITK_DEFAULT_MODULE_NAME_PREFIX})
 set(MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME 1)
 
 #-----------------------------------------------------------------------------
@@ -1017,6 +1018,7 @@ foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
       add_subdirectory(${MITK_MODULES_EXTENSION_DIR}/${mitk_module} Modules/${mitk_module})
     endforeach()
   endif()
+  set(MITK_MODULE_NAME_PREFIX ${MITK_DEFAULT_MODULE_NAME_PREFIX})
 endforeach()
 
 if(MITK_USE_BLUEBERRY)

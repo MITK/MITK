@@ -31,56 +31,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 
 #include <QmitkMouseModeSwitcher.h>
-#include <QmitkCustomMultiWidget.h>
 
-
-//#TODO: create different default views (different layouts of the render window widgets)
-class QmitkCustomMultiWidgetEditor::Impl final
-{
-public:
-
-  Impl();
-  ~Impl();
-
-  QmitkCustomMultiWidget* m_CustomMultiWidget;
-  QmitkMouseModeSwitcher* m_MouseModeToolbar;
-  /*
-  * @brief Members for the MultiWidget decoration
-  */
-  QString m_WidgetBackgroundColor1[4];
-  QString m_WidgetBackgroundColor2[4];
-  QString m_WidgetDecorationColor[4];
-  QString m_WidgetAnnotation[4];
-  bool m_MenuWidgetsEnabled;
-
-  QHash<QString, QmitkRenderWindow*> m_RenderWindows;
-
-};
-
-QmitkCustomMultiWidgetEditor::Impl::Impl()
-  : m_CustomMultiWidget(nullptr)
-  , m_MouseModeToolbar(nullptr)
-  , m_MenuWidgetsEnabled(false)
-{
-  // nothing here
-}
-
-QmitkCustomMultiWidgetEditor::Impl::~Impl()
-{
-  // nothing here
-}
 
 const QString QmitkCustomMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.custommultiwidget";
 
 QmitkCustomMultiWidgetEditor::QmitkCustomMultiWidgetEditor()
-  : m_Impl(new Impl()) // this?
+  : m_CustomMultiWidget(nullptr)
 {
-  RequestActivateMenuWidget(true);
+  // nothing here
 }
 
 QmitkCustomMultiWidgetEditor::~QmitkCustomMultiWidgetEditor()
 {
-  RequestActivateMenuWidget(false);
+  // nothing here
 }
 
 void QmitkCustomMultiWidgetEditor::Activated()
@@ -95,20 +58,19 @@ void QmitkCustomMultiWidgetEditor::Deactivated()
 
 void QmitkCustomMultiWidgetEditor::Visible()
 {
-  RequestActivateMenuWidget(true);
+  // nothing here
 }
 
 void QmitkCustomMultiWidgetEditor::Hidden()
 {
-  RequestActivateMenuWidget(false);
+  // nothing here
 }
 
 QmitkRenderWindow* QmitkCustomMultiWidgetEditor::GetActiveQmitkRenderWindow() const
 {
-  // #TODO: active render window currently not implemented
-  if (m_Impl->m_CustomMultiWidget)
+  if (nullptr != m_CustomMultiWidget)
   {
-    return m_Impl->m_CustomMultiWidget->GetActiveRenderWindowWidget()->GetRenderWindow();
+    return m_CustomMultiWidget->GetActiveRenderWindowWidget()->GetRenderWindow();
   }
 
   return nullptr;
@@ -116,32 +78,47 @@ QmitkRenderWindow* QmitkCustomMultiWidgetEditor::GetActiveQmitkRenderWindow() co
 
 QHash<QString, QmitkRenderWindow*> QmitkCustomMultiWidgetEditor::GetQmitkRenderWindows() const
 {
-  // #TODO: we do not want to keep a hash-table here!? 
-  return m_Impl->m_RenderWindows;
-}
-
-QmitkRenderWindow* QmitkCustomMultiWidgetEditor::GetQmitkRenderWindow(const QString &id) const
-{
-  // #TODO: invalid since a specific id (e.g. 'axial') does not uniquely identify a render window anymore
-  /*
-  if (m_Impl->m_RenderWindows.contains(id))
+  QHash<QString, QmitkRenderWindow*> result;
+  if (nullptr == m_CustomMultiWidget)
   {
-    return m_Impl->m_RenderWindows[id];
+    return result;
   }
-  */
-  return nullptr;
+
+  // create QHash on demand
+  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    result.insert(renderWindowWidget.first, renderWindowWidget.second->GetRenderWindow());
+  }
+  return result;
 }
 
-mitk::Point3D QmitkCustomMultiWidgetEditor::GetSelectedPosition(const QString & id) const
+QmitkRenderWindow* QmitkCustomMultiWidgetEditor::GetQmitkRenderWindow(const QString& id) const
 {
-  // #TODO: use id or string for render window widget identification
-  return m_Impl->m_CustomMultiWidget->GetCrossPosition(0/*id*/);
+  if (nullptr == m_CustomMultiWidget)
+  {
+    return nullptr;
+  }
+
+  return m_CustomMultiWidget->GetRenderWindow(id);
+}
+
+mitk::Point3D QmitkCustomMultiWidgetEditor::GetSelectedPosition(const QString& id) const
+{
+  if (nullptr == m_CustomMultiWidget)
+  {
+    return mitk::Point3D();
+  }
+
+  return m_CustomMultiWidget->GetCrossPosition(id);
 }
 
 void QmitkCustomMultiWidgetEditor::SetSelectedPosition(const mitk::Point3D& pos, const QString& id)
 {
-  // #TODO: use id or string for render window widget identification
-  m_Impl->m_CustomMultiWidget->MoveCrossToPosition(0/*id*/, pos);
+  if (nullptr != m_CustomMultiWidget)
+  {
+    m_CustomMultiWidget->MoveCrossToPosition(id, pos);
+  }
 }
 
 void QmitkCustomMultiWidgetEditor::EnableDecorations(bool enable, const QStringList &decorations)
@@ -149,13 +126,14 @@ void QmitkCustomMultiWidgetEditor::EnableDecorations(bool enable, const QStringL
   // #TODO: define: - for all render windows
   //                - for the one, active render window
   // MOVE TO DECORATION MANAGER
+
   if (decorations.isEmpty() || decorations.contains(DECORATION_BORDER))
   {
-    m_Impl->m_CustomMultiWidget->ShowAllColoredRectangles(enable);
+    m_CustomMultiWidget->ShowAllColoredRectangles(enable);
   }
   if (decorations.isEmpty() || decorations.contains(DECORATION_LOGO))
   {
-    m_Impl->m_CustomMultiWidget->ShowAllDepartmentLogos(enable);
+    m_CustomMultiWidget->ShowAllDepartmentLogos(enable);
   }
   if (decorations.isEmpty() || decorations.contains(DECORATION_MENU))
   {
@@ -163,11 +141,11 @@ void QmitkCustomMultiWidgetEditor::EnableDecorations(bool enable, const QStringL
   }
   if (decorations.isEmpty() || decorations.contains(DECORATION_BACKGROUND))
   {
-    m_Impl->m_CustomMultiWidget->ShowAllBackgroundColorGradients(enable);
+    m_CustomMultiWidget->ShowAllBackgroundColorGradients(enable);
   }
   if (decorations.isEmpty() || decorations.contains(DECORATION_CORNER_ANNOTATION))
   {
-    m_Impl->m_CustomMultiWidget->ShowAllCornerAnnotations(enable);
+    m_CustomMultiWidget->ShowAllCornerAnnotations(enable);
   }
 }
 
@@ -204,6 +182,7 @@ bool QmitkCustomMultiWidgetEditor::IsDecorationEnabled(const QString &decoration
 QStringList QmitkCustomMultiWidgetEditor::GetDecorations() const
 {
   // MOVE TO DECORATION MANAGER
+
   QStringList decorations;
   decorations << DECORATION_BORDER << DECORATION_LOGO << DECORATION_MENU << DECORATION_BACKGROUND << DECORATION_CORNER_ANNOTATION;
   return decorations;
@@ -222,14 +201,14 @@ bool QmitkCustomMultiWidgetEditor::IsSlicingPlanesEnabled() const
 
 QmitkCustomMultiWidget* QmitkCustomMultiWidgetEditor::GetCustomMultiWidget()
 {
-  return m_Impl->m_CustomMultiWidget;
+  return m_CustomMultiWidget;
 }
 
 void QmitkCustomMultiWidgetEditor::SetFocus()
 {
-  if (nullptr != m_Impl->m_CustomMultiWidget)
+  if (nullptr != m_CustomMultiWidget)
   {
-    m_Impl->m_CustomMultiWidget->setFocus();
+    m_CustomMultiWidget->setFocus();
   }
 }
 
@@ -283,7 +262,8 @@ void QmitkCustomMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPrefe
   FillMembersWithCurrentDecorations();
   GetPreferenceDecorations(preferences);
 
-
+  // MOVE TO DECORATION MANAGER
+  /*
   // preferences for renderWindows
   for(unsigned int i = 0; i < 4; ++i)
   {
@@ -301,6 +281,7 @@ void QmitkCustomMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPrefe
     // enable colored rectangle
     m_Impl->m_CustomMultiWidget->ShowColoredRectangle(i, true);
   }
+  */
 
   // Set preferences respecting zooming and panning
   bool constrainedZooming = preferences->GetBool("Use constrained zooming and panning", true);
@@ -315,42 +296,36 @@ void QmitkCustomMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPrefe
   bool showLevelWindowWidget = preferences->GetBool("Show level-window widget", true);
   if (showLevelWindowWidget)
   {
-    m_Impl->m_CustomMultiWidget->ShowAllLevelWindowWidgets(true);
+    m_CustomMultiWidget->ShowAllLevelWindowWidgets(true);
   }
   else
   {
-    m_Impl->m_CustomMultiWidget->ShowAllLevelWindowWidgets(false);
+    m_CustomMultiWidget->ShowAllLevelWindowWidgets(false);
   }
 }
 
 void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 {
-  if (nullptr == m_Impl->m_CustomMultiWidget)
+  if (nullptr == m_CustomMultiWidget)
   {
     QHBoxLayout* layout = new QHBoxLayout(parent);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    if (nullptr == m_Impl->m_MouseModeToolbar)
-    {
-      m_Impl->m_MouseModeToolbar = new QmitkMouseModeSwitcher(parent);
-      layout->addWidget(m_Impl->m_MouseModeToolbar);
-    }
-
     berry::IPreferences::Pointer prefs = GetPreferences();
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt("Rendering Mode", 0));
 
-    m_Impl->m_CustomMultiWidget = new QmitkCustomMultiWidget(parent, 0, 0, renderingMode);
-    layout->addWidget(m_Impl->m_CustomMultiWidget);
+    m_CustomMultiWidget = new QmitkCustomMultiWidget(parent, 0, 0, renderingMode);
+    layout->addWidget(m_CustomMultiWidget);
 
     //m_Impl->m_MouseModeToolbar->setMouseModeSwitcher(m_Impl->m_CustomMultiWidget->GetMouseModeSwitcher());
 
     mitk::DataStorage::Pointer dataStorage = GetDataStorage();
-    m_Impl->m_CustomMultiWidget->SetDataStorage(dataStorage);
+    m_CustomMultiWidget->SetDataStorage(dataStorage);
 
     mitk::TimeGeometry::Pointer timeGeometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
     mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
 
-    m_Impl->m_CustomMultiWidget->ShowAllLevelWindowWidgets(true);
+    m_CustomMultiWidget->ShowAllLevelWindowWidgets(true);
 
     // Store the initial visibility status of the menu widget.
     //m_Impl->m_MenuWidgetsEnabled = m_Impl->m_CustomMultiWidget->IsRenderWindowMenuActivated(0);
@@ -363,28 +338,9 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   }
 }
 
-void QmitkCustomMultiWidgetEditor::RequestActivateMenuWidget(bool on)
-{
-  /*
-  if (nullptr == m_Impl->m_CustomMultiWidget)
-  {
-    return;
-  }
-
-  if (on)
-  {
-    m_Impl->m_CustomMultiWidget->ActivateAllRenderWindowMenus(m_Impl->m_MenuWidgetsEnabled);
-  }
-  else
-  {
-    m_Impl->m_MenuWidgetsEnabled = m_Impl->m_CustomMultiWidget->IsRenderWindowMenuActivated(0);
-    m_Impl->m_CustomMultiWidget->ActivateAllRenderWindowMenus(false);
-  }
-  */
-}
-
 void QmitkCustomMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences* preferences)
 {
+  /*
   FillMembersWithCurrentDecorations(); // fill members
   GetPreferenceDecorations(preferences); // overwrite if preferences are defined
 
@@ -407,10 +363,12 @@ void QmitkCustomMultiWidgetEditor::InitializePreferences(berry::IBerryPreference
   preferences->Put("widget2 second background color", m_Impl->m_WidgetBackgroundColor2[1]);
   preferences->Put("widget3 second background color", m_Impl->m_WidgetBackgroundColor2[2]);
   preferences->Put("widget4 second background color", m_Impl->m_WidgetBackgroundColor2[3]);
+  */
 }
 
 void QmitkCustomMultiWidgetEditor::FillMembersWithCurrentDecorations()
 {
+  /*
   //fill members with current values (or default values) from the std multi widget
   for(unsigned int i = 0; i < 4; ++i)
   {
@@ -419,10 +377,12 @@ void QmitkCustomMultiWidgetEditor::FillMembersWithCurrentDecorations()
     m_Impl->m_WidgetBackgroundColor2[i] = MitkColorToHexColor(m_Impl->m_CustomMultiWidget->GetBackgroundColorGradient(i).second);
     m_Impl->m_WidgetAnnotation[i] = QString::fromStdString(m_Impl->m_CustomMultiWidget->GetCornerAnnotationText(i));
   }
+  */
 }
 
 void QmitkCustomMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPreferences * preferences)
 {
+  /*
   // MOVE TO DECORATION MANAGER
 
   //overwrite members with values from the preferences, if they the preference is defined
@@ -444,6 +404,7 @@ void QmitkCustomMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryP
   m_Impl->m_WidgetAnnotation[1] = preferences->Get("widget2 corner annotation", m_Impl->m_WidgetAnnotation[1]);
   m_Impl->m_WidgetAnnotation[2] = preferences->Get("widget3 corner annotation", m_Impl->m_WidgetAnnotation[2]);
   m_Impl->m_WidgetAnnotation[3] = preferences->Get("widget4 corner annotation", m_Impl->m_WidgetAnnotation[3]);
+  */
 }
 
 mitk::Color QmitkCustomMultiWidgetEditor::HexColorToMitkColor(const QString& hexColor)

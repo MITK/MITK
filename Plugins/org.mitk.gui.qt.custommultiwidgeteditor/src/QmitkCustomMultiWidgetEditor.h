@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // custom multi widget editor
 #include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
+// qt widgets module
+#include <QmitkCustomMultiWidget.h>
 
 #include <memory>
 
@@ -157,8 +159,8 @@ private:
    */
   QString MitkColorToHexColor(const mitk::Color& mitkColor);
 
-  class Impl;
-  std::unique_ptr<Impl> m_Impl;
+  QmitkCustomMultiWidget* m_CustomMultiWidget;
+
 };
 
 #endif // QMITKCUSTOMMULTIWIDGETEDITOR_H

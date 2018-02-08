@@ -227,7 +227,19 @@ void mitk::CameraController::Zoom(ScalarType factor, const Point2D& zoomPointInM
     this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
     //Move camera in a way that the clicked point stays visible on the display where it was.
     Point2D planePoint = GetCameraPositionOnPlane();
-    MoveCameraToPoint(planePoint + ((zoomPointInMM - planePoint) * (factor - 1)));
+
+    planePoint = planePoint + ((zoomPointInMM - planePoint) * (factor - 1));
+
+    AdjustConstrainedCameraPosition(planePoint);
+
+    mitk::Point3D world;
+    this->GetRenderer()->PlaneToDisplay(planePoint, planePoint);
+    this->GetRenderer()->DisplayToWorld(planePoint, world);
+   
+    vtkCamera* camera = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
+    double* pos = camera->GetPosition();
+    camera->SetPosition(world[0], world[1], pos[2]);
+    camera->SetFocalPoint(world[0], world[1], world[2]);
   }
 }
 

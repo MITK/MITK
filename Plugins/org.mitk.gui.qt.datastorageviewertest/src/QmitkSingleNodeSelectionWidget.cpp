@@ -24,7 +24,9 @@ QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) 
   m_Controls.setupUi(this);
 
   m_Controls.btnLock->setChecked(false);
-  m_Controls.nodeInfo->setHtml(m_InvalidInfo);
+  this->UpdateInfo();
+
+  m_Controls.nodeInfo->installEventFilter(this);
 
   connect(m_Controls.btnLock, &QPushButton::clicked, this, &QmitkSingleNodeSelectionWidget::OnLock);
 }
@@ -114,6 +116,21 @@ void QmitkSingleNodeSelectionWidget::EditSelection()
 
 void QmitkSingleNodeSelectionWidget::UpdateInfo()
 {
+  if (m_SelectedNode.IsNull())
+  {
+    if (m_IsOptional)
+    {
+      m_Controls.nodeInfo->setText("Empty");
+    }
+    else
+    {
+      m_Controls.nodeInfo->setText(m_InvalidInfo);
+    }
+  }
+  else
+  {
+    m_Controls.nodeInfo->setText(QString::fromStdString(m_SelectedNode->GetName()));
+  }
 
 };
 
@@ -126,20 +143,29 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
 {
   if (!m_Controls.btnLock->isChecked())
   {
+    mitk::DataNode::Pointer newSelected = nullptr;
+    NodeList list;
+    bool changed = false;
+
     if (!selectedNodes.empty() && m_SelectedNode != selectedNodes.first())
     {
-      m_SelectedNode = selectedNodes.first();
-      NodeList list;
+      newSelected = selectedNodes.first();
       list.append(m_SelectedNode);
-      emit CurrentSelectionChanged(list);
+      changed = true;
     }
     else if(selectedNodes.empty() && m_SelectedNode != nullptr)
     {
-      m_SelectedNode = nullptr;
-      NodeList list;
-      emit CurrentSelectionChanged(list);
+      newSelected = nullptr;
+      changed = true;
     }
-    this->UpdateInfo();
+
+    if (changed)
+    {
+      emit CurrentSelectionChanged(list);
+      m_SelectedNode = newSelected;
+      this->UpdateInfo();
+    }
+
   }
 };
 

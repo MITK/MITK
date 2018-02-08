@@ -49,6 +49,9 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   m_Controls.selectionListView2->setAlternatingRowColors(true);
   m_Controls.selectionListView2->setModel(m_DataStorageDefaultListModel2);
 
+  m_Controls.singleSlot->SetDataStorage(GetDataStorage());
+
+
   m_ModelViewSelectionConnector = std::make_unique<QmitkModelViewSelectionConnector>();
   try
   {
@@ -82,6 +85,8 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.selectionProviderCheckBox3, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider3(bool)));
   connect(m_Controls.selectionListenerCheckBox3, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionListener3(bool)));
 
+  connect(m_Controls.checkOnlyVisible, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectOnlyVisibleNodes(bool)));
+  connect(m_Controls.checkOptional, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectionIsOptional(bool)));
 }
 
 void QmitkDataStorageViewerTestView::SetAsSelectionProvider1(bool checked)
@@ -159,12 +164,12 @@ void QmitkDataStorageViewerTestView::SetAsSelectionListener3(bool checked)
 {
   if (checked)
   {
-    m_SelectionServiceConnector3->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
-    connect(m_SelectionServiceConnector3.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_Controls.singleSlot, SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+    m_SelectionServiceConnector3->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());  
+    connect(m_SelectionServiceConnector3.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
   }
   else
   {
     m_SelectionServiceConnector3->RemovePostSelectionListener();
-    disconnect(m_SelectionServiceConnector3.get(), SIGNAL(ServiceSelectionChanged(QList<mitk::DataNode::Pointer>)), m_Controls.singleSlot, SLOT(SetCurrentSelection(QList<mitk::DataNode::Pointer>)));
+    disconnect(m_SelectionServiceConnector3.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
   }
 }

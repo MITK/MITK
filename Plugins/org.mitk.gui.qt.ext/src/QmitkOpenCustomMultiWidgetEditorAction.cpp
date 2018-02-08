@@ -23,8 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryIWorkbench.h>
 #include <berryPlatform.h>
-#include <berryFileEditorInput.h>
-
+#include <mitkDataStorageEditorInput.h>
 
 QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(0)
@@ -63,6 +62,6 @@ void QmitkOpenCustomMultiWidgetEditorAction::Run()
     m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
   }
 
-  berry::IEditorInput::Pointer editorInput(new berry::FileEditorInput(QString()));
-  m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.custommultiwidgeteditor");
+  berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput());
+  m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.custommultiwidget");
 }

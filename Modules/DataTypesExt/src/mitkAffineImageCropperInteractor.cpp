@@ -70,7 +70,7 @@ bool mitk::AffineImageCropperInteractor::CheckOverObject(const InteractionEvent*
   if (dn.IsNull())
     return false;
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
-  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
+  Point3D currentPickedPoint = positionEvent->GetPlanePositionInWorld();
   mitk::BoundingObject* object = dynamic_cast<mitk::BoundingObject*> (dn->GetData());
   object->GetGeometry()->WorldToIndex(currentPickedPoint,currentPickedPoint);
   return object && object->GetGeometry()->GetBoundingBox()->IsInside(currentPickedPoint);
@@ -117,7 +117,7 @@ void mitk::AffineImageCropperInteractor::ScaleRadius(StateMachineAction*, Intera
   mitk::Point3D newScale;
   newScale[0] = newScale[1] = newScale[2] = scale;
 
-  mitk::Point3D anchorPoint = wheelEvent->GetPositionInWorld();
+  mitk::Point3D anchorPoint = wheelEvent->GetPlanePositionInWorld();
   ScaleOperation* doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
   m_SelectedNode->GetData()->GetGeometry()->ExecuteOperation(doOp);
 
@@ -131,7 +131,7 @@ void mitk::AffineImageCropperInteractor::InitTranslate(StateMachineAction*, Inte
   if(positionEvent == NULL)
     return;
 
-  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
+  m_InitialPickedPoint = positionEvent->GetPlanePositionInWorld();
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*> (m_SelectedNode->GetData());
@@ -145,7 +145,7 @@ void mitk::AffineImageCropperInteractor::InitRotate(StateMachineAction*, Interac
   if(positionEvent == NULL)
     return;
 
-  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
+  m_InitialPickedPoint = positionEvent->GetPlanePositionInWorld();
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*> (m_SelectedNode->GetData());
@@ -159,7 +159,7 @@ void mitk::AffineImageCropperInteractor::InitDeformation(StateMachineAction*, In
   if(positionEvent == NULL)
     return;
 
-  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
+  m_InitialPickedPoint = positionEvent->GetPlanePositionInWorld();
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*> (m_SelectedNode->GetData());
@@ -173,7 +173,7 @@ void mitk::AffineImageCropperInteractor::TranslateObject (StateMachineAction*, I
   if(positionEvent == NULL)
     return;
 
-  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
+  Point3D currentPickedPoint = positionEvent->GetPlanePositionInWorld();
 
   Vector3D interactionMove;
   interactionMove[0] = currentPickedPoint[0] - m_InitialPickedPoint[0];
@@ -194,7 +194,7 @@ void mitk::AffineImageCropperInteractor::DeformObject (StateMachineAction*, Inte
   if(positionEvent == NULL)
     return;
 
-  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
+  Point3D currentPickedPoint = positionEvent->GetPlanePositionInWorld();
   Vector3D interactionMove = currentPickedPoint-m_InitialPickedPoint;
 
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*> (m_SelectedNode->GetData());

@@ -142,14 +142,14 @@ void mitk::ClassicRegionGrowingTool::OnMousePressed(StateMachineAction*, Interac
       // 2. Determine if the user clicked inside or outside of the segmentation
       const BaseGeometry* workingSliceGeometry = m_WorkingSlice->GetGeometry();
       Point3D mprojectedPointIn2D;
-      workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
+      workingSliceGeometry->WorldToIndex(positionEvent->GetPlanePositionInWorld(), mprojectedPointIn2D);
       itk::Index<2> projectedPointInWorkingSlice2D;
       projectedPointInWorkingSlice2D[0] = static_cast<int>(mprojectedPointIn2D[0] - 0.5);
       projectedPointInWorkingSlice2D[1] = static_cast<int>(mprojectedPointIn2D[1] - 0.5);
 
       if (workingSliceGeometry->IsIndexInside(projectedPointInWorkingSlice2D))
       {
-        MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
+        MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPlanePositionInWorld() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
 
         // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
         itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
@@ -286,14 +286,14 @@ void mitk::ClassicRegionGrowingTool::OnMousePressedOutside(StateMachineAction*, 
   // if click was outside the image, don't continue
   const BaseGeometry* sliceGeometry = m_ReferenceSlice->GetGeometry();
   Point3D mprojectedPointIn2D;
-  sliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
+  sliceGeometry->WorldToIndex(positionEvent->GetPlanePositionInWorld(), mprojectedPointIn2D);
   itk::Index<2> projectedPointIn2D;
   projectedPointIn2D[0] = static_cast<int>(mprojectedPointIn2D[0] - 0.5);
   projectedPointIn2D[1] = static_cast<int>(mprojectedPointIn2D[1] - 0.5);
 
   if (sliceGeometry->IsIndexInside(mprojectedPointIn2D))
   {
-    MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
+    MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPlanePositionInWorld() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 
     // 3.2.1 Remember Y cursor position and initial seed point
 #ifdef _WIN32

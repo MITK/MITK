@@ -322,7 +322,7 @@ void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
   if (m_WorkingSlice.IsNull()) return;
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  m_WorkingSlice->GetGeometry()->WorldToIndex( positionEvent->GetPositionInWorld(), m_LastPosition );
+  m_WorkingSlice->GetGeometry()->WorldToIndex( positionEvent->GetPlanePositionInWorld(), m_LastPosition );
 
   if (!positionEvent) return;
 
@@ -351,7 +351,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
   m_LastTimeStep = positionEvent->GetSender()->GetTimeStep();
-  m_LastWorldCoordinates = positionEvent->GetPositionInWorld();
+  m_LastWorldCoordinates = positionEvent->GetPlanePositionInWorld();
 
   MouseMovedImpl(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), leftMouseButtonPressed);
 

@@ -310,14 +310,14 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
         // 2. Determine if the user clicked inside or outside of the segmentation/working slice (i.e. the whole volume)
         mitk::BaseGeometry::Pointer workingSliceGeometry;
         workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
-        workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), m_SeedPoint);
+        workingSliceGeometry->WorldToIndex(positionEvent->GetPlanePositionInWorld(), m_SeedPoint);
         itk::Index<2> indexInWorkingSlice2D;
         indexInWorkingSlice2D[0] = m_SeedPoint[0];
         indexInWorkingSlice2D[1] = m_SeedPoint[1];
 
         if (workingSliceGeometry->IsIndexInside(m_SeedPoint))
         {
-            MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << m_SeedPoint << ") is inside working slice";
+            MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPlanePositionInWorld() << " (index coordinates " << m_SeedPoint << ") is inside working slice";
 
             // 3. determine the pixel value under the last click to determine what to do
             bool inside(true);
@@ -417,7 +417,7 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction*, Interac
         referenceSliceGeometry = m_ReferenceSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
         itk::Index<3> indexInReferenceSlice;
         itk::Index<2> indexInReferenceSlice2D;
-        referenceSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), indexInReferenceSlice);
+        referenceSliceGeometry->WorldToIndex(positionEvent->GetPlanePositionInWorld(), indexInReferenceSlice);
         indexInReferenceSlice2D[0] = indexInReferenceSlice[0];
         indexInReferenceSlice2D[1] = indexInReferenceSlice[1];
 

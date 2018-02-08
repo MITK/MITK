@@ -56,7 +56,7 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
 
   contour->Deselect();
 
-  mitk::Point3D click = positionEvent->GetPositionInWorld();
+  mitk::Point3D click = positionEvent->GetPlanePositionInWorld();
 
   if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
@@ -96,7 +96,7 @@ bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent* interactio
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( this->GetDataNode()->GetData() );
 
-  mitk::Point3D currentPosition = positionEvent->GetPositionInWorld();
+  mitk::Point3D currentPosition = positionEvent->GetPlanePositionInWorld();
 
 
   bool isHover = false;
@@ -129,13 +129,13 @@ void mitk::ContourModelInteractor::OnMovePoint(StateMachineAction*, InteractionE
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( this->GetDataNode()->GetData() );
 
   mitk::Vector3D translation;
-  mitk::Point3D currentPosition = positionEvent->GetPositionInWorld();
+  mitk::Point3D currentPosition = positionEvent->GetPlanePositionInWorld();
   translation[0] = currentPosition[0] - this->m_lastMousePosition[0];
   translation[1] = currentPosition[1] - this->m_lastMousePosition[1];
   translation[2] = currentPosition[2] - this->m_lastMousePosition[2];
   contour->ShiftSelectedVertex(translation);
 
-  this->m_lastMousePosition = positionEvent->GetPositionInWorld();
+  this->m_lastMousePosition = positionEvent->GetPlanePositionInWorld();
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 }
 
@@ -150,13 +150,13 @@ void mitk::ContourModelInteractor::OnMoveContour(StateMachineAction*, Interactio
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( this->GetDataNode()->GetData() );
   mitk::Vector3D translation;
-  mitk::Point3D currentPosition = positionEvent->GetPositionInWorld();
+  mitk::Point3D currentPosition = positionEvent->GetPlanePositionInWorld();
   translation[0] = currentPosition[0] - this->m_lastMousePosition[0];
   translation[1] = currentPosition[1] - this->m_lastMousePosition[1];
   translation[2] = currentPosition[2] - this->m_lastMousePosition[2];
   contour->ShiftContour(translation, timestep);
 
-  this->m_lastMousePosition = positionEvent->GetPositionInWorld();
+  this->m_lastMousePosition = positionEvent->GetPlanePositionInWorld();
 
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 }

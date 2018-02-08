@@ -242,7 +242,7 @@ bool mitk::LiveWireTool2D::IsPositionEventInsideImageRegion(mitk::InteractionPos
 {
   bool IsPositionEventInsideImageRegion =
       data != nullptr &&
-      data->GetGeometry()->IsInside(positionEvent->GetPositionInWorld());
+      data->GetGeometry()->IsInside(positionEvent->GetPlanePositionInWorld());
   if(!IsPositionEventInsideImageRegion)
   {
     MITK_WARN("LiveWireTool2D") << "PositionEvent is outside ImageRegion!";
@@ -321,7 +321,7 @@ void mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_LiveWireFilter->SetInput(m_WorkingSlice);
 
   //map click to pixel coordinates
-  mitk::Point3D click = positionEvent->GetPositionInWorld();
+  mitk::Point3D click = positionEvent->GetPlanePositionInWorld();
   itk::Index<3> idx;
   m_WorkingSlice->GetGeometry()->WorldToIndex(click, idx);
 
@@ -361,7 +361,7 @@ void mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   if (m_PlaneGeometry != NULL)
   {
     // this checks that the point is in the correct slice
-    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
+    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPlanePositionInWorld()) > mitk::sqrteps)
     {
       return;
     }
@@ -393,7 +393,7 @@ void mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   m_LiveWireContour->Clear(timestep);
 
   //set new start point
-  m_LiveWireFilter->SetStartPoint(positionEvent->GetPositionInWorld());
+  m_LiveWireFilter->SetStartPoint(positionEvent->GetPlanePositionInWorld());
 
   if( m_CreateAndUseDynamicCosts )
   {
@@ -416,7 +416,7 @@ void mitk::LiveWireTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* 
   // actual LiveWire computation
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  m_LiveWireFilter->SetEndPoint(positionEvent->GetPositionInWorld());
+  m_LiveWireFilter->SetEndPoint(positionEvent->GetPlanePositionInWorld());
 
   m_LiveWireFilter->SetTimeStep( timestep );
   m_LiveWireFilter->Update();
@@ -452,7 +452,7 @@ bool mitk::LiveWireTool2D::OnCheckPoint( const InteractionEvent* interactionEven
   {
     int timestep = positionEvent->GetSender()->GetTimeStep();
 
-    mitk::Point3D click = positionEvent->GetPositionInWorld();
+    mitk::Point3D click = positionEvent->GetPlanePositionInWorld();
     mitk::Point3D first = this->m_Contour->GetVertexAt(0, timestep)->Coordinates;
 
     if (first.EuclideanDistanceTo(click) < 4.5)

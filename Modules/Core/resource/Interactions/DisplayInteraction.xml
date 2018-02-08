@@ -93,7 +93,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
             <condition name="check_can_swivel" inverted="true"/>
         </transition>
 
-        <transition event_class="InternalEvent" event_variant="" target="mouseCameraRotation">
+        <transition event_class="InternalEvent" event_variant="MouseCameraRotation" target="mouseCameraRotation">
             <condition name="check_is_in_mouse_rotation_mode"/>
             <action name="startMouseCameraRotation"/>
         </transition>
@@ -220,7 +220,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="MouseReleaseEvent" event_variant="EndMoveCrosshair" target="start">
             <action name="stopMouseCameraRotation"/>
         </transition>
-        <transition event_class="InternalEvent" event_variant="" target="start">
+        <transition event_class="InternalEvent" event_variant="MouseCameraRotation" target="start">
             <action name="stopMouseCameraRotation"/>
             <condition name="check_is_in_mouse_rotation_mode" inverted="true"/>
         </transition>

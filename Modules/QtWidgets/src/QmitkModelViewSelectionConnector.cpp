@@ -38,20 +38,21 @@ void QmitkModelViewSelectionConnector::SetView(QAbstractItemView* view)
 
   // reset model-view pair and check for valid function argument
   m_View = nullptr;
-  m_Model = nullptr;
   if (nullptr == view)
   {
     mitkThrow() << "Invalid item view. To use the model-view selection connector please specify a valid 'QAbstractItemView'.";
   }
 
-  if (nullptr == dynamic_cast<QmitkAbstractDataStorageModel*>(view->model()))
+  auto storageModel = dynamic_cast<QmitkAbstractDataStorageModel*>(view->model());
+
+  if (storageModel == nullptr)
   {
     mitkThrow() << "Invalid data model. To use the model-view selection connector please set a valid 'QmitkAbstractDataStorageModel' for the given item view.";
   }
 
   // a valid item view and a valid data model was found
   m_View = view;
-  m_Model = dynamic_cast<QmitkAbstractDataStorageModel*>(m_View->model());
+  m_Model = storageModel;
   connect(m_View->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
 }
 
@@ -70,7 +71,7 @@ void QmitkModelViewSelectionConnector::SetCurrentSelection(QList<mitk::DataNode:
   // filter input nodes and return the modified input node list
   QList<mitk::DataNode::Pointer> filteredNodes = FilterNodeList(selectedNodes);
 
-  bool equal = IsEqualToCurrentSelection(filteredNodes);
+  bool equal = EqualNodeSelections(this->GetInternalSelectedNodes(), filteredNodes);
   if (equal)
   {
     return;
@@ -175,16 +176,13 @@ QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::FilterNodeList(
   return result;
 }
 
-bool QmitkModelViewSelectionConnector::IsEqualToCurrentSelection(QList<mitk::DataNode::Pointer>& selectedNodes) const
+bool MITKQTWIDGETS_EXPORT EqualNodeSelections(const QList<mitk::DataNode::Pointer>& selection1, const QList<mitk::DataNode::Pointer>& selection2)
 {
-  // get the currently selected nodes from the model
-  QList<mitk::DataNode::Pointer> currentlySelectedNodes = GetInternalSelectedNodes();
-
-  if (currentlySelectedNodes.size() == selectedNodes.size())
+  if (selection1.size() == selection2.size())
   {
     // lambda to compare node pointer inside both lists
     auto lambda = [](mitk::DataNode::Pointer lhs, mitk::DataNode::Pointer rhs) { return lhs == rhs; };
-    return std::is_permutation(selectedNodes.begin(), selectedNodes.end(), currentlySelectedNodes.begin(), currentlySelectedNodes.end(), lambda);
+    return std::is_permutation(selection1.begin(), selection1.end(), selection2.begin(), selection2.end(), lambda);
   }
 
   return false;

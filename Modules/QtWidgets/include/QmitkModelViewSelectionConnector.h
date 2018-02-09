@@ -145,12 +145,10 @@ private:
   *        of given nodes is returned.
   */
   QList<mitk::DataNode::Pointer> FilterNodeList(const QList<mitk::DataNode::Pointer>& nodes) const;
-  /*
-  * @brief Return true, if the nodes in the list of given selected nodes are equal to the
-  *        currently selected nodes from the selection model of the private member item view.
-  */
-  bool IsEqualToCurrentSelection(QList<mitk::DataNode::Pointer>& selectedNodes) const;
-
 };
+
+/*
+* @brief Return true, if the nodes in the list of two given selections are equal (Sorting is ignored. Any permutation is valid.)*/
+bool MITKQTWIDGETS_EXPORT EqualNodeSelections(const QList<mitk::DataNode::Pointer>& selection1, const QList<mitk::DataNode::Pointer>& selection2);
 
 #endif // QMITKMODELVIEWSELECTIONCONNECTOR_H

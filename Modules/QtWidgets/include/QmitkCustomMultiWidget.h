@@ -62,6 +62,7 @@ public:
   virtual ~QmitkCustomMultiWidget();
   
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  void InitRenderWindowWidgets();
 
   using RenderWindowWidgetMap = std::map<QString, QmitkRenderWindowWidget*>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;

@@ -326,11 +326,8 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     m_MouseModeSwitcher->setMouseModeSwitcher(m_CustomMultiWidget->GetMouseModeSwitcher());
 
-    mitk::DataStorage::Pointer dataStorage = GetDataStorage();
-    m_CustomMultiWidget->SetDataStorage(dataStorage);
-
-    mitk::TimeGeometry::Pointer timeGeometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
-    mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
+    m_CustomMultiWidget->SetDataStorage(GetDataStorage());
+    m_CustomMultiWidget->InitRenderWindowWidgets();
 
     m_CustomMultiWidget->ShowAllLevelWindowWidgets(true);
 

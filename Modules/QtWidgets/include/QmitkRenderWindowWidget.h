@@ -102,7 +102,7 @@ private:
   QmitkRenderWindow* m_RenderWindow;
   QmitkLevelWindowWidget* m_LevelWindowWidget;
 
-  mitk::RenderingManager* m_RenderingManager;
+  mitk::RenderingManager::Pointer m_RenderingManager;
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
   mitk::SliceNavigationController *m_TimeNavigationController;
 

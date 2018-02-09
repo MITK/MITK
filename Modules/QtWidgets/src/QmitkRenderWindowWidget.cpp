@@ -172,11 +172,18 @@ void QmitkRenderWindowWidget::InitializeGUI()
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // create render window for this render window widget
-  m_RenderingManager = mitk::RenderingManager::GetInstance(); // TODO: do not always use the standard global rendering manager
+  //m_RenderingManager = mitk::RenderingManager::GetInstance();
+  m_RenderingManager = mitk::RenderingManager::New(); // TODO: allow external access to the different render window manager
+  m_RenderingManager->SetDataStorage(m_DataStorage);
+
   m_RenderingMode = mitk::BaseRenderer::RenderingMode::Standard; // TODO: do not always use the standard rendering mode
   m_RenderWindow = new QmitkRenderWindow(this, m_UID, nullptr, m_RenderingManager, m_RenderingMode);
   m_RenderWindow->SetLayoutIndex(QmitkCustomMultiWidget::SAGITTAL); // TODO: allow to change layout type later
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+  m_RenderWindow->GetSliceNavigationController()->SetRenderingManager(m_RenderingManager);
+
+  mitk::TimeGeometry::Pointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  m_RenderingManager->InitializeViews(timeGeometry);
 
   // create level window widget for this render window widget
   m_LevelWindowWidget = new QmitkLevelWindowWidget(this);
@@ -193,18 +200,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // set colors, add logo etc.
   InitializeDecorations();
-
-  if (m_RenderingManager == nullptr)
-  {
-    m_RenderingManager = mitk::RenderingManager::GetInstance();
-  }
-  m_TimeNavigationController = m_RenderingManager->GetTimeNavigationController();
-
-  // connect to the "time navigation controller": send time via sliceNavigationControllers
-  m_TimeNavigationController->ConnectGeometryTimeEvent(GetRenderWindow()->GetSliceNavigationController(), false);
-
-  // reverse connection between sliceNavigationControllers and m_TimeNavigationController
-  GetRenderWindow()->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 }
 
 void QmitkRenderWindowWidget::InitializeDecorations()

@@ -58,21 +58,12 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
   , m_RenderingManager(renderingManager)
   , m_RenderingMode(renderingMode)
   , m_MultiWidgetName(multiWidgetName)
-  , m_TimeNavigationController(nullptr)
   , m_PendingCrosshairPositionEvent(false)
   , m_CrosshairNavigationEnabled(false)
 {
-  if (nullptr == m_RenderingManager)
-  {
-    m_RenderingManager = mitk::RenderingManager::GetInstance();
-  }
-  m_TimeNavigationController = m_RenderingManager->GetTimeNavigationController();
-
   // create widget manually
   // create and set layout
   InitializeGUI();
-  // create at least one render window initially
-  AddRenderWindowWidget();
 
   resize(QSize(364, 477).expandedTo(minimumSizeHint()));
 
@@ -81,10 +72,7 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
 
 QmitkCustomMultiWidget::~QmitkCustomMultiWidget()
 {
-  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
-  {
-    m_TimeNavigationController->Disconnect(renderWindowWidget.second->GetRenderWindow()->GetSliceNavigationController());
-  }
+  // nothing here
 }
 
 void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -99,6 +87,14 @@ void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   {
     renderWindowWidget.second->SetDataStorage(m_DataStorage);
   }
+}
+
+void QmitkCustomMultiWidget::InitRenderWindowWidgets()
+{
+  // create three render window (widgets) initially
+  AddRenderWindowWidget();
+  AddRenderWindowWidget();
+  AddRenderWindowWidget();
 }
 
 QmitkCustomMultiWidget::RenderWindowWidgetMap QmitkCustomMultiWidget::GetRenderWindowWidgets() const
@@ -617,7 +613,6 @@ void QmitkCustomMultiWidget::MoveCrossToPosition(const QString& widgetID, const 
   }
 
   MITK_ERROR << "Geometry plane can not be shown for an unknown widget.";
-
 }
 
 void QmitkCustomMultiWidget::ResetCrosshair()
@@ -708,13 +703,6 @@ void QmitkCustomMultiWidget::AddRenderWindowWidget()
 
   // store the newly created render window widget with the UID
   m_RenderWindowWidgets.insert(std::pair<QString, QmitkRenderWindowWidget*>(UID, renderWindowWidget));
-
-  mitk::SliceNavigationController* sliceNavigationController = renderWindowWidget->GetSliceNavigationController();
-  if (nullptr != sliceNavigationController)
-  {
-    m_TimeNavigationController->ConnectGeometryTimeEvent(sliceNavigationController, false);
-    sliceNavigationController->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  }
 
   // #TODO: define the grid cell to add the new render window widget
   // add the newly created render window widget to this multi widget

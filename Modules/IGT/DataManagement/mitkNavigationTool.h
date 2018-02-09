@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
-#include <mitkTrackingTool.h>
 #include <mitkTrackingTypes.h>
 #include <mitkSurface.h>
 #include <MitkIGTExports.h>

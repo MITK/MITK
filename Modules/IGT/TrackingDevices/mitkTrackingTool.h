@@ -40,6 +40,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(TrackingTool, itk::Object);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
@@ -75,8 +77,6 @@ namespace mitk
     itkGetConstMacro(IGTTimeStamp, double) ///< Gets the IGT timestamp of the tracking tool object (time in milliseconds). Returns 0 if the timestamp was not set.
 
   protected:
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
     TrackingTool();
     virtual ~TrackingTool();
 

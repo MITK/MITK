@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
+#include <mitkMouseModeSwitcher.h>
 
 // qt
 #include <qwidget.h>
@@ -79,6 +80,8 @@ public:
   void RequestUpdateAll();
   void ForceImmediateUpdate(const QString& widgetID);
   void ForceImmediateUpdateAll();
+
+  mitk::MouseModeSwitcher* GetMouseModeSwitcher();
 
   const mitk::Point3D GetCrossPosition(const QString& widgetID) const;
 
@@ -200,7 +203,7 @@ private:
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
   QString m_MultiWidgetName;
 
-  //mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
+  mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
   mitk::SliceNavigationController *m_TimeNavigationController;
 
   mitk::DataStorage::Pointer m_DataStorage;

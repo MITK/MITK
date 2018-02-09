@@ -160,6 +160,7 @@ private:
   QString MitkColorToHexColor(const mitk::Color& mitkColor);
 
   QmitkCustomMultiWidget* m_CustomMultiWidget;
+  QmitkMouseModeSwitcher* m_MouseModeSwitcher;
 
 };
 

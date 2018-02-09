@@ -37,6 +37,7 @@ const QString QmitkCustomMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.custom
 
 QmitkCustomMultiWidgetEditor::QmitkCustomMultiWidgetEditor()
   : m_CustomMultiWidget(nullptr)
+  , m_MouseModeSwitcher(nullptr)
 {
   // nothing here
 }
@@ -311,13 +312,19 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     QHBoxLayout* layout = new QHBoxLayout(parent);
     layout->setContentsMargins(0, 0, 0, 0);
 
+    if (nullptr == m_MouseModeSwitcher)
+    {
+      m_MouseModeSwitcher = new QmitkMouseModeSwitcher(parent);
+      layout->addWidget(m_MouseModeSwitcher);
+    }
+
     berry::IPreferences::Pointer prefs = GetPreferences();
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt("Rendering Mode", 0));
 
     m_CustomMultiWidget = new QmitkCustomMultiWidget(parent, 0, 0, renderingMode);
     layout->addWidget(m_CustomMultiWidget);
 
-    //m_Impl->m_MouseModeToolbar->setMouseModeSwitcher(m_Impl->m_CustomMultiWidget->GetMouseModeSwitcher());
+    m_MouseModeSwitcher->setMouseModeSwitcher(m_CustomMultiWidget->GetMouseModeSwitcher());
 
     mitk::DataStorage::Pointer dataStorage = GetDataStorage();
     m_CustomMultiWidget->SetDataStorage(dataStorage);

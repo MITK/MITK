@@ -187,6 +187,11 @@ void QmitkCustomMultiWidget::ForceImmediateUpdateAll()
   }
 }
 
+mitk::MouseModeSwitcher* QmitkCustomMultiWidget::GetMouseModeSwitcher()
+{
+  return m_MouseModeSwitcher;
+}
+
 const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(const QString& widgetID) const
 {
   /*
@@ -666,6 +671,10 @@ void QmitkCustomMultiWidget::InitializeWidget()
 {
   // #TODO: some things have to be handled globally (hold for all render window (widgets)
   // analyse those things and design a controlling mechanism
+
+  // necessary here? mouse mode is valid for all render windows (and also used in editor)
+  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
+  m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
 
   // setup the department logo rendering
   /*

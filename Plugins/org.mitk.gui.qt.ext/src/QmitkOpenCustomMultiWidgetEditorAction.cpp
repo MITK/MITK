@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <mitkDataStorageEditorInput.h>
 
+#include "internal/QmitkCommonExtPlugin.h"
+#include <mitkIDataStorageService.h>
+class ctkPluginContext;
+
 QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(0)
 {
@@ -55,13 +59,23 @@ void QmitkOpenCustomMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Point
 
 void QmitkOpenCustomMultiWidgetEditorAction::Run()
 {
- // check if there is an open perspective, if not open the default perspective
+  // check if there is an open perspective, if not open the default perspective
   if (m_Window->GetActivePage().IsNull())
   {
     QString defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
     m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
   }
 
-  berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput());
-  m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.custommultiwidget");
+  ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
+  ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
+  if (serviceRef)
+  {
+    mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
+    if (dsService)
+    {
+      mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
+      berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsRef));
+      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.custommultiwidget");
+    }
+  }
 }

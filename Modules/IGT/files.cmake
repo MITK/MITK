@@ -49,7 +49,6 @@ set(CPP_FILES
 
   TrackingDevices/mitkClaronTool.cpp
   TrackingDevices/mitkClaronTrackingDevice.cpp
-  TrackingDevices/mitkInternalTrackingTool.cpp
   TrackingDevices/mitkNDIPassiveTool.cpp
   TrackingDevices/mitkNDIProtocol.cpp
   TrackingDevices/mitkNDITrackingDevice.cpp

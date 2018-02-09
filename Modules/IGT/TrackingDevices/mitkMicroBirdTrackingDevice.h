@@ -94,7 +94,7 @@ namespace mitk {
     void HandleError(int errorCode);
     bool CompareError(int errorCode, int errorConstant);
 
-    typedef InternalTrackingTool ToolType;
+    typedef TrackingTool ToolType;
     typedef std::vector<ToolType::Pointer> ToolContainerType;
     MicroBirdTrackingDevice();
     virtual ~MicroBirdTrackingDevice();

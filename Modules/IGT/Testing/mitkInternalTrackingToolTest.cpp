@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkInternalTrackingTool.h"
+#include "mitkTrackingTool.h"
 
 #include "mitkTestingMacros.h"
 
@@ -27,17 +27,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 * tool objects. Therefore, we derive from NDIPassiveTool and add a
 * public itkFactorylessNewMacro, so that we can instantiate and test the class
 */
-class InternalTrackingToolTestClass : public mitk::InternalTrackingTool
+class InternalTrackingToolTestClass : public mitk::TrackingTool
 {
 public:
-  mitkClassMacro(InternalTrackingToolTestClass, InternalTrackingTool);
+  mitkClassMacro(InternalTrackingToolTestClass, TrackingTool);
   /** make a public constructor, so that the test is able
   *   to instantiate NDIPassiveTool
   */
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 protected:
-  InternalTrackingToolTestClass() : mitk::InternalTrackingTool()
+  InternalTrackingToolTestClass() : mitk::TrackingTool()
   {
   }
 
@@ -45,18 +45,18 @@ public: //these static methods are only to structure the test
         //please see them seperated from the upper part of the class
 
 static void TestBasicFunctionality()
-  {
+{
   // let's create an object of our class
-  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New().GetPointer();
+  mitk::TrackingTool::Pointer trackingTool = InternalTrackingToolTestClass::New().GetPointer();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(internalTrackingTool.IsNotNull(),"Testing instantiation");
+  MITK_TEST_CONDITION_REQUIRED(trackingTool.IsNotNull(),"Testing instantiation");
 
     // test for Enable()
-  internalTrackingTool->Enable();
-  MITK_TEST_CONDITION((internalTrackingTool->IsEnabled()==true),"Testing of Enable()");
+  trackingTool->Enable();
+  MITK_TEST_CONDITION((trackingTool->IsEnabled()==true),"Testing of Enable()");
 
   srand(time(nullptr));
   // generate a random position to test Set/GetPosition()
@@ -64,10 +64,10 @@ static void TestBasicFunctionality()
   position[0] = rand()%1000;
   position[1] = rand()%1000;
   position[2] = rand()%1000;
-  internalTrackingTool->SetPosition(position);
+  trackingTool->SetPosition(position);
   mitk::Point3D returnedPosition;
   returnedPosition.Fill(0);
-  internalTrackingTool->GetPosition(returnedPosition);
+  trackingTool->GetPosition(returnedPosition);
   MITK_TEST_CONDITION((position==returnedPosition),"Testing of Set/GetPosition()");
 
   // generate a random orientation to test Set/GetOrientation()
@@ -76,39 +76,39 @@ static void TestBasicFunctionality()
   orientation[1] = (rand()%1000)/1000.0;
   orientation[2] = (rand()%1000)/1000.0;
   orientation[3] = (rand()%1000)/1000.0;
-  internalTrackingTool->SetOrientation(orientation);
+  trackingTool->SetOrientation(orientation);
   mitk::Quaternion returnedOrientation(0,0,0,0);
-  internalTrackingTool->GetOrientation(returnedOrientation);
+  trackingTool->GetOrientation(returnedOrientation);
   MITK_TEST_CONDITION((orientation==returnedOrientation),"Testing of Set/GetQuaternion()");
 
   // test Set/GetTrackingError()
   float trackingError = rand()%2;
-  internalTrackingTool->SetTrackingError(trackingError);
-  MITK_TEST_CONDITION((internalTrackingTool->GetTrackingError()==trackingError),"Testing of Set/GetTrackingError()");
+  trackingTool->SetTrackingError(trackingError);
+  MITK_TEST_CONDITION((trackingTool->GetTrackingError()==trackingError),"Testing of Set/GetTrackingError()");
   // test Set/GetDataValid()
-  internalTrackingTool->SetDataValid(true);
-  MITK_TEST_CONDITION((internalTrackingTool->IsDataValid()==true),"Testing of SetDataValid and IsDataValid() for parameter 'true'");
-  internalTrackingTool->SetDataValid(false);
-  MITK_TEST_CONDITION((internalTrackingTool->IsDataValid()==false),"Testing of SetDataValid and IsDataValid() for parameter 'false'");
+  trackingTool->SetDataValid(true);
+  MITK_TEST_CONDITION((trackingTool->IsDataValid()==true),"Testing of SetDataValid and IsDataValid() for parameter 'true'");
+  trackingTool->SetDataValid(false);
+  MITK_TEST_CONDITION((trackingTool->IsDataValid()==false),"Testing of SetDataValid and IsDataValid() for parameter 'false'");
 
-  internalTrackingTool->Disable();
-  MITK_TEST_CONDITION((internalTrackingTool->IsEnabled()==false),"Testing of Disable()");
-  }
+  trackingTool->Disable();
+  MITK_TEST_CONDITION((trackingTool->IsEnabled()==false),"Testing of Disable()");
+}
 
 static void TestTooltipFunctionality()
-  {
-  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New().GetPointer();
+{
+  mitk::TrackingTool::Pointer trackingTool = InternalTrackingToolTestClass::New().GetPointer();
   mitk::Point3D toolTipPos; mitk::FillVector3D(toolTipPos,1,1,1);
   mitk::Quaternion toolTipQuat = mitk::Quaternion(0,0,0,1);
-  internalTrackingTool->SetToolTip(toolTipPos,toolTipQuat);
+  trackingTool->SetToolTip(toolTipPos,toolTipQuat);
 
   mitk::Point3D positionInput; mitk::FillVector3D(positionInput,5,6,7);
 
-  internalTrackingTool->SetPosition(positionInput);
+  trackingTool->SetPosition(positionInput);
 
   mitk::Point3D positionOutput;
 
-  internalTrackingTool->GetPosition(positionOutput);
+  trackingTool->GetPosition(positionOutput);
 
   MITK_TEST_CONDITION(((positionOutput[0] == 6)&&
                        (positionOutput[0] == 6)&&
@@ -116,13 +116,11 @@ static void TestTooltipFunctionality()
                        (positionOutput[0] == 6)),
                        "Testing tooltip definition."
                      );
-
-
-  }
+}
 
 static void TestModiciationTimeCorrectness()
 {
-  mitk::InternalTrackingTool::Pointer tool = InternalTrackingToolTestClass::New().GetPointer();
+  mitk::TrackingTool::Pointer tool = InternalTrackingToolTestClass::New().GetPointer();
   unsigned long mTime1 = tool->GetMTime();
 
   mitk::Point3D position1;
@@ -160,7 +158,7 @@ static void TestModiciationTimeCorrectness()
 };
 
 /**
- *  Simple example for a test for the class "InternalTrackingTool".
+ *  Simple example for a test for the class "TrackingTool".
  *
  *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
@@ -170,12 +168,11 @@ static void TestModiciationTimeCorrectness()
 int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("InternalTrackingTool")
+  MITK_TEST_BEGIN("TrackingTool")
 
   InternalTrackingToolTestClass::TestBasicFunctionality();
   InternalTrackingToolTestClass::TestTooltipFunctionality();
   InternalTrackingToolTestClass::TestModiciationTimeCorrectness();
-
 
   // always end with this!
   MITK_TEST_END();

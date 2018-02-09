@@ -22,7 +22,14 @@ QmitkDataStorageListViewWidget::QmitkDataStorageListViewWidget(QWidget* parent/*
   : QmitkAbstractDataStorageViewWidget(parent)
 {
   m_Controls.setupUi(this);
+
+  m_Controls.view->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_Controls.view->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls.view->setAlternatingRowColors(true);
+
   m_StorageModel = new QmitkDataStorageDefaultListModel(this);
+
+  m_Controls.view->setModel(m_StorageModel);
 }
 
 QAbstractItemView* QmitkDataStorageListViewWidget::GetView()
@@ -40,5 +47,15 @@ void QmitkDataStorageListViewWidget::Initialize()
   m_StorageModel->SetDataStorage(m_DataStorage.Lock());
   m_StorageModel->SetNodePredicate(m_NodePredicate);
 
-  m_Controls.view->setModel(m_StorageModel);
+  m_Connector->SetView(m_Controls.view);
 }
+
+void QmitkDataStorageListViewWidget::SetSelectionMode(SelectionMode mode)
+{
+  m_Controls.view->setSelectionMode(mode);
+}
+
+QmitkDataStorageListViewWidget::SelectionMode QmitkDataStorageListViewWidget::GetSelectionMode() const
+{
+  return m_Controls.view->selectionMode();
+};

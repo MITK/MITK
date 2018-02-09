@@ -76,6 +76,10 @@ public:
 
   bool GetSelectOnlyVisibleNodes() const;
 
+  using SelectionMode = QAbstractItemView::SelectionMode;
+  virtual void SetSelectionMode(SelectionMode mode) = 0;
+  virtual SelectionMode GetSelectionMode() const = 0;
+
 Q_SIGNALS:
   /*
   * @brief A signal that will be emitted if the selected node has changed.

@@ -39,7 +39,7 @@ namespace mitk
   class MITKIGT_EXPORT TrackingTool : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(TrackingTool, itk::Object);
+    mitkClassMacroItkParent(TrackingTool, itk::Object)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

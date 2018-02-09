@@ -15,58 +15,60 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QMITK_NODE_SELECTION_DIALOG_H
-#define QMITK_NODE_SELECTION_DIALOG_H
+#ifndef QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
+#define QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
 
+#include <QmitkModelViewSelectionConnector.h>
 
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
-#include <QmitkAbstractDataStorageViewWidget.h>
-
 #include "org_mitk_gui_qt_datastorageviewertest_Export.h"
 
-#include "ui_QmitkNodeSelectionDialog.h"
+#include <QWidget>
 
-#include <QDialog>
+class QmitkAbstractDataStorageModel;
+class QAbstractItemVew;
 
 /**
-* \class QmitkNodeSelectionDialog
-* \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
+* \class QmitkAbstractNodeSelectionWidget
+* \brief Abstract base class for the selection of data from a data storage.
 */
-class DATASTORAGEVIEWERTEST_EXPORT QmitkNodeSelectionDialog : public QDialog
+class DATASTORAGEVIEWERTEST_EXPORT QmitkAbstractNodeSelectionWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkNodeSelectionDialog(QWidget* parent = nullptr, QString caption = "", QString hint = "");
+  explicit QmitkAbstractNodeSelectionWidget(QWidget* parent = nullptr);
 
-  /*
+  /**
   * @brief Sets the data storage that will be used /monitored by widget.
   *
   * @par dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
-
-  /*
-  * @brief Sets the node predicate and updates the widget, according to the node predicate.
+ 
+  /**
+  * Sets the node predicate and updates the widget, according to the node predicate.
+  * Implement OnNodePredicateChange() for custom actualization of a derived widget class.
   *
   * @par nodePredicate    A pointer to node predicate.
   */
-  virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
+  void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
 
   mitk::NodePredicateBase* GetNodePredicate() const;
+  
+  QString GetInvalidInfo() const;
+  QString GetEmptyInfo() const;
+  QString GetPopUpTitel() const;
+  QString GetPopUpHint() const;
 
-  using NodeList = QList<mitk::DataNode::Pointer>;
-
-  NodeList GetSelectedNodes() const;
+  bool GetSelectionIsOptional() const;
 
   bool GetSelectOnlyVisibleNodes() const;
 
-  using SelectionMode = QAbstractItemView::SelectionMode;
-  void SetSelectionMode(SelectionMode mode);
-  SelectionMode GetSelectionMode() const;
+  using NodeList = QList<mitk::DataNode::Pointer>;
 
 Q_SIGNALS:
   /*
@@ -74,9 +76,9 @@ Q_SIGNALS:
   *
   * @par	nodes		A list of data nodes that are newly selected.
   */
-  void CurrentSelectionChanged(NodeList nodes);
+  void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
-  public Q_SLOTS:
+public Q_SLOTS:
   /*
   * @brief Change the selection modus of the item view's selection model.
   *
@@ -88,7 +90,7 @@ Q_SIGNALS:
   *
   * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
-  void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
+  virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
 
   /*
   * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
@@ -102,26 +104,46 @@ Q_SIGNALS:
   *
   * @par	nodes		A list of data nodes that should be newly selected.
   */
-  void SetCurrentSelection(NodeList selectedNodes);
+  virtual void SetCurrentSelection(NodeList selectedNodes) = 0;
 
-protected Q_SLOTS:
-  void OnSelectionChanged(NodeList selectedNodes);
-  void OnOK();
-  void OnCancel();
+  /** Set the info text that should be displayed if no (valid) node is selected,
+   * but a selection is mandatory.
+   * The string can contain HTML code. if wanted*/
+  void SetInvalidInfo(QString info);
+
+  /** Set the info text that should be displayed if no (valid) node is selected,
+  * but a selection is optional.
+  * The string can contain HTML code. if wanted*/
+  void SetEmptyInfo(QString info);
+  
+  /** Set the caption of the popup that is displayed to alter the selection.
+  * The string can contain HTML code. if wanted*/
+  void SetPopUpTitel(QString info);
+
+  /** Set the hint text of the popup that is displayed to alter the selection.
+  * The string can contain HTML code. if wanted*/
+  void SetPopUpHint(QString info);
+
+  /** Set the widget into an optional mode. Optional means that the selection of no valid
+   node does not mean an invalid state. Thus no node is a valid "node" selection too.*/
+  void SetSelectionIsOptional(bool isOptional);
 
 protected:
-  void AddPanel(QmitkAbstractDataStorageViewWidget*, QString name);
+  /**Member is called if the display of the selected nodes should be updated.*/
+  virtual void UpdateInfo() = 0;
+
+  /**Member is called if the predicate has changed. Thus the selection might change to.*/
+  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) = 0;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_NodePredicate;
+
+  QString m_InvalidInfo;
+  QString m_EmptyInfo;
+  QString m_PopUpTitel;
+  QString m_PopUpHint;
+
+  bool m_IsOptional;
   bool m_SelectOnlyVisibleNodes;
-  NodeList m_SelectedNodes;
-
-  SelectionMode m_SelectionMode;
-
-  using PanelVectorType = std::vector<QmitkAbstractDataStorageViewWidget*>;
-  PanelVectorType m_Panels;
-
-  Ui_QmitkNodeSelectionDialog m_Controls;
 };
-#endif // QmitkNodeSelectionDialog_H
+#endif // QmitkAbstractNodeSelectionWidget_H

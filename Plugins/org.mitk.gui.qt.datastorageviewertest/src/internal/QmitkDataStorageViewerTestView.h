@@ -50,9 +50,14 @@ private Q_SLOTS:
   void SetAsSelectionProvider1(bool checked);
   void SetAsSelectionProvider2(bool checked);
   void SetAsSelectionProvider3(bool checked);
+  void SetAsSelectionProvider4(bool checked);
   void SetAsSelectionListener1(bool checked);
   void SetAsSelectionListener2(bool checked);
   void SetAsSelectionListener3(bool checked);
+  void SetAsSelectionListener4(bool checked);
+
+  void OnOnlyImages(bool checked);
+  void OnOnlyImages2(bool checked);
 
 private:
 
@@ -66,6 +71,7 @@ private:
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector2;
 
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector3;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector4;
 };
 
 #endif // QMITKDATASTORAGEVIEWERTESTVIEW_H

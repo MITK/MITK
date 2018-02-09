@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // data storage viewer test plugin
 #include "QmitkDataStorageViewerTestView.h"
 
+#include "mitkNodePredicateDataType.h"
+
 // berry
 #include <berryIWorkbenchWindow.h>
 
@@ -50,7 +52,16 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   m_Controls.selectionListView2->setModel(m_DataStorageDefaultListModel2);
 
   m_Controls.singleSlot->SetDataStorage(GetDataStorage());
+  m_Controls.singleSlot->SetEmptyInfo(QString("EmptyInfo: Set this to display info in empty state"));
+  m_Controls.singleSlot->SetInvalidInfo(QString("<b><font color=\"red\">InvalidInfo: is displayed for invalid states</font></b>"));
+  m_Controls.singleSlot->SetPopUpTitel(QString("This is the definable caption. Choose your data now!"));
+  m_Controls.singleSlot->SetPopUpHint(QString("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
 
+  m_Controls.multiSlot->SetDataStorage(GetDataStorage());
+  m_Controls.multiSlot->SetEmptyInfo(QString("EmptyInfo: Set this to display info in empty state"));
+  m_Controls.multiSlot->SetInvalidInfo(QString("<b><font color=\"red\">InvalidInfo: is displayed for invalid states</font></b>"));
+  m_Controls.multiSlot->SetPopUpTitel(QString("This is the definable caption. Choose your data now!"));
+  m_Controls.multiSlot->SetPopUpHint(QString("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
 
   m_ModelViewSelectionConnector = std::make_unique<QmitkModelViewSelectionConnector>();
   try
@@ -75,6 +86,7 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
   m_SelectionServiceConnector2 = std::make_unique<QmitkSelectionServiceConnector>();
 
   m_SelectionServiceConnector3 = std::make_unique<QmitkSelectionServiceConnector>();
+  m_SelectionServiceConnector4 = std::make_unique<QmitkSelectionServiceConnector>();
 
   connect(m_Controls.selectionProviderCheckBox, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider1(bool)));
   connect(m_Controls.selectionProviderCheckBox2, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider2(bool)));
@@ -87,6 +99,14 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
 
   connect(m_Controls.checkOnlyVisible, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectOnlyVisibleNodes(bool)));
   connect(m_Controls.checkOptional, SIGNAL(toggled(bool)), m_Controls.singleSlot, SLOT(SetSelectionIsOptional(bool)));
+  connect(m_Controls.checkOnlyImages, SIGNAL(toggled(bool)), this, SLOT(OnOnlyImages(bool)));
+
+  connect(m_Controls.selectionProviderCheckBox4, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionProvider4(bool)));
+  connect(m_Controls.selectionListenerCheckBox4, SIGNAL(toggled(bool)), this, SLOT(SetAsSelectionListener4(bool)));
+
+  connect(m_Controls.checkOnlyVisible_2, SIGNAL(toggled(bool)), m_Controls.multiSlot, SLOT(SetSelectOnlyVisibleNodes(bool)));
+  connect(m_Controls.checkOptional_2, SIGNAL(toggled(bool)), m_Controls.multiSlot, SLOT(SetSelectionIsOptional(bool)));
+  connect(m_Controls.checkOnlyImages_2, SIGNAL(toggled(bool)), this, SLOT(OnOnlyImages2(bool)));
 }
 
 void QmitkDataStorageViewerTestView::SetAsSelectionProvider1(bool checked)
@@ -151,12 +171,12 @@ void QmitkDataStorageViewerTestView::SetAsSelectionProvider3(bool checked)
   if (checked)
   {
     m_SelectionServiceConnector3->SetAsSelectionProvider(GetSite()->GetSelectionProvider().Cast<QmitkDataNodeSelectionProvider>().GetPointer());
-    connect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+    connect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector3.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
   }
   else
   {
     m_SelectionServiceConnector3->RemoveAsSelectionProvider();
-    disconnect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+    disconnect(m_Controls.singleSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector3.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
   }
 }
 
@@ -173,3 +193,55 @@ void QmitkDataStorageViewerTestView::SetAsSelectionListener3(bool checked)
     disconnect(m_SelectionServiceConnector3.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
   }
 }
+
+void QmitkDataStorageViewerTestView::SetAsSelectionProvider4(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector4->SetAsSelectionProvider(GetSite()->GetSelectionProvider().Cast<QmitkDataNodeSelectionProvider>().GetPointer());
+    connect(m_Controls.multiSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector4.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+  }
+  else
+  {
+    m_SelectionServiceConnector4->RemoveAsSelectionProvider();
+    disconnect(m_Controls.multiSlot, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector4.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
+  }
+}
+
+void QmitkDataStorageViewerTestView::SetAsSelectionListener4(bool checked)
+{
+  if (checked)
+  {
+    m_SelectionServiceConnector4->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
+    connect(m_SelectionServiceConnector4.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.multiSlot, &QmitkMultiNodeSelectionWidget::SetCurrentSelection);
+  }
+  else
+  {
+    m_SelectionServiceConnector4->RemovePostSelectionListener();
+    disconnect(m_SelectionServiceConnector4.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.multiSlot, &QmitkMultiNodeSelectionWidget::SetCurrentSelection);
+  }
+}
+
+void QmitkDataStorageViewerTestView::OnOnlyImages(bool checked)
+{
+  if (checked)
+  {
+    m_Controls.singleSlot->SetNodePredicate(mitk::NodePredicateDataType::New("Image"));
+  }
+  else
+  {
+    m_Controls.singleSlot->SetNodePredicate(nullptr);
+  }
+};
+
+void QmitkDataStorageViewerTestView::OnOnlyImages2(bool checked)
+{
+  if (checked)
+  {
+    m_Controls.multiSlot->SetNodePredicate(mitk::NodePredicateDataType::New("Image"));
+  }
+  else
+  {
+    m_Controls.multiSlot->SetNodePredicate(nullptr);
+  }
+};

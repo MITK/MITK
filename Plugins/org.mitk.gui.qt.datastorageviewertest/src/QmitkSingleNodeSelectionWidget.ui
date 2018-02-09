@@ -42,45 +42,6 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QPushButton" name="btnLock">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>40</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>:/org.mitk.gui.qt.datastorageviewertest/resources/icon_unlock.png</normaloff>
-       <normalon>:/org.mitk.gui.qt.datastorageviewertest/resources/icon_lock.png</normalon>:/org.mitk.gui.qt.datastorageviewertest/resources/icon_unlock.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>34</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>

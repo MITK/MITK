@@ -19,10 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkDataStorageListViewWidget.h>
 
-QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent) : QDialog(parent), m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false)
+QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent), m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false)
 {
   m_Controls.setupUi(this);
   AddPanel(new QmitkDataStorageListViewWidget(this),"Test");
+  m_Controls.tabWidget->setCurrentIndex(0);
+  this->setWindowTitle(title);
+  this->setToolTip(hint);
+
+  m_Controls.hint->setText(hint);
+  m_Controls.hint->setVisible(!hint.isEmpty());
+
+  connect(m_Controls.buttonBox, SIGNAL(accepted()), this, SLOT(OnOK()));
+  connect(m_Controls.buttonBox, SIGNAL(rejected()), this, SLOT(OnCancel()));
 }
 
 void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -79,6 +88,7 @@ void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleN
 
 void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
 {
+  m_SelectedNodes = selectedNodes;
   for (auto panel : m_Panels)
   {
     panel->SetCurrentSelection(selectedNodes);
@@ -94,10 +104,11 @@ void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
 void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageViewWidget* view, QString name)
 {
   view->setParent(this);
+  view->SetSelectionMode(m_SelectionMode);
 
   auto tabPanel = new QWidget();
   tabPanel->setObjectName(QString("tab_")+name);
-  m_Controls.tabWidget->addTab(tabPanel, name);
+  m_Controls.tabWidget->insertTab(0, tabPanel, name);
 
   auto verticalLayout = new QVBoxLayout(tabPanel);
   verticalLayout->setSpacing(0);
@@ -108,3 +119,26 @@ void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageViewWidget* view
   connect(view, &QmitkAbstractDataStorageViewWidget::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
 };
 
+void QmitkNodeSelectionDialog::OnOK()
+{
+  this->accept();
+};
+
+void QmitkNodeSelectionDialog::OnCancel()
+{
+  this->reject();
+};
+
+void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
+{
+  m_SelectionMode = mode;
+  for (auto panel : m_Panels)
+  {
+    panel->SetSelectionMode(mode);
+  }
+};
+
+QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
+{
+  return m_SelectionMode;
+}

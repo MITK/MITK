@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
-    <height>412</height>
+    <width>945</width>
+    <height>728</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,46 +19,42 @@
   <property name="windowTitle">
    <string>Data storage viewer test</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1">
-      <widget class="QListView" name="selectionListView2"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QCheckBox" name="selectionProviderCheckBox">
-       <property name="text">
-        <string>Set as selection provider</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QListView" name="selectionListView"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="selectionListenerCheckBox">
-       <property name="text">
-        <string>Set as selection listener</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QCheckBox" name="selectionListenerCheckBox2">
-       <property name="text">
-        <string>Set as selection listener</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QCheckBox" name="selectionProviderCheckBox2">
-       <property name="text">
-        <string>Set as selection provider</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QListView" name="selectionListView"/>
    </item>
-   <item>
+   <item row="0" column="1">
+    <widget class="QListView" name="selectionListView2"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QCheckBox" name="selectionProviderCheckBox">
+     <property name="text">
+      <string>Set as selection provider</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QCheckBox" name="selectionProviderCheckBox2">
+     <property name="text">
+      <string>Set as selection provider</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="selectionListenerCheckBox">
+     <property name="text">
+      <string>Set as selection listener</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="selectionListenerCheckBox2">
+     <property name="text">
+      <string>Set as selection listener</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
     <widget class="QmitkSingleNodeSelectionWidget" name="singleSlot" native="true">
      <property name="minimumSize">
       <size>
@@ -68,36 +64,74 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="3" column="1">
+    <widget class="QmitkMultiNodeSelectionWidget" name="multiSlot" native="true"/>
+   </item>
+   <item row="4" column="0">
     <widget class="QCheckBox" name="selectionProviderCheckBox3">
      <property name="text">
       <string>Set as selection provider</string>
      </property>
     </widget>
    </item>
-   <item>
+   <item row="5" column="0">
     <widget class="QCheckBox" name="selectionListenerCheckBox3">
      <property name="text">
       <string>Set as selection listner</string>
      </property>
     </widget>
    </item>
-   <item>
+   <item row="6" column="0">
     <widget class="QCheckBox" name="checkOnlyVisible">
      <property name="text">
-      <string>Change Only visible</string>
+      <string>Only valid nodes</string>
      </property>
     </widget>
    </item>
-   <item>
+   <item row="7" column="0">
     <widget class="QCheckBox" name="checkOnlyImages">
      <property name="text">
       <string>Allow only images </string>
      </property>
     </widget>
    </item>
-   <item>
+   <item row="8" column="0">
     <widget class="QCheckBox" name="checkOptional">
+     <property name="text">
+      <string>Is Optional</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QCheckBox" name="selectionProviderCheckBox4">
+     <property name="text">
+      <string>Set as selection provider</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QCheckBox" name="selectionListenerCheckBox4">
+     <property name="text">
+      <string>Set as selection listner</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QCheckBox" name="checkOnlyVisible_2">
+     <property name="text">
+      <string>Only valid nodes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="checkOnlyImages_2">
+     <property name="text">
+      <string>Allow only images </string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QCheckBox" name="checkOptional_2">
      <property name="text">
       <string>Is Optional</string>
      </property>
@@ -110,6 +144,12 @@
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkMultiNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkMultiNodeSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

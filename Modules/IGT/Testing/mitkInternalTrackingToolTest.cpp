@@ -44,57 +44,6 @@ protected:
 public: //these static methods are only to structure the test
         //please see them seperated from the upper part of the class
 
-static void TestBasicFunctionality()
-{
-  // let's create an object of our class
-  mitk::TrackingTool::Pointer trackingTool = InternalTrackingToolTestClass::New().GetPointer();
-
-  // first test: did this work?
-  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-  // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(trackingTool.IsNotNull(),"Testing instantiation");
-
-    // test for Enable()
-  trackingTool->Enable();
-  MITK_TEST_CONDITION((trackingTool->IsEnabled()==true),"Testing of Enable()");
-
-  srand(time(nullptr));
-  // generate a random position to test Set/GetPosition()
-  mitk::Point3D position;
-  position[0] = rand()%1000;
-  position[1] = rand()%1000;
-  position[2] = rand()%1000;
-  trackingTool->SetPosition(position);
-  mitk::Point3D returnedPosition;
-  returnedPosition.Fill(0);
-  trackingTool->GetPosition(returnedPosition);
-  MITK_TEST_CONDITION((position==returnedPosition),"Testing of Set/GetPosition()");
-
-  // generate a random orientation to test Set/GetOrientation()
-  mitk::Quaternion orientation;
-  orientation[0] = (rand()%1000)/1000.0;
-  orientation[1] = (rand()%1000)/1000.0;
-  orientation[2] = (rand()%1000)/1000.0;
-  orientation[3] = (rand()%1000)/1000.0;
-  trackingTool->SetOrientation(orientation);
-  mitk::Quaternion returnedOrientation(0,0,0,0);
-  trackingTool->GetOrientation(returnedOrientation);
-  MITK_TEST_CONDITION((orientation==returnedOrientation),"Testing of Set/GetQuaternion()");
-
-  // test Set/GetTrackingError()
-  float trackingError = rand()%2;
-  trackingTool->SetTrackingError(trackingError);
-  MITK_TEST_CONDITION((trackingTool->GetTrackingError()==trackingError),"Testing of Set/GetTrackingError()");
-  // test Set/GetDataValid()
-  trackingTool->SetDataValid(true);
-  MITK_TEST_CONDITION((trackingTool->IsDataValid()==true),"Testing of SetDataValid and IsDataValid() for parameter 'true'");
-  trackingTool->SetDataValid(false);
-  MITK_TEST_CONDITION((trackingTool->IsDataValid()==false),"Testing of SetDataValid and IsDataValid() for parameter 'false'");
-
-  trackingTool->Disable();
-  MITK_TEST_CONDITION((trackingTool->IsEnabled()==false),"Testing of Disable()");
-}
-
 static void TestTooltipFunctionality()
 {
   mitk::TrackingTool::Pointer trackingTool = InternalTrackingToolTestClass::New().GetPointer();
@@ -170,7 +119,6 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("TrackingTool")
 
-  InternalTrackingToolTestClass::TestBasicFunctionality();
   InternalTrackingToolTestClass::TestTooltipFunctionality();
   InternalTrackingToolTestClass::TestModiciationTimeCorrectness();
 

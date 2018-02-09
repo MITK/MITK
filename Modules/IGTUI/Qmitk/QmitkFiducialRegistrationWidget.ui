@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>388</height>
+    <width>570</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -101,12 +101,18 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QmitkPointListWidget" name="m_RegistrationImagePoints">
+         <widget class="QmitkPointListWidget" name="m_RegistrationImagePoints" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>200</height>
+           </size>
           </property>
          </widget>
         </item>
@@ -127,7 +133,7 @@
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>37</height>
+            <height>170</height>
            </size>
           </property>
           <property name="title">
@@ -169,6 +175,12 @@
                <height>35</height>
               </size>
              </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>70</height>
+              </size>
+             </property>
              <property name="text">
               <string>Add image fiducial</string>
              </property>
@@ -188,6 +200,12 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>800</height>
+        </size>
+       </property>
        <property name="title">
         <string>Tracker / fixed fiducials </string>
        </property>
@@ -205,12 +223,18 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="QmitkPointListWidget" name="m_RegistrationTrackingPoints">
+         <widget class="QmitkPointListWidget" name="m_RegistrationTrackingPoints" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>200</height>
+           </size>
           </property>
          </widget>
         </item>
@@ -231,7 +255,7 @@
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>37</height>
+            <height>170</height>
            </size>
           </property>
           <property name="title">
@@ -270,7 +294,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>35</height>
+               <height>37</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>170</height>
               </size>
              </property>
              <property name="text">
@@ -352,8 +382,9 @@ instrument position</string>
  <customwidgets>
   <customwidget>
    <class>QmitkPointListWidget</class>
-   <extends>QListWidget</extends>
+   <extends>QWidget</extends>
    <header>QmitkPointListWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

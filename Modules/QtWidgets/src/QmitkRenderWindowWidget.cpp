@@ -172,8 +172,8 @@ void QmitkRenderWindowWidget::InitializeGUI()
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // create render window for this render window widget
-  //m_RenderingManager = mitk::RenderingManager::GetInstance();
-  m_RenderingManager = mitk::RenderingManager::New(); // TODO: allow external access to the different render window manager
+  m_RenderingManager = mitk::RenderingManager::GetInstance();
+  //m_RenderingManager = mitk::RenderingManager::New();
   m_RenderingManager->SetDataStorage(m_DataStorage);
 
   m_RenderingMode = mitk::BaseRenderer::RenderingMode::Standard; // TODO: do not always use the standard rendering mode

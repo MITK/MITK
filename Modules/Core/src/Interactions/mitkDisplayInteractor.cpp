@@ -370,8 +370,21 @@ void mitk::DisplayInteractor::Move(StateMachineAction *, InteractionEvent *inter
   // perform translation
   Vector2D moveVector = (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * invertModifier;
   moveVector *= sender->GetScaleFactorMMPerDisplayUnit();
-  sender->GetCameraController()->MoveBy(moveVector);
-  sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+
+  //sender->GetCameraController()->MoveBy(moveVector);
+  //sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+
+  auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
+
+  for (auto renWin : renWindows)
+  {
+    if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D)
+    {
+      BaseRenderer::GetInstance(renWin)->GetCameraController()->MoveBy(moveVector);
+      BaseRenderer::GetInstance(renWin)->GetRenderingManager()->RequestUpdate(renWin);
+    }
+  }
+
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
 }
 
@@ -382,12 +395,12 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
   auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
   Point3D pos = positionEvent->GetPositionInWorld();
 
-  for (auto renWin : renWindows)
-  {
-    if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D &&
-        renWin != sender->GetRenderWindow())
-      BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->SelectSliceByPoint(pos);
-  }
+  //for (auto renWin : renWindows)
+  //{
+  //  if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D &&
+  //      renWin != sender->GetRenderWindow())
+  //    BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->SelectSliceByPoint(pos);
+  //}
 }
 
 void mitk::DisplayInteractor::Zoom(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -424,8 +437,19 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction *, InteractionEvent *inter
 
   if (factor != 1.0)
   {
-    sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
-    sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+    //sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
+    //sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+
+    auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
+
+    for (auto renWin : renWindows)
+    {
+      if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D)
+      {
+        BaseRenderer::GetInstance(renWin)->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
+        BaseRenderer::GetInstance(renWin)->GetRenderingManager()->RequestUpdate(renWin);
+      }
+    }
   }
 
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
@@ -495,6 +519,19 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction *, InteractionEvent *int
     }
     // set the new position
     sliceNaviController->GetSlice()->SetPos(newPos);
+
+    const BaseRenderer::Pointer sender = interactionEvent->GetSender();
+    auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
+    for (auto renWin : renWindows)
+    {
+      if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D &&
+          renWin != sender->GetRenderWindow())
+      {
+        mitk::SliceNavigationController::Pointer sliceNaviController = sender->GetSliceNavigationController();
+        sliceNaviController->GetSlice()->SetPos(newPos);
+      }
+    }
+
     m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
     m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   }

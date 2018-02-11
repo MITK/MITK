@@ -43,6 +43,7 @@ set(CACHED_RESOURCE_FILES
   resources/tractogram.png
   resources/odf_peaks.png
   resources/ml_tractogram.png
+  resources/sh.png
   resources/refresh.xpm
   resources/segmentation.svg
  )

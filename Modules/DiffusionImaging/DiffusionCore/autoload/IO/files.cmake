@@ -19,6 +19,9 @@ set(CPP_FILES
   mitkNrrdOdfImageWriter.cpp
   mitkOdfImageSerializer.cpp
   mitkPeakImageSerializer.cpp
+  mitkShImageReader.cpp
+  mitkShImageWriter.cpp
+  mitkShImageSerializer.cpp
 
   mitkCompositeMapper.cpp
 )

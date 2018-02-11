@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkSmartPointer.h"
 #include "vtkOdfSource.h"
 #include "vtkThickPlane.h"
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace mitk {
 
@@ -118,6 +119,7 @@ protected:
     static bool m_ToggleColourisationMode;
     static bool m_ToggleGlyphPlacementMode;
 
+
     typedef vnl_matrix_fixed<double, 3, 3> DirectionsType;
 
 
@@ -143,6 +145,13 @@ private:
     vtkImageData*                                     m_VtkImage ;
     std::vector< OdfDisplayGeometry >                 m_LastDisplayGeometry;
     mitk::LocalStorageHandler<LocalStorage>           m_LSH;
+
+    static vnl_matrix<float>                          m_Sh2Basis;
+    static vnl_matrix<float>                          m_Sh4Basis;
+    static vnl_matrix<float>                          m_Sh6Basis;
+    static vnl_matrix<float>                          m_Sh8Basis;
+    static vnl_matrix<float>                          m_Sh10Basis;
+    static vnl_matrix<float>                          m_Sh12Basis;
 };
 
 } // namespace mitk

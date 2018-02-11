@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <boost/math/special_functions.hpp>
 #include <boost/progress.hpp>
-
+#include <mitkDiffusionFunctionCollection.h>
 
 using namespace boost::math;
 
@@ -54,7 +54,7 @@ FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
   , m_ClusteringThreshold(0.9)
   , m_AngularThreshold(0.7)
   , m_NumCoeffs((ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder)
-  , m_Toolkit(FSL)
+  , m_Toolkit(MRTRIX)
   , m_ApplyDirectionMatrix(false)
 {
   this->SetNumberOfRequiredInputs(1);
@@ -253,8 +253,11 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     odf_dir[2] = odf.GetDirection(i)[2];
     dirs.push_back(odf_dir);
   }
-  Cart2Sph(dirs, sphCoords);                          // convert candidate peaks to spherical angles
-  m_ShBasis = CalcShBasis(sphCoords);                // evaluate spherical harmonics at each peak
+  CreateDirMatrix(dirs, sphCoords);                          // convert candidate peaks to spherical angles
+  if (m_Toolkit==Toolkit::MRTRIX)
+    m_ShBasis = mitk::sh::CalcShBasisForDirections(ShOrder, sphCoords);
+  else
+    m_ShBasis = mitk::sh::CalcShBasisForDirections(ShOrder, sphCoords, false);
 
   MITK_INFO << "Starting finite differences maximum extraction";
   MITK_INFO << "ODF sampling points: " << NrOdfDirections;
@@ -315,9 +318,14 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     FindCandidatePeaks(odf, max, candidates);       // find all local maxima
     candidates = MeanShiftClustering(candidates);   // cluster maxima
 
-    vnl_matrix< double > shBasis, sphCoords;
-    Cart2Sph(candidates, sphCoords);                // convert candidate peaks to spherical angles
-    shBasis = CalcShBasis(sphCoords);            // evaluate spherical harmonics at each peak
+    vnl_matrix<double> sphCoords;
+    CreateDirMatrix(candidates, sphCoords);                // convert candidate peaks to spherical angles
+    vnl_matrix< float > shBasis;
+    if (m_Toolkit==Toolkit::MRTRIX)
+      shBasis = mitk::sh::CalcShBasisForDirections(ShOrder, sphCoords);
+    else
+      shBasis = mitk::sh::CalcShBasisForDirections(ShOrder, sphCoords, false);
+
     max = 0.0;
     for (unsigned int i=0; i<candidates.size(); i++)         // scale peaks according to ODF value
     {
@@ -406,73 +414,15 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 // convert cartesian to spherical coordinates
 template< class PixelType, int ShOrder, int NrOdfDirections >
 void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
-::Cart2Sph(const std::vector< DirectionType >& dir, vnl_matrix<double>& sphCoords)
+::CreateDirMatrix(const std::vector< DirectionType >& dir, vnl_matrix<double>& sphCoords)
 {
-  sphCoords.set_size(dir.size(), 2);
-
+  sphCoords.set_size(3, dir.size());
   for (unsigned int i=0; i<dir.size(); i++)
   {
-    double mag = dir[i].magnitude();
-
-    if( mag<0.0001 )
-    {
-      sphCoords(i,0) = M_PI/2; // theta
-      sphCoords(i,1) = M_PI/2; // phi
-    }
-    else
-    {
-      sphCoords(i,0) = acos(dir[i](2)/mag); // theta
-          sphCoords(i,1) = atan2(dir[i](1), dir[i](0)); // phi
-    }
+    sphCoords(0, i) = dir[i](0);
+    sphCoords(1, i) = dir[i](1);
+    sphCoords(2, i) = dir[i](2);
   }
-}
-
-// generate spherical harmonic values of the desired order for each input direction
-template< class PixelType, int ShOrder, int NrOdfDirections >
-vnl_matrix<double> FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
-::CalcShBasis(vnl_matrix<double>& sphCoords)
-{
-  int M = sphCoords.rows();
-  int j, m; double mag, plm;
-  vnl_matrix<double> shBasis;
-  shBasis.set_size(M, m_NumCoeffs);
-
-  for (int p=0; p<M; p++)
-  {
-    j=0;
-    for (int l=0; l<=ShOrder; l=l+2)
-      for (m=-l; m<=l; m++)
-      {
-        switch (m_Toolkit)
-        {
-        case FSL:
-          plm = legendre_p<double>(l,abs(m),cos(sphCoords(p,0)));
-          mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
-
-          if (m<0)
-            shBasis(p,j) = sqrt(2.0)*mag*cos(fabs((double)m)*sphCoords(p,1));
-          else if (m==0)
-            shBasis(p,j) = mag;
-          else
-            shBasis(p,j) = pow(-1.0, m)*sqrt(2.0)*mag*sin(m*sphCoords(p,1));
-          break;
-        case MRTRIX:
-
-          plm = legendre_p<double>(l,abs(m),-cos(sphCoords(p,0)));
-          mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
-          if (m>0)
-            shBasis(p,j) = mag*cos(m*sphCoords(p,1));
-          else if (m==0)
-            shBasis(p,j) = mag;
-          else
-            shBasis(p,j) = mag*sin(-m*sphCoords(p,1));
-          break;
-        }
-
-        j++;
-      }
-  }
-  return shBasis;
 }
 
 }

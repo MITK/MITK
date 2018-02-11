@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateIsDWI.h>
 #include <mitkPeakImage.h>
+#include <mitkShImage.h>
 
 // Qt
 #include <QMessageBox>
@@ -89,7 +90,6 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_MaskBox->SetPredicate(mitk::NodePredicateAnd::New(mitk::NodePredicateAnd::New(unwanted, dim3), isBinaryPredicate));
     m_Controls->m_ImageBox->SetPredicate(mitk::NodePredicateAnd::New(mitk::NodePredicateAnd::New(unwanted, isMitkImage), mitk::NodePredicateNot::New(isBinaryPredicate)));
     m_Controls->m_MaskBox->SetZeroEntryText("--");
-    m_Controls->m_ImageBox->SetZeroEntryText("--");
 
     connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnImageSelectionChanged()) );
 
@@ -124,47 +124,19 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
   caster->Update();
 
   typename FilterType::Pointer filter = FilterType::New();
-
-  switch (m_Controls->m_ToolkitBox->currentIndex())
-  {
-  case 0:
-    filter->SetToolkit(FilterType::FSL);
-    break;
-  case 1:
-    filter->SetToolkit(FilterType::MRTRIX);
-    break;
-  default:
-    filter->SetToolkit(FilterType::FSL);
-  }
-
   filter->SetInputImage(caster->GetOutput());
   filter->GenerateData();
-  typename FilterType::OdfImageType::Pointer itkodf = filter->GetOdfImage();
   typename FilterType::CoefficientImageType::Pointer itkCi = filter->GetCoefficientImage();
 
   {
-    mitk::Image::Pointer img = mitk::Image::New();
+    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::ShImage::New().GetPointer());
     img->InitializeByItk(itkCi.GetPointer());
     img->SetVolume(itkCi->GetBufferPointer());
     DataNode::Pointer node = DataNode::New();
     node->SetData(img);
 
     QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
-    name += "_ShCoefficientImage_Imported";
-    node->SetName(name.toStdString().c_str());
-
-    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
-  }
-
-  {
-    mitk::OdfImage::Pointer img = mitk::OdfImage::New();
-    img->InitializeByItk(itkodf.GetPointer());
-    img->SetVolume(itkodf->GetBufferPointer());
-    DataNode::Pointer node = DataNode::New();
-    node->SetData(img);
-
-    QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
-    name += "_OdfImage_Imported";
+    name += "_ShImage_Imported";
     node->SetName(name.toStdString().c_str());
 
     GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
@@ -184,20 +156,6 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
   }
 
   int nrCoeffs = mitkImg->GetLargestPossibleRegion().GetSize()[3];
-
-  //  // solve bx² + cx + d = 0 = shOrder² + 2*shOrder + 2-2*neededCoeffs;
-  //  int c = 3, d = 2 - 2 * nrCoeffs;
-  //  double D = c*c - 4 * d;
-  //  int shOrder;
-  //  if (D>0)
-  //  {
-  //    shOrder = (-c + sqrt(D)) / 2.0;
-  //    if (shOrder<0)
-  //      shOrder = (-c - sqrt(D)) / 2.0;
-  //  }
-  //  else if (D == 0)
-  //    shOrder = -c / 2.0;
-
   switch (nrCoeffs)
   {
   case 6:
@@ -286,19 +244,19 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
 template<int shOrder>
 void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
 {
-  typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, shOrder, 20242 > MaximaExtractionFilterType;
+  typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, shOrder, 10000 > MaximaExtractionFilterType;
   typename MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
 
   switch (m_Controls->m_ToolkitBox->currentIndex())
   {
   case 0:
-    filter->SetToolkit(MaximaExtractionFilterType::FSL);
-    break;
-  case 1:
     filter->SetToolkit(MaximaExtractionFilterType::MRTRIX);
     break;
-  default:
+  case 1:
     filter->SetToolkit(MaximaExtractionFilterType::FSL);
+    break;
+  default:
+    filter->SetToolkit(MaximaExtractionFilterType::MRTRIX);
   }
 
   mitk::BaseGeometry::Pointer geometry;

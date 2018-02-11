@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 #include <boost/version.hpp>
-
+#include <itkPointShell.h>
 
 // Namespace ::Gradients
 #include "itkVectorContainer.h"
@@ -43,7 +43,7 @@ double mitk::sh::factorial(int number) {
   return result;
 }
 
-void mitk::sh::Cart2Sph(double x, double y, double z, double *cart)
+void mitk::sh::Cart2Sph(double x, double y, double z, double *spherical)
 {
   double phi, th, rad;
   rad = sqrt(x*x+y*y+z*z);
@@ -57,9 +57,9 @@ void mitk::sh::Cart2Sph(double x, double y, double z, double *cart)
     th = acos(z/rad);
     phi = atan2(y, x);
   }
-  cart[0] = phi;
-  cart[1] = th;
-  cart[2] = rad;
+  spherical[0] = phi;
+  spherical[1] = th;
+  spherical[2] = rad;
 }
 
 double mitk::sh::legendre0(int l)
@@ -78,20 +78,63 @@ double mitk::sh::legendre0(int l)
   }
 }
 
-
-double mitk::sh::Yj(int m, int l, double theta, double phi)
+double mitk::sh::Yj(int m, int l, float theta, float phi, bool mrtrix)
 {
-  if (m<0)
-    return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
-  else if (m==0)
-    return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
+  if (!mrtrix)
+  {
+    if (m<0)
+      return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
+    else if (m==0)
+      return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
+    else
+      return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
+  }
   else
-    return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
+  {
+    double plm = ::boost::math::legendre_p<float>(l,abs(m),-cos(theta));
+    double mag = sqrt((double)(2*l+1)/(4.0*M_PI)*::boost::math::factorial<float>(l-abs(m))/::boost::math::factorial<float>(l+abs(m)))*plm;
+    if (m>0)
+      return mag*cos(m*phi);
+    else if (m==0)
+      return mag;
+    else
+      return mag*sin(-m*phi);
+  }
 
   return 0;
 }
 
+vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<double> U, bool mrtrix)
+{
+  vnl_matrix<float> sh_basis  = vnl_matrix<float>(U.cols(), (sh_order*sh_order + sh_order + 2)/2 + sh_order );
+  for(unsigned int i=0; i<U.cols(); i++)
+  {
+    double x = U(0,i);
+    double y = U(1,i);
+    double z = U(2,i);
+    double spherical[3];
+    mitk::sh::Cart2Sph(x,y,z,spherical);
+    U(0,i) = spherical[0];
+    U(1,i) = spherical[1];
+    U(2,i) = spherical[2];
+  }
 
+  for(unsigned int i=0; i<U.cols(); i++)
+  {
+    for(int k=0; k<=sh_order; k+=2)
+    {
+      for(int m=-k; m<=k; m++)
+      {
+        int j = (k*k + k + 2)/2 + m - 1;
+        double phi = U(0,i);
+        double th = U(1,i);
+        sh_basis(i,j) = mitk::sh::Yj(m,k,th,phi, mrtrix);
+      }
+    }
+  }
+
+  return sh_basis;
+}
 
 //------------------------- gradients-function ------------------------------------
 

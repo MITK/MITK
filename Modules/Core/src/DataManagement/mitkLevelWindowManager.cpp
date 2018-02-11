@@ -493,11 +493,13 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   mitk::NodePredicateDataType::Pointer isDImage = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isTImage = mitk::NodePredicateDataType::New("TensorImage");
   mitk::NodePredicateDataType::Pointer isOdfImage = mitk::NodePredicateDataType::New("OdfImage");
+  mitk::NodePredicateDataType::Pointer isShImage = mitk::NodePredicateDataType::New("ShImage");
   mitk::NodePredicateOr::Pointer predicateTypes = mitk::NodePredicateOr::New();
   predicateTypes->AddPredicate(isImage);
   predicateTypes->AddPredicate(isDImage);
   predicateTypes->AddPredicate(isTImage);
   predicateTypes->AddPredicate(isOdfImage);
+  predicateTypes->AddPredicate(isShImage);
 
   mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New();
   predicate->AddPredicate(notBinary);

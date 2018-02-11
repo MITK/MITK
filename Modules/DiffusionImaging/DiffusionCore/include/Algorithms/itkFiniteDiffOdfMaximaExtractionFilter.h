@@ -111,11 +111,8 @@ Image< unsigned char, 3 > >
     /** Cluster input directions within a certain angular threshold **/
     std::vector< DirectionType > MeanShiftClustering(std::vector< DirectionType >& inDirs);
 
-    /** Convert cartesian to spherical coordinates **/
-    void Cart2Sph(const std::vector< DirectionType >& dir, vnl_matrix<double>& sphCoords);
-
-    /** Calculate spherical harmonic basis of the defined order **/
-    vnl_matrix<double> CalcShBasis(vnl_matrix<double>& sphCoords);
+    /** Convert direction vector to matrix **/
+    void CreateDirMatrix(const std::vector< DirectionType >& dir, vnl_matrix<double>& sphCoords);
 
     private:
 
@@ -123,7 +120,7 @@ Image< unsigned char, 3 > >
     unsigned int                                m_MaxNumPeaks;          ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
     double                                      m_PeakThreshold;        ///< threshold on the peak length relative to the largest peak inside the current voxel
     double                                      m_AbsolutePeakThreshold;///< hard threshold on the peak length of all local maxima
-    vnl_matrix< double >                        m_ShBasis;              ///< container for evaluated SH base functions
+    vnl_matrix< float >                         m_ShBasis;              ///< container for evaluated SH base functions
     double                                      m_ClusteringThreshold;  ///< directions closer together than the specified angular threshold will be clustered (in rad)
     double                                      m_AngularThreshold;     ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
     const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients

@@ -21,12 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImageDicomReaderService.h>
 #include <mitkNrrdTensorImageReader.h>
 #include <mitkNrrdOdfImageReader.h>
+#include <mitkShImageReader.h>
 #include <mitkPeakImageReader.h>
 
 #include <mitkDiffusionImageNrrdWriterService.h>
 #include <mitkDiffusionImageNiftiWriterService.h>
 #include <mitkNrrdTensorImageWriter.h>
 #include <mitkNrrdOdfImageWriter.h>
+#include <mitkShImageWriter.h>
 
 #include <mitkDiffusionPropertyHelper.h>
 
@@ -65,11 +67,13 @@ namespace mitk
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
       m_NrrdOdfImageReader = new NrrdOdfImageReader();
       m_PeakImageReader = new PeakImageReader();
+      m_ShImageReader = new ShImageReader();
 
       m_DiffusionImageNrrdWriterService = new DiffusionImageNrrdWriterService();
       m_DiffusionImageNiftiWriterService = new DiffusionImageNiftiWriterService();
       m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
       m_NrrdOdfImageWriter = new NrrdOdfImageWriter();
+      m_ShImageWriter = new ShImageWriter();
 
       //register relevant properties
       //non-persistent properties
@@ -110,11 +114,13 @@ namespace mitk
       delete m_NrrdTensorImageReader;
       delete m_NrrdOdfImageReader;
       delete m_PeakImageReader;
+      delete m_ShImageReader;
 
       delete m_DiffusionImageNrrdWriterService;
       delete m_DiffusionImageNiftiWriterService;
       delete m_NrrdTensorImageWriter;
       delete m_NrrdOdfImageWriter;
+      delete m_ShImageWriter;
     }
 
   private:
@@ -126,11 +132,13 @@ namespace mitk
     NrrdTensorImageReader * m_NrrdTensorImageReader;
     NrrdOdfImageReader * m_NrrdOdfImageReader;
     PeakImageReader * m_PeakImageReader;
+    ShImageReader * m_ShImageReader;
 
     DiffusionImageNrrdWriterService * m_DiffusionImageNrrdWriterService;
     DiffusionImageNiftiWriterService * m_DiffusionImageNiftiWriterService;
     NrrdTensorImageWriter * m_NrrdTensorImageWriter;
     NrrdOdfImageWriter * m_NrrdOdfImageWriter;
+    ShImageWriter * m_ShImageWriter;
 
     std::vector<mitk::CustomMimeType*> m_MimeTypes;
 

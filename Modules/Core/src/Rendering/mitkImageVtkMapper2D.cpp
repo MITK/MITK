@@ -772,7 +772,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
   }
 
   std::string className = image->GetNameOfClass();
-  if (className != "TensorImage" && className != "OdfImage")
+  if (className != "TensorImage" && className != "OdfImage" && className != "ShImage")
   {
     PixelType pixelType = image->GetPixelType();
     size_t numComponents = pixelType.GetNumberOfComponents();

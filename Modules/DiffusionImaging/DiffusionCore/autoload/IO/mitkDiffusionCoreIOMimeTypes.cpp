@@ -42,6 +42,7 @@ std::vector<CustomMimeType*> DiffusionCoreIOMimeTypes::Get()
   mimeTypes.push_back(DTI_MIMETYPE().Clone());
   mimeTypes.push_back(ODF_MIMETYPE().Clone());
   mimeTypes.push_back(PEAK_MIMETYPE().Clone());
+  mimeTypes.push_back(SH_MIMETYPE().Clone());
 
   return mimeTypes;
 }
@@ -211,7 +212,7 @@ DiffusionCoreIOMimeTypes::DiffusionImageNiftiMimeType DiffusionCoreIOMimeTypes::
 DiffusionCoreIOMimeTypes::DiffusionImageFslMimeType::DiffusionImageFslMimeType()
   : CustomMimeType(DWI_FSL_MIMETYPE_NAME())
 {
-  std::string category = "Diffusion Weighted Image";
+  std::string category = "Diffusion Weighted Images";
   this->SetCategory(category);
   this->SetComment("Diffusion Weighted Images");
   this->AddExtension("fslgz");
@@ -407,11 +408,111 @@ DiffusionCoreIOMimeTypes::PeakImageMimeType DiffusionCoreIOMimeTypes::PEAK_MIMET
 }
 
 
+DiffusionCoreIOMimeTypes::SHImageMimeType::SHImageMimeType() : CustomMimeType(SH_MIMETYPE_NAME())
+{
+  std::string category = "SH Image";
+  this->SetCategory(category);
+  this->SetComment("SH Image");
+
+  this->AddExtension("nii.gz");
+  this->AddExtension("nii");
+  this->AddExtension("nrrd");
+  this->AddExtension("shi");
+}
+
+bool DiffusionCoreIOMimeTypes::SHImageMimeType::AppliesTo(const std::string &path) const
+{
+  {
+    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+    try
+    {
+      io->SetFileName( path.c_str() );
+      io->ReadImageInformation();
+      if ( io->GetPixelType() == itk::ImageIOBase::SCALAR && io->GetNumberOfDimensions()==4)
+      {
+        switch (io->GetDimensions(3))
+        {
+        case 6:
+          return true;
+          break;
+        case 15:
+          return true;
+          break;
+        case 28:
+          return true;
+          break;
+        case 45:
+          return true;
+          break;
+        case 66:
+          return true;
+          break;
+        case 91:
+          return true;
+          break;
+        default :
+          return false;
+        }
+      }
+    }
+    catch(...)
+    {}
+  }
+
+  {
+    itk::NiftiImageIO::Pointer io = itk::NiftiImageIO::New();
+    if ( io->CanReadFile( path.c_str() ) )
+    {
+      io->SetFileName( path.c_str() );
+      io->ReadImageInformation();
+      if ( io->GetPixelType() == itk::ImageIOBase::SCALAR && io->GetNumberOfDimensions()==4)
+      {
+        switch (io->GetDimensions(3))
+        {
+        case 6:
+          return true;
+          break;
+        case 15:
+          return true;
+          break;
+        case 28:
+          return true;
+          break;
+        case 45:
+          return true;
+          break;
+        case 66:
+          return true;
+          break;
+        case 91:
+          return true;
+          break;
+        default :
+          return false;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+DiffusionCoreIOMimeTypes::SHImageMimeType* DiffusionCoreIOMimeTypes::SHImageMimeType::Clone() const
+{
+  return new SHImageMimeType(*this);
+}
+
+
+DiffusionCoreIOMimeTypes::SHImageMimeType DiffusionCoreIOMimeTypes::SH_MIMETYPE()
+{
+  return SHImageMimeType();
+}
+
 CustomMimeType DiffusionCoreIOMimeTypes::DTI_MIMETYPE()
 {
   CustomMimeType mimeType(DTI_MIMETYPE_NAME());
-  std::string category = "Tensor Images";
-  mimeType.SetComment("Diffusion Tensor Images");
+  std::string category = "Tensor Image";
+  mimeType.SetComment("Diffusion Tensor Image");
   mimeType.SetCategory(category);
   mimeType.AddExtension("dti");
   return mimeType;
@@ -420,8 +521,8 @@ CustomMimeType DiffusionCoreIOMimeTypes::DTI_MIMETYPE()
 CustomMimeType DiffusionCoreIOMimeTypes::ODF_MIMETYPE()
 {
   CustomMimeType mimeType(ODF_MIMETYPE_NAME());
-  std::string category = "ODF Images";
-  mimeType.SetComment("Diffusion ODF Images");
+  std::string category = "ODF Image";
+  mimeType.SetComment("Diffusion ODF Image");
   mimeType.SetCategory(category);
   mimeType.AddExtension("odf");
   mimeType.AddExtension("qbi"); // legacy support
@@ -431,7 +532,7 @@ CustomMimeType DiffusionCoreIOMimeTypes::ODF_MIMETYPE()
 // Names
 std::string DiffusionCoreIOMimeTypes::PEAK_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".nrrd";
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + "_PEAKS";
   return name;
 }
 
@@ -471,6 +572,12 @@ std::string DiffusionCoreIOMimeTypes::ODF_MIMETYPE_NAME()
   return name;
 }
 
+std::string DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + "_SH";
+  return name;
+}
+
 // Descriptions
 std::string DiffusionCoreIOMimeTypes::PEAK_MIMETYPE_DESCRIPTION()
 {
@@ -504,13 +611,19 @@ std::string DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE_DESCRIPTION()
 
 std::string DiffusionCoreIOMimeTypes::DTI_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "Diffusion Tensor Images";
+  static std::string description = "Diffusion Tensor Image";
   return description;
 }
 
 std::string DiffusionCoreIOMimeTypes::ODF_MIMETYPE_DESCRIPTION()
 {
-  static std::string description = "ODF Images";
+  static std::string description = "ODF Image";
+  return description;
+}
+
+std::string DiffusionCoreIOMimeTypes::SH_MIMETYPE_DESCRIPTION()
+{
+  static std::string description = "SH Image";
   return description;
 }
 

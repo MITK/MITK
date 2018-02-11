@@ -83,14 +83,8 @@ namespace itk{
  *
  */
 
-template< class TReferenceImagePixelType,
-          class TGradientImagePixelType,
-          class TOdfPixelType,
-          int ShOrder,
-          int NrOdfDirections>
-class AnalyticalDiffusionQballReconstructionImageFilter :
-        public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >,
-        Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
+template< class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int ShOrder, int NrOdfDirections>
+class AnalyticalDiffusionQballReconstructionImageFilter : public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >, Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {
 
 public:
@@ -180,9 +174,6 @@ public:
     }
 
     static void tofile2(vnl_matrix<float> *A, std::string fname);
-    static void Cart2Sph(double x, double y, double z, double* cart);
-    static double Yj(int m, int k, double theta, double phi, bool useMRtrixBasis = false);
-    double Legendre0(int l);
 
     OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
     vnl_vector<TOdfPixelType> PreNormalize( vnl_vector<TOdfPixelType> vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  );

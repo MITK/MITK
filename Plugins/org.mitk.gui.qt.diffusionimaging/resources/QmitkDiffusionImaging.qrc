@@ -28,5 +28,6 @@
         <file>DiffData24.png</file>
         <file>odf_peaks.png</file>
         <file>segmentation.svg</file>
+        <file>sh.png</file>
     </qresource>
 </RCC>

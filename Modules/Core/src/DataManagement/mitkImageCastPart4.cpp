@@ -156,14 +156,18 @@ namespace mitk
 
   // allow for fixed-size vectors of specific length
   // (inspired by itkPointshell.cpp, precompiled ODF configs)
-
   // TYPE_TEN_VECS(0)
   // TYPE_N_VEC(11)
   // TYPE_N_VEC(12)
   TYPE_N_VEC(2)
   TYPE_N_VEC(3)
   TYPE_N_VEC(6)
+  TYPE_N_VEC(15)
+  TYPE_N_VEC(28)
   TYPE_N_VEC(42)
+  TYPE_N_VEC(45)
+  TYPE_N_VEC(66)
+  TYPE_N_VEC(91)
   TYPE_N_VEC(92)
   TYPE_N_VEC(162)
   TYPE_N_VEC(252)

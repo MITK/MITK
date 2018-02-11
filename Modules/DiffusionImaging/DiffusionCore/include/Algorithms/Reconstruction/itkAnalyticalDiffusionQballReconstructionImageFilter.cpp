@@ -22,20 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <itkArray.h>
 #include <vnl/vnl_vector.h>
+#include <mitkDiffusionFunctionCollection.h>
 
-#include <boost/version.hpp>
 #include <stdio.h>
 #include <locale>
 #include <fstream>
-
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-#include <boost/math/special_functions.hpp>
-
 #include "itkPointShell.h"
-
-using namespace boost::math;
 
 namespace itk {
 
@@ -434,71 +428,6 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
 }
 
 template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>::Cart2Sph(double x, double y, double z, double *spherical)
-{
-  double phi, theta, r;
-  r = sqrt(x*x+y*y+z*z);
-
-  if( r<mitk::eps )
-  {
-    theta = M_PI/2;
-    phi = M_PI/2;
-  }
-  else
-  {
-    theta = acos(z/r);
-    phi = atan2(y, x);
-  }
-  spherical[0] = phi;
-  spherical[1] = theta;
-  spherical[2] = r;
-}
-
-template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
-double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>::Yj(int m, int l, double theta, double phi, bool useMRtrixBasis)
-{
-  if (!useMRtrixBasis)
-  {
-    if (m<0)
-      return sqrt(2.0)*spherical_harmonic_r(l, -m, theta, phi);
-    else if (m==0)
-      return spherical_harmonic_r(l, m, theta, phi);
-    else
-      return pow(-1.0,m)*sqrt(2.0)*spherical_harmonic_i(l, m, theta, phi);
-  }
-  else
-  {
-    double plm = legendre_p<float>(l,abs(m),-cos(theta));
-    double mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<float>(l-abs(m))/factorial<float>(l+abs(m)))*plm;
-    if (m>0)
-      return mag*cos(m*phi);
-    else if (m==0)
-      return mag;
-    else
-      return mag*sin(-m*phi);
-  }
-
-  return 0;
-}
-
-template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
-double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>::Legendre0(int l)
-{
-  if( l%2 != 0 )
-  {
-    return 0;
-  }
-  else
-  {
-    double prod1 = 1.0;
-    for(int i=1;i<l;i+=2) prod1 *= i;
-    double prod2 = 1.0;
-    for(int i=2;i<=l;i+=2) prod2 *= i;
-    return pow(-1.0,l/2.0)*(prod1/prod2);
-  }
-}
-
-template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
 void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>::ComputeReconstructionMatrix()
 {
   m_NumberCoefficients = (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder;
@@ -567,7 +496,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
         double y = gdcit.Value().get(1);
         double z = gdcit.Value().get(2);
         double cart[3];
-        Cart2Sph(x,y,z,cart);
+        mitk::sh::Cart2Sph(x,y,z,cart);
         Q(0,i) = cart[0];
         Q(1,i) = cart[1];
         Q(2,i++) = cart[2];
@@ -585,7 +514,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
           double y = gdcit.Value().get(1);
           double z = gdcit.Value().get(2);
           double cart[3];
-          Cart2Sph(x,y,z,cart);
+          mitk::sh::Cart2Sph(x,y,z,cart);
           Q(0,i) = cart[0];
           Q(1,i) = cart[1];
           Q(2,i++) = cart[2];
@@ -607,14 +536,14 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
         int j = (k*k + k + 2)/2 + m - 1;
         L(j,j) = -k*(k+1);
         lj[j] = k;
-        B(i,j) = Yj(m, k, Q(1,i), Q(0,i), m_UseMrtrixBasis);
+        B(i,j) = mitk::sh::Yj(m, k, Q(1,i), Q(0,i));
       }
     }
   }
 
   vnl_matrix<float> P(m_NumberCoefficients,m_NumberCoefficients, 0);
   for(unsigned int i=0; i<m_NumberCoefficients; i++)
-    P(i,i) = Legendre0(lj[i]);
+    P(i,i) = mitk::sh::legendre0(lj[i]);
 
   vnl_matrix<float> B_transpose(B.transpose());
   vnl_matrix_inverse<float>* pseudoInverse = new vnl_matrix_inverse<float>( B_transpose * B + L*L*m_Lambda );
@@ -642,34 +571,10 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
     break;
   }
 
-  // this code goes to the image adapter coeffs->odfs later
+  // needed to calculate the ODF values from the SH coefficients
   vnl_matrix_fixed<double, 3, NrOdfDirections>* U = itk::PointShell<NrOdfDirections, vnl_matrix_fixed<double, 3, NrOdfDirections> >::DistributePointShell();
-  m_SphericalHarmonicBasisMatrix  = vnl_matrix<TO>(NrOdfDirections,m_NumberCoefficients);
-  for(int i=0; i<NrOdfDirections; i++)
-  {
-    double x = (*U)(0,i);
-    double y = (*U)(1,i);
-    double z = (*U)(2,i);
-    double spherical[3];
-    Cart2Sph(x,y,z,spherical);
-    (*U)(0,i) = spherical[0];
-    (*U)(1,i) = spherical[1];
-    (*U)(2,i) = spherical[2];
-  }
 
-  for(int i=0; i<NrOdfDirections; i++)
-  {
-    for(int k=0; k<=ShOrder; k+=2)
-    {
-      for(int m=-k; m<=k; m++)
-      {
-        int j = (k*k + k + 2)/2 + m - 1;
-        double phi = (*U)(0,i);
-        double th = (*U)(1,i);
-        m_SphericalHarmonicBasisMatrix(i,j) = Yj(m,k,th,phi,m_UseMrtrixBasis);
-      }
-    }
-  }
+  m_SphericalHarmonicBasisMatrix  = mitk::sh::CalcShBasisForDirections(ShOrder, U->as_matrix());
   m_ReconstructionMatrix = m_SphericalHarmonicBasisMatrix * m_CoeffReconstructionMatrix;
 }
 

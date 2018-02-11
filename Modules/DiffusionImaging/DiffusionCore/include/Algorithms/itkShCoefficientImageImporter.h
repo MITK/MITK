@@ -21,7 +21,7 @@
 
 namespace itk{
 /** \class ShCoefficientImageImporter
-  Converts FSL reconstructions of diffusionweighted images (4D images containing the sh coefficients) to Odf images or 3D sh-coefficient images.
+  Converts converts 4D SH coefficient images (MRtrix) to 3D vector images containing the SH coefficients
 */
 
 template< class PixelType, int ShOrder >
@@ -29,17 +29,6 @@ class ShCoefficientImageImporter : public ProcessObject
 {
 
 public:
-
-    enum NormalizationMethods {
-        NO_NORM,
-        SINGLE_VEC_NORM,
-        SPACING_COMPENSATION
-    };
-
-    enum Toolkit {  ///< SH coefficient convention (depends on toolkit)
-        FSL,
-        MRTRIX
-    };
 
     typedef ShCoefficientImageImporter Self;
     typedef SmartPointer<Self>                      Pointer;
@@ -61,10 +50,6 @@ public:
 
     // output
     itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
-    itkGetMacro( OdfImage, typename OdfImageType::Pointer)                ///< mitk ODF image generated from the coefficients
-
-    itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
-    itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
 
     void GenerateData() override;
 
@@ -72,14 +57,8 @@ protected:
     ShCoefficientImageImporter();
     ~ShCoefficientImageImporter(){}
 
-    void CalcShBasis();
-    vnl_matrix_fixed<double, 2, ODF_SAMPLING_SIZE> GetSphericalOdfDirections();
-
     InputImageType::Pointer                   m_InputImage;
     typename CoefficientImageType::Pointer    m_CoefficientImage; ///< mitk style image containing the SH coefficients
-    typename OdfImageType::Pointer          m_OdfImage;       ///< mitk ODF image generated from the coefficients
-    vnl_matrix<double>                        m_ShBasis;
-    Toolkit                                   m_Toolkit;
 
 private:
 

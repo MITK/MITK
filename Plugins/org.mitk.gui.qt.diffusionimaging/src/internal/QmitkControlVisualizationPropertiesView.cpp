@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkResliceMethodProperty.h"
 #include "mitkRenderingManager.h"
 
-#include "mitkTbssImage.h"
+#include "mitkImageCast.h"
+#include "mitkShImage.h"
 #include "mitkPlanarFigure.h"
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
@@ -468,7 +469,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       m_Controls->m_FiberThicknessSlider->setMaximum(max * 10);
       m_Controls->m_FiberThicknessSlider->setValue(range * 10);
     }
-    else if(dynamic_cast<mitk::OdfImage*>(nodeData) || dynamic_cast<mitk::TensorImage*>(nodeData))
+    else if(dynamic_cast<mitk::OdfImage*>(nodeData) || dynamic_cast<mitk::TensorImage*>(nodeData) || dynamic_cast<mitk::ShImage*>(nodeData))
     {
       m_Controls->m_ImageControlsFrame->setVisible(true);
       m_Controls->m_NumberGlyphsFrame->setVisible(true);
@@ -502,16 +503,13 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       node->GetIntProperty("ShowMaxNumber", val);
       m_Controls->m_ShowMaxNumber->setValue(val);
 
-      m_Controls->m_NormalizationDropdown
-          ->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("Normalization"))
-                            ->GetValueAsId());
+      m_Controls->m_NormalizationDropdown->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("Normalization"))->GetValueAsId());
 
       float fval;
       node->GetFloatProperty("Scaling",fval);
       m_Controls->m_ScalingFactor->setValue(fval);
 
-      m_Controls->m_AdditionalScaling
-          ->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("ScaleBy"))->GetValueAsId());
+      m_Controls->m_AdditionalScaling->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("ScaleBy"))->GetValueAsId());
 
       bool switchTensorViewValue = false;
       node->GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", switchTensorViewValue );
@@ -899,7 +897,8 @@ void QmitkControlVisualizationPropertiesView::ShowMaxNumberChanged()
   }
 
   if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetIntProperty("ShowMaxNumber", maxNr);
   }
@@ -932,7 +931,8 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
   }
 
   if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetProperty("Normalization", normMeth.GetPointer());
   }
@@ -944,7 +944,8 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
 void QmitkControlVisualizationPropertiesView::ScalingFactorChanged(double scalingFactor)
 {
   if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetFloatProperty("Scaling", scalingFactor);
   }
@@ -983,7 +984,8 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
   }
 
   if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetProperty("ScaleBy", scaleBy.GetPointer());
   }

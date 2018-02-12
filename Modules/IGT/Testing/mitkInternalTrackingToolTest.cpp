@@ -44,29 +44,6 @@ protected:
 public: //these static methods are only to structure the test
         //please see them seperated from the upper part of the class
 
-static void TestTooltipFunctionality()
-{
-  mitk::TrackingTool::Pointer trackingTool = InternalTrackingToolTestClass::New().GetPointer();
-  mitk::Point3D toolTipPos; mitk::FillVector3D(toolTipPos,1,1,1);
-  mitk::Quaternion toolTipQuat = mitk::Quaternion(0,0,0,1);
-  trackingTool->SetToolTip(toolTipPos,toolTipQuat);
-
-  mitk::Point3D positionInput; mitk::FillVector3D(positionInput,5,6,7);
-
-  trackingTool->SetPosition(positionInput);
-
-  mitk::Point3D positionOutput;
-
-  trackingTool->GetPosition(positionOutput);
-
-  MITK_TEST_CONDITION(((positionOutput[0] == 6)&&
-                       (positionOutput[0] == 6)&&
-                       (positionOutput[0] == 6)&&
-                       (positionOutput[0] == 6)),
-                       "Testing tooltip definition."
-                     );
-}
-
 static void TestModiciationTimeCorrectness()
 {
   mitk::TrackingTool::Pointer tool = InternalTrackingToolTestClass::New().GetPointer();
@@ -119,7 +96,6 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("TrackingTool")
 
-  InternalTrackingToolTestClass::TestTooltipFunctionality();
   InternalTrackingToolTestClass::TestModiciationTimeCorrectness();
 
   // always end with this!

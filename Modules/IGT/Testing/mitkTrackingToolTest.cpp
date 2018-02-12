@@ -36,11 +36,16 @@ class mitkTrackingToolTestSuite : public mitk::TestFixture
   MITK_TEST(GetPosition_SetValidPosition_ReturnsValidPosition);
   MITK_TEST(GetOrientation_Default_ReturnsAllValuesZero);
   MITK_TEST(GetOrientation_SetValidOrientation_ReturnsValidOrientation);
+  MITK_TEST(GetOrientation_SetToolTip_ReturnsTransformedOrientation);
   MITK_TEST(GetTrackingError_Default_ReturnsZero);
   MITK_TEST(GetTrackingError_SetValidTrackingError_ReturnsValidTrackingError);
   MITK_TEST(IsDataValid_Default_ReturnsFalse);
   MITK_TEST(IsDataValid_SetTrue_ReturnsTrue);
   MITK_TEST(IsDataValid_SetFalse_ReturnsFalse);
+  MITK_TEST(GetToolTipPosition_Default_ReturnsAllValuesZero);
+  MITK_TEST(GetToolTipOrientation_Default_ReturnsDefaultOrientation);
+  MITK_TEST(IsToolTipSet_Default_ReturnsFalse);
+  MITK_TEST(GetToolTipX_SetValidToolTip_ReturnsValidToolTip);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -132,6 +137,31 @@ public:
     CPPUNIT_ASSERT_EQUAL(expectedOrientation, actualOrientation);
   }
 
+  void GetOrientation_SetToolTip_ReturnsTransformedOrientation()
+  {
+    mitk::Point3D toolTipPosition;
+    mitk::FillVector3D(toolTipPosition, 1, 1, 1);
+
+    mitk::Quaternion toolTipOrientation = mitk::Quaternion(0.5, 0, 0, 1);
+
+    m_TrackingTool->SetToolTip(toolTipPosition, toolTipOrientation);
+
+    mitk::Point3D toolPosition;
+    mitk::FillVector3D(toolPosition, 5, 6, 7);
+
+    mitk::Quaternion toolOrientation = mitk::Quaternion(0, 0.5, 0, 1);
+
+    m_TrackingTool->SetPosition(toolPosition);
+    m_TrackingTool->SetOrientation(toolOrientation);
+
+    mitk::Quaternion expectedToolOrientation = mitk::Quaternion(0.5, 0.5, -0.25, 1);
+
+    mitk::Quaternion actualToolOrientation;
+    m_TrackingTool->GetOrientation(actualToolOrientation);
+
+    CPPUNIT_ASSERT_EQUAL(expectedToolOrientation, actualToolOrientation);
+  }
+
   void GetTrackingError_Default_ReturnsZero()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0f, m_TrackingTool->GetTrackingError(), mitk::eps);
@@ -158,6 +188,42 @@ public:
   {
     m_TrackingTool->SetDataValid(false);
     CPPUNIT_ASSERT_EQUAL(false, m_TrackingTool->IsDataValid());
+  }
+
+  void GetToolTipPosition_Default_ReturnsAllValuesZero()
+  {
+    mitk::Point3D expectedPosition;
+    expectedPosition.Fill(0);
+
+    CPPUNIT_ASSERT_EQUAL(expectedPosition, m_TrackingTool->GetToolTipPosition());
+  }
+
+  void GetToolTipOrientation_Default_ReturnsDefaultOrientation()
+  {
+    mitk::Quaternion expectedOrientation(0, 0, 0, 1);
+
+    CPPUNIT_ASSERT_EQUAL(expectedOrientation,  m_TrackingTool->GetToolTipOrientation());
+  }
+
+  void IsToolTipSet_Default_ReturnsFalse()
+  {
+    CPPUNIT_ASSERT_EQUAL(false, m_TrackingTool->IsToolTipSet());
+  }
+
+  void GetToolTipX_SetValidToolTip_ReturnsValidToolTip()
+  {
+    mitk::Point3D expectedPosition;
+    expectedPosition[0] = 100;
+    expectedPosition[1] = 200;
+    expectedPosition[2] = 300;
+
+    mitk::Quaternion expectedOrientation(0.344, 0.625, 0.999, 0.574);
+
+    m_TrackingTool->SetToolTip(expectedPosition, expectedOrientation);
+
+    CPPUNIT_ASSERT_EQUAL(expectedPosition, m_TrackingTool->GetToolTipPosition());
+    CPPUNIT_ASSERT_EQUAL(expectedOrientation, m_TrackingTool->GetToolTipOrientation());
+    CPPUNIT_ASSERT_EQUAL(true, m_TrackingTool->IsToolTipSet());
   }
 
 };

@@ -163,14 +163,14 @@ namespace itk
     boost::progress_display disp(compartment_images.at(0)->GetVectorLength()*compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
 
 #pragma omp parallel for
-    for (unsigned int g=0; g<compartment_images.at(0)->GetVectorLength(); g++)
+    for (int g=0; g<(int)compartment_images.at(0)->GetVectorLength(); g++)
     {
       if (this->GetAbortGenerateData())
         continue;
 
       std::vector< unsigned int > spikeSlice;
 #pragma omp critical
-      while (!spikeVolume.empty() && spikeVolume.back()==g)
+      while (!spikeVolume.empty() && (int)spikeVolume.back()==g)
       {
         spikeSlice.push_back(m_RandGen->GetIntegerVariate()%compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
         spikeVolume.pop_back();

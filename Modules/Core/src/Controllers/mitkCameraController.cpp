@@ -237,8 +237,17 @@ void mitk::CameraController::Zoom(ScalarType factor, const Point2D& zoomPointInM
     this->GetRenderer()->DisplayToWorld(planePoint, world);
    
     vtkCamera* camera = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
-    double* pos = camera->GetPosition();
-    camera->SetPosition(world[0], world[1], pos[2]);
+
+    Point3D pos(camera->GetPosition());
+    Vector3D dir(camera->GetDirectionOfProjection());
+
+    for (int i = 0; i < 3; i++) {
+      if (dir[i] == 0) {
+        pos[i] = world[i];
+      }
+    }
+
+    camera->SetPosition(pos[0], pos[1], pos[2]);
     camera->SetFocalPoint(world[0], world[1], world[2]);
   }
 }

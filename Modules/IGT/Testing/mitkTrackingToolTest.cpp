@@ -98,13 +98,10 @@ public:
 
   void GetPosition_SetValidPosition_ReturnsValidPosition()
   {
-    srand(time(nullptr));
-
-    // generate a random position to test Set/GetPosition()
     mitk::Point3D expectedPosition;
-    expectedPosition[0] = rand()%1000;
-    expectedPosition[1] = rand()%1000;
-    expectedPosition[2] = rand()%1000;
+    expectedPosition[0] = 100;
+    expectedPosition[1] = 200;
+    expectedPosition[2] = 300;
 
     m_TrackingTool->SetPosition(expectedPosition);
 
@@ -126,15 +123,7 @@ public:
 
   void GetOrientation_SetValidOrientation_ReturnsValidOrientation()
   {
-    srand(time(nullptr));
-
-    // generate a random orientation to test Set/GetOrientation()
-    mitk::Quaternion expectedOrientation;
-    expectedOrientation[0] = (rand()%1000)/1000.0;
-    expectedOrientation[1] = (rand()%1000)/1000.0;
-    expectedOrientation[2] = (rand()%1000)/1000.0;
-    expectedOrientation[3] = (rand()%1000)/1000.0;
-
+    mitk::Quaternion expectedOrientation(0.344, 0.625, 0.999, 0.574);
     m_TrackingTool->SetOrientation(expectedOrientation);
 
     mitk::Quaternion actualOrientation;

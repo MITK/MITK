@@ -48,6 +48,14 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     set(_boost_layout)
     if(MSVC)
       mitkFunctionGetMSVCVersion()
+
+      # Work around due to BOOST toolset limitations
+      # Remove if task T24222 is fixed
+      if(${VISUAL_STUDIO_VERSION_MAJOR} EQUAL "14" AND ${VISUAL_STUDIO_VERSION_MINOR} GREATER "0")
+        set(VISUAL_STUDIO_VERSION_MINOR "1")
+      endif(${VISUAL_STUDIO_VERSION_MAJOR} EQUAL "14" AND ${VISUAL_STUDIO_VERSION_MINOR} GREATER "0")
+      # End Work around
+
       set(_boost_with_toolset "vc${VISUAL_STUDIO_VERSION_MAJOR}")
       if(${VISUAL_STUDIO_VERSION_MINOR})
         set(_boost_with_toolset "${_boost_with_toolset}${VISUAL_STUDIO_VERSION_MINOR}")

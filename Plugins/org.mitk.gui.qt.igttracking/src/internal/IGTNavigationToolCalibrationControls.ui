@@ -10,12 +10,6 @@
     <height>958</height>
    </rect>
   </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>0</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
@@ -70,7 +64,6 @@ p, li { white-space: pre-wrap; }
           <height>30</height>
          </size>
         </property>
-        <zorder>tabWidget</zorder>
        </widget>
       </item>
      </layout>
@@ -81,8 +74,17 @@ p, li { white-space: pre-wrap; }
      <property name="enabled">
       <bool>true</bool>
      </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="currentIndex">
       <number>0</number>
+     </property>
+     <property name="elideMode">
+      <enum>Qt::ElideMiddle</enum>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1064,8 +1066,6 @@ Alternative: Manually edit the axis using the spinboxes.</string>
         </spacer>
        </item>
       </layout>
-      <zorder>gridLayoutWidget_2</zorder>
-      <zorder>label_18</zorder>
       <zorder>verticalSpacer_5</zorder>
      </widget>
     </widget>

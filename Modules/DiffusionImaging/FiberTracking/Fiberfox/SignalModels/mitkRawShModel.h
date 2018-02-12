@@ -64,11 +64,11 @@ public:
     typedef itk::Matrix< double, 3, 3 >                                     MatrixType;
 
     /** Actual signal generation **/
-    PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(unsigned int dir);
+    PixelType SimulateMeasurement(GradientType& fiberDirection);
+    ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection);
 
     bool SetShCoefficients(vnl_vector< double > shCoefficients, double b0);
-    void SetFiberDirection(GradientType fiberDirection);
+    vnl_matrix<double> SetFiberDirection(GradientType& fiberDirection);
     void SetFaRange(double min, double max){ m_FaRange.first = min; m_FaRange.second = max; }
     void SetAdcRange(double min, double max){ m_AdcRange.first = min; m_AdcRange.second = max; }
     void SetMaxNumKernels(unsigned int max){ m_MaxNumKernels = max; }
@@ -80,7 +80,6 @@ public:
 
     std::vector< vnl_vector< double > > GetShCoefficients(){ return m_ShCoefficients; }
     std::vector< double > GetB0Signals(){ return m_B0Signal; }
-    vnl_matrix<double> GetSphericalCoordinates(){ return m_SphCoords; }
     unsigned int GetShOrder(){ return m_ShOrder; }
     int GetModelIndex(){ return m_ModelIndex; }
 
@@ -91,13 +90,12 @@ public:
 
 protected:
 
-    void Cart2Sph( GradientListType gradients );
+    vnl_matrix<double> Cart2Sph( GradientListType& gradients );
     void RandomModel();
 
     std::vector< vnl_vector< double > > m_ShCoefficients;
     std::vector< double >               m_B0Signal;
     std::vector< GradientType >         m_PrototypeMaxDirection;
-    vnl_matrix<double>                  m_SphCoords;
     std::pair< double, double >         m_AdcRange;
     std::pair< double, double >         m_FaRange;
     unsigned int                        m_ShOrder;

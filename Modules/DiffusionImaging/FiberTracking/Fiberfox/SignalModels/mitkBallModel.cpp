@@ -34,7 +34,7 @@ BallModel< ScalarType >::~BallModel()
 }
 
 template< class ScalarType >
-ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType& )
 {
     ScalarType signal = 0;
 
@@ -53,7 +53,7 @@ ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 }
 
 template< class ScalarType >
-typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMeasurement()
+typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMeasurement(GradientType& )
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());

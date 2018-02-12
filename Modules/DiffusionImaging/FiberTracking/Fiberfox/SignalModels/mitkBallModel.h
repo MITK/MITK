@@ -52,15 +52,13 @@ public:
 
 
     /** Actual signal generation **/
-    PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(unsigned int dir);
+    PixelType SimulateMeasurement(GradientType& fiberDirection);
+    ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection);
 
     void SetDiffusivity(double D) { m_Diffusivity = D; }
     double GetDiffusivity() { return m_Diffusivity; }
     void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
     double GetBvalue() { return m_BValue; }
-
-    void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
 
 protected:
 

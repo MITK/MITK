@@ -123,9 +123,7 @@ void FitFibersToImageFilter::CreateDiffSystem()
         int y = idx3[1];
         int z = idx3[2];
 
-
-        m_SignalModel->SetFiberDirection(fiber_dir);
-        mitk::DiffusionSignalModel<>::PixelType simulated_pixel = m_SignalModel->SimulateMeasurement();
+        mitk::DiffusionSignalModel<>::PixelType simulated_pixel = m_SignalModel->SimulateMeasurement(fiber_dir);
         VectorImgType::PixelType measured_pixel = m_DiffImage->GetPixel(idx3);
 
         double simulated_mean = 0;

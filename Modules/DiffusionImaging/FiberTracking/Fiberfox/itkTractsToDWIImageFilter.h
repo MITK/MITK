@@ -54,8 +54,8 @@ public:
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
-    typedef itk::Image< double, 2 >                                     SliceType;
-    typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
+    typedef itk::Image< double, 2 >                                     Double2DImageType;
+    typedef itk::VnlForwardFFTImageFilter<Double2DImageType>::OutputImageType   Complex2DImageType;
     typedef itk::VectorImage< vcl_complex< double >, 3 >                ComplexDwiType;
     typedef itk::Vector< double,3>                                      DoubleVectorType;
 
@@ -154,6 +154,7 @@ protected:
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::Pointer   m_DoubleInterpolator;
+    itk::Vector<double,3>                       m_NullDir;
 };
 }
 

@@ -46,7 +46,7 @@ AstroStickModel< ScalarType >::~AstroStickModel()
 }
 
 template< class ScalarType >
-ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType& )
 {
     ScalarType signal = 0;
 
@@ -90,7 +90,7 @@ typename AstroStickModel< ScalarType >::GradientType AstroStickModel< ScalarType
 }
 
 template< class ScalarType >
-typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >::SimulateMeasurement()
+typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >::SimulateMeasurement(GradientType& )
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());

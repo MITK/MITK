@@ -37,7 +37,7 @@ TensorModel< ScalarType >::~TensorModel()
 }
 
 template< class ScalarType >
-ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType &fiberDirection)
 {
   ScalarType signal = 0;
 
@@ -45,9 +45,8 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     return signal;
 
   ItkTensorType tensor; tensor.Fill(0.0);
-  this->m_FiberDirection.Normalize();
-  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, this->m_FiberDirection).GetVnlVector(); axis.normalize();
-  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*this->m_FiberDirection));
+  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, fiberDirection).GetVnlVector(); axis.normalize();
+  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*fiberDirection));
   rotation.normalize();
   vnl_matrix_fixed<double, 3, 3> matrix = rotation.rotation_matrix_transpose();
 
@@ -82,14 +81,13 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 }
 
 template< class ScalarType >
-typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::SimulateMeasurement()
+typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::SimulateMeasurement(GradientType& fiberDirection)
 {
   PixelType signal; signal.SetSize(this->m_GradientList.size()); signal.Fill(0.0);
 
   ItkTensorType tensor; tensor.Fill(0.0);
-  this->m_FiberDirection.Normalize();
-  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, this->m_FiberDirection).GetVnlVector(); axis.normalize();
-  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*this->m_FiberDirection));
+  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, fiberDirection).GetVnlVector(); axis.normalize();
+  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*fiberDirection));
   rotation.normalize();
   vnl_matrix_fixed<double, 3, 3> matrix = rotation.rotation_matrix_transpose();
 

@@ -54,8 +54,8 @@ public:
     typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
 
     /** Actual signal generation **/
-    PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(unsigned int dir);
+    PixelType SimulateMeasurement(GradientType& fiberDirection);
+    ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection);
 
     void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
     double GetBvalue() { return m_BValue; }
@@ -66,7 +66,6 @@ public:
     double GetDiffusivity2() { return m_KernelTensorMatrix[1][1]; }
     double GetDiffusivity3() { return m_KernelTensorMatrix[2][2]; }
 
-    void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
     GradientType GetKernelDirection(){ return m_KernelDirection; }
     vnl_matrix_fixed<double, 3, 3> GetKernelTensorMatrix(){ return m_KernelTensorMatrix; }
 

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Constructor
 //=======================================================
 mitk::OptitrackTrackingTool::OptitrackTrackingTool()
-  :  mitk::InternalTrackingTool(),
+  :  mitk::TrackingTool(),
     m_ID(-1)
 {
   MITK_DEBUG << "Creating OptitrackTrackingTool Object";
@@ -496,7 +496,7 @@ void mitk::OptitrackTrackingTool::updateTool()
 // Constructor
 //=======================================================
 mitk::OptitrackTrackingTool::OptitrackTrackingTool()
-  :  mitk::InternalTrackingTool(),
+  :  mitk::TrackingTool(),
     m_ID(-1)
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);

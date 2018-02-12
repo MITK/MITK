@@ -422,9 +422,9 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
 }
 
 
-mitk::TrackingTool* mitk::MicroBirdTrackingDevice::GetTool(unsigned int toolNumber)
+mitk::ToolType* mitk::MicroBirdTrackingDevice::GetTool(unsigned int toolNumber)
 {
-  return static_cast<TrackingTool*>(GetMicroBirdTool(toolNumber));
+  return static_cast<ToolType*>(GetMicroBirdTool(toolNumber));
 }
 
 

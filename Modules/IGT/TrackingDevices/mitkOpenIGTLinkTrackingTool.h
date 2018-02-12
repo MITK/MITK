@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOpenIGTLinkTrackingTOOL_H_HEADER_INCLUDED_
 #define MITKOpenIGTLinkTrackingTOOL_H_HEADER_INCLUDED_
 
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <itkFastMutexLock.h>
 
 namespace mitk
@@ -29,11 +29,11 @@ namespace mitk
   *           continuously update the tool coordinates.
   *   \ingroup IGT
   */
-  class MITKIGT_EXPORT OpenIGTLinkTrackingTool : public InternalTrackingTool
+  class MITKIGT_EXPORT OpenIGTLinkTrackingTool : public TrackingTool
   {
   public:
     friend class OpenIGTLinkTrackingTrackingDevice;
-    mitkClassMacro(OpenIGTLinkTrackingTool, InternalTrackingTool);
+    mitkClassMacro(OpenIGTLinkTrackingTool, TrackingTool);
 
     itkFactorylessNewMacro(Self)
   protected:

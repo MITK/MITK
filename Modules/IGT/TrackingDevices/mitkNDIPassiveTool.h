@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_
 #define MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_
 
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include "mitkTrackingTypes.h"
 
 namespace mitk
@@ -32,7 +32,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MITKIGT_EXPORT NDIPassiveTool : public InternalTrackingTool
+  class MITKIGT_EXPORT NDIPassiveTool : public TrackingTool
   {
   public:
     friend class NDITrackingDevice;
@@ -46,7 +46,7 @@ namespace mitk
       ButtonBox = 'B'
     };
 
-    mitkClassMacro(NDIPassiveTool, InternalTrackingTool);
+    mitkClassMacro(NDIPassiveTool, TrackingTool);
 
 
     virtual bool LoadSROMFile(const char* filename);      ///< load a srom tool description file

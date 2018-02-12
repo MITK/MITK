@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkVirtualTrackingDevice.h>
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <mitkIOUtil.h>
 
 #include <mitkNavigationData.h>

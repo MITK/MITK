@@ -18,7 +18,6 @@ set(MODULE_TESTS
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp
    mitkClaronTrackingDeviceTest.cpp
-   mitkInternalTrackingToolTest.cpp
    mitkNavigationDataDisplacementFilterTest.cpp
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp

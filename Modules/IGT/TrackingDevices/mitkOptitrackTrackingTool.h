@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
 #include "mitkCommon.h"
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 #include "mitkIGTException.h"
@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  //class OptitrackTragkingDevice;
+  //class OptitrackTrackingDevice;
 
   /** Documentation:
   *   \brief An object of this class represents the a Tool tracked by Optitrack System. You can define
@@ -55,11 +55,11 @@ namespace mitk
   *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */
-  class MITKIGT_EXPORT OptitrackTrackingTool : public InternalTrackingTool
+  class MITKIGT_EXPORT OptitrackTrackingTool : public TrackingTool
   {
   public:
     friend class OptitrackTrackingDevice;
-    mitkClassMacro(mitk::OptitrackTrackingTool, mitk::InternalTrackingTool);
+    mitkClassMacro(mitk::OptitrackTrackingTool, mitk::TrackingTool);
     itkNewMacro(Self);
 
 

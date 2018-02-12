@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPolhemusTOOL_H_HEADER_INCLUDED_
 
 #include <mitkPolhemusInterface.h>
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <itkFastMutexLock.h>
 
 namespace mitk
@@ -30,11 +30,11 @@ namespace mitk
   *           continuously update the tool coordinates.
   *   \ingroup IGT
   */
-  class MITKIGT_EXPORT PolhemusTool : public InternalTrackingTool
+  class MITKIGT_EXPORT PolhemusTool : public TrackingTool
   {
   public:
     friend class PolhemusTrackingDevice;
-    mitkClassMacro(PolhemusTool, InternalTrackingTool);
+    mitkClassMacro(PolhemusTool, TrackingTool);
 
     /**
     * \brief Sets the port of the tool. (e.g. 1 for port "SENS 1" etc.)

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 #include "Poco/File.h"
 #include "mitkUnspecifiedTrackingTypeInformation.h"
-#include "mitkInternalTrackingTool.h"
 
 #include "vtkSphereSource.h"
 #include "vtkConeSource.h"

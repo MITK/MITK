@@ -46,6 +46,8 @@ class mitkTrackingToolTestSuite : public mitk::TestFixture
   MITK_TEST(GetToolTipOrientation_Default_ReturnsDefaultOrientation);
   MITK_TEST(IsToolTipSet_Default_ReturnsFalse);
   MITK_TEST(GetToolTipX_SetValidToolTip_ReturnsValidToolTip);
+  MITK_TEST(GetMTime_SetPosition_ReturnsModifiedTime);
+  MITK_TEST(GetMTime_SetOrientation_ReturnsModifiedTime);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -224,6 +226,48 @@ public:
     CPPUNIT_ASSERT_EQUAL(expectedPosition, m_TrackingTool->GetToolTipPosition());
     CPPUNIT_ASSERT_EQUAL(expectedOrientation, m_TrackingTool->GetToolTipOrientation());
     CPPUNIT_ASSERT_EQUAL(true, m_TrackingTool->IsToolTipSet());
+  }
+
+  void GetMTime_SetPosition_ReturnsModifiedTime()
+  {
+    itk::ModifiedTimeType time = m_TrackingTool->GetMTime();
+
+    mitk::Point3D position1;
+    mitk::FillVector3D(position1, 1.1, 2.2, 3.3);
+    m_TrackingTool->SetPosition(position1);
+
+    CPPUNIT_ASSERT(time < m_TrackingTool->GetMTime());
+
+    time = m_TrackingTool->GetMTime();
+    m_TrackingTool->SetPosition(position1);
+
+    CPPUNIT_ASSERT(time == m_TrackingTool->GetMTime());
+
+    mitk::Point3D position2;
+    mitk::FillVector3D(position2, 1, 2, 3);
+    m_TrackingTool->SetPosition(position2);
+
+    CPPUNIT_ASSERT(time < m_TrackingTool->GetMTime());
+  }
+
+  void GetMTime_SetOrientation_ReturnsModifiedTime()
+  {
+    itk::ModifiedTimeType time = m_TrackingTool->GetMTime();
+
+    mitk::Quaternion orientation1 = mitk::Quaternion(0, 0, 0.70710678118654757, 0.70710678118654757);
+    m_TrackingTool->SetOrientation(orientation1);
+
+    CPPUNIT_ASSERT(time < m_TrackingTool->GetMTime());
+
+    time = m_TrackingTool->GetMTime();
+    m_TrackingTool->SetOrientation(orientation1);
+
+    CPPUNIT_ASSERT(time == m_TrackingTool->GetMTime());
+
+    mitk::Quaternion orientation2 = mitk::Quaternion(0, 0, 0.70710678118654757, 0.70710678118654757 + 0.00001);
+    m_TrackingTool->SetOrientation(orientation2);
+
+    CPPUNIT_ASSERT(time < m_TrackingTool->GetMTime());
   }
 
 };

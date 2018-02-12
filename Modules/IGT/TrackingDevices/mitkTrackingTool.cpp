@@ -173,8 +173,11 @@ void mitk::TrackingTool::SetPosition(mitk::Point3D position)
   itkDebugMacro("setting m_Position to " << position);
 
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  m_Position = position;
-  this->Modified();
+  if (m_Position != position)
+  {
+    m_Position = position;
+    this->Modified();
+  }
 }
 
 void mitk::TrackingTool::GetOrientation(mitk::Quaternion& orientation) const
@@ -200,8 +203,11 @@ void mitk::TrackingTool::SetOrientation(mitk::Quaternion orientation)
   itkDebugMacro("setting m_Orientation to " << orientation);
 
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  m_Orientation = orientation;
-  this->Modified();
+  if (m_Orientation != orientation)
+  {
+    m_Orientation = orientation;
+    this->Modified();
+  }
 }
 
 bool mitk::TrackingTool::Enable()
@@ -232,13 +238,13 @@ bool mitk::TrackingTool::IsEnabled() const
   return m_Enabled;
 }
 
-void mitk::TrackingTool::SetDataValid(bool _arg)
+void mitk::TrackingTool::SetDataValid(bool isDataValid)
 {
-  itkDebugMacro("setting m_DataValid to " << _arg);
-  if (this->m_DataValid != _arg)
+  itkDebugMacro("setting m_DataValid to " << isDataValid);
+  if (this->m_DataValid != isDataValid)
   {
     MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-    this->m_DataValid = _arg;
+    this->m_DataValid = isDataValid;
     this->Modified();
   }
 }
@@ -252,20 +258,18 @@ bool mitk::TrackingTool::IsDataValid() const
 float mitk::TrackingTool::GetTrackingError() const
 {
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  float r = m_TrackingError;
-  return r;
+  return m_TrackingError;
 }
 
 void mitk::TrackingTool::SetTrackingError(float error)
 {
   itkDebugMacro("setting m_TrackingError to " << error);
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  if (error == m_TrackingError)
+  if (m_TrackingError != error)
   {
-    return;
+    m_TrackingError = error;
+    this->Modified();
   }
-  m_TrackingError = error;
-  this->Modified();
 }
 
 const char* mitk::TrackingTool::GetErrorMessage() const

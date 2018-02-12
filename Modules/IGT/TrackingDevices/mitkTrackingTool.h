@@ -64,7 +64,7 @@ namespace mitk
     virtual bool Disable(); ///< disables the tool, so that it will not be tracked anymore
     virtual bool IsEnabled() const; ///< returns whether the tool is enabled or disabled
 
-    virtual void SetDataValid(bool _arg); ///< sets if the tracking data (position & Orientation) is valid
+    virtual void SetDataValid(bool isDataValid); ///< sets if the tracking data (position & orientation) is valid
     virtual bool IsDataValid() const; ///< returns true if the current position data is valid (no error during tracking, tracking error below threshold, ...)
 
     virtual float GetTrackingError() const; ///< returns one value that corresponds to the overall tracking error.

@@ -41,46 +41,7 @@ protected:
   {
   }
 
-public: //these static methods are only to structure the test
-        //please see them seperated from the upper part of the class
 
-static void TestModiciationTimeCorrectness()
-{
-  mitk::TrackingTool::Pointer tool = InternalTrackingToolTestClass::New().GetPointer();
-  unsigned long mTime1 = tool->GetMTime();
-
-  mitk::Point3D position1;
-  mitk::FillVector3D(position1, 1.1, 2.2, 3.3);
-  tool->SetPosition(position1);
-  MITK_TEST_CONDITION( mTime1 < tool->GetMTime(),
-                       "Testing MTime updated after initial position set" );
-
-  mitk::Quaternion quat1 = mitk::Quaternion(0,0,0.70710678118654757,0.70710678118654757);
-  tool->SetOrientation(quat1);
-  MITK_TEST_CONDITION( mTime1 < tool->GetMTime(),
-                       "Testing MTime updated after initial orientation set" );
-
-  unsigned long mTime2 = tool->GetMTime();
-
-  mitk::Point3D position2;
-  mitk::FillVector3D(position2, 1.10001, 2.2, 3.3);
-  tool->SetPosition(position2);
-  MITK_TEST_CONDITION( mTime2 < tool->GetMTime(),
-                       "Testing MTime updated after new position set" );
-
-  unsigned long mTime3 = tool->GetMTime();
-
-  mitk::Quaternion quat2 = mitk::Quaternion(0.0,
-                                            0.0,
-                                            0.70710678118654757,
-                                            0.70710678118654757 + 0.00001);
-  tool->SetOrientation(quat2);
-  MITK_TEST_CONDITION( mTime3 < tool->GetMTime(),
-                       "Testing MTime updated after new orientation set" );
-
-  mitk::Point3D position3;
-  mitk::FillVector3D(position3, 1.10002, 2.2, 3.3);
-}
 };
 
 /**
@@ -95,8 +56,6 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("TrackingTool")
-
-  InternalTrackingToolTestClass::TestModiciationTimeCorrectness();
 
   // always end with this!
   MITK_TEST_END();

@@ -520,11 +520,11 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
 
   ImageType::IndexType pixelIndex;
 
-  for (ImageType::IndexValueType slice = 0; slice < reference->GetDimension(2); ++slice)
+  for (unsigned int slice = 0; slice < reference->GetDimension(2); ++slice)
   {
-    for (ImageType::IndexValueType line = 0; line < reference->GetDimension(0); ++line)
+    for (unsigned int line = 0; line < reference->GetDimension(0); ++line)
     {
-      for (ImageType::IndexValueType sample = 0; sample < reference->GetDimension(1); ++sample)
+      for (unsigned int sample = 0; sample < reference->GetDimension(1); ++sample)
       {
         pixelIndex[0] = line;
         pixelIndex[1] = sample;

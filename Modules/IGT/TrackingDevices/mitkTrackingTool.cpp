@@ -148,7 +148,7 @@ void mitk::TrackingTool::GetPosition(mitk::Point3D& position) const
 {
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (m_ToolTipSet)
-    {
+  {
     // Compute the position of tool tip in the coordinate frame of the
     // tracking device: Rotate the position of the tip into the tracking
     // device coordinate frame then add to the position of the tracking
@@ -158,13 +158,13 @@ void mitk::TrackingTool::GetPosition(mitk::Point3D& position) const
     position[0] = pos_vnl[0];
     position[1] = pos_vnl[1];
     position[2] = pos_vnl[2];
-    }
+  }
   else
-    {
+  {
     position[0] = m_Position[0];
     position[1] = m_Position[1];
     position[2] = m_Position[2];
-    }
+  }
   this->Modified();
 }
 
@@ -181,18 +181,18 @@ void mitk::TrackingTool::GetOrientation(mitk::Quaternion& orientation) const
 {
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   if (m_ToolTipSet)
-    {
+  {
     // Compute the orientation of the tool tip in the coordinate frame of
     // the tracking device.
     //
     //   * m_Orientation is the orientation of the sensor relative to the transmitter
     //   * m_ToolTipRotation is the orientation of the tool tip relative to the sensor
-    orientation =  m_Orientation * m_ToolTipRotation;
-    }
+    orientation = m_Orientation * m_ToolTipRotation;
+  }
   else
-    {
+  {
     orientation = m_Orientation;
-    }
+  }
 }
 
 void mitk::TrackingTool::SetOrientation(mitk::Quaternion orientation)

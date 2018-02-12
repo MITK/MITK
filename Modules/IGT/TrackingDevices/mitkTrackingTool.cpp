@@ -270,8 +270,8 @@ void mitk::TrackingTool::SetTrackingError(float error)
 
 const char* mitk::TrackingTool::GetErrorMessage() const
 {
- MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
- return this->m_ErrorMessage.c_str();
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
+  return this->m_ErrorMessage.c_str();
 }
 
 void mitk::TrackingTool::SetErrorMessage(const char* _arg)

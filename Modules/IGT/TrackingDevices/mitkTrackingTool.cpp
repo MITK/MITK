@@ -131,7 +131,7 @@ void mitk::TrackingTool::SetToolTip(mitk::Point3D toolTipPosition,
   }
 }
 
-bool mitk::TrackingTool::IsTooltipSet() const
+bool mitk::TrackingTool::IsToolTipSet() const
 {
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   return m_ToolTipSet;

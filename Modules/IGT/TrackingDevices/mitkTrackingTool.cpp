@@ -99,9 +99,16 @@ void mitk::TrackingTool::SetToolName( const std::string _arg )
   this->SetToolName(_arg.c_str());
 }
 
-mitk::Point3D mitk::TrackingTool::GetToolTip() const
+mitk::Point3D mitk::TrackingTool::GetToolTipPosition() const
 {
+  MutexLockHolder lock(*m_MyMutex);
   return m_ToolTip;
+}
+
+mitk::Quaternion mitk::TrackingTool::GetToolTipOrientation() const
+{
+  MutexLockHolder lock(*m_MyMutex);
+  return m_ToolTipRotation;
 }
 
 void mitk::TrackingTool::SetToolTip(mitk::Point3D toolTipPosition,
@@ -135,12 +142,6 @@ bool mitk::TrackingTool::IsToolTipSet() const
 {
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
   return m_ToolTipSet;
-}
-
-mitk::Quaternion mitk::TrackingTool::GetToolTipOrientation() const
-{
-  MutexLockHolder lock(*m_MyMutex);
-  return m_ToolTipRotation;
 }
 
 void mitk::TrackingTool::GetPosition(mitk::Point3D& position) const

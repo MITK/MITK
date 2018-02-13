@@ -650,13 +650,27 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
 {
-  if (!m_tracking) return;
+	if (!m_tracking) return;
+  for (unsigned int i = 0; i < m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+  {
+	mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
+	if (currentTool->IsDataValid())
+	{
+  	 this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_INVALID);
+	}
+  }
+
+  //refresh view and status widget
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+
   m_TrackingRenderTimer->stop();
   m_TrackingLoggingTimer->stop();
 
   m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eStopTracking);
   m_WorkerThread->start();
   m_Controls->m_MainWidget->setEnabled(false);
+
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QString errorMessage)
@@ -858,6 +872,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateRenderTrackingTimer()
     mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
     if (currentTool->IsDataValid())
     {
+		
       this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_VALID);
     }
     else

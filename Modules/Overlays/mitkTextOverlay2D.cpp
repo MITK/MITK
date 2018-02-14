@@ -39,6 +39,11 @@ void mitk::TextOverlay2D::SetOrientation(const TextOrientation& orientation)
   m_Orientation = orientation;
 }
 
+mitk::TextOrientation mitk::TextOverlay2D::GetOrientation()
+{
+  return m_Orientation;
+}
+
 mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);

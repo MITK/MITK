@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkGL.h"
 
+#include "mitkOverlay.h"
 #include "mitkTextOverlay2D.h"
 
 #define _USE_MATH_DEFINES
@@ -160,7 +161,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   
   if ( m_DrawName && !label.empty() )
   {
-    RenderAnnotations(renderer, label, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
+    RenderAnnotations(planarFigure, renderer, label, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
   }
 
   // draw feature quantities (if requested) next to the anchor point,
@@ -798,7 +799,8 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( const mitk::PlanarFigure *
   }
 }
 
-void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * renderer,
+void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarFigure,
+                                                    mitk::BaseRenderer * renderer,
                                                     const std::string name,
                                                     const mitk::Point2D anchorPoint,
                                                     float globalOpacity,
@@ -824,6 +826,7 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
   m_AnnotationOverlay->SetFontSize( m_AnnotationSize*m_DevicePixelRatio );
   m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_AnnotationsShadow );
   m_AnnotationOverlay->SetVisibility( true, renderer );
+
   m_AnnotationOverlay->SetStringProperty( "font.family", m_AnnotationFontFamily );
   m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
   m_AnnotationOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
@@ -845,6 +848,21 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
   m_AnnotationOverlay->Paint( renderer );
   annotationOffset -= 15.0;
 //  annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
+
+  mitk::Overlay::Bounds bounds = m_AnnotationOverlay->GetBoundsOnDisplay(renderer);
+  mitk::TextOrientation orientation = m_AnnotationOverlay->GetOrientation();
+
+  /* // Get PlanarFigure from input
+   * // Currently added to arguments of this function
+  mitk::PlanarFigure *planarFigure = const_cast< mitk::PlanarFigure * >(
+    static_cast< const mitk::PlanarFigure * >( GetDataNode()->GetData() ) );
+  */
+
+  if (orientation == mitk::TextOrientation::TextLeft)
+  {
+    bounds.Position[0] -= bounds.Size[0];
+  }
+  planarFigure->SetAnnotaionsBoundingBox(bounds);
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * planarFigure,
@@ -889,10 +907,9 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
   m_QuantityOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
   m_QuantityOverlay->SetVisibility( true, renderer );
 
-  m_AnnotationOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
-  m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
-  m_AnnotationOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
-
+  m_QuantityOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
+  m_QuantityOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
+  m_QuantityOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
 
   m_QuantityOverlay->SetText( quantityString.str().c_str() );
   mitk::Point2D offset;

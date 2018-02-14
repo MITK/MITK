@@ -52,6 +52,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("minimal_figure_is_finished", CheckMinimalFigureFinished);
   CONNECT_CONDITION("hovering_above_figure", CheckFigureHovering);
   CONNECT_CONDITION("hovering_above_point", CheckControlPointHovering);
+  CONNECT_CONDITION("hovering_above_annotation", CheckAnnotationHovering);
   CONNECT_CONDITION("figure_is_selected", CheckSelection);
   CONNECT_CONDITION("point_is_valid", CheckPointValidity);
   CONNECT_CONDITION("figure_is_finished", CheckFigureFinished);
@@ -569,6 +570,40 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionE
     renderer);
 
   if ( pointIndex >= 0 )
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool mitk::PlanarFigureInteractor::CheckAnnotationHovering( const InteractionEvent* interactionEvent )
+{
+  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
+  if ( positionEvent == nullptr )
+    return false;
+
+  mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
+  if ( planarFigure == nullptr )
+    return false;
+
+  mitk::Overlay::Bounds annotationsBox = planarFigure->GetAnnotaionsBoundingBox();
+
+  const mitk::Point2D displayPosition = positionEvent->GetPointerPositionOnScreen();
+
+  /* debug anootation position
+  std::cout << "xB: " << annotationsBox.Position[0] << std::endl;
+  std::cout << "yB: " << annotationsBox.Position[1] << std::endl;
+  std::cout << "x: " << displayPosition[0] << std::endl;
+  std::cout << "y: " << displayPosition[1] << std::endl;
+  */
+
+  if ( displayPosition[0] > annotationsBox.Position[0]
+    && displayPosition[1] < annotationsBox.Position[1]
+    && displayPosition[0] < annotationsBox.Position[0] + annotationsBox.Size[0]
+    && displayPosition[1] > annotationsBox.Position[1] - annotationsBox.Size[1])
   {
     return true;
   }

@@ -171,7 +171,8 @@ protected:
   /**
   * \brief Renders the text annotations.
   */
-  void RenderAnnotations( mitk::BaseRenderer * renderer,
+  void RenderAnnotations( mitk::PlanarFigure * planarFigure,
+                          mitk::BaseRenderer * renderer,
                           const std::string name,
                           const mitk::Point2D anchorPoint,
                           float globalOpacity,

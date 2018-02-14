@@ -87,6 +87,8 @@ protected:
 
   bool CheckControlPointHovering( const InteractionEvent* interactionEvent );
 
+  bool CheckAnnotationHovering( const InteractionEvent* interactionEvent );
+
   bool CheckSelection( const InteractionEvent* interactionEvent );
 
   bool CheckPointValidity( const InteractionEvent* interactionEvent );

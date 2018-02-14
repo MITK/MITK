@@ -818,3 +818,13 @@ bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigu
   // FIXME: use eps and verbose
   return leftHandSide.Equals(rightHandSide);
 }
+
+mitk::Overlay::Bounds mitk::PlanarFigure::GetAnnotaionsBoundingBox()
+{
+  return m_AnnotationsBoundingBox;
+}
+
+void mitk::PlanarFigure::SetAnnotaionsBoundingBox(mitk::Overlay::Bounds points)
+{
+  m_AnnotationsBoundingBox = points;
+}

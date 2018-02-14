@@ -87,6 +87,12 @@
       <action name="select_point" />
     </transition>
 
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="hovering_above_annotation" />
+      <action name="start_hovering" />
+    </transition>
+
     <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
       <condition name="figure_is_selected" />
       <condition name="figure_can_be_deleted" />
@@ -97,6 +103,7 @@
   <state name="HoveringOverFigure">
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
       <condition name="hovering_above_figure" inverted="true" />
+      <condition name="hovering_above_annotation" inverted="true" />
       <action name="hide_preview_point" />
       <action name="end_hovering" />
     </transition>

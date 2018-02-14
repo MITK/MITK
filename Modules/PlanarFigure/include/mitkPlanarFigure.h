@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 
+#include <mitkOverlay.h>
+
 #include <deque>
 
 
@@ -56,6 +58,7 @@ class PlaneGeometry;
  * TODO: Implement local 2D transform (including center of rotation...)
  *
  */
+
 class MITKPLANARFIGURE_EXPORT PlanarFigure : public BaseData
 {
 public:
@@ -285,6 +288,9 @@ public:
   */
   virtual bool Equals(const mitk::PlanarFigure& other) const;
 
+  mitk::Overlay::Bounds GetAnnotaionsBoundingBox();
+
+  void SetAnnotaionsBoundingBox(mitk::Overlay::Bounds points);
 
 protected:
   PlanarFigure();
@@ -411,6 +417,7 @@ private:
   // It's used to determine whether or not GetHelperPolyLine() needs to recalculate the HelperPolyLines.
   std::pair<double, unsigned int> m_DisplaySize;
 
+  mitk::Overlay::Bounds m_AnnotationsBoundingBox;
 };
 
 MITKPLANARFIGURE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );

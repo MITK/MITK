@@ -22,19 +22,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLog.h>
 #include <algorithm>
 #include <string>
+#include <mitkFiberfoxParameters.h>
 
-template< class ScalarType >
-mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
+mitk::FiberfoxParameters::FiberfoxParameters()
   : m_NoiseModel(nullptr)
 {
 
 }
 
-template< class ScalarType >
-mitk::FiberfoxParameters< ScalarType >::~FiberfoxParameters()
+
+mitk::FiberfoxParameters::~FiberfoxParameters()
 {
-  //    if (m_NoiseModel!=nullptr)
-  //        delete m_NoiseModel;
+
 }
 
 void mitk::SignalGenerationParameters::GenerateGradientHalfShell()
@@ -186,8 +185,8 @@ void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionPrope
   }
 }
 
-template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename)
+
+void mitk::FiberfoxParameters::SaveParameters(std::string filename)
 {
   if(filename.empty())
     return;
@@ -307,15 +306,15 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename
   if (m_NoiseModel!=nullptr)
   {
     parameters.put("fiberfox.image.artifacts.noisevariance", m_NoiseModel->GetNoiseVariance());
-    if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+    if (dynamic_cast<mitk::RicianNoiseModel<>*>(m_NoiseModel.get()))
       parameters.put("fiberfox.image.artifacts.noisetype", "rice");
-    else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+    else if (dynamic_cast<mitk::ChiSquareNoiseModel<>*>(m_NoiseModel.get()))
       parameters.put("fiberfox.image.artifacts.noisetype", "chisquare");
   }
 
   for (std::size_t i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
   {
-    mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
+    mitk::DiffusionSignalModel<>* signalModel = nullptr;
     if (i<m_FiberModelList.size())
     {
       signalModel = m_FiberModelList.at(i);
@@ -327,17 +326,17 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".type", "non-fiber");
     }
 
-    if (dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel))
+    if (dynamic_cast<mitk::StickModel<>*>(signalModel))
     {
-      mitk::StickModel<ScalarType>* model = dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel);
+      mitk::StickModel<>* model = dynamic_cast<mitk::StickModel<>*>(signalModel);
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "stick");
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d", model->GetDiffusivity());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
     }
-    else  if (dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel))
+    else  if (dynamic_cast<mitk::TensorModel<>*>(signalModel))
     {
-      mitk::TensorModel<ScalarType>* model = dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel);
+      mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "tensor");
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d1", model->GetDiffusivity1());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d2", model->GetDiffusivity2());
@@ -345,9 +344,9 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
     }
-    else  if (dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel))
+    else  if (dynamic_cast<mitk::RawShModel<>*>(signalModel))
     {
-      mitk::RawShModel<ScalarType>* model = dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel);
+      mitk::RawShModel<>* model = dynamic_cast<mitk::RawShModel<>*>(signalModel);
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "prototype");
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".minFA", model->GetFaRange().first);
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".maxFA", model->GetFaRange().second);
@@ -366,26 +365,26 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename
         parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".kernels."+boost::lexical_cast<std::string>(j)+".B0", model->GetBaselineSignal(j));
       }
     }
-    else  if (dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel))
+    else  if (dynamic_cast<mitk::BallModel<>*>(signalModel))
     {
-      mitk::BallModel<ScalarType>* model = dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel);
+      mitk::BallModel<>* model = dynamic_cast<mitk::BallModel<>*>(signalModel);
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "ball");
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d", model->GetDiffusivity());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
     }
-    else  if (dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel))
+    else  if (dynamic_cast<mitk::AstroStickModel<>*>(signalModel))
     {
-      mitk::AstroStickModel<ScalarType>* model = dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel);
+      mitk::AstroStickModel<>* model = dynamic_cast<mitk::AstroStickModel<>*>(signalModel);
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "astrosticks");
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".d", model->GetDiffusivity());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".randomize", model->GetRandomizeSticks());
     }
-    else  if (dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel))
+    else  if (dynamic_cast<mitk::DotModel<>*>(signalModel))
     {
-      mitk::DotModel<ScalarType>* model = dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel);
+      mitk::DotModel<>* model = dynamic_cast<mitk::DotModel<>*>(signalModel);
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".model", "dot");
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t2", model->GetT2());
       parameters.put("fiberfox.image.compartments."+boost::lexical_cast<std::string>(i)+".t1", model->GetT1());
@@ -415,7 +414,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename
   boost::property_tree::xml_parser::write_xml(filename, parameters, std::locale(), writerSettings);
 
   try{
-    itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
+    itk::ImageFileWriter<ItkFloatImgType>::Pointer writer = itk::ImageFileWriter<ItkFloatImgType>::New();
     writer->SetFileName(filename+"_FMAP.nrrd");
     writer->SetInput(m_SignalGen.m_FrequencyMap);
     writer->Update();
@@ -439,9 +438,9 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(std::string filename
 }
 
 
-template< class ScalarType >
+
 template< class ParameterType >
-ParameterType mitk::FiberfoxParameters< ScalarType >::ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential)
+ParameterType mitk::FiberfoxParameters::ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential)
 {
   try
   {
@@ -463,8 +462,8 @@ ParameterType mitk::FiberfoxParameters< ScalarType >::ReadVal(boost::property_tr
   }
 }
 
-template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename)
+
+void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 {
   m_MissingTags = "";
   if(filename.empty()) { return; }
@@ -546,21 +545,21 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
       m_SignalGen.m_ImageRegion.SetSize(0, ReadVal<int>(v1,"basic.size.x",m_SignalGen.m_ImageRegion.GetSize(0)));
       m_SignalGen.m_ImageRegion.SetSize(1, ReadVal<int>(v1,"basic.size.y",m_SignalGen.m_ImageRegion.GetSize(1)));
       m_SignalGen.m_ImageRegion.SetSize(2, ReadVal<int>(v1,"basic.size.z",m_SignalGen.m_ImageRegion.GetSize(2)));
-      m_SignalGen.m_ImageSpacing[0] = ReadVal<double>(v1,"basic.spacing.x",m_SignalGen.m_ImageSpacing[0]);
-      m_SignalGen.m_ImageSpacing[1] = ReadVal<double>(v1,"basic.spacing.y",m_SignalGen.m_ImageSpacing[1]);
-      m_SignalGen.m_ImageSpacing[2] = ReadVal<double>(v1,"basic.spacing.z",m_SignalGen.m_ImageSpacing[2]);
-      m_SignalGen.m_ImageOrigin[0] = ReadVal<double>(v1,"basic.origin.x",m_SignalGen.m_ImageOrigin[0]);
-      m_SignalGen.m_ImageOrigin[1] = ReadVal<double>(v1,"basic.origin.y",m_SignalGen.m_ImageOrigin[1]);
-      m_SignalGen.m_ImageOrigin[2] = ReadVal<double>(v1,"basic.origin.z",m_SignalGen.m_ImageOrigin[2]);
-      m_SignalGen.m_ImageDirection[0][0] = ReadVal<double>(v1,"basic.direction.1",m_SignalGen.m_ImageDirection[0][0]);
-      m_SignalGen.m_ImageDirection[0][1] = ReadVal<double>(v1,"basic.direction.2",m_SignalGen.m_ImageDirection[0][1]);
-      m_SignalGen.m_ImageDirection[0][2] = ReadVal<double>(v1,"basic.direction.3",m_SignalGen.m_ImageDirection[0][2]);
-      m_SignalGen.m_ImageDirection[1][0] = ReadVal<double>(v1,"basic.direction.4",m_SignalGen.m_ImageDirection[1][0]);
-      m_SignalGen.m_ImageDirection[1][1] = ReadVal<double>(v1,"basic.direction.5",m_SignalGen.m_ImageDirection[1][1]);
-      m_SignalGen.m_ImageDirection[1][2] = ReadVal<double>(v1,"basic.direction.6",m_SignalGen.m_ImageDirection[1][2]);
-      m_SignalGen.m_ImageDirection[2][0] = ReadVal<double>(v1,"basic.direction.7",m_SignalGen.m_ImageDirection[2][0]);
-      m_SignalGen.m_ImageDirection[2][1] = ReadVal<double>(v1,"basic.direction.8",m_SignalGen.m_ImageDirection[2][1]);
-      m_SignalGen.m_ImageDirection[2][2] = ReadVal<double>(v1,"basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
+      m_SignalGen.m_ImageSpacing[0] = ReadVal<float>(v1,"basic.spacing.x",m_SignalGen.m_ImageSpacing[0]);
+      m_SignalGen.m_ImageSpacing[1] = ReadVal<float>(v1,"basic.spacing.y",m_SignalGen.m_ImageSpacing[1]);
+      m_SignalGen.m_ImageSpacing[2] = ReadVal<float>(v1,"basic.spacing.z",m_SignalGen.m_ImageSpacing[2]);
+      m_SignalGen.m_ImageOrigin[0] = ReadVal<float>(v1,"basic.origin.x",m_SignalGen.m_ImageOrigin[0]);
+      m_SignalGen.m_ImageOrigin[1] = ReadVal<float>(v1,"basic.origin.y",m_SignalGen.m_ImageOrigin[1]);
+      m_SignalGen.m_ImageOrigin[2] = ReadVal<float>(v1,"basic.origin.z",m_SignalGen.m_ImageOrigin[2]);
+      m_SignalGen.m_ImageDirection[0][0] = ReadVal<float>(v1,"basic.direction.1",m_SignalGen.m_ImageDirection[0][0]);
+      m_SignalGen.m_ImageDirection[0][1] = ReadVal<float>(v1,"basic.direction.2",m_SignalGen.m_ImageDirection[0][1]);
+      m_SignalGen.m_ImageDirection[0][2] = ReadVal<float>(v1,"basic.direction.3",m_SignalGen.m_ImageDirection[0][2]);
+      m_SignalGen.m_ImageDirection[1][0] = ReadVal<float>(v1,"basic.direction.4",m_SignalGen.m_ImageDirection[1][0]);
+      m_SignalGen.m_ImageDirection[1][1] = ReadVal<float>(v1,"basic.direction.5",m_SignalGen.m_ImageDirection[1][1]);
+      m_SignalGen.m_ImageDirection[1][2] = ReadVal<float>(v1,"basic.direction.6",m_SignalGen.m_ImageDirection[1][2]);
+      m_SignalGen.m_ImageDirection[2][0] = ReadVal<float>(v1,"basic.direction.7",m_SignalGen.m_ImageDirection[2][0]);
+      m_SignalGen.m_ImageDirection[2][1] = ReadVal<float>(v1,"basic.direction.8",m_SignalGen.m_ImageDirection[2][1]);
+      m_SignalGen.m_ImageDirection[2][2] = ReadVal<float>(v1,"basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
 
       m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)
                                       ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
@@ -568,34 +567,34 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
                                              ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
       m_SignalGen.m_NumberOfCoils = ReadVal<int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
       m_SignalGen.m_ReversePhase = ReadVal<bool>(v1,"reversephase", m_SignalGen.m_ReversePhase);
-      m_SignalGen.m_PartialFourier = ReadVal<double>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
-      m_SignalGen.m_NoiseVariance = ReadVal<double>(v1,"noisevariance", m_SignalGen.m_NoiseVariance);
-      m_SignalGen.m_tRep = ReadVal<double>(v1,"trep", m_SignalGen.m_tRep);
-      m_SignalGen.m_SignalScale = ReadVal<double>(v1,"signalScale", m_SignalGen.m_SignalScale);
-      m_SignalGen.m_tEcho = ReadVal<double>(v1,"tEcho", m_SignalGen.m_tEcho);
-      m_SignalGen.m_tLine = ReadVal<double>(v1,"tLine", m_SignalGen.m_tLine);
-      m_SignalGen.m_tInhom = ReadVal<double>(v1,"tInhom", m_SignalGen.m_tInhom);
+      m_SignalGen.m_PartialFourier = ReadVal<float>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
+      m_SignalGen.m_NoiseVariance = ReadVal<float>(v1,"noisevariance", m_SignalGen.m_NoiseVariance);
+      m_SignalGen.m_tRep = ReadVal<float>(v1,"trep", m_SignalGen.m_tRep);
+      m_SignalGen.m_SignalScale = ReadVal<float>(v1,"signalScale", m_SignalGen.m_SignalScale);
+      m_SignalGen.m_tEcho = ReadVal<float>(v1,"tEcho", m_SignalGen.m_tEcho);
+      m_SignalGen.m_tLine = ReadVal<float>(v1,"tLine", m_SignalGen.m_tLine);
+      m_SignalGen.m_tInhom = ReadVal<float>(v1,"tInhom", m_SignalGen.m_tInhom);
       m_SignalGen.m_Bvalue = ReadVal<double>(v1,"bvalue", m_SignalGen.m_Bvalue);
       m_SignalGen.m_SimulateKspaceAcquisition = ReadVal<bool>(v1,"simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
 
       m_SignalGen.m_AxonRadius = ReadVal<double>(v1,"axonRadius", m_SignalGen.m_AxonRadius);
       m_SignalGen.m_Spikes = ReadVal<unsigned int>(v1,"artifacts.spikesnum", m_SignalGen.m_Spikes);
-      m_SignalGen.m_SpikeAmplitude = ReadVal<double>(v1,"artifacts.spikesscale", m_SignalGen.m_SpikeAmplitude);
-      m_SignalGen.m_KspaceLineOffset = ReadVal<double>(v1,"artifacts.kspaceLineOffset", m_SignalGen.m_KspaceLineOffset);
-      m_SignalGen.m_EddyStrength = ReadVal<double>(v1,"artifacts.eddyStrength", m_SignalGen.m_EddyStrength);
-      m_SignalGen.m_Tau = ReadVal<double>(v1,"artifacts.eddyTau", m_SignalGen.m_Tau);
-      m_SignalGen.m_CroppingFactor = ReadVal<double>(v1,"artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
+      m_SignalGen.m_SpikeAmplitude = ReadVal<float>(v1,"artifacts.spikesscale", m_SignalGen.m_SpikeAmplitude);
+      m_SignalGen.m_KspaceLineOffset = ReadVal<float>(v1,"artifacts.kspaceLineOffset", m_SignalGen.m_KspaceLineOffset);
+      m_SignalGen.m_EddyStrength = ReadVal<float>(v1,"artifacts.eddyStrength", m_SignalGen.m_EddyStrength);
+      m_SignalGen.m_Tau = ReadVal<float>(v1,"artifacts.eddyTau", m_SignalGen.m_Tau);
+      m_SignalGen.m_CroppingFactor = ReadVal<float>(v1,"artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
       m_SignalGen.m_DoAddGibbsRinging = ReadVal<bool>(v1,"artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
       m_SignalGen.m_DoSimulateRelaxation = ReadVal<bool>(v1,"doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
       m_SignalGen.m_DoDisablePartialVolume = ReadVal<bool>(v1,"doDisablePartialVolume", m_SignalGen.m_DoDisablePartialVolume);
       m_SignalGen.m_DoAddMotion = ReadVal<bool>(v1,"artifacts.doAddMotion", m_SignalGen.m_DoAddMotion);
       m_SignalGen.m_DoRandomizeMotion = ReadVal<bool>(v1,"artifacts.randomMotion", m_SignalGen.m_DoRandomizeMotion);
-      m_SignalGen.m_Translation[0] = ReadVal<double>(v1,"artifacts.translation0", m_SignalGen.m_Translation[0]);
-      m_SignalGen.m_Translation[1] = ReadVal<double>(v1,"artifacts.translation1", m_SignalGen.m_Translation[1]);
-      m_SignalGen.m_Translation[2] = ReadVal<double>(v1,"artifacts.translation2", m_SignalGen.m_Translation[2]);
-      m_SignalGen.m_Rotation[0] = ReadVal<double>(v1,"artifacts.rotation0", m_SignalGen.m_Rotation[0]);
-      m_SignalGen.m_Rotation[1] = ReadVal<double>(v1,"artifacts.rotation1", m_SignalGen.m_Rotation[1]);
-      m_SignalGen.m_Rotation[2] = ReadVal<double>(v1,"artifacts.rotation2", m_SignalGen.m_Rotation[2]);
+      m_SignalGen.m_Translation[0] = ReadVal<float>(v1,"artifacts.translation0", m_SignalGen.m_Translation[0]);
+      m_SignalGen.m_Translation[1] = ReadVal<float>(v1,"artifacts.translation1", m_SignalGen.m_Translation[1]);
+      m_SignalGen.m_Translation[2] = ReadVal<float>(v1,"artifacts.translation2", m_SignalGen.m_Translation[2]);
+      m_SignalGen.m_Rotation[0] = ReadVal<float>(v1,"artifacts.rotation0", m_SignalGen.m_Rotation[0]);
+      m_SignalGen.m_Rotation[1] = ReadVal<float>(v1,"artifacts.rotation1", m_SignalGen.m_Rotation[1]);
+      m_SignalGen.m_Rotation[2] = ReadVal<float>(v1,"artifacts.rotation2", m_SignalGen.m_Rotation[2]);
 
 
       // m_SignalGen.SetNumWeightedVolumes(ReadVal<unsigned int>(v1,"numgradients", m_SignalGen.GetNumWeightedVolumes()));
@@ -683,8 +682,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
       {
         if (ReadVal<std::string>(v1,"artifacts.noisetype","")=="rice")
         {
-          m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<ScalarType> >();
-          m_NoiseModel->SetNoiseVariance(ReadVal<double>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
+          m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<> >();
+          m_NoiseModel->SetNoiseVariance(ReadVal<float>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
         }
       }
       catch(...)
@@ -697,8 +696,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
       {
         if (ReadVal<std::string>(v1,"artifacts.noisetype","")=="chisquare")
         {
-          m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<ScalarType> >();
-          m_NoiseModel->SetNoiseVariance(ReadVal<double>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
+          m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<> >();
+          m_NoiseModel->SetNoiseVariance(ReadVal<float>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
         }
       }
       catch(...)
@@ -710,12 +709,12 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
 
       BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("compartments") )
       {
-        mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
+        mitk::DiffusionSignalModel<>* signalModel = nullptr;
 
         std::string model = ReadVal<std::string>(v2,"model","",true);
         if (model=="stick")
         {
-          mitk::StickModel<ScalarType>* model = new mitk::StickModel<ScalarType>();
+          mitk::StickModel<>* model = new mitk::StickModel<>();
           model->SetDiffusivity(ReadVal<double>(v2,"d",model->GetDiffusivity()));
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
@@ -729,7 +728,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
         }
         else if (model=="tensor")
         {
-          mitk::TensorModel<ScalarType>* model = new mitk::TensorModel<ScalarType>();
+          mitk::TensorModel<>* model = new mitk::TensorModel<>();
           model->SetDiffusivity1(ReadVal<double>(v2,"d1",model->GetDiffusivity1()));
           model->SetDiffusivity2(ReadVal<double>(v2,"d2",model->GetDiffusivity2()));
           model->SetDiffusivity3(ReadVal<double>(v2,"d3",model->GetDiffusivity3()));
@@ -745,7 +744,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
         }
         else if (model=="ball")
         {
-          mitk::BallModel<ScalarType>* model = new mitk::BallModel<ScalarType>();
+          mitk::BallModel<>* model = new mitk::BallModel<>();
           model->SetDiffusivity(ReadVal<double>(v2,"d",model->GetDiffusivity()));
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
@@ -759,7 +758,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
         }
         else if (model=="astrosticks")
         {
-          mitk::AstroStickModel<ScalarType>* model = new AstroStickModel<ScalarType>();
+          mitk::AstroStickModel<>* model = new AstroStickModel<>();
           model->SetDiffusivity(ReadVal<double>(v2,"d",model->GetDiffusivity()));
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
@@ -774,7 +773,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
         }
         else if (model=="dot")
         {
-          mitk::DotModel<ScalarType>* model = new mitk::DotModel<ScalarType>();
+          mitk::DotModel<>* model = new mitk::DotModel<>();
           model->SetT2(ReadVal<double>(v2,"t2",model->GetT2()));
           model->SetT1(ReadVal<double>(v2,"t1",model->GetT1()));
           model->m_CompartmentId = ReadVal<unsigned int>(v2,"ID",0,true);
@@ -786,7 +785,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
         }
         else if (model=="prototype")
         {
-          mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
+          mitk::RawShModel<>* model = new mitk::RawShModel<>();
           model->SetMaxNumKernels(ReadVal<unsigned int>(v2,"maxNumSamples",model->GetMaxNumKernels()));
           model->SetFaRange(ReadVal<double>(v2,"minFA",model->GetFaRange().first), ReadVal<double>(v2,"maxFA",model->GetFaRange().second));
           model->SetAdcRange(ReadVal<double>(v2,"minADC",model->GetAdcRange().first), ReadVal<double>(v2,"maxADC",model->GetAdcRange().second));
@@ -838,7 +837,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
 
   try
   {
-    itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
+    itk::ImageFileReader<ItkFloatImgType>::Pointer reader = itk::ImageFileReader<ItkFloatImgType>::New();
     reader->SetFileName(filename+"_FMAP.nrrd");
     reader->Update();
     m_SignalGen.m_FrequencyMap = reader->GetOutput();
@@ -869,8 +868,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(std::string filename
   setlocale(LC_ALL, currLocale.c_str());
 }
 
-template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::PrintSelf()
+
+void mitk::FiberfoxParameters::PrintSelf()
 {
   MITK_INFO << "Not implemented :(";
 }

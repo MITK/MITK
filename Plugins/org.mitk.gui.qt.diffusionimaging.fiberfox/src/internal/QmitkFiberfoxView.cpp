@@ -137,7 +137,7 @@ void QmitkFiberfoxView::AfterThread()
   m_ThreadIsRunning = false;
 
   QString statusText;
-  FiberfoxParameters<double> parameters;
+  FiberfoxParameters parameters;
   mitk::Image::Pointer mitkImage = mitk::Image::New();
 
   statusText = QString(m_TractsToDwiFilter->GetStatusText().c_str());
@@ -432,10 +432,9 @@ void QmitkFiberfoxView::OnFibSelected(int )
   UpdateGui();
 }
 
-template< class ScalarType >
-FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
+FiberfoxParameters QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
 {
-  FiberfoxParameters< ScalarType > parameters;
+  FiberfoxParameters parameters;
   parameters.m_Misc.m_OutputPath = "";
   parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
   parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
@@ -603,8 +602,8 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
   {
     mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
     mitk::Image* img = dynamic_cast<mitk::Image*>(fMapNode->GetData());
-    ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
-    CastToItkImage< ItkDoubleImgType >(img, itkImg);
+    ItkFloatImgType::Pointer itkImg = ItkFloatImgType::New();
+    CastToItkImage< ItkFloatImgType >(img, itkImg);
 
     if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNull())   // use geometry of frequency map
     {
@@ -619,7 +618,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         parameters.m_SignalGen.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
     {
       parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
-      itk::ImageDuplicator<ItkDoubleImgType>::Pointer duplicator = itk::ImageDuplicator<ItkDoubleImgType>::New();
+      itk::ImageDuplicator<ItkFloatImgType>::Pointer duplicator = itk::ImageDuplicator<ItkFloatImgType>::New();
       duplicator->SetInputImage(itkImg);
       duplicator->Update();
       parameters.m_SignalGen.m_FrequencyMap = duplicator->GetOutput();
@@ -1169,7 +1168,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
 
 void QmitkFiberfoxView::SaveParameters(QString filename)
 {
-  FiberfoxParameters<> ffParamaters = UpdateImageParameters<double>(true, true);
+  FiberfoxParameters ffParamaters = UpdateImageParameters(true, true);
   std::vector< int > bVals = ffParamaters.m_SignalGen.GetBvalues();
   std::cout << "b-values: ";
   for (auto v : bVals)
@@ -1334,7 +1333,7 @@ void QmitkFiberfoxView::LoadParameters()
 
   m_ParameterFile = filename;
 
-  FiberfoxParameters<> parameters = UpdateImageParameters<double>();
+  FiberfoxParameters parameters = UpdateImageParameters();
   parameters.LoadParameters(filename.toStdString());
 
   if (parameters.m_MissingTags.size()>0)
@@ -2166,7 +2165,7 @@ void QmitkFiberfoxView::GenerateFibers()
       return;
   }
 
-  FiberfoxParameters<double> parameters = UpdateImageParameters<double>(false);
+  FiberfoxParameters parameters = UpdateImageParameters(false);
 
   for (unsigned int i=0; i<m_SelectedBundles.size(); i++)
   {
@@ -2293,7 +2292,7 @@ void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
     return;
   }
 
-  FiberfoxParameters<double> parameters = UpdateImageParameters<double>();
+  FiberfoxParameters parameters = UpdateImageParameters();
 
   mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(imageNode->GetData());
   ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
@@ -2324,7 +2323,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
   mitk::FiberBundle::Pointer fiberBundle = dynamic_cast<mitk::FiberBundle*>(fiberNode->GetData());
   if (fiberBundle->GetNumFibers()<=0) { return; }
 
-  FiberfoxParameters<double> parameters = UpdateImageParameters<double>();
+  FiberfoxParameters parameters = UpdateImageParameters();
 
   m_TractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
   parameters.m_Misc.m_ParentNode = fiberNode;

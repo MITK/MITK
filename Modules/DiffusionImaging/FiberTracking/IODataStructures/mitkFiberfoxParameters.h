@@ -36,15 +36,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <limits>
+#include <MitkFiberTrackingExports.h>
 
 namespace mitk
 {
 
   /** Signal generation */
-  class SignalGenerationParameters
+  class MITKFIBERTRACKING_EXPORT SignalGenerationParameters
   {
   public:
-    typedef itk::Image<double, 3>                   ItkDoubleImgType;
+    typedef itk::Image<float, 3>                    ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
@@ -104,20 +105,20 @@ namespace mitk
     /** input/output image specifications */
     itk::ImageRegion<3>                 m_CroppedRegion;            ///< Image size with reduced FOV.
     itk::ImageRegion<3>                 m_ImageRegion;              ///< Image size.
-    itk::Vector<double,3>               m_ImageSpacing;             ///< Image voxel size.
-    itk::Point<double,3>                m_ImageOrigin;              ///< Image origin.
+    itk::Vector<float,3>                m_ImageSpacing;             ///< Image voxel size.
+    itk::Point<float,3>                 m_ImageOrigin;              ///< Image origin.
     itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
     AcquisitionType                     m_AcquisitionType;          ///< determines k-space trajectory and maximum echo position(s)
-    double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
-    double                              m_tEcho;                    ///< Echo time TE.
-    double                              m_tRep;                     ///< Echo time TR.
-    double                              m_tLine;                    ///< k-space line readout time (dwell time).
-    double                              m_tInhom;                   ///< T2'
+    float                               m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
+    float                               m_tEcho;                    ///< Echo time TE.
+    float                               m_tRep;                     ///< Echo time TR.
+    float                               m_tLine;                    ///< k-space line readout time (dwell time).
+    float                               m_tInhom;                   ///< T2'
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
-    double                              m_PartialFourier;           ///< Partial fourier factor (0.5-1)
-    double                              m_NoiseVariance;            ///< Variance of complex gaussian noise
+    float                               m_PartialFourier;           ///< Partial fourier factor (0.5-1)
+    float                               m_NoiseVariance;            ///< Variance of complex gaussian noise
     int                                 m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
     CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
     double                              m_Bvalue;                   ///< Acquisition b-value
@@ -127,36 +128,36 @@ namespace mitk
 
     /** Artifacts and other effects */
     unsigned int                        m_Spikes;                   ///< Number of spikes randomly appearing in the image
-    double                              m_SpikeAmplitude;           ///< amplitude of spikes relative to the largest signal intensity (magnitude of complex)
-    double                              m_KspaceLineOffset;         ///< Causes N/2 ghosts. Larger offset means stronger ghost.
-    double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in mT/m.
-    double                              m_Tau;                      ///< Eddy current decay constant (in ms)
-    double                              m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
+    float                               m_SpikeAmplitude;           ///< amplitude of spikes relative to the largest signal intensity (magnitude of complex)
+    float                               m_KspaceLineOffset;         ///< Causes N/2 ghosts. Larger offset means stronger ghost.
+    float                               m_EddyStrength;             ///< Strength of eddy current induced gradients in mT/m.
+    float                               m_Tau;                      ///< Eddy current decay constant (in ms)
+    float                               m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
     bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
     std::vector< bool >                 m_MotionVolumes;            ///< Indicates the image volumes that are affected by motion
     ///< with positive numbers, inverted logic with negative numbers.
-    itk::Vector<double,3>               m_Translation;              ///< Maximum translational motion.
-    itk::Vector<double,3>               m_Rotation;                 ///< Maximum rotational motion.
-    ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != nullptr, distortions are added to the image using this frequency map.
+    itk::Vector<float,3>                m_Translation;              ///< Maximum translational motion.
+    itk::Vector<float,3>                m_Rotation;                 ///< Maximum rotational motion.
+    ItkFloatImgType::Pointer            m_FrequencyMap;             ///< If != nullptr, distortions are added to the image using this frequency map.
     ItkUcharImgType::Pointer            m_MaskImage;                ///< Signal is only genrated inside of the mask image.
 
-    inline void GenerateGradientHalfShell();                        ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
-    inline std::vector< int > GetBaselineIndices();                 ///< Returns list of nun-diffusion-weighted image volume indices
-    inline unsigned int GetFirstBaselineIndex();                    ///< Returns index of first non-diffusion-weighted image volume
-    inline bool IsBaselineIndex(unsigned int idx);                  ///< Checks if image volume with given index is non-diffusion-weighted volume or not.
-    inline unsigned int GetNumWeightedVolumes();                    ///< Get number of diffusion-weighted image volumes
-    inline unsigned int GetNumBaselineVolumes();                    ///< Get number of non-diffusion-weighted image volumes
-    inline unsigned int GetNumVolumes();                            ///< Get number of baseline and diffusion-weighted image volumes
-    inline GradientListType GetGradientDirections();                ///< Return gradient direction container
-    inline GradientType GetGradientDirection(unsigned int i);
-    inline std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
+    void GenerateGradientHalfShell();                        ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
+    std::vector< int > GetBaselineIndices();                 ///< Returns list of nun-diffusion-weighted image volume indices
+    unsigned int GetFirstBaselineIndex();                    ///< Returns index of first non-diffusion-weighted image volume
+    bool IsBaselineIndex(unsigned int idx);                  ///< Checks if image volume with given index is non-diffusion-weighted volume or not.
+    unsigned int GetNumWeightedVolumes();                    ///< Get number of diffusion-weighted image volumes
+    unsigned int GetNumBaselineVolumes();                    ///< Get number of non-diffusion-weighted image volumes
+    unsigned int GetNumVolumes();                            ///< Get number of baseline and diffusion-weighted image volumes
+    GradientListType GetGradientDirections();                ///< Return gradient direction container
+    GradientType GetGradientDirection(unsigned int i);
+    std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
 
-    inline void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
-    inline void SetGradienDirections(GradientListType gradientList);
-    inline void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
+    void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
+    void SetGradienDirections(GradientListType gradientList);
+    void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
 
   protected:
 
@@ -166,7 +167,7 @@ namespace mitk
   };
 
   /** Fiber generation */
-  class FiberGenerationParameters
+  class MITKFIBERTRACKING_EXPORT FiberGenerationParameters
   {
   public:
 
@@ -208,7 +209,7 @@ namespace mitk
   };
 
   /** GUI persistence, input, output, ... */
-  class MiscFiberfoxParameters
+  class MITKFIBERTRACKING_EXPORT MiscFiberfoxParameters
   {
   public:
     MiscFiberfoxParameters()
@@ -263,69 +264,19 @@ namespace mitk
   * \brief Datastructure to manage the Fiberfox signal generation parameters.
   *
   */
-  template< class ScalarType = double >
-  class FiberfoxParameters
+  class MITKFIBERTRACKING_EXPORT FiberfoxParameters
   {
   public:
 
+    typedef itk::Image<float, 3>                            ItkFloatImgType;
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
-    typedef DiffusionSignalModel<ScalarType>                DiffusionModelType;
+    typedef DiffusionSignalModel<double>                    DiffusionModelType;
     typedef std::vector< DiffusionModelType* >              DiffusionModelListType;
-    typedef DiffusionNoiseModel<ScalarType>                 NoiseModelType;
+    typedef DiffusionNoiseModel<double>                     NoiseModelType;
 
     FiberfoxParameters();
     ~FiberfoxParameters();
-
-    /** Get same parameter object with different template parameter */
-    template< class OutType >
-    FiberfoxParameters< OutType > CopyParameters()
-    {
-      FiberfoxParameters< OutType > out;
-
-      out.m_FiberGen = m_FiberGen;
-      out.m_SignalGen = m_SignalGen;
-      out.m_Misc = m_Misc;
-
-      if (m_NoiseModel!=nullptr)
-      {
-        if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
-          out.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<OutType> >();
-        else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel.get()))
-          out.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<OutType> >();
-        out.m_NoiseModel->SetNoiseVariance(m_NoiseModel->GetNoiseVariance());
-      }
-
-      for (unsigned int i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
-      {
-        mitk::DiffusionSignalModel<OutType>* outModel = nullptr;
-        mitk::DiffusionSignalModel<ScalarType>* signalModel = nullptr;
-        if (i<m_FiberModelList.size())
-          signalModel = m_FiberModelList.at(i);
-        else
-          signalModel = m_NonFiberModelList.at(i-m_FiberModelList.size());
-
-        if (dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel))
-          outModel = new mitk::StickModel<OutType>(dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel));
-        else  if (dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel))
-          outModel = new mitk::TensorModel<OutType>(dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel));
-        else  if (dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel))
-          outModel = new mitk::RawShModel<OutType>(dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel));
-        else  if (dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel))
-          outModel = new mitk::BallModel<OutType>(dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel));
-        else if (dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel))
-          outModel = new mitk::AstroStickModel<OutType>(dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel));
-        else  if (dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel))
-          outModel = new mitk::DotModel<OutType>(dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel));
-
-        if (i<m_FiberModelList.size())
-          out.m_FiberModelList.push_back(outModel);
-        else
-          out.m_NonFiberModelList.push_back(outModel);
-      }
-
-      return out;
-    }
 
     /** Not templated parameters */
     FiberGenerationParameters           m_FiberGen;             ///< Fiber generation parameters
@@ -345,8 +296,6 @@ namespace mitk
     std::string                         m_MissingTags;
   };
 }
-
-#include "mitkFiberfoxParameters.cpp"
 
 #endif
 

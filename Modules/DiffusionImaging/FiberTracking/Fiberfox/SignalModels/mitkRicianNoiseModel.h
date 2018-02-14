@@ -27,7 +27,7 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class RicianNoiseModel : public DiffusionNoiseModel< ScalarType >
 {
 public:

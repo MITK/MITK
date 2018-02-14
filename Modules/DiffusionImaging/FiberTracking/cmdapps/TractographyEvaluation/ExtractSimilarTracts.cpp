@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricEuclideanStd.h>
 #include <mitkClusteringMetricAnatomic.h>
 #include <mitkClusteringMetricScalarMap.h>
+#include <itksys/SystemTools.hxx>
 
 typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkFloatImgType;

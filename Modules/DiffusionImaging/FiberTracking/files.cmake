@@ -7,6 +7,7 @@ set(CPP_FILES
   IODataStructures/FiberBundle/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
   IODataStructures/mitkTractographyForest.cpp
+  IODataStructures/mitkFiberfoxParameters.cpp
 
   # Interactions
 

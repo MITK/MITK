@@ -67,7 +67,6 @@ public:
   itkCloneMacro(Self)
 
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
-  virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const override;
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds) override;
 
   void SetOrientation(const TextOrientation& orientation);
@@ -79,7 +78,7 @@ protected:
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   vtkProp* GetVtkProp(BaseRenderer *renderer) const override;
-  //virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const override;
+  virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const override;
   void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer) override;
 
   /** \brief explicit constructor which disallows implicit conversions */

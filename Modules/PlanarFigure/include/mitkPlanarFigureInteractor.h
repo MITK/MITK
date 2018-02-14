@@ -116,6 +116,8 @@ protected:
 
   void MoveCurrentPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
+  void MoveAnnotations(StateMachineAction*, InteractionEvent* interactionEvent);
+
   void DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
   void AddPoint(StateMachineAction*, InteractionEvent* interactionEvent);

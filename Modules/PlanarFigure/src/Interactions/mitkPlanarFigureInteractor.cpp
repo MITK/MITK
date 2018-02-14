@@ -68,6 +68,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "hide_control_points", HideControlPoints )
   CONNECT_FUNCTION( "set_preview_point_position", SetPreviewPointPosition )
   CONNECT_FUNCTION( "move_current_point", MoveCurrentPoint);
+  CONNECT_FUNCTION( "move_annotations", MoveAnnotations);
   CONNECT_FUNCTION( "deselect_point", DeselectPoint);
   CONNECT_FUNCTION( "add_new_point", AddPoint);
   CONNECT_FUNCTION( "add_initial_point", AddInitialPoint);
@@ -133,6 +134,37 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
 
   // Move current control point to this point
   planarFigure->SetCurrentControlPoint( point2D );
+
+  // Re-evaluate features
+  planarFigure->EvaluateFeatures();
+
+  // Update rendered scene
+  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+}
+
+void mitk::PlanarFigureInteractor::MoveAnnotations(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  if ( positionEvent == nullptr )
+    return;
+
+  bool isEditable = true;
+  GetDataNode()->GetBoolProperty( "planarfigure.iseditable", isEditable );
+
+  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
+    GetDataNode()->GetData() );
+
+  const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
+  if ( planarFigureGeometry == nullptr )
+    return;
+
+  Point2D point2D;
+  planarFigureGeometry->Map( positionEvent->GetPositionInWorld(), point2D );
+
+  planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
+
+  // Move current control point to this point
+  planarFigure->SetAnnotationsPosition( point2D );
 
   // Re-evaluate features
   planarFigure->EvaluateFeatures();

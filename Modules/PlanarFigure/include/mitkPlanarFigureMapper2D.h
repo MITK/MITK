@@ -177,7 +177,9 @@ protected:
                           const mitk::Point2D anchorPoint,
                           float globalOpacity,
                           const PlanarFigureDisplayMode lineDisplayMode,
-                          double &annotationOffset );
+                          double &annotationOffset,
+                          const mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                          const mitk::PlaneGeometry * rendererPlaneGeometry);
 
   /**
   * \brief Renders the control-points.

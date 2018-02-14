@@ -126,7 +126,6 @@ public:
 
   virtual bool SetCurrentControlPoint( const Point2D& point );
 
-
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
 
@@ -292,6 +291,14 @@ public:
 
   void SetAnnotaionsBoundingBox(mitk::Overlay::Bounds points);
 
+  bool IsAnnotationsDetached();
+
+  void SetAnnotationsDetached(bool detached = true);
+
+  mitk::Point2D GetAnnotationsPosition();
+
+  bool SetAnnotationsPosition( const Point2D& point );
+
 protected:
   PlanarFigure();
 
@@ -376,6 +383,9 @@ protected:
   bool m_PreviewControlPointVisible;
 
   bool m_FigurePlaced;
+
+  bool m_DetachedAnnotations;
+  Point2D m_AnnotationPosition;
 
 private:
 

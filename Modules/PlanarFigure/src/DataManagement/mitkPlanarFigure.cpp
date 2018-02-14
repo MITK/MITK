@@ -26,6 +26,7 @@ mitk::PlanarFigure::PlanarFigure()
 : m_SelectedControlPoint( -1 ),
   m_PreviewControlPointVisible( false ),
   m_FigurePlaced( false ),
+  m_DetachedAnnotations( false ),
   m_PlaneGeometry( nullptr ),
   m_PolyLineUpToDate(false),
   m_HelperLinesUpToDate(false),
@@ -204,6 +205,32 @@ bool mitk::PlanarFigure::SetCurrentControlPoint( const Point2D& point )
   }
 
   return this->SetControlPoint(m_SelectedControlPoint, point, false);
+}
+
+
+bool mitk::PlanarFigure::IsAnnotationsDetached()
+{
+  return m_DetachedAnnotations;
+}
+
+
+void mitk::PlanarFigure::SetAnnotationsDetached(bool detached)
+{
+  m_DetachedAnnotations = detached;
+}
+
+
+mitk::Point2D mitk::PlanarFigure::GetAnnotationsPosition()
+{
+  return m_AnnotationPosition;
+}
+
+
+bool mitk::PlanarFigure::SetAnnotationsPosition( const Point2D& point )
+{
+  m_DetachedAnnotations = true;
+  m_AnnotationPosition = point;
+  return true;
 }
 
 

@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 
+#include <mitkOverlay.h>
+
 #include <deque>
 
 
@@ -56,6 +58,7 @@ class PlaneGeometry;
  * TODO: Implement local 2D transform (including center of rotation...)
  *
  */
+
 class MITKPLANARFIGURE_EXPORT PlanarFigure : public BaseData
 {
 public:
@@ -122,7 +125,6 @@ public:
   virtual bool SetControlPoint( unsigned int index, const Point2D& point, bool createIfDoesNotExist = false);
 
   virtual bool SetCurrentControlPoint( const Point2D& point );
-
 
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
@@ -285,6 +287,17 @@ public:
   */
   virtual bool Equals(const mitk::PlanarFigure& other) const;
 
+  mitk::Overlay::Bounds GetAnnotaionsBoundingBox();
+
+  void SetAnnotaionsBoundingBox(mitk::Overlay::Bounds points);
+
+  bool IsAnnotationsDetached();
+
+  void SetAnnotationsDetached(bool detached = true);
+
+  mitk::Point2D GetAnnotationsPosition();
+
+  bool SetAnnotationsPosition( const Point2D& point );
 
 protected:
   PlanarFigure();
@@ -371,6 +384,9 @@ protected:
 
   bool m_FigurePlaced;
 
+  bool m_DetachedAnnotations;
+  Point2D m_AnnotationPosition;
+
 private:
 
   // not implemented to prevent PlanarFigure::New() calls which would create an itk::Object.
@@ -411,6 +427,7 @@ private:
   // It's used to determine whether or not GetHelperPolyLine() needs to recalculate the HelperPolyLines.
   std::pair<double, unsigned int> m_DisplaySize;
 
+  mitk::Overlay::Bounds m_AnnotationsBoundingBox;
 };
 
 MITKPLANARFIGURE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );

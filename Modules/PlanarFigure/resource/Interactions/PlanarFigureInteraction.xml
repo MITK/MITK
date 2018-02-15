@@ -87,11 +87,39 @@
       <action name="select_point" />
     </transition>
 
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverAnnotation" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="hovering_above_annotation" />
+      <action name="start_hovering" />
+    </transition>
+
     <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
       <condition name="figure_is_selected" />
       <condition name="figure_can_be_deleted" />
       <action name="delete_figure" />
     </transition>
+  </state>
+
+  <state name="HoveringOverAnnotation">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
+      <condition name="hovering_above_annotation" inverted="true" />
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="HoveringOverAnnotation" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_editable" />
+      <action name="move_annotations" />
+    </transition>
+    <!--
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="HoveringOverPoint" >
+      <condition name="minimal_figure_is_finished" />
+      <condition name="figure_is_placed" />
+      <condition name="figure_is_editable" />
+      <action name="select_point" />
+      <action name="end_interaction" />
+    </transition>
+    -->
   </state>
 
   <state name="HoveringOverFigure">
@@ -123,17 +151,6 @@
       <condition name="figure_is_finished" inverted="true" />
       <action name="add_new_point" ID="10" /> <!-- AcADDPOINT -->
     </transition>
-
-<!--    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >
-      <condition name="figure_is_on_current_slice" />
-      <condition name="figure_is_selected" />
-      <condition name="point_is_valid" />
-      <condition name="figure_is_finished" />
-      <condition name="figure_is_editable" />
-      <condition name="reset_on_point_select_needed" />
-      <action name="reset_on_point_select" />
-      <action name="move_current_point" />
-    </transition> -->
 
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >
       <condition name="figure_is_on_current_slice" />

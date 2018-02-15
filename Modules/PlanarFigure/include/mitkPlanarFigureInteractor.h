@@ -87,6 +87,8 @@ protected:
 
   bool CheckControlPointHovering( const InteractionEvent* interactionEvent );
 
+  bool CheckAnnotationHovering( const InteractionEvent* interactionEvent );
+
   bool CheckSelection( const InteractionEvent* interactionEvent );
 
   bool CheckPointValidity( const InteractionEvent* interactionEvent );
@@ -113,6 +115,8 @@ protected:
   void FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent );
 
   void MoveCurrentPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+
+  void MoveAnnotations(StateMachineAction*, InteractionEvent* interactionEvent);
 
   void DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 

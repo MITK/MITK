@@ -171,12 +171,15 @@ protected:
   /**
   * \brief Renders the text annotations.
   */
-  void RenderAnnotations( mitk::BaseRenderer * renderer,
+  void RenderAnnotations( mitk::PlanarFigure * planarFigure,
+                          mitk::BaseRenderer * renderer,
                           const std::string name,
                           const mitk::Point2D anchorPoint,
                           float globalOpacity,
                           const PlanarFigureDisplayMode lineDisplayMode,
-                          double &annotationOffset );
+                          double &annotationOffset,
+                          const mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                          const mitk::PlaneGeometry * rendererPlaneGeometry);
 
   /**
   * \brief Renders the control-points.

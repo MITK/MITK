@@ -70,6 +70,7 @@ public:
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds) override;
 
   void SetOrientation(const TextOrientation& orientation);
+  TextOrientation GetOrientation();
 
 protected:
 

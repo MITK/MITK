@@ -118,6 +118,8 @@ protected:
 
   void MoveAnnotations(StateMachineAction*, InteractionEvent* interactionEvent);
 
+  void AttachAnnotations(StateMachineAction*, InteractionEvent* interactionEvent);
+
   void DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
   void AddPoint(StateMachineAction*, InteractionEvent* interactionEvent);

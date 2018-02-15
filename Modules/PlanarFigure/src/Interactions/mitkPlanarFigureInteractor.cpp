@@ -69,6 +69,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "set_preview_point_position", SetPreviewPointPosition )
   CONNECT_FUNCTION( "move_current_point", MoveCurrentPoint);
   CONNECT_FUNCTION( "move_annotations", MoveAnnotations);
+  CONNECT_FUNCTION( "attach_annotations", AttachAnnotations);
   CONNECT_FUNCTION( "deselect_point", DeselectPoint);
   CONNECT_FUNCTION( "add_new_point", AddPoint);
   CONNECT_FUNCTION( "add_initial_point", AddInitialPoint);
@@ -148,11 +149,11 @@ void mitk::PlanarFigureInteractor::MoveAnnotations(StateMachineAction*, Interact
   if ( positionEvent == nullptr )
     return;
 
-  bool isEditable = true;
-  GetDataNode()->GetBoolProperty( "planarfigure.iseditable", isEditable );
-
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     GetDataNode()->GetData() );
+
+  if ( planarFigure == nullptr )
+    return;
 
   const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   if ( planarFigureGeometry == nullptr )
@@ -171,6 +172,25 @@ void mitk::PlanarFigureInteractor::MoveAnnotations(StateMachineAction*, Interact
 
   // Update rendered scene
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+}
+
+void mitk::PlanarFigureInteractor::AttachAnnotations(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  if ( positionEvent == nullptr )
+    return;
+
+  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
+    GetDataNode()->GetData() );
+
+  if ( planarFigure == nullptr )
+    return;
+
+  const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
+  if ( planarFigureGeometry == nullptr )
+    return;
+
+  planarFigure->SetAnnotationsDetached(false);
 }
 
 void mitk::PlanarFigureInteractor::FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent )

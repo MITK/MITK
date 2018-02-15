@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageGenerator.h>
 
 // Qmitk
-#include "IGTFiducialRegistration.h"
+#include "QmitkIGTFiducialRegistration.h"
 
 // Qt
 #include <QMessageBox>
@@ -40,13 +40,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include "usServiceReference.h"
 
-const std::string IGTFiducialRegistration::VIEW_ID = "org.mitk.views.IGTFiducialRegistration";
+const std::string QmitkIGTFiducialRegistration::VIEW_ID = "org.mitk.views.IGTFiducialRegistration";
 
-void IGTFiducialRegistration::SetFocus()
+void QmitkIGTFiducialRegistration::SetFocus()
 {
 }
 
-void IGTFiducialRegistration::CreateQtPartControl( QWidget *parent )
+void QmitkIGTFiducialRegistration::CreateQtPartControl( QWidget *parent )
 {
 
   // create GUI widgets from the Qt Designer's .ui file
@@ -69,7 +69,7 @@ void IGTFiducialRegistration::CreateQtPartControl( QWidget *parent )
 
 }
 
-void IGTFiducialRegistration::InitializeRegistration()
+void QmitkIGTFiducialRegistration::InitializeRegistration()
 {
   foreach(QmitkRenderWindow* renderWindow, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
   {
@@ -77,7 +77,7 @@ void IGTFiducialRegistration::InitializeRegistration()
   }
 }
 
-void IGTFiducialRegistration::PointerSelectionChanged()
+void QmitkIGTFiducialRegistration::PointerSelectionChanged()
 {
   InitializeRegistration();
   int toolID = m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedToolID();
@@ -86,19 +86,19 @@ void IGTFiducialRegistration::PointerSelectionChanged()
   m_Controls.m_PointerLabel->setText(m_Controls.m_TrackingDeviceSelectionWidget->GetSelectedNavigationTool()->GetToolName().c_str());
 }
 
-void IGTFiducialRegistration::ImageSelectionChanged()
+void QmitkIGTFiducialRegistration::ImageSelectionChanged()
 {
   InitializeRegistration();
   m_Controls.m_ImageLabel->setText(m_Controls.m_DataStorageComboBox->GetSelectedNode()->GetName().c_str());
   m_Controls.m_FiducialRegistrationWidget->setImageNode(m_Controls.m_DataStorageComboBox->GetSelectedNode());
 }
 
-IGTFiducialRegistration::IGTFiducialRegistration()
+QmitkIGTFiducialRegistration::QmitkIGTFiducialRegistration()
 {
 
 }
 
-IGTFiducialRegistration::~IGTFiducialRegistration()
+QmitkIGTFiducialRegistration::~QmitkIGTFiducialRegistration()
 {
 
 }

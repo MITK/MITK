@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef UltrasoundSupport_h
-#define UltrasoundSupport_h
+#ifndef QmitkUltrasoundSupport_h
+#define QmitkUltrasoundSupport_h
 
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_UltrasoundSupportControls.h"
+#include "ui_QmitkUltrasoundSupportControls.h"
 #include "QmitkUSAbstractCustomWidget.h"
 #include "QmitkUSControlsBModeWidget.h"
 #include "QmitkUSControlsDopplerWidget.h"
@@ -46,7 +46,7 @@ This plugin provides functionality to manage Ultrasound devices, create video de
 
 \ingroup ${plugin_target}_internal
 */
-class UltrasoundSupport : public QmitkAbstractView
+class QmitkUltrasoundSupport : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -60,8 +60,8 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  UltrasoundSupport();
-  virtual ~UltrasoundSupport();
+  QmitkUltrasoundSupport();
+  virtual ~QmitkUltrasoundSupport();
 
   public slots:
   /*

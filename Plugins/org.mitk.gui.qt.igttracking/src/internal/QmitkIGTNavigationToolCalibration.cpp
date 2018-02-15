@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "IGTNavigationToolCalibration.h"
+#include "QmitkIGTNavigationToolCalibration.h"
 
 // mitk
 #include <mitkNavigationToolWriter.h>
@@ -42,14 +42,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-const std::string IGTNavigationToolCalibration::VIEW_ID = "org.mitk.views.igtnavigationtoolcalibration";
+const std::string QmitkIGTNavigationToolCalibration::VIEW_ID = "org.mitk.views.igtnavigationtoolcalibration";
 
-IGTNavigationToolCalibration::IGTNavigationToolCalibration()
+QmitkIGTNavigationToolCalibration::QmitkIGTNavigationToolCalibration()
 {
   m_ToolTransformationWidget = new QmitkInteractiveTransformationWidget();
 }
 
-IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
+QmitkIGTNavigationToolCalibration::~QmitkIGTNavigationToolCalibration()
 {
 //The following code is required due to a bug in the point list widget.
 //If this is removed, MITK crashes when closing the view:
@@ -63,12 +63,12 @@ m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(nullptr);
   delete m_ToolTransformationWidget;
 }
 
-void IGTNavigationToolCalibration::SetFocus()
+void QmitkIGTNavigationToolCalibration::SetFocus()
 {
 
 }
 
-void IGTNavigationToolCalibration::OnToolCalibrationMethodChanged(int index)
+void QmitkIGTNavigationToolCalibration::OnToolCalibrationMethodChanged(int index)
 {
   //if pivot calibration (3) or manual(0) is chosen only calibration pointer is needed
   if (index == 0 || index == 3) {
@@ -86,7 +86,7 @@ void IGTNavigationToolCalibration::OnToolCalibrationMethodChanged(int index)
   m_IndexCurrentCalibrationMethod = index;
 }
 
-void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
+void QmitkIGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
 {
   m_TrackingTimer = new QTimer(this);
 
@@ -143,7 +143,7 @@ void IGTNavigationToolCalibration::CreateQtPartControl(QWidget *parent)
 }
 
 
-void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
+void QmitkIGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
 {
   if (!CheckInitialization()) { return; }
 
@@ -208,7 +208,7 @@ void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
 
 }
 
-void IGTNavigationToolCalibration::OnLoginSingleRefToolNavigationDataClicked()
+void QmitkIGTNavigationToolCalibration::OnLoginSingleRefToolNavigationDataClicked()
 {
 
   if (!CheckInitialization()) { return; }
@@ -223,7 +223,7 @@ void IGTNavigationToolCalibration::OnLoginSingleRefToolNavigationDataClicked()
   MITK_INFO << "Collecting " << m_NumberOfNavigationData << " NavigationData ... " << endl;
 }
 
-void IGTNavigationToolCalibration::LoginSingleRefToolNavigationData()
+void QmitkIGTNavigationToolCalibration::LoginSingleRefToolNavigationData()
 {
   if (!CheckInitialization()) { return; }
 
@@ -267,13 +267,13 @@ void IGTNavigationToolCalibration::LoginSingleRefToolNavigationData()
   }
 }
 
-void IGTNavigationToolCalibration::OnSetNewToolTipPosButtonClicked()
+void QmitkIGTNavigationToolCalibration::OnSetNewToolTipPosButtonClicked()
 {
   ApplyToolTipTransform(m_ComputedToolTipTransformation);
   RemoveToolTipPreview();
 }
 
-void IGTNavigationToolCalibration::ClearOldPivot()
+void QmitkIGTNavigationToolCalibration::ClearOldPivot()
 {
   mitk::NavigationData::Pointer tempND = mitk::NavigationData::New();
   this->ApplyToolTipTransform(tempND);
@@ -281,7 +281,7 @@ void IGTNavigationToolCalibration::ClearOldPivot()
   //m_ManualToolTipEditWidget->hide(); //TODO
   this->GetDataStorage()->Remove(m_ToolSurfaceInToolCoordinatesDataNode);
 }
-void IGTNavigationToolCalibration::OnAddPivotPose()
+void QmitkIGTNavigationToolCalibration::OnAddPivotPose()
 {
   ClearOldPivot();
   //When the collect Poses Button is Clicked
@@ -290,7 +290,7 @@ void IGTNavigationToolCalibration::OnAddPivotPose()
 
 }
 
-void IGTNavigationToolCalibration::AddPivotPose()
+void QmitkIGTNavigationToolCalibration::AddPivotPose()
 {
   //Save the poses to be used in computation
   if (PivotCount < m_NumberOfNavigationData)
@@ -307,7 +307,7 @@ void IGTNavigationToolCalibration::AddPivotPose()
   }
 }
 
-void IGTNavigationToolCalibration::OnComputePivot()
+void QmitkIGTNavigationToolCalibration::OnComputePivot()
 {
 
   mitk::PivotCalibration::Pointer myPivotCalibration = mitk::PivotCalibration::New();
@@ -361,7 +361,7 @@ void IGTNavigationToolCalibration::OnComputePivot()
   m_Controls.m_ResultText->setText(resultString);
 
 }
-void IGTNavigationToolCalibration::UpdatePivotCount()
+void QmitkIGTNavigationToolCalibration::UpdatePivotCount()
 {
   PivotCount = 0;
   while (!m_PivotPoses.empty())
@@ -371,7 +371,7 @@ void IGTNavigationToolCalibration::UpdatePivotCount()
   m_Controls.m_PoseNumber->setText(QString::number(PivotCount));
 }
 
-void IGTNavigationToolCalibration::OnUseComputedPivotPoint()
+void QmitkIGTNavigationToolCalibration::OnUseComputedPivotPoint()
 {
   RemoveToolTipPreview();
   QString resultString = QString("Pivoted tool tip transformation was written to the tool ") + m_ToolToCalibrate->GetToolName().c_str();
@@ -380,7 +380,7 @@ void IGTNavigationToolCalibration::OnUseComputedPivotPoint()
   UpdatePivotCount();
 }
 
-void IGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationData::Pointer ToolTipTransformInToolCoordinates, std::string message)
+void QmitkIGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationData::Pointer ToolTipTransformInToolCoordinates, std::string message)
 {
   if (!CheckInitialization(false)) { return; }
 
@@ -403,7 +403,7 @@ void IGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationData::P
   MITK_INFO << message;
 }
 
-void IGTNavigationToolCalibration::ShowToolTipPreview(mitk::NavigationData::Pointer ToolTipInTrackingCoordinates)
+void QmitkIGTNavigationToolCalibration::ShowToolTipPreview(mitk::NavigationData::Pointer ToolTipInTrackingCoordinates)
 {
   if(m_ToolTipPointPreview.IsNull())
   {
@@ -425,11 +425,11 @@ void IGTNavigationToolCalibration::ShowToolTipPreview(mitk::NavigationData::Poin
   m_ToolTipPointPreview->GetData()->GetGeometry()->SetIndexToWorldTransform(ToolTipInTrackingCoordinates->GetAffineTransform3D());
 }
 
-void IGTNavigationToolCalibration::RemoveToolTipPreview()
+void QmitkIGTNavigationToolCalibration::RemoveToolTipPreview()
 {
   this->GetDataStorage()->Remove(m_ToolTipPointPreview.GetPointer());
 }
-void IGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
+void QmitkIGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
 {
   if (m_ToolToCalibrate.IsNull()) { return; }
   //parse human readable transformation data and display it
@@ -449,7 +449,7 @@ void IGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
   m_Controls.m_ManualCurrentOrientation->setPlainText(orientation.str().c_str());
 }
 
-void IGTNavigationToolCalibration::OnStartManualToolTipCalibration()
+void QmitkIGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 {
   if (!CheckInitialization(false)) { return; }
 
@@ -460,7 +460,7 @@ void IGTNavigationToolCalibration::OnStartManualToolTipCalibration()
   m_ToolTransformationWidget->open();
 }
 
-void IGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
+void QmitkIGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip)
 {
   //This function is called, when the toolTipEdit view is closed.
   //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
@@ -475,7 +475,7 @@ void IGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::AffineTrans
   UpdateManualToolTipCalibrationView();
 }
 
-void IGTNavigationToolCalibration::OnGetPositions()
+void QmitkIGTNavigationToolCalibration::OnGetPositions()
 {
   if (!CheckInitialization(true)) { return; }
 
@@ -500,7 +500,7 @@ void IGTNavigationToolCalibration::OnGetPositions()
   m_Controls.m_ToolAxisPositionLabel->setText(_label);
 }
 
-void IGTNavigationToolCalibration::OnCalibrateToolAxis()
+void QmitkIGTNavigationToolCalibration::OnCalibrateToolAxis()
 {
   if (!m_AxisCalibration_ToolToCalibrate || !m_AxisCalibration_NavDataCalibratingTool)
   {
@@ -536,7 +536,7 @@ void IGTNavigationToolCalibration::OnCalibrateToolAxis()
   m_Controls.m_ToolAxis_X->blockSignals(false); m_Controls.m_ToolAxis_Y->blockSignals(false); m_Controls.m_ToolAxis_Z->blockSignals(false);
 }
 
-void IGTNavigationToolCalibration::OnToolAxisSpinboxChanged()
+void QmitkIGTNavigationToolCalibration::OnToolAxisSpinboxChanged()
 {
   m_CalibratedToolAxis.SetElement(0, m_Controls.m_ToolAxis_X->value());
   m_CalibratedToolAxis.SetElement(1, m_Controls.m_ToolAxis_Y->value());
@@ -545,7 +545,7 @@ void IGTNavigationToolCalibration::OnToolAxisSpinboxChanged()
   MITK_INFO << "Tool axis changed to " << m_CalibratedToolAxis;
 }
 
-void IGTNavigationToolCalibration::SetToolToCalibrate()
+void QmitkIGTNavigationToolCalibration::SetToolToCalibrate()
 {
   m_IDToolToCalibrate = m_Controls.m_SelectionWidget->GetSelectedToolID();
   if (m_IDToolToCalibrate == -1) //no valid tool to calibrate
@@ -588,7 +588,7 @@ void IGTNavigationToolCalibration::SetToolToCalibrate()
   }
 }
 
-void IGTNavigationToolCalibration::SetCalibrationPointer()
+void QmitkIGTNavigationToolCalibration::SetCalibrationPointer()
 {
   m_IDCalibrationPointer = m_Controls.m_SelectionWidget->GetSelectedToolID();
   if (m_IDCalibrationPointer == -1)
@@ -611,7 +611,7 @@ void IGTNavigationToolCalibration::SetCalibrationPointer()
   }
 }
 
-void IGTNavigationToolCalibration::UpdateOffsetCoordinates()
+void QmitkIGTNavigationToolCalibration::UpdateOffsetCoordinates()
 {
   if (m_NavigationDataSourceOfCalibrationPointer.IsNull() || m_NavigationDataSourceOfToolToCalibrate.IsNull())
   {
@@ -654,7 +654,7 @@ void IGTNavigationToolCalibration::UpdateOffsetCoordinates()
   }
 }
 
-void IGTNavigationToolCalibration::UpdateTrackingTimer()
+void QmitkIGTNavigationToolCalibration::UpdateTrackingTimer()
 {
   m_Controls.m_StatusWidgetToolToCalibrate->Refresh();
   m_Controls.m_StatusWidgetCalibrationPointer->Refresh();
@@ -668,7 +668,7 @@ void IGTNavigationToolCalibration::UpdateTrackingTimer()
 
 }
 
-void IGTNavigationToolCalibration::AddLandmark()
+void QmitkIGTNavigationToolCalibration::AddLandmark()
 {
   if (!CheckInitialization()) { return; }
   mitk::NavigationData::Pointer navDataTool = m_NavigationDataSourceOfToolToCalibrate->GetOutput(m_IDToolToCalibrate);
@@ -697,7 +697,7 @@ void IGTNavigationToolCalibration::AddLandmark()
   m_RegistrationLandmarks->InsertPoint(m_RegistrationLandmarks->GetSize(), landmark);
 }
 
-void IGTNavigationToolCalibration::SaveCalibratedTool()
+void QmitkIGTNavigationToolCalibration::SaveCalibratedTool()
 {
   if (m_ToolToCalibrate.IsNotNull())
   {
@@ -717,7 +717,7 @@ void IGTNavigationToolCalibration::SaveCalibratedTool()
   }
 }
 
-bool IGTNavigationToolCalibration::CheckInitialization(bool CalibrationPointerRequired)
+bool QmitkIGTNavigationToolCalibration::CheckInitialization(bool CalibrationPointerRequired)
 {
   if ((m_IDToolToCalibrate == -1) ||
     ((CalibrationPointerRequired) &&

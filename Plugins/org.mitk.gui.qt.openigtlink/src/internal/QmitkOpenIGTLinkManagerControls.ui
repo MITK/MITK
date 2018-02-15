@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>OpenIGTLinkManagerControls</class>
+ <class>QmitkOpenIGTLinkManagerControls</class>
  <widget class="QWidget" name="OpenIGTLinkManagerControls">
   <property name="geometry">
    <rect>

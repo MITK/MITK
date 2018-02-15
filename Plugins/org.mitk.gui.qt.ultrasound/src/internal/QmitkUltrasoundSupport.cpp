@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHBoxLayout>
 
 // Qmitk
-#include "UltrasoundSupport.h"
+#include "QmitkUltrasoundSupport.h"
 // Qt
 #include <QMessageBox>
 #include <QSettings>
@@ -50,13 +50,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 #include <mitkRenderingModeProperty.h>
 
-const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
+const std::string QmitkUltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
-void UltrasoundSupport::SetFocus()
+void QmitkUltrasoundSupport::SetFocus()
 {
 }
 
-void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
+void QmitkUltrasoundSupport::CreateQtPartControl(QWidget *parent)
 {
   //initialize timers
   m_UpdateTimer = new QTimer(this);
@@ -103,7 +103,7 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   m_Controls.tabWidget->setTabEnabled(1, false);
 }
 
-void UltrasoundSupport::CreateWindows()
+void QmitkUltrasoundSupport::CreateWindows()
 {
   auto pausViewer = GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.photoacoustics.pausviewer");
   if (pausViewer != nullptr)
@@ -120,7 +120,7 @@ void UltrasoundSupport::CreateWindows()
   }
 }
 
-void UltrasoundSupport::InitNewNode()
+void QmitkUltrasoundSupport::InitNewNode()
 {
   m_Node.push_back(nullptr);
   auto& Node = m_Node.back();
@@ -142,7 +142,7 @@ void UltrasoundSupport::InitNewNode()
     m_PADataStorage->Add(Node);
 }
 
-void UltrasoundSupport::DestroyLastNode()
+void QmitkUltrasoundSupport::DestroyLastNode()
 {
   auto& Node = m_Node.back();
 
@@ -160,7 +160,7 @@ void UltrasoundSupport::DestroyLastNode()
   m_Node.pop_back();
 }
 
-void UltrasoundSupport::UpdateLevelWindows()
+void QmitkUltrasoundSupport::UpdateLevelWindows()
 {
   mitk::LevelWindow levelWindow;
 
@@ -184,7 +184,7 @@ void UltrasoundSupport::UpdateLevelWindows()
   }
 }
 
-void UltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type)
+void QmitkUltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type)
 {
   // consider removing this, unused for now, and probably forever
 
@@ -199,7 +199,7 @@ void UltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTa
   renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
 }
 
-void UltrasoundSupport::OnClickedAddNewDevice()
+void QmitkUltrasoundSupport::OnClickedAddNewDevice()
 {
   m_Controls.m_NewVideoDeviceWidget->setVisible(true);
   m_Controls.m_DeviceManagerWidget->setVisible(false);
@@ -207,7 +207,7 @@ void UltrasoundSupport::OnClickedAddNewDevice()
   m_Controls.m_WidgetActiveDevices->setVisible(false);
 }
 
-void UltrasoundSupport::OnClickedEditDevice()
+void QmitkUltrasoundSupport::OnClickedEditDevice()
 {
   m_Controls.m_NewVideoDeviceWidget->setVisible(true);
   m_Controls.m_DeviceManagerWidget->setVisible(false);
@@ -215,7 +215,7 @@ void UltrasoundSupport::OnClickedEditDevice()
   m_Controls.m_Headline->setText("Edit Video Device:");
 }
 
-void UltrasoundSupport::UpdateAmountOfOutputs()
+void QmitkUltrasoundSupport::UpdateAmountOfOutputs()
 {
   // Update the amount of Nodes; there should be one Node for every slide that is set. Note that we must check whether the slices are set, 
   // just using the m_Image->dimension(3) will produce nullpointers on slices of the image that were not set
@@ -249,7 +249,7 @@ void UltrasoundSupport::UpdateAmountOfOutputs()
   }
 }
 
-void UltrasoundSupport::UpdateImage()
+void QmitkUltrasoundSupport::UpdateImage()
 {
   if(m_Controls.m_ShowImageStream->isChecked())
   {
@@ -351,7 +351,7 @@ void UltrasoundSupport::UpdateImage()
   }
 }
 
-void UltrasoundSupport::RenderImage2d()
+void QmitkUltrasoundSupport::RenderImage2d()
 {
   if (!m_Controls.m_Update2DView->isChecked())
     return;
@@ -383,7 +383,7 @@ void UltrasoundSupport::RenderImage2d()
   }
 }
 
-void UltrasoundSupport::RenderImage3d()
+void QmitkUltrasoundSupport::RenderImage3d()
 {
   if (!m_Controls.m_Update3DView->isChecked())
     return;
@@ -400,7 +400,7 @@ void UltrasoundSupport::RenderImage3d()
   }
 }
 
-void UltrasoundSupport::OnChangedFramerateLimit()
+void QmitkUltrasoundSupport::OnChangedFramerateLimit()
 {
   StopTimers();
   int intervalPipeline = (1000 / m_Controls.m_FrameRatePipeline->value());
@@ -410,7 +410,7 @@ void UltrasoundSupport::OnChangedFramerateLimit()
   StartTimers();
 }
 
-void UltrasoundSupport::OnClickedFreezeButton()
+void QmitkUltrasoundSupport::OnClickedFreezeButton()
 {
   if (m_Device.IsNull())
   {
@@ -429,7 +429,7 @@ void UltrasoundSupport::OnClickedFreezeButton()
   }
 }
 
-void UltrasoundSupport::OnChangedActiveDevice()
+void QmitkUltrasoundSupport::OnChangedActiveDevice()
 {
   //clean up, delete nodes and stop timer
   StopTimers();
@@ -475,7 +475,7 @@ void UltrasoundSupport::OnChangedActiveDevice()
   CreateWindows();
 }
 
-void UltrasoundSupport::OnNewDeviceWidgetDone()
+void QmitkUltrasoundSupport::OnNewDeviceWidgetDone()
 {
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
   m_Controls.m_DeviceManagerWidget->setVisible(true);
@@ -483,7 +483,7 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_WidgetActiveDevices->setVisible(true);
 }
 
-void UltrasoundSupport::CreateControlWidgets()
+void QmitkUltrasoundSupport::CreateControlWidgets()
 {
   m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.m_ToolBoxControlWidgets);
   m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
@@ -539,7 +539,7 @@ void UltrasoundSupport::CreateControlWidgets()
   }
 }
 
-void UltrasoundSupport::RemoveControlWidgets()
+void QmitkUltrasoundSupport::RemoveControlWidgets()
 {
   if (!m_ControlProbesWidget) { return; } //widgets do not exist... nothing to do
 
@@ -572,7 +572,7 @@ void UltrasoundSupport::RemoveControlWidgets()
   }
 }
 
-void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
+void QmitkUltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
   if (m_Device.IsNull() || event.getType() != static_cast<ctkServiceEvent::Type>(us::ServiceEvent::MODIFIED))
   {
@@ -608,7 +608,7 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
   }
 }
 
-UltrasoundSupport::UltrasoundSupport()
+QmitkUltrasoundSupport::QmitkUltrasoundSupport()
   : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
   m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0),
@@ -624,7 +624,7 @@ UltrasoundSupport::UltrasoundSupport()
   }
 }
 
-UltrasoundSupport::~UltrasoundSupport()
+QmitkUltrasoundSupport::~QmitkUltrasoundSupport()
 {
   try
   {
@@ -647,7 +647,7 @@ UltrasoundSupport::~UltrasoundSupport()
   }
 }
 
-void UltrasoundSupport::StoreUISettings()
+void QmitkUltrasoundSupport::StoreUISettings()
 {
   QSettings settings;
   settings.beginGroup(QString::fromStdString(VIEW_ID));
@@ -661,7 +661,7 @@ void UltrasoundSupport::StoreUISettings()
   settings.endGroup();
 }
 
-void UltrasoundSupport::LoadUISettings()
+void QmitkUltrasoundSupport::LoadUISettings()
 {
   QSettings settings;
   settings.beginGroup(QString::fromStdString(VIEW_ID));
@@ -675,21 +675,21 @@ void UltrasoundSupport::LoadUISettings()
   settings.endGroup();
 }
 
-void UltrasoundSupport::StartTimers()
+void QmitkUltrasoundSupport::StartTimers()
 {
   m_UpdateTimer->start();
   if (m_Controls.m_Update2DView->isChecked()) { m_RenderingTimer2d->start(); }
   if (m_Controls.m_Update3DView->isChecked()) { m_RenderingTimer3d->start(); }
 }
 
-void UltrasoundSupport::StopTimers()
+void QmitkUltrasoundSupport::StopTimers()
 {
   m_UpdateTimer->stop();
   m_RenderingTimer2d->stop();
   m_RenderingTimer3d->stop();
 }
 
-void UltrasoundSupport::SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D)
+void QmitkUltrasoundSupport::SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D)
 {
   m_UpdateTimer->setInterval(intervalPipeline);
   m_RenderingTimer2d->setInterval(interval2D);

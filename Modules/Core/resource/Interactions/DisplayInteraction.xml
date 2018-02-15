@@ -54,6 +54,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="MousePressEvent"  event_variant="StartAdjustLevelWindow" target="adjustlevelwindow">
             <action name="init"/>
         </transition>
+        <transition event_class="MousePressEvent" event_variant="MouseRotationPress" target="mouseCameraRotation">
+            <action name="init"/>
+        </transition>
         <transition event_class="InteractionKeyEvent" event_variant="StdArrowRight" target="start" >
           <action name="rotate" />
         </transition>
@@ -93,10 +96,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
             <condition name="check_can_swivel" inverted="true"/>
         </transition>
 
-        <transition event_class="InternalEvent" event_variant="MouseCameraRotation" target="mouseCameraRotation">
-            <condition name="check_is_in_mouse_rotation_mode"/>
-            <action name="startMouseCameraRotation"/>
-        </transition>
     </state>
     <state name="crosshair">
       <transition event_class="InteractionPositionEvent"  event_variant="MoveCrosshair" target="crosshair">
@@ -211,18 +210,11 @@ TODO Std move to abort interaction of scroll/pan/zoom
       <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
     </state>
     <state name="mouseCameraRotation">
-        <transition event_class="MousePressEvent" event_variant="SetCrosshair" target="mouseCameraRotation">
-            <action name="init"/>
-        </transition>
-        <transition event_class="MouseMoveEvent" event_variant="MoveCrosshair" target="mouseCameraRotation">
+        <transition event_class="MouseMoveEvent" event_variant="MouseRotationMove" target="mouseCameraRotation">
             <action name="mouseRotateCamera"/>
         </transition>
-        <transition event_class="MouseReleaseEvent" event_variant="EndMoveCrosshair" target="start">
+        <transition event_class="MouseReleaseEvent" event_variant="MouseRotationRelease" target="start">
             <action name="stopMouseCameraRotation"/>
-        </transition>
-        <transition event_class="InternalEvent" event_variant="MouseCameraRotation" target="start">
-            <action name="stopMouseCameraRotation"/>
-            <condition name="check_is_in_mouse_rotation_mode" inverted="true"/>
         </transition>
     </state>
 

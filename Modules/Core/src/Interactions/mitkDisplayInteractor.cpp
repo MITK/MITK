@@ -93,14 +93,11 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("selectObject", SelectObject);
   CONNECT_FUNCTION("deSelectObject", DeSelectObject);
 
-  CONNECT_FUNCTION("startMouseCameraRotation", StartMouseRotation);
   CONNECT_FUNCTION("mouseRotateCamera", MouseRotateCamera);
-  CONNECT_FUNCTION("stopMouseCameraRotation", StopMouseRotation);
 }
 
 double mitk::DisplayInteractor::m_ClockRotationSpeed = 90.;
 bool mitk::DisplayInteractor::m_MouseRotationMode = false;
-std::function<void(std::string) > mitk::DisplayInteractor::m_CurrentCallbackFunction = nullptr;
 
 mitk::DisplayInteractor::DisplayInteractor()
   : m_Selector(true)
@@ -134,13 +131,6 @@ bool mitk::DisplayInteractor::CheckPositionEvent( const InteractionEvent* intera
 void mitk::DisplayInteractor::SetSelectionMode(bool selection)
 {
   m_SelectionMode = selection;
-}
-
-void mitk::DisplayInteractor::SetMouseRotationMode(bool active, std::function<void(std::string) > globalCallback)
-{
-  m_MouseRotationMode = active;
-  m_CurrentCallbackFunction = globalCallback;
-  globalCallback("MouseCameraRotation");
 }
 
 bool mitk::DisplayInteractor::GetMouseRotationMode()
@@ -736,11 +726,6 @@ void mitk::DisplayInteractor::EndRotation(mitk::StateMachineAction *, mitk::Inte
   this->ResetMouseCursor();
 }
 
-void mitk::DisplayInteractor::StartMouseRotation(StateMachineAction* state, InteractionEvent* e)
-{
-  StartRotation(state, e);
-}
-
 void mitk::DisplayInteractor::MouseRotateCamera(StateMachineAction*, InteractionEvent* e)
 {
   const InteractionPositionEvent* posEvent = dynamic_cast<const InteractionPositionEvent*>(e);
@@ -755,12 +740,6 @@ void mitk::DisplayInteractor::MouseRotateCamera(StateMachineAction*, Interaction
   RotateCameraImpl(e->GetSender(), -movementVector[0]);
 }
 
-void mitk::DisplayInteractor::StopMouseRotation(StateMachineAction* state, InteractionEvent* e)
-{
-  EndRotation(state, e);
-  m_MouseRotationMode = false;
-  m_CurrentCallbackFunction("MouseCameraRotation");
-}
 
 void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::InteractionEvent * event)
 {

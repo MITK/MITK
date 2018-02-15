@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef USNAVIGATIONMARKERPLACEMENT_H
-#define USNAVIGATIONMARKERPLACEMENT_H
+#ifndef QmitkUSNAVIGATIONMARKERPLACEMENT_H
+#define QmitkUSNAVIGATIONMARKERPLACEMENT_H
 
 #include <QmitkAbstractView.h>
 
@@ -43,7 +43,7 @@ namespace mitk
 
 namespace Ui
 {
-  class USNavigationMarkerPlacement;
+  class QmitkUSNavigationMarkerPlacement;
 }
 
 class QmitkUSAbstractNavigationStep;
@@ -61,7 +61,7 @@ class QSignalMapper;
 * An experiment mode allows for logging results, durations and the ultrasound
 * images.
 */
-class USNavigationMarkerPlacement : public QmitkAbstractView
+class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
 {
   Q_OBJECT
 
@@ -133,8 +133,8 @@ public:
   static const char *DATANAME_TARGETS_PATHS;
   static const char *DATANAME_REACHED_TARGETS;
 
-  explicit USNavigationMarkerPlacement();
-  ~USNavigationMarkerPlacement();
+  explicit QmitkUSNavigationMarkerPlacement();
+  ~QmitkUSNavigationMarkerPlacement();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -208,9 +208,9 @@ protected:
   mitk::NavigationToolStorage::Pointer m_CurrentStorage;
 
 private:
-  mitk::MessageDelegate2<USNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;
+  mitk::MessageDelegate2<QmitkUSNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;
 
-  Ui::USNavigationMarkerPlacement *ui;
+  Ui::QmitkUSNavigationMarkerPlacement *ui;
 };
 
 #endif // USNAVIGATIONMARKERPLACEMENT_H

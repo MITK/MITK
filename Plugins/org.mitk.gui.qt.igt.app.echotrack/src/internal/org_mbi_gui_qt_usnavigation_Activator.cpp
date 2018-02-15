@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 //#include "USNavigation.h"
-#include "UltrasoundCalibration.h"
-#include "USNavigationMarkerPlacement.h"
+#include "QmitkUltrasoundCalibration.h"
+#include "QmitkUSNavigationMarkerPlacement.h"
 #include "QmitkUSNavigationPerspective.h"
 
 #include "mitkVirtualTrackingDevice.h"
@@ -34,8 +34,8 @@ namespace mitk {
     m_Context = context;
 
     //BERRY_REGISTER_EXTENSION_CLASS(USNavigation, context)
-    BERRY_REGISTER_EXTENSION_CLASS(UltrasoundCalibration, context)
-      BERRY_REGISTER_EXTENSION_CLASS(USNavigationMarkerPlacement, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkUltrasoundCalibration, context)
+      BERRY_REGISTER_EXTENSION_CLASS(QmitkUSNavigationMarkerPlacement, context)
       BERRY_REGISTER_EXTENSION_CLASS(QmitkUSNavigationPerspective, context)
 
       // create a combined modality persistence object for loading and storing

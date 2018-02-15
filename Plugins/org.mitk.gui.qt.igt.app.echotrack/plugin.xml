@@ -8,7 +8,7 @@
     <view id="org.mitk.views.usmarkerplacement"
           name="IGT EchoTrack"
           category="IGT"
-          class="USNavigationMarkerPlacement"
+          class="QmitkUSNavigationMarkerPlacement"
           icon="resources/icon2.xpm" />
     <view id="org.mitk.views.ultrasoundcalibration"
           name="IGT EchoTrack Calibration"

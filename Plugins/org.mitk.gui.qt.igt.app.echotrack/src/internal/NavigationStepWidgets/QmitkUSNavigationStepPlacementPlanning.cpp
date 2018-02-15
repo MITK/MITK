@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../Filter/mitkUSNavigationTargetIntersectionFilter.h"
 #include "../Filter/mitkUSNavigationTargetUpdateFilter.h"
 
-#include "../USNavigationMarkerPlacement.h"
+#include "../QmitkUSNavigationMarkerPlacement.h"
 
 #include "mitkLookupTableProperty.h"
 #include "mitkSurface.h"
@@ -91,9 +91,9 @@ bool QmitkUSNavigationStepPlacementPlanning::OnStartStep()
   node->SetBoolProperty("show contour", true);
 
   // make sure that the targets node exist in the data storage
-  this->GetNamedDerivedNodeAndCreate(USNavigationMarkerPlacement::DATANAME_TARGETS,
+  this->GetNamedDerivedNodeAndCreate(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETS,
                                      QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
-  this->GetNamedDerivedNodeAndCreate(USNavigationMarkerPlacement::DATANAME_TARGETS_PATHS,
+  this->GetNamedDerivedNodeAndCreate(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETS_PATHS,
                                      QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
 
   // listen to event of point mark interactor
@@ -131,7 +131,7 @@ bool QmitkUSNavigationStepPlacementPlanning::OnStopStep()
   m_PlannedNeedlePaths.clear();
 
   // remove the targets node from the data storage
-  mitk::DataNode::Pointer targetsNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TARGETS,
+  mitk::DataNode::Pointer targetsNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETS,
                                                                   QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   if (targetsNode.IsNotNull())
   {
@@ -140,7 +140,7 @@ bool QmitkUSNavigationStepPlacementPlanning::OnStopStep()
 
   // remove the target paths node from the data storage
   mitk::DataNode::Pointer targetPathsNode = this->GetNamedDerivedNode(
-    USNavigationMarkerPlacement::DATANAME_TARGETS_PATHS, QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
+    QmitkUSNavigationMarkerPlacement::DATANAME_TARGETS_PATHS, QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   if (targetPathsNode.IsNotNull())
   {
     dataStorage->Remove(targetPathsNode);
@@ -215,8 +215,8 @@ bool QmitkUSNavigationStepPlacementPlanning::OnActivateStep()
     m_CurrentTargetIndex = m_PlannedTargetNodes.size() - 1;
   }
 
-  m_TargetNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
-                                           USNavigationMarkerPlacement::DATANAME_TUMOUR);
+  m_TargetNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
+                                           QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR);
   m_TargetNode->SetBoolProperty("visible", true);
 
   // set lookup table of tumour node
@@ -490,7 +490,7 @@ void QmitkUSNavigationStepPlacementPlanning::CreateTargetNodesIfNecessary()
       QString("%1").arg(m_PlannedTargetNodes.size() + 1, m_NumberOfTargets / 10 + 1, 10, QLatin1Char('0'));
 
     mitk::DataNode::Pointer targetNode = this->GetNamedDerivedNodeAndCreate(
-      (QString("Target ") + targetNumber).toStdString().c_str(), USNavigationMarkerPlacement::DATANAME_TARGETS);
+      (QString("Target ") + targetNumber).toStdString().c_str(), QmitkUSNavigationMarkerPlacement::DATANAME_TARGETS);
     targetNode->SetOpacity(0.5);
     targetNode->SetBoolProperty("surface_empty", true);
     targetNode->SetData(mitk::Surface::New());
@@ -499,7 +499,7 @@ void QmitkUSNavigationStepPlacementPlanning::CreateTargetNodesIfNecessary()
 
     mitk::DataNode::Pointer targetPathNode =
       this->GetNamedDerivedNodeAndCreate((QString("Target Path ") + targetNumber).toStdString().c_str(),
-                                         USNavigationMarkerPlacement::DATANAME_TARGETS_PATHS);
+                                         QmitkUSNavigationMarkerPlacement::DATANAME_TARGETS_PATHS);
     targetPathNode->SetOpacity(0.5);
     targetPathNode->SetColor(1, 1, 1);
     targetPathNode->SetColor(1, 1, 1, nullptr, "contourcolor");

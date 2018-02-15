@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef UltrasoundCalibration_h
-#define UltrasoundCalibration_h
+#ifndef QmitkUltrasoundCalibration_h
+#define QmitkUltrasoundCalibration_h
 
 #include <berryISelectionListener.h>
 
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataToIGTLMessageFilter.h>
 
 // Microservices
-#include "ui_UltrasoundCalibrationControls.h"
+#include "ui_QmitkUltrasoundCalibrationControls.h"
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
@@ -42,14 +42,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkServiceEvent.h>
 
 /*!
-  \brief UltrasoundCalibration
+  \brief QmitkUltrasoundCalibration
 
   \warning  This view provides a simple calibration process.
 
   \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
   */
-class UltrasoundCalibration : public QmitkAbstractView
+class QmitkUltrasoundCalibration : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -57,8 +57,8 @@ class UltrasoundCalibration : public QmitkAbstractView
 
 public:
 
-  UltrasoundCalibration();
-  ~UltrasoundCalibration();
+  QmitkUltrasoundCalibration();
+  ~QmitkUltrasoundCalibration();
 
   static const std::string VIEW_ID;
 
@@ -199,7 +199,7 @@ protected:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes);
 
-  Ui::UltrasoundCalibrationControls m_Controls;
+  Ui::QmitkUltrasoundCalibrationControls m_Controls;
 
   /**
   * \brief Internal function that activates display of the needle path.
@@ -342,7 +342,7 @@ protected:
   int m_SpacingPointsCount;
 
 private:
-  mitk::MessageDelegate2<UltrasoundCalibration, const std::string&, const std::string&> m_USDeviceChanged;
+  mitk::MessageDelegate2<QmitkUltrasoundCalibration, const std::string&, const std::string&> m_USDeviceChanged;
 };
 
 #endif // UltrasoundCalibration_h

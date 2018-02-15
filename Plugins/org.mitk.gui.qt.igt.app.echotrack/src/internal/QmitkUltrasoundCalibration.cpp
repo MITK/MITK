@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "UltrasoundCalibration.h"
+#include "QmitkUltrasoundCalibration.h"
 #include <QTimer>
 
 // Qt
@@ -56,10 +56,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <chrono>
 #include <thread>
 
-const std::string UltrasoundCalibration::VIEW_ID = "org.mitk.views.ultrasoundcalibration";
+const std::string QmitkUltrasoundCalibration::VIEW_ID = "org.mitk.views.ultrasoundcalibration";
 
-UltrasoundCalibration::UltrasoundCalibration() :
-m_USDeviceChanged(this, &UltrasoundCalibration::OnUSDepthChanged)
+QmitkUltrasoundCalibration::QmitkUltrasoundCalibration() :
+m_USDeviceChanged(this, &QmitkUltrasoundCalibration::OnUSDepthChanged)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 
@@ -71,7 +71,7 @@ m_USDeviceChanged(this, &UltrasoundCalibration::OnUSDepthChanged)
   }
 }
 
-UltrasoundCalibration::~UltrasoundCalibration()
+QmitkUltrasoundCalibration::~QmitkUltrasoundCalibration()
 {
   m_Controls.m_CombinedModalityManagerWidget->blockSignals(true);
   mitk::USCombinedModality::Pointer combinedModality;
@@ -101,12 +101,12 @@ UltrasoundCalibration::~UltrasoundCalibration()
   delete m_Timer;
 }
 
-void UltrasoundCalibration::SetFocus()
+void QmitkUltrasoundCalibration::SetFocus()
 {
   m_Controls.m_ToolBox->setFocus();
 }
 
-void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
+void QmitkUltrasoundCalibration::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
@@ -211,12 +211,12 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   m_Controls.m_ToolBox->setCurrentIndex(0);
 }
 
-void UltrasoundCalibration::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
+void QmitkUltrasoundCalibration::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
   const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
 }
 
-void UltrasoundCalibration::OnTabSwitch(int index)
+void QmitkUltrasoundCalibration::OnTabSwitch(int index)
 {
   switch (index)
   {
@@ -231,8 +231,8 @@ void UltrasoundCalibration::OnTabSwitch(int index)
   }
 }
 
-//void UltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
-void UltrasoundCalibration::OnDeviceSelected()
+//void QmitkUltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
+void QmitkUltrasoundCalibration::OnDeviceSelected()
 {
   mitk::USCombinedModality::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
@@ -251,7 +251,7 @@ void UltrasoundCalibration::OnDeviceSelected()
   }
 }
 
-void UltrasoundCalibration::OnDeviceDeselected()
+void QmitkUltrasoundCalibration::OnDeviceDeselected()
 {
   mitk::USCombinedModality::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
@@ -266,7 +266,7 @@ void UltrasoundCalibration::OnDeviceDeselected()
   m_Controls.m_ToolBox->setItemEnabled(2, false);
 }
 
-void UltrasoundCalibration::OnAddCurrentTipPositionToReferencePoints()
+void QmitkUltrasoundCalibration::OnAddCurrentTipPositionToReferencePoints()
 {
   if (m_Controls.m_VerificationPointerChoser->GetSelectedNavigationDataSource().IsNull() ||
     (m_Controls.m_VerificationPointerChoser->GetSelectedToolID() == -1))
@@ -279,7 +279,7 @@ void UltrasoundCalibration::OnAddCurrentTipPositionToReferencePoints()
   m_VerificationReferencePoints->InsertPoint(m_VerificationReferencePoints->GetSize(), currentTipPosition);
 }
 
-void UltrasoundCalibration::OnStartVerification()
+void QmitkUltrasoundCalibration::OnStartVerification()
 {
   m_currentPoint = 0;
   mitk::PointSet::Pointer selectedPointSet = dynamic_cast<mitk::PointSet*>(m_Controls.m_ReferencePointsComboBox->GetSelectedNode()->GetData());
@@ -292,7 +292,7 @@ void UltrasoundCalibration::OnStartVerification()
   }
 }
 
-void UltrasoundCalibration::OnAddCurrentTipPositionForVerification()
+void QmitkUltrasoundCalibration::OnAddCurrentTipPositionForVerification()
 {
   if (m_currentPoint == -1) { MITK_WARN << "Cannot add point"; return; }
   if (m_Controls.m_VerificationPointerChoser->GetSelectedNavigationDataSource().IsNull() ||
@@ -328,7 +328,7 @@ void UltrasoundCalibration::OnAddCurrentTipPositionForVerification()
   }
 }
 
-void UltrasoundCalibration::OnStartCalibrationProcess()
+void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
 {
   // US Image Stream
   m_Node = mitk::DataNode::New();
@@ -376,7 +376,7 @@ void UltrasoundCalibration::OnStartCalibrationProcess()
   m_Controls.m_ToolBox->setCurrentIndex(1);
 }
 
-void UltrasoundCalibration::OnStartPlusCalibration()
+void QmitkUltrasoundCalibration::OnStartPlusCalibration()
 {
   if (m_CombinedModality.IsNull()){
     m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
@@ -411,11 +411,11 @@ void UltrasoundCalibration::OnStartPlusCalibration()
   m_TrackingToIGTLMessageFilter->ConnectTo(m_CombinedModality->GetTrackingDevice());
   m_TrackingToIGTLMessageFilter->SetName("Tracker Filter");
 
-  typedef itk::SimpleMemberCommand< UltrasoundCalibration > CurCommandType;
+  typedef itk::SimpleMemberCommand< QmitkUltrasoundCalibration > CurCommandType;
 
   CurCommandType::Pointer newConnectionCommand = CurCommandType::New();
   newConnectionCommand->SetCallbackFunction(
-    this, &UltrasoundCalibration::OnPlusConnected);
+    this, &QmitkUltrasoundCalibration::OnPlusConnected);
   this->m_NewConnectionObserverTag = this->m_TrackingServer->AddObserver(
     mitk::NewClientConnectionEvent(), newConnectionCommand);
 
@@ -454,7 +454,7 @@ void UltrasoundCalibration::OnStartPlusCalibration()
   }
 }
 
-void UltrasoundCalibration::OnStopPlusCalibration()
+void QmitkUltrasoundCalibration::OnStopPlusCalibration()
 {
   //closing all server and clients when PlusCalibration is finished
   if (m_USMessageProvider.IsNotNull())
@@ -491,25 +491,25 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   delete m_StreamingTimer;
 }
 
-void UltrasoundCalibration::OnPlusConnected()
+void QmitkUltrasoundCalibration::OnPlusConnected()
 {
   emit NewConnectionSignal();
 }
 
-void UltrasoundCalibration::OnNewConnection()
+void QmitkUltrasoundCalibration::OnNewConnection()
 {
   m_Controls.m_StartStreaming->setEnabled(true);
   m_Controls.m_ConnectionStatus->setStyleSheet("QLabel { color : green; }");
   m_Controls.m_ConnectionStatus->setText("Connection successfull you can now start streaming");
 }
 
-void UltrasoundCalibration::OnStreamingTimerTimeout()
+void QmitkUltrasoundCalibration::OnStreamingTimerTimeout()
 {
   m_USMessageProvider->Update();
   m_TrackingMessageProvider->Update();
 }
 
-void UltrasoundCalibration::OnStartStreaming()
+void QmitkUltrasoundCalibration::OnStartStreaming()
 {
   m_USMessageProvider->StartStreamingOfSource(m_USImageToIGTLMessageFilter, 5);
   m_TrackingMessageProvider->StartStreamingOfSource(m_TrackingToIGTLMessageFilter, 5);
@@ -518,7 +518,7 @@ void UltrasoundCalibration::OnStartStreaming()
   m_StreamingTimer->start((1.0 / 5.0 * 1000.0));
 }
 
-void UltrasoundCalibration::OnGetPlusCalibration()
+void QmitkUltrasoundCalibration::OnGetPlusCalibration()
 {
   m_TransformClient = mitk::IGTLClient::New(true);
   m_TransformClient->SetHostname("127.0.0.1");
@@ -586,7 +586,7 @@ void UltrasoundCalibration::OnGetPlusCalibration()
   }
 }
 
-void UltrasoundCalibration::ProcessPlusCalibration(igtl::Matrix4x4& imageToTracker)
+void QmitkUltrasoundCalibration::ProcessPlusCalibration(igtl::Matrix4x4& imageToTracker)
 {
   mitk::AffineTransform3D::Pointer imageToTrackerTransform = mitk::AffineTransform3D::New();
   itk::Matrix<mitk::ScalarType, 3, 3> rotationFloat = itk::Matrix<mitk::ScalarType, 3, 3>();
@@ -615,7 +615,7 @@ void UltrasoundCalibration::ProcessPlusCalibration(igtl::Matrix4x4& imageToTrack
   m_Controls.m_GotCalibrationLabel->setText("Recieved Calibration from PLUS you can now save it");
 }
 
-void UltrasoundCalibration::OnStopCalibrationProcess()
+void QmitkUltrasoundCalibration::OnStopCalibrationProcess()
 {
   this->ClearTemporaryMembers();
 
@@ -633,7 +633,7 @@ void UltrasoundCalibration::OnStopCalibrationProcess()
   m_Controls.m_ToolBox->setCurrentIndex(0);
 }
 
-void UltrasoundCalibration::OnDeciveServiceEvent(const ctkServiceEvent event)
+void QmitkUltrasoundCalibration::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
   if (m_CombinedModality.IsNull() || event.getType() != ctkServiceEvent::MODIFIED) { return; }
 
@@ -647,7 +647,7 @@ void UltrasoundCalibration::OnDeciveServiceEvent(const ctkServiceEvent event)
   }
 }
 
-void UltrasoundCalibration::OnAddCalibPoint()
+void QmitkUltrasoundCalibration::OnAddCalibPoint()
 {
   mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
 
@@ -662,7 +662,7 @@ void UltrasoundCalibration::OnAddCalibPoint()
   SwitchFreeze();
 }
 
-void UltrasoundCalibration::OnCalibration()
+void QmitkUltrasoundCalibration::OnCalibration()
 {
   // Compute transformation
   vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
@@ -771,7 +771,7 @@ void UltrasoundCalibration::OnCalibration()
   m_Controls.m_CalibBtnSaveCalibration->setEnabled(true);
 }
 
-void UltrasoundCalibration::OnAddEvalTargetPoint()
+void QmitkUltrasoundCalibration::OnAddEvalTargetPoint()
 {
   mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
 
@@ -799,7 +799,7 @@ void UltrasoundCalibration::OnAddEvalTargetPoint()
   SwitchFreeze();
 }
 
-void UltrasoundCalibration::OnAddEvalProjectedPoint()
+void QmitkUltrasoundCalibration::OnAddEvalProjectedPoint()
 {
   MITK_WARN << "Projection Evaluation may currently be inaccurate.";
   // TODO: Verify correct Evaluation. Is the Point that is added really current?
@@ -809,7 +809,7 @@ void UltrasoundCalibration::OnAddEvalProjectedPoint()
   this->m_Controls.m_EvalLblNumProjectionPoints->setText(text);
 }
 
-void UltrasoundCalibration::OnSaveEvaluation()
+void QmitkUltrasoundCalibration::OnSaveEvaluation()
 {
   //Filename without suffix
   QString filename = m_Controls.m_EvalFilePath->text() + "//" + m_Controls.m_EvalFilePrefix->text();
@@ -839,7 +839,7 @@ void UltrasoundCalibration::OnSaveEvaluation()
   */
 }
 
-void UltrasoundCalibration::OnSaveCalibration()
+void QmitkUltrasoundCalibration::OnSaveCalibration()
 {
   m_Controls.m_GotCalibrationLabel->setText("");
   QString filename = QFileDialog::getSaveFileName(QApplication::activeWindow(),
@@ -871,7 +871,7 @@ void UltrasoundCalibration::OnSaveCalibration()
   }
 }
 
-void UltrasoundCalibration::OnReset()
+void QmitkUltrasoundCalibration::OnReset()
 {
   this->ClearTemporaryMembers();
 
@@ -891,7 +891,7 @@ void UltrasoundCalibration::OnReset()
   this->m_Controls.m_EvalLblNumProjectionPoints->setText(text2);
 }
 
-void UltrasoundCalibration::Update()
+void QmitkUltrasoundCalibration::Update()
 {
   //QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   // if (nodes.empty()) return;
@@ -927,7 +927,7 @@ void UltrasoundCalibration::Update()
   //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
-void UltrasoundCalibration::SwitchFreeze()
+void QmitkUltrasoundCalibration::SwitchFreeze()
 {
   m_Controls.m_CalibBtnAddPoint->setEnabled(false); // generally deactivate
   // We use the activity state of the timer to determine whether we are currently viewing images
@@ -974,7 +974,7 @@ void UltrasoundCalibration::SwitchFreeze()
   }
 }
 
-void UltrasoundCalibration::ShowNeedlePath()
+void QmitkUltrasoundCalibration::ShowNeedlePath()
 {
   // Init Filter
   this->m_NeedleProjectionFilter->SelectInput(0);
@@ -991,7 +991,7 @@ void UltrasoundCalibration::ShowNeedlePath()
   }
 }
 
-void UltrasoundCalibration::ClearTemporaryMembers()
+void QmitkUltrasoundCalibration::ClearTemporaryMembers()
 {
   m_CalibPointsTool->Clear();
   m_CalibPointsImage->Clear();
@@ -1008,7 +1008,7 @@ void UltrasoundCalibration::ClearTemporaryMembers()
   m_SpacingPointsCount = 0;
 }
 
-vtkSmartPointer<vtkPolyData> UltrasoundCalibration::ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet)
+vtkSmartPointer<vtkPolyData> QmitkUltrasoundCalibration::ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet)
 {
   vtkSmartPointer<vtkPolyData> returnValue = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
@@ -1029,7 +1029,7 @@ vtkSmartPointer<vtkPolyData> UltrasoundCalibration::ConvertPointSetToVtkPolyData
   return returnValue;
 }
 
-double UltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform)
+double QmitkUltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform)
 {
   if (imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
   double FRE = 0;
@@ -1049,7 +1049,7 @@ double UltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials,
   return FRE;
 }
 
-void UltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform)
+void QmitkUltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform)
 {
   for (int i = 0; i < pointSet->GetSize(); ++i)
   {
@@ -1059,7 +1059,7 @@ void UltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer poi
   }
 }
 
-void UltrasoundCalibration::OnFreezeClicked()
+void QmitkUltrasoundCalibration::OnFreezeClicked()
 {
   if (m_CombinedModality->GetIsFreezed())
   { //device was already frozen so we need to delete all Spacing points because they need to be collected all at once
@@ -1078,7 +1078,7 @@ void UltrasoundCalibration::OnFreezeClicked()
   //SwitchFreeze();
 }
 
-void UltrasoundCalibration::OnAddSpacingPoint()
+void QmitkUltrasoundCalibration::OnAddSpacingPoint()
 {
   mitk::Point3D point = this->GetRenderWindowPart()->GetSelectedPosition();
 
@@ -1099,7 +1099,7 @@ void UltrasoundCalibration::OnAddSpacingPoint()
   }
 }
 
-void UltrasoundCalibration::OnCalculateSpacing()
+void QmitkUltrasoundCalibration::OnCalculateSpacing()
 {
   mitk::Point3D horizontalOne = m_SpacingPoints->GetPoint(0);
   mitk::Point3D horizontalTwo = m_SpacingPoints->GetPoint(1);
@@ -1130,7 +1130,7 @@ void UltrasoundCalibration::OnCalculateSpacing()
   m_CombinedModality->SetIsFreezed(false);
 }
 
-void UltrasoundCalibration::OnUSDepthChanged(const std::string& key, const std::string&)
+void QmitkUltrasoundCalibration::OnUSDepthChanged(const std::string& key, const std::string&)
 {
   //whenever depth of USImage is changed the spacing should no longer be overwritten
   if (key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH)

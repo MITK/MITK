@@ -14,25 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef IGTFiducialRegistration_h
-#define IGTFiducialRegistration_h
+#ifndef QmitkIGTFiducialRegistration_h
+#define QmitkIGTFiducialRegistration_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
 
-#include "ui_IGTFiducialRegistrationControls.h"
+#include "ui_QmitkIGTFiducialRegistrationControls.h"
 
 
 #include <ctkServiceEvent.h>
 
 /*!
-\brief IGTFiducialRegistration
+\brief QmitkIGTFiducialRegistration
 
 \sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
-class IGTFiducialRegistration : public QmitkAbstractView
+class QmitkIGTFiducialRegistration : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -46,8 +46,8 @@ class IGTFiducialRegistration : public QmitkAbstractView
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 
-    IGTFiducialRegistration();
-    virtual ~IGTFiducialRegistration();
+    QmitkIGTFiducialRegistration();
+    virtual ~QmitkIGTFiducialRegistration();
 
   public slots:
 

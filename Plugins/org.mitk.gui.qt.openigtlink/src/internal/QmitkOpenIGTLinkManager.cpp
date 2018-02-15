@@ -20,28 +20,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 //
-#include "OpenIGTLinkManager.h"
+#include "QmitkOpenIGTLinkManager.h"
 
 
-const std::string OpenIGTLinkManager::VIEW_ID =
+const std::string QmitkOpenIGTLinkManager::VIEW_ID =
     "org.mitk.views.openigtlinkmanager";
 
-OpenIGTLinkManager::OpenIGTLinkManager()
+QmitkOpenIGTLinkManager::QmitkOpenIGTLinkManager()
 : QmitkAbstractView()
 {
 }
 
-OpenIGTLinkManager::~OpenIGTLinkManager()
+QmitkOpenIGTLinkManager::~QmitkOpenIGTLinkManager()
 {
   for(unsigned int i=0; i < m_AllSourcesHandledByThisWidget.size(); i++)
     m_AllSourcesHandledByThisWidget.at(i)->UnRegisterMicroservice();
 }
 
-void OpenIGTLinkManager::SetFocus()
+void QmitkOpenIGTLinkManager::SetFocus()
 {
 }
 
-void OpenIGTLinkManager::CreateQtPartControl( QWidget *parent )
+void QmitkOpenIGTLinkManager::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
@@ -58,14 +58,14 @@ void OpenIGTLinkManager::CreateQtPartControl( QWidget *parent )
 }
 
 
-void OpenIGTLinkManager::NewSourceByWidget(
+void QmitkOpenIGTLinkManager::NewSourceByWidget(
     mitk::IGTLDeviceSource::Pointer source,std::string /*sourceName*/)
 {
   source->RegisterAsMicroservice(/*sourceName*/);
   m_AllSourcesHandledByThisWidget.push_back(source);
 }
 
-void OpenIGTLinkManager::SourceSelected(
+void QmitkOpenIGTLinkManager::SourceSelected(
     mitk::IGTLDeviceSource::Pointer source)
 {
   if (source.IsNull()) //no source selected

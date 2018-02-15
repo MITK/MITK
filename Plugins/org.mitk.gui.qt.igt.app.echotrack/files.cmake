@@ -5,8 +5,8 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mbi_gui_qt_usnavigation_Activator.cpp
   #USNavigation.cpp //not functional anymore. Delete code?
-  UltrasoundCalibration.cpp
-  USNavigationMarkerPlacement.cpp
+  QmitkUltrasoundCalibration.cpp
+  QmitkUSNavigationMarkerPlacement.cpp
 
   QmitkUSNavigationPerspective.cpp
 
@@ -51,8 +51,8 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   #src/internal/USNavigationControls.ui //not functional anymore. Delete code?
-  src/internal/UltrasoundCalibrationControls.ui
-  src/internal/USNavigationMarkerPlacement.ui
+  src/internal/QmitkUltrasoundCalibrationControls.ui
+  src/internal/QmitkUSNavigationMarkerPlacement.ui
 
   src/internal/Widgets/QmitkUSCombinedModalityCreationWidget.ui
   src/internal/Widgets/QmitkUSCombinedModalityEditWidget.ui
@@ -73,8 +73,8 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/org_mbi_gui_qt_usnavigation_Activator.h
   #src/internal/USNavigation.h //not functional anymore. Delete code?
-  src/internal/UltrasoundCalibration.h
-  src/internal/USNavigationMarkerPlacement.h
+  src/internal/QmitkUltrasoundCalibration.h
+  src/internal/QmitkUSNavigationMarkerPlacement.h
   src/internal/QmitkUSZonesDataModel.h
   src/internal/QmitkUSNavigationCalibrationsDataModel.h
   src/internal/QmitkUSZoneManagementColorDialogDelegate.h

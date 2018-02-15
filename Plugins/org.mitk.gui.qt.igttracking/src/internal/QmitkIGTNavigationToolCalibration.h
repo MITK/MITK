@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef IGTNavigationToolCalibration_h
-#define IGTNavigationToolCalibration_h
+#ifndef QmitkIGTNavigationToolCalibration_h
+#define  QmitkIGTNavigationToolCalibration_h
 
 #include <berryISelectionListener.h>
 
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkInteractiveTransformationWidget.h"
 
 
-#include "ui_IGTNavigationToolCalibrationControls.h"
+#include "ui_QmitkIGTNavigationToolCalibrationControls.h"
 
 #include <mitkNavigationDataRecorder.h>
 
@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   \ingroup ${plugin_target}_internal
   */
-class IGTNavigationToolCalibration : public QmitkAbstractView
+class  QmitkIGTNavigationToolCalibration : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -50,9 +50,9 @@ class IGTNavigationToolCalibration : public QmitkAbstractView
 
 public:
 
-  IGTNavigationToolCalibration();
+	QmitkIGTNavigationToolCalibration();
 
-  virtual ~IGTNavigationToolCalibration();
+  virtual ~QmitkIGTNavigationToolCalibration();
 
   static const std::string VIEW_ID;
 

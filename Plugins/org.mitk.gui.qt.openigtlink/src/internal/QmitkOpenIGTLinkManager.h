@@ -15,14 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef OpenIGTLinkManager_h
-#define OpenIGTLinkManager_h
+#ifndef QmitkOpenIGTLinkManager_h
+#define QmitkOpenIGTLinkManager_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
 
-#include "ui_OpenIGTLinkManagerControls.h"
+#include "ui_QmitkOpenIGTLinkManagerControls.h"
 #include "mitkIGTLClient.h"
 #include "mitkIGTLDeviceSource.h"
 
@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class OpenIGTLinkManager : public QmitkAbstractView
+class QmitkOpenIGTLinkManager : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -44,8 +44,8 @@ class OpenIGTLinkManager : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
-    OpenIGTLinkManager();
-    virtual ~OpenIGTLinkManager();
+	QmitkOpenIGTLinkManager();
+    virtual ~QmitkOpenIGTLinkManager();
 
   public slots:
     void NewSourceByWidget(mitk::IGTLDeviceSource::Pointer source, std::string);
@@ -60,7 +60,7 @@ class OpenIGTLinkManager : public QmitkAbstractView
     void CreatePipeline();
     void DestroyPipeline();
 
-    Ui::OpenIGTLinkManagerControls m_Controls;
+    Ui::QmitkOpenIGTLinkManagerControls m_Controls;
 
     /** Someone needs to hold the smart pointers of new sources, otherwise the
      * objects will be lost although they are listed as microservice.

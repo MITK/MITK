@@ -20,12 +20,12 @@
      <view id="org.mitk.views.igtnavigationtoolcalibration"
           name="IGT Navigation Tool Calibration"
           category="IGT"
-          class="IGTNavigationToolCalibration"
+          class="QmitkIGTNavigationToolCalibration"
           icon="resources/iconTrackingToolCalibration.svg" />
 	 <view id="org.mitk.views.IGTFiducialRegistration"
           name="IGT Fiducial Registration"
           category="IGT"
-          class="IGTFiducialRegistration"
+          class="QmitkIGTFiducialRegistration"
           icon="resources/iconTrackingRegistration.svg" />
   </extension>
 

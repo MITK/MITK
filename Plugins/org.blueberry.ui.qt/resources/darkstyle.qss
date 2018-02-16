@@ -374,7 +374,7 @@ QGroupBox
 {
   border:1px solid #323231;
   border-radius: 0px;
-  padding-top: 1px;
+  padding-top: 24px;
   font-weight: bold;
 }
 

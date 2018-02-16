@@ -251,7 +251,7 @@ void QmitkNavigationToolCreationWidget::GetValuesFromGuiElements()
 {
   //Tracking Device
   m_ToolToBeEdited->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->currentText().toStdString());
-  m_ToolToBeEdited->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toStdString());
+  //m_ToolToBeEdited->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toStdString());
 
   //Tool Landmarks
   mitk::PointSet::Pointer toolCalLandmarks, toolRegLandmarks;

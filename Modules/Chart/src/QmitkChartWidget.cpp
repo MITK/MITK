@@ -393,6 +393,18 @@ void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D, const s
   m_Impl->AddData2D(data2D, label, type);
 }
 
+std::vector<QmitkChartxyData*> QmitkChartWidget::GetData()
+{
+  if (m_Impl->GetC3xyData() == nullptr)
+  {
+    return std::vector<QmitkChartxyData*>();
+  }
+  else
+  {
+    return *m_Impl->GetC3xyData();
+  }
+}
+
 void QmitkChartWidget::SetColor(const std::string& label, const std::string& colorName)
 {
   m_Impl->SetColor(label, colorName);

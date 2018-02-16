@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkChartExports.h>
 
+class QmitkChartxyData;
 
 /*!
 \brief QmitkChartWidget is a widget to display various charts based on the javascript chart library C3js. Currently, bar charts, line charts and pie charts are supported.
@@ -97,6 +98,12 @@ public:
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
   void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType type = ChartType::bar);
+
+  /*!
+  * \brief Get the data that is stored for displaying.
+  * \note Only needed for testing purposes.
+  */
+  std::vector<QmitkChartxyData*> GetData();
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data

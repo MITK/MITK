@@ -697,14 +697,14 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   {
     Type = m_Controls->m_ConfigurationWidget->GetTrackingDevice()->GetType();
     //enable controls because device is valid
-    m_Controls->m_TrackingToolsGoupBox->setEnabled(true);
+    m_Controls->m_TrackingToolsGroupBox->setEnabled(true);
     m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
   }
   else
   {
     Type = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
     MessageBox("Error: This tracking device is not included in this project. Please make sure that the device is installed and activated in your MITK build.");
-    m_Controls->m_TrackingToolsGoupBox->setEnabled(false);
+    m_Controls->m_TrackingToolsGroupBox->setEnabled(false);
     m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
     return;
   }

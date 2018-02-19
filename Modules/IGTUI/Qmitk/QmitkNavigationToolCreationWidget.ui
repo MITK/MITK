@@ -43,16 +43,28 @@
    </item>
    <item>
     <widget class="QToolBox" name="toolBox">
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="midLineWidth">
+      <number>2</number>
+     </property>
      <property name="currentIndex">
       <number>0</number>
+     </property>
+     <property name="tabSpacing">
+      <number>6</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>339</width>
-        <height>211</height>
+        <width>337</width>
+        <height>209</height>
        </rect>
       </property>
       <attribute name="label">
@@ -140,8 +152,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>339</width>
-        <height>211</height>
+        <width>337</width>
+        <height>173</height>
        </rect>
       </property>
       <attribute name="label">
@@ -258,8 +270,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>145</width>
-        <height>73</height>
+        <width>337</width>
+        <height>173</height>
        </rect>
       </property>
       <attribute name="label">
@@ -300,8 +312,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>276</width>
-        <height>161</height>
+        <width>337</width>
+        <height>173</height>
        </rect>
       </property>
       <attribute name="label">
@@ -569,15 +581,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QmitkPointListWidget</class>
    <extends>QWidget</extends>
    <header>QmitkPointListWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

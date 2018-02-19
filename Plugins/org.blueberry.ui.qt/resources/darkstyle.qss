@@ -277,7 +277,7 @@ QMenu::separator
   background: #3399cc;
   margin-left: 10px;
   margin-right: 5px;
-}
+} 
 
 QMenu::indicator
 {
@@ -883,7 +883,7 @@ QTabBar
   qproperty-drawBase: 0;
   left: 0px;
   border-radius: 0px;
-  border: 1px trasparent #1d1d1c;
+   border: 1px trasparent #1d1d1c;
 }
 
 QTabBar:focus
@@ -943,11 +943,11 @@ QTabBar::scroller
 QTabBar::tab:top
 {
   font-weight: bold;
-  color: #adb1b6;
+  color:#ffffff;
   border: 0px solid #1d1d1c;
-  background-color: #1d1d1c;
-  padding: 5px;
-  min-width: 50px;
+  background: #7c7c7a;
+  padding: 2px;
+  min-width: 150px;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
@@ -971,7 +971,7 @@ QTabBar::tab:top:!selected:hover
 QTabBar::tab:bottom
 {
   font-weight: bold;
-  color: #adb1b6;
+  color: #ffffff ;
   border: 0px solid #1d1d1c;
   background-color: #1d1d1c;
   padding: 5px;
@@ -1374,19 +1374,19 @@ QToolBox
 
 QToolBox::tab
 {
-  color: #adb1b6;
+  color: #ffffff;
   background-color: #323231;
   border: 1px solid #1d1d1c;
-  border-bottom: 1px transparent #323231;
+  border-bottom: 1px solid #1d1d1c;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
 
 QToolBox::tab:selected
 {
-  background-color: #323231;
-  border-color: #3399cc;
-}
+  font-weight: bold;
+  background-color: #7c7c7a;
+ }
 
 QStatusBar::item
 {

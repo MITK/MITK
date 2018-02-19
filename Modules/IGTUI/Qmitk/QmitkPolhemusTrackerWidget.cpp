@@ -198,7 +198,7 @@ void QmitkPolhemusTrackerWidget::on_m_ToggleToolTipCalibration_clicked()
   {
     mitk::PolhemusTool* _tool = dynamic_cast<mitk::PolhemusTool*> (this->m_TrackingDevice->GetToolByName(m_Controls->m_ToolSelection->currentText().toStdString()));
     mitk::Point3D tip = _tool->GetToolTipPosition().GetVectorFromOrigin()*(-1.);
-    mitk::Quaternion quat = _tool->GetToolTipOrientation().inverse();
+    mitk::Quaternion quat = _tool->GetToolAxisTransform().inverse();
     _tool->SetToolTip(tip, quat);
   }
   else
@@ -207,7 +207,7 @@ void QmitkPolhemusTrackerWidget::on_m_ToggleToolTipCalibration_clicked()
     {
       mitk::PolhemusTool* _tool = dynamic_cast<mitk::PolhemusTool*> (this->m_TrackingDevice->GetTool(i));
       mitk::Point3D tip = _tool->GetToolTipPosition().GetVectorFromOrigin()*(-1.);
-      mitk::Quaternion quat = _tool->GetToolTipOrientation().inverse();
+      mitk::Quaternion quat = _tool->GetToolAxisTransform().inverse();
       _tool->SetToolTip(tip, quat);
     }
   }

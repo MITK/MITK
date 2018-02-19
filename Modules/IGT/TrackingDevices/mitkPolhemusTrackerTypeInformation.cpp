@@ -62,7 +62,7 @@ namespace mitk
         errorMessage->append("Can't add tool, is the toolfile valid?");
         return NULL;
       }
-      thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolTipOrientation());
+      thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolAxisTransform());
     }
     returnValue->SetTrackingDevice(thisDevice);
     return returnValue;

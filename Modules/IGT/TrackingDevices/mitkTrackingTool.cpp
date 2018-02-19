@@ -105,7 +105,7 @@ mitk::Point3D mitk::TrackingTool::GetToolTipPosition() const
   return m_ToolTip;
 }
 
-mitk::Quaternion mitk::TrackingTool::GetToolTipOrientation() const
+mitk::Quaternion mitk::TrackingTool::GetToolAxisTransform() const
 {
   MutexLockHolder lock(*m_MyMutex);
   return m_ToolTipRotation;

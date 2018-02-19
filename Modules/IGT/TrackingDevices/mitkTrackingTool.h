@@ -50,7 +50,7 @@ namespace mitk
     virtual void SetToolName(const char* _arg); ///< Sets the name of the tool
 
     Point3D GetToolTipPosition() const; ///< returns the tool tip in tool coordinates, which where set by SetToolTip
-    Quaternion GetToolTipOrientation() const; ///< returns the tool tip orientation in tool coordinates, which where set by SetToolTip
+    Quaternion GetToolAxisTransform() const; ///< returns the transformation of the tool axis with respect to the MITK-IGT main tool axis (0,0,-1)
     virtual void SetToolTip(Point3D toolTipPosition, Quaternion orientation, ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
     virtual bool IsToolTipSet() const; ///< returns true if a tool tip is set, false if not
 

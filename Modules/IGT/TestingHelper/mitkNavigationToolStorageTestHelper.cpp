@@ -62,7 +62,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     mitk::FillVector3D(toolTipPos,1.3423,2.323,4.332);
     mitk::Quaternion toolTipRot = mitk::Quaternion(0.1,0.2,0.3,0.4);
     myTool1->SetToolTipPosition(toolTipPos);
-    myTool1->SetToolTipOrientation(toolTipRot);
+    myTool1->SetToolAxisTransform(toolTipRot);
     myStorage->AddTool(myTool1);
 
     return myStorage;

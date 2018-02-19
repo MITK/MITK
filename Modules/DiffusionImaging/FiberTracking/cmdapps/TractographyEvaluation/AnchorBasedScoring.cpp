@@ -53,6 +53,31 @@ std::vector< mitk::FiberBundle::Pointer > CombineTractograms(std::vector< mitk::
   return fib;
 }
 
+std::vector< std::string > get_file_list(const std::string& path, std::vector< std::string > extensions={".fib", ".trk"})
+{
+  std::vector< std::string > file_list;
+  itk::Directory::Pointer dir = itk::Directory::New();
+
+  if (dir->Load(path.c_str()))
+  {
+    int n = dir->GetNumberOfFiles();
+    for (int r = 0; r < n; r++)
+    {
+      const char *filename = dir->GetFile(r);
+      std::string ext = ist::GetFilenameExtension(filename);
+      for (auto e : extensions)
+      {
+        if (ext==e)
+        {
+          file_list.push_back(path + '/' + filename);
+          break;
+        }
+      }
+    }
+  }
+  return file_list;
+}
+
 /*!
 \brief Fits the tractogram to the input peak image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).
 */
@@ -68,7 +93,7 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("", "a", mitkCommandLineParser::InputFile, "Anchor tractogram:", "anchor tracts in one tractogram file", us::Any(), false);
   parser.addArgument("", "p", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
-  parser.addArgument("", "c", mitkCommandLineParser::StringList, "Candidates:", "candidate tracts (separate files)", us::Any(), false);
+  parser.addArgument("", "c", mitkCommandLineParser::InputDirectory, "Candidates folder:", "folder containing candidate tracts", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any(), false);
 
   parser.addArgument("anchor_masks", "", mitkCommandLineParser::StringList, "Reference Masks:", "reference tract masks for accuracy evaluation");
@@ -84,7 +109,7 @@ int main(int argc, char* argv[])
 
   std::string anchors_file = us::any_cast<std::string>(parsedArgs["a"]);
   std::string peak_file_name = us::any_cast<std::string>(parsedArgs["p"]);
-  mitkCommandLineParser::StringContainerType candidate_tract_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["c"]);
+  std::string candidate_tract_folder = us::any_cast<std::string>(parsedArgs["c"]);
   std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
 
   bool greedy_add = false;
@@ -116,10 +141,11 @@ int main(int argc, char* argv[])
     itk::TimeProbe clock;
     clock.Start();
 
-    MITK_INFO << "Creating output directory";
     if (ist::PathExists(out_folder))
-      ist::RemoveADirectory(out_folder);
-    ist::MakeDirectory(out_folder);
+    {
+      MITK_INFO << "Creating output directory";
+      ist::MakeDirectory(out_folder);
+    }
 
     MITK_INFO << "Loading data";
     std::streambuf *old = cout.rdbuf(); // <-- save
@@ -167,6 +193,7 @@ int main(int argc, char* argv[])
     PeakImgType::Pointer peak_image = caster->GetOutput();
 
     // Load all candidate tracts
+    std::vector< std::string > candidate_tract_files = get_file_list(candidate_tract_folder);
     std::vector< mitk::FiberBundle::Pointer > input_candidates;
     for (std::string f : candidate_tract_files)
     {
@@ -179,6 +206,7 @@ int main(int argc, char* argv[])
       input_candidates.push_back(fib);
     }
     std::cout.rdbuf (old);              // <-- restore
+    MITK_INFO << "Loaded " << candidate_tract_files.size() << " candidate tracts.";
 
     double rmse = 0.0;
     int iteration = 0;

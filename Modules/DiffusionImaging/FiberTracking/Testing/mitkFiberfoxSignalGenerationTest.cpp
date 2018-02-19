@@ -44,8 +44,8 @@ class mitkFiberfoxSignalGenerationTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkFiberfoxSignalGenerationTestSuite);
-//  MITK_TEST(Test0);
-//  MITK_TEST(Test1);
+  MITK_TEST(Test0);
+  MITK_TEST(Test1);
   MITK_TEST(Test2);
   MITK_TEST(Test3);
   MITK_TEST(Test4);
@@ -68,6 +68,7 @@ public:
 
   void setUp() override
   {
+    std::srand(0);
     omp_set_num_threads(1);
 
     m_FiberBundle = dynamic_cast<FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/Fiberfox/Signalgen.fib"))[0].GetPointer());

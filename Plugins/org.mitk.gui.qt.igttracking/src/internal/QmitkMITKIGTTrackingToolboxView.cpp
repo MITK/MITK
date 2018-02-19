@@ -697,15 +697,15 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   {
     Type = m_Controls->m_ConfigurationWidget->GetTrackingDevice()->GetType();
     //enable controls because device is valid
-    m_Controls->m_TrackingToolsGoupBox->setEnabled(true);
-    m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
+    m_Controls->m_TrackingToolsFrame->setEnabled(true);
+    m_Controls->m_TrackingControlsFrame->setEnabled(true);
   }
   else
   {
     Type = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
     MessageBox("Error: This tracking device is not included in this project. Please make sure that the device is installed and activated in your MITK build.");
-    m_Controls->m_TrackingToolsGoupBox->setEnabled(false);
-    m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
+    m_Controls->m_TrackingToolsFrame->setEnabled(false);
+    m_Controls->m_TrackingControlsFrame->setEnabled(false);
     return;
   }
 
@@ -1200,12 +1200,12 @@ void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
 
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingControls()
 {
-  m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
+  m_Controls->m_TrackingControlsFrame->setEnabled(true);
 }
 
 void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
 {
-  m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
+  m_Controls->m_TrackingControlsFrame->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()

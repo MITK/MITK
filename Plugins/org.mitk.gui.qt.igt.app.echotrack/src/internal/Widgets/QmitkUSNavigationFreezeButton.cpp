@@ -96,7 +96,7 @@ void QmitkUSNavigationFreezeButton::OnButtonClicked(bool checked)
   {
   MITK_INFO << "Freezing";
   // freeze the imaging and the tracking
-  m_CombinedModality->SetIsFreezed(true);
+  m_CombinedModality->GetUltrasoundDevice()->SetIsFreezed(true);
 
   if ( m_OutputIndex >= 0 )
   {
@@ -111,7 +111,7 @@ void QmitkUSNavigationFreezeButton::OnButtonClicked(bool checked)
       MITK_WARN("QmitkUSNavigationStepZoneMarking")("QmitkUSNavigationStepTumourSelection")
         << "Unfreezing device as the last tracking data of the reference sensor wasn't valid.";
 
-      m_CombinedModality->SetIsFreezed(false);
+      m_CombinedModality->GetUltrasoundDevice()->SetIsFreezed(false);
       this->setChecked(false);
       return;
     }

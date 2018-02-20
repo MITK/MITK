@@ -281,7 +281,7 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
   }
 
   if (m_CombinedModality.IsNotNull() &&
-    !this->m_CombinedModality->GetIsFreezed()) // if the combined modality is freezed: do nothing
+    !this->m_CombinedModality->GetUltrasoundDevice()->GetIsFreezed()) // if the combined modality is freezed: do nothing
   {
     ui->navigationProcessWidget->UpdateNavigationProgress();
     m_AblationZonesDisplacementFilter->Update();

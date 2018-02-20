@@ -487,7 +487,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
 {
   if (freezed)
   {
-    this->GetCombinedModality()->SetIsFreezed(true);
+    this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(true);
     // load state machine and event config for data interactor
     m_PointMarkInteractor->LoadStateMachine("USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("MitkUS"));
     m_PointMarkInteractor->SetEventConfig("globalConfig.xml");
@@ -514,7 +514,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
   else
   {
     m_PointMarkInteractor->SetDataNode(0);
-    this->GetCombinedModality()->SetIsFreezed(false);
+    this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(false);
   }
 }
 

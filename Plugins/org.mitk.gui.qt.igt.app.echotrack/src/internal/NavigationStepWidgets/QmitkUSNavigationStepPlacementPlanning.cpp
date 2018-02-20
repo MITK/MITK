@@ -367,7 +367,7 @@ void QmitkUSNavigationStepPlacementPlanning::OnSetCombinedModality()
 void QmitkUSNavigationStepPlacementPlanning::OnFreeze(bool freeze)
 {
   if (freeze)
-    this->GetCombinedModality()->SetIsFreezed(true);
+    this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(true);
   if (freeze)
   {
     // load state machine and event config for data interactor
@@ -384,7 +384,7 @@ void QmitkUSNavigationStepPlacementPlanning::OnFreeze(bool freeze)
   }
 
   if (!freeze)
-    this->GetCombinedModality()->SetIsFreezed(false);
+    this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(false);
 }
 
 void QmitkUSNavigationStepPlacementPlanning::OnPlaceTargetButtonClicked()

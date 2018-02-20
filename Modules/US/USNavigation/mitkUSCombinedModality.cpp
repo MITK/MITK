@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSCombinedModality.h"
-#include "mitkUSDevice.h"
+//#include "mitkUSDevice.h"
 #include "mitkNavigationDataSource.h"
 #include "mitkImageReadAccessor.h"
 #include <mitkNavigationDataSmoothingFilter.h>
@@ -48,7 +48,7 @@ const std::string mitk::USCombinedModality::US_PROPKEY_CLASS = US_INTERFACE_NAME
 const std::string mitk::USCombinedModality::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
 
 mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
-  : mitk::USDevice(manufacturer, model), m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
+  : m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
   m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()), m_DelayFilter(mitk::NavigationDataDelayFilter::New(0)),
   m_NumberOfSmoothingValues(0), m_DelayCount(0)
 {
@@ -60,7 +60,7 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
 
   // Combined Modality should not spawn an own acquire thread, because
   // image acquiring is done by the included us device
-  this->SetSpawnAcquireThread(false);
+  m_UltrasoundDevice->SetSpawnAcquireThread(false);
 }
 
 mitk::USCombinedModality::~USCombinedModality()
@@ -132,8 +132,8 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInt
 
 void mitk::USCombinedModality::UnregisterOnService()
 {
-  if (m_DeviceState == State_Activated) { this->Deactivate(); }
-  if (m_DeviceState == State_Connected) { this->Disconnect(); }
+  if (m_UltrasoundDevice->GetDeviceState() == USDevice::State_Activated) { m_UltrasoundDevice->Deactivate(); }
+  if (m_UltrasoundDevice->GetDeviceState() == USDevice::State_Connected) { m_UltrasoundDevice->Disconnect(); }
 
   if (m_ServiceRegistration != nullptr)
     m_ServiceRegistration.Unregister();
@@ -503,7 +503,7 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentProbe()
   us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
 
   us::ServiceProperties::const_iterator probeIt = usdeviceProperties.find(
-    mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
   std::string probeName = mitk::USCombinedModality::DefaultProbeIdentifier;
@@ -525,7 +525,7 @@ std::string mitk::USCombinedModality::GetCurrentDepthValue()
   // get string for depth value from the micro service properties
   std::string depth;
   us::ServiceProperties::iterator depthIterator = usdeviceProperties.find(
-    mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
 
   if (depthIterator != usdeviceProperties.end())
   {
@@ -572,7 +572,7 @@ void mitk::USCombinedModality::RegisterAsMicroservice()
   mitk::UIDGenerator uidGen =
     mitk::UIDGenerator("org.mitk.services.USCombinedModality", 16);
   props[US_PROPKEY_ID] = uidGen.GetUID();
-  props[US_PROPKEY_DEVICENAME] = this->GetName();
+  props[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
   props[US_PROPKEY_CLASS] = this->GetDeviceClass();
 
   m_ServiceProperties = props;

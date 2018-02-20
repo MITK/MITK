@@ -248,7 +248,7 @@ QmitkUSAbstractNavigationStep::FilterVector QmitkUSNavigationStepTumourSelection
 
 void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
 {
-  if (freezed) this->GetCombinedModality()->SetIsFreezed(true);
+  if (freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(true);
 
   ui->tumourSelectionExplanation1Label->setEnabled(freezed);
   ui->tumourSelectionExplanation2Label->setEnabled(freezed);
@@ -276,7 +276,7 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
     }
   }
 
-  if (!freezed) this->GetCombinedModality()->SetIsFreezed(false);
+  if (!freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(false);
 }
 
 void QmitkUSNavigationStepTumourSelection::OnSetCombinedModality()

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkUSNavigationExports.h>
 #include "mitkUSDevice.h"
+#include "mitkImageSource.h"
 #include "mitkNavigationDataSource.h"
 
 // Microservices
@@ -38,7 +39,7 @@ namespace mitk {
 
   /**
    * \brief Combination of USDevice and NavigationDataSource.
-   * This class can be used as any USDevice subclass. Additionally tracking data be
+   * This class can be used as an ImageSource subclass. Additionally tracking data be
    * retrieved from the NavigationDataSource returned by GetTrackingDevice().
    *
    * A calibration of the ultrasound image stream to the navigation datas can be set
@@ -46,14 +47,14 @@ namespace mitk {
    * The ultrasound images are transformed according to this calibration in the
    * GenerateData() method.
    */
-  class MITKUSNAVIGATION_EXPORT USCombinedModality : public USDevice
+  class MITKUSNAVIGATION_EXPORT USCombinedModality : public mitk::ImageSource
   {
   public:
     static const std::string DeviceClassIdentifier;
     static const char*       DefaultProbeIdentifier;
     static const char*       ProbeAndDepthSeperator;
 
-    mitkClassMacro(USCombinedModality, USDevice);
+    mitkClassMacro(USCombinedModality, mitk::ImageSource);
     mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, std::string, std::string);
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
@@ -118,32 +119,32 @@ namespace mitk {
     /**
     * \brief Returns the Class of the Device.
     */
-    virtual std::string GetDeviceClass() override;
+    virtual std::string GetDeviceClass();
 
     /**
     * \brief Wrapper for returning USImageSource of the UltrasoundDevice.
     */
-    virtual USImageSource::Pointer GetUSImageSource() override;
+    virtual USImageSource::Pointer GetUSImageSource();
 
     /**
     * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
+    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom();
 
     /**
     * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode() override;
+    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode();
 
     /**
     * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes() override;
+    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes();
 
     /**
     * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler() override;
+    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler();
 
     virtual itk::SmartPointer<mitk::NavigationDataSource> GetNavigationDataSource();
 
@@ -203,32 +204,32 @@ namespace mitk {
     /**
     * \brief Initializes UltrasoundDevice.
     */
-    virtual bool OnInitialization() override;
+    virtual bool OnInitialization();
 
     /**
     * \brief Connects UltrasoundDevice.
     */
-    virtual bool OnConnection() override;
+    virtual bool OnConnection();
 
     /**
     * \brief Disconnects UltrasoundDevice.
     */
-    virtual bool OnDisconnection() override;
+    virtual bool OnDisconnection();
 
     /**
     * \brief Activates UltrasoundDevice.
     */
-    virtual bool OnActivation() override;
+    virtual bool OnActivation();
 
     /**
     * \brief Deactivates UltrasoundDevice.
     */
-    virtual bool OnDeactivation() override;
+    virtual bool OnDeactivation();
 
     /**
     * \brief Freezes or unfreezes UltrasoundDevice.
     */
-    virtual void OnFreeze(bool) override;
+    virtual void OnFreeze(bool);
 
     /**
     * \brief Grabs the next frame from the input.

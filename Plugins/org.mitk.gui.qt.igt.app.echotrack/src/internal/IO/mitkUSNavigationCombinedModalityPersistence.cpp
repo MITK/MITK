@@ -80,8 +80,8 @@ void mitk::USNavigationCombinedModalityPersistence::StoreCurrentDevices()
     if ( currentDevice.IsNotNull() )
     {
       // save manufacturer and model strig of the combined modality
-      deviceStrings.push_back(QString::fromStdString(currentDevice->GetManufacturer()));
-      deviceStrings.push_back(QString::fromStdString(currentDevice->GetName()));
+      deviceStrings.push_back(QString::fromStdString(currentDevice->GetUltrasoundDevice()->GetManufacturer()));
+      deviceStrings.push_back(QString::fromStdString(currentDevice->GetUltrasoundDevice()->GetName()));
 
       // save name of the navigation data source
       mitk::NavigationDataSource::Pointer navigationDataSource = currentDevice->GetNavigationDataSource();
@@ -133,7 +133,7 @@ void mitk::USNavigationCombinedModalityPersistence::LoadStoredDevices()
       {
         mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(usDevice, navigationDataSource, stringList.at(0).toStdString(), stringList.at(1).toStdString());
         combinedModality->DeserializeCalibration(stringList.at(6).toStdString());
-        combinedModality->Initialize();
+        combinedModality->GetUltrasoundDevice()->Initialize();
       }
     }
   }
@@ -154,7 +154,7 @@ mitk::USCombinedModality::Pointer mitk::USNavigationCombinedModalityPersistence:
     mitk::USCombinedModality::Pointer currentDevice = dynamic_cast<mitk::USCombinedModality*>(context->GetService(*it));
     if ( currentDevice.IsNotNull() )
     {
-      if ( currentDevice->GetManufacturer() == manufacturer && currentDevice->GetName() == model )
+      if ( currentDevice->GetUltrasoundDevice()->GetManufacturer() == manufacturer && currentDevice->GetUltrasoundDevice()->GetName() == model )
       {
         return currentDevice;
       }

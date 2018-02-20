@@ -47,7 +47,7 @@ QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWi
   connect(ui->combinedModalityEditWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityEditExit()));
   connect(ui->combinedModalityEditWidget, SIGNAL(SignalSaved()), this, SLOT(OnCombinedModalityEditExit()));
 
-  std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
+  std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USDevice::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
   //std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice))";
   ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USCombinedModality::US_PROPKEY_DEVICENAME);
   ui->combinedModalityListWidget->SetAutomaticallySelectFirstEntry(true);
@@ -110,8 +110,8 @@ void QmitkUSNavigationStepCombinedModality::OnDeviceSelectionChanged()
     }
 
     // enable disconnect button only if combined modality is connected or active
-    ui->combinedModalityDistconnectButton->setEnabled(combinedModality->GetDeviceState() >= mitk::USCombinedModality::State_Connected);
-    ui->combinedModalityActivateButton->setEnabled(combinedModality->GetDeviceState() < mitk::USCombinedModality::State_Activated);
+    ui->combinedModalityDistconnectButton->setEnabled(combinedModality->GetUltrasoundDevice()->GetDeviceState() >= mitk::USDevice::State_Connected);
+    ui->combinedModalityActivateButton->setEnabled(combinedModality->GetUltrasoundDevice()->GetDeviceState() < mitk::USDevice::State_Activated);
 
     this->UpdateTrackingToolNames();
   }
@@ -232,8 +232,8 @@ void QmitkUSNavigationStepCombinedModality::OnActivateButtonClicked()
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
-    if (!combinedModality->GetIsConnected()) { combinedModality->Connect(); }
-    if (!combinedModality->GetIsActive()) { combinedModality->Activate(); }
+    if (!combinedModality->GetUltrasoundDevice()->GetIsConnected()) { combinedModality->GetUltrasoundDevice()->Connect(); }
+    if (!combinedModality->GetUltrasoundDevice()->GetIsActive()) { combinedModality->GetUltrasoundDevice()->Activate(); }
   }
 }
 
@@ -242,8 +242,8 @@ void QmitkUSNavigationStepCombinedModality::OnDisconnectButtonClicked()
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
-    if (combinedModality->GetIsActive()) { combinedModality->Deactivate(); }
-    if (combinedModality->GetIsConnected()) { combinedModality->Disconnect(); }
+    if (combinedModality->GetUltrasoundDevice()->GetIsActive()) { combinedModality->GetUltrasoundDevice()->Deactivate(); }
+    if (combinedModality->GetUltrasoundDevice()->GetIsConnected()) { combinedModality->GetUltrasoundDevice()->Disconnect(); }
   }
 }
 
@@ -264,8 +264,8 @@ bool QmitkUSNavigationStepCombinedModality::OnFinishStep()
   {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     // make sure that the combined modality is in connected state before using it
-    if (combinedModality->GetDeviceState() < mitk::USDevice::State_Connected) { combinedModality->Connect(); }
-    if (combinedModality->GetDeviceState() < mitk::USDevice::State_Activated) { combinedModality->Activate(); }
+    if (combinedModality->GetUltrasoundDevice()->GetDeviceState() < mitk::USDevice::State_Connected) { combinedModality->GetUltrasoundDevice()->Connect(); }
+    if (combinedModality->GetUltrasoundDevice()->GetDeviceState() < mitk::USDevice::State_Activated) { combinedModality->GetUltrasoundDevice()->Activate(); }
     QApplication::restoreOverrideCursor();
   }
 
@@ -335,8 +335,8 @@ void QmitkUSNavigationStepCombinedModality::CreateCombinedModalityResultAndSigna
   mitk::DataNode::Pointer combinedModalityResult = mitk::DataNode::New();
   combinedModalityResult->SetName("CombinedModalityResult");
   combinedModalityResult->SetStringProperty("USNavigation::CombinedModality",
-    std::string(combinedModality->GetManufacturer() + ": " + combinedModality->GetName()
-    + " (" + combinedModality->GetComment() + ")").c_str());
+    std::string(combinedModality->GetUltrasoundDevice()->GetManufacturer() + ": " + combinedModality->GetUltrasoundDevice()->GetName()
+    + " (" + combinedModality->GetUltrasoundDevice()->GetComment() + ")").c_str());
   combinedModalityResult->SetStringProperty("USNavigation::UltrasoundDevice",
     std::string(usDevice->GetManufacturer() + ": " + usDevice->GetName()
     + " (" + usDevice->GetComment() + ")").c_str());

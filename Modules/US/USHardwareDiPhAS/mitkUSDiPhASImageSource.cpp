@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkIndex.h>
 #include "itkMultiplyImageFilter.h"
 
-
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   : m_Device(device),
   m_StartTime(((float)std::clock()) / CLOCKS_PER_SEC),
@@ -153,11 +152,11 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   // do image processing before displaying it
   if (image.IsNotNull())
   {
-    typedef itk::Image< float, 3 > itkFloatImageType;
     itkFloatImageType::Pointer itkImage;
 
     mitk::CastToItkImage(image, itkImage);
     image = mitk::GrabItkImageMemory(itkImage); //thereby using float images
+    image = CutOffTop(image, 165);
 
     // now apply filters to the image, if the options have been selected.
     if ((m_CompensateForScattering || m_UseBModeFilter) && m_DataType == DataType::Beamformed_Short)
@@ -273,8 +272,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   // we use this seperate ApplyBmodeFilter Method for processing of two-dimensional images
 
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
-  typedef itk::Image< float, 3 > itkFloatImageType;
-  
+
   typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
   BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter
 
@@ -282,10 +280,8 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New(); // No LogFilter
 
   itkFloatImageType::Pointer itkImage;
-
-  mitk::CastToItkImage(image, itkImage);
-
   itkFloatImageType::Pointer bmode;
+  mitk::CastToItkImage(image, itkImage);
 
   if (useLogFilter)
   {
@@ -302,9 +298,28 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   return mitk::GrabItkImageMemory(bmode);
 }
 
+mitk::Image::Pointer mitk::USDiPhASImageSource::CutOffTop(mitk::Image::Pointer image, int cutOffSize)
+{
+  typedef itk::CropImageFilter < itkFloatImageType, itkFloatImageType > CutImageFilter;
+  itkFloatImageType::SizeType cropSize;
+  itkFloatImageType::Pointer itkImage;
+  mitk::CastToItkImage(image, itkImage);
+
+  cropSize[0] = 0;
+  if(itkImage->GetLargestPossibleRegion().GetSize()[1] == 2048)
+    cropSize[1] = cutOffSize;
+  else
+    cropSize[1] = 0;
+  cropSize[2] = 0;
+  CutImageFilter::Pointer cutOffFilter = CutImageFilter::New();
+  cutOffFilter->SetInput(itkImage);
+  cutOffFilter->SetLowerBoundaryCropSize(cropSize);
+  cutOffFilter->UpdateLargestPossibleRegion();
+  return mitk::GrabItkImageMemory(cutOffFilter->GetOutput());
+}
+
 mitk::Image::Pointer mitk::USDiPhASImageSource::ResampleOutputVertical(mitk::Image::Pointer image, float verticalSpacing)
 {
-  typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
   ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
 
@@ -333,7 +348,6 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ResampleOutputVertical(mitk::Ima
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
 {
-  typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
 
   itkFloatImageType::Pointer itkImage;
@@ -348,8 +362,6 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyScatteringCompensation(mitk
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3])
 {
-  typedef itk::Image< double, 3 > itkFloatImageType; 
-  
   typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
   ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
 
@@ -382,7 +394,6 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Poi
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::MultiplyImage(mitk::Image::Pointer inputImage, double value)
 {
-  typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
 
   itkFloatImageType::Pointer itkImage;
@@ -499,7 +510,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       short offset = m_Device->GetScanMode().accumulation * 2048;
 
       short* noOffset = new short[channelDataChannelsPerDataset*channelDataSamplesPerChannel*channelDataTotalDatasets];
-      for (unsigned char set = 0; set < channelDataTotalDatasets; ++set)
+      for (unsigned char set = 0; set < 1; ++set)// channelDataTotalDatasets; ++set) // we ignore the raw US images for now
       {
         for (unsigned short sam = 0; sam < channelDataSamplesPerChannel; ++sam)
         {
@@ -512,7 +523,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       }
 
       // save the raw images when recording
-      for (unsigned char i = 0; i < channelDataTotalDatasets; ++i)
+      for (unsigned char i = 0; i < 1; ++i)// channelDataTotalDatasets; ++i) // we ignore the raw US images for now
       {
         mitk::Image::Pointer rawImage = mitk::Image::New();
         rawImage->Initialize(mitk::MakeScalarPixelType<short>(), 3, dim);
@@ -524,7 +535,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
         mitk::Vector3D rawSpacing;
         rawSpacing[0] = m_Device->GetScanMode().transducerPitchMeter * 1000; // save in mm
-        rawSpacing[1] = recordTime / channelDataSamplesPerChannel / 2 * 1000000;  // save in us
+        rawSpacing[1] = recordTime / channelDataSamplesPerChannel * 1000000;  // save in us
         rawSpacing[2] = 1;
 
         rawImage->GetGeometry()->SetSpacing(rawSpacing);
@@ -752,16 +763,17 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       if (m_SavingSettings.saveRaw)
       {
         OrderImagesInterleaved(PAImageRaw, USImageRaw, m_RawRecordedImages, true);
-        mitk::IOUtil::Save(USImageRaw, pathUSRaw);
+        // mitk::IOUtil::Save(USImageRaw, pathUSRaw);
         mitk::IOUtil::Save(PAImageRaw, pathPARaw);
       }
 
       // read the pixelvalues of the enveloped images at this position
 
       itk::Index<3> pixel = { {
-          (itk::Index<3>::IndexValueType)(m_RecordedImages.at(1)->GetDimension(0) / 2),
+          (itk::Index<3>::IndexValueType)(m_RecordedImages.at(0)->GetDimension(0) / 2),
           (itk::Index<3>::IndexValueType)(22.0 / 532.0*m_Device->GetScanMode().reconstructionSamplesPerLine), 
           0 } }; //22/532*2048 = 84
+
       GetPixelValues(pixel, m_PixelValues); // write the Pixelvalues to m_PixelValues
 
       // save the timestamps!
@@ -788,7 +800,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       settingsFile << "Speed of Sound [m/s] = " << sM.averageSpeedOfSound << "\n";
       settingsFile << "Excitation Frequency [MHz] = " << sM.transducerFrequencyHz/1000000 << "\n";
       settingsFile << "Voltage [V] = " << sM.voltageV << "\n";
-      settingsFile << "TGC min = " << (int)sM.tgcdB[0] << " max = " << (int)sM.tgcdB[6] << "\n";
+      settingsFile << "TGC min = " << (int)sM.tgcdB[0] << " max = " << (int)sM.tgcdB[7] << "\n";
 
       settingsFile << "[Beamforming Parameters]\n";
       settingsFile << "Reconstructed Lines = " << sM.reconstructionLines << "\n";
@@ -811,7 +823,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
 void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel, std::vector<float>& values)
 {
-  unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+  unsigned int events = 2;
   for (int index = 0; index < m_RecordedImages.size(); index += events)  // omit sound images
   {
     Image::Pointer image = m_RecordedImages.at(index);
@@ -825,6 +837,8 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
   unsigned int width  = 32;
   unsigned int height = 32;
   unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+  if (!raw)
+    events = 2; // the beamformed image array contains only the resulting image of multiple events
 
   if (raw)
   {
@@ -853,13 +867,15 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
   for (int index = 0; index < recordedList.size(); ++index)
   {
     mitk::ImageReadAccessor inputReadAccessor(recordedList.at(index));
+
     if (index % events == 0)
     {
       PAImage->SetSlice(inputReadAccessor.GetData(), index / events);
     }
     else
     {
-      USImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events)-1);
+      if(!raw)
+        USImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events)-1);
     }
   }
 }

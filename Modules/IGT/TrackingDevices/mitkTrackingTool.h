@@ -91,7 +91,7 @@ namespace mitk
     bool m_Enabled;             ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;           ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data
     Point3D m_ToolTipPosition;
-    Quaternion m_ToolTipRotation;
+    Quaternion m_ToolAxisTransform;
     bool m_ToolTipSet;
   };
 } // namespace mitk

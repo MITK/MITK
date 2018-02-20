@@ -133,13 +133,13 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     if (Tool->IsToolTipSet())
     {
       thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())));
-      thisTool->AddProperty("ToolTipOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolTipOrientation())));
+      thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())));
     }
 
     //Tool Axis
     thisTool->AddProperty("ToolAxis", mitk::StringProperty::New(ConvertPointToString(Tool->GetToolAxis())));
 
-  //Material is not needed, to avoid errors in scene serialization we have to do this:
+  ////Material is not needed, to avoid errors in scene serialization we have to do this:
     thisTool->ReplaceProperty("material",nullptr);
 
 

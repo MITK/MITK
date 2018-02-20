@@ -123,7 +123,7 @@ namespace mitk
             //adapt name of tool
             dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
             //set tip of tool
-            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTip(navigationTools->GetTool(j)->GetToolTipPosition(), navigationTools->GetTool(j)->GetToolTipOrientation());
+            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTipPosition(navigationTools->GetTool(j)->GetToolTipPosition(), navigationTools->GetTool(j)->GetToolAxisOrientation());
             //rember that this tool was already found
             alreadyFoundTools.push_back(j);
 

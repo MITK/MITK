@@ -204,7 +204,7 @@ void mitk::PolhemusTrackingDevice::TrackTools()
       else
       {
         std::vector<mitk::PolhemusTool::Pointer> allTools = this->GetAllTools();
-        for (int i = 0; i < allTools.size(); i++)
+        for (size_t i = 0; i < allTools.size(); i++)
         {
           mitk::PolhemusTool::Pointer currentTool = allTools.at(i);
           currentTool->SetDataValid(true);

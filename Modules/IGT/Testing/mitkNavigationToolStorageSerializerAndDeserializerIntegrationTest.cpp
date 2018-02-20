@@ -122,7 +122,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("..Testing if tool calibration landmarks have been stored and loaded correctly.",((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)));
 
     mitk::Point3D readToolTipPos = readStorage->GetTool(0)->GetToolTipPosition();
-    mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolTipOrientation();
+    mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolAxisOrientation();
 
     CPPUNIT_ASSERT_MESSAGE("..Testing if tool tip position has been stored and loaded correctly.",
       ((float(readToolTipPos[0]) == float(1.3423))&&

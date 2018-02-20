@@ -149,7 +149,7 @@ bool mitk::PolhemusInterface::Connect()
   //if we have the same number of tools as before, check if they are still the same.
   if (m_ToolPorts.size() == _trackingData.size())
   {
-    for (int i = 0; i < _trackingData.size(); ++i)
+    for (size_t i = 0; i < _trackingData.size(); ++i)
     {
       //if they are not the same, clear hemispheres and toolNames and break.
       if (m_ToolPorts[i] != _trackingData.at(i).id)
@@ -165,7 +165,7 @@ bool mitk::PolhemusInterface::Connect()
   //if we don't have old tool names or if the old ones don't match any more, assign them again.
   if (m_ToolPorts.size() == 0)
   {
-    for (int i = 0; i < _trackingData.size(); ++i)
+    for (size_t i = 0; i < _trackingData.size(); ++i)
     {
       m_ToolPorts.push_back(_trackingData.at(i).id);
     }

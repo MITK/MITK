@@ -74,14 +74,16 @@ namespace mitk {
     //Tool tip definition:
     itkGetConstMacro(ToolTipPosition,mitk::Point3D);
     itkSetMacro(ToolTipPosition,mitk::Point3D);
-    itkGetConstMacro(ToolTipOrientation,mitk::Quaternion);
-    itkSetMacro(ToolTipOrientation,mitk::Quaternion);
+    itkGetConstMacro(ToolAxisOrientation,mitk::Quaternion);
+    itkSetMacro(ToolAxisOrientation,mitk::Quaternion);
 
     //Tool Axis definition:
-    //default tool axis is along x axis, the tool axis must be normalized
-    itkGetConstMacro(ToolAxis, mitk::Point3D);
-    itkSetMacro(ToolAxis, mitk::Point3D);
-
+    /** @return Returns the main tool axis which is defined as the z-coordinate of the tool coordinate system. */
+    mitk::Point3D GetToolAxis();
+    /** Convenience function to define the tool orientation given the main tool axis. As the main tool axis 
+    is defined as the negative z-axis of the tool coordinate system, the tool orientation is calculated as 
+    a rotation of the actual tool axis in tool coordinates as obtained by a calibration  to the main axis.*/
+    void SetToolAxis(mitk::Point3D toolAxis);
 
     /** @return Returns the tooltip as transform object. */
     mitk::AffineTransform3D::Pointer GetToolTipTransform();
@@ -199,12 +201,8 @@ namespace mitk {
     mitk::PointSet::Pointer m_ToolControlPoints;
     /** @brief Holds the position of the tool tip. */
     mitk::Point3D m_ToolTipPosition;
-    /** @brief Holds the orientation of the tool tip. */
-    mitk::Quaternion m_ToolTipOrientation;
-
-    /** @brief Holds the axis of the tool. */
-    mitk::Point3D m_ToolAxis;
-    //#################################################
+    /** @brief Holds the transformation of the main tool axis to the negative z-axis (0,0,-1) */
+    mitk::Quaternion m_ToolAxisOrientation;
 
   };
 } // namespace mitk

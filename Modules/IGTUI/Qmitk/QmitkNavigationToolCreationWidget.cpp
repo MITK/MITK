@@ -185,17 +185,14 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
   m_Controls->m_IdentifierEdit->setText(QString(m_ToolToBeEdited->GetIdentifier().c_str()));
   m_Controls->m_SerialNumberEdit->setText(QString(m_ToolToBeEdited->GetSerialNumber().c_str()));
 
-  m_Controls->m_ToolAxisX->setValue(m_ToolToBeEdited->GetToolAxis()[0]);
-  m_Controls->m_ToolAxisY->setValue(m_ToolToBeEdited->GetToolAxis()[1]);
-  m_Controls->m_ToolAxisZ->setValue(m_ToolToBeEdited->GetToolAxis()[2]);
   QString _label = "(" +
     QString::number(m_ToolToBeEdited->GetToolTipPosition()[0], 'f', 1) + ", " +
     QString::number(m_ToolToBeEdited->GetToolTipPosition()[1], 'f', 1) + ", " +
     QString::number(m_ToolToBeEdited->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[0], 'f', 2) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[1], 'f', 2) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[2], 'f', 2) + ", " +
-    QString::number(m_ToolToBeEdited->GetToolTipOrientation()[3], 'f', 2) + "]";
+    QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[0], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[1], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[2], 'f', 2) + ", " +
+    QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[3], 'f', 2) + "]";
   m_Controls->m_ToolTipLabel->setText(_label);
 
   //Undo block signals. Don't remove it, if signals are still blocked at the beginning of this function!
@@ -268,12 +265,12 @@ void QmitkNavigationToolCreationWidget::GetValuesFromGuiElements()
   m_ToolToBeEdited->SetIdentifier(m_Controls->m_IdentifierEdit->text().toLatin1().data());
   m_ToolToBeEdited->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toLatin1().data());
 
-  //Tool Axis
-  mitk::Point3D toolAxis;
-  toolAxis.SetElement(0, (m_Controls->m_ToolAxisX->value()));
-  toolAxis.SetElement(1, (m_Controls->m_ToolAxisY->value()));
-  toolAxis.SetElement(2, (m_Controls->m_ToolAxisZ->value()));
-  m_ToolToBeEdited->SetToolAxis(toolAxis);
+  ////Tool Axis
+  //mitk::Point3D toolAxis;
+  //toolAxis.SetElement(0, (m_Controls->m_ToolAxisX->value()));
+  //toolAxis.SetElement(1, (m_Controls->m_ToolAxisY->value()));
+  //toolAxis.SetElement(2, (m_Controls->m_ToolAxisZ->value()));
+  //m_ToolToBeEdited->SetToolAxis(toolAxis);
 }
 
 mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool()
@@ -329,7 +326,7 @@ void QmitkNavigationToolCreationWidget::MessageBox(std::string s)
 void QmitkNavigationToolCreationWidget::OnEditToolTip()
 {
   m_ToolTransformationWidget->SetToolToEdit(m_ToolToBeEdited);
-  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToBeEdited->GetToolTipOrientation());
+  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToBeEdited->GetToolAxisOrientation());
   m_ToolTransformationWidget->SetDefaultOffset(m_ToolToBeEdited->GetToolTipPosition());
 
   m_ToolTransformationWidget->open();
@@ -342,17 +339,17 @@ void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransf
   {
     m_ToolToBeEdited->SetToolTipPosition(toolTip->GetOffset());
     mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
-    m_ToolToBeEdited->SetToolTipOrientation(tempND->GetOrientation());
+    m_ToolToBeEdited->SetToolAxisOrientation(tempND->GetOrientation());
 
     //Update Label
     QString _label = "(" +
       QString::number(m_ToolToBeEdited->GetToolTipPosition()[0], 'f', 1) + ", " +
       QString::number(m_ToolToBeEdited->GetToolTipPosition()[1], 'f', 1) + ", " +
       QString::number(m_ToolToBeEdited->GetToolTipPosition()[2], 'f', 1) + "), quat: [" +
-      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[0], 'f', 2) + ", " +
-      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[1], 'f', 2) + ", " +
-      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[2], 'f', 2) + ", " +
-      QString::number(m_ToolToBeEdited->GetToolTipOrientation()[3], 'f', 2) + "]";
+      QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[0], 'f', 2) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[1], 'f', 2) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[2], 'f', 2) + ", " +
+      QString::number(m_ToolToBeEdited->GetToolAxisOrientation()[3], 'f', 2) + "]";
     m_Controls->m_ToolTipLabel->setText(_label);
   }
 }

@@ -386,7 +386,7 @@ void QmitkIGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationDa
 
   //Update tool in tool storage
   m_ToolToCalibrate->SetToolTipPosition(ToolTipTransformInToolCoordinates->GetPosition());
-  m_ToolToCalibrate->SetToolTipOrientation(ToolTipTransformInToolCoordinates->GetOrientation());
+  m_ToolToCalibrate->SetToolAxisOrientation(ToolTipTransformInToolCoordinates->GetOrientation());
 
   //And also update tracking device, so the transform is directly used
   mitk::TrackingDeviceSource::Pointer trackingDeviceSource;
@@ -394,7 +394,7 @@ void QmitkIGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationDa
   {
     trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_NavigationDataSourceOfToolToCalibrate.GetPointer());
     mitk::TrackingTool::Pointer TrackingToolToCalibrate = trackingDeviceSource->GetTrackingDevice()->GetTool(m_IDToolToCalibrate);
-    TrackingToolToCalibrate->SetToolTip(ToolTipTransformInToolCoordinates->GetPosition(), ToolTipTransformInToolCoordinates->GetOrientation());
+    TrackingToolToCalibrate->SetToolTipPosition(ToolTipTransformInToolCoordinates->GetPosition(), ToolTipTransformInToolCoordinates->GetOrientation());
   }
   catch (std::exception& e)
   {
@@ -436,12 +436,12 @@ void QmitkIGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
   std::stringstream translation;
   std::stringstream orientation;
   translation << m_ToolToCalibrate->GetToolTipPosition();
-  orientation << "Quaternion: (" << m_ToolToCalibrate->GetToolTipOrientation() << ")" << std::endl;
+  orientation << "Quaternion: (" << m_ToolToCalibrate->GetToolAxisOrientation() << ")" << std::endl;
   orientation << std::endl;
-  orientation << "Euler Angles [rad]: (" << m_ToolToCalibrate->GetToolTipOrientation().rotation_euler_angles() << ")" << std::endl;
+  orientation << "Euler Angles [rad]: (" << m_ToolToCalibrate->GetToolAxisOrientation().rotation_euler_angles() << ")" << std::endl;
   orientation << std::endl;
   orientation << "Matrix:" << std::endl;
-  vnl_matrix_fixed<double, 3, 3> rotMatrix = m_ToolToCalibrate->GetToolTipOrientation().rotation_matrix_transpose();
+  vnl_matrix_fixed<double, 3, 3> rotMatrix = m_ToolToCalibrate->GetToolAxisOrientation().rotation_matrix_transpose();
   orientation << rotMatrix[0][0] << " " << rotMatrix[0][1] << " " << rotMatrix[0][2] << std::endl;
   orientation << rotMatrix[1][0] << " " << rotMatrix[1][1] << " " << rotMatrix[1][2] << std::endl;
   orientation << rotMatrix[2][0] << " " << rotMatrix[2][1] << " " << rotMatrix[2][2] << std::endl;
@@ -455,7 +455,7 @@ void QmitkIGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 
   m_ToolTransformationWidget->SetToolToEdit(m_ToolToCalibrate);
   m_ToolTransformationWidget->SetDefaultOffset(m_ToolToCalibrate->GetToolTipPosition());
-  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToCalibrate->GetToolTipOrientation());
+  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToCalibrate->GetToolAxisOrientation());
 
   m_ToolTransformationWidget->open();
 }
@@ -512,16 +512,22 @@ void QmitkIGTNavigationToolCalibration::OnCalibrateToolAxis()
   //here is an explanation, what is happening here:
   /*
   The axis is equal to the (tool tip) minus the (end of the tool) in tool coordinates of the tool which should be calibrated.
-  The tool tip in tool coordinates is zero (definition of the tip).
-  The end of the tool is recorded by the calibration pointer's position and is transformed using the inverse of the tool which should be calibrated.
+  The tool tip is defined as the origin of the tool coordinate system.
+  The end of the tool is recorded by the calibration pointer's position and is transformed into the coordinate system of the tool to be calibrated
   Normalize it.
   */
+  //m_CalibratedToolAxis = -m_AxisCalibration_ToolToCalibrate->TransformPoint(m_AxisCalibration_NavDataCalibratingTool->GetPosition()).GetVectorFromOrigin();
   m_CalibratedToolAxis = -m_AxisCalibration_ToolToCalibrate->GetInverse()->TransformPoint(m_AxisCalibration_NavDataCalibratingTool->GetPosition()).GetVectorFromOrigin();
   MITK_DEBUG << "Tool Endpoint in Tool coordinates: " << m_CalibratedToolAxis;
   m_CalibratedToolAxis.Normalize();
   MITK_DEBUG << "Tool Axis: " << m_CalibratedToolAxis;
 
   m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
+
+  // Update TrackingTool
+  m_ComputedToolTipTransformation->SetPosition(m_ToolToCalibrate->GetToolTipPosition());
+  m_ComputedToolTipTransformation->SetOrientation(m_ToolToCalibrate->GetToolAxisOrientation());
+  ApplyToolTipTransform(m_ComputedToolTipTransformation);
 
   //Update GUI
   QString calibratedToolAxisString = "Tool Axis: " + QString::number(m_CalibratedToolAxis.GetElement(0), 'f', 3) + ", " +
@@ -571,15 +577,6 @@ void QmitkIGTNavigationToolCalibration::SetToolToCalibrate()
     mitk::Surface::Pointer ToolSurface = dynamic_cast<mitk::Surface*>(m_ToolToCalibrate->GetDataNode()->GetData())->Clone();
     m_ToolSurfaceInToolCoordinatesDataNode->SetData(ToolSurface);
     m_ToolSurfaceInToolCoordinatesDataNode->GetData()->GetGeometry()->SetIdentity();
-
-    //Set the default needle axis
-    m_CalibratedToolAxis = m_ToolToCalibrate->GetToolAxis().GetVectorFromOrigin();
-    //Block QT signals, we don't want to emit SpinboxChanged on the first value to overwrite the next ones
-    m_Controls.m_ToolAxis_X->blockSignals(true); m_Controls.m_ToolAxis_Y->blockSignals(true); m_Controls.m_ToolAxis_Z->blockSignals(true);
-    m_Controls.m_ToolAxis_X->setValue(m_CalibratedToolAxis[0]);
-    m_Controls.m_ToolAxis_Y->setValue(m_CalibratedToolAxis[1]);
-    m_Controls.m_ToolAxis_Z->setValue(m_CalibratedToolAxis[2]);
-    m_Controls.m_ToolAxis_X->blockSignals(false); m_Controls.m_ToolAxis_Y->blockSignals(false); m_Controls.m_ToolAxis_Z->blockSignals(false);
 
     UpdateManualToolTipCalibrationView();
 
@@ -706,7 +703,6 @@ void QmitkIGTNavigationToolCalibration::SaveCalibratedTool()
     calibratedTool->SetToolLandmarks(this->m_RegistrationLandmarks);
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(nullptr,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
-    filename.append(".IGTTool");
     if (filename == "") return;
     if (myWriter->DoWrite(filename, calibratedTool)) MITK_INFO << "Saved calibrated tool to file " << filename;
     else MITK_WARN << "Can't write tool to file " << filename;

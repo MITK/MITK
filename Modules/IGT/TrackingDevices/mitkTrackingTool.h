@@ -33,6 +33,13 @@ namespace mitk
   * TrackingDevices, or be subclassed for more specific implementations.
   * mitk::MicroBirdTrackingDevice uses this class to manage its tools. Other tracking devices
   * uses specialized versions of this class (e.g. mitk::NDITrackingTool)
+  * 
+  * The TrackingTool class holds all coordinate transforms associated with tracking of a tool.
+  * The sensor attached to the tool is localized in the global tracking coordinate system (m_Position, m_Orientation). 
+  * A tool tip (m_ToolTipPosition) can be defined in sensor coordinates. 
+  * The tool axis defines the main axis of the tool and is defined as the negative z-axis of the tool tip coordinate system
+  * The main axis of the representation object of the tool (e.g. a surface) has to be defined along the negative z-axis
+  * \imageMacro{TrackingTool.png,"Coordinate transforms associated to the tracking tool.",5.00}
   *
   * \ingroup IGT
   */
@@ -45,13 +52,13 @@ namespace mitk
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
-    virtual const char* GetToolName() const; ///< every tool has a name that can be used to identify it.
+    virtual const char* GetToolName() const; ///< every tool has a name thatgit  can be used to identify it.
     virtual void SetToolName(const std::string _arg); ///< Sets the name of the tool
     virtual void SetToolName(const char* _arg); ///< Sets the name of the tool
 
     Point3D GetToolTipPosition() const; ///< returns the tool tip in tool coordinates, which where set by SetToolTip
-    Quaternion GetToolTipOrientation() const; ///< returns the tool tip orientation in tool coordinates, which where set by SetToolTip
-    virtual void SetToolTip(Point3D toolTipPosition, Quaternion orientation, ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
+    Quaternion GetToolAxisOrientation() const; ///< returns the transformation of the tool axis with respect to the MITK-IGT main tool axis (0,0,-1)
+    virtual void SetToolTipPosition(Point3D toolTipPosition, Quaternion orientation, ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
     virtual bool IsToolTipSet() const; ///< returns true if a tool tip is set, false if not
 
     virtual void GetPosition(Point3D& position) const; ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)
@@ -85,13 +92,13 @@ namespace mitk
     double m_IGTTimeStamp;                           ///< contains the time at which the tracking data was recorded
     itk::FastMutexLock::Pointer m_MyMutex;           ///< mutex to control concurrent access to the tool
 
-    Point3D m_Position;         ///< holds the position of the tool
-    Quaternion m_Orientation;   ///< holds the orientation of the tool
+    Point3D m_Position;         ///< holds the position of the tool in global tracking coordinates
+    Quaternion m_Orientation;   ///< holds the orientation of the tool´in global tracking coordinates
     float m_TrackingError;      ///< holds the tracking error of the tool
     bool m_Enabled;             ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;           ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data
-    Point3D m_ToolTip;
-    Quaternion m_ToolTipRotation;
+    Point3D m_ToolTipPosition;  ///< holds the position of the tool tip in the coordinate system of the tracking sensor
+    Quaternion m_ToolAxisOrientation; ///< holds the rotation of the sensor coordinate system such that the z-axis coincides with the main tool axis e.g. obtained by a tool calibration
     bool m_ToolTipSet;
   };
 } // namespace mitk

@@ -524,6 +524,11 @@ void QmitkIGTNavigationToolCalibration::OnCalibrateToolAxis()
 
   m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
 
+  // Update TrackingTool
+  m_ComputedToolTipTransformation->SetPosition(m_ToolToCalibrate->GetToolTipPosition());
+  m_ComputedToolTipTransformation->SetOrientation(m_ToolToCalibrate->GetToolAxisOrientation());
+  ApplyToolTipTransform(m_ComputedToolTipTransformation);
+
   //Update GUI
   QString calibratedToolAxisString = "Tool Axis: " + QString::number(m_CalibratedToolAxis.GetElement(0), 'f', 3) + ", " +
     QString::number(m_CalibratedToolAxis.GetElement(1), 'f', 3) + ", " + QString::number(m_CalibratedToolAxis.GetElement(2), 'f', 3);
@@ -698,7 +703,6 @@ void QmitkIGTNavigationToolCalibration::SaveCalibratedTool()
     calibratedTool->SetToolRegistrationLandmarks(this->m_RegistrationLandmarks);
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(nullptr,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
-    filename.append(".IGTTool");
     if (filename == "") return;
     if (myWriter->DoWrite(filename, calibratedTool)) MITK_INFO << "Saved calibrated tool to file " << filename;
     else MITK_WARN << "Can't write tool to file " << filename;

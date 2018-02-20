@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
     itk::TimeProbe clock;
     clock.Start();
 
-    if (ist::PathExists(out_folder))
+    if (!ist::PathExists(out_folder))
     {
       MITK_INFO << "Creating output directory";
       ist::MakeDirectory(out_folder);

@@ -21,7 +21,6 @@ using namespace mitk;
 
 template< class ScalarType >
 TensorModel< ScalarType >::TensorModel()
-  : m_BValue(1000)
 {
   m_KernelDirection[0]=1; m_KernelDirection[1]=0; m_KernelDirection[2]=0;
   m_KernelTensorMatrix.fill(0.0);
@@ -72,7 +71,7 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir, Grad
 
     // check for corrupted tensor and generate signal
     if (D_scalar>=0)
-      signal = std::exp ( -m_BValue * D_scalar );  // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
+      signal = std::exp ( -this->m_BValue * D_scalar );  // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
   }
   else
     signal = 1;
@@ -115,7 +114,7 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
 
       // check for corrupted tensor and generate signal
       if (D_scalar>=0)
-        signal[i] = std::exp ( -m_BValue * D_scalar ); // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
+        signal[i] = std::exp ( -this->m_BValue * D_scalar ); // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
     }
     else
       signal[i] = 1;

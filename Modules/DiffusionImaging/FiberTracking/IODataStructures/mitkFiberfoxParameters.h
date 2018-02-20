@@ -40,10 +40,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class MITKFIBERTRACKING_EXPORT FiberfoxParameters;
 
   /** Signal generation */
   class MITKFIBERTRACKING_EXPORT SignalGenerationParameters
   {
+    friend FiberfoxParameters;
   public:
     typedef itk::Image<float, 3>                    ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
@@ -74,7 +76,6 @@ namespace mitk
       , m_NoiseVariance(0.001)
       , m_NumberOfCoils(1)
       , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
-      , m_Bvalue(1000)
       , m_SimulateKspaceAcquisition(false)
       , m_AxonRadius(0)
       , m_DoDisablePartialVolume(false)
@@ -90,6 +91,7 @@ namespace mitk
       , m_DoRandomizeMotion(true)
       , m_FrequencyMap(nullptr)
       , m_MaskImage(nullptr)
+      , m_Bvalue(1000)
     {
       m_ImageRegion.SetSize(0, 12);
       m_ImageRegion.SetSize(1, 12);
@@ -121,7 +123,6 @@ namespace mitk
     float                               m_NoiseVariance;            ///< Variance of complex gaussian noise
     int                                 m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
     CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
-    double                              m_Bvalue;                   ///< Acquisition b-value
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
     bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.
@@ -144,7 +145,6 @@ namespace mitk
     ItkFloatImgType::Pointer            m_FrequencyMap;             ///< If != nullptr, distortions are added to the image using this frequency map.
     ItkUcharImgType::Pointer            m_MaskImage;                ///< Signal is only genrated inside of the mask image.
 
-    void GenerateGradientHalfShell();                        ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
     std::vector< int > GetBaselineIndices();                 ///< Returns list of nun-diffusion-weighted image volume indices
     unsigned int GetFirstBaselineIndex();                    ///< Returns index of first non-diffusion-weighted image volume
     bool IsBaselineIndex(unsigned int idx);                  ///< Checks if image volume with given index is non-diffusion-weighted volume or not.
@@ -154,16 +154,19 @@ namespace mitk
     GradientListType GetGradientDirections();                ///< Return gradient direction container
     GradientType GetGradientDirection(unsigned int i);
     std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
-
-    void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
-    void SetGradienDirections(GradientListType gradientList);
-    void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
+    double GetBvalue();
 
   protected:
 
     unsigned int                        m_NumGradients;             ///< Number of diffusion-weighted image volumes.
     unsigned int                        m_NumBaseline;              ///< Number of non-diffusion-weighted image volumes.
     GradientListType                    m_GradientDirections;       ///< Total number of image volumes.
+    double                              m_Bvalue;                   ///< Acquisition b-value
+
+    void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
+    void SetGradienDirections(GradientListType gradientList);
+    void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
+    void GenerateGradientHalfShell();                        ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
   };
 
   /** Fiber generation */
@@ -266,7 +269,9 @@ namespace mitk
   */
   class MITKFIBERTRACKING_EXPORT FiberfoxParameters
   {
+
   public:
+
 
     typedef itk::Image<float, 3>                            ItkFloatImgType;
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
@@ -276,6 +281,7 @@ namespace mitk
     typedef DiffusionNoiseModel<double>                     NoiseModelType;
 
     FiberfoxParameters();
+    FiberfoxParameters(const FiberfoxParameters &params);
     ~FiberfoxParameters();
 
     /** Not templated parameters */
@@ -287,6 +293,13 @@ namespace mitk
     DiffusionModelListType              m_FiberModelList;       ///< Intra- and inter-axonal compartments.
     DiffusionModelListType              m_NonFiberModelList;    ///< Extra-axonal compartments.
     std::shared_ptr< NoiseModelType >   m_NoiseModel;           ///< If != nullptr, noise is added to the image.
+
+    void GenerateGradientHalfShell();
+    void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
+    void SetGradienDirections(mitk::SignalGenerationParameters::GradientListType gradientList);
+    void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
+    void SetBvalue(double Bvalue);
+    void UpdateSignalModels();
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(std::string filename);  ///< Save image generation parameters to .ffp file.

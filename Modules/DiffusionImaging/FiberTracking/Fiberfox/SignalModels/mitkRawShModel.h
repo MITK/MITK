@@ -38,7 +38,6 @@ public:
     {
         this->m_CompartmentId = model->m_CompartmentId;
         this->m_T2 = model->GetT2();
-        this->m_FiberDirection = model->GetFiberDirection();
         this->m_GradientList = model->GetGradientList();
         this->m_VolumeFractionImage = model->GetVolumeFractionImage();
         this->m_RandGen = model->GetRandomGenerator();
@@ -47,7 +46,6 @@ public:
         this->m_FaRange = model->GetFaRange();
         this->m_ShCoefficients = model->GetShCoefficients();
         this->m_B0Signal = model->GetB0Signals();
-        this->m_SphCoords = model->GetSphericalCoordinates();
         this->m_ShOrder = model->GetShOrder();
         this->m_ModelIndex = model->GetModelIndex();
         this->m_MaxNumKernels = model->GetMaxNumKernels();

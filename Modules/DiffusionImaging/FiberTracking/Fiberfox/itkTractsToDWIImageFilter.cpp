@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkExtractImageFilter.h>
 #include <itkResampleDwiImageFilter.h>
 #include <boost/algorithm/string/replace.hpp>
+#include <omp.h>
 
 namespace itk
 {
@@ -959,6 +960,9 @@ namespace itk
       int numFibers = m_FiberBundleWorkingCopy->GetNumFibers();
       boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
 
+      if (m_FiberBundle->GetMeanFiberLength()<5.0)
+        omp_set_num_threads(2);
+
       PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
       PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
 
@@ -1162,7 +1166,7 @@ namespace itk
         }
       }
 
-      if (m_Parameters.m_SignalGen.m_NoiseVariance>0)
+      if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_CheckAddNoiseBox)
         PrintToLog("Simulating complex Gaussian noise", false);
       if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
         PrintToLog("Simulating signal relaxation", false);

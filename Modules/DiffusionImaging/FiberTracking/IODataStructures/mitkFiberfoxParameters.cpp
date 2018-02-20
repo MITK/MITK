@@ -30,6 +30,51 @@ mitk::FiberfoxParameters::FiberfoxParameters()
 
 }
 
+mitk::FiberfoxParameters::FiberfoxParameters(const mitk::FiberfoxParameters& params)
+  : m_NoiseModel(nullptr)
+{
+  m_FiberGen = params.m_FiberGen;
+  m_SignalGen = params.m_SignalGen;
+  m_Misc = params.m_Misc;
+
+  if (params.m_NoiseModel!=nullptr)
+  {
+    if (dynamic_cast<mitk::RicianNoiseModel<>*>(params.m_NoiseModel.get()))
+      m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<> >();
+    else if (dynamic_cast<mitk::ChiSquareNoiseModel<>*>(params.m_NoiseModel.get()))
+      m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<> >();
+    m_NoiseModel->SetNoiseVariance(params.m_NoiseModel->GetNoiseVariance());
+  }
+
+  for (unsigned int i=0; i<params.m_FiberModelList.size()+params.m_NonFiberModelList.size(); i++)
+  {
+    mitk::DiffusionSignalModel<>* outModel = nullptr;
+    mitk::DiffusionSignalModel<>* signalModel = nullptr;
+    if (i<params.m_FiberModelList.size())
+      signalModel = params.m_FiberModelList.at(i);
+    else
+      signalModel = params.m_NonFiberModelList.at(i-params.m_FiberModelList.size());
+
+    if (dynamic_cast<mitk::StickModel<>*>(signalModel))
+      outModel = new mitk::StickModel<>(dynamic_cast<mitk::StickModel<>*>(signalModel));
+    else  if (dynamic_cast<mitk::TensorModel<>*>(signalModel))
+      outModel = new mitk::TensorModel<>(dynamic_cast<mitk::TensorModel<>*>(signalModel));
+    else  if (dynamic_cast<mitk::RawShModel<>*>(signalModel))
+      outModel = new mitk::RawShModel<>(dynamic_cast<mitk::RawShModel<>*>(signalModel));
+    else  if (dynamic_cast<mitk::BallModel<>*>(signalModel))
+      outModel = new mitk::BallModel<>(dynamic_cast<mitk::BallModel<>*>(signalModel));
+    else if (dynamic_cast<mitk::AstroStickModel<>*>(signalModel))
+      outModel = new mitk::AstroStickModel<>(dynamic_cast<mitk::AstroStickModel<>*>(signalModel));
+    else  if (dynamic_cast<mitk::DotModel<>*>(signalModel))
+      outModel = new mitk::DotModel<>(dynamic_cast<mitk::DotModel<>*>(signalModel));
+
+    if (i<params.m_FiberModelList.size())
+      m_FiberModelList.push_back(outModel);
+    else
+      m_NonFiberModelList.push_back(outModel);
+  }
+}
+
 
 mitk::FiberfoxParameters::~FiberfoxParameters()
 {
@@ -145,6 +190,11 @@ std::vector< int > mitk::SignalGenerationParameters::GetBvalues()
       bVals.push_back(bVal);
   }
   return bVals;
+}
+
+double mitk::SignalGenerationParameters::GetBvalue()
+{
+  return m_Bvalue;
 }
 
 void mitk::SignalGenerationParameters::SetGradienDirections(GradientListType gradientList)
@@ -462,6 +512,49 @@ ParameterType mitk::FiberfoxParameters::ReadVal(boost::property_tree::ptree::val
   }
 }
 
+void mitk::FiberfoxParameters::UpdateSignalModels()
+{
+  for (mitk::DiffusionSignalModel<>* m : m_FiberModelList)
+  {
+    m->SetGradientList(m_SignalGen.m_GradientDirections);
+    m->SetBvalue(m_SignalGen.m_Bvalue);
+  }
+  for (mitk::DiffusionSignalModel<>* m : m_NonFiberModelList)
+  {
+    m->SetGradientList(m_SignalGen.m_GradientDirections);
+    m->SetBvalue(m_SignalGen.m_Bvalue);
+  }
+}
+
+void mitk::FiberfoxParameters::SetNumWeightedVolumes(int numGradients)
+{
+  m_SignalGen.SetNumWeightedVolumes(numGradients);
+  UpdateSignalModels();
+}
+
+void mitk::FiberfoxParameters::SetGradienDirections(mitk::SignalGenerationParameters::GradientListType gradientList)
+{
+  m_SignalGen.SetGradienDirections(gradientList);
+  UpdateSignalModels();
+}
+
+void mitk::FiberfoxParameters::SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList)
+{
+  m_SignalGen.SetGradienDirections(gradientList);
+  UpdateSignalModels();
+}
+
+void mitk::FiberfoxParameters::SetBvalue(double Bvalue)
+{
+  m_SignalGen.m_Bvalue = Bvalue;
+  UpdateSignalModels();
+}
+
+void mitk::FiberfoxParameters::GenerateGradientHalfShell()
+{
+  m_SignalGen.GenerateGradientHalfShell();
+  UpdateSignalModels();
+}
 
 void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 {
@@ -503,14 +596,14 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 
       switch (ReadVal<unsigned int>(v1,"distribution", 0))
       {
-        case 0:
-          m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+      case 0:
+        m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
         break;
-        case 1:
-          m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
+      case 1:
+        m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
         break;
-        default:
-          m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+      default:
+        m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
       }
       m_FiberGen.m_Variance = ReadVal<double>(v1,"variance", m_FiberGen.m_Variance);
       m_FiberGen.m_Density = ReadVal<unsigned int>(v1,"density", m_FiberGen.m_Density);
@@ -629,9 +722,9 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
         while( stream >> nummer )
         {
           if( nummer < std::numeric_limits<int>::max() )
-            {
-              numbers.push_back( nummer );
-            }
+          {
+            numbers.push_back( nummer );
+          }
         }
         // If a list of negative numbers is given:
         if( *(std::min_element( numbers.begin(), numbers.end() )) < 0

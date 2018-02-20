@@ -1022,6 +1022,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
   MITK_INFO << "Cutting fibers";
+  std::vector<float> new_weights;
   boost::progress_display disp(m_NumFibers);
   for (int i=0; i<m_NumFibers; i++)
   {
@@ -1065,8 +1066,11 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
         }
       }
 
-      if (newNumPoints>0)
+      if (newNumPoints>1)
+      {
         vtkNewCells->InsertNextCell(container);
+        new_weights.push_back(this->GetFiberWeight(i));
+      }
     }
 
   }
@@ -1079,6 +1083,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
   newPolyData->SetLines(vtkNewCells);
   mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(newPolyData);
   newFib->Compress(0.1);
+  for (unsigned int i=0; i<new_weights.size(); ++i)
+    newFib->SetFiberWeight(i, new_weights.at(i));
   return newFib;
 }
 

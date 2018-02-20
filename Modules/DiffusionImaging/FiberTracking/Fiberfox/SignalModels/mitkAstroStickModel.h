@@ -37,7 +37,6 @@ public:
     {
         this->m_CompartmentId = model->m_CompartmentId;
         this->m_T2 = model->GetT2();
-        this->m_FiberDirection = model->GetFiberDirection();
         this->m_GradientList = model->GetGradientList();
         this->m_VolumeFractionImage = model->GetVolumeFractionImage();
         this->m_RandGen = model->GetRandomGenerator();
@@ -60,9 +59,6 @@ public:
 
     void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; } ///< Random stick configuration in each voxel
     bool GetRandomizeSticks() { return m_RandomizeSticks; }
-
-    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    double GetBvalue() { return m_BValue; }
 
     void SetDiffusivity(double diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
     double GetDiffusivity() { return m_Diffusivity; }
@@ -111,7 +107,6 @@ public:
 protected:
 
     GradientType GetRandomDirection();
-    double   m_BValue;              ///< b-value used to generate the artificial signal
     double   m_Diffusivity;         ///< Scalar diffusion constant
     GradientListType m_Sticks;          ///< Stick container
     unsigned int m_NumSticks;           ///< Number of sticks

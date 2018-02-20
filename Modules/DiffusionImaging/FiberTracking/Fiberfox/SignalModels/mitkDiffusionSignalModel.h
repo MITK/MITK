@@ -40,6 +40,7 @@ public:
     DiffusionSignalModel()
         : m_T2(100)
         , m_T1(0)
+        , m_BValue(1000)
     {}
     ~DiffusionSignalModel(){}
 
@@ -91,6 +92,9 @@ public:
         m_RandGen->SetSeed(s);
     }
 
+    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    double GetBvalue() { return m_BValue; }
+
     unsigned int                m_CompartmentId;        ///< GUI flag. Which compartment is this model assigned to?
 
 protected:
@@ -100,6 +104,7 @@ protected:
     double                      m_T1;                   ///< Tissue specific longitudinal relaxation time
     ItkDoubleImgType::Pointer   m_VolumeFractionImage;  ///< Tissue specific volume fraction for each voxel (only relevant for non fiber compartments)
     ItkRandGenType::Pointer     m_RandGen;              ///< Random number generator
+    double                      m_BValue;
 };
 
 }

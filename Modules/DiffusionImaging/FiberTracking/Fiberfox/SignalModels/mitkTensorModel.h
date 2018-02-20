@@ -37,7 +37,6 @@ public:
     {
         this->m_CompartmentId = model->m_CompartmentId;
         this->m_T2 = model->GetT2();
-        this->m_FiberDirection = model->GetFiberDirection();
         this->m_GradientList = model->GetGradientList();
         this->m_VolumeFractionImage = model->GetVolumeFractionImage();
         this->m_RandGen = model->GetRandomGenerator();
@@ -57,8 +56,6 @@ public:
     PixelType SimulateMeasurement(GradientType& fiberDirection);
     ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection);
 
-    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    double GetBvalue() { return m_BValue; }
     void SetDiffusivity1(double d1){ m_KernelTensorMatrix[0][0] = d1; }
     void SetDiffusivity2(double d2){ m_KernelTensorMatrix[1][1] = d2; }
     void SetDiffusivity3(double d3){ m_KernelTensorMatrix[2][2] = d3; }
@@ -75,7 +72,6 @@ protected:
     void UpdateKernelTensor();
     GradientType                        m_KernelDirection;      ///< Direction of the kernel tensors principal eigenvector
     vnl_matrix_fixed<double, 3, 3>      m_KernelTensorMatrix;   ///< 3x3 matrix containing the kernel tensor values
-    double                              m_BValue;               ///< b-value used to generate the artificial signal
 };
 
 }

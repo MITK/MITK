@@ -146,7 +146,7 @@ public:
 
     mitk::Quaternion toolTipOrientation = mitk::Quaternion(0.5, 0, 0, 1);
 
-    m_TrackingTool->SetToolTip(toolTipPosition, toolTipOrientation);
+    m_TrackingTool->SetToolTipPosition(toolTipPosition, toolTipOrientation);
 
     mitk::Point3D toolPosition;
     mitk::FillVector3D(toolPosition, 5, 6, 7);
@@ -204,7 +204,7 @@ public:
   {
     mitk::Quaternion expectedOrientation(0, 0, 0, 1);
 
-    CPPUNIT_ASSERT_EQUAL(expectedOrientation,  m_TrackingTool->GetToolTipOrientation());
+    CPPUNIT_ASSERT_EQUAL(expectedOrientation,  m_TrackingTool->GetToolAxisOrientation());
   }
 
   void IsToolTipSet_Default_ReturnsFalse()
@@ -221,10 +221,10 @@ public:
 
     mitk::Quaternion expectedOrientation(0.344, 0.625, 0.999, 0.574);
 
-    m_TrackingTool->SetToolTip(expectedPosition, expectedOrientation);
+    m_TrackingTool->SetToolTipPosition(expectedPosition, expectedOrientation);
 
     CPPUNIT_ASSERT_EQUAL(expectedPosition, m_TrackingTool->GetToolTipPosition());
-    CPPUNIT_ASSERT_EQUAL(expectedOrientation, m_TrackingTool->GetToolTipOrientation());
+    CPPUNIT_ASSERT_EQUAL(expectedOrientation, m_TrackingTool->GetToolAxisOrientation());
     CPPUNIT_ASSERT_EQUAL(true, m_TrackingTool->IsToolTipSet());
   }
 

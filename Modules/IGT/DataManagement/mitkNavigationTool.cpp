@@ -348,8 +348,8 @@ std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
     << "  Serial number: " << m_SerialNumber << "\n"
     << "  TrackingDeviceType: " << m_TrackingDeviceType << "\n"
     << "  ToolTip Position: " << m_ToolTipPosition << "\n"
-    << "  Tool Axis Transform: " << m_ToolAxisOrientation << "\n"
-    << "  Tool Axis: " << m_ToolAxisOrientation.rotation_matrix_transpose().get_row(2);
+    << "  Tool Axis Orientation: " << m_ToolAxisOrientation << "\n"
+    << "  Tool Axis: " <<   m_ToolAxisOrientation.inverse().rotate(vnl_vector_fixed<mitk::ScalarType,3>(0.0,0.0,-1.0))
     ;
 
   return _info.str();

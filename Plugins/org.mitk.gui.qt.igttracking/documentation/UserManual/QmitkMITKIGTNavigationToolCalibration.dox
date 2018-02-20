@@ -64,10 +64,15 @@ To calibrate your tool via pivoting place it on its tip an pivot it around its t
 
 Two types of landmarks can be defined for each tool:
 <ul>
-<li> Tool landmarks that represents features on the tool which are e.g. visible in a CT image
 <li> Control points for a later point-based registration
+<li> Tool landmarks that represents features on the tool which are e.g. visible in a CT image
 </ul>
-Both sets of landmarks are defined in the tool coordinate space. The tool landmarks can be calibrated using a second tracked pointer, move it to each landmark and press "Add Pointer Position". The control points are virtual and can only defined manually. A typical set of three control points for a 6 DoF tool might be [1;0;0], [0;1;0], [0;0;1].
+
+Both sets of landmarks are defined in the tool coordinate space.
+
+Control points are virtual and can only defined manually. These landmarks clearly define the tools pose only by using landmarks in the tool coordinate system. E.g., two landmarks for a 5DoF tool and three landmarks for a 6DoF tool. They may be used, e.g., for a point based registration of a tool from image space to tracking space. A typical set of three control points for a 6 DoF tool might be [1;0;0], [0;1;0], [0;0;1].
+
+Tool landmarks are designed for representing defined landmarks on a tool. The number of these landmarks might exeed the number of control points for reasons of redundancy and averaging. They are used for, e.g., manually registering the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a point based registration from image space to tracking space later, you might overweight the tool because of two many landmarks compared to other markers. The tool landmarks can be calibrated manually or by using a second tracked pointer, move it to each landmark and press "Add Pointer Position".
 
 Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 

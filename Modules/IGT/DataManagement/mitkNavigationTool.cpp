@@ -45,10 +45,6 @@ m_ToolAxisOrientation(mitk::Quaternion(0, 0, 0, 1))
   m_ToolTipPosition[1] = 0;
   m_ToolTipPosition[2] = 0;
 
-  //m_ToolAxis[0] = 1;
-  //m_ToolAxis[1] = 0;
-  //m_ToolAxis[2] = 0;
-
   SetDefaultSurface();
 }
 
@@ -85,7 +81,6 @@ mitk::NavigationTool::NavigationTool(const NavigationTool &other)
     this->m_ToolCalibrationLandmarks = other.m_ToolCalibrationLandmarks->Clone();
   this->m_ToolTipPosition = other.m_ToolTipPosition;
   this->m_ToolAxisOrientation = other.m_ToolAxisOrientation;
-  //this->m_ToolAxis = other.m_ToolAxis;
 }
 
 mitk::NavigationTool::~NavigationTool()
@@ -340,19 +335,6 @@ void mitk::NavigationTool::SetDefaultSurface()
   TrafoFilter->Update();
 
   mySphere->SetVtkPolyData(TrafoFilter->GetOutput());
-
-  //vtkCone->Delete();
-  //vtkSphere->Delete();
-  //vtkLine->Delete();
-  //vtkLine2->Delete();
-  //vtkLine3->Delete();
-  //vtkCylinder->Delete();
-  //ZTransform->Delete();
-  //XTransform->Delete();
-  //ScaleTransform->Delete();
-  //TrafoFilter->Delete();
-  //appendPolyData->Delete();
-  //surface->Delete();
 
   this->GetDataNode()->SetData(mySphere);
 }

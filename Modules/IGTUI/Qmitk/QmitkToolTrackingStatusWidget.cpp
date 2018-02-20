@@ -208,7 +208,7 @@ void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Po
     label->setObjectName(name);
     label->setAlignment(m_Alignment | Qt::AlignVCenter);
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    //label->setStyleSheet("QLabel{background-color: #dddddd }");
+	label->setStyleSheet("QLabel{background-color: #dddddd; color: #000000 }");
     if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(label);
     else m_Controls->m_GridLayout->addWidget(label);
   }
@@ -268,7 +268,7 @@ void QmitkToolTrackingStatusWidget::AddEmptyLabel()
   label->setObjectName("No tools loaded yet.");
   label->setAlignment(m_Alignment | Qt::AlignVCenter);
   label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  //label->setStyleSheet("QLabel{background-color: #dddddd }");
+  label->setStyleSheet("QLabel{background-color: #dddddd; color: #000000 }");
   if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(label);
   else m_Controls->m_GridLayout->addWidget(label);
 }

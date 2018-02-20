@@ -70,7 +70,6 @@ p, li { white-space: pre-wrap; }
           <height>30</height>
          </size>
         </property>
-        <zorder>tabWidget</zorder>
        </widget>
       </item>
      </layout>
@@ -316,11 +315,6 @@ p, li { white-space: pre-wrap; }
            <item>
             <property name="text">
              <string>Single Reference Tool</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Multiple Tools Reference</string>
             </property>
            </item>
            <item>
@@ -713,7 +707,6 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="page_5"/>
          <widget class="QWidget" name="page">
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
@@ -897,7 +890,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
-          <string>Registration Landmarks</string>
+          <string>Tool landmarks</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
@@ -923,7 +916,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
-          <string>Calibration Landmarks</string>
+          <string>Control points for registration</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
@@ -1064,8 +1057,6 @@ Alternative: Manually edit the axis using the spinboxes.</string>
         </spacer>
        </item>
       </layout>
-      <zorder>gridLayoutWidget_2</zorder>
-      <zorder>label_18</zorder>
       <zorder>verticalSpacer_5</zorder>
      </widget>
     </widget>

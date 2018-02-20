@@ -35,8 +35,8 @@ m_Type(mitk::NavigationTool::Unknown),
 m_CalibrationFile("none"),
 m_SerialNumber(""),
 m_TrackingDeviceType(mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()),
-m_ToolRegistrationLandmarks(mitk::PointSet::New()),
-m_ToolCalibrationLandmarks(mitk::PointSet::New()),
+m_ToolLandmarks(mitk::PointSet::New()),
+m_ToolControlPoints(mitk::PointSet::New()),
 m_ToolTipOrientation(mitk::Quaternion(0, 0, 0, 1))
 {
   m_ToolTipPosition[0] = 0;
@@ -77,10 +77,10 @@ mitk::NavigationTool::NavigationTool(const NavigationTool &other)
   this->m_CalibrationFile = other.m_CalibrationFile;
   this->m_SerialNumber = other.m_SerialNumber;
   this->m_TrackingDeviceType = other.m_TrackingDeviceType;
-  if (other.m_ToolRegistrationLandmarks.IsNotNull())
-    this->m_ToolRegistrationLandmarks = other.m_ToolRegistrationLandmarks->Clone();
-  if (other.m_ToolCalibrationLandmarks.IsNotNull())
-    this->m_ToolCalibrationLandmarks = other.m_ToolCalibrationLandmarks->Clone();
+  if (other.m_ToolLandmarks.IsNotNull())
+    this->m_ToolLandmarks = other.m_ToolLandmarks->Clone();
+  if (other.m_ToolControlPoints.IsNotNull())
+    this->m_ToolControlPoints = other.m_ToolControlPoints->Clone();
   this->m_ToolTipPosition = other.m_ToolTipPosition;
   this->m_ToolTipOrientation = other.m_ToolTipOrientation;
   this->m_ToolAxis = other.m_ToolAxis;
@@ -128,8 +128,8 @@ void mitk::NavigationTool::Graft(const DataObject *data)
   m_CalibrationFile = nd->GetCalibrationFile();
   m_SerialNumber = nd->GetSerialNumber();
   m_TrackingDeviceType = nd->GetTrackingDeviceType();
-  m_ToolRegistrationLandmarks = nd->GetToolRegistrationLandmarks();
-  m_ToolCalibrationLandmarks = nd->GetToolCalibrationLandmarks();
+  m_ToolLandmarks = nd->GetToolLandmarks();
+  m_ToolControlPoints = nd->GetToolControlPoints();
   m_ToolTipPosition = nd->GetToolTipPosition();
   m_ToolTipOrientation = nd->GetToolTipOrientation();
   m_ToolAxis = nd->GetToolAxis();

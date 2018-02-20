@@ -169,8 +169,8 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   node->GetStringProperty("ToolCalibrationLandmarks", CalLandmarksString);
   ToolRegLandmarks = ConvertStringToPointSet(RegLandmarksString);
   ToolCalLandmarks = ConvertStringToPointSet(CalLandmarksString);
-  returnValue->SetToolRegistrationLandmarks(ToolRegLandmarks);
-  returnValue->SetToolCalibrationLandmarks(ToolCalLandmarks);
+  returnValue->SetToolLandmarks(ToolRegLandmarks);
+  returnValue->SetToolControlPoints(ToolCalLandmarks);
 
   //Tool Tip
   std::string toolTipPositionString;

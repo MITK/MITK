@@ -702,8 +702,8 @@ void QmitkIGTNavigationToolCalibration::SaveCalibratedTool()
   if (m_ToolToCalibrate.IsNotNull())
   {
     mitk::NavigationTool::Pointer calibratedTool = m_ToolToCalibrate;
-    calibratedTool->SetToolCalibrationLandmarks(this->m_CalibrationLandmarks);
-    calibratedTool->SetToolRegistrationLandmarks(this->m_RegistrationLandmarks);
+    calibratedTool->SetToolControlPoints(this->m_CalibrationLandmarks);
+    calibratedTool->SetToolLandmarks(this->m_RegistrationLandmarks);
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(nullptr,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
     filename.append(".IGTTool");

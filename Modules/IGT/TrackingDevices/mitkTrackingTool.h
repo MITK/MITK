@@ -45,13 +45,13 @@ namespace mitk
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
-    virtual const char* GetToolName() const; ///< every tool has a name that can be used to identify it.
+    virtual const char* GetToolName() const; ///< every tool has a name thatgit  can be used to identify it.
     virtual void SetToolName(const std::string _arg); ///< Sets the name of the tool
     virtual void SetToolName(const char* _arg); ///< Sets the name of the tool
 
     Point3D GetToolTipPosition() const; ///< returns the tool tip in tool coordinates, which where set by SetToolTip
     Quaternion GetToolAxisTransform() const; ///< returns the transformation of the tool axis with respect to the MITK-IGT main tool axis (0,0,-1)
-    virtual void SetToolTip(Point3D toolTipPosition, Quaternion orientation, ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
+    virtual void SetToolTipPosition(Point3D toolTipPosition, Quaternion orientation, ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
     virtual bool IsToolTipSet() const; ///< returns true if a tool tip is set, false if not
 
     virtual void GetPosition(Point3D& position) const; ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)
@@ -90,7 +90,7 @@ namespace mitk
     float m_TrackingError;      ///< holds the tracking error of the tool
     bool m_Enabled;             ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;           ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data
-    Point3D m_ToolTip;
+    Point3D m_ToolTipPosition;
     Quaternion m_ToolTipRotation;
     bool m_ToolTipSet;
   };

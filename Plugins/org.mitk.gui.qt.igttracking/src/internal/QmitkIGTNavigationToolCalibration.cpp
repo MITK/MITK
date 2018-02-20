@@ -394,7 +394,7 @@ void QmitkIGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationDa
   {
     trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_NavigationDataSourceOfToolToCalibrate.GetPointer());
     mitk::TrackingTool::Pointer TrackingToolToCalibrate = trackingDeviceSource->GetTrackingDevice()->GetTool(m_IDToolToCalibrate);
-    TrackingToolToCalibrate->SetToolTip(ToolTipTransformInToolCoordinates->GetPosition(), ToolTipTransformInToolCoordinates->GetOrientation());
+    TrackingToolToCalibrate->SetToolTipPosition(ToolTipTransformInToolCoordinates->GetPosition(), ToolTipTransformInToolCoordinates->GetOrientation());
   }
   catch (std::exception& e)
   {

@@ -115,8 +115,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing deserialization of tool storage with tool registrations",readStorage.IsNotNull());
     CPPUNIT_ASSERT_MESSAGE(" ..Testing number of tools in storage",readStorage->GetToolCount()==1);
 
-    mitk::PointSet::Pointer readRegLandmarks = readStorage->GetTool(0)->GetToolRegistrationLandmarks();
-    mitk::PointSet::Pointer readCalLandmarks = readStorage->GetTool(0)->GetToolCalibrationLandmarks();
+    mitk::PointSet::Pointer readRegLandmarks = readStorage->GetTool(0)->GetToolLandmarks();
+    mitk::PointSet::Pointer readCalLandmarks = readStorage->GetTool(0)->GetToolControlPoints();
 
     CPPUNIT_ASSERT_MESSAGE("..Testing if tool registration landmarks have been stored and loaded correctly.",((readRegLandmarks->GetPoint(5)[0] == 4)&&(readRegLandmarks->GetPoint(5)[1] == 5)&&(readRegLandmarks->GetPoint(5)[2] == 6)));
     CPPUNIT_ASSERT_MESSAGE("..Testing if tool calibration landmarks have been stored and loaded correctly.",((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)));

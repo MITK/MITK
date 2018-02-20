@@ -65,8 +65,8 @@ class mitkNavigationToolTestClass
     mitk::FillVector3D(testPt2,4,5,6);
     RegLandmarks->SetPoint(0,testPt2);
 
-    myNavigationTool->SetToolCalibrationLandmarks(CalLandmarks);
-    myNavigationTool->SetToolRegistrationLandmarks(RegLandmarks);
+    myNavigationTool->SetToolControlPoints(CalLandmarks);
+    myNavigationTool->SetToolLandmarks(RegLandmarks);
 
     //test getter
     MITK_TEST_CONDITION(myNavigationTool->GetType()==mitk::NavigationTool::Instrument,"Testing getter and setter of type.");
@@ -77,8 +77,8 @@ class mitkNavigationToolTestClass
     MITK_TEST_CONDITION(myNavigationTool->GetSerialNumber()=="0815","Testing getter and setter of serial number.");
     MITK_TEST_CONDITION(myNavigationTool->GetTrackingDeviceType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), "Testing getter and setter of tracking device type.");
     MITK_TEST_CONDITION(myNavigationTool->GetToolName()=="TestNodeName","Testing method GetToolName().");
-    MITK_TEST_CONDITION(myNavigationTool->GetToolCalibrationLandmarks()->GetPoint(0)[0] == 1.0,"Testing method GetToolCalibrationLandmarks()");
-    MITK_TEST_CONDITION(myNavigationTool->GetToolRegistrationLandmarks()->GetPoint(0)[0] == 4.0,"Testing method GetToolRegistrationLandmarks()");
+    MITK_TEST_CONDITION(myNavigationTool->GetToolControlPoints()->GetPoint(0)[0] == 1.0,"Testing method GetToolControlPoints()");
+    MITK_TEST_CONDITION(myNavigationTool->GetToolLandmarks()->GetPoint(0)[0] == 4.0,"Testing method GetToolLandmarks()");
     }
 
   };

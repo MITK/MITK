@@ -133,7 +133,7 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     if (Tool->IsToolTipSet())
     {
       thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())));
-      thisTool->AddProperty("ToolAxisTransform",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisTransform())));
+      thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())));
     }
 
     //Tool Axis

@@ -50,7 +50,7 @@ namespace mitk
     virtual void SetToolName(const char* _arg); ///< Sets the name of the tool
 
     Point3D GetToolTipPosition() const; ///< returns the tool tip in tool coordinates, which where set by SetToolTip
-    Quaternion GetToolAxisTransform() const; ///< returns the transformation of the tool axis with respect to the MITK-IGT main tool axis (0,0,-1)
+    Quaternion GetToolAxisOrientation() const; ///< returns the transformation of the tool axis with respect to the MITK-IGT main tool axis (0,0,-1)
     virtual void SetToolTipPosition(Point3D toolTipPosition, Quaternion orientation, ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
     virtual bool IsToolTipSet() const; ///< returns true if a tool tip is set, false if not
 
@@ -91,7 +91,7 @@ namespace mitk
     bool m_Enabled;             ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;           ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data
     Point3D m_ToolTipPosition;
-    Quaternion m_ToolAxisTransform;
+    Quaternion m_ToolAxisOrientation;
     bool m_ToolTipSet;
   };
 } // namespace mitk

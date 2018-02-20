@@ -386,7 +386,7 @@ void QmitkIGTNavigationToolCalibration::ApplyToolTipTransform(mitk::NavigationDa
 
   //Update tool in tool storage
   m_ToolToCalibrate->SetToolTipPosition(ToolTipTransformInToolCoordinates->GetPosition());
-  m_ToolToCalibrate->SetToolAxisTransform(ToolTipTransformInToolCoordinates->GetOrientation());
+  m_ToolToCalibrate->SetToolAxisOrientation(ToolTipTransformInToolCoordinates->GetOrientation());
 
   //And also update tracking device, so the transform is directly used
   mitk::TrackingDeviceSource::Pointer trackingDeviceSource;
@@ -436,12 +436,12 @@ void QmitkIGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
   std::stringstream translation;
   std::stringstream orientation;
   translation << m_ToolToCalibrate->GetToolTipPosition();
-  orientation << "Quaternion: (" << m_ToolToCalibrate->GetToolAxisTransform() << ")" << std::endl;
+  orientation << "Quaternion: (" << m_ToolToCalibrate->GetToolAxisOrientation() << ")" << std::endl;
   orientation << std::endl;
-  orientation << "Euler Angles [rad]: (" << m_ToolToCalibrate->GetToolAxisTransform().rotation_euler_angles() << ")" << std::endl;
+  orientation << "Euler Angles [rad]: (" << m_ToolToCalibrate->GetToolAxisOrientation().rotation_euler_angles() << ")" << std::endl;
   orientation << std::endl;
   orientation << "Matrix:" << std::endl;
-  vnl_matrix_fixed<double, 3, 3> rotMatrix = m_ToolToCalibrate->GetToolAxisTransform().rotation_matrix_transpose();
+  vnl_matrix_fixed<double, 3, 3> rotMatrix = m_ToolToCalibrate->GetToolAxisOrientation().rotation_matrix_transpose();
   orientation << rotMatrix[0][0] << " " << rotMatrix[0][1] << " " << rotMatrix[0][2] << std::endl;
   orientation << rotMatrix[1][0] << " " << rotMatrix[1][1] << " " << rotMatrix[1][2] << std::endl;
   orientation << rotMatrix[2][0] << " " << rotMatrix[2][1] << " " << rotMatrix[2][2] << std::endl;
@@ -455,7 +455,7 @@ void QmitkIGTNavigationToolCalibration::OnStartManualToolTipCalibration()
 
   m_ToolTransformationWidget->SetToolToEdit(m_ToolToCalibrate);
   m_ToolTransformationWidget->SetDefaultOffset(m_ToolToCalibrate->GetToolTipPosition());
-  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToCalibrate->GetToolAxisTransform());
+  m_ToolTransformationWidget->SetDefaultRotation(m_ToolToCalibrate->GetToolAxisOrientation());
 
   m_ToolTransformationWidget->open();
 }

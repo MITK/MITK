@@ -41,10 +41,10 @@ mitk::TrackingTool::TrackingTool()
   m_ToolTipPosition[0] = 0.0f;
   m_ToolTipPosition[1] = 0.0f;
   m_ToolTipPosition[2] = 0.0f;
-  m_ToolAxisTransform[0] = 0.0f;
-  m_ToolAxisTransform[1] = 0.0f;
-  m_ToolAxisTransform[2] = 0.0f;
-  m_ToolAxisTransform[3] = 1.0f;
+  m_ToolAxisOrientation[0] = 0.0f;
+  m_ToolAxisOrientation[1] = 0.0f;
+  m_ToolAxisOrientation[2] = 0.0f;
+  m_ToolAxisOrientation[3] = 1.0f;
 }
 
 mitk::TrackingTool::~TrackingTool()
@@ -64,7 +64,7 @@ void mitk::TrackingTool::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << "Enabled: " << m_Enabled << std::endl;
   os << indent << "DataValid: " << m_DataValid << std::endl;
   os << indent << "ToolTip: " << m_ToolTipPosition << std::endl;
-  os << indent << "ToolTipRotation: " << m_ToolAxisTransform << std::endl;
+  os << indent << "ToolTipRotation: " << m_ToolAxisOrientation << std::endl;
   os << indent << "ToolTipSet: " << m_ToolTipSet << std::endl;
 }
 
@@ -105,10 +105,10 @@ mitk::Point3D mitk::TrackingTool::GetToolTipPosition() const
   return m_ToolTipPosition;
 }
 
-mitk::Quaternion mitk::TrackingTool::GetToolAxisTransform() const
+mitk::Quaternion mitk::TrackingTool::GetToolAxisOrientation() const
 {
   MutexLockHolder lock(*m_MyMutex);
-  return m_ToolAxisTransform;
+  return m_ToolAxisOrientation;
 }
 
 void mitk::TrackingTool::SetToolTipPosition(mitk::Point3D toolTipPosition,
@@ -116,7 +116,7 @@ void mitk::TrackingTool::SetToolTipPosition(mitk::Point3D toolTipPosition,
                                     mitk::ScalarType eps)
 {
   if ( !Equal(m_ToolTipPosition, toolTipPosition, eps) ||
-       !Equal(m_ToolAxisTransform, orientation, eps) )
+       !Equal(m_ToolAxisOrientation, orientation, eps) )
   {
     if( (toolTipPosition[0] == 0) &&
         (toolTipPosition[1] == 0) &&
@@ -133,7 +133,7 @@ void mitk::TrackingTool::SetToolTipPosition(mitk::Point3D toolTipPosition,
       m_ToolTipSet = true;
     }
     m_ToolTipPosition = toolTipPosition;
-    m_ToolAxisTransform = orientation;
+    m_ToolAxisOrientation = orientation;
     this->Modified();
   }
 }
@@ -189,8 +189,8 @@ void mitk::TrackingTool::GetOrientation(mitk::Quaternion& orientation) const
     // the tracking device.
     //
     //   * m_Orientation is the orientation of the sensor relative to the transmitter
-    //   * m_ToolAxisTransform is the orientation of the tool tip relative to the sensor
-    orientation = m_Orientation * m_ToolAxisTransform;
+    //   * m_ToolAxisOrientation is the orientation of the tool tip relative to the sensor
+    orientation = m_Orientation * m_ToolAxisOrientation;
   }
   else
   {

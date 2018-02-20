@@ -74,8 +74,8 @@ namespace mitk {
     //Tool tip definition:
     itkGetConstMacro(ToolTipPosition,mitk::Point3D);
     itkSetMacro(ToolTipPosition,mitk::Point3D);
-    itkGetConstMacro(ToolAxisTransform,mitk::Quaternion);
-    itkSetMacro(ToolAxisTransform,mitk::Quaternion);
+    itkGetConstMacro(ToolAxisOrientation,mitk::Quaternion);
+    itkSetMacro(ToolAxisOrientation,mitk::Quaternion);
 
     //Tool Axis definition:
     /** @return Returns the main tool axis which is defined as the z-coordinate of the tool coordinate system. */
@@ -202,7 +202,7 @@ namespace mitk {
     /** @brief Holds the position of the tool tip. */
     mitk::Point3D m_ToolTipPosition;
     /** @brief Holds the transformation of the main tool axis to the negative z-axis (0,0,-1) */
-    mitk::Quaternion m_ToolAxisTransform;
+    mitk::Quaternion m_ToolAxisOrientation;
 
   };
 } // namespace mitk

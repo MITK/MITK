@@ -39,7 +39,7 @@ m_SerialNumber(""),
 m_TrackingDeviceType(mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()),
 m_ToolRegistrationLandmarks(mitk::PointSet::New()),
 m_ToolCalibrationLandmarks(mitk::PointSet::New()),
-m_ToolAxisTransform(mitk::Quaternion(0, 0, 0, 1))
+m_ToolAxisOrientation(mitk::Quaternion(0, 0, 0, 1))
 {
   m_ToolTipPosition[0] = 0;
   m_ToolTipPosition[1] = 0;
@@ -84,7 +84,7 @@ mitk::NavigationTool::NavigationTool(const NavigationTool &other)
   if (other.m_ToolCalibrationLandmarks.IsNotNull())
     this->m_ToolCalibrationLandmarks = other.m_ToolCalibrationLandmarks->Clone();
   this->m_ToolTipPosition = other.m_ToolTipPosition;
-  this->m_ToolAxisTransform = other.m_ToolAxisTransform;
+  this->m_ToolAxisOrientation = other.m_ToolAxisOrientation;
   //this->m_ToolAxis = other.m_ToolAxis;
 }
 
@@ -98,7 +98,7 @@ mitk::Point3D mitk::NavigationTool::GetToolAxis()
   mitk::Vector3D toolAxisSensorCoordinateSystem;
   mitk::FillVector3D(toolAxisSensorCoordinateSystem, 0.0, 0.0, -1.0);
   // Apply inverse tool axis transform to calculate tool axis
-  vnl_vector_fixed<mitk::ScalarType,3> toolAxisVector = m_ToolAxisTransform.inverse().rotate(toolAxisSensorCoordinateSystem.GetVnlVector());
+  vnl_vector_fixed<mitk::ScalarType,3> toolAxisVector = m_ToolAxisOrientation.inverse().rotate(toolAxisSensorCoordinateSystem.GetVnlVector());
   // Transfer to mitk::Point3D
   mitk::Point3D toolAxis;
   toolAxis[0] = toolAxisVector[0];
@@ -121,19 +121,19 @@ void mitk::NavigationTool::SetToolAxis(mitk::Point3D toolAxis)
   // Determine rotation axis
   mitk::Vector3D rotationAxis = itk::CrossProduct(toolAxisSensorCoordinateSystem, toolAxisFromCalibration);
   // Calculate transform
-  itk::AffineTransform<mitk::ScalarType>::Pointer sensorToToolAxisTransform = itk::AffineTransform<mitk::ScalarType>::New();
-  sensorToToolAxisTransform->Rotate3D(rotationAxis, rotationAngle);
+  itk::AffineTransform<mitk::ScalarType>::Pointer sensorToToolAxisOrientation = itk::AffineTransform<mitk::ScalarType>::New();
+  sensorToToolAxisOrientation->Rotate3D(rotationAxis, rotationAngle);
   // transfer to quaternion notation. Note that the vnl_quaternion expects the matrix in row major format, hence the transpose
-  mitk::Quaternion toolAxisTransform(sensorToToolAxisTransform->GetMatrix().GetVnlMatrix().transpose());
+  mitk::Quaternion toolAxisTransform(sensorToToolAxisOrientation->GetMatrix().GetVnlMatrix().transpose());
   // Update the tool tip orientation
-  m_ToolAxisTransform = toolAxisTransform;
+  m_ToolAxisOrientation = toolAxisTransform;
 }
 
 mitk::AffineTransform3D::Pointer mitk::NavigationTool::GetToolTipTransform()
 {
   mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
   returnValue->SetPosition(this->m_ToolTipPosition);
-  returnValue->SetOrientation(this->m_ToolAxisTransform);
+  returnValue->SetOrientation(this->m_ToolAxisOrientation);
   return returnValue->GetAffineTransform3D();
 }
 
@@ -170,7 +170,7 @@ void mitk::NavigationTool::Graft(const DataObject *data)
   m_ToolRegistrationLandmarks = nd->GetToolRegistrationLandmarks();
   m_ToolCalibrationLandmarks = nd->GetToolCalibrationLandmarks();
   m_ToolTipPosition = nd->GetToolTipPosition();
-  m_ToolAxisTransform = nd->GetToolAxisTransform();
+  m_ToolAxisOrientation = nd->GetToolAxisOrientation();
 }
 
 bool mitk::NavigationTool::IsToolTipSet()
@@ -178,10 +178,10 @@ bool mitk::NavigationTool::IsToolTipSet()
   if ((m_ToolTipPosition[0] == 0) &&
     (m_ToolTipPosition[1] == 0) &&
     (m_ToolTipPosition[2] == 0) &&
-    (m_ToolAxisTransform.x() == 0) &&
-    (m_ToolAxisTransform.y() == 0) &&
-    (m_ToolAxisTransform.z() == 0) &&
-    (m_ToolAxisTransform.r() == 1))
+    (m_ToolAxisOrientation.x() == 0) &&
+    (m_ToolAxisOrientation.y() == 0) &&
+    (m_ToolAxisOrientation.z() == 0) &&
+    (m_ToolAxisOrientation.r() == 1))
     return false;
   else return true;
 }
@@ -366,8 +366,8 @@ std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
     << "  Serial number: " << m_SerialNumber << "\n"
     << "  TrackingDeviceType: " << m_TrackingDeviceType << "\n"
     << "  ToolTip Position: " << m_ToolTipPosition << "\n"
-    << "  Tool Axis Transform: " << m_ToolAxisTransform << "\n"
-    << "  Tool Axis: " << m_ToolAxisTransform.rotation_matrix_transpose().get_row(2);
+    << "  Tool Axis Transform: " << m_ToolAxisOrientation << "\n"
+    << "  Tool Axis: " << m_ToolAxisOrientation.rotation_matrix_transpose().get_row(2);
     ;
 
   return _info.str();

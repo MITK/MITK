@@ -176,12 +176,12 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   std::string toolTipPositionString;
   std::string toolTipOrientationString;
   bool positionSet = node->GetStringProperty("ToolTipPosition", toolTipPositionString);
-  bool orientationSet = node->GetStringProperty("ToolAxisTransform", toolTipOrientationString);
+  bool orientationSet = node->GetStringProperty("ToolAxisOrientation", toolTipOrientationString);
 
   if (positionSet && orientationSet) //only define tooltip if it is set
   {
     returnValue->SetToolTipPosition(ConvertStringToPoint(toolTipPositionString));
-    returnValue->SetToolAxisTransform(ConvertStringToQuaternion(toolTipOrientationString));
+    returnValue->SetToolAxisOrientation(ConvertStringToQuaternion(toolTipOrientationString));
   }
   else if (positionSet != orientationSet)
   {

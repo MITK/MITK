@@ -168,7 +168,7 @@ void QmitkNavigationToolCreationWidget::SetGuiElements()
   m_Controls->m_ToolNameEdit->setText(QString(m_ToolToBeEdited->GetToolName().c_str()));
   m_Controls->m_CalibrationFileName->setText(QString(m_ToolToBeEdited->GetCalibrationFile().c_str()));
 
-  FillUIToolLandmarkLists(m_ToolToBeEdited->GetToolCalibrationLandmarks(), m_ToolToBeEdited->GetToolRegistrationLandmarks());
+  FillUIToolLandmarkLists(m_ToolToBeEdited->GetToolControlPoints(), m_ToolToBeEdited->GetToolLandmarks());
 
   switch (m_ToolToBeEdited->GetType())
   {
@@ -256,8 +256,8 @@ void QmitkNavigationToolCreationWidget::GetValuesFromGuiElements()
   //Tool Landmarks
   mitk::PointSet::Pointer toolCalLandmarks, toolRegLandmarks;
   GetUIToolLandmarksLists(toolCalLandmarks, toolRegLandmarks);
-  m_ToolToBeEdited->SetToolCalibrationLandmarks(toolCalLandmarks);
-  m_ToolToBeEdited->SetToolRegistrationLandmarks(toolRegLandmarks);
+  m_ToolToBeEdited->SetToolControlPoints(toolCalLandmarks);
+  m_ToolToBeEdited->SetToolLandmarks(toolRegLandmarks);
 
   //Advanced
   if (m_Controls->m_ToolTypeChooser->currentText() == "Instrument") m_ToolToBeEdited->SetType(mitk::NavigationTool::Instrument);

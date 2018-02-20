@@ -92,14 +92,14 @@ namespace mitk {
     //Tool Landmarks:
     /** For overview, here are descriptons of the two types of tool landmarks:
      *
-     *  tool calibration landmarks: These landmarks may be used clearly define the tools pose only by
+     *  control points: These landmarks may be used clearly define the tools pose only by
      *  using landmarks in the tool coordinate system. E.g., two landmarks for a 5DoF tool and three
      *  landmarks for a 6DoF tool. These landmarks may be used, e.g., for a point based registration
      *  of a tool from image space to tracking space.
      *
-     *  tool registration landmarks: These landmarks are designed for representing defined landmarks
-     *  on a tools surface. The number of these landmarks might exeed the number of tool calibration
-     *  landmarks for reasons of redundancy and averaging. They are used for, e.g., manually registering
+     *  tool landmarks: These landmarks are designed for representing defined landmarks
+     *  on a tools surface. The number of these landmarks might exeed the number of tool control points
+     *  for reasons of redundancy and averaging. They are used for, e.g., manually registering
      *  the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a
      *  point based registration from image space to tracking space later, you might overweight the
      *  tool because of two many landmarks compared to other markers.
@@ -108,19 +108,19 @@ namespace mitk {
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      *          If there are no landmarks defined for this tool the method returns an empty point set.
      */
-    itkGetConstMacro(ToolRegistrationLandmarks,mitk::PointSet::Pointer);
-    /** @brief  Sets the tool registration landmarks which represent markers / special points on a
+    itkGetConstMacro(ToolLandmarks,mitk::PointSet::Pointer);
+    /** @brief  Sets the tool landmarks which represent markers / special points on a
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      */
-    itkSetMacro(ToolRegistrationLandmarks,mitk::PointSet::Pointer);
-    /** @return Returns the tool calibration landmarks for calibration of the defined points in the
-      *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
+    itkSetMacro(ToolLandmarks,mitk::PointSet::Pointer);
+    /** @return Returns the tool control point in the tool coordinate system, e.g. 2 landmarks for a 5DoF
+      *         tool and 3 landmarks for a 6DoF tool.
       */
-    itkGetConstMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
+    itkGetConstMacro(ToolControlPoints,mitk::PointSet::Pointer);
     /** @brief  Sets the tool calibration landmarks for calibration of defined points in the
       *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
-    itkSetMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
+    itkSetMacro(ToolControlPoints,mitk::PointSet::Pointer);
 
     //SerialNumber:
     itkGetConstMacro(SerialNumber,std::string);
@@ -192,11 +192,11 @@ namespace mitk {
     /** @brief   This member holds the tracking device type of the tool. */
     mitk::TrackingDeviceType m_TrackingDeviceType;
     /** @brief Holds landmarks for tool registration. */
-    mitk::PointSet::Pointer m_ToolRegistrationLandmarks;
-    /** @brief Holds landmarks for calibration of the defined points in the tool coordinate system,
+    mitk::PointSet::Pointer m_ToolLandmarks;
+    /** @brief Holds control points in the tool coordinate system,
       *        e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
-    mitk::PointSet::Pointer m_ToolCalibrationLandmarks;
+    mitk::PointSet::Pointer m_ToolControlPoints;
     /** @brief Holds the position of the tool tip. */
     mitk::Point3D m_ToolTipPosition;
     /** @brief Holds the orientation of the tool tip. */

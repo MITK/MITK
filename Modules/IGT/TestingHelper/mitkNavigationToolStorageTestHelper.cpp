@@ -56,8 +56,8 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     mitk::Point3D testPt2;
     mitk::FillVector3D(testPt2,4,5,6);
     RegLandmarks1->SetPoint(5,testPt2);
-    myTool1->SetToolCalibrationLandmarks(CalLandmarks1);
-    myTool1->SetToolRegistrationLandmarks(RegLandmarks1);
+    myTool1->SetToolControlPoints(CalLandmarks1);
+    myTool1->SetToolLandmarks(RegLandmarks1);
     mitk::Point3D toolTipPos;
     mitk::FillVector3D(toolTipPos,1.3423,2.323,4.332);
     mitk::Quaternion toolTipRot = mitk::Quaternion(0.1,0.2,0.3,0.4);

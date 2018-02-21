@@ -36,15 +36,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 //TempIncludes
 #include <tinyxml.h>
 
-const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier = "org.mitk.modules.us.AbstractUltrasoundTrackerDevice";
+//___
+//Microservices
+
+const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
 const char* mitk::AbstractUltrasoundTrackerDevice::DefaultProbeIdentifier = "default";
 const char* mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator = "_";
-/*
-const std::string mitk::AbstractUltrasoundTrackerDevice::US_INTERFACE_NAME = "org.mitk.services.AbstractUltrasoundTrackerDevice";
+
+const std::string mitk::AbstractUltrasoundTrackerDevice::US_INTERFACE_NAME = "org.mitk.services.USCombinedModality";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
-*/
+//____
 
 
 mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(

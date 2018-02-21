@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceProperties.h>
+#include <usModuleContext.h>
 
 namespace itk {
   template<class T> class SmartPointer;
@@ -53,6 +57,10 @@ namespace mitk {
     static const std::string DeviceClassIdentifier;
     static const char*       DefaultProbeIdentifier;
     static const char*       ProbeAndDepthSeperator;
+    static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_DEVICENAME;
+    static const std::string US_PROPKEY_CLASS;
+    static const std::string US_PROPKEY_ID;
 
 
     mitkClassMacro(AbstractUltrasoundTrackerDevice, mitk::ImageSource);
@@ -245,6 +253,7 @@ namespace mitk {
 
 } // namespace mitk
 
+MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.USCombinedModality")
 //MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.AbstractUltrasoundTrackerDevice")
 
 #endif

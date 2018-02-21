@@ -50,15 +50,6 @@ namespace mitk {
   {
   public:
 
-    static const std::string DeviceClassIdentifier;
-    static const char*       DefaultProbeIdentifier;
-    static const char*       ProbeAndDepthSeperator;
-    static const std::string US_INTERFACE_NAME;
-    static const std::string US_PROPKEY_DEVICENAME;
-    static const std::string US_PROPKEY_CLASS;
-    static const std::string US_PROPKEY_ID;
-
-
     void UnregisterOnService();
 
     void RegisterAsMicroservice() override;
@@ -144,5 +135,5 @@ namespace mitk {
       us::ServiceProperties                   m_ServiceProperties;
   };
 } // namespace mitk
-MITK_DECLARE_SERVICE_INTERFACE(mitk::USCombinedModality, "org.mitk.services.USCombinedModality")
+
 #endif // MITKUSCombinedModality_H_HEADER_INCLUDED_

@@ -27,22 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSControlInterfaceDoppler.h"
 
 
-//___
-//Microservices
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usServiceProperties.h>
-#include <usModuleContext.h>
 
-const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
-const char* mitk::USCombinedModality::DefaultProbeIdentifier = "default";
-const char* mitk::USCombinedModality::ProbeAndDepthSeperator = "_";
-
-const std::string mitk::USCombinedModality::US_INTERFACE_NAME = "org.mitk.services.USCombinedModality";
-const std::string mitk::USCombinedModality::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
-const std::string mitk::USCombinedModality::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
-const std::string mitk::USCombinedModality::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
-//____
 
 mitk::USCombinedModality::USCombinedModality( USDevice::Pointer usDevice,
                                               NavigationDataSource::Pointer trackingDevice,

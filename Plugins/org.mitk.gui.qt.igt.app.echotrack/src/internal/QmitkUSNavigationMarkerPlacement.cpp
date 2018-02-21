@@ -267,7 +267,15 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
   ui->m_CriticalStructuresWidget->Update();
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
-{}
+{
+  ui->m_NavigationWidget->SetCombinedModality(ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality());
+  ui->m_NavigationWidget->SetDataStorage(this->GetDataStorage());
+  ui->m_NavigationWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
+  ui->m_NavigationWidget->OnActivateStep();
+  ui->m_NavigationWidget->OnStartStep();
+  ui->m_NavigationWidget->Update();
+
+}
 
 void QmitkUSNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const std::string &key, const std::string &)
 {
@@ -294,6 +302,7 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
 {
   ui->m_TargetMarkingWidget->Update();
   ui->m_CriticalStructuresWidget->Update();
+  ui->m_NavigationWidget->Update();
 
   if (!m_StdMultiWidget)
   {

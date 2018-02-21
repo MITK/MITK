@@ -55,9 +55,9 @@ namespace mitk
     std::istringstream iss(dcmValueString);
     iss.imbue(std::locale("C"));
     TNumericReturnType d;
-    if (!(iss >> d))
+    if (!(iss >> d) || !(iss.eof()))
     {
-      mitkThrow() << "Cannot convert string to value type. String: " << dcmValueString;
+      mitkThrow() << "Cannot convert string to value type. Type: " << typeid(TNumericReturnType).name() << "; String: " << dcmValueString;
     }
 
     return d;

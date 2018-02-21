@@ -152,7 +152,9 @@ public:
   {
     CPPUNIT_ASSERT_EQUAL(mitk::ConvertDICOMStrToValue<double>("1.35"), 1.35);
     CPPUNIT_ASSERT_EQUAL(mitk::ConvertDICOMStrToValue<double>("1"), 1.);
-    CPPUNIT_ASSERT_EQUAL(mitk::ConvertDICOMStrToValue<int>("1.35"), 1);
+    CPPUNIT_ASSERT_THROW(mitk::ConvertDICOMStrToValue<int>("1.35"), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL(mitk::ConvertDICOMStrToValue<int>("1"), 1);
+    CPPUNIT_ASSERT_THROW(mitk::ConvertDICOMStrToValue<double>("1,35"), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::ConvertDICOMStrToValue<double>("nonumber"), mitk::Exception);
   }
 

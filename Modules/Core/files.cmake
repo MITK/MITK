@@ -312,6 +312,9 @@ Interactions/DisplayConfigZoomMiddle.xml
 Interactions/DisplayConfigLevelWindowLeft.xml
 Interactions/DisplayConfigLevelWindowRight.xml
 Interactions/DisplayConfigLevelWindowMiddle.xml
+Interactions/DisplayConfigMouseRotationLeft.xml
+Interactions/DisplayConfigMouseRotationRight.xml
+Interactions/DisplayConfigMouseRotationMiddle.xml
 Interactions/DisplayConfigCrossHairLeft.xml
 Interactions/DisplayConfigCrossHairRight.xml
 Interactions/DisplayConfigCrossHairMiddle.xml

@@ -24,9 +24,6 @@
   <event_variant class="MouseReleaseEvent" name="EndMoveCrosshair">
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
-  <event_variant class="InternalEvent" name="MouseCameraRotation">
-    <attribute name="SignalName" value="MouseCameraRotation"/>
-  </event_variant>
 
   <!-- Moving -->
   <event_variant name="MovePointer" class="MouseMoveEvent" >

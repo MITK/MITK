@@ -1,0 +1,11 @@
+<config>
+  <event_variant class="MousePressEvent" name="MouseRotationPress">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="MouseRotationRelease">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseRotationMove">
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </event_variant>
+</config>

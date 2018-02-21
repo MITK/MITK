@@ -144,6 +144,11 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode, const std::string&
     eventConfig = "DisplayConfigCrossHair";
     break;
   }
+  case MouseRotation:
+  {
+    eventConfig = "DisplayConfigMouseRotation";
+    break;
+  }
   } // end switch (mode)
 
   if (eventConfig != "DisplayConfigMITK") {

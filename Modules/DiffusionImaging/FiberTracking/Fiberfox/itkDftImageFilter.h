@@ -57,7 +57,7 @@ public:
     typedef typename Superclass::OutputImageType        OutputImageType;
     typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
 
-    void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
+    void SetParameters( FiberfoxParameters& param ){ m_Parameters = param; }
 
 protected:
     DftImageFilter();
@@ -68,7 +68,7 @@ protected:
 
 private:
 
-    FiberfoxParameters<double>          m_Parameters;
+    FiberfoxParameters  m_Parameters;
 };
 
 }

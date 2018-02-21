@@ -36,7 +36,6 @@ public:
     {
         this->m_CompartmentId = model->m_CompartmentId;
         this->m_T2 = model->GetT2();
-        this->m_FiberDirection = model->GetFiberDirection();
         this->m_GradientList = model->GetGradientList();
         this->m_VolumeFractionImage = model->GetVolumeFractionImage();
         this->m_RandGen = model->GetRandomGenerator();

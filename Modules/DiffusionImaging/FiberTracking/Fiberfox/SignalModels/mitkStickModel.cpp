@@ -22,7 +22,6 @@ using namespace mitk;
 template< class ScalarType >
 StickModel< ScalarType >::StickModel()
   : m_Diffusivity(0.001)
-  , m_BValue(1000)
 {
 
 }
@@ -45,7 +44,7 @@ ScalarType StickModel< ScalarType >::SimulateMeasurement(unsigned int dir, Gradi
   if (g.GetNorm()>0.0001)
   {
     ScalarType dot = fiberDirection*g;
-    signal = std::exp( -m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
+    signal = std::exp( -this->m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
   }
   else
     signal = 1;
@@ -65,7 +64,7 @@ typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateM
     if (g.GetNorm()>0.0001)
     {
       ScalarType dot = fiberDirection*g;
-      signal[i] = std::exp( -m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
+      signal[i] = std::exp( -this->m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
     }
     else
       signal[i] = 1;

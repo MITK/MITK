@@ -36,7 +36,6 @@ public:
     {
         this->m_CompartmentId = model->m_CompartmentId;
         this->m_T2 = model->GetT2();
-        this->m_FiberDirection = model->GetFiberDirection();
         this->m_GradientList = model->GetGradientList();
         this->m_VolumeFractionImage = model->GetVolumeFractionImage();
         this->m_RandGen = model->GetRandomGenerator();
@@ -57,13 +56,10 @@ public:
 
     void SetDiffusivity(double D) { m_Diffusivity = D; }
     double GetDiffusivity() { return m_Diffusivity; }
-    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    double GetBvalue() { return m_BValue; }
 
 protected:
 
     double  m_Diffusivity;  ///< Scalar diffusion constant
-    double  m_BValue;       ///< b-value used to generate the artificial signal
 };
 
 }

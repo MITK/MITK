@@ -93,9 +93,8 @@ int main(int argc, char* argv[])
 
   try
   {
-    if (ist::PathExists(out_folder))
-      ist::RemoveADirectory(out_folder);
-    ist::MakeDirectory(out_folder);
+    if (!ist::PathExists(out_folder))
+      ist::MakeDirectory(out_folder);
 
     std::vector< std::string > fib_files = get_file_list(input_folder, {".fib", ".trk", ".tck"});
     if (fib_files.empty())

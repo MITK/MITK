@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkExtractImageFilter.h>
 #include <itkResampleDwiImageFilter.h>
 #include <boost/algorithm/string/replace.hpp>
+#include <omp.h>
 
 namespace itk
 {
@@ -180,9 +181,9 @@ namespace itk
 
       for (unsigned int z=0; z<compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2); z++)
       {
-        std::vector< Double2DImageType::Pointer > compartment_slices;
-        std::vector< double > t2Vector;
-        std::vector< double > t1Vector;
+        std::vector< Float2DImageType::Pointer > compartment_slices;
+        std::vector< float > t2Vector;
+        std::vector< float > t1Vector;
 
         for (unsigned int i=0; i<compartment_images.size(); i++)
         {
@@ -192,7 +193,7 @@ namespace itk
           else
             signalModel = m_Parameters.m_NonFiberModelList.at(i-numFiberCompartments);
 
-          auto slice = Double2DImageType::New();
+          auto slice = Float2DImageType::New();
           slice->SetLargestPossibleRegion( sliceRegion );
           slice->SetBufferedRegion( sliceRegion );
           slice->SetRequestedRegion( sliceRegion );
@@ -204,7 +205,7 @@ namespace itk
           for (unsigned int y=0; y<compartment_images.at(0)->GetLargestPossibleRegion().GetSize(1); y++)
             for (unsigned int x=0; x<compartment_images.at(0)->GetLargestPossibleRegion().GetSize(0); x++)
             {
-              Double2DImageType::IndexType index2D; index2D[0]=x; index2D[1]=y;
+              Float2DImageType::IndexType index2D; index2D[0]=x; index2D[1]=y;
               DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
 
               slice->SetPixel(index2D, compartment_images.at(i)->GetPixel(index3D)[g]);
@@ -229,13 +230,13 @@ namespace itk
         for (int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
         {
           // create k-sapce (inverse fourier transform slices)
-          auto idft = itk::KspaceImageFilter< Double2DImageType::PixelType >::New();
+          auto idft = itk::KspaceImageFilter< Float2DImageType::PixelType >::New();
           idft->SetCompartmentImages(compartment_slices);
           idft->SetT2(t2Vector);
           idft->SetT1(t1Vector);
           idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
           idft->SetParameters(&m_Parameters);
-          idft->SetZ((double)z-(double)( compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)
+          idft->SetZ((float)z-(float)( compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)
                                         -compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)%2 ) / 2.0);
           idft->SetZidx(z);
           idft->SetCoilPosition(coilPositions.at(c));
@@ -259,7 +260,7 @@ namespace itk
 
           // fourier transform slice
           Complex2DImageType::Pointer newSlice;
-          auto dft = itk::DftImageFilter< Double2DImageType::PixelType >::New();
+          auto dft = itk::DftImageFilter< Float2DImageType::PixelType >::New();
           dft->SetInput(fSlice);
           dft->SetParameters(m_Parameters);
           dft->Update();
@@ -621,13 +622,13 @@ namespace itk
       // resample frequency map
       if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
       {
-        auto resampler = itk::ResampleImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+        auto resampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
         resampler->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
         resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_FrequencyMap);
         resampler->SetSize(m_WorkingImageRegion.GetSize());
         resampler->SetOutputSpacing(m_WorkingSpacing);
         resampler->SetOutputOrigin(m_WorkingOrigin);
-        auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkDoubleImgType, double>::New();
+        auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
         resampler->SetInterpolator(nn_interpolator);
         resampler->Update();
         m_Parameters.m_SignalGen.m_FrequencyMap = resampler->GetOutput();
@@ -920,8 +921,8 @@ namespace itk
       itkExceptionMacro("No diffusion model for non-fiber compartments defined and input diffusion-weighted"
                         " image is nullptr! At least one non-fiber compartment is necessary to simulate diffusion.");
 
-    int baselineIndex = m_Parameters.m_SignalGen.GetFirstBaselineIndex();
-    if (baselineIndex<0) { itkExceptionMacro("No baseline index found!"); }
+//    int baselineIndex = m_Parameters.m_SignalGen.GetFirstBaselineIndex();
+//    if (baselineIndex<0) { itkExceptionMacro("No baseline index found!"); }
 
     if (!m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition)  // No upsampling of input image needed if no k-space simulation is performed
     {
@@ -958,6 +959,9 @@ namespace itk
 
       int numFibers = m_FiberBundleWorkingCopy->GetNumFibers();
       boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
+
+      if (m_FiberBundle->GetMeanFiberLength()<5.0)
+        omp_set_num_threads(2);
 
       PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
       PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
@@ -1162,7 +1166,7 @@ namespace itk
         }
       }
 
-      if (m_Parameters.m_SignalGen.m_NoiseVariance>0)
+      if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_CheckAddNoiseBox)
         PrintToLog("Simulating complex Gaussian noise", false);
       if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
         PrintToLog("Simulating signal relaxation", false);

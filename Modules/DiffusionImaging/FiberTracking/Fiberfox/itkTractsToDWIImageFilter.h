@@ -54,9 +54,8 @@ public:
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
-    typedef itk::Image< double, 2 >                                     Double2DImageType;
-    typedef itk::VnlForwardFFTImageFilter<Double2DImageType>::OutputImageType   Complex2DImageType;
-    typedef itk::VectorImage< vcl_complex< double >, 3 >                ComplexDwiType;
+    typedef itk::Image< float, 2 >                                      Float2DImageType;
+    typedef itk::Image< vcl_complex< float >, 2 >                       Complex2DImageType;
     typedef itk::Vector< double,3>                                      DoubleVectorType;
 
     itkFactorylessNewMacro(Self)
@@ -67,11 +66,11 @@ public:
     itkSetMacro( FiberBundle, FiberBundleType )             ///< Input fiber bundle
     itkSetMacro( InputImage, typename OutputImageType::Pointer )     ///< Input diffusion-weighted image. If no fiber bundle is set, then the acquisition is simulated for this image without a new diffusion simulation.
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
-    void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
+    void SetParameters( FiberfoxParameters param )  ///< Simulation parameters.
     { m_Parameters = param; }
 
     /** Output */
-    FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
+    FiberfoxParameters GetParameters(){ return m_Parameters; }
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions() ///< one double image for each compartment containing the corresponding volume fraction per voxel
     { return m_VolumeFractions; }
     mitk::LevelWindow GetLevelWindow()  ///< Level window is determined from the output image
@@ -111,7 +110,7 @@ protected:
     void InitializeFiberData();
 
     // input
-    mitk::FiberfoxParameters<double>            m_Parameters;
+    mitk::FiberfoxParameters                    m_Parameters;
     FiberBundleType                             m_FiberBundle;
     typename OutputImageType::Pointer           m_InputImage;
 

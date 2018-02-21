@@ -73,11 +73,11 @@ mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(
 
 mitk::AbstractUltrasoundTrackerDevice::~AbstractUltrasoundTrackerDevice()
 {
-  /*if( m_ServiceRegistration != nullptr )
+  if (m_ServiceRegistration != nullptr)
   {
     m_ServiceRegistration.Unregister();
   }
-  m_ServiceRegistration = 0;*/
+  m_ServiceRegistration = 0;
 }
 
 mitk::AffineTransform3D::Pointer
@@ -315,10 +315,6 @@ void mitk::AbstractUltrasoundTrackerDevice::SetDelayCount( unsigned int delayCou
   m_DelayFilter->SetDelay(delayCount);
 }
 
-void mitk::AbstractUltrasoundTrackerDevice::RegisterAsMicroservice()
-{
-}
-
 itk::SmartPointer<mitk::USAbstractControlInterface> mitk::AbstractUltrasoundTrackerDevice::GetControlInterfaceCustom()
 {
   return itk::SmartPointer<USAbstractControlInterface>();
@@ -448,4 +444,36 @@ mitk::NavigationDataSource::Pointer mitk::AbstractUltrasoundTrackerDevice::Rebui
   }
 
   return filter.GetPointer();
+}
+
+void mitk::AbstractUltrasoundTrackerDevice::UnregisterOnService()
+{
+  if (m_UltrasoundDevice->GetDeviceState() == USDevice::State_Activated)
+  {
+    m_UltrasoundDevice->Deactivate();
+  }
+  if (m_UltrasoundDevice->GetDeviceState() == USDevice::State_Connected)
+  {
+    m_UltrasoundDevice->Disconnect();
+  }
+
+  if (m_ServiceRegistration != nullptr)
+    m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
+}
+
+void mitk::AbstractUltrasoundTrackerDevice::RegisterAsMicroservice()
+{
+  //Get Context
+  us::ModuleContext* context = us::GetModuleContext();
+
+  //Define ServiceProps
+  //us::ServiceProperties props;
+  mitk::UIDGenerator uidGen =
+    mitk::UIDGenerator("org.mitk.services.USCombinedModality", 16);
+  m_ServiceProperties[US_PROPKEY_ID] = uidGen.GetUID();
+  m_ServiceProperties[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
+  m_ServiceProperties[US_PROPKEY_CLASS] = mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier;
+
+  m_ServiceRegistration = context->RegisterService(this, m_ServiceProperties);
 }

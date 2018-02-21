@@ -50,10 +50,6 @@ namespace mitk {
   {
   public:
 
-    void UnregisterOnService();
-
-    void RegisterAsMicroservice() override;
-
     mitkClassMacro(USCombinedModality, mitk::AbstractUltrasoundTrackerDevice);
     mitkNewMacro3Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
 
@@ -114,7 +110,7 @@ namespace mitk {
     */
     //___virtual void OnFreeze(bool);
 
-
+    void RegisterAsMicroservice() override;
 
     /**
     * \brief Grabs the next frame from the input.
@@ -122,17 +118,6 @@ namespace mitk {
     */
     void GenerateData() override;
 
-
-    private:
-      /**
-      *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
-      */
-      us::ServiceRegistration<Self>           m_ServiceRegistration;
-
-      /**
-      * \brief Properties of the device's Microservice.
-      */
-      us::ServiceProperties                   m_ServiceProperties;
   };
 } // namespace mitk
 

@@ -369,7 +369,6 @@ void mitk::AbstractUltrasoundTrackerDevice::RegisterAsMicroservice()
 
 void mitk::AbstractUltrasoundTrackerDevice::GenerateData()
 {
-
 }
 
 

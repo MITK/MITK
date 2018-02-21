@@ -65,7 +65,6 @@ const char *QmitkUSNavigationMarkerPlacement::DATANAME_REACHED_TARGETS = "Reache
 
 QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
   : m_Parent(nullptr),
-  m_NavigationSteps(),
   m_UpdateTimer(new QTimer(this)),
   m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
   m_StdMultiWidget(nullptr),
@@ -483,7 +482,7 @@ void QmitkUSNavigationMarkerPlacement::OnStartExperiment()
       m_NavigationStepTimer->Reset();
       m_NavigationStepTimer->SetOutputFileName(
         QString(m_ExperimentResultsSubDirectory + QDir::separator() + QString("durations.cvs")).toStdString());
-      m_NavigationStepTimer->SetActiveIndex(0, m_NavigationSteps.at(0)->GetTitle().toStdString());
+      m_NavigationStepTimer->SetActiveIndex(0, "Initialization");
 
       ui->finishExperimentButton->setEnabled(true);
       ui->startExperimentButton->setDisabled(true);
@@ -619,13 +618,6 @@ void QmitkUSNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk:
   }
 
   MITK_INFO("USNavigation") << "Results Directory: " << m_ResultsDirectory.toStdString();
-}
-void QmitkUSNavigationMarkerPlacement::OnNextNavigationStep()
-{
-  QmitkUSNavigationStepCombinedModality* n = static_cast<QmitkUSNavigationStepCombinedModality*>(m_NavigationSteps.at(0));
-  m_CombinedModality = n->GetSelectedCombinedModality();
-
-  for (int i = 0; i < m_NavigationSteps.size(); i++) { m_NavigationSteps.at(i)->SetCombinedModality(m_CombinedModality); }
 }
 
 void QmitkUSNavigationMarkerPlacement::ReinitOnImage()

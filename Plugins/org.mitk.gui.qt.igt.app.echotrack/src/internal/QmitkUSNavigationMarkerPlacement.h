@@ -71,7 +71,6 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
   void OnInitializeCriticalStructureMarking();
   void OnInitializeNavigation();
 
-  void OnNextNavigationStep();
   /**
   * \brief Called periodically to update the rendering.
   * The standard multi widget is changed to fit the navigation process once it
@@ -161,7 +160,6 @@ protected:
   void InitImageStream();
 
   QWidget *m_Parent;
-  QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
   QTimer *m_UpdateTimer;
   QTimer *m_ImageAndNavigationDataLoggingTimer;
   QmitkStdMultiWidget *m_StdMultiWidget;

@@ -109,6 +109,8 @@ public:
   explicit QmitkUSNavigationProcessWidget(QWidget* parent = 0);
   ~QmitkUSNavigationProcessWidget();
 
+  itk::SmartPointer<mitk::DataNode> GetSettingsNode();
+
   /**
    * \brief Setter for the data storage used for storing the navigation progress.
    */

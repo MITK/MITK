@@ -238,11 +238,29 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
   ui->navigationProcessWidget->SetDataStorage(this->GetDataStorage());
 
+  connect(ui->m_initializeTargetMarking, SIGNAL(clicked()), this, SLOT(OnInitializeTargetMarking()));
+  connect(ui->m_initializeCritStructureMarking, SIGNAL(clicked()), this, SLOT(OnInitializeCriticalStructureMarking()));
+  connect(ui->m_initializeNavigation, SIGNAL(clicked()), this, SLOT(OnInitializeNavigation()));
+
   // indicate that no experiment is running at start
   ui->runningLabel->setPixmap(m_IconNotRunning);
 
   ui->navigationProcessWidget->SetSettingsWidget(new QmitkUSNavigationCombinedSettingsWidget(m_Parent));
 }
+
+void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
+{
+  ui->m_TargetMarkingWidget->SetCombinedModality(ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality());
+  ui->m_TargetMarkingWidget->SetDataStorage(this->GetDataStorage());
+  ui->m_TargetMarkingWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
+  ui->m_TargetMarkingWidget->OnActivateStep();
+  ui->m_TargetMarkingWidget->OnStartStep();
+  ui->m_TargetMarkingWidget->Update();
+}
+void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
+{}
+void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
+{}
 
 void QmitkUSNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const std::string &key, const std::string &)
 {
@@ -267,6 +285,7 @@ void QmitkUSNavigationMarkerPlacement::SetFocus()
 
 void QmitkUSNavigationMarkerPlacement::OnTimeout()
 {
+  ui->m_TargetMarkingWidget->Update();
   if (!m_StdMultiWidget)
   {
     // try to get the standard multi widget if it couldn't be got before
@@ -290,6 +309,8 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
   {
     ui->navigationProcessWidget->UpdateNavigationProgress();
     m_AblationZonesDisplacementFilter->Update();
+
+
 
     // update the 3D window only every fourth time to speed up the rendering (at least in 2D)
     this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);

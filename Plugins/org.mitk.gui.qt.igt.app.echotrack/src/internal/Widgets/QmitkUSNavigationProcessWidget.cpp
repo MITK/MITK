@@ -62,6 +62,11 @@ QmitkUSNavigationProcessWidget::QmitkUSNavigationProcessWidget(QWidget* parent) 
   ui->settingsFrameWidget->setHidden(true);
 }
 
+itk::SmartPointer<mitk::DataNode> QmitkUSNavigationProcessWidget::GetSettingsNode()
+{
+  return m_SettingsNode;
+}
+
 QmitkUSNavigationProcessWidget::~QmitkUSNavigationProcessWidget()
 {
   ui->stepsToolBox->blockSignals(true);

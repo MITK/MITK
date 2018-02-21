@@ -59,7 +59,7 @@ std::vector<mitk::Image::Pointer> mitk::USImageSource::GetNextImage()
     if(result.size() != imageVector.size())
       result.resize(imageVector.size());
 
-    for (int i = 0; i < imageVector.size(); ++i)
+    for (size_t i = 0; i < imageVector.size(); ++i)
     {
       if (!imageVector[i].empty())
       {
@@ -81,7 +81,7 @@ std::vector<mitk::Image::Pointer> mitk::USImageSource::GetNextImage()
     this->GetNextRawImage(result);
   }
 
-  for (int i = 0; i < result.size(); ++i)
+  for (size_t i = 0; i < result.size(); ++i)
   {
     if (result[i].IsNotNull())
     {

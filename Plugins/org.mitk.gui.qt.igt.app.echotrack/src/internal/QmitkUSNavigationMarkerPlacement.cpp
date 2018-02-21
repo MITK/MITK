@@ -113,18 +113,6 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
 
 QmitkUSNavigationMarkerPlacement::~QmitkUSNavigationMarkerPlacement()
 {
-  // remove listener for ultrasound device changes
-  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
-  {
-    m_CombinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
-  }
-
-  // remove listener for ultrasound device changes
-  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
-  {
-    m_CombinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
-  }
-
   delete ui;
 }
 
@@ -199,42 +187,12 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 {
   m_Parent = parent;
   ui->setupUi(parent);
-
-  connect(ui->navigationProcessWidget,
-    SIGNAL(SignalCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>)),
-    this,
-    SLOT(OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>)));
-
-  connect(ui->navigationProcessWidget,
-    SIGNAL(SignalSettingsChanged(itk::SmartPointer<mitk::DataNode>)),
-    this,
-    SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
-
-  connect(ui->navigationProcessWidget,
-    SIGNAL(SignalActiveNavigationStepChanged(int)),
-    this,
-    SLOT(OnActiveNavigationStepChanged(int)));
-
-  connect(ui->navigationProcessWidget,
-    SIGNAL(SignalActiveNavigationStepChangeRequested(int)),
-    this,
-    SLOT(OnNextNavigationStepInitialization(int)));
-
-  connect(ui->navigationProcessWidget,
-    SIGNAL(SignalNextButtonClicked()),
-    this,
-    SLOT(OnNextNavigationStep()));
-
+    
   connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
   connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
   connect(ui->m_RenderWindowSelection, SIGNAL(valueChanged(int)), this, SLOT(OnRenderWindowSelection()));
   connect(ui->m_RefreshView, SIGNAL(clicked()), this, SLOT(OnRefreshView()));
-
-  connect(ui->navigationProcessWidget,
-    SIGNAL(SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>)),
-    this,
-    SLOT(OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode>)));
 
   ui->navigationProcessWidget->SetDataStorage(this->GetDataStorage());
 

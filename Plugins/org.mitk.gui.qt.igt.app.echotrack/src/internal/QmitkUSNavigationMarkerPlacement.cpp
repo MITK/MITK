@@ -258,7 +258,14 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
   ui->m_TargetMarkingWidget->Update();
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
-{}
+{
+  ui->m_CriticalStructuresWidget->SetCombinedModality(ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality());
+  ui->m_CriticalStructuresWidget->SetDataStorage(this->GetDataStorage());
+  ui->m_CriticalStructuresWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
+  ui->m_CriticalStructuresWidget->OnActivateStep();
+  ui->m_CriticalStructuresWidget->OnStartStep();
+  ui->m_CriticalStructuresWidget->Update();
+}
 void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
 {}
 
@@ -286,6 +293,8 @@ void QmitkUSNavigationMarkerPlacement::SetFocus()
 void QmitkUSNavigationMarkerPlacement::OnTimeout()
 {
   ui->m_TargetMarkingWidget->Update();
+  ui->m_CriticalStructuresWidget->Update();
+
   if (!m_StdMultiWidget)
   {
     // try to get the standard multi widget if it couldn't be got before

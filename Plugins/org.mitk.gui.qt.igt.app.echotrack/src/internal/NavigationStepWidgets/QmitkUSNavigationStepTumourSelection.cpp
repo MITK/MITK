@@ -187,7 +187,6 @@ void QmitkUSNavigationStepTumourSelection::OnUpdate()
 
   m_NavigationDataSource->Update();
   m_NodeDisplacementFilter->Update();
-  MITK_INFO << "Pos:" << m_NodeDisplacementFilter->GetOutput()->GetPosition();
 
   bool valid = m_NavigationDataSource->GetOutput(m_ReferenceSensorIndex)->IsDataValid();
 

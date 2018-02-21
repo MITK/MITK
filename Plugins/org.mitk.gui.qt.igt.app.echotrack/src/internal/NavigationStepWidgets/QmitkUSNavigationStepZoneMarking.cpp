@@ -86,6 +86,7 @@ bool QmitkUSNavigationStepZoneMarking::OnFinishStep()
 
 bool QmitkUSNavigationStepZoneMarking::OnActivateStep()
 {
+  m_ZoneDisplacementFilter->ConnectTo(this->GetCombinedModality()->GetNavigationDataSource());
   m_ZoneDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
 
   emit SignalReadyForNextStep();
@@ -105,6 +106,7 @@ void QmitkUSNavigationStepZoneMarking::OnUpdate()
   if (m_NavigationDataSource.IsNull()) { return; }
 
   m_NavigationDataSource->Update();
+  m_ZoneDisplacementFilter->Update();
 
   bool valid = m_NavigationDataSource->GetOutput(m_ReferenceSensorIndex)->IsDataValid();
 
@@ -251,7 +253,8 @@ void QmitkUSNavigationStepZoneMarking::UpdateReferenceSensorName()
   {
     try
     {
-      m_ReferenceSensorIndex = m_NavigationDataSource->GetOutputIndex(m_ReferenceSensorName);
+      //m_ReferenceSensorIndex = m_NavigationDataSource->GetOutputIndex(m_ReferenceSensorName);
+      m_ReferenceSensorIndex = 1;
     }
     catch ( const std::exception &e )
     {

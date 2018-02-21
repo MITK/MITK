@@ -202,6 +202,8 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   // indicate that no experiment is running at start
   ui->runningLabel->setPixmap(m_IconNotRunning);
 
+  connect(ui->m_settingsWidget, SIGNAL(SettingsChanged(itk::SmartPointer<mitk::DataNode>)), this, SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
+  
   ui->navigationProcessWidget->SetSettingsWidget(new QmitkUSNavigationCombinedSettingsWidget(m_Parent));
 }
 

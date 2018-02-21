@@ -35,15 +35,15 @@ public:
     usSource->SetVideoFileInput(videoFilePath);
     MITK_TEST_CONDITION_REQUIRED(usSource->GetIsVideoReady(), "USImageVideoSource should have isVideoReady flag set after opening a Video File");
     mitk::Image::Pointer frame;
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "First frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Second frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Third frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Fourth frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Fifth frame should not be null.");
   }
   /** This Test will fail if no device is attached. Since it basically covers the same non-OpenCV Functionality as TestOpenVideoFile, it is ommited

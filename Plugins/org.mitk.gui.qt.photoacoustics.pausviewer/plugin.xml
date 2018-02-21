@@ -6,7 +6,7 @@
           name="PA US Viewer"
           category="Photoacoustics"
           class="QmitkPAUSViewerView"
-          icon="resources/PAUSViewer.png" />
+          icon="resources/iconPAUSViewer.svg" />
   </extension>
 
 </plugin>

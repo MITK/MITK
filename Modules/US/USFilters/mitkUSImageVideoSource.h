@@ -178,14 +178,14 @@ namespace mitk {
       *
       * \param[out] image an OpenCV-Matrix containing this image
       */
-    virtual void GetNextRawImage( cv::Mat& image ) override;
+    virtual void GetNextRawImage( std::vector<cv::Mat>& image ) override;
 
     /**
       * \brief Next image is gathered from the image source.
       *
       * \param[out] image an mitk::Image containing this image
       */
-    virtual void GetNextRawImage( mitk::Image::Pointer& image ) override;
+    virtual void GetNextRawImage( std::vector<mitk::Image::Pointer>& image ) override;
 
     /**
       * \brief The source of the video, managed internally

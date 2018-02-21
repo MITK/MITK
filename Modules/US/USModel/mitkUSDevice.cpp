@@ -52,7 +52,8 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
-  m_UnregisteringStarted(false)
+  m_UnregisteringStarted(false),
+  m_NumberOfOutputs(1)
 {
   USImageCropArea empty;
   empty.cropBottom = 0;
@@ -62,7 +63,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   this->m_CropArea = empty;
 
   // set number of outputs
-  this->SetNumberOfIndexedOutputs(1);
+  this->SetNumberOfIndexedOutputs(m_NumberOfOutputs);
 
   // create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();
@@ -545,12 +546,10 @@ output->Graft( graft );
 
 void mitk::USDevice::GrabImage()
 {
-  mitk::Image::Pointer image = this->GetUSImageSource()->GetNextImage();
+  std::vector<mitk::Image::Pointer> image = this->GetUSImageSource()->GetNextImage();
   m_ImageMutex->Lock();
-  this->SetImage(image);
+  this->SetImageVector(image);
   m_ImageMutex->Unlock();
-  // if (image.IsNotNull() && (image->GetGeometry()!=nullptr)){
-  //  MITK_INFO << "Spacing: " << image->GetGeometry()->GetSpacing();}
 }
 
 //########### GETTER & SETTER ##################//
@@ -577,34 +576,34 @@ void mitk::USDevice::GenerateData()
 {
   m_ImageMutex->Lock();
 
-  if (m_Image.IsNull() || !m_Image->IsInitialized())
+  for (unsigned int i = 0; i < m_ImageVector.size() && i < this->GetNumberOfIndexedOutputs(); ++i)
   {
-    m_ImageMutex->Unlock();
-    return;
-  }
-
-  mitk::Image::Pointer output = this->GetOutput();
-
-  if (!output->IsInitialized() ||
-    output->GetDimension(0) != m_Image->GetDimension(0) ||
-    output->GetDimension(1) != m_Image->GetDimension(1) ||
-    output->GetDimension(2) != m_Image->GetDimension(2) ||
-    output->GetPixelType()  != m_Image->GetPixelType())
-  {
-    output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(),
-      m_Image->GetDimensions());
-  }
-
-  // copy contents of the given image into the member variable, slice after slice
-  for (unsigned int sliceNumber = 0; sliceNumber < m_Image->GetDimension(2); ++sliceNumber)
-  {
-    if (m_Image->IsSliceSet(sliceNumber)) {
-      mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
-      output->SetSlice(inputReadAccessor.GetData(), sliceNumber);
+    auto& image = m_ImageVector[i];
+    if (image.IsNull() || !image->IsInitialized())
+    {
+      // skip image
     }
- }
+    else
+    {
+      mitk::Image::Pointer output = this->GetOutput(i);
 
-  output->SetGeometry(m_Image->GetGeometry());
+      if (!output->IsInitialized() ||
+        output->GetDimension(0) != image->GetDimension(0) ||
+        output->GetDimension(1) != image->GetDimension(1) ||
+        output->GetDimension(2) != image->GetDimension(2) ||
+        output->GetPixelType() != image->GetPixelType())
+      {
+        output->Initialize(image->GetPixelType(), image->GetDimension(),
+          image->GetDimensions());
+      }
+
+      // copy contents of the given image into the member variable
+      mitk::ImageReadAccessor inputReadAccessor(image);
+      output->SetImportVolume(inputReadAccessor.GetData());
+
+      output->SetGeometry(image->GetGeometry());
+    }
+  }
   m_ImageMutex->Unlock();
 };
 

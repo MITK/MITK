@@ -103,57 +103,28 @@ void QmitkUltrasoundSupport::CreateQtPartControl(QWidget *parent)
   m_Controls.tabWidget->setTabEnabled(1, false);
 }
 
-void QmitkUltrasoundSupport::CreateWindows()
-{
-  auto pausViewer = GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.photoacoustics.pausviewer");
-  if (pausViewer != nullptr)
-  {
-    m_PausViewerView = dynamic_cast<QmitkPAUSViewerView*>(pausViewer.GetPointer());
-    m_PausViewerView->SetPADataStorage(m_PADataStorage);
-    m_PausViewerView->SetUSDataStorage(m_USDataStorage);
-
-    m_PausViewerView->InitWindows();
-    m_PausViewerView->SetUltrasoundReference(&m_PausViewerView);
-    UpdateLevelWindows();
-
-    m_ForceRequestUpdateAll = true;
-  }
-}
-
 void QmitkUltrasoundSupport::InitNewNode()
 {
   m_Node.push_back(nullptr);
   auto& Node = m_Node.back();
 
   Node = mitk::DataNode::New();
-  Node->SetName("No Data received yet ...");
+  char name[30];
+  sprintf(name, "US Viewing Stream - Image %d", (unsigned int)(m_Node.size() - 1));
+  Node->SetName(name);
   //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
   mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255, 0);
   Node->SetData(dummyImage);
   m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
 
-  // Add to Control Datastorage
   this->GetDataStorage()->Add(Node);
-
-  // Add to Display Datastorage
-  if (m_Node.size() > 1)
-    m_USDataStorage->Add(Node);
-  else if (m_Node.size() == 1)
-    m_PADataStorage->Add(Node);
 }
 
 void QmitkUltrasoundSupport::DestroyLastNode()
 {
   auto& Node = m_Node.back();
 
-  // Remove from Control Datastorage
-  this->GetDataStorage()->Remove(Node); 
-
-  // Remove from Display Datastorage
-  if (m_Node.size() > 1)
-    m_USDataStorage->Remove(Node);
-  else if (m_Node.size() == 1)
-    m_PADataStorage->Remove(Node);
+  this->GetDataStorage()->Remove(Node);
 
   // clean up
   Node->ReleaseData();
@@ -164,30 +135,20 @@ void QmitkUltrasoundSupport::UpdateLevelWindows()
 {
   mitk::LevelWindow levelWindow;
 
-  if (m_Node.size() > 1)
+  if (m_Node.size() > 0)
   {
     for (unsigned int index = 0; index < m_AmountOfOutputs; ++index)
     {
-      m_Node.at(index)->GetLevelWindow(levelWindow);
-      if (!m_curOutput.at(index)->IsEmpty())
-        //levelWindow.SetWindowBounds(0, 4 * (index+1));
-        levelWindow.SetToImageRange(m_curOutput.at(index));
-      m_Node.at(index)->SetLevelWindow(levelWindow);
+      m_Node[index]->GetLevelWindow(levelWindow);
+      if (!m_curOutput[index]->IsEmpty())
+        levelWindow.SetToImageRange(m_curOutput[index]);
+      m_Node[index]->SetLevelWindow(levelWindow);
     }
-  }
-  else if (m_Node.size() == 1)
-  {
-    m_Node.back()->GetLevelWindow(levelWindow);
-    if (!m_curOutput.at(0)->IsEmpty())
-      levelWindow.SetToImageRange(m_curOutput.at(0));
-    m_Node.back()->SetLevelWindow(levelWindow);
   }
 }
 
 void QmitkUltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type)
 {
-  // consider removing this, unused for now, and probably forever
-
   mitk::LookupTable::Pointer lookupTable = mitk::LookupTable::New();
   mitk::LookupTableProperty::Pointer lookupTableProperty = mitk::LookupTableProperty::New();
   lookupTable->SetType(type);
@@ -217,16 +178,6 @@ void QmitkUltrasoundSupport::OnClickedEditDevice()
 
 void QmitkUltrasoundSupport::UpdateAmountOfOutputs()
 {
-  // Update the amount of Nodes; there should be one Node for every slide that is set. Note that we must check whether the slices are set, 
-  // just using the m_Image->dimension(3) will produce nullpointers on slices of the image that were not set
-  bool isSet = true;
-  m_AmountOfOutputs = 0;
-  while (isSet) {
-    isSet = m_Image->IsSliceSet(m_AmountOfOutputs);
-    if (isSet)
-      ++m_AmountOfOutputs;
-  }
-
   // correct the amount of Nodes to display data
   while (m_Node.size() < m_AmountOfOutputs) {
     InitNewNode();
@@ -239,10 +190,8 @@ void QmitkUltrasoundSupport::UpdateAmountOfOutputs()
   while (m_curOutput.size() < m_AmountOfOutputs) {
     m_curOutput.push_back(mitk::Image::New());
 
-    // initialize the slice images as 2d images with the size of m_Images
-    unsigned int* dimOld = m_Image->GetDimensions();
-    unsigned int dim[2] = { dimOld[0], dimOld[1] };
-    m_curOutput.back()->Initialize(m_Image->GetPixelType(), 2, dim);
+    unsigned int dim[3] = { 2, 2, 1};
+    m_curOutput.back()->Initialize(mitk::MakeScalarPixelType<double>(), 3, dim);
   }
   while (m_curOutput.size() > m_AmountOfOutputs) {
     m_curOutput.pop_back();
@@ -251,16 +200,11 @@ void QmitkUltrasoundSupport::UpdateAmountOfOutputs()
 
 void QmitkUltrasoundSupport::UpdateImage()
 {
-  if(m_Controls.m_ShowImageStream->isChecked())
+  if (m_Controls.m_ShowImageStream->isChecked())
   {
     m_Device->Modified();
     m_Device->Update();
     // Update device
-
-    m_Image = m_Device->GetOutput();
-    // get the Image data to display
-    UpdateAmountOfOutputs();
-    // create as many Nodes and Outputs as there are slices in m_Image
 
     if (m_AmountOfOutputs == 0)
       return;
@@ -268,66 +212,60 @@ void QmitkUltrasoundSupport::UpdateImage()
 
     for (unsigned int index = 0; index < m_AmountOfOutputs; ++index)
     {
-      if (m_curOutput.at(index)->GetDimension(0) != m_Image->GetDimension(0) ||
-        m_curOutput.at(index)->GetDimension(1) != m_Image->GetDimension(1) ||
-        m_curOutput.at(index)->GetDimension(2) != m_Image->GetDimension(2) ||
-        m_curOutput.at(index)->GetPixelType() != m_Image->GetPixelType())
-      {
-        unsigned int* dimOld = m_Image->GetDimensions();
-        unsigned int dim[2] = { dimOld[0], dimOld[1]};
-        m_curOutput.at(index)->Initialize(m_Image->GetPixelType(), 2, dim);
-        // if we switched image resolution or type the outputs must be reinitialized!
-      } 
+      auto image = m_Device->GetOutput(index);
+      // get the Image data to display
 
-      if (!m_Image->IsEmpty())
+      if (!image->IsEmpty())
       {
-        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index,0,0,nullptr,mitk::Image::ReferenceMemory));
-        // just reference the slices, to get a small performance gain
-        m_curOutput.at(index)->SetSlice(inputReadAccessor.GetData());
-        m_curOutput.at(index)->GetGeometry()->SetIndexToWorldTransform(m_Image->GetSlicedGeometry()->GetIndexToWorldTransform());
-        // Update the image Output with seperate slices
+        if (m_curOutput[index]->GetDimension(0) != image->GetDimension(0) ||
+          m_curOutput[index]->GetDimension(1) != image->GetDimension(1) ||
+          m_curOutput[index]->GetDimension(2) != image->GetDimension(2) ||
+          m_curOutput[index]->GetPixelType() != image->GetPixelType())
+        {
+          m_curOutput[index]->Initialize(image->GetPixelType(), image->GetDimension(), image->GetDimensions());
+          // if we switched image resolution or type the outputs must be reinitialized!
+        }
+
+        // copy the contents of the device output into the image the data storage will display
+        mitk::ImageReadAccessor inputReadAccessor(image);
+        m_curOutput[index]->SetImportVolume(inputReadAccessor.GetData());
+        m_curOutput[index]->GetGeometry()->SetIndexToWorldTransform(image->GetSlicedGeometry()->GetIndexToWorldTransform());
       }
 
-      if (m_curOutput.at(index)->IsEmpty())
+      if (m_curOutput[index]->IsEmpty())
       {
-        m_Node.at(index)->SetName("No Data received yet ...");
         // create a noise image for correct initialization of level window, etc.
         mitk::Image::Pointer randomImage = mitk::ImageGenerator::GenerateRandomImage<float>(32, 32, 1, 1, 1, 1, 1, 255, 0);
-        m_Node.at(index)->SetData(randomImage);
-        m_curOutput.at(index)->SetGeometry(randomImage->GetGeometry());
+        m_Node[index]->SetData(randomImage);
+        m_curOutput[index]->SetGeometry(randomImage->GetGeometry());
       }
       else
       {
-        char name[30];
-        sprintf(name, "US Viewing Stream - Image %d", index);
-        m_Node.at(index)->SetName(name);
-        m_Node.at(index)->SetData(m_curOutput.at(index)); 
-        // set the name of the Output
+        m_Node[index]->SetData(m_curOutput[index]);
       }
     }
 
     float eps = 0.000001f;
-    // if the geometry changed: reinitialize the ultrasound image. we use the m_curOutput.at(0) to readjust the geometry
+    // if the geometry changed: reinitialize the ultrasound image. we use the m_curOutput[0] to readjust the geometry
     if (((m_OldGeometry.IsNotNull()) &&
-          (m_curOutput.at(0)->GetGeometry() != nullptr)) &&
+      (m_curOutput[0]->GetGeometry() != nullptr)) &&
       (
-        (abs(m_OldGeometry->GetSpacing()[0] - m_curOutput.at(0)->GetGeometry()->GetSpacing()[0]) > eps )||
-        (abs(m_OldGeometry->GetSpacing()[1] - m_curOutput.at(0)->GetGeometry()->GetSpacing()[1]) > eps )||
-        (abs(m_OldGeometry->GetCenter()[0] - m_curOutput.at(0)->GetGeometry()->GetCenter()[0]) > eps) ||
-        (abs(m_OldGeometry->GetCenter()[1] - m_curOutput.at(0)->GetGeometry()->GetCenter()[1]) > eps) ||
+      (abs(m_OldGeometry->GetSpacing()[0] - m_curOutput[0]->GetGeometry()->GetSpacing()[0]) > eps) ||
+        (abs(m_OldGeometry->GetSpacing()[1] - m_curOutput[0]->GetGeometry()->GetSpacing()[1]) > eps) ||
+        (abs(m_OldGeometry->GetCenter()[0] - m_curOutput[0]->GetGeometry()->GetCenter()[0]) > eps) ||
+        (abs(m_OldGeometry->GetCenter()[1] - m_curOutput[0]->GetGeometry()->GetCenter()[1]) > eps) ||
         m_ForceRequestUpdateAll))
     {
-      MITK_INFO << "now";
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-      if ((renderWindow != nullptr) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
+      if ((renderWindow != nullptr) && (m_curOutput[0]->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
       {
         renderWindow->GetRenderingManager()->InitializeViews(
-          m_curOutput.at(0)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+          m_curOutput[0]->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
         renderWindow->GetRenderingManager()->RequestUpdateAll();
       }
-      m_CurrentImageWidth = m_curOutput.at(0)->GetDimension(0);
-      m_CurrentImageHeight = m_curOutput.at(0)->GetDimension(1);
-      m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_curOutput.at(0)->GetGeometry());
+      m_CurrentImageWidth = m_curOutput[0]->GetDimension(0);
+      m_CurrentImageHeight = m_curOutput[0]->GetDimension(1);
+      m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_curOutput[0]->GetGeometry());
       UpdateLevelWindows();
       m_ForceRequestUpdateAll = false;
     }
@@ -356,21 +294,10 @@ void QmitkUltrasoundSupport::RenderImage2d()
   if (!m_Controls.m_Update2DView->isChecked())
     return;
 
-  if (m_PausViewerView != nullptr)
-  {
-    auto renderingManager = mitk::RenderingManager::GetInstance();
-    renderingManager->RequestUpdate(m_PausViewerView->GetPARenderWindow());
-    renderingManager->RequestUpdate(m_PausViewerView->GetUSRenderWindow());
-  }
-  else
-  {
-    CreateWindows(); // try to check whether the PausViwer has been opened by now
-  }
-
   //mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
   //renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
-  // TODO: figure out how to proceed with the standard display
-  //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 
   m_FrameCounter2d++;
   if (m_FrameCounter2d >= 10)
@@ -441,9 +368,6 @@ void QmitkUltrasoundSupport::OnChangedActiveDevice()
   }
   m_Node.clear();
 
-  // disconnect from the PausViewer
-  m_PausViewerView = nullptr;
-
   //get current device, abort if it is invalid
   m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
   if (m_Device.IsNull())
@@ -471,8 +395,9 @@ void QmitkUltrasoundSupport::OnChangedActiveDevice()
     m_Controls.m_TimerWidget->setEnabled(false);
   }
 
-  // connect to PausViewer and Set it up
-  CreateWindows();
+  m_AmountOfOutputs = m_Device->GetNumberOfIndexedOutputs();
+  // create as many nodes and image outputs as needed
+  UpdateAmountOfOutputs();
 }
 
 void QmitkUltrasoundSupport::OnNewDeviceWidgetDone()
@@ -595,24 +520,14 @@ void QmitkUltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
   if (m_CurrentDynamicRange != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble())
   {
     m_CurrentDynamicRange = service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble();
-
-    // update level window for the current dynamic range
-    mitk::LevelWindow levelWindow;
-    for (auto& Node : m_Node)
-    {
-      Node->GetLevelWindow(levelWindow);
-      levelWindow.SetAuto(m_Image, true, true);
-	  levelWindow.SetWindowBounds(55, 125,true);
-      Node->SetLevelWindow(levelWindow);
-    }
+    UpdateLevelWindows();
   }
 }
 
 QmitkUltrasoundSupport::QmitkUltrasoundSupport()
   : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
-  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0),
-  m_PADataStorage(mitk::StandaloneDataStorage::New()), m_USDataStorage(mitk::StandaloneDataStorage::New()), m_ForceRequestUpdateAll(false)
+  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0), m_ForceRequestUpdateAll(false)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 

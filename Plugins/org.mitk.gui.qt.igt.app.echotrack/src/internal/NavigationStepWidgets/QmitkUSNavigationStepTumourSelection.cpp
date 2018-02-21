@@ -421,6 +421,7 @@ void QmitkUSNavigationStepTumourSelection::UpdateReferenceSensorName()
 
   if (this->GetNavigationStepState() >= QmitkUSAbstractNavigationStep::State_Active)
   {
+    MITK_INFO << "############### " << m_NodeDisplacementFilter->GetNumberOfIndexedInputs();
     m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
   }
 

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIRenderingManager.h"
 #include "mitkNodeDisplacementFilter.h"
-#include "mitkUSCombinedModality.h"
+#include "mitkAbstractUltrasoundTrackerDevice.h"
 #include <mitkIOUtil.h>
 
 #include "IO/mitkUSNavigationExperimentLogging.h"
@@ -201,9 +201,9 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   ui->setupUi(parent);
 
   connect(ui->navigationProcessWidget,
-    SIGNAL(SignalCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>)),
+    SIGNAL(SignalCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>)),
     this,
-    SLOT(OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>)));
+    SLOT(OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>)));
 
   connect(ui->navigationProcessWidget,
     SIGNAL(SignalSettingsChanged(itk::SmartPointer<mitk::DataNode>)),
@@ -219,6 +219,11 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
     SIGNAL(SignalActiveNavigationStepChangeRequested(int)),
     this,
     SLOT(OnNextNavigationStepInitialization(int)));
+
+  connect(ui->navigationProcessWidget,
+    SIGNAL(SignalNextButtonClicked()),
+    this,
+    SLOT(OnNextNavigationStep()));
 
   connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
@@ -549,11 +554,13 @@ void QmitkUSNavigationMarkerPlacement::OnFinishExperiment()
 }
 
 void QmitkUSNavigationMarkerPlacement::OnCombinedModalityChanged(
-  itk::SmartPointer<mitk::USCombinedModality> combinedModality)
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality)
 {
+  MITK_INFO << "On combined modality changed";
   // remove old listener for ultrasound device changes
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
   {
+    MITK_INFO << "New combined modality";
     m_CombinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
   }
 
@@ -709,9 +716,18 @@ void QmitkUSNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk:
 
   MITK_INFO("USNavigation") << "Results Directory: " << m_ResultsDirectory.toStdString();
 }
+void QmitkUSNavigationMarkerPlacement::OnNextNavigationStep()
+{
+  QmitkUSNavigationStepCombinedModality* n = static_cast<QmitkUSNavigationStepCombinedModality*>(m_NavigationSteps.at(0));
+  m_CombinedModality = n->GetSelectedCombinedModality();
+
+  for (int i = 0; i < m_NavigationSteps.size(); i++) { m_NavigationSteps.at(i)->SetCombinedModality(m_CombinedModality); }
+}
 
 void QmitkUSNavigationMarkerPlacement::OnActiveNavigationStepChanged(int index)
 {
+
+
   // update navigation step timer each time the active navigation step changes
   m_NavigationStepTimer->SetActiveIndex(index, m_NavigationSteps.at(index)->GetTitle().toStdString());
   if (static_cast<int>(m_NavigationStepNames.size()) <= index)

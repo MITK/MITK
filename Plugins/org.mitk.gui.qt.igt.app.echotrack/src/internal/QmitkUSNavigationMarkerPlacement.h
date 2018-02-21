@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageLoggingFilter.h"
 #include <mitkMessage.h>
 #include <mitkTextAnnotation2D.h>
-#include <mitkUSCombinedModality.h>
+#include <mitkAbstractUltrasoundTrackerDevice.h>
 #include <mitkNavigationToolStorage.h>
 
 namespace itk
@@ -66,6 +66,8 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
   Q_OBJECT
 
     protected slots:
+
+  void OnNextNavigationStep();
   /**
   * \brief Called periodically to update the rendering.
   * The standard multi widget is changed to fit the navigation process once it
@@ -91,7 +93,7 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
   */
   void OnFinishExperiment();
 
-  void OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
+  void OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
 
   /**
   * \brief Switches the navigation step widgets if the navigation application was changed.

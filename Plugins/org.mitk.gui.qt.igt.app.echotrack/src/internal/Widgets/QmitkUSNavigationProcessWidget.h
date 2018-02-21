@@ -79,6 +79,8 @@ signals:
    */
   void SignalNavigationStepFinished(int, bool);
 
+  void SignalNextButtonClicked();
+
   /**
    * \brief Signals the creation of an intermediate result.
    * The result data is given as properties of the data node.

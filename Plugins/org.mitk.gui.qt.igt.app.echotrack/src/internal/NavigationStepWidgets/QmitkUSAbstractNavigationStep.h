@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 #include "mitkDataStorage.h"
-#include "mitkUSCombinedModality.h"
+#include "mitkAbstractUltrasoundTrackerDevice.h"
 
 namespace itk {
 template<class T> class SmartPointer;

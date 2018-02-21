@@ -258,6 +258,7 @@ void QmitkUSNavigationProcessWidget::UpdateNavigationProgress()
 
 void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
 {
+  emit SignalNextButtonClicked();
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice()->GetIsFreezed()) {return;} //no moving through steps when the modality is nullptr or frozen
 
   int currentIndex = ui->stepsToolBox->currentIndex();
@@ -270,6 +271,7 @@ void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
   ui->stepsToolBox->setCurrentIndex(++currentIndex);
 
   this->UpdatePrevNextButtons();
+
 }
 
 void QmitkUSNavigationProcessWidget::OnPreviousButtonClicked()

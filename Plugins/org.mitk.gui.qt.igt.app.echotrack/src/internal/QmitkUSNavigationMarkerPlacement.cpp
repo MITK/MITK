@@ -574,35 +574,6 @@ void QmitkUSNavigationMarkerPlacement::OnFinishExperiment()
   MITK_INFO("USNavigationLogging") << "Finished!";
 }
 
-void QmitkUSNavigationMarkerPlacement::OnCombinedModalityChanged(
-  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality)
-{
-  m_CombinedModality = combinedModality;
-  m_ReinitAlreadyDone = false;
-
-  // update navigation data recorder for using the new combined modality
-  mitk::NavigationDataSource::Pointer navigationDataSource = combinedModality->GetNavigationDataSource();
-  m_NavigationDataRecorder->ConnectTo(navigationDataSource);
-  m_NavigationDataRecorder->ResetRecording();
-
-  // update ultrasound image logging filter for using the new combined modality
-  mitk::USDevice::Pointer ultrasoundImageSource = combinedModality->GetUltrasoundDevice();
-  for (unsigned int n = 0; n < ultrasoundImageSource->GetNumberOfIndexedOutputs(); ++n)
-  {
-    m_USImageLoggingFilter->SetInput(n, ultrasoundImageSource->GetOutput(n));
-  }
-
-  // update ablation zone filter for using the new combined modality
-  for (unsigned int n = 0; n < navigationDataSource->GetNumberOfIndexedOutputs(); ++n)
-  {
-    m_AblationZonesDisplacementFilter->SetInput(n, navigationDataSource->GetOutput(n));
-  }
-  m_AblationZonesDisplacementFilter->SelectInput(m_MarkerIndex);
-
-  // make sure that a reinit is done for the new images
-  this->ReinitOnImage();
-}
-
 void QmitkUSNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::DataNode> settings)
 {
   std::string applicationName;
@@ -729,87 +700,6 @@ void QmitkUSNavigationMarkerPlacement::OnNextNavigationStep()
   m_CombinedModality = n->GetSelectedCombinedModality();
 
   for (int i = 0; i < m_NavigationSteps.size(); i++) { m_NavigationSteps.at(i)->SetCombinedModality(m_CombinedModality); }
-}
-
-void QmitkUSNavigationMarkerPlacement::OnActiveNavigationStepChanged(int index)
-{
-
-
-  // update navigation step timer each time the active navigation step changes
-  m_NavigationStepTimer->SetActiveIndex(index, m_NavigationSteps.at(index)->GetTitle().toStdString());
-  if (static_cast<int>(m_NavigationStepNames.size()) <= index)
-  {
-    MITK_INFO("USNavigationLogging") << "Someting went wrong: unknown navigation step!";
-  }
-  else
-  {
-    MITK_INFO("USNavigationLogging") << "Navigation step finished/changed, next step: "
-      << this->m_NavigationStepNames.at(index).toStdString()
-      << "; duration until now: " << m_NavigationStepTimer->GetTotalDuration();
-  }
-}
-
-void QmitkUSNavigationMarkerPlacement::OnNextNavigationStepInitialization(int index)
-{
-  MITK_DEBUG << "Next Step: " << m_NavigationSteps.at(index)->GetTitle().toStdString();
-
-  if (m_NavigationSteps.at(index)->GetTitle().toStdString() == "Computer-assisted Intervention")
-  {
-    QmitkUSNavigationStepPunctuationIntervention* navigationStepPunctuationIntervention = static_cast<QmitkUSNavigationStepPunctuationIntervention*>(m_NavigationSteps.at(index));
-    if (navigationStepPunctuationIntervention != nullptr)
-    {
-      if (m_CurrentStorage.IsNull()) { this->UpdateToolStorage(); }
-      if (m_CurrentStorage.IsNull() || (m_CurrentStorage->GetTool(m_NeedleIndex).IsNull()))
-      {
-        MITK_WARN << "Found null pointer when setting the tool axis, aborting";
-      }
-      else
-      {
-        navigationStepPunctuationIntervention->SetNeedleMetaData(m_CurrentStorage->GetTool(m_NeedleIndex));
-        MITK_DEBUG << "Needle axis vector: " << m_CurrentStorage->GetTool(m_NeedleIndex)->GetToolAxis();
-      }
-    }
-  }
-}
-
-void QmitkUSNavigationMarkerPlacement::OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode> resultsNode)
-{
-  // intermediate results only matter during an experiment
-  if (!m_IsExperimentRunning)
-  {
-    return;
-  }
-
-  this->WaitCursorOn();
-
-  // set results node to the experiment logging (for saving contents to the
-  // file system)
-  m_ExperimentLogging->SetResult(resultsNode);
-
-  std::string resultsName;
-  if (!resultsNode->GetName(resultsName))
-  {
-    MITK_WARN << "Could not get name of current results node.";
-    return;
-  }
-
-  // save the mitk scene
-  std::string scenefile = QString(m_ExperimentResultsSubDirectory + QDir::separator() +
-    QString("Scene %1 - ").arg(m_SceneNumber++, 2, 10, QChar('0')) +
-    QString::fromStdString(resultsName).replace(":", "_") + ".mitk")
-    .toStdString();
-  MITK_INFO << "Saving Scene File: " << scenefile;
-
-  mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
-  mitk::NodePredicateNot::Pointer isNotHelperObject =
-    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
-  mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = this->GetDataStorage()->GetSubset(isNotHelperObject);
-
-  this->Convert2DImagesTo3D(nodesToBeSaved);
-
-  sceneIO->SaveScene(nodesToBeSaved, this->GetDataStorage(), scenefile);
-
-  this->WaitCursorOff();
 }
 
 void QmitkUSNavigationMarkerPlacement::ReinitOnImage()

@@ -97,25 +97,10 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
   */
   void OnFinishExperiment();
 
-  void OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
-
   /**
   * \brief Switches the navigation step widgets if the navigation application was changed.
   */
   void OnSettingsChanged(itk::SmartPointer<mitk::DataNode>);
-
-  /**
-  * \brief Updates the timer for the navigation steps durations every time the active navigation step changes.
-  */
-  void OnActiveNavigationStepChanged(int);
-
-  /** Initializes the next navigation step */
-  void OnNextNavigationStepInitialization(int);
-
-  /**
-  * \brief The data node is given to the experiment logging and scene is saved to the file system.
-  */
-  void OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode>);
 
   void OnAddAblationZone(int size);
 

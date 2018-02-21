@@ -219,8 +219,6 @@ protected:
   itk::SmartPointer<mitk::DataNode> m_ImageStreamNode;
 
 private:
-  mitk::MessageDelegate2<QmitkUSNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;
-
   Ui::QmitkUSNavigationMarkerPlacement *ui;
 };
 

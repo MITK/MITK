@@ -173,6 +173,8 @@ protected:
 
   void CreateOverlays();
 
+  void InitImageStream();
+
   QWidget *m_Parent;
   QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
   QTimer *m_UpdateTimer;
@@ -212,6 +214,8 @@ protected:
   //To get tool storage
   mitk::NavigationDataSource::Pointer m_NavigationDataSource;
   mitk::NavigationToolStorage::Pointer m_CurrentStorage;
+
+  itk::SmartPointer<mitk::DataNode> m_ImageStreamNode;
 
 private:
   mitk::MessageDelegate2<QmitkUSNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;

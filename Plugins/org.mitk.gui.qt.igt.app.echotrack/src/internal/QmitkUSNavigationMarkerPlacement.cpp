@@ -250,7 +250,9 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
 void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
 {
-  ui->m_TargetMarkingWidget->SetCombinedModality(ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality());
+  InitImageStream();
+  m_CombinedModality = ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality();
+  ui->m_TargetMarkingWidget->SetCombinedModality(m_CombinedModality);
   ui->m_TargetMarkingWidget->SetDataStorage(this->GetDataStorage());
   ui->m_TargetMarkingWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
   ui->m_TargetMarkingWidget->OnActivateStep();
@@ -259,7 +261,7 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 {
-  ui->m_CriticalStructuresWidget->SetCombinedModality(ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality());
+  ui->m_CriticalStructuresWidget->SetCombinedModality(m_CombinedModality);
   ui->m_CriticalStructuresWidget->SetDataStorage(this->GetDataStorage());
   ui->m_CriticalStructuresWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
   ui->m_CriticalStructuresWidget->OnActivateStep();
@@ -268,13 +270,25 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
 {
-  ui->m_NavigationWidget->SetCombinedModality(ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality());
+  ui->m_NavigationWidget->SetCombinedModality(m_CombinedModality);
   ui->m_NavigationWidget->SetDataStorage(this->GetDataStorage());
   ui->m_NavigationWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
   ui->m_NavigationWidget->OnActivateStep();
   ui->m_NavigationWidget->OnStartStep();
   ui->m_NavigationWidget->Update();
 
+}
+
+void QmitkUSNavigationMarkerPlacement::InitImageStream()
+{
+  m_ImageStreamNode = this->GetDataStorage()->GetNamedNode(QmitkUSAbstractNavigationStep::DATANAME_IMAGESTREAM);
+  if (m_ImageStreamNode.IsNull())
+  {
+    // Create Node for US Stream
+    m_ImageStreamNode = mitk::DataNode::New();
+    m_ImageStreamNode->SetName(QmitkUSAbstractNavigationStep::DATANAME_IMAGESTREAM);
+    this->GetDataStorage()->Add(m_ImageStreamNode);
+  }
 }
 
 void QmitkUSNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const std::string &key, const std::string &)
@@ -300,9 +314,18 @@ void QmitkUSNavigationMarkerPlacement::SetFocus()
 
 void QmitkUSNavigationMarkerPlacement::OnTimeout()
 {
+  if (m_CombinedModality.IsNull()) return;
   ui->m_TargetMarkingWidget->Update();
   ui->m_CriticalStructuresWidget->Update();
   ui->m_NavigationWidget->Update();
+
+
+  mitk::Image::Pointer image = m_CombinedModality->GetOutput();
+  // make sure that always the current image is set to the data node
+  if (image.IsNotNull() && m_ImageStreamNode->GetData() != image.GetPointer() && image->IsInitialized())
+  {
+    m_ImageStreamNode->SetData(image);
+  }
 
   if (!m_StdMultiWidget)
   {

@@ -38,7 +38,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
    }
  }
 
- void QmitkUSNavigationCalibrationsDataModel::SetCombinedModality(mitk::USCombinedModality::Pointer combinedModality)
+ void QmitkUSNavigationCalibrationsDataModel::SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality)
  {
    if ( m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull() )
    {

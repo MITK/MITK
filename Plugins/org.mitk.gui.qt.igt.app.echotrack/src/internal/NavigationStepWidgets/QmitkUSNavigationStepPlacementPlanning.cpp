@@ -349,7 +349,7 @@ QmitkUSAbstractNavigationStep::FilterVector QmitkUSNavigationStepPlacementPlanni
 
 void QmitkUSNavigationStepPlacementPlanning::OnSetCombinedModality()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if (combinedModality.IsNotNull())
   {
     mitk::AffineTransform3D::Pointer calibration = combinedModality->GetCalibration();
@@ -767,7 +767,7 @@ void QmitkUSNavigationStepPlacementPlanning::UpdateBodyMarkerStatus(mitk::Naviga
 
 void QmitkUSNavigationStepPlacementPlanning::UpdateSensorsNames()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if (combinedModality.IsNull())
   {
     return;

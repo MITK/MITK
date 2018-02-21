@@ -408,7 +408,7 @@ void QmitkUltrasoundCalibration::OnStartPlusCalibration()
   m_TrackingMessageProvider->SetFPS(5);
 
   m_TrackingToIGTLMessageFilter = mitk::NavigationDataToIGTLMessageFilter::New();
-  m_TrackingToIGTLMessageFilter->ConnectTo(m_CombinedModality->GetTrackingDevice());
+  m_TrackingToIGTLMessageFilter->ConnectTo(m_CombinedModality->GetTrackingDeviceDataSource());
   m_TrackingToIGTLMessageFilter->SetName("Tracker Filter");
 
   typedef itk::SimpleMemberCommand< QmitkUltrasoundCalibration > CurCommandType;

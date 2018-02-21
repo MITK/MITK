@@ -62,13 +62,13 @@ void QmitkUSCombinedModalityCreationWidget::OnCreation()
   QString name = ui->nameLineEdit->text();
   if (name.isEmpty()) { name = "Combined Modality"; }
 
-  mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(
-    usDevice, trackingDevice, vendor.toStdString(), name.toStdString());
-  combinedModality->GetUltrasoundDevice()->Initialize();
-  combinedModality->RegisterAsMicroservice(); // register as micro service
+  m_CombinedModality = mitk::USCombinedModality::New(usDevice, trackingDevice, false);
+
+  m_CombinedModality->GetUltrasoundDevice()->Initialize();
+  m_CombinedModality->RegisterAsMicroservice(); // register as micro service
 
   emit SignalCreated();
-  emit SignalCreated(combinedModality);
+  //emit SignalCreated(m_CombinedModality);
 }
 
 void QmitkUSCombinedModalityCreationWidget::OnSelectedUltrasoundOrTrackingDevice()

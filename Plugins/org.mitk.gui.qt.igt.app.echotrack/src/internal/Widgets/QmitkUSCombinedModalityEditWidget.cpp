@@ -44,7 +44,7 @@ QmitkUSCombinedModalityEditWidget::~QmitkUSCombinedModalityEditWidget()
   delete ui;
 }
 
-void QmitkUSCombinedModalityEditWidget::SetCombinedModality(mitk::USCombinedModality::Pointer combinedModality)
+void QmitkUSCombinedModalityEditWidget::SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality)
 {
   m_CalibrationsDataModel->SetCombinedModality(combinedModality);
 

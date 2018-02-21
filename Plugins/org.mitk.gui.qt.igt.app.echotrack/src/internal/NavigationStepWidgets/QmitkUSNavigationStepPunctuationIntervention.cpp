@@ -194,7 +194,7 @@ QmitkUSNavigationStepPunctuationIntervention::FilterVector QmitkUSNavigationStep
 
 void QmitkUSNavigationStepPunctuationIntervention::OnSetCombinedModality()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if ( combinedModality.IsNotNull() )
   {
     // set calibration of the combined modality to the needle projection filter

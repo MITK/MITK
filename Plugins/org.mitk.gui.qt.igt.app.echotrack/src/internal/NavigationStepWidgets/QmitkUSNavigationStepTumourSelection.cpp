@@ -281,7 +281,7 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
 
 void QmitkUSNavigationStepTumourSelection::OnSetCombinedModality()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if (combinedModality.IsNotNull())
   {
     m_NavigationDataSource = combinedModality->GetNavigationDataSource();

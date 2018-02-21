@@ -160,7 +160,7 @@ protected:
   itk::SmartPointer<mitk::DataNode>               m_ImageStreamNode;
   bool                                            m_ImageAlreadySetToNode;
 
-  itk::SmartPointer<mitk::USCombinedModality>     m_CombinedModality;
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>     m_CombinedModality;
 
   itk::SmartPointer<mitk::NavigationDataSource>   m_LastNavigationDataFilter;
 

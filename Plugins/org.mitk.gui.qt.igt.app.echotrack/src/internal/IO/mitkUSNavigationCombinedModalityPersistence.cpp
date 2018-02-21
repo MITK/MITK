@@ -131,7 +131,7 @@ void mitk::USNavigationCombinedModalityPersistence::LoadStoredDevices()
       // ultrasound device werde found
       if ( navigationDataSource.IsNotNull() && usDevice.IsNotNull() )
       {
-        mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(usDevice, navigationDataSource, stringList.at(0).toStdString(), stringList.at(1).toStdString());
+        mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(usDevice, navigationDataSource, false);
         combinedModality->DeserializeCalibration(stringList.at(6).toStdString());
         combinedModality->GetUltrasoundDevice()->Initialize();
       }

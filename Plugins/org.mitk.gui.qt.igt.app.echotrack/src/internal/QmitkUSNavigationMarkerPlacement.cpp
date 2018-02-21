@@ -487,7 +487,7 @@ void QmitkUSNavigationMarkerPlacement::OnFinishExperiment()
   MITK_INFO("USNavigationLogging") << "Experiment finished!";
   MITK_INFO("USNavigationLogging")
     << "Position/Orientation of needle tip: "
-    << (dynamic_cast<mitk::NavigationData *>(m_CombinedModality->GetTrackingDevice()->GetOutput(0)))->GetPosition();
+    << (dynamic_cast<mitk::NavigationData *>(m_CombinedModality->GetTrackingDeviceDataSource()->GetOutput(0)))->GetPosition();
   MITK_INFO("USNavigationLogging")
     << "Position of target: " << m_TargetNodeDisplacementFilter->GetRawDisplacementNavigationData(0)->GetPosition();
   MITK_INFO("USNavigationLogging") << "Total duration: " << m_NavigationStepTimer->GetTotalDuration();

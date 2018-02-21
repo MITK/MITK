@@ -16,7 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUSNavigationStepCombinedModality.h"
 #include "ui_QmitkUSNavigationStepCombinedModality.h"
 
+#include "mitkAbstractUltrasoundTrackerDevice.h"
 #include "mitkUSCombinedModality.h"
+
 
 #include "../Widgets/QmitkUSCombinedModalityEditWidget.h"
 
@@ -47,7 +49,7 @@ QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWi
   connect(ui->combinedModalityEditWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityEditExit()));
   connect(ui->combinedModalityEditWidget, SIGNAL(SignalSaved()), this, SLOT(OnCombinedModalityEditExit()));
 
-  std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USDevice::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
+  //std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USDevice::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
   //std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice))";
   ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USCombinedModality::US_PROPKEY_DEVICENAME);
   ui->combinedModalityListWidget->SetAutomaticallySelectFirstEntry(true);
@@ -328,7 +330,7 @@ void QmitkUSNavigationStepCombinedModality::SetCombinedModalityEditWidgetEnabled
 
 void QmitkUSNavigationStepCombinedModality::CreateCombinedModalityResultAndSignalIt()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality();
   mitk::USDevice::Pointer usDevice = combinedModality->GetUltrasoundDevice();
 
   // save identifiers and calibration to a result object

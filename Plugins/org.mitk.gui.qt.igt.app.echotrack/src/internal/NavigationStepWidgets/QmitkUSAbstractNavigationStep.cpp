@@ -154,7 +154,7 @@ itk::SmartPointer<mitk::DataStorage> QmitkUSAbstractNavigationStep::GetDataStora
   return m_DataStorage;
 }
 
-itk::SmartPointer<mitk::USCombinedModality> QmitkUSAbstractNavigationStep::GetCombinedModality(bool throwNull)
+itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> QmitkUSAbstractNavigationStep::GetCombinedModality(bool throwNull)
 {
   if ( throwNull && m_CombinedModality.IsNull() )
   {

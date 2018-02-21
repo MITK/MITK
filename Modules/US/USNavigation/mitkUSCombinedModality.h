@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkUSNavigationExports.h>
 #include "mitkUSDevice.h"
 #include "mitkImageSource.h"
+#include "mitkAbstractUltrasoundTrackerDevice.h"
 #include "mitkNavigationDataSource.h"
 
 // Microservices
@@ -31,8 +32,6 @@ namespace itk {
 }
 
 namespace mitk {
-  class NavigationDataSmoothingFilter;
-  class NavigationDataDelayFilter;
   class USControlInterfaceBMode;
   class USControlInterfaceProbes;
   class USControlInterfaceDoppler;
@@ -47,189 +46,84 @@ namespace mitk {
    * The ultrasound images are transformed according to this calibration in the
    * GenerateData() method.
    */
-  class MITKUSNAVIGATION_EXPORT USCombinedModality : public mitk::ImageSource
+  class MITKUSNAVIGATION_EXPORT USCombinedModality : public mitk::AbstractUltrasoundTrackerDevice
   {
   public:
+
     static const std::string DeviceClassIdentifier;
     static const char*       DefaultProbeIdentifier;
     static const char*       ProbeAndDepthSeperator;
-
-    mitkClassMacro(USCombinedModality, mitk::ImageSource);
-    mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, std::string, std::string);
-
-    itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
-    itkSetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
-    itkGetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
-    itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
-
-    /**
-    * \brief Getter for calibration data of the currently active depth and probe.
-    *
-    * \return Transformation for calibration or null if no calibration is available.
-    */
-    AffineTransform3D::Pointer GetCalibration();
-
-    /**
-     * \brief Getter for calibration data of the given depth and the currently active probe.
-     *
-     * \param depth depth of the b mode ultrasound image for which the calibration should be returned
-     * \return Transformation for calibration or null if no calibration is available.
-     */
-    AffineTransform3D::Pointer GetCalibration(std::string depth);
-
-    /**
-     * \brief Getter for calibration data of the given depth and probe.
-     *
-     * \param depth depth of the b mode ultrasound image for which the calibration should be returned
-     * \param probe probe of the ultrasound device for which the calibration should be returned
-     * \return Transformation for calibration or null if no calibration is available.
-     */
-    AffineTransform3D::Pointer GetCalibration(std::string depth, std::string probe);
-
-    /**
-    * \brief Sets a transformation as calibration data.
-    * Calibration data is set for the currently activated probe and their current
-    * zoom factor. It also marks the device as calibrated.
-    */
-    void SetCalibration(AffineTransform3D::Pointer calibration);
-
-    /**
-     * \brief Removes the calibration data of the currently active depth and probe.
-     * \return true on success, false if there was no calibration
-     */
-    bool RemoveCalibration();
-
-    /**
-     * \brief Removes the calibration data of the given depth and the currently active probe.
-     *
-     * \param depth depth of the b mode ultrasound image for which the calibration should be removed
-     * \return true on success, false if there was no calibration
-     */
-    bool RemoveCalibration(std::string depth);
-
-    /**
-     * \brief Removes the calibration data of the given depth and probe.
-     *
-     * \param depth depth of the b mode ultrasound image for which the calibration should be removed
-     * \param probe probe of the ultrasound device for which the calibration should be removed
-     * \return true on success, false if there was no calibration
-     */
-    bool RemoveCalibration(std::string depth, std::string probe);
-
-    /**
-    * \brief Returns the Class of the Device.
-    */
-    virtual std::string GetDeviceClass();
-
-    /**
-    * \brief Wrapper for returning USImageSource of the UltrasoundDevice.
-    */
-    virtual USImageSource::Pointer GetUSImageSource();
-
-    /**
-    * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom();
-
-    /**
-    * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode();
-
-    /**
-    * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes();
-
-    /**
-    * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler();
-
-    virtual itk::SmartPointer<mitk::NavigationDataSource> GetNavigationDataSource();
-
-    /**
-     * \return true if the device is calibrated for the currently selected probe with the current zoom level
-     */
-    bool GetIsCalibratedForCurrentStatus();
-
-    /**
-     * \return true if a calibration was loaded for at least one probe and depth
-     */
-    bool GetContainsAtLeastOneCalibration();
-
-    /**
-    * \brief Remove this device from the micro service.
-    * This method is public for mitk::USCombinedModality, because this devices
-    * can be completly removed. This is not possible for API devices, which
-    * should be available while their sub module is loaded.
-    */
-    void UnregisterOnService();
-
-    /**
-    * \brief Serializes all contained calibrations into an xml fragment.
-    *
-    * The returned string contains one parent node named "calibrations" and several
-    * subnodes, one for each calibration that is present.
-    */
-    std::string SerializeCalibration();
-
-    /**
-    * \brief Deserializes a string provided by a prior call to Serialize().
-    * If the bool flag is true, all prior calibrations will be deleted.
-    * If the flag is set to false, prior calibrations will be retained, but overwritten
-    * if one of equal name is present.
-    *
-    * \throws mitk::Exception if the given string could not be parsed correctly.
-    */
-    void DeserializeCalibration(const std::string &xmlString, bool clearPreviousCalibrations = true);
-
-    void SetNumberOfSmoothingValues(unsigned int numberOfSmoothingValues);
-
-    void SetDelayCount(unsigned int delayCount);
-
-    void RegisterAsMicroservice();
-
-    /**
-    *\brief These Constants are used in conjunction with Microservices
-    */
     static const std::string US_INTERFACE_NAME;
     static const std::string US_PROPKEY_DEVICENAME;
     static const std::string US_PROPKEY_CLASS;
     static const std::string US_PROPKEY_ID;
+
+
+    void UnregisterOnService();
+
+    void RegisterAsMicroservice() override;
+
+    mitkClassMacro(USCombinedModality, mitk::AbstractUltrasoundTrackerDevice);
+    mitkNewMacro3Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
+
+
+    /**
+    * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
+    */
+    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
+
+    /**
+    * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
+    */
+    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode() override;
+
+    /**
+    * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
+    */
+    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes() override;
+
+    /**
+    * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
+    */
+    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler() override;
+
   protected:
-    USCombinedModality(USDevice::Pointer usDevice, itk::SmartPointer<NavigationDataSource> trackingDevice, std::string manufacturer = "", std::string model = "");
+    USCombinedModality( USDevice::Pointer usDevice,
+                        itk::SmartPointer<NavigationDataSource> trackingDevice,
+                        bool trackedUltrasoundActive = false );
     virtual ~USCombinedModality();
 
     /**
     * \brief Initializes UltrasoundDevice.
     */
-    virtual bool OnInitialization();
+    //___virtual bool OnInitialization();
 
     /**
     * \brief Connects UltrasoundDevice.
     */
-    virtual bool OnConnection();
+    //___virtual bool OnConnection();
 
     /**
     * \brief Disconnects UltrasoundDevice.
     */
-    virtual bool OnDisconnection();
+    //___virtual bool OnDisconnection();
 
     /**
     * \brief Activates UltrasoundDevice.
     */
-    virtual bool OnActivation();
+    //___virtual bool OnActivation();
 
     /**
     * \brief Deactivates UltrasoundDevice.
     */
-    virtual bool OnDeactivation();
+   //___ virtual bool OnDeactivation();
 
     /**
     * \brief Freezes or unfreezes UltrasoundDevice.
     */
-    virtual void OnFreeze(bool);
+    //___virtual void OnFreeze(bool);
+
+
 
     /**
     * \brief Grabs the next frame from the input.
@@ -237,35 +131,18 @@ namespace mitk {
     */
     void GenerateData() override;
 
-    std::string GetIdentifierForCurrentCalibration();
-    std::string GetIdentifierForCurrentProbe();
-    std::string GetCurrentDepthValue();
 
-    void RebuildFilterPipeline();
+    private:
+      /**
+      *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
+      */
+      us::ServiceRegistration<Self>           m_ServiceRegistration;
 
-    USDevice::Pointer                                      m_UltrasoundDevice;
-    itk::SmartPointer<NavigationDataSource>                m_TrackingDevice;
-    std::map<std::string, AffineTransform3D::Pointer>      m_Calibrations;
-
-    itk::SmartPointer<mitk::NavigationDataSmoothingFilter> m_SmoothingFilter;
-    itk::SmartPointer<mitk::NavigationDataDelayFilter>     m_DelayFilter;
-    itk::SmartPointer<mitk::NavigationDataSource>          m_LastFilter;
-
-    unsigned int m_NumberOfSmoothingValues;
-    unsigned int m_DelayCount;
-
-  private:
-    /**
-    *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
-    */
-    us::ServiceRegistration<Self>           m_ServiceRegistration;
-
-    /**
-    * \brief Properties of the device's Microservice.
-    */
-    us::ServiceProperties                   m_ServiceProperties;
+      /**
+      * \brief Properties of the device's Microservice.
+      */
+      us::ServiceProperties                   m_ServiceProperties;
   };
 } // namespace mitk
-
 MITK_DECLARE_SERVICE_INTERFACE(mitk::USCombinedModality, "org.mitk.services.USCombinedModality")
 #endif // MITKUSCombinedModality_H_HEADER_INCLUDED_

@@ -278,7 +278,7 @@ protected:
    * \return the combined modality set by SetCombinedModality(); can only be null if the parameter throwNull is set to false
    * \throws mitk::Exception if the combined modality is null and the parameter throwNull is set to true
    */
-  itk::SmartPointer<mitk::USCombinedModality> GetCombinedModality(bool throwNull = true);
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> GetCombinedModality(bool throwNull = true);
 
   /**
    * \brief Returns node with the given name and the given source node (parent) from the data storage.
@@ -303,7 +303,7 @@ protected:
 
 private:
   itk::SmartPointer<mitk::DataStorage>        m_DataStorage;
-  itk::SmartPointer<mitk::USCombinedModality> m_CombinedModality;
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> m_CombinedModality;
 
   NavigationStepState                         m_NavigationStepState;
 };

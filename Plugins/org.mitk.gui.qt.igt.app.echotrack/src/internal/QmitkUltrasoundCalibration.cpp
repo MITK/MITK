@@ -74,7 +74,7 @@ m_USDeviceChanged(this, &QmitkUltrasoundCalibration::OnUSDepthChanged)
 QmitkUltrasoundCalibration::~QmitkUltrasoundCalibration()
 {
   m_Controls.m_CombinedModalityManagerWidget->blockSignals(true);
-  mitk::USCombinedModality::Pointer combinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
@@ -234,7 +234,7 @@ void QmitkUltrasoundCalibration::OnTabSwitch(int index)
 //void QmitkUltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
 void QmitkUltrasoundCalibration::OnDeviceSelected()
 {
-  mitk::USCombinedModality::Pointer combinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
@@ -253,7 +253,7 @@ void QmitkUltrasoundCalibration::OnDeviceSelected()
 
 void QmitkUltrasoundCalibration::OnDeviceDeselected()
 {
-  mitk::USCombinedModality::Pointer combinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {

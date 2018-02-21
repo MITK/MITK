@@ -110,7 +110,7 @@ namespace mitk {
     */
     //___virtual void OnFreeze(bool);
 
-    void RegisterAsMicroservice() override;
+   // void RegisterAsMicroservice() override;
 
     /**
     * \brief Grabs the next frame from the input.

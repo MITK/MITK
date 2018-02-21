@@ -49,9 +49,9 @@ QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWi
   connect(ui->combinedModalityEditWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityEditExit()));
   connect(ui->combinedModalityEditWidget, SIGNAL(SignalSaved()), this, SLOT(OnCombinedModalityEditExit()));
 
-  //std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USDevice::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
+  std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.AbstractUltrasoundTrackerDevice)(" + mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_CLASS + "=" + mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier + "))";
   //std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice))";
-  ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USCombinedModality::US_PROPKEY_DEVICENAME);
+  ui->combinedModalityListWidget->Initialize<mitk::AbstractUltrasoundTrackerDevice>(filterOnlyCombinedModalities);
   ui->combinedModalityListWidget->SetAutomaticallySelectFirstEntry(true);
 
   //try to load UI settings
@@ -77,7 +77,7 @@ QmitkUSNavigationStepCombinedModality::~QmitkUSNavigationStepCombinedModality()
 
 void QmitkUSNavigationStepCombinedModality::OnDeviceSelectionChanged()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetSelectedCombinedModality();
   bool combinedModalitySelected = combinedModality.IsNotNull();
 
   ui->calibrationGroupBox->setEnabled(combinedModalitySelected);
@@ -132,7 +132,7 @@ void QmitkUSNavigationStepCombinedModality::OnLoadCalibration()
     "Calibration files *.cal");
   m_LastCalibrationFilename = filename.toStdString();
 
-  mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNull())
   {
     ui->calibrationLoadStateLabel->setText("Selected device is no USCombinedModality.");
@@ -215,7 +215,7 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityEditExit()
 
 void QmitkUSNavigationStepCombinedModality::OnDeleteButtonClicked()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
     combinedModality->RemoveAllObservers();
@@ -231,7 +231,7 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityEditButtonClicked(
 
 void QmitkUSNavigationStepCombinedModality::OnActivateButtonClicked()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
     if (!combinedModality->GetUltrasoundDevice()->GetIsConnected()) { combinedModality->GetUltrasoundDevice()->Connect(); }
@@ -241,7 +241,7 @@ void QmitkUSNavigationStepCombinedModality::OnActivateButtonClicked()
 
 void QmitkUSNavigationStepCombinedModality::OnDisconnectButtonClicked()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
     if (combinedModality->GetUltrasoundDevice()->GetIsActive()) { combinedModality->GetUltrasoundDevice()->Deactivate(); }
@@ -261,7 +261,7 @@ bool QmitkUSNavigationStepCombinedModality::OnRestartStep()
 
 bool QmitkUSNavigationStepCombinedModality::OnFinishStep()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -362,12 +362,12 @@ bool QmitkUSNavigationStepCombinedModality::UpdateCalibrationState()
   return calibrated;
 }
 
-mitk::USCombinedModality::Pointer QmitkUSNavigationStepCombinedModality::GetSelectedCombinedModality()
+mitk::AbstractUltrasoundTrackerDevice::Pointer QmitkUSNavigationStepCombinedModality::GetSelectedCombinedModality()
 {
   // nothing more to do if no device is selected at the moment
   if (!ui->combinedModalityListWidget->GetIsServiceSelected()) { return 0; }
 
-  mitk::USCombinedModality::Pointer combinedModality = ui->combinedModalityListWidget->GetSelectedService<mitk::USCombinedModality>();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = ui->combinedModalityListWidget->GetSelectedService<mitk::AbstractUltrasoundTrackerDevice>();
 
   if (combinedModality.IsNull())
   {

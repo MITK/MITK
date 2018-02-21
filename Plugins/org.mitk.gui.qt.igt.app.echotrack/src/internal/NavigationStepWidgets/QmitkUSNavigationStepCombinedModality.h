@@ -89,7 +89,7 @@ public:
   virtual QString GetTitle();
   virtual bool GetIsRestartable();
 
-  mitk::USCombinedModality::Pointer GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer GetSelectedCombinedModality();
 
   void SetCalibrationLoadedNecessary(bool);
 

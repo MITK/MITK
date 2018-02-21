@@ -395,7 +395,7 @@ void QmitkUSNavigationProcessWidget::OnStepNoLongerReady(int index)
   emit SignalNavigationStepFinished(index, false);
 }
 
-void QmitkUSNavigationProcessWidget::OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality> combinedModality)
+void QmitkUSNavigationProcessWidget::OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality)
 {
   m_CombinedModality = combinedModality;
   m_ImageAlreadySetToNode = false;

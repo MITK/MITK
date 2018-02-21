@@ -57,7 +57,7 @@ signals:
   /**
    * \brief Signals a replacement of the combined modality by one of the navigation steps.
    */
-  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
+  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
 
   /**
    * \brief Signals a change of the navigation settings.
@@ -97,7 +97,7 @@ protected slots:
   void OnStepReady(int);
   void OnStepNoLongerReady(int);
 
-  void OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
+  void OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
   void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode>);
 
 public:

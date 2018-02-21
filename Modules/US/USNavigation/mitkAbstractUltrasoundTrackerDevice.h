@@ -256,7 +256,6 @@ namespace mitk {
 
 } // namespace mitk
 
-MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.USCombinedModality")
-//MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.AbstractUltrasoundTrackerDevice")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.AbstractUltrasoundTrackerDevice")
 
 #endif

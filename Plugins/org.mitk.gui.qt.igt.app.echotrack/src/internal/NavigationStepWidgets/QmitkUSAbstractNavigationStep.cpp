@@ -52,7 +52,7 @@ void QmitkUSAbstractNavigationStep::SetDataStorage(itk::SmartPointer<mitk::DataS
   m_DataStorage = dataStorage;
 }
 
-void QmitkUSAbstractNavigationStep::SetCombinedModality(itk::SmartPointer<mitk::USCombinedModality> combinedModality)
+void QmitkUSAbstractNavigationStep::SetCombinedModality(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality)
 {
   m_CombinedModality = combinedModality;
 

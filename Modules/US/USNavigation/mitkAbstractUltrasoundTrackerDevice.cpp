@@ -39,11 +39,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //___
 //Microservices
 
-const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
+const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier = "org.mitk.modules.us.AbstractUltrasoundTrackerDevice";
 const char* mitk::AbstractUltrasoundTrackerDevice::DefaultProbeIdentifier = "default";
 const char* mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator = "_";
 
-const std::string mitk::AbstractUltrasoundTrackerDevice::US_INTERFACE_NAME = "org.mitk.services.USCombinedModality";
+const std::string mitk::AbstractUltrasoundTrackerDevice::US_INTERFACE_NAME = "org.mitk.services.AbstractUltrasoundTrackerDevice";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
@@ -470,7 +470,7 @@ void mitk::AbstractUltrasoundTrackerDevice::RegisterAsMicroservice()
   //Define ServiceProps
   //us::ServiceProperties props;
   mitk::UIDGenerator uidGen =
-    mitk::UIDGenerator("org.mitk.services.USCombinedModality", 16);
+    mitk::UIDGenerator("org.mitk.services.AbstractUltrasoundTrackerDevice", 16);
   m_ServiceProperties[US_PROPKEY_ID] = uidGen.GetUID();
   m_ServiceProperties[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
   m_ServiceProperties[US_PROPKEY_CLASS] = mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier;

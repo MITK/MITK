@@ -91,7 +91,7 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource()
   m_Pyro = nullptr;
 }
 
-void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
+void mitk::USDiPhASImageSource::GetNextRawImage(std::vector<mitk::Image::Pointer>& imageVector)
 {
   // modify all settings that have been changed here, so we don't get multithreading issues
   if (m_DataTypeModified)
@@ -126,8 +126,13 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     m_CompensateEnergyModified = false;
   }
 
+  if (imageVector.size() != 2)
+  {
+    imageVector.resize(2);
+  }
+
   // make sure image is nullptr
-  image = nullptr;
+  mitk::Image::Pointer image = nullptr;
   float ImageEnergyValue = 0;
 
   for (int i = 100; i > 90 && ImageEnergyValue <= 0; --i)
@@ -264,6 +269,22 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
         }
       }
     }
+
+    //TODO: completely rewrite this mess
+
+    imageVector[0] = Image::New();
+    unsigned int dim[] = { image->GetDimension(0),image->GetDimension(1),1 };
+    imageVector[0]->Initialize(image->GetPixelType(), 3, dim);
+    imageVector[0]->SetGeometry(image->GetGeometry());
+
+    imageVector[1] = Image::New();
+    imageVector[1]->Initialize(image->GetPixelType(), 3, dim);
+    imageVector[1]->SetGeometry(image->GetGeometry());
+
+    ImageReadAccessor inputReadAccessorCopyPA(image, image->GetSliceData(0));
+    imageVector[0]->SetSlice(inputReadAccessorCopyPA.GetData(), 0);
+    ImageReadAccessor inputReadAccessorCopyUS(image, image->GetSliceData(1));
+    imageVector[1]->SetSlice(inputReadAccessorCopyUS.GetData(), 0);
   }
 }
 

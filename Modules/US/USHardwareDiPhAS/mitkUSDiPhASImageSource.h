@@ -62,7 +62,7 @@ public:
     * Implementation of the superclass method. Returns the pointer
     * to the mitk::Image filled by DiPhAS API callback.
     */
-  virtual void GetNextRawImage( mitk::Image::Pointer& );
+  virtual void GetNextRawImage( std::vector<mitk::Image::Pointer>& ) override;
 
   /**
     * The API calls this function to pass the image data to the

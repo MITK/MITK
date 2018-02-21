@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandaloneDataStorage.h>
 #include <QmitkLevelWindowWidget.h>
 #include <QmitkSliceWidget.h>
-#include <QmitkPAUSViewerView.h>
 
 #include <QTime>
 
@@ -104,10 +103,6 @@ protected:
   void CreateControlWidgets();
   void RemoveControlWidgets();
 
-  void CreateWindows();
-
-  QmitkPAUSViewerView* m_PausViewerView;
-
   Ui::UltrasoundSupportControls m_Controls;
 
   QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
@@ -122,9 +117,6 @@ protected:
 
   /** Keeps track of the amount of output Nodes*/
   unsigned int m_AmountOfOutputs;
-
-  mitk::StandaloneDataStorage::Pointer m_PADataStorage;
-  mitk::StandaloneDataStorage::Pointer m_USDataStorage;
 
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
@@ -166,10 +158,6 @@ protected:
   bool m_ForceRequestUpdateAll;
 
   void SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type);
-
-  /** The image that holds all data given by the USDevice.*/
-  mitk::Image::Pointer                m_Image;
-
 
   /** The seperated slices from m_Image */
   std::vector<mitk::Image::Pointer>   m_curOutput;

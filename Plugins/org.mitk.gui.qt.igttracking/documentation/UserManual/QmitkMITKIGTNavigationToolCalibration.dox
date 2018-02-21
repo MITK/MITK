@@ -7,7 +7,13 @@
 \tableofcontents
 
 \section QmitkMITKIGTNavigationToolCalibrationIntroduction Introduction
-This view allows the calibration of navigation tools. The calibrated tools can be saved permanently and later be used for any other IGT application.
+This view allows the calibration of navigation tools. The calibrated tools can be saved permanently and later be used for any other IGT application. The following coordinate transforms are associated with tracking of a tool:
+ <ul>
+ <li> The sensor transformation from the global tracking coordinate system to the local coordinate system of the tracked sensor (m_Position, m_Orientation).
+ <li> The tool tip transformation from the local sensor coordinate system to a tool tip coordinate system defined by a tool tip position and a main tool axis (m_ToolTipPosition, m_ToolAxisOrientation). The tool axis is defined as the negative z-axis of the tool tip coordinate system.
+ <li> The main axis of the representation object of the tool (e.g. a surface) has to be defined along the negative z-axis.
+ </ul>
+\imageMacro{TrackingTool.png,"Coordinate transforms associated to the tracking tool.",5.00}
 
 
 \section QmitkMITKIGTNavigationToolCalibrationPrerequisities Prerequisites
@@ -50,7 +56,7 @@ If you are not satisfied with the results you can click "Start Edit Tooltip" aga
 
 Use this method to calibrate a navigation tool using a tool as pointer that is already calibrated.
 First choose the number of tracking data you wish to collect. It is 100 by default but you may choose as many as you wish. Now place your tool to calibrate in a fixed position where it is tracked. Next place your pointing tool in a manner that its tip touches the tip and is tracked too. Fix it in this position. For a good calibration it is important that the tools move the least possible.
-After you placed the tools click on the "Collect Navigation Data" Button and wait until all the data is gathered. Now you have several options to adjust the calibration to your needs. You can calibrate the position and/or the orientation or even invert the calibration transform. Choose the options needed for your tool and tracker and then click on "Run Calibration".
+After you placed the tools click on the "Collect Navigation Data" Button and wait until all the data is gathered. Now you have several options to adjust the calibration to your needs. You can calibrate the position and/or the orientation or even invert the calibration transform. Calibrating the position will translate the position of the tool to calibrate to the position of the calibration pointer. The orientation calibration will copy the mean orientation of the calibration pointer to the tool the calibrate. Choose the options needed for your tool and tracker and then click on "Run Calibration".
 The new Tool Tip Position and Orientation will be displayed und you can now apply them onto your tool by clicking on "Set New Tool Tip Position and/or Tool Orientation". To finally save the calibrated tool for later use just click on "Save Calibrated Navigation Tool".
 If you are not satisfied with the result of the calibration just repeat the steps described above.
 

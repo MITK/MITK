@@ -107,9 +107,8 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInt
 
 void mitk::USCombinedModality::GenerateData()
 {
-  MITK_INFO << "Updating1";
   if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
-  MITK_INFO << "Updating2";
+
   //get next image from ultrasound image source
   mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
 

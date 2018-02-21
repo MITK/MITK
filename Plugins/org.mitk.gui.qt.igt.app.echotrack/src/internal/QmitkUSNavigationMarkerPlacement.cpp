@@ -317,22 +317,18 @@ void QmitkUSNavigationMarkerPlacement::SetFocus()
 void QmitkUSNavigationMarkerPlacement::OnTimeout()
 {
   if (m_CombinedModality.IsNull()) return;
-  m_CombinedModality->Modified();
+  m_CombinedModality->Modified(); //shouldn't be nessecary ... fix in abstract ultrasound tracker device!
   m_CombinedModality->Update();
   ui->m_TargetMarkingWidget->Update();
   ui->m_CriticalStructuresWidget->Update();
   ui->m_NavigationWidget->Update();
-  //mitk::USCombinedModality::Pointer combinedModality_casted = dynamic_cast<mitk::USCombinedModality*>(m_CombinedModality.GetPointer());
-  //combinedModality_casted->Update();
 
   mitk::Image::Pointer image = m_CombinedModality->GetOutput();
-  if (image.IsNotNull()) {m_ImageStreamNode->SetData(image);}
-  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
   // make sure that always the current image is set to the data node
-  //if (image.IsNotNull() && m_ImageStreamNode->GetData() != image.GetPointer() && image->IsInitialized())
-  //{
-  //  m_ImageStreamNode->SetData(image);
-  //}
+  if (image.IsNotNull() && m_ImageStreamNode->GetData() != image.GetPointer() && image->IsInitialized())
+  {
+    m_ImageStreamNode->SetData(image);
+  }
 
   if (!m_StdMultiWidget)
   {

@@ -181,6 +181,7 @@ protected:
   QTimer *m_ImageAndNavigationDataLoggingTimer;
   QmitkStdMultiWidget *m_StdMultiWidget;
   itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> m_CombinedModality;
+  itk::SmartPointer<mitk::DataNode> m_SettingsNode;
   bool m_ReinitAlreadyDone;
   bool m_IsExperimentRunning;
   std::string m_CurrentApplicationName;

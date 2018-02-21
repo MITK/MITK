@@ -208,22 +208,23 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
 void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
 {
-  itk::SmartPointer<mitk::DataNode> settingsNode = mitk::DataNode::New();
+  m_SettingsNode = mitk::DataNode::New();
+  ui->m_settingsWidget->OnSetSettingsNode(m_SettingsNode, true);
   InitImageStream();
   m_CombinedModality = ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality();
   ui->m_TargetMarkingWidget->SetCombinedModality(m_CombinedModality);
   ui->m_TargetMarkingWidget->SetDataStorage(this->GetDataStorage());
-  ui->m_TargetMarkingWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
+  ui->m_TargetMarkingWidget->OnSettingsChanged(m_SettingsNode);
   ui->m_TargetMarkingWidget->OnActivateStep();
   ui->m_TargetMarkingWidget->OnStartStep();
   ui->m_TargetMarkingWidget->Update();
-  ui->m_settingsWidget->OnSetSettingsNode(settingsNode,true);
+  
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 {
   ui->m_CriticalStructuresWidget->SetCombinedModality(m_CombinedModality);
   ui->m_CriticalStructuresWidget->SetDataStorage(this->GetDataStorage());
-  ui->m_CriticalStructuresWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
+  ui->m_CriticalStructuresWidget->OnSettingsChanged(m_SettingsNode);
   ui->m_CriticalStructuresWidget->OnActivateStep();
   ui->m_CriticalStructuresWidget->OnStartStep();
   ui->m_CriticalStructuresWidget->Update();
@@ -232,7 +233,7 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
 {
   ui->m_NavigationWidget->SetCombinedModality(m_CombinedModality);
   ui->m_NavigationWidget->SetDataStorage(this->GetDataStorage());
-  ui->m_NavigationWidget->OnSettingsChanged(ui->navigationProcessWidget->GetSettingsNode());
+  ui->m_NavigationWidget->OnSettingsChanged(m_SettingsNode);
   ui->m_NavigationWidget->OnActivateStep();
   ui->m_NavigationWidget->OnStartStep();
   ui->m_NavigationWidget->Update();

@@ -120,6 +120,16 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QmitkUSNavigationCombinedSettingsWidget" name="m_settingsWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -221,6 +231,12 @@
    <class>QmitkUSNavigationStepPunctuationIntervention</class>
    <extends>QWidget</extends>
    <header>src/internal/NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNavigationCombinedSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>src/internal/SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

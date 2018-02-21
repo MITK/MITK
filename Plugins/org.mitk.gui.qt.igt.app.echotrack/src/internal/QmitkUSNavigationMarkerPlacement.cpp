@@ -250,6 +250,7 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
 void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
 {
+  itk::SmartPointer<mitk::DataNode> settingsNode = mitk::DataNode::New();
   InitImageStream();
   m_CombinedModality = ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality();
   ui->m_TargetMarkingWidget->SetCombinedModality(m_CombinedModality);
@@ -258,6 +259,7 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
   ui->m_TargetMarkingWidget->OnActivateStep();
   ui->m_TargetMarkingWidget->OnStartStep();
   ui->m_TargetMarkingWidget->Update();
+  ui->m_settingsWidget->OnSetSettingsNode(settingsNode,true);
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 {

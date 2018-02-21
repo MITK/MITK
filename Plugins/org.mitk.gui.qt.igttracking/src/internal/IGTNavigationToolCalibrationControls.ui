@@ -36,7 +36,7 @@ p, li { white-space: pre-wrap; }
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>50</height>
+          <height>35</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -61,7 +61,7 @@ p, li { white-space: pre-wrap; }
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>30</height>
+          <height>35</height>
          </size>
         </property>
        </widget>

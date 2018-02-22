@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
-    <height>745</height>
+    <width>562</width>
+    <height>446</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,12 +16,25 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Initialization</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QmitkUSNavigationStepCombinedModality" name="m_CombinedModalityCreationWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>New</string>
+       <string>Navigation Control</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -29,25 +42,15 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="page">
+         <widget class="QWidget" name="page_3">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>828</width>
-            <height>408</height>
+            <width>512</width>
+            <height>86</height>
            </rect>
           </property>
-          <attribute name="label">
-           <string>Initialization</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QmitkUSNavigationStepCombinedModality" name="m_CombinedModalityCreationWidget" native="true"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="page_3">
           <attribute name="label">
            <string>Target</string>
           </attribute>
@@ -65,6 +68,14 @@
           </layout>
          </widget>
          <widget class="QWidget" name="page_4">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>115</width>
+            <height>67</height>
+           </rect>
+          </property>
           <attribute name="label">
            <string>Critical Structures</string>
           </attribute>
@@ -86,12 +97,12 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>828</width>
-            <height>408</height>
+            <width>512</width>
+            <height>86</height>
            </rect>
           </property>
           <attribute name="label">
-           <string>Navigation</string>
+           <string>Needle Insertion</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
@@ -107,16 +118,6 @@
           </layout>
          </widget>
         </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>Old</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QmitkUSNavigationProcessWidget" name="navigationProcessWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -198,6 +199,26 @@
      <property name="text">
       <string>Start New Experiment</string>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="page_5">
+      <widget class="QmitkUSNavigationProcessWidget" name="navigationProcessWidget" native="true">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>512</width>
+         <height>237</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="page_6"/>
     </widget>
    </item>
   </layout>

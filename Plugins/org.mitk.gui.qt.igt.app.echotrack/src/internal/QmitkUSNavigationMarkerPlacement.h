@@ -38,7 +38,6 @@ namespace itk
 namespace mitk
 {
   class USNavigationStepTimer;
-  class USNavigationExperimentLogging;
 }
 
 namespace Ui
@@ -168,9 +167,7 @@ protected:
   bool m_ReinitAlreadyDone;
   bool m_IsExperimentRunning;
   std::string m_CurrentApplicationName;
-
   itk::SmartPointer<mitk::USNavigationStepTimer> m_NavigationStepTimer;
-  itk::SmartPointer<mitk::USNavigationExperimentLogging> m_ExperimentLogging;
 
   QPixmap m_IconRunning;
   QPixmap m_IconNotRunning;

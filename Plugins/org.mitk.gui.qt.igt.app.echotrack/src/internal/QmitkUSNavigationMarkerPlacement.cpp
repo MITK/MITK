@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractUltrasoundTrackerDevice.h"
 #include <mitkIOUtil.h>
 
-#include "IO/mitkUSNavigationExperimentLogging.h"
 #include "IO/mitkUSNavigationStepTimer.h"
 
 #include <QDateTime>
@@ -73,7 +72,6 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
   m_IsExperimentRunning(false),
   m_CurrentApplicationName(),
   m_NavigationStepTimer(mitk::USNavigationStepTimer::New()),
-  m_ExperimentLogging(mitk::USNavigationExperimentLogging::New()),
   m_IconRunning(QPixmap(":/USNavigation/record.png")),
   m_IconNotRunning(QPixmap(":/USNavigation/record-gray.png")),
   m_ResultsDirectory(),
@@ -101,10 +99,6 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
   // scale running (and not running) icon the specific height
   m_IconRunning = m_IconRunning.scaledToHeight(20, Qt::SmoothTransformation);
   m_IconNotRunning = m_IconNotRunning.scaledToHeight(20, Qt::SmoothTransformation);
-
-  // set prefix for experiment logging (only keys with this prefix are taken
-  // into consideration
-  m_ExperimentLogging->SetKeyPrefix("USNavigation::");
 
   m_UpdateTimer->start(33); // every 33 Milliseconds = 30 Frames/Second
 }
@@ -498,11 +492,6 @@ void QmitkUSNavigationMarkerPlacement::OnStartExperiment()
       m_IsExperimentRunning = true;
 
       m_ImageAndNavigationDataLoggingTimer->start(1000);
-
-      // (re)start experiment logging and set output file name
-      m_ExperimentLogging->Reset();
-      m_ExperimentLogging->SetFileName(
-        QString(m_ExperimentResultsSubDirectory + QDir::separator() + "experiment-logging.xml").toStdString());
     }
   }
 }

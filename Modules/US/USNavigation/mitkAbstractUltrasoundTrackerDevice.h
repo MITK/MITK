@@ -200,14 +200,6 @@ namespace mitk {
     */
     virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler();
 
-    /**
-    *\brief These Constants are used in conjunction with Microservices
-    */
-    /*static const std::string US_INTERFACE_NAME;
-    static const std::string US_PROPKEY_DEVICENAME;
-    static const std::string US_PROPKEY_CLASS;
-    static const std::string US_PROPKEY_ID;*/
-
   protected:
     AbstractUltrasoundTrackerDevice( USDevice::Pointer usDevice,
                                      itk::SmartPointer<NavigationDataSource> trackingDevice,

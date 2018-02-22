@@ -15,19 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSCombinedModality.h"
-//#include "mitkNavigationDataSource.h"
 #include "mitkImageReadAccessor.h"
 #include <mitkNavigationDataSmoothingFilter.h>
 #include <mitkNavigationDataDelayFilter.h>
 #include "mitkTrackingDeviceSource.h"
-
-// US Control Interfaces
-#include "mitkUSControlInterfaceProbes.h"
-#include "mitkUSControlInterfaceBMode.h"
-#include "mitkUSControlInterfaceDoppler.h"
-
-
-
 
 mitk::USCombinedModality::USCombinedModality( USDevice::Pointer usDevice,
                                               NavigationDataSource::Pointer trackingDevice,
@@ -41,69 +32,6 @@ mitk::USCombinedModality::~USCombinedModality()
 {
 
 }
-/*
-void mitk::USCombinedModality::RegisterAsMicroservice()
-{
-  //Get Context
-  us::ModuleContext* context = us::GetModuleContext();
-
-  //Define ServiceProps
-  //us::ServiceProperties props;
-  mitk::UIDGenerator uidGen =
-    mitk::UIDGenerator("org.mitk.services.AbstractUltrasoundTrackerDevice", 16);
-  m_ServiceProperties[US_PROPKEY_ID] = uidGen.GetUID();
-  m_ServiceProperties[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
-  m_ServiceProperties[US_PROPKEY_CLASS] = mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier;
-
-  m_ServiceRegistration = context->RegisterService(this, m_ServiceProperties);
-}*/
-
-
-
-mitk::USAbstractControlInterface::Pointer mitk::USCombinedModality::GetControlInterfaceCustom()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceCustom();
-}
-
-mitk::USControlInterfaceBMode::Pointer mitk::USCombinedModality::GetControlInterfaceBMode()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceBMode();
-}
-
-mitk::USControlInterfaceProbes::Pointer mitk::USCombinedModality::GetControlInterfaceProbes()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceProbes();
-}
-
-mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInterfaceDoppler()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceDoppler();
-}
-
 
 void mitk::USCombinedModality::GenerateData()
 {
@@ -141,122 +69,3 @@ void mitk::USCombinedModality::GenerateData()
     }
   }
 }
-
-
-//======================================================================================================================
-/**
-bool mitk::USCombinedModality::OnInitialization()
-{
-if (m_UltrasoundDevice.IsNull())
-{
-MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-mitkThrow() << "UltrasoundDevice must not be null.";
-}
-
-if (m_UltrasoundDevice->GetDeviceState() < mitk::USDevice::State_Initialized)
-{
-return m_UltrasoundDevice->Initialize();
-}
-else
-{
-return true;
-}
-}
-
-bool mitk::USCombinedModality::OnConnection()
-{
-if (m_UltrasoundDevice.IsNull())
-{
-MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-mitkThrow() << "UltrasoundDevice must not be null.";
-}
-
-// connect ultrasound device only if it is not already connected
-if (m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Connected)
-{
-return true;
-}
-else
-{
-return m_UltrasoundDevice->Connect();
-}
-}
-
-bool mitk::USCombinedModality::OnDisconnection()
-{
-if (m_UltrasoundDevice.IsNull())
-{
-MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-mitkThrow() << "UltrasoundDevice must not be null.";
-}
-
-return m_UltrasoundDevice->Disconnect();
-}
-
-bool mitk::USCombinedModality::OnActivation()
-{
-if (m_UltrasoundDevice.IsNull())
-{
-MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-mitkThrow() << "UltrasoundDevice must not be null.";
-}
-
-mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-if (trackingDeviceSource.IsNull())
-{
-MITK_WARN("USCombinedModality")("USDevice") << "Cannot start tracking as TrackingDeviceSource is null.";
-}
-trackingDeviceSource->StartTracking();
-
-// activate ultrasound device only if it is not already activated
-if (m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Activated)
-{
-return true;
-}
-else
-{
-return m_UltrasoundDevice->Activate();
-}
-}
-
-bool mitk::USCombinedModality::OnDeactivation()
-{
-if (m_UltrasoundDevice.IsNull())
-{
-MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-mitkThrow() << "UltrasoundDevice must not be null.";
-}
-
-mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-if (trackingDeviceSource.IsNull())
-{
-MITK_WARN("USCombinedModality")("USDevice") << "Cannot stop tracking as TrackingDeviceSource is null.";
-}
-trackingDeviceSource->StopTracking();
-
-m_UltrasoundDevice->Deactivate();
-
-return m_UltrasoundDevice->GetIsConnected();
-}
-
-void mitk::USCombinedModality::OnFreeze(bool freeze)
-{
-mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-if (trackingDeviceSource.IsNull())
-{
-MITK_WARN("USCombinedModality")("USDevice") << "Cannot freeze tracking.";
-}
-else
-{
-if (freeze) { trackingDeviceSource->Freeze(); }
-else { trackingDeviceSource->UnFreeze(); }
-}
-
-if (m_UltrasoundDevice.IsNull())
-{
-MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-mitkThrow() << "UltrasoundDevice must not be null.";
-}
-m_UltrasoundDevice->SetIsFreezed(freeze);
-}
-*/

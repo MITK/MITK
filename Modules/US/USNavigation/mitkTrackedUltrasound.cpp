@@ -21,10 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkTrackingDeviceSource.h"
 
-// US Control Interfaces
-#include "mitkUSControlInterfaceProbes.h"
-#include "mitkUSControlInterfaceBMode.h"
-#include "mitkUSControlInterfaceDoppler.h"
+
 
 
 mitk::TrackedUltrasound::TrackedUltrasound( USDevice::Pointer usDevice,
@@ -37,54 +34,6 @@ mitk::TrackedUltrasound::TrackedUltrasound( USDevice::Pointer usDevice,
 mitk::TrackedUltrasound::~TrackedUltrasound()
 {
 }
-
-
-
-
-mitk::USAbstractControlInterface::Pointer mitk::TrackedUltrasound::GetControlInterfaceCustom()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceCustom();
-}
-
-mitk::USControlInterfaceBMode::Pointer mitk::TrackedUltrasound::GetControlInterfaceBMode()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceBMode();
-}
-
-mitk::USControlInterfaceProbes::Pointer mitk::TrackedUltrasound::GetControlInterfaceProbes()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceProbes();
-}
-
-mitk::USControlInterfaceDoppler::Pointer mitk::TrackedUltrasound::GetControlInterfaceDoppler()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceDoppler();
-}
-
 
 void mitk::TrackedUltrasound::GenerateData()
 {

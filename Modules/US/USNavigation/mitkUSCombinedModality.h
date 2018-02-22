@@ -53,64 +53,11 @@ namespace mitk {
     mitkClassMacro(USCombinedModality, mitk::AbstractUltrasoundTrackerDevice);
     mitkNewMacro3Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
 
-
-    /**
-    * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
-
-    /**
-    * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode() override;
-
-    /**
-    * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes() override;
-
-    /**
-    * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
-    */
-    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler() override;
-
   protected:
     USCombinedModality( USDevice::Pointer usDevice,
                         itk::SmartPointer<NavigationDataSource> trackingDevice,
                         bool trackedUltrasoundActive = false );
     virtual ~USCombinedModality();
-
-    /**
-    * \brief Initializes UltrasoundDevice.
-    */
-    //___virtual bool OnInitialization();
-
-    /**
-    * \brief Connects UltrasoundDevice.
-    */
-    //___virtual bool OnConnection();
-
-    /**
-    * \brief Disconnects UltrasoundDevice.
-    */
-    //___virtual bool OnDisconnection();
-
-    /**
-    * \brief Activates UltrasoundDevice.
-    */
-    //___virtual bool OnActivation();
-
-    /**
-    * \brief Deactivates UltrasoundDevice.
-    */
-   //___ virtual bool OnDeactivation();
-
-    /**
-    * \brief Freezes or unfreezes UltrasoundDevice.
-    */
-    //___virtual void OnFreeze(bool);
-
-   // void RegisterAsMicroservice() override;
 
     /**
     * \brief Grabs the next frame from the input.

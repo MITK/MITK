@@ -39,7 +39,7 @@ namespace mitk
   * A tool tip (m_ToolTipPosition) can be defined in sensor coordinates. 
   * The tool axis defines the main axis of the tool and is defined as the negative z-axis of the tool tip coordinate system
   * The main axis of the representation object of the tool (e.g. a surface) has to be defined along the negative z-axis
-  * \imageMacro{TrackingTool.png,"Coordinate transforms associated to the tracking tool.",5}
+  * \imageMacro{TrackingTool.png,"Coordinate transforms associated to the tracking tool.",3}
   *
   * \ingroup IGT
   */

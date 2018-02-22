@@ -58,16 +58,15 @@ float CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 
   return -1;
 }
 
-FiberfoxParameters MakeProposal(FiberfoxParameters old_params, double temperature)
+FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double temperature)
 {
   std::random_device r;
   std::default_random_engine randgen(r());
 
-  std::uniform_int_distribution<int> uint1(0, 2);
+  std::uniform_int_distribution<int> uint1(0, 4);
 
   FiberfoxParameters new_params(old_params);
   int prop = uint1(randgen);
-//  prop = 2;
   switch(prop)
   {
   case 0:
@@ -106,6 +105,36 @@ FiberfoxParameters MakeProposal(FiberfoxParameters old_params, double temperatur
     t2 += add;
     new_params.m_FiberModelList[model_index]->SetT2(t2);
     MITK_INFO << "Proposal T2 (Fiber " << model_index << "): " << add << " (" << t2 << ")";
+    break;
+  }
+  case 3:
+  {
+    int model_index = rand()%new_params.m_NonFiberModelList.size();
+    double t1 = new_params.m_NonFiberModelList[model_index]->GetT1();
+    MITK_INFO << "T1: " << t1;
+    std::normal_distribution<double> normal_dist(0, t1*0.1*temperature);
+
+    double add = 0;
+    while (add == 0)
+      add = normal_dist(randgen);
+    t1 += add;
+    new_params.m_NonFiberModelList[model_index]->SetT1(t1);
+    MITK_INFO << "Proposal T1 (Non-Fiber " << model_index << "): " << add << " (" << t1 << ")";
+    break;
+  }
+  case 4:
+  {
+    int model_index = rand()%new_params.m_FiberModelList.size();
+    double t1 = new_params.m_FiberModelList[model_index]->GetT1();
+    MITK_INFO << "T1: " << t1;
+    std::normal_distribution<double> normal_dist(0, t1*0.1*temperature);
+
+    double add = 0;
+    while (add == 0)
+      add = normal_dist(randgen);
+    t1 += add;
+    new_params.m_FiberModelList[model_index]->SetT1(t1);
+    MITK_INFO << "Proposal T1 (Fiber " << model_index << "): " << add << " (" << t1 << ")";
     break;
   }
   }
@@ -285,7 +314,7 @@ int main(int argc, char* argv[])
     if (optimize_diff)
       proposal = MakeProposalDiff(parameters, temperature);
     else
-      proposal = MakeProposal(parameters, temperature);
+      proposal = MakeProposalRelaxation(parameters, temperature);
 
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
@@ -315,9 +344,9 @@ int main(int argc, char* argv[])
       mitk::DiffusionPropertyHelper propertyHelper( image );
       propertyHelper.InitializeImage();
       mitk::IOUtil::Save(image, "optimized.dwi");
-      std::cout.rdbuf (old);              // <-- restore
 
       proposal.SaveParameters("optimized.ffp");
+      std::cout.rdbuf (old);              // <-- restore
 
       accepted++;
 

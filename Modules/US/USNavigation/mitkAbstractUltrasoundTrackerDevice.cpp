@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageReadAccessor.h"
 #include "mitkNavigationDataSmoothingFilter.h"
 #include "mitkNavigationDataDelayFilter.h"
+#include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkTrackingDeviceSource.h"
 
 // US Control Interfaces
@@ -36,9 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //TempIncludes
 #include <tinyxml.h>
 
-//___
-//Microservices
-
 const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier = "org.mitk.modules.us.AbstractUltrasoundTrackerDevice";
 const char* mitk::AbstractUltrasoundTrackerDevice::DefaultProbeIdentifier = "default";
 const char* mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator = "_";
@@ -56,9 +54,12 @@ mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(
     m_UltrasoundDevice(usDevice), m_TrackingDeviceDataSource(trackingDevice),
     m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()),
     m_DelayFilter(mitk::NavigationDataDelayFilter::New(0)),
+    m_DisplacementFilter(mitk::NavigationDataDisplacementFilter::New()),
     m_NumberOfSmoothingValues(0), m_DelayCount(0),
     m_IsTrackedUltrasoundActive( trackedUltrasoundActive )
 {
+  m_DisplacementFilter->SetTransform6DOF(true);
+
   this->RebuildFilterPipeline();
 
   //create a new output (for the image data)
@@ -440,6 +441,12 @@ mitk::NavigationDataSource::Pointer mitk::AbstractUltrasoundTrackerDevice::Rebui
       m_DelayFilter->SetInput(i, filter->GetOutput(i));
     }
     filter = m_DelayFilter;
+  }
+
+  if( m_IsTrackedUltrasoundActive )
+  {
+    m_DisplacementFilter->ConnectTo(filter.GetPointer());
+    filter = m_DisplacementFilter;
   }
 
   return filter.GetPointer();

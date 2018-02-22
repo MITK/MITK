@@ -908,6 +908,7 @@ void QmitkUltrasoundCalibration::Update()
   m_CombinedModality->Modified();
   m_CombinedModality->Update();
   mitk::Image::Pointer m_Image = m_CombinedModality->GetOutput();
+  m_Node->SetData(m_Image);
   if (m_Image.IsNotNull() && m_Image->IsInitialized())
   {
     if (m_OverrideSpacing)
@@ -924,7 +925,7 @@ void QmitkUltrasoundCalibration::Update()
   m_NeedleProjectionFilter->Update();
 
   //only update 2d window because it is faster
-  //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
 void QmitkUltrasoundCalibration::SwitchFreeze()

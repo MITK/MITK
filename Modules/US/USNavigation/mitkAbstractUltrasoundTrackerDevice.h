@@ -72,6 +72,8 @@ namespace mitk {
     itkGetMacro(TrackingDeviceDataSource, itk::SmartPointer<NavigationDataSource>);
     itkSetMacro(TrackingDeviceDataSource, itk::SmartPointer<NavigationDataSource>);
 
+    itkGetMacro(IsTrackedUltrasoundActive, bool);
+
     /**
     * \brief Getter for calibration data of the currently active depth and probe.
     *
@@ -214,7 +216,6 @@ namespace mitk {
                                      bool trackedUltrasoundActive );
     virtual ~AbstractUltrasoundTrackerDevice();
 
-    itkGetMacro(IsTrackedUltrasoundActive, bool);
 
     /**
     * \brief Grabs the next frame from the input.

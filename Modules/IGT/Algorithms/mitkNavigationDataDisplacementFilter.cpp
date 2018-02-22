@@ -60,9 +60,9 @@ void mitk::NavigationDataDisplacementFilter::GenerateData()
   }
   else
   {
-    if( this->GetNumberOfOutputs() != 2 )
+    if( this->GetNumberOfOutputs() < 2 )
     {
-      MITK_WARN << "TrackedUltrasound not possible. The number of tracked devices must be 2.";
+      MITK_WARN << "TrackedUltrasound not possible. The number of tracked devices must be at least 2.";
       return;
     }
 
@@ -93,6 +93,23 @@ void mitk::NavigationDataDisplacementFilter::GenerateData()
 
     usTrackerOut->SetDataValid(true);
     needleOut->SetDataValid(true);
+
+    if( this->GetNumberOfOutputs() > 2 )
+    {
+      for( unsigned int i = 2; i < this->GetNumberOfOutputs(); ++i )
+      {
+        mitk::NavigationData* output = this->GetOutput(i);
+        const mitk::NavigationData* input = this->GetInput(i);
+
+        if (input->IsDataValid() == false)
+        {
+          output->SetDataValid(false);
+          continue;
+        }
+        output->Graft(input);
+        output->SetDataValid(true);
+      }
+    }
   }
 }
 

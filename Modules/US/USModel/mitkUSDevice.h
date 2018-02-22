@@ -80,6 +80,8 @@ namespace mitk {
     enum DeviceStates { State_NoState, State_Initialized, State_Connected, State_Activated };
 
     mitkClassMacro(USDevice, mitk::ImageSource);
+    itkSetMacro(SpawnAcquireThread, bool);
+    itkGetMacro(SpawnAcquireThread, bool);
 
     struct USImageCropArea
     {
@@ -314,8 +316,6 @@ namespace mitk {
 
   protected:
     itkSetMacro(Image, mitk::Image::Pointer);
-    itkSetMacro(SpawnAcquireThread, bool);
-    itkGetMacro(SpawnAcquireThread, bool);
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
     static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);

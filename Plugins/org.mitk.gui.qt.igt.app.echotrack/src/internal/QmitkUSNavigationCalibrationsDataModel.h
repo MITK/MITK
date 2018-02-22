@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkSmartPointer.h>
 
 namespace mitk {
-  class USCombinedModality;
+  class AbstractUltrasoundTrackerDevice;
   class USControlInterfaceBMode;
   class USControlInterfaceProbes;
 }
@@ -36,7 +36,7 @@ public:
   explicit QmitkUSNavigationCalibrationsDataModel(QObject *parent = 0);
   virtual ~QmitkUSNavigationCalibrationsDataModel();
 
-  void SetCombinedModality(itk::SmartPointer<mitk::USCombinedModality> combinedModality);
+  void SetCombinedModality(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality);
 
   void OnDeviceChanged(const std::string&, const std::string&);
 
@@ -65,7 +65,7 @@ public:
   virtual bool removeRows ( int row, int count, const QModelIndex& parent, bool removeFromDataStorage );
 
 private:
-  itk::SmartPointer<mitk::USCombinedModality>       m_CombinedModality;
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>       m_CombinedModality;
   itk::SmartPointer<mitk::USControlInterfaceBMode>  m_ControlInterfaceBMode;
 
   mitk::MessageDelegate2<QmitkUSNavigationCalibrationsDataModel, const std::string&, const std::string&> m_ListenerDeviceChanged;

@@ -38,7 +38,7 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
    }
  }
 
- void QmitkUSNavigationCalibrationsDataModel::SetCombinedModality(mitk::USCombinedModality::Pointer combinedModality)
+ void QmitkUSNavigationCalibrationsDataModel::SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality)
  {
    if ( m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull() )
    {
@@ -52,8 +52,8 @@ QmitkUSNavigationCalibrationsDataModel::QmitkUSNavigationCalibrationsDataModel(Q
 
      // make sure that the combined modality is active as this may be
      // necessary to get the available depths
-     if ( m_CombinedModality->GetDeviceState() < mitk::USDevice::State_Connected ) { m_CombinedModality->Connect(); }
-     if ( m_CombinedModality->GetDeviceState() == mitk::USDevice::State_Connected ) { m_CombinedModality->Activate(); }
+     if ( m_CombinedModality->GetUltrasoundDevice()->GetDeviceState() < mitk::USDevice::State_Connected ) { m_CombinedModality->GetUltrasoundDevice()->Connect(); }
+     if ( m_CombinedModality->GetUltrasoundDevice()->GetDeviceState() == mitk::USDevice::State_Connected ) { m_CombinedModality->GetUltrasoundDevice()->Activate(); }
 
      if ( m_CombinedModality->GetUltrasoundDevice().IsNotNull() )
      {

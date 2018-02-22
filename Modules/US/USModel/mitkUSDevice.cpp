@@ -425,13 +425,14 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
 
 bool mitk::USDevice::GetIsFreezed()
 {
+  /*
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")("mitkUSTelemedDevice")
       << "Cannot get freeze state if the hardware interface is not ready. "
       "Returning false...";
     return false;
-  }
+  }*/
 
   return m_IsFreezed;
 }

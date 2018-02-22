@@ -203,7 +203,7 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreationExit()
   }
   else
   {
-    mitkThrow()<< "No reinit possible";
+    MITK_WARN << "No reinit possible";
   }
 }
 

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageReadAccessor.h"
 #include <mitkNavigationDataSmoothingFilter.h>
 #include <mitkNavigationDataDelayFilter.h>
+#include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkTrackingDeviceSource.h"
 
 // US Control Interfaces
@@ -31,49 +32,14 @@ mitk::TrackedUltrasound::TrackedUltrasound( USDevice::Pointer usDevice,
                                               bool trackedUltrasoundActive )
   : AbstractUltrasoundTrackerDevice( usDevice, trackingDevice, trackedUltrasoundActive )
 {
-
 }
 
 mitk::TrackedUltrasound::~TrackedUltrasound()
 {
-  /*if (m_ServiceRegistration != nullptr)
-  {
-    m_ServiceRegistration.Unregister();
-  }
-  m_ServiceRegistration = 0;*/
 }
 
-/*void mitk::TrackedUltrasound::UnregisterOnService()
-{
-  if (m_UltrasoundDevice->GetDeviceState() == USDevice::State_Activated)
-  {
-    m_UltrasoundDevice->Deactivate();
-  }
-  if (m_UltrasoundDevice->GetDeviceState() == USDevice::State_Connected)
-  {
-    m_UltrasoundDevice->Disconnect();
-  }
 
-  if (m_ServiceRegistration != nullptr)
-    m_ServiceRegistration.Unregister();
-  m_ServiceRegistration = 0;
-}*/
 
-/*void mitk::TrackedUltrasound::RegisterAsMicroservice()
-{
-  //Get Context
-  us::ModuleContext* context = us::GetModuleContext();
-
-  //Define ServiceProps
-  //us::ServiceProperties props;
-  mitk::UIDGenerator uidGen =
-    mitk::UIDGenerator("org.mitk.services.AbstractUltrasoundTrackerDevice", 16);
-  m_ServiceProperties[US_PROPKEY_ID] = uidGen.GetUID();
-  m_ServiceProperties[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
-  m_ServiceProperties[US_PROPKEY_CLASS] = mitk::TrackedUltrasound::DeviceClassIdentifier;
-
-  m_ServiceRegistration = context->RegisterService(this, m_ServiceProperties);
-}*/
 
 mitk::USAbstractControlInterface::Pointer mitk::TrackedUltrasound::GetControlInterfaceCustom()
 {
@@ -152,7 +118,7 @@ void mitk::TrackedUltrasound::GenerateData()
     {
       // transform image according to callibration if one is set
       // for current configuration of probe and depth
-      this->GetOutput()->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
+      m_DisplacementFilter->SetTransformation(calibrationIterator->second);
     }
   }
 }

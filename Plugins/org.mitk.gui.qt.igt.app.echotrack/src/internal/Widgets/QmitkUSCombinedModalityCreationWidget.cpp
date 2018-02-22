@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUSCombinedModalityCreationWidget.h"
 #include "ui_QmitkUSCombinedModalityCreationWidget.h"
 
+#include "mitkTrackedUltrasound.h"
+
 QmitkUSCombinedModalityCreationWidget::QmitkUSCombinedModalityCreationWidget(QWidget *parent) :
 QWidget(parent),
 ui(new Ui::QmitkUSCombinedModalityCreationWidget)
@@ -60,9 +62,18 @@ void QmitkUSCombinedModalityCreationWidget::OnCreation()
 
   QString vendor = ui->vendorLineEdit->text();
   QString name = ui->nameLineEdit->text();
-  if (name.isEmpty()) { name = "Combined Modality"; }
+  if (name.isEmpty()) { name = "Ultrasound Tracker Device"; }
 
-  m_CombinedModality = mitk::USCombinedModality::New(usDevice, trackingDevice, false);
+  if( ui->activateTrackedUSCheckbox->isChecked() )
+  {
+    m_CombinedModality = mitk::TrackedUltrasound::New(usDevice, trackingDevice, true);
+    MITK_INFO << "Created TrackedUltrasound device";
+  }
+  else
+  {
+    m_CombinedModality = mitk::USCombinedModality::New(usDevice, trackingDevice, false);
+    MITK_INFO << "Created CombinedModality device";
+  }
 
   m_CombinedModality->GetUltrasoundDevice()->Initialize();
   m_CombinedModality->RegisterAsMicroservice(); // register as micro service

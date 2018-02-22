@@ -23,10 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractUltrasoundTrackerDevice.h"
 #include "mitkNavigationDataSource.h"
 
-// Microservices
-#include <mitkServiceInterface.h>
-#include <usServiceRegistration.h>
-
 namespace itk {
   template<class T> class SmartPointer;
 }
@@ -49,10 +45,6 @@ namespace mitk {
   class MITKUSNAVIGATION_EXPORT TrackedUltrasound : public mitk::AbstractUltrasoundTrackerDevice
   {
   public:
-
-    //void UnregisterOnService();
-
-    //void RegisterAsMicroservice() override;
 
     mitkClassMacro(TrackedUltrasound, mitk::AbstractUltrasoundTrackerDevice);
     mitkNewMacro3Param(TrackedUltrasound, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
@@ -90,17 +82,6 @@ namespace mitk {
     */
     void GenerateData() override;
 
-
-    private:
-      /**
-      *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
-      */
-      //us::ServiceRegistration<Self>           m_ServiceRegistration;
-
-      /**
-      * \brief Properties of the device's Microservice.
-      */
-      //us::ServiceProperties                   m_ServiceProperties;
   };
 } // namespace mitk
 #endif // __mitkTrackedUltrasound_h

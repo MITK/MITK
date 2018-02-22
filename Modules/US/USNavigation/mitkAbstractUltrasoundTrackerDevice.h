@@ -37,6 +37,7 @@ namespace itk {
 namespace mitk {
   class NavigationDataSmoothingFilter;
   class NavigationDataDelayFilter;
+  class NavigationDataDisplacementFilter;
 
   /**
   * \brief Abstract class for an easy handling of a combination of an USDevice and
@@ -234,6 +235,7 @@ namespace mitk {
 
     itk::SmartPointer<mitk::NavigationDataSmoothingFilter> m_SmoothingFilter;
     itk::SmartPointer<mitk::NavigationDataDelayFilter>     m_DelayFilter;
+    itk::SmartPointer<mitk::NavigationDataDisplacementFilter> m_DisplacementFilter;
 
     unsigned int m_NumberOfSmoothingValues;
     unsigned int m_DelayCount;

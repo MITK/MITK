@@ -908,7 +908,6 @@ void QmitkUltrasoundCalibration::Update()
   m_CombinedModality->Modified();
   m_CombinedModality->Update();
   mitk::Image::Pointer m_Image = m_CombinedModality->GetOutput();
-  m_Node->SetData(m_Image);
   if (m_Image.IsNotNull() && m_Image->IsInitialized())
   {
     if (m_OverrideSpacing)
@@ -920,6 +919,7 @@ void QmitkUltrasoundCalibration::Update()
       m_Node->SetData(m_Image);
     }
   }
+  m_Node->SetData(m_Image); //Workaround because image is not initalized, maybe problem of the Ultrasound view?
 
   // Update Needle Projection
   m_NeedleProjectionFilter->Update();

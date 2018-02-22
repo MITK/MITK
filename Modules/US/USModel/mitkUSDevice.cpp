@@ -46,14 +46,14 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_NumberOfOutputs(1),
   m_Manufacturer(manufacturer),
   m_Name(model),
   m_SpawnAcquireThread(true),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
-  m_UnregisteringStarted(false),
-  m_NumberOfOutputs(1)
+  m_UnregisteringStarted(false)
 {
   USImageCropArea empty;
   empty.cropBottom = 0;

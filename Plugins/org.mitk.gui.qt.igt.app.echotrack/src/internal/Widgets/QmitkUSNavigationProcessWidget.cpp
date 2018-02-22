@@ -62,6 +62,11 @@ QmitkUSNavigationProcessWidget::QmitkUSNavigationProcessWidget(QWidget* parent) 
   ui->settingsFrameWidget->setHidden(true);
 }
 
+itk::SmartPointer<mitk::DataNode> QmitkUSNavigationProcessWidget::GetSettingsNode()
+{
+  return m_SettingsNode;
+}
+
 QmitkUSNavigationProcessWidget::~QmitkUSNavigationProcessWidget()
 {
   ui->stepsToolBox->blockSignals(true);
@@ -258,6 +263,7 @@ void QmitkUSNavigationProcessWidget::UpdateNavigationProgress()
 
 void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
 {
+  emit SignalNextButtonClicked();
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice()->GetIsFreezed()) {return;} //no moving through steps when the modality is nullptr or frozen
 
   int currentIndex = ui->stepsToolBox->currentIndex();
@@ -270,6 +276,7 @@ void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
   ui->stepsToolBox->setCurrentIndex(++currentIndex);
 
   this->UpdatePrevNextButtons();
+
 }
 
 void QmitkUSNavigationProcessWidget::OnPreviousButtonClicked()
@@ -395,7 +402,7 @@ void QmitkUSNavigationProcessWidget::OnStepNoLongerReady(int index)
   emit SignalNavigationStepFinished(index, false);
 }
 
-void QmitkUSNavigationProcessWidget::OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality> combinedModality)
+void QmitkUSNavigationProcessWidget::OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality)
 {
   m_CombinedModality = combinedModality;
   m_ImageAlreadySetToNode = false;

@@ -74,7 +74,7 @@ m_USDeviceChanged(this, &QmitkUltrasoundCalibration::OnUSDepthChanged)
 QmitkUltrasoundCalibration::~QmitkUltrasoundCalibration()
 {
   m_Controls.m_CombinedModalityManagerWidget->blockSignals(true);
-  mitk::USCombinedModality::Pointer combinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
@@ -234,7 +234,7 @@ void QmitkUltrasoundCalibration::OnTabSwitch(int index)
 //void QmitkUltrasoundCalibration::OnSelectDevice(mitk::USCombinedModality::Pointer combinedModality)
 void QmitkUltrasoundCalibration::OnDeviceSelected()
 {
-  mitk::USCombinedModality::Pointer combinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
@@ -253,7 +253,7 @@ void QmitkUltrasoundCalibration::OnDeviceSelected()
 
 void QmitkUltrasoundCalibration::OnDeviceDeselected()
 {
-  mitk::USCombinedModality::Pointer combinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality;
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
@@ -919,12 +919,13 @@ void QmitkUltrasoundCalibration::Update()
       m_Node->SetData(m_Image);
     }
   }
+  m_Node->SetData(m_Image); //Workaround because image is not initalized, maybe problem of the Ultrasound view?
 
   // Update Needle Projection
   m_NeedleProjectionFilter->Update();
 
   //only update 2d window because it is faster
-  //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
 void QmitkUltrasoundCalibration::SwitchFreeze()

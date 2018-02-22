@@ -175,9 +175,10 @@ namespace mitk {
     * can be completly removed. This is not possible for API devices, which
     * should be available while their sub module is loaded.
     */
-    //void UnregisterOnService();
+    void UnregisterOnService();
 
     virtual void RegisterAsMicroservice();
+
     /**
     * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
     */
@@ -237,23 +238,24 @@ namespace mitk {
     unsigned int m_NumberOfSmoothingValues;
     unsigned int m_DelayCount;
 
-  private:
     /**
     *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
     */
-    //us::ServiceRegistration<Self>           m_ServiceRegistration;
+    us::ServiceRegistration<Self>           m_ServiceRegistration;
 
     /**
     * \brief Properties of the device's Microservice.
     */
-    //us::ServiceProperties                   m_ServiceProperties;
+    us::ServiceProperties                   m_ServiceProperties;
+
+  private:
+
 
     bool m_IsTrackedUltrasoundActive;
   };
 
 } // namespace mitk
 
-MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.USCombinedModality")
-//MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.AbstractUltrasoundTrackerDevice")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractUltrasoundTrackerDevice, "org.mitk.services.AbstractUltrasoundTrackerDevice")
 
 #endif

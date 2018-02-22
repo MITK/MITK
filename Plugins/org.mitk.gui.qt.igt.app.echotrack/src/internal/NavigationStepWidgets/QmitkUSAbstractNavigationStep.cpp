@@ -52,9 +52,10 @@ void QmitkUSAbstractNavigationStep::SetDataStorage(itk::SmartPointer<mitk::DataS
   m_DataStorage = dataStorage;
 }
 
-void QmitkUSAbstractNavigationStep::SetCombinedModality(itk::SmartPointer<mitk::USCombinedModality> combinedModality)
+void QmitkUSAbstractNavigationStep::SetCombinedModality(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality)
 {
   m_CombinedModality = combinedModality;
+  MITK_INFO << "Combined modality set to NULL: " << m_CombinedModality.IsNull();
 
   this->OnSetCombinedModality();
 }
@@ -158,7 +159,7 @@ itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> QmitkUSAbstractNavigati
 {
   if ( throwNull && m_CombinedModality.IsNull() )
   {
-    MITK_ERROR << "Combined modality is not set yet for this widget.";
+    MITK_INFO << "Combined modality is not set yet for this widget.";
     mitkThrow() << "Combined modality is not set yet for this widget.";
   }
 

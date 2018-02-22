@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 #include "mitkDataStorage.h"
-#include "mitkUSCombinedModality.h"
+#include "mitkAbstractUltrasoundTrackerDevice.h"
 
 namespace itk {
 template<class T> class SmartPointer;
@@ -65,7 +65,7 @@ signals:
    * This signal is mainly for steps which creates the combined modality. The
    * new combined modality is given as a parameter.
    */
-  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
+  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
 
   /**
    * \brief Signals that an intermediate result was produced.
@@ -135,7 +135,7 @@ public:
    * \brief Sets the combined modality for the navigation step.
    * OnSetCombinedModality() is called internal.
    */
-  void SetCombinedModality(itk::SmartPointer<mitk::USCombinedModality> combinedModality);
+  void SetCombinedModality(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality);
 
   /**
    * \brief Should be called to start the navigation step.

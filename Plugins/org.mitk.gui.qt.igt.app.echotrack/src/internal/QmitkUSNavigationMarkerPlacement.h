@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageLoggingFilter.h"
 #include <mitkMessage.h>
 #include <mitkTextAnnotation2D.h>
-#include <mitkUSCombinedModality.h>
+#include <mitkAbstractUltrasoundTrackerDevice.h>
 #include <mitkNavigationToolStorage.h>
 
 namespace itk
@@ -66,6 +66,11 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
   Q_OBJECT
 
     protected slots:
+
+  void OnInitializeTargetMarking();
+  void OnInitializeCriticalStructureMarking();
+  void OnInitializeNavigation();
+
   /**
   * \brief Called periodically to update the rendering.
   * The standard multi widget is changed to fit the navigation process once it
@@ -91,25 +96,10 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
   */
   void OnFinishExperiment();
 
-  void OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
-
   /**
   * \brief Switches the navigation step widgets if the navigation application was changed.
   */
   void OnSettingsChanged(itk::SmartPointer<mitk::DataNode>);
-
-  /**
-  * \brief Updates the timer for the navigation steps durations every time the active navigation step changes.
-  */
-  void OnActiveNavigationStepChanged(int);
-
-  /** Initializes the next navigation step */
-  void OnNextNavigationStepInitialization(int);
-
-  /**
-  * \brief The data node is given to the experiment logging and scene is saved to the file system.
-  */
-  void OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode>);
 
   void OnAddAblationZone(int size);
 
@@ -167,12 +157,14 @@ protected:
 
   void CreateOverlays();
 
+  void InitImageStream();
+
   QWidget *m_Parent;
-  QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
   QTimer *m_UpdateTimer;
   QTimer *m_ImageAndNavigationDataLoggingTimer;
   QmitkStdMultiWidget *m_StdMultiWidget;
   itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> m_CombinedModality;
+  itk::SmartPointer<mitk::DataNode> m_SettingsNode;
   bool m_ReinitAlreadyDone;
   bool m_IsExperimentRunning;
   std::string m_CurrentApplicationName;
@@ -207,9 +199,9 @@ protected:
   mitk::NavigationDataSource::Pointer m_NavigationDataSource;
   mitk::NavigationToolStorage::Pointer m_CurrentStorage;
 
-private:
-  mitk::MessageDelegate2<QmitkUSNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;
+  itk::SmartPointer<mitk::DataNode> m_ImageStreamNode;
 
+private:
   Ui::QmitkUSNavigationMarkerPlacement *ui;
 };
 

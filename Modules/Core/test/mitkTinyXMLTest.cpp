@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkTinyXMLTestSuite : public mitk::TestFixture
 {
 	CPPUNIT_TEST_SUITE(mitkTinyXMLTestSuite);
+
 	MITK_TEST(TestingFunctionSetupWorks_Success);
 	MITK_TEST(TestingReadValueFromSetupDocument_Success);
 	MITK_TEST(TestingReadOutValueWorks_Success);
@@ -51,9 +52,12 @@ class mitkTinyXMLTestSuite : public mitk::TestFixture
 	
 
 private:
-	const std::string filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
-	const std::string elementToStoreAttributeName = "DoubleTest";
-	const std::string attributeToStoreName = "CommaValue";
+	const std::string m_filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
+	const std::string m_elementToStoreAttributeName = "DoubleTest";
+	const std::string m_attributeToStoreName = "CommaValue";
+
+	TiXmlDocument m_document;
+	TiXmlElement *m_doubleTest;
 
 	double calcPrecision(const unsigned int requiredDecimalPlaces)
 	{
@@ -63,37 +67,32 @@ private:
 	bool Setup(double valueToWrite)
 	{
 	  // 1. create simple document
-	  TiXmlDocument document;
 	  auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
-	  document.LinkEndChild(decl);
+	  m_document.LinkEndChild(decl);
 	
 	  auto version = new TiXmlElement("Version");
 	  version->SetAttribute("Writer", __FILE__);
 	  version->SetAttribute("CVSRevision", "$Revision: 17055 $");
 	  version->SetAttribute("FileVersion", 1);
-	  document.LinkEndChild(version);
+	  m_document.LinkEndChild(version);
 	
 	  // 2. store one element containing a double value with potentially many after comma digits.
-	  auto vElement = new TiXmlElement(elementToStoreAttributeName);
-	  vElement->SetDoubleAttribute(attributeToStoreName, valueToWrite);
-	  document.LinkEndChild(vElement);
+	  auto vElement = new TiXmlElement(m_elementToStoreAttributeName);
+	  vElement->SetDoubleAttribute(m_attributeToStoreName, valueToWrite);
+	  m_document.LinkEndChild(vElement);
 	
 	  // 3. store in file.
-	  return document.SaveFile(filename);
+	  return m_document.SaveFile(m_filename);
 	}
 
 public:
-	void setUp() {
-
-		double valueToWrite=0;
-		TiXmlDocument document;
-		auto decl = new TiXmlDeclaration("1.0", "", ""); 
-		auto version = new TiXmlElement("Version");
-		auto vElement = new TiXmlElement(elementToStoreAttributeName);
+	void setUp()
+	{
+		TiXmlDocument m_document;
 	}
 
-	void tearDown() {
-
+	void tearDown() 
+	{
 	}
 
     void TestingFunctionSetupWorks_Success()
@@ -103,33 +102,30 @@ public:
 
     int readValueFromSetupDocument(double &readOutValue)
 	{
-	  TiXmlDocument document;
 	
-	  if (!document.LoadFile(filename))
+	  if (!m_document.LoadFile(m_filename))
 	  {
 		CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", false);
 	    return TIXML_NO_ATTRIBUTE;
 	  }
 	  else
 	  {
-	    TiXmlElement *doubleTest = document.FirstChildElement(elementToStoreAttributeName);
-	    return doubleTest->QueryDoubleAttribute(attributeToStoreName, &readOutValue);
+	    m_doubleTest = m_document.FirstChildElement(m_elementToStoreAttributeName);
+	    return m_doubleTest->QueryDoubleAttribute(m_attributeToStoreName, &readOutValue);
 	  }
 	}
 
 	void TestingReadValueFromSetupDocument_Success()
 	{  
-		TiXmlDocument document;
-
-		if (!document.LoadFile(filename))
+		if (!m_document.LoadFile(m_filename))
 		{
-			CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", !document.LoadFile(filename));
+			CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", !m_document.LoadFile(m_filename));
 		
 		}
 		else
 		{
-			TiXmlElement *doubleTest = document.FirstChildElement(elementToStoreAttributeName);
-			CPPUNIT_ASSERT_MESSAGE("Test Setup could open file", doubleTest != nullptr);
+			m_doubleTest = m_document.FirstChildElement(m_elementToStoreAttributeName);
+			CPPUNIT_ASSERT_MESSAGE("Test Setup could open file", m_doubleTest != nullptr);
 		}
 	}
 

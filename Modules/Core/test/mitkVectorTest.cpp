@@ -37,12 +37,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkVectorTestSuite : public mitk::TestFixture
 {
 	CPPUNIT_TEST_SUITE(mitkVectorTestSuite);
+
 	MITK_TEST(TestingItkVecorEqualityMethods_Success);
     MITK_TEST(TestingItkPointEqualityMethods_Failure);
     MITK_TEST(TestingMitkVnlVectorEqualityMethods_Failure);
 	MITK_TEST(TestingVnl_VectorEqualityMethod_Success);
 	MITK_TEST(TestingScalarEqualityMethod_Success);
 	MITK_TEST(TestingMatrixEqualityMethods_Success);
+
 	CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -51,19 +53,19 @@ private:
 	itk::Vector<mitk::ScalarType, 3> m_itkVector_3;
 
 public:
-
-	void setUp() {
-
+	void setUp() 
+	{
 		itk::Vector<mitk::ScalarType, 3> m_itkVector_1;
 		itk::Vector<mitk::ScalarType, 3> m_itkVector_2;
 		itk::Vector<mitk::ScalarType, 3> m_itkVector_3;
+
 		m_itkVector_1[0] = 4.6;
 		m_itkVector_1[1] = 9.76543;
 		m_itkVector_1[2] = 746.09;
 
 	}
-	void tearDown() {
-
+	void tearDown() 
+	{
 		m_itkVector_1[0] = 0;
 		m_itkVector_1[1] = 0;
 		m_itkVector_1[2] = 0;
@@ -204,7 +206,6 @@ public:
 		CPPUNIT_ASSERT_MESSAGE("Test for matrix equality with given epsilon and slightly different matrix elements",
 			mitk::MatrixEqualRMS(vnlMatrix3x3_1, vnlMatrix3x3_2, epsilon));
 	}
-
 };
 MITK_TEST_SUITE_REGISTRATION(mitkVector)
 

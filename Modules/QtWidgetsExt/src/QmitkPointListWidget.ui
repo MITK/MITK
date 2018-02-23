@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>QmitkSliceWidget</string>
+   <string>QmitkPointListWidget</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
@@ -51,7 +51,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resource/QtWidgetsExt.qrc">
-           <normaloff>:/images/btnSetPoints.png</normaloff>:/images/btnSetPoints.png</iconset>
+           <normaloff>:/QtWidgetsExt/btnSetPoints.png</normaloff>:/QtWidgetsExt/btnSetPoints.png</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -71,7 +71,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resource/QtWidgetsExt.qrc">
-           <normaloff>:/images/btnSetPointsManually.xpm</normaloff>:/images/btnSetPointsManually.xpm</iconset>
+           <normaloff>:/QtWidgetsExt/btnSetPointsManually.xpm</normaloff>:/QtWidgetsExt/btnSetPointsManually.xpm</iconset>
          </property>
         </widget>
        </item>
@@ -88,7 +88,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resource/QtWidgetsExt.qrc">
-           <normaloff>:/images/btnClear.xpm</normaloff>:/images/btnClear.xpm</iconset>
+           <normaloff>:/QtWidgetsExt/btnClear.xpm</normaloff>:/QtWidgetsExt/btnClear.xpm</iconset>
          </property>
         </widget>
        </item>
@@ -102,7 +102,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resource/QtWidgetsExt.qrc">
-           <normaloff>:/images/btnMoveUp.png</normaloff>:/images/btnMoveUp.png</iconset>
+           <normaloff>:/QtWidgetsExt/btnMoveUp.png</normaloff>:/QtWidgetsExt/btnMoveUp.png</iconset>
          </property>
         </widget>
        </item>
@@ -116,7 +116,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resource/QtWidgetsExt.qrc">
-           <normaloff>:/images/btnMoveDown.png</normaloff>:/images/btnMoveDown.png</iconset>
+           <normaloff>:/QtWidgetsExt/btnMoveDown.png</normaloff>:/QtWidgetsExt/btnMoveDown.png</iconset>
          </property>
         </widget>
        </item>
@@ -130,7 +130,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resource/QtWidgetsExt.qrc">
-           <normaloff>:/images/btnSave.xpm</normaloff>:/images/btnSave.xpm</iconset>
+           <normaloff>:/QtWidgetsExt/btnSave.xpm</normaloff>:/QtWidgetsExt/btnSave.xpm</iconset>
          </property>
         </widget>
        </item>
@@ -144,7 +144,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resource/QtWidgetsExt.qrc">
-           <normaloff>:/images/btnLoad.xpm</normaloff>:/images/btnLoad.xpm</iconset>
+           <normaloff>:/QtWidgetsExt/btnLoad.xpm</normaloff>:/QtWidgetsExt/btnLoad.xpm</iconset>
          </property>
         </widget>
        </item>

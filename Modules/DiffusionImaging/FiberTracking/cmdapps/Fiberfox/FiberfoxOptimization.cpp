@@ -111,7 +111,6 @@ FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double 
   {
     int model_index = rand()%new_params.m_NonFiberModelList.size();
     double t1 = new_params.m_NonFiberModelList[model_index]->GetT1();
-    MITK_INFO << "T1: " << t1;
     std::normal_distribution<double> normal_dist(0, t1*0.1*temperature);
 
     double add = 0;
@@ -126,7 +125,6 @@ FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double 
   {
     int model_index = rand()%new_params.m_FiberModelList.size();
     double t1 = new_params.m_FiberModelList[model_index]->GetT1();
-    MITK_INFO << "T1: " << t1;
     std::normal_distribution<double> normal_dist(0, t1*0.1*temperature);
 
     double add = 0;
@@ -238,7 +236,8 @@ int main(int argc, char* argv[])
   parser.addArgument("iterations", "", mitkCommandLineParser::Int, "Iterations:", "Number of optimizations steps", 1000);
   parser.addArgument("start_temp", "", mitkCommandLineParser::Float, "Start temperature:", "", 1.0);
   parser.addArgument("end_temp", "", mitkCommandLineParser::Float, "End temperature:", "", 0.1);
-  parser.addArgument("optimize_diff", "", mitkCommandLineParser::Bool, "Optimize diffusivities:", "");
+  parser.addArgument("no_diff", "", mitkCommandLineParser::Bool, "Don't optimize diffusivities:", "Don't optimize diffusivities");
+  parser.addArgument("no_relax", "", mitkCommandLineParser::Bool, "Don't optimize relaxation times and signal scale:", "Don't optimize relaxation times and signal scale");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -260,9 +259,19 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("end_temp"))
     end_temp = us::any_cast<float>(parsedArgs["end_temp"]);
 
-  bool optimize_diff=false;
-  if (parsedArgs.count("optimize_diff"))
-    optimize_diff = true;
+  bool no_diff=false;
+  if (parsedArgs.count("no_diff"))
+    no_diff = true;
+
+  bool no_relax=false;
+  if (parsedArgs.count("no_relax"))
+    no_relax = true;
+
+  if (no_relax && no_diff)
+  {
+    MITK_INFO << "Incompatible options. Nothing to optimize.";
+    return EXIT_FAILURE;
+  }
 
   FiberfoxParameters parameters;
   parameters.LoadParameters(paramName);
@@ -310,11 +319,21 @@ int main(int argc, char* argv[])
     double temperature = start_temp * exp(alpha*(double)i/iterations);
     MITK_INFO << "Temperature: " << temperature << " (" << i+1 << "/" << iterations << ")";
 
-    FiberfoxParameters proposal;
-    if (optimize_diff)
-      proposal = MakeProposalDiff(parameters, temperature);
+    std::random_device r;
+    std::default_random_engine randgen(r());
+    std::uniform_int_distribution<int> uint1(0, 1);
+
+    FiberfoxParameters proposal(parameters);
+    int select = uint1(randgen);
+    if (no_relax)
+      select = 0;
+    else if (no_diff)
+      select = 1;
+
+    if (select==0)
+      proposal = MakeProposalDiff(proposal, temperature);
     else
-      proposal = MakeProposalRelaxation(parameters, temperature);
+      proposal = MakeProposalRelaxation(proposal, temperature);
 
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;

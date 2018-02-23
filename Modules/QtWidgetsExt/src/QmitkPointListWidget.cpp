@@ -28,28 +28,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataInteractor.h>
 
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
-  : QWidget(parent),
-    m_PointListView(nullptr),
-    m_PointSetNode(nullptr),
-    m_Orientation(0),
-    m_MovePointUpBtn(nullptr),
-    m_MovePointDownBtn(nullptr),
-    m_RemovePointBtn(nullptr),
-    m_SavePointsBtn(nullptr),
-    m_LoadPointsBtn(nullptr),
-    m_ToggleAddPoint(nullptr),
-    m_AddPoint(nullptr),
-    m_DataInteractor(nullptr),
-    m_TimeStep(0),
-    m_EditAllowed(true),
-    m_NodeObserverTag(0)
+  : QWidget(parent)//,
+    //m_PointListView(nullptr),
+    //m_PointSetNode(nullptr),
+    //m_Orientation(0),
+    //m_MovePointUpBtn(nullptr),
+    //m_MovePointDownBtn(nullptr),
+    //m_RemovePointBtn(nullptr),
+    //m_SavePointsBtn(nullptr),
+    //m_LoadPointsBtn(nullptr),
+    //m_ToggleAddPoint(nullptr),
+    //m_AddPoint(nullptr),
+    //m_DataInteractor(nullptr),
+    //m_TimeStep(0),
+    //m_EditAllowed(true),
+    //m_NodeObserverTag(0)
 {
-  m_PointListView = new QmitkPointListView();
+ // m_PointListView = new QmitkPointListView();
 
   if (orientation != 0)
     m_Orientation = orientation;
 
-  SetupUi();
+  this->setupUi(this);
   SetupConnections();
   ObserveNewNode(nullptr);
 }
@@ -69,7 +69,7 @@ QmitkPointListWidget::~QmitkPointListWidget()
 
 void QmitkPointListWidget::SetupConnections()
 {
-  connect(this->m_LoadPointsBtn, SIGNAL(clicked()), this, SLOT(OnBtnLoadPoints()));
+  connect(m_LoadPointsBtn, SIGNAL(clicked()), this, SLOT(OnBtnLoadPoints()));
   connect(this->m_SavePointsBtn, SIGNAL(clicked()), this, SLOT(OnBtnSavePoints()));
   connect(this->m_MovePointUpBtn, SIGNAL(clicked()), this, SLOT(MoveSelectedPointUp()));
   connect(this->m_MovePointDownBtn, SIGNAL(clicked()), this, SLOT(MoveSelectedPointDown()));
@@ -80,102 +80,103 @@ void QmitkPointListWidget::SetupConnections()
   connect(this->m_PointListView, SIGNAL(SignalPointSelectionChanged()), this, SLOT(OnPointSelectionChanged()));
 }
 
-void QmitkPointListWidget::SetupUi()
-{
-  // Setup the buttons
-
-  m_ToggleAddPoint = new QPushButton();
-  m_ToggleAddPoint->setMaximumSize(25, 25);
-  m_ToggleAddPoint->setCheckable(true);
-  m_ToggleAddPoint->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
-  QIcon iconAdd(":/QtWidgetsExt/btnSetPoints.xpm");
-  m_ToggleAddPoint->setIcon(iconAdd);
-
-  m_AddPoint = new QPushButton();
-  m_AddPoint->setMaximumSize(25, 25);
-  m_AddPoint->setToolTip("Manually add point");
-  QIcon iconAddManually(":/QtWidgetsExt/btnSetPointsManually.xpm");
-  m_AddPoint->setIcon(iconAddManually);
-
-  m_RemovePointBtn = new QPushButton();
-  m_RemovePointBtn->setMaximumSize(25, 25);
-  const QIcon iconDel(":/QtWidgetsExt/btnClear.xpm");
-  m_RemovePointBtn->setIcon(iconDel);
-  m_RemovePointBtn->setToolTip("Erase one point from list   (Hotkey: DEL)");
-
-  m_MovePointUpBtn = new QPushButton();
-  m_MovePointUpBtn->setMaximumSize(25, 25);
-  const QIcon iconUp(":/QtWidgetsExt/btnUp.xpm");
-  m_MovePointUpBtn->setIcon(iconUp);
-  m_MovePointUpBtn->setToolTip("Swap selected point upwards   (Hotkey: F2)");
-
-  m_MovePointDownBtn = new QPushButton();
-  m_MovePointDownBtn->setMaximumSize(25, 25);
-  const QIcon iconDown(":/QtWidgetsExt/btnDown.xpm");
-  m_MovePointDownBtn->setIcon(iconDown);
-  m_MovePointDownBtn->setToolTip("Swap selected point downwards   (Hotkey: F3)");
-
-  m_SavePointsBtn = new QPushButton();
-  m_SavePointsBtn->setMaximumSize(25, 25);
-  QIcon iconSave(":/QtWidgetsExt/btnSave.xpm");
-  m_SavePointsBtn->setIcon(iconSave);
-  m_SavePointsBtn->setToolTip("Save points to file");
-
-  m_LoadPointsBtn = new QPushButton();
-  m_LoadPointsBtn->setMaximumSize(25, 25);
-  QIcon iconLoad(":/QtWidgetsExt/btnLoad.xpm");
-  m_LoadPointsBtn->setIcon(iconLoad);
-  m_LoadPointsBtn->setToolTip("Load list of points from file (REPLACES current content)");
-
-  int i;
-
-  QBoxLayout *lay1;
-  QBoxLayout *lay2;
-
-  switch (m_Orientation)
-  {
-    case 0:
-      lay1 = new QVBoxLayout(this);
-      lay2 = new QHBoxLayout();
-      i = 0;
-      break;
-
-    case 1:
-      lay1 = new QHBoxLayout(this);
-      lay2 = new QVBoxLayout();
-      i = -1;
-      break;
-
-    case 2:
-      lay1 = new QHBoxLayout(this);
-      lay2 = new QVBoxLayout();
-      i = 0;
-      break;
-
-    default:
-      lay1 = new QVBoxLayout(this);
-      lay2 = new QHBoxLayout();
-      i = -1;
-      break;
-  }
-
-  // setup Layouts
-
-  this->setLayout(lay1);
-  lay1->addLayout(lay2);
-
-  lay2->stretch(true);
-  lay2->addWidget(m_ToggleAddPoint);
-  lay2->addWidget(m_AddPoint);
-  lay2->addWidget(m_RemovePointBtn);
-  lay2->addWidget(m_MovePointUpBtn);
-  lay2->addWidget(m_MovePointDownBtn);
-  lay2->addWidget(m_SavePointsBtn);
-  lay2->addWidget(m_LoadPointsBtn);
-
-  lay1->insertWidget(i, m_PointListView);
-  this->setLayout(lay1);
-}
+//void QmitkPointListWidget::SetupUi()
+//{
+//
+//  // Setup the buttons
+//
+//  m_ToggleAddPoint = new QPushButton();
+//  m_ToggleAddPoint->setMaximumSize(25, 25);
+//  m_ToggleAddPoint->setCheckable(true);
+//  m_ToggleAddPoint->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
+//  QIcon iconAdd(":/QtWidgetsExt/btnSetPoints.xpm");
+//  m_ToggleAddPoint->setIcon(iconAdd);
+//
+//  m_AddPoint = new QPushButton();
+//  m_AddPoint->setMaximumSize(25, 25);
+//  m_AddPoint->setToolTip("Manually add point");
+//  QIcon iconAddManually(":/QtWidgetsExt/btnSetPointsManually.xpm");
+//  m_AddPoint->setIcon(iconAddManually);
+//
+//  m_RemovePointBtn = new QPushButton();
+//  m_RemovePointBtn->setMaximumSize(25, 25);
+//  const QIcon iconDel(":/QtWidgetsExt/btnClear.xpm");
+//  m_RemovePointBtn->setIcon(iconDel);
+//  m_RemovePointBtn->setToolTip("Erase one point from list   (Hotkey: DEL)");
+//
+//  m_MovePointUpBtn = new QPushButton();
+//  m_MovePointUpBtn->setMaximumSize(25, 25);
+//  const QIcon iconUp(":/QtWidgetsExt/btnUp.xpm");
+//  m_MovePointUpBtn->setIcon(iconUp);
+//  m_MovePointUpBtn->setToolTip("Swap selected point upwards   (Hotkey: F2)");
+//
+//  m_MovePointDownBtn = new QPushButton();
+//  m_MovePointDownBtn->setMaximumSize(25, 25);
+//  const QIcon iconDown(":/QtWidgetsExt/btnDown.xpm");
+//  m_MovePointDownBtn->setIcon(iconDown);
+//  m_MovePointDownBtn->setToolTip("Swap selected point downwards   (Hotkey: F3)");
+//
+//  m_SavePointsBtn = new QPushButton();
+//  m_SavePointsBtn->setMaximumSize(25, 25);
+//  QIcon iconSave(":/QtWidgetsExt/btnSave.xpm");
+//  m_SavePointsBtn->setIcon(iconSave);
+//  m_SavePointsBtn->setToolTip("Save points to file");
+//
+//  m_LoadPointsBtn = new QPushButton();
+//  m_LoadPointsBtn->setMaximumSize(25, 25);
+//  QIcon iconLoad(":/QtWidgetsExt/btnLoad.xpm");
+//  m_LoadPointsBtn->setIcon(iconLoad);
+//  m_LoadPointsBtn->setToolTip("Load list of points from file (REPLACES current content)");
+//
+//  int i;
+//
+//  QBoxLayout *lay1;
+//  QBoxLayout *lay2;
+//
+//  switch (m_Orientation)
+//  {
+//    case 0:
+//      lay1 = new QVBoxLayout(this);
+//      lay2 = new QHBoxLayout();
+//      i = 0;
+//      break;
+//
+//    case 1:
+//      lay1 = new QHBoxLayout(this);
+//      lay2 = new QVBoxLayout();
+//      i = -1;
+//      break;
+//
+//    case 2:
+//      lay1 = new QHBoxLayout(this);
+//      lay2 = new QVBoxLayout();
+//      i = 0;
+//      break;
+//
+//    default:
+//      lay1 = new QVBoxLayout(this);
+//      lay2 = new QHBoxLayout();
+//      i = -1;
+//      break;
+//  }
+//
+//  // setup Layouts
+//
+//  this->setLayout(lay1);
+//  lay1->addLayout(lay2);
+//
+//  lay2->stretch(true);
+//  lay2->addWidget(m_ToggleAddPoint);
+//  lay2->addWidget(m_AddPoint);
+//  lay2->addWidget(m_RemovePointBtn);
+//  lay2->addWidget(m_MovePointUpBtn);
+//  lay2->addWidget(m_MovePointDownBtn);
+//  lay2->addWidget(m_SavePointsBtn);
+//  lay2->addWidget(m_LoadPointsBtn);
+//
+//  lay1->insertWidget(i, m_PointListView);
+//  this->setLayout(lay1);
+//}
 
 void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
 {

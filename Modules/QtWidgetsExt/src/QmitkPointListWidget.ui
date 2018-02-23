@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkPointListWidgetUi</class>
+ <widget class="QWidget" name="QmitkPointListWidgetUi">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>385</width>
+    <height>381</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkSliceWidget</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QmitkPointListView" name="m_PointListView" native="true">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>231</width>
+          <height>191</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="m_ToggleAddPoint">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Toggle point editing (use SHIFT  + Left Mouse Button to add Points)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resource/QtWidgetsExt.qrc">
+           <normaloff>:/images/btnSetPoints.png</normaloff>:/images/btnSetPoints.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_AddPoint">
+         <property name="toolTip">
+          <string>Manually add point</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resource/QtWidgetsExt.qrc">
+           <normaloff>:/images/btnSetPointsManually.xpm</normaloff>:/images/btnSetPointsManually.xpm</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_RemovePointBtn">
+         <property name="toolTip">
+          <string>Erase one point from list   (Hotkey: DEL)</string>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resource/QtWidgetsExt.qrc">
+           <normaloff>:/images/btnClear.xpm</normaloff>:/images/btnClear.xpm</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_MovePointUpBtn">
+         <property name="toolTip">
+          <string>Swap selected point upwards   (Hotkey: F2)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resource/QtWidgetsExt.qrc">
+           <normaloff>:/images/btnMoveUp.png</normaloff>:/images/btnMoveUp.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_MovePointDownBtn">
+         <property name="toolTip">
+          <string>Swap selected point downwards   (Hotkey: F3)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resource/QtWidgetsExt.qrc">
+           <normaloff>:/images/btnMoveDown.png</normaloff>:/images/btnMoveDown.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_SavePointsBtn">
+         <property name="toolTip">
+          <string>Save points to file</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resource/QtWidgetsExt.qrc">
+           <normaloff>:/images/btnSave.xpm</normaloff>:/images/btnSave.xpm</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_LoadPointsBtn">
+         <property name="toolTip">
+          <string>Load list of points from file (REPLACES current content)</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resource/QtWidgetsExt.qrc">
+           <normaloff>:/images/btnLoad.xpm</normaloff>:/images/btnLoad.xpm</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkPointListView</class>
+   <extends>QWidget</extends>
+   <header>qmitkpointlistview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resource/QtWidgetsExt.qrc"/>
+ </resources>
+ <connections/>
+</ui>

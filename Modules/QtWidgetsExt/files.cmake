@@ -99,6 +99,7 @@ set(UI_FILES
   src/QmitkSliderNavigator.ui
   src/QmitkTransferFunctionGeneratorWidget.ui
   src/QmitkTransferFunctionWidget.ui
+  src/QmitkPointListWidget.ui
 )
 
 set(QRC_FILES

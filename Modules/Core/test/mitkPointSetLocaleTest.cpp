@@ -38,10 +38,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkPointSetLocaleTestSuite : public mitk::TestFixture
 {
 	CPPUNIT_TEST_SUITE(mitkPointSetLocaleTestSuite);
+
 	MITK_TEST(TestIfGermanLocaleUsed_Success);
+
 	CPPUNIT_TEST_SUITE_END();
 
 private:
+	typedef std::list<std::string> StringList;
+	StringList m_alllocales;
+
+	mitk::PointSet::Pointer m_refPointSet;
+	mitk::Point3D m_refPoint;
+
+	mitk::Point3D m_point;
+
+	mitk::PointSet::Pointer m_pointSet;
+
+
 	bool ChangeLocale(const std::string &locale)
 	{
 		try
@@ -52,8 +65,8 @@ private:
 			std::locale l(locale.c_str());
 			std::cin.imbue(l);
 			std::cout.imbue(l);
-
 			return true;
+
 		}
 		catch (...)
 		{
@@ -66,14 +79,13 @@ private:
 	{
 		MITK_TEST_OUTPUT(<< "---- Reader Test ---- ");
 
-		mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+		m_pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename)[0].GetPointer());
 
-		mitk::Point3D point;
-		if (pointSet->GetPointIfExists(0, &point))
+		if (m_pointSet->GetPointIfExists(0, &m_point))
 		{
-			CPPUNIT_ASSERT_MESSAGE("read x correct", fabs(refPoint[0] - point[0]) < 0.00001);
-			CPPUNIT_ASSERT_MESSAGE("read y correct", fabs(refPoint[1] - point[1]) < 0.00001);
-			CPPUNIT_ASSERT_MESSAGE("read z correct", fabs(refPoint[2] - point[2]) < 0.00001);
+			CPPUNIT_ASSERT_MESSAGE("read x correct", fabs(refPoint[0] - m_point[0]) < 0.00001);
+			CPPUNIT_ASSERT_MESSAGE("read y correct", fabs(refPoint[1] - m_point[1]) < 0.00001);
+			CPPUNIT_ASSERT_MESSAGE("read z correct", fabs(refPoint[2] - m_point[2]) < 0.00001);
 		}
 		else
 		{
@@ -86,13 +98,13 @@ private:
 	{
 		MITK_TEST_OUTPUT(<< "---- Writer Test---- ");
 		// create pointset
-		mitk::PointSet::Pointer refPointSet = mitk::PointSet::New();
-		refPointSet->InsertPoint(0, refPoint);
+		m_refPointSet = mitk::PointSet::New();
+		m_refPointSet->InsertPoint(0, refPoint);
 
 		std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile("testPointSet_XXXXXX.mps");
 
 		// write point set
-		mitk::IOUtil::Save(refPointSet, tmpFilePath);
+		mitk::IOUtil::Save(m_refPointSet, tmpFilePath);
 
 		std::ifstream stream(tmpFilePath.c_str());
 
@@ -124,31 +136,40 @@ private:
 	}
 
 public:
-
-	void TestIfGermanLocaleUsed_Success() {
-
-		// create reference point set
-		mitk::PointSet::Pointer refPointSet = mitk::PointSet::New();
-		mitk::Point3D refPoint;
-		refPoint[0] = 32.2946;
-		refPoint[1] = -17.7359;
-		refPoint[2] = 29.6502;
-		refPointSet->SetPoint(0, refPoint);
+	void setUp()
+	{
+		StringList alllocales;
+		m_refPointSet = mitk::PointSet::New();
 
 		// create locale list
-		typedef std::list<std::string> StringList;
-		StringList alllocales;
-		alllocales.push_back("de_DE");
-		alllocales.push_back("de_DE.utf8");
-		alllocales.push_back("de_DE.UTF-8");
-		alllocales.push_back("de_DE@euro");
-		alllocales.push_back("German_Germany");
+		m_alllocales.push_back("de_DE");
+		m_alllocales.push_back("de_DE.utf8");
+		m_alllocales.push_back("de_DE.UTF-8");
+		m_alllocales.push_back("de_DE@euro");
+		m_alllocales.push_back("German_Germany");
+
+		m_refPoint[0] = 32.2946;
+		m_refPoint[1] = -17.7359;
+		m_refPoint[2] = 29.6502;
+	}
+
+	void tearDown()
+	{
+		m_refPoint[0] = 0;
+		m_refPoint[1] = 0;
+		m_refPoint[2] = 0;
+	}
+
+	void TestIfGermanLocaleUsed_Success()
+	{
+		// create reference point set
+		m_refPointSet->SetPoint(0, m_refPoint);
 
 		// QuickFix for MAC OS X
 		// See for more the Bug #3894 comments
-    #if defined(__APPLE__) || defined(MACOSX)
+#if defined(__APPLE__) || defined(MACOSX)
 		alllocales.push_back("C");
-    #endif
+#endif
 
 		// write a reference file using the "C" locale once
 		ChangeLocale("C");
@@ -156,16 +177,16 @@ public:
 		MITK_INFO << "Reference PointSet in " << referenceFilePath;
 
 		// write point set
-		mitk::IOUtil::Save(refPointSet, referenceFilePath);
+		mitk::IOUtil::Save(m_refPointSet, referenceFilePath);
 
 		unsigned int numberOfTestedGermanLocales(0);
-		for (auto iter = alllocales.begin(); iter != alllocales.end(); ++iter)
+		for (auto iter = m_alllocales.begin(); iter != m_alllocales.end(); ++iter)
 		{
 			if (ChangeLocale(*iter))
 			{
 				++numberOfTestedGermanLocales;
-				WriterLocaleTest(refPoint, referenceFilePath);
-				ReaderLocaleTest(refPoint, referenceFilePath);
+				WriterLocaleTest(m_refPoint, referenceFilePath);
+				ReaderLocaleTest(m_refPoint, referenceFilePath);
 			}
 		}
 
@@ -173,7 +194,7 @@ public:
 		{
 			MITK_TEST_OUTPUT(<< "Warning: No German locale was found on the system.");
 		}
-		
+
 	}
 };
 

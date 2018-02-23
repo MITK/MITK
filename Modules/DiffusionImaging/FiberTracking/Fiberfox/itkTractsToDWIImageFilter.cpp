@@ -1075,7 +1075,7 @@ namespace itk
         // generate non-fiber signal
         ImageRegionIterator<ItkUcharImgType> it3(m_TransformedMaskImage, m_TransformedMaskImage->GetLargestPossibleRegion());
         double fact = 1;    // density correction factor in mm³
-        if (m_Parameters.m_SignalGen.m_AxonRadius<0.0001 || maxVolume>m_VoxelVolume)    // the fullest voxel is always completely full
+        if (m_Parameters.m_SignalGen.m_AxonRadius<0.0001)    // the fullest voxel is always completely full
           fact = m_VoxelVolume/maxVolume;
 
         while(!it3.IsAtEnd())
@@ -1101,9 +1101,15 @@ namespace itk
             }
 
             double iAxVolume = intraAxonalVolumeImage->GetPixel(index);
+            double fact3 = 1.0;
+            if (iAxVolume>m_VoxelVolume)
+            {
+              fact3 = m_VoxelVolume/iAxVolume;
+              fact = 1.0;
+            }
 
             // if volume fraction image is set use it, otherwise use scaling factor to obtain one full fiber voxel
-            double fact2 = fact;
+            double fact2 = fact*fact3;
             if ( m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage()!=nullptr && iAxVolume>0.0001 )
             {
               m_DoubleInterpolator->SetInputImage(m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage());

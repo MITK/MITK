@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkBaseDataTestSuite : public mitk:: TestFixture
 {
 	CPPUNIT_TEST_SUITE(mitkBaseDataTestSuite);
+
 	MITK_TEST(CreateBaseData_Success);
 	MITK_TEST(TestingGetTimeGeometry_Success);
 	MITK_TEST(TestingGetGeometry_Failure);
@@ -46,35 +47,35 @@ class mitkBaseDataTestSuite : public mitk:: TestFixture
 	MITK_TEST(TestingSetAndGetPropertyList_Success);
     MITK_TEST(TestingUpdateOutputInformation_Failure);
 	MITK_TEST(TestingCopyInformation_Failure);
+
 	CPPUNIT_TEST_SUITE_END();
 
 private:
-
 	mitk::BaseDataTestImplementation::Pointer m_baseDataImpl;
 	mitk::BaseDataTestImplementation::Pointer m_cloneBaseData;
 	mitk::TimeGeometry *m_geo;
 	mitk::ProportionalTimeGeometry::Pointer m_geo2;
 
 public:
+  void setUp() override 
+  {
+	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
+	m_cloneBaseData = m_baseDataImpl->Clone();
+	m_geo = nullptr;
+	m_geo2 = mitk::ProportionalTimeGeometry::New();
+  }
 
-void setUp() /*override*/ {
+  void tearDown() override 
+  {
+	m_baseDataImpl = nullptr;
+	m_cloneBaseData =nullptr;
+	m_geo = nullptr;
+	m_geo2 = nullptr;
+  }
 
-	mitk::BaseDataTestImplementation::Pointer m_baseDataImpl = mitk::BaseDataTestImplementation::New();
-	mitk::BaseDataTestImplementation::Pointer m_cloneBaseData = m_baseDataImpl->Clone();
-	mitk::TimeGeometry *m_geo = nullptr;
-	mitk::ProportionalTimeGeometry::Pointer m_geo2 = mitk::ProportionalTimeGeometry::New();
-}
-
-void tearDown() /*override*/ {
-
-	mitk::BaseDataTestImplementation::Pointer m_baseDataImpl = nullptr;
-	mitk::BaseDataTestImplementation::Pointer m_cloneBaseData =nullptr;
-	mitk::TimeGeometry *m_geo = nullptr;
-	mitk::ProportionalTimeGeometry::Pointer m_geo2 = nullptr;
-}
-
-void CreateBaseData_Success() {
-// Create a BaseData implementation
+  void CreateBaseData_Success()
+  {
+    // Create a BaseData implementation
 	MITK_INFO << "Creating a base data instance...";
 	
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
@@ -88,11 +89,11 @@ void CreateBaseData_Success() {
 	CPPUNIT_ASSERT_MESSAGE("Clone of BaseDataTestImplementation is initialized and empty", m_cloneBaseData->IsEmpty());
 
 	MITK_INFO << "Testing setter and getter for geometries...";
-}
+  }
 
-void TestingGetTimeGeometry_Success() {
-// test method GetTimeGeometry()
-
+  void TestingGetTimeGeometry_Success()
+  {
+    // test method GetTimeGeometry()
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
 	m_geo2 = mitk::ProportionalTimeGeometry::New();
     CPPUNIT_ASSERT_MESSAGE("Testing creation of TimeGeometry", m_baseDataImpl->GetTimeGeometry());
@@ -105,22 +106,25 @@ void TestingGetTimeGeometry_Success() {
     m_geo2->Initialize(2);
     CPPUNIT_ASSERT_MESSAGE("Correct Reinit of TimeGeometry", m_baseDataImpl->GetTimeGeometry() == m_geo2.GetPointer());
 
-}
+  }
 
-void TestingGetGeometry_Failure() {
+  void TestingGetGeometry_Failure() 
+  {
 	// test method GetGeometry(int timeStep)
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
 	CPPUNIT_ASSERT_MESSAGE("... and single Geometries", m_baseDataImpl->GetGeometry(1) == nullptr);
-}
+  }
 
-void TestingExpand_Success(){
+  void TestingExpand_Success()
+  {
 	// test method Expand(unsigned int timeSteps)
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
 	m_baseDataImpl->Expand(5);
 	CPPUNIT_ASSERT_MESSAGE("Expand the geometry to further time slices!", m_baseDataImpl->GetTimeSteps() == 5);
-}
+  }
 
-void TestingGetUpdateGeometry_Success() {
+  void TestingGetUpdateGeometry_Success() 
+  {
 	// test method GetUpdatedGeometry(int timeStep);
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
 	m_baseDataImpl->Expand(5);
@@ -152,49 +156,53 @@ void TestingGetUpdateGeometry_Success() {
 	CPPUNIT_ASSERT_MESSAGE("Is not empty before clear()!", !m_baseDataImpl->IsEmptyTimeStep(1));
 	m_baseDataImpl->Clear();
 	CPPUNIT_ASSERT_MESSAGE("...but afterwards!", m_baseDataImpl->IsEmptyTimeStep(1));
-}
+  }
 
-void TestingSetAndGetProperty_Success() {
+  void TestingSetAndGetProperty_Success()
+  {
 	 //test method Set-/GetProperty()
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
 	m_baseDataImpl->SetProperty("property38", mitk::StringProperty::New("testproperty"));
-	 CPPUNIT_ASSERT_MESSAGE("Check if base property is set correctly!", m_baseDataImpl->GetProperty("property38")->GetValueAsString() == "testproperty");
+	CPPUNIT_ASSERT_MESSAGE("Check if base property is set correctly!", m_baseDataImpl->GetProperty("property38")->GetValueAsString() == "testproperty");
 	 
-	 m_cloneBaseData = m_baseDataImpl->Clone();
-	 CPPUNIT_ASSERT_MESSAGE("Testing origin set in clone!", m_cloneBaseData->GetProperty("property38")->GetValueAsString() == "testproperty");
-}
+	m_cloneBaseData = m_baseDataImpl->Clone();
+	CPPUNIT_ASSERT_MESSAGE("Testing origin set in clone!", m_cloneBaseData->GetProperty("property38")->GetValueAsString() == "testproperty");
+  }
 
-void TestingSetAndGetPropertyList_Success() {
+  void TestingSetAndGetPropertyList_Success() 
+  {
 	// test method Set-/GetPropertyList
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
-	 mitk::PropertyList::Pointer propertyList = mitk::PropertyList::New();
-	 propertyList->SetFloatProperty("floatProperty1", 123.45);
-	 propertyList->SetBoolProperty("visibility", true);
-	 propertyList->SetStringProperty("nameXY", "propertyName");
-	 m_baseDataImpl->SetPropertyList(propertyList);
-	 bool value = false;
-	 CPPUNIT_ASSERT_MESSAGE("Check if base property list is set correctly!", m_baseDataImpl->GetPropertyList() == propertyList);
-	 CPPUNIT_ASSERT_MESSAGE("Check if base property is set correctly in the property list!",
+	mitk::PropertyList::Pointer propertyList = mitk::PropertyList::New();
+	propertyList->SetFloatProperty("floatProperty1", 123.45);
+	propertyList->SetBoolProperty("visibility", true);
+	propertyList->SetStringProperty("nameXY", "propertyName");
+	m_baseDataImpl->SetPropertyList(propertyList);
+	bool value = false;
+	CPPUNIT_ASSERT_MESSAGE("Check if base property list is set correctly!", m_baseDataImpl->GetPropertyList() == propertyList);
+	CPPUNIT_ASSERT_MESSAGE("Check if base property is set correctly in the property list!",
 		 m_baseDataImpl->GetPropertyList()->GetBoolProperty("visibility", value) == true);
-}
+  }
 
-void TestingUpdateOutputInformation_Failure() {
+  void TestingUpdateOutputInformation_Failure()
+  {
 	// test method UpdateOutputInformation()
-	//m_baseDataImpl = mitk::BaseDataTestImplementation::New();
-	//m_geo2 = mitk::ProportionalTimeGeometry::New();
+	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
+	m_geo2 = mitk::ProportionalTimeGeometry::New();
 	m_baseDataImpl->UpdateOutputInformation();
 	m_geo2->Initialize(2);
 	m_geo2.GetPointer();
 	CPPUNIT_ASSERT_MESSAGE("TimeGeometry update!", m_baseDataImpl->GetUpdatedTimeGeometry() != m_geo2);
-}
+  }
 
-void TestingCopyInformation_Failure() {
+  void TestingCopyInformation_Failure() 
+  {
 	// Test method CopyInformation()
 	m_baseDataImpl = mitk::BaseDataTestImplementation::New();
 	mitk::BaseDataTestImplementation::Pointer newBaseData = mitk::BaseDataTestImplementation::New();
 	newBaseData->CopyInformation(m_baseDataImpl);
 	CPPUNIT_ASSERT_MESSAGE("Check copying of of Basedata Data Object!", newBaseData->GetTimeGeometry()->CountTimeSteps() != 5);
-}
+  }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkBaseData)
 

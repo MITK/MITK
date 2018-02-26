@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
+#include <mitkImageToItk.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
@@ -822,6 +823,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
         CasterType::Pointer caster = CasterType::New();
         caster->SetInput(m_InputImages.at(0));
+        caster->SetCopyMemFlag(true);
         caster->Update();
         mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
         m_TrackingHandler = new mitk::TrackingHandlerPeaks();
@@ -891,6 +893,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput(dynamic_cast<mitk::PeakImage*>(m_Controls->m_PriorImageBox->GetSelectedNode()->GetData()));
+    caster->SetCopyMemFlag(true);
     caster->Update();
     mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
     mitk::TrackingDataHandler* trackingPriorHandler = new mitk::TrackingHandlerPeaks();
@@ -902,7 +905,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     trackingPriorHandler->SetFlipZ(m_Controls->m_FlipZBox->isChecked());
     trackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
     trackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
-    trackingPriorHandler->SetAngularThreshold(0.0);
 
     m_Tracker->SetTrackingPriorHandler(trackingPriorHandler);
     m_Tracker->SetTrackingPriorWeight(m_Controls->m_PriorWeightBox->value());

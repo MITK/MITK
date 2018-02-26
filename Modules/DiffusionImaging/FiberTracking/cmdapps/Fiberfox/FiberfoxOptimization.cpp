@@ -168,7 +168,7 @@ void ProposeDiffusivities(mitk::DiffusionSignalModel<>* signalModel, double temp
     mitk::TensorModel<>* m = dynamic_cast<mitk::TensorModel<>*>(signalModel);
     m->SetDiffusivity1(UpdateDiffusivity(m->GetDiffusivity1(), temperature));
     double new_d2 = UpdateDiffusivity(m->GetDiffusivity2(), temperature);
-    while (m->GetDiffusivity1()*0.9<new_d2)
+    while (m->GetDiffusivity1()*0.2<new_d2)
       new_d2 = UpdateDiffusivity(m->GetDiffusivity2(), temperature);
     m->SetDiffusivity2(new_d2);
     m->SetDiffusivity3(new_d2);

@@ -200,6 +200,7 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
 
   // store feature pixel values in a vigra data type
   vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->GetNumFeatures()) );
+  featureData.init(0.0);
   typename DwiFeatureImageType::PixelType dwiFeaturePixel = mitk::imv::GetImageValue< typename DwiFeatureImageType::PixelType >(pos, m_Interpolate, m_DwiFeatureImageInterpolator);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];

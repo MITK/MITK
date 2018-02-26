@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <TrackingHandlers/mitkTrackingDataHandler.h>
 #include <MitkFiberTrackingExports.h>
 #include <mitkFiberBundle.h>
+#include <mitkPeakImage.h>
 
 namespace itk{
 
@@ -129,7 +130,9 @@ public:
   itkSetMacro( StopTracking, bool )
   itkSetMacro( InterpolateMasks, bool )
   itkSetMacro( TrialsPerSeed, unsigned int )          ///< When using probabilistic tractography, each seed point is used N times until a valid streamline that is compliant with all thresholds etc. is found
-
+  itkSetMacro( TrackingPriorWeight, float)            ///< Weight between prior and data [0-1]. One mean tracking only on the prior peaks, zero only on the data.
+  itkSetMacro( TrackingPriorAsMask, bool)             ///< If true, data directions in voxels where prior directions are invalid are set to zero
+  itkSetMacro( IntroduceDirectionsFromPrior, bool)    ///< If false, prior voxels with invalid data voxel are ignored
 
   ///< Use manually defined points in physical space as seed points instead of seed image
   void SetSeedPoints( const std::vector< itk::Point<float> >& sP) {
@@ -147,6 +150,8 @@ public:
 
   std::string GetStatusText();
 
+  void SetTrackingPriorHandler(mitk::TrackingDataHandler *TrackingPriorHandler);
+
 protected:
 
   void GenerateData() override;
@@ -159,7 +164,7 @@ protected:
   void GetSeedPointsFromSeedImage();
   void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
   float FollowStreamline(itk::Point<float, 3> start_pos, vnl_vector_fixed<float,3> dir, FiberType* fib, DirectionContainer* container, float tractLength, bool front, bool& exclude);       ///< Start streamline in one direction.
-  vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
+  vnl_vector_fixed<float,3> GetNewDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
   std::vector< vnl_vector_fixed<float,3> > CreateDirections(int NPoints);
 
@@ -231,6 +236,13 @@ protected:
   itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::Pointer   m_ExclusionInterpolator;
   bool                                                                     m_SeedImageSet;
   bool                                                                     m_TargetImageSet;
+
+
+  // Directional priors
+  bool                                        m_IntroduceDirectionsFromPrior;
+  bool                                        m_TrackingPriorAsMask;
+  float                                       m_TrackingPriorWeight;
+  mitk::TrackingDataHandler*                  m_TrackingPriorHandler;
 
 private:
 

@@ -42,9 +42,9 @@ mitk::USTelemedImageSource::~USTelemedImageSource( )
   SAFE_RELEASE(m_DepthProperties);
 }
 
-void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
+void mitk::USTelemedImageSource::GetNextRawImage(std::vector<mitk::Image::Pointer>& imageVector)
 {
-  if ( image.IsNull() ) { image = mitk::Image::New(); }
+  if (imageVector.empty() ) { imageVector.push_back( mitk::Image::New()); }
 
   //get the actual resolution to check if it changed. We have to do this every time because the geometry takes a few frames to adapt
   Usgfw2Lib::tagImageResolution resolutionInMetersActual;
@@ -66,10 +66,10 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     m_ImageMutex->Lock();
 
     // copy contents of the given image into the member variable
-    image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+    imageVector.at(0)->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
-    image->SetSlice(inputReadAccessor.GetData());
-    image->SetGeometry(m_Image->GetGeometry());
+    imageVector.at(0)->SetSlice(inputReadAccessor.GetData());
+    imageVector.at(0)->SetGeometry(m_Image->GetGeometry());
 
     m_ImageMutex->Unlock();
   }

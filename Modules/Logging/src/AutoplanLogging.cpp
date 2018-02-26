@@ -17,6 +17,8 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/locale.hpp>
 
+#include <boost/algorithm/string.hpp>
+
 // boost log
 #include <boost/log/expressions.hpp>
 #include <boost/log/attributes.hpp>
@@ -46,12 +48,21 @@ namespace
 {
   const char TIME_STAMP_FORMAT[] = "%Y-%m-%d %H:%M:%S";
 
-  std::string MessageToUTF8(const boost::log::value_ref<std::string>& message)
+  // convert to UTF8, escape slashes
+  std::string MessageForLogstash(const boost::log::value_ref<std::string>& message)
   {
+    if (!message) {
+      return std::string();
+    }
+
+    std::string msg = *message;
+    boost::replace_all(msg, "\\", "\\\\");
+    boost::replace_all(msg, "\n", "\\n");
+
 #ifdef _WIN32
-    return message ? Utilities::convertLocalToUTF8(*message) : std::string();
+    return Utilities::convertLocalToUTF8(msg);
 #else
-    return message ? *message : std::string();
+    return msg;
 #endif
   }
 
@@ -210,36 +221,24 @@ namespace Logger
 
     if (Options::get().filelog) {
       boost::shared_ptr< file_sink > sink(new file_sink(
-        boost::log::keywords::file_name = Options::get().logsPath + "/%Y%m%d_%H%M%S_%5N.xml",
+        boost::log::keywords::file_name = Options::get().logsPath + "/%Y%m%d_%H%M%S_%5N.json",
         boost::log::keywords::rotation_size = 16384
-        ));
+      ));
       sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
         boost::log::keywords::target = Options::get().logsPath,     /*< the target directory >*/
         boost::log::keywords::max_size = 16 * 1024 * 1024,          /*< maximum total size of the stored files, in bytes >*/
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
-        ));
+      ));
       sink->set_formatter(
-        boost::log::expressions::format("<record id=\"%1%\" timestamp=\"%2%\" severity=\"%6%\" host=\"%4%\" user=\"%5%\" source=\"%7%\" fullname=\"%8%\" organization=\"%9%\">%3%</record>")
-        % boost::log::expressions::attr< unsigned int >("RecordID")
-        % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
-        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
+        boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
+        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
         % boost::log::trivial::severity
         % boost::log::expressions::attr<std::string>("Source")
         % boost::log::expressions::attr<std::string>("FullName")
         % boost::log::expressions::attr<std::string>("Organization")
-        );
-
-      auto write_header = [](boost::log::sinks::text_file_backend::stream_type& file) {
-        file << "<?xml version=\"1.0\"?>\n<log>\n";
-      };
-      auto write_footer = [](boost::log::sinks::text_file_backend::stream_type& file) {
-        file << "</log>\n";
-      };
-      /// Set header and footer writing functors
-      sink->locked_backend()->set_open_handler(write_header);
-      sink->locked_backend()->set_close_handler(write_footer);
+      );
 
       /// Add the sink to the core
       boost::log::core::get()->add_sink(sink);
@@ -256,16 +255,13 @@ namespace Logger
         stream->connect(Options::get().iphost, Options::get().ipport);
       });
 
-      //not sure if we should even wait here
-      //m_TaskGroup.WaitAll();
-
       backend->add_stream(stream);
       backend->auto_flush(true);
 
       boost::shared_ptr< ostream_sink > sink2(new ostream_sink(backend));
       sink2->set_formatter(
         boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
-        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageToUTF8, boost::log::expressions::attr<std::string>("Message"))]
+        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
         % boost::log::trivial::severity

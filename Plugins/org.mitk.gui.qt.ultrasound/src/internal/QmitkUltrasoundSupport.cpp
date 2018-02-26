@@ -138,6 +138,7 @@ void QmitkUltrasoundSupport::UpdateImage()
         nodeName << "US Viewing Stream - Image " << i;
         m_Node.at(i)->SetName(nodeName.str());
         m_Node.at(i)->SetData(curOutput);
+        m_Node.at(i)->Modified();
       }
       // if the geometry changed: reinitialize the ultrasound image
       if ((i==0) && (m_OldGeometry.IsNotNull()) &&
@@ -179,6 +180,9 @@ void QmitkUltrasoundSupport::UpdateImage()
 
 void QmitkUltrasoundSupport::RenderImage2d()
 {
+  if (!m_Controls.m_Update2DView->isChecked())
+    return;
+
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
   m_FrameCounter2d++;
   if (m_FrameCounter2d >= 10)
@@ -193,6 +197,9 @@ void QmitkUltrasoundSupport::RenderImage2d()
 
 void QmitkUltrasoundSupport::RenderImage3d()
 {
+  if (!m_Controls.m_Update3DView->isChecked())
+    return;
+
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
   m_FrameCounter3d++;
   if (m_FrameCounter3d >= 10)

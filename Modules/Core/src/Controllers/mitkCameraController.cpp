@@ -211,8 +211,9 @@ void mitk::CameraController::MoveBy(const mitk::Vector2D &moveVectorInMM)
   AdjustConstrainedCameraPosition(nextCameraPos);
   this->GetRenderer()->GetCurrentWorldPlaneGeometry()->Map(nextCameraPos, worldPoint);
 
+  Vector3D cameraDir = camera->GetDirectionOfProjection();
   camera->SetFocalPoint(worldPoint.GetDataPointer());
-  worldPoint -= Vector3D(camera->GetDirectionOfProjection()) * camera->GetDistance();
+  worldPoint -= cameraDir * camera->GetDistance();
   camera->SetPosition(worldPoint.GetDataPointer());
 
   this->Modified();
@@ -248,8 +249,9 @@ void mitk::CameraController::Zoom(ScalarType factor, const Point2D& zoomPointInM
    
     vtkCamera* camera = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
 
+    Vector3D cameraDir = Vector3D(camera->GetDirectionOfProjection());
     camera->SetFocalPoint(worldPoint.GetDataPointer());
-    worldPoint -= Vector3D(camera->GetDirectionOfProjection()) * camera->GetDistance();
+    worldPoint -= cameraDir * camera->GetDistance();
     camera->SetPosition(worldPoint.GetDataPointer());
   }
 }

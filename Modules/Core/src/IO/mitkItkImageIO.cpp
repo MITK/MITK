@@ -571,8 +571,8 @@ namespace mitk
         ioRegion.SetIndex(i, image->GetLargestPossibleRegion().GetIndex(i));
       }
 
-      // dont use compression because it takes rediculusly long
-      m_ImageIO->UseCompressionOff();
+      // use compression if available
+      m_ImageIO->UseCompressionOn();
 
       m_ImageIO->SetIORegion(ioRegion);
       m_ImageIO->SetFileName(path);

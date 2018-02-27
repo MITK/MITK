@@ -103,7 +103,7 @@ protected:
   void CreateControlWidgets();
   void RemoveControlWidgets();
 
-  Ui::UltrasoundSupportControls m_Controls;
+  Ui::UltrasoundSupportControls* m_Controls;
 
   QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
   QmitkUSControlsBModeWidget*   m_ControlBModeWidget;

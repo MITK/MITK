@@ -86,7 +86,7 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 void vtkMitkRectangleProp::UpdateRectangle()
 {
   vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
-  float offset = (GetProperty()->GetLineWidth()-0.5);
+  float offset = (GetProperty()->GetLineWidth()-1.);
   float wLine = m_OriginX+m_Width-1;
   float hLine = m_OriginY+m_Height-1;
   float offX = m_OriginX+offset;

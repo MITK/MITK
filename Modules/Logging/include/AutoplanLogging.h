@@ -80,7 +80,8 @@ namespace Logger
       bool consolelog;
       bool filelog;
       bool tcplog;
-      bool datastoragelog; // true for test
+      bool datastoragelog;
+      bool tcpdump;
 
       static Options& get();
 

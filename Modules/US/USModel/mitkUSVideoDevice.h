@@ -124,7 +124,7 @@ namespace mitk {
     */
     bool GetIsSourceFile();
 
-    itkGetMacro(Image, mitk::Image::Pointer);
+    itkGetMacro(ImageVector, std::vector<mitk::Image::Pointer>);
     itkGetMacro(DeviceID, int);
     itkGetMacro(FilePath, std::string);
   protected:

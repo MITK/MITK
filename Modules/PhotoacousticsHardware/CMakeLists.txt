@@ -1,9 +1,9 @@
 if(WIN32)
 
   option(MITK_USE_GALIL_HARDWARE "Enable support for OPOTEK Lasers" OFF)
-  option(MITK_USE_OPHIR_PRYO_HARDWARE "Enable support for Ophir Pyroelectrical Sensors" OFF)
+  option(MITK_USE_OPHIR_PYRO_HARDWARE "Enable support for Ophir Pyroelectrical Sensors" OFF)
 
-  if(MITK_USE_OPHIR_PRYO_HARDWARE)
+  if(MITK_USE_OPHIR_PYRO_HARDWARE)
     set(MITK_OPHIR_API_PATH "" CACHE PATH "Path to Ophir API lib.")
   endif()
 

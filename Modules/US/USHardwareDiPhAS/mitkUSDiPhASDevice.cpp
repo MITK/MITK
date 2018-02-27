@@ -23,10 +23,13 @@ mitk::USDiPhASDevice::USDiPhASDevice(std::string manufacturer, std::string model
   m_ControlInterfaceCustom(mitk::USDiPhASCustomControls::New(this)),
   m_IsRunning(false),
   m_BurstHalfwaveClockCount(7),
-  m_Interleaved(true)
+  m_Interleaved(true)  
 {
-  SetNumberOfOutputs(1);
+  m_NumberOfOutputs = 2;
+  this->SetNumberOfIndexedOutputs(m_NumberOfOutputs);
+
   SetNthOutput(0, this->MakeOutput(0));
+  SetNthOutput(1, this->MakeOutput(1));
 }
 
 mitk::USDiPhASDevice::~USDiPhASDevice()

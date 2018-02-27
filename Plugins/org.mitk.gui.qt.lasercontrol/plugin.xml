@@ -6,7 +6,7 @@
           name="OPO Laser Control"
           category="Photoacoustics"
           class="OPOLaserControl"
-          icon="resources/iconLaser.xpm" />
+          icon="resources/iconLaserControl.svg" />
   </extension>
 
 </plugin>

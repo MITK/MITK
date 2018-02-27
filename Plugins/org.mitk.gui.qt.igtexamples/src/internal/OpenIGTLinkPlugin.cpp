@@ -50,8 +50,8 @@ void OpenIGTLinkPlugin::CreateQtPartControl(QWidget *parent)
 void OpenIGTLinkPlugin::UpdatePipeline()
 {
   m_NavigationDataObjectVisualizationFilter->Update();
-  mitk::Image::Pointer image2d = m_ImageFilter2D->GetNextImage();
-  mitk::Image::Pointer image3d = m_ImageFilter3D->GetNextImage();
+  mitk::Image::Pointer image2d = m_ImageFilter2D->GetNextImage().at(0);
+  mitk::Image::Pointer image3d = m_ImageFilter3D->GetNextImage().at(0);
 
   m_Image2dNode->SetName("US Image Stream");
   m_Image2dNode->SetData(image2d);

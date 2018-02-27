@@ -47,14 +47,46 @@ class mitkExceptionTestSuite :  public itk::Object,  public mitk::TestFixture
 	CPPUNIT_TEST_SUITE(mitkExceptionTestSuite);
 
 	MITK_TEST(TestExceptionConstructor_Success);
-	MITK_TEST(TestExceptionMessageStream_Success);
+	MITK_TEST(TestSpecializedExceptionConstructor_Success);
+
+	MITK_TEST(TestExceptionMessageStreamAddingString_Success);
+	MITK_TEST(TestExceptionMessageStreamAddingSingleChars_Success);
+	MITK_TEST(TestExceptionMessageStreamAddingObject_Success);
+	MITK_TEST(TestSpecializedExceptionMessageStreamAddingString);
 	MITK_TEST(TestExceptionMessageStreamThrowing_Success);
-	MITK_TEST(TestMitkThrowMacro_Success);
-	MITK_TEST(TestRethrowInformation_Success);
+
+	MITK_TEST(TestMitkThrowMacroThrowing_Success);
+	MITK_TEST(TestMitkThrowMacroMessage_Success);
+	MITK_TEST(TestMitkThrowMacroException_Success);
+	MITK_TEST(TestMitkThrowMacroSpezcializedException);
+
+	MITK_TEST(TestGetNumberOfRethrows_Success);
+
+	MITK_TEST(TestGetRethrowDataWithNegativNumber_Success);
+	MITK_TEST(TestGetRethrowDataWithNumberZero_Success);
+	MITK_TEST(TestGetRethrowDataWithNumberOne_Success);
+
+	MITK_TEST(TestAddRethrowData_Success);
+
+	MITK_TEST(TestFirstRethrowDataAreStoredProperly_Success);
+	MITK_TEST(TestSecondRethrowDataAreStoredProperly_Success);
+
 	MITK_TEST(TestRethrowMacro_Success);
 
 	CPPUNIT_TEST_SUITE_END();
-	
+
+private:
+	bool m_ExceptionThrown;
+
+	std::string m_MessageText;
+	std::string m_Message;
+	std::string m_File;
+
+	int m_Line;
+
+	mitk::Exception m_E = mitk::Exception("test.cpp", 155, "", "");
+	mitk::Exception m_MyException = mitk::Exception("testfile.cpp", 111, "testmessage");
+
 public:
 	mitkClassMacroItkParent(mitkExceptionTestSuite, itk::Object);
 	itkFactorylessNewMacro(Self) itkCloneMacro(Self)
@@ -102,61 +134,78 @@ public:
 	
 	void setUp()
 	{
-
+	   m_ExceptionThrown = false;
+	   m_MessageText = "";
+	   m_Message = "invalid";
+	   m_File = "invalid";
+	   m_Line = -1;
 	}
 
 	void tearDown()
 	{
-
+		m_ExceptionThrown = false;
+		m_MessageText = "";
+		m_Message = "";
+		m_File = "";
+		m_Line = 0;
 	}
 
-    void TestExceptionConstructor_Success()
+	void TestExceptionConstructor_Success()
 	{
-		bool exceptionThrown = false;
 		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		try
 		{
-		 myExceptionTestObject->throwExceptionManually();
+			myExceptionTestObject->throwExceptionManually();
 		}
 		catch (mitk::Exception)
 		{
-			exceptionThrown = true;
+			m_ExceptionThrown = true;
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing constructor of mitkException", exceptionThrown);
-	
-		exceptionThrown = false;
+		CPPUNIT_ASSERT_MESSAGE("Testing constructor of mitkException", m_ExceptionThrown);
+	}
+
+	void TestSpecializedExceptionConstructor_Success()
+	{
+		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		try
 		{
 			myExceptionTestObject->throwSpecializedExceptionManually();
 		}
 		catch (SpecializedTestException)
 		{
-			exceptionThrown = true;
+			m_ExceptionThrown = true;
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing constructor specialized exception (deriving from mitkException)", exceptionThrown);
+		CPPUNIT_ASSERT_MESSAGE("Testing constructor specialized exception (deriving from mitkException)", m_ExceptionThrown);
 	}
 	
 
-
-	void TestExceptionMessageStream_Success()
+	//##### this methods are ONLY to test the streaming operators of the exceptions and
+	//##### NO code example. Please do not instantiate exceptions by yourself in normal code!
+	//##### Normally exceptions should only be thrown by using the exception macro!
+	void TestExceptionMessageStreamAddingString_Success()
 	{
-		//##### this method is ONLY to test the streaming operators of the exceptions and
-		//##### NO code example. Please do not instantiate exceptions by yourself in normal code!
-		//##### Normally exceptions should only be thrown by using the exception macro!
-		mitk::Exception myException = mitk::Exception("testfile.cpp", 111, "testmessage");
-		myException << " and additional stream";
-		CPPUNIT_ASSERT_MESSAGE("Testing mitkException message stream (adding std::string)", myException.GetDescription() == std::string("testmessage and additional stream"));
+		m_MyException << " and additional stream";
+		CPPUNIT_ASSERT_MESSAGE("Testing mitkException message stream (adding std::string)", m_MyException.GetDescription() == std::string("testmessage and additional stream"));
+	}
+
+	void TestExceptionMessageStreamAddingSingleChars_Success()
+	{
+		m_MyException.SetDescription("testmessage2");
+		m_MyException << ' ' << 'a' << 'n' << 'd' << ' ' << 'c' << 'h' << 'a' << 'r' << 's';
+		CPPUNIT_ASSERT_MESSAGE("Testing mitkException message stream (adding single chars)", m_MyException.GetDescription() == std::string("testmessage2 and chars"));
+	}
 	
-		myException.SetDescription("testmessage2");
-		myException << ' ' << 'a' << 'n' << 'd' << ' ' << 'c' << 'h' << 'a' << 'r' << 's';
-		CPPUNIT_ASSERT_MESSAGE("Testing mitkException message stream (adding single chars)", myException.GetDescription() == std::string("testmessage2 and chars"));
-	
-		myException.SetDescription("testmessage3");
-		myException << myException; // adding the object itself makes no sense but should work
-		CPPUNIT_ASSERT_MESSAGE("Testing mitkException message stream (adding object)", myException.GetDescription() != std::string(""));
-	
+	void TestExceptionMessageStreamAddingObject_Success()
+	{
+		m_MyException.SetDescription("testmessage3");
+		m_MyException << m_MyException; // adding the object itself makes no sense but should work
+		CPPUNIT_ASSERT_MESSAGE("Testing mitkException message stream (adding object)", m_MyException.GetDescription() != std::string(""));
+	}
+
+	void TestSpecializedExceptionMessageStreamAddingString()
+	{
 		SpecializedTestException mySpecializedException =
-			SpecializedTestException("testfile.cpp", 111, "testmessage", "test");
+		SpecializedTestException("testfile.cpp", 111, "testmessage", "test");
 		mySpecializedException << " and additional stream";
 		CPPUNIT_ASSERT_MESSAGE("Testing specialized exception message stream (adding std::string)", 
 			mySpecializedException.GetDescription() == std::string("testmessage and additional stream"));
@@ -164,7 +213,6 @@ public:
 	
 	void TestExceptionMessageStreamThrowing_Success()
 	{
-		bool exceptionThrown = false;
 		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		std::string thrownMessage = "";
 		try
@@ -174,157 +222,144 @@ public:
 		catch (mitk::Exception &e)
 		{
 			 thrownMessage = e.GetDescription();
-			 exceptionThrown = true;
+			 m_ExceptionThrown = true;
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing throwing and streaming of mitk::Exception together.", exceptionThrown && (thrownMessage == std::string("message1 and message2")));
+		CPPUNIT_ASSERT_MESSAGE("Testing throwing and streaming of mitk::Exception together.", m_ExceptionThrown && (thrownMessage == std::string("message1 and message2")));
 	}
 	
-	void TestMitkThrowMacro_Success()
+	void TestMitkThrowMacroThrowing_Success()
 	{
-		bool exceptionThrown = false;
 		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
-	
 		// case 1: test throwing
-	
 		try
 		{
-			 myExceptionTestObject->throwExceptionWithThrowMacro();
+			myExceptionTestObject->throwExceptionWithThrowMacro();
 		}
 		catch (mitk::Exception)
 		{
-			exceptionThrown = true;
+			m_ExceptionThrown = true;
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing mitkThrow()", exceptionThrown);
-	
+		CPPUNIT_ASSERT_MESSAGE("Testing mitkThrow()", m_ExceptionThrown);
+	}
+
+	void TestMitkThrowMacroMessage_Success()
+	{
+		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 2: test message text
-	
-		exceptionThrown = false;
-		std::string messageText = "";
-	
 		try
 		{
 			myExceptionTestObject->throwExceptionWithThrowMacro("test123");
 		}
 		catch (mitk::Exception &e)
 		{
-			exceptionThrown = true;
-			messageText = e.GetDescription();
+			m_ExceptionThrown = true;
+			m_MessageText = e.GetDescription();
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing message test of mitkThrow()", (exceptionThrown && (messageText == "test123")));
-	
+		CPPUNIT_ASSERT_MESSAGE("Testing message test of mitkThrow()", (m_ExceptionThrown && (m_MessageText == "test123")));
+	}
+
+	void TestMitkThrowMacroException_Success()
+	{
+		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 3: specialized exception / command mitkThrow(mitk::Exception)
-	
-		exceptionThrown = false;
-		messageText = "";
-	
 		try
 		{
 			myExceptionTestObject->throwSpecializedExceptionWithThrowMacro("test123");
 		}
 		catch (mitk::Exception &e)
 		{
-			exceptionThrown = true;
-			messageText = e.GetDescription();
+			m_ExceptionThrown = true;
+			m_MessageText = e.GetDescription();
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing special exception with mitkThrow(mitk::Exception)", exceptionThrown && messageText == "test123");
-	
+		CPPUNIT_ASSERT_MESSAGE("Testing special exception with mitkThrow(mitk::Exception)", m_ExceptionThrown && m_MessageText == "test123");
+	}
+
+	void TestMitkThrowMacroSpezcializedException()
+	{
+		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 4: specialized exception / command mitkThrow(mitk::SpecializedException)
-	
-		exceptionThrown = false;
-		messageText = "";
-	
 		try
 		{
 			myExceptionTestObject->throwSpecializedExceptionWithThrowMacro2("test123");
 		}
 		catch (SpecializedTestException &e)
 		{
-			exceptionThrown = true;
-			messageText = e.GetDescription();
+			m_ExceptionThrown = true;
+			m_MessageText = e.GetDescription();
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing special exception with mitkThrow(mitk::SpecializedException)", exceptionThrown && messageText == "test123");
+		CPPUNIT_ASSERT_MESSAGE("Testing special exception with mitkThrow(mitk::SpecializedException)", m_ExceptionThrown && m_MessageText == "test123");
 	}
 	
-	void TestRethrowInformation_Success()
-	// this method is ONLY to test methods of mitk::Exception and no code example
-	// normally exceptions should only be instantiated and thrown by using the exception macros!
+	//#####  this methods are ONLY to test methods of mitk::Exception and no code example
+	//#####  normally exceptions should only be instantiated and thrown by using the exception macros!
+	void TestGetNumberOfRethrows_Success()
 	{
 		// first: testing rethrow information methods, when no information is stored
-	
 		// case 1.1: method GetNumberOfRethrows()
-		mitk::Exception e = mitk::Exception("test.cpp", 155, "", "");
-		CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfRethrows() with empty rethrow information", e.GetNumberOfRethrows() == 0);
-	
+		CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfRethrows() with empty rethrow information", m_E.GetNumberOfRethrows() == 0);
+	}
+
+	void TestGetRethrowDataWithNegativNumber_Success()
+	{
 		// case 1.2: GetRethrowData() with negative number
-		{
-			std::string file = "invalid";
-			int line = -1;
-			std::string message = "invalid";
-			e.GetRethrowData(-1, file, line, message);
-			CPPUNIT_ASSERT_MESSAGE("Testing GetRethrowData() with invalid rethrow number (negative).", ((file == "") && (line == 0) && (message == "")));
-		}
-	
+		m_E.GetRethrowData(-1, m_File, m_Line, m_Message);
+		CPPUNIT_ASSERT_MESSAGE("Testing GetRethrowData() with invalid rethrow number (negative).", ((m_File == "") && (m_Line == 0) && (m_Message == "")));
+	}
+
+	void TestGetRethrowDataWithNumberZero_Success()
+	{
 		// case 1.3: GetRethrowData() with number 0
-		{
-			std::string file = "invalid";
-			int line = -1;
-			std::string message = "invalid";
-			e.GetRethrowData(0, file, line, message);
-			CPPUNIT_ASSERT_MESSAGE("Testing GetRethrowData() with non-existing rethrow number (0).", ((file == "") && (line == 0) && (message == "")));
-		}
+		m_E.GetRethrowData(0, m_File, m_Line, m_Message);
+		CPPUNIT_ASSERT_MESSAGE("Testing GetRethrowData() with non-existing rethrow number (0).", ((m_File == "") && (m_Line == 0) && (m_Message == "")));
+	}
 	
+	void TestGetRethrowDataWithNumberOne_Success()
+	{
 		// case 1.4: GetRethrowData() with number 1
-		{
-			std::string file = "invalid";
-			int line = -1;
-			std::string message = "invalid";
-			e.GetRethrowData(1, file, line, message);
-			CPPUNIT_ASSERT_MESSAGE("Testing GetRethrowData() with non-existing rethrow number (1).", ((file == "") && (line == 0) && (message == "")));
-		}
-	
+		m_E.GetRethrowData(1, m_File, m_Line, m_Message);
+		CPPUNIT_ASSERT_MESSAGE("Testing GetRethrowData() with non-existing rethrow number (1).", ((m_File == "") && (m_Line == 0) && (m_Message == "")));
+	}
+
+	void TestAddRethrowData_Success()
+	{
 		// second: add rethrow data
-		e.AddRethrowData("test2.cpp", 10, "Rethrow one");
-		CPPUNIT_ASSERT_MESSAGE("Testing adding of rethrow data.", e.GetNumberOfRethrows() == 1);
-		e.AddRethrowData("test3.cpp", 15, "Rethrow two");
-		CPPUNIT_ASSERT_MESSAGE("Testing adding of more rethrow data.", e.GetNumberOfRethrows() == 2);
-	
+		m_E.AddRethrowData("test2.cpp", 10, "Rethrow one");
+		CPPUNIT_ASSERT_MESSAGE("Testing adding of rethrow data.", m_E.GetNumberOfRethrows() == 1);
+		m_E.AddRethrowData("test3.cpp", 15, "Rethrow two");
+		CPPUNIT_ASSERT_MESSAGE("Testing adding of more rethrow data.", m_E.GetNumberOfRethrows() == 2);
+	}
+
+	void TestFirstRethrowDataAreStoredProperly_Success()
+	{
 		// third: test if this rethrow data was stored properly
-		{
-			std::string file = "invalid";
-			int line = -1;
-			std::string message = "invalid";
-			e.GetRethrowData(0, file, line, message);
-			CPPUNIT_ASSERT_MESSAGE("Testing stored information of first rethrow.", ((file == "test2.cpp") && (line == 10) && (message == "Rethrow one")));
-		}
-	
-		{
-			std::string file = "invalid";
-			int line = -1;
-			std::string message = "invalid";
-			e.GetRethrowData(1, file, line, message);
-			CPPUNIT_ASSERT_MESSAGE("Testing stored information of second rethrow.", ((file == "test3.cpp") && (line == 15) && (message == "Rethrow two")));
-		}
+		m_E.AddRethrowData("test2.cpp", 10, "Rethrow one");
+		m_E.GetRethrowData(0, m_File, m_Line, m_Message);
+		CPPUNIT_ASSERT_MESSAGE("Testing stored information of first rethrow.", ((m_File == "test2.cpp") && (m_Line == 10) && (m_Message == "Rethrow one")));
+	}
+
+	void TestSecondRethrowDataAreStoredProperly_Success()
+	{
+		m_E.AddRethrowData("test2.cpp", 10, "Rethrow one");
+		m_E.AddRethrowData("test3.cpp", 15, "Rethrow two");
+		m_E.GetRethrowData(1, m_File, m_Line, m_Message);
+		CPPUNIT_ASSERT_MESSAGE("Testing stored information of second rethrow.", ((m_File == "test3.cpp") && (m_Line == 15) && (m_Message == "Rethrow two")));
 	}
 	
 	void TestRethrowMacro_Success()
 	{
-		bool exceptionThrown = false;
-		std::string message = "";
 		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
-	
 		// case 1: test throwing
-	
 		try
 		{
 			myExceptionTestObject->reThrowExceptionWithReThrowMacro("Test original message.", "Test rethrow message.");
 		}
 		catch (mitk::Exception &e)
 		{
-			message = e.GetDescription();
-			exceptionThrown = true;
+			m_Message = e.GetDescription();
+			m_ExceptionThrown = true;
 		}
-		CPPUNIT_ASSERT_MESSAGE("Testing mitkReThrow()", exceptionThrown);
-		CPPUNIT_ASSERT_MESSAGE("Testing message/descriprion after rethrow.", message == "Test original message.Test rethrow message.");
+		CPPUNIT_ASSERT_MESSAGE("Testing mitkReThrow()", m_ExceptionThrown);
+		CPPUNIT_ASSERT_MESSAGE("Testing message/descriprion after rethrow.", m_Message == "Test original message.Test rethrow message.");
 	}
 };
 

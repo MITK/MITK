@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <iostream>
 
+
 class mitkPointSetLocaleTestSuite : public mitk::TestFixture
 {
 	CPPUNIT_TEST_SUITE(mitkPointSetLocaleTestSuite);
@@ -45,14 +46,14 @@ class mitkPointSetLocaleTestSuite : public mitk::TestFixture
 
 private:
 	typedef std::list<std::string> StringList;
-	StringList m_alllocales;
+	StringList m_AllLocales;
 
-	mitk::PointSet::Pointer m_refPointSet;
-	mitk::Point3D m_refPoint;
+	mitk::PointSet::Pointer m_RefPointSet;
+	mitk::Point3D m_RefPoint;
 
-	mitk::Point3D m_point;
+	mitk::Point3D m_Point;
 
-	mitk::PointSet::Pointer m_pointSet;
+	mitk::PointSet::Pointer m_PointSet;
 
 
 	bool ChangeLocale(const std::string &locale)
@@ -79,13 +80,13 @@ private:
 	{
 		MITK_TEST_OUTPUT(<< "---- Reader Test ---- ");
 
-		m_pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+		m_PointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename)[0].GetPointer());
 
-		if (m_pointSet->GetPointIfExists(0, &m_point))
+		if (m_PointSet->GetPointIfExists(0, &m_Point))
 		{
-			CPPUNIT_ASSERT_MESSAGE("read x correct", fabs(refPoint[0] - m_point[0]) < 0.00001);
-			CPPUNIT_ASSERT_MESSAGE("read y correct", fabs(refPoint[1] - m_point[1]) < 0.00001);
-			CPPUNIT_ASSERT_MESSAGE("read z correct", fabs(refPoint[2] - m_point[2]) < 0.00001);
+			CPPUNIT_ASSERT_MESSAGE("read x correct", fabs(refPoint[0] - m_Point[0]) < 0.00001);
+			CPPUNIT_ASSERT_MESSAGE("read y correct", fabs(refPoint[1] - m_Point[1]) < 0.00001);
+			CPPUNIT_ASSERT_MESSAGE("read z correct", fabs(refPoint[2] - m_Point[2]) < 0.00001);
 		}
 		else
 		{
@@ -98,13 +99,13 @@ private:
 	{
 		MITK_TEST_OUTPUT(<< "---- Writer Test---- ");
 		// create pointset
-		m_refPointSet = mitk::PointSet::New();
-		m_refPointSet->InsertPoint(0, refPoint);
+		m_RefPointSet = mitk::PointSet::New();
+		m_RefPointSet->InsertPoint(0, refPoint);
 
 		std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile("testPointSet_XXXXXX.mps");
 
 		// write point set
-		mitk::IOUtil::Save(m_refPointSet, tmpFilePath);
+		mitk::IOUtil::Save(m_RefPointSet, tmpFilePath);
 
 		std::ifstream stream(tmpFilePath.c_str());
 
@@ -138,32 +139,31 @@ private:
 public:
 	void setUp()
 	{
-		StringList alllocales;
-		m_refPointSet = mitk::PointSet::New();
+		m_RefPointSet = mitk::PointSet::New();
 
 		// create locale list
-		m_alllocales.push_back("de_DE");
-		m_alllocales.push_back("de_DE.utf8");
-		m_alllocales.push_back("de_DE.UTF-8");
-		m_alllocales.push_back("de_DE@euro");
-		m_alllocales.push_back("German_Germany");
+		m_AllLocales.push_back("de_DE");
+		m_AllLocales.push_back("de_DE.utf8");
+		m_AllLocales.push_back("de_DE.UTF-8");
+		m_AllLocales.push_back("de_DE@euro");
+		m_AllLocales.push_back("German_Germany");
 
-		m_refPoint[0] = 32.2946;
-		m_refPoint[1] = -17.7359;
-		m_refPoint[2] = 29.6502;
+		m_RefPoint[0] = 32.2946;
+		m_RefPoint[1] = -17.7359;
+		m_RefPoint[2] = 29.6502;
 	}
 
 	void tearDown()
 	{
-		m_refPoint[0] = 0;
-		m_refPoint[1] = 0;
-		m_refPoint[2] = 0;
+		m_RefPoint[0] = 0;
+		m_RefPoint[1] = 0;
+		m_RefPoint[2] = 0;
 	}
 
 	void TestIfGermanLocaleUsed_Success()
 	{
 		// create reference point set
-		m_refPointSet->SetPoint(0, m_refPoint);
+		m_RefPointSet->SetPoint(0, m_RefPoint);
 
 		// QuickFix for MAC OS X
 		// See for more the Bug #3894 comments
@@ -177,16 +177,16 @@ public:
 		MITK_INFO << "Reference PointSet in " << referenceFilePath;
 
 		// write point set
-		mitk::IOUtil::Save(m_refPointSet, referenceFilePath);
+		mitk::IOUtil::Save(m_RefPointSet, referenceFilePath);
 
 		unsigned int numberOfTestedGermanLocales(0);
-		for (auto iter = m_alllocales.begin(); iter != m_alllocales.end(); ++iter)
+		for (auto iter = m_AllLocales.begin(); iter != m_AllLocales.end(); ++iter)
 		{
 			if (ChangeLocale(*iter))
 			{
 				++numberOfTestedGermanLocales;
-				WriterLocaleTest(m_refPoint, referenceFilePath);
-				ReaderLocaleTest(m_refPoint, referenceFilePath);
+				WriterLocaleTest(m_RefPoint, referenceFilePath);
+				ReaderLocaleTest(m_RefPoint, referenceFilePath);
 			}
 		}
 

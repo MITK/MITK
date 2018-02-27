@@ -152,10 +152,9 @@ public:
 
 	void TestExceptionConstructor_Success()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		try
 		{
-			myExceptionTestObject->throwExceptionManually();
+			this->throwExceptionManually();
 		}
 		catch (mitk::Exception)
 		{
@@ -166,10 +165,9 @@ public:
 
 	void TestSpecializedExceptionConstructor_Success()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		try
 		{
-			myExceptionTestObject->throwSpecializedExceptionManually();
+			this->throwSpecializedExceptionManually();
 		}
 		catch (SpecializedTestException)
 		{
@@ -213,11 +211,10 @@ public:
 	
 	void TestExceptionMessageStreamThrowing_Success()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		std::string thrownMessage = "";
 		try
 		{
-			 myExceptionTestObject->throwExceptionManually("message1", " and message2");
+			 this->throwExceptionManually("message1", " and message2");
 		}
 		catch (mitk::Exception &e)
 		{
@@ -229,11 +226,10 @@ public:
 	
 	void TestMitkThrowMacroThrowing_Success()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 1: test throwing
 		try
 		{
-			myExceptionTestObject->throwExceptionWithThrowMacro();
+			this->throwExceptionWithThrowMacro();
 		}
 		catch (mitk::Exception)
 		{
@@ -244,11 +240,10 @@ public:
 
 	void TestMitkThrowMacroMessage_Success()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 2: test message text
 		try
 		{
-			myExceptionTestObject->throwExceptionWithThrowMacro("test123");
+			this->throwExceptionWithThrowMacro("test123");
 		}
 		catch (mitk::Exception &e)
 		{
@@ -260,11 +255,10 @@ public:
 
 	void TestMitkThrowMacroException_Success()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 3: specialized exception / command mitkThrow(mitk::Exception)
 		try
 		{
-			myExceptionTestObject->throwSpecializedExceptionWithThrowMacro("test123");
+			this->throwSpecializedExceptionWithThrowMacro("test123");
 		}
 		catch (mitk::Exception &e)
 		{
@@ -276,11 +270,10 @@ public:
 
 	void TestMitkThrowMacroSpezcializedException()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 4: specialized exception / command mitkThrow(mitk::SpecializedException)
 		try
 		{
-			myExceptionTestObject->throwSpecializedExceptionWithThrowMacro2("test123");
+			this->throwSpecializedExceptionWithThrowMacro2("test123");
 		}
 		catch (SpecializedTestException &e)
 		{
@@ -347,11 +340,10 @@ public:
 	
 	void TestRethrowMacro_Success()
 	{
-		mitkExceptionTestSuite::Pointer myExceptionTestObject = mitkExceptionTestSuite::New();
 		// case 1: test throwing
 		try
 		{
-			myExceptionTestObject->reThrowExceptionWithReThrowMacro("Test original message.", "Test rethrow message.");
+			this->reThrowExceptionWithReThrowMacro("Test original message.", "Test rethrow message.");
 		}
 		catch (mitk::Exception &e)
 		{
@@ -364,3 +356,4 @@ public:
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkException)
+

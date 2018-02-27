@@ -2,6 +2,8 @@ berry--QCTabBar::tab:selected
 {
   background: #3399cc;
   color: #1d1d1c;
+  font-weight :normal;
+  border: 0px;
 }
 
 berry--QCTabBar QToolButton#TabCloseButton

@@ -1,17 +1,19 @@
 berry--QCTabBar::tab:selected
 {
-  background: #1d1d1c;
+  background: #323231;
   color: #adb1b6;
+   border: 0px;
 }
 
 berry--QCTabBar::tab:selected:hover
 {
   color: #3399cc;
+    border: 0px;
 }
 
 QFrame#ViewFormContentFrame
 {
-  border: 1px solid #1d1d1c
+  border: 1px solid #1d1d1c;
 }
 
 berry--QCTabBar QToolButton

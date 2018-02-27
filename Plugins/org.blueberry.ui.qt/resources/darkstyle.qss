@@ -352,7 +352,6 @@ QMenuBar:focus
   border: 1px solid #3399cc;
 }
 
-QTabWidget:focus,
 QCheckBox:focus,
 QRadioButton:focus,
 QSlider:focus
@@ -866,14 +865,10 @@ QLabel
   border: 1px solid #1d1d1c;
 }
 
-QTabWidget{
-  border: 1px transparent #1d1d1c;
-}
-
 QTabWidget::pane
 {
-  border: 1px solid #1d1d1c;
-  padding: 2px;
+  border: 1px solid #adb1b6;
+  padding: 1px;
   margin: 0px;
 }
 
@@ -883,12 +878,12 @@ QTabBar
   qproperty-drawBase: 0;
   left: 0px;
   border-radius: 0px;
-   border: 1px trasparent #1d1d1c;
+   border: 1px transparent #adb1b6;
 }
 
 QTabBar:focus
 {
-  border: 1px solid #1d1d1c;
+  border: 1px solid #adb1b6;
 }
 
 QTabBar::close-button
@@ -942,10 +937,11 @@ QTabBar::scroller
 /* TOP TABS */
 QTabBar::tab:top
 {
-  font-weight: bold;
-  color:#ffffff;
-  border: 0px solid #1d1d1c;
-  background: #7c7c7a;
+  font-weight: normal;
+  color:#1d1d1c;
+  border: 1px solid #adb1b6;
+  border-bottom: 0px;
+  background: #adb1b6;
   padding: 2px;
   min-width: 150px;
   border-top-left-radius: 0px;
@@ -957,7 +953,7 @@ QTabBar::tab:top:!selected
   color: #adb1b6;
   font-weight: normal;
   background-color: #323231;
-  border: 0px solid #1d1d1c;
+  border: 0px solid #323231;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
@@ -1362,6 +1358,7 @@ QTableCornerButton::section
   background-color: #323231;
   border: 1px transparent #1d1d1c;
   border-radius: 0px;
+  
 }
 
 QToolBox
@@ -1369,23 +1366,36 @@ QToolBox
   color: #adb1b6;
   background-color: #323231;
   padding: 5px;
-  border: 1px transparent #1d1d1c;
+  border: 1px solid #adb1b6;
+  border-bottom: 1px solid #adb1b6;
+
 }
 
 QToolBox::tab
 {
-  color: #ffffff;
+  color:#adb1b6;
   background-color: #323231;
-  border: 1px solid #1d1d1c;
-  border-bottom: 1px solid #1d1d1c;
+  border: 1px solid #adb1b6;
+  border-bottom: 1px solid #adb1b6;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
+   
 }
 
+QToolBox::tab:hover
+{
+color : #3399cc;
+}
 QToolBox::tab:selected
 {
-  font-weight: bold;
-  background-color: #7c7c7a;
+  color :#1d1d1c;
+  font-weight: normal;
+  border: 1px solid #adb1b6;
+  border-bottom: 1px solid #adb1b6;
+  background: #adb1b6;
+  frame: Box;
+  midLineWidth:1;
+  lineWidth:1;
  }
 
 QStatusBar::item

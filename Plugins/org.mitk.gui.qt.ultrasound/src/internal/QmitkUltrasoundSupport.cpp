@@ -111,8 +111,8 @@ void QmitkUltrasoundSupport::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice())); // Change Widget Visibilities
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls->m_NewVideoDeviceWidget, SLOT(CreateNewDevice())); // Init NewDeviceWidget
     connect(m_Controls->m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()));
-    connect(m_Controls->m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
-    connect(m_Controls->m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
+	connect(m_Controls->m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));	
+	connect(m_Controls->m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
     connect(m_Controls->m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone())); // After NewDeviceWidget finished editing
     connect(m_Controls->m_FrameRatePipeline, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit()));
     connect(m_Controls->m_FrameRate2d, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit()));
@@ -164,6 +164,7 @@ void QmitkUltrasoundSupport::UpdateImage()
   m_Device->Modified();
   m_Device->Update();
 
+
   //Only update the view if the image is shown
   if (m_Controls->m_ShowImageStream->isChecked())
   {
@@ -207,13 +208,15 @@ void QmitkUltrasoundSupport::UpdateImage()
     }
   }
 
+
+
   //Update frame counter
   m_FrameCounterPipeline++;
-  if (m_FrameCounterPipeline >= 10)
+  if (m_FrameCounterPipeline >0)
   {
     //compute framerate of pipeline update
     int nMilliseconds = m_Clock.restart();
-    int fps = 10000.0f / (nMilliseconds);
+    int fps = 1000.0 / nMilliseconds;
     m_FPSPipeline = fps;
     m_FrameCounterPipeline = 0;
 
@@ -232,11 +235,11 @@ void QmitkUltrasoundSupport::RenderImage2d()
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
   m_FrameCounter2d++;
-  if (m_FrameCounter2d >= 10)
+  if (m_FrameCounter2d >0)
   {
     //compute framerate of 2d render window update
     int nMilliseconds = m_Clock2d.restart();
-    int fps = 10000.0f / (nMilliseconds);
+    int fps = 1000.0f / (nMilliseconds);
     m_FPS2d = fps;
     m_FrameCounter2d = 0;
   }
@@ -249,11 +252,11 @@ void QmitkUltrasoundSupport::RenderImage3d()
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
   m_FrameCounter3d++;
-  if (m_FrameCounter3d >= 10)
+  if (m_FrameCounter3d >0)
   {
     //compute framerate of 2d render window update
     int nMilliseconds = m_Clock3d.restart();
-    int fps = 10000.0f / (nMilliseconds);
+    int fps = 1000.0f / (nMilliseconds);
     m_FPS3d = fps;
     m_FrameCounter3d = 0;
   }
@@ -290,6 +293,12 @@ void QmitkUltrasoundSupport::OnClickedFreezeButton()
 
 void QmitkUltrasoundSupport::OnChangedActiveDevice()
 {
+	if (m_Controls->m_RunImageTimer->isChecked() == FALSE)
+	{
+		StopTimers();
+		return;
+	}
+
   //clean up and stop timer
   StopTimers();
   this->RemoveControlWidgets();
@@ -503,6 +512,7 @@ void QmitkUltrasoundSupport::LoadUISettings()
 
 void QmitkUltrasoundSupport::StartTimers()
 {
+  m_Clock.start();
   m_UpdateTimer->start();
   if (m_Controls->m_Update2DView->isChecked()) { m_RenderingTimer2d->start(); }
   if (m_Controls->m_Update3DView->isChecked()) { m_RenderingTimer3d->start(); }

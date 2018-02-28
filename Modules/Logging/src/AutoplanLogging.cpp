@@ -48,7 +48,22 @@ namespace
 {
   const char TIME_STAMP_FORMAT[] = "%Y-%m-%d %H:%M:%S";
 
-  // convert to UTF8, escape slashes
+  // convert to UTF8 (req for dumps)
+  std::string MessageToUTF8(const boost::log::value_ref<std::string>& message)
+  {
+    if (!message) {
+      return std::string();
+    }
+
+    std::string msg = *message;
+#ifdef _WIN32
+    return Utilities::convertLocalToUTF8(msg);
+#else
+    return msg;
+#endif
+  }
+
+  // convert to UTF8, escape slashes (req for JSON format)
   std::string MessageForLogstash(const boost::log::value_ref<std::string>& message)
   {
     if (!message) {
@@ -133,8 +148,9 @@ namespace Logger
     // defaults
     consolelog = true;
     filelog = true;
-    tcplog = false;
+    tcplog = true;
     datastoragelog = false;
+    tcpdump = false;
 
 #ifdef _WIN32
     if(const char* ifAppData = std::getenv("LOCALAPPDATA")) {
@@ -213,7 +229,6 @@ namespace Logger
 
   void Log::reinitLogger()
   {
-    boost::log::core::get()->flush();
     boost::log::core::get()->remove_all_sinks();
 
     /// Just return if everything is disabled
@@ -259,16 +274,27 @@ namespace Logger
       backend->auto_flush(true);
 
       boost::shared_ptr< ostream_sink > sink2(new ostream_sink(backend));
-      sink2->set_formatter(
-        boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
-        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
-        % boost::log::expressions::attr<std::string>("ComputerName")
-        % boost::log::expressions::attr<std::string>("UserName")
-        % boost::log::trivial::severity
-        % boost::log::expressions::attr<std::string>("Source")
-        % boost::log::expressions::attr<std::string>("FullName")
-        % boost::log::expressions::attr<std::string>("Organization")
-      );
+
+      // raw json data to TCP
+      if (Options::get().tcpdump) {
+        sink2->set_formatter(
+          boost::log::expressions::format("%1%")
+          % boost::log::expressions::xml_decor
+              [boost::log::expressions::stream << boost::phoenix::bind
+                                                  (&MessageToUTF8, boost::log::expressions::attr<std::string>("Message"))]
+        );
+      } else {
+        sink2->set_formatter(
+          boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
+          % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
+          % boost::log::expressions::attr<std::string>("ComputerName")
+          % boost::log::expressions::attr<std::string>("UserName")
+          % boost::log::trivial::severity
+          % boost::log::expressions::attr<std::string>("Source")
+          % boost::log::expressions::attr<std::string>("FullName")
+          % boost::log::expressions::attr<std::string>("Organization")
+        );
+      }
 
       boost::log::core::get()->add_sink(sink2);
     }
@@ -318,6 +344,7 @@ namespace Logger
     boost::log::core::get()->add_global_attribute("Organization", organizationAttribute);
 
     boost::log::add_common_attributes();
+    boost::log::core::get()->flush();
   }
 
   void Log::setSource(const std::string& src)

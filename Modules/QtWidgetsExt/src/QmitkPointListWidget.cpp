@@ -46,7 +46,7 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
     m_EditAllowed(true),
     m_NodeObserverTag(0),
 	m_TimeSlotDisplay(nullptr)
-	//m_TimeSlotStatus(nullptr)
+
 {
   m_PointListView = new QmitkPointListView();
 

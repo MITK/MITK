@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 
 #include <QPushButton>
+#include <QToolButton>
 
 /*!
  * \brief Widget for regular operations on point sets
@@ -125,6 +126,7 @@ protected slots:
 
 protected:
   void SetupUi();
+  void updateTimeStepStatus();
   void ObserveNewNode(mitk::DataNode *node);
 
   QmitkPointListView *m_PointListView;
@@ -140,11 +142,14 @@ protected:
   QPushButton *m_LoadPointsBtn;
   QPushButton *m_ToggleAddPoint;
   QPushButton *m_AddPoint;
+  QLabel *m_TimeStepDisplay;
 
   mitk::DataInteractor::Pointer m_DataInteractor;
   int m_TimeStep;
   bool m_EditAllowed;
   unsigned long m_NodeObserverTag;
+
+  QmitkPointListModel *m_PointListModel;
 };
 
 #endif

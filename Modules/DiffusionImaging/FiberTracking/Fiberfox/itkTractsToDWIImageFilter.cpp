@@ -1061,14 +1061,15 @@ namespace itk
               if (vol>maxVolume) { maxVolume = vol; }
             }
 
-            // progress report
-            ++disp;
-            unsigned long newTick = 50*disp.count()/disp.expected_count();
-            for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
+#pragma omp critical
             {
-              PrintToLog("*", false, false, false);
+              // progress report
+              ++disp;
+              unsigned long newTick = 50*disp.count()/disp.expected_count();
+              for (unsigned int tick = 0; tick<(newTick-lastTick); ++tick)
+                PrintToLog("*", false, false, false);
+              lastTick = newTick;
             }
-            lastTick = newTick;
           }
         }
 

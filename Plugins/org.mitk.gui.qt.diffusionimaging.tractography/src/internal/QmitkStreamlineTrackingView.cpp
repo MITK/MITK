@@ -426,9 +426,6 @@ void QmitkStreamlineTrackingView::Deactivated()
 void QmitkStreamlineTrackingView::Visible()
 {
   m_Visible = true;
-  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
-  berry::IWorkbenchPart::Pointer nullPart;
-  OnSelectionChanged(nullPart, selection);
 }
 
 void QmitkStreamlineTrackingView::Hidden()
@@ -475,9 +472,6 @@ void QmitkStreamlineTrackingView::OutputStyleSwitched()
 
 void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes )
 {
-  if (!m_Visible)
-    return;
-
   std::vector< mitk::DataNode::Pointer > last_nodes = m_InputImageNodes;
   m_InputImageNodes.clear();
   m_InputImages.clear();
@@ -647,9 +641,7 @@ void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
-  if (m_ThreadIsRunning)
-    return;
-  if (m_InputImages.empty())
+  if (m_ThreadIsRunning || m_InputImages.empty() || !m_Visible)
     return;
   if (m_Controls->m_InteractiveBox->isChecked() && m_SeedPoints.empty())
     return;

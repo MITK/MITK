@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <mitkIOUtil.h>
 
+
 #include <QmitkEditPointDialog.h>
 
 #include <mitkPointSetDataInteractor.h>
@@ -45,7 +46,7 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
     m_TimeStep(0),
     m_EditAllowed(true),
     m_NodeObserverTag(0),
-	m_TimeSlotDisplay(nullptr)
+	m_TimeStepDisplay(nullptr)
 
 {
   m_PointListView = new QmitkPointListView();
@@ -82,7 +83,7 @@ void QmitkPointListWidget::SetupConnections()
   connect(this->m_AddPoint, SIGNAL(clicked()), this, SLOT(OnBtnAddPointManually()));
   connect(this->m_PointListView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(OnListDoubleClick()));
   connect(this->m_PointListView, SIGNAL(SignalPointSelectionChanged()), this, SLOT(OnPointSelectionChanged()));
-  connect(this->m_PointListView->m_TimeStepFaderLabel, SIGNAL(m_PointListView->wheelEvent(QWheelEvent)), this, SLOT(updateTimeSlotStatus()));
+  connect(this->m_PointListView->m_TimeStepFaderLabel, SIGNAL(m_PointListView->wheelEvent(QWheelEvent)), this, SLOT(updateTimeStepStatus()));
 }
 
 void QmitkPointListWidget::SetupUi()
@@ -178,18 +179,18 @@ void QmitkPointListWidget::SetupUi()
   lay2->addWidget(m_LoadPointsBtn);
 
   // setup Labels
-  m_TimeSlotDisplay = new QLabel();
+  m_TimeStepDisplay = new QLabel();
   lay3 = new QHBoxLayout(); 
 
-  m_TimeSlotDisplay->setMaximumSize(50, 15);
+  m_TimeStepDisplay->setMaximumSize(50, 15);
   m_PointListView->m_TimeStepFaderLabel->setMaximumSize(10, 15);
 
   lay3->stretch(true);
   lay3->setAlignment(Qt::AlignLeft);
-  lay3->addWidget(m_TimeSlotDisplay);
+  lay3->addWidget(m_TimeStepDisplay);
   lay3->addWidget(m_PointListView->m_TimeStepFaderLabel);
 
-  m_TimeSlotDisplay->setText("Time Step: ");
+  m_TimeStepDisplay->setText("Time Step: ");
   m_PointListModel = new QmitkPointListModel;
   m_PointListView->m_TimeStepFaderLabel->setText(QString("%1").arg((this->m_PointListModel)->GetTimeStep()));
   
@@ -201,7 +202,7 @@ void QmitkPointListWidget::SetupUi()
   lay1->addLayout(lay3);
 }
 
-void QmitkPointListWidget::updateTimeSlotStatus()
+void QmitkPointListWidget::updateTimeStepStatus()
 {
 	m_PointListView->m_TimeStepFaderLabel = new QLabel(this);
 	m_PointListView->m_TimeStepFaderLabel->setVisible(true);

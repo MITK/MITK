@@ -44,6 +44,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListView : public QListView
 public:
   QmitkPointListView(QWidget *parent = 0);
   ~QmitkPointListView() override;
+  QLabel *m_TimeStepFaderLabel;
 
   /// assign a point set for observation
   void SetPointSetNode(mitk::DataNode *pointSetNode);
@@ -125,7 +126,6 @@ protected:
 
   /// used to position the planes on a selected point
   QmitkStdMultiWidget *m_MultiWidget;
-  QLabel *m_TimeStepFaderLabel;
 };
 
 #endif

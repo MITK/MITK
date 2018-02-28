@@ -176,7 +176,7 @@ public:
 
   void OnAddCurrentTipPositionForVerification();
 
-  void OnDeciveServiceEvent(const ctkServiceEvent event);
+  void OnDeviceServiceEvent(const ctkServiceEvent event);
 
   void OnFreezeClicked();
 

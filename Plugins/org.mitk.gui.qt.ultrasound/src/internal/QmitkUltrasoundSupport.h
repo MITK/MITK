@@ -83,7 +83,7 @@ public:
 
   void OnClickedFreezeButton();
 
-  void OnDeciveServiceEvent(const ctkServiceEvent event);
+  void OnDeviceServiceEvent(const ctkServiceEvent event);
 
   /*
   * \brief This is the main imaging loop that updates the image and is called regularily during the imaging process

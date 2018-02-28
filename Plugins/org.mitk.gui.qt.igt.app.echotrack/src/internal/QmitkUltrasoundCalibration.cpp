@@ -66,7 +66,7 @@ m_USDeviceChanged(this, &QmitkUltrasoundCalibration::OnUSDepthChanged)
   if (pluginContext)
   {
     // to be notified about service event of an USDevice
-    pluginContext->connectServiceListener(this, "OnDeciveServiceEvent",
+    pluginContext->connectServiceListener(this, "OnDeviceServiceEvent",
       QString::fromStdString("(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<mitk::USDevice>() + ")"));
   }
 }
@@ -633,7 +633,7 @@ void QmitkUltrasoundCalibration::OnStopCalibrationProcess()
   m_Controls.m_ToolBox->setCurrentIndex(0);
 }
 
-void QmitkUltrasoundCalibration::OnDeciveServiceEvent(const ctkServiceEvent event)
+void QmitkUltrasoundCalibration::OnDeviceServiceEvent(const ctkServiceEvent event)
 {
   if (m_CombinedModality.IsNull() || event.getType() != ctkServiceEvent::MODIFIED) { return; }
 

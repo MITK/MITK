@@ -443,7 +443,7 @@ void QmitkUltrasoundSupport::RemoveControlWidgets()
 
 void QmitkUltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
-  if (m_Device.IsNull() || event.getType() != us::ServiceEvent::MODIFIED)
+  if (m_Device.IsNull() || event.getType() != ctkServiceEvent::MODIFIED)
   {
     return;
   }

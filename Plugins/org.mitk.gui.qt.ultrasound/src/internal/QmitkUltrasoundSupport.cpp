@@ -54,7 +54,7 @@ QmitkUltrasoundSupport::QmitkUltrasoundSupport()
   if (pluginContext)
   {
     // to be notified about service event of an USDevice
-    pluginContext->connectServiceListener(this, "OnDeciveServiceEvent",
+    pluginContext->connectServiceListener(this, "OnDeviceServiceEvent",
       QString::fromStdString("(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<mitk::USDevice>() + ")"));
   }
 }
@@ -190,7 +190,7 @@ void QmitkUltrasoundSupport::UpdateImage()
       // if the geometry changed: reinitialize the ultrasound image
       if ((i==0) && (m_OldGeometry.IsNotNull()) &&
         (curOutput->GetGeometry() != NULL) &&
-        (!mitk::Equal(m_OldGeometry.GetPointer(), curOutput->GetGeometry(), 0.0001, false))
+        (!mitk::Equal(*(m_OldGeometry.GetPointer()), *(curOutput->GetGeometry()), 0.0001, false))
         )
       {
         mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
@@ -441,9 +441,9 @@ void QmitkUltrasoundSupport::RemoveControlWidgets()
   }
 }
 
-void QmitkUltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
+void QmitkUltrasoundSupport::OnDeviceServiceEvent(const ctkServiceEvent event)
 {
-  if (m_Device.IsNull() || event.getType() != us::ServiceEvent::MODIFIED)
+  if (m_Device.IsNull() || event.getType() != ctkServiceEvent::MODIFIED)
   {
     return;
   }

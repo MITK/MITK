@@ -68,7 +68,7 @@ QmitkUltrasoundSupport::~QmitkUltrasoundSupport()
 
     // Get all active devicesand deactivate them to prevent freeze
     std::vector<mitk::USDevice*> devices = this->m_Controls->m_ActiveVideoDevices->GetAllServices<mitk::USDevice>();
-    for (int i = 0; i < devices.size(); i++)
+    for (size_t i = 0; i < devices.size(); i++)
     {
       mitk::USDevice::Pointer device = devices[i];
       if (device.IsNotNull() && device->GetIsActive())

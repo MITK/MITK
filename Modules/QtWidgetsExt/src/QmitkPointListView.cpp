@@ -47,8 +47,6 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_TimeStepFaderLabel = new QLabel(this);
-  QFont font("Arial", 17);
-  m_TimeStepFaderLabel->setFont(font);
 
   this->setMinimumHeight(40);
 
@@ -247,38 +245,8 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
 
 void QmitkPointListView::fadeTimeStepIn()
 {
-  // Setup Widget
-  QWidget *m_TimeStepFader = new QWidget(this);
-  QHBoxLayout *layout = new QHBoxLayout(m_TimeStepFader);
-
-  int x = (int)(this->geometry().x() + this->width() * 0.6);
-  int y = (int)(this->geometry().y() + this->height() * 0.8);
-  m_TimeStepFader->move(x, y);
-  m_TimeStepFader->resize(60, 55);
-  m_TimeStepFader->setLayout(layout);
-  m_TimeStepFader->setAttribute(Qt::WA_DeleteOnClose);
-
-  layout->addWidget(m_TimeStepFaderLabel);
-  m_TimeStepFaderLabel->setAlignment(Qt::AlignCenter);
-  m_TimeStepFaderLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
-  m_TimeStepFaderLabel->setLineWidth(2);
   m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_PointListModel->GetTimeStep()));
-
-  // give the widget opacity and some colour
-  QPalette pal = m_TimeStepFaderLabel->palette();
-  QColor semiTransparentColor(139, 192, 223, 50);
-  QColor labelTransparentColor(0, 0, 0, 200);
-  pal.setColor(m_TimeStepFaderLabel->backgroundRole(), semiTransparentColor);
-  pal.setColor(m_TimeStepFaderLabel->foregroundRole(), labelTransparentColor);
-  m_TimeStepFaderLabel->setAutoFillBackground(true);
-  m_TimeStepFaderLabel->setPalette(pal);
-
-  // show the widget
-  m_TimeStepFader->show();
-
-  // and start the timer
   m_TimeStepFaderLabel->setVisible(true);
-  QTimer::singleShot(2000, this, SLOT(fadeTimeStepOut()));
 }
 
 void QmitkPointListView::fadeTimeStepOut()

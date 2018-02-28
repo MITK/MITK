@@ -244,6 +244,7 @@ m_Range(1.0)
 {
   SetShortName("deprecated-cooc");
   SetLongName("deprecated-cooccurence");
+  SetFeatureClassName("Deprecated Co-occurence Features");
 }
 
 mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -270,60 +271,6 @@ mitk::GIFCooccurenceMatrix::FeatureNameListType mitk::GIFCooccurenceMatrix::GetF
   FeatureNameListType featureList;
   featureList.push_back("co-occ. Energy Means");
   featureList.push_back("co-occ. Energy Std.");
-  featureList.push_back("co-occ. Entropy Means");
-  featureList.push_back("co-occ. Entropy Std.");
-  featureList.push_back("co-occ. Correlation Means");
-  featureList.push_back("co-occ. Correlation Std.");
-  featureList.push_back("co-occ. InverseDifferenceMoment Means");
-  featureList.push_back("co-occ. InverseDifferenceMoment Std.");
-  featureList.push_back("co-occ. Inertia Means");
-  featureList.push_back("co-occ. Inertia Std.");
-  featureList.push_back("co-occ. ClusterShade Means");
-  featureList.push_back("co-occ. ClusterShade Std.");
-  featureList.push_back("co-occ. ClusterProminence Means");
-  featureList.push_back("co-occ. ClusterProminence Std.");
-  featureList.push_back("co-occ. HaralickCorrelation Means");
-  featureList.push_back("co-occ. HaralickCorrelation Std.");
-  featureList.push_back("co-occ. Autocorrelation Means");
-  featureList.push_back("co-occ. Autocorrelation Std.");
-  featureList.push_back("co-occ. Contrast Means");
-  featureList.push_back("co-occ. Contrast Std.");
-  featureList.push_back("co-occ. Dissimilarity Means");
-  featureList.push_back("co-occ. Dissimilarity Std.");
-  featureList.push_back("co-occ. MaximumProbability Means");
-  featureList.push_back("co-occ. MaximumProbability Std.");
-  featureList.push_back("co-occ. InverseVariance Means");
-  featureList.push_back("co-occ. InverseVariance Std.");
-  featureList.push_back("co-occ. Homogeneity1 Means");
-  featureList.push_back("co-occ. Homogeneity1 Std.");
-  featureList.push_back("co-occ. ClusterTendency Means");
-  featureList.push_back("co-occ. ClusterTendency Std.");
-  featureList.push_back("co-occ. Variance Means");
-  featureList.push_back("co-occ. Variance Std.");
-  featureList.push_back("co-occ. SumAverage Means");
-  featureList.push_back("co-occ. SumAverage Std.");
-  featureList.push_back("co-occ. SumEntropy Means");
-  featureList.push_back("co-occ. SumEntropy Std.");
-  featureList.push_back("co-occ. SumVariance Means");
-  featureList.push_back("co-occ. SumVariance Std.");
-  featureList.push_back("co-occ. DifferenceAverage Means");
-  featureList.push_back("co-occ. DifferenceAverage Std.");
-  featureList.push_back("co-occ. DifferenceEntropy Means");
-  featureList.push_back("co-occ. DifferenceEntropy Std.");
-  featureList.push_back("co-occ. DifferenceVariance Means");
-  featureList.push_back("co-occ. DifferenceVariance Std.");
-  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Means");
-  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Std.");
-  featureList.push_back("co-occ. InverseDifferenceNormalized Means");
-  featureList.push_back("co-occ. InverseDifferenceNormalized Std.");
-  featureList.push_back("co-occ. InverseDifference Means");
-  featureList.push_back("co-occ. InverseDifference Std.");
-  featureList.push_back("co-occ. JointAverage Means");
-  featureList.push_back("co-occ. JointAverage Std.");
-  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Means");
-  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Std.");
-  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Means");
-  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Std.");
   return featureList;
 }
 

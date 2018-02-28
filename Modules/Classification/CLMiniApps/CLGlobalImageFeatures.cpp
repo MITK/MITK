@@ -363,21 +363,24 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
 
 int main(int argc, char* argv[])
 {
-  mitk::GIFImageDescriptionFeatures::Pointer ipCalculator = mitk::GIFImageDescriptionFeatures::New(); // Commented
-  mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New(); //Commented
-  mitk::GIFFirstOrderHistogramStatistics::Pointer firstOrderHistoCalculator = mitk::GIFFirstOrderHistogramStatistics::New(); // Commented
-  mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();   // Commented
-  mitk::GIFVolumetricDensityStatistics::Pointer voldenCalculator = mitk::GIFVolumetricDensityStatistics::New(); // Commented
-  mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New(); // Commented
-  mitk::GIFCooccurenceMatrix2::Pointer cooc2Calculator = mitk::GIFCooccurenceMatrix2::New(); //Commented
-  mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer ngldCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
-  mitk::GIFGreyLevelRunLength::Pointer rlCalculator = mitk::GIFGreyLevelRunLength::New();
-  mitk::GIFGreyLevelSizeZone::Pointer glszCalculator = mitk::GIFGreyLevelSizeZone::New(); // Commented
-  mitk::GIFGreyLevelDistanceZone::Pointer gldzCalculator = mitk::GIFGreyLevelDistanceZone::New(); //Commented
-  mitk::GIFLocalIntensity::Pointer lociCalculator = mitk::GIFLocalIntensity::New(); //Commented
-  mitk::GIFIntensityVolumeHistogramFeatures::Pointer ivohCalculator = mitk::GIFIntensityVolumeHistogramFeatures::New(); // Commented
-  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New(); //Commented
-  mitk::GIFCurvatureStatistic::Pointer curvCalculator = mitk::GIFCurvatureStatistic::New();
+  // Commented : Updated to a common interface, include, if possible, mask is type unsigned short, uses Quantification, Comments
+  //                                 Name follows standard scheme with Class Name::Feature Name
+  // Commented 2: Updated to use automatic inclusion of list of parameters if required.
+  mitk::GIFImageDescriptionFeatures::Pointer ipCalculator = mitk::GIFImageDescriptionFeatures::New(); // Commented 2
+  mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New(); //Commented 2
+  mitk::GIFFirstOrderHistogramStatistics::Pointer firstOrderHistoCalculator = mitk::GIFFirstOrderHistogramStatistics::New(); // Commented 2
+  mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();   // Commented 2
+  mitk::GIFVolumetricDensityStatistics::Pointer voldenCalculator = mitk::GIFVolumetricDensityStatistics::New(); // Commented 2
+  mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New(); // Commented 2
+  mitk::GIFCooccurenceMatrix2::Pointer cooc2Calculator = mitk::GIFCooccurenceMatrix2::New(); //Commented 2
+  mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer ngldCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New(); //Commented 2
+  mitk::GIFGreyLevelRunLength::Pointer rlCalculator = mitk::GIFGreyLevelRunLength::New(); // Commented 2
+  mitk::GIFGreyLevelSizeZone::Pointer glszCalculator = mitk::GIFGreyLevelSizeZone::New(); // Commented 2
+  mitk::GIFGreyLevelDistanceZone::Pointer gldzCalculator = mitk::GIFGreyLevelDistanceZone::New(); //Commented 2
+  mitk::GIFLocalIntensity::Pointer lociCalculator = mitk::GIFLocalIntensity::New(); //Commented 2
+  mitk::GIFIntensityVolumeHistogramFeatures::Pointer ivohCalculator = mitk::GIFIntensityVolumeHistogramFeatures::New(); // Commented 2
+  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New(); //Commented 2
+  mitk::GIFCurvatureStatistic::Pointer curvCalculator = mitk::GIFCurvatureStatistic::New(); //Commented 2
 
   std::vector<mitk::AbstractGlobalImageFeature::Pointer> features;
   features.push_back(volCalculator.GetPointer());
@@ -466,6 +469,7 @@ int main(int argc, char* argv[])
     morphMask = mitk::IOUtil::LoadImage(param.morphPath);
   }
 
+  log << " Check for Dimensions -";
   if ((image->GetDimension() != mask->GetDimension()))
   {
     MITK_INFO << "Dimension of image does not match. ";
@@ -492,7 +496,7 @@ int main(int argc, char* argv[])
     writeDirection = us::any_cast<int>(parsedArgs["output-mode"]);
   }
 
-
+  log << " Check for Resolution -";
   if (param.resampleToFixIsotropic)
   {
     mitk::Image::Pointer newImage = mitk::Image::New();
@@ -514,6 +518,7 @@ int main(int argc, char* argv[])
     }
   }
 
+  log << " Resample if required -";
   if (param.resampleMask)
   {
     mitk::Image::Pointer newMaskImage = mitk::Image::New();
@@ -521,6 +526,7 @@ int main(int argc, char* argv[])
     mask = newMaskImage;
   }
 
+  log << " Check for Equality -";
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetSpacing(), image->GetGeometry(0)->GetSpacing()))
   {
     MITK_INFO << "Not equal Sapcings";
@@ -571,6 +577,7 @@ int main(int argc, char* argv[])
     MITK_INFO << "Slice";
   }
 
+  log << " Configure features -";
   for (auto cFeature : features)
   {
     if (param.defineGlobalMinimumIntensity)
@@ -590,6 +597,7 @@ int main(int argc, char* argv[])
     }
     cFeature->SetParameter(parsedArgs);
     cFeature->SetDirection(direction);
+    cFeature->SetEncodeParameters(param.encodeParameter);
   }
 
   bool addDescription = parsedArgs.count("description");
@@ -627,6 +635,7 @@ int main(int argc, char* argv[])
 
   std::vector<mitk::AbstractGlobalImageFeature::FeatureListType> allStats;
 
+  log << " Begin Processing -";
   while (imageToProcess)
   {
     if (sliceWise)
@@ -659,6 +668,7 @@ int main(int argc, char* argv[])
 
     for (auto cFeature : features)
     {
+      log << " Calculating " << cFeature->GetFeatureClassName() << " -";
       cFeature->SetMorphMask(cMorphMask);
       cFeature->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
     }
@@ -682,6 +692,7 @@ int main(int argc, char* argv[])
     ++currentSlice;
   }
 
+  log << " Process Slicewise -";
   if (sliceWise)
   {
     mitk::AbstractGlobalImageFeature::FeatureListType statMean, statStd;
@@ -738,7 +749,7 @@ int main(int argc, char* argv[])
 
   if (param.useLogfile)
   {
-    log << "Finished calculation";
+    log << "Finished calculation" << std::endl;
     log.close();
   }
   return 0;

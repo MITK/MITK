@@ -105,35 +105,42 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  mitk::BaseData::Pointer data = mitk::IOUtil::Load(parsedArgs["planar"].ToString())[0];
-  mitk::PlanarFigure::Pointer planar = dynamic_cast<mitk::PlanarFigure*>(data.GetPointer());
+  try
+  {
+    mitk::BaseData::Pointer data = mitk::IOUtil::Load(parsedArgs["planar"].ToString())[0];
+    mitk::PlanarFigure::Pointer planar = dynamic_cast<mitk::PlanarFigure*>(data.GetPointer());
 
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
 
-  mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
-  pfMaskGen->SetPlanarFigure(planar);
-  pfMaskGen->SetTimeStep(0);
-  pfMaskGen->SetInputImage(image);
+    mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
+    pfMaskGen->SetPlanarFigure(planar);
+    pfMaskGen->SetTimeStep(0);
+    pfMaskGen->SetInputImage(image);
 
-  mitk::Image::Pointer mask = pfMaskGen->GetMask();
-  mitk::Image::Pointer refImage = pfMaskGen->GetReferenceImage();
-  unsigned int axis = pfMaskGen->GetPlanarFigureAxis();
-  unsigned int slice = pfMaskGen->GetPlanarFigureSlice();
+    mitk::Image::Pointer mask = pfMaskGen->GetMask();
+    mitk::Image::Pointer refImage = pfMaskGen->GetReferenceImage();
+    unsigned int axis = pfMaskGen->GetPlanarFigureAxis();
+    unsigned int slice = pfMaskGen->GetPlanarFigureSlice();
 
-  //itk::Image<unsigned short, 3>::IndexType index;
-  mitk::Image::Pointer fullMask;
-  MaskParameter param;
-  param.slice = slice;
-  param.axis = axis;
-  param.mask = mask;
-  AccessByItk_2(image, CreateNewMask, param, fullMask);
+    //itk::Image<unsigned short, 3>::IndexType index;
+    mitk::Image::Pointer fullMask;
+    MaskParameter param;
+    param.slice = slice;
+    param.axis = axis;
+    param.mask = mask;
+    AccessByItk_2(image, CreateNewMask, param, fullMask);
 
-  std::string saveAs = parsedArgs["output"].ToString();
-  MITK_INFO << "Save as: " << saveAs;
-  mitk::IOUtil::Save(pfMaskGen->GetMask(), saveAs);
-  mitk::IOUtil::Save(fullMask, saveAs);
+    std::string saveAs = parsedArgs["output"].ToString();
+    MITK_INFO << "Save as: " << saveAs;
+    mitk::IOUtil::Save(pfMaskGen->GetMask(), saveAs);
+    mitk::IOUtil::Save(fullMask, saveAs);
 
-  return 0;
+    return 0;
+  }
+  catch (...)
+  {
+    return EXIT_FAILURE;
+  }
 }
 
 #endif

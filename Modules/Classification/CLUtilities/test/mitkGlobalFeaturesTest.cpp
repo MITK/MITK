@@ -112,6 +112,7 @@ static mitk::Image::Pointer GenerateGradientWithDimXImage(unsigned int dimX,
   return mitkImage;
 }
 
+
 class mitkGlobalFeaturesTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkGlobalFeaturesTestSuite  );
@@ -250,8 +251,6 @@ public:
   {
     mitk::GIFGreyLevelRunLength::Pointer calculator = mitk::GIFGreyLevelRunLength::New();
     //calculator->SetHistogramSize(4096);
-    calculator->SetUseCtRange(true);
-    calculator->SetRange(981);
     auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
 
     std::map<std::string, double> results;

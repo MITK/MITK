@@ -76,9 +76,11 @@ namespace mitk
     * \brief Returns a list of the names of all features that are calculated from this class
     */
     virtual FeatureNameListType GetFeatureNames();
+    virtual void AddArguments(mitkCommandLineParser &parser);
 
     virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
+
+    virtual std::string GetCurrentFeatureEncoding() override;
 
   private:
   };

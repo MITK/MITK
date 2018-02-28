@@ -46,12 +46,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Eigen
 #include <Eigen/Dense>
 
+struct GIFVolumetricDensityStatisticsParameters
+{
+  double volume;
+  std::string prefix;
+};
+
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, double volume, mitk::GIFVolumetricDensityStatistics::FeatureListType & featureList)
+CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, GIFVolumetricDensityStatisticsParameters params, mitk::GIFVolumetricDensityStatistics::FeatureListType & featureList)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
+
+  double volume = params.volume;
+  std::string prefix = params.prefix;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
@@ -117,9 +126,9 @@ void
     ++maskA;
   }
 
-  featureList.push_back(std::make_pair("Morphological Density::Volume integrated intensity", volume* mean));
-  featureList.push_back(std::make_pair("Morphological Density::Volume Moran's I index", Nv / w_ij * moranA / moranB));
-  featureList.push_back(std::make_pair("Morphological Density::Volume Geary's C measure", ( Nv -1 ) / 2 / w_ij * geary/ moranB));
+  featureList.push_back(std::make_pair(prefix + "Volume integrated intensity", volume* mean));
+  featureList.push_back(std::make_pair(prefix + "Volume Moran's I index", Nv / w_ij * moranA / moranB));
+  featureList.push_back(std::make_pair(prefix + "Volume Geary's C measure", ( Nv -1 ) / 2 / w_ij * geary/ moranB));
 }
 
 void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
@@ -286,6 +295,8 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
     return featureList;
   }
 
+  std::string prefix = FeatureDescriptionPrefix();
+
   vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
   vtkSmartPointer<vtkMassProperties> stats = vtkSmartPointer<vtkMassProperties>::New();
   vtkSmartPointer<vtkMassProperties> stats2 = vtkSmartPointer<vtkMassProperties>::New();
@@ -319,7 +330,10 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
   double meshVolume = stats->GetVolume();
   double meshSurf = stats->GetSurfaceArea();
 
-  AccessByItk_3(image, CalculateVolumeDensityStatistic, mask, meshVolume, featureList);
+  GIFVolumetricDensityStatisticsParameters params;
+  params.volume = meshVolume;
+  params.prefix = prefix;
+  AccessByItk_3(image, CalculateVolumeDensityStatistic, mask, params, featureList);
 
   //Calculate center of mass shift
   int xx = mask->GetDimensions()[0];
@@ -462,16 +476,16 @@ mitk::GIFVolumetricDensityStatistics::FeatureListType mitk::GIFVolumetricDensity
   double vd_ch = meshVolume / stats2->GetVolume();
   double ad_ch = meshSurf / stats2->GetSurfaceArea();
 
-  featureList.push_back(std::make_pair("Morphological Density::Volume density axis-aligned bounding box", vd_aabb));
-  featureList.push_back(std::make_pair("Morphological Density::Surface density axis-aligned bounding box", ad_aabb));
-  featureList.push_back(std::make_pair("Morphological Density::Volume density oriented minimum bounding box", meshVolume / vol_mobb));
-  featureList.push_back(std::make_pair("Morphological Density::Surface density oriented minimum bounding box", meshSurf / surf_mobb));
-  featureList.push_back(std::make_pair("Morphological Density::Volume density approx. enclosing ellipsoid", vd_aee));
-  featureList.push_back(std::make_pair("Morphological Density::Surface density approx. enclosing ellipsoid", ad_aee));
-  featureList.push_back(std::make_pair("Morphological Density::Volume density approx. minimum volume enclosing ellipsoid", meshVolume / vol_mvee));
-  featureList.push_back(std::make_pair("Morphological Density::Surface density approx. minimum volume enclosing ellipsoid", meshSurf / surf_mvee));
-  featureList.push_back(std::make_pair("Morphological Density::Volume density convex hull", vd_ch));
-  featureList.push_back(std::make_pair("Morphological Density::Surface density convex hull", ad_ch));
+  featureList.push_back(std::make_pair(prefix + "Volume density axis-aligned bounding box", vd_aabb));
+  featureList.push_back(std::make_pair(prefix + "Surface density axis-aligned bounding box", ad_aabb));
+  featureList.push_back(std::make_pair(prefix + "Volume density oriented minimum bounding box", meshVolume / vol_mobb));
+  featureList.push_back(std::make_pair(prefix + "Surface density oriented minimum bounding box", meshSurf / surf_mobb));
+  featureList.push_back(std::make_pair(prefix + "Volume density approx. enclosing ellipsoid", vd_aee));
+  featureList.push_back(std::make_pair(prefix + "Surface density approx. enclosing ellipsoid", ad_aee));
+  featureList.push_back(std::make_pair(prefix + "Volume density approx. minimum volume enclosing ellipsoid", meshVolume / vol_mvee));
+  featureList.push_back(std::make_pair(prefix + "Surface density approx. minimum volume enclosing ellipsoid", meshSurf / surf_mvee));
+  featureList.push_back(std::make_pair(prefix + "Volume density convex hull", vd_ch));
+  featureList.push_back(std::make_pair(prefix + "Surface density convex hull", ad_ch));
 
   return featureList;
 }
@@ -480,6 +494,7 @@ mitk::GIFVolumetricDensityStatistics::GIFVolumetricDensityStatistics()
 {
   SetLongName("volume-density");
   SetShortName("volden");
+  SetFeatureClassName("Morphological Density");
 }
 
 mitk::GIFVolumetricDensityStatistics::FeatureNameListType mitk::GIFVolumetricDensityStatistics::GetFeatureNames()

@@ -28,18 +28,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL
 #include <limits>
 
-
+struct GIFIntensityVolumeHistogramFeaturesParameters
+{
+  mitk::IntensityQuantifier::Pointer quantifier;
+  std::string prefix;
+};
 
 
 template<typename TPixel, unsigned int VImageDimension>
 static void
-CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::IntensityQuantifier::Pointer quantifier, mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType & featureList)
+CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, GIFIntensityVolumeHistogramFeaturesParameters params, mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType & featureList)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
   typename MaskType::Pointer itkMask = MaskType::New();
   mitk::CastToItkImage(mask, itkMask);
+
+  mitk::IntensityQuantifier::Pointer quantifier = params.quantifier;
+  std::string prefix = params.prefix;
 
   itk::ImageRegionConstIterator<ImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
   itk::ImageRegionConstIterator<MaskType> iterMask(itkMask, itkMask->GetLargestPossibleRegion());
@@ -100,13 +107,13 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   unsigned int index010 = std::ceil(quantifier->GetBins() * 0.1);
   unsigned int index090 = std::floor(quantifier->GetBins() * 0.9);
 
-  featureList.push_back(std::make_pair("Intensity Volume Histogram::Volume fration at 0.10 intensity", hist[index010]));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram::Volume fration at 0.90 intensity", hist[index090]));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram::Intensity at 0.10 volume", intensity010));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram::Intensity at 0.90 volume", intensity090));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram::Difference volume fration at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram::Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
-  featureList.push_back(std::make_pair("Intensity Volume Histogram::Area under IVH curve", auc));
+  featureList.push_back(std::make_pair(prefix + "Volume fration at 0.10 intensity", hist[index010]));
+  featureList.push_back(std::make_pair(prefix + "Volume fration at 0.90 intensity", hist[index090]));
+  featureList.push_back(std::make_pair(prefix + "Intensity at 0.10 volume", intensity010));
+  featureList.push_back(std::make_pair(prefix + "Intensity at 0.90 volume", intensity090));
+  featureList.push_back(std::make_pair(prefix + "Difference volume fration at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
+  featureList.push_back(std::make_pair(prefix + "Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
+  featureList.push_back(std::make_pair(prefix + "Area under IVH curve", auc));
   //featureList.push_back(std::make_pair("Local Intensity Global Intensity Peak", globalPeakValue));
 }
 
@@ -115,13 +122,17 @@ mitk::GIFIntensityVolumeHistogramFeatures::GIFIntensityVolumeHistogramFeatures()
 {
   SetLongName("intensity-volume-histogram");
   SetShortName("ivoh");
+  SetFeatureClassName("Intensity Volume Histogram");
 }
 
 mitk::GIFIntensityVolumeHistogramFeatures::FeatureListType mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
   InitializeQuantifier(image, mask, 1000);
   FeatureListType featureList;
-  AccessByItk_3(image, CalculateIntensityPeak, mask, GetQuantifier(), featureList);
+  GIFIntensityVolumeHistogramFeaturesParameters params;
+  params.quantifier = GetQuantifier();
+  params.prefix = FeatureDescriptionPrefix();
+  AccessByItk_3(image, CalculateIntensityPeak, mask, params, featureList);
   return featureList;
 }
 
@@ -153,5 +164,10 @@ mitk::GIFIntensityVolumeHistogramFeatures::CalculateFeaturesUsingParameters(cons
     featureList.insert(featureList.end(), localResults.begin(), localResults.end());
     MITK_INFO << "Finished calculating local intensity features....";
   }
+}
+
+std::string mitk::GIFIntensityVolumeHistogramFeatures::GetCurrentFeatureEncoding()
+{
+  return QuantifierParameterString();
 }
 

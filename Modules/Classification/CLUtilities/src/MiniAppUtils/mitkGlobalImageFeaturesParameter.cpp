@@ -58,7 +58,7 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   parser.addArgument("bins", "bins", mitkCommandLineParser::Int, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
   parser.addArgument("binsize", "binsize", mitkCommandLineParser::Float, "Int", "Size of bins that is used. If set, it is overwritten by more specific bin count", us::Any());
   parser.addArgument("ignore-mask-for-histogram", "ignore-mask", mitkCommandLineParser::Bool, "Bool", "If the whole image is used to calculate the histogram. ", us::Any());
-
+  parser.addArgument("encode-parameter-in-name", "encode-parameter", mitkCommandLineParser::Bool, "Bool", "If true, the parameters used for each feature is encoded in its name. ", us::Any());
 }
 
 void mitk::cl::GlobalImageFeaturesParameter::ParseParameter(std::map<std::string, us::Any> parsedArgs)
@@ -197,6 +197,7 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseGlobalFeatureParameter(std::ma
   defineGlobalMinimumIntensity = false;
   defineGlobalMaximumIntensity = false;
   defineGlobalNumberOfBins = false;
+  encodeParameter = false;
   if (parsedArgs.count("minimum-intensity"))
   {
     defineGlobalMinimumIntensity = true;
@@ -211,5 +212,9 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseGlobalFeatureParameter(std::ma
   {
     defineGlobalNumberOfBins = true;
     globalNumberOfBins = us::any_cast<int>(parsedArgs["bins"]);
+  }
+  if (parsedArgs.count("encode-parameter-in-name"))
+  {
+    encodeParameter = true;
   }
 }

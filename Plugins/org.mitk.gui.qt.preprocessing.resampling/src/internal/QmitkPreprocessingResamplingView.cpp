@@ -117,7 +117,8 @@ void QmitkPreprocessingResampling::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->btnDoIt), SIGNAL(clicked()),(QObject*) this, SLOT(StartButtonClicked()));
+    connect((QObject*)(m_Controls->btnDoIt), SIGNAL(clicked()), (QObject*) this, SLOT(StartButtonClicked()));
+    connect((QObject*)(m_Controls->buttonExecuteOnMultipleImages), SIGNAL(clicked()), (QObject*) this, SLOT(StartMultipleImagesButtonClicked()));
     connect( (QObject*)(m_Controls->cbParam4), SIGNAL( activated(int) ), this, SLOT( SelectInterpolator(int) ) );
   }
 }
@@ -146,52 +147,63 @@ void QmitkPreprocessingResampling::OnSelectionChanged(berry::IWorkbenchPart::Poi
   //any nodes there?
   if (!nodes.empty())
   {
-  // reset GUI
-  m_Controls->sliceNavigatorTime->setEnabled(false);
-  m_Controls->leImage1->setText(tr("Select an Image in Data Manager"));
+    // reset GUI
+    m_Controls->sliceNavigatorTime->setEnabled(false);
+    m_Controls->leImage1->setText(tr("Select an Image in Data Manager"));
 
-  m_SelectedImageNode->RemoveAllNodes();
-  //get the selected Node
-  mitk::DataNode* _DataNode = nodes.front();
-  *m_SelectedImageNode = _DataNode;
-  //try to cast to image
-  mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
+    m_SelectedNodes.clear();
 
-    //no image
-    if( tempImage.IsNull() || (tempImage->IsInitialized() == false) )
+    for (mitk::DataNode* _DataNode : nodes)
     {
-      m_Controls->leImage1->setText(tr("Not an image."));
-      return;
+      m_SelectedImageNode->RemoveAllNodes();
+      *m_SelectedImageNode = _DataNode;
+      mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
+
+      //no image
+      if (tempImage.IsNull() || (tempImage->IsInitialized() == false))
+      {
+        if (m_SelectedNodes.size() < 1)
+        {
+          m_Controls->leImage1->setText(tr("Not an image."));
+        }
+        continue;
+      }
+
+      //2D image
+      if (tempImage->GetDimension() < 3)
+      {
+        if (m_SelectedNodes.size() < 1)
+        {
+          m_Controls->leImage1->setText(tr("2D images are not supported."));
+        }
+        continue;
+      }
+
+      if (m_SelectedNodes.size() < 1)
+      {
+        m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetNode()->GetName().c_str()));
+        mitk::Vector3D aSpacing = tempImage->GetGeometry()->GetSpacing();
+        std::string text("x-spacing (" + std::to_string(aSpacing[0]) + ")");
+        m_Controls->tlParam1->setText(text.c_str());
+        text = "y-spacing (" + std::to_string(aSpacing[1]) + ")";
+        m_Controls->tlParam2->setText(text.c_str());
+        text = "z-spacing (" + std::to_string(aSpacing[2]) + ")";
+        m_Controls->tlParam3->setText(text.c_str());
+
+        if (tempImage->GetDimension() > 3)
+        {
+          // try to retrieve the TNC (for 4-D Processing )
+          this->InternalGetTimeNavigationController();
+
+          m_Controls->sliceNavigatorTime->setEnabled(true);
+          m_Controls->tlTime->setEnabled(true);
+        }
+      }
+      m_SelectedNodes.push_back(_DataNode);
     }
-
-    //2D image
-    if( tempImage->GetDimension() < 3)
+    if (m_SelectedNodes.size() > 0)
     {
-      m_Controls->leImage1->setText(tr("2D images are not supported."));
-      return;
-    }
-
-    //image
-    m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetNode()->GetName().c_str()));
-    mitk::Vector3D aSpacing = tempImage->GetGeometry()->GetSpacing();
-    std::string text("x-spacing (" + std::to_string(aSpacing[0]) + ")");
-    m_Controls->tlParam1->setText(text.c_str());
-    text = "y-spacing (" + std::to_string(aSpacing[1]) + ")";
-    m_Controls->tlParam2->setText(text.c_str());
-    text = "z-spacing (" + std::to_string(aSpacing[2]) + ")";
-    m_Controls->tlParam3->setText(text.c_str());
-    MITK_INFO << "Spacing of current Image : " << aSpacing;
-//    m_Controls->tlParam1->setText("y-spacing");
-//    m_Controls->tlParam1->setText("z-spacing");
-
-    // button coding
-    if ( tempImage->GetDimension() > 3 )
-    {
-      // try to retrieve the TNC (for 4-D Processing )
-      this->InternalGetTimeNavigationController();
-
-      m_Controls->sliceNavigatorTime->setEnabled(true);
-      m_Controls->tlTime->setEnabled(true);
+      *m_SelectedImageNode = m_SelectedNodes[0];
     }
     ResetParameterPanel();
   }
@@ -201,6 +213,7 @@ void QmitkPreprocessingResampling::ResetOneImageOpPanel()
 {
   m_Controls->tlTime->setEnabled(false);
   m_Controls->btnDoIt->setEnabled(false);
+  m_Controls->buttonExecuteOnMultipleImages->setEnabled(false);
   m_Controls->cbHideOrig->setEnabled(false);
   m_Controls->leImage1->setText(tr("Select an Image in Data Manager"));
   m_Controls->tlParam1->setText("x-spacing");
@@ -211,11 +224,22 @@ void QmitkPreprocessingResampling::ResetOneImageOpPanel()
 void QmitkPreprocessingResampling::ResetParameterPanel()
 {
   m_Controls->btnDoIt->setEnabled(true);
+  m_Controls->buttonExecuteOnMultipleImages->setEnabled(true);
   m_Controls->cbHideOrig->setEnabled(true);
 }
 
 void QmitkPreprocessingResampling::ResetTwoImageOpPanel()
 {
+}
+
+void QmitkPreprocessingResampling::StartMultipleImagesButtonClicked()
+{
+  for (auto currentSelectedNode : m_SelectedNodes)
+  {
+    m_SelectedImageNode->RemoveAllNodes();
+    *m_SelectedImageNode = currentSelectedNode;
+    StartButtonClicked();
+  }
 }
 
 void QmitkPreprocessingResampling::StartButtonClicked()
@@ -324,12 +348,36 @@ void QmitkPreprocessingResampling::StartButtonClicked()
       ImageType::SizeType output_size;
       ImageType::SpacingType output_spacing;
 
-      output_size[0] = std::ceil(input_size[0] * (input_spacing[0] / dparam1));
-      output_size[1] = std::ceil(input_size[1] * (input_spacing[1] / dparam2));
-      output_size[2] = std::ceil(input_size[2] * (input_spacing[2] / dparam3));
-      output_spacing [0] = dparam1;
-      output_spacing [1] = dparam2;
-      output_spacing [2] = dparam3;
+      if (dparam1 > 0)
+      {
+        output_size[0] = std::ceil(input_size[0] * (input_spacing[0] / dparam1));
+        output_spacing[0] = dparam1;
+      }
+      else
+      {
+        output_size[0] = std::ceil(input_size[0] * (-1.0 / dparam1));
+        output_spacing[0] = -1.0*input_spacing[0] * dparam1;
+      }
+      if (dparam2 > 0)
+      {
+        output_size[1] = std::ceil(input_size[1] * (input_spacing[1] / dparam2));
+        output_spacing[1] = dparam2;
+      }
+      else
+      {
+        output_size[1] = std::ceil(input_size[1] * (-1.0 / dparam2));
+        output_spacing[1] = -1.0*input_spacing[1] * dparam2;
+      }
+      if (dparam3 > 0)
+      {
+        output_size[2] = std::ceil(input_size[2] * (input_spacing[2] / dparam3));
+        output_spacing[2] = dparam3;
+      }
+      else
+      {
+        output_size[2] = std::ceil(input_size[2] * (-1.0 / dparam3));
+        output_spacing[2] = -1.0*input_spacing[2] * dparam3;
+      }
 
       resampler->SetSize( output_size );
       resampler->SetOutputSpacing( output_spacing );
@@ -380,14 +428,10 @@ void QmitkPreprocessingResampling::StartButtonClicked()
     result->SetMapper(1,mapper);
   }
 
-  // reset GUI to ease further processing
-//  this->ResetOneImageOpPanel();
-
   // add new image to data storage and set as active to ease further processing
   GetDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
   if ( m_Controls->cbHideOrig->isChecked() == true )
     m_SelectedImageNode->GetNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
-  // TODO!! m_Controls->m_ImageSelector1->SetSelectedNode(result);
 
   // show the results
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

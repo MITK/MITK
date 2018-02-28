@@ -58,14 +58,14 @@ double mitk::NGLDMMatrixHolder::IndexToMaxIntensity(int index)
 template<typename TPixel, unsigned int VImageDimension>
 void
 CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
-                    itk::Image<unsigned char, VImageDimension>* mask,
+                    itk::Image<unsigned short, VImageDimension>* mask,
                     int alpha,
                     int range,
                     unsigned int direction,
                     mitk::NGLDMMatrixHolder &holder)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> MaskImageType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskImageType;
   typedef itk::NeighborhoodIterator<ImageType> ShapeIterType;
   typedef itk::NeighborhoodIterator<MaskImageType> ShapeMaskIterType;
 
@@ -254,25 +254,10 @@ void
 CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType & featureList, mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeatureConfiguration config)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> MaskType;
-  typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
+  typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-  typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
-  minMaxComputer->SetImage(itkImage);
-  minMaxComputer->Compute();
-
-  double rangeMin = -0.5 + minMaxComputer->GetMinimum();
-  double rangeMax = 0.5 + minMaxComputer->GetMaximum();
-
-  if (config.UseMinimumIntensity)
-    rangeMin = config.MinimumIntensity;
-  if (config.UseMaximumIntensity)
-    rangeMax = config.MaximumIntensity;
-
-  // Define Range
+  double rangeMin = config.MinimumIntensity;
+  double rangeMax = config.MaximumIntensity;
   int numberOfBins = config.Bins;
 
   typename MaskType::Pointer maskImage = MaskType::New();
@@ -288,11 +273,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   CalculateNGLDMMatrix<TPixel, VImageDimension>(itkImage, maskImage, config.alpha, config.range, config.direction, holderOverall);
   LocalCalculateFeatures(holderOverall, overallFeature);
 
-  std::ostringstream  ss;
-  ss << config.range;
-  std::string strRange = ss.str();
-
-  MatrixFeaturesTo(overallFeature, "NGLDM (" + strRange + ") overall", featureList);
+  MatrixFeaturesTo(overallFeature, config.FeatureEncoding, featureList);
 }
 
 
@@ -301,57 +282,59 @@ void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
                       std::string prefix,
                       mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType &featureList)
 {
-  featureList.push_back(std::make_pair(prefix + " Low Dependence Emphasis", features.LowDependenceEmphasis));
-  featureList.push_back(std::make_pair(prefix + " High Dependence Emphasis", features.HighDependenceEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Low Grey Level Count Emphasis", features.LowGreyLevelCountEmphasis));
-  featureList.push_back(std::make_pair(prefix + " High Grey Level Count Emphasis", features.HighGreyLevelCountEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Low Dependence Low Grey Level Emphasis", features.LowDependenceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " Low Dependence High Grey Level Emphasis", features.LowDependenceHighGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " High Dependence Low Grey Level Emphasis", features.HighDependenceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " High Dependence High Grey Level Emphasis", features.HighDependenceHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Low Dependence Emphasis", features.LowDependenceEmphasis));
+  featureList.push_back(std::make_pair(prefix + "High Dependence Emphasis", features.HighDependenceEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Low Grey Level Count Emphasis", features.LowGreyLevelCountEmphasis));
+  featureList.push_back(std::make_pair(prefix + "High Grey Level Count Emphasis", features.HighGreyLevelCountEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Low Dependence Low Grey Level Emphasis", features.LowDependenceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "Low Dependence High Grey Level Emphasis", features.LowDependenceHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "High Dependence Low Grey Level Emphasis", features.HighDependenceLowGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + "High Dependence High Grey Level Emphasis", features.HighDependenceHighGreyLevelEmphasis));
 
-  featureList.push_back(std::make_pair(prefix + " Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
-  featureList.push_back(std::make_pair(prefix + " Grey Level Non-Uniformity Normalised", features.GreyLevelNonUniformityNormalised));
-  featureList.push_back(std::make_pair(prefix + " Dependence Count Non-Uniformity", features.DependenceCountNonUniformity));
-  featureList.push_back(std::make_pair(prefix + " Dependence Count Non-Uniformtiy Normalised", features.DependenceCountNonUniformityNormalised));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity Normalised", features.GreyLevelNonUniformityNormalised));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Non-Uniformity", features.DependenceCountNonUniformity));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Non-Uniformtiy Normalised", features.DependenceCountNonUniformityNormalised));
 
-  featureList.push_back(std::make_pair(prefix + " Dependence Count Percentage", features.DependenceCountPercentage));
-  featureList.push_back(std::make_pair(prefix + " Grey Level Mean", features.MeanGreyLevelCount));
-  featureList.push_back(std::make_pair(prefix + " Grey Level Variance", features.GreyLevelVariance));
-  featureList.push_back(std::make_pair(prefix + " Dependence Count Mean", features.MeanDependenceCount));
-  featureList.push_back(std::make_pair(prefix + " Dependence Count Variance", features.DependenceCountVariance));
-  featureList.push_back(std::make_pair(prefix + " Dependence Count Entropy", features.DependenceCountEntropy));
-  featureList.push_back(std::make_pair(prefix + " Dependence Count Energy", features.DependenceCountEnergy));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Percentage", features.DependenceCountPercentage));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Mean", features.MeanGreyLevelCount));
+  featureList.push_back(std::make_pair(prefix + "Grey Level Variance", features.GreyLevelVariance));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Mean", features.MeanDependenceCount));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Variance", features.DependenceCountVariance));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Entropy", features.DependenceCountEntropy));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Energy", features.DependenceCountEnergy));
 
-  featureList.push_back(std::make_pair(prefix + " Expected Neighbourhood Size", features.ExpectedNeighbourhoodSize));
-  featureList.push_back(std::make_pair(prefix + " Average Neighbourhood Size", features.AverageNeighbourhoodSize));
-  featureList.push_back(std::make_pair(prefix + " Average Incomplete Neighbourhood Size", features.AverageIncompleteNeighbourhoodSize));
-  featureList.push_back(std::make_pair(prefix + " Percentage of complete Neighbourhoods", features.PercentageOfCompleteNeighbourhoods));
-  featureList.push_back(std::make_pair(prefix + " Percentage of Dependence Neighbour Voxels", features.PercentageOfDependenceNeighbours));
+  featureList.push_back(std::make_pair(prefix + "Expected Neighbourhood Size", features.ExpectedNeighbourhoodSize));
+  featureList.push_back(std::make_pair(prefix + "Average Neighbourhood Size", features.AverageNeighbourhoodSize));
+  featureList.push_back(std::make_pair(prefix + "Average Incomplete Neighbourhood Size", features.AverageIncompleteNeighbourhoodSize));
+  featureList.push_back(std::make_pair(prefix + "Percentage of complete Neighbourhoods", features.PercentageOfCompleteNeighbourhoods));
+  featureList.push_back(std::make_pair(prefix + "Percentage of Dependence Neighbour Voxels", features.PercentageOfDependenceNeighbours));
 
 }
 
 mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeature() :
-m_Range(1.0), m_Bins(6)
+m_Range(1.0)
 {
-  SetShortName("ngldm");
-  SetLongName("ngldm");
+  SetShortName("ngld");
+  SetLongName("neighbouring-grey-level-dependence");
+  SetFeatureClassName("Neighbouring Grey Level Dependence");
 }
 
 mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
   FeatureListType featureList;
+  InitializeQuantifier(image, mask);
 
   GIFNeighbouringGreyLevelDependenceFeatureConfiguration config;
   config.direction = GetDirection();
   config.range = m_Range;
   config.alpha = 0;
 
-  config.MinimumIntensity = GetMinimumIntensity();
-  config.MaximumIntensity = GetMaximumIntensity();
-  config.UseMinimumIntensity = GetUseMinimumIntensity();
-  config.UseMaximumIntensity = GetUseMaximumIntensity();
-  config.Bins = GetBins();
+  config.MinimumIntensity = GetQuantifier()->GetMinimum();
+  config.MaximumIntensity = GetQuantifier()->GetMaximum();
+  config.Bins = GetQuantifier()->GetBins();
+
+  config.FeatureEncoding = FeatureDescriptionPrefix();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -371,9 +354,10 @@ void mitk::GIFNeighbouringGreyLevelDependenceFeature::AddArguments(mitkCommandLi
 {
   std::string name = GetOptionPrefix();
 
-  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Calculate Neighbouring grey level dependence based features", "Calculate Neighbouring grey level dependence based features", us::Any());
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Calculate Neighbouring Grey Level Dependence Features", "Calculate Neighbouring grey level dependence based features", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "NGLD Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::String, "NGLD Number of Bins", "Define the number of bins that is used ", us::Any());
+
+  AddQuantifierArguments(parser);
 }
 
 void
@@ -393,20 +377,23 @@ mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeaturesUsingParameter
     {
       ranges.push_back(1);
     }
-    if (parsedArgs.count(name + "::bins"))
+    for (double range : ranges)
     {
-      auto bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';')[0];
-      this->SetBins(bins);
-    }
-
-    for (std::size_t i = 0; i < ranges.size(); ++i)
-    {
-      MITK_INFO << "Start calculating NGLDM with range " << ranges[i] << "....";
-      this->SetRange(ranges[i]);
+      InitializeQuantifierFromParameters(feature, maskNoNAN);
+      this->SetRange(range);
+      MITK_INFO << "Start calculating NGLD";
       auto localResults = this->CalculateFeatures(feature, maskNoNAN);
       featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-      MITK_INFO << "Finished calculating NGLDM with range " << ranges[i] << "....";
+      MITK_INFO << "Finished calculating NGLD";
     }
   }
+}
+
+std::string mitk::GIFNeighbouringGreyLevelDependenceFeature::GetCurrentFeatureEncoding()
+{
+  std::ostringstream  ss;
+  ss << m_Range;
+  std::string strRange = ss.str();
+  return QuantifierParameterString() + "_Range-"+ss.str();
 }
 

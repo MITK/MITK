@@ -370,7 +370,7 @@ CalculateGreyLevelDistanceZoneFeatures(itk::Image<TPixel, VImageDimension>* itkI
   CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, distanceImage, offsetVector, false, holderOverall);
   CalculateFeatures(holderOverall, overallFeature);
 
-  MatrixFeaturesTo(overallFeature, "Grey Level Distance Zone::", featureList);
+  MatrixFeaturesTo(overallFeature, config.prefix, featureList);
 }
 
 
@@ -404,6 +404,7 @@ void MatrixFeaturesTo(mitk::GreyLevelDistanceZoneFeatures features,
 {
   SetShortName("gldz");
   SetLongName("distance-zone");
+  SetFeatureClassName("Grey Level Distance Zone");
 }
 
 mitk::GIFGreyLevelDistanceZone::FeatureListType mitk::GIFGreyLevelDistanceZone::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -426,6 +427,7 @@ mitk::GIFGreyLevelDistanceZone::FeatureListType mitk::GIFGreyLevelDistanceZone::
   config.MinimumIntensity = GetQuantifier()->GetMinimum();
   config.MaximumIntensity = GetQuantifier()->GetMaximum();
   config.Bins = GetQuantifier()->GetBins();
+  config.prefix = FeatureDescriptionPrefix();
 
   AccessByItk_3(image, CalculateGreyLevelDistanceZoneFeatures, mask, featureList, config);
 
@@ -443,10 +445,10 @@ mitk::GIFGreyLevelDistanceZone::FeatureNameListType mitk::GIFGreyLevelDistanceZo
 
 void mitk::GIFGreyLevelDistanceZone::AddArguments(mitkCommandLineParser &parser)
 {
-  AddQuantifierArguments(parser);
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Grey Level Distance Zone", "Calculates the size zone based features.", us::Any());
+  AddQuantifierArguments(parser);
 }
 
 void
@@ -465,5 +467,10 @@ mitk::GIFGreyLevelDistanceZone::CalculateFeaturesUsingParameters(const Image::Po
     MITK_INFO << "Finished calculating Grey Level Distance Zone.";
   }
 
+}
+
+std::string mitk::GIFGreyLevelDistanceZone::GetCurrentFeatureEncoding()
+{
+  return QuantifierParameterString();
 }
 

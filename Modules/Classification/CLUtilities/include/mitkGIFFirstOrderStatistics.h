@@ -146,6 +146,7 @@ namespace mitk
     * \brief Returns a list of the names of all features that are calculated from this class
     */
     virtual FeatureNameListType GetFeatureNames() override;
+    virtual std::string GetCurrentFeatureEncoding() override;
 
     virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
     virtual void AddArguments(mitkCommandLineParser &parser);
@@ -155,6 +156,7 @@ namespace mitk
       double MinimumIntensity;
       double MaximumIntensity;
       int Bins;
+      std::string prefix;
     };
 
   };

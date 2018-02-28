@@ -88,6 +88,8 @@ public:
     */
     void StartButtonClicked();
 
+    void StartMultipleImagesButtonClicked();
+
     void SelectInterpolator(int interpolator);
 
 private:
@@ -118,6 +120,8 @@ private:
   //mitk::DataNode*       m_SelectedImageNode;
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
+
+  std::vector<mitk::DataNode::Pointer> m_SelectedNodes;
 
   enum InterpolationType{
     LINEAR,

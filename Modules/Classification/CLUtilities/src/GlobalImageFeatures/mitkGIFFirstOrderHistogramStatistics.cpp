@@ -226,54 +226,54 @@ CalculateFirstOrderHistogramStatistics(itk::Image<TPixel, VImageDimension>* itkI
   robustMeanAbsoluteDeviationValue /= robustCount;
   robustMeanAbsoluteDeivationIndex /= robustCount;
 
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Mean Value", meanValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Variance Value", varianceValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Skewness Value", skewnessValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Excess Kurtosis Value", kurtosisValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Median Value", medianValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Minimum Value", minimumValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Percentile 10 Value", p10Value));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Percentile 90 Value", p90Value));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Maximum Value", maximumValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Mode Value", modeValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Interquantile Range Value", p75Value - p25Value));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Range Value", maximumValue - minimumValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Mean Absolute Deviation Value", meanAbsoluteDeviationValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Robust Mean Absolute Deviation Value", robustMeanAbsoluteDeviationValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Median Absolute Deviation Value", medianAbsoluteDeviationValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Coefficient of Variation Value", coefficientOfVariationValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Quantile coefficient of Dispersion Value", quantileCoefficientOfDispersionValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Entropy Value", entropyValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Uniformity Value", uniformityValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Robust Mean Value", robustMeanValue));
+  featureList.push_back(std::make_pair(params.prefix + "Mean Value", meanValue));
+  featureList.push_back(std::make_pair(params.prefix + "Variance Value", varianceValue));
+  featureList.push_back(std::make_pair(params.prefix + "Skewness Value", skewnessValue));
+  featureList.push_back(std::make_pair(params.prefix + "Excess Kurtosis Value", kurtosisValue));
+  featureList.push_back(std::make_pair(params.prefix + "Median Value", medianValue));
+  featureList.push_back(std::make_pair(params.prefix + "Minimum Value", minimumValue));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 10 Value", p10Value));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 90 Value", p90Value));
+  featureList.push_back(std::make_pair(params.prefix + "Maximum Value", maximumValue));
+  featureList.push_back(std::make_pair(params.prefix + "Mode Value", modeValue));
+  featureList.push_back(std::make_pair(params.prefix + "Interquantile Range Value", p75Value - p25Value));
+  featureList.push_back(std::make_pair(params.prefix + "Range Value", maximumValue - minimumValue));
+  featureList.push_back(std::make_pair(params.prefix + "Mean Absolute Deviation Value", meanAbsoluteDeviationValue));
+  featureList.push_back(std::make_pair(params.prefix + "Robust Mean Absolute Deviation Value", robustMeanAbsoluteDeviationValue));
+  featureList.push_back(std::make_pair(params.prefix + "Median Absolute Deviation Value", medianAbsoluteDeviationValue));
+  featureList.push_back(std::make_pair(params.prefix + "Coefficient of Variation Value", coefficientOfVariationValue));
+  featureList.push_back(std::make_pair(params.prefix + "Quantile coefficient of Dispersion Value", quantileCoefficientOfDispersionValue));
+  featureList.push_back(std::make_pair(params.prefix + "Entropy Value", entropyValue));
+  featureList.push_back(std::make_pair(params.prefix + "Uniformity Value", uniformityValue));
+  featureList.push_back(std::make_pair(params.prefix + "Robust Mean Value", robustMeanValue));
 
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Mean Index", meanIndex + 1 ));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Variance Index", varianceIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Skewness Index", skewnessIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Excess Kurtosis Index", kurtosisIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Median Index", medianIndex + 1));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Minimum Index", minimumIndex + 1));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Percentile 10 Index", p10Index + 1));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Percentile 90 Index", p90Index + 1));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Maximum Index", maximumIndex + 1));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Mode Index", modeIndex + 1));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Interquantile Range Index", p75Index - p25Index));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Range Index", maximumIndex - minimumIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Mean Absolute Deviation Index", meanAbsoluteDeviationIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Robust Mean Absolute Deviation Index", robustMeanAbsoluteDeivationIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Median Absolute Deviation Index", medianAbsoluteDeviationIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Coefficient of Variation Index", coefficientOfVariationIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Quantile coefficient of Dispersion Index", quantileCoefficientOfDispersionIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Entropy Index", entropyIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Uniformity Index", uniformityIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Maximum Gradient", maximumGradientValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Maximum Gradient Index", maximumGradientIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Minimum Gradient", minimumGradientValue));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Minimum Gradient Index", minimumGradientIndex));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Robust Mean Index", robustMeanIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Mean Index", meanIndex + 1 ));
+  featureList.push_back(std::make_pair(params.prefix + "Variance Index", varianceIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Skewness Index", skewnessIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Excess Kurtosis Index", kurtosisIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Median Index", medianIndex + 1));
+  featureList.push_back(std::make_pair(params.prefix + "Minimum Index", minimumIndex + 1));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 10 Index", p10Index + 1));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 90 Index", p90Index + 1));
+  featureList.push_back(std::make_pair(params.prefix + "Maximum Index", maximumIndex + 1));
+  featureList.push_back(std::make_pair(params.prefix + "Mode Index", modeIndex + 1));
+  featureList.push_back(std::make_pair(params.prefix + "Interquantile Range Index", p75Index - p25Index));
+  featureList.push_back(std::make_pair(params.prefix + "Range Index", maximumIndex - minimumIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Mean Absolute Deviation Index", meanAbsoluteDeviationIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Robust Mean Absolute Deviation Index", robustMeanAbsoluteDeivationIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Median Absolute Deviation Index", medianAbsoluteDeviationIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Coefficient of Variation Index", coefficientOfVariationIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Quantile coefficient of Dispersion Index", quantileCoefficientOfDispersionIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Entropy Index", entropyIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Uniformity Index", uniformityIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Maximum Gradient", maximumGradientValue));
+  featureList.push_back(std::make_pair(params.prefix + "Maximum Gradient Index", maximumGradientIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Minimum Gradient", minimumGradientValue));
+  featureList.push_back(std::make_pair(params.prefix + "Minimum Gradient Index", minimumGradientIndex));
+  featureList.push_back(std::make_pair(params.prefix + "Robust Mean Index", robustMeanIndex));
 
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Number of Bins", histogram->GetSize(0)));
-  featureList.push_back(std::make_pair("FirstOrderHistogram::Bin Size", binWidth));
+  featureList.push_back(std::make_pair(params.prefix + "Number of Bins", histogram->GetSize(0)));
+  featureList.push_back(std::make_pair(params.prefix + "Bin Size", binWidth));
 }
 
 mitk::GIFFirstOrderHistogramStatistics::GIFFirstOrderHistogramStatistics() :
@@ -281,6 +281,7 @@ m_HistogramSize(256), m_UseCtRange(false), m_BinSize(-1)
 {
   SetShortName("foh");
   SetLongName("first-order-histogram");
+  SetFeatureClassName("First Order Histogram");
 }
 
 mitk::GIFFirstOrderHistogramStatistics::FeatureListType mitk::GIFFirstOrderHistogramStatistics::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -292,6 +293,7 @@ mitk::GIFFirstOrderHistogramStatistics::FeatureListType mitk::GIFFirstOrderHisto
   params.MinimumIntensity = GetQuantifier()->GetMinimum();
   params.MaximumIntensity = GetQuantifier()->GetMaximum();
   params.Bins = GetQuantifier()->GetBins();
+  params.prefix = FeatureDescriptionPrefix();
 
   AccessByItk_3(image, CalculateFirstOrderHistogramStatistics, mask, featureList, params);
 
@@ -327,5 +329,9 @@ mitk::GIFFirstOrderHistogramStatistics::CalculateFeaturesUsingParameters(const I
     featureList.insert(featureList.end(), localResults.begin(), localResults.end());
     MITK_INFO << "Finished calculating first order histogram features....";
   }
+}
+std::string mitk::GIFFirstOrderHistogramStatistics::GetCurrentFeatureEncoding()
+{
+  return QuantifierParameterString();
 }
 

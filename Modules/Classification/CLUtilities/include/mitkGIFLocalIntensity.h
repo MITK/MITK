@@ -69,6 +69,8 @@ namespace mitk
     virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
     virtual void AddArguments(mitkCommandLineParser &parser);
 
+    virtual std::string GetCurrentFeatureEncoding() override;
+
     itkGetConstMacro(Range, double);
     itkSetMacro(Range, double);
 

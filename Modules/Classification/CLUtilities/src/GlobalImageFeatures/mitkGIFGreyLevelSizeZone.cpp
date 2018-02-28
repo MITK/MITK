@@ -274,7 +274,7 @@ CalculateGreyLevelSizeZoneFeatures(itk::Image<TPixel, VImageDimension>* itkImage
   CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, offsetVector, false, holderOverall);
   CalculateFeatures(holderOverall, overallFeature);
 
-  MatrixFeaturesTo(overallFeature, "Grey Level Size Zone::", featureList);
+  MatrixFeaturesTo(overallFeature, config.prefix, featureList);
 }
 
 
@@ -307,6 +307,7 @@ void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
 {
   SetShortName("glsz");
   SetLongName("grey-level-sizezone");
+  SetFeatureClassName("Grey Level Size Zone");
 }
 
 mitk::GIFGreyLevelSizeZone::FeatureListType mitk::GIFGreyLevelSizeZone::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -321,6 +322,7 @@ mitk::GIFGreyLevelSizeZone::FeatureListType mitk::GIFGreyLevelSizeZone::Calculat
   config.MinimumIntensity = GetQuantifier()->GetMinimum();
   config.MaximumIntensity = GetQuantifier()->GetMaximum();
   config.Bins = GetQuantifier()->GetBins();
+  config.prefix = FeatureDescriptionPrefix();
 
   AccessByItk_3(image, CalculateGreyLevelSizeZoneFeatures, mask, featureList, config);
 
@@ -360,5 +362,10 @@ mitk::GIFGreyLevelSizeZone::CalculateFeaturesUsingParameters(const Image::Pointe
     MITK_INFO << "Finished calculating Grey level size zone ...";
   }
 
+}
+
+std::string mitk::GIFGreyLevelSizeZone::GetCurrentFeatureEncoding()
+{
+  return QuantifierParameterString();
 }
 

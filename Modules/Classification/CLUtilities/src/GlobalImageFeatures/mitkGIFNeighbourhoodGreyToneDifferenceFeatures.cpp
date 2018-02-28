@@ -29,10 +29,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL
 #include <limits>
 
+struct GIFNeighbourhoodGreyToneDifferenceParameter
+{
+  int Range = 1;
+  mitk::IntensityQuantifier::Pointer quantifier;
+  std::string prefix;
+};
 
 template<typename TPixel, unsigned int VImageDimension>
 static void
-CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::NGTDFeatures params, mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::FeatureListType & featureList)
+CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, GIFNeighbourhoodGreyToneDifferenceParameter params, mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::FeatureListType & featureList)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -133,11 +139,12 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
     strength = strengthA / sumS;
   }
 
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Coarsness", coarsness));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Contrast", contrast));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Busyness", busyness));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Complexity", complexity));
-  featureList.push_back(std::make_pair("Neighbourhood Grey Tone Difference::Strength", strength));
+  std::string prefix = params.prefix;
+  featureList.push_back(std::make_pair(prefix + "Coarsness", coarsness));
+  featureList.push_back(std::make_pair(prefix + "Contrast", contrast));
+  featureList.push_back(std::make_pair(prefix + "Busyness", busyness));
+  featureList.push_back(std::make_pair(prefix + "Complexity", complexity));
+  featureList.push_back(std::make_pair(prefix + "Strength", strength));
 }
 
 
@@ -146,6 +153,7 @@ m_Range(1)
 {
   SetLongName("neighbourhood-grey-tone-difference");
   SetShortName("ngtd");
+  SetFeatureClassName("Neighbourhood Grey Tone Difference");
 }
 
 mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::FeatureListType mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -154,9 +162,10 @@ mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::FeatureListType mitk::GIFNeigh
 
   InitializeQuantifierFromParameters(image, mask);
 
-  NGTDFeatures params;
+  GIFNeighbourhoodGreyToneDifferenceParameter params;
   params.Range = GetRange();
   params.quantifier = GetQuantifier();
+  params.prefix = FeatureDescriptionPrefix();
 
   AccessByItk_3(image, CalculateIntensityPeak, mask, params, featureList);
   return featureList;
@@ -199,4 +208,14 @@ mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::CalculateFeaturesUsingParamete
     MITK_INFO << "Finished calculating Neighbourhood Grey Tone Difference features....";
   }
 }
+
+std::string mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::GetCurrentFeatureEncoding()
+{
+  std::ostringstream  ss;
+  ss << m_Range;
+  std::string strRange = ss.str();
+  return QuantifierParameterString() + "_Range-" + ss.str();
+}
+
+
 

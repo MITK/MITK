@@ -149,15 +149,32 @@ public:
   */
   virtual FeatureNameListType GetFeatureNames() = 0;
 
+  /**
+  * \brief Adds an additional Separator to the name of the feature, which encodes the used parameters
+  */
+  virtual std::string GetCurrentFeatureEncoding();
+
+  /**
+  * \brief Returns a string that encodes the feature class name.
+  *
+  * This Feature returns a string that should be put before every other feature
+  * value. It has the format [<Prefix>::]<Feature Class Name>::[<Parameter Encoding>::].
+  * The options <Prefix> and <Parameter Encoding> are only added, if the corresponding
+  * options are set.
+  */
+  std::string FeatureDescriptionPrefix();
+
   itkSetMacro(Prefix, std::string);
   itkSetMacro(ShortName, std::string);
   itkSetMacro(LongName, std::string);
+  itkSetMacro(FeatureClassName, std::string);
   itkSetMacro(Direction, int);
   void SetParameter(ParameterTypes param) { m_Parameter=param; };
 
   itkGetConstMacro(Prefix, std::string);
   itkGetConstMacro(ShortName, std::string);
   itkGetConstMacro(LongName, std::string);
+  itkGetConstMacro(FeatureClassName, std::string);
   itkGetConstMacro(Parameter, ParameterTypes);
 
   itkSetMacro(UseQuantifier, bool);
@@ -193,6 +210,9 @@ public:
   itkSetMacro(IgnoreMask, bool);
   itkGetConstMacro(IgnoreMask, bool);
 
+  itkSetMacro(EncodeParameters, bool);
+  itkGetConstMacro(EncodeParameters, bool);
+
   std::string GetOptionPrefix() const
   {
     if (m_Prefix.length() > 0)
@@ -207,6 +227,7 @@ public:
   void AddQuantifierArguments(mitkCommandLineParser &parser);
   void InitializeQuantifierFromParameters(const Image::Pointer & feature, const Image::Pointer &mask,unsigned int defaultBins = 256);
   void InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins = 256);
+  std::string QuantifierParameterString();
 
 public:
 
@@ -233,6 +254,7 @@ private:
   std::string m_Prefix; // Prefix before all input parameters
   std::string m_ShortName; // Name of all variables
   std::string m_LongName; // Long version of the name (For turning on)
+  std::string m_FeatureClassName;
   ParameterTypes m_Parameter; // Parameter setting
 
   bool m_UseQuantifier = false;
@@ -242,6 +264,7 @@ private:
   bool m_UseMinimumIntensity = false;
   double m_MaximumIntensity = 100;
   bool m_UseMaximumIntensity = false;
+  bool m_EncodeParameters = false;
 
   double m_Binsize = 1;
   bool m_UseBinsize = false;

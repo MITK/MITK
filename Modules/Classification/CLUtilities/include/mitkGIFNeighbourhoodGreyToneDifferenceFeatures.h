@@ -84,20 +84,15 @@ namespace mitk
     */
     virtual FeatureNameListType GetFeatureNames();
 
+    virtual std::string GetCurrentFeatureEncoding() override;
+
     virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
     virtual void AddArguments(mitkCommandLineParser &parser);
 
     itkSetMacro(Range, int);
     itkGetConstMacro(Range, int);
-    struct NGTDFeatures
-    {
-      int Range = 1;
-      IntensityQuantifier::Pointer quantifier;
-    };
+
   private:
-
-
-
     int m_Range;
   };
 }

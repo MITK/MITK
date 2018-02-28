@@ -70,6 +70,7 @@ namespace mitk
       int globalNumberOfBins;
       bool useDecimalPoint;
       char decimalPoint;
+      bool encodeParameter;
 
     private:
       void ParseFileLocations(std::map<std::string, us::Any> &parsedArgs);

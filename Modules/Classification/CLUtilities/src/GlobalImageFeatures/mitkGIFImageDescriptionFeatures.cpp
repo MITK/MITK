@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixel, unsigned int VImageDimension>
 static void
-CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFImageDescriptionFeatures::FeatureListType & featureList)
+CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFImageDescriptionFeatures::FeatureListType & featureList, std::string prefix)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -107,29 +107,29 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   imageMean /= voxelCount;
   maskMean /= maskVoxelCount;
 
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Dimension X", imageDimensionX));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Dimension Y", imageDimensionY));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Dimension Z", imageDimensionZ));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Spacing X", imageVoxelSpacingX));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Spacing Y", imageVoxelSpacingY));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Spacing Z", imageVoxelSpacingZ));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Mean intensity", imageMean));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Minimum intensity", imageMinimum));
-  featureList.push_back(std::make_pair("Diagnostic (Image)::Maximum intensity", imageMaximum));
+  featureList.push_back(std::make_pair(prefix + "Image Dimension X", imageDimensionX));
+  featureList.push_back(std::make_pair(prefix + "Image Dimension Y", imageDimensionY));
+  featureList.push_back(std::make_pair(prefix + "Image Dimension Z", imageDimensionZ));
+  featureList.push_back(std::make_pair(prefix + "Image Spacing X", imageVoxelSpacingX));
+  featureList.push_back(std::make_pair(prefix + "Image Spacing Y", imageVoxelSpacingY));
+  featureList.push_back(std::make_pair(prefix + "Image Spacing Z", imageVoxelSpacingZ));
+  featureList.push_back(std::make_pair(prefix + "Image Mean intensity", imageMean));
+  featureList.push_back(std::make_pair(prefix + "Image Minimum intensity", imageMinimum));
+  featureList.push_back(std::make_pair(prefix + "Image Maximum intensity", imageMaximum));
 
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Dimension X", maskDimensionX));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Dimension Y", maskDimensionY));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Dimension Z", maskDimensionZ));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask bounding box X", maskMaximumX - maskMinimumX + 1));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask bounding box Y", maskMaximumY - maskMinimumY + 1));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mask bounding box Z", maskMaximumZ - maskMinimumZ + 1));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Spacing X", maskVoxelSpacingX));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Spacing Y", maskVoxelSpacingY));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Spacing Z", maskVoxelSpacingZ));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Voxel Count ", maskVoxelCount));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Mean intensity", maskMean));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Minimum intensity", maskMinimum));
-  featureList.push_back(std::make_pair("Diagnostic (Mask)::Maximum intensity", maskMaximum));
+  featureList.push_back(std::make_pair(prefix + "Mask Dimension X", maskDimensionX));
+  featureList.push_back(std::make_pair(prefix + "Mask Dimension Y", maskDimensionY));
+  featureList.push_back(std::make_pair(prefix + "Mask Dimension Z", maskDimensionZ));
+  featureList.push_back(std::make_pair(prefix + "Mask bounding box X", maskMaximumX - maskMinimumX + 1));
+  featureList.push_back(std::make_pair(prefix + "Mask bounding box Y", maskMaximumY - maskMinimumY + 1));
+  featureList.push_back(std::make_pair(prefix + "Mask bounding box Z", maskMaximumZ - maskMinimumZ + 1));
+  featureList.push_back(std::make_pair(prefix + "Mask Spacing X", maskVoxelSpacingX));
+  featureList.push_back(std::make_pair(prefix + "Mask Spacing Y", maskVoxelSpacingY));
+  featureList.push_back(std::make_pair(prefix + "Mask Spacing Z", maskVoxelSpacingZ));
+  featureList.push_back(std::make_pair(prefix + "Mask Voxel Count ", maskVoxelCount));
+  featureList.push_back(std::make_pair(prefix + "Mask Mean intensity", maskMean));
+  featureList.push_back(std::make_pair(prefix + "Mask Minimum intensity", maskMinimum));
+  featureList.push_back(std::make_pair(prefix + "Mask Maximum intensity", maskMaximum));
 
 }
 
@@ -137,12 +137,14 @@ mitk::GIFImageDescriptionFeatures::GIFImageDescriptionFeatures()
 {
   SetShortName("id");
   SetLongName("image-diagnostic");
+
+  SetFeatureClassName("Diagnostic");
 }
 
 mitk::GIFImageDescriptionFeatures::FeatureListType mitk::GIFImageDescriptionFeatures::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
   FeatureListType featureList;
-  AccessByItk_2(image, CalculateFirstOrderStatistics, mask, featureList);
+  AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, FeatureDescriptionPrefix());
 
   return featureList;
 }

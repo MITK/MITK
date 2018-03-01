@@ -55,7 +55,8 @@ public:
   void setUp()
   {
     m_VolumeProperties = createTestVolumeParameters();
-    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_VolumeProperties);
+    auto rng = std::mt19937();
+    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_VolumeProperties, &rng);
     m_Test3DVolume = createTest3DVolume(5);
     itk::FileTools::CreateDirectory(TEST_FOLDER_PATH);
     itk::FileTools::CreateDirectory(TEST_QUALIFIED_FOLDER_PATH);
@@ -100,7 +101,8 @@ public:
     returnParameters->SetXDim(10);
     returnParameters->SetYDim(10);
     returnParameters->SetZDim(10);
-    returnParameters->SetBackgroundAbsorption(0);
+    returnParameters->SetMinBackgroundAbsorption(0);
+    returnParameters->SetMaxBackgroundAbsorption(0);
     returnParameters->SetBackgroundScattering(0);
     returnParameters->SetBackgroundAnisotropy(0);
     return returnParameters;

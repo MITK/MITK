@@ -33,9 +33,9 @@ namespace mitk {
     {
     public:
       mitkClassMacroItkParent(InSilicoTissueVolume, itk::LightObject)
-        mitkNewMacro1Param(Self, TissueGeneratorParameters::Pointer)
+      mitkNewMacro2Param(Self, TissueGeneratorParameters::Pointer, std::mt19937*)
 
-        enum SegmentationType
+      enum SegmentationType
       {
         AIR = -1,
         BACKGROUND = 0,
@@ -126,7 +126,7 @@ namespace mitk {
         mitk::PropertyList::Pointer propertyList);
 
     protected:
-      InSilicoTissueVolume(TissueGeneratorParameters::Pointer parameters);
+      InSilicoTissueVolume(TissueGeneratorParameters::Pointer parameters, std::mt19937* rng);
       InSilicoTissueVolume(Volume::Pointer absorptionVolume,
         Volume::Pointer scatteringVolume,
         Volume::Pointer anisotropyVolume,
@@ -143,6 +143,10 @@ namespace mitk {
       TissueGeneratorParameters::Pointer m_TissueParameters;
 
       unsigned int m_TDim;
+
+      double m_InitialBackgroundAbsorption;
+
+      std::mt19937* m_Rng;
 
       void RandomizeTissueCoefficients(long rngSeed, bool useRngSeed, double percentage);
 

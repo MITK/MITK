@@ -45,7 +45,8 @@ public:
     m_DefaultParameters->SetXDim(5);
     m_DefaultParameters->SetYDim(5);
     m_DefaultParameters->SetZDim(5);
-    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters);
+    auto rng = std::mt19937();
+    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters, &rng);
     m_ComposedVolume = mitk::pa::ComposedVolume::New(m_InSilicoTissueVolume);
   }
 

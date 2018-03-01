@@ -47,7 +47,8 @@ public:
     m_DefaultParameters->SetXDim(3);
     m_DefaultParameters->SetYDim(3);
     m_DefaultParameters->SetZDim(3);
-    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters);
+    auto rng = std::mt19937();
+    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters, &rng);
     m_ComposedVolume = mitk::pa::ComposedVolume::New(m_InSilicoTissueVolume);
     m_ComposedVolume->AddSlice(CreateValidationPair(-1, 1));
     m_ComposedVolume->AddSlice(CreateValidationPair(0, 3));
@@ -160,9 +161,9 @@ public:
     CPPUNIT_ASSERT(slicedFluence->GetXDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetYDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetZDim() == 3);
-    AssertYSliceValue(slicedFluence, 0, 1 * m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 1, 4 * m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 2, 8 * m_DefaultParameters->GetBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 0, 1 * m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 1, 4 * m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 2, 8 * m_DefaultParameters->GetMinBackgroundAbsorption());
   }
 
   void testGetSlicedAbsorptionVolume()
@@ -173,9 +174,9 @@ public:
     CPPUNIT_ASSERT(slicedFluence->GetXDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetYDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetZDim() == 3);
-    AssertYSliceValue(slicedFluence, 0, m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 1, m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 2, m_DefaultParameters->GetBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 0, m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 1, m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 2, m_DefaultParameters->GetMinBackgroundAbsorption());
   }
 
   void tearDown()

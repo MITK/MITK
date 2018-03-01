@@ -49,7 +49,8 @@ public:
     m_StraightLine = &mitk::pa::VesselMeanderStrategy::CalculateNewPositionInStraightLine;
     m_Diverging = &mitk::pa::VesselMeanderStrategy::CalculateRandomlyDivergingPosition;
     m_TestVolumeParameters = createTestVolumeParameters();
-    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_TestVolumeParameters);
+    auto rng = std::mt19937();
+    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_TestVolumeParameters, &rng);
   }
 
   mitk::pa::TissueGeneratorParameters::Pointer createTestVolumeParameters()
@@ -60,7 +61,8 @@ public:
     returnParameters->SetXDim(10);
     returnParameters->SetYDim(10);
     returnParameters->SetZDim(10);
-    returnParameters->SetBackgroundAbsorption(0);
+    returnParameters->SetMinBackgroundAbsorption(0);
+    returnParameters->SetMaxBackgroundAbsorption(0);
     returnParameters->SetBackgroundScattering(0);
     returnParameters->SetBackgroundAnisotropy(0);
     return returnParameters;

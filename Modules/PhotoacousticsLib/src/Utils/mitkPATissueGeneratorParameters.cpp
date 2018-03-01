@@ -28,7 +28,8 @@ mitk::pa::TissueGeneratorParameters::TissueGeneratorParameters()
   m_RandomizePhysicalProperties = false;
   m_RandomizePhysicalPropertiesPercentage = 0;
 
-  m_BackgroundAbsorption = 0.1;
+  m_MinBackgroundAbsorption = 0.1;
+  m_MaxBackgroundAbsorption = 0.1;
   m_BackgroundScattering = 15;
   m_BackgroundAnisotropy = 0.9;
   m_AirAbsorption = 0.0001;

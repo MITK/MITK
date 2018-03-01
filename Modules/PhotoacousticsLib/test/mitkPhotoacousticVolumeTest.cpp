@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkPhotoacousticVolumeTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPhotoacousticVolumeTestSuite);
+  MITK_TEST(TestUniformDistributionIsUniform);
   MITK_TEST(TestInitializedTissueContainsOnlyZeros);
   MITK_TEST(TestConvertedMitkImageContainsOnlyZerosOrAir);
   MITK_TEST(TestTissueVolumeContainsCorrectAbsorptionNumber);
@@ -47,7 +48,38 @@ public:
   void setUp()
   {
     m_TissueGeneratorParameters = mitk::pa::TissueGeneratorParameters::New();
-    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters);
+    auto rng = std::mt19937();
+    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters, &rng);
+  }
+
+  void TestUniformDistributionIsUniform()
+  {
+
+      int dims = 30;
+      m_TissueGeneratorParameters->SetXDim(dims);
+      m_TissueGeneratorParameters->SetYDim(dims);
+      m_TissueGeneratorParameters->SetZDim(dims);
+      m_TissueGeneratorParameters->SetAirThicknessInMillimeters(0);
+
+      m_TissueGeneratorParameters->SetMinBackgroundAbsorption(0.001);
+      m_TissueGeneratorParameters->SetMaxBackgroundAbsorption(0.2);
+
+      auto rng = std::mt19937();
+      m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters, &rng);
+
+      for (int x = 0; x < dims; x++)
+      {
+        for (int y = 0; y < dims; y++)
+        {
+          for (int z = 0; z < dims; z++)
+          {
+            CPPUNIT_ASSERT_EQUAL_MESSAGE("Every absorption should be in bounds.",
+                                         m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(x, y, z) >= 0.001 &&
+                                         m_PhotoacousticVolume->GetAbsorptionVolume()->GetData(x, y, z) <= 0.2, true);
+          }
+        }
+      }
+
   }
 
   void TestInitializedTissueContainsOnlyZeros()
@@ -57,8 +89,10 @@ public:
     m_TissueGeneratorParameters->SetYDim(dims);
     m_TissueGeneratorParameters->SetZDim(dims);
     m_TissueGeneratorParameters->SetAirThicknessInMillimeters(0);
-    m_TissueGeneratorParameters->SetBackgroundAbsorption(0);
-    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters);
+    m_TissueGeneratorParameters->SetMinBackgroundAbsorption(0);
+    m_TissueGeneratorParameters->SetMaxBackgroundAbsorption(0);
+    auto rng = std::mt19937();
+    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters, &rng);
 
     for (int x = 0; x < dims; x++)
     {
@@ -78,7 +112,8 @@ public:
     m_TissueGeneratorParameters->SetXDim(dims);
     m_TissueGeneratorParameters->SetYDim(dims);
     m_TissueGeneratorParameters->SetZDim(dims);
-    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters);
+    auto rng = std::mt19937();
+    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters, &rng);
 
     mitk::Image::Pointer testImage = m_PhotoacousticVolume->ConvertToMitkImage();
 
@@ -97,7 +132,8 @@ public:
     m_TissueGeneratorParameters->SetXDim(dims);
     m_TissueGeneratorParameters->SetYDim(dims);
     m_TissueGeneratorParameters->SetZDim(dims);
-    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters);
+    auto rng = std::mt19937();
+    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters, &rng);
 
     m_PhotoacousticVolume->SetVolumeValues(0, 0, 0, 0, 0, 0);
     m_PhotoacousticVolume->SetVolumeValues(0, 0, 1, 1, 0, 0);
@@ -124,7 +160,8 @@ public:
     m_TissueGeneratorParameters->SetXDim(dims);
     m_TissueGeneratorParameters->SetYDim(dims);
     m_TissueGeneratorParameters->SetZDim(dims);
-    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters);
+    auto rng = std::mt19937();
+    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters, &rng);
 
     m_PhotoacousticVolume->SetVolumeValues(0, 0, 0, 0, 0, 0);
     m_PhotoacousticVolume->SetVolumeValues(0, 0, 1, 0, 1, 0);
@@ -151,7 +188,8 @@ public:
     m_TissueGeneratorParameters->SetXDim(dims);
     m_TissueGeneratorParameters->SetYDim(dims);
     m_TissueGeneratorParameters->SetZDim(dims);
-    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters);
+    auto rng = std::mt19937();
+    m_PhotoacousticVolume = mitk::pa::InSilicoTissueVolume::New(m_TissueGeneratorParameters, &rng);
 
     m_PhotoacousticVolume->SetVolumeValues(0, 0, 0, 0, 0, 0);
     m_PhotoacousticVolume->SetVolumeValues(0, 0, 1, 0, 0, 1);

@@ -45,7 +45,8 @@ public:
     m_VesselProperties = VesselProperties::New();
     m_Tree = VesselTree::New(m_VesselProperties);
     m_StraightLine = &VesselMeanderStrategy::CalculateNewPositionInStraightLine;
-    m_TestInSilicoVolume = InSilicoTissueVolume::New(createTestVolumeParameters());
+    auto rng = std::mt19937();
+    m_TestInSilicoVolume = InSilicoTissueVolume::New(createTestVolumeParameters(), &rng);
   }
 
   TissueGeneratorParameters::Pointer createTestVolumeParameters()
@@ -56,7 +57,8 @@ public:
     returnParameters->SetXDim(10);
     returnParameters->SetYDim(10);
     returnParameters->SetZDim(10);
-    returnParameters->SetBackgroundAbsorption(0);
+    returnParameters->SetMinBackgroundAbsorption(0);
+    returnParameters->SetMaxBackgroundAbsorption(0);
     returnParameters->SetBackgroundScattering(0);
     returnParameters->SetBackgroundAnisotropy(0);
     return returnParameters;

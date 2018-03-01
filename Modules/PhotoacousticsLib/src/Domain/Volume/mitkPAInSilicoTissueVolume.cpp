@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <chrono>
 
-mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::Pointer parameters)
+mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::Pointer parameters, std::mt19937* rng)
 {
   {
     unsigned int xDim = parameters->GetXDim();
@@ -37,9 +37,12 @@ mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::
     double* anisotropyArray = new double[size];
     double* segmentationArray = new double[size];
 
+    m_InitialBackgroundAbsorption = (parameters->GetMinBackgroundAbsorption() + parameters->GetMaxBackgroundAbsorption()) / 2;
+    m_Rng = rng;
+
     for (unsigned int index = 0; index < size; index++)
     {
-      absorptionArray[index] = parameters->GetBackgroundAbsorption();
+      absorptionArray[index] = m_InitialBackgroundAbsorption;
       scatteringArray[index] = parameters->GetBackgroundScattering();
       anisotropyArray[index] = parameters->GetBackgroundAnisotropy();
       segmentationArray[index] = SegmentationType::BACKGROUND;
@@ -74,7 +77,8 @@ void mitk::pa::InSilicoTissueVolume::UpdatePropertyList()
   AddDoubleProperty("radius", m_TissueParameters->GetMCRadius());
   AddDoubleProperty("waist", m_TissueParameters->GetMCWaist());
   AddDoubleProperty("partialVolume", m_TissueParameters->GetDoPartialVolume());
-  AddDoubleProperty("standardTissueAbsorption", m_TissueParameters->GetBackgroundAbsorption());
+  AddDoubleProperty("standardTissueAbsorptionMin", m_TissueParameters->GetMinBackgroundAbsorption());
+  AddDoubleProperty("standardTissueAbsorptionMax", m_TissueParameters->GetMaxBackgroundAbsorption());
   AddDoubleProperty("standardTissueScattering", m_TissueParameters->GetBackgroundScattering());
   AddDoubleProperty("standardTissueAnisotropy", m_TissueParameters->GetBackgroundAnisotropy());
   AddDoubleProperty("airThickness", m_TissueParameters->GetAirThicknessInMillimeters());
@@ -223,9 +227,33 @@ void mitk::pa::InSilicoTissueVolume::FinalizeVolume()
 
   // If specified, randomize all tissue parameters
   if (m_TissueParameters->GetRandomizePhysicalProperties())
+  {
     RandomizeTissueCoefficients(m_TissueParameters->GetUseRngSeed(),
       m_TissueParameters->GetRngSeed(),
       m_TissueParameters->GetRandomizePhysicalPropertiesPercentage());
+  }
+
+  unsigned int xDim = m_TissueParameters->GetXDim();
+  unsigned int yDim = m_TissueParameters->GetYDim();
+  unsigned int zDim = m_TissueParameters->GetZDim();
+
+  std::uniform_real_distribution<double> randomBackgroundAbsorptionDistribution(
+              m_TissueParameters->GetMinBackgroundAbsorption(), m_TissueParameters->GetMaxBackgroundAbsorption());
+
+
+  for (unsigned int z = 0; z < zDim; z++)
+  {
+      for (unsigned int y = 0; y < yDim; y++)
+      {
+          for (unsigned int x = 0; x < xDim; x++)
+          {
+              if(fabs(m_AbsorptionVolume->GetData(x, y, z)-m_InitialBackgroundAbsorption) < mitk::eps)
+              {
+                  m_AbsorptionVolume->SetData(randomBackgroundAbsorptionDistribution(*m_Rng), x, y, z);
+              }
+          }
+      }
+  }
 }
 
 void mitk::pa::InSilicoTissueVolume::AddSkinAndAirLayers()

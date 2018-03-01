@@ -48,7 +48,8 @@ namespace mitk {
         itkGetMacro(RandomizePhysicalProperties, bool)
         itkGetMacro(RandomizePhysicalPropertiesPercentage, double)
 
-        itkGetMacro(BackgroundAbsorption, double)
+        itkGetMacro(MinBackgroundAbsorption, double)
+        itkGetMacro(MaxBackgroundAbsorption, double)
         itkGetMacro(BackgroundScattering, double)
         itkGetMacro(BackgroundAnisotropy, double)
         itkGetMacro(AirAbsorption, double)
@@ -102,7 +103,8 @@ namespace mitk {
         itkSetMacro(RandomizePhysicalProperties, bool)
         itkSetMacro(RandomizePhysicalPropertiesPercentage, double)
 
-        itkSetMacro(BackgroundAbsorption, double)
+        itkSetMacro(MinBackgroundAbsorption, double)
+        itkSetMacro(MaxBackgroundAbsorption, double)
         itkSetMacro(BackgroundScattering, double)
         itkSetMacro(BackgroundAnisotropy, double)
         itkSetMacro(AirAbsorption, double)
@@ -162,7 +164,8 @@ namespace mitk {
       bool m_RandomizePhysicalProperties;
       double m_RandomizePhysicalPropertiesPercentage;
 
-      double m_BackgroundAbsorption;
+      double m_MinBackgroundAbsorption;
+      double m_MaxBackgroundAbsorption;
       double m_BackgroundScattering;
       double m_BackgroundAnisotropy;
       double m_AirAbsorption;

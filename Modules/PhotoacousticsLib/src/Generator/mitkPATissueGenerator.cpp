@@ -34,10 +34,6 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / RESAMPLING_FACTOR);
   }
 
-  auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters);
-
-  const double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
-
   std::mt19937 randomNumberGenerator;
   std::random_device randomDevice;
   if (parameters->GetUseRngSeed())
@@ -56,12 +52,22 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     }
   }
 
-  std::uniform_int_distribution<int> randomNumVesselDistribution(parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());
-  std::uniform_real_distribution<double> randomBendingDistribution(parameters->GetMinVesselBending(), parameters->GetMaxVesselBending());
-  std::uniform_real_distribution<double> randomAbsorptionDistribution(parameters->GetMinVesselAbsorption(), parameters->GetMaxVesselAbsorption());
-  std::uniform_real_distribution<double> randomRadiusDistribution(parameters->GetMinVesselRadiusInMillimeters(), parameters->GetMaxVesselRadiusInMillimeters());
-  std::uniform_real_distribution<double> randomScatteringDistribution(parameters->GetMinVesselScattering(), parameters->GetMaxVesselScattering());
-  std::uniform_real_distribution<double> randomAnisotropyDistribution(parameters->GetMinVesselAnisotropy(), parameters->GetMaxVesselAnisotropy());
+  auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters, &randomNumberGenerator);
+
+  const double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
+
+  std::uniform_int_distribution<int> randomNumVesselDistribution(
+              parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());
+  std::uniform_real_distribution<double> randomBendingDistribution(
+              parameters->GetMinVesselBending(), parameters->GetMaxVesselBending());
+  std::uniform_real_distribution<double> randomAbsorptionDistribution(
+              parameters->GetMinVesselAbsorption(), parameters->GetMaxVesselAbsorption());
+  std::uniform_real_distribution<double> randomRadiusDistribution(
+              parameters->GetMinVesselRadiusInMillimeters(), parameters->GetMaxVesselRadiusInMillimeters());
+  std::uniform_real_distribution<double> randomScatteringDistribution(
+              parameters->GetMinVesselScattering(), parameters->GetMaxVesselScattering());
+  std::uniform_real_distribution<double> randomAnisotropyDistribution(
+              parameters->GetMinVesselAnisotropy(), parameters->GetMaxVesselAnisotropy());
   std::uniform_int_distribution<int> borderTypeDistribution(0, 3);
 
   int numberOfBloodVessels = randomNumVesselDistribution(randomNumberGenerator);

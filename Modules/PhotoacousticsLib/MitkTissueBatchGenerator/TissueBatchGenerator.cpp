@@ -27,11 +27,155 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk::pa;
 
+TissueGeneratorParameters::Pointer CreateMultiHB_13_02_18_Parameters()
+{
+  auto returnParameters = TissueGeneratorParameters::New();
+  returnParameters->SetAirThicknessInMillimeters(1.8);
+  returnParameters->SetMinBackgroundAbsorption(0.001);
+  returnParameters->SetMaxBackgroundAbsorption(0.2);
+  returnParameters->SetBackgroundAnisotropy(0.9);
+  returnParameters->SetBackgroundScattering(15);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetDoPartialVolume(true);
+  returnParameters->SetMinNumberOfVessels(1);
+  returnParameters->SetMaxNumberOfVessels(7);
+  returnParameters->SetMinVesselAbsorption(1);
+  returnParameters->SetMaxVesselAbsorption(12);
+  returnParameters->SetMinVesselAnisotropy(0.9);
+  returnParameters->SetMaxVesselAnisotropy(0.9);
+  returnParameters->SetMinVesselBending(0);
+  returnParameters->SetMaxVesselBending(0.2);
+  returnParameters->SetMinVesselRadiusInMillimeters(0.5);
+  returnParameters->SetMaxVesselRadiusInMillimeters(6);
+  returnParameters->SetMinVesselScattering(15);
+  returnParameters->SetMaxVesselScattering(15);
+  returnParameters->SetMinVesselZOrigin(1);
+  returnParameters->SetMaxVesselZOrigin(3);
+  returnParameters->SetVesselBifurcationFrequency(5000);
+  returnParameters->SetRandomizePhysicalProperties(false);
+  returnParameters->SetSkinThicknessInMillimeters(0);
+  returnParameters->SetUseRngSeed(false);
+  returnParameters->SetVoxelSpacingInCentimeters(0.06);
+  returnParameters->SetXDim(70);
+  returnParameters->SetYDim(100);
+  returnParameters->SetZDim(100);
+  returnParameters->SetMCflag(4);
+  return returnParameters;
+}
+
+TissueGeneratorParameters::Pointer CreateBaselineHB_13_02_18_Parameters()
+{
+  auto returnParameters = TissueGeneratorParameters::New();
+  returnParameters->SetAirThicknessInMillimeters(1.8);
+  returnParameters->SetMinBackgroundAbsorption(0.001);
+  returnParameters->SetMaxBackgroundAbsorption(0.2);
+  returnParameters->SetBackgroundAnisotropy(0.9);
+  returnParameters->SetBackgroundScattering(15);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetDoPartialVolume(true);
+  returnParameters->SetMinNumberOfVessels(1);
+  returnParameters->SetMaxNumberOfVessels(1);
+  returnParameters->SetMinVesselAbsorption(4.73);
+  returnParameters->SetMaxVesselAbsorption(4.73);
+  returnParameters->SetMinVesselAnisotropy(0.9);
+  returnParameters->SetMaxVesselAnisotropy(0.9);
+  returnParameters->SetMinVesselBending(0);
+  returnParameters->SetMaxVesselBending(0.2);
+  returnParameters->SetMinVesselRadiusInMillimeters(3);
+  returnParameters->SetMaxVesselRadiusInMillimeters(3);
+  returnParameters->SetMinVesselScattering(15);
+  returnParameters->SetMaxVesselScattering(15);
+  returnParameters->SetMinVesselZOrigin(1);
+  returnParameters->SetMaxVesselZOrigin(3);
+  returnParameters->SetVesselBifurcationFrequency(5000);
+  returnParameters->SetRandomizePhysicalProperties(false);
+  returnParameters->SetSkinThicknessInMillimeters(0);
+  returnParameters->SetUseRngSeed(false);
+  returnParameters->SetVoxelSpacingInCentimeters(0.06);
+  returnParameters->SetXDim(70);
+  returnParameters->SetYDim(100);
+  returnParameters->SetZDim(100);
+  returnParameters->SetMCflag(4);
+  return returnParameters;
+}
+
+TissueGeneratorParameters::Pointer CreateSingleVesselHeterogeneousBackground_08_02_18_Parameters()
+{
+  auto returnParameters = TissueGeneratorParameters::New();
+  returnParameters->SetAirThicknessInMillimeters(1.8);
+  returnParameters->SetMinBackgroundAbsorption(0.001);
+  returnParameters->SetMaxBackgroundAbsorption(0.2);
+  returnParameters->SetBackgroundAnisotropy(0.9);
+  returnParameters->SetBackgroundScattering(15);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetDoPartialVolume(true);
+  returnParameters->SetMinNumberOfVessels(1);
+  returnParameters->SetMaxNumberOfVessels(1);
+  returnParameters->SetMinVesselAbsorption(1);
+  returnParameters->SetMaxVesselAbsorption(12);
+  returnParameters->SetMinVesselAnisotropy(0.9);
+  returnParameters->SetMaxVesselAnisotropy(0.9);
+  returnParameters->SetMinVesselBending(0);
+  returnParameters->SetMaxVesselBending(0.2);
+  returnParameters->SetMinVesselRadiusInMillimeters(0.5);
+  returnParameters->SetMaxVesselRadiusInMillimeters(6);
+  returnParameters->SetMinVesselScattering(15);
+  returnParameters->SetMaxVesselScattering(15);
+  returnParameters->SetMinVesselZOrigin(1);
+  returnParameters->SetMaxVesselZOrigin(3);
+  returnParameters->SetVesselBifurcationFrequency(5000);
+  returnParameters->SetRandomizePhysicalProperties(false);
+  returnParameters->SetSkinThicknessInMillimeters(0);
+  returnParameters->SetUseRngSeed(false);
+  returnParameters->SetVoxelSpacingInCentimeters(0.06);
+  returnParameters->SetXDim(70);
+  returnParameters->SetYDim(100);
+  returnParameters->SetZDim(100);
+  returnParameters->SetMCflag(4);
+  return returnParameters;
+}
+
+TissueGeneratorParameters::Pointer CreateMultivessel_19_12_17_Parameters()
+{
+  auto returnParameters = TissueGeneratorParameters::New();
+  returnParameters->SetAirThicknessInMillimeters(12);
+  returnParameters->SetMinBackgroundAbsorption(0.1);
+  returnParameters->SetMaxBackgroundAbsorption(0.1);
+  returnParameters->SetBackgroundAnisotropy(0.9);
+  returnParameters->SetBackgroundScattering(15);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetDoPartialVolume(true);
+  returnParameters->SetMinNumberOfVessels(1);
+  returnParameters->SetMaxNumberOfVessels(7);
+  returnParameters->SetMinVesselAbsorption(2);
+  returnParameters->SetMaxVesselAbsorption(8);
+  returnParameters->SetMinVesselAnisotropy(0.9);
+  returnParameters->SetMaxVesselAnisotropy(0.9);
+  returnParameters->SetMinVesselBending(0.1);
+  returnParameters->SetMaxVesselBending(0.3);
+  returnParameters->SetMinVesselRadiusInMillimeters(0.5);
+  returnParameters->SetMaxVesselRadiusInMillimeters(4);
+  returnParameters->SetMinVesselScattering(15);
+  returnParameters->SetMaxVesselScattering(15);
+  returnParameters->SetMinVesselZOrigin(2.2);
+  returnParameters->SetMaxVesselZOrigin(4);
+  returnParameters->SetVesselBifurcationFrequency(5000);
+  returnParameters->SetRandomizePhysicalProperties(false);
+  returnParameters->SetSkinThicknessInMillimeters(0);
+  returnParameters->SetUseRngSeed(false);
+  returnParameters->SetVoxelSpacingInCentimeters(0.06);
+  returnParameters->SetXDim(70);
+  returnParameters->SetYDim(100);
+  returnParameters->SetZDim(100);
+  return returnParameters;
+}
+
 TissueGeneratorParameters::Pointer CreateMultivessel_19_10_17_Parameters()
 {
   auto returnParameters = TissueGeneratorParameters::New();
   returnParameters->SetAirThicknessInMillimeters(12);
-  returnParameters->SetBackgroundAbsorption(0.1);
+  returnParameters->SetMinBackgroundAbsorption(0.1);
+  returnParameters->SetMaxBackgroundAbsorption(0.1);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
   returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
@@ -65,7 +209,8 @@ TissueGeneratorParameters::Pointer CreateSinglevessel_19_10_17_Parameters()
 {
   auto returnParameters = TissueGeneratorParameters::New();
   returnParameters->SetAirThicknessInMillimeters(12);
-  returnParameters->SetBackgroundAbsorption(0.1);
+  returnParameters->SetMinBackgroundAbsorption(0.1);
+  returnParameters->SetMaxBackgroundAbsorption(0.1);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
   returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
@@ -127,12 +272,12 @@ InputParameters parseInput(int argc, char* argv[])
     "mitkMcxyz", "m", mitkCommandLineParser::OutputFile,
     "MitkMcxyz binary (file)", "path to the MitkMcxyz binary",
     us::Any(), false);
+  parser.endGroup();
+  parser.beginGroup("Optional parameters");
   parser.addArgument(
     "probe", "p", mitkCommandLineParser::OutputFile,
     "xml probe file (file)", "file to the definition of the used probe (*.xml)",
-    us::Any(), false);
-  parser.endGroup();
-  parser.beginGroup("Optional parameters");
+    us::Any());
   parser.addArgument(
     "verbose", "v", mitkCommandLineParser::Bool,
     "Verbose Output", "Whether to produce verbose, or rather debug output");
@@ -196,7 +341,7 @@ int main(int argc, char * argv[])
 
   while (true)
   {
-    auto parameters = CreateSinglevessel_19_10_17_Parameters();
+    auto parameters = CreateBaselineHB_13_02_18_Parameters();
     MITK_INFO(input.verbose) << "Generating tissue..";
     auto resultTissue = InSilicoTissueGenerator::GenerateInSilicoData(parameters);
     MITK_INFO(input.verbose) << "Generating tissue..[Done]";
@@ -212,13 +357,38 @@ int main(int argc, char * argv[])
       itksys::SystemTools::MakeDirectory(outputfolder);
     }
 
-    std::string savePath = input.saveFolderPath + "input/MultiVessel_" + input.identifyer + "_" + std::to_string(iterationNumber) + ".nrrd";
+    std::string savePath = input.saveFolderPath + "input/BaselineHB_" + input.identifyer +
+            "_" + std::to_string(iterationNumber) + ".nrrd";
     mitk::IOUtil::Save(resultTissue->ConvertToMitkImage(), savePath);
-    std::string outputPath = input.saveFolderPath + "output/Fluence_MultiVessel_" + input.identifyer + "_" + std::to_string(iterationNumber) + ".nrrd";
+    std::string outputPath = input.saveFolderPath + "output/BaselineHB_" + input.identifyer +
+            "_" + std::to_string(iterationNumber) + "/";
+
+    if (!itksys::SystemTools::FileIsDirectory(outputPath))
+    {
+      itksys::SystemTools::MakeDirectory(outputPath);
+    }
+
+    outputPath = outputPath + "Fluence_BaselineHB_" + input.identifyer + "_" + std::to_string(iterationNumber);
 
     MITK_INFO(input.verbose) << "Simulating fluence..";
-    int result = std::system(std::string(input.exePath + " -i " + savePath + " -o " + outputPath + " -p " + input.probePath + " -n 100000000").c_str());
-    MITK_INFO(input.verbose) << "Simulating fluence"<< result <<"..[Done]";
+    for(double yo = -1.8; yo <= 1.81; yo=yo+0.12)
+    {
+        std::string yo_string = std::to_string(round(yo*100)/100.0);
+        int result = -4;
+        if(!input.probePath.empty())
+            result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
+                                             (outputPath + "_yo" + yo_string + ".nrrd") +
+                                             " -yo " + yo_string + " -p " + input.probePath +
+                                             " -n 100000000").c_str());
+        else
+            result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
+                                             (outputPath + "_yo" + yo_string + ".nrrd") +
+                                             " -yo " + yo_string + " -n 100000000").c_str());
+        MITK_INFO << "yo: " << yo_string << ": " << result;
+    }
+
+    MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
+
     iterationNumber++;
   }
 }

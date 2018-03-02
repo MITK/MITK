@@ -14,22 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkAbstractDataStorageViewWidget.h>
+#include <QmitkAbstractDataStorageInspector.h>
 
-QmitkAbstractDataStorageViewWidget::QmitkAbstractDataStorageViewWidget(QWidget* parent/* = nullptr*/)
+QmitkAbstractDataStorageInspector::QmitkAbstractDataStorageInspector(QWidget* parent/* = nullptr*/)
   : QWidget(parent)
   , m_NodePredicate(nullptr)
 {
   m_Connector = std::make_unique<QmitkModelViewSelectionConnector>();
 
-  connect(m_Connector.get(), &QmitkModelViewSelectionConnector::CurrentSelectionChanged, this, &QmitkAbstractDataStorageViewWidget::OnSelectionChanged);
+  connect(m_Connector.get(), &QmitkModelViewSelectionConnector::CurrentSelectionChanged, this, &QmitkAbstractDataStorageInspector::OnSelectionChanged);
 }
 
-QmitkAbstractDataStorageViewWidget::~QmitkAbstractDataStorageViewWidget()
+QmitkAbstractDataStorageInspector::~QmitkAbstractDataStorageInspector()
 {
 }
 
-void QmitkAbstractDataStorageViewWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkAbstractDataStorageInspector::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (m_DataStorage != dataStorage)
   {
@@ -42,7 +42,7 @@ void QmitkAbstractDataStorageViewWidget::SetDataStorage(mitk::DataStorage* dataS
   }
 }
 
-void QmitkAbstractDataStorageViewWidget::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkAbstractDataStorageInspector::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate != nodePredicate)
   {
@@ -52,32 +52,32 @@ void QmitkAbstractDataStorageViewWidget::SetNodePredicate(mitk::NodePredicateBas
   }
 }
 
-mitk::NodePredicateBase* QmitkAbstractDataStorageViewWidget::GetNodePredicate() const
+mitk::NodePredicateBase* QmitkAbstractDataStorageInspector::GetNodePredicate() const
 {
   return m_NodePredicate;
 }
 
-QmitkAbstractDataStorageViewWidget::NodeList QmitkAbstractDataStorageViewWidget::GetSelectedNodes() const
+QmitkAbstractDataStorageInspector::NodeList QmitkAbstractDataStorageInspector::GetSelectedNodes() const
 {
   return m_Connector->GetSelectedNodes();
 };
 
-bool QmitkAbstractDataStorageViewWidget::GetSelectOnlyVisibleNodes() const
+bool QmitkAbstractDataStorageInspector::GetSelectOnlyVisibleNodes() const
 {
   return m_Connector->GetSelectOnlyVisibleNodes();
 };
 
-void QmitkAbstractDataStorageViewWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
+void QmitkAbstractDataStorageInspector::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
   m_Connector->SetSelectOnlyVisibleNodes(selectOnlyVisibleNodes);
 };
 
-void QmitkAbstractDataStorageViewWidget::SetCurrentSelection(NodeList selectedNodes)
+void QmitkAbstractDataStorageInspector::SetCurrentSelection(NodeList selectedNodes)
 {
   m_Connector->SetCurrentSelection(selectedNodes);
 };
 
-void QmitkAbstractDataStorageViewWidget::OnSelectionChanged(NodeList selectedNodes)
+void QmitkAbstractDataStorageInspector::OnSelectionChanged(NodeList selectedNodes)
 {
   emit CurrentSelectionChanged(selectedNodes);
 };

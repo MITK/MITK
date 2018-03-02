@@ -14,12 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkDataStorageListViewWidget.h>
+#include <QmitkDataStorageListInspector.h>
 
 #include <QmitkDataStorageDefaultListModel.h>
 
-QmitkDataStorageListViewWidget::QmitkDataStorageListViewWidget(QWidget* parent/* = nullptr*/)
-  : QmitkAbstractDataStorageViewWidget(parent)
+QmitkDataStorageListInspector::QmitkDataStorageListInspector(QWidget* parent/* = nullptr*/)
+  : QmitkAbstractDataStorageInspector(parent)
 {
   m_Controls.setupUi(this);
 
@@ -32,17 +32,17 @@ QmitkDataStorageListViewWidget::QmitkDataStorageListViewWidget(QWidget* parent/*
   m_Controls.view->setModel(m_StorageModel);
 }
 
-QAbstractItemView* QmitkDataStorageListViewWidget::GetView()
+QAbstractItemView* QmitkDataStorageListInspector::GetView()
 {
   return m_Controls.view;
 };
 
-QAbstractItemView* QmitkDataStorageListViewWidget::GetView() const
+QAbstractItemView* QmitkDataStorageListInspector::GetView() const
 {
   return m_Controls.view;
 };
 
-void QmitkDataStorageListViewWidget::Initialize()
+void QmitkDataStorageListInspector::Initialize()
 {
   m_StorageModel->SetDataStorage(m_DataStorage.Lock());
   m_StorageModel->SetNodePredicate(m_NodePredicate);
@@ -50,12 +50,12 @@ void QmitkDataStorageListViewWidget::Initialize()
   m_Connector->SetView(m_Controls.view);
 }
 
-void QmitkDataStorageListViewWidget::SetSelectionMode(SelectionMode mode)
+void QmitkDataStorageListInspector::SetSelectionMode(SelectionMode mode)
 {
   m_Controls.view->setSelectionMode(mode);
 }
 
-QmitkDataStorageListViewWidget::SelectionMode QmitkDataStorageListViewWidget::GetSelectionMode() const
+QmitkDataStorageListInspector::SelectionMode QmitkDataStorageListInspector::GetSelectionMode() const
 {
   return m_Controls.view->selectionMode();
 };

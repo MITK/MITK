@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKABSTRACTDATASTORAGEVIEWWIDGET_H
-#define QMITKABSTRACTDATASTORAGEVIEWWIDGET_H
+#ifndef QMITKABSTRACTDATASTORAGEINSPECTOR_H
+#define QMITKABSTRACTDATASTORAGEINSPECTOR_H
 
 #include <QmitkModelViewSelectionConnector.h>
 
@@ -31,25 +31,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QAbstractItemVew;
 
 /*
-* @brief This abstract class extends the 'QAbstractItemModel' to accept an 'mitk::DataStorage' and a 'mitk::NodePredicateBase'.,
-*   It registers itself as a node event listener of the data storage.
-*   The 'QmitkAbstractDataStorageViewWidget' provides three empty functions, 'NodeAdded', 'NodeChanged' and 'NodeRemoved', that
-*   may be implemented by the subclasses. These functions allow to react to the 'AddNodeEvent', 'ChangedNodeEvent' and
-*   'RemoveNodeEvent' of the data storage. This might be useful to force an update on the custom view to correctly
-*   represent the content of the data storage.
-*
-*   A concrete implementations of this class is used to store the temporarily shown data nodes of the data storage.
-*   These nodes may be a subset of all the nodes inside the data storage, if a specific node predicate is set.
-*
-*   A model that implements this class has to return mitk::DataNode::Pointer objects for model indexes when the
-*   role is QmitkDataNodeRole.
+* @brief This abstract class for convienient widgets that over a specific view onto a given DataStorage instance to
+* inspect its contents. One may also get the selection in this inspector of the data storage.
 */
-class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageViewWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageInspector : public QWidget
 {
   Q_OBJECT
 
 public:
-  virtual ~QmitkAbstractDataStorageViewWidget();
+  virtual ~QmitkAbstractDataStorageInspector();
 
   /*
   * @brief Sets the data storage that will be used /monitored by widget.
@@ -129,7 +119,7 @@ protected:
 
   std::unique_ptr<QmitkModelViewSelectionConnector> m_Connector;
 
-  QmitkAbstractDataStorageViewWidget(QWidget* parent = nullptr);
+  QmitkAbstractDataStorageInspector(QWidget* parent = nullptr);
 
 };
 

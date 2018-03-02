@@ -19,20 +19,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <QmitkAbstractDataStorageViewWidget.h>
+#include <QmitkAbstractDataStorageInspector.h>
 #include <QSortFilterProxyModel>
 
-#include "ui_QmitkDataStorageListViewWidget.h"
+#include "ui_QmitkDataStorageListInspector.h"
 
 /*
-* @brief This is a widget to offer a simple list view on a data storage.
+* @brief This is an inspector that offers a simple list view on a data storage.
 */
-class MITKQTWIDGETS_EXPORT QmitkDataStorageListViewWidget : public QmitkAbstractDataStorageViewWidget
+class MITKQTWIDGETS_EXPORT QmitkDataStorageListInspector : public QmitkAbstractDataStorageInspector
 {
   Q_OBJECT
 
 public:
-  QmitkDataStorageListViewWidget(QWidget* parent = nullptr);
+  QmitkDataStorageListInspector(QWidget* parent = nullptr);
 
   virtual QAbstractItemView* GetView() override;
   virtual QAbstractItemView* GetView() const override;
@@ -44,7 +44,7 @@ protected:
   virtual void Initialize() override;
 
   QmitkAbstractDataStorageModel* m_StorageModel;
-  Ui_QmitkDataStorageListViewWidget m_Controls;
+  Ui_QmitkDataStorageListInspector m_Controls;
 };
 
 #endif // QMITKABSTRACTDATASTORAGEMODEL_H

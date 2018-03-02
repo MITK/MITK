@@ -162,7 +162,7 @@ void itkErode2(
   distanceImage->Allocate();
   distanceImage->FillBuffer(std::numeric_limits<MaskType>::max()-1);
 
-  ImageType::SizeType radius;
+  typename ImageType::SizeType radius;
   radius.Fill(1);
   itk::NeighborhoodIterator<ImageType> neighbourIter(radius, sourceImage, sourceImage->GetLargestPossibleRegion());
   itk::NeighborhoodIterator<MaskImageType>  distanceIter(radius, distanceImage, distanceImage->GetLargestPossibleRegion());
@@ -194,7 +194,6 @@ void itkErode2(
         }
         if (minimumDistance != oldDistance)
         {
-          //MITK_INFO << "Min Distance: " << minimumDistance << " - " << oldDistance;
           distanceIter.SetCenterPixel(minimumDistance);
           imageChanged = true;
         }
@@ -320,7 +319,6 @@ CalculateGreyLevelDistanceZoneFeatures(itk::Image<TPixel, VImageDimension>* itkI
   int maximumDistance = 0;
   mitk::Image::Pointer mitkDistanceImage = mitk::Image::New();
   erodeAndAdd(config.distanceMask, mitkDistanceImage, maximumDistance);
-  mitk::IOUtil::Save(mitkDistanceImage, "e:/tmp/distance_image.nrrd");
   typename MaskType::Pointer distanceImage = MaskType::New();
   mitk::CastToItkImage(mitkDistanceImage, distanceImage);
 

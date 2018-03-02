@@ -9,26 +9,6 @@
 
 namespace mitk
 {
-  struct GreyLevelDistanceZoneMatrixHolder
-  {
-  public:
-    GreyLevelDistanceZoneMatrixHolder(double min, double max, int number, int maxSize);
-
-    int IntensityToIndex(double intensity);
-    double IndexToMinIntensity(int index);
-    double IndexToMeanIntensity(int index);
-    double IndexToMaxIntensity(int index);
-
-    double m_MinimumRange;
-    double m_MaximumRange;
-    double m_Stepsize;
-    int m_NumberOfBins;
-    int m_MaximumSize;
-    int m_NumerOfVoxels;
-    Eigen::MatrixXd m_Matrix;
-
-  };
-
   struct GreyLevelDistanceZoneFeatures
   {
     GreyLevelDistanceZoneFeatures() :
@@ -181,6 +161,8 @@ namespace mitk
       struct GIFGreyLevelDistanceZoneConfiguration
     {
       mitk::Image::Pointer distanceMask;
+
+      mitk::IntensityQuantifier::Pointer Quantifier;
 
       unsigned int direction;
       double MinimumIntensity;

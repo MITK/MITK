@@ -180,7 +180,7 @@ void mitk::IntensityQuantifier::InitializeByImageRegionAndBinsizeAndMaximum(mitk
 unsigned int mitk::IntensityQuantifier::IntensityToIndex(double intensity)
 {
   double index = std::floor((intensity - m_Minimum) / m_Binsize);
-  return std::min<double>(index, m_Bins-1);
+  return std::max<double>(0, std::min<double>(index, m_Bins-1));
 }
 
 double mitk::IntensityQuantifier::IndexToMinimumIntensity(unsigned int index)

@@ -14,6 +14,23 @@
 #include <itkBinaryErodeImageFilter.h>
 #include <itkAddImageFilter.h>
 
+namespace mitk{
+  struct GreyLevelDistanceZoneMatrixHolder
+  {
+  public:
+    GreyLevelDistanceZoneMatrixHolder(mitk::IntensityQuantifier::Pointer quantifier, int number, int maxSize);
+
+    int IntensityToIndex(double intensity);
+
+    int m_NumberOfBins;
+    int m_MaximumSize;
+    int m_NumerOfVoxels;
+    Eigen::MatrixXd m_Matrix;
+    mitk::IntensityQuantifier::Pointer m_Quantifier;
+
+  };
+}
+
 static
 void MatrixFeaturesTo(mitk::GreyLevelDistanceZoneFeatures features,
                       std::string prefix,
@@ -21,35 +38,21 @@ void MatrixFeaturesTo(mitk::GreyLevelDistanceZoneFeatures features,
 
 
 
-mitk::GreyLevelDistanceZoneMatrixHolder::GreyLevelDistanceZoneMatrixHolder(double min, double max, int number, int maxSize) :
-                    m_MinimumRange(min),
-                    m_MaximumRange(max),
+mitk::GreyLevelDistanceZoneMatrixHolder::GreyLevelDistanceZoneMatrixHolder(mitk::IntensityQuantifier::Pointer quantifier, int number, int maxSize) :
                     m_NumberOfBins(number),
                     m_MaximumSize(maxSize),
-                    m_NumerOfVoxels(0)
+                    m_NumerOfVoxels(0),
+                    m_Quantifier(quantifier)
 {
   m_Matrix.resize(number, maxSize);
   m_Matrix.fill(0);
-  m_Stepsize = (max - min) / (number);
 }
 
 int mitk::GreyLevelDistanceZoneMatrixHolder::IntensityToIndex(double intensity)
 {
-  return std::floor((intensity - m_MinimumRange) / m_Stepsize);
+  return m_Quantifier->IntensityToIndex(intensity);
 }
 
-double mitk::GreyLevelDistanceZoneMatrixHolder::IndexToMinIntensity(int index)
-{
-  return m_MinimumRange + index * m_Stepsize;
-}
-double mitk::GreyLevelDistanceZoneMatrixHolder::IndexToMeanIntensity(int index)
-{
-  return m_MinimumRange + (index+0.5) * m_Stepsize;
-}
-double mitk::GreyLevelDistanceZoneMatrixHolder::IndexToMaxIntensity(int index)
-{
-  return m_MinimumRange + (index + 1) * m_Stepsize;
-}
 
 template<typename TPixel, unsigned int VImageDimension>
 int
@@ -142,84 +145,80 @@ CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
 }
 
 template <typename TPixel, unsigned int VDimension>
-void itkErode(
+void itkErode2(
   itk::Image<TPixel, VDimension> *sourceImage,
   mitk::Image::Pointer &resultImage,
-  bool &segmentationRemaining)
+  int &maxDistance)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
-  typedef itk::BinaryCrossStructuringElement<TPixel, VDimension> CrossType;
-  typedef typename itk::BinaryErodeImageFilter<ImageType, ImageType, CrossType> CrossErodeFilterType;
+  typedef unsigned short MaskType;
+  typedef itk::Image<MaskType, VDimension> MaskImageType;
 
-  CrossType cross;
-  typename CrossType::SizeType size;
-  size.Fill(1);
-  cross.SetRadius(size);
-  cross.CreateStructuringElement();
+  typename MaskImageType::Pointer distanceImage = MaskImageType::New();
+  distanceImage->SetRegions(sourceImage->GetLargestPossibleRegion());
+  distanceImage->SetOrigin(sourceImage->GetOrigin());
+  distanceImage->SetSpacing(sourceImage->GetSpacing());
+  distanceImage->SetDirection(sourceImage->GetDirection());
+  distanceImage->Allocate();
+  distanceImage->FillBuffer(std::numeric_limits<MaskType>::max()-1);
 
-  typename CrossErodeFilterType::Pointer erodeFilter = CrossErodeFilterType::New();
-  erodeFilter->SetKernel(cross);
-  erodeFilter->SetInput(sourceImage);
-  erodeFilter->SetErodeValue(1);
-  erodeFilter->UpdateLargestPossibleRegion();
+  ImageType::SizeType radius;
+  radius.Fill(1);
+  itk::NeighborhoodIterator<ImageType> neighbourIter(radius, sourceImage, sourceImage->GetLargestPossibleRegion());
+  itk::NeighborhoodIterator<MaskImageType>  distanceIter(radius, distanceImage, distanceImage->GetLargestPossibleRegion());
 
-  segmentationRemaining = false;
-  itk::ImageRegionConstIterator<ImageType> iter(erodeFilter->GetOutput(), erodeFilter->GetOutput()->GetLargestPossibleRegion());
-  while ((!iter.IsAtEnd()) && (!segmentationRemaining))
+  bool imageChanged = true;
+  while (imageChanged)
   {
-    if (iter.Get() > 0)
-      segmentationRemaining = true;
-    ++iter;
+    imageChanged = false;
+    maxDistance = 0;
+    neighbourIter.GoToBegin();
+    distanceIter.GoToBegin();
+    while (!neighbourIter.IsAtEnd())
+    {
+      MaskType oldDistance = distanceIter.GetCenterPixel();
+      maxDistance = std::max<MaskType>(maxDistance, oldDistance);
+      if (neighbourIter.GetCenterPixel() < 1)
+      {
+        if (oldDistance > 0)
+        {
+          distanceIter.SetCenterPixel(0);
+          imageChanged = true;
+        }
+      }
+      else if (oldDistance>0) {
+        MaskType minimumDistance = oldDistance;
+        for (unsigned int i = 0; i < distanceIter.Size(); ++i)
+        {
+          auto current_value = distanceIter.GetPixel(i);
+          minimumDistance = std::min<MaskType>(minimumDistance, 1+distanceIter.GetPixel(i));
+        }
+        if (minimumDistance != oldDistance)
+        {
+          //MITK_INFO << "Min Distance: " << minimumDistance << " - " << oldDistance;
+          distanceIter.SetCenterPixel(minimumDistance);
+          imageChanged = true;
+        }
+      }
+
+      ++neighbourIter;
+      ++distanceIter;
+    }
   }
 
-  mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
+  mitk::CastToMitkImage(distanceImage, resultImage);
 }
 
-template <typename TPixel, unsigned int VDimension>
-void itkAdd(
-  itk::Image<TPixel, VDimension> *imageA, mitk::Image::Pointer mitkImageB,
-  mitk::Image::Pointer &resultImage)
+void erode(mitk::Image::Pointer input, mitk::Image::Pointer &output, int &maxDistance)
 {
-  typedef itk::Image<TPixel, VDimension> ImageType;
-  typedef itk::AddImageFilter<ImageType, ImageType, ImageType> AddFilterType;
-
-  typename ImageType::Pointer imageB;
-  mitk::CastToItkImage(mitkImageB, imageB);
-
-  typename AddFilterType::Pointer addFilter = AddFilterType::New();
-  addFilter->SetInput1(imageA);
-  addFilter->SetInput2(imageB);
-  addFilter->UpdateLargestPossibleRegion();
-
-  mitk::CastToMitkImage(addFilter->GetOutput(), resultImage);
+  AccessByItk_2(input, itkErode2, output, maxDistance);
 }
 
-void erode(mitk::Image::Pointer input, mitk::Image::Pointer &output, bool &segmentationRemaining)
-{
-  AccessByItk_2(input, itkErode, output, segmentationRemaining);
-}
-void add(mitk::Image::Pointer inputA, mitk::Image::Pointer inputB, mitk::Image::Pointer &output)
-{
-  AccessByItk_2(inputA, itkAdd, inputB, output);
-}
 
 void erodeAndAdd(mitk::Image::Pointer input, mitk::Image::Pointer& finalOutput, int &maxDistance)
 {
-  mitk::Image::Pointer workingImage = input;
-  mitk::Image::Pointer output = input;
   maxDistance = 0;
-  bool segmentationRemaining = true;
-  while (segmentationRemaining)
-  {
-    mitk::Image::Pointer erodedImage = mitk::Image::New();
-    mitk::Image::Pointer result = mitk::Image::New();
-    erode(workingImage, erodedImage, segmentationRemaining);
-    workingImage = erodedImage;
-    add(output, erodedImage, result);
-    output = result;
-    ++maxDistance;
-  }
-  finalOutput = output;
+  erode(input, finalOutput, maxDistance);
 }
 
 
@@ -326,6 +325,7 @@ CalculateGreyLevelDistanceZoneFeatures(itk::Image<TPixel, VImageDimension>* itkI
   int maximumDistance = 0;
   mitk::Image::Pointer mitkDistanceImage = mitk::Image::New();
   erodeAndAdd(config.distanceMask, mitkDistanceImage, maximumDistance);
+  mitk::IOUtil::Save(mitkDistanceImage, "e:/tmp/distance_image.nrrd");
   typename MaskType::Pointer distanceImage = MaskType::New();
   mitk::CastToItkImage(mitkDistanceImage, distanceImage);
 
@@ -365,7 +365,7 @@ CalculateGreyLevelDistanceZoneFeatures(itk::Image<TPixel, VImageDimension>* itkI
 
   MITK_INFO << "Maximum Distance: " << maximumDistance;
   std::vector<mitk::GreyLevelDistanceZoneFeatures> resultVector;
-  mitk::GreyLevelDistanceZoneMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins, maximumDistance+1);
+  mitk::GreyLevelDistanceZoneMatrixHolder holderOverall(config.Quantifier, numberOfBins, maximumDistance+1);
   mitk::GreyLevelDistanceZoneFeatures overallFeature;
   CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, distanceImage, offsetVector, false, holderOverall);
   CalculateFeatures(holderOverall, overallFeature);
@@ -428,6 +428,7 @@ mitk::GIFGreyLevelDistanceZone::FeatureListType mitk::GIFGreyLevelDistanceZone::
   config.MaximumIntensity = GetQuantifier()->GetMaximum();
   config.Bins = GetQuantifier()->GetBins();
   config.prefix = FeatureDescriptionPrefix();
+  config.Quantifier = GetQuantifier();
 
   AccessByItk_3(image, CalculateGreyLevelDistanceZoneFeatures, mask, featureList, config);
 

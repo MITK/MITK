@@ -5,6 +5,10 @@ set(SRC_CPP_FILES
   QmitkDnDFrameWidget.cpp
   QmitkSelectionServiceConnector.cpp
   QmitkSliceNavigationListener.cpp
+  QmitkSingleNodeSelectionWidget.cpp
+  QmitkNodeSelectionDialog.cpp
+  QmitkAbstractNodeSelectionWidget.cpp
+  QmitkMultiNodeSelectionWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -14,12 +18,21 @@ set(INTERNAL_CPP_FILES
   QmitkViewCoordinator.cpp
 )
 
+set(UI_FILES
+  src/QmitkSingleNodeSelectionWidget.ui
+  src/QmitkMultiNodeSelectionWidget.ui
+  src/QmitkNodeSelectionDialog.ui
+)
+
 set(MOC_H_FILES
   src/QmitkAbstractRenderEditor.h
   src/QmitkDnDFrameWidget.h
   src/QmitkSelectionServiceConnector.h
   src/QmitkSliceNavigationListener.h
-
+  src/QmitkSingleNodeSelectionWidget.h
+  src/QmitkNodeSelectionDialog.h
+  src/QmitkAbstractNodeSelectionWidget.h
+  src/QmitkMultiNodeSelectionWidget.h
   src/internal/QmitkCommonActivator.h
 )
 

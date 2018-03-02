@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
-#include "org_mitk_gui_qt_datastorageviewertest_Export.h"
+#include "org_mitk_gui_qt_common_Export.h"
 
 #include <QWidget>
 
@@ -35,7 +35,7 @@ class QAbstractItemVew;
 * \class QmitkAbstractNodeSelectionWidget
 * \brief Abstract base class for the selection of data from a data storage.
 */
-class DATASTORAGEVIEWERTEST_EXPORT QmitkAbstractNodeSelectionWidget : public QWidget
+class MITK_QT_COMMON QmitkAbstractNodeSelectionWidget : public QWidget
 {
   Q_OBJECT
 
@@ -48,7 +48,7 @@ public:
   * @par dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
- 
+
   /**
   * Sets the node predicate and updates the widget, according to the node predicate.
   * Implement OnNodePredicateChange() for custom actualization of a derived widget class.
@@ -58,7 +58,7 @@ public:
   void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
 
   mitk::NodePredicateBase* GetNodePredicate() const;
-  
+
   QString GetInvalidInfo() const;
   QString GetEmptyInfo() const;
   QString GetPopUpTitel() const;
@@ -115,7 +115,7 @@ public Q_SLOTS:
   * but a selection is optional.
   * The string can contain HTML code. if wanted*/
   void SetEmptyInfo(QString info);
-  
+
   /** Set the caption of the popup that is displayed to alter the selection.
   * The string can contain HTML code. if wanted*/
   void SetPopUpTitel(QString info);

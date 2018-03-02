@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeSelectionDialog.h"
 
-#include <QmitkDataStorageListViewWidget.h>
+#include <QmitkDataStorageListInspector.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent), m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false)
 {
   m_Controls.setupUi(this);
-  AddPanel(new QmitkDataStorageListViewWidget(this),"Test");
+  AddPanel(new QmitkDataStorageListInspector(this),"Test");
   m_Controls.tabWidget->setCurrentIndex(0);
   this->setWindowTitle(title);
   this->setToolTip(hint);
@@ -101,7 +101,7 @@ void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
   emit CurrentSelectionChanged(selectedNodes);
 };
 
-void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageViewWidget* view, QString name)
+void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name)
 {
   view->setParent(this);
   view->SetSelectionMode(m_SelectionMode);
@@ -116,7 +116,7 @@ void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageViewWidget* view
   verticalLayout->addWidget(view);
 
   m_Panels.push_back(view);
-  connect(view, &QmitkAbstractDataStorageViewWidget::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
+  connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
 };
 
 void QmitkNodeSelectionDialog::OnOK()

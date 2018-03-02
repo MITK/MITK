@@ -1,8 +1,4 @@
 set(SRC_CPP_FILES
-  QmitkSingleNodeSelectionWidget.cpp
-  QmitkNodeSelectionDialog.cpp
-  QmitkAbstractNodeSelectionWidget.cpp
-  QmitkMultiNodeSelectionWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -12,18 +8,11 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkDataStorageViewerTestControls.ui
-  src/QmitkSingleNodeSelectionWidget.ui
-  src/QmitkMultiNodeSelectionWidget.ui
-  src/QmitkNodeSelectionDialog.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkDataStorageViewerTestView.h
-  src/QmitkSingleNodeSelectionWidget.h
-  src/QmitkNodeSelectionDialog.h
-  src/QmitkAbstractNodeSelectionWidget.h
-  src/QmitkMultiNodeSelectionWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

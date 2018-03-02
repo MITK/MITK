@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
-#include <QmitkAbstractDataStorageViewWidget.h>
+#include <QmitkAbstractDataStorageInspector.h>
 
-#include "org_mitk_gui_qt_datastorageviewertest_Export.h"
+#include "org_mitk_gui_qt_common_Export.h"
 
 #include "ui_QmitkNodeSelectionDialog.h"
 
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \class QmitkNodeSelectionDialog
 * \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
 */
-class DATASTORAGEVIEWERTEST_EXPORT QmitkNodeSelectionDialog : public QDialog
+class MITK_QT_COMMON QmitkNodeSelectionDialog : public QDialog
 {
   Q_OBJECT
 
@@ -110,7 +110,7 @@ protected Q_SLOTS:
   void OnCancel();
 
 protected:
-  void AddPanel(QmitkAbstractDataStorageViewWidget*, QString name);
+  void AddPanel(QmitkAbstractDataStorageInspector*, QString name);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_NodePredicate;
@@ -119,7 +119,7 @@ protected:
 
   SelectionMode m_SelectionMode;
 
-  using PanelVectorType = std::vector<QmitkAbstractDataStorageViewWidget*>;
+  using PanelVectorType = std::vector<QmitkAbstractDataStorageInspector*>;
   PanelVectorType m_Panels;
 
   Ui_QmitkNodeSelectionDialog m_Controls;

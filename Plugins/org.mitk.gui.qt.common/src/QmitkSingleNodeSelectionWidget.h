@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QMITK_MULTI_NODE_SELECTION_WIDGET_H
-#define QMITK_MULTI_NODE_SELECTION_WIDGET_H
+#ifndef QMITK_SINGLE_NODE_SELECTION_WIDGET_H
+#define QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 
 #include <QmitkModelViewSelectionConnector.h>
 
@@ -24,9 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
-#include "org_mitk_gui_qt_datastorageviewertest_Export.h"
+#include "org_mitk_gui_qt_common_Export.h"
 
-#include "ui_QmitkMultiNodeSelectionWidget.h"
+#include "ui_QmitkSingleNodeSelectionWidget.h"
 
 #include <QmitkAbstractNodeSelectionWidget.h>
 
@@ -34,19 +34,19 @@ class QmitkAbstractDataStorageModel;
 class QAbstractItemVew;
 
 /**
-* \class QmitkMultiNodeSelectionWidget
+* \class QmitkSingleNodeSelectionWidget
 * \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
 */
-class DATASTORAGEVIEWERTEST_EXPORT QmitkMultiNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
+class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkMultiNodeSelectionWidget(QWidget* parent = nullptr);
+  explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
+
+  mitk::DataNode::Pointer GetSelectedNode() const;
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
-
-  NodeList GetSelectedNodes() const;
 
 Q_SIGNALS:
   /*
@@ -56,21 +56,23 @@ Q_SIGNALS:
   */
   void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
-  public Q_SLOTS:
+public Q_SLOTS:
   virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
   virtual void SetCurrentSelection(NodeList selectedNodes) override;
-  void OnEditSelection();
 
 protected:
+  mitk::DataNode::Pointer ExtractCurrentValidSelection(const NodeList& nodes) const;
   NodeList CompileEmitSelection() const;
 
+  virtual bool eventFilter(QObject *obj, QEvent *ev) override;
+  void EditSelection();
   virtual void UpdateInfo() override;
-  virtual void UpdateList();
 
   virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate);
 
-  NodeList m_CurrentSelection;
+  NodeList m_ExternalSelection;
+  mitk::DataNode::Pointer m_SelectedNode;
 
-  Ui_QmitkMultiNodeSelectionWidget m_Controls;
+  Ui_QmitkSingleNodeSelectionWidget m_Controls;
 };
-#endif // QmitkMultiNodeSelectionWidget_H
+#endif // QmitkSingleNodeSelectionWidget_H

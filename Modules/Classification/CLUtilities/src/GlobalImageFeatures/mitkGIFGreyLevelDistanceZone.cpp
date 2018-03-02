@@ -318,10 +318,6 @@ CalculateGreyLevelDistanceZoneFeatures(itk::Image<TPixel, VImageDimension>* itkI
   typedef itk::Offset<VImageDimension> OffsetType;
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
-  double rangeMin = config.MinimumIntensity;
-  double rangeMax = config.MaximumIntensity;
-  int numberOfBins = config.Bins;
-
   int maximumDistance = 0;
   mitk::Image::Pointer mitkDistanceImage = mitk::Image::New();
   erodeAndAdd(config.distanceMask, mitkDistanceImage, maximumDistance);
@@ -365,7 +361,7 @@ CalculateGreyLevelDistanceZoneFeatures(itk::Image<TPixel, VImageDimension>* itkI
 
   MITK_INFO << "Maximum Distance: " << maximumDistance;
   std::vector<mitk::GreyLevelDistanceZoneFeatures> resultVector;
-  mitk::GreyLevelDistanceZoneMatrixHolder holderOverall(config.Quantifier, numberOfBins, maximumDistance+1);
+  mitk::GreyLevelDistanceZoneMatrixHolder holderOverall(config.Quantifier, config.Bins, maximumDistance + 1);
   mitk::GreyLevelDistanceZoneFeatures overallFeature;
   CalculateGlSZMatrix<TPixel, VImageDimension>(itkImage, maskImage, distanceImage, offsetVector, false, holderOverall);
   CalculateFeatures(holderOverall, overallFeature);

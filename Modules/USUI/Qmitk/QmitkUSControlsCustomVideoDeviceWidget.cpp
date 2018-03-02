@@ -20,6 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkException.h>
 
+
+QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget()
+  : ui(new Ui::QmitkUSControlsCustomVideoDeviceWidget)
+{
+  this->RegisterService();
+}
+
+
 QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent)
   : QmitkUSAbstractCustomWidget(parent), ui(new Ui::QmitkUSControlsCustomVideoDeviceWidget)
 {

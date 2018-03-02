@@ -57,11 +57,8 @@ class QmitkUSControlsCustomVideoDeviceWidget : public QmitkUSAbstractCustomWidge
   */
   void SetDepthsForProbe(std::string probename);
 public:
-  /**
-    * Constructs widget object. All gui control elements will be disabled until
-    * QmitkUSAbstractCustomWidget::SetDevice() was called.
-    */
-  explicit QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent = 0);
+
+  QmitkUSControlsCustomVideoDeviceWidget();
   ~QmitkUSControlsCustomVideoDeviceWidget();
 
   /**
@@ -95,6 +92,11 @@ protected:
   mitk::USImageVideoSource::USImageCropping m_Cropping;
 
 private:
+  /**
+  * Constructs widget object. All gui control elements will be disabled until
+  * QmitkUSAbstractCustomWidget::SetDevice() was called.
+  */
+  QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent);
   Ui::QmitkUSControlsCustomVideoDeviceWidget*         ui;
 
   mitk::USVideoDeviceCustomControls::Pointer  m_ControlInterface;

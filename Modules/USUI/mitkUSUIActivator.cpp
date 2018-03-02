@@ -26,7 +26,7 @@ mitk::USUIActivator::~USUIActivator()
 {
 }
 
-void mitk::USUIActivator::Load(us::ModuleContext* context)
+void mitk::USUIActivator::Load(us::ModuleContext* /*context*/)
 {
   m_USCustomWidgets.push_back(new QmitkUSControlsCustomVideoDeviceWidget());
   m_USCustomWidgets.push_back(new QmitkUSControlsCustomDiPhASDeviceWidget());

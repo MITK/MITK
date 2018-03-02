@@ -53,10 +53,10 @@ void QmitkDataStorageDefaultListModel::NodeRemoved(const mitk::DataNode* node)
 
 QModelIndex QmitkDataStorageDefaultListModel::index(int row, int column, const QModelIndex &parent) const
 {
-  bool hastIndex = hasIndex(row, column, parent);
-  if (hastIndex)
+  bool hasIndex = this->hasIndex(row, column, parent);
+  if (hasIndex)
   {
-    return createIndex(row, column);
+    return this->createIndex(row, column);
   }
 
   return QModelIndex();

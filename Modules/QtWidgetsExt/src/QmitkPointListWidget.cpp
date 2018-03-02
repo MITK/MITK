@@ -32,22 +32,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
   : QWidget(parent),
-    m_PointListView(nullptr),
-    m_PointSetNode(nullptr),
-    m_Orientation(0),
-    m_MovePointUpBtn(nullptr),
-    m_MovePointDownBtn(nullptr),
-    m_RemovePointBtn(nullptr),
-    m_SavePointsBtn(nullptr),
-    m_LoadPointsBtn(nullptr),
-    m_ToggleAddPoint(nullptr),
-    m_AddPoint(nullptr),
-    m_DataInteractor(nullptr),
-    m_TimeStep(0),
-    m_EditAllowed(true),
-    m_NodeObserverTag(0),
-	m_TimeStepDisplay(nullptr)
-
+  m_PointListView(nullptr),
+  m_PointSetNode(nullptr),
+  m_Orientation(0),
+  m_MovePointUpBtn(nullptr),
+  m_MovePointDownBtn(nullptr),
+  m_RemovePointBtn(nullptr),
+  m_SavePointsBtn(nullptr),
+  m_LoadPointsBtn(nullptr),
+  m_ToggleAddPoint(nullptr),
+  m_AddPoint(nullptr),
+  m_TimeStepDisplay(nullptr),
+  m_DataInteractor(nullptr),
+  m_TimeStep(0),
+  m_EditAllowed(true),
+  m_NodeObserverTag(0)
 {
   m_PointListView = new QmitkPointListView();
 
@@ -182,7 +181,7 @@ void QmitkPointListWidget::SetupUi()
   m_TimeStepDisplay = new QLabel();
   lay3 = new QHBoxLayout(); 
 
-  m_TimeStepDisplay->setMaximumSize(50, 15);
+  m_TimeStepDisplay->setMaximumSize(200, 15);
   m_PointListView->m_TimeStepFaderLabel->setMaximumSize(10, 15);
 
   lay3->stretch(true);

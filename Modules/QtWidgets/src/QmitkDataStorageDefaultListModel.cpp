@@ -20,9 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
 
-QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent)
+QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
 {
-  // nothing here
 }
 
 void QmitkDataStorageDefaultListModel::DataStorageChanged()
@@ -89,7 +88,7 @@ int QmitkDataStorageDefaultListModel::columnCount(const QModelIndex &parent) con
 
 QVariant QmitkDataStorageDefaultListModel::data(const QModelIndex &index, int role) const
 {
-  if (!index.isValid())
+  if (!index.isValid() || index.model() != this)
   {
     return QVariant();
   }
@@ -119,7 +118,7 @@ QVariant QmitkDataStorageDefaultListModel::headerData(int section, Qt::Orientati
 
 Qt::ItemFlags QmitkDataStorageDefaultListModel::flags(const QModelIndex &index) const
 {
-  if (index.isValid())
+  if (index.isValid() && index.model() == this)
   {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
   }
@@ -130,15 +129,16 @@ Qt::ItemFlags QmitkDataStorageDefaultListModel::flags(const QModelIndex &index) 
 void QmitkDataStorageDefaultListModel::UpdateModelData()
 {
   mitk::DataStorage::SetOfObjects::ConstPointer dataNodes;
-  if (m_DataStorage != nullptr)
+  if (!m_DataStorage.IsExpired())
   {
-    if (m_NodePredicate != nullptr)
+    auto dataStorage = m_DataStorage.Lock();
+    if (m_NodePredicate.IsNotNull())
     {
-      dataNodes = m_DataStorage->GetSubset(m_NodePredicate);
+      dataNodes = dataStorage->GetSubset(m_NodePredicate);
     }
     else
     {
-      dataNodes = m_DataStorage->GetAll();
+      dataNodes = dataStorage->GetAll();
     }
   }
 

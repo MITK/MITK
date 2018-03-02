@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkDataStorage.h>
 #include <mitkNodePredicateBase.h>
+#include <mitkWeakPointer.h>
 
 // qt
 #include <QAbstractItemModel>
@@ -54,7 +55,7 @@ public:
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  mitk::DataStorage* GetDataStorage() { return m_DataStorage; }
+  mitk::DataStorage* GetDataStorage() { return m_DataStorage.Lock().GetPointer(); }
   /*
   * @brief Sets the node predicate and updates the model data, according to the node predicate.
   *
@@ -75,8 +76,16 @@ protected:
 
   QmitkAbstractDataStorageModel(QObject* parent = nullptr);
   QmitkAbstractDataStorageModel(mitk::DataStorage* dataStorage, QObject* parent = nullptr);
-  mitk::DataStorage* m_DataStorage;
+
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_NodePredicate;
+
+private:
+
+  /** Helper triggered on the storage delete event */
+  void SetDataStorageDeleted();
+
+  unsigned long m_DataStorageDeletedTag;
 
 };
 

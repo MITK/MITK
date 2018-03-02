@@ -34,14 +34,19 @@ QmitkAbstractDataStorageModel::QmitkAbstractDataStorageModel(mitk::DataStorage* 
 
 QmitkAbstractDataStorageModel::~QmitkAbstractDataStorageModel()
 {
-  if (nullptr != m_DataStorage)
+  if (!m_DataStorage.IsExpired())
   {
+    auto dataStorage = m_DataStorage.Lock();
+
+    // remove Listener for the data storage itself
+    dataStorage->RemoveObserver(m_DataStorageDeletedTag);
+
     // remove listener from data storage
-    m_DataStorage->AddNodeEvent.RemoveListener(
+    dataStorage->AddNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeAdded));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(
+    dataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeRemoved));
-    m_DataStorage->ChangedNodeEvent.RemoveListener(
+    dataStorage->ChangedNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeChanged));
   }
 }
@@ -53,31 +58,48 @@ void QmitkAbstractDataStorageModel::SetDataStorage(mitk::DataStorage* dataStorag
     return;
   }
 
-  if (nullptr != m_DataStorage)
+  if (!m_DataStorage.IsExpired())
   {
+    auto dataStorage = m_DataStorage.Lock();
+
+    // remove Listener for the data storage itself
+    dataStorage->RemoveObserver(m_DataStorageDeletedTag);
+
     // remove listener from old data storage
-    m_DataStorage->AddNodeEvent.RemoveListener(
+    dataStorage->AddNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeAdded));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(
+    dataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeRemoved));
-    m_DataStorage->ChangedNodeEvent.RemoveListener(
+    dataStorage->ChangedNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeChanged));
   }
 
   m_DataStorage = dataStorage;
 
-  if (nullptr != dataStorage)
+  if (!m_DataStorage.IsExpired())
   {
+    auto dataStorage = m_DataStorage.Lock();
+
+    // add Listener for the data storage itself
+    auto command = itk::SimpleMemberCommand<QmitkAbstractDataStorageModel>::New();
+    command->SetCallbackFunction(this, &QmitkAbstractDataStorageModel::SetDataStorageDeleted);
+    m_DataStorageDeletedTag = dataStorage->AddObserver(itk::DeleteEvent(), command);
+
     // add listener for new data storage
-    m_DataStorage->AddNodeEvent.AddListener(
+    dataStorage->AddNodeEvent.AddListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeAdded));
-    m_DataStorage->RemoveNodeEvent.AddListener(
+    dataStorage->RemoveNodeEvent.AddListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeRemoved));
-    m_DataStorage->ChangedNodeEvent.AddListener(
+    dataStorage->ChangedNodeEvent.AddListener(
       mitk::MessageDelegate1<QmitkAbstractDataStorageModel, const mitk::DataNode*>(this, &QmitkAbstractDataStorageModel::NodeChanged));
   }
   // update model if the data storage has been changed
   DataStorageChanged();
+}
+
+void QmitkAbstractDataStorageModel::SetDataStorageDeleted()
+{
+  this->SetDataStorage(nullptr);
 }
 
 void QmitkAbstractDataStorageModel::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)

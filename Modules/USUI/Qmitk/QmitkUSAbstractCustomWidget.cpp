@@ -104,7 +104,7 @@ void QmitkUSAbstractCustomWidget::UnregisterService()
   }
   catch (const std::exception &e)
   {
-    MITK_ERROR << e;
+    MITK_ERROR << e.what();
   }
 }
 

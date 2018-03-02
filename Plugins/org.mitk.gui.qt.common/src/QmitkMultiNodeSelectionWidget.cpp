@@ -94,6 +94,8 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
       emit CurrentSelectionChanged(newEmission);
     }
   }
+
+  delete dialog;
 };
 
 void QmitkMultiNodeSelectionWidget::UpdateInfo()

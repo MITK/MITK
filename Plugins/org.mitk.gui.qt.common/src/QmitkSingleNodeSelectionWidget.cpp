@@ -129,6 +129,8 @@ void QmitkSingleNodeSelectionWidget::EditSelection()
       this->UpdateInfo();
     }
   }
+
+  delete dialog;
 };
 
 void QmitkSingleNodeSelectionWidget::UpdateInfo()

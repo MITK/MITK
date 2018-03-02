@@ -122,11 +122,14 @@
            <string>Create a new segmentation</string>
           </property>
           <property name="text">
-           <string>...</string>
+           <string>&amp;New...</string>
           </property>
           <property name="icon">
            <iconset resource="../../resources/segmentation.qrc">
             <normaloff>:/segmentation/btnNew.png</normaloff>:/segmentation/btnNew.png</iconset>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextOnly</enum>
           </property>
          </widget>
         </item>

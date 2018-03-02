@@ -23,9 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <usModuleActivator.h>
 
-class QmitkUSControlsCustomVideoDeviceWidget;
-class QmitkUSControlsCustomDiPhASDeviceWidget;
-
 namespace mitk
 {
   class USUICustomWidgetFactory;
@@ -54,11 +51,8 @@ namespace mitk
     void Unload(us::ModuleContext* context) override;
 
   protected:
-    us::ServiceRegistration<QmitkUSAbstractCustomWidget>  m_ServiceRegistration;
 
-    std::vector<USUICustomWidgetFactory*>                 m_CustomWidgetFactory;
-    QmitkUSControlsCustomVideoDeviceWidget*               m_CustomVideoDeviceWidget;
-    QmitkUSControlsCustomDiPhASDeviceWidget*              m_CustomDiPhASDeviceWidget;
+    std::vector<QmitkUSAbstractCustomWidget*> m_USCustomWidgets; ///< Contains the currently available US custom controls widgets which are loaded on Load()
   };
 } // namespace mitk
 

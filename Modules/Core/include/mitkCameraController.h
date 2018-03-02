@@ -73,7 +73,8 @@ public:
     */
    void MoveCameraToPoint(const Point2D &planePoint);
 
-   void MoveBy(const Vector2D &moveVectorInMM);
+   // Move by moveVector in display coordinates
+   void MoveBy(const Vector2D &moveVector);
 
    void Zoom(ScalarType factor, const Point2D &zoomPointInMM);
 

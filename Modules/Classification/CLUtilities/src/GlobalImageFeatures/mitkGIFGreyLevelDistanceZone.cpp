@@ -190,7 +190,6 @@ void itkErode2(
         MaskType minimumDistance = oldDistance;
         for (unsigned int i = 0; i < distanceIter.Size(); ++i)
         {
-          auto current_value = distanceIter.GetPixel(i);
           minimumDistance = std::min<MaskType>(minimumDistance, 1+distanceIter.GetPixel(i));
         }
         if (minimumDistance != oldDistance)

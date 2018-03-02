@@ -18,11 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNodeSelectionDialog.h"
 
 #include <QmitkDataStorageListInspector.h>
+#include <QmitkDataStorageTreeInspector.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent), m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false)
 {
   m_Controls.setupUi(this);
-  AddPanel(new QmitkDataStorageListInspector(this),"Test");
+  AddPanel(new QmitkDataStorageListInspector(this),"List");
+  AddPanel(new QmitkDataStorageTreeInspector(this), "Rendering Tree");
   m_Controls.tabWidget->setCurrentIndex(0);
   this->setWindowTitle(title);
   this->setToolTip(hint);

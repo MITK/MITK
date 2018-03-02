@@ -7,7 +7,9 @@ set(CPP_FILES
   QmitkDataStorageDefaultListModel.cpp
   QmitkDataStorageListModel.cpp
   QmitkDataStorageTableModel.cpp
+  QmitkDataStorageSimpleTreeModel.cpp
   QmitkDataStorageTreeModel.cpp
+  QmitkDataStorageTreeModelInternalItem.cpp
   QmitkFileReaderOptionsDialog.cpp
   QmitkFileReaderWriterOptionsWidget.cpp
   QmitkFileWriterOptionsDialog.cpp
@@ -40,8 +42,9 @@ set(CPP_FILES
   QmitkPropertyItem.cpp
   QmitkPropertyItemDelegate.cpp
   QmitkPropertyItemModel.cpp
-  QmitkAbstractDataStorageViewWidget.cpp
-  QmitkDataStorageListViewWidget.cpp
+  QmitkAbstractDataStorageInspector.cpp
+  QmitkDataStorageListInspector.cpp
+  QmitkDataStorageTreeInspector.cpp
   QmitkModelViewSelectionConnector.cpp
 )
 
@@ -50,6 +53,8 @@ set(MOC_H_FILES
   include/QmitkDataStorageComboBox.h
   include/QmitkDataStorageTableModel.h
   include/QmitkDataStorageTreeModel.h
+  include/QmitkDataStorageSimpleTreeModel.h
+  include/QmitkDataStorageDefaultListModel.h
   include/QmitkFileReaderOptionsDialog.h
   include/QmitkFileReaderWriterOptionsWidget.h
   include/QmitkFileWriterOptionsDialog.h
@@ -75,8 +80,9 @@ set(MOC_H_FILES
   include/QmitkDataStorageComboBoxWithSelectNone.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
-  include/QmitkDataStorageListViewWidget.h
-  include/QmitkAbstractDataStorageViewWidget.h
+  include/QmitkDataStorageListInspector.h
+  include/QmitkAbstractDataStorageInspector.h
+  include/QmitkDataStorageTreeInspector.h
   include/QmitkModelViewSelectionConnector.h
 )
 
@@ -88,7 +94,8 @@ set(UI_FILES
   src/QmitkLevelWindowRangeChange.ui
   src/QmitkMemoryUsageIndicator.ui
   src/QmitkServiceListWidgetControls.ui
-  src/QmitkDataStorageListViewWidget.ui
+  src/QmitkDataStorageListInspector.ui
+  src/QmitkDataStorageTreeInspector.ui
 )
 
 set(QRC_FILES

@@ -76,7 +76,7 @@ public:
     * Constructs widget object. All gui control elements will be disabled until
     * QmitkUSAbstractCustomWidget::SetDevice() was called.
     */
-  explicit QmitkUSControlsCustomDiPhASDeviceWidget(QWidget *parent = 0);
+  QmitkUSControlsCustomDiPhASDeviceWidget();
   ~QmitkUSControlsCustomDiPhASDeviceWidget();
 
   /**
@@ -108,6 +108,7 @@ protected:
   void BlockSignalAndSetValue(QSpinBox* target, int value);
 
 private:
+  QmitkUSControlsCustomDiPhASDeviceWidget(QWidget *parent);
   Ui::QmitkUSControlsCustomDiPhASDeviceWidget*         ui;
   mitk::USDiPhASDeviceCustomControls::Pointer  m_ControlInterface;
   int m_OldReconstructionLines;

@@ -21,6 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkException.h>
 
+QmitkUSControlsCustomDiPhASDeviceWidget::QmitkUSControlsCustomDiPhASDeviceWidget()
+  : ui(new Ui::QmitkUSControlsCustomDiPhASDeviceWidget)
+{
+  this->RegisterService();
+}
+
 QmitkUSControlsCustomDiPhASDeviceWidget::QmitkUSControlsCustomDiPhASDeviceWidget(QWidget *parent)
   : QmitkUSAbstractCustomWidget(parent), ui(new Ui::QmitkUSControlsCustomDiPhASDeviceWidget)
 {
@@ -28,13 +34,6 @@ QmitkUSControlsCustomDiPhASDeviceWidget::QmitkUSControlsCustomDiPhASDeviceWidget
 
 QmitkUSControlsCustomDiPhASDeviceWidget::~QmitkUSControlsCustomDiPhASDeviceWidget()
 {
-  m_ControlInterface = dynamic_cast<mitk::USDiPhASDeviceCustomControls*>
-    (this->GetDevice()->GetControlInterfaceCustom().GetPointer());
-
-  if (m_ControlInterface.IsNotNull())
-  {
-    m_ControlInterface->passGUIOut([](QString /*str*/)->void {} );
-  }
   delete ui;
 }
 

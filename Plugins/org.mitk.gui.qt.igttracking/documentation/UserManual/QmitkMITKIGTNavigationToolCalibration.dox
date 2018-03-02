@@ -13,7 +13,7 @@ This view allows the calibration of navigation tools. The calibrated tools can b
  <li> The tool tip transformation from the local sensor coordinate system to a tool tip coordinate system defined by a tool tip position and a main tool axis (m_ToolTipPosition, m_ToolAxisOrientation). The tool axis is defined as the negative z-axis of the tool tip coordinate system.
  <li> The main axis of the representation object of the tool (e.g. a surface) has to be defined along the negative z-axis.
  </ul>
-\imageMacro{TrackingTool.svg,"Coordinate transforms associated to the tracking tool.",5.00}
+\imageMacro{TrackingTool.png,"Coordinate transforms associated to the tracking tool.",5.00}
 
 
 \section QmitkMITKIGTNavigationToolCalibrationPrerequisities Prerequisites
